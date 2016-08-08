@@ -1,15 +1,24 @@
 #include "mainwindow.h"
-#include <QtSvg/QGraphicsSvgItem>
+#include "canvas.h"
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    canvas->callKeyPress(event);
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    graphicsScene = new QGraphicsScene(this);
-    graphicsView = new QGraphicsView(graphicsScene, this);
-    setCentralWidget(graphicsView);
+    canvas = new Canvas(this);
+    setCentralWidget(canvas);
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::addUndoRedo(UndoRedo undoRedo)
+{
+    mUndoRedoStack.addUndoRedo(undoRedo);
 }
