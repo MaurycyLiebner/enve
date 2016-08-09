@@ -25,7 +25,7 @@ public:
     void addPathToSelection(VectorPath *path);
     void clearPathsSelection();
     void selectOnlyLastPressedPath();
-    void removePointFromSelection(PathPoint *point);
+    void removePointFromSelection(MovablePoint *point);
     void removePathFromSelection(VectorPath *path);
     void selectOnlyLastPressedPoint();
     bool isShiftPressed();
@@ -48,7 +48,7 @@ protected:
 
     void keyPressEvent(QKeyEvent *event);
     void clearPointsSelection();
-    void addPointToSelection(PathPoint *point);
+    void addPointToSelection(MovablePoint *point);
 
     void setCurrentPoint(PathPoint *point);
 
@@ -70,9 +70,9 @@ private:
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
     QList<VectorPath*> mPaths;
-    PathPoint *mLastPressedPoint = NULL;
-    PathPoint *mCurrentPoint = NULL;
-    QList<PathPoint*> mSelectedPoints;
+    MovablePoint *mLastPressedPoint = NULL;
+    PathPoint *mCurrentEndPoint = NULL;
+    QList<MovablePoint*> mSelectedPoints;
     VectorPath *mLastPressedPath = NULL;
     QList<VectorPath*> mSelectedPaths;
 };

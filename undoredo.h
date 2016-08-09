@@ -4,6 +4,7 @@
 #include <QList>
 #include "canvas.h"
 #include "vectorpath.h"
+#include "movablepoint.h"
 #include <QDebug>
 
 class UndoRedo
@@ -168,10 +169,10 @@ private:
     VectorPath *mDeletedPath;
 };
 
-class MovePathPointUndoRedo : public UndoRedo
+class MoveMovablePointUndoRedo : public UndoRedo
 {
 public:
-    MovePathPointUndoRedo(PathPoint *movedPoint,
+    MoveMovablePointUndoRedo(MovablePoint *movedPoint,
                          QPointF absPosBefore,
                          QPointF absPosAfter) : UndoRedo() {
         mMovedPoint = movedPoint;
@@ -188,7 +189,7 @@ public:
     }
 
 private:
-    PathPoint *mMovedPoint;
+    MovablePoint *mMovedPoint;
     QPointF mAbsPosBefore;
     QPointF mAbsPosAfter;
 };

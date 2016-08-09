@@ -57,7 +57,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         }
         mLastPressedPath = pathUnderMouse;
     } else {
-        PathPoint *pointUnderMouse = NULL;
+        MovablePoint *pointUnderMouse = NULL;
         foreach (VectorPath *path, mSelectedPaths) {
             pointUnderMouse = path->getPointAt(mPressPos, mCurrentMode);
             if(pointUnderMouse != NULL) {
@@ -68,29 +68,30 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 
         if(mCurrentMode == CanvasMode::ADD_POINT) {
-            if(pointUnderMouse == mCurrentPoint && pointUnderMouse != NULL) {
+            PathPoint *pathPointUnderMouse = (PathPoint*) pointUnderMouse;
+            if(pathPointUnderMouse == mCurrentEndPoint && pathPointUnderMouse != NULL) {
                 return;
             }
-            if(mCurrentPoint == NULL && pointUnderMouse == NULL) {
+            if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
                 VectorPath *newPath = new VectorPath(this);
                 addPath(newPath);
-                setCurrentPoint(newPath->addPoint(mPressPos, mCurrentPoint) );
+                setCurrentPoint(newPath->addPoint(mPressPos, mCurrentEndPoint) );
                 newPath->updatePathIfNeeded();
             } else {
-                if(pointUnderMouse == NULL) {
-                    setCurrentPoint(mCurrentPoint->addPoint(mPressPos) );
-                    mCurrentPoint->getParentPath()->updatePathIfNeeded();
-                } else if(mCurrentPoint == NULL) {
-                        setCurrentPoint(pointUnderMouse);
+                if(pathPointUnderMouse == NULL) {
+                    setCurrentPoint(mCurrentEndPoint->addPoint(mPressPos) );
+                    mCurrentEndPoint->getParentPath()->updatePathIfNeeded();
+                } else if(mCurrentEndPoint == NULL) {
+                        setCurrentPoint(pathPointUnderMouse);
                 } else {
-                    if(mCurrentPoint->getParentPath() == pointUnderMouse->getParentPath())
+                    if(mCurrentEndPoint->getParentPath() == pathPointUnderMouse->getParentPath())
                     {
-                        pointUnderMouse->connectToPoint(mCurrentPoint);
-                        pointUnderMouse->getParentPath()->updatePathIfNeeded();
+                        pathPointUnderMouse->connectToPoint(mCurrentEndPoint);
+                        pathPointUnderMouse->getParentPath()->updatePathIfNeeded();
                     }
                     else {
-                        connectPointsFromDifferentPaths(pointUnderMouse, mCurrentPoint);
-                        mCurrentPoint->getParentPath()->updatePathIfNeeded();
+                        connectPointsFromDifferentPaths(pathPointUnderMouse, mCurrentEndPoint);
+                        mCurrentEndPoint->getParentPath()->updatePathIfNeeded();
                     }
                     setCurrentPoint(NULL);
                 }
@@ -137,7 +138,7 @@ void Canvas::handleMovePointMouseRelease(QMouseEvent *event) {
             selectOnlyLastPressedPoint();
         }
     } else {
-        foreach(PathPoint *point, mSelectedPoints) {
+        foreach(MovablePoint *point, mSelectedPoints) {
             point->finishTransform();
         }
     }
@@ -222,15 +223,13 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
             mLastPressedPoint = NULL;
         }
         if(mFirstMouseMove) {
-            foreach(PathPoint *point, mSelectedPoints) {
+            foreach(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();
                 point->moveBy(event->pos() - mPressPos);
-                point->getParentPath()->updatePathIfNeeded();
             }
         } else {
-            foreach(PathPoint *point, mSelectedPoints) {
+            foreach(MovablePoint *point, mSelectedPoints) {
                 point->moveBy(event->pos() - mPressPos);
-                point->getParentPath()->updatePathIfNeeded();
             }
         }
     } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
@@ -274,7 +273,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         if(mCurrentMode == MOVE_POINT) {
             startNewUndoRedoSet();
 
-            foreach(PathPoint *point, mSelectedPoints) {
+            foreach(MovablePoint *point, mSelectedPoints) {
                 point->remove();
             }
 
@@ -305,7 +304,7 @@ void Canvas::clearPathsSelection()
 
 void Canvas::clearPointsSelection()
 {
-    foreach(PathPoint *point, mSelectedPoints) {
+    foreach(MovablePoint *point, mSelectedPoints) {
         point->deselect();
     }
     mSelectedPoints.clear();
@@ -319,7 +318,7 @@ void Canvas::addPathToSelection(VectorPath *path) {
     mSelectedPaths.append(path);
 }
 
-void Canvas::addPointToSelection(PathPoint *point)
+void Canvas::addPointToSelection(MovablePoint *point)
 {
     if(point->isSelected()) {
         return;
@@ -333,20 +332,20 @@ void Canvas::removePathFromSelection(VectorPath *path) {
     mSelectedPaths.removeOne(path);
 }
 
-void Canvas::removePointFromSelection(PathPoint *point) {
+void Canvas::removePointFromSelection(MovablePoint *point) {
     point->deselect();
     mSelectedPoints.removeOne(point);
 }
 
 void Canvas::setCurrentPoint(PathPoint *point)
 {
-    if(mCurrentPoint != NULL) {
-        mCurrentPoint->deselect();
+    if(mCurrentEndPoint != NULL) {
+        mCurrentEndPoint->deselect();
     }
     if(point != NULL) {
         point->select();
     }
-    mCurrentPoint = point;
+    mCurrentEndPoint = point;
 }
 
 void Canvas::selectOnlyLastPressedPath() {
@@ -380,13 +379,13 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
     if(pointSrc->hasNextPoint()) {
         PathPoint *point = pointSrc;
         while(point != NULL) {
-            setCurrentPoint(mCurrentPoint->addPoint(point->getAbsolutePos()));
+            setCurrentPoint(mCurrentEndPoint->addPoint(point->getAbsolutePos()));
             point = point->getNextPoint();
         }
     } else {
         PathPoint *point = pointSrc;
         while(point != NULL) {
-            setCurrentPoint(mCurrentPoint->addPoint(point->getAbsolutePos()));
+            setCurrentPoint(mCurrentEndPoint->addPoint(point->getAbsolutePos()));
             point = point->getPreviousPoint();
         }
     }

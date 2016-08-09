@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     canvas.cpp \
     childparent.cpp \
     undoredo.cpp \
-    connectedtomainwindow.cpp
+    connectedtomainwindow.cpp \
+    movablepoint.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -30,4 +31,5 @@ HEADERS  += mainwindow.h \
     childparent.h \
     undoredo.h \
     updatescheduler.h \
-    connectedtomainwindow.h
+    connectedtomainwindow.h \
+    movablepoint.h

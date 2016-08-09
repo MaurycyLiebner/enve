@@ -1,32 +1,25 @@
 #ifndef PATHPOINT_H
 #define PATHPOINT_H
-#include <QPointF>
-#include "valueanimators.h"
-#include <QPainter>
-#include "connectedtomainwindow.h"
+#include "movablepoint.h"
 
 class UndoRedoStack;
 
 class VectorPath;
 
-class PathPoint : public ConnectedToMainWindow
+enum CanvasMode : short;
+
+class PathPoint : public MovablePoint
 {
 public:
     PathPoint(QPointF absPos, VectorPath *vectorPath);
 
-    void startTransform();
-    void finishTransform();
+    void setStartCtrlPtRelativePos(QPointF startCtrlPt);
+    QPointF getStartCtrlPtRelativePos();
+    MovablePoint *getStartCtrlPt();
 
-    void setRelativePos(QPointF pos);
-    QPointF getRelativePos();
-
-    QPointF getAbsolutePos();
-
-    void setStartCtrlPt(QPointF startCtrlPt);
-    QPointF getStartCtrlPt();
-
-    void setEndCtrlPt(QPointF endCtrlPt);
-    QPointF getEndCtrlPt();
+    void setEndCtrlPtRelativePos(QPointF endCtrlPt);
+    QPointF getEndCtrlPtRelativePos();
+    MovablePoint *getEndCtrlPt();
 
     void draw(QPainter *p);
 
@@ -35,7 +28,6 @@ public:
 
     bool isEndPoint();
 
-    bool isPointAt(QPointF absPoint);
     void setAbsolutePos(QPointF pos);
 
     void setPointAsPrevious(PathPoint *pointToSet);
@@ -46,31 +38,21 @@ public:
     bool hasNextPoint();
     bool hasPreviousPoint();
 
-    VectorPath *getParentPath();
-
     PathPoint *addPoint(QPointF absPos);
-    bool isContainedInRect(QRectF absRect);
-    void moveBy(QPointF absTranslation);
-
-    void select();
-    void deselect();
-
-    bool isSelected();
 
     void connectToPoint(PathPoint *point);
     void disconnectFromPoint(PathPoint *point);
 
     void remove();
+
+    void moveBy(QPointF absTranslation);
+
+    MovablePoint *getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode);
 private:
-    bool mSelected = false;
-    static const qreal RADIUS;
     PathPoint *mNextPoint = NULL;
     PathPoint *mPreviousPoint = NULL;
-    QPointFAnimator mRelativePos;
-    QPointF mSavedAbsPos;
-    QPointFAnimator mStartCtrlPt;
-    QPointFAnimator mEndCtrlPt;
-    VectorPath *mVectorPath = NULL;
+    MovablePoint *mStartCtrlPt;
+    MovablePoint *mEndCtrlPt;
 };
 
 #endif // PATHPOINT_H

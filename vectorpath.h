@@ -23,9 +23,9 @@ public:
     PathPoint *addPoint(QPointF absPtPos, PathPoint *toPoint = NULL);
 
     bool pointInsidePath(QPointF point);
-    PathPoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
+    MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
 
-    void selectAndAddContainedPointsToList(QRectF absRect, QList<PathPoint*> *list);
+    void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint*> *list);
     bool isContainedIn(QRectF absRect);
 
     bool isSelected();

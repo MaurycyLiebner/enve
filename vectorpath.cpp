@@ -31,8 +31,8 @@ void VectorPath::updatePath()
                 break;
             }
             QPointF pointPos = point->getRelativePos();
-            mPath.cubicTo(pointPos + point->getEndCtrlPt(),
-                          pointPos + point->getStartCtrlPt(),
+            mPath.cubicTo(lastPoint->getEndCtrlPtRelativePos(),
+                          point->getStartCtrlPtRelativePos(),
                           pointPos);
             if(point == firstPointInPath) {
                 break;
@@ -158,26 +158,22 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     p->restore();
 }
 
-PathPoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
+MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
 {
+    MovablePoint *pointToReturn = NULL;
     foreach (PathPoint *point, mPoints) {
-        if(point->isPointAt(absPtPos)) {
-            if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-                return point;
-            } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
-                if(point->isEndPoint()) {
-                    return point;
-                }
-            }
+        pointToReturn = point->getPointAtAbsPos(absPtPos, currentCanvasMode);
+        if(pointToReturn != NULL) {
+            break;
         }
     }
-    return NULL;
+    return pointToReturn;
 }
 
 void VectorPath::selectAndAddContainedPointsToList(QRectF absRect,
-                                                   QList<PathPoint *> *list)
+                                                   QList<MovablePoint *> *list)
 {
-    foreach(PathPoint *point, mPoints) {
+    foreach(MovablePoint *point, mPoints) {
         if(point->isSelected()) {
             continue;
         }
