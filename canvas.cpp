@@ -5,10 +5,10 @@
 #include <QApplication>
 #include "undoredo.h"
 #include "mainwindow.h"
+#include "updatescheduler.h"
 
-Canvas::Canvas(MainWindow *parent) : QWidget(parent)
+Canvas::Canvas(MainWindow *parent) : QWidget(parent), ConnectedToMainWindow(parent)
 {
-    mMainWindow = parent;
 }
 
 void Canvas::callKeyPress(QKeyEvent *event)
@@ -53,7 +53,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 clearPathsSelection();
             }
             mSelecting = true;
-            mSelectionRect.setTopLeft(mPressPos);
+            startSelectionAtPoint(mPressPos);
         }
         mLastPressedPath = pathUnderMouse;
     } else {
@@ -102,7 +102,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                     clearPointsSelection();
                 }
                 mSelecting = true;
-                mSelectionRect.setTopLeft(mPressPos);
+                startSelectionAtPoint(mPressPos);
             } else {
                 if(pointUnderMouse->isSelected()) {
                     return;
@@ -113,13 +113,15 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             }
         }
     } // current mode allows interaction with points
+
+    callUpdateSchedulers();
 }
 
 void Canvas::handleMovePointMouseRelease(QMouseEvent *event) {
     if(mSelecting) {
-        mSelectionRect.setBottomRight(event->pos());
+        moveSecondSelectionPoint(event->pos());
         foreach (VectorPath *path, mSelectedPaths) {
-            path->SelectAndAddContainedPointsToList(mSelectionRect, &mSelectedPoints);
+            path->selectAndAddContainedPointsToList(mSelectionRect, &mSelectedPoints);
         }
         mSelecting = false;
     } else if(mFirstMouseMove) {
@@ -141,14 +143,26 @@ void Canvas::handleMovePointMouseRelease(QMouseEvent *event) {
     }
 }
 
-UndoRedoStack *Canvas::getUndoRedoStack()
+void Canvas::scheduleRepaint()
 {
-    return mMainWindow->getUndoRedoStack();
+    if(mRepaintNeeded) {
+        return;
+    }
+    addUpdateScheduler(new CanvasRepaintScheduler(this));
+    mRepaintNeeded = true;
+}
+
+void Canvas::repaintIfNeeded()
+{
+    if(mRepaintNeeded) {
+        repaint();
+        mRepaintNeeded = false;
+    }
 }
 
 void Canvas::handleMovePathMouseRelease(QMouseEvent *event) {
     if(mSelecting) {
-        mSelectionRect.setBottomRight(event->pos());
+        moveSecondSelectionPoint(event->pos());
         foreach (VectorPath *path, mPaths) {
             if(path->isContainedIn(mSelectionRect) ) {
                 addPathToSelection(path);
@@ -183,14 +197,25 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     }
     mLastPressedPath = NULL;
     mLastPressedPoint = NULL;
-    repaint();
+
+    callUpdateSchedulers();
+}
+
+void Canvas::moveSecondSelectionPoint(QPointF pos) {
+    mSelectionRect.setBottomRight(pos);
+    scheduleRepaint();
+}
+
+void Canvas::startSelectionAtPoint(QPointF pos) {
+    mSelectionRect.setTopLeft(pos);
+    mSelectionRect.setBottomRight(pos);
+    scheduleRepaint();
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
     if(mSelecting) {
-        mSelectionRect.setBottomRight(event->pos());
-        repaint();
+        moveSecondSelectionPoint(event->pos());
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         if(mLastPressedPoint != NULL) {
             addPointToSelection(mLastPressedPoint);
@@ -225,40 +250,43 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
                 path->updateMappedPathIfNeeded();
             }
         }
-        repaint();
     }
     mPressPos = event->pos();
     mFirstMouseMove = false;
+
+    callUpdateSchedulers();
+}
+
+void Canvas::setCanvasMode(CanvasMode mode) {
+    mCurrentMode = mode;
+    scheduleRepaint();
 }
 
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_F1) {
-        mCurrentMode = CanvasMode::MOVE_PATH;
-        repaint();
+        setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_F2) {
-        mCurrentMode = CanvasMode::MOVE_POINT;
-        repaint();
+        setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(event->key() == Qt::Key_F3) {
-        mCurrentMode = CanvasMode::ADD_POINT;
-        repaint();
+        setCanvasMode(CanvasMode::ADD_POINT);
     } else if(event->key() == Qt::Key_Delete) {
         if(mCurrentMode == MOVE_POINT) {
-            getUndoRedoStack()->startNewSet();
+            startNewUndoRedoSet();
 
             foreach(PathPoint *point, mSelectedPoints) {
                 point->remove();
             }
 
-            getUndoRedoStack()->finishSet();
+            finishUndoRedoSet();
         } else if(mCurrentMode == MOVE_PATH) {
-            getUndoRedoStack()->startNewSet();
+            startNewUndoRedoSet();
 
             foreach(VectorPath *path, mSelectedPaths) {
                 path->remove();
             }
 
-            getUndoRedoStack()->finishSet();
+            finishUndoRedoSet();
         }
     } else {
         return;
@@ -347,7 +375,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
     if(pointSrc->getParentPath() == pointDest->getParentPath()) {
         return;
     }
-    getUndoRedoStack()->startNewSet();
+    startNewUndoRedoSet();
     setCurrentPoint(pointDest);
     if(pointSrc->hasNextPoint()) {
         PathPoint *point = pointSrc;
@@ -365,7 +393,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
     VectorPath *pathSrc = pointSrc->getParentPath();
     removePath(pathSrc);
 
-    getUndoRedoStack()->finishSet();
+    finishUndoRedoSet();
 }
 
 void Canvas::addPath(VectorPath *path, bool saveUndoRedo)
@@ -375,7 +403,7 @@ void Canvas::addPath(VectorPath *path, bool saveUndoRedo)
 
     if(saveUndoRedo) {
         AddPathUndoRedo *undoRedo = new AddPathUndoRedo(path);
-        getUndoRedoStack()->addUndoRedo(undoRedo);
+        addUndoRedo(undoRedo);
     }
 }
 
@@ -388,6 +416,6 @@ void Canvas::removePath(VectorPath *path, bool saveUndoRedo)
 
     if(saveUndoRedo) {
         RemovePathUndoRedo *undoRedo = new RemovePathUndoRedo(path);
-        getUndoRedoStack()->addUndoRedo(undoRedo);
+        addUndoRedo(undoRedo);
     }
 }

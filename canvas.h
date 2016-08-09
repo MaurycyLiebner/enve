@@ -16,7 +16,7 @@ enum CanvasMode : short {
     ADD_POINT
 };
 
-class Canvas : public QWidget
+class Canvas : public QWidget, public ConnectedToMainWindow
 {
     Q_OBJECT
 public:
@@ -34,7 +34,12 @@ public:
     void addPath(VectorPath *path, bool saveUndoRedo = true);
     void removePath(VectorPath *path, bool saveUndoRedo = true);
 
-    UndoRedoStack *getUndoRedoStack();
+    void scheduleRepaint();
+
+    void repaintIfNeeded();
+    void setCanvasMode(CanvasMode mode);
+    void startSelectionAtPoint(QPointF pos);
+    void moveSecondSelectionPoint(QPointF pos);
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -51,13 +56,13 @@ protected:
 
     void handleMovePathMouseRelease(QMouseEvent *event);
     void handleMovePointMouseRelease(QMouseEvent *event);
-
 signals:
 
 public slots:
 
 private:
-    MainWindow *mMainWindow;
+    bool mRepaintNeeded = false;
+
     bool mFirstMouseMove = false;
     bool mSelecting = false;
 //    bool mMoving = false;

@@ -1,6 +1,7 @@
 #ifndef CHILDPARENT_H
 #define CHILDPARENT_H
 #include <QMatrix>
+#include "connectedtomainwindow.h"
 
 class UndoRedo;
 
@@ -8,7 +9,7 @@ class Canvas;
 
 class UndoRedoStack;
 
-class ChildParent
+class ChildParent : public ConnectedToMainWindow
 {
 public:
     ChildParent(Canvas *canvas);
@@ -29,8 +30,6 @@ public:
 
     void startTransform();
     void finishTransform();
-
-    UndoRedoStack *getUndoRedoStack();
 protected:
     virtual void updateAfterTransformationChanged();
     virtual void updateAfterCombinedTransformationChanged();

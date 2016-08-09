@@ -3,7 +3,7 @@
 #include "undoredo.h"
 #include <QDebug>
 
-ChildParent::ChildParent(Canvas *canvas)
+ChildParent::ChildParent(Canvas *canvas) : ConnectedToMainWindow(canvas)
 {
     mCanvas = canvas;
     mTransformMatrix.reset();
@@ -46,12 +46,7 @@ void ChildParent::finishTransform()
     TransformChildParentUndoRedo *undoRedo = new TransformChildParentUndoRedo(this,
                                                            mSavedTransformMatrix,
                                                            mTransformMatrix);
-    getUndoRedoStack()->addUndoRedo(undoRedo);
-}
-
-UndoRedoStack *ChildParent::getUndoRedoStack()
-{
-    return mCanvas->getUndoRedoStack();
+    addUndoRedo(undoRedo);
 }
 
 void ChildParent::moveBy(qreal dx, qreal dy)

@@ -6,12 +6,15 @@
 #include "canvas.h"
 #include "undoredo.h"
 
+class UpdateScheduler;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
     Canvas *canvas;
     UndoRedoStack mUndoRedoStack;
+    QList<UpdateScheduler*> mUpdateSchedulers;
 protected:
     void keyPressEvent(QKeyEvent *event);
 public:
@@ -19,6 +22,10 @@ public:
     ~MainWindow();
 
     UndoRedoStack *getUndoRedoStack();
+
+    void addUpdateScheduler(UpdateScheduler *scheduler);
+
+    void callUpdateSchedulers();
 };
 
 #endif // MAINWINDOW_H

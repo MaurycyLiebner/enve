@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include <QApplication>
 #include <QDebug>
+#include "updatescheduler.h"
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -16,6 +17,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     } else {
         canvas->callKeyPress(event);
     }
+
+    callUpdateSchedulers();
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -33,4 +36,18 @@ MainWindow::~MainWindow()
 UndoRedoStack *MainWindow::getUndoRedoStack()
 {
     return &mUndoRedoStack;
+}
+
+void MainWindow::addUpdateScheduler(UpdateScheduler *scheduler)
+{
+    mUpdateSchedulers << scheduler;
+}
+
+void MainWindow::callUpdateSchedulers()
+{
+    foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
+        sheduler->update();
+        delete sheduler;
+    }
+    mUpdateSchedulers.clear();
 }

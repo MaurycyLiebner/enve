@@ -3,10 +3,11 @@
 #include "canvas.h"
 #include <QDebug>
 #include "undoredo.h"
+#include "mainwindow.h"
+#include "updatescheduler.h"
 
 VectorPath::VectorPath(Canvas *canvas) : ChildParent(canvas)
 {
-
 }
 
 VectorPath::~VectorPath()
@@ -49,7 +50,13 @@ void VectorPath::remove() {
 
 void VectorPath::schedulePathUpdate()
 {
+    if(mPathUpdateNeeded) {
+        return;
+    }
+    addUpdateScheduler(new PathUpdateScheduler(this));
     mPathUpdateNeeded = true;
+    mMappedPathUpdateNeeded = false;
+    scheduleRepaint();
 }
 
 void VectorPath::updatePathIfNeeded()
@@ -71,7 +78,12 @@ void VectorPath::updateMappedPathIfNeeded()
 
 void VectorPath::scheduleMappedPathUpdate()
 {
+    if(mMappedPathUpdateNeeded || mPathUpdateNeeded) {
+        return;
+    }
+    addUpdateScheduler(new MappedPathUpdateScheduler(this));
     mMappedPathUpdateNeeded = true;
+    scheduleRepaint();
 }
 
 void VectorPath::updateAfterTransformationChanged()
@@ -87,7 +99,6 @@ void VectorPath::updateAfterCombinedTransformationChanged()
 void VectorPath::updateMappedPath()
 {
     mMappedPath = mCombinedTransformMatrix.map(mPath);
-    repaint();
 }
 
 bool VectorPath::isContainedIn(QRectF absRect) {
@@ -102,11 +113,13 @@ bool VectorPath::isSelected()
 void VectorPath::select()
 {
     mSelected = true;
+    scheduleRepaint();
 }
 
 void VectorPath::deselect()
 {
     mSelected = false;
+    scheduleRepaint();
 }
 
 QRectF VectorPath::getBoundingRect()
@@ -161,7 +174,7 @@ PathPoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode
     return NULL;
 }
 
-void VectorPath::SelectAndAddContainedPointsToList(QRectF absRect,
+void VectorPath::selectAndAddContainedPointsToList(QRectF absRect,
                                                    QList<PathPoint *> *list)
 {
     foreach(PathPoint *point, mPoints) {
@@ -181,8 +194,10 @@ void VectorPath::addPointToSeparatePaths(PathPoint *pointToAdd,
 
     if(saveUndoRedo) {
         AddPointToSeparatePathsUndoRedo *undoRedo = new AddPointToSeparatePathsUndoRedo(this, pointToAdd);
-        getUndoRedoStack()->addUndoRedo(undoRedo);
+        addUndoRedo(undoRedo);
     }
+
+    schedulePathUpdate();
 }
 
 void VectorPath::removePointFromSeparatePaths(PathPoint *pointToRemove,
@@ -191,15 +206,14 @@ void VectorPath::removePointFromSeparatePaths(PathPoint *pointToRemove,
 
     if(saveUndoRedo) {
         RemovePointFromSeparatePathsUndoRedo *undoRedo = new RemovePointFromSeparatePathsUndoRedo(this, pointToRemove);
-        getUndoRedoStack()->addUndoRedo(undoRedo);
+        addUndoRedo(undoRedo);
     }
-
+    schedulePathUpdate();
 }
 
 PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
 {
-    UndoRedoStack *stack = getUndoRedoStack();
-    stack->startNewSet();
+    startNewUndoRedoSet();
     appendToPointsList(pointToAdd);
     if(toPoint == NULL) {
         addPointToSeparatePaths(pointToAdd);
@@ -211,9 +225,7 @@ PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
             toPoint->setPointAsPrevious(pointToAdd);
         }
     }
-    stack->finishSet();
-
-    repaint();
+    finishUndoRedoSet();
 
     return pointToAdd;
 }
@@ -235,9 +247,8 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
 
     if(saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo = new AppendToPointsListUndoRedo(point, this);
-        getUndoRedoStack()->addUndoRedo(undoRedo);
+        addUndoRedo(undoRedo);
     }
-    repaint();
 }
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
@@ -245,14 +256,12 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
 
     if(saveUndoRedo) {
         RemoveFromPointsListUndoRedo *undoRedo = new RemoveFromPointsListUndoRedo(point, this);
-        getUndoRedoStack()->addUndoRedo(undoRedo);
+        addUndoRedo(undoRedo);
     }
-    repaint();
 }
 
 void VectorPath::removePoint(PathPoint *point) {
-    UndoRedoStack *stack = getUndoRedoStack();
-    stack->startNewSet();
+    startNewUndoRedoSet();
     PathPoint *prevPoint = point->getPreviousPoint();
     PathPoint *nextPoint = point->getNextPoint();
 
@@ -266,7 +275,7 @@ void VectorPath::removePoint(PathPoint *point) {
     }
     removeFromPointsList(point);
 
-    stack->finishSet();
+    finishUndoRedoSet();
 }
 
 bool VectorPath::pointInsidePath(QPointF point)
@@ -274,12 +283,13 @@ bool VectorPath::pointInsidePath(QPointF point)
     return mMappedPath.contains(point);
 }
 
-void VectorPath::repaint() {
-    getCanvas()->repaint();
+void VectorPath::scheduleRepaint() {
+    getCanvas()->scheduleRepaint();
 }
 
 void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
                                           PathPoint *newPoint) {
     mSeparatePaths.replace(mSeparatePaths.indexOf(pointBeingReplaced),
                            newPoint);
+    schedulePathUpdate();
 }

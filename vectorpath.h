@@ -6,6 +6,8 @@
 
 class Canvas;
 
+class MainWindow;
+
 enum CanvasMode : short;
 
 class VectorPath : public ChildParent
@@ -23,7 +25,7 @@ public:
     bool pointInsidePath(QPointF point);
     PathPoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
 
-    void SelectAndAddContainedPointsToList(QRectF absRect, QList<PathPoint*> *list);
+    void selectAndAddContainedPointsToList(QRectF absRect, QList<PathPoint*> *list);
     bool isContainedIn(QRectF absRect);
 
     bool isSelected();
@@ -34,7 +36,7 @@ public:
     Canvas *getCanvas();
 
     void removePoint(PathPoint *point);
-    void repaint();
+    void scheduleRepaint();
     void replaceSeparatePathPoint(PathPoint *pointBeingReplaced, PathPoint *newPoint);
     void addPointToSeparatePaths(PathPoint *pointToAdd, bool saveUndoRedo = true);
     void removePointFromSeparatePaths(PathPoint *pointToRemove, bool saveUndoRedo = true);

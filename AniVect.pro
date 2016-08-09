@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     valueanimators.cpp \
     canvas.cpp \
     childparent.cpp \
-    undoredo.cpp
+    undoredo.cpp \
+    connectedtomainwindow.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -27,4 +28,6 @@ HEADERS  += mainwindow.h \
     valueanimators.h \
     canvas.h \
     childparent.h \
-    undoredo.h
+    undoredo.h \
+    updatescheduler.h \
+    connectedtomainwindow.h

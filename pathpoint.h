@@ -3,12 +3,13 @@
 #include <QPointF>
 #include "valueanimators.h"
 #include <QPainter>
+#include "connectedtomainwindow.h"
 
 class UndoRedoStack;
 
 class VectorPath;
 
-class PathPoint
+class PathPoint : public ConnectedToMainWindow
 {
 public:
     PathPoint(QPointF absPos, VectorPath *vectorPath);
@@ -55,7 +56,6 @@ public:
     void deselect();
 
     bool isSelected();
-    UndoRedoStack *getUndoRedoStack();
 
     void connectToPoint(PathPoint *point);
     void disconnectFromPoint(PathPoint *point);
