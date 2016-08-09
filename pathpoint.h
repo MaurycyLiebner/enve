@@ -4,6 +4,7 @@
 #include "valueanimators.h"
 #include <QPainter>
 
+class UndoRedoStack;
 
 class VectorPath;
 
@@ -11,6 +12,9 @@ class PathPoint
 {
 public:
     PathPoint(QPointF absPos, VectorPath *vectorPath);
+
+    void startTransform();
+    void finishTransform();
 
     void setRelativePos(QPointF pos);
     QPointF getRelativePos();
@@ -32,14 +36,14 @@ public:
 
     bool isPointAt(QPointF absPoint);
     void setAbsolutePos(QPointF pos);
+
     void setPointAsPrevious(PathPoint *pointToSet);
     void setPointAsNext(PathPoint *pointToSet);
+    void setNextPoint(PathPoint *mNextPoint, bool saveUndoRedo = true);
+    void setPreviousPoint(PathPoint *mPreviousPoint, bool saveUndoRedo = true);
 
-    void setNextPoint(PathPoint *mNextPoint);
-    void setPreviousPoint(PathPoint *mPreviousPoint);
     bool hasNextPoint();
     bool hasPreviousPoint();
-    void setPointAsNextOrPrevious(PathPoint *pointToSet);
 
     VectorPath *getParentPath();
 
@@ -51,12 +55,19 @@ public:
     void deselect();
 
     bool isSelected();
+    UndoRedoStack *getUndoRedoStack();
+
+    void connectToPoint(PathPoint *point);
+    void disconnectFromPoint(PathPoint *point);
+
+    void remove();
 private:
     bool mSelected = false;
     static const qreal RADIUS;
     PathPoint *mNextPoint = NULL;
     PathPoint *mPreviousPoint = NULL;
     QPointFAnimator mRelativePos;
+    QPointF mSavedAbsPos;
     QPointFAnimator mStartCtrlPt;
     QPointFAnimator mEndCtrlPt;
     VectorPath *mVectorPath = NULL;

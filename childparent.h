@@ -2,7 +2,11 @@
 #define CHILDPARENT_H
 #include <QMatrix>
 
+class UndoRedo;
+
 class Canvas;
+
+class UndoRedoStack;
 
 class ChildParent
 {
@@ -20,17 +24,19 @@ public:
 
     QPointF getAbsolutePos();
 
-    virtual void updateAfterTransformationChanged();
-    virtual void updateAfterCombinedTransformationChanged();
-
     void updateCombinedTransform();
     void moveBy(QPointF trans);
 
     void startTransform();
     void finishTransform();
+
+    UndoRedoStack *getUndoRedoStack();
 protected:
+    virtual void updateAfterTransformationChanged();
+    virtual void updateAfterCombinedTransformationChanged();
+
     Canvas *mCanvas;
-    QMatrix mSaveTransformMatrix;
+    QMatrix mSavedTransformMatrix;
     qreal mRot = 0.f;
     QMatrix mTransformMatrix;
     QMatrix mCombinedTransformMatrix;

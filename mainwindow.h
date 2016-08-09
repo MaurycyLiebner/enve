@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsView>
 #include "canvas.h"
+#include "undoredo.h"
 
 class MainWindow : public QMainWindow
 {
@@ -17,7 +18,7 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void addUndoRedo(UndoRedo undoRedo);
+    UndoRedoStack *getUndoRedoStack();
 };
 
 #endif // MAINWINDOW_H

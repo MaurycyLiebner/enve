@@ -14,11 +14,6 @@ public:
     VectorPath(Canvas *canvasT);
     ~VectorPath();
 
-    void updatePath();
-    void updateAfterTransformationChanged();
-    void updateAfterCombinedTransformationChanged();
-    void updateMappedPath();
-
     QRectF getBoundingRect();
     void draw(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
@@ -28,7 +23,7 @@ public:
     bool pointInsidePath(QPointF point);
     PathPoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
 
-    void addContainedPointsToList(QRectF absRect, QList<PathPoint*> *list);
+    void SelectAndAddContainedPointsToList(QRectF absRect, QList<PathPoint*> *list);
     bool isContainedIn(QRectF absRect);
 
     bool isSelected();
@@ -38,13 +33,36 @@ public:
 
     Canvas *getCanvas();
 
+    void removePoint(PathPoint *point);
+    void repaint();
+    void replaceSeparatePathPoint(PathPoint *pointBeingReplaced, PathPoint *newPoint);
+    void addPointToSeparatePaths(PathPoint *pointToAdd, bool saveUndoRedo = true);
+    void removePointFromSeparatePaths(PathPoint *pointToRemove, bool saveUndoRedo = true);
+    void appendToPointsList(PathPoint *point, bool saveUndoRedo = true);
+    void removeFromPointsList(PathPoint *point, bool saveUndoRedo = true);
+    void remove();
+
+    void schedulePathUpdate();
+    void scheduleMappedPathUpdate();
+
+    void updatePathIfNeeded();
+    void updateMappedPathIfNeeded();
 private:
+    void updatePath();
+    void updateMappedPath();
+
+    bool mPathUpdateNeeded = false;
+    bool mMappedPathUpdateNeeded = false;
+
     bool mSelected = false;
     bool mClosedPath = false;
     QList<PathPoint*> mSeparatePaths;
     QList<PathPoint*> mPoints;
     QPainterPath mPath;
     QPainterPath mMappedPath;
+protected:
+    void updateAfterTransformationChanged();
+    void updateAfterCombinedTransformationChanged();
 };
 
 #endif // VECTORPATH_H

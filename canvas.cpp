@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
+#include "undoredo.h"
 #include "mainwindow.h"
 
 Canvas::Canvas(MainWindow *parent) : QWidget(parent)
@@ -34,7 +35,7 @@ void Canvas::paintEvent(QPaintEvent *)
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
-    mMouseClick = true;
+    mFirstMouseMove = true;
     mPressPos = event->pos();
     if(mCurrentMode == CanvasMode::MOVE_PATH) {
         VectorPath *pathUnderMouse = NULL;
@@ -74,18 +75,22 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 VectorPath *newPath = new VectorPath(this);
                 addPath(newPath);
                 setCurrentPoint(newPath->addPoint(mPressPos, mCurrentPoint) );
+                newPath->updatePathIfNeeded();
             } else {
                 if(pointUnderMouse == NULL) {
                     setCurrentPoint(mCurrentPoint->addPoint(mPressPos) );
+                    mCurrentPoint->getParentPath()->updatePathIfNeeded();
                 } else if(mCurrentPoint == NULL) {
                         setCurrentPoint(pointUnderMouse);
                 } else {
                     if(mCurrentPoint->getParentPath() == pointUnderMouse->getParentPath())
                     {
-                        pointUnderMouse->setPointAsNextOrPrevious(mCurrentPoint);
+                        pointUnderMouse->connectToPoint(mCurrentPoint);
+                        pointUnderMouse->getParentPath()->updatePathIfNeeded();
                     }
                     else {
                         connectPointsFromDifferentPaths(pointUnderMouse, mCurrentPoint);
+                        mCurrentPoint->getParentPath()->updatePathIfNeeded();
                     }
                     setCurrentPoint(NULL);
                 }
@@ -110,50 +115,71 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     } // current mode allows interaction with points
 }
 
+void Canvas::handleMovePointMouseRelease(QMouseEvent *event) {
+    if(mSelecting) {
+        mSelectionRect.setBottomRight(event->pos());
+        foreach (VectorPath *path, mSelectedPaths) {
+            path->SelectAndAddContainedPointsToList(mSelectionRect, &mSelectedPoints);
+        }
+        mSelecting = false;
+    } else if(mFirstMouseMove) {
+        if(isShiftPressed()) {
+            if(mLastPressedPoint != NULL) {
+                if(mLastPressedPoint->isSelected()) {
+                    removePointFromSelection(mLastPressedPoint);
+                } else {
+                    addPointToSelection(mLastPressedPoint);
+                }
+            }
+        } else {
+            selectOnlyLastPressedPoint();
+        }
+    } else {
+        foreach(PathPoint *point, mSelectedPoints) {
+            point->finishTransform();
+        }
+    }
+}
+
+UndoRedoStack *Canvas::getUndoRedoStack()
+{
+    return mMainWindow->getUndoRedoStack();
+}
+
+void Canvas::handleMovePathMouseRelease(QMouseEvent *event) {
+    if(mSelecting) {
+        mSelectionRect.setBottomRight(event->pos());
+        foreach (VectorPath *path, mPaths) {
+            if(path->isContainedIn(mSelectionRect) ) {
+                addPathToSelection(path);
+            }
+        }
+        mSelecting = false;
+    } else if(mFirstMouseMove) {
+        if(isShiftPressed()) {
+            if(mLastPressedPath != NULL) {
+                if(mLastPressedPath->isSelected()) {
+                    removePathFromSelection(mLastPressedPath);
+                } else {
+                    addPathToSelection(mLastPressedPath);
+                }
+            }
+        } else {
+            selectOnlyLastPressedPath();
+        }
+    } else {
+        foreach(VectorPath *path, mSelectedPaths) {
+            path->finishTransform();
+        }
+    }
+}
+
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
     if(mCurrentMode == CanvasMode::MOVE_POINT) {
-        if(mSelecting) {
-            mSelectionRect.setBottomRight(event->pos());
-            foreach (VectorPath *path, mSelectedPaths) {
-                path->addContainedPointsToList(mSelectionRect, &mSelectedPoints);
-            }
-            mSelecting = false;
-        } else if(mMouseClick) {
-            if(isShiftPressed()) {
-                if(mLastPressedPoint != NULL) {
-                    if(mLastPressedPoint->isSelected()) {
-                        removePointFromSelection(mLastPressedPoint);
-                    } else {
-                        addPointToSelection(mLastPressedPoint);
-                    }
-                }
-            } else {
-                selectOnlyLastPressedPoint();
-            }
-        }
+        handleMovePointMouseRelease(event);
     } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
-        if(mSelecting) {
-            mSelectionRect.setBottomRight(event->pos());
-            foreach (VectorPath *path, mPaths) {
-                if(path->isContainedIn(mSelectionRect) ) {
-                    addPathToSelection(path);
-                }
-            }
-            mSelecting = false;
-        } else if(mMouseClick) {
-            if(isShiftPressed()) {
-                if(mLastPressedPath != NULL) {
-                    if(mLastPressedPath->isSelected()) {
-                        removePathFromSelection(mLastPressedPath);
-                    } else {
-                        addPathToSelection(mLastPressedPath);
-                    }
-                }
-            } else {
-                selectOnlyLastPressedPath();
-            }
-        }
+        handleMovePathMouseRelease(event);
     }
     mLastPressedPath = NULL;
     mLastPressedPoint = NULL;
@@ -162,35 +188,47 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
-    mMouseClick = false;
     if(mSelecting) {
         mSelectionRect.setBottomRight(event->pos());
         repaint();
-        return;
-    }
-    if(mCurrentMode == CanvasMode::MOVE_POINT) {
+    } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         if(mLastPressedPoint != NULL) {
             addPointToSelection(mLastPressedPoint);
             mLastPressedPoint = NULL;
         }
-        foreach(PathPoint *point, mSelectedPoints) {
-            point->moveBy(event->pos() - mPressPos);
+        if(mFirstMouseMove) {
+            foreach(PathPoint *point, mSelectedPoints) {
+                point->startTransform();
+                point->moveBy(event->pos() - mPressPos);
+                point->getParentPath()->updatePathIfNeeded();
+            }
+        } else {
+            foreach(PathPoint *point, mSelectedPoints) {
+                point->moveBy(event->pos() - mPressPos);
+                point->getParentPath()->updatePathIfNeeded();
+            }
         }
     } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
         if(mLastPressedPath != NULL) {
             addPathToSelection(mLastPressedPath);
             mLastPressedPath = NULL;
         }
-        foreach(VectorPath *path, mSelectedPaths) {
-            path->moveBy(event->pos() - mPressPos);
+        if(mFirstMouseMove) {
+            foreach(VectorPath *path, mSelectedPaths) {
+                path->startTransform();
+                path->moveBy(event->pos() - mPressPos);
+                path->updateMappedPathIfNeeded();
+            }
+        } else {
+            foreach(VectorPath *path, mSelectedPaths) {
+                path->moveBy(event->pos() - mPressPos);
+                path->updateMappedPathIfNeeded();
+            }
         }
         repaint();
     }
     mPressPos = event->pos();
-
-//    if(mCurrentPoint != NULL && ) {
-//        mCurrentPoint->setAbsolutePos(event->pos());
-//    }
+    mFirstMouseMove = false;
 }
 
 void Canvas::keyPressEvent(QKeyEvent *event)
@@ -204,6 +242,24 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     } else if(event->key() == Qt::Key_F3) {
         mCurrentMode = CanvasMode::ADD_POINT;
         repaint();
+    } else if(event->key() == Qt::Key_Delete) {
+        if(mCurrentMode == MOVE_POINT) {
+            getUndoRedoStack()->startNewSet();
+
+            foreach(PathPoint *point, mSelectedPoints) {
+                point->remove();
+            }
+
+            getUndoRedoStack()->finishSet();
+        } else if(mCurrentMode == MOVE_PATH) {
+            getUndoRedoStack()->startNewSet();
+
+            foreach(VectorPath *path, mSelectedPaths) {
+                path->remove();
+            }
+
+            getUndoRedoStack()->finishSet();
+        }
     } else {
         return;
     }
@@ -265,11 +321,6 @@ void Canvas::setCurrentPoint(PathPoint *point)
     mCurrentPoint = point;
 }
 
-void Canvas::addUndoRedo(UndoRedo undoRedo)
-{
-    mMainWindow->addUndoRedo(undoRedo);
-}
-
 void Canvas::selectOnlyLastPressedPath() {
     clearPathsSelection();
     if(mLastPressedPath == NULL) {
@@ -296,6 +347,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
     if(pointSrc->getParentPath() == pointDest->getParentPath()) {
         return;
     }
+    getUndoRedoStack()->startNewSet();
     setCurrentPoint(pointDest);
     if(pointSrc->hasNextPoint()) {
         PathPoint *point = pointSrc;
@@ -312,18 +364,30 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
     }
     VectorPath *pathSrc = pointSrc->getParentPath();
     removePath(pathSrc);
+
+    getUndoRedoStack()->finishSet();
 }
 
-void Canvas::addPath(VectorPath *path)
+void Canvas::addPath(VectorPath *path, bool saveUndoRedo)
 {
     mPaths.append(path);
-    addPathToSelection(newPath);
+    addPathToSelection(path);
+
+    if(saveUndoRedo) {
+        AddPathUndoRedo *undoRedo = new AddPathUndoRedo(path);
+        getUndoRedoStack()->addUndoRedo(undoRedo);
+    }
 }
 
-void Canvas::removePath(VectorPath *path)
+void Canvas::removePath(VectorPath *path, bool saveUndoRedo)
 {
     mPaths.removeOne(path);
     if(path->isSelected()) {
         removePathFromSelection(path);
+    }
+
+    if(saveUndoRedo) {
+        RemovePathUndoRedo *undoRedo = new RemovePathUndoRedo(path);
+        getUndoRedoStack()->addUndoRedo(undoRedo);
     }
 }

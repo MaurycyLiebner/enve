@@ -2,10 +2,13 @@
 #define CANVAS_H
 
 #include <QWidget>
-#include "undoredo.h"
 #include "vectorpath.h"
 
 class MainWindow;
+
+class UndoRedo;
+
+class UndoRedoStack;
 
 enum CanvasMode : short {
     MOVE_PATH,
@@ -26,10 +29,12 @@ public:
     void removePathFromSelection(VectorPath *path);
     void selectOnlyLastPressedPoint();
     bool isShiftPressed();
-    void connectPointsFromDifferentPaths(PathPoint *point1, PathPoint *pointDest);
+    void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
 
-    void addPath(VectorPath *path);
-    void removePath(VectorPath *path);
+    void addPath(VectorPath *path, bool saveUndoRedo = true);
+    void removePath(VectorPath *path, bool saveUndoRedo = true);
+
+    UndoRedoStack *getUndoRedoStack();
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -44,14 +49,16 @@ protected:
 
     PathPoint *getCurrentPoint();
 
-    void addUndoRedo(UndoRedo undoRedo);
+    void handleMovePathMouseRelease(QMouseEvent *event);
+    void handleMovePointMouseRelease(QMouseEvent *event);
+
 signals:
 
 public slots:
 
 private:
     MainWindow *mMainWindow;
-    bool mMouseClick = false;
+    bool mFirstMouseMove = false;
     bool mSelecting = false;
 //    bool mMoving = false;
     QPoint mPressPos;

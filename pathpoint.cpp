@@ -1,5 +1,6 @@
 #include "pathpoint.h"
 #include "vectorpath.h"
+#include "undoredo.h"
 #include <QPainter>
 
 const qreal PathPoint::RADIUS = 10.f;
@@ -10,6 +11,56 @@ PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath)
     setAbsolutePos(absPos);
 }
 
+void PathPoint::startTransform()
+{
+    mSavedAbsPos = getAbsolutePos();
+}
+
+void PathPoint::finishTransform()
+{
+    MovePathPointUndoRedo *undoRedo = new MovePathPointUndoRedo(this,
+                                                           mSavedAbsPos,
+                                                           getAbsolutePos());
+    getUndoRedoStack()->addUndoRedo(undoRedo);
+}
+
+UndoRedoStack *PathPoint::getUndoRedoStack() {
+    return mVectorPath->getUndoRedoStack();
+}
+
+void PathPoint::connectToPoint(PathPoint *point)
+{
+    if(point == NULL) {
+        return;
+    }
+    if(!hasNextPoint()) {
+        setPointAsNext(point);
+    } else if(!hasPreviousPoint()) {
+        setPointAsPrevious(point);
+    } else {
+        return;
+    }
+}
+
+void PathPoint::disconnectFromPoint(PathPoint *point)
+{
+    if(point == NULL) {
+        return;
+    }
+    if(point == mNextPoint) {
+        setPointAsNext(NULL);
+    } else if(point == mPreviousPoint) {
+        setPointAsPrevious(NULL);
+    } else {
+        return;
+    }
+}
+
+void PathPoint::remove()
+{
+    mVectorPath->removePoint(this);
+}
+
 void PathPoint::setAbsolutePos(QPointF pos)
 {
     setRelativePos(mVectorPath->getCombinedTransform().inverted().map(pos));
@@ -18,7 +69,7 @@ void PathPoint::setAbsolutePos(QPointF pos)
 void PathPoint::setRelativePos(QPointF pos)
 {
     mRelativePos.setCurrentValue(pos, false);
-    mVectorPath->updatePath();
+    mVectorPath->schedulePathUpdate();
 }
 
 QPointF PathPoint::getRelativePos()
@@ -34,7 +85,7 @@ QPointF PathPoint::getAbsolutePos()
 void PathPoint::setStartCtrlPt(QPointF startCtrlPt)
 {
     mStartCtrlPt.setCurrentValue(startCtrlPt, false);
-    mVectorPath->updatePath();
+    mVectorPath->schedulePathUpdate();
 }
 
 QPointF PathPoint::getStartCtrlPt()
@@ -45,7 +96,7 @@ QPointF PathPoint::getStartCtrlPt()
 void PathPoint::setEndCtrlPt(QPointF endCtrlPt)
 {
     mEndCtrlPt.setCurrentValue(endCtrlPt, false);
-    mVectorPath->updatePath();
+    mVectorPath->schedulePathUpdate();
 }
 
 QPointF PathPoint::getEndCtrlPt()
@@ -74,14 +125,28 @@ PathPoint *PathPoint::getPreviousPoint()
     return mPreviousPoint;
 }
 
-void PathPoint::setNextPoint(PathPoint *nextPoint)
+void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
 {
+    if(saveUndoRedo) {
+        SetNextPointUndoRedo *undoRedo = new SetNextPointUndoRedo(this,
+                                                                  mNextPoint,
+                                                                  nextPoint);
+        getUndoRedoStack()->addUndoRedo(undoRedo);
+    }
     mNextPoint = nextPoint;
+    mVectorPath->schedulePathUpdate();
 }
 
-void PathPoint::setPreviousPoint(PathPoint *previousPoint)
+void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
 {
+    if(saveUndoRedo) {
+        SetPreviousPointUndoRedo *undoRedo = new SetPreviousPointUndoRedo(this,
+                                                                      mPreviousPoint,
+                                                                      previousPoint);
+        getUndoRedoStack()->addUndoRedo(undoRedo);
+    }
     mPreviousPoint = previousPoint;
+    mVectorPath->schedulePathUpdate();
 }
 
 bool PathPoint::hasNextPoint() {
@@ -93,24 +158,33 @@ bool PathPoint::hasPreviousPoint() {
 }
 
 void PathPoint::setPointAsNext(PathPoint *pointToSet) {
+    UndoRedoStack *stack = getUndoRedoStack();
+    stack->startNewSet();
+
+    if(hasNextPoint()) {
+        mNextPoint->setPreviousPoint(NULL);
+    }
     setNextPoint(pointToSet);
-    pointToSet->setPreviousPoint(this);
-    mVectorPath->updatePath();
+    if(pointToSet != NULL) {
+        pointToSet->setPreviousPoint(this);
+    }
+
+    stack->finishSet();
 }
 
 void PathPoint::setPointAsPrevious(PathPoint *pointToSet) {
-    setPreviousPoint(pointToSet);
-    pointToSet->setNextPoint(this);
-    mVectorPath->updatePath();
-}
+    UndoRedoStack *stack = getUndoRedoStack();
+    stack->startNewSet();
 
-void PathPoint::setPointAsNextOrPrevious(PathPoint *pointToSet) {
-    if(!hasNextPoint()) {
-        setPointAsNext(pointToSet);
-    } else if(!hasPreviousPoint()) {
-        setPointAsPrevious(pointToSet);
+    if(hasPreviousPoint()) {
+        mPreviousPoint->setNextPoint(NULL);
+    }
+    setPreviousPoint(pointToSet);
+    if(pointToSet != NULL) {
+        pointToSet->setNextPoint(this);
     }
 
+    stack->finishSet();
 }
 
 VectorPath *PathPoint::getParentPath()

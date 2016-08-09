@@ -4,6 +4,7 @@
 #include <QList>
 #include "canvas.h"
 #include "vectorpath.h"
+#include <QDebug>
 
 class UndoRedo
 {
@@ -17,52 +18,66 @@ public:
 class UndoRedoSet : public UndoRedo
 {
 public:
-    UndoRedoSet() : UndoRedo() {}
+    UndoRedoSet() : UndoRedo() {
+    }
     void undo() {
-        foreach(UndoRedo undoRedo, mSet) {
-            undoRedo.undo();
+        for(int i = mSet.length() - 1; i >= 0; i--) {
+            mSet.at(i)->undo();
         }
     }
 
     void redo() {
-        foreach(UndoRedo undoRedo, mSet) {
-            undoRedo.redo();
+        foreach(UndoRedo* undoRedo, mSet) {
+            undoRedo->redo();
         }
     }
 
-    void addUndoRedo(UndoRedo undoRedo) {
+    void addUndoRedo(UndoRedo* undoRedo) {
         mSet << undoRedo;
     }
 
 private:
-    QList<UndoRedo> mSet;
+    QList<UndoRedo*> mSet;
 };
 
 class UndoRedoStack {
 public:
     UndoRedoStack() {}
     void startNewSet() {
-        mCurrentSet = UndoRedoSet();
-        mAddToSet = true;
+        if(mNumberOfSets == 0) {
+            mCurrentSet = new UndoRedoSet();
+        }
+        mNumberOfSets++;
     }
 
     void finishSet() {
-        mAddToSet = false;
-        addSet();
+        mNumberOfSets--;
+        if(mNumberOfSets == 0) {
+            addSet();
+            mCurrentSet = NULL;
+        }
     }
 
     void addSet() {
-        addUndoRedo((UndoRedo) mCurrentSet);
+        addUndoRedo(mCurrentSet);
     }
 
-    void addToSet(UndoRedo undoRedo) {
-        mCurrentSet.addUndoRedo(undoRedo);
+    void addToSet(UndoRedo *undoRedo) {
+        mCurrentSet->addUndoRedo(undoRedo);
     }
 
-    void addUndoRedo(UndoRedo undoRedo) {
-        if(mAddToSet) {
+    void clearRedoStack() {
+        foreach (UndoRedo *redoStackItem, mRedoStack) {
+            delete redoStackItem;
+        }
+        mRedoStack.clear();
+    }
+
+    void addUndoRedo(UndoRedo *undoRedo) {
+        if(mNumberOfSets != 0) {
             addToSet(undoRedo);
         } else {
+            clearRedoStack();
             mUndoStack << undoRedo;
         }
     }
@@ -71,24 +86,24 @@ public:
         if(mRedoStack.isEmpty()) {
             return;
         }
-        UndoRedo toRedo = mRedoStack.takeLast();
-        toRedo.redo();
+        UndoRedo *toRedo = mRedoStack.takeLast();
+        toRedo->redo();
         mUndoStack << toRedo;
     }
     void undo() {
         if(mUndoStack.isEmpty()) {
             return;
         }
-        UndoRedo toUndo = mUndoStack.takeLast();
-        toUndo.undo();
+        UndoRedo *toUndo = mUndoStack.takeLast();
+        toUndo->undo();
         mRedoStack << toUndo;
     }
 
 private:
-    bool mAddToSet = false;
-    UndoRedoSet mCurrentSet;
-    QList<UndoRedo> mUndoStack;
-    QList<UndoRedo> mRedoStack;
+    int mNumberOfSets = 0;
+    UndoRedoSet *mCurrentSet;
+    QList<UndoRedo*> mUndoStack;
+    QList<UndoRedo*> mRedoStack;
 };
 
 class TransformChildParentUndoRedo : public UndoRedo
@@ -116,19 +131,37 @@ private:
     QMatrix mTransformAfter;
 };
 
-class DeletePathUndoRedo : public UndoRedo
+class AddPathUndoRedo : public UndoRedo
 {
 public:
-    DeletePathUndoRedo(VectorPath *deletedPath) : UndoRedo() {
-        mDeletedPath = deletedPath;
+    AddPathUndoRedo(VectorPath *createdPath) : UndoRedo() {
+        mCreatedPath = createdPath;
     }
 
     void redo() {
-        mDeletedPath->getCanvas()->removePath(mDeletedPath);
+        mCreatedPath->getCanvas()->addPath(mCreatedPath, false);
     }
 
     void undo() {
-        mDeletedPath->getCanvas()->addPath(mDeletedPath);
+        mCreatedPath->getCanvas()->removePath(mCreatedPath, false);
+    }
+
+private:
+    VectorPath *mCreatedPath;
+};
+
+class RemovePathUndoRedo : public AddPathUndoRedo
+{
+public:
+    RemovePathUndoRedo(VectorPath *removedPath) : AddPathUndoRedo(removedPath) {
+    }
+
+    void redo() {
+        AddPathUndoRedo::undo();
+    }
+
+    void undo() {
+        AddPathUndoRedo::redo();
     }
 
 private:
@@ -160,44 +193,122 @@ private:
     QPointF mAbsPosAfter;
 };
 
-class CreatePointUndoRedo : public UndoRedo
+class AppendToPointsListUndoRedo : public UndoRedo
 {
 public:
-    CreatePointUndoRedo(PathPoint *createdPoint) : UndoRedo(){
-        mCreatedPoint = createdPoint;
+    AppendToPointsListUndoRedo(PathPoint *pointToAdd, VectorPath *path) : UndoRedo() {
+        mPoint = pointToAdd;
+        mPath = path;
     }
 
-    virtual void redo() {
-        PathPoint *addToPoint = NULL;
-        if(mCreatedPoint->hasPreviousPoint()) {
-            addToPoint = mCreatedPoint->getPreviousPoint();
-        } else if(mCreatedPoint->hasNextPoint()) {
-            addToPoint = mCreatedPoint->getNextPoint();
-        }
-        mCreatedPoint->getParentPath()->addPoint(mCreatedPoint, addToPoint);
+    void redo() {
+        mPath->appendToPointsList(mPoint, false);
     }
 
-    virtual void undo() {
-        mCreatedPoint->getParentPath()->removePoint(mCreatedPoint);
+    void undo() {
+        mPath->removeFromPointsList(mPoint, false);
     }
 
 private:
-    PathPoint *mCreatedPoint;
+    PathPoint *mPoint;
+    VectorPath *mPath;
 };
 
-class DeletePointUndoRedo : public CreatePointUndoRedo
+class RemoveFromPointsListUndoRedo : public AppendToPointsListUndoRedo
 {
 public:
-    DeletePointUndoRedo(PathPoint *deletedPoint) : CreatePointUndoRedo(deletedPoint) {
+    RemoveFromPointsListUndoRedo(PathPoint *pointToRemove, VectorPath *path) : AppendToPointsListUndoRedo(pointToRemove, path) {
+    }
+
+    void redo() {
+        AppendToPointsListUndoRedo::undo();
+    }
+
+    void undo() {
+        AppendToPointsListUndoRedo::redo();
+    }
+};
+
+class SetNextPointUndoRedo : public UndoRedo
+{
+public:
+    SetNextPointUndoRedo(PathPoint *point, PathPoint *oldNext, PathPoint *newNext) : UndoRedo() {
+        mNewNext = newNext;
+        mOldNext = oldNext;
+        mPoint = point;
+    }
+
+    void redo(){
+        mPoint->setNextPoint(mNewNext, false);
+    }
+
+    void undo() {
+        mPoint->setNextPoint(mOldNext, false);
+    }
+
+private:
+    PathPoint *mNewNext;
+    PathPoint *mOldNext;
+    PathPoint *mPoint;
+};
+
+class SetPreviousPointUndoRedo : public UndoRedo
+{
+public:
+    SetPreviousPointUndoRedo(PathPoint *point, PathPoint *oldPrevious, PathPoint *newPrevious) : UndoRedo() {
+        mNewPrev = newPrevious;
+        mOldPrev = oldPrevious;
+        mPoint = point;
+    }
+
+    void redo(){
+        mPoint->setPreviousPoint(mNewPrev, false);
+    }
+
+    void undo() {
+        mPoint->setPreviousPoint(mOldPrev, false);
+    }
+
+private:
+    PathPoint *mNewPrev;
+    PathPoint *mOldPrev;
+    PathPoint *mPoint;
+};
+
+class AddPointToSeparatePathsUndoRedo : public UndoRedo
+{
+public:
+    AddPointToSeparatePathsUndoRedo(VectorPath *path, PathPoint *point) : UndoRedo() {
+        mPath = path;
+        mPoint = point;
+    }
+
+    void redo() {
+        mPath->addPointToSeparatePaths(mPoint, false);
+    }
+
+    void undo() {
+        mPath->removePointFromSeparatePaths(mPoint, false);
+    }
+
+private:
+    VectorPath *mPath;
+    PathPoint *mPoint;
+};
+
+class RemovePointFromSeparatePathsUndoRedo : public AddPointToSeparatePathsUndoRedo
+{
+public:
+    RemovePointFromSeparatePathsUndoRedo(VectorPath *path, PathPoint *point) : AddPointToSeparatePathsUndoRedo(path, point) {
 
     }
 
     void redo() {
-        CreatePointUndoRedo::redo();
+        AddPointToSeparatePathsUndoRedo::undo();
     }
 
     void undo() {
-        CreatePointUndoRedo::undo();
+        AddPointToSeparatePathsUndoRedo::redo();
     }
 };
 

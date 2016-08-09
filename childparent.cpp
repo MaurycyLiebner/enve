@@ -1,5 +1,6 @@
 #include "childparent.h"
 #include "canvas.h"
+#include "undoredo.h"
 #include <QDebug>
 
 ChildParent::ChildParent(Canvas *canvas)
@@ -37,15 +38,20 @@ void ChildParent::moveBy(QPointF trans)
 
 void ChildParent::startTransform()
 {
-    mSaveTransformMatrix = mTransformMatrix;
+    mSavedTransformMatrix = mTransformMatrix;
 }
 
 void ChildParent::finishTransform()
 {
-    TransformChildParentUndoRedo undoRedo = TransformChildParentUndoRedo(this,
-                                                           mSaveTransformMatrix,
+    TransformChildParentUndoRedo *undoRedo = new TransformChildParentUndoRedo(this,
+                                                           mSavedTransformMatrix,
                                                            mTransformMatrix);
-    mCanvas->addUndoRedo(undoRedo);
+    getUndoRedoStack()->addUndoRedo(undoRedo);
+}
+
+UndoRedoStack *ChildParent::getUndoRedoStack()
+{
+    return mCanvas->getUndoRedoStack();
 }
 
 void ChildParent::moveBy(qreal dx, qreal dy)

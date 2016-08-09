@@ -1,9 +1,21 @@
 #include "mainwindow.h"
 #include "canvas.h"
+#include <QKeyEvent>
+#include <QApplication>
+#include <QDebug>
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    canvas->callKeyPress(event);
+    if(event->key() == Qt::Key_Z &&
+            (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
+        if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+            mUndoRedoStack.redo();
+        } else {
+            mUndoRedoStack.undo();
+        }
+    } else {
+        canvas->callKeyPress(event);
+    }
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -18,7 +30,7 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::addUndoRedo(UndoRedo undoRedo)
+UndoRedoStack *MainWindow::getUndoRedoStack()
 {
-    mUndoRedoStack.addUndoRedo(undoRedo);
+    return &mUndoRedoStack;
 }
