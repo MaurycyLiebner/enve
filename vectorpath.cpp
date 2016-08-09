@@ -5,15 +5,28 @@
 #include "undoredo.h"
 #include "mainwindow.h"
 #include "updatescheduler.h"
+#include "pathpivot.h"
 
 VectorPath::VectorPath(Canvas *canvas) : ChildParent(canvas)
 {
+    mRotPivot = new PathPivot(this);
 }
 
 VectorPath::~VectorPath()
 {
     foreach(PathPoint *point, mPoints) {
         delete point;
+    }
+}
+
+void VectorPath::updatePivotPosition() {
+    if(!mRotPivot->wasChanged()) {
+        QPointF posSum = QPointF(0.f, 0.f);
+        int count = mPoints.length();
+        foreach(PathPoint *point, mPoints) {
+            posSum += point->getAbsolutePos();
+        }
+        mRotPivot->setAbsolutePos(posSum/count);
     }
 }
 
@@ -138,10 +151,17 @@ void VectorPath::draw(QPainter *p)
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     p->save();
-    if(currentCanvasMode == CanvasMode::MOVE_PATH) {
+    if(currentCanvasMode == CanvasMode::MOVE_PATH_SCALE ||
+            currentCanvasMode == CanvasMode::MOVE_PATH_ROTATE ||
+            currentCanvasMode == CanvasMode::MOVE_PATH) {
+        QPen pen = p->pen();
         p->setPen(QPen(QColor(0, 0, 0, 125), 2, Qt::DotLine));
         p->setBrush(Qt::NoBrush);
         p->drawRect(getBoundingRect());
+        p->setPen(pen);
+        if(currentCanvasMode == CanvasMode::MOVE_PATH_ROTATE) {
+            mRotPivot->draw(p);
+        }
     } else if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
@@ -156,6 +176,10 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
         }
     }
     p->restore();
+}
+
+PathPivot *VectorPath::getPivotAt(QPointF absPos) {
+    return ( (mRotPivot->isPointAt(absPos)) ? mRotPivot : NULL );
 }
 
 MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
@@ -240,6 +264,7 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo = new AppendToPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
     }
+    updatePivotPosition();
 }
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
@@ -250,6 +275,7 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
         RemoveFromPointsListUndoRedo *undoRedo = new RemoveFromPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
     }
+    updatePivotPosition();
 }
 
 void VectorPath::removePoint(PathPoint *point) {

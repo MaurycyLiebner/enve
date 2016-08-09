@@ -4,23 +4,20 @@
 #include <QPainter>
 
 PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
-    MovablePoint(absPos, vectorPath, 10.f)
+    PathPoint(absPos, absPos, absPos, vectorPath)
 {
-    mStartCtrlPt = new MovablePoint(absPos, vectorPath);
-    mStartCtrlPt->hide();
-    mEndCtrlPt = new MovablePoint(absPos, vectorPath);
-    mEndCtrlPt->hide();
+
 }
 
 PathPoint::PathPoint(QPointF absPos,
                      QPointF startCtrlAbsPos,
                      QPointF endCtrlAbsPos,
                      VectorPath *vectorPath) :
-    MovablePoint(absPos, vectorPath, 10.f)
+    MovablePoint(absPos, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
 {
-    mStartCtrlPt = new MovablePoint(startCtrlAbsPos, vectorPath);
+    mStartCtrlPt = new MovablePoint(startCtrlAbsPos, vectorPath, MovablePointType::TYPE_CTRL_POINT);
     mStartCtrlPt->hide();
-    mEndCtrlPt = new MovablePoint(endCtrlAbsPos, vectorPath);
+    mEndCtrlPt = new MovablePoint(endCtrlAbsPos, vectorPath, MovablePointType::TYPE_CTRL_POINT);
     mEndCtrlPt->hide();
 }
 
@@ -176,14 +173,14 @@ MovablePoint *PathPoint::getEndCtrlPt()
 void PathPoint::draw(QPainter *p, CanvasMode mode)
 {
     if(mSelected) {
-        p->setBrush(QColor(0, 0, 255, 75));
+        p->setBrush(QColor(0, 0, 255, 155));
     } else {
-        p->setBrush(Qt::NoBrush);
+        p->setBrush(QColor(0, 0, 255, 75));
     }
     p->drawEllipse(getAbsolutePos(),
                    mRadius, mRadius);
     if(mode == CanvasMode::MOVE_POINT) {
-        p->save();
+        QPen pen = p->pen();
         p->setPen(QPen(Qt::black, 1.5f, Qt::DotLine));
         if(mEndCtrlPt->isVisible()) {
             p->drawLine(getAbsolutePos(), mEndCtrlPt->getAbsolutePos());
@@ -191,7 +188,7 @@ void PathPoint::draw(QPainter *p, CanvasMode mode)
         if(mStartCtrlPt->isVisible()) {
             p->drawLine(getAbsolutePos(), mStartCtrlPt->getAbsolutePos());
         }
-        p->restore();
+        p->setPen(pen);
         mEndCtrlPt->draw(p);
         mStartCtrlPt->draw(p);
     }

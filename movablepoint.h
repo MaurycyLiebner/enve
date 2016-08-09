@@ -9,10 +9,16 @@
 class VectorPath;
 class PathPoint;
 
+enum MovablePointType {
+    TYPE_PATH_POINT,
+    TYPE_CTRL_POINT,
+    TYPE_PIVOT_POINT
+};
+
 class MovablePoint : public ConnectedToMainWindow
 {
 public:
-    MovablePoint(QPointF absPos, VectorPath *vectorPath, qreal radius = 7.5f);
+    MovablePoint(QPointF absPos, VectorPath *vectorPath, MovablePointType type, qreal radius = 7.5f);
 
     virtual void startTransform();
     virtual void finishTransform();
@@ -45,7 +51,12 @@ public:
     bool isHidden();
     bool isVisible();
     void setVisible(bool bT);
+
+    bool isPathPoint();
+    bool isPivotPoint();
+    bool isCtrlPoint();
 protected:
+    MovablePointType mType;
     bool mHidden = false;
     bool mSelected = false;
     qreal mRadius;

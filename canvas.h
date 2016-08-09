@@ -12,6 +12,8 @@ class UndoRedoStack;
 
 enum CanvasMode : short {
     MOVE_PATH,
+    MOVE_PATH_SCALE,
+    MOVE_PATH_ROTATE,
     MOVE_POINT,
     ADD_POINT
 };
@@ -40,6 +42,8 @@ public:
     void setCanvasMode(CanvasMode mode);
     void startSelectionAtPoint(QPointF pos);
     void moveSecondSelectionPoint(QPointF pos);
+    void clearAllPointsSelection();
+    void clearAllPathsSelection();
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -50,12 +54,14 @@ protected:
     void clearPointsSelection();
     void addPointToSelection(MovablePoint *point);
 
-    void setCurrentPoint(PathPoint *point);
+    void setCurrentEndPoint(PathPoint *point);
 
     PathPoint *getCurrentPoint();
 
     void handleMovePathMouseRelease(QMouseEvent *event);
     void handleMovePointMouseRelease(QMouseEvent *event);
+
+    bool isMovingPath();
 signals:
 
 public slots:

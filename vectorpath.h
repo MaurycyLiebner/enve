@@ -8,6 +8,8 @@ class Canvas;
 
 class MainWindow;
 
+class PathPivot;
+
 enum CanvasMode : short;
 
 class VectorPath : public ChildParent
@@ -49,6 +51,8 @@ public:
 
     void updatePathIfNeeded();
     void updateMappedPathIfNeeded();
+    void updatePivotPosition();
+    PathPivot *getPivotAt(QPointF absPos);
 private:
     void updatePath();
     void updateMappedPath();
@@ -62,6 +66,7 @@ private:
     QList<PathPoint*> mPoints;
     QPainterPath mPath;
     QPainterPath mMappedPath;
+    PathPivot *mRotPivot;
 protected:
     void updateAfterTransformationChanged();
     void updateAfterCombinedTransformationChanged();

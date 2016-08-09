@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     childparent.cpp \
     undoredo.cpp \
     connectedtomainwindow.cpp \
-    movablepoint.cpp
+    movablepoint.cpp \
+    pathpivot.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -32,4 +33,5 @@ HEADERS  += mainwindow.h \
     undoredo.h \
     updatescheduler.h \
     connectedtomainwindow.h \
-    movablepoint.h
+    movablepoint.h \
+    pathpivot.h

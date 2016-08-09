@@ -2,8 +2,9 @@
 #include "vectorpath.h"
 #include "undoredo.h"
 
-MovablePoint::MovablePoint(QPointF absPos, VectorPath *vectorPath, qreal radius) : ConnectedToMainWindow(vectorPath)
+MovablePoint::MovablePoint(QPointF absPos, VectorPath *vectorPath, MovablePointType type, qreal radius) : ConnectedToMainWindow(vectorPath)
 {
+    mType = type;
     mRadius = radius;
     mVectorPath = vectorPath;
     setAbsolutePos(absPos);
@@ -49,7 +50,7 @@ void MovablePoint::draw(QPainter *p)
         return;
     }
     if(mSelected) {
-        p->setBrush(QColor(255, 0, 0, 255));
+        p->setBrush(QColor(255, 0, 0, 155));
     } else {
         p->setBrush(QColor(255, 0, 0, 75));
     }
@@ -138,4 +139,19 @@ void MovablePoint::setVisible(bool bT)
     } else {
         hide();
     }
+}
+
+bool MovablePoint::isPathPoint()
+{
+    return mType == MovablePointType::TYPE_PATH_POINT;
+}
+
+bool MovablePoint::isPivotPoint()
+{
+    return mType == MovablePointType::TYPE_PIVOT_POINT;
+}
+
+bool MovablePoint::isCtrlPoint()
+{
+    return mType == MovablePointType::TYPE_CTRL_POINT;
 }
