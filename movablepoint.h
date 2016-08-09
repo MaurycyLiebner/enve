@@ -12,10 +12,10 @@ class PathPoint;
 class MovablePoint : public ConnectedToMainWindow
 {
 public:
-    MovablePoint(QPointF absPos, VectorPath *vectorPath, qreal radius = 5.f);
+    MovablePoint(QPointF absPos, VectorPath *vectorPath, qreal radius = 7.5f);
 
-    void startTransform();
-    void finishTransform();
+    virtual void startTransform();
+    virtual void finishTransform();
 
     void setRelativePos(QPointF pos);
     QPointF getRelativePos();
@@ -31,6 +31,7 @@ public:
 
     bool isContainedInRect(QRectF absRect);
     virtual void moveBy(QPointF absTranslation);
+    virtual void moveToAbs(QPointF absPos);
 
     void select();
     void deselect();
@@ -38,7 +39,14 @@ public:
     bool isSelected();
 
     virtual void remove();
+
+    void hide();
+    void show();
+    bool isHidden();
+    bool isVisible();
+    void setVisible(bool bT);
 protected:
+    bool mHidden = false;
     bool mSelected = false;
     qreal mRadius;
     QPointFAnimator mRelativePos;

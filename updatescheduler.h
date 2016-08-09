@@ -36,20 +36,5 @@ private:
     VectorPath *mPath;
 };
 
-class CanvasRepaintScheduler : public UpdateScheduler {
-public:
-    CanvasRepaintScheduler(Canvas *canvas) : UpdateScheduler() {
-        mCanvas = canvas;
-    }
-
-    void update() {
-        mCanvas->repaintIfNeeded();
-    }
-
-private:
-    Canvas *mCanvas;
-};
-
-
 
 #endif // UPDATESCHEDULER_H

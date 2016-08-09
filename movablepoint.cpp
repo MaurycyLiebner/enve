@@ -45,10 +45,13 @@ QPointF MovablePoint::getAbsolutePos()
 
 void MovablePoint::draw(QPainter *p)
 {
+    if(mHidden) {
+        return;
+    }
     if(mSelected) {
-        p->setBrush(QColor(255, 0, 0, 200));
+        p->setBrush(QColor(255, 0, 0, 255));
     } else {
-        p->setBrush(QColor(255, 0, 0, 125));
+        p->setBrush(QColor(255, 0, 0, 75));
     }
     p->drawEllipse(getAbsolutePos(),
                    mRadius, mRadius);
@@ -61,17 +64,28 @@ VectorPath *MovablePoint::getParentPath()
 
 bool MovablePoint::isPointAt(QPointF absPoint)
 {
+    if(mHidden) {
+        return false;
+    }
     QPointF dist = getAbsolutePos() - absPoint;
     return (dist.x()*dist.x() + dist.y()*dist.y() < mRadius*mRadius);
 }
 
 bool MovablePoint::isContainedInRect(QRectF absRect)
 {
+    if(mHidden) {
+        return false;
+    }
     return absRect.contains(getAbsolutePos());
 }
 
 void MovablePoint::moveBy(QPointF absTranslation) {
     setAbsolutePos(getAbsolutePos() + absTranslation);
+}
+
+void MovablePoint::moveToAbs(QPointF absPos)
+{
+    setAbsolutePos(absPos);
 }
 
 void MovablePoint::select()
@@ -94,4 +108,34 @@ bool MovablePoint::isSelected()
 void MovablePoint::remove()
 {
 
+}
+
+void MovablePoint::hide()
+{
+    mHidden = true;
+    deselect();
+}
+
+void MovablePoint::show()
+{
+    mHidden = false;
+}
+
+bool MovablePoint::isHidden()
+{
+    return mHidden;
+}
+
+bool MovablePoint::isVisible()
+{
+    return !mHidden;
+}
+
+void MovablePoint::setVisible(bool bT)
+{
+    if(bT) {
+        show();
+    } else {
+        hide();
+    }
 }

@@ -3,10 +3,65 @@
 #include "undoredo.h"
 #include <QPainter>
 
-PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) : MovablePoint(absPos, vectorPath, 10.f)
+PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
+    MovablePoint(absPos, vectorPath, 10.f)
 {
     mStartCtrlPt = new MovablePoint(absPos, vectorPath);
+    mStartCtrlPt->hide();
     mEndCtrlPt = new MovablePoint(absPos, vectorPath);
+    mEndCtrlPt->hide();
+}
+
+PathPoint::PathPoint(QPointF absPos,
+                     QPointF startCtrlAbsPos,
+                     QPointF endCtrlAbsPos,
+                     VectorPath *vectorPath) :
+    MovablePoint(absPos, vectorPath, 10.f)
+{
+    mStartCtrlPt = new MovablePoint(startCtrlAbsPos, vectorPath);
+    mStartCtrlPt->hide();
+    mEndCtrlPt = new MovablePoint(endCtrlAbsPos, vectorPath);
+    mEndCtrlPt->hide();
+}
+
+void PathPoint::startTransform()
+{
+    MovablePoint::startTransform();
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->startTransform();
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->startTransform();
+    }
+}
+
+void PathPoint::finishTransform()
+{
+    startNewUndoRedoSet();
+    MovablePoint::finishTransform();
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->finishTransform();
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->finishTransform();
+    }
+    finishUndoRedoSet();
+}
+
+void PathPoint::moveBy(QPointF absTranslation)
+{
+    MovablePoint::moveBy(absTranslation);
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->moveBy(absTranslation);
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->moveBy(absTranslation);
+    }
+}
+
+void PathPoint::moveToAbs(QPointF absPos)
+{
+    moveBy(absPos - getAbsolutePos());
 }
 
 void PathPoint::connectToPoint(PathPoint *point)
@@ -42,11 +97,25 @@ void PathPoint::remove()
     mVectorPath->removePoint(this);
 }
 
-void PathPoint::moveBy(QPointF absTranslation)
-{
-    MovablePoint::moveBy(absTranslation);
-    mStartCtrlPt->moveBy(absTranslation);
-    mEndCtrlPt->moveBy(absTranslation);
+void PathPoint::rectPointsSelection(QRectF absRect, QList<MovablePoint*> *list) {
+    if(!isSelected()) {
+        if(isContainedInRect(absRect)) {
+            select();
+            list->append(this);
+        }
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        if(mEndCtrlPt->isContainedInRect(absRect)) {
+            mEndCtrlPt->select();
+            list->append(mEndCtrlPt);
+        }
+    }
+    if(!mStartCtrlPt->isSelected()) {
+        if(mStartCtrlPt->isContainedInRect(absRect)) {
+            mStartCtrlPt->select();
+            list->append(mStartCtrlPt);
+        }
+    }
 }
 
 MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
@@ -64,9 +133,14 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
     return NULL;
 }
 
-void PathPoint::setStartCtrlPtRelativePos(QPointF startCtrlPt)
+void PathPoint::setStartCtrlPtAbsPos(QPointF startCtrlPt)
 {
-    mStartCtrlPt->setRelativePos(startCtrlPt);
+    mStartCtrlPt->setAbsolutePos(startCtrlPt);
+}
+
+QPointF PathPoint::getStartCtrlPtAbsPos()
+{
+    return mStartCtrlPt->getAbsolutePos();
 }
 
 QPointF PathPoint::getStartCtrlPtRelativePos()
@@ -79,9 +153,14 @@ MovablePoint *PathPoint::getStartCtrlPt()
     return mStartCtrlPt;
 }
 
-void PathPoint::setEndCtrlPtRelativePos(QPointF endCtrlPt)
+void PathPoint::setEndCtrlPtAbsPos(QPointF endCtrlPt)
 {
-    mEndCtrlPt->setRelativePos(endCtrlPt);
+    mEndCtrlPt->setAbsolutePos(endCtrlPt);
+}
+
+QPointF PathPoint::getEndCtrlPtAbsPos()
+{
+    return mEndCtrlPt->getAbsolutePos();
 }
 
 QPointF PathPoint::getEndCtrlPtRelativePos()
@@ -94,7 +173,7 @@ MovablePoint *PathPoint::getEndCtrlPt()
     return mEndCtrlPt;
 }
 
-void PathPoint::draw(QPainter *p)
+void PathPoint::draw(QPainter *p, CanvasMode mode)
 {
     if(mSelected) {
         p->setBrush(QColor(0, 0, 255, 75));
@@ -103,8 +182,19 @@ void PathPoint::draw(QPainter *p)
     }
     p->drawEllipse(getAbsolutePos(),
                    mRadius, mRadius);
-    mEndCtrlPt->draw(p);
-    mStartCtrlPt->draw(p);
+    if(mode == CanvasMode::MOVE_POINT) {
+        p->save();
+        p->setPen(QPen(Qt::black, 1.5f, Qt::DotLine));
+        if(mEndCtrlPt->isVisible()) {
+            p->drawLine(getAbsolutePos(), mEndCtrlPt->getAbsolutePos());
+        }
+        if(mStartCtrlPt->isVisible()) {
+            p->drawLine(getAbsolutePos(), mStartCtrlPt->getAbsolutePos());
+        }
+        p->restore();
+        mEndCtrlPt->draw(p);
+        mStartCtrlPt->draw(p);
+    }
 }
 
 PathPoint* PathPoint::getNextPoint()
@@ -126,7 +216,48 @@ void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
         addUndoRedo(undoRedo);
     }
     mNextPoint = nextPoint;
+    updateEndCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();
+}
+
+void PathPoint::updateStartCtrlPtVisibility() {
+    if(mPreviousPoint == NULL) {
+        mStartCtrlPt->hide();
+    } else {
+        mStartCtrlPt->setVisible(mStartCtrlPtEnabled);
+    }
+}
+
+void PathPoint::updateEndCtrlPtVisibility() {
+    if(mNextPoint == NULL) {
+        mEndCtrlPt->hide();
+    } else {
+        mEndCtrlPt->setVisible(mEndCtrlPtEnabled);
+    }
+}
+
+void PathPoint::setEndCtrlPtEnabled(bool enabled)
+{
+    mEndCtrlPtEnabled = enabled;
+    mEndCtrlPt->setAbsolutePos(getAbsolutePos());
+    updateEndCtrlPtVisibility();
+}
+
+void PathPoint::setStartCtrlPtEnabled(bool enabled)
+{
+    mStartCtrlPtEnabled = enabled;
+    mStartCtrlPt->setAbsolutePos(getAbsolutePos());
+    updateStartCtrlPtVisibility();
+}
+
+void PathPoint::setSeparatePathPoint(bool separatePathPoint)
+{
+    mSeparatePathPoint = separatePathPoint;
+}
+
+bool PathPoint::isSeparatePathPoint()
+{
+    return mSeparatePathPoint;
 }
 
 void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
@@ -138,6 +269,7 @@ void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
         addUndoRedo(undoRedo);
     }
     mPreviousPoint = previousPoint;
+    updateStartCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();
 }
 
@@ -180,6 +312,11 @@ void PathPoint::setPointAsPrevious(PathPoint *pointToSet) {
 PathPoint *PathPoint::addPoint(QPointF absPos)
 {
     return mVectorPath->addPoint(absPos, this);
+}
+
+PathPoint *PathPoint::addPoint(PathPoint *pointToAdd)
+{
+    return mVectorPath->addPoint(pointToAdd, this);
 }
 
 bool PathPoint::isEndPoint() {

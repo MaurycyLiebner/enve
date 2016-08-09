@@ -15,7 +15,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             mUndoRedoStack.undo();
         }
     } else {
-        canvas->callKeyPress(event);
+        mCanvas->callKeyPress(event);
     }
 
     callUpdateSchedulers();
@@ -24,8 +24,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    canvas = new Canvas(this);
-    setCentralWidget(canvas);
+    mCanvas = new Canvas(this);
+    setCentralWidget(mCanvas);
 }
 
 MainWindow::~MainWindow()
@@ -50,4 +50,5 @@ void MainWindow::callUpdateSchedulers()
         delete sheduler;
     }
     mUpdateSchedulers.clear();
+    mCanvas->repaintIfNeeded();
 }

@@ -145,13 +145,13 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     } else if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
-            point->draw(p);
+            point->draw(p, currentCanvasMode);
         }
     } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
             if(point->isEndPoint()) {
-                point->draw(p);
+                point->draw(p, currentCanvasMode);
             }
         }
     }
@@ -173,31 +173,26 @@ MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasM
 void VectorPath::selectAndAddContainedPointsToList(QRectF absRect,
                                                    QList<MovablePoint *> *list)
 {
-    foreach(MovablePoint *point, mPoints) {
-        if(point->isSelected()) {
-            continue;
-        }
-        if(point->isContainedInRect(absRect)) {
-            point->select();
-            list->append(point);
-        }
+    foreach(PathPoint *point, mPoints) {
+        point->rectPointsSelection(absRect, list);
     }
 }
 
 void VectorPath::addPointToSeparatePaths(PathPoint *pointToAdd,
                                          bool saveUndoRedo) {
     mSeparatePaths.append(pointToAdd);
+    pointToAdd->setSeparatePathPoint(true);
 
     if(saveUndoRedo) {
         AddPointToSeparatePathsUndoRedo *undoRedo = new AddPointToSeparatePathsUndoRedo(this, pointToAdd);
         addUndoRedo(undoRedo);
     }
-
     schedulePathUpdate();
 }
 
 void VectorPath::removePointFromSeparatePaths(PathPoint *pointToRemove,
                                               bool saveUndoRedo) {
+    pointToRemove->setSeparatePathPoint(false);
     mSeparatePaths.removeOne(pointToRemove);
 
     if(saveUndoRedo) {
@@ -240,7 +235,7 @@ PathPoint* VectorPath::addPoint(QPointF absPtPos, PathPoint *toPoint)
 
 void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.append(point);
-
+    point->show();
     if(saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo = new AppendToPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
@@ -249,7 +244,8 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.removeOne(point);
-
+    point->hide();
+    point->deselect();
     if(saveUndoRedo) {
         RemoveFromPointsListUndoRedo *undoRedo = new RemoveFromPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
@@ -262,6 +258,9 @@ void VectorPath::removePoint(PathPoint *point) {
     PathPoint *nextPoint = point->getNextPoint();
 
     if(prevPoint != NULL) {
+        if(point->isSeparatePathPoint()) {
+            replaceSeparatePathPoint(point, prevPoint);
+        }
         prevPoint->setPointAsNext(nextPoint);
     } else if (nextPoint != NULL){
         replaceSeparatePathPoint(point, nextPoint);
@@ -285,7 +284,8 @@ void VectorPath::scheduleRepaint() {
 
 void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
                                           PathPoint *newPoint) {
-    mSeparatePaths.replace(mSeparatePaths.indexOf(pointBeingReplaced),
-                           newPoint);
-    schedulePathUpdate();
+    startNewUndoRedoSet();
+    removePointFromSeparatePaths(pointBeingReplaced);
+    addPointToSeparatePaths(newPoint);
+    finishUndoRedoSet();
 }

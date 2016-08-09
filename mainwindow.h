@@ -12,7 +12,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
-    Canvas *canvas;
+    Canvas *mCanvas;
     UndoRedoStack mUndoRedoStack;
     QList<UpdateScheduler*> mUpdateSchedulers;
 protected:

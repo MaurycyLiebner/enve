@@ -68,6 +68,11 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 
         if(mCurrentMode == CanvasMode::ADD_POINT) {
+            if(mCurrentEndPoint != NULL) {
+                if(mCurrentEndPoint->isHidden()) {
+                    setCurrentPoint(NULL);
+                }
+            }
             PathPoint *pathPointUnderMouse = (PathPoint*) pointUnderMouse;
             if(pathPointUnderMouse == mCurrentEndPoint && pathPointUnderMouse != NULL) {
                 return;
@@ -76,22 +81,18 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 VectorPath *newPath = new VectorPath(this);
                 addPath(newPath);
                 setCurrentPoint(newPath->addPoint(mPressPos, mCurrentEndPoint) );
-                newPath->updatePathIfNeeded();
             } else {
                 if(pathPointUnderMouse == NULL) {
                     setCurrentPoint(mCurrentEndPoint->addPoint(mPressPos) );
-                    mCurrentEndPoint->getParentPath()->updatePathIfNeeded();
                 } else if(mCurrentEndPoint == NULL) {
                         setCurrentPoint(pathPointUnderMouse);
                 } else {
                     if(mCurrentEndPoint->getParentPath() == pathPointUnderMouse->getParentPath())
                     {
                         pathPointUnderMouse->connectToPoint(mCurrentEndPoint);
-                        pathPointUnderMouse->getParentPath()->updatePathIfNeeded();
                     }
                     else {
                         connectPointsFromDifferentPaths(pathPointUnderMouse, mCurrentEndPoint);
-                        mCurrentEndPoint->getParentPath()->updatePathIfNeeded();
                     }
                     setCurrentPoint(NULL);
                 }
@@ -138,9 +139,11 @@ void Canvas::handleMovePointMouseRelease(QMouseEvent *event) {
             selectOnlyLastPressedPoint();
         }
     } else {
+        startNewUndoRedoSet();
         foreach(MovablePoint *point, mSelectedPoints) {
             point->finishTransform();
         }
+        finishUndoRedoSet();
     }
 }
 
@@ -149,7 +152,6 @@ void Canvas::scheduleRepaint()
     if(mRepaintNeeded) {
         return;
     }
-    addUpdateScheduler(new CanvasRepaintScheduler(this));
     mRepaintNeeded = true;
 }
 
@@ -183,9 +185,11 @@ void Canvas::handleMovePathMouseRelease(QMouseEvent *event) {
             selectOnlyLastPressedPath();
         }
     } else {
+        startNewUndoRedoSet();
         foreach(VectorPath *path, mSelectedPaths) {
             path->finishTransform();
         }
+        finishUndoRedoSet();
     }
 }
 
@@ -276,6 +280,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             foreach(MovablePoint *point, mSelectedPoints) {
                 point->remove();
             }
+            mSelectedPoints.clear();
 
             finishUndoRedoSet();
         } else if(mCurrentMode == MOVE_PATH) {
@@ -284,6 +289,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             foreach(VectorPath *path, mSelectedPaths) {
                 path->remove();
             }
+            mSelectedPaths.clear();
 
             finishUndoRedoSet();
         }
@@ -368,28 +374,57 @@ bool Canvas::isShiftPressed() {
     return QApplication::keyboardModifiers() & Qt::ShiftModifier;
 }
 
+void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,
+                             QPointF *startCtrlPtPos, QPointF *endCtrlPtPos) {
+    if(mirror) {
+        *startCtrlPtPos = point->getEndCtrlPtAbsPos();
+        *endCtrlPtPos = point->getStartCtrlPtAbsPos();
+    } else {
+        *startCtrlPtPos = point->getStartCtrlPtAbsPos();
+        *endCtrlPtPos = point->getEndCtrlPtAbsPos();
+    }
+}
 
 void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
                                              PathPoint *pointDest) {
     if(pointSrc->getParentPath() == pointDest->getParentPath()) {
         return;
     }
+    VectorPath *pathSrc = pointSrc->getParentPath();
+    VectorPath *pathDest = pointDest->getParentPath();
     startNewUndoRedoSet();
     setCurrentPoint(pointDest);
     if(pointSrc->hasNextPoint()) {
         PathPoint *point = pointSrc;
+        bool mirror = pointDest->hasNextPoint();
         while(point != NULL) {
-            setCurrentPoint(mCurrentEndPoint->addPoint(point->getAbsolutePos()));
+            QPointF startCtrlPtPos;
+            QPointF endCtrlPtPos;
+            getMirroredCtrlPtAbsPos(mirror, point,
+                                    &startCtrlPtPos, &endCtrlPtPos);
+            setCurrentPoint(mCurrentEndPoint->addPoint(
+                                new PathPoint(point->getAbsolutePos(),
+                                              startCtrlPtPos,
+                                              endCtrlPtPos,
+                                              pathDest)) );
             point = point->getNextPoint();
         }
     } else {
         PathPoint *point = pointSrc;
+        bool mirror = pointDest->hasPreviousPoint();
         while(point != NULL) {
-            setCurrentPoint(mCurrentEndPoint->addPoint(point->getAbsolutePos()));
+            QPointF startCtrlPtPos;
+            QPointF endCtrlPtPos;
+            getMirroredCtrlPtAbsPos(mirror, point,
+                                    &startCtrlPtPos, &endCtrlPtPos);
+            setCurrentPoint(mCurrentEndPoint->addPoint(
+                                new PathPoint(point->getAbsolutePos(),
+                                              startCtrlPtPos,
+                                              endCtrlPtPos,
+                                              pathDest)) );
             point = point->getPreviousPoint();
         }
     }
-    VectorPath *pathSrc = pointSrc->getParentPath();
     removePath(pathSrc);
 
     finishUndoRedoSet();
