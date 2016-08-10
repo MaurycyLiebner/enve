@@ -6,6 +6,8 @@ class UndoRedoStack;
 
 class VectorPath;
 
+class CtrlPoint;
+
 enum CanvasMode : short;
 
 enum CtrlsMode {
@@ -26,14 +28,12 @@ public:
     void moveBy(QPointF absTranslation);
     void moveToAbs(QPointF absPos);
 
-    void setStartCtrlPtAbsPos(QPointF startCtrlPt);
     QPointF getStartCtrlPtAbsPos();
-    QPointF getStartCtrlPtRelativePos();
+    QPointF getStartCtrlPtValue();
     MovablePoint *getStartCtrlPt();
 
-    void setEndCtrlPtAbsPos(QPointF endCtrlPt);
     QPointF getEndCtrlPtAbsPos();
-    QPointF getEndCtrlPtRelativePos();
+    QPointF getEndCtrlPtValue();
     MovablePoint *getEndCtrlPt();
 
     void draw(QPainter *p, CanvasMode mode);
@@ -64,14 +64,16 @@ public:
     void updateStartCtrlPtVisibility();
     void updateEndCtrlPtVisibility();
 
-    void setEndCtrlPtEnabled(bool enabled);
-    void setStartCtrlPtEnabled(bool enabled);
-
     void setSeparatePathPoint(bool separatePathPoint);
     bool isSeparatePathPoint();
 
-    void setCtrlsMode(CtrlsMode mode);
+    void setCtrlsMode(CtrlsMode mode, bool saveUndoRedo = true);
     QPointF symmetricToAbsPos(QPointF absPosToMirror);
+    QPointF symmetricToAbsPosNewLen(QPointF absPosToMirror, qreal newLen);
+    void ctrlPointPosChanged(bool startPtChanged);
+    void moveEndCtrlPtToAbsPos(QPointF endCtrlPt);
+    void moveStartCtrlPtToAbsPos(QPointF startCtrlPt);
+    void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
 private:
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 
@@ -79,9 +81,12 @@ private:
     PathPoint *mNextPoint = NULL;
     PathPoint *mPreviousPoint = NULL;
     bool mStartCtrlPtEnabled = true;
-    MovablePoint *mStartCtrlPt;
+    CtrlPoint *mStartCtrlPt;
     bool mEndCtrlPtEnabled = true;
-    MovablePoint *mEndCtrlPt;
+    CtrlPoint *mEndCtrlPt;
+    void ctrlPointPosChanged(CtrlPoint *pointChanged, CtrlPoint *pointToUpdate);
+    void setEndCtrlPtEnabled(bool enabled);
+    void setStartCtrlPtEnabled(bool enabled);
 };
 
 #endif // PATHPOINT_H

@@ -44,6 +44,7 @@ public:
     void moveSecondSelectionPoint(QPointF pos);
     void clearAllPointsSelection();
     void clearAllPathsSelection();
+    void setPointCtrlsMode(CtrlsMode mode);
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -68,6 +69,10 @@ public slots:
     void connectPoints();
     void disconnectPoints();
     void mergePoints();
+
+    void makePointCtrlsSymmetric();
+    void makePointCtrlsSmooth();
+    void makePointCtrlsCorner();
 private:
     bool mRepaintNeeded = false;
 
@@ -83,6 +88,7 @@ private:
     QList<MovablePoint*> mSelectedPoints;
     VectorPath *mLastPressedPath = NULL;
     QList<VectorPath*> mSelectedPaths;
+    void setCtrlPointsEnabled(bool enabled);
 };
 
 #endif // CANVAS_H

@@ -58,6 +58,8 @@ void Canvas::connectPoints()
         finishUndoRedoSet();
         scheduleRepaint();
     }
+
+    callUpdateSchedulers();
 }
 
 void Canvas::disconnectPoints()
@@ -78,6 +80,8 @@ void Canvas::disconnectPoints()
         finishUndoRedoSet();
         scheduleRepaint();
     }
+
+    callUpdateSchedulers();
 }
 
 void Canvas::mergePoints()
@@ -100,6 +104,36 @@ void Canvas::mergePoints()
         finishUndoRedoSet();
         scheduleRepaint();
     }
+
+    callUpdateSchedulers();
+}
+
+void Canvas::setPointCtrlsMode(CtrlsMode mode) {
+    startNewUndoRedoSet();
+    foreach(MovablePoint *point, mSelectedPoints) {
+        if(point->isPathPoint()) {
+            ( (PathPoint*)point)->setCtrlsMode(mode);
+        }
+    }
+    finishUndoRedoSet();
+    scheduleRepaint();
+
+    callUpdateSchedulers();
+}
+
+void Canvas::makePointCtrlsSymmetric()
+{
+    setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+}
+
+void Canvas::makePointCtrlsSmooth()
+{
+    setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+}
+
+void Canvas::makePointCtrlsCorner()
+{
+    setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
 }
 
 void Canvas::scheduleRepaint()

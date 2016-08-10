@@ -16,6 +16,11 @@ private:
     QAction *mActionConnectPoints;
     QAction *mActionDisconnectPoints;
     QAction *mActionMergePoints;
+//
+    QAction *mActionSymmetricPointCtrls;
+    QAction *mActionSmoothPointCtrls;
+    QAction *mActionCornerPointCtrls;
+//
 
     Canvas *mCanvas;
     UndoRedoStack mUndoRedoStack;

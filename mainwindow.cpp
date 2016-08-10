@@ -30,16 +30,33 @@ MainWindow::MainWindow(QWidget *parent)
     mActionConnectPoints = new QAction("CONNECT POINTS", this);
     mToolBar->addAction(mActionConnectPoints);
     connect(mActionConnectPoints, SIGNAL(triggered(bool)),
-            mCanvas, SLOT(connectPoints()));
+            mCanvas, SLOT(connectPoints()) );
+
     mActionDisconnectPoints = new QAction("DISCONNECT POINTS", this);
     mToolBar->addAction(mActionDisconnectPoints);
     connect(mActionDisconnectPoints, SIGNAL(triggered(bool)),
-            mCanvas, SLOT(disconnectPoints()));
+            mCanvas, SLOT(disconnectPoints()) );
+
     mActionMergePoints = new QAction("MERGE POINTS", this);
     mToolBar->addAction(mActionMergePoints);
     connect(mActionMergePoints, SIGNAL(triggered(bool)),
-            mCanvas, SLOT(mergePoints()));
+            mCanvas, SLOT(mergePoints()) );
+//
+    mActionSymmetricPointCtrls = new QAction("SYMMETRIC POINTS", this);
+    mToolBar->addAction(mActionSymmetricPointCtrls);
+    connect(mActionSymmetricPointCtrls, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(makePointCtrlsSymmetric()) );
 
+    mActionSmoothPointCtrls = new QAction("SMOOTH POINTS", this);
+    mToolBar->addAction(mActionSmoothPointCtrls);
+    connect(mActionSmoothPointCtrls, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(makePointCtrlsSmooth()) );
+
+    mActionCornerPointCtrls = new QAction("CORNER POINTS", this);
+    mToolBar->addAction(mActionCornerPointCtrls);
+    connect(mActionCornerPointCtrls, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(makePointCtrlsCorner()) );
+//
     addToolBar(mToolBar);
 
     setCentralWidget(mCanvas);

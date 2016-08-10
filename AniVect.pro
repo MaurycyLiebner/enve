@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     connectedtomainwindow.cpp \
     movablepoint.cpp \
     pathpivot.cpp \
-    canvasmouseinteractions.cpp
+    canvasmouseinteractions.cpp \
+    ctrlpoint.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -35,4 +36,5 @@ HEADERS  += mainwindow.h \
     updatescheduler.h \
     connectedtomainwindow.h \
     movablepoint.h \
-    pathpivot.h
+    pathpivot.h \
+    ctrlpoint.h

@@ -181,11 +181,11 @@ public:
     }
 
     void redo() {
-        mMovedPoint->setAbsolutePos(mAbsPosAfter);
+        mMovedPoint->setAbsolutePos(mAbsPosAfter, false);
     }
 
     void undo() {
-        mMovedPoint->setAbsolutePos(mAbsPosBefore);
+        mMovedPoint->setAbsolutePos(mAbsPosBefore, false);
     }
 
 private:
@@ -311,6 +311,52 @@ public:
     void undo() {
         AddPointToSeparatePathsUndoRedo::redo();
     }
+};
+
+class SetPathPointModeUndoRedo : public UndoRedo
+{
+public:
+    SetPathPointModeUndoRedo(PathPoint *point, CtrlsMode modeBefore, CtrlsMode modeAfter) : UndoRedo() {
+        mPoint = point;
+        mBefore = modeBefore;
+        mAfter = modeAfter;
+    }
+
+    void redo() {
+        mPoint->setCtrlsMode(mAfter, false);
+    }
+
+    void undo() {
+        mPoint->setCtrlsMode(mBefore, false);
+    }
+
+private:
+    PathPoint *mPoint;
+    CtrlsMode mBefore;
+    CtrlsMode mAfter;
+};
+
+class SetCtrlPtEnabledUndoRedo : public UndoRedo
+{
+public:
+    SetCtrlPtEnabledUndoRedo(bool enabled, bool isStartPt, PathPoint* parentPoint) : UndoRedo() {
+        mParentPoint = parentPoint;
+        mEnabled = enabled;
+        mIsStartPt = isStartPt;
+    }
+
+    void redo() {
+        mParentPoint->setCtrlPtEnabled(mEnabled, mIsStartPt, false);
+    }
+
+    void undo() {
+        mParentPoint->setCtrlPtEnabled(!mEnabled, mIsStartPt, false);
+    }
+
+private:
+    PathPoint *mParentPoint;
+    bool mEnabled;
+    bool mIsStartPt;
 };
 
 #endif // UNDOREDO_H

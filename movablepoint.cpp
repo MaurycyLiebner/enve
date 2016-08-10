@@ -7,24 +7,32 @@ MovablePoint::MovablePoint(QPointF absPos, VectorPath *vectorPath, MovablePointT
     mType = type;
     mRadius = radius;
     mVectorPath = vectorPath;
-    setAbsolutePos(absPos);
+    setAbsolutePos(absPos, false);
 }
 
 void MovablePoint::startTransform()
 {
+    mTransformStarted = true;
     mSavedAbsPos = getAbsolutePos();
 }
 
 void MovablePoint::finishTransform()
 {
+    if(!mTransformStarted) {
+        return;
+    }
+    mTransformStarted = false;
     MoveMovablePointUndoRedo *undoRedo = new MoveMovablePointUndoRedo(this,
                                                            mSavedAbsPos,
                                                            getAbsolutePos());
     addUndoRedo(undoRedo);
 }
 
-void MovablePoint::setAbsolutePos(QPointF pos)
+void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo)
 {
+    if(saveUndoRedo) {
+        addUndoRedo(new MoveMovablePointUndoRedo(this, getAbsolutePos(), pos));
+    }
     setRelativePos(mVectorPath->getCombinedTransform().inverted().map(pos));
 }
 
@@ -81,12 +89,12 @@ bool MovablePoint::isContainedInRect(QRectF absRect)
 }
 
 void MovablePoint::moveBy(QPointF absTranslation) {
-    setAbsolutePos(getAbsolutePos() + absTranslation);
+    setAbsolutePos(getAbsolutePos() + absTranslation, false);
 }
 
 void MovablePoint::moveToAbs(QPointF absPos)
 {
-    setAbsolutePos(absPos);
+    setAbsolutePos(absPos, false);
 }
 
 void MovablePoint::select()

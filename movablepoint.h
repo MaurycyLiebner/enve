@@ -23,7 +23,7 @@ public:
     virtual void startTransform();
     virtual void finishTransform();
 
-    void setRelativePos(QPointF pos);
+
     QPointF getRelativePos();
 
     QPointF getAbsolutePos();
@@ -31,12 +31,12 @@ public:
     virtual void draw(QPainter *p);
 
     bool isPointAt(QPointF absPoint);
-    void setAbsolutePos(QPointF pos);
+    void setAbsolutePos(QPointF pos, bool saveUndoRedo = true);
 
     VectorPath *getParentPath();
 
     bool isContainedInRect(QRectF absRect);
-    virtual void moveBy(QPointF absTranslation);
+    virtual void moveBy(QPointF absTranslatione);
     virtual void moveToAbs(QPointF absPos);
 
     void select();
@@ -56,6 +56,7 @@ public:
     bool isPivotPoint();
     bool isCtrlPoint();
 protected:
+    bool mTransformStarted = false;
     MovablePointType mType;
     bool mHidden = false;
     bool mSelected = false;
@@ -63,6 +64,8 @@ protected:
     QPointFAnimator mRelativePos;
     QPointF mSavedAbsPos;
     VectorPath *mVectorPath = NULL;
+private:
+    void setRelativePos(QPointF pos);
 };
 
 #endif // MOVABLEPOINT_H

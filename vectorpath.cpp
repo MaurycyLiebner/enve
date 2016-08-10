@@ -26,7 +26,7 @@ void VectorPath::updatePivotPosition() {
         foreach(PathPoint *point, mPoints) {
             posSum += point->getAbsolutePos();
         }
-        mRotPivot->setAbsolutePos(posSum/count);
+        mRotPivot->setAbsolutePos(posSum/count, false);
     }
 }
 
@@ -43,9 +43,9 @@ void VectorPath::updatePath()
             if(point == NULL) {
                 break;
             }
-            QPointF pointPos = point->getRelativePos();
-            mPath.cubicTo(lastPoint->getEndCtrlPtRelativePos(),
-                          point->getStartCtrlPtRelativePos(),
+            QPointF pointPos = point->getAbsolutePos();
+            mPath.cubicTo(lastPoint->getEndCtrlPtValue(),
+                          point->getStartCtrlPtValue(),
                           pointPos);
             if(point == firstPointInPath) {
                 break;

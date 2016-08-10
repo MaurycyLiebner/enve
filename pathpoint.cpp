@@ -1,6 +1,7 @@
 #include "pathpoint.h"
 #include "vectorpath.h"
 #include "undoredo.h"
+#include "ctrlpoint.h"
 #include <QPainter>
 
 PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
@@ -15,9 +16,13 @@ PathPoint::PathPoint(QPointF absPos,
                      VectorPath *vectorPath) :
     MovablePoint(absPos, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
 {
-    mStartCtrlPt = new MovablePoint(startCtrlAbsPos, vectorPath, MovablePointType::TYPE_CTRL_POINT);
+    mStartCtrlPt = new CtrlPoint(startCtrlAbsPos, this, true);
+    mEndCtrlPt = new CtrlPoint(endCtrlAbsPos, this, false);
+
+    mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
+    mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
+
     mStartCtrlPt->hide();
-    mEndCtrlPt = new MovablePoint(endCtrlAbsPos, vectorPath, MovablePointType::TYPE_CTRL_POINT);
     mEndCtrlPt->hide();
 }
 
@@ -25,10 +30,10 @@ void PathPoint::startTransform()
 {
     MovablePoint::startTransform();
     if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->startTransform();
+        mStartCtrlPt->MovablePoint::startTransform();
     }
     if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->startTransform();
+        mEndCtrlPt->MovablePoint::startTransform();
     }
 }
 
@@ -37,10 +42,10 @@ void PathPoint::finishTransform()
     startNewUndoRedoSet();
     MovablePoint::finishTransform();
     if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->finishTransform();
+        mStartCtrlPt->MovablePoint::finishTransform();
     }
     if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->finishTransform();
+        mEndCtrlPt->MovablePoint::finishTransform();
     }
     finishUndoRedoSet();
 }
@@ -49,10 +54,10 @@ void PathPoint::moveBy(QPointF absTranslation)
 {
     MovablePoint::moveBy(absTranslation);
     if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->moveBy(absTranslation);
+        mStartCtrlPt->MovablePoint::moveBy(absTranslation);
     }
     if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->moveBy(absTranslation);
+        mEndCtrlPt->MovablePoint::moveBy(absTranslation);
     }
 }
 
@@ -135,12 +140,31 @@ QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {
     return getAbsolutePos() - posDist;
 }
 
-void PathPoint::setStartCtrlPtAbsPos(QPointF startCtrlPt)
-{
-    if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-        mEndCtrlPt->setAbsolutePos(symmetricToAbsPos(startCtrlPt));
+qreal pointToLen(QPointF point) {
+    return sqrt(point.x()*point.x() + point.y()*point.y());
+}
+
+bool isPointZero(QPointF pos) {
+    return abs(pos.x()) == 0 && abs(pos.y()) == 0;
+}
+
+QPointF scalePointToNewLen(QPointF point, qreal newLen) {
+    if(isPointZero(point)) {
+        return point;
     }
-    mStartCtrlPt->setAbsolutePos(startCtrlPt);
+    return point * newLen / pointToLen(point);
+}
+
+QPointF PathPoint::symmetricToAbsPosNewLen(QPointF absPosToMirror, qreal newLen)
+{
+    QPointF posDist = absPosToMirror - getAbsolutePos();
+    return getAbsolutePos() - scalePointToNewLen(posDist, newLen);
+}
+
+
+void PathPoint::moveStartCtrlPtToAbsPos(QPointF startCtrlPt)
+{
+    mStartCtrlPt->moveToAbs(startCtrlPt);
 }
 
 QPointF PathPoint::getStartCtrlPtAbsPos()
@@ -148,9 +172,13 @@ QPointF PathPoint::getStartCtrlPtAbsPos()
     return mStartCtrlPt->getAbsolutePos();
 }
 
-QPointF PathPoint::getStartCtrlPtRelativePos()
+QPointF PathPoint::getStartCtrlPtValue()
 {
-    return mStartCtrlPt->getRelativePos();
+    if(mStartCtrlPtEnabled) {
+        return mStartCtrlPt->getRelativePos();
+    } else {
+        return getRelativePos();
+    }
 }
 
 MovablePoint *PathPoint::getStartCtrlPt()
@@ -158,12 +186,30 @@ MovablePoint *PathPoint::getStartCtrlPt()
     return mStartCtrlPt;
 }
 
-void PathPoint::setEndCtrlPtAbsPos(QPointF endCtrlPt)
-{
+void PathPoint::ctrlPointPosChanged(bool startPtChanged) {
+    ctrlPointPosChanged((startPtChanged) ? mStartCtrlPt : mEndCtrlPt,
+                        (startPtChanged) ? mEndCtrlPt : mStartCtrlPt);
+}
+
+void PathPoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
+                                    CtrlPoint *pointToUpdate) {
+    QPointF changedPointPos = pointChanged->getAbsolutePos();
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-        mStartCtrlPt->setAbsolutePos(symmetricToAbsPos(endCtrlPt));
+        pointToUpdate->moveToWithoutUpdatingTheOther(symmetricToAbsPos(changedPointPos));
+    } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
+        if(!isPointZero(changedPointPos) ) {
+            pointToUpdate->moveToWithoutUpdatingTheOther(
+                        symmetricToAbsPosNewLen(
+                            changedPointPos,
+                            pointToLen(pointToUpdate->getAbsolutePos() -
+                                       getAbsolutePos())) );
+        }
     }
-    mEndCtrlPt->setAbsolutePos(endCtrlPt);
+}
+
+void PathPoint::moveEndCtrlPtToAbsPos(QPointF endCtrlPt)
+{
+    mEndCtrlPt->moveToAbs(endCtrlPt);
 }
 
 QPointF PathPoint::getEndCtrlPtAbsPos()
@@ -171,9 +217,13 @@ QPointF PathPoint::getEndCtrlPtAbsPos()
     return mEndCtrlPt->getAbsolutePos();
 }
 
-QPointF PathPoint::getEndCtrlPtRelativePos()
+QPointF PathPoint::getEndCtrlPtValue()
 {
-    return mEndCtrlPt->getRelativePos();
+    if(mEndCtrlPtEnabled) {
+        return mEndCtrlPt->getRelativePos();
+    } else {
+        return getRelativePos();
+    }
 }
 
 MovablePoint *PathPoint::getEndCtrlPt()
@@ -247,15 +297,32 @@ void PathPoint::updateEndCtrlPtVisibility() {
 void PathPoint::setEndCtrlPtEnabled(bool enabled)
 {
     mEndCtrlPtEnabled = enabled;
-    mEndCtrlPt->setAbsolutePos(getAbsolutePos());
     updateEndCtrlPtVisibility();
+    mVectorPath->schedulePathUpdate();
 }
 
 void PathPoint::setStartCtrlPtEnabled(bool enabled)
 {
     mStartCtrlPtEnabled = enabled;
-    mStartCtrlPt->setAbsolutePos(getAbsolutePos());
     updateStartCtrlPtVisibility();
+    mVectorPath->schedulePathUpdate();
+}
+
+void PathPoint::setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo) {
+    if(isStartPt) {
+        if(mStartCtrlPtEnabled == enabled) {
+            return;
+        }
+        setStartCtrlPtEnabled(enabled);
+    } else {
+        if(mEndCtrlPtEnabled == enabled) {
+            return;
+        }
+        setEndCtrlPtEnabled(enabled);
+    }
+    if(saveUndoRedo) {
+        addUndoRedo(new SetCtrlPtEnabledUndoRedo(enabled, isStartPt, this));
+    }
 }
 
 void PathPoint::setSeparatePathPoint(bool separatePathPoint)
@@ -268,9 +335,57 @@ bool PathPoint::isSeparatePathPoint()
     return mSeparatePathPoint;
 }
 
-void PathPoint::setCtrlsMode(CtrlsMode mode)
+void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
 {
+    if(saveUndoRedo) {
+        startNewUndoRedoSet();
+        addUndoRedo(new SetPathPointModeUndoRedo(this, mCtrlsMode, mode));
+    }
     mCtrlsMode = mode;
+    if(saveUndoRedo) {
+        if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
+            QPointF point1 = mEndCtrlPt->getAbsolutePos();
+            point1 = symmetricToAbsPos(point1);
+            QPointF point2 = mStartCtrlPt->getAbsolutePos();
+            qreal len1 = pointToLen(point1);
+            qreal len2 = pointToLen(point2);
+            qreal lenSum = len1 + len2;
+            QPointF newStartCtrlPtPos = (point1*len1 + point2*len2)/lenSum;
+            QPointF newEndCtrlPtPos = symmetricToAbsPos(newStartCtrlPtPos);
+            mStartCtrlPt->setAbsolutePos(newStartCtrlPtPos);
+            mEndCtrlPt->setAbsolutePos(newEndCtrlPtPos);
+
+        } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
+            QPointF point1 = mEndCtrlPt->getAbsolutePos();
+            point1 = symmetricToAbsPos(point1);
+            QPointF point2 = mStartCtrlPt->getAbsolutePos();
+            qreal len1 = pointToLen(point1);
+            qreal len2 = pointToLen(point2);
+            qreal lenSum = len1 + len2;
+            QPointF point1Rel = mEndCtrlPt->getAbsolutePos() - getAbsolutePos();
+            QPointF point2Rel = mStartCtrlPt->getAbsolutePos() - getAbsolutePos();
+            QPointF newStartDirection =
+                    scalePointToNewLen(
+                        (point1*len1 + point2*len2)/lenSum - getAbsolutePos(),
+                        1.f);
+            qreal startCtrlPtLen =
+                    abs(QPointF::dotProduct(point2Rel, newStartDirection));
+            QPointF newStartCtrlPtPos = newStartDirection*startCtrlPtLen +
+                    getAbsolutePos();
+            qreal endCtrlPtLen =
+                    abs(QPointF::dotProduct(point1Rel, newStartDirection));
+            QPointF newEndCtrlPtPos = -newStartDirection*endCtrlPtLen +
+                    getAbsolutePos();
+            mStartCtrlPt->setAbsolutePos(newStartCtrlPtPos);
+            mEndCtrlPt->setAbsolutePos(newEndCtrlPtPos);
+        }
+
+        setCtrlPtEnabled(true, true);
+        setCtrlPtEnabled(true, false);
+        mVectorPath->schedulePathUpdate();
+
+        finishUndoRedoSet();
+    }
 }
 
 void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
