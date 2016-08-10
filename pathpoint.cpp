@@ -130,8 +130,16 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
     return NULL;
 }
 
+QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {
+    QPointF posDist = absPosToMirror - getAbsolutePos();
+    return getAbsolutePos() - posDist;
+}
+
 void PathPoint::setStartCtrlPtAbsPos(QPointF startCtrlPt)
 {
+    if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
+        mEndCtrlPt->setAbsolutePos(symmetricToAbsPos(startCtrlPt));
+    }
     mStartCtrlPt->setAbsolutePos(startCtrlPt);
 }
 
@@ -152,6 +160,9 @@ MovablePoint *PathPoint::getStartCtrlPt()
 
 void PathPoint::setEndCtrlPtAbsPos(QPointF endCtrlPt)
 {
+    if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
+        mStartCtrlPt->setAbsolutePos(symmetricToAbsPos(endCtrlPt));
+    }
     mEndCtrlPt->setAbsolutePos(endCtrlPt);
 }
 
@@ -182,10 +193,10 @@ void PathPoint::draw(QPainter *p, CanvasMode mode)
     if(mode == CanvasMode::MOVE_POINT || (mode == CanvasMode::ADD_POINT && mSelected)) {
         QPen pen = p->pen();
         p->setPen(QPen(Qt::black, 1.5f, Qt::DotLine));
-        if(mEndCtrlPt->isVisible()) {
+        if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
             p->drawLine(getAbsolutePos(), mEndCtrlPt->getAbsolutePos());
         }
-        if(mStartCtrlPt->isVisible()) {
+        if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
             p->drawLine(getAbsolutePos(), mStartCtrlPt->getAbsolutePos());
         }
         p->setPen(pen);
@@ -255,6 +266,11 @@ void PathPoint::setSeparatePathPoint(bool separatePathPoint)
 bool PathPoint::isSeparatePathPoint()
 {
     return mSeparatePathPoint;
+}
+
+void PathPoint::setCtrlsMode(CtrlsMode mode)
+{
+    mCtrlsMode = mode;
 }
 
 void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)

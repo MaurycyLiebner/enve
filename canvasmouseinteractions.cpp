@@ -224,7 +224,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
             }
         }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-        mCurrentEndPoint->setStartCtrlPtAbsPos(event->pos());
+        mCurrentEndPoint->setEndCtrlPtAbsPos(event->pos());
     }
     mPressPos = event->pos();
     mFirstMouseMove = false;

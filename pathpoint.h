@@ -8,6 +8,12 @@ class VectorPath;
 
 enum CanvasMode : short;
 
+enum CtrlsMode {
+    CTRLS_SMOOTH,
+    CTRLS_SYMMETRIC,
+    CTRLS_CORNER
+};
+
 class PathPoint : public MovablePoint
 {
 public:
@@ -63,7 +69,12 @@ public:
 
     void setSeparatePathPoint(bool separatePathPoint);
     bool isSeparatePathPoint();
+
+    void setCtrlsMode(CtrlsMode mode);
+    QPointF symmetricToAbsPos(QPointF absPosToMirror);
 private:
+    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+
     bool mSeparatePathPoint = false;
     PathPoint *mNextPoint = NULL;
     PathPoint *mPreviousPoint = NULL;
