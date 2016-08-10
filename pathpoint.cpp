@@ -179,7 +179,7 @@ void PathPoint::draw(QPainter *p, CanvasMode mode)
     }
     p->drawEllipse(getAbsolutePos(),
                    mRadius, mRadius);
-    if(mode == CanvasMode::MOVE_POINT) {
+    if(mode == CanvasMode::MOVE_POINT || (mode == CanvasMode::ADD_POINT && mSelected)) {
         QPen pen = p->pen();
         p->setPen(QPen(Qt::black, 1.5f, Qt::DotLine));
         if(mEndCtrlPt->isVisible()) {

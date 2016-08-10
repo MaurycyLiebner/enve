@@ -170,7 +170,7 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
-            if(point->isEndPoint()) {
+            if(point->isEndPoint() || point->isSelected()) {
                 point->draw(p, currentCanvasMode);
             }
         }

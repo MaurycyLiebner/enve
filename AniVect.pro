@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     undoredo.cpp \
     connectedtomainwindow.cpp \
     movablepoint.cpp \
-    pathpivot.cpp
+    pathpivot.cpp \
+    canvasmouseinteractions.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \

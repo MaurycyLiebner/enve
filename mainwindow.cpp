@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include <QApplication>
 #include <QDebug>
+#include <QToolBar>
 #include "updatescheduler.h"
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -25,6 +26,22 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     mCanvas = new Canvas(this);
+    mToolBar = new QToolBar(this);
+    mActionConnectPoints = new QAction("CONNECT POINTS", this);
+    mToolBar->addAction(mActionConnectPoints);
+    connect(mActionConnectPoints, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(connectPoints()));
+    mActionDisconnectPoints = new QAction("DISCONNECT POINTS", this);
+    mToolBar->addAction(mActionDisconnectPoints);
+    connect(mActionDisconnectPoints, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(disconnectPoints()));
+    mActionMergePoints = new QAction("MERGE POINTS", this);
+    mToolBar->addAction(mActionMergePoints);
+    connect(mActionMergePoints, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(mergePoints()));
+
+    addToolBar(mToolBar);
+
     setCentralWidget(mCanvas);
 }
 

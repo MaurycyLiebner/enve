@@ -12,6 +12,11 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
+    QToolBar *mToolBar;
+    QAction *mActionConnectPoints;
+    QAction *mActionDisconnectPoints;
+    QAction *mActionMergePoints;
+
     Canvas *mCanvas;
     UndoRedoStack mUndoRedoStack;
     QList<UpdateScheduler*> mUpdateSchedulers;

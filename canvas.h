@@ -65,7 +65,9 @@ protected:
 signals:
 
 public slots:
-
+    void connectPoints();
+    void disconnectPoints();
+    void mergePoints();
 private:
     bool mRepaintNeeded = false;
 
