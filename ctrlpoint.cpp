@@ -56,5 +56,10 @@ void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {
 void CtrlPoint::remove()
 {
     mParentPoint->setCtrlPtEnabled(false, mIsStartCtrlPt);
-    mVectorPath->schedulePathUpdate();
+}
+
+void CtrlPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
+{
+    MovablePoint::setRelativePos(relPos, saveUndoRedo);
+    mParentPoint->getParentPath()->schedulePathUpdate();
 }

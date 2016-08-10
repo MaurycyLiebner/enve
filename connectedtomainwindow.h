@@ -19,7 +19,7 @@ public:
 
     void startNewUndoRedoSet();
     void finishUndoRedoSet();
-
+    void scheduleRepaint();
 private:
     MainWindow *mMainWindow;
 };

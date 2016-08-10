@@ -2,18 +2,21 @@
 #include "vectorpath.h"
 #include "undoredo.h"
 
-MovablePoint::MovablePoint(QPointF absPos, VectorPath *vectorPath, MovablePointType type, qreal radius) : ConnectedToMainWindow(vectorPath)
+MovablePoint::MovablePoint(QPointF absPos,
+                           BoundingBox *parent,
+                           MovablePointType type,
+                           qreal radius) : ConnectedToMainWindow(parent)
 {
     mType = type;
     mRadius = radius;
-    mVectorPath = vectorPath;
+    mParent = parent;
     setAbsolutePos(absPos, false);
 }
 
 void MovablePoint::startTransform()
 {
     mTransformStarted = true;
-    mSavedAbsPos = getAbsolutePos();
+    mSavedRelPos = getRelativePos();
 }
 
 void MovablePoint::finishTransform()
@@ -23,33 +26,32 @@ void MovablePoint::finishTransform()
     }
     mTransformStarted = false;
     MoveMovablePointUndoRedo *undoRedo = new MoveMovablePointUndoRedo(this,
-                                                           mSavedAbsPos,
-                                                           getAbsolutePos());
+                                                           mSavedRelPos,
+                                                           getRelativePos());
     addUndoRedo(undoRedo);
 }
 
 void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo)
 {
-    if(saveUndoRedo) {
-        addUndoRedo(new MoveMovablePointUndoRedo(this, getAbsolutePos(), pos));
-    }
-    setRelativePos(mVectorPath->getCombinedTransform().inverted().map(pos));
+    setRelativePos(mParent->getCombinedTransform().inverted().map(pos), saveUndoRedo );
 }
 
-void MovablePoint::setRelativePos(QPointF pos)
+void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
-    mRelativePos.setCurrentValue(pos, false);
-    mVectorPath->schedulePathUpdate();
+    if(saveUndoRedo) {
+        addUndoRedo(new MoveMovablePointUndoRedo(this, getRelativePos(), relPos));
+    }
+    mRelPos.setCurrentValue(relPos, false);
 }
 
 QPointF MovablePoint::getRelativePos()
 {
-    return mRelativePos.getCurrentValue();
+    return mRelPos.getCurrentValue();
 }
 
 QPointF MovablePoint::getAbsolutePos()
 {
-    return mVectorPath->getCombinedTransform().map(getRelativePos());
+    return mParent->getCombinedTransform().map(getRelativePos());
 }
 
 void MovablePoint::draw(QPainter *p)
@@ -66,9 +68,9 @@ void MovablePoint::draw(QPainter *p)
                    mRadius, mRadius);
 }
 
-VectorPath *MovablePoint::getParentPath()
+BoundingBox *MovablePoint::getParent()
 {
-    return mVectorPath;
+    return mParent;
 }
 
 bool MovablePoint::isPointAt(QPointF absPoint)
@@ -100,13 +102,13 @@ void MovablePoint::moveToAbs(QPointF absPos)
 void MovablePoint::select()
 {
     mSelected = true;
-    mVectorPath->scheduleRepaint();
+    mParent->scheduleRepaint();
 }
 
 void MovablePoint::deselect()
 {
     mSelected = false;
-    mVectorPath->scheduleRepaint();
+    mParent->scheduleRepaint();
 }
 
 bool MovablePoint::isSelected()

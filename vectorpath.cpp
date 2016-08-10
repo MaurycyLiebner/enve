@@ -7,9 +7,10 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 
-VectorPath::VectorPath(Canvas *canvas) : ChildParent(canvas)
+VectorPath::VectorPath(Canvas *canvas) : BoundingBox(canvas)
 {
-    mRotPivot = new PathPivot(this);
+    mCanvas = canvas;
+    updateCombinedTransform();
 }
 
 VectorPath::~VectorPath()
@@ -20,13 +21,13 @@ VectorPath::~VectorPath()
 }
 
 void VectorPath::updatePivotPosition() {
-    if(!mRotPivot->wasChanged()) {
+    if(!mPivotChanged) {
         QPointF posSum = QPointF(0.f, 0.f);
         int count = mPoints.length();
         foreach(PathPoint *point, mPoints) {
             posSum += point->getAbsolutePos();
         }
-        mRotPivot->setAbsolutePos(posSum/count, false);
+        mAbsRotPivotPos = posSum/count;
     }
 }
 
@@ -43,7 +44,7 @@ void VectorPath::updatePath()
             if(point == NULL) {
                 break;
             }
-            QPointF pointPos = point->getAbsolutePos();
+            QPointF pointPos = point->getRelativePos();
             mPath.cubicTo(lastPoint->getEndCtrlPtValue(),
                           point->getStartCtrlPtValue(),
                           pointPos);
@@ -55,10 +56,6 @@ void VectorPath::updatePath()
     }
 
     updateMappedPath();
-}
-
-void VectorPath::remove() {
-    mCanvas->removePath(this);
 }
 
 void VectorPath::schedulePathUpdate()
@@ -97,11 +94,6 @@ void VectorPath::scheduleMappedPathUpdate()
     addUpdateScheduler(new MappedPathUpdateScheduler(this));
     mMappedPathUpdateNeeded = true;
     scheduleRepaint();
-}
-
-void VectorPath::updateAfterTransformationChanged()
-{
-    return;
 }
 
 void VectorPath::updateAfterCombinedTransformationChanged()
@@ -159,9 +151,6 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
         p->setBrush(Qt::NoBrush);
         p->drawRect(getBoundingRect());
         p->setPen(pen);
-        if(currentCanvasMode == CanvasMode::MOVE_PATH_ROTATE) {
-            mRotPivot->draw(p);
-        }
     } else if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
@@ -178,8 +167,9 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     p->restore();
 }
 
-PathPivot *VectorPath::getPivotAt(QPointF absPos) {
-    return ( (mRotPivot->isPointAt(absPos)) ? mRotPivot : NULL );
+QPointF VectorPath::getPivotAbsPos()
+{
+    return mAbsRotPivotPos;
 }
 
 MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
@@ -302,10 +292,6 @@ void VectorPath::removePoint(PathPoint *point) {
 bool VectorPath::pointInsidePath(QPointF point)
 {
     return mMappedPath.contains(point);
-}
-
-void VectorPath::scheduleRepaint() {
-    getCanvas()->scheduleRepaint();
 }
 
 void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,

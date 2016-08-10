@@ -6,9 +6,11 @@
 #include "undoredo.h"
 #include "mainwindow.h"
 #include "updatescheduler.h"
+#include "pathpivot.h"
 
-Canvas::Canvas(MainWindow *parent) : QWidget(parent), ConnectedToMainWindow(parent)
+Canvas::Canvas(MainWindow *parent) : QWidget(parent), BoundingBox(parent)
 {
+    mRotPivot = new PathPivot(this);
 }
 
 void Canvas::callKeyPress(QKeyEvent *event)
@@ -20,6 +22,7 @@ void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
+
     foreach (VectorPath *path, mPaths) {
         path->draw(&p);
     }
@@ -30,6 +33,20 @@ void Canvas::paintEvent(QPaintEvent *)
     if(mSelecting) {
         p.drawRect(mSelectionRect);
     }
+    if(mCurrentMode == CanvasMode::MOVE_PATH_ROTATE) {
+        mRotPivot->draw(&p);
+    }
+
+    QPointF absPos = getAbsolutePos();
+    p.drawRect(QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight)));
+    QPainterPath path;
+    path.addRect(0, 0, width() + 1, height() + 1);
+    QPainterPath viewRectPath;
+    viewRectPath.addRect(
+                QRectF(absPos,absPos + QPointF(mVisibleWidth, mVisibleHeight)));
+    p.setBrush(QColor(0, 0, 0, 125));
+    p.setPen(QPen(Qt::black, 0.f));
+    p.drawPath(path.subtracted(viewRectPath));
     p.end();
 }
 
@@ -190,7 +207,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             startNewUndoRedoSet();
 
             foreach(VectorPath *path, mSelectedPaths) {
-                path->remove();
+                removePath(path);
             }
             mSelectedPaths.clear();
 

@@ -74,7 +74,11 @@ public:
     void moveEndCtrlPtToAbsPos(QPointF endCtrlPt);
     void moveStartCtrlPtToAbsPos(QPointF startCtrlPt);
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
+    VectorPath *getParentPath();
+protected:
+    void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
 private:
+    VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 
     bool mSeparatePathPoint = false;

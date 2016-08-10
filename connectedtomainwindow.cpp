@@ -40,3 +40,7 @@ void ConnectedToMainWindow::finishUndoRedoSet()
 {
      mMainWindow->getUndoRedoStack()->finishSet();
 }
+
+void ConnectedToMainWindow::scheduleRepaint() {
+    mMainWindow->scheduleRepaint();
+}

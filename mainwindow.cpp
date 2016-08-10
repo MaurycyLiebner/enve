@@ -86,3 +86,8 @@ void MainWindow::callUpdateSchedulers()
     mUpdateSchedulers.clear();
     mCanvas->repaintIfNeeded();
 }
+
+void MainWindow::scheduleRepaint()
+{
+    mCanvas->scheduleRepaint();
+}

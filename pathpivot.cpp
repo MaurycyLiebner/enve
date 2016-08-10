@@ -1,7 +1,7 @@
 #include "pathpivot.h"
 
-PathPivot::PathPivot(VectorPath *path) :
-    MovablePoint(QPointF(0.f, 0.f), path,
+PathPivot::PathPivot(BoundingBox *parent) :
+    MovablePoint(QPointF(0.f, 0.f), parent,
                  MovablePointType::TYPE_PIVOT_POINT, 15.f)
 {
 
@@ -25,9 +25,4 @@ void PathPivot::draw(QPainter *p)
     p->drawLine(QPointF(-halfRadius, 0), QPointF(halfRadius, 0));
     p->drawLine(QPointF(0, -halfRadius), QPointF(0, halfRadius));
     p->restore();
-}
-
-bool PathPivot::wasChanged()
-{
-    return mWasChanged;
 }

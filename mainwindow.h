@@ -36,6 +36,7 @@ public:
     void addUpdateScheduler(UpdateScheduler *scheduler);
 
     void callUpdateSchedulers();
+    void scheduleRepaint();
 };
 
 #endif // MAINWINDOW_H

@@ -110,7 +110,7 @@ private:
 class TransformChildParentUndoRedo : public UndoRedo
 {
 public:
-    TransformChildParentUndoRedo(ChildParent *transformedPath,
+    TransformChildParentUndoRedo(BoundingBox *transformedPath,
                      QMatrix transformBefore,
                      QMatrix transformAfter) : UndoRedo() {
         mTransformedPath = transformedPath;
@@ -127,7 +127,7 @@ public:
     }
 
 private:
-    ChildParent *mTransformedPath;
+    BoundingBox *mTransformedPath;
     QMatrix mTransformBefore;
     QMatrix mTransformAfter;
 };
@@ -173,25 +173,25 @@ class MoveMovablePointUndoRedo : public UndoRedo
 {
 public:
     MoveMovablePointUndoRedo(MovablePoint *movedPoint,
-                         QPointF absPosBefore,
-                         QPointF absPosAfter) : UndoRedo() {
+                         QPointF relPosBefore,
+                         QPointF relPosAfter) : UndoRedo() {
         mMovedPoint = movedPoint;
-        mAbsPosAfter = absPosAfter;
-        mAbsPosBefore = absPosBefore;
+        mRelPosAfter = relPosAfter;
+        mRelPosBefore = relPosBefore;
     }
 
     void redo() {
-        mMovedPoint->setAbsolutePos(mAbsPosAfter, false);
+        mMovedPoint->setRelativePos(mRelPosAfter, false);
     }
 
     void undo() {
-        mMovedPoint->setAbsolutePos(mAbsPosBefore, false);
+        mMovedPoint->setRelativePos(mRelPosBefore, false);
     }
 
 private:
     MovablePoint *mMovedPoint;
-    QPointF mAbsPosBefore;
-    QPointF mAbsPosAfter;
+    QPointF mRelPosBefore;
+    QPointF mRelPosAfter;
 };
 
 class AppendToPointsListUndoRedo : public UndoRedo

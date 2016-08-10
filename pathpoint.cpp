@@ -7,7 +7,6 @@
 PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
     PathPoint(absPos, absPos, absPos, vectorPath)
 {
-
 }
 
 PathPoint::PathPoint(QPointF absPos,
@@ -16,6 +15,7 @@ PathPoint::PathPoint(QPointF absPos,
                      VectorPath *vectorPath) :
     MovablePoint(absPos, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
 {
+    mVectorPath = vectorPath;
     mStartCtrlPt = new CtrlPoint(startCtrlAbsPos, this, true);
     mEndCtrlPt = new CtrlPoint(endCtrlAbsPos, this, false);
 
@@ -133,6 +133,12 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
         return this;
     }
     return NULL;
+}
+
+void PathPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
+{
+    MovablePoint::setRelativePos(relPos, saveUndoRedo);
+    mVectorPath->schedulePathUpdate();
 }
 
 QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {
@@ -323,6 +329,11 @@ void PathPoint::setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo
     if(saveUndoRedo) {
         addUndoRedo(new SetCtrlPtEnabledUndoRedo(enabled, isStartPt, this));
     }
+}
+
+VectorPath *PathPoint::getParentPath()
+{
+    return mVectorPath;
 }
 
 void PathPoint::setSeparatePathPoint(bool separatePathPoint)

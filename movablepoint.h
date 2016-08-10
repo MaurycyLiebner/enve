@@ -6,7 +6,7 @@
 #include "valueanimators.h"
 #include "connectedtomainwindow.h"
 
-class VectorPath;
+class BoundingBox;
 class PathPoint;
 
 enum MovablePointType {
@@ -18,7 +18,7 @@ enum MovablePointType {
 class MovablePoint : public ConnectedToMainWindow
 {
 public:
-    MovablePoint(QPointF absPos, VectorPath *vectorPath, MovablePointType type, qreal radius = 7.5f);
+    MovablePoint(QPointF absPos, BoundingBox *parent, MovablePointType type, qreal radius = 7.5f);
 
     virtual void startTransform();
     virtual void finishTransform();
@@ -33,7 +33,7 @@ public:
     bool isPointAt(QPointF absPoint);
     void setAbsolutePos(QPointF pos, bool saveUndoRedo = true);
 
-    VectorPath *getParentPath();
+    BoundingBox *getParent();
 
     bool isContainedInRect(QRectF absRect);
     virtual void moveBy(QPointF absTranslatione);
@@ -55,17 +55,17 @@ public:
     bool isPathPoint();
     bool isPivotPoint();
     bool isCtrlPoint();
+
+    virtual void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;
     bool mHidden = false;
     bool mSelected = false;
     qreal mRadius;
-    QPointFAnimator mRelativePos;
-    QPointF mSavedAbsPos;
-    VectorPath *mVectorPath = NULL;
-private:
-    void setRelativePos(QPointF pos);
+    QPointFAnimator mRelPos;
+    QPointF mSavedRelPos;
+    BoundingBox *mParent = NULL;
 };
 
 #endif // MOVABLEPOINT_H

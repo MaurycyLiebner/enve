@@ -5,13 +5,9 @@
 class PathPivot : public MovablePoint
 {
 public:
-    PathPivot(VectorPath *path);
+    PathPivot(BoundingBox *parent);
 
     void draw(QPainter *p);
-
-    bool wasChanged();
-private:
-    bool mWasChanged = false;
 };
 
 #endif // PATHPIVOT_H

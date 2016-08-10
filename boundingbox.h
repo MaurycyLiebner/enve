@@ -9,15 +9,19 @@ class Canvas;
 
 class UndoRedoStack;
 
-class ChildParent : public ConnectedToMainWindow
+class BoundingBox : public ConnectedToMainWindow
 {
 public:
-    ChildParent(Canvas *canvas);
+    BoundingBox(BoundingBox *parent);
+    BoundingBox(MainWindow *window);
 
     QMatrix getCombinedTransform();
 
-    void setParent(ChildParent *parent);
     QPointF getTranslation();
+
+    void scale(qreal scaleBy, QPointF absOrigin);
+    void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
+
     void rotateBy(qreal rot, QPointF absOrigin);
     void moveBy(qreal dx, qreal dy);
 
@@ -30,17 +34,18 @@ public:
 
     void startTransform();
     void finishTransform();
+
+    void addChild(BoundingBox *child);
+    void removeChild(BoundingBox *child);
 protected:
-    virtual void updateAfterTransformationChanged();
     virtual void updateAfterCombinedTransformationChanged();
 
-    Canvas *mCanvas;
+    QList<BoundingBox*> mChildren;
+    BoundingBox *mParent = NULL;
     QMatrix mSavedTransformMatrix;
-    qreal mRot = 0.f;
     QMatrix mTransformMatrix;
     QMatrix mCombinedTransformMatrix;
-    ChildParent *mParent = NULL;
-    QList<ChildParent*> mChildren;
 };
+
 
 #endif // CHILDPARENT_H

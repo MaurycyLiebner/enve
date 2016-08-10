@@ -18,7 +18,7 @@ enum CanvasMode : short {
     ADD_POINT
 };
 
-class Canvas : public QWidget, public ConnectedToMainWindow
+class Canvas : public QWidget, public BoundingBox
 {
     Q_OBJECT
 public:
@@ -45,11 +45,13 @@ public:
     void clearAllPointsSelection();
     void clearAllPathsSelection();
     void setPointCtrlsMode(CtrlsMode mode);
+    QPointF scaleDistancePointByCurrentScale(QPointF point);
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
     void clearPointsSelection();
@@ -59,8 +61,8 @@ protected:
 
     PathPoint *getCurrentPoint();
 
-    void handleMovePathMouseRelease(QMouseEvent *event);
-    void handleMovePointMouseRelease(QMouseEvent *event);
+    void handleMovePathMouseRelease(QPointF pos);
+    void handleMovePointMouseRelease(QPointF pos);
 
     bool isMovingPath();
 signals:
@@ -74,6 +76,12 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    int mWidth = 1920;
+    int mHeight = 1080;
+
+    qreal mVisibleWidth = 1920;
+    qreal mVisibleHeight = 1080;
+
     bool mRepaintNeeded = false;
 
     bool mFirstMouseMove = false;
@@ -89,6 +97,12 @@ private:
     VectorPath *mLastPressedPath = NULL;
     QList<VectorPath*> mSelectedPaths;
     void setCtrlPointsEnabled(bool enabled);
+    PathPivot *mRotPivot;
+    void handleMovePointMouseMove(QPointF eventPos);
+    void handleMovePathMouseMove(QPointF eventPos);
+    void handleAddPointMouseMove(QPointF eventPos);
+    void handleMovePathMousePressEvent();
+    void handleAddPointMouseRelease();
 };
 
 #endif // CANVAS_H
