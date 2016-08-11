@@ -16,12 +16,7 @@ void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
     rect_t->resize(rect_width, rect_height);
 }
 
-void ColorSettingsWidget::setLastColorHSV(GLfloat h_t, GLfloat s_t, GLfloat v_t)
-{
-    color_label->setLastColorHSV(h_t, s_t, v_t);
-}
-
-void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t)
+void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t)
 {
     wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
     r_rect->setColorHSV_f(h_t, s_t, v_t);
@@ -36,21 +31,43 @@ void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t)
     l_rect->setColorHSV_f(h_t, s_t, v_t);
 
     color_label->setColorHSV_f(h_t, s_t, v_t);
+    color_label->setAlpha(a_t);
+
+    a_rect->setColorHSL_f(h_t, s_t, v_t);
+    a_rect->setVal(a_t);
 }
 
 void ColorSettingsWidget::colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t)
 {
-    emit colorChangedHSVSignal(h_t, s_t, v_t);
+    emit colorChangedHSVSignal(h_t, s_t, v_t, a_rect->getVal());
 }
 
-ColorSettingsWidget::ColorSettingsWidget(GLfloat h_t, GLfloat s_t, GLfloat v_t, QWidget *parent) : QWidget(parent)
+void ColorSettingsWidget::moveAlphaWidgetToTab(int tabId)
+{
+    ((QVBoxLayout*)aLayout->parent())->removeItem(aLayout);
+    if(tabId == 0) {
+        mRGBLayout->addLayout(aLayout);
+    } else if(tabId == 1) {
+        mHSVLayout->addLayout(aLayout);
+    } else if(tabId == 2) {
+        mHSLLayout->addLayout(aLayout);
+    } else if(tabId == 3) {
+        mWheelLayout->addLayout(aLayout);
+    }
+}
+
+ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
 {
     mWidgetsLayout->setAlignment(Qt::AlignTop);
     setLayout(mWidgetsLayout);
 
-    color_label = new ColorLabel(h_t, s_t, v_t, this);
+    color_label = new ColorLabel(this);
 
+    mWheelWidget->setLayout(mWheelLayout);
+    mWheelLayout->setAlignment(Qt::AlignTop);
     wheel_triangle_widget = new H_Wheel_SV_Triangle(this);
+    mWheelLayout->addWidget(wheel_triangle_widget, Qt::AlignHCenter);
+    mWheelLayout->setAlignment(wheel_triangle_widget, Qt::AlignHCenter);
 
     int LABEL_WIDTH = 20;
 
@@ -117,18 +134,27 @@ ColorSettingsWidget::ColorSettingsWidget(GLfloat h_t, GLfloat s_t, GLfloat v_t, 
     mHSLLayout->addLayout(lLayout);
     mHSLWidget->setLayout(mHSLLayout);
 
+    a_rect = new ColorValueRect(CVR_ALPHA, this);
+    aLabel->setFixedWidth(LABEL_WIDTH);
+    aLayout->addWidget(aLabel);
+    aLayout->addWidget(a_rect);
+    aLayout->addWidget(aSpin->getSpinBox());
+
     mWidgetsLayout->addWidget(color_label);
     mTabWidget->addTab(mRGBWidget, "RGB");
     mTabWidget->addTab(mHSVWidget, "HSV");
     mTabWidget->addTab(mHSLWidget, "HSL");
-    mTabWidget->addTab(wheel_triangle_widget, "Wheel");
+    mTabWidget->addTab(mWheelWidget, "Wheel");
     mWidgetsLayout->addWidget(mTabWidget);
+    mRGBLayout->addLayout(aLayout);
 
+    connect(mTabWidget, SIGNAL(currentChanged(int)),
+            SLOT(moveAlphaWidgetToTab(int)));
 
     connectSignalsAndSlots();
 
-    r_rect->setColorHSV_f(h_t, s_t, v_t, true);
     setMinimumSize(250, 200);
+    setCurrentColor(0.f, 0.f, 0.f);
 }
 
 void ColorSettingsWidget::connectColorWidgetSignalToSlot(ColorWidget *slot_obj, const char *slot,
@@ -159,6 +185,8 @@ void ColorSettingsWidget::connectColorWidgetSignalToSlots(ColorWidget *signal_sr
     connectColorWidgetSignalToSlot(wheel_triangle_widget, slot, signal_src, signal);
 
     connectColorWidgetSignalToSlot(color_label, slot, signal_src, signal);
+
+    connectColorWidgetSignalToSlot(a_rect, slot, signal_src, signal);
 
     connect(signal_src, signal, this, SLOT(colorChangedHSVSlot(GLfloat, GLfloat, GLfloat)) );
 }
@@ -245,4 +273,8 @@ void ColorSettingsWidget::connectSignalsAndSlots()
     connectColorWidgetSignalToSlots(color_label, SIGNAL(colorChangedHSV(GLfloat,GLfloat,GLfloat)),
                                     SLOT(setColorHSV_f(GLfloat, GLfloat, GLfloat) ) );
     //
+
+    connectRectToSpin(a_rect, aSpin);
+
+    connect(a_rect, SIGNAL(valChanged(GLfloat)), color_label, SLOT(setAlpha(GLfloat)));
 }

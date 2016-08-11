@@ -90,18 +90,7 @@ QString colorToStyleSheetString(Color color_t)
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Z &&
-            (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
-        if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
-            mUndoRedoStack.redo();
-        } else {
-            mUndoRedoStack.undo();
-        }
-    } else {
-        mCanvas->callKeyPress(event);
-    }
-
-    callUpdateSchedulers();
+    processKeyEvent(event);
 }
 
 #include "Colors/ColorWidgets/colorsettingswidget.h"
@@ -109,10 +98,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    QApplication::instance()->installEventFilter((QObject*)this);
+    setStyleSheet(
+        "QMainWindow::separator {\
+            background: rgb(155, 155, 155);\
+            width: 10px;\
+            height: 10px;\
+        }");
+
     mCanvas = new Canvas(this);
 
     mRightDock = new QDockWidget(this);
-    mRightDock->setWidget(new ColorSettingsWidget(0.f, 0.f, 0.f, this));
+    mRightDock->setWidget(new ColorSettingsWidget(this));
+    mRightDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar	);
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
 
     mToolBar = new QToolBar(this);
@@ -179,4 +177,31 @@ void MainWindow::callUpdateSchedulers()
 void MainWindow::scheduleRepaint()
 {
     mCanvas->scheduleRepaint();
+}
+
+bool MainWindow::eventFilter(QObject *, QEvent *e)
+{
+    if (e->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *key_event = (QKeyEvent*)e;
+        return processKeyEvent(key_event);
+    }
+    return false;
+}
+
+bool MainWindow::processKeyEvent(QKeyEvent *event) {
+    bool returnBool = true;
+    if(event->key() == Qt::Key_Z &&
+            (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
+        if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+            mUndoRedoStack.redo();
+        } else {
+            mUndoRedoStack.undo();
+        }
+    } else {
+        returnBool = mCanvas->processKeyEvent(event);
+    }
+
+    callUpdateSchedulers();
+    return returnBool;
 }

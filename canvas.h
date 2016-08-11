@@ -30,7 +30,6 @@ class Canvas : public QWidget, public BoundingBox
     Q_OBJECT
 public:
     explicit Canvas(MainWindow *parent = 0);
-    void callKeyPress(QKeyEvent *event);
     void addBoxToSelection(BoundingBox *box);
     void clearBoxesSelection();
     void selectOnlyLastPressedBox();
@@ -54,6 +53,7 @@ public:
     QPointF scaleDistancePointByCurrentScale(QPointF point);
     void addChild(BoundingBox *box);
     void removeChild(BoundingBox *box);
+    bool processKeyEvent(QKeyEvent *event);
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);

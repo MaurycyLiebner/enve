@@ -527,6 +527,18 @@ void ColorWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat hei
              top_aa, bottom_aa, left_aa, right_aa);
 }
 
+void ColorWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
+                                GLfloat r, GLfloat g, GLfloat b, GLfloat a,
+                                bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
+{
+    drawRect(x, y, width, height,
+             r, g, b, a,
+             r, g, b, a,
+             r, g, b, a,
+             r, g, b, a,
+             top_aa, bottom_aa, left_aa, right_aa);
+}
+
 void ColorWidget::drawSolidRectCenter(GLfloat cx, GLfloat cy, GLfloat width, GLfloat height,
                                          GLfloat r, GLfloat g, GLfloat b,
                                       bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
@@ -626,10 +638,10 @@ void ColorWidget::drawSolidCircle(GLfloat r, GLfloat cx, GLfloat cy, GLuint num_
 }
 
 void ColorWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
-                           GLfloat r1, GLfloat g1, GLfloat b1,
-                           GLfloat r2, GLfloat g2, GLfloat b2,
-                           GLfloat r3, GLfloat g3, GLfloat b3,
-                           GLfloat r4, GLfloat g4, GLfloat b4,
+                           GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
+                           GLfloat r2, GLfloat g2, GLfloat b2, GLfloat a2,
+                           GLfloat r3, GLfloat g3, GLfloat b3, GLfloat a3,
+                           GLfloat r4, GLfloat g4, GLfloat b4, GLfloat a4,
                            bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
 {
     GLfloat x1 = x;
@@ -653,13 +665,13 @@ void ColorWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
     GLfloat y44 = y4 + AA_VECT_LEN;
 
     glBegin(GL_QUADS);
-        glColor3f(r1, g1, b1);
+        glColor4f(r1, g1, b1, a1);
         glVertex2f(x1, y1);
-        glColor3f(r2, g2, b2);
+        glColor4f(r2, g2, b2, a2);
         glVertex2f(x2, y2);
-        glColor3f(r3, g3, b3);
+        glColor4f(r3, g3, b3, a3);
         glVertex2f(x3, y3);
-        glColor3f(r4, g4, b4);
+        glColor4f(r4, g4, b4, a4);
         glVertex2f(x4, y4);
 
         if(top_aa)
@@ -707,5 +719,20 @@ void ColorWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
             glVertex2f(x44, y44);
         }
     glEnd();
+}
+
+void ColorWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
+                           GLfloat r1, GLfloat g1, GLfloat b1,
+                           GLfloat r2, GLfloat g2, GLfloat b2,
+                           GLfloat r3, GLfloat g3, GLfloat b3,
+                           GLfloat r4, GLfloat g4, GLfloat b4,
+                           bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
+{
+    drawRect(x, y, width, height,
+             r1, g1, b1, 1.f,
+             r2, g2, b2, 1.f,
+             r3, g3, b3, 1.f,
+             r4, g4, b4, 1.f,
+             top_aa, bottom_aa, left_aa, right_aa);
 }
 

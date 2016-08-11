@@ -13,7 +13,8 @@ enum CVR_TYPE
     CVR_VALUE,
 
     CVR_HSLSATURATION,
-    CVR_LIGHTNESS
+    CVR_LIGHTNESS,
+    CVR_ALPHA
 };
 
 class ColorValueRect : public ColorWidget
@@ -22,6 +23,7 @@ class ColorValueRect : public ColorWidget
 public:
     ColorValueRect(CVR_TYPE type_t, QWidget *parent = NULL);
     void updateVal();
+    GLfloat getVal();
 private:
     void paintGL();
     void mouseMoveEvent(QMouseEvent *e);

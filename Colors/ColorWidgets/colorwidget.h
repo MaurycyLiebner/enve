@@ -23,6 +23,7 @@ public:
     void hide();
     ColorWidget(QWidget *parent = NULL);
     void emitColorChangedSignal(bool external_signal_t = true);
+    void drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height, GLfloat r, GLfloat g, GLfloat b, GLfloat a, bool top_aa, bool bottom_aa, bool left_aa, bool right_aa);
 protected:
     Color bgColor;
     GLfloat hsl_saturaton_tmp = -1.f; // HSL saturation saved when changing lightness
@@ -68,6 +69,12 @@ protected:
     void resizeGL(int w, int h);
 
     void setInternalColorChangeFunc(void (*internalColorChangeFunc_t)(ColorWidget *));
+    void drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
+                  GLfloat r1, GLfloat g1, GLfloat b1, GLfloat a1,
+                  GLfloat r2, GLfloat g2, GLfloat b2, GLfloat a2,
+                  GLfloat r3, GLfloat g3, GLfloat b3, GLfloat a3,
+                  GLfloat r4, GLfloat g4, GLfloat b4, GLfloat a4,
+                  bool top_aa, bool bottom_aa, bool left_aa, bool right_aa);
 private:
     bool visible = true;
     void initializeGL();

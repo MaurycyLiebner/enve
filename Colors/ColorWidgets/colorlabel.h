@@ -7,21 +7,17 @@ class ColorLabel : public ColorWidget
 {
     Q_OBJECT
 public:
-    explicit ColorLabel(GLfloat h_t, GLfloat s_t, GLfloat v_t, QWidget *parent = 0);
+    explicit ColorLabel(QWidget *parent = 0);
     void saveCurrentColorAsLast();
     void setLastColorHSV(GLfloat h, GLfloat s, GLfloat v);
     void mousePressEvent(QMouseEvent *e);
 signals:
 
 public slots:
+    void setAlpha(GLfloat alpha_t);
 private:
     void paintGL();
-    GLfloat last_color_r = 0.f;
-    GLfloat last_color_g = 0.f;
-    GLfloat last_color_b = 0.f;
-    GLfloat last_color_h = 0.f;
-    GLfloat last_color_s = 0.f;
-    GLfloat last_color_v = 0.f;
+    GLfloat alpha = 1.f;
 };
 
 #endif // COLORLABEL_H

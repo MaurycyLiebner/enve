@@ -14,23 +14,24 @@ class ColorSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ColorSettingsWidget(GLfloat h_t = 0.f, GLfloat s_t = 0.f, GLfloat v_t = 0.f, QWidget *parent = 0);
+    explicit ColorSettingsWidget(QWidget *parent = 0);
 
-    void setLastColorHSV(GLfloat h_t, GLfloat s_t, GLfloat v_t);
-
-
-    void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t);
+    void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
 signals:
-    void colorChangedHSVSignal(GLfloat, GLfloat, GLfloat);
+    void colorChangedHSVSignal(GLfloat, GLfloat, GLfloat, GLfloat);
 public slots:
 private slots:
     void colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t);
+
+    void moveAlphaWidgetToTab(int tabId);
 private:
     void connectSignalsAndSlots();
 
     QTabWidget *mTabWidget = new QTabWidget();
     QVBoxLayout *mWidgetsLayout = new QVBoxLayout();
 
+    QWidget *mWheelWidget = new QWidget();
+    QVBoxLayout *mWheelLayout = new QVBoxLayout();
     H_Wheel_SV_Triangle *wheel_triangle_widget = NULL;
 
     QWidget *mRGBWidget = new QWidget();
@@ -77,6 +78,12 @@ private:
     QLabel *lLabel = new QLabel("L:");
     ColorValueRect *l_rect = NULL;
     ColorValueSpin *lSpin = new ColorValueSpin(0, 100, 0, this);
+
+    QHBoxLayout *aLayout = new QHBoxLayout();
+    QLabel *aLabel = new QLabel("A:");
+    ColorValueRect *a_rect = NULL;
+    ColorValueSpin *aSpin = new ColorValueSpin(0, 100, 100, this);
+
 
     ColorLabel *color_label = NULL;
     void connectColorWidgetSignalToSlot(ColorWidget *slot_obj, const char *slot,

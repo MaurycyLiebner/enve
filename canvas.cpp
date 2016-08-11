@@ -16,12 +16,65 @@ bool zLessThan(BoundingBox *box1, BoundingBox *box2)
 Canvas::Canvas(MainWindow *parent) : QWidget(parent),
     BoundingBox(parent, BoundingBoxType::TYPE_CANVAS)
 {
+    setFocusPolicy(Qt::StrongFocus);
     mRotPivot = new PathPivot(this);
 }
 
-void Canvas::callKeyPress(QKeyEvent *event)
-{
-    keyPressEvent(event);
+bool Canvas::processKeyEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_F1) {
+        setCanvasMode(CanvasMode::MOVE_PATH);
+    } else if(event->key() == Qt::Key_F2) {
+        setCanvasMode(CanvasMode::MOVE_POINT);
+    } else if(event->key() == Qt::Key_F3) {
+        setCanvasMode(CanvasMode::ADD_POINT);
+    } else if(event->key() == Qt::Key_Delete) {
+        if(mCurrentMode == MOVE_POINT) {
+            startNewUndoRedoSet();
+
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->remove();
+            }
+            mSelectedPoints.clear();
+
+            finishUndoRedoSet();
+        } else if(mCurrentMode == MOVE_PATH) {
+            startNewUndoRedoSet();
+
+            foreachBoxInList(mSelectedBoxes) {
+                removeChild(box);
+            }
+            mSelectedBoxes.clear();
+
+            finishUndoRedoSet();
+        }
+    } else if(event->key() == Qt::Key_PageUp) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->moveUp();
+        }
+    } else if(event->key() == Qt::Key_PageDown) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->moveDown();
+        }
+    } else if(event->key() == Qt::Key_End) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->bringToEnd();
+        }
+    } else if(event->key() == Qt::Key_Home) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->bringToFront();
+        }
+    } else if(event->key() == Qt::Key_R && isMovingPath()) {
+        setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
+    } else if(event->key() == Qt::Key_S && isMovingPath()) {
+        setCanvasMode(CanvasMode::MOVE_PATH_SCALE);
+    } else if(event->key() == Qt::Key_G && isMovingPath()) {
+        setCanvasMode(CanvasMode::MOVE_PATH);
+    } else {
+        return false;
+    }
+    clearAllPointsSelection();
+
+    return true;
 }
 
 void Canvas::paintEvent(QPaintEvent *)
@@ -194,58 +247,7 @@ void Canvas::setCanvasMode(CanvasMode mode) {
 
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_F1) {
-        setCanvasMode(CanvasMode::MOVE_PATH);
-    } else if(event->key() == Qt::Key_F2) {
-        setCanvasMode(CanvasMode::MOVE_POINT);
-    } else if(event->key() == Qt::Key_F3) {
-        setCanvasMode(CanvasMode::ADD_POINT);
-    } else if(event->key() == Qt::Key_Delete) {
-        if(mCurrentMode == MOVE_POINT) {
-            startNewUndoRedoSet();
-
-            foreach(MovablePoint *point, mSelectedPoints) {
-                point->remove();
-            }
-            mSelectedPoints.clear();
-
-            finishUndoRedoSet();
-        } else if(mCurrentMode == MOVE_PATH) {
-            startNewUndoRedoSet();
-
-            foreachBoxInList(mSelectedBoxes) {
-                removeChild(box);
-            }
-            mSelectedBoxes.clear();
-
-            finishUndoRedoSet();
-        }
-    } else if(event->key() == Qt::Key_PageUp) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->moveUp();
-        }
-    } else if(event->key() == Qt::Key_PageDown) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->moveDown();
-        }
-    } else if(event->key() == Qt::Key_End) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->bringToEnd();
-        }
-    } else if(event->key() == Qt::Key_Home) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->bringToFront();
-        }
-    } else if(event->key() == Qt::Key_R && isMovingPath()) {
-        setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
-    } else if(event->key() == Qt::Key_S && isMovingPath()) {
-        setCanvasMode(CanvasMode::MOVE_PATH_SCALE);
-    } else if(event->key() == Qt::Key_G && isMovingPath()) {
-        setCanvasMode(CanvasMode::MOVE_PATH);
-    } else {
-        return;
-    }
-    clearAllPointsSelection();
+    processKeyEvent(event);
 }
 
 void Canvas::clearAllPathsSelection() {

@@ -19,6 +19,7 @@ public slots:
 private slots:
     void spinBoxValSet(int spin_box_val_t);
 private:
+    bool mEmit = true;
     QSpinBox *spin_box = NULL;
 };
 

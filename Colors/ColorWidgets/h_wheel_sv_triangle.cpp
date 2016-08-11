@@ -9,8 +9,7 @@
 
 H_Wheel_SV_Triangle::H_Wheel_SV_Triangle(QWidget *parent_t) : ColorWidget(parent_t)
 {
-    setMinimumSize(100, 100);
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setFixedSize(200, 200);
 }
 
 void H_Wheel_SV_Triangle::resizeGL(int w, int h)

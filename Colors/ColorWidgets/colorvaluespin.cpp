@@ -22,12 +22,14 @@ QSpinBox *ColorValueSpin::getSpinBox()
 
 void ColorValueSpin::setVal(GLfloat val_t)
 {
-    disconnect(spin_box, SIGNAL(valueChanged(int) ), this, SLOT(spinBoxValSet(int)) );
+    mEmit = false;
     spin_box->setValue(val_t*(spin_box->maximum() - spin_box->minimum()) + spin_box->minimum() );
-    connect(spin_box, SIGNAL(valueChanged(int) ), this, SLOT(spinBoxValSet(int)) );
+    mEmit = true;
 }
 
 void ColorValueSpin::spinBoxValSet(int spin_box_val_t)
 {
-    emit valSet( ( (GLfloat)spin_box_val_t)/spin_box->maximum() );
+    if(mEmit) {
+        emit valSet( ( (GLfloat)spin_box_val_t)/spin_box->maximum() );
+    }
 }

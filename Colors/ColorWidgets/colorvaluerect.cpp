@@ -21,10 +21,8 @@ void ColorValueRect::paintGL()
     GLfloat g = saturation;
     GLfloat b = value;
     hsv_to_rgb_float(&r, &g, &b);
-    bool text_light = false;
     if(type == CVR_RED)
     {
-        text_light = shouldValPointerBeLightRGB(0.f, g, b);
         drawRect(0.f, 0.f, width(), height(),
                  0.f, g, b,
                  1.f, g, b,
@@ -33,7 +31,6 @@ void ColorValueRect::paintGL()
     }
     else if(type == CVR_GREEN)
     {
-        text_light = shouldValPointerBeLightRGB(r, 0.f, b);
         drawRect(0.f, 0.f, width(), height(),
                  r, 0.f, b,
                  r, 1.f, b,
@@ -42,7 +39,6 @@ void ColorValueRect::paintGL()
     }
     else if(type == CVR_BLUE)
     {
-        text_light = shouldValPointerBeLightRGB(r, g, 0.f);
         drawRect(0.f, 0.f, width(), height(),
                  r, g, 0.f,
                  r, g, 1.f,
@@ -51,7 +47,6 @@ void ColorValueRect::paintGL()
     }
     else if(type == CVR_HUE)
     {
-        text_light = shouldValPointerBeLightHSV(0.f, saturation, value);
         GLfloat seg_width = (GLfloat)width()/number_segments;
         GLfloat last_r;
         GLfloat last_g;
@@ -79,7 +74,6 @@ void ColorValueRect::paintGL()
     }
     else if(type == CVR_HSVSATURATION)
     {
-        text_light = shouldValPointerBeLightHSV(hue, 0.f, value);
         GLfloat seg_width = (GLfloat)width()/number_segments;
         GLfloat last_r;
         GLfloat last_g;
@@ -107,7 +101,6 @@ void ColorValueRect::paintGL()
     }
     else if(type == CVR_VALUE)
     {
-        text_light = shouldValPointerBeLightHSV(hue, saturation, 0.f);
         GLfloat seg_width = (GLfloat)width()/number_segments;
         GLfloat last_r;
         GLfloat last_g;
@@ -145,7 +138,6 @@ void ColorValueRect::paintGL()
         GLfloat s_t = saturation;
         GLfloat l_t = value;
         hsv_to_hsl(&h_t, &s_t, &l_t);
-        text_light = shouldValPointerBeLightHSL(h_t, 0.f, l_t);
         for(int i = 0; i <= number_segments; i++)
         {
             GLfloat c_r = hue;
@@ -178,7 +170,6 @@ void ColorValueRect::paintGL()
         GLfloat s_t = saturation;
         GLfloat l_t = value;
         hsv_to_hsl(&h_t, &s_t, &l_t);
-        text_light = shouldValPointerBeLightHSL(h_t, s_t, 0.f);
         for(int i = 0; i <= number_segments; i++)
         {
             GLfloat c_r = hue;
@@ -198,6 +189,28 @@ void ColorValueRect::paintGL()
             last_g = c_g;
             last_b = c_b;
         }
+    }
+    else if(type == CVR_ALPHA)
+    {
+        GLfloat r = hue;
+        GLfloat g = saturation;
+        GLfloat b = value;
+        hsv_to_rgb_float(&r, &g, &b);
+        GLfloat val1 = 0.5f;
+        GLfloat val2 = 0.25f;
+        for(int i = 0; i < width(); i += 7) {
+            for(int j = 0; j < height(); j += 7) {
+                GLfloat val = ((i + j) % 2 == 0) ? val1 : val2;
+                drawSolidRect(i, j, 7, 7, val, val, val,
+                              false, false, false, false);
+            }
+        }
+        drawRect(0.f, 0.f, width(), height(),
+                 r, g, b, 0.f,
+                 r, g, b, 1.f,
+                 r, g, b, 1.f,
+                 r, g, b, 0.f,
+                 false, false, false, false);
     }
 
     if(shouldValPointerBeLightHSV(hue, saturation, value) )
@@ -343,6 +356,11 @@ void ColorValueRect::updateVal()
         setVal(lightness_t);
     }
     emit valUpdated(val);
+}
+
+GLfloat ColorValueRect::getVal()
+{
+    return val;
 }
 
 void ColorValueRect::setVal(GLfloat val_t, bool emit_signal)

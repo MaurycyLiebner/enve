@@ -29,8 +29,10 @@ private:
     Canvas *mCanvas;
     UndoRedoStack mUndoRedoStack;
     QList<UpdateScheduler*> mUpdateSchedulers;
+    bool processKeyEvent(QKeyEvent *event);
 protected:
     void keyPressEvent(QKeyEvent *event);
+    bool eventFilter(QObject *, QEvent *e);
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
