@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     Colors/savedcolorbutton.cpp \
     Colors/savedcolorswidget.cpp \
     Colors/savedcolorwidgets.cpp \
-    Colors/helpers.cpp
+    Colors/helpers.cpp \
+    boxesgroup.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -63,4 +64,5 @@ HEADERS  += mainwindow.h \
     Colors/savedcolorbutton.h \
     Colors/savedcolorswidget.h \
     Colors/savedcolorwidgets.h \
-    Colors/helpers.h
+    Colors/helpers.h \
+    boxesgroup.h

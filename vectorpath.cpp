@@ -127,15 +127,12 @@ void VectorPath::draw(QPainter *p)
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     p->save();
-    if(currentCanvasMode == CanvasMode::MOVE_PATH_SCALE ||
-            currentCanvasMode == CanvasMode::MOVE_PATH_ROTATE ||
-            currentCanvasMode == CanvasMode::MOVE_PATH) {
-        QPen pen = p->pen();
-        p->setPen(QPen(QColor(0, 0, 0, 125), 2, Qt::DotLine));
-        p->setBrush(Qt::NoBrush);
-        p->drawRect(getBoundingRect());
-        p->setPen(pen);
-    } else if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+    QPen pen = p->pen();
+    p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
+    p->setBrush(Qt::NoBrush);
+    p->drawRect(getBoundingRect());
+    p->setPen(pen);
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
             point->draw(p, currentCanvasMode);

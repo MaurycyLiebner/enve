@@ -54,6 +54,7 @@ public:
     void addChild(BoundingBox *box);
     void removeChild(BoundingBox *box);
     bool processKeyEvent(QKeyEvent *event);
+    bool isCtrlPressed();
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -73,6 +74,7 @@ protected:
     void handleMovePointMouseRelease(QPointF pos);
 
     bool isMovingPath();
+    BoundingBox *getBoxAt(QPointF absPos);
 signals:
 
 public slots:

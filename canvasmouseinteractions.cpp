@@ -6,23 +6,28 @@ QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
     return point/mTransformMatrix.m11();
 }
 
+BoundingBox *Canvas::getBoxAt(QPointF absPos) {
+    BoundingBox *boxAtPos = NULL;
+
+    foreachBoxInListInverted(mChildren) {
+        if(box->pointInsidePath(absPos)) {
+            if(!(isShiftPressed()) && !box->isSelected()) {
+                clearBoxesSelection();
+            }
+            boxAtPos = box;
+            break;
+        }
+    }
+    return boxAtPos;
+}
+
 void Canvas::handleMovePathMousePressEvent() {
     if(mCurrentMode == CanvasMode::MOVE_PATH_ROTATE) {
         if(mRotPivot->isPointAt(mPressPos)) {
             mRotPivot->select();
         }
     } else {
-        BoundingBox *boxUnderMouse = NULL;
-
-        foreachBoxInListInverted(mChildren) {
-            if(box->pointInsidePath(mPressPos)) {
-                if(!(isShiftPressed()) && !box->isSelected()) {
-                    clearBoxesSelection();
-                }
-                boxUnderMouse = box;
-                break;
-            }
-        }
+        BoundingBox *boxUnderMouse = getBoxAt(mPressPos);
         if(boxUnderMouse == NULL) {
             if(!(isShiftPressed()) ) {
                 clearBoxesSelection();
@@ -108,11 +113,27 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
 void Canvas::handleMovePointMouseRelease(QPointF pos) {
     if(mSelecting) {
+        mSelecting = false;
+        if(mFirstMouseMove) {
+            BoundingBox *box = getBoxAt(pos);
+            if(box != NULL) {
+                mLastPressedBox = box;
+                if(isShiftPressed()) {
+                    if(box->isSelected()) {
+                        removeBoxFromSelection(box);
+                    } else {
+                        addBoxToSelection(box);
+                    }
+                } else {
+                    selectOnlyLastPressedBox();
+                }
+            }
+            return;
+        }
         moveSecondSelectionPoint(pos);
         foreachBoxInList(mSelectedBoxes) {
             box->selectAndAddContainedPointsToList(mSelectionRect, &mSelectedPoints);
         }
-        mSelecting = false;
     } else if(mFirstMouseMove) {
         if(isShiftPressed()) {
             if(mLastPressedPoint != NULL) {

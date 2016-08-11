@@ -48,19 +48,19 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
             finishUndoRedoSet();
         }
     } else if(event->key() == Qt::Key_PageUp) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
+        foreachBoxInList(mSelectedBoxes) {
             box->moveUp();
         }
     } else if(event->key() == Qt::Key_PageDown) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
+        foreachBoxInList(mSelectedBoxes) {
             box->moveDown();
         }
     } else if(event->key() == Qt::Key_End) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
+        foreachBoxInList(mSelectedBoxes) {
             box->bringToEnd();
         }
     } else if(event->key() == Qt::Key_Home) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
+        foreachBoxInList(mSelectedBoxes) {
             box->bringToFront();
         }
     } else if(event->key() == Qt::Key_R && isMovingPath()) {
@@ -69,12 +69,27 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
         setCanvasMode(CanvasMode::MOVE_PATH_SCALE);
     } else if(event->key() == Qt::Key_G && isMovingPath()) {
         setCanvasMode(CanvasMode::MOVE_PATH);
+    } else if(event->key() == Qt::Key_A && isCtrlPressed()) {
+        if(isShiftPressed()) {
+            foreachBoxInList(mSelectedBoxes) {
+                removeBoxFromSelection(box);
+            }
+        } else {
+            foreachBoxInList(mChildren) {
+                if(box->isSelected()) continue;
+                addBoxToSelection(box);
+            }
+        }
     } else {
         return false;
     }
     clearAllPointsSelection();
 
     return true;
+}
+
+bool Canvas::isCtrlPressed() {
+    return (QApplication::keyboardModifiers() & Qt::ControlModifier);
 }
 
 void Canvas::paintEvent(QPaintEvent *)
