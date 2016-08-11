@@ -9,11 +9,26 @@ class Canvas;
 
 class UndoRedoStack;
 
+enum CanvasMode : short;
+
+enum BoundingBoxType {
+    TYPE_VECTOR_PATH,
+    TYPE_GROUP,
+    TYPE_CANVAS
+};
+
 class BoundingBox : public ConnectedToMainWindow
 {
 public:
-    BoundingBox(BoundingBox *parent);
-    BoundingBox(MainWindow *window);
+    BoundingBox(BoundingBox *parent, BoundingBoxType type);
+    BoundingBox(MainWindow *window, BoundingBoxType type);
+
+    virtual void updatePivotPosition() {}
+    virtual bool isContainedIn(QRectF absRect) {}
+    virtual QRectF getBoundingRect() {}
+
+    virtual void draw(QPainter *p) {}
+    virtual void drawSelected(QPainter *p, CanvasMode currentCanvasMode) {}
 
     QMatrix getCombinedTransform();
 
@@ -37,14 +52,42 @@ public:
 
     void addChild(BoundingBox *child);
     void removeChild(BoundingBox *child);
+
+    void moveUp();
+    void moveDown();
+    void bringToFront();
+    void bringToEnd();
+
+    void increaseChildZInList(BoundingBox *child);
+    void decreaseChildZInList(BoundingBox *child);
+    void bringChildToEndList(BoundingBox *child);
+    void bringChildToFrontList(BoundingBox *child);
+
+    void setZListIndex(int z, bool saveUndoRedo = true);
+    void updateChildrenId(int firstId, int lastId);
+    void updateChildrenId(int firstId);
+    void moveChildInList(int from, int to, bool saveUndoRedo = true);
+    void removeChildFromList(int id, bool saveUndoRedo = true);
+    void addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo = true);
+
+
+    QPointF getPivotAbsPos();
+    bool isSelected();
+    void select();
+    void deselect();
+    int getZIndex();
 protected:
     virtual void updateAfterCombinedTransformationChanged();
-
+    BoundingBoxType mType;
     QList<BoundingBox*> mChildren;
     BoundingBox *mParent = NULL;
     QMatrix mSavedTransformMatrix;
     QMatrix mTransformMatrix;
     QMatrix mCombinedTransformMatrix;
+    int mZListIndex;
+    QPointF mAbsRotPivotPos;
+    bool mPivotChanged = false;
+    bool mSelected = false;
 };
 
 

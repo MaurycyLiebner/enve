@@ -3,16 +3,41 @@
 #include "undoredo.h"
 #include <QDebug>
 
-BoundingBox::BoundingBox(BoundingBox *parent) : ConnectedToMainWindow(parent)
+BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) : ConnectedToMainWindow(parent)
 {
+    mType = type;
     mParent = parent;
     mParent->addChild(this);
     mTransformMatrix.reset();
     mCombinedTransformMatrix.reset();
+    updateCombinedTransform();
 }
 
-BoundingBox::BoundingBox(MainWindow *window) : ConnectedToMainWindow(window)
+QPointF BoundingBox::getPivotAbsPos()
 {
+    return mAbsRotPivotPos;
+}
+
+bool BoundingBox::isSelected()
+{
+    return mSelected;
+}
+
+void BoundingBox::select()
+{
+    mSelected = true;
+    scheduleRepaint();
+}
+
+void BoundingBox::deselect()
+{
+    mSelected = false;
+    scheduleRepaint();
+}
+
+BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) : ConnectedToMainWindow(window)
+{
+    mType = type;
     mTransformMatrix.reset();
     mCombinedTransformMatrix.reset();
 }
@@ -69,12 +94,133 @@ void BoundingBox::finishTransform()
 
 void BoundingBox::addChild(BoundingBox *child)
 {
-    mChildren.append(child);
+    startNewUndoRedoSet();
+    addChildToListAt(0, child);
+    updateChildrenId(0);
+    finishUndoRedoSet();
+}
+
+void BoundingBox::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
+    mChildren.insert(index, child);
+
+    if(saveUndoRedo) {
+        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
+    }
+}
+
+void BoundingBox::updateChildrenId(int firstId) {
+    updateChildrenId(firstId, mChildren.length() - 1);
+}
+
+void BoundingBox::updateChildrenId(int firstId, int lastId) {
+    startNewUndoRedoSet();
+    for(int i = firstId; i <= lastId; i++) {
+        mChildren.at(i)->setZListIndex(i);
+    }
+    finishUndoRedoSet();
+}
+
+void BoundingBox::removeChildFromList(int id, bool saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new RemoveChildFromListUndoRedo(this, id, mChildren.at(id)) );
+    }
+    mChildren.removeAt(id);
 }
 
 void BoundingBox::removeChild(BoundingBox *child)
 {
-    mChildren.removeOne(child);
+    startNewUndoRedoSet();
+    int index = mChildren.indexOf(child);
+    removeChildFromList(index);
+    updateChildrenId(index);
+    finishUndoRedoSet();
+}
+
+void BoundingBox::moveUp()
+{
+    mParent->decreaseChildZInList(this);
+}
+
+void BoundingBox::moveDown()
+{
+    mParent->increaseChildZInList(this);
+}
+
+void BoundingBox::bringToFront()
+{
+    mParent->bringChildToFrontList(this);
+}
+
+void BoundingBox::bringToEnd()
+{
+    mParent->bringChildToEndList(this);
+}
+
+void BoundingBox::increaseChildZInList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == mChildren.count() - 1) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, index + 1);
+    updateChildrenId(index);
+    finishUndoRedoSet();
+}
+
+void BoundingBox::decreaseChildZInList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == 0) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, index - 1);
+    updateChildrenId(index - 1);
+    finishUndoRedoSet();
+}
+
+void BoundingBox::bringChildToEndList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == mChildren.count() - 1) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, mChildren.length() - 1);
+    updateChildrenId(index - 1);
+    finishUndoRedoSet();
+}
+
+void BoundingBox::bringChildToFrontList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == 0) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, 0);
+    updateChildrenId(0, index);
+    finishUndoRedoSet();
+}
+
+void BoundingBox::moveChildInList(int from, int to, bool saveUndoRedo) {
+    mChildren.move(from, to);
+    if(saveUndoRedo) {
+        addUndoRedo(new MoveChildInListUndoRedo(from, to, this) );
+    }
+}
+
+void BoundingBox::setZListIndex(int z, bool saveUndoRedo)
+{
+    if(saveUndoRedo) {
+        addUndoRedo(new SetBoundingBoxZListIndexUnoRedo(mZListIndex, z, this));
+    }
+    mZListIndex = z;
+}
+
+int BoundingBox::getZIndex() {
+    return mZListIndex;
 }
 
 void BoundingBox::moveBy(qreal dx, qreal dy)

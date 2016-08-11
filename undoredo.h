@@ -359,4 +359,98 @@ private:
     bool mIsStartPt;
 };
 
+class MoveChildInListUndoRedo : public UndoRedo
+{
+public:
+    MoveChildInListUndoRedo(int fromIndex,
+                            int toIndex,
+                            BoundingBox *parentBox) : UndoRedo() {
+        mParentBox = parentBox;
+        mFromIndex = fromIndex;
+        mToIndex = toIndex;
+    }
+
+    void redo() {
+        mParentBox->moveChildInList(mFromIndex, mToIndex, false);
+    }
+
+    void undo() {
+        mParentBox->moveChildInList(mToIndex, mFromIndex, false);
+    }
+private:
+    BoundingBox *mParentBox;
+    int mFromIndex;
+    int mToIndex;
+};
+
+class SetBoundingBoxZListIndexUnoRedo : public UndoRedo
+{
+public:
+    SetBoundingBoxZListIndexUnoRedo(int indexBefore,
+                                    int indexAfter,
+                                    BoundingBox *box) : UndoRedo() {
+        mBox = box;
+        mIndexAfter = indexAfter;
+        mIndexBefore = indexBefore;
+    }
+
+    void redo() {
+        mBox->setZListIndex(mIndexAfter, false);
+    }
+
+    void undo() {
+        mBox->setZListIndex(mIndexBefore, false);
+    }
+
+private:
+    int mIndexBefore;
+    int mIndexAfter;
+    BoundingBox *mBox;
+};
+
+class AddChildToListUndoRedo : public UndoRedo
+{
+public:
+    AddChildToListUndoRedo(BoundingBox *parent,
+                           int index,
+                           BoundingBox *child) : UndoRedo() {
+        mParent = parent;
+        mAddAtId = index;
+        mChild = child;
+    }
+
+    void redo() {
+        mParent->addChildToListAt(mAddAtId, mChild, false);
+    }
+
+    void undo() {
+        mParent->removeChildFromList(mAddAtId, false);
+    }
+
+private:
+    BoundingBox *mParent;
+    int mAddAtId;
+    BoundingBox *mChild;
+};
+
+class RemoveChildFromListUndoRedo : public AddChildToListUndoRedo
+{
+public:
+    RemoveChildFromListUndoRedo(BoundingBox *parent,
+                                int index,
+                                BoundingBox *child) :
+        AddChildToListUndoRedo(parent, index, child) {
+
+    }
+
+    void redo() {
+        AddChildToListUndoRedo::undo();
+    }
+
+    void undo() {
+        AddChildToListUndoRedo::redo();
+    }
+private:
+};
+
 #endif // UNDOREDO_H

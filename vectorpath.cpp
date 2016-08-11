@@ -7,10 +7,11 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 
-VectorPath::VectorPath(Canvas *canvas) : BoundingBox(canvas)
+VectorPath::VectorPath(Canvas *canvas) :
+    BoundingBox(canvas,
+                BoundingBoxType::TYPE_VECTOR_PATH)
 {
     mCanvas = canvas;
-    updateCombinedTransform();
 }
 
 VectorPath::~VectorPath()
@@ -110,23 +111,6 @@ bool VectorPath::isContainedIn(QRectF absRect) {
     return absRect.contains(getBoundingRect());
 }
 
-bool VectorPath::isSelected()
-{
-    return mSelected;
-}
-
-void VectorPath::select()
-{
-    mSelected = true;
-    scheduleRepaint();
-}
-
-void VectorPath::deselect()
-{
-    mSelected = false;
-    scheduleRepaint();
-}
-
 QRectF VectorPath::getBoundingRect()
 {
     return mMappedPath.boundingRect();
@@ -165,11 +149,6 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
         }
     }
     p->restore();
-}
-
-QPointF VectorPath::getPivotAbsPos()
-{
-    return mAbsRotPivotPos;
 }
 
 MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)

@@ -30,9 +30,6 @@ public:
     void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint*> *list);
     bool isContainedIn(QRectF absRect);
 
-    bool isSelected();
-    void select();
-    void deselect();
     PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
 
     Canvas *getCanvas();
@@ -50,8 +47,6 @@ public:
     void updatePathIfNeeded();
     void updateMappedPathIfNeeded();
     void updatePivotPosition();
-
-    QPointF getPivotAbsPos();
 private:
     void updatePath();
     void updateMappedPath();
@@ -59,15 +54,11 @@ private:
     bool mPathUpdateNeeded = false;
     bool mMappedPathUpdateNeeded = false;
 
-    bool mSelected = false;
     bool mClosedPath = false;
     QList<PathPoint*> mSeparatePaths;
     QList<PathPoint*> mPoints;
     QPainterPath mPath;
     QPainterPath mMappedPath;
-
-    bool mPivotChanged = false;
-    QPointF mAbsRotPivotPos;
 
     Canvas *mCanvas;
 protected:

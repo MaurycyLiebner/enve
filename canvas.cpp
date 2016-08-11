@@ -8,7 +8,13 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 
-Canvas::Canvas(MainWindow *parent) : QWidget(parent), BoundingBox(parent)
+bool zLessThan(BoundingBox *box1, BoundingBox *box2)
+{
+    return box1->getZIndex() < box2->getZIndex();
+}
+
+Canvas::Canvas(MainWindow *parent) : QWidget(parent),
+    BoundingBox(parent, BoundingBoxType::TYPE_CANVAS)
 {
     mRotPivot = new PathPivot(this);
 }
@@ -212,6 +218,22 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             mSelectedPaths.clear();
 
             finishUndoRedoSet();
+        }
+    } else if(event->key() == Qt::Key_PageUp) {
+        foreach(BoundingBox *box, mSelectedPaths) {
+            box->moveUp();
+        }
+    } else if(event->key() == Qt::Key_PageDown) {
+        foreach(BoundingBox *box, mSelectedPaths) {
+            box->moveDown();
+        }
+    } else if(event->key() == Qt::Key_End) {
+        foreach(BoundingBox *box, mSelectedPaths) {
+            box->bringToEnd();
+        }
+    } else if(event->key() == Qt::Key_Home) {
+        foreach(BoundingBox *box, mSelectedPaths) {
+            box->bringToFront();
         }
     } else if(event->key() == Qt::Key_R && isMovingPath()) {
         setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
