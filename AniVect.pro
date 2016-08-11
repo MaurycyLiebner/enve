@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg
+QT       += core gui svg opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,7 +24,21 @@ SOURCES += main.cpp\
     pathpivot.cpp \
     canvasmouseinteractions.cpp \
     ctrlpoint.cpp \
-    boundingbox.cpp
+    boundingbox.cpp \
+    Colors/ColorWidgets/colorlabel.cpp \
+    Colors/ColorWidgets/colorsettingswidget.cpp \
+    Colors/ColorWidgets/colorvaluerect.cpp \
+    Colors/ColorWidgets/colorvaluespin.cpp \
+    Colors/ColorWidgets/colorwidget.cpp \
+    Colors/ColorWidgets/h_wheel_sv_triangle.cpp \
+    Colors/ColorWidgets/hwheelsvtriangle.cpp \
+    Colors/color.cpp \
+    Colors/colorbutton.cpp \
+    Colors/colorpickingwidget.cpp \
+    Colors/savedcolorbutton.cpp \
+    Colors/savedcolorswidget.cpp \
+    Colors/savedcolorwidgets.cpp \
+    Colors/helpers.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -37,4 +51,18 @@ HEADERS  += mainwindow.h \
     movablepoint.h \
     pathpivot.h \
     ctrlpoint.h \
-    boundingbox.h
+    boundingbox.h \
+    Colors/ColorWidgets/colorlabel.h \
+    Colors/ColorWidgets/colorsettingswidget.h \
+    Colors/ColorWidgets/colorvaluerect.h \
+    Colors/ColorWidgets/colorvaluespin.h \
+    Colors/ColorWidgets/colorwidget.h \
+    Colors/ColorWidgets/h_wheel_sv_triangle.h \
+    Colors/ColorWidgets/hwheelsvtriangle.h \
+    Colors/color.h \
+    Colors/colorbutton.h \
+    Colors/colorpickingwidget.h \
+    Colors/savedcolorbutton.h \
+    Colors/savedcolorswidget.h \
+    Colors/savedcolorwidgets.h \
+    Colors/helpers.h

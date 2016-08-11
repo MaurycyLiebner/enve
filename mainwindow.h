@@ -5,6 +5,8 @@
 #include <QGraphicsView>
 #include "canvas.h"
 #include "undoredo.h"
+#include "Colors/color.h"
+#include <QDockWidget>
 
 class UpdateScheduler;
 
@@ -12,6 +14,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
+    QDockWidget *mRightDock;
+
     QToolBar *mToolBar;
     QAction *mActionConnectPoints;
     QAction *mActionDisconnectPoints;
@@ -37,6 +41,23 @@ public:
 
     void callUpdateSchedulers();
     void scheduleRepaint();
+
+    static Color getColor(bool darker, bool selected, bool hover);
+// colors
+    static Color color_hover;
+    static Color color_hover_darker;
+    static Color color_selected;
+    static Color color_selected_darker;
+    static Color color_selected_hover;
+    static Color color_selected_hover_darker;
+    static Color color_current;
+    static Color color_current_darker;
+    static Color color_current_hover;
+    static Color color_current_hover_darker;
+    static Color color_light;
+    static Color color_darker;
+    static Color color_dark;
+    static Color color_selected_active;
 };
 
 #endif // MAINWINDOW_H
