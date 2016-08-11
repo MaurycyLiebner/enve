@@ -29,11 +29,12 @@ void Canvas::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
-    foreach (VectorPath *path, mPaths) {
-        path->draw(&p);
+
+    for(int i = mChildren.length() - 1; i >= 0; i--) {
+        mChildren.at(i)->draw(&p);
     }
-    foreach (VectorPath *path, mSelectedPaths) {
-        path->drawSelected(&p, mCurrentMode);
+    for(int i = mSelectedBoxes.length() - 1; i >= 0; i--) {
+        mSelectedBoxes.at(i)->drawSelected(&p, mCurrentMode);
     }
     p.setPen(QPen(QColor(0, 0, 255, 125), 2.f, Qt::DotLine));
     if(mSelecting) {
@@ -212,27 +213,27 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         } else if(mCurrentMode == MOVE_PATH) {
             startNewUndoRedoSet();
 
-            foreach(VectorPath *path, mSelectedPaths) {
-                removePath(path);
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                removeChild(box);
             }
-            mSelectedPaths.clear();
+            mSelectedBoxes.clear();
 
             finishUndoRedoSet();
         }
     } else if(event->key() == Qt::Key_PageUp) {
-        foreach(BoundingBox *box, mSelectedPaths) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->moveUp();
         }
     } else if(event->key() == Qt::Key_PageDown) {
-        foreach(BoundingBox *box, mSelectedPaths) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->moveDown();
         }
     } else if(event->key() == Qt::Key_End) {
-        foreach(BoundingBox *box, mSelectedPaths) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->bringToEnd();
         }
     } else if(event->key() == Qt::Key_Home) {
-        foreach(BoundingBox *box, mSelectedPaths) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->bringToFront();
         }
     } else if(event->key() == Qt::Key_R && isMovingPath()) {
@@ -248,19 +249,19 @@ void Canvas::keyPressEvent(QKeyEvent *event)
 }
 
 void Canvas::clearAllPathsSelection() {
-    clearPathsSelection();
-    if(mLastPressedPath != NULL) {
-        mLastPressedPath->deselect();
-        mLastPressedPath = NULL;
+    clearBoxesSelection();
+    if(mLastPressedBox != NULL) {
+        mLastPressedBox->deselect();
+        mLastPressedBox = NULL;
     }
 }
 
-void Canvas::clearPathsSelection()
+void Canvas::clearBoxesSelection()
 {
-    foreach(VectorPath *path, mSelectedPaths) {
-        path->deselect();
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->deselect();
     }
-    mSelectedPaths.clear();
+    mSelectedBoxes.clear();
 }
 
 void Canvas::clearAllPointsSelection() {
@@ -280,12 +281,13 @@ void Canvas::clearPointsSelection()
     mSelectedPoints.clear();
 }
 
-void Canvas::addPathToSelection(VectorPath *path) {
-    if(path->isSelected()) {
+void Canvas::addBoxToSelection(BoundingBox *box) {
+    if(box->isSelected()) {
         return;
     }
-    path->select();
-    mSelectedPaths.append(path);
+    box->select();
+    mSelectedBoxes.append(box);
+    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
 }
 
 void Canvas::addPointToSelection(MovablePoint *point)
@@ -297,9 +299,9 @@ void Canvas::addPointToSelection(MovablePoint *point)
     mSelectedPoints.append(point);
 }
 
-void Canvas::removePathFromSelection(VectorPath *path) {
-    path->deselect();
-    mSelectedPaths.removeOne(path);
+void Canvas::removeBoxFromSelection(BoundingBox *box) {
+    box->deselect();
+    mSelectedBoxes.removeOne(box);
 }
 
 void Canvas::removePointFromSelection(MovablePoint *point) {
@@ -318,12 +320,12 @@ void Canvas::setCurrentEndPoint(PathPoint *point)
     mCurrentEndPoint = point;
 }
 
-void Canvas::selectOnlyLastPressedPath() {
-    clearPathsSelection();
-    if(mLastPressedPath == NULL) {
+void Canvas::selectOnlyLastPressedBox() {
+    clearBoxesSelection();
+    if(mLastPressedBox == NULL) {
         return;
     }
-    addPathToSelection(mLastPressedPath);
+    addBoxToSelection(mLastPressedBox);
 }
 
 void Canvas::selectOnlyLastPressedPoint() {
@@ -389,31 +391,21 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
             point = point->getPreviousPoint();
         }
     }
-    removePath(pathSrc);
+    removeChild(pathSrc);
 
     finishUndoRedoSet();
 }
 
-void Canvas::addPath(VectorPath *path, bool saveUndoRedo)
+void Canvas::addChild(BoundingBox *box)
 {
-    mPaths.append(path);
-    addPathToSelection(path);
-
-    if(saveUndoRedo) {
-        AddPathUndoRedo *undoRedo = new AddPathUndoRedo(path);
-        addUndoRedo(undoRedo);
-    }
+    BoundingBox::addChild(box);
+    addBoxToSelection(box);
 }
 
-void Canvas::removePath(VectorPath *path, bool saveUndoRedo)
+void Canvas::removeChild(BoundingBox *box)
 {
-    mPaths.removeOne(path);
-    if(path->isSelected()) {
-        removePathFromSelection(path);
-    }
-
-    if(saveUndoRedo) {
-        RemovePathUndoRedo *undoRedo = new RemovePathUndoRedo(path);
-        addUndoRedo(undoRedo);
+    BoundingBox::removeChild(box);
+    if(box->isSelected()) {
+        removeBoxFromSelection(box);
     }
 }

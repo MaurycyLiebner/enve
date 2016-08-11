@@ -132,43 +132,6 @@ private:
     QMatrix mTransformAfter;
 };
 
-class AddPathUndoRedo : public UndoRedo
-{
-public:
-    AddPathUndoRedo(VectorPath *createdPath) : UndoRedo() {
-        mCreatedPath = createdPath;
-    }
-
-    void redo() {
-        mCreatedPath->getCanvas()->addPath(mCreatedPath, false);
-    }
-
-    void undo() {
-        mCreatedPath->getCanvas()->removePath(mCreatedPath, false);
-    }
-
-private:
-    VectorPath *mCreatedPath;
-};
-
-class RemovePathUndoRedo : public AddPathUndoRedo
-{
-public:
-    RemovePathUndoRedo(VectorPath *removedPath) : AddPathUndoRedo(removedPath) {
-    }
-
-    void redo() {
-        AddPathUndoRedo::undo();
-    }
-
-    void undo() {
-        AddPathUndoRedo::redo();
-    }
-
-private:
-    VectorPath *mDeletedPath;
-};
-
 class MoveMovablePointUndoRedo : public UndoRedo
 {
 public:

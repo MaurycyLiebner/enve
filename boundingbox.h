@@ -9,6 +9,8 @@ class Canvas;
 
 class UndoRedoStack;
 
+class MovablePoint;
+
 enum CanvasMode : short;
 
 enum BoundingBoxType {
@@ -50,8 +52,11 @@ public:
     void startTransform();
     void finishTransform();
 
-    void addChild(BoundingBox *child);
-    void removeChild(BoundingBox *child);
+    virtual void addChild(BoundingBox *child);
+    virtual void removeChild(BoundingBox *child);
+
+    virtual bool pointInsidePath(QPointF absPos) {}
+    virtual MovablePoint *getPointAt(QPointF absPos, CanvasMode currentMode) {}
 
     void moveUp();
     void moveDown();
@@ -68,8 +73,12 @@ public:
     void updateChildrenId(int firstId);
     void moveChildInList(int from, int to, bool saveUndoRedo = true);
     void removeChildFromList(int id, bool saveUndoRedo = true);
-    void addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo = true);
+    void addChildToListAt(int index,
+                          BoundingBox *child,
+                          bool saveUndoRedo = true);
 
+    virtual void selectAndAddContainedPointsToList
+                            (QRectF absRect,QList<MovablePoint*> *list) {}
 
     QPointF getPivotAbsPos();
     bool isSelected();
@@ -84,7 +93,7 @@ protected:
     QMatrix mSavedTransformMatrix;
     QMatrix mTransformMatrix;
     QMatrix mCombinedTransformMatrix;
-    int mZListIndex;
+    int mZListIndex = 0;
     QPointF mAbsRotPivotPos;
     bool mPivotChanged = false;
     bool mSelected = false;

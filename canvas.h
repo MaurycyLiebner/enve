@@ -24,17 +24,16 @@ class Canvas : public QWidget, public BoundingBox
 public:
     explicit Canvas(MainWindow *parent = 0);
     void callKeyPress(QKeyEvent *event);
-    void addPathToSelection(VectorPath *path);
-    void clearPathsSelection();
-    void selectOnlyLastPressedPath();
+    void addBoxToSelection(BoundingBox *box);
+    void clearBoxesSelection();
+    void selectOnlyLastPressedBox();
     void removePointFromSelection(MovablePoint *point);
-    void removePathFromSelection(VectorPath *path);
+    void removeBoxFromSelection(BoundingBox *box);
     void selectOnlyLastPressedPoint();
     bool isShiftPressed();
     void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
 
-    void addPath(VectorPath *path, bool saveUndoRedo = true);
-    void removePath(VectorPath *path, bool saveUndoRedo = true);
+
 
     void scheduleRepaint();
 
@@ -46,6 +45,8 @@ public:
     void clearAllPathsSelection();
     void setPointCtrlsMode(CtrlsMode mode);
     QPointF scaleDistancePointByCurrentScale(QPointF point);
+    void addChild(BoundingBox *box);
+    void removeChild(BoundingBox *box);
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -90,12 +91,11 @@ private:
     QPoint mPressPos;
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
-    QList<VectorPath*> mPaths;
     MovablePoint *mLastPressedPoint = NULL;
     PathPoint *mCurrentEndPoint = NULL;
     QList<MovablePoint*> mSelectedPoints;
-    VectorPath *mLastPressedPath = NULL;
-    QList<VectorPath*> mSelectedPaths;
+    BoundingBox *mLastPressedBox = NULL;
+    QList<BoundingBox*> mSelectedBoxes;
     void setCtrlPointsEnabled(bool enabled);
     PathPivot *mRotPivot;
     void handleMovePointMouseMove(QPointF eventPos);

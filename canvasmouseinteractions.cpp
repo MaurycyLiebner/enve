@@ -12,24 +12,24 @@ void Canvas::handleMovePathMousePressEvent() {
             mRotPivot->select();
         }
     } else {
-        VectorPath *pathUnderMouse = NULL;
-        foreach(VectorPath *path, mPaths) {
-            if(path->pointInsidePath(mPressPos)) {
-                if(!(isShiftPressed()) && !path->isSelected()) {
-                    clearPathsSelection();
+        BoundingBox *boxUnderMouse = NULL;
+        foreach(BoundingBox *box, mChildren) {
+            if(box->pointInsidePath(mPressPos)) {
+                if(!(isShiftPressed()) && !box->isSelected()) {
+                    clearBoxesSelection();
                 }
-                pathUnderMouse = path;
+                boxUnderMouse = box;
                 break;
             }
         }
-        if(pathUnderMouse == NULL) {
+        if(boxUnderMouse == NULL) {
             if(!(isShiftPressed()) ) {
-                clearPathsSelection();
+                clearBoxesSelection();
             }
             mSelecting = true;
             startSelectionAtPoint(mPressPos);
         }
-        mLastPressedPath = pathUnderMouse;
+        mLastPressedBox = boxUnderMouse;
     }
 }
 
@@ -44,8 +44,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             handleMovePathMousePressEvent();
         } else {
             MovablePoint *pointUnderMouse = NULL;
-            foreach (VectorPath *path, mSelectedPaths) {
-                pointUnderMouse = path->getPointAt(mPressPos, mCurrentMode);
+            foreach (BoundingBox *box, mSelectedBoxes) {
+                pointUnderMouse = box->getPointAt(mPressPos, mCurrentMode);
                 if(pointUnderMouse != NULL) {
                     break;
                 }
@@ -65,7 +65,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 }
                 if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
                     VectorPath *newPath = new VectorPath(this);
-                    addPath(newPath);
                     setCurrentEndPoint(newPath->addPoint(mPressPos, mCurrentEndPoint) );
                 } else {
                     if(pathPointUnderMouse == NULL) {
@@ -109,8 +108,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 void Canvas::handleMovePointMouseRelease(QPointF pos) {
     if(mSelecting) {
         moveSecondSelectionPoint(pos);
-        foreach (VectorPath *path, mSelectedPaths) {
-            path->selectAndAddContainedPointsToList(mSelectionRect, &mSelectedPoints);
+        foreach (BoundingBox *box, mSelectedBoxes) {
+            box->selectAndAddContainedPointsToList(mSelectionRect, &mSelectedPoints);
         }
         mSelecting = false;
     } else if(mFirstMouseMove) {
@@ -144,28 +143,28 @@ void Canvas::handleMovePathMouseRelease(QPointF pos) {
         mRotPivot->deselect();
     } else if(mSelecting) {
         moveSecondSelectionPoint(pos);
-        foreach (VectorPath *path, mPaths) {
-            if(path->isContainedIn(mSelectionRect) ) {
-                addPathToSelection(path);
+        foreach (BoundingBox *box, mChildren) {
+            if(box->isContainedIn(mSelectionRect) ) {
+                addBoxToSelection(box);
             }
         }
         mSelecting = false;
     } else if(mFirstMouseMove) {
         if(isShiftPressed()) {
-            if(mLastPressedPath != NULL) {
-                if(mLastPressedPath->isSelected()) {
-                    removePathFromSelection(mLastPressedPath);
+            if(mLastPressedBox != NULL) {
+                if(mLastPressedBox->isSelected()) {
+                    removeBoxFromSelection(mLastPressedBox);
                 } else {
-                    addPathToSelection(mLastPressedPath);
+                    addBoxToSelection(mLastPressedBox);
                 }
             }
         } else {
-            selectOnlyLastPressedPath();
+            selectOnlyLastPressedBox();
         }
     } else {
         startNewUndoRedoSet();
-        foreach(VectorPath *path, mSelectedPaths) {
-            path->finishTransform();
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->finishTransform();
         }
         finishUndoRedoSet();
     }
@@ -193,7 +192,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
             handleAddPointMouseRelease();
         }
     }
-    mLastPressedPath = NULL;
+    mLastPressedBox = NULL;
     mLastPressedPoint = NULL;
 
     callUpdateSchedulers();
@@ -224,20 +223,18 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
         }
         mRotPivot->moveBy(scaleDistancePointByCurrentScale(eventPos - mPressPos));
     } else {
-        if(mLastPressedPath != NULL) {
-            addPathToSelection(mLastPressedPath);
-            mLastPressedPath = NULL;
+        if(mLastPressedBox != NULL) {
+            addBoxToSelection(mLastPressedBox);
+            mLastPressedBox = NULL;
         }
         if(mFirstMouseMove) {
-            foreach(VectorPath *path, mSelectedPaths) {
-                path->startTransform();
-                path->moveBy(scaleDistancePointByCurrentScale(eventPos - mPressPos));
-                path->updateMappedPathIfNeeded();
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->startTransform();
+                box->moveBy(scaleDistancePointByCurrentScale(eventPos - mPressPos));
             }
         } else {
-            foreach(VectorPath *path, mSelectedPaths) {
-                path->moveBy(scaleDistancePointByCurrentScale(eventPos - mPressPos));
-                path->updateMappedPathIfNeeded();
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->moveBy(scaleDistancePointByCurrentScale(eventPos - mPressPos));
             }
         }
     }
