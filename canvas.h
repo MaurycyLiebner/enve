@@ -4,6 +4,13 @@
 #include <QWidget>
 #include "vectorpath.h"
 
+#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
+
+#define foreachBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
+    for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
+
+#define foreachBoxInList(boxesList) foreach(BoundingBox *box, (boxesList))
+
 class MainWindow;
 
 class UndoRedo;

@@ -13,7 +13,8 @@ void Canvas::handleMovePathMousePressEvent() {
         }
     } else {
         BoundingBox *boxUnderMouse = NULL;
-        foreach(BoundingBox *box, mChildren) {
+
+        foreachBoxInListInverted(mChildren) {
             if(box->pointInsidePath(mPressPos)) {
                 if(!(isShiftPressed()) && !box->isSelected()) {
                     clearBoxesSelection();
@@ -44,7 +45,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             handleMovePathMousePressEvent();
         } else {
             MovablePoint *pointUnderMouse = NULL;
-            foreach (BoundingBox *box, mSelectedBoxes) {
+            foreachBoxInList(mSelectedBoxes) {
                 pointUnderMouse = box->getPointAt(mPressPos, mCurrentMode);
                 if(pointUnderMouse != NULL) {
                     break;
@@ -108,7 +109,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 void Canvas::handleMovePointMouseRelease(QPointF pos) {
     if(mSelecting) {
         moveSecondSelectionPoint(pos);
-        foreach (BoundingBox *box, mSelectedBoxes) {
+        foreachBoxInList(mSelectedBoxes) {
             box->selectAndAddContainedPointsToList(mSelectionRect, &mSelectedPoints);
         }
         mSelecting = false;
@@ -143,7 +144,7 @@ void Canvas::handleMovePathMouseRelease(QPointF pos) {
         mRotPivot->deselect();
     } else if(mSelecting) {
         moveSecondSelectionPoint(pos);
-        foreach (BoundingBox *box, mChildren) {
+        foreachBoxInList(mChildren) {
             if(box->isContainedIn(mSelectionRect) ) {
                 addBoxToSelection(box);
             }
@@ -163,7 +164,7 @@ void Canvas::handleMovePathMouseRelease(QPointF pos) {
         }
     } else {
         startNewUndoRedoSet();
-        foreach(BoundingBox *box, mSelectedBoxes) {
+        foreachBoxInList(mSelectedBoxes) {
             box->finishTransform();
         }
         finishUndoRedoSet();
@@ -228,12 +229,12 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
             mLastPressedBox = NULL;
         }
         if(mFirstMouseMove) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
+            foreachBoxInList(mSelectedBoxes) {
                 box->startTransform();
                 box->moveBy(scaleDistancePointByCurrentScale(eventPos - mPressPos));
             }
         } else {
-            foreach(BoundingBox *box, mSelectedBoxes) {
+            foreachBoxInList(mSelectedBoxes) {
                 box->moveBy(scaleDistancePointByCurrentScale(eventPos - mPressPos));
             }
         }

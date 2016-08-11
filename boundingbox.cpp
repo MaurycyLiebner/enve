@@ -95,8 +95,8 @@ void BoundingBox::finishTransform()
 void BoundingBox::addChild(BoundingBox *child)
 {
     startNewUndoRedoSet();
-    addChildToListAt(0, child);
-    updateChildrenId(0);
+    addChildToListAt(mChildren.count(), child);
+    updateChildrenId(mChildren.count() - 1);
     finishUndoRedoSet();
 }
 
@@ -138,22 +138,22 @@ void BoundingBox::removeChild(BoundingBox *child)
 
 void BoundingBox::moveUp()
 {
-    mParent->decreaseChildZInList(this);
+    mParent->increaseChildZInList(this);
 }
 
 void BoundingBox::moveDown()
 {
-    mParent->increaseChildZInList(this);
+    mParent->decreaseChildZInList(this);
 }
 
 void BoundingBox::bringToFront()
 {
-    mParent->bringChildToFrontList(this);
+    mParent->bringChildToEndList(this);
 }
 
 void BoundingBox::bringToEnd()
 {
-    mParent->bringChildToEndList(this);
+    mParent->bringChildToFrontList(this);
 }
 
 void BoundingBox::increaseChildZInList(BoundingBox *child)
@@ -210,13 +210,12 @@ void BoundingBox::moveChildInList(int from, int to, bool saveUndoRedo) {
         addUndoRedo(new MoveChildInListUndoRedo(from, to, this) );
     }
 }
-#include <QDebug>
+
 void BoundingBox::setZListIndex(int z, bool saveUndoRedo)
 {
     if(saveUndoRedo) {
         addUndoRedo(new SetBoundingBoxZListIndexUnoRedo(mZListIndex, z, this));
     }
-    qDebug() << "change z from " << mZListIndex << " to " << z;
     mZListIndex = z;
     scheduleRepaint();
 }

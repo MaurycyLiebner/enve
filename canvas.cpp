@@ -10,7 +10,7 @@
 
 bool zLessThan(BoundingBox *box1, BoundingBox *box2)
 {
-    return box1->getZIndex() < box2->getZIndex();
+    return box1->getZIndex() > box2->getZIndex();
 }
 
 Canvas::Canvas(MainWindow *parent) : QWidget(parent),
@@ -30,11 +30,11 @@ void Canvas::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
 
 
-    for(int i = mChildren.length() - 1; i >= 0; i--) {
-        mChildren.at(i)->draw(&p);
+    foreachBoxInList(mChildren){
+        box->draw(&p);
     }
-    for(int i = mSelectedBoxes.length() - 1; i >= 0; i--) {
-        mSelectedBoxes.at(i)->drawSelected(&p, mCurrentMode);
+    foreachBoxInList(mSelectedBoxes) {
+        box->drawSelected(&p, mCurrentMode);
     }
     p.setPen(QPen(QColor(0, 0, 255, 125), 2.f, Qt::DotLine));
     if(mSelecting) {
@@ -213,7 +213,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         } else if(mCurrentMode == MOVE_PATH) {
             startNewUndoRedoSet();
 
-            foreach(BoundingBox *box, mSelectedBoxes) {
+            foreachBoxInList(mSelectedBoxes) {
                 removeChild(box);
             }
             mSelectedBoxes.clear();
@@ -258,7 +258,7 @@ void Canvas::clearAllPathsSelection() {
 
 void Canvas::clearBoxesSelection()
 {
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    foreachBoxInList(mSelectedBoxes) {
         box->deselect();
     }
     mSelectedBoxes.clear();
