@@ -2,6 +2,7 @@
 #define CHILDPARENT_H
 #include <QMatrix>
 #include "connectedtomainwindow.h"
+#include "fillstrokesettings.h"
 
 class UndoRedo;
 
@@ -91,6 +92,16 @@ public:
 
     bool isGroup();
     virtual BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
+
+    virtual void setFillStrokeSettings(PaintSettings fillSettings,
+                                       StrokeSettings strokeSettings) {}
+    virtual void setStrokeSettings(StrokeSettings strokeSettings) {}
+    virtual void setFillSettings(PaintSettings fillSettings) {}
+
+    virtual PaintSettings getFillSettings();
+    virtual StrokeSettings getStrokeSettings();
+
+    virtual qreal getCurrentCanvasScale();
 protected:
     virtual void updateAfterCombinedTransformationChanged();
     BoundingBoxType mType;

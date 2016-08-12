@@ -44,7 +44,21 @@ public:
     void updatePathIfNeeded();
     void updateMappedPathIfNeeded();
     void updatePivotPosition();
+
+    void setFillStrokeSettings(PaintSettings fillSettings,
+                               StrokeSettings strokeSettings);
+
+    void setStrokeSettings(StrokeSettings strokeSettings);
+    void setFillSettings(PaintSettings fillSettings);
+
+    StrokeSettings getStrokeSettings();
+    PaintSettings getFillSettings();
+    void updateDrawPen();
 private:
+    QPen mDrawPen;
+    PaintSettings mFillSettings;
+    StrokeSettings mStrokeSettings;
+
     void updatePath();
     void updateMappedPath();
 

@@ -41,7 +41,7 @@ struct Color
     }*/
     void updateHSVFromRGB();
     void updateQColFromHSV();
-    void setHSV(GLfloat h, GLfloat s, GLfloat v);
+    void setHSV(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
     void setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t);
     void updateRGBFromHSV();
     void setGLColor();

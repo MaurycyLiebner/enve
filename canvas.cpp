@@ -8,9 +8,16 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 
-Canvas::Canvas(MainWindow *parent) : QWidget(parent),
-    BoxesGroup(parent)
+Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
+               MainWindow *parent) :
+    QWidget(parent),
+    BoxesGroup(fillStrokeSettings, parent)
 {
+    connect(mFillStrokeSettingsWidget, SIGNAL(fillSettingsChanged(PaintSettings)),
+            this, SLOT(fillSettingsChanged(PaintSettings)) );
+    connect(mFillStrokeSettingsWidget, SIGNAL(strokeSettingsChanged(StrokeSettings)),
+            this, SLOT(strokeSettingsChanged(StrokeSettings)) );
+
     mCurrentBoxesGroup = this;
     setFocusPolicy(Qt::StrongFocus);
     mRotPivot = new PathPivot(this);
@@ -114,6 +121,23 @@ bool Canvas::isMovingPath() {
             mCurrentMode == CanvasMode::MOVE_PATH;
 }
 
+qreal Canvas::getCurrentCanvasScale()
+{
+    return mTransformMatrix.m11();
+}
+
+void Canvas::fillSettingsChanged(PaintSettings fillSettings)
+{
+    mCurrentBoxesGroup->setSelectedFillSettings(fillSettings);
+    callUpdateSchedulers();
+}
+
+void Canvas::strokeSettingsChanged(StrokeSettings strokeSettings)
+{
+    mCurrentBoxesGroup->setSelectedStrokeSettings(strokeSettings);
+    callUpdateSchedulers();
+}
+
 void Canvas::connectPointsSlot()
 {
     mCurrentBoxesGroup->connectPoints();
@@ -142,6 +166,16 @@ void Canvas::makePointCtrlsSmooth()
 void Canvas::makePointCtrlsCorner()
 {
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
+}
+
+void Canvas::fillColorChanged(Color newColor)
+{
+
+}
+
+void Canvas::borderColorChanged(Color newColor)
+{
+
 }
 
 void Canvas::scheduleRepaint()

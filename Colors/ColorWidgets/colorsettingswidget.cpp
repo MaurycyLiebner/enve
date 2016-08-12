@@ -37,6 +37,19 @@ void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t,
     a_rect->setVal(a_t);
 }
 
+void ColorSettingsWidget::setCurrentColor(Color color)
+{
+    setCurrentColor(color.gl_h, color.gl_s, color.gl_v, color.gl_a);
+}
+
+void ColorSettingsWidget::alphaChanged(GLfloat a_t)
+{
+    emit colorChangedHSVSignal(h_rect->getVal(),
+                               hsv_s_rect->getVal(),
+                               v_rect->getVal(),
+                               a_t);
+}
+
 void ColorSettingsWidget::colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t)
 {
     emit colorChangedHSVSignal(h_t, s_t, v_t, a_rect->getVal());
@@ -54,6 +67,12 @@ void ColorSettingsWidget::moveAlphaWidgetToTab(int tabId)
     } else if(tabId == 3) {
         mWheelLayout->addLayout(aLayout);
     }
+    for(int i=0;i < mTabWidget->count();i++)
+        if(i!=tabId)
+            mTabWidget->widget(i)->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Ignored);
+
+    mTabWidget->widget(tabId)->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+    mTabWidget->widget(tabId)->resize(mTabWidget->widget(tabId)->minimumSizeHint());
 }
 
 ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
@@ -154,7 +173,10 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
     connectSignalsAndSlots();
 
     setMinimumSize(250, 200);
+    mTabWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     setCurrentColor(0.f, 0.f, 0.f);
+
+    moveAlphaWidgetToTab(0);
 }
 
 void ColorSettingsWidget::connectColorWidgetSignalToSlot(ColorWidget *slot_obj, const char *slot,
@@ -277,4 +299,7 @@ void ColorSettingsWidget::connectSignalsAndSlots()
     connectRectToSpin(a_rect, aSpin);
 
     connect(a_rect, SIGNAL(valChanged(GLfloat)), color_label, SLOT(setAlpha(GLfloat)));
+
+    connect(a_rect, SIGNAL(valChanged(GLfloat)),
+            this, SLOT(alphaChanged(GLfloat)));
 }

@@ -2,6 +2,7 @@
 #define BOXESGROUP_H
 #include "boundingbox.h"
 #include "vectorpath.h"
+#include "fillstrokesettings.h"
 
 #define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
 
@@ -15,8 +16,8 @@ class MainWindow;
 class BoxesGroup : public BoundingBox
 {
 public:
-    BoxesGroup(BoundingBox *parent);
-    BoxesGroup(MainWindow *parent);
+    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox *parent);
+    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent);
 
     bool pointInsidePath(QPointF absPos);
     QRectF getBoundingRect();
@@ -57,7 +58,17 @@ public:
     void setIsCurrentGroup(bool bT);
 
     BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
+
+    void setSelectedFillStrokeSettings(PaintSettings fillSettings,
+                                       StrokeSettings strokeSettings);
+    void setFillStrokeSettings(PaintSettings fillSettings,
+                               StrokeSettings strokeSettings);
+    void setFillSettings(PaintSettings fillSettings);
+    void setStrokeSettings(StrokeSettings strokeSettings);
+    void setSelectedFillSettings(PaintSettings fillSettings);
+    void setSelectedStrokeSettings(StrokeSettings strokeSettings);
 protected:
+    FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;

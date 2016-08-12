@@ -7,8 +7,11 @@
 #include "undoredo.h"
 #include "Colors/color.h"
 #include <QDockWidget>
+#include "fillstrokesettings.h"
 
 class UpdateScheduler;
+
+class ColorSettingsWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -30,6 +33,7 @@ private:
     UndoRedoStack mUndoRedoStack;
     QList<UpdateScheduler*> mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
+    FillStrokeSettingsWidget *mFillStrokeSettings;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -60,6 +64,8 @@ public:
     static Color color_darker;
     static Color color_dark;
     static Color color_selected_active;
+private slots:
+
 };
 
 #endif // MAINWINDOW_H

@@ -10,13 +10,14 @@ void Color::updateHSVFromRGB()
 }
 void Color::updateQColFromHSV()
 {
-    qcol.setHsvF(gl_h, gl_s, gl_v);
+    qcol.setHsvF(gl_h, gl_s, gl_v, gl_a);
 }
-void Color::setHSV(GLfloat h, GLfloat s, GLfloat v)
+void Color::setHSV(GLfloat h, GLfloat s, GLfloat v, GLfloat a)
 {
     gl_h = h;
     gl_s = s;
     gl_v = v;
+    gl_a = a;
     updateQColFromHSV();
     updateRGBFromHSV();
 }

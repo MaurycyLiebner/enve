@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include "boxesgroup.h"
+#include "Colors/color.h"
+#include "fillstrokesettings.h"
 
 class MainWindow;
 
@@ -22,7 +24,8 @@ class Canvas : public QWidget, public BoxesGroup
 {
     Q_OBJECT
 public:
-    explicit Canvas(MainWindow *parent = 0);
+    explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
+                    MainWindow *parent = 0);
     QRectF getBoundingRect();
     void addBoxToSelection(BoundingBox *box);
     void clearBoxesSelection();
@@ -66,8 +69,12 @@ protected:
     void handleMovePointMouseRelease(QPointF pos);
 
     bool isMovingPath();
-signals:
 
+    qreal getCurrentCanvasScale();
+signals:
+private slots:
+    void fillSettingsChanged(PaintSettings fillSettings);
+    void strokeSettingsChanged(StrokeSettings strokeSettings);
 public slots:
     void connectPointsSlot();
     void disconnectPointsSlot();
@@ -76,7 +83,13 @@ public slots:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
+
+    void fillColorChanged(Color newColor);
+    void borderColorChanged(Color newColor);
 private:
+    Color mFillColor;
+    Color mOutlineColor;
+
     BoxesGroup *mCurrentBoxesGroup;
 
     int mWidth = 1920;

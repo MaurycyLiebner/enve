@@ -31,6 +31,40 @@ void VectorPath::updatePivotPosition() {
     }
 }
 
+PaintSettings VectorPath::getFillSettings()
+{
+    return mFillSettings;
+}
+
+StrokeSettings VectorPath::getStrokeSettings()
+{
+    return mStrokeSettings;
+}
+
+void VectorPath::setFillStrokeSettings(PaintSettings fillSettings,
+                                       StrokeSettings strokeSettings)
+{
+    mFillSettings = fillSettings;
+    mStrokeSettings = strokeSettings;
+    mStrokeSettings.updateQPen();
+    updateDrawPen();
+    scheduleRepaint();
+}
+
+void VectorPath::setStrokeSettings(StrokeSettings strokeSettings)
+{
+    mStrokeSettings = strokeSettings;
+    mStrokeSettings.updateQPen();
+    updateDrawPen();
+    scheduleRepaint();
+}
+
+void VectorPath::setFillSettings(PaintSettings fillSettings)
+{
+    mFillSettings = fillSettings;
+    scheduleRepaint();
+}
+
 void VectorPath::updatePath()
 {
     mPath = QPainterPath();
@@ -104,6 +138,12 @@ void VectorPath::updateAfterCombinedTransformationChanged()
 void VectorPath::updateMappedPath()
 {
     mMappedPath = mCombinedTransformMatrix.map(mPath);
+    updateDrawPen();
+}
+
+void VectorPath::updateDrawPen() {
+    mDrawPen = mStrokeSettings.qpen;
+    mDrawPen.setWidthF(mDrawPen.widthF()*getCurrentCanvasScale());
 }
 
 QRectF VectorPath::getBoundingRect()
@@ -114,7 +154,8 @@ QRectF VectorPath::getBoundingRect()
 void VectorPath::draw(QPainter *p)
 {
     p->save();
-    p->setBrush(QColor(200, 200, 200));
+    p->setPen(mDrawPen);
+    p->setBrush(mFillSettings.color.qcol);
     p->drawPath(mMappedPath);
     p->restore();
 }

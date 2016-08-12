@@ -17,10 +17,13 @@ public:
     explicit ColorSettingsWidget(QWidget *parent = 0);
 
     void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
+    void setCurrentColor(Color color);
 signals:
     void colorChangedHSVSignal(GLfloat, GLfloat, GLfloat, GLfloat);
 public slots:
 private slots:
+    void alphaChanged(GLfloat a_t);
+
     void colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t);
 
     void moveAlphaWidgetToTab(int tabId);

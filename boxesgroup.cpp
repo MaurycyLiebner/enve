@@ -6,16 +6,16 @@ bool zLessThan(BoundingBox *box1, BoundingBox *box2)
     return box1->getZIndex() > box2->getZIndex();
 }
 
-BoxesGroup::BoxesGroup(BoundingBox *parent) :
+BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_GROUP)
 {
-
+    mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
-BoxesGroup::BoxesGroup(MainWindow *parent) :
+BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_CANVAS)
 {
-
+    mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
 bool BoxesGroup::pointInsidePath(QPointF absPos)
@@ -74,6 +74,50 @@ BoundingBox *BoxesGroup::getBoxAtFromAllAncestors(QPointF absPos)
     return boxAtPos;
 }
 
+void BoxesGroup::setFillStrokeSettings(PaintSettings fillSettings,
+                                       StrokeSettings strokeSettings)
+{
+    foreachBoxInList(mChildren) {
+        box->setFillStrokeSettings(fillSettings, strokeSettings);
+    }
+}
+
+void BoxesGroup::setFillSettings(PaintSettings fillSettings)
+{
+    foreachBoxInList(mChildren) {
+        box->setFillSettings(fillSettings);
+    }
+}
+
+void BoxesGroup::setStrokeSettings(StrokeSettings strokeSettings)
+{
+    foreachBoxInList(mChildren) {
+        box->setStrokeSettings(strokeSettings);
+    }
+}
+
+void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings)
+{
+    foreachBoxInList(mSelectedBoxes) {
+        box->setFillSettings(fillSettings);
+    }
+}
+
+void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings)
+{
+    foreachBoxInList(mSelectedBoxes) {
+        box->setStrokeSettings(strokeSettings);
+    }
+}
+
+void BoxesGroup::setSelectedFillStrokeSettings(PaintSettings fillSettings,
+                                               StrokeSettings strokeSettings)
+{
+    foreachBoxInList(mSelectedBoxes) {
+        box->setFillStrokeSettings(fillSettings, strokeSettings);
+    }
+}
+
 void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     foreachBoxInList(mSelectedBoxes) {
@@ -130,6 +174,8 @@ void BoxesGroup::addBoxToSelection(BoundingBox *box) {
     box->select();
     mSelectedBoxes.append(box);
     qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
+    mFillStrokeSettingsWidget->setCurrentSettings(box->getFillSettings(),
+                                            box->getStrokeSettings());
 }
 
 void BoxesGroup::addPointToSelection(MovablePoint *point)
@@ -376,7 +422,7 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
         return NULL;
     }
     startNewUndoRedoSet();
-    BoxesGroup *newGroup = new BoxesGroup(this);
+    BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
     foreachBoxInListInverted(mSelectedBoxes) {
         BoundingBox::removeChild(box);
         box->deselect();

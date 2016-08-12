@@ -71,6 +71,21 @@ BoundingBox *BoundingBox::getBoxAtFromAllAncestors(QPointF absPos) {
     }
 }
 
+PaintSettings BoundingBox::getFillSettings()
+{
+    return PaintSettings();
+}
+
+StrokeSettings BoundingBox::getStrokeSettings()
+{
+    return StrokeSettings();
+}
+
+qreal BoundingBox::getCurrentCanvasScale()
+{
+     return mParent->getCurrentCanvasScale();
+}
+
 void BoundingBox::drawBoundingRect(QPainter *p) {
     QPen pen = p->pen();
     p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));

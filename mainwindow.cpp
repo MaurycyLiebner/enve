@@ -106,10 +106,12 @@ MainWindow::MainWindow(QWidget *parent)
             height: 10px;\
         }");
 
-    mCanvas = new Canvas(this);
-
     mRightDock = new QDockWidget(this);
-    mRightDock->setWidget(new ColorSettingsWidget(this));
+    mFillStrokeSettings = new FillStrokeSettingsWidget(this);
+
+    mCanvas = new Canvas(mFillStrokeSettings, this);
+
+    mRightDock->setWidget(mFillStrokeSettings);
     mRightDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar	);
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
 
