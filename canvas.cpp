@@ -8,16 +8,18 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 
-bool zLessThan(BoundingBox *box1, BoundingBox *box2)
-{
-    return box1->getZIndex() > box2->getZIndex();
-}
-
 Canvas::Canvas(MainWindow *parent) : QWidget(parent),
-    BoundingBox(parent, BoundingBoxType::TYPE_CANVAS)
+    BoxesGroup(parent)
 {
+    mCurrentBoxesGroup = this;
     setFocusPolicy(Qt::StrongFocus);
     mRotPivot = new PathPivot(this);
+}
+
+QRectF Canvas::getBoundingRect()
+{
+    QPointF absPos = getAbsolutePos();
+    return QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight));
 }
 
 bool Canvas::processKeyEvent(QKeyEvent *event) {
@@ -29,40 +31,23 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
         setCanvasMode(CanvasMode::ADD_POINT);
     } else if(event->key() == Qt::Key_Delete) {
         if(mCurrentMode == MOVE_POINT) {
-            startNewUndoRedoSet();
-
-            foreach(MovablePoint *point, mSelectedPoints) {
-                point->remove();
-            }
-            mSelectedPoints.clear();
-
-            finishUndoRedoSet();
+            mCurrentBoxesGroup->removeSelectedPointsAndClearList();
         } else if(mCurrentMode == MOVE_PATH) {
-            startNewUndoRedoSet();
-
-            foreachBoxInList(mSelectedBoxes) {
-                removeChild(box);
-            }
-            mSelectedBoxes.clear();
-
-            finishUndoRedoSet();
+            mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
+        }
+    } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
+        BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
+        if(newGroup != NULL) {
+            setCurrentBoxesGroup(newGroup);
         }
     } else if(event->key() == Qt::Key_PageUp) {
-        foreachBoxInList(mSelectedBoxes) {
-            box->moveUp();
-        }
+        mCurrentBoxesGroup->moveSelectedBoxesUp();
     } else if(event->key() == Qt::Key_PageDown) {
-        foreachBoxInList(mSelectedBoxes) {
-            box->moveDown();
-        }
+        mCurrentBoxesGroup->moveSelectedBoxesDown();
     } else if(event->key() == Qt::Key_End) {
-        foreachBoxInList(mSelectedBoxes) {
-            box->bringToEnd();
-        }
+        mCurrentBoxesGroup->bringSelectedBoxesToEnd();
     } else if(event->key() == Qt::Key_Home) {
-        foreachBoxInList(mSelectedBoxes) {
-            box->bringToFront();
-        }
+        mCurrentBoxesGroup->bringSelectedBoxesToFront();
     } else if(event->key() == Qt::Key_R && isMovingPath()) {
         setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
     } else if(event->key() == Qt::Key_S && isMovingPath()) {
@@ -71,14 +56,9 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
         setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_A && isCtrlPressed()) {
         if(isShiftPressed()) {
-            foreachBoxInList(mSelectedBoxes) {
-                removeBoxFromSelection(box);
-            }
+            mCurrentBoxesGroup->deselectAllBoxes();
         } else {
-            foreachBoxInList(mChildren) {
-                if(box->isSelected()) continue;
-                addBoxToSelection(box);
-            }
+            mCurrentBoxesGroup->selectAllBoxes();
         }
     } else {
         return false;
@@ -88,8 +68,12 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
     return true;
 }
 
-bool Canvas::isCtrlPressed() {
-    return (QApplication::keyboardModifiers() & Qt::ControlModifier);
+void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
+    mCurrentBoxesGroup->setIsCurrentGroup(false);
+    mCurrentBoxesGroup->clearBoxesSelection();
+    mCurrentBoxesGroup->clearPointsSelection();
+    mCurrentBoxesGroup = group;
+    group->setIsCurrentGroup(true);
 }
 
 void Canvas::paintEvent(QPaintEvent *)
@@ -101,9 +85,8 @@ void Canvas::paintEvent(QPaintEvent *)
     foreachBoxInList(mChildren){
         box->draw(&p);
     }
-    foreachBoxInList(mSelectedBoxes) {
-        box->drawSelected(&p, mCurrentMode);
-    }
+    mCurrentBoxesGroup->drawSelected(&p, mCurrentMode);
+
     p.setPen(QPen(QColor(0, 0, 255, 125), 2.f, Qt::DotLine));
     if(mSelecting) {
         p.drawRect(mSelectionRect);
@@ -112,16 +95,16 @@ void Canvas::paintEvent(QPaintEvent *)
         mRotPivot->draw(&p);
     }
 
-    QPointF absPos = getAbsolutePos();
-    p.drawRect(QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight)));
     QPainterPath path;
     path.addRect(0, 0, width() + 1, height() + 1);
     QPainterPath viewRectPath;
+    QPointF absPos = getAbsolutePos();
     viewRectPath.addRect(
                 QRectF(absPos,absPos + QPointF(mVisibleWidth, mVisibleHeight)));
     p.setBrush(QColor(0, 0, 0, 125));
-    p.setPen(QPen(Qt::black, 0.f));
+    p.setPen(QPen(Qt::black, 2.f));
     p.drawPath(path.subtracted(viewRectPath));
+
     p.end();
 }
 
@@ -131,101 +114,34 @@ bool Canvas::isMovingPath() {
             mCurrentMode == CanvasMode::MOVE_PATH;
 }
 
-void Canvas::connectPoints()
+void Canvas::connectPointsSlot()
 {
-    QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
-        }
-    }
-    if(selectedPathPoints.count() == 2) {
-        startNewUndoRedoSet();
-
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
-        if(firstPoint->isEndPoint() && secondPoint->isEndPoint()) {
-            firstPoint->connectToPoint(secondPoint);
-        }
-        finishUndoRedoSet();
-        scheduleRepaint();
-    }
-
-    callUpdateSchedulers();
+    mCurrentBoxesGroup->connectPoints();
 }
 
-void Canvas::disconnectPoints()
+void Canvas::disconnectPointsSlot()
 {
-    QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
-        }
-    }
-    if(selectedPathPoints.count() == 2) {
-        startNewUndoRedoSet();
-
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
-        firstPoint->disconnectFromPoint(secondPoint);
-
-        finishUndoRedoSet();
-        scheduleRepaint();
-    }
-
-    callUpdateSchedulers();
+    mCurrentBoxesGroup->disconnectPoints();
 }
 
-void Canvas::mergePoints()
+void Canvas::mergePointsSlot()
 {
-    QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
-        }
-    }
-    if(selectedPathPoints.count() == 2) {
-        startNewUndoRedoSet();
-
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
-        QPointF sumPos = firstPoint->getAbsolutePos() + secondPoint->getAbsolutePos();
-        firstPoint->remove();
-        secondPoint->moveToAbs(sumPos/2);
-
-        finishUndoRedoSet();
-        scheduleRepaint();
-    }
-
-    callUpdateSchedulers();
-}
-
-void Canvas::setPointCtrlsMode(CtrlsMode mode) {
-    startNewUndoRedoSet();
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            ( (PathPoint*)point)->setCtrlsMode(mode);
-        }
-    }
-    finishUndoRedoSet();
-    scheduleRepaint();
-
-    callUpdateSchedulers();
+    mCurrentBoxesGroup->mergePoints();
 }
 
 void Canvas::makePointCtrlsSymmetric()
 {
-    setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+    mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
 }
 
 void Canvas::makePointCtrlsSmooth()
 {
-    setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+    mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
 }
 
 void Canvas::makePointCtrlsCorner()
 {
-    setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
 }
 
 void Canvas::scheduleRepaint()
@@ -266,64 +182,20 @@ void Canvas::keyPressEvent(QKeyEvent *event)
 }
 
 void Canvas::clearAllPathsSelection() {
-    clearBoxesSelection();
+    mCurrentBoxesGroup->clearBoxesSelection();
     if(mLastPressedBox != NULL) {
         mLastPressedBox->deselect();
         mLastPressedBox = NULL;
     }
 }
 
-void Canvas::clearBoxesSelection()
-{
-    foreachBoxInList(mSelectedBoxes) {
-        box->deselect();
-    }
-    mSelectedBoxes.clear();
-}
-
 void Canvas::clearAllPointsSelection() {
-    clearPointsSelection();
+    mCurrentBoxesGroup->clearPointsSelection();
     if(mLastPressedPoint != NULL) {
         mLastPressedPoint->deselect();
         mLastPressedPoint = NULL;
     }
     setCurrentEndPoint(NULL);
-}
-
-void Canvas::clearPointsSelection()
-{
-    foreach(MovablePoint *point, mSelectedPoints) {
-        point->deselect();
-    }
-    mSelectedPoints.clear();
-}
-
-void Canvas::addBoxToSelection(BoundingBox *box) {
-    if(box->isSelected()) {
-        return;
-    }
-    box->select();
-    mSelectedBoxes.append(box);
-    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
-}
-
-void Canvas::addPointToSelection(MovablePoint *point)
-{
-    if(point->isSelected()) {
-        return;
-    }
-    point->select();
-    mSelectedPoints.append(point);
-}
-
-void Canvas::removeBoxFromSelection(BoundingBox *box) {
-    box->deselect();
-    mSelectedBoxes.removeOne(box);
-}
-
-void Canvas::removePointFromSelection(MovablePoint *point) {
-    point->deselect();
-    mSelectedPoints.removeOne(point);
 }
 
 void Canvas::setCurrentEndPoint(PathPoint *point)
@@ -338,23 +210,19 @@ void Canvas::setCurrentEndPoint(PathPoint *point)
 }
 
 void Canvas::selectOnlyLastPressedBox() {
-    clearBoxesSelection();
+    mCurrentBoxesGroup->clearBoxesSelection();
     if(mLastPressedBox == NULL) {
         return;
     }
-    addBoxToSelection(mLastPressedBox);
+    mCurrentBoxesGroup->addBoxToSelection(mLastPressedBox);
 }
 
 void Canvas::selectOnlyLastPressedPoint() {
-    clearPointsSelection();
+    mCurrentBoxesGroup->clearPointsSelection();
     if(mLastPressedPoint == NULL) {
         return;
     }
-    addPointToSelection(mLastPressedPoint);
-}
-
-bool Canvas::isShiftPressed() {
-    return QApplication::keyboardModifiers() & Qt::ShiftModifier;
+    mCurrentBoxesGroup->addPointToSelection(mLastPressedPoint);
 }
 
 void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,
@@ -408,21 +276,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
             point = point->getPreviousPoint();
         }
     }
-    removeChild(pathSrc);
+    mCurrentBoxesGroup->removeChild(pathSrc);
 
     finishUndoRedoSet();
-}
-
-void Canvas::addChild(BoundingBox *box)
-{
-    BoundingBox::addChild(box);
-    addBoxToSelection(box);
-}
-
-void Canvas::removeChild(BoundingBox *box)
-{
-    BoundingBox::removeChild(box);
-    if(box->isSelected()) {
-        removeBoxFromSelection(box);
-    }
 }

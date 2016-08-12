@@ -26,7 +26,7 @@ public:
     BoundingBox(MainWindow *window, BoundingBoxType type);
 
     virtual void updatePivotPosition() {}
-    virtual bool isContainedIn(QRectF absRect) {}
+    virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getBoundingRect() {}
 
     virtual void draw(QPainter *p) {}
@@ -85,6 +85,12 @@ public:
     void select();
     void deselect();
     int getZIndex();
+    virtual void drawBoundingRect(QPainter *p);
+    void setParent(BoundingBox *parent, bool saveUndoRedo = true);
+    BoundingBox *getParent();
+
+    bool isGroup();
+    virtual BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
 protected:
     virtual void updateAfterCombinedTransformationChanged();
     BoundingBoxType mType;

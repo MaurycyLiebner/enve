@@ -6,11 +6,27 @@
 BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) : ConnectedToMainWindow(parent)
 {
     mType = type;
-    mParent = parent;
-    mParent->addChild(this);
+    parent->addChild(this);
     mTransformMatrix.reset();
     mCombinedTransformMatrix.reset();
     updateCombinedTransform();
+}
+
+void BoundingBox::setParent(BoundingBox *parent, bool saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new SetBoxParentUndoRedo(this, mParent, parent));
+    }
+    mParent = parent;
+}
+
+BoundingBox *BoundingBox::getParent()
+{
+    return mParent;
+}
+
+bool BoundingBox::isGroup()
+{
+    return mType == TYPE_GROUP;
 }
 
 QPointF BoundingBox::getPivotAbsPos()
@@ -40,6 +56,27 @@ BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) : ConnectedTo
     mType = type;
     mTransformMatrix.reset();
     mCombinedTransformMatrix.reset();
+}
+
+bool BoundingBox::isContainedIn(QRectF absRect)
+{
+    return absRect.contains(getBoundingRect());
+}
+
+BoundingBox *BoundingBox::getBoxAtFromAllAncestors(QPointF absPos) {
+    if(pointInsidePath(absPos)) {
+        return this;
+    } else {
+        return NULL;
+    }
+}
+
+void BoundingBox::drawBoundingRect(QPainter *p) {
+    QPen pen = p->pen();
+    p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
+    p->setBrush(Qt::NoBrush);
+    p->drawRect(getBoundingRect());
+    p->setPen(pen);
 }
 
 QMatrix BoundingBox::getCombinedTransform()
@@ -95,6 +132,7 @@ void BoundingBox::finishTransform()
 void BoundingBox::addChild(BoundingBox *child)
 {
     startNewUndoRedoSet();
+    child->setParent(this);
     addChildToListAt(mChildren.count(), child);
     updateChildrenId(mChildren.count() - 1);
     finishUndoRedoSet();

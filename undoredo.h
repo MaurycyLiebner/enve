@@ -416,4 +416,30 @@ public:
 private:
 };
 
+class SetBoxParentUndoRedo : public UndoRedo
+{
+public:
+    SetBoxParentUndoRedo(BoundingBox *childBox,
+                         BoundingBox *oldParent,
+                         BoundingBox *newParent) : UndoRedo()
+    {
+        mChildBox = childBox;
+        mOldParent = oldParent;
+        mNewParent = newParent;
+    }
+
+    void redo() {
+        mChildBox->setParent(mNewParent, false);
+    }
+
+    void undo() {
+        mChildBox->setParent(mOldParent, false);
+    }
+
+private:
+    BoundingBox *mChildBox;
+    BoundingBox *mOldParent;
+    BoundingBox *mNewParent;
+};
+
 #endif // UNDOREDO_H

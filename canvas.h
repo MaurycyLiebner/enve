@@ -2,14 +2,7 @@
 #define CANVAS_H
 
 #include <QWidget>
-#include "vectorpath.h"
-
-#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
-
-#define foreachBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
-    for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
-
-#define foreachBoxInList(boxesList) foreach(BoundingBox *box, (boxesList))
+#include "boxesgroup.h"
 
 class MainWindow;
 
@@ -25,18 +18,18 @@ enum CanvasMode : short {
     ADD_POINT
 };
 
-class Canvas : public QWidget, public BoundingBox
+class Canvas : public QWidget, public BoxesGroup
 {
     Q_OBJECT
 public:
     explicit Canvas(MainWindow *parent = 0);
+    QRectF getBoundingRect();
     void addBoxToSelection(BoundingBox *box);
     void clearBoxesSelection();
     void selectOnlyLastPressedBox();
     void removePointFromSelection(MovablePoint *point);
     void removeBoxFromSelection(BoundingBox *box);
     void selectOnlyLastPressedPoint();
-    bool isShiftPressed();
     void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
 
 
@@ -51,16 +44,15 @@ public:
     void clearAllPathsSelection();
     void setPointCtrlsMode(CtrlsMode mode);
     QPointF scaleDistancePointByCurrentScale(QPointF point);
-    void addChild(BoundingBox *box);
-    void removeChild(BoundingBox *box);
     bool processKeyEvent(QKeyEvent *event);
-    bool isCtrlPressed();
+    void setCurrentBoxesGroup(BoxesGroup *group);
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
     void clearPointsSelection();
@@ -74,18 +66,19 @@ protected:
     void handleMovePointMouseRelease(QPointF pos);
 
     bool isMovingPath();
-    BoundingBox *getBoxAt(QPointF absPos);
 signals:
 
 public slots:
-    void connectPoints();
-    void disconnectPoints();
-    void mergePoints();
+    void connectPointsSlot();
+    void disconnectPointsSlot();
+    void mergePointsSlot();
 
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    BoxesGroup *mCurrentBoxesGroup;
+
     int mWidth = 1920;
     int mHeight = 1080;
 
@@ -102,9 +95,7 @@ private:
     CanvasMode mCurrentMode = ADD_POINT;
     MovablePoint *mLastPressedPoint = NULL;
     PathPoint *mCurrentEndPoint = NULL;
-    QList<MovablePoint*> mSelectedPoints;
     BoundingBox *mLastPressedBox = NULL;
-    QList<BoundingBox*> mSelectedBoxes;
     void setCtrlPointsEnabled(bool enabled);
     PathPivot *mRotPivot;
     void handleMovePointMouseMove(QPointF eventPos);

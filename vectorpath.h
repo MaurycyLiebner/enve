@@ -4,7 +4,7 @@
 #include "boundingbox.h"
 #include "pathpoint.h"
 
-class Canvas;
+class BoxesGroup;
 
 class MainWindow;
 
@@ -15,10 +15,10 @@ enum CanvasMode : short;
 class VectorPath : public BoundingBox
 {
 public:
-    VectorPath(Canvas *canvasT);
+    VectorPath(BoxesGroup *group);
     ~VectorPath();
 
-    QRectF getBoundingRect();
+    virtual QRectF getBoundingRect();
     void draw(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
 
@@ -28,11 +28,8 @@ public:
     MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
 
     void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint*> *list);
-    bool isContainedIn(QRectF absRect);
 
     PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
-
-    Canvas *getCanvas();
 
     void removePoint(PathPoint *point);
     void replaceSeparatePathPoint(PathPoint *pointBeingReplaced, PathPoint *newPoint);
@@ -59,8 +56,6 @@ private:
     QList<PathPoint*> mPoints;
     QPainterPath mPath;
     QPainterPath mMappedPath;
-
-    Canvas *mCanvas;
 protected:
     void updateAfterTransformationChanged();
     void updateAfterCombinedTransformationChanged();

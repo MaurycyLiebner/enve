@@ -7,11 +7,10 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 
-VectorPath::VectorPath(Canvas *canvas) :
-    BoundingBox(canvas,
+VectorPath::VectorPath(BoxesGroup *group) :
+    BoundingBox(group,
                 BoundingBoxType::TYPE_VECTOR_PATH)
 {
-    mCanvas = canvas;
 }
 
 VectorPath::~VectorPath()
@@ -107,10 +106,6 @@ void VectorPath::updateMappedPath()
     mMappedPath = mCombinedTransformMatrix.map(mPath);
 }
 
-bool VectorPath::isContainedIn(QRectF absRect) {
-    return absRect.contains(getBoundingRect());
-}
-
 QRectF VectorPath::getBoundingRect()
 {
     return mMappedPath.boundingRect();
@@ -127,11 +122,7 @@ void VectorPath::draw(QPainter *p)
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     p->save();
-    QPen pen = p->pen();
-    p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
-    p->setBrush(Qt::NoBrush);
-    p->drawRect(getBoundingRect());
-    p->setPen(pen);
+    drawBoundingRect(p);
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
@@ -209,11 +200,6 @@ PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
     finishUndoRedoSet();
 
     return pointToAdd;
-}
-
-Canvas *VectorPath::getCanvas()
-{
-    return mCanvas;
 }
 
 PathPoint* VectorPath::addPoint(QPointF absPtPos, PathPoint *toPoint)
