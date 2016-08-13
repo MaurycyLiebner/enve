@@ -61,10 +61,10 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(QWidget *parent) : QWidget(pa
     setFillTarget();
 }
 
-void FillStrokeSettingsWidget::setCurrentDisplayedSettings(PaintSettings settings) {
-    mGradientWidget->setCurrentGradient(settings.gradient);
-    setCurrentPaintType(settings.paintType);
-    mColorTypeBar->setCurrentIndex(settings.paintType);
+void FillStrokeSettingsWidget::setCurrentDisplayedSettings(PaintSettings *settings) {
+    mGradientWidget->setCurrentGradient(settings->gradient);
+    setCurrentPaintType(settings->paintType);
+    mColorTypeBar->setCurrentIndex(settings->paintType);
 }
 
 void FillStrokeSettingsWidget::setCurrentPaintType(PaintType paintType)
@@ -97,9 +97,9 @@ void FillStrokeSettingsWidget::setCurrentSettings(PaintSettings fillPaintSetting
     connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
     if(mTargetId == 0) { // fill
-        setCurrentDisplayedSettings(mFillPaintSettings);
+        setCurrentDisplayedSettings(&mFillPaintSettings);
     } else {
-        setCurrentDisplayedSettings(mStrokePaintSettings.paintSettings);
+        setCurrentDisplayedSettings(&mStrokePaintSettings);
     }
     connect(mColorTypeBar, SIGNAL(currentChanged(int)),
             this, SLOT(colorTypeSet(int)) );
@@ -181,7 +181,7 @@ PaintSettings *FillStrokeSettingsWidget::getCurrentTargetPaintSettings()
     if(mTargetId == 0) {
         return &mFillPaintSettings;
     } else {
-        return &mStrokePaintSettings.paintSettings;
+        return &mStrokePaintSettings;
     }
 }
 
@@ -206,7 +206,7 @@ void FillStrokeSettingsWidget::setFillTarget()
     mFillTargetButton->setChecked(true);
     mStrokeTargetButton->setChecked(false);
     mStrokeSettingsWidget->hide();
-    setCurrentDisplayedSettings(mFillPaintSettings);
+    setCurrentDisplayedSettings(&mFillPaintSettings);
 }
 
 void FillStrokeSettingsWidget::setStrokeTarget()
@@ -215,7 +215,7 @@ void FillStrokeSettingsWidget::setStrokeTarget()
     mStrokeTargetButton->setChecked(true);
     mFillTargetButton->setChecked(false);
     mStrokeSettingsWidget->show();
-    setCurrentDisplayedSettings(mStrokePaintSettings.paintSettings);
+    setCurrentDisplayedSettings(&mStrokePaintSettings);
 }
 
 void FillStrokeSettingsWidget::setNoPaintType()
@@ -245,4 +245,6 @@ void FillStrokeSettingsWidget::setGradientPaintType()
     mColorsSettingsWidget->setCurrentColor(mGradientWidget->getCurrentColor());
 
     getCurrentTargetPaintSettings()->paintType = GRADIENTPAINT;
+
+    mGradientWidget->update();
 }

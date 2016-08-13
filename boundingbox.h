@@ -28,10 +28,10 @@ public:
 
     virtual void updatePivotPosition() {}
     virtual bool isContainedIn(QRectF absRect);
-    virtual QRectF getBoundingRect() {}
+    virtual QRectF getBoundingRect() { return QRectF(); }
 
-    virtual void draw(QPainter *p) {}
-    virtual void drawSelected(QPainter *p, CanvasMode currentCanvasMode) {}
+    virtual void draw(QPainter *) {}
+    virtual void drawSelected(QPainter *, CanvasMode) {}
 
     QMatrix getCombinedTransform();
 
@@ -56,8 +56,8 @@ public:
     virtual void addChild(BoundingBox *child);
     virtual void removeChild(BoundingBox *child);
 
-    virtual bool pointInsidePath(QPointF absPos) {}
-    virtual MovablePoint *getPointAt(QPointF absPos, CanvasMode currentMode) {}
+    virtual bool pointInsidePath(QPointF) { return false; }
+    virtual MovablePoint *getPointAt(QPointF, CanvasMode) { return NULL; }
 
     void moveUp();
     void moveDown();
@@ -79,7 +79,7 @@ public:
                           bool saveUndoRedo = true);
 
     virtual void selectAndAddContainedPointsToList
-                            (QRectF absRect,QList<MovablePoint*> *list) {}
+                            (QRectF,QList<MovablePoint*> *) {}
 
     QPointF getPivotAbsPos();
     bool isSelected();
@@ -93,10 +93,10 @@ public:
     bool isGroup();
     virtual BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
 
-    virtual void setFillStrokeSettings(PaintSettings fillSettings,
-                                       StrokeSettings strokeSettings) {}
-    virtual void setStrokeSettings(StrokeSettings strokeSettings) {}
-    virtual void setFillSettings(PaintSettings fillSettings) {}
+    virtual void setFillStrokeSettings(PaintSettings,
+                                       StrokeSettings) {}
+    virtual void setStrokeSettings(StrokeSettings) {}
+    virtual void setFillSettings(PaintSettings) {}
 
     virtual PaintSettings getFillSettings();
     virtual StrokeSettings getStrokeSettings();

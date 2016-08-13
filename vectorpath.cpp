@@ -11,6 +11,8 @@ VectorPath::VectorPath(BoxesGroup *group) :
     BoundingBox(group,
                 BoundingBoxType::TYPE_VECTOR_PATH)
 {
+    mFillGradientPoints.initialize(this);
+    mStrokeGradientPoints.initialize(this);
 }
 
 VectorPath::~VectorPath()
@@ -33,7 +35,7 @@ void VectorPath::updatePivotPosition() {
 
 PaintSettings VectorPath::getFillSettings()
 {
-    return mFillSettings;
+    return mFillPaintSettings;
 }
 
 StrokeSettings VectorPath::getStrokeSettings()
@@ -50,16 +52,26 @@ void VectorPath::setFillStrokeSettings(PaintSettings fillSettings,
 
 void VectorPath::setStrokeSettings(StrokeSettings strokeSettings)
 {
+    bool wasGradient = mStrokeSettings.paintType == GRADIENTPAINT;
     mStrokeSettings = strokeSettings;
     mStrokeSettings.updateQPen();
     updateDrawPen();
+    if(mStrokeSettings.paintType == GRADIENTPAINT && !wasGradient) {
+        mStrokeGradientPoints.setPositions(getBoundingRect().topLeft(),
+                     getBoundingRect().bottomRight());
+    }
     scheduleRepaint();
 }
 
 void VectorPath::setFillSettings(PaintSettings fillSettings)
 {
-    mFillSettings = fillSettings;
+    bool wasGradient = mFillPaintSettings.paintType == GRADIENTPAINT;
+    mFillPaintSettings = fillSettings;
     updateDrawGradient();
+    if(mFillPaintSettings.paintType == GRADIENTPAINT && !wasGradient) {
+        mFillGradientPoints.setPositions(getBoundingRect().topLeft(),
+                     getBoundingRect().bottomRight());
+    }
     scheduleRepaint();
 }
 
@@ -136,20 +148,42 @@ void VectorPath::updateAfterCombinedTransformationChanged()
 void VectorPath::updateMappedPath()
 {
     mMappedPath = mCombinedTransformMatrix.map(mPath);
+    updateDrawGradient();
     updateDrawPen();
 }
 
 void VectorPath::updateDrawPen() {
     mDrawPen = mStrokeSettings.qpen;
+    if(mStrokeSettings.paintType == GRADIENTPAINT) {
+        mDrawPen.setBrush(mDrawStrokeGradient);
+    }
     mDrawPen.setWidthF(mDrawPen.widthF()*getCurrentCanvasScale());
 }
 
 void VectorPath::updateDrawGradient()
 {
-    if(mFillSettings.gradient != NULL) {
-        mDrawGradient.setStops(mFillSettings.gradient->qgradientStops);
-        mDrawGradient.setStart(0.f, 0.f);
-        mDrawGradient.setFinalStop(100.f, 100.f);
+    if(mFillPaintSettings.paintType == GRADIENTPAINT) {
+        Gradient *gradient = mFillPaintSettings.gradient;
+        mFillGradientPoints.setColors(gradient->qgradientStops.first().second,
+                                      gradient->qgradientStops.last().second);
+        mFillGradientPoints.enable();
+        mDrawFillGradient.setStops(gradient->qgradientStops);
+        mDrawFillGradient.setStart(mFillGradientPoints.getStartPoint() );
+        mDrawFillGradient.setFinalStop(mFillGradientPoints.getEndPoint() );
+    } else {
+        mFillGradientPoints.disable();
+    }
+    if(mStrokeSettings.paintType == GRADIENTPAINT) {
+        Gradient *gradient = mStrokeSettings.gradient;
+        mStrokeGradientPoints.setColors(gradient->qgradientStops.first().second,
+                                      gradient->qgradientStops.last().second);
+
+        mStrokeGradientPoints.enable();
+        mDrawStrokeGradient.setStops(gradient->qgradientStops);
+        mDrawStrokeGradient.setStart(mStrokeGradientPoints.getStartPoint() );
+        mDrawStrokeGradient.setFinalStop(mStrokeGradientPoints.getEndPoint() );
+    } else {
+        mStrokeGradientPoints.disable();
     }
 }
 
@@ -162,11 +196,10 @@ void VectorPath::draw(QPainter *p)
 {
     p->save();
     p->setPen(mDrawPen);
-    p->setBrush(mFillSettings.color.qcol);
-    if(mFillSettings.paintType == GRADIENTPAINT) {
-        p->setBrush(mDrawGradient);
-    } else if(mFillSettings.paintType == FLATPAINT) {
-        p->setBrush(mFillSettings.color.qcol);
+    if(mFillPaintSettings.paintType == GRADIENTPAINT) {
+        p->setBrush(mDrawFillGradient);
+    } else if(mFillPaintSettings.paintType == FLATPAINT) {
+        p->setBrush(mFillPaintSettings.color.qcol);
     } else{
         p->setBrush(Qt::NoBrush);
     }
@@ -183,6 +216,8 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
         foreach (PathPoint *point, mPoints) {
             point->draw(p, currentCanvasMode);
         }
+        mFillGradientPoints.draw(p);
+        mStrokeGradientPoints.draw(p);
     } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 2));
         foreach (PathPoint *point, mPoints) {
@@ -197,10 +232,18 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
 {
     MovablePoint *pointToReturn = NULL;
-    foreach (PathPoint *point, mPoints) {
-        pointToReturn = point->getPointAtAbsPos(absPtPos, currentCanvasMode);
-        if(pointToReturn != NULL) {
-            break;
+    if(currentCanvasMode == MOVE_POINT) {
+        pointToReturn = mStrokeGradientPoints.getPointAt(absPtPos);
+        if(pointToReturn == NULL) {
+            pointToReturn = mFillGradientPoints.getPointAt(absPtPos);
+        }
+    }
+    if(pointToReturn == NULL) {
+        foreach (PathPoint *point, mPoints) {
+            pointToReturn = point->getPointAtAbsPos(absPtPos, currentCanvasMode);
+            if(pointToReturn != NULL) {
+                break;
+            }
         }
     }
     return pointToReturn;
@@ -317,4 +360,72 @@ void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
     removePointFromSeparatePaths(pointBeingReplaced);
     addPointToSeparatePaths(newPoint);
     finishUndoRedoSet();
+}
+
+GradientPoints::GradientPoints()
+{
+
+}
+
+void GradientPoints::initialize(VectorPath *parentT)
+{
+    parent = parentT;
+    startPoint = new GradientPoint(QPointF(0, 0), parent);
+    endPoint = new GradientPoint(QPointF(100, 100), parent);
+    enabled = false;
+}
+
+void GradientPoints::enable()
+{
+    if(enabled) {
+        return;
+    }
+    enabled = true;
+}
+
+void GradientPoints::setPositions(QPointF startPos, QPointF endPos) {
+    startPoint->setAbsolutePos(startPos);
+    endPoint->setAbsolutePos(endPos);
+}
+
+void GradientPoints::disable()
+{
+    enabled = false;
+}
+
+void GradientPoints::draw(QPainter *p)
+{
+    if(enabled) {
+       p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
+       startPoint->draw(p);
+       endPoint->draw(p);
+    }
+}
+
+MovablePoint *GradientPoints::getPointAt(QPointF absPos)
+{
+    if(enabled) {
+        if(startPoint->isPointAt(absPos) ) {
+            return startPoint;
+        } else if (endPoint->isPointAt(absPos) ){
+            return endPoint;
+        }
+    }
+    return NULL;
+}
+
+QPointF GradientPoints::getStartPoint()
+{
+    return startPoint->getAbsolutePos();
+}
+
+QPointF GradientPoints::getEndPoint()
+{
+    return endPoint->getAbsolutePos();
+}
+
+void GradientPoints::setColors(QColor startColor, QColor endColor)
+{
+    startPoint->setColor(startColor);
+    endPoint->setColor(endColor);
 }

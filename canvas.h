@@ -83,9 +83,6 @@ public slots:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
-
-    void fillColorChanged(Color newColor);
-    void borderColorChanged(Color newColor);
 private:
     Color mFillColor;
     Color mOutlineColor;

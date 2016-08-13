@@ -4,6 +4,7 @@
 #include "boundingbox.h"
 #include "pathpoint.h"
 #include <QLinearGradient>
+#include "gradientpoint.h"
 
 class BoxesGroup;
 
@@ -12,6 +13,36 @@ class MainWindow;
 class PathPivot;
 
 enum CanvasMode : short;
+
+class VectorPath;
+
+class GradientPoints {
+public:
+    GradientPoints();
+
+    void initialize(VectorPath *parentT);
+
+    void enable();
+
+    void disable();
+
+    void draw(QPainter *p);
+
+    MovablePoint *getPointAt(QPointF absPos);
+
+    QPointF getStartPoint();
+
+    QPointF getEndPoint();
+
+    void setColors(QColor startColor, QColor endColor);
+
+    bool enabled;
+    GradientPoint *startPoint;
+    GradientPoint *endPoint;
+    VectorPath *parent;
+
+    void setPositions(QPointF startPos, QPointF endPos);
+};
 
 class VectorPath : public BoundingBox
 {
@@ -57,9 +88,13 @@ public:
     void updateDrawPen();
     void updateDrawGradient();
 private:
-    QLinearGradient mDrawGradient;
+    GradientPoints mFillGradientPoints;
+    GradientPoints mStrokeGradientPoints;
+
+    QLinearGradient mDrawFillGradient;
+    QLinearGradient mDrawStrokeGradient;
     QPen mDrawPen;
-    PaintSettings mFillSettings;
+    PaintSettings mFillPaintSettings;
     StrokeSettings mStrokeSettings;
 
     void updatePath();

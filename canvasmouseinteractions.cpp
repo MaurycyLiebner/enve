@@ -53,6 +53,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 }
                 if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
                     VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
+                    mCurrentBoxesGroup->clearBoxesSelection();
                     mCurrentBoxesGroup->addBoxToSelection(newPath);
                     setCurrentEndPoint(newPath->addPoint(mPressPos, mCurrentEndPoint) );
                 } else {

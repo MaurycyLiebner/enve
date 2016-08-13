@@ -18,7 +18,8 @@ enum PaintType {
     GRADIENTPAINT
 };
 
-struct Gradient {
+class Gradient {
+public:
     Gradient(Color color1, Color color2) {
         colors << color1;
         colors << color2;
@@ -51,7 +52,8 @@ struct Gradient {
     QList<Color> colors;
 };
 
-struct PaintSettings {
+class PaintSettings {
+public:
     PaintSettings() {
 
     }
@@ -69,11 +71,30 @@ struct PaintSettings {
     Gradient *gradient = NULL;
 };
 
-struct StrokeSettings {
+class StrokeSettings : public PaintSettings
+{
+public:
+    StrokeSettings() : PaintSettings() {
+
+    }
+
+    StrokeSettings(Color colorT,
+                   PaintType paintTypeT,
+                   Gradient *gradientT = NULL) : PaintSettings(colorT,
+                                                               paintTypeT,
+                                                               gradientT)
+    {
+
+    }
 
     void updateQPen() {
         qpen.setWidthF(lineWidth);
-        qpen.setColor(paintSettings.color.qcol);
+        if(paintType == FLATPAINT) {
+            qpen.setColor(color.qcol);
+        } else {
+            qpen.setBrush(Qt::NoBrush);
+        }
+
     }
 
     void setLineWidth(qreal newWidth) {
@@ -81,14 +102,8 @@ struct StrokeSettings {
         updateQPen();
     }
 
-    void setPainSettings(PaintSettings settings) {
-        paintSettings = settings;
-        updateQPen();
-    }
-
     QPen qpen;
     qreal lineWidth = 1.f;
-    PaintSettings paintSettings = PaintSettings(Color(0, 0, 0), FLATPAINT);
 };
 
 class FillStrokeSettingsWidget : public QWidget
@@ -99,7 +114,7 @@ public:
 
     void setCurrentSettings(PaintSettings fillPaintSettings,
                             StrokeSettings strokePaintSettings);
-    void setCurrentDisplayedSettings(PaintSettings settings);
+    void setCurrentDisplayedSettings(PaintSettings *settings);
     void setCurrentPaintType(PaintType paintType);
 signals:
     void fillSettingsChanged(PaintSettings);

@@ -131,6 +131,7 @@ void BoxesGroup::removeSelectedPointsAndClearList()
     startNewUndoRedoSet();
 
     foreach(MovablePoint *point, mSelectedPoints) {
+        point->deselect();
         point->remove();
     }
     mSelectedPoints.clear();

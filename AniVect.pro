@@ -40,7 +40,8 @@ SOURCES += main.cpp\
     boxesgroup.cpp \
     fillstrokesettings.cpp \
     Colors/ColorWidgets/gradientwidget.cpp \
-    Colors/ColorWidgets/glwidget.cpp
+    Colors/ColorWidgets/glwidget.cpp \
+    gradientpoint.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -69,4 +70,5 @@ HEADERS  += mainwindow.h \
     boxesgroup.h \
     fillstrokesettings.h \
     Colors/ColorWidgets/gradientwidget.h \
-    Colors/ColorWidgets/glwidget.h
+    Colors/ColorWidgets/glwidget.h \
+    gradientpoint.h

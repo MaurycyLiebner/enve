@@ -35,6 +35,7 @@ void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t,
 
     a_rect->setColorHSV_f(h_t, s_t, v_t);
     a_rect->setVal(a_t);
+    aSpin->setVal(a_t);
 }
 
 void ColorSettingsWidget::setCurrentColor(Color color)

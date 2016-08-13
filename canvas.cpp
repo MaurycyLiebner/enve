@@ -168,16 +168,6 @@ void Canvas::makePointCtrlsCorner()
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
 }
 
-void Canvas::fillColorChanged(Color newColor)
-{
-
-}
-
-void Canvas::borderColorChanged(Color newColor)
-{
-
-}
-
 void Canvas::scheduleRepaint()
 {
     if(mRepaintNeeded) {

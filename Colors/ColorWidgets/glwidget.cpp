@@ -47,7 +47,7 @@ void GLWidget::drawSubTris(GLfloat x1, GLfloat y1,
                               GLfloat h2, GLfloat s2, GLfloat v2,
                               GLfloat x3, GLfloat y3,
                               GLfloat h3, GLfloat s3, GLfloat v3,
-                              int n_next, bool e12_aa, bool e13_aa, bool e23_aa)
+                              int n_next, GLboolean e12_aa, GLboolean e13_aa, GLboolean e23_aa)
 {
     n_next--;
     if(n_next > 0)
@@ -153,7 +153,7 @@ void GLWidget::drawSolidAATris(GLfloat x1, GLfloat y1,
                                   GLfloat x2, GLfloat y2,
                                   GLfloat x3, GLfloat y3,
                                   GLfloat r, GLfloat g, GLfloat b,
-                                  bool e12_aa, bool e13_aa, bool e23_aa)
+                                  GLboolean e12_aa, GLboolean e13_aa, GLboolean e23_aa)
 {
     drawAATris(x1, y1,
                r, g, b,
@@ -170,7 +170,7 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
                                      GLfloat r2, GLfloat g2, GLfloat b2,
                                      GLfloat x3, GLfloat y3,
                                      GLfloat r3, GLfloat g3, GLfloat b3,
-                                     bool e12_aa, bool e13_aa, bool e23_aa)
+                                     GLboolean e12_aa, GLboolean e13_aa, GLboolean e23_aa)
 {
     GLfloat center_x = (x1 + x2 + x3)/3;
     GLfloat center_y = (y1 + y2 + y3)/3;
@@ -191,9 +191,9 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
     GLfloat y22;
     GLfloat x33;
     GLfloat y33;
-    bool sharp_1 = e12_aa && e13_aa;
-    bool sharp_2 = e12_aa && e23_aa;
-    bool sharp_3 = e13_aa && e23_aa;
+    GLboolean sharp_1 = e12_aa && e13_aa;
+    GLboolean sharp_2 = e12_aa && e23_aa;
+    GLboolean sharp_3 = e13_aa && e23_aa;
     if(sharp_1)
     {
         getAATrisVert(center_x, center_y, x1, y1, &x11_sharp, &y11_sharp, AA_SHARP_VECT_LEN);
@@ -324,7 +324,7 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
 
 void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
                                 GLfloat r, GLfloat g, GLfloat b,
-                                bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
+                                GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
 {
     drawRect(x, y, width, height,
              r, g, b,
@@ -336,7 +336,7 @@ void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height
 
 void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
                                 GLfloat r, GLfloat g, GLfloat b, GLfloat a,
-                                bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
+                                GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
 {
     drawRect(x, y, width, height,
              r, g, b, a,
@@ -348,7 +348,7 @@ void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height
 
 void GLWidget::drawSolidRectCenter(GLfloat cx, GLfloat cy, GLfloat width, GLfloat height,
                                          GLfloat r, GLfloat g, GLfloat b,
-                                      bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
+                                      GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
 {
     drawSolidRect(cx - width*0.5f, cy - height*0.5f, width, height, r, g, b,
                   top_aa, bottom_aa, left_aa, right_aa);
@@ -444,7 +444,7 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
                            GLfloat r2, GLfloat g2, GLfloat b2, GLfloat a2,
                            GLfloat r3, GLfloat g3, GLfloat b3, GLfloat a3,
                            GLfloat r4, GLfloat g4, GLfloat b4, GLfloat a4,
-                           bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
+                           GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
 {
     GLfloat x1 = x;
     GLfloat y1 = y;
@@ -528,7 +528,7 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
                            GLfloat r2, GLfloat g2, GLfloat b2,
                            GLfloat r3, GLfloat g3, GLfloat b3,
                            GLfloat r4, GLfloat g4, GLfloat b4,
-                           bool top_aa, bool bottom_aa, bool left_aa, bool right_aa)
+                           GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
 {
     drawRect(x, y, width, height,
              r1, g1, b1, 1.f,
