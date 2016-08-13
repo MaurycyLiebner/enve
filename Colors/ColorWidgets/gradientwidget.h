@@ -10,23 +10,34 @@ class GradientWidget : public GLWidget
 public:
     GradientWidget(QWidget *parent);
 
-    void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
     void setCurrentGradient(Gradient *gradient);
-    void setCurrentGradient(int listId);
+    Gradient *getCurrentGradient();
+    Color getCurrentColor();
 
     void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+
     void newGradient(Color color1 = Color(0.f, 0.f, 0.f, 1.f),
                      Color color2 = Color(0.f, 0.f, 0.f, 0.f));
+
     void wheelEvent(QWheelEvent *event);
-    void drawGradient(int id, GLfloat height, GLfloat cY, bool border = true);
+
     void paintGL();
+signals:
+    void selectedColorChanged(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
+    void currentGradientChanged(Gradient *gradient);
+    void gradientSettingsChanged();
+public slots:
+    void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
 private:
     QList<Gradient*> mGradients;
     Gradient *mCurrentGradient = NULL;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
     void drawBorder(GLfloat xt, GLfloat yt, GLfloat wt, GLfloat ht);
+    void setCurrentGradient(int listId);
+    void setCurrentColorId(int id);
+    void drawGradient(int id, GLfloat height, GLfloat cY, bool border = true);
 };
 
 #endif // GRADIENTWIDGET_H

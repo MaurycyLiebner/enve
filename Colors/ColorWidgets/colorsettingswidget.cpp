@@ -33,7 +33,7 @@ void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t,
     color_label->setColorHSV_f(h_t, s_t, v_t);
     color_label->setAlpha(a_t);
 
-    a_rect->setColorHSL_f(h_t, s_t, v_t);
+    a_rect->setColorHSV_f(h_t, s_t, v_t);
     a_rect->setVal(a_t);
 }
 

@@ -44,11 +44,8 @@ StrokeSettings VectorPath::getStrokeSettings()
 void VectorPath::setFillStrokeSettings(PaintSettings fillSettings,
                                        StrokeSettings strokeSettings)
 {
-    mFillSettings = fillSettings;
-    mStrokeSettings = strokeSettings;
-    mStrokeSettings.updateQPen();
-    updateDrawPen();
-    scheduleRepaint();
+    setFillSettings(fillSettings);
+    setStrokeSettings(strokeSettings);
 }
 
 void VectorPath::setStrokeSettings(StrokeSettings strokeSettings)
@@ -62,6 +59,7 @@ void VectorPath::setStrokeSettings(StrokeSettings strokeSettings)
 void VectorPath::setFillSettings(PaintSettings fillSettings)
 {
     mFillSettings = fillSettings;
+    updateDrawGradient();
     scheduleRepaint();
 }
 
@@ -146,6 +144,15 @@ void VectorPath::updateDrawPen() {
     mDrawPen.setWidthF(mDrawPen.widthF()*getCurrentCanvasScale());
 }
 
+void VectorPath::updateDrawGradient()
+{
+    if(mFillSettings.gradient != NULL) {
+        mDrawGradient.setStops(mFillSettings.gradient->qgradientStops);
+        mDrawGradient.setStart(0.f, 0.f);
+        mDrawGradient.setFinalStop(100.f, 100.f);
+    }
+}
+
 QRectF VectorPath::getBoundingRect()
 {
     return mMappedPath.boundingRect();
@@ -156,6 +163,13 @@ void VectorPath::draw(QPainter *p)
     p->save();
     p->setPen(mDrawPen);
     p->setBrush(mFillSettings.color.qcol);
+    if(mFillSettings.paintType == GRADIENTPAINT) {
+        p->setBrush(mDrawGradient);
+    } else if(mFillSettings.paintType == FLATPAINT) {
+        p->setBrush(mFillSettings.color.qcol);
+    } else{
+        p->setBrush(Qt::NoBrush);
+    }
     p->drawPath(mMappedPath);
     p->restore();
 }

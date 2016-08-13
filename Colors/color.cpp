@@ -1,6 +1,6 @@
 #include "color.h"
 #include "helpers.h"
-
+#include <QDebug>
 void Color::updateHSVFromRGB()
 {
     gl_h = gl_r;
@@ -99,5 +99,5 @@ Color::Color(int r_t, int g_t, int b_t, int a_t)
 }
 Color::Color()
 {
-
+    Color(0, 0, 0, 255);
 }

@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QTabBar>
 #include <QPen>
+#include <QGradient>
+#include <QDebug>
 
 class GradientWidget;
 
@@ -20,24 +22,32 @@ struct Gradient {
     Gradient(Color color1, Color color2) {
         colors << color1;
         colors << color2;
+        updateQGradientStops();
     }
 
     void swapColors(int id1, int id2) {
         colors.swap(id1, id2);
+        updateQGradientStops();
     }
 
     void removeColor(int id) {
         colors.removeAt(id);
+        updateQGradientStops();
     }
 
     void addColor(Color color) {
         colors << color;
+        updateQGradientStops();
     }
 
     void replaceColor(int id, Color color) {
         colors.replace(id, color);
+        updateQGradientStops();
     }
 
+    void updateQGradientStops();
+
+    QGradientStops qgradientStops;
     QList<Color> colors;
 };
 
@@ -100,11 +110,17 @@ private slots:
     void setFillTarget();
     void setStrokeTarget();
 
-    void colorSet(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
+    void flatColorSet(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
+    void gradientSet(Gradient *gradient);
+    void gradientChanged();
+    void emitTargetSettingsChanged();
+    void setGradient(Gradient* gradient);
 private:
+    void connectGradient();
+    void disconnectGradient();
+
     PaintSettings *getCurrentTargetPaintSettings();
 
-    void emitTargetSettingsChanged();
 
     int mTargetId = 0;
 

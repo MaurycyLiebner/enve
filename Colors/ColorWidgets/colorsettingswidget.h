@@ -16,11 +16,12 @@ class ColorSettingsWidget : public QWidget
 public:
     explicit ColorSettingsWidget(QWidget *parent = 0);
 
-    void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
+
     void setCurrentColor(Color color);
 signals:
     void colorChangedHSVSignal(GLfloat, GLfloat, GLfloat, GLfloat);
 public slots:
+    void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
 private slots:
     void alphaChanged(GLfloat a_t);
 

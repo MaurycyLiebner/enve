@@ -3,6 +3,7 @@
 #include <QPainterPath>
 #include "boundingbox.h"
 #include "pathpoint.h"
+#include <QLinearGradient>
 
 class BoxesGroup;
 
@@ -54,7 +55,9 @@ public:
     StrokeSettings getStrokeSettings();
     PaintSettings getFillSettings();
     void updateDrawPen();
+    void updateDrawGradient();
 private:
+    QLinearGradient mDrawGradient;
     QPen mDrawPen;
     PaintSettings mFillSettings;
     StrokeSettings mStrokeSettings;

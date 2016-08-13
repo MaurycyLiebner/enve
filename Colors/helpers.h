@@ -20,6 +20,8 @@
 #define sqrt_3 sqrt(3)
 #define sqrt_2 sqrt(2);
 
+
+extern int clampInt(int val, int min, int max);
 extern void glOrthoAndViewportSet(GLuint w, GLuint h);
 extern void normalize(GLfloat *x_t, GLfloat *y_t, GLfloat dest_len = 1.f);
 extern float clamp(float val_t, float min_t, float max_t);

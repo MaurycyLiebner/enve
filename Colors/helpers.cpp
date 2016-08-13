@@ -11,6 +11,17 @@ void rotate(float rad_t, float *x_t, float *y_t)
     *y_t = y_rotated_t;
 }
 
+
+int clampInt(int val, int min, int max) {
+    if(val > max) {
+        return max;
+    } else if(val < min) {
+        return min;
+    } else {
+        return val;
+    }
+}
+
 bool insideCircle(int r, int x_t, int y_t)
 {
     return x_t*x_t + y_t*y_t < r*r;
