@@ -1,7 +1,12 @@
 #include "fillstrokesettings.h"
+#include "Colors/ColorWidgets/gradientwidget.h"
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(QWidget *parent) : QWidget(parent)
 {
+    mGradientWidget = new GradientWidget(this);
+    mGradientWidget->newGradient();
+    mGradientWidget->newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
+    mGradientWidget->newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
     mColorTypeBar = new QTabBar(this);
     mStrokeSettingsWidget = new QWidget(this);
     mColorsSettingsWidget = new ColorSettingsWidget(this);
@@ -21,6 +26,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(QWidget *parent) : QWidget(pa
 
     mMainLayout->addLayout(mTargetLayout);
     mMainLayout->addWidget(mColorTypeBar);
+    mMainLayout->addWidget(mGradientWidget);
     mMainLayout->addWidget(mColorsSettingsWidget);
 
     mLineWidthSpin = new QDoubleSpinBox(this);
@@ -152,16 +158,19 @@ void FillStrokeSettingsWidget::setNoPaintType()
 {
     getCurrentTargetPaintSettings()->paintType = NOPAINT;
     mColorsSettingsWidget->hide();
+    mGradientWidget->hide();
 }
 
 void FillStrokeSettingsWidget::setFlatPaintType()
 {
     mColorsSettingsWidget->show();
+    mGradientWidget->hide();
     getCurrentTargetPaintSettings()->paintType = FLATPAINT;
 }
 
 void FillStrokeSettingsWidget::setGradientPaintType()
 {
     mColorsSettingsWidget->show();
+    mGradientWidget->show();
     getCurrentTargetPaintSettings()->paintType = GRADIENTPAINT;
 }

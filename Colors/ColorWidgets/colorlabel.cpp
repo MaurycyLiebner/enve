@@ -2,6 +2,7 @@
 #include "Colors/helpers.h"
 #include <QPainter>
 #include <QMouseEvent>
+#include <QWidget>
 
 ColorLabel::ColorLabel(QWidget *parent) : ColorWidget(parent)
 {

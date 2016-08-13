@@ -8,6 +8,8 @@
 #include <QTabBar>
 #include <QPen>
 
+class GradientWidget;
+
 enum PaintType {
     NOPAINT,
     FLATPAINT,
@@ -18,6 +20,14 @@ struct Gradient {
     Gradient(Color color1, Color color2) {
         colors << color1;
         colors << color2;
+    }
+
+    void swapColors(int id1, int id2) {
+        colors.swap(id1, id2);
+    }
+
+    void removeColor(int id) {
+        colors.removeAt(id);
     }
 
     void addColor(Color color) {
@@ -120,6 +130,8 @@ private:
     QDoubleSpinBox *mLineWidthSpin;
 
     ColorSettingsWidget *mColorsSettingsWidget;
+
+    GradientWidget *mGradientWidget;
 };
 
 #endif // FILLSTROKESETTINGS_H

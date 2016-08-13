@@ -3,6 +3,7 @@
 
 #include "colorwidget.h"
 
+
 class ColorLabel : public ColorWidget
 {
     Q_OBJECT

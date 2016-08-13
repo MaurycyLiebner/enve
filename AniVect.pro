@@ -38,7 +38,9 @@ SOURCES += main.cpp\
     Colors/savedcolorwidgets.cpp \
     Colors/helpers.cpp \
     boxesgroup.cpp \
-    fillstrokesettings.cpp
+    fillstrokesettings.cpp \
+    Colors/ColorWidgets/gradientwidget.cpp \
+    Colors/ColorWidgets/glwidget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -65,4 +67,6 @@ HEADERS  += mainwindow.h \
     Colors/savedcolorwidgets.h \
     Colors/helpers.h \
     boxesgroup.h \
-    fillstrokesettings.h
+    fillstrokesettings.h \
+    Colors/ColorWidgets/gradientwidget.h \
+    Colors/ColorWidgets/glwidget.h
