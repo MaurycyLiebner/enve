@@ -37,9 +37,14 @@ public:
         mSet << undoRedo;
     }
 
+    bool isEmpty() {
+        return mSet.isEmpty();
+    }
+
 private:
     QList<UndoRedo*> mSet;
 };
+
 
 class UndoRedoStack {
 public:
@@ -60,6 +65,9 @@ public:
     }
 
     void addSet() {
+        if(mCurrentSet->isEmpty()) {
+            return;
+        }
         addUndoRedo(mCurrentSet);
     }
 
@@ -441,5 +449,73 @@ private:
     BoundingBox *mOldParent;
     BoundingBox *mNewParent;
 };
+
+class StrokeSettingsChangedUndoRedo : public UndoRedo
+{
+public:
+    StrokeSettingsChangedUndoRedo(StrokeSettings oldStrokeSettings,
+                                  StrokeSettings newStrokeSettings,
+                                  VectorPath *target) : UndoRedo() {
+        mOldSettings = oldStrokeSettings;
+        mNewSettings = newStrokeSettings;
+        mTarget = target;
+    }
+
+    void updateDisplayedSettings() {
+        if(mTarget->isSelected()) {
+            ((BoxesGroup*)mTarget->getParent())->
+                    setCurrentFillStrokeSettingsFromBox(mTarget);
+        }
+    }
+
+    void redo() {
+        mTarget->setStrokeSettings(mNewSettings, false);
+        updateDisplayedSettings();
+    }
+
+    void undo() {
+        mTarget->setStrokeSettings(mOldSettings, false);
+        updateDisplayedSettings();
+    }
+
+private:
+    StrokeSettings mOldSettings;
+    StrokeSettings mNewSettings;
+    VectorPath *mTarget;
+};
+
+class FillSettingsChangedUndoRedo : public UndoRedo
+{
+public:
+    FillSettingsChangedUndoRedo(PaintSettings oldStrokeSettings,
+                                PaintSettings newStrokeSettings,
+                                VectorPath *target) : UndoRedo() {
+        mOldSettings = oldStrokeSettings;
+        mNewSettings = newStrokeSettings;
+        mTarget = target;
+    }
+
+    void updateDisplayedSettings() {
+        if(mTarget->isSelected()) {
+            ((BoxesGroup*)mTarget->getParent())->
+                    setCurrentFillStrokeSettingsFromBox(mTarget);
+        }
+    }
+
+    void redo() {
+        mTarget->setFillSettings(mNewSettings, false);
+        updateDisplayedSettings();
+    }
+
+    void undo() {
+        mTarget->setFillSettings(mOldSettings, false);
+        updateDisplayedSettings();
+    }
+
+private:
+    PaintSettings mOldSettings;
+    PaintSettings mNewSettings;
+    VectorPath *mTarget;
+} ;
 
 #endif // UNDOREDO_H

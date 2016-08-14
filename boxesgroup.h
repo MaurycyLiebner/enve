@@ -63,10 +63,23 @@ public:
                                        StrokeSettings strokeSettings);
     void setFillStrokeSettings(PaintSettings fillSettings,
                                StrokeSettings strokeSettings);
-    void setFillSettings(PaintSettings fillSettings);
-    void setStrokeSettings(StrokeSettings strokeSettings);
-    void setSelectedFillSettings(PaintSettings fillSettings);
-    void setSelectedStrokeSettings(StrokeSettings strokeSettings);
+    void setFillSettings(PaintSettings fillSettings,
+                         bool saveUndoRedo = true);
+    void setStrokeSettings(StrokeSettings strokeSettings,
+                           bool saveUndoRedo = true);
+    void setSelectedFillSettings(PaintSettings fillSettings, bool saveUndoRedo);
+    void setSelectedStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo);
+    void setCurrentFillStrokeSettingsFromBox(BoundingBox *box);
+
+    void startStrokeTransform();
+    void startFillTransform();
+    void finishStrokeTransform();
+    void finishFillTransform();
+
+    void startSelectedStrokeTransform();
+    void startSelectedFillTransform();
+    void finishSelectedStrokeTransform();
+    void finishSelectedFillTransform();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

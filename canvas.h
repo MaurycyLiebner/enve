@@ -73,8 +73,13 @@ protected:
     qreal getCurrentCanvasScale();
 signals:
 private slots:
-    void fillSettingsChanged(PaintSettings fillSettings);
-    void strokeSettingsChanged(StrokeSettings strokeSettings);
+    void fillSettingsChanged(PaintSettings fillSettings, bool saveUndoRedo);
+    void strokeSettingsChanged(StrokeSettings strokeSettings, bool saveUndoRedo);
+
+    void startStrokeSettingsTransform();
+    void startFillSettingsTransform();
+    void finishStrokeSettingsTransform();
+    void finishFillSettingsTransform();
 public slots:
     void connectPointsSlot();
     void disconnectPointsSlot();

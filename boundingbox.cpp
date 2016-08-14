@@ -13,7 +13,7 @@ BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) : ConnectedT
 }
 
 void BoundingBox::setParent(BoundingBox *parent, bool saveUndoRedo) {
-    if(saveUndoRedo) {
+    if(saveUndoRedo && mParent != NULL) {
         addUndoRedo(new SetBoxParentUndoRedo(this, mParent, parent));
     }
     mParent = parent;
@@ -189,7 +189,7 @@ void BoundingBox::removeChild(BoundingBox *child)
     startNewUndoRedoSet();
     removeChildFromList(index);
     updateChildrenId(index);
-    child->setParent(this);
+    child->setParent(this); // called to update
     finishUndoRedoSet();
 }
 

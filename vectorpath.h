@@ -80,12 +80,17 @@ public:
     void setFillStrokeSettings(PaintSettings fillSettings,
                                StrokeSettings strokeSettings);
 
-    void setStrokeSettings(StrokeSettings strokeSettings);
-    void setFillSettings(PaintSettings fillSettings);
+    void setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo = true);
+    void setFillSettings(PaintSettings fillSettings, bool saveUndoRedo = true);
 
     StrokeSettings getStrokeSettings();
     PaintSettings getFillSettings();
     void updateDrawGradients();
+
+    void startStrokeTransform();
+    void startFillTransform();
+    void finishStrokeTransform();
+    void finishFillTransform();
 private:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;
@@ -93,8 +98,12 @@ private:
     QLinearGradient mDrawFillGradient;
     QLinearGradient mDrawStrokeGradient;
     QPen mDrawPen;
+
     PaintSettings mFillPaintSettings;
     StrokeSettings mStrokeSettings;
+
+    PaintSettings mSavedFillPaintSettings;
+    StrokeSettings mSavedStrokeSettings;
 
     void updatePath();
     void updateMappedPath();

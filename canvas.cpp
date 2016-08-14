@@ -13,10 +13,19 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     QWidget(parent),
     BoxesGroup(fillStrokeSettings, parent)
 {
-    connect(mFillStrokeSettingsWidget, SIGNAL(fillSettingsChanged(PaintSettings)),
-            this, SLOT(fillSettingsChanged(PaintSettings)) );
-    connect(mFillStrokeSettingsWidget, SIGNAL(strokeSettingsChanged(StrokeSettings)),
-            this, SLOT(strokeSettingsChanged(StrokeSettings)) );
+    connect(mFillStrokeSettingsWidget, SIGNAL(fillSettingsChanged(PaintSettings, bool)),
+            this, SLOT(fillSettingsChanged(PaintSettings, bool)) );
+    connect(mFillStrokeSettingsWidget, SIGNAL(strokeSettingsChanged(StrokeSettings, bool)),
+            this, SLOT(strokeSettingsChanged(StrokeSettings, bool)) );
+
+    connect(mFillStrokeSettingsWidget, SIGNAL(startFillSettingsTransform()),
+            this, SLOT(startFillSettingsTransform()) );
+    connect(mFillStrokeSettingsWidget, SIGNAL(startStrokeSettingsTransform()),
+            this, SLOT(startStrokeSettingsTransform()) );
+    connect(mFillStrokeSettingsWidget, SIGNAL(finishFillSettingsTransform()),
+            this, SLOT(finishFillSettingsTransform()) );
+    connect(mFillStrokeSettingsWidget, SIGNAL(finishStrokeSettingsTransform()),
+            this, SLOT(finishStrokeSettingsTransform()) );
 
     mCurrentBoxesGroup = this;
     setFocusPolicy(Qt::StrongFocus);
@@ -126,16 +135,36 @@ qreal Canvas::getCurrentCanvasScale()
     return mTransformMatrix.m11();
 }
 
-void Canvas::fillSettingsChanged(PaintSettings fillSettings)
+void Canvas::fillSettingsChanged(PaintSettings fillSettings, bool saveUndoRedo)
 {
-    mCurrentBoxesGroup->setSelectedFillSettings(fillSettings);
+    mCurrentBoxesGroup->setSelectedFillSettings(fillSettings, saveUndoRedo);
     callUpdateSchedulers();
 }
 
-void Canvas::strokeSettingsChanged(StrokeSettings strokeSettings)
+void Canvas::strokeSettingsChanged(StrokeSettings strokeSettings, bool saveUndoRedo)
 {
-    mCurrentBoxesGroup->setSelectedStrokeSettings(strokeSettings);
+    mCurrentBoxesGroup->setSelectedStrokeSettings(strokeSettings, saveUndoRedo);
     callUpdateSchedulers();
+}
+
+void Canvas::startStrokeSettingsTransform()
+{
+    mCurrentBoxesGroup->startSelectedStrokeTransform();
+}
+
+void Canvas::startFillSettingsTransform()
+{
+    mCurrentBoxesGroup->startSelectedFillTransform();
+}
+
+void Canvas::finishStrokeSettingsTransform()
+{
+    mCurrentBoxesGroup->finishSelectedStrokeTransform();
+}
+
+void Canvas::finishFillSettingsTransform()
+{
+    mCurrentBoxesGroup->finishSelectedFillTransform();
 }
 
 void Canvas::connectPointsSlot()

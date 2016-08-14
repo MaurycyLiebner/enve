@@ -9,6 +9,7 @@
 #include <QPen>
 #include <QGradient>
 #include <QDebug>
+#include <QTimer>
 #include <QPainterPathStroker>
 
 class GradientWidget;
@@ -77,7 +78,6 @@ class StrokeSettings : public PaintSettings
 public:
     StrokeSettings() : PaintSettings() {
         stroker = new QPainterPathStroker();
-        updateStroker();
         color.setQColor(Qt::black);
     }
 
@@ -88,51 +88,91 @@ public:
                                                                gradientT)
     {
         stroker = new QPainterPathStroker();
-        updateStroker();
-    }
-
-    void updateStroker() {
-        stroker->setWidth(lineWidth);
-        stroker->setCapStyle(Qt::RoundCap);
-        stroker->setJoinStyle(Qt::RoundJoin);
     }
 
     void setLineWidth(qreal newWidth) {
-        lineWidth = newWidth;
-        updateStroker();
+        stroker->setWidth(newWidth);
+    }
+
+    qreal lineWidth() {
+        return stroker->width();
+    }
+
+    void setCapStyle(Qt::PenCapStyle capStyle) {
+        stroker->setCapStyle(capStyle);
+    }
+
+    Qt::PenCapStyle capStyle() {
+        return stroker->capStyle();
+    }
+
+    void setJoinStyle(Qt::PenJoinStyle joinStyle) {
+        stroker->setJoinStyle(joinStyle);
+    }
+
+    Qt::PenJoinStyle joinStyle() {
+        return stroker->joinStyle();
     }
 
     QPainterPathStroker *stroker;
-    qreal lineWidth = 1.f;
 };
+
+class MainWindow;
 
 class FillStrokeSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit FillStrokeSettingsWidget(QWidget *parent = 0);
+    explicit FillStrokeSettingsWidget(MainWindow *parent = 0);
 
     void setCurrentSettings(PaintSettings fillPaintSettings,
                             StrokeSettings strokePaintSettings);
     void setCurrentDisplayedSettings(PaintSettings *settings);
     void setCurrentPaintType(PaintType paintType);
+
 signals:
-    void fillSettingsChanged(PaintSettings);
-    void strokeSettingsChanged(StrokeSettings);
+    void fillSettingsChanged(PaintSettings, bool);
+    void strokeSettingsChanged(StrokeSettings, bool);
+    void finishFillSettingsTransform();
+    void finishStrokeSettingsTransform();
+    void startFillSettingsTransform();
+    void startStrokeSettingsTransform();
 private slots:
     void setStrokeWidth(qreal width);
+
     void colorTypeSet(int id);
     void setFillTarget();
     void setStrokeTarget();
 
     void flatColorSet(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
-    void gradientSet(Gradient *gradient);
-    void gradientChanged();
     void emitTargetSettingsChanged();
     void setGradient(Gradient* gradient);
+
+    void setBevelJoinStyle();
+    void setMiterJoinStyle();
+    void setRoundJoinStyle();
+
+    void setFlatCapStyle();
+    void setSquareCapStyle();
+    void setRoundCapStyle();
+
+    void waitToSaveChanges();
+
+    void finishTransform();
+    void startTransform();
+    void emitTargetSettingsChangedTMP();
 private:
+    MainWindow *mMainWindow;
+    bool mTransormStarted = false;
+
+    QTimer *mUndoRedoSaveTimer;
+
     void connectGradient();
     void disconnectGradient();
+
+    void setJoinStyle(Qt::PenJoinStyle joinStyle);
+
+    void setCapStyle(Qt::PenCapStyle capStyle);
 
     PaintSettings *getCurrentTargetPaintSettings();
 
@@ -156,6 +196,17 @@ private:
 
     QWidget *mStrokeSettingsWidget;
     QVBoxLayout *mStrokeSettingsLayout = new QVBoxLayout();
+
+    QHBoxLayout *mJoinStyleLayout = new QHBoxLayout();
+    QPushButton *mBevelJoinStyleButton;
+    QPushButton *mMiterJointStyleButton;
+    QPushButton *mRoundJoinStyleButton;
+
+    QHBoxLayout *mCapStyleLayout = new QHBoxLayout();
+    QPushButton *mFlatCapStyleButton;
+    QPushButton *mSquareCapStyleButton;
+    QPushButton *mRoundCapStyleButton;
+
     QHBoxLayout *mLineWidthLayout = new QHBoxLayout();
     QLabel *mLineWidthLabel = new QLabel("Width:");
     QDoubleSpinBox *mLineWidthSpin;

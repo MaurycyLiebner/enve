@@ -50,8 +50,13 @@ void VectorPath::setFillStrokeSettings(PaintSettings fillSettings,
     setStrokeSettings(strokeSettings);
 }
 
-void VectorPath::setStrokeSettings(StrokeSettings strokeSettings)
+void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
 {
+    if(saveUndoRedo) {
+        addUndoRedo(new StrokeSettingsChangedUndoRedo(mStrokeSettings,
+                                                      strokeSettings,
+                                                      this) );
+    }
     bool wasGradient = mStrokeSettings.paintType == GRADIENTPAINT;
     mStrokeSettings = strokeSettings;
     updateOutlinePath();
@@ -62,8 +67,13 @@ void VectorPath::setStrokeSettings(StrokeSettings strokeSettings)
     scheduleRepaint();
 }
 
-void VectorPath::setFillSettings(PaintSettings fillSettings)
+void VectorPath::setFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
 {
+    if(saveUndoRedo) {
+        addUndoRedo(new FillSettingsChangedUndoRedo(mFillPaintSettings,
+                                                       fillSettings,
+                                                     this) );
+    }
     bool wasGradient = mFillPaintSettings.paintType == GRADIENTPAINT;
     mFillPaintSettings = fillSettings;
     updateDrawGradients();
@@ -196,6 +206,30 @@ void VectorPath::updateDrawGradients()
     } else {
         mStrokeGradientPoints.disable();
     }
+}
+
+void VectorPath::startStrokeTransform()
+{
+    mSavedStrokeSettings = mStrokeSettings;
+}
+
+void VectorPath::startFillTransform()
+{
+    mSavedFillPaintSettings = mFillPaintSettings;
+}
+
+void VectorPath::finishStrokeTransform()
+{
+    addUndoRedo(new StrokeSettingsChangedUndoRedo(mSavedStrokeSettings,
+                                                  mStrokeSettings,
+                                                  this) );
+}
+
+void VectorPath::finishFillTransform()
+{
+    addUndoRedo(new FillSettingsChangedUndoRedo(mSavedFillPaintSettings,
+                                                mFillPaintSettings,
+                                                this) );
 }
 
 QRectF VectorPath::getBoundingRect()

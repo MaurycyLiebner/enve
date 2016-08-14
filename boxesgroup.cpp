@@ -77,46 +77,125 @@ BoundingBox *BoxesGroup::getBoxAtFromAllAncestors(QPointF absPos)
 void BoxesGroup::setFillStrokeSettings(PaintSettings fillSettings,
                                        StrokeSettings strokeSettings)
 {
+    startNewUndoRedoSet();
     foreachBoxInList(mChildren) {
         box->setFillStrokeSettings(fillSettings, strokeSettings);
     }
+    finishUndoRedoSet();
 }
 
-void BoxesGroup::setFillSettings(PaintSettings fillSettings)
+void BoxesGroup::setFillSettings(PaintSettings fillSettings,
+                                 bool saveUndoRedo)
 {
+    startNewUndoRedoSet();
     foreachBoxInList(mChildren) {
-        box->setFillSettings(fillSettings);
+        box->setFillSettings(fillSettings, saveUndoRedo);
     }
+    finishUndoRedoSet();
 }
 
-void BoxesGroup::setStrokeSettings(StrokeSettings strokeSettings)
+void BoxesGroup::setStrokeSettings(StrokeSettings strokeSettings,
+                                   bool saveUndoRedo)
 {
+    startNewUndoRedoSet();
     foreachBoxInList(mChildren) {
-        box->setStrokeSettings(strokeSettings);
+        box->setStrokeSettings(strokeSettings, saveUndoRedo);
     }
+    finishUndoRedoSet();
 }
 
-void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings)
+void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
 {
+    startNewUndoRedoSet();
     foreachBoxInList(mSelectedBoxes) {
-        box->setFillSettings(fillSettings);
+        box->setFillSettings(fillSettings, saveUndoRedo);
     }
+    finishUndoRedoSet();
 }
 
-void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings)
+void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
 {
+    startNewUndoRedoSet();
     foreachBoxInList(mSelectedBoxes) {
-        box->setStrokeSettings(strokeSettings);
+        box->setStrokeSettings(strokeSettings, saveUndoRedo);
     }
+    finishUndoRedoSet();
 }
 
 void BoxesGroup::setSelectedFillStrokeSettings(PaintSettings fillSettings,
                                                StrokeSettings strokeSettings)
 {
+    startNewUndoRedoSet();
     foreachBoxInList(mSelectedBoxes) {
         box->setFillStrokeSettings(fillSettings, strokeSettings);
     }
+    finishUndoRedoSet();
 }
+
+void BoxesGroup::startStrokeTransform()
+{
+    foreachBoxInList(mChildren) {
+        box->startStrokeTransform();
+    }
+}
+
+void BoxesGroup::startFillTransform()
+{
+    foreachBoxInList(mChildren) {
+        box->startFillTransform();
+    }
+}
+
+void BoxesGroup::finishStrokeTransform()
+{
+    startNewUndoRedoSet();
+    foreachBoxInList(mChildren) {
+        box->finishStrokeTransform();
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::finishFillTransform()
+{
+    startNewUndoRedoSet();
+    foreachBoxInList(mChildren) {
+        box->finishFillTransform();
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::startSelectedStrokeTransform()
+{
+    foreachBoxInList(mSelectedBoxes) {
+        box->startStrokeTransform();
+    }
+}
+
+void BoxesGroup::startSelectedFillTransform()
+{
+    foreachBoxInList(mSelectedBoxes) {
+        box->startFillTransform();
+    }
+}
+
+void BoxesGroup::finishSelectedStrokeTransform()
+{
+    startNewUndoRedoSet();
+    foreachBoxInList(mSelectedBoxes) {
+        box->finishStrokeTransform();
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::finishSelectedFillTransform()
+{
+    startNewUndoRedoSet();
+    foreachBoxInList(mSelectedBoxes) {
+        box->finishFillTransform();
+    }
+    finishUndoRedoSet();
+}
+
 
 void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
@@ -169,6 +248,11 @@ void BoxesGroup::clearPointsSelection()
     mSelectedPoints.clear();
 }
 
+void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {
+    mFillStrokeSettingsWidget->setCurrentSettings(box->getFillSettings(),
+                                                  box->getStrokeSettings());
+}
+
 void BoxesGroup::addBoxToSelection(BoundingBox *box) {
     if(box->isSelected()) {
         return;
@@ -176,8 +260,7 @@ void BoxesGroup::addBoxToSelection(BoundingBox *box) {
     box->select();
     mSelectedBoxes.append(box);
     qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
-    mFillStrokeSettingsWidget->setCurrentSettings(box->getFillSettings(),
-                                            box->getStrokeSettings());
+    setCurrentFillStrokeSettingsFromBox(box);
 }
 
 void BoxesGroup::addPointToSelection(MovablePoint *point)

@@ -95,13 +95,18 @@ public:
 
     virtual void setFillStrokeSettings(PaintSettings,
                                        StrokeSettings) {}
-    virtual void setStrokeSettings(StrokeSettings) {}
-    virtual void setFillSettings(PaintSettings) {}
+    virtual void setStrokeSettings(StrokeSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
+    virtual void setFillSettings(PaintSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
 
     virtual PaintSettings getFillSettings();
     virtual StrokeSettings getStrokeSettings();
 
     virtual qreal getCurrentCanvasScale();
+
+    virtual void startStrokeTransform() {}
+    virtual void startFillTransform() {}
+    virtual void finishStrokeTransform() {}
+    virtual void finishFillTransform() {}
 protected:
     virtual void updateAfterCombinedTransformationChanged();
     BoundingBoxType mType;
