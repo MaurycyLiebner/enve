@@ -9,6 +9,7 @@
 #include <QPen>
 #include <QGradient>
 #include <QDebug>
+#include <QPainterPathStroker>
 
 class GradientWidget;
 
@@ -75,7 +76,9 @@ class StrokeSettings : public PaintSettings
 {
 public:
     StrokeSettings() : PaintSettings() {
-
+        stroker = new QPainterPathStroker();
+        updateStroker();
+        color.setQColor(Qt::black);
     }
 
     StrokeSettings(Color colorT,
@@ -84,25 +87,22 @@ public:
                                                                paintTypeT,
                                                                gradientT)
     {
-
+        stroker = new QPainterPathStroker();
+        updateStroker();
     }
 
-    void updateQPen() {
-        qpen.setWidthF(lineWidth);
-        if(paintType == FLATPAINT) {
-            qpen.setColor(color.qcol);
-        } else {
-            qpen.setBrush(Qt::NoBrush);
-        }
-
+    void updateStroker() {
+        stroker->setWidth(lineWidth);
+        stroker->setCapStyle(Qt::RoundCap);
+        stroker->setJoinStyle(Qt::RoundJoin);
     }
 
     void setLineWidth(qreal newWidth) {
         lineWidth = newWidth;
-        updateQPen();
+        updateStroker();
     }
 
-    QPen qpen;
+    QPainterPathStroker *stroker;
     qreal lineWidth = 1.f;
 };
 

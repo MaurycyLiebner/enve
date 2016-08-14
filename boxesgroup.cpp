@@ -152,12 +152,13 @@ void BoxesGroup::removeSelectedBoxesAndClearList()
     finishUndoRedoSet();
 }
 
-void BoxesGroup::removeChild(BoundingBox *box)
+void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
 {
+    BoundingBox *box = mChildren.at(id);
     if(box->isSelected()) {
         removeBoxFromSelection(box);
     }
-    BoundingBox::removeChild(box);
+    BoundingBox::removeChildFromList(id, saveUndoRedo);
 }
 
 void BoxesGroup::clearPointsSelection()

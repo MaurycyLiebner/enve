@@ -17,6 +17,7 @@ void BoundingBox::setParent(BoundingBox *parent, bool saveUndoRedo) {
         addUndoRedo(new SetBoxParentUndoRedo(this, mParent, parent));
     }
     mParent = parent;
+    updateCombinedTransform();
 }
 
 BoundingBox *BoundingBox::getParent()
@@ -155,7 +156,6 @@ void BoundingBox::addChild(BoundingBox *child)
 
 void BoundingBox::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
     mChildren.insert(index, child);
-
     if(saveUndoRedo) {
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
@@ -182,10 +182,14 @@ void BoundingBox::removeChildFromList(int id, bool saveUndoRedo) {
 
 void BoundingBox::removeChild(BoundingBox *child)
 {
-    startNewUndoRedoSet();
     int index = mChildren.indexOf(child);
+    if(index < 0) {
+        return;
+    }
+    startNewUndoRedoSet();
     removeChildFromList(index);
     updateChildrenId(index);
+    child->setParent(this);
     finishUndoRedoSet();
 }
 

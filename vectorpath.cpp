@@ -54,8 +54,7 @@ void VectorPath::setStrokeSettings(StrokeSettings strokeSettings)
 {
     bool wasGradient = mStrokeSettings.paintType == GRADIENTPAINT;
     mStrokeSettings = strokeSettings;
-    mStrokeSettings.updateQPen();
-    updateDrawPen();
+    updateOutlinePath();
     if(mStrokeSettings.paintType == GRADIENTPAINT && !wasGradient) {
         mStrokeGradientPoints.setPositions(getBoundingRect().topLeft(),
                      getBoundingRect().bottomRight());
@@ -67,7 +66,7 @@ void VectorPath::setFillSettings(PaintSettings fillSettings)
 {
     bool wasGradient = mFillPaintSettings.paintType == GRADIENTPAINT;
     mFillPaintSettings = fillSettings;
-    updateDrawGradient();
+    updateDrawGradients();
     if(mFillPaintSettings.paintType == GRADIENTPAINT && !wasGradient) {
         mFillGradientPoints.setPositions(getBoundingRect().topLeft(),
                      getBoundingRect().bottomRight());
@@ -145,22 +144,34 @@ void VectorPath::updateAfterCombinedTransformationChanged()
     scheduleMappedPathUpdate();
 }
 
+void VectorPath::updateOutlinePath() {
+    QPainterPathStroker *stroker = mStrokeSettings.stroker;
+    mPathStroker.setCapStyle(stroker->capStyle());
+    mPathStroker.setJoinStyle(stroker->joinStyle());
+    mPathStroker.setWidth(stroker->width()*getCurrentCanvasScale());
+    mOutlinePath = mPathStroker.createStroke(mMappedPath);
+    updateWholePath();
+}
+
+void VectorPath::updateWholePath() {
+    mMappedWhole = QPainterPath();
+    if(mStrokeSettings.paintType != NOPAINT) {
+        mMappedWhole += mOutlinePath;
+    }
+    if(mFillPaintSettings.paintType != NOPAINT ||
+            mStrokeSettings.paintType == NOPAINT) {
+        mMappedWhole += mMappedPath;
+    }
+}
+
 void VectorPath::updateMappedPath()
 {
     mMappedPath = mCombinedTransformMatrix.map(mPath);
-    updateDrawGradient();
-    updateDrawPen();
+    updateOutlinePath();
+    updateDrawGradients();
 }
 
-void VectorPath::updateDrawPen() {
-    mDrawPen = mStrokeSettings.qpen;
-    if(mStrokeSettings.paintType == GRADIENTPAINT) {
-        mDrawPen.setBrush(mDrawStrokeGradient);
-    }
-    mDrawPen.setWidthF(mDrawPen.widthF()*getCurrentCanvasScale());
-}
-
-void VectorPath::updateDrawGradient()
+void VectorPath::updateDrawGradients()
 {
     if(mFillPaintSettings.paintType == GRADIENTPAINT) {
         Gradient *gradient = mFillPaintSettings.gradient;
@@ -189,13 +200,13 @@ void VectorPath::updateDrawGradient()
 
 QRectF VectorPath::getBoundingRect()
 {
-    return mMappedPath.boundingRect();
+    return mMappedWhole.boundingRect();
 }
 
 void VectorPath::draw(QPainter *p)
 {
     p->save();
-    p->setPen(mDrawPen);
+    p->setPen(Qt::NoPen);
     if(mFillPaintSettings.paintType == GRADIENTPAINT) {
         p->setBrush(mDrawFillGradient);
     } else if(mFillPaintSettings.paintType == FLATPAINT) {
@@ -204,6 +215,14 @@ void VectorPath::draw(QPainter *p)
         p->setBrush(Qt::NoBrush);
     }
     p->drawPath(mMappedPath);
+    if(mStrokeSettings.paintType == GRADIENTPAINT) {
+        p->setBrush(mDrawStrokeGradient);
+    } else if(mStrokeSettings.paintType == FLATPAINT) {
+        p->setBrush(mStrokeSettings.color.qcol);
+    } else{
+        p->setBrush(Qt::NoBrush);
+    }
+    p->drawPath(mOutlinePath);
     p->restore();
 }
 
@@ -322,8 +341,13 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
     point->hide();
     point->deselect();
     if(saveUndoRedo) {
+        startNewUndoRedoSet();
         RemoveFromPointsListUndoRedo *undoRedo = new RemoveFromPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
+        if(mPoints.count() < 2) {
+            mParent->removeChild(this);
+        }
+        finishUndoRedoSet();
     }
     updatePivotPosition();
 }
@@ -351,7 +375,7 @@ void VectorPath::removePoint(PathPoint *point) {
 
 bool VectorPath::pointInsidePath(QPointF point)
 {
-    return mMappedPath.contains(point);
+    return mMappedWhole.contains(point);
 }
 
 void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,

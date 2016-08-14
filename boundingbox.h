@@ -73,7 +73,7 @@ public:
     void updateChildrenId(int firstId, int lastId);
     void updateChildrenId(int firstId);
     void moveChildInList(int from, int to, bool saveUndoRedo = true);
-    void removeChildFromList(int id, bool saveUndoRedo = true);
+    virtual void removeChildFromList(int id, bool saveUndoRedo = true);
     void addChildToListAt(int index,
                           BoundingBox *child,
                           bool saveUndoRedo = true);

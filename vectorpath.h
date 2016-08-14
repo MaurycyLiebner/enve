@@ -85,8 +85,7 @@ public:
 
     StrokeSettings getStrokeSettings();
     PaintSettings getFillSettings();
-    void updateDrawPen();
-    void updateDrawGradient();
+    void updateDrawGradients();
 private:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;
@@ -108,6 +107,11 @@ private:
     QList<PathPoint*> mPoints;
     QPainterPath mPath;
     QPainterPath mMappedPath;
+    QPainterPath mOutlinePath;
+    QPainterPathStroker mPathStroker;
+    QPainterPath mMappedWhole;
+    void updateOutlinePath();
+    void updateWholePath();
 protected:
     void updateAfterTransformationChanged();
     void updateAfterCombinedTransformationChanged();

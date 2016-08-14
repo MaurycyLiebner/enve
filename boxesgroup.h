@@ -25,7 +25,7 @@ public:
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
-    void removeChild(BoundingBox *box);
+    void removeChildFromList(int id, bool saveUndoRedo);
     void clearBoxesSelection();
     void removePointFromSelection(MovablePoint *point);
     void removeBoxFromSelection(BoundingBox *box);
