@@ -36,5 +36,4 @@ private:
     VectorPath *mPath;
 };
 
-
 #endif // UPDATESCHEDULER_H

@@ -64,6 +64,7 @@ public:
     static Color color_darker;
     static Color color_dark;
     static Color color_selected_active;
+    FillStrokeSettingsWidget *getFillStrokeSettings();
 private slots:
 
 };

@@ -41,7 +41,7 @@ public:
     GradientPoint *endPoint;
     VectorPath *parent;
 
-    void setPositions(QPointF startPos, QPointF endPos);
+    void setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo = true);
 };
 
 class VectorPath : public BoundingBox
@@ -76,9 +76,6 @@ public:
     void updatePathIfNeeded();
     void updateMappedPathIfNeeded();
     void updatePivotPosition();
-
-    void setFillStrokeSettings(PaintSettings fillSettings,
-                               StrokeSettings strokeSettings);
 
     void setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo = true);
     void setFillSettings(PaintSettings fillSettings, bool saveUndoRedo = true);

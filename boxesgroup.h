@@ -59,10 +59,6 @@ public:
 
     BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
 
-    void setSelectedFillStrokeSettings(PaintSettings fillSettings,
-                                       StrokeSettings strokeSettings);
-    void setFillStrokeSettings(PaintSettings fillSettings,
-                               StrokeSettings strokeSettings);
     void setFillSettings(PaintSettings fillSettings,
                          bool saveUndoRedo = true);
     void setStrokeSettings(StrokeSettings strokeSettings,

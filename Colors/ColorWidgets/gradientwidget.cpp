@@ -4,8 +4,9 @@
 #include <QAction>
 #include "Colors/helpers.h"
 
-GradientWidget::GradientWidget(QWidget *parent) : GLWidget(parent)
+GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) : GLWidget(parent)
 {
+    mMainWindow = mainWindow;
     setFixedHeight(6*20 + 10);
     newGradient();
     newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
@@ -20,7 +21,7 @@ void GradientWidget::setCurrentColorId(int id) {
 }
 
 void GradientWidget::newGradient(Color color1, Color color2) {
-    mGradients << new Gradient(color1, color2);
+    mGradients << new Gradient(color1, color2, this, mMainWindow);
     setCurrentGradient(mGradients.last());
     repaint();
 }
@@ -257,4 +258,16 @@ void GradientWidget::paintGL()
         cX += segWidth;
     }
     drawGradient(mGradients.indexOf(mCurrentGradient), quorterHeight, halfHeight + quorterHeight, false);
+}
+
+void GradientWidget::finishGradientTransform()
+{
+    if(mCurrentGradient == NULL) return;
+    mCurrentGradient->finishTransform();
+}
+
+void GradientWidget::startGradientTransform()
+{
+    if(mCurrentGradient == NULL) return;
+    mCurrentGradient->startTransform();
 }

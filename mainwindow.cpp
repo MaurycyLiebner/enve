@@ -163,7 +163,7 @@ UndoRedoStack *MainWindow::getUndoRedoStack()
 
 void MainWindow::addUpdateScheduler(UpdateScheduler *scheduler)
 {
-    mUpdateSchedulers << scheduler;
+    mUpdateSchedulers.prepend(scheduler);
 }
 
 void MainWindow::callUpdateSchedulers()
@@ -174,6 +174,10 @@ void MainWindow::callUpdateSchedulers()
     }
     mUpdateSchedulers.clear();
     mCanvas->repaintIfNeeded();
+}
+
+FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
+    return mFillStrokeSettings;
 }
 
 void MainWindow::scheduleRepaint()

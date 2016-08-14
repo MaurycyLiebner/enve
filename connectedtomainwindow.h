@@ -20,7 +20,7 @@ public:
     void startNewUndoRedoSet();
     void finishUndoRedoSet();
     void scheduleRepaint();
-private:
+protected:
     MainWindow *mMainWindow;
 };
 

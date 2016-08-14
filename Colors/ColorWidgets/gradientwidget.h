@@ -8,7 +8,7 @@ class GradientWidget : public GLWidget
 {
     Q_OBJECT
 public:
-    GradientWidget(QWidget *parent);
+    GradientWidget(QWidget *parent, MainWindow *mainWindow);
 
     void setCurrentGradient(Gradient *gradient);
     Gradient *getCurrentGradient();
@@ -23,6 +23,9 @@ public:
     void wheelEvent(QWheelEvent *event);
 
     void paintGL();
+
+    void finishGradientTransform();
+    void startGradientTransform();
 signals:
     void selectedColorChanged(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
     void currentGradientChanged(Gradient *gradient);
@@ -30,6 +33,7 @@ signals:
 public slots:
     void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
 private:
+    MainWindow *mMainWindow;
     QList<Gradient*> mGradients;
     Gradient *mCurrentGradient = NULL;
     int mCurrentColorId = 0;

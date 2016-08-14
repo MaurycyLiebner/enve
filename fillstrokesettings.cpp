@@ -1,6 +1,31 @@
 #include "fillstrokesettings.h"
 #include "Colors/ColorWidgets/gradientwidget.h"
 #include "mainwindow.h"
+#include "undoredo.h"
+
+void Gradient::setColors(QList<Color> newColors)
+{
+    colors = newColors;
+    updateQGradientStops();
+    mGradientWidget->repaint();
+    mMainWindow->getFillStrokeSettings()->
+            setCurrentColor(mGradientWidget->getCurrentColor());
+}
+
+void Gradient::updatePaths()
+{
+    foreach (VectorPath *path, mAffectedPaths) {
+        path->updateDrawGradients();
+    }
+}
+
+void Gradient::finishTransform()
+{
+    if(transformPending) {
+        transformPending = false;
+        addUndoRedo(new ChangeGradientColorsUndoRedo(savedColors, colors, this));
+    }
+}
 
 void Gradient::updateQGradientStops() {
     qgradientStops.clear();
@@ -10,6 +35,7 @@ void Gradient::updateQGradientStops() {
         qgradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0.f, 1.f), colors.at(i).qcol) );
         cPos += inc;
     }
+    updatePaths();
 }
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget(parent)
@@ -19,7 +45,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     connect(mUndoRedoSaveTimer, SIGNAL(timeout()),
             this, SLOT(finishTransform()) );
 
-    mGradientWidget = new GradientWidget(this);
+    mGradientWidget = new GradientWidget(this, mMainWindow);
     mColorTypeBar = new QTabBar(this);
     mStrokeSettingsWidget = new QWidget(this);
     mColorsSettingsWidget = new ColorSettingsWidget(this);
@@ -101,13 +127,19 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     connect(mColorTypeBar, SIGNAL(currentChanged(int)),
             this, SLOT(colorTypeSet(int)) );
 
+    connect(mColorsSettingsWidget,
+                SIGNAL(colorChangedHSVSignal(GLfloat,GLfloat,GLfloat,GLfloat)),
+                this, SLOT(colorChangedTMP(GLfloat,GLfloat,GLfloat,GLfloat)) );
+
     setFillTarget();
     setCapStyle(Qt::RoundCap);
     setJoinStyle(Qt::RoundJoin);
 }
 
 void FillStrokeSettingsWidget::setCurrentDisplayedSettings(PaintSettings *settings) {
-    mGradientWidget->setCurrentGradient(settings->gradient);
+    if(settings->paintType == GRADIENTPAINT) {
+        mGradientWidget->setCurrentGradient(settings->gradient);
+    }
     setCurrentPaintType(settings->paintType);
     mColorTypeBar->setCurrentIndex(settings->paintType);
 }
@@ -125,6 +157,7 @@ void FillStrokeSettingsWidget::setCurrentPaintType(PaintType paintType)
 
 void FillStrokeSettingsWidget::setStrokeWidth(qreal width)
 {
+    startTransform();
     mStrokePaintSettings.setLineWidth(width);
     emitTargetSettingsChangedTMP();
 }
@@ -134,23 +167,31 @@ void FillStrokeSettingsWidget::setCurrentSettings(PaintSettings fillPaintSetting
 {
     disconnect(mColorTypeBar, SIGNAL(currentChanged(int)),
             this, SLOT(colorTypeSet(int)) );
-    mFillPaintSettings = fillPaintSettings;
-    mStrokePaintSettings = strokePaintSettings;
     disconnect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
+    mFillPaintSettings = fillPaintSettings;
+    mStrokePaintSettings = strokePaintSettings;
     mLineWidthSpin->setValue(mStrokePaintSettings.lineWidth());
-    connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
-            this, SLOT(setStrokeWidth(qreal)));
     if(mTargetId == 0) { // fill
         setCurrentDisplayedSettings(&mFillPaintSettings);
     } else {
         setCurrentDisplayedSettings(&mStrokePaintSettings);
     }
-    connect(mColorTypeBar, SIGNAL(currentChanged(int)),
-            this, SLOT(colorTypeSet(int)) );
 
     setCapStyle(strokePaintSettings.capStyle());
     setJoinStyle(strokePaintSettings.joinStyle());
+    connect(mColorTypeBar, SIGNAL(currentChanged(int)),
+            this, SLOT(colorTypeSet(int)) );
+    connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
+            this, SLOT(setStrokeWidth(qreal)));
+}
+
+void FillStrokeSettingsWidget::setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a) {
+    mColorsSettingsWidget->setCurrentColor(h, s, v, a);
+}
+
+void FillStrokeSettingsWidget::setCurrentColor(Color color) {
+    mColorsSettingsWidget->setCurrentColor(color);
 }
 
 void FillStrokeSettingsWidget::colorTypeSet(int id)
@@ -165,30 +206,30 @@ void FillStrokeSettingsWidget::colorTypeSet(int id)
     emitTargetSettingsChanged();
 }
 
+void FillStrokeSettingsWidget::colorChangedTMP(GLfloat h, GLfloat s, GLfloat v, GLfloat a)
+{
+    startTransform();
+    if(getCurrentTargetPaintSettings()->paintType == FLATPAINT) {
+        flatColorSet(h, s, v, a);
+    } else if(getCurrentTargetPaintSettings()->paintType == GRADIENTPAINT) {
+        mGradientWidget->setCurrentColor(h, s, v, a);
+    }
+    emitTargetSettingsChangedTMP();
+}
+
 void FillStrokeSettingsWidget::flatColorSet(GLfloat h, GLfloat s, GLfloat v, GLfloat a)
 {
     Color newColor;
     newColor.setHSV(h, s, v, a);
     getCurrentTargetPaintSettings()->color = newColor;
-    emitTargetSettingsChangedTMP();
 }
 
 void FillStrokeSettingsWidget::connectGradient()
 {
-    disconnect(mColorsSettingsWidget,
-            SIGNAL(colorChangedHSVSignal(GLfloat,GLfloat,GLfloat,GLfloat)),
-            this, SLOT(flatColorSet(GLfloat,GLfloat,GLfloat,GLfloat)) );
-
     connect(mGradientWidget,
             SIGNAL(selectedColorChanged(GLfloat,GLfloat,GLfloat,GLfloat)),
             mColorsSettingsWidget,
             SLOT(setCurrentColor(GLfloat,GLfloat,GLfloat,GLfloat) ) );
-    connect(mColorsSettingsWidget,
-            SIGNAL(colorChangedHSVSignal(GLfloat,GLfloat,GLfloat,GLfloat)),
-            mGradientWidget,
-            SLOT(setCurrentColor(GLfloat,GLfloat,GLfloat,GLfloat)) );
-    connect(mGradientWidget, SIGNAL(gradientSettingsChanged()),
-            this, SLOT(emitTargetSettingsChangedTMP()) );
     connect(mGradientWidget, SIGNAL(currentGradientChanged(Gradient*)),
             this, SLOT(setGradient(Gradient*)) );
 }
@@ -199,18 +240,8 @@ void FillStrokeSettingsWidget::disconnectGradient()
             SIGNAL(selectedColorChanged(GLfloat,GLfloat,GLfloat,GLfloat)),
             mColorsSettingsWidget,
             SLOT(setCurrentColor(GLfloat,GLfloat,GLfloat,GLfloat) ) );
-    disconnect(mColorsSettingsWidget,
-            SIGNAL(colorChangedHSVSignal(GLfloat,GLfloat,GLfloat,GLfloat)),
-            mGradientWidget,
-            SLOT(setCurrentColor(GLfloat,GLfloat,GLfloat,GLfloat)) );
-    disconnect(mGradientWidget, SIGNAL(gradientSettingsChanged()),
-            this, SLOT(emitTargetSettingsChangedTMP()) );
     disconnect(mGradientWidget, SIGNAL(currentGradientChanged(Gradient*)),
             this, SLOT(setGradient(Gradient*)) );
-
-    connect(mColorsSettingsWidget,
-            SIGNAL(colorChangedHSVSignal(GLfloat,GLfloat,GLfloat,GLfloat)),
-            this, SLOT(flatColorSet(GLfloat,GLfloat,GLfloat,GLfloat)) );
 }
 
 void FillStrokeSettingsWidget::setJoinStyle(Qt::PenJoinStyle joinStyle)
@@ -249,7 +280,6 @@ void FillStrokeSettingsWidget::emitTargetSettingsChanged()
 
 void FillStrokeSettingsWidget::emitTargetSettingsChangedTMP()
 {
-    startTransform();
     if(mTargetId == 0) {
         emit fillSettingsChanged(mFillPaintSettings, false);
     } else {
@@ -261,10 +291,14 @@ void FillStrokeSettingsWidget::finishTransform()
 {
     if(mTransormStarted) {
         mTransormStarted = false;
-        if(mTargetId == 0) {
-            emit finishFillSettingsTransform();
+        if(getCurrentTargetPaintSettings()->paintType == GRADIENTPAINT) {
+            mGradientWidget->finishGradientTransform();
         } else {
-            emit finishStrokeSettingsTransform();
+            if(mTargetId == 0) {
+                emit finishFillSettingsTransform();
+            } else {
+                emit finishStrokeSettingsTransform();
+            }
         }
     }
 }
@@ -274,17 +308,21 @@ void FillStrokeSettingsWidget::startTransform()
     waitToSaveChanges();
     if(mTransormStarted) return;
     mTransormStarted = true;
-    if(mTargetId == 0) {
-        emit startFillSettingsTransform();
+    if(getCurrentTargetPaintSettings()->paintType == GRADIENTPAINT) {
+        mGradientWidget->startGradientTransform();
     } else {
-        emit startStrokeSettingsTransform();
+        if(mTargetId == 0) {
+            emit startFillSettingsTransform();
+        } else {
+            emit startStrokeSettingsTransform();
+        }
     }
 }
 
 void FillStrokeSettingsWidget::setGradient(Gradient *gradient)
 {
     getCurrentTargetPaintSettings()->gradient = gradient;
-    emitTargetSettingsChangedTMP();
+    emitTargetSettingsChanged();
 }
 
 void FillStrokeSettingsWidget::setBevelJoinStyle()
@@ -325,8 +363,12 @@ void FillStrokeSettingsWidget::setRoundCapStyle()
 
 void FillStrokeSettingsWidget::waitToSaveChanges()
 {
+    if(mUndoRedoSaveTimer->isActive()) {
+        mUndoRedoSaveTimer->setInterval(50);
+        return;
+    }
     mUndoRedoSaveTimer->stop();
-    mUndoRedoSaveTimer->setInterval(250);
+    mUndoRedoSaveTimer->setInterval(50);
     mUndoRedoSaveTimer->setSingleShot(true);
     mUndoRedoSaveTimer->start();
 }

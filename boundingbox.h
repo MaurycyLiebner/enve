@@ -93,8 +93,6 @@ public:
     bool isGroup();
     virtual BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
 
-    virtual void setFillStrokeSettings(PaintSettings,
-                                       StrokeSettings) {}
     virtual void setStrokeSettings(StrokeSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
     virtual void setFillSettings(PaintSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
 

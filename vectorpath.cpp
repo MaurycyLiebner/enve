@@ -43,13 +43,6 @@ StrokeSettings VectorPath::getStrokeSettings()
     return mStrokeSettings;
 }
 
-void VectorPath::setFillStrokeSettings(PaintSettings fillSettings,
-                                       StrokeSettings strokeSettings)
-{
-    setFillSettings(fillSettings);
-    setStrokeSettings(strokeSettings);
-}
-
 void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
 {
     if(saveUndoRedo) {
@@ -58,11 +51,14 @@ void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoR
                                                       this) );
     }
     bool wasGradient = mStrokeSettings.paintType == GRADIENTPAINT;
+    if(wasGradient) {
+        mStrokeSettings.gradient->removePath(this);
+    }
     mStrokeSettings = strokeSettings;
     updateOutlinePath();
     if(mStrokeSettings.paintType == GRADIENTPAINT && !wasGradient) {
         mStrokeGradientPoints.setPositions(getBoundingRect().topLeft(),
-                     getBoundingRect().bottomRight());
+                     getBoundingRect().bottomRight(), saveUndoRedo);
     }
     scheduleRepaint();
 }
@@ -75,11 +71,14 @@ void VectorPath::setFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
                                                      this) );
     }
     bool wasGradient = mFillPaintSettings.paintType == GRADIENTPAINT;
+    if(wasGradient) {
+        mFillPaintSettings.gradient->removePath(this);
+    }
     mFillPaintSettings = fillSettings;
     updateDrawGradients();
     if(mFillPaintSettings.paintType == GRADIENTPAINT && !wasGradient) {
         mFillGradientPoints.setPositions(getBoundingRect().topLeft(),
-                     getBoundingRect().bottomRight());
+                     getBoundingRect().bottomRight(), saveUndoRedo);
     }
     scheduleRepaint();
 }
@@ -155,10 +154,7 @@ void VectorPath::updateAfterCombinedTransformationChanged()
 }
 
 void VectorPath::updateOutlinePath() {
-    QPainterPathStroker *stroker = mStrokeSettings.stroker;
-    mPathStroker.setCapStyle(stroker->capStyle());
-    mPathStroker.setJoinStyle(stroker->joinStyle());
-    mPathStroker.setWidth(stroker->width()*getCurrentCanvasScale());
+    mStrokeSettings.setStrokerSettings(&mPathStroker, getCurrentCanvasScale());
     mOutlinePath = mPathStroker.createStroke(mMappedPath);
     updateWholePath();
 }
@@ -185,6 +181,9 @@ void VectorPath::updateDrawGradients()
 {
     if(mFillPaintSettings.paintType == GRADIENTPAINT) {
         Gradient *gradient = mFillPaintSettings.gradient;
+        if(!gradient->isInPaths(this)) {
+            gradient->addPath(this);
+        }
         mFillGradientPoints.setColors(gradient->qgradientStops.first().second,
                                       gradient->qgradientStops.last().second);
         mFillGradientPoints.enable();
@@ -196,6 +195,9 @@ void VectorPath::updateDrawGradients()
     }
     if(mStrokeSettings.paintType == GRADIENTPAINT) {
         Gradient *gradient = mStrokeSettings.gradient;
+        if(!gradient->isInPaths(this)) {
+            gradient->addPath(this);
+        }
         mStrokeGradientPoints.setColors(gradient->qgradientStops.first().second,
                                       gradient->qgradientStops.last().second);
 
@@ -441,9 +443,9 @@ void GradientPoints::enable()
     enabled = true;
 }
 
-void GradientPoints::setPositions(QPointF startPos, QPointF endPos) {
-    startPoint->setAbsolutePos(startPos);
-    endPoint->setAbsolutePos(endPos);
+void GradientPoints::setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo) {
+    startPoint->setAbsolutePos(startPos, saveUndoRedo);
+    endPoint->setAbsolutePos(endPos, saveUndoRedo);
 }
 
 void GradientPoints::disable()

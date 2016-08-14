@@ -74,62 +74,58 @@ BoundingBox *BoxesGroup::getBoxAtFromAllAncestors(QPointF absPos)
     return boxAtPos;
 }
 
-void BoxesGroup::setFillStrokeSettings(PaintSettings fillSettings,
-                                       StrokeSettings strokeSettings)
-{
-    startNewUndoRedoSet();
-    foreachBoxInList(mChildren) {
-        box->setFillStrokeSettings(fillSettings, strokeSettings);
-    }
-    finishUndoRedoSet();
-}
-
 void BoxesGroup::setFillSettings(PaintSettings fillSettings,
                                  bool saveUndoRedo)
 {
-    startNewUndoRedoSet();
+    if(saveUndoRedo) {
+        startNewUndoRedoSet();
+    }
     foreachBoxInList(mChildren) {
         box->setFillSettings(fillSettings, saveUndoRedo);
     }
-    finishUndoRedoSet();
+    if(saveUndoRedo) {
+        finishUndoRedoSet();
+    }
 }
 
 void BoxesGroup::setStrokeSettings(StrokeSettings strokeSettings,
                                    bool saveUndoRedo)
 {
-    startNewUndoRedoSet();
+    if(saveUndoRedo) {
+        startNewUndoRedoSet();
+    }
     foreachBoxInList(mChildren) {
         box->setStrokeSettings(strokeSettings, saveUndoRedo);
     }
-    finishUndoRedoSet();
+    if(saveUndoRedo) {
+        finishUndoRedoSet();
+    }
 }
 
 void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
 {
-    startNewUndoRedoSet();
+    if(saveUndoRedo) {
+        startNewUndoRedoSet();
+    }
     foreachBoxInList(mSelectedBoxes) {
         box->setFillSettings(fillSettings, saveUndoRedo);
     }
-    finishUndoRedoSet();
+    if(saveUndoRedo) {
+        finishUndoRedoSet();
+    }
 }
 
 void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
 {
-    startNewUndoRedoSet();
+    if(saveUndoRedo) {
+        startNewUndoRedoSet();
+    }
     foreachBoxInList(mSelectedBoxes) {
         box->setStrokeSettings(strokeSettings, saveUndoRedo);
     }
-    finishUndoRedoSet();
-}
-
-void BoxesGroup::setSelectedFillStrokeSettings(PaintSettings fillSettings,
-                                               StrokeSettings strokeSettings)
-{
-    startNewUndoRedoSet();
-    foreachBoxInList(mSelectedBoxes) {
-        box->setFillStrokeSettings(fillSettings, strokeSettings);
+    if(saveUndoRedo) {
+        finishUndoRedoSet();
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::startStrokeTransform()
