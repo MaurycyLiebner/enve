@@ -92,6 +92,11 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     group->setIsCurrentGroup(true);
 }
 
+void Canvas::rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans)
+{
+    mCurrentBoxesGroup->rotateSelectedBy(rotChange, absOrigin, startTrans);
+}
+
 void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter p(this);

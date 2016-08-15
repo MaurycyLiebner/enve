@@ -120,10 +120,13 @@ void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 
 void BoundingBox::rotateBy(qreal rot, QPointF absOrigin)
 {
-    QPointF transPoint = getAbsolutePos() - absOrigin;
+    qDebug() << mSavedTransformMatrix.dx() << mSavedTransformMatrix.dy();
+    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
+
     mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mTransformMatrix.rotate(rot);
     mTransformMatrix.translate(transPoint.x(), transPoint.y());
+    //mTransformMatrix = rotMatrix*mTransformMatrix;
     updateCombinedTransform();
 }
 

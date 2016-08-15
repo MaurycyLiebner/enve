@@ -110,8 +110,11 @@ protected:
     BoundingBoxType mType;
     QList<BoundingBox*> mChildren;
     BoundingBox *mParent = NULL;
+
+    QPointF mSavedTransformAbsPos;
     QMatrix mSavedTransformMatrix;
     QMatrix mTransformMatrix;
+
     QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;
     QPointF mAbsRotPivotPos;

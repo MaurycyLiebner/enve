@@ -76,6 +76,8 @@ public:
     void startSelectedFillTransform();
     void finishSelectedStrokeTransform();
     void finishSelectedFillTransform();
+
+    void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

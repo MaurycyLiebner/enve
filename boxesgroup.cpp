@@ -192,6 +192,21 @@ void BoxesGroup::finishSelectedFillTransform()
     finishUndoRedoSet();
 }
 
+void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
+                                  bool startTrans)
+{
+    if(startTrans) {
+        foreachBoxInList(mSelectedBoxes) {
+            box->startTransform();
+            box->rotateBy(rotBy, absOrigin);
+        }
+    } else {
+        foreachBoxInList(mSelectedBoxes) {
+            box->rotateBy(rotBy, absOrigin);
+        }
+    }
+}
+
 
 void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {

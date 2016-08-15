@@ -49,6 +49,8 @@ public:
     QPointF scaleDistancePointByCurrentScale(QPointF point);
     bool processKeyEvent(QKeyEvent *event);
     void setCurrentBoxesGroup(BoxesGroup *group);
+
+    void rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans);
 protected:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -105,7 +107,7 @@ private:
     bool mFirstMouseMove = false;
     bool mSelecting = false;
 //    bool mMoving = false;
-    QPoint mPressPos;
+    QPoint mLastMouseEventPos;
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
     MovablePoint *mLastPressedPoint = NULL;
