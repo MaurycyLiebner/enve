@@ -41,7 +41,6 @@ public:
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
 
     void rotateBy(qreal rot, QPointF absOrigin);
-    void moveBy(qreal dx, qreal dy);
 
     void setTransformation(QMatrix transMatrix);
 
@@ -105,6 +104,7 @@ public:
     virtual void startFillTransform() {}
     virtual void finishStrokeTransform() {}
     virtual void finishFillTransform() {}
+    void setPivotAbsPos(QPointF absPos);
 protected:
     virtual void updateAfterCombinedTransformationChanged();
     BoundingBoxType mType;
@@ -117,7 +117,7 @@ protected:
 
     QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;
-    QPointF mAbsRotPivotPos;
+    QPointF mRelRotPivotPos;
     bool mPivotChanged = false;
     bool mSelected = false;
 };

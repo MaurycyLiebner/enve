@@ -140,6 +140,19 @@ qreal Canvas::getCurrentCanvasScale()
     return mTransformMatrix.m11();
 }
 
+void Canvas::schedulePivotUpdate()
+{
+    mPivotUpdateNeeded = true;
+}
+
+void Canvas::updatePivotIfNeeded()
+{
+    if(mPivotUpdateNeeded) {
+        mPivotUpdateNeeded = false;
+        updatePivot();
+    }
+}
+
 void Canvas::fillSettingsChanged(PaintSettings fillSettings, bool saveUndoRedo)
 {
     mCurrentBoxesGroup->setSelectedFillSettings(fillSettings, saveUndoRedo);
@@ -229,8 +242,29 @@ void Canvas::startSelectionAtPoint(QPointF pos) {
     scheduleRepaint();
 }
 
+void Canvas::updatePivot() {
+    if(mCurrentMode != MOVE_PATH_ROTATE) {
+        return;
+    }
+    if(mCurrentBoxesGroup->isSelectionEmpty() ) {
+        mRotPivot->hide();
+    } else {
+        mRotPivot->show();
+        mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedPivotPos(), false);
+    }
+}
+
+void Canvas::updateAfterCombinedTransformationChanged()
+{
+    BoundingBox::updateAfterCombinedTransformationChanged();
+    mRotPivot->updateRotationMappedPath();
+}
+
 void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
+    if(mCurrentMode == MOVE_PATH_ROTATE) {
+        schedulePivotUpdate();
+    }
     scheduleRepaint();
 }
 

@@ -207,6 +207,28 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
     }
 }
 
+QPointF BoxesGroup::getSelectedPivotPos()
+{
+    if(mSelectedBoxes.isEmpty()) return QPointF(0.f, 0.f);
+    QPointF posSum = QPointF(0.f, 0.f);
+    int count = mSelectedBoxes.length();
+    foreachBoxInList(mSelectedBoxes) {
+        posSum += box->getPivotAbsPos();
+    }
+    return posSum/count;
+}
+
+bool BoxesGroup::isSelectionEmpty()
+{
+    return mSelectedBoxes.isEmpty();
+}
+
+void BoxesGroup::setSelectedPivotAbsPos(QPointF absPos)
+{
+    if(mSelectedBoxes.count() == 1) {
+        mSelectedBoxes.first()->setPivotAbsPos(absPos);
+    }
+}
 
 void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
@@ -224,7 +246,7 @@ void BoxesGroup::removeSelectedPointsAndClearList()
         point->deselect();
         point->remove();
     }
-    mSelectedPoints.clear();
+    mSelectedPoints.clear(); schedulePivotUpdate();
 
     finishUndoRedoSet();
 }
@@ -237,7 +259,7 @@ void BoxesGroup::removeSelectedBoxesAndClearList()
         BoundingBox::removeChild(box);
         box->deselect();
     }
-    mSelectedBoxes.clear();
+    mSelectedBoxes.clear(); schedulePivotUpdate();
 
     finishUndoRedoSet();
 }
@@ -269,7 +291,7 @@ void BoxesGroup::addBoxToSelection(BoundingBox *box) {
         return;
     }
     box->select();
-    mSelectedBoxes.append(box);
+    mSelectedBoxes.append(box); schedulePivotUpdate();
     qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
     setCurrentFillStrokeSettingsFromBox(box);
 }
@@ -285,7 +307,7 @@ void BoxesGroup::addPointToSelection(MovablePoint *point)
 
 void BoxesGroup::removeBoxFromSelection(BoundingBox *box) {
     box->deselect();
-    mSelectedBoxes.removeOne(box);
+    mSelectedBoxes.removeOne(box); schedulePivotUpdate();
 }
 
 void BoxesGroup::removePointFromSelection(MovablePoint *point) {
@@ -298,7 +320,7 @@ void BoxesGroup::clearBoxesSelection()
     foreachBoxInList(mSelectedBoxes) {
         box->deselect();
     }
-    mSelectedBoxes.clear();
+    mSelectedBoxes.clear(); schedulePivotUpdate();
 }
 
 void BoxesGroup::bringSelectedBoxesToFront() {
@@ -525,7 +547,7 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
         newGroup->addChild(box);
     }
     newGroup->selectAllBoxes();
-    mSelectedBoxes.clear();
+    mSelectedBoxes.clear(); schedulePivotUpdate();
     finishUndoRedoSet();
     return newGroup;
 }

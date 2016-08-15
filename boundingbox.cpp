@@ -30,9 +30,14 @@ bool BoundingBox::isGroup()
     return mType == TYPE_GROUP;
 }
 
+void BoundingBox::setPivotAbsPos(QPointF absPos) {
+    mPivotChanged = true;
+    mRelRotPivotPos = getCombinedTransform().inverted().map(absPos);
+}
+
 QPointF BoundingBox::getPivotAbsPos()
 {
-    return mAbsRotPivotPos;
+    return getCombinedTransform().map(mRelRotPivotPos);
 }
 
 bool BoundingBox::isSelected()
@@ -112,27 +117,31 @@ void BoundingBox::scale(qreal scaleBy, QPointF absOrigin)
 
 void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 {
-    mTransformMatrix.translate(-absOrigin.x(), -absOrigin.y());
+    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
+
+    mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mTransformMatrix.scale(scaleXBy, scaleYBy);
-    mTransformMatrix.translate(absOrigin.x(), absOrigin.y());
+    mTransformMatrix.translate(transPoint.x(), transPoint.y());
     updateCombinedTransform();
 }
 
 void BoundingBox::rotateBy(qreal rot, QPointF absOrigin)
 {
-    qDebug() << mSavedTransformMatrix.dx() << mSavedTransformMatrix.dy();
     QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
 
     mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mTransformMatrix.rotate(rot);
     mTransformMatrix.translate(transPoint.x(), transPoint.y());
-    //mTransformMatrix = rotMatrix*mTransformMatrix;
     updateCombinedTransform();
 }
 
 void BoundingBox::moveBy(QPointF trans)
 {
-    moveBy(trans.x(), trans.y());
+    trans = getCombinedTransform().inverted().map(trans) -
+            getCombinedTransform().inverted().map(QPointF(0, 0));
+
+    mTransformMatrix.translate(trans.x(), trans.y());
+    updateCombinedTransform();
 }
 
 void BoundingBox::startTransform()
@@ -284,12 +293,6 @@ int BoundingBox::getZIndex() {
     return mZListIndex;
 }
 
-void BoundingBox::moveBy(qreal dx, qreal dy)
-{
-    mTransformMatrix.translate(dx, dy);
-    updateCombinedTransform();
-}
-
 void BoundingBox::setTransformation(QMatrix transMatrix)
 {
     mTransformMatrix = transMatrix;
@@ -316,5 +319,6 @@ void BoundingBox::updateCombinedTransform()
         mCombinedTransformMatrix = mTransformMatrix*
                 mParent->getCombinedTransform();
     }
+    schedulePivotUpdate();
     updateAfterCombinedTransformationChanged();
 }

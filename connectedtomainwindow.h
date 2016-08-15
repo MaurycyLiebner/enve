@@ -19,7 +19,8 @@ public:
 
     void startNewUndoRedoSet();
     void finishUndoRedoSet();
-    void scheduleRepaint();
+    virtual void scheduleRepaint();
+    virtual void schedulePivotUpdate();
 protected:
     MainWindow *mMainWindow;
 };

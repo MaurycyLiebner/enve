@@ -51,7 +51,12 @@ public:
     void setCurrentBoxesGroup(BoxesGroup *group);
 
     void rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans);
+    void updatePivot();
+
+    void schedulePivotUpdate();
+    void updatePivotIfNeeded();
 protected:
+    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -103,6 +108,7 @@ private:
     qreal mVisibleHeight = 1080;
 
     bool mRepaintNeeded = false;
+    bool mPivotUpdateNeeded = false;
 
     bool mFirstMouseMove = false;
     bool mSelecting = false;

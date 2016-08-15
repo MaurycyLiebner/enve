@@ -78,6 +78,10 @@ public:
     void finishSelectedFillTransform();
 
     void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
+
+    QPointF getSelectedPivotPos();
+    bool isSelectionEmpty();
+    void setSelectedPivotAbsPos(QPointF absPos);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

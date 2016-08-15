@@ -215,6 +215,7 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
             mRotPivot->startTransform();
         }
         mRotPivot->moveBy(eventPos - mLastMouseEventPos);
+        mCurrentBoxesGroup->setSelectedPivotAbsPos(mRotPivot->getAbsolutePos());
     } else if(mCurrentMode == CanvasMode::MOVE_PATH_ROTATE &&
               mRotPivot->isRotating()) {
         mRotPivot->handleMouseMove(eventPos, eventPos - mLastMouseEventPos,
@@ -224,8 +225,7 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
             mCurrentBoxesGroup->addBoxToSelection(mLastPressedBox);
             mLastPressedBox = NULL;
         }
-        mCurrentBoxesGroup->moveSelectedBoxesBy(
-                    scaleDistancePointByCurrentScale(eventPos - mLastMouseEventPos),
+        mCurrentBoxesGroup->moveSelectedBoxesBy(eventPos - mLastMouseEventPos,
                     mFirstMouseMove);
     }
 }
@@ -238,7 +238,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
     QPointF eventPos = event->pos();
     if(event->buttons() & Qt::MiddleButton) {
-        moveBy(scaleDistancePointByCurrentScale(event->pos() - mLastMouseEventPos));
+        moveBy(event->pos() - mLastMouseEventPos);
         scheduleRepaint();
     } else {
         if(mSelecting) {
@@ -259,15 +259,13 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
 void Canvas::wheelEvent(QWheelEvent *event)
 {
-    QPointF zoomOrigin = (getAbsolutePos() - event->posF())/mTransformMatrix.m11();
     if(event->delta() > 0) {
-        scale(1.2, zoomOrigin);
+        scale(1.2, event->posF());
     } else {
-        scale(0.8, zoomOrigin);
+        scale(0.8, event->posF());
     }
     mVisibleHeight = mTransformMatrix.m22()*mHeight;
     mVisibleWidth = mTransformMatrix.m11()*mWidth;
-    mRotPivot->updateRotationMappedPath();
     scheduleRepaint();
     callUpdateSchedulers();
 }

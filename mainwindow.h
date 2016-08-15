@@ -47,6 +47,9 @@ public:
 
     void callUpdateSchedulers();
     void scheduleRepaint();
+    void schedulePivotUpdate();
+
+    Canvas *getCanvas();
 
     static Color getColor(bool darker, bool selected, bool hover);
 // colors

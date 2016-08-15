@@ -27,9 +27,9 @@ void VectorPath::updatePivotPosition() {
         QPointF posSum = QPointF(0.f, 0.f);
         int count = mPoints.length();
         foreach(PathPoint *point, mPoints) {
-            posSum += point->getAbsolutePos();
+            posSum += point->getRelativePos();
         }
-        mAbsRotPivotPos = posSum/count;
+        mRelRotPivotPos = posSum/count;
     }
 }
 

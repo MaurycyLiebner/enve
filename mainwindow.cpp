@@ -173,6 +173,7 @@ void MainWindow::callUpdateSchedulers()
         delete sheduler;
     }
     mUpdateSchedulers.clear();
+    mCanvas->updatePivotIfNeeded();
     mCanvas->repaintIfNeeded();
 }
 
@@ -183,6 +184,16 @@ FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
 void MainWindow::scheduleRepaint()
 {
     mCanvas->scheduleRepaint();
+}
+
+void MainWindow::schedulePivotUpdate()
+{
+    mCanvas->schedulePivotUpdate();
+}
+
+Canvas *MainWindow::getCanvas()
+{
+    return mCanvas;
 }
 
 bool MainWindow::eventFilter(QObject *, QEvent *e)

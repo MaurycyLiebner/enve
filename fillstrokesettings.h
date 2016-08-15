@@ -158,8 +158,8 @@ public:
     }
 private:
     qreal mLineWidth = 1.f;
-    Qt::PenCapStyle mCapStyle;
-    Qt::PenJoinStyle mJoinStyle;
+    Qt::PenCapStyle mCapStyle = Qt::RoundCap;
+    Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
 };
 
 class MainWindow;

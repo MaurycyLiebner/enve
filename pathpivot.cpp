@@ -10,7 +10,6 @@ PathPivot::PathPivot(Canvas *parent) :
     QPainterPath removeEllipse;
     removeEllipse.addEllipse(QPointF(0.f, 0.f), 30.f, 30.f);
     mRotationPath -= removeEllipse;
-    updateRotationMappedPath();
 }
 
 void PathPivot::draw(QPainter *p)
@@ -58,7 +57,6 @@ bool PathPivot::isRotating()
 bool PathPivot::handleMousePress(QPointF absPressPos)
 {
     if(isRotationPathAt(absPressPos) ) {
-        qDebug() << "start";
         mRotating = true;
         return true;
     }

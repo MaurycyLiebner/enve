@@ -1,4 +1,4 @@
-#ifndef UPDATESCHEDULER_H
+﻿#ifndef UPDATESCHEDULER_H
 #define UPDATESCHEDULER_H
 
 #include "vectorpath.h"

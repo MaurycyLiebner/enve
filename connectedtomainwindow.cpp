@@ -1,5 +1,6 @@
 #include "connectedtomainwindow.h"
 #include "mainwindow.h"
+#include "updatescheduler.h"
 
 ConnectedToMainWindow::ConnectedToMainWindow(ConnectedToMainWindow *parent)
 {
@@ -43,4 +44,8 @@ void ConnectedToMainWindow::finishUndoRedoSet()
 
 void ConnectedToMainWindow::scheduleRepaint() {
     mMainWindow->scheduleRepaint();
+}
+
+void ConnectedToMainWindow::schedulePivotUpdate() {
+    mMainWindow->schedulePivotUpdate();
 }
