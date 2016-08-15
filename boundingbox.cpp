@@ -30,9 +30,22 @@ bool BoundingBox::isGroup()
     return mType == TYPE_GROUP;
 }
 
-void BoundingBox::setPivotAbsPos(QPointF absPos) {
-    mPivotChanged = true;
-    mRelRotPivotPos = getCombinedTransform().inverted().map(absPos);
+void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
+    if(saveUndoRedo) {
+        addUndoRedo(new SetPivotAbsPosUndoRedo(this, getPivotAbsPos(), absPos,
+                                               mPivotChanged, pivotChanged));
+    }
+    mPivotChanged = pivotChanged;
+    QPointF newPos = getCombinedTransform().inverted().map(absPos);
+    mRelRotPivotPos = newPos;
+    schedulePivotUpdate();
+}
+
+void BoundingBox::applyTransformation(QMatrix transformation)
+{
+    startTransform();
+    mTransformMatrix = mTransformMatrix*transformation;
+    finishTransform();
 }
 
 QPointF BoundingBox::getPivotAbsPos()
@@ -142,6 +155,7 @@ void BoundingBox::moveBy(QPointF trans)
 
     mTransformMatrix.translate(trans.x(), trans.y());
     updateCombinedTransform();
+    schedulePivotUpdate();
 }
 
 void BoundingBox::startTransform()
@@ -297,6 +311,7 @@ void BoundingBox::setTransformation(QMatrix transMatrix)
 {
     mTransformMatrix = transMatrix;
     updateCombinedTransform();
+    schedulePivotUpdate();
 }
 
 QPointF BoundingBox::getAbsolutePos()
@@ -319,6 +334,5 @@ void BoundingBox::updateCombinedTransform()
         mCombinedTransformMatrix = mTransformMatrix*
                 mParent->getCombinedTransform();
     }
-    schedulePivotUpdate();
     updateAfterCombinedTransformationChanged();
 }

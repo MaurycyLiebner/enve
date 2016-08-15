@@ -40,7 +40,7 @@ QRectF Canvas::getBoundingRect()
 
 bool Canvas::processKeyEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_F1) {
-        setCanvasMode(CanvasMode::MOVE_PATH);
+        setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
     } else if(event->key() == Qt::Key_F2) {
         setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(event->key() == Qt::Key_F3) {
@@ -48,13 +48,17 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_Delete) {
         if(mCurrentMode == MOVE_POINT) {
             mCurrentBoxesGroup->removeSelectedPointsAndClearList();
-        } else if(mCurrentMode == MOVE_PATH) {
+        } else if(mCurrentMode == MOVE_PATH_ROTATE) {
             mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
         }
     } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
-        BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
-        if(newGroup != NULL) {
-            setCurrentBoxesGroup(newGroup);
+        if(isShiftPressed()) {
+            mCurrentBoxesGroup->ungroupSelected();
+        } else {
+            BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
+            if(newGroup != NULL) {
+                setCurrentBoxesGroup(newGroup);
+            }
         }
     } else if(event->key() == Qt::Key_PageUp) {
         mCurrentBoxesGroup->moveSelectedBoxesUp();
@@ -69,7 +73,7 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_S && isMovingPath()) {
         setCanvasMode(CanvasMode::MOVE_PATH_SCALE);
     } else if(event->key() == Qt::Key_G && isMovingPath()) {
-        setCanvasMode(CanvasMode::MOVE_PATH);
+        setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
     } else if(event->key() == Qt::Key_A && isCtrlPressed()) {
         if(isShiftPressed()) {
             mCurrentBoxesGroup->deselectAllBoxes();
@@ -131,8 +135,7 @@ void Canvas::paintEvent(QPaintEvent *)
 
 bool Canvas::isMovingPath() {
     return mCurrentMode == CanvasMode::MOVE_PATH_ROTATE ||
-            mCurrentMode == CanvasMode::MOVE_PATH_SCALE ||
-            mCurrentMode == CanvasMode::MOVE_PATH;
+            mCurrentMode == CanvasMode::MOVE_PATH_SCALE;
 }
 
 qreal Canvas::getCurrentCanvasScale()

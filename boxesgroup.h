@@ -63,8 +63,8 @@ public:
                          bool saveUndoRedo = true);
     void setStrokeSettings(StrokeSettings strokeSettings,
                            bool saveUndoRedo = true);
-    void setSelectedFillSettings(PaintSettings fillSettings, bool saveUndoRedo);
-    void setSelectedStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo);
+    void setSelectedFillSettings(PaintSettings fillSettings, bool saveUndoRedo = true);
+    void setSelectedStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo = true);
     void setCurrentFillStrokeSettingsFromBox(BoundingBox *box);
 
     void startStrokeTransform();
@@ -82,6 +82,12 @@ public:
     QPointF getSelectedPivotPos();
     bool isSelectionEmpty();
     void setSelectedPivotAbsPos(QPointF absPos);
+
+    void ungroupSelected();
+    void ungroup();
+    void updatePivotPosition();
+
+    void select();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

@@ -3,12 +3,12 @@
 
 PathPivot::PathPivot(Canvas *parent) :
     MovablePoint(QPointF(0.f, 0.f), parent,
-                 MovablePointType::TYPE_PIVOT_POINT, 15.f)
+                 MovablePointType::TYPE_PIVOT_POINT, 10.f)
 {
     mCanvas = parent;
     mRotationPath.addEllipse(QPointF(0.f, 0.f), 50.f, 50.f);
     QPainterPath removeEllipse;
-    removeEllipse.addEllipse(QPointF(0.f, 0.f), 30.f, 30.f);
+    removeEllipse.addEllipse(QPointF(0.f, 0.f), 40.f, 40.f);
     mRotationPath -= removeEllipse;
 }
 
@@ -43,6 +43,15 @@ void PathPivot::updateRotationMappedPath() {
     scheduleRepaint();
 }
 
+void PathPivot::finishTransform()
+{
+    if(!mTransformStarted) {
+        return;
+    }
+    mTransformStarted = false;
+    mCanvas->setPivotPositionForSelected();
+}
+
 void PathPivot::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
@@ -56,9 +65,14 @@ bool PathPivot::isRotating()
 
 bool PathPivot::handleMousePress(QPointF absPressPos)
 {
-    if(isRotationPathAt(absPressPos) ) {
-        mRotating = true;
+    if(isPointAt(absPressPos)) {
+        select();
         return true;
+    } else {
+        if(isRotationPathAt(absPressPos) ) {
+            mRotating = true;
+            return true;
+        }
     }
     return false;
 }

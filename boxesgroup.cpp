@@ -230,6 +230,28 @@ void BoxesGroup::setSelectedPivotAbsPos(QPointF absPos)
     }
 }
 
+void BoxesGroup::ungroup() {
+    startNewUndoRedoSet();
+    clearBoxesSelection();
+    BoxesGroup *parentGroup = (BoxesGroup*) mParent;
+    foreachBoxInListInverted(mChildren) {
+        box->applyTransformation(mTransformMatrix);
+        BoundingBox::removeChild(box);
+        parentGroup->addChild(box);
+    }
+    mParent->removeChild(this);
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::ungroupSelected()
+{
+    foreachBoxInList(mSelectedBoxes) {
+        if(box->isGroup()) {
+            ((BoxesGroup*) box)->ungroup();
+        }
+    }
+}
+
 void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     foreachBoxInList(mSelectedBoxes) {
@@ -525,6 +547,24 @@ void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect)
     foreachBoxInList(mSelectedBoxes) {
         box->selectAndAddContainedPointsToList(absRect, &mSelectedPoints);
     }
+}
+
+void BoxesGroup::updatePivotPosition() {
+    if(!mPivotChanged) {
+        if(mChildren.isEmpty()) return;
+        QPointF posSum = QPointF(0.f, 0.f);
+        int count = mChildren.length();
+        foreachBoxInList(mChildren) {
+            posSum += box->getPivotAbsPos();
+        }
+        setPivotAbsPos(posSum/count, false, false);
+    }
+}
+
+void BoxesGroup::select()
+{
+    BoundingBox::select();
+    updatePivotPosition();
 }
 
 bool BoxesGroup::isShiftPressed() {

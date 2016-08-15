@@ -551,4 +551,33 @@ private:
     QList<Color> mNewColors;
 };
 
+class SetPivotAbsPosUndoRedo : public UndoRedo
+{
+public:
+    SetPivotAbsPosUndoRedo(BoundingBox *target, QPointF prevAbsPos, QPointF newAbsPos,
+                           bool prevPivotChanged, bool newPivotChanged) :
+        UndoRedo("SetPivotAbsPosUndoRedo") {
+        mTarget = target;
+        mPrevAbsPos = prevAbsPos;
+        mNewAbsPos = newAbsPos;
+        mPrevPivotChanged = prevPivotChanged;
+        mNewPivotChanged = newPivotChanged;
+    }
+
+    void redo() {
+        mTarget->setPivotAbsPos(mNewAbsPos, false, mNewPivotChanged);
+    }
+
+    void undo() {
+        mTarget->setPivotAbsPos(mPrevAbsPos, false, mPrevPivotChanged);
+    }
+
+private:
+    BoundingBox *mTarget;
+    QPointF mPrevAbsPos;
+    QPointF mNewAbsPos;
+    bool mPrevPivotChanged;
+    bool mNewPivotChanged;
+};
+
 #endif // UNDOREDO_H

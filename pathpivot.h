@@ -17,6 +17,7 @@ public:
     bool handleMouseRelease();
     bool handleMouseMove(QPointF moveDestAbs, QPointF moveBy, bool startTransform);
     void updateRotationMappedPath();
+    void finishTransform();
 private:
     Canvas *mCanvas;
     bool mRotating = false;

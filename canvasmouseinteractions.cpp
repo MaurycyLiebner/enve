@@ -7,13 +7,8 @@ QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
 }
 
 void Canvas::handleMovePathMousePressEvent() {
-    if(mCurrentMode == CanvasMode::MOVE_PATH_ROTATE) {
-        if(mRotPivot->isPointAt(mLastMouseEventPos)) {
-            mRotPivot->select();
-        } else {
-            mRotPivot->handleMousePress(mLastMouseEventPos);
-        }
-    } else {
+    if((mCurrentMode == CanvasMode::MOVE_PATH_ROTATE) ?
+            !mRotPivot->handleMousePress(mLastMouseEventPos) : true) {
         mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPos);
         if(mLastPressedBox != NULL) {
             if(!(isShiftPressed()) && !mLastPressedBox->isSelected()) {
@@ -32,6 +27,8 @@ void Canvas::handleMovePathMousePressEvent() {
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
+    mDoubleClick = false;
+    mMovesToSkip = 2;
     mFirstMouseMove = true;
     mLastMouseEventPos = event->pos();
     if(event->button() == Qt::MiddleButton) {
@@ -182,16 +179,18 @@ void Canvas::handleAddPointMouseRelease() {
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
-    QPointF eventPos = event->pos();
-    if(event->button() == Qt::MiddleButton) {
+    if(!mDoubleClick) {
+        QPointF eventPos = event->pos();
+        if(event->button() == Qt::MiddleButton) {
 
-    } else {
-        if(mCurrentMode == CanvasMode::MOVE_POINT) {
-            handleMovePointMouseRelease(eventPos);
-        } else if(isMovingPath()) {
-            handleMovePathMouseRelease(eventPos);
-        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-            handleAddPointMouseRelease();
+        } else {
+            if(mCurrentMode == CanvasMode::MOVE_POINT) {
+                handleMovePointMouseRelease(eventPos);
+            } else if(isMovingPath()) {
+                handleMovePathMouseRelease(eventPos);
+            } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+                handleAddPointMouseRelease();
+            }
         }
     }
     mLastPressedBox = NULL;
@@ -208,6 +207,10 @@ void Canvas::handleMovePointMouseMove(QPointF eventPos) {
     mCurrentBoxesGroup->moveSelectedPointsBy(eventPos - mLastMouseEventPos, mFirstMouseMove);
 }
 
+void Canvas::setPivotPositionForSelected() {
+    mCurrentBoxesGroup->setSelectedPivotAbsPos(mRotPivot->getAbsolutePos());
+}
+
 void Canvas::handleMovePathMouseMove(QPointF eventPos) {
     if(mCurrentMode == CanvasMode::MOVE_PATH_ROTATE &&
             mRotPivot->isSelected()) {
@@ -215,7 +218,6 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
             mRotPivot->startTransform();
         }
         mRotPivot->moveBy(eventPos - mLastMouseEventPos);
-        mCurrentBoxesGroup->setSelectedPivotAbsPos(mRotPivot->getAbsolutePos());
     } else if(mCurrentMode == CanvasMode::MOVE_PATH_ROTATE &&
               mRotPivot->isRotating()) {
         mRotPivot->handleMouseMove(eventPos, eventPos - mLastMouseEventPos,
@@ -236,6 +238,10 @@ void Canvas::handleAddPointMouseMove(QPointF eventPos) {
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
+    if(mMovesToSkip > 0) {
+        mMovesToSkip--;
+        return;
+    }
     QPointF eventPos = event->pos();
     if(event->buttons() & Qt::MiddleButton) {
         moveBy(event->pos() - mLastMouseEventPos);
@@ -272,6 +278,7 @@ void Canvas::wheelEvent(QWheelEvent *event)
 
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    mDoubleClick = true;
     BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(event->pos());
     if(boxAt == NULL) {
         if(mCurrentBoxesGroup != this) {

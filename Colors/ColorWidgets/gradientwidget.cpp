@@ -42,7 +42,6 @@ void GradientWidget::setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a)
     Color newColor;
     newColor.setHSV(h, s, v, a);
     mCurrentGradient->replaceColor(mCurrentColorId, newColor);
-    emit gradientSettingsChanged();
     repaint();
 }
 
@@ -101,12 +100,16 @@ void GradientWidget::mousePressEvent(QMouseEvent *event)
                     } else {
                         mCurrentGradient->removeColor(mCurrentColorId);
                     }
+                    startGradientTransform();
                     setCurrentColorId(0);
                     emit gradientSettingsChanged();
+                    finishGradientTransform();
                     repaint();
                 } else if(selected_action->text() == "Add Color") {
+                    startGradientTransform();
                     mCurrentGradient->addColor(Color(0.f, 0.f, 0.f, 1.f));
                     emit gradientSettingsChanged();
+                    finishGradientTransform();
                     repaint();
                 }
             }
@@ -124,9 +127,11 @@ void GradientWidget::mouseMoveEvent(QMouseEvent *event)
         int nCols = mCurrentGradient->colors.length();
             int colorId = clampInt(event->x()*nCols/width(), 0, nCols - 1);
             if(colorId != mCurrentColorId) {
+                startGradientTransform();
                 mCurrentGradient->swapColors(mCurrentColorId, colorId);
                 setCurrentColorId(colorId);
                 emit gradientSettingsChanged();
+                finishGradientTransform();
                 repaint();
             }
     }

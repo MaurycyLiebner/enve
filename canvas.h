@@ -13,7 +13,6 @@ class UndoRedo;
 class UndoRedoStack;
 
 enum CanvasMode : short {
-    MOVE_PATH,
     MOVE_PATH_SCALE,
     MOVE_PATH_ROTATE,
     MOVE_POINT,
@@ -55,6 +54,7 @@ public:
 
     void schedulePivotUpdate();
     void updatePivotIfNeeded();
+    void setPivotPositionForSelected();
 protected:
     void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -96,6 +96,9 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    bool mDoubleClick = false;
+    int mMovesToSkip = 0;
+
     Color mFillColor;
     Color mOutlineColor;
 

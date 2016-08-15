@@ -73,7 +73,7 @@ public:
     void updateChildrenId(int firstId);
     void moveChildInList(int from, int to, bool saveUndoRedo = true);
     virtual void removeChildFromList(int id, bool saveUndoRedo = true);
-    void addChildToListAt(int index,
+    virtual void addChildToListAt(int index,
                           BoundingBox *child,
                           bool saveUndoRedo = true);
 
@@ -82,7 +82,7 @@ public:
 
     QPointF getPivotAbsPos();
     bool isSelected();
-    void select();
+    virtual void select();
     void deselect();
     int getZIndex();
     virtual void drawBoundingRect(QPainter *p);
@@ -104,7 +104,8 @@ public:
     virtual void startFillTransform() {}
     virtual void finishStrokeTransform() {}
     virtual void finishFillTransform() {}
-    void setPivotAbsPos(QPointF absPos);
+    void setPivotAbsPos(QPointF absPos, bool saveUndoRedo = true, bool pivotChanged = true);
+    void applyTransformation(QMatrix transformation);
 protected:
     virtual void updateAfterCombinedTransformationChanged();
     BoundingBoxType mType;

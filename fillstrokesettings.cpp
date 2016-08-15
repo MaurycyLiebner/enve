@@ -24,6 +24,8 @@ void Gradient::finishTransform()
     if(transformPending) {
         transformPending = false;
         addUndoRedo(new ChangeGradientColorsUndoRedo(savedColors, colors, this));
+        scheduleRepaint();
+        callUpdateSchedulers();
     }
 }
 
