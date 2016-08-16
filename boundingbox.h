@@ -106,6 +106,7 @@ public:
     virtual void finishFillTransform() {}
     void setPivotAbsPos(QPointF absPos, bool saveUndoRedo = true, bool pivotChanged = true);
     void applyTransformation(QMatrix transformation);
+    void setPivotRelPos(QPointF relPos, bool saveUndoRedo = true, bool pivotChanged = true);
 protected:
     virtual void updateAfterCombinedTransformationChanged();
     BoundingBoxType mType;

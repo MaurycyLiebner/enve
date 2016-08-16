@@ -30,13 +30,23 @@ bool BoundingBox::isGroup()
     return mType == TYPE_GROUP;
 }
 
-void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
+void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo, bool pivotChanged) {
     if(saveUndoRedo) {
-        addUndoRedo(new SetPivotAbsPosUndoRedo(this, getPivotAbsPos(), absPos,
+        addUndoRedo(new SetPivotRelPosUndoRedo(this, mRelRotPivotPos, relPos,
                                                mPivotChanged, pivotChanged));
     }
     mPivotChanged = pivotChanged;
+    mRelRotPivotPos = relPos;
+    schedulePivotUpdate();
+}
+
+void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
     QPointF newPos = getCombinedTransform().inverted().map(absPos);
+    if(saveUndoRedo) {
+        addUndoRedo(new SetPivotRelPosUndoRedo(this, mRelRotPivotPos, newPos,
+                                               mPivotChanged, pivotChanged));
+    }
+    mPivotChanged = pivotChanged;
     mRelRotPivotPos = newPos;
     schedulePivotUpdate();
 }

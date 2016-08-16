@@ -551,31 +551,30 @@ private:
     QList<Color> mNewColors;
 };
 
-class SetPivotAbsPosUndoRedo : public UndoRedo
+class SetPivotRelPosUndoRedo : public UndoRedo
 {
 public:
-    SetPivotAbsPosUndoRedo(BoundingBox *target, QPointF prevAbsPos, QPointF newAbsPos,
-                           bool prevPivotChanged, bool newPivotChanged) :
-        UndoRedo("SetPivotAbsPosUndoRedo") {
+    SetPivotRelPosUndoRedo(BoundingBox *target, QPointF prevRelPos, QPointF newRelPos,
+                           bool prevPivotChanged, bool newPivotChanged) : UndoRedo() {
         mTarget = target;
-        mPrevAbsPos = prevAbsPos;
-        mNewAbsPos = newAbsPos;
+        mPrevRelPos = prevRelPos;
+        mNewRelPos = newRelPos;
         mPrevPivotChanged = prevPivotChanged;
         mNewPivotChanged = newPivotChanged;
     }
 
     void redo() {
-        mTarget->setPivotAbsPos(mNewAbsPos, false, mNewPivotChanged);
+        mTarget->setPivotRelPos(mNewRelPos, false, mNewPivotChanged);
     }
 
     void undo() {
-        mTarget->setPivotAbsPos(mPrevAbsPos, false, mPrevPivotChanged);
+        mTarget->setPivotRelPos(mPrevRelPos, false, mPrevPivotChanged);
     }
 
 private:
     BoundingBox *mTarget;
-    QPointF mPrevAbsPos;
-    QPointF mNewAbsPos;
+    QPointF mPrevRelPos;
+    QPointF mNewRelPos;
     bool mPrevPivotChanged;
     bool mNewPivotChanged;
 };
