@@ -88,6 +88,10 @@ public:
     void updatePivotPosition();
 
     void select();
+    void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
+    void cancelSelectedBoxesTransform();
+
+    void saveToQuery(QSqlQuery *query, qint32 parentId);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

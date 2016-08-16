@@ -13,18 +13,22 @@ public:
     void setRelativePos(QPointF relPos, bool saveUndoRedo);
 
     bool isRotating();
+    bool isScaling();
     bool handleMousePress(QPointF absPressPos);
     bool handleMouseRelease();
-    bool handleMouseMove(QPointF moveDestAbs, QPointF moveBy, bool startTransform);
-    void updateRotationMappedPath();
+    bool handleMouseMove(QPointF moveDestAbs, QPointF moveBy, QPointF pressPos, bool startTransform);
+//    void updateRotationMappedPath();
     void finishTransform();
+    void startRotating();
+    void startScaling();
 private:
     Canvas *mCanvas;
     bool mRotating = false;
-    bool isRotationPathAt(QPointF absPos);
+    bool mScaling = false;
+//    bool isRotationPathAt(QPointF absPos);
 
-    QPainterPath mRotationPath;
-    QPainterPath mMappedRotationPath;
+//    QPainterPath mRotationPath;
+//    QPainterPath mMappedRotationPath;
 };
 
 #endif // PATHPIVOT_H

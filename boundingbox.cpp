@@ -13,10 +13,15 @@ BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) : ConnectedT
 }
 
 void BoundingBox::setParent(BoundingBox *parent, bool saveUndoRedo) {
-    if(saveUndoRedo && mParent != NULL) {
+    if(saveUndoRedo) {
         addUndoRedo(new SetBoxParentUndoRedo(this, mParent, parent));
     }
     mParent = parent;
+    if(mParent == NULL) {
+        scheduleRemoval();
+    } else {
+        descheduleRemoval();
+    }
     updateCombinedTransform();
 }
 
@@ -38,6 +43,21 @@ void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo, bool pivotCh
     mPivotChanged = pivotChanged;
     mRelRotPivotPos = relPos;
     schedulePivotUpdate();
+}
+
+void BoundingBox::scheduleRemoval()
+{
+    mScheduledForRemove = true;
+}
+
+void BoundingBox::descheduleRemoval()
+{
+    mScheduledForRemove = false;
+}
+
+bool BoundingBox::isScheduldedForRemoval()
+{
+    return mScheduledForRemove;
 }
 
 void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
@@ -138,6 +158,141 @@ void BoundingBox::scale(qreal scaleBy, QPointF absOrigin)
     scale(scaleBy, scaleBy, absOrigin);
 }
 
+void BoundingBox::scaleCenter(qreal scaleBy)
+{
+    scaleCenter(scaleBy, scaleBy);
+}
+
+void BoundingBox::scaleCenter(qreal scaleXBy, qreal scaleYBy)
+{
+    QPointF absOrigin = getBoundingRect().center();
+    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleRight(qreal scaleXBy)
+{
+    QPointF absOrigin = QPointF(getBoundingRect().right(), 1.f);
+    scaleFromSaved(scaleXBy, 1.f, absOrigin);
+}
+
+void BoundingBox::scaleRightFixedRatio(qreal scaleXBy)
+{
+    QPointF absOrigin = QPointF(getBoundingRect().right(), getBoundingRect().center().y());
+    scaleFromSaved(scaleXBy, scaleXBy, absOrigin);
+}
+
+void BoundingBox::scaleLeft(qreal scaleXBy)
+{
+    QPointF absOrigin = QPointF(getBoundingRect().left(), 1.f);
+    scaleFromSaved(scaleXBy, 1.f, absOrigin);
+}
+
+void BoundingBox::scaleLeftFixedRatio(qreal scaleXBy)
+{
+    QPointF absOrigin = QPointF(getBoundingRect().left(), getBoundingRect().center().y());
+    scaleFromSaved(scaleXBy, scaleXBy, absOrigin);
+}
+
+void BoundingBox::scaleTop(qreal scaleYBy)
+{
+    QPointF absOrigin = QPointF(1.f, getBoundingRect().top() );
+    scaleFromSaved(1.f, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleTopFixedRatio(qreal scaleYBy)
+{
+    QPointF absOrigin = QPointF(getBoundingRect().center().x(), getBoundingRect().top());
+    scaleFromSaved(scaleYBy, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleBottom(qreal scaleYBy)
+{
+    QPointF absOrigin = QPointF(1.f, getBoundingRect().bottom() );
+    scaleFromSaved(1.f, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleBottomFixedRatio(qreal scaleYBy)
+{
+    QPointF absOrigin = QPointF(getBoundingRect().center().x(), getBoundingRect().bottom());
+    scaleFromSaved(scaleYBy, scaleYBy, absOrigin);
+}
+
+
+void BoundingBox::scaleBottomRight(qreal scaleXBy, qreal scaleYBy)
+{
+    QPointF absOrigin = getBoundingRect().bottomRight();
+    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleBottomLeft(qreal scaleXBy, qreal scaleYBy)
+{
+    QPointF absOrigin = getBoundingRect().bottomLeft();
+    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleTopRight(qreal scaleXBy, qreal scaleYBy)
+{
+    QPointF absOrigin = getBoundingRect().topRight();
+    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleTopLeft(qreal scaleXBy, qreal scaleYBy)
+{
+    QPointF absOrigin = getBoundingRect().topLeft();
+    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
+}
+
+void BoundingBox::scaleBottomRight(qreal scaleBy)
+{
+    QPointF absOrigin = getBoundingRect().bottomRight();
+    scaleFromSaved(scaleBy, scaleBy, absOrigin);
+}
+
+void BoundingBox::scaleBottomLeft(qreal scaleBy)
+{
+    QPointF absOrigin = getBoundingRect().bottomLeft();
+    scaleFromSaved(scaleBy, scaleBy, absOrigin);
+}
+
+void BoundingBox::scaleTopRight(qreal scaleBy)
+{
+    QPointF absOrigin = getBoundingRect().topRight();
+    scaleFromSaved(scaleBy, scaleBy, absOrigin);
+}
+
+void BoundingBox::scaleTopLeft(qreal scaleBy)
+{
+    QPointF absOrigin = getBoundingRect().topLeft();
+    scaleFromSaved(scaleBy, scaleBy, absOrigin);
+}
+
+void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
+{
+    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
+
+    mTransformMatrix = mSavedTransformMatrix;
+    mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
+    mTransformMatrix.scale(scaleXBy, scaleYBy);
+    mTransformMatrix.translate(transPoint.x(), transPoint.y());
+    updateCombinedTransform();
+}
+
+void BoundingBox::saveToQuery(QSqlQuery *query, qint32 parentId)
+{
+    query->exec(QString("INSERT INTO boundingbox (m11_trans, m12_trans, m21_trans, m22_trans, dx_trans, dy_trans, pivotx, pivoty, parentboundingboxid) "
+               "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
+                arg(mTransformMatrix.m11(), 0, 'f').
+                arg(mTransformMatrix.m12(), 0, 'f').
+                arg(mTransformMatrix.m21(), 0, 'f').
+                arg(mTransformMatrix.m22(), 0, 'f').
+                arg(mTransformMatrix.dx(), 0, 'f').
+                arg(mTransformMatrix.dy(), 0, 'f').
+                arg(mRelRotPivotPos.x(), 0, 'f').
+                arg(mRelRotPivotPos.y(), 0, 'f').
+                arg( (parentId == 0) ? "NULL" : QString::number(parentId) )
+                );
+}
+
 void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 {
     QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
@@ -179,6 +334,10 @@ void BoundingBox::finishTransform()
                                                            mSavedTransformMatrix,
                                                            mTransformMatrix);
     addUndoRedo(undoRedo);
+}
+
+void BoundingBox::cancelTransform() {
+    setTransformation(mSavedTransformMatrix);
 }
 
 void BoundingBox::addChild(BoundingBox *child)
@@ -225,7 +384,7 @@ void BoundingBox::removeChild(BoundingBox *child)
     startNewUndoRedoSet();
     removeChildFromList(index);
     updateChildrenId(index);
-    child->setParent(this); // called to update
+    child->setParent(NULL); // called to update
     finishUndoRedoSet();
 }
 

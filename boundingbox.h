@@ -3,6 +3,7 @@
 #include <QMatrix>
 #include "connectedtomainwindow.h"
 #include "fillstrokesettings.h"
+#include <QSqlQuery>
 
 class UndoRedo;
 
@@ -107,14 +108,44 @@ public:
     void setPivotAbsPos(QPointF absPos, bool saveUndoRedo = true, bool pivotChanged = true);
     void applyTransformation(QMatrix transformation);
     void setPivotRelPos(QPointF relPos, bool saveUndoRedo = true, bool pivotChanged = true);
+
+    void scheduleRemoval();
+    void descheduleRemoval();
+    bool isScheduldedForRemoval();
+
+    void scaleCenter(qreal scaleXBy, qreal scaleYBy);
+    void scaleCenter(qreal scaleBy);
+    void scaleRight(qreal scaleXBy);
+    void scaleLeft(qreal scaleXBy);
+    void scaleTop(qreal scaleYBy);
+    void scaleBottom(qreal scaleYBy);
+    void scaleBottomRight(qreal scaleXBy, qreal scaleYBy);
+    void scaleBottomLeft(qreal scaleXBy, qreal scaleYBy);
+    void scaleTopRight(qreal scaleXBy, qreal scaleYBy);
+    void scaleTopLeft(qreal scaleXBy, qreal scaleYBy);
+    void scaleRightFixedRatio(qreal scaleXBy);
+    void scaleBottomFixedRatio(qreal scaleYBy);
+    void scaleTopFixedRatio(qreal scaleYBy);
+    void scaleLeftFixedRatio(qreal scaleXBy);
+    void scaleBottomRight(qreal scaleBy);
+    void scaleBottomLeft(qreal scaleBy);
+    void scaleTopRight(qreal scaleBy);
+    void scaleTopLeft(qreal scaleBy);
+    void cancelTransform();
+    void scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
+
+    virtual void saveToQuery(QSqlQuery *query, qint32 parentId);
 protected:
     virtual void updateAfterCombinedTransformationChanged();
+
+    bool mScheduledForRemove = false;
     BoundingBoxType mType;
     QList<BoundingBox*> mChildren;
     BoundingBox *mParent = NULL;
 
     QPointF mSavedTransformAbsPos;
     QMatrix mSavedTransformMatrix;
+
     QMatrix mTransformMatrix;
 
     QMatrix mCombinedTransformMatrix;

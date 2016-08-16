@@ -1,6 +1,7 @@
 #ifndef PATHPOINT_H
 #define PATHPOINT_H
 #include "movablepoint.h"
+#include <QSqlQuery>
 
 class UndoRedoStack;
 
@@ -51,7 +52,7 @@ public:
     bool hasNextPoint();
     bool hasPreviousPoint();
 
-    PathPoint *addPoint(QPointF absPos);
+    PathPoint *addPointAbsPos(QPointF absPos);
     PathPoint *addPoint(PathPoint *pointToAdd);
 
     void connectToPoint(PathPoint *point);
@@ -73,10 +74,13 @@ public:
     void ctrlPointPosChanged(bool startPtChanged);
     void moveEndCtrlPtToAbsPos(QPointF endCtrlPt);
     void moveStartCtrlPtToAbsPos(QPointF startCtrlPt);
+    void moveEndCtrlPtToRelPos(QPointF endCtrlPt);
+    void moveStartCtrlPtToRelPos(QPointF startCtrlPt);
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
     VectorPath *getParentPath();
-protected:
     void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
+
+    void saveToQuery(QSqlQuery *query, qint32 vectorPathId);
 private:
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;

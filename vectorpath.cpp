@@ -110,6 +110,15 @@ void VectorPath::updatePath()
     updateMappedPath();
 }
 
+PathPoint *VectorPath::addPointRelPos(QPointF relPos,
+                                      QPointF startRelPos, QPointF endRelPos,
+                                      PathPoint *toPoint) {
+    PathPoint *newPoint = addPointRelPos(relPos, toPoint);
+    newPoint->moveStartCtrlPtToRelPos(startRelPos);
+    newPoint->moveEndCtrlPtToRelPos(endRelPos);
+    return newPoint;
+}
+
 void VectorPath::schedulePathUpdate()
 {
     if(mPathUpdateNeeded) {
@@ -127,6 +136,7 @@ void VectorPath::updatePathIfNeeded()
         mPathUpdateNeeded = false;
         mMappedPathUpdateNeeded = false;
         updatePath();
+        updatePivotPosition();
     }
 }
 
@@ -355,9 +365,17 @@ PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
     return pointToAdd;
 }
 
-PathPoint* VectorPath::addPoint(QPointF absPtPos, PathPoint *toPoint)
+PathPoint* VectorPath::addPointAbsPos(QPointF absPtPos, PathPoint *toPoint)
 {
     PathPoint *newPoint = new PathPoint(absPtPos, this);
+
+    return addPoint(newPoint, toPoint);
+}
+
+PathPoint *VectorPath::addPointRelPos(QPointF relPtPos, PathPoint *toPoint)
+{
+    PathPoint *newPoint = new PathPoint(QPointF(0.f, 0.f), this);
+    newPoint->setRelativePos(relPtPos);
 
     return addPoint(newPoint, toPoint);
 }
@@ -369,7 +387,6 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo = new AppendToPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
     }
-    updatePivotPosition();
 }
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
@@ -385,7 +402,6 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
         }
         finishUndoRedoSet();
     }
-    updatePivotPosition();
 }
 
 void VectorPath::removePoint(PathPoint *point) {
@@ -421,6 +437,34 @@ void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
     addPointToSeparatePaths(newPoint);
     finishUndoRedoSet();
 }
+#include <QSqlError>
+void VectorPath::saveToQuery(QSqlQuery *query, qint32 parentId)
+{
+    BoundingBox::saveToQuery(query, parentId);
+    QPointF fillStartPt = mFillGradientPoints.startPoint->getRelativePos();
+    QPointF fillEndPt = mFillGradientPoints.endPoint->getRelativePos();
+    QPointF strokeStartPt = mStrokeGradientPoints.startPoint->getRelativePos();
+    QPointF strokeEndPt = mStrokeGradientPoints.endPoint->getRelativePos();
+    qint32 boundingBoxId = query->lastInsertId().toInt();
+    query->exec(QString("INSERT INTO vectorpath (fillgradientstartx, fillgradientstarty, fillgradientendx, fillgradientendy, "
+                        "strokegradientstartx, strokegradientstarty, strokegradientendx, strokegradientendy, "
+                        "boundingboxid) "
+                        "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
+                arg(fillStartPt.x(), 0, 'f').
+                arg(fillStartPt.y(), 0, 'f').
+                arg(fillEndPt.x(), 0, 'f').
+                arg(fillEndPt.y(), 0, 'f').
+                arg(strokeStartPt.x(), 0, 'f').
+                arg(strokeStartPt.y(), 0, 'f').
+                arg(strokeEndPt.x(), 0, 'f').
+                arg(strokeEndPt.y(), 0, 'f').
+                arg(boundingBoxId));
+    qint32 vectorPathId = query->lastInsertId().toInt();
+    foreach(PathPoint *point, mSeparatePaths) {
+        point->saveToQuery(query, vectorPathId);
+    }
+}
+
 
 GradientPoints::GradientPoints()
 {

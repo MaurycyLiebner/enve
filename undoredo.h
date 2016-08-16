@@ -26,6 +26,13 @@ class UndoRedoSet : public UndoRedo
 public:
     UndoRedoSet() : UndoRedo("UndoRedoSet") {
     }
+
+    ~UndoRedoSet() {
+        foreach(UndoRedo *undoRedo, mSet) {
+            delete undoRedo;
+        }
+    }
+
     void undo() {
         for(int i = mSet.length() - 1; i >= 0; i--) {
             mSet.at(i)->undo();
@@ -87,11 +94,20 @@ public:
         mRedoStack.clear();
     }
 
+    void emptySomeOfUndo() {
+        if(mUndoStack.length() > 150) {
+            for(int i = 0; i < 50; i++) {
+                delete mUndoStack.takeFirst();
+            }
+        }
+    }
+
     void addUndoRedo(UndoRedo *undoRedo) {
         if(mNumberOfSets != 0) {
             addToSet(undoRedo);
         } else {
             clearRedoStack();
+            emptySomeOfUndo();
             mUndoStack << undoRedo;
         }
     }
@@ -451,6 +467,12 @@ public:
         mChildBox->setParent(mOldParent, false);
     }
 
+    ~SetBoxParentUndoRedo() {
+        if(mChildBox->isScheduldedForRemoval()) {
+            delete mChildBox;
+        }
+    }
+
 private:
     BoundingBox *mChildBox;
     BoundingBox *mOldParent;
@@ -555,7 +577,7 @@ class SetPivotRelPosUndoRedo : public UndoRedo
 {
 public:
     SetPivotRelPosUndoRedo(BoundingBox *target, QPointF prevRelPos, QPointF newRelPos,
-                           bool prevPivotChanged, bool newPivotChanged) : UndoRedo() {
+                           bool prevPivotChanged, bool newPivotChanged) : UndoRedo("SetPivotRelPosUndoRedo") {
         mTarget = target;
         mPrevRelPos = prevRelPos;
         mNewRelPos = newRelPos;

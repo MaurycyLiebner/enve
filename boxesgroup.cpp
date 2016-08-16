@@ -207,6 +207,20 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
     }
 }
 
+void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
+                                 bool startTrans) {
+    if(startTrans) {
+        foreachBoxInList(mSelectedBoxes) {
+            box->startTransform();
+            box->scaleFromSaved(scaleBy, scaleBy, absOrigin);
+        }
+    } else {
+        foreachBoxInList(mSelectedBoxes) {
+            box->scaleFromSaved(scaleBy, scaleBy, absOrigin);
+        }
+    }
+}
+
 QPointF BoxesGroup::getSelectedPivotPos()
 {
     if(mSelectedBoxes.isEmpty()) return QPointF(0.f, 0.f);
@@ -512,6 +526,25 @@ void BoxesGroup::finishSelectedBoxesTransform()
         box->finishTransform();
     }
     finishUndoRedoSet();
+}
+
+void BoxesGroup::cancelSelectedBoxesTransform() {
+    startNewUndoRedoSet();
+    foreachBoxInList(mSelectedBoxes) {
+        box->cancelTransform();
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::saveToQuery(QSqlQuery *query, qint32 parentId)
+{
+    BoundingBox::saveToQuery(query, parentId);
+    qint32 boundingBoxId = query->lastInsertId().toInt();
+    query->exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
+                arg(boundingBoxId));
+    foreachBoxInList(mChildren) {
+        box->saveToQuery(query, boundingBoxId);
+    }
 }
 
 void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)

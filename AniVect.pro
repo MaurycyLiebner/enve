@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg opengl
+QT       += core gui svg opengl sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     fillstrokesettings.cpp \
     Colors/ColorWidgets/gradientwidget.cpp \
     Colors/ColorWidgets/glwidget.cpp \
-    gradientpoint.cpp
+    gradientpoint.cpp \
+    svgimporter.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -71,4 +72,5 @@ HEADERS  += mainwindow.h \
     fillstrokesettings.h \
     Colors/ColorWidgets/gradientwidget.h \
     Colors/ColorWidgets/glwidget.h \
-    gradientpoint.h
+    gradientpoint.h \
+    svgimporter.h

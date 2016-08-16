@@ -5,6 +5,7 @@
 #include "boxesgroup.h"
 #include "Colors/color.h"
 #include "fillstrokesettings.h"
+#include <QSqlQuery>
 
 class MainWindow;
 
@@ -13,8 +14,7 @@ class UndoRedo;
 class UndoRedoStack;
 
 enum CanvasMode : short {
-    MOVE_PATH_SCALE,
-    MOVE_PATH_ROTATE,
+    MOVE_PATH,
     MOVE_POINT,
     ADD_POINT
 };
@@ -55,8 +55,11 @@ public:
     void schedulePivotUpdate();
     void updatePivotIfNeeded();
     void setPivotPositionForSelected();
+    void scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
+
+    void saveToQuery(QSqlQuery *query);
 protected:
-    void updateAfterCombinedTransformationChanged();
+//    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -96,6 +99,11 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    bool mCancelTransform = false;
+    bool mIsMouseGrabbing = false;
+
+    QImage mBgImage;
+
     bool mDoubleClick = false;
     int mMovesToSkip = 0;
 
@@ -117,6 +125,7 @@ private:
     bool mSelecting = false;
 //    bool mMoving = false;
     QPoint mLastMouseEventPos;
+    QPointF mLastPressPos;
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
     MovablePoint *mLastPressedPoint = NULL;

@@ -14,7 +14,6 @@ public:
     void finishTransform();
     void setOtherCtrlPt(CtrlPoint *ctrlPt);
     void remove();
-protected:
     void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
 private:
     bool mIsStartCtrlPt;

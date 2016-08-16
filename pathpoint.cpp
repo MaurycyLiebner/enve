@@ -140,6 +140,30 @@ void PathPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
     mVectorPath->schedulePathUpdate();
 }
+#include <QSqlError>
+void PathPoint::saveToQuery(QSqlQuery *query, qint32 vectorPathId)
+{
+    QPointF relPos = mRelPos.getCurrentValue();
+    QPointF startPtPos = mStartCtrlPt->getRelativePos();
+    QPointF endPtPos = mEndCtrlPt->getRelativePos();
+    QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
+    query->exec(QString("INSERT INTO pathpoint (isfirst, xrelpos, yrelpos, "
+                "startctrlptrelx, startctrlptrely, endctrlptrelx, endctrlptrely, vectorpathid) "
+                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8)").
+                arg(isFirst).
+                arg(relPos.x(), 0, 'f').
+                arg(relPos.y(), 0, 'f').
+                arg(startPtPos.x(), 0, 'f').
+                arg(startPtPos.y(), 0, 'f').
+                arg(endPtPos.x(), 0, 'f').
+                arg(endPtPos.y(), 0, 'f').
+                arg(vectorPathId) );
+    if(mNextPoint != NULL) {
+        if(!mNextPoint->isSeparatePathPoint()) {
+            mNextPoint->saveToQuery(query, vectorPathId);
+        }
+    }
+}
 
 QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {
     QPointF posDist = absPosToMirror - getAbsolutePos();
@@ -171,6 +195,16 @@ QPointF PathPoint::symmetricToAbsPosNewLen(QPointF absPosToMirror, qreal newLen)
 void PathPoint::moveStartCtrlPtToAbsPos(QPointF startCtrlPt)
 {
     mStartCtrlPt->moveToAbs(startCtrlPt);
+}
+
+void PathPoint::moveEndCtrlPtToRelPos(QPointF endCtrlPt)
+{
+    mEndCtrlPt->setRelativePos(endCtrlPt);
+}
+
+void PathPoint::moveStartCtrlPtToRelPos(QPointF startCtrlPt)
+{
+    mStartCtrlPt->setRelativePos(startCtrlPt);
 }
 
 QPointF PathPoint::getStartCtrlPtAbsPos()
@@ -448,9 +482,9 @@ void PathPoint::setPointAsPrevious(PathPoint *pointToSet) {
     finishUndoRedoSet();
 }
 
-PathPoint *PathPoint::addPoint(QPointF absPos)
+PathPoint *PathPoint::addPointAbsPos(QPointF absPos)
 {
-    return mVectorPath->addPoint(absPos, this);
+    return mVectorPath->addPointAbsPos(absPos, this);
 }
 
 PathPoint *PathPoint::addPoint(PathPoint *pointToAdd)

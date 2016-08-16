@@ -54,7 +54,8 @@ public:
     void draw(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
 
-    PathPoint *addPoint(QPointF absPtPos, PathPoint *toPoint = NULL);
+    PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
+    PathPoint *addPointRelPos(QPointF relPtPos, PathPoint *toPoint = NULL);
 
     bool pointInsidePath(QPointF point);
     MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
@@ -88,6 +89,10 @@ public:
     void startFillTransform();
     void finishStrokeTransform();
     void finishFillTransform();
+    PathPoint *addPointRelPos(QPointF relPos,
+                              QPointF startRelPos, QPointF endRelPos,
+                              PathPoint *toPoint = NULL);
+    void saveToQuery(QSqlQuery *query, qint32 parentId);
 private:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

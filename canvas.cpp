@@ -40,7 +40,7 @@ QRectF Canvas::getBoundingRect()
 
 bool Canvas::processKeyEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_F1) {
-        setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
+        setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_F2) {
         setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(event->key() == Qt::Key_F3) {
@@ -48,7 +48,7 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_Delete) {
         if(mCurrentMode == MOVE_POINT) {
             mCurrentBoxesGroup->removeSelectedPointsAndClearList();
-        } else if(mCurrentMode == MOVE_PATH_ROTATE) {
+        } else if(mCurrentMode == MOVE_PATH) {
             mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
         }
     } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
@@ -69,11 +69,23 @@ bool Canvas::processKeyEvent(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_Home) {
         mCurrentBoxesGroup->bringSelectedBoxesToFront();
     } else if(event->key() == Qt::Key_R && isMovingPath()) {
-        setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
+        setCanvasMode(MOVE_PATH);
+        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
+        mLastPressPos = mLastMouseEventPos;
+        mRotPivot->startRotating();
+        mIsMouseGrabbing = true;
+        mDoubleClick = false;
+        mFirstMouseMove = true;
+        setMouseTracking(true);
     } else if(event->key() == Qt::Key_S && isMovingPath()) {
-        setCanvasMode(CanvasMode::MOVE_PATH_SCALE);
-    } else if(event->key() == Qt::Key_G && isMovingPath()) {
-        setCanvasMode(CanvasMode::MOVE_PATH_ROTATE);
+        setCanvasMode(CanvasMode::MOVE_PATH);
+        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
+        mLastPressPos = mLastMouseEventPos;
+        mRotPivot->startScaling();
+        mIsMouseGrabbing = true;
+        mDoubleClick = false;
+        mFirstMouseMove = true;
+        setMouseTracking(true);
     } else if(event->key() == Qt::Key_A && isCtrlPressed()) {
         if(isShiftPressed()) {
             mCurrentBoxesGroup->deselectAllBoxes();
@@ -101,11 +113,27 @@ void Canvas::rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans)
     mCurrentBoxesGroup->rotateSelectedBy(rotChange, absOrigin, startTrans);
 }
 
+void Canvas::scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans)
+{
+    mCurrentBoxesGroup->scaleSelectedBy(scaleBy, absOrigin, startTrans);
+}
+
+void Canvas::saveToQuery(QSqlQuery *query)
+{
+    foreachBoxInList(mChildren) {
+        box->saveToQuery(query, 0);
+    }
+}
+
 void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
 
+    QPointF absPos = getAbsolutePos();
+    QRectF viewRect = QRectF(absPos,absPos + QPointF(mVisibleWidth, mVisibleHeight));
+
+    p.drawImage(viewRect, mBgImage);
 
     foreachBoxInList(mChildren){
         box->draw(&p);
@@ -116,16 +144,14 @@ void Canvas::paintEvent(QPaintEvent *)
     if(mSelecting) {
         p.drawRect(mSelectionRect);
     }
-    if(mCurrentMode == CanvasMode::MOVE_PATH_ROTATE) {
+    if(mCurrentMode == CanvasMode::MOVE_PATH) {
         mRotPivot->draw(&p);
     }
 
     QPainterPath path;
     path.addRect(0, 0, width() + 1, height() + 1);
     QPainterPath viewRectPath;
-    QPointF absPos = getAbsolutePos();
-    viewRectPath.addRect(
-                QRectF(absPos,absPos + QPointF(mVisibleWidth, mVisibleHeight)));
+    viewRectPath.addRect(viewRect);
     p.setBrush(QColor(0, 0, 0, 125));
     p.setPen(QPen(Qt::black, 2.f));
     p.drawPath(path.subtracted(viewRectPath));
@@ -134,8 +160,7 @@ void Canvas::paintEvent(QPaintEvent *)
 }
 
 bool Canvas::isMovingPath() {
-    return mCurrentMode == CanvasMode::MOVE_PATH_ROTATE ||
-            mCurrentMode == CanvasMode::MOVE_PATH_SCALE;
+    return mCurrentMode == CanvasMode::MOVE_PATH;
 }
 
 qreal Canvas::getCurrentCanvasScale()
@@ -246,7 +271,7 @@ void Canvas::startSelectionAtPoint(QPointF pos) {
 }
 
 void Canvas::updatePivot() {
-    if(mCurrentMode != MOVE_PATH_ROTATE) {
+    if(mCurrentMode != MOVE_PATH) {
         return;
     }
     if(mCurrentBoxesGroup->isSelectionEmpty() ) {
@@ -257,15 +282,15 @@ void Canvas::updatePivot() {
     }
 }
 
-void Canvas::updateAfterCombinedTransformationChanged()
-{
-    BoundingBox::updateAfterCombinedTransformationChanged();
-    mRotPivot->updateRotationMappedPath();
-}
+//void Canvas::updateAfterCombinedTransformationChanged()
+//{
+//    BoundingBox::updateAfterCombinedTransformationChanged();
+//    mRotPivot->updateRotationMappedPath();
+//}
 
 void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
-    if(mCurrentMode == MOVE_PATH_ROTATE) {
+    if(mCurrentMode == MOVE_PATH) {
         schedulePivotUpdate();
     }
     scheduleRepaint();

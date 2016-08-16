@@ -5,95 +5,14 @@
 #include <QDebug>
 #include <QToolBar>
 #include "updatescheduler.h"
-
-
-Color MainWindow::color_hover = Color(125, 125, 255);
-Color MainWindow::color_hover_darker = Color(70, 70, 240);
-Color MainWindow::color_selected = Color(255, 125, 125);
-Color MainWindow::color_selected_darker = Color(240, 110, 110);
-Color MainWindow::color_selected_hover = Color(255, 85, 85);
-Color MainWindow::color_selected_hover_darker = Color(240, 70, 70);
-Color MainWindow::color_current = Color(255, 175, 125);
-Color MainWindow::color_current_darker = Color(255, 160, 95);
-Color MainWindow::color_current_hover = Color(255, 130, 50);
-Color MainWindow::color_current_hover_darker = Color(255, 115, 25);
-Color MainWindow::color_light = Color(225, 225, 225);
-Color MainWindow::color_darker = Color(175, 175, 175);
-Color MainWindow::color_dark = Color(145, 145, 145);
-Color MainWindow::color_selected_active = Color(255, 45, 45);
-
-
-Color MainWindow::getColor(bool darker, bool selected, bool hover)
-{
-    if(darker)
-    {
-        if(selected)
-        {
-            if(hover)
-            {
-                return MainWindow::color_selected_hover_darker;
-            }
-            else
-            {
-                return MainWindow::color_selected_darker;
-            }
-        }
-        else
-        {
-            if(hover)
-            {
-                return MainWindow::color_hover_darker;
-            }
-            else
-            {
-                return  MainWindow::color_dark;
-            }
-        }
-    }
-    else
-    {
-        if(selected)
-        {
-            if(hover)
-            {
-                return MainWindow::color_selected_hover;
-            }
-            else
-            {
-                return MainWindow::color_selected;
-            }
-        }
-        else
-        {
-            if(hover)
-            {
-                return MainWindow::color_hover;
-            }
-            else
-            {
-                return MainWindow::color_light;
-            }
-        }
-    }
-}
-
-QString colorToStyleSheetString(Color color_t)
-{
-    QString col_s_t = "rgba(%1, %2, %3, %4)";
-    QColor qcol_t = color_t.qcol;
-    int r_t = qcol_t.red();
-    int g_t = qcol_t.green();
-    int b_t = qcol_t.blue();
-    int a_t = qcol_t.alpha();
-    return col_s_t.arg(r_t).arg(g_t).arg(b_t).arg(a_t);
-}
+#include "Colors/ColorWidgets/colorsettingswidget.h"
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     processKeyEvent(event);
 }
-
-#include "Colors/ColorWidgets/colorsettingswidget.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -206,19 +125,110 @@ bool MainWindow::eventFilter(QObject *, QEvent *e)
     return false;
 }
 
+bool isCtrlPressed() {
+    return (QApplication::keyboardModifiers() & Qt::ControlModifier);
+}
+
 bool MainWindow::processKeyEvent(QKeyEvent *event) {
     bool returnBool = true;
     if(event->key() == Qt::Key_Z &&
-            (QApplication::keyboardModifiers() & Qt::ControlModifier)) {
+            isCtrlPressed()) {
         if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
             mUndoRedoStack.redo();
         } else {
             mUndoRedoStack.undo();
         }
+    } else if(isCtrlPressed() && event->key() == Qt::Key_S) {
+        saveToFile("test.av");
     } else {
         returnBool = mCanvas->processKeyEvent(event);
     }
+    mCanvas->schedulePivotUpdate();
 
     callUpdateSchedulers();
     return returnBool;
+}
+
+void MainWindow::saveToFile(QString path) {
+    QFile file(path);
+    if(file.exists()) {
+        file.remove();
+    }
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");//not dbConnection
+    db.setDatabaseName(path);
+    db.open();
+    QSqlQuery query;
+    query.exec("CREATE TABLE boundingbox "
+               "(id INTEGER PRIMARY KEY, "
+               "m11_trans REAL, "
+               "m12_trans REAL, "
+               "m21_trans REAL, "
+               "m22_trans REAL, "
+               "dx_trans REAL, "
+               "dy_trans REAL, "
+               "pivotx REAL, "
+               "pivoty REAL, "
+               "parentboundingboxid INTEGER, "
+               "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
+    query.exec("CREATE TABLE boxesgroup "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+    query.exec("CREATE TABLE vectorpath "
+               "(id INTEGER PRIMARY KEY, "
+               "fillgradientstartx REAL, "
+               "fillgradientstarty REAL, "
+               "fillgradientendx REAL, "
+               "fillgradientendy REAL, "
+               "strokegradientstartx REAL, "
+               "strokegradientstarty REAL, "
+               "strokegradientendx REAL, "
+               "strokegradientendy REAL, "
+               "boundingboxid INTEGER, "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+    query.exec("CREATE TABLE color "
+               "(id INTEGER PRIMARY KEY, "
+               "hue REAL, "
+               "saturation REAL, "
+               "value REAL, "
+               "alpha REAL )");
+    query.exec("CREATE TABLE gradient "
+               "(id INTEGER PRIMARY KEY)");
+    query.exec("CREATE TABLE gradientcolor "
+               "(colorid INTEGER, "
+               "gradientid INTEGER, "
+               "positioningradient INTEGER, "
+               "FOREIGN KEY(colorid) REFERENCES color(id), "
+               "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
+    query.exec("CREATE TABLE paintsettings "
+               "(id INTEGER PRIMARY KEY, "
+               "painttype INTEGER, "
+               "gradientid INTEGER, "
+               "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
+    query.exec("CREATE TABLE strokesettings "
+               "(id INTEGER PRIMARY KEY, "
+               "linewidth REAL, "
+               "capstyle INTEGER, "
+               "joinstyle INTEGER, "
+               "paintsettingsid INTEGER, "
+               "FOREIGN KEY(paintsettingsid) REFERENCES paintsettings(id) )");
+    query.exec("CREATE TABLE pathpoint "
+               "(id INTEGER PRIMARY KEY, "
+               "isfirst BOOLEAN, "
+               "xrelpos REAL, "
+               "yrelpos REAL, "
+               "startctrlptrelx REAL, "
+               "startctrlptrely REAL, "
+               "endctrlptrelx REAL, "
+               "endctrlptrely REAL, "
+               "vectorpathid INTEGER, "
+               "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id) )");
+    mCanvas->saveToQuery(&query);
+    /*query.exec("INSERT INTO color (hue, saturation, value, alpha) VALUES (0.1, 0.2, 0.3, 0.4)");
+    qint32 id = query.lastInsertId().toInt();
+    qDebug() << id;
+    query.exec(QString("INSERT INTO color (hue, saturation, value, alpha) VALUES (%1, 0.4, 0.1, 0.2)").arg(0.1121212f, 0, 'f'));
+    id = query.lastInsertId().toInt();
+    qDebug() << id;*/
+    db.close();
 }
