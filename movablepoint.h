@@ -19,7 +19,10 @@ enum MovablePointType {
 class MovablePoint : public ConnectedToMainWindow
 {
 public:
-    MovablePoint(QPointF absPos, BoundingBox *parent, MovablePointType type, qreal radius = 7.5f);
+    MovablePoint(qreal relPosX, qreal relPosY, BoundingBox *parent,
+                 MovablePointType type, qreal radius = 7.5f);
+    MovablePoint(QPointF absPos, BoundingBox *parent, MovablePointType type,
+                 qreal radius = 7.5f);
 
     virtual void startTransform();
     virtual void finishTransform();

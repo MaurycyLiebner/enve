@@ -57,7 +57,8 @@ public:
     void setPivotPositionForSelected();
     void scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
 
-    void saveToQuery(QSqlQuery *query);
+    void saveToQuery();
+    void loadAllBoxesFromSql();
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);

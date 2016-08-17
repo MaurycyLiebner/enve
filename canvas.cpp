@@ -118,11 +118,15 @@ void Canvas::scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans)
     mCurrentBoxesGroup->scaleSelectedBy(scaleBy, absOrigin, startTrans);
 }
 
-void Canvas::saveToQuery(QSqlQuery *query)
+void Canvas::saveToQuery()
 {
     foreachBoxInList(mChildren) {
-        box->saveToQuery(query, 0);
+        box->saveToQuery(0);
     }
+}
+
+void Canvas::loadAllBoxesFromSql() {
+    loadChildrenFromSql("NULL");
 }
 
 void Canvas::paintEvent(QPaintEvent *)

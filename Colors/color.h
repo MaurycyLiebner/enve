@@ -2,6 +2,8 @@
 #define COLOR_H
 #include "GL/gl.h"
 #include <QColor>
+#include <QSqlQuery>
+#include <QSqlRecord>
 
 struct Color
 {
@@ -39,6 +41,8 @@ struct Color
         gl_a = a_t;
         qcol.setAlpha(a_t);
     }*/
+    int saveToQuery();
+
     void updateHSVFromRGB();
     void updateQColFromHSV();
     void setHSV(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
@@ -53,6 +57,7 @@ struct Color
     void setGLColorA(GLfloat a_t);
     Color(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a_t = 1.0f);
     Color(int r_t, int g_t, int b_t, int a_t = 255);
+    Color(int sqlId);
     Color();
 };
 

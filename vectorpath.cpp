@@ -15,6 +15,115 @@ VectorPath::VectorPath(BoxesGroup *group) :
     mStrokeGradientPoints.initialize(this);
 }
 
+VectorPath::VectorPath(int boundingBoxId,
+                        BoundingBox *parent) :
+    BoundingBox(boundingBoxId,
+                parent, TYPE_VECTOR_PATH) {
+    QSqlQuery query;
+    QString queryStr = "SELECT * FROM vectorpath WHERE boundingboxid = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idId = query.record().indexOf("id");
+        int idfillgradientstartx = query.record().indexOf("fillgradientstartx");
+        int idfillgradientstarty = query.record().indexOf("fillgradientstarty");
+        int idfillgradientendx = query.record().indexOf("fillgradientendx");
+        int idfillgradientendy = query.record().indexOf("fillgradientendy");
+        int idstrokegradientstartx = query.record().indexOf("strokegradientstartx");
+        int idstrokegradientstarty = query.record().indexOf("strokegradientstarty");
+        int idstrokegradientendx = query.record().indexOf("strokegradientendx");
+        int idstrokegradientendy = query.record().indexOf("strokegradientendy");
+        int idfillsettingsid = query.record().indexOf("fillsettingsid");
+        int idstrokesettingsid = query.record().indexOf("strokesettingsid");
+
+
+        int vectorPathId = query.value(idId).toInt();
+        qreal fillGradientStartX = query.value(idfillgradientstartx).toReal();
+        qreal fillGradientStartY = query.value(idfillgradientstarty).toReal();
+        qreal fillGradientEndX = query.value(idfillgradientendx).toReal();
+        qreal fillGradientEndY = query.value(idfillgradientendy).toReal();
+        qreal strokeGradientStartX = query.value(idstrokegradientstartx).toReal();
+        qreal strokeGradientStartY = query.value(idstrokegradientstarty).toReal();
+        qreal strokeGradientEndX = query.value(idstrokegradientendx).toReal();
+        qreal strokeGradientEndY = query.value(idstrokegradientendy).toReal();
+        int fillSettingsId = query.value(idfillsettingsid).toInt();
+        int strokeSettingsId = query.value(idstrokesettingsid).toInt();
+
+        mFillGradientPoints.initialize(this,
+                               QPointF(fillGradientStartX, fillGradientStartY),
+                               QPointF(fillGradientEndX, fillGradientEndY));
+        mStrokeGradientPoints.initialize(this,
+                               QPointF(strokeGradientStartX, strokeGradientStartY),
+                               QPointF(strokeGradientEndX, strokeGradientEndY));
+
+        GradientWidget *gradientWidget =
+                mMainWindow->getFillStrokeSettings()->getGradientWidget();
+
+        mFillPaintSettings = PaintSettings(fillSettingsId, gradientWidget);
+        mStrokeSettings = StrokeSettings::createStrokeSettingsFromSql(
+                    strokeSettingsId, gradientWidget);
+
+        loadPointsFromSql(vectorPathId);
+    } else {
+        qDebug() << "Could not load vectorpath with id " << boundingBoxId;
+    }
+}
+
+void VectorPath::loadPointsFromSql(int vectorPathId) {
+    qDebug() << "loading points";
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM pathpoint WHERE vectorpathid = %1 "
+                               "ORDER BY id ASC").arg(vectorPathId);
+    if(query.exec(queryStr) ) {
+        int idisfirst = query.record().indexOf("isfirst");
+        int idisendpoint = query.record().indexOf("isendpoint");
+        int idxrelpos = query.record().indexOf("xrelpos");
+        int idyrelpos = query.record().indexOf("yrelpos");
+        int idstartctrlptrelx = query.record().indexOf("startctrlptrelx");
+        int idstartctrlptrely = query.record().indexOf("startctrlptrely");
+        int idendctrlptrelx = query.record().indexOf("endctrlptrelx");
+        int idendctrlptrely = query.record().indexOf("endctrlptrely");
+        PathPoint *firstPoint = NULL;
+        PathPoint *lastPoint = NULL;
+        while(query.next()) {
+            bool isfirst = query.value(idisfirst).toBool();
+            bool isendpoint = query.value(idisendpoint).toBool();
+            qreal xrelpos = query.value(idxrelpos).toReal();
+            qreal yrelpos = query.value(idyrelpos).toReal();
+            qreal startctrlptrelx = query.value(idstartctrlptrelx).toReal();
+            qreal startctrlptrely = query.value(idstartctrlptrely).toReal();
+            qreal endctrlptrelx = query.value(idendctrlptrelx).toReal();
+            qreal endctrlptrely = query.value(idendctrlptrely).toReal();
+
+            PathPoint *newPoint = new PathPoint(xrelpos, yrelpos,
+                          startctrlptrelx, startctrlptrely,
+                          endctrlptrelx, endctrlptrely, isfirst, this);
+            appendToPointsList(newPoint, false);
+            if(lastPoint != NULL) {
+                if(isfirst && firstPoint != NULL) {
+                    lastPoint->setPointAsNext(firstPoint);
+                } else if(!isfirst) {
+                    lastPoint->setPointAsNext(newPoint);
+                }
+            }
+            if(isfirst) {
+                addPointToSeparatePaths(newPoint, false);
+                if(isendpoint) {
+                    firstPoint = NULL;
+                } else {
+                    firstPoint = newPoint;
+                }
+            }
+            lastPoint = newPoint;
+        }
+        if(lastPoint != NULL && firstPoint != NULL) {
+            lastPoint->setPointAsNext(firstPoint);
+        }
+    } else {
+        qDebug() << "Could not load points for vectorpath with id " << vectorPathId;
+    }
+}
+
 VectorPath::~VectorPath()
 {
     foreach(PathPoint *point, mPoints) {
@@ -142,7 +251,7 @@ void VectorPath::updatePathIfNeeded()
 
 void VectorPath::updateMappedPathIfNeeded()
 {
-    if(mMappedPathUpdateNeeded) {
+    if(mMappedPathUpdateNeeded && mParent != NULL) {
         mMappedPathUpdateNeeded = false;
         updateMappedPath();
     }
@@ -438,31 +547,39 @@ void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
     finishUndoRedoSet();
 }
 #include <QSqlError>
-void VectorPath::saveToQuery(QSqlQuery *query, qint32 parentId)
+int VectorPath::saveToQuery(int parentId)
 {
-    BoundingBox::saveToQuery(query, parentId);
+    QSqlQuery query;
+    int boundingBoxId = BoundingBox::saveToQuery(parentId);
     QPointF fillStartPt = mFillGradientPoints.startPoint->getRelativePos();
     QPointF fillEndPt = mFillGradientPoints.endPoint->getRelativePos();
     QPointF strokeStartPt = mStrokeGradientPoints.startPoint->getRelativePos();
     QPointF strokeEndPt = mStrokeGradientPoints.endPoint->getRelativePos();
-    qint32 boundingBoxId = query->lastInsertId().toInt();
-    query->exec(QString("INSERT INTO vectorpath (fillgradientstartx, fillgradientstarty, fillgradientendx, fillgradientendy, "
+
+
+    int fillSettingsId = mFillPaintSettings.saveToQuery();
+    int strokeSettingsId = mStrokeSettings.saveToQuery();
+    query.exec(QString("INSERT INTO vectorpath (fillgradientstartx, fillgradientstarty, fillgradientendx, fillgradientendy, "
                         "strokegradientstartx, strokegradientstarty, strokegradientendx, strokegradientendy, "
-                        "boundingboxid) "
-                        "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
-                arg(fillStartPt.x(), 0, 'f').
-                arg(fillStartPt.y(), 0, 'f').
-                arg(fillEndPt.x(), 0, 'f').
-                arg(fillEndPt.y(), 0, 'f').
-                arg(strokeStartPt.x(), 0, 'f').
-                arg(strokeStartPt.y(), 0, 'f').
-                arg(strokeEndPt.x(), 0, 'f').
-                arg(strokeEndPt.y(), 0, 'f').
-                arg(boundingBoxId));
-    qint32 vectorPathId = query->lastInsertId().toInt();
+                        "boundingboxid, fillsettingsid, strokesettingsid) "
+                        "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11)").
+                        arg(fillStartPt.x(), 0, 'f').
+                        arg(fillStartPt.y(), 0, 'f').
+                        arg(fillEndPt.x(), 0, 'f').
+                        arg(fillEndPt.y(), 0, 'f').
+                        arg(strokeStartPt.x(), 0, 'f').
+                        arg(strokeStartPt.y(), 0, 'f').
+                        arg(strokeEndPt.x(), 0, 'f').
+                        arg(strokeEndPt.y(), 0, 'f').
+                        arg(boundingBoxId).
+                        arg(fillSettingsId).
+                        arg(strokeSettingsId) );
+    int vectorPathId = query.lastInsertId().toInt();
     foreach(PathPoint *point, mSeparatePaths) {
-        point->saveToQuery(query, vectorPathId);
+        point->saveToQuery(vectorPathId);
     }
+
+    return boundingBoxId;
 }
 
 
@@ -471,11 +588,12 @@ GradientPoints::GradientPoints()
 
 }
 
-void GradientPoints::initialize(VectorPath *parentT)
+void GradientPoints::initialize(VectorPath *parentT,
+                                QPointF startPt, QPointF endPt)
 {
     parent = parentT;
-    startPoint = new GradientPoint(QPointF(0, 0), parent);
-    endPoint = new GradientPoint(QPointF(100, 100), parent);
+    startPoint = new GradientPoint(startPt, parent);
+    endPoint = new GradientPoint(endPt, parent);
     enabled = false;
 }
 

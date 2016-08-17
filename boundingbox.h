@@ -26,6 +26,8 @@ class BoundingBox : public ConnectedToMainWindow
 public:
     BoundingBox(BoundingBox *parent, BoundingBoxType type);
     BoundingBox(MainWindow *window, BoundingBoxType type);
+    BoundingBox(int boundingBoxId, BoundingBox *parent,
+                BoundingBoxType type);
 
     virtual void updatePivotPosition() {}
     virtual bool isContainedIn(QRectF absRect);
@@ -134,7 +136,7 @@ public:
     void cancelTransform();
     void scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
 
-    virtual void saveToQuery(QSqlQuery *query, qint32 parentId);
+    virtual int saveToQuery(int parentId);
 protected:
     virtual void updateAfterCombinedTransformationChanged();
 

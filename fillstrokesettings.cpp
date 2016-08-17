@@ -3,6 +3,88 @@
 #include "mainwindow.h"
 #include "undoredo.h"
 
+Gradient::Gradient(Color color1, Color color2, GradientWidget *gradientWidget, MainWindow *parent) :
+    ConnectedToMainWindow(parent)
+{
+    mGradientWidget = gradientWidget;
+    colors << color1;
+    colors << color2;
+    updateQGradientStops();
+}
+
+Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget, MainWindow *parent) :
+    ConnectedToMainWindow(parent)
+{
+    mGradientWidget = gradientWidget;
+    foreach (Color color, fromGradient->colors) {
+        colors << color;
+    }
+    updateQGradientStops();
+}
+
+Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget, MainWindow *parent) :
+    ConnectedToMainWindow(parent) {
+    QSqlQuery query;
+    mGradientWidget = gradientWidget;
+    sqlId = sqlIdT;
+    QString queryStr = QString("SELECT * FROM gradient WHERE id = %1").
+            arg(sqlId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        queryStr = QString("SELECT colorid FROM gradientcolor WHERE gradientid = %1 ORDER BY positioningradient ASC").
+                arg(sqlId);
+        if(query.exec(queryStr) ) {
+            int idColorId = query.record().indexOf("colorid");
+            while(query.next()) {
+                int colorId = query.value(idColorId).toInt();
+                colors << Color(colorId);
+            }
+        } else {
+            qDebug() << "Could not load gradientcolors for gradient with id " << sqlId;
+        }
+    } else {
+        qDebug() << "Could not load gradient with id " << sqlId;
+    }
+    updateQGradientStops();
+}
+
+int Gradient::saveToQuery() {
+    QSqlQuery query;
+    query.exec("INSERT INTO gradient DEFAULT VALUES");
+    sqlId = query.lastInsertId().toInt();
+    int posInGradient = 0;
+    foreach(Color color, colors) {
+        int colorId = color.saveToQuery();
+        query.exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
+                            "VALUES (%1, %2, %3)").
+                    arg(colorId).
+                    arg(sqlId).
+                    arg(posInGradient) );
+        posInGradient++;
+    }
+    return sqlId;
+}
+
+void Gradient::swapColors(int id1, int id2) {
+    colors.swap(id1, id2);
+    updateQGradientStops();
+}
+
+void Gradient::removeColor(int id) {
+    colors.removeAt(id);
+    updateQGradientStops();
+}
+
+void Gradient::addColor(Color color) {
+    colors << color;
+    updateQGradientStops();
+}
+
+void Gradient::replaceColor(int id, Color color) {
+    colors.replace(id, color);
+    updateQGradientStops();
+}
+
 void Gradient::setColors(QList<Color> newColors)
 {
     colors = newColors;
@@ -10,6 +92,28 @@ void Gradient::setColors(QList<Color> newColors)
     mGradientWidget->repaint();
     mMainWindow->getFillStrokeSettings()->
             setCurrentColor(mGradientWidget->getCurrentColor());
+}
+
+void Gradient::startTransform() {
+    if(transformPending) return;
+    transformPending = true;
+    savedColors = colors;
+}
+
+bool Gradient::isInPaths(VectorPath *path) {
+    return mAffectedPaths.contains(path);
+}
+
+void Gradient::addPath(VectorPath *path) {
+    mAffectedPaths << path;
+}
+
+void Gradient::removePath(VectorPath *path) {
+    mAffectedPaths.removeOne(path);
+}
+
+bool Gradient::affectsPaths() {
+    return !mAffectedPaths.isEmpty();
 }
 
 void Gradient::updatePaths()
@@ -38,6 +142,139 @@ void Gradient::updateQGradientStops() {
         cPos += inc;
     }
     updatePaths();
+}
+
+int Gradient::getSqlId() {
+    return sqlId;
+}
+
+
+PaintSettings::PaintSettings() {
+
+}
+
+PaintSettings::PaintSettings(Color colorT, PaintType paintTypeT, Gradient *gradientT) {
+    color = colorT;
+    paintType = paintTypeT;
+    gradient = gradientT;
+}
+
+PaintSettings::PaintSettings(int sqlId, GradientWidget *gradientWidget) {
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM paintsettings WHERE id = %1").
+            arg(sqlId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idPaintType = query.record().indexOf("painttype");
+        paintType = static_cast<PaintType>(query.value(idPaintType).toInt());
+        int idColorId = query.record().indexOf("colorid");
+        color = Color(query.value(idColorId).toInt() );
+        int idGradientId = query.record().indexOf("gradientid");
+        if(!query.value(idGradientId).isNull()) {
+            gradient = gradientWidget->getGradientBySqlId(
+                        query.value(idGradientId).toInt());
+        }
+    } else {
+        qDebug() << "Could not load paintSettings with id " << sqlId;
+    }
+}
+
+int PaintSettings::saveToQuery() {
+    QSqlQuery query;
+    int colorId = color.saveToQuery();
+    QString gradientId = (gradient == NULL) ? "NULL" : QString::number(gradient->getSqlId());
+    query.exec(QString("INSERT INTO paintsettings (painttype, colorid, gradientid) "
+                        "VALUES (%1, %2, %3)").
+                arg(paintType).
+                arg(colorId).
+                arg(gradientId) );
+    return query.lastInsertId().toInt();
+}
+
+StrokeSettings::StrokeSettings() : PaintSettings() {
+    color.setQColor(Qt::black);
+}
+
+StrokeSettings::StrokeSettings(Color colorT, PaintType paintTypeT, Gradient *gradientT) : PaintSettings(colorT,
+                                                                                                        paintTypeT,
+                                                                                                        gradientT)
+{
+}
+
+StrokeSettings StrokeSettings::createStrokeSettingsFromSql(int strokeSqlId,
+                        GradientWidget *gradientWidget) {
+    QSqlQuery query;
+    QString queryStr = QString("SELECT paintsettingsid FROM strokesettings WHERE id = %1").
+            arg(strokeSqlId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idPaintSettingsId = query.record().indexOf("paintsettingsid");
+        int paintSettingsId = static_cast<PaintType>(query.value(idPaintSettingsId).toInt());
+        return StrokeSettings(strokeSqlId, paintSettingsId, gradientWidget);
+    }
+    qDebug() << "Could not load strokesettings with id " << strokeSqlId;
+    return StrokeSettings();
+}
+
+StrokeSettings::StrokeSettings(int strokeSqlId, int paintSqlId,
+                               GradientWidget *gradientWidget) :
+    PaintSettings(paintSqlId, gradientWidget) {
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM strokesettings WHERE id = %1").
+            arg(strokeSqlId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idLineWidth = query.record().indexOf("linewidth");
+        int idCapStyle = query.record().indexOf("capstyle");
+        int idJoinStyle = query.record().indexOf("joinstyle");
+        mLineWidth = query.value(idLineWidth).toReal();
+        mCapStyle = static_cast<Qt::PenCapStyle>(query.value(idCapStyle).toInt());
+        mJoinStyle = static_cast<Qt::PenJoinStyle>(query.value(idJoinStyle).toInt());
+    } else {
+        qDebug() << "Could not load strokesettings with id " << strokeSqlId;
+    }
+}
+
+int StrokeSettings::saveToQuery() {
+    QSqlQuery query;
+    int paintSettingsId = PaintSettings::saveToQuery();
+    query.exec(QString("INSERT INTO strokesettings (linewidth, capstyle, joinstyle, paintsettingsid) "
+                        "VALUES (%1, %2, %3, %4)").
+                arg(mLineWidth, 0, 'f').
+                arg(mCapStyle).
+                arg(mJoinStyle).
+                arg(paintSettingsId) );
+    return query.lastInsertId().toInt();
+}
+
+void StrokeSettings::setLineWidth(qreal newWidth) {
+    mLineWidth = newWidth;
+}
+
+qreal StrokeSettings::lineWidth() {
+    return mLineWidth;
+}
+
+void StrokeSettings::setCapStyle(Qt::PenCapStyle capStyle) {
+    mCapStyle = capStyle;
+}
+
+Qt::PenCapStyle StrokeSettings::capStyle() {
+    return mCapStyle;
+}
+
+void StrokeSettings::setJoinStyle(Qt::PenJoinStyle joinStyle) {
+    mJoinStyle = joinStyle;
+}
+
+Qt::PenJoinStyle StrokeSettings::joinStyle() {
+    return mJoinStyle;
+}
+
+void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker, qreal scale) {
+    stroker->setWidth(mLineWidth*scale);
+    stroker->setCapStyle(mCapStyle);
+    stroker->setJoinStyle(mJoinStyle);
 }
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget(parent)
@@ -194,6 +431,19 @@ void FillStrokeSettingsWidget::setCurrentColor(GLfloat h, GLfloat s, GLfloat v, 
 
 void FillStrokeSettingsWidget::setCurrentColor(Color color) {
     mColorsSettingsWidget->setCurrentColor(color);
+}
+
+void FillStrokeSettingsWidget::saveGradientsToQuery()
+{
+    mGradientWidget->saveGradientsToQuery();
+}
+
+void FillStrokeSettingsWidget::loadAllGradientsFromSql() {
+    mGradientWidget->loadAllGradientsFromSql();
+}
+
+GradientWidget *FillStrokeSettingsWidget::getGradientWidget() {
+    return mGradientWidget;
 }
 
 void FillStrokeSettingsWidget::colorTypeSet(int id)

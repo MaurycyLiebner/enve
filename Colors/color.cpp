@@ -1,6 +1,20 @@
 #include "color.h"
 #include "helpers.h"
 #include <QDebug>
+
+
+int Color::saveToQuery()
+{
+    QSqlQuery query;
+    query.exec(QString("INSERT INTO color (hue, saturation, value, alpha) "
+                "VALUES (%1, %2, %3, %4)").
+                arg(gl_h, 0, 'f').
+                arg(gl_s, 0, 'f').
+                arg(gl_v, 0, 'f').
+                arg(gl_a, 0, 'f') );
+    return query.lastInsertId().toInt();
+}
+
 void Color::updateHSVFromRGB()
 {
     gl_h = gl_r;
@@ -97,6 +111,28 @@ Color::Color(int r_t, int g_t, int b_t, int a_t)
     gl_a = a_t/255.0f;
     updateHSVFromRGB();
 }
+
+Color::Color(int sqlId)
+{
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM color WHERE id = %1").
+            arg(sqlId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idHue = query.record().indexOf("hue");
+        GLfloat h = query.value(idHue).toReal();
+        int idSaturation = query.record().indexOf("saturation");
+        GLfloat s = query.value(idSaturation).toReal();
+        int idValue = query.record().indexOf("value");
+        GLfloat v = query.value(idValue).toReal();
+        int idAlpha = query.record().indexOf("alpha");
+        GLfloat a = query.value(idAlpha).toReal();
+        setHSV(h, s, v, a);
+    } else {
+        qDebug() << "Could not load color with id " << sqlId;
+    }
+}
+
 Color::Color()
 {
     Color(0, 0, 0, 255);

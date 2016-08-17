@@ -12,6 +12,14 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox 
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
+BoxesGroup::BoxesGroup(int boundingBoxId,
+                       FillStrokeSettingsWidget *fillStrokeSetting,
+                       BoundingBox *parent) : BoundingBox(boundingBoxId,
+                                                          parent, TYPE_GROUP) {
+    mFillStrokeSettingsWidget = fillStrokeSetting;
+    loadChildrenFromSql(QString::number(boundingBoxId));
+}
+
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_CANVAS)
 {
@@ -536,15 +544,42 @@ void BoxesGroup::cancelSelectedBoxesTransform() {
     finishUndoRedoSet();
 }
 
-void BoxesGroup::saveToQuery(QSqlQuery *query, qint32 parentId)
+void BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId) {
+    QSqlQuery query;
+    QString queryStr;
+    if(thisBoundingBoxId == "NULL") {
+        queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid IS " + thisBoundingBoxId;
+    } else {
+        queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid = " + thisBoundingBoxId;
+    }
+    if(query.exec(queryStr) ) {
+        int idId = query.record().indexOf("id");
+        int idBoxType = query.record().indexOf("boxtype");
+        while(query.next() ) {
+            if(static_cast<BoundingBoxType>(
+                        query.value(idBoxType).toInt()) == TYPE_VECTOR_PATH ) {
+                new VectorPath(query.value(idId).toInt(), this);
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_GROUP ) {
+                new BoxesGroup(query.value(idId).toInt(),
+                               mFillStrokeSettingsWidget, this);
+            }
+        }
+    } else {
+        qDebug() << "Could not load children for boxesgroup with id " + thisBoundingBoxId;
+    }
+}
+
+int BoxesGroup::saveToQuery(int parentId)
 {
-    BoundingBox::saveToQuery(query, parentId);
-    qint32 boundingBoxId = query->lastInsertId().toInt();
-    query->exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
+    QSqlQuery query;
+    int boundingBoxId = BoundingBox::saveToQuery(parentId);
+    query.exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
                 arg(boundingBoxId));
     foreachBoxInList(mChildren) {
-        box->saveToQuery(query, boundingBoxId);
+        box->saveToQuery(boundingBoxId);
     }
+    return boundingBoxId;
 }
 
 void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)

@@ -18,6 +18,8 @@ class BoxesGroup : public BoundingBox
 public:
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox *parent);
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent);
+    BoxesGroup(int boundingBoxId,
+               FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox *parent);
 
     bool pointInsidePath(QPointF absPos);
     QRectF getBoundingRect();
@@ -91,7 +93,8 @@ public:
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
 
-    void saveToQuery(QSqlQuery *query, qint32 parentId);
+    int saveToQuery(int parentId);
+    void loadChildrenFromSql(QString thisBoundingBoxId);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

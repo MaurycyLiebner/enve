@@ -19,6 +19,8 @@ public:
 
     void newGradient(Color color1 = Color(0.f, 0.f, 0.f, 1.f),
                      Color color2 = Color(0.f, 0.f, 0.f, 0.f));
+    void newGradient(int fromGradientId);
+    void removeGradient(int gradientId);
 
     void wheelEvent(QWheelEvent *event);
 
@@ -26,6 +28,9 @@ public:
 
     void finishGradientTransform();
     void startGradientTransform();
+    void saveGradientsToQuery();
+    Gradient *getGradientBySqlId(int id);
+    void loadAllGradientsFromSql();
 signals:
     void selectedColorChanged(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
     void currentGradientChanged(Gradient *gradient);

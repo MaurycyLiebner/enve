@@ -12,7 +12,8 @@
 #include <QTimer>
 #include <QPainterPathStroker>
 #include "connectedtomainwindow.h"
-
+#include <QSqlQuery>
+#include <QSqlRecord>
 
 class GradientWidget;
 
@@ -30,54 +31,35 @@ class Gradient : ConnectedToMainWindow
 {
 public:
     Gradient(Color color1, Color color2,
-             GradientWidget *gradientWidget, MainWindow *parent) :
-        ConnectedToMainWindow(parent)
-    {
-        mGradientWidget = gradientWidget;
-        colors << color1;
-        colors << color2;
-        updateQGradientStops();
-    }
+             GradientWidget *gradientWidget, MainWindow *parent);
 
-    void swapColors(int id1, int id2) {
-        colors.swap(id1, id2);
-        updateQGradientStops();
-    }
+    Gradient(Gradient *fromGradient,
+             GradientWidget *gradientWidget, MainWindow *parent);
 
-    void removeColor(int id) {
-        colors.removeAt(id);
-        updateQGradientStops();
-    }
+    Gradient(int sqlIdT,
+             GradientWidget *gradientWidget, MainWindow *parent);
 
-    void addColor(Color color) {
-        colors << color;
-        updateQGradientStops();
-    }
+    int saveToQuery();
 
-    void replaceColor(int id, Color color) {
-        colors.replace(id, color);
-        updateQGradientStops();
-    }
+    void swapColors(int id1, int id2);
+
+    void removeColor(int id);
+
+    void addColor(Color color);
+
+    void replaceColor(int id, Color color);
 
     void setColors(QList<Color> newColors);
 
-    void startTransform() {
-        if(transformPending) return;
-        transformPending = true;
-        savedColors = colors;
-    }
+    void startTransform();
 
-    bool isInPaths(VectorPath *path) {
-        return mAffectedPaths.contains(path);
-    }
+    bool isInPaths(VectorPath *path);
 
-    void addPath(VectorPath *path) {
-        mAffectedPaths << path;
-    }
+    void addPath(VectorPath *path);
 
-    void removePath(VectorPath *path) {
-        mAffectedPaths << path;
-    }
+    void removePath(VectorPath *path);
+
+    bool affectsPaths();
 
     void updatePaths();
 
@@ -85,6 +67,9 @@ public:
 
     void updateQGradientStops();
 
+    int getSqlId();
+
+    int sqlId = 0;
     bool transformPending = false;
     GradientWidget *mGradientWidget;
     QGradientStops qgradientStops;
@@ -95,17 +80,15 @@ public:
 
 class PaintSettings {
 public:
-    PaintSettings() {
-
-    }
+    PaintSettings();
 
     PaintSettings(Color colorT,
                   PaintType paintTypeT,
-                  Gradient *gradientT = NULL) {
-        color = colorT;
-        paintType = paintTypeT;
-        gradient = gradientT;
-    }
+                  Gradient *gradientT = NULL);
+
+    PaintSettings(int sqlId, GradientWidget *gradientWidget);
+
+    virtual int saveToQuery();
 
     Color color;
     PaintType paintType = FLATPAINT;
@@ -115,47 +98,30 @@ public:
 class StrokeSettings : public PaintSettings
 {
 public:
-    StrokeSettings() : PaintSettings() {
-        color.setQColor(Qt::black);
-    }
+    StrokeSettings();
 
     StrokeSettings(Color colorT,
                    PaintType paintTypeT,
-                   Gradient *gradientT = NULL) : PaintSettings(colorT,
-                                                               paintTypeT,
-                                                               gradientT)
-    {
-    }
+                   Gradient *gradientT = NULL);
 
-    void setLineWidth(qreal newWidth) {
-        mLineWidth = newWidth;
-    }
+    int saveToQuery();
 
-    qreal lineWidth() {
-        return mLineWidth;
-    }
+    void setLineWidth(qreal newWidth);
 
-    void setCapStyle(Qt::PenCapStyle capStyle) {
-        mCapStyle = capStyle;
-    }
+    qreal lineWidth();
 
-    Qt::PenCapStyle capStyle() {
-        return mCapStyle;
-    }
+    void setCapStyle(Qt::PenCapStyle capStyle);
 
-    void setJoinStyle(Qt::PenJoinStyle joinStyle) {
-        mJoinStyle = joinStyle;
-    }
+    Qt::PenCapStyle capStyle();
 
-    Qt::PenJoinStyle joinStyle() {
-        return mJoinStyle;
-    }
+    void setJoinStyle(Qt::PenJoinStyle joinStyle);
 
-    void setStrokerSettings(QPainterPathStroker *stroker, qreal scale) {
-        stroker->setWidth(mLineWidth*scale);
-        stroker->setCapStyle(mCapStyle);
-        stroker->setJoinStyle(mJoinStyle);
-    }
+    Qt::PenJoinStyle joinStyle();
+
+    void setStrokerSettings(QPainterPathStroker *stroker, qreal scale);
+    StrokeSettings(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
+    static StrokeSettings createStrokeSettingsFromSql(int strokeSqlId,
+                                              GradientWidget *gradientWidget);
 private:
     qreal mLineWidth = 1.f;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
@@ -177,6 +143,10 @@ public:
 
     void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
     void setCurrentColor(Color color);
+
+    void saveGradientsToQuery();
+    void loadAllGradientsFromSql();
+    GradientWidget *getGradientWidget();
 signals:
     void fillSettingsChanged(PaintSettings, bool);
     void strokeSettingsChanged(StrokeSettings, bool);

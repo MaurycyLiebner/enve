@@ -52,6 +52,7 @@ public:
     Canvas *getCanvas();
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
+    void loadFile(QString path);
 private slots:
 
 };

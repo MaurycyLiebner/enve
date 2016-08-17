@@ -140,6 +140,8 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         }
     } else if(isCtrlPressed() && event->key() == Qt::Key_S) {
         saveToFile("test.av");
+    } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
+        loadFile("test.av");
     } else {
         returnBool = mCanvas->processKeyEvent(event);
     }
@@ -147,6 +149,21 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
 
     callUpdateSchedulers();
     return returnBool;
+}
+
+void MainWindow::loadFile(QString path) {
+    QFile file(path);
+    if(!file.exists()) {
+        return;
+    }
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");//not dbConnection
+    db.setDatabaseName(path);
+    db.open();
+
+    mFillStrokeSettings->loadAllGradientsFromSql();
+    mCanvas->loadAllBoxesFromSql();
+
+    db.close();
 }
 
 void MainWindow::saveToFile(QString path) {
@@ -158,8 +175,38 @@ void MainWindow::saveToFile(QString path) {
     db.setDatabaseName(path);
     db.open();
     QSqlQuery query;
+    query.exec("CREATE TABLE color "
+               "(id INTEGER PRIMARY KEY, "
+               "hue REAL, "
+               "saturation REAL, "
+               "value REAL, "
+               "alpha REAL )");
+    query.exec("CREATE TABLE gradient "
+               "(id INTEGER PRIMARY KEY)");
+    query.exec("CREATE TABLE gradientcolor "
+               "(colorid INTEGER, "
+               "gradientid INTEGER, "
+               "positioningradient INTEGER, "
+               "FOREIGN KEY(colorid) REFERENCES color(id), "
+               "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
+    query.exec("CREATE TABLE paintsettings "
+               "(id INTEGER PRIMARY KEY, "
+               "painttype INTEGER, "
+               "colorid INTEGER, "
+               "gradientid INTEGER, "
+               "FOREIGN KEY(colorid) REFERENCES color(id), "
+               "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
+    query.exec("CREATE TABLE strokesettings "
+               "(id INTEGER PRIMARY KEY, "
+               "linewidth REAL, "
+               "capstyle INTEGER, "
+               "joinstyle INTEGER, "
+               "paintsettingsid INTEGER, "
+               "FOREIGN KEY(paintsettingsid) REFERENCES paintsettings(id) )");
+
     query.exec("CREATE TABLE boundingbox "
                "(id INTEGER PRIMARY KEY, "
+               "boxtype INTEGER, "
                "m11_trans REAL, "
                "m12_trans REAL, "
                "m21_trans REAL, "
@@ -185,36 +232,15 @@ void MainWindow::saveToFile(QString path) {
                "strokegradientendx REAL, "
                "strokegradientendy REAL, "
                "boundingboxid INTEGER, "
-               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
-    query.exec("CREATE TABLE color "
-               "(id INTEGER PRIMARY KEY, "
-               "hue REAL, "
-               "saturation REAL, "
-               "value REAL, "
-               "alpha REAL )");
-    query.exec("CREATE TABLE gradient "
-               "(id INTEGER PRIMARY KEY)");
-    query.exec("CREATE TABLE gradientcolor "
-               "(colorid INTEGER, "
-               "gradientid INTEGER, "
-               "positioningradient INTEGER, "
-               "FOREIGN KEY(colorid) REFERENCES color(id), "
-               "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
-    query.exec("CREATE TABLE paintsettings "
-               "(id INTEGER PRIMARY KEY, "
-               "painttype INTEGER, "
-               "gradientid INTEGER, "
-               "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
-    query.exec("CREATE TABLE strokesettings "
-               "(id INTEGER PRIMARY KEY, "
-               "linewidth REAL, "
-               "capstyle INTEGER, "
-               "joinstyle INTEGER, "
-               "paintsettingsid INTEGER, "
-               "FOREIGN KEY(paintsettingsid) REFERENCES paintsettings(id) )");
+               "fillsettingsid INTEGER, "
+               "strokesettingsid INTEGER, "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
+               "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
+               "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
     query.exec("CREATE TABLE pathpoint "
                "(id INTEGER PRIMARY KEY, "
                "isfirst BOOLEAN, "
+               "isendpoint BOOLEAN, "
                "xrelpos REAL, "
                "yrelpos REAL, "
                "startctrlptrelx REAL, "
@@ -223,9 +249,10 @@ void MainWindow::saveToFile(QString path) {
                "endctrlptrely REAL, "
                "vectorpathid INTEGER, "
                "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id) )");
-    mCanvas->saveToQuery(&query);
+    mFillStrokeSettings->saveGradientsToQuery();
+    mCanvas->saveToQuery();
     /*query.exec("INSERT INTO color (hue, saturation, value, alpha) VALUES (0.1, 0.2, 0.3, 0.4)");
-    qint32 id = query.lastInsertId().toInt();
+    int id = query.lastInsertId().toInt();
     qDebug() << id;
     query.exec(QString("INSERT INTO color (hue, saturation, value, alpha) VALUES (%1, 0.4, 0.1, 0.2)").arg(0.1121212f, 0, 'f'));
     id = query.lastInsertId().toInt();

@@ -80,7 +80,10 @@ public:
     VectorPath *getParentPath();
     void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
 
-    void saveToQuery(QSqlQuery *query, qint32 vectorPathId);
+    void saveToQuery(int vectorPathId);
+    PathPoint(qreal relPosX, qreal relPosy,
+              qreal startCtrlRelX, qreal startCtrlRelY,
+              qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, VectorPath *vectorPath);
 private:
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;

@@ -3,12 +3,50 @@
 #include "undoredo.h"
 #include <QDebug>
 
-BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) : ConnectedToMainWindow(parent)
+BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) :
+    ConnectedToMainWindow(parent)
 {
     mType = type;
     parent->addChild(this);
     mTransformMatrix.reset();
     mCombinedTransformMatrix.reset();
+    updateCombinedTransform();
+}
+
+BoundingBox::BoundingBox(int boundingBoxId,
+                         BoundingBox *parent, BoundingBoxType type) :
+    ConnectedToMainWindow(parent) {
+    QSqlQuery query;
+    mType = type;
+
+    QString queryStr = "SELECT * FROM boundingbox WHERE id = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr)) {
+        query.next();
+        int idM11 = query.record().indexOf("m11_trans");
+        int idM12 = query.record().indexOf("m12_trans");
+        int idM21 = query.record().indexOf("m21_trans");
+        int idM22 = query.record().indexOf("m22_trans");
+        int idDx = query.record().indexOf("dx_trans");
+        int idDy = query.record().indexOf("dy_trans");
+        int idPivotx = query.record().indexOf("pivotx");
+        int idPivoty = query.record().indexOf("pivoty");
+        qreal m11 = query.value(idM11).toReal();
+        qreal m12 = query.value(idM12).toReal();
+        qreal m21 = query.value(idM21).toReal();
+        qreal m22 = query.value(idM22).toReal();
+        qreal dx = query.value(idDx).toReal();
+        qreal dy = query.value(idDy).toReal();
+        qreal pivotX = query.value(idPivotx).toReal();
+        qreal pivotY = query.value(idPivoty).toReal();
+        mTransformMatrix.setMatrix(m11, m12, m21, m22, dx, dy);
+        mRelRotPivotPos.setX(pivotX);
+        mRelRotPivotPos.setY(pivotY);
+    } else {
+        qDebug() << "Could not load boundingbox with id " << boundingBoxId;
+    }
+
+    parent->addChild(this);
     updateCombinedTransform();
 }
 
@@ -277,10 +315,12 @@ void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF absOrig
     updateCombinedTransform();
 }
 
-void BoundingBox::saveToQuery(QSqlQuery *query, qint32 parentId)
+int BoundingBox::saveToQuery(int parentId)
 {
-    query->exec(QString("INSERT INTO boundingbox (m11_trans, m12_trans, m21_trans, m22_trans, dx_trans, dy_trans, pivotx, pivoty, parentboundingboxid) "
-               "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
+    QSqlQuery query;
+    query.exec(QString("INSERT INTO boundingbox (boxtype, m11_trans, m12_trans, m21_trans, m22_trans, dx_trans, dy_trans, pivotx, pivoty, parentboundingboxid) "
+               "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10)").
+                arg(mType).
                 arg(mTransformMatrix.m11(), 0, 'f').
                 arg(mTransformMatrix.m12(), 0, 'f').
                 arg(mTransformMatrix.m21(), 0, 'f').
@@ -291,6 +331,7 @@ void BoundingBox::saveToQuery(QSqlQuery *query, qint32 parentId)
                 arg(mRelRotPivotPos.y(), 0, 'f').
                 arg( (parentId == 0) ? "NULL" : QString::number(parentId) )
                 );
+    return query.lastInsertId().toInt();
 }
 
 void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)

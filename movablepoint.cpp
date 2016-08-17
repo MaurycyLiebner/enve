@@ -13,6 +13,17 @@ MovablePoint::MovablePoint(QPointF absPos,
     setAbsolutePos(absPos, false);
 }
 
+MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
+                           BoundingBox *parent,
+                           MovablePointType type,
+                           qreal radius) : ConnectedToMainWindow(parent)
+{
+    mType = type;
+    mRadius = radius;
+    mParent = parent;
+    setRelativePos(QPointF(relPosX, relPosY), false);
+}
+
 void MovablePoint::startTransform()
 {
     mTransformStarted = true;

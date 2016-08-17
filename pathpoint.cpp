@@ -9,6 +9,24 @@ PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
 {
 }
 
+PathPoint::PathPoint(qreal relPosX, qreal relPosy,
+                     qreal startCtrlRelX, qreal startCtrlRelY,
+                     qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst,
+                     VectorPath *vectorPath) :
+    MovablePoint(relPosX, relPosy, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
+{
+    mSeparatePathPoint = isFirst;
+    mVectorPath = vectorPath;
+    mStartCtrlPt = new CtrlPoint(startCtrlRelX, startCtrlRelY, this, true);
+    mEndCtrlPt = new CtrlPoint(endCtrlRelX, endCtrlRelY, this, false);
+
+    mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
+    mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
+
+    mStartCtrlPt->hide();
+    mEndCtrlPt->hide();
+}
+
 PathPoint::PathPoint(QPointF absPos,
                      QPointF startCtrlAbsPos,
                      QPointF endCtrlAbsPos,
@@ -141,16 +159,19 @@ void PathPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
     mVectorPath->schedulePathUpdate();
 }
 #include <QSqlError>
-void PathPoint::saveToQuery(QSqlQuery *query, qint32 vectorPathId)
+void PathPoint::saveToQuery(int vectorPathId)
 {
+    QSqlQuery query;
     QPointF relPos = mRelPos.getCurrentValue();
     QPointF startPtPos = mStartCtrlPt->getRelativePos();
     QPointF endPtPos = mEndCtrlPt->getRelativePos();
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
-    query->exec(QString("INSERT INTO pathpoint (isfirst, xrelpos, yrelpos, "
+    QString isEnd = ( (isEndPoint()) ? "1" : "0" );
+    query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, xrelpos, yrelpos, "
                 "startctrlptrelx, startctrlptrely, endctrlptrelx, endctrlptrely, vectorpathid) "
-                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8)").
+                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
                 arg(isFirst).
+                arg(isEnd).
                 arg(relPos.x(), 0, 'f').
                 arg(relPos.y(), 0, 'f').
                 arg(startPtPos.x(), 0, 'f').
@@ -160,7 +181,7 @@ void PathPoint::saveToQuery(QSqlQuery *query, qint32 vectorPathId)
                 arg(vectorPathId) );
     if(mNextPoint != NULL) {
         if(!mNextPoint->isSeparatePathPoint()) {
-            mNextPoint->saveToQuery(query, vectorPathId);
+            mNextPoint->saveToQuery( vectorPathId);
         }
     }
 }

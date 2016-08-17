@@ -20,7 +20,8 @@ class GradientPoints {
 public:
     GradientPoints();
 
-    void initialize(VectorPath *parentT);
+    void initialize(VectorPath *parentT, QPointF startPt = QPointF(0.f, 0.f),
+                    QPointF endPt = QPointF(100.f, 100.f));
 
     void enable();
 
@@ -48,6 +49,7 @@ class VectorPath : public BoundingBox
 {
 public:
     VectorPath(BoxesGroup *group);
+    VectorPath(int boundingBoxId, BoundingBox *parent);
     ~VectorPath();
 
     virtual QRectF getBoundingRect();
@@ -92,8 +94,11 @@ public:
     PathPoint *addPointRelPos(QPointF relPos,
                               QPointF startRelPos, QPointF endRelPos,
                               PathPoint *toPoint = NULL);
-    void saveToQuery(QSqlQuery *query, qint32 parentId);
+    int saveToQuery(int parentId);
+
 private:
+    void loadPointsFromSql(int vectorPathId);
+
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;
 

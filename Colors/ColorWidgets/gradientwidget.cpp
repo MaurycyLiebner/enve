@@ -26,10 +26,65 @@ void GradientWidget::newGradient(Color color1, Color color2) {
     repaint();
 }
 
+void GradientWidget::newGradient(int fromGradientId)
+{
+    Gradient *fromGradient = mGradients.at(fromGradientId);
+    mGradients << new Gradient(fromGradient, this, mMainWindow);
+    setCurrentGradient(mGradients.last());
+    repaint();
+}
+
+void GradientWidget::removeGradient(int gradientId)
+{
+    Gradient *toRemove = mGradients.at(gradientId);
+    if(toRemove->affectsPaths()) {
+        return;
+    }
+    mGradients.removeAt(gradientId);
+    if(mCurrentGradient == toRemove) {
+        setCurrentGradient((Gradient*) NULL);
+    }
+    delete toRemove;
+    mCenterGradientId = clampInt(mCenterGradientId, 1, mGradients.length() - 2);
+    repaint();
+}
+
+void GradientWidget::saveGradientsToQuery() {
+    foreach(Gradient *gradient, mGradients) {
+        gradient->saveToQuery();
+    }
+}
+
+void GradientWidget::loadAllGradientsFromSql() {
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM gradient");
+    if(query.exec(queryStr) ) {
+        int idId = query.record().indexOf("id");
+        while(query.next() ) {
+            mGradients << new Gradient(query.value(idId).toInt(), this, mMainWindow);
+
+        }
+        if(mGradients.isEmpty()) return;
+        setCurrentGradient(mGradients.last());
+        repaint();
+    } else {
+        qDebug() << "Could not load gradients";
+    }
+}
+
+Gradient *GradientWidget::getGradientBySqlId(int id) {
+    foreach (Gradient *gradient, mGradients) {
+        if(gradient->getSqlId() == id) {
+            return gradient;
+        }
+    }
+    return NULL;
+}
+
 void GradientWidget::wheelEvent(QWheelEvent *event)
 {
     if(event->y() > height()/2 || mGradients.length() < 4) return;
-    if(event->delta() > 0) {
+    if(event->delta() < 0) {
         mCenterGradientId = clampInt(mCenterGradientId + 1, 1, mGradients.length() - 2);
     } else {
         mCenterGradientId = clampInt(mCenterGradientId - 1, 1, mGradients.length() - 2);
@@ -79,7 +134,31 @@ void GradientWidget::mousePressEvent(QMouseEvent *event)
 {
     if(event->y() < height()/2 - 10) {
         int heightGrad = (height()/2 - 10)/3;
-        setCurrentGradient(event->y()/heightGrad);
+        int gradId = event->y()/heightGrad + mCenterGradientId - 1;
+        if(gradId >= mGradients.count() || gradId < 0) {
+            return;
+        }
+        if(event->button() == Qt::RightButton) {
+            QMenu menu(this);
+            menu.addAction("Delete Gradient");
+            menu.addAction("Add Gradient");
+            QAction *selected_action = menu.exec(event->globalPos());
+            if(selected_action != NULL)
+            {
+                if(selected_action->text() == "Delete Gradient")
+                {
+                    removeGradient(gradId);
+                } else if(selected_action->text() == "Add Gradient") {
+                    newGradient(gradId);
+                }
+            }
+            else
+            {
+
+            }
+        } else {
+            setCurrentGradient(gradId);
+        }
     } else if(event->y() > height()/2 && event->y() < 3*height()/4 && mCurrentGradient != NULL) {
         int nCols = mCurrentGradient->colors.length();
         setCurrentColorId(clampInt(event->x()*nCols/width(), 0, nCols - 1) );
@@ -238,7 +317,7 @@ void GradientWidget::paintGL()
     for(int i = (mCenterGradientId > 1) ? mCenterGradientId - 1 : 0;
         i < mCenterGradientId + 2 && i < mGradients.length();
         i++) {
-        drawGradient(i, scrollItemHeight, i*scrollItemHeight);
+        drawGradient(i, scrollItemHeight, (i - mCenterGradientId + 1)*scrollItemHeight);
     }
     drawSolidRect(0.f, halfHeight - 10.f, width(), 10.f, 1.f, 1.f, 1.f, 1.f,
                   false, false, false, false);
