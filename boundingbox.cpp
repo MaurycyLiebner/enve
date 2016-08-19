@@ -141,12 +141,14 @@ bool BoundingBox::isSelected()
 void BoundingBox::select()
 {
     mSelected = true;
+    scheduleBoxesListRepaint();
     scheduleRepaint();
 }
 
 void BoundingBox::deselect()
 {
     mSelected = false;
+    scheduleBoxesListRepaint();
     scheduleRepaint();
 }
 
@@ -162,7 +164,7 @@ bool BoundingBox::isContainedIn(QRectF absRect)
     return absRect.contains(getBoundingRect());
 }
 
-BoundingBox *BoundingBox::getBoxAtFromAllAncestors(QPointF absPos) {
+BoundingBox *BoundingBox::getPathAtFromAllAncestors(QPointF absPos) {
     if(pointInsidePath(absPos)) {
         return this;
     } else {

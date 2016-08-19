@@ -115,9 +115,10 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
         if(mFirstMouseMove) {
             mLastPressedBox = mCurrentBoxesGroup->getBoxAt(pos);
             if((mLastPressedBox == NULL) ? true : mLastPressedBox->isGroup()) {
-                mLastPressedBox = getBoxAtFromAllAncestors(pos);
-                if(mLastPressedBox != NULL) {
-                    setCurrentBoxesGroup((BoxesGroup*) mLastPressedBox->getParent());
+                BoundingBox *pressedBox = getPathAtFromAllAncestors(pos);
+                if(pressedBox != NULL) {
+                    setCurrentBoxesGroup((BoxesGroup*) pressedBox->getParent());
+                    mCurrentBoxesGroup->addBoxToSelection(pressedBox);
                 }
             }
             if(mLastPressedBox != NULL) {

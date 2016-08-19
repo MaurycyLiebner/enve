@@ -55,7 +55,9 @@ void BoxesList::wheelEvent(QWheelEvent *event)
 
 void BoxesList::mousePressEvent(QMouseEvent *event)
 {
-    mCanvas->handleChildListItemMousePress(event->x(), event->y(), 0.f);
+    mCanvas->handleChildListItemMousePress(event->x(),
+                                           event->y() + mViewedRect.top(),
+                                           0.f);
     mMainWindow->callUpdateSchedulers();
 }
 

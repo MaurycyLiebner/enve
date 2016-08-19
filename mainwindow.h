@@ -77,6 +77,8 @@ public:
 
     void scheduleBoxesListRepaint();
 private slots:
+    void newFile();
+    bool askForSaving();
     void openFile();
     void saveFile();
     void saveFileAs();

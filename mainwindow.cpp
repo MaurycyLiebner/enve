@@ -10,6 +10,7 @@
 #include <QtSql/QSqlQuery>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QMessageBox>
 #include "boxeslist.h"
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -97,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
     mMenuBar = new QMenuBar(this);
 
     mFileMenu = mMenuBar->addMenu("File");
+    mFileMenu->addAction("New...", this, SLOT(newFile));
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
     mFileMenu->addAction("Import...", this, SLOT(importFile()));
     mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
@@ -155,6 +157,26 @@ FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
     return mFillStrokeSettings;
 }
 
+bool MainWindow::askForSaving() {
+    if(mChangedSinceSaving) {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Save", "Save changes to document \"" +
+                                      mCurrentFilePath.split("/").last() +
+                                      "\"?", "Close without saving",
+                                      "Cancel",
+                                      "Save");
+        if (reply.text() == "Cancel") {
+            return false;
+        } else {
+            if(reply.text() == "Save") {
+                saveFile();
+            }
+            return true;
+        }
+    }
+    return true;
+}
+
 void MainWindow::scheduleRepaint()
 {
     mCanvas->scheduleRepaint();
@@ -181,6 +203,13 @@ void MainWindow::enableEventFilter() {
 void MainWindow::scheduleBoxesListRepaint()
 {
     mBoxListWidget->scheduleRepaint();
+}
+
+void MainWindow::newFile()
+{
+    if(askForSaving()) {
+        closeProject();
+    }
 }
 
 bool MainWindow::eventFilter(QObject *, QEvent *e)
@@ -268,15 +297,17 @@ void MainWindow::updateTitle() {
 
 void MainWindow::openFile()
 {
-    disableEventFilter();
-    QString openPath = QFileDialog::getOpenFileName(this,
-        "Open File", "", "AniVect Files (*.av)");
-    enableEventFilter();
-    if(!openPath.isEmpty()) {
-        setCurrentPath(openPath);
-        loadFile(mCurrentFilePath);
+    if(askForSaving()) {
+        disableEventFilter();
+        QString openPath = QFileDialog::getOpenFileName(this,
+            "Open File", "", "AniVect Files (*.av)");
+        enableEventFilter();
+        if(!openPath.isEmpty()) {
+            setCurrentPath(openPath);
+            loadFile(mCurrentFilePath);
+        }
+        setFileChangedSinceSaving(false);
     }
-    setFileChangedSinceSaving(false);
 }
 
 void MainWindow::saveFile()
@@ -317,14 +348,18 @@ void MainWindow::saveBackup()
 
 void MainWindow::closeProject()
 {
-    setCurrentPath("");
-    clearAll();
-    setFileChangedSinceSaving(false);
+    if(askForSaving()) {
+        setCurrentPath("");
+        clearAll();
+        setFileChangedSinceSaving(false);
+    }
 }
 
 void MainWindow::exitProgram()
 {
-    close();
+    if(askForSaving()) {
+        close();
+    }
 }
 
 void MainWindow::importFile()

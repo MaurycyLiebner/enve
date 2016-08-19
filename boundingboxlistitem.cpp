@@ -12,6 +12,21 @@ void BoundingBox::handleListItemMousePress(qreal relX, qreal relY) {
         setVisibile(!mVisible);
     } else if(relX < LIST_ITEM_HEIGHT*3) {
         setLocked(!mLocked);
+    } else {
+        if(isVisibleAndUnlocked() && ((BoxesGroup*)mParent)->isCurrentGroup()) {
+            if(isShiftPressed()) {
+                if(mSelected) {
+                    ((BoxesGroup*)mParent)->removeBoxFromSelection(this);
+                } else {
+                    ((BoxesGroup*)mParent)->addBoxToSelection(this);
+                }
+            } else {
+                ((BoxesGroup*)mParent)->clearBoxesSelection();
+                ((BoxesGroup*)mParent)->addBoxToSelection(this);
+            }
+            scheduleBoxesListRepaint();
+            scheduleRepaint();
+        }
     }
 }
 
@@ -39,6 +54,11 @@ void BoxesGroup::handleListItemMousePress(qreal relX, qreal relY) {
 
 void BoundingBox::drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY) {
     Q_UNUSED(maxY);
+    if(mSelected) {
+        p->setBrush(QColor(185, 185, 185));
+    } else {
+        p->setBrush(QColor(225, 225, 225));
+    }
     p->drawRect(QRectF(drawX, drawY,
                        LIST_ITEM_MAX_WIDTH - drawX, LIST_ITEM_HEIGHT));
     drawX += LIST_ITEM_HEIGHT;

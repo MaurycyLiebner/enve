@@ -29,6 +29,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
             this, SLOT(finishStrokeSettingsTransform()) );
 
     mCurrentBoxesGroup = this;
+    mIsCurrentGroup = true;
     setFocusPolicy(Qt::StrongFocus);
     mRotPivot = new PathPivot(this);
     setMinimumSize(500, 500);

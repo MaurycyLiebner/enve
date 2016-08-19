@@ -95,7 +95,7 @@ public:
     BoundingBox *getParent();
 
     bool isGroup();
-    virtual BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
+    virtual BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
 
     virtual void setStrokeSettings(StrokeSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
     virtual void setFillSettings(PaintSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }

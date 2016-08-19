@@ -50,14 +50,12 @@ public:
     void finishSelectedBoxesTransform();
     void moveSelectedPointsBy(QPointF by, bool startTransform);
     void moveSelectedBoxesBy(QPointF by, bool startTransform);
-    bool isShiftPressed();
-    bool isCtrlPressed();
     BoxesGroup *groupSelectedBoxes();
     void drawBoundingRect(QPainter *p);
 
     void setIsCurrentGroup(bool bT);
 
-    BoundingBox *getBoxAtFromAllAncestors(QPointF absPos);
+    BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
 
     void setFillSettings(PaintSettings fillSettings,
                          bool saveUndoRedo = true);
@@ -103,6 +101,7 @@ public:
     qreal getListItemHeight();
     void handleListItemMousePress(qreal relX, qreal relY);
     void handleChildListItemMousePress(qreal relX, qreal relY, qreal y0);
+    bool isCurrentGroup();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

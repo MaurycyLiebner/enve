@@ -79,15 +79,24 @@ void BoxesGroup::drawBoundingRect(QPainter *p) {
 void BoxesGroup::setIsCurrentGroup(bool bT)
 {
     mIsCurrentGroup = bT;
+    if(!bT) {
+        if(mChildren.isEmpty() && mParent != NULL) {
+            mParent->removeChild(this);
+        }
+    }
     scheduleRepaint();
 }
 
-BoundingBox *BoxesGroup::getBoxAtFromAllAncestors(QPointF absPos)
+bool BoxesGroup::isCurrentGroup() {
+    return mIsCurrentGroup;
+}
+
+BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
 {
     BoundingBox *boxAtPos = NULL;
     foreachBoxInListInverted(mChildren) {
         if(box->isVisibleAndUnlocked()) {
-            boxAtPos = box->getBoxAtFromAllAncestors(absPos);
+            boxAtPos = box->getPathAtFromAllAncestors(absPos);
             if(boxAtPos != NULL) {
                 break;
             }
@@ -661,14 +670,6 @@ void BoxesGroup::select()
 {
     BoundingBox::select();
     updatePivotPosition();
-}
-
-bool BoxesGroup::isShiftPressed() {
-    return QApplication::keyboardModifiers() & Qt::ShiftModifier;
-}
-
-bool BoxesGroup::isCtrlPressed() {
-    return (QApplication::keyboardModifiers() & Qt::ControlModifier);
 }
 
 BoxesGroup* BoxesGroup::groupSelectedBoxes() {

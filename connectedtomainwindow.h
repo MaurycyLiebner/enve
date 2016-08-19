@@ -22,6 +22,8 @@ public:
     virtual void scheduleRepaint();
     virtual void schedulePivotUpdate();
     void scheduleBoxesListRepaint();
+    bool isShiftPressed();
+    bool isCtrlPressed();
 protected:
     MainWindow *mMainWindow;
 };

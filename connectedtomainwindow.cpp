@@ -1,6 +1,7 @@
 #include "connectedtomainwindow.h"
 #include "mainwindow.h"
 #include "updatescheduler.h"
+#include <QApplication>
 
 ConnectedToMainWindow::ConnectedToMainWindow(ConnectedToMainWindow *parent)
 {
@@ -30,6 +31,14 @@ void ConnectedToMainWindow::callUpdateSchedulers()
 MainWindow *ConnectedToMainWindow::getMainWindow()
 {
     return mMainWindow;
+}
+
+bool ConnectedToMainWindow::isShiftPressed() {
+    return QApplication::keyboardModifiers() & Qt::ShiftModifier;
+}
+
+bool ConnectedToMainWindow::isCtrlPressed() {
+    return (QApplication::keyboardModifiers() & Qt::ControlModifier);
 }
 
 void ConnectedToMainWindow::startNewUndoRedoSet()
