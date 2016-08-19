@@ -7,6 +7,11 @@ BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) :
     ConnectedToMainWindow(parent)
 {
     mType = type;
+    if(type == TYPE_VECTOR_PATH) {
+        mName = "Path";
+    } else {
+        mName = "Group";
+    }
     parent->addChild(this);
     mTransformMatrix.reset();
     mCombinedTransformMatrix.reset();
@@ -437,6 +442,7 @@ void BoundingBox::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
         mChildren.at(i)->setZListIndex(i, saveUndoRedo);
     }
     if(saveUndoRedo) finishUndoRedoSet();
+    scheduleBoxesListRepaint();
 }
 
 void BoundingBox::removeChildFromList(int id, bool saveUndoRedo) {

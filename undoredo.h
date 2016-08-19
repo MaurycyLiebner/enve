@@ -476,6 +476,7 @@ public:
 
     ~SetBoxParentUndoRedo() {
         if(mChildBox->isScheduldedForRemoval()) {
+            mChildBox->clearAll();
             delete mChildBox;
         }
     }
@@ -584,7 +585,8 @@ class SetPivotRelPosUndoRedo : public UndoRedo
 {
 public:
     SetPivotRelPosUndoRedo(BoundingBox *target, QPointF prevRelPos, QPointF newRelPos,
-                           bool prevPivotChanged, bool newPivotChanged) : UndoRedo("SetPivotRelPosUndoRedo") {
+                           bool prevPivotChanged, bool newPivotChanged) :
+        UndoRedo("SetPivotRelPosUndoRedo") {
         mTarget = target;
         mPrevRelPos = prevRelPos;
         mNewRelPos = newRelPos;
@@ -606,6 +608,31 @@ private:
     QPointF mNewRelPos;
     bool mPrevPivotChanged;
     bool mNewPivotChanged;
+};
+
+class  SetBoxVisibleUndoRedo : public UndoRedo
+{
+public:
+     SetBoxVisibleUndoRedo(BoundingBox *target,
+                           bool visibleBefore, bool visibleAfter) :
+         UndoRedo("SetBoxVisibleUndoRedo") {
+         mTarget = target;
+         mVisibleAfter = visibleAfter;
+         mVisibleBefore = visibleBefore;
+     }
+
+     void redo() {
+         mTarget->setVisibile(mVisibleAfter, false);
+     }
+
+     void undo() {
+         mTarget->setVisibile(mVisibleBefore, false);
+     }
+
+private:
+     bool mVisibleBefore;
+     bool mVisibleAfter;
+     BoundingBox *mTarget;
 };
 
 #endif // UNDOREDO_H

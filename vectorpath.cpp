@@ -334,7 +334,7 @@ void VectorPath::updateMappedPathIfNeeded()
 
 void VectorPath::scheduleMappedPathUpdate()
 {
-    if(mMappedPathUpdateNeeded || mPathUpdateNeeded) {
+    if(mMappedPathUpdateNeeded || mPathUpdateNeeded || mParent == NULL) {
         return;
     }
     addUpdateScheduler(new MappedPathUpdateScheduler(this));
@@ -435,47 +435,51 @@ QRectF VectorPath::getBoundingRect()
 
 void VectorPath::draw(QPainter *p)
 {
-    p->save();
-    p->setPen(Qt::NoPen);
-    if(mFillPaintSettings.paintType == GRADIENTPAINT) {
-        p->setBrush(mDrawFillGradient);
-    } else if(mFillPaintSettings.paintType == FLATPAINT) {
-        p->setBrush(mFillPaintSettings.color.qcol);
-    } else{
-        p->setBrush(Qt::NoBrush);
+    if(mVisible) {
+        p->save();
+        p->setPen(Qt::NoPen);
+        if(mFillPaintSettings.paintType == GRADIENTPAINT) {
+            p->setBrush(mDrawFillGradient);
+        } else if(mFillPaintSettings.paintType == FLATPAINT) {
+            p->setBrush(mFillPaintSettings.color.qcol);
+        } else{
+            p->setBrush(Qt::NoBrush);
+        }
+        p->drawPath(mMappedPath);
+        if(mStrokeSettings.paintType == GRADIENTPAINT) {
+            p->setBrush(mDrawStrokeGradient);
+        } else if(mStrokeSettings.paintType == FLATPAINT) {
+            p->setBrush(mStrokeSettings.color.qcol);
+        } else{
+            p->setBrush(Qt::NoBrush);
+        }
+        p->drawPath(mOutlinePath);
+        p->restore();
     }
-    p->drawPath(mMappedPath);
-    if(mStrokeSettings.paintType == GRADIENTPAINT) {
-        p->setBrush(mDrawStrokeGradient);
-    } else if(mStrokeSettings.paintType == FLATPAINT) {
-        p->setBrush(mStrokeSettings.color.qcol);
-    } else{
-        p->setBrush(Qt::NoBrush);
-    }
-    p->drawPath(mOutlinePath);
-    p->restore();
 }
 
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
-    p->save();
-    drawBoundingRect(p);
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        p->setPen(QPen(QColor(0, 0, 0, 125), 2));
-        foreach (PathPoint *point, mPoints) {
-            point->draw(p, currentCanvasMode);
-        }
-        mFillGradientPoints.draw(p);
-        mStrokeGradientPoints.draw(p);
-    } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
-        p->setPen(QPen(QColor(0, 0, 0, 125), 2));
-        foreach (PathPoint *point, mPoints) {
-            if(point->isEndPoint() || point->isSelected()) {
+    if(mVisible) {
+        p->save();
+        drawBoundingRect(p);
+        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+            p->setPen(QPen(QColor(0, 0, 0, 125), 2));
+            foreach (PathPoint *point, mPoints) {
                 point->draw(p, currentCanvasMode);
             }
+            mFillGradientPoints.draw(p);
+            mStrokeGradientPoints.draw(p);
+        } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
+            p->setPen(QPen(QColor(0, 0, 0, 125), 2));
+            foreach (PathPoint *point, mPoints) {
+                if(point->isEndPoint() || point->isSelected()) {
+                    point->draw(p, currentCanvasMode);
+                }
+            }
         }
+        p->restore();
     }
-    p->restore();
 }
 
 MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)

@@ -9,6 +9,8 @@
 #include <QDockWidget>
 #include "fillstrokesettings.h"
 
+class BoxesList;
+
 class UpdateScheduler;
 
 class ColorSettingsWidget;
@@ -18,6 +20,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 private:
     QDockWidget *mRightDock;
+    QDockWidget *mBottomDock;
+    BoxesList *mBoxListWidget;
 
     QToolBar *mToolBar;
     QAction *mActionConnectPoints;
@@ -70,6 +74,8 @@ public:
     void setFileChangedSinceSaving(bool changed);
     void disableEventFilter();
     void enableEventFilter();
+
+    void scheduleBoxesListRepaint();
 private slots:
     void openFile();
     void saveFile();

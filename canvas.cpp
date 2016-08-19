@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "updatescheduler.h"
 #include "pathpivot.h"
+#include "boxeslist.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                MainWindow *parent) :
@@ -30,6 +31,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mCurrentBoxesGroup = this;
     setFocusPolicy(Qt::StrongFocus);
     mRotPivot = new PathPivot(this);
+    setMinimumSize(500, 500);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
 QRectF Canvas::getBoundingRect()

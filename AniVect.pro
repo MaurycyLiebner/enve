@@ -42,7 +42,9 @@ SOURCES += main.cpp\
     Colors/ColorWidgets/gradientwidget.cpp \
     Colors/ColorWidgets/glwidget.cpp \
     gradientpoint.cpp \
-    svgimporter.cpp
+    svgimporter.cpp \
+    boundingboxlistitem.cpp \
+    boxeslist.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -73,4 +75,5 @@ HEADERS  += mainwindow.h \
     Colors/ColorWidgets/gradientwidget.h \
     Colors/ColorWidgets/glwidget.h \
     gradientpoint.h \
-    svgimporter.h
+    svgimporter.h \
+    boxeslist.h

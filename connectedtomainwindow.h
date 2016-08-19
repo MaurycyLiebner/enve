@@ -21,6 +21,7 @@ public:
     void finishUndoRedoSet();
     virtual void scheduleRepaint();
     virtual void schedulePivotUpdate();
+    void scheduleBoxesListRepaint();
 protected:
     MainWindow *mMainWindow;
 };

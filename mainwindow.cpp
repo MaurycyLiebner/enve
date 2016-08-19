@@ -10,6 +10,7 @@
 #include <QtSql/QSqlQuery>
 #include <QMenuBar>
 #include <QFileDialog>
+#include "boxeslist.h"
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -32,12 +33,19 @@ MainWindow::MainWindow(QWidget *parent)
 
     mRightDock = new QDockWidget(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
+    mRightDock->setWidget(mFillStrokeSettings);
+    mRightDock->setFeatures(0);
+    mRightDock->setTitleBarWidget(new QWidget());
+    addDockWidget(Qt::RightDockWidgetArea, mRightDock);
 
     mCanvas = new Canvas(mFillStrokeSettings, this);
 
-    mRightDock->setWidget(mFillStrokeSettings);
-    mRightDock->setFeatures(QDockWidget::DockWidgetVerticalTitleBar	);
-    addDockWidget(Qt::RightDockWidgetArea, mRightDock);
+    mBottomDock = new QDockWidget(this);
+    mBoxListWidget = new BoxesList(mCanvas, this);
+    mBottomDock->setWidget(mBoxListWidget);
+    mBottomDock->setFeatures(0);
+    mBottomDock->setTitleBarWidget(new QWidget());
+    addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
     mToolBar = new QToolBar(this);
     mActionConnectPoints = new QAction(
@@ -140,6 +148,7 @@ void MainWindow::callUpdateSchedulers()
     mUpdateSchedulers.clear();
     mCanvas->updatePivotIfNeeded();
     mCanvas->repaintIfNeeded();
+    mBoxListWidget->repaintIfNeeded();
 }
 
 FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
@@ -167,6 +176,11 @@ void MainWindow::disableEventFilter() {
 
 void MainWindow::enableEventFilter() {
     mEventFilterDisabled = false;
+}
+
+void MainWindow::scheduleBoxesListRepaint()
+{
+    mBoxListWidget->scheduleRepaint();
 }
 
 bool MainWindow::eventFilter(QObject *, QEvent *e)

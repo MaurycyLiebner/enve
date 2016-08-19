@@ -57,8 +57,10 @@ QRectF BoxesGroup::getBoundingRect()
 
 void BoxesGroup::draw(QPainter *p)
 {
-    foreach(BoundingBox *box, mChildren) {
-        box->draw(p);
+    if(mVisible) {
+        foreach(BoundingBox *box, mChildren) {
+            box->draw(p);
+        }
     }
 }
 
@@ -84,9 +86,11 @@ BoundingBox *BoxesGroup::getBoxAtFromAllAncestors(QPointF absPos)
 {
     BoundingBox *boxAtPos = NULL;
     foreachBoxInListInverted(mChildren) {
-        boxAtPos = box->getBoxAtFromAllAncestors(absPos);
-        if(boxAtPos != NULL) {
-            break;
+        if(box->isVisibleAndUnlocked()) {
+            boxAtPos = box->getBoxAtFromAllAncestors(absPos);
+            if(boxAtPos != NULL) {
+                break;
+            }
         }
     }
     return boxAtPos;
@@ -287,10 +291,12 @@ void BoxesGroup::ungroupSelected()
 
 void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->drawSelected(p, currentCanvasMode);
+    if(mVisible) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->drawSelected(p, currentCanvasMode);
+        }
+        drawBoundingRect(p);
     }
-    drawBoundingRect(p);
 }
 
 void BoxesGroup::removeSelectedPointsAndClearList()
@@ -501,9 +507,11 @@ BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
     BoundingBox *boxAtPos = NULL;
 
     foreachBoxInListInverted(mChildren) {
-        if(box->pointInsidePath(absPos)) {
-            boxAtPos = box;
-            break;
+        if(box->isVisibleAndUnlocked()) {
+            if(box->pointInsidePath(absPos)) {
+                boxAtPos = box;
+                break;
+            }
         }
     }
     return boxAtPos;
@@ -532,8 +540,10 @@ void BoxesGroup::finishSelectedPointsTransform()
 void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 {
     foreach(BoundingBox *box, mChildren) {
-        if(box->isContainedIn(rect) ) {
-            addBoxToSelection(box);
+        if(box->isVisibleAndUnlocked()) {
+            if(box->isContainedIn(rect) ) {
+                addBoxToSelection(box);
+            }
         }
     }
 }
@@ -662,7 +672,7 @@ bool BoxesGroup::isCtrlPressed() {
 }
 
 BoxesGroup* BoxesGroup::groupSelectedBoxes() {
-    if(mSelectedBoxes.count() < 2) {
+    if(mSelectedBoxes.count() == 0) {
         return NULL;
     }
     startNewUndoRedoSet();

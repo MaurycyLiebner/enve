@@ -146,6 +146,27 @@ public:
     bool isPath();
     void saveTransformPivot(QPointF absPivot);
     void scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF relOrigin);
+
+    //
+
+    virtual void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
+    virtual qreal getListItemHeight();
+    void showChildrenListItems();
+    void hideChildrenListItems();
+    void setName(QString name);
+    QString getName();
+
+    void hide();
+    void show();
+    bool isVisible();
+    void setVisibile(bool visible, bool saveUndoRedo = true);
+    virtual void handleListItemMousePress(qreal relX, qreal relY);
+    void setChildrenListItemsVisible(bool bt);
+    void lock();
+    void unlock();
+    void setLocked(bool bt);
+    bool isLocked();
+    bool isVisibleAndUnlocked();
 protected:
     virtual void updateAfterCombinedTransformationChanged();
 
@@ -164,6 +185,13 @@ protected:
     QPointF mRelRotPivotPos;
     bool mPivotChanged = false;
     bool mSelected = false;
+
+    bool mVisible = true;
+    bool mLocked = false;
+    //
+
+    bool mChildrenListItemsVisibile = false;
+    QString mName = "";
 };
 
 

@@ -46,6 +46,10 @@ void ConnectedToMainWindow::scheduleRepaint() {
     mMainWindow->scheduleRepaint();
 }
 
+void ConnectedToMainWindow::scheduleBoxesListRepaint() {
+    mMainWindow->scheduleBoxesListRepaint();
+}
+
 void ConnectedToMainWindow::schedulePivotUpdate() {
     mMainWindow->schedulePivotUpdate();
 }

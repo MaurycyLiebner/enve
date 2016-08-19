@@ -95,6 +95,14 @@ public:
     void loadChildrenFromSql(QString thisBoundingBoxId);
     PathPoint *createNewPointOnLineNearSelected(QPointF absPos);
     void saveSelectedToSql();
+
+    //
+
+    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
+    void drawChildren(QPainter *p, qreal drawX, qreal drawY, qreal minY, qreal maxY);
+    qreal getListItemHeight();
+    void handleListItemMousePress(qreal relX, qreal relY);
+    void handleChildListItemMousePress(qreal relX, qreal relY, qreal y0);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
