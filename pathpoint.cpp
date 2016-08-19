@@ -27,6 +27,12 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
     mEndCtrlPt->hide();
 }
 
+void PathPoint::clearAll()
+{
+    delete mStartCtrlPt;
+    delete mEndCtrlPt;
+}
+
 PathPoint::PathPoint(QPointF absPos,
                      QPointF startCtrlAbsPos,
                      QPointF endCtrlAbsPos,
@@ -159,7 +165,7 @@ void PathPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
     mVectorPath->schedulePathUpdate();
 }
 #include <QSqlError>
-void PathPoint::saveToQuery(int vectorPathId)
+void PathPoint::saveToSql(int vectorPathId)
 {
     QSqlQuery query;
     QPointF relPos = mRelPos.getCurrentValue();
@@ -181,7 +187,7 @@ void PathPoint::saveToQuery(int vectorPathId)
                 arg(vectorPathId) );
     if(mNextPoint != NULL) {
         if(!mNextPoint->isSeparatePathPoint()) {
-            mNextPoint->saveToQuery( vectorPathId);
+            mNextPoint->saveToSql( vectorPathId);
         }
     }
 }
@@ -475,32 +481,32 @@ bool PathPoint::hasPreviousPoint() {
     return mPreviousPoint != NULL;
 }
 
-void PathPoint::setPointAsNext(PathPoint *pointToSet) {
-    startNewUndoRedoSet();
+void PathPoint::setPointAsNext(PathPoint *pointToSet, bool saveUndoRedo) {
+    if(saveUndoRedo) startNewUndoRedoSet();
 
     if(hasNextPoint()) {
-        mNextPoint->setPreviousPoint(NULL);
+        mNextPoint->setPreviousPoint(NULL, saveUndoRedo);
     }
-    setNextPoint(pointToSet);
+    setNextPoint(pointToSet, saveUndoRedo);
     if(pointToSet != NULL) {
-        pointToSet->setPreviousPoint(this);
+        pointToSet->setPreviousPoint(this, saveUndoRedo);
     }
 
-    finishUndoRedoSet();
+    if(saveUndoRedo) finishUndoRedoSet();
 }
 
-void PathPoint::setPointAsPrevious(PathPoint *pointToSet) {
-    startNewUndoRedoSet();
+void PathPoint::setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo) {
+    if(saveUndoRedo) startNewUndoRedoSet();
 
     if(hasPreviousPoint()) {
-        mPreviousPoint->setNextPoint(NULL);
+        mPreviousPoint->setNextPoint(NULL, saveUndoRedo);
     }
-    setPreviousPoint(pointToSet);
+    setPreviousPoint(pointToSet, saveUndoRedo);
     if(pointToSet != NULL) {
-        pointToSet->setNextPoint(this);
+        pointToSet->setNextPoint(this, saveUndoRedo);
     }
 
-    finishUndoRedoSet();
+    if(saveUndoRedo) finishUndoRedoSet();
 }
 
 PathPoint *PathPoint::addPointAbsPos(QPointF absPos)

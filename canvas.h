@@ -46,7 +46,6 @@ public:
     void clearAllPathsSelection();
     void setPointCtrlsMode(CtrlsMode mode);
     QPointF scaleDistancePointByCurrentScale(QPointF point);
-    bool processKeyEvent(QKeyEvent *event);
     void setCurrentBoxesGroup(BoxesGroup *group);
 
     void rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans);
@@ -57,8 +56,13 @@ public:
     void setPivotPositionForSelected();
     void scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
 
-    void saveToQuery();
+    void saveToSql();
     void loadAllBoxesFromSql();
+    void clearAll();
+    void resetTransormation();
+    void fitCanvasToSize();
+    void saveSelectedToSqlForCurrentBox();
+    bool processFilteredKeyEvent(QKeyEvent *event);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);

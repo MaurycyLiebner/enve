@@ -20,6 +20,16 @@ BoxesGroup::BoxesGroup(int boundingBoxId,
     loadChildrenFromSql(QString::number(boundingBoxId));
 }
 
+PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        PathPoint *point = box->createNewPointOnLineNear(absPos);
+        if(point != NULL) {
+            return point;
+        }
+    }
+    return NULL;
+}
+
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_CANVAS)
 {
@@ -28,7 +38,7 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *
 
 bool BoxesGroup::pointInsidePath(QPointF absPos)
 {
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         if(box->pointInsidePath(absPos)) {
             return true;
         }
@@ -47,7 +57,7 @@ QRectF BoxesGroup::getBoundingRect()
 
 void BoxesGroup::draw(QPainter *p)
 {
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         box->draw(p);
     }
 }
@@ -88,7 +98,7 @@ void BoxesGroup::setFillSettings(PaintSettings fillSettings,
     if(saveUndoRedo) {
         startNewUndoRedoSet();
     }
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         box->setFillSettings(fillSettings, saveUndoRedo);
     }
     if(saveUndoRedo) {
@@ -102,7 +112,7 @@ void BoxesGroup::setStrokeSettings(StrokeSettings strokeSettings,
     if(saveUndoRedo) {
         startNewUndoRedoSet();
     }
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         box->setStrokeSettings(strokeSettings, saveUndoRedo);
     }
     if(saveUndoRedo) {
@@ -115,7 +125,7 @@ void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings, bool saveUn
     if(saveUndoRedo) {
         startNewUndoRedoSet();
     }
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFillSettings(fillSettings, saveUndoRedo);
     }
     if(saveUndoRedo) {
@@ -128,7 +138,7 @@ void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings, bool s
     if(saveUndoRedo) {
         startNewUndoRedoSet();
     }
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeSettings(strokeSettings, saveUndoRedo);
     }
     if(saveUndoRedo) {
@@ -138,14 +148,14 @@ void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings, bool s
 
 void BoxesGroup::startStrokeTransform()
 {
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         box->startStrokeTransform();
     }
 }
 
 void BoxesGroup::startFillTransform()
 {
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         box->startFillTransform();
     }
 }
@@ -153,7 +163,7 @@ void BoxesGroup::startFillTransform()
 void BoxesGroup::finishStrokeTransform()
 {
     startNewUndoRedoSet();
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         box->finishStrokeTransform();
     }
     finishUndoRedoSet();
@@ -162,7 +172,7 @@ void BoxesGroup::finishStrokeTransform()
 void BoxesGroup::finishFillTransform()
 {
     startNewUndoRedoSet();
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         box->finishFillTransform();
     }
     finishUndoRedoSet();
@@ -170,14 +180,14 @@ void BoxesGroup::finishFillTransform()
 
 void BoxesGroup::startSelectedStrokeTransform()
 {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->startStrokeTransform();
     }
 }
 
 void BoxesGroup::startSelectedFillTransform()
 {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->startFillTransform();
     }
 }
@@ -185,7 +195,7 @@ void BoxesGroup::startSelectedFillTransform()
 void BoxesGroup::finishSelectedStrokeTransform()
 {
     startNewUndoRedoSet();
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->finishStrokeTransform();
     }
     finishUndoRedoSet();
@@ -194,7 +204,7 @@ void BoxesGroup::finishSelectedStrokeTransform()
 void BoxesGroup::finishSelectedFillTransform()
 {
     startNewUndoRedoSet();
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->finishFillTransform();
     }
     finishUndoRedoSet();
@@ -204,12 +214,12 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
                                   bool startTrans)
 {
     if(startTrans) {
-        foreachBoxInList(mSelectedBoxes) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->startTransform();
             box->rotateBy(rotBy, absOrigin);
         }
     } else {
-        foreachBoxInList(mSelectedBoxes) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->rotateBy(rotBy, absOrigin);
         }
     }
@@ -218,13 +228,14 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
 void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
                                  bool startTrans) {
     if(startTrans) {
-        foreachBoxInList(mSelectedBoxes) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->startTransform();
-            box->scaleFromSaved(scaleBy, scaleBy, absOrigin);
+            box->saveTransformPivot(absOrigin);
+            box->scaleFromSaved(scaleBy, scaleBy);
         }
     } else {
-        foreachBoxInList(mSelectedBoxes) {
-            box->scaleFromSaved(scaleBy, scaleBy, absOrigin);
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->scaleFromSaved(scaleBy, scaleBy);
         }
     }
 }
@@ -234,7 +245,7 @@ QPointF BoxesGroup::getSelectedPivotPos()
     if(mSelectedBoxes.isEmpty()) return QPointF(0.f, 0.f);
     QPointF posSum = QPointF(0.f, 0.f);
     int count = mSelectedBoxes.length();
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         posSum += box->getPivotAbsPos();
     }
     return posSum/count;
@@ -267,7 +278,7 @@ void BoxesGroup::ungroup() {
 
 void BoxesGroup::ungroupSelected()
 {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->isGroup()) {
             ((BoxesGroup*) box)->ungroup();
         }
@@ -276,7 +287,7 @@ void BoxesGroup::ungroupSelected()
 
 void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->drawSelected(p, currentCanvasMode);
     }
     drawBoundingRect(p);
@@ -299,7 +310,7 @@ void BoxesGroup::removeSelectedBoxesAndClearList()
 {
     startNewUndoRedoSet();
 
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         BoundingBox::removeChild(box);
         box->deselect();
     }
@@ -361,44 +372,44 @@ void BoxesGroup::removePointFromSelection(MovablePoint *point) {
 
 void BoxesGroup::clearBoxesSelection()
 {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
 }
 
 void BoxesGroup::bringSelectedBoxesToFront() {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->bringToFront();
     }
 }
 
 void BoxesGroup::bringSelectedBoxesToEnd() {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->bringToEnd();
     }
 }
 
 void BoxesGroup::moveSelectedBoxesDown() {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->moveDown();
     }
 }
 
 void BoxesGroup::moveSelectedBoxesUp() {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->moveUp();
     }
 }
 
 void BoxesGroup::deselectAllBoxes() {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         removeBoxFromSelection(box);
     }
 }
 
 void BoxesGroup::selectAllBoxes() {
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         if(box->isSelected()) continue;
         addBoxToSelection(box);
     }
@@ -500,7 +511,7 @@ BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
 
 MovablePoint *BoxesGroup::getPointAt(QPointF absPos, CanvasMode currentMode) {
     MovablePoint *pointAtPos = NULL;
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         pointAtPos = box->getPointAt(absPos, currentMode);
         if(pointAtPos != NULL) {
             break;
@@ -520,7 +531,7 @@ void BoxesGroup::finishSelectedPointsTransform()
 
 void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 {
-    foreachBoxInList(mChildren) {
+    foreach(BoundingBox *box, mChildren) {
         if(box->isContainedIn(rect) ) {
             addBoxToSelection(box);
         }
@@ -530,7 +541,7 @@ void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 void BoxesGroup::finishSelectedBoxesTransform()
 {
     startNewUndoRedoSet();
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->finishTransform();
     }
     finishUndoRedoSet();
@@ -538,7 +549,7 @@ void BoxesGroup::finishSelectedBoxesTransform()
 
 void BoxesGroup::cancelSelectedBoxesTransform() {
     startNewUndoRedoSet();
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->cancelTransform();
     }
     finishUndoRedoSet();
@@ -570,16 +581,23 @@ void BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId) {
     }
 }
 
-int BoxesGroup::saveToQuery(int parentId)
+int BoxesGroup::saveToSql(int parentId)
 {
     QSqlQuery query;
-    int boundingBoxId = BoundingBox::saveToQuery(parentId);
+    int boundingBoxId = BoundingBox::saveToSql(parentId);
     query.exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
                 arg(boundingBoxId));
-    foreachBoxInList(mChildren) {
-        box->saveToQuery(boundingBoxId);
+    foreach(BoundingBox *box, mChildren) {
+        box->saveToSql(boundingBoxId);
     }
     return boundingBoxId;
+}
+
+void BoxesGroup::saveSelectedToSql()
+{
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->saveToSql(0);
+    }
 }
 
 void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
@@ -599,12 +617,12 @@ void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
 void BoxesGroup::moveSelectedBoxesBy(QPointF by, bool startTransform)
 {
     if(startTransform) {
-        foreachBoxInList(mSelectedBoxes) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->startTransform();
             box->moveBy(by);
         }
     } else {
-        foreachBoxInList(mSelectedBoxes) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
             box->moveBy(by);
         }
     }
@@ -612,7 +630,7 @@ void BoxesGroup::moveSelectedBoxesBy(QPointF by, bool startTransform)
 
 void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect)
 {
-    foreachBoxInList(mSelectedBoxes) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
         box->selectAndAddContainedPointsToList(absRect, &mSelectedPoints);
     }
 }
@@ -622,7 +640,7 @@ void BoxesGroup::updatePivotPosition() {
         if(mChildren.isEmpty()) return;
         QPointF posSum = QPointF(0.f, 0.f);
         int count = mChildren.length();
-        foreachBoxInList(mChildren) {
+        foreach(BoundingBox *box, mChildren) {
             posSum += box->getPivotAbsPos();
         }
         setPivotAbsPos(posSum/count, false, false);

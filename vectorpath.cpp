@@ -49,6 +49,8 @@ VectorPath::VectorPath(int boundingBoxId,
         int fillSettingsId = query.value(idfillsettingsid).toInt();
         int strokeSettingsId = query.value(idstrokesettingsid).toInt();
 
+        loadPointsFromSql(vectorPathId);
+
         mFillGradientPoints.initialize(this,
                                QPointF(fillGradientStartX, fillGradientStartY),
                                QPointF(fillGradientEndX, fillGradientEndY));
@@ -62,15 +64,12 @@ VectorPath::VectorPath(int boundingBoxId,
         mFillPaintSettings = PaintSettings(fillSettingsId, gradientWidget);
         mStrokeSettings = StrokeSettings::createStrokeSettingsFromSql(
                     strokeSettingsId, gradientWidget);
-
-        loadPointsFromSql(vectorPathId);
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }
 }
 
 void VectorPath::loadPointsFromSql(int vectorPathId) {
-    qDebug() << "loading points";
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM pathpoint WHERE vectorpathid = %1 "
                                "ORDER BY id ASC").arg(vectorPathId);
@@ -101,9 +100,9 @@ void VectorPath::loadPointsFromSql(int vectorPathId) {
             appendToPointsList(newPoint, false);
             if(lastPoint != NULL) {
                 if(isfirst && firstPoint != NULL) {
-                    lastPoint->setPointAsNext(firstPoint);
+                    lastPoint->setPointAsNext(firstPoint, false);
                 } else if(!isfirst) {
-                    lastPoint->setPointAsNext(newPoint);
+                    lastPoint->setPointAsNext(newPoint, false);
                 }
             }
             if(isfirst) {
@@ -117,18 +116,94 @@ void VectorPath::loadPointsFromSql(int vectorPathId) {
             lastPoint = newPoint;
         }
         if(lastPoint != NULL && firstPoint != NULL) {
-            lastPoint->setPointAsNext(firstPoint);
+            lastPoint->setPointAsNext(firstPoint, false);
         }
     } else {
         qDebug() << "Could not load points for vectorpath with id " << vectorPathId;
     }
 }
 
-VectorPath::~VectorPath()
+void VectorPath::clearAll()
 {
     foreach(PathPoint *point, mPoints) {
+        point->clearAll();
         delete point;
     }
+    mStrokeGradientPoints.clearAll();
+    mFillGradientPoints.clearAll();
+}
+
+qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
+    QPointF dPoint = point1 - point2;
+    return sqrt(dPoint.x()*dPoint.x() + dPoint.y()*dPoint.y());
+}
+
+qreal VectorPath::findPercentForPoint(QPointF point,
+                                      qreal minPercent, qreal maxPercent) {
+    qreal smallestStep = 0.00001f;
+    QPointF nearestPoint;
+    qreal smallestDist = 1000000.f;
+    qreal nearestPercent = minPercent;
+    qreal percentStep = (maxPercent - minPercent)*0.01f;
+    if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5f;
+    qreal currPercent = minPercent;
+    for(int i = 0; i < 100; i++) {
+        QPointF testPoint = mMappedPath.pointAtPercent(currPercent);
+        qreal dist = distBetweenTwoPoints(testPoint, point);
+        if(dist < smallestDist) {
+            smallestDist = dist;
+            nearestPoint = testPoint;
+            nearestPercent = currPercent;
+        }
+        currPercent += percentStep;
+    }
+    return findPercentForPoint(point, nearestPercent - percentStep,
+                               nearestPercent + percentStep);
+}
+
+PathPoint *VectorPath::findPointNearestToPercent(qreal percent,
+                                                 qreal *foundAtPercent) {
+    PathPoint *nearestPoint = mPoints.first();
+    qreal nearestPointPercent = 100.f;
+    foreach(PathPoint *point, mPoints) {
+        qreal pointPercent = findPercentForPoint(point->getAbsolutePos());
+        if(qAbs(pointPercent - percent) < qAbs(nearestPointPercent - percent)) {
+            nearestPointPercent = pointPercent;
+            nearestPoint = point;
+        }
+    }
+    *foundAtPercent = nearestPointPercent;
+    return nearestPoint;
+}
+
+PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
+{
+    qreal maxDist = 14.f;
+    if(!mMappedPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
+                                     QSizeF(maxDist*2, maxDist*2))) ) {
+        return NULL;
+    }
+    startNewUndoRedoSet();
+
+    qreal nearestPercent = findPercentForPoint(absPos);
+    QPointF nearestPtOnPath = mMappedPath.pointAtPercent(nearestPercent);
+    qreal nearestPtPercent;
+    PathPoint *nearestPoint = findPointNearestToPercent(nearestPercent,
+                                                        &nearestPtPercent);
+    PathPoint *newPoint = new PathPoint(nearestPtOnPath, this);
+    if(nearestPtPercent > nearestPercent) {
+        PathPoint *prevPoint = nearestPoint->getPreviousPoint();
+        nearestPoint->setPointAsPrevious(newPoint);
+        prevPoint->setPointAsNext(newPoint);
+    } else {
+        PathPoint *nextPoint = nearestPoint->getNextPoint();
+        nearestPoint->setPointAsNext(newPoint);
+        nextPoint->setPointAsPrevious(newPoint);
+    }
+    appendToPointsList(newPoint);
+
+    finishUndoRedoSet();
+    return newPoint;
 }
 
 void VectorPath::updatePivotPosition() {
@@ -273,8 +348,8 @@ void VectorPath::updateAfterCombinedTransformationChanged()
 }
 
 void VectorPath::updateOutlinePath() {
-    mStrokeSettings.setStrokerSettings(&mPathStroker, getCurrentCanvasScale());
-    mOutlinePath = mPathStroker.createStroke(mMappedPath);
+    mStrokeSettings.setStrokerSettings(&mPathStroker);
+    mOutlinePath = mCombinedTransformMatrix.map(mPathStroker.createStroke(mPath));
     updateWholePath();
 }
 
@@ -547,18 +622,18 @@ void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
     finishUndoRedoSet();
 }
 #include <QSqlError>
-int VectorPath::saveToQuery(int parentId)
+int VectorPath::saveToSql(int parentId)
 {
     QSqlQuery query;
-    int boundingBoxId = BoundingBox::saveToQuery(parentId);
+    int boundingBoxId = BoundingBox::saveToSql(parentId);
     QPointF fillStartPt = mFillGradientPoints.startPoint->getRelativePos();
     QPointF fillEndPt = mFillGradientPoints.endPoint->getRelativePos();
     QPointF strokeStartPt = mStrokeGradientPoints.startPoint->getRelativePos();
     QPointF strokeEndPt = mStrokeGradientPoints.endPoint->getRelativePos();
 
 
-    int fillSettingsId = mFillPaintSettings.saveToQuery();
-    int strokeSettingsId = mStrokeSettings.saveToQuery();
+    int fillSettingsId = mFillPaintSettings.saveToSql();
+    int strokeSettingsId = mStrokeSettings.saveToSql();
     query.exec(QString("INSERT INTO vectorpath (fillgradientstartx, fillgradientstarty, fillgradientendx, fillgradientendy, "
                         "strokegradientstartx, strokegradientstarty, strokegradientendx, strokegradientendy, "
                         "boundingboxid, fillsettingsid, strokesettingsid) "
@@ -576,7 +651,7 @@ int VectorPath::saveToQuery(int parentId)
                         arg(strokeSettingsId) );
     int vectorPathId = query.lastInsertId().toInt();
     foreach(PathPoint *point, mSeparatePaths) {
-        point->saveToQuery(vectorPathId);
+        point->saveToSql(vectorPathId);
     }
 
     return boundingBoxId;
@@ -595,6 +670,12 @@ void GradientPoints::initialize(VectorPath *parentT,
     startPoint = new GradientPoint(startPt, parent);
     endPoint = new GradientPoint(endPt, parent);
     enabled = false;
+}
+
+void GradientPoints::clearAll()
+{
+    delete startPoint;
+    delete endPoint;
 }
 
 void GradientPoints::enable()

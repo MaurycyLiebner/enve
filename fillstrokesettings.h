@@ -39,7 +39,9 @@ public:
     Gradient(int sqlIdT,
              GradientWidget *gradientWidget, MainWindow *parent);
 
-    int saveToQuery();
+    int saveToSql();
+
+    void saveToSqlIfPathSelected();
 
     void swapColors(int id1, int id2);
 
@@ -88,7 +90,7 @@ public:
 
     PaintSettings(int sqlId, GradientWidget *gradientWidget);
 
-    virtual int saveToQuery();
+    virtual int saveToSql();
 
     Color color;
     PaintType paintType = FLATPAINT;
@@ -104,7 +106,7 @@ public:
                    PaintType paintTypeT,
                    Gradient *gradientT = NULL);
 
-    int saveToQuery();
+    int saveToSql();
 
     void setLineWidth(qreal newWidth);
 
@@ -118,7 +120,7 @@ public:
 
     Qt::PenJoinStyle joinStyle();
 
-    void setStrokerSettings(QPainterPathStroker *stroker, qreal scale);
+    void setStrokerSettings(QPainterPathStroker *stroker);
     StrokeSettings(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
     static StrokeSettings createStrokeSettingsFromSql(int strokeSqlId,
                                               GradientWidget *gradientWidget);
@@ -147,6 +149,9 @@ public:
     void saveGradientsToQuery();
     void loadAllGradientsFromSql();
     GradientWidget *getGradientWidget();
+
+    void clearAll();
+    void saveGradientsToSqlIfPathSelected();
 signals:
     void fillSettingsChanged(PaintSettings, bool);
     void strokeSettingsChanged(StrokeSettings, bool);

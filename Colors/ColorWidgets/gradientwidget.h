@@ -31,6 +31,8 @@ public:
     void saveGradientsToQuery();
     Gradient *getGradientBySqlId(int id);
     void loadAllGradientsFromSql();
+    void clearAll();
+    void saveGradientsToSqlIfPathSelected();
 signals:
     void selectedColorChanged(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
     void currentGradientChanged(Gradient *gradient);

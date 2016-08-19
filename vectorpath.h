@@ -23,6 +23,8 @@ public:
     void initialize(VectorPath *parentT, QPointF startPt = QPointF(0.f, 0.f),
                     QPointF endPt = QPointF(100.f, 100.f));
 
+    void clearAll();
+
     void enable();
 
     void disable();
@@ -50,7 +52,6 @@ class VectorPath : public BoundingBox
 public:
     VectorPath(BoxesGroup *group);
     VectorPath(int boundingBoxId, BoundingBox *parent);
-    ~VectorPath();
 
     virtual QRectF getBoundingRect();
     void draw(QPainter *p);
@@ -94,8 +95,15 @@ public:
     PathPoint *addPointRelPos(QPointF relPos,
                               QPointF startRelPos, QPointF endRelPos,
                               PathPoint *toPoint = NULL);
-    int saveToQuery(int parentId);
+    int saveToSql(int parentId);
 
+    void clearAll();
+
+    PathPoint *createNewPointOnLineNear(QPointF absPos);
+    qreal percentAtPoint(QPointF absPos, qreal distTolerance,
+                         qreal maxPercent, qreal minPercent,
+                         bool *found = NULL, QPointF *posInPath = NULL);
+    PathPoint *findPointNearestToPercent(qreal percent, qreal *foundAtPercent);
 private:
     void loadPointsFromSql(int vectorPathId);
 
@@ -128,6 +136,8 @@ private:
     QPainterPath mMappedWhole;
     void updateOutlinePath();
     void updateWholePath();
+    qreal findPercentForPoint(QPointF point, qreal minPercent = 0.f,
+                              qreal maxPercent = 1.f);
 protected:
     void updateAfterTransformationChanged();
     void updateAfterCombinedTransformationChanged();

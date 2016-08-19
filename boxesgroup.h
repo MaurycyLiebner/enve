@@ -9,8 +9,6 @@
 #define foreachBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
     for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
 
-#define foreachBoxInList(boxesList) foreach(BoundingBox *box, (boxesList))
-
 class MainWindow;
 
 class BoxesGroup : public BoundingBox
@@ -93,8 +91,10 @@ public:
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
 
-    int saveToQuery(int parentId);
+    int saveToSql(int parentId);
     void loadChildrenFromSql(QString thisBoundingBoxId);
+    PathPoint *createNewPointOnLineNearSelected(QPointF absPos);
+    void saveSelectedToSql();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

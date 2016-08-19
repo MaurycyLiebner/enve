@@ -34,6 +34,18 @@ void GradientWidget::newGradient(int fromGradientId)
     repaint();
 }
 
+void GradientWidget::clearAll() {
+    foreach(Gradient *gradient, mGradients) {
+        delete gradient;
+    }
+    mGradients.clear();
+
+    mCurrentGradient = NULL;
+    mCenterGradientId = 1;
+    mCurrentColorId = 0;
+    repaint();
+}
+
 void GradientWidget::removeGradient(int gradientId)
 {
     Gradient *toRemove = mGradients.at(gradientId);
@@ -51,7 +63,13 @@ void GradientWidget::removeGradient(int gradientId)
 
 void GradientWidget::saveGradientsToQuery() {
     foreach(Gradient *gradient, mGradients) {
-        gradient->saveToQuery();
+        gradient->saveToSql();
+    }
+}
+
+void GradientWidget::saveGradientsToSqlIfPathSelected() {
+    foreach(Gradient *gradient, mGradients) {
+        gradient->saveToSqlIfPathSelected();
     }
 }
 

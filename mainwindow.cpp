@@ -8,6 +8,8 @@
 #include "Colors/ColorWidgets/colorsettingswidget.h"
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
+#include <QMenuBar>
+#include <QFileDialog>
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -17,10 +19,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    mUndoRedoStack.setWindow(this);
+    setCurrentPath("");
+    QSqlDatabase::addDatabase("QSQLITE");
     QApplication::instance()->installEventFilter((QObject*)this);
     setStyleSheet(
         "QMainWindow::separator {\
-            background: rgb(155, 155, 155);\
+            background: rgb(0, 0, 0);\
             width: 10px;\
             height: 10px;\
         }");
@@ -35,39 +40,74 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
 
     mToolBar = new QToolBar(this);
-    mActionConnectPoints = new QAction("CONNECT POINTS", this);
+    mActionConnectPoints = new QAction(
+                QIcon("pixmaps/icons/ink_node_join.png"),
+                "CONNECT POINTS", this);
     mToolBar->addAction(mActionConnectPoints);
     connect(mActionConnectPoints, SIGNAL(triggered(bool)),
             mCanvas, SLOT(connectPointsSlot()) );
 
-    mActionDisconnectPoints = new QAction("DISCONNECT POINTS", this);
+    mActionDisconnectPoints = new QAction(
+                QIcon("pixmaps/icons/ink_node_delete_segment.png"),
+                "DISCONNECT POINTS", this);
     mToolBar->addAction(mActionDisconnectPoints);
     connect(mActionDisconnectPoints, SIGNAL(triggered(bool)),
             mCanvas, SLOT(disconnectPointsSlot()) );
 
-    mActionMergePoints = new QAction("MERGE POINTS", this);
+    mActionMergePoints = new QAction(
+                QIcon("pixmaps/icons/ink_node_join.png"),
+                "MERGE POINTS", this);
     mToolBar->addAction(mActionMergePoints);
     connect(mActionMergePoints, SIGNAL(triggered(bool)),
             mCanvas, SLOT(mergePointsSlot()) );
 //
-    mActionSymmetricPointCtrls = new QAction("SYMMETRIC POINTS", this);
+    mActionSymmetricPointCtrls = new QAction(
+                QIcon("pixmaps/icons/ink_node_symmetric.png"),
+                "SYMMETRIC POINTS", this);
     mToolBar->addAction(mActionSymmetricPointCtrls);
     connect(mActionSymmetricPointCtrls, SIGNAL(triggered(bool)),
             mCanvas, SLOT(makePointCtrlsSymmetric()) );
 
-    mActionSmoothPointCtrls = new QAction("SMOOTH POINTS", this);
+    mActionSmoothPointCtrls = new QAction(
+                QIcon("pixmaps/icons/ink_node_smooth.png"),
+                "SMOOTH POINTS", this);
     mToolBar->addAction(mActionSmoothPointCtrls);
     connect(mActionSmoothPointCtrls, SIGNAL(triggered(bool)),
             mCanvas, SLOT(makePointCtrlsSmooth()) );
 
-    mActionCornerPointCtrls = new QAction("CORNER POINTS", this);
+    mActionCornerPointCtrls = new QAction(
+                QIcon("pixmaps/icons/ink_node_cusp.png"),
+                "CORNER POINTS", this);
     mToolBar->addAction(mActionCornerPointCtrls);
     connect(mActionCornerPointCtrls, SIGNAL(triggered(bool)),
             mCanvas, SLOT(makePointCtrlsCorner()) );
 //
     addToolBar(mToolBar);
 
+
+//
+    mMenuBar = new QMenuBar(this);
+
+    mFileMenu = mMenuBar->addMenu("File");
+    mFileMenu->addAction("Open...", this, SLOT(openFile()));
+    mFileMenu->addAction("Import...", this, SLOT(importFile()));
+    mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
+    mFileMenu->addAction("Revert", this, SLOT(revert()));
+    mFileMenu->addSeparator();
+    mFileMenu->addAction("Save", this, SLOT(saveFile()));
+    mFileMenu->addAction("Save As...", this, SLOT(saveFileAs()));
+    mFileMenu->addAction("Save Backup", this, SLOT(saveBackup()));
+    mFileMenu->addSeparator();
+    mFileMenu->addAction("Close", this, SLOT(closeProject()));
+    mFileMenu->addSeparator();
+    mFileMenu->addAction("Exit", this, SLOT(exitProgram()));
+
+    setMenuBar(mMenuBar);
+//
+
     setCentralWidget(mCanvas);
+
+    showMaximized();
 }
 
 MainWindow::~MainWindow()
@@ -78,6 +118,12 @@ MainWindow::~MainWindow()
 UndoRedoStack *MainWindow::getUndoRedoStack()
 {
     return &mUndoRedoStack;
+}
+
+void MainWindow::setFileChangedSinceSaving(bool changed) {
+    if(changed == mChangedSinceSaving) return;
+    mChangedSinceSaving = changed;
+    updateTitle();
 }
 
 void MainWindow::addUpdateScheduler(UpdateScheduler *scheduler)
@@ -115,8 +161,19 @@ Canvas *MainWindow::getCanvas()
     return mCanvas;
 }
 
+void MainWindow::disableEventFilter() {
+    mEventFilterDisabled = true;
+}
+
+void MainWindow::enableEventFilter() {
+    mEventFilterDisabled = false;
+}
+
 bool MainWindow::eventFilter(QObject *, QEvent *e)
 {
+    if(mEventFilterDisabled) {
+        return false;
+    }
     if (e->type() == QEvent::KeyPress)
     {
         QKeyEvent *key_event = (QKeyEvent*)e;
@@ -139,11 +196,11 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
             mUndoRedoStack.undo();
         }
     } else if(isCtrlPressed() && event->key() == Qt::Key_S) {
-        saveToFile("test.av");
+        saveFile();
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
-        loadFile("test.av");
+        openFile();
     } else {
-        returnBool = mCanvas->processKeyEvent(event);
+        returnBool = mCanvas->processFilteredKeyEvent(event);
     }
     mCanvas->schedulePivotUpdate();
 
@@ -151,12 +208,149 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     return returnBool;
 }
 
-void MainWindow::loadFile(QString path) {
+void MainWindow::clearAll() {
+    foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
+        delete sheduler;
+    }
+    mUpdateSchedulers.clear();
+
+    mUndoRedoStack.clearAll();
+    mCanvas->clearAll();
+    mFillStrokeSettings->clearAll();
+}
+
+void MainWindow::exportSelected(QString path) {
+    setDisabled(true);
+
+    QFile file(path);
+    if(file.exists()) {
+        file.remove();
+    }
+
+    QSqlDatabase db = QSqlDatabase::database();
+    db.setDatabaseName(path);
+    db.open();
+
+    createTablesInSaveDatabase();
+
+    mFillStrokeSettings->saveGradientsToSqlIfPathSelected();
+    mCanvas->saveSelectedToSqlForCurrentBox();
+
+    db.close();
+
+    setEnabled(true);
+}
+
+void MainWindow::setCurrentPath(QString newPath) {
+    mCurrentFilePath = newPath;
+    updateTitle();
+}
+
+void MainWindow::updateTitle() {
+    QString star = "";
+    if(mChangedSinceSaving) star = "*";
+    setWindowTitle(mCurrentFilePath.split("/").last() + star + " - AniVect");
+}
+
+void MainWindow::openFile()
+{
+    disableEventFilter();
+    QString openPath = QFileDialog::getOpenFileName(this,
+        "Open File", "", "AniVect Files (*.av)");
+    enableEventFilter();
+    if(!openPath.isEmpty()) {
+        setCurrentPath(openPath);
+        loadFile(mCurrentFilePath);
+    }
+    setFileChangedSinceSaving(false);
+}
+
+void MainWindow::saveFile()
+{
+    if(mCurrentFilePath.isEmpty()) {
+        saveFileAs();
+        return;
+    }
+    saveToFile(mCurrentFilePath);
+    setFileChangedSinceSaving(false);
+}
+
+void MainWindow::saveFileAs()
+{
+    disableEventFilter();
+    QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
+                               "untitled.av",
+                               "AniVect Files (*.av)");
+    enableEventFilter();
+    if(!saveAs.isEmpty()) {
+        setCurrentPath(saveAs);
+        saveToFile(mCurrentFilePath);
+    }
+    setFileChangedSinceSaving(false);
+}
+
+void MainWindow::saveBackup()
+{
+    QString backupPath = "backup/backup_%1.av";
+    int id = 1;
+    QFile backupFile(backupPath.arg(id));
+    while(backupFile.exists()) {
+        id++;
+        backupFile.setFileName(backupPath.arg(id) );
+    }
+    saveToFile(backupPath.arg(id));
+}
+
+void MainWindow::closeProject()
+{
+    setCurrentPath("");
+    clearAll();
+    setFileChangedSinceSaving(false);
+}
+
+void MainWindow::exitProgram()
+{
+    close();
+}
+
+void MainWindow::importFile()
+{
+    disableEventFilter();
+    QString importPath = QFileDialog::getOpenFileName(this,
+        "Open File", "", "AniVect Files (*.av)");
+    enableEventFilter();
+    if(!importPath.isEmpty()) {
+        importFile(importPath);
+    }
+}
+
+void MainWindow::exportSelected()
+{
+    disableEventFilter();
+    QString saveAs = QFileDialog::getSaveFileName(this, "Export Selected",
+                               "untitled.av",
+                               "AniVect Files (*.av)");
+    enableEventFilter();
+    if(!saveAs.isEmpty()) {
+        exportSelected(saveAs);
+    }
+}
+
+void MainWindow::revert()
+{
+    loadFile(mCurrentFilePath);
+    setFileChangedSinceSaving(false);
+}
+
+void MainWindow::importFile(QString path) {
+    setDisabled(true);
+    mUndoRedoStack.startNewSet();
+
     QFile file(path);
     if(!file.exists()) {
         return;
     }
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");//not dbConnection
+    QSqlDatabase db = QSqlDatabase::database();//not dbConnection
     db.setDatabaseName(path);
     db.open();
 
@@ -164,16 +358,22 @@ void MainWindow::loadFile(QString path) {
     mCanvas->loadAllBoxesFromSql();
 
     db.close();
+    mUndoRedoStack.finishSet();
+    setEnabled(true);
+    scheduleRepaint();
+    callUpdateSchedulers();
 }
 
-void MainWindow::saveToFile(QString path) {
-    QFile file(path);
-    if(file.exists()) {
-        file.remove();
-    }
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");//not dbConnection
-    db.setDatabaseName(path);
-    db.open();
+void MainWindow::loadFile(QString path) {
+    clearAll();
+
+    importFile(path);
+
+    mUndoRedoStack.clearAll();
+    setFileChangedSinceSaving(false);
+}
+
+void MainWindow::createTablesInSaveDatabase() {
     QSqlQuery query;
     query.exec("CREATE TABLE color "
                "(id INTEGER PRIMARY KEY, "
@@ -215,6 +415,7 @@ void MainWindow::saveToFile(QString path) {
                "dy_trans REAL, "
                "pivotx REAL, "
                "pivoty REAL, "
+               "pivotchanged BOOLEAN, "
                "parentboundingboxid INTEGER, "
                "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
     query.exec("CREATE TABLE boxesgroup "
@@ -249,13 +450,24 @@ void MainWindow::saveToFile(QString path) {
                "endctrlptrely REAL, "
                "vectorpathid INTEGER, "
                "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id) )");
+}
+
+void MainWindow::saveToFile(QString path) {
+    setDisabled(true);
+    QFile file(path);
+    if(file.exists()) {
+        file.remove();
+    }
+
+    QSqlDatabase db = QSqlDatabase::database();
+    db.setDatabaseName(path);
+    db.open();
+
+    createTablesInSaveDatabase();
+
     mFillStrokeSettings->saveGradientsToQuery();
-    mCanvas->saveToQuery();
-    /*query.exec("INSERT INTO color (hue, saturation, value, alpha) VALUES (0.1, 0.2, 0.3, 0.4)");
-    int id = query.lastInsertId().toInt();
-    qDebug() << id;
-    query.exec(QString("INSERT INTO color (hue, saturation, value, alpha) VALUES (%1, 0.4, 0.1, 0.2)").arg(0.1121212f, 0, 'f'));
-    id = query.lastInsertId().toInt();
-    qDebug() << id;*/
+    mCanvas->saveToSql();
     db.close();
+
+    setEnabled(true);
 }

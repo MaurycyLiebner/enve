@@ -106,6 +106,25 @@ bool PathPivot::handleMouseRelease()
     return false;
 }
 
+qreal signedSquare(qreal val) {
+    int mult;
+    if(val > 0.f) {
+        mult = 1;
+    } else {
+        mult = -1;
+    }
+    return val*val*mult;
+}
+
+qreal distSign(QPointF distPt) {
+    qreal val = signedSquare(distPt.x()) + signedSquare(distPt.y() );
+    if(val > 0.f) {
+        return sqrt(val);
+    } else {
+        return -sqrt(-val);
+    }
+}
+
 bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF moveBy,
                                 QPointF pressPos, bool startTransform)
 {
@@ -123,7 +142,7 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF moveBy,
     } else if(mScaling) {
         QPointF absPos = getAbsolutePos();
         QPointF distMoved = moveDestAbs - pressPos;
-        qreal scaleBy = 1.f + (distMoved.x() + distMoved.y())*0.01f;
+        qreal scaleBy = 1.f + distSign(distMoved)*0.005f;
         if(scaleBy < 0.f) scaleBy = 0.f;
         mCanvas->scaleBoxesBy(scaleBy, absPos, startTransform);
         return true;

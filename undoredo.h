@@ -68,6 +68,8 @@ public:
         mNumberOfSets++;
     }
 
+    void setWindow(MainWindow *mainWindow);
+
     void finishSet() {
         mNumberOfSets--;
         if(mNumberOfSets == 0) {
@@ -94,6 +96,13 @@ public:
         mRedoStack.clear();
     }
 
+    void clearUndoStack() {
+        foreach (UndoRedo *undoStackItem, mUndoStack) {
+            delete undoStackItem;
+        }
+        mUndoStack.clear();
+    }
+
     void emptySomeOfUndo() {
         if(mUndoStack.length() > 150) {
             for(int i = 0; i < 50; i++) {
@@ -102,15 +111,12 @@ public:
         }
     }
 
-    void addUndoRedo(UndoRedo *undoRedo) {
-        if(mNumberOfSets != 0) {
-            addToSet(undoRedo);
-        } else {
-            clearRedoStack();
-            emptySomeOfUndo();
-            mUndoStack << undoRedo;
-        }
+    void clearAll() {
+        clearRedoStack();
+        clearUndoStack();
     }
+
+    void addUndoRedo(UndoRedo *undoRedo);
 
     void redo() {
         if(mRedoStack.isEmpty()) {
@@ -132,6 +138,7 @@ public:
     }
 
 private:
+    MainWindow *mMainWindow;
     int mNumberOfSets = 0;
     UndoRedoSet *mCurrentSet;
     QList<UndoRedo*> mUndoStack;

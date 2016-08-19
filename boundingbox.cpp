@@ -31,6 +31,7 @@ BoundingBox::BoundingBox(int boundingBoxId,
         int idDy = query.record().indexOf("dy_trans");
         int idPivotx = query.record().indexOf("pivotx");
         int idPivoty = query.record().indexOf("pivoty");
+        int idPivotChanged = query.record().indexOf("pivotchanged");
         qreal m11 = query.value(idM11).toReal();
         qreal m12 = query.value(idM12).toReal();
         qreal m21 = query.value(idM21).toReal();
@@ -39,9 +40,11 @@ BoundingBox::BoundingBox(int boundingBoxId,
         qreal dy = query.value(idDy).toReal();
         qreal pivotX = query.value(idPivotx).toReal();
         qreal pivotY = query.value(idPivoty).toReal();
+        bool pivotChanged = query.value(idPivotChanged).toBool();
         mTransformMatrix.setMatrix(m11, m12, m21, m22, dx, dy);
         mRelRotPivotPos.setX(pivotX);
         mRelRotPivotPos.setY(pivotY);
+        mPivotChanged = pivotChanged;
     } else {
         qDebug() << "Could not load boundingbox with id " << boundingBoxId;
     }
@@ -71,6 +74,10 @@ BoundingBox *BoundingBox::getParent()
 bool BoundingBox::isGroup()
 {
     return mType == TYPE_GROUP;
+}
+
+bool BoundingBox::isPath() {
+    return mType == TYPE_VECTOR_PATH;
 }
 
 void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo, bool pivotChanged) {
@@ -304,22 +311,31 @@ void BoundingBox::scaleTopLeft(qreal scaleBy)
     scaleFromSaved(scaleBy, scaleBy, absOrigin);
 }
 
-void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
+void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF relOrigin)
 {
-    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
-
     mTransformMatrix = mSavedTransformMatrix;
-    mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
+    mTransformMatrix.translate(-relOrigin.x(), -relOrigin.y());
     mTransformMatrix.scale(scaleXBy, scaleYBy);
-    mTransformMatrix.translate(transPoint.x(), transPoint.y());
+    mTransformMatrix.translate(relOrigin.x(), relOrigin.y());
     updateCombinedTransform();
 }
 
-int BoundingBox::saveToQuery(int parentId)
+void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy)
+{
+    mTransformMatrix = mSavedTransformMatrix;
+    mTransformMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    mTransformMatrix.scale(scaleXBy, scaleYBy);
+    mTransformMatrix.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    updateCombinedTransform();
+}
+
+int BoundingBox::saveToSql(int parentId)
 {
     QSqlQuery query;
-    query.exec(QString("INSERT INTO boundingbox (boxtype, m11_trans, m12_trans, m21_trans, m22_trans, dx_trans, dy_trans, pivotx, pivoty, parentboundingboxid) "
-               "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10)").
+    QString pivotChanged = (mPivotChanged) ? "1" : "0";
+    query.exec(QString("INSERT INTO boundingbox (boxtype, m11_trans, m12_trans, "
+                       "m21_trans, m22_trans, dx_trans, dy_trans, pivotx, pivoty, pivotchanged, parentboundingboxid) "
+               "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11)").
                 arg(mType).
                 arg(mTransformMatrix.m11(), 0, 'f').
                 arg(mTransformMatrix.m12(), 0, 'f').
@@ -329,9 +345,19 @@ int BoundingBox::saveToQuery(int parentId)
                 arg(mTransformMatrix.dy(), 0, 'f').
                 arg(mRelRotPivotPos.x(), 0, 'f').
                 arg(mRelRotPivotPos.y(), 0, 'f').
+                arg(pivotChanged).
                 arg( (parentId == 0) ? "NULL" : QString::number(parentId) )
                 );
     return query.lastInsertId().toInt();
+}
+
+void BoundingBox::clearAll()
+{
+    foreach(BoundingBox *box, mChildren) {
+        box->clearAll();
+        delete box;
+    }
+    mChildren.clear();
 }
 
 void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
@@ -364,6 +390,10 @@ void BoundingBox::moveBy(QPointF trans)
     schedulePivotUpdate();
 }
 
+void BoundingBox::saveTransformPivot(QPointF absPivot) {
+    mSavedTransformPivot = -getCombinedTransform().inverted().map(absPivot);
+}
+
 void BoundingBox::startTransform()
 {
     mSavedTransformMatrix = mTransformMatrix;
@@ -386,27 +416,27 @@ void BoundingBox::addChild(BoundingBox *child)
     startNewUndoRedoSet();
     child->setParent(this);
     addChildToListAt(mChildren.count(), child);
-    updateChildrenId(mChildren.count() - 1);
     finishUndoRedoSet();
 }
 
 void BoundingBox::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
     mChildren.insert(index, child);
+    updateChildrenId(index, saveUndoRedo);
     if(saveUndoRedo) {
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
 }
 
-void BoundingBox::updateChildrenId(int firstId) {
-    updateChildrenId(firstId, mChildren.length() - 1);
+void BoundingBox::updateChildrenId(int firstId, bool saveUndoRedo) {
+    updateChildrenId(firstId, mChildren.length() - 1, saveUndoRedo);
 }
 
-void BoundingBox::updateChildrenId(int firstId, int lastId) {
-    startNewUndoRedoSet();
+void BoundingBox::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
+    if(saveUndoRedo) startNewUndoRedoSet();
     for(int i = firstId; i <= lastId; i++) {
-        mChildren.at(i)->setZListIndex(i);
+        mChildren.at(i)->setZListIndex(i, saveUndoRedo);
     }
-    finishUndoRedoSet();
+    if(saveUndoRedo) finishUndoRedoSet();
 }
 
 void BoundingBox::removeChildFromList(int id, bool saveUndoRedo) {
@@ -414,6 +444,7 @@ void BoundingBox::removeChildFromList(int id, bool saveUndoRedo) {
         addUndoRedo(new RemoveChildFromListUndoRedo(this, id, mChildren.at(id)) );
     }
     mChildren.removeAt(id);
+    updateChildrenId(id, saveUndoRedo);
 }
 
 void BoundingBox::removeChild(BoundingBox *child)
@@ -424,7 +455,6 @@ void BoundingBox::removeChild(BoundingBox *child)
     }
     startNewUndoRedoSet();
     removeChildFromList(index);
-    updateChildrenId(index);
     child->setParent(NULL); // called to update
     finishUndoRedoSet();
 }
@@ -457,7 +487,6 @@ void BoundingBox::increaseChildZInList(BoundingBox *child)
     }
     startNewUndoRedoSet();
     moveChildInList(index, index + 1);
-    updateChildrenId(index);
     finishUndoRedoSet();
 }
 
@@ -469,7 +498,6 @@ void BoundingBox::decreaseChildZInList(BoundingBox *child)
     }
     startNewUndoRedoSet();
     moveChildInList(index, index - 1);
-    updateChildrenId(index - 1);
     finishUndoRedoSet();
 }
 
@@ -481,7 +509,6 @@ void BoundingBox::bringChildToEndList(BoundingBox *child)
     }
     startNewUndoRedoSet();
     moveChildInList(index, mChildren.length() - 1);
-    updateChildrenId(index);
     finishUndoRedoSet();
 }
 
@@ -493,12 +520,12 @@ void BoundingBox::bringChildToFrontList(BoundingBox *child)
     }
     startNewUndoRedoSet();
     moveChildInList(index, 0);
-    updateChildrenId(0, index);
     finishUndoRedoSet();
 }
 
 void BoundingBox::moveChildInList(int from, int to, bool saveUndoRedo) {
     mChildren.move(from, to);
+    updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
     if(saveUndoRedo) {
         addUndoRedo(new MoveChildInListUndoRedo(from, to, this) );
     }

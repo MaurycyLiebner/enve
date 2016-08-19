@@ -41,7 +41,7 @@ struct Color
         gl_a = a_t;
         qcol.setAlpha(a_t);
     }*/
-    int saveToQuery();
+    int saveToSql();
 
     void updateHSVFromRGB();
     void updateQColFromHSV();

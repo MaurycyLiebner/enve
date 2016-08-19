@@ -44,8 +44,8 @@ public:
 
     bool isEndPoint();
 
-    void setPointAsPrevious(PathPoint *pointToSet);
-    void setPointAsNext(PathPoint *pointToSet);
+    void setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo = true);
+    void setPointAsNext(PathPoint *pointToSet, bool saveUndoRedo = true);
     void setNextPoint(PathPoint *mNextPoint, bool saveUndoRedo = true);
     void setPreviousPoint(PathPoint *mPreviousPoint, bool saveUndoRedo = true);
 
@@ -80,10 +80,12 @@ public:
     VectorPath *getParentPath();
     void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
 
-    void saveToQuery(int vectorPathId);
+    void saveToSql(int vectorPathId);
     PathPoint(qreal relPosX, qreal relPosy,
               qreal startCtrlRelX, qreal startCtrlRelY,
               qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, VectorPath *vectorPath);
+
+    void clearAll();
 private:
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;

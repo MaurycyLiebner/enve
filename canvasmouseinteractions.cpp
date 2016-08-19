@@ -83,11 +83,17 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             } // point adding mode
             else if (mCurrentMode == CanvasMode::MOVE_POINT) {
                 if (mLastPressedPoint == NULL) {
-                    if(!(isShiftPressed()) ) {
+                    if(isCtrlPressed() ) {
                         mCurrentBoxesGroup->clearPointsSelection();
+                        mLastPressedPoint = mCurrentBoxesGroup->
+                                createNewPointOnLineNearSelected(mLastPressPos);
+                    } else {
+                        if(!(isShiftPressed()) ) {
+                            mCurrentBoxesGroup->clearPointsSelection();
+                        }
+                        mSelecting = true;
+                        startSelectionAtPoint(mLastMouseEventPos);
                     }
-                    mSelecting = true;
-                    startSelectionAtPoint(mLastMouseEventPos);
                 } else {
                     if(mLastPressedPoint->isSelected()) {
                         return;

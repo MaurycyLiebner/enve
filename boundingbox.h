@@ -13,6 +13,8 @@ class UndoRedoStack;
 
 class MovablePoint;
 
+class PathPoint;
+
 enum CanvasMode : short;
 
 enum BoundingBoxType {
@@ -72,8 +74,8 @@ public:
     void bringChildToFrontList(BoundingBox *child);
 
     void setZListIndex(int z, bool saveUndoRedo = true);
-    void updateChildrenId(int firstId, int lastId);
-    void updateChildrenId(int firstId);
+    void updateChildrenId(int firstId, int lastId, bool saveUndoRedo = true);
+    void updateChildrenId(int firstId, bool saveUndoRedo = true);
     void moveChildInList(int from, int to, bool saveUndoRedo = true);
     virtual void removeChildFromList(int id, bool saveUndoRedo = true);
     virtual void addChildToListAt(int index,
@@ -134,9 +136,16 @@ public:
     void scaleTopRight(qreal scaleBy);
     void scaleTopLeft(qreal scaleBy);
     void cancelTransform();
-    void scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
+    void scaleFromSaved(qreal scaleXBy, qreal scaleYBy);
 
-    virtual int saveToQuery(int parentId);
+    virtual int saveToSql(int parentId);
+
+    virtual void clearAll();
+
+    virtual PathPoint *createNewPointOnLineNear(QPointF) { return NULL; }
+    bool isPath();
+    void saveTransformPivot(QPointF absPivot);
+    void scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF relOrigin);
 protected:
     virtual void updateAfterCombinedTransformationChanged();
 
@@ -145,7 +154,7 @@ protected:
     QList<BoundingBox*> mChildren;
     BoundingBox *mParent = NULL;
 
-    QPointF mSavedTransformAbsPos;
+    QPointF mSavedTransformPivot;
     QMatrix mSavedTransformMatrix;
 
     QMatrix mTransformMatrix;

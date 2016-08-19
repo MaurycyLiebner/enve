@@ -48,13 +48,13 @@ Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget, MainWindow *paren
     updateQGradientStops();
 }
 
-int Gradient::saveToQuery() {
+int Gradient::saveToSql() {
     QSqlQuery query;
     query.exec("INSERT INTO gradient DEFAULT VALUES");
     sqlId = query.lastInsertId().toInt();
     int posInGradient = 0;
     foreach(Color color, colors) {
-        int colorId = color.saveToQuery();
+        int colorId = color.saveToSql();
         query.exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
                             "VALUES (%1, %2, %3)").
                     arg(colorId).
@@ -63,6 +63,19 @@ int Gradient::saveToQuery() {
         posInGradient++;
     }
     return sqlId;
+}
+
+void Gradient::saveToSqlIfPathSelected() {
+    foreach(VectorPath *path, mAffectedPaths) {
+        BoundingBox *parent = (BoundingBox *) path;
+        while(parent != NULL) {
+            if(parent->isSelected()) {
+                saveToSql();
+                return;
+            }
+            parent = parent->getParent();
+        }
+    }
 }
 
 void Gradient::swapColors(int id1, int id2) {
@@ -179,9 +192,9 @@ PaintSettings::PaintSettings(int sqlId, GradientWidget *gradientWidget) {
     }
 }
 
-int PaintSettings::saveToQuery() {
+int PaintSettings::saveToSql() {
     QSqlQuery query;
-    int colorId = color.saveToQuery();
+    int colorId = color.saveToSql();
     QString gradientId = (gradient == NULL) ? "NULL" : QString::number(gradient->getSqlId());
     query.exec(QString("INSERT INTO paintsettings (painttype, colorid, gradientid) "
                         "VALUES (%1, %2, %3)").
@@ -235,9 +248,9 @@ StrokeSettings::StrokeSettings(int strokeSqlId, int paintSqlId,
     }
 }
 
-int StrokeSettings::saveToQuery() {
+int StrokeSettings::saveToSql() {
     QSqlQuery query;
-    int paintSettingsId = PaintSettings::saveToQuery();
+    int paintSettingsId = PaintSettings::saveToSql();
     query.exec(QString("INSERT INTO strokesettings (linewidth, capstyle, joinstyle, paintsettingsid) "
                         "VALUES (%1, %2, %3, %4)").
                 arg(mLineWidth, 0, 'f').
@@ -271,8 +284,8 @@ Qt::PenJoinStyle StrokeSettings::joinStyle() {
     return mJoinStyle;
 }
 
-void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker, qreal scale) {
-    stroker->setWidth(mLineWidth*scale);
+void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
+    stroker->setWidth(mLineWidth);
     stroker->setCapStyle(mCapStyle);
     stroker->setJoinStyle(mJoinStyle);
 }
@@ -375,6 +388,10 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     setJoinStyle(Qt::RoundJoin);
 }
 
+void FillStrokeSettingsWidget::saveGradientsToSqlIfPathSelected() {
+    mGradientWidget->saveGradientsToSqlIfPathSelected();
+}
+
 void FillStrokeSettingsWidget::setCurrentDisplayedSettings(PaintSettings *settings) {
     if(settings->paintType == GRADIENTPAINT) {
         mGradientWidget->setCurrentGradient(settings->gradient);
@@ -444,6 +461,11 @@ void FillStrokeSettingsWidget::loadAllGradientsFromSql() {
 
 GradientWidget *FillStrokeSettingsWidget::getGradientWidget() {
     return mGradientWidget;
+}
+
+void FillStrokeSettingsWidget::clearAll()
+{
+    mGradientWidget->clearAll();
 }
 
 void FillStrokeSettingsWidget::colorTypeSet(int id)

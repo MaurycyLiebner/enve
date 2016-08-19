@@ -29,11 +29,19 @@ private:
     QAction *mActionCornerPointCtrls;
 //
 
+    QString mCurrentFilePath = "";
+
+    QMenuBar *mMenuBar;
+    QMenu *mFileMenu;
+
     Canvas *mCanvas;
     UndoRedoStack mUndoRedoStack;
     QList<UpdateScheduler*> mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
+
+    bool mChangedSinceSaving = false;
+    bool mEventFilterDisabled = false;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -53,8 +61,25 @@ public:
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
     void loadFile(QString path);
+    void clearAll();
+    void importFile(QString path);
+    void exportSelected(QString path);
+    void setCurrentPath(QString newPath);
+    void createTablesInSaveDatabase();
+    void updateTitle();
+    void setFileChangedSinceSaving(bool changed);
+    void disableEventFilter();
+    void enableEventFilter();
 private slots:
-
+    void openFile();
+    void saveFile();
+    void saveFileAs();
+    void saveBackup();
+    void closeProject();
+    void exitProgram();
+    void importFile();
+    void exportSelected();
+    void revert();
 };
 
 #endif // MAINWINDOW_H

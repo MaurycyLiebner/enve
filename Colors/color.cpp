@@ -3,7 +3,7 @@
 #include <QDebug>
 
 
-int Color::saveToQuery()
+int Color::saveToSql()
 {
     QSqlQuery query;
     query.exec(QString("INSERT INTO color (hue, saturation, value, alpha) "
