@@ -51,7 +51,7 @@ class VectorPath : public BoundingBox
 {
 public:
     VectorPath(BoxesGroup *group);
-    VectorPath(int boundingBoxId, BoundingBox *parent);
+    VectorPath(int boundingBoxId, BoxesGroup *parent);
 
     virtual QRectF getBoundingRect();
     void draw(QPainter *p);

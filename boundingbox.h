@@ -23,12 +23,14 @@ enum BoundingBoxType {
     TYPE_CANVAS
 };
 
+class BoxesGroup;
+
 class BoundingBox : public ConnectedToMainWindow
 {
 public:
-    BoundingBox(BoundingBox *parent, BoundingBoxType type);
+    BoundingBox(BoxesGroup *parent, BoundingBoxType type);
     BoundingBox(MainWindow *window, BoundingBoxType type);
-    BoundingBox(int boundingBoxId, BoundingBox *parent,
+    BoundingBox(int boundingBoxId, BoxesGroup *parent,
                 BoundingBoxType type);
 
     virtual void updatePivotPosition() {}
@@ -57,8 +59,6 @@ public:
     void startTransform();
     void finishTransform();
 
-    virtual void addChild(BoundingBox *child);
-    virtual void removeChild(BoundingBox *child);
 
     virtual bool pointInsidePath(QPointF) { return false; }
     virtual MovablePoint *getPointAt(QPointF, CanvasMode) { return NULL; }
@@ -68,19 +68,7 @@ public:
     void bringToFront();
     void bringToEnd();
 
-    void increaseChildZInList(BoundingBox *child);
-    void decreaseChildZInList(BoundingBox *child);
-    void bringChildToEndList(BoundingBox *child);
-    void bringChildToFrontList(BoundingBox *child);
-
     void setZListIndex(int z, bool saveUndoRedo = true);
-    void updateChildrenId(int firstId, int lastId, bool saveUndoRedo = true);
-    void updateChildrenId(int firstId, bool saveUndoRedo = true);
-    void moveChildInList(int from, int to, bool saveUndoRedo = true);
-    virtual void removeChildFromList(int id, bool saveUndoRedo = true);
-    virtual void addChildToListAt(int index,
-                          BoundingBox *child,
-                          bool saveUndoRedo = true);
 
     virtual void selectAndAddContainedPointsToList
                             (QRectF,QList<MovablePoint*> *) {}
@@ -91,8 +79,8 @@ public:
     void deselect();
     int getZIndex();
     virtual void drawBoundingRect(QPainter *p);
-    void setParent(BoundingBox *parent, bool saveUndoRedo = true);
-    BoundingBox *getParent();
+    void setParent(BoxesGroup *parent, bool saveUndoRedo = true);
+    BoxesGroup *getParent();
 
     bool isGroup();
     virtual BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
@@ -140,7 +128,7 @@ public:
 
     virtual int saveToSql(int parentId);
 
-    virtual void clearAll();
+    virtual void clearAll() {}
 
     virtual PathPoint *createNewPointOnLineNear(QPointF) { return NULL; }
     bool isPath();
@@ -168,12 +156,11 @@ public:
     bool isLocked();
     bool isVisibleAndUnlocked();
 protected:
-    virtual void updateAfterCombinedTransformationChanged();
+    virtual void updateAfterCombinedTransformationChanged() {}
 
     bool mScheduledForRemove = false;
     BoundingBoxType mType;
-    QList<BoundingBox*> mChildren;
-    BoundingBox *mParent = NULL;
+    BoxesGroup *mParent = NULL;
 
     QPointF mSavedTransformPivot;
     QMatrix mSavedTransformMatrix;

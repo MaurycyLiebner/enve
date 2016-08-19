@@ -160,7 +160,7 @@ void Canvas::schedulePivotUpdate()
 
 void Canvas::clearAll() {
     setCurrentBoxesGroup(this);
-    BoundingBox::clearAll();
+    BoxesGroup::clearAll();
     resetTransormation();
 }
 

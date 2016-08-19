@@ -1,4 +1,5 @@
 #include "boxesgroup.h"
+#include "undoredo.h"
 #include <QApplication>
 
 bool zLessThan(BoundingBox *box1, BoundingBox *box2)
@@ -6,7 +7,7 @@ bool zLessThan(BoundingBox *box1, BoundingBox *box2)
     return box1->getZIndex() > box2->getZIndex();
 }
 
-BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox *parent) :
+BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_GROUP)
 {
     mFillStrokeSettingsWidget = fillStrokeSetting;
@@ -14,7 +15,7 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox 
 
 BoxesGroup::BoxesGroup(int boundingBoxId,
                        FillStrokeSettingsWidget *fillStrokeSetting,
-                       BoundingBox *parent) : BoundingBox(boundingBoxId,
+                       BoxesGroup *parent) : BoundingBox(boundingBoxId,
                                                           parent, TYPE_GROUP) {
     mFillStrokeSettingsWidget = fillStrokeSetting;
     loadChildrenFromSql(QString::number(boundingBoxId));
@@ -282,7 +283,7 @@ void BoxesGroup::ungroup() {
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
     foreachBoxInListInverted(mChildren) {
         box->applyTransformation(mTransformMatrix);
-        BoundingBox::removeChild(box);
+        removeChild(box);
         parentGroup->addChild(box);
     }
     mParent->removeChild(this);
@@ -326,21 +327,12 @@ void BoxesGroup::removeSelectedBoxesAndClearList()
     startNewUndoRedoSet();
 
     foreach(BoundingBox *box, mSelectedBoxes) {
-        BoundingBox::removeChild(box);
+        removeChild(box);
         box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
 
     finishUndoRedoSet();
-}
-
-void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
-{
-    BoundingBox *box = mChildren.at(id);
-    if(box->isSelected()) {
-        removeBoxFromSelection(box);
-    }
-    BoundingBox::removeChildFromList(id, saveUndoRedo);
 }
 
 void BoxesGroup::clearPointsSelection()
@@ -679,7 +671,7 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     startNewUndoRedoSet();
     BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
     foreachBoxInListInverted(mSelectedBoxes) {
-        BoundingBox::removeChild(box);
+        removeChild(box);
         box->deselect();
         newGroup->addChild(box);
     }
@@ -687,4 +679,127 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     mSelectedBoxes.clear(); schedulePivotUpdate();
     finishUndoRedoSet();
     return newGroup;
+}
+
+void BoxesGroup::addChild(BoundingBox *child)
+{
+    startNewUndoRedoSet();
+    child->setParent(this);
+    addChildToListAt(mChildren.count(), child);
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
+    mChildren.insert(index, child);
+    updateChildrenId(index, saveUndoRedo);
+    if(saveUndoRedo) {
+        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
+    }
+}
+
+void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
+    updateChildrenId(firstId, mChildren.length() - 1, saveUndoRedo);
+}
+
+void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
+    if(saveUndoRedo) startNewUndoRedoSet();
+    for(int i = firstId; i <= lastId; i++) {
+        mChildren.at(i)->setZListIndex(i, saveUndoRedo);
+    }
+    if(saveUndoRedo) finishUndoRedoSet();
+    scheduleBoxesListRepaint();
+}
+
+void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
+{
+    BoundingBox *box = mChildren.at(id);
+    if(box->isSelected()) {
+        removeBoxFromSelection(box);
+    }
+    if(saveUndoRedo) {
+        addUndoRedo(new RemoveChildFromListUndoRedo(this, id, mChildren.at(id)) );
+    }
+    mChildren.removeAt(id);
+    updateChildrenId(id, saveUndoRedo);
+}
+
+void BoxesGroup::removeChild(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index < 0) {
+        return;
+    }
+    startNewUndoRedoSet();
+    removeChildFromList(index);
+    child->setParent(NULL); // called to update
+    finishUndoRedoSet();
+}
+
+
+void BoxesGroup::increaseChildZInList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == mChildren.count() - 1) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, index + 1);
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::decreaseChildZInList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == 0) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, index - 1);
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::bringChildToEndList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == mChildren.count() - 1) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, mChildren.length() - 1);
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::bringChildToFrontList(BoundingBox *child)
+{
+    int index = mChildren.indexOf(child);
+    if(index == 0) {
+        return;
+    }
+    startNewUndoRedoSet();
+    moveChildInList(index, 0);
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::moveChildInList(int from, int to, bool saveUndoRedo) {
+    mChildren.move(from, to);
+    updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
+    if(saveUndoRedo) {
+        addUndoRedo(new MoveChildInListUndoRedo(from, to, this) );
+    }
+}
+
+void BoxesGroup::updateAfterCombinedTransformationChanged()
+{
+    foreach(BoundingBox *child, mChildren) {
+        child->updateCombinedTransform();
+    }
+}
+
+void BoxesGroup::clearAll()
+{
+    foreach(BoundingBox *box, mChildren) {
+        box->clearAll();
+        delete box;
+    }
+    mChildren.clear();
 }

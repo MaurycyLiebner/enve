@@ -14,10 +14,10 @@ class MainWindow;
 class BoxesGroup : public BoundingBox
 {
 public:
-    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox *parent);
+    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent);
     BoxesGroup(int boundingBoxId,
-               FillStrokeSettingsWidget *fillStrokeSetting, BoundingBox *parent);
+               FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
 
     bool pointInsidePath(QPointF absPos);
     QRectF getBoundingRect();
@@ -25,7 +25,6 @@ public:
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
-    void removeChildFromList(int id, bool saveUndoRedo);
     void clearBoxesSelection();
     void removePointFromSelection(MovablePoint *point);
     void removeBoxFromSelection(BoundingBox *box);
@@ -101,12 +100,27 @@ public:
     qreal getListItemHeight();
     void handleListItemMousePress(qreal relX, qreal relY);
     void handleChildListItemMousePress(qreal relX, qreal relY, qreal y0);
+
     bool isCurrentGroup();
+    void addChild(BoundingBox *child);
+    void addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo = true);
+    void updateChildrenId(int firstId, bool saveUndoRedo = true);
+    void updateChildrenId(int firstId, int lastId, bool saveUndoRedo = true);
+    void removeChild(BoundingBox *child);
+    void increaseChildZInList(BoundingBox *child);
+    void decreaseChildZInList(BoundingBox *child);
+    void bringChildToEndList(BoundingBox *child);
+    void bringChildToFrontList(BoundingBox *child);
+    void moveChildInList(int from, int to, bool saveUndoRedo = true);
+    void updateAfterCombinedTransformationChanged();
+    void clearAll();
+    void removeChildFromList(int id, bool saveUndoRedo = true);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;
+    QList<BoundingBox*> mChildren;
 };
 
 #endif // BOXESGROUP_H

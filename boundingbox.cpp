@@ -1,9 +1,10 @@
 #include "boundingbox.h"
 #include "canvas.h"
 #include "undoredo.h"
+#include "boxesgroup.h"
 #include <QDebug>
 
-BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) :
+BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     ConnectedToMainWindow(parent)
 {
     mType = type;
@@ -19,7 +20,7 @@ BoundingBox::BoundingBox(BoundingBox *parent, BoundingBoxType type) :
 }
 
 BoundingBox::BoundingBox(int boundingBoxId,
-                         BoundingBox *parent, BoundingBoxType type) :
+                         BoxesGroup *parent, BoundingBoxType type) :
     ConnectedToMainWindow(parent) {
     QSqlQuery query;
     mType = type;
@@ -58,7 +59,7 @@ BoundingBox::BoundingBox(int boundingBoxId,
     updateCombinedTransform();
 }
 
-void BoundingBox::setParent(BoundingBox *parent, bool saveUndoRedo) {
+void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new SetBoxParentUndoRedo(this, mParent, parent));
     }
@@ -71,7 +72,7 @@ void BoundingBox::setParent(BoundingBox *parent, bool saveUndoRedo) {
     updateCombinedTransform();
 }
 
-BoundingBox *BoundingBox::getParent()
+BoxesGroup *BoundingBox::getParent()
 {
     return mParent;
 }
@@ -358,15 +359,6 @@ int BoundingBox::saveToSql(int parentId)
     return query.lastInsertId().toInt();
 }
 
-void BoundingBox::clearAll()
-{
-    foreach(BoundingBox *box, mChildren) {
-        box->clearAll();
-        delete box;
-    }
-    mChildren.clear();
-}
-
 void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 {
     QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
@@ -418,55 +410,6 @@ void BoundingBox::cancelTransform() {
     setTransformation(mSavedTransformMatrix);
 }
 
-void BoundingBox::addChild(BoundingBox *child)
-{
-    startNewUndoRedoSet();
-    child->setParent(this);
-    addChildToListAt(mChildren.count(), child);
-    finishUndoRedoSet();
-}
-
-void BoundingBox::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
-    mChildren.insert(index, child);
-    updateChildrenId(index, saveUndoRedo);
-    if(saveUndoRedo) {
-        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
-    }
-}
-
-void BoundingBox::updateChildrenId(int firstId, bool saveUndoRedo) {
-    updateChildrenId(firstId, mChildren.length() - 1, saveUndoRedo);
-}
-
-void BoundingBox::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
-    if(saveUndoRedo) startNewUndoRedoSet();
-    for(int i = firstId; i <= lastId; i++) {
-        mChildren.at(i)->setZListIndex(i, saveUndoRedo);
-    }
-    if(saveUndoRedo) finishUndoRedoSet();
-    scheduleBoxesListRepaint();
-}
-
-void BoundingBox::removeChildFromList(int id, bool saveUndoRedo) {
-    if(saveUndoRedo) {
-        addUndoRedo(new RemoveChildFromListUndoRedo(this, id, mChildren.at(id)) );
-    }
-    mChildren.removeAt(id);
-    updateChildrenId(id, saveUndoRedo);
-}
-
-void BoundingBox::removeChild(BoundingBox *child)
-{
-    int index = mChildren.indexOf(child);
-    if(index < 0) {
-        return;
-    }
-    startNewUndoRedoSet();
-    removeChildFromList(index);
-    child->setParent(NULL); // called to update
-    finishUndoRedoSet();
-}
-
 void BoundingBox::moveUp()
 {
     mParent->increaseChildZInList(this);
@@ -485,58 +428,6 @@ void BoundingBox::bringToFront()
 void BoundingBox::bringToEnd()
 {
     mParent->bringChildToFrontList(this);
-}
-
-void BoundingBox::increaseChildZInList(BoundingBox *child)
-{
-    int index = mChildren.indexOf(child);
-    if(index == mChildren.count() - 1) {
-        return;
-    }
-    startNewUndoRedoSet();
-    moveChildInList(index, index + 1);
-    finishUndoRedoSet();
-}
-
-void BoundingBox::decreaseChildZInList(BoundingBox *child)
-{
-    int index = mChildren.indexOf(child);
-    if(index == 0) {
-        return;
-    }
-    startNewUndoRedoSet();
-    moveChildInList(index, index - 1);
-    finishUndoRedoSet();
-}
-
-void BoundingBox::bringChildToEndList(BoundingBox *child)
-{
-    int index = mChildren.indexOf(child);
-    if(index == mChildren.count() - 1) {
-        return;
-    }
-    startNewUndoRedoSet();
-    moveChildInList(index, mChildren.length() - 1);
-    finishUndoRedoSet();
-}
-
-void BoundingBox::bringChildToFrontList(BoundingBox *child)
-{
-    int index = mChildren.indexOf(child);
-    if(index == 0) {
-        return;
-    }
-    startNewUndoRedoSet();
-    moveChildInList(index, 0);
-    finishUndoRedoSet();
-}
-
-void BoundingBox::moveChildInList(int from, int to, bool saveUndoRedo) {
-    mChildren.move(from, to);
-    updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
-    if(saveUndoRedo) {
-        addUndoRedo(new MoveChildInListUndoRedo(from, to, this) );
-    }
 }
 
 void BoundingBox::setZListIndex(int z, bool saveUndoRedo)
@@ -562,13 +453,6 @@ void BoundingBox::setTransformation(QMatrix transMatrix)
 QPointF BoundingBox::getAbsolutePos()
 {
     return QPointF(mCombinedTransformMatrix.dx(), mCombinedTransformMatrix.dy());
-}
-
-void BoundingBox::updateAfterCombinedTransformationChanged()
-{
-    foreach(BoundingBox *child, mChildren) {
-        child->updateCombinedTransform();
-    }
 }
 
 void BoundingBox::updateCombinedTransform()

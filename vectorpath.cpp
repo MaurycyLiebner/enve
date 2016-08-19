@@ -16,7 +16,7 @@ VectorPath::VectorPath(BoxesGroup *group) :
 }
 
 VectorPath::VectorPath(int boundingBoxId,
-                        BoundingBox *parent) :
+                        BoxesGroup *parent) :
     BoundingBox(boundingBoxId,
                 parent, TYPE_VECTOR_PATH) {
     QSqlQuery query;

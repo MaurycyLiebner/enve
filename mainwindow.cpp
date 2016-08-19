@@ -159,16 +159,15 @@ FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
 
 bool MainWindow::askForSaving() {
     if(mChangedSinceSaving) {
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, "Save", "Save changes to document \"" +
+        int buttonId = QMessageBox::question(this, "Save", "Save changes to document \"" +
                                       mCurrentFilePath.split("/").last() +
                                       "\"?", "Close without saving",
                                       "Cancel",
                                       "Save");
-        if (reply.text() == "Cancel") {
+        if (buttonId == 1) {
             return false;
         } else {
-            if(reply.text() == "Save") {
+            if(buttonId == 2) {
                 saveFile();
             }
             return true;

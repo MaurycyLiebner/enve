@@ -365,7 +365,7 @@ class MoveChildInListUndoRedo : public UndoRedo
 public:
     MoveChildInListUndoRedo(int fromIndex,
                             int toIndex,
-                            BoundingBox *parentBox) : UndoRedo("MoveChildInListUndoRedo") {
+                            BoxesGroup *parentBox) : UndoRedo("MoveChildInListUndoRedo") {
         mParentBox = parentBox;
         mFromIndex = fromIndex;
         mToIndex = toIndex;
@@ -379,7 +379,7 @@ public:
         mParentBox->moveChildInList(mToIndex, mFromIndex, false);
     }
 private:
-    BoundingBox *mParentBox;
+    BoxesGroup *mParentBox;
     int mFromIndex;
     int mToIndex;
 };
@@ -412,7 +412,7 @@ private:
 class AddChildToListUndoRedo : public UndoRedo
 {
 public:
-    AddChildToListUndoRedo(BoundingBox *parent,
+    AddChildToListUndoRedo(BoxesGroup *parent,
                            int index,
                            BoundingBox *child) : UndoRedo("AddChildToListUndoRedo") {
         mParent = parent;
@@ -429,7 +429,7 @@ public:
     }
 
 private:
-    BoundingBox *mParent;
+    BoxesGroup *mParent;
     int mAddAtId;
     BoundingBox *mChild;
 };
@@ -437,7 +437,7 @@ private:
 class RemoveChildFromListUndoRedo : public AddChildToListUndoRedo
 {
 public:
-    RemoveChildFromListUndoRedo(BoundingBox *parent,
+    RemoveChildFromListUndoRedo(BoxesGroup *parent,
                                 int index,
                                 BoundingBox *child) :
         AddChildToListUndoRedo(parent, index, child) {
@@ -458,8 +458,8 @@ class SetBoxParentUndoRedo : public UndoRedo
 {
 public:
     SetBoxParentUndoRedo(BoundingBox *childBox,
-                         BoundingBox *oldParent,
-                         BoundingBox *newParent) : UndoRedo("SetBoxParentUndoRedo")
+                         BoxesGroup *oldParent,
+                         BoxesGroup *newParent) : UndoRedo("SetBoxParentUndoRedo")
     {
         mChildBox = childBox;
         mOldParent = oldParent;
@@ -483,8 +483,8 @@ public:
 
 private:
     BoundingBox *mChildBox;
-    BoundingBox *mOldParent;
-    BoundingBox *mNewParent;
+    BoxesGroup *mOldParent;
+    BoxesGroup *mNewParent;
 };
 
 class StrokeSettingsChangedUndoRedo : public UndoRedo
@@ -500,7 +500,7 @@ public:
 
     void updateDisplayedSettings() {
         if(mTarget->isSelected()) {
-            ((BoxesGroup*)mTarget->getParent())->
+            mTarget->getParent()->
                     setCurrentFillStrokeSettingsFromBox(mTarget);
         }
     }
@@ -534,7 +534,7 @@ public:
 
     void updateDisplayedSettings() {
         if(mTarget->isSelected()) {
-            ((BoxesGroup*)mTarget->getParent())->
+            mTarget->getParent()->
                     setCurrentFillStrokeSettingsFromBox(mTarget);
         }
     }
