@@ -5,7 +5,7 @@
 MovablePoint::MovablePoint(QPointF absPos,
                            BoundingBox *parent,
                            MovablePointType type,
-                           qreal radius) : ConnectedToMainWindow(parent)
+                           qreal radius) : Transformable(parent)
 {
     mType = type;
     mRadius = radius;
@@ -16,7 +16,7 @@ MovablePoint::MovablePoint(QPointF absPos,
 MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
                            BoundingBox *parent,
                            MovablePointType type,
-                           qreal radius) : ConnectedToMainWindow(parent)
+                           qreal radius) : Transformable(parent)
 {
     mType = type;
     mRadius = radius;
@@ -110,6 +110,59 @@ void MovablePoint::moveToAbs(QPointF absPos)
     setAbsolutePos(absPos, false);
 }
 
+void MovablePoint::scale(qreal scaleBy) {
+    scale(scaleBy, scaleBy);
+}
+
+void MovablePoint::cancelTransform()
+{
+    setRelativePos(mSavedRelPos, false);
+}
+
+void MovablePoint::setRadius(qreal radius)
+{
+    mRadius = radius;
+}
+
+QPointF MovablePoint::getAbsBoneAttachPoint()
+{
+    return getAbsolutePos();
+}
+
+void MovablePoint::attachToBoneFromSqlZId()
+{
+    setBone(mParent->getParent()->boneFromZIndex(mSqlLoadBoneZId) );
+}
+
+bool MovablePoint::isBeingTransformed()
+{
+    return mSelected || mParent->isSelected();
+}
+
+void MovablePoint::rotateBy(qreal rot)
+{
+    QMatrix rotMatrix;
+    rotMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    rotMatrix.rotate(rot);
+    rotMatrix.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    setRelativePos(mSavedRelPos*rotMatrix, false);
+}
+
+void MovablePoint::scale(qreal scaleXBy, qreal scaleYBy)
+{
+    QMatrix scaleMatrix;
+    scaleMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    scaleMatrix.scale(scaleXBy, scaleYBy);
+    scaleMatrix.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    setRelativePos(mSavedRelPos*scaleMatrix, false);
+}
+
+void MovablePoint::saveTransformPivot(QPointF absPivot)
+{
+    mSavedTransformPivot =
+            -mParent->getCombinedTransform().inverted().map(absPivot);
+}
+
 void MovablePoint::select()
 {
     mSelected = true;
@@ -120,11 +173,6 @@ void MovablePoint::deselect()
 {
     mSelected = false;
     mParent->scheduleRepaint();
-}
-
-bool MovablePoint::isSelected()
-{
-    return mSelected;
 }
 
 void MovablePoint::remove()

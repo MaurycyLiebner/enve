@@ -106,6 +106,20 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
     return boxAtPos;
 }
 
+Bone *BoxesGroup::getBoneAt(QPointF absPos)
+{
+    Bone *boxAtPos = NULL;
+    foreachBoxInListInverted(mChildren) {
+        if(box->isVisibleAndUnlocked() && box->isBone()) {
+            if(box->pointInsidePath(absPos) ) {
+                boxAtPos = (Bone*)box;
+                break;
+            }
+        }
+    }
+    return boxAtPos;
+}
+
 void BoxesGroup::setFillSettings(PaintSettings fillSettings,
                                  bool saveUndoRedo)
 {
@@ -230,11 +244,12 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
     if(startTrans) {
         foreach(BoundingBox *box, mSelectedBoxes) {
             box->startTransform();
-            box->rotateBy(rotBy, absOrigin);
+            box->saveTransformPivot(absOrigin);
+            box->rotateBy(rotBy);
         }
     } else {
         foreach(BoundingBox *box, mSelectedBoxes) {
-            box->rotateBy(rotBy, absOrigin);
+            box->rotateBy(rotBy);
         }
     }
 }
@@ -245,11 +260,35 @@ void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
         foreach(BoundingBox *box, mSelectedBoxes) {
             box->startTransform();
             box->saveTransformPivot(absOrigin);
-            box->scaleFromSaved(scaleBy, scaleBy);
+            box->scale(scaleBy);
         }
     } else {
         foreach(BoundingBox *box, mSelectedBoxes) {
-            box->scaleFromSaved(scaleBy, scaleBy);
+            box->scale(scaleBy);
+        }
+    }
+}
+
+void BoxesGroup::attachToBone(Bone *parentBone, CanvasMode currentCanvasMode) {
+    if(currentCanvasMode == MOVE_POINT) {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->setBone(parentBone);
+        }
+    } else if(currentCanvasMode == MOVE_PATH) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->setBone(parentBone);
+        }
+    }
+}
+
+void BoxesGroup::detachFromBone(CanvasMode currentCanvasMode) {
+    if(currentCanvasMode == MOVE_POINT) {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->setBone(NULL);
+        }
+    } else if(currentCanvasMode == MOVE_PATH) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->setBone(NULL);
         }
     }
 }
@@ -559,11 +598,33 @@ void BoxesGroup::finishSelectedBoxesTransform()
 }
 
 void BoxesGroup::cancelSelectedBoxesTransform() {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->cancelTransform();
     }
-    finishUndoRedoSet();
+}
+
+void BoxesGroup::cancelSelectedPointsTransform() {
+    foreach(MovablePoint *point, mSelectedPoints) {
+        point->cancelTransform();
+    }
+}
+
+Bone *BoxesGroup::boneFromZIndex(int index) {
+    if(index >= 0 && index < mChildren.count()) {
+        BoundingBox *box = mChildren.at(index);
+        if(box->isBone()) {
+            return (Bone*) box;
+        }
+    }
+    return NULL;
+}
+
+void BoxesGroup::attachToBoneFromSqlZId()
+{
+    BoundingBox::attachToBoneFromSqlZId();
+    foreach (BoundingBox *box, mChildren) {
+        box->attachToBoneFromSqlZId();
+    }
 }
 
 void BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId) {
@@ -579,6 +640,9 @@ void BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId) {
         int idBoxType = query.record().indexOf("boxtype");
         while(query.next() ) {
             if(static_cast<BoundingBoxType>(
+                        query.value(idBoxType).toInt()) == TYPE_BONE ) {
+                new Bone(query.value(idId).toInt(), this);
+            } else if(static_cast<BoundingBoxType>(
                         query.value(idBoxType).toInt()) == TYPE_VECTOR_PATH ) {
                 new VectorPath(query.value(idId).toInt(), this);
             } else if(static_cast<BoundingBoxType>(

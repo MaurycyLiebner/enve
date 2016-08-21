@@ -5,7 +5,7 @@
 #include <QDebug>
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
-    ConnectedToMainWindow(parent)
+    Transformable(parent)
 {
     mType = type;
     if(type == TYPE_VECTOR_PATH) {
@@ -19,9 +19,16 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     updateCombinedTransform();
 }
 
+BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) : Transformable(window)
+{
+    mType = type;
+    mTransformMatrix.reset();
+    mCombinedTransformMatrix.reset();
+}
+
 BoundingBox::BoundingBox(int boundingBoxId,
                          BoxesGroup *parent, BoundingBoxType type) :
-    ConnectedToMainWindow(parent) {
+    Transformable(parent) {
     QSqlQuery query;
     mType = type;
 
@@ -29,6 +36,7 @@ BoundingBox::BoundingBox(int boundingBoxId,
             QString::number(boundingBoxId);
     if(query.exec(queryStr)) {
         query.next();
+        int idName = query.record().indexOf("name");
         int idM11 = query.record().indexOf("m11_trans");
         int idM12 = query.record().indexOf("m12_trans");
         int idM21 = query.record().indexOf("m21_trans");
@@ -38,6 +46,9 @@ BoundingBox::BoundingBox(int boundingBoxId,
         int idPivotx = query.record().indexOf("pivotx");
         int idPivoty = query.record().indexOf("pivoty");
         int idPivotChanged = query.record().indexOf("pivotchanged");
+        int idVisible = query.record().indexOf("visible");
+        int idLocked = query.record().indexOf("locked");
+        int idBoneZId = query.record().indexOf("bonezid");
         qreal m11 = query.value(idM11).toReal();
         qreal m12 = query.value(idM12).toReal();
         qreal m21 = query.value(idM21).toReal();
@@ -47,10 +58,16 @@ BoundingBox::BoundingBox(int boundingBoxId,
         qreal pivotX = query.value(idPivotx).toReal();
         qreal pivotY = query.value(idPivoty).toReal();
         bool pivotChanged = query.value(idPivotChanged).toBool();
+        bool visible = query.value(idVisible).toBool();
+        bool locked = query.value(idLocked).toBool();
         mTransformMatrix.setMatrix(m11, m12, m21, m22, dx, dy);
         mRelRotPivotPos.setX(pivotX);
         mRelRotPivotPos.setY(pivotY);
         mPivotChanged = pivotChanged;
+        mLocked = locked;
+        mVisible = visible;
+        mSqlLoadBoneZId = query.value(idBoneZId).toInt();
+        mName = query.value(idName).toString();
     } else {
         qDebug() << "Could not load boundingbox with id " << boundingBoxId;
     }
@@ -75,6 +92,11 @@ void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
 BoxesGroup *BoundingBox::getParent()
 {
     return mParent;
+}
+
+bool BoundingBox::isBone()
+{
+    return mType == TYPE_BONE;
 }
 
 bool BoundingBox::isGroup()
@@ -113,13 +135,7 @@ bool BoundingBox::isScheduldedForRemoval()
 
 void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
     QPointF newPos = getCombinedTransform().inverted().map(absPos);
-    if(saveUndoRedo) {
-        addUndoRedo(new SetPivotRelPosUndoRedo(this, mRelRotPivotPos, newPos,
-                                               mPivotChanged, pivotChanged));
-    }
-    mPivotChanged = pivotChanged;
-    mRelRotPivotPos = newPos;
-    schedulePivotUpdate();
+    setPivotRelPos(newPos, saveUndoRedo, pivotChanged);
 }
 
 void BoundingBox::applyTransformation(QMatrix transformation)
@@ -134,11 +150,6 @@ QPointF BoundingBox::getPivotAbsPos()
     return getCombinedTransform().map(mRelRotPivotPos);
 }
 
-bool BoundingBox::isSelected()
-{
-    return mSelected;
-}
-
 void BoundingBox::select()
 {
     mSelected = true;
@@ -151,13 +162,6 @@ void BoundingBox::deselect()
     mSelected = false;
     scheduleBoxesListRepaint();
     scheduleRepaint();
-}
-
-BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) : ConnectedToMainWindow(window)
-{
-    mType = type;
-    mTransformMatrix.reset();
-    mCombinedTransformMatrix.reset();
 }
 
 bool BoundingBox::isContainedIn(QRectF absRect)
@@ -206,129 +210,16 @@ QPointF BoundingBox::getTranslation()
     return QPointF(mTransformMatrix.dx(), mTransformMatrix.dy());
 }
 
-void BoundingBox::scale(qreal scaleBy, QPointF absOrigin)
-{
-    scale(scaleBy, scaleBy, absOrigin);
+void BoundingBox::scale(qreal scaleBy) {
+    scale(scaleBy, scaleBy);
 }
 
-void BoundingBox::scaleCenter(qreal scaleBy)
+void BoundingBox::attachToBoneFromSqlZId()
 {
-    scaleCenter(scaleBy, scaleBy);
+    setBone(mParent->boneFromZIndex(mSqlLoadBoneZId), false);
 }
 
-void BoundingBox::scaleCenter(qreal scaleXBy, qreal scaleYBy)
-{
-    QPointF absOrigin = getBoundingRect().center();
-    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleRight(qreal scaleXBy)
-{
-    QPointF absOrigin = QPointF(getBoundingRect().right(), 1.f);
-    scaleFromSaved(scaleXBy, 1.f, absOrigin);
-}
-
-void BoundingBox::scaleRightFixedRatio(qreal scaleXBy)
-{
-    QPointF absOrigin = QPointF(getBoundingRect().right(), getBoundingRect().center().y());
-    scaleFromSaved(scaleXBy, scaleXBy, absOrigin);
-}
-
-void BoundingBox::scaleLeft(qreal scaleXBy)
-{
-    QPointF absOrigin = QPointF(getBoundingRect().left(), 1.f);
-    scaleFromSaved(scaleXBy, 1.f, absOrigin);
-}
-
-void BoundingBox::scaleLeftFixedRatio(qreal scaleXBy)
-{
-    QPointF absOrigin = QPointF(getBoundingRect().left(), getBoundingRect().center().y());
-    scaleFromSaved(scaleXBy, scaleXBy, absOrigin);
-}
-
-void BoundingBox::scaleTop(qreal scaleYBy)
-{
-    QPointF absOrigin = QPointF(1.f, getBoundingRect().top() );
-    scaleFromSaved(1.f, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleTopFixedRatio(qreal scaleYBy)
-{
-    QPointF absOrigin = QPointF(getBoundingRect().center().x(), getBoundingRect().top());
-    scaleFromSaved(scaleYBy, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleBottom(qreal scaleYBy)
-{
-    QPointF absOrigin = QPointF(1.f, getBoundingRect().bottom() );
-    scaleFromSaved(1.f, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleBottomFixedRatio(qreal scaleYBy)
-{
-    QPointF absOrigin = QPointF(getBoundingRect().center().x(), getBoundingRect().bottom());
-    scaleFromSaved(scaleYBy, scaleYBy, absOrigin);
-}
-
-
-void BoundingBox::scaleBottomRight(qreal scaleXBy, qreal scaleYBy)
-{
-    QPointF absOrigin = getBoundingRect().bottomRight();
-    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleBottomLeft(qreal scaleXBy, qreal scaleYBy)
-{
-    QPointF absOrigin = getBoundingRect().bottomLeft();
-    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleTopRight(qreal scaleXBy, qreal scaleYBy)
-{
-    QPointF absOrigin = getBoundingRect().topRight();
-    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleTopLeft(qreal scaleXBy, qreal scaleYBy)
-{
-    QPointF absOrigin = getBoundingRect().topLeft();
-    scaleFromSaved(scaleXBy, scaleYBy, absOrigin);
-}
-
-void BoundingBox::scaleBottomRight(qreal scaleBy)
-{
-    QPointF absOrigin = getBoundingRect().bottomRight();
-    scaleFromSaved(scaleBy, scaleBy, absOrigin);
-}
-
-void BoundingBox::scaleBottomLeft(qreal scaleBy)
-{
-    QPointF absOrigin = getBoundingRect().bottomLeft();
-    scaleFromSaved(scaleBy, scaleBy, absOrigin);
-}
-
-void BoundingBox::scaleTopRight(qreal scaleBy)
-{
-    QPointF absOrigin = getBoundingRect().topRight();
-    scaleFromSaved(scaleBy, scaleBy, absOrigin);
-}
-
-void BoundingBox::scaleTopLeft(qreal scaleBy)
-{
-    QPointF absOrigin = getBoundingRect().topLeft();
-    scaleFromSaved(scaleBy, scaleBy, absOrigin);
-}
-
-void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF relOrigin)
-{
-    mTransformMatrix = mSavedTransformMatrix;
-    mTransformMatrix.translate(-relOrigin.x(), -relOrigin.y());
-    mTransformMatrix.scale(scaleXBy, scaleYBy);
-    mTransformMatrix.translate(relOrigin.x(), relOrigin.y());
-    updateCombinedTransform();
-}
-
-void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy)
+void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy)
 {
     mTransformMatrix = mSavedTransformMatrix;
     mTransformMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
@@ -336,14 +227,17 @@ void BoundingBox::scaleFromSaved(qreal scaleXBy, qreal scaleYBy)
     mTransformMatrix.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
     updateCombinedTransform();
 }
-
+#include <QSqlError>
 int BoundingBox::saveToSql(int parentId)
 {
     QSqlQuery query;
-    QString pivotChanged = (mPivotChanged) ? "1" : "0";
-    query.exec(QString("INSERT INTO boundingbox (boxtype, m11_trans, m12_trans, "
-                       "m21_trans, m22_trans, dx_trans, dy_trans, pivotx, pivoty, pivotchanged, parentboundingboxid) "
-               "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11)").
+    if(!query.exec(
+        QString("INSERT INTO boundingbox (name, boxtype, m11_trans, m12_trans, "
+                "m21_trans, m22_trans, dx_trans, dy_trans, "
+                "pivotx, pivoty, pivotchanged, visible, locked, "
+                "bonezid, parentboundingboxid) "
+                "VALUES ('%1', %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, %12, %13, %14, %15)").
+                arg(mName).
                 arg(mType).
                 arg(mTransformMatrix.m11(), 0, 'f').
                 arg(mTransformMatrix.m12(), 0, 'f').
@@ -353,29 +247,24 @@ int BoundingBox::saveToSql(int parentId)
                 arg(mTransformMatrix.dy(), 0, 'f').
                 arg(mRelRotPivotPos.x(), 0, 'f').
                 arg(mRelRotPivotPos.y(), 0, 'f').
-                arg(pivotChanged).
+                arg(boolToSql(mPivotChanged)).
+                arg(boolToSql(mVisible) ).
+                arg(boolToSql(mLocked) ).
+                arg((mBone == NULL) ? -1 : mBone->getZIndex() ).
                 arg( (parentId == 0) ? "NULL" : QString::number(parentId) )
-                );
+                ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+
     return query.lastInsertId().toInt();
 }
 
-void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
+void BoundingBox::rotateBy(qreal rot)
 {
-    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
-
-    mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
-    mTransformMatrix.scale(scaleXBy, scaleYBy);
-    mTransformMatrix.translate(transPoint.x(), transPoint.y());
-    updateCombinedTransform();
-}
-
-void BoundingBox::rotateBy(qreal rot, QPointF absOrigin)
-{
-    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
-
-    mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
+    mTransformMatrix = mSavedTransformMatrix;
+    mTransformMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
     mTransformMatrix.rotate(rot);
-    mTransformMatrix.translate(transPoint.x(), transPoint.y());
+    mTransformMatrix.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
     updateCombinedTransform();
 }
 
@@ -391,6 +280,11 @@ void BoundingBox::moveBy(QPointF trans)
 
 void BoundingBox::saveTransformPivot(QPointF absPivot) {
     mSavedTransformPivot = -getCombinedTransform().inverted().map(absPivot);
+}
+
+QPointF BoundingBox::getAbsBoneAttachPoint()
+{
+    return getPivotAbsPos();
 }
 
 void BoundingBox::startTransform()

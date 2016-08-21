@@ -3,6 +3,10 @@
 #include "updatescheduler.h"
 #include <QApplication>
 
+QString ConnectedToMainWindow::boolToSql(bool bT) {
+    return (bT) ? "1" : "0";
+}
+
 ConnectedToMainWindow::ConnectedToMainWindow(ConnectedToMainWindow *parent)
 {
     mMainWindow = parent->getMainWindow();
@@ -39,6 +43,10 @@ bool ConnectedToMainWindow::isShiftPressed() {
 
 bool ConnectedToMainWindow::isCtrlPressed() {
     return (QApplication::keyboardModifiers() & Qt::ControlModifier);
+}
+
+bool ConnectedToMainWindow::isAltPressed() {
+    return (QApplication::keyboardModifiers() & Qt::AltModifier);
 }
 
 void ConnectedToMainWindow::startNewUndoRedoSet()

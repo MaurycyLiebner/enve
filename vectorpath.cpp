@@ -82,6 +82,7 @@ void VectorPath::loadPointsFromSql(int vectorPathId) {
         int idstartctrlptrely = query.record().indexOf("startctrlptrely");
         int idendctrlptrelx = query.record().indexOf("endctrlptrelx");
         int idendctrlptrely = query.record().indexOf("endctrlptrely");
+        int idbonez = query.record().indexOf("bonezid");
         PathPoint *firstPoint = NULL;
         PathPoint *lastPoint = NULL;
         while(query.next()) {
@@ -93,10 +94,11 @@ void VectorPath::loadPointsFromSql(int vectorPathId) {
             qreal startctrlptrely = query.value(idstartctrlptrely).toReal();
             qreal endctrlptrelx = query.value(idendctrlptrelx).toReal();
             qreal endctrlptrely = query.value(idendctrlptrely).toReal();
+            int bonez = query.value(idbonez).toInt();
 
             PathPoint *newPoint = new PathPoint(xrelpos, yrelpos,
                           startctrlptrelx, startctrlptrely,
-                          endctrlptrelx, endctrlptrely, isfirst, this);
+                          endctrlptrelx, endctrlptrely, isfirst, bonez, this);
             appendToPointsList(newPoint, false);
             if(lastPoint != NULL) {
                 if(isfirst && firstPoint != NULL) {
@@ -174,6 +176,16 @@ PathPoint *VectorPath::findPointNearestToPercent(qreal percent,
     }
     *foundAtPercent = nearestPointPercent;
     return nearestPoint;
+}
+
+void VectorPath::attachToBoneFromSqlZId()
+{
+    BoundingBox::attachToBoneFromSqlZId();
+    foreach(PathPoint *point, mPoints) {
+        point->attachToBoneFromSqlZId();
+    }
+    mFillGradientPoints.attachToBoneFromSqlZId();
+    mStrokeGradientPoints.attachToBoneFromSqlZId();
 }
 
 PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
@@ -638,7 +650,7 @@ int VectorPath::saveToSql(int parentId)
 
     int fillSettingsId = mFillPaintSettings.saveToSql();
     int strokeSettingsId = mStrokeSettings.saveToSql();
-    query.exec(QString("INSERT INTO vectorpath (fillgradientstartx, fillgradientstarty, fillgradientendx, fillgradientendy, "
+    if(!query.exec(QString("INSERT INTO vectorpath (fillgradientstartx, fillgradientstarty, fillgradientendx, fillgradientendy, "
                         "strokegradientstartx, strokegradientstarty, strokegradientendx, strokegradientendy, "
                         "boundingboxid, fillsettingsid, strokesettingsid) "
                         "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11)").
@@ -652,7 +664,9 @@ int VectorPath::saveToSql(int parentId)
                         arg(strokeEndPt.y(), 0, 'f').
                         arg(boundingBoxId).
                         arg(fillSettingsId).
-                        arg(strokeSettingsId) );
+                        arg(strokeSettingsId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
     int vectorPathId = query.lastInsertId().toInt();
     foreach(PathPoint *point, mSeparatePaths) {
         point->saveToSql(vectorPathId);
@@ -735,4 +749,10 @@ void GradientPoints::setColors(QColor startColor, QColor endColor)
 {
     startPoint->setColor(startColor);
     endPoint->setColor(endColor);
+}
+
+void GradientPoints::attachToBoneFromSqlZId()
+{
+    startPoint->attachToBoneFromSqlZId();
+    endPoint->attachToBoneFromSqlZId();
 }

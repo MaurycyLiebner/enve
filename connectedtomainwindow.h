@@ -1,5 +1,6 @@
 #ifndef CONNECTEDTOMAINWINDOW_H
 #define CONNECTEDTOMAINWINDOW_H
+#include <QString>
 
 class MainWindow;
 
@@ -12,10 +13,13 @@ class ConnectedToMainWindow
 public:
     ConnectedToMainWindow(ConnectedToMainWindow *parent);
     ConnectedToMainWindow(MainWindow *parent);
+    virtual ~ConnectedToMainWindow() {}
+
     void addUndoRedo(UndoRedo *undoRedo);
     void addUpdateScheduler(UpdateScheduler *scheduler);
     void callUpdateSchedulers();
     MainWindow *getMainWindow();
+    QString boolToSql(bool bT);
 
     void startNewUndoRedoSet();
     void finishUndoRedoSet();
@@ -24,6 +28,7 @@ public:
     void scheduleBoxesListRepaint();
     bool isShiftPressed();
     bool isCtrlPressed();
+    bool isAltPressed();
 protected:
     MainWindow *mMainWindow;
 };

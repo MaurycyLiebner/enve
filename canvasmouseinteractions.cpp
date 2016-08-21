@@ -10,17 +10,16 @@ void Canvas::handleMovePathMousePressEvent() {
     if((mCurrentMode == CanvasMode::MOVE_PATH) ?
             !mRotPivot->handleMousePress(mLastMouseEventPos) : true) {
         mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPos);
-        if(mLastPressedBox != NULL) {
-            if(!(isShiftPressed()) && !mLastPressedBox->isSelected()) {
-                mCurrentBoxesGroup->clearBoxesSelection();
-            }
-        }
         if(mLastPressedBox == NULL) {
-            if(!(isShiftPressed()) ) {
+            if(!isShiftPressed() ) {
                 mCurrentBoxesGroup->clearBoxesSelection();
             }
             mSelecting = true;
             startSelectionAtPoint(mLastMouseEventPos);
+        } else {
+            if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
+                mCurrentBoxesGroup->clearBoxesSelection();
+            }
         }
     }
 }
@@ -110,7 +109,10 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 }
 
 void Canvas::handleMovePointMouseRelease(QPointF pos) {
-    if(mSelecting) {
+    if(mCancelTransform) {
+        mCancelTransform = false;
+        mCurrentBoxesGroup->cancelSelectedPointsTransform();
+    } else if(mSelecting) {
         mSelecting = false;
         if(mFirstMouseMove) {
             mLastPressedBox = mCurrentBoxesGroup->getBoxAt(pos);
@@ -169,6 +171,9 @@ void Canvas::handleMovePathMouseRelease(QPointF pos) {
         } else {
             mCurrentBoxesGroup->finishSelectedBoxesTransform();
         }
+    } else if(mCancelTransform) {
+        mCancelTransform = false;
+        mCurrentBoxesGroup->cancelSelectedBoxesTransform();
     } else if(mFirstMouseMove) {
         mSelecting = false;
         if(isShiftPressed() && mLastPressedBox != NULL) {
@@ -240,8 +245,7 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
         mRotPivot->moveBy(eventPos - mLastMouseEventPos);
     } else if((mCurrentMode == CanvasMode::MOVE_PATH && mRotPivot->isRotating()) ||
               (mCurrentMode == CanvasMode::MOVE_PATH && mRotPivot->isScaling()) ) {
-        mRotPivot->handleMouseMove(eventPos, eventPos - mLastMouseEventPos,
-                                   mLastPressPos, mFirstMouseMove);
+        mRotPivot->handleMouseMove(eventPos, mLastPressPos, mFirstMouseMove);
     } else {
         if(mLastPressedBox != NULL) {
             mCurrentBoxesGroup->addBoxToSelection(mLastPressedBox);

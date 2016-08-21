@@ -1,7 +1,7 @@
 #ifndef CHILDPARENT_H
 #define CHILDPARENT_H
 #include <QMatrix>
-#include "connectedtomainwindow.h"
+#include "transformable.h"
 #include "fillstrokesettings.h"
 #include <QSqlQuery>
 
@@ -19,13 +19,14 @@ enum CanvasMode : short;
 
 enum BoundingBoxType {
     TYPE_VECTOR_PATH,
+    TYPE_BONE,
     TYPE_GROUP,
     TYPE_CANVAS
 };
 
 class BoxesGroup;
 
-class BoundingBox : public ConnectedToMainWindow
+class BoundingBox : public Transformable
 {
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
@@ -74,13 +75,14 @@ public:
                             (QRectF,QList<MovablePoint*> *) {}
 
     QPointF getPivotAbsPos();
-    bool isSelected();
     virtual void select();
     void deselect();
     int getZIndex();
     virtual void drawBoundingRect(QPainter *p);
     void setParent(BoxesGroup *parent, bool saveUndoRedo = true);
     BoxesGroup *getParent();
+
+    bool isBone();
 
     bool isGroup();
     virtual BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
@@ -105,26 +107,8 @@ public:
     void descheduleRemoval();
     bool isScheduldedForRemoval();
 
-    void scaleCenter(qreal scaleXBy, qreal scaleYBy);
-    void scaleCenter(qreal scaleBy);
-    void scaleRight(qreal scaleXBy);
-    void scaleLeft(qreal scaleXBy);
-    void scaleTop(qreal scaleYBy);
-    void scaleBottom(qreal scaleYBy);
-    void scaleBottomRight(qreal scaleXBy, qreal scaleYBy);
-    void scaleBottomLeft(qreal scaleXBy, qreal scaleYBy);
-    void scaleTopRight(qreal scaleXBy, qreal scaleYBy);
-    void scaleTopLeft(qreal scaleXBy, qreal scaleYBy);
-    void scaleRightFixedRatio(qreal scaleXBy);
-    void scaleBottomFixedRatio(qreal scaleYBy);
-    void scaleTopFixedRatio(qreal scaleYBy);
-    void scaleLeftFixedRatio(qreal scaleXBy);
-    void scaleBottomRight(qreal scaleBy);
-    void scaleBottomLeft(qreal scaleBy);
-    void scaleTopRight(qreal scaleBy);
-    void scaleTopLeft(qreal scaleBy);
     void cancelTransform();
-    void scaleFromSaved(qreal scaleXBy, qreal scaleYBy);
+    void scale(qreal scaleXBy, qreal scaleYBy);
 
     virtual int saveToSql(int parentId);
 
@@ -133,8 +117,8 @@ public:
     virtual PathPoint *createNewPointOnLineNear(QPointF) { return NULL; }
     bool isPath();
     void saveTransformPivot(QPointF absPivot);
-    void scaleFromSaved(qreal scaleXBy, qreal scaleYBy, QPointF relOrigin);
 
+    QPointF getAbsBoneAttachPoint();
     //
 
     virtual void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
@@ -155,6 +139,10 @@ public:
     void setLocked(bool bt);
     bool isLocked();
     bool isVisibleAndUnlocked();
+    void rotateBy(qreal rot);
+    void scale(qreal scaleBy);
+
+    virtual void attachToBoneFromSqlZId();
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 
@@ -162,7 +150,6 @@ protected:
     BoundingBoxType mType;
     BoxesGroup *mParent = NULL;
 
-    QPointF mSavedTransformPivot;
     QMatrix mSavedTransformMatrix;
 
     QMatrix mTransformMatrix;
@@ -171,7 +158,6 @@ protected:
     int mZListIndex = 0;
     QPointF mRelRotPivotPos;
     bool mPivotChanged = false;
-    bool mSelected = false;
 
     bool mVisible = true;
     bool mLocked = false;

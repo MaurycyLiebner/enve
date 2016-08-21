@@ -98,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
     mMenuBar = new QMenuBar(this);
 
     mFileMenu = mMenuBar->addMenu("File");
-    mFileMenu->addAction("New...", this, SLOT(newFile));
+    mFileMenu->addAction("New...", this, SLOT(newFile()));
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
     mFileMenu->addAction("Import...", this, SLOT(importFile()));
     mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
@@ -244,7 +244,6 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     } else {
         returnBool = mCanvas->processFilteredKeyEvent(event);
     }
-    mCanvas->schedulePivotUpdate();
 
     callUpdateSchedulers();
     return returnBool;
@@ -454,6 +453,7 @@ void MainWindow::createTablesInSaveDatabase() {
 
     query.exec("CREATE TABLE boundingbox "
                "(id INTEGER PRIMARY KEY, "
+               "name TEXT, "
                "boxtype INTEGER, "
                "m11_trans REAL, "
                "m12_trans REAL, "
@@ -464,6 +464,9 @@ void MainWindow::createTablesInSaveDatabase() {
                "pivotx REAL, "
                "pivoty REAL, "
                "pivotchanged BOOLEAN, "
+               "visible BOOLEAN, "
+               "locked BOOLEAN, "
+               "bonezid INTEGER, "
                "parentboundingboxid INTEGER, "
                "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
     query.exec("CREATE TABLE boxesgroup "
@@ -496,6 +499,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "startctrlptrely REAL, "
                "endctrlptrelx REAL, "
                "endctrlptrely REAL, "
+               "bonezid INTEGER, "
                "vectorpathid INTEGER, "
                "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id) )");
 }

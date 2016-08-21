@@ -44,6 +44,8 @@ public:
     GradientPoint *endPoint;
     VectorPath *parent;
 
+    void attachToBoneFromSqlZId();
+
     void setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo = true);
 };
 
@@ -104,7 +106,9 @@ public:
                          qreal maxPercent, qreal minPercent,
                          bool *found = NULL, QPointF *posInPath = NULL);
     PathPoint *findPointNearestToPercent(qreal percent, qreal *foundAtPercent);
-private:
+
+    void attachToBoneFromSqlZId();
+protected:
     void loadPointsFromSql(int vectorPathId);
 
     GradientPoints mFillGradientPoints;

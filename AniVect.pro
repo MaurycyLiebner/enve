@@ -44,7 +44,9 @@ SOURCES += main.cpp\
     gradientpoint.cpp \
     svgimporter.cpp \
     boundingboxlistitem.cpp \
-    boxeslist.cpp
+    boxeslist.cpp \
+    transformable.cpp \
+    bone.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -76,4 +78,6 @@ HEADERS  += mainwindow.h \
     Colors/ColorWidgets/glwidget.h \
     gradientpoint.h \
     svgimporter.h \
-    boxeslist.h
+    boxeslist.h \
+    transformable.h \
+    bone.h

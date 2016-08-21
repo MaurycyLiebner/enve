@@ -83,9 +83,10 @@ public:
     void saveToSql(int vectorPathId);
     PathPoint(qreal relPosX, qreal relPosy,
               qreal startCtrlRelX, qreal startCtrlRelY,
-              qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, VectorPath *vectorPath);
+              qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, int boneZ, VectorPath *vectorPath);
 
     void clearAll();
+    void cancelTransform();
 private:
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;

@@ -11,10 +11,11 @@ PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
 
 PathPoint::PathPoint(qreal relPosX, qreal relPosy,
                      qreal startCtrlRelX, qreal startCtrlRelY,
-                     qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst,
+                     qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, int boneZ,
                      VectorPath *vectorPath) :
     MovablePoint(relPosX, relPosy, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
 {
+    mSqlLoadBoneZId = boneZ;
     mSeparatePathPoint = isFirst;
     mVectorPath = vectorPath;
     mStartCtrlPt = new CtrlPoint(startCtrlRelX, startCtrlRelY, this, true);
@@ -58,6 +59,17 @@ void PathPoint::startTransform()
     }
     if(!mEndCtrlPt->isSelected()) {
         mEndCtrlPt->MovablePoint::startTransform();
+    }
+}
+
+void PathPoint::cancelTransform()
+{
+    MovablePoint::cancelTransform();
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->MovablePoint::cancelTransform();
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->MovablePoint::cancelTransform();
     }
 }
 
@@ -173,9 +185,10 @@ void PathPoint::saveToSql(int vectorPathId)
     QPointF endPtPos = mEndCtrlPt->getRelativePos();
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
     QString isEnd = ( (isEndPoint()) ? "1" : "0" );
-    query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, xrelpos, yrelpos, "
-                "startctrlptrelx, startctrlptrely, endctrlptrelx, endctrlptrely, vectorpathid) "
-                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
+    if(!query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, xrelpos, yrelpos, "
+                "startctrlptrelx, startctrlptrely, endctrlptrelx, endctrlptrely, "
+                "bonezid, vectorpathid) "
+                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10)").
                 arg(isFirst).
                 arg(isEnd).
                 arg(relPos.x(), 0, 'f').
@@ -184,7 +197,10 @@ void PathPoint::saveToSql(int vectorPathId)
                 arg(startPtPos.y(), 0, 'f').
                 arg(endPtPos.x(), 0, 'f').
                 arg(endPtPos.y(), 0, 'f').
-                arg(vectorPathId) );
+                arg((mBone == NULL) ? -1 : mBone->getZIndex() ).
+                arg(vectorPathId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
     if(mNextPoint != NULL) {
         if(!mNextPoint->isSeparatePathPoint()) {
             mNextPoint->saveToSql( vectorPathId);

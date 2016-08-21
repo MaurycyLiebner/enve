@@ -3,6 +3,7 @@
 #include "boundingbox.h"
 #include "vectorpath.h"
 #include "fillstrokesettings.h"
+#include "bone.h"
 
 #define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
 
@@ -115,6 +116,13 @@ public:
     void updateAfterCombinedTransformationChanged();
     void clearAll();
     void removeChildFromList(int id, bool saveUndoRedo = true);
+    Bone *getBoneAt(QPointF absPos);
+    void attachToBone(Bone *parentBone, CanvasMode currentCanvasMode);
+    void detachFromBone(CanvasMode currentCanvasMode);
+    void cancelSelectedPointsTransform();
+    Bone *boneFromZIndex(int index);
+
+    void attachToBoneFromSqlZId();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

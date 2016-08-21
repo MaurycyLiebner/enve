@@ -4,7 +4,7 @@
 #include <QRectF>
 #include <QPainter>
 #include "valueanimators.h"
-#include "connectedtomainwindow.h"
+#include "transformable.h"
 
 class BoundingBox;
 class PathPoint;
@@ -16,7 +16,7 @@ enum MovablePointType {
     TYPE_GRADIENT_POINT
 };
 
-class MovablePoint : public ConnectedToMainWindow
+class MovablePoint : public Transformable
 {
 public:
     MovablePoint(qreal relPosX, qreal relPosY, BoundingBox *parent,
@@ -46,8 +46,6 @@ public:
     void select();
     void deselect();
 
-    bool isSelected();
-
     virtual void remove();
 
     void hide();
@@ -61,11 +59,23 @@ public:
     bool isCtrlPoint();
 
     virtual void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
+    void rotateBy(qreal rot);
+    void scale(qreal scaleXBy, qreal scaleYBy);
+    void saveTransformPivot(QPointF absPivot);
+    void scale(qreal scaleBy);
+    void cancelTransform();
+
+    void setRadius(qreal radius);
+
+    QPointF getAbsBoneAttachPoint();
+
+    void attachToBoneFromSqlZId();
+
+    bool isBeingTransformed();
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;
     bool mHidden = false;
-    bool mSelected = false;
     qreal mRadius;
     QPointFAnimator mRelPos;
     QPointF mSavedRelPos;

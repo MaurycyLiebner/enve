@@ -125,13 +125,13 @@ qreal distSign(QPointF distPt) {
     }
 }
 
-bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF moveBy,
-                                QPointF pressPos, bool startTransform)
+bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
+                                bool startTransform)
 {
     if(mRotating) {
         QPointF absPos = getAbsolutePos();
         QLineF dest_line(absPos, moveDestAbs);
-        QLineF prev_line(absPos, moveDestAbs - moveBy);
+        QLineF prev_line(absPos, pressPos);
         qreal d_rot = dest_line.angleTo(prev_line);
         if(d_rot > 180)
         {

@@ -42,6 +42,21 @@ QRectF Canvas::getBoundingRect()
     return QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight));
 }
 
+void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
+{
+    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
+
+    mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
+    mTransformMatrix.scale(scaleXBy, scaleYBy);
+    mTransformMatrix.translate(transPoint.x(), transPoint.y());
+    updateCombinedTransform();
+}
+
+void Canvas::scale(qreal scaleBy, QPointF absOrigin)
+{
+    scale(scaleBy, scaleBy, absOrigin);
+}
+
 bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_F1) {
         setCanvasMode(CanvasMode::MOVE_PATH);
@@ -108,6 +123,7 @@ void Canvas::saveSelectedToSqlForCurrentBox() {
 
 void Canvas::loadAllBoxesFromSql() {
     loadChildrenFromSql("NULL");
+    attachToBoneFromSqlZId();
 }
 
 void Canvas::paintEvent(QPaintEvent *)
@@ -324,8 +340,25 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        mCurrentBoxesGroup->bringSelectedBoxesToEnd();
     } else if(event->key() == Qt::Key_Home) {
        mCurrentBoxesGroup->bringSelectedBoxesToFront();
+    } else if(event->key() == Qt::Key_B) {
+        if(isAltPressed()) {
+            mCurrentBoxesGroup->detachFromBone(mCurrentMode);
+        } else if(isCtrlPressed()) {
+            Bone *bone = mCurrentBoxesGroup->getBoneAt(
+                        mapFromGlobal(QCursor::pos()));
+            if(bone == NULL) return;
+            mCurrentBoxesGroup->attachToBone(bone, mCurrentMode);
+        } else {
+            startNewUndoRedoSet();
+            Bone *newBone = new Bone(mCurrentBoxesGroup);
+            newBone->addCircle(mapFromGlobal(QCursor::pos()) );
+            finishUndoRedoSet();
+            setCanvasMode(MOVE_PATH);
+            mCurrentBoxesGroup->clearBoxesSelection();
+            mCurrentBoxesGroup->addBoxToSelection(newBone);
+            setCanvasMode(MOVE_POINT);
+        }
     } else if(event->key() == Qt::Key_R && isMovingPath()) {
-       setCanvasMode(MOVE_PATH);
        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
        mLastPressPos = mLastMouseEventPos;
        mRotPivot->startRotating();
@@ -334,7 +367,6 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        mFirstMouseMove = true;
        setMouseTracking(true);
     } else if(event->key() == Qt::Key_S && isMovingPath()) {
-       setCanvasMode(CanvasMode::MOVE_PATH);
        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
        mLastPressPos = mLastMouseEventPos;
        mRotPivot->startScaling();
@@ -342,14 +374,22 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        mDoubleClick = false;
        mFirstMouseMove = true;
        setMouseTracking(true);
-    } else if(event->key() == Qt::Key_A && isCtrlPressed()) {
+    } else if(event->key() == Qt::Key_G && (isMovingPath() ||
+                                            mCurrentMode == MOVE_POINT)) {
+        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
+        mLastPressPos = mLastMouseEventPos;
+        mIsMouseGrabbing = true;
+        mDoubleClick = false;
+        mFirstMouseMove = true;
+        setMouseTracking(true);
+     } else if(event->key() == Qt::Key_A && isCtrlPressed()) {
        if(isShiftPressed()) {
            mCurrentBoxesGroup->deselectAllBoxes();
        } else {
            mCurrentBoxesGroup->selectAllBoxes();
        }
     }
-    schedulePivotUpdate();
+    //schedulePivotUpdate();
 
     callUpdateSchedulers();
 }

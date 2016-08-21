@@ -7,6 +7,7 @@
 class UpdateScheduler {
 public:
     UpdateScheduler() {}
+    virtual ~UpdateScheduler() {}
     virtual void update() {}
 };
 

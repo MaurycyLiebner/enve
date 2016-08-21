@@ -63,6 +63,8 @@ public:
     void fitCanvasToSize();
     void saveSelectedToSqlForCurrentBox();
     bool processFilteredKeyEvent(QKeyEvent *event);
+    void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
+    void scale(qreal scaleBy, QPointF absOrigin);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
