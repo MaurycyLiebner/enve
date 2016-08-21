@@ -21,7 +21,9 @@ class PathPoint : public MovablePoint
 {
 public:
     PathPoint(QPointF absPos, VectorPath *vectorPath);
-    PathPoint(QPointF absPos, QPointF startCtrlAbsPos, QPointF endCtrlAbsPos, VectorPath *vectorPath);
+    PathPoint(QPointF absPos, QPointF startCtrlAbsPos, QPointF endCtrlAbsPos,
+              VectorPath *vectorPath);
+    PathPoint(int movablePointId, int pathPointId, VectorPath *vectorPath);
 
     void startTransform();
     void finishTransform();
@@ -87,6 +89,7 @@ public:
 
     void clearAll();
     void cancelTransform();
+    void attachToBoneFromSqlZId();
 private:
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;

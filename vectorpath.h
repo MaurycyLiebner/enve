@@ -23,6 +23,9 @@ public:
     void initialize(VectorPath *parentT, QPointF startPt = QPointF(0.f, 0.f),
                     QPointF endPt = QPointF(100.f, 100.f));
 
+    void initialize(VectorPath *parentT,
+                    int fillGradientStartId, int fillGradientEndId);
+
     void clearAll();
 
     void enable();

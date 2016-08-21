@@ -121,9 +121,10 @@ void Canvas::saveSelectedToSqlForCurrentBox() {
     mCurrentBoxesGroup->saveSelectedToSql();
 }
 
-void Canvas::loadAllBoxesFromSql() {
-    loadChildrenFromSql("NULL");
-    attachToBoneFromSqlZId();
+void Canvas::loadAllBoxesFromSql(bool loadInBox) {
+    BoxesGroup *container = mCurrentBoxesGroup->loadChildrenFromSql("NULL",
+                                                                    loadInBox);
+    container->attachToBoneFromSqlZId();
 }
 
 void Canvas::paintEvent(QPaintEvent *)

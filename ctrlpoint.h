@@ -17,6 +17,7 @@ public:
     void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
     CtrlPoint(qreal relPosX, qreal relPosY,
               PathPoint *parentPoint, bool isStartCtrlPt);
+    CtrlPoint(int movablepointid, PathPoint *parentPoint, bool isStartCtrlPt);
 private:
     bool mIsStartCtrlPt;
     PathPoint *mParentPoint;

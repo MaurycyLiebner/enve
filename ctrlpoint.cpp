@@ -12,6 +12,16 @@ CtrlPoint::CtrlPoint(QPointF absPos,
     mParentPoint = parentPoint;
 }
 
+CtrlPoint::CtrlPoint(int movablepointid,
+                     PathPoint *parentPoint, bool isStartCtrlPt) :
+    MovablePoint(movablepointid,
+                 parentPoint->getParentPath(),
+                 MovablePointType::TYPE_CTRL_POINT)
+{
+    mIsStartCtrlPt = isStartCtrlPt;
+    mParentPoint = parentPoint;
+}
+
 CtrlPoint::CtrlPoint(qreal relPosX, qreal relPosY,
                      PathPoint *parentPoint, bool isStartCtrlPt) :
     MovablePoint(relPosX, relPosY,

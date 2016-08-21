@@ -51,6 +51,35 @@ PathPoint::PathPoint(QPointF absPos,
     mEndCtrlPt->hide();
 }
 
+PathPoint::PathPoint(int movablePointId, int pathPointId,
+                     VectorPath *vectorPath) :
+    MovablePoint(movablePointId, vectorPath,
+                 MovablePointType::TYPE_PATH_POINT, 10.f)
+{
+    mVectorPath = vectorPath;
+
+    QSqlQuery query;
+    QString queryStr = "SELECT * FROM pathpoint WHERE id = " +
+            QString::number(pathPointId);
+    if(query.exec(queryStr)) {
+        query.next();
+        int idisfirst = query.record().indexOf("isfirst");
+        int idstartctrlptid = query.record().indexOf("startctrlptid");
+        int idendctrlptid = query.record().indexOf("endctrlptid");
+
+        mSeparatePathPoint = query.value(idisfirst).toBool();
+
+        mStartCtrlPt = new CtrlPoint(query.value(idstartctrlptid).toInt(),
+                                     this, true);
+        mEndCtrlPt = new CtrlPoint(query.value(idendctrlptid).toInt(),
+                                   this, false);
+        mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
+        mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
+    } else {
+        qDebug() << "Could not load pathpoint with id " << pathPointId;
+    }
+}
+
 void PathPoint::startTransform()
 {
     MovablePoint::startTransform();
@@ -179,25 +208,20 @@ void PathPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 #include <QSqlError>
 void PathPoint::saveToSql(int vectorPathId)
 {
+    int movablePtId = MovablePoint::saveToSql();
+    int startPtId = mStartCtrlPt->saveToSql();
+    int endPtId = mEndCtrlPt->saveToSql();
     QSqlQuery query;
-    QPointF relPos = mRelPos.getCurrentValue();
-    QPointF startPtPos = mStartCtrlPt->getRelativePos();
-    QPointF endPtPos = mEndCtrlPt->getRelativePos();
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
     QString isEnd = ( (isEndPoint()) ? "1" : "0" );
-    if(!query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, xrelpos, yrelpos, "
-                "startctrlptrelx, startctrlptrely, endctrlptrelx, endctrlptrely, "
-                "bonezid, vectorpathid) "
-                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10)").
+    if(!query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, "
+                "movablepointid, startctrlptid, endctrlptid, vectorpathid) "
+                "VALUES (%1, %2, %3, %4, %5, %6)").
                 arg(isFirst).
                 arg(isEnd).
-                arg(relPos.x(), 0, 'f').
-                arg(relPos.y(), 0, 'f').
-                arg(startPtPos.x(), 0, 'f').
-                arg(startPtPos.y(), 0, 'f').
-                arg(endPtPos.x(), 0, 'f').
-                arg(endPtPos.y(), 0, 'f').
-                arg((mBone == NULL) ? -1 : mBone->getZIndex() ).
+                arg(movablePtId).
+                arg(startPtId).
+                arg(endPtId).
                 arg(vectorPathId) ) ) {
         qDebug() << query.lastError() << endl << query.lastQuery();
     }
@@ -206,6 +230,13 @@ void PathPoint::saveToSql(int vectorPathId)
             mNextPoint->saveToSql( vectorPathId);
         }
     }
+}
+
+void PathPoint::attachToBoneFromSqlZId()
+{
+    MovablePoint::attachToBoneFromSqlZId();
+    mStartCtrlPt->attachToBoneFromSqlZId();
+    mEndCtrlPt->attachToBoneFromSqlZId();
 }
 
 QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {

@@ -367,7 +367,7 @@ void MainWindow::importFile()
         "Open File", "", "AniVect Files (*.av)");
     enableEventFilter();
     if(!importPath.isEmpty()) {
-        importFile(importPath);
+        importFile(importPath, true);
     }
 }
 
@@ -389,7 +389,7 @@ void MainWindow::revert()
     setFileChangedSinceSaving(false);
 }
 
-void MainWindow::importFile(QString path) {
+void MainWindow::importFile(QString path, bool loadInBox) {
     setDisabled(true);
     mUndoRedoStack.startNewSet();
 
@@ -402,7 +402,7 @@ void MainWindow::importFile(QString path) {
     db.open();
 
     mFillStrokeSettings->loadAllGradientsFromSql();
-    mCanvas->loadAllBoxesFromSql();
+    mCanvas->loadAllBoxesFromSql(loadInBox);
 
     db.close();
     mUndoRedoStack.finishSet();
@@ -414,7 +414,7 @@ void MainWindow::importFile(QString path) {
 void MainWindow::loadFile(QString path) {
     clearAll();
 
-    importFile(path);
+    importFile(path, false);
 
     mUndoRedoStack.clearAll();
     setFileChangedSinceSaving(false);
@@ -475,32 +475,36 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
     query.exec("CREATE TABLE vectorpath "
                "(id INTEGER PRIMARY KEY, "
-               "fillgradientstartx REAL, "
-               "fillgradientstarty REAL, "
-               "fillgradientendx REAL, "
-               "fillgradientendy REAL, "
-               "strokegradientstartx REAL, "
-               "strokegradientstarty REAL, "
-               "strokegradientendx REAL, "
-               "strokegradientendy REAL, "
+               "fillgradientstartid INTEGER, "
+               "fillgradientendid INTEGER, "
+               "strokegradientstartid INTEGER, "
+               "strokegradientendid INTEGER, "
                "boundingboxid INTEGER, "
                "fillsettingsid INTEGER, "
                "strokesettingsid INTEGER, "
+               "FOREIGN KEY(fillgradientstartid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(fillgradientendid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(strokegradientstartid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(strokegradientendid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
                "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
                "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
+    query.exec("CREATE TABLE movablepoint "
+               "(id INTEGER PRIMARY KEY, "
+               "xrelpos REAL, "
+               "yrelpos REAL, "
+               "bonezid INTEGER )");
     query.exec("CREATE TABLE pathpoint "
                "(id INTEGER PRIMARY KEY, "
                "isfirst BOOLEAN, "
                "isendpoint BOOLEAN, "
-               "xrelpos REAL, "
-               "yrelpos REAL, "
-               "startctrlptrelx REAL, "
-               "startctrlptrely REAL, "
-               "endctrlptrelx REAL, "
-               "endctrlptrely REAL, "
-               "bonezid INTEGER, "
+               "movablepointid INTEGER, "
+               "startctrlptid INTEGER, "
+               "endctrlptid INTEGER, "
                "vectorpathid INTEGER, "
+               "FOREIGN KEY(movablepointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(startctrlptid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(endctrlptid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id) )");
 }
 

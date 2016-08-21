@@ -90,7 +90,7 @@ public:
     void cancelSelectedBoxesTransform();
 
     int saveToSql(int parentId);
-    void loadChildrenFromSql(QString thisBoundingBoxId);
+    BoxesGroup *loadChildrenFromSql(QString thisBoundingBoxId, bool loadInBox);
     PathPoint *createNewPointOnLineNearSelected(QPointF absPos);
     void saveSelectedToSql();
 

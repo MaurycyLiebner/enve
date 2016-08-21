@@ -23,6 +23,8 @@ public:
                  MovablePointType type, qreal radius = 7.5f);
     MovablePoint(QPointF absPos, BoundingBox *parent, MovablePointType type,
                  qreal radius = 7.5f);
+    MovablePoint(int movablePointId, BoundingBox *parent,
+                 MovablePointType type, qreal radius = 7.5f);
 
     virtual void startTransform();
     virtual void finishTransform();
@@ -72,6 +74,7 @@ public:
     void attachToBoneFromSqlZId();
 
     bool isBeingTransformed();
+    virtual int saveToSql();
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

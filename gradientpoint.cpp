@@ -7,6 +7,12 @@ GradientPoint::GradientPoint(QPointF absPos, VectorPath *parent) :
 
 }
 
+GradientPoint::GradientPoint(int idT, VectorPath *parent) :
+    MovablePoint(idT, parent, TYPE_GRADIENT_POINT)
+{
+
+}
+
 void GradientPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);

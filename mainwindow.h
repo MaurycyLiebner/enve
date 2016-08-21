@@ -66,7 +66,7 @@ public:
     void saveToFile(QString path);
     void loadFile(QString path);
     void clearAll();
-    void importFile(QString path);
+    void importFile(QString path, bool loadInBox);
     void exportSelected(QString path);
     void setCurrentPath(QString newPath);
     void createTablesInSaveDatabase();

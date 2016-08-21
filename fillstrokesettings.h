@@ -71,7 +71,7 @@ public:
 
     int getSqlId();
 
-    int sqlId = 0;
+    int sqlId = -1;
     bool transformPending = false;
     GradientWidget *mGradientWidget;
     QGradientStops qgradientStops;

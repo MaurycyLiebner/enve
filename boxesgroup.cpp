@@ -1,6 +1,7 @@
 #include "boxesgroup.h"
 #include "undoredo.h"
 #include <QApplication>
+#include "mainwindow.h"
 
 bool zLessThan(BoundingBox *box1, BoundingBox *box2)
 {
@@ -18,7 +19,7 @@ BoxesGroup::BoxesGroup(int boundingBoxId,
                        BoxesGroup *parent) : BoundingBox(boundingBoxId,
                                                           parent, TYPE_GROUP) {
     mFillStrokeSettingsWidget = fillStrokeSetting;
-    loadChildrenFromSql(QString::number(boundingBoxId));
+    loadChildrenFromSql(QString::number(boundingBoxId), false);
 }
 
 PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos) {
@@ -270,6 +271,7 @@ void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
 }
 
 void BoxesGroup::attachToBone(Bone *parentBone, CanvasMode currentCanvasMode) {
+    startNewUndoRedoSet();
     if(currentCanvasMode == MOVE_POINT) {
         foreach(MovablePoint *point, mSelectedPoints) {
             point->setBone(parentBone);
@@ -279,9 +281,11 @@ void BoxesGroup::attachToBone(Bone *parentBone, CanvasMode currentCanvasMode) {
             box->setBone(parentBone);
         }
     }
+    finishUndoRedoSet();
 }
 
 void BoxesGroup::detachFromBone(CanvasMode currentCanvasMode) {
+    startNewUndoRedoSet();
     if(currentCanvasMode == MOVE_POINT) {
         foreach(MovablePoint *point, mSelectedPoints) {
             point->setBone(NULL);
@@ -291,6 +295,7 @@ void BoxesGroup::detachFromBone(CanvasMode currentCanvasMode) {
             box->setBone(NULL);
         }
     }
+    finishUndoRedoSet();
 }
 
 QPointF BoxesGroup::getSelectedPivotPos()
@@ -627,7 +632,13 @@ void BoxesGroup::attachToBoneFromSqlZId()
     }
 }
 
-void BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId) {
+BoxesGroup *BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId,
+                                            bool loadInBox) {
+    if(loadInBox) {
+        BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
+        newGroup->loadChildrenFromSql(thisBoundingBoxId, false);
+        return newGroup;
+    }
     QSqlQuery query;
     QString queryStr;
     if(thisBoundingBoxId == "NULL") {
@@ -654,6 +665,7 @@ void BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId) {
     } else {
         qDebug() << "Could not load children for boxesgroup with id " + thisBoundingBoxId;
     }
+    return this;
 }
 
 int BoxesGroup::saveToSql(int parentId)
@@ -784,6 +796,12 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
         addUndoRedo(new RemoveChildFromListUndoRedo(this, id, mChildren.at(id)) );
     }
     mChildren.removeAt(id);
+    if(box->isGroup()) {
+        BoxesGroup *group = (BoxesGroup*) box;
+        if(group->isCurrentGroup()) {
+            mMainWindow->getCanvas()->setCurrentBoxesGroup(group->getParent());
+        }
+    }
     updateChildrenId(id, saveUndoRedo);
 }
 
@@ -795,7 +813,7 @@ void BoxesGroup::removeChild(BoundingBox *child)
     }
     startNewUndoRedoSet();
     removeChildFromList(index);
-    child->setParent(NULL); // called to update
+    child->setParent(NULL);
     finishUndoRedoSet();
 }
 

@@ -57,7 +57,7 @@ public:
     void scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
 
     void saveToSql();
-    void loadAllBoxesFromSql();
+    void loadAllBoxesFromSql(bool loadInBox);
     void clearAll();
     void resetTransormation();
     void fitCanvasToSize();

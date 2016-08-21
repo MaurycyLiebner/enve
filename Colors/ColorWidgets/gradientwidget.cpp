@@ -74,13 +74,16 @@ void GradientWidget::saveGradientsToSqlIfPathSelected() {
 }
 
 void GradientWidget::loadAllGradientsFromSql() {
+    foreach(Gradient *gradient, mGradients) {
+        gradient->sqlId = -1;
+    }
+
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM gradient");
     if(query.exec(queryStr) ) {
         int idId = query.record().indexOf("id");
         while(query.next() ) {
             mGradients << new Gradient(query.value(idId).toInt(), this, mMainWindow);
-
         }
         if(mGradients.isEmpty()) return;
         setCurrentGradient(mGradients.last());

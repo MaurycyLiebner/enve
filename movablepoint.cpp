@@ -24,6 +24,29 @@ MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
     setRelativePos(QPointF(relPosX, relPosY), false);
 }
 
+MovablePoint::MovablePoint(int movablePointId, BoundingBox *parent,
+             MovablePointType type, qreal radius)  : Transformable(parent) {
+    mType = type;
+    mRadius = radius;
+    mParent = parent;
+
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM movablepoint WHERE id = " +
+            QString::number(movablePointId);
+    if(query.exec(queryStr)) {
+        query.next();
+        int idxrelpos = query.record().indexOf("xrelpos");
+        int idyrelpos = query.record().indexOf("yrelpos");
+        int idbonezid = query.record().indexOf("bonezid");
+        mSqlLoadBoneZId = query.value(idbonezid).toInt();
+        setRelativePos(QPointF(query.value(idxrelpos).toReal(),
+                               query.value(idyrelpos).toReal()), false );
+    } else {
+        qDebug() << "Could not load movablepoint with id " << movablePointId;
+    }
+}
+
 void MovablePoint::startTransform()
 {
     mTransformStarted = true;
@@ -137,6 +160,21 @@ void MovablePoint::attachToBoneFromSqlZId()
 bool MovablePoint::isBeingTransformed()
 {
     return mSelected || mParent->isSelected();
+}
+#include <QSqlError>
+int MovablePoint::saveToSql()
+{
+    QSqlQuery query;
+    QPointF relPos = mRelPos.getCurrentValue();
+    if(!query.exec(QString("INSERT INTO movablepoint (xrelpos, yrelpos, "
+                           "bonezid) "
+                "VALUES (%1, %2, %3)").
+                arg(relPos.x(), 0, 'f').
+                arg(relPos.y(), 0, 'f').
+                arg((mBone == NULL) ? -1 : mBone->getZIndex()) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+    return query.lastInsertId().toInt();
 }
 
 void MovablePoint::rotateBy(qreal rot)
