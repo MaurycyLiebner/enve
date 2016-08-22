@@ -265,6 +265,8 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
 
 void Canvas::handleAddPointMouseMove(QPointF eventPos) {
     if(mCurrentEndPoint == NULL) return;
+    mCurrentEndPoint->setEndCtrlPtEnabled(true);
+    mCurrentEndPoint->setStartCtrlPtEnabled(true);
     mCurrentEndPoint->moveEndCtrlPtToAbsPos(eventPos);
 }
 

@@ -422,6 +422,16 @@ void PathPoint::setStartCtrlPtEnabled(bool enabled)
     mVectorPath->schedulePathUpdate();
 }
 
+bool PathPoint::isEndCtrlPtEnabled()
+{
+    return mEndCtrlPtEnabled;
+}
+
+bool PathPoint::isStartCtrlPtEnabled()
+{
+    return mStartCtrlPtEnabled;
+}
+
 void PathPoint::setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo) {
     if(isStartPt) {
         if(mStartCtrlPtEnabled == enabled) {

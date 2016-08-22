@@ -90,6 +90,12 @@ public:
     void clearAll();
     void cancelTransform();
     void attachToBoneFromSqlZId();
+
+    void setEndCtrlPtEnabled(bool enabled);
+    void setStartCtrlPtEnabled(bool enabled);
+
+    bool isEndCtrlPtEnabled();
+    bool isStartCtrlPtEnabled();
 private:
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
@@ -97,13 +103,11 @@ private:
     bool mSeparatePathPoint = false;
     PathPoint *mNextPoint = NULL;
     PathPoint *mPreviousPoint = NULL;
-    bool mStartCtrlPtEnabled = true;
+    bool mStartCtrlPtEnabled = false;
     CtrlPoint *mStartCtrlPt;
-    bool mEndCtrlPtEnabled = true;
+    bool mEndCtrlPtEnabled = false;
     CtrlPoint *mEndCtrlPt;
     void ctrlPointPosChanged(CtrlPoint *pointChanged, CtrlPoint *pointToUpdate);
-    void setEndCtrlPtEnabled(bool enabled);
-    void setStartCtrlPtEnabled(bool enabled);
 };
 
 #endif // PATHPOINT_H

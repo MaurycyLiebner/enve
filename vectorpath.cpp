@@ -201,10 +201,22 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
         PathPoint *prevPoint = nearestPoint->getPreviousPoint();
         nearestPoint->setPointAsPrevious(newPoint);
         prevPoint->setPointAsNext(newPoint);
+        if(prevPoint->isEndCtrlPtEnabled()) {
+            newPoint->setStartCtrlPtEnabled(true);
+        }
+        if(newPoint->getNextPoint()->isStartCtrlPtEnabled()) {
+            newPoint->setEndCtrlPtEnabled(true);
+        }
     } else {
         PathPoint *nextPoint = nearestPoint->getNextPoint();
         nearestPoint->setPointAsNext(newPoint);
         nextPoint->setPointAsPrevious(newPoint);
+        if(newPoint->getPreviousPoint()->isEndCtrlPtEnabled()) {
+            newPoint->setStartCtrlPtEnabled(true);
+        }
+        if(nextPoint->isStartCtrlPtEnabled()) {
+            newPoint->setEndCtrlPtEnabled(true);
+        }
     }
     appendToPointsList(newPoint);
 
