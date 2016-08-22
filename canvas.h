@@ -16,7 +16,8 @@ class UndoRedoStack;
 enum CanvasMode : short {
     MOVE_PATH,
     MOVE_POINT,
-    ADD_POINT
+    ADD_POINT,
+    PICK_PATH_SETTINGS
 };
 
 class Canvas : public QWidget, public BoxesGroup
@@ -33,8 +34,6 @@ public:
     void removeBoxFromSelection(BoundingBox *box);
     void selectOnlyLastPressedPoint();
     void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
-
-
 
     void scheduleRepaint();
 
@@ -65,6 +64,7 @@ public:
     bool processFilteredKeyEvent(QKeyEvent *event);
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
     void scale(qreal scaleBy, QPointF absOrigin);
+    void pickPathForSettings();
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -105,7 +105,7 @@ public slots:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
-private:
+private:    
     bool mCancelTransform = false;
     bool mIsMouseGrabbing = false;
 

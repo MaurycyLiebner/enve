@@ -34,12 +34,18 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mRotPivot = new PathPivot(this);
     setMinimumSize(500, 500);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+    setCanvasMode(MOVE_PATH);
 }
 
 QRectF Canvas::getBoundingRect()
 {
     QPointF absPos = getAbsolutePos();
     return QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight));
+}
+
+void Canvas::pickPathForSettings() {
+    setCanvasMode(PICK_PATH_SETTINGS);
 }
 
 void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
@@ -302,6 +308,8 @@ void Canvas::setCanvasMode(CanvasMode mode) {
         setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mCurrentMode == MOVE_POINT) {
         setCursor(QCursor(QPixmap("pixmaps/cursor-node.xpm"), 0, 0) );
+    } else if(mCurrentMode == PICK_PATH_SETTINGS) {
+        setCursor(QCursor(QPixmap("pixmaps/cursor_color_picker.png"), 2, 20) );
     } else {
         setCursor(QCursor(QPixmap("pixmaps/cursor-pen.xpm"), 4, 4) );
     }

@@ -5,25 +5,32 @@
 #include <QApplication>
 #include <QScreen>
 #include <QDesktopWidget>
+#include "ColorWidgets/colorsettingswidget.h"
+#include <QDebug>
 
-ColorPickingWidget::ColorPickingWidget(QWidget *parent)
-    : QWidget(parent)
+ColorPickingWidget::ColorPickingWidget(ColorSettingsWidget *parent)
+    : QWidget()
 {
+    mColorSettingsWidget = parent;
     QPixmap picker("pixmaps/cursor_color_picker.png");
-    QApplication::setOverrideCursor(QCursor(picker) );
+    QApplication::setOverrideCursor(QCursor(picker, 2, 20) );
     grabMouse();
     grabKeyboard();
     setMouseTracking(true);
-    setAttribute( Qt::WA_TranslucentBackground, true );
-    setStyleSheet("QWidget{background-color: transparent;}");
+    setAttribute(Qt::WA_TranslucentBackground);
     showFullScreen();
     updateBox(QCursor::pos());
 }
 
 void ColorPickingWidget::mousePressEvent(QMouseEvent *e)
 {
+    if(e->button() == Qt::RightButton) endThis();
     QPoint pos_t = mapToGlobal(e->pos());
     QColor pickedColor = colorFromPoint(pos_t.x(), pos_t.y());
+    Color color;
+    color.setQColor(pickedColor);
+    mColorSettingsWidget->setCurrentColor(color);
+    mColorSettingsWidget->colorChangedHSVSlot(color.gl_h, color.gl_s, color.gl_v);
     endThis();
 }
 
@@ -47,8 +54,7 @@ void ColorPickingWidget::keyPressEvent(QKeyEvent *e)
 
 void ColorPickingWidget::mouseMoveEvent(QMouseEvent *e)
 {
-    QPoint pos_t = mapToGlobal(e->pos() );
-    updateBox(pos_t);
+    updateBox(e->pos());
 }
 
 QColor ColorPickingWidget::colorFromPoint(int x_t, int y_t)
@@ -70,14 +76,15 @@ void ColorPickingWidget::endThis()
     QApplication::restoreOverrideCursor();
     releaseMouse();
     releaseKeyboard();
-    delete this;
+    deleteLater();
 }
 
 void ColorPickingWidget::updateBox(QPoint pos_t)
 {
     cursor_x = pos_t.x();
     cursor_y = pos_t.y();
-    current_color = colorFromPoint(cursor_x, cursor_y);
+    QPointF globalPos = mapToGlobal(pos_t);
+    current_color = colorFromPoint(globalPos.x(), globalPos.y());
     repaint();
 }
 

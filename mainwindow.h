@@ -46,6 +46,7 @@ private:
 
     bool mChangedSinceSaving = false;
     bool mEventFilterDisabled = false;
+    QWidget *grayOutWidget = NULL;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -76,6 +77,8 @@ public:
     void enableEventFilter();
 
     void scheduleBoxesListRepaint();
+    void disable();
+    void enable();
 private slots:
     void newFile();
     bool askForSaving();

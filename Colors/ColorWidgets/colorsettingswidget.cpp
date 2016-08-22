@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include <QResizeEvent>
 #include <QMenu>
+#include "Colors/colorpickingwidget.h"
 
 void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
                             int rect_width, int rect_height,
@@ -75,6 +76,11 @@ void ColorSettingsWidget::moveAlphaWidgetToTab(int tabId)
 
     mTabWidget->widget(tabId)->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     mTabWidget->widget(tabId)->resize(mTabWidget->widget(tabId)->minimumSizeHint());
+}
+
+void ColorSettingsWidget::startColorPicking()
+{
+    new ColorPickingWidget(this);
 }
 
 ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
@@ -161,7 +167,16 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
     aLayout->addWidget(a_rect);
     aLayout->addWidget(aSpin->getSpinBox());
 
-    mWidgetsLayout->addWidget(color_label);
+
+    mPickingButton = new QPushButton(QIcon("pixmaps/icons/ink_draw_dropper.png"),
+                                     "", this);
+    mPickingButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    connect(mPickingButton, SIGNAL(pressed()),
+            this, SLOT(startColorPicking()));
+    mColorLabelLayout->addWidget(color_label);
+    mColorLabelLayout->addWidget(mPickingButton);
+    mWidgetsLayout->addLayout(mColorLabelLayout);
+
     mTabWidget->addTab(mRGBWidget, "RGB");
     mTabWidget->addTab(mHSVWidget, "HSV");
     mTabWidget->addTab(mHSLWidget, "HSL");
@@ -175,7 +190,8 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
     connectSignalsAndSlots();
 
     setMinimumSize(250, 200);
-    mTabWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    mTabWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
+                              QSizePolicy::Maximum);
     setCurrentColor(0.f, 0.f, 0.f);
 
     moveAlphaWidgetToTab(0);

@@ -9,6 +9,7 @@
 #include <QTabWidget>
 #include <QLabel>
 #include "colorvaluespin.h"
+#include <QPushButton>
 
 class ColorSettingsWidget : public QWidget
 {
@@ -22,12 +23,13 @@ signals:
     void colorChangedHSVSignal(GLfloat, GLfloat, GLfloat, GLfloat);
 public slots:
     void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
+    void colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t);
 private slots:
     void alphaChanged(GLfloat a_t);
 
-    void colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t);
-
     void moveAlphaWidgetToTab(int tabId);
+
+    void startColorPicking();
 private:
     void connectSignalsAndSlots();
 
@@ -88,6 +90,8 @@ private:
     ColorValueRect *a_rect = NULL;
     ColorValueSpin *aSpin = new ColorValueSpin(0, 100, 100, this);
 
+    QHBoxLayout *mColorLabelLayout = new QHBoxLayout();
+    QPushButton *mPickingButton;
 
     ColorLabel *color_label = NULL;
     void connectColorWidgetSignalToSlot(ColorWidget *slot_obj, const char *slot,

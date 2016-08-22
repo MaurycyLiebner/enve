@@ -2,6 +2,7 @@
 #include "Colors/ColorWidgets/gradientwidget.h"
 #include "mainwindow.h"
 #include "undoredo.h"
+#include "canvas.h"
 
 Gradient::Gradient(Color color1, Color color2, GradientWidget *gradientWidget, MainWindow *parent) :
     ConnectedToMainWindow(parent)
@@ -292,6 +293,7 @@ void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
 
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget(parent)
 {
+    //setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mMainWindow = parent;
     mUndoRedoSaveTimer = new QTimer(this);
     connect(mUndoRedoSaveTimer, SIGNAL(timeout()),
@@ -301,8 +303,12 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     mColorTypeBar = new QTabBar(this);
     mStrokeSettingsWidget = new QWidget(this);
     mColorsSettingsWidget = new ColorSettingsWidget(this);
-    mFillTargetButton = new QPushButton(QIcon("pixmaps/icons/ink_properties_fill.png"), "Fill", this);
-    mStrokeTargetButton = new QPushButton(QIcon("pixmaps/icons/ink_properties_stroke.png"), "Stroke", this);
+    mFillTargetButton = new QPushButton(
+                QIcon("pixmaps/icons/ink_properties_fill.png"),
+                "Fill", this);
+    mStrokeTargetButton = new QPushButton(
+                QIcon("pixmaps/icons/ink_properties_stroke_paint.png"),
+                "Stroke", this);
     setLayout(mMainLayout);
     mMainLayout->setAlignment(Qt::AlignTop);
 
@@ -322,9 +328,9 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     mMainLayout->addWidget(mColorsSettingsWidget);
 
 
-    mBevelJoinStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_bevel.png"), "Bevel join", this);
-    mMiterJointStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_miter.png"), "Miter join", this);
-    mRoundJoinStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_round.png"), "Round join", this);
+    mBevelJoinStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_bevel.png"), "", this);
+    mMiterJointStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_miter.png"), "", this);
+    mRoundJoinStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_round.png"), "", this);
     mBevelJoinStyleButton->setCheckable(true);
     mMiterJointStyleButton->setCheckable(true);
     mRoundJoinStyleButton->setCheckable(true);
@@ -340,9 +346,9 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
 
     mStrokeSettingsLayout->addLayout(mJoinStyleLayout);
 
-    mFlatCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_flat.png"), "Flat cap", this);
-    mSquareCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_square.png"), "Square cap", this);
-    mRoundCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_round.png"), "Round cap", this);
+    mFlatCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_flat.png"), "", this);
+    mSquareCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_square.png"), "", this);
+    mRoundCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_round.png"), "", this);
     mFlatCapStyleButton->setCheckable(true);
     mSquareCapStyleButton->setCheckable(true);
     mRoundCapStyleButton->setCheckable(true);
@@ -382,6 +388,29 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     connect(mColorsSettingsWidget,
                 SIGNAL(colorChangedHSVSignal(GLfloat,GLfloat,GLfloat,GLfloat)),
                 this, SLOT(colorChangedTMP(GLfloat,GLfloat,GLfloat,GLfloat)) );
+
+    mFillPickerButton = new QPushButton(
+                QIcon("pixmaps/icons/ink_fill_dropper.png"), "", this);
+    mFillPickerButton->setSizePolicy(QSizePolicy::Maximum,
+                                     QSizePolicy::Maximum);
+    mStrokePickerButton = new QPushButton(
+                QIcon("pixmaps/icons/ink_stroke_dropper.png"), "", this);
+    mStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
+                                       QSizePolicy::Maximum);
+    mFillStrokePickerButton = new QPushButton(
+                QIcon("pixmaps/icons/ink_fill_stroke_dropper.png"), "", this);
+    mFillStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
+                                           QSizePolicy::Maximum);
+    mPickersLayout->addWidget(mFillPickerButton);
+    connect(mFillPickerButton, SIGNAL(pressed()),
+            this, SLOT(startLoadingFillFromPath()) );
+    mPickersLayout->addWidget(mStrokePickerButton);
+    connect(mStrokePickerButton, SIGNAL(pressed()),
+            this, SLOT(startLoadingStrokeFromPath()) );
+    mPickersLayout->addWidget(mFillStrokePickerButton);
+    connect(mFillStrokePickerButton, SIGNAL(pressed()),
+            this, SLOT(startLoadingSettingsFromPath()) );
+    mMainLayout->addLayout(mPickersLayout);
 
     setFillTarget();
     setCapStyle(Qt::RoundCap);
@@ -543,6 +572,19 @@ PaintSettings *FillStrokeSettingsWidget::getCurrentTargetPaintSettings()
     }
 }
 
+void FillStrokeSettingsWidget::loadSettingsFromPath(VectorPath *path) {
+    if(mLoadFillFromPath) {
+        mLoadFillFromPath = false;
+        mFillPaintSettings = path->getFillSettings();
+        emit fillSettingsChanged(mFillPaintSettings, true);
+    }
+    if(mLoadStrokeFromPath) {
+        mLoadStrokeFromPath = false;
+        mStrokePaintSettings = path->getStrokeSettings();
+        emit strokeSettingsChanged(mStrokePaintSettings, true);
+    }
+}
+
 void FillStrokeSettingsWidget::emitTargetSettingsChanged()
 {
     if(mTargetId == 0) {
@@ -559,6 +601,25 @@ void FillStrokeSettingsWidget::emitTargetSettingsChangedTMP()
     } else {
         emit strokeSettingsChanged(mStrokePaintSettings, false);
     }
+}
+
+void FillStrokeSettingsWidget::startLoadingFillFromPath()
+{
+    mLoadFillFromPath = true;
+    mMainWindow->getCanvas()->pickPathForSettings();
+}
+
+void FillStrokeSettingsWidget::startLoadingStrokeFromPath()
+{
+    mLoadStrokeFromPath = true;
+    mMainWindow->getCanvas()->pickPathForSettings();
+}
+
+void FillStrokeSettingsWidget::startLoadingSettingsFromPath()
+{
+    mLoadFillFromPath = true;
+    mLoadStrokeFromPath = true;
+    mMainWindow->getCanvas()->pickPathForSettings();
 }
 
 void FillStrokeSettingsWidget::finishTransform()

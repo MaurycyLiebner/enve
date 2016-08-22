@@ -152,6 +152,7 @@ public:
 
     void clearAll();
     void saveGradientsToSqlIfPathSelected();
+    void loadSettingsFromPath(VectorPath *path);
 signals:
     void fillSettingsChanged(PaintSettings, bool);
     void strokeSettingsChanged(StrokeSettings, bool);
@@ -184,7 +185,14 @@ private slots:
     void finishTransform();
     void startTransform();
     void emitTargetSettingsChangedTMP();
+
+    void startLoadingFillFromPath();
+    void startLoadingStrokeFromPath();
+    void startLoadingSettingsFromPath();
 private:
+    bool mLoadFillFromPath = false;
+    bool mLoadStrokeFromPath = false;
+
     MainWindow *mMainWindow;
     bool mTransormStarted = false;
 
@@ -237,6 +245,11 @@ private:
     ColorSettingsWidget *mColorsSettingsWidget;
 
     GradientWidget *mGradientWidget;
+
+    QHBoxLayout *mPickersLayout = new QHBoxLayout();
+    QPushButton *mFillPickerButton;
+    QPushButton *mStrokePickerButton;
+    QPushButton *mFillStrokePickerButton;
 };
 
 #endif // FILLSTROKESETTINGS_H

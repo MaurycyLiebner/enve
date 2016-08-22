@@ -204,6 +204,22 @@ void MainWindow::scheduleBoxesListRepaint()
     mBoxListWidget->scheduleRepaint();
 }
 
+void MainWindow::disable()
+{
+    grayOutWidget = new QWidget(this);
+    grayOutWidget->setFixedSize(size());
+    grayOutWidget->setStyleSheet("QWidget { background-color: rgb(0, 0, 0, 125) }");
+    grayOutWidget->show();
+    grayOutWidget->repaint();
+}
+
+void MainWindow::enable()
+{
+    if(grayOutWidget == NULL) return;
+    delete grayOutWidget;
+    grayOutWidget = NULL;
+}
+
 void MainWindow::newFile()
 {
     if(askForSaving()) {
@@ -261,7 +277,7 @@ void MainWindow::clearAll() {
 }
 
 void MainWindow::exportSelected(QString path) {
-    setDisabled(true);
+    disable();
 
     QFile file(path);
     if(file.exists()) {
@@ -279,7 +295,7 @@ void MainWindow::exportSelected(QString path) {
 
     db.close();
 
-    setEnabled(true);
+    enable();
 }
 
 void MainWindow::setCurrentPath(QString newPath) {
@@ -390,7 +406,7 @@ void MainWindow::revert()
 }
 
 void MainWindow::importFile(QString path, bool loadInBox) {
-    setDisabled(true);
+    disable();
     mUndoRedoStack.startNewSet();
 
     QFile file(path);
@@ -406,7 +422,7 @@ void MainWindow::importFile(QString path, bool loadInBox) {
 
     db.close();
     mUndoRedoStack.finishSet();
-    setEnabled(true);
+    enable();
     scheduleRepaint();
     callUpdateSchedulers();
 }
@@ -509,7 +525,7 @@ void MainWindow::createTablesInSaveDatabase() {
 }
 
 void MainWindow::saveToFile(QString path) {
-    setDisabled(true);
+    disable();
     QFile file(path);
     if(file.exists()) {
         file.remove();
@@ -525,5 +541,5 @@ void MainWindow::saveToFile(QString path) {
     mCanvas->saveToSql();
     db.close();
 
-    setEnabled(true);
+    enable();
 }

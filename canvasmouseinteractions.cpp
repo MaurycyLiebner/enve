@@ -44,9 +44,10 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     } else {
         if(isMovingPath()) {
             handleMovePathMousePressEvent();
+        } else if(mCurrentMode == PICK_PATH_SETTINGS) {
+            mLastPressedBox = getPathAtFromAllAncestors(mLastPressPos);
         } else {
             mLastPressedPoint = mCurrentBoxesGroup->getPointAt(mLastMouseEventPos, mCurrentMode);
-
 
             if(mCurrentMode == CanvasMode::ADD_POINT) {
                 if(mCurrentEndPoint != NULL) {
@@ -215,6 +216,12 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
                 handleMovePathMouseRelease(eventPos);
             } else if(mCurrentMode == CanvasMode::ADD_POINT) {
                 handleAddPointMouseRelease();
+            } else if(mCurrentMode == PICK_PATH_SETTINGS) {
+                if(mLastPressedBox != NULL) {
+                    mFillStrokeSettingsWidget->loadSettingsFromPath(
+                                (VectorPath*) mLastPressedBox);
+                }
+                setCanvasMode(MOVE_PATH);
             }
         }
     }
@@ -257,6 +264,7 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
 }
 
 void Canvas::handleAddPointMouseMove(QPointF eventPos) {
+    if(mCurrentEndPoint == NULL) return;
     mCurrentEndPoint->moveEndCtrlPtToAbsPos(eventPos);
 }
 
