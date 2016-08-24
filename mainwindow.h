@@ -8,12 +8,16 @@
 #include "Colors/color.h"
 #include <QDockWidget>
 #include "fillstrokesettings.h"
+#include "animationdockwidget.h"
 
 class BoxesList;
 
 class UpdateScheduler;
 
 class ColorSettingsWidget;
+
+extern bool isCtrlPressed();
+extern bool isShiftPressed();
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +26,8 @@ private:
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
     BoxesList *mBoxListWidget;
+    QDockWidget *mTopBottomDock;
+    AnimationDockWidget *mAnimationWidget;
 
     QToolBar *mToolBar;
     QAction *mActionConnectPoints;

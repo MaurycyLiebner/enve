@@ -16,7 +16,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     vectorpath.cpp \
     pathpoint.cpp \
-    valueanimators.cpp \
     canvas.cpp \
     undoredo.cpp \
     connectedtomainwindow.cpp \
@@ -46,12 +45,16 @@ SOURCES += main.cpp\
     boundingboxlistitem.cpp \
     boxeslist.cpp \
     transformable.cpp \
-    bone.cpp
+    bone.cpp \
+    qrealanimator.cpp \
+    qpointfanimator.cpp \
+    animationwidget.cpp \
+    animatonwidgetscrollbar.cpp \
+    animationdockwidget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
     pathpoint.h \
-    valueanimators.h \
     canvas.h \
     undoredo.h \
     updatescheduler.h \
@@ -80,4 +83,9 @@ HEADERS  += mainwindow.h \
     svgimporter.h \
     boxeslist.h \
     transformable.h \
-    bone.h
+    bone.h \
+    qrealanimator.h \
+    qpointfanimator.h \
+    animationwidget.h \
+    animatonwidgetscrollbar.h \
+    animationdockwidget.h

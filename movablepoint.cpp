@@ -75,7 +75,7 @@ void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
     if(saveUndoRedo) {
         addUndoRedo(new MoveMovablePointUndoRedo(this, getRelativePos(), relPos));
     }
-    mRelPos.setCurrentValue(relPos, false);
+    mRelPos.setCurrentValue(relPos);
 }
 
 QPointF MovablePoint::getRelativePos()

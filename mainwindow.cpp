@@ -44,9 +44,19 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock = new QDockWidget(this);
     mBoxListWidget = new BoxesList(mCanvas, this);
     mBottomDock->setWidget(mBoxListWidget);
+
     mBottomDock->setFeatures(0);
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
+
+    mTopBottomDock = new QDockWidget(this);
+    mAnimationWidget = new AnimationDockWidget(this);
+    mTopBottomDock->setWidget(mAnimationWidget);
+
+    mTopBottomDock->setFeatures(0);
+    mTopBottomDock->setTitleBarWidget(new QWidget());
+    addDockWidget(Qt::BottomDockWidgetArea, mTopBottomDock);
+
 
     mToolBar = new QToolBar(this);
     mActionConnectPoints = new QAction(
@@ -244,11 +254,15 @@ bool isCtrlPressed() {
     return (QApplication::keyboardModifiers() & Qt::ControlModifier);
 }
 
+bool isShiftPressed() {
+    return (QApplication::keyboardModifiers() & Qt::ShiftModifier);
+}
+
 bool MainWindow::processKeyEvent(QKeyEvent *event) {
     bool returnBool = true;
     if(event->key() == Qt::Key_Z &&
             isCtrlPressed()) {
-        if(QApplication::keyboardModifiers() & Qt::ShiftModifier) {
+        if(isShiftPressed()) {
             mUndoRedoStack.redo();
         } else {
             mUndoRedoStack.undo();
