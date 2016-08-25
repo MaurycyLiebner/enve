@@ -12,6 +12,9 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent) : QWidget(parent)
 
     connect(mScrollBar, SIGNAL(viewedFramesChanged(int,int)),
             mAnimationWidget, SLOT(setViewedFramesRange(int,int)) );
+    connect(mAnimationWidget, SIGNAL(changedViewedFrames(int,int)),
+            mScrollBar, SLOT(setViewedFramesRange(int, int)) );
+
     mScrollBar->emitChange();
 
     setLayout(mMainLayout);

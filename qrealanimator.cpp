@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QApplication>
 #include "mainwindow.h"
+#include "animationdockwidget.h"
 
 qreal clamp(qreal val, qreal min, qreal max) {
     if(val > max) return max;
@@ -13,7 +14,6 @@ qreal clamp(qreal val, qreal min, qreal max) {
 
 QrealAnimator::QrealAnimator()
 {
-
 }
 
 qreal QrealAnimator::getValueAtFrame(int frame)
@@ -24,12 +24,7 @@ qreal QrealAnimator::getValueAtFrame(int frame)
         if(nextId == prevId) return mKeys.at(nextId)->getValue();
         QrealKey *prevKey = mKeys.at(prevId);
         QrealKey *nextKey = mKeys.at(nextId);
-        qreal prevMultiplier;
-        qreal nextMultiplier;
-        getKeyMultiplicatorsAtFrame(frame, prevKey, nextKey,
-                                    &prevMultiplier, &nextMultiplier);
-        return prevKey->getValue()*prevMultiplier +
-               nextKey->getValue()*nextMultiplier;
+        return getValueAtFrame(frame, prevKey, nextKey);
     } else {
         return mCurrentValue;
     }
@@ -47,7 +42,7 @@ void QrealAnimator::setCurrentValue(qreal newValue)
 
 void QrealAnimator::updateValueFromCurrentFrame()
 {
-    mCurrentValue = getValueAtFrame(mCurrentFrame);
+    setCurrentValue(getValueAtFrame(mCurrentFrame) );
 }
 
 QrealKey *QrealAnimator::addNewKeyAtFrame(int frame)
@@ -90,22 +85,27 @@ bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
     if(mKeys.isEmpty()) return false;
     int minId = 0;
     int maxId = mKeys.count() - 1;
-    if(frame > mKeys.last()->getFrame()) {
+    if(frame >= mKeys.last()->getFrame()) {
         *prevIdP = maxId;
         *nextIdP = maxId;
         return true;
     }
-    if(frame < mKeys.first()->getFrame()) {
+    if(frame <= mKeys.first()->getFrame()) {
         *prevIdP = minId;
         *nextIdP = minId;
         return true;
     }
     while(maxId - minId > 1) {
         int guess = (maxId + minId)/2;
-        if(mKeys.at(guess)->getFrame() > frame) {
+        int keyFrame = mKeys.at(guess)->getFrame();
+        if(keyFrame > frame) {
             maxId = guess;
-        } else {
+        } else if(keyFrame < frame) {
             minId = guess;
+        } else {
+            *nextIdP = guess;
+            *prevIdP = guess;
+            return true;
         }
     }
 
@@ -178,7 +178,11 @@ void QrealAnimator::updateKeysPath()
     }
     if(lastKey != NULL) {
         mKeysPath.lineTo(5000, -lastKey->getValue());
+    } else {
+        mKeysPath.moveTo(0, -mCurrentValue);
+        mKeysPath.lineTo(5000, -mCurrentValue);
     }
+    updateValueFromCurrentFrame();
     updateDrawPath();
 }
 
@@ -215,11 +219,9 @@ qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x) {
     return (maxT + minT)*0.5;
 }
 
-void QrealAnimator::getKeyMultiplicatorsAtFrame(int frame,
-                                                QrealKey *prevKey,
-                                                QrealKey *nextKey,
-                                                qreal *prevMultiplicator,
-                                                qreal *nextMultiplicator)
+qreal QrealAnimator::getValueAtFrame(int frame,
+                                    QrealKey *prevKey,
+                                    QrealKey *nextKey)
 {
     qreal t = tFromX(prevKey->getFrame(),
                      prevKey->getEndValueFrame(),
@@ -229,26 +231,64 @@ void QrealAnimator::getKeyMultiplicatorsAtFrame(int frame,
     qreal p1y = prevKey->getEndValue();
     qreal p2y = nextKey->getStartValue();
     qreal p3y = nextKey->getValue();
-    qreal multiplicator = calcCubicBezierVal(p0y, p1y, p2y, p3y, t);
-    *nextMultiplicator = multiplicator;
-    *prevMultiplicator = 1 - multiplicator;
+    return calcCubicBezierVal(p0y, p1y, p2y, p3y, t);
+}
+
+void QrealAnimator::middlePress(QPointF pressPos)
+{
+    mSavedStartFrame = mStartFrame;
+    mSavedEndFrame = mEndFrame;
+    mSavedMinShownValue = mMinShownVal;
+    mMiddlePressPos = pressPos;
+}
+
+void QrealAnimator::middleMove(QPointF movePos)
+{
+    QPointF diffFrameValue = (movePos - mMiddlePressPos);
+    diffFrameValue.setX(diffFrameValue.x()/mPixelsPerFrame);
+    diffFrameValue.setY(diffFrameValue.y()/mPixelsPerValUnit);
+    if(qAbs(diffFrameValue.x() ) > 1) {
+        mStartFrame = mSavedStartFrame - diffFrameValue.x();
+        mEndFrame = mSavedEndFrame - diffFrameValue.x();
+    }
+    setMinShownVal(mSavedMinShownValue + diffFrameValue.y());
+}
+
+void QrealAnimator::middleRelease()
+{
+
+}
+
+int QrealAnimator::getStartFrame()
+{
+    return mStartFrame;
+}
+
+int QrealAnimator::getEndFrame()
+{
+    return mEndFrame;
 }
 
 void QrealAnimator::getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
-    foreach(QrealKey *key, mKeys) {
-        qreal keyVal = key->getValue();
-        qreal startVal = key->getStartValue();
-        qreal endVal = key->getEndValue();
-        qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
-        qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
-        if(maxKeyVal > maxVal) maxVal = maxKeyVal;
-        if(minKeyVal < minVal) minVal = minKeyVal;
-    }
+    if(mKeys.isEmpty()) {
+        *minValP = mCurrentValue;
+        *maxValP = mCurrentValue;
+    } else {
+        foreach(QrealKey *key, mKeys) {
+            qreal keyVal = key->getValue();
+            qreal startVal = key->getStartValue();
+            qreal endVal = key->getEndValue();
+            qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
+            qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
+            if(maxKeyVal > maxVal) maxVal = maxKeyVal;
+            if(minKeyVal < minVal) minVal = minKeyVal;
+        }
 
-    *minValP = minVal;
-    *maxValP = maxVal;
+        *minValP = minVal;
+        *maxValP = maxVal;
+    }
 }
 
 void QrealAnimator::getMinAndMaxValuesBetweenFrames(
@@ -275,26 +315,30 @@ void QrealAnimator::getMinAndMaxValuesBetweenFrames(
 void QrealAnimator::updateDrawPath() {
     QMatrix transform;
     transform.translate(-mPixelsPerFrame*mStartFrame,
-                mDrawRect.height() + mPixelsPerValUnit*mMinVal - mMargin);
+                mDrawRect.height() + mPixelsPerValUnit*mMinShownVal - mMargin);
     transform.scale(mPixelsPerFrame, mPixelsPerValUnit);
     mKeysDrawPath = mKeysPath*transform;
 }
 
-void QrealAnimator::incMargin(qreal inc) {
-    qreal newMargin = mMargin + inc;
-    setMargin(clamp(newMargin, -mDrawRect.height(),
-                    mDrawRect.height()*0.25));
+void QrealAnimator::incScale(qreal inc) {
+    qreal newScale = mValueScale + inc;
+    setScale(clamp(newScale, 0.1, 10.));
 }
 
-void QrealAnimator::setMargin(qreal margin) {
-    mMargin = margin;
+void QrealAnimator::setScale(qreal scale) {
+    mValueScale = scale;
     updateDimensions();
 }
 
 void QrealAnimator::updateDimensions() {
     getMinAndMaxValues(&mMinVal, &mMaxVal);
-    mPixelsPerValUnit = (mDrawRect.height() - 2*mMargin)/
+    if(qAbs(mMinVal - mMaxVal) < 0.1 ) {
+        mMinVal -= 0.05;
+        mMaxVal += 0.05;
+    }
+    mPixelsPerValUnit = mValueScale*(mDrawRect.height() - 2*mMargin)/
                                 (mMaxVal - mMinVal);
+    incMinShownVal(0.);
     int dFrame = mEndFrame - mStartFrame;
     mPixelsPerFrame = mDrawRect.width()/dFrame;
     updateDrawPath();
@@ -302,42 +346,119 @@ void QrealAnimator::updateDimensions() {
 
 void QrealAnimator::draw(QPainter *p)
 {
+    p->fillRect(mDrawRect, QColor(150, 150, 150));
     p->setBrush(Qt::NoBrush);
 
-    p->setPen(QPen(QColor(0, 0, 0, 75), 1.));
-    qreal xL = 0.;
+    p->fillRect(0, 0, mDrawRect.width(), 20, Qt::white);
+    p->fillRect(0, 0, 40, mDrawRect.height(), Qt::white);
+
     qreal maxX = mDrawRect.width();
-    qreal inc = mPixelsPerFrame;
-    while(inc < 10.) inc = mPixelsPerFrame*10;
-    while(xL < maxX) {
-        p->drawLine(xL, 0, xL, mDrawRect.height());
-        xL += inc;
+    int currAlpha = 75;
+    qreal lineWidth = 1.;
+    QList<int> incFrameList = { 1, 5, 10, 100 };
+    foreach(int incFrame, incFrameList) {
+        if(mPixelsPerFrame*incFrame < 15.) continue;
+        bool drawText = mPixelsPerFrame*incFrame > 30.;
+        p->setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
+        int frameL = (mStartFrame >= 0) ? -(mStartFrame%incFrame) :
+                                        -mStartFrame;
+        int currFrame = mStartFrame + frameL;
+        qreal xL = frameL*mPixelsPerFrame;
+        qreal inc = incFrame*mPixelsPerFrame;
+        while(xL < 40) {
+            xL += inc;
+            currFrame += incFrame;
+        }
+        while(xL < maxX) {
+            if(drawText) {
+                p->drawText(QRectF(xL - inc, 0, 2*inc, 20),
+                            Qt::AlignCenter, QString::number(currFrame));
+            }
+            p->drawLine(xL, 20, xL, mDrawRect.height());
+            xL += inc;
+            currFrame += incFrame;
+        }
+        currAlpha *= 1.5;
+        lineWidth *= 1.5;
     }
 
-    p->setPen(QPen(Qt::black, 1.));
+    p->setPen(QPen(Qt::green, 2.f));
+    qreal xL = (mCurrentFrame - mStartFrame)*mPixelsPerFrame;
+    /*p->drawText(QRectF(xL - 20, 0, 40, 20),
+                Qt::AlignCenter, QString::number(mCurrentFrame));*/
+    p->drawLine(xL, 20, xL, mDrawRect.height());
+
+
+    lineWidth = 2.;
+    qreal incValue = 1000.;
+    bool by2 = true;
+    currAlpha = 255;
+    while(mPixelsPerValUnit*incValue > 50.) {
+        qreal yL = mDrawRect.height() +
+                fmod(mMinShownVal, incValue)*mPixelsPerValUnit - mMargin;
+        qreal incY = incValue*mPixelsPerValUnit;
+        if( yL > 20 && (yL < mDrawRect.height() || yL - incY > 20) ) {
+            p->setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
+            qreal currValue = mMinShownVal - fmod(mMinShownVal, incValue);
+            while(yL > 20) {
+                p->drawText(QRectF(0, yL - incY, 40, 2*incY),
+                            Qt::AlignCenter, QString::number(currValue));
+                p->drawLine(40, yL, mDrawRect.width(), yL);
+                yL -= incY;
+                currValue += incValue;
+            }
+            currAlpha *= 0.95;
+            lineWidth *= 0.85;
+        }
+        if(by2) {
+            incValue /= 2;
+        } else {
+            incValue /= 5;
+        }
+        by2 = !by2;
+    }
+
+    p->setClipRect(40, 20, mDrawRect.width() - 20, mDrawRect.height() - 20);
+
+    p->setPen(QPen(Qt::black, 4.));
     p->drawPath(mKeysDrawPath);
+    p->setPen(QPen(Qt::red, 2.));
+    p->drawPath(mKeysDrawPath);
+    p->setPen(QPen(Qt::black, 2.));
 
     p->save();
     p->translate(0., mDrawRect.height() - mMargin);
     p->setBrush(Qt::black);
     foreach(QrealKey *key, mKeys) {
         key->draw(p,
-                  mStartFrame, mMinVal,
+                  mStartFrame, mMinShownVal,
                   mPixelsPerFrame, mPixelsPerValUnit);
     }
     p->restore();
 
     if(mSelecting) {
         p->setBrush(Qt::NoBrush);
-        p->setPen(QPen(Qt::blue, 1.f, Qt::DotLine));
+        p->setPen(QPen(Qt::blue, 2.f, Qt::DotLine));
         p->drawRect(mSelectionRect);
     }
+}
+
+void QrealAnimator::incMinShownVal(qreal inc) {
+    setMinShownVal(inc*(mMaxVal - mMinVal) + mMinShownVal);
+}
+
+void QrealAnimator::setMinShownVal(qreal newMinShownVal) {
+    qreal halfHeightVal = (mDrawRect.height() - 2*mMargin)*0.5/mPixelsPerValUnit;
+    mMinShownVal = clamp(newMinShownVal,
+                         mMinVal - halfHeightVal,
+                         mMaxVal - halfHeightVal);
+    updateDrawPath();
 }
 
 void QrealAnimator::getValueAndFrameFromPos(QPointF pos,
                                             qreal *value, qreal *frame) {
     *value = (mDrawRect.height() - pos.y() - mMargin)/mPixelsPerValUnit
-            + mMinVal;
+            + mMinShownVal;
     *frame = mStartFrame + pos.x()/mPixelsPerFrame;
 }
 
@@ -360,23 +481,55 @@ void QrealAnimator::updateMinAndMaxMove(QrealKey *key) {
     }
 }
 
+QrealPoint *QrealAnimator::getPointAt(QPointF pos) {
+    qreal value;
+    qreal frame;
+    getValueAndFrameFromPos(pos, &value, &frame);
+    return getPointAt(value, frame);
+}
+
+void QrealAnimator::deletePressed()
+{
+    if(!mSelectedKeys.isEmpty()) {
+        foreach(QrealKey *key, mSelectedKeys) {
+            mKeys.removeOne(key);
+            delete key;
+        }
+        mSelectedKeys.clear();
+        sortKeys();
+        updateKeysPath();
+    } else if(mCurrentPoint != NULL) {
+        QrealKey *key = mCurrentPoint->getParentKey();
+        if(mCurrentPoint->isEndPoint()) {
+            key->setEndEnabled(false);
+        } else if(mCurrentPoint->isStartPoint()) {
+            key->setStartEnabled(false);
+        }
+    }
+}
+
+QrealPoint *QrealAnimator::getPointAt(qreal value, qreal frame) {
+    QrealPoint *point = NULL;
+    foreach(QrealKey *key, mKeys) {
+        point = key->mousePress(frame, value,
+                                mPixelsPerFrame, mPixelsPerValUnit);
+        if(point != NULL) {
+            break;
+        }
+    }
+    return point;
+}
+
 void QrealAnimator::mousePress(QPointF pressPos) {
     mFirstMove = true;
     qreal value;
     qreal frame;
     getValueAndFrameFromPos(pressPos, &value, &frame);
-    QrealKey *addedKey = NULL;
-    foreach(QrealKey *key, mKeys) {
-        mCurrentPoint = key->mousePress(frame, value,
-                                        mPixelsPerFrame, mPixelsPerValUnit);
-        if(mCurrentPoint != NULL) {
-            if(!mCurrentPoint->isKeyPoint()) {
-                updateMinAndMaxMove(key);
-            }
-            addedKey = key;
-            break;
-        }
-    }
+
+    mCurrentPoint = getPointAt(value, frame);
+    QrealKey *parentKey = (mCurrentPoint == NULL) ?
+                NULL :
+                mCurrentPoint->getParentKey();
     if(mCurrentPoint == NULL) {
         mSelecting = true;
         mSelectionRect.setTopLeft(pressPos);
@@ -384,18 +537,19 @@ void QrealAnimator::mousePress(QPointF pressPos) {
     } else if(mCurrentPoint->isKeyPoint()) {
         mPressFrameAndValue = QPointF(frame, value);
         if(isShiftPressed()) {
-            if(addedKey->isSelected()) {
-                removeKeyFromSelection(addedKey);
+            if(parentKey->isSelected()) {
+                removeKeyFromSelection(parentKey);
             } else {
-                addKeyToSelection(addedKey);
+                addKeyToSelection(parentKey);
             }
         } else {
-            if(!addedKey->isSelected()) {
+            if(!parentKey->isSelected()) {
                 clearKeysSelection();
-                addKeyToSelection(addedKey);
+                addKeyToSelection(parentKey);
             }
         }
     } else {
+        updateMinAndMaxMove(parentKey);
         mCurrentPoint->setSelected(true);
         clearKeysSelection();
     }

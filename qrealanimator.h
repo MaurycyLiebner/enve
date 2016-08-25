@@ -130,13 +130,9 @@ public:
     void removeKey(QrealKey *removeKey);
     void sortKeys();
     bool getNextAndPreviousKeyId(int *prevIdP, int *nextIdP, int frame);
-    void getKeyMultiplicatorsAtFrame(int frame,
-                                     QrealKey *prevKey,
-                                     QrealKey *nextKey,
-                                     qreal *prevMultiplicator,
-                                     qreal *nextMultiplicator);
 
     void draw(QPainter *p);
+
     void mousePress(QPointF pressPos);
     void mouseMove(QPointF mousePos);
     void mouseRelease();
@@ -145,8 +141,8 @@ public:
     void updateDimensions();
 
     void updateMinAndMaxMove(QrealKey *key);
-    void setMargin(qreal margin);
-    void incMargin(qreal inc);
+    void setScale(qreal scale);
+    void incScale(qreal inc);
     void mergeKeysIfNeeded();
     void clearKeysSelection();
 
@@ -155,8 +151,28 @@ public:
     void setViewedFramesRange(int minF, int maxF);
     void setRect(QRectF rect);
     void getMinAndMaxValues(qreal *minValP, qreal *maxValP);
+    void setMinShownVal(qreal newMinShownVal);
+    void incMinShownVal(qreal inc);
+    QrealPoint *getPointAt(qreal value, qreal frame);
+    QrealPoint *getPointAt(QPointF pos);
+    void deletePressed();
+    qreal getValueAtFrame(int frame, QrealKey *prevKey, QrealKey *nextKey);
+
+    void middlePress(QPointF pressPos);
+    void middleMove(QPointF movePos);
+    void middleRelease();
+
+    int getStartFrame();
+    int getEndFrame();
 private:
-    qreal mMargin = 20.f;
+    int mSavedStartFrame;
+    int mSavedEndFrame;
+    qreal mSavedMinShownValue;
+    QPointF mMiddlePressPos;
+
+    qreal mMargin = 20.;
+    qreal mValueScale = 1.;
+    qreal mMinShownVal = 0.;
 
     QPointF mPressFrameAndValue;
 

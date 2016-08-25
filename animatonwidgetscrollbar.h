@@ -20,6 +20,7 @@ protected:
 signals:
     void viewedFramesChanged(int, int);
 public slots:
+    void setViewedFramesRange(int startFrame, int endFrame);
 private:
     bool mPressed = false;
 

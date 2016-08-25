@@ -22,17 +22,19 @@ void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
 
-    p.fillRect(rect(), QColor(200, 200, 200));
+    p.setPen(Qt::NoPen);
+
+    p.fillRect(rect(), QColor(75, 75, 75));
 
     QColor col;
     if(mPressed) {
-        col = QColor(255, 75, 75);
+        col = QColor(255, 0, 0);
     } else {
-        col = QColor(200, 125, 125);
+        col = QColor(0, 0, 0);
     }
-    p.fillRect(frameToPos(mFirstViewedFrame), 0,
-               mFramesSpan*width()/(mMaxFrame - mMinFrame), height(),
-               col);
+    p.setBrush(col);
+    p.drawRect(QRectF(frameToPos(mFirstViewedFrame), 0,
+               mFramesSpan*width()/(mMaxFrame - mMinFrame), height()) );
 
     p.end();
 }
@@ -83,6 +85,13 @@ void AnimatonWidgetScrollBar::mouseMoveEvent(QMouseEvent *event)
 void AnimatonWidgetScrollBar::mouseReleaseEvent(QMouseEvent *)
 {
     mPressed = false;
+    repaint();
+}
+
+void AnimatonWidgetScrollBar::setViewedFramesRange(int startFrame, int endFrame)
+{
+    mFirstViewedFrame = startFrame;
+    mFramesSpan = endFrame - startFrame;
     repaint();
 }
 
