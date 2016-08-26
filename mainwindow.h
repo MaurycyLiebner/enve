@@ -16,6 +16,8 @@ class UpdateScheduler;
 
 class ColorSettingsWidget;
 
+class BoxesListAnimationDockWidget;
+
 extern bool isCtrlPressed();
 extern bool isShiftPressed();
 
@@ -25,6 +27,7 @@ class MainWindow : public QMainWindow
 private:
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
+    BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
     BoxesList *mBoxListWidget;
     QDockWidget *mTopBottomDock;
     AnimationDockWidget *mAnimationWidget;

@@ -51,7 +51,9 @@ SOURCES += main.cpp\
     animationwidget.cpp \
     animatonwidgetscrollbar.cpp \
     animationdockwidget.cpp \
-    qrealpointvaluedialog.cpp
+    qrealpointvaluedialog.cpp \
+    boxeslistanimationdockwidget.cpp \
+    transformanimator.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -90,4 +92,6 @@ HEADERS  += mainwindow.h \
     animationwidget.h \
     animatonwidgetscrollbar.h \
     animationdockwidget.h \
-    qrealpointvaluedialog.h
+    qrealpointvaluedialog.h \
+    boxeslistanimationdockwidget.h \
+    transformanimator.h

@@ -11,7 +11,7 @@ QPixmap *BoxesList::SHOW_CHILDREN;
 QPixmap *BoxesList::LOCKED_PIXMAP;
 QPixmap *BoxesList::UNLOCKED_PIXMAP;
 
-BoxesList::BoxesList(Canvas *canvas, MainWindow *parent) : QWidget(parent)
+BoxesList::BoxesList(MainWindow *mainWindow, QWidget *parent) : QWidget(parent)
 {
     VISIBLE_PIXMAP = new QPixmap("pixmaps/icons/ink_visible.png");
     INVISIBLE_PIXMAP = new QPixmap("pixmaps/icons/ink_hidden.png");
@@ -20,8 +20,8 @@ BoxesList::BoxesList(Canvas *canvas, MainWindow *parent) : QWidget(parent)
     LOCKED_PIXMAP = new QPixmap("pixmaps/icons/ink_lock_locked.png");
     UNLOCKED_PIXMAP = new QPixmap("pixmaps/icons/ink_lock_unlocked.png");
 
-    mCanvas = canvas;
-    mMainWindow = parent;
+    mCanvas = mainWindow->getCanvas();
+    mMainWindow = mainWindow;
     setMinimumHeight(200);
 }
 

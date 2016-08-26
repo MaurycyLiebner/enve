@@ -164,7 +164,7 @@ void QrealAnimator::updateKeysPath()
     foreach(QrealKey *key, mKeys) {
         int keyFrame = key->getFrame();
         if(lastKey == NULL) {
-            mKeysPath.moveTo(0, -key->getValue());
+            mKeysPath.moveTo(-5000, -key->getValue());
             mKeysPath.lineTo(keyFrame, -key->getValue());
         } else {
             mKeysPath.cubicTo(

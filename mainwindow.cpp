@@ -12,6 +12,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "boxeslist.h"
+#include "boxeslistanimationdockwidget.h"
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -42,8 +43,9 @@ MainWindow::MainWindow(QWidget *parent)
     mCanvas = new Canvas(mFillStrokeSettings, this);
 
     mBottomDock = new QDockWidget(this);
-    mBoxListWidget = new BoxesList(mCanvas, this);
-    mBottomDock->setWidget(mBoxListWidget);
+    mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
+    mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();
+    mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBottomDock->setFeatures(0);
     mBottomDock->setTitleBarWidget(new QWidget());

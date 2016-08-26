@@ -7,11 +7,16 @@ class AnimatonWidgetScrollBar : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimatonWidgetScrollBar(QWidget *parent = 0);
+    explicit AnimatonWidgetScrollBar(int minSpan, int maxSpan,
+                                     int spanInc, int height,
+                                     int viewedInc, bool range,
+                                     bool clamp,
+                                     QWidget *parent = 0);
     void emitChange();
+    bool setFirstViewedFrame(int firstFrame);
+    void setFramesSpan(int newSpan);
 protected:
-    int frameToPos(int frame);
-    int posToFrame(int xPos);
+    qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);
     void wheelEvent(QWheelEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -21,10 +26,15 @@ signals:
     void viewedFramesChanged(int, int);
 public slots:
     void setViewedFramesRange(int startFrame, int endFrame);
+
+    void setMinMaxFrames(int minFrame, int maxFrame);
 private:
+    bool mClamp;
+
+    bool mRange;
     bool mPressed = false;
 
-    int mLastMouseEventFrame;
+    qreal mLastMousePressFrame;
     int mSavedFirstFrame;
 
     int mFirstViewedFrame = 0;
@@ -32,6 +42,12 @@ private:
 
     int mMinFrame = 0;
     int mMaxFrame = 200;
+
+    int mViewedInc;
+
+    int mMinSpan;
+    int mMaxSpan;
+    int mSpanInc;
 };
 
 #endif // ANIMATONWIDGETSCROLLBAR_H

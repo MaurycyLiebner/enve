@@ -5,7 +5,10 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent) : QWidget(parent)
     mMainLayout = new QVBoxLayout(this);
     mMainLayout->setMargin(0);
     mMainLayout->setSpacing(0);
-    mScrollBar = new AnimatonWidgetScrollBar(this);
+    mScrollBar = new AnimatonWidgetScrollBar(50, 200,
+                                             10, 30,
+                                             1, true,
+                                             false, this);
     mAnimationWidget = new AnimationWidget(this);
     mMainLayout->addWidget(mScrollBar);
     mMainLayout->addWidget(mAnimationWidget);

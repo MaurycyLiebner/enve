@@ -15,7 +15,7 @@ class BoxesList : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BoxesList(Canvas *canvas, MainWindow *parent = 0);
+    explicit BoxesList(MainWindow *mainWindow, QWidget *parent = 0);
     void scheduleRepaint();
     void repaintIfNeeded();
 
