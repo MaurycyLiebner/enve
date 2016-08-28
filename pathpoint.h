@@ -2,6 +2,7 @@
 #define PATHPOINT_H
 #include "movablepoint.h"
 #include <QSqlQuery>
+#include "pointhelpers.h"
 
 class UndoRedoStack;
 
@@ -10,12 +11,6 @@ class VectorPath;
 class CtrlPoint;
 
 enum CanvasMode : short;
-
-enum CtrlsMode {
-    CTRLS_SMOOTH,
-    CTRLS_SYMMETRIC,
-    CTRLS_CORNER
-};
 
 class PathPoint : public MovablePoint
 {

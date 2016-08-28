@@ -23,6 +23,14 @@ public slots:
     void mergeKeysIfNeeded();
     void updateDrawnPath();
     void setViewedFramesRange(int startFrame, int endFrame);
+
+    void setTwoSizeCtrl();
+    void setRightSideCtrl();
+    void setLeftSideCtrl();
+    void setNoSideCtrl();
+    void setSmoothCtrl();
+    void setSymmetricCtrl();
+    void setCornerCtrl();
 private:
     QrealAnimator *mAnimator;
 };

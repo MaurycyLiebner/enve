@@ -1,6 +1,6 @@
 #include "qpointfanimator.h"
 
-QPointFAnimator::QPointFAnimator()
+QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 {
 
 }
@@ -8,6 +8,16 @@ QPointFAnimator::QPointFAnimator()
 QPointF QPointFAnimator::getCurrentValue()
 {
     return QPointF(mXAnimator.getCurrentValue(), mYAnimator.getCurrentValue());
+}
+
+qreal QPointFAnimator::getXValue()
+{
+    return mXAnimator.getCurrentValue();
+}
+
+qreal QPointFAnimator::getYValue()
+{
+    return mYAnimator.getCurrentValue();
 }
 
 void QPointFAnimator::setCurrentValue(QPointF val)

@@ -4,110 +4,7 @@
 #include <QList>
 #include <QPainterPath>
 #include <QPainter>
-
-class QrealPoint;
-
-class QrealKey
-{
-public:
-    QrealKey(int frame);
-    QrealPoint *mousePress(qreal frameT, qreal valueT,
-                    qreal pixelsPerFrame, qreal pixelsPerValue);
-
-    bool isSelected();
-
-    qreal getValue();
-    void setValue(qreal value);
-    void setStartValue(qreal value);
-    void setEndValue(qreal value);
-
-    int getFrame();
-    void setFrame(int frame);
-    void setStartFrame(qreal startFrame);
-    void setEndFrame(qreal endFrame);
-
-    qreal getStartValue();
-    qreal getEndValue();
-    qreal getStartValueFrame();
-    qreal getEndValueFrame();
-
-    void setStartEnabled(bool bT);
-
-    void setEndEnabled(bool bT);
-
-    void setSelected(bool bT);
-
-    bool isInsideRect(QRectF valueFrameRect);
-
-    void draw(QPainter *p,
-              qreal minFrameT, qreal minValueT,
-              qreal pixelsPerFrame, qreal pixelsPerValue);
-    void changeFrameAndValueBy(QPointF frameValueChange);
-    void saveCurrentFrameAndValue();
-private:
-    QrealPoint *mKeyPoint;
-    QrealPoint *mStartPoint;
-    QrealPoint *mEndPoint;
-
-    qreal mValue;
-    int mFrame;
-    qreal mSavedFrame;
-    qreal mSavedValue;
-
-    qreal mSavedMaxStartFrameDist;
-    qreal mSavedMaxEndFrameDist;
-
-    qreal mStartValue = 0.;
-    qreal mEndValue = 0.;
-    qreal mStartFrame = 0.;
-    qreal mEndFrame = 0.;
-    bool mStartEnabled = false;
-    bool mEndEnabled = false;
-};
-
-enum QrealPointType {
-    START_POINT,
-    END_POINT,
-    KEY_POINT
-};
-
-class QrealPoint
-{
-public:
-    QrealPoint(QrealPointType type, QrealKey *parentKey);
-
-    qreal getFrame();
-
-    void setFrame(qreal frame);
-
-    qreal getValue();
-
-    void setValue(qreal value);
-
-    bool isSelected();
-
-    bool isNear(qreal frameT, qreal valueT,
-                qreal pixelsPerFrame, qreal pixelsPerValue);
-
-    void moveTo(qreal frameT, qreal valueT);
-
-    void draw(QPainter *p,
-              qreal minFrameT, qreal minValueT,
-              qreal pixelsPerFrame, qreal pixelsPerValue);
-
-    void setSelected(bool bT);
-
-    bool isKeyPoint();
-    bool isStartPoint();
-    bool isEndPoint();
-
-    QrealKey *getParentKey();
-private:
-    bool mIsSelected = false;
-    QrealPointType mType;
-    QrealKey *mParentKey;
-    qreal mRadius = 10.f;
-};
+#include "qrealkey.h"
 
 class QrealAnimator
 {
@@ -140,7 +37,7 @@ public:
     void updateDrawPath();
     void updateDimensions();
 
-    void updateMinAndMaxMove(QrealKey *key);
+    virtual void updateMinAndMaxMove(QrealKey *key);
     void setScale(qreal scale);
     void incScale(qreal inc);
     void mergeKeysIfNeeded();
@@ -164,7 +61,22 @@ public:
 
     int getStartFrame();
     int getEndFrame();
-private:
+
+    void setTwoSideCtrlForSelected();
+    void setRightSideCtrlForSelected();
+    void setLeftSideCtrlForSelected();
+    void setNoSideCtrlForSelected();
+    void setCtrlsModeForSelected(CtrlsMode mode);
+    void constrainCtrlsFrameValues();
+
+    virtual qreal clampValue(qreal value);
+
+    qreal getPrevKeyValue(QrealKey *key);
+    qreal getNextKeyValue(QrealKey *key);
+
+    bool hasPrevKey(QrealKey *key);
+    bool hasNextKey(QrealKey *key);
+protected:
     int mSavedStartFrame;
     int mSavedEndFrame;
     qreal mSavedMinShownValue;

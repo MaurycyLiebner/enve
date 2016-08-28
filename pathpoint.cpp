@@ -240,31 +240,13 @@ void PathPoint::attachToBoneFromSqlZId()
 }
 
 QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {
-    QPointF posDist = absPosToMirror - getAbsolutePos();
-    return getAbsolutePos() - posDist;
-}
-
-qreal pointToLen(QPointF point) {
-    return sqrt(point.x()*point.x() + point.y()*point.y());
-}
-
-bool isPointZero(QPointF pos) {
-    return abs(pos.x()) == 0 && abs(pos.y()) == 0;
-}
-
-QPointF scalePointToNewLen(QPointF point, qreal newLen) {
-    if(isPointZero(point)) {
-        return point;
-    }
-    return point * newLen / pointToLen(point);
+    return symmetricToPos(absPosToMirror, getAbsolutePos());
 }
 
 QPointF PathPoint::symmetricToAbsPosNewLen(QPointF absPosToMirror, qreal newLen)
 {
-    QPointF posDist = absPosToMirror - getAbsolutePos();
-    return getAbsolutePos() - scalePointToNewLen(posDist, newLen);
+    return symmetricToPosNewLen(absPosToMirror, getAbsolutePos(), newLen);
 }
-
 
 void PathPoint::moveStartCtrlPtToAbsPos(QPointF startCtrlPt)
 {
@@ -473,40 +455,58 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
     mCtrlsMode = mode;
     if(saveUndoRedo) {
         if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-            QPointF point1 = mEndCtrlPt->getAbsolutePos();
-            point1 = symmetricToAbsPos(point1);
-            QPointF point2 = mStartCtrlPt->getAbsolutePos();
-            qreal len1 = pointToLen(point1);
-            qreal len2 = pointToLen(point2);
-            qreal lenSum = len1 + len2;
-            QPointF newStartCtrlPtPos = (point1*len1 + point2*len2)/lenSum;
-            QPointF newEndCtrlPtPos = symmetricToAbsPos(newStartCtrlPtPos);
-            mStartCtrlPt->setAbsolutePos(newStartCtrlPtPos);
-            mEndCtrlPt->setAbsolutePos(newEndCtrlPtPos);
+            QPointF newStartPos;
+            QPointF newEndPos;
+            getCtrlsSymmetricPos(mEndCtrlPt->getAbsolutePos(),
+                                 mStartCtrlPt->getAbsolutePos(),
+                                 getAbsolutePos(),
+                                 &newEndPos,
+                                 &newStartPos);
+            mStartCtrlPt->setAbsolutePos(newStartPos);
+            mEndCtrlPt->setAbsolutePos(newEndPos);
+//            QPointF point1 = mEndCtrlPt->getAbsolutePos();
+//            point1 = symmetricToAbsPos(point1);
+//            QPointF point2 = mStartCtrlPt->getAbsolutePos();
+//            qreal len1 = pointToLen(point1);
+//            qreal len2 = pointToLen(point2);
+//            qreal lenSum = len1 + len2;
+//            QPointF newStartCtrlPtPos = (point1*len1 + point2*len2)/lenSum;
+//            QPointF newEndCtrlPtPos = symmetricToAbsPos(newStartCtrlPtPos);
+//            mStartCtrlPt->setAbsolutePos(newStartCtrlPtPos);
+//            mEndCtrlPt->setAbsolutePos(newEndCtrlPtPos);
 
         } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
-            QPointF point1 = mEndCtrlPt->getAbsolutePos();
-            point1 = symmetricToAbsPos(point1);
-            QPointF point2 = mStartCtrlPt->getAbsolutePos();
-            qreal len1 = pointToLen(point1);
-            qreal len2 = pointToLen(point2);
-            qreal lenSum = len1 + len2;
-            QPointF point1Rel = mEndCtrlPt->getAbsolutePos() - getAbsolutePos();
-            QPointF point2Rel = mStartCtrlPt->getAbsolutePos() - getAbsolutePos();
-            QPointF newStartDirection =
-                    scalePointToNewLen(
-                        (point1*len1 + point2*len2)/lenSum - getAbsolutePos(),
-                        1.f);
-            qreal startCtrlPtLen =
-                    abs(QPointF::dotProduct(point2Rel, newStartDirection));
-            QPointF newStartCtrlPtPos = newStartDirection*startCtrlPtLen +
-                    getAbsolutePos();
-            qreal endCtrlPtLen =
-                    abs(QPointF::dotProduct(point1Rel, newStartDirection));
-            QPointF newEndCtrlPtPos = -newStartDirection*endCtrlPtLen +
-                    getAbsolutePos();
-            mStartCtrlPt->setAbsolutePos(newStartCtrlPtPos);
-            mEndCtrlPt->setAbsolutePos(newEndCtrlPtPos);
+            QPointF newStartPos;
+            QPointF newEndPos;
+            getCtrlsSmoothPos(mEndCtrlPt->getAbsolutePos(),
+                              mStartCtrlPt->getAbsolutePos(),
+                              getAbsolutePos(),
+                              &newEndPos,
+                              &newStartPos);
+            mStartCtrlPt->setAbsolutePos(newStartPos);
+            mEndCtrlPt->setAbsolutePos(newEndPos);
+//            QPointF point1 = mEndCtrlPt->getAbsolutePos();
+//            point1 = symmetricToAbsPos(point1);
+//            QPointF point2 = mStartCtrlPt->getAbsolutePos();
+//            qreal len1 = pointToLen(point1);
+//            qreal len2 = pointToLen(point2);
+//            qreal lenSum = len1 + len2;
+//            QPointF point1Rel = mEndCtrlPt->getAbsolutePos() - getAbsolutePos();
+//            QPointF point2Rel = mStartCtrlPt->getAbsolutePos() - getAbsolutePos();
+//            QPointF newStartDirection =
+//                    scalePointToNewLen(
+//                        (point1*len1 + point2*len2)/lenSum - getAbsolutePos(),
+//                        1.f);
+//            qreal startCtrlPtLen =
+//                    abs(QPointF::dotProduct(point2Rel, newStartDirection));
+//            QPointF newStartCtrlPtPos = newStartDirection*startCtrlPtLen +
+//                    getAbsolutePos();
+//            qreal endCtrlPtLen =
+//                    abs(QPointF::dotProduct(point1Rel, newStartDirection));
+//            QPointF newEndCtrlPtPos = -newStartDirection*endCtrlPtLen +
+//                    getAbsolutePos();
+//            mStartCtrlPt->setAbsolutePos(newStartCtrlPtPos);
+//            mEndCtrlPt->setAbsolutePos(newEndCtrlPtPos);
         }
 
         setCtrlPtEnabled(true, true);

@@ -27,6 +27,51 @@ AnimationWidget::AnimationWidget(QWidget *parent) : QWidget(parent)
     setMinimumSize(200, 200);
 }
 
+void AnimationWidget::setTwoSizeCtrl()
+{
+    mAnimator->setTwoSideCtrlForSelected();
+    repaint();
+}
+
+void AnimationWidget::setRightSideCtrl()
+{
+    mAnimator->setRightSideCtrlForSelected();
+    repaint();
+}
+
+void AnimationWidget::setLeftSideCtrl()
+{
+    mAnimator->setLeftSideCtrlForSelected();
+    repaint();
+}
+
+void AnimationWidget::setNoSideCtrl()
+{
+    mAnimator->setNoSideCtrlForSelected();
+    repaint();
+}
+
+void AnimationWidget::setSmoothCtrl()
+{
+    mAnimator->setTwoSideCtrlForSelected();
+    mAnimator->setCtrlsModeForSelected(CTRLS_SMOOTH);
+    repaint();
+}
+
+void AnimationWidget::setSymmetricCtrl()
+{
+    mAnimator->setTwoSideCtrlForSelected();
+    mAnimator->setCtrlsModeForSelected(CTRLS_SYMMETRIC);
+    repaint();
+}
+
+void AnimationWidget::setCornerCtrl()
+{
+    mAnimator->setTwoSideCtrlForSelected();
+    mAnimator->setCtrlsModeForSelected(CTRLS_CORNER);
+    repaint();
+}
+
 void AnimationWidget::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
