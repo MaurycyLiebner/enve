@@ -1,6 +1,7 @@
 #include "complexanimator.h"
 
-ComplexAnimator::ComplexAnimator() : QrealAnimator()
+ComplexAnimator::ComplexAnimator() :
+    QrealAnimator()
 {
 
 }

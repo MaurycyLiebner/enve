@@ -11,6 +11,14 @@ public:
     qreal getXValue();
     qreal getYValue();
     void setCurrentValue(QPointF val);
+    void incCurrentValue(qreal x, qreal y);
+    void multCurrentValue(qreal sx, qreal sy);
+    void saveCurrentValue();
+    void retrieveSavedValue();
+
+    QPointF getSavedValue();
+    qreal getSavedXValue();
+    qreal getSavedYValue();
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

@@ -65,6 +65,7 @@ public:
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
     void scale(qreal scaleBy, QPointF absOrigin);
     void pickPathForSettings();
+    void moveBy(QPointF trans);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);

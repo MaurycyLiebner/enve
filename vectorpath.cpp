@@ -231,7 +231,7 @@ void VectorPath::updatePivotPosition() {
         foreach(PathPoint *point, mPoints) {
             posSum += point->getRelativePos();
         }
-        mRelRotPivotPos = posSum/count;
+        mTransformMatrix.setPivot(posSum/count, false);
     }
 }
 

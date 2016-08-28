@@ -528,6 +528,36 @@ bool QrealAnimator::hasNextKey(QrealKey *key)
     return false;
 }
 
+void QrealAnimator::retrieveSavedValue()
+{
+    setCurrentValue(mSavedCurrentValue);
+}
+
+void QrealAnimator::incCurrentValue(qreal incBy)
+{
+    setCurrentValue(mCurrentValue + incBy);
+}
+
+void QrealAnimator::saveCurrentValue()
+{
+    mSavedCurrentValue = mCurrentValue;
+}
+
+void QrealAnimator::finishTransform()
+{
+
+}
+
+void QrealAnimator::multCurrentValue(qreal mult)
+{
+    setCurrentValue(mCurrentValue*mult);
+}
+
+qreal QrealAnimator::getSavedValue()
+{
+    return mSavedCurrentValue;
+}
+
 void QrealAnimator::setCtrlsModeForSelected(CtrlsMode mode) {
     foreach(QrealKey *key, mSelectedKeys) {
         key->setCtrlsMode(mode);

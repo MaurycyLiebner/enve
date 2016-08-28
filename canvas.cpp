@@ -52,10 +52,10 @@ void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 {
     QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
 
-    mTransformMatrix.translate(-transPoint.x(), -transPoint.y());
-    mTransformMatrix.scale(scaleXBy, scaleYBy);
-    mTransformMatrix.translate(transPoint.x(), transPoint.y());
-    updateCombinedTransform();
+    mCombinedTransformMatrix.translate(-transPoint.x(), -transPoint.y());
+    mCombinedTransformMatrix.scale(scaleXBy, scaleYBy);
+    mCombinedTransformMatrix.translate(transPoint.x(), transPoint.y());
+    updateAfterCombinedTransformationChanged();
 }
 
 void Canvas::scale(qreal scaleBy, QPointF absOrigin)
@@ -173,7 +173,7 @@ bool Canvas::isMovingPath() {
 
 qreal Canvas::getCurrentCanvasScale()
 {
-    return mTransformMatrix.m11();
+    return mCombinedTransformMatrix.m11();
 }
 
 void Canvas::schedulePivotUpdate()
@@ -448,27 +448,37 @@ void Canvas::selectOnlyLastPressedPoint() {
 }
 
 void Canvas::resetTransormation() {
-    mTransformMatrix.reset();
+    mCombinedTransformMatrix.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
-    updateCombinedTransform();
+    updateAfterCombinedTransformationChanged();
     scheduleRepaint();
 }
 
 void Canvas::fitCanvasToSize() {
-    mTransformMatrix.reset();
+    mCombinedTransformMatrix.reset();
     mVisibleHeight = mHeight + 20;
     mVisibleWidth = mWidth + 20;
-    updateCombinedTransform();
+    updateAfterCombinedTransformationChanged();
     qreal widthScale = width()/mVisibleWidth;
     qreal heightScale = height()/mVisibleHeight;
     scale(qMin(heightScale, widthScale), QPointF(0.f, 0.f));
-    mVisibleHeight = mTransformMatrix.m22()*mHeight;
-    mVisibleWidth = mTransformMatrix.m11()*mWidth;
+    mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
+    mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
     moveBy(QPointF( (width() - mVisibleWidth)*0.5f,
                     (height() - mVisibleHeight)*0.5f) );
-    updateCombinedTransform();
+    updateAfterCombinedTransformationChanged();
     scheduleRepaint();
+}
+
+void Canvas::moveBy(QPointF trans)
+{
+    trans = getCombinedTransform().inverted().map(trans) -
+            getCombinedTransform().inverted().map(QPointF(0, 0));
+
+    mCombinedTransformMatrix.translate(trans.x(), trans.y());
+    updateCombinedTransform();
+    schedulePivotUpdate();
 }
 
 void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,

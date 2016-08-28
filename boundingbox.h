@@ -4,6 +4,7 @@
 #include "transformable.h"
 #include "fillstrokesettings.h"
 #include <QSqlQuery>
+#include "transformanimator.h"
 
 class UndoRedo;
 
@@ -43,7 +44,7 @@ public:
 
     QMatrix getCombinedTransform();
 
-    QPointF getTranslation();
+    void applyTransformation(TransformAnimator *transAnimator);
 
     void scale(qreal scaleBy, QPointF absOrigin);
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
@@ -100,7 +101,7 @@ public:
     virtual void finishStrokeTransform() {}
     virtual void finishFillTransform() {}
     void setPivotAbsPos(QPointF absPos, bool saveUndoRedo = true, bool pivotChanged = true);
-    void applyTransformation(QMatrix transformation);
+
     void setPivotRelPos(QPointF relPos, bool saveUndoRedo = true, bool pivotChanged = true);
 
     void scheduleRemoval();
@@ -143,6 +144,8 @@ public:
     void scale(qreal scaleBy);
 
     virtual void attachToBoneFromSqlZId();
+    void rotateRelativeToSavedPivot(qreal rot);
+    void scaleRelativeToSavedPivot(qreal scaleBy);
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 
@@ -152,11 +155,10 @@ protected:
 
     QMatrix mSavedTransformMatrix;
 
-    QMatrix mTransformMatrix;
+    TransformAnimator mTransformMatrix;
 
     QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;
-    QPointF mRelRotPivotPos;
     bool mPivotChanged = false;
 
     bool mVisible = true;

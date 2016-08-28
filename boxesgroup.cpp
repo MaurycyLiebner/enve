@@ -242,30 +242,56 @@ void BoxesGroup::finishSelectedFillTransform()
 void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
                                   bool startTrans)
 {
-    if(startTrans) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->startTransform();
-            box->saveTransformPivot(absOrigin);
-            box->rotateBy(rotBy);
+    if(mSelectedBoxes.count() == 1) {
+        if(startTrans) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->startTransform();
+                box->rotateBy(rotBy);
+            }
+        } else {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->rotateBy(rotBy);
+            }
         }
     } else {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->rotateBy(rotBy);
+        if(startTrans) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->startTransform();
+                box->saveTransformPivot(absOrigin);
+                box->rotateRelativeToSavedPivot(rotBy);
+            }
+        } else {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->rotateRelativeToSavedPivot(rotBy);
+            }
         }
     }
 }
 
 void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
                                  bool startTrans) {
-    if(startTrans) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->startTransform();
-            box->saveTransformPivot(absOrigin);
-            box->scale(scaleBy);
+    if(mSelectedBoxes.count() == 1) {
+        if(startTrans) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->startTransform();
+                box->scale(scaleBy);
+            }
+        } else {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->scale(scaleBy);
+            }
         }
     } else {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->scale(scaleBy);
+        if(startTrans) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->startTransform();
+                box->saveTransformPivot(absOrigin);
+                box->scaleRelativeToSavedPivot(scaleBy);
+            }
+        } else {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->scaleRelativeToSavedPivot(scaleBy);
+            }
         }
     }
 }
@@ -326,7 +352,7 @@ void BoxesGroup::ungroup() {
     clearBoxesSelection();
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
     foreachBoxInListInverted(mChildren) {
-        box->applyTransformation(mTransformMatrix);
+        box->applyTransformation(&mTransformMatrix);
         removeChild(box);
         parentGroup->addChild(box);
     }

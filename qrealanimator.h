@@ -5,6 +5,7 @@
 #include <QPainterPath>
 #include <QPainter>
 #include "qrealkey.h"
+#include "connectedtomainwindow.h"
 
 class QrealAnimator
 {
@@ -76,6 +77,17 @@ public:
 
     bool hasPrevKey(QrealKey *key);
     bool hasNextKey(QrealKey *key);
+
+    virtual void retrieveSavedValue();
+    void incCurrentValue(qreal incBy);
+
+    virtual void saveCurrentValue();
+
+    virtual void finishTransform();
+
+    void multCurrentValue(qreal mult);
+
+    qreal getSavedValue();
 protected:
     int mSavedStartFrame;
     int mSavedEndFrame;
@@ -97,6 +109,7 @@ protected:
     QList<QrealKey*> mSelectedKeys;
 
     qreal mCurrentValue;
+    qreal mSavedCurrentValue;
     QList<QrealKey*> mKeys;
     QPainterPath mKeysPath;
     QPainterPath mKeysDrawPath;

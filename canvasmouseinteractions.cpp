@@ -3,7 +3,7 @@
 #include "pathpivot.h"
 
 QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
-    return point/mTransformMatrix.m11();
+    return point/mCombinedTransformMatrix.m11();
 }
 
 void Canvas::handleMovePathMousePressEvent() {
@@ -304,8 +304,8 @@ void Canvas::wheelEvent(QWheelEvent *event)
     } else {
         scale(0.8, event->posF());
     }
-    mVisibleHeight = mTransformMatrix.m22()*mHeight;
-    mVisibleWidth = mTransformMatrix.m11()*mWidth;
+    mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
+    mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
     scheduleRepaint();
     callUpdateSchedulers();
 }
