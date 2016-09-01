@@ -6,11 +6,17 @@
 #include <QPainter>
 #include "qrealkey.h"
 #include "connectedtomainwindow.h"
+#include "animatorupdater.h"
+
+class ComplexAnimator;
 
 class QrealAnimator
 {
 public:
     QrealAnimator();
+    virtual ~QrealAnimator();
+
+    void setParentAnimator(ComplexAnimator *parentAnimator);
 
     qreal getValueAtFrame(int frame);
     qreal getCurrentValue();
@@ -20,7 +26,7 @@ public:
     void saveCurrentValueToKey(QrealKey *key);
     void saveValueToKey(QrealKey *key, qreal value);
 
-    void setFrame(int frame);
+    virtual void setFrame(int frame);
     QrealKey *getKeyAtFrame(int frame);
     void saveCurrentValueAsKey();
     void updateKeysPath();
@@ -81,14 +87,30 @@ public:
     virtual void retrieveSavedValue();
     void incCurrentValue(qreal incBy);
 
-    virtual void saveCurrentValue();
+    virtual void startTransform();
 
-    virtual void finishTransform();
+    virtual void finishTransform(bool record);
 
     void multCurrentValue(qreal mult);
 
     qreal getSavedValue();
+
+    virtual void setConnectedToMainWindow(ConnectedToMainWindow *connected);
+
+    virtual void cancelTransform();
+
+    virtual void setUpdater(AnimatorUpdater *updater);
+
+    void callUpdater();
 protected:
+    ComplexAnimator *mParentAnimator = NULL;
+
+    AnimatorUpdater *mUpdater = NULL;
+
+    ConnectedToMainWindow *mConnectedToMainWindow = NULL;
+
+    bool mTransformed = false;
+
     int mSavedStartFrame;
     int mSavedEndFrame;
     qreal mSavedMinShownValue;

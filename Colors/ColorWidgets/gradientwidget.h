@@ -9,6 +9,7 @@ class GradientWidget : public GLWidget
     Q_OBJECT
 public:
     GradientWidget(QWidget *parent, MainWindow *mainWindow);
+    ~GradientWidget();
 
     void setCurrentGradient(Gradient *gradient);
     Gradient *getCurrentGradient();

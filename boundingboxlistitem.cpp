@@ -52,8 +52,15 @@ void BoxesGroup::handleListItemMousePress(qreal relX, qreal relY) {
     }
 }
 
-void BoundingBox::drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY) {
+void BoundingBox::drawListItem(QPainter *p,
+                               qreal drawX, qreal drawY,
+                               qreal maxY, qreal pixelsPerFrame,
+                               int startFrame, int endFrame) {
     Q_UNUSED(maxY);
+    drawAnimationBar(p, pixelsPerFrame,
+                     200., drawY,
+                     startFrame, endFrame);
+
     if(mSelected) {
         p->setBrush(QColor(185, 185, 185));
     } else {
@@ -80,9 +87,19 @@ void BoundingBox::drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY
                 mName, QTextOption(Qt::AlignVCenter));
 }
 
+void BoundingBox::drawAnimationBar(QPainter *p,
+                                   qreal pixelsPerFrame,
+                                   qreal drawX, qreal drawY,
+                                   int startFrame, int endFrame) {
+    mTransformAnimator.drawKeys(p,
+                                pixelsPerFrame, drawX, drawY, 20.,
+                                startFrame, endFrame, true);
+}
+
 void BoxesGroup::drawChildren(QPainter *p,
                               qreal drawX, qreal drawY,
-                              qreal minY, qreal maxY) {
+                              qreal minY, qreal maxY, qreal pixelsPerFrame,
+                              int startFrame, int endFrame) {
     qreal currentY = drawY;
     qreal currentDrawY = drawY;
     foreach (BoundingBox *box, mChildren) {
@@ -91,22 +108,28 @@ void BoxesGroup::drawChildren(QPainter *p,
             if(currentY > maxY) {
                 break;
             }
-            box->drawListItem(p, drawX, currentDrawY, maxY);
+            box->drawListItem(p, drawX, currentDrawY, maxY,
+                              pixelsPerFrame, startFrame, endFrame);
             currentDrawY += boxHeight;
         }
         currentY += boxHeight;
     }
 }
 
-void BoxesGroup::drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY)
+void BoxesGroup::drawListItem(QPainter *p,
+                              qreal drawX, qreal drawY,
+                              qreal maxY, qreal pixelsPerFrame,
+                              int startFrame, int endFrame)
 {
-    BoundingBox::drawListItem(p, drawX, drawY, maxY);
+    BoundingBox::drawListItem(p, drawX, drawY, maxY,
+                              pixelsPerFrame, startFrame, endFrame);
     if(mChildrenListItemsVisibile) {
         p->drawPixmap(drawX, drawY, *BoxesList::HIDE_CHILDREN);
 
         drawX += LIST_ITEM_CHILD_INDENT;
         drawY += LIST_ITEM_HEIGHT;
-        drawChildren(p, drawX, drawY, 0.f, maxY);
+        drawChildren(p, drawX, drawY, 0.f, maxY,
+                     pixelsPerFrame, startFrame, endFrame);
     } else {
         p->drawPixmap(drawX, drawY, *BoxesList::SHOW_CHILDREN);
     }

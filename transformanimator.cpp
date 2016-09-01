@@ -1,4 +1,5 @@
 #include "transformanimator.h"
+#include "undoredo.h"
 #include <QDebug>
 
 TransformAnimator::TransformAnimator() : ComplexAnimator()
@@ -6,6 +7,10 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mScaleAnimator.setCurrentValue(QPointF(1., 1.));
     mRotAnimator.setCurrentValue(0.);
     mPosAnimator.setCurrentValue(QPointF(0., 0.) );
+
+    mScaleAnimator.setParentAnimator(this);
+    mRotAnimator.setParentAnimator(this);
+    mPosAnimator.setParentAnimator(this);
 }
 
 void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel) {
@@ -47,11 +52,66 @@ void TransformAnimator::scale(qreal sx, qreal sy, QPointF pivot)
     mPosAnimator.setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
-void TransformAnimator::saveCurrentValue()
+void TransformAnimator::setScale(qreal sx, qreal sy)
 {
-    mPosAnimator.saveCurrentValue();
-    mScaleAnimator.saveCurrentValue();
-    mRotAnimator.saveCurrentValue();
+    mScaleAnimator.setCurrentValue(QPointF(sx, sy) );
+}
+
+void TransformAnimator::setPosition(qreal x, qreal y)
+{
+    mPosAnimator.setCurrentValue(QPointF(x, y) );
+}
+
+void TransformAnimator::setRotation(qreal rot)
+{
+    mRotAnimator.setCurrentValue(rot);
+}
+
+void TransformAnimator::startTransform()
+{
+    startRotTransform();
+    startPosTransform();
+    startScaleTransform();
+}
+
+void TransformAnimator::startRotTransform()
+{
+    mRotAnimator.startTransform();
+}
+
+void TransformAnimator::startPosTransform() {
+    mPosAnimator.startTransform();
+}
+
+void TransformAnimator::startScaleTransform() {
+    mScaleAnimator.startTransform();
+}
+
+void TransformAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
+{
+    QrealAnimator::setConnectedToMainWindow(connected);
+
+    mPosAnimator.setConnectedToMainWindow(connected);
+    mRotAnimator.setConnectedToMainWindow(connected);
+    mScaleAnimator.setConnectedToMainWindow(connected);
+}
+
+void TransformAnimator::setUpdater(AnimatorUpdater *updater)
+{
+    QrealAnimator::setUpdater(updater);
+
+    mPosAnimator.setUpdater(updater);
+    mRotAnimator.setUpdater(updater);
+    mScaleAnimator.setUpdater(updater);
+}
+
+void TransformAnimator::setFrame(int frame)
+{
+    QrealAnimator::setFrame(frame);
+
+    mPosAnimator.setFrame(frame);
+    mRotAnimator.setFrame(frame);
+    mScaleAnimator.setFrame(frame);
 }
 
 void TransformAnimator::retrieveSavedValue()
@@ -61,11 +121,22 @@ void TransformAnimator::retrieveSavedValue()
     mRotAnimator.retrieveSavedValue();
 }
 
-void TransformAnimator::finishTransform()
+void TransformAnimator::finishTransform(bool record)
 {
-    mPosAnimator.finishTransform();
-    mScaleAnimator.finishTransform();
-    mRotAnimator.finishTransform();
+    mConnectedToMainWindow->startNewUndoRedoSet();
+
+    mPosAnimator.finishTransform(record);
+    mScaleAnimator.finishTransform(record);
+    mRotAnimator.finishTransform(record);
+
+    mConnectedToMainWindow->finishUndoRedoSet();
+}
+
+void TransformAnimator::cancelTransform()
+{
+    mPosAnimator.cancelTransform();
+    mScaleAnimator.cancelTransform();
+    mRotAnimator.cancelTransform();
 }
 
 qreal TransformAnimator::getYScale()
@@ -85,18 +156,37 @@ void TransformAnimator::reset()
     mPosAnimator.setCurrentValue(QPointF(0., 0.) );
 }
 
-void TransformAnimator::setPivot(qreal x, qreal y, bool saveUndoRedo)
+void TransformAnimator::setPivot(qreal x, qreal y)
 {
-    setPivot(QPointF(x, y), saveUndoRedo );
+    setPivot(QPointF(x, y) );
 }
 
-void TransformAnimator::setPivot(QPointF point, bool saveUndoRedo)
+void TransformAnimator::setPivot(QPointF point)
 {
-    if(saveUndoRedo) {
-//        addUndoRedo(new SetPivotRelPosUndoRedo(this, mRelPivotPos, relPos,
-//                                               mPivotChanged, pivotChanged));
-    }
+    QMatrix currentMatrix;
+    currentMatrix.translate(mPivotPoint.x() + mPosAnimator.getXValue(),
+                     mPivotPoint.y() + mPosAnimator.getYValue());
+    currentMatrix.scale(mScaleAnimator.getXValue(),
+                        mScaleAnimator.getYValue() );
+    currentMatrix.rotate(mRotAnimator.getCurrentValue() );
+    currentMatrix.translate(-mPivotPoint.x(),
+                            -mPivotPoint.y());
+
+    QMatrix futureMatrix;
+    futureMatrix.translate(point.x() + mPosAnimator.getXValue(),
+                     point.y() + mPosAnimator.getYValue());
+    futureMatrix.scale(mScaleAnimator.getXValue(),
+                        mScaleAnimator.getYValue() );
+    futureMatrix.rotate(mRotAnimator.getCurrentValue() );
+    futureMatrix.translate(-point.x(),
+                            -point.y());
+
+    mPosAnimator.incCurrentValue(currentMatrix.dx() - futureMatrix.dx(),
+                                 currentMatrix.dy() - futureMatrix.dy());
+
     mPivotPoint = point;
+
+    mUpdater->update();
 }
 
 QPointF TransformAnimator::getPivot()
@@ -132,6 +222,16 @@ qreal TransformAnimator::yScale()
 QPointF TransformAnimator::pos()
 {
     return mPosAnimator.getCurrentValue();
+}
+
+qreal TransformAnimator::getPivotX()
+{
+    return mPivotPoint.x();
+}
+
+qreal TransformAnimator::getPivotY()
+{
+    return mPivotPoint.y();
 }
 
 QMatrix TransformAnimator::getCurrentValue()

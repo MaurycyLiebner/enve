@@ -56,9 +56,12 @@ private:
     bool mChangedSinceSaving = false;
     bool mEventFilterDisabled = false;
     QWidget *grayOutWidget = NULL;
+
+    int mCurrentFrame = 0;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
+    void closeEvent(QCloseEvent *e);
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -88,6 +91,10 @@ public:
     void scheduleBoxesListRepaint();
     void disable();
     void enable();
+
+    int getCurrentFrame();
+public slots:
+    void setCurrentFrame(int frame);
 private slots:
     void newFile();
     bool askForSaving();
@@ -96,7 +103,6 @@ private slots:
     void saveFileAs();
     void saveBackup();
     void closeProject();
-    void exitProgram();
     void importFile();
     void exportSelected();
     void revert();

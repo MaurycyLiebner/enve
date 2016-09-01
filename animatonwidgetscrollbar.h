@@ -15,6 +15,9 @@ public:
     void emitChange();
     bool setFirstViewedFrame(int firstFrame);
     void setFramesSpan(int newSpan);
+
+    int getMaxFrame();
+    int getMinFrame();
 protected:
     qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);

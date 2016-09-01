@@ -75,7 +75,6 @@ public:
     void moveStartCtrlPtToRelPos(QPointF startCtrlPt);
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
     VectorPath *getParentPath();
-    void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
 
     void saveToSql(int vectorPathId);
     PathPoint(qreal relPosX, qreal relPosy,
@@ -91,6 +90,8 @@ public:
 
     bool isEndCtrlPtEnabled();
     bool isStartCtrlPtEnabled();
+
+    void setPosAnimatorUpdater(AnimatorUpdater *updater);
 private:
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;

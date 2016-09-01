@@ -6,18 +6,20 @@ ComplexAnimator::ComplexAnimator() :
 
 }
 
-
+#include <QDebug>
 void ComplexAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
-                               qreal centerY,
+                               qreal startX, qreal startY, qreal height,
                                int startFrame, int endFrame,
                                bool detailedView)
 {
-    qreal radius = pixelsPerFrame*0.5;
     foreach(QrealKey *key, mKeys) {
         if(key->getFrame() >= startFrame && key->getFrame() <= endFrame) {
-            p->drawEllipse(
-                    QPointF((key->getFrame() - startFrame)*pixelsPerFrame, centerY),
-                    radius, radius);
+            p->fillRect(
+                QRectF(
+                    QPointF((key->getFrame() - startFrame)*pixelsPerFrame +
+                            startX,
+                            startY),
+                    QSize(pixelsPerFrame, height) ), Qt::red );
         }
     }
 
@@ -55,7 +57,7 @@ void ComplexAnimator::updateMinAndMaxMove(QrealKey *key) {
     mMaxMoveValue = mMaxMoveFrame;
 }
 
-void ComplexAnimator::addQrealKey(QrealKey *key)
+void ComplexAnimator::addChildQrealKey(QrealKey *key)
 {
     ComplexKey *collection = getKeyCollectionAtFrame(key->getFrame() );
     if(collection == NULL) {
@@ -66,7 +68,7 @@ void ComplexAnimator::addQrealKey(QrealKey *key)
     collection->addAnimatorKey(key);
 }
 
-void ComplexAnimator::removeQrealKey(QrealKey *key)
+void ComplexAnimator::removeChildQrealKey(QrealKey *key)
 {
     ComplexKey *collection = getKeyCollectionAtFrame(key->getFrame() );
     collection->removeAnimatorKey(key);

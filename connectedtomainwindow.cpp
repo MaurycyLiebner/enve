@@ -49,6 +49,11 @@ bool ConnectedToMainWindow::isAltPressed() {
     return (QApplication::keyboardModifiers() & Qt::AltModifier);
 }
 
+int ConnectedToMainWindow::getCurrentFrame()
+{
+    return mMainWindow->getCurrentFrame();
+}
+
 void ConnectedToMainWindow::startNewUndoRedoSet()
 {
      mMainWindow->getUndoRedoStack()->startNewSet();

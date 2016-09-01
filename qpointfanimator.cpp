@@ -2,7 +2,8 @@
 
 QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 {
-
+    mXAnimator.setParentAnimator(this);
+    mYAnimator.setParentAnimator(this);
 }
 
 QPointF QPointFAnimator::getCurrentValue()
@@ -38,10 +39,47 @@ void QPointFAnimator::multCurrentValue(qreal sx, qreal sy)
     mYAnimator.multCurrentValue(sy);
 }
 
-void QPointFAnimator::saveCurrentValue()
+void QPointFAnimator::startTransform()
 {
-    mXAnimator.saveCurrentValue();
-    mYAnimator.saveCurrentValue();
+    mXAnimator.startTransform();
+    mYAnimator.startTransform();
+}
+
+void QPointFAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
+{
+    QrealAnimator::setConnectedToMainWindow(connected);
+    mXAnimator.setConnectedToMainWindow(connected);
+    mYAnimator.setConnectedToMainWindow(connected);
+}
+
+void QPointFAnimator::setUpdater(AnimatorUpdater *updater)
+{
+    QrealAnimator::setUpdater(updater);
+
+    mXAnimator.setUpdater(updater);
+    mYAnimator.setUpdater(updater);
+}
+
+void QPointFAnimator::setFrame(int frame)
+{
+    QrealAnimator::setFrame(frame);
+    mXAnimator.setFrame(frame);
+    mYAnimator.setFrame(frame);
+}
+
+void QPointFAnimator::finishTransform(bool record)
+{
+    mConnectedToMainWindow->startNewUndoRedoSet();
+
+    mXAnimator.finishTransform(record);
+    mYAnimator.finishTransform(record);
+
+    mConnectedToMainWindow->finishUndoRedoSet();
+}
+
+void QPointFAnimator::cancelTransform() {
+    mXAnimator.cancelTransform();
+    mYAnimator.cancelTransform();
 }
 
 void QPointFAnimator::retrieveSavedValue()

@@ -122,7 +122,7 @@ MainWindow::MainWindow(QWidget *parent)
     mFileMenu->addSeparator();
     mFileMenu->addAction("Close", this, SLOT(closeProject()));
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Exit", this, SLOT(exitProgram()));
+    mFileMenu->addAction("Exit", this, SLOT(close()));
 
     setMenuBar(mMenuBar);
 //
@@ -232,6 +232,20 @@ void MainWindow::enable()
     grayOutWidget = NULL;
 }
 
+int MainWindow::getCurrentFrame()
+{
+    return mCurrentFrame;
+}
+
+void MainWindow::setCurrentFrame(int frame)
+{
+    mCurrentFrame = frame;
+    mCanvas->updateAfterFrameChanged(mCurrentFrame);
+    mBoxListWidget->scheduleRepaint();
+
+    callUpdateSchedulers();
+}
+
 void MainWindow::newFile()
 {
     if(askForSaving()) {
@@ -250,6 +264,13 @@ bool MainWindow::eventFilter(QObject *, QEvent *e)
         return processKeyEvent(key_event);
     }
     return false;
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    if(!askForSaving() ) {
+        e->ignore();
+    }
 }
 
 bool isCtrlPressed() {
@@ -385,13 +406,6 @@ void MainWindow::closeProject()
     }
 }
 
-void MainWindow::exitProgram()
-{
-    if(askForSaving()) {
-        close();
-    }
-}
-
 void MainWindow::importFile()
 {
     disableEventFilter();
@@ -487,12 +501,11 @@ void MainWindow::createTablesInSaveDatabase() {
                "(id INTEGER PRIMARY KEY, "
                "name TEXT, "
                "boxtype INTEGER, "
-               "m11_trans REAL, "
-               "m12_trans REAL, "
-               "m21_trans REAL, "
-               "m22_trans REAL, "
-               "dx_trans REAL, "
-               "dy_trans REAL, "
+               "sx REAL, "
+               "sy REAL, "
+               "rot REAL, "
+               "dx REAL, "
+               "dy REAL, "
                "pivotx REAL, "
                "pivoty REAL, "
                "pivotchanged BOOLEAN, "

@@ -5,6 +5,7 @@
 #include "canvas.h"
 #include "vectorpath.h"
 #include "movablepoint.h"
+#include "qrealanimator.h"
 #include <QDebug>
 
 class UndoRedo
@@ -66,6 +67,11 @@ public:
             mCurrentSet = new UndoRedoSet();
         }
         mNumberOfSets++;
+    }
+
+    ~UndoRedoStack() {
+        clearUndoStack();
+        clearRedoStack();
     }
 
     void setWindow(MainWindow *mainWindow);
@@ -143,31 +149,6 @@ private:
     UndoRedoSet *mCurrentSet;
     QList<UndoRedo*> mUndoStack;
     QList<UndoRedo*> mRedoStack;
-};
-
-class TransformChildParentUndoRedo : public UndoRedo
-{
-public:
-    TransformChildParentUndoRedo(BoundingBox *transformedPath,
-                     QMatrix transformBefore,
-                     QMatrix transformAfter) : UndoRedo("TransformChildParentUndoRedo") {
-        mTransformedPath = transformedPath;
-        mTransformBefore = transformBefore;
-        mTransformAfter = transformAfter;
-    }
-
-    void redo() {
-        mTransformedPath->setTransformation(mTransformAfter);
-    }
-
-    void undo() {
-        mTransformedPath->setTransformation(mTransformBefore);
-    }
-
-private:
-    BoundingBox *mTransformedPath;
-    QMatrix mTransformBefore;
-    QMatrix mTransformAfter;
 };
 
 class MoveMovablePointUndoRedo : public UndoRedo
@@ -658,6 +639,31 @@ private:
     Transformable *mTransformable;
     Bone *mOldBone;
     Bone *mNewBone;
+};
+
+class ChangeQrealAnimatorValue : public UndoRedo
+{
+public:
+    ChangeQrealAnimatorValue(qreal oldValue, qreal newValue,
+                             QrealAnimator *animator) :
+        UndoRedo("ChangeQrealAnimatorValue") {
+        mOldValue = oldValue;
+        mNewValue = newValue;
+        mAnimator = animator;
+    }
+
+    void redo() {
+        mAnimator->setCurrentValue(mNewValue);
+    }
+
+    void undo() {
+        mAnimator->setCurrentValue(mOldValue);
+    }
+
+private:
+    qreal mOldValue;
+    qreal mNewValue;
+    QrealAnimator *mAnimator;
 };
 
 #endif // UNDOREDO_H

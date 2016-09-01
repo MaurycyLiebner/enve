@@ -10,6 +10,18 @@ QrealAnimator::QrealAnimator()
 {
 }
 
+QrealAnimator::~QrealAnimator()
+{
+    if(mUpdater != NULL) {
+        delete mUpdater;
+    }
+}
+
+void QrealAnimator::setParentAnimator(ComplexAnimator *parentAnimator)
+{
+    mParentAnimator = parentAnimator;
+}
+
 qreal QrealAnimator::getValueAtFrame(int frame)
 {
     int prevId;
@@ -32,6 +44,7 @@ qreal QrealAnimator::getCurrentValue()
 void QrealAnimator::setCurrentValue(qreal newValue)
 {
     mCurrentValue = newValue;
+    callUpdater();
 }
 
 void QrealAnimator::updateValueFromCurrentFrame()
@@ -60,11 +73,17 @@ void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
 
 void QrealAnimator::appendKey(QrealKey *newKey) {
     mKeys.append(newKey);
+    if(mParentAnimator != NULL) {
+        mParentAnimator->addChildQrealKey(newKey);
+    }
     sortKeys();
 }
 
 void QrealAnimator::removeKey(QrealKey *removeKey) {
     mKeys.removeOne(removeKey);
+    if(mParentAnimator != NULL) {
+        mParentAnimator->removeChildQrealKey(removeKey);
+    }
     sortKeys();
 }
 
@@ -201,8 +220,9 @@ qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x) {
     qreal minT = 0.;
     qreal maxT = 1.;
     qreal xGuess;
+    qreal guessT;
     do {
-        qreal guessT = (maxT + minT)*0.5;
+        guessT = (maxT + minT)*0.5;
         xGuess = calcCubicBezierVal(p0x, p1x, p2x, p3x, guessT);
         if(xGuess > x) {
             maxT = guessT;
@@ -210,7 +230,7 @@ qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x) {
             minT = guessT;
         }
     } while(qAbs(xGuess - x) > 0.0001);
-    return (maxT + minT)*0.5;
+    return guessT;
 }
 
 qreal QrealAnimator::getValueAtFrame(int frame,
@@ -538,14 +558,42 @@ void QrealAnimator::incCurrentValue(qreal incBy)
     setCurrentValue(mCurrentValue + incBy);
 }
 
-void QrealAnimator::saveCurrentValue()
+void QrealAnimator::startTransform()
 {
     mSavedCurrentValue = mCurrentValue;
+    mTransformed = true;
 }
 
-void QrealAnimator::finishTransform()
+void QrealAnimator::finishTransform(bool record)
 {
+    if(mTransformed) {
+        mConnectedToMainWindow->addUndoRedo(
+                    new ChangeQrealAnimatorValue(mSavedCurrentValue,
+                                                 mCurrentValue,
+                                                 this) );
+        if(record) {
+            saveCurrentValueAsKey();
+        }
+        mTransformed = false;
+    }
+}
 
+void QrealAnimator::cancelTransform() {
+    if(mTransformed) {
+        mTransformed = false;
+        retrieveSavedValue();
+    }
+}
+
+void QrealAnimator::setUpdater(AnimatorUpdater *updater)
+{
+    mUpdater = updater;
+}
+
+void QrealAnimator::callUpdater()
+{
+    if(mUpdater == NULL) return;
+    mUpdater->update();
 }
 
 void QrealAnimator::multCurrentValue(qreal mult)
@@ -556,6 +604,11 @@ void QrealAnimator::multCurrentValue(qreal mult)
 qreal QrealAnimator::getSavedValue()
 {
     return mSavedCurrentValue;
+}
+
+void QrealAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
+{
+    mConnectedToMainWindow = connected;
 }
 
 void QrealAnimator::setCtrlsModeForSelected(CtrlsMode mode) {

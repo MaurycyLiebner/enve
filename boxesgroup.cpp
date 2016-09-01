@@ -48,6 +48,14 @@ bool BoxesGroup::pointInsidePath(QPointF absPos)
     return false;
 }
 
+void BoxesGroup::updateAfterFrameChanged(int currentFrame)
+{
+    BoundingBox::updateAfterFrameChanged(currentFrame);
+    foreach(BoundingBox *box, mChildren) {
+        box->updateAfterFrameChanged(currentFrame);
+    }
+}
+
 QRectF BoxesGroup::getBoundingRect()
 {
     QRectF rect;
@@ -245,7 +253,7 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
     if(mSelectedBoxes.count() == 1) {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startTransform();
+                box->startRotTransform();
                 box->rotateBy(rotBy);
             }
         } else {
@@ -256,7 +264,8 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
     } else {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startTransform();
+                box->startRotTransform();
+                box->startPosTransform();
                 box->saveTransformPivot(absOrigin);
                 box->rotateRelativeToSavedPivot(rotBy);
             }
@@ -273,7 +282,7 @@ void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
     if(mSelectedBoxes.count() == 1) {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startTransform();
+                box->startScaleTransform();
                 box->scale(scaleBy);
             }
         } else {
@@ -284,7 +293,8 @@ void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
     } else {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startTransform();
+                box->startScaleTransform();
+                box->startPosTransform();
                 box->saveTransformPivot(absOrigin);
                 box->scaleRelativeToSavedPivot(scaleBy);
             }
@@ -352,7 +362,7 @@ void BoxesGroup::ungroup() {
     clearBoxesSelection();
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
     foreachBoxInListInverted(mChildren) {
-        box->applyTransformation(&mTransformMatrix);
+        box->applyTransformation(&mTransformAnimator);
         removeChild(box);
         parentGroup->addChild(box);
     }
@@ -731,7 +741,7 @@ void BoxesGroup::moveSelectedBoxesBy(QPointF by, bool startTransform)
 {
     if(startTransform) {
         foreach(BoundingBox *box, mSelectedBoxes) {
-            box->startTransform();
+            box->startPosTransform();
             box->moveBy(by);
         }
     } else {

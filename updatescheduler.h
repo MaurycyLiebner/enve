@@ -3,36 +3,29 @@
 
 #include "vectorpath.h"
 #include "canvas.h"
+#include <QDebug>
 
 class UpdateScheduler {
 public:
     UpdateScheduler() {}
     virtual ~UpdateScheduler() {}
-    virtual void update() {}
+    virtual void update() { }
 };
 
 class PathUpdateScheduler : public UpdateScheduler {
 public:
-    PathUpdateScheduler(VectorPath *path) : UpdateScheduler() {
-        mPath = path;
-    }
+    PathUpdateScheduler(VectorPath *path);
 
-    void update() {
-        mPath->updatePathIfNeeded();
-    }
+    void update();
 private:
     VectorPath *mPath;
 };
 
 class MappedPathUpdateScheduler : public UpdateScheduler {
 public:
-    MappedPathUpdateScheduler(VectorPath *path) : UpdateScheduler() {
-        mPath = path;
-    }
+    MappedPathUpdateScheduler(VectorPath *path);
 
-    void update() {
-        mPath->updateMappedPathIfNeeded();
-    }
+    void update();
 private:
     VectorPath *mPath;
 };

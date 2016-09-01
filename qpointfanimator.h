@@ -13,12 +13,19 @@ public:
     void setCurrentValue(QPointF val);
     void incCurrentValue(qreal x, qreal y);
     void multCurrentValue(qreal sx, qreal sy);
-    void saveCurrentValue();
+    void startTransform();
+    void finishTransform(bool record);
     void retrieveSavedValue();
 
     QPointF getSavedValue();
     qreal getSavedXValue();
     qreal getSavedYValue();
+    void cancelTransform();
+    void setConnectedToMainWindow(ConnectedToMainWindow *connected);
+
+    void setUpdater(AnimatorUpdater *updater);
+
+    void setFrame(int frame);
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

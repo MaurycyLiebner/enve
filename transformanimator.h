@@ -14,18 +14,24 @@ public:
     void scale(qreal sx, qreal sy);
     void scale(qreal sx, qreal sy, QPointF pivot);
 
-    void saveCurrentValue();
+    void setScale(qreal sx, qreal sy);
+    void setPosition(qreal x, qreal y);
+    void setRotation(qreal rot);
+
+    void startTransform();
     void retrieveSavedValue();
 
-    void finishTransform();
+    void finishTransform(bool record);
+
+    void cancelTransform();
 
     qreal getYScale();
     qreal getXScale();
 
     void reset();
 
-    void setPivot(qreal x, qreal y, bool saveUndoRedo);
-    void setPivot(QPointF point, bool saveUndoRedo);
+    void setPivot(qreal x, qreal y);
+    void setPivot(QPointF point);
     QPointF getPivot();
 
     qreal dx();
@@ -34,7 +40,20 @@ public:
     qreal xScale();
     qreal yScale();
     QPointF pos();
+
+    qreal getPivotX();
+    qreal getPivotY();
+
     void rotateRelativeToSavedValue(qreal rotRel, QPointF pivot);
+    void startRotTransform();
+    void startPosTransform();
+    void startScaleTransform();
+
+    void setConnectedToMainWindow(ConnectedToMainWindow *connected);
+
+    void setUpdater(AnimatorUpdater *updater);
+
+    void setFrame(int frame);
 private:
     QPointF mPivotPoint;
     QPointFAnimator mPosAnimator;

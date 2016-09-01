@@ -19,6 +19,10 @@ public:
     void addCircle(QPointF absPos);
     void cancelTransform();
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
+    void startTransformablesTransform();
+    void startRotTransform();
+    void startPosTransform();
+    void startScaleTransform();
 private:
     QList<Transformable*> mTransformables;
 };

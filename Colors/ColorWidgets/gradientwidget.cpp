@@ -13,6 +13,13 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) : GLWidg
     newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
 }
 
+GradientWidget::~GradientWidget()
+{
+    foreach(Gradient *gradient, mGradients) {
+        delete gradient;
+    }
+}
+
 void GradientWidget::setCurrentColorId(int id) {
     mCurrentColorId = id;
     Color col = mCurrentGradient->colors.at(mCurrentColorId);

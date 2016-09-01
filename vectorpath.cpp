@@ -231,7 +231,7 @@ void VectorPath::updatePivotPosition() {
         foreach(PathPoint *point, mPoints) {
             posSum += point->getRelativePos();
         }
-        mTransformMatrix.setPivot(posSum/count, false);
+        mTransformAnimator.setPivot(posSum/count);
     }
 }
 
@@ -335,18 +335,20 @@ void VectorPath::schedulePathUpdate()
 void VectorPath::updatePathIfNeeded()
 {
     if(mPathUpdateNeeded) {
-        mPathUpdateNeeded = false;
-        mMappedPathUpdateNeeded = false;
         updatePath();
         updatePivotPosition();
+        mPathUpdateNeeded = false;
+        mMappedPathUpdateNeeded = false;
     }
 }
 
 void VectorPath::updateMappedPathIfNeeded()
 {
-    if(mMappedPathUpdateNeeded && mParent != NULL) {
+    if(mMappedPathUpdateNeeded) {
+        if(mParent != NULL) {
+            updateMappedPath();
+        }
         mMappedPathUpdateNeeded = false;
-        updateMappedPath();
     }
 }
 

@@ -110,6 +110,16 @@ void AnimatonWidgetScrollBar::setFramesSpan(int newSpan) {
     if(mClamp) setFirstViewedFrame(mFirstViewedFrame);
 }
 
+int AnimatonWidgetScrollBar::getMaxFrame()
+{
+    return mMaxFrame;
+}
+
+int AnimatonWidgetScrollBar::getMinFrame()
+{
+    return mMinFrame;
+}
+
 void AnimatonWidgetScrollBar::wheelEvent(QWheelEvent *event)
 {
 

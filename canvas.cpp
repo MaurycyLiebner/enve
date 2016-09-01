@@ -38,6 +38,11 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     setCanvasMode(MOVE_PATH);
 }
 
+Canvas::~Canvas()
+{
+    delete mRotPivot;
+}
+
 QRectF Canvas::getBoundingRect()
 {
     QPointF absPos = getAbsolutePos();
@@ -479,6 +484,13 @@ void Canvas::moveBy(QPointF trans)
     mCombinedTransformMatrix.translate(trans.x(), trans.y());
     updateCombinedTransform();
     schedulePivotUpdate();
+}
+
+void Canvas::updateAfterFrameChanged(int currentFrame)
+{
+    foreach(BoundingBox *box, mChildren) {
+        box->updateAfterFrameChanged(currentFrame);
+    }
 }
 
 void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,

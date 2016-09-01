@@ -96,8 +96,12 @@ public:
 
     //
 
-    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
-    void drawChildren(QPainter *p, qreal drawX, qreal drawY, qreal minY, qreal maxY);
+    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY,
+                      qreal pixelsPerFrame, int startFrame, int endFrame);
+    void drawChildren(QPainter *p,
+                      qreal drawX, qreal drawY,
+                      qreal minY, qreal maxY, qreal pixelsPerFrame,
+                      int startFrame, int endFrame);
     qreal getListItemHeight();
     void handleListItemMousePress(qreal relX, qreal relY);
     void handleChildListItemMousePress(qreal relX, qreal relY, qreal y0);
@@ -123,6 +127,7 @@ public:
     Bone *boneFromZIndex(int index);
 
     void attachToBoneFromSqlZId();
+    void updateAfterFrameChanged(int currentFrame);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

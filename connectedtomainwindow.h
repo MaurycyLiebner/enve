@@ -29,6 +29,8 @@ public:
     bool isShiftPressed();
     bool isCtrlPressed();
     bool isAltPressed();
+
+    int getCurrentFrame();
 protected:
     MainWindow *mMainWindow;
 };

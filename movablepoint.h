@@ -9,6 +9,8 @@
 class BoundingBox;
 class PathPoint;
 
+class AnimatorUpdater;
+
 enum MovablePointType {
     TYPE_PATH_POINT,
     TYPE_CTRL_POINT,
@@ -75,6 +77,8 @@ public:
 
     bool isBeingTransformed();
     virtual int saveToSql();
+
+    virtual void setPosAnimatorUpdater(AnimatorUpdater *updater);
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

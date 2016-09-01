@@ -51,8 +51,6 @@ public:
 
     void rotateBy(qreal rot, QPointF absOrigin);
 
-    void setTransformation(QMatrix transMatrix);
-
     QPointF getAbsolutePos();
 
     void updateCombinedTransform();
@@ -122,7 +120,8 @@ public:
     QPointF getAbsBoneAttachPoint();
     //
 
-    virtual void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
+    virtual void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY,
+                              qreal pixelsPerFrame, int startFrame, int endFrame);
     virtual qreal getListItemHeight();
     void showChildrenListItems();
     void hideChildrenListItems();
@@ -146,6 +145,14 @@ public:
     virtual void attachToBoneFromSqlZId();
     void rotateRelativeToSavedPivot(qreal rot);
     void scaleRelativeToSavedPivot(qreal scaleBy);
+
+    virtual void startPosTransform();
+    virtual void startRotTransform();
+    virtual void startScaleTransform();
+    void drawAnimationBar(QPainter *p,
+                          qreal pixelsPerFrame, qreal drawX, qreal drawY,
+                          int startFrame, int endFrame);
+    virtual void updateAfterFrameChanged(int currentFrame);
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 
@@ -153,9 +160,7 @@ protected:
     BoundingBoxType mType;
     BoxesGroup *mParent = NULL;
 
-    QMatrix mSavedTransformMatrix;
-
-    TransformAnimator mTransformMatrix;
+    TransformAnimator mTransformAnimator;
 
     QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;

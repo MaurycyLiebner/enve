@@ -18,12 +18,17 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
                                                             1, false,
                                                             true, this);
 
+    connect(mAnimationWidgetScrollbar, SIGNAL(viewedFramesChanged(int,int)),
+            parent, SLOT(setCurrentFrame(int)) );
+
     connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int,int)) );
 
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                              QSizePolicy::Maximum);
     mBoxesList = new BoxesList(parent, this);
+    connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
+            mBoxesList, SLOT(setFramesRange(int,int)) );
 
     mControlsLayout = new QHBoxLayout();
     mControlsLayout->setAlignment(Qt::AlignLeft);
@@ -87,4 +92,3 @@ BoxesList *BoxesListAnimationDockWidget::getBoxesList()
 {
     return mBoxesList;
 }
-

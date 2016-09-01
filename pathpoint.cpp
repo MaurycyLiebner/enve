@@ -3,6 +3,7 @@
 #include "undoredo.h"
 #include "ctrlpoint.h"
 #include <QPainter>
+#include <QDebug>
 
 PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
     PathPoint(absPos, absPos, absPos, vectorPath)
@@ -14,7 +15,7 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
                      qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, int boneZ,
                      VectorPath *vectorPath) :
     MovablePoint(relPosX, relPosy, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
-{
+{    
     mSqlLoadBoneZId = boneZ;
     mSeparatePathPoint = isFirst;
     mVectorPath = vectorPath;
@@ -26,6 +27,8 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
 
     mStartCtrlPt->hide();
     mEndCtrlPt->hide();
+
+    setPosAnimatorUpdater(new PathPointUpdater(vectorPath) );
 }
 
 void PathPoint::clearAll()
@@ -41,6 +44,7 @@ PathPoint::PathPoint(QPointF absPos,
     MovablePoint(absPos, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
 {
     mVectorPath = vectorPath;
+
     mStartCtrlPt = new CtrlPoint(startCtrlAbsPos, this, true);
     mEndCtrlPt = new CtrlPoint(endCtrlAbsPos, this, false);
 
@@ -49,6 +53,8 @@ PathPoint::PathPoint(QPointF absPos,
 
     mStartCtrlPt->hide();
     mEndCtrlPt->hide();
+
+    setPosAnimatorUpdater(new PathPointUpdater(vectorPath) );
 }
 
 PathPoint::PathPoint(int movablePointId, int pathPointId,
@@ -200,11 +206,6 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
     return NULL;
 }
 
-void PathPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
-{
-    MovablePoint::setRelativePos(relPos, saveUndoRedo);
-    mVectorPath->schedulePathUpdate();
-}
 #include <QSqlError>
 void PathPoint::saveToSql(int vectorPathId)
 {
@@ -412,6 +413,13 @@ bool PathPoint::isEndCtrlPtEnabled()
 bool PathPoint::isStartCtrlPtEnabled()
 {
     return mStartCtrlPtEnabled;
+}
+
+void PathPoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
+{
+    MovablePoint::setPosAnimatorUpdater(updater);
+    mEndCtrlPt->setPosAnimatorUpdater(updater);
+    mStartCtrlPt->setPosAnimatorUpdater(updater);
 }
 
 void PathPoint::setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo) {

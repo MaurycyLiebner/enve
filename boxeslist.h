@@ -33,12 +33,15 @@ protected:
 signals:
 
 public slots:
-
+    void setFramesRange(int startFrame, int endFrame);
 private:
     bool mRepaintScheduled = false;
     Canvas *mCanvas;
     QRectF mViewedRect;
     MainWindow *mMainWindow;
+
+    int mStartFrame = 0;
+    int mEndFrame = 50;
 };
 
 #endif // BOXESLIST_H

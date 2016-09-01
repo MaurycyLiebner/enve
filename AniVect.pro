@@ -58,7 +58,9 @@ SOURCES += main.cpp\
     qrealpoint.cpp \
     complexanimator.cpp \
     animatordiagram.cpp \
-    pointhelpers.cpp
+    pointhelpers.cpp \
+    animatorupdater.cpp \
+    updatescheduler.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -104,4 +106,5 @@ HEADERS  += mainwindow.h \
     qrealpoint.h \
     complexanimator.h \
     animatordiagram.h \
-    pointhelpers.h
+    pointhelpers.h \
+    animatorupdater.h

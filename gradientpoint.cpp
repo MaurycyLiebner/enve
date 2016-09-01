@@ -16,7 +16,7 @@ GradientPoint::GradientPoint(int idT, VectorPath *parent) :
 void GradientPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
-    ((VectorPath*)mParent)->schedulePathUpdate();
+    ((VectorPath*)mParent)->scheduleMappedPathUpdate();
 }
 
 void GradientPoint::setColor(QColor fillColor)

@@ -7,6 +7,7 @@ MovablePoint::MovablePoint(QPointF absPos,
                            MovablePointType type,
                            qreal radius) : Transformable(parent)
 {
+    mRelPos.setConnectedToMainWindow(this);
     mType = type;
     mRadius = radius;
     mParent = parent;
@@ -175,6 +176,11 @@ int MovablePoint::saveToSql()
         qDebug() << query.lastError() << endl << query.lastQuery();
     }
     return query.lastInsertId().toInt();
+}
+
+void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
+{
+    mRelPos.setUpdater(updater);
 }
 
 void MovablePoint::rotateBy(qreal rot)

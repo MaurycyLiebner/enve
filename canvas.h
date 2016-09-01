@@ -26,6 +26,7 @@ class Canvas : public QWidget, public BoxesGroup
 public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                     MainWindow *parent = 0);
+    ~Canvas();
     QRectF getBoundingRect();
     void addBoxToSelection(BoundingBox *box);
     void clearBoxesSelection();
@@ -66,6 +67,8 @@ public:
     void scale(qreal scaleBy, QPointF absOrigin);
     void pickPathForSettings();
     void moveBy(QPointF trans);
+
+    void updateAfterFrameChanged(int currentFrame);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);

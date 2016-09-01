@@ -51,15 +51,37 @@ void Bone::moveBy(QPointF trans)
     }
 }
 
-void Bone::startTransform()
-{
-    VectorPath::startTransform();
+void Bone::startTransformablesTransform() {
     foreach(Transformable *transformable, mTransformables) {
         if(transformable->isBeingTransformed()) {
             continue;
         }
         transformable->startTransform();
     }
+}
+
+void Bone::startTransform()
+{
+    VectorPath::startTransform();
+    startTransformablesTransform();
+}
+
+void Bone::startRotTransform()
+{
+    VectorPath::startRotTransform();
+    startTransformablesTransform();
+}
+
+void Bone::startPosTransform()
+{
+    VectorPath::startPosTransform();
+    startTransformablesTransform();
+}
+
+void Bone::startScaleTransform()
+{
+    VectorPath::startScaleTransform();
+    startTransformablesTransform();
 }
 
 void Bone::finishTransform()
