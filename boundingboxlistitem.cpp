@@ -4,6 +4,13 @@
 #include "undoredo.h"
 #include <QPainter>
 
+QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
+    Q_UNUSED(relY);
+    return mTransformAnimator.getKeyAtPos(relX,
+                           mBoxesList->getMinViewedFrame(),
+                           mBoxesList->getPixelsPerFrame());
+}
+
 void BoundingBox::handleListItemMousePress(qreal relX, qreal relY) {
     Q_UNUSED(relY);
     if(relX < LIST_ITEM_HEIGHT) {
@@ -28,6 +35,43 @@ void BoundingBox::handleListItemMousePress(qreal relX, qreal relY) {
             scheduleRepaint();
         }
     }
+}
+
+void BoundingBox::getKeysInRect(QRectF selectionRect, qreal y0,
+                                QList<QrealKey*> *keysList) {
+    Q_UNUSED(y0);
+    mTransformAnimator.getKeysInRect(selectionRect,
+                                     mBoxesList->getMinViewedFrame(),
+                                     mBoxesList->getPixelsPerFrame(),
+                                     keysList);
+}
+
+void BoxesGroup::getKeysInRect(QRectF selectionRect, qreal y0,
+                                QList<QrealKey*> *keysList) {
+    qreal currentY = y0;
+    foreach(BoundingBox *box, mChildren) {
+        qreal boxHeight = box->getListItemHeight();
+        QRectF boxRect = QRectF(selectionRect.left(), currentY,
+                                selectionRect.width(), boxHeight);
+        if(boxRect.intersects(selectionRect)) {
+            box->getKeysInRect(selectionRect.translated(0., -currentY),
+                               currentY, keysList);
+        }
+        currentY += boxHeight;
+    }
+}
+
+QrealKey *BoxesGroup::getKeyAtPos(qreal relX, qreal relY,
+                               qreal y0) {
+    qreal currentY = y0;
+    foreach(BoundingBox *box, mChildren) {
+        qreal boxHeight = box->getListItemHeight();
+        if(relY - currentY < boxHeight) {
+            return box->getKeyAtPos(relX, relY - currentY, currentY);
+        }
+        currentY += boxHeight;
+    }
+    return NULL;
 }
 
 void BoxesGroup::handleChildListItemMousePress(qreal relX, qreal relY,
@@ -95,6 +139,18 @@ void BoundingBox::drawAnimationBar(QPainter *p,
                                 pixelsPerFrame, drawX, drawY, 20.,
                                 startFrame, endFrame, true);
 }
+
+void VectorPath::drawAnimationBar(QPainter *p, qreal pixelsPerFrame,
+                                  qreal drawX, qreal drawY,
+                                  int startFrame, int endFrame) {
+    BoundingBox::drawAnimationBar(p, pixelsPerFrame,
+                                  drawX, drawY,
+                                  startFrame, endFrame);
+    mPathAnimator.drawKeys(p,
+                           pixelsPerFrame, drawX, drawY, 20.,
+                           startFrame, endFrame, true);
+}
+
 
 void BoxesGroup::drawChildren(QPainter *p,
                               qreal drawX, qreal drawY,

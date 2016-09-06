@@ -167,6 +167,19 @@ void QrealKey::setValue(qreal value) {
     mValue = value;
 }
 
+void QrealKey::incFrameAndUpdateParentAnimator(int inc) {
+    setFrameAndUpdateParentAnimator(mFrame + inc);
+}
+
+QrealAnimator *QrealKey::getParentAnimator()
+{
+    return mParentAnimator;
+}
+
+void QrealKey::setFrameAndUpdateParentAnimator(int newFrame) {
+    mParentAnimator->moveKeyToFrame(this, newFrame);
+}
+
 void QrealKey::setStartValue(qreal value)
 {
     mStartValue = value;

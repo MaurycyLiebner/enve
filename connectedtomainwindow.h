@@ -31,6 +31,10 @@ public:
     bool isAltPressed();
 
     int getCurrentFrame();
+    int getMaxFrame();
+    int getMinFrame();
+    bool isRecording();
+    bool isRecordingAllPoints();
 protected:
     MainWindow *mMainWindow;
 };

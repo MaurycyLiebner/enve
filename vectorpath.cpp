@@ -182,6 +182,14 @@ void VectorPath::attachToBoneFromSqlZId()
     mStrokeGradientPoints.attachToBoneFromSqlZId();
 }
 
+void VectorPath::updateAfterFrameChanged(int currentFrame)
+{
+    foreach(PathPoint *point, mPoints) {
+        point->updateAfterFrameChanged(currentFrame);
+    }
+    BoundingBox::updateAfterFrameChanged(currentFrame);
+}
+
 PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
 {
     qreal maxDist = 14.f;
@@ -478,6 +486,32 @@ void VectorPath::draw(QPainter *p)
     }
 }
 
+void VectorPath::render(QPainter *p)
+{
+    p->save();
+    p->setPen(Qt::NoPen);
+    if(mFillPaintSettings.paintType == GRADIENTPAINT) {
+        p->setBrush(mDrawFillGradient);
+    } else if(mFillPaintSettings.paintType == FLATPAINT) {
+        p->setBrush(mFillPaintSettings.color.qcol);
+    } else{
+        p->setBrush(Qt::NoBrush);
+    }
+
+    QMatrix combinedRenderTransform = getCombinedRenderTransform();
+    p->drawPath(combinedRenderTransform.map(mPath) );
+
+    if(mStrokeSettings.paintType == GRADIENTPAINT) {
+        p->setBrush(mDrawStrokeGradient);
+    } else if(mStrokeSettings.paintType == FLATPAINT) {
+        p->setBrush(mStrokeSettings.color.qcol);
+    } else{
+        p->setBrush(Qt::NoBrush);
+    }
+    p->drawPath(combinedRenderTransform.map(mPathStroker.createStroke(mPath)) );
+    p->restore();
+}
+
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     if(mVisible) {
@@ -590,6 +624,7 @@ PathPoint *VectorPath::addPointRelPos(QPointF relPtPos, PathPoint *toPoint)
 
 void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.append(point);
+    mPathAnimator.addPathPoint(point);
     point->show();
     if(saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo = new AppendToPointsListUndoRedo(point, this);
@@ -599,6 +634,7 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.removeOne(point);
+    mPathAnimator.removePathPoint(point);
     point->hide();
     point->deselect();
     if(saveUndoRedo) {
@@ -680,6 +716,19 @@ int VectorPath::saveToSql(int parentId)
     return boundingBoxId;
 }
 
+void VectorPath::startAllPointsTransform()
+{
+    foreach(PathPoint *point, mPoints) {
+        point->startTransform();
+    }
+}
+
+void VectorPath::finishAllPointsTransform()
+{
+    foreach(PathPoint *point, mPoints) {
+        point->finishTransform();
+    }
+}
 
 GradientPoints::GradientPoints()
 {

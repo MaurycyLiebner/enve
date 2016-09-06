@@ -3,10 +3,12 @@
 #include "undoredo.h"
 #include "boxesgroup.h"
 #include <QDebug>
+#include "mainwindow.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     Transformable(parent)
 {
+    mBoxesList = parent->getMainWindow()->getBoxesList();
     mTransformAnimator.setConnectedToMainWindow(this);
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;
@@ -21,7 +23,8 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     updateCombinedTransform();
 }
 
-BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) : Transformable(window)
+BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) :
+    Transformable(window)
 {
     mType = type;
     mTransformAnimator.reset();
@@ -308,7 +311,7 @@ void BoundingBox::finishTransform()
 {
     startNewUndoRedoSet();
 
-    mTransformAnimator.finishTransform(true);
+    mTransformAnimator.finishTransform(isRecording());
 
     finishUndoRedoSet();
 }
@@ -362,4 +365,10 @@ void BoundingBox::updateCombinedTransform()
                 mParent->getCombinedTransform();
     }
     updateAfterCombinedTransformationChanged();
+}
+
+QMatrix BoundingBox::getCombinedRenderTransform() {
+    if(mParent == NULL) return QMatrix();
+    return mTransformAnimator.getCurrentValue()*
+            mParent->getCombinedRenderTransform();
 }

@@ -45,16 +45,28 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
                 QIcon("pixmaps/icons/play_button.png"), "", this);
     mPlayButton->setSizePolicy(QSizePolicy::Maximum,
                                QSizePolicy::Maximum);
+    connect(mPlayButton, SIGNAL(pressed()),
+            parent, SLOT(renderPreview()) );
 
     mRecordButton = new QPushButton(
-                QIcon("pixmaps/icons/record_button.png"), "", this);
+                QIcon("pixmaps/icons/not_recording.png"), "", this);
     mRecordButton->setSizePolicy(QSizePolicy::Maximum,
                                QSizePolicy::Maximum);
+    mRecordButton->setCheckable(true);
+    connect(mRecordButton, SIGNAL(toggled(bool)),
+            this, SLOT(setRecording(bool)) );
+    connect(mRecordButton, SIGNAL(toggled(bool)),
+            parent, SLOT(setRecording(bool)) );
 
-    mAddKeyButton = new QPushButton(
-                QIcon("pixmaps/icons/add_key_button.png"), "", this);
-    mAddKeyButton->setSizePolicy(QSizePolicy::Maximum,
-                               QSizePolicy::Maximum);
+    mAllPointsRecordButton = new QPushButton(
+                QIcon("pixmaps/icons/recordSinglePoint.png"), "", this);
+    mAllPointsRecordButton->setSizePolicy(QSizePolicy::Maximum,
+                                          QSizePolicy::Maximum);
+    mAllPointsRecordButton->setCheckable(true);
+    connect(mAllPointsRecordButton, SIGNAL(toggled(bool)),
+            this, SLOT(setAllPointsRecord(bool)) );
+    connect(mAllPointsRecordButton, SIGNAL(toggled(bool)),
+            parent, SLOT(setAllPointsRecord(bool)) );
 
     mRemoveKeyButton = new QPushButton(
                 QIcon("pixmaps/icons/remove_key_button.png"), "", this);
@@ -77,7 +89,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlButtonsLayout->addWidget(mPlayButton);
 
     mControlButtonsLayout->addWidget(mRecordButton);
-    mControlButtonsLayout->addWidget(mAddKeyButton);
+    mControlButtonsLayout->addWidget(mAllPointsRecordButton);
     mControlButtonsLayout->addWidget(mRemoveKeyButton);
 
     mControlsLayout->addWidget(mControlButtonsWidget);
@@ -86,9 +98,36 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mMainLayout->addLayout(mControlsLayout);
     mMainLayout->addWidget(mBoxesList);
     mMainLayout->addWidget(mFrameRangeScrollbar);
+
+    mFrameRangeScrollbar->emitChange();
 }
 
 BoxesList *BoxesListAnimationDockWidget::getBoxesList()
 {
     return mBoxesList;
+}
+
+void BoxesListAnimationDockWidget::setRecording(bool recording)
+{
+    if(recording) {
+        mRecordButton->setIcon(QIcon("pixmaps/icons/recording.png") );
+    } else {
+        mRecordButton->setIcon(QIcon("pixmaps/icons/not_recording.png") );
+    }
+}
+
+void BoxesListAnimationDockWidget::setAllPointsRecord(bool allPointsRecord)
+{
+    if(allPointsRecord) {
+        mAllPointsRecordButton->setIcon(
+                    QIcon("pixmaps/icons/recordAllPoints.png") );
+    } else {
+        mAllPointsRecordButton->setIcon(
+                    QIcon("pixmaps/icons/recordSinglePoint.png") );
+    }
+}
+
+void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {
+    mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
+    mAnimationWidgetScrollbar->emitChange();
 }

@@ -14,6 +14,11 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     QWidget(parent),
     BoxesGroup(fillStrokeSettings, parent)
 {
+    mPreviewFPSTimer = new QTimer(this);
+    mPreviewFPSTimer->setInterval(1000/24.);
+    connect(mPreviewFPSTimer, SIGNAL(timeout()),
+            this, SLOT(nextPreviewFrame()) );
+
     connect(mFillStrokeSettingsWidget, SIGNAL(fillSettingsChanged(PaintSettings, bool)),
             this, SLOT(fillSettingsChanged(PaintSettings, bool)) );
     connect(mFillStrokeSettingsWidget, SIGNAL(strokeSettingsChanged(StrokeSettings, bool)),
@@ -144,30 +149,50 @@ void Canvas::paintEvent(QPaintEvent *)
     p.setRenderHint(QPainter::Antialiasing);
 
     QPointF absPos = getAbsolutePos();
-    QRectF viewRect = QRectF(absPos,absPos + QPointF(mVisibleWidth, mVisibleHeight));
+    QRectF viewRect = QRectF(absPos,
+                             absPos + QPointF(mVisibleWidth, mVisibleHeight));
 
-    p.drawImage(viewRect, mBgImage);
+    if(mPreviewing) {
+        QPainterPath path;
+        path.addRect(0, 0, width() + 1, height() + 1);
+        QPainterPath viewRectPath;
+        viewRectPath.addRect(viewRect);
+        p.setBrush(QColor(0, 0, 0));
+        p.setPen(Qt::NoPen);
+        p.drawPath(path.subtracted(viewRectPath));
 
-    foreach(BoundingBox *box, mChildren){
-        box->draw(&p);
+        p.drawImage(absPos, *mCurrentPreviewImg);
+    } else {
+        p.fillRect(0, 0, width() + 1, height() + 1, QColor(75, 75, 75));
+        p.fillRect(viewRect, Qt::white);
+
+        foreach(BoundingBox *box, mChildren){
+            box->draw(&p);
+        }
+        mCurrentBoxesGroup->drawSelected(&p, mCurrentMode);
+
+        p.setPen(QPen(Qt::black, 2.f));
+        p.setBrush(Qt::NoBrush);
+        p.drawRect(viewRect.adjusted(-1., -1., 1., 1.));
+
+        p.setPen(QPen(QColor(0, 0, 255, 125), 2.f, Qt::DotLine));
+        if(mSelecting) {
+            p.drawRect(mSelectionRect);
+        }
+        if(mCurrentMode == CanvasMode::MOVE_PATH) {
+            mRotPivot->draw(&p);
+        }
     }
-    mCurrentBoxesGroup->drawSelected(&p, mCurrentMode);
 
-    p.setPen(QPen(QColor(0, 0, 255, 125), 2.f, Qt::DotLine));
-    if(mSelecting) {
-        p.drawRect(mSelectionRect);
-    }
-    if(mCurrentMode == CanvasMode::MOVE_PATH) {
-        mRotPivot->draw(&p);
-    }
+    p.end();
+}
 
-    QPainterPath path;
-    path.addRect(0, 0, width() + 1, height() + 1);
-    QPainterPath viewRectPath;
-    viewRectPath.addRect(viewRect);
-    p.setBrush(QColor(0, 0, 0, 125));
-    p.setPen(QPen(Qt::black, 2.f));
-    p.drawPath(path.subtracted(viewRectPath));
+void Canvas::renderCurrentFrameToQImage(QImage *frame)
+{
+    QPainter p(frame);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    BoxesGroup::render(&p);
 
     p.end();
 }
@@ -179,6 +204,61 @@ bool Canvas::isMovingPath() {
 qreal Canvas::getCurrentCanvasScale()
 {
     return mCombinedTransformMatrix.m11();
+}
+
+QSize Canvas::getCanvasSize()
+{
+    return QSize(mWidth, mHeight);
+}
+
+void Canvas::playPreview()
+{
+    if(mPreviewFrames.isEmpty() ) return;
+    mCurrentPreviewFrameId = 0;
+    mCurrentPreviewImg = mPreviewFrames.first();
+    mPreviewing = true;
+    repaint();
+
+    mPreviewFPSTimer->start();
+}
+
+void Canvas::clearPreview() {
+    if(mPreviewing) {
+        mPreviewFPSTimer->stop();
+        mPreviewing = false;
+        for(int i = 0; i < mPreviewFrames.length(); i++) {
+            delete mPreviewFrames.at(i);
+        }
+        mPreviewFrames.clear();
+    }
+}
+
+void Canvas::nextPreviewFrame()
+{
+    mCurrentPreviewFrameId++;
+    if(mCurrentPreviewFrameId >= mPreviewFrames.length() ) {
+        clearPreview();
+    } else {
+        mCurrentPreviewImg = mPreviewFrames.at(mCurrentPreviewFrameId);
+    }
+    repaint();
+}
+
+void Canvas::renderCurrentFrameToPreview()
+{
+    QImage *image = new QImage(mVisibleWidth, mVisibleHeight,
+                               QImage::Format_ARGB32);
+    image->fill(Qt::transparent);
+    renderCurrentFrameToQImage(image);
+    mPreviewFrames << image;
+}
+
+QMatrix Canvas::getCombinedRenderTransform()
+{
+    QMatrix matrix;
+    matrix.scale(mCombinedTransformMatrix.m11(),
+                 mCombinedTransformMatrix.m22() );
+    return matrix;
 }
 
 void Canvas::schedulePivotUpdate()

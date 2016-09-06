@@ -17,6 +17,63 @@ QrealAnimator::~QrealAnimator()
     }
 }
 
+void QrealAnimator::getKeysInRect(QRectF selectionRect,
+                                  int minViewedFrame,
+                                  qreal pixelsPerFrame,
+                                  QList<QrealKey*> *keysList) {
+    int keyRectFramesSpan = KEY_RECT_SIZE/pixelsPerFrame;
+    int selLeftFrame = selectionRect.left()/pixelsPerFrame + minViewedFrame -
+            keyRectFramesSpan;
+    int selRightFrame = selectionRect.right()/pixelsPerFrame + minViewedFrame -
+            keyRectFramesSpan;
+    for(int i = selRightFrame; i >= selLeftFrame; i--) {
+        QrealKey *keyAtPos = getKeyAtFrame(i);
+        if(keyAtPos != NULL) {
+            keysList->append(keyAtPos);
+        }
+    }
+}
+
+void QrealAnimator::addAllKeysToComplexAnimator()
+{
+    if(mParentAnimator == NULL) return;
+    foreach(QrealKey *key, mKeys) {
+        mParentAnimator->addChildQrealKey(key);
+    }
+}
+
+void QrealAnimator::removeAllKeysFromComplexAnimator()
+{
+    if(mParentAnimator == NULL) return;
+    foreach(QrealKey *key, mKeys) {
+        mParentAnimator->removeChildQrealKey(key);
+    }
+}
+
+QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
+                                     int minViewedFrame,
+                                     qreal pixelsPerFrame) {
+    qreal relFrame = relX/pixelsPerFrame;
+    qreal pressFrame = relFrame + minViewedFrame;
+    if(pixelsPerFrame > KEY_RECT_SIZE) {
+        int relFrameInt = relFrame;
+        if( qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX) > KEY_RECT_SIZE*0.5) {
+            return NULL;
+        }
+    }
+    qreal keyRectFramesSpan = 0.5*KEY_RECT_SIZE/pixelsPerFrame;
+    int minPossibleKey = pressFrame - keyRectFramesSpan;
+    int maxPossibleKey = pressFrame + keyRectFramesSpan;
+    QrealKey *keyAtPos = NULL;
+    for(int i = maxPossibleKey; i >= minPossibleKey; i--) {
+        keyAtPos = getKeyAtFrame(i);
+        if(keyAtPos != NULL) {
+            return keyAtPos;
+        }
+    }
+    return NULL;
+}
+
 void QrealAnimator::setParentAnimator(ComplexAnimator *parentAnimator)
 {
     mParentAnimator = parentAnimator;
@@ -68,11 +125,13 @@ void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
 {
     key->setValue(value);
     updateKeysPath();
-    updateValueFromCurrentFrame();
 }
 
 void QrealAnimator::appendKey(QrealKey *newKey) {
     mKeys.append(newKey);
+    if(mConnectedToMainWindow != NULL) {
+        mConnectedToMainWindow->scheduleBoxesListRepaint();
+    }
     if(mParentAnimator != NULL) {
         mParentAnimator->addChildQrealKey(newKey);
     }
@@ -85,6 +144,13 @@ void QrealAnimator::removeKey(QrealKey *removeKey) {
         mParentAnimator->removeChildQrealKey(removeKey);
     }
     sortKeys();
+}
+
+void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
+{
+    key->setFrame(newFrame);
+    sortKeys();
+    updateKeysPath();
 }
 
 void QrealAnimator::setFrame(int frame)
@@ -594,6 +660,28 @@ void QrealAnimator::callUpdater()
 {
     if(mUpdater == NULL) return;
     mUpdater->update();
+}
+
+void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
+                             qreal startX, qreal startY, qreal height,
+                             int startFrame, int endFrame, bool detailedView)
+{
+    p->setPen(QPen(Qt::black, 1.));
+    foreach(QrealKey *key, mKeys) {
+        if(key->getFrame() >= startFrame && key->getFrame() <= endFrame) {
+            if(key->isSelected() ) {
+                p->setBrush(Qt::yellow);
+            } else {
+                p->setBrush(Qt::red);
+            }
+            p->drawRect(
+                QRectF(
+                    QPointF((key->getFrame() - startFrame + 0.5)*pixelsPerFrame +
+                            startX - KEY_RECT_SIZE*0.5,
+                            startY + (height - KEY_RECT_SIZE)*0.5 ),
+                    QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
+        }
+    }
 }
 
 void QrealAnimator::multCurrentValue(qreal mult)

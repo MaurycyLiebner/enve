@@ -79,7 +79,15 @@ public:
     virtual int saveToSql();
 
     virtual void setPosAnimatorUpdater(AnimatorUpdater *updater);
+
+    virtual void updateAfterFrameChanged(int frame);
+
+    bool isPosKeyOnCurrentFrame();
+    void updateIsPosKeyOnCurrentFrame();
+
+    QPointFAnimator *getRelativePosAnimatorPtr();
 protected:
+    bool mKeyOnCurrentFrame = false;
     bool mTransformStarted = false;
     MovablePointType mType;
     bool mHidden = false;

@@ -15,9 +15,14 @@ class BoxesListAnimationDockWidget : public QWidget
 public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
     BoxesList *getBoxesList();
+    void setCurrentFrame(int frame);
 signals:
 
 public slots:
+private slots:
+    void setRecording(bool recording);
+
+    void setAllPointsRecord(bool allPointsRecord);
 private:
     QVBoxLayout *mMainLayout;
 
@@ -31,7 +36,7 @@ private:
     QPushButton *mPlayButton;
 
     QPushButton *mRecordButton;
-    QPushButton *mAddKeyButton;
+    QPushButton *mAllPointsRecordButton;
     QPushButton *mRemoveKeyButton;
 
     BoxesList *mBoxesList;

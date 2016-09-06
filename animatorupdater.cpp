@@ -1,5 +1,5 @@
 #include "animatorupdater.h"
-
+#include <QDebug>
 #include "vectorpath.h"
 
 TransUpdater::TransUpdater(BoundingBox *boundingBox) : AnimatorUpdater()

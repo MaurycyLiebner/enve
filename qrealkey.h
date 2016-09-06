@@ -57,6 +57,10 @@ public:
 
     bool hasPrevKey();
     bool hasNextKey();
+    void setFrameAndUpdateParentAnimator(int newFrame);
+    void incFrameAndUpdateParentAnimator(int inc);
+
+    QrealAnimator *getParentAnimator();
 protected:
     QrealAnimator *mParentAnimator;
 

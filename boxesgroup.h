@@ -23,6 +23,7 @@ public:
     bool pointInsidePath(QPointF absPos);
     QRectF getBoundingRect();
     void draw(QPainter *p);
+    void render(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
@@ -128,6 +129,8 @@ public:
 
     void attachToBoneFromSqlZId();
     void updateAfterFrameChanged(int currentFrame);
+    QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
+    void getKeysInRect(QRectF selectionRect, qreal y0, QList<QrealKey *> *keysList);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

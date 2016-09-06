@@ -5,6 +5,7 @@
 #include "pathpoint.h"
 #include <QLinearGradient>
 #include "gradientpoint.h"
+#include "pathanimator.h"
 
 class BoxesGroup;
 
@@ -60,6 +61,7 @@ public:
 
     virtual QRectF getBoundingRect();
     void draw(QPainter *p);
+    void render(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
 
     PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
@@ -111,7 +113,16 @@ public:
     PathPoint *findPointNearestToPercent(qreal percent, qreal *foundAtPercent);
 
     void attachToBoneFromSqlZId();
+
+    void updateAfterFrameChanged(int currentFrame);
+    void drawAnimationBar(QPainter *p, qreal pixelsPerFrame,
+                          qreal drawX, qreal drawY,
+                          int startFrame, int endFrame);
+    void startAllPointsTransform();
+    void finishAllPointsTransform();
 protected:
+    PathAnimator mPathAnimator;
+
     void loadPointsFromSql(int vectorPathId);
 
     GradientPoints mFillGradientPoints;

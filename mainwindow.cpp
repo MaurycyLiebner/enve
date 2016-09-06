@@ -137,6 +137,19 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::renderPreview()
+{
+    mCanvas->clearPreview();
+    mSavedCurrentFrame = mCurrentFrame;
+    for(int i = mSavedCurrentFrame; i <= mMaxFrame; i++) {
+        mBoxesListAnimationDockWidget->setCurrentFrame(i);
+        mCanvas->renderCurrentFrameToPreview();
+    }
+    mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+
+    mCanvas->playPreview();
+}
+
 UndoRedoStack *MainWindow::getUndoRedoStack()
 {
     return &mUndoRedoStack;
@@ -198,6 +211,11 @@ void MainWindow::schedulePivotUpdate()
     mCanvas->schedulePivotUpdate();
 }
 
+BoxesList *MainWindow::getBoxesList()
+{
+    return mBoxesListAnimationDockWidget->getBoxesList();
+}
+
 Canvas *MainWindow::getCanvas()
 {
     return mCanvas;
@@ -237,6 +255,26 @@ int MainWindow::getCurrentFrame()
     return mCurrentFrame;
 }
 
+bool MainWindow::isRecording()
+{
+    return mRecording;
+}
+
+bool MainWindow::isRecordingAllPoints()
+{
+    return mAllPointsRecording;
+}
+
+int MainWindow::getMinFrame()
+{
+    return mMinFrame;
+}
+
+int MainWindow::getMaxFrame()
+{
+    return mMaxFrame;
+}
+
 void MainWindow::setCurrentFrame(int frame)
 {
     mCurrentFrame = frame;
@@ -244,6 +282,16 @@ void MainWindow::setCurrentFrame(int frame)
     mBoxListWidget->scheduleRepaint();
 
     callUpdateSchedulers();
+}
+
+void MainWindow::setRecording(bool recording)
+{
+    mRecording = recording;
+}
+
+void MainWindow::setAllPointsRecord(bool allPointsRecord)
+{
+    mAllPointsRecording = allPointsRecord;
 }
 
 void MainWindow::newFile()

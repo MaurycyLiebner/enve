@@ -74,6 +74,13 @@ void BoxesGroup::draw(QPainter *p)
     }
 }
 
+void BoxesGroup::render(QPainter *p)
+{
+    foreach(BoundingBox *box, mChildren){
+        box->render(p);
+    }
+}
+
 void BoxesGroup::drawBoundingRect(QPainter *p) {
     QPen pen = p->pen();
     if(mIsCurrentGroup) {
@@ -612,8 +619,20 @@ MovablePoint *BoxesGroup::getPointAt(QPointF absPos, CanvasMode currentMode) {
 void BoxesGroup::finishSelectedPointsTransform()
 {
     startNewUndoRedoSet();
-    foreach(MovablePoint *point, mSelectedPoints) {
-        point->finishTransform();
+    if(isRecordingAllPoints() ) {
+        QList<BoundingBox*> parentBoxes;
+        foreach(MovablePoint *point, mSelectedPoints) {
+            BoundingBox *parentBox = point->getParent();
+            if(parentBoxes.contains(parentBox) ) continue;
+            parentBoxes << parentBox;
+        }
+        foreach(BoundingBox *parentBox, parentBoxes) {
+            parentBox->finishAllPointsTransform();
+        }
+    } else {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->finishTransform();
+        }
     }
     finishUndoRedoSet();
 }
@@ -726,9 +745,25 @@ void BoxesGroup::saveSelectedToSql()
 void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
 {
     if(startTransform) {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-            point->moveBy(by);
+        if(isRecordingAllPoints() ) {
+            QList<BoundingBox*> parentBoxes;
+            foreach(MovablePoint *point, mSelectedPoints) {
+                BoundingBox *parentBox = point->getParent();
+                if(parentBoxes.contains(parentBox) ) continue;
+                parentBoxes << parentBox;
+            }
+            foreach(BoundingBox *parentBox, parentBoxes) {
+                parentBox->startAllPointsTransform();
+            }
+
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->moveBy(by);
+            }
+        } else {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->startTransform();
+                point->moveBy(by);
+            }
         }
     } else {
         foreach(MovablePoint *point, mSelectedPoints) {

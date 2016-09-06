@@ -12,16 +12,8 @@ void ComplexAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
                                int startFrame, int endFrame,
                                bool detailedView)
 {
-    foreach(QrealKey *key, mKeys) {
-        if(key->getFrame() >= startFrame && key->getFrame() <= endFrame) {
-            p->fillRect(
-                QRectF(
-                    QPointF((key->getFrame() - startFrame)*pixelsPerFrame +
-                            startX,
-                            startY),
-                    QSize(pixelsPerFrame, height) ), Qt::red );
-        }
-    }
+    QrealAnimator::drawKeys(p, pixelsPerFrame, startX, startY, height,
+                            startFrame, endFrame, detailedView);
 
     if(detailedView) {
         drawChildAnimatorKeys();

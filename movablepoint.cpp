@@ -50,6 +50,7 @@ MovablePoint::MovablePoint(int movablePointId, BoundingBox *parent,
 
 void MovablePoint::startTransform()
 {
+    mRelPos.startTransform();
     mTransformStarted = true;
     mSavedRelPos = getRelativePos();
 }
@@ -63,6 +64,11 @@ void MovablePoint::finishTransform()
     MoveMovablePointUndoRedo *undoRedo = new MoveMovablePointUndoRedo(this,
                                                            mSavedRelPos,
                                                            getRelativePos());
+    mRelPos.finishTransform(isRecording());
+    if(isRecording()) {
+        updateIsPosKeyOnCurrentFrame();
+    }
+
     addUndoRedo(undoRedo);
 }
 
@@ -99,8 +105,16 @@ void MovablePoint::draw(QPainter *p)
     } else {
         p->setBrush(QColor(255, 0, 0, 75));
     }
-    p->drawEllipse(getAbsolutePos(),
+    QPointF absPos = getAbsolutePos();
+    p->drawEllipse(absPos,
                    mRadius, mRadius);
+    if(isPosKeyOnCurrentFrame() ) {
+        p->save();
+        p->setBrush(Qt::red);
+        p->setPen(QPen(Qt::black, 1.) );
+        p->drawEllipse(absPos, 4, 4);
+        p->restore();
+    }
 }
 
 BoundingBox *MovablePoint::getParent()
@@ -140,7 +154,8 @@ void MovablePoint::scale(qreal scaleBy) {
 
 void MovablePoint::cancelTransform()
 {
-    setRelativePos(mSavedRelPos, false);
+    mRelPos.cancelTransform();
+    //setRelativePos(mSavedRelPos, false);
 }
 
 void MovablePoint::setRadius(qreal radius)
@@ -181,6 +196,26 @@ int MovablePoint::saveToSql()
 void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
 {
     mRelPos.setUpdater(updater);
+}
+
+void MovablePoint::updateIsPosKeyOnCurrentFrame() {
+    mKeyOnCurrentFrame = mRelPos.getKeyAtFrame(getCurrentFrame() ) != NULL;
+}
+
+QPointFAnimator *MovablePoint::getRelativePosAnimatorPtr()
+{
+    return &mRelPos;
+}
+
+void MovablePoint::updateAfterFrameChanged(int frame)
+{
+    mRelPos.setFrame(frame);
+    updateIsPosKeyOnCurrentFrame();
+}
+
+bool MovablePoint::isPosKeyOnCurrentFrame()
+{
+    return mKeyOnCurrentFrame;
 }
 
 void MovablePoint::rotateBy(qreal rot)

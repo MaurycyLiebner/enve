@@ -10,9 +10,10 @@ public:
     ComplexAnimator();
     QMatrix getCurrentValue();
 
-    void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal startX, qreal startY, qreal height,
-              int startFrame, int endFrame,
-              bool detailedView);
+    void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                  qreal startX, qreal startY, qreal height,
+                  int startFrame, int endFrame,
+                  bool detailedView);
 
     void addChildQrealKey(QrealKey *key);
     ComplexKey *getKeyCollectionAtFrame(int frame);

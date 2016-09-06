@@ -26,6 +26,9 @@ public:
     void setUpdater(AnimatorUpdater *updater);
 
     void setFrame(int frame);
+
+    void sortKeys();
+    void updateKeysPath();
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

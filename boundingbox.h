@@ -27,6 +27,8 @@ enum BoundingBoxType {
 
 class BoxesGroup;
 
+class BoxesList;
+
 class BoundingBox : public Transformable
 {
 public:
@@ -39,6 +41,7 @@ public:
     virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getBoundingRect() { return QRectF(); }
 
+    virtual void render(QPainter *) {}
     virtual void draw(QPainter *) {}
     virtual void drawSelected(QPainter *, CanvasMode) {}
 
@@ -149,12 +152,21 @@ public:
     virtual void startPosTransform();
     virtual void startRotTransform();
     virtual void startScaleTransform();
-    void drawAnimationBar(QPainter *p,
+    virtual void drawAnimationBar(QPainter *p,
                           qreal pixelsPerFrame, qreal drawX, qreal drawY,
                           int startFrame, int endFrame);
     virtual void updateAfterFrameChanged(int currentFrame);
+    virtual QMatrix getCombinedRenderTransform();
+    virtual QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal);
+    virtual void getKeysInRect(QRectF selectionRect, qreal y0,
+                               QList<QrealKey *> *keysList);
+
+    virtual void startAllPointsTransform() {}
+    virtual void finishAllPointsTransform() {}
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
+
+    BoxesList *mBoxesList;
 
     bool mScheduledForRemove = false;
     BoundingBoxType mType;

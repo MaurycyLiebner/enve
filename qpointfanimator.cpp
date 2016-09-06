@@ -67,6 +67,20 @@ void QPointFAnimator::setFrame(int frame)
     mYAnimator.setFrame(frame);
 }
 
+void QPointFAnimator::sortKeys()
+{
+    QrealAnimator::sortKeys();
+    mXAnimator.sortKeys();
+    mYAnimator.sortKeys();
+}
+
+void QPointFAnimator::updateKeysPath()
+{
+    QrealAnimator::updateKeysPath();
+    mXAnimator.updateKeysPath();
+    mYAnimator.updateKeysPath();
+}
+
 void QPointFAnimator::finishTransform(bool record)
 {
     mConnectedToMainWindow->startNewUndoRedoSet();

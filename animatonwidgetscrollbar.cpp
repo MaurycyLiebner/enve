@@ -29,7 +29,8 @@ AnimatonWidgetScrollBar::AnimatonWidgetScrollBar(int minSpan, int maxSpan,
 
 qreal AnimatonWidgetScrollBar::posToFrame(int xPos)
 {
-    return xPos*(mMaxFrame - mMinFrame)/((qreal)width()) + mMinFrame;
+    return xPos*(mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
+            ((qreal)width()) + mMinFrame;
 }
 
 void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
@@ -48,14 +49,10 @@ void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
     }
     p.setBrush(col);
     int dFrame = mMaxFrame - mMinFrame;
+    if(!mRange) dFrame++;
     qreal pixPerFrame = ((qreal)width())/dFrame;
-    if(mRange) {
-        p.drawRect(QRectF((mFirstViewedFrame - mMinFrame)*pixPerFrame, 0,
-                   mFramesSpan*pixPerFrame, height()) );
-    } else {
-        p.drawRect(QRectF((mFirstViewedFrame - mMinFrame - 0.5)*pixPerFrame, 0,
-                   mFramesSpan*pixPerFrame, height()) );
-    }
+    p.drawRect(QRectF((mFirstViewedFrame - mMinFrame)*pixPerFrame, 0,
+               mFramesSpan*pixPerFrame, height()) );
 
     p.setPen(Qt::white);
 
@@ -72,7 +69,7 @@ void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
         divInc++;
     }
     qreal inc = frameInc*pixPerFrame;
-    qreal xL = (mMinFrame%frameInc)*pixPerFrame;
+    qreal xL = (mMinFrame%frameInc + (mRange ? 0. : 0.5) )*pixPerFrame;
     int currentFrame = mMinFrame + mMinFrame%frameInc;
     if(mMinFrame%frameInc == 0) {
         currentFrame += frameInc;
@@ -163,7 +160,7 @@ void AnimatonWidgetScrollBar::mousePressEvent(QMouseEvent *event)
     mLastMousePressFrame = posToFrame(event->x() );
     if(mLastMousePressFrame < mFirstViewedFrame ||
             mLastMousePressFrame > mFirstViewedFrame + mFramesSpan) {
-        setFirstViewedFrame(qRound(mLastMousePressFrame - mFramesSpan/2));
+        setFirstViewedFrame(qRound(mLastMousePressFrame - mFramesSpan/2.));
         emitChange();
     }
     mSavedFirstFrame = mFirstViewedFrame;

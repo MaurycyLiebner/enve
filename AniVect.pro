@@ -60,7 +60,9 @@ SOURCES += main.cpp\
     animatordiagram.cpp \
     pointhelpers.cpp \
     animatorupdater.cpp \
-    updatescheduler.cpp
+    updatescheduler.cpp \
+    coloranimator.cpp \
+    pathanimator.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -107,4 +109,6 @@ HEADERS  += mainwindow.h \
     complexanimator.h \
     animatordiagram.h \
     pointhelpers.h \
-    animatorupdater.h
+    animatorupdater.h \
+    coloranimator.h \
+    pathanimator.h

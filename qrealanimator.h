@@ -8,6 +8,8 @@
 #include "connectedtomainwindow.h"
 #include "animatorupdater.h"
 
+const int KEY_RECT_SIZE = 10;
+
 class ComplexAnimator;
 
 class QrealAnimator
@@ -29,10 +31,13 @@ public:
     virtual void setFrame(int frame);
     QrealKey *getKeyAtFrame(int frame);
     void saveCurrentValueAsKey();
-    void updateKeysPath();
+    virtual void updateKeysPath();
     void appendKey(QrealKey *newKey);
     void removeKey(QrealKey *removeKey);
-    void sortKeys();
+
+    void moveKeyToFrame(QrealKey *key, int newFrame);
+
+    virtual void sortKeys();
     bool getNextAndPreviousKeyId(int *prevIdP, int *nextIdP, int frame);
 
     void draw(QPainter *p);
@@ -102,6 +107,16 @@ public:
     virtual void setUpdater(AnimatorUpdater *updater);
 
     void callUpdater();
+
+    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                          qreal startX, qreal startY, qreal height,
+                          int startFrame, int endFrame,
+                          bool detailedView);
+    QrealKey *getKeyAtPos(qreal relX, int minViewedFrame, qreal pixelsPerFrame);
+    void getKeysInRect(QRectF selectionRect, int minViewedFrame, qreal pixelsPerFrame, QList<QrealKey *> *keysList);
+
+    void addAllKeysToComplexAnimator();
+    void removeAllKeysFromComplexAnimator();
 protected:
     ComplexAnimator *mParentAnimator = NULL;
 

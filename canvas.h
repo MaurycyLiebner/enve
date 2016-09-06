@@ -6,6 +6,7 @@
 #include "Colors/color.h"
 #include "fillstrokesettings.h"
 #include <QSqlQuery>
+#include <QThread>
 
 class MainWindow;
 
@@ -69,6 +70,18 @@ public:
     void moveBy(QPointF trans);
 
     void updateAfterFrameChanged(int currentFrame);
+
+    void renderCurrentFrameToQImage(QImage *frame);
+
+    QSize getCanvasSize();
+
+    void playPreview();
+
+    void renderCurrentFrameToPreview();
+
+    QMatrix getCombinedRenderTransform();
+
+    void clearPreview();
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -101,6 +114,8 @@ private slots:
     void startFillSettingsTransform();
     void finishStrokeSettingsTransform();
     void finishFillSettingsTransform();
+
+    void nextPreviewFrame();
 public slots:
     void connectPointsSlot();
     void disconnectPointsSlot();
@@ -109,11 +124,14 @@ public slots:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
-private:    
+private:
+    bool mPreviewing = false;
+    QImage *mCurrentPreviewImg = NULL;
+    QTimer *mPreviewFPSTimer = NULL;
+    int mCurrentPreviewFrameId;
+
     bool mCancelTransform = false;
     bool mIsMouseGrabbing = false;
-
-    QImage mBgImage;
 
     bool mDoubleClick = false;
     int mMovesToSkip = 0;
@@ -149,6 +167,8 @@ private:
     void handleAddPointMouseMove(QPointF eventPos);
     void handleMovePathMousePressEvent();
     void handleAddPointMouseRelease();
+
+    QList<QImage*> mPreviewFrames;
 };
 
 #endif // CANVAS_H

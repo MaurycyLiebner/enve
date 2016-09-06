@@ -114,6 +114,22 @@ void TransformAnimator::setFrame(int frame)
     mScaleAnimator.setFrame(frame);
 }
 
+void TransformAnimator::sortKeys()
+{
+    QrealAnimator::sortKeys();
+    mPosAnimator.sortKeys();
+    mRotAnimator.sortKeys();
+    mScaleAnimator.sortKeys();
+}
+
+void TransformAnimator::updateKeysPath()
+{
+    QrealAnimator::updateKeysPath();
+    mPosAnimator.updateKeysPath();
+    mRotAnimator.updateKeysPath();
+    mScaleAnimator.updateKeysPath();
+}
+
 void TransformAnimator::retrieveSavedValue()
 {
     mPosAnimator.retrieveSavedValue();

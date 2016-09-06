@@ -54,6 +54,9 @@ public:
     void setUpdater(AnimatorUpdater *updater);
 
     void setFrame(int frame);
+
+    void sortKeys();
+    void updateKeysPath();
 private:
     QPointF mPivotPoint;
     QPointFAnimator mPosAnimator;

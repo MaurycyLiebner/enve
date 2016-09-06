@@ -57,7 +57,13 @@ private:
     bool mEventFilterDisabled = false;
     QWidget *grayOutWidget = NULL;
 
+    qreal mFPS = 24.;
+    int mMinFrame = 0;
+    int mMaxFrame = 200;
+    int mSavedCurrentFrame = 0;
     int mCurrentFrame = 0;
+    bool mRecording = false;
+    bool mAllPointsRecording = false;
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -74,6 +80,7 @@ public:
     void scheduleRepaint();
     void schedulePivotUpdate();
 
+    BoxesList *getBoxesList();
     Canvas *getCanvas();
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
@@ -93,8 +100,18 @@ public:
     void enable();
 
     int getCurrentFrame();
+
+    bool isRecording();
+
+    bool isRecordingAllPoints();
+
+    int getMinFrame();
+    int getMaxFrame();
 public slots:
     void setCurrentFrame(int frame);
+    void setRecording(bool recording);
+    void setAllPointsRecord(bool allPointsRecord);
+    void renderPreview();
 private slots:
     void newFile();
     bool askForSaving();

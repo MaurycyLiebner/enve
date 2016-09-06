@@ -12,6 +12,30 @@ class CtrlPoint;
 
 enum CanvasMode : short;
 
+class PathPoint;
+
+struct PathPointAnimators {
+
+    void setAllVars(PathPoint *parentPathPointT,
+                       QPointFAnimator *endPosAnimatorT,
+                       QPointFAnimator *startPosAnimatorT,
+                       QPointFAnimator *pathPointPosAnimatorT) {
+        parentPathPoint = parentPathPointT;
+        endPosAnimator = endPosAnimatorT;
+        startPosAnimator = startPosAnimatorT;
+        pathPointPosAnimator = pathPointPosAnimatorT;
+    }
+
+    bool isOfPathPoint(PathPoint *checkPoint) {
+        return parentPathPoint == checkPoint;
+    }
+
+    PathPoint *parentPathPoint;
+    QPointFAnimator *endPosAnimator;
+    QPointFAnimator *startPosAnimator;
+    QPointFAnimator *pathPointPosAnimator;
+};
+
 class PathPoint : public MovablePoint
 {
 public:
@@ -92,7 +116,13 @@ public:
     bool isStartCtrlPtEnabled();
 
     void setPosAnimatorUpdater(AnimatorUpdater *updater);
+
+    void updateAfterFrameChanged(int frame);
+
+    PathPointAnimators *getPathPointAnimatorsPtr();
 private:
+    PathPointAnimators mPathPointAnimators;
+
     VectorPath *mVectorPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
 

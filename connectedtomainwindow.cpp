@@ -54,6 +54,26 @@ int ConnectedToMainWindow::getCurrentFrame()
     return mMainWindow->getCurrentFrame();
 }
 
+int ConnectedToMainWindow::getMaxFrame()
+{
+    return mMainWindow->getMaxFrame();
+}
+
+int ConnectedToMainWindow::getMinFrame()
+{
+    return mMainWindow->getMinFrame();
+}
+
+bool ConnectedToMainWindow::isRecording()
+{
+    return mMainWindow->isRecording();
+}
+
+bool ConnectedToMainWindow::isRecordingAllPoints()
+{
+    return mMainWindow->isRecordingAllPoints();
+}
+
 void ConnectedToMainWindow::startNewUndoRedoSet()
 {
      mMainWindow->getUndoRedoStack()->startNewSet();
