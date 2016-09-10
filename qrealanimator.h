@@ -106,7 +106,7 @@ public:
 
     virtual void setUpdater(AnimatorUpdater *updater);
 
-    void callUpdater();
+    virtual void callUpdater();
 
     virtual void drawKeys(QPainter *p, qreal pixelsPerFrame,
                           qreal startX, qreal startY, qreal height,
@@ -117,7 +117,13 @@ public:
 
     void addAllKeysToComplexAnimator();
     void removeAllKeysFromComplexAnimator();
+
+    bool hasKeys();
+
+    void incAllValues(qreal valInc);
 protected:
+    QString mName = "";
+
     ComplexAnimator *mParentAnimator = NULL;
 
     AnimatorUpdater *mUpdater = NULL;

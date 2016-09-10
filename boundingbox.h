@@ -6,6 +6,8 @@
 #include <QSqlQuery>
 #include "transformanimator.h"
 
+#include "animatorscollection.h"
+
 class UndoRedo;
 
 class Canvas;
@@ -37,7 +39,7 @@ public:
     BoundingBox(int boundingBoxId, BoxesGroup *parent,
                 BoundingBoxType type);
 
-    virtual void updatePivotPosition() {}
+    virtual void centerPivotPosition() {}
     virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getBoundingRect() { return QRectF(); }
 
@@ -163,6 +165,9 @@ public:
 
     virtual void startAllPointsTransform() {}
     virtual void finishAllPointsTransform() {}
+
+    void addActiveAnimator(QrealAnimator *animator);
+    void removeActiveAnimator(QrealAnimator *animator);
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 
@@ -171,6 +176,8 @@ protected:
     bool mScheduledForRemove = false;
     BoundingBoxType mType;
     BoxesGroup *mParent = NULL;
+
+    AnimatorsCollection mAnimatorsCollection;
 
     TransformAnimator mTransformAnimator;
 
@@ -182,8 +189,9 @@ protected:
     bool mLocked = false;
     //
 
-    bool mChildrenListItemsVisibile = false;
+    bool mBoxListItemDetailsVisible = false;
     QString mName = "";
+    QList<QrealAnimator*> mActiveAnimators;
 };
 
 

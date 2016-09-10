@@ -50,6 +50,19 @@ void QrealAnimator::removeAllKeysFromComplexAnimator()
     }
 }
 
+bool QrealAnimator::hasKeys()
+{
+    return !mKeys.isEmpty();
+}
+
+void QrealAnimator::incAllValues(qreal valInc)
+{
+    foreach(QrealKey *key, mKeys) {
+        key->incValue(valInc);
+    }
+    incCurrentValue(valInc);
+}
+
 QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
                                      int minViewedFrame,
                                      qreal pixelsPerFrame) {
@@ -148,7 +161,13 @@ void QrealAnimator::removeKey(QrealKey *removeKey) {
 
 void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
 {
+    if(mParentAnimator != NULL) {
+        mParentAnimator->removeChildQrealKey(key);
+    }
     key->setFrame(newFrame);
+    if(mParentAnimator != NULL) {
+        mParentAnimator->addChildQrealKey(key);
+    }
     sortKeys();
     updateKeysPath();
 }
@@ -860,9 +879,11 @@ void QrealAnimator::mergeKeysIfNeeded() {
         if(lastKey != NULL) {
             if(key->getFrame() == lastKey->getFrame() ) {
                 if(key->isSelected()) {
+                    key->mergeWith(lastKey);
                     mKeys.removeOne(lastKey);
                     delete lastKey;
                 } else {
+                    lastKey->mergeWith(key);
                     mKeys.removeOne(key);
                     delete key;
                     key = NULL;

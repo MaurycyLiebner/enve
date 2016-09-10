@@ -11,6 +11,7 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mScaleAnimator.setParentAnimator(this);
     mRotAnimator.setParentAnimator(this);
     mPosAnimator.setParentAnimator(this);
+    mPivotAnimator.setParentAnimator(this);
 }
 
 void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel) {
@@ -94,6 +95,7 @@ void TransformAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connecte
     mPosAnimator.setConnectedToMainWindow(connected);
     mRotAnimator.setConnectedToMainWindow(connected);
     mScaleAnimator.setConnectedToMainWindow(connected);
+    mPivotAnimator.setConnectedToMainWindow(connected);
 }
 
 void TransformAnimator::setUpdater(AnimatorUpdater *updater)
@@ -103,6 +105,7 @@ void TransformAnimator::setUpdater(AnimatorUpdater *updater)
     mPosAnimator.setUpdater(updater);
     mRotAnimator.setUpdater(updater);
     mScaleAnimator.setUpdater(updater);
+    mPivotAnimator.setUpdater(updater);
 }
 
 void TransformAnimator::setFrame(int frame)
@@ -112,6 +115,7 @@ void TransformAnimator::setFrame(int frame)
     mPosAnimator.setFrame(frame);
     mRotAnimator.setFrame(frame);
     mScaleAnimator.setFrame(frame);
+    mPivotAnimator.setFrame(frame);
 }
 
 void TransformAnimator::sortKeys()
@@ -120,6 +124,7 @@ void TransformAnimator::sortKeys()
     mPosAnimator.sortKeys();
     mRotAnimator.sortKeys();
     mScaleAnimator.sortKeys();
+    mPivotAnimator.sortKeys();
 }
 
 void TransformAnimator::updateKeysPath()
@@ -128,6 +133,7 @@ void TransformAnimator::updateKeysPath()
     mPosAnimator.updateKeysPath();
     mRotAnimator.updateKeysPath();
     mScaleAnimator.updateKeysPath();
+    mPivotAnimator.updateKeysPath();
 }
 
 void TransformAnimator::retrieveSavedValue()
@@ -180,13 +186,15 @@ void TransformAnimator::setPivot(qreal x, qreal y)
 void TransformAnimator::setPivot(QPointF point)
 {
     QMatrix currentMatrix;
-    currentMatrix.translate(mPivotPoint.x() + mPosAnimator.getXValue(),
-                     mPivotPoint.y() + mPosAnimator.getYValue());
+    qreal pivotX = mPivotAnimator.getXValue();
+    qreal pivotY = mPivotAnimator.getYValue();
+    currentMatrix.translate(pivotX + mPosAnimator.getXValue(),
+                     pivotY + mPosAnimator.getYValue());
     currentMatrix.scale(mScaleAnimator.getXValue(),
                         mScaleAnimator.getYValue() );
     currentMatrix.rotate(mRotAnimator.getCurrentValue() );
-    currentMatrix.translate(-mPivotPoint.x(),
-                            -mPivotPoint.y());
+    currentMatrix.translate(-pivotX,
+                            -pivotY);
 
     QMatrix futureMatrix;
     futureMatrix.translate(point.x() + mPosAnimator.getXValue(),
@@ -197,17 +205,19 @@ void TransformAnimator::setPivot(QPointF point)
     futureMatrix.translate(-point.x(),
                             -point.y());
 
-    mPosAnimator.incCurrentValue(currentMatrix.dx() - futureMatrix.dx(),
+    mPosAnimator.incAllValues(currentMatrix.dx() - futureMatrix.dx(),
                                  currentMatrix.dy() - futureMatrix.dy());
 
-    mPivotPoint = point;
+    mPivotAnimator.startTransform();
+    mPivotAnimator.setCurrentValue(point);
+    mPivotAnimator.finishTransform(mConnectedToMainWindow->isRecording());
 
-    mUpdater->update();
+    callUpdater();
 }
 
 QPointF TransformAnimator::getPivot()
 {
-    return mPivotPoint;
+    return mPivotAnimator.getCurrentValue();
 }
 
 qreal TransformAnimator::dx()
@@ -242,22 +252,24 @@ QPointF TransformAnimator::pos()
 
 qreal TransformAnimator::getPivotX()
 {
-    return mPivotPoint.x();
+    return mPivotAnimator.getXValue();
 }
 
 qreal TransformAnimator::getPivotY()
 {
-    return mPivotPoint.y();
+    return mPivotAnimator.getYValue();
 }
 
 QMatrix TransformAnimator::getCurrentValue()
 {
     QMatrix matrix;
-    matrix.translate(mPivotPoint.x() + mPosAnimator.getXValue(),
-                     mPivotPoint.y() + mPosAnimator.getYValue());
+    qreal pivotX = mPivotAnimator.getXValue();
+    qreal pivotY = mPivotAnimator.getYValue();
+    matrix.translate(pivotX + mPosAnimator.getXValue(),
+                     pivotY + mPosAnimator.getYValue());
     matrix.scale(mScaleAnimator.getXValue(), mScaleAnimator.getYValue() );
     matrix.rotate(mRotAnimator.getCurrentValue() );
-    matrix.translate(-mPivotPoint.x(),
-                     -mPivotPoint.y());
+    matrix.translate(-pivotX,
+                     -pivotY);
     return matrix;
 }

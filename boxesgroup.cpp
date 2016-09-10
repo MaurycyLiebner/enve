@@ -793,7 +793,7 @@ void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect)
     }
 }
 
-void BoxesGroup::updatePivotPosition() {
+void BoxesGroup::centerPivotPosition() {
     if(!mPivotChanged) {
         if(mChildren.isEmpty()) return;
         QPointF posSum = QPointF(0.f, 0.f);
@@ -803,12 +803,6 @@ void BoxesGroup::updatePivotPosition() {
         }
         setPivotAbsPos(posSum/count, false, false);
     }
-}
-
-void BoxesGroup::select()
-{
-    BoundingBox::select();
-    updatePivotPosition();
 }
 
 BoxesGroup* BoxesGroup::groupSelectedBoxes() {
@@ -833,6 +827,7 @@ void BoxesGroup::addChild(BoundingBox *child)
     startNewUndoRedoSet();
     child->setParent(this);
     addChildToListAt(mChildren.count(), child);
+    centerPivotPosition();
     finishUndoRedoSet();
 }
 
@@ -885,6 +880,7 @@ void BoxesGroup::removeChild(BoundingBox *child)
     startNewUndoRedoSet();
     removeChildFromList(index);
     child->setParent(NULL);
+    centerPivotPosition();
     finishUndoRedoSet();
 }
 

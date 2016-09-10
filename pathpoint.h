@@ -30,6 +30,18 @@ struct PathPointAnimators {
         return parentPathPoint == checkPoint;
     }
 
+    void updateKeysPath() {
+        endPosAnimator->updateKeysPath();
+        startPosAnimator->updateKeysPath();
+        pathPointPosAnimator->updateKeysPath();
+    }
+
+    void sortKeys() {
+        endPosAnimator->sortKeys();
+        startPosAnimator->sortKeys();
+        pathPointPosAnimator->sortKeys();
+    }
+
     PathPoint *parentPathPoint;
     QPointFAnimator *endPosAnimator;
     QPointFAnimator *startPosAnimator;

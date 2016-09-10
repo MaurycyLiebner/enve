@@ -37,3 +37,19 @@ void PathAnimator::removePointPosAnimator(QrealAnimator *pointPosAnimator)
 
     pointPosAnimator->setParentAnimator(NULL);
 }
+
+void PathAnimator::updateKeysPath()
+{
+    QrealAnimator::updateKeysPath();
+    foreach(PathPointAnimators *animator, mPathPointAnimators) {
+        animator->updateKeysPath();
+    }
+}
+
+void PathAnimator::sortKeys()
+{
+    QrealAnimator::sortKeys();
+    foreach(PathPointAnimators *animator, mPathPointAnimators) {
+        animator->sortKeys();
+    }
+}

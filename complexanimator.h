@@ -81,6 +81,13 @@ public:
         mKeys << key;
     }
 
+    void addAnimatorKeyIfNotDuplicate(QrealKey *keyAdd) {
+        foreach(QrealKey *key, mKeys) {
+            if(key->getParentAnimator() == keyAdd->getParentAnimator() ) return;
+        }
+        addAnimatorKey(keyAdd);
+    }
+
     void removeAnimatorKey(QrealKey *key) {
         mKeys.removeOne(key);
     }
@@ -101,6 +108,17 @@ public:
             key->setFrame(frame);
         }
     }
+
+    void mergeWith(QrealKey *key) {
+        ((ComplexKey*) key)->copyAllKeysToKey(this);
+    }
+
+    void copyAllKeysToKey(ComplexKey *target) {
+        foreach(QrealKey *key, mKeys) {
+            target->addAnimatorKeyIfNotDuplicate(key);
+        }
+    }
+
 private:
     QList<QrealKey*> mKeys;
 };

@@ -21,6 +21,10 @@ void QrealKey::constrainEndCtrlMaxFrame(int maxFrame) {
     mEndPoint->moveTo(newFrame, change*(mEndValue - mValue) + mValue);
 }
 
+void QrealKey::incValue(qreal incBy) {
+    setValue(mValue + incBy);
+}
+
 QrealPoint *QrealKey::getStartPoint()
 {
     return mStartPoint;

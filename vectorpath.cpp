@@ -11,6 +11,9 @@ VectorPath::VectorPath(BoxesGroup *group) :
     BoundingBox(group,
                 BoundingBoxType::TYPE_VECTOR_PATH)
 {
+    addActiveAnimator(&mPathAnimator);
+    mAnimatorsCollection.addAnimator(&mPathAnimator);
+
     mFillGradientPoints.initialize(this);
     mStrokeGradientPoints.initialize(this);
 }
@@ -19,6 +22,9 @@ VectorPath::VectorPath(int boundingBoxId,
                         BoxesGroup *parent) :
     BoundingBox(boundingBoxId,
                 parent, TYPE_VECTOR_PATH) {
+    addActiveAnimator(&mPathAnimator);
+    mAnimatorsCollection.addAnimator(&mPathAnimator);
+
     QSqlQuery query;
     QString queryStr = "SELECT * FROM vectorpath WHERE boundingboxid = " +
             QString::number(boundingBoxId);
@@ -187,6 +193,7 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
     foreach(PathPoint *point, mPoints) {
         point->updateAfterFrameChanged(currentFrame);
     }
+    mPathAnimator.setFrame(currentFrame);
     BoundingBox::updateAfterFrameChanged(currentFrame);
 }
 
@@ -232,7 +239,7 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
     return newPoint;
 }
 
-void VectorPath::updatePivotPosition() {
+void VectorPath::centerPivotPosition() {
     if(!mPivotChanged) {
         QPointF posSum = QPointF(0.f, 0.f);
         int count = mPoints.length();
@@ -344,7 +351,7 @@ void VectorPath::updatePathIfNeeded()
 {
     if(mPathUpdateNeeded) {
         updatePath();
-        updatePivotPosition();
+        if(!mAnimatorsCollection.hasKeys() ) centerPivotPosition();
         mPathUpdateNeeded = false;
         mMappedPathUpdateNeeded = false;
     }

@@ -84,9 +84,8 @@ public:
 
     void ungroupSelected();
     void ungroup();
-    void updatePivotPosition();
+    void centerPivotPosition();
 
-    void select();
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
 
@@ -131,6 +130,8 @@ public:
     void updateAfterFrameChanged(int currentFrame);
     QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
     void getKeysInRect(QRectF selectionRect, qreal y0, QList<QrealKey *> *keysList);
+    QrealKey *getKeyAtPosFromChildren(qreal relX, qreal relY, qreal y0);
+    void getKeysInRectFromChildren(QRectF selectionRect, qreal y0, QList<QrealKey *> *keysList);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

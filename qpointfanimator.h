@@ -29,6 +29,7 @@ public:
 
     void sortKeys();
     void updateKeysPath();
+    void incAllValues(qreal x, qreal y);
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

@@ -8,6 +8,9 @@
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     Transformable(parent)
 {
+    addActiveAnimator(&mTransformAnimator);
+    mAnimatorsCollection.addAnimator(&mTransformAnimator);
+
     mBoxesList = parent->getMainWindow()->getBoxesList();
     mTransformAnimator.setConnectedToMainWindow(this);
     mTransformAnimator.setUpdater(new TransUpdater(this) );
@@ -34,6 +37,9 @@ BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) :
 BoundingBox::BoundingBox(int boundingBoxId,
                          BoxesGroup *parent, BoundingBoxType type) :
     Transformable(parent) {
+    addActiveAnimator(&mTransformAnimator);
+    mAnimatorsCollection.addAnimator(&mTransformAnimator);
+
     QSqlQuery query;
     mType = type;
 
@@ -82,6 +88,7 @@ BoundingBox::BoundingBox(int boundingBoxId,
 void BoundingBox::updateAfterFrameChanged(int currentFrame)
 {
     mTransformAnimator.setFrame(currentFrame);
+    mAnimatorsCollection.setFrame(currentFrame);
 }
 
 void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {

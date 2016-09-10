@@ -82,6 +82,8 @@ public:
     QMatrix getCombinedRenderTransform();
 
     void clearPreview();
+    QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
+    void getKeysInRect(QRectF selectionRect, qreal y0, QList<QrealKey *> *keysList);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);

@@ -18,6 +18,8 @@ public:
     void removePathPoint(PathPoint *pathPoint);
     void addPointPosAnimator(QrealAnimator *pointPosAnimator);
     void removePointPosAnimator(QrealAnimator *pointPosAnimator);
+    void updateKeysPath();
+    void sortKeys();
 private:
     QList<PathPointAnimators*> mPathPointAnimators;
 };

@@ -181,6 +181,15 @@ void BoxesList::mouseReleaseEvent(QMouseEvent *)
                 addKeyToSelection(mLastPressedKey);
             }
         }
+        QList<QrealAnimator*> parentAnimators;
+        foreach(QrealKey *key, mSelectedKeys) {
+            if(parentAnimators.contains(key->getParentAnimator()) ) continue;
+            parentAnimators << key->getParentAnimator();
+        }
+        foreach(QrealAnimator *animator, parentAnimators) {
+            animator->mergeKeysIfNeeded();
+        }
+
         mMoveDFrame = 0;
         mMovingKeys = false;
     }

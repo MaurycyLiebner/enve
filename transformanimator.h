@@ -58,7 +58,7 @@ public:
     void sortKeys();
     void updateKeysPath();
 private:
-    QPointF mPivotPoint;
+    QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;
     QPointFAnimator mScaleAnimator;
     QrealAnimator mRotAnimator;

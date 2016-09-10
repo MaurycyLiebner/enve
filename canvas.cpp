@@ -37,6 +37,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mIsCurrentGroup = true;
     setFocusPolicy(Qt::StrongFocus);
     mRotPivot = new PathPivot(this);
+    mRotPivot->hide();
     setMinimumSize(500, 500);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 

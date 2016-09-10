@@ -62,7 +62,8 @@ SOURCES += main.cpp\
     animatorupdater.cpp \
     updatescheduler.cpp \
     coloranimator.cpp \
-    pathanimator.cpp
+    pathanimator.cpp \
+    animatorscollection.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -111,4 +112,5 @@ HEADERS  += mainwindow.h \
     pointhelpers.h \
     animatorupdater.h \
     coloranimator.h \
-    pathanimator.h
+    pathanimator.h \
+    animatorscollection.h

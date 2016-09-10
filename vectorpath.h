@@ -86,7 +86,7 @@ public:
 
     void updatePathIfNeeded();
     void updateMappedPathIfNeeded();
-    void updatePivotPosition();
+    void centerPivotPosition();
 
     void setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo = true);
     void setFillSettings(PaintSettings fillSettings, bool saveUndoRedo = true);
@@ -115,11 +115,10 @@ public:
     void attachToBoneFromSqlZId();
 
     void updateAfterFrameChanged(int currentFrame);
-    void drawAnimationBar(QPainter *p, qreal pixelsPerFrame,
-                          qreal drawX, qreal drawY,
-                          int startFrame, int endFrame);
+
     void startAllPointsTransform();
     void finishAllPointsTransform();
+
 protected:
     PathAnimator mPathAnimator;
 

@@ -61,6 +61,9 @@ public:
     void incFrameAndUpdateParentAnimator(int inc);
 
     QrealAnimator *getParentAnimator();
+
+    virtual void mergeWith(QrealKey *key) {}
+    void incValue(qreal incBy);
 protected:
     QrealAnimator *mParentAnimator;
 
