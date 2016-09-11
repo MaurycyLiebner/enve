@@ -3,7 +3,7 @@
 
 PathAnimator::PathAnimator() : ComplexAnimator()
 {
-
+    setName("path");
 }
 
 void PathAnimator::addPathPoint(PathPoint *pathPoint)

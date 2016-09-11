@@ -46,7 +46,7 @@ struct Color
     void updateHSVFromRGB();
     void updateQColFromHSV();
     void setHSV(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
-    void setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t);
+    void setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a = 1.f);
     void updateRGBFromHSV();
     void setGLColor();
     void setGLClearColor();
@@ -59,6 +59,9 @@ struct Color
     Color(int r_t, int g_t, int b_t, int a_t = 255);
     Color(int sqlId);
     Color();
+
+public:
+    void setHSL(GLfloat h, GLfloat s, GLfloat l, GLfloat a);
 };
 
 #endif // COLOR_H

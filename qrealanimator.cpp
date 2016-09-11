@@ -14,6 +14,7 @@ QrealAnimator::~QrealAnimator()
 {
     if(mUpdater != NULL) {
         delete mUpdater;
+        setUpdater(NULL);
     }
 }
 
@@ -61,6 +62,16 @@ void QrealAnimator::incAllValues(qreal valInc)
         key->incValue(valInc);
     }
     incCurrentValue(valInc);
+}
+
+QString QrealAnimator::getName()
+{
+    return mName;
+}
+
+void QrealAnimator::setName(QString newName)
+{
+    mName = newName;
 }
 
 QrealKey *QrealAnimator::getKeyAtPos(qreal relX,

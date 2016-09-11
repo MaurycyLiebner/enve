@@ -3,15 +3,24 @@
 #include "complexanimator.h"
 #include "Colors/color.h"
 
+enum ColorMode {
+    HSVMODE,
+    HSLMODE,
+    RGBMODE
+};
+
 class ColorAnimator : public ComplexAnimator
 {
 public:
     ColorAnimator();
 
+    Color getCurrentValue();
+    void setColorMode(ColorMode colorMode);
 private:
-    QrealAnimator mHueAnimator;
-    QrealAnimator mSaturationAnimator;
-    QrealAnimator mValueAnimator;
+    ColorMode mColorMode;
+    QrealAnimator mVal1Animator;
+    QrealAnimator mVal2Animator;
+    QrealAnimator mVal3Animator;
     QrealAnimator mAlphaAnimator;
 };
 

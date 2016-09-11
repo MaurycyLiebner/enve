@@ -36,12 +36,19 @@ void Color::setHSV(GLfloat h, GLfloat s, GLfloat v, GLfloat a)
     updateRGBFromHSV();
 }
 
-void Color::setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t)
+void Color::setHSL(GLfloat h, GLfloat s, GLfloat l, GLfloat a)
+{
+    hsl_to_hsv(&h, &s, &l);
+    setHSV(h, s, l, a);
+}
+
+
+void Color::setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a)
 {
     gl_r = r_t;
     gl_g = g_t;
     gl_b = b_t;
-    gl_a = 1.f;
+    gl_a = a;
     qcol.setRgbF(r_t, g_t, b_t);
     updateHSVFromRGB();
 }

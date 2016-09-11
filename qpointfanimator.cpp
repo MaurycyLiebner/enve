@@ -2,7 +2,9 @@
 
 QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 {
+    mXAnimator.setName("x");
     mXAnimator.setParentAnimator(this);
+    mYAnimator.setName("y");
     mYAnimator.setParentAnimator(this);
 }
 

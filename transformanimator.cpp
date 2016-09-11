@@ -4,9 +4,14 @@
 
 TransformAnimator::TransformAnimator() : ComplexAnimator()
 {
+    setName("transformation");
+    mScaleAnimator.setName("scale");
     mScaleAnimator.setCurrentValue(QPointF(1., 1.));
+    mRotAnimator.setName("rot");
     mRotAnimator.setCurrentValue(0.);
+    mPosAnimator.setName("pos");
     mPosAnimator.setCurrentValue(QPointF(0., 0.) );
+    mPivotAnimator.setName("pivot");
 
     mScaleAnimator.setParentAnimator(this);
     mRotAnimator.setParentAnimator(this);

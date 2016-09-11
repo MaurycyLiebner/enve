@@ -174,7 +174,7 @@ void BoundingBox::drawListItem(QPainter *p,
                                int startFrame, int endFrame) {
     Q_UNUSED(maxY);
     drawAnimationBar(p, pixelsPerFrame,
-                     200., drawY,
+                     drawX + LIST_ITEM_HEIGHT, drawY,
                      startFrame, endFrame);
 
     if(mSelected) {
@@ -214,12 +214,16 @@ void BoundingBox::drawAnimationBar(QPainter *p,
                                    qreal drawX, qreal drawY,
                                    int startFrame, int endFrame) {
     mAnimatorsCollection.drawKeys(p,
-                                pixelsPerFrame, drawX, drawY, 20.,
+                                pixelsPerFrame, 200., drawY, 20.,
                                 startFrame, endFrame, true);
     drawY += LIST_ITEM_HEIGHT;
     if(mBoxListItemDetailsVisible) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
-            animator->drawKeys(p, pixelsPerFrame, drawX, drawY, 20.,
+            p->drawText(drawX, drawY,
+                        200. - drawX, LIST_ITEM_HEIGHT,
+                        Qt::AlignVCenter | Qt::AlignLeft,
+                        animator->getName() );
+            animator->drawKeys(p, pixelsPerFrame, 200., drawY, 20.,
                                startFrame, endFrame, true);
             drawY += LIST_ITEM_HEIGHT;
         }

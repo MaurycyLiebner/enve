@@ -121,6 +121,9 @@ public:
     bool hasKeys();
 
     void incAllValues(qreal valInc);
+
+    QString getName();
+    void setName(QString newName);
 protected:
     QString mName = "";
 
