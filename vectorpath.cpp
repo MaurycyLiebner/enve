@@ -476,7 +476,7 @@ void VectorPath::draw(QPainter *p)
         if(mFillPaintSettings.paintType == GRADIENTPAINT) {
             p->setBrush(mDrawFillGradient);
         } else if(mFillPaintSettings.paintType == FLATPAINT) {
-            p->setBrush(mFillPaintSettings.color.qcol);
+            p->setBrush(mFillPaintSettings.color.getCurrentValue().qcol);
         } else{
             p->setBrush(Qt::NoBrush);
         }
@@ -484,7 +484,7 @@ void VectorPath::draw(QPainter *p)
         if(mStrokeSettings.paintType == GRADIENTPAINT) {
             p->setBrush(mDrawStrokeGradient);
         } else if(mStrokeSettings.paintType == FLATPAINT) {
-            p->setBrush(mStrokeSettings.color.qcol);
+            p->setBrush(mStrokeSettings.color.getCurrentValue().qcol);
         } else{
             p->setBrush(Qt::NoBrush);
         }
@@ -500,7 +500,7 @@ void VectorPath::render(QPainter *p)
     if(mFillPaintSettings.paintType == GRADIENTPAINT) {
         p->setBrush(mDrawFillGradient);
     } else if(mFillPaintSettings.paintType == FLATPAINT) {
-        p->setBrush(mFillPaintSettings.color.qcol);
+        p->setBrush(mFillPaintSettings.color.getCurrentValue().qcol);
     } else{
         p->setBrush(Qt::NoBrush);
     }
@@ -511,7 +511,7 @@ void VectorPath::render(QPainter *p)
     if(mStrokeSettings.paintType == GRADIENTPAINT) {
         p->setBrush(mDrawStrokeGradient);
     } else if(mStrokeSettings.paintType == FLATPAINT) {
-        p->setBrush(mStrokeSettings.color.qcol);
+        p->setBrush(mStrokeSettings.color.getCurrentValue().qcol);
     } else{
         p->setBrush(Qt::NoBrush);
     }
@@ -637,6 +637,7 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo = new AppendToPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
     }
+    point->incNumberPointers();
 }
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
@@ -653,6 +654,7 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
         }
         finishUndoRedoSet();
     }
+    point->decNumberPointers();
 }
 
 void VectorPath::removePoint(PathPoint *point) {

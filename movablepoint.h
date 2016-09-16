@@ -82,12 +82,8 @@ public:
 
     virtual void updateAfterFrameChanged(int frame);
 
-    bool isPosKeyOnCurrentFrame();
-    void updateIsPosKeyOnCurrentFrame();
-
     QPointFAnimator *getRelativePosAnimatorPtr();
 protected:
-    bool mKeyOnCurrentFrame = false;
     bool mTransformStarted = false;
     MovablePointType mType;
     bool mHidden = false;

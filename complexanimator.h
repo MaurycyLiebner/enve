@@ -32,92 +32,35 @@ protected:
 class ComplexKey : public QrealKey
 {
 public:
-    ComplexKey(int frameT, ComplexAnimator *parentAnimator) :
-        QrealKey(frameT, parentAnimator, frameT) {
-    }
+    ComplexKey(int frameT, ComplexAnimator *parentAnimator);
 
-    void setStartValue(qreal value) {
-        QrealKey::setStartValue(value);
+    void setStartValue(qreal value);
 
-        foreach(QrealKey *key, mKeys) {
-            if(key->hasPrevKey() ) {
-                qreal prevVal = key->getPrevKeyValue();
-                key->setStartValue(value *
-                                   (key->getValue() - prevVal ) /
-                                   (getValue() - getPrevKeyValue()) + prevVal );
-            }
-        }
-    }
+    void setEndValue(qreal value);
 
-    void setEndValue(qreal value) {
-        QrealKey::setEndValue(value);
+    void setStartFrame(qreal startFrame);
 
-        foreach(QrealKey *key, mKeys) {
-            if(key->hasNextKey() ) {
-                key->setEndValue(value *
-                                (key->getNextKeyValue() - key->getValue() ) /
-                                (getNextKeyValue() - getValue()) + key->getValue() );
-            }
-        }
-    }
+    void setEndFrame(qreal endFrame);
 
-    void setStartFrame(qreal startFrame) {
-        QrealKey::setStartFrame(startFrame);
+    void addAnimatorKey(QrealKey* key);
 
-        foreach(QrealKey *key, mKeys) {
-            key->setStartFrame(startFrame);
-        }
-    }
+    void addOrMergeKey(QrealKey *keyAdd);
 
-    void setEndFrame(qreal endFrame) {
-        QrealKey::setEndFrame(endFrame);
+    void removeAnimatorKey(QrealKey *key);
 
-        foreach(QrealKey *key, mKeys) {
-            key->setEndFrame(endFrame);
-        }
-    }
+    bool isEmpty();
 
-    void addAnimatorKey(QrealKey* key) {
-        mKeys << key;
-    }
+    void setValue(qreal);
 
-    void addAnimatorKeyIfNotDuplicate(QrealKey *keyAdd) {
-        foreach(QrealKey *key, mKeys) {
-            if(key->getParentAnimator() == keyAdd->getParentAnimator() ) return;
-        }
-        addAnimatorKey(keyAdd);
-    }
+    qreal getValue();
 
-    void removeAnimatorKey(QrealKey *key) {
-        mKeys.removeOne(key);
-    }
+    void setFrame(int frame);
 
-    bool isEmpty() {
-        return mKeys.isEmpty();
-    }
+    void mergeWith(QrealKey *key);
 
-    void setValue(qreal) { QrealKey::setValue(mFrame); }
+    void margeAllKeysToKey(ComplexKey *target);
 
-    qreal getValue() { return mFrame; }
-
-    void setFrame(int frame) {
-        QrealKey::setFrame(frame);
-        QrealKey::setValue(frame);
-
-        foreach(QrealKey *key, mKeys) {
-            key->setFrame(frame);
-        }
-    }
-
-    void mergeWith(QrealKey *key) {
-        ((ComplexKey*) key)->copyAllKeysToKey(this);
-    }
-
-    void copyAllKeysToKey(ComplexKey *target) {
-        foreach(QrealKey *key, mKeys) {
-            target->addAnimatorKeyIfNotDuplicate(key);
-        }
-    }
+    bool isDescendantSelected();
 
 private:
     QList<QrealKey*> mKeys;

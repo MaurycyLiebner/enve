@@ -1,6 +1,7 @@
 #ifndef QREALPOINT_H
 #define QREALPOINT_H
 #include <QPainter>
+#include "smartpointertarget.h"
 
 class QrealKey;
 
@@ -10,7 +11,7 @@ enum QrealPointType {
     KEY_POINT
 };
 
-class QrealPoint
+class QrealPoint : public SmartPointerTarget
 {
 public:
     QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius = 10.f);

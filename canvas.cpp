@@ -14,6 +14,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     QWidget(parent),
     BoxesGroup(fillStrokeSettings, parent)
 {
+    incNumberPointers();
+
     mPreviewFPSTimer = new QTimer(this);
     mPreviewFPSTimer->setInterval(1000/24.);
     connect(mPreviewFPSTimer, SIGNAL(timeout()),

@@ -1,4 +1,5 @@
 #include "qpointfanimator.h"
+#include "boxeslist.h"
 
 QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 {
@@ -38,6 +39,15 @@ void QPointFAnimator::incCurrentValue(qreal x, qreal y)
 void QPointFAnimator::incAllValues(qreal x, qreal y) {
     mXAnimator.incAllValues(x);
     mYAnimator.incAllValues(y);
+}
+
+qreal QPointFAnimator::getBoxesListHeight()
+{
+    if(mBoxesListDetailVisible) {
+        return 3*LIST_ITEM_HEIGHT;
+    } else {
+        return LIST_ITEM_HEIGHT;
+    }
 }
 
 void QPointFAnimator::multCurrentValue(qreal sx, qreal sy)
@@ -96,6 +106,8 @@ void QPointFAnimator::finishTransform(bool record)
     mYAnimator.finishTransform(record);
 
     mConnectedToMainWindow->finishUndoRedoSet();
+
+    updateKeyOnCurrrentFrame();
 }
 
 void QPointFAnimator::cancelTransform() {
@@ -107,6 +119,45 @@ void QPointFAnimator::retrieveSavedValue()
 {
     mXAnimator.retrieveSavedValue();
     mYAnimator.retrieveSavedValue();
+}
+
+void QPointFAnimator::drawBoxesList(QPainter *p,
+                                      qreal drawX, qreal drawY,
+                                      qreal pixelsPerFrame,
+                                      int startFrame, int endFrame)
+{
+    QrealAnimator::drawBoxesList(p, drawX, drawY,
+                                 pixelsPerFrame, startFrame, endFrame);
+    if(mBoxesListDetailVisible) {
+        drawX += LIST_ITEM_CHILD_INDENT;
+        drawY += LIST_ITEM_HEIGHT;
+        mXAnimator.drawBoxesList(p, drawX, drawY,
+                                pixelsPerFrame,
+                                startFrame, endFrame);
+        drawY += mXAnimator.getBoxesListHeight();
+
+        mYAnimator.drawBoxesList(p, drawX, drawY,
+                                pixelsPerFrame,
+                                startFrame, endFrame);
+        drawY += mYAnimator.getBoxesListHeight();
+    }
+}
+QrealKey *QPointFAnimator::getKeyAtPos(qreal relX, qreal relY,
+                                     int minViewedFrame,
+                                     qreal pixelsPerFrame) {
+    if(relY <= LIST_ITEM_HEIGHT) {
+        return QrealAnimator::getKeyAtPos(relX, relY,
+                                          minViewedFrame, pixelsPerFrame);
+    } else if(mBoxesListDetailVisible) {
+        if(relY <= 2*LIST_ITEM_HEIGHT) {
+            return mXAnimator.getKeyAtPos(relX, relY,
+                                          minViewedFrame, pixelsPerFrame);
+        } else if(relY <= 3*LIST_ITEM_HEIGHT) {
+            return mYAnimator.getKeyAtPos(relX, relY,
+                                          minViewedFrame, pixelsPerFrame);
+        }
+    }
+    return NULL;
 }
 
 QPointF QPointFAnimator::getSavedValue()

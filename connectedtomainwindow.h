@@ -1,6 +1,7 @@
 #ifndef CONNECTEDTOMAINWINDOW_H
 #define CONNECTEDTOMAINWINDOW_H
 #include <QString>
+#include "smartpointertarget.h"
 
 class MainWindow;
 
@@ -8,12 +9,12 @@ class UndoRedo;
 
 class UpdateScheduler;
 
-class ConnectedToMainWindow
+class ConnectedToMainWindow : public SmartPointerTarget
 {
 public:
     ConnectedToMainWindow(ConnectedToMainWindow *parent);
     ConnectedToMainWindow(MainWindow *parent);
-    virtual ~ConnectedToMainWindow() {}
+    ~ConnectedToMainWindow() {}
 
     void addUndoRedo(UndoRedo *undoRedo);
     void addUpdateScheduler(UpdateScheduler *scheduler);

@@ -63,7 +63,8 @@ SOURCES += main.cpp\
     updatescheduler.cpp \
     coloranimator.cpp \
     pathanimator.cpp \
-    animatorscollection.cpp
+    animatorscollection.cpp \
+    smartpointertarget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -113,4 +114,5 @@ HEADERS  += mainwindow.h \
     animatorupdater.h \
     coloranimator.h \
     pathanimator.h \
-    animatorscollection.h
+    animatorscollection.h \
+    smartpointertarget.h

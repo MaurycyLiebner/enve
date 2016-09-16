@@ -4,18 +4,10 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include "animationdockwidget.h"
-
+#include "boxeslist.h"
 
 QrealAnimator::QrealAnimator()
 {
-}
-
-QrealAnimator::~QrealAnimator()
-{
-    if(mUpdater != NULL) {
-        delete mUpdater;
-        setUpdater(NULL);
-    }
 }
 
 void QrealAnimator::getKeysInRect(QRectF selectionRect,
@@ -74,9 +66,47 @@ void QrealAnimator::setName(QString newName)
     mName = newName;
 }
 
-QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
+bool QrealAnimator::isKeyOnCurrentFrame() {
+    return mKeyOnCurrentFrame;
+}
+
+bool QrealAnimator::isBoxesListDetailVisible()
+{
+    return mBoxesListDetailVisible;
+}
+
+void QrealAnimator::setBoxesListDetailVisible(bool bT)
+{
+    mBoxesListDetailVisible = bT;
+}
+
+qreal QrealAnimator::getBoxesListHeight()
+{
+    return LIST_ITEM_HEIGHT;
+}
+
+void QrealAnimator::drawBoxesList(QPainter *p,
+                                  qreal drawX, qreal drawY,
+                                  qreal pixelsPerFrame,
+                                  int startFrame, int endFrame)
+{
+    p->drawText(drawX, drawY,
+                200. - drawX, LIST_ITEM_HEIGHT,
+                Qt::AlignVCenter | Qt::AlignLeft,
+                getName() );
+    drawKeys(p, pixelsPerFrame, 200., drawY, LIST_ITEM_HEIGHT,
+                       startFrame, endFrame, true);
+}
+
+void QrealAnimator::updateKeyOnCurrrentFrame()
+{
+    mKeyOnCurrentFrame = getKeyAtFrame(mCurrentFrame) != NULL;
+}
+
+QrealKey *QrealAnimator::getKeyAtPos(qreal relX, qreal relY,
                                      int minViewedFrame,
                                      qreal pixelsPerFrame) {
+    Q_UNUSED(relY);
     qreal relFrame = relX/pixelsPerFrame;
     qreal pressFrame = relFrame + minViewedFrame;
     if(pixelsPerFrame > KEY_RECT_SIZE) {
@@ -153,6 +183,7 @@ void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
 
 void QrealAnimator::appendKey(QrealKey *newKey) {
     mKeys.append(newKey);
+    newKey->incNumberPointers();
     if(mConnectedToMainWindow != NULL) {
         mConnectedToMainWindow->scheduleBoxesListRepaint();
     }
@@ -163,11 +194,13 @@ void QrealAnimator::appendKey(QrealKey *newKey) {
 }
 
 void QrealAnimator::removeKey(QrealKey *removeKey) {
-    mKeys.removeOne(removeKey);
-    if(mParentAnimator != NULL) {
-        mParentAnimator->removeChildQrealKey(removeKey);
+    if(mKeys.removeOne(removeKey) ) {
+        if(mParentAnimator != NULL) {
+            mParentAnimator->removeChildQrealKey(removeKey);
+        }
+        removeKey->decNumberPointers();
+        sortKeys();
     }
-    sortKeys();
 }
 
 void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
@@ -187,6 +220,7 @@ void QrealAnimator::setFrame(int frame)
 {
     mCurrentFrame = frame;
     updateValueFromCurrentFrame();
+    updateKeyOnCurrrentFrame();
 }
 
 bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
@@ -285,11 +319,11 @@ void QrealAnimator::updateKeysPath()
         }
         lastKey = key;
     }
-    if(lastKey != NULL) {
-        mKeysPath.lineTo(5000, -lastKey->getValue());
-    } else {
+    if(lastKey == NULL) {
         mKeysPath.moveTo(0, -mCurrentValue);
         mKeysPath.lineTo(5000, -mCurrentValue);
+    } else {
+        mKeysPath.lineTo(5000, -lastKey->getValue());
     }
     updateValueFromCurrentFrame();
     updateDrawPath();
@@ -778,8 +812,9 @@ void QrealAnimator::deletePressed()
             }
     } else {
         foreach(QrealKey *key, mSelectedKeys) {
-            mKeys.removeOne(key);
-            delete key;
+            if(mKeys.removeOne(key) ) {
+                key->decNumberPointers();
+            }
         }
         mSelectedKeys.clear();
         sortKeys();
@@ -886,29 +921,31 @@ void QrealAnimator::mouseMove(QPointF mousePos)
 
 void QrealAnimator::mergeKeysIfNeeded() {
     QrealKey *lastKey = NULL;
+    QList<QrealKeyPair> keyPairsToMerge;
     foreach(QrealKey *key, mKeys) {
         if(lastKey != NULL) {
             if(key->getFrame() == lastKey->getFrame() ) {
-                if(key->isSelected()) {
-                    key->mergeWith(lastKey);
-                    mKeys.removeOne(lastKey);
-                    delete lastKey;
+                if(key->isDescendantSelected()) {
+                    keyPairsToMerge << QrealKeyPair(key, lastKey);
                 } else {
-                    lastKey->mergeWith(key);
-                    mKeys.removeOne(key);
-                    delete key;
+                    keyPairsToMerge << QrealKeyPair(lastKey, key);
                     key = NULL;
                 }
             }
         }
         lastKey = key;
     }
+    foreach(QrealKeyPair keyPair, keyPairsToMerge) {
+        keyPair.merge();
+    }
+
     updateKeysPath();
 }
 
 void QrealAnimator::clearKeysSelection() {
     foreach(QrealKey *key, mKeys) {
         key->setSelected(false);
+        key->decNumberPointers();
     }
 
     mSelectedKeys.clear();
@@ -919,13 +956,16 @@ void QrealAnimator::addKeyToSelection(QrealKey *key)
     if(key->isSelected()) return;
     key->setSelected(true);
     mSelectedKeys << key;
+    key->incNumberPointers();
 }
 
 void QrealAnimator::removeKeyFromSelection(QrealKey *key)
 {
     if(key->isSelected()) {
         key->setSelected(false);
-        mSelectedKeys.removeOne(key);
+        if(mSelectedKeys.removeOne(key) ) {
+            key->decNumberPointers();
+        }
     }
 }
 
@@ -954,8 +994,7 @@ void QrealAnimator::addKeysInRectToSelection(QRectF rect) {
     frameValueRect.setBottomRight(QPointF(rightFrame, bottomValue) );
     foreach(QrealKey *key, mKeys) {
         if(key->isInsideRect(frameValueRect)) {
-            mSelectedKeys << key;
-            key->setSelected(true);
+            addKeyToSelection(key);
         }
     }
 }

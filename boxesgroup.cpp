@@ -837,6 +837,7 @@ void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRe
     if(saveUndoRedo) {
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
+    child->incNumberPointers();
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -869,6 +870,8 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
         }
     }
     updateChildrenId(id, saveUndoRedo);
+
+    box->decNumberPointers();
 }
 
 void BoxesGroup::removeChild(BoundingBox *child)
@@ -948,7 +951,7 @@ void BoxesGroup::clearAll()
 {
     foreach(BoundingBox *box, mChildren) {
         box->clearAll();
-        delete box;
+        box->decNumberPointers();
     }
     mChildren.clear();
 }

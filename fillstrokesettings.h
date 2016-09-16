@@ -14,6 +14,7 @@
 #include "connectedtomainwindow.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include "coloranimator.h"
 
 class GradientWidget;
 
@@ -27,7 +28,7 @@ class VectorPath;
 
 class ChangeGradientColorsUndoRedo;
 
-class Gradient : ConnectedToMainWindow
+class Gradient : public ConnectedToMainWindow
 {
 public:
     Gradient(Color color1, Color color2,
@@ -92,7 +93,7 @@ public:
 
     virtual int saveToSql();
 
-    Color color;
+    ColorAnimator color;
     PaintType paintType = FLATPAINT;
     Gradient *gradient = NULL;
 };
@@ -125,7 +126,7 @@ public:
     static StrokeSettings createStrokeSettingsFromSql(int strokeSqlId,
                                               GradientWidget *gradientWidget);
 private:
-    qreal mLineWidth = 1.f;
+    QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
 };

@@ -16,7 +16,6 @@ class QrealAnimator
 {
 public:
     QrealAnimator();
-    virtual ~QrealAnimator();
 
     void setParentAnimator(ComplexAnimator *parentAnimator);
 
@@ -112,8 +111,11 @@ public:
                           qreal startX, qreal startY, qreal height,
                           int startFrame, int endFrame,
                           bool detailedView);
-    QrealKey *getKeyAtPos(qreal relX, int minViewedFrame, qreal pixelsPerFrame);
-    void getKeysInRect(QRectF selectionRect, int minViewedFrame, qreal pixelsPerFrame, QList<QrealKey *> *keysList);
+    virtual QrealKey *getKeyAtPos(qreal relX, qreal relY,
+                                  int minViewedFrame, qreal pixelsPerFrame);
+    void getKeysInRect(QRectF selectionRect,
+                       int minViewedFrame,
+                       qreal pixelsPerFrame, QList<QrealKey *> *keysList);
 
     void addAllKeysToComplexAnimator();
     void removeAllKeysFromComplexAnimator();
@@ -124,7 +126,22 @@ public:
 
     QString getName();
     void setName(QString newName);
+
+    void updateKeyOnCurrrentFrame();
+    bool isKeyOnCurrentFrame();
+
+    bool isBoxesListDetailVisible();
+    void setBoxesListDetailVisible(bool bT);
+    virtual qreal getBoxesListHeight();
+
+    virtual void drawBoxesList(QPainter *p,
+                               qreal drawX, qreal drawY,
+                               qreal pixelsPerFrame,
+                               int startFrame, int endFrame);
 protected:
+    bool mBoxesListDetailVisible = true;
+    bool mKeyOnCurrentFrame = false;
+
     QString mName = "";
 
     ComplexAnimator *mParentAnimator = NULL;

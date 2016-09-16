@@ -20,8 +20,8 @@ void Bone::addCircle(QPointF absPos) {
     point = point->addPointAbsPos(absPos + QPointF(0.f, -radius));
     firstPoint->connectToPoint(point);
 
-    mFillPaintSettings.color = Color(1.f, 1.f, 1.f, 0.5f);
-    mStrokeSettings.color = Color(1.f, 0.f, 0.f, 1.f);
+    mFillPaintSettings.color.setCurrentValue(Color(1.f, 1.f, 1.f, 0.5f) );
+    mStrokeSettings.color.setCurrentValue(Color(1.f, 0.f, 0.f, 1.f) );
 }
 
 void Bone::cancelTransform()

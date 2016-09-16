@@ -1,7 +1,8 @@
 #include "qrealpoint.h"
 #include "qrealkey.h"
 
-QrealPoint::QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius) {
+QrealPoint::QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius) :
+SmartPointerTarget() {
     mRadius = radius;
     mType = type;
     mParentKey = parentKey;

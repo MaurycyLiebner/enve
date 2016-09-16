@@ -164,11 +164,11 @@ int Gradient::getSqlId() {
 
 
 PaintSettings::PaintSettings() {
-
+    color.setCurrentValue(QColor(Qt::white));
 }
 
 PaintSettings::PaintSettings(Color colorT, PaintType paintTypeT, Gradient *gradientT) {
-    color = colorT;
+    color.setCurrentValue(colorT);
     paintType = paintTypeT;
     gradient = gradientT;
 }
@@ -182,7 +182,7 @@ PaintSettings::PaintSettings(int sqlId, GradientWidget *gradientWidget) {
         int idPaintType = query.record().indexOf("painttype");
         paintType = static_cast<PaintType>(query.value(idPaintType).toInt());
         int idColorId = query.record().indexOf("colorid");
-        color = Color(query.value(idColorId).toInt() );
+        color.setCurrentValue(Color(query.value(idColorId).toInt() ) );
         int idGradientId = query.record().indexOf("gradientid");
         if(!query.value(idGradientId).isNull()) {
             gradient = gradientWidget->getGradientBySqlId(
@@ -195,7 +195,7 @@ PaintSettings::PaintSettings(int sqlId, GradientWidget *gradientWidget) {
 
 int PaintSettings::saveToSql() {
     QSqlQuery query;
-    int colorId = color.saveToSql();
+    int colorId = color.getCurrentValue().saveToSql();
     QString gradientId = (gradient == NULL) ? "NULL" : QString::number(gradient->getSqlId());
     query.exec(QString("INSERT INTO paintsettings (painttype, colorid, gradientid) "
                         "VALUES (%1, %2, %3)").
@@ -206,13 +206,15 @@ int PaintSettings::saveToSql() {
 }
 
 StrokeSettings::StrokeSettings() : PaintSettings() {
-    color.setQColor(Qt::black);
+    color.setCurrentValue(QColor(Qt::black));
+    mLineWidth.setCurrentValue(1.);
 }
 
 StrokeSettings::StrokeSettings(Color colorT, PaintType paintTypeT, Gradient *gradientT) : PaintSettings(colorT,
                                                                                                         paintTypeT,
                                                                                                         gradientT)
 {
+    mLineWidth.setCurrentValue(1.);
 }
 
 StrokeSettings StrokeSettings::createStrokeSettingsFromSql(int strokeSqlId,
@@ -241,7 +243,7 @@ StrokeSettings::StrokeSettings(int strokeSqlId, int paintSqlId,
         int idLineWidth = query.record().indexOf("linewidth");
         int idCapStyle = query.record().indexOf("capstyle");
         int idJoinStyle = query.record().indexOf("joinstyle");
-        mLineWidth = query.value(idLineWidth).toReal();
+        mLineWidth.setCurrentValue(query.value(idLineWidth).toReal() );
         mCapStyle = static_cast<Qt::PenCapStyle>(query.value(idCapStyle).toInt());
         mJoinStyle = static_cast<Qt::PenJoinStyle>(query.value(idJoinStyle).toInt());
     } else {
@@ -254,7 +256,7 @@ int StrokeSettings::saveToSql() {
     int paintSettingsId = PaintSettings::saveToSql();
     query.exec(QString("INSERT INTO strokesettings (linewidth, capstyle, joinstyle, paintsettingsid) "
                         "VALUES (%1, %2, %3, %4)").
-                arg(mLineWidth, 0, 'f').
+                arg(mLineWidth.getCurrentValue(), 0, 'f').
                 arg(mCapStyle).
                 arg(mJoinStyle).
                 arg(paintSettingsId) );
@@ -262,11 +264,11 @@ int StrokeSettings::saveToSql() {
 }
 
 void StrokeSettings::setLineWidth(qreal newWidth) {
-    mLineWidth = newWidth;
+    mLineWidth.setCurrentValue(newWidth);
 }
 
 qreal StrokeSettings::lineWidth() {
-    return mLineWidth;
+    return mLineWidth.getCurrentValue();
 }
 
 void StrokeSettings::setCapStyle(Qt::PenCapStyle capStyle) {
@@ -286,7 +288,7 @@ Qt::PenJoinStyle StrokeSettings::joinStyle() {
 }
 
 void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
-    stroker->setWidth(mLineWidth);
+    stroker->setWidth(mLineWidth.getCurrentValue());
     stroker->setCapStyle(mCapStyle);
     stroker->setJoinStyle(mJoinStyle);
 }
@@ -524,7 +526,7 @@ void FillStrokeSettingsWidget::flatColorSet(GLfloat h, GLfloat s, GLfloat v, GLf
 {
     Color newColor;
     newColor.setHSV(h, s, v, a);
-    getCurrentTargetPaintSettings()->color = newColor;
+    getCurrentTargetPaintSettings()->color.setCurrentValue(newColor);
 }
 
 void FillStrokeSettingsWidget::connectGradient()
@@ -738,7 +740,8 @@ void FillStrokeSettingsWidget::setFlatPaintType()
     disconnectGradient();
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
-    mColorsSettingsWidget->setCurrentColor(getCurrentTargetPaintSettings()->color);
+    mColorsSettingsWidget->setCurrentColor(
+                getCurrentTargetPaintSettings()->color.getCurrentValue());
     getCurrentTargetPaintSettings()->paintType = FLATPAINT;
 }
 

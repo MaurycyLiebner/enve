@@ -11,21 +11,22 @@ QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
     QrealKey *collectionKey = NULL;
     qreal currY = relY;
     if(currY <= LIST_ITEM_HEIGHT) {
-        collectionKey = mAnimatorsCollection.getKeyAtPos(relX,
+        collectionKey = mAnimatorsCollection.getKeyAtPos(relX, relY,
                                minViewedFrame,
                                pixelsPerFrame);
     }
     currY -= LIST_ITEM_HEIGHT;
     if(collectionKey == NULL) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
-            if(currY <= LIST_ITEM_HEIGHT) {
-                QrealKey *animatorKey = animator->getKeyAtPos(relX,
+            qreal animatorHeight = animator->getBoxesListHeight();
+            if(currY <= animatorHeight) {
+                QrealKey *animatorKey = animator->getKeyAtPos(relX, currY,
                                        minViewedFrame,
                                        pixelsPerFrame);
                 if(animatorKey == NULL) continue;
                 return animatorKey;
             }
-            currY -= LIST_ITEM_HEIGHT;
+            currY -= animatorHeight;
         }
     } else {
         return collectionKey;
@@ -219,13 +220,10 @@ void BoundingBox::drawAnimationBar(QPainter *p,
     drawY += LIST_ITEM_HEIGHT;
     if(mBoxListItemDetailsVisible) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
-            p->drawText(drawX, drawY,
-                        200. - drawX, LIST_ITEM_HEIGHT,
-                        Qt::AlignVCenter | Qt::AlignLeft,
-                        animator->getName() );
-            animator->drawKeys(p, pixelsPerFrame, 200., drawY, 20.,
-                               startFrame, endFrame, true);
-            drawY += LIST_ITEM_HEIGHT;
+            animator->drawBoxesList(p, drawX, drawY,
+                                    pixelsPerFrame,
+                                    startFrame, endFrame);
+            drawY += animator->getBoxesListHeight();
         }
     }
 }
@@ -276,8 +274,16 @@ qreal BoxesGroup::getListItemHeight() {
 }
 
 qreal BoundingBox::getListItemHeight() {
-    return LIST_ITEM_HEIGHT + ( (mBoxListItemDetailsVisible) ?
-                LIST_ITEM_HEIGHT*mActiveAnimators.length() : 0);
+    if(mBoxListItemDetailsVisible) {
+        qreal height = LIST_ITEM_HEIGHT;
+        foreach(QrealAnimator *animator, mActiveAnimators) {
+            height += animator->getBoxesListHeight();
+        }
+
+        return height;
+    } else {
+        return LIST_ITEM_HEIGHT;
+    }
 }
 
 void BoundingBox::setChildrenListItemsVisible(bool bt)

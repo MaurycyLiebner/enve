@@ -65,9 +65,6 @@ void MovablePoint::finishTransform()
                                                            mSavedRelPos,
                                                            getRelativePos());
     mRelPos.finishTransform(isRecording());
-    if(isRecording()) {
-        updateIsPosKeyOnCurrentFrame();
-    }
 
     addUndoRedo(undoRedo);
 }
@@ -108,7 +105,7 @@ void MovablePoint::draw(QPainter *p)
     QPointF absPos = getAbsolutePos();
     p->drawEllipse(absPos,
                    mRadius, mRadius);
-    if(isPosKeyOnCurrentFrame() ) {
+    if(mRelPos.isKeyOnCurrentFrame()) {
         p->save();
         p->setBrush(Qt::red);
         p->setPen(QPen(Qt::black, 1.) );
@@ -198,10 +195,6 @@ void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
     mRelPos.setUpdater(updater);
 }
 
-void MovablePoint::updateIsPosKeyOnCurrentFrame() {
-    mKeyOnCurrentFrame = mRelPos.getKeyAtFrame(getCurrentFrame() ) != NULL;
-}
-
 QPointFAnimator *MovablePoint::getRelativePosAnimatorPtr()
 {
     return &mRelPos;
@@ -210,12 +203,6 @@ QPointFAnimator *MovablePoint::getRelativePosAnimatorPtr()
 void MovablePoint::updateAfterFrameChanged(int frame)
 {
     mRelPos.setFrame(frame);
-    updateIsPosKeyOnCurrentFrame();
-}
-
-bool MovablePoint::isPosKeyOnCurrentFrame()
-{
-    return mKeyOnCurrentFrame;
 }
 
 void MovablePoint::rotateBy(qreal rot)

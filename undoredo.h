@@ -158,8 +158,13 @@ public:
                          QPointF relPosBefore,
                          QPointF relPosAfter) : UndoRedo("MoveMovablePointUndoRedo") {
         mMovedPoint = movedPoint;
+        mMovedPoint->incNumberPointers();
         mRelPosAfter = relPosAfter;
         mRelPosBefore = relPosBefore;
+    }
+
+    ~MoveMovablePointUndoRedo() {
+        mMovedPoint->decNumberPointers();
     }
 
     void redo() {
@@ -182,6 +187,13 @@ public:
     AppendToPointsListUndoRedo(PathPoint *pointToAdd, VectorPath *path) : UndoRedo("AppendToPointsListUndoRedo") {
         mPoint = pointToAdd;
         mPath = path;
+        mPoint->incNumberPointers();
+        mPath->incNumberPointers();
+    }
+
+    ~AppendToPointsListUndoRedo() {
+        mPath->decNumberPointers();
+        mPoint->decNumberPointers();
     }
 
     void redo() {
@@ -219,6 +231,15 @@ public:
         mNewNext = newNext;
         mOldNext = oldNext;
         mPoint = point;
+        if(mNewNext != NULL) mNewNext->incNumberPointers();
+        if(mOldNext != NULL) mOldNext->incNumberPointers();
+        mPoint->incNumberPointers();
+    }
+
+    ~SetNextPointUndoRedo() {
+        if(mNewNext != NULL) mNewNext->decNumberPointers();
+        if(mOldNext != NULL) mOldNext->decNumberPointers();
+        mPoint->decNumberPointers();
     }
 
     void redo(){
@@ -242,6 +263,15 @@ public:
         mNewPrev = newPrevious;
         mOldPrev = oldPrevious;
         mPoint = point;
+        if(mNewPrev != NULL) mNewPrev->incNumberPointers();
+        if(mOldPrev != NULL) mOldPrev->incNumberPointers();
+        mPoint->incNumberPointers();
+    }
+
+    ~SetPreviousPointUndoRedo() {
+        if(mNewPrev != NULL) mNewPrev->decNumberPointers();
+        if(mOldPrev != NULL) mOldPrev->decNumberPointers();
+        mPoint->decNumberPointers();
     }
 
     void redo(){
@@ -263,7 +293,14 @@ class AddPointToSeparatePathsUndoRedo : public UndoRedo
 public:
     AddPointToSeparatePathsUndoRedo(VectorPath *path, PathPoint *point) : UndoRedo("AddPointToSeparatePathsUndoRedo") {
         mPath = path;
+        mPath->incNumberPointers();
         mPoint = point;
+        mPoint->incNumberPointers();
+    }
+
+    ~AddPointToSeparatePathsUndoRedo() {
+        mPath->decNumberPointers();
+        mPoint->decNumberPointers();
     }
 
     void redo() {
@@ -300,8 +337,13 @@ class SetPathPointModeUndoRedo : public UndoRedo
 public:
     SetPathPointModeUndoRedo(PathPoint *point, CtrlsMode modeBefore, CtrlsMode modeAfter) : UndoRedo("SetPathPointModeUndoRedo") {
         mPoint = point;
+        mPoint->incNumberPointers();
         mBefore = modeBefore;
         mAfter = modeAfter;
+    }
+
+    ~SetPathPointModeUndoRedo() {
+        mPoint->decNumberPointers();
     }
 
     void redo() {
@@ -323,8 +365,13 @@ class SetCtrlPtEnabledUndoRedo : public UndoRedo
 public:
     SetCtrlPtEnabledUndoRedo(bool enabled, bool isStartPt, PathPoint* parentPoint) : UndoRedo("SetCtrlPtEnabledUndoRedo") {
         mParentPoint = parentPoint;
+        mParentPoint->incNumberPointers();
         mEnabled = enabled;
         mIsStartPt = isStartPt;
+    }
+
+    ~SetCtrlPtEnabledUndoRedo() {
+        mParentPoint->decNumberPointers();
     }
 
     void redo() {
@@ -348,8 +395,13 @@ public:
                             int toIndex,
                             BoxesGroup *parentBox) : UndoRedo("MoveChildInListUndoRedo") {
         mParentBox = parentBox;
+        mParentBox->incNumberPointers();
         mFromIndex = fromIndex;
         mToIndex = toIndex;
+    }
+
+    ~MoveChildInListUndoRedo() {
+        mParentBox->decNumberPointers();
     }
 
     void redo() {
@@ -372,8 +424,13 @@ public:
                                     int indexAfter,
                                     BoundingBox *box) : UndoRedo("SetBoundingBoxZListIndexUnoRedo") {
         mBox = box;
+        mBox->incNumberPointers();
         mIndexAfter = indexAfter;
         mIndexBefore = indexBefore;
+    }
+
+    ~SetBoundingBoxZListIndexUnoRedo() {
+        mBox->decNumberPointers();
     }
 
     void redo() {
@@ -397,8 +454,15 @@ public:
                            int index,
                            BoundingBox *child) : UndoRedo("AddChildToListUndoRedo") {
         mParent = parent;
+        mParent->incNumberPointers();
         mAddAtId = index;
         mChild = child;
+        mChild->incNumberPointers();
+    }
+
+    ~AddChildToListUndoRedo() {
+        mChild->decNumberPointers();
+        mParent->decNumberPointers();
     }
 
     void redo() {
@@ -443,8 +507,17 @@ public:
                          BoxesGroup *newParent) : UndoRedo("SetBoxParentUndoRedo")
     {
         mChildBox = childBox;
+        if(childBox != NULL) mChildBox->incNumberPointers();
         mOldParent = oldParent;
+        if(oldParent != NULL) mOldParent->incNumberPointers();
         mNewParent = newParent;
+        if(newParent != NULL) mNewParent->incNumberPointers();
+    }
+
+    ~SetBoxParentUndoRedo() {
+        if(mChildBox != NULL) mChildBox->decNumberPointers();
+        if(mOldParent != NULL) mOldParent->decNumberPointers();
+        if(mNewParent != NULL) mNewParent->decNumberPointers();
     }
 
     void redo() {
@@ -453,13 +526,6 @@ public:
 
     void undo() {
         mChildBox->setParent(mOldParent, false);
-    }
-
-    ~SetBoxParentUndoRedo() {
-        if(mChildBox->isScheduldedForRemoval()) {
-            mChildBox->clearAll();
-            delete mChildBox;
-        }
     }
 
 private:
@@ -477,6 +543,11 @@ public:
         mOldSettings = oldStrokeSettings;
         mNewSettings = newStrokeSettings;
         mTarget = target;
+        mTarget->incNumberPointers();
+    }
+
+    ~StrokeSettingsChangedUndoRedo() {
+        mTarget->decNumberPointers();
     }
 
     void updateDisplayedSettings() {
@@ -511,6 +582,11 @@ public:
         mOldSettings = oldStrokeSettings;
         mNewSettings = newStrokeSettings;
         mTarget = target;
+        mTarget->incNumberPointers();
+    }
+
+    ~FillSettingsChangedUndoRedo() {
+        mTarget->decNumberPointers();
     }
 
     void updateDisplayedSettings() {
@@ -543,8 +619,13 @@ public:
                                  QList<Color> newColors,
                                  Gradient *gradient) : UndoRedo("ChangeGradientColorsUndoRedo") {
         mGradient = gradient;
+        mGradient->incNumberPointers();
         mOldColors = oldColors;
         mNewColors = newColors;
+    }
+
+    ~ChangeGradientColorsUndoRedo() {
+        mGradient->decNumberPointers();
     }
 
     void redo() {
@@ -556,7 +637,6 @@ public:
     }
 
 private:
-    GradientWidget *mGradientWidget;
     Gradient *mGradient;
     QList<Color> mOldColors;
     QList<Color> mNewColors;
@@ -569,10 +649,15 @@ public:
                            bool prevPivotChanged, bool newPivotChanged) :
         UndoRedo("SetPivotRelPosUndoRedo") {
         mTarget = target;
+        mTarget->incNumberPointers();
         mPrevRelPos = prevRelPos;
         mNewRelPos = newRelPos;
         mPrevPivotChanged = prevPivotChanged;
         mNewPivotChanged = newPivotChanged;
+    }
+
+    ~SetPivotRelPosUndoRedo() {
+        mTarget->decNumberPointers();
     }
 
     void redo() {
@@ -598,8 +683,13 @@ public:
                            bool visibleBefore, bool visibleAfter) :
          UndoRedo("SetBoxVisibleUndoRedo") {
          mTarget = target;
+         mTarget->incNumberPointers();
          mVisibleAfter = visibleAfter;
          mVisibleBefore = visibleBefore;
+     }
+
+     ~SetBoxVisibleUndoRedo() {
+         mTarget->decNumberPointers();
      }
 
      void redo() {

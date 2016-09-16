@@ -62,8 +62,12 @@ public:
 
     QrealAnimator *getParentAnimator();
 
-    virtual void mergeWith(QrealKey *key) {}
+    virtual void mergeWith(QrealKey *key) { key->removeFromAnimator(); }
     void incValue(qreal incBy);
+
+    virtual bool isDescendantSelected() { return isSelected(); }
+
+    void removeFromAnimator();
 protected:
     QrealAnimator *mParentAnimator;
 
@@ -86,6 +90,20 @@ protected:
     qreal mEndFrame = 0.;
     bool mStartEnabled = false;
     bool mEndEnabled = false;
+};
+
+struct QrealKeyPair {
+    QrealKeyPair(QrealKey *key1T, QrealKey *key2T) {
+        key1 = key1T;
+        key2 = key2T;
+    }
+
+    void merge() {
+        key1->mergeWith(key2);
+    }
+
+    QrealKey *key1;
+    QrealKey *key2;
 };
 
 #endif // QREALKEY_H

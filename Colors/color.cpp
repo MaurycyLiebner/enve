@@ -49,7 +49,7 @@ void Color::setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a)
     gl_g = g_t;
     gl_b = b_t;
     gl_a = a;
-    qcol.setRgbF(r_t, g_t, b_t);
+    qcol.setRgbF(r_t, g_t, b_t, a);
     updateHSVFromRGB();
 }
 void Color::updateRGBFromHSV()

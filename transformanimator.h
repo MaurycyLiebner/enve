@@ -57,6 +57,14 @@ public:
 
     void sortKeys();
     void updateKeysPath();
+
+    qreal getBoxesListHeight();
+
+    void drawBoxesList(QPainter *p,
+                       qreal drawX, qreal drawY,
+                       qreal pixelsPerFrame,
+                       int startFrame, int endFrame);
+    QrealKey *getKeyAtPos(qreal relX, qreal relY, int minViewedFrame, qreal pixelsPerFrame);
 private:
     QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;

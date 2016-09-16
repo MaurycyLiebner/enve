@@ -7,12 +7,14 @@ QString ConnectedToMainWindow::boolToSql(bool bT) {
     return (bT) ? "1" : "0";
 }
 
-ConnectedToMainWindow::ConnectedToMainWindow(ConnectedToMainWindow *parent)
+ConnectedToMainWindow::ConnectedToMainWindow(ConnectedToMainWindow *parent) :
+    SmartPointerTarget()
 {
     mMainWindow = parent->getMainWindow();
 }
 
-ConnectedToMainWindow::ConnectedToMainWindow(MainWindow *parent)
+ConnectedToMainWindow::ConnectedToMainWindow(MainWindow *parent) :
+    SmartPointerTarget()
 {
     mMainWindow = parent;
 }

@@ -11,7 +11,15 @@ QrealKey::QrealKey(int frame, QrealAnimator *parentAnimator, qreal value) : Qrea
     mEndValue = value;
 
     mStartPoint = new QrealPoint(START_POINT, this, 7.5);
+    mStartPoint->incNumberPointers();
     mEndPoint = new QrealPoint(END_POINT, this, 7.5);
+    mEndPoint->incNumberPointers();
+}
+
+QrealKey::~QrealKey()
+{
+    mStartPoint->decNumberPointers();
+    mEndPoint->decNumberPointers();
 }
 
 void QrealKey::constrainEndCtrlMaxFrame(int maxFrame) {
@@ -23,6 +31,11 @@ void QrealKey::constrainEndCtrlMaxFrame(int maxFrame) {
 
 void QrealKey::incValue(qreal incBy) {
     setValue(mValue + incBy);
+}
+
+void QrealKey::removeFromAnimator()
+{
+    mParentAnimator->removeKey(this);
 }
 
 QrealPoint *QrealKey::getStartPoint()
@@ -92,12 +105,6 @@ QrealPoint *QrealKey::mousePress(qreal frameT, qreal valueT,
     }
     return NULL;
 }
-
-QrealKey::~QrealKey()
-{
-
-}
-
 
 void QrealKey::setCtrlsMode(CtrlsMode mode)
 {

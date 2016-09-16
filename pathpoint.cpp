@@ -353,7 +353,7 @@ void PathPoint::draw(QPainter *p, CanvasMode mode)
     QPointF absPos = getAbsolutePos();
     p->drawEllipse(absPos,
                    mRadius, mRadius);
-    if(isPosKeyOnCurrentFrame() ) {
+    if(mRelPos.isKeyOnCurrentFrame() ) {
         p->save();
         p->setBrush(Qt::red);
         p->setPen(QPen(Qt::black, 1.) );
