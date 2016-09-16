@@ -24,12 +24,19 @@ BoxesList::BoxesList(MainWindow *mainWindow, QWidget *parent) : QWidget(parent)
     mCanvas = mainWindow->getCanvas();
     mMainWindow = mainWindow;
     setMinimumHeight(200);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void BoxesList::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    p.fillRect(rect(), QColor(155, 155, 155));
+    if(hasFocus() ) {
+        p.setPen(QPen(Qt::red, 4.));
+    } else {
+        p.setPen(Qt::NoPen);
+    }
+    p.setBrush(QColor(155, 155, 155));
+    p.drawRect(rect());
 
     p.setPen(QPen(QColor(75, 75, 75), 1.));
     qreal xT = 200 + mPixelsPerFrame*0.5 - mMinViewedFrame*mPixelsPerFrame;
@@ -65,6 +72,17 @@ void BoxesList::paintEvent(QPaintEvent *)
 
     p.end();
 }
+
+bool BoxesList::processFilteredKeyEvent(QKeyEvent *event) {
+    if(!hasFocus() ) return false;
+    if(event->key() == Qt::Key_Delete) {
+        repaint();
+    } else {
+        return false;
+    }
+    return true;
+}
+
 
 void BoxesList::resizeEvent(QResizeEvent *e)
 {

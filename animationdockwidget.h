@@ -12,6 +12,7 @@ class AnimationDockWidget : public QWidget
 public:
     explicit AnimationDockWidget(QWidget *parent = 0);
 
+    AnimationWidget *getAnimationWidget();
 protected:
     void paintEvent(QPaintEvent *);
 signals:

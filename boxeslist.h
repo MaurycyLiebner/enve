@@ -38,6 +38,7 @@ public:
     void removeKeyFromSelection(QrealKey *key);
     void clearKeySelection();
     void selectKeysInSelectionRect();
+    bool processFilteredKeyEvent(QKeyEvent *event);
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *e);

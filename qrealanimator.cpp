@@ -562,6 +562,7 @@ void QrealAnimator::draw(QPainter *p)
         by2 = !by2;
     }
 
+    p->save();
     p->setClipRect(40, 20, mDrawRect.width() - 20, mDrawRect.height() - 20);
 
     p->setPen(QPen(Qt::black, 4.));
@@ -585,6 +586,7 @@ void QrealAnimator::draw(QPainter *p)
         p->setPen(QPen(Qt::blue, 2.f, Qt::DotLine));
         p->drawRect(mSelectionRect);
     }
+    p->restore();
 }
 
 void QrealAnimator::incMinShownVal(qreal inc) {
@@ -943,7 +945,7 @@ void QrealAnimator::mergeKeysIfNeeded() {
 }
 
 void QrealAnimator::clearKeysSelection() {
-    foreach(QrealKey *key, mKeys) {
+    foreach(QrealKey *key, mSelectedKeys) {
         key->setSelected(false);
         key->decNumberPointers();
     }

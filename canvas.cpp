@@ -77,6 +77,7 @@ void Canvas::scale(qreal scaleBy, QPointF absOrigin)
 }
 
 bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
+    if(!hasFocus()) return false;
     if(event->key() == Qt::Key_F1) {
         setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_F2) {
@@ -149,6 +150,7 @@ void Canvas::loadAllBoxesFromSql(bool loadInBox) {
 void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
+
     p.setRenderHint(QPainter::Antialiasing);
 
     QPointF absPos = getAbsolutePos();
@@ -186,6 +188,14 @@ void Canvas::paintEvent(QPaintEvent *)
             mRotPivot->draw(&p);
         }
     }
+
+    if(hasFocus() ) {
+        p.setPen(QPen(Qt::red, 4.));
+    } else {
+        p.setPen(Qt::NoPen);
+    }
+    p.setBrush(Qt::NoBrush);
+    p.drawRect(rect());
 
     p.end();
 }

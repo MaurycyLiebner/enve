@@ -9,6 +9,7 @@ class AnimationWidget : public QWidget
     Q_OBJECT
 public:
     explicit AnimationWidget(QWidget *parent = 0);
+    bool processFilteredKeyEvent(QKeyEvent *event);
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *);
@@ -16,7 +17,6 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void keyPressEvent(QKeyEvent *event);
 signals:
     void changedViewedFrames(int, int);
 public slots:

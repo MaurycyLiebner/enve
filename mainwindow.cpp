@@ -52,8 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
     mTopBottomDock = new QDockWidget(this);
-    mAnimationWidget = new AnimationDockWidget(this);
-    mTopBottomDock->setWidget(mAnimationWidget);
+    mAnimationDockWidget = new AnimationDockWidget(this);
+    mTopBottomDock->setWidget(mAnimationDockWidget);
 
     mTopBottomDock->setFeatures(0);
     mTopBottomDock->setTitleBarWidget(new QWidget());
@@ -342,8 +342,12 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         saveFile();
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
         openFile();
+    } else if(mCanvas->processFilteredKeyEvent(event) ) {
+    } else if(mAnimationDockWidget->getAnimationWidget()->
+              processFilteredKeyEvent(event) ) {
+    } else if(mBoxListWidget->processFilteredKeyEvent(event) ) {
     } else {
-        returnBool = mCanvas->processFilteredKeyEvent(event);
+        returnBool = false;
     }
 
     callUpdateSchedulers();

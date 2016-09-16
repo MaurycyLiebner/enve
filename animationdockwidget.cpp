@@ -96,6 +96,11 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent) : QWidget(parent)
     setLayout(mMainLayout);
 }
 
+AnimationWidget *AnimationDockWidget::getAnimationWidget()
+{
+    return mAnimationWidget;
+}
+
 void AnimationDockWidget::paintEvent(QPaintEvent *)
 {
     QStyleOption opt;

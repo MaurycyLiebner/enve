@@ -30,7 +30,7 @@ private:
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
     BoxesList *mBoxListWidget;
     QDockWidget *mTopBottomDock;
-    AnimationDockWidget *mAnimationWidget;
+    AnimationDockWidget *mAnimationDockWidget;
 
     QToolBar *mToolBar;
     QAction *mActionConnectPoints;

@@ -77,6 +77,14 @@ void AnimationWidget::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
     mAnimator->draw(&p);
+
+    if(hasFocus() ) {
+        p.setPen(QPen(Qt::red, 4.));
+    } else {
+        p.setPen(Qt::NoPen);
+    }
+    p.setBrush(Qt::NoBrush);
+    p.drawRect(rect());
     p.end();
 }
 
@@ -148,12 +156,16 @@ void AnimationWidget::wheelEvent(QWheelEvent *event)
     repaint();
 }
 
-void AnimationWidget::keyPressEvent(QKeyEvent *event)
+bool AnimationWidget::processFilteredKeyEvent(QKeyEvent *event)
 {
+    if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete) {
         mAnimator->deletePressed();
+        repaint();
+    } else {
+        return false;
     }
-    repaint();
+    return true;
 }
 
 void AnimationWidget::updateDrawnPath()
