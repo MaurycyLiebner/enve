@@ -30,13 +30,7 @@ BoxesList::BoxesList(MainWindow *mainWindow, QWidget *parent) : QWidget(parent)
 void BoxesList::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
-    if(hasFocus() ) {
-        p.setPen(QPen(Qt::red, 4.));
-    } else {
-        p.setPen(Qt::NoPen);
-    }
-    p.setBrush(QColor(155, 155, 155));
-    p.drawRect(rect());
+    p.fillRect(rect(), QColor(155, 155, 155));
 
     p.setPen(QPen(QColor(75, 75, 75), 1.));
     qreal xT = 200 + mPixelsPerFrame*0.5 - mMinViewedFrame*mPixelsPerFrame;
@@ -52,6 +46,11 @@ void BoxesList::paintEvent(QPaintEvent *)
     for(int i = mMainWindow->getMinFrame(); i <= mMainWindow->getMaxFrame(); i += iInc) {
         qreal xTT = xT + i*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, mViewedRect.height()) );
+    }
+
+    p.setPen(QPen(QColor(125, 125, 125), 1.));
+    for(int i = LIST_ITEM_HEIGHT; i < height(); i += LIST_ITEM_HEIGHT) {
+        p.drawLine(QPointF(0, i), QPointF(width(), i) );
     }
 
     xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
@@ -70,13 +69,36 @@ void BoxesList::paintEvent(QPaintEvent *)
         p.drawRect(mSelectionRect);
     }
 
+    if(hasFocus() ) {
+        p.setBrush(Qt::NoBrush);
+        p.setPen(QPen(Qt::red, 4.));
+        p.drawRect(rect() );
+    }
     p.end();
+}
+
+void BoxesList::deleteSelectedKeys()
+{
+    foreach(QrealKey *key, mSelectedKeys) {
+        key->deleteKey();
+        key->decNumberPointers();
+    }
+    mSelectedKeys.clear();
 }
 
 bool BoxesList::processFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete) {
+        deleteSelectedKeys();
         repaint();
+    } else if(event->key() == Qt::Key_Right) {
+        foreach(QrealKey *key, mSelectedKeys) {
+            key->incFrameAndUpdateParentAnimator(1);
+        }
+    } else if(event->key() == Qt::Key_Left) {
+        foreach(QrealKey *key, mSelectedKeys) {
+            key->incFrameAndUpdateParentAnimator(-1);
+        }
     } else {
         return false;
     }
@@ -258,13 +280,16 @@ void BoxesList::addKeyToSelection(QrealKey *key)
     if(key->isSelected()) return;
     key->setSelected(true);
     mSelectedKeys << key;
+    key->incNumberPointers();
 }
 
 void BoxesList::removeKeyFromSelection(QrealKey *key)
 {
     if(key->isSelected()) {
         key->setSelected(false);
-        mSelectedKeys.removeOne(key);
+        if(mSelectedKeys.removeOne(key) ) {
+            key->decNumberPointers();
+        }
     }
 }
 

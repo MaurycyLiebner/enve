@@ -87,6 +87,7 @@ public:
                        QList<QrealKey *> *keysList);
 
     void centerPivotPosition() {}
+    bool processUnfilteredKeyEvent(QKeyEvent *event);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);

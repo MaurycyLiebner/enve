@@ -76,15 +76,23 @@ void Canvas::scale(qreal scaleBy, QPointF absOrigin)
     scale(scaleBy, scaleBy, absOrigin);
 }
 
-bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
-    if(!hasFocus()) return false;
+bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_F1) {
         setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_F2) {
         setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(event->key() == Qt::Key_F3) {
         setCanvasMode(CanvasMode::ADD_POINT);
-    } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
+    if(processUnfilteredKeyEvent(event)) return true;
+    if(!hasFocus()) return false;
+    if(isCtrlPressed() && event->key() == Qt::Key_G) {
         if(isShiftPressed()) {
             mCurrentBoxesGroup->ungroupSelected();
         } else {
@@ -243,6 +251,7 @@ void Canvas::clearPreview() {
             delete mPreviewFrames.at(i);
         }
         mPreviewFrames.clear();
+        mMainWindow->previewFinished();
     }
 }
 

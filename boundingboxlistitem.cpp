@@ -236,7 +236,7 @@ void BoxesGroup::drawChildren(QPainter *p,
     qreal currentDrawY = drawY;
     foreach (BoundingBox *box, mChildren) {
         qreal boxHeight = box->getListItemHeight();
-        if(currentY >= minY) {
+        if(currentY /*+ boxHeight*/ >= minY) {
             if(currentY > maxY) {
                 break;
             }
@@ -257,7 +257,7 @@ void BoxesGroup::drawListItem(QPainter *p,
                               pixelsPerFrame, startFrame, endFrame);
     if(mBoxListItemDetailsVisible) {
         drawX += LIST_ITEM_CHILD_INDENT;
-        drawY += LIST_ITEM_HEIGHT*(1 + mActiveAnimators.length());
+        drawY += BoundingBox::getListItemHeight();
         drawChildren(p, drawX, drawY, 0.f, maxY,
                      pixelsPerFrame, startFrame, endFrame);
     }

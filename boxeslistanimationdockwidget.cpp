@@ -1,9 +1,11 @@
 #include "boxeslistanimationdockwidget.h"
 #include "mainwindow.h"
+#include <QKeyEvent>
 
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     QWidget(parent)
 {
+    mMainWindow = parent;
     setMinimumSize(200, 200);
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
@@ -46,7 +48,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mPlayButton->setSizePolicy(QSizePolicy::Maximum,
                                QSizePolicy::Maximum);
     connect(mPlayButton, SIGNAL(pressed()),
-            parent, SLOT(renderPreview()) );
+            this, SLOT(playPreview()) );
 
     mRecordButton = new QPushButton(
                 QIcon("pixmaps/icons/not_recording.png"), "", this);
@@ -107,6 +109,49 @@ BoxesList *BoxesListAnimationDockWidget::getBoxesList()
     return mBoxesList;
 }
 
+bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Right && isCtrlPressed()) {
+        setCurrentFrame(mMainWindow->getCurrentFrame() + 1);
+    } else if(event->key() == Qt::Key_Left && isCtrlPressed()) {
+        setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool BoxesListAnimationDockWidget::processFilteredKeyEvent(QKeyEvent *event) {
+    if(processUnfilteredKeyEvent(event) ) return true;
+    return mBoxesList->processFilteredKeyEvent(event);
+}
+
+void BoxesListAnimationDockWidget::setPlaying(bool playing) {
+    if(playing) {
+        mPlayButton->setIcon(QIcon("pixmaps/icons/stop_button.png") );
+        disconnect(mPlayButton, SIGNAL(pressed()),
+                this, SLOT(playPreview()) );
+        connect(mPlayButton, SIGNAL(pressed()),
+                mMainWindow, SLOT(stopPreview()) );
+    } else {
+        mPlayButton->setIcon(QIcon("pixmaps/icons/play_button.png") );
+        disconnect(mPlayButton, SIGNAL(pressed()),
+                mMainWindow, SLOT(stopPreview()) );
+        connect(mPlayButton, SIGNAL(pressed()),
+                this, SLOT(playPreview()) );
+    }
+}
+
+void BoxesListAnimationDockWidget::previewFinished()
+{
+    setPlaying(false);
+}
+
+void BoxesListAnimationDockWidget::playPreview()
+{
+    setPlaying(true);
+    mMainWindow->playPreview();
+}
+
 void BoxesListAnimationDockWidget::setRecording(bool recording)
 {
     if(recording) {
@@ -130,4 +175,5 @@ void BoxesListAnimationDockWidget::setAllPointsRecord(bool allPointsRecord)
 void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
     mAnimationWidgetScrollbar->emitChange();
+    mAnimationWidgetScrollbar->repaint();
 }

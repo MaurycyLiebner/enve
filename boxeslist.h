@@ -51,6 +51,8 @@ signals:
 public slots:
     void setFramesRange(int startFrame, int endFrame);
 private:
+    void deleteSelectedKeys();
+
     QrealKey *mLastPressedKey = NULL;
     bool mFirstMove = false;
     int mMoveDFrame = 0;

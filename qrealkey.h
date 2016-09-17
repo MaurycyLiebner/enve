@@ -68,6 +68,8 @@ public:
     virtual bool isDescendantSelected() { return isSelected(); }
 
     void removeFromAnimator();
+
+    virtual void deleteKey() { removeFromAnimator(); }
 protected:
     QrealAnimator *mParentAnimator;
 

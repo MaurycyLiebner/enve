@@ -46,6 +46,8 @@ public:
 
     void addOrMergeKey(QrealKey *keyAdd);
 
+    void deleteKey();
+
     void removeAnimatorKey(QrealKey *key);
 
     bool isEmpty();

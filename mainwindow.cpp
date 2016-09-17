@@ -137,7 +137,7 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::renderPreview()
+void MainWindow::playPreview()
 {
     mCanvas->clearPreview();
     mSavedCurrentFrame = mCurrentFrame;
@@ -148,6 +148,15 @@ void MainWindow::renderPreview()
     mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
 
     mCanvas->playPreview();
+}
+
+void MainWindow::previewFinished() {
+    mBoxesListAnimationDockWidget->previewFinished();
+}
+
+void MainWindow::stopPreview() {
+    mCanvas->clearPreview();
+    mCanvas->repaint();
 }
 
 UndoRedoStack *MainWindow::getUndoRedoStack()
@@ -345,7 +354,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     } else if(mCanvas->processFilteredKeyEvent(event) ) {
     } else if(mAnimationDockWidget->getAnimationWidget()->
               processFilteredKeyEvent(event) ) {
-    } else if(mBoxListWidget->processFilteredKeyEvent(event) ) {
+    } else if(mBoxesListAnimationDockWidget->processFilteredKeyEvent(event) ) {
     } else {
         returnBool = false;
     }

@@ -16,14 +16,22 @@ public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
     BoxesList *getBoxesList();
     void setCurrentFrame(int frame);
+    bool processUnfilteredKeyEvent(QKeyEvent *event);
+    bool processFilteredKeyEvent(QKeyEvent *event);
+    void previewFinished();
+    void setPlaying(bool playing);
 signals:
 
 public slots:
+
 private slots:
+    void playPreview();
+
     void setRecording(bool recording);
 
     void setAllPointsRecord(bool allPointsRecord);
 private:
+    MainWindow *mMainWindow;
     QVBoxLayout *mMainLayout;
 
     QWidget *mControlButtonsWidget;

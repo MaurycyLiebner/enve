@@ -107,11 +107,14 @@ public:
 
     int getMinFrame();
     int getMaxFrame();
+
+    void previewFinished();
 public slots:
     void setCurrentFrame(int frame);
     void setRecording(bool recording);
     void setAllPointsRecord(bool allPointsRecord);
-    void renderPreview();
+    void playPreview();
+    void stopPreview();
 private slots:
     void newFile();
     bool askForSaving();

@@ -129,6 +129,14 @@ void ComplexKey::addOrMergeKey(QrealKey *keyAdd) {
     addAnimatorKey(keyAdd);
 }
 
+void ComplexKey::deleteKey()
+{
+    QList<QrealKey*> keys = mKeys;
+    foreach(QrealKey *key, keys) {
+        key->deleteKey();
+    }
+}
+
 void ComplexKey::removeAnimatorKey(QrealKey *key) {
     if(mKeys.removeOne(key) ) {
         key->decNumberPointers();
