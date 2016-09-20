@@ -631,7 +631,7 @@ PathPoint *VectorPath::addPointRelPos(QPointF relPtPos, PathPoint *toPoint)
 
 void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.append(point);
-    mPathAnimator.addPathPoint(point);
+    mPathAnimator.addChildAnimator(point->getPathPointAnimatorsPtr());
     point->show();
     if(saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo = new AppendToPointsListUndoRedo(point, this);
@@ -642,7 +642,7 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.removeOne(point);
-    mPathAnimator.removePathPoint(point);
+    mPathAnimator.removeChildAnimator(point->getPathPointAnimatorsPtr());
     point->hide();
     point->deselect();
     if(saveUndoRedo) {

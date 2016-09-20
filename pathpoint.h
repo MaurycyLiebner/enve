@@ -14,7 +14,11 @@ enum CanvasMode : short;
 
 class PathPoint;
 
-struct PathPointAnimators {
+class PathPointAnimators : public ComplexAnimator {
+public:
+    PathPointAnimators() : ComplexAnimator() {
+        setName("point");
+    }
 
     void setAllVars(PathPoint *parentPathPointT,
                        QPointFAnimator *endPosAnimatorT,
@@ -22,67 +26,22 @@ struct PathPointAnimators {
                        QPointFAnimator *pathPointPosAnimatorT) {
         parentPathPoint = parentPathPointT;
         endPosAnimator = endPosAnimatorT;
+        endPosAnimator->setName("ctrl pt 1 pos");
         startPosAnimator = startPosAnimatorT;
+        startPosAnimator->setName("ctrl pt 2 pos");
         pathPointPosAnimator = pathPointPosAnimatorT;
+        pathPointPosAnimator->setName("point pos");
+
+        addChildAnimator(pathPointPosAnimator);
+        addChildAnimator(endPosAnimator);
+        addChildAnimator(startPosAnimator);
     }
 
     bool isOfPathPoint(PathPoint *checkPoint) {
         return parentPathPoint == checkPoint;
     }
 
-    void updateKeysPath() {
-        endPosAnimator->updateKeysPath();
-        startPosAnimator->updateKeysPath();
-        pathPointPosAnimator->updateKeysPath();
-    }
-
-    void sortKeys() {
-        endPosAnimator->sortKeys();
-        startPosAnimator->sortKeys();
-        pathPointPosAnimator->sortKeys();
-    }
-
-    qreal getBoxesListHeight() {
-        return endPosAnimator->getBoxesListHeight() +
-               startPosAnimator->getBoxesListHeight() +
-               pathPointPosAnimator->getBoxesListHeight();
-    }
-
-    void drawBoxesList(QPainter *p,
-                       qreal drawX, qreal drawY,
-                       qreal pixelsPerFrame,
-                       int startFrame, int endFrame) {
-        endPosAnimator->drawBoxesList(p, drawX, drawY,
-                                      pixelsPerFrame, startFrame, endFrame);
-        startPosAnimator->drawBoxesList(p, drawX, drawY,
-                                      pixelsPerFrame, startFrame, endFrame);
-        pathPointPosAnimator->drawBoxesList(p, drawX, drawY,
-                                      pixelsPerFrame, startFrame, endFrame);
-    }
-
-    QrealKey *getKeyAtPos(qreal relX, qreal relY,
-                          int minViewedFrame, qreal pixelsPerFrame) {
-        qreal endHeight = endPosAnimator->getBoxesListHeight();
-        if(relY <= endHeight) {
-            return endPosAnimator->getKeyAtPos(relX, relY - endHeight,
-                                               minViewedFrame, pixelsPerFrame);
-        }
-        relY -= endHeight;
-        qreal startHeight = startPosAnimator->getBoxesListHeight();
-        if(relY <= startHeight) {
-            return startPosAnimator->getKeyAtPos(relX, relY - startHeight,
-                                               minViewedFrame, pixelsPerFrame);
-        }
-        relY -= startHeight;
-        qreal pointHeight = pathPointPosAnimator->getBoxesListHeight();
-        if(relY <= pointHeight) {
-            return pathPointPosAnimator->getKeyAtPos(relX, relY - pointHeight,
-                                               minViewedFrame, pixelsPerFrame);
-        }
-        return NULL;
-    }
-
-
+private:
     PathPoint *parentPathPoint;
     QPointFAnimator *endPosAnimator;
     QPointFAnimator *startPosAnimator;

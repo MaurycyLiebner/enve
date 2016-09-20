@@ -11,6 +11,8 @@ QPixmap *BoxesList::HIDE_CHILDREN;
 QPixmap *BoxesList::SHOW_CHILDREN;
 QPixmap *BoxesList::LOCKED_PIXMAP;
 QPixmap *BoxesList::UNLOCKED_PIXMAP;
+QPixmap *BoxesList::ANIMATOR_CHILDREN_VISIBLE;
+QPixmap *BoxesList::ANIMATOR_CHILDREN_HIDDEN;
 
 BoxesList::BoxesList(MainWindow *mainWindow, QWidget *parent) : QWidget(parent)
 {
@@ -20,6 +22,10 @@ BoxesList::BoxesList(MainWindow *mainWindow, QWidget *parent) : QWidget(parent)
     SHOW_CHILDREN = new QPixmap("pixmaps/icons/list_show_children.png");
     LOCKED_PIXMAP = new QPixmap("pixmaps/icons/ink_lock_locked.png");
     UNLOCKED_PIXMAP = new QPixmap("pixmaps/icons/ink_lock_unlocked.png");
+    ANIMATOR_CHILDREN_VISIBLE = new QPixmap(
+                "pixmaps/icons/animator_children_visible.png");
+    ANIMATOR_CHILDREN_HIDDEN = new QPixmap(
+                "pixmaps/icons/animator_children_hidden.png");
 
     mCanvas = mainWindow->getCanvas();
     mMainWindow = mainWindow;
@@ -60,8 +66,11 @@ void BoxesList::paintEvent(QPaintEvent *)
 
     p.setPen(QPen(Qt::black, 1.));
 
-    mCanvas->drawChildren(&p, 0.f, 0.f, mViewedRect.top(), mViewedRect.bottom(),
-                          mPixelsPerFrame, mMinViewedFrame, mMaxViewedFrame);
+    mCanvas->drawChildrenListItems(&p,
+                                   0., -mViewedRect.top(),
+                                   mViewedRect.bottom(),
+                                   mPixelsPerFrame,
+                                   mMinViewedFrame, mMaxViewedFrame);
 
     if(mSelectingKeys) {
         p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
@@ -145,8 +154,13 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
             if(!isShiftPressed() && !mLastPressedKey->isSelected()) {
                 clearKeySelection();
             }
-            addKeyToSelection(mLastPressedKey);
-            mMovingKeys = true;
+            if(isShiftPressed() && mLastPressedKey->isSelected()) {
+                removeKeyFromSelection(mLastPressedKey);
+            } else {
+                addKeyToSelection(mLastPressedKey);
+
+                mMovingKeys = true;
+            }
         }
     }
 
@@ -176,7 +190,7 @@ void BoxesList::mouseMoveEvent(QMouseEvent *event)
 void BoxesList::selectKeysInSelectionRect() {
     QList<QrealKey*> listKeys;
     mCanvas->getKeysInRect(mSelectionRect.translated(-200., mViewedRect.top() ),
-                           0., &listKeys);
+                           &listKeys);
     foreach(QrealKey *key, listKeys) {
         addKeyToSelection(key);
     }

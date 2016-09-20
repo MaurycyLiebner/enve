@@ -33,6 +33,8 @@ public:
     static QPixmap *SHOW_CHILDREN;
     static QPixmap *LOCKED_PIXMAP;
     static QPixmap *UNLOCKED_PIXMAP;
+    static QPixmap *ANIMATOR_CHILDREN_VISIBLE;
+    static QPixmap *ANIMATOR_CHILDREN_HIDDEN;
 
     void addKeyToSelection(QrealKey *key);
     void removeKeyFromSelection(QrealKey *key);

@@ -115,7 +115,6 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     } else {
         return false;
     }
-    clearAllPointsSelection();
 
     return true;
 }
@@ -420,6 +419,7 @@ void Canvas::setCanvasMode(CanvasMode mode) {
     } else {
         setCursor(QCursor(QPixmap("pixmaps/cursor-pen.xpm"), 4, 4) );
     }
+    clearAllPointsSelection();
     if(mCurrentMode == MOVE_PATH) {
         schedulePivotUpdate();
     }

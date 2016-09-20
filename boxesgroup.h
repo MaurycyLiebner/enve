@@ -98,9 +98,8 @@ public:
 
     void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY,
                       qreal pixelsPerFrame, int startFrame, int endFrame);
-    void drawChildren(QPainter *p,
-                      qreal drawX, qreal drawY,
-                      qreal minY, qreal maxY, qreal pixelsPerFrame,
+    void drawChildrenListItems(QPainter *p,
+                      qreal drawX, qreal drawY, qreal maxY, qreal pixelsPerFrame,
                       int startFrame, int endFrame);
     qreal getListItemHeight();
     void handleListItemMousePress(qreal relX, qreal relY);
@@ -129,9 +128,9 @@ public:
     void attachToBoneFromSqlZId();
     void updateAfterFrameChanged(int currentFrame);
     QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
-    void getKeysInRect(QRectF selectionRect, qreal y0, QList<QrealKey *> *keysList);
+    void getKeysInRect(QRectF selectionRect, QList<QrealKey *> *keysList);
     QrealKey *getKeyAtPosFromChildren(qreal relX, qreal relY, qreal y0);
-    void getKeysInRectFromChildren(QRectF selectionRect, qreal y0, QList<QrealKey *> *keysList);
+    void getKeysInRectFromChildren(QRectF selectionRect, QList<QrealKey *> *keysList);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

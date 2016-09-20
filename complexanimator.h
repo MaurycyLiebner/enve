@@ -24,7 +24,27 @@ public:
                      int startFrame, int endFrame, bool detailedView);
     qreal clampValue(qreal value);
     void updateMinAndMaxMove(QrealKey *key);
+
+    void addChildAnimator(QrealAnimator *childAnimator);
+    void removeChildAnimator(QrealAnimator *removeAnimator);
+    void startTransform();
+    void setConnectedToMainWindow(ConnectedToMainWindow *connected);
+    void setUpdater(AnimatorUpdater *updater);
+    void setFrame(int frame);
+    void sortKeys();
+    void updateKeysPath();
+    qreal getBoxesListHeight();
+    void drawBoxesList(QPainter *p, qreal drawX, qreal drawY, qreal pixelsPerFrame, int startFrame, int endFrame);
+    QrealKey *getKeyAtPos(qreal relX, qreal relY, int minViewedFrame, qreal pixelsPerFrame);
+    void getKeysInRect(QRectF selectionRect, int minViewedFrame,
+                       qreal pixelsPerFrame,
+                       QList<QrealKey *> *keysList);
+    void handleListItemMousePress(qreal relY);
+    void retrieveSavedValue();
+    void finishTransform(bool record);
+    void cancelTransform();
 protected:
+    QList<QrealAnimator*> mChildAnimators;
     qreal mMinMoveValue;
     qreal mMaxMoveValue;
 };

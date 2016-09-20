@@ -90,12 +90,17 @@ void QrealAnimator::drawBoxesList(QPainter *p,
                                   qreal pixelsPerFrame,
                                   int startFrame, int endFrame)
 {
-    p->drawText(drawX, drawY,
+    p->drawText(drawX + LIST_ITEM_CHILD_INDENT, drawY,
                 200. - drawX, LIST_ITEM_HEIGHT,
                 Qt::AlignVCenter | Qt::AlignLeft,
                 getName() );
     drawKeys(p, pixelsPerFrame, 200., drawY, LIST_ITEM_HEIGHT,
-                       startFrame, endFrame, true);
+             startFrame, endFrame, true);
+}
+
+void QrealAnimator::handleListItemMousePress(qreal relY)
+{
+    setBoxesListDetailVisible(!mBoxesListDetailVisible);
 }
 
 void QrealAnimator::updateKeyOnCurrrentFrame()

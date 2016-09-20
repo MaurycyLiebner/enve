@@ -71,7 +71,9 @@ void MovablePoint::finishTransform()
 
 void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo)
 {
-    setRelativePos(mParent->getCombinedTransform().inverted().map(pos), saveUndoRedo );
+    QMatrix combinedM = mParent->getCombinedTransform();
+    QPointF newPos = combinedM.inverted().map(pos);
+    setRelativePos(newPos, saveUndoRedo );
 }
 
 void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)

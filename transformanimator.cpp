@@ -13,11 +13,12 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mPosAnimator.setName("pos");
     mPosAnimator.setCurrentValue(QPointF(0., 0.) );
     mPivotAnimator.setName("pivot");
+    mPivotAnimator.setCurrentValue(QPointF(0., 0.) );
 
-    mScaleAnimator.setParentAnimator(this);
-    mRotAnimator.setParentAnimator(this);
-    mPosAnimator.setParentAnimator(this);
-    mPivotAnimator.setParentAnimator(this);
+    addChildAnimator(&mPosAnimator);
+    addChildAnimator(&mRotAnimator);
+    addChildAnimator(&mScaleAnimator);
+    addChildAnimator(&mPivotAnimator);
 }
 
 void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel) {
@@ -74,13 +75,6 @@ void TransformAnimator::setRotation(qreal rot)
     mRotAnimator.setCurrentValue(rot);
 }
 
-void TransformAnimator::startTransform()
-{
-    startRotTransform();
-    startPosTransform();
-    startScaleTransform();
-}
-
 void TransformAnimator::startRotTransform()
 {
     mRotAnimator.startTransform();
@@ -92,159 +86,6 @@ void TransformAnimator::startPosTransform() {
 
 void TransformAnimator::startScaleTransform() {
     mScaleAnimator.startTransform();
-}
-
-void TransformAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
-{
-    QrealAnimator::setConnectedToMainWindow(connected);
-
-    mPosAnimator.setConnectedToMainWindow(connected);
-    mRotAnimator.setConnectedToMainWindow(connected);
-    mScaleAnimator.setConnectedToMainWindow(connected);
-    mPivotAnimator.setConnectedToMainWindow(connected);
-}
-
-void TransformAnimator::setUpdater(AnimatorUpdater *updater)
-{
-    QrealAnimator::setUpdater(updater);
-
-    mPosAnimator.setUpdater(updater);
-    mRotAnimator.setUpdater(updater);
-    mScaleAnimator.setUpdater(updater);
-    mPivotAnimator.setUpdater(updater);
-}
-
-void TransformAnimator::setFrame(int frame)
-{
-    QrealAnimator::setFrame(frame);
-
-    mPosAnimator.setFrame(frame);
-    mRotAnimator.setFrame(frame);
-    mScaleAnimator.setFrame(frame);
-    mPivotAnimator.setFrame(frame);
-}
-
-void TransformAnimator::sortKeys()
-{
-    QrealAnimator::sortKeys();
-    mPosAnimator.sortKeys();
-    mRotAnimator.sortKeys();
-    mScaleAnimator.sortKeys();
-    mPivotAnimator.sortKeys();
-}
-
-void TransformAnimator::updateKeysPath()
-{
-    QrealAnimator::updateKeysPath();
-    mPosAnimator.updateKeysPath();
-    mRotAnimator.updateKeysPath();
-    mScaleAnimator.updateKeysPath();
-    mPivotAnimator.updateKeysPath();
-}
-
-qreal TransformAnimator::getBoxesListHeight()
-{
-    if(mBoxesListDetailVisible) {
-        return mPosAnimator.getBoxesListHeight() +
-               mRotAnimator.getBoxesListHeight() +
-               mScaleAnimator.getBoxesListHeight() +
-               mPivotAnimator.getBoxesListHeight() +
-               LIST_ITEM_HEIGHT;
-    } else {
-        return LIST_ITEM_HEIGHT;
-    }
-}
-
-void TransformAnimator::drawBoxesList(QPainter *p,
-                                      qreal drawX, qreal drawY,
-                                      qreal pixelsPerFrame,
-                                      int startFrame, int endFrame)
-{
-    QrealAnimator::drawBoxesList(p, drawX, drawY,
-                                 pixelsPerFrame, startFrame, endFrame);
-    if(mBoxesListDetailVisible) {
-        drawX += LIST_ITEM_CHILD_INDENT;
-        drawY += LIST_ITEM_HEIGHT;
-        mPosAnimator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame);
-        drawY += mPosAnimator.getBoxesListHeight();
-
-        mScaleAnimator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame);
-        drawY += mScaleAnimator.getBoxesListHeight();
-
-        mRotAnimator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame);
-        drawY += mRotAnimator.getBoxesListHeight();
-
-        mPivotAnimator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame);
-        drawY += mPivotAnimator.getBoxesListHeight();
-    }
-}
-
-QrealKey *TransformAnimator::getKeyAtPos(qreal relX, qreal relY,
-                                     int minViewedFrame,
-                                     qreal pixelsPerFrame) {
-    if(relY <= LIST_ITEM_HEIGHT) {
-        return QrealAnimator::getKeyAtPos(relX, relY,
-                                   minViewedFrame, pixelsPerFrame);
-    } else if(mBoxesListDetailVisible) {
-        relY -= LIST_ITEM_HEIGHT;
-        qreal posHeight = mPosAnimator.getBoxesListHeight();
-        if(relY <= posHeight) {
-            return mPosAnimator.getKeyAtPos(relX, relY,
-                                     minViewedFrame, pixelsPerFrame);
-        }
-        relY -= posHeight;
-        qreal scaleHeight = mScaleAnimator.getBoxesListHeight();
-        if(relY <= scaleHeight) {
-            return mScaleAnimator.getKeyAtPos(relX, relY,
-                                       minViewedFrame, pixelsPerFrame);
-        }
-        relY -= scaleHeight;
-        qreal rotHeight = mRotAnimator.getBoxesListHeight();
-        if(relY <= rotHeight) {
-            return mRotAnimator.getKeyAtPos(relX, relY,
-                                     minViewedFrame, pixelsPerFrame);
-        }
-        relY -= rotHeight;
-        qreal pivotHeight = mPivotAnimator.getBoxesListHeight();
-        if(relY <= pivotHeight) {
-            return mPivotAnimator.getKeyAtPos(relX, relY,
-                                       minViewedFrame, pixelsPerFrame);
-        }
-    }
-    return NULL;
-}
-
-void TransformAnimator::retrieveSavedValue()
-{
-    mPosAnimator.retrieveSavedValue();
-    mScaleAnimator.retrieveSavedValue();
-    mRotAnimator.retrieveSavedValue();
-}
-
-void TransformAnimator::finishTransform(bool record)
-{
-    mConnectedToMainWindow->startNewUndoRedoSet();
-
-    mPosAnimator.finishTransform(record);
-    mScaleAnimator.finishTransform(record);
-    mRotAnimator.finishTransform(record);
-
-    mConnectedToMainWindow->finishUndoRedoSet();
-}
-
-void TransformAnimator::cancelTransform()
-{
-    mPosAnimator.cancelTransform();
-    mScaleAnimator.cancelTransform();
-    mRotAnimator.cancelTransform();
 }
 
 qreal TransformAnimator::getYScale()

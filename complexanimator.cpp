@@ -1,4 +1,5 @@
 #include "complexanimator.h"
+#include "boxeslist.h"
 
 ComplexAnimator::ComplexAnimator() :
     QrealAnimator()
@@ -47,6 +48,191 @@ void ComplexAnimator::updateMinAndMaxMove(QrealKey *key) {
     QrealAnimator::updateMinAndMaxMove(key);
     mMinMoveValue = mMinMoveFrame;
     mMaxMoveValue = mMaxMoveFrame;
+}
+
+void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
+{
+    mChildAnimators << childAnimator;
+    childAnimator->setParentAnimator(this);
+}
+
+void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
+{
+    mChildAnimators.removeOne(removeAnimator);
+    removeAnimator->setParentAnimator(NULL);
+}
+
+void ComplexAnimator::startTransform()
+{
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->startTransform();
+    }
+}
+
+void ComplexAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
+{
+    QrealAnimator::setConnectedToMainWindow(connected);
+
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->setConnectedToMainWindow(connected);
+    }
+}
+
+void ComplexAnimator::setUpdater(AnimatorUpdater *updater)
+{
+    QrealAnimator::setUpdater(updater);
+
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->setUpdater(updater);
+    }
+}
+
+void ComplexAnimator::setFrame(int frame)
+{
+    QrealAnimator::setFrame(frame);
+
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->setFrame(frame);
+    }
+}
+
+void ComplexAnimator::sortKeys()
+{
+    QrealAnimator::sortKeys();
+
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->sortKeys();
+    }
+}
+
+void ComplexAnimator::updateKeysPath()
+{
+    QrealAnimator::updateKeysPath();
+
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->updateKeysPath();
+    }
+}
+
+qreal ComplexAnimator::getBoxesListHeight()
+{
+    if(mBoxesListDetailVisible) {
+        qreal heightT = LIST_ITEM_HEIGHT;
+        foreach(QrealAnimator *animator, mChildAnimators) {
+            heightT += animator->getBoxesListHeight();
+        }
+        return heightT;
+    } else {
+        return LIST_ITEM_HEIGHT;
+    }
+}
+
+void ComplexAnimator::drawBoxesList(QPainter *p,
+                                      qreal drawX, qreal drawY,
+                                      qreal pixelsPerFrame,
+                                      int startFrame, int endFrame)
+{
+    QrealAnimator::drawBoxesList(p, drawX, drawY,
+                                 pixelsPerFrame, startFrame, endFrame);
+    if(mBoxesListDetailVisible) {
+        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_CHILDREN_VISIBLE);
+        drawX += LIST_ITEM_CHILD_INDENT;
+        drawY += LIST_ITEM_HEIGHT;
+        foreach(QrealAnimator *animator, mChildAnimators) {
+            animator->drawBoxesList(p, drawX, drawY,
+                                    pixelsPerFrame,
+                                    startFrame, endFrame);
+            drawY += animator->getBoxesListHeight();
+        }
+    } else {
+        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_CHILDREN_HIDDEN);
+    }
+}
+
+QrealKey *ComplexAnimator::getKeyAtPos(qreal relX, qreal relY,
+                                     int minViewedFrame,
+                                     qreal pixelsPerFrame) {
+    if(relY <= LIST_ITEM_HEIGHT) {
+        return QrealAnimator::getKeyAtPos(relX, relY,
+                                   minViewedFrame, pixelsPerFrame);
+    } else if(mBoxesListDetailVisible) {
+        relY -= LIST_ITEM_HEIGHT;
+        foreach(QrealAnimator *animator, mChildAnimators) {
+            qreal heightT = animator->getBoxesListHeight();
+            if(relY <= heightT) {
+                return animator->getKeyAtPos(relX, relY,
+                                         minViewedFrame, pixelsPerFrame);
+            }
+            relY -= heightT;
+        }
+    }
+    return NULL;
+}
+
+void ComplexAnimator::getKeysInRect(QRectF selectionRect,
+                                    int minViewedFrame,
+                                    qreal pixelsPerFrame,
+                                    QList<QrealKey *> *keysList)
+{
+    qreal rectMargin = (LIST_ITEM_HEIGHT - KEY_RECT_SIZE)*0.5;
+    if(selectionRect.top() <= LIST_ITEM_HEIGHT - rectMargin) {
+        QrealAnimator::getKeysInRect(selectionRect, minViewedFrame,
+                                     pixelsPerFrame, keysList);
+    }
+    if(mBoxesListDetailVisible) {
+        selectionRect.translate(0., -LIST_ITEM_HEIGHT);
+        foreach(QrealAnimator *animator, mChildAnimators) {
+            if(selectionRect.bottom() < rectMargin) break;
+            qreal heightT = animator->getBoxesListHeight();
+            if(selectionRect.top() <= heightT - rectMargin) {
+                animator->getKeysInRect(selectionRect, minViewedFrame,
+                                        pixelsPerFrame, keysList);
+            }
+            selectionRect.translate(0., -heightT);
+        }
+    }
+}
+
+void ComplexAnimator::handleListItemMousePress(qreal relY)
+{
+    if(relY < LIST_ITEM_HEIGHT) {
+        setBoxesListDetailVisible(!mBoxesListDetailVisible);
+    } else {
+        relY -= LIST_ITEM_HEIGHT;
+        foreach(QrealAnimator *animator, mChildAnimators) {
+            qreal heightT = animator->getBoxesListHeight();
+            if(heightT > relY) {
+                animator->handleListItemMousePress(relY);
+                break;
+            }
+            relY -= heightT;
+        }
+    }
+}
+
+void ComplexAnimator::retrieveSavedValue()
+{
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->retrieveSavedValue();
+    }
+}
+
+void ComplexAnimator::finishTransform(bool record)
+{
+    mConnectedToMainWindow->startNewUndoRedoSet();
+
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->finishTransform(record);
+    }
+
+    mConnectedToMainWindow->finishUndoRedoSet();
+}
+
+void ComplexAnimator::cancelTransform()
+{
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->cancelTransform();
+    }
 }
 
 void ComplexAnimator::addChildQrealKey(QrealKey *key)
@@ -116,6 +302,7 @@ void ComplexKey::setEndFrame(qreal endFrame) {
 
 void ComplexKey::addAnimatorKey(QrealKey *key) {
     mKeys << key;
+    key->setParentKey(this);
     key->incNumberPointers();
 }
 
@@ -139,6 +326,7 @@ void ComplexKey::deleteKey()
 
 void ComplexKey::removeAnimatorKey(QrealKey *key) {
     if(mKeys.removeOne(key) ) {
+        key->setParentKey(NULL);
         key->decNumberPointers();
     }
 }

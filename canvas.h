@@ -83,7 +83,7 @@ public:
 
     void clearPreview();
     QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
-    void getKeysInRect(QRectF selectionRect, qreal y0,
+    void getKeysInRect(QRectF selectionRect,
                        QList<QrealKey *> *keysList);
 
     void centerPivotPosition() {}
@@ -98,7 +98,6 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
-    void clearPointsSelection();
     void addPointToSelection(MovablePoint *point);
 
     void setCurrentEndPoint(PathPoint *point);

@@ -160,7 +160,7 @@ public:
     virtual void updateAfterFrameChanged(int currentFrame);
     virtual QMatrix getCombinedRenderTransform();
     virtual QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal);
-    virtual void getKeysInRect(QRectF selectionRect, qreal y0,
+    virtual void getKeysInRect(QRectF selectionRect,
                                QList<QrealKey *> *keysList);
 
     virtual void startAllPointsTransform() {}

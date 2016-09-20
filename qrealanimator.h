@@ -113,9 +113,10 @@ public:
                           bool detailedView);
     virtual QrealKey *getKeyAtPos(qreal relX, qreal relY,
                                   int minViewedFrame, qreal pixelsPerFrame);
-    void getKeysInRect(QRectF selectionRect,
-                       int minViewedFrame,
-                       qreal pixelsPerFrame, QList<QrealKey *> *keysList);
+    virtual void getKeysInRect(QRectF selectionRect,
+                               int minViewedFrame,
+                               qreal pixelsPerFrame,
+                               QList<QrealKey *> *keysList);
 
     void addAllKeysToComplexAnimator();
     void removeAllKeysFromComplexAnimator();
@@ -138,8 +139,10 @@ public:
                                qreal drawX, qreal drawY,
                                qreal pixelsPerFrame,
                                int startFrame, int endFrame);
+
+    virtual void handleListItemMousePress(qreal relY);
 protected:
-    bool mBoxesListDetailVisible = true;
+    bool mBoxesListDetailVisible = false;
     bool mKeyOnCurrentFrame = false;
 
     QString mName = "";

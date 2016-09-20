@@ -3,6 +3,10 @@
 #include "qrealpoint.h"
 #include "pointhelpers.h"
 
+class ComplexAnimator;
+
+class ComplexKey;
+
 class QrealAnimator;
 
 class QrealKey : public QrealPoint
@@ -57,7 +61,6 @@ public:
 
     bool hasPrevKey();
     bool hasNextKey();
-    void setFrameAndUpdateParentAnimator(int newFrame);
     void incFrameAndUpdateParentAnimator(int inc);
 
     QrealAnimator *getParentAnimator();
@@ -70,8 +73,13 @@ public:
     void removeFromAnimator();
 
     virtual void deleteKey() { removeFromAnimator(); }
+
+    void setParentKey(ComplexKey *parentKey);
+
+    bool isAncestorSelected();
 protected:
-    QrealAnimator *mParentAnimator;
+    QrealAnimator *mParentAnimator = NULL;
+    ComplexKey *mParentKey = NULL;
 
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 

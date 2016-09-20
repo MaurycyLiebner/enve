@@ -1,7 +1,9 @@
 #include "qrealkey.h"
 #include "qrealanimator.h"
+#include "complexanimator.h"
 
-QrealKey::QrealKey(int frame, QrealAnimator *parentAnimator, qreal value) : QrealPoint(KEY_POINT, this) {
+QrealKey::QrealKey(int frame, QrealAnimator *parentAnimator, qreal value) :
+    QrealPoint(KEY_POINT, this) {
     mParentAnimator = parentAnimator;
     mFrame = frame;
     mEndFrame = frame + 5;
@@ -36,6 +38,17 @@ void QrealKey::incValue(qreal incBy) {
 void QrealKey::removeFromAnimator()
 {
     mParentAnimator->removeKey(this);
+}
+
+void QrealKey::setParentKey(ComplexKey *parentKey)
+{
+    mParentKey = parentKey;
+}
+
+bool QrealKey::isAncestorSelected()
+{
+    if(mParentKey == NULL) return isSelected();
+    return isSelected() || mParentKey->isAncestorSelected();
 }
 
 QrealPoint *QrealKey::getStartPoint()
@@ -179,16 +192,13 @@ void QrealKey::setValue(qreal value) {
 }
 
 void QrealKey::incFrameAndUpdateParentAnimator(int inc) {
-    setFrameAndUpdateParentAnimator(mFrame + inc);
+    if((mParentKey == NULL) ? false : mParentKey->isAncestorSelected() ) return;
+    mParentAnimator->moveKeyToFrame(this, mFrame + inc);
 }
 
 QrealAnimator *QrealKey::getParentAnimator()
 {
     return mParentAnimator;
-}
-
-void QrealKey::setFrameAndUpdateParentAnimator(int newFrame) {
-    mParentAnimator->moveKeyToFrame(this, newFrame);
 }
 
 void QrealKey::setStartValue(qreal value)

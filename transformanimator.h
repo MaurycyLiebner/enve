@@ -18,13 +18,6 @@ public:
     void setPosition(qreal x, qreal y);
     void setRotation(qreal rot);
 
-    void startTransform();
-    void retrieveSavedValue();
-
-    void finishTransform(bool record);
-
-    void cancelTransform();
-
     qreal getYScale();
     qreal getXScale();
 
@@ -48,23 +41,6 @@ public:
     void startRotTransform();
     void startPosTransform();
     void startScaleTransform();
-
-    void setConnectedToMainWindow(ConnectedToMainWindow *connected);
-
-    void setUpdater(AnimatorUpdater *updater);
-
-    void setFrame(int frame);
-
-    void sortKeys();
-    void updateKeysPath();
-
-    qreal getBoxesListHeight();
-
-    void drawBoxesList(QPainter *p,
-                       qreal drawX, qreal drawY,
-                       qreal pixelsPerFrame,
-                       int startFrame, int endFrame);
-    QrealKey *getKeyAtPos(qreal relX, qreal relY, int minViewedFrame, qreal pixelsPerFrame);
 private:
     QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;
