@@ -220,6 +220,11 @@ void MainWindow::schedulePivotUpdate()
     mCanvas->schedulePivotUpdate();
 }
 
+AnimationDockWidget *MainWindow::getAnimationDockWidget()
+{
+    return mAnimationDockWidget;
+}
+
 BoxesList *MainWindow::getBoxesList()
 {
     return mBoxesListAnimationDockWidget->getBoxesList();

@@ -68,16 +68,28 @@ QRectF BoxesGroup::getBoundingRect()
 void BoxesGroup::draw(QPainter *p)
 {
     if(mVisible) {
+        p->save();
+
+        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
         foreach(BoundingBox *box, mChildren) {
             box->draw(p);
         }
+
+        p->restore();
     }
 }
 
 void BoxesGroup::render(QPainter *p)
 {
-    foreach(BoundingBox *box, mChildren){
-        box->render(p);
+    if(mVisible) {
+        p->save();
+
+        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
+        foreach(BoundingBox *box, mChildren){
+            box->render(p);
+        }
+
+        p->restore();
     }
 }
 

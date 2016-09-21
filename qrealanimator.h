@@ -7,6 +7,7 @@
 #include "qrealkey.h"
 #include "connectedtomainwindow.h"
 #include "animatorupdater.h"
+#include "float.h"
 
 const int KEY_RECT_SIZE = 10;
 
@@ -16,6 +17,8 @@ class QrealAnimator
 {
 public:
     QrealAnimator();
+
+    void setValueRange(qreal minVal, qreal maxVal);
 
     void setParentAnimator(ComplexAnimator *parentAnimator);
 
@@ -149,6 +152,9 @@ public:
     virtual bool isDescendantRecording() { return mIsRecording; }
     virtual QString getValueText();
 protected:
+    qreal mMaxPossibleVal = DBL_MAX;
+    qreal mMinPossibleVal = -DBL_MAX;
+
     bool mIsRecording = false;
     bool mBoxesListDetailVisible = false;
     bool mKeyOnCurrentFrame = false;

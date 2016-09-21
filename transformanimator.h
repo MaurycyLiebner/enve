@@ -37,6 +37,8 @@ public:
     qreal getPivotX();
     qreal getPivotY();
 
+    qreal getOpacity();
+
     void rotateRelativeToSavedValue(qreal rotRel, QPointF pivot);
     void startRotTransform();
     void startPosTransform();

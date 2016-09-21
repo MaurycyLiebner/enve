@@ -10,6 +10,13 @@ QrealAnimator::QrealAnimator()
 {
 }
 
+void QrealAnimator::setValueRange(qreal minVal, qreal maxVal)
+{
+    mMinPossibleVal = minVal;
+    mMaxPossibleVal = maxVal;
+    setCurrentValue(mCurrentValue);
+}
+
 void QrealAnimator::getKeysInRect(QRectF selectionRect,
                                   int minViewedFrame,
                                   qreal pixelsPerFrame,
@@ -118,8 +125,11 @@ void QrealAnimator::handleListItemMousePress(qreal relX, qreal relY)
 {
     if(relX < LIST_ITEM_CHILD_INDENT) {
         setRecording(!mIsRecording);
-    } else {
+    } else if(relX < 2*LIST_ITEM_CHILD_INDENT) {
         setBoxesListDetailVisible(!mBoxesListDetailVisible);
+    } else {
+        mConnectedToMainWindow->getMainWindow()->getAnimationDockWidget()->
+                getAnimationWidget()->setAnimator(this);
     }
 }
 
@@ -207,7 +217,7 @@ qreal QrealAnimator::getCurrentValue()
 
 void QrealAnimator::setCurrentValue(qreal newValue)
 {
-    mCurrentValue = newValue;
+    mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
     callUpdater();
 }
 

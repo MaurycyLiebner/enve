@@ -10,6 +10,8 @@ class AnimationWidget : public QWidget
 public:
     explicit AnimationWidget(QWidget *parent = 0);
     bool processFilteredKeyEvent(QKeyEvent *event);
+
+    void setAnimator(QrealAnimator *animator);
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *);
@@ -32,7 +34,7 @@ public slots:
     void setSymmetricCtrl();
     void setCornerCtrl();
 private:
-    QrealAnimator *mAnimator;
+    QrealAnimator *mAnimator = NULL;
 };
 
 #endif // ANIMATIONWIDGET_H

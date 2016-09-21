@@ -65,10 +65,13 @@ void BoxesList::paintEvent(QPaintEvent *)
         p.drawLine(QPointF(0, i), QPointF(width(), i) );
     }
 
-    xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
-            LIST_ITEM_MAX_WIDTH + mPixelsPerFrame*0.5;
-    p.setPen(QPen(Qt::green, 2.));
-    p.drawLine(QPointF(xT, 0.), QPointF(xT, mViewedRect.height()) );
+    if(mMainWindow->getCurrentFrame() <= mMaxViewedFrame &&
+            mMainWindow->getCurrentFrame() >= mMinViewedFrame) {
+        xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
+                LIST_ITEM_MAX_WIDTH + mPixelsPerFrame*0.5;
+        p.setPen(QPen(Qt::green, 2.));
+        p.drawLine(QPointF(xT, 0.), QPointF(xT, mViewedRect.height()) );
+    }
 
     p.setPen(QPen(Qt::black, 1.));
 

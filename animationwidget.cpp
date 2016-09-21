@@ -168,6 +168,12 @@ bool AnimationWidget::processFilteredKeyEvent(QKeyEvent *event)
     return true;
 }
 
+void AnimationWidget::setAnimator(QrealAnimator *animator)
+{
+    mAnimator = animator;
+    repaint();
+}
+
 void AnimationWidget::updateDrawnPath()
 {
     mAnimator->sortKeys();

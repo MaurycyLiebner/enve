@@ -472,6 +472,8 @@ void VectorPath::draw(QPainter *p)
 {
     if(mVisible) {
         p->save();
+
+        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity() );
         p->setPen(Qt::NoPen);
         if(mFillPaintSettings.paintType == GRADIENTPAINT) {
             p->setBrush(mDrawFillGradient);
@@ -489,6 +491,7 @@ void VectorPath::draw(QPainter *p)
             p->setBrush(Qt::NoBrush);
         }
         p->drawPath(mOutlinePath);
+
         p->restore();
     }
 }
@@ -496,6 +499,8 @@ void VectorPath::draw(QPainter *p)
 void VectorPath::render(QPainter *p)
 {
     p->save();
+
+    p->setOpacity(p->opacity()*mTransformAnimator.getOpacity() );
     p->setPen(Qt::NoPen);
     if(mFillPaintSettings.paintType == GRADIENTPAINT) {
         p->setBrush(mDrawFillGradient);
@@ -516,6 +521,7 @@ void VectorPath::render(QPainter *p)
         p->setBrush(Qt::NoBrush);
     }
     p->drawPath(combinedRenderTransform.map(mPathStroker.createStroke(mPath)) );
+
     p->restore();
 }
 

@@ -305,5 +305,10 @@ void QrealKey::saveCurrentFrameAndValue() {
 void QrealKey::changeFrameAndValueBy(QPointF frameValueChange)
 {
     setValue(frameValueChange.y() + mSavedValue);
-    setFrame(qRound(frameValueChange.x() + mSavedFrame) );
+    int newFrame = qRound(frameValueChange.x() + mSavedFrame);
+    if(mParentAnimator != NULL) {
+        mParentAnimator->moveKeyToFrame(this, newFrame);
+    } else {
+        setFrame(newFrame);
+    }
 }

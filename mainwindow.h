@@ -80,6 +80,7 @@ public:
     void scheduleRepaint();
     void schedulePivotUpdate();
 
+    AnimationDockWidget *getAnimationDockWidget();
     BoxesList *getBoxesList();
     Canvas *getCanvas();
     FillStrokeSettingsWidget *getFillStrokeSettings();

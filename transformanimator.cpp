@@ -15,6 +15,7 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mPivotAnimator.setName("pivot");
     mPivotAnimator.setCurrentValue(QPointF(0., 0.) );
     mOpacityAnimator.setName("opacity");
+    mOpacityAnimator.setValueRange(0., 100.);
     mOpacityAnimator.setCurrentValue(100.);
 
     addChildAnimator(&mPosAnimator);
@@ -196,6 +197,11 @@ qreal TransformAnimator::getPivotX()
 qreal TransformAnimator::getPivotY()
 {
     return mPivotAnimator.getYValue();
+}
+
+qreal TransformAnimator::getOpacity()
+{
+    return mOpacityAnimator.getCurrentValue();
 }
 
 QMatrix TransformAnimator::getCurrentValue()
