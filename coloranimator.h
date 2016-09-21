@@ -26,7 +26,7 @@ public:
     void startAlphaTransform();
 
     void startTransform();
-    void finishTransform(bool record);
+    void finishTransform();
     void setConnectedToMainWindow(ConnectedToMainWindow *connected);
     void setUpdater(AnimatorUpdater *updater);
     void setFrame(int frame);

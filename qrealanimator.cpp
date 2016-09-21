@@ -85,22 +85,70 @@ qreal QrealAnimator::getBoxesListHeight()
     return LIST_ITEM_HEIGHT;
 }
 
+QString QrealAnimator::getValueText() {
+    return QString::number(mCurrentValue, 'f', 2);
+}
+
 void QrealAnimator::drawBoxesList(QPainter *p,
                                   qreal drawX, qreal drawY,
                                   qreal pixelsPerFrame,
                                   int startFrame, int endFrame)
 {
-    p->drawText(drawX + LIST_ITEM_CHILD_INDENT, drawY,
-                200. - drawX, LIST_ITEM_HEIGHT,
+    if(mIsRecording) {
+        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_RECORDING);
+    } else {
+        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_NOT_RECORDING);
+    }
+    p->setPen(Qt::black);
+    drawX += 2*LIST_ITEM_CHILD_INDENT;
+    p->drawText(drawX, drawY,
+                LIST_ITEM_MAX_WIDTH - 80. - drawX, LIST_ITEM_HEIGHT,
                 Qt::AlignVCenter | Qt::AlignLeft,
                 getName() );
-    drawKeys(p, pixelsPerFrame, 200., drawY, LIST_ITEM_HEIGHT,
+    p->setPen(Qt::blue);
+    p->drawText(LIST_ITEM_MAX_WIDTH - 80., drawY,
+                70., LIST_ITEM_HEIGHT,
+                Qt::AlignVCenter | Qt::AlignLeft,
+                " " + getValueText() );
+    drawKeys(p, pixelsPerFrame, LIST_ITEM_MAX_WIDTH, drawY, LIST_ITEM_HEIGHT,
              startFrame, endFrame, true);
 }
 
-void QrealAnimator::handleListItemMousePress(qreal relY)
+void QrealAnimator::handleListItemMousePress(qreal relX, qreal relY)
 {
-    setBoxesListDetailVisible(!mBoxesListDetailVisible);
+    if(relX < LIST_ITEM_CHILD_INDENT) {
+        setRecording(!mIsRecording);
+    } else {
+        setBoxesListDetailVisible(!mBoxesListDetailVisible);
+    }
+}
+
+void QrealAnimator::removeAllKeys() {
+    if(mKeys.isEmpty()) return;
+    qreal currentValue = mCurrentValue;
+    QList<QrealKey*> keys = mKeys;
+    foreach(QrealKey *key, keys) {
+        removeKey(key);
+    }
+    setCurrentValue(currentValue);
+}
+
+void QrealAnimator::setRecording(bool rec)
+{
+    mIsRecording = rec;
+    if(rec) {
+        saveCurrentValueAsKey();
+    } else {
+        removeAllKeys();
+    }
+    if(mParentAnimator != NULL) {
+        mParentAnimator->childAnimatorIsRecordingChanged();
+    }
+}
+
+bool QrealAnimator::isRecording()
+{
+    return mIsRecording;
 }
 
 void QrealAnimator::updateKeyOnCurrrentFrame()
@@ -701,14 +749,14 @@ void QrealAnimator::startTransform()
     mTransformed = true;
 }
 
-void QrealAnimator::finishTransform(bool record)
+void QrealAnimator::finishTransform()
 {
     if(mTransformed) {
         mConnectedToMainWindow->addUndoRedo(
                     new ChangeQrealAnimatorValue(mSavedCurrentValue,
                                                  mCurrentValue,
                                                  this) );
-        if(record) {
+        if(mIsRecording) {
             saveCurrentValueAsKey();
         }
         mTransformed = false;

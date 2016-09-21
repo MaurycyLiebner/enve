@@ -93,7 +93,7 @@ public:
 
     virtual void startTransform();
 
-    virtual void finishTransform(bool record);
+    virtual void finishTransform();
 
     void multCurrentValue(qreal mult);
 
@@ -140,8 +140,16 @@ public:
                                qreal pixelsPerFrame,
                                int startFrame, int endFrame);
 
-    virtual void handleListItemMousePress(qreal relY);
+    virtual void handleListItemMousePress(qreal relX, qreal relY);
+
+    virtual void setRecording(bool rec);
+    bool isRecording();
+    void removeAllKeys();
+
+    virtual bool isDescendantRecording() { return mIsRecording; }
+    virtual QString getValueText();
 protected:
+    bool mIsRecording = false;
     bool mBoxesListDetailVisible = false;
     bool mKeyOnCurrentFrame = false;
 

@@ -41,11 +41,14 @@ public:
     void startRotTransform();
     void startPosTransform();
     void startScaleTransform();
+    void startOpacityTransform();
+    void setOpacity(qreal newOpacity);
 private:
     QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;
     QPointFAnimator mScaleAnimator;
     QrealAnimator mRotAnimator;
+    QrealAnimator mOpacityAnimator;
 };
 
 #endif // TRANSFORMANIMATOR_H

@@ -64,7 +64,7 @@ void MovablePoint::finishTransform()
     MoveMovablePointUndoRedo *undoRedo = new MoveMovablePointUndoRedo(this,
                                                            mSavedRelPos,
                                                            getRelativePos());
-    mRelPos.finishTransform(isRecording());
+    mRelPos.finishTransform();
 
     addUndoRedo(undoRedo);
 }

@@ -58,15 +58,17 @@ void BoundingBox::handleListItemMousePress(qreal relX, qreal relY) {
                 scheduleRepaint();
             }
         }
-    }
-    relY -= LIST_ITEM_HEIGHT;
-    foreach(QrealAnimator *animator, mActiveAnimators) {
-        qreal animatorHeight = animator->getBoxesListHeight();
-        if(relY <= animatorHeight) {
-            animator->handleListItemMousePress(relY);
-            break;
+    } else if(mBoxListItemDetailsVisible) {
+        relY -= LIST_ITEM_HEIGHT;
+        foreach(QrealAnimator *animator, mActiveAnimators) {
+            qreal animatorHeight = animator->getBoxesListHeight();
+            if(relY <= animatorHeight) {
+                animator->handleListItemMousePress(relX - LIST_ITEM_CHILD_INDENT,
+                                                   relY);
+                break;
+            }
+            relY -= animatorHeight;
         }
-        relY -= animatorHeight;
     }
 }
 
@@ -227,7 +229,7 @@ void BoundingBox::drawAnimationBar(QPainter *p,
                                    qreal drawX, qreal drawY,
                                    int startFrame, int endFrame) {
     mAnimatorsCollection.drawKeys(p,
-                                pixelsPerFrame, 200., drawY, 20.,
+                                pixelsPerFrame, LIST_ITEM_MAX_WIDTH, drawY, 20.,
                                 startFrame, endFrame, true);
     drawY += LIST_ITEM_HEIGHT;
     if(mBoxListItemDetailsVisible) {

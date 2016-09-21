@@ -13,11 +13,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mMainLayout->setMargin(0);
     mFrameRangeScrollbar = new AnimatonWidgetScrollBar(20, 200,
                                                        20, 30,
-                                                       10, true,
+                                                       true,
                                                        true, this);
     mAnimationWidgetScrollbar = new AnimatonWidgetScrollBar(1, 1,
                                                             10, 30,
-                                                            1, false,
+                                                            false,
                                                             true, this);
 
     connect(mAnimationWidgetScrollbar, SIGNAL(viewedFramesChanged(int,int)),
@@ -77,7 +77,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mControlButtonsLayout = new QHBoxLayout();
     mControlButtonsWidget = new QWidget(this);
-    mControlButtonsWidget->setFixedWidth(201);
+    mControlButtonsWidget->setFixedWidth(LIST_ITEM_MAX_WIDTH + 1);
     mControlButtonsWidget->setLayout(mControlButtonsLayout);
     mControlButtonsWidget->setStyleSheet("background-color: black");
 

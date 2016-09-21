@@ -21,6 +21,8 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
     mVectorPath = vectorPath;
     mStartCtrlPt = new CtrlPoint(startCtrlRelX, startCtrlRelY, this, true);
     mEndCtrlPt = new CtrlPoint(endCtrlRelX, endCtrlRelY, this, false);
+    mStartCtrlPt->incNumberPointers();
+    mEndCtrlPt->incNumberPointers();
 
     mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
     mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
@@ -38,8 +40,8 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
 
 void PathPoint::clearAll()
 {
-    delete mStartCtrlPt;
-    delete mEndCtrlPt;
+    mStartCtrlPt->decNumberPointers();
+    mEndCtrlPt->decNumberPointers();
 }
 
 PathPoint::PathPoint(QPointF absPos,
@@ -52,6 +54,8 @@ PathPoint::PathPoint(QPointF absPos,
 
     mStartCtrlPt = new CtrlPoint(startCtrlAbsPos, this, true);
     mEndCtrlPt = new CtrlPoint(endCtrlAbsPos, this, false);
+    mStartCtrlPt->incNumberPointers();
+    mEndCtrlPt->incNumberPointers();
 
     mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
     mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
@@ -89,6 +93,8 @@ PathPoint::PathPoint(int movablePointId, int pathPointId,
                                      this, true);
         mEndCtrlPt = new CtrlPoint(query.value(idendctrlptid).toInt(),
                                    this, false);
+        mStartCtrlPt->incNumberPointers();
+        mEndCtrlPt->incNumberPointers();
         mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
         mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
     } else {

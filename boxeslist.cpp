@@ -13,6 +13,8 @@ QPixmap *BoxesList::LOCKED_PIXMAP;
 QPixmap *BoxesList::UNLOCKED_PIXMAP;
 QPixmap *BoxesList::ANIMATOR_CHILDREN_VISIBLE;
 QPixmap *BoxesList::ANIMATOR_CHILDREN_HIDDEN;
+QPixmap *BoxesList::ANIMATOR_RECORDING;
+QPixmap *BoxesList::ANIMATOR_NOT_RECORDING;
 
 BoxesList::BoxesList(MainWindow *mainWindow, QWidget *parent) : QWidget(parent)
 {
@@ -26,6 +28,10 @@ BoxesList::BoxesList(MainWindow *mainWindow, QWidget *parent) : QWidget(parent)
                 "pixmaps/icons/animator_children_visible.png");
     ANIMATOR_CHILDREN_HIDDEN = new QPixmap(
                 "pixmaps/icons/animator_children_hidden.png");
+    ANIMATOR_RECORDING = new QPixmap(
+                "pixmaps/icons/recording.png");
+    ANIMATOR_NOT_RECORDING = new QPixmap(
+                "pixmaps/icons/not_recording.png");
 
     mCanvas = mainWindow->getCanvas();
     mMainWindow = mainWindow;
@@ -39,7 +45,7 @@ void BoxesList::paintEvent(QPaintEvent *)
     p.fillRect(rect(), QColor(155, 155, 155));
 
     p.setPen(QPen(QColor(75, 75, 75), 1.));
-    qreal xT = 200 + mPixelsPerFrame*0.5 - mMinViewedFrame*mPixelsPerFrame;
+    qreal xT = LIST_ITEM_MAX_WIDTH + mPixelsPerFrame*0.5;
     int iInc = 1;
     bool mult5 = true;
     while(iInc*mPixelsPerFrame < 10.) {
@@ -60,7 +66,7 @@ void BoxesList::paintEvent(QPaintEvent *)
     }
 
     xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
-            200 + mPixelsPerFrame*0.5;
+            LIST_ITEM_MAX_WIDTH + mPixelsPerFrame*0.5;
     p.setPen(QPen(Qt::green, 2.));
     p.drawLine(QPointF(xT, 0.), QPointF(xT, mViewedRect.height()) );
 
@@ -83,6 +89,8 @@ void BoxesList::paintEvent(QPaintEvent *)
         p.setPen(QPen(Qt::red, 4.));
         p.drawRect(rect() );
     }
+    p.setPen(QPen(Qt::black, 1.) );
+    p.drawLine(LIST_ITEM_MAX_WIDTH, 0, LIST_ITEM_MAX_WIDTH, height());
     p.end();
 }
 
@@ -137,12 +145,12 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
 {
     mFirstMove = true;
     mLastPressPos = event->pos();
-    if(event->x() < 200) {
+    if(event->x() < LIST_ITEM_MAX_WIDTH) {
         mCanvas->handleChildListItemMousePress(event->x(),
                                                event->y() + mViewedRect.top(),
                                                0.f);
     } else {
-        mLastPressedKey = mCanvas->getKeyAtPos(event->x() - 200.,
+        mLastPressedKey = mCanvas->getKeyAtPos(event->x() - LIST_ITEM_MAX_WIDTH,
                                                 event->y() + mViewedRect.top(),
                                                 0.);
         if(mLastPressedKey == NULL) {
@@ -189,7 +197,7 @@ void BoxesList::mouseMoveEvent(QMouseEvent *event)
 
 void BoxesList::selectKeysInSelectionRect() {
     QList<QrealKey*> listKeys;
-    mCanvas->getKeysInRect(mSelectionRect.translated(-200., mViewedRect.top() ),
+    mCanvas->getKeysInRect(mSelectionRect.translated(-LIST_ITEM_MAX_WIDTH, mViewedRect.top() ),
                            &listKeys);
     foreach(QrealKey *key, listKeys) {
         addKeyToSelection(key);
@@ -284,7 +292,7 @@ qreal BoxesList::getPixelsPerFrame()
 
 void BoxesList::updatePixelsPerFrame()
 {
-    qreal animWidth = mViewedRect.width() - 200;
+    qreal animWidth = mViewedRect.width() - LIST_ITEM_MAX_WIDTH;
     qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
     mPixelsPerFrame = animWidth/dFrame;
 }

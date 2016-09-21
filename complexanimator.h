@@ -39,11 +39,20 @@ public:
     void getKeysInRect(QRectF selectionRect, int minViewedFrame,
                        qreal pixelsPerFrame,
                        QList<QrealKey *> *keysList);
-    void handleListItemMousePress(qreal relY);
+    void handleListItemMousePress(qreal relX, qreal relY);
     void retrieveSavedValue();
-    void finishTransform(bool record);
+    void finishTransform();
     void cancelTransform();
+
+    void setRecording(bool rec);
+
+    void childAnimatorIsRecordingChanged();
+    void setRecordingValue(bool rec);
+
+    bool isDescendantRecording();
+    QString getValueText();
 protected:
+    bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;
     qreal mMinMoveValue;
     qreal mMaxMoveValue;

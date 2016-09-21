@@ -184,14 +184,14 @@ void ColorAnimator::startTransform()
     mAlphaAnimator.startTransform();
 }
 
-void ColorAnimator::finishTransform(bool record)
+void ColorAnimator::finishTransform()
 {
     mConnectedToMainWindow->startNewUndoRedoSet();
 
-    mVal1Animator.finishTransform(record);
-    mVal2Animator.finishTransform(record);
-    mVal3Animator.finishTransform(record);
-    mAlphaAnimator.finishTransform(record);
+    mVal1Animator.finishTransform();
+    mVal2Animator.finishTransform();
+    mVal3Animator.finishTransform();
+    mAlphaAnimator.finishTransform();
 
     mConnectedToMainWindow->finishUndoRedoSet();
 }

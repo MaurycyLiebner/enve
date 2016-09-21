@@ -8,8 +8,7 @@ class AnimatonWidgetScrollBar : public QWidget
     Q_OBJECT
 public:
     explicit AnimatonWidgetScrollBar(int minSpan, int maxSpan,
-                                     int spanInc, int height,
-                                     int viewedInc, bool range,
+                                     int spanInc, int height, bool range,
                                      bool clamp,
                                      QWidget *parent = 0);
     void emitChange();
@@ -45,8 +44,6 @@ private:
 
     int mMinFrame = 0;
     int mMaxFrame = 200;
-
-    int mViewedInc;
 
     int mMinSpan;
     int mMaxSpan;

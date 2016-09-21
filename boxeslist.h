@@ -4,7 +4,7 @@
 #include <QWidget>
 
 const qreal LIST_ITEM_HEIGHT = 20;
-const qreal LIST_ITEM_MAX_WIDTH = 200;
+const qreal LIST_ITEM_MAX_WIDTH = 250;
 const qreal LIST_ITEM_CHILD_INDENT = 20;
 
 class QrealKey;
@@ -35,6 +35,8 @@ public:
     static QPixmap *UNLOCKED_PIXMAP;
     static QPixmap *ANIMATOR_CHILDREN_VISIBLE;
     static QPixmap *ANIMATOR_CHILDREN_HIDDEN;
+    static QPixmap *ANIMATOR_RECORDING;
+    static QPixmap *ANIMATOR_NOT_RECORDING;
 
     void addKeyToSelection(QrealKey *key);
     void removeKeyFromSelection(QrealKey *key);

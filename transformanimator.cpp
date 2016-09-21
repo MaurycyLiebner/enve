@@ -14,11 +14,14 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mPosAnimator.setCurrentValue(QPointF(0., 0.) );
     mPivotAnimator.setName("pivot");
     mPivotAnimator.setCurrentValue(QPointF(0., 0.) );
+    mOpacityAnimator.setName("opacity");
+    mOpacityAnimator.setCurrentValue(100.);
 
     addChildAnimator(&mPosAnimator);
     addChildAnimator(&mRotAnimator);
     addChildAnimator(&mScaleAnimator);
     addChildAnimator(&mPivotAnimator);
+    addChildAnimator(&mOpacityAnimator);
 }
 
 void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel) {
@@ -58,6 +61,14 @@ void TransformAnimator::scale(qreal sx, qreal sy, QPointF pivot)
                      -pivot.y() + mPosAnimator.getSavedYValue() );
     scale(sx, sy);
     mPosAnimator.setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
+}
+
+void TransformAnimator::startOpacityTransform() {
+    mOpacityAnimator.startTransform();
+}
+
+void TransformAnimator::setOpacity(qreal newOpacity) {
+    mOpacityAnimator.setCurrentValue(newOpacity);
 }
 
 void TransformAnimator::setScale(qreal sx, qreal sy)
@@ -137,7 +148,7 @@ void TransformAnimator::setPivot(QPointF point)
 
     mPivotAnimator.startTransform();
     mPivotAnimator.setCurrentValue(point);
-    mPivotAnimator.finishTransform(mConnectedToMainWindow->isRecording());
+    mPivotAnimator.finishTransform();
 
     callUpdater();
 }

@@ -9,7 +9,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent) : QWidget(parent)
 
     mScrollBar = new AnimatonWidgetScrollBar(50, 200,
                                              10, 30,
-                                             1, true,
+                                             true,
                                              false, this);
 
     mAnimationWidget = new AnimationWidget(this);

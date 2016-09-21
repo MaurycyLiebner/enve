@@ -10,7 +10,7 @@ int clampInt2(int val, int min, int max) {
 
 AnimatonWidgetScrollBar::AnimatonWidgetScrollBar(int minSpan, int maxSpan,
                                                  int spanInc, int height,
-                                                 int viewedInc, bool range,
+                                                 bool range,
                                                  bool clamp,
                                                  QWidget *parent) :
     QWidget(parent)
@@ -18,7 +18,6 @@ AnimatonWidgetScrollBar::AnimatonWidgetScrollBar(int minSpan, int maxSpan,
     mMinSpan = minSpan;
     mMaxSpan = maxSpan;
     mSpanInc = spanInc;
-    mViewedInc = viewedInc;
     mRange = range;
     mClamp = clamp;
     setFramesSpan(0);
@@ -69,12 +68,17 @@ void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
         divInc++;
     }
     qreal inc = frameInc*pixPerFrame;
-    qreal xL = (mMinFrame%frameInc + (mRange ? 0. : 0.5) )*pixPerFrame;
-    int currentFrame = mMinFrame + mMinFrame%frameInc;
-    if(mMinFrame%frameInc == 0) {
-        currentFrame += frameInc;
-        xL += inc;
+
+    int minMod = mMinFrame%frameInc;
+    qreal xL = (-minMod + (mRange ? 0. : 0.5) )*pixPerFrame;
+    int currentFrame = mMinFrame - minMod;
+    if(!mRange) {
+        while(xL < 70.) {
+            currentFrame += frameInc;
+            xL += inc;
+        }
     }
+
     qreal halfHeight = height()*0.5;
     qreal qorterHeight = height()*0.25;
     qreal threeFourthsHeight = height()*0.75;
@@ -119,14 +123,21 @@ int AnimatonWidgetScrollBar::getMinFrame()
 
 void AnimatonWidgetScrollBar::wheelEvent(QWheelEvent *event)
 {
-
-    int newFramesSpan = mFramesSpan;
-    if(event->delta() > 0) {
-        newFramesSpan -= mSpanInc;
+    if(mRange) {
+        int newFramesSpan = mFramesSpan;
+        if(event->delta() > 0) {
+            newFramesSpan -= mSpanInc;
+        } else {
+            newFramesSpan += mSpanInc;
+        }
+        setFramesSpan(newFramesSpan);
     } else {
-        newFramesSpan += mSpanInc;
+        if(event->delta() > 0) {
+            setFirstViewedFrame(mFirstViewedFrame - 1);
+        } else {
+            setFirstViewedFrame(mFirstViewedFrame + 1);
+        }
     }
-    setFramesSpan(newFramesSpan);
 
     emitChange();
     repaint();
@@ -134,19 +145,13 @@ void AnimatonWidgetScrollBar::wheelEvent(QWheelEvent *event)
 
 bool AnimatonWidgetScrollBar::setFirstViewedFrame(int firstFrame) {
     if(mClamp) {
-        if(mViewedInc == 1) {
-            mFirstViewedFrame = clampInt2(firstFrame, mMinFrame, mMaxFrame);
-            return true;
+        if(mRange) {
+            mFirstViewedFrame = clampInt2(firstFrame, mMinFrame, mMaxFrame -
+                                          mFramesSpan);
         } else {
-            int newValue = qRound((qreal)firstFrame/mViewedInc)*mViewedInc;
-            int minMod = mMinFrame%mViewedInc;
-            int maxMod = mMaxFrame%mViewedInc;
-            mFirstViewedFrame = clampInt2(newValue,
-                      (minMod == 0) ? mMinFrame : mMinFrame - mViewedInc + minMod,
-                      (maxMod == 0) ? mMaxFrame - mFramesSpan : mMaxFrame +
-                                                mViewedInc - maxMod - mFramesSpan);
-            return true;
+            mFirstViewedFrame = clampInt2(firstFrame, mMinFrame, mMaxFrame);
         }
+        return true;
     } else {
         mFirstViewedFrame = firstFrame;
         return true;

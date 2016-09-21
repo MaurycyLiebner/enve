@@ -134,9 +134,20 @@ void ComplexAnimator::drawBoxesList(QPainter *p,
 {
     QrealAnimator::drawBoxesList(p, drawX, drawY,
                                  pixelsPerFrame, startFrame, endFrame);
+    if(mChildAnimatorRecording && !mIsRecording) {
+        p->save();
+        p->setRenderHint(QPainter::Antialiasing);
+        p->setBrush(Qt::red);
+        p->setPen(Qt::NoPen);
+        p->drawEllipse(QPointF(LIST_ITEM_CHILD_INDENT*0.5 + drawX,
+                               LIST_ITEM_HEIGHT*0.5 + drawY),
+                       2.5, 2.5);
+        p->restore();
+    }
+    drawX += LIST_ITEM_CHILD_INDENT;
     if(mBoxesListDetailVisible) {
-        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_CHILDREN_VISIBLE);
-        drawX += LIST_ITEM_CHILD_INDENT;
+        p->drawPixmap(drawX, drawY,
+                      *BoxesList::ANIMATOR_CHILDREN_VISIBLE);
         drawY += LIST_ITEM_HEIGHT;
         foreach(QrealAnimator *animator, mChildAnimators) {
             animator->drawBoxesList(p, drawX, drawY,
@@ -193,16 +204,18 @@ void ComplexAnimator::getKeysInRect(QRectF selectionRect,
     }
 }
 
-void ComplexAnimator::handleListItemMousePress(qreal relY)
+void ComplexAnimator::handleListItemMousePress(qreal relX, qreal relY)
 {
     if(relY < LIST_ITEM_HEIGHT) {
-        setBoxesListDetailVisible(!mBoxesListDetailVisible);
+        QrealAnimator::handleListItemMousePress(relX, relY);
     } else {
         relY -= LIST_ITEM_HEIGHT;
         foreach(QrealAnimator *animator, mChildAnimators) {
             qreal heightT = animator->getBoxesListHeight();
             if(heightT > relY) {
-                animator->handleListItemMousePress(relY);
+                animator->handleListItemMousePress(
+                            relX - LIST_ITEM_CHILD_INDENT,
+                            relY);
                 break;
             }
             relY -= heightT;
@@ -217,12 +230,12 @@ void ComplexAnimator::retrieveSavedValue()
     }
 }
 
-void ComplexAnimator::finishTransform(bool record)
+void ComplexAnimator::finishTransform()
 {
     mConnectedToMainWindow->startNewUndoRedoSet();
 
     foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->finishTransform(record);
+        animator->finishTransform();
     }
 
     mConnectedToMainWindow->finishUndoRedoSet();
@@ -233,6 +246,48 @@ void ComplexAnimator::cancelTransform()
     foreach(QrealAnimator *animator, mChildAnimators) {
         animator->cancelTransform();
     }
+}
+
+void ComplexAnimator::setRecordingValue(bool rec) {
+    mIsRecording = rec;
+    if(mParentAnimator != NULL) {
+        mParentAnimator->childAnimatorIsRecordingChanged();
+    }
+}
+
+bool ComplexAnimator::isDescendantRecording()
+{
+    return mChildAnimatorRecording;
+}
+
+QString ComplexAnimator::getValueText()
+{
+    return "";
+}
+
+void ComplexAnimator::setRecording(bool rec)
+{
+    foreach(QrealAnimator *childAnimator, mChildAnimators) {
+        childAnimator->setRecording(rec);
+    }
+    setRecordingValue(rec);
+}
+
+void ComplexAnimator::childAnimatorIsRecordingChanged()
+{
+    bool rec = true;
+    mChildAnimatorRecording = false;
+    foreach(QrealAnimator *childAnimator, mChildAnimators) {
+        bool isChildRec = childAnimator->isRecording();
+        bool isChildDescRec = childAnimator->isDescendantRecording();
+        if(isChildDescRec) {
+            mChildAnimatorRecording = true;
+        }
+        if(!isChildRec) {
+            rec = false;
+        }
+    }
+    setRecordingValue(rec);
 }
 
 void ComplexAnimator::addChildQrealKey(QrealKey *key)

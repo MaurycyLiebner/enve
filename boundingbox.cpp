@@ -318,7 +318,7 @@ void BoundingBox::finishTransform()
 {
     startNewUndoRedoSet();
 
-    mTransformAnimator.finishTransform(isRecording());
+    mTransformAnimator.finishTransform();
 
     finishUndoRedoSet();
 }
