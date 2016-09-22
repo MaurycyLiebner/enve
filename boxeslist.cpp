@@ -4,6 +4,7 @@
 #include <QResizeEvent>
 #include "mainwindow.h"
 #include "qrealkey.h"
+#include "animationwidget.h"
 
 QPixmap *BoxesList::VISIBLE_PIXMAP;
 QPixmap *BoxesList::INVISIBLE_PIXMAP;
@@ -110,7 +111,7 @@ bool BoxesList::processFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete) {
         deleteSelectedKeys();
-        repaint();
+        repaintWidthAnimationWidget();
     } else if(event->key() == Qt::Key_Right) {
         foreach(QrealKey *key, mSelectedKeys) {
             key->incFrameAndUpdateParentAnimator(1);
@@ -123,6 +124,18 @@ bool BoxesList::processFilteredKeyEvent(QKeyEvent *event) {
         return false;
     }
     return true;
+}
+
+void BoxesList::setAnimationWidget(AnimationWidget *animationWidget)
+{
+    mAnimationWidget = animationWidget;
+}
+
+void BoxesList::repaintWidthAnimationWidget()
+{
+    repaint();
+    if(mAnimationWidget == NULL) return;
+    mAnimationWidget->repaint();
 }
 
 
@@ -142,7 +155,7 @@ void BoxesList::wheelEvent(QWheelEvent *event)
     } else {
         mViewedRect.translate(0, LIST_ITEM_HEIGHT);
     }
-    repaint();
+    repaintWidthAnimationWidget();
 }
 void BoxesList::mousePressEvent(QMouseEvent *event)
 {
@@ -268,12 +281,12 @@ void BoxesList::setFramesRange(int startFrame, int endFrame)
     mMinViewedFrame = startFrame;
     mMaxViewedFrame = endFrame;
     updatePixelsPerFrame();
-    repaint();
+    repaintWidthAnimationWidget();
 }
 
 void BoxesList::repaintIfNeeded() {
     if(mRepaintScheduled) {
-        repaint();
+        repaintWidthAnimationWidget();
         mRepaintScheduled = false;
     }
 }

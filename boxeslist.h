@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class AnimationWidget;
+
 const qreal LIST_ITEM_HEIGHT = 20;
 const qreal LIST_ITEM_MAX_WIDTH = 250;
 const qreal LIST_ITEM_CHILD_INDENT = 20;
@@ -43,6 +45,10 @@ public:
     void clearKeySelection();
     void selectKeysInSelectionRect();
     bool processFilteredKeyEvent(QKeyEvent *event);
+
+    void setAnimationWidget(AnimationWidget *animationWidget);
+
+    void repaintWidthAnimationWidget();
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *e);
@@ -56,6 +62,8 @@ public slots:
     void setFramesRange(int startFrame, int endFrame);
 private:
     void deleteSelectedKeys();
+
+    AnimationWidget *mAnimationWidget = NULL;
 
     QrealKey *mLastPressedKey = NULL;
     bool mFirstMove = false;

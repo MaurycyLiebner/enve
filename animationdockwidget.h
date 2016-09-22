@@ -10,7 +10,7 @@ class AnimationDockWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimationDockWidget(QWidget *parent = 0);
+    explicit AnimationDockWidget(MainWindow *parent = 0);
 
     AnimationWidget *getAnimationWidget();
 protected:

@@ -45,7 +45,7 @@ public:
               qreal pixelsPerFrame, qreal pixelsPerValue);
     void changeFrameAndValueBy(QPointF frameValueChange);
     void saveCurrentFrameAndValue();
-    void setCtrlsMode(CtrlsMode mode);
+    virtual void setCtrlsMode(CtrlsMode mode);
 
     void constrainStartCtrlMinFrame(int minFrame);
     void constrainEndCtrlMaxFrame(int maxFrame);

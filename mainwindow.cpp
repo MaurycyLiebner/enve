@@ -53,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     mTopBottomDock = new QDockWidget(this);
     mAnimationDockWidget = new AnimationDockWidget(this);
+    mAnimationDockWidget->getAnimationWidget()->setBoxesList(mBoxListWidget);
+    mBoxListWidget->setAnimationWidget(mAnimationDockWidget->getAnimationWidget());
     mTopBottomDock->setWidget(mAnimationDockWidget);
 
     mTopBottomDock->setFeatures(0);

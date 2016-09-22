@@ -44,12 +44,6 @@ ComplexKey *ComplexAnimator::getKeyCollectionAtFrame(int frame) {
     return (ComplexKey *) getKeyAtFrame(frame);
 }
 
-void ComplexAnimator::updateMinAndMaxMove(QrealKey *key) {
-    QrealAnimator::updateMinAndMaxMove(key);
-    mMinMoveValue = mMinMoveFrame;
-    mMaxMoveValue = mMaxMoveFrame;
-}
-
 void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
 {
     mChildAnimators << childAnimator;
@@ -376,6 +370,15 @@ void ComplexKey::deleteKey()
     QList<QrealKey*> keys = mKeys;
     foreach(QrealKey *key, keys) {
         key->deleteKey();
+    }
+}
+
+void ComplexKey::setCtrlsMode(CtrlsMode mode)
+{
+    QrealKey::setCtrlsMode(mode);
+
+    foreach(QrealKey *key, mKeys) {
+        key->setCtrlsMode(mode);
     }
 }
 

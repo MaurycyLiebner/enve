@@ -23,8 +23,6 @@ public:
                      qreal pixelsPerFrame, qreal pixelsPerValue,
                      int startFrame, int endFrame, bool detailedView);
     qreal clampValue(qreal value);
-    void updateMinAndMaxMove(QrealKey *key);
-
     void addChildAnimator(QrealAnimator *childAnimator);
     void removeChildAnimator(QrealAnimator *removeAnimator);
     void startTransform();
@@ -76,6 +74,8 @@ public:
     void addOrMergeKey(QrealKey *keyAdd);
 
     void deleteKey();
+
+    void setCtrlsMode(CtrlsMode mode);
 
     void removeAnimatorKey(QrealKey *key);
 
