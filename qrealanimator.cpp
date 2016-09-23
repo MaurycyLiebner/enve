@@ -468,20 +468,33 @@ void QrealAnimator::getMinAndMaxValuesBetweenFrames(
         qreal *minValP, qreal *maxValP) {
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
-    foreach(QrealKey *key, mKeys) {
-        int keyFrame = key->getFrame();
-        if(keyFrame > endFrame || keyFrame < startFrame) continue;
-        qreal keyVal = key->getValue();
-        qreal startVal = key->getStartValue();
-        qreal endVal = key->getEndValue();
-        qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
-        qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
-        if(maxKeyVal > maxVal) maxVal = maxKeyVal;
-        if(minKeyVal < minVal) minVal = minKeyVal;
+    if(mKeys.isEmpty()) {
+        *minValP = mCurrentValue;
+        *maxValP = mCurrentValue;
+    } else {
+        bool first = true;
+        foreach(QrealKey *key, mKeys) {
+            int keyFrame = key->getFrame();
+            if(keyFrame > endFrame || keyFrame < startFrame) continue;
+            if(first) first = false;
+            qreal keyVal = key->getValue();
+            qreal startVal = key->getStartValue();
+            qreal endVal = key->getEndValue();
+            qreal maxKeyVal = qMax(qMax(startVal, endVal), keyVal);
+            qreal minKeyVal = qMin(qMin(startVal, endVal), keyVal);
+            if(maxKeyVal > maxVal) maxVal = maxKeyVal;
+            if(minKeyVal < minVal) minVal = minKeyVal;
+        }
+        if(first) {
+            int midFrame = (startFrame + endFrame)/2;
+            qreal value = getValueAtFrame(midFrame);
+            *minValP = value;
+            *maxValP = value;
+        } else {
+            *minValP = minVal;
+            *maxValP = maxVal;
+        }
     }
-
-    *minValP = minVal;
-    *maxValP = maxVal;
 }
 
 void QrealAnimator::updateDrawPathIfNeeded(qreal height, qreal margin,

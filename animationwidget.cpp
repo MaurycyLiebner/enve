@@ -169,7 +169,8 @@ void AnimationWidget::setScale(qreal scale) {
 
 void AnimationWidget::updateDimensions() {
     if(mAnimator == NULL) return;
-    mAnimator->getMinAndMaxValues(&mMinVal, &mMaxVal);
+    mAnimator->getMinAndMaxValuesBetweenFrames(mStartFrame, mEndFrame,
+                                               &mMinVal, &mMaxVal);
     if(qAbs(mMinVal - mMaxVal) < 0.1 ) {
         mMinVal -= 0.05;
         mMaxVal += 0.05;
@@ -545,6 +546,11 @@ void AnimationWidget::setAnimator(QrealAnimator *animator)
 {
     clearKeysSelection();
     mAnimator = animator;
+    qreal minVal;
+    qreal maxVal;
+    mAnimator->getMinAndMaxValuesBetweenFrames(mStartFrame, mEndFrame,
+                                               &minVal, &maxVal);
+    setMinShownVal(minVal);
     setScale(1.);
     repaintWithBoxesList();
 }

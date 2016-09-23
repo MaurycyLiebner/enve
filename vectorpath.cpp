@@ -13,6 +13,7 @@ VectorPath::VectorPath(BoxesGroup *group) :
 {
     addActiveAnimator(&mPathAnimator);
     mAnimatorsCollection.addAnimator(&mPathAnimator);
+    mPathAnimator.setConnectedToMainWindow(this);
 
     mFillGradientPoints.initialize(this);
     mStrokeGradientPoints.initialize(this);
@@ -24,6 +25,7 @@ VectorPath::VectorPath(int boundingBoxId,
                 parent, TYPE_VECTOR_PATH) {
     addActiveAnimator(&mPathAnimator);
     mAnimatorsCollection.addAnimator(&mPathAnimator);
+    mPathAnimator.setConnectedToMainWindow(this);
 
     QSqlQuery query;
     QString queryStr = "SELECT * FROM vectorpath WHERE boundingboxid = " +

@@ -77,6 +77,10 @@ public:
 
     void setCtrlsMode(CtrlsMode mode);
 
+    void setEndEnabled(bool bT);
+
+    void setStartEnabled(bool bT);
+
     void removeAnimatorKey(QrealKey *key);
 
     bool isEmpty();

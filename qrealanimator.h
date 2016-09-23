@@ -60,6 +60,8 @@ public:
     void removeKeyFromSelection(QrealKey *key);
     void setViewedFramesRange(int minF, int maxF);
     void getMinAndMaxValues(qreal *minValP, qreal *maxValP);
+    void getMinAndMaxValuesBetweenFrames(int startFrame, int endFrame,
+                                         qreal *minValP, qreal *maxValP);
     void setMinShownVal(qreal newMinShownVal);
     void incMinShownVal(qreal inc);
     QrealPoint *getPointAt(qreal value, qreal frame,
@@ -144,7 +146,8 @@ public:
 
     virtual bool isDescendantRecording() { return mIsRecording; }
     virtual QString getValueText();
-    void getMinAndMaxMoveFrame(QrealKey *key, QrealPoint *currentPoint, qreal *minMoveFrame, qreal *maxMoveFrame);
+    void getMinAndMaxMoveFrame(QrealKey *key, QrealPoint *currentPoint,
+                               qreal *minMoveFrame, qreal *maxMoveFrame);
     void drawKeysPath(QPainter *p,
                       qreal height, qreal margin,
                       qreal startFrame, qreal minShownVal,
@@ -179,8 +182,6 @@ protected:
     QPainterPath mKeysDrawPath;
 
     int mCurrentFrame = 0;
-    void getMinAndMaxValuesBetweenFrames(int startFrame, int endFrame,
-                                         qreal *minValP, qreal *maxValP);
 };
 
 #endif // VALUEANIMATORS_H

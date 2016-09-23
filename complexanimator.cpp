@@ -382,6 +382,24 @@ void ComplexKey::setCtrlsMode(CtrlsMode mode)
     }
 }
 
+void ComplexKey::setEndEnabled(bool bT)
+{
+    QrealKey::setEndEnabled(bT);
+
+    foreach(QrealKey *key, mKeys) {
+        key->setEndEnabled(bT);
+    }
+}
+
+void ComplexKey::setStartEnabled(bool bT)
+{
+    QrealKey::setStartEnabled(bT);
+
+    foreach(QrealKey *key, mKeys) {
+        key->setStartEnabled(bT);
+    }
+}
+
 void ComplexKey::removeAnimatorKey(QrealKey *key) {
     if(mKeys.removeOne(key) ) {
         key->setParentKey(NULL);
