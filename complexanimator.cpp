@@ -21,23 +21,9 @@ void ComplexAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
     }
 }
 
-void ComplexAnimator::drawDiagram(QPainter *p,
-                                  qreal pixelsPerFrame, qreal pixelsPerValue,
-                                  int startFrame, int endFrame,
-                                  bool detailedView) {
-//    qreal radius = pixelsPerFrame*0.5;
-//    foreach(KeyCollection *key, mKeys) {
-//        if(key->frame >= startFrame && key->frame <= endFrame) {
-//            p->drawEllipse(
-//                    QPointF((key->frame - startFrame)*pixelsPerFrame, centerY),
-//                    radius, radius);
-//        }
-    //    }
-}
-
 qreal ComplexAnimator::clampValue(qreal value)
 {
-    return clamp(value, mMinMoveValue, mMaxMoveValue);
+    return value;//clamp(value, mMinMoveValue, mMaxMoveValue);
 }
 
 ComplexKey *ComplexAnimator::getKeyCollectionAtFrame(int frame) {
@@ -122,12 +108,15 @@ qreal ComplexAnimator::getBoxesListHeight()
 }
 
 void ComplexAnimator::drawBoxesList(QPainter *p,
-                                      qreal drawX, qreal drawY,
-                                      qreal pixelsPerFrame,
-                                      int startFrame, int endFrame)
+                                    qreal drawX, qreal drawY,
+                                    qreal pixelsPerFrame,
+                                    int startFrame, int endFrame,
+                                    bool animationBar)
 {
     QrealAnimator::drawBoxesList(p, drawX, drawY,
-                                 pixelsPerFrame, startFrame, endFrame);
+                                 pixelsPerFrame,
+                                 startFrame, endFrame,
+                                 animationBar);
     if(mChildAnimatorRecording && !mIsRecording) {
         p->save();
         p->setRenderHint(QPainter::Antialiasing);
@@ -146,7 +135,8 @@ void ComplexAnimator::drawBoxesList(QPainter *p,
         foreach(QrealAnimator *animator, mChildAnimators) {
             animator->drawBoxesList(p, drawX, drawY,
                                     pixelsPerFrame,
-                                    startFrame, endFrame);
+                                    startFrame, endFrame,
+                                    animationBar);
             drawY += animator->getBoxesListHeight();
         }
     } else {
@@ -198,10 +188,11 @@ void ComplexAnimator::getKeysInRect(QRectF selectionRect,
     }
 }
 
-void ComplexAnimator::handleListItemMousePress(qreal relX, qreal relY)
+void ComplexAnimator::handleListItemMousePress(qreal relX, qreal relY,
+                                               QMouseEvent *event)
 {
     if(relY < LIST_ITEM_HEIGHT) {
-        QrealAnimator::handleListItemMousePress(relX, relY);
+        QrealAnimator::handleListItemMousePress(relX, relY, event);
     } else {
         relY -= LIST_ITEM_HEIGHT;
         foreach(QrealAnimator *animator, mChildAnimators) {
@@ -209,7 +200,7 @@ void ComplexAnimator::handleListItemMousePress(qreal relX, qreal relY)
             if(heightT > relY) {
                 animator->handleListItemMousePress(
                             relX - LIST_ITEM_CHILD_INDENT,
-                            relY);
+                            relY, event);
                 break;
             }
             relY -= heightT;

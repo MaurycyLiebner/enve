@@ -51,16 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
-    mTopBottomDock = new QDockWidget(this);
-    mAnimationDockWidget = new AnimationDockWidget(this);
-    mAnimationDockWidget->getAnimationWidget()->setBoxesList(mBoxListWidget);
-    mBoxListWidget->setAnimationWidget(mAnimationDockWidget->getAnimationWidget());
-    mTopBottomDock->setWidget(mAnimationDockWidget);
-
-    mTopBottomDock->setFeatures(0);
-    mTopBottomDock->setTitleBarWidget(new QWidget());
-    addDockWidget(Qt::BottomDockWidgetArea, mTopBottomDock);
-
 
     mToolBar = new QToolBar(this);
     mActionConnectPoints = new QAction(
@@ -222,11 +212,6 @@ void MainWindow::schedulePivotUpdate()
     mCanvas->schedulePivotUpdate();
 }
 
-AnimationDockWidget *MainWindow::getAnimationDockWidget()
-{
-    return mAnimationDockWidget;
-}
-
 BoxesList *MainWindow::getBoxesList()
 {
     return mBoxesListAnimationDockWidget->getBoxesList();
@@ -359,8 +344,6 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
         openFile();
     } else if(mCanvas->processFilteredKeyEvent(event) ) {
-    } else if(mAnimationDockWidget->getAnimationWidget()->
-              processFilteredKeyEvent(event) ) {
     } else if(mBoxesListAnimationDockWidget->processFilteredKeyEvent(event) ) {
     } else {
         returnBool = false;

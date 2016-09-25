@@ -4,7 +4,6 @@
 #include <QResizeEvent>
 #include "mainwindow.h"
 #include "qrealkey.h"
-#include "animationwidget.h"
 
 QPixmap *BoxesList::VISIBLE_PIXMAP;
 QPixmap *BoxesList::INVISIBLE_PIXMAP;
@@ -61,9 +60,15 @@ void BoxesList::paintEvent(QPaintEvent *)
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, mViewedRect.height()) );
     }
 
+    qreal boxLineWidth;
+    if(mAnimator == NULL) {
+        boxLineWidth = width();
+    } else {
+        boxLineWidth = LIST_ITEM_MAX_WIDTH;
+    }
     p.setPen(QPen(QColor(125, 125, 125), 1.));
     for(int i = LIST_ITEM_HEIGHT; i < height(); i += LIST_ITEM_HEIGHT) {
-        p.drawLine(QPointF(0, i), QPointF(width(), i) );
+        p.drawLine(QPointF(0, i), QPointF(boxLineWidth, i) );
     }
 
     if(mMainWindow->getCurrentFrame() <= mMaxViewedFrame &&
@@ -80,12 +85,21 @@ void BoxesList::paintEvent(QPaintEvent *)
                                    0., -mViewedRect.top(),
                                    mViewedRect.bottom(),
                                    mPixelsPerFrame,
-                                   mMinViewedFrame, mMaxViewedFrame);
+                                   mMinViewedFrame, mMaxViewedFrame,
+                                   mAnimator == NULL);
+    if(mAnimator == NULL) {
+        if(mSelecting) {
+            p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
+            p.setBrush(Qt::NoBrush);
+            p.drawRect(mSelectionRect);
+        }
+    } else {
+        p.save();
 
-    if(mSelectingKeys) {
-        p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
-        p.setBrush(Qt::NoBrush);
-        p.drawRect(mSelectionRect);
+        p.translate(LIST_ITEM_MAX_WIDTH, 0.);
+        graphPaint(&p);
+
+        p.restore();
     }
 
     if(hasFocus() ) {
@@ -109,33 +123,25 @@ void BoxesList::deleteSelectedKeys()
 
 bool BoxesList::processFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
-    if(event->key() == Qt::Key_Delete) {
-        deleteSelectedKeys();
-        repaintWidthAnimationWidget();
-    } else if(event->key() == Qt::Key_Right) {
-        foreach(QrealKey *key, mSelectedKeys) {
-            key->incFrameAndUpdateParentAnimator(1);
+    if(mAnimator == NULL) {
+        if(event->key() == Qt::Key_Delete) {
+            deleteSelectedKeys();
+            repaint();
+        } else if(event->key() == Qt::Key_Right) {
+            foreach(QrealKey *key, mSelectedKeys) {
+                key->incFrameAndUpdateParentAnimator(1);
+            }
+        } else if(event->key() == Qt::Key_Left) {
+            foreach(QrealKey *key, mSelectedKeys) {
+                key->incFrameAndUpdateParentAnimator(-1);
+            }
+        } else {
+            return false;
         }
-    } else if(event->key() == Qt::Key_Left) {
-        foreach(QrealKey *key, mSelectedKeys) {
-            key->incFrameAndUpdateParentAnimator(-1);
-        }
+        return true;
     } else {
-        return false;
+        return graphProcessFilteredKeyEvent(event);
     }
-    return true;
-}
-
-void BoxesList::setAnimationWidget(AnimationWidget *animationWidget)
-{
-    mAnimationWidget = animationWidget;
-}
-
-void BoxesList::repaintWidthAnimationWidget()
-{
-    repaint();
-    if(mAnimationWidget == NULL) return;
-    mAnimationWidget->repaint();
 }
 
 
@@ -143,34 +149,45 @@ void BoxesList::resizeEvent(QResizeEvent *e)
 {
     mViewedRect.setSize(e->size());
     updatePixelsPerFrame();
+    mGraphRect = QRectF(0., 0.,
+                e->size().width() - LIST_ITEM_MAX_WIDTH, e->size().height());
+    if(mAnimator != NULL) {
+        graphResizeEvent(e);
+    }
 }
 
 void BoxesList::wheelEvent(QWheelEvent *event)
 {
-    if(event->delta() > 0) {
-        mViewedRect.translate(0, -LIST_ITEM_HEIGHT);
-        if(mViewedRect.top() < 0) {
-            mViewedRect.translate(0, -mViewedRect.top());
+    if(mAnimator == NULL) {
+        if(event->delta() > 0) {
+            mViewedRect.translate(0, -LIST_ITEM_HEIGHT);
+            if(mViewedRect.top() < 0) {
+                mViewedRect.translate(0, -mViewedRect.top());
+            }
+        } else {
+            mViewedRect.translate(0, LIST_ITEM_HEIGHT);
         }
     } else {
-        mViewedRect.translate(0, LIST_ITEM_HEIGHT);
+        graphWheelEvent(event);
     }
-    repaintWidthAnimationWidget();
+    repaint();
 }
+
 void BoxesList::mousePressEvent(QMouseEvent *event)
 {
-    mFirstMove = true;
-    mLastPressPos = event->pos();
     if(event->x() < LIST_ITEM_MAX_WIDTH) {
         mCanvas->handleChildListItemMousePress(event->x(),
                                                event->y() + mViewedRect.top(),
-                                               0.f);
-    } else {
+                                               0.f, event);
+    } else if(mAnimator == NULL) {
+        mFirstMove = true;
+        mLastPressPos = event->pos();
+
         mLastPressedKey = mCanvas->getKeyAtPos(event->x() - LIST_ITEM_MAX_WIDTH,
                                                 event->y() + mViewedRect.top(),
                                                 0.);
         if(mLastPressedKey == NULL) {
-            mSelectingKeys = true;
+            mSelecting = true;
             mSelectionRect.setTopLeft(event->pos() );
             mSelectionRect.setBottomRight(event->pos() );
         }
@@ -186,6 +203,9 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
                 mMovingKeys = true;
             }
         }
+    } else {
+        graphMousePressEvent(event->pos() - QPoint(LIST_ITEM_MAX_WIDTH, 0.),
+                             event->button());
     }
 
     scheduleRepaint();
@@ -194,17 +214,22 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
 
 void BoxesList::mouseMoveEvent(QMouseEvent *event)
 {
-    mFirstMove = false;
-    if(mMovingKeys) {
-        int dFrame = qRound( (event->x() - mLastPressPos.x())/mPixelsPerFrame );
-        int dDFrame = dFrame - mMoveDFrame;
-        if(dDFrame == 0) return;
-        mMoveDFrame = dFrame;
-        foreach(QrealKey *key, mSelectedKeys) {
-            key->incFrameAndUpdateParentAnimator(dDFrame);
+    if(mAnimator == NULL) {
+        mFirstMove = false;
+        if(mMovingKeys) {
+            int dFrame = qRound( (event->x() - mLastPressPos.x())/mPixelsPerFrame );
+            int dDFrame = dFrame - mMoveDFrame;
+            if(dDFrame == 0) return;
+            mMoveDFrame = dFrame;
+            foreach(QrealKey *key, mSelectedKeys) {
+                key->incFrameAndUpdateParentAnimator(dDFrame);
+            }
+        } else if(mSelecting) {
+            mSelectionRect.setBottomRight(event->pos() );
         }
-    } else if(mSelectingKeys) {
-        mSelectionRect.setBottomRight(event->pos() );
+    } else {
+        graphMouseMoveEvent(event->pos() - QPoint(LIST_ITEM_MAX_WIDTH, 0.),
+                            event->buttons());
     }
 
     scheduleRepaint();
@@ -220,56 +245,60 @@ void BoxesList::selectKeysInSelectionRect() {
     }
 }
 
-void BoxesList::mouseReleaseEvent(QMouseEvent *)
+void BoxesList::mouseReleaseEvent(QMouseEvent *e)
 {
-    if(mSelectingKeys) {
-        if(mFirstMove) {
-            if(!isShiftPressed() ) {
-                clearKeySelection();
-            }
-        } else {
-            if(mSelectionRect.left() > mSelectionRect.right()) {
-                qreal rightT = mSelectionRect.right();
-                qreal leftT = mSelectionRect.left();
-                mSelectionRect.setLeft(rightT);
-                mSelectionRect.setRight(leftT);
-            }
-            if(mSelectionRect.top() > mSelectionRect.bottom()) {
-                qreal bottomT = mSelectionRect.bottom();
-                qreal topT = mSelectionRect.top();
-                mSelectionRect.setTop(bottomT);
-                mSelectionRect.setBottom(topT);
-            }
-            if(!isShiftPressed()) {
-                clearKeySelection();
-            }
-            selectKeysInSelectionRect();
-        }
-        mSelectingKeys = false;
-    } else if(mMovingKeys) {
-        if(mFirstMove) {
-            if(isShiftPressed()) {
-                if(mLastPressedKey->isSelected() ) {
-                    removeKeyFromSelection(mLastPressedKey);
-                } else {
-                    addKeyToSelection(mLastPressedKey);
+    if(mAnimator == NULL) {
+        if(mSelecting) {
+            if(mFirstMove) {
+                if(!isShiftPressed() ) {
+                    clearKeySelection();
                 }
             } else {
-                clearKeySelection();
-                addKeyToSelection(mLastPressedKey);
+                if(mSelectionRect.left() > mSelectionRect.right()) {
+                    qreal rightT = mSelectionRect.right();
+                    qreal leftT = mSelectionRect.left();
+                    mSelectionRect.setLeft(rightT);
+                    mSelectionRect.setRight(leftT);
+                }
+                if(mSelectionRect.top() > mSelectionRect.bottom()) {
+                    qreal bottomT = mSelectionRect.bottom();
+                    qreal topT = mSelectionRect.top();
+                    mSelectionRect.setTop(bottomT);
+                    mSelectionRect.setBottom(topT);
+                }
+                if(!isShiftPressed()) {
+                    clearKeySelection();
+                }
+                selectKeysInSelectionRect();
             }
-        }
-        QList<QrealAnimator*> parentAnimators;
-        foreach(QrealKey *key, mSelectedKeys) {
-            if(parentAnimators.contains(key->getParentAnimator()) ) continue;
-            parentAnimators << key->getParentAnimator();
-        }
-        foreach(QrealAnimator *animator, parentAnimators) {
-            animator->mergeKeysIfNeeded();
-        }
+            mSelecting = false;
+        } else if(mMovingKeys) {
+            if(mFirstMove) {
+                if(isShiftPressed()) {
+                    if(mLastPressedKey->isSelected() ) {
+                        removeKeyFromSelection(mLastPressedKey);
+                    } else {
+                        addKeyToSelection(mLastPressedKey);
+                    }
+                } else {
+                    clearKeySelection();
+                    addKeyToSelection(mLastPressedKey);
+                }
+            }
+            QList<QrealAnimator*> parentAnimators;
+            foreach(QrealKey *key, mSelectedKeys) {
+                if(parentAnimators.contains(key->getParentAnimator()) ) continue;
+                parentAnimators << key->getParentAnimator();
+            }
+            foreach(QrealAnimator *animator, parentAnimators) {
+                animator->mergeKeysIfNeeded();
+            }
 
-        mMoveDFrame = 0;
-        mMovingKeys = false;
+            mMoveDFrame = 0;
+            mMovingKeys = false;
+        }
+    } else {
+        graphMouseReleaseEvent(e->button());
     }
 
     scheduleRepaint();
@@ -281,12 +310,15 @@ void BoxesList::setFramesRange(int startFrame, int endFrame)
     mMinViewedFrame = startFrame;
     mMaxViewedFrame = endFrame;
     updatePixelsPerFrame();
-    repaintWidthAnimationWidget();
+    if(mAnimator != NULL) {
+        graphUpdateDimensions();
+    }
+    repaint();
 }
 
 void BoxesList::repaintIfNeeded() {
     if(mRepaintScheduled) {
-        repaintWidthAnimationWidget();
+        repaint();
         mRepaintScheduled = false;
     }
 }

@@ -48,7 +48,6 @@ SOURCES += main.cpp\
     bone.cpp \
     qrealanimator.cpp \
     qpointfanimator.cpp \
-    animationwidget.cpp \
     animatonwidgetscrollbar.cpp \
     animationdockwidget.cpp \
     qrealpointvaluedialog.cpp \
@@ -64,7 +63,8 @@ SOURCES += main.cpp\
     coloranimator.cpp \
     pathanimator.cpp \
     animatorscollection.cpp \
-    smartpointertarget.cpp
+    smartpointertarget.cpp \
+    graphboxeslist.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -100,7 +100,6 @@ HEADERS  += mainwindow.h \
     bone.h \
     qrealanimator.h \
     qpointfanimator.h \
-    animationwidget.h \
     animatonwidgetscrollbar.h \
     animationdockwidget.h \
     qrealpointvaluedialog.h \

@@ -1,6 +1,7 @@
 #include "boxeslistanimationdockwidget.h"
 #include "mainwindow.h"
 #include <QKeyEvent>
+#include "animationdockwidget.h"
 
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     QWidget(parent)
@@ -26,11 +27,18 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int,int)) );
 
+
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                              QSizePolicy::Maximum);
     mBoxesList = new BoxesList(parent, this);
+    connect(mBoxesList, SIGNAL(changedViewedFrames(int,int)),
+            mFrameRangeScrollbar, SLOT(setViewedFramesRange(int, int)) );
+    connect(mBoxesList, SIGNAL(changedViewedFrames(int,int)),
+            mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int, int)) );
     connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             mBoxesList, SLOT(setFramesRange(int,int)) );
+    AnimationDockWidget *animationDockWidget =
+            new AnimationDockWidget(parent, mBoxesList);
 
     mControlsLayout = new QHBoxLayout();
     mControlsLayout->setAlignment(Qt::AlignLeft);
@@ -98,6 +106,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlsLayout->addWidget(mAnimationWidgetScrollbar);
 
     mMainLayout->addLayout(mControlsLayout);
+    mMainLayout->addWidget(animationDockWidget);
     mMainLayout->addWidget(mBoxesList);
     mMainLayout->addWidget(mFrameRangeScrollbar);
 

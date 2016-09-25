@@ -4,6 +4,7 @@
 #include <QList>
 #include <QPainterPath>
 #include <QPainter>
+#include <QMouseEvent>
 #include "qrealkey.h"
 #include "connectedtomainwindow.h"
 #include "animatorupdater.h"
@@ -26,7 +27,6 @@ public:
     qreal getCurrentValue();
     void setCurrentValue(qreal newValue);
     void updateValueFromCurrentFrame();
-    QrealKey *addNewKeyAtFrame(int frame);
     void saveCurrentValueToKey(QrealKey *key);
     void saveValueToKey(QrealKey *key, qreal value);
 
@@ -136,9 +136,10 @@ public:
     virtual void drawBoxesList(QPainter *p,
                                qreal drawX, qreal drawY,
                                qreal pixelsPerFrame,
-                               int startFrame, int endFrame);
+                               int startFrame, int endFrame, bool animationBar);
 
-    virtual void handleListItemMousePress(qreal relX, qreal relY);
+    virtual void handleListItemMousePress(qreal relX, qreal relY,
+                                          QMouseEvent *event);
 
     virtual void setRecording(bool rec);
     bool isRecording();
@@ -155,7 +156,10 @@ public:
     void setDrawPathUpdateNeeded();
     void addKeysInRectToList(QRectF frameValueRect,
                              QList<QrealKey*> *keys);
+
+    void setIsCurrentAnimator(bool bT);
 protected:
+    bool mIsCurrentAnimator = false;
     bool mDrawPathUpdateNeeded = false;
 
     qreal mMaxPossibleVal = DBL_MAX;

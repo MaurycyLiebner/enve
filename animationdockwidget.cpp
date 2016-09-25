@@ -1,23 +1,18 @@
 #include "animationdockwidget.h"
 #include <QStyleOption>
 #include "mainwindow.h"
+#include "boxeslist.h"
 
-AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
+AnimationDockWidget::AnimationDockWidget(MainWindow *parent,
+                                         BoxesList *boxesList) :
+    QWidget(parent)
 {
-    mMainLayout = new QVBoxLayout(this);
-    mMainLayout->setMargin(0);
-    mMainLayout->setSpacing(0);
-
-    mScrollBar = new AnimatonWidgetScrollBar(50, 200,
-                                             10, 30,
-                                             true,
-                                             false, this);
-
-    mAnimationWidget = new AnimationWidget(this, parent);
-
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
     setStyleSheet(".AnimationDockWidget .QPushButton { background-color: black }");
 
     mButtonsLayout = new QHBoxLayout();
+    mButtonsLayout->setMargin(0);
+    mButtonsLayout->setSpacing(0);
 
     mSymmetricButton = new QPushButton(
                 QIcon("pixmaps/icons/ink_node_symmetric_white.png"),
@@ -25,7 +20,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
 //    mSymmetricButton->setSizePolicy(QSizePolicy::Maximum,
 //                                    QSizePolicy::Maximum);
     connect(mSymmetricButton, SIGNAL(pressed()),
-            mAnimationWidget, SLOT(setSymmetricCtrl()) );
+            boxesList, SLOT(graphSetSymmetricCtrl()) );
 
     mSmoothButton = new QPushButton(
                 QIcon("pixmaps/icons/ink_node_smooth_white.png"),
@@ -33,7 +28,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
 //    mSmoothButton->setSizePolicy(QSizePolicy::Maximum,
 //                                 QSizePolicy::Maximum);
     connect(mSmoothButton, SIGNAL(pressed()),
-            mAnimationWidget, SLOT(setSmoothCtrl()) );
+            boxesList, SLOT(graphSetSmoothCtrl()) );
 
     mCornerButton = new QPushButton(
                 QIcon("pixmaps/icons/ink_node_cusp_white.png"),
@@ -41,7 +36,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
 //    mCornerButton->setSizePolicy(QSizePolicy::Maximum,
 //                                 QSizePolicy::Maximum);
     connect(mCornerButton, SIGNAL(pressed()),
-            mAnimationWidget, SLOT(setCornerCtrl()) );
+            boxesList, SLOT(graphSetCornerCtrl()) );
 
     mTwoSideCtrlButton = new QPushButton(
                 QIcon("pixmaps/icons/two_side_ctrl_white.png"),
@@ -49,7 +44,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
 //    mTwoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                     QSizePolicy::Maximum);
     connect(mTwoSideCtrlButton, SIGNAL(pressed()),
-            mAnimationWidget, SLOT(setTwoSideCtrlForSelected()) );
+            boxesList, SLOT(graphSetTwoSideCtrlForSelected()) );
 
     mLeftSideCtrlButton = new QPushButton(
                 QIcon("pixmaps/icons/left_side_ctrl_white.png"),
@@ -57,7 +52,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
 //    mLeftSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                       QSizePolicy::Maximum);
     connect(mLeftSideCtrlButton, SIGNAL(pressed()),
-            mAnimationWidget, SLOT(setLeftSideCtrlForSelected()) );
+            boxesList, SLOT(graphSetLeftSideCtrlForSelected()) );
 
     mRightSideCtrlButton = new QPushButton(
                 QIcon("pixmaps/icons/right_side_ctrl_white.png"),
@@ -65,7 +60,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
 //    mRightSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                        QSizePolicy::Maximum);
     connect(mRightSideCtrlButton, SIGNAL(pressed()),
-            mAnimationWidget, SLOT(setRightSideCtrlForSelected()) );
+            boxesList, SLOT(graphSetRightSideCtrlForSelected()) );
 
     mNoSideCtrlButton = new QPushButton(
                 QIcon("pixmaps/icons/no_side_ctrl_white.png"),
@@ -73,7 +68,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
 //    mNoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                     QSizePolicy::Maximum);
     connect(mNoSideCtrlButton, SIGNAL(pressed()),
-            mAnimationWidget, SLOT(setNoSideCtrlForSelected()) );
+            boxesList, SLOT(graphSetNoSideCtrlForSelected()) );
 
     mButtonsLayout->addWidget(mSymmetricButton);
     mButtonsLayout->addWidget(mSmoothButton);
@@ -83,23 +78,7 @@ AnimationDockWidget::AnimationDockWidget(MainWindow *parent) : QWidget(parent)
     mButtonsLayout->addWidget(mRightSideCtrlButton);
     mButtonsLayout->addWidget(mNoSideCtrlButton);
 
-    mMainLayout->addWidget(mScrollBar);
-    mMainLayout->addLayout(mButtonsLayout);
-    mMainLayout->addWidget(mAnimationWidget);
-
-    connect(mScrollBar, SIGNAL(viewedFramesChanged(int,int)),
-            mAnimationWidget, SLOT(setViewedFramesRange(int,int)) );
-    connect(mAnimationWidget, SIGNAL(changedViewedFrames(int,int)),
-            mScrollBar, SLOT(setViewedFramesRange(int, int)) );
-
-    mScrollBar->emitChange();
-
-    setLayout(mMainLayout);
-}
-
-AnimationWidget *AnimationDockWidget::getAnimationWidget()
-{
-    return mAnimationWidget;
+    setLayout(mButtonsLayout);
 }
 
 void AnimationDockWidget::paintEvent(QPaintEvent *)

@@ -29,8 +29,6 @@ private:
     QDockWidget *mBottomDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
     BoxesList *mBoxListWidget;
-    QDockWidget *mTopBottomDock;
-    AnimationDockWidget *mAnimationDockWidget;
 
     QToolBar *mToolBar;
     QAction *mActionConnectPoints;

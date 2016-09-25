@@ -1,62 +1,47 @@
-#include "animationwidget.h"
 #include <QPainter>
 #include <QMouseEvent>
 #include "mainwindow.h"
 #include "qrealpointvaluedialog.h"
 #include "boxeslist.h"
 
-AnimationWidget::AnimationWidget(QWidget *parent, MainWindow *window) :
-    QWidget(parent)
-{
-    mMainWindow = window;
-    setFocusPolicy(Qt::StrongFocus);
-    setMinimumSize(200, 200);
-}
-
-void AnimationWidget::setSmoothCtrl()
+void BoxesList::graphSetSmoothCtrl()
 {
     if(mAnimator == NULL) return;
-    setTwoSideCtrlForSelected();
-    setCtrlsModeForSelected(CTRLS_SMOOTH);
-    repaintWithBoxesList();
+    graphSetTwoSideCtrlForSelected();
+    graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
+    graphRepaint();
 }
 
-void AnimationWidget::setSymmetricCtrl()
+void BoxesList::graphSetSymmetricCtrl()
 {
     if(mAnimator == NULL) return;
-    setTwoSideCtrlForSelected();
-    setCtrlsModeForSelected(CTRLS_SYMMETRIC);
-    repaintWithBoxesList();
+    graphSetTwoSideCtrlForSelected();
+    graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
+    graphRepaint();
 }
 
-void AnimationWidget::setCornerCtrl()
+void BoxesList::graphSetCornerCtrl()
 {
     if(mAnimator == NULL) return;
-    setTwoSideCtrlForSelected();
-    setCtrlsModeForSelected(CTRLS_CORNER);
-    repaintWithBoxesList();
+    graphSetTwoSideCtrlForSelected();
+    graphSetCtrlsModeForSelected(CTRLS_CORNER);
+    graphRepaint();
 }
 
-void AnimationWidget::paintEvent(QPaintEvent *)
+void BoxesList::graphPaint(QPainter *p)
 {
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
+    p->setRenderHint(QPainter::Antialiasing);
 
+    p->setBrush(Qt::NoBrush);
 
-    p.fillRect(rect(), QColor(150, 150, 150));
-    p.setBrush(Qt::NoBrush);
-
-    p.fillRect(0, 0, width(), 20, Qt::white);
-    p.fillRect(0, 0, 40, height(), Qt::white);
-
-    qreal maxX = width();
+    /*qreal maxX = mGraphRect.width();
     int currAlpha = 75;
     qreal lineWidth = 1.;
     QList<int> incFrameList = { 1, 5, 10, 100 };
     foreach(int incFrame, incFrameList) {
         if(mPixelsPerFrame*incFrame < 15.) continue;
         bool drawText = mPixelsPerFrame*incFrame > 30.;
-        p.setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
+        p->setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
         int frameL = (mStartFrame >= 0) ? -(mStartFrame%incFrame) :
                                         -mStartFrame;
         int currFrame = mStartFrame + frameL;
@@ -68,10 +53,10 @@ void AnimationWidget::paintEvent(QPaintEvent *)
         }
         while(xL < maxX) {
             if(drawText) {
-                p.drawText(QRectF(xL - inc, 0, 2*inc, 20),
+                p->drawText(QRectF(xL - inc, 0, 2*inc, 20),
                             Qt::AlignCenter, QString::number(currFrame));
             }
-            p.drawLine(xL, 20, xL, height());
+            p->drawLine(xL, 20, xL, mGraphRect.height());
             xL += inc;
             currFrame += incFrame;
         }
@@ -79,144 +64,127 @@ void AnimationWidget::paintEvent(QPaintEvent *)
         lineWidth *= 1.5;
     }
 
-    p.setPen(QPen(Qt::green, 2.f));
+    p->setPen(QPen(Qt::green, 2.f));
     qreal xL = (mCurrentFrame - mStartFrame)*mPixelsPerFrame;
-    /*p.drawText(QRectF(xL - 20, 0, 40, 20),
-                Qt::AlignCenter, QString::number(mCurrentFrame));*/
-    p.drawLine(xL, 20, xL, height());
+    //p->drawText(QRectF(xL - 20, 0, 40, 20),
+    //            Qt::AlignCenter, QString::number(mCurrentFrame));
+    p->drawLine(xL, 20, xL, mGraphRect.height());*/
 
 
-    if(mAnimator != NULL) {
-        lineWidth = 2.;
-        qreal incValue = 1000.;
-        bool by2 = true;
-        currAlpha = 255;
-        while(mPixelsPerValUnit*incValue > 50.) {
-            qreal yL = height() +
-                    fmod(mMinShownVal, incValue)*mPixelsPerValUnit - mMargin;
-            qreal incY = incValue*mPixelsPerValUnit;
-            if( yL > 20 && (yL < height() || yL - incY > 20) ) {
-                p.setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
-                qreal currValue = mMinShownVal - fmod(mMinShownVal, incValue);
-                while(yL > 20) {
-                    p.drawText(QRectF(0, yL - incY, 40, 2*incY),
-                                Qt::AlignCenter, QString::number(currValue));
-                    p.drawLine(40, yL, width(), yL);
-                    yL -= incY;
-                    currValue += incValue;
-                }
-                currAlpha *= 0.95;
-                lineWidth *= 0.85;
+    qreal lineWidth = 2.;
+    qreal incValue = 1000.;
+    bool by2 = true;
+    int currAlpha = 255;
+    while(mPixelsPerValUnit*incValue > 50.) {
+        qreal yL = mGraphRect.height() +
+                fmod(mMinShownVal, incValue)*mPixelsPerValUnit - mMargin;
+        qreal incY = incValue*mPixelsPerValUnit;
+        if( yL > 20 && (yL < mGraphRect.height() || yL - incY > 20) ) {
+            p->setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
+            qreal currValue = mMinShownVal - fmod(mMinShownVal, incValue);
+            while(yL > 20) {
+                p->drawText(QRectF(0, yL - incY, 40, 2*incY),
+                            Qt::AlignCenter, QString::number(currValue));
+                p->drawLine(40, yL, mGraphRect.width(), yL);
+                yL -= incY;
+                currValue += incValue;
             }
-            if(by2) {
-                incValue /= 2;
-            } else {
-                incValue /= 5;
-            }
-            by2 = !by2;
+            currAlpha *= 0.95;
+            lineWidth *= 0.85;
         }
-
-        p.save();
-        p.setClipRect(40, 20, width() - 20, height() - 20);
-
-        mAnimator->drawKeysPath(&p,
-                                height(), mMargin,
-                                mStartFrame, mMinShownVal,
-                                mPixelsPerFrame, mPixelsPerValUnit);
+        if(by2) {
+            incValue /= 2;
+        } else {
+            incValue /= 5;
+        }
+        by2 = !by2;
     }
+
+    p->save();
+    p->setClipRect(0, 0, mGraphRect.width(), mGraphRect.height());
+
+    mAnimator->drawKeysPath(p,
+                            mGraphRect.height(), mMargin,
+                            mMinViewedFrame, mMinShownVal,
+                            mPixelsPerFrame, mPixelsPerValUnit);
 
     if(mSelecting) {
-        p.setBrush(Qt::NoBrush);
-        p.setPen(QPen(Qt::blue, 2.f, Qt::DotLine));
-        p.drawRect(mSelectionRect);
+        p->setBrush(Qt::NoBrush);
+        p->setPen(QPen(Qt::blue, 2.f, Qt::DotLine));
+        p->drawRect(mSelectionRect);
     }
-    p.restore();
-
-
+    p->restore();
+/*
 
     if(hasFocus() ) {
-        p.setPen(QPen(Qt::red, 4.));
+        p->setPen(QPen(Qt::red, 4.));
     } else {
-        p.setPen(Qt::NoPen);
+        p->setPen(Qt::NoPen);
     }
-    p.setBrush(Qt::NoBrush);
-    p.drawRect(rect());
-    p.end();
+    p->setBrush(Qt::NoBrush);
+    p->drawRect(mGraphRect);
+*/
 }
 
-void AnimationWidget::setViewedFramesRange(int startFrame, int endFrame) {
-    mStartFrame = startFrame;
-    mEndFrame = endFrame;
-    updateDimensions();
-
-    repaintWithBoxesList();
-}
-
-void AnimationWidget::setCurrentFrame(int frame)
-{
-    mCurrentFrame = frame;
-}
-
-void AnimationWidget::incScale(qreal inc) {
+void BoxesList::graphIncScale(qreal inc) {
     qreal newScale = mValueScale + inc;
-    setScale(clamp(newScale, 0.1, 10.));
+    graphSetScale(clamp(newScale, 0.1, 10.));
 }
 
-void AnimationWidget::setScale(qreal scale) {
+void BoxesList::graphSetScale(qreal scale) {
     mValueScale = scale;
-    updateDimensions();
+    graphUpdateDimensions();
 }
 
-void AnimationWidget::updateDimensions() {
+void BoxesList::graphUpdateDimensions() {
     if(mAnimator == NULL) return;
-    mAnimator->getMinAndMaxValuesBetweenFrames(mStartFrame, mEndFrame,
-                                               &mMinVal, &mMaxVal);
+    mAnimator->getMinAndMaxValues(&mMinVal, &mMaxVal);
     if(qAbs(mMinVal - mMaxVal) < 0.1 ) {
         mMinVal -= 0.05;
         mMaxVal += 0.05;
     }
-    mPixelsPerValUnit = mValueScale*(height() - 2*mMargin)/
+    mPixelsPerValUnit = mValueScale*(mGraphRect.height() - 2*mMargin)/
                                 (mMaxVal - mMinVal);
-    incMinShownVal(0.);
-    int dFrame = mEndFrame - mStartFrame;
-    mPixelsPerFrame = width()/dFrame;
+    graphIncMinShownVal(0.);
+    updatePixelsPerFrame();
     mAnimator->setDrawPathUpdateNeeded();
 }
 
-void AnimationWidget::resizeEvent(QResizeEvent *)
+void BoxesList::graphResizeEvent(QResizeEvent *)
 {
-    updateDimensions();
-    updateDrawPath();
+    graphUpdateDimensions();
+    graphUpdateDrawPathIfNeeded();
+}
+
+void BoxesList::graphIncMinShownVal(qreal inc) {
+    graphSetMinShownVal(inc*(mMaxVal - mMinVal) + mMinShownVal);
+    graphSetDrawPathUpdateNeeded();
+}
+
+void BoxesList::graphSetDrawPathUpdateNeeded() {
     if(mAnimator == NULL) return;
-    mAnimator->updateDrawPathIfNeeded(height(), mMargin,
-                                      mStartFrame, mMinShownVal,
-                                      mPixelsPerFrame, mPixelsPerValUnit);
+    mAnimator->setDrawPathUpdateNeeded();
 }
 
-void AnimationWidget::incMinShownVal(qreal inc) {
-    setMinShownVal(inc*(mMaxVal - mMinVal) + mMinShownVal);
-}
-
-void AnimationWidget::setMinShownVal(qreal newMinShownVal) {
-    qreal halfHeightVal = (height() - 2*mMargin)*0.5/mPixelsPerValUnit;
+void BoxesList::graphSetMinShownVal(qreal newMinShownVal) {
+    qreal halfHeightVal = (mGraphRect.height() - 2*mMargin)*0.5/mPixelsPerValUnit;
     mMinShownVal = clamp(newMinShownVal,
                          mMinVal - halfHeightVal,
                          mMaxVal - halfHeightVal);
-    updateDrawPath();
 }
 
-void AnimationWidget::getValueAndFrameFromPos(QPointF pos,
+void BoxesList::graphGetValueAndFrameFromPos(QPointF pos,
                                             qreal *value, qreal *frame) {
-    *value = (height() - pos.y() - mMargin)/mPixelsPerValUnit
+    *value = (mGraphRect.height() - pos.y() - mMargin)/mPixelsPerValUnit
             + mMinShownVal;
-    *frame = mStartFrame + pos.x()/mPixelsPerFrame;
+    *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame - 0.5;
 }
 
-void AnimationWidget::mousePress(QPointF pressPos) {
+void BoxesList::graphMousePress(QPointF pressPos) {
     mFirstMove = true;
     qreal value;
     qreal frame;
-    getValueAndFrameFromPos(pressPos, &value, &frame);
+    graphGetValueAndFrameFromPos(pressPos, &value, &frame);
 
     mCurrentPoint = mAnimator->getPointAt(value, frame,
                                           mPixelsPerFrame, mPixelsPerValUnit);
@@ -225,16 +193,13 @@ void AnimationWidget::mousePress(QPointF pressPos) {
                 mCurrentPoint->getParentKey();
     if(mCurrentPoint == NULL) {
         if(isCtrlPressed() ) {
-            clearKeysSelection();
+            graphClearKeysSelection();
             QrealKey *newKey = new QrealKey(qRound(frame), mAnimator, value);
             mAnimator->appendKey(newKey);
-            addKeyToSelection(newKey);
-            mergeKeysIfNeeded();
             mCurrentPoint = newKey->getEndPoint();
             mAnimator->getMinAndMaxMoveFrame(newKey, mCurrentPoint,
                                              &mMinMoveFrame, &mMaxMoveFrame);
             mCurrentPoint->setSelected(true);
-            mAnimator->updateKeysPath();
         } else {
             mSelecting = true;
             mSelectionRect.setTopLeft(pressPos);
@@ -244,14 +209,14 @@ void AnimationWidget::mousePress(QPointF pressPos) {
         mPressFrameAndValue = QPointF(frame, value);
         if(isShiftPressed()) {
             if(parentKey->isSelected()) {
-                removeKeyFromSelection(parentKey);
+                graphRemoveKeyFromSelection(parentKey);
             } else {
-                addKeyToSelection(parentKey);
+                graphAddKeyToSelection(parentKey);
             }
         } else {
             if(!parentKey->isSelected()) {
-                clearKeysSelection();
-                addKeyToSelection(parentKey);
+                graphClearKeysSelection();
+                graphAddKeyToSelection(parentKey);
             }
         }
     } else {
@@ -262,19 +227,19 @@ void AnimationWidget::mousePress(QPointF pressPos) {
     }
 }
 
-void AnimationWidget::mouseRelease()
+void BoxesList::graphMouseRelease()
 {
     if(mSelecting) {
         if(!isShiftPressed()) {
-            clearKeysSelection();
+            graphClearKeysSelection();
         }
         qreal topValue;
         qreal leftFrame;
-        getValueAndFrameFromPos(mSelectionRect.topLeft(),
+        graphGetValueAndFrameFromPos(mSelectionRect.topLeft(),
                                 &topValue, &leftFrame);
         qreal bottomValue;
         qreal rightFrame;
-        getValueAndFrameFromPos(mSelectionRect.bottomRight(),
+        graphGetValueAndFrameFromPos(mSelectionRect.bottomRight(),
                                 &bottomValue, &rightFrame);
         QRectF frameValueRect;
         frameValueRect.setTopLeft(QPointF(leftFrame, topValue) );
@@ -283,7 +248,7 @@ void AnimationWidget::mouseRelease()
         QList<QrealKey*> keysList;
         mAnimator->addKeysInRectToList(frameValueRect, &keysList);
         foreach(QrealKey *key, keysList) {
-            addKeyToSelection(key);
+            graphAddKeyToSelection(key);
         }
 
         mSelecting = false;
@@ -291,11 +256,11 @@ void AnimationWidget::mouseRelease()
         if(mCurrentPoint->isKeyPoint()) {
             if(mFirstMove) {
                 if(!isShiftPressed()) {
-                    clearKeysSelection();
-                    addKeyToSelection(mCurrentPoint->getParentKey());
+                    graphClearKeysSelection();
+                    graphAddKeyToSelection(mCurrentPoint->getParentKey());
                 }
             }
-            mergeKeysIfNeeded();
+            graphMergeKeysIfNeeded();
         } else {
                mCurrentPoint->setSelected(false);
         }
@@ -305,32 +270,31 @@ void AnimationWidget::mouseRelease()
     }
 }
 
-void AnimationWidget::middlePress(QPointF pressPos)
+void BoxesList::graphMiddlePress(QPointF pressPos)
 {
-    mSavedStartFrame = mStartFrame;
-    mSavedEndFrame = mEndFrame;
+    mSavedMinViewedFrame = mMinViewedFrame;
+    mSavedMaxViewedFrame = mMaxViewedFrame;
     mSavedMinShownValue = mMinShownVal;
     mMiddlePressPos = pressPos;
 }
 
-void AnimationWidget::middleMove(QPointF movePos)
+void BoxesList::graphMiddleMove(QPointF movePos)
 {
     QPointF diffFrameValue = (movePos - mMiddlePressPos);
     diffFrameValue.setX(diffFrameValue.x()/mPixelsPerFrame);
     diffFrameValue.setY(diffFrameValue.y()/mPixelsPerValUnit);
-    if(qAbs(diffFrameValue.x() ) > 1) {
-        mStartFrame = mSavedStartFrame - diffFrameValue.x();
-        mEndFrame = mSavedEndFrame - diffFrameValue.x();
-    }
-    setMinShownVal(mSavedMinShownValue + diffFrameValue.y());
+    int roundX = qRound(diffFrameValue.x() );
+    setFramesRange(mSavedMinViewedFrame - roundX,
+                   mSavedMaxViewedFrame - roundX );
+    graphSetMinShownVal(mSavedMinShownValue + diffFrameValue.y());
 }
 
-void AnimationWidget::middleRelease()
+void BoxesList::graphMiddleRelease()
 {
 
 }
 
-void AnimationWidget::setCtrlsModeForSelected(CtrlsMode mode) {
+void BoxesList::graphSetCtrlsModeForSelected(CtrlsMode mode) {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setCtrlsMode(mode);
@@ -338,46 +302,47 @@ void AnimationWidget::setCtrlsModeForSelected(CtrlsMode mode) {
     mAnimator->constrainCtrlsFrameValues();
 }
 
-void AnimationWidget::setTwoSideCtrlForSelected() {
+void BoxesList::graphSetTwoSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(true);
         key->setStartEnabled(true);
     }
     mAnimator->constrainCtrlsFrameValues();
-    repaintWithBoxesList();
+    graphRepaint();
 }
 
-void AnimationWidget::setRightSideCtrlForSelected() {
+void BoxesList::graphSetRightSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(true);
         key->setStartEnabled(false);
     }
     mAnimator->constrainCtrlsFrameValues();
-    repaintWithBoxesList();
+    graphRepaint();
 }
 
-void AnimationWidget::setLeftSideCtrlForSelected() {
+void BoxesList::graphSetLeftSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(false);
         key->setStartEnabled(true);
     }
     mAnimator->constrainCtrlsFrameValues();
-    repaintWithBoxesList();
+    graphRepaint();
 }
 
-void AnimationWidget::setNoSideCtrlForSelected() {
+void BoxesList::graphSetNoSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(false);
         key->setStartEnabled(false);
     }
-    repaintWithBoxesList();
+    mAnimator->constrainCtrlsFrameValues();
+    graphRepaint();
 }
 
-void AnimationWidget::deletePressed()
+void BoxesList::graphDeletePressed()
 {
     if(mCurrentPoint != NULL) {
             QrealKey *key = mCurrentPoint->getParentKey();
@@ -398,7 +363,7 @@ void AnimationWidget::deletePressed()
     }
 }
 
-void AnimationWidget::clearKeysSelection() {
+void BoxesList::graphClearKeysSelection() {
     foreach(QrealKey *key, mSelectedKeys) {
         key->setSelected(false);
         key->decNumberPointers();
@@ -407,7 +372,7 @@ void AnimationWidget::clearKeysSelection() {
     mSelectedKeys.clear();
 }
 
-void AnimationWidget::addKeyToSelection(QrealKey *key)
+void BoxesList::graphAddKeyToSelection(QrealKey *key)
 {
     if(key->isSelected()) return;
     key->setSelected(true);
@@ -415,7 +380,7 @@ void AnimationWidget::addKeyToSelection(QrealKey *key)
     key->incNumberPointers();
 }
 
-void AnimationWidget::removeKeyFromSelection(QrealKey *key)
+void BoxesList::graphRemoveKeyFromSelection(QrealKey *key)
 {
     if(key->isSelected()) {
         key->setSelected(false);
@@ -425,7 +390,7 @@ void AnimationWidget::removeKeyFromSelection(QrealKey *key)
     }
 }
 
-void AnimationWidget::mouseMove(QPointF mousePos)
+void BoxesList::graphMouseMove(QPointF mousePos)
 {
     if(mSelecting) {
         mSelectionRect.setBottomRight(mousePos);
@@ -438,7 +403,7 @@ void AnimationWidget::mouseMove(QPointF mousePos)
         }
         qreal value;
         qreal frame;
-        getValueAndFrameFromPos(mousePos, &value, &frame);
+        graphGetValueAndFrameFromPos(mousePos, &value, &frame);
         if(mCurrentPoint->isKeyPoint()) {
             QPointF currentFrameAndValue = QPointF(frame, value);
             if(mFirstMove) {
@@ -461,125 +426,136 @@ void AnimationWidget::mouseMove(QPointF mousePos)
         mAnimator->updateKeysPath();
     }
     mFirstMove = false;
+    graphUpdateDrawPathIfNeeded();
 }
 
-void AnimationWidget::mousePressEvent(QMouseEvent *event)
+void BoxesList::graphMousePressEvent(QPoint eventPos,
+                                     Qt::MouseButton eventButton)
 {
-    if(mAnimator == NULL) return;
-    if(event->button() == Qt::RightButton) {
+    if(eventButton == Qt::RightButton) {
         qreal value;
         qreal frame;
-        getValueAndFrameFromPos(event->pos(), &value, &frame);
+        graphGetValueAndFrameFromPos(eventPos, &value, &frame);
         QrealPoint *point = mAnimator->getPointAt(value, frame,
                                             mPixelsPerFrame, mPixelsPerValUnit);
         if(point == NULL) return;
         QrealPointValueDialog *dialog = new QrealPointValueDialog(point, this);
         dialog->show();
-        connect(dialog, SIGNAL(repaintWithBoxesListSignal()),
-                this, SLOT(updateDrawPath()) );
+        connect(dialog, SIGNAL(graphRepaint()),
+                this, SLOT(graphUpdateAfterKeysChanged()) );
         connect(dialog, SIGNAL(finished(int)),
-                this, SLOT(mergeKeysIfNeeded()) );
-    } else if(event->button() == Qt::MiddleButton) {
-        middlePress(event->pos());
+                this, SLOT(graphMergeKeysIfNeeded()) );
+    } else if(eventButton == Qt::MiddleButton) {
+        graphMiddlePress(eventPos);
     } else {
-        mousePress(event->pos());
+        graphMousePress(eventPos);
     }
-    repaintWithBoxesList();
+    graphUpdateDrawPathIfNeeded();
 }
 
-void AnimationWidget::mouseMoveEvent(QMouseEvent *event) {
-    if(mAnimator == NULL) return;
-    if(event->buttons() == Qt::MiddleButton) {
-        middleMove(event->pos());
-        emit changedViewedFrames(mStartFrame,
-                                 mEndFrame);
+void BoxesList::graphMouseMoveEvent(QPoint eventPos,
+                                    Qt::MouseButtons eventButtons) {
+    if(eventButtons == Qt::MiddleButton) {
+        graphMiddleMove(eventPos);
+        emit changedViewedFrames(mMinViewedFrame,
+                                 mMaxViewedFrame);
     } else {
-        mouseMove(event->pos());
+        graphMouseMove(eventPos);
     }
-    repaintWithBoxesList();
-    mMainWindow->callUpdateSchedulers();
+    graphUpdateDrawPathIfNeeded();
 }
 
-void AnimationWidget::mouseReleaseEvent(QMouseEvent *event)
+void BoxesList::graphMouseReleaseEvent(Qt::MouseButton eventButton)
 {
-    if(mAnimator == NULL) return;
-    if(event->button() == Qt::MiddleButton) {
-        middleRelease();
+    if(eventButton == Qt::MiddleButton) {
+        graphMiddleRelease();
     } else {
-        mouseRelease();
+        graphMouseRelease();
     }
-    repaintWithBoxesList();
+    graphUpdateDrawPathIfNeeded();
 }
 
-void AnimationWidget::wheelEvent(QWheelEvent *event)
+void BoxesList::graphWheelEvent(QWheelEvent *event)
 {
-    if(mAnimator == NULL) return;
     if(isCtrlPressed()) {
         if(event->delta() > 0) {
-            incScale(0.1);
+            graphIncScale(0.1);
         } else {
-            incScale(-0.1);
+            graphIncScale(-0.1);
         }
     } else {
         if(event->delta() > 0) {
-            incMinShownVal(0.1);
+            graphIncMinShownVal(0.1);
         } else {
-            incMinShownVal(-0.1);
+            graphIncMinShownVal(-0.1);
         }
     }
-    repaintWithBoxesList();
+    graphUpdateDrawPathIfNeeded();
 }
 
-bool AnimationWidget::processFilteredKeyEvent(QKeyEvent *event)
+bool BoxesList::graphProcessFilteredKeyEvent(QKeyEvent *event)
 {
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete && mAnimator != NULL) {
-        deletePressed();
-        repaintWithBoxesList();
+        graphDeletePressed();
+        graphRepaint();
     } else {
         return false;
     }
     return true;
 }
 
-void AnimationWidget::setAnimator(QrealAnimator *animator)
-{
-    clearKeysSelection();
-    mAnimator = animator;
+void BoxesList::graphResetValueScaleAndMinShown() {
     qreal minVal;
     qreal maxVal;
-    mAnimator->getMinAndMaxValuesBetweenFrames(mStartFrame, mEndFrame,
-                                               &minVal, &maxVal);
-    setMinShownVal(minVal);
-    setScale(1.);
-    repaintWithBoxesList();
+    mAnimator->getMinAndMaxValues(&minVal, &maxVal);
+    graphSetMinShownVal(minVal);
+    graphSetScale(1.);
 }
 
-void AnimationWidget::setBoxesList(BoxesList *boxesList)
+void BoxesList::graphSetAnimator(QrealAnimator *animator)
 {
-    mBoxesList = boxesList;
-}
-
-void AnimationWidget::repaintWithBoxesList()
-{
+    graphClearKeysSelection();
+    if(animator == mAnimator) {
+        animator = NULL;
+    }
     if(mAnimator != NULL) {
-        mAnimator->updateDrawPathIfNeeded(height(), mMargin,
-                                          mStartFrame, mMinShownVal,
+        mAnimator->setIsCurrentAnimator(false);
+    }
+    mAnimator = animator;
+    if(animator != NULL) {
+        animator->setIsCurrentAnimator(true);
+        animator->setDrawPathUpdateNeeded();
+        graphResetValueScaleAndMinShown();
+    }
+    graphRepaint();
+}
+
+void BoxesList::graphRepaint()
+{
+    graphUpdateDrawPathIfNeeded();
+    repaint();
+}
+
+void BoxesList::graphUpdateDrawPathIfNeeded() {
+    if(mAnimator != NULL) {
+        mAnimator->updateDrawPathIfNeeded(mGraphRect.height(), mMargin,
+                                          mMinViewedFrame, mMinShownVal,
                                           mPixelsPerFrame, mPixelsPerValUnit);
     }
-    repaint();
-    if(mBoxesList == NULL) return;
-    mBoxesList->repaint();
 }
 
-void AnimationWidget::updateDrawPath()
+void BoxesList::graphUpdateAfterKeysChanged()
 {
     if(mAnimator == NULL) return;
     mAnimator->sortKeys();
     mAnimator->updateKeysPath();
+    graphResetValueScaleAndMinShown();
+    graphUpdateDimensions();
+    graphUpdateDrawPathIfNeeded();
 }
 
-void AnimationWidget::mergeKeysIfNeeded() {
+void BoxesList::graphMergeKeysIfNeeded() {
     if(mAnimator == NULL) return;
     mAnimator->mergeKeysIfNeeded();
 }

@@ -97,13 +97,16 @@ public:
     //
 
     void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY,
-                      qreal pixelsPerFrame, int startFrame, int endFrame);
+                      qreal pixelsPerFrame,
+                      int startFrame, int endFrame, bool animationBar);
     void drawChildrenListItems(QPainter *p,
                       qreal drawX, qreal drawY, qreal maxY, qreal pixelsPerFrame,
-                      int startFrame, int endFrame);
+                      int startFrame, int endFrame, bool animationBar);
     qreal getListItemHeight();
-    void handleListItemMousePress(qreal relX, qreal relY);
-    void handleChildListItemMousePress(qreal relX, qreal relY, qreal y0);
+    void handleListItemMousePress(qreal relX, qreal relY,
+                                  QMouseEvent *event);
+    void handleChildListItemMousePress(qreal relX, qreal relY,
+                                       qreal y0, QMouseEvent *event);
 
     bool isCurrentGroup();
     void addChild(BoundingBox *child);

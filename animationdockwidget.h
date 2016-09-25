@@ -3,16 +3,16 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include "animationwidget.h"
-#include "animatonwidgetscrollbar.h"
+
+class MainWindow;
+class BoxesList;
 
 class AnimationDockWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimationDockWidget(MainWindow *parent = 0);
+    explicit AnimationDockWidget(MainWindow *parent, BoxesList *boxesList);
 
-    AnimationWidget *getAnimationWidget();
 protected:
     void paintEvent(QPaintEvent *);
 signals:
@@ -20,7 +20,6 @@ signals:
 public slots:
 
 private:
-    QVBoxLayout *mMainLayout;
     QHBoxLayout *mButtonsLayout;
     QPushButton *mSmoothButton;
     QPushButton *mSymmetricButton;
@@ -29,8 +28,6 @@ private:
     QPushButton *mRightSideCtrlButton;
     QPushButton *mLeftSideCtrlButton;
     QPushButton *mNoSideCtrlButton;
-    AnimatonWidgetScrollBar *mScrollBar;
-    AnimationWidget *mAnimationWidget;
 };
 
 #endif // ANIMATIONDOCKWIDGET_H

@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "updatescheduler.h"
 #include <QApplication>
+#include "boxeslist.h"
 
 QString ConnectedToMainWindow::boolToSql(bool bT) {
     return (bT) ? "1" : "0";
@@ -74,6 +75,11 @@ bool ConnectedToMainWindow::isRecording()
 bool ConnectedToMainWindow::isRecordingAllPoints()
 {
     return mMainWindow->isRecordingAllPoints();
+}
+
+void ConnectedToMainWindow::graphUpdateAfterKeysChanged()
+{
+    mMainWindow->getBoxesList()->graphUpdateAfterKeysChanged();
 }
 
 void ConnectedToMainWindow::startNewUndoRedoSet()

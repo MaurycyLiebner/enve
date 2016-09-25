@@ -19,9 +19,6 @@ public:
     ComplexKey *getKeyCollectionAtFrame(int frame);
     void removeChildQrealKey(QrealKey *key);
     virtual void drawChildAnimatorKeys() {}
-    void drawDiagram(QPainter *p,
-                     qreal pixelsPerFrame, qreal pixelsPerValue,
-                     int startFrame, int endFrame, bool detailedView);
     qreal clampValue(qreal value);
     void addChildAnimator(QrealAnimator *childAnimator);
     void removeChildAnimator(QrealAnimator *removeAnimator);
@@ -32,12 +29,16 @@ public:
     void sortKeys();
     void updateKeysPath();
     qreal getBoxesListHeight();
-    void drawBoxesList(QPainter *p, qreal drawX, qreal drawY, qreal pixelsPerFrame, int startFrame, int endFrame);
+    void drawBoxesList(QPainter *p,
+                       qreal drawX, qreal drawY,
+                       qreal pixelsPerFrame,
+                       int startFrame, int endFrame,
+                       bool animationBar);
     QrealKey *getKeyAtPos(qreal relX, qreal relY, int minViewedFrame, qreal pixelsPerFrame);
     void getKeysInRect(QRectF selectionRect, int minViewedFrame,
                        qreal pixelsPerFrame,
                        QList<QrealKey *> *keysList);
-    void handleListItemMousePress(qreal relX, qreal relY);
+    void handleListItemMousePress(qreal relX, qreal relY, QMouseEvent *event);
     void retrieveSavedValue();
     void finishTransform();
     void cancelTransform();

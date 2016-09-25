@@ -70,33 +70,39 @@ Color ColorAnimator::getCurrentValue()
 }
 
 void ColorAnimator::drawBoxesList(QPainter *p,
-                                      qreal drawX, qreal drawY,
-                                      qreal pixelsPerFrame,
-                                      int startFrame, int endFrame)
+                                  qreal drawX, qreal drawY,
+                                  qreal pixelsPerFrame,
+                                  int startFrame, int endFrame,
+                                  bool animationBar)
 {
     QrealAnimator::drawBoxesList(p, drawX, drawY,
-                                 pixelsPerFrame, startFrame, endFrame);
+                                 pixelsPerFrame, startFrame, endFrame,
+                                 animationBar);
     if(mBoxesListDetailVisible) {
         drawX += LIST_ITEM_CHILD_INDENT;
         drawY += LIST_ITEM_HEIGHT;
         mVal1Animator.drawBoxesList(p, drawX, drawY,
                                 pixelsPerFrame,
-                                startFrame, endFrame);
+                                startFrame, endFrame,
+                                animationBar);
         drawY += mVal1Animator.getBoxesListHeight();
 
         mVal2Animator.drawBoxesList(p, drawX, drawY,
                                 pixelsPerFrame,
-                                startFrame, endFrame);
+                                startFrame, endFrame,
+                                animationBar);
         drawY += mVal2Animator.getBoxesListHeight();
 
         mVal3Animator.drawBoxesList(p, drawX, drawY,
                                 pixelsPerFrame,
-                                startFrame, endFrame);
+                                startFrame, endFrame,
+                                animationBar);
         drawY += mVal3Animator.getBoxesListHeight();
 
         mAlphaAnimator.drawBoxesList(p, drawX, drawY,
                                 pixelsPerFrame,
-                                startFrame, endFrame);
+                                startFrame, endFrame,
+                                animationBar);
         drawY += mAlphaAnimator.getBoxesListHeight();
     }
 }

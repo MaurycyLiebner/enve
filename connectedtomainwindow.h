@@ -36,6 +36,7 @@ public:
     int getMinFrame();
     bool isRecording();
     bool isRecordingAllPoints();
+    void graphUpdateAfterKeysChanged();
 protected:
     MainWindow *mMainWindow;
 };

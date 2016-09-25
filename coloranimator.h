@@ -37,7 +37,7 @@ public:
     void drawBoxesList(QPainter *p,
                        qreal drawX, qreal drawY,
                        qreal pixelsPerFrame,
-                       int startFrame, int endFrame);
+                       int startFrame, int endFrame, bool animationBar);
     qreal getBoxesListHeight();
     QrealKey *getKeyAtPos(qreal relX, qreal relY,
                           int minViewedFrame, qreal pixelsPerFrame);

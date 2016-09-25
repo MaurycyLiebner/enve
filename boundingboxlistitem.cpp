@@ -34,7 +34,8 @@ QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
     return NULL;
 }
 
-void BoundingBox::handleListItemMousePress(qreal relX, qreal relY) {
+void BoundingBox::handleListItemMousePress(qreal relX, qreal relY,
+                                           QMouseEvent *event) {
     if(relY < LIST_ITEM_HEIGHT) {
         if(relX < LIST_ITEM_HEIGHT) {
             setChildrenListItemsVisible(!mBoxListItemDetailsVisible);
@@ -64,7 +65,7 @@ void BoundingBox::handleListItemMousePress(qreal relX, qreal relY) {
             qreal animatorHeight = animator->getBoxesListHeight();
             if(relY <= animatorHeight) {
                 animator->handleListItemMousePress(relX - LIST_ITEM_CHILD_INDENT,
-                                                   relY);
+                                                   relY, event);
                 break;
             }
             relY -= animatorHeight;
@@ -161,36 +162,39 @@ QrealKey *Canvas::getKeyAtPos(qreal relX, qreal relY,
 }
 
 void BoxesGroup::handleChildListItemMousePress(qreal relX, qreal relY,
-                                               qreal y0) {
+                                               qreal y0, QMouseEvent *event) {
     qreal currentY = y0;
     foreach(BoundingBox *box, mChildren) {
         qreal boxHeight = box->getListItemHeight();
         if(relY - currentY < boxHeight) {
-            box->handleListItemMousePress(relX, relY - currentY);
+            box->handleListItemMousePress(relX, relY - currentY,
+                                          event);
             break;
         }
         currentY += boxHeight;
     }
 }
 
-void BoxesGroup::handleListItemMousePress(qreal relX, qreal relY) {
+void BoxesGroup::handleListItemMousePress(qreal relX, qreal relY,
+                                          QMouseEvent *event) {
     qreal heightT = BoundingBox::getListItemHeight();
     if(relY < heightT) {
-        BoundingBox::handleListItemMousePress(relX, relY);
+        BoundingBox::handleListItemMousePress(relX, relY, event);
     } else {
         handleChildListItemMousePress(relX - LIST_ITEM_HEIGHT, relY,
-                                      heightT);
+                                      heightT, event);
     }
 }
 
 void BoundingBox::drawListItem(QPainter *p,
                                qreal drawX, qreal drawY,
                                qreal maxY, qreal pixelsPerFrame,
-                               int startFrame, int endFrame) {
+                               int startFrame, int endFrame,
+                               bool animationBar) {
     Q_UNUSED(maxY);
     drawAnimationBar(p, pixelsPerFrame,
                      drawX + LIST_ITEM_HEIGHT, drawY,
-                     startFrame, endFrame);
+                     startFrame, endFrame, animationBar);
 
     if(mSelected) {
         p->setBrush(QColor(185, 185, 185));
@@ -227,16 +231,20 @@ void BoundingBox::drawListItem(QPainter *p,
 void BoundingBox::drawAnimationBar(QPainter *p,
                                    qreal pixelsPerFrame,
                                    qreal drawX, qreal drawY,
-                                   int startFrame, int endFrame) {
-    mAnimatorsCollection.drawKeys(p,
-                                pixelsPerFrame, LIST_ITEM_MAX_WIDTH, drawY, 20.,
-                                startFrame, endFrame, true);
+                                   int startFrame, int endFrame,
+                                   bool animationBar) {
+    if(animationBar) {
+        mAnimatorsCollection.drawKeys(p,
+                                    pixelsPerFrame, LIST_ITEM_MAX_WIDTH, drawY, 20.,
+                                    startFrame, endFrame, true);
+    }
     drawY += LIST_ITEM_HEIGHT;
     if(mBoxListItemDetailsVisible) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
             animator->drawBoxesList(p, drawX, drawY,
                                     pixelsPerFrame,
-                                    startFrame, endFrame);
+                                    startFrame, endFrame,
+                                    animationBar);
             drawY += animator->getBoxesListHeight();
         }
     }
@@ -245,7 +253,8 @@ void BoundingBox::drawAnimationBar(QPainter *p,
 void BoxesGroup::drawChildrenListItems(QPainter *p,
                               qreal drawX, qreal drawY,
                               qreal maxY, qreal pixelsPerFrame,
-                              int startFrame, int endFrame) {
+                              int startFrame, int endFrame,
+                              bool animationBar) {
     qreal currentY = drawY;
     foreach (BoundingBox *box, mChildren) {
         qreal boxHeight = box->getListItemHeight();
@@ -254,7 +263,8 @@ void BoxesGroup::drawChildrenListItems(QPainter *p,
                 break;
             }
             box->drawListItem(p, drawX, currentY, maxY,
-                              pixelsPerFrame, startFrame, endFrame);
+                              pixelsPerFrame, startFrame, endFrame,
+                              animationBar);
         }
         currentY += boxHeight;
     }
@@ -263,15 +273,18 @@ void BoxesGroup::drawChildrenListItems(QPainter *p,
 void BoxesGroup::drawListItem(QPainter *p,
                               qreal drawX, qreal drawY,
                               qreal maxY, qreal pixelsPerFrame,
-                              int startFrame, int endFrame)
+                              int startFrame, int endFrame,
+                              bool animationBar)
 {
     BoundingBox::drawListItem(p, drawX, drawY, maxY,
-                              pixelsPerFrame, startFrame, endFrame);
+                              pixelsPerFrame, startFrame, endFrame,
+                              animationBar);
     if(mBoxListItemDetailsVisible) {
         drawX += LIST_ITEM_CHILD_INDENT;
         drawY += BoundingBox::getListItemHeight();
         drawChildrenListItems(p, drawX, drawY, maxY,
-                     pixelsPerFrame, startFrame, endFrame);
+                              pixelsPerFrame, startFrame, endFrame,
+                              animationBar);
     }
 }
 

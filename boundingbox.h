@@ -126,7 +126,7 @@ public:
     //
 
     virtual void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY,
-                              qreal pixelsPerFrame, int startFrame, int endFrame);
+                              qreal pixelsPerFrame, int startFrame, int endFrame, bool animationBar);
     virtual qreal getListItemHeight();
     void showChildrenListItems();
     void hideChildrenListItems();
@@ -137,7 +137,8 @@ public:
     void show();
     bool isVisible();
     void setVisibile(bool visible, bool saveUndoRedo = true);
-    virtual void handleListItemMousePress(qreal relX, qreal relY);
+    virtual void handleListItemMousePress(qreal relX, qreal relY,
+                                          QMouseEvent *event);
     void setChildrenListItemsVisible(bool bt);
     void lock();
     void unlock();
@@ -156,7 +157,7 @@ public:
     virtual void startScaleTransform();
     virtual void drawAnimationBar(QPainter *p,
                           qreal pixelsPerFrame, qreal drawX, qreal drawY,
-                          int startFrame, int endFrame);
+                          int startFrame, int endFrame, bool animationBar);
     virtual void updateAfterFrameChanged(int currentFrame);
     virtual QMatrix getCombinedRenderTransform();
     virtual QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal);

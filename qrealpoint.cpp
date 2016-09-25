@@ -61,7 +61,7 @@ void QrealPoint::draw(QPainter *p,
     } else {
         p->setBrush(Qt::black);
     }
-    p->drawEllipse(QPointF((getFrame() - minFrameT)*pixelsPerFrame,
+    p->drawEllipse(QPointF((getFrame() - minFrameT + 0.5)*pixelsPerFrame,
                            (minValueT - getValue())*pixelsPerValue),
                            mRadius, mRadius);
 }

@@ -5,6 +5,7 @@
 #include "mainwindow.h"
 #include "animationdockwidget.h"
 #include "boxeslist.h"
+#include <QMenu>
 
 QrealAnimator::QrealAnimator()
 {
@@ -99,8 +100,14 @@ QString QrealAnimator::getValueText() {
 void QrealAnimator::drawBoxesList(QPainter *p,
                                   qreal drawX, qreal drawY,
                                   qreal pixelsPerFrame,
-                                  int startFrame, int endFrame)
+                                  int startFrame, int endFrame,
+                                  bool animationBar)
 {
+    if(mIsCurrentAnimator) {
+        p->fillRect(drawX, drawY,
+                    LIST_ITEM_MAX_WIDTH - drawX, LIST_ITEM_HEIGHT,
+                    QColor(255, 255, 255, 125));
+    }
     if(mIsRecording) {
         p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_RECORDING);
     } else {
@@ -117,19 +124,44 @@ void QrealAnimator::drawBoxesList(QPainter *p,
                 70., LIST_ITEM_HEIGHT,
                 Qt::AlignVCenter | Qt::AlignLeft,
                 " " + getValueText() );
-    drawKeys(p, pixelsPerFrame, LIST_ITEM_MAX_WIDTH, drawY, LIST_ITEM_HEIGHT,
-             startFrame, endFrame, true);
+    p->setPen(Qt::black);
+    if(animationBar) {
+        drawKeys(p, pixelsPerFrame, LIST_ITEM_MAX_WIDTH, drawY, LIST_ITEM_HEIGHT,
+                 startFrame, endFrame, true);
+    }
 }
 
-void QrealAnimator::handleListItemMousePress(qreal relX, qreal relY)
+void QrealAnimator::handleListItemMousePress(qreal relX, qreal relY,
+                                             QMouseEvent *event)
 {
-    if(relX < LIST_ITEM_CHILD_INDENT) {
-        setRecording(!mIsRecording);
-    } else if(relX < 2*LIST_ITEM_CHILD_INDENT) {
-        setBoxesListDetailVisible(!mBoxesListDetailVisible);
+    Q_UNUSED(relY);
+    if(event->button() == Qt::RightButton) {
+        QMenu menu;
+        menu.addAction("Add Key");
+        QAction *selected_action = menu.exec(event->globalPos());
+        if(selected_action != NULL)
+        {
+            if(selected_action->text() == "Add Key")
+            {
+                if(!mIsRecording) {
+                    setRecording(true);
+                }
+                saveCurrentValueAsKey();
+            }
+        }
+        else
+        {
+
+        }
     } else {
-        mConnectedToMainWindow->getMainWindow()->getAnimationDockWidget()->
-                getAnimationWidget()->setAnimator(this);
+        if(relX < LIST_ITEM_CHILD_INDENT) {
+            setRecording(!mIsRecording);
+        } else if(relX < 2*LIST_ITEM_CHILD_INDENT) {
+            setBoxesListDetailVisible(!mBoxesListDetailVisible);
+        } else {
+            mConnectedToMainWindow->getMainWindow()->getBoxesList()->
+                    graphSetAnimator(this);
+        }
     }
 }
 
@@ -226,13 +258,6 @@ void QrealAnimator::updateValueFromCurrentFrame()
     setCurrentValue(getValueAtFrame(mCurrentFrame) );
 }
 
-QrealKey *QrealAnimator::addNewKeyAtFrame(int frame)
-{
-    QrealKey *newKey = new QrealKey(frame, this);
-    appendKey(newKey);
-    return newKey;
-}
-
 void QrealAnimator::saveCurrentValueToKey(QrealKey *key)
 {
     saveValueToKey(key, mCurrentValue);
@@ -242,18 +267,28 @@ void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
 {
     key->setValue(value);
     updateKeysPath();
+    if(mConnectedToMainWindow != NULL) {
+        mConnectedToMainWindow->scheduleBoxesListRepaint();
+        if(mIsCurrentAnimator) {
+            mConnectedToMainWindow->graphUpdateAfterKeysChanged();
+        }
+    }
 }
 
 void QrealAnimator::appendKey(QrealKey *newKey) {
     mKeys.append(newKey);
     newKey->incNumberPointers();
-    if(mConnectedToMainWindow != NULL) {
-        mConnectedToMainWindow->scheduleBoxesListRepaint();
-    }
+    sortKeys();
+    mergeKeysIfNeeded();
     if(mParentAnimator != NULL) {
         mParentAnimator->addChildQrealKey(newKey);
     }
-    sortKeys();
+    if(mConnectedToMainWindow != NULL) {
+        mConnectedToMainWindow->scheduleBoxesListRepaint();
+        if(mIsCurrentAnimator) {
+            mConnectedToMainWindow->graphUpdateAfterKeysChanged();
+        }
+    }
 }
 
 void QrealAnimator::removeKey(QrealKey *removeKey) {
@@ -358,9 +393,11 @@ void QrealAnimator::saveCurrentValueAsKey()
 {
     QrealKey *keyAtFrame = getKeyAtFrame(mCurrentFrame);
     if(keyAtFrame == NULL) {
-        keyAtFrame = addNewKeyAtFrame(mCurrentFrame);
+        keyAtFrame = new QrealKey(mCurrentFrame, this, mCurrentValue);
+        appendKey(keyAtFrame);
+    } else {
+        saveCurrentValueToKey(keyAtFrame);
     }
-    saveCurrentValueToKey(keyAtFrame);
 }
 
 void QrealAnimator::updateKeysPath()
@@ -504,7 +541,7 @@ void QrealAnimator::updateDrawPathIfNeeded(qreal height, qreal margin,
     if(mDrawPathUpdateNeeded ) {
         mDrawPathUpdateNeeded = false;
         QMatrix transform;
-        transform.translate(-pixelsPerFrame*startFrame,
+        transform.translate(-pixelsPerFrame*(startFrame - 0.5),
                     height + pixelsPerValUnit*minShownVal - margin);
         transform.scale(pixelsPerFrame, pixelsPerValUnit);
         mKeysDrawPath = mKeysPath*transform;
@@ -526,7 +563,7 @@ void QrealAnimator::drawKeysPath(QPainter *p,
     p->translate(0., height - margin);
     p->setBrush(Qt::black);
     foreach(QrealKey *key, mKeys) {
-        key->draw(p,
+        key->drawGraphKey(p,
                   startFrame, minShownVal,
                   pixelsPerFrame, pixelsPerValUnit);
     }
@@ -547,13 +584,13 @@ void QrealAnimator::getMinAndMaxMoveFrame(
     if(currentPoint->isEndPoint()) {
         minMoveFrameT = key->getFrame();
         if(keyId == mKeys.count() - 1) {
-            maxMoveFrameT = 5000.;
+            maxMoveFrameT = minMoveFrameT + 5000.;
         } else {
             maxMoveFrameT = mKeys.at(keyId + 1)->getFrame();
         }
     } else if(currentPoint->isStartPoint()) {
         if(keyId == 0) {
-            minMoveFrameT = 0.;
+            minMoveFrameT = minMoveFrameT - 5000.;
         } else {
             QrealKey *prevKey = mKeys.at(keyId - 1);
             minMoveFrameT = prevKey->getFrame();
@@ -664,6 +701,7 @@ void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
                              qreal startX, qreal startY, qreal height,
                              int startFrame, int endFrame, bool detailedView)
 {
+    Q_UNUSED(detailedView);
     p->setPen(QPen(Qt::black, 1.));
     foreach(QrealKey *key, mKeys) {
         if(key->getFrame() >= startFrame && key->getFrame() <= endFrame) {
@@ -740,4 +778,9 @@ void QrealAnimator::addKeysInRectToList(QRectF frameValueRect,
             keys->append(key);
         }
     }
+}
+
+void QrealAnimator::setIsCurrentAnimator(bool bT)
+{
+    mIsCurrentAnimator = bT;
 }

@@ -265,23 +265,23 @@ bool QrealKey::isInsideRect(QRectF valueFrameRect)
     return valueFrameRect.contains(keyPoint);
 }
 
-void QrealKey::draw(QPainter *p,
+void QrealKey::drawGraphKey(QPainter *p,
                     qreal minFrameT, qreal minValueT,
                     qreal pixelsPerFrame, qreal pixelsPerValue)
 {
     if(isSelected()) {
         p->save();
         p->setPen(QPen(Qt::black, 2., Qt::DotLine));
-        QPointF thisPos = QPointF((mFrame - minFrameT)*pixelsPerFrame,
+        QPointF thisPos = QPointF((mFrame - minFrameT + 0.5)*pixelsPerFrame,
                                   (minValueT - mValue)*pixelsPerValue);
         if(mStartEnabled) {
             p->drawLine(thisPos,
-                        QPointF((mStartFrame - minFrameT)*pixelsPerFrame,
+                        QPointF((mStartFrame - minFrameT + 0.5)*pixelsPerFrame,
                                 (minValueT - mStartValue)*pixelsPerValue));
         }
         if(mEndEnabled) {
             p->drawLine(thisPos,
-                        QPointF((mEndFrame - minFrameT)*pixelsPerFrame,
+                        QPointF((mEndFrame - minFrameT + 0.5)*pixelsPerFrame,
                                 (minValueT - mEndValue)*pixelsPerValue));
         }
         p->restore();

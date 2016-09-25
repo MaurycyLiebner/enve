@@ -34,13 +34,13 @@ public:
     qreal getStartValueFrame();
     qreal getEndValueFrame();
 
-    void setStartEnabled(bool bT);
+    virtual void setStartEnabled(bool bT);
 
-    void setEndEnabled(bool bT);
+    virtual void setEndEnabled(bool bT);
 
     bool isInsideRect(QRectF valueFrameRect);
 
-    void draw(QPainter *p,
+    void drawGraphKey(QPainter *p,
               qreal minFrameT, qreal minValueT,
               qreal pixelsPerFrame, qreal pixelsPerValue);
     void changeFrameAndValueBy(QPointF frameValueChange);
