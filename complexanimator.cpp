@@ -281,7 +281,6 @@ void ComplexAnimator::addChildQrealKey(QrealKey *key)
     if(collection == NULL) {
         collection = new ComplexKey(key->getFrame(), this );
         appendKey(collection);
-        sortKeys();
     }
     collection->addAnimatorKey(key);
 }

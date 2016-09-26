@@ -312,6 +312,7 @@ void BoxesList::setFramesRange(int startFrame, int endFrame)
     updatePixelsPerFrame();
     if(mAnimator != NULL) {
         graphUpdateDimensions();
+        graphUpdateDrawPathIfNeeded();
     }
     repaint();
 }

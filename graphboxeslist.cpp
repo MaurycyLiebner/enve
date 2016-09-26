@@ -267,6 +267,9 @@ void BoxesList::graphMouseRelease()
         mCurrentPoint = NULL;
 
         mAnimator->constrainCtrlsFrameValues();
+
+        // needed ?
+        graphUpdateDimensions();
     }
 }
 
@@ -441,7 +444,7 @@ void BoxesList::graphMousePressEvent(QPoint eventPos,
         if(point == NULL) return;
         QrealPointValueDialog *dialog = new QrealPointValueDialog(point, this);
         dialog->show();
-        connect(dialog, SIGNAL(graphRepaint()),
+        connect(dialog, SIGNAL(repaintSignal()),
                 this, SLOT(graphUpdateAfterKeysChanged()) );
         connect(dialog, SIGNAL(finished(int)),
                 this, SLOT(graphMergeKeysIfNeeded()) );

@@ -279,7 +279,7 @@ void QrealAnimator::appendKey(QrealKey *newKey) {
     mKeys.append(newKey);
     newKey->incNumberPointers();
     sortKeys();
-    mergeKeysIfNeeded();
+    //mergeKeysIfNeeded();
     if(mParentAnimator != NULL) {
         mParentAnimator->addChildQrealKey(newKey);
     }

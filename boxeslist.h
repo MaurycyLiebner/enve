@@ -79,8 +79,6 @@ public:
     void graphRemoveKeyFromSelection(QrealKey *key);
     void graphMouseMove(QPointF mousePos);
     void graphRepaint();
-    void graphUpdateAfterKeysChanged();
-    void graphMergeKeysIfNeeded();
     void graphUpdateDrawPathIfNeeded();
     void graphSetDrawPathUpdateNeeded();
     void graphResetValueScaleAndMinShown();
@@ -94,6 +92,9 @@ protected:
 signals:
     void changedViewedFrames(int, int);
 public slots:
+    void graphUpdateAfterKeysChanged();
+    void graphMergeKeysIfNeeded();
+
     void setFramesRange(int startFrame, int endFrame);
 
     void graphSetSmoothCtrl();
