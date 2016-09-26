@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     mCanvas = new Canvas(mFillStrokeSettings, this);
 
+    mFillStrokeSettings->setCanvasPtr(mCanvas);
+
     mBottomDock = new QDockWidget(this);
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
     mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();

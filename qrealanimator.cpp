@@ -228,7 +228,7 @@ void QrealAnimator::setParentAnimator(ComplexAnimator *parentAnimator)
     mParentAnimator = parentAnimator;
 }
 
-qreal QrealAnimator::getValueAtFrame(int frame)
+qreal QrealAnimator::getValueAtFrame(int frame) const
 {
     int prevId;
     int nextId;
@@ -242,7 +242,7 @@ qreal QrealAnimator::getValueAtFrame(int frame)
     }
 }
 
-qreal QrealAnimator::getCurrentValue()
+qreal QrealAnimator::getCurrentValue() const
 {
     return mCurrentValue;
 }
@@ -322,7 +322,7 @@ void QrealAnimator::setFrame(int frame)
 }
 
 bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
-                                            int frame) {
+                                            int frame) const {
     if(mKeys.isEmpty()) return false;
     int minId = 0;
     int maxId = mKeys.count() - 1;
@@ -465,7 +465,7 @@ qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x) {
 
 qreal QrealAnimator::getValueAtFrame(int frame,
                                     QrealKey *prevKey,
-                                    QrealKey *nextKey)
+                                    QrealKey *nextKey) const
 {
     qreal t = tFromX(prevKey->getFrame(),
                      prevKey->getEndValueFrame(),

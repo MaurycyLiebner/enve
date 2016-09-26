@@ -88,6 +88,59 @@ public:
 
     void centerPivotPosition() {}
     bool processUnfilteredKeyEvent(QKeyEvent *event);
+
+    void fillGradientChanged(Gradient* gradient, bool finish) {
+        mCurrentBoxesGroup->setSelectedFillGradient(gradient, finish);
+    }
+
+    void strokeGradientChanged(Gradient* gradient, bool finish) {
+        mCurrentBoxesGroup->setSelectedStrokeGradient(gradient, finish);
+    }
+
+    void fillFlatColorChanged(Color color, bool finish) {
+        mCurrentBoxesGroup->setSelectedFillFlatColor(color, finish);
+    }
+
+    void strokeFlatColorChanged(Color color, bool finish) {
+        mCurrentBoxesGroup->setSelectedStrokeFlatColor(color, finish);
+    }
+
+    void fillPaintTypeChanged(PaintType paintType, Color color,
+                              Gradient* gradient) {
+        mCurrentBoxesGroup->setSelectedFillPaintType(paintType, color,
+                                                     gradient);
+    }
+
+    void strokePaintTypeChanged(PaintType paintType, Color color,
+                                Gradient* gradient) {
+        mCurrentBoxesGroup->setSelectedStrokePaintType(paintType, color,
+                                                       gradient);
+    }
+
+    void strokeCapStyleChanged(Qt::PenCapStyle capStyle) {
+        mCurrentBoxesGroup->setSelectedCapStyle(capStyle);
+    }
+
+    void strokeJoinStyleChanged(Qt::PenJoinStyle joinStyle) {
+        mCurrentBoxesGroup->setSelectedJoinStyle(joinStyle);
+    }
+
+    void strokeWidthChanged(qreal strokeWidth, bool finish) {
+        mCurrentBoxesGroup->setSelectedStrokeWidth(strokeWidth, finish);
+    }
+
+    void startStrokeWidthTransform() {
+        mCurrentBoxesGroup->startSelectedStrokeWidthTransform();
+    }
+
+    void startStrokeColorTransform() {
+        mCurrentBoxesGroup->startSelectedStrokeColorTransform();
+    }
+
+    void startFillColorTransform() {
+        mCurrentBoxesGroup->startSelectedFillColorTransform();
+    }
+
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -114,11 +167,6 @@ signals:
 private slots:
     void fillSettingsChanged(PaintSettings fillSettings, bool saveUndoRedo);
     void strokeSettingsChanged(StrokeSettings strokeSettings, bool saveUndoRedo);
-
-    void startStrokeSettingsTransform();
-    void startFillSettingsTransform();
-    void finishStrokeSettingsTransform();
-    void finishFillSettingsTransform();
 
     void nextPreviewFrame();
 public slots:

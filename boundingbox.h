@@ -94,15 +94,11 @@ public:
     virtual void setStrokeSettings(StrokeSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
     virtual void setFillSettings(PaintSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
 
-    virtual PaintSettings getFillSettings();
-    virtual StrokeSettings getStrokeSettings();
+    virtual const PaintSettings *getFillSettings();
+    virtual const StrokeSettings *getStrokeSettings();
 
     virtual qreal getCurrentCanvasScale();
 
-    virtual void startStrokeTransform() {}
-    virtual void startFillTransform() {}
-    virtual void finishStrokeTransform() {}
-    virtual void finishFillTransform() {}
     void setPivotAbsPos(QPointF absPos, bool saveUndoRedo = true, bool pivotChanged = true);
 
     void setPivotRelPos(QPointF relPos, bool saveUndoRedo = true, bool pivotChanged = true);
@@ -169,6 +165,22 @@ public:
 
     void addActiveAnimator(QrealAnimator *animator);
     void removeActiveAnimator(QrealAnimator *animator);
+
+    virtual void setFillGradient(Gradient* gradient, bool finish) {}
+    virtual void setStrokeGradient(Gradient* gradient, bool finish) {}
+    virtual void setFillFlatColor(Color color, bool finish) {}
+    virtual void setStrokeFlatColor(Color color, bool finish) {}
+    virtual void setFillPaintType(PaintType paintType, Color color,
+                                  Gradient* gradient) {}
+    virtual void setStrokePaintType(PaintType paintType, Color color,
+                                    Gradient* gradient) {}
+    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {}
+    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {}
+    virtual void setStrokeWidth(qreal strokeWidth, bool finish) {}
+
+    virtual void startStrokeWidthTransform() {}
+    virtual void startStrokeColorTransform() {}
+    virtual void startFillColorTransform() {}
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 

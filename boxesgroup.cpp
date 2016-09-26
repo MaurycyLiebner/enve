@@ -56,6 +56,119 @@ void BoxesGroup::updateAfterFrameChanged(int currentFrame)
     }
 }
 
+void BoxesGroup::setSelectedFillGradient(Gradient *gradient, bool finish) {
+    if(finish) {
+        startNewUndoRedoSet();
+    }
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setFillGradient(gradient, finish);
+    }
+    if(finish) {
+        finishUndoRedoSet();
+    }
+}
+
+void BoxesGroup::setSelectedStrokeGradient(Gradient *gradient, bool finish) {
+    if(finish) {
+        startNewUndoRedoSet();
+    }
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setStrokeGradient(gradient, finish);
+    }
+    if(finish) {
+        finishUndoRedoSet();
+    }
+}
+
+void BoxesGroup::setSelectedFillFlatColor(Color color, bool finish) {
+    if(finish) {
+        startNewUndoRedoSet();
+    }
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setFillFlatColor(color, finish);
+    }
+    if(finish) {
+        finishUndoRedoSet();
+    }
+}
+
+void BoxesGroup::setSelectedStrokeFlatColor(Color color, bool finish) {
+    if(finish) {
+        startNewUndoRedoSet();
+    }
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setStrokeFlatColor(color, finish);
+    }
+    if(finish) {
+        finishUndoRedoSet();
+    }
+}
+
+void BoxesGroup::setSelectedFillPaintType(PaintType paintType, Color color, Gradient *gradient) {
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setFillPaintType(paintType, color, gradient);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setSelectedStrokePaintType(PaintType paintType, Color color, Gradient *gradient) {
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setStrokePaintType(paintType, color, gradient);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setSelectedCapStyle(Qt::PenCapStyle capStyle) {
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setStrokeCapStyle(capStyle);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setSelectedJoinStyle(Qt::PenJoinStyle joinStyle) {
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setStrokeJoinStyle(joinStyle);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setSelectedStrokeWidth(qreal strokeWidth, bool finish) {
+    if(finish) {
+        startNewUndoRedoSet();
+    }
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setStrokeWidth(strokeWidth, finish);
+    }
+    if(finish) {
+        finishUndoRedoSet();
+    }
+}
+
+void BoxesGroup::startSelectedStrokeWidthTransform()
+{
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->startStrokeWidthTransform();
+    }
+}
+
+void BoxesGroup::startSelectedStrokeColorTransform()
+{
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->startStrokeColorTransform();
+    }
+}
+
+void BoxesGroup::startSelectedFillColorTransform()
+{
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->startFillColorTransform();
+    }
+}
+
 QRectF BoxesGroup::getBoundingRect()
 {
     QRectF rect;
@@ -200,70 +313,6 @@ void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings, bool s
     if(saveUndoRedo) {
         finishUndoRedoSet();
     }
-}
-
-void BoxesGroup::startStrokeTransform()
-{
-    foreach(BoundingBox *box, mChildren) {
-        box->startStrokeTransform();
-    }
-}
-
-void BoxesGroup::startFillTransform()
-{
-    foreach(BoundingBox *box, mChildren) {
-        box->startFillTransform();
-    }
-}
-
-void BoxesGroup::finishStrokeTransform()
-{
-    startNewUndoRedoSet();
-    foreach(BoundingBox *box, mChildren) {
-        box->finishStrokeTransform();
-    }
-    finishUndoRedoSet();
-}
-
-void BoxesGroup::finishFillTransform()
-{
-    startNewUndoRedoSet();
-    foreach(BoundingBox *box, mChildren) {
-        box->finishFillTransform();
-    }
-    finishUndoRedoSet();
-}
-
-void BoxesGroup::startSelectedStrokeTransform()
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->startStrokeTransform();
-    }
-}
-
-void BoxesGroup::startSelectedFillTransform()
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->startFillTransform();
-    }
-}
-
-void BoxesGroup::finishSelectedStrokeTransform()
-{
-    startNewUndoRedoSet();
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->finishStrokeTransform();
-    }
-    finishUndoRedoSet();
-}
-
-void BoxesGroup::finishSelectedFillTransform()
-{
-    startNewUndoRedoSet();
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->finishFillTransform();
-    }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,

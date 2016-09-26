@@ -88,17 +88,159 @@ public:
     void updateMappedPathIfNeeded();
     void centerPivotPosition();
 
-    void setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo = true);
-    void setFillSettings(PaintSettings fillSettings, bool saveUndoRedo = true);
+    void resetStrokeGradientPointsPos(bool finish) {
+        mStrokeGradientPoints.setPositions(getBoundingRect().topLeft(),
+                     getBoundingRect().bottomRight(), finish);
+    }
 
-    StrokeSettings getStrokeSettings();
-    PaintSettings getFillSettings();
+    void resetFillGradientPointsPos(bool finish) {
+        mFillGradientPoints.setPositions(getBoundingRect().topLeft(),
+                     getBoundingRect().bottomRight(), finish);
+    }
+
+    void changeFillGradient(bool wasGradient, bool isGradient, bool finish) {
+        if(wasGradient) {
+            mFillPaintSettings.getGradient()->removePath(this);
+        } else if(isGradient) {
+            resetFillGradientPointsPos(finish);
+        }
+    }
+
+    void changeStrokeGradient(bool wasGradient, bool isGradient, bool finish) {
+        if(wasGradient) {
+            mStrokeSettings.getGradient()->removePath(this);
+        } else if(isGradient) {
+            resetStrokeGradientPointsPos(finish);
+        }
+    }
+
+    virtual void setFillGradient(Gradient* gradient, bool finish) {
+        if(mFillPaintSettings.getPaintType() != GRADIENTPAINT) {
+            setFillPaintType(GRADIENTPAINT,
+                              mFillPaintSettings.getCurrentColor(),
+                              gradient);
+        } else {
+            changeFillGradient(mFillPaintSettings.getPaintType() == GRADIENTPAINT,
+                                 true, finish);
+
+            mFillPaintSettings.setGradient(gradient);
+            updateDrawGradients();
+
+            scheduleRepaint();
+        }
+    }
+
+    virtual void setStrokeGradient(Gradient* gradient, bool finish) {
+        if(mStrokeSettings.getPaintType() != GRADIENTPAINT) {
+            setStrokePaintType(GRADIENTPAINT,
+                               mStrokeSettings.getCurrentColor(),
+                               gradient);
+        } else {
+            changeStrokeGradient(mStrokeSettings.getPaintType() == GRADIENTPAINT,
+                                 true, finish);
+
+            mStrokeSettings.setGradient(gradient);
+            updateDrawGradients();
+
+            scheduleRepaint();
+        }
+    }
+
+    virtual void setFillFlatColor(Color color, bool finish) {
+        if(mFillPaintSettings.getPaintType() != FLATPAINT) {
+            setFillPaintType(FLATPAINT, color, NULL);
+        } else {
+            mFillPaintSettings.setCurrentColor(color);
+            if(finish) {
+                mFillPaintSettings.getColorAnimator()->finishTransform();
+            }
+
+            scheduleRepaint();
+        }
+    }
+
+    virtual void setStrokeFlatColor(Color color, bool finish) {
+        if(mStrokeSettings.getPaintType() != FLATPAINT) {
+            setStrokePaintType(FLATPAINT, color, NULL);
+        } else {
+            mStrokeSettings.setCurrentColor(color);
+            if(finish) {
+                mStrokeSettings.getColorAnimator()->finishTransform();
+            }
+
+            scheduleRepaint();
+        }
+    }
+
+    virtual void setFillPaintType(PaintType paintType, Color color,
+                                  Gradient* gradient) {
+        changeFillGradient(mFillPaintSettings.getPaintType() == GRADIENTPAINT,
+                           paintType == GRADIENTPAINT, true);
+        if(paintType == GRADIENTPAINT) {
+            mFillPaintSettings.setGradient(gradient);
+            updateDrawGradients();
+        } else if(paintType == FLATPAINT) {
+            mFillPaintSettings.setCurrentColor(color);
+        }
+        mFillPaintSettings.setPaintType(paintType);
+
+        scheduleRepaint();
+    }
+
+    virtual void setStrokePaintType(PaintType paintType, Color color,
+                                    Gradient* gradient) {
+        changeStrokeGradient(mStrokeSettings.getPaintType() == GRADIENTPAINT,
+                           paintType == GRADIENTPAINT, true);
+        if(paintType == GRADIENTPAINT) {
+            mStrokeSettings.setGradient(gradient);
+            updateDrawGradients();
+        } else if(paintType == FLATPAINT) {
+            mStrokeSettings.setCurrentColor(color);
+        }
+        mStrokeSettings.setPaintType(paintType);
+
+        scheduleRepaint();
+    }
+
+    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
+        mStrokeSettings.setCapStyle(capStyle);
+        updateOutlinePath();
+
+        scheduleRepaint();
+    }
+
+    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
+        mStrokeSettings.setJoinStyle(joinStyle);
+        updateOutlinePath();
+        scheduleRepaint();
+    }
+
+    virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
+        mStrokeSettings.setCurrentStrokeWidth(strokeWidth);
+        if(finish) {
+            mStrokeSettings.getStrokeWidthAnimator()->finishTransform();
+        }
+        updateOutlinePath();
+
+        scheduleRepaint();
+    }
+
+    void startStrokeWidthTransform() {
+        mStrokeSettings.getStrokeWidthAnimator()->startTransform();
+    }
+
+    void startStrokeColorTransform() {
+        mStrokeSettings.getColorAnimator()->startTransform();
+    }
+
+    void startFillColorTransform() {
+        mFillPaintSettings.getColorAnimator()->startTransform();
+    }
+
+    const StrokeSettings *getStrokeSettings();
+    const PaintSettings *getFillSettings();
     void updateDrawGradients();
 
-    void startStrokeTransform();
-    void startFillTransform();
-    void finishStrokeTransform();
-    void finishFillTransform();
     PathPoint *addPointRelPos(QPointF relPos,
                               QPointF startRelPos, QPointF endRelPos,
                               PathPoint *toPoint = NULL);
@@ -133,9 +275,6 @@ protected:
 
     PaintSettings mFillPaintSettings;
     StrokeSettings mStrokeSettings;
-
-    PaintSettings mSavedFillPaintSettings;
-    StrokeSettings mSavedStrokeSettings;
 
     void updatePath();
     void updateMappedPath();

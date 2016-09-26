@@ -9,10 +9,10 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
     mAlphaAnimator.setName("alpha");
     setColorMode(RGBMODE);
 
-    mVal1Animator.setParentAnimator(this);
-    mVal2Animator.setParentAnimator(this);
-    mVal3Animator.setParentAnimator(this);
-    mAlphaAnimator.setParentAnimator(this);
+    addChildAnimator(&mVal1Animator);
+    addChildAnimator(&mVal2Animator);
+    addChildAnimator(&mVal3Animator);
+    addChildAnimator(&mAlphaAnimator);
 }
 
 void ColorAnimator::setCurrentValue(Color colorValue)
@@ -47,7 +47,7 @@ void ColorAnimator::setCurrentValue(QColor qcolorValue)
     setCurrentValue(color);
 }
 
-Color ColorAnimator::getCurrentValue()
+Color ColorAnimator::getCurrentValue() const
 {
     Color color;
     if(mColorMode == RGBMODE) {
@@ -67,44 +67,6 @@ Color ColorAnimator::getCurrentValue()
                      mAlphaAnimator.getCurrentValue() );
     }
     return color;
-}
-
-void ColorAnimator::drawBoxesList(QPainter *p,
-                                  qreal drawX, qreal drawY,
-                                  qreal pixelsPerFrame,
-                                  int startFrame, int endFrame,
-                                  bool animationBar)
-{
-    QrealAnimator::drawBoxesList(p, drawX, drawY,
-                                 pixelsPerFrame, startFrame, endFrame,
-                                 animationBar);
-    if(mBoxesListDetailVisible) {
-        drawX += LIST_ITEM_CHILD_INDENT;
-        drawY += LIST_ITEM_HEIGHT;
-        mVal1Animator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame,
-                                animationBar);
-        drawY += mVal1Animator.getBoxesListHeight();
-
-        mVal2Animator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame,
-                                animationBar);
-        drawY += mVal2Animator.getBoxesListHeight();
-
-        mVal3Animator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame,
-                                animationBar);
-        drawY += mVal3Animator.getBoxesListHeight();
-
-        mAlphaAnimator.drawBoxesList(p, drawX, drawY,
-                                pixelsPerFrame,
-                                startFrame, endFrame,
-                                animationBar);
-        drawY += mAlphaAnimator.getBoxesListHeight();
-    }
 }
 
 QrealKey *ColorAnimator::getKeyAtPos(qreal relX, qreal relY,
@@ -129,19 +91,6 @@ QrealKey *ColorAnimator::getKeyAtPos(qreal relX, qreal relY,
         }
     }
     return NULL;
-}
-
-qreal ColorAnimator::getBoxesListHeight()
-{
-    if(mBoxesListDetailVisible) {
-        return mVal1Animator.getBoxesListHeight() +
-               mVal2Animator.getBoxesListHeight() +
-               mVal3Animator.getBoxesListHeight() +
-               mAlphaAnimator.getBoxesListHeight() +
-               QrealAnimator::getBoxesListHeight();
-    } else {
-        return QrealAnimator::getBoxesListHeight();
-    }
 }
 
 void ColorAnimator::setColorMode(ColorMode colorMode)
@@ -180,84 +129,4 @@ void ColorAnimator::startVal3Transform()
 void ColorAnimator::startAlphaTransform()
 {
     mAlphaAnimator.startTransform();
-}
-
-void ColorAnimator::startTransform()
-{
-    mVal1Animator.startTransform();
-    mVal2Animator.startTransform();
-    mVal3Animator.startTransform();
-    mAlphaAnimator.startTransform();
-}
-
-void ColorAnimator::finishTransform()
-{
-    mConnectedToMainWindow->startNewUndoRedoSet();
-
-    mVal1Animator.finishTransform();
-    mVal2Animator.finishTransform();
-    mVal3Animator.finishTransform();
-    mAlphaAnimator.finishTransform();
-
-    mConnectedToMainWindow->finishUndoRedoSet();
-}
-
-void ColorAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
-{
-    QrealAnimator::setConnectedToMainWindow(connected);
-    mVal1Animator.setConnectedToMainWindow(connected);
-    mVal2Animator.setConnectedToMainWindow(connected);
-    mVal3Animator.setConnectedToMainWindow(connected);
-    mAlphaAnimator.setConnectedToMainWindow(connected);
-}
-
-void ColorAnimator::setUpdater(AnimatorUpdater *updater)
-{
-    QrealAnimator::setUpdater(updater);
-    mVal1Animator.setUpdater(updater);
-    mVal2Animator.setUpdater(updater);
-    mVal3Animator.setUpdater(updater);
-    mAlphaAnimator.setUpdater(updater);
-}
-
-void ColorAnimator::setFrame(int frame)
-{
-    QrealAnimator::setFrame(frame);
-    mVal1Animator.setFrame(frame);
-    mVal2Animator.setFrame(frame);
-    mVal3Animator.setFrame(frame);
-    mAlphaAnimator.setFrame(frame);
-}
-
-void ColorAnimator::sortKeys()
-{
-    QrealAnimator::sortKeys();
-    mVal1Animator.sortKeys();
-    mVal2Animator.sortKeys();
-    mVal3Animator.sortKeys();
-    mAlphaAnimator.sortKeys();
-}
-
-void ColorAnimator::updateKeysPath()
-{
-    QrealAnimator::updateKeysPath();
-    mVal1Animator.updateKeysPath();
-    mVal2Animator.updateKeysPath();
-    mVal3Animator.updateKeysPath();
-    mAlphaAnimator.updateKeysPath();
-}
-
-void ColorAnimator::cancelTransform() {
-    mVal1Animator.cancelTransform();
-    mVal2Animator.cancelTransform();
-    mVal3Animator.cancelTransform();
-    mAlphaAnimator.cancelTransform();
-}
-
-void ColorAnimator::retrieveSavedValue()
-{
-    mVal1Animator.retrieveSavedValue();
-    mVal2Animator.retrieveSavedValue();
-    mVal3Animator.retrieveSavedValue();
-    mAlphaAnimator.retrieveSavedValue();
 }

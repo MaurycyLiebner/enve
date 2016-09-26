@@ -21,20 +21,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     connect(mPreviewFPSTimer, SIGNAL(timeout()),
             this, SLOT(nextPreviewFrame()) );
 
-    connect(mFillStrokeSettingsWidget, SIGNAL(fillSettingsChanged(PaintSettings, bool)),
-            this, SLOT(fillSettingsChanged(PaintSettings, bool)) );
-    connect(mFillStrokeSettingsWidget, SIGNAL(strokeSettingsChanged(StrokeSettings, bool)),
-            this, SLOT(strokeSettingsChanged(StrokeSettings, bool)) );
-
-    connect(mFillStrokeSettingsWidget, SIGNAL(startFillSettingsTransform()),
-            this, SLOT(startFillSettingsTransform()) );
-    connect(mFillStrokeSettingsWidget, SIGNAL(startStrokeSettingsTransform()),
-            this, SLOT(startStrokeSettingsTransform()) );
-    connect(mFillStrokeSettingsWidget, SIGNAL(finishFillSettingsTransform()),
-            this, SLOT(finishFillSettingsTransform()) );
-    connect(mFillStrokeSettingsWidget, SIGNAL(finishStrokeSettingsTransform()),
-            this, SLOT(finishStrokeSettingsTransform()) );
-
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
     setFocusPolicy(Qt::StrongFocus);
@@ -311,26 +297,6 @@ void Canvas::strokeSettingsChanged(StrokeSettings strokeSettings, bool saveUndoR
 {
     mCurrentBoxesGroup->setSelectedStrokeSettings(strokeSettings, saveUndoRedo);
     callUpdateSchedulers();
-}
-
-void Canvas::startStrokeSettingsTransform()
-{
-    mCurrentBoxesGroup->startSelectedStrokeTransform();
-}
-
-void Canvas::startFillSettingsTransform()
-{
-    mCurrentBoxesGroup->startSelectedFillTransform();
-}
-
-void Canvas::finishStrokeSettingsTransform()
-{
-    mCurrentBoxesGroup->finishSelectedStrokeTransform();
-}
-
-void Canvas::finishFillSettingsTransform()
-{
-    mCurrentBoxesGroup->finishSelectedFillTransform();
 }
 
 void Canvas::connectPointsSlot()

@@ -187,14 +187,14 @@ BoundingBox *BoundingBox::getPathAtFromAllAncestors(QPointF absPos) {
     }
 }
 
-PaintSettings BoundingBox::getFillSettings()
+const PaintSettings *BoundingBox::getFillSettings()
 {
-    return PaintSettings();
+    return NULL;
 }
 
-StrokeSettings BoundingBox::getStrokeSettings()
+const StrokeSettings *BoundingBox::getStrokeSettings()
 {
-    return StrokeSettings();
+    return NULL;
 }
 
 qreal BoundingBox::getCurrentCanvasScale()

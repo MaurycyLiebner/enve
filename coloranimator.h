@@ -17,7 +17,7 @@ public:
     void setCurrentValue(Color colorValue);
     void setCurrentValue(QColor qcolorValue);
 
-    Color getCurrentValue();
+    Color getCurrentValue() const;
     void setColorMode(ColorMode colorMode);
 
     void startVal1Transform();
@@ -25,20 +25,6 @@ public:
     void startVal3Transform();
     void startAlphaTransform();
 
-    void startTransform();
-    void finishTransform();
-    void setConnectedToMainWindow(ConnectedToMainWindow *connected);
-    void setUpdater(AnimatorUpdater *updater);
-    void setFrame(int frame);
-    void sortKeys();
-    void updateKeysPath();
-    void cancelTransform();
-    void retrieveSavedValue();
-    void drawBoxesList(QPainter *p,
-                       qreal drawX, qreal drawY,
-                       qreal pixelsPerFrame,
-                       int startFrame, int endFrame, bool animationBar);
-    qreal getBoxesListHeight();
     QrealKey *getKeyAtPos(qreal relX, qreal relY,
                           int minViewedFrame, qreal pixelsPerFrame);
 private:

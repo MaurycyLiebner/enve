@@ -66,16 +66,6 @@ public:
     void setSelectedStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo = true);
     void setCurrentFillStrokeSettingsFromBox(BoundingBox *box);
 
-    void startStrokeTransform();
-    void startFillTransform();
-    void finishStrokeTransform();
-    void finishFillTransform();
-
-    void startSelectedStrokeTransform();
-    void startSelectedFillTransform();
-    void finishSelectedStrokeTransform();
-    void finishSelectedFillTransform();
-
     void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
 
     QPointF getSelectedPivotPos();
@@ -134,6 +124,30 @@ public:
     void getKeysInRect(QRectF selectionRect, QList<QrealKey *> *keysList);
     QrealKey *getKeyAtPosFromChildren(qreal relX, qreal relY, qreal y0);
     void getKeysInRectFromChildren(QRectF selectionRect, QList<QrealKey *> *keysList);
+
+    void setSelectedFillGradient(Gradient* gradient, bool finish);
+
+    void setSelectedStrokeGradient(Gradient* gradient, bool finish);
+
+    void setSelectedFillFlatColor(Color color, bool finish);
+
+    void setSelectedStrokeFlatColor(Color color, bool finish);
+
+    void setSelectedFillPaintType(PaintType paintType, Color color,
+                              Gradient* gradient);
+
+    void setSelectedStrokePaintType(PaintType paintType, Color color,
+                                Gradient* gradient);
+
+    void setSelectedCapStyle(Qt::PenCapStyle capStyle);
+
+    void setSelectedJoinStyle(Qt::PenJoinStyle joinStyle);
+
+    void setSelectedStrokeWidth(qreal strokeWidth, bool finish);
+
+    void startSelectedStrokeWidthTransform();
+    void startSelectedStrokeColorTransform();
+    void startSelectedFillColorTransform();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

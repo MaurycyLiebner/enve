@@ -12,8 +12,14 @@ VectorPath::VectorPath(BoxesGroup *group) :
                 BoundingBoxType::TYPE_VECTOR_PATH)
 {
     addActiveAnimator(&mPathAnimator);
+    addActiveAnimator(&mFillPaintSettings);
+    addActiveAnimator(&mStrokeSettings);
     mAnimatorsCollection.addAnimator(&mPathAnimator);
     mPathAnimator.setConnectedToMainWindow(this);
+    mAnimatorsCollection.addAnimator(&mFillPaintSettings);
+    mFillPaintSettings.setConnectedToMainWindow(this);
+    mAnimatorsCollection.addAnimator(&mStrokeSettings);
+    mStrokeSettings.setConnectedToMainWindow(this);
 
     mFillGradientPoints.initialize(this);
     mStrokeGradientPoints.initialize(this);
@@ -195,6 +201,8 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
     foreach(PathPoint *point, mPoints) {
         point->updateAfterFrameChanged(currentFrame);
     }
+    mFillPaintSettings.setFrame(currentFrame);
+    mStrokeSettings.setFrame(currentFrame);
     mPathAnimator.setFrame(currentFrame);
     BoundingBox::updateAfterFrameChanged(currentFrame);
 }
@@ -252,17 +260,17 @@ void VectorPath::centerPivotPosition() {
     }
 }
 
-PaintSettings VectorPath::getFillSettings()
+const PaintSettings *VectorPath::getFillSettings()
 {
-    return mFillPaintSettings;
+    return &mFillPaintSettings;
 }
 
-StrokeSettings VectorPath::getStrokeSettings()
+const StrokeSettings *VectorPath::getStrokeSettings()
 {
-    return mStrokeSettings;
+    return &mStrokeSettings;
 }
 
-void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
+/*void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
 {
     if(saveUndoRedo) {
         addUndoRedo(new StrokeSettingsChangedUndoRedo(mStrokeSettings,
@@ -300,7 +308,7 @@ void VectorPath::setFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
                      getBoundingRect().bottomRight(), saveUndoRedo);
     }
     scheduleRepaint();
-}
+}*/
 
 void VectorPath::updatePath()
 {
@@ -392,11 +400,11 @@ void VectorPath::updateOutlinePath() {
 
 void VectorPath::updateWholePath() {
     mMappedWhole = QPainterPath();
-    if(mStrokeSettings.paintType != NOPAINT) {
+    if(mStrokeSettings.getPaintType() != NOPAINT) {
         mMappedWhole += mOutlinePath;
     }
-    if(mFillPaintSettings.paintType != NOPAINT ||
-            mStrokeSettings.paintType == NOPAINT) {
+    if(mFillPaintSettings.getPaintType() != NOPAINT ||
+            mStrokeSettings.getPaintType() == NOPAINT) {
         mMappedWhole += mMappedPath;
     }
 }
@@ -410,8 +418,8 @@ void VectorPath::updateMappedPath()
 
 void VectorPath::updateDrawGradients()
 {
-    if(mFillPaintSettings.paintType == GRADIENTPAINT) {
-        Gradient *gradient = mFillPaintSettings.gradient;
+    if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
+        Gradient *gradient = mFillPaintSettings.getGradient();
         if(!gradient->isInPaths(this)) {
             gradient->addPath(this);
         }
@@ -424,8 +432,8 @@ void VectorPath::updateDrawGradients()
     } else {
         mFillGradientPoints.disable();
     }
-    if(mStrokeSettings.paintType == GRADIENTPAINT) {
-        Gradient *gradient = mStrokeSettings.gradient;
+    if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
+        Gradient *gradient = mStrokeSettings.getGradient();
         if(!gradient->isInPaths(this)) {
             gradient->addPath(this);
         }
@@ -441,30 +449,6 @@ void VectorPath::updateDrawGradients()
     }
 }
 
-void VectorPath::startStrokeTransform()
-{
-    mSavedStrokeSettings = mStrokeSettings;
-}
-
-void VectorPath::startFillTransform()
-{
-    mSavedFillPaintSettings = mFillPaintSettings;
-}
-
-void VectorPath::finishStrokeTransform()
-{
-    addUndoRedo(new StrokeSettingsChangedUndoRedo(mSavedStrokeSettings,
-                                                  mStrokeSettings,
-                                                  this) );
-}
-
-void VectorPath::finishFillTransform()
-{
-    addUndoRedo(new FillSettingsChangedUndoRedo(mSavedFillPaintSettings,
-                                                mFillPaintSettings,
-                                                this) );
-}
-
 QRectF VectorPath::getBoundingRect()
 {
     return mMappedWhole.boundingRect();
@@ -477,18 +461,18 @@ void VectorPath::draw(QPainter *p)
 
         p->setOpacity(p->opacity()*mTransformAnimator.getOpacity() );
         p->setPen(Qt::NoPen);
-        if(mFillPaintSettings.paintType == GRADIENTPAINT) {
+        if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawFillGradient);
-        } else if(mFillPaintSettings.paintType == FLATPAINT) {
-            p->setBrush(mFillPaintSettings.color.getCurrentValue().qcol);
+        } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
+            p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
         } else{
             p->setBrush(Qt::NoBrush);
         }
         p->drawPath(mMappedPath);
-        if(mStrokeSettings.paintType == GRADIENTPAINT) {
+        if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawStrokeGradient);
-        } else if(mStrokeSettings.paintType == FLATPAINT) {
-            p->setBrush(mStrokeSettings.color.getCurrentValue().qcol);
+        } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
+            p->setBrush(mStrokeSettings.getCurrentColor().qcol);
         } else{
             p->setBrush(Qt::NoBrush);
         }
@@ -504,10 +488,10 @@ void VectorPath::render(QPainter *p)
 
     p->setOpacity(p->opacity()*mTransformAnimator.getOpacity() );
     p->setPen(Qt::NoPen);
-    if(mFillPaintSettings.paintType == GRADIENTPAINT) {
+    if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
         p->setBrush(mDrawFillGradient);
-    } else if(mFillPaintSettings.paintType == FLATPAINT) {
-        p->setBrush(mFillPaintSettings.color.getCurrentValue().qcol);
+    } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
+        p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
     } else{
         p->setBrush(Qt::NoBrush);
     }
@@ -515,10 +499,10 @@ void VectorPath::render(QPainter *p)
     QMatrix combinedRenderTransform = getCombinedRenderTransform();
     p->drawPath(combinedRenderTransform.map(mPath) );
 
-    if(mStrokeSettings.paintType == GRADIENTPAINT) {
+    if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
         p->setBrush(mDrawStrokeGradient);
-    } else if(mStrokeSettings.paintType == FLATPAINT) {
-        p->setBrush(mStrokeSettings.color.getCurrentValue().qcol);
+    } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
+        p->setBrush(mStrokeSettings.getCurrentColor().qcol);
     } else{
         p->setBrush(Qt::NoBrush);
     }

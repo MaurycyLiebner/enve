@@ -23,8 +23,8 @@ public:
 
     void setParentAnimator(ComplexAnimator *parentAnimator);
 
-    qreal getValueAtFrame(int frame);
-    qreal getCurrentValue();
+    qreal getValueAtFrame(int frame) const;
+    qreal getCurrentValue() const;
     void setCurrentValue(qreal newValue);
     void updateValueFromCurrentFrame();
     void saveCurrentValueToKey(QrealKey *key);
@@ -40,7 +40,7 @@ public:
     void moveKeyToFrame(QrealKey *key, int newFrame);
 
     virtual void sortKeys();
-    bool getNextAndPreviousKeyId(int *prevIdP, int *nextIdP, int frame);
+    bool getNextAndPreviousKeyId(int *prevIdP, int *nextIdP, int frame) const;
 
     void mousePress(QPointF pressPos);
     void mouseMove(QPointF mousePos);
@@ -67,7 +67,7 @@ public:
     QrealPoint *getPointAt(qreal value, qreal frame,
                            qreal pixelsPerFrame, qreal pixelsPerValUnit);
     void deletePressed();
-    qreal getValueAtFrame(int frame, QrealKey *prevKey, QrealKey *nextKey);
+    qreal getValueAtFrame(int frame, QrealKey *prevKey, QrealKey *nextKey) const;
 
     void middlePress(QPointF pressPos);
     void middleMove(QPointF movePos);

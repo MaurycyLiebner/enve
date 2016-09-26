@@ -73,7 +73,6 @@ public:
     int getSqlId();
 
     int sqlId = -1;
-    bool transformPending = false;
     GradientWidget *mGradientWidget;
     QGradientStops qgradientStops;
     QList<Color> colors;
@@ -81,7 +80,7 @@ public:
     QList<VectorPath*> mAffectedPaths;
 };
 
-class PaintSettings {
+class PaintSettings : public ComplexAnimator {
 public:
     PaintSettings();
 
@@ -93,9 +92,38 @@ public:
 
     virtual int saveToSql();
 
-    ColorAnimator color;
-    PaintType paintType = FLATPAINT;
-    Gradient *gradient = NULL;
+    Color getCurrentColor() const {
+        return mColor.getCurrentValue();
+    }
+
+    PaintType getPaintType() const {
+        return mPaintType;
+    }
+
+    Gradient *getGradient() const {
+        return mGradient;
+    }
+
+    void setGradient(Gradient *gradient) {
+        mGradient = gradient;
+    }
+
+    void setCurrentColor(Color color) {
+        mColor.setCurrentValue(color);
+    }
+
+    void setPaintType(PaintType paintType) {
+        mPaintType = paintType;
+    }
+
+    ColorAnimator *getColorAnimator() {
+        return &mColor;
+    }
+
+private:
+    ColorAnimator mColor;
+    PaintType mPaintType = FLATPAINT;
+    Gradient *mGradient = NULL;
 };
 
 class StrokeSettings : public PaintSettings
@@ -109,22 +137,33 @@ public:
 
     int saveToSql();
 
-    void setLineWidth(qreal newWidth);
-
-    qreal lineWidth();
+    void setCurrentStrokeWidth(qreal newWidth);
 
     void setCapStyle(Qt::PenCapStyle capStyle);
 
-    Qt::PenCapStyle capStyle();
-
     void setJoinStyle(Qt::PenJoinStyle joinStyle);
-
-    Qt::PenJoinStyle joinStyle();
 
     void setStrokerSettings(QPainterPathStroker *stroker);
     StrokeSettings(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
     static StrokeSettings createStrokeSettingsFromSql(int strokeSqlId,
                                               GradientWidget *gradientWidget);
+
+    qreal getCurrentStrokeWidth() const {
+        return mLineWidth.getCurrentValue();
+    }
+
+    Qt::PenCapStyle getCapStyle() const {
+        return mCapStyle;
+    }
+
+    Qt::PenJoinStyle getJoinStyle() const {
+        return mJoinStyle;
+    }
+
+    QrealAnimator *getStrokeWidthAnimator() {
+        return &mLineWidth;
+    }
+
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
@@ -132,6 +171,7 @@ private:
 };
 
 class MainWindow;
+class Canvas;
 
 class FillStrokeSettingsWidget : public QWidget
 {
@@ -139,9 +179,9 @@ class FillStrokeSettingsWidget : public QWidget
 public:
     explicit FillStrokeSettingsWidget(MainWindow *parent = 0);
 
-    void setCurrentSettings(PaintSettings fillPaintSettings,
-                            StrokeSettings strokePaintSettings);
-    void setCurrentDisplayedSettings(PaintSettings *settings);
+    void setCurrentSettings(const PaintSettings *fillPaintSettings,
+                            const StrokeSettings *strokePaintSettings);
+    void updateAfterTargetChanged();
     void setCurrentPaintType(PaintType paintType);
 
     void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
@@ -154,13 +194,22 @@ public:
     void clearAll();
     void saveGradientsToSqlIfPathSelected();
     void loadSettingsFromPath(VectorPath *path);
-signals:
-    void fillSettingsChanged(PaintSettings, bool);
-    void strokeSettingsChanged(StrokeSettings, bool);
-    void finishFillSettingsTransform();
-    void finishStrokeSettingsTransform();
-    void startFillSettingsTransform();
-    void startStrokeSettingsTransform();
+    void setFillValuesFromFillSettings(const PaintSettings *settings);
+    void setStrokeValuesFromStrokeSettings(const StrokeSettings *settings);
+
+    void setCanvasPtr(Canvas *canvas);
+public slots:
+    void emitColorSettingsChangedTMP();
+    void emitColorSettingsChanged();
+    void emitPaintTypeChanged();
+    void emitStrokeWidthChanged();
+    void emitStrokeWidthChangedTMP();
+    void emitCapStyleChanged();
+    void emitJoinStyleChanged();
+    void emitGradientChangedTMP();
+    void emitGradientChanged();
+    void emitFlatColorChangedTMP();
+    void emitFlatColorChanged();
 private slots:
     void colorChangedTMP(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
     void setStrokeWidth(qreal width);
@@ -170,7 +219,6 @@ private slots:
     void setStrokeTarget();
 
     void flatColorSet(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
-    void emitTargetSettingsChanged();
     void setGradient(Gradient* gradient);
 
     void setBevelJoinStyle();
@@ -184,13 +232,13 @@ private slots:
     void waitToSaveChanges();
 
     void finishTransform();
-    void startTransform();
-    void emitTargetSettingsChangedTMP();
+    void startTransform(const char *slot);
 
     void startLoadingFillFromPath();
     void startLoadingStrokeFromPath();
     void startLoadingSettingsFromPath();
 private:
+    Canvas *mCanvas;
     bool mLoadFillFromPath = false;
     bool mLoadStrokeFromPath = false;
 
@@ -206,13 +254,70 @@ private:
 
     void setCapStyle(Qt::PenCapStyle capStyle);
 
-    PaintSettings *getCurrentTargetPaintSettings();
-
 
     int mTargetId = 0;
 
-    PaintSettings mFillPaintSettings;
-    StrokeSettings mStrokePaintSettings;
+    //
+
+    PaintType getCurrentPaintTypeVal() {
+        if(mTargetId == 0) {
+            return mCurrentFillPaintType;
+        } else {
+            return mCurrentStrokePaintType;
+        }
+    }
+
+    void setCurrentPaintTypeVal(PaintType paintType) {
+        if(mTargetId == 0) {
+            mCurrentFillPaintType = paintType;
+        } else {
+            mCurrentStrokePaintType = paintType;
+        }
+    }
+
+    Color getCurrentColorVal() {
+        if(mTargetId == 0) {
+            return mCurrentFillColor;
+        } else {
+            return mCurrentStrokeColor;
+        }
+    }
+
+    void setCurrentColorVal(Color color) {
+        if(mTargetId == 0) {
+            mCurrentFillColor = color;
+        } else {
+            mCurrentStrokeColor = color;
+        }
+    }
+
+    Gradient *getCurrentGradientVal() {
+        if(mTargetId == 0) {
+            return mCurrentFillGradient;
+        } else {
+            return mCurrentStrokeGradient;
+        }
+    }
+
+    void setCurrentGradientVal(Gradient *gradient) {
+        if(mTargetId == 0) {
+            mCurrentFillGradient = gradient;
+        } else {
+            mCurrentStrokeGradient = gradient;
+        }
+    }
+
+    PaintType mCurrentFillPaintType;
+    PaintType mCurrentStrokePaintType;
+    Color mCurrentFillColor;
+    Color mCurrentStrokeColor;
+    Gradient *mCurrentStrokeGradient = NULL;
+    Gradient *mCurrentFillGradient = NULL;
+    Qt::PenCapStyle mCurrentCapStyle;
+    Qt::PenJoinStyle mCurrentJoinStyle;
+    qreal mCurrentStrokeWidth;
+
+    //
 
     void setNoPaintType();
     void setFlatPaintType();
@@ -251,6 +356,17 @@ private:
     QPushButton *mFillPickerButton;
     QPushButton *mStrokePickerButton;
     QPushButton *mFillStrokePickerButton;
+    void setTransformFinishEmitter(const char *slot);
+    void emitStrokeFlatColorChanged();
+    void emitStrokeFlatColorChangedTMP();
+    void emitStrokeGradientChanged();
+    void emitStrokeGradientChangedTMP();
+    void emitStrokePaintTypeChanged();
+    void emitFillFlatColorChanged();
+    void emitFillFlatColorChangedTMP();
+    void emitFillGradientChanged();
+    void emitFillGradientChangedTMP();
+    void emitFillPaintTypeChanged();
 };
 
 #endif // FILLSTROKESETTINGS_H
