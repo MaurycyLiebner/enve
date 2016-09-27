@@ -55,7 +55,13 @@ void BoxesList::paintEvent(QPaintEvent *)
             iInc *= 2;
         }
     }
-    for(int i = mMainWindow->getMinFrame(); i <= mMainWindow->getMaxFrame(); i += iInc) {
+    int minFrame = mMainWindow->getMinFrame();
+    if(mAnimator != NULL) {
+        while(xT + minFrame*mPixelsPerFrame < LIST_ITEM_MAX_WIDTH + 38.) {
+            minFrame++;
+        }
+    }
+    for(int i = minFrame; i <= mMainWindow->getMaxFrame(); i += iInc) {
         qreal xTT = xT + i*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, mViewedRect.height()) );
     }

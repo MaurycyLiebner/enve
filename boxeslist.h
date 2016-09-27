@@ -145,6 +145,7 @@ private:
     qreal mSavedMinShownValue;
     QPointF mMiddlePressPos;
     QRectF mGraphRect;
+    qreal mValueInc;
 
     QrealAnimator *mAnimator = NULL;
 };

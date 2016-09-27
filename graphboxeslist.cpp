@@ -70,34 +70,17 @@ void BoxesList::graphPaint(QPainter *p)
     //            Qt::AlignCenter, QString::number(mCurrentFrame));
     p->drawLine(xL, 20, xL, mGraphRect.height());*/
 
-
-    qreal lineWidth = 2.;
-    qreal incValue = 1000.;
-    bool by2 = true;
-    int currAlpha = 255;
-    while(mPixelsPerValUnit*incValue > 50.) {
-        qreal yL = mGraphRect.height() +
-                fmod(mMinShownVal, incValue)*mPixelsPerValUnit - mMargin;
-        qreal incY = incValue*mPixelsPerValUnit;
-        if( yL > 20 && (yL < mGraphRect.height() || yL - incY > 20) ) {
-            p->setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
-            qreal currValue = mMinShownVal - fmod(mMinShownVal, incValue);
-            while(yL > 20) {
-                p->drawText(QRectF(0, yL - incY, 40, 2*incY),
-                            Qt::AlignCenter, QString::number(currValue));
-                p->drawLine(40, yL, mGraphRect.width(), yL);
-                yL -= incY;
-                currValue += incValue;
-            }
-            currAlpha *= 0.95;
-            lineWidth *= 0.85;
-        }
-        if(by2) {
-            incValue /= 2;
-        } else {
-            incValue /= 5;
-        }
-        by2 = !by2;
+    p->setPen(QPen(QColor(0, 0, 0, 125), 2.));
+    qreal incY = mValueInc*mPixelsPerValUnit;
+    qreal yL = mGraphRect.height() +
+            fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit - mMargin - incY;
+    qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
+    while(yL > 0) {
+        p->drawText(QRectF(0, yL - incY, 40, 2*incY),
+                    Qt::AlignCenter, QString::number(currValue));
+        p->drawLine(40, yL, mGraphRect.width(), yL);
+        yL -= incY;
+        currValue += mValueInc;
     }
 
     p->save();
@@ -145,6 +128,18 @@ void BoxesList::graphUpdateDimensions() {
     }
     mPixelsPerValUnit = mValueScale*(mGraphRect.height() - 2*mMargin)/
                                 (mMaxVal - mMinVal);
+    mValueInc = 10000.;
+    qreal incIncValue = 1000.;
+    int nIncs = 0;
+    while(mValueInc*mPixelsPerValUnit > 50. ) {
+        mValueInc -= incIncValue;
+        nIncs++;
+        if(nIncs == 9) {
+            nIncs = 0;
+            incIncValue *= 0.1;
+        }
+    }
+
     graphIncMinShownVal(0.);
     updatePixelsPerFrame();
     mAnimator->setDrawPathUpdateNeeded();
