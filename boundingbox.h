@@ -31,6 +31,10 @@ class BoxesGroup;
 
 class BoxesList;
 
+class CtrlPoint;
+
+class Edge;
+
 class BoundingBox : public Transformable
 {
 public:
@@ -181,6 +185,10 @@ public:
     virtual void startStrokeWidthTransform() {}
     virtual void startStrokeColorTransform() {}
     virtual void startFillColorTransform() {}
+
+    virtual Edge *getEgde(QPointF absPos) {
+        return NULL;
+    }
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 

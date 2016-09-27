@@ -64,11 +64,11 @@ public:
 
     QPointF getStartCtrlPtAbsPos();
     QPointF getStartCtrlPtValue();
-    MovablePoint *getStartCtrlPt();
+    CtrlPoint *getStartCtrlPt();
 
     QPointF getEndCtrlPtAbsPos();
     QPointF getEndCtrlPtValue();
-    MovablePoint *getEndCtrlPt();
+    CtrlPoint *getEndCtrlPt();
 
     void draw(QPainter *p, CanvasMode mode);
 

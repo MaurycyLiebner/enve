@@ -7,6 +7,7 @@
 #include "fillstrokesettings.h"
 #include <QSqlQuery>
 #include <QThread>
+#include "ctrlpoint.h"
 
 class MainWindow;
 
@@ -19,6 +20,56 @@ enum CanvasMode : short {
     MOVE_POINT,
     ADD_POINT,
     PICK_PATH_SETTINGS
+};
+
+class Edge {
+public:
+    Edge(PathPoint *pt1, PathPoint *pt2, qreal pressedT) {
+        mPoint1 = pt1;
+        mPoint1EndPt = pt1->getEndCtrlPt();
+        mPoint2 = pt2;
+        mPoint2StartPt = pt2->getStartCtrlPt();
+        mPressedT = pressedT;
+    }
+
+    void makePassThrough(QPointF absPos) {
+        QPointF p0Pos = mPoint1->getAbsolutePos();
+        QPointF p1Pos = mPoint1EndPt->getAbsolutePos();
+        QPointF p2Pos = mPoint2StartPt->getAbsolutePos();
+        QPointF p3Pos = mPoint2->getAbsolutePos();
+        qreal x0 = p0Pos.x();
+        qreal y0 = p0Pos.y();
+        qreal x1 = p1Pos.x();
+        qreal y1 = p1Pos.y();
+        qreal x2 = p2Pos.x();
+        qreal y2 = p2Pos.y();
+        qreal x3 = p3Pos.x();
+        qreal y3 = p3Pos.y();
+
+        qreal dx = absPos.x() - calcCubicBezierVal(x0, x1, x2, x3, mPressedT);
+        qreal dy = absPos.y() - calcCubicBezierVal(y0, y1, y2, y3, mPressedT);
+        while(dx*dx + dy*dy > 1.) {
+            x1 += (1. - mPressedT)*dx;
+            y1 += (1. - mPressedT)*dy;
+            x2 += mPressedT*dx;
+            y2 += mPressedT*dy;
+
+            dx = absPos.x() - calcCubicBezierVal(x0, x1, x2, x3, mPressedT);
+            dy = absPos.y() - calcCubicBezierVal(y0, y1, y2, y3, mPressedT);
+        }
+
+
+        mPoint1EndPt->setAbsolutePos(QPointF(x1, y1) );
+        mPoint2StartPt->setAbsolutePos(QPointF(x2, y2) );
+    }
+
+private:
+    PathPoint *mPoint1;
+    CtrlPoint *mPoint1EndPt;
+    PathPoint *mPoint2;
+    CtrlPoint *mPoint2StartPt;
+
+    qreal mPressedT;
 };
 
 class Canvas : public QWidget, public BoxesGroup
@@ -178,6 +229,8 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    Edge *mCurrentEdge = NULL;
+
     bool mPreviewing = false;
     QImage *mCurrentPreviewImg = NULL;
     QTimer *mPreviewFPSTimer = NULL;

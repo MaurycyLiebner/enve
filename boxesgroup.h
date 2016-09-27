@@ -12,6 +12,8 @@
 
 class MainWindow;
 
+class Edge;
+
 class BoxesGroup : public BoundingBox
 {
 public:
@@ -148,6 +150,8 @@ public:
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
+    void clearPointsSelectionOrDeselect();
+    Edge *getPressedEdge(QPointF absPos);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

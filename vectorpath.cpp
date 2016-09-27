@@ -214,10 +214,15 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
                                      QSizeF(maxDist*2, maxDist*2))) ) {
         return NULL;
     }
-    startNewUndoRedoSet();
 
     qreal nearestPercent = findPercentForPoint(absPos);
     QPointF nearestPtOnPath = mMappedPath.pointAtPercent(nearestPercent);
+    if((nearestPtOnPath - absPos).manhattanLength() > maxDist ) {
+        return NULL;
+    }
+
+    startNewUndoRedoSet();
+
     qreal nearestPtPercent;
     PathPoint *nearestPoint = findPointNearestToPercent(nearestPercent,
                                                         &nearestPtPercent);
@@ -247,6 +252,52 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
 
     finishUndoRedoSet();
     return newPoint;
+}
+
+Edge *VectorPath::getEgde(QPointF absPos) {
+    qreal maxDist = 14.f;
+    if(!mMappedPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
+                                     QSizeF(maxDist*2, maxDist*2))) ) {
+        return NULL;
+    }
+
+    qreal nearestPercent = findPercentForPoint(absPos);
+    QPointF nearestPtOnPath = mMappedPath.pointAtPercent(nearestPercent);
+
+    if((nearestPtOnPath - absPos).manhattanLength() > maxDist ) {
+        return NULL;
+    }
+
+    qreal nearestPtPercent;
+    PathPoint *nearestPoint = findPointNearestToPercent(nearestPercent,
+                                                        &nearestPtPercent);
+
+    PathPoint *prevPoint;
+    PathPoint *nextPoint;
+    if(nearestPtPercent > nearestPercent) {
+        prevPoint = nearestPoint->getPreviousPoint();
+        nextPoint = nearestPoint;
+    } else {
+        nextPoint = nearestPoint->getNextPoint();
+        prevPoint = nearestPoint;
+    }
+
+    if(!nextPoint->isStartCtrlPtEnabled() ) {
+        nextPoint->setStartCtrlPtEnabled(true);
+    }
+    if(!prevPoint->isEndCtrlPtEnabled() ) {
+        prevPoint->setEndCtrlPtEnabled(true);
+    }
+
+    qreal percent1 = findPercentForPoint(prevPoint->getAbsolutePos());
+    qreal percent2 = findPercentForPoint(nextPoint->getAbsolutePos());
+    if(nextPoint->isSeparatePathPoint() ) {
+        percent2 += 1;
+    }
+    qreal minPercent = qMin(percent1, percent2);
+    qreal maxPercent = qMax(percent1, percent2);
+    qreal pressedT = (nearestPercent - minPercent) / (maxPercent - minPercent);
+    return new Edge(prevPoint, nextPoint, pressedT);
 }
 
 void VectorPath::centerPivotPosition() {

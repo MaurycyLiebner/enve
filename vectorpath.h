@@ -17,6 +17,8 @@ enum CanvasMode : short;
 
 class VectorPath;
 
+class Edge;
+
 class GradientPoints {
 public:
     GradientPoints();
@@ -261,6 +263,7 @@ public:
     void startAllPointsTransform();
     void finishAllPointsTransform();
 
+    Edge *getEgde(QPointF absPos);
 protected:
     PathAnimator mPathAnimator;
 

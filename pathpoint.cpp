@@ -299,7 +299,7 @@ QPointF PathPoint::getStartCtrlPtValue()
     }
 }
 
-MovablePoint *PathPoint::getStartCtrlPt()
+CtrlPoint *PathPoint::getStartCtrlPt()
 {
     return mStartCtrlPt;
 }
@@ -344,7 +344,7 @@ QPointF PathPoint::getEndCtrlPtValue()
     }
 }
 
-MovablePoint *PathPoint::getEndCtrlPt()
+CtrlPoint *PathPoint::getEndCtrlPt()
 {
     return mEndCtrlPt;
 }

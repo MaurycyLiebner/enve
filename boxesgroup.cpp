@@ -2,6 +2,7 @@
 #include "undoredo.h"
 #include <QApplication>
 #include "mainwindow.h"
+#include "ctrlpoint.h"
 
 bool zLessThan(BoundingBox *box1, BoundingBox *box2)
 {
@@ -53,6 +54,14 @@ void BoxesGroup::updateAfterFrameChanged(int currentFrame)
     BoundingBox::updateAfterFrameChanged(currentFrame);
     foreach(BoundingBox *box, mChildren) {
         box->updateAfterFrameChanged(currentFrame);
+    }
+}
+
+void BoxesGroup::clearPointsSelectionOrDeselect() {
+    if(mSelectedPoints.isEmpty() ) {
+        deselectAllBoxes();
+    } else {
+        clearPointsSelection();
     }
 }
 
@@ -231,6 +240,17 @@ void BoxesGroup::setIsCurrentGroup(bool bT)
 
 bool BoxesGroup::isCurrentGroup() {
     return mIsCurrentGroup;
+}
+
+Edge *BoxesGroup::getPressedEdge(QPointF absPos) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->isSelected() ) {
+            Edge *pathEdge = box->getEgde(absPos);
+            if(pathEdge == NULL) continue;
+            return pathEdge;
+        }
+    }
+    return NULL;
 }
 
 BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
