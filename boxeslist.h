@@ -92,6 +92,8 @@ protected:
 signals:
     void changedViewedFrames(int, int);
 public slots:
+    void graphUpdateAfterKeysChangedAndRepaint();
+
     void graphUpdateAfterKeysChanged();
     void graphMergeKeysIfNeeded();
 

@@ -196,6 +196,7 @@ void BoxesList::graphMousePress(QPointF pressPos) {
             graphClearKeysSelection();
             QrealKey *newKey = new QrealKey(qRound(frame), mAnimator, value);
             mAnimator->appendKey(newKey);
+            mAnimator->updateKeysPath();
             mCurrentPoint = newKey->getEndPoint();
             mAnimator->getMinAndMaxMoveFrame(newKey, mCurrentPoint,
                                              &mMinMoveFrame, &mMaxMoveFrame);
@@ -445,7 +446,7 @@ void BoxesList::graphMousePressEvent(QPoint eventPos,
         QrealPointValueDialog *dialog = new QrealPointValueDialog(point, this);
         dialog->show();
         connect(dialog, SIGNAL(repaintSignal()),
-                this, SLOT(graphUpdateAfterKeysChanged()) );
+                this, SLOT(graphUpdateAfterKeysChangedAndRepaint()) );
         connect(dialog, SIGNAL(finished(int)),
                 this, SLOT(graphMergeKeysIfNeeded()) );
     } else if(eventButton == Qt::MiddleButton) {
@@ -546,6 +547,12 @@ void BoxesList::graphUpdateDrawPathIfNeeded() {
                                           mMinViewedFrame, mMinShownVal,
                                           mPixelsPerFrame, mPixelsPerValUnit);
     }
+}
+
+void BoxesList::graphUpdateAfterKeysChangedAndRepaint() {
+    graphUpdateAfterKeysChanged();
+    scheduleRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesList::graphUpdateAfterKeysChanged()
