@@ -25,8 +25,6 @@ class BoxesList : public QWidget
     Q_OBJECT
 public:
     explicit BoxesList(MainWindow *mainWindow, QWidget *parent = 0);
-    void scheduleRepaint();
-    void repaintIfNeeded();
 
     int getMinViewedFrame();
     int getMaxViewedFrame();
@@ -117,7 +115,6 @@ private:
     bool mSelecting = false;
     QRectF mSelectionRect;
 
-    bool mRepaintScheduled = false;
     Canvas *mCanvas;
     QRectF mViewedRect;
     MainWindow *mMainWindow;

@@ -12,7 +12,7 @@
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                MainWindow *parent) :
     QWidget(parent),
-    BoxesGroup(fillStrokeSettings, parent)
+    BoxesGroup(fillStrokeSettings)
 {
     incNumberPointers();
 
@@ -35,6 +35,10 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 Canvas::~Canvas()
 {
     delete mRotPivot;
+}
+
+void Canvas::updateDisplayedFillStrokeSettings() {
+    mCurrentBoxesGroup->setDisplayedFillStrokeSettingsFromLastSelected();
 }
 
 QRectF Canvas::getBoundingRect()
@@ -329,31 +333,15 @@ void Canvas::makePointCtrlsCorner()
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
 }
 
-void Canvas::scheduleRepaint()
-{
-    if(mRepaintNeeded) {
-        return;
-    }
-    mRepaintNeeded = true;
-}
-
-void Canvas::repaintIfNeeded()
-{
-    if(mRepaintNeeded) {
-        repaint();
-        mRepaintNeeded = false;
-    }
-}
-
 void Canvas::moveSecondSelectionPoint(QPointF pos) {
     mSelectionRect.setBottomRight(pos);
-    scheduleRepaint();
+
 }
 
 void Canvas::startSelectionAtPoint(QPointF pos) {
     mSelectionRect.setTopLeft(pos);
     mSelectionRect.setBottomRight(pos);
-    scheduleRepaint();
+
 }
 
 void Canvas::updatePivot() {
@@ -364,7 +352,8 @@ void Canvas::updatePivot() {
         mRotPivot->hide();
     } else {
         mRotPivot->show();
-        mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedPivotPos(), false);
+        mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedPivotPos(),
+                                  false);
     }
 }
 
@@ -389,7 +378,7 @@ void Canvas::setCanvasMode(CanvasMode mode) {
     if(mCurrentMode == MOVE_PATH) {
         schedulePivotUpdate();
     }
-    scheduleRepaint();
+
 }
 
 void Canvas::keyPressEvent(QKeyEvent *event)
@@ -525,7 +514,7 @@ void Canvas::resetTransormation() {
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
     updateAfterCombinedTransformationChanged();
-    scheduleRepaint();
+
 }
 
 void Canvas::fitCanvasToSize() {
@@ -541,7 +530,7 @@ void Canvas::fitCanvasToSize() {
     moveBy(QPointF( (width() - mVisibleWidth)*0.5f,
                     (height() - mVisibleHeight)*0.5f) );
     updateAfterCombinedTransformationChanged();
-    scheduleRepaint();
+
 }
 
 void Canvas::moveBy(QPointF trans)

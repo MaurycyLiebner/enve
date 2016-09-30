@@ -128,7 +128,7 @@ public:
             mFillPaintSettings.setGradient(gradient);
             updateDrawGradients();
 
-            scheduleRepaint();
+
         }
     }
 
@@ -144,7 +144,7 @@ public:
             mStrokeSettings.setGradient(gradient);
             updateDrawGradients();
 
-            scheduleRepaint();
+
         }
     }
 
@@ -157,7 +157,7 @@ public:
                 mFillPaintSettings.getColorAnimator()->finishTransform();
             }
 
-            scheduleRepaint();
+
         }
     }
 
@@ -170,7 +170,7 @@ public:
                 mStrokeSettings.getColorAnimator()->finishTransform();
             }
 
-            scheduleRepaint();
+
         }
     }
 
@@ -186,7 +186,7 @@ public:
         }
         mFillPaintSettings.setPaintType(paintType);
 
-        scheduleRepaint();
+
     }
 
     virtual void setStrokePaintType(PaintType paintType, Color color,
@@ -201,20 +201,20 @@ public:
         }
         mStrokeSettings.setPaintType(paintType);
 
-        scheduleRepaint();
+
     }
 
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
         mStrokeSettings.setCapStyle(capStyle);
         updateOutlinePath();
 
-        scheduleRepaint();
+
     }
 
     virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
         mStrokeSettings.setJoinStyle(joinStyle);
         updateOutlinePath();
-        scheduleRepaint();
+
     }
 
     virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
@@ -224,7 +224,7 @@ public:
         }
         updateOutlinePath();
 
-        scheduleRepaint();
+
     }
 
     void startStrokeWidthTransform() {

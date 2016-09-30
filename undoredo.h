@@ -62,10 +62,8 @@ private:
 class UndoRedoStack {
 public:
     UndoRedoStack() {}
+
     void startNewSet() {
-        if(mNumberOfSets == 0) {
-            mCurrentSet = new UndoRedoSet();
-        }
         mNumberOfSets++;
     }
 
@@ -80,18 +78,22 @@ public:
         mNumberOfSets--;
         if(mNumberOfSets == 0) {
             addSet();
-            mCurrentSet = NULL;
         }
     }
 
     void addSet() {
-        if(mCurrentSet->isEmpty()) {
+        if((mCurrentSet == NULL) ? true : mCurrentSet->isEmpty()) {
+            mCurrentSet = NULL;
             return;
         }
         addUndoRedo(mCurrentSet);
+        mCurrentSet = NULL;
     }
 
     void addToSet(UndoRedo *undoRedo) {
+        if(mCurrentSet == NULL) {
+            mCurrentSet = new UndoRedoSet();
+        }
         mCurrentSet->addUndoRedo(undoRedo);
     }
 

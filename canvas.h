@@ -59,8 +59,8 @@ public:
         }
 
 
-        mPoint1EndPt->setAbsolutePos(QPointF(x1, y1) );
-        mPoint2StartPt->setAbsolutePos(QPointF(x2, y2) );
+        mPoint1EndPt->moveToAbs(QPointF(x1, y1) );
+        mPoint2StartPt->moveToAbs(QPointF(x2, y2) );
     }
 
 private:
@@ -87,8 +87,6 @@ public:
     void removeBoxFromSelection(BoundingBox *box);
     void selectOnlyLastPressedPoint();
     void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
-
-    void scheduleRepaint();
 
     void repaintIfNeeded();
     void setCanvasMode(CanvasMode mode);
@@ -192,6 +190,7 @@ public:
         mCurrentBoxesGroup->startSelectedFillColorTransform();
     }
 
+    void updateDisplayedFillStrokeSettings();
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -252,8 +251,6 @@ private:
 
     qreal mVisibleWidth = 1920;
     qreal mVisibleHeight = 1080;
-
-    bool mRepaintNeeded = false;
     bool mPivotUpdateNeeded = false;
 
     bool mFirstMouseMove = false;

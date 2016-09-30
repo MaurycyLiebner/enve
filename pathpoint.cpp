@@ -36,6 +36,8 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
                                    mEndCtrlPt->getRelativePosAnimatorPtr(),
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
                                    getRelativePosAnimatorPtr());
+
+    mPathPointAnimators.incNumberPointers();
 }
 
 void PathPoint::clearAll()
@@ -69,6 +71,7 @@ PathPoint::PathPoint(QPointF absPos,
                                    mEndCtrlPt->getRelativePosAnimatorPtr(),
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
                                    getRelativePosAnimatorPtr());
+    mPathPointAnimators.incNumberPointers();
 }
 
 PathPoint::PathPoint(int movablePointId, int pathPointId,
@@ -105,6 +108,7 @@ PathPoint::PathPoint(int movablePointId, int pathPointId,
                                    mEndCtrlPt->getRelativePosAnimatorPtr(),
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
                                    getRelativePosAnimatorPtr());
+    mPathPointAnimators.incNumberPointers();
 }
 
 void PathPoint::startTransform()

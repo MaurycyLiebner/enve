@@ -301,7 +301,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     QPointF eventPos = event->pos();
     if(event->buttons() & Qt::MiddleButton) {
         moveBy(event->pos() - mLastMouseEventPos);
-        scheduleRepaint();
+        
     } else {
         if(mSelecting) {
             moveSecondSelectionPoint(eventPos);
@@ -328,7 +328,7 @@ void Canvas::wheelEvent(QWheelEvent *event)
     }
     mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
-    scheduleRepaint();
+    
     callUpdateSchedulers();
 }
 
@@ -349,6 +349,6 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
             setCanvasMode(MOVE_PATH);
         }
     }
-    scheduleRepaint();
+    
     callUpdateSchedulers();
 }

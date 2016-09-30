@@ -33,8 +33,13 @@ PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos) {
     return NULL;
 }
 
-BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent) :
-    BoundingBox(parent, BoundingBoxType::TYPE_CANVAS)
+void BoxesGroup::setDisplayedFillStrokeSettingsFromLastSelected() {
+    if(mSelectedBoxes.isEmpty()) return;
+    setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
+}
+
+BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
+    BoundingBox(BoundingBoxType::TYPE_CANVAS)
 {
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
@@ -235,7 +240,7 @@ void BoxesGroup::setIsCurrentGroup(bool bT)
             mParent->removeChild(this);
         }
     }
-    scheduleRepaint();
+    
 }
 
 bool BoxesGroup::isCurrentGroup() {
@@ -607,7 +612,7 @@ void BoxesGroup::connectPoints()
             firstPoint->connectToPoint(secondPoint);
         }
         finishUndoRedoSet();
-        scheduleRepaint();
+        
     }
 
     callUpdateSchedulers();
@@ -629,7 +634,7 @@ void BoxesGroup::disconnectPoints()
         firstPoint->disconnectFromPoint(secondPoint);
 
         finishUndoRedoSet();
-        scheduleRepaint();
+        
     }
 
     callUpdateSchedulers();
@@ -653,7 +658,7 @@ void BoxesGroup::mergePoints()
         secondPoint->moveToAbs(sumPos/2);
 
         finishUndoRedoSet();
-        scheduleRepaint();
+        
     }
 
     callUpdateSchedulers();
@@ -667,7 +672,7 @@ void BoxesGroup::setPointCtrlsMode(CtrlsMode mode) {
         }
     }
     finishUndoRedoSet();
-    scheduleRepaint();
+    
 
     callUpdateSchedulers();
 }
@@ -931,7 +936,6 @@ void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
         mChildren.at(i)->setZListIndex(i, saveUndoRedo);
     }
     if(saveUndoRedo) finishUndoRedoSet();
-    scheduleBoxesListRepaint();
 }
 
 void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)

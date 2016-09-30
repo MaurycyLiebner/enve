@@ -13,38 +13,45 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
     addChildAnimator(&mVal2Animator);
     addChildAnimator(&mVal3Animator);
     addChildAnimator(&mAlphaAnimator);
+
+    mVal1Animator.setValueRange(0., 1.);
+    mVal1Animator.setPrefferedValueStep(0.05);
+    mVal2Animator.setValueRange(0., 1.);
+    mVal2Animator.setPrefferedValueStep(0.05);
+    mVal3Animator.setValueRange(0., 1.);
+    mVal3Animator.setPrefferedValueStep(0.05);
+    mAlphaAnimator.setValueRange(0., 1.);
+    mAlphaAnimator.setPrefferedValueStep(0.05);
 }
 
-void ColorAnimator::setCurrentValue(Color colorValue)
+void ColorAnimator::setCurrentValue(Color colorValue, bool finish)
 {
     if(mColorMode == RGBMODE) {
-        mVal1Animator.setCurrentValue(colorValue.gl_r);
-        mVal2Animator.setCurrentValue(colorValue.gl_g);
-        mVal3Animator.setCurrentValue(colorValue.gl_b);
-        mAlphaAnimator.setCurrentValue(colorValue.gl_a);
+        mVal1Animator.setCurrentValue(colorValue.gl_r, finish);
+        mVal2Animator.setCurrentValue(colorValue.gl_g, finish);
+        mVal3Animator.setCurrentValue(colorValue.gl_b, finish);
     } else if(mColorMode == HSVMODE) {
-        mVal1Animator.setCurrentValue(colorValue.gl_h);
-        mVal2Animator.setCurrentValue(colorValue.gl_s);
-        mVal3Animator.setCurrentValue(colorValue.gl_v);
-        mAlphaAnimator.setCurrentValue(colorValue.gl_a);
+        mVal1Animator.setCurrentValue(colorValue.gl_h, finish);
+        mVal2Animator.setCurrentValue(colorValue.gl_s, finish);
+        mVal3Animator.setCurrentValue(colorValue.gl_v, finish);
     } else { // HSLMODE
         float h = colorValue.gl_h;
         float s = colorValue.gl_s;
         float l = colorValue.gl_v;
         hsv_to_hsl(&h, &s, &l);
 
-        mVal1Animator.setCurrentValue(h);
-        mVal2Animator.setCurrentValue(s);
-        mVal3Animator.setCurrentValue(l);
-        mAlphaAnimator.setCurrentValue(colorValue.gl_a);
+        mVal1Animator.setCurrentValue(h, finish);
+        mVal2Animator.setCurrentValue(s, finish);
+        mVal3Animator.setCurrentValue(l, finish);
     }
+    mAlphaAnimator.setCurrentValue(colorValue.gl_a, finish);
 }
 
-void ColorAnimator::setCurrentValue(QColor qcolorValue)
+void ColorAnimator::setCurrentValue(QColor qcolorValue, bool finish)
 {
     Color color;
     color.setQColor(qcolorValue);
-    setCurrentValue(color);
+    setCurrentValue(color, finish);
 }
 
 Color ColorAnimator::getCurrentValue() const

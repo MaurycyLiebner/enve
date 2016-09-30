@@ -25,6 +25,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
+    static MainWindow *mMainWindowInstance;
+
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
@@ -70,12 +72,13 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    static MainWindow *getInstance();
+
     UndoRedoStack *getUndoRedoStack();
 
     void addUpdateScheduler(UpdateScheduler *scheduler);
 
     void callUpdateSchedulers();
-    void scheduleRepaint();
     void schedulePivotUpdate();
 
     AnimationDockWidget *getAnimationDockWidget();

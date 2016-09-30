@@ -39,7 +39,7 @@ class BoundingBox : public Transformable
 {
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
-    BoundingBox(MainWindow *window, BoundingBoxType type);
+    BoundingBox(BoundingBoxType type);
     BoundingBox(int boundingBoxId, BoxesGroup *parent,
                 BoundingBoxType type);
 
@@ -107,10 +107,6 @@ public:
 
     void setPivotRelPos(QPointF relPos, bool saveUndoRedo = true, bool pivotChanged = true);
 
-    void scheduleRemoval();
-    void descheduleRemoval();
-    bool isScheduldedForRemoval();
-
     void cancelTransform();
     void scale(qreal scaleXBy, qreal scaleYBy);
 
@@ -125,8 +121,10 @@ public:
     QPointF getAbsBoneAttachPoint();
     //
 
-    virtual void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY,
-                              qreal pixelsPerFrame, int startFrame, int endFrame, bool animationBar);
+    virtual void drawListItem(QPainter *p,
+                              qreal drawX, qreal drawY,
+                              qreal maxY, qreal pixelsPerFrame,
+                              int startFrame, int endFrame, bool animationBar);
     virtual qreal getListItemHeight();
     void showChildrenListItems();
     void hideChildrenListItems();
@@ -137,7 +135,7 @@ public:
     void show();
     bool isVisible();
     void setVisibile(bool visible, bool saveUndoRedo = true);
-    virtual void handleListItemMousePress(qreal relX, qreal relY,
+    virtual void handleListItemMousePress(qreal boxesListX, qreal relX, qreal relY,
                                           QMouseEvent *event);
     void setChildrenListItemsVisible(bool bt);
     void lock();
@@ -170,23 +168,24 @@ public:
     void addActiveAnimator(QrealAnimator *animator);
     void removeActiveAnimator(QrealAnimator *animator);
 
-    virtual void setFillGradient(Gradient* gradient, bool finish) {}
-    virtual void setStrokeGradient(Gradient* gradient, bool finish) {}
-    virtual void setFillFlatColor(Color color, bool finish) {}
-    virtual void setStrokeFlatColor(Color color, bool finish) {}
+    virtual void setFillGradient(Gradient* gradient, bool finish) { Q_UNUSED(gradient); Q_UNUSED(finish); }
+    virtual void setStrokeGradient(Gradient* gradient, bool finish) { Q_UNUSED(gradient); Q_UNUSED(finish); }
+    virtual void setFillFlatColor(Color color, bool finish) { Q_UNUSED(color); Q_UNUSED(finish); }
+    virtual void setStrokeFlatColor(Color color, bool finish) { Q_UNUSED(color); Q_UNUSED(finish); }
     virtual void setFillPaintType(PaintType paintType, Color color,
-                                  Gradient* gradient) {}
+                                  Gradient* gradient) { Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
     virtual void setStrokePaintType(PaintType paintType, Color color,
-                                    Gradient* gradient) {}
-    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {}
-    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {}
-    virtual void setStrokeWidth(qreal strokeWidth, bool finish) {}
+                                    Gradient* gradient) { Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
+    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) { Q_UNUSED(capStyle); }
+    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) { Q_UNUSED(joinStyle); }
+    virtual void setStrokeWidth(qreal strokeWidth, bool finish) { Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
 
     virtual void startStrokeWidthTransform() {}
     virtual void startStrokeColorTransform() {}
     virtual void startFillColorTransform() {}
 
     virtual Edge *getEgde(QPointF absPos) {
+        Q_UNUSED(absPos);
         return NULL;
     }
 protected:

@@ -4,71 +4,108 @@
 #include "undoredo.h"
 #include "canvas.h"
 
-Gradient::Gradient(Color color1, Color color2, GradientWidget *gradientWidget, MainWindow *parent) :
-    ConnectedToMainWindow(parent)
+Gradient::Gradient(Color color1, Color color2, GradientWidget *gradientWidget) :
+    ComplexAnimator()
 {
+    setName("gradient");
     mGradientWidget = gradientWidget;
-    colors << color1;
-    colors << color2;
+    addColorToList(color1);
+    addColorToList(color2);
     updateQGradientStops();
 }
 
-void Gradient::startTransform() {
-    savedColors = colors;
-}
 
-
-Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget, MainWindow *parent) :
-    ConnectedToMainWindow(parent)
+Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget) :
+    ComplexAnimator()
 {
+    setName("gradient");
     mGradientWidget = gradientWidget;
-    foreach (Color color, fromGradient->colors) {
-        colors << color;
+    foreach (ColorAnimator *color, fromGradient->mColors) {
+        addColorToList(color->getCurrentValue());
     }
     updateQGradientStops();
 }
 
-Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget, MainWindow *parent) :
-    ConnectedToMainWindow(parent) {
+Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
+    ComplexAnimator() {
+    setName("gradient");
     QSqlQuery query;
     mGradientWidget = gradientWidget;
-    sqlId = sqlIdT;
+    mSqlId = sqlIdT;
     QString queryStr = QString("SELECT * FROM gradient WHERE id = %1").
-            arg(sqlId);
+            arg(mSqlId);
     if(query.exec(queryStr) ) {
         query.next();
         queryStr = QString("SELECT colorid FROM gradientcolor WHERE gradientid = %1 ORDER BY positioningradient ASC").
-                arg(sqlId);
+                arg(mSqlId);
         if(query.exec(queryStr) ) {
             int idColorId = query.record().indexOf("colorid");
             while(query.next()) {
                 int colorId = query.value(idColorId).toInt();
-                colors << Color(colorId);
+                addColorToList(Color(colorId) );
             }
         } else {
-            qDebug() << "Could not load gradientcolors for gradient with id " << sqlId;
+            qDebug() << "Could not load gradientcolors for gradient with id " << mSqlId;
         }
     } else {
-        qDebug() << "Could not load gradient with id " << sqlId;
+        qDebug() << "Could not load gradient with id " << mSqlId;
     }
     updateQGradientStops();
+}
+
+void Gradient::startTransform() {
+    //savedColors = colors;
+}
+
+void Gradient::addColorToList(Color color) {
+    ColorAnimator *newColorAnimator = new ColorAnimator();
+    newColorAnimator->setCurrentValue(color);
+    newColorAnimator->setUpdater(new GradientUpdater(this) );
+    mColors << newColorAnimator;
+
+    addChildAnimator(newColorAnimator);
+}
+
+Color Gradient::getCurrentColorAt(int id)
+{
+    return mColors.at(id)->getCurrentValue();
+}
+
+int Gradient::getColorCount()
+{
+    return mColors.length();
+}
+
+QColor Gradient::getLastQGradientStopQColor()
+{
+    return mQGradientStops.last().second;
+}
+
+QColor Gradient::getFirstQGradientStopQColor()
+{
+    return mQGradientStops.first().second;
+}
+
+QGradientStops Gradient::getQGradientStops()
+{
+    return mQGradientStops;
 }
 
 int Gradient::saveToSql() {
     QSqlQuery query;
     query.exec("INSERT INTO gradient DEFAULT VALUES");
-    sqlId = query.lastInsertId().toInt();
-    int posInGradient = 0;
-    foreach(Color color, colors) {
-        int colorId = color.saveToSql();
-        query.exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
-                            "VALUES (%1, %2, %3)").
-                    arg(colorId).
-                    arg(sqlId).
-                    arg(posInGradient) );
-        posInGradient++;
+    mSqlId = query.lastInsertId().toInt();
+    //int posInGradient = 0;
+    foreach(ColorAnimator *color, mColors) {
+//        int colorId = color->saveToSql();
+//        query.exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
+//                            "VALUES (%1, %2, %3)").
+//                    arg(colorId).
+//                    arg(sqlId).
+//                    arg(posInGradient) );
+//        posInGradient++;
     }
-    return sqlId;
+    return mSqlId;
 }
 
 void Gradient::saveToSqlIfPathSelected() {
@@ -85,32 +122,34 @@ void Gradient::saveToSqlIfPathSelected() {
 }
 
 void Gradient::swapColors(int id1, int id2) {
-    colors.swap(id1, id2);
+    swapChildAnimators(mColors.at(id1), mColors.at(id2));
+    mColors.swap(id1, id2);
     updateQGradientStops();
 }
 
 void Gradient::removeColor(int id) {
-    colors.removeAt(id);
+    removeChildAnimator(mColors.at(id) );
+    mColors.takeAt(id)->decNumberPointers();
     updateQGradientStops();
 }
 
 void Gradient::addColor(Color color) {
-    colors << color;
+    addColorToList(color);
     updateQGradientStops();
 }
 
 void Gradient::replaceColor(int id, Color color) {
-    colors.replace(id, color);
+    mColors.at(id)->setCurrentValue(color);
     updateQGradientStops();
 }
 
 void Gradient::setColors(QList<Color> newColors)
 {
-    colors = newColors;
-    updateQGradientStops();
-    mGradientWidget->repaint();
-    mMainWindow->getFillStrokeSettings()->
-            setCurrentColor(mGradientWidget->getCurrentColor());
+//    colors = newColors;
+//    updateQGradientStops();
+//    mGradientWidget->repaint();
+//    mMainWindow->getFillStrokeSettings()->
+//            setCurrentColor(mGradientWidget->getCurrentColor());
 }
 
 bool Gradient::isInPaths(VectorPath *path) {
@@ -138,25 +177,30 @@ void Gradient::updatePaths()
 
 void Gradient::finishTransform()
 {
-    addUndoRedo(new ChangeGradientColorsUndoRedo(savedColors, colors, this));
-    savedColors = colors;
-    scheduleRepaint();
+    //addUndoRedo(new ChangeGradientColorsUndoRedo(savedColors, colors, this));
+    //savedColors = colors;
     callUpdateSchedulers();
 }
 
 void Gradient::updateQGradientStops() {
-    qgradientStops.clear();
-    qreal inc = 1.f/(colors.length() - 1.f);
+    mQGradientStops.clear();
+    qreal inc = 1.f/(mColors.length() - 1.f);
     qreal cPos = 0.f;
-    for(int i = 0; i < colors.length(); i++) {
-        qgradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0.f, 1.f), colors.at(i).qcol) );
+    for(int i = 0; i < mColors.length(); i++) {
+        mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0.f, 1.f),
+                                    mColors.at(i)->getCurrentValue().qcol) );
         cPos += inc;
     }
     updatePaths();
 }
 
 int Gradient::getSqlId() {
-    return sqlId;
+    return mSqlId;
+}
+
+void Gradient::setSqlId(int id)
+{
+    mSqlId = id;
 }
 
 
@@ -170,6 +214,7 @@ PaintSettings::PaintSettings(Color colorT,
                              Gradient *gradientT) : ComplexAnimator() {
     setName("fill");
     mColor.setCurrentValue(colorT);
+    mColor.incNumberPointers();
     mPaintType = paintTypeT;
     mGradient = gradientT;
 
@@ -227,6 +272,8 @@ StrokeSettings::StrokeSettings(Color colorT,
     mLineWidth.setName("thickness");
 
     addChildAnimator(&mLineWidth);
+
+    mLineWidth.setValueRange(0., mLineWidth.getMaxPossibleValue());
 }
 
 StrokeSettings StrokeSettings::createStrokeSettingsFromSql(int strokeSqlId,
@@ -510,6 +557,10 @@ void FillStrokeSettingsWidget::colorTypeSet(int id)
     } else if(id == 1) {
         setFlatPaintType();
     } else {
+        if((mTargetId == 0) ? (mCurrentFillGradient == NULL) :
+                (mCurrentStrokeGradient == NULL) ) {
+            mGradientWidget->setCurrentGradient((Gradient*)NULL);
+        }
         setGradientPaintType();
     }
     emitPaintTypeChanged();
@@ -648,8 +699,8 @@ void FillStrokeSettingsWidget::emitStrokeGradientChangedTMP() {
 
 void FillStrokeSettingsWidget::emitStrokePaintTypeChanged() {
     mCanvas->strokePaintTypeChanged(mCurrentStrokePaintType,
-                                mCurrentStrokeColor,
-                                mCurrentStrokeGradient);
+                                    mCurrentStrokeColor,
+                                    mCurrentStrokeGradient);
 
     mMainWindow->callUpdateSchedulers();
 }

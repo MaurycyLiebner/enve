@@ -546,7 +546,7 @@ void BoxesList::graphUpdateDrawPathIfNeeded() {
 
 void BoxesList::graphUpdateAfterKeysChangedAndRepaint() {
     graphUpdateAfterKeysChanged();
-    scheduleRepaint();
+    
     mMainWindow->callUpdateSchedulers();
 }
 

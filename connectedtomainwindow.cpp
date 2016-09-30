@@ -8,16 +8,10 @@ QString ConnectedToMainWindow::boolToSql(bool bT) {
     return (bT) ? "1" : "0";
 }
 
-ConnectedToMainWindow::ConnectedToMainWindow(ConnectedToMainWindow *parent) :
+ConnectedToMainWindow::ConnectedToMainWindow() :
     SmartPointerTarget()
 {
-    mMainWindow = parent->getMainWindow();
-}
-
-ConnectedToMainWindow::ConnectedToMainWindow(MainWindow *parent) :
-    SmartPointerTarget()
-{
-    mMainWindow = parent;
+    mMainWindow = MainWindow::getInstance();
 }
 
 void ConnectedToMainWindow::addUndoRedo(UndoRedo *undoRedo)
@@ -90,14 +84,6 @@ void ConnectedToMainWindow::startNewUndoRedoSet()
 void ConnectedToMainWindow::finishUndoRedoSet()
 {
      mMainWindow->getUndoRedoStack()->finishSet();
-}
-
-void ConnectedToMainWindow::scheduleRepaint() {
-    mMainWindow->scheduleRepaint();
-}
-
-void ConnectedToMainWindow::scheduleBoxesListRepaint() {
-    mMainWindow->scheduleBoxesListRepaint();
 }
 
 void ConnectedToMainWindow::schedulePivotUpdate() {

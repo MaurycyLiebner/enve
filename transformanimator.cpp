@@ -21,6 +21,7 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     addChildAnimator(&mPosAnimator);
     addChildAnimator(&mRotAnimator);
     addChildAnimator(&mScaleAnimator);
+    mScaleAnimator.setPrefferedValueStep(0.05);
     addChildAnimator(&mPivotAnimator);
     addChildAnimator(&mOpacityAnimator);
 }
@@ -122,7 +123,7 @@ void TransformAnimator::setPivot(qreal x, qreal y)
     setPivot(QPointF(x, y) );
 }
 
-void TransformAnimator::setPivot(QPointF point)
+void TransformAnimator::setPivot(QPointF point, bool finish)
 {
     QMatrix currentMatrix;
     qreal pivotX = mPivotAnimator.getXValue();
@@ -147,9 +148,7 @@ void TransformAnimator::setPivot(QPointF point)
     mPosAnimator.incAllValues(currentMatrix.dx() - futureMatrix.dx(),
                                  currentMatrix.dy() - futureMatrix.dy());
 
-    mPivotAnimator.startTransform();
-    mPivotAnimator.setCurrentValue(point);
-    mPivotAnimator.finishTransform();
+    mPivotAnimator.setCurrentValue(point, finish);
 
     callUpdater();
 }

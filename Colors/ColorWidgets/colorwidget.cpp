@@ -112,8 +112,10 @@ void ColorWidget::setHSLSaturation_f(GLfloat s, bool emit_signal)
     setColorHSV_f(hue, s, hsv_v, emit_signal);
 }
 
-void ColorWidget::setColorHSL_i(GLushort h, GLushort s, GLushort l, bool emit_signal)
+void ColorWidget::setColorHSL_i(GLushort h, GLushort s, GLushort l,
+                                bool emit_signal)
 {
+    Q_UNUSED(emit_signal);
     GLfloat h_f = clamp(h/360.f, 0.f, 1.f);
     GLfloat s_f = clamp(s*0.01f, 0.f, 1.f);
     GLfloat l_f = clamp(l*0.01f, 0.f, 1.f);

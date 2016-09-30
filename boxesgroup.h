@@ -18,7 +18,7 @@ class BoxesGroup : public BoundingBox
 {
 public:
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
-    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, MainWindow *parent);
+    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
     BoxesGroup(int boundingBoxId,
                FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
 
@@ -92,12 +92,15 @@ public:
                       qreal pixelsPerFrame,
                       int startFrame, int endFrame, bool animationBar);
     void drawChildrenListItems(QPainter *p,
-                      qreal drawX, qreal drawY, qreal maxY, qreal pixelsPerFrame,
+                      qreal drawX, qreal drawY,
+                      qreal maxY, qreal pixelsPerFrame,
                       int startFrame, int endFrame, bool animationBar);
     qreal getListItemHeight();
-    void handleListItemMousePress(qreal relX, qreal relY,
+    void handleListItemMousePress(qreal boxesListX,
+                                  qreal relX, qreal relY,
                                   QMouseEvent *event);
-    void handleChildListItemMousePress(qreal relX, qreal relY,
+    void handleChildListItemMousePress(qreal boxesListX,
+                                       qreal relX, qreal relY,
                                        qreal y0, QMouseEvent *event);
 
     bool isCurrentGroup();
@@ -152,6 +155,7 @@ public:
     void startSelectedFillColorTransform();
     void clearPointsSelectionOrDeselect();
     Edge *getPressedEdge(QPointF absPos);
+    void setDisplayedFillStrokeSettingsFromLastSelected();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

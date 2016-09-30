@@ -10,7 +10,7 @@ public:
     QPointF getCurrentValue();
     qreal getXValue();
     qreal getYValue();
-    void setCurrentValue(QPointF val);
+    void setCurrentValue(QPointF val, bool finish = false);
     void incCurrentValue(qreal x, qreal y);
     void multCurrentValue(qreal sx, qreal sy);
 

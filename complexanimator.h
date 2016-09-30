@@ -23,7 +23,6 @@ public:
     void addChildAnimator(QrealAnimator *childAnimator);
     void removeChildAnimator(QrealAnimator *removeAnimator);
     void startTransform();
-    void setConnectedToMainWindow(ConnectedToMainWindow *connected);
     void setUpdater(AnimatorUpdater *updater);
     void setFrame(int frame);
     void sortKeys();
@@ -38,7 +37,7 @@ public:
     void getKeysInRect(QRectF selectionRect, int minViewedFrame,
                        qreal pixelsPerFrame,
                        QList<QrealKey *> *keysList);
-    void handleListItemMousePress(qreal relX, qreal relY, QMouseEvent *event);
+    void handleListItemMousePress(qreal boxesListX, qreal relX, qreal relY, QMouseEvent *event);
     void retrieveSavedValue();
     void finishTransform();
     void cancelTransform();
@@ -50,6 +49,7 @@ public:
 
     bool isDescendantRecording();
     QString getValueText();
+    void swapChildAnimators(QrealAnimator *animator1, QrealAnimator *animator2);
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

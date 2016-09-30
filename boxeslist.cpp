@@ -164,7 +164,7 @@ void BoxesList::resizeEvent(QResizeEvent *e)
 
 void BoxesList::wheelEvent(QWheelEvent *event)
 {
-    if(mAnimator == NULL) {
+    if(mAnimator == NULL || event->x() < LIST_ITEM_MAX_WIDTH) {
         if(event->delta() > 0) {
             mViewedRect.translate(0, -LIST_ITEM_HEIGHT);
             if(mViewedRect.top() < 0) {
@@ -183,6 +183,7 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
 {
     if(event->x() < LIST_ITEM_MAX_WIDTH) {
         mCanvas->handleChildListItemMousePress(event->x(),
+                                               event->x(),
                                                event->y() + mViewedRect.top(),
                                                0.f, event);
     } else if(mAnimator == NULL) {
@@ -214,7 +215,7 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
                              event->button());
     }
 
-    scheduleRepaint();
+
     mMainWindow->callUpdateSchedulers();
 }
 
@@ -238,7 +239,7 @@ void BoxesList::mouseMoveEvent(QMouseEvent *event)
                             event->buttons());
     }
 
-    scheduleRepaint();
+
     mMainWindow->callUpdateSchedulers();
 }
 
@@ -307,7 +308,7 @@ void BoxesList::mouseReleaseEvent(QMouseEvent *e)
         graphMouseReleaseEvent(e->button());
     }
 
-    scheduleRepaint();
+
     mMainWindow->callUpdateSchedulers();
 }
 
@@ -321,13 +322,6 @@ void BoxesList::setFramesRange(int startFrame, int endFrame)
         graphUpdateDrawPathIfNeeded();
     }
     repaint();
-}
-
-void BoxesList::repaintIfNeeded() {
-    if(mRepaintScheduled) {
-        repaint();
-        mRepaintScheduled = false;
-    }
 }
 
 int BoxesList::getMinViewedFrame()
@@ -376,9 +370,4 @@ void BoxesList::clearKeySelection()
         key->setSelected(false);
     }
     mSelectedKeys.clear();
-}
-
-void BoxesList::scheduleRepaint() {
-    if(mRepaintScheduled) return;
-    mRepaintScheduled = true;
 }

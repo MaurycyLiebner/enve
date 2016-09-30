@@ -22,7 +22,7 @@ void GradientPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 void GradientPoint::setColor(QColor fillColor)
 {
     mFillColor = fillColor;
-    scheduleRepaint();
+    
 }
 
 void GradientPoint::draw(QPainter *p)

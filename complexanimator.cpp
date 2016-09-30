@@ -4,7 +4,7 @@
 ComplexAnimator::ComplexAnimator() :
     QrealAnimator()
 {
-
+    mIsComplexAnimator = true;
 }
 
 #include <QDebug>
@@ -33,6 +33,7 @@ ComplexKey *ComplexAnimator::getKeyCollectionAtFrame(int frame) {
 void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
 {
     mChildAnimators << childAnimator;
+    childAnimator->incNumberPointers();
     childAnimator->setParentAnimator(this);
 }
 
@@ -40,21 +41,20 @@ void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
 {
     mChildAnimators.removeOne(removeAnimator);
     removeAnimator->setParentAnimator(NULL);
+    removeAnimator->decNumberPointers();
+}
+
+void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,
+                                         QrealAnimator *animator2) {
+    int id1 = mChildAnimators.indexOf(animator1);
+    int id2 = mChildAnimators.indexOf(animator2);
+    mChildAnimators.swap(id1, id2);
 }
 
 void ComplexAnimator::startTransform()
 {
     foreach(QrealAnimator *animator, mChildAnimators) {
         animator->startTransform();
-    }
-}
-
-void ComplexAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
-{
-    QrealAnimator::setConnectedToMainWindow(connected);
-
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->setConnectedToMainWindow(connected);
     }
 }
 
@@ -188,17 +188,17 @@ void ComplexAnimator::getKeysInRect(QRectF selectionRect,
     }
 }
 
-void ComplexAnimator::handleListItemMousePress(qreal relX, qreal relY,
+void ComplexAnimator::handleListItemMousePress(qreal boxesListX, qreal relX, qreal relY,
                                                QMouseEvent *event)
 {
     if(relY < LIST_ITEM_HEIGHT) {
-        QrealAnimator::handleListItemMousePress(relX, relY, event);
+        QrealAnimator::handleListItemMousePress(boxesListX, relX, relY, event);
     } else {
         relY -= LIST_ITEM_HEIGHT;
         foreach(QrealAnimator *animator, mChildAnimators) {
             qreal heightT = animator->getBoxesListHeight();
             if(heightT > relY) {
-                animator->handleListItemMousePress(
+                animator->handleListItemMousePress(boxesListX,
                             relX - LIST_ITEM_CHILD_INDENT,
                             relY, event);
                 break;
@@ -217,13 +217,13 @@ void ComplexAnimator::retrieveSavedValue()
 
 void ComplexAnimator::finishTransform()
 {
-    mConnectedToMainWindow->startNewUndoRedoSet();
+    startNewUndoRedoSet();
 
     foreach(QrealAnimator *animator, mChildAnimators) {
         animator->finishTransform();
     }
 
-    mConnectedToMainWindow->finishUndoRedoSet();
+    finishUndoRedoSet();
 }
 
 void ComplexAnimator::cancelTransform()

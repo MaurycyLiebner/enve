@@ -135,11 +135,11 @@ void Bone::saveTransformPivot(QPointF absPivot)
 void Bone::addTransformable(Transformable *transformable)
 {
     mTransformables << transformable;
-    scheduleRepaint();
+    
 }
 
 void Bone::removeTransformable(Transformable *transformable)
 {
     mTransformables.removeOne(transformable);
-    scheduleRepaint();
+    
 }

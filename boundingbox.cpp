@@ -6,13 +6,12 @@
 #include "mainwindow.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
-    Transformable(parent)
+    Transformable()
 {
     addActiveAnimator(&mTransformAnimator);
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
 
-    mBoxesList = parent->getMainWindow()->getBoxesList();
-    mTransformAnimator.setConnectedToMainWindow(this);
+    mBoxesList = getMainWindow()->getBoxesList();
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;
     if(type == TYPE_VECTOR_PATH) {
@@ -26,8 +25,8 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     updateCombinedTransform();
 }
 
-BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) :
-    Transformable(window)
+BoundingBox::BoundingBox(BoundingBoxType type) :
+    Transformable()
 {
     mType = type;
     mTransformAnimator.reset();
@@ -36,7 +35,7 @@ BoundingBox::BoundingBox(MainWindow *window, BoundingBoxType type) :
 
 BoundingBox::BoundingBox(int boundingBoxId,
                          BoxesGroup *parent, BoundingBoxType type) :
-    Transformable(parent) {
+    Transformable() {
     addActiveAnimator(&mTransformAnimator);
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
 
@@ -96,11 +95,7 @@ void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
         addUndoRedo(new SetBoxParentUndoRedo(this, mParent, parent));
     }
     mParent = parent;
-    if(mParent == NULL) {
-        scheduleRemoval();
-    } else {
-        descheduleRemoval();
-    }
+
     updateCombinedTransform();
 }
 
@@ -123,30 +118,16 @@ bool BoundingBox::isPath() {
     return mType == TYPE_VECTOR_PATH;
 }
 
-void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo, bool pivotChanged) {
+void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
+                                 bool pivotChanged) {
     if(saveUndoRedo) {
         addUndoRedo(new SetPivotRelPosUndoRedo(this,
                         mTransformAnimator.getPivot(), relPos,
                         mPivotChanged, pivotChanged));
     }
     mPivotChanged = pivotChanged;
-    mTransformAnimator.setPivot(relPos);
+    mTransformAnimator.setPivot(relPos, saveUndoRedo);
     schedulePivotUpdate();
-}
-
-void BoundingBox::scheduleRemoval()
-{
-    mScheduledForRemove = true;
-}
-
-void BoundingBox::descheduleRemoval()
-{
-    mScheduledForRemove = false;
-}
-
-bool BoundingBox::isScheduldedForRemoval()
-{
-    return mScheduledForRemove;
 }
 
 void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
@@ -163,15 +144,11 @@ QPointF BoundingBox::getPivotAbsPos()
 void BoundingBox::select()
 {
     mSelected = true;
-    scheduleBoxesListRepaint();
-    scheduleRepaint();
 }
 
 void BoundingBox::deselect()
 {
     mSelected = false;
-    scheduleBoxesListRepaint();
-    scheduleRepaint();
 }
 
 bool BoundingBox::isContainedIn(QRectF absRect)
@@ -217,7 +194,7 @@ QMatrix BoundingBox::getCombinedTransform()
 
 void BoundingBox::applyTransformation(TransformAnimator *transAnimator)
 {
-
+    Q_UNUSED(transAnimator);
 }
 
 void BoundingBox::scale(qreal scaleBy) {
@@ -353,7 +330,7 @@ void BoundingBox::setZListIndex(int z, bool saveUndoRedo)
         addUndoRedo(new SetBoundingBoxZListIndexUnoRedo(mZListIndex, z, this));
     }
     mZListIndex = z;
-    scheduleRepaint();
+
 }
 
 int BoundingBox::getZIndex() {

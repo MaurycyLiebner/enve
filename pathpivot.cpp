@@ -42,7 +42,7 @@ void PathPivot::draw(QPainter *p)
 
 //void PathPivot::updateRotationMappedPath() {
 //    mMappedRotationPath = mRotationPath.translated(getAbsolutePos());
-//    scheduleRepaint();
+//    
 //}
 
 void PathPivot::finishTransform()
@@ -58,7 +58,7 @@ void PathPivot::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
 //    updateRotationMappedPath();
-    scheduleRepaint();
+    
 }
 
 bool PathPivot::isRotating()

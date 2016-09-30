@@ -12,8 +12,7 @@ class UpdateScheduler;
 class ConnectedToMainWindow : public SmartPointerTarget
 {
 public:
-    ConnectedToMainWindow(ConnectedToMainWindow *parent);
-    ConnectedToMainWindow(MainWindow *parent);
+    ConnectedToMainWindow();
     ~ConnectedToMainWindow() {}
 
     void addUndoRedo(UndoRedo *undoRedo);
@@ -24,9 +23,7 @@ public:
 
     void startNewUndoRedoSet();
     void finishUndoRedoSet();
-    virtual void scheduleRepaint();
     virtual void schedulePivotUpdate();
-    void scheduleBoxesListRepaint();
     bool isShiftPressed();
     bool isCtrlPressed();
     bool isAltPressed();

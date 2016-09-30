@@ -15,11 +15,8 @@ VectorPath::VectorPath(BoxesGroup *group) :
     addActiveAnimator(&mFillPaintSettings);
     addActiveAnimator(&mStrokeSettings);
     mAnimatorsCollection.addAnimator(&mPathAnimator);
-    mPathAnimator.setConnectedToMainWindow(this);
     mAnimatorsCollection.addAnimator(&mFillPaintSettings);
-    mFillPaintSettings.setConnectedToMainWindow(this);
     mAnimatorsCollection.addAnimator(&mStrokeSettings);
-    mStrokeSettings.setConnectedToMainWindow(this);
 
     mFillGradientPoints.initialize(this);
     mStrokeGradientPoints.initialize(this);
@@ -31,7 +28,6 @@ VectorPath::VectorPath(int boundingBoxId,
                 parent, TYPE_VECTOR_PATH) {
     addActiveAnimator(&mPathAnimator);
     mAnimatorsCollection.addAnimator(&mPathAnimator);
-    mPathAnimator.setConnectedToMainWindow(this);
 
     QSqlQuery query;
     QString queryStr = "SELECT * FROM vectorpath WHERE boundingboxid = " +
@@ -223,6 +219,10 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
 
     startNewUndoRedoSet();
 
+    QPointF ctrlDPos = mMappedPath.pointAtPercent(nearestPercent + 0.01) -
+                       mMappedPath.pointAtPercent(nearestPercent - 0.01);
+    ctrlDPos = scalePointToNewLen(ctrlDPos, 20.);
+
     qreal nearestPtPercent;
     PathPoint *nearestPoint = findPointNearestToPercent(nearestPercent,
                                                         &nearestPtPercent);
@@ -231,11 +231,16 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
         PathPoint *prevPoint = nearestPoint->getPreviousPoint();
         nearestPoint->setPointAsPrevious(newPoint);
         prevPoint->setPointAsNext(newPoint);
+
         if(prevPoint->isEndCtrlPtEnabled()) {
             newPoint->setStartCtrlPtEnabled(true);
+            newPoint->moveStartCtrlPtToAbsPos(
+                        newPoint->getAbsolutePos() - ctrlDPos);
         }
         if(newPoint->getNextPoint()->isStartCtrlPtEnabled()) {
             newPoint->setEndCtrlPtEnabled(true);
+            newPoint->moveEndCtrlPtToAbsPos(
+                        newPoint->getAbsolutePos() + ctrlDPos);
         }
     } else {
         PathPoint *nextPoint = nearestPoint->getNextPoint();
@@ -243,9 +248,13 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
         nextPoint->setPointAsPrevious(newPoint);
         if(newPoint->getPreviousPoint()->isEndCtrlPtEnabled()) {
             newPoint->setStartCtrlPtEnabled(true);
+            newPoint->moveStartCtrlPtToAbsPos(
+                        newPoint->getAbsolutePos() - ctrlDPos);
         }
         if(nextPoint->isStartCtrlPtEnabled()) {
             newPoint->setEndCtrlPtEnabled(true);
+            newPoint->moveEndCtrlPtToAbsPos(
+                        newPoint->getAbsolutePos() + ctrlDPos);
         }
     }
     appendToPointsList(newPoint);
@@ -304,6 +313,7 @@ void VectorPath::centerPivotPosition() {
     if(!mPivotChanged) {
         QPointF posSum = QPointF(0.f, 0.f);
         int count = mPoints.length();
+        if(count == 0) return;
         foreach(PathPoint *point, mPoints) {
             posSum += point->getRelativePos();
         }
@@ -338,7 +348,7 @@ const StrokeSettings *VectorPath::getStrokeSettings()
         mStrokeGradientPoints.setPositions(getBoundingRect().topLeft(),
                      getBoundingRect().bottomRight(), saveUndoRedo);
     }
-    scheduleRepaint();
+    
 }
 
 void VectorPath::setFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
@@ -358,7 +368,7 @@ void VectorPath::setFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
         mFillGradientPoints.setPositions(getBoundingRect().topLeft(),
                      getBoundingRect().bottomRight(), saveUndoRedo);
     }
-    scheduleRepaint();
+    
 }*/
 
 void VectorPath::updatePath()
@@ -405,7 +415,7 @@ void VectorPath::schedulePathUpdate()
     addUpdateScheduler(new PathUpdateScheduler(this));
     mPathUpdateNeeded = true;
     mMappedPathUpdateNeeded = false;
-    scheduleRepaint();
+    
 }
 
 void VectorPath::updatePathIfNeeded()
@@ -435,7 +445,7 @@ void VectorPath::scheduleMappedPathUpdate()
     }
     addUpdateScheduler(new MappedPathUpdateScheduler(this));
     mMappedPathUpdateNeeded = true;
-    scheduleRepaint();
+    
 }
 
 void VectorPath::updateAfterCombinedTransformationChanged()
@@ -474,10 +484,10 @@ void VectorPath::updateDrawGradients()
         if(!gradient->isInPaths(this)) {
             gradient->addPath(this);
         }
-        mFillGradientPoints.setColors(gradient->qgradientStops.first().second,
-                                      gradient->qgradientStops.last().second);
+        mFillGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
+                                      gradient->getLastQGradientStopQColor());
         mFillGradientPoints.enable();
-        mDrawFillGradient.setStops(gradient->qgradientStops);
+        mDrawFillGradient.setStops(gradient->getQGradientStops());
         mDrawFillGradient.setStart(mFillGradientPoints.getStartPoint() );
         mDrawFillGradient.setFinalStop(mFillGradientPoints.getEndPoint() );
     } else {
@@ -488,11 +498,11 @@ void VectorPath::updateDrawGradients()
         if(!gradient->isInPaths(this)) {
             gradient->addPath(this);
         }
-        mStrokeGradientPoints.setColors(gradient->qgradientStops.first().second,
-                                      gradient->qgradientStops.last().second);
+        mStrokeGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
+                                      gradient->getLastQGradientStopQColor() );
 
         mStrokeGradientPoints.enable();
-        mDrawStrokeGradient.setStops(gradient->qgradientStops);
+        mDrawStrokeGradient.setStops(gradient->getQGradientStops());
         mDrawStrokeGradient.setStart(mStrokeGradientPoints.getStartPoint() );
         mDrawStrokeGradient.setFinalStop(mStrokeGradientPoints.getEndPoint() );
     } else {
@@ -792,7 +802,9 @@ void GradientPoints::initialize(VectorPath *parentT,
 {
     parent = parentT;
     startPoint = new GradientPoint(startPt, parent);
+    startPoint->incNumberPointers();
     endPoint = new GradientPoint(endPt, parent);
+    endPoint->incNumberPointers();
     enabled = false;
 }
 
@@ -801,7 +813,9 @@ void GradientPoints::initialize(VectorPath *parentT,
 {
     parent = parentT;
     startPoint = new GradientPoint(fillGradientStartId, parent);
+    startPoint->incNumberPointers();
     endPoint = new GradientPoint(fillGradientEndId, parent);
+    endPoint->incNumberPointers();
     enabled = false;
 }
 

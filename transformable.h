@@ -8,8 +8,7 @@ class Bone;
 class Transformable : public ConnectedToMainWindow
 {
 public:
-    Transformable(MainWindow *mainWindow);
-    Transformable(ConnectedToMainWindow *parent);
+    Transformable();
 
     virtual void startTransform() {}
     virtual void finishTransform() {}

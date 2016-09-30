@@ -7,7 +7,7 @@
 #include "boxeslist.h"
 #include <QMenu>
 
-QrealAnimator::QrealAnimator()
+QrealAnimator::QrealAnimator() : ConnectedToMainWindow()
 {
 }
 
@@ -130,8 +130,9 @@ void QrealAnimator::drawBoxesList(QPainter *p,
                  startFrame, endFrame, true);
     }
 }
-
-void QrealAnimator::handleListItemMousePress(qreal relX, qreal relY,
+#include <QWidgetAction>
+void QrealAnimator::handleListItemMousePress(qreal boxesListX,
+                                             qreal relX, qreal relY,
                                              QMouseEvent *event)
 {
     Q_UNUSED(relY);
@@ -148,9 +149,7 @@ void QrealAnimator::handleListItemMousePress(qreal relX, qreal relY,
                 }
                 saveCurrentValueAsKey();
             }
-        }
-        else
-        {
+        } else {
 
         }
     } else {
@@ -158,11 +157,52 @@ void QrealAnimator::handleListItemMousePress(qreal relX, qreal relY,
             setRecording(!mIsRecording);
         } else if(relX < 2*LIST_ITEM_CHILD_INDENT) {
             setBoxesListDetailVisible(!mBoxesListDetailVisible);
-        } else {
-            mConnectedToMainWindow->getMainWindow()->getBoxesList()->
+        } else if(boxesListX < LIST_ITEM_MAX_WIDTH - 80 || mIsComplexAnimator) {
+            getMainWindow()->getBoxesList()->
                     graphSetAnimator(this);
+        } else {
+            QMenu menu;
+            menu.setAttribute(Qt::WA_TranslucentBackground);
+            menu.setStyleSheet("background-color: rgba(0, 0, 0, 0); "
+                               "color: rgba(0, 0, 0, 0);");
+            QWidgetAction *widgetAction = new QWidgetAction(getMainWindow());
+            QrealAnimatorSpin *spinBox = new QrealAnimatorSpin(this);
+            spinBox->setStyleSheet("background-color: rgba(200, 200, 200); "
+                               "color: rgba(0, 0, 255);");
+            spinBox->setFixedWidth(70);
+            widgetAction->setDefaultWidget(spinBox);
+            menu.addAction(widgetAction);
+            QAction *selected_action = menu.exec(event->globalPos() +
+                        QPoint(LIST_ITEM_MAX_WIDTH - 83. - boxesListX,
+                               -relY - 3.));
+            if(selected_action != NULL)
+            {
+                delete spinBox;
+                delete widgetAction;
+            } else {
+                delete spinBox;
+                delete widgetAction;
+            }
         }
     }
+}
+
+qreal QrealAnimator::getMinPossibleValue() {
+    return mMinPossibleVal;
+}
+
+qreal QrealAnimator::getMaxPossibleValue() {
+    return mMaxPossibleVal;
+}
+
+qreal QrealAnimator::getPrefferedValueStep()
+{
+    return mPrefferedValueStep;
+}
+
+void QrealAnimator::setPrefferedValueStep(qreal valueStep)
+{
+    mPrefferedValueStep = valueStep;
 }
 
 void QrealAnimator::removeAllKeys() {
@@ -247,9 +287,16 @@ qreal QrealAnimator::getCurrentValue() const
     return mCurrentValue;
 }
 
-void QrealAnimator::setCurrentValue(qreal newValue)
+void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
 {
-    mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+    if(finish) {
+        startTransform();
+        mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+        finishTransform();
+    } else {
+        mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+    }
+
     callUpdater();
 }
 
@@ -267,11 +314,9 @@ void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
 {
     key->setValue(value);
     updateKeysPath();
-    if(mConnectedToMainWindow != NULL) {
-        mConnectedToMainWindow->scheduleBoxesListRepaint();
-        if(mIsCurrentAnimator) {
-            mConnectedToMainWindow->graphUpdateAfterKeysChanged();
-        }
+
+    if(mIsCurrentAnimator) {
+        graphUpdateAfterKeysChanged();
     }
 }
 
@@ -283,11 +328,9 @@ void QrealAnimator::appendKey(QrealKey *newKey) {
     if(mParentAnimator != NULL) {
         mParentAnimator->addChildQrealKey(newKey);
     }
-    if(mConnectedToMainWindow != NULL) {
-        mConnectedToMainWindow->scheduleBoxesListRepaint();
-        if(mIsCurrentAnimator) {
-            mConnectedToMainWindow->graphUpdateAfterKeysChanged();
-        }
+
+    if(mIsCurrentAnimator) {
+        graphUpdateAfterKeysChanged();
     }
 }
 
@@ -567,7 +610,7 @@ void QrealAnimator::getMinAndMaxMoveFrame(
         }
     } else if(currentPoint->isStartPoint()) {
         if(keyId == 0) {
-            minMoveFrameT = minMoveFrameT - 5000.;
+            minMoveFrameT = key->getFrame() - 5000.;
         } else {
             QrealKey *prevKey = mKeys.at(keyId - 1);
             minMoveFrameT = prevKey->getFrame();
@@ -645,7 +688,7 @@ void QrealAnimator::startTransform()
 void QrealAnimator::finishTransform()
 {
     if(mTransformed) {
-        mConnectedToMainWindow->addUndoRedo(
+        addUndoRedo(
                     new ChangeQrealAnimatorValue(mSavedCurrentValue,
                                                  mCurrentValue,
                                                  this) );
@@ -670,8 +713,11 @@ void QrealAnimator::setUpdater(AnimatorUpdater *updater)
 
 void QrealAnimator::callUpdater()
 {
-    if(mUpdater == NULL) return;
-    mUpdater->update();
+    if(mUpdater == NULL) {
+        return;
+    } else {
+        mUpdater->update();
+    }
 }
 
 void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
@@ -705,11 +751,6 @@ void QrealAnimator::multCurrentValue(qreal mult)
 qreal QrealAnimator::getSavedValue()
 {
     return mSavedCurrentValue;
-}
-
-void QrealAnimator::setConnectedToMainWindow(ConnectedToMainWindow *connected)
-{
-    mConnectedToMainWindow = connected;
 }
 
 QrealPoint *QrealAnimator::getPointAt(qreal value, qreal frame,
@@ -760,4 +801,31 @@ void QrealAnimator::addKeysInRectToList(QRectF frameValueRect,
 void QrealAnimator::setIsCurrentAnimator(bool bT)
 {
     mIsCurrentAnimator = bT;
+}
+
+QrealAnimatorSpin::QrealAnimatorSpin(QrealAnimator *animator)
+{
+    setRange(animator->getMinPossibleValue(),
+             animator->getMaxPossibleValue());
+    setValue(animator->getCurrentValue() );
+    setSingleStep(animator->getPrefferedValueStep());
+    mAnimator = animator;
+    mAnimator->startTransform();
+    connect(this, SIGNAL(valueChanged(double)),
+            this, SLOT(valueEdited(double)));
+    connect(this, SIGNAL(editingFinished()),
+            this, SLOT(finishValueEdit()));
+}
+
+void QrealAnimatorSpin::valueEdited(double newVal)
+{
+    mAnimator->setCurrentValue(newVal);
+    MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+void QrealAnimatorSpin::finishValueEdit()
+{
+    mAnimator->finishTransform();
+    MainWindow::getInstance()->callUpdateSchedulers();
+    mAnimator->startTransform();
 }

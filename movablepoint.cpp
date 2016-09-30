@@ -5,9 +5,8 @@
 MovablePoint::MovablePoint(QPointF absPos,
                            BoundingBox *parent,
                            MovablePointType type,
-                           qreal radius) : Transformable(parent)
+                           qreal radius) : Transformable()
 {
-    mRelPos.setConnectedToMainWindow(this);
     mType = type;
     mRadius = radius;
     mParent = parent;
@@ -17,7 +16,7 @@ MovablePoint::MovablePoint(QPointF absPos,
 MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
                            BoundingBox *parent,
                            MovablePointType type,
-                           qreal radius) : Transformable(parent)
+                           qreal radius) : Transformable()
 {
     mType = type;
     mRadius = radius;
@@ -26,7 +25,7 @@ MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
 }
 
 MovablePoint::MovablePoint(int movablePointId, BoundingBox *parent,
-             MovablePointType type, qreal radius)  : Transformable(parent) {
+             MovablePointType type, qreal radius)  : Transformable() {
     mType = type;
     mRadius = radius;
     mParent = parent;
@@ -57,16 +56,10 @@ void MovablePoint::startTransform()
 
 void MovablePoint::finishTransform()
 {
-    if(!mTransformStarted) {
-        return;
+    if(mTransformStarted) {
+        mTransformStarted = false;
+        mRelPos.finishTransform();
     }
-    mTransformStarted = false;
-    MoveMovablePointUndoRedo *undoRedo = new MoveMovablePointUndoRedo(this,
-                                                           mSavedRelPos,
-                                                           getRelativePos());
-    mRelPos.finishTransform();
-
-    addUndoRedo(undoRedo);
 }
 
 void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo)
@@ -78,10 +71,7 @@ void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo)
 
 void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
-    if(saveUndoRedo) {
-        addUndoRedo(new MoveMovablePointUndoRedo(this, getRelativePos(), relPos));
-    }
-    mRelPos.setCurrentValue(relPos);
+    mRelPos.setCurrentValue(relPos, saveUndoRedo);
 }
 
 QPointF MovablePoint::getRelativePos()
@@ -234,13 +224,11 @@ void MovablePoint::saveTransformPivot(QPointF absPivot)
 void MovablePoint::select()
 {
     mSelected = true;
-    mParent->scheduleRepaint();
 }
 
 void MovablePoint::deselect()
 {
     mSelected = false;
-    mParent->scheduleRepaint();
 }
 
 void MovablePoint::remove()

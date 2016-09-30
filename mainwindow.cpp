@@ -14,6 +14,8 @@
 #include "boxeslist.h"
 #include "boxeslistanimationdockwidget.h"
 
+MainWindow *MainWindow::mMainWindowInstance;
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     processKeyEvent(event);
@@ -22,6 +24,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    mMainWindowInstance = this;
     mUndoRedoStack.setWindow(this);
     setCurrentPath("");
     QSqlDatabase::addDatabase("QSQLITE");
@@ -131,6 +134,11 @@ MainWindow::~MainWindow()
 
 }
 
+MainWindow *MainWindow::getInstance()
+{
+    return mMainWindowInstance;
+}
+
 void MainWindow::playPreview()
 {
     mCanvas->clearPreview();
@@ -177,8 +185,9 @@ void MainWindow::callUpdateSchedulers()
     }
     mUpdateSchedulers.clear();
     mCanvas->updatePivotIfNeeded();
-    mCanvas->repaintIfNeeded();
-    mBoxListWidget->repaintIfNeeded();
+    mCanvas->repaint();
+    mBoxListWidget->repaint();
+    mFillStrokeSettings->repaint();
 }
 
 FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
@@ -204,11 +213,6 @@ bool MainWindow::askForSaving() {
     return true;
 }
 
-void MainWindow::scheduleRepaint()
-{
-    mCanvas->scheduleRepaint();
-}
-
 void MainWindow::schedulePivotUpdate()
 {
     mCanvas->schedulePivotUpdate();
@@ -230,11 +234,6 @@ void MainWindow::disableEventFilter() {
 
 void MainWindow::enableEventFilter() {
     mEventFilterDisabled = false;
-}
-
-void MainWindow::scheduleBoxesListRepaint()
-{
-    mBoxListWidget->scheduleRepaint();
 }
 
 void MainWindow::disable()
@@ -282,7 +281,6 @@ void MainWindow::setCurrentFrame(int frame)
 {
     mCurrentFrame = frame;
     mCanvas->updateAfterFrameChanged(mCurrentFrame);
-    mBoxListWidget->scheduleRepaint();
 
     callUpdateSchedulers();
 }
@@ -341,6 +339,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             mUndoRedoStack.undo();
         }
+        mCanvas->updateDisplayedFillStrokeSettings();
     } else if(isCtrlPressed() && event->key() == Qt::Key_S) {
         saveFile();
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
@@ -506,7 +505,7 @@ void MainWindow::importFile(QString path, bool loadInBox) {
     db.close();
     mUndoRedoStack.finishSet();
     enable();
-    scheduleRepaint();
+
     callUpdateSchedulers();
 }
 

@@ -28,17 +28,17 @@ class VectorPath;
 
 class ChangeGradientColorsUndoRedo;
 
-class Gradient : public ConnectedToMainWindow
+class Gradient : public ComplexAnimator
 {
 public:
     Gradient(Color color1, Color color2,
-             GradientWidget *gradientWidget, MainWindow *parent);
+             GradientWidget *gradientWidget);
 
     Gradient(Gradient *fromGradient,
-             GradientWidget *gradientWidget, MainWindow *parent);
+             GradientWidget *gradientWidget);
 
     Gradient(int sqlIdT,
-             GradientWidget *gradientWidget, MainWindow *parent);
+             GradientWidget *gradientWidget);
 
     int saveToSql();
 
@@ -71,12 +71,23 @@ public:
     void updateQGradientStops();
 
     int getSqlId();
+    void setSqlId(int id);
 
-    int sqlId = -1;
+    void addColorToList(Color color);
+
+    Color getCurrentColorAt(int id);
+
+    int getColorCount();
+
+    QColor getLastQGradientStopQColor();
+    QColor getFirstQGradientStopQColor();
+
+    QGradientStops getQGradientStops();
+private:
+    int mSqlId = -1;
     GradientWidget *mGradientWidget;
-    QGradientStops qgradientStops;
-    QList<Color> colors;
-    QList<Color> savedColors;
+    QGradientStops mQGradientStops;
+    QList<ColorAnimator*> mColors;
     QList<VectorPath*> mAffectedPaths;
 };
 
@@ -113,6 +124,16 @@ public:
     }
 
     void setPaintType(PaintType paintType) {
+        if(mPaintType == GRADIENTPAINT && paintType != GRADIENTPAINT) {
+            removeChildAnimator(mGradient);
+        } else if(paintType == GRADIENTPAINT && mPaintType != GRADIENTPAINT) {
+            addChildAnimator(mGradient);
+        }
+        if(mPaintType == FLATPAINT && paintType != FLATPAINT) {
+            removeChildAnimator(&mColor);
+        } else if(paintType == FLATPAINT && mPaintType != FLATPAINT) {
+            addChildAnimator(&mColor);
+        }
         mPaintType = paintType;
     }
 

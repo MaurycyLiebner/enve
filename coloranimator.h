@@ -14,8 +14,8 @@ class ColorAnimator : public ComplexAnimator
 public:
     ColorAnimator();
 
-    void setCurrentValue(Color colorValue);
-    void setCurrentValue(QColor qcolorValue);
+    void setCurrentValue(Color colorValue, bool finish = false);
+    void setCurrentValue(QColor qcolorValue, bool finish = false);
 
     Color getCurrentValue() const;
     void setColorMode(ColorMode colorMode);

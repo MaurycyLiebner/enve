@@ -34,7 +34,8 @@ QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
     return NULL;
 }
 
-void BoundingBox::handleListItemMousePress(qreal relX, qreal relY,
+void BoundingBox::handleListItemMousePress(qreal boxesListX,
+                                           qreal relX, qreal relY,
                                            QMouseEvent *event) {
     if(relY < LIST_ITEM_HEIGHT) {
         if(relX < LIST_ITEM_HEIGHT) {
@@ -55,8 +56,6 @@ void BoundingBox::handleListItemMousePress(qreal relX, qreal relY,
                     mParent->clearBoxesSelection();
                     mParent->addBoxToSelection(this);
                 }
-                scheduleBoxesListRepaint();
-                scheduleRepaint();
             }
         }
     } else if(mBoxListItemDetailsVisible) {
@@ -64,7 +63,8 @@ void BoundingBox::handleListItemMousePress(qreal relX, qreal relY,
         foreach(QrealAnimator *animator, mActiveAnimators) {
             qreal animatorHeight = animator->getBoxesListHeight();
             if(relY <= animatorHeight) {
-                animator->handleListItemMousePress(relX - LIST_ITEM_CHILD_INDENT,
+                animator->handleListItemMousePress(boxesListX,
+                                                   relX - LIST_ITEM_CHILD_INDENT,
                                                    relY, event);
                 break;
             }
@@ -161,13 +161,15 @@ QrealKey *Canvas::getKeyAtPos(qreal relX, qreal relY,
     return getKeyAtPosFromChildren(relX, relY, y0);
 }
 
-void BoxesGroup::handleChildListItemMousePress(qreal relX, qreal relY,
+void BoxesGroup::handleChildListItemMousePress(qreal boxesListX,
+                                               qreal relX, qreal relY,
                                                qreal y0, QMouseEvent *event) {
     qreal currentY = y0;
     foreach(BoundingBox *box, mChildren) {
         qreal boxHeight = box->getListItemHeight();
         if(relY - currentY < boxHeight) {
-            box->handleListItemMousePress(relX, relY - currentY,
+            box->handleListItemMousePress(boxesListX,
+                                          relX, relY - currentY,
                                           event);
             break;
         }
@@ -175,13 +177,16 @@ void BoxesGroup::handleChildListItemMousePress(qreal relX, qreal relY,
     }
 }
 
-void BoxesGroup::handleListItemMousePress(qreal relX, qreal relY,
+void BoxesGroup::handleListItemMousePress(qreal boxesListX,
+                                          qreal relX, qreal relY,
                                           QMouseEvent *event) {
     qreal heightT = BoundingBox::getListItemHeight();
     if(relY < heightT) {
-        BoundingBox::handleListItemMousePress(relX, relY, event);
+        BoundingBox::handleListItemMousePress(boxesListX,
+                                              relX, relY, event);
     } else {
-        handleChildListItemMousePress(relX - LIST_ITEM_HEIGHT, relY,
+        handleChildListItemMousePress(boxesListX,
+                                      relX - LIST_ITEM_HEIGHT, relY,
                                       heightT, event);
     }
 }
@@ -314,7 +319,6 @@ qreal BoundingBox::getListItemHeight() {
 void BoundingBox::setChildrenListItemsVisible(bool bt)
 {
     mBoxListItemDetailsVisible = bt;
-    scheduleBoxesListRepaint();
 }
 
 void BoundingBox::showChildrenListItems()
@@ -330,7 +334,6 @@ void BoundingBox::hideChildrenListItems()
 void BoundingBox::setName(QString name)
 {
     mName = name;
-    scheduleBoxesListRepaint();
 }
 
 QString BoundingBox::getName()
@@ -347,8 +350,6 @@ void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
         addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
     }
     mVisible = visible;
-    scheduleBoxesListRepaint();
-    scheduleRepaint();
 }
 
 void BoundingBox::hide()
@@ -388,5 +389,4 @@ void BoundingBox::setLocked(bool bt) {
         ((BoxesGroup*) mParent)->removeBoxFromSelection(this);
     }
     mLocked = bt;
-    scheduleBoxesListRepaint();
 }

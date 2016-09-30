@@ -24,10 +24,10 @@ qreal QPointFAnimator::getYValue()
     return mYAnimator.getCurrentValue();
 }
 
-void QPointFAnimator::setCurrentValue(QPointF val)
+void QPointFAnimator::setCurrentValue(QPointF val, bool finish)
 {
-    mXAnimator.setCurrentValue(val.x() );
-    mYAnimator.setCurrentValue(val.y() );
+    mXAnimator.setCurrentValue(val.x(), finish);
+    mYAnimator.setCurrentValue(val.y(), finish);
 }
 
 void QPointFAnimator::incCurrentValue(qreal x, qreal y)

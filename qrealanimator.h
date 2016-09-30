@@ -14,7 +14,9 @@ const int KEY_RECT_SIZE = 10;
 
 class ComplexAnimator;
 
-class QrealAnimator
+#include <QDoubleSpinBox>
+
+class QrealAnimator : public ConnectedToMainWindow
 {
 public:
     QrealAnimator();
@@ -25,7 +27,7 @@ public:
 
     qreal getValueAtFrame(int frame) const;
     qreal getCurrentValue() const;
-    void setCurrentValue(qreal newValue);
+    void setCurrentValue(qreal newValue, bool finish = false);
     void updateValueFromCurrentFrame();
     void saveCurrentValueToKey(QrealKey *key);
     void saveValueToKey(QrealKey *key, qreal value);
@@ -97,8 +99,6 @@ public:
 
     qreal getSavedValue();
 
-    virtual void setConnectedToMainWindow(ConnectedToMainWindow *connected);
-
     virtual void cancelTransform();
 
     virtual void setUpdater(AnimatorUpdater *updater);
@@ -138,7 +138,8 @@ public:
                                qreal pixelsPerFrame,
                                int startFrame, int endFrame, bool animationBar);
 
-    virtual void handleListItemMousePress(qreal relX, qreal relY,
+    virtual void handleListItemMousePress(qreal boxesListX,
+                                          qreal relX, qreal relY,
                                           QMouseEvent *event);
 
     virtual void setRecording(bool rec);
@@ -158,6 +159,11 @@ public:
                              QList<QrealKey*> *keys);
 
     void setIsCurrentAnimator(bool bT);
+    qreal getMinPossibleValue();
+    qreal getMaxPossibleValue();
+
+    qreal getPrefferedValueStep();
+    void setPrefferedValueStep(qreal valueStep);
 protected:
     bool mIsCurrentAnimator = false;
     bool mDrawPathUpdateNeeded = false;
@@ -175,8 +181,6 @@ protected:
 
     AnimatorUpdater *mUpdater = NULL;
 
-    ConnectedToMainWindow *mConnectedToMainWindow = NULL;
-
     bool mTransformed = false;
 
     qreal mCurrentValue;
@@ -186,6 +190,22 @@ protected:
     QPainterPath mKeysDrawPath;
 
     int mCurrentFrame = 0;
+
+    bool mIsComplexAnimator = false;
+
+    qreal mPrefferedValueStep = 1.;
+};
+
+class QrealAnimatorSpin : public QDoubleSpinBox
+{
+    Q_OBJECT
+public:
+    QrealAnimatorSpin(QrealAnimator *animator);
+public slots:
+    void valueEdited(double newVal);
+    void finishValueEdit();
+private:
+    QrealAnimator *mAnimator;
 };
 
 #endif // VALUEANIMATORS_H

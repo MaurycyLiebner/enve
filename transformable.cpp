@@ -2,14 +2,8 @@
 #include "bone.h"
 #include "undoredo.h"
 
-Transformable::Transformable(MainWindow *mainWindow) :
-    ConnectedToMainWindow(mainWindow)
-{
-
-}
-
-Transformable::Transformable(ConnectedToMainWindow *parent) :
-    ConnectedToMainWindow(parent)
+Transformable::Transformable() :
+    ConnectedToMainWindow()
 {
 
 }

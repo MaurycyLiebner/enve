@@ -8,9 +8,9 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) : GLWidg
 {
     mMainWindow = mainWindow;
     setFixedHeight(6*20 + 10);
-    newGradient();
-    newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
-    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
+//    newGradient();
+//    newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
+//    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
 }
 
 GradientWidget::~GradientWidget()
@@ -22,28 +22,35 @@ GradientWidget::~GradientWidget()
 
 void GradientWidget::setCurrentColorId(int id) {
     mCurrentColorId = id;
-    Color col = mCurrentGradient->colors.at(mCurrentColorId);
+    Color col = mCurrentGradient->getCurrentColorAt(mCurrentColorId);
     emit selectedColorChanged(col.gl_h, col.gl_s, col.gl_v, col.gl_a);
     repaint();
 }
 
+void GradientWidget::addGradientToList(Gradient *gradient) {
+    mGradients << gradient;
+    gradient->incNumberPointers();
+}
+
 void GradientWidget::newGradient(Color color1, Color color2) {
-    mGradients << new Gradient(color1, color2, this, mMainWindow);
-    setCurrentGradient(mGradients.last());
+    Gradient *newGradient = new Gradient(color1, color2, this);
+    addGradientToList(newGradient);
+    setCurrentGradient(newGradient);
     repaint();
 }
 
 void GradientWidget::newGradient(int fromGradientId)
 {
     Gradient *fromGradient = mGradients.at(fromGradientId);
-    mGradients << new Gradient(fromGradient, this, mMainWindow);
+    Gradient *newGradient = new Gradient(fromGradient, this);
+    addGradientToList(newGradient);
     setCurrentGradient(mGradients.last());
     repaint();
 }
 
 void GradientWidget::clearAll() {
     foreach(Gradient *gradient, mGradients) {
-        delete gradient;
+        gradient->decNumberPointers();
     }
     mGradients.clear();
 
@@ -53,17 +60,22 @@ void GradientWidget::clearAll() {
     repaint();
 }
 
+void GradientWidget::removeGradientFromList(Gradient *toRemove) {
+    mGradients.removeOne(toRemove);
+    if(mCurrentGradient == toRemove) {
+        setCurrentGradient((Gradient*) NULL);
+    }
+    toRemove->decNumberPointers();
+}
+
 void GradientWidget::removeGradient(int gradientId)
 {
     Gradient *toRemove = mGradients.at(gradientId);
     if(toRemove->affectsPaths()) {
         return;
     }
-    mGradients.removeAt(gradientId);
-    if(mCurrentGradient == toRemove) {
-        setCurrentGradient((Gradient*) NULL);
-    }
-    delete toRemove;
+    removeGradientFromList(toRemove);
+
     mCenterGradientId = clampInt(mCenterGradientId, 1, mGradients.length() - 2);
     repaint();
 }
@@ -82,7 +94,7 @@ void GradientWidget::saveGradientsToSqlIfPathSelected() {
 
 void GradientWidget::loadAllGradientsFromSql() {
     foreach(Gradient *gradient, mGradients) {
-        gradient->sqlId = -1;
+        gradient->setSqlId(-1);
     }
 
     QSqlQuery query;
@@ -90,7 +102,7 @@ void GradientWidget::loadAllGradientsFromSql() {
     if(query.exec(queryStr) ) {
         int idId = query.record().indexOf("id");
         while(query.next() ) {
-            mGradients << new Gradient(query.value(idId).toInt(), this, mMainWindow);
+            addGradientToList(new Gradient(query.value(idId).toInt(), this) );
         }
         if(mGradients.isEmpty()) return;
         setCurrentGradient(mGradients.last());
@@ -148,7 +160,7 @@ Gradient *GradientWidget::getCurrentGradient()
 Color GradientWidget::getCurrentColor()
 {
     if(mCurrentGradient == NULL) return Color();
-    return mCurrentGradient->colors.at(mCurrentColorId);
+    return mCurrentGradient->getCurrentColorAt(mCurrentColorId);
 }
 
 void GradientWidget::setCurrentGradient(int listId)
@@ -188,7 +200,7 @@ void GradientWidget::mousePressEvent(QMouseEvent *event)
             setCurrentGradient(gradId);
         }
     } else if(event->y() > height()/2 && event->y() < 3*height()/4 && mCurrentGradient != NULL) {
-        int nCols = mCurrentGradient->colors.length();
+        int nCols = mCurrentGradient->getColorCount();
         setCurrentColorId(clampInt(event->x()*nCols/width(), 0, nCols - 1) );
         if(event->button() == Qt::RightButton)
         {
@@ -201,7 +213,7 @@ void GradientWidget::mousePressEvent(QMouseEvent *event)
                 if(selected_action->text() == "Delete Color")
                 {
 
-                    if(mCurrentGradient->colors.count() < 2) {
+                    if(mCurrentGradient->getColorCount() < 2) {
                         mCurrentGradient->replaceColor(mCurrentColorId,
                                                        Color(0.f, 0.f, 0.f, 1.f));
                     } else {
@@ -231,7 +243,7 @@ void GradientWidget::mousePressEvent(QMouseEvent *event)
 void GradientWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if(event->y() > height()/2 && event->y() < 3*height()/4 && mCurrentGradient != NULL) {
-        int nCols = mCurrentGradient->colors.length();
+        int nCols = mCurrentGradient->getColorCount();
             int colorId = clampInt(event->x()*nCols/width(), 0, nCols - 1);
             if(colorId != mCurrentColorId) {
                 startGradientTransform();
@@ -303,14 +315,14 @@ void GradientWidget::drawBorder(GLfloat xt, GLfloat yt, GLfloat wt, GLfloat ht) 
 void GradientWidget::drawGradient(int id, GLfloat height, GLfloat cY, bool border) {
     Gradient *gradient = mGradients.at(id);
 
-    int len = gradient->colors.length();
-    Color nextColor = gradient->colors.first();
+    int len = gradient->getColorCount();
+    Color nextColor = gradient->getCurrentColorAt(0);
     GLfloat cX = 0.f;
     GLfloat segWidth = width()/(GLfloat)(len - 1);
 
     for(int i = 0; i < len - 1; i++) {
         Color color = nextColor;
-        nextColor = gradient->colors.at(i + 1);
+        nextColor = gradient->getCurrentColorAt(i + 1);
 
         drawRect(cX, cY, segWidth, height,
                  color.gl_r, color.gl_g, color.gl_b, color.gl_a,
@@ -350,8 +362,8 @@ void GradientWidget::paintGL()
     drawSolidRect(0.f, halfHeight - 10.f, width(), 10.f, 1.f, 1.f, 1.f, 1.f,
                   false, false, false, false);
 
-    int len = mCurrentGradient->colors.length();
-    Color nextColor = mCurrentGradient->colors.first();
+    int len = mCurrentGradient->getColorCount();
+    Color nextColor = mCurrentGradient->getCurrentColorAt(0);
     GLfloat cX = 0.f;
     GLfloat segWidth = width()/(GLfloat)len;
     for(int i = 0; i < len; i++) {
@@ -366,7 +378,7 @@ void GradientWidget::paintGL()
             drawBorder(cX, halfHeight, segWidth, quorterHeight);
         }
         if(i + 1 == len) break;
-        nextColor = mCurrentGradient->colors.at(i + 1);
+        nextColor = mCurrentGradient->getCurrentColorAt(i + 1);
         cX += segWidth;
     }
     drawGradient(mGradients.indexOf(mCurrentGradient), quorterHeight, halfHeight + quorterHeight, false);

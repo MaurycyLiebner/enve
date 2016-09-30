@@ -5,6 +5,8 @@ class BoundingBox;
 
 class VectorPath;
 
+class Gradient;
+
 class AnimatorUpdater
 {
 public:
@@ -34,6 +36,17 @@ public:
 
 private:
     VectorPath *mTarget;
+};
+
+class GradientUpdater : public AnimatorUpdater
+{
+public:
+    GradientUpdater(Gradient *gradient);
+
+    void update();
+
+private:
+    Gradient *mTarget;
 };
 
 #endif // ANIMATORUPDATER_H

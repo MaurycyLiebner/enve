@@ -24,7 +24,7 @@ public:
     void reset();
 
     void setPivot(qreal x, qreal y);
-    void setPivot(QPointF point);
+    void setPivot(QPointF point, bool finish = false);
     QPointF getPivot();
 
     qreal dx();
