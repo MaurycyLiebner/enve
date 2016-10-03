@@ -14,6 +14,35 @@ enum CanvasMode : short;
 
 class PathPoint;
 
+struct PathPointValues {
+    PathPointValues(QPointF startPosT,
+                    QPointF pointPosT,
+                    QPointF endPosT) {
+        startRelPos = startPosT;
+        pointRelPos = pointPosT;
+        endRelPos = endPosT;
+    }
+
+
+    QPointF startRelPos;
+    QPointF pointRelPos;
+    QPointF endRelPos;
+};
+
+struct PosExpectation {
+    PosExpectation(QPointF posT, qreal influenceT) {
+        pos = posT;
+        influence = influenceT;
+    }
+
+    QPointF getPosMultByInf() {
+        return pos*influence;
+    }
+
+    QPointF pos;
+    qreal influence;
+};
+
 class PathPointAnimators : public ComplexAnimator {
 public:
     PathPointAnimators() : ComplexAnimator() {
@@ -21,9 +50,11 @@ public:
     }
 
     void setAllVars(PathPoint *parentPathPointT,
-                       QPointFAnimator *endPosAnimatorT,
-                       QPointFAnimator *startPosAnimatorT,
-                       QPointFAnimator *pathPointPosAnimatorT) {
+                    QPointFAnimator *endPosAnimatorT,
+                    QPointFAnimator *startPosAnimatorT,
+                    QPointFAnimator *pathPointPosAnimatorT,
+                    QrealAnimator *influenceAnimator,
+                    QrealAnimator *influenceTAnimator) {
         parentPathPoint = parentPathPointT;
         endPosAnimator = endPosAnimatorT;
         endPosAnimator->setName("ctrl pt 1 pos");
@@ -31,10 +62,21 @@ public:
         startPosAnimator->setName("ctrl pt 2 pos");
         pathPointPosAnimator = pathPointPosAnimatorT;
         pathPointPosAnimator->setName("point pos");
+        influenceAnimator->setName("influence");
+        influenceAnimator->setValueRange(0., 1.);
+        influenceAnimator->setPrefferedValueStep(0.01);
+        influenceTAnimator->setName("influence T");
+        influenceTAnimator->setValueRange(0., 1.);
+        influenceTAnimator->setPrefferedValueStep(0.01);
+
+        influenceAnimator->setCurrentValue(1.);
+        influenceTAnimator->setCurrentValue(0.5);
 
         addChildAnimator(pathPointPosAnimator);
         addChildAnimator(endPosAnimator);
         addChildAnimator(startPosAnimator);
+        addChildAnimator(influenceAnimator);
+        addChildAnimator(influenceTAnimator);
     }
 
     bool isOfPathPoint(PathPoint *checkPoint) {
@@ -46,7 +88,7 @@ private:
     QPointFAnimator *endPosAnimator;
     QPointFAnimator *startPosAnimator;
     QPointFAnimator *pathPointPosAnimator;
-};
+}; 
 
 class PathPoint : public MovablePoint
 {
@@ -134,7 +176,35 @@ public:
     PathPointAnimators *getPathPointAnimatorsPtr();
     void setPointId(int idT);
 
+    qreal getCurrentInfluence();
+    qreal getCurrentInfluenceT();
+
+    CtrlsMode getCurrentCtrlsMode();
+    bool hasNoInfluence();
+    bool hasFullInfluence();
+    bool hasSomeInfluence();
+
+    PathPointValues getPointValues();
+
+    void addEndExpectation(PosExpectation expectation);
+    void addStartExternalExpectation(PosExpectation expectation);
+    void addEndExternalExpectation(PosExpectation expectation);
+    void addStartExpectation(PosExpectation expectation);
+    void addPointExpectation(PosExpectation expectation);
+
+    void clearExpectations();
+    void addExpectations();
+    PathPointValues getInfluenceAdjustedPointValues();
 private:
+    QList<PosExpectation> mEndExpectations;
+    QList<PosExpectation> mStartExpectations;
+    QList<PosExpectation> mPointExpectations;
+    QList<PosExpectation> mStartExternalExpectations;
+    QList<PosExpectation> mEndExternalExpectations;
+
+    QrealAnimator mInfluenceAnimator;
+    QrealAnimator mInfluenceTAnimator;
+
     int mPointId;
     PathPointAnimators mPathPointAnimators;
 

@@ -177,7 +177,7 @@ qreal VectorPath::findPercentForPoint(QPointF point,
 PathPoint *VectorPath::findPointNearestToPercent(qreal percent,
                                                  qreal *foundAtPercent) {
     PathPoint *nearestPoint = mPoints.first();
-    qreal nearestPointPercent = 100.f;
+    qreal nearestPointPercent = 100.;
     foreach(PathPoint *point, mPoints) {
         qreal pointPercent = findPercentForPoint(point->getAbsolutePos());
         if(qAbs(pointPercent - percent) < qAbs(nearestPointPercent - percent)) {
@@ -224,50 +224,81 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
         return NULL;
     }
 
-    startNewUndoRedoSet();
-
-    QPointF ctrlDPos = mMappedPath.pointAtPercent(nearestPercent + 0.01) -
-                       mMappedPath.pointAtPercent(nearestPercent - 0.01);
-    ctrlDPos = scalePointToNewLen(ctrlDPos, 20.);
 
     qreal nearestPtPercent;
     PathPoint *nearestPoint = findPointNearestToPercent(nearestPercent,
                                                         &nearestPtPercent);
-    PathPoint *newPoint = new PathPoint(nearestPtOnPath, this);
+
+    PathPoint *prevPoint;
+    PathPoint *nextPoint;
     if(nearestPtPercent > nearestPercent) {
-        PathPoint *prevPoint = nearestPoint->getPreviousPoint();
-        nearestPoint->setPointAsPrevious(newPoint);
+        prevPoint = nearestPoint->getPreviousPoint();
+        nextPoint = nearestPoint;
+    } else {
+        nextPoint = nearestPoint->getNextPoint();
+        prevPoint = nearestPoint;
+    }
+
+    qreal percent1 = findPercentForPoint(prevPoint->getAbsolutePos());
+    qreal percent2 = findPercentForPoint(nextPoint->getAbsolutePos());
+    if(nextPoint->isSeparatePathPoint() ) {
+        percent2 += 1;
+    }
+    qreal minPercent = qMin(percent1, percent2);
+    qreal maxPercent = qMax(percent1, percent2);
+    qreal pressedT = (nearestPercent - minPercent) / (maxPercent - minPercent);
+    if(pressedT > 0.0001 && pressedT < 0.9999) {
+        startNewUndoRedoSet();
+
+        QPointF prevPointEnd = prevPoint->getEndCtrlPtValue();
+        QPointF nextPointStart = nextPoint->getStartCtrlPtValue();
+        QPointF newPointPos;
+        QPointF newPointStart;
+        QPointF newPointEnd;
+        Edge::getNewRelPosForKnotInsertionAtT(prevPoint->getRelativePos(),
+                                              &prevPointEnd,
+                                              &nextPointStart,
+                                              nextPoint->getRelativePos(),
+                                              &newPointPos,
+                                              &newPointStart,
+                                              &newPointEnd,
+                                              pressedT);
+
+        PathPoint *newPoint = new PathPoint(newPointPos, this);
+        newPoint->setRelativePos(newPointPos, false);
+
+        nextPoint->setPointAsPrevious(newPoint);
         prevPoint->setPointAsNext(newPoint);
 
-        if(prevPoint->isEndCtrlPtEnabled()) {
-            newPoint->setStartCtrlPtEnabled(true);
-            newPoint->moveStartCtrlPtToAbsPos(
-                        newPoint->getAbsolutePos() - ctrlDPos);
-        }
-        if(newPoint->getNextPoint()->isStartCtrlPtEnabled()) {
-            newPoint->setEndCtrlPtEnabled(true);
-            newPoint->moveEndCtrlPtToAbsPos(
-                        newPoint->getAbsolutePos() + ctrlDPos);
-        }
-    } else {
-        PathPoint *nextPoint = nearestPoint->getNextPoint();
-        nearestPoint->setPointAsNext(newPoint);
-        nextPoint->setPointAsPrevious(newPoint);
-        if(newPoint->getPreviousPoint()->isEndCtrlPtEnabled()) {
-            newPoint->setStartCtrlPtEnabled(true);
-            newPoint->moveStartCtrlPtToAbsPos(
-                        newPoint->getAbsolutePos() - ctrlDPos);
-        }
-        if(nextPoint->isStartCtrlPtEnabled()) {
-            newPoint->setEndCtrlPtEnabled(true);
-            newPoint->moveEndCtrlPtToAbsPos(
-                        newPoint->getAbsolutePos() + ctrlDPos);
-        }
-    }
-    appendToPointsList(newPoint);
 
-    finishUndoRedoSet();
-    return newPoint;
+        if(!prevPoint->isEndCtrlPtEnabled() && !nextPoint->isStartCtrlPtEnabled()) {
+            newPoint->setStartCtrlPtEnabled(false);
+            newPoint->setEndCtrlPtEnabled(false);
+        } else {
+            newPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH, false);
+            newPoint->setStartCtrlPtEnabled(true);
+            newPoint->moveStartCtrlPtToRelPos(newPointStart);
+            newPoint->setEndCtrlPtEnabled(true);
+            newPoint->moveEndCtrlPtToRelPos(newPointEnd);
+
+            if(prevPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
+                prevPoint->isEndCtrlPtEnabled() && prevPoint->isStartCtrlPtEnabled()) {
+                prevPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+            }
+            if(nextPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
+                nextPoint->isEndCtrlPtEnabled() && nextPoint->isStartCtrlPtEnabled()) {
+                nextPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+            }
+            prevPoint->moveEndCtrlPtToRelPos(prevPointEnd);
+            nextPoint->moveStartCtrlPtToRelPos(nextPointStart);
+        }
+
+        appendToPointsList(newPoint);
+
+        finishUndoRedoSet();
+        return newPoint;
+    }
+    return NULL;
 }
 
 Edge *VectorPath::getEgde(QPointF absPos) {
@@ -386,28 +417,71 @@ void VectorPath::updatePath()
 {
     mPath = QPainterPath();
     mPath.setFillRule(Qt::WindingFill);
+    foreach(PathPoint *point, mPoints) {
+        point->clearExpectations();
+    }
+
+    foreach(PathPoint *point, mPoints) {
+        point->addExpectations();
+    }
+
     foreach (PathPoint *firstPointInPath, mSeparatePaths) {
         PathPoint *point = NULL;
         PathPoint *lastPoint = firstPointInPath;
-        mPath.moveTo(firstPointInPath->getRelativePos());
+        PathPointValues lastPointValues = lastPoint->getInfluenceAdjustedPointValues();
+        mPath.moveTo(lastPointValues.pointRelPos);
         while(true) {
             point = lastPoint->getNextPoint();
             if(point == NULL) {
                 break;
             }
-            QPointF pointPos = point->getRelativePos();
-            mPath.cubicTo(lastPoint->getEndCtrlPtValue(),
-                          point->getStartCtrlPtValue(),
-                          pointPos);
+            PathPointValues pointValues = point->getInfluenceAdjustedPointValues();
+            mPath.cubicTo(lastPointValues.endRelPos,
+                          pointValues.startRelPos,
+                          pointValues.pointRelPos);
             if(point == firstPointInPath) {
                 break;
             }
             lastPoint = point;
+            lastPointValues = pointValues;
         }
     }
 
     updateMappedPath();
 }
+
+//void VectorPath::updatePath()
+//{
+//    mPath = QPainterPath();
+//    mPath.setFillRule(Qt::WindingFill);
+//    foreach (PathPoint *firstPointInPath, mSeparatePaths) {
+//        PathPoint *point = NULL;
+//        PathPoint *lastPoint = firstPointInPath;
+//        mPath.moveTo(firstPointInPath->getRelativePos());
+//        while(true) {
+//            point = lastPoint->getNextPoint();
+//            if(point == NULL) {
+//                break;
+//            }
+//            qreal pointInf = point->getCurrentInfluence();
+//            qreal pointInfT = point->getCurrentInfluenceT();
+//            QPointF pointPos = point->getRelativePos();
+//            pointPos = pointPos*pointInf +
+//                    (1. - pointInf)*Edge::getRelPosBetweenPointsAtT(pointInfT,
+//                                                                    lastPoint,
+//                                                                    point->getNextPoint() );
+//            mPath.cubicTo(lastPoint->getEndCtrlPtValue(),
+//                          point->getStartCtrlPtValue(),
+//                          pointPos);
+//            if(point == firstPointInPath) {
+//                break;
+//            }
+//            lastPoint = point;
+//        }
+//    }
+
+//    updateMappedPath();
+//}
 
 PathPoint *VectorPath::addPointRelPos(QPointF relPos,
                                       QPointF startRelPos, QPointF endRelPos,
@@ -681,7 +755,7 @@ void VectorPath::removePointFromSeparatePaths(PathPoint *pointToRemove,
 PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
 {
     startNewUndoRedoSet();
-    appendToPointsList(pointToAdd);
+
     if(toPoint == NULL) {
         addPointToSeparatePaths(pointToAdd);
     } else {
@@ -692,9 +766,9 @@ PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
             toPoint->setPointAsPrevious(pointToAdd);
         }
     }
-    finishUndoRedoSet();
 
-    updatePathPointIds();
+    appendToPointsList(pointToAdd);
+    finishUndoRedoSet();
 
     return pointToAdd;
 }
@@ -723,6 +797,8 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
         addUndoRedo(undoRedo);
     }
     point->incNumberPointers();
+
+    updatePathPointIds();
 }
 
 void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
@@ -740,6 +816,8 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
         finishUndoRedoSet();
     }
     point->decNumberPointers();
+
+    updatePathPointIds();
 }
 
 void VectorPath::removePoint(PathPoint *point) {
@@ -761,8 +839,6 @@ void VectorPath::removePoint(PathPoint *point) {
     removeFromPointsList(point);
 
     finishUndoRedoSet();
-
-    updatePathPointIds();
 }
 
 bool VectorPath::pointInsidePath(QPointF point)

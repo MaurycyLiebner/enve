@@ -32,11 +32,15 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
     mEndCtrlPt->hide();
 
     setPosAnimatorUpdater(new PathPointUpdater(vectorPath) );
+    mInfluenceAnimator.setUpdater(new PathPointUpdater(vectorPath) );
+    mInfluenceTAnimator.setUpdater(new PathPointUpdater(vectorPath) );
 
     mPathPointAnimators.setAllVars(this,
                                    mEndCtrlPt->getRelativePosAnimatorPtr(),
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
-                                   getRelativePosAnimatorPtr());
+                                   getRelativePosAnimatorPtr(),
+                                   &mInfluenceAnimator,
+                                   &mInfluenceTAnimator);
 
     mPathPointAnimators.incNumberPointers();
 
@@ -69,11 +73,15 @@ PathPoint::PathPoint(QPointF absPos,
     mEndCtrlPt->hide();
 
     setPosAnimatorUpdater(new PathPointUpdater(vectorPath) );
+    mInfluenceAnimator.setUpdater(new PathPointUpdater(vectorPath) );
+    mInfluenceTAnimator.setUpdater(new PathPointUpdater(vectorPath) );
 
     mPathPointAnimators.setAllVars(this,
                                    mEndCtrlPt->getRelativePosAnimatorPtr(),
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
-                                   getRelativePosAnimatorPtr());
+                                   getRelativePosAnimatorPtr(),
+                                   &mInfluenceAnimator,
+                                   &mInfluenceTAnimator);
     mPathPointAnimators.incNumberPointers();
 
     mRelPos.setTraceKeyOnCurrentFrame(true);
@@ -112,7 +120,9 @@ PathPoint::PathPoint(int movablePointId, int pathPointId,
     mPathPointAnimators.setAllVars(this,
                                    mEndCtrlPt->getRelativePosAnimatorPtr(),
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
-                                   getRelativePosAnimatorPtr());
+                                   getRelativePosAnimatorPtr(),
+                                   &mInfluenceAnimator,
+                                   &mInfluenceTAnimator);
     mPathPointAnimators.incNumberPointers();
 
     mRelPos.setTraceKeyOnCurrentFrame(true);
@@ -473,6 +483,220 @@ void PathPoint::updateAfterFrameChanged(int frame)
 void PathPoint::setPointId(int idT) {
     mPathPointAnimators.setName("point " + QString::number(idT) );
     mPointId = idT;
+}
+
+qreal PathPoint::getCurrentInfluence()
+{
+    return mInfluenceAnimator.getCurrentValue();
+}
+
+bool PathPoint::hasFullInfluence() {
+    return mInfluenceAnimator.getCurrentValue() > 0.99999;
+}
+
+bool PathPoint::hasNoInfluence() {
+    return mInfluenceAnimator.getCurrentValue() < 0.00001;
+}
+
+bool PathPoint::hasSomeInfluence() {
+    return mInfluenceAnimator.getCurrentValue() > 0.00001;
+}
+
+PathPointValues PathPoint::getPointValues()
+{
+    return PathPointValues(getStartCtrlPtValue(),
+                           getRelativePos(),
+                           getEndCtrlPtValue() );
+}
+
+void PathPoint::addEndExpectation(PosExpectation expectation)
+{
+    mEndExpectations << expectation;
+}
+
+void PathPoint::addEndExternalExpectation(PosExpectation expectation)
+{
+    mEndExternalExpectations << expectation;
+}
+
+void PathPoint::addStartExpectation(PosExpectation expectation)
+{
+    mStartExpectations << expectation;
+}
+
+void PathPoint::addStartExternalExpectation(PosExpectation expectation)
+{
+    mStartExternalExpectations << expectation;
+}
+
+void PathPoint::addPointExpectation(PosExpectation expectation)
+{
+    mPointExpectations << expectation;
+}
+
+void PathPoint::clearExpectations()
+{
+    mEndExpectations.clear();
+    mStartExpectations.clear();
+    mPointExpectations.clear();
+    mStartExternalExpectations.clear();
+    mEndExternalExpectations.clear();
+}
+
+void PathPoint::addExpectations() {
+    if(hasFullInfluence() ) return;
+    qreal thisT = getCurrentInfluenceT();
+    qreal thisInfl = getCurrentInfluence();
+    qreal totalInfl = 0.;
+    PathPoint *prevPoint = mPreviousPoint;
+    PathPoint *nextPoint = mNextPoint;
+    bool iterPrev = false;
+    bool iterNext = true;
+    QList<PathPoint*> nextPoints;
+    nextPoints << nextPoint;
+    QList<PathPoint*> prevPoints;
+    while(totalInfl < 1.) {
+        if(prevPoint == NULL && nextPoint == NULL) break;
+        if(prevPoint == NULL) {
+            addPointExpectation(PosExpectation(nextPoint->getRelativePos(),
+                                               1. - totalInfl) );
+            addEndExpectation(PosExpectation(nextPoint->getRelativePos(),
+                                             1. - totalInfl) );
+            addStartExpectation(PosExpectation(nextPoint->getRelativePos(),
+                                               1. - totalInfl) );
+
+            break;
+        }
+        if(nextPoint == NULL) {
+            addPointExpectation(PosExpectation(prevPoint->getRelativePos(),
+                                               1. - totalInfl) );
+            addEndExpectation(PosExpectation(prevPoint->getRelativePos(),
+                                             1. - totalInfl) );
+            addStartExpectation(PosExpectation(prevPoint->getRelativePos(),
+                                               1. - totalInfl) );
+
+            break;
+        }
+        QPointF prevPointEnd = prevPoint->getEndCtrlPtValue();
+        QPointF nextPointStart = nextPoint->getStartCtrlPtValue();
+        QPointF newPointPos;
+        QPointF newPointStart;
+        QPointF newPointEnd;
+        Edge::getNewRelPosForKnotInsertionAtT(prevPoint->getRelativePos(),
+                                              &prevPointEnd,
+                                              &nextPointStart,
+                                              nextPoint->getRelativePos(),
+                                              &newPointPos,
+                                              &newPointStart,
+                                              &newPointEnd,
+                                              thisT);
+
+        qreal expInfl = prevPoint->getCurrentInfluence()*
+                        nextPoint->getCurrentInfluence();
+        qreal expExtInfl = (1. - thisInfl)*expInfl;
+        prevPoint->addEndExternalExpectation(PosExpectation(prevPointEnd,
+                                                            expExtInfl) );
+        nextPoint->addStartExternalExpectation(PosExpectation(nextPointStart,
+                                                              expExtInfl) );
+        addPointExpectation(PosExpectation(newPointPos, expInfl) );
+        addEndExpectation(PosExpectation(newPointEnd, expInfl) );
+        addStartExpectation(PosExpectation(newPointStart, expInfl) );
+
+
+        if(iterNext) {
+            if(nextPoint == nextPoints.last() ) {
+                iterPrev = true;
+                iterNext = false;
+
+                prevPoints << prevPoint;
+                prevPoint = prevPoints.first();
+            }
+
+            nextPoint = nextPoint->getNextPoint();
+        } else {
+            if(prevPoint == prevPoints.last() ) {
+                iterNext = true;
+                iterPrev = false;
+
+                nextPoints << nextPoint;
+                nextPoint = nextPoints.first();
+            }
+
+            prevPoint = prevPoint->getPreviousPoint();
+        }
+        totalInfl += expInfl;
+    }
+}
+
+PathPointValues PathPoint::getInfluenceAdjustedPointValues() {
+    qreal infl = getCurrentInfluence();
+    qreal sStartExtExpInf = 0.;
+    QPointF sStartExtExp = QPointF(0., 0.);
+    foreach(PosExpectation expectation, mStartExternalExpectations) {
+        sStartExtExpInf += expectation.influence;
+        sStartExtExp += expectation.getPosMultByInf();
+    }
+
+    qreal sStartExpInf = 0.;
+    QPointF sStartExp = QPointF(0., 0.);
+    foreach(PosExpectation expectation, mStartExpectations) {
+        sStartExpInf += expectation.influence;
+        sStartExp += expectation.getPosMultByInf();
+    }
+
+
+    QPointF RStartP = infl*( (1. - sStartExtExpInf)*getStartCtrlPtValue() +
+                             sStartExtExp);
+    if(!mStartExpectations.isEmpty()) {
+        RStartP += (1 - infl)*(sStartExp)/sStartExpInf;
+    }
+
+    qreal sEndExtExpInf = 0.;
+    QPointF sEndExtExp = QPointF(0., 0.);
+    foreach(PosExpectation expectation, mEndExternalExpectations) {
+        sEndExtExpInf += expectation.influence;
+        sEndExtExp += expectation.getPosMultByInf();
+    }
+
+    qreal sEndExpInf = 0.;
+    QPointF sEndExp = QPointF(0., 0.);
+    foreach(PosExpectation expectation, mEndExpectations) {
+        sEndExpInf += expectation.influence;
+        sEndExp += expectation.getPosMultByInf();
+    }
+
+
+    QPointF REndP = infl*( (1. - sEndExtExpInf)*getEndCtrlPtValue() +
+                             sEndExtExp);
+    if(!mEndExpectations.isEmpty() ) {
+        REndP += (1 - infl)*(sEndExp)/sEndExpInf;
+    }
+
+
+    qreal sPointExpInf = 0.;
+    QPointF sPointExp = QPointF(0., 0.);
+    foreach(PosExpectation expectation, mPointExpectations) {
+        sPointExpInf += expectation.influence;
+        sPointExp += expectation.getPosMultByInf();
+    }
+
+
+    QPointF RPointP = infl*getRelativePos();
+    if(!mPointExpectations.isEmpty() ) {
+        RPointP += (1 - infl)*(sPointExp)/sPointExpInf;
+    }
+
+    return PathPointValues(RStartP, RPointP, REndP);
+}
+
+qreal PathPoint::getCurrentInfluenceT()
+{
+    return mInfluenceTAnimator.getCurrentValue();
+}
+
+CtrlsMode PathPoint::getCurrentCtrlsMode()
+{
+    return mCtrlsMode;
 }
 
 PathPointAnimators *PathPoint::getPathPointAnimatorsPtr()

@@ -32,6 +32,56 @@ public:
         mPressedT = pressedT;
     }
 
+    static void getNewRelPosForKnotInsertionAtT(QPointF P0,
+                                                QPointF *P1_ptr,
+                                                QPointF *P2_ptr,
+                                                QPointF P3,
+                                                QPointF *new_p_ptr,
+                                                QPointF *new_p_start_ptr,
+                                                QPointF *new_p_end_ptr,
+                                                qreal t) {
+        QPointF P1 = *P1_ptr;
+        QPointF P2 = *P2_ptr;
+        QPointF P0_1 = (1-t)*P0 + t*P1;
+        QPointF P1_2 = (1-t)*P1 + t*P2;
+        QPointF P2_3 = (1-t)*P2 + t*P3;
+
+        QPointF P01_12 = (1-t)*P0_1 + t*P1_2;
+        QPointF P12_23 = (1-t)*P1_2 + t*P2_3;
+
+        QPointF P0112_1223 = (1-t)*P01_12 + t*P12_23;
+
+        *P1_ptr = P0_1;
+        *new_p_start_ptr = P01_12;
+        *new_p_ptr = P0112_1223;
+        *new_p_end_ptr = P12_23;
+        *P2_ptr = P2_3;
+    }
+
+    static QPointF getRelPosBetweenPointsAtT(qreal t,
+                                             PathPoint *point1,
+                                             PathPoint *point2) {
+        if(point1 == NULL) return point2->getRelativePos();
+        if(point2 == NULL) return point1->getRelativePos();
+        CtrlPoint *point1EndPt = point1->getEndCtrlPt();
+        CtrlPoint *point2StartPt = point2->getStartCtrlPt();
+        QPointF p0Pos = point1->getRelativePos();
+        QPointF p1Pos = point1EndPt->getRelativePos();
+        QPointF p2Pos = point2StartPt->getRelativePos();
+        QPointF p3Pos = point2->getRelativePos();
+        qreal x0 = p0Pos.x();
+        qreal y0 = p0Pos.y();
+        qreal x1 = p1Pos.x();
+        qreal y1 = p1Pos.y();
+        qreal x2 = p2Pos.x();
+        qreal y2 = p2Pos.y();
+        qreal x3 = p3Pos.x();
+        qreal y3 = p3Pos.y();
+
+        return QPointF(calcCubicBezierVal(x0, x1, x2, x3, t),
+                       calcCubicBezierVal(y0, y1, y2, y3, t) );
+    }
+
     void makePassThrough(QPointF absPos) {
         QPointF p0Pos = mPoint1->getAbsolutePos();
         QPointF p1Pos = mPoint1EndPt->getAbsolutePos();
