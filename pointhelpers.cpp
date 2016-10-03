@@ -40,7 +40,7 @@ qreal pointToLen(QPointF point) {
 }
 
 bool isPointZero(QPointF pos) {
-    return abs(pos.x()) == 0 && abs(pos.y()) == 0;
+    return pointToLen(pos) < 0.0001;
 }
 
 QPointF scalePointToNewLen(QPointF point, qreal newLen) {

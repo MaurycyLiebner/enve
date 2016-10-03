@@ -63,6 +63,16 @@ public:
         mPoint2StartPt->moveToAbs(QPointF(x2, y2) );
     }
 
+    void finishTransform() {
+        mPoint1EndPt->finishTransform();
+        mPoint2StartPt->finishTransform();
+    }
+
+    void startTransform() {
+        mPoint1EndPt->startTransform();
+        mPoint2StartPt->startTransform();
+    }
+
 private:
     PathPoint *mPoint1;
     CtrlPoint *mPoint1EndPt;

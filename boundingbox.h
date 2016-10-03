@@ -188,6 +188,9 @@ public:
         Q_UNUSED(absPos);
         return NULL;
     }
+    void setAbsolutePos(QPointF pos, bool saveUndoRedo);
+    void setRelativePos(QPointF relPos, bool saveUndoRedo);
+    virtual void setRenderCombinedTransform();
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 

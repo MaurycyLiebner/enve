@@ -1,5 +1,6 @@
 #include "complexanimator.h"
 #include "boxeslist.h"
+#include "mainwindow.h"
 
 ComplexAnimator::ComplexAnimator() :
     QrealAnimator()
@@ -35,13 +36,20 @@ void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
     mChildAnimators << childAnimator;
     childAnimator->incNumberPointers();
     childAnimator->setParentAnimator(this);
+    childAnimator->addAllKeysToComplexAnimator();
+    childAnimatorIsRecordingChanged();
+    childAnimator->setFrame(mCurrentFrame);
+    updateKeysPath();
 }
 
 void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
 {
+    removeAnimator->removeAllKeysFromComplexAnimator();
     mChildAnimators.removeOne(removeAnimator);
     removeAnimator->setParentAnimator(NULL);
     removeAnimator->decNumberPointers();
+    childAnimatorIsRecordingChanged();
+    updateKeysPath();
 }
 
 void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,
@@ -49,6 +57,15 @@ void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,
     int id1 = mChildAnimators.indexOf(animator1);
     int id2 = mChildAnimators.indexOf(animator2);
     mChildAnimators.swap(id1, id2);
+}
+
+void ComplexAnimator::clearFromGraphView()
+{
+    QrealAnimator::clearFromGraphView();
+
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->clearFromGraphView();
+    }
 }
 
 void ComplexAnimator::startTransform()
@@ -291,6 +308,7 @@ void ComplexAnimator::removeChildQrealKey(QrealKey *key)
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
         removeKey(collection);
+        if(mKeys.isEmpty() ) mCurrentValue = 0.;
     }
 }
 
@@ -298,28 +316,19 @@ ComplexKey::ComplexKey(int frameT, ComplexAnimator *parentAnimator) :
     QrealKey(frameT, parentAnimator, frameT) {
 }
 
-void ComplexKey::setStartValue(qreal value) {
-    QrealKey::setStartValue(value);
+void ComplexKey::setStartValue(qreal) {
+    QrealKey::setStartValue(getValue());
 
     foreach(QrealKey *key, mKeys) {
-        if(key->hasPrevKey() ) {
-            qreal prevVal = key->getPrevKeyValue();
-            key->setStartValue(value *
-                               (key->getValue() - prevVal ) /
-                               (getValue() - getPrevKeyValue()) + prevVal );
-        }
+        key->setStartValue(key->getValue());
     }
 }
 
-void ComplexKey::setEndValue(qreal value) {
-    QrealKey::setEndValue(value);
+void ComplexKey::setEndValue(qreal) {
+    QrealKey::setEndValue(getValue());
 
     foreach(QrealKey *key, mKeys) {
-        if(key->hasNextKey() ) {
-            key->setEndValue(value *
-                             (key->getNextKeyValue() - key->getValue() ) /
-                             (getNextKeyValue() - getValue()) + key->getValue() );
-        }
+        key->setStartValue(key->getValue());
     }
 }
 

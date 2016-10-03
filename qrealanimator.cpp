@@ -135,6 +135,9 @@ void QrealAnimator::handleListItemMousePress(qreal boxesListX,
                                              qreal relX, qreal relY,
                                              QMouseEvent *event)
 {
+    if(relX < 0) {
+        return;
+    }
     Q_UNUSED(relY);
     if(event->button() == Qt::RightButton) {
         QMenu menu;
@@ -161,28 +164,11 @@ void QrealAnimator::handleListItemMousePress(qreal boxesListX,
             getMainWindow()->getBoxesList()->
                     graphSetAnimator(this);
         } else {
-            QMenu menu;
-            menu.setAttribute(Qt::WA_TranslucentBackground);
-            menu.setStyleSheet("background-color: rgba(0, 0, 0, 0); "
-                               "color: rgba(0, 0, 0, 0);");
-            QWidgetAction *widgetAction = new QWidgetAction(getMainWindow());
-            QrealAnimatorSpin *spinBox = new QrealAnimatorSpin(this);
-            spinBox->setStyleSheet("background-color: rgba(200, 200, 200); "
-                               "color: rgba(0, 0, 255);");
-            spinBox->setFixedWidth(70);
-            widgetAction->setDefaultWidget(spinBox);
-            menu.addAction(widgetAction);
-            QAction *selected_action = menu.exec(event->globalPos() +
-                        QPoint(LIST_ITEM_MAX_WIDTH - 83. - boxesListX,
-                               -relY - 3.));
-            if(selected_action != NULL)
-            {
-                delete spinBox;
-                delete widgetAction;
-            } else {
-                delete spinBox;
-                delete widgetAction;
-            }
+            QrealAnimatorSpin *spin = new QrealAnimatorSpin(this);
+            spin->show();
+            spin->move(event->globalPos() +
+                       QPoint(LIST_ITEM_MAX_WIDTH - 83. - boxesListX,
+                              -relY - 3.));
         }
     }
 }
@@ -222,6 +208,7 @@ void QrealAnimator::setRecording(bool rec)
         saveCurrentValueAsKey();
     } else {
         removeAllKeys();
+        updateKeysPath();
     }
     if(mParentAnimator != NULL) {
         mParentAnimator->childAnimatorIsRecordingChanged();
@@ -235,7 +222,9 @@ bool QrealAnimator::isRecording()
 
 void QrealAnimator::updateKeyOnCurrrentFrame()
 {
-    mKeyOnCurrentFrame = getKeyAtFrame(mCurrentFrame) != NULL;
+    if(mTraceKeyOnCurrentFrame) {
+        mKeyOnCurrentFrame = getKeyAtFrame(mCurrentFrame) != NULL;
+    }
 }
 
 QrealKey *QrealAnimator::getKeyAtPos(qreal relX, qreal relY,
@@ -263,9 +252,22 @@ QrealKey *QrealAnimator::getKeyAtPos(qreal relX, qreal relY,
     return NULL;
 }
 
+void QrealAnimator::clearFromGraphView() {
+    MainWindow::getInstance()->getBoxesList()->ifIsCurrentAnimatorSetNull(
+                this);
+}
+
+void QrealAnimator::freezeMinMaxValues()
+{
+    mMinMaxValuesFrozen = true;
+}
+
 void QrealAnimator::setParentAnimator(ComplexAnimator *parentAnimator)
 {
     mParentAnimator = parentAnimator;
+    if(parentAnimator == NULL) {
+        clearFromGraphView();
+    }
 }
 
 qreal QrealAnimator::getValueAtFrame(int frame) const
@@ -316,7 +318,7 @@ void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
     updateKeysPath();
 
     if(mIsCurrentAnimator) {
-        graphUpdateAfterKeysChanged();
+        graphScheduleUpdateAfterKeysChanged();
     }
 }
 
@@ -330,8 +332,10 @@ void QrealAnimator::appendKey(QrealKey *newKey) {
     }
 
     if(mIsCurrentAnimator) {
-        graphUpdateAfterKeysChanged();
+        graphScheduleUpdateAfterKeysChanged();
     }
+
+    updateKeyOnCurrrentFrame();
 }
 
 void QrealAnimator::removeKey(QrealKey *removeKey) {
@@ -341,6 +345,12 @@ void QrealAnimator::removeKey(QrealKey *removeKey) {
         }
         removeKey->decNumberPointers();
         sortKeys();
+
+        if(mIsCurrentAnimator) {
+            graphScheduleUpdateAfterKeysChanged();
+        }
+
+        updateKeyOnCurrrentFrame();
     }
 }
 
@@ -355,12 +365,15 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
     }
     sortKeys();
     updateKeysPath();
+
+    updateKeyOnCurrrentFrame();
 }
 
 void QrealAnimator::setFrame(int frame)
 {
     mCurrentFrame = frame;
     updateValueFromCurrentFrame();
+
     updateKeyOnCurrrentFrame();
 }
 
@@ -432,6 +445,22 @@ QrealKey *QrealAnimator::getKeyAtFrame(int frame)
     return NULL;
 }
 
+void QrealAnimator::saveValueAtFrameAsKey(int frame) {
+    QrealKey *keyAtFrame = getKeyAtFrame(frame);
+    if(keyAtFrame == NULL) {
+        keyAtFrame = new QrealKey(frame, this, getValueAtFrame(frame));
+        appendKey(keyAtFrame);
+        updateKeysPath();
+    } else {
+        saveCurrentValueToKey(keyAtFrame);
+    }
+}
+
+void QrealAnimator::setTraceKeyOnCurrentFrame(bool bT)
+{
+    mTraceKeyOnCurrentFrame = bT;
+}
+
 void QrealAnimator::saveCurrentValueAsKey()
 {
     QrealKey *keyAtFrame = getKeyAtFrame(mCurrentFrame);
@@ -464,13 +493,13 @@ void QrealAnimator::updateKeysPath()
         lastKey = key;
     }
     if(lastKey == NULL) {
-        mKeysPath.moveTo(0, -mCurrentValue);
+        mKeysPath.moveTo(-5000, -mCurrentValue);
         mKeysPath.lineTo(5000, -mCurrentValue);
     } else {
         mKeysPath.lineTo(5000, -lastKey->getValue());
     }
     updateValueFromCurrentFrame();
-    mDrawPathUpdateNeeded = true;
+    setDrawPathUpdateNeeded();
 }
 
 bool keysFrameSort(QrealKey *key1, QrealKey *key2)
@@ -499,6 +528,11 @@ qreal QrealAnimator::getValueAtFrame(int frame,
 }
 
 void QrealAnimator::getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
+    if(mMinMaxValuesFrozen) {
+        *minValP = mMinPossibleVal;
+        *maxValP = mMaxPossibleVal;
+        return;
+    }
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
     if(mKeys.isEmpty()) {
@@ -598,30 +632,43 @@ void QrealAnimator::setDrawPathUpdateNeeded()
 void QrealAnimator::getMinAndMaxMoveFrame(
                                      QrealKey *key, QrealPoint *currentPoint,
                                      qreal *minMoveFrame, qreal *maxMoveFrame) {
-    qreal minMoveFrameT;
-    qreal maxMoveFrameT;
-    int keyId = mKeys.indexOf(key);
-    if(currentPoint->isEndPoint()) {
-        minMoveFrameT = key->getFrame();
-        if(keyId == mKeys.count() - 1) {
-            maxMoveFrameT = minMoveFrameT + 5000.;
-        } else {
-            maxMoveFrameT = mKeys.at(keyId + 1)->getFrame();
-        }
-    } else if(currentPoint->isStartPoint()) {
-        if(keyId == 0) {
-            minMoveFrameT = key->getFrame() - 5000.;
-        } else {
-            QrealKey *prevKey = mKeys.at(keyId - 1);
-            minMoveFrameT = prevKey->getFrame();
-        }
-        maxMoveFrameT = key->getFrame();
-    } else {
-        return;
-    }
-    *minMoveFrame = minMoveFrameT;
-    *maxMoveFrame = maxMoveFrameT;
+    if(currentPoint->isKeyPoint()) return;
+    qreal keyFrame = key->getFrame();
 
+    qreal startMinMoveFrame;
+    qreal endMaxMoveFrame;
+    int keyId = mKeys.indexOf(key);
+
+    if(keyId == mKeys.count() - 1) {
+        endMaxMoveFrame = keyFrame + 5000.;
+    } else {
+        endMaxMoveFrame = mKeys.at(keyId + 1)->getFrame();
+    }
+
+    if(keyId == 0) {
+        startMinMoveFrame = keyFrame - 5000.;
+    } else {
+        QrealKey *prevKey = mKeys.at(keyId - 1);
+        startMinMoveFrame = prevKey->getFrame();
+    }
+
+    if(key->getCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC) {
+        if(currentPoint->isEndPoint()) {
+            *minMoveFrame = keyFrame;
+            *maxMoveFrame = qMin(endMaxMoveFrame, 2*keyFrame - startMinMoveFrame);
+        } else {
+            *minMoveFrame = qMax(startMinMoveFrame, 2*keyFrame - endMaxMoveFrame);
+            *maxMoveFrame = keyFrame;
+        }
+    } else {
+        if(currentPoint->isEndPoint()) {
+            *minMoveFrame = keyFrame;
+            *maxMoveFrame = endMaxMoveFrame;
+        } else {
+            *minMoveFrame = startMinMoveFrame;
+            *maxMoveFrame = keyFrame;
+        }
+    }
 }
 
 void QrealAnimator::constrainCtrlsFrameValues() {
@@ -801,19 +848,36 @@ void QrealAnimator::addKeysInRectToList(QRectF frameValueRect,
 void QrealAnimator::setIsCurrentAnimator(bool bT)
 {
     mIsCurrentAnimator = bT;
+    if(bT) {
+        updateKeysPath();
+    }
 }
 
-QrealAnimatorSpin::QrealAnimatorSpin(QrealAnimator *animator)
+QrealAnimatorSpin::QrealAnimatorSpin(QrealAnimator *animator) : QMenu()
 {
-    setRange(animator->getMinPossibleValue(),
+    setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+    setStyleSheet("background-color: rgba(0, 0, 0, 0); "
+                       "color: rgba(0, 0, 0, 0);");
+    QWidgetAction *widgetAction = new QWidgetAction(MainWindow::getInstance());
+    QDoubleSpinBox *spinBox = new QDoubleSpinBox();
+    spinBox->setStyleSheet("background-color: rgba(200, 200, 200); "
+                       "color: rgba(0, 0, 255);");
+    spinBox->setFixedWidth(70);
+    spinBox->setFocus();
+    widgetAction->setDefaultWidget(spinBox);
+    addAction(widgetAction);
+
+    spinBox->setRange(animator->getMinPossibleValue(),
              animator->getMaxPossibleValue());
-    setValue(animator->getCurrentValue() );
-    setSingleStep(animator->getPrefferedValueStep());
+    spinBox->setValue(animator->getCurrentValue() );
+    spinBox->setSingleStep(animator->getPrefferedValueStep());
     mAnimator = animator;
     mAnimator->startTransform();
-    connect(this, SIGNAL(valueChanged(double)),
+
+    connect(spinBox, SIGNAL(valueChanged(double)),
             this, SLOT(valueEdited(double)));
-    connect(this, SIGNAL(editingFinished()),
+    connect(spinBox, SIGNAL(editingFinished()),
             this, SLOT(finishValueEdit()));
 }
 
@@ -828,4 +892,5 @@ void QrealAnimatorSpin::finishValueEdit()
     mAnimator->finishTransform();
     MainWindow::getInstance()->callUpdateSchedulers();
     mAnimator->startTransform();
+    close();
 }

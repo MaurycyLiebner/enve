@@ -30,4 +30,23 @@ private:
     VectorPath *mPath;
 };
 
+class OutlineUpdateScheduler : public UpdateScheduler {
+public:
+    OutlineUpdateScheduler(VectorPath *path);
+
+    void update();
+
+private:
+    VectorPath *mPath;
+};
+
+class QGradientStopsUpdateScheduler : public UpdateScheduler {
+public:
+    QGradientStopsUpdateScheduler(Gradient *gradient);
+
+    void update();
+private:
+    Gradient *mGradient;
+};
+
 #endif // UPDATESCHEDULER_H

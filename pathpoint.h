@@ -132,7 +132,10 @@ public:
     void updateAfterFrameChanged(int frame);
 
     PathPointAnimators *getPathPointAnimatorsPtr();
+    void setPointId(int idT);
+
 private:
+    int mPointId;
     PathPointAnimators mPathPointAnimators;
 
     VectorPath *mVectorPath;

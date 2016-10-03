@@ -197,16 +197,6 @@ void Canvas::paintEvent(QPaintEvent *)
     p.end();
 }
 
-void Canvas::renderCurrentFrameToQImage(QImage *frame)
-{
-    QPainter p(frame);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    BoxesGroup::render(&p);
-
-    p.end();
-}
-
 bool Canvas::isMovingPath() {
     return mCurrentMode == CanvasMode::MOVE_PATH;
 }
@@ -262,6 +252,17 @@ void Canvas::renderCurrentFrameToPreview()
     image->fill(Qt::transparent);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
+}
+
+void Canvas::renderCurrentFrameToQImage(QImage *frame)
+{
+    QPainter p(frame);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    setChildrenRenderCombinedTransform();
+    BoxesGroup::draw(&p);
+
+    p.end();
 }
 
 QMatrix Canvas::getCombinedRenderTransform()

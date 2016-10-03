@@ -146,6 +146,8 @@ void GradientWidget::setCurrentGradient(Gradient *gradient)
         if(mGradients.isEmpty()) newGradient();
         setCurrentGradient(0);
         return;
+    } else if(mCurrentGradient == gradient) {
+        return;
     }
     mCurrentGradient = gradient;
     setCurrentColorId(0);
@@ -175,28 +177,32 @@ void GradientWidget::mousePressEvent(QMouseEvent *event)
     if(event->y() < height()/2 - 10) {
         int heightGrad = (height()/2 - 10)/3;
         int gradId = event->y()/heightGrad + mCenterGradientId - 1;
+        bool gradPressed = true;
         if(gradId >= mGradients.count() || gradId < 0) {
-            return;
+            gradPressed = false;
         }
         if(event->button() == Qt::RightButton) {
             QMenu menu(this);
-            menu.addAction("Delete Gradient");
-            menu.addAction("Add Gradient");
+            menu.addAction("New Gradient");
+            if(gradPressed) {
+                menu.addAction("Duplicate Gradient");
+                menu.addAction("Delete Gradient");
+            }
             QAction *selected_action = menu.exec(event->globalPos());
             if(selected_action != NULL)
             {
                 if(selected_action->text() == "Delete Gradient")
                 {
                     removeGradient(gradId);
-                } else if(selected_action->text() == "Add Gradient") {
+                } else if(selected_action->text() == "Duplicate Gradient") {
                     newGradient(gradId);
+                } else if(selected_action->text() == "New Gradient"){
+                    newGradient();
                 }
-            }
-            else
-            {
+            } else {
 
             }
-        } else {
+        } else if(gradPressed) {
             setCurrentGradient(gradId);
         }
     } else if(event->y() > height()/2 && event->y() < 3*height()/4 && mCurrentGradient != NULL) {
@@ -381,7 +387,13 @@ void GradientWidget::paintGL()
         nextColor = mCurrentGradient->getCurrentColorAt(i + 1);
         cX += segWidth;
     }
-    drawGradient(mGradients.indexOf(mCurrentGradient), quorterHeight, halfHeight + quorterHeight, false);
+    drawGradient(mGradients.indexOf(mCurrentGradient),
+                 quorterHeight, halfHeight + quorterHeight, false);
+}
+
+void GradientWidget::startSelectedColorTransform() {
+    if(mCurrentGradient == NULL) return;
+    mCurrentGradient->startColorIdTransform(mCurrentColorId);
 }
 
 void GradientWidget::finishGradientTransform()

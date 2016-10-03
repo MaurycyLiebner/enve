@@ -50,6 +50,7 @@ public:
     bool isDescendantRecording();
     QString getValueText();
     void swapChildAnimators(QrealAnimator *animator1, QrealAnimator *animator2);
+    void clearFromGraphView();
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;
@@ -62,9 +63,9 @@ class ComplexKey : public QrealKey
 public:
     ComplexKey(int frameT, ComplexAnimator *parentAnimator);
 
-    void setStartValue(qreal value);
+    void setStartValue(qreal);
 
-    void setEndValue(qreal value);
+    void setEndValue(qreal);
 
     void setStartFrame(qreal startFrame);
 
@@ -97,7 +98,6 @@ public:
     void margeAllKeysToKey(ComplexKey *target);
 
     bool isDescendantSelected();
-
 private:
     QList<QrealKey*> mKeys;
 };

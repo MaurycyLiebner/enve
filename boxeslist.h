@@ -80,6 +80,11 @@ public:
     void graphUpdateDrawPathIfNeeded();
     void graphSetDrawPathUpdateNeeded();
     void graphResetValueScaleAndMinShown();
+    void ifIsCurrentAnimatorSetNull(QrealAnimator *animator);
+    void middlePress(QPointF pressPos);
+    void middleMove(QPointF movePos);
+    void scheduleGraphUpdateAfterKeysChanged();
+    void graphUpdateAfterKeysChangedIfNeeded();
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *e);
@@ -106,6 +111,8 @@ public slots:
     void graphSetNoSideCtrlForSelected();
 private:
     void deleteSelectedKeys();
+
+    bool mGraphUpdateAfterKeysChangedNeeded = false;
 
     QrealKey *mLastPressedKey = NULL;
     bool mFirstMove = false;
@@ -145,6 +152,9 @@ private:
     qreal mValueInc;
 
     QrealAnimator *mAnimator = NULL;
+
+    bool mListFocus = false;
+    bool mBeforePressListFocus = false;
 };
 
 #endif // BOXESLIST_H

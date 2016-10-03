@@ -95,9 +95,15 @@ void BoxesList::paintEvent(QPaintEvent *)
                                    mAnimator == NULL);
     if(mAnimator == NULL) {
         if(mSelecting) {
+            p.save();
+
+            p.setClipRect(LIST_ITEM_MAX_WIDTH, 0,
+                          mGraphRect.width(), mGraphRect.height());
             p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
             p.setBrush(Qt::NoBrush);
             p.drawRect(mSelectionRect);
+
+            p.restore();
         }
     } else {
         p.save();
@@ -108,13 +114,22 @@ void BoxesList::paintEvent(QPaintEvent *)
         p.restore();
     }
 
+    p.setPen(QPen(Qt::black, 1.) );
+    p.drawLine(LIST_ITEM_MAX_WIDTH, 0, LIST_ITEM_MAX_WIDTH, height());
+
     if(hasFocus() ) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::red, 4.));
-        p.drawRect(rect() );
+        if(mListFocus) {
+            p.drawRect(0, 0,
+                       LIST_ITEM_MAX_WIDTH, height());
+        } else {
+            p.drawRect(LIST_ITEM_MAX_WIDTH, 0,
+                       width() - LIST_ITEM_MAX_WIDTH, height());
+        }
+
     }
-    p.setPen(QPen(Qt::black, 1.) );
-    p.drawLine(LIST_ITEM_MAX_WIDTH, 0, LIST_ITEM_MAX_WIDTH, height());
+
     p.end();
 }
 
@@ -179,40 +194,72 @@ void BoxesList::wheelEvent(QWheelEvent *event)
     repaint();
 }
 
+void BoxesList::ifIsCurrentAnimatorSetNull(QrealAnimator *animator) {
+    if(mAnimator == animator) {
+        graphSetAnimator(animator);
+    }
+}
+
+void BoxesList::middlePress(QPointF pressPos)
+{
+    mSavedMinViewedFrame = mMinViewedFrame;
+    mSavedMaxViewedFrame = mMaxViewedFrame;
+    mMiddlePressPos = pressPos;
+}
+
+void BoxesList::middleMove(QPointF movePos)
+{
+    qreal diffFrame = (movePos.x() - mMiddlePressPos.x() ) / mPixelsPerFrame;
+    int roundX = qRound(diffFrame );
+    setFramesRange(mSavedMinViewedFrame - roundX,
+                   mSavedMaxViewedFrame - roundX );
+}
+
 void BoxesList::mousePressEvent(QMouseEvent *event)
 {
+    mBeforePressListFocus = mListFocus;
+    mListFocus = false;
     if(event->x() < LIST_ITEM_MAX_WIDTH) {
+        mListFocus = true;
         mCanvas->handleChildListItemMousePress(event->x(),
                                                event->x(),
                                                event->y() + mViewedRect.top(),
                                                0.f, event);
-    } else if(mAnimator == NULL) {
-        mFirstMove = true;
-        mLastPressPos = event->pos();
-
-        mLastPressedKey = mCanvas->getKeyAtPos(event->x() - LIST_ITEM_MAX_WIDTH,
-                                                event->y() + mViewedRect.top(),
-                                                0.);
-        if(mLastPressedKey == NULL) {
-            mSelecting = true;
-            mSelectionRect.setTopLeft(event->pos() );
-            mSelectionRect.setBottomRight(event->pos() );
-        }
-        else {
-            if(!isShiftPressed() && !mLastPressedKey->isSelected()) {
-                clearKeySelection();
-            }
-            if(isShiftPressed() && mLastPressedKey->isSelected()) {
-                removeKeyFromSelection(mLastPressedKey);
-            } else {
-                addKeyToSelection(mLastPressedKey);
-
-                mMovingKeys = true;
-            }
-        }
     } else {
-        graphMousePressEvent(event->pos() - QPoint(LIST_ITEM_MAX_WIDTH, 0.),
-                             event->button());
+        if(mAnimator == NULL) {
+            if(event->button() == Qt::MiddleButton) {
+                middlePress(event->pos() );
+            } else {
+                mFirstMove = true;
+                mLastPressPos = event->pos();
+
+                mLastPressedKey = mCanvas->getKeyAtPos(event->x() - LIST_ITEM_MAX_WIDTH,
+                                                        event->y() + mViewedRect.top(),
+                                                        0.);
+                if(mLastPressedKey == NULL) {
+                    mSelecting = true;
+                    mSelectionRect.setTopLeft(event->pos() );
+                    mSelectionRect.setBottomRight(event->pos() );
+                }
+                else {
+                    if(!mMainWindow->isShiftPressed() &&
+                            !mLastPressedKey->isSelected()) {
+                        clearKeySelection();
+                    }
+                    if(mMainWindow->isShiftPressed() &&
+                            mLastPressedKey->isSelected()) {
+                        removeKeyFromSelection(mLastPressedKey);
+                    } else {
+                        addKeyToSelection(mLastPressedKey);
+
+                        mMovingKeys = true;
+                    }
+                }
+            }
+        } else {
+            graphMousePressEvent(event->pos() - QPoint(LIST_ITEM_MAX_WIDTH, 0.),
+                                 event->button());
+        }
     }
 
 
@@ -222,17 +269,23 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
 void BoxesList::mouseMoveEvent(QMouseEvent *event)
 {
     if(mAnimator == NULL) {
-        mFirstMove = false;
-        if(mMovingKeys) {
-            int dFrame = qRound( (event->x() - mLastPressPos.x())/mPixelsPerFrame );
-            int dDFrame = dFrame - mMoveDFrame;
-            if(dDFrame == 0) return;
-            mMoveDFrame = dFrame;
-            foreach(QrealKey *key, mSelectedKeys) {
-                key->incFrameAndUpdateParentAnimator(dDFrame);
+        if(event->buttons() == Qt::MiddleButton) {
+            middleMove(event->pos() );
+            emit changedViewedFrames(mMinViewedFrame,
+                                     mMaxViewedFrame);
+        } else {
+            mFirstMove = false;
+            if(mMovingKeys) {
+                int dFrame = qRound( (event->x() - mLastPressPos.x())/mPixelsPerFrame );
+                int dDFrame = dFrame - mMoveDFrame;
+                if(dDFrame == 0) return;
+                mMoveDFrame = dFrame;
+                foreach(QrealKey *key, mSelectedKeys) {
+                    key->incFrameAndUpdateParentAnimator(dDFrame);
+                }
+            } else if(mSelecting) {
+                mSelectionRect.setBottomRight(event->pos() );
             }
-        } else if(mSelecting) {
-            mSelectionRect.setBottomRight(event->pos() );
         }
     } else {
         graphMouseMoveEvent(event->pos() - QPoint(LIST_ITEM_MAX_WIDTH, 0.),
@@ -257,7 +310,7 @@ void BoxesList::mouseReleaseEvent(QMouseEvent *e)
     if(mAnimator == NULL) {
         if(mSelecting) {
             if(mFirstMove) {
-                if(!isShiftPressed() ) {
+                if(!mMainWindow->isShiftPressed() && !mBeforePressListFocus) {
                     clearKeySelection();
                 }
             } else {
@@ -273,7 +326,7 @@ void BoxesList::mouseReleaseEvent(QMouseEvent *e)
                     mSelectionRect.setTop(bottomT);
                     mSelectionRect.setBottom(topT);
                 }
-                if(!isShiftPressed()) {
+                if(!mMainWindow->isShiftPressed()) {
                     clearKeySelection();
                 }
                 selectKeysInSelectionRect();
@@ -281,7 +334,7 @@ void BoxesList::mouseReleaseEvent(QMouseEvent *e)
             mSelecting = false;
         } else if(mMovingKeys) {
             if(mFirstMove) {
-                if(isShiftPressed()) {
+                if(mMainWindow->isShiftPressed()) {
                     if(mLastPressedKey->isSelected() ) {
                         removeKeyFromSelection(mLastPressedKey);
                     } else {

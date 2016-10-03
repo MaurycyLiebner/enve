@@ -51,6 +51,11 @@ bool QrealKey::isAncestorSelected()
     return isSelected() || mParentKey->isAncestorSelected();
 }
 
+CtrlsMode QrealKey::getCtrlsMode()
+{
+    return mCtrlsMode;
+}
+
 QrealPoint *QrealKey::getStartPoint()
 {
     return mStartPoint;
@@ -167,6 +172,7 @@ void QrealKey::updateCtrlFromCtrl(QrealPointType type)
     }
     QPointF newFrameValue;
     if(mCtrlsMode == CTRLS_SMOOTH) {
+        // mFrame and mValue are of different units chence len is wrong
         newFrameValue = symmetricToPosNewLen(
             fromPt,
             QPointF(mFrame, mValue),
@@ -185,6 +191,9 @@ void QrealKey::updateCtrlFromCtrl(QrealPointType type)
 qreal QrealKey::getValue() { return mValue; }
 
 void QrealKey::setValue(qreal value) {
+    value = clamp(value,
+                  mParentAnimator->getMinPossibleValue(),
+                  mParentAnimator->getMaxPossibleValue());
     qreal dVal = value - mValue;
     setEndValue(mEndValue + dVal);
     setStartValue(mStartValue + dVal);
@@ -219,6 +228,7 @@ void QrealKey::setFrame(int frame) {
     setEndFrame(mEndFrame + dFrame);
     setStartFrame(mStartFrame + dFrame);
     mFrame = frame;
+    mParentAnimator->updateKeyOnCurrrentFrame();
 }
 
 void QrealKey::setStartFrame(qreal startFrame)

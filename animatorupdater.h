@@ -49,4 +49,23 @@ private:
     Gradient *mTarget;
 };
 
+class StrokeWidthUpdater : public AnimatorUpdater
+{
+public:
+    StrokeWidthUpdater(VectorPath *path);
+
+    void update();
+
+private:
+    VectorPath *mTarget;
+};
+
+class DisplayedFillStrokeSettingsUpdater : public AnimatorUpdater
+{
+public:
+    DisplayedFillStrokeSettingsUpdater();
+
+    void update();
+};
+
 #endif // ANIMATORUPDATER_H

@@ -10,6 +10,7 @@ CtrlPoint::CtrlPoint(QPointF absPos,
 {
     mIsStartCtrlPt = isStartCtrlPt;
     mParentPoint = parentPoint;
+    mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
 CtrlPoint::CtrlPoint(int movablepointid,
@@ -20,6 +21,7 @@ CtrlPoint::CtrlPoint(int movablepointid,
 {
     mIsStartCtrlPt = isStartCtrlPt;
     mParentPoint = parentPoint;
+    mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
 CtrlPoint::CtrlPoint(qreal relPosX, qreal relPosY,
@@ -30,6 +32,7 @@ CtrlPoint::CtrlPoint(qreal relPosX, qreal relPosY,
 {
     mIsStartCtrlPt = isStartCtrlPt;
     mParentPoint = parentPoint;
+    mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
 void CtrlPoint::moveToWithoutUpdatingTheOther(QPointF absPos)
@@ -58,12 +61,14 @@ void CtrlPoint::moveBy(QPointF absTranslation)
 void CtrlPoint::startTransform()
 {
     MovablePoint::startTransform();
+    mParentPoint->MovablePoint::startTransform();
     mOtherCtrlPt->MovablePoint::startTransform();
 }
 
 void CtrlPoint::finishTransform()
 {
     startNewUndoRedoSet();
+    mParentPoint->MovablePoint::finishTransform();
     MovablePoint::finishTransform();
     mOtherCtrlPt->MovablePoint::finishTransform();
     finishUndoRedoSet();

@@ -263,6 +263,22 @@ void BoundingBox::moveBy(QPointF trans)
     mTransformAnimator.translate(trans.x(), trans.y());
 }
 
+void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo)
+{
+    QMatrix combinedM = mParent->getCombinedTransform();
+    QPointF newPos = combinedM.inverted().map(pos);
+    setRelativePos(newPos, saveUndoRedo );
+}
+
+void BoundingBox::setRelativePos(QPointF relPos, bool saveUndoRedo)
+{
+    mTransformAnimator.setPosition(relPos.x(), relPos.y() );
+}
+
+void BoundingBox::setRenderCombinedTransform() {
+    mCombinedTransformMatrix = getCombinedRenderTransform();
+}
+
 void BoundingBox::saveTransformPivot(QPointF absPivot) {
     mSavedTransformPivot =
             mParent->getCombinedTransform().inverted().map(absPivot) -

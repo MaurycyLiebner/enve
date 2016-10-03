@@ -16,12 +16,16 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
 
     mVal1Animator.setValueRange(0., 1.);
     mVal1Animator.setPrefferedValueStep(0.05);
+    mVal1Animator.freezeMinMaxValues();
     mVal2Animator.setValueRange(0., 1.);
     mVal2Animator.setPrefferedValueStep(0.05);
+    mVal2Animator.freezeMinMaxValues();
     mVal3Animator.setValueRange(0., 1.);
     mVal3Animator.setPrefferedValueStep(0.05);
+    mVal3Animator.freezeMinMaxValues();
     mAlphaAnimator.setValueRange(0., 1.);
     mAlphaAnimator.setPrefferedValueStep(0.05);
+    mAlphaAnimator.freezeMinMaxValues();
 }
 
 void ColorAnimator::setCurrentValue(Color colorValue, bool finish)

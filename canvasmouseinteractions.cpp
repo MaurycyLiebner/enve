@@ -64,10 +64,16 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                     return;
                 }
                 if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
+                    startNewUndoRedoSet();
+
                     VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
                     mCurrentBoxesGroup->clearBoxesSelection();
                     mCurrentBoxesGroup->addBoxToSelection(newPath);
-                    setCurrentEndPoint(newPath->addPointAbsPos(mLastMouseEventPos, mCurrentEndPoint) );
+                    setCurrentEndPoint(
+                                newPath->addPointAbsPos(mLastMouseEventPos,
+                                                        mCurrentEndPoint) );
+
+                    finishUndoRedoSet();
                 } else {
                     if(pathPointUnderMouse == NULL) {
                         setCurrentEndPoint(mCurrentEndPoint->addPointAbsPos(mLastMouseEventPos) );
@@ -150,6 +156,7 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
             }
             return;
         }
+        if(!isShiftPressed()) mCurrentBoxesGroup->clearPointsSelection();
         moveSecondSelectionPoint(pos);
         mCurrentBoxesGroup->selectAndAddContainedPointsToSelection(mSelectionRect);
     } else if(mFirstMouseMove) {
@@ -241,6 +248,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     mLastPressedBox = NULL;
     mLastPressedPoint = NULL;
     if(mCurrentEdge != NULL) {
+        if(!mFirstMouseMove) {
+            mCurrentEdge->finishTransform();
+        }
         delete mCurrentEdge;
         mCurrentEdge = NULL;
     }
@@ -250,6 +260,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
 void Canvas::handleMovePointMouseMove(QPointF eventPos) {
     if(mCurrentEdge != NULL) {
+        if(mFirstMouseMove) {
+            mCurrentEdge->startTransform();
+        }
         mCurrentEdge->makePassThrough(eventPos);
     } else {
         if(mLastPressedPoint != NULL) {

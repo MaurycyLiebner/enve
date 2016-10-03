@@ -90,9 +90,9 @@ void MovablePoint::draw(QPainter *p)
         return;
     }
     if(mSelected) {
-        p->setBrush(QColor(255, 0, 0, 155));
+        p->setBrush(QColor(255, 0, 0));
     } else {
-        p->setBrush(QColor(255, 0, 0, 75));
+        p->setBrush(QColor(255, 175, 175));
     }
     QPointF absPos = getAbsolutePos();
     p->drawEllipse(absPos,

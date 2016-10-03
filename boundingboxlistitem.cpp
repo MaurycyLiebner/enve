@@ -37,6 +37,9 @@ QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
 void BoundingBox::handleListItemMousePress(qreal boxesListX,
                                            qreal relX, qreal relY,
                                            QMouseEvent *event) {
+    if(relX < 0) {
+        return;
+    }
     if(relY < LIST_ITEM_HEIGHT) {
         if(relX < LIST_ITEM_HEIGHT) {
             setChildrenListItemsVisible(!mBoxListItemDetailsVisible);

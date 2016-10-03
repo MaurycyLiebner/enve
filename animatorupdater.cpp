@@ -30,5 +30,27 @@ GradientUpdater::GradientUpdater(Gradient *gradient)
 
 void GradientUpdater::update()
 {
-    mTarget->updateQGradientStops();
+    mTarget->scheduleQGradientStopsUpdate();
+    MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+}
+
+StrokeWidthUpdater::StrokeWidthUpdater(VectorPath *path)
+{
+    mTarget = path;
+}
+
+void StrokeWidthUpdater::update()
+{
+    mTarget->scheduleOutlinePathUpdate();
+    MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+}
+
+DisplayedFillStrokeSettingsUpdater::DisplayedFillStrokeSettingsUpdater()
+{
+
+}
+
+void DisplayedFillStrokeSettingsUpdater::update()
+{
+    MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }

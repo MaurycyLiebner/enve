@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include "undoredo.h"
 #include "canvas.h"
+#include "updatescheduler.h"
 
 Gradient::Gradient(Color color1, Color color2, GradientWidget *gradientWidget) :
     ComplexAnimator()
@@ -177,9 +178,29 @@ void Gradient::updatePaths()
 
 void Gradient::finishTransform()
 {
+    ComplexAnimator::finishTransform();
     //addUndoRedo(new ChangeGradientColorsUndoRedo(savedColors, colors, this));
     //savedColors = colors;
     callUpdateSchedulers();
+}
+
+void Gradient::scheduleQGradientStopsUpdate() {
+    if(mQGradientStopsUpdateNeeded) return;
+    mQGradientStopsUpdateNeeded = true;
+    addUpdateScheduler(new QGradientStopsUpdateScheduler(this) );
+}
+
+void Gradient::updateQGradientStopsIfNeeded() {
+    if(mQGradientStopsUpdateNeeded) {
+        mQGradientStopsUpdateNeeded = false;
+        updateQGradientStops();
+    }
+}
+
+void Gradient::startColorIdTransform(int id)
+{
+    if(mColors.count() <= id || id < 0) return;
+    mColors.at(id)->startTransform();
 }
 
 void Gradient::updateQGradientStops() {
@@ -219,6 +240,8 @@ PaintSettings::PaintSettings(Color colorT,
     mGradient = gradientT;
 
     addChildAnimator(&mColor);
+
+    mColor.setUpdater(new DisplayedFillStrokeSettingsUpdater() );
 }
 
 PaintSettings::PaintSettings(int sqlId, GradientWidget *gradientWidget)
@@ -274,6 +297,10 @@ StrokeSettings::StrokeSettings(Color colorT,
     addChildAnimator(&mLineWidth);
 
     mLineWidth.setValueRange(0., mLineWidth.getMaxPossibleValue());
+}
+
+void StrokeSettings::setLineWidthUpdaterTarget(VectorPath *path) {
+    setUpdater(new StrokeWidthUpdater(path));
 }
 
 StrokeSettings StrokeSettings::createStrokeSettingsFromSql(int strokeSqlId,
@@ -570,9 +597,17 @@ void FillStrokeSettingsWidget::colorChangedTMP(GLfloat h, GLfloat s, GLfloat v,
                                                GLfloat a)
 {
     if(mTargetId == 0) {
-        mCanvas->startSelectedFillColorTransform();
+        if(mCurrentFillPaintType == GRADIENTPAINT) {
+            mGradientWidget->startSelectedColorTransform();
+        } else if(mCurrentFillPaintType == FLATPAINT) {
+            mCanvas->startSelectedFillColorTransform();
+        }
     } else {
-        mCanvas->startSelectedStrokeColorTransform();
+        if(mCurrentStrokePaintType == GRADIENTPAINT) {
+            mGradientWidget->startSelectedColorTransform();
+        } else if(mCurrentStrokePaintType == FLATPAINT) {
+            mCanvas->startSelectedStrokeColorTransform();
+        }
     }
     startTransform(SLOT(emitColorSettingsChanged()));
     if(getCurrentPaintTypeVal() == FLATPAINT) {

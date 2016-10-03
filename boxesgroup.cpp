@@ -62,6 +62,17 @@ void BoxesGroup::updateAfterFrameChanged(int currentFrame)
     }
 }
 
+void BoxesGroup::setChildrenRenderCombinedTransform() {
+    foreach(BoundingBox *box, mChildren) {
+        box->setRenderCombinedTransform();
+    }
+}
+
+void BoxesGroup::setRenderCombinedTransform() {
+    BoundingBox::setRenderCombinedTransform();
+    setChildrenRenderCombinedTransform();
+}
+
 void BoxesGroup::clearPointsSelectionOrDeselect() {
     if(mSelectedPoints.isEmpty() ) {
         deselectAllBoxes();
@@ -261,7 +272,9 @@ Edge *BoxesGroup::getPressedEdge(QPointF absPos) {
 BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
 {
     BoundingBox *boxAtPos = NULL;
-    foreachBoxInListInverted(mChildren) {
+    //foreachBoxInListInverted(mChildren) {
+    BoundingBox *box;
+    foreachInverted(box, mChildren) {
         if(box->isVisibleAndUnlocked()) {
             boxAtPos = box->getPathAtFromAllAncestors(absPos);
             if(boxAtPos != NULL) {
@@ -275,7 +288,8 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
 Bone *BoxesGroup::getBoneAt(QPointF absPos)
 {
     Bone *boxAtPos = NULL;
-    foreachBoxInListInverted(mChildren) {
+    BoundingBox *box;
+    foreachInverted(box, mChildren) {
         if(box->isVisibleAndUnlocked() && box->isBone()) {
             if(box->pointInsidePath(absPos) ) {
                 boxAtPos = (Bone*)box;
@@ -454,7 +468,8 @@ void BoxesGroup::ungroup() {
     startNewUndoRedoSet();
     clearBoxesSelection();
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
-    foreachBoxInListInverted(mChildren) {
+    BoundingBox *box;
+    foreachInverted(box, mChildren) {
         box->applyTransformation(&mTransformAnimator);
         removeChild(box);
         parentGroup->addChild(box);
@@ -680,7 +695,8 @@ void BoxesGroup::setPointCtrlsMode(CtrlsMode mode) {
 BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
     BoundingBox *boxAtPos = NULL;
 
-    foreachBoxInListInverted(mChildren) {
+    BoundingBox *box;
+    foreachInverted(box, mChildren) {
         if(box->isVisibleAndUnlocked()) {
             if(box->pointInsidePath(absPos)) {
                 boxAtPos = box;
@@ -897,7 +913,8 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     }
     startNewUndoRedoSet();
     BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
-    foreachBoxInListInverted(mSelectedBoxes) {
+    BoundingBox *box;
+    foreachInverted(box, mSelectedBoxes) {
         removeChild(box);
         box->deselect();
         newGroup->addChild(box);

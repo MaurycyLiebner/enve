@@ -19,7 +19,7 @@ class VectorPath;
 
 class Edge;
 
-class GradientPoints {
+class GradientPoints : public ComplexAnimator {
 public:
     GradientPoints();
 
@@ -35,7 +35,7 @@ public:
 
     void disable();
 
-    void draw(QPainter *p);
+    void drawGradientPoints(QPainter *p);
 
     MovablePoint *getPointAt(QPointF absPos);
 
@@ -63,7 +63,6 @@ public:
 
     virtual QRectF getBoundingRect();
     void draw(QPainter *p);
-    void render(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
 
     PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
@@ -91,11 +90,13 @@ public:
     void centerPivotPosition();
 
     void resetStrokeGradientPointsPos(bool finish) {
+        mStrokeGradientPoints.setRecording(false);
         mStrokeGradientPoints.setPositions(getBoundingRect().topLeft(),
                      getBoundingRect().bottomRight(), finish);
     }
 
     void resetFillGradientPointsPos(bool finish) {
+        mFillGradientPoints.setRecording(false);
         mFillGradientPoints.setPositions(getBoundingRect().topLeft(),
                      getBoundingRect().bottomRight(), finish);
     }
@@ -222,9 +223,6 @@ public:
         if(finish) {
             mStrokeSettings.getStrokeWidthAnimator()->finishTransform();
         }
-        updateOutlinePath();
-
-
     }
 
     void startStrokeWidthTransform() {
@@ -264,7 +262,13 @@ public:
     void finishAllPointsTransform();
 
     Edge *getEgde(QPointF absPos);
+
+    void updateOutlinePath();
+    void scheduleOutlinePathUpdate();
+    void updateOutlinePathIfNeeded();
+    void setRenderCombinedTransform();
 protected:
+    void updatePathPointIds();
     PathAnimator mPathAnimator;
 
     void loadPointsFromSql(int vectorPathId);
@@ -284,6 +288,7 @@ protected:
 
     bool mPathUpdateNeeded = false;
     bool mMappedPathUpdateNeeded = false;
+    bool mOutlinePathUpdateNeeded = false;
 
     bool mClosedPath = false;
     QList<PathPoint*> mSeparatePaths;
@@ -293,7 +298,6 @@ protected:
     QPainterPath mOutlinePath;
     QPainterPathStroker mPathStroker;
     QPainterPath mMappedWhole;
-    void updateOutlinePath();
     void updateWholePath();
     qreal findPercentForPoint(QPointF point, qreal minPercent = 0.f,
                               qreal maxPercent = 1.f);

@@ -177,16 +177,35 @@ void MainWindow::addUpdateScheduler(UpdateScheduler *scheduler)
     mUpdateSchedulers.prepend(scheduler);
 }
 
+bool MainWindow::isShiftPressed()
+{
+    return mShiftPressed;
+}
+
+bool MainWindow::isCtrlPressed()
+{
+    return mCtrlPressed;
+}
+
+bool MainWindow::isAltPressed()
+{
+    return mAltPressed;
+}
+
 void MainWindow::callUpdateSchedulers()
 {
+    mBoxListWidget->graphUpdateAfterKeysChangedIfNeeded();
+
     foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
         sheduler->update();
         delete sheduler;
     }
+
     mUpdateSchedulers.clear();
     mCanvas->updatePivotIfNeeded();
     mCanvas->repaint();
     mBoxListWidget->repaint();
+    updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
 }
 
@@ -310,7 +329,24 @@ bool MainWindow::eventFilter(QObject *, QEvent *e)
     if (e->type() == QEvent::KeyPress)
     {
         QKeyEvent *key_event = (QKeyEvent*)e;
+        if(key_event->key() == Qt::Key_Control) {
+            mCtrlPressed = true;
+        } else if(key_event->key() == Qt::Key_Shift) {
+            mShiftPressed = true;
+        } else if(key_event->key() == Qt::Key_Alt) {
+            mAltPressed = true;
+        }
         return processKeyEvent(key_event);
+    } else if(e->type() == QEvent::KeyRelease) {
+        QKeyEvent *key_event = (QKeyEvent*)e;
+        if(key_event->key() == Qt::Key_Control) {
+            mCtrlPressed = false;
+            callUpdateSchedulers();
+        } else if(key_event->key() == Qt::Key_Shift) {
+            mShiftPressed = false;
+        } else if(key_event->key() == Qt::Key_Alt) {
+            mAltPressed = false;
+        }
     }
     return false;
 }
@@ -322,12 +358,20 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 }
 
-bool isCtrlPressed() {
-    return (QApplication::keyboardModifiers() & Qt::ControlModifier);
+void MainWindow::updateDisplayedFillStrokeSettings() {
+    mCanvas->updateDisplayedFillStrokeSettings();
 }
 
-bool isShiftPressed() {
-    return (QApplication::keyboardModifiers() & Qt::ShiftModifier);
+void MainWindow::updateDisplayedFillStrokeSettingsIfNeeded() {
+    if(mDisplayedFillStrokeSettingsUpdateNeeded) {
+        mDisplayedFillStrokeSettingsUpdateNeeded = false;
+        updateDisplayedFillStrokeSettings();
+    }
+}
+
+void MainWindow::scheduleDisplayedFillStrokeSettingsUpdate()
+{
+    mDisplayedFillStrokeSettingsUpdateNeeded = true;
 }
 
 bool MainWindow::processKeyEvent(QKeyEvent *event) {
@@ -339,7 +383,6 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         } else {
             mUndoRedoStack.undo();
         }
-        mCanvas->updateDisplayedFillStrokeSettings();
     } else if(isCtrlPressed() && event->key() == Qt::Key_S) {
         saveFile();
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {

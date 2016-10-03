@@ -18,9 +18,6 @@ class ColorSettingsWidget;
 
 class BoxesListAnimationDockWidget;
 
-extern bool isCtrlPressed();
-extern bool isShiftPressed();
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -64,7 +61,13 @@ private:
     int mCurrentFrame = 0;
     bool mRecording = false;
     bool mAllPointsRecording = false;
-protected:
+
+    bool mDisplayedFillStrokeSettingsUpdateNeeded = false;
+
+    bool mShiftPressed = false;
+    bool mAltPressed = false;
+    bool mCtrlPressed = false;
+protected:    
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
     void closeEvent(QCloseEvent *e);
@@ -77,6 +80,10 @@ public:
     UndoRedoStack *getUndoRedoStack();
 
     void addUpdateScheduler(UpdateScheduler *scheduler);
+
+    bool isShiftPressed();
+    bool isCtrlPressed();
+    bool isAltPressed();
 
     void callUpdateSchedulers();
     void schedulePivotUpdate();
@@ -111,6 +118,9 @@ public:
     int getMaxFrame();
 
     void previewFinished();
+    void updateDisplayedFillStrokeSettings();
+    void scheduleDisplayedFillStrokeSettingsUpdate();
+    void updateDisplayedFillStrokeSettingsIfNeeded();
 public slots:
     void setCurrentFrame(int frame);
     void setRecording(bool recording);

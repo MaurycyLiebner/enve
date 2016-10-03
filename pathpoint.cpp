@@ -8,6 +8,7 @@
 PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
     PathPoint(absPos, absPos, absPos, vectorPath)
 {
+
 }
 
 PathPoint::PathPoint(qreal relPosX, qreal relPosy,
@@ -38,6 +39,8 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
                                    getRelativePosAnimatorPtr());
 
     mPathPointAnimators.incNumberPointers();
+
+    mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
 void PathPoint::clearAll()
@@ -72,6 +75,8 @@ PathPoint::PathPoint(QPointF absPos,
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
                                    getRelativePosAnimatorPtr());
     mPathPointAnimators.incNumberPointers();
+
+    mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
 PathPoint::PathPoint(int movablePointId, int pathPointId,
@@ -109,6 +114,8 @@ PathPoint::PathPoint(int movablePointId, int pathPointId,
                                    mStartCtrlPt->getRelativePosAnimatorPtr(),
                                    getRelativePosAnimatorPtr());
     mPathPointAnimators.incNumberPointers();
+
+    mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
 void PathPoint::startTransform()
@@ -356,13 +363,14 @@ CtrlPoint *PathPoint::getEndCtrlPt()
 void PathPoint::draw(QPainter *p, CanvasMode mode)
 {
     if(mSelected) {
-        p->setBrush(QColor(0, 0, 255, 155));
+        p->setBrush(QColor(0, 200, 255));
     } else {
-        p->setBrush(QColor(0, 0, 255, 75));
+        p->setBrush(QColor(170, 240, 255));
     }
     QPointF absPos = getAbsolutePos();
     p->drawEllipse(absPos,
                    mRadius, mRadius);
+
     if(mRelPos.isKeyOnCurrentFrame() ) {
         p->save();
         p->setBrush(Qt::red);
@@ -372,16 +380,33 @@ void PathPoint::draw(QPainter *p, CanvasMode mode)
     }
     if(mode == CanvasMode::MOVE_POINT || (mode == CanvasMode::ADD_POINT && mSelected)) {
         QPen pen = p->pen();
-        p->setPen(QPen(Qt::black, 1.5f, Qt::DotLine));
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            p->setPen(QPen(Qt::black, 1.5));
+            p->drawLine(absPos, mEndCtrlPt->getAbsolutePos());
+            p->setPen(QPen(Qt::white, 0.75));
             p->drawLine(absPos, mEndCtrlPt->getAbsolutePos());
         }
         if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            p->setPen(QPen(Qt::black, 1.5));
+            p->drawLine(absPos, mStartCtrlPt->getAbsolutePos());
+            p->setPen(QPen(Qt::white, 0.75));
             p->drawLine(absPos, mStartCtrlPt->getAbsolutePos());
         }
         p->setPen(pen);
         mEndCtrlPt->draw(p);
         mStartCtrlPt->draw(p);
+    }
+
+    if(isCtrlPressed()) {
+        QPen pen = p->pen();
+        p->setPen(Qt::NoPen);
+        p->setBrush(Qt::white);
+        p->drawEllipse(absPos, 6., 6.);
+        p->setPen(pen);
+        p->drawText(QRectF(absPos - QPointF(mRadius, mRadius),
+                           absPos + QPointF(mRadius, mRadius)),
+                    Qt::AlignCenter,
+                    QString::number(mPointId));
     }
 }
 
@@ -443,6 +468,11 @@ void PathPoint::updateAfterFrameChanged(int frame)
     MovablePoint::updateAfterFrameChanged(frame);
     mEndCtrlPt->updateAfterFrameChanged(frame);
     mStartCtrlPt->updateAfterFrameChanged(frame);
+}
+
+void PathPoint::setPointId(int idT) {
+    mPathPointAnimators.setName("point " + QString::number(idT) );
+    mPointId = idT;
 }
 
 PathPointAnimators *PathPoint::getPathPointAnimatorsPtr()

@@ -2,8 +2,8 @@
 #include "canvas.h"
 
 PathPivot::PathPivot(Canvas *parent) :
-    MovablePoint(QPointF(0.f, 0.f), parent,
-                 MovablePointType::TYPE_PIVOT_POINT, 10.f)
+    MovablePoint(QPointF(0., 0.), parent,
+                 MovablePointType::TYPE_PIVOT_POINT, 10.)
 {
     mCanvas = parent;
 //    mRotationPath.addEllipse(QPointF(0.f, 0.f), 50.f, 50.f);
@@ -25,16 +25,16 @@ void PathPivot::draw(QPainter *p)
 //    p->restore();
 
     if(mSelected) {
-        p->setBrush(QColor(0, 255, 0, 155));
+        p->setBrush(QColor(0, 255, 0));
     } else {
-        p->setBrush(QColor(0, 255, 0, 75));
+        p->setBrush(QColor(125, 255, 125));
     }
-    p->setPen(QPen(Qt::black, 1.f));
+    p->setPen(QPen(Qt::black, 1.5));
     p->drawEllipse(absPos,
                    mRadius, mRadius);
 
     p->translate(absPos);
-    qreal halfRadius = mRadius*0.5f;
+    qreal halfRadius = mRadius*0.5;
     p->drawLine(QPointF(-halfRadius, 0), QPointF(halfRadius, 0));
     p->drawLine(QPointF(0, -halfRadius), QPointF(0, halfRadius));
     p->restore();

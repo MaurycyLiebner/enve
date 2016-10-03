@@ -35,15 +35,15 @@ MainWindow *ConnectedToMainWindow::getMainWindow()
 }
 
 bool ConnectedToMainWindow::isShiftPressed() {
-    return QApplication::keyboardModifiers() & Qt::ShiftModifier;
+    return mMainWindow->isShiftPressed();
 }
 
 bool ConnectedToMainWindow::isCtrlPressed() {
-    return (QApplication::keyboardModifiers() & Qt::ControlModifier);
+    return mMainWindow->isCtrlPressed();
 }
 
 bool ConnectedToMainWindow::isAltPressed() {
-    return (QApplication::keyboardModifiers() & Qt::AltModifier);
+    return mMainWindow->isAltPressed();
 }
 
 int ConnectedToMainWindow::getCurrentFrame()
@@ -74,6 +74,10 @@ bool ConnectedToMainWindow::isRecordingAllPoints()
 void ConnectedToMainWindow::graphUpdateAfterKeysChanged()
 {
     mMainWindow->getBoxesList()->graphUpdateAfterKeysChanged();
+}
+
+void ConnectedToMainWindow::graphScheduleUpdateAfterKeysChanged() {
+    mMainWindow->getBoxesList()->scheduleGraphUpdateAfterKeysChanged();
 }
 
 void ConnectedToMainWindow::startNewUndoRedoSet()

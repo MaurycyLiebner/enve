@@ -164,7 +164,17 @@ public:
 
     qreal getPrefferedValueStep();
     void setPrefferedValueStep(qreal valueStep);
+    virtual void clearFromGraphView();
+
+    void freezeMinMaxValues();
+    void saveValueAtFrameAsKey(int frame);
+
+    void setTraceKeyOnCurrentFrame(bool bT);
 protected:
+    bool mTraceKeyOnCurrentFrame = false;
+
+    bool mMinMaxValuesFrozen = false;
+
     bool mIsCurrentAnimator = false;
     bool mDrawPathUpdateNeeded = false;
 
@@ -195,8 +205,8 @@ protected:
 
     qreal mPrefferedValueStep = 1.;
 };
-
-class QrealAnimatorSpin : public QDoubleSpinBox
+#include <QMenu>
+class QrealAnimatorSpin : public QMenu
 {
     Q_OBJECT
 public:

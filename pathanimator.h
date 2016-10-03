@@ -14,7 +14,6 @@ class PathAnimator : public ComplexAnimator
 public:
     PathAnimator();
 private:
-    QList<PathPointAnimators*> mPathPointAnimators;
 };
 
 #endif // PATHANIMATOR_H

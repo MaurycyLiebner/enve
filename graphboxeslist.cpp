@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include "qrealpointvaluedialog.h"
 #include "boxeslist.h"
+#include "updatescheduler.h"
 
 void BoxesList::graphSetSmoothCtrl()
 {
@@ -73,7 +74,7 @@ void BoxesList::graphPaint(QPainter *p)
     p->setPen(QPen(QColor(0, 0, 0, 125), 2.));
     qreal incY = mValueInc*mPixelsPerValUnit;
     qreal yL = mGraphRect.height() +
-            fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit - mMargin - incY;
+            fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit - mMargin + incY;
     qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
     while(yL > 0) {
         p->drawText(QRectF(0, yL - incY, 40, 2*incY),
@@ -187,7 +188,7 @@ void BoxesList::graphMousePress(QPointF pressPos) {
                 NULL :
                 mCurrentPoint->getParentKey();
     if(mCurrentPoint == NULL) {
-        if(isCtrlPressed() ) {
+        if(mMainWindow->isCtrlPressed() ) {
             graphClearKeysSelection();
             QrealKey *newKey = new QrealKey(qRound(frame), mAnimator, value);
             mAnimator->appendKey(newKey);
@@ -203,7 +204,7 @@ void BoxesList::graphMousePress(QPointF pressPos) {
         }
     } else if(mCurrentPoint->isKeyPoint()) {
         mPressFrameAndValue = QPointF(frame, value);
-        if(isShiftPressed()) {
+        if(mMainWindow->isShiftPressed()) {
             if(parentKey->isSelected()) {
                 graphRemoveKeyFromSelection(parentKey);
             } else {
@@ -226,7 +227,7 @@ void BoxesList::graphMousePress(QPointF pressPos) {
 void BoxesList::graphMouseRelease()
 {
     if(mSelecting) {
-        if(!isShiftPressed()) {
+        if(!mMainWindow->isShiftPressed()) {
             graphClearKeysSelection();
         }
         qreal topValue;
@@ -251,7 +252,7 @@ void BoxesList::graphMouseRelease()
     } else if(mCurrentPoint != NULL) {
         if(mCurrentPoint->isKeyPoint()) {
             if(mFirstMove) {
-                if(!isShiftPressed()) {
+                if(!mMainWindow->isShiftPressed()) {
                     graphClearKeysSelection();
                     graphAddKeyToSelection(mCurrentPoint->getParentKey());
                 }
@@ -476,7 +477,7 @@ void BoxesList::graphMouseReleaseEvent(Qt::MouseButton eventButton)
 
 void BoxesList::graphWheelEvent(QWheelEvent *event)
 {
-    if(isCtrlPressed()) {
+    if(mMainWindow->isCtrlPressed()) {
         if(event->delta() > 0) {
             graphIncScale(0.1);
         } else {
@@ -523,6 +524,7 @@ void BoxesList::graphSetAnimator(QrealAnimator *animator)
     }
     mAnimator = animator;
     if(animator != NULL) {
+        graphUpdateDimensions();
         animator->setIsCurrentAnimator(true);
         animator->setDrawPathUpdateNeeded();
         graphResetValueScaleAndMinShown();
@@ -545,9 +547,21 @@ void BoxesList::graphUpdateDrawPathIfNeeded() {
 }
 
 void BoxesList::graphUpdateAfterKeysChangedAndRepaint() {
-    graphUpdateAfterKeysChanged();
+    scheduleGraphUpdateAfterKeysChanged();
     
     mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesList::scheduleGraphUpdateAfterKeysChanged() {
+    if(mGraphUpdateAfterKeysChangedNeeded) return;
+    mGraphUpdateAfterKeysChangedNeeded = true;
+}
+
+void BoxesList::graphUpdateAfterKeysChangedIfNeeded() {
+    if(mGraphUpdateAfterKeysChangedNeeded) {
+        mGraphUpdateAfterKeysChangedNeeded = false;
+        graphUpdateAfterKeysChanged();
+    }
 }
 
 void BoxesList::graphUpdateAfterKeysChanged()

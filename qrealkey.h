@@ -77,6 +77,8 @@ public:
     void setParentKey(ComplexKey *parentKey);
 
     bool isAncestorSelected();
+
+    CtrlsMode getCtrlsMode();
 protected:
     QrealAnimator *mParentAnimator = NULL;
     ComplexKey *mParentKey = NULL;

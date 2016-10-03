@@ -106,7 +106,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlsLayout->addWidget(mAnimationWidgetScrollbar);
 
     mMainLayout->addLayout(mControlsLayout);
-    mMainLayout->addWidget(animationDockWidget);
+    //mMainLayout->addWidget(animationDockWidget);
     mMainLayout->addWidget(mBoxesList);
     mMainLayout->addWidget(mFrameRangeScrollbar);
 
@@ -119,9 +119,9 @@ BoxesList *BoxesListAnimationDockWidget::getBoxesList()
 }
 
 bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Right && isCtrlPressed()) {
+    if(event->key() == Qt::Key_Right && mMainWindow->isCtrlPressed()) {
         setCurrentFrame(mMainWindow->getCurrentFrame() + 1);
-    } else if(event->key() == Qt::Key_Left && isCtrlPressed()) {
+    } else if(event->key() == Qt::Key_Left && mMainWindow->isCtrlPressed()) {
         setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
     } else {
         return false;

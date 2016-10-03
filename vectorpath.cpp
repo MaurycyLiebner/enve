@@ -19,7 +19,14 @@ VectorPath::VectorPath(BoxesGroup *group) :
     mAnimatorsCollection.addAnimator(&mStrokeSettings);
 
     mFillGradientPoints.initialize(this);
+    mFillGradientPoints.incNumberPointers();
     mStrokeGradientPoints.initialize(this);
+    mStrokeGradientPoints.incNumberPointers();
+
+    mFillPaintSettings.setGradientPoints(&mFillGradientPoints);
+    mStrokeSettings.setGradientPoints(&mStrokeGradientPoints);
+
+    mStrokeSettings.setLineWidthUpdaterTarget(this);
 }
 
 VectorPath::VectorPath(int boundingBoxId,
@@ -306,7 +313,11 @@ Edge *VectorPath::getEgde(QPointF absPos) {
     qreal minPercent = qMin(percent1, percent2);
     qreal maxPercent = qMax(percent1, percent2);
     qreal pressedT = (nearestPercent - minPercent) / (maxPercent - minPercent);
-    return new Edge(prevPoint, nextPoint, pressedT);
+    if(pressedT > 0.0001 && pressedT < 0.9999) {
+        return new Edge(prevPoint, nextPoint, pressedT);
+    } else {
+        return NULL;
+    }
 }
 
 void VectorPath::centerPivotPosition() {
@@ -415,7 +426,7 @@ void VectorPath::schedulePathUpdate()
     addUpdateScheduler(new PathUpdateScheduler(this));
     mPathUpdateNeeded = true;
     mMappedPathUpdateNeeded = false;
-    
+    mOutlinePathUpdateNeeded = false;
 }
 
 void VectorPath::updatePathIfNeeded()
@@ -425,6 +436,23 @@ void VectorPath::updatePathIfNeeded()
         if(!mAnimatorsCollection.hasKeys() ) centerPivotPosition();
         mPathUpdateNeeded = false;
         mMappedPathUpdateNeeded = false;
+        mOutlinePathUpdateNeeded = false;
+    }
+}
+
+void VectorPath::scheduleOutlinePathUpdate()
+{
+    if(mOutlinePathUpdateNeeded) {
+        return;
+    }
+    addUpdateScheduler(new OutlineUpdateScheduler(this));
+    mOutlinePathUpdateNeeded = true;
+}
+
+void VectorPath::updateOutlinePathIfNeeded() {
+    if(mOutlinePathUpdateNeeded) {
+        updateOutlinePath();
+        mOutlinePathUpdateNeeded = false;
     }
 }
 
@@ -470,6 +498,25 @@ void VectorPath::updateWholePath() {
     }
 }
 
+void VectorPath::setRenderCombinedTransform() {
+    BoundingBox::setRenderCombinedTransform();
+    updateMappedPath();
+}
+
+void VectorPath::updatePathPointIds()
+{
+    int pointId = 1;
+    foreach(PathPoint *point, mSeparatePaths) {
+        PathPoint *nextPoint = point;
+        while(true) {
+            nextPoint->setPointId(pointId);
+            pointId++;
+            nextPoint = nextPoint->getNextPoint();
+            if(nextPoint == NULL || nextPoint == point) break;
+        }
+    }
+}
+
 void VectorPath::updateMappedPath()
 {
     mMappedPath = mCombinedTransformMatrix.map(mPath);
@@ -486,11 +533,15 @@ void VectorPath::updateDrawGradients()
         }
         mFillGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
                                       gradient->getLastQGradientStopQColor());
-        mFillGradientPoints.enable();
+        if(!mFillGradientPoints.enabled) {
+            mFillGradientPoints.enable();
+        }
+
         mDrawFillGradient.setStops(gradient->getQGradientStops());
         mDrawFillGradient.setStart(mFillGradientPoints.getStartPoint() );
         mDrawFillGradient.setFinalStop(mFillGradientPoints.getEndPoint() );
-    } else {
+
+    } else if(mFillGradientPoints.enabled) {
         mFillGradientPoints.disable();
     }
     if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
@@ -501,11 +552,13 @@ void VectorPath::updateDrawGradients()
         mStrokeGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
                                       gradient->getLastQGradientStopQColor() );
 
-        mStrokeGradientPoints.enable();
+        if(!mStrokeGradientPoints.enabled) {
+            mStrokeGradientPoints.enable();
+        }
         mDrawStrokeGradient.setStops(gradient->getQGradientStops());
         mDrawStrokeGradient.setStart(mStrokeGradientPoints.getStartPoint() );
         mDrawStrokeGradient.setFinalStop(mStrokeGradientPoints.getEndPoint() );
-    } else {
+    } else if(mStrokeGradientPoints.enabled) {
         mStrokeGradientPoints.disable();
     }
 }
@@ -543,50 +596,23 @@ void VectorPath::draw(QPainter *p)
     }
 }
 
-void VectorPath::render(QPainter *p)
-{
-    p->save();
-
-    p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
-    p->setPen(Qt::NoPen);
-    if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
-        p->setBrush(mDrawFillGradient);
-    } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
-        p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
-    } else{
-        p->setBrush(Qt::NoBrush);
-    }
-
-    QMatrix combinedRenderTransform = getCombinedRenderTransform();
-    p->drawPath(combinedRenderTransform.map(mPath) );
-
-    if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
-        p->setBrush(mDrawStrokeGradient);
-    } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
-        p->setBrush(mStrokeSettings.getCurrentColor().qcol);
-    } else{
-        p->setBrush(Qt::NoBrush);
-    }
-    p->drawPath(combinedRenderTransform.map(mPathStroker.createStroke(mPath)) );
-
-    p->restore();
-}
-
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     if(mVisible) {
         p->save();
         drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            p->setPen(QPen(QColor(0, 0, 0, 125), 2));
-            foreach (PathPoint *point, mPoints) {
+            p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
+            PathPoint *point;
+            foreachInverted(point, mPoints) {
                 point->draw(p, currentCanvasMode);
             }
-            mFillGradientPoints.draw(p);
-            mStrokeGradientPoints.draw(p);
+            mFillGradientPoints.drawGradientPoints(p);
+            mStrokeGradientPoints.drawGradientPoints(p);
         } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
-            p->setPen(QPen(QColor(0, 0, 0, 125), 2));
-            foreach (PathPoint *point, mPoints) {
+            p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
+            PathPoint *point;
+            foreachInverted(point, mPoints) {
                 if(point->isEndPoint() || point->isSelected()) {
                     point->draw(p, currentCanvasMode);
                 }
@@ -606,7 +632,7 @@ MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasM
         }
     }
     if(pointToReturn == NULL) {
-        foreach (PathPoint *point, mPoints) {
+        foreach(PathPoint *point, mPoints) {
             pointToReturn = point->getPointAtAbsPos(absPtPos, currentCanvasMode);
             if(pointToReturn != NULL) {
                 break;
@@ -634,6 +660,8 @@ void VectorPath::addPointToSeparatePaths(PathPoint *pointToAdd,
         addUndoRedo(undoRedo);
     }
     schedulePathUpdate();
+
+    updatePathPointIds();
 }
 
 void VectorPath::removePointFromSeparatePaths(PathPoint *pointToRemove,
@@ -646,6 +674,8 @@ void VectorPath::removePointFromSeparatePaths(PathPoint *pointToRemove,
         addUndoRedo(undoRedo);
     }
     schedulePathUpdate();
+
+    updatePathPointIds();
 }
 
 PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
@@ -663,6 +693,8 @@ PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
         }
     }
     finishUndoRedoSet();
+
+    updatePathPointIds();
 
     return pointToAdd;
 }
@@ -729,6 +761,8 @@ void VectorPath::removePoint(PathPoint *point) {
     removeFromPointsList(point);
 
     finishUndoRedoSet();
+
+    updatePathPointIds();
 }
 
 bool VectorPath::pointInsidePath(QPointF point)
@@ -792,9 +826,9 @@ void VectorPath::finishAllPointsTransform()
     }
 }
 
-GradientPoints::GradientPoints()
+GradientPoints::GradientPoints() : ComplexAnimator()
 {
-
+    setName("gradient points");
 }
 
 void GradientPoints::initialize(VectorPath *parentT,
@@ -803,8 +837,12 @@ void GradientPoints::initialize(VectorPath *parentT,
     parent = parentT;
     startPoint = new GradientPoint(startPt, parent);
     startPoint->incNumberPointers();
+    addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
+    startPoint->getRelativePosAnimatorPtr()->setName("point1");
     endPoint = new GradientPoint(endPt, parent);
+    endPoint->getRelativePosAnimatorPtr()->setName("point2");
     endPoint->incNumberPointers();
+    addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
     enabled = false;
 }
 
@@ -814,8 +852,12 @@ void GradientPoints::initialize(VectorPath *parentT,
     parent = parentT;
     startPoint = new GradientPoint(fillGradientStartId, parent);
     startPoint->incNumberPointers();
+    addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
+    startPoint->getRelativePosAnimatorPtr()->setName("point1");
     endPoint = new GradientPoint(fillGradientEndId, parent);
     endPoint->incNumberPointers();
+    endPoint->getRelativePosAnimatorPtr()->setName("point2");
+    addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
     enabled = false;
 }
 
@@ -843,7 +885,7 @@ void GradientPoints::disable()
     enabled = false;
 }
 
-void GradientPoints::draw(QPainter *p)
+void GradientPoints::drawGradientPoints(QPainter *p)
 {
     if(enabled) {
        p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());

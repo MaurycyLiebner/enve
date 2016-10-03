@@ -28,6 +28,8 @@ class VectorPath;
 
 class ChangeGradientColorsUndoRedo;
 
+class GradientPoints;
+
 class Gradient : public ComplexAnimator
 {
 public:
@@ -83,12 +85,17 @@ public:
     QColor getFirstQGradientStopQColor();
 
     QGradientStops getQGradientStops();
+    void scheduleQGradientStopsUpdate();
+    void updateQGradientStopsIfNeeded();
+    void startColorIdTransform(int id);
 private:
     int mSqlId = -1;
     GradientWidget *mGradientWidget;
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
     QList<VectorPath*> mAffectedPaths;
+
+    bool mQGradientStopsUpdateNeeded = false;
 };
 
 class PaintSettings : public ComplexAnimator {
@@ -126,8 +133,10 @@ public:
     void setPaintType(PaintType paintType) {
         if(mPaintType == GRADIENTPAINT && paintType != GRADIENTPAINT) {
             removeChildAnimator(mGradient);
+            removeChildAnimator((QrealAnimator*) mGradientPoints);
         } else if(paintType == GRADIENTPAINT && mPaintType != GRADIENTPAINT) {
             addChildAnimator(mGradient);
+            addChildAnimator((QrealAnimator*) mGradientPoints);
         }
         if(mPaintType == FLATPAINT && paintType != FLATPAINT) {
             removeChildAnimator(&mColor);
@@ -141,7 +150,12 @@ public:
         return &mColor;
     }
 
+    void setGradientPoints(GradientPoints *gradientPoints) {
+        mGradientPoints = gradientPoints;
+    }
+
 private:
+    GradientPoints *mGradientPoints = NULL;
     ColorAnimator mColor;
     PaintType mPaintType = FLATPAINT;
     Gradient *mGradient = NULL;
@@ -185,6 +199,7 @@ public:
         return &mLineWidth;
     }
 
+    void setLineWidthUpdaterTarget(VectorPath *path);
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;

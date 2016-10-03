@@ -5,10 +5,10 @@
 #include "fillstrokesettings.h"
 #include "bone.h"
 
-#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
-
 #define foreachBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
     for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
+
+
 
 class MainWindow;
 
@@ -156,6 +156,8 @@ public:
     void clearPointsSelectionOrDeselect();
     Edge *getPressedEdge(QPointF absPos);
     void setDisplayedFillStrokeSettingsFromLastSelected();
+    void setRenderCombinedTransform();
+    void setChildrenRenderCombinedTransform();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

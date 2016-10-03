@@ -3,6 +3,11 @@
 #include <QString>
 #include "smartpointertarget.h"
 
+#define getAtIndexOrGiveNull(index, list) (( (index) >= (list).count() || (index) < 0 ) ? NULL : (list).at( (index) ))
+
+#define foreachInverted(item, list) item = getAtIndexOrGiveNull((list).count() - 1, (list)); \
+    for(int i = (list).count() - 1; i >= 0; i--, item = getAtIndexOrGiveNull(i, (list)) )
+
 class MainWindow;
 
 class UndoRedo;
@@ -34,6 +39,7 @@ public:
     bool isRecording();
     bool isRecordingAllPoints();
     void graphUpdateAfterKeysChanged();
+    void graphScheduleUpdateAfterKeysChanged();
 protected:
     MainWindow *mMainWindow;
 };
