@@ -267,7 +267,41 @@ public:
     void scheduleOutlinePathUpdate();
     void updateOutlinePathIfNeeded();
     void setRenderCombinedTransform();
+
+    void setInfluenceEnabled(bool bT) {
+        if(bT) {
+            enableInfluence();
+        } else {
+            disableInfluence();
+        }
+    }
+
+    void disableInfluence() {
+        mInfluenceEnabled = false;
+
+        foreach(PathPoint *point, mPoints) {
+            point->disableInfluenceAnimators();
+        }
+    }
+
+    void enableInfluence() {
+        mInfluenceEnabled = true;
+        schedulePathUpdate();
+
+        foreach(PathPoint *point, mPoints) {
+            point->enableInfluenceAnimators();
+        }
+    }
+
+    void showContextMenu(QPoint globalPos);
+
+    PathPoint *findPointNearestToPercentEditPath(qreal percent, qreal *foundAtPercent);
+    qreal findPercentForPointEditPath(QPointF point, qreal minPercent = 0., qreal maxPercent = 1.);
+    Edge *getEdgeFromMappedEditPath(QPointF absPos);
+    Edge *getEdgeFromMappedPath(QPointF absPos);
 protected:
+    bool mInfluenceEnabled = false;
+
     void updatePathPointIds();
     PathAnimator mPathAnimator;
 
@@ -293,14 +327,16 @@ protected:
     bool mClosedPath = false;
     QList<PathPoint*> mSeparatePaths;
     QList<PathPoint*> mPoints;
+    QPainterPath mEditPath;
     QPainterPath mPath;
+    QPainterPath mMappedEditPath;
     QPainterPath mMappedPath;
-    QPainterPath mOutlinePath;
+    QPainterPath mMappedOutlinePath;
     QPainterPathStroker mPathStroker;
     QPainterPath mMappedWhole;
     void updateWholePath();
-    qreal findPercentForPoint(QPointF point, qreal minPercent = 0.f,
-                              qreal maxPercent = 1.f);
+    qreal findPercentForPoint(QPointF point, qreal minPercent = 0.,
+                              qreal maxPercent = 1.);
 protected:
     void updateAfterTransformationChanged();
     void updateAfterCombinedTransformationChanged();

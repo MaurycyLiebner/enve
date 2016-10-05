@@ -41,25 +41,29 @@ void BoundingBox::handleListItemMousePress(qreal boxesListX,
         return;
     }
     if(relY < LIST_ITEM_HEIGHT) {
-        if(relX < LIST_ITEM_HEIGHT) {
-            setChildrenListItemsVisible(!mBoxListItemDetailsVisible);
-        } else if(relX < LIST_ITEM_HEIGHT*2) {
-            setVisibile(!mVisible);
-        } else if(relX < LIST_ITEM_HEIGHT*3) {
-            setLocked(!mLocked);
-        } else {
-            if(isVisibleAndUnlocked() && mParent->isCurrentGroup()) {
-                if(isShiftPressed()) {
-                    if(mSelected) {
-                        mParent->removeBoxFromSelection(this);
+        if(event->button() == Qt::LeftButton) {
+            if(relX < LIST_ITEM_HEIGHT) {
+                setChildrenListItemsVisible(!mBoxListItemDetailsVisible);
+            } else if(relX < LIST_ITEM_HEIGHT*2) {
+                setVisibile(!mVisible);
+            } else if(relX < LIST_ITEM_HEIGHT*3) {
+                setLocked(!mLocked);
+            } else {
+                if(isVisibleAndUnlocked() && mParent->isCurrentGroup()) {
+                    if(isShiftPressed()) {
+                        if(mSelected) {
+                            mParent->removeBoxFromSelection(this);
+                        } else {
+                            mParent->addBoxToSelection(this);
+                        }
                     } else {
+                        mParent->clearBoxesSelection();
                         mParent->addBoxToSelection(this);
                     }
-                } else {
-                    mParent->clearBoxesSelection();
-                    mParent->addBoxToSelection(this);
                 }
             }
+        } else if(event->button() == Qt::RightButton) {
+            showContextMenu(event->globalPos() );
         }
     } else if(mBoxListItemDetailsVisible) {
         relY -= LIST_ITEM_HEIGHT;

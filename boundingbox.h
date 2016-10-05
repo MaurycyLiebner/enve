@@ -191,6 +191,8 @@ public:
     void setAbsolutePos(QPointF pos, bool saveUndoRedo);
     void setRelativePos(QPointF relPos, bool saveUndoRedo);
     virtual void setRenderCombinedTransform();
+
+    virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 

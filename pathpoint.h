@@ -23,6 +23,8 @@ struct PathPointValues {
         endRelPos = endPosT;
     }
 
+    PathPointValues() {}
+
 
     QPointF startRelPos;
     QPointF pointRelPos;
@@ -53,8 +55,8 @@ public:
                     QPointFAnimator *endPosAnimatorT,
                     QPointFAnimator *startPosAnimatorT,
                     QPointFAnimator *pathPointPosAnimatorT,
-                    QrealAnimator *influenceAnimator,
-                    QrealAnimator *influenceTAnimator) {
+                    QrealAnimator *influenceAnimatorT,
+                    QrealAnimator *influenceTAnimatorT) {
         parentPathPoint = parentPathPointT;
         endPosAnimator = endPosAnimatorT;
         endPosAnimator->setName("ctrl pt 1 pos");
@@ -62,32 +64,47 @@ public:
         startPosAnimator->setName("ctrl pt 2 pos");
         pathPointPosAnimator = pathPointPosAnimatorT;
         pathPointPosAnimator->setName("point pos");
-        influenceAnimator->setName("influence");
-        influenceAnimator->setValueRange(0., 1.);
-        influenceAnimator->setPrefferedValueStep(0.01);
-        influenceTAnimator->setName("influence T");
-        influenceTAnimator->setValueRange(0., 1.);
-        influenceTAnimator->setPrefferedValueStep(0.01);
+        influenceAnimatorT->setName("influence");
+        influenceAnimatorT->setValueRange(0., 1.);
+        influenceAnimatorT->setPrefferedValueStep(0.01);
+        influenceTAnimatorT->setName("influence T");
+        influenceTAnimatorT->setValueRange(0., 1.);
+        influenceTAnimatorT->setPrefferedValueStep(0.01);
 
-        influenceAnimator->setCurrentValue(1.);
-        influenceTAnimator->setCurrentValue(0.5);
+        influenceAnimatorT->setCurrentValue(1.);
+        influenceTAnimatorT->setCurrentValue(0.5);
+
+        influenceAnimator = influenceAnimatorT;
+        influenceAnimator->incNumberPointers();
+        influenceTAnimator = influenceTAnimatorT;
+        influenceTAnimator->incNumberPointers();
 
         addChildAnimator(pathPointPosAnimator);
         addChildAnimator(endPosAnimator);
         addChildAnimator(startPosAnimator);
-        addChildAnimator(influenceAnimator);
-        addChildAnimator(influenceTAnimator);
     }
 
     bool isOfPathPoint(PathPoint *checkPoint) {
         return parentPathPoint == checkPoint;
     }
 
+    void enableInfluenceAnimators() {
+        addChildAnimator(influenceAnimator);
+        addChildAnimator(influenceTAnimator);
+    }
+
+    void disableInfluenceAnimators() {
+        removeChildAnimator(influenceAnimator);
+        removeChildAnimator(influenceTAnimator);
+    }
 private:
     PathPoint *parentPathPoint;
     QPointFAnimator *endPosAnimator;
     QPointFAnimator *startPosAnimator;
     QPointFAnimator *pathPointPosAnimator;
+
+    QrealAnimator *influenceAnimator;
+    QrealAnimator *influenceTAnimator;
 }; 
 
 class PathPoint : public MovablePoint
@@ -175,6 +192,7 @@ public:
 
     PathPointAnimators *getPathPointAnimatorsPtr();
     void setPointId(int idT);
+    int getPointId();
 
     qreal getCurrentInfluence();
     qreal getCurrentInfluenceT();
@@ -186,21 +204,21 @@ public:
 
     PathPointValues getPointValues();
 
-    void addEndExpectation(PosExpectation expectation);
-    void addStartExternalExpectation(PosExpectation expectation);
-    void addEndExternalExpectation(PosExpectation expectation);
-    void addStartExpectation(PosExpectation expectation);
-    void addPointExpectation(PosExpectation expectation);
-
-    void clearExpectations();
-    void addExpectations();
+    void clearInfluenceAdjustedPointValues();
     PathPointValues getInfluenceAdjustedPointValues();
+    bool updateInfluenceAdjustedPointValues();
+    void setInfluenceAdjustedEnd(QPointF newEnd, qreal infl);
+    void setInfluenceAdjustedStart(QPointF newStart, qreal infl);
+    void finishInfluenceAdjusted();
+    void enableInfluenceAnimators();
+    void disableInfluenceAnimators();
+    QPointF getInfluenceAbsolutePos();
 private:
-    QList<PosExpectation> mEndExpectations;
-    QList<PosExpectation> mStartExpectations;
-    QList<PosExpectation> mPointExpectations;
-    QList<PosExpectation> mStartExternalExpectations;
-    QList<PosExpectation> mEndExternalExpectations;
+    bool mStartExternalInfluence = false;
+    QPointF mStartAdjustedForExternalInfluence;
+    bool mEndExternalInfluence = false;
+    QPointF mEndAdjustedForExternalInfluence;
+    PathPointValues mInfluenceAdjustedPointValues;
 
     QrealAnimator mInfluenceAnimator;
     QrealAnimator mInfluenceTAnimator;
