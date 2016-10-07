@@ -114,7 +114,7 @@ public:
 
     virtual void clearAll() {}
 
-    virtual PathPoint *createNewPointOnLineNear(QPointF) { return NULL; }
+    virtual PathPoint *createNewPointOnLineNear(QPointF, bool) { return NULL; }
     bool isPath();
     void saveTransformPivot(QPointF absPivot);
 

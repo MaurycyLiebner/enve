@@ -248,7 +248,7 @@ public:
 
     void clearAll();
 
-    PathPoint *createNewPointOnLineNear(QPointF absPos);
+    PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
     qreal percentAtPoint(QPointF absPos, qreal distTolerance,
                          qreal maxPercent, qreal minPercent,
                          bool *found = NULL, QPointF *posInPath = NULL);

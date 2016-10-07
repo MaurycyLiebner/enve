@@ -49,6 +49,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         } else {
             mLastPressedPoint = mCurrentBoxesGroup->getPointAt(mLastMouseEventPos, mCurrentMode);
 
+
             if(mCurrentMode == CanvasMode::ADD_POINT) {
                 if(mCurrentEndPoint != NULL) {
                     if(mCurrentEndPoint->isHidden()) {
@@ -96,7 +97,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                     if(isCtrlPressed() ) {
                         mCurrentBoxesGroup->clearPointsSelection();
                         mLastPressedPoint = mCurrentBoxesGroup->
-                                createNewPointOnLineNearSelected(mLastPressPos);
+                                createNewPointOnLineNearSelected(mLastPressPos,
+                                                                 isShiftPressed());
                     } else {
                         mCurrentEdge = mCurrentBoxesGroup->getPressedEdge(
                                                                 mLastPressPos);
@@ -348,18 +350,24 @@ void Canvas::wheelEvent(QWheelEvent *event)
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
 {
     mDoubleClick = true;
-    BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(event->pos());
-    if(boxAt == NULL) {
-        if(mCurrentBoxesGroup != this) {
-            setCurrentBoxesGroup((BoxesGroup*) mCurrentBoxesGroup->getParent());
-        }
-    } else {
-        if(boxAt->isGroup()) {
-            setCurrentBoxesGroup((BoxesGroup*) boxAt);
-        } else if(mCurrentMode == MOVE_PATH) {
-            setCanvasMode(MOVE_PATH);
-        } else if(mCurrentMode == MOVE_PATH) {
-            setCanvasMode(MOVE_PATH);
+
+    mLastPressedPoint = mCurrentBoxesGroup->
+            createNewPointOnLineNearSelected(mLastPressPos, true);
+
+    if(mLastPressedPoint == NULL) {
+        BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(event->pos());
+        if(boxAt == NULL) {
+            if(mCurrentBoxesGroup != this) {
+                setCurrentBoxesGroup((BoxesGroup*) mCurrentBoxesGroup->getParent());
+            }
+        } else {
+            if(boxAt->isGroup()) {
+                setCurrentBoxesGroup((BoxesGroup*) boxAt);
+            } else if(mCurrentMode == MOVE_PATH) {
+                setCanvasMode(MOVE_PATH);
+            } else if(mCurrentMode == MOVE_PATH) {
+                setCanvasMode(MOVE_PATH);
+            }
         }
     }
     

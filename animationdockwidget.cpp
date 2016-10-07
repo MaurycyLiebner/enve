@@ -3,7 +3,7 @@
 #include "mainwindow.h"
 #include "boxeslist.h"
 
-AnimationDockWidget::AnimationDockWidget(MainWindow *parent,
+AnimationDockWidget::AnimationDockWidget(QWidget *parent,
                                          BoxesList *boxesList) :
     QWidget(parent)
 {

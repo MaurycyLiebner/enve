@@ -23,9 +23,9 @@ BoxesGroup::BoxesGroup(int boundingBoxId,
     loadChildrenFromSql(QString::number(boundingBoxId), false);
 }
 
-PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos) {
+PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos, bool adjust) {
     foreach(BoundingBox *box, mSelectedBoxes) {
-        PathPoint *point = box->createNewPointOnLineNear(absPos);
+        PathPoint *point = box->createNewPointOnLineNear(absPos, adjust);
         if(point != NULL) {
             return point;
         }

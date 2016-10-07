@@ -238,6 +238,8 @@ void H_Wheel_SV_Triangle::triangleInteraction(int x_t, int y_t)
 
 void H_Wheel_SV_Triangle::mousePressEvent(QMouseEvent *e)
 {
+    mValueBlocked = true;
+
     if(e->button() == Qt::RightButton)
     {
         return;
@@ -266,6 +268,7 @@ void H_Wheel_SV_Triangle::mouseReleaseEvent(QMouseEvent *)
     releaseMouse();
     QApplication::restoreOverrideCursor();
     value_focus = NONE;
+    mValueBlocked = false;
 }
 
 void H_Wheel_SV_Triangle::mouseMoveEvent(QMouseEvent *e)

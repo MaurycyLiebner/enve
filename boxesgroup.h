@@ -83,7 +83,7 @@ public:
 
     int saveToSql(int parentId);
     BoxesGroup *loadChildrenFromSql(QString thisBoundingBoxId, bool loadInBox);
-    PathPoint *createNewPointOnLineNearSelected(QPointF absPos);
+    PathPoint *createNewPointOnLineNearSelected(QPointF absPos, bool adjust);
     void saveSelectedToSql();
 
     //

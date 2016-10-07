@@ -20,6 +20,7 @@ private slots:
     void spinBoxValSet(int spin_box_val_t);
 private:
     bool mEmit = true;
+    bool mBlockValue = false;
     QSpinBox *spin_box = NULL;
 };
 

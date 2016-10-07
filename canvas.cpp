@@ -14,6 +14,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     QWidget(parent),
     BoxesGroup(fillStrokeSettings)
 {
+    mBoxListItemDetailsVisible = true;
     incNumberPointers();
 
     mPreviewFPSTimer = new QTimer(this);

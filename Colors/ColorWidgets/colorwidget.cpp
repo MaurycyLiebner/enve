@@ -26,7 +26,10 @@ ColorWidget::ColorWidget(QWidget *parent) : GLWidget(parent)
 
 void ColorWidget::setColorHSV_f(GLfloat h, GLfloat s, GLfloat v, bool emit_signal)
 {
-    hue = h;
+    if(mValueBlocked) return;
+    if(s > 0.0001) {
+        hue = h;
+    }
     saturation = s;
     value = v;
     emitColorChangedSignal(emit_signal);
@@ -34,24 +37,28 @@ void ColorWidget::setColorHSV_f(GLfloat h, GLfloat s, GLfloat v, bool emit_signa
 
 void ColorWidget::setHue_f(GLfloat h, bool emit_signal)
 {
+    if(mValueBlocked) return;
     hue = h;
     emitColorChangedSignal(emit_signal);
 }
 
 void ColorWidget::setHSVSaturation_f(GLfloat s, bool emit_signal)
 {
+    if(mValueBlocked) return;
     saturation = s;
     emitColorChangedSignal(emit_signal);
 }
 
 void ColorWidget::setValue_f(GLfloat v, bool emit_signal)
 {
+    if(mValueBlocked) return;
     value = v;
     emitColorChangedSignal(emit_signal);
 }
 
 void ColorWidget::setColorHSV_i(GLushort h, GLushort s, GLushort v, bool emit_signal)
 {
+    if(mValueBlocked) return;
     hue = clamp(h/360.f, 0.f, 1.f);
     saturation = clamp(s*0.01f, 0.f, 1.f);
     value = clamp(v*0.01f, 0.f, 1.f);
@@ -60,30 +67,35 @@ void ColorWidget::setColorHSV_i(GLushort h, GLushort s, GLushort v, bool emit_si
 
 void ColorWidget::setHue_i(GLushort h, bool emit_signal)
 {
+    if(mValueBlocked) return;
     hue = clamp(h/360.f, 0.f, 1.f);
     emitColorChangedSignal(emit_signal);
 }
 
 void ColorWidget::setHSVSaturation_i(GLushort s, bool emit_signal)
 {
+    if(mValueBlocked) return;
     saturation = clamp(s*0.01f, 0.f, 1.f);
     emitColorChangedSignal(emit_signal);
 }
 
 void ColorWidget::setValue_i(GLushort v, bool emit_signal)
 {
+    if(mValueBlocked) return;
     value = clamp(v*0.01f, 0.f, 1.f);
     emitColorChangedSignal(emit_signal);
 }
 
 void ColorWidget::setColorHSL_f(GLfloat h, GLfloat s, GLfloat l, bool emit_signal)
 {
+    if(mValueBlocked) return;
     hsl_to_hsv(&h, &s, &l);
     setColorHSV_f(h, s, l, emit_signal);
 }
 
 void ColorWidget::setLightness_f(GLfloat l, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat hsv_h = hue;
     GLfloat hsv_s = saturation;
     GLfloat hsv_v = value;
@@ -102,6 +114,7 @@ void ColorWidget::setLightness_f(GLfloat l, bool emit_signal)
 
 void ColorWidget::setHSLSaturation_f(GLfloat s, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat hsv_h = hue;
     GLfloat hsv_s = saturation;
     GLfloat hsv_v = value;
@@ -115,6 +128,7 @@ void ColorWidget::setHSLSaturation_f(GLfloat s, bool emit_signal)
 void ColorWidget::setColorHSL_i(GLushort h, GLushort s, GLushort l,
                                 bool emit_signal)
 {
+    if(mValueBlocked) return;
     Q_UNUSED(emit_signal);
     GLfloat h_f = clamp(h/360.f, 0.f, 1.f);
     GLfloat s_f = clamp(s*0.01f, 0.f, 1.f);
@@ -124,18 +138,21 @@ void ColorWidget::setColorHSL_i(GLushort h, GLushort s, GLushort l,
 
 void ColorWidget::setLightness_i(GLushort l, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat l_f = clamp(l*0.01f, 0.f, 1.f);
     setLightness_f(l_f, emit_signal);
 }
 
 void ColorWidget::setHSLSaturation_i(GLushort s, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat s_f = clamp(s*0.01f, 0.f, 1.f);
     setHSLSaturation_f(s_f, emit_signal);
 }
 
 void ColorWidget::setColorRGB_f(GLfloat r, GLfloat g, GLfloat b, bool emit_signal)
 {
+    if(mValueBlocked) return;
     rgb_to_hsv_float(&r, &g, &b);
     hue = r;
     saturation = g;
@@ -145,6 +162,7 @@ void ColorWidget::setColorRGB_f(GLfloat r, GLfloat g, GLfloat b, bool emit_signa
 
 void ColorWidget::setR_f(GLfloat r, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat c_r = hue;
     GLfloat c_g = saturation;
     GLfloat c_b = value;
@@ -154,6 +172,7 @@ void ColorWidget::setR_f(GLfloat r, bool emit_signal)
 
 void ColorWidget::setG_f(GLfloat g, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat c_r = hue;
     GLfloat c_g = saturation;
     GLfloat c_b = value;
@@ -163,6 +182,7 @@ void ColorWidget::setG_f(GLfloat g, bool emit_signal)
 
 void ColorWidget::setB_f(GLfloat b, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat c_r = hue;
     GLfloat c_g = saturation;
     GLfloat c_b = value;
@@ -172,25 +192,27 @@ void ColorWidget::setB_f(GLfloat b, bool emit_signal)
 
 void ColorWidget::setR_i(GLushort r, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat r_f = r/255.f;
     setR_f(r_f, emit_signal);
 }
 
 void ColorWidget::setG_i(GLushort g, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat g_f = g/255.f;
     setG_f(g_f, emit_signal);
 }
 
 void ColorWidget::setB_i(GLushort b, bool emit_signal)
 {
+    if(mValueBlocked) return;
     GLfloat b_f = b/255.f;
     setB_f(b_f, emit_signal);
 }
 
 void ColorWidget::emitColorChangedSignal(bool external_signal_t)
 {
-    update();
     if(external_signal_t)
     {
         emit colorChangedHSV(hue, saturation, value);
@@ -199,6 +221,8 @@ void ColorWidget::emitColorChangedSignal(bool external_signal_t)
     {
         internalColorChangeFunc(this);
     }
+
+    update();
 }
 
 void ColorWidget::setInternalColorChangeFunc(void (*internalColorChangeFunc_t)(ColorWidget *))

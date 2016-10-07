@@ -280,6 +280,24 @@ private slots:
 
     void nextPreviewFrame();
 public slots:
+    void setMovePathMode() {
+        setCanvasMode(MOVE_PATH);
+
+        callUpdateSchedulers();
+    }
+
+    void setMovePointMode() {
+        setCanvasMode(MOVE_POINT);
+
+        callUpdateSchedulers();
+    }
+
+    void setAddPointMode() {
+        setCanvasMode(ADD_POINT);
+
+        callUpdateSchedulers();
+    }
+
     void connectPointsSlot();
     void disconnectPointsSlot();
     void mergePointsSlot();

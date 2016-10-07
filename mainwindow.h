@@ -30,6 +30,11 @@ private:
     BoxesList *mBoxListWidget;
 
     QToolBar *mToolBar;
+
+    QAction *mMovePathMode;
+    QAction *mMovePointMode;
+    QAction *mAddPointMode;
+//
     QAction *mActionConnectPoints;
     QAction *mActionDisconnectPoints;
     QAction *mActionMergePoints;

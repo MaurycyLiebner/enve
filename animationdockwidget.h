@@ -11,7 +11,7 @@ class AnimationDockWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimationDockWidget(MainWindow *parent, BoxesList *boxesList);
+    explicit AnimationDockWidget(QWidget *parent, BoxesList *boxesList);
 
 protected:
     void paintEvent(QPaintEvent *);

@@ -248,7 +248,7 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
     BoundingBox::updateAfterFrameChanged(currentFrame);
 }
 
-PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
+PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
 {
     qreal maxDist = 14.f;
     if(!mMappedPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
@@ -308,27 +308,28 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos)
         nextPoint->setPointAsPrevious(newPoint);
         prevPoint->setPointAsNext(newPoint);
 
+        if(adjust) {
+            if(!prevPoint->isEndCtrlPtEnabled() && !nextPoint->isStartCtrlPtEnabled()) {
+                newPoint->setStartCtrlPtEnabled(false);
+                newPoint->setEndCtrlPtEnabled(false);
+            } else {
+                newPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH, false);
+                newPoint->setStartCtrlPtEnabled(true);
+                newPoint->moveStartCtrlPtToRelPos(newPointStart);
+                newPoint->setEndCtrlPtEnabled(true);
+                newPoint->moveEndCtrlPtToRelPos(newPointEnd);
 
-        if(!prevPoint->isEndCtrlPtEnabled() && !nextPoint->isStartCtrlPtEnabled()) {
-            newPoint->setStartCtrlPtEnabled(false);
-            newPoint->setEndCtrlPtEnabled(false);
-        } else {
-            newPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH, false);
-            newPoint->setStartCtrlPtEnabled(true);
-            newPoint->moveStartCtrlPtToRelPos(newPointStart);
-            newPoint->setEndCtrlPtEnabled(true);
-            newPoint->moveEndCtrlPtToRelPos(newPointEnd);
-
-            if(prevPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
-                prevPoint->isEndCtrlPtEnabled() && prevPoint->isStartCtrlPtEnabled()) {
-                prevPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+                if(prevPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
+                    prevPoint->isEndCtrlPtEnabled() && prevPoint->isStartCtrlPtEnabled()) {
+                    prevPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+                }
+                if(nextPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
+                    nextPoint->isEndCtrlPtEnabled() && nextPoint->isStartCtrlPtEnabled()) {
+                    nextPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+                }
+                prevPoint->moveEndCtrlPtToRelPos(prevPointEnd);
+                nextPoint->moveStartCtrlPtToRelPos(nextPointStart);
             }
-            if(nextPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
-                nextPoint->isEndCtrlPtEnabled() && nextPoint->isStartCtrlPtEnabled()) {
-                nextPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
-            }
-            prevPoint->moveEndCtrlPtToRelPos(prevPointEnd);
-            nextPoint->moveStartCtrlPtToRelPos(nextPointStart);
         }
 
         appendToPointsList(newPoint);
@@ -374,14 +375,16 @@ Edge *VectorPath::getEdgeFromMappedPath(QPointF absPos) {
     nextPointS = nextPoint;
     prevPointS = prevPoint;
 
-    while(!nextPoint->hasFullInfluence() ) {
-        nextPoint = nextPoint->getNextPoint();
-        if(nextPoint == nextPointS || nextPoint == NULL) return NULL;
-    }
+    if(mInfluenceEnabled) {
+        while(!nextPoint->hasFullInfluence() ) {
+            nextPoint = nextPoint->getNextPoint();
+            if(nextPoint == nextPointS || nextPoint == NULL) return NULL;
+        }
 
-    while(!prevPoint->hasFullInfluence() ) {
-        prevPoint = prevPoint->getPreviousPoint();
-        if(prevPoint == prevPointS || prevPoint == NULL) return NULL;
+        while(!prevPoint->hasFullInfluence() ) {
+            prevPoint = prevPoint->getPreviousPoint();
+            if(prevPoint == prevPointS || prevPoint == NULL) return NULL;
+        }
     }
 
     if(!nextPoint->isStartCtrlPtEnabled() ) {

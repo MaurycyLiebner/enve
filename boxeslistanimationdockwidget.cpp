@@ -38,7 +38,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             mBoxesList, SLOT(setFramesRange(int,int)) );
     AnimationDockWidget *animationDockWidget =
-            new AnimationDockWidget(parent, mBoxesList);
+            new AnimationDockWidget(mBoxesList, mBoxesList);
+    animationDockWidget->move(LIST_ITEM_MAX_WIDTH, 0);
 
     mControlsLayout = new QHBoxLayout();
     mControlsLayout->setAlignment(Qt::AlignLeft);

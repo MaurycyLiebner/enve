@@ -16,6 +16,8 @@ public:
     ColorWidget(QWidget *parent = NULL);
     void emitColorChangedSignal(bool external_signal_t = true);
 protected:
+    bool mValueBlocked = false;
+
     Color bgColor;
     GLfloat hsl_saturaton_tmp = -1.f; // HSL saturation saved when changing lightness
 

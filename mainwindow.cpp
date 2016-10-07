@@ -58,6 +58,33 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     mToolBar = new QToolBar(this);
+
+    mMovePathMode = new QAction(
+                QIcon("pixmaps/icons/ink_draw_select.png"),
+                "CONNECT POINTS", this);
+    mMovePathMode->setToolTip("F1");
+    mToolBar->addAction(mMovePathMode);
+    connect(mMovePathMode, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(setMovePathMode()) );
+
+    mMovePointMode = new QAction(
+                QIcon("pixmaps/icons/ink_draw_node.png"),
+                "CONNECT POINTS", this);
+    mMovePointMode->setToolTip("F2");
+    mToolBar->addAction(mMovePointMode);
+    connect(mMovePointMode, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(setMovePointMode()) );
+
+    mAddPointMode = new QAction(
+                QIcon("pixmaps/icons/ink_draw_pen.png"),
+                "CONNECT POINTS", this);
+    mAddPointMode->setToolTip("F3");
+    mToolBar->addAction(mAddPointMode);
+    connect(mAddPointMode, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(setAddPointMode()) );
+
+    mToolBar->addSeparator();
+
     mActionConnectPoints = new QAction(
                 QIcon("pixmaps/icons/ink_node_join.png"),
                 "CONNECT POINTS", this);
