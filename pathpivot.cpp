@@ -128,6 +128,7 @@ qreal distSign(QPointF distPt) {
 }
 
 bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
+                                bool xOnly, bool yOnly,
                                 bool startTransform)
 {
     if(mRotating) {
@@ -153,9 +154,25 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
     } else if(mScaling) {
         QPointF absPos = getAbsolutePos();
         QPointF distMoved = moveDestAbs - pressPos;
-        qreal scaleBy = 1.f + distSign(distMoved)*0.005f;
-        if(scaleBy < 0.f) scaleBy = 0.f;
-        mCanvas->scaleBoxesBy(scaleBy, absPos, startTransform);
+
+        //if(scaleBy < 0.f) scaleBy = 0.f;
+        qreal scaleBy = 1. + distSign(distMoved)*0.005;
+        if(xOnly) {
+            mCanvas->scaleBoxesBy(scaleBy, 1., absPos, startTransform);
+        } else if(yOnly) {
+            mCanvas->scaleBoxesBy(1., scaleBy, absPos, startTransform);
+        } else {
+            if(isShiftPressed()) {
+                mCanvas->scaleBoxesBy(scaleBy, absPos, startTransform);
+            } else {
+                qreal scaleXBy = 1. +
+                        distSign(distMoved - QPointF(0., distMoved.y()) )*0.005;
+                qreal scaleYBy = 1. +
+                        distSign(distMoved - QPointF(distMoved.x(), 0.) )*0.005;
+                mCanvas->scaleBoxesBy(scaleXBy, scaleYBy, absPos,
+                                      startTransform);
+            }
+        }
         return true;
     }
     return false;

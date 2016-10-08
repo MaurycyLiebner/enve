@@ -16,7 +16,7 @@ public:
     bool isScaling();
     bool handleMousePress(QPointF absPressPos);
     bool handleMouseRelease();
-    bool handleMouseMove(QPointF moveDestAbs, QPointF pressPos, bool startTransform);
+    bool handleMouseMove(QPointF moveDestAbs, QPointF pressPos, bool xOnly, bool yOnly, bool startTransform);
 //    void updateRotationMappedPath();
     void finishTransform();
     void startRotating();

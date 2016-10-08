@@ -128,6 +128,13 @@ void Canvas::scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans)
     mCurrentBoxesGroup->scaleSelectedBy(scaleBy, absOrigin, startTrans);
 }
 
+void Canvas::scaleBoxesBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin,
+                          bool startTrans)
+{
+    mCurrentBoxesGroup->scaleSelectedBy(scaleXBy, scaleYBy, absOrigin,
+                                        startTrans);
+}
+
 void Canvas::saveToSql()
 {
     foreach(BoundingBox *box, mChildren) {
@@ -461,6 +468,12 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        } else {
            mCurrentBoxesGroup->selectAllBoxes();
        }
+    } else if(event->key() == Qt::Key_X) {
+        mXOnlyTransform = !mXOnlyTransform;
+        mYOnlyTransform = false;
+    } else if(event->key() == Qt::Key_Y) {
+        mYOnlyTransform = !mYOnlyTransform;
+        mXOnlyTransform = false;
     }
     //schedulePivotUpdate();
 

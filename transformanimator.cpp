@@ -212,8 +212,8 @@ QMatrix TransformAnimator::getCurrentValue()
     qreal pivotY = mPivotAnimator.getYValue();
     matrix.translate(pivotX + mPosAnimator.getXValue(),
                      pivotY + mPosAnimator.getYValue());
-    matrix.scale(mScaleAnimator.getXValue(), mScaleAnimator.getYValue() );
     matrix.rotate(mRotAnimator.getCurrentValue() );
+    matrix.scale(mScaleAnimator.getXValue(), mScaleAnimator.getYValue() );
     matrix.translate(-pivotX,
                      -pivotY);
     return matrix;

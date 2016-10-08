@@ -413,6 +413,36 @@ void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
     }
 }
 
+void BoxesGroup::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
+                                 QPointF absOrigin,
+                                 bool startTrans) {
+    if(mSelectedBoxes.count() == 1) {
+        if(startTrans) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->startScaleTransform();
+                box->scale(scaleXBy, scaleYBy);
+            }
+        } else {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->scale(scaleXBy, scaleYBy);
+            }
+        }
+    } else {
+        if(startTrans) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->startScaleTransform();
+                box->startPosTransform();
+                box->saveTransformPivot(absOrigin);
+                box->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+            }
+        } else {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                box->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+            }
+        }
+    }
+}
+
 void BoxesGroup::attachToBone(Bone *parentBone, CanvasMode currentCanvasMode) {
     startNewUndoRedoSet();
     if(currentCanvasMode == MOVE_POINT) {

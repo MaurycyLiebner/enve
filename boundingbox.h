@@ -194,6 +194,7 @@ public:
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
     virtual void drawKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
     virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY, int startFrame, int endFrame);
+    void scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy);
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 

@@ -155,6 +155,7 @@ public:
     void setChildrenRenderCombinedTransform();
     void drawChildrenKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
     void drawKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
+    void scaleSelectedBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

@@ -251,6 +251,7 @@ public:
     }
 
     void updateDisplayedFillStrokeSettings();
+    void scaleBoxesBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -306,6 +307,9 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    bool mXOnlyTransform = false;
+    bool mYOnlyTransform = false;
+
     Edge *mCurrentEdge = NULL;
 
     bool mPreviewing = false;

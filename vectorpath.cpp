@@ -277,6 +277,8 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
         prevPoint = nearestPoint;
     }
 
+    if(nextPoint == NULL || prevPoint == NULL) return NULL;
+
     qreal percent1 = findPercentForPoint(prevPoint->getAbsolutePos());
     qreal percent2 = findPercentForPoint(nextPoint->getAbsolutePos());
     if(nextPoint->isSeparatePathPoint() ) {
