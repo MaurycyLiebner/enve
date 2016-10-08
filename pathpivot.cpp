@@ -73,6 +73,8 @@ bool PathPivot::isScaling()
 
 void PathPivot::startRotating() {
     mRotating = true;
+    mLastDRot = 0.;
+    mRotHalfCycles = 0;
 }
 
 void PathPivot::startScaling()
@@ -137,7 +139,16 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
         {
             d_rot -= 360;
         }
-        mCanvas->rotateBoxesBy(d_rot, absPos, startTransform);
+
+        if(mLastDRot - d_rot > 90) {
+            mRotHalfCycles += 2;
+        } else if(mLastDRot - d_rot < -90) {
+            mRotHalfCycles -= 2;
+        }
+        mLastDRot = d_rot;
+        qreal rot = d_rot + mRotHalfCycles*180.;
+
+        mCanvas->rotateBoxesBy(rot, absPos, startTransform);
         return true;
     } else if(mScaling) {
         QPointF absPos = getAbsolutePos();

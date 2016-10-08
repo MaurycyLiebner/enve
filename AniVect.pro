@@ -64,7 +64,8 @@ SOURCES += main.cpp\
     pathanimator.cpp \
     animatorscollection.cpp \
     smartpointertarget.cpp \
-    graphboxeslist.cpp
+    graphboxeslist.cpp \
+    keysview.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -114,4 +115,5 @@ HEADERS  += mainwindow.h \
     coloranimator.h \
     pathanimator.h \
     animatorscollection.h \
-    smartpointertarget.h
+    smartpointertarget.h \
+    keysview.h

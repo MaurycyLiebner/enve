@@ -5,13 +5,13 @@
 #include <QPushButton>
 
 class MainWindow;
-class BoxesList;
+class KeysView;
 
 class AnimationDockWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimationDockWidget(QWidget *parent, BoxesList *boxesList);
+    explicit AnimationDockWidget(QWidget *parent, KeysView *keysView);
 
 protected:
     void paintEvent(QPaintEvent *);

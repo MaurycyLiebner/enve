@@ -22,6 +22,8 @@ public:
     void startRotating();
     void startScaling();
 private:
+    qreal mLastDRot = 0.;
+    int mRotHalfCycles = 0;
     Canvas *mCanvas;
     bool mRotating = false;
     bool mScaling = false;

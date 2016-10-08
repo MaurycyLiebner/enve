@@ -30,16 +30,18 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                              QSizePolicy::Maximum);
-    mBoxesList = new BoxesList(parent, this);
-    connect(mBoxesList, SIGNAL(changedViewedFrames(int,int)),
+    mBoxesList = new BoxesList(this);
+
+    mKeysView = new KeysView(mBoxesList, this);
+    connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
             mFrameRangeScrollbar, SLOT(setViewedFramesRange(int, int)) );
-    connect(mBoxesList, SIGNAL(changedViewedFrames(int,int)),
+    connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
             mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int, int)) );
     connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
-            mBoxesList, SLOT(setFramesRange(int,int)) );
-    AnimationDockWidget *animationDockWidget =
-            new AnimationDockWidget(mBoxesList, mBoxesList);
-    animationDockWidget->move(LIST_ITEM_MAX_WIDTH, 0);
+            mKeysView, SLOT(setFramesRange(int,int)) );
+
+    mAnimationDockWidget = new AnimationDockWidget(mBoxesList, mKeysView);
+    mKeysView->setAnimationDockWidget(mAnimationDockWidget);
 
     mControlsLayout = new QHBoxLayout();
     mControlsLayout->setAlignment(Qt::AlignLeft);
@@ -108,7 +110,18 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mMainLayout->addLayout(mControlsLayout);
     //mMainLayout->addWidget(animationDockWidget);
-    mMainLayout->addWidget(mBoxesList);
+
+    mBoxesListKeysViewLayout = new QHBoxLayout();
+    mKeysViewLayout = new QVBoxLayout();
+    mBoxesListKeysViewLayout->addWidget(mBoxesList);
+    mBoxesListKeysViewLayout->addLayout(mKeysViewLayout);
+
+    mKeysViewLayout->addWidget(mKeysView);
+    mKeysViewLayout->addWidget(mAnimationDockWidget);
+    mAnimationDockWidget->hide();
+
+    mMainLayout->addLayout(mBoxesListKeysViewLayout);
+
     mMainLayout->addWidget(mFrameRangeScrollbar);
 
     mFrameRangeScrollbar->emitChange();
@@ -117,6 +130,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 BoxesList *BoxesListAnimationDockWidget::getBoxesList()
 {
     return mBoxesList;
+}
+
+KeysView *BoxesListAnimationDockWidget::getKeysView()
+{
+    return mKeysView;
 }
 
 bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(QKeyEvent *event) {

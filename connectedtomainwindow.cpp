@@ -73,11 +73,11 @@ bool ConnectedToMainWindow::isRecordingAllPoints()
 
 void ConnectedToMainWindow::graphUpdateAfterKeysChanged()
 {
-    mMainWindow->getBoxesList()->graphUpdateAfterKeysChanged();
+    mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();
 }
 
 void ConnectedToMainWindow::graphScheduleUpdateAfterKeysChanged() {
-    mMainWindow->getBoxesList()->scheduleGraphUpdateAfterKeysChanged();
+    mMainWindow->getKeysView()->scheduleGraphUpdateAfterKeysChanged();
 }
 
 void ConnectedToMainWindow::startNewUndoRedoSet()

@@ -4,6 +4,7 @@
 #include "boxesgroup.h"
 #include <QDebug>
 #include "mainwindow.h"
+#include "keysview.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     Transformable()
@@ -12,6 +13,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
 
     mBoxesList = getMainWindow()->getBoxesList();
+    mKeysView = getMainWindow()->getKeysView();
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;
     if(type == TYPE_VECTOR_PATH) {

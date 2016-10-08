@@ -88,13 +88,8 @@ public:
 
     //
 
-    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY,
-                      qreal pixelsPerFrame,
-                      int startFrame, int endFrame, bool animationBar);
-    void drawChildrenListItems(QPainter *p,
-                      qreal drawX, qreal drawY,
-                      qreal maxY, qreal pixelsPerFrame,
-                      int startFrame, int endFrame, bool animationBar);
+    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
+    void drawChildrenListItems(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
     qreal getListItemHeight();
     void handleListItemMousePress(qreal boxesListX,
                                   qreal relX, qreal relY,
@@ -158,6 +153,8 @@ public:
     void setDisplayedFillStrokeSettingsFromLastSelected();
     void setRenderCombinedTransform();
     void setChildrenRenderCombinedTransform();
+    void drawChildrenKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
+    void drawKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

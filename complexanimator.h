@@ -29,10 +29,7 @@ public:
     void updateKeysPath();
     qreal getBoxesListHeight();
     void drawBoxesList(QPainter *p,
-                       qreal drawX, qreal drawY,
-                       qreal pixelsPerFrame,
-                       int startFrame, int endFrame,
-                       bool animationBar);
+                       qreal drawX, qreal drawY);
     QrealKey *getKeyAtPos(qreal relX, qreal relY, int minViewedFrame, qreal pixelsPerFrame);
     void getKeysInRect(QRectF selectionRect, int minViewedFrame,
                        qreal pixelsPerFrame,

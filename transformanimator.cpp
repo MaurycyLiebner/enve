@@ -16,7 +16,9 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mPivotAnimator.setCurrentValue(QPointF(0., 0.) );
     mOpacityAnimator.setName("opacity");
     mOpacityAnimator.setValueRange(0., 100.);
+    mOpacityAnimator.setPrefferedValueStep(5.);
     mOpacityAnimator.setCurrentValue(100.);
+    mOpacityAnimator.freezeMinMaxValues();
 
     addChildAnimator(&mPosAnimator);
     addChildAnimator(&mRotAnimator);

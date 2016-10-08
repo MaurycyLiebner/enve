@@ -134,9 +134,7 @@ public:
     virtual qreal getBoxesListHeight();
 
     virtual void drawBoxesList(QPainter *p,
-                               qreal drawX, qreal drawY,
-                               qreal pixelsPerFrame,
-                               int startFrame, int endFrame, bool animationBar);
+                               qreal drawX, qreal drawY);
 
     virtual void handleListItemMousePress(qreal boxesListX,
                                           qreal relX, qreal relY,

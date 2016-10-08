@@ -6,6 +6,7 @@ ComplexAnimator::ComplexAnimator() :
     QrealAnimator()
 {
     mIsComplexAnimator = true;
+    mCurrentValue = 0.;
 }
 
 #include <QDebug>
@@ -125,15 +126,9 @@ qreal ComplexAnimator::getBoxesListHeight()
 }
 
 void ComplexAnimator::drawBoxesList(QPainter *p,
-                                    qreal drawX, qreal drawY,
-                                    qreal pixelsPerFrame,
-                                    int startFrame, int endFrame,
-                                    bool animationBar)
+                                    qreal drawX, qreal drawY)
 {
-    QrealAnimator::drawBoxesList(p, drawX, drawY,
-                                 pixelsPerFrame,
-                                 startFrame, endFrame,
-                                 animationBar);
+    QrealAnimator::drawBoxesList(p, drawX, drawY);
     if(mChildAnimatorRecording && !mIsRecording) {
         p->save();
         p->setRenderHint(QPainter::Antialiasing);
@@ -150,10 +145,7 @@ void ComplexAnimator::drawBoxesList(QPainter *p,
                       *BoxesList::ANIMATOR_CHILDREN_VISIBLE);
         drawY += LIST_ITEM_HEIGHT;
         foreach(QrealAnimator *animator, mChildAnimators) {
-            animator->drawBoxesList(p, drawX, drawY,
-                                    pixelsPerFrame,
-                                    startFrame, endFrame,
-                                    animationBar);
+            animator->drawBoxesList(p, drawX, drawY);
             drawY += animator->getBoxesListHeight();
         }
     } else {

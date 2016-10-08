@@ -8,6 +8,9 @@
 #include <QLabel>
 #include "boxeslist.h"
 #include "animatonwidgetscrollbar.h"
+#include "keysview.h"
+
+class AnimationDockWidget;
 
 class BoxesListAnimationDockWidget : public QWidget
 {
@@ -15,6 +18,7 @@ class BoxesListAnimationDockWidget : public QWidget
 public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
     BoxesList *getBoxesList();
+    KeysView *getKeysView();
     void setCurrentFrame(int frame);
     bool processUnfilteredKeyEvent(QKeyEvent *event);
     bool processFilteredKeyEvent(QKeyEvent *event);
@@ -47,7 +51,11 @@ private:
     QPushButton *mAllPointsRecordButton;
     QPushButton *mRemoveKeyButton;
 
+    AnimationDockWidget *mAnimationDockWidget;
+    QHBoxLayout *mBoxesListKeysViewLayout;
+    QVBoxLayout *mKeysViewLayout;
     BoxesList *mBoxesList;
+    KeysView *mKeysView;
     AnimatonWidgetScrollBar *mFrameRangeScrollbar;
     AnimatonWidgetScrollBar *mAnimationWidgetScrollbar;
 };

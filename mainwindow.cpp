@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock = new QDockWidget(this);
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
     mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();
+    mKeysView = mBoxesListAnimationDockWidget->getKeysView();
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBottomDock->setFeatures(0);
@@ -221,7 +222,7 @@ bool MainWindow::isAltPressed()
 
 void MainWindow::callUpdateSchedulers()
 {
-    mBoxListWidget->graphUpdateAfterKeysChangedIfNeeded();
+    mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
     foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
         sheduler->update();
@@ -232,6 +233,7 @@ void MainWindow::callUpdateSchedulers()
     mCanvas->updatePivotIfNeeded();
     mCanvas->repaint();
     mBoxListWidget->repaint();
+    mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
 }
@@ -262,6 +264,11 @@ bool MainWindow::askForSaving() {
 void MainWindow::schedulePivotUpdate()
 {
     mCanvas->schedulePivotUpdate();
+}
+
+KeysView *MainWindow::getKeysView()
+{
+    return mKeysView;
 }
 
 BoxesList *MainWindow::getBoxesList()

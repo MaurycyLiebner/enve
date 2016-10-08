@@ -2,10 +2,10 @@
 #include <QMouseEvent>
 #include "mainwindow.h"
 #include "qrealpointvaluedialog.h"
-#include "boxeslist.h"
+#include "keysview.h"
 #include "updatescheduler.h"
 
-void BoxesList::graphSetSmoothCtrl()
+void KeysView::graphSetSmoothCtrl()
 {
     if(mAnimator == NULL) return;
     graphSetTwoSideCtrlForSelected();
@@ -13,7 +13,7 @@ void BoxesList::graphSetSmoothCtrl()
     graphRepaint();
 }
 
-void BoxesList::graphSetSymmetricCtrl()
+void KeysView::graphSetSymmetricCtrl()
 {
     if(mAnimator == NULL) return;
     graphSetTwoSideCtrlForSelected();
@@ -21,7 +21,7 @@ void BoxesList::graphSetSymmetricCtrl()
     graphRepaint();
 }
 
-void BoxesList::graphSetCornerCtrl()
+void KeysView::graphSetCornerCtrl()
 {
     if(mAnimator == NULL) return;
     graphSetTwoSideCtrlForSelected();
@@ -29,13 +29,13 @@ void BoxesList::graphSetCornerCtrl()
     graphRepaint();
 }
 
-void BoxesList::graphPaint(QPainter *p)
+void KeysView::graphPaint(QPainter *p)
 {
     p->setRenderHint(QPainter::Antialiasing);
 
     p->setBrush(Qt::NoBrush);
 
-    /*qreal maxX = mGraphRect.width();
+    /*qreal maxX = width();
     int currAlpha = 75;
     qreal lineWidth = 1.;
     QList<int> incFrameList = { 1, 5, 10, 100 };
@@ -57,7 +57,7 @@ void BoxesList::graphPaint(QPainter *p)
                 p->drawText(QRectF(xL - inc, 0, 2*inc, 20),
                             Qt::AlignCenter, QString::number(currFrame));
             }
-            p->drawLine(xL, 20, xL, mGraphRect.height());
+            p->drawLine(xL, 20, xL, height());
             xL += inc;
             currFrame += incFrame;
         }
@@ -69,35 +69,25 @@ void BoxesList::graphPaint(QPainter *p)
     qreal xL = (mCurrentFrame - mStartFrame)*mPixelsPerFrame;
     //p->drawText(QRectF(xL - 20, 0, 40, 20),
     //            Qt::AlignCenter, QString::number(mCurrentFrame));
-    p->drawLine(xL, 20, xL, mGraphRect.height());*/
+    p->drawLine(xL, 20, xL, height());*/
 
     p->setPen(QPen(QColor(0, 0, 0, 125), 2.));
     qreal incY = mValueInc*mPixelsPerValUnit;
-    qreal yL = mGraphRect.height() +
+    qreal yL = height() +
             fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit - mMargin + incY;
     qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
     while(yL > 0) {
         p->drawText(QRectF(0, yL - incY, 40, 2*incY),
                     Qt::AlignCenter, QString::number(currValue));
-        p->drawLine(40, yL, mGraphRect.width(), yL);
+        p->drawLine(40, yL, width(), yL);
         yL -= incY;
         currValue += mValueInc;
     }
 
-    p->save();
-    p->setClipRect(0, 0, mGraphRect.width(), mGraphRect.height());
-
     mAnimator->drawKeysPath(p,
-                            mGraphRect.height(), mMargin,
+                            height(), mMargin,
                             mMinViewedFrame, mMinShownVal,
                             mPixelsPerFrame, mPixelsPerValUnit);
-
-    if(mSelecting) {
-        p->setBrush(Qt::NoBrush);
-        p->setPen(QPen(Qt::blue, 2.f, Qt::DotLine));
-        p->drawRect(mSelectionRect);
-    }
-    p->restore();
 /*
 
     if(hasFocus() ) {
@@ -110,24 +100,24 @@ void BoxesList::graphPaint(QPainter *p)
 */
 }
 
-void BoxesList::graphIncScale(qreal inc) {
+void KeysView::graphIncScale(qreal inc) {
     qreal newScale = mValueScale + inc;
     graphSetScale(clamp(newScale, 0.1, 10.));
 }
 
-void BoxesList::graphSetScale(qreal scale) {
+void KeysView::graphSetScale(qreal scale) {
     mValueScale = scale;
     graphUpdateDimensions();
 }
 
-void BoxesList::graphUpdateDimensions() {
+void KeysView::graphUpdateDimensions() {
     if(mAnimator == NULL) return;
     mAnimator->getMinAndMaxValues(&mMinVal, &mMaxVal);
     if(qAbs(mMinVal - mMaxVal) < 0.1 ) {
         mMinVal -= 0.05;
         mMaxVal += 0.05;
     }
-    mPixelsPerValUnit = mValueScale*(mGraphRect.height() - 2*mMargin)/
+    mPixelsPerValUnit = mValueScale*(height() - 2*mMargin)/
                                 (mMaxVal - mMinVal);
     mValueInc = 10000.;
     qreal incIncValue = 1000.;
@@ -146,37 +136,37 @@ void BoxesList::graphUpdateDimensions() {
     mAnimator->setDrawPathUpdateNeeded();
 }
 
-void BoxesList::graphResizeEvent(QResizeEvent *)
+void KeysView::graphResizeEvent(QResizeEvent *)
 {
     graphUpdateDimensions();
     graphUpdateDrawPathIfNeeded();
 }
 
-void BoxesList::graphIncMinShownVal(qreal inc) {
+void KeysView::graphIncMinShownVal(qreal inc) {
     graphSetMinShownVal(inc*(mMaxVal - mMinVal) + mMinShownVal);
     graphSetDrawPathUpdateNeeded();
 }
 
-void BoxesList::graphSetDrawPathUpdateNeeded() {
+void KeysView::graphSetDrawPathUpdateNeeded() {
     if(mAnimator == NULL) return;
     mAnimator->setDrawPathUpdateNeeded();
 }
 
-void BoxesList::graphSetMinShownVal(qreal newMinShownVal) {
-    qreal halfHeightVal = (mGraphRect.height() - 2*mMargin)*0.5/mPixelsPerValUnit;
+void KeysView::graphSetMinShownVal(qreal newMinShownVal) {
+    qreal halfHeightVal = (height() - 2*mMargin)*0.5/mPixelsPerValUnit;
     mMinShownVal = clamp(newMinShownVal,
                          mMinVal - halfHeightVal,
                          mMaxVal - halfHeightVal);
 }
 
-void BoxesList::graphGetValueAndFrameFromPos(QPointF pos,
+void KeysView::graphGetValueAndFrameFromPos(QPointF pos,
                                             qreal *value, qreal *frame) {
-    *value = (mGraphRect.height() - pos.y() - mMargin)/mPixelsPerValUnit
+    *value = (height() - pos.y() - mMargin)/mPixelsPerValUnit
             + mMinShownVal;
     *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame - 0.5;
 }
 
-void BoxesList::graphMousePress(QPointF pressPos) {
+void KeysView::graphMousePress(QPointF pressPos) {
     mFirstMove = true;
     qreal value;
     qreal frame;
@@ -224,7 +214,7 @@ void BoxesList::graphMousePress(QPointF pressPos) {
     }
 }
 
-void BoxesList::graphMouseRelease()
+void KeysView::graphMouseRelease()
 {
     if(mSelecting) {
         if(!mMainWindow->isShiftPressed()) {
@@ -270,7 +260,7 @@ void BoxesList::graphMouseRelease()
     }
 }
 
-void BoxesList::graphMiddlePress(QPointF pressPos)
+void KeysView::graphMiddlePress(QPointF pressPos)
 {
     mSavedMinViewedFrame = mMinViewedFrame;
     mSavedMaxViewedFrame = mMaxViewedFrame;
@@ -278,7 +268,7 @@ void BoxesList::graphMiddlePress(QPointF pressPos)
     mMiddlePressPos = pressPos;
 }
 
-void BoxesList::graphMiddleMove(QPointF movePos)
+void KeysView::graphMiddleMove(QPointF movePos)
 {
     QPointF diffFrameValue = (movePos - mMiddlePressPos);
     diffFrameValue.setX(diffFrameValue.x()/mPixelsPerFrame);
@@ -289,12 +279,12 @@ void BoxesList::graphMiddleMove(QPointF movePos)
     graphSetMinShownVal(mSavedMinShownValue + diffFrameValue.y());
 }
 
-void BoxesList::graphMiddleRelease()
+void KeysView::graphMiddleRelease()
 {
 
 }
 
-void BoxesList::graphSetCtrlsModeForSelected(CtrlsMode mode) {
+void KeysView::graphSetCtrlsModeForSelected(CtrlsMode mode) {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setCtrlsMode(mode);
@@ -302,7 +292,7 @@ void BoxesList::graphSetCtrlsModeForSelected(CtrlsMode mode) {
     mAnimator->constrainCtrlsFrameValues();
 }
 
-void BoxesList::graphSetTwoSideCtrlForSelected() {
+void KeysView::graphSetTwoSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(true);
@@ -312,7 +302,7 @@ void BoxesList::graphSetTwoSideCtrlForSelected() {
     graphRepaint();
 }
 
-void BoxesList::graphSetRightSideCtrlForSelected() {
+void KeysView::graphSetRightSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(true);
@@ -322,7 +312,7 @@ void BoxesList::graphSetRightSideCtrlForSelected() {
     graphRepaint();
 }
 
-void BoxesList::graphSetLeftSideCtrlForSelected() {
+void KeysView::graphSetLeftSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(false);
@@ -332,7 +322,7 @@ void BoxesList::graphSetLeftSideCtrlForSelected() {
     graphRepaint();
 }
 
-void BoxesList::graphSetNoSideCtrlForSelected() {
+void KeysView::graphSetNoSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
     foreach(QrealKey *key, mSelectedKeys) {
         key->setEndEnabled(false);
@@ -342,7 +332,7 @@ void BoxesList::graphSetNoSideCtrlForSelected() {
     graphRepaint();
 }
 
-void BoxesList::graphDeletePressed()
+void KeysView::graphDeletePressed()
 {
     if(mCurrentPoint != NULL) {
             QrealKey *key = mCurrentPoint->getParentKey();
@@ -363,7 +353,7 @@ void BoxesList::graphDeletePressed()
     }
 }
 
-void BoxesList::graphClearKeysSelection() {
+void KeysView::graphClearKeysSelection() {
     foreach(QrealKey *key, mSelectedKeys) {
         key->setSelected(false);
         key->decNumberPointers();
@@ -372,7 +362,7 @@ void BoxesList::graphClearKeysSelection() {
     mSelectedKeys.clear();
 }
 
-void BoxesList::graphAddKeyToSelection(QrealKey *key)
+void KeysView::graphAddKeyToSelection(QrealKey *key)
 {
     if(key->isSelected()) return;
     key->setSelected(true);
@@ -380,7 +370,7 @@ void BoxesList::graphAddKeyToSelection(QrealKey *key)
     key->incNumberPointers();
 }
 
-void BoxesList::graphRemoveKeyFromSelection(QrealKey *key)
+void KeysView::graphRemoveKeyFromSelection(QrealKey *key)
 {
     if(key->isSelected()) {
         key->setSelected(false);
@@ -390,7 +380,7 @@ void BoxesList::graphRemoveKeyFromSelection(QrealKey *key)
     }
 }
 
-void BoxesList::graphMouseMove(QPointF mousePos)
+void KeysView::graphMouseMove(QPointF mousePos)
 {
     if(mSelecting) {
         mSelectionRect.setBottomRight(mousePos);
@@ -429,7 +419,7 @@ void BoxesList::graphMouseMove(QPointF mousePos)
     graphUpdateDrawPathIfNeeded();
 }
 
-void BoxesList::graphMousePressEvent(QPoint eventPos,
+void KeysView::graphMousePressEvent(QPoint eventPos,
                                      Qt::MouseButton eventButton)
 {
     if(eventButton == Qt::RightButton) {
@@ -453,7 +443,7 @@ void BoxesList::graphMousePressEvent(QPoint eventPos,
     graphUpdateDrawPathIfNeeded();
 }
 
-void BoxesList::graphMouseMoveEvent(QPoint eventPos,
+void KeysView::graphMouseMoveEvent(QPoint eventPos,
                                     Qt::MouseButtons eventButtons) {
     if(eventButtons == Qt::MiddleButton) {
         graphMiddleMove(eventPos);
@@ -465,7 +455,7 @@ void BoxesList::graphMouseMoveEvent(QPoint eventPos,
     graphUpdateDrawPathIfNeeded();
 }
 
-void BoxesList::graphMouseReleaseEvent(Qt::MouseButton eventButton)
+void KeysView::graphMouseReleaseEvent(Qt::MouseButton eventButton)
 {
     if(eventButton == Qt::MiddleButton) {
         graphMiddleRelease();
@@ -475,7 +465,7 @@ void BoxesList::graphMouseReleaseEvent(Qt::MouseButton eventButton)
     graphUpdateDrawPathIfNeeded();
 }
 
-void BoxesList::graphWheelEvent(QWheelEvent *event)
+void KeysView::graphWheelEvent(QWheelEvent *event)
 {
     if(mMainWindow->isCtrlPressed()) {
         if(event->delta() > 0) {
@@ -493,7 +483,7 @@ void BoxesList::graphWheelEvent(QWheelEvent *event)
     graphUpdateDrawPathIfNeeded();
 }
 
-bool BoxesList::graphProcessFilteredKeyEvent(QKeyEvent *event)
+bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event)
 {
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete && mAnimator != NULL) {
@@ -505,7 +495,7 @@ bool BoxesList::graphProcessFilteredKeyEvent(QKeyEvent *event)
     return true;
 }
 
-void BoxesList::graphResetValueScaleAndMinShown() {
+void KeysView::graphResetValueScaleAndMinShown() {
     qreal minVal;
     qreal maxVal;
     mAnimator->getMinAndMaxValues(&minVal, &maxVal);
@@ -513,7 +503,7 @@ void BoxesList::graphResetValueScaleAndMinShown() {
     graphSetScale(1.);
 }
 
-void BoxesList::graphSetAnimator(QrealAnimator *animator)
+void KeysView::graphSetAnimator(QrealAnimator *animator)
 {
     graphClearKeysSelection();
     if(animator == mAnimator) {
@@ -523,48 +513,51 @@ void BoxesList::graphSetAnimator(QrealAnimator *animator)
         mAnimator->setIsCurrentAnimator(false);
     }
     mAnimator = animator;
-    if(animator != NULL) {
+    if(animator == NULL) {
+        setGraphViewed(false);
+    } else {
         graphUpdateDimensions();
         animator->setIsCurrentAnimator(true);
         animator->setDrawPathUpdateNeeded();
         graphResetValueScaleAndMinShown();
+        setGraphViewed(true);
     }
     graphRepaint();
 }
 
-void BoxesList::graphRepaint()
+void KeysView::graphRepaint()
 {
     graphUpdateDrawPathIfNeeded();
     repaint();
 }
 
-void BoxesList::graphUpdateDrawPathIfNeeded() {
+void KeysView::graphUpdateDrawPathIfNeeded() {
     if(mAnimator != NULL) {
-        mAnimator->updateDrawPathIfNeeded(mGraphRect.height(), mMargin,
+        mAnimator->updateDrawPathIfNeeded(height(), mMargin,
                                           mMinViewedFrame, mMinShownVal,
                                           mPixelsPerFrame, mPixelsPerValUnit);
     }
 }
 
-void BoxesList::graphUpdateAfterKeysChangedAndRepaint() {
+void KeysView::graphUpdateAfterKeysChangedAndRepaint() {
     scheduleGraphUpdateAfterKeysChanged();
     
     mMainWindow->callUpdateSchedulers();
 }
 
-void BoxesList::scheduleGraphUpdateAfterKeysChanged() {
+void KeysView::scheduleGraphUpdateAfterKeysChanged() {
     if(mGraphUpdateAfterKeysChangedNeeded) return;
     mGraphUpdateAfterKeysChangedNeeded = true;
 }
 
-void BoxesList::graphUpdateAfterKeysChangedIfNeeded() {
+void KeysView::graphUpdateAfterKeysChangedIfNeeded() {
     if(mGraphUpdateAfterKeysChangedNeeded) {
         mGraphUpdateAfterKeysChangedNeeded = false;
         graphUpdateAfterKeysChanged();
     }
 }
 
-void BoxesList::graphUpdateAfterKeysChanged()
+void KeysView::graphUpdateAfterKeysChanged()
 {
     if(mAnimator == NULL) return;
     mAnimator->sortKeys();
@@ -574,7 +567,7 @@ void BoxesList::graphUpdateAfterKeysChanged()
     graphUpdateDrawPathIfNeeded();
 }
 
-void BoxesList::graphMergeKeysIfNeeded() {
+void KeysView::graphMergeKeysIfNeeded() {
     if(mAnimator == NULL) return;
     mAnimator->mergeKeysIfNeeded();
 }

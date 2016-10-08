@@ -8,6 +8,8 @@
 
 #include "animatorscollection.h"
 
+class KeysView;
+
 class UndoRedo;
 
 class Canvas;
@@ -123,8 +125,7 @@ public:
 
     virtual void drawListItem(QPainter *p,
                               qreal drawX, qreal drawY,
-                              qreal maxY, qreal pixelsPerFrame,
-                              int startFrame, int endFrame, bool animationBar);
+                              qreal maxY);
     virtual qreal getListItemHeight();
     void showChildrenListItems();
     void hideChildrenListItems();
@@ -153,9 +154,7 @@ public:
     virtual void startPosTransform();
     virtual void startRotTransform();
     virtual void startScaleTransform();
-    virtual void drawAnimationBar(QPainter *p,
-                          qreal pixelsPerFrame, qreal drawX, qreal drawY,
-                          int startFrame, int endFrame, bool animationBar);
+    virtual void drawAnimationBar(QPainter *p, qreal drawX, qreal drawY);
     virtual void updateAfterFrameChanged(int currentFrame);
     virtual QMatrix getCombinedRenderTransform();
     virtual QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal);
@@ -193,10 +192,13 @@ public:
     virtual void setRenderCombinedTransform();
 
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
+    virtual void drawKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
+    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY, int startFrame, int endFrame);
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 
     BoxesList *mBoxesList;
+    KeysView *mKeysView;
 
     bool mScheduledForRemove = false;
     BoundingBoxType mType;

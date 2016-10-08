@@ -9,6 +9,7 @@
 #include <QDockWidget>
 #include "fillstrokesettings.h"
 #include "animationdockwidget.h"
+#include "keysview.h"
 
 class BoxesList;
 
@@ -28,6 +29,7 @@ private:
     QDockWidget *mBottomDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
     BoxesList *mBoxListWidget;
+    KeysView *mKeysView;
 
     QToolBar *mToolBar;
 
@@ -94,6 +96,7 @@ public:
     void schedulePivotUpdate();
 
     AnimationDockWidget *getAnimationDockWidget();
+    KeysView *getKeysView();
     BoxesList *getBoxesList();
     Canvas *getCanvas();
     FillStrokeSettingsWidget *getFillStrokeSettings();

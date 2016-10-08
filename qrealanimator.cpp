@@ -34,7 +34,6 @@ void QrealAnimator::getKeysInRect(QRectF selectionRect,
         }
     }
 }
-
 void QrealAnimator::addAllKeysToComplexAnimator()
 {
     if(mParentAnimator == NULL) return;
@@ -98,10 +97,7 @@ QString QrealAnimator::getValueText() {
 }
 
 void QrealAnimator::drawBoxesList(QPainter *p,
-                                  qreal drawX, qreal drawY,
-                                  qreal pixelsPerFrame,
-                                  int startFrame, int endFrame,
-                                  bool animationBar)
+                                  qreal drawX, qreal drawY)
 {
     if(mIsCurrentAnimator) {
         p->fillRect(drawX, drawY,
@@ -124,11 +120,6 @@ void QrealAnimator::drawBoxesList(QPainter *p,
                 70., LIST_ITEM_HEIGHT,
                 Qt::AlignVCenter | Qt::AlignLeft,
                 " " + getValueText() );
-    p->setPen(Qt::black);
-    if(animationBar) {
-        drawKeys(p, pixelsPerFrame, LIST_ITEM_MAX_WIDTH, drawY, LIST_ITEM_HEIGHT,
-                 startFrame, endFrame, true);
-    }
 }
 #include <QWidgetAction>
 void QrealAnimator::handleListItemMousePress(qreal boxesListX,
@@ -161,7 +152,7 @@ void QrealAnimator::handleListItemMousePress(qreal boxesListX,
         } else if(relX < 2*LIST_ITEM_CHILD_INDENT) {
             setBoxesListDetailVisible(!mBoxesListDetailVisible);
         } else if(boxesListX < LIST_ITEM_MAX_WIDTH - 80 || mIsComplexAnimator) {
-            getMainWindow()->getBoxesList()->
+            getMainWindow()->getKeysView()->
                     graphSetAnimator(this);
         } else {
             QrealAnimatorSpin *spin = new QrealAnimatorSpin(this);
@@ -253,7 +244,7 @@ QrealKey *QrealAnimator::getKeyAtPos(qreal relX, qreal relY,
 }
 
 void QrealAnimator::clearFromGraphView() {
-    MainWindow::getInstance()->getBoxesList()->ifIsCurrentAnimatorSetNull(
+    MainWindow::getInstance()->getKeysView()->ifIsCurrentAnimatorSetNull(
                 this);
 }
 
@@ -531,6 +522,11 @@ void QrealAnimator::getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
     if(mMinMaxValuesFrozen) {
         *minValP = mMinPossibleVal;
         *maxValP = mMaxPossibleVal;
+        return;
+    }
+    if(mIsComplexAnimator) {
+        *minValP = mMainWindow->getKeysView()->getMinViewedFrame();
+        *maxValP = mMainWindow->getKeysView()->getMaxViewedFrame();
         return;
     }
     qreal minVal = 100000.;
