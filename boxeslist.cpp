@@ -85,8 +85,7 @@ void BoxesList::translateViewed(qreal translateBy) {
     mViewedTop += translateBy;
 }
 
-void BoxesList::wheelEvent(QWheelEvent *event)
-{
+void BoxesList::handleWheelEvent(QWheelEvent *event) {
     if(event->delta() > 0) {
         translateViewed(-LIST_ITEM_HEIGHT);
         if(mViewedTop < 0) {
@@ -96,6 +95,12 @@ void BoxesList::wheelEvent(QWheelEvent *event)
         translateViewed(LIST_ITEM_HEIGHT);
     }
     repaint();
+    mMainWindow->getKeysView()->repaint();
+}
+
+void BoxesList::wheelEvent(QWheelEvent *event)
+{
+    handleWheelEvent(event);
 }
 
 void BoxesList::mousePressEvent(QMouseEvent *event)

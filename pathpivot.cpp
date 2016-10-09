@@ -129,25 +129,32 @@ qreal distSign(QPointF distPt) {
 
 bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
                                 bool xOnly, bool yOnly,
+                                bool inputTransformationEnabled,
+                                qreal inputTransformationValue,
                                 bool startTransform)
 {
     if(mRotating) {
         QPointF absPos = getAbsolutePos();
-        QLineF dest_line(absPos, moveDestAbs);
-        QLineF prev_line(absPos, pressPos);
-        qreal d_rot = dest_line.angleTo(prev_line);
-        if(d_rot > 180)
-        {
-            d_rot -= 360;
-        }
+        qreal rot;
+        if(inputTransformationEnabled) {
+            rot = inputTransformationValue;
+        } else {
+            QLineF dest_line(absPos, moveDestAbs);
+            QLineF prev_line(absPos, pressPos);
+            qreal d_rot = dest_line.angleTo(prev_line);
+            if(d_rot > 180)
+            {
+                d_rot -= 360;
+            }
 
-        if(mLastDRot - d_rot > 90) {
-            mRotHalfCycles += 2;
-        } else if(mLastDRot - d_rot < -90) {
-            mRotHalfCycles -= 2;
+            if(mLastDRot - d_rot > 90) {
+                mRotHalfCycles += 2;
+            } else if(mLastDRot - d_rot < -90) {
+                mRotHalfCycles -= 2;
+            }
+            mLastDRot = d_rot;
+            rot = d_rot + mRotHalfCycles*180.;
         }
-        mLastDRot = d_rot;
-        qreal rot = d_rot + mRotHalfCycles*180.;
 
         mCanvas->rotateBoxesBy(rot, absPos, startTransform);
         return true;
@@ -156,13 +163,18 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
         QPointF distMoved = moveDestAbs - pressPos;
 
         //if(scaleBy < 0.f) scaleBy = 0.f;
-        qreal scaleBy = 1. + distSign(distMoved)*0.005;
+        qreal scaleBy;
+        if(inputTransformationEnabled) {
+            scaleBy = inputTransformationValue;
+        } else {
+            scaleBy = 1. + distSign(distMoved)*0.005;
+        }
         if(xOnly) {
             mCanvas->scaleBoxesBy(scaleBy, 1., absPos, startTransform);
         } else if(yOnly) {
             mCanvas->scaleBoxesBy(1., scaleBy, absPos, startTransform);
         } else {
-            if(isShiftPressed()) {
+            if(isShiftPressed() || inputTransformationEnabled) {
                 mCanvas->scaleBoxesBy(scaleBy, absPos, startTransform);
             } else {
                 qreal scaleXBy = 1. +

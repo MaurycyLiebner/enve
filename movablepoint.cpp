@@ -1,5 +1,6 @@
 #include "movablepoint.h"
 #include "vectorpath.h"
+#include "mainwindow.h"
 #include "undoredo.h"
 
 MovablePoint::MovablePoint(QPointF absPos,
@@ -129,7 +130,10 @@ bool MovablePoint::isContainedInRect(QRectF absRect)
 }
 
 void MovablePoint::moveBy(QPointF absTranslation) {
-    setAbsolutePos(getAbsolutePos() + absTranslation, false);
+    absTranslation /= mMainWindow->getCanvas()->getCurrentCanvasScale();
+
+    mRelPos.retrieveSavedValue();
+    mRelPos.incCurrentValue(absTranslation.x(), absTranslation.y());
 }
 
 void MovablePoint::moveToAbs(QPointF absPos)

@@ -143,6 +143,24 @@ public:
 
     void setSelectedJoinStyle(Qt::PenJoinStyle joinStyle);
 
+
+    void setFillGradient(Gradient* gradient, bool finish);
+    void setStrokeGradient(Gradient* gradient, bool finish);
+    void setFillFlatColor(Color color, bool finish);
+    void setStrokeFlatColor(Color color, bool finish);
+    void setFillPaintType(PaintType paintType, Color color,
+                                  Gradient* gradient);
+    void setStrokePaintType(PaintType paintType, Color color,
+                                    Gradient* gradient);
+    void setStrokeCapStyle(Qt::PenCapStyle capStyle);
+    void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle);
+    void setStrokeWidth(qreal strokeWidth, bool finish);
+
+    void startStrokeWidthTransform();
+    void startStrokeColorTransform();
+    void startFillColorTransform();
+
+
     void setSelectedStrokeWidth(qreal strokeWidth, bool finish);
 
     void startSelectedStrokeWidthTransform();
@@ -153,9 +171,18 @@ public:
     void setDisplayedFillStrokeSettingsFromLastSelected();
     void setRenderCombinedTransform();
     void setChildrenRenderCombinedTransform();
-    void drawChildrenKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
-    void drawKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
-    void scaleSelectedBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
+    void drawChildrenKeysView(QPainter *p,
+                              qreal drawY, qreal maxY,
+                              qreal pixelsPerFrame,
+                              int startFrame, int endFrame);
+    void drawKeysView(QPainter *p,
+                      qreal drawY, qreal maxY,
+                      qreal pixelsPerFrame,
+                      int startFrame, int endFrame);
+    void scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
+                         QPointF absOrigin, bool startTrans);
+    const PaintSettings *getFillSettings();
+    const StrokeSettings *getStrokeSettings();
 protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;

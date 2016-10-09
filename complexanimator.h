@@ -12,13 +12,14 @@ public:
 
     void drawKeys(QPainter *p, qreal pixelsPerFrame,
                   qreal startX, qreal startY, qreal height,
-                  int startFrame, int endFrame,
-                  bool detailedView);
+                  int startFrame, int endFrame);
 
     void addChildQrealKey(QrealKey *key);
     ComplexKey *getKeyCollectionAtFrame(int frame);
     void removeChildQrealKey(QrealKey *key);
-    virtual void drawChildAnimatorKeys() {}
+    void drawChildAnimatorKeys(QPainter *p, qreal pixelsPerFrame,
+                               qreal startX, qreal startY, qreal height,
+                               int startFrame, int endFrame);
     qreal clampValue(qreal value);
     void addChildAnimator(QrealAnimator *childAnimator);
     void removeChildAnimator(QrealAnimator *removeAnimator);

@@ -71,9 +71,11 @@ void KeysView::resizeEvent(QResizeEvent *e) {
 }
 
 void KeysView::wheelEvent(QWheelEvent *e) {
-    graphWheelEvent(e);
-
-    repaint();
+    if(mGraphViewed) {
+        graphWheelEvent(e);
+    } else {
+        mBoxesList->handleWheelEvent(e);
+    }
 }
 
 void KeysView::mousePressEvent(QMouseEvent *e) {

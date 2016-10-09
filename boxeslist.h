@@ -40,6 +40,8 @@ public:
     void translateViewed(qreal translateBy);
     qreal getViewedTop();
     qreal getViewedBottom();
+
+    void handleWheelEvent(QWheelEvent *event);
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *e);
@@ -47,7 +49,6 @@ protected:
     void mousePressEvent(QMouseEvent *event);
 
 private:
-
     Canvas *mCanvas;
     qreal mViewedTop;
     qreal mViewedBottom;

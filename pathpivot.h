@@ -16,7 +16,11 @@ public:
     bool isScaling();
     bool handleMousePress(QPointF absPressPos);
     bool handleMouseRelease();
-    bool handleMouseMove(QPointF moveDestAbs, QPointF pressPos, bool xOnly, bool yOnly, bool startTransform);
+    bool handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
+                         bool xOnly, bool yOnly,
+                         bool inputTransformationEnabled,
+                         qreal inputTransformationValue,
+                         bool startTransform);
 //    void updateRotationMappedPath();
     void finishTransform();
     void startRotating();

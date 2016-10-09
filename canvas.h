@@ -252,6 +252,10 @@ public:
 
     void updateDisplayedFillStrokeSettings();
     void scaleBoxesBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
+    void updateInputValue();
+    void clearAndDisableInput();
+
+    qreal getCurrentCanvasScale();
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -272,8 +276,6 @@ protected:
     void handleMovePointMouseRelease(QPointF pos);
 
     bool isMovingPath();
-
-    qreal getCurrentCanvasScale();
 signals:
 private slots:
     void fillSettingsChanged(PaintSettings fillSettings, bool saveUndoRedo);
@@ -307,6 +309,11 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    bool mTransformationFinishedBeforeMouseRelease = false;
+    QString mInputText;
+    qreal mInputTransformationValue = 0.;
+    bool mInputTransformationEnabled = false;
+
     bool mXOnlyTransform = false;
     bool mYOnlyTransform = false;
 
@@ -354,6 +361,9 @@ private:
     void handleAddPointMouseRelease();
 
     QList<QImage*> mPreviewFrames;
+    void updateTransformation();
+    void handleMouseRelease(QPointF eventPos, Qt::MouseButton button);
+    QPointF getMoveByValueForEventPos(QPointF eventPos);
 };
 
 #endif // CANVAS_H

@@ -765,9 +765,8 @@ void QrealAnimator::callUpdater()
 
 void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
                              qreal startX, qreal startY, qreal height,
-                             int startFrame, int endFrame, bool detailedView)
+                             int startFrame, int endFrame)
 {
-    Q_UNUSED(detailedView);
     p->setPen(QPen(Qt::black, 1.));
     foreach(QrealKey *key, mKeys) {
         if(key->getFrame() >= startFrame && key->getFrame() <= endFrame) {

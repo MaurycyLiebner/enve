@@ -166,7 +166,7 @@ const StrokeSettings *BoundingBox::getStrokeSettings() {
 }
 
 qreal BoundingBox::getCurrentCanvasScale() {
-     return mParent->getCurrentCanvasScale();
+     return mMainWindow->getCanvas()->getCurrentCanvasScale();
 }
 
 void BoundingBox::drawBoundingRect(QPainter *p) {
@@ -246,7 +246,8 @@ void BoundingBox::scaleRelativeToSavedPivot(qreal scaleBy) {
 void BoundingBox::moveBy(QPointF trans) {
     trans /= getCurrentCanvasScale();
 
-    mTransformAnimator.translate(trans.x(), trans.y());
+    mTransformAnimator.moveRelativeToSavedValue(trans.x(), trans.y());
+    //mTransformAnimator.translate(trans.x(), trans.y());
 }
 
 void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo) {

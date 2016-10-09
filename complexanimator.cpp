@@ -12,14 +12,26 @@ ComplexAnimator::ComplexAnimator() :
 #include <QDebug>
 void ComplexAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
                                qreal startX, qreal startY, qreal height,
-                               int startFrame, int endFrame,
-                               bool detailedView)
+                               int startFrame, int endFrame)
 {
     QrealAnimator::drawKeys(p, pixelsPerFrame, startX, startY, height,
-                            startFrame, endFrame, detailedView);
+                            startFrame, endFrame);
 
-    if(detailedView) {
-        drawChildAnimatorKeys();
+    if(mBoxesListDetailVisible) {
+        drawChildAnimatorKeys(p, pixelsPerFrame, startX, startY, height,
+                              startFrame, endFrame);
+    }
+}
+
+void ComplexAnimator::drawChildAnimatorKeys(QPainter *p, qreal pixelsPerFrame,
+                                            qreal startX, qreal startY, qreal height,
+                                            int startFrame, int endFrame)
+{
+    startY += LIST_ITEM_HEIGHT;
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->drawKeys(p, pixelsPerFrame, startX, startY, height,
+                           startFrame, endFrame);
+        startY += animator->getBoxesListHeight();
     }
 }
 

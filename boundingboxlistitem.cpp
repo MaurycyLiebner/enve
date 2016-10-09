@@ -264,12 +264,12 @@ void BoundingBox::drawKeys(QPainter *p,
                            int startFrame, int endFrame) {
     mAnimatorsCollection.drawKeys(p,
                                   pixelsPerFrame, 0., drawY, 20.,
-                                  startFrame, endFrame, true);
+                                  startFrame, endFrame);
     drawY += LIST_ITEM_HEIGHT;
     if(mBoxListItemDetailsVisible) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
             animator->drawKeys(p, pixelsPerFrame, 0., drawY, LIST_ITEM_HEIGHT,
-                               startFrame, endFrame, true);
+                               startFrame, endFrame);
             drawY += animator->getBoxesListHeight();
         }
     }
@@ -361,6 +361,7 @@ qreal BoundingBox::getListItemHeight() {
 void BoundingBox::setChildrenListItemsVisible(bool bt)
 {
     mBoxListItemDetailsVisible = bt;
+    mAnimatorsCollection.setBoxesListDetailVisible(bt);
 }
 
 void BoundingBox::showChildrenListItems()

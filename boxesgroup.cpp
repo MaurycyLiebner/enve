@@ -161,6 +161,110 @@ void BoxesGroup::setSelectedJoinStyle(Qt::PenJoinStyle joinStyle) {
     finishUndoRedoSet();
 }
 
+void BoxesGroup::setFillGradient(Gradient *gradient, bool finish)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setFillGradient(gradient, finish);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setStrokeGradient(Gradient *gradient, bool finish)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setStrokeGradient(gradient, finish);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setFillFlatColor(Color color, bool finish)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setFillFlatColor(color, finish);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setStrokeFlatColor(Color color, bool finish)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setStrokeFlatColor(color, finish);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setFillPaintType(PaintType paintType,
+                                  Color color, Gradient *gradient)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setFillPaintType(paintType, color, gradient);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setStrokePaintType(PaintType paintType,
+                                    Color color, Gradient *gradient)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setStrokePaintType(paintType, color, gradient);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setStrokeCapStyle(Qt::PenCapStyle capStyle)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setStrokeCapStyle(capStyle);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setStrokeJoinStyle(Qt::PenJoinStyle joinStyle)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setStrokeJoinStyle(joinStyle);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setStrokeWidth(qreal strokeWidth, bool finish)
+{
+    startNewUndoRedoSet();
+    foreach(BoundingBox *box, mChildren) {
+        box->setStrokeWidth(strokeWidth, finish);
+    }
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::startStrokeWidthTransform()
+{
+    foreach(BoundingBox *box, mChildren) {
+        box->startStrokeWidthTransform();
+    }
+}
+
+void BoxesGroup::startStrokeColorTransform()
+{
+    foreach(BoundingBox *box, mChildren) {
+        box->startStrokeColorTransform();
+    }
+}
+
+void BoxesGroup::startFillColorTransform()
+{
+    foreach(BoundingBox *box, mChildren) {
+        box->startFillColorTransform();
+    }
+}
+
 void BoxesGroup::setSelectedStrokeWidth(qreal strokeWidth, bool finish) {
     if(finish) {
         startNewUndoRedoSet();
@@ -559,6 +663,14 @@ void BoxesGroup::clearPointsSelection()
         point->deselect();
     }
     mSelectedPoints.clear();
+}
+
+const PaintSettings *BoxesGroup::getFillSettings() {
+    return mChildren.first()->getFillSettings();
+}
+
+const StrokeSettings *BoxesGroup::getStrokeSettings() {
+    return mChildren.first()->getStrokeSettings();
 }
 
 void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {

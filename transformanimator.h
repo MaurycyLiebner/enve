@@ -45,6 +45,7 @@ public:
     void startScaleTransform();
     void startOpacityTransform();
     void setOpacity(qreal newOpacity);
+    void moveRelativeToSavedValue(qreal dX, qreal dY);
 private:
     QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;

@@ -534,6 +534,7 @@ void FillStrokeSettingsWidget::setStrokeWidth(qreal width)
 void FillStrokeSettingsWidget::setCurrentSettings(const PaintSettings *fillPaintSettings,
                                             const StrokeSettings *strokePaintSettings)
 {
+    if(fillPaintSettings == NULL || strokePaintSettings == NULL) return;
     disconnect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
 

@@ -44,6 +44,11 @@ void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel, QPointF pivot) 
     mPosAnimator.setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
+void TransformAnimator::moveRelativeToSavedValue(qreal dX, qreal dY) {
+    mPosAnimator.retrieveSavedValue();
+    mPosAnimator.incCurrentValue(dX, dY);
+}
+
 void TransformAnimator::translate(qreal dX, qreal dY)
 {
     mPosAnimator.incCurrentValue(dX, dY);
