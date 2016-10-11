@@ -113,9 +113,9 @@ public:
 
     void emptySomeOfUndo() {
         if(mUndoStack.length() > 150) {
-            for(int i = 0; i < 50; i++) {
+//            for(int i = 0; i < 50; i++) {
                 delete mUndoStack.takeFirst();
-            }
+//            }
         }
     }
 

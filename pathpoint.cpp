@@ -15,7 +15,7 @@ PathPoint::PathPoint(qreal relPosX, qreal relPosy,
                      qreal startCtrlRelX, qreal startCtrlRelY,
                      qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, int boneZ,
                      VectorPath *vectorPath) :
-    MovablePoint(relPosX, relPosy, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
+    MovablePoint(relPosX, relPosy, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.)
 {    
     mSqlLoadBoneZId = boneZ;
     mSeparatePathPoint = isFirst;
@@ -70,7 +70,7 @@ PathPoint::PathPoint(QPointF absPos,
                      QPointF startCtrlAbsPos,
                      QPointF endCtrlAbsPos,
                      VectorPath *vectorPath) :
-    MovablePoint(absPos, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.f)
+    MovablePoint(absPos, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.)
 {
     mVectorPath = vectorPath;
 
@@ -103,7 +103,7 @@ PathPoint::PathPoint(QPointF absPos,
 PathPoint::PathPoint(int movablePointId, int pathPointId,
                      VectorPath *vectorPath) :
     MovablePoint(movablePointId, vectorPath,
-                 MovablePointType::TYPE_PATH_POINT, 10.f)
+                 MovablePointType::TYPE_PATH_POINT, 10.)
 {
     mVectorPath = vectorPath;
 
@@ -139,6 +139,12 @@ PathPoint::PathPoint(int movablePointId, int pathPointId,
     mPathPointAnimators.incNumberPointers();
 
     mRelPos.setTraceKeyOnCurrentFrame(true);
+}
+
+PathPoint::~PathPoint()
+{
+    mStartCtrlPt->decNumberPointers();
+    mEndCtrlPt->decNumberPointers();
 }
 
 void PathPoint::startTransform()
@@ -223,6 +229,11 @@ void PathPoint::disconnectFromPoint(PathPoint *point)
 void PathPoint::remove()
 {
     mVectorPath->removePoint(this);
+}
+
+void PathPoint::removeApproximate()
+{
+    mVectorPath->deletePointAndApproximate(this);
 }
 
 void PathPoint::rectPointsSelection(QRectF absRect, QList<MovablePoint*> *list) {
@@ -401,7 +412,9 @@ void PathPoint::draw(QPainter *p, CanvasMode mode)
         p->drawEllipse(absPos, 4, 4);
         p->restore();
     }
-    if(mode == CanvasMode::MOVE_POINT || (mode == CanvasMode::ADD_POINT && mSelected)) {
+    if((mode == CanvasMode::MOVE_POINT &&
+       (isNeighbourSelected() || BoxesGroup::getCtrlsAlwaysVisible() ) ) ||
+       (mode == CanvasMode::ADD_POINT && mSelected) ) {
         QPen pen = p->pen();
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
             p->setPen(QPen(Qt::black, 1.5));
@@ -801,6 +814,14 @@ void PathPoint::setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo
     if(saveUndoRedo) {
         addUndoRedo(new SetCtrlPtEnabledUndoRedo(enabled, isStartPt, this));
     }
+}
+
+bool PathPoint::isNeighbourSelected() {
+    bool nextSelected = (mNextPoint == NULL) ?
+                false : mNextPoint->isSelected();
+    bool prevSelected = (mPreviousPoint == NULL) ?
+                false : mPreviousPoint->isSelected();
+    return isSelected() || nextSelected || prevSelected;
 }
 
 VectorPath *PathPoint::getParentPath()

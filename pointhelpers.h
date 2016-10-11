@@ -24,6 +24,8 @@ extern void getCtrlsSmoothPos(QPointF endPos, QPointF startPos,
 
 extern qreal clamp(qreal val, qreal min, qreal max);
 
+extern qreal qclamp(qreal val, qreal min, qreal max);
+
 extern qreal calcCubicBezierVal(qreal p0, qreal p1, qreal p2, qreal p3, qreal t);
 
 extern qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x);

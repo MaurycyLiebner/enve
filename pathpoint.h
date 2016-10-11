@@ -115,6 +115,8 @@ public:
               VectorPath *vectorPath);
     PathPoint(int movablePointId, int pathPointId, VectorPath *vectorPath);
 
+    ~PathPoint();
+
     void startTransform();
     void finishTransform();
 
@@ -151,6 +153,7 @@ public:
     void disconnectFromPoint(PathPoint *point);
 
     void remove();
+    void removeApproximate();
 
     MovablePoint *getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode);
     void rectPointsSelection(QRectF absRect, QList<MovablePoint *> *list);
@@ -213,6 +216,7 @@ public:
     void enableInfluenceAnimators();
     void disableInfluenceAnimators();
     QPointF getInfluenceAbsolutePos();
+    bool isNeighbourSelected();
 private:
     bool mStartExternalInfluence = false;
     QPointF mStartAdjustedForExternalInfluence;

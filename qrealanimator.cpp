@@ -11,6 +11,16 @@ QrealAnimator::QrealAnimator() : ConnectedToMainWindow()
 {
 }
 
+QrealAnimator::~QrealAnimator()
+{
+    foreach(QrealKey *key, mKeys) {
+        key->decNumberPointers();
+    }
+    if(mUpdater != NULL) {
+        mUpdater->decNumberPointers();
+    }
+}
+
 void QrealAnimator::setValueRange(qreal minVal, qreal maxVal)
 {
     mMinPossibleVal = minVal;
@@ -121,6 +131,25 @@ void QrealAnimator::drawBoxesList(QPainter *p,
                 Qt::AlignVCenter | Qt::AlignLeft,
                 " " + getValueText() );
 }
+
+void QrealAnimator::openContextMenu(QPoint pos) {
+    QMenu menu;
+    menu.addAction("Add Key");
+    QAction *selected_action = menu.exec(pos);
+    if(selected_action != NULL)
+    {
+        if(selected_action->text() == "Add Key")
+        {
+            if(!mIsRecording) {
+                setRecording(true);
+            }
+            saveCurrentValueAsKey();
+        }
+    } else {
+
+    }
+}
+
 #include <QWidgetAction>
 void QrealAnimator::handleListItemMousePress(qreal boxesListX,
                                              qreal relX, qreal relY,
@@ -131,21 +160,7 @@ void QrealAnimator::handleListItemMousePress(qreal boxesListX,
     }
     Q_UNUSED(relY);
     if(event->button() == Qt::RightButton) {
-        QMenu menu;
-        menu.addAction("Add Key");
-        QAction *selected_action = menu.exec(event->globalPos());
-        if(selected_action != NULL)
-        {
-            if(selected_action->text() == "Add Key")
-            {
-                if(!mIsRecording) {
-                    setRecording(true);
-                }
-                saveCurrentValueAsKey();
-            }
-        } else {
-
-        }
+        openContextMenu(event->globalPos());
     } else {
         if(relX < LIST_ITEM_CHILD_INDENT) {
             setRecording(!mIsRecording);
@@ -301,6 +316,18 @@ void QrealAnimator::updateValueFromCurrentFrame()
 void QrealAnimator::saveCurrentValueToKey(QrealKey *key)
 {
     saveValueToKey(key, mCurrentValue);
+}
+
+void QrealAnimator::saveValueToKey(int frame, qreal value)
+{
+    QrealKey *keyAtFrame = getKeyAtFrame(frame);
+    if(keyAtFrame == NULL) {
+        keyAtFrame = new QrealKey(frame, this, value);
+        appendKey(keyAtFrame);
+        updateKeysPath();
+    } else {
+        saveValueToKey(keyAtFrame, value);
+    }
 }
 
 void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
@@ -751,7 +778,9 @@ void QrealAnimator::cancelTransform() {
 
 void QrealAnimator::setUpdater(AnimatorUpdater *updater)
 {
+    if(mUpdater != NULL) mUpdater->decNumberPointers();
     mUpdater = updater;
+    mUpdater->incNumberPointers();
 }
 
 void QrealAnimator::callUpdater()

@@ -81,16 +81,27 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     connect(mAllPointsRecordButton, SIGNAL(toggled(bool)),
             parent, SLOT(setAllPointsRecord(bool)) );
 
-    mRemoveKeyButton = new QPushButton(
-                QIcon("pixmaps/icons/remove_key_button.png"), "", this);
-    mRemoveKeyButton->setSizePolicy(QSizePolicy::Maximum,
+    mCtrlsAlwaysVisible = new QPushButton(
+                QIcon("pixmaps/icons/ctrlsNotAlwaysVisible.png"), "", this);
+    mCtrlsAlwaysVisible->setSizePolicy(QSizePolicy::Maximum,
                                QSizePolicy::Maximum);
+    mCtrlsAlwaysVisible->setCheckable(true);
+    mCtrlsAlwaysVisible->setChecked(false);
+    connect(mCtrlsAlwaysVisible, SIGNAL(toggled(bool)),
+            this, SLOT(setCtrlsAlwaysVisible(bool)) );
 
     mControlButtonsLayout = new QHBoxLayout();
     mControlButtonsWidget = new QWidget(this);
     mControlButtonsWidget->setFixedWidth(LIST_ITEM_MAX_WIDTH + 1);
     mControlButtonsWidget->setLayout(mControlButtonsLayout);
-    mControlButtonsWidget->setStyleSheet("background-color: black");
+    mControlButtonsWidget->setStyleSheet("QWidget {"
+                                            "background-color: rgb(0, 0, 0);"
+                                         "}"
+                                         "QPushButton {"
+                                            "qproperty-iconSize: 20px;"
+                                            "border: 1px solid black;"
+                                            "background-color: rgb(55, 55, 55);"
+                                         "}");
 
     mControlButtonsLayout->setSpacing(0);
     mControlButtonsLayout->setMargin(0);
@@ -98,12 +109,18 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlsLayout->setMargin(0);
 
     mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
+    mGoToPreviousKeyButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mGoToNextKeyButton);
+    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mPlayButton);
+    mPlayButton->setFocusPolicy(Qt::NoFocus);
 
     mControlButtonsLayout->addWidget(mRecordButton);
+    mRecordButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mAllPointsRecordButton);
-    mControlButtonsLayout->addWidget(mRemoveKeyButton);
+    mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
+    mControlButtonsLayout->addWidget(mCtrlsAlwaysVisible);
+    mCtrlsAlwaysVisible->setFocusPolicy(Qt::NoFocus);
 
     mControlsLayout->addWidget(mControlButtonsWidget);
     mControlsLayout->addWidget(mAnimationWidgetScrollbar);
@@ -198,6 +215,18 @@ void BoxesListAnimationDockWidget::setAllPointsRecord(bool allPointsRecord)
         mAllPointsRecordButton->setIcon(
                     QIcon("pixmaps/icons/recordSinglePoint.png") );
     }
+}
+
+void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible) {
+    if(ctrlsAlwaysVisible) {
+        mCtrlsAlwaysVisible->setIcon(
+                    QIcon("pixmaps/icons/ctrlsAlwaysVisible.png"));
+    } else {
+        mCtrlsAlwaysVisible->setIcon(
+                    QIcon("pixmaps/icons/ctrlsNotAlwaysVisible.png"));
+    }
+    BoxesGroup::setCtrlsAlwaysVisible(ctrlsAlwaysVisible);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {

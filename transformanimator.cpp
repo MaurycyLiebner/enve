@@ -20,6 +20,12 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mOpacityAnimator.setCurrentValue(100.);
     mOpacityAnimator.freezeMinMaxValues();
 
+    mPosAnimator.blockPointer();
+    mRotAnimator.blockPointer();
+    mScaleAnimator.blockPointer();
+    mPivotAnimator.blockPointer();
+    mOpacityAnimator.blockPointer();
+
     addChildAnimator(&mPosAnimator);
     addChildAnimator(&mRotAnimator);
     addChildAnimator(&mScaleAnimator);

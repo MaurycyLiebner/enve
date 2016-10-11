@@ -1,6 +1,7 @@
 #include "ctrlpoint.h"
 #include "pathpoint.h"
 #include "vectorpath.h"
+#include "boxesgroup.h"
 
 CtrlPoint::CtrlPoint(QPointF absPos,
                      PathPoint *parentPoint, bool isStartCtrlPt) :
@@ -81,4 +82,10 @@ void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {
 void CtrlPoint::remove()
 {
     mParentPoint->setCtrlPtEnabled(false, mIsStartCtrlPt);
+}
+
+bool CtrlPoint::isHidden()
+{
+    return MovablePoint::isHidden() ||
+           (!mParentPoint->isNeighbourSelected() && !BoxesGroup::getCtrlsAlwaysVisible() );
 }

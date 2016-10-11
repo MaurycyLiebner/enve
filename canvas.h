@@ -83,6 +83,13 @@ public:
     }
 
     void makePassThrough(QPointF absPos) {
+        if(!mPoint2->isStartCtrlPtEnabled() ) {
+            mPoint2->setStartCtrlPtEnabled(true);
+        }
+        if(!mPoint1->isEndCtrlPtEnabled() ) {
+            mPoint1->setEndCtrlPtEnabled(true);
+        }
+
         QPointF p0Pos = mPoint1->getAbsolutePos();
         QPointF p1Pos = mPoint1EndPt->getAbsolutePos();
         QPointF p2Pos = mPoint2StartPt->getAbsolutePos();
@@ -256,6 +263,9 @@ public:
     void clearAndDisableInput();
 
     qreal getCurrentCanvasScale();
+
+    void ctrlsVisiblityChanged();
+    void grabMouseAndTrack();
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -324,7 +334,6 @@ private:
     QTimer *mPreviewFPSTimer = NULL;
     int mCurrentPreviewFrameId;
 
-    bool mCancelTransform = false;
     bool mIsMouseGrabbing = false;
 
     bool mDoubleClick = false;
@@ -362,8 +371,10 @@ private:
 
     QList<QImage*> mPreviewFrames;
     void updateTransformation();
-    void handleMouseRelease(QPointF eventPos, Qt::MouseButton button);
+    void handleMouseRelease(QPointF eventPos);
     QPointF getMoveByValueForEventPos(QPointF eventPos);
+    void cancelCurrentTransform();
+    void releaseMouseAndDontTrack();
 };
 
 #endif // CANVAS_H

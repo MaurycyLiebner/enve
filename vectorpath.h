@@ -22,9 +22,10 @@ class Edge;
 class GradientPoints : public ComplexAnimator {
 public:
     GradientPoints();
+    ~GradientPoints();
 
-    void initialize(VectorPath *parentT, QPointF startPt = QPointF(0.f, 0.f),
-                    QPointF endPt = QPointF(100.f, 100.f));
+    void initialize(VectorPath *parentT, QPointF startPt = QPointF(0., 0.),
+                    QPointF endPt = QPointF(100., 100.));
 
     void initialize(VectorPath *parentT,
                     int fillGradientStartId, int fillGradientEndId);
@@ -60,6 +61,8 @@ class VectorPath : public BoundingBox
 public:
     VectorPath(BoxesGroup *group);
     VectorPath(int boundingBoxId, BoxesGroup *parent);
+
+    ~VectorPath();
 
     virtual QRectF getBoundingRect();
     void draw(QPainter *p);
@@ -128,8 +131,6 @@ public:
 
             mFillPaintSettings.setGradient(gradient);
             updateDrawGradients();
-
-
         }
     }
 
@@ -144,8 +145,6 @@ public:
 
             mStrokeSettings.setGradient(gradient);
             updateDrawGradients();
-
-
         }
     }
 
@@ -181,13 +180,12 @@ public:
                            paintType == GRADIENTPAINT, true);
         if(paintType == GRADIENTPAINT) {
             mFillPaintSettings.setGradient(gradient);
-            updateDrawGradients();
         } else if(paintType == FLATPAINT) {
             mFillPaintSettings.setCurrentColor(color);
         }
         mFillPaintSettings.setPaintType(paintType);
 
-
+        updateDrawGradients();
     }
 
     virtual void setStrokePaintType(PaintType paintType, Color color,
@@ -299,6 +297,7 @@ public:
     qreal findPercentForPointEditPath(QPointF point, qreal minPercent = 0., qreal maxPercent = 1.);
     Edge *getEdgeFromMappedEditPath(QPointF absPos);
     Edge *getEdgeFromMappedPath(QPointF absPos);
+    void deletePointAndApproximate(PathPoint *pointToRemove);
 protected:
     bool mInfluenceEnabled = false;
 

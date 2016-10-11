@@ -8,7 +8,12 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
-    setStyleSheet(".AnimationDockWidget .QPushButton { background-color: black }");
+    setStyleSheet("AnimationDockWidget { background-color: black }"
+                  "QPushButton {"
+                                 "qproperty-iconSize: 20px;"
+                                 "border: 1px solid black;"
+                                 "background-color: rgb(55, 55, 55);"
+                              "}");
 
     mButtonsLayout = new QHBoxLayout();
     mButtonsLayout->setMargin(0);

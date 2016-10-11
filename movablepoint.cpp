@@ -12,6 +12,8 @@ MovablePoint::MovablePoint(QPointF absPos,
     mRadius = radius;
     mParent = parent;
     setAbsolutePos(absPos, false);
+
+    mRelPos.blockPointer();
 }
 
 MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
@@ -23,6 +25,8 @@ MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
     mRadius = radius;
     mParent = parent;
     setRelativePos(QPointF(relPosX, relPosY), false);
+
+    mRelPos.blockPointer();
 }
 
 MovablePoint::MovablePoint(int movablePointId, BoundingBox *parent,
@@ -46,6 +50,8 @@ MovablePoint::MovablePoint(int movablePointId, BoundingBox *parent,
     } else {
         qDebug() << "Could not load movablepoint with id " << movablePointId;
     }
+
+    mRelPos.blockPointer();
 }
 
 void MovablePoint::startTransform()
@@ -87,7 +93,7 @@ QPointF MovablePoint::getAbsolutePos()
 
 void MovablePoint::draw(QPainter *p)
 {
-    if(mHidden) {
+    if(isHidden()) {
         return;
     }
     if(mSelected) {
@@ -114,7 +120,7 @@ BoundingBox *MovablePoint::getParent()
 
 bool MovablePoint::isPointAt(QPointF absPoint)
 {
-    if(mHidden) {
+    if(isHidden()) {
         return false;
     }
     QPointF dist = getAbsolutePos() - absPoint;
@@ -123,7 +129,7 @@ bool MovablePoint::isPointAt(QPointF absPoint)
 
 bool MovablePoint::isContainedInRect(QRectF absRect)
 {
-    if(mHidden) {
+    if(isHidden() || (isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible()) ) {
         return false;
     }
     return absRect.contains(getAbsolutePos());
@@ -258,7 +264,7 @@ bool MovablePoint::isHidden()
 
 bool MovablePoint::isVisible()
 {
-    return !mHidden;
+    return !isHidden();
 }
 
 void MovablePoint::setVisible(bool bT)

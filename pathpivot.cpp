@@ -6,9 +6,9 @@ PathPivot::PathPivot(Canvas *parent) :
                  MovablePointType::TYPE_PIVOT_POINT, 10.)
 {
     mCanvas = parent;
-//    mRotationPath.addEllipse(QPointF(0.f, 0.f), 50.f, 50.f);
+//    mRotationPath.addEllipse(QPointF(0., 0.), 50., 50.);
 //    QPainterPath removeEllipse;
-//    removeEllipse.addEllipse(QPointF(0.f, 0.f), 40.f, 40.f);
+//    removeEllipse.addEllipse(QPointF(0., 0.), 40., 40.);
 //    mRotationPath -= removeEllipse;
 }
 
@@ -110,7 +110,7 @@ bool PathPivot::handleMouseRelease()
 
 qreal signedSquare(qreal val) {
     int mult;
-    if(val > 0.f) {
+    if(val > 0.) {
         mult = 1;
     } else {
         mult = -1;
@@ -120,7 +120,7 @@ qreal signedSquare(qreal val) {
 
 qreal distSign(QPointF distPt) {
     qreal val = signedSquare(distPt.x()) + signedSquare(distPt.y() );
-    if(val > 0.f) {
+    if(val > 0.) {
         return sqrt(val);
     } else {
         return -sqrt(-val);
@@ -162,7 +162,7 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
         QPointF absPos = getAbsolutePos();
         QPointF distMoved = moveDestAbs - pressPos;
 
-        //if(scaleBy < 0.f) scaleBy = 0.f;
+        //if(scaleBy < 0.) scaleBy = 0.;
         qreal scaleBy;
         if(inputTransformationEnabled) {
             scaleBy = inputTransformationValue;

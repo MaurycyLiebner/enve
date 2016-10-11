@@ -47,6 +47,8 @@ public:
     virtual void moveBy(QPointF absTranslatione);
     virtual void moveToAbs(QPointF absPos);
 
+    virtual void removeApproximate() {}
+
     void select();
     void deselect();
 
@@ -54,7 +56,7 @@ public:
 
     void hide();
     void show();
-    bool isHidden();
+    virtual bool isHidden();
     bool isVisible();
     void setVisible(bool bT);
 

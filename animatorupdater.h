@@ -1,5 +1,6 @@
 #ifndef ANIMATORUPDATER_H
 #define ANIMATORUPDATER_H
+#include "smartpointertarget.h"
 
 class BoundingBox;
 
@@ -7,10 +8,10 @@ class VectorPath;
 
 class Gradient;
 
-class AnimatorUpdater
+class AnimatorUpdater : public SmartPointerTarget
 {
 public:
-    AnimatorUpdater() {}
+    AnimatorUpdater() : SmartPointerTarget() {}
     virtual ~AnimatorUpdater() {}
 
     virtual void update() {}

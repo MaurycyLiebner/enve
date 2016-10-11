@@ -8,6 +8,8 @@ class ComplexAnimator : public QrealAnimator
 {
 public:
     ComplexAnimator();
+    ~ComplexAnimator();
+
     QMatrix getCurrentValue();
 
     void drawKeys(QPainter *p, qreal pixelsPerFrame,

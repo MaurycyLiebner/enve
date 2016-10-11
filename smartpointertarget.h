@@ -10,8 +10,11 @@ public:
 
     void incNumberPointers();
     void decNumberPointers();
+
+    void blockPointer();
 private:
     int mNumberOfPointers = 0;
+    bool mBlocked = false;
 };
 
 #endif // SMARTPOINTERTARGET_H

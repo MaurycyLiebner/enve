@@ -481,6 +481,8 @@ void KeysView::graphWheelEvent(QWheelEvent *event)
         }
     }
     graphUpdateDrawPathIfNeeded();
+
+    repaint();
 }
 
 bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event)

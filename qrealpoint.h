@@ -14,7 +14,7 @@ enum QrealPointType {
 class QrealPoint : public SmartPointerTarget
 {
 public:
-    QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius = 10.f);
+    QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius = 10.);
 
     qreal getFrame();
 

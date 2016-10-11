@@ -21,6 +21,8 @@ class QrealAnimator : public ConnectedToMainWindow
 public:
     QrealAnimator();
 
+    ~QrealAnimator();
+
     void setValueRange(qreal minVal, qreal maxVal);
 
     void setParentAnimator(ComplexAnimator *parentAnimator);
@@ -167,6 +169,8 @@ public:
     void saveValueAtFrameAsKey(int frame);
 
     void setTraceKeyOnCurrentFrame(bool bT);
+    virtual void openContextMenu(QPoint pos);
+    void saveValueToKey(int frame, qreal value);
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 

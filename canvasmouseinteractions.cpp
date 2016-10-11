@@ -26,119 +26,140 @@ void Canvas::handleMovePathMousePressEvent() {
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
-    if(event->button() == Qt::LeftButton) {
-        if(mouseGrabber() != this) grabMouse();
-        mTransformationFinishedBeforeMouseRelease = false;
-    }
-    if(mIsMouseGrabbing) {
-        mIsMouseGrabbing = false;
-        setMouseTracking(false);
+    mLastMouseEventPos = event->pos();
+    if(event->button() != Qt::LeftButton) {
         if(event->button() == Qt::RightButton) {
-            mCancelTransform = true;
-            mTransformationFinishedBeforeMouseRelease = true;
+            cancelCurrentTransform();
         }
         return;
     }
-    if(event->button() == Qt::RightButton) {
-        mCancelTransform = true;
-        mTransformationFinishedBeforeMouseRelease = true;
+
+    if(mIsMouseGrabbing) {
+        releaseMouseAndDontTrack();
         return;
     }
+
+    grabMouseAndTrack();
+
     mDoubleClick = false;
     mMovesToSkip = 2;
     mFirstMouseMove = true;
-    mLastMouseEventPos = event->pos();
+
     mLastPressPos = mLastMouseEventPos;
-    if(event->button() == Qt::MiddleButton) {
-        return;
+
+    if(isMovingPath()) {
+        handleMovePathMousePressEvent();
+    } else if(mCurrentMode == PICK_PATH_SETTINGS) {
+        mLastPressedBox = getPathAtFromAllAncestors(mLastPressPos);
     } else {
-        if(isMovingPath()) {
-            handleMovePathMousePressEvent();
-        } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-            mLastPressedBox = getPathAtFromAllAncestors(mLastPressPos);
-        } else {
-            mLastPressedPoint = mCurrentBoxesGroup->getPointAt(mLastMouseEventPos, mCurrentMode);
+        mLastPressedPoint = mCurrentBoxesGroup->getPointAt(mLastMouseEventPos, mCurrentMode);
 
 
-            if(mCurrentMode == CanvasMode::ADD_POINT) {
-                if(mCurrentEndPoint != NULL) {
-                    if(mCurrentEndPoint->isHidden()) {
-                        setCurrentEndPoint(NULL);
-                    }
-                }
-                PathPoint *pathPointUnderMouse = (PathPoint*) mLastPressedPoint;
-                if( (pathPointUnderMouse == NULL) ? false :
-                        !pathPointUnderMouse->isEndPoint() ) {
-                    pathPointUnderMouse = NULL;
-                }
-                if(pathPointUnderMouse == mCurrentEndPoint && pathPointUnderMouse != NULL) {
-                    return;
-                }
-                if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
-                    startNewUndoRedoSet();
-
-                    VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
-                    mCurrentBoxesGroup->clearBoxesSelection();
-                    mCurrentBoxesGroup->addBoxToSelection(newPath);
-                    setCurrentEndPoint(
-                                newPath->addPointAbsPos(mLastMouseEventPos,
-                                                        mCurrentEndPoint) );
-
-                    finishUndoRedoSet();
-                } else {
-                    if(pathPointUnderMouse == NULL) {
-                        setCurrentEndPoint(mCurrentEndPoint->addPointAbsPos(mLastMouseEventPos) );
-                    } else if(mCurrentEndPoint == NULL) {
-                        setCurrentEndPoint(pathPointUnderMouse);
-                    } else {
-                        if(mCurrentEndPoint->getParentPath() == pathPointUnderMouse->getParentPath())
-                        {
-                            pathPointUnderMouse->connectToPoint(mCurrentEndPoint);
-                        }
-                        else {
-                            connectPointsFromDifferentPaths(mCurrentEndPoint, pathPointUnderMouse);
-                        }
-                        setCurrentEndPoint(pathPointUnderMouse);
-                    }
-                } // pats is not null
-            } // point adding mode
-            else if (mCurrentMode == CanvasMode::MOVE_POINT) {
-                if (mLastPressedPoint == NULL) {
-                    if(isCtrlPressed() ) {
-                        mCurrentBoxesGroup->clearPointsSelection();
-                        mLastPressedPoint = mCurrentBoxesGroup->
-                                createNewPointOnLineNearSelected(mLastPressPos,
-                                                                 isShiftPressed());
-                    } else {
-                        mCurrentEdge = mCurrentBoxesGroup->getPressedEdge(
-                                                                mLastPressPos);
-                        if(mCurrentEdge == NULL) {
-                            mSelecting = true;
-                            startSelectionAtPoint(mLastMouseEventPos);
-                        } else {
-                            mCurrentBoxesGroup->clearPointsSelection();
-                        }
-                    }
-                } else {
-                    if(mLastPressedPoint->isSelected()) {
-                        return;
-                    }
-                    if(!isShiftPressed()) {
-                        mCurrentBoxesGroup->clearPointsSelection();
-                    }
+        if(mCurrentMode == CanvasMode::ADD_POINT) {
+            if(mCurrentEndPoint != NULL) {
+                if(mCurrentEndPoint->isHidden()) {
+                    setCurrentEndPoint(NULL);
                 }
             }
-        } // current mode allows interaction with points
+            PathPoint *pathPointUnderMouse = (PathPoint*) mLastPressedPoint;
+            if( (pathPointUnderMouse == NULL) ? false :
+                    !pathPointUnderMouse->isEndPoint() ) {
+                pathPointUnderMouse = NULL;
+            }
+            if(pathPointUnderMouse == mCurrentEndPoint && pathPointUnderMouse != NULL) {
+                return;
+            }
+            if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
+                startNewUndoRedoSet();
+
+                VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
+                mCurrentBoxesGroup->clearBoxesSelection();
+                mCurrentBoxesGroup->addBoxToSelection(newPath);
+                setCurrentEndPoint(
+                            newPath->addPointAbsPos(mLastMouseEventPos,
+                                                    mCurrentEndPoint) );
+
+                finishUndoRedoSet();
+            } else {
+                if(pathPointUnderMouse == NULL) {
+                    setCurrentEndPoint(mCurrentEndPoint->addPointAbsPos(mLastMouseEventPos) );
+                } else if(mCurrentEndPoint == NULL) {
+                    setCurrentEndPoint(pathPointUnderMouse);
+                } else {
+                    if(mCurrentEndPoint->getParentPath() == pathPointUnderMouse->getParentPath())
+                    {
+                        pathPointUnderMouse->connectToPoint(mCurrentEndPoint);
+                    }
+                    else {
+                        connectPointsFromDifferentPaths(mCurrentEndPoint, pathPointUnderMouse);
+                    }
+                    setCurrentEndPoint(pathPointUnderMouse);
+                }
+            } // pats is not null
+        } // point adding mode
+        else if (mCurrentMode == CanvasMode::MOVE_POINT) {
+            if (mLastPressedPoint == NULL) {
+                if(isCtrlPressed() ) {
+                    mCurrentBoxesGroup->clearPointsSelection();
+                    mLastPressedPoint = mCurrentBoxesGroup->
+                            createNewPointOnLineNearSelected(mLastPressPos,
+                                                             isShiftPressed());
+                } else {
+                    mCurrentEdge = mCurrentBoxesGroup->getPressedEdge(
+                                                            mLastPressPos);
+                    if(mCurrentEdge == NULL) {
+                        mSelecting = true;
+                        startSelectionAtPoint(mLastMouseEventPos);
+                    } else {
+                        mCurrentBoxesGroup->clearPointsSelection();
+                    }
+                }
+            } else {
+                if(mLastPressedPoint->isSelected()) {
+                    return;
+                }
+                if(!isShiftPressed() &&
+                        !(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible()) ) {
+                    mCurrentBoxesGroup->clearPointsSelection();
+                }
+                if(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible() ) {
+                    mCurrentBoxesGroup->addPointToSelection(mLastPressedPoint);
+                }
+            }
+        }
+    } // current mode allows interaction with points
+
+    callUpdateSchedulers();
+}
+
+void Canvas::cancelCurrentTransform() {
+    if(mCurrentMode == CanvasMode::MOVE_POINT) {
+        mCurrentBoxesGroup->cancelSelectedPointsTransform();
+    } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
+        if(mCurrentMode == CanvasMode::MOVE_PATH &&
+                mRotPivot->isSelected()) {
+            mRotPivot->cancelTransform();
+        } else {
+            if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
+                mRotPivot->handleMouseRelease();
+            }
+            mCurrentBoxesGroup->cancelSelectedBoxesTransform();
+        }
+    } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+
+    } else if(mCurrentMode == PICK_PATH_SETTINGS) {
+        setCanvasMode(MOVE_PATH);
+    }
+    mTransformationFinishedBeforeMouseRelease = true;
+    if(mIsMouseGrabbing) {
+        releaseMouseAndDontTrack();
     }
 
     callUpdateSchedulers();
 }
 
 void Canvas::handleMovePointMouseRelease(QPointF pos) {
-    if(mCancelTransform) {
-        mCancelTransform = false;
-        mCurrentBoxesGroup->cancelSelectedPointsTransform();
-    } else if(mSelecting) {
+    if(mSelecting) {
         mSelecting = false;
         if(mFirstMouseMove) {
             mLastPressedBox = mCurrentBoxesGroup->getBoxAt(pos);
@@ -185,6 +206,11 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
         }
     } else {
         mCurrentBoxesGroup->finishSelectedPointsTransform();
+        if(mLastPressedPoint != NULL) {
+            if(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible() ) {
+                mCurrentBoxesGroup->removePointFromSelection(mLastPressedPoint);
+            }
+        }
     }
 }
 
@@ -198,15 +224,7 @@ void Canvas::handleMovePathMouseRelease(QPointF pos) {
         mRotPivot->deselect();
     } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
         mRotPivot->handleMouseRelease();
-        if(mCancelTransform) {
-            mCancelTransform = false;
-            mCurrentBoxesGroup->cancelSelectedBoxesTransform();
-        } else {
-            mCurrentBoxesGroup->finishSelectedBoxesTransform();
-        }
-    } else if(mCancelTransform) {
-        mCancelTransform = false;
-        mCurrentBoxesGroup->cancelSelectedBoxesTransform();
+        mCurrentBoxesGroup->finishSelectedBoxesTransform();
     } else if(mFirstMouseMove) {
         mSelecting = false;
         if(isShiftPressed() && mLastPressedBox != NULL) {
@@ -235,25 +253,27 @@ void Canvas::handleAddPointMouseRelease() {
     }
 }
 
-void Canvas::handleMouseRelease(QPointF eventPos, Qt::MouseButton button) {
-    if(mouseGrabber() == this) releaseMouse();
+void Canvas::handleMouseRelease(QPointF eventPos) {
+    if(mTransformationFinishedBeforeMouseRelease) {
+        mTransformationFinishedBeforeMouseRelease = false;
+        return;
+    }
+    if(mIsMouseGrabbing) {
+        releaseMouseAndDontTrack();
+    }
     if(!mDoubleClick) {
-        if(button == Qt::MiddleButton) {
-
-        } else {
-            if(mCurrentMode == CanvasMode::MOVE_POINT) {
-                handleMovePointMouseRelease(eventPos);
-            } else if(isMovingPath()) {
-                handleMovePathMouseRelease(eventPos);
-            } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-                handleAddPointMouseRelease();
-            } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-                if(mLastPressedBox != NULL) {
-                    mFillStrokeSettingsWidget->loadSettingsFromPath(
-                                (VectorPath*) mLastPressedBox);
-                }
-                setCanvasMode(MOVE_PATH);
+        if(mCurrentMode == CanvasMode::MOVE_POINT) {
+            handleMovePointMouseRelease(eventPos);
+        } else if(isMovingPath()) {
+            handleMovePathMouseRelease(eventPos);
+        } else if(mCurrentMode == CanvasMode::ADD_POINT) {
+            handleAddPointMouseRelease();
+        } else if(mCurrentMode == PICK_PATH_SETTINGS) {
+            if(mLastPressedBox != NULL) {
+                mFillStrokeSettingsWidget->loadSettingsFromPath(
+                            (VectorPath*) mLastPressedBox);
             }
+            setCanvasMode(MOVE_PATH);
         }
     }
     mXOnlyTransform = false;
@@ -275,13 +295,8 @@ void Canvas::handleMouseRelease(QPointF eventPos, Qt::MouseButton button) {
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(event->button() == Qt::LeftButton) {
-        if(mTransformationFinishedBeforeMouseRelease) {
-            mTransformationFinishedBeforeMouseRelease = false;
-            return;
-        }
-    }
-    handleMouseRelease(event->pos(), event->button());
+    if(event->button() != Qt::LeftButton) return;
+    handleMouseRelease(event->pos());
 }
 
 QPointF Canvas::getMoveByValueForEventPos(QPointF eventPos) {
@@ -307,11 +322,17 @@ void Canvas::handleMovePointMouseMove(QPointF eventPos) {
     } else {
         if(mLastPressedPoint != NULL) {
             mCurrentBoxesGroup->addPointToSelection(mLastPressedPoint);
-            mLastPressedPoint = NULL;
-        }
 
-        mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
-                                                 mFirstMouseMove);
+            if(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible() ) {
+                if(mFirstMouseMove) {
+                    mLastPressedPoint->startTransform();
+                }
+                mLastPressedPoint->moveBy(getMoveByValueForEventPos(eventPos) );
+            } else {
+                mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
+                                                         mFirstMouseMove);
+            }
+        }
     }
 }
 
@@ -378,7 +399,6 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
     if(event->buttons() & Qt::MiddleButton) {
         moveBy(event->pos() - mLastMouseEventPos);
-        
     } else if(!mTransformationFinishedBeforeMouseRelease) {
         if(mSelecting) {
             moveSecondSelectionPoint(eventPos);

@@ -50,7 +50,7 @@ protected:
 
 private:
     Canvas *mCanvas;
-    qreal mViewedTop;
+    qreal mViewedTop = 0.;
     qreal mViewedBottom;
     MainWindow *mMainWindow;
 };

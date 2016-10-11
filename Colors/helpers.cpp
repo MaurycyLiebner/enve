@@ -387,7 +387,277 @@ void hsl_to_hsv(float* h, float *s, float *l)
     }
 }
 
+void qhsv_to_hsl(qreal* h, qreal* s, qreal *v)
+{
+    qreal hh = *h;
+    qreal ss = *s;
+    qreal vv = *v;
+    *h = hh;
+    *v = (2 - ss) * vv;
+    *s = ss * vv;
+    *s /= (*v <= 1) ? (*v) : 2 - (*v);
+    *v *= 0.5;
+    if(isnan(*s) )
+    {
+        *s = 0.;
+    }
+}
 
+void qhsl_to_hsv(qreal* h, qreal *s, qreal *l)
+{
+    float hh = *h;
+    float ss = *s;
+    float ll = *l;
+    *h = hh;
+    ll *= 2;
+    ss *= (ll <= 1) ? ll : 2 - ll;
+    *l = (ll + ss) *0.5;
+    *s = (2 * ss) / (ll + ss);
+    if(isnan(*s) )
+    {
+        *s = 0.;
+    }
+}
+
+void qhsl_to_rgb(qreal *h_, qreal *s_, qreal *l_)
+{
+  qreal h, s, l;
+  qreal r, g, b;
+
+  h = *h_;
+  s = *s_;
+  l = *l_;
+
+  h = h - floor(h);
+  s = CLAMP(s, 0.0, 1.0);
+  l = CLAMP(l, 0.0, 1.0);
+
+  if (s == 0)
+    {
+      /*  achromatic case  */
+      r = l;
+      g = l;
+      b = l;
+    }
+  else
+    {
+      qreal m1, m2;
+
+      if (l <= 0.5)
+        m2 = l * (1.0 + s);
+      else
+        m2 = l + s - l * s;
+
+      m1 = 2.0 * l - m2;
+
+      r = hsl_value (m1, m2, h * 6.0 + 2.0);
+      g = hsl_value (m1, m2, h * 6.0);
+      b = hsl_value (m1, m2, h * 6.0 - 2.0);
+    }
+
+  *h_ = r;
+  *s_ = g;
+  *l_ = b;
+}
+
+void qrgb_to_hsv(qreal *r_ /*h*/, qreal *g_ /*s*/, qreal *b_ /*v*/)
+{
+  qreal max, min, delta;
+  qreal h, s, v;
+  qreal r, g, b;
+
+  h = 0.0; // silence gcc warning
+
+  r = *r_;
+  g = *g_;
+  b = *b_;
+
+  r = CLAMP(r, 0.0, 1.0);
+  g = CLAMP(g, 0.0, 1.0);
+  b = CLAMP(b, 0.0, 1.0);
+
+  max = MAX3(r, g, b);
+  min = MIN3(r, g, b);
+
+  v = max;
+  delta = max - min;
+
+  if (delta > 0.0001)
+    {
+      s = delta / max;
+
+      if (r == max)
+        {
+          h = (g - b) / delta;
+          if (h < 0.0)
+            h += 6.0;
+        }
+      else if (g == max)
+        {
+          h = 2.0 + (b - r) / delta;
+        }
+      else if (b == max)
+        {
+          h = 4.0 + (r - g) / delta;
+        }
+
+      h /= 6.0;
+    }
+  else
+    {
+      s = 0.0;
+      h = 0.0;
+    }
+
+  *r_ = h;
+  *g_ = s;
+  *b_ = v;
+}
+
+// (from gimp_hsv_to_rgb)
+void qhsv_to_rgb(qreal *h_, qreal *s_, qreal *v_)
+{
+  int    i;
+  qreal f, w, q, t;
+  qreal h, s, v;
+  qreal r, g, b;
+  r = g = b = 0.0; // silence gcc warning
+
+  h = *h_;
+  s = *s_;
+  v = *v_;
+
+  h = h - floor(h);
+  s = CLAMP(s, 0.0, 1.0);
+  v = CLAMP(v, 0.0, 1.0);
+
+  qreal hue;
+
+  if (s == 0.0)
+    {
+      r = v;
+      g = v;
+      b = v;
+    }
+  else
+    {
+      hue = h;
+
+      if (hue == 1.0)
+        hue = 0.0;
+
+      hue *= 6.0;
+
+      i = (int) hue;
+      f = hue - i;
+      w = v * (1.0 - s);
+      q = v * (1.0 - (s * f));
+      t = v * (1.0 - (s * (1.0 - f)));
+
+      switch (i)
+        {
+        case 0:
+          r = v;
+          g = t;
+          b = w;
+          break;
+        case 1:
+          r = q;
+          g = v;
+          b = w;
+          break;
+        case 2:
+          r = w;
+          g = v;
+          b = t;
+          break;
+        case 3:
+          r = w;
+          g = q;
+          b = v;
+          break;
+        case 4:
+          r = t;
+          g = w;
+          b = v;
+          break;
+        case 5:
+          r = v;
+          g = w;
+          b = q;
+          break;
+        }
+    }
+
+  *h_ = r;
+  *s_ = g;
+  *v_ = b;
+}
+
+// (from gimp_rgb_to_hsl)
+void qrgb_to_hsl(qreal *r_, qreal *g_, qreal *b_)
+{
+  qreal max, min, delta;
+
+  qreal h, s, l;
+  qreal r, g, b;
+
+  // silence gcc warnings
+  h=0;
+
+  r = *r_;
+  g = *g_;
+  b = *b_;
+
+  r = CLAMP(r, 0.0, 1.0);
+  g = CLAMP(g, 0.0, 1.0);
+  b = CLAMP(b, 0.0, 1.0);
+
+  max = MAX3(r, g, b);
+  min = MIN3(r, g, b);
+
+  l = (max + min) / 2.0;
+
+  if (max == min)
+    {
+      s = 0.0;
+      h = 0.0; //GIMP_HSL_UNDEFINED;
+    }
+  else
+    {
+      if (l <= 0.5)
+        s = (max - min) / (max + min);
+      else
+        s = (max - min) / (2.0 - max - min);
+
+      delta = max - min;
+
+      if (delta == 0.0)
+        delta = 1.0;
+
+      if (r == max)
+        {
+          h = (g - b) / delta;
+        }
+      else if (g == max)
+        {
+          h = 2.0 + (b - r) / delta;
+        }
+      else if (b == max)
+        {
+          h = 4.0 + (r - g) / delta;
+        }
+
+      h /= 6.0;
+
+      if (h < 0.0)
+        h += 1.0;
+    }
+
+  *r_ = h;
+  *g_ = s;
+  *b_ = l;
+}
 
 bool isNonZero(GLfloat val_t)
 {

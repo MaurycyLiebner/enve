@@ -56,9 +56,14 @@ void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 {
     QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
 
+    mLastPressPos = mCombinedTransformMatrix.inverted().map(mLastPressPos);
+
     mCombinedTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mCombinedTransformMatrix.scale(scaleXBy, scaleYBy);
     mCombinedTransformMatrix.translate(transPoint.x(), transPoint.y());
+
+    mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
+
     updateAfterCombinedTransformationChanged();
 }
 
@@ -226,6 +231,11 @@ bool Canvas::isMovingPath() {
 qreal Canvas::getCurrentCanvasScale()
 {
     return mCombinedTransformMatrix.m11();
+}
+
+void Canvas::ctrlsVisiblityChanged()
+{
+    mCurrentBoxesGroup->updateSelectedPointsAfterCtrlsVisiblityChanged();
 }
 
 QSize Canvas::getCanvasSize()
@@ -420,13 +430,28 @@ void Canvas::updateInputValue() {
     updateTransformation();
 }
 
+void Canvas::grabMouseAndTrack() {
+    mIsMouseGrabbing = true;
+    setMouseTracking(true);
+    grabMouse();
+}
+
+void Canvas::releaseMouseAndDontTrack() {
+    mIsMouseGrabbing = false;
+    setMouseTracking(false);
+    releaseMouse();
+}
+
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
     bool isGrabbingMouse = mouseGrabber() == this;
     if(isGrabbingMouse) {
-        if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        if(event->key() == Qt::Key_Escape) {
+            cancelCurrentTransform();
+            return;
+        } else if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
             mTransformationFinishedBeforeMouseRelease = true;
-            handleMouseRelease(mLastMouseEventPos, Qt::LeftButton);
+            handleMouseRelease(mLastMouseEventPos);
             return;
         } else if(event->key() == Qt::Key_Minus) {
             if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
@@ -510,7 +535,11 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         resetTransormation();
     } else if(event->key() == Qt::Key_Delete) {
        if(mCurrentMode == MOVE_POINT) {
-           mCurrentBoxesGroup->removeSelectedPointsAndClearList();
+           if(isShiftPressed()) {
+               mCurrentBoxesGroup->removeSelectedPointsApproximateAndClearList();
+           } else {
+               mCurrentBoxesGroup->removeSelectedPointsAndClearList();
+           }
        } else if(mCurrentMode == MOVE_PATH) {
            mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
        }
@@ -555,12 +584,10 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
        mLastPressPos = mLastMouseEventPos;
        mRotPivot->startRotating();
-       mIsMouseGrabbing = true;
        mDoubleClick = false;
        mFirstMouseMove = true;
 
-       setMouseTracking(true);
-       grabMouse();
+       grabMouseAndTrack();
     } else if(event->key() == Qt::Key_S && isMovingPath() && !isGrabbingMouse) {
        mTransformationFinishedBeforeMouseRelease = false;
        mXOnlyTransform = false;
@@ -569,12 +596,10 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
        mLastPressPos = mLastMouseEventPos;
        mRotPivot->startScaling();
-       mIsMouseGrabbing = true;
        mDoubleClick = false;
        mFirstMouseMove = true;
 
-       setMouseTracking(true);
-       grabMouse();
+       grabMouseAndTrack();
     } else if(event->key() == Qt::Key_G && (isMovingPath() ||
                                             mCurrentMode == MOVE_POINT) &&
               !isGrabbingMouse) {
@@ -584,12 +609,10 @@ void Canvas::keyPressEvent(QKeyEvent *event)
 
         mLastMouseEventPos = mapFromGlobal(QCursor::pos());
         mLastPressPos = mLastMouseEventPos;
-        mIsMouseGrabbing = true;
         mDoubleClick = false;
         mFirstMouseMove = true;
 
-        setMouseTracking(true);
-        grabMouse();
+        grabMouseAndTrack();
      } else if(event->key() == Qt::Key_A && isCtrlPressed() && !isGrabbingMouse) {
        if(isShiftPressed()) {
            mCurrentBoxesGroup->deselectAllBoxes();
@@ -597,9 +620,10 @@ void Canvas::keyPressEvent(QKeyEvent *event)
            mCurrentBoxesGroup->selectAllBoxes();
        }
     }
-    //schedulePivotUpdate();
 
-    //callUpdateSchedulers();
+    schedulePivotUpdate();
+
+    callUpdateSchedulers();
 }
 
 void Canvas::clearAllPathsSelection() {
@@ -675,7 +699,11 @@ void Canvas::moveBy(QPointF trans)
     trans = getCombinedTransform().inverted().map(trans) -
             getCombinedTransform().inverted().map(QPointF(0, 0));
 
+    mLastPressPos = mCombinedTransformMatrix.inverted().map(mLastPressPos);
+
     mCombinedTransformMatrix.translate(trans.x(), trans.y());
+
+    mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
     updateCombinedTransform();
     schedulePivotUpdate();
 }

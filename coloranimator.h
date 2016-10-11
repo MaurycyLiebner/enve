@@ -27,8 +27,9 @@ public:
 
     QrealKey *getKeyAtPos(qreal relX, qreal relY,
                           int minViewedFrame, qreal pixelsPerFrame);
+    void openContextMenu(QPoint pos);
 private:
-    ColorMode mColorMode;
+    ColorMode mColorMode = RGBMODE;
     QrealAnimator mVal1Animator;
     QrealAnimator mVal2Animator;
     QrealAnimator mVal3Animator;

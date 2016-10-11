@@ -26,9 +26,9 @@ public:
     void setPlaying(bool playing);
 signals:
 
-public slots:
-
 private slots:
+    void setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible);
+
     void playPreview();
 
     void setRecording(bool recording);
@@ -49,7 +49,7 @@ private:
 
     QPushButton *mRecordButton;
     QPushButton *mAllPointsRecordButton;
-    QPushButton *mRemoveKeyButton;
+    QPushButton *mCtrlsAlwaysVisible;
 
     AnimationDockWidget *mAnimationDockWidget;
     QHBoxLayout *mBoxesListKeysViewLayout;

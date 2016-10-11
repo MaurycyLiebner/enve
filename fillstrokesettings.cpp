@@ -234,8 +234,8 @@ PaintSettings::PaintSettings(Color colorT,
                              PaintType paintTypeT,
                              Gradient *gradientT) : ComplexAnimator() {
     setName("fill");
+    mColor.blockPointer();
     mColor.setCurrentValue(colorT);
-    mColor.incNumberPointers();
     mPaintType = paintTypeT;
     mGradient = gradientT;
 
@@ -295,6 +295,7 @@ StrokeSettings::StrokeSettings(Color colorT,
     mLineWidth.setName("thickness");
 
     addChildAnimator(&mLineWidth);
+    mLineWidth.blockPointer();
 
     mLineWidth.setValueRange(0., mLineWidth.getMaxPossibleValue());
 }

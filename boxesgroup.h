@@ -22,6 +22,8 @@ public:
     BoxesGroup(int boundingBoxId,
                FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
 
+    ~BoxesGroup();
+
     bool pointInsidePath(QPointF absPos);
     QRectF getBoundingRect();
     void draw(QPainter *p);
@@ -183,7 +185,13 @@ public:
                          QPointF absOrigin, bool startTrans);
     const PaintSettings *getFillSettings();
     const StrokeSettings *getStrokeSettings();
+
+    static bool getCtrlsAlwaysVisible();
+    static void setCtrlsAlwaysVisible(bool bT);
+    void updateSelectedPointsAfterCtrlsVisiblityChanged();
+    void removeSelectedPointsApproximateAndClearList();
 protected:
+    static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
     QList<MovablePoint*> mSelectedPoints;

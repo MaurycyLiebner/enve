@@ -71,7 +71,7 @@ void getCtrlsSmoothPos(QPointF endPos, QPointF startPos, QPointF centerPos,
     QPointF newStartDirection =
             scalePointToNewLen(
                 (symEndPos*len1 + startPos*len2)/lenSum - centerPos,
-                1.f);
+                1.);
     qreal startCtrlPtLen =
             abs(QPointF::dotProduct(point2Rel, newStartDirection));
     *newStartPos = newStartDirection*startCtrlPtLen +
@@ -83,6 +83,12 @@ void getCtrlsSmoothPos(QPointF endPos, QPointF startPos, QPointF centerPos,
 }
 
 qreal clamp(qreal val, qreal min, qreal max) {
+    if(val > max) return max;
+    if(val < min) return min;
+    return val;
+}
+
+qreal qclamp(qreal val, qreal min, qreal max) {
     if(val > max) return max;
     if(val < min) return min;
     return val;

@@ -26,6 +26,11 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
     mAlphaAnimator.setValueRange(0., 1.);
     mAlphaAnimator.setPrefferedValueStep(0.05);
     mAlphaAnimator.freezeMinMaxValues();
+
+    mVal1Animator.blockPointer();
+    mVal2Animator.blockPointer();
+    mVal3Animator.blockPointer();
+    mAlphaAnimator.blockPointer();
 }
 
 void ColorAnimator::setCurrentValue(Color colorValue, bool finish)
@@ -119,6 +124,55 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
         mVal2Animator.setName("saturation");
         mVal3Animator.setName("lightness");
     }
+    if(mColorMode == colorMode) return;
+
+    void (*foo)(qreal*, qreal*, qreal*);
+    if(mColorMode == RGBMODE && colorMode == HSVMODE) {
+        foo = &qrgb_to_hsv;
+    } else if(mColorMode == RGBMODE && colorMode == HSLMODE) {
+        foo = &qrgb_to_hsl;
+    } else if(mColorMode == HSVMODE && colorMode == RGBMODE) {
+        foo = &qhsv_to_rgb;
+    } else if(mColorMode == HSVMODE && colorMode == HSLMODE) {
+        foo = &qhsv_to_hsl;
+    } else if(mColorMode == HSLMODE && colorMode == RGBMODE) {
+        foo = &qhsl_to_rgb;
+    } else if(mColorMode == HSLMODE && colorMode == HSVMODE) {
+        foo = &qhsl_to_hsv;
+    } else {
+        return;
+    }
+
+    qreal crF = mVal1Animator.getCurrentValue();
+    qreal cgF = mVal2Animator.getCurrentValue();
+    qreal cbF = mVal3Animator.getCurrentValue();
+
+    foreach(QrealKey *key, mKeys) {
+        int frame = key->getFrame();
+
+        qreal rF = mVal1Animator.getValueAtFrame(frame);
+        qreal gF = mVal2Animator.getValueAtFrame(frame);
+        qreal bF = mVal3Animator.getValueAtFrame(frame);
+
+        foo(&rF, &gF, &bF);
+
+        mVal1Animator.saveValueToKey(frame, rF);
+        mVal2Animator.saveValueToKey(frame, gF);
+        mVal3Animator.saveValueToKey(frame, bF);
+    }
+
+    foo(&crF, &cgF, &cbF);
+
+    mVal1Animator.setCurrentValue(crF);
+    mVal2Animator.setCurrentValue(cgF);
+    mVal3Animator.setCurrentValue(cbF);
+
+    if(!mKeys.isEmpty()) {
+        mVal1Animator.setRecording(true);
+        mVal2Animator.setRecording(true);
+        mVal3Animator.setRecording(true);
+    }
+
     mColorMode = colorMode;
 }
 
@@ -140,4 +194,50 @@ void ColorAnimator::startVal3Transform()
 void ColorAnimator::startAlphaTransform()
 {
     mAlphaAnimator.startTransform();
+}
+
+void ColorAnimator::openContextMenu(QPoint pos) {
+    QMenu menu;
+    menu.addAction("Add Key");
+
+    QMenu colorModeMenu;
+    colorModeMenu.setTitle("Color Mode");
+
+    QAction *rgbAction = new QAction("RGB");
+    rgbAction->setCheckable(true);
+    rgbAction->setChecked(mColorMode == RGBMODE);
+
+    QAction *hsvAction = new QAction("HSV");
+    hsvAction->setCheckable(true);
+    hsvAction->setChecked(mColorMode == HSVMODE);
+
+    QAction *hslAction = new QAction("HSL");
+    hslAction->setCheckable(true);
+    hslAction->setChecked(mColorMode == HSLMODE);
+
+    colorModeMenu.addAction(rgbAction);
+    colorModeMenu.addAction(hsvAction);
+    colorModeMenu.addAction(hslAction);
+    menu.addMenu(&colorModeMenu);
+    QAction *selected_action = menu.exec(pos);
+    if(selected_action != NULL)
+    {
+        if(selected_action->text() == "Add Key")
+        {
+            if(!mIsRecording) {
+                setRecording(true);
+            }
+            saveCurrentValueAsKey();
+        } else if(selected_action == rgbAction) {
+            setColorMode(RGBMODE);
+        } else if(selected_action == hsvAction) {
+            setColorMode(HSVMODE);
+        } else if(selected_action == hslAction) {
+            setColorMode(HSLMODE);
+        }
+
+        callUpdateSchedulers();
+    } else {
+
+    }
 }

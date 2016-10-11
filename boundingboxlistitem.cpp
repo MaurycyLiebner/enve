@@ -207,7 +207,7 @@ void BoundingBox::drawListItem(QPainter *p, qreal drawX, qreal drawY,
 
     p->setPen(Qt::black);
     if(mSelected) {
-        p->setBrush(QColor(185, 185, 185));
+        p->setBrush(QColor(185, 185, 255));
     } else {
         p->setBrush(QColor(225, 225, 225));
     }

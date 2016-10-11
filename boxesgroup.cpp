@@ -4,6 +4,8 @@
 #include "mainwindow.h"
 #include "ctrlpoint.h"
 
+bool BoxesGroup::mCtrlsAlwaysVisible = false;
+
 bool zLessThan(BoundingBox *box1, BoundingBox *box2)
 {
     return box1->getZIndex() > box2->getZIndex();
@@ -23,7 +25,17 @@ BoxesGroup::BoxesGroup(int boundingBoxId,
     loadChildrenFromSql(QString::number(boundingBoxId), false);
 }
 
-PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos, bool adjust) {
+BoxesGroup::~BoxesGroup()
+{
+    clearBoxesSelection();
+    clearPointsSelection();
+    foreach(BoundingBox *box, mChildren) {
+        box->decNumberPointers();
+    }
+}
+
+PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos,
+                                                        bool adjust) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         PathPoint *point = box->createNewPointOnLineNear(absPos, adjust);
         if(point != NULL) {
@@ -129,7 +141,8 @@ void BoxesGroup::setSelectedStrokeFlatColor(Color color, bool finish) {
     }
 }
 
-void BoxesGroup::setSelectedFillPaintType(PaintType paintType, Color color, Gradient *gradient) {
+void BoxesGroup::setSelectedFillPaintType(PaintType paintType,
+                                          Color color, Gradient *gradient) {
     startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFillPaintType(paintType, color, gradient);
@@ -137,7 +150,8 @@ void BoxesGroup::setSelectedFillPaintType(PaintType paintType, Color color, Grad
     finishUndoRedoSet();
 }
 
-void BoxesGroup::setSelectedStrokePaintType(PaintType paintType, Color color, Gradient *gradient) {
+void BoxesGroup::setSelectedStrokePaintType(PaintType paintType,
+                                            Color color, Gradient *gradient) {
     startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokePaintType(paintType, color, gradient);
@@ -432,7 +446,8 @@ void BoxesGroup::setStrokeSettings(StrokeSettings strokeSettings,
     }
 }
 
-void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
+void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings,
+                                         bool saveUndoRedo)
 {
     if(saveUndoRedo) {
         startNewUndoRedoSet();
@@ -445,7 +460,8 @@ void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings, bool saveUn
     }
 }
 
-void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
+void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings,
+                                           bool saveUndoRedo)
 {
     if(saveUndoRedo) {
         startNewUndoRedoSet();
@@ -631,6 +647,18 @@ void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     }
 }
 
+void BoxesGroup::removeSelectedPointsApproximateAndClearList() {
+    startNewUndoRedoSet();
+
+    foreach(MovablePoint *point, mSelectedPoints) {
+        point->deselect();
+        point->removeApproximate();
+    }
+    mSelectedPoints.clear(); schedulePivotUpdate();
+
+    finishUndoRedoSet();
+}
+
 void BoxesGroup::removeSelectedPointsAndClearList()
 {
     startNewUndoRedoSet();
@@ -671,6 +699,29 @@ const PaintSettings *BoxesGroup::getFillSettings() {
 
 const StrokeSettings *BoxesGroup::getStrokeSettings() {
     return mChildren.first()->getStrokeSettings();
+}
+
+void BoxesGroup::updateSelectedPointsAfterCtrlsVisiblityChanged() {
+    if(!BoxesGroup::mCtrlsAlwaysVisible) {
+        QList<MovablePoint*> pointsToDeselect;
+        foreach(MovablePoint *point, mSelectedPoints) {
+            pointsToDeselect << point;
+        }
+        foreach(MovablePoint *point, pointsToDeselect) {
+            removePointFromSelection(point);
+        }
+    }
+}
+
+bool BoxesGroup::getCtrlsAlwaysVisible()
+{
+    return BoxesGroup::mCtrlsAlwaysVisible;
+}
+
+void BoxesGroup::setCtrlsAlwaysVisible(bool bT)
+{
+    BoxesGroup::mCtrlsAlwaysVisible = bT;
+    MainWindow::getInstance()->getCanvas()->ctrlsVisiblityChanged();
 }
 
 void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {

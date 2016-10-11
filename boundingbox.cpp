@@ -11,6 +11,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
 {
     addActiveAnimator(&mTransformAnimator);
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
+    mTransformAnimator.blockPointer();
 
     mBoxesList = getMainWindow()->getBoxesList();
     mKeysView = getMainWindow()->getKeysView();

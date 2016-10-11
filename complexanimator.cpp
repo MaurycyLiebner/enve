@@ -9,6 +9,13 @@ ComplexAnimator::ComplexAnimator() :
     mCurrentValue = 0.;
 }
 
+ComplexAnimator::~ComplexAnimator()
+{
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->decNumberPointers();
+    }
+}
+
 #include <QDebug>
 void ComplexAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
                                qreal startX, qreal startY, qreal height,

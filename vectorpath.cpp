@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include "updatescheduler.h"
 #include "pathpivot.h"
+#include "pointhelpers.h"
 
 VectorPath::VectorPath(BoxesGroup *group) :
     BoundingBox(group,
@@ -18,10 +19,14 @@ VectorPath::VectorPath(BoxesGroup *group) :
     mAnimatorsCollection.addAnimator(&mFillPaintSettings);
     mAnimatorsCollection.addAnimator(&mStrokeSettings);
 
+    mPathAnimator.blockPointer();
+    mFillPaintSettings.blockPointer();
+    mStrokeSettings.blockPointer();
+
     mFillGradientPoints.initialize(this);
-    mFillGradientPoints.incNumberPointers();
+    mFillGradientPoints.blockPointer();
     mStrokeGradientPoints.initialize(this);
-    mStrokeGradientPoints.incNumberPointers();
+    mStrokeGradientPoints.blockPointer();
 
     mFillPaintSettings.setGradientPoints(&mFillGradientPoints);
     mStrokeSettings.setGradientPoints(&mStrokeGradientPoints);
@@ -91,6 +96,19 @@ VectorPath::VectorPath(int boundingBoxId,
     }
 }
 
+VectorPath::~VectorPath()
+{
+    foreach(PathPoint *point, mPoints) {
+        point->decNumberPointers();
+    }
+    if(mFillPaintSettings.getGradient() != NULL) {
+        mFillPaintSettings.getGradient()->removePath(this);
+    }
+    if(mStrokeSettings.getGradient() != NULL) {
+        mStrokeSettings.getGradient()->removePath(this);
+    }
+}
+
 void VectorPath::loadPointsFromSql(int vectorPathId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT id, isfirst, isendpoint, movablepointid "
@@ -153,14 +171,14 @@ qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
 
 qreal VectorPath::findPercentForPoint(QPointF point,
                                       qreal minPercent, qreal maxPercent) {
-    qreal smallestStep = 0.00001f;
+    qreal smallestStep = 0.00001;
     QPointF nearestPoint;
-    qreal smallestDist = 1000000.f;
+    qreal smallestDist = 1000000.;
     qreal nearestPercent = minPercent;
-    qreal percentStep = (maxPercent - minPercent)*0.01f;
-    if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5f;
+    qreal percentStep = (maxPercent - minPercent)*0.01;
+    if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5;
     qreal currPercent = minPercent;
-    for(int i = 0; i < 100; i++) {
+    while(currPercent < maxPercent) {
         QPointF testPoint = mMappedPath.pointAtPercent(currPercent);
         qreal dist = distBetweenTwoPoints(testPoint, point);
         if(dist < smallestDist) {
@@ -170,20 +188,21 @@ qreal VectorPath::findPercentForPoint(QPointF point,
         }
         currPercent += percentStep;
     }
-    return findPercentForPoint(point, nearestPercent - percentStep,
-                               nearestPercent + percentStep);
+    return findPercentForPoint(point,
+                               qclamp(nearestPercent - percentStep, 0., 1.),
+                               qclamp(nearestPercent + percentStep, 0., 1.) );
 }
 
 qreal VectorPath::findPercentForPointEditPath(QPointF point,
                                       qreal minPercent, qreal maxPercent) {
-    qreal smallestStep = 0.00001f;
+    qreal smallestStep = 0.00001;
     QPointF nearestPoint;
-    qreal smallestDist = 1000000.f;
+    qreal smallestDist = 1000000.;
     qreal nearestPercent = minPercent;
-    qreal percentStep = (maxPercent - minPercent)*0.01f;
-    if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5f;
+    qreal percentStep = (maxPercent - minPercent)*0.01;
+    if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5;
     qreal currPercent = minPercent;
-    for(int i = 0; i < 100; i++) {
+    while(currPercent < maxPercent) {
         QPointF testPoint = mMappedEditPath.pointAtPercent(currPercent);
         qreal dist = distBetweenTwoPoints(testPoint, point);
         if(dist < smallestDist) {
@@ -193,8 +212,9 @@ qreal VectorPath::findPercentForPointEditPath(QPointF point,
         }
         currPercent += percentStep;
     }
-    return findPercentForPointEditPath(point, nearestPercent - percentStep,
-                                       nearestPercent + percentStep);
+    return findPercentForPointEditPath(point,
+                                       qclamp(nearestPercent - percentStep, 0., 1.),
+                                       qclamp(nearestPercent + percentStep, 0., 1.) );
 }
 
 PathPoint *VectorPath::findPointNearestToPercent(qreal percent,
@@ -250,7 +270,7 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
 
 PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
 {
-    qreal maxDist = 14.f;
+    qreal maxDist = 14.;
     if(!mMappedPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
         return NULL;
@@ -343,7 +363,7 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
 }
 
 Edge *VectorPath::getEdgeFromMappedPath(QPointF absPos) {
-    qreal maxDist = 14.f;
+    qreal maxDist = 14.;
     if(!mMappedPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
         return NULL;
@@ -389,13 +409,6 @@ Edge *VectorPath::getEdgeFromMappedPath(QPointF absPos) {
         }
     }
 
-    if(!nextPoint->isStartCtrlPtEnabled() ) {
-        nextPoint->setStartCtrlPtEnabled(true);
-    }
-    if(!prevPoint->isEndCtrlPtEnabled() ) {
-        prevPoint->setEndCtrlPtEnabled(true);
-    }
-
     qreal percent1 = findPercentForPoint(prevPoint->getAbsolutePos());
     qreal percent2 = findPercentForPoint(nextPoint->getAbsolutePos());
     if(percent2 < percent1 ) {
@@ -416,7 +429,7 @@ Edge *VectorPath::getEdgeFromMappedPath(QPointF absPos) {
 
 Edge *VectorPath::getEdgeFromMappedEditPath(QPointF absPos)
 {
-    qreal maxDist = 14.f;
+    qreal maxDist = 14.;
     if(!mMappedEditPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
         return NULL;
@@ -442,13 +455,6 @@ Edge *VectorPath::getEdgeFromMappedEditPath(QPointF absPos)
     } else {
         nextPoint = nearestPoint->getNextPoint();
         prevPoint = nearestPoint;
-    }
-
-    if(!nextPoint->isStartCtrlPtEnabled() ) {
-        nextPoint->setStartCtrlPtEnabled(true);
-    }
-    if(!prevPoint->isEndCtrlPtEnabled() ) {
-        prevPoint->setEndCtrlPtEnabled(true);
     }
 
     qreal percent1 = findPercentForPointEditPath(prevPoint->getAbsolutePos());
@@ -482,7 +488,7 @@ Edge *VectorPath::getEgde(QPointF absPos) {
 
 void VectorPath::centerPivotPosition() {
     if(!mPivotChanged) {
-        QPointF posSum = QPointF(0.f, 0.f);
+        QPointF posSum = QPointF(0., 0.);
         int count = mPoints.length();
         if(count == 0) return;
         foreach(PathPoint *point, mPoints) {
@@ -788,6 +794,19 @@ void VectorPath::updateMappedPath()
     updateDrawGradients();
 }
 
+void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
+    PathPoint *nextPoint = pointToRemove->getNextPoint();
+    PathPoint *prevPoint = pointToRemove->getPreviousPoint();
+    if(nextPoint == NULL || prevPoint == NULL) return;
+
+    QPointF absPos = pointToRemove->getAbsolutePos();
+
+    pointToRemove->remove();
+
+    Edge newEdge = Edge(prevPoint, nextPoint, 0.5);
+    newEdge.makePassThrough(absPos);
+}
+
 void VectorPath::updateDrawGradients()
 {
     if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
@@ -977,7 +996,7 @@ PathPoint* VectorPath::addPointAbsPos(QPointF absPtPos, PathPoint *toPoint)
 
 PathPoint *VectorPath::addPointRelPos(QPointF relPtPos, PathPoint *toPoint)
 {
-    PathPoint *newPoint = new PathPoint(QPointF(0.f, 0.f), this);
+    PathPoint *newPoint = new PathPoint(QPointF(0., 0.), this);
     newPoint->setRelativePos(relPtPos);
 
     return addPoint(newPoint, toPoint);
@@ -1100,6 +1119,12 @@ void VectorPath::finishAllPointsTransform()
 GradientPoints::GradientPoints() : ComplexAnimator()
 {
     setName("gradient points");
+}
+
+GradientPoints::~GradientPoints()
+{
+    startPoint->decNumberPointers();
+    endPoint->decNumberPointers();
 }
 
 void GradientPoints::initialize(VectorPath *parentT,

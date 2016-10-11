@@ -14,6 +14,9 @@ public:
     void finishTransform();
     void setOtherCtrlPt(CtrlPoint *ctrlPt);
     void remove();
+
+    bool isHidden();
+
     CtrlPoint(qreal relPosX, qreal relPosY,
               PathPoint *parentPoint, bool isStartCtrlPt);
     CtrlPoint(int movablepointid, PathPoint *parentPoint, bool isStartCtrlPt);
