@@ -375,6 +375,7 @@ private:
     QPointF getMoveByValueForEventPos(QPointF eventPos);
     void cancelCurrentTransform();
     void releaseMouseAndDontTrack();
+    void groupSelectedBoxesAction();
 };
 
 #endif // CANVAS_H

@@ -23,12 +23,6 @@ void KeysView::setGraphViewed(bool bT) {
     mGraphControls->setVisible(bT);
 }
 
-void KeysView::ifIsCurrentAnimatorSetNull(QrealAnimator *animator) {
-    if(mAnimator == animator) {
-        graphSetAnimator(NULL);
-    }
-}
-
 void KeysView::middlePress(QPointF pressPos)
 {
     mSavedMinViewedFrame = mMinViewedFrame;
@@ -79,7 +73,10 @@ void KeysView::wheelEvent(QWheelEvent *e) {
 }
 
 void KeysView::mousePressEvent(QMouseEvent *e) {
-    if(mAnimator == NULL) {
+    if(mGraphViewed) {
+        graphMousePressEvent(e->pos(),
+                             e->button());
+    } else {
         if(e->button() == Qt::MiddleButton) {
             middlePress(e->pos() );
         } else {
@@ -109,9 +106,6 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 }
             }
         }
-    } else {
-        graphMousePressEvent(e->pos(),
-                             e->button());
     }
 
     mMainWindow->callUpdateSchedulers();
@@ -165,7 +159,7 @@ void KeysView::paintEvent(QPaintEvent *) {
         }
     }
     int minFrame = mMainWindow->getMinFrame();
-    if(mAnimator != NULL) {
+    if(mGraphViewed) {
         while(xT + minFrame*mPixelsPerFrame < 38.) {
             minFrame++;
         }
@@ -215,7 +209,10 @@ void KeysView::paintEvent(QPaintEvent *) {
 
 void KeysView::mouseMoveEvent(QMouseEvent *event)
 {
-    if(mAnimator == NULL) {
+    if(mGraphViewed) {
+        graphMouseMoveEvent(event->pos(),
+                            event->buttons());
+    } else {
         if(event->buttons() == Qt::MiddleButton) {
             middleMove(event->pos() );
             emit changedViewedFrames(mMinViewedFrame,
@@ -234,9 +231,6 @@ void KeysView::mouseMoveEvent(QMouseEvent *event)
                 mSelectionRect.setBottomRight(event->pos() );
             }
         }
-    } else {
-        graphMouseMoveEvent(event->pos(),
-                            event->buttons());
     }
 
 
@@ -245,7 +239,9 @@ void KeysView::mouseMoveEvent(QMouseEvent *event)
 
 void KeysView::mouseReleaseEvent(QMouseEvent *e)
 {
-    if(mAnimator == NULL) {
+    if(mGraphViewed) {
+        graphMouseReleaseEvent(e->button());
+    } else {
         if(mSelecting) {
             if(mFirstMove) {
                 if(!mMainWindow->isShiftPressed()) {
@@ -295,8 +291,6 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e)
             mMoveDFrame = 0;
             mMovingKeys = false;
         }
-    } else {
-        graphMouseReleaseEvent(e->button());
     }
 
 
@@ -308,7 +302,7 @@ void KeysView::setFramesRange(int startFrame, int endFrame)
     mMinViewedFrame = startFrame;
     mMaxViewedFrame = endFrame;
     updatePixelsPerFrame();
-    if(mAnimator != NULL) {
+    if(mGraphViewed) {
         graphUpdateDimensions();
         graphUpdateDrawPathIfNeeded();
     }

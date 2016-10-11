@@ -338,9 +338,9 @@ void MainWindow::setCurrentFrame(int frame)
     callUpdateSchedulers();
 }
 
-void MainWindow::setRecording(bool recording)
+void MainWindow::setGraphEnabled(bool graphEnabled)
 {
-    mRecording = recording;
+    mKeysView->setGraphViewed(graphEnabled);
 }
 
 void MainWindow::setAllPointsRecord(bool allPointsRecord)

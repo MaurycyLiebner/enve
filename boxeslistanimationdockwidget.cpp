@@ -61,15 +61,16 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     connect(mPlayButton, SIGNAL(pressed()),
             this, SLOT(playPreview()) );
 
-    mRecordButton = new QPushButton(
-                QIcon("pixmaps/icons/not_recording.png"), "", this);
-    mRecordButton->setSizePolicy(QSizePolicy::Maximum,
+    mGraphEnabledButton = new QPushButton(
+                QIcon("pixmaps/icons/graphDisabled.png"), "", this);
+    mGraphEnabledButton->setSizePolicy(QSizePolicy::Maximum,
                                QSizePolicy::Maximum);
-    mRecordButton->setCheckable(true);
-    connect(mRecordButton, SIGNAL(toggled(bool)),
-            this, SLOT(setRecording(bool)) );
-    connect(mRecordButton, SIGNAL(toggled(bool)),
-            parent, SLOT(setRecording(bool)) );
+    mGraphEnabledButton->setCheckable(true);
+    mGraphEnabledButton->setChecked(false);
+    connect(mGraphEnabledButton, SIGNAL(toggled(bool)),
+            this, SLOT(setGraphEnabled(bool)) );
+    connect(mGraphEnabledButton, SIGNAL(toggled(bool)),
+            parent, SLOT(setGraphEnabled(bool)) );
 
     mAllPointsRecordButton = new QPushButton(
                 QIcon("pixmaps/icons/recordSinglePoint.png"), "", this);
@@ -115,8 +116,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlButtonsLayout->addWidget(mPlayButton);
     mPlayButton->setFocusPolicy(Qt::NoFocus);
 
-    mControlButtonsLayout->addWidget(mRecordButton);
-    mRecordButton->setFocusPolicy(Qt::NoFocus);
+    mControlButtonsLayout->addWidget(mGraphEnabledButton);
+    mGraphEnabledButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mAllPointsRecordButton);
     mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mCtrlsAlwaysVisible);
@@ -197,12 +198,12 @@ void BoxesListAnimationDockWidget::playPreview()
     mMainWindow->playPreview();
 }
 
-void BoxesListAnimationDockWidget::setRecording(bool recording)
+void BoxesListAnimationDockWidget::setGraphEnabled(bool graphEnabled)
 {
-    if(recording) {
-        mRecordButton->setIcon(QIcon("pixmaps/icons/recording.png") );
+    if(graphEnabled) {
+        mGraphEnabledButton->setIcon(QIcon("pixmaps/icons/graphEnabled.png") );
     } else {
-        mRecordButton->setIcon(QIcon("pixmaps/icons/not_recording.png") );
+        mGraphEnabledButton->setIcon(QIcon("pixmaps/icons/graphDisabled.png") );
     }
 }
 

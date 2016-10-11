@@ -24,6 +24,7 @@ enum CanvasMode : short;
 
 enum BoundingBoxType {
     TYPE_VECTOR_PATH,
+    TYPE_CIRCLE,
     TYPE_BONE,
     TYPE_GROUP,
     TYPE_CANVAS

@@ -29,7 +29,58 @@ void Canvas::mousePressEvent(QMouseEvent *event)
     mLastMouseEventPos = event->pos();
     if(event->button() != Qt::LeftButton) {
         if(event->button() == Qt::RightButton) {
-            cancelCurrentTransform();
+            if(mIsMouseGrabbing) {
+                cancelCurrentTransform();
+            } else {
+                BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(
+                                                                event->pos());
+                if(pressedBox == NULL) {
+                    mCurrentBoxesGroup->clearBoxesSelection();
+
+                    QMenu menu;
+
+                    menu.addAction("Paste");
+
+                    QAction *selectedAction = menu.exec(event->globalPos());
+                    if(selectedAction != NULL) {
+                        if(selectedAction->text() == "Paste") {
+                        }
+
+                        callUpdateSchedulers();
+                    } else {
+
+                    }
+                } else {
+                    if(!pressedBox->isSelected()) {
+                        mCurrentBoxesGroup->clearBoxesSelection();
+                        mCurrentBoxesGroup->addBoxToSelection(pressedBox);
+                    }
+
+                    QMenu menu;
+
+                    menu.addAction("Copy");
+                    menu.addAction("Cut");
+                    menu.addAction("Duplicate");
+                    menu.addAction("Group");
+                    menu.addAction("Ungroup");
+                    menu.addAction("Delete");
+
+                    QAction *selectedAction = menu.exec(event->globalPos());
+                    if(selectedAction != NULL) {
+                        if(selectedAction->text() == "Delete") {
+                            mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
+                        } else if(selectedAction->text() == "Group") {
+                            groupSelectedBoxesAction();
+                        } else if(selectedAction->text() == "Ungroup") {
+                            mCurrentBoxesGroup->ungroupSelected();
+                        }
+
+                        callUpdateSchedulers();
+                    } else {
+
+                    }
+                }
+            }
         }
         return;
     }

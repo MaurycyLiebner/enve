@@ -31,7 +31,7 @@ private slots:
 
     void playPreview();
 
-    void setRecording(bool recording);
+    void setGraphEnabled(bool recording);
 
     void setAllPointsRecord(bool allPointsRecord);
 private:
@@ -47,7 +47,7 @@ private:
 
     QPushButton *mPlayButton;
 
-    QPushButton *mRecordButton;
+    QPushButton *mGraphEnabledButton;
     QPushButton *mAllPointsRecordButton;
     QPushButton *mCtrlsAlwaysVisible;
 

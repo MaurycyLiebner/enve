@@ -131,7 +131,7 @@ public:
     void updateDisplayedFillStrokeSettingsIfNeeded();
 public slots:
     void setCurrentFrame(int frame);
-    void setRecording(bool recording);
+    void setGraphEnabled(bool graphEnabled);
     void setAllPointsRecord(bool allPointsRecord);
     void playPreview();
     void stopPreview();

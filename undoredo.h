@@ -148,7 +148,7 @@ public:
 private:
     MainWindow *mMainWindow;
     int mNumberOfSets = 0;
-    UndoRedoSet *mCurrentSet;
+    UndoRedoSet *mCurrentSet = NULL;
     QList<UndoRedo*> mUndoStack;
     QList<UndoRedo*> mRedoStack;
 };

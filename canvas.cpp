@@ -442,6 +442,13 @@ void Canvas::releaseMouseAndDontTrack() {
     releaseMouse();
 }
 
+void Canvas::groupSelectedBoxesAction() {
+    BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
+    if(newGroup != NULL) {
+        setCurrentBoxesGroup(newGroup);
+    }
+}
+
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
     bool isGrabbingMouse = mouseGrabber() == this;
@@ -547,10 +554,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        if(isShiftPressed()) {
            mCurrentBoxesGroup->ungroupSelected();
        } else {
-           BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
-           if(newGroup != NULL) {
-               setCurrentBoxesGroup(newGroup);
-           }
+           groupSelectedBoxesAction();
        }
 
     } else if(event->key() == Qt::Key_PageUp) {

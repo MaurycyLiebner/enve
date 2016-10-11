@@ -171,6 +171,9 @@ public:
     void setTraceKeyOnCurrentFrame(bool bT);
     virtual void openContextMenu(QPoint pos);
     void saveValueToKey(int frame, qreal value);
+    void removeThisFromGraphAnimator();
+
+    void setAnimatorColor(QColor color);
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 
@@ -205,6 +208,8 @@ protected:
     bool mIsComplexAnimator = false;
 
     qreal mPrefferedValueStep = 1.;
+
+    QColor mAnimatorColor;
 };
 #include <QMenu>
 class QrealAnimatorSpin : public QMenu

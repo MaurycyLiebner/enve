@@ -47,7 +47,7 @@ public:
     void graphMouseReleaseEvent(Qt::MouseButton eventButton);
     bool graphProcessFilteredKeyEvent(QKeyEvent *event);
     void graphResizeEvent(QResizeEvent *);
-    void graphSetAnimator(QrealAnimator *animator);
+    void graphAddViewedAnimator(QrealAnimator *animator);
     void graphIncScale(qreal inc);
     void graphSetScale(qreal scale);
     void graphUpdateDimensions();
@@ -72,12 +72,13 @@ public:
     void scheduleGraphUpdateAfterKeysChanged();
     void graphUpdateAfterKeysChangedIfNeeded();
     bool processFilteredKeyEvent(QKeyEvent *event);
-    void ifIsCurrentAnimatorSetNull(QrealAnimator *animator);
     void deleteSelectedKeys();
     void middleMove(QPointF movePos);
     void middlePress(QPointF pressPos);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *e);
+    void graphRemoveViewedAnimator(QrealAnimator *animator);
+    void updateAnimatorsColors();
 protected:
     void resizeEvent(QResizeEvent *e);
 
@@ -103,6 +104,8 @@ public slots:
     void graphSetRightSideCtrlForSelected();
     void graphSetLeftSideCtrlForSelected();
     void graphSetNoSideCtrlForSelected();
+
+    void graphClearAnimatorSelection();
 private:
     AnimationDockWidget *mGraphControls = NULL;
 
@@ -112,7 +115,7 @@ private:
     bool mGraphViewed = false;
     qreal mPixelsPerFrame;
     QPointF mMiddlePressPos;
-    QrealAnimator *mAnimator = NULL;
+    QList<QrealAnimator*> mAnimators;
 
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
@@ -146,6 +149,8 @@ private:
     qreal mSavedMaxViewedFrame;
     qreal mSavedMinShownValue;
     qreal mValueInc;
+    void graphConstrainAnimatorCtrlsFrameValues();
+    void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
 };
 
 #endif // KEYSVIEW_H

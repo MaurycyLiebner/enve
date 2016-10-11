@@ -110,6 +110,9 @@ void QrealAnimator::drawBoxesList(QPainter *p,
                                   qreal drawX, qreal drawY)
 {
     if(mIsCurrentAnimator) {
+        p->fillRect(drawX - 5, drawY,
+                    5, LIST_ITEM_HEIGHT,
+                    mAnimatorColor);
         p->fillRect(drawX, drawY,
                     LIST_ITEM_MAX_WIDTH - drawX, LIST_ITEM_HEIGHT,
                     QColor(255, 255, 255, 125));
@@ -167,8 +170,12 @@ void QrealAnimator::handleListItemMousePress(qreal boxesListX,
         } else if(relX < 2*LIST_ITEM_CHILD_INDENT) {
             setBoxesListDetailVisible(!mBoxesListDetailVisible);
         } else if(boxesListX < LIST_ITEM_MAX_WIDTH - 80 || mIsComplexAnimator) {
-            getMainWindow()->getKeysView()->
-                    graphSetAnimator(this);
+            if(mIsCurrentAnimator) {
+                removeThisFromGraphAnimator();
+            } else {
+                mMainWindow->getKeysView()->
+                        graphAddViewedAnimator(this);
+            }
         } else {
             QrealAnimatorSpin *spin = new QrealAnimatorSpin(this);
             spin->show();
@@ -258,9 +265,17 @@ QrealKey *QrealAnimator::getKeyAtPos(qreal relX, qreal relY,
     return NULL;
 }
 
+void QrealAnimator::removeThisFromGraphAnimator() {
+    mMainWindow->getKeysView()->graphRemoveViewedAnimator(this);
+}
+
+void QrealAnimator::setAnimatorColor(QColor color)
+{
+    mAnimatorColor = color;
+}
+
 void QrealAnimator::clearFromGraphView() {
-    MainWindow::getInstance()->getKeysView()->ifIsCurrentAnimatorSetNull(
-                this);
+    removeThisFromGraphAnimator();
 }
 
 void QrealAnimator::freezeMinMaxValues()
@@ -559,8 +574,8 @@ void QrealAnimator::getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
     if(mKeys.isEmpty()) {
-        *minValP = mCurrentValue;
-        *maxValP = mCurrentValue;
+        *minValP = mCurrentValue - mPrefferedValueStep;
+        *maxValP = mCurrentValue + mPrefferedValueStep;
     } else {
         foreach(QrealKey *key, mKeys) {
             qreal keyVal = key->getValue();
@@ -572,8 +587,8 @@ void QrealAnimator::getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
             if(minKeyVal < minVal) minVal = minKeyVal;
         }
 
-        *minValP = minVal;
-        *maxValP = maxVal;
+        *minValP = minVal - mPrefferedValueStep;
+        *maxValP = maxVal + mPrefferedValueStep;
     }
 }
 
@@ -632,7 +647,7 @@ void QrealAnimator::drawKeysPath(QPainter *p,
 {
     p->setPen(QPen(Qt::black, 4.));
     p->drawPath(mKeysDrawPath);
-    p->setPen(QPen(Qt::red, 2.));
+    p->setPen(QPen(mAnimatorColor, 2.));
     p->drawPath(mKeysDrawPath);
     p->setPen(QPen(Qt::black, 2.));
 
@@ -766,6 +781,10 @@ void QrealAnimator::finishTransform()
             saveCurrentValueAsKey();
         }
         mTransformed = false;
+
+        if(mIsCurrentAnimator) {
+            graphScheduleUpdateAfterKeysChanged();
+        }
     }
 }
 
