@@ -135,11 +135,14 @@ bool MovablePoint::isContainedInRect(QRectF absRect)
     return absRect.contains(getAbsolutePos());
 }
 
-void MovablePoint::moveBy(QPointF absTranslation) {
-    absTranslation /= mMainWindow->getCanvas()->getCurrentCanvasScale();
-
+void MovablePoint::moveBy(QPointF relTranslation) {
     mRelPos.retrieveSavedValue();
-    mRelPos.incCurrentValue(absTranslation.x(), absTranslation.y());
+    mRelPos.incCurrentValue(relTranslation.x(), relTranslation.y());
+}
+
+void MovablePoint::moveByAbs(QPointF absTranslatione) {
+    mRelPos.retrieveSavedValue();
+    moveToAbs(getAbsolutePos() + absTranslatione);
 }
 
 void MovablePoint::moveToAbs(QPointF absPos)
@@ -200,6 +203,11 @@ void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
 QPointFAnimator *MovablePoint::getRelativePosAnimatorPtr()
 {
     return &mRelPos;
+}
+
+qreal MovablePoint::getRadius()
+{
+    return mRadius;
 }
 
 void MovablePoint::updateAfterFrameChanged(int frame)

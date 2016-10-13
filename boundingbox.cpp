@@ -17,11 +17,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mKeysView = getMainWindow()->getKeysView();
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;
-    if(type == TYPE_VECTOR_PATH) {
-        mName = "Path";
-    } else {
-        mName = "Group";
-    }
+
     parent->addChild(this);
     mTransformAnimator.reset();
     mCombinedTransformMatrix.reset();
@@ -84,6 +80,18 @@ BoundingBox::BoundingBox(int boundingBoxId,
     }
 
     parent->addChild(this);
+}
+
+void BoundingBox::resetScale() {
+    mTransformAnimator.resetScale();
+}
+
+void BoundingBox::resetTranslation() {
+    mTransformAnimator.resetTranslation();
+}
+
+void BoundingBox::resetRotation() {
+    mTransformAnimator.resetRotation();
 }
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {

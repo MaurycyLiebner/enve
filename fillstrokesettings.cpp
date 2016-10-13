@@ -110,7 +110,7 @@ int Gradient::saveToSql() {
 }
 
 void Gradient::saveToSqlIfPathSelected() {
-    foreach(VectorPath *path, mAffectedPaths) {
+    foreach(PathBox *path, mAffectedPaths) {
         BoundingBox *parent = (BoundingBox *) path;
         while(parent != NULL) {
             if(parent->isSelected()) {
@@ -153,15 +153,15 @@ void Gradient::setColors(QList<Color> newColors)
 //            setCurrentColor(mGradientWidget->getCurrentColor());
 }
 
-bool Gradient::isInPaths(VectorPath *path) {
+bool Gradient::isInPaths(PathBox *path) {
     return mAffectedPaths.contains(path);
 }
 
-void Gradient::addPath(VectorPath *path) {
+void Gradient::addPath(PathBox *path) {
     mAffectedPaths << path;
 }
 
-void Gradient::removePath(VectorPath *path) {
+void Gradient::removePath(PathBox *path) {
     mAffectedPaths.removeOne(path);
 }
 
@@ -171,7 +171,7 @@ bool Gradient::affectsPaths() {
 
 void Gradient::updatePaths()
 {
-    foreach (VectorPath *path, mAffectedPaths) {
+    foreach (PathBox *path, mAffectedPaths) {
         path->updateDrawGradients();
     }
 }
@@ -300,7 +300,7 @@ StrokeSettings::StrokeSettings(Color colorT,
     mLineWidth.setValueRange(0., mLineWidth.getMaxPossibleValue());
 }
 
-void StrokeSettings::setLineWidthUpdaterTarget(VectorPath *path) {
+void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
     setUpdater(new StrokeWidthUpdater(path));
 }
 
@@ -689,7 +689,7 @@ void FillStrokeSettingsWidget::setCanvasPtr(Canvas *canvas)
     mCanvas = canvas;
 }
 
-void FillStrokeSettingsWidget::loadSettingsFromPath(VectorPath *path) {
+void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
     if(mLoadFillFromPath) {
         mLoadFillFromPath = false;
         setFillValuesFromFillSettings(path->getFillSettings());

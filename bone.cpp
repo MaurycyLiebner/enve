@@ -6,10 +6,10 @@ Bone::Bone(BoxesGroup *parent) : VectorPath(parent)
     setName("Bone");
 }
 
-Bone::Bone(int boundingBoxId, BoxesGroup *parent) :
-    VectorPath(boundingBoxId, parent)
+Bone *Bone::createFromSql(int boundingBoxId, BoxesGroup *parent)
 {
-    mType = TYPE_BONE;
+    Bone *bone = new Bone(parent);
+    bone->loadFromSql(boundingBoxId);
 }
 
 void Bone::addCircle(QPointF absPos) {

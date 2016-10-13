@@ -14,6 +14,7 @@ bool zLessThan(BoundingBox *box1, BoundingBox *box2)
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_GROUP)
 {
+    setName("Group");
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
@@ -32,6 +33,36 @@ BoxesGroup::~BoxesGroup()
     foreach(BoundingBox *box, mChildren) {
         box->decNumberPointers();
     }
+}
+
+void BoxesGroup::resetSelectedTranslation() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->resetTranslation();
+    }
+
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::resetSelectedScale() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->resetScale();
+    }
+
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::resetSelectedRotation() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->resetRotation();
+    }
+
+    finishUndoRedoSet();
 }
 
 PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos,
@@ -647,6 +678,16 @@ void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     }
 }
 
+void BoxesGroup::centerPivotForSelected() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->centerPivotPosition();
+    }
+
+    finishUndoRedoSet();
+}
+
 void BoxesGroup::removeSelectedPointsApproximateAndClearList() {
     startNewUndoRedoSet();
 
@@ -1002,10 +1043,10 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId,
         while(query.next() ) {
             if(static_cast<BoundingBoxType>(
                         query.value(idBoxType).toInt()) == TYPE_BONE ) {
-                new Bone(query.value(idId).toInt(), this);
+                Bone::createFromSql(query.value(idId).toInt(), this);
             } else if(static_cast<BoundingBoxType>(
                         query.value(idBoxType).toInt()) == TYPE_VECTOR_PATH ) {
-                new VectorPath(query.value(idId).toInt(), this);
+                VectorPath::createPathFromSql(query.value(idId).toInt(), this);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_GROUP ) {
                 new BoxesGroup(query.value(idId).toInt(),
@@ -1052,17 +1093,17 @@ void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
             }
 
             foreach(MovablePoint *point, mSelectedPoints) {
-                point->moveBy(by);
+                point->moveByAbs(by);
             }
         } else {
             foreach(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();
-                point->moveBy(by);
+                point->moveByAbs(by);
             }
         }
     } else {
         foreach(MovablePoint *point, mSelectedPoints) {
-            point->moveBy(by);
+            point->moveByAbs(by);
         }
     }
 }

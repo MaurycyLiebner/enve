@@ -4,9 +4,13 @@
 
 class BoundingBox;
 
-class VectorPath;
+class PathBox;
 
 class Gradient;
+
+class Circle;
+
+class Rectangle;
 
 class AnimatorUpdater : public SmartPointerTarget
 {
@@ -31,12 +35,12 @@ private:
 class PathPointUpdater : public AnimatorUpdater
 {
 public:
-    PathPointUpdater(VectorPath *vectorPath);
+    PathPointUpdater(PathBox *vectorPath);
 
     void update();
 
 private:
-    VectorPath *mTarget;
+    PathBox *mTarget;
 };
 
 class GradientUpdater : public AnimatorUpdater
@@ -53,12 +57,12 @@ private:
 class StrokeWidthUpdater : public AnimatorUpdater
 {
 public:
-    StrokeWidthUpdater(VectorPath *path);
+    StrokeWidthUpdater(PathBox *path);
 
     void update();
 
 private:
-    VectorPath *mTarget;
+    PathBox *mTarget;
 };
 
 class DisplayedFillStrokeSettingsUpdater : public AnimatorUpdater
@@ -67,6 +71,17 @@ public:
     DisplayedFillStrokeSettingsUpdater();
 
     void update();
+};
+
+class RectangleBottomRightUpdater : public AnimatorUpdater
+{
+public:
+    RectangleBottomRightUpdater(Rectangle *target);
+
+    void update();
+
+private:
+    Rectangle *mTarget;
 };
 
 #endif // ANIMATORUPDATER_H

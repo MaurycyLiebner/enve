@@ -79,6 +79,10 @@ bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
         setCanvasMode(CanvasMode::MOVE_POINT);
     } else if(event->key() == Qt::Key_F3) {
         setCanvasMode(CanvasMode::ADD_POINT);
+    } else if(event->key() == Qt::Key_F4) {
+        setCanvasMode(CanvasMode::ADD_CIRCLE);
+    } else if(event->key() == Qt::Key_F5) {
+        setCanvasMode(CanvasMode::ADD_RECTANGLE);
     } else {
         return false;
     }
@@ -404,6 +408,10 @@ void Canvas::setCanvasMode(CanvasMode mode) {
         setCursor(QCursor(QPixmap("pixmaps/cursor-node.xpm"), 0, 0) );
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
         setCursor(QCursor(QPixmap("pixmaps/cursor_color_picker.png"), 2, 20) );
+    } else if(mCurrentMode == ADD_CIRCLE) {
+        setCursor(QCursor(QPixmap("pixmaps/cursor-ellipse.xpm"), 4, 4) );
+    } else if(mCurrentMode == ADD_RECTANGLE) {
+        setCursor(QCursor(QPixmap("pixmaps/cursor-rect.xpm"), 4, 4) );
     } else {
         setCursor(QCursor(QPixmap("pixmaps/cursor-pen.xpm"), 4, 4) );
     }
@@ -566,7 +574,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     } else if(event->key() == Qt::Key_Home) {
        mCurrentBoxesGroup->bringSelectedBoxesToFront();
     } else if(event->key() == Qt::Key_B) {
-        if(isAltPressed()) {
+        if(isAltPressed(event)) {
             mCurrentBoxesGroup->detachFromBone(mCurrentMode);
         } else if(isCtrlPressed()) {
             Bone *bone = mCurrentBoxesGroup->getBoneAt(
@@ -583,6 +591,12 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             mCurrentBoxesGroup->addBoxToSelection(newBone);
             setCanvasMode(MOVE_POINT);
         }
+    } else if(event->key() == Qt::Key_G && isAltPressed(event)) {
+        mCurrentBoxesGroup->resetSelectedTranslation();
+    } else if(event->key() == Qt::Key_S && isAltPressed(event)) {
+        mCurrentBoxesGroup->resetSelectedScale();
+    } else if(event->key() == Qt::Key_R && isAltPressed(event)) {
+        mCurrentBoxesGroup->resetSelectedRotation();
     } else if(event->key() == Qt::Key_R && isMovingPath() && !isGrabbingMouse) {
        mTransformationFinishedBeforeMouseRelease = false;
        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
@@ -617,7 +631,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         mFirstMouseMove = true;
 
         grabMouseAndTrack();
-     } else if(event->key() == Qt::Key_A && isCtrlPressed() && !isGrabbingMouse) {
+     } else if(event->key() == Qt::Key_A && isCtrlPressed(event) && !isGrabbingMouse) {
        if(isShiftPressed()) {
            mCurrentBoxesGroup->deselectAllBoxes();
        } else {

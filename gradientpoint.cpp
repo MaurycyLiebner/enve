@@ -1,13 +1,13 @@
 #include "gradientpoint.h"
 #include "vectorpath.h"
 
-GradientPoint::GradientPoint(QPointF absPos, VectorPath *parent) :
+GradientPoint::GradientPoint(QPointF absPos, PathBox *parent) :
     MovablePoint(absPos, parent, TYPE_GRADIENT_POINT)
 {
     mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
-GradientPoint::GradientPoint(int idT, VectorPath *parent) :
+GradientPoint::GradientPoint(int idT, PathBox *parent) :
     MovablePoint(idT, parent, TYPE_GRADIENT_POINT)
 {
     mRelPos.setTraceKeyOnCurrentFrame(true);

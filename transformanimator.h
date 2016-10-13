@@ -8,6 +8,11 @@ class TransformAnimator : public ComplexAnimator
 public:
     TransformAnimator();
 
+    void resetScale();
+    void resetTranslation();
+    void resetRotation();
+    void reset();
+
     QMatrix getCurrentValue();
     void rotateRelativeToSavedValue(qreal rotRel);
     void translate(qreal dX, qreal dY);
@@ -20,8 +25,6 @@ public:
 
     qreal getYScale();
     qreal getXScale();
-
-    void reset();
 
     void setPivot(qreal x, qreal y);
     void setPivot(QPointF point, bool finish = false);

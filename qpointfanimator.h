@@ -19,6 +19,9 @@ public:
     qreal getSavedYValue();
 
     void incAllValues(qreal x, qreal y);
+
+    QrealAnimator *getXAnimator();
+    QrealAnimator *getYAnimator();
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

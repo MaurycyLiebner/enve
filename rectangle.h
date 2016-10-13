@@ -1,0 +1,77 @@
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
+#include "pathbox.h"
+
+class RectangleTopLeftPoint : public MovablePoint
+{
+public:
+    RectangleTopLeftPoint(qreal relPosX, qreal relPosY,
+                          BoundingBox *parent);
+
+    void moveBy(QPointF absTranslatione);
+    void moveByAbs(QPointF absTranslatione);
+    void startTransform();
+    void finishTransform();
+
+    void setBottomRightPoint(MovablePoint *bottomRightPoint);
+private:
+    MovablePoint *mBottomRightPoint;
+};
+
+class RectangleBottomRightPoint : public MovablePoint
+{
+public:
+    RectangleBottomRightPoint(qreal relPosX, qreal relPosY,
+                              BoundingBox *parent);
+    void setPoints(MovablePoint *topLeftPoint, MovablePoint *radiusPoint);
+
+    void moveBy(QPointF absTranslatione);
+    void moveByAbs(QPointF absTranslatione);
+    void startTransform();
+    void finishTransform();
+private:
+    MovablePoint *mTopLeftPoint;
+    MovablePoint *mRadiusPoint;
+};
+
+class RectangleRadiusPoint : public MovablePoint
+{
+public:
+    RectangleRadiusPoint(qreal relPosX, qreal relPosY,
+                         BoundingBox *parent);
+    void setPoints(MovablePoint *topLeftPoint, MovablePoint *bottomRightPoint);
+
+    void moveBy(QPointF absTranslatione);
+    void moveByAbs(QPointF absTranslatione);
+    void startTransform();
+    void finishTransform();
+    void setAbsPosRadius(QPointF pos);
+private:
+    MovablePoint *mTopLeftPoint;
+    MovablePoint *mBottomRightPoint;
+};
+
+class Rectangle : public PathBox
+{
+public:
+    Rectangle(BoxesGroup *parent);
+    ~Rectangle();
+
+    void moveSizePointByAbs(QPointF absTrans);
+    void startAllPointsTransform();
+    void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
+    MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
+    void selectAndAddContainedPointsToList(QRectF absRect,
+                                           QList<MovablePoint *> *list);
+    void updatePath();
+    void centerPivotPosition();
+    void updateRadiusXAndRange();
+    void updateAfterFrameChanged(int currentFrame);
+private:
+    RectangleTopLeftPoint *mTopLeftPoint;
+    RectangleBottomRightPoint *mBottomRightPoint;
+
+    RectangleRadiusPoint *mRadiusPoint;
+};
+
+#endif // RECTANGLE_H

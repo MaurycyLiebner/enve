@@ -120,8 +120,7 @@ public:
     void startTransform();
     void finishTransform();
 
-    void moveBy(QPointF absTranslation);
-    void moveToAbs(QPointF absPos);
+    void moveBy(QPointF relTranslation);
 
     QPointF getStartCtrlPtAbsPos();
     QPointF getStartCtrlPtValue();
@@ -217,6 +216,7 @@ public:
     void disableInfluenceAnimators();
     QPointF getInfluenceAbsolutePos();
     bool isNeighbourSelected();
+    void moveByAbs(QPointF absTranslatione);
 private:
     bool mStartExternalInfluence = false;
     QPointF mStartAdjustedForExternalInfluence;

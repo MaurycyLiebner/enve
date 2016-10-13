@@ -15,10 +15,16 @@ class UndoRedo;
 
 class UndoRedoStack;
 
+class Circle;
+
+class Rectangle;
+
 enum CanvasMode : short {
     MOVE_PATH,
     MOVE_POINT,
     ADD_POINT,
+    ADD_CIRCLE,
+    ADD_RECTANGLE,
     PICK_PATH_SETTINGS
 };
 
@@ -311,6 +317,14 @@ public slots:
         callUpdateSchedulers();
     }
 
+    void setRectangleMode() {
+        setCanvasMode(ADD_RECTANGLE);
+    }
+
+    void setCircleMode() {
+        setCanvasMode(ADD_CIRCLE);
+    }
+
     void connectPointsSlot();
     void disconnectPointsSlot();
     void mergePointsSlot();
@@ -319,6 +333,9 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    Circle *mCurrentCircle = NULL;
+    Rectangle *mCurrentRectangle = NULL;
+
     bool mTransformationFinishedBeforeMouseRelease = false;
     QString mInputText;
     qreal mInputTransformationValue = 0.;

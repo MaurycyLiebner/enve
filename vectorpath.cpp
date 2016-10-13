@@ -9,38 +9,16 @@
 #include "pointhelpers.h"
 
 VectorPath::VectorPath(BoxesGroup *group) :
-    BoundingBox(group,
-                BoundingBoxType::TYPE_VECTOR_PATH)
+    PathBox(group, BoundingBoxType::TYPE_VECTOR_PATH)
 {
+    setName("Path");
     addActiveAnimator(&mPathAnimator);
-    addActiveAnimator(&mFillPaintSettings);
-    addActiveAnimator(&mStrokeSettings);
     mAnimatorsCollection.addAnimator(&mPathAnimator);
-    mAnimatorsCollection.addAnimator(&mFillPaintSettings);
-    mAnimatorsCollection.addAnimator(&mStrokeSettings);
 
     mPathAnimator.blockPointer();
-    mFillPaintSettings.blockPointer();
-    mStrokeSettings.blockPointer();
-
-    mFillGradientPoints.initialize(this);
-    mFillGradientPoints.blockPointer();
-    mStrokeGradientPoints.initialize(this);
-    mStrokeGradientPoints.blockPointer();
-
-    mFillPaintSettings.setGradientPoints(&mFillGradientPoints);
-    mStrokeSettings.setGradientPoints(&mStrokeGradientPoints);
-
-    mStrokeSettings.setLineWidthUpdaterTarget(this);
 }
 
-VectorPath::VectorPath(int boundingBoxId,
-                        BoxesGroup *parent) :
-    BoundingBox(boundingBoxId,
-                parent, TYPE_VECTOR_PATH) {
-    addActiveAnimator(&mPathAnimator);
-    mAnimatorsCollection.addAnimator(&mPathAnimator);
-
+void VectorPath::loadFromSql(int boundingBoxId) {
     QSqlQuery query;
     QString queryStr = "SELECT * FROM vectorpath WHERE boundingboxid = " +
             QString::number(boundingBoxId);
@@ -96,16 +74,18 @@ VectorPath::VectorPath(int boundingBoxId,
     }
 }
 
+VectorPath *VectorPath::createPathFromSql(int boundingBoxId,
+                                          BoxesGroup *parent) {
+    VectorPath *path = new VectorPath(parent);
+    path->loadFromSql(boundingBoxId);
+
+    return path;
+}
+
 VectorPath::~VectorPath()
 {
     foreach(PathPoint *point, mPoints) {
         point->decNumberPointers();
-    }
-    if(mFillPaintSettings.getGradient() != NULL) {
-        mFillPaintSettings.getGradient()->removePath(this);
-    }
-    if(mStrokeSettings.getGradient() != NULL) {
-        mStrokeSettings.getGradient()->removePath(this);
     }
 }
 
@@ -262,10 +242,8 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
     foreach(PathPoint *point, mPoints) {
         point->updateAfterFrameChanged(currentFrame);
     }
-    mFillPaintSettings.setFrame(currentFrame);
-    mStrokeSettings.setFrame(currentFrame);
     mPathAnimator.setFrame(currentFrame);
-    BoundingBox::updateAfterFrameChanged(currentFrame);
+    PathBox::updateAfterFrameChanged(currentFrame);
 }
 
 PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
@@ -487,25 +465,13 @@ Edge *VectorPath::getEgde(QPointF absPos) {
 }
 
 void VectorPath::centerPivotPosition() {
-    if(!mPivotChanged) {
-        QPointF posSum = QPointF(0., 0.);
-        int count = mPoints.length();
-        if(count == 0) return;
-        foreach(PathPoint *point, mPoints) {
-            posSum += point->getRelativePos();
-        }
-        mTransformAnimator.setPivot(posSum/count);
+    QPointF posSum = QPointF(0., 0.);
+    int count = mPoints.length();
+    if(count == 0) return;
+    foreach(PathPoint *point, mPoints) {
+        posSum += point->getRelativePos();
     }
-}
-
-const PaintSettings *VectorPath::getFillSettings()
-{
-    return &mFillPaintSettings;
-}
-
-const StrokeSettings *VectorPath::getStrokeSettings()
-{
-    return &mStrokeSettings;
+    mTransformAnimator.setPivot(posSum/count);
 }
 
 /*void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
@@ -657,91 +623,6 @@ PathPoint *VectorPath::addPointRelPos(QPointF relPos,
     return newPoint;
 }
 
-void VectorPath::schedulePathUpdate()
-{
-    if(mPathUpdateNeeded) {
-        return;
-    }
-    addUpdateScheduler(new PathUpdateScheduler(this));
-    mPathUpdateNeeded = true;
-    mMappedPathUpdateNeeded = false;
-    mOutlinePathUpdateNeeded = false;
-}
-
-void VectorPath::updatePathIfNeeded()
-{
-    if(mPathUpdateNeeded) {
-        updatePath();
-        if(!mAnimatorsCollection.hasKeys() ) centerPivotPosition();
-        mPathUpdateNeeded = false;
-        mMappedPathUpdateNeeded = false;
-        mOutlinePathUpdateNeeded = false;
-    }
-}
-
-void VectorPath::scheduleOutlinePathUpdate()
-{
-    if(mOutlinePathUpdateNeeded) {
-        return;
-    }
-    addUpdateScheduler(new OutlineUpdateScheduler(this));
-    mOutlinePathUpdateNeeded = true;
-}
-
-void VectorPath::updateOutlinePathIfNeeded() {
-    if(mOutlinePathUpdateNeeded) {
-        updateOutlinePath();
-        mOutlinePathUpdateNeeded = false;
-    }
-}
-
-void VectorPath::updateMappedPathIfNeeded()
-{
-    if(mMappedPathUpdateNeeded) {
-        if(mParent != NULL) {
-            updateMappedPath();
-        }
-        mMappedPathUpdateNeeded = false;
-    }
-}
-
-void VectorPath::scheduleMappedPathUpdate()
-{
-    if(mMappedPathUpdateNeeded || mPathUpdateNeeded || mParent == NULL) {
-        return;
-    }
-    addUpdateScheduler(new MappedPathUpdateScheduler(this));
-    mMappedPathUpdateNeeded = true;
-    
-}
-
-void VectorPath::updateAfterCombinedTransformationChanged()
-{
-    scheduleMappedPathUpdate();
-}
-
-void VectorPath::updateOutlinePath() {
-    mStrokeSettings.setStrokerSettings(&mPathStroker);
-    mMappedOutlinePath = mCombinedTransformMatrix.map(mPathStroker.createStroke(mPath));
-    updateWholePath();
-}
-
-void VectorPath::updateWholePath() {
-    mMappedWhole = QPainterPath();
-    if(mStrokeSettings.getPaintType() != NOPAINT) {
-        mMappedWhole += mMappedOutlinePath;
-    }
-    if(mFillPaintSettings.getPaintType() != NOPAINT ||
-            mStrokeSettings.getPaintType() == NOPAINT) {
-        mMappedWhole += mMappedPath;
-    }
-}
-
-void VectorPath::setRenderCombinedTransform() {
-    BoundingBox::setRenderCombinedTransform();
-    updateMappedPath();
-}
-
 void VectorPath::updatePathPointIds()
 {
     int pointId = 1;
@@ -758,6 +639,11 @@ void VectorPath::updatePathPointIds()
 
 void VectorPath::showContextMenu(QPoint globalPos) {
     QMenu menu(mMainWindow);
+
+    QAction *outlineScaled = new QAction("Scale outline");
+    outlineScaled->setCheckable(true);
+    outlineScaled->setChecked(mOutlineAffectedByScale);
+    menu.addAction(outlineScaled);
 
     QAction  *infAction = new QAction("Points influence");
     infAction->setCheckable(true);
@@ -778,6 +664,8 @@ void VectorPath::showContextMenu(QPoint globalPos) {
             } else {
                 enableInfluence();
             }
+        } else if(selected_action == outlineScaled) {
+            setOutlineAffectedByScale(!mOutlineAffectedByScale);
         }
     } else {
 
@@ -786,12 +674,10 @@ void VectorPath::showContextMenu(QPoint globalPos) {
 
 void VectorPath::updateMappedPath()
 {
-    mMappedPath = mCombinedTransformMatrix.map(mPath);
     if(mInfluenceEnabled) {
         mMappedEditPath = mCombinedTransformMatrix.map(mEditPath);
     }
-    updateOutlinePath();
-    updateDrawGradients();
+    PathBox::updateMappedPath();
 }
 
 void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
@@ -805,78 +691,6 @@ void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
 
     Edge newEdge = Edge(prevPoint, nextPoint, 0.5);
     newEdge.makePassThrough(absPos);
-}
-
-void VectorPath::updateDrawGradients()
-{
-    if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
-        Gradient *gradient = mFillPaintSettings.getGradient();
-        if(!gradient->isInPaths(this)) {
-            gradient->addPath(this);
-        }
-        mFillGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
-                                      gradient->getLastQGradientStopQColor());
-        if(!mFillGradientPoints.enabled) {
-            mFillGradientPoints.enable();
-        }
-
-        mDrawFillGradient.setStops(gradient->getQGradientStops());
-        mDrawFillGradient.setStart(mFillGradientPoints.getStartPoint() );
-        mDrawFillGradient.setFinalStop(mFillGradientPoints.getEndPoint() );
-
-    } else if(mFillGradientPoints.enabled) {
-        mFillGradientPoints.disable();
-    }
-    if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
-        Gradient *gradient = mStrokeSettings.getGradient();
-        if(!gradient->isInPaths(this)) {
-            gradient->addPath(this);
-        }
-        mStrokeGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
-                                      gradient->getLastQGradientStopQColor() );
-
-        if(!mStrokeGradientPoints.enabled) {
-            mStrokeGradientPoints.enable();
-        }
-        mDrawStrokeGradient.setStops(gradient->getQGradientStops());
-        mDrawStrokeGradient.setStart(mStrokeGradientPoints.getStartPoint() );
-        mDrawStrokeGradient.setFinalStop(mStrokeGradientPoints.getEndPoint() );
-    } else if(mStrokeGradientPoints.enabled) {
-        mStrokeGradientPoints.disable();
-    }
-}
-
-QRectF VectorPath::getBoundingRect()
-{
-    return mMappedWhole.boundingRect();
-}
-
-void VectorPath::draw(QPainter *p)
-{
-    if(mVisible) {
-        p->save();
-
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
-        p->setPen(Qt::NoPen);
-        if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
-            p->setBrush(mDrawFillGradient);
-        } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
-            p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
-        } else{
-            p->setBrush(Qt::NoBrush);
-        }
-        p->drawPath(mMappedPath);
-        if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
-            p->setBrush(mDrawStrokeGradient);
-        } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
-            p->setBrush(mStrokeSettings.getCurrentColor().qcol);
-        } else{
-            p->setBrush(Qt::NoBrush);
-        }
-        p->drawPath(mMappedOutlinePath);
-
-        p->restore();
-    }
 }
 
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
@@ -1055,11 +869,6 @@ void VectorPath::removePoint(PathPoint *point) {
     finishUndoRedoSet();
 }
 
-bool VectorPath::pointInsidePath(QPointF point)
-{
-    return mMappedWhole.contains(point);
-}
-
 void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
                                           PathPoint *newPoint) {
     startNewUndoRedoSet();
@@ -1067,6 +876,7 @@ void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
     addPointToSeparatePaths(newPoint);
     finishUndoRedoSet();
 }
+
 #include <QSqlError>
 int VectorPath::saveToSql(int parentId)
 {
@@ -1114,112 +924,4 @@ void VectorPath::finishAllPointsTransform()
     foreach(PathPoint *point, mPoints) {
         point->finishTransform();
     }
-}
-
-GradientPoints::GradientPoints() : ComplexAnimator()
-{
-    setName("gradient points");
-}
-
-GradientPoints::~GradientPoints()
-{
-    startPoint->decNumberPointers();
-    endPoint->decNumberPointers();
-}
-
-void GradientPoints::initialize(VectorPath *parentT,
-                                QPointF startPt, QPointF endPt)
-{
-    parent = parentT;
-    startPoint = new GradientPoint(startPt, parent);
-    startPoint->incNumberPointers();
-    addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
-    startPoint->getRelativePosAnimatorPtr()->setName("point1");
-    endPoint = new GradientPoint(endPt, parent);
-    endPoint->getRelativePosAnimatorPtr()->setName("point2");
-    endPoint->incNumberPointers();
-    addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
-    enabled = false;
-}
-
-void GradientPoints::initialize(VectorPath *parentT,
-                                int fillGradientStartId, int fillGradientEndId)
-{
-    parent = parentT;
-    startPoint = new GradientPoint(fillGradientStartId, parent);
-    startPoint->incNumberPointers();
-    addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
-    startPoint->getRelativePosAnimatorPtr()->setName("point1");
-    endPoint = new GradientPoint(fillGradientEndId, parent);
-    endPoint->incNumberPointers();
-    endPoint->getRelativePosAnimatorPtr()->setName("point2");
-    addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
-    enabled = false;
-}
-
-void GradientPoints::clearAll()
-{
-    delete startPoint;
-    delete endPoint;
-}
-
-void GradientPoints::enable()
-{
-    if(enabled) {
-        return;
-    }
-    enabled = true;
-}
-
-void GradientPoints::setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo) {
-    startPoint->setAbsolutePos(startPos, saveUndoRedo);
-    endPoint->setAbsolutePos(endPos, saveUndoRedo);
-}
-
-void GradientPoints::disable()
-{
-    enabled = false;
-}
-
-void GradientPoints::drawGradientPoints(QPainter *p)
-{
-    if(enabled) {
-       p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
-       startPoint->draw(p);
-       endPoint->draw(p);
-    }
-}
-
-MovablePoint *GradientPoints::getPointAt(QPointF absPos)
-{
-    if(enabled) {
-        if(startPoint->isPointAt(absPos) ) {
-            return startPoint;
-        } else if (endPoint->isPointAt(absPos) ){
-            return endPoint;
-        }
-    }
-    return NULL;
-}
-
-QPointF GradientPoints::getStartPoint()
-{
-    return startPoint->getAbsolutePos();
-}
-
-QPointF GradientPoints::getEndPoint()
-{
-    return endPoint->getAbsolutePos();
-}
-
-void GradientPoints::setColors(QColor startColor, QColor endColor)
-{
-    startPoint->setColor(startColor);
-    endPoint->setColor(endColor);
-}
-
-void GradientPoints::attachToBoneFromSqlZId()
-{
-    startPoint->attachToBoneFromSqlZId();
-    endPoint->attachToBoneFromSqlZId();
 }

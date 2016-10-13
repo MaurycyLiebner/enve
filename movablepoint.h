@@ -44,8 +44,9 @@ public:
     BoundingBox *getParent();
 
     bool isContainedInRect(QRectF absRect);
-    virtual void moveBy(QPointF absTranslatione);
+    virtual void moveBy(QPointF relTranslation);
     virtual void moveToAbs(QPointF absPos);
+    virtual void moveByAbs(QPointF absTranslatione);
 
     virtual void removeApproximate() {}
 
@@ -85,6 +86,8 @@ public:
     virtual void updateAfterFrameChanged(int frame);
 
     QPointFAnimator *getRelativePosAnimatorPtr();
+
+    qreal getRadius();
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

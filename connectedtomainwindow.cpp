@@ -38,12 +38,24 @@ bool ConnectedToMainWindow::isShiftPressed() {
     return mMainWindow->isShiftPressed();
 }
 
+bool ConnectedToMainWindow::isShiftPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::ShiftModifier;
+}
+
 bool ConnectedToMainWindow::isCtrlPressed() {
     return mMainWindow->isCtrlPressed();
 }
 
+bool ConnectedToMainWindow::isCtrlPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::ControlModifier;
+}
+
 bool ConnectedToMainWindow::isAltPressed() {
     return mMainWindow->isAltPressed();
+}
+
+bool ConnectedToMainWindow::isAltPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::AltModifier;
 }
 
 int ConnectedToMainWindow::getCurrentFrame()

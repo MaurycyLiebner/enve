@@ -1,7 +1,9 @@
 #include "animatorupdater.h"
 #include <QDebug>
-#include "vectorpath.h"
+#include "pathbox.h"
 #include "mainwindow.h"
+#include "circle.h"
+#include "rectangle.h"
 
 TransUpdater::TransUpdater(BoundingBox *boundingBox) : AnimatorUpdater()
 {
@@ -13,7 +15,7 @@ void TransUpdater::update() {
     mTarget->schedulePivotUpdate();
 }
 
-PathPointUpdater::PathPointUpdater(VectorPath *vectorPath)
+PathPointUpdater::PathPointUpdater(PathBox *vectorPath)
 {
     mTarget = vectorPath;
 }
@@ -34,7 +36,7 @@ void GradientUpdater::update()
     MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
-StrokeWidthUpdater::StrokeWidthUpdater(VectorPath *path)
+StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path)
 {
     mTarget = path;
 }
@@ -53,4 +55,15 @@ DisplayedFillStrokeSettingsUpdater::DisplayedFillStrokeSettingsUpdater()
 void DisplayedFillStrokeSettingsUpdater::update()
 {
     MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+}
+
+RectangleBottomRightUpdater::RectangleBottomRightUpdater(Rectangle *target) :
+    AnimatorUpdater()
+{
+    mTarget = target;
+}
+
+void RectangleBottomRightUpdater::update()
+{
+    mTarget->updateRadiusXAndRange();
 }

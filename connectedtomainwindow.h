@@ -14,6 +14,8 @@ class UndoRedo;
 
 class UpdateScheduler;
 
+class QKeyEvent;
+
 class ConnectedToMainWindow : public SmartPointerTarget
 {
 public:
@@ -40,6 +42,9 @@ public:
     bool isRecordingAllPoints();
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();
+    bool isShiftPressed(QKeyEvent *event);
+    bool isCtrlPressed(QKeyEvent *event);
+    bool isAltPressed(QKeyEvent *event);
 protected:
     MainWindow *mMainWindow;
 };

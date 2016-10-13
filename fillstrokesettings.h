@@ -24,7 +24,7 @@ enum PaintType {
     GRADIENTPAINT
 };
 
-class VectorPath;
+class PathBox;
 
 class ChangeGradientColorsUndoRedo;
 
@@ -58,11 +58,11 @@ public:
 
     void startTransform();
 
-    bool isInPaths(VectorPath *path);
+    bool isInPaths(PathBox *path);
 
-    void addPath(VectorPath *path);
+    void addPath(PathBox *path);
 
-    void removePath(VectorPath *path);
+    void removePath(PathBox *path);
 
     bool affectsPaths();
 
@@ -93,7 +93,7 @@ private:
     GradientWidget *mGradientWidget;
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
-    QList<VectorPath*> mAffectedPaths;
+    QList<PathBox*> mAffectedPaths;
 
     bool mQGradientStopsUpdateNeeded = false;
 };
@@ -199,7 +199,7 @@ public:
         return &mLineWidth;
     }
 
-    void setLineWidthUpdaterTarget(VectorPath *path);
+    void setLineWidthUpdaterTarget(PathBox *path);
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
@@ -229,7 +229,7 @@ public:
 
     void clearAll();
     void saveGradientsToSqlIfPathSelected();
-    void loadSettingsFromPath(VectorPath *path);
+    void loadSettingsFromPath(PathBox *path);
     void setFillValuesFromFillSettings(const PaintSettings *settings);
     void setStrokeValuesFromStrokeSettings(const StrokeSettings *settings);
 

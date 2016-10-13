@@ -84,6 +84,22 @@ MainWindow::MainWindow(QWidget *parent)
     connect(mAddPointMode, SIGNAL(triggered(bool)),
             mCanvas, SLOT(setAddPointMode()) );
 
+    mCircleMode = new QAction(
+                QIcon("pixmaps/icons/ink_draw_arc.png"),
+                "CONNECT POINTS", this);
+    mCircleMode->setToolTip("F4");
+    mToolBar->addAction(mCircleMode);
+    connect(mCircleMode, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(setCircleMode()) );
+
+    mRectangleMode = new QAction(
+                QIcon("pixmaps/icons/ink_draw_rect.png"),
+                "CONNECT POINTS", this);
+    mRectangleMode->setToolTip("F5");
+    mToolBar->addAction(mRectangleMode);
+    connect(mRectangleMode, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(setRectangleMode()) );
+
     mToolBar->addSeparator();
 
     mActionConnectPoints = new QAction(

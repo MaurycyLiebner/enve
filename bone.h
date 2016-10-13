@@ -6,7 +6,7 @@ class Bone : public VectorPath
 {
 public:
     Bone(BoxesGroup *parent);
-    Bone(int boundingBoxId, BoxesGroup *parent);
+    static Bone *createFromSql(int boundingBoxId, BoxesGroup *parent);
 
     void moveBy(QPointF trans);
     void startTransform();

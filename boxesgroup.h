@@ -190,6 +190,10 @@ public:
     static void setCtrlsAlwaysVisible(bool bT);
     void updateSelectedPointsAfterCtrlsVisiblityChanged();
     void removeSelectedPointsApproximateAndClearList();
+    void centerPivotForSelected();
+    void resetSelectedScale();
+    void resetSelectedTranslation();
+    void resetSelectedRotation();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

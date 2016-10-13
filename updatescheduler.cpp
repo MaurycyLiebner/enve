@@ -1,7 +1,7 @@
 #include "updatescheduler.h"
 #include "mainwindow.h"
 
-MappedPathUpdateScheduler::MappedPathUpdateScheduler(VectorPath *path) : UpdateScheduler() {
+MappedPathUpdateScheduler::MappedPathUpdateScheduler(PathBox *path) : UpdateScheduler() {
     mPath = path;
 }
 
@@ -9,7 +9,7 @@ void MappedPathUpdateScheduler::update() {
     mPath->updateMappedPathIfNeeded();
 }
 
-PathUpdateScheduler::PathUpdateScheduler(VectorPath *path) : UpdateScheduler() {
+PathUpdateScheduler::PathUpdateScheduler(PathBox *path) : UpdateScheduler() {
     mPath = path;
 }
 
@@ -17,7 +17,7 @@ void PathUpdateScheduler::update() {
     mPath->updatePathIfNeeded();
 }
 
-OutlineUpdateScheduler::OutlineUpdateScheduler(VectorPath *path)
+OutlineUpdateScheduler::OutlineUpdateScheduler(PathBox *path)
 {
     mPath = path;
 }

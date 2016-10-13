@@ -25,6 +25,7 @@ enum CanvasMode : short;
 enum BoundingBoxType {
     TYPE_VECTOR_PATH,
     TYPE_CIRCLE,
+    TYPE_RECTANGLE,
     TYPE_BONE,
     TYPE_GROUP,
     TYPE_CANVAS
@@ -196,6 +197,9 @@ public:
     virtual void drawKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
     virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY, int startFrame, int endFrame);
     void scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy);
+    void resetScale();
+    void resetTranslation();
+    void resetRotation();
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 

@@ -1,6 +1,8 @@
 #include "canvas.h"
 #include <QMouseEvent>
 #include "pathpivot.h"
+#include "circle.h"
+#include "rectangle.h"
 
 QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
     return point/mCombinedTransformMatrix.m11();
@@ -58,6 +60,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
                     QMenu menu;
 
+                    menu.addAction("Center Pivot");
                     menu.addAction("Copy");
                     menu.addAction("Cut");
                     menu.addAction("Duplicate");
@@ -73,6 +76,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                             groupSelectedBoxesAction();
                         } else if(selectedAction->text() == "Ungroup") {
                             mCurrentBoxesGroup->ungroupSelected();
+                        } else if(selectedAction->text() == "Center Pivot") {
+                            mCurrentBoxesGroup->centerPivotForSelected();
                         }
 
                         callUpdateSchedulers();
@@ -177,6 +182,30 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                     mCurrentBoxesGroup->addPointToSelection(mLastPressedPoint);
                 }
             }
+        } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
+            startNewUndoRedoSet();
+
+            Circle *newPath = new Circle(mCurrentBoxesGroup);
+            newPath->setAbsolutePos(mLastMouseEventPos, false);
+            newPath->startAllPointsTransform();
+            mCurrentBoxesGroup->clearBoxesSelection();
+            mCurrentBoxesGroup->addBoxToSelection(newPath);
+
+            mCurrentCircle = newPath;
+
+            finishUndoRedoSet();
+        } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
+            startNewUndoRedoSet();
+
+            Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
+            newPath->setAbsolutePos(mLastMouseEventPos, false);
+            newPath->startAllPointsTransform();
+            mCurrentBoxesGroup->clearBoxesSelection();
+            mCurrentBoxesGroup->addBoxToSelection(newPath);
+
+            mCurrentRectangle = newPath;
+
+            finishUndoRedoSet();
         }
     } // current mode allows interaction with points
 
@@ -378,7 +407,7 @@ void Canvas::handleMovePointMouseMove(QPointF eventPos) {
                 if(mFirstMouseMove) {
                     mLastPressedPoint->startTransform();
                 }
-                mLastPressedPoint->moveBy(getMoveByValueForEventPos(eventPos) );
+                mLastPressedPoint->moveByAbs(getMoveByValueForEventPos(eventPos) );
             } else {
                 mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
                                                          mFirstMouseMove);
@@ -398,7 +427,7 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
             mRotPivot->startTransform();
         }
 
-        mRotPivot->moveBy(getMoveByValueForEventPos(eventPos));
+        mRotPivot->moveByAbs(getMoveByValueForEventPos(eventPos));
     } else if((mCurrentMode == CanvasMode::MOVE_PATH && mRotPivot->isRotating()) ||
               (mCurrentMode == CanvasMode::MOVE_PATH && mRotPivot->isScaling()) ) {
         mRotPivot->handleMouseMove(eventPos, mLastPressPos,
@@ -459,6 +488,22 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
             handleMovePathMouseMove(eventPos);
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseMove(eventPos);
+        } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
+            if(isShiftPressed() ) {
+                qreal lenR = pointToLen(eventPos - mLastPressPos);
+                mCurrentCircle->moveRadiusesByAbs(QPointF(lenR, lenR));
+            } else {
+                mCurrentCircle->moveRadiusesByAbs(eventPos - mLastPressPos);
+            }
+        } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
+            if(isShiftPressed()) {
+                QPointF trans = eventPos - mLastPressPos;
+                qreal valF = qMax(trans.x(), trans.y() );
+                trans = QPointF(valF, valF);
+                mCurrentRectangle->moveSizePointByAbs(trans);
+            } else {
+                mCurrentRectangle->moveSizePointByAbs(eventPos - mLastPressPos);
+            }
         }
     }
     mLastMouseEventPos = event->pos();

@@ -48,6 +48,16 @@ void QPointFAnimator::incAllValues(qreal x, qreal y) {
     mYAnimator.incAllValues(y);
 }
 
+QrealAnimator *QPointFAnimator::getXAnimator()
+{
+    return &mXAnimator;
+}
+
+QrealAnimator *QPointFAnimator::getYAnimator()
+{
+    return &mYAnimator;
+}
+
 void QPointFAnimator::multCurrentValue(qreal sx, qreal sy)
 {
     mXAnimator.multCurrentValue(sx);

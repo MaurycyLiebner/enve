@@ -36,6 +36,8 @@ private:
     QAction *mMovePathMode;
     QAction *mMovePointMode;
     QAction *mAddPointMode;
+    QAction *mCircleMode;
+    QAction *mRectangleMode;
 //
     QAction *mActionConnectPoints;
     QAction *mActionDisconnectPoints;

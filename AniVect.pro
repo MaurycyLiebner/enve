@@ -66,7 +66,10 @@ SOURCES += main.cpp\
     smartpointertarget.cpp \
     graphboxeslist.cpp \
     keysview.cpp \
-    circle.cpp
+    circle.cpp \
+    pathbox.cpp \
+    gradientpoints.cpp \
+    rectangle.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -118,4 +121,7 @@ HEADERS  += mainwindow.h \
     animatorscollection.h \
     smartpointertarget.h \
     keysview.h \
-    circle.h
+    circle.h \
+    pathbox.h \
+    gradientpoints.h \
+    rectangle.h

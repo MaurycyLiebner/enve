@@ -182,20 +182,25 @@ void PathPoint::finishTransform()
     finishUndoRedoSet();
 }
 
-void PathPoint::moveBy(QPointF absTranslation)
+void PathPoint::moveBy(QPointF relTranslation)
 {
-    MovablePoint::moveBy(absTranslation);
+    MovablePoint::moveBy(relTranslation);
     if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->MovablePoint::moveBy(absTranslation);
+        mStartCtrlPt->MovablePoint::moveBy(relTranslation);
     }
     if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->MovablePoint::moveBy(absTranslation);
+        mEndCtrlPt->MovablePoint::moveBy(relTranslation);
     }
 }
 
-void PathPoint::moveToAbs(QPointF absPos)
-{
-    moveBy(absPos - getAbsolutePos());
+void PathPoint::moveByAbs(QPointF absTranslatione) {
+    MovablePoint::moveByAbs(absTranslatione);
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->MovablePoint::moveByAbs(absTranslatione);
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->MovablePoint::moveByAbs(absTranslatione);
+    }
 }
 
 void PathPoint::connectToPoint(PathPoint *point)

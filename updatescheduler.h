@@ -14,30 +14,30 @@ public:
 
 class PathUpdateScheduler : public UpdateScheduler {
 public:
-    PathUpdateScheduler(VectorPath *path);
+    PathUpdateScheduler(PathBox *path);
 
     void update();
 private:
-    VectorPath *mPath;
+    PathBox *mPath;
 };
 
 class MappedPathUpdateScheduler : public UpdateScheduler {
 public:
-    MappedPathUpdateScheduler(VectorPath *path);
+    MappedPathUpdateScheduler(PathBox *path);
 
     void update();
 private:
-    VectorPath *mPath;
+    PathBox *mPath;
 };
 
 class OutlineUpdateScheduler : public UpdateScheduler {
 public:
-    OutlineUpdateScheduler(VectorPath *path);
+    OutlineUpdateScheduler(PathBox *path);
 
     void update();
 
 private:
-    VectorPath *mPath;
+    PathBox *mPath;
 };
 
 class QGradientStopsUpdateScheduler : public UpdateScheduler {
