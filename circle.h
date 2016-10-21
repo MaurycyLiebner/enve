@@ -6,8 +6,7 @@
 class CircleCenterPoint : public MovablePoint
 {
 public:
-    CircleCenterPoint(qreal relPosX, qreal relPosY,
-                      BoundingBox *parent, MovablePointType type);
+    CircleCenterPoint(BoundingBox *parent, MovablePointType type);
     ~CircleCenterPoint();
 
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
@@ -27,8 +26,7 @@ private:
 class CircleRadiusPoint : public MovablePoint
 {
 public:
-    CircleRadiusPoint(qreal relPosX, qreal relPosY,
-                      BoundingBox *parent, MovablePointType type,
+    CircleRadiusPoint(BoundingBox *parent, MovablePointType type,
                       bool blockX, MovablePoint *centerPoint);
     ~CircleRadiusPoint();
 
@@ -60,6 +58,11 @@ public:
     void moveRadiusesByAbs(QPointF absTrans);
     void startPointsTransform();
     void updateAfterFrameChanged(int currentFrame);
+    void getTopLeftQuadrantVectorPoints(QPointF *leftPtr, QPointF *leftCtrlPtr,
+                                        QPointF *topCtrlPtr, QPointF *topPtr);
+
+    VectorPath *objectToPath();
+
 private:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;

@@ -7,8 +7,7 @@ class VectorPath;
 class GradientPoint : public MovablePoint
 {
 public:
-    GradientPoint(QPointF absPos, PathBox *parent);
-    GradientPoint(int idT, PathBox *parent);
+    GradientPoint(PathBox *parent);
     void setRelativePos(QPointF relPos, bool saveUndoRedo);
     void moveBy(QPointF absTranslatione);
     void setColor(QColor fillColor);

@@ -24,6 +24,34 @@ QrealKey::~QrealKey()
     mEndPoint->decNumberPointers();
 }
 
+
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QDebug>
+int QrealKey::saveToSql(int parentAnimatorSqlId) {
+    QSqlQuery query;
+    if(!query.exec(
+        QString("INSERT INTO qrealkey (value, frame, endenabled, "
+                "startenabled, ctrlsmode, endvalue, endframe, startvalue, "
+                "startframe, qrealanimatorid) "
+                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10)").
+                arg(mValue, 0, 'f').
+                arg(mFrame).
+                arg(boolToSql(mEndEnabled)).
+                arg(boolToSql(mStartEnabled)).
+                arg(mCtrlsMode).
+                arg(mEndValue, 0, 'f').
+                arg(mEndFrame).
+                arg(mStartValue, 0, 'f').
+                arg(mStartFrame).
+                arg(parentAnimatorSqlId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+
+    return query.lastInsertId().toInt();
+}
+
+
 void QrealKey::constrainEndCtrlMaxFrame(int maxFrame) {
     if(mEndFrame < maxFrame || !mEndEnabled) return;
     qreal newFrame = clamp(mEndFrame, mFrame, maxFrame);

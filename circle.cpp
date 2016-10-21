@@ -8,13 +8,14 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
     setName("Circle");
 
 
-    mCenter = new CircleCenterPoint(0., 0., this, TYPE_PATH_POINT);
-    mHorizontalRadiusPoint = new CircleRadiusPoint(0., 0.,
-                                              this, TYPE_PATH_POINT,
-                                              false, mCenter);
-    mVerticalRadiusPoint = new CircleRadiusPoint(0., 0.,
-                                            this, TYPE_PATH_POINT,
-                                            true, mCenter);
+    mCenter = new CircleCenterPoint(this, TYPE_PATH_POINT);
+    mCenter->setRelativePos(QPointF(0., 0.), false);
+    mHorizontalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
+                                                   false, mCenter);
+    mCenter->setRelativePos(QPointF(0., 0.), false);
+    mVerticalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
+                                                 true, mCenter);
+    mCenter->setRelativePos(QPointF(0., 0.), false);
 
     QrealAnimator *hXAnimator = mHorizontalRadiusPoint->
                                     getRelativePosAnimatorPtr()->getXAnimator();
@@ -27,7 +28,8 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
     vYAnimator->setName("vertical radius");
 
 
-    mCenter->setVerticalAndHorizontalPoints(mVerticalRadiusPoint, mHorizontalRadiusPoint);
+    mCenter->setVerticalAndHorizontalPoints(mVerticalRadiusPoint,
+                                            mHorizontalRadiusPoint);
 
     mCenter->setPosAnimatorUpdater(new PathPointUpdater(this) );
     mHorizontalRadiusPoint->setPosAnimatorUpdater(
@@ -36,6 +38,103 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
                 new PathPointUpdater(this));
 
     schedulePathUpdate();
+}
+
+QPointF ellipseQPointFToCanvas(QPointF ellipseCoordPoint, qreal ar, qreal br) {
+    return QPointF(ellipseCoordPoint.x() + ar, br - ellipseCoordPoint.y());
+}
+
+void Circle::getTopLeftQuadrantVectorPoints(QPointF *leftPtr, QPointF *leftCtrlPtr,
+                                            QPointF *topCtrlPtr, QPointF *topPtr) {
+    qreal ar = qAbs(mHorizontalRadiusPoint->getRelativePos().x());
+    qreal br = qAbs(mVerticalRadiusPoint->getRelativePos().y());
+
+    qreal leftCtrlY = br;
+    qreal topCtrlX = -ar;
+    qreal xTestLeft = -ar*0.75;
+    qreal xTestTop = -ar*0.25;
+
+    qreal maxTopCtrlX = ar/3;
+    qreal minLeftCtrlY = br/3;
+
+    qreal testLeftY = br * sqrt(ar*ar - xTestLeft*xTestLeft) / ar;
+    qreal testTopY = br * sqrt(ar*ar - xTestTop*xTestTop) / ar;
+
+    QPointF left = QPointF(-ar, 0.);
+    QPointF leftCtrl = QPointF(-ar, leftCtrlY);
+    QPointF topCtrl = QPointF(topCtrlX, br);
+    QPointF top = QPointF(0., br);
+    qreal dLeft = 0.;
+    qreal dTop = 0.;
+    for(int i = 0; i < 100; i++) {
+        if(qAbs(dTop) < qAbs(dLeft)*0.5) dTop = -dLeft;
+        topCtrlX += dTop;
+        if(topCtrlX > maxTopCtrlX) topCtrlX = maxTopCtrlX;
+
+        if(qAbs(dLeft) < qAbs(dTop)*0.5) dLeft = -dTop;
+        leftCtrlY += dLeft;
+        if(leftCtrlY < minLeftCtrlY) leftCtrlY = minLeftCtrlY;
+
+        leftCtrl.setY(leftCtrlY);
+        topCtrl.setX(topCtrlX);
+
+        qreal tLeftTest = tFromX(left.x(),
+                         leftCtrl.x(),
+                         topCtrl.x(),
+                         top.x(), xTestLeft);
+        qreal guessTestLeftY = calcCubicBezierVal(left.y(), leftCtrl.y(),
+                                  topCtrl.y(), top.y(), tLeftTest);
+
+        qreal tTopTest = tFromX(left.x(),
+                         leftCtrl.x(),
+                         topCtrl.x(),
+                         top.x(), xTestTop);
+        qreal guessTestTopY = calcCubicBezierVal(left.y(), leftCtrl.y(),
+                                  topCtrl.y(), top.y(), tTopTest);
+
+        dLeft = testLeftY - guessTestLeftY;
+        dTop = guessTestTopY - testTopY;
+    }
+
+    // from ellipse coordinates to canvas
+    *leftPtr = left;
+    *leftCtrlPtr = leftCtrl;
+    *topCtrlPtr = topCtrl;
+    *topPtr = top;
+}
+
+VectorPath *Circle::objectToPath()
+{
+    QPointF left;
+    QPointF leftEndCtrl;
+    QPointF topStartCtrl;
+    QPointF top;
+
+    getTopLeftQuadrantVectorPoints(&left, &leftEndCtrl, &topStartCtrl, &top);
+
+    QPointF right = QPointF(-left.x(), left.y() );
+    QPointF bottom = QPointF(top.x(), -top.y() );
+
+    QPointF leftStartCtrl = left + left - leftEndCtrl;
+    QPointF topEndCtrl = top + top - topStartCtrl;
+
+    QPointF rightStartCtrl = QPointF(-leftEndCtrl.x(), leftEndCtrl.y() );
+    QPointF rightEndCtrl = QPointF(-leftStartCtrl.x(), leftStartCtrl.y() );
+
+    QPointF bottomStartCtrl = QPointF(topEndCtrl.x(), -topEndCtrl.y());
+    QPointF bottomEndCtrl = QPointF(topStartCtrl.x(), -topStartCtrl.y());
+
+    VectorPath *newPath = new VectorPath(mParent);
+    PathPoint *prevPoint = newPath->addPointRelPos(left, leftStartCtrl, leftEndCtrl);
+    PathPoint *leftPoint = prevPoint;
+    prevPoint = newPath->addPointRelPos(top, topStartCtrl, topEndCtrl, prevPoint);
+    prevPoint = newPath->addPointRelPos(right, rightStartCtrl, rightEndCtrl, prevPoint);
+    prevPoint = newPath->addPointRelPos(bottom, bottomStartCtrl, bottomEndCtrl, prevPoint);
+    prevPoint->connectToPoint(leftPoint);
+
+    copyTransformationTo(newPath);
+
+    return newPath;
 }
 
 void Circle::updateAfterFrameChanged(int currentFrame)
@@ -149,17 +248,15 @@ void Circle::updatePath()
 }
 
 void Circle::centerPivotPosition() {
-    mTransformAnimator.setPivot(mCenter->getRelativePos());
+    mTransformAnimator.setPivotWithoutChangingTransformation(mCenter->getRelativePos());
 }
 
-CircleCenterPoint::CircleCenterPoint(qreal relPosX, qreal relPosY,
-                                     BoundingBox *parent,
+CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,
                                      MovablePointType type) :
-    MovablePoint(relPosX, relPosY, parent, type)
+    MovablePoint(parent, type)
 {
 
 }
-
 
 
 CircleCenterPoint::~CircleCenterPoint()
@@ -194,10 +291,9 @@ void CircleCenterPoint::finishTransform()
     mParent->finishTransform();
 }
 
-CircleRadiusPoint::CircleRadiusPoint(qreal relPosX, qreal relPosY,
-                                     BoundingBox *parent, MovablePointType type,
+CircleRadiusPoint::CircleRadiusPoint(BoundingBox *parent, MovablePointType type,
                                      bool blockX, MovablePoint *centerPoint) :
-    MovablePoint(relPosX, relPosY, parent, type)
+    MovablePoint(parent, type)
 {
     mCenterPoint = centerPoint;
     mXBlocked = blockX;

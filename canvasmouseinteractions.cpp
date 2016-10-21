@@ -3,6 +3,8 @@
 #include "pathpivot.h"
 #include "circle.h"
 #include "rectangle.h"
+#include "imagebox.h"
+#include "textbox.h"
 
 QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
     return point/mCombinedTransformMatrix.m11();
@@ -28,6 +30,7 @@ void Canvas::handleMovePathMousePressEvent() {
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
+    if(mPreviewing) return;
     mLastMouseEventPos = event->pos();
     if(event->button() != Qt::LeftButton) {
         if(event->button() == Qt::RightButton) {
@@ -197,6 +200,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
             startNewUndoRedoSet();
 
+            new ImageBox(mCurrentBoxesGroup, "/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/pixmaps/mypaint_logo.png");
+
             Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPos, false);
             newPath->startAllPointsTransform();
@@ -204,6 +209,19 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             mCurrentBoxesGroup->addBoxToSelection(newPath);
 
             mCurrentRectangle = newPath;
+
+            finishUndoRedoSet();
+        } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
+            startNewUndoRedoSet();
+
+
+            TextBox *newPath = new TextBox(mCurrentBoxesGroup);
+            newPath->setAbsolutePos(mLastMouseEventPos, false);
+
+            mCurrentTextBox = newPath;
+
+            mCurrentBoxesGroup->clearBoxesSelection();
+            mCurrentBoxesGroup->addBoxToSelection(newPath);
 
             finishUndoRedoSet();
         }
@@ -354,6 +372,10 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
                             (VectorPath*) mLastPressedBox);
             }
             setCanvasMode(MOVE_PATH);
+        } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
+            if(mCurrentTextBox != NULL) {
+                mCurrentTextBox->openTextEditor();
+            }
         }
     }
     mXOnlyTransform = false;
@@ -375,6 +397,7 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
+    if(mPreviewing) return;
     if(event->button() != Qt::LeftButton) return;
     handleMouseRelease(event->pos());
 }
@@ -471,6 +494,7 @@ void Canvas::updateTransformation() {
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
+    if(mPreviewing) return;
     if(mMovesToSkip > 0) {
         mMovesToSkip--;
         return;
@@ -514,6 +538,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
 
 void Canvas::wheelEvent(QWheelEvent *event)
 {
+    if(mPreviewing) return;
     if(event->delta() > 0) {
         scale(1.2, event->posF());
     } else {
@@ -541,8 +566,10 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
         } else {
             if(boxAt->isGroup()) {
                 setCurrentBoxesGroup((BoxesGroup*) boxAt);
-            } else if(mCurrentMode == MOVE_PATH) {
-                setCanvasMode(MOVE_PATH);
+            } else if(boxAt->isText()) {
+                ((TextBox*) boxAt)->openTextEditor();
+            } else if(boxAt->isCircle() ) {
+                ((Circle*) boxAt)->objectToPath();
             } else if(mCurrentMode == MOVE_PATH) {
                 setCanvasMode(MOVE_PATH);
             }

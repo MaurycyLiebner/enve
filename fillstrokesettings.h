@@ -88,6 +88,7 @@ public:
     void scheduleQGradientStopsUpdate();
     void updateQGradientStopsIfNeeded();
     void startColorIdTransform(int id);
+    void addColorToList(ColorAnimator *newColorAnimator);
 private:
     int mSqlId = -1;
     GradientWidget *mGradientWidget;
@@ -105,8 +106,6 @@ public:
     PaintSettings(Color colorT,
                   PaintType paintTypeT,
                   Gradient *gradientT = NULL);
-
-    PaintSettings(int sqlId, GradientWidget *gradientWidget);
 
     virtual int saveToSql();
 
@@ -154,6 +153,7 @@ public:
         mGradientPoints = gradientPoints;
     }
 
+    virtual void loadFromSql(int sqlId, GradientWidget *gradientWidget);
 private:
     GradientPoints *mGradientPoints = NULL;
     ColorAnimator mColor;
@@ -200,6 +200,7 @@ public:
     }
 
     void setLineWidthUpdaterTarget(PathBox *path);
+    void loadFromSql(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;

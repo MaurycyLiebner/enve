@@ -10,6 +10,7 @@
 #include "fillstrokesettings.h"
 #include "animationdockwidget.h"
 #include "keysview.h"
+#include "fontswidget.h"
 
 class BoxesList;
 
@@ -38,6 +39,7 @@ private:
     QAction *mAddPointMode;
     QAction *mCircleMode;
     QAction *mRectangleMode;
+    QAction *mTextMode;
 //
     QAction *mActionConnectPoints;
     QAction *mActionDisconnectPoints;
@@ -48,10 +50,18 @@ private:
     QAction *mActionCornerPointCtrls;
 //
 
+    FontsWidget *mFontWidget = NULL;
+
     QString mCurrentFilePath = "";
 
     QMenuBar *mMenuBar;
     QMenu *mFileMenu;
+    QMenu *mSelectSameMenu;
+    QMenu *mEditMenu;
+    QMenu *mObjectMenu;
+    QMenu *mPathMenu;
+    QMenu *mEffectsMenu;
+    QMenu *mViewMenu;
 
     Canvas *mCanvas;
     UndoRedoStack mUndoRedoStack;
@@ -131,6 +141,7 @@ public:
     void updateDisplayedFillStrokeSettings();
     void scheduleDisplayedFillStrokeSettingsUpdate();
     void updateDisplayedFillStrokeSettingsIfNeeded();
+    void updateCanvasModeButtonsChecked(CanvasMode currentMode);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);

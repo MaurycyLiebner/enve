@@ -33,6 +33,50 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
     mAlphaAnimator.blockPointer();
 }
 
+void ColorAnimator::loadFromSql(int sqlId)
+{
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM coloranimator WHERE id = %1").
+            arg(sqlId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idModeAnimator = query.record().indexOf("colormode");
+        ColorMode colorMode = static_cast<ColorMode>(query.value(idModeAnimator).toInt());
+        setColorMode(colorMode);
+        int idVal1AnimatorId = query.record().indexOf("val1animatorid");
+        mVal1Animator.loadFromSql(query.value(idVal1AnimatorId).toInt());
+        int idVal2AnimatorId = query.record().indexOf("val2animatorid");
+        mVal2Animator.loadFromSql(query.value(idVal2AnimatorId).toInt());
+        int idVal3AnimatorId = query.record().indexOf("val3animatorid");
+        mVal3Animator.loadFromSql(query.value(idVal3AnimatorId).toInt());
+        int idAlphaAnimatorId = query.record().indexOf("alphaanimatorid");
+        mAlphaAnimator.loadFromSql(query.value(idAlphaAnimatorId).toInt());
+    } else {
+        qDebug() << "Could not load color with id " << sqlId;
+    }
+}
+
+#include <QSqlError>
+int ColorAnimator::saveToSql()
+{
+    int val1AnimatorId = mVal1Animator.saveToSql();
+    int val2AnimatorId = mVal2Animator.saveToSql();
+    int val3AnimatorId = mVal3Animator.saveToSql();
+    int alphaAnimatorId = mAlphaAnimator.saveToSql();
+    QSqlQuery query;
+    if(!query.exec(QString("INSERT INTO coloranimator (colormode, val1animatorid, "
+                       "val2animatorid, val3animatorid, alphaanimatorid) "
+                "VALUES (%1, %2, %3, %4, %5)").
+                arg(mColorMode).
+                arg(val1AnimatorId).
+                arg(val2AnimatorId).
+                arg(val3AnimatorId).
+                arg(alphaAnimatorId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+    return query.lastInsertId().toInt();
+}
+
 void ColorAnimator::setCurrentValue(Color colorValue, bool finish)
 {
     if(mColorMode == RGBMODE) {

@@ -22,6 +22,8 @@ public:
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();
+    int saveToSql();
+    void loadFromSql(int posAnimatorId);
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

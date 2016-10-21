@@ -5,23 +5,12 @@
 #include <QPainter>
 #include <QDebug>
 
-PathPoint::PathPoint(QPointF absPos, VectorPath *vectorPath) :
-    PathPoint(absPos, absPos, absPos, vectorPath)
+PathPoint::PathPoint(VectorPath *vectorPath) :
+    MovablePoint(vectorPath, MovablePointType::TYPE_PATH_POINT, 10.)
 {
-
-}
-
-PathPoint::PathPoint(qreal relPosX, qreal relPosy,
-                     qreal startCtrlRelX, qreal startCtrlRelY,
-                     qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, int boneZ,
-                     VectorPath *vectorPath) :
-    MovablePoint(relPosX, relPosy, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.)
-{    
-    mSqlLoadBoneZId = boneZ;
-    mSeparatePathPoint = isFirst;
     mVectorPath = vectorPath;
-    mStartCtrlPt = new CtrlPoint(startCtrlRelX, startCtrlRelY, this, true);
-    mEndCtrlPt = new CtrlPoint(endCtrlRelX, endCtrlRelY, this, false);
+    mStartCtrlPt = new CtrlPoint(this, true);
+    mEndCtrlPt = new CtrlPoint(this, false);
     mStartCtrlPt->incNumberPointers();
     mEndCtrlPt->incNumberPointers();
 
@@ -66,47 +55,14 @@ void PathPoint::clearAll()
     mEndCtrlPt->decNumberPointers();
 }
 
-PathPoint::PathPoint(QPointF absPos,
-                     QPointF startCtrlAbsPos,
-                     QPointF endCtrlAbsPos,
-                     VectorPath *vectorPath) :
-    MovablePoint(absPos, vectorPath, MovablePointType::TYPE_PATH_POINT, 10.)
+PathPoint::~PathPoint()
 {
-    mVectorPath = vectorPath;
-
-    mStartCtrlPt = new CtrlPoint(startCtrlAbsPos, this, true);
-    mEndCtrlPt = new CtrlPoint(endCtrlAbsPos, this, false);
-    mStartCtrlPt->incNumberPointers();
-    mEndCtrlPt->incNumberPointers();
-
-    mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
-    mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
-
-    mStartCtrlPt->hide();
-    mEndCtrlPt->hide();
-
-    setPosAnimatorUpdater(new PathPointUpdater(vectorPath) );
-    mInfluenceAnimator.setUpdater(new PathPointUpdater(vectorPath) );
-    mInfluenceTAnimator.setUpdater(new PathPointUpdater(vectorPath) );
-
-    mPathPointAnimators.setAllVars(this,
-                                   mEndCtrlPt->getRelativePosAnimatorPtr(),
-                                   mStartCtrlPt->getRelativePosAnimatorPtr(),
-                                   getRelativePosAnimatorPtr(),
-                                   &mInfluenceAnimator,
-                                   &mInfluenceTAnimator);
-    mPathPointAnimators.incNumberPointers();
-
-    mRelPos.setTraceKeyOnCurrentFrame(true);
+    mStartCtrlPt->decNumberPointers();
+    mEndCtrlPt->decNumberPointers();
 }
 
-PathPoint::PathPoint(int movablePointId, int pathPointId,
-                     VectorPath *vectorPath) :
-    MovablePoint(movablePointId, vectorPath,
-                 MovablePointType::TYPE_PATH_POINT, 10.)
-{
-    mVectorPath = vectorPath;
-
+void PathPoint::loadFromSql(int pathPointId, int movablePointId) {
+    MovablePoint::loadFromSql(movablePointId);
     QSqlQuery query;
     QString queryStr = "SELECT * FROM pathpoint WHERE id = " +
             QString::number(pathPointId);
@@ -115,36 +71,20 @@ PathPoint::PathPoint(int movablePointId, int pathPointId,
         int idisfirst = query.record().indexOf("isfirst");
         int idstartctrlptid = query.record().indexOf("startctrlptid");
         int idendctrlptid = query.record().indexOf("endctrlptid");
+        int idstartpointenabled = query.record().indexOf("startpointenabled");
+        int idendpointenabled = query.record().indexOf("endpointenabled");
+        int idctrlsmode = query.record().indexOf("ctrlsmode");
 
         mSeparatePathPoint = query.value(idisfirst).toBool();
+        mStartCtrlPtEnabled = query.value(idstartpointenabled).toBool();
+        mEndCtrlPtEnabled = query.value(idendpointenabled).toBool();
+        mCtrlsMode = static_cast<CtrlsMode>(query.value(idctrlsmode).toInt() );
 
-        mStartCtrlPt = new CtrlPoint(query.value(idstartctrlptid).toInt(),
-                                     this, true);
-        mEndCtrlPt = new CtrlPoint(query.value(idendctrlptid).toInt(),
-                                   this, false);
-        mStartCtrlPt->incNumberPointers();
-        mEndCtrlPt->incNumberPointers();
-        mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
-        mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
+        mStartCtrlPt->loadFromSql(query.value(idstartctrlptid).toInt());
+        mEndCtrlPt->loadFromSql(query.value(idendctrlptid).toInt());
     } else {
         qDebug() << "Could not load pathpoint with id " << pathPointId;
     }
-
-    mPathPointAnimators.setAllVars(this,
-                                   mEndCtrlPt->getRelativePosAnimatorPtr(),
-                                   mStartCtrlPt->getRelativePosAnimatorPtr(),
-                                   getRelativePosAnimatorPtr(),
-                                   &mInfluenceAnimator,
-                                   &mInfluenceTAnimator);
-    mPathPointAnimators.incNumberPointers();
-
-    mRelPos.setTraceKeyOnCurrentFrame(true);
-}
-
-PathPoint::~PathPoint()
-{
-    mStartCtrlPt->decNumberPointers();
-    mEndCtrlPt->decNumberPointers();
 }
 
 void PathPoint::startTransform()
@@ -287,14 +227,18 @@ void PathPoint::saveToSql(int vectorPathId)
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
     QString isEnd = ( (isEndPoint()) ? "1" : "0" );
     if(!query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, "
-                "movablepointid, startctrlptid, endctrlptid, vectorpathid) "
-                "VALUES (%1, %2, %3, %4, %5, %6)").
+                "movablepointid, startctrlptid, endctrlptid, vectorpathid, "
+                "ctrlsmode, startpointenabled, endpointenabled) "
+                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
                 arg(isFirst).
                 arg(isEnd).
                 arg(movablePtId).
                 arg(startPtId).
                 arg(endPtId).
-                arg(vectorPathId) ) ) {
+                arg(vectorPathId).
+                arg(mCtrlsMode).
+                arg(mStartCtrlPtEnabled).
+                arg(mEndCtrlPtEnabled) ) ) {
         qDebug() << query.lastError() << endl << query.lastQuery();
     }
     if(mNextPoint != NULL) {
@@ -302,13 +246,6 @@ void PathPoint::saveToSql(int vectorPathId)
             mNextPoint->saveToSql( vectorPathId);
         }
     }
-}
-
-void PathPoint::attachToBoneFromSqlZId()
-{
-    MovablePoint::attachToBoneFromSqlZId();
-    mStartCtrlPt->attachToBoneFromSqlZId();
-    mEndCtrlPt->attachToBoneFromSqlZId();
 }
 
 QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {

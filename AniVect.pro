@@ -45,7 +45,6 @@ SOURCES += main.cpp\
     boundingboxlistitem.cpp \
     boxeslist.cpp \
     transformable.cpp \
-    bone.cpp \
     qrealanimator.cpp \
     qpointfanimator.cpp \
     animatonwidgetscrollbar.cpp \
@@ -69,7 +68,10 @@ SOURCES += main.cpp\
     circle.cpp \
     pathbox.cpp \
     gradientpoints.cpp \
-    rectangle.cpp
+    rectangle.cpp \
+    imagebox.cpp \
+    fontswidget.cpp \
+    textbox.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -102,7 +104,6 @@ HEADERS  += mainwindow.h \
     svgimporter.h \
     boxeslist.h \
     transformable.h \
-    bone.h \
     qrealanimator.h \
     qpointfanimator.h \
     animatonwidgetscrollbar.h \
@@ -124,4 +125,7 @@ HEADERS  += mainwindow.h \
     circle.h \
     pathbox.h \
     gradientpoints.h \
-    rectangle.h
+    rectangle.h \
+    imagebox.h \
+    fontswidget.h \
+    textbox.h

@@ -58,15 +58,15 @@ void VectorPath::loadFromSql(int boundingBoxId) {
                    "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
                    "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
                    "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
-        mFillGradientPoints.initialize(this, fillGradientStartId,
+        mFillGradientPoints.loadFromSql(fillGradientStartId,
                                        fillGradientEndId);
-        mStrokeGradientPoints.initialize(this, strokeGradientStartId,
+        mStrokeGradientPoints.loadFromSql(strokeGradientStartId,
                                          strokeGradientEndId);
 
         GradientWidget *gradientWidget =
                 mMainWindow->getFillStrokeSettings()->getGradientWidget();
 
-        mFillPaintSettings = PaintSettings(fillSettingsId, gradientWidget);
+        mFillPaintSettings.loadFromSql(fillSettingsId, gradientWidget);
         mStrokeSettings = StrokeSettings::createStrokeSettingsFromSql(
                     strokeSettingsId, gradientWidget);
     } else {
@@ -107,7 +107,8 @@ void VectorPath::loadPointsFromSql(int vectorPathId) {
             bool isendpoint = query.value(idisendpoint).toBool();
             int movablepointid = query.value(idmovablepointid).toInt();
 
-            PathPoint *newPoint = new PathPoint(movablepointid, id, this);
+            PathPoint *newPoint = new PathPoint(this);
+            newPoint->loadFromSql(id, movablepointid);
             appendToPointsList(newPoint, false);
             if(lastPoint != NULL) {
                 if(isfirst && firstPoint != NULL) {
@@ -138,7 +139,7 @@ void VectorPath::clearAll()
 {
     foreach(PathPoint *point, mPoints) {
         point->clearAll();
-        delete point;
+        point->decNumberPointers();
     }
     mStrokeGradientPoints.clearAll();
     mFillGradientPoints.clearAll();
@@ -227,16 +228,6 @@ PathPoint *VectorPath::findPointNearestToPercentEditPath(qreal percent,
     return nearestPoint;
 }
 
-void VectorPath::attachToBoneFromSqlZId()
-{
-    BoundingBox::attachToBoneFromSqlZId();
-    foreach(PathPoint *point, mPoints) {
-        point->attachToBoneFromSqlZId();
-    }
-    mFillGradientPoints.attachToBoneFromSqlZId();
-    mStrokeGradientPoints.attachToBoneFromSqlZId();
-}
-
 void VectorPath::updateAfterFrameChanged(int currentFrame)
 {
     foreach(PathPoint *point, mPoints) {
@@ -302,7 +293,7 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
                                               &newPointEnd,
                                               pressedT);
 
-        PathPoint *newPoint = new PathPoint(newPointPos, this);
+        PathPoint *newPoint = new PathPoint(this);
         newPoint->setRelativePos(newPointPos, false);
 
         nextPoint->setPointAsPrevious(newPoint);
@@ -471,7 +462,7 @@ void VectorPath::centerPivotPosition() {
     foreach(PathPoint *point, mPoints) {
         posSum += point->getRelativePos();
     }
-    mTransformAnimator.setPivot(posSum/count);
+    mTransformAnimator.setPivotWithoutChangingTransformation(posSum/count);
 }
 
 /*void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)
@@ -618,6 +609,7 @@ PathPoint *VectorPath::addPointRelPos(QPointF relPos,
                                       QPointF startRelPos, QPointF endRelPos,
                                       PathPoint *toPoint) {
     PathPoint *newPoint = addPointRelPos(relPos, toPoint);
+    newPoint->setCtrlsMode(CTRLS_SYMMETRIC);
     newPoint->moveStartCtrlPtToRelPos(startRelPos);
     newPoint->moveEndCtrlPtToRelPos(endRelPos);
     return newPoint;
@@ -803,15 +795,20 @@ PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
 
 PathPoint* VectorPath::addPointAbsPos(QPointF absPtPos, PathPoint *toPoint)
 {
-    PathPoint *newPoint = new PathPoint(absPtPos, this);
+    PathPoint *newPoint = new PathPoint(this);
+    newPoint->setAbsolutePos(absPtPos, false);
+    newPoint->moveStartCtrlPtToAbsPos(absPtPos);
+    newPoint->moveEndCtrlPtToAbsPos(absPtPos);
 
     return addPoint(newPoint, toPoint);
 }
 
 PathPoint *VectorPath::addPointRelPos(QPointF relPtPos, PathPoint *toPoint)
 {
-    PathPoint *newPoint = new PathPoint(QPointF(0., 0.), this);
-    newPoint->setRelativePos(relPtPos);
+    PathPoint *newPoint = new PathPoint(this);
+    newPoint->setRelativePos(relPtPos, false);
+    newPoint->moveStartCtrlPtToRelPos(relPtPos);
+    newPoint->moveEndCtrlPtToRelPos(relPtPos);
 
     return addPoint(newPoint, toPoint);
 }

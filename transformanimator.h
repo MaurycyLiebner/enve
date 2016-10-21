@@ -26,8 +26,8 @@ public:
     qreal getYScale();
     qreal getXScale();
 
-    void setPivot(qreal x, qreal y);
-    void setPivot(QPointF point, bool finish = false);
+    void setPivotWithoutChangingTransformation(qreal x, qreal y);
+    void setPivotWithoutChangingTransformation(QPointF point, bool finish = false);
     QPointF getPivot();
 
     qreal dx();
@@ -49,6 +49,10 @@ public:
     void startOpacityTransform();
     void setOpacity(qreal newOpacity);
     void moveRelativeToSavedValue(qreal dX, qreal dY);
+    void copyTransformationTo(TransformAnimator *targetAnimator);
+    void setPivot(QPointF point, bool finish = false);
+    int saveToSql();
+    void loadFromSql(int transformAnimatorId);
 private:
     QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;

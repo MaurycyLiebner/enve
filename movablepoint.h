@@ -21,12 +21,8 @@ enum MovablePointType {
 class MovablePoint : public Transformable
 {
 public:
-    MovablePoint(qreal relPosX, qreal relPosY, BoundingBox *parent,
-                 MovablePointType type, qreal radius = 7.5f);
-    MovablePoint(QPointF absPos, BoundingBox *parent, MovablePointType type,
+    MovablePoint(BoundingBox *parent, MovablePointType type,
                  qreal radius = 7.5f);
-    MovablePoint(int movablePointId, BoundingBox *parent,
-                 MovablePointType type, qreal radius = 7.5f);
 
     virtual void startTransform();
     virtual void finishTransform();
@@ -74,10 +70,6 @@ public:
 
     void setRadius(qreal radius);
 
-    QPointF getAbsBoneAttachPoint();
-
-    void attachToBoneFromSqlZId();
-
     bool isBeingTransformed();
     virtual int saveToSql();
 
@@ -88,6 +80,7 @@ public:
     QPointFAnimator *getRelativePosAnimatorPtr();
 
     qreal getRadius();
+    void loadFromSql(int movablePointId);
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

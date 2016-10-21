@@ -2,8 +2,7 @@
 #include "canvas.h"
 
 PathPivot::PathPivot(Canvas *parent) :
-    MovablePoint(QPointF(0., 0.), parent,
-                 MovablePointType::TYPE_PIVOT_POINT, 10.)
+    MovablePoint(parent, MovablePointType::TYPE_PIVOT_POINT, 10.)
 {
     mCanvas = parent;
 //    mRotationPath.addEllipse(QPointF(0., 0.), 50., 50.);
@@ -84,6 +83,7 @@ void PathPivot::startScaling()
 
 bool PathPivot::handleMousePress(QPointF absPressPos)
 {
+    if(mHidden) return false;
     if(isPointAt(absPressPos)) {
         select();
         return true;
@@ -169,22 +169,27 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
         } else {
             scaleBy = 1. + distSign(distMoved)*0.005;
         }
+        qreal scaleX;
+        qreal scaleY;
         if(xOnly) {
-            mCanvas->scaleBoxesBy(scaleBy, 1., absPos, startTransform);
+            scaleX = scaleBy;
+            scaleY = 1.;
         } else if(yOnly) {
-            mCanvas->scaleBoxesBy(1., scaleBy, absPos, startTransform);
+            scaleX = 1.;
+            scaleY = scaleBy;
         } else {
             if(isShiftPressed() || inputTransformationEnabled) {
-                mCanvas->scaleBoxesBy(scaleBy, absPos, startTransform);
+                scaleX = scaleBy;
+                scaleY = scaleBy;
             } else {
-                qreal scaleXBy = 1. +
+                scaleX = 1. +
                         distSign(distMoved - QPointF(0., distMoved.y()) )*0.005;
-                qreal scaleYBy = 1. +
+                scaleY = 1. +
                         distSign(distMoved - QPointF(distMoved.x(), 0.) )*0.005;
-                mCanvas->scaleBoxesBy(scaleXBy, scaleYBy, absPos,
-                                      startTransform);
             }
         }
+
+        mCanvas->scaleBoxesBy(scaleX, scaleY, absPos, startTransform);
         return true;
     }
     return false;

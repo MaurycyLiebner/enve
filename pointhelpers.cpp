@@ -39,6 +39,10 @@ qreal pointToLen(QPointF point) {
     return sqrt(point.x()*point.x() + point.y()*point.y());
 }
 
+bool isZero(qreal val) {
+    return qAbs(val) < 0.0001;
+}
+
 bool isPointZero(QPointF pos) {
     return pointToLen(pos) < 0.0001;
 }
@@ -48,6 +52,10 @@ QPointF scalePointToNewLen(QPointF point, qreal newLen) {
         return point;
     }
     return point * newLen / pointToLen(point);
+}
+
+QString boolToSql(bool bT) {
+    return (bT) ? "1" : "0";
 }
 
 void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos, QPointF centerPos,

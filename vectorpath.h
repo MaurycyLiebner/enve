@@ -55,8 +55,6 @@ public:
                          bool *found = NULL, QPointF *posInPath = NULL);
     PathPoint *findPointNearestToPercent(qreal percent, qreal *foundAtPercent);
 
-    void attachToBoneFromSqlZId();
-
     void updateAfterFrameChanged(int currentFrame);
 
     void startAllPointsTransform();
@@ -96,7 +94,7 @@ public:
     Edge *getEdgeFromMappedEditPath(QPointF absPos);
     Edge *getEdgeFromMappedPath(QPointF absPos);
     void deletePointAndApproximate(PathPoint *pointToRemove);
-    void loadFromSql(int boundingBoxId);
+    virtual void loadFromSql(int boundingBoxId);
 protected:
     bool mInfluenceEnabled = false;
     void updatePath();

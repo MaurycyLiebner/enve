@@ -14,6 +14,7 @@ ComplexAnimator::~ComplexAnimator()
     foreach(QrealAnimator *animator, mChildAnimators) {
         animator->decNumberPointers();
     }
+    mChildAnimators.clear();
 }
 
 #include <QDebug>

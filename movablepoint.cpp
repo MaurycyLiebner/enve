@@ -3,55 +3,30 @@
 #include "mainwindow.h"
 #include "undoredo.h"
 
-MovablePoint::MovablePoint(QPointF absPos,
-                           BoundingBox *parent,
+MovablePoint::MovablePoint(BoundingBox *parent,
                            MovablePointType type,
                            qreal radius) : Transformable()
 {
     mType = type;
     mRadius = radius;
     mParent = parent;
-    setAbsolutePos(absPos, false);
 
     mRelPos.blockPointer();
 }
 
-MovablePoint::MovablePoint(qreal relPosX, qreal relPosY,
-                           BoundingBox *parent,
-                           MovablePointType type,
-                           qreal radius) : Transformable()
-{
-    mType = type;
-    mRadius = radius;
-    mParent = parent;
-    setRelativePos(QPointF(relPosX, relPosY), false);
-
-    mRelPos.blockPointer();
-}
-
-MovablePoint::MovablePoint(int movablePointId, BoundingBox *parent,
-             MovablePointType type, qreal radius)  : Transformable() {
-    mType = type;
-    mRadius = radius;
-    mParent = parent;
-
+void MovablePoint::loadFromSql(int movablePointId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM movablepoint WHERE id = " +
             QString::number(movablePointId);
     if(query.exec(queryStr)) {
         query.next();
-        int idxrelpos = query.record().indexOf("xrelpos");
-        int idyrelpos = query.record().indexOf("yrelpos");
-        int idbonezid = query.record().indexOf("bonezid");
-        mSqlLoadBoneZId = query.value(idbonezid).toInt();
-        setRelativePos(QPointF(query.value(idxrelpos).toReal(),
-                               query.value(idyrelpos).toReal()), false );
+        int idposanimator = query.record().indexOf("posanimatorid");
+
+        mRelPos.loadFromSql(query.value(idposanimator).toInt() );
     } else {
         qDebug() << "Could not load movablepoint with id " << movablePointId;
     }
-
-    mRelPos.blockPointer();
 }
 
 void MovablePoint::startTransform()
@@ -165,16 +140,6 @@ void MovablePoint::setRadius(qreal radius)
     mRadius = radius;
 }
 
-QPointF MovablePoint::getAbsBoneAttachPoint()
-{
-    return getAbsolutePos();
-}
-
-void MovablePoint::attachToBoneFromSqlZId()
-{
-    setBone(mParent->getParent()->boneFromZIndex(mSqlLoadBoneZId) );
-}
-
 bool MovablePoint::isBeingTransformed()
 {
     return mSelected || mParent->isSelected();
@@ -182,14 +147,11 @@ bool MovablePoint::isBeingTransformed()
 #include <QSqlError>
 int MovablePoint::saveToSql()
 {
+    int posAnimatorId = mRelPos.saveToSql();
     QSqlQuery query;
-    QPointF relPos = mRelPos.getCurrentValue();
-    if(!query.exec(QString("INSERT INTO movablepoint (xrelpos, yrelpos, "
-                           "bonezid) "
-                "VALUES (%1, %2, %3)").
-                arg(relPos.x(), 0, 'f').
-                arg(relPos.y(), 0, 'f').
-                arg((mBone == NULL) ? -1 : mBone->getZIndex()) ) ) {
+    if(!query.exec(QString("INSERT INTO movablepoint (posanimatorid) "
+                "VALUES (%1)").
+                arg(posAnimatorId) ) ) {
         qDebug() << query.lastError() << endl << query.lastQuery();
     }
     return query.lastInsertId().toInt();

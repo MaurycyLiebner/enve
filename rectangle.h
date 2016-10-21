@@ -5,8 +5,7 @@
 class RectangleTopLeftPoint : public MovablePoint
 {
 public:
-    RectangleTopLeftPoint(qreal relPosX, qreal relPosY,
-                          BoundingBox *parent);
+    RectangleTopLeftPoint(BoundingBox *parent);
 
     void moveBy(QPointF absTranslatione);
     void moveByAbs(QPointF absTranslatione);
@@ -21,8 +20,7 @@ private:
 class RectangleBottomRightPoint : public MovablePoint
 {
 public:
-    RectangleBottomRightPoint(qreal relPosX, qreal relPosY,
-                              BoundingBox *parent);
+    RectangleBottomRightPoint(BoundingBox *parent);
     void setPoints(MovablePoint *topLeftPoint, MovablePoint *radiusPoint);
 
     void moveBy(QPointF absTranslatione);
@@ -37,8 +35,7 @@ private:
 class RectangleRadiusPoint : public MovablePoint
 {
 public:
-    RectangleRadiusPoint(qreal relPosX, qreal relPosY,
-                         BoundingBox *parent);
+    RectangleRadiusPoint(BoundingBox *parent);
     void setPoints(MovablePoint *topLeftPoint, MovablePoint *bottomRightPoint);
 
     void moveBy(QPointF absTranslatione);
@@ -67,11 +64,14 @@ public:
     void centerPivotPosition();
     void updateRadiusXAndRange();
     void updateAfterFrameChanged(int currentFrame);
+    VectorPath *objectToPath();
 private:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;
 
     RectangleRadiusPoint *mRadiusPoint;
+
+    QrealAnimator *mRadiusAnimator;
 };
 
 #endif // RECTANGLE_H

@@ -174,6 +174,9 @@ public:
     void removeThisFromGraphAnimator();
 
     void setAnimatorColor(QColor color);
+    virtual int saveToSql();
+    void loadFromSql(int qrealAnimatorId);
+    void loadKeysFromSql(int qrealAnimatorId);
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 

@@ -26,8 +26,6 @@ public:
     void addUpdateScheduler(UpdateScheduler *scheduler);
     void callUpdateSchedulers();
     MainWindow *getMainWindow();
-    QString boolToSql(bool bT);
-
     void startNewUndoRedoSet();
     void finishUndoRedoSet();
     virtual void schedulePivotUpdate();

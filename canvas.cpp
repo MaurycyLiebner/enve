@@ -8,6 +8,7 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 #include "boxeslist.h"
+#include "imagebox.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                MainWindow *parent) :
@@ -30,7 +31,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     setMinimumSize(500, 500);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    setCanvasMode(MOVE_PATH);
+    mCurrentMode = MOVE_PATH;
+    //setCanvasMode(MOVE_PATH);
 }
 
 Canvas::~Canvas()
@@ -83,6 +85,8 @@ bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
         setCanvasMode(CanvasMode::ADD_CIRCLE);
     } else if(event->key() == Qt::Key_F5) {
         setCanvasMode(CanvasMode::ADD_RECTANGLE);
+    } else if(event->key() == Qt::Key_F6) {
+        setCanvasMode(CanvasMode::ADD_TEXT);
     } else {
         return false;
     }
@@ -105,13 +109,13 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
 
         callUpdateSchedulers();
     } else if(event->key() == Qt::Key_PageUp) {
-        mCurrentBoxesGroup->moveSelectedBoxesUp();
+        mCurrentBoxesGroup->raiseSelectedBoxes();
     } else if(event->key() == Qt::Key_PageDown) {
-        mCurrentBoxesGroup->moveSelectedBoxesDown();
+        mCurrentBoxesGroup->lowerSelectedBoxes();
     } else if(event->key() == Qt::Key_End) {
-        mCurrentBoxesGroup->bringSelectedBoxesToEnd();
+        mCurrentBoxesGroup->lowerSelectedBoxesToBottom();
     } else if(event->key() == Qt::Key_Home) {
-        mCurrentBoxesGroup->bringSelectedBoxesToFront();
+        mCurrentBoxesGroup->raiseSelectedBoxesToTop();
     } else {
         return false;
     }
@@ -156,9 +160,8 @@ void Canvas::saveSelectedToSqlForCurrentBox() {
 }
 
 void Canvas::loadAllBoxesFromSql(bool loadInBox) {
-    BoxesGroup *container = mCurrentBoxesGroup->loadChildrenFromSql("NULL",
+    BoxesGroup *container = mCurrentBoxesGroup->loadChildrenFromSql(0,
                                                                     loadInBox);
-    container->attachToBoneFromSqlZId();
 }
 
 void Canvas::paintEvent(QPaintEvent *)
@@ -281,6 +284,31 @@ void Canvas::nextPreviewFrame()
     repaint();
 }
 
+void Canvas::raiseAction()
+{
+    mCurrentBoxesGroup->raiseSelectedBoxes();
+}
+
+void Canvas::lowerAction()
+{
+    mCurrentBoxesGroup->lowerSelectedBoxes();
+}
+
+void Canvas::raiseToTopAction()
+{
+    mCurrentBoxesGroup->raiseSelectedBoxesToTop();
+}
+
+void Canvas::lowerToBottomAction()
+{
+    mCurrentBoxesGroup->lowerSelectedBoxesToBottom();
+}
+
+void Canvas::objectsToPathAction()
+{
+    mCurrentBoxesGroup->convertSelectedBoxesToPath();
+}
+
 void Canvas::renderCurrentFrameToPreview()
 {
     QImage *image = new QImage(mVisibleWidth, mVisibleHeight,
@@ -389,7 +417,7 @@ void Canvas::updatePivot() {
         mRotPivot->hide();
     } else {
         mRotPivot->show();
-        mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedPivotPos(),
+        mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedBoxesPivotPos(),
                                   false);
     }
 }
@@ -412,6 +440,8 @@ void Canvas::setCanvasMode(CanvasMode mode) {
         setCursor(QCursor(QPixmap("pixmaps/cursor-ellipse.xpm"), 4, 4) );
     } else if(mCurrentMode == ADD_RECTANGLE) {
         setCursor(QCursor(QPixmap("pixmaps/cursor-rect.xpm"), 4, 4) );
+    } else if(mCurrentMode == ADD_TEXT) {
+        setCursor(QCursor(QPixmap("pixmaps/cursor-text.xpm"), 4, 4) );
     } else {
         setCursor(QCursor(QPixmap("pixmaps/cursor-pen.xpm"), 4, 4) );
     }
@@ -420,6 +450,7 @@ void Canvas::setCanvasMode(CanvasMode mode) {
         schedulePivotUpdate();
     }
 
+    mMainWindow->updateCanvasModeButtonsChecked(mode);
 }
 
 void Canvas::clearAndDisableInput() {
@@ -444,6 +475,20 @@ void Canvas::grabMouseAndTrack() {
     grabMouse();
 }
 
+void Canvas::setFontFamilyAndStyle(QString family, QString style)
+{
+    mCurrentBoxesGroup->setSelectedFontFamilyAndStyle(family, style);
+
+    callUpdateSchedulers();
+}
+
+void Canvas::setFontSize(qreal size)
+{
+    mCurrentBoxesGroup->setSelectedFontSize(size);
+
+    callUpdateSchedulers();
+}
+
 void Canvas::releaseMouseAndDontTrack() {
     mIsMouseGrabbing = false;
     setMouseTracking(false);
@@ -459,6 +504,7 @@ void Canvas::groupSelectedBoxesAction() {
 
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
+    if(mPreviewing) return;
     bool isGrabbingMouse = mouseGrabber() == this;
     if(isGrabbingMouse) {
         if(event->key() == Qt::Key_Escape) {
@@ -566,31 +612,13 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        }
 
     } else if(event->key() == Qt::Key_PageUp) {
-       mCurrentBoxesGroup->moveSelectedBoxesUp();
+       raiseAction();
     } else if(event->key() == Qt::Key_PageDown) {
-       mCurrentBoxesGroup->moveSelectedBoxesDown();
+       lowerAction();
     } else if(event->key() == Qt::Key_End) {
-       mCurrentBoxesGroup->bringSelectedBoxesToEnd();
+       lowerToBottomAction();
     } else if(event->key() == Qt::Key_Home) {
-       mCurrentBoxesGroup->bringSelectedBoxesToFront();
-    } else if(event->key() == Qt::Key_B) {
-        if(isAltPressed(event)) {
-            mCurrentBoxesGroup->detachFromBone(mCurrentMode);
-        } else if(isCtrlPressed()) {
-            Bone *bone = mCurrentBoxesGroup->getBoneAt(
-                        mapFromGlobal(QCursor::pos()));
-            if(bone == NULL) return;
-            mCurrentBoxesGroup->attachToBone(bone, mCurrentMode);
-        } else {
-            startNewUndoRedoSet();
-            Bone *newBone = new Bone(mCurrentBoxesGroup);
-            newBone->addCircle(mapFromGlobal(QCursor::pos()) );
-            finishUndoRedoSet();
-            setCanvasMode(MOVE_PATH);
-            mCurrentBoxesGroup->clearBoxesSelection();
-            mCurrentBoxesGroup->addBoxToSelection(newBone);
-            setCanvasMode(MOVE_POINT);
-        }
+       raiseToTopAction();
     } else if(event->key() == Qt::Key_G && isAltPressed(event)) {
         mCurrentBoxesGroup->resetSelectedTranslation();
     } else if(event->key() == Qt::Key_S && isAltPressed(event)) {
@@ -761,11 +789,12 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
             QPointF endCtrlPtPos;
             getMirroredCtrlPtAbsPos(mirror, point,
                                     &startCtrlPtPos, &endCtrlPtPos);
-            setCurrentEndPoint(mCurrentEndPoint->addPoint(
-                                new PathPoint(point->getAbsolutePos(),
-                                              startCtrlPtPos,
-                                              endCtrlPtPos,
-                                              pathDest)) );
+            PathPoint *newPoint = new PathPoint(pathDest);
+            newPoint->setAbsolutePos(point->getAbsolutePos());
+            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
+            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
+
+            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
             point = point->getNextPoint();
         }
     } else {
@@ -776,11 +805,13 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
             QPointF endCtrlPtPos;
             getMirroredCtrlPtAbsPos(mirror, point,
                                     &startCtrlPtPos, &endCtrlPtPos);
-            setCurrentEndPoint(mCurrentEndPoint->addPoint(
-                                new PathPoint(point->getAbsolutePos(),
-                                              startCtrlPtPos,
-                                              endCtrlPtPos,
-                                              pathDest)) );
+
+            PathPoint *newPoint = new PathPoint(pathDest);
+            newPoint->setAbsolutePos(point->getAbsolutePos());
+            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
+            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
+
+            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
             point = point->getPreviousPoint();
         }
     }

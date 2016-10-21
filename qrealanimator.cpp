@@ -21,6 +21,70 @@ QrealAnimator::~QrealAnimator()
     }
 }
 
+
+#include <QSqlError>
+#include <QSqlQuery>
+int QrealAnimator::saveToSql() {
+    QSqlQuery query;
+    if(!query.exec(
+        QString("INSERT INTO qrealanimator (currentvalue) "
+                "VALUES (%1)").
+                arg(mCurrentValue, 0, 'f') ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+
+    int thisSqlId = query.lastInsertId().toInt();
+
+    foreach(QrealKey *key, mKeys) {
+        key->saveToSql(thisSqlId);
+    }
+
+    return thisSqlId;
+}
+
+void QrealAnimator::loadFromSql(int qrealAnimatorId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM qrealanimator WHERE id = " +
+            QString::number(qrealAnimatorId);
+    if(query.exec(queryStr)) {
+        query.next();
+        int qrealAnimatorId = query.record().indexOf("id");
+        int currentValue = query.record().indexOf("currentvalue");
+
+        loadKeysFromSql(query.value(qrealAnimatorId).toInt() );
+
+        if(mKeys.isEmpty()) {
+            setCurrentValue(query.value(currentValue).toReal());
+        }
+    } else {
+        qDebug() << "Could not load qpointfanimator with id " << qrealAnimatorId;
+    }
+}
+
+void QrealAnimator::loadKeysFromSql(int qrealAnimatorId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM qrealkey WHERE qrealanimatorid = " +
+            QString::number(qrealAnimatorId);
+    if(query.exec(queryStr)) {
+        int idValue = query.record().indexOf("value");
+        int idFrame = query.record().indexOf("frame");
+        int idEndEnabled = query.record().indexOf("endenabled");
+        int idStartEnabled = query.record().indexOf("startenabled");
+        int idCtrlsMode = query.record().indexOf("ctrlsmode");
+        int idEndValue = query.record().indexOf("endvalue");
+        int idEndFrame = query.record().indexOf("endframe");
+        int idStartValue = query.record().indexOf("startvalue");
+        int idStartFrame = query.record().indexOf("startframe");
+        while(query.next() ) {
+
+        }
+    } else {
+        qDebug() << "Could not load qpointfanimator with id " << qrealAnimatorId;
+    }
+}
+
 void QrealAnimator::setValueRange(qreal minVal, qreal maxVal)
 {
     mMinPossibleVal = minVal;

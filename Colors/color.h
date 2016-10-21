@@ -41,7 +41,6 @@ struct Color
         gl_a = a_t;
         qcol.setAlpha(a_t);
     }*/
-    int saveToSql();
 
     void updateHSVFromRGB();
     void updateQColFromHSV();
@@ -57,7 +56,6 @@ struct Color
     void setGLColorA(GLfloat a_t);
     Color(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a_t = 1.0f);
     Color(int r_t, int g_t, int b_t, int a_t = 255);
-    Color(int sqlId);
     Color();
 
 public:

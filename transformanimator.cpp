@@ -34,6 +34,69 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     addChildAnimator(&mOpacityAnimator);
 }
 
+#include <QSqlError>
+int TransformAnimator::saveToSql() {
+    int posAnimatorId = mPosAnimator.saveToSql();
+    int scaleAnimatorId = mScaleAnimator.saveToSql();
+    int pivotAnimatorId = mPivotAnimator.saveToSql();
+    int rotAnimatorId = mRotAnimator.saveToSql();
+    int opacityAnimatorId = mOpacityAnimator.saveToSql();
+    QSqlQuery query;
+    if(!query.exec(
+        QString("INSERT INTO transformanimator (posanimatorid, scaleanimatorid, "
+                "pivotanimatorid, rotanimatorid, opacityanimatorid ) "
+                "VALUES (%1, %2, %3, %4, %5)").
+                arg(posAnimatorId).
+                arg(scaleAnimatorId).
+                arg(pivotAnimatorId).
+                arg(rotAnimatorId).
+                arg(opacityAnimatorId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+
+    return query.lastInsertId().toInt();
+}
+
+void TransformAnimator::loadFromSql(int transformAnimatorId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM transformanimator WHERE id = " +
+            QString::number(transformAnimatorId);
+    if(query.exec(queryStr)) {
+        query.next();
+        int posanimatorid = query.record().indexOf("posanimatorid");
+        int scaleanimatorid = query.record().indexOf("scaleanimatorid");
+        int pivotanimatorid = query.record().indexOf("pivotanimatorid");
+        int rotanimatorid = query.record().indexOf("rotanimatorid");
+        int opacityanimatorid = query.record().indexOf("opacityanimatorid");
+
+        //loadKeysFromSql(qrealAnimatorId);
+
+        mPosAnimator.loadFromSql(posanimatorid);
+        mScaleAnimator.loadFromSql(scaleanimatorid);
+        mPivotAnimator.loadFromSql(pivotanimatorid);
+        mRotAnimator.loadFromSql(rotanimatorid);
+        mOpacityAnimator.loadFromSql(opacityanimatorid);
+    } else {
+        qDebug() << "Could not load qpointfanimator with id " << transformAnimatorId;
+    }
+}
+
+void TransformAnimator::copyTransformationTo(
+                                        TransformAnimator *targetAnimator) {
+    QPointF currScale = mScaleAnimator.getCurrentValue();
+    QPointF currTrans = mPosAnimator.getCurrentValue();
+    QPointF currPivot = mPivotAnimator.getCurrentValue();
+    qreal currRot = mRotAnimator.getCurrentValue();
+    qreal currOpacity = mOpacityAnimator.getCurrentValue();
+
+    targetAnimator->setScale(currScale.x(), currScale.y() );
+    targetAnimator->setPosition(currTrans.x(), currTrans.y() );
+    targetAnimator->setRotation(currRot);
+    targetAnimator->setOpacity(currOpacity);
+    targetAnimator->setPivot(currPivot);
+}
+
 void TransformAnimator::resetScale()
 {
     mScaleAnimator.setCurrentValue(QPointF(1., 1.) );
@@ -147,12 +210,12 @@ qreal TransformAnimator::getXScale()
     return mScaleAnimator.getXValue();
 }
 
-void TransformAnimator::setPivot(qreal x, qreal y)
+void TransformAnimator::setPivotWithoutChangingTransformation(qreal x, qreal y)
 {
-    setPivot(QPointF(x, y) );
+    setPivotWithoutChangingTransformation(QPointF(x, y) );
 }
 
-void TransformAnimator::setPivot(QPointF point, bool finish)
+void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, bool finish)
 {
     QMatrix currentMatrix;
     qreal pivotX = mPivotAnimator.getXValue();
@@ -180,6 +243,13 @@ void TransformAnimator::setPivot(QPointF point, bool finish)
 
     mPosAnimator.incAllValues(currentMatrix.dx() - futureMatrix.dx(),
                               currentMatrix.dy() - futureMatrix.dy());
+
+    mPivotAnimator.setCurrentValue(point, finish);
+
+    callUpdater();
+}
+
+void TransformAnimator::setPivot(QPointF point, bool finish) {
 
     mPivotAnimator.setCurrentValue(point, finish);
 

@@ -4,10 +4,6 @@
 #include <QApplication>
 #include "boxeslist.h"
 
-QString ConnectedToMainWindow::boolToSql(bool bT) {
-    return (bT) ? "1" : "0";
-}
-
 ConnectedToMainWindow::ConnectedToMainWindow() :
     SmartPointerTarget()
 {

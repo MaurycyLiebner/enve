@@ -3,32 +3,8 @@
 #include "vectorpath.h"
 #include "boxesgroup.h"
 
-CtrlPoint::CtrlPoint(QPointF absPos,
-                     PathPoint *parentPoint, bool isStartCtrlPt) :
-    MovablePoint(absPos,
-                 parentPoint->getParentPath(),
-                 MovablePointType::TYPE_CTRL_POINT)
-{
-    mIsStartCtrlPt = isStartCtrlPt;
-    mParentPoint = parentPoint;
-    mRelPos.setTraceKeyOnCurrentFrame(true);
-}
-
-CtrlPoint::CtrlPoint(int movablepointid,
-                     PathPoint *parentPoint, bool isStartCtrlPt) :
-    MovablePoint(movablepointid,
-                 parentPoint->getParentPath(),
-                 MovablePointType::TYPE_CTRL_POINT)
-{
-    mIsStartCtrlPt = isStartCtrlPt;
-    mParentPoint = parentPoint;
-    mRelPos.setTraceKeyOnCurrentFrame(true);
-}
-
-CtrlPoint::CtrlPoint(qreal relPosX, qreal relPosY,
-                     PathPoint *parentPoint, bool isStartCtrlPt) :
-    MovablePoint(relPosX, relPosY,
-                 parentPoint->getParentPath(),
+CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
+    MovablePoint(parentPoint->getParentPath(),
                  MovablePointType::TYPE_CTRL_POINT)
 {
     mIsStartCtrlPt = isStartCtrlPt;

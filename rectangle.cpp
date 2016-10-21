@@ -5,12 +5,12 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
 {
     setName("Rectangle");
 
-    mTopLeftPoint = new RectangleTopLeftPoint(0., 0.,
-                                              this);
-    mBottomRightPoint = new RectangleBottomRightPoint(0., 0.,
-                                                      this);
-    mRadiusPoint = new RectangleRadiusPoint(0., 0.,
-                                            this);
+    mTopLeftPoint = new RectangleTopLeftPoint(this);
+    mTopLeftPoint->setRelativePos(QPointF(0., 0.), false);
+    mBottomRightPoint = new RectangleBottomRightPoint(this);
+    mBottomRightPoint->setRelativePos(QPointF(0., 0.), false);
+    mRadiusPoint = new RectangleRadiusPoint(this);
+    mRadiusPoint->setRelativePos(QPointF(0., 0.), false);
 
     mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
     mRadiusPoint->setPoints(mTopLeftPoint, mBottomRightPoint);
@@ -27,11 +27,11 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
     addActiveAnimator(widthAnimator);
     addActiveAnimator(heightAnimator);
 
-    QrealAnimator *radiusAnimator = mRadiusPoint->
+    mRadiusAnimator = mRadiusPoint->
             getRelativePosAnimatorPtr()->getYAnimator();
 
-    radiusAnimator->setName("radius");
-    addActiveAnimator(radiusAnimator);
+    mRadiusAnimator->setName("radius");
+    addActiveAnimator(mRadiusAnimator);
 
     mBottomRightPoint->setPosAnimatorUpdater(new RectangleBottomRightUpdater(this) );
     mRadiusPoint->setPosAnimatorUpdater(new PathPointUpdater(this) );
@@ -40,6 +40,94 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
 Rectangle::~Rectangle()
 {
 
+}
+
+
+VectorPath *Rectangle::objectToPath()
+{
+    qreal radius = mRadiusAnimator->getCurrentValue();
+    QPointF topLeft = QPointF(0., 0.);
+    QPointF bottomRight = mBottomRightPoint->getRelativePos();
+    QPointF topRight = QPointF(bottomRight.x(), topLeft.y());
+    QPointF bottomLeft = QPointF(topLeft.x(), bottomRight.y());
+
+    radius = qclamp(radius, 0., bottomRight.y()*0.5);
+
+    VectorPath *newPath = new VectorPath(mParent);
+    if(isZero(radius) ) {
+        PathPoint *prevPoint = newPath->addPointRelPos(topLeft);
+        PathPoint *topLeftPoint = prevPoint;
+        prevPoint = newPath->addPointRelPos(topRight, prevPoint);
+        prevPoint = newPath->addPointRelPos(bottomRight, prevPoint);
+        prevPoint = newPath->addPointRelPos(bottomLeft, prevPoint);
+        prevPoint->connectToPoint(topLeftPoint);
+    } else {
+        qreal kappa = 0.552228474;
+        qreal oneMinusKappa = 1. - kappa;
+        qreal k = radius*oneMinusKappa;
+
+        QPointF topLeft1 = topLeft + QPointF(0., radius);
+        QPointF topLeft1End = topLeft + QPointF(0., k);
+        //
+        QPointF topLeft2 = topLeft + QPointF(radius, 0.);
+        QPointF topLeft2Start = topLeft + QPointF(k, 0.);
+        //
+        QPointF topRight1 = topRight - QPointF(radius, 0.);
+        QPointF topRight1End = topRight - QPointF(k, 0.);
+        //
+        QPointF topRight2 = topRight + QPointF(0., radius);
+        QPointF topRight2Start = topRight + QPointF(0., k);
+        //
+        QPointF bottomRight1 = bottomRight - QPointF(0., radius);
+        QPointF bottomRight1End = bottomRight - QPointF(0., k);
+        //
+        QPointF bottomRight2 = bottomRight - QPointF(radius, 0.);
+        QPointF bottomRight2Start = bottomRight - QPointF(k, 0.);
+        //
+        QPointF bottomLeft1 = bottomLeft + QPointF(radius, 0.);
+        QPointF bottomLeft1End = bottomLeft + QPointF(k, 0.);
+        //
+        QPointF bottomLeft2 = bottomLeft - QPointF(0., radius);
+        QPointF bottomLeft2Start = bottomLeft - QPointF(0., k);
+
+        PathPoint *prevPoint = newPath->addPointRelPos(topLeft1,
+                                                       topLeft1, topLeft1End);
+        prevPoint->setStartCtrlPtEnabled(false);
+        PathPoint *topLeft1Point = prevPoint;
+        prevPoint = newPath->addPointRelPos(topLeft2,
+                                            topLeft2Start, topLeft2,
+                                            prevPoint);
+        prevPoint->setEndCtrlPtEnabled(false);
+        prevPoint = newPath->addPointRelPos(topRight1,
+                                            topRight1, topRight1End,
+                                            prevPoint);
+        prevPoint->setStartCtrlPtEnabled(false);
+        prevPoint = newPath->addPointRelPos(topRight2,
+                                            topRight2Start, topRight2,
+                                            prevPoint);
+        prevPoint->setEndCtrlPtEnabled(false);
+        prevPoint = newPath->addPointRelPos(bottomRight1,
+                                            bottomRight1, bottomRight1End,
+                                            prevPoint);
+        prevPoint->setStartCtrlPtEnabled(false);
+        prevPoint = newPath->addPointRelPos(bottomRight2,
+                                            bottomRight2Start, bottomRight2,
+                                            prevPoint);
+        prevPoint->setEndCtrlPtEnabled(false);
+        prevPoint = newPath->addPointRelPos(bottomLeft1,
+                                            bottomLeft1, bottomLeft1End,
+                                            prevPoint);
+        prevPoint->setStartCtrlPtEnabled(false);
+        prevPoint = newPath->addPointRelPos(bottomLeft2,
+                                            bottomLeft2Start, bottomLeft2,
+                                            prevPoint);
+        prevPoint->setEndCtrlPtEnabled(false);
+        prevPoint->connectToPoint(topLeft1Point);
+    }
+
+    copyTransformationTo(newPath);
+
+    return newPath;
 }
 
 void Rectangle::updateAfterFrameChanged(int currentFrame)
@@ -55,7 +143,7 @@ void Rectangle::updateRadiusXAndRange() {
             setValueRange(bttmPos.x(), bttmPos.x());
 
     mRadiusPoint->getRelativePosAnimatorPtr()->getYAnimator()->
-            setValueRange(0., bttmPos.y() - mRadiusPoint->getRadius() );
+            setValueRange(0., bttmPos.y()*0.5 );
 }
 
 void Rectangle::startAllPointsTransform() {
@@ -145,12 +233,11 @@ void Rectangle::updatePath()
 }
 
 void Rectangle::centerPivotPosition() {
-    mTransformAnimator.setPivot(mBottomRightPoint->getRelativePos() * 0.5);
+    mTransformAnimator.setPivotWithoutChangingTransformation(mBottomRightPoint->getRelativePos() * 0.5);
 }
 
-RectangleTopLeftPoint::RectangleTopLeftPoint(qreal relPosX, qreal relPosY,
-                                             BoundingBox *parent) :
-    MovablePoint(relPosX, relPosY, parent, TYPE_PATH_POINT) {
+RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :
+    MovablePoint(parent, TYPE_PATH_POINT) {
 
 }
 
@@ -183,9 +270,8 @@ void RectangleTopLeftPoint::setBottomRightPoint(
     mBottomRightPoint = bottomRightPoint;
 }
 
-RectangleBottomRightPoint::RectangleBottomRightPoint(qreal relPosX, qreal relPosY,
-                                                     BoundingBox *parent) :
-    MovablePoint(relPosX, relPosY, parent, TYPE_PATH_POINT) {
+RectangleBottomRightPoint::RectangleBottomRightPoint(BoundingBox *parent) :
+    MovablePoint(parent, TYPE_PATH_POINT) {
 
 }
 
@@ -216,9 +302,8 @@ void RectangleBottomRightPoint::finishTransform() {
 
 }
 
-RectangleRadiusPoint::RectangleRadiusPoint(qreal relPosX, qreal relPosY,
-                                           BoundingBox *parent) :
-    MovablePoint(relPosX, relPosY, parent, TYPE_PATH_POINT) {
+RectangleRadiusPoint::RectangleRadiusPoint(BoundingBox *parent) :
+    MovablePoint(parent, TYPE_PATH_POINT) {
 
 }
 

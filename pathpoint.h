@@ -110,10 +110,7 @@ private:
 class PathPoint : public MovablePoint
 {
 public:
-    PathPoint(QPointF absPos, VectorPath *vectorPath);
-    PathPoint(QPointF absPos, QPointF startCtrlAbsPos, QPointF endCtrlAbsPos,
-              VectorPath *vectorPath);
-    PathPoint(int movablePointId, int pathPointId, VectorPath *vectorPath);
+    PathPoint(VectorPath *vectorPath);
 
     ~PathPoint();
 
@@ -174,13 +171,9 @@ public:
     VectorPath *getParentPath();
 
     void saveToSql(int vectorPathId);
-    PathPoint(qreal relPosX, qreal relPosy,
-              qreal startCtrlRelX, qreal startCtrlRelY,
-              qreal endCtrlRelX, qreal endCtrlRelY, bool isFirst, int boneZ, VectorPath *vectorPath);
 
     void clearAll();
     void cancelTransform();
-    void attachToBoneFromSqlZId();
 
     void setEndCtrlPtEnabled(bool enabled);
     void setStartCtrlPtEnabled(bool enabled);
@@ -217,6 +210,7 @@ public:
     QPointF getInfluenceAbsolutePos();
     bool isNeighbourSelected();
     void moveByAbs(QPointF absTranslatione);
+    void loadFromSql(int pathPointId, int movablePointId);
 private:
     bool mStartExternalInfluence = false;
     QPointF mStartAdjustedForExternalInfluence;

@@ -708,31 +708,6 @@ private:
      BoundingBox *mTarget;
 };
 
-class SetBoneUndoRedo : public UndoRedo
-{
-public:
-    SetBoneUndoRedo(Transformable *transformable,
-                    Bone *oldBone, Bone *newBone) :
-        UndoRedo("SetBoneUndoRedo") {
-        mTransformable = transformable;
-        mOldBone = oldBone;
-        mNewBone = newBone;
-    }
-
-    void redo() {
-        mTransformable->setBone(mNewBone, false);
-    }
-
-    void undo() {
-        mTransformable->setBone(mOldBone, false);
-    }
-
-private:
-    Transformable *mTransformable;
-    Bone *mOldBone;
-    Bone *mNewBone;
-};
-
 class ChangeQrealAnimatorValue : public UndoRedo
 {
 public:

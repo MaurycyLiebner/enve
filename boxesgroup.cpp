@@ -18,14 +18,6 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
-BoxesGroup::BoxesGroup(int boundingBoxId,
-                       FillStrokeSettingsWidget *fillStrokeSetting,
-                       BoxesGroup *parent) : BoundingBox(boundingBoxId,
-                                                          parent, TYPE_GROUP) {
-    mFillStrokeSettingsWidget = fillStrokeSetting;
-    loadChildrenFromSql(QString::number(boundingBoxId), false);
-}
-
 BoxesGroup::~BoxesGroup()
 {
     clearBoxesSelection();
@@ -33,6 +25,43 @@ BoxesGroup::~BoxesGroup()
     foreach(BoundingBox *box, mChildren) {
         box->decNumberPointers();
     }
+}
+
+void BoxesGroup::loadFromSql(int boundingBoxId) {
+    BoundingBox::loadFromSql(boundingBoxId);
+    loadChildrenFromSql(boundingBoxId, false);
+}
+
+void BoxesGroup::convertSelectedBoxesToPath() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->objectToPath();
+    }
+
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setSelectedFontFamilyAndStyle(QString family, QString style)
+{
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setFontFamilyAndStyle(family, style);
+    }
+
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::setSelectedFontSize(qreal size)
+{
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setFontSize(size);
+    }
+
+    finishUndoRedoSet();
 }
 
 void BoxesGroup::resetSelectedTranslation() {
@@ -434,21 +463,6 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
     return boxAtPos;
 }
 
-Bone *BoxesGroup::getBoneAt(QPointF absPos)
-{
-    Bone *boxAtPos = NULL;
-    BoundingBox *box;
-    foreachInverted(box, mChildren) {
-        if(box->isVisibleAndUnlocked() && box->isBone()) {
-            if(box->pointInsidePath(absPos) ) {
-                boxAtPos = (Bone*)box;
-                break;
-            }
-        }
-    }
-    return boxAtPos;
-}
-
 void BoxesGroup::setFillSettings(PaintSettings fillSettings,
                                  bool saveUndoRedo)
 {
@@ -594,35 +608,7 @@ void BoxesGroup::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
     }
 }
 
-void BoxesGroup::attachToBone(Bone *parentBone, CanvasMode currentCanvasMode) {
-    startNewUndoRedoSet();
-    if(currentCanvasMode == MOVE_POINT) {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->setBone(parentBone);
-        }
-    } else if(currentCanvasMode == MOVE_PATH) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->setBone(parentBone);
-        }
-    }
-    finishUndoRedoSet();
-}
-
-void BoxesGroup::detachFromBone(CanvasMode currentCanvasMode) {
-    startNewUndoRedoSet();
-    if(currentCanvasMode == MOVE_POINT) {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->setBone(NULL);
-        }
-    } else if(currentCanvasMode == MOVE_PATH) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->setBone(NULL);
-        }
-    }
-    finishUndoRedoSet();
-}
-
-QPointF BoxesGroup::getSelectedPivotPos()
+QPointF BoxesGroup::getSelectedBoxesPivotPos()
 {
     if(mSelectedBoxes.isEmpty()) return QPointF(0.f, 0.f);
     QPointF posSum = QPointF(0.f, 0.f);
@@ -807,25 +793,25 @@ void BoxesGroup::clearBoxesSelection()
     mSelectedBoxes.clear(); schedulePivotUpdate();
 }
 
-void BoxesGroup::bringSelectedBoxesToFront() {
+void BoxesGroup::raiseSelectedBoxesToTop() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->bringToFront();
     }
 }
 
-void BoxesGroup::bringSelectedBoxesToEnd() {
+void BoxesGroup::lowerSelectedBoxesToBottom() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->bringToEnd();
     }
 }
 
-void BoxesGroup::moveSelectedBoxesDown() {
+void BoxesGroup::lowerSelectedBoxes() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->moveDown();
     }
 }
 
-void BoxesGroup::moveSelectedBoxesUp() {
+void BoxesGroup::raiseSelectedBoxes() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->moveUp();
     }
@@ -1005,26 +991,9 @@ void BoxesGroup::cancelSelectedPointsTransform() {
     }
 }
 
-Bone *BoxesGroup::boneFromZIndex(int index) {
-    if(index >= 0 && index < mChildren.count()) {
-        BoundingBox *box = mChildren.at(index);
-        if(box->isBone()) {
-            return (Bone*) box;
-        }
-    }
-    return NULL;
-}
-
-void BoxesGroup::attachToBoneFromSqlZId()
-{
-    BoundingBox::attachToBoneFromSqlZId();
-    foreach (BoundingBox *box, mChildren) {
-        box->attachToBoneFromSqlZId();
-    }
-}
-
-BoxesGroup *BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId,
+BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
                                             bool loadInBox) {
+    QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
     if(loadInBox) {
         BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
         newGroup->loadChildrenFromSql(thisBoundingBoxId, false);
@@ -1032,29 +1001,22 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(QString thisBoundingBoxId,
     }
     QSqlQuery query;
     QString queryStr;
-    if(thisBoundingBoxId == "NULL") {
-        queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid IS " + thisBoundingBoxId;
-    } else {
-        queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid = " + thisBoundingBoxId;
-    }
+    queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid = " + thisBoundingBoxIdStr;
     if(query.exec(queryStr) ) {
         int idId = query.record().indexOf("id");
         int idBoxType = query.record().indexOf("boxtype");
         while(query.next() ) {
             if(static_cast<BoundingBoxType>(
-                        query.value(idBoxType).toInt()) == TYPE_BONE ) {
-                Bone::createFromSql(query.value(idId).toInt(), this);
-            } else if(static_cast<BoundingBoxType>(
                         query.value(idBoxType).toInt()) == TYPE_VECTOR_PATH ) {
                 VectorPath::createPathFromSql(query.value(idId).toInt(), this);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_GROUP ) {
-                new BoxesGroup(query.value(idId).toInt(),
-                               mFillStrokeSettingsWidget, this);
+                BoxesGroup *group = new BoxesGroup(mFillStrokeSettingsWidget, this);
+                group->loadFromSql(query.value(idId).toInt());
             }
         }
     } else {
-        qDebug() << "Could not load children for boxesgroup with id " + thisBoundingBoxId;
+        qDebug() << "Could not load children for boxesgroup with id " + thisBoundingBoxIdStr;
     }
     return this;
 }

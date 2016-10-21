@@ -66,7 +66,7 @@ void KeysView::graphPaint(QPainter *p)
         lineWidth *= 1.5;
     }
 
-    p->setPen(QPen(Qt::green, 2.f));
+    p->setPen(QPen(Qt::green, 2.));
     qreal xL = (mCurrentFrame - mStartFrame)*mPixelsPerFrame;
     //p->drawText(QRectF(xL - 20, 0, 40, 20),
     //            Qt::AlignCenter, QString::number(mCurrentFrame));

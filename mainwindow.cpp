@@ -64,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent)
                 QIcon("pixmaps/icons/ink_draw_select.png"),
                 "CONNECT POINTS", this);
     mMovePathMode->setToolTip("F1");
+    mMovePathMode->setCheckable(true);
+    mMovePathMode->setChecked(true);
     mToolBar->addAction(mMovePathMode);
     connect(mMovePathMode, SIGNAL(triggered(bool)),
             mCanvas, SLOT(setMovePathMode()) );
@@ -72,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
                 QIcon("pixmaps/icons/ink_draw_node.png"),
                 "CONNECT POINTS", this);
     mMovePointMode->setToolTip("F2");
+    mMovePointMode->setCheckable(true);
     mToolBar->addAction(mMovePointMode);
     connect(mMovePointMode, SIGNAL(triggered(bool)),
             mCanvas, SLOT(setMovePointMode()) );
@@ -80,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
                 QIcon("pixmaps/icons/ink_draw_pen.png"),
                 "CONNECT POINTS", this);
     mAddPointMode->setToolTip("F3");
+    mAddPointMode->setCheckable(true);
     mToolBar->addAction(mAddPointMode);
     connect(mAddPointMode, SIGNAL(triggered(bool)),
             mCanvas, SLOT(setAddPointMode()) );
@@ -88,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent)
                 QIcon("pixmaps/icons/ink_draw_arc.png"),
                 "CONNECT POINTS", this);
     mCircleMode->setToolTip("F4");
+    mCircleMode->setCheckable(true);
     mToolBar->addAction(mCircleMode);
     connect(mCircleMode, SIGNAL(triggered(bool)),
             mCanvas, SLOT(setCircleMode()) );
@@ -96,9 +101,20 @@ MainWindow::MainWindow(QWidget *parent)
                 QIcon("pixmaps/icons/ink_draw_rect.png"),
                 "CONNECT POINTS", this);
     mRectangleMode->setToolTip("F5");
+    mRectangleMode->setCheckable(true);
     mToolBar->addAction(mRectangleMode);
     connect(mRectangleMode, SIGNAL(triggered(bool)),
             mCanvas, SLOT(setRectangleMode()) );
+
+    mTextMode = new QAction(
+                QIcon("pixmaps/icons/ink_draw_text.png"),
+                "CONNECT POINTS", this);
+    mTextMode->setToolTip("F6");
+    mTextMode->setCheckable(true);
+    mToolBar->addAction(mTextMode);
+    connect(mTextMode, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(setTextMode()) );
+
 
     mToolBar->addSeparator();
 
@@ -146,6 +162,13 @@ MainWindow::MainWindow(QWidget *parent)
 //
     addToolBar(mToolBar);
 
+    mFontWidget = new FontsWidget(this);
+    mToolBar->addWidget(mFontWidget);
+
+    connect(mFontWidget, SIGNAL(fontSizeChanged(qreal)),
+            mCanvas, SLOT(setFontSize(qreal)) );
+    connect(mFontWidget, SIGNAL(fontFamilyAndStyleChanged(QString, QString)),
+            mCanvas, SLOT(setFontFamilyAndStyle(QString, QString)) );
 
 //
     mMenuBar = new QMenuBar(this);
@@ -165,6 +188,67 @@ MainWindow::MainWindow(QWidget *parent)
     mFileMenu->addSeparator();
     mFileMenu->addAction("Exit", this, SLOT(close()));
 
+    mEditMenu = mMenuBar->addMenu("Edit");
+
+    mEditMenu->addAction("Undo");
+    mEditMenu->addAction("Redo");
+    mEditMenu->addAction("Undo History...");
+    mEditMenu->addSeparator();
+    mEditMenu->addAction("Cut");
+    mEditMenu->addAction("Copy");
+    mEditMenu->addAction("Paste");
+    mEditMenu->addSeparator();
+    mEditMenu->addAction("Duplicate");
+    mEditMenu->addAction("Clone");
+    mEditMenu->addSeparator();
+    mEditMenu->addAction("Delete");
+    mEditMenu->addSeparator();
+    mEditMenu->addAction("Select All");
+    mEditMenu->addAction("Invert Selection");
+    mEditMenu->addAction("Deselect");
+
+    mSelectSameMenu = mEditMenu->addMenu("Select Same");
+    mSelectSameMenu->addAction("Fill and Stroke");
+    mSelectSameMenu->addAction("Fill Color");
+    mSelectSameMenu->addAction("Stroke Color");
+    mSelectSameMenu->addAction("Stroke Style");
+    mSelectSameMenu->addAction("Object Type");
+
+    mObjectMenu = mMenuBar->addMenu("Object");
+
+    mObjectMenu->addSeparator();
+    mObjectMenu->addAction("Raise", mCanvas, SLOT(raiseAction()));
+    mObjectMenu->addAction("Lower", mCanvas, SLOT(lowerAction()));
+    mObjectMenu->addAction("Rasie to Top", mCanvas, SLOT(raiseToTopAction()));
+    mObjectMenu->addAction("Lower to Bottom", mCanvas, SLOT(lowerToBottomAction()));
+    mObjectMenu->addSeparator();
+    mObjectMenu->addAction("Rotate 90° Right");
+    mObjectMenu->addAction("Rotate 90° Left");
+    mObjectMenu->addAction("Flip Horizontal");
+    mObjectMenu->addAction("Flip Vertical");
+    mObjectMenu->addSeparator();
+    mObjectMenu->addAction("Group");
+    mObjectMenu->addAction("Ungroup");
+
+    mPathMenu = mMenuBar->addMenu("Path");
+
+    mPathMenu->addAction("Object to Path", mCanvas, SLOT(objectsToPathAction()));
+    mPathMenu->addAction("Stroke to Path");
+    mPathMenu->addSeparator();
+    mPathMenu->addAction("Union");
+    mPathMenu->addAction("Difference");
+    mPathMenu->addAction("Intersection");
+    mPathMenu->addAction("Exclusion");
+    mPathMenu->addAction("Division");
+    mPathMenu->addAction("Cut Path");
+    mPathMenu->addSeparator();
+    mPathMenu->addAction("Combine");
+    mPathMenu->addAction("Break Apart");
+
+    mEffectsMenu = mMenuBar->addMenu("Effects");
+
+    mEffectsMenu->addAction("Blur");
+
     setMenuBar(mMenuBar);
 //
 
@@ -181,6 +265,15 @@ MainWindow::~MainWindow()
 MainWindow *MainWindow::getInstance()
 {
     return mMainWindowInstance;
+}
+
+void MainWindow::updateCanvasModeButtonsChecked(CanvasMode currentMode) {
+    mMovePathMode->setChecked(currentMode == MOVE_PATH);
+    mMovePointMode->setChecked(currentMode == MOVE_POINT);
+    mAddPointMode->setChecked(currentMode == ADD_POINT);
+    mCircleMode->setChecked(currentMode == ADD_CIRCLE);
+    mRectangleMode->setChecked(currentMode == ADD_RECTANGLE);
+    mTextMode->setChecked(currentMode == ADD_TEXT);
 }
 
 void MainWindow::playPreview()
@@ -613,51 +706,92 @@ void MainWindow::loadFile(QString path) {
 
 void MainWindow::createTablesInSaveDatabase() {
     QSqlQuery query;
-    query.exec("CREATE TABLE color "
+
+    query.exec("CREATE TABLE qrealanimator "
+               "(id INTEGER PRIMARY KEY,"
+               "currentvalue REAL )");
+
+    query.exec("CREATE TABLE qrealkey "
                "(id INTEGER PRIMARY KEY, "
-               "hue REAL, "
-               "saturation REAL, "
                "value REAL, "
-               "alpha REAL )");
+               "frame INTEGER, "
+               "endenabled BOOLEAN, "
+               "startenabled BOOLEAN,"
+               "ctrlsmode INTEGER, "
+               "endvalue REAL, "
+               "endframe INTEGER, "
+               "startvalue REAL, "
+               "startframe INTEGER, "
+               "qrealanimatorid INTEGER, "
+               "FOREIGN KEY(qrealanimatorid) REFERENCES qrealanimator(id) )");
+
+    query.exec("CREATE TABLE transformanimator "
+               "(id INTEGER PRIMARY KEY, "
+               "posanimatorid INTEGER, "
+               "scaleanimatorid INTEGER, "
+               "pivotanimatorid INTEGER, "
+               "rotanimatorid INTEGER, "
+               "opacityanimatorid INTEGER, "
+               "FOREIGN KEY(posanimatorid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(scaleanimatorid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(pivotanimatorid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(rotanimatorid) REFERENCES qrealanimator(id), "
+               "FOREIGN KEY(opacityanimatorid) REFERENCES qrealanimator(id) )");
+
+    query.exec("CREATE TABLE qpointfanimator "
+               "(id INTEGER PRIMARY KEY, "
+               "xanimatorid INTEGER, "
+               "yanimatorid INTEGER, "
+               "FOREIGN KEY(xanimatorid) REFERENCES qrealanimator(id), "
+               "FOREIGN KEY(yanimatorid) REFERENCES qrealanimator(id) )");
+
+
+    query.exec("CREATE TABLE coloranimator "
+               "(id INTEGER PRIMARY KEY, "
+               "colormode INTEGER, "
+               "val1animatorid INTEGER, "
+               "val2animatorid INTEGER, "
+               "val3animatorid INTEGER, "
+               "alphaanimatorid INTEGER, "
+               "FOREIGN KEY(val1animatorid) REFERENCES qrealanimator(id), "
+               "FOREIGN KEY(val2animatorid) REFERENCES qrealanimator(id), "
+               "FOREIGN KEY(val3animatorid) REFERENCES qrealanimator(id), "
+               "FOREIGN KEY(alphaanimatorid) REFERENCES qrealanimator(id) )");
+
     query.exec("CREATE TABLE gradient "
                "(id INTEGER PRIMARY KEY)");
     query.exec("CREATE TABLE gradientcolor "
                "(colorid INTEGER, "
                "gradientid INTEGER, "
                "positioningradient INTEGER, "
-               "FOREIGN KEY(colorid) REFERENCES color(id), "
+               "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
     query.exec("CREATE TABLE paintsettings "
                "(id INTEGER PRIMARY KEY, "
                "painttype INTEGER, "
                "colorid INTEGER, "
                "gradientid INTEGER, "
-               "FOREIGN KEY(colorid) REFERENCES color(id), "
+               "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
     query.exec("CREATE TABLE strokesettings "
                "(id INTEGER PRIMARY KEY, "
-               "linewidth REAL, "
+               "linewidthanimatorid INTEGER, "
                "capstyle INTEGER, "
                "joinstyle INTEGER, "
                "paintsettingsid INTEGER, "
+               "FOREIGN KEY(linewidthanimatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(paintsettingsid) REFERENCES paintsettings(id) )");
 
     query.exec("CREATE TABLE boundingbox "
                "(id INTEGER PRIMARY KEY, "
                "name TEXT, "
                "boxtype INTEGER, "
-               "sx REAL, "
-               "sy REAL, "
-               "rot REAL, "
-               "dx REAL, "
-               "dy REAL, "
-               "pivotx REAL, "
-               "pivoty REAL, "
+               "transformanimatorid INTEGER, "
                "pivotchanged BOOLEAN, "
                "visible BOOLEAN, "
                "locked BOOLEAN, "
-               "bonezid INTEGER, "
                "parentboundingboxid INTEGER, "
+               "FOREIGN KEY(transformanimatorid) REFERENCES transformanimator(id), "
                "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
     query.exec("CREATE TABLE boxesgroup "
                "(id INTEGER PRIMARY KEY, "
@@ -672,6 +806,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "boundingboxid INTEGER, "
                "fillsettingsid INTEGER, "
                "strokesettingsid INTEGER, "
+               "pointsinfluenceenabled BOOLEAN, "
                "FOREIGN KEY(fillgradientstartid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(fillgradientendid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(strokegradientstartid) REFERENCES movablepoint(id), "
@@ -681,9 +816,8 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
     query.exec("CREATE TABLE movablepoint "
                "(id INTEGER PRIMARY KEY, "
-               "xrelpos REAL, "
-               "yrelpos REAL, "
-               "bonezid INTEGER )");
+               "posanimatorid INTEGER, "
+               "FOREIGN KEY(posanimatorid) REFERENCES qrealanimator(id) )");
     query.exec("CREATE TABLE pathpoint "
                "(id INTEGER PRIMARY KEY, "
                "isfirst BOOLEAN, "
@@ -692,10 +826,17 @@ void MainWindow::createTablesInSaveDatabase() {
                "startctrlptid INTEGER, "
                "endctrlptid INTEGER, "
                "vectorpathid INTEGER, "
+               "ctrlsmode INTEGER, "
+               "startpointenabled BOOLEAN, "
+               "endpointenabled BOOLEAN, "
+               "influenceanimatorid INTEGER, "
+               "influencetanimatorid INTEGER, "
                "FOREIGN KEY(movablepointid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(startctrlptid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(endctrlptid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id) )");
+               "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id), "
+               "FOREIGN KEY(influenceanimatorid) REFERENCES qrealanimator(id), "
+               "FOREIGN KEY(influencetanimatorid) REFERENCES qrealanimator(id) )");
 }
 
 void MainWindow::saveToFile(QString path) {

@@ -8,6 +8,7 @@
 #include <QSqlQuery>
 #include <QThread>
 #include "ctrlpoint.h"
+#include "textbox.h"
 
 class MainWindow;
 
@@ -25,6 +26,7 @@ enum CanvasMode : short {
     ADD_POINT,
     ADD_CIRCLE,
     ADD_RECTANGLE,
+    ADD_TEXT,
     PICK_PATH_SETTINGS
 };
 
@@ -65,27 +67,37 @@ public:
     }
 
     static QPointF getRelPosBetweenPointsAtT(qreal t,
+                                             QPointF p0Pos,
+                                             QPointF p1EndPos,
+                                             QPointF p2StartPos,
+                                             QPointF p3Pos) {
+        qreal x0 = p0Pos.x();
+        qreal y0 = p0Pos.y();
+        qreal x1 = p1EndPos.x();
+        qreal y1 = p1EndPos.y();
+        qreal x2 = p2StartPos.x();
+        qreal y2 = p2StartPos.y();
+        qreal x3 = p3Pos.x();
+        qreal y3 = p3Pos.y();
+
+        return QPointF(calcCubicBezierVal(x0, x1, x2, x3, t),
+                       calcCubicBezierVal(y0, y1, y2, y3, t) );
+    }
+
+    static QPointF getRelPosBetweenPointsAtT(qreal t,
                                              PathPoint *point1,
                                              PathPoint *point2) {
         if(point1 == NULL) return point2->getRelativePos();
         if(point2 == NULL) return point1->getRelativePos();
+
         CtrlPoint *point1EndPt = point1->getEndCtrlPt();
         CtrlPoint *point2StartPt = point2->getStartCtrlPt();
         QPointF p0Pos = point1->getRelativePos();
         QPointF p1Pos = point1EndPt->getRelativePos();
         QPointF p2Pos = point2StartPt->getRelativePos();
         QPointF p3Pos = point2->getRelativePos();
-        qreal x0 = p0Pos.x();
-        qreal y0 = p0Pos.y();
-        qreal x1 = p1Pos.x();
-        qreal y1 = p1Pos.y();
-        qreal x2 = p2Pos.x();
-        qreal y2 = p2Pos.y();
-        qreal x3 = p3Pos.x();
-        qreal y3 = p3Pos.y();
 
-        return QPointF(calcCubicBezierVal(x0, x1, x2, x3, t),
-                       calcCubicBezierVal(y0, y1, y2, y3, t) );
+        return getRelPosBetweenPointsAtT(t, p0Pos, p1Pos, p2Pos, p3Pos);
     }
 
     void makePassThrough(QPointF absPos) {
@@ -272,6 +284,7 @@ public:
 
     void ctrlsVisiblityChanged();
     void grabMouseAndTrack();
+
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -299,6 +312,16 @@ private slots:
 
     void nextPreviewFrame();
 public slots:
+    void raiseAction();
+    void lowerAction();
+    void raiseToTopAction();
+    void lowerToBottomAction();
+
+    void objectsToPathAction();
+
+    void setFontFamilyAndStyle(QString family, QString style);
+    void setFontSize(qreal size);
+
     void setMovePathMode() {
         setCanvasMode(MOVE_PATH);
 
@@ -325,6 +348,10 @@ public slots:
         setCanvasMode(ADD_CIRCLE);
     }
 
+    void setTextMode() {
+        setCanvasMode(ADD_TEXT);
+    }
+
     void connectPointsSlot();
     void disconnectPointsSlot();
     void mergePointsSlot();
@@ -335,6 +362,7 @@ public slots:
 private:
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;
+    TextBox *mCurrentTextBox = NULL;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
     QString mInputText;

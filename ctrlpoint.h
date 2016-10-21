@@ -5,7 +5,7 @@
 class CtrlPoint : public MovablePoint
 {
 public:
-    CtrlPoint(QPointF absPos, PathPoint *parentPoint, bool isStartCtrlPt);
+    CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt);
     void moveToWithoutUpdatingTheOther(QPointF absPos);
     void moveToAbs(QPointF absPos);
     void moveByWithoutUpdatingTheOther(QPointF absTranslation);
@@ -16,10 +16,6 @@ public:
     void remove();
 
     bool isHidden();
-
-    CtrlPoint(qreal relPosX, qreal relPosY,
-              PathPoint *parentPoint, bool isStartCtrlPt);
-    CtrlPoint(int movablepointid, PathPoint *parentPoint, bool isStartCtrlPt);
 private:
     bool mIsStartCtrlPt;
     PathPoint *mParentPoint;

@@ -3,7 +3,6 @@
 #include "boundingbox.h"
 #include "vectorpath.h"
 #include "fillstrokesettings.h"
-#include "bone.h"
 
 #define foreachBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
     for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
@@ -19,11 +18,11 @@ class BoxesGroup : public BoundingBox
 public:
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
-    BoxesGroup(int boundingBoxId,
-               FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
-
     ~BoxesGroup();
+    virtual void loadFromSql(int boundingBoxId);
 
+    void setSelectedFontFamilyAndStyle(QString family, QString style);
+    void setSelectedFontSize(qreal size);
     bool pointInsidePath(QPointF absPos);
     QRectF getBoundingRect();
     void draw(QPainter *p);
@@ -37,10 +36,10 @@ public:
     void addPointToSelection(MovablePoint *point);
     void addBoxToSelection(BoundingBox *box);
     void clearPointsSelection();
-    void bringSelectedBoxesToFront();
-    void bringSelectedBoxesToEnd();
-    void moveSelectedBoxesUp();
-    void moveSelectedBoxesDown();
+    void raiseSelectedBoxesToTop();
+    void lowerSelectedBoxesToBottom();
+    void raiseSelectedBoxes();
+    void lowerSelectedBoxes();
     void selectAllBoxes();
     void deselectAllBoxes();
     void setPointCtrlsMode(CtrlsMode mode);
@@ -72,7 +71,7 @@ public:
 
     void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
 
-    QPointF getSelectedPivotPos();
+    QPointF getSelectedBoxesPivotPos();
     bool isSelectionEmpty();
     void setSelectedPivotAbsPos(QPointF absPos);
 
@@ -84,7 +83,7 @@ public:
     void cancelSelectedBoxesTransform();
 
     int saveToSql(int parentId);
-    BoxesGroup *loadChildrenFromSql(QString thisBoundingBoxId, bool loadInBox);
+    BoxesGroup *loadChildrenFromSql(int thisBoundingBoxId, bool loadInBox);
     PathPoint *createNewPointOnLineNearSelected(QPointF absPos, bool adjust);
     void saveSelectedToSql();
 
@@ -114,13 +113,8 @@ public:
     void updateAfterCombinedTransformationChanged();
     void clearAll();
     void removeChildFromList(int id, bool saveUndoRedo = true);
-    Bone *getBoneAt(QPointF absPos);
-    void attachToBone(Bone *parentBone, CanvasMode currentCanvasMode);
-    void detachFromBone(CanvasMode currentCanvasMode);
     void cancelSelectedPointsTransform();
-    Bone *boneFromZIndex(int index);
 
-    void attachToBoneFromSqlZId();
     void updateAfterFrameChanged(int currentFrame);
     QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
     void getKeysInRect(QRectF selectionRect, QList<QrealKey *> *keysList);
@@ -194,6 +188,7 @@ public:
     void resetSelectedScale();
     void resetSelectedTranslation();
     void resetSelectedRotation();
+    void convertSelectedBoxesToPath();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

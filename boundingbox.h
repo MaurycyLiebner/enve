@@ -25,8 +25,9 @@ enum CanvasMode : short;
 enum BoundingBoxType {
     TYPE_VECTOR_PATH,
     TYPE_CIRCLE,
+    TYPE_IMAGE,
     TYPE_RECTANGLE,
-    TYPE_BONE,
+    TYPE_TEXT,
     TYPE_GROUP,
     TYPE_CANVAS
 };
@@ -39,13 +40,18 @@ class CtrlPoint;
 
 class Edge;
 
+class VectorPath;
+
 class BoundingBox : public Transformable
 {
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
     BoundingBox(BoundingBoxType type);
-    BoundingBox(int boundingBoxId, BoxesGroup *parent,
-                BoundingBoxType type);
+
+    virtual void setFont(QFont) {}
+    virtual void setFontSize(qreal) {}
+    virtual void setFontFamilyAndStyle(QString,
+                                       QString) {}
 
     virtual void centerPivotPosition() {}
     virtual bool isContainedIn(QRectF absRect);
@@ -94,8 +100,6 @@ public:
     void setParent(BoxesGroup *parent, bool saveUndoRedo = true);
     BoxesGroup *getParent();
 
-    bool isBone();
-
     bool isGroup();
     virtual BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
 
@@ -122,7 +126,6 @@ public:
     bool isPath();
     void saveTransformPivot(QPointF absPivot);
 
-    QPointF getAbsBoneAttachPoint();
     //
 
     virtual void drawListItem(QPainter *p,
@@ -149,7 +152,6 @@ public:
     void rotateBy(qreal rot);
     void scale(qreal scaleBy);
 
-    virtual void attachToBoneFromSqlZId();
     void rotateRelativeToSavedPivot(qreal rot);
     void scaleRelativeToSavedPivot(qreal scaleBy);
 
@@ -200,6 +202,16 @@ public:
     void resetScale();
     void resetTranslation();
     void resetRotation();
+    bool isCircle();
+    bool isRect();
+    bool isText();
+    TransformAnimator *getTransformAnimator();
+    void disablePivotAutoAdjust();
+    void enablePivotAutoAdjust();
+    void copyTransformationTo(BoundingBox *box);
+
+    virtual VectorPath *objectToPath() { return NULL; }
+    virtual void loadFromSql(int boundingBoxId);
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 

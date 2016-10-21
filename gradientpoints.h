@@ -10,11 +10,7 @@ public:
     GradientPoints();
     ~GradientPoints();
 
-    void initialize(PathBox *parentT, QPointF startPt = QPointF(0., 0.),
-                    QPointF endPt = QPointF(100., 100.));
-
-    void initialize(PathBox *parentT,
-                    int fillGradientStartId, int fillGradientEndId);
+    void initialize(PathBox *parentT);
 
     void clearAll();
 
@@ -37,9 +33,8 @@ public:
     GradientPoint *endPoint;
     PathBox *parent;
 
-    void attachToBoneFromSqlZId();
-
     void setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo = true);
+    void loadFromSql(int fillGradientStartId, int fillGradientEndId);
 };
 
 #endif // GRADIENTPOINTS_H

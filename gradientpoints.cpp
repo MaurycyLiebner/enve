@@ -11,34 +11,24 @@ GradientPoints::~GradientPoints()
     endPoint->decNumberPointers();
 }
 
-void GradientPoints::initialize(PathBox *parentT,
-                                QPointF startPt, QPointF endPt)
+void GradientPoints::initialize(PathBox *parentT)
 {
     parent = parentT;
-    startPoint = new GradientPoint(startPt, parent);
+    startPoint = new GradientPoint(parent);
     startPoint->incNumberPointers();
     addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
     startPoint->getRelativePosAnimatorPtr()->setName("point1");
-    endPoint = new GradientPoint(endPt, parent);
+    endPoint = new GradientPoint(parent);
     endPoint->getRelativePosAnimatorPtr()->setName("point2");
     endPoint->incNumberPointers();
     addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
     enabled = false;
 }
 
-void GradientPoints::initialize(PathBox *parentT,
-                                int fillGradientStartId, int fillGradientEndId)
+void GradientPoints::loadFromSql(int fillGradientStartId, int fillGradientEndId)
 {
-    parent = parentT;
-    startPoint = new GradientPoint(fillGradientStartId, parent);
-    startPoint->incNumberPointers();
-    addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
-    startPoint->getRelativePosAnimatorPtr()->setName("point1");
-    endPoint = new GradientPoint(fillGradientEndId, parent);
-    endPoint->incNumberPointers();
-    endPoint->getRelativePosAnimatorPtr()->setName("point2");
-    addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
-    enabled = false;
+    startPoint->loadFromSql(fillGradientStartId);
+    startPoint->loadFromSql(fillGradientEndId);
 }
 
 void GradientPoints::clearAll()
@@ -100,10 +90,4 @@ void GradientPoints::setColors(QColor startColor, QColor endColor)
 {
     startPoint->setColor(startColor);
     endPoint->setColor(endColor);
-}
-
-void GradientPoints::attachToBoneFromSqlZId()
-{
-    startPoint->attachToBoneFromSqlZId();
-    endPoint->attachToBoneFromSqlZId();
 }

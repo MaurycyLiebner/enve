@@ -28,6 +28,8 @@ public:
     QrealKey *getKeyAtPos(qreal relX, qreal relY,
                           int minViewedFrame, qreal pixelsPerFrame);
     void openContextMenu(QPoint pos);
+    void loadFromSql(int sqlId);
+    int saveToSql();
 private:
     ColorMode mColorMode = RGBMODE;
     QrealAnimator mVal1Animator;

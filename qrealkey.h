@@ -79,6 +79,7 @@ public:
     bool isAncestorSelected();
 
     CtrlsMode getCtrlsMode();
+    int saveToSql(int parentAnimatorSqlId);
 protected:
     QrealAnimator *mParentAnimator = NULL;
     ComplexKey *mParentKey = NULL;
