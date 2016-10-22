@@ -49,10 +49,10 @@ void QrealAnimator::loadFromSql(int qrealAnimatorId) {
             QString::number(qrealAnimatorId);
     if(query.exec(queryStr)) {
         query.next();
-        int qrealAnimatorId = query.record().indexOf("id");
+        int idQrealAnimatorId = query.record().indexOf("id");
         int currentValue = query.record().indexOf("currentvalue");
 
-        loadKeysFromSql(query.value(qrealAnimatorId).toInt() );
+        loadKeysFromSql(query.value(idQrealAnimatorId).toInt() );
 
         if(mKeys.isEmpty()) {
             setCurrentValue(query.value(currentValue).toReal());
@@ -68,17 +68,10 @@ void QrealAnimator::loadKeysFromSql(int qrealAnimatorId) {
     QString queryStr = "SELECT * FROM qrealkey WHERE qrealanimatorid = " +
             QString::number(qrealAnimatorId);
     if(query.exec(queryStr)) {
-        int idValue = query.record().indexOf("value");
-        int idFrame = query.record().indexOf("frame");
-        int idEndEnabled = query.record().indexOf("endenabled");
-        int idStartEnabled = query.record().indexOf("startenabled");
-        int idCtrlsMode = query.record().indexOf("ctrlsmode");
-        int idEndValue = query.record().indexOf("endvalue");
-        int idEndFrame = query.record().indexOf("endframe");
-        int idStartValue = query.record().indexOf("startvalue");
-        int idStartFrame = query.record().indexOf("startframe");
+        int idId = query.record().indexOf("id");
         while(query.next() ) {
-
+            QrealKey *key = new QrealKey(this);
+            key->loadFromSql(query.value(idId).toInt());
         }
     } else {
         qDebug() << "Could not load qpointfanimator with id " << qrealAnimatorId;
@@ -401,7 +394,9 @@ void QrealAnimator::saveValueToKey(int frame, qreal value)
 {
     QrealKey *keyAtFrame = getKeyAtFrame(frame);
     if(keyAtFrame == NULL) {
-        keyAtFrame = new QrealKey(frame, this, value);
+        keyAtFrame = new QrealKey(this);
+        keyAtFrame->setFrame(frame);
+        keyAtFrame->setValue(value);
         appendKey(keyAtFrame);
         updateKeysPath();
     } else {
@@ -545,7 +540,10 @@ QrealKey *QrealAnimator::getKeyAtFrame(int frame)
 void QrealAnimator::saveValueAtFrameAsKey(int frame) {
     QrealKey *keyAtFrame = getKeyAtFrame(frame);
     if(keyAtFrame == NULL) {
-        keyAtFrame = new QrealKey(frame, this, getValueAtFrame(frame));
+        qreal value = getValueAtFrame(frame);
+        keyAtFrame = new QrealKey(this);
+        keyAtFrame->setFrame(frame);
+        keyAtFrame->setValue(value);
         appendKey(keyAtFrame);
         updateKeysPath();
     } else {
@@ -562,7 +560,9 @@ void QrealAnimator::saveCurrentValueAsKey()
 {
     QrealKey *keyAtFrame = getKeyAtFrame(mCurrentFrame);
     if(keyAtFrame == NULL) {
-        keyAtFrame = new QrealKey(mCurrentFrame, this, mCurrentValue);
+        keyAtFrame = new QrealKey(this);
+        keyAtFrame->setFrame(mCurrentFrame);
+        keyAtFrame->setValue(mCurrentValue);
         appendKey(keyAtFrame);
         updateKeysPath();
     } else {

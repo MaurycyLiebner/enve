@@ -120,8 +120,6 @@ public:
 
     virtual int saveToSql(int parentId);
 
-    virtual void clearAll() {}
-
     virtual PathPoint *createNewPointOnLineNear(QPointF, bool) { return NULL; }
     bool isPath();
     void saveTransformPivot(QPointF absPivot);

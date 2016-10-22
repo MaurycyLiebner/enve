@@ -1,5 +1,6 @@
 #include "pathbox.h"
 #include "updatescheduler.h"
+#include "mainwindow.h"
 
 PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
     BoundingBox(parent, type)
@@ -30,6 +31,76 @@ PathBox::~PathBox()
     }
     if(mStrokeSettings.getGradient() != NULL) {
         mStrokeSettings.getGradient()->removePath(this);
+    }
+}
+
+#include <QSqlError>
+int PathBox::saveToSql(int parentId)
+{
+    int boundingBoxId = BoundingBox::saveToSql(parentId);
+    QSqlQuery query;
+
+    int fillStartPt = mFillGradientPoints.startPoint->saveToSql();
+    int fillEndPt = mFillGradientPoints.endPoint->saveToSql();
+    int strokeStartPt = mStrokeGradientPoints.startPoint->saveToSql();
+    int strokeEndPt = mStrokeGradientPoints.endPoint->saveToSql();
+
+    int fillSettingsId = mFillPaintSettings.saveToSql();
+    int strokeSettingsId = mStrokeSettings.saveToSql();
+    if(!query.exec(
+            QString(
+            "INSERT INTO pathbox (fillgradientstartid, fillgradientendid, "
+            "strokegradientstartid, strokegradientendid, "
+            "boundingboxid, fillsettingsid, strokesettingsid) "
+            "VALUES (%1, %2, %3, %4, %5, %6, %7)").
+            arg(fillStartPt).
+            arg(fillEndPt).
+            arg(strokeStartPt).
+            arg(strokeEndPt).
+            arg(boundingBoxId).
+            arg(fillSettingsId).
+            arg(strokeSettingsId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+
+    return boundingBoxId;
+}
+
+void PathBox::loadFromSql(int boundingBoxId) {
+    BoundingBox::loadFromSql(boundingBoxId);
+    QSqlQuery query;
+    QString queryStr = "SELECT * FROM pathbox WHERE boundingboxid = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idId = query.record().indexOf("id");
+        int idfillgradientstartid = query.record().indexOf("fillgradientstartid");
+        int idfillgradientendid = query.record().indexOf("fillgradientendid");
+        int idstrokegradientstartid = query.record().indexOf("strokegradientstartid");
+        int idstrokegradientendid = query.record().indexOf("strokegradientendid");
+        int idfillsettingsid = query.record().indexOf("fillsettingsid");
+        int idstrokesettingsid = query.record().indexOf("strokesettingsid");
+
+        int fillGradientStartId = query.value(idfillgradientstartid).toInt();
+        int fillGradientEndId = query.value(idfillgradientendid).toInt();
+        int strokeGradientStartId = query.value(idstrokegradientstartid).toInt();
+        int strokeGradientEndId = query.value(idstrokegradientendid).toInt();
+        int fillSettingsId = query.value(idfillsettingsid).toInt();
+        int strokeSettingsId = query.value(idstrokesettingsid).toInt();
+
+
+        mFillGradientPoints.loadFromSql(fillGradientStartId,
+                                       fillGradientEndId);
+        mStrokeGradientPoints.loadFromSql(strokeGradientStartId,
+                                         strokeGradientEndId);
+
+        GradientWidget *gradientWidget =
+                mMainWindow->getFillStrokeSettings()->getGradientWidget();
+
+        mFillPaintSettings.loadFromSql(fillSettingsId, gradientWidget);
+        mStrokeSettings.loadFromSql(strokeSettingsId, gradientWidget);
+    } else {
+        qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }
 }
 
@@ -186,7 +257,7 @@ void PathBox::draw(QPainter *p)
     if(mVisible) {
         p->save();
 
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
+        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01);
         p->setPen(Qt::NoPen);
         if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawFillGradient);

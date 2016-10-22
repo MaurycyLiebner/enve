@@ -111,7 +111,6 @@ public:
     void bringChildToFrontList(BoundingBox *child);
     void moveChildInList(int from, int to, bool saveUndoRedo = true);
     void updateAfterCombinedTransformationChanged();
-    void clearAll();
     void removeChildFromList(int id, bool saveUndoRedo = true);
     void cancelSelectedPointsTransform();
 

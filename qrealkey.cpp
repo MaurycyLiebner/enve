@@ -2,15 +2,15 @@
 #include "qrealanimator.h"
 #include "complexanimator.h"
 
-QrealKey::QrealKey(int frame, QrealAnimator *parentAnimator, qreal value) :
+QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     QrealPoint(KEY_POINT, this) {
     mParentAnimator = parentAnimator;
-    mFrame = frame;
-    mEndFrame = frame + 5;
-    mStartFrame = frame - 5;
-    mValue = value;
-    mStartValue = value;
-    mEndValue = value;
+    mFrame = 0;
+    mEndFrame = mFrame + 5;
+    mStartFrame = mFrame - 5;
+    mValue = 0.;
+    mStartValue = mValue;
+    mEndValue = mValue;
 
     mStartPoint = new QrealPoint(START_POINT, this, 7.5);
     mStartPoint->incNumberPointers();
@@ -23,7 +23,6 @@ QrealKey::~QrealKey()
     mStartPoint->decNumberPointers();
     mEndPoint->decNumberPointers();
 }
-
 
 #include <QSqlError>
 #include <QSqlQuery>
@@ -51,6 +50,37 @@ int QrealKey::saveToSql(int parentAnimatorSqlId) {
     return query.lastInsertId().toInt();
 }
 
+#include <QSqlRecord>
+void QrealKey::loadFromSql(int keyId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM qrealkey WHERE id = " +
+            QString::number(keyId);
+    if(query.exec(queryStr)) {
+        query.next();
+        int idValue = query.record().indexOf("value");
+        int idFrame = query.record().indexOf("frame");
+        int idEndEnabled = query.record().indexOf("endenabled");
+        int idStartEnabled = query.record().indexOf("startenabled");
+        int idCtrlsMode = query.record().indexOf("ctrlsmode");
+        int idEndValue = query.record().indexOf("endvalue");
+        int idEndFrame = query.record().indexOf("endframe");
+        int idStartValue = query.record().indexOf("startvalue");
+        int idStartFrame = query.record().indexOf("startframe");
+
+        mValue = query.value(idValue).toReal();
+        mFrame = query.value(idFrame).toInt();
+        mEndEnabled = query.value(idEndEnabled).toBool();
+        mStartEnabled = query.value(idStartEnabled).toBool();
+        mCtrlsMode = static_cast<CtrlsMode>(query.value(idCtrlsMode).toInt());
+        mEndValue = query.value(idEndValue).toReal();
+        mEndFrame = query.value(idEndFrame).toInt();
+        mStartValue = query.value(idStartValue).toReal();
+        mStartFrame = query.value(idStartFrame).toInt();
+    } else {
+        qDebug() << "Could not load qrealkey with id " << keyId;
+    }
+}
 
 void QrealKey::constrainEndCtrlMaxFrame(int maxFrame) {
     if(mEndFrame < maxFrame || !mEndEnabled) return;

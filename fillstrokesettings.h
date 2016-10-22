@@ -180,8 +180,6 @@ public:
 
     void setStrokerSettings(QPainterPathStroker *stroker);
     StrokeSettings(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
-    static StrokeSettings createStrokeSettingsFromSql(int strokeSqlId,
-                                              GradientWidget *gradientWidget);
 
     qreal getCurrentStrokeWidth() const {
         return mLineWidth.getCurrentValue();
@@ -201,6 +199,7 @@ public:
 
     void setLineWidthUpdaterTarget(PathBox *path);
     void loadFromSql(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
+    void loadFromSql(int strokeSqlId, GradientWidget *gradientWidget);
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;

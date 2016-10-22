@@ -31,12 +31,6 @@ void GradientPoints::loadFromSql(int fillGradientStartId, int fillGradientEndId)
     startPoint->loadFromSql(fillGradientEndId);
 }
 
-void GradientPoints::clearAll()
-{
-    delete startPoint;
-    delete endPoint;
-}
-
 void GradientPoints::enable()
 {
     if(enabled) {

@@ -144,6 +144,7 @@ bool MovablePoint::isBeingTransformed()
 {
     return mSelected || mParent->isSelected();
 }
+
 #include <QSqlError>
 int MovablePoint::saveToSql()
 {

@@ -12,7 +12,7 @@ class QrealAnimator;
 class QrealKey : public QrealPoint
 {
 public:
-    QrealKey(int frame, QrealAnimator *parentAnimator, qreal value = 0.);
+    QrealKey(QrealAnimator *parentAnimator);
     QrealPoint *mousePress(qreal frameT, qreal valueT,
                     qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~QrealKey();
@@ -80,6 +80,7 @@ public:
 
     CtrlsMode getCtrlsMode();
     int saveToSql(int parentAnimatorSqlId);
+    void loadFromSql(int keyId);
 protected:
     QrealAnimator *mParentAnimator = NULL;
     ComplexKey *mParentKey = NULL;

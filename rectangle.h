@@ -65,6 +65,8 @@ public:
     void updateRadiusXAndRange();
     void updateAfterFrameChanged(int currentFrame);
     VectorPath *objectToPath();
+    void loadFromSql(int boundingBoxId);
+    int saveToSql(int parentId);
 private:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;

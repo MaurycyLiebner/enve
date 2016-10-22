@@ -3,6 +3,8 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include "ctrlpoint.h"
+#include "circle.h"
+#include "rectangle.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -30,6 +32,69 @@ BoxesGroup::~BoxesGroup()
 void BoxesGroup::loadFromSql(int boundingBoxId) {
     BoundingBox::loadFromSql(boundingBoxId);
     loadChildrenFromSql(boundingBoxId, false);
+}
+
+
+BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
+                                            bool loadInBox) {
+    QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
+    if(loadInBox) {
+        BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
+        newGroup->loadChildrenFromSql(thisBoundingBoxId, false);
+        newGroup->centerPivotPosition();
+        return newGroup;
+    }
+    QSqlQuery query;
+    QString queryStr;
+    queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid = " + thisBoundingBoxIdStr;
+    if(query.exec(queryStr) ) {
+        int idId = query.record().indexOf("id");
+        int idBoxType = query.record().indexOf("boxtype");
+        while(query.next() ) {
+            if(static_cast<BoundingBoxType>(
+                        query.value(idBoxType).toInt()) == TYPE_VECTOR_PATH ) {
+                VectorPath::createPathFromSql(query.value(idId).toInt(), this);
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_GROUP ) {
+                BoxesGroup *group = new BoxesGroup(mFillStrokeSettingsWidget, this);
+                group->loadFromSql(query.value(idId).toInt());
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_CIRCLE ) {
+                Circle *circle = new Circle(this);
+                circle->loadFromSql(query.value(idId).toInt());
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_TEXT ) {
+                TextBox *textBox = new TextBox(this);
+                textBox->loadFromSql(query.value(idId).toInt());
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_RECTANGLE ) {
+                Rectangle *rectangle = new Rectangle(this);
+                rectangle->loadFromSql(query.value(idId).toInt());
+            }
+        }
+    } else {
+        qDebug() << "Could not load children for boxesgroup with id " + thisBoundingBoxIdStr;
+    }
+    return this;
+}
+
+int BoxesGroup::saveToSql(int parentId)
+{
+    QSqlQuery query;
+    int boundingBoxId = BoundingBox::saveToSql(parentId);
+    query.exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
+                arg(boundingBoxId));
+    foreach(BoundingBox *box, mChildren) {
+        box->saveToSql(boundingBoxId);
+    }
+    return boundingBoxId;
+}
+
+void BoxesGroup::saveSelectedToSql()
+{
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->saveToSql(0);
+    }
 }
 
 void BoxesGroup::convertSelectedBoxesToPath() {
@@ -991,55 +1056,6 @@ void BoxesGroup::cancelSelectedPointsTransform() {
     }
 }
 
-BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
-                                            bool loadInBox) {
-    QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
-    if(loadInBox) {
-        BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
-        newGroup->loadChildrenFromSql(thisBoundingBoxId, false);
-        return newGroup;
-    }
-    QSqlQuery query;
-    QString queryStr;
-    queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid = " + thisBoundingBoxIdStr;
-    if(query.exec(queryStr) ) {
-        int idId = query.record().indexOf("id");
-        int idBoxType = query.record().indexOf("boxtype");
-        while(query.next() ) {
-            if(static_cast<BoundingBoxType>(
-                        query.value(idBoxType).toInt()) == TYPE_VECTOR_PATH ) {
-                VectorPath::createPathFromSql(query.value(idId).toInt(), this);
-            } else if(static_cast<BoundingBoxType>(
-                          query.value(idBoxType).toInt()) == TYPE_GROUP ) {
-                BoxesGroup *group = new BoxesGroup(mFillStrokeSettingsWidget, this);
-                group->loadFromSql(query.value(idId).toInt());
-            }
-        }
-    } else {
-        qDebug() << "Could not load children for boxesgroup with id " + thisBoundingBoxIdStr;
-    }
-    return this;
-}
-
-int BoxesGroup::saveToSql(int parentId)
-{
-    QSqlQuery query;
-    int boundingBoxId = BoundingBox::saveToSql(parentId);
-    query.exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
-                arg(boundingBoxId));
-    foreach(BoundingBox *box, mChildren) {
-        box->saveToSql(boundingBoxId);
-    }
-    return boundingBoxId;
-}
-
-void BoxesGroup::saveSelectedToSql()
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->saveToSql(0);
-    }
-}
-
 void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
 {
     if(startTransform) {
@@ -1092,15 +1108,13 @@ void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect)
 }
 
 void BoxesGroup::centerPivotPosition() {
-    if(!mPivotChanged) {
-        if(mChildren.isEmpty()) return;
-        QPointF posSum = QPointF(0.f, 0.f);
-        int count = mChildren.length();
-        foreach(BoundingBox *box, mChildren) {
-            posSum += box->getPivotAbsPos();
-        }
-        setPivotAbsPos(posSum/count, false, false);
+    if(mChildren.isEmpty()) return;
+    QPointF posSum = QPointF(0.f, 0.f);
+    int count = mChildren.length();
+    foreach(BoundingBox *box, mChildren) {
+        posSum += box->getPivotAbsPos();
     }
+    setPivotAbsPos(posSum/count, false, mPivotChanged);
 }
 
 BoxesGroup* BoxesGroup::groupSelectedBoxes() {
@@ -1126,7 +1140,7 @@ void BoxesGroup::addChild(BoundingBox *child)
     startNewUndoRedoSet();
     child->setParent(this);
     addChildToListAt(mChildren.count(), child);
-    centerPivotPosition();
+    if(!mPivotChanged) centerPivotPosition();
     finishUndoRedoSet();
 }
 
@@ -1181,7 +1195,7 @@ void BoxesGroup::removeChild(BoundingBox *child)
     startNewUndoRedoSet();
     removeChildFromList(index);
     child->setParent(NULL);
-    centerPivotPosition();
+    if(!mPivotChanged) centerPivotPosition();
     finishUndoRedoSet();
 }
 
@@ -1243,13 +1257,4 @@ void BoxesGroup::updateAfterCombinedTransformationChanged()
     foreach(BoundingBox *child, mChildren) {
         child->updateCombinedTransform();
     }
-}
-
-void BoxesGroup::clearAll()
-{
-    foreach(BoundingBox *box, mChildren) {
-        box->clearAll();
-        box->decNumberPointers();
-    }
-    mChildren.clear();
 }

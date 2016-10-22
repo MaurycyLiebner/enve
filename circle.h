@@ -62,7 +62,8 @@ public:
                                         QPointF *topCtrlPtr, QPointF *topPtr);
 
     VectorPath *objectToPath();
-
+    int saveToSql(int parentId);
+    void loadFromSql(int boundingBoxId);
 private:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;

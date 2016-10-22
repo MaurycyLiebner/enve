@@ -49,12 +49,6 @@ QPointF PathPoint::getInfluenceAbsolutePos()
     return mParent->getCombinedTransform().map(mInfluenceAdjustedPointValues.pointRelPos);
 }
 
-void PathPoint::clearAll()
-{
-    mStartCtrlPt->decNumberPointers();
-    mEndCtrlPt->decNumberPointers();
-}
-
 PathPoint::~PathPoint()
 {
     mStartCtrlPt->decNumberPointers();
@@ -218,7 +212,7 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
 }
 
 #include <QSqlError>
-void PathPoint::saveToSql(int vectorPathId)
+void PathPoint::saveToSql(int boundingBoxId)
 {
     int movablePtId = MovablePoint::saveToSql();
     int startPtId = mStartCtrlPt->saveToSql();
@@ -227,7 +221,7 @@ void PathPoint::saveToSql(int vectorPathId)
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
     QString isEnd = ( (isEndPoint()) ? "1" : "0" );
     if(!query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, "
-                "movablepointid, startctrlptid, endctrlptid, vectorpathid, "
+                "movablepointid, startctrlptid, endctrlptid, boundingboxid, "
                 "ctrlsmode, startpointenabled, endpointenabled) "
                 "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
                 arg(isFirst).
@@ -235,7 +229,7 @@ void PathPoint::saveToSql(int vectorPathId)
                 arg(movablePtId).
                 arg(startPtId).
                 arg(endPtId).
-                arg(vectorPathId).
+                arg(boundingBoxId).
                 arg(mCtrlsMode).
                 arg(mStartCtrlPtEnabled).
                 arg(mEndCtrlPtEnabled) ) ) {
@@ -243,7 +237,7 @@ void PathPoint::saveToSql(int vectorPathId)
     }
     if(mNextPoint != NULL) {
         if(!mNextPoint->isSeparatePathPoint()) {
-            mNextPoint->saveToSql( vectorPathId);
+            mNextPoint->saveToSql(boundingBoxId);
         }
     }
 }

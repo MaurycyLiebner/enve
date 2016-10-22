@@ -200,7 +200,7 @@ protected:
 
     bool mTransformed = false;
 
-    qreal mCurrentValue;
+    qreal mCurrentValue = 0.;
     qreal mSavedCurrentValue;
     QList<QrealKey*> mKeys;
     QPainterPath mKeysPath;

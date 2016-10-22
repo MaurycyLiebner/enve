@@ -18,60 +18,22 @@ VectorPath::VectorPath(BoxesGroup *group) :
     mPathAnimator.blockPointer();
 }
 
-void VectorPath::loadFromSql(int boundingBoxId) {
-    QSqlQuery query;
-    QString queryStr = "SELECT * FROM vectorpath WHERE boundingboxid = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        int idId = query.record().indexOf("id");
-        int idfillgradientstartid = query.record().indexOf("fillgradientstartid");
-        int idfillgradientendid = query.record().indexOf("fillgradientendid");
-        int idstrokegradientstartid = query.record().indexOf("strokegradientstartid");
-        int idstrokegradientendid = query.record().indexOf("strokegradientendid");
-        int idfillsettingsid = query.record().indexOf("fillsettingsid");
-        int idstrokesettingsid = query.record().indexOf("strokesettingsid");
-
-
-        int vectorPathId = query.value(idId).toInt();
-        int fillGradientStartId = query.value(idfillgradientstartid).toInt();
-        int fillGradientEndId = query.value(idfillgradientendid).toInt();
-        int strokeGradientStartId = query.value(idstrokegradientstartid).toInt();
-        int strokeGradientEndId = query.value(idstrokegradientendid).toInt();
-        int fillSettingsId = query.value(idfillsettingsid).toInt();
-        int strokeSettingsId = query.value(idstrokesettingsid).toInt();
-
-        loadPointsFromSql(vectorPathId);
-        query.exec("CREATE TABLE vectorpath "
-                   "(id INTEGER PRIMARY KEY, "
-                   "fillgradientstartid INTEGER, "
-                   "fillgradientendid INTEGER, "
-                   "strokegradientstartid INTEGER, "
-                   "strokegradientendid INTEGER, "
-                   "boundingboxid INTEGER, "
-                   "fillsettingsid INTEGER, "
-                   "strokesettingsid INTEGER, "
-                   "FOREIGN KEY(fillgradientstartid) REFERENCES movablepoint(id), "
-                   "FOREIGN KEY(fillgradientendid) REFERENCES movablepoint(id), "
-                   "FOREIGN KEY(strokegradientstartid) REFERENCES movablepoint(id), "
-                   "FOREIGN KEY(strokegradientendid) REFERENCES movablepoint(id), "
-                   "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
-                   "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
-                   "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
-        mFillGradientPoints.loadFromSql(fillGradientStartId,
-                                       fillGradientEndId);
-        mStrokeGradientPoints.loadFromSql(strokeGradientStartId,
-                                         strokeGradientEndId);
-
-        GradientWidget *gradientWidget =
-                mMainWindow->getFillStrokeSettings()->getGradientWidget();
-
-        mFillPaintSettings.loadFromSql(fillSettingsId, gradientWidget);
-        mStrokeSettings = StrokeSettings::createStrokeSettingsFromSql(
-                    strokeSettingsId, gradientWidget);
-    } else {
-        qDebug() << "Could not load vectorpath with id " << boundingBoxId;
+#include <QSqlError>
+int VectorPath::saveToSql(int parentId)
+{
+    int boundingBoxId = PathBox::saveToSql(parentId);
+    foreach(PathPoint *point, mSeparatePaths) {
+        point->saveToSql(boundingBoxId);
     }
+
+    return boundingBoxId;
+}
+
+
+void VectorPath::loadFromSql(int boundingBoxId) {
+    PathBox::loadFromSql(boundingBoxId);
+    loadPointsFromSql(boundingBoxId);
+    if(!mPivotChanged) centerPivotPosition();
 }
 
 VectorPath *VectorPath::createPathFromSql(int boundingBoxId,
@@ -89,11 +51,11 @@ VectorPath::~VectorPath()
     }
 }
 
-void VectorPath::loadPointsFromSql(int vectorPathId) {
+void VectorPath::loadPointsFromSql(int boundingBoxId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT id, isfirst, isendpoint, movablepointid "
-                               "FROM pathpoint WHERE vectorpathid = %1 "
-                               "ORDER BY id ASC").arg(vectorPathId);
+                               "FROM pathpoint WHERE boundingboxid = %1 "
+                               "ORDER BY id ASC").arg(boundingBoxId);
     if(query.exec(queryStr) ) {
         int idisfirst = query.record().indexOf("isfirst");
         int idisendpoint = query.record().indexOf("isendpoint");
@@ -131,18 +93,8 @@ void VectorPath::loadPointsFromSql(int vectorPathId) {
             lastPoint->setPointAsNext(firstPoint, false);
         }
     } else {
-        qDebug() << "Could not load points for vectorpath with id " << vectorPathId;
+        qDebug() << "Could not load points for vectorpath with id " << boundingBoxId;
     }
-}
-
-void VectorPath::clearAll()
-{
-    foreach(PathPoint *point, mPoints) {
-        point->clearAll();
-        point->decNumberPointers();
-    }
-    mStrokeGradientPoints.clearAll();
-    mFillGradientPoints.clearAll();
 }
 
 qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
@@ -872,41 +824,6 @@ void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
     removePointFromSeparatePaths(pointBeingReplaced);
     addPointToSeparatePaths(newPoint);
     finishUndoRedoSet();
-}
-
-#include <QSqlError>
-int VectorPath::saveToSql(int parentId)
-{
-    QSqlQuery query;
-    int boundingBoxId = BoundingBox::saveToSql(parentId);
-    int fillStartPt = mFillGradientPoints.startPoint->saveToSql();
-    int fillEndPt = mFillGradientPoints.endPoint->saveToSql();
-    int strokeStartPt = mStrokeGradientPoints.startPoint->saveToSql();
-    int strokeEndPt = mStrokeGradientPoints.endPoint->saveToSql();
-
-    int fillSettingsId = mFillPaintSettings.saveToSql();
-    int strokeSettingsId = mStrokeSettings.saveToSql();
-    if(!query.exec(
-            QString(
-            "INSERT INTO vectorpath (fillgradientstartid, fillgradientendid, "
-            "strokegradientstartid, strokegradientendid, "
-            "boundingboxid, fillsettingsid, strokesettingsid) "
-            "VALUES (%1, %2, %3, %4, %5, %6, %7)").
-            arg(fillStartPt).
-            arg(fillEndPt).
-            arg(strokeStartPt).
-            arg(strokeEndPt).
-            arg(boundingBoxId).
-            arg(fillSettingsId).
-            arg(strokeSettingsId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
-    }
-    int vectorPathId = query.lastInsertId().toInt();
-    foreach(PathPoint *point, mSeparatePaths) {
-        point->saveToSql(vectorPathId);
-    }
-
-    return boundingBoxId;
 }
 
 void VectorPath::startAllPointsTransform()

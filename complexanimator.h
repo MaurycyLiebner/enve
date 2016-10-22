@@ -61,7 +61,7 @@ protected:
 class ComplexKey : public QrealKey
 {
 public:
-    ComplexKey(int frameT, ComplexAnimator *parentAnimator);
+    ComplexKey(ComplexAnimator *parentAnimator);
 
     void setStartValue(qreal);
 

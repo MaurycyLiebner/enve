@@ -309,21 +309,17 @@ void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
     setUpdater(new StrokeWidthUpdater(path));
 }
 
-StrokeSettings StrokeSettings::createStrokeSettingsFromSql(int strokeSqlId,
-                        GradientWidget *gradientWidget) {
+void StrokeSettings::loadFromSql(int strokeSqlId, GradientWidget *gradientWidget) {
     QSqlQuery query;
     QString queryStr = QString("SELECT paintsettingsid FROM strokesettings WHERE id = %1").
             arg(strokeSqlId);
-    StrokeSettings strokeSettings;
     if(query.exec(queryStr) ) {
         query.next();
         int idPaintSettingsId = query.record().indexOf("paintsettingsid");
         int paintSettingsId = static_cast<PaintType>(query.value(idPaintSettingsId).toInt());
-        strokeSettings.loadFromSql(strokeSqlId, paintSettingsId, gradientWidget);
-        return strokeSettings;
+        loadFromSql(strokeSqlId, paintSettingsId, gradientWidget);
     }
     qDebug() << "Could not load strokesettings with id " << strokeSqlId;
-    return strokeSettings;
 }
 
 void StrokeSettings::loadFromSql(int strokeSqlId, int paintSqlId,

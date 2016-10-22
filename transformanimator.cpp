@@ -72,11 +72,11 @@ void TransformAnimator::loadFromSql(int transformAnimatorId) {
 
         //loadKeysFromSql(qrealAnimatorId);
 
-        mPosAnimator.loadFromSql(posanimatorid);
-        mScaleAnimator.loadFromSql(scaleanimatorid);
-        mPivotAnimator.loadFromSql(pivotanimatorid);
-        mRotAnimator.loadFromSql(rotanimatorid);
-        mOpacityAnimator.loadFromSql(opacityanimatorid);
+        mPosAnimator.loadFromSql(query.value(posanimatorid).toInt());
+        mScaleAnimator.loadFromSql(query.value(scaleanimatorid).toInt());
+        mPivotAnimator.loadFromSql(query.value(pivotanimatorid).toInt());
+        mRotAnimator.loadFromSql(query.value(rotanimatorid).toInt());
+        mOpacityAnimator.loadFromSql(query.value(opacityanimatorid).toInt());
     } else {
         qDebug() << "Could not load qpointfanimator with id " << transformAnimatorId;
     }

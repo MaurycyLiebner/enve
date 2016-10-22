@@ -170,9 +170,8 @@ public:
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
     VectorPath *getParentPath();
 
-    void saveToSql(int vectorPathId);
+    void saveToSql(int boundingBoxId);
 
-    void clearAll();
     void cancelTransform();
 
     void setEndCtrlPtEnabled(bool enabled);

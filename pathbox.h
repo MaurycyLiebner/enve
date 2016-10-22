@@ -174,6 +174,8 @@ public:
     void updateAfterFrameChanged(int currentFrame);
 
     void setOutlineAffectedByScale(bool bT);
+    int saveToSql(int parentId);
+    void loadFromSql(int boundingBoxId);
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

@@ -344,7 +344,12 @@ void Canvas::schedulePivotUpdate()
 
 void Canvas::clearAll() {
     setCurrentBoxesGroup(this);
-    BoxesGroup::clearAll();
+
+    foreach(BoundingBox *box, mChildren) {
+        box->decNumberPointers();
+    }
+    mChildren.clear();
+
     resetTransormation();
 }
 

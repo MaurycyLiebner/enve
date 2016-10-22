@@ -42,6 +42,56 @@ Rectangle::~Rectangle()
 
 }
 
+#include <QSqlError>
+int Rectangle::saveToSql(int parentId)
+{
+    int boundingBoxId = PathBox::saveToSql(parentId);
+
+    int bottomRightPointId = mTopLeftPoint->saveToSql();
+    int topLeftPointId = mTopLeftPoint->saveToSql();
+    int radiusPointId = mRadiusPoint->saveToSql();
+
+    QSqlQuery query;
+    if(!query.exec(QString("INSERT INTO rectangle (boundingboxid, "
+                           "topleftpointid, bottomrightpointid, "
+                           "radiuspointid) "
+                "VALUES (%1, %2, %3, %4)").
+                arg(boundingBoxId).
+                arg(topLeftPointId).
+                arg(bottomRightPointId).
+                arg(radiusPointId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+
+    return boundingBoxId;
+}
+
+
+void Rectangle::loadFromSql(int boundingBoxId) {
+    PathBox::loadFromSql(boundingBoxId);
+
+    QSqlQuery query;
+    QString queryStr = "SELECT * FROM rectangle WHERE boundingboxid = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idBottomRightPointId = query.record().indexOf("bottomrightpointid");
+        int idTopLeftPointId = query.record().indexOf("topleftpointid");
+        int idRadiusPointId = query.record().indexOf("radiuspointid");
+
+        int bottomRightPointId = query.value(idBottomRightPointId).toInt();
+        int topLeftPointId = query.value(idTopLeftPointId).toInt();
+        int radiusPointId = query.value(idRadiusPointId).toInt();
+
+        mBottomRightPoint->loadFromSql(bottomRightPointId);
+        mTopLeftPoint->loadFromSql(topLeftPointId);
+        mRadiusPoint->loadFromSql(radiusPointId);
+    } else {
+        qDebug() << "Could not load rectangle with id " << boundingBoxId;
+    }
+
+    if(!mPivotChanged) centerPivotPosition();
+}
 
 VectorPath *Rectangle::objectToPath()
 {

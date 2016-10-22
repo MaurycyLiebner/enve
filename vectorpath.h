@@ -47,8 +47,6 @@ public:
                               PathPoint *toPoint = NULL);
     int saveToSql(int parentId);
 
-    void clearAll();
-
     PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
     qreal percentAtPoint(QPointF absPos, qreal distTolerance,
                          qreal maxPercent, qreal minPercent,
@@ -102,7 +100,7 @@ protected:
     void updatePathPointIds();
     PathAnimator mPathAnimator;
 
-    void loadPointsFromSql(int vectorPathId);
+    void loadPointsFromSql(int boundingBoxId);
 
     qreal findPercentForPoint(QPointF point, qreal minPercent = 0.,
                               qreal maxPercent = 1.);

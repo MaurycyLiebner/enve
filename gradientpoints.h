@@ -12,8 +12,6 @@ public:
 
     void initialize(PathBox *parentT);
 
-    void clearAll();
-
     void enable();
 
     void disable();

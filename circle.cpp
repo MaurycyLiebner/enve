@@ -7,7 +7,6 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
 {
     setName("Circle");
 
-
     mCenter = new CircleCenterPoint(this, TYPE_PATH_POINT);
     mCenter->setRelativePos(QPointF(0., 0.), false);
     mHorizontalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
@@ -38,6 +37,52 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
                 new PathPointUpdater(this));
 
     schedulePathUpdate();
+}
+
+
+#include <QSqlError>
+int Circle::saveToSql(int parentId)
+{
+    int boundingBoxId = PathBox::saveToSql(parentId);
+
+    int horizontalRadiusPointId = mHorizontalRadiusPoint->saveToSql();
+    int verticalRadiusPointId = mVerticalRadiusPoint->saveToSql();
+
+    QSqlQuery query;
+    if(!query.exec(QString("INSERT INTO circle (boundingboxid, "
+                           "horizontalradiuspointid, verticalradiuspointid) "
+                "VALUES (%1, %2, %3)").
+                arg(boundingBoxId).
+                arg(horizontalRadiusPointId).
+                arg(verticalRadiusPointId) ) ) {
+        qDebug() << query.lastError() << endl << query.lastQuery();
+    }
+
+    return boundingBoxId;
+}
+
+
+void Circle::loadFromSql(int boundingBoxId) {
+    PathBox::loadFromSql(boundingBoxId);
+
+    QSqlQuery query;
+    QString queryStr = "SELECT * FROM circle WHERE boundingboxid = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idHorizontalRadiusPointId = query.record().indexOf("horizontalradiuspointid");
+        int idVerticalRadiusPointId = query.record().indexOf("verticalradiuspointid");
+
+        int horizontalRadiusPointId = query.value(idHorizontalRadiusPointId).toInt();
+        int verticalRadiusPointId = query.value(idVerticalRadiusPointId).toInt();
+
+        mHorizontalRadiusPoint->loadFromSql(horizontalRadiusPointId);
+        mVerticalRadiusPoint->loadFromSql(verticalRadiusPointId);
+    } else {
+        qDebug() << "Could not load circle with id " << boundingBoxId;
+    }
+
+    if(!mPivotChanged) centerPivotPosition();
 }
 
 QPointF ellipseQPointFToCanvas(QPointF ellipseCoordPoint, qreal ar, qreal br) {

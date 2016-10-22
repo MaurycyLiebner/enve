@@ -797,7 +797,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
-    query.exec("CREATE TABLE vectorpath "
+    query.exec("CREATE TABLE pathbox "
                "(id INTEGER PRIMARY KEY, "
                "fillgradientstartid INTEGER, "
                "fillgradientendid INTEGER, "
@@ -825,7 +825,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "movablepointid INTEGER, "
                "startctrlptid INTEGER, "
                "endctrlptid INTEGER, "
-               "vectorpathid INTEGER, "
+               "boundingboxid INTEGER, "
                "ctrlsmode INTEGER, "
                "startpointenabled BOOLEAN, "
                "endpointenabled BOOLEAN, "
@@ -834,9 +834,38 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(movablepointid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(startctrlptid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(endctrlptid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(vectorpathid) REFERENCES vectorpath(id), "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
                "FOREIGN KEY(influenceanimatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(influencetanimatorid) REFERENCES qrealanimator(id) )");
+    query.exec("CREATE TABLE circle "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "horizontalradiuspointid INTEGER, "
+               "verticalradiuspointid INTEGER, "
+               "FOREIGN KEY(horizontalradiuspointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(verticalradiuspointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query.exec("CREATE TABLE rectangle "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "topleftpointid INTEGER, "
+               "bottomrightpointid INTEGER, "
+               "radiuspointid INTEGER, "
+               "FOREIGN KEY(topleftpointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(bottomrightpointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(radiuspointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query.exec("CREATE TABLE textbox "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "text TEXT, "
+               "fontfamily TEXT, "
+               "fontstyle TEXT, "
+               "fontsize REAL, "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
 }
 
 void MainWindow::saveToFile(QString path) {

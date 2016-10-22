@@ -308,7 +308,8 @@ void ComplexAnimator::addChildQrealKey(QrealKey *key)
 {
     ComplexKey *collection = getKeyCollectionAtFrame(key->getFrame() );
     if(collection == NULL) {
-        collection = new ComplexKey(key->getFrame(), this );
+        collection = new ComplexKey(this);
+        collection->setFrame(key->getFrame());
         appendKey(collection);
     }
     collection->addAnimatorKey(key);
@@ -324,8 +325,8 @@ void ComplexAnimator::removeChildQrealKey(QrealKey *key)
     }
 }
 
-ComplexKey::ComplexKey(int frameT, ComplexAnimator *parentAnimator) :
-    QrealKey(frameT, parentAnimator, frameT) {
+ComplexKey::ComplexKey(ComplexAnimator *parentAnimator) :
+    QrealKey(parentAnimator) {
 }
 
 void ComplexKey::setStartValue(qreal) {
