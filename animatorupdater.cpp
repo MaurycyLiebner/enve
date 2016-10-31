@@ -11,7 +11,7 @@ TransUpdater::TransUpdater(BoundingBox *boundingBox) : AnimatorUpdater()
 }
 
 void TransUpdater::update() {
-    mTarget->updateCombinedTransform();
+    mTarget->updateRelativeTransform();
     mTarget->schedulePivotUpdate();
 }
 

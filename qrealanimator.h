@@ -177,6 +177,8 @@ public:
     virtual int saveToSql();
     void loadFromSql(int qrealAnimatorId);
     void loadKeysFromSql(int qrealAnimatorId);
+    virtual void incSavedValueToCurrentValue(qreal incBy);
+    virtual void multSavedValueToCurrentValue(qreal multBy);
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 

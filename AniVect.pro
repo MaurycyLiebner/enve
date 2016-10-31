@@ -71,7 +71,8 @@ SOURCES += main.cpp\
     rectangle.cpp \
     imagebox.cpp \
     fontswidget.cpp \
-    textbox.cpp
+    textbox.cpp \
+    paintcontroler.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -128,4 +129,5 @@ HEADERS  += mainwindow.h \
     rectangle.h \
     imagebox.h \
     fontswidget.h \
-    textbox.h
+    textbox.h \
+    paintcontroler.h

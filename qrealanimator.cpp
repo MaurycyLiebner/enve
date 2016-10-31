@@ -823,6 +823,14 @@ void QrealAnimator::retrieveSavedValue()
     setCurrentValue(mSavedCurrentValue);
 }
 
+void QrealAnimator::incSavedValueToCurrentValue(qreal incBy) {
+    setCurrentValue(mSavedCurrentValue + incBy);
+}
+
+void QrealAnimator::multSavedValueToCurrentValue(qreal multBy) {
+    setCurrentValue(mSavedCurrentValue * multBy);
+}
+
 void QrealAnimator::incCurrentValue(qreal incBy)
 {
     setCurrentValue(mCurrentValue + incBy);

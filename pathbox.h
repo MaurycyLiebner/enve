@@ -176,6 +176,13 @@ public:
     void setOutlineAffectedByScale(bool bT);
     int saveToSql(int parentId);
     void loadFromSql(int boundingBoxId);
+    virtual void updateBoundingRect();
+    void updatePrettyPixmap();
+    void updateBoundingRectClippedToView();
+
+    void afterSuccessfulUpdate();
+
+    void updateUpdateTransform();
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;
@@ -190,6 +197,10 @@ protected:
     bool mPathUpdateNeeded = false;
     bool mMappedPathUpdateNeeded = false;
     bool mOutlinePathUpdateNeeded = false;
+
+    bool mUpdatePathUpdateNeeded = false;
+    bool mUpdateMappedPathUpdateNeeded = false;
+    bool mUpdateOutlinePathUpdateNeeded = false;
 
 
     QPainterPath mPath;

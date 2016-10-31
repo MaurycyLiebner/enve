@@ -121,8 +121,7 @@ void TransformAnimator::reset()
 }
 
 void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel) {
-    mRotAnimator.retrieveSavedValue();
-    mRotAnimator.incCurrentValue(rotRel);
+    mRotAnimator.incSavedValueToCurrentValue(rotRel);
 }
 
 void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel, QPointF pivot) {
@@ -137,8 +136,7 @@ void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel, QPointF pivot) 
 }
 
 void TransformAnimator::moveRelativeToSavedValue(qreal dX, qreal dY) {
-    mPosAnimator.retrieveSavedValue();
-    mPosAnimator.incCurrentValue(dX, dY);
+    mPosAnimator.incSavedValueToCurrentValue(dX, dY);
 }
 
 void TransformAnimator::translate(qreal dX, qreal dY)
@@ -148,8 +146,7 @@ void TransformAnimator::translate(qreal dX, qreal dY)
 
 void TransformAnimator::scale(qreal sx, qreal sy)
 {
-    mScaleAnimator.retrieveSavedValue();
-    mScaleAnimator.multCurrentValue(sx, sy);
+    mScaleAnimator.multSavedValueToCurrentValue(sx, sy);
 }
 
 void TransformAnimator::scale(qreal sx, qreal sy, QPointF pivot)
@@ -217,7 +214,7 @@ void TransformAnimator::setPivotWithoutChangingTransformation(qreal x, qreal y)
 
 void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, bool finish)
 {
-    QMatrix currentMatrix;
+    /*QMatrix currentMatrix;
     qreal pivotX = mPivotAnimator.getXValue();
     qreal pivotY = mPivotAnimator.getYValue();
     currentMatrix.translate(pivotX + mPosAnimator.getXValue(),
@@ -246,7 +243,7 @@ void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, boo
 
     mPivotAnimator.setCurrentValue(point, finish);
 
-    callUpdater();
+    callUpdater();*/
 }
 
 void TransformAnimator::setPivot(QPointF point, bool finish) {

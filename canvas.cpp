@@ -15,6 +15,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     QWidget(parent),
     BoxesGroup(fillStrokeSettings)
 {
+    setAttribute(Qt::WA_OpaquePaintEvent);
+
     mBoxListItemDetailsVisible = true;
     incNumberPointers();
 
@@ -164,6 +166,34 @@ void Canvas::loadAllBoxesFromSql(bool loadInBox) {
                                                                     loadInBox);
 }
 
+void Canvas::setPartialRepaintRect(QRectF absRect) {
+    mPartialRepaintRect = absRect;
+}
+
+void Canvas::partialRepaintRectToPoint(QPointF point) {
+    mPartialRepaintRect.setTopLeft(point);
+    mPartialRepaintRect.setBottomRight(point);
+}
+
+void Canvas::makePartialRepaintInclude(QPointF pointToInclude) {
+    if(pointToInclude.x() > mPartialRepaintRect.right() ) {
+        mPartialRepaintRect.setRight(pointToInclude.x() );
+    } else if(pointToInclude.x() < mPartialRepaintRect.left() ) {
+        mPartialRepaintRect.setLeft(pointToInclude.x() );
+    }
+    if(pointToInclude.y() > mPartialRepaintRect.bottom() ) {
+        mPartialRepaintRect.setBottom(pointToInclude.y() );
+    } else if(pointToInclude.y() < mPartialRepaintRect.top() ) {
+        mPartialRepaintRect.setTop(pointToInclude.y() );
+    }
+}
+
+void Canvas::repaintPartially() {
+    mFullRepaint = false;
+    repaint();
+    mFullRepaint = true;
+}
+
 void Canvas::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
@@ -184,12 +214,12 @@ void Canvas::paintEvent(QPaintEvent *)
         p.drawPath(path.subtracted(viewRectPath));
 
         p.drawImage(absPos, *mCurrentPreviewImg);
-    } else {
+    } else if(mFullRepaint) {
         p.fillRect(0, 0, width() + 1, height() + 1, QColor(75, 75, 75));
         p.fillRect(viewRect, Qt::white);
 
         foreach(BoundingBox *box, mChildren){
-            box->draw(&p);
+            box->drawPixmap(&p);
         }
         mCurrentBoxesGroup->drawSelected(&p, mCurrentMode);
 
@@ -755,7 +785,7 @@ void Canvas::moveBy(QPointF trans)
     mCombinedTransformMatrix.translate(trans.x(), trans.y());
 
     mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
-    updateCombinedTransform();
+    updateAfterCombinedTransformationChanged();
     schedulePivotUpdate();
 }
 

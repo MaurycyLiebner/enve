@@ -28,10 +28,11 @@ public:
     QRectF getTextRect();
     bool pointInsidePath(QPointF point);
     void setPathText(bool pathText);
-    QRectF getBoundingRect();
+
     void centerPivotPosition();
+    void updateBoundingRect();
 private:
-    bool mPathText = false;
+    bool mPathText = true;
     QString mText;
     QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;

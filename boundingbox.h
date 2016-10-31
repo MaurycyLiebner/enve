@@ -57,6 +57,7 @@ public:
     virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getBoundingRect() { return QRectF(); }
 
+    virtual void drawPixmap(QPainter *p);
     virtual void render(QPainter *) {}
     virtual void draw(QPainter *) {}
     virtual void drawSelected(QPainter *, CanvasMode) {}
@@ -194,8 +195,10 @@ public:
     virtual void setRenderCombinedTransform();
 
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
-    virtual void drawKeysView(QPainter *p, qreal drawY, qreal maxY, qreal pixelsPerFrame, int startFrame, int endFrame);
-    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY, int startFrame, int endFrame);
+    virtual void drawKeysView(QPainter *p, qreal drawY, qreal maxY,
+                              qreal pixelsPerFrame, int startFrame, int endFrame);
+    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                          qreal drawY, int startFrame, int endFrame);
     void scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy);
     void resetScale();
     void resetTranslation();
@@ -210,8 +213,43 @@ public:
 
     virtual VectorPath *objectToPath() { return NULL; }
     virtual void loadFromSql(int boundingBoxId);
+
+    virtual void updatePrettyPixmap();
+    void setAwaitingUpdate(bool bT);
+    void awaitUpdate();
+    QRectF getBoundingRectClippedToView();
+    void saveOldPixmap();
+
+    void saveUglyPaintTransform();
+    void drawAsBoundingRect(QPainter *p, QRectF rect);
+    virtual void updateUpdateTransform();
+    void updateUglyPaintTransform();
+    void redoUpdate();
+    bool shouldRedoUpdate();
+    void setRedoUpdateToFalse();
+
+    virtual void afterSuccessfulUpdate() {}
+
+    void updateAllLowQualityPixmap();
+    void updateRelativeTransform();
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
+
+    QMatrix mRelativeTransformMatrix;
+
+    QMatrix mUpdateTransform;
+    QMatrix mOldTransform;
+    QPixmap mNewPixmap;
+    QPixmap mOldPixmap;
+    QPixmap mAllLowQualityPixmap;
+    QRectF mOldPixBoundingRect;
+
+    bool mRedoUpdate = false;
+    bool mAwaitingUpdate = false;
+    QMatrix mUglyPaintTransform;
+
+    QRectF mBoundingRect;
+    QRectF mBoundingRectClippedToView;
 
     BoxesList *mBoxesList;
     KeysView *mKeysView;

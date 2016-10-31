@@ -74,13 +74,12 @@ bool TextBox::pointInsidePath(QPointF point)
     }
 }
 
-QRectF TextBox::getBoundingRect()
-{
+void TextBox::updateBoundingRect() {
     if(mPathText) {
-        return PathBox::getBoundingRect();
+        PathBox::updateBoundingRect();
     } else {
-        QRectF rect = mCombinedTransformMatrix.mapRect(getTextRect() );
-        return rect;
+        mBoundingRect = mUpdateTransform.mapRect(getTextRect() );
+        updateBoundingRectClippedToView();
     }
 }
 
@@ -92,18 +91,6 @@ void TextBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     if(mVisible) {
         p->save();
-        if(mPathText) {
-            drawBoundingRect(p);
-        } else {
-            QPainterPath mapped;
-            mapped.addRect(getTextRect() );
-            mapped = mCombinedTransformMatrix.map(mapped);
-            QPen pen = p->pen();
-            p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
-            p->setBrush(Qt::NoBrush);
-            p->drawPath(mapped);
-            p->setPen(pen);
-        }
 
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
@@ -134,7 +121,7 @@ void TextBox::draw(QPainter *p)
             }
 
             p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
-            p->setTransform(QTransform(mCombinedTransformMatrix) );
+            p->setTransform(QTransform(mUpdateTransform), true);
             p->setFont(mFont);
             p->drawText(getTextRect(), mAlignment, mText);
 
@@ -158,25 +145,6 @@ void TextBox::openTextEditor()
         callUpdateSchedulers();
     }
 }
-
-//void TextBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
-//{
-//    if(mVisible) {
-//        p->save();
-
-//        QPainterPath mapped;
-//        mapped.addRect(getTextRect() );
-//        mapped = mCombinedTransformMatrix.map(mapped);
-//        QPen pen = p->pen();
-//        p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
-//        p->setBrush(Qt::NoBrush);
-//        p->drawPath(mapped);
-//        p->setPen(pen);
-
-//        //drawBoundingRect(p);
-//        p->restore();
-//    }
-//}
 
 void TextBox::setText(QString text)
 {
@@ -259,9 +227,7 @@ void TextBox::updatePath()
         }
 
         updateMappedPath();
+    } else {
+        updateBoundingRect();
     }
 }
-
-//void TextBox::centerPivotPosition() {
-
-//}

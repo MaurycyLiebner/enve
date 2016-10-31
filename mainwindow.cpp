@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include "boxeslist.h"
 #include "boxeslistanimationdockwidget.h"
+#include "paintcontroler.h"
 
 MainWindow *MainWindow::mMainWindowInstance;
 
@@ -25,6 +26,15 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     mMainWindowInstance = this;
+    mPaintControlerThread = new QThread();
+    mPaintControler = new PaintControler();
+    mPaintControler->moveToThread(mPaintControlerThread);
+    connect(mPaintControler, SIGNAL(finishedUpdatingLastBox()),
+            this, SLOT(sendNextBoxForUpdate()) );
+    connect(this, SIGNAL(updateBox(BoundingBox*)),
+            mPaintControler, SLOT(updateBoxPrettyPixmap(BoundingBox*)) );
+    mPaintControlerThread->start();
+
     mUndoRedoStack.setWindow(this);
     setCurrentPath("");
     QSqlDatabase::addDatabase("QSQLITE");
@@ -274,6 +284,40 @@ void MainWindow::updateCanvasModeButtonsChecked(CanvasMode currentMode) {
     mCircleMode->setChecked(currentMode == ADD_CIRCLE);
     mRectangleMode->setChecked(currentMode == ADD_RECTANGLE);
     mTextMode->setChecked(currentMode == ADD_TEXT);
+}
+
+void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)
+{
+    if(mNoBoxesAwaitUpdate) {
+        mNoBoxesAwaitUpdate = false;
+        mLastUpdatedBox = box;
+        emit updateBox(box);
+    } else {
+        mBoxesAwaitingUpdate << box;
+    }
+}
+
+void MainWindow::sendNextBoxForUpdate()
+{
+    if(mLastUpdatedBox != NULL) {
+        if(mLastUpdatedBox->shouldRedoUpdate()) {
+            qDebug() << "redo;";
+            mLastUpdatedBox->setRedoUpdateToFalse();
+            mLastUpdatedBox->setAwaitingUpdate(true);
+            emit updateBox(mLastUpdatedBox);
+            return;
+        } else {
+            mLastUpdatedBox->setAwaitingUpdate(false);
+        }
+    }
+    if(mBoxesAwaitingUpdate.isEmpty()) {
+        mNoBoxesAwaitUpdate = true;
+        mLastUpdatedBox = NULL;
+        callUpdateSchedulers();
+    } else {
+        mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
+        emit updateBox(mLastUpdatedBox);
+    }
 }
 
 void MainWindow::playPreview()

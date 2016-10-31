@@ -73,7 +73,6 @@ void PathBox::loadFromSql(int boundingBoxId) {
             QString::number(boundingBoxId);
     if(query.exec(queryStr) ) {
         query.next();
-        int idId = query.record().indexOf("id");
         int idfillgradientstartid = query.record().indexOf("fillgradientstartid");
         int idfillgradientendid = query.record().indexOf("fillgradientendid");
         int idstrokegradientstartid = query.record().indexOf("strokegradientstartid");
@@ -104,62 +103,76 @@ void PathBox::loadFromSql(int boundingBoxId) {
     }
 }
 
+void PathBox::updatePathIfNeeded()
+{
+    if(mUpdatePathUpdateNeeded) {
+        updatePath();
+        if(!mAnimatorsCollection.hasKeys() && !mPivotChanged ) centerPivotPosition();
+        updateAllLowQualityPixmap();
+    }
+}
+
+void PathBox::updatePrettyPixmap() {
+    if(mRedoUpdate) {
+        mRedoUpdate = false;
+        qDebug() << "redo update;";
+        updateUpdateTransform();
+    }
+
+    qDebug() << "updated: " << mUpdateTransform;
+    updatePathIfNeeded();
+    updateOutlinePathIfNeeded();
+    updateMappedPathIfNeeded();
+
+    BoundingBox::updatePrettyPixmap();
+}
+
 void PathBox::schedulePathUpdate()
 {
+    awaitUpdate();
     if(mPathUpdateNeeded) {
         return;
     }
-    addUpdateScheduler(new PathUpdateScheduler(this));
+
     mPathUpdateNeeded = true;
     mMappedPathUpdateNeeded = false;
     mOutlinePathUpdateNeeded = false;
 }
 
-void PathBox::updatePathIfNeeded()
+void PathBox::scheduleMappedPathUpdate()
 {
-    if(mPathUpdateNeeded) {
-        updatePath();
-        if(!mAnimatorsCollection.hasKeys() && !mPivotChanged ) centerPivotPosition();
-        mPathUpdateNeeded = false;
-        mMappedPathUpdateNeeded = false;
-        mOutlinePathUpdateNeeded = false;
+    awaitUpdate();
+    if(mMappedPathUpdateNeeded || mPathUpdateNeeded || mParent == NULL) {
+        return;
     }
+
+    mMappedPathUpdateNeeded = true;
 }
 
 void PathBox::scheduleOutlinePathUpdate()
 {
-    if(mOutlinePathUpdateNeeded) {
+    awaitUpdate();
+    if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
     }
-    addUpdateScheduler(new OutlineUpdateScheduler(this));
+
     mOutlinePathUpdateNeeded = true;
 }
 
 void PathBox::updateOutlinePathIfNeeded() {
-    if(mOutlinePathUpdateNeeded) {
+    if(mUpdateOutlinePathUpdateNeeded) {
         updateOutlinePath();
-        mOutlinePathUpdateNeeded = false;
     }
 }
 
 void PathBox::updateMappedPathIfNeeded()
 {
-    if(mMappedPathUpdateNeeded) {
+    if(mUpdateMappedPathUpdateNeeded) {
         if(mParent != NULL) {
             updateMappedPath();
         }
-        mMappedPathUpdateNeeded = false;
+        qDebug() << "mapped path updated;" << mUpdateTransform.m11();
     }
-}
-
-void PathBox::scheduleMappedPathUpdate()
-{
-    if(mMappedPathUpdateNeeded || mPathUpdateNeeded || mParent == NULL) {
-        return;
-    }
-    addUpdateScheduler(new MappedPathUpdateScheduler(this));
-    mMappedPathUpdateNeeded = true;
-
 }
 
 void PathBox::updateAfterCombinedTransformationChanged()
@@ -170,7 +183,7 @@ void PathBox::updateAfterCombinedTransformationChanged()
 void PathBox::updateOutlinePath() {
     mStrokeSettings.setStrokerSettings(&mPathStroker);
     if(mOutlineAffectedByScale) {
-        mMappedOutlinePath = mCombinedTransformMatrix.map(
+        mMappedOutlinePath = mUpdateTransform.map(
                                             mPathStroker.createStroke(mPath));
     } else {
         QPainterPathStroker stroker;
@@ -192,6 +205,7 @@ void PathBox::updateWholePath() {
             mStrokeSettings.getPaintType() == NOPAINT) {
         mMappedWhole += mMappedPath;
     }
+    updateBoundingRect();
 }
 
 void PathBox::setRenderCombinedTransform() {
@@ -201,7 +215,7 @@ void PathBox::setRenderCombinedTransform() {
 
 void PathBox::updateMappedPath()
 {
-    mMappedPath = mCombinedTransformMatrix.map(mPath);
+    mMappedPath = mUpdateTransform.map(mPath);
 
     updateOutlinePath();
     updateDrawGradients();
@@ -247,9 +261,41 @@ void PathBox::updateDrawGradients()
     }
 }
 
+void PathBox::updateBoundingRectClippedToView() {
+    mBoundingRectClippedToView = mBoundingRect.intersected(
+                mMainWindow->getCanvas()->rect().adjusted(-400, -400, 400, 400));
+}
+
+void PathBox::afterSuccessfulUpdate()
+{
+    qDebug() << "succes";
+    mUpdatePathUpdateNeeded = false;
+    mUpdateMappedPathUpdateNeeded = false;
+    mUpdateOutlinePathUpdateNeeded = false;
+}
+
+void PathBox::updateUpdateTransform()
+{
+    mUpdatePathUpdateNeeded = mPathUpdateNeeded ||
+            mUpdatePathUpdateNeeded;
+    mUpdateMappedPathUpdateNeeded = mMappedPathUpdateNeeded ||
+            mUpdateMappedPathUpdateNeeded;
+    mUpdateOutlinePathUpdateNeeded = mOutlinePathUpdateNeeded ||
+            mUpdateOutlinePathUpdateNeeded;
+    mPathUpdateNeeded = false;
+    mMappedPathUpdateNeeded = false;
+    mOutlinePathUpdateNeeded = false;
+    BoundingBox::updateUpdateTransform();
+}
+
+void PathBox::updateBoundingRect() {
+    mBoundingRect = mMappedWhole.boundingRect();
+    updateBoundingRectClippedToView();
+}
+
 QRectF PathBox::getBoundingRect()
 {
-    return mMappedWhole.boundingRect();
+    return mBoundingRect;
 }
 
 void PathBox::draw(QPainter *p)

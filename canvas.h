@@ -285,6 +285,10 @@ public:
     void ctrlsVisiblityChanged();
     void grabMouseAndTrack();
 
+    void setPartialRepaintRect(QRectF absRect);
+    void repaintPartially();
+    void makePartialRepaintInclude(QPointF pointToInclude);
+    void partialRepaintRectToPoint(QPointF point);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -360,6 +364,8 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    QRectF mPartialRepaintRect;
+    bool mFullRepaint = true;
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;
     TextBox *mCurrentTextBox = NULL;

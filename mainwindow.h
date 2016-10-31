@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -11,6 +11,8 @@
 #include "animationdockwidget.h"
 #include "keysview.h"
 #include "fontswidget.h"
+
+class PaintControler;
 
 class BoxesList;
 
@@ -25,6 +27,14 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 private:
     static MainWindow *mMainWindowInstance;
+
+    bool mCancelLastBoxUpdate = false;
+    BoundingBox *mLastUpdatedBox = NULL;
+    QList<BoundingBox*> mBoxesAwaitingUpdate;
+    bool mNoBoxesAwaitUpdate = true;
+
+    QThread *mPaintControlerThread;
+    PaintControler *mPaintControler;
 
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
@@ -142,6 +152,8 @@ public:
     void scheduleDisplayedFillStrokeSettingsUpdate();
     void updateDisplayedFillStrokeSettingsIfNeeded();
     void updateCanvasModeButtonsChecked(CanvasMode currentMode);
+
+    void addBoxAwaitingUpdate(BoundingBox *box);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);
@@ -149,6 +161,8 @@ public slots:
     void playPreview();
     void stopPreview();
 private slots:
+    void sendNextBoxForUpdate();
+
     void newFile();
     bool askForSaving();
     void openFile();
@@ -159,6 +173,8 @@ private slots:
     void importFile();
     void exportSelected();
     void revert();
+signals:
+    void updateBox(BoundingBox*);
 };
 
 #endif // MAINWINDOW_H

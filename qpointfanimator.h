@@ -24,6 +24,8 @@ public:
     QrealAnimator *getYAnimator();
     int saveToSql();
     void loadFromSql(int posAnimatorId);
+    void multSavedValueToCurrentValue(qreal sx, qreal sy);
+    void incSavedValueToCurrentValue(qreal incXBy, qreal incYBy);
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

@@ -9,35 +9,7 @@ class UpdateScheduler {
 public:
     UpdateScheduler() {}
     virtual ~UpdateScheduler() {}
-    virtual void update() { }
-};
-
-class PathUpdateScheduler : public UpdateScheduler {
-public:
-    PathUpdateScheduler(PathBox *path);
-
-    void update();
-private:
-    PathBox *mPath;
-};
-
-class MappedPathUpdateScheduler : public UpdateScheduler {
-public:
-    MappedPathUpdateScheduler(PathBox *path);
-
-    void update();
-private:
-    PathBox *mPath;
-};
-
-class OutlineUpdateScheduler : public UpdateScheduler {
-public:
-    OutlineUpdateScheduler(PathBox *path);
-
-    void update();
-
-private:
-    PathBox *mPath;
+    virtual void update() {}
 };
 
 class QGradientStopsUpdateScheduler : public UpdateScheduler {

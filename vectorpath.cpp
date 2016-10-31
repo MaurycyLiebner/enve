@@ -641,7 +641,7 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     if(mVisible) {
         p->save();
-        drawBoundingRect(p);
+        //drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             if(mInfluenceEnabled) {
                 p->setBrush(Qt::NoBrush);
@@ -775,6 +775,8 @@ void VectorPath::appendToPointsList(PathPoint *point, bool saveUndoRedo) {
     }
     point->incNumberPointers();
 
+    schedulePathUpdate();
+
     updatePathPointIds();
 }
 
@@ -793,6 +795,8 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
         finishUndoRedoSet();
     }
     point->decNumberPointers();
+
+    schedulePathUpdate();
 
     updatePathPointIds();
 }
