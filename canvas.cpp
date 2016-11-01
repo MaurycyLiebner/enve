@@ -199,6 +199,7 @@ void Canvas::paintEvent(QPaintEvent *)
     QPainter p(this);
 
     p.setRenderHint(QPainter::Antialiasing);
+    p.setRenderHint(QPainter::SmoothPixmapTransform);
 
     QPointF absPos = getAbsolutePos();
     QRectF viewRect = QRectF(absPos,

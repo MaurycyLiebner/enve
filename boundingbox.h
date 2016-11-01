@@ -231,8 +231,18 @@ public:
     virtual void afterSuccessfulUpdate() {}
 
     void updateRelativeTransform();
+    void updateAllUglyPixmap();
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
+
+    QMatrix mAllUglyTransform;
+    QMatrix mAllUglyPaintTransform;
+    QRectF mAllUglyBoundingRect;
+
+    QMatrix mOldAllUglyTransform;
+    QMatrix mOldAllUglyPaintTransform;
+    QRectF mOldAllUglyBoundingRect;
+    QPixmap mOldAllUglyPixmap;
 
     QMatrix mRelativeTransformMatrix;
 
@@ -241,6 +251,7 @@ protected:
     QMatrix mOldTransform;
     QPixmap mNewPixmap;
     QPixmap mOldPixmap;
+    QPixmap mAllUglyPixmap;
     QRectF mOldPixBoundingRect;
 
     bool mRedoUpdate = false;

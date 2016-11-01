@@ -114,15 +114,14 @@ void PathBox::updatePathIfNeeded()
 void PathBox::updatePrettyPixmap() {
     if(mRedoUpdate) {
         mRedoUpdate = false;
-        qDebug() << "redo update;";
         updateUpdateTransform();
     }
 
-    qDebug() << "updated: " << mUpdateTransform;
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
     updateMappedPathIfNeeded();
 
+    BoundingBox::updateAllUglyPixmap();
     BoundingBox::updatePrettyPixmap();
 }
 
@@ -170,7 +169,6 @@ void PathBox::updateMappedPathIfNeeded()
         if(mParent != NULL) {
             updateMappedPath();
         }
-        qDebug() << "mapped path updated;" << mUpdateTransform.m11();
     }
 }
 
@@ -267,7 +265,6 @@ void PathBox::updateBoundingRectClippedToView() {
 
 void PathBox::afterSuccessfulUpdate()
 {
-    qDebug() << "succes";
     mUpdatePathUpdateNeeded = false;
     mUpdateMappedPathUpdateNeeded = false;
     mUpdateOutlinePathUpdateNeeded = false;

@@ -152,9 +152,8 @@ void BoundingBox::loadFromSql(int boundingBoxId) {
 }
 
 void BoundingBox::updateUpdateTransform() {
-    mUpdateTransform = mCombinedTransformMatrix;
     mUpdateCanvasTransform = mMainWindow->getCanvas()->getCombinedTransform();
-    qDebug() << "update: " << mUpdateTransform;
+    mUpdateTransform = mCombinedTransformMatrix;
 }
 
 void BoundingBox::setAwaitingUpdate(bool bT) {
@@ -163,6 +162,11 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
         mOldPixmap = mNewPixmap;
         mOldPixBoundingRect = mBoundingRectClippedToView;
         mOldTransform = mUpdateTransform;
+
+        mOldAllUglyPixmap = mAllUglyPixmap;
+        mOldAllUglyBoundingRect = mAllUglyBoundingRect;
+        mOldAllUglyTransform = mAllUglyTransform;
+
         updateUpdateTransform();
         updateUglyPaintTransform();
     } else {
@@ -185,10 +189,36 @@ void BoundingBox::updatePrettyPixmap() {
 
     draw(&p);
     p.end();
-
+    return;
     qreal blurrRadius = 0.1;
     mNewPixmap = blurrPixmap(mNewPixmap, mNewPixmap.rect(),
                              blurrRadius);
+}
+
+void BoundingBox::updateAllUglyPixmap() {
+    QMatrix inverted = mUpdateCanvasTransform.inverted();
+    mAllUglyTransform = inverted*mUpdateTransform;
+    mAllUglyBoundingRect = inverted.mapRect(mBoundingRect);
+    QSizeF sizeF = mAllUglyBoundingRect.size();
+    mAllUglyPixmap = QPixmap(QSize(ceil(sizeF.width()), ceil(sizeF.height())) );
+    mAllUglyPixmap.fill(Qt::transparent);
+
+    QPainter p(&mAllUglyPixmap);
+    p.setRenderHint(QPainter::Antialiasing);
+    p.translate(-mAllUglyBoundingRect.topLeft());
+    p.setTransform(QTransform(inverted), true);
+
+    draw(&p);
+    p.end();
+
+    mAllUglyBoundingRect.setTopLeft((mUpdateTransform.inverted()*mAllUglyTransform).map(mBoundingRect.topLeft()) );
+
+    return;
+    qreal blurrRadius = 0.1;
+    mAllUglyPixmap = blurrPixmap(mAllUglyPixmap, mAllUglyPixmap.rect(),
+                             blurrRadius);
+
+
 }
 
 bool BoundingBox::shouldRedoUpdate() {
@@ -207,15 +237,20 @@ void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
 
     if(mAwaitingUpdate) {
-        p->setTransform(QTransform(mUglyPaintTransform), true);
-        p->translate(mOldPixBoundingRect.topLeft());
-        p->drawPixmap(0, 0, mOldPixmap);
-        if(mSelected) drawAsBoundingRect(p, mOldPixmap.rect());
-        qDebug() << "ugly";
+        p->setTransform(QTransform(mOldAllUglyPaintTransform), true);
+        p->translate(mOldAllUglyBoundingRect.topLeft());
+
+        p->drawPixmap(0, 0, mOldAllUglyPixmap);
+        p->setRenderHint(QPainter::NonCosmeticDefaultPen);
+        if(mSelected) drawAsBoundingRect(p, mOldAllUglyPixmap.rect());
+        //
+//        p->setTransform(QTransform(mUglyPaintTransform), true);
+//        p->translate(mOldPixBoundingRect.topLeft());
+//        p->drawPixmap(0, 0, mOldPixmap);
+//        if(mSelected) drawAsBoundingRect(p, mOldPixmap.rect());
     } else {
         p->drawPixmap(mBoundingRectClippedToView.topLeft(), mNewPixmap);
         if(mSelected) drawBoundingRect(p);
-        qDebug() << "pretty " << getCurrentCanvasScale();
     }
 
     p->restore();
@@ -488,7 +523,6 @@ void BoundingBox::updateCombinedTransform() {
     } else {
         mCombinedTransformMatrix = mRelativeTransformMatrix*
                 mParent->getCombinedTransform();
-        qDebug() << "combined: " << mCombinedTransformMatrix;
 
         updateAfterCombinedTransformationChanged();
 
@@ -503,6 +537,7 @@ void BoundingBox::updateCombinedTransform() {
 
 void BoundingBox::updateUglyPaintTransform() {
     mUglyPaintTransform = mOldTransform.inverted()*mCombinedTransformMatrix;
+    mOldAllUglyPaintTransform = mOldAllUglyTransform.inverted()*mCombinedTransformMatrix;
 }
 
 TransformAnimator *BoundingBox::getTransformAnimator() {
