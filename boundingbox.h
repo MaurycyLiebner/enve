@@ -230,18 +230,17 @@ public:
 
     virtual void afterSuccessfulUpdate() {}
 
-    void updateAllLowQualityPixmap();
     void updateRelativeTransform();
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 
     QMatrix mRelativeTransformMatrix;
 
+    QMatrix mUpdateCanvasTransform;
     QMatrix mUpdateTransform;
     QMatrix mOldTransform;
     QPixmap mNewPixmap;
     QPixmap mOldPixmap;
-    QPixmap mAllLowQualityPixmap;
     QRectF mOldPixBoundingRect;
 
     bool mRedoUpdate = false;

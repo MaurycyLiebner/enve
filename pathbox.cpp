@@ -108,7 +108,6 @@ void PathBox::updatePathIfNeeded()
     if(mUpdatePathUpdateNeeded) {
         updatePath();
         if(!mAnimatorsCollection.hasKeys() && !mPivotChanged ) centerPivotPosition();
-        updateAllLowQualityPixmap();
     }
 }
 
