@@ -301,7 +301,6 @@ void MainWindow::sendNextBoxForUpdate()
 {
     if(mLastUpdatedBox != NULL) {
         if(mLastUpdatedBox->shouldRedoUpdate()) {
-            qDebug() << "redo;";
             mLastUpdatedBox->setRedoUpdateToFalse();
             mLastUpdatedBox->setAwaitingUpdate(true);
             emit updateBox(mLastUpdatedBox);

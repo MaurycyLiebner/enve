@@ -237,17 +237,36 @@ void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
 
     if(mAwaitingUpdate) {
+        bool paintOld = mUglyPaintTransform.m11() < mOldAllUglyPaintTransform.m11();
+
+        if(paintOld) {
+            p->save();
+            QMatrix clipMatrix = mUglyPaintTransform;
+            clipMatrix.translate(mOldPixBoundingRect.left(), mOldPixBoundingRect.top());
+            QRegion clipRegion;
+            clipRegion = clipMatrix.map(clipRegion.united(mOldPixmap.rect()));
+            QRegion clipRegion2;
+            clipRegion2 = clipRegion2.united(QRect(-100000, -100000, 200000, 200000));
+            clipRegion = clipRegion2.subtracted(clipRegion);
+
+            p->setClipRegion(clipRegion);
+        }
+
         p->setTransform(QTransform(mOldAllUglyPaintTransform), true);
         p->translate(mOldAllUglyBoundingRect.topLeft());
-
         p->drawPixmap(0, 0, mOldAllUglyPixmap);
-        p->setRenderHint(QPainter::NonCosmeticDefaultPen);
-        if(mSelected) drawAsBoundingRect(p, mOldAllUglyPixmap.rect());
-        //
-//        p->setTransform(QTransform(mUglyPaintTransform), true);
-//        p->translate(mOldPixBoundingRect.topLeft());
-//        p->drawPixmap(0, 0, mOldPixmap);
-//        if(mSelected) drawAsBoundingRect(p, mOldPixmap.rect());
+
+        if(mSelected) {
+            drawAsBoundingRect(p, mOldAllUglyPixmap.rect());
+        }
+
+        if(paintOld) {
+            p->restore();
+
+            p->setTransform(QTransform(mUglyPaintTransform), true);
+            p->translate(mOldPixBoundingRect.topLeft());
+            p->drawPixmap(0, 0, mOldPixmap);
+        }
     } else {
         p->drawPixmap(mBoundingRectClippedToView.topLeft(), mNewPixmap);
         if(mSelected) drawBoundingRect(p);
@@ -382,7 +401,9 @@ qreal BoundingBox::getCurrentCanvasScale() {
 
 void BoundingBox::drawAsBoundingRect(QPainter *p, QRectF rect) {
     p->save();
-    p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
+    QPen pen = QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine);
+    pen.setCosmetic(true);
+    p->setPen(pen);
     p->setBrush(Qt::NoBrush);
     p->drawRect(rect);
     p->restore();
