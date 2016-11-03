@@ -49,6 +49,11 @@ QPointF PathPoint::getInfluenceAbsolutePos()
     return mParent->getCombinedTransform().map(mInfluenceAdjustedPointValues.pointRelPos);
 }
 
+QPointF PathPoint::getInfluenceRelativePos()
+{
+    return mInfluenceAdjustedPointValues.pointRelPos;
+}
+
 PathPoint::~PathPoint()
 {
     mStartCtrlPt->decNumberPointers();

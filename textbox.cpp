@@ -62,10 +62,10 @@ QRectF TextBox::getTextRect() {
     return rect.translated(-rect.topLeft() );
 }
 
-bool TextBox::pointInsidePath(QPointF point)
+bool TextBox::absPointInsidePath(QPointF point)
 {
     if(mPathText) {
-        return PathBox::pointInsidePath(point);
+        return PathBox::absPointInsidePath(point);
     } else {
         QPainterPath mapped;
         mapped.addRect(getTextRect());
@@ -78,8 +78,8 @@ void TextBox::updateBoundingRect() {
     if(mPathText) {
         PathBox::updateBoundingRect();
     } else {
-        mBoundingRect = mUpdateTransform.mapRect(getTextRect() );
-        updateBoundingRectClippedToView();
+        mPixBoundingRect = mUpdateTransform.mapRect(getTextRect() );
+        updatePixBoundingRectClippedToView();
     }
 }
 
@@ -226,7 +226,7 @@ void TextBox::updatePath()
             yT += fm.height();
         }
 
-        updateMappedPath();
+        updateOutlinePath();
     } else {
         updateBoundingRect();
     }

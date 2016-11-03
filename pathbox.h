@@ -9,25 +9,23 @@ public:
     PathBox(BoxesGroup *parent, BoundingBoxType type);
     ~PathBox();
 
-    QRectF getBoundingRect();
+    QRectF getPixBoundingRect();
     void draw(QPainter *p);
 
     void schedulePathUpdate();
-    void scheduleMappedPathUpdate();
 
     void updatePathIfNeeded();
-    void updateMappedPathIfNeeded();
 
     void resetStrokeGradientPointsPos(bool finish) {
         mStrokeGradientPoints.setRecording(false);
-        mStrokeGradientPoints.setPositions(getBoundingRect().topLeft(),
-                     getBoundingRect().bottomRight(), finish);
+        mStrokeGradientPoints.setPositions(getPixBoundingRect().topLeft(),
+                     getPixBoundingRect().bottomRight(), finish);
     }
 
     void resetFillGradientPointsPos(bool finish) {
         mFillGradientPoints.setRecording(false);
-        mFillGradientPoints.setPositions(getBoundingRect().topLeft(),
-                     getBoundingRect().bottomRight(), finish);
+        mFillGradientPoints.setPositions(getPixBoundingRect().topLeft(),
+                     getPixBoundingRect().bottomRight(), finish);
     }
 
     void changeFillGradient(bool wasGradient, bool isGradient, bool finish) {
@@ -58,6 +56,7 @@ public:
             mFillPaintSettings.setGradient(gradient);
             updateDrawGradients();
         }
+        awaitUpdate();
     }
 
     virtual void setStrokeGradient(Gradient* gradient, bool finish) {
@@ -72,6 +71,7 @@ public:
             mStrokeSettings.setGradient(gradient);
             updateDrawGradients();
         }
+        awaitUpdate();
     }
 
     virtual void setFillFlatColor(Color color, bool finish) {
@@ -82,9 +82,9 @@ public:
             if(finish) {
                 mFillPaintSettings.getColorAnimator()->finishTransform();
             }
-
-
         }
+
+        awaitUpdate();
     }
 
     virtual void setStrokeFlatColor(Color color, bool finish) {
@@ -95,9 +95,9 @@ public:
             if(finish) {
                 mStrokeSettings.getColorAnimator()->finishTransform();
             }
-
-
         }
+
+        awaitUpdate();
     }
 
     virtual void setFillPaintType(PaintType paintType, Color color,
@@ -112,6 +112,8 @@ public:
         mFillPaintSettings.setPaintType(paintType);
 
         updateDrawGradients();
+
+        awaitUpdate();
     }
 
     virtual void setStrokePaintType(PaintType paintType, Color color,
@@ -126,20 +128,17 @@ public:
         }
         mStrokeSettings.setPaintType(paintType);
 
-
+        awaitUpdate();
     }
 
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
         mStrokeSettings.setCapStyle(capStyle);
-        updateOutlinePath();
-
-
+        scheduleOutlinePathUpdate();
     }
 
     virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
         mStrokeSettings.setJoinStyle(joinStyle);
-        updateOutlinePath();
-
+        scheduleOutlinePathUpdate();
     }
 
     virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
@@ -147,6 +146,7 @@ public:
         if(finish) {
             mStrokeSettings.getStrokeWidthAnimator()->finishTransform();
         }
+        awaitUpdate();
     }
 
     void startStrokeWidthTransform() {
@@ -168,9 +168,8 @@ public:
     void updateOutlinePath();
     void scheduleOutlinePathUpdate();
     void updateOutlinePathIfNeeded();
-    void setRenderCombinedTransform();
 
-    bool pointInsidePath(QPointF point);
+    bool absPointInsidePath(QPointF absPoint);
     void updateAfterFrameChanged(int currentFrame);
 
     void setOutlineAffectedByScale(bool bT);
@@ -178,7 +177,7 @@ public:
     void loadFromSql(int boundingBoxId);
     virtual void updateBoundingRect();
     void updatePrettyPixmap();
-    void updateBoundingRectClippedToView();
+    void updatePixBoundingRectClippedToView();
 
     void afterSuccessfulUpdate();
 
@@ -195,26 +194,21 @@ protected:
 
 
     bool mPathUpdateNeeded = false;
-    bool mMappedPathUpdateNeeded = false;
     bool mOutlinePathUpdateNeeded = false;
 
     bool mUpdatePathUpdateNeeded = false;
-    bool mUpdateMappedPathUpdateNeeded = false;
     bool mUpdateOutlinePathUpdateNeeded = false;
 
 
     QPainterPath mPath;
-    QPainterPath mMappedEditPath;
-    QPainterPath mMappedPath;
-    QPainterPath mMappedOutlinePath;
+    QPainterPath mOutlinePath;
     QPainterPathStroker mPathStroker;
-    QPainterPath mMappedWhole;
+    QPainterPath mWholePath;
     void updateWholePath();
     void updateAfterTransformationChanged();
     void updateAfterCombinedTransformationChanged();
 
     virtual void updatePath() {}
-    virtual void updateMappedPath();
 
     bool mOutlineAffectedByScale = true;
 };

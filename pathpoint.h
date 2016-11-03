@@ -210,6 +210,7 @@ public:
     bool isNeighbourSelected();
     void moveByAbs(QPointF absTranslatione);
     void loadFromSql(int pathPointId, int movablePointId);
+    QPointF getInfluenceRelativePos();
 private:
     bool mStartExternalInfluence = false;
     QPointF mStartAdjustedForExternalInfluence;

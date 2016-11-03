@@ -10,7 +10,7 @@ ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
     reloadPixmap();
 }
 
-QRectF ImageBox::getBoundingRect()
+QRectF ImageBox::getPixBoundingRect()
 {
     return mCombinedTransformMatrix.mapRect(mPixmap.rect());
 }
@@ -34,7 +34,7 @@ void ImageBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     }
 }
 
-bool ImageBox::pointInsidePath(QPointF point)
+bool ImageBox::absPointInsidePath(QPointF point)
 {
     QPainterPath mapped;
     mapped.addRect(mPixmap.rect());

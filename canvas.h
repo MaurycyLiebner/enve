@@ -164,7 +164,7 @@ public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                     MainWindow *parent = 0);
     ~Canvas();
-    QRectF getBoundingRect();
+    QRectF getPixBoundingRect();
     void addBoxToSelection(BoundingBox *box);
     void clearBoxesSelection();
     void selectOnlyLastPressedBox();

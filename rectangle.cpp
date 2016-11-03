@@ -279,7 +279,7 @@ void Rectangle::updatePath()
     qreal radius = radPos.y();
     mPath.addRoundedRect(0., 0., botPos.x(), botPos.y(), radius, radius);
 
-    updateMappedPath();
+    updateOutlinePath();
 }
 
 void Rectangle::centerPivotPosition() {

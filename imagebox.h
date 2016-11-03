@@ -8,13 +8,13 @@ class ImageBox : public BoundingBox
 public:
     ImageBox(BoxesGroup *parent, QString filePath);
 
-    QRectF getBoundingRect();
+    QRectF getPixBoundingRect();
     void draw(QPainter *p);
     void reloadPixmap();
     void setFilePath(QString path);
     void centerPivotPosition();
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
-    bool pointInsidePath(QPointF point);
+    bool absPointInsidePath(QPointF point);
 private:
     QPixmap mPixmap;
     QString mImageFilePath;

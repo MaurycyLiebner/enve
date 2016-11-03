@@ -89,14 +89,13 @@ public:
 
     PathPoint *findPointNearestToPercentEditPath(qreal percent, qreal *foundAtPercent);
     qreal findPercentForPointEditPath(QPointF point, qreal minPercent = 0., qreal maxPercent = 1.);
-    Edge *getEdgeFromMappedEditPath(QPointF absPos);
-    Edge *getEdgeFromMappedPath(QPointF absPos);
+    Edge *getEdgeFromEditPath(QPointF absPos);
+    Edge *getEdgeFromPath(QPointF absPos);
     void deletePointAndApproximate(PathPoint *pointToRemove);
     virtual void loadFromSql(int boundingBoxId);
 protected:
     bool mInfluenceEnabled = false;
     void updatePath();
-    void updateMappedPath();
     void updatePathPointIds();
     PathAnimator mPathAnimator;
 

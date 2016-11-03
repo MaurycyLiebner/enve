@@ -119,7 +119,7 @@ void PathBox::updatePrettyPixmap() {
 
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
-    updateMappedPathIfNeeded();
+    updateBoundingRect();
 
     BoundingBox::updateAllUglyPixmap();
     BoundingBox::updatePrettyPixmap();
@@ -133,18 +133,7 @@ void PathBox::schedulePathUpdate()
     }
 
     mPathUpdateNeeded = true;
-    mMappedPathUpdateNeeded = false;
     mOutlinePathUpdateNeeded = false;
-}
-
-void PathBox::scheduleMappedPathUpdate()
-{
-    awaitUpdate();
-    if(mMappedPathUpdateNeeded || mPathUpdateNeeded || mParent == NULL) {
-        return;
-    }
-
-    mMappedPathUpdateNeeded = true;
 }
 
 void PathBox::scheduleOutlinePathUpdate()
@@ -163,61 +152,36 @@ void PathBox::updateOutlinePathIfNeeded() {
     }
 }
 
-void PathBox::updateMappedPathIfNeeded()
-{
-    if(mUpdateMappedPathUpdateNeeded) {
-        if(mParent != NULL) {
-            updateMappedPath();
-        }
-    }
-}
-
 void PathBox::updateAfterCombinedTransformationChanged()
 {
-    scheduleMappedPathUpdate();
 }
 
 void PathBox::updateOutlinePath() {
     mStrokeSettings.setStrokerSettings(&mPathStroker);
     if(mOutlineAffectedByScale) {
-        mMappedOutlinePath = mUpdateTransform.map(
-                                            mPathStroker.createStroke(mPath));
+        mOutlinePath = mPathStroker.createStroke(mPath);
     } else {
         QPainterPathStroker stroker;
         stroker.setCapStyle(mPathStroker.capStyle());
         stroker.setJoinStyle(mPathStroker.joinStyle());
         stroker.setMiterLimit(mPathStroker.miterLimit());
         stroker.setWidth(mPathStroker.width()*getCurrentCanvasScale() );
-        mMappedOutlinePath = stroker.createStroke(mMappedPath);
+        mOutlinePath = stroker.createStroke(mPath);
     }
     updateWholePath();
 }
 
 void PathBox::updateWholePath() {
-    mMappedWhole = QPainterPath();
+    mWholePath = QPainterPath();
     if(mStrokeSettings.getPaintType() != NOPAINT) {
-        mMappedWhole += mMappedOutlinePath;
+        mWholePath += mOutlinePath;
     }
     if(mFillPaintSettings.getPaintType() != NOPAINT ||
             mStrokeSettings.getPaintType() == NOPAINT) {
-        mMappedWhole += mMappedPath;
+        mWholePath += mPath;
     }
     updateBoundingRect();
 }
-
-void PathBox::setRenderCombinedTransform() {
-    BoundingBox::setRenderCombinedTransform();
-    updateMappedPath();
-}
-
-void PathBox::updateMappedPath()
-{
-    mMappedPath = mUpdateTransform.map(mPath);
-
-    updateOutlinePath();
-    updateDrawGradients();
-}
-
 
 void PathBox::updateDrawGradients()
 {
@@ -258,15 +222,14 @@ void PathBox::updateDrawGradients()
     }
 }
 
-void PathBox::updateBoundingRectClippedToView() {
-    mBoundingRectClippedToView = mBoundingRect.intersected(
-                mMainWindow->getCanvas()->rect().adjusted(-400, -400, 400, 400));
+void PathBox::updatePixBoundingRectClippedToView() {
+    mPixBoundingRectClippedToView = mPixBoundingRect.intersected(
+                mMainWindow->getCanvas()->rect());
 }
 
 void PathBox::afterSuccessfulUpdate()
 {
     mUpdatePathUpdateNeeded = false;
-    mUpdateMappedPathUpdateNeeded = false;
     mUpdateOutlinePathUpdateNeeded = false;
 }
 
@@ -274,24 +237,25 @@ void PathBox::updateUpdateTransform()
 {
     mUpdatePathUpdateNeeded = mPathUpdateNeeded ||
             mUpdatePathUpdateNeeded;
-    mUpdateMappedPathUpdateNeeded = mMappedPathUpdateNeeded ||
-            mUpdateMappedPathUpdateNeeded;
     mUpdateOutlinePathUpdateNeeded = mOutlinePathUpdateNeeded ||
             mUpdateOutlinePathUpdateNeeded;
     mPathUpdateNeeded = false;
-    mMappedPathUpdateNeeded = false;
     mOutlinePathUpdateNeeded = false;
     BoundingBox::updateUpdateTransform();
 }
 
 void PathBox::updateBoundingRect() {
-    mBoundingRect = mMappedWhole.boundingRect();
-    updateBoundingRectClippedToView();
+    QRectF relBoundingRect = mWholePath.boundingRect();
+    mPixBoundingRect = mUpdateTransform.mapRect(relBoundingRect);
+    mBoundingRect = QPainterPath();
+    mBoundingRect.addRect(relBoundingRect);
+    mBoundingRect = mUpdateTransform.map(mBoundingRect);
+    updatePixBoundingRectClippedToView();
 }
 
-QRectF PathBox::getBoundingRect()
+QRectF PathBox::getPixBoundingRect()
 {
-    return mBoundingRect;
+    return mPixBoundingRect;
 }
 
 void PathBox::draw(QPainter *p)
@@ -308,7 +272,7 @@ void PathBox::draw(QPainter *p)
         } else{
             p->setBrush(Qt::NoBrush);
         }
-        p->drawPath(mMappedPath);
+        p->drawPath(mPath);
         if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawStrokeGradient);
         } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
@@ -317,15 +281,18 @@ void PathBox::draw(QPainter *p)
             p->setBrush(Qt::NoBrush);
         }
 
-        p->drawPath(mMappedOutlinePath);
+        p->drawPath(mOutlinePath);
 
         p->restore();
     }
 }
 
-bool PathBox::pointInsidePath(QPointF point)
-{
-    return mMappedWhole.contains(point);
+bool PathBox::absPointInsidePath(QPointF absPoint) {
+    if(mBoundingRect.contains(absPoint) ) {
+        return mWholePath.contains(mapAbsPosToRel(absPoint));
+    } else {
+        return false;
+    }
 }
 
 void PathBox::updateAfterFrameChanged(int currentFrame)

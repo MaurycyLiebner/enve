@@ -26,7 +26,7 @@ public:
     void schedulePathUpdateIfPathText();
     void draw(QPainter *p);
     QRectF getTextRect();
-    bool pointInsidePath(QPointF point);
+    bool absPointInsidePath(QPointF point);
     void setPathText(bool pathText);
 
     void centerPivotPosition();

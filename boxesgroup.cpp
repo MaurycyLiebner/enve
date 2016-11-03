@@ -181,10 +181,10 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
-bool BoxesGroup::pointInsidePath(QPointF absPos)
+bool BoxesGroup::absPointInsidePath(QPointF absPos)
 {
     foreach(BoundingBox *box, mChildren) {
-        if(box->pointInsidePath(absPos)) {
+        if(box->absPointInsidePath(absPos)) {
             return true;
         }
     }
@@ -437,11 +437,11 @@ void BoxesGroup::startSelectedFillColorTransform()
     }
 }
 
-QRectF BoxesGroup::getBoundingRect()
+QRectF BoxesGroup::getPixBoundingRect()
 {
     QRectF rect;
     foreach(BoundingBox *box, mChildren) {
-        rect = rect.united(box->getBoundingRect());
+        rect = rect.united(box->getPixBoundingRect());
     }
     return rect;
 }
@@ -482,7 +482,7 @@ void BoxesGroup::drawBoundingRect(QPainter *p) {
         p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
     }
     p->setBrush(Qt::NoBrush);
-    p->drawRect(getBoundingRect());
+    p->drawRect(getPixBoundingRect());
     p->setPen(pen);
 }
 
@@ -983,7 +983,7 @@ BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
     BoundingBox *box;
     foreachInverted(box, mChildren) {
         if(box->isVisibleAndUnlocked()) {
-            if(box->pointInsidePath(absPos)) {
+            if(box->absPointInsidePath(absPos)) {
                 boxAtPos = box;
                 break;
             }

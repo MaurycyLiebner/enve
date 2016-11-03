@@ -198,8 +198,7 @@ void MovablePoint::scale(qreal scaleXBy, qreal scaleYBy)
 
 void MovablePoint::saveTransformPivot(QPointF absPivot)
 {
-    mSavedTransformPivot =
-            -mParent->getCombinedTransform().inverted().map(absPivot);
+    mSavedTransformPivot = -mParent->mapAbsPosToRel(absPivot);
 }
 
 void MovablePoint::select()

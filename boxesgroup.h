@@ -23,8 +23,8 @@ public:
 
     void setSelectedFontFamilyAndStyle(QString family, QString style);
     void setSelectedFontSize(qreal size);
-    bool pointInsidePath(QPointF absPos);
-    QRectF getBoundingRect();
+    bool absPointInsidePath(QPointF absPos);
+    QRectF getPixBoundingRect();
     void draw(QPainter *p);
     void render(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);

@@ -160,7 +160,7 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
     mAwaitingUpdate = bT;
     if(bT) {
         mOldPixmap = mNewPixmap;
-        mOldPixBoundingRect = mBoundingRectClippedToView;
+        mOldPixBoundingRect = mPixBoundingRectClippedToView;
         mOldTransform = mUpdateTransform;
 
         mOldAllUglyPixmap = mAllUglyPixmap;
@@ -175,17 +175,18 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
 }
 
 QRectF BoundingBox::getBoundingRectClippedToView() {
-    return mBoundingRectClippedToView;
+    return mPixBoundingRectClippedToView;
 }
 
 void BoundingBox::updatePrettyPixmap() {
-    QSizeF sizeF = mBoundingRectClippedToView.size();
+    QSizeF sizeF = mPixBoundingRectClippedToView.size();
     mNewPixmap = QPixmap(QSize(ceil(sizeF.width()), ceil(sizeF.height())) );
     mNewPixmap.fill(Qt::transparent);
 
     QPainter p(&mNewPixmap);
     p.setRenderHint(QPainter::Antialiasing);
-    p.translate(-mBoundingRectClippedToView.topLeft());
+    p.translate(-mPixBoundingRectClippedToView.topLeft());
+    p.setTransform(QTransform(mUpdateTransform), true);
 
     draw(&p);
     p.end();
@@ -198,7 +199,7 @@ void BoundingBox::updatePrettyPixmap() {
 void BoundingBox::updateAllUglyPixmap() {
     QMatrix inverted = mUpdateCanvasTransform.inverted();
     mAllUglyTransform = inverted*mUpdateTransform;
-    mAllUglyBoundingRect = inverted.mapRect(mBoundingRect);
+    mAllUglyBoundingRect = (mUpdateTransform.inverted()*mAllUglyTransform).mapRect(mPixBoundingRect);
     QSizeF sizeF = mAllUglyBoundingRect.size();
     mAllUglyPixmap = QPixmap(QSize(ceil(sizeF.width()), ceil(sizeF.height())) );
     mAllUglyPixmap.fill(Qt::transparent);
@@ -206,12 +207,10 @@ void BoundingBox::updateAllUglyPixmap() {
     QPainter p(&mAllUglyPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-mAllUglyBoundingRect.topLeft());
-    p.setTransform(QTransform(inverted), true);
+    p.setTransform(QTransform(mAllUglyTransform), true);
 
     draw(&p);
     p.end();
-
-    mAllUglyBoundingRect.setTopLeft((mUpdateTransform.inverted()*mAllUglyTransform).map(mBoundingRect.topLeft()) );
 
     return;
     qreal blurrRadius = 0.1;
@@ -256,10 +255,6 @@ void BoundingBox::drawPixmap(QPainter *p) {
         p->translate(mOldAllUglyBoundingRect.topLeft());
         p->drawPixmap(0, 0, mOldAllUglyPixmap);
 
-        if(mSelected) {
-            drawAsBoundingRect(p, mOldAllUglyPixmap.rect());
-        }
-
         if(paintOld) {
             p->restore();
 
@@ -268,11 +263,13 @@ void BoundingBox::drawPixmap(QPainter *p) {
             p->drawPixmap(0, 0, mOldPixmap);
         }
     } else {
-        p->drawPixmap(mBoundingRectClippedToView.topLeft(), mNewPixmap);
-        if(mSelected) drawBoundingRect(p);
+        p->drawPixmap(mPixBoundingRectClippedToView.topLeft(), mNewPixmap);
+
     }
 
     p->restore();
+
+    if(mSelected) drawBoundingRect(p);
 }
 
 void BoundingBox::awaitUpdate() {
@@ -358,7 +355,7 @@ void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
 }
 
 void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
-    QPointF newPos = getCombinedTransform().inverted().map(absPos);
+    QPointF newPos = mapAbsPosToRel(absPos);
     setPivotRelPos(newPos, saveUndoRedo, pivotChanged);
     updateCombinedTransform();
 }
@@ -376,15 +373,19 @@ void BoundingBox::deselect() {
 }
 
 bool BoundingBox::isContainedIn(QRectF absRect) {
-    return absRect.contains(getBoundingRect());
+    return absRect.contains(getPixBoundingRect());
 }
 
 BoundingBox *BoundingBox::getPathAtFromAllAncestors(QPointF absPos) {
-    if(pointInsidePath(absPos)) {
+    if(absPointInsidePath(absPos)) {
         return this;
     } else {
         return NULL;
     }
+}
+
+QPointF BoundingBox::mapAbsPosToRel(QPointF absPos) {
+    return mCombinedTransformMatrix.inverted().map(absPos);
 }
 
 const PaintSettings *BoundingBox::getFillSettings() {
@@ -399,18 +400,18 @@ qreal BoundingBox::getCurrentCanvasScale() {
      return mMainWindow->getCanvas()->getCurrentCanvasScale();
 }
 
-void BoundingBox::drawAsBoundingRect(QPainter *p, QRectF rect) {
+void BoundingBox::drawAsBoundingRect(QPainter *p, QPainterPath path) {
     p->save();
     QPen pen = QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine);
     pen.setCosmetic(true);
     p->setPen(pen);
     p->setBrush(Qt::NoBrush);
-    p->drawRect(rect);
+    p->drawPath(path);
     p->restore();
 }
 
 void BoundingBox::drawBoundingRect(QPainter *p) {
-    drawAsBoundingRect(p, getBoundingRect());
+    drawAsBoundingRect(p, mBoundingRect);
 }
 
 QMatrix BoundingBox::getCombinedTransform() {
@@ -469,7 +470,7 @@ void BoundingBox::setRenderCombinedTransform() {
 
 void BoundingBox::saveTransformPivot(QPointF absPivot) {
     mSavedTransformPivot =
-            mParent->getCombinedTransform().inverted().map(absPivot) -
+            mParent->mapAbsPosToRel(absPivot) -
             mTransformAnimator.getPivot();
 }
 

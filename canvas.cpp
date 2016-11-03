@@ -46,7 +46,7 @@ void Canvas::updateDisplayedFillStrokeSettings() {
     mCurrentBoxesGroup->setDisplayedFillStrokeSettingsFromLastSelected();
 }
 
-QRectF Canvas::getBoundingRect()
+QRectF Canvas::getPixBoundingRect()
 {
     QPointF absPos = getAbsolutePos();
     return QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight));
@@ -58,9 +58,9 @@ void Canvas::pickPathForSettings() {
 
 void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 {
-    QPointF transPoint = -getCombinedTransform().inverted().map(absOrigin);
+    QPointF transPoint = -mapAbsPosToRel(absOrigin);
 
-    mLastPressPos = mCombinedTransformMatrix.inverted().map(mLastPressPos);
+    mLastPressPos = mapAbsPosToRel(mLastPressPos);
 
     mCombinedTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mCombinedTransformMatrix.scale(scaleXBy, scaleYBy);
@@ -778,10 +778,10 @@ void Canvas::fitCanvasToSize() {
 
 void Canvas::moveBy(QPointF trans)
 {
-    trans = getCombinedTransform().inverted().map(trans) -
-            getCombinedTransform().inverted().map(QPointF(0, 0));
+    trans = mapAbsPosToRel(trans) -
+            mapAbsPosToRel(QPointF(0, 0));
 
-    mLastPressPos = mCombinedTransformMatrix.inverted().map(mLastPressPos);
+    mLastPressPos = mapAbsPosToRel(mLastPressPos);
 
     mCombinedTransformMatrix.translate(trans.x(), trans.y());
 

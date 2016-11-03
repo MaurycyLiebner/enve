@@ -55,7 +55,7 @@ public:
 
     virtual void centerPivotPosition() {}
     virtual bool isContainedIn(QRectF absRect);
-    virtual QRectF getBoundingRect() { return QRectF(); }
+    virtual QRectF getPixBoundingRect() { return QRectF(); }
 
     virtual void drawPixmap(QPainter *p);
     virtual void render(QPainter *) {}
@@ -80,7 +80,7 @@ public:
     void finishTransform();
 
 
-    virtual bool pointInsidePath(QPointF) { return false; }
+    virtual bool absPointInsidePath(QPointF) { return false; }
     virtual MovablePoint *getPointAt(QPointF, CanvasMode) { return NULL; }
 
     void moveUp();
@@ -221,7 +221,7 @@ public:
     void saveOldPixmap();
 
     void saveUglyPaintTransform();
-    void drawAsBoundingRect(QPainter *p, QRectF rect);
+    void drawAsBoundingRect(QPainter *p, QPainterPath path);
     virtual void updateUpdateTransform();
     void updateUglyPaintTransform();
     void redoUpdate();
@@ -232,6 +232,7 @@ public:
 
     void updateRelativeTransform();
     void updateAllUglyPixmap();
+    QPointF mapAbsPosToRel(QPointF absPos);
 protected:
     virtual void updateAfterCombinedTransformationChanged() {}
 
@@ -258,8 +259,9 @@ protected:
     bool mAwaitingUpdate = false;
     QMatrix mUglyPaintTransform;
 
-    QRectF mBoundingRect;
-    QRectF mBoundingRectClippedToView;
+    QRectF mPixBoundingRect;
+    QRectF mPixBoundingRectClippedToView;
+    QPainterPath mBoundingRect;
 
     BoxesList *mBoxesList;
     KeysView *mKeysView;

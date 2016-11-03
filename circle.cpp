@@ -289,7 +289,7 @@ void Circle::updatePath()
                      (centerPos - mHorizontalRadiusPoint->getRelativePos()).x(),
                      (centerPos - mVerticalRadiusPoint->getRelativePos()).y() );
 
-    updateMappedPath();
+    updateOutlinePath();
 }
 
 void Circle::centerPivotPosition() {

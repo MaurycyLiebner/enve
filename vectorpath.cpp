@@ -112,7 +112,7 @@ qreal VectorPath::findPercentForPoint(QPointF point,
     if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5;
     qreal currPercent = minPercent;
     while(currPercent < maxPercent) {
-        QPointF testPoint = mMappedPath.pointAtPercent(currPercent);
+        QPointF testPoint = mPath.pointAtPercent(currPercent);
         qreal dist = distBetweenTwoPoints(testPoint, point);
         if(dist < smallestDist) {
             smallestDist = dist;
@@ -136,7 +136,7 @@ qreal VectorPath::findPercentForPointEditPath(QPointF point,
     if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5;
     qreal currPercent = minPercent;
     while(currPercent < maxPercent) {
-        QPointF testPoint = mMappedEditPath.pointAtPercent(currPercent);
+        QPointF testPoint = mEditPath.pointAtPercent(currPercent);
         qreal dist = distBetweenTwoPoints(testPoint, point);
         if(dist < smallestDist) {
             smallestDist = dist;
@@ -155,7 +155,7 @@ PathPoint *VectorPath::findPointNearestToPercent(qreal percent,
     PathPoint *nearestPoint = mPoints.first();
     qreal nearestPointPercent = 100.;
     foreach(PathPoint *point, mPoints) {
-        qreal pointPercent = findPercentForPoint(point->getAbsolutePos());
+        qreal pointPercent = findPercentForPoint(point->getRelativePos());
         if(qAbs(pointPercent - percent) < qAbs(nearestPointPercent - percent)) {
             nearestPointPercent = pointPercent;
             nearestPoint = point;
@@ -170,7 +170,7 @@ PathPoint *VectorPath::findPointNearestToPercentEditPath(qreal percent,
     PathPoint *nearestPoint = mPoints.first();
     qreal nearestPointPercent = 100.;
     foreach(PathPoint *point, mPoints) {
-        qreal pointPercent = findPercentForPoint(point->getInfluenceAbsolutePos());
+        qreal pointPercent = findPercentForPoint(point->getInfluenceRelativePos());
         if(qAbs(pointPercent - percent) < qAbs(nearestPointPercent - percent)) {
             nearestPointPercent = pointPercent;
             nearestPoint = point;
@@ -192,14 +192,15 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
 PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
 {
     qreal maxDist = 14.;
-    if(!mMappedPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
+    QPointF relPos = mapAbsPosToRel(absPos);
+    if(!mPath.intersects(QRectF(relPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
         return NULL;
     }
 
-    qreal nearestPercent = findPercentForPoint(absPos);
-    QPointF nearestPtOnPath = mMappedPath.pointAtPercent(nearestPercent);
-    if((nearestPtOnPath - absPos).manhattanLength() > maxDist ) {
+    qreal nearestPercent = findPercentForPoint(relPos);
+    QPointF nearestPtOnPath = mPath.pointAtPercent(nearestPercent);
+    if((nearestPtOnPath - relPos).manhattanLength() > maxDist ) {
         return NULL;
     }
 
@@ -220,8 +221,8 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
 
     if(nextPoint == NULL || prevPoint == NULL) return NULL;
 
-    qreal percent1 = findPercentForPoint(prevPoint->getAbsolutePos());
-    qreal percent2 = findPercentForPoint(nextPoint->getAbsolutePos());
+    qreal percent1 = findPercentForPoint(prevPoint->getRelativePos());
+    qreal percent2 = findPercentForPoint(nextPoint->getRelativePos());
     if(nextPoint->isSeparatePathPoint() ) {
         percent2 += 1;
     }
@@ -283,17 +284,18 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
     return NULL;
 }
 
-Edge *VectorPath::getEdgeFromMappedPath(QPointF absPos) {
+Edge *VectorPath::getEdgeFromPath(QPointF absPos) {
     qreal maxDist = 14.;
-    if(!mMappedPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
+    QPointF relPos = mapAbsPosToRel(absPos);
+    if(!mPath.intersects(QRectF(relPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
         return NULL;
     }
 
-    qreal nearestPercent = findPercentForPoint(absPos);
-    QPointF nearestPtOnPath = mMappedPath.pointAtPercent(nearestPercent);
+    qreal nearestPercent = findPercentForPoint(relPos);
+    QPointF nearestPtOnPath = mPath.pointAtPercent(nearestPercent);
 
-    if((nearestPtOnPath - absPos).manhattanLength() > maxDist ) {
+    if((nearestPtOnPath - relPos).manhattanLength() > maxDist ) {
         return NULL;
     }
 
@@ -330,8 +332,8 @@ Edge *VectorPath::getEdgeFromMappedPath(QPointF absPos) {
         }
     }
 
-    qreal percent1 = findPercentForPoint(prevPoint->getAbsolutePos());
-    qreal percent2 = findPercentForPoint(nextPoint->getAbsolutePos());
+    qreal percent1 = findPercentForPoint(prevPoint->getRelativePos());
+    qreal percent2 = findPercentForPoint(nextPoint->getRelativePos());
     if(percent2 < percent1 ) {
         percent2 += 1.;
         if(nearestPercent < percent1) {
@@ -348,18 +350,19 @@ Edge *VectorPath::getEdgeFromMappedPath(QPointF absPos) {
     }
 }
 
-Edge *VectorPath::getEdgeFromMappedEditPath(QPointF absPos)
+Edge *VectorPath::getEdgeFromEditPath(QPointF absPos)
 {
     qreal maxDist = 14.;
-    if(!mMappedEditPath.intersects(QRectF(absPos - QPointF(maxDist, maxDist),
+    QPointF relPos = mapAbsPosToRel(absPos);
+    if(!mEditPath.intersects(QRectF(relPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
         return NULL;
     }
 
-    qreal nearestPercent = findPercentForPointEditPath(absPos);
-    QPointF nearestPtOnPath = mMappedEditPath.pointAtPercent(nearestPercent);
+    qreal nearestPercent = findPercentForPointEditPath(relPos);
+    QPointF nearestPtOnPath = mEditPath.pointAtPercent(nearestPercent);
 
-    if((nearestPtOnPath - absPos).manhattanLength() > maxDist ) {
+    if((nearestPtOnPath - relPos).manhattanLength() > maxDist ) {
         return NULL;
     }
 
@@ -378,8 +381,8 @@ Edge *VectorPath::getEdgeFromMappedEditPath(QPointF absPos)
         prevPoint = nearestPoint;
     }
 
-    qreal percent1 = findPercentForPointEditPath(prevPoint->getAbsolutePos());
-    qreal percent2 = findPercentForPointEditPath(nextPoint->getAbsolutePos());
+    qreal percent1 = findPercentForPointEditPath(prevPoint->getRelativePos());
+    qreal percent2 = findPercentForPointEditPath(nextPoint->getRelativePos());
     if(percent2 < percent1 ) {
         percent2 += 1.;
         if(nearestPercent < percent1) {
@@ -399,10 +402,10 @@ Edge *VectorPath::getEdgeFromMappedEditPath(QPointF absPos)
 Edge *VectorPath::getEgde(QPointF absPos) {
     Edge *edgeT = NULL;
     if(mInfluenceEnabled) {
-        edgeT = getEdgeFromMappedEditPath(absPos);
+        edgeT = getEdgeFromEditPath(absPos);
     }
     if(edgeT == NULL) {
-        edgeT = getEdgeFromMappedPath(absPos);
+        edgeT = getEdgeFromPath(absPos);
     }
     return edgeT;
 }
@@ -521,7 +524,7 @@ void VectorPath::updatePath()
         }
     }
 
-    updateMappedPath();
+    updateOutlinePath();
 }
 
 //void VectorPath::updatePath()
@@ -616,14 +619,6 @@ void VectorPath::showContextMenu(QPoint globalPos) {
     }
 }
 
-void VectorPath::updateMappedPath()
-{
-    if(mInfluenceEnabled) {
-        mMappedEditPath = mCombinedTransformMatrix.map(mEditPath);
-    }
-    PathBox::updateMappedPath();
-}
-
 void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
     PathPoint *nextPoint = pointToRemove->getNextPoint();
     PathPoint *prevPoint = pointToRemove->getPreviousPoint();
@@ -646,7 +641,7 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
             if(mInfluenceEnabled) {
                 p->setBrush(Qt::NoBrush);
                 p->setPen(QPen(Qt::blue, 1., Qt::DashLine) );
-                p->drawPath(mMappedEditPath);
+                //p->drawPath(mMappedEditPath);
             }
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
             PathPoint *point;
