@@ -107,6 +107,21 @@ void BoundingBox::getKeysInRect(QRectF selectionRect,
     }
 }
 
+void BoundingBox::addEffect(PixmapEffect *effect) {
+    effect->incNumberPointers();
+    mEffects << effect;
+    addActiveAnimator(effect);
+    mAnimatorsCollection.addAnimator(effect);
+}
+
+void BoundingBox::removeEffect(PixmapEffect *effect) {
+
+    mEffects.removeOne(effect);
+    removeActiveAnimator(effect);
+    mAnimatorsCollection.removeAnimator(effect);
+    effect->decNumberPointers();
+}
+
 void BoundingBox::addActiveAnimator(QrealAnimator *animator)
 {
     mActiveAnimators << animator;

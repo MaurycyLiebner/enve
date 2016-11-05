@@ -127,7 +127,7 @@ void PathBox::updatePrettyPixmap() {
 
 void PathBox::schedulePathUpdate()
 {
-    awaitUpdate();
+    scheduleAwaitUpdate();
     if(mPathUpdateNeeded) {
         return;
     }
@@ -138,7 +138,7 @@ void PathBox::schedulePathUpdate()
 
 void PathBox::scheduleOutlinePathUpdate()
 {
-    awaitUpdate();
+    scheduleAwaitUpdate();
     if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
     }
@@ -249,7 +249,7 @@ void PathBox::updateBoundingRect() {
     mPixBoundingRect = mUpdateTransform.mapRect(relBoundingRect);
     mBoundingRect = QPainterPath();
     mBoundingRect.addRect(relBoundingRect);
-    mBoundingRect = mUpdateTransform.map(mBoundingRect);
+    mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
     updatePixBoundingRectClippedToView();
 }
 
@@ -288,7 +288,7 @@ void PathBox::draw(QPainter *p)
 }
 
 bool PathBox::absPointInsidePath(QPointF absPoint) {
-    if(mBoundingRect.contains(absPoint) ) {
+    if(mMappedBoundingRect.contains(absPoint) ) {
         return mWholePath.contains(mapAbsPosToRel(absPoint));
     } else {
         return false;

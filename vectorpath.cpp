@@ -639,9 +639,12 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
         //drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             if(mInfluenceEnabled) {
+                p->save();
                 p->setBrush(Qt::NoBrush);
                 p->setPen(QPen(Qt::blue, 1., Qt::DashLine) );
-                //p->drawPath(mMappedEditPath);
+                p->setTransform(QTransform(mCombinedTransformMatrix), true);
+                p->drawPath(mEditPath);
+                p->restore();
             }
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
             PathPoint *point;

@@ -61,9 +61,13 @@ QPointF MovablePoint::getRelativePos()
     return mRelPos.getCurrentValue();
 }
 
+QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) {
+    return mParent->getCombinedTransform().map(relPos);
+}
+
 QPointF MovablePoint::getAbsolutePos()
 {
-    return mParent->getCombinedTransform().map(getRelativePos());
+    return mapRelativeToAbsolute(getRelativePos());
 }
 
 void MovablePoint::draw(QPainter *p)
@@ -111,13 +115,11 @@ bool MovablePoint::isContainedInRect(QRectF absRect)
 }
 
 void MovablePoint::moveBy(QPointF relTranslation) {
-    mRelPos.retrieveSavedValue();
-    mRelPos.incCurrentValue(relTranslation.x(), relTranslation.y());
+    mRelPos.incSavedValueToCurrentValue(relTranslation.x(), relTranslation.y());
 }
 
 void MovablePoint::moveByAbs(QPointF absTranslatione) {
-    mRelPos.retrieveSavedValue();
-    moveToAbs(getAbsolutePos() + absTranslatione);
+    moveToAbs(mapRelativeToAbsolute(mRelPos.getSavedValue()) + absTranslatione);
 }
 
 void MovablePoint::moveToAbs(QPointF absPos)

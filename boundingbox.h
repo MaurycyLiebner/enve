@@ -7,6 +7,7 @@
 #include "transformanimator.h"
 
 #include "animatorscollection.h"
+#include "pixmapeffect.h"
 
 class KeysView;
 
@@ -233,8 +234,15 @@ public:
     void updateRelativeTransform();
     void updateAllUglyPixmap();
     QPointF mapAbsPosToRel(QPointF absPos);
+    void addEffect(PixmapEffect *effect);
+    void removeEffect(PixmapEffect *effect);
+    void scheduleAwaitUpdate();
+    void setAwaitUpdateScheduled(bool bT);
 protected:
+    bool mAwaitUpdateScheduled = false;
+
     virtual void updateAfterCombinedTransformationChanged() {}
+    QPixmap applyEffects(const QPixmap &pixmap);
 
     QMatrix mAllUglyTransform;
     QMatrix mAllUglyPaintTransform;
@@ -262,6 +270,7 @@ protected:
     QRectF mPixBoundingRect;
     QRectF mPixBoundingRectClippedToView;
     QPainterPath mBoundingRect;
+    QPainterPath mMappedBoundingRect;
 
     BoxesList *mBoxesList;
     KeysView *mKeysView;
@@ -285,6 +294,8 @@ protected:
     bool mBoxListItemDetailsVisible = false;
     QString mName = "";
     QList<QrealAnimator*> mActiveAnimators;
+
+    QList<PixmapEffect*> mEffects;
 };
 
 

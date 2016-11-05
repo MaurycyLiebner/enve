@@ -72,12 +72,12 @@ MovablePoint *GradientPoints::getPointAt(QPointF absPos)
 
 QPointF GradientPoints::getStartPoint()
 {
-    return startPoint->getAbsolutePos();
+    return startPoint->getRelativePos();
 }
 
 QPointF GradientPoints::getEndPoint()
 {
-    return endPoint->getAbsolutePos();
+    return endPoint->getRelativePos();
 }
 
 void GradientPoints::setColors(QColor startColor, QColor endColor)

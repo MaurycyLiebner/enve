@@ -81,6 +81,7 @@ public:
 
     qreal getRadius();
     void loadFromSql(int movablePointId);
+    QPointF mapRelativeToAbsolute(QPointF relPos);
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

@@ -362,6 +362,21 @@ qreal QrealAnimator::getValueAtFrame(int frame) const
     }
 }
 
+qreal QrealAnimator::getValueAtFrame(int frame,
+                                    QrealKey *prevKey,
+                                    QrealKey *nextKey) const
+{
+    qreal t = tFromX(prevKey->getFrame(),
+                     prevKey->getEndValueFrame(),
+                     nextKey->getStartValueFrame(),
+                     nextKey->getFrame(), frame);
+    qreal p0y = prevKey->getValue();
+    qreal p1y = prevKey->getEndValue();
+    qreal p2y = nextKey->getStartValue();
+    qreal p3y = nextKey->getValue();
+    return calcCubicBezierVal(p0y, p1y, p2y, p3y, t);
+}
+
 qreal QrealAnimator::getCurrentValue() const
 {
     return mCurrentValue;
@@ -607,21 +622,6 @@ bool keysFrameSort(QrealKey *key1, QrealKey *key2)
 void QrealAnimator::sortKeys()
 {
     qSort(mKeys.begin(), mKeys.end(), keysFrameSort);
-}
-
-qreal QrealAnimator::getValueAtFrame(int frame,
-                                    QrealKey *prevKey,
-                                    QrealKey *nextKey) const
-{
-    qreal t = tFromX(prevKey->getFrame(),
-                     prevKey->getEndValueFrame(),
-                     nextKey->getStartValueFrame(),
-                     nextKey->getFrame(), frame);
-    qreal p0y = prevKey->getValue();
-    qreal p1y = prevKey->getEndValue();
-    qreal p2y = nextKey->getStartValue();
-    qreal p3y = nextKey->getValue();
-    return calcCubicBezierVal(p0y, p1y, p2y, p3y, t);
 }
 
 void QrealAnimator::getMinAndMaxValues(qreal *minValP, qreal *maxValP) {

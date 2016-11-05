@@ -31,74 +31,14 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
     mCombinedTransformMatrix.reset();
 }
 
-QPixmap blurrPixmap(const QPixmap& pixmap, const QRect& rect, qreal alpha,
-                    bool alphaOnly = false)
-{
-    //int tab[] = { 14, 10, 8, 6, 5, 5, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2 };
-    //int alpha = (radius < 1)  ? 16 : (radius > 17) ? 1 : tab[radius-1];
-    alpha = qclamp(alpha, 0., 16.);
-
-    QImage result = pixmap.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);
-    int r1 = rect.top();
-    int r2 = rect.bottom();
-    int c1 = rect.left();
-    int c2 = rect.right();
-
-    int bpl = result.bytesPerLine();
-    int rgba[4];
-    unsigned char* p;
-
-    int i1 = 0;
-    int i2 = 3;
-
-    if (alphaOnly)
-        i1 = i2 = (QSysInfo::ByteOrder == QSysInfo::BigEndian ? 0 : 3);
-
-    for (int col = c1; col <= c2; col++) {
-        p = result.scanLine(r1) + col * 4;
-        for (int i = i1; i <= i2; i++)
-            rgba[i] = p[i] << 4;
-
-        p += bpl;
-        for (int j = r1; j < r2; j++, p += bpl)
-            for (int i = i1; i <= i2; i++)
-                p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
+QPixmap BoundingBox::applyEffects(const QPixmap& pixmap) {
+    if(mEffects.isEmpty() ) return pixmap;
+    QImage im = pixmap.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);;
+    fmt_filters::image img(im.bits(), im.width(), im.height());
+    foreach(PixmapEffect *effect, mEffects) {
+        effect->apply(img);
     }
-
-    for (int row = r1; row <= r2; row++) {
-        p = result.scanLine(row) + c1 * 4;
-        for (int i = i1; i <= i2; i++)
-            rgba[i] = p[i] << 4;
-
-        p += 4;
-        for (int j = c1; j < c2; j++, p += 4)
-            for (int i = i1; i <= i2; i++)
-                p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
-    }
-
-    for (int col = c1; col <= c2; col++) {
-        p = result.scanLine(r2) + col * 4;
-        for (int i = i1; i <= i2; i++)
-            rgba[i] = p[i] << 4;
-
-        p -= bpl;
-        for (int j = r1; j < r2; j++, p -= bpl)
-            for (int i = i1; i <= i2; i++)
-                p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
-    }
-
-    for (int row = r1; row <= r2; row++) {
-        p = result.scanLine(row) + c2 * 4;
-        for (int i = i1; i <= i2; i++)
-            rgba[i] = p[i] << 4;
-
-        p -= 4;
-        for (int j = c1; j < c2; j++, p -= 4)
-            for (int i = i1; i <= i2; i++)
-                p[i] = (rgba[i] += ((p[i] << 4) - rgba[i]) * alpha / 16) >> 4;
-    }
-
-    return QPixmap::fromImage(result);
+    return QPixmap::fromImage(im);
 }
 
 #include <QSqlError>
@@ -190,10 +130,8 @@ void BoundingBox::updatePrettyPixmap() {
 
     draw(&p);
     p.end();
-    return;
-    qreal blurrRadius = 0.1;
-    mNewPixmap = blurrPixmap(mNewPixmap, mNewPixmap.rect(),
-                             blurrRadius);
+
+    mNewPixmap = applyEffects(mNewPixmap);
 }
 
 void BoundingBox::updateAllUglyPixmap() {
@@ -212,12 +150,7 @@ void BoundingBox::updateAllUglyPixmap() {
     draw(&p);
     p.end();
 
-    return;
-    qreal blurrRadius = 0.1;
-    mAllUglyPixmap = blurrPixmap(mAllUglyPixmap, mAllUglyPixmap.rect(),
-                             blurrRadius);
-
-
+    mAllUglyPixmap = applyEffects(mAllUglyPixmap);
 }
 
 bool BoundingBox::shouldRedoUpdate() {
@@ -252,19 +185,16 @@ void BoundingBox::drawPixmap(QPainter *p) {
         }
 
         p->setTransform(QTransform(mOldAllUglyPaintTransform), true);
-        p->translate(mOldAllUglyBoundingRect.topLeft());
-        p->drawPixmap(0, 0, mOldAllUglyPixmap);
+        p->drawPixmap(mOldAllUglyBoundingRect.topLeft(), mOldAllUglyPixmap);
 
         if(paintOld) {
             p->restore();
 
             p->setTransform(QTransform(mUglyPaintTransform), true);
-            p->translate(mOldPixBoundingRect.topLeft());
-            p->drawPixmap(0, 0, mOldPixmap);
+            p->drawPixmap(mOldPixBoundingRect.topLeft(), mOldPixmap);
         }
     } else {
         p->drawPixmap(mPixBoundingRectClippedToView.topLeft(), mNewPixmap);
-
     }
 
     p->restore();
@@ -276,6 +206,17 @@ void BoundingBox::awaitUpdate() {
     if(mAwaitingUpdate) return;
     setAwaitingUpdate(true);
     mMainWindow->addBoxAwaitingUpdate(this);
+}
+
+#include "updatescheduler.h"
+void BoundingBox::scheduleAwaitUpdate() {
+    if(mAwaitUpdateScheduled) return;
+    setAwaitUpdateScheduled(true);
+    addUpdateScheduler(new AwaitUpdateUpdateScheduler(this));
+}
+
+void BoundingBox::setAwaitUpdateScheduled(bool bT) {
+    mAwaitUpdateScheduled = bT;
 }
 
 void BoundingBox::resetScale() {
@@ -406,6 +347,7 @@ void BoundingBox::drawAsBoundingRect(QPainter *p, QPainterPath path) {
     pen.setCosmetic(true);
     p->setPen(pen);
     p->setBrush(Qt::NoBrush);
+    p->setTransform(QTransform(mCombinedTransformMatrix), true);
     p->drawPath(path);
     p->restore();
 }
@@ -551,7 +493,7 @@ void BoundingBox::updateCombinedTransform() {
         if(mAwaitingUpdate) {
             redoUpdate();
         } else {
-            awaitUpdate();
+            scheduleAwaitUpdate();
         }
         updateUglyPaintTransform();
     }

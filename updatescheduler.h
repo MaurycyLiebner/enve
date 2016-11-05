@@ -21,4 +21,13 @@ private:
     Gradient *mGradient;
 };
 
+class AwaitUpdateUpdateScheduler : public UpdateScheduler {
+public:
+    AwaitUpdateUpdateScheduler(BoundingBox *target);
+
+    void update();
+private:
+    BoundingBox *mTarget;
+};
+
 #endif // UPDATESCHEDULER_H

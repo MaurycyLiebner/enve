@@ -72,7 +72,10 @@ SOURCES += main.cpp\
     imagebox.cpp \
     fontswidget.cpp \
     textbox.cpp \
-    paintcontroler.cpp
+    paintcontroler.cpp \
+    fmt_filters.cpp \
+    pixmapeffect.cpp \
+    valuenoise.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -130,4 +133,7 @@ HEADERS  += mainwindow.h \
     imagebox.h \
     fontswidget.h \
     textbox.h \
-    paintcontroler.h
+    paintcontroler.h \
+    fmt_filters.h \
+    pixmapeffect.h \
+    valuenoise.h
