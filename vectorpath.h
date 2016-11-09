@@ -93,7 +93,10 @@ public:
     Edge *getEdgeFromPath(QPointF absPos);
     void deletePointAndApproximate(PathPoint *pointToRemove);
     virtual void loadFromSql(int boundingBoxId);
+    void saveCurrentPathToShape(VectorPathShape *shape);
 protected:
+    QList<VectorPathShape*> mShapes;
+
     bool mInfluenceEnabled = false;
     void updatePath();
     void updatePathPointIds();

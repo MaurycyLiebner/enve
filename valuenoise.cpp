@@ -9,7 +9,12 @@ qreal qRandF(qreal fMin, qreal fMax)
 
 ValueNoise::ValueNoise()
 {
+    mAmplitudeAnimator.setCurrentValue(45.);
+    mAmplitudeAnimator.setName("amplitude");
+    mFramePeriodAnimator.setCurrentValue(10.);
+    mFramePeriodAnimator.setName("frame period");
 
+    generateNoisePoints();
 }
 
 void ValueNoise::generateNoisePoints()
@@ -23,8 +28,11 @@ void ValueNoise::generateNoisePoints()
         qreal amplitude = mAmplitudeAnimator.getValueAtFrame(frame);
         qreal halfAmplitude = amplitude*0.5;
         mNoisePoints << NoisePoint(frame, qRandF(-halfAmplitude, halfAmplitude));
-        frame += mFramePeriodAnimator.getValueAtFrame(frame);
+        qreal currPeriod = mFramePeriodAnimator.getValueAtFrame(frame);
+        qreal nextPeriod = mFramePeriodAnimator.getValueAtFrame(frame + currPeriod);
+        frame += nextPeriod;
     }
+    updateCurrentValue();
 }
 
 qreal ValueNoise::getValueAtFrame(int frame) const
@@ -36,6 +44,23 @@ qreal ValueNoise::getValueAtFrame(int frame) const
     NoisePoint prevNoisePoint = mNoisePoints.at(prevId);
     NoisePoint nextNoisePoint = mNoisePoints.at(nextId);
     return getValueAtFrame(frame, prevNoisePoint, nextNoisePoint);
+}
+
+qreal ValueNoise::getCurrentValue() const
+{
+    return mCurrentValue;
+}
+
+void ValueNoise::setFrame(int frame)
+{
+    if(mFrame == frame) return;
+    mFrame = frame;
+    updateCurrentValue();
+}
+
+void ValueNoise::updateCurrentValue()
+{
+    mCurrentValue = getValueAtFrame(mFrame);
 }
 
 qreal ValueNoise::getValueAtFrame(int frame,

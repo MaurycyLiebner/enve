@@ -167,7 +167,7 @@ void BoundingBox::redoUpdate() {
 
 void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
-
+    p->setCompositionMode(mCompositionMode);
     if(mAwaitingUpdate) {
         bool paintOld = mUglyPaintTransform.m11() < mOldAllUglyPaintTransform.m11();
 
@@ -217,6 +217,12 @@ void BoundingBox::scheduleAwaitUpdate() {
 
 void BoundingBox::setAwaitUpdateScheduled(bool bT) {
     mAwaitUpdateScheduled = bT;
+}
+
+void BoundingBox::setCompositionMode(QPainter::CompositionMode compositionMode)
+{
+    mCompositionMode = compositionMode;
+    scheduleAwaitUpdate();
 }
 
 void BoundingBox::resetScale() {
@@ -356,7 +362,7 @@ void BoundingBox::drawBoundingRect(QPainter *p) {
     drawAsBoundingRect(p, mBoundingRect);
 }
 
-QMatrix BoundingBox::getCombinedTransform() {
+QMatrix BoundingBox::getCombinedTransform() const {
     return mCombinedTransformMatrix;
 }
 

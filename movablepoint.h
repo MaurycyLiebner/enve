@@ -28,9 +28,9 @@ public:
     virtual void finishTransform();
 
 
-    QPointF getRelativePos();
+    QPointF getRelativePos() const;
 
-    QPointF getAbsolutePos();
+    QPointF getAbsolutePos() const;
 
     virtual void draw(QPainter *p);
 
@@ -81,7 +81,7 @@ public:
 
     qreal getRadius();
     void loadFromSql(int movablePointId);
-    QPointF mapRelativeToAbsolute(QPointF relPos);
+    QPointF mapRelativeToAbsolute(QPointF relPos) const;
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

@@ -63,7 +63,7 @@ public:
     virtual void draw(QPainter *) {}
     virtual void drawSelected(QPainter *, CanvasMode) {}
 
-    QMatrix getCombinedTransform();
+    QMatrix getCombinedTransform() const;
 
     void applyTransformation(TransformAnimator *transAnimator);
 
@@ -238,6 +238,8 @@ public:
     void removeEffect(PixmapEffect *effect);
     void scheduleAwaitUpdate();
     void setAwaitUpdateScheduled(bool bT);
+
+    void setCompositionMode(QPainter::CompositionMode compositionMode);
 protected:
     bool mAwaitUpdateScheduled = false;
 
@@ -286,6 +288,8 @@ protected:
     QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;
     bool mPivotChanged = false;
+
+    QPainter::CompositionMode mCompositionMode = QPainter::CompositionMode_SourceOver;
 
     bool mVisible = true;
     bool mLocked = false;

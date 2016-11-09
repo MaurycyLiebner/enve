@@ -40,7 +40,6 @@ private:
 
     QWidget *mControlButtonsWidget;
     QHBoxLayout *mControlButtonsLayout;
-    QHBoxLayout *mControlsLayout;
 
     QPushButton *mGoToPreviousKeyButton;
     QPushButton *mGoToNextKeyButton;
@@ -53,6 +52,7 @@ private:
 
     AnimationDockWidget *mAnimationDockWidget;
     QHBoxLayout *mBoxesListKeysViewLayout;
+    QVBoxLayout *mBoxesListLayout;
     QVBoxLayout *mKeysViewLayout;
     BoxesList *mBoxesList;
     KeysView *mKeysView;

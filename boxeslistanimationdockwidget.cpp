@@ -32,6 +32,10 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
                                              QSizePolicy::Maximum);
     mBoxesList = new BoxesList(this);
 
+    mBoxesListLayout = new QVBoxLayout();
+    mBoxesListLayout->setSpacing(0);
+    mBoxesListLayout->setMargin(0);
+
     mKeysView = new KeysView(mBoxesList, this);
     connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
             mFrameRangeScrollbar, SLOT(setViewedFramesRange(int, int)) );
@@ -42,9 +46,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mAnimationDockWidget = new AnimationDockWidget(mBoxesList, mKeysView);
     mKeysView->setAnimationDockWidget(mAnimationDockWidget);
-
-    mControlsLayout = new QHBoxLayout();
-    mControlsLayout->setAlignment(Qt::AlignLeft);
 
     mGoToPreviousKeyButton = new QPushButton(
                 QIcon("pixmaps/icons/prev_key_button.png"), "", this);
@@ -93,7 +94,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mControlButtonsLayout = new QHBoxLayout();
     mControlButtonsWidget = new QWidget(this);
-    mControlButtonsWidget->setFixedWidth(LIST_ITEM_MAX_WIDTH + 1);
+    mControlButtonsWidget->setFixedHeight(30);
     mControlButtonsWidget->setLayout(mControlButtonsLayout);
     mControlButtonsWidget->setStyleSheet("QWidget {"
                                             "background-color: rgb(0, 0, 0);"
@@ -106,8 +107,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mControlButtonsLayout->setSpacing(0);
     mControlButtonsLayout->setMargin(0);
-    mControlsLayout->setSpacing(0);
-    mControlsLayout->setMargin(0);
 
     mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
     mGoToPreviousKeyButton->setFocusPolicy(Qt::NoFocus);
@@ -123,26 +122,31 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlButtonsLayout->addWidget(mCtrlsAlwaysVisible);
     mCtrlsAlwaysVisible->setFocusPolicy(Qt::NoFocus);
 
-    mControlsLayout->addWidget(mControlButtonsWidget);
-    mControlsLayout->addWidget(mAnimationWidgetScrollbar);
-
-    mMainLayout->addLayout(mControlsLayout);
-    //mMainLayout->addWidget(animationDockWidget);
-
     mBoxesListKeysViewLayout = new QHBoxLayout();
     mKeysViewLayout = new QVBoxLayout();
-    mBoxesListKeysViewLayout->addWidget(mBoxesList);
+
+    mBoxesListLayout->addWidget(mControlButtonsWidget);
+    mBoxesListLayout->addWidget(mBoxesList);
+
+    mBoxesListKeysViewLayout->addLayout(mBoxesListLayout);
     mBoxesListKeysViewLayout->addLayout(mKeysViewLayout);
 
+    mKeysViewLayout->addWidget(mAnimationWidgetScrollbar);
     mKeysViewLayout->addWidget(mKeysView);
     mKeysViewLayout->addWidget(mAnimationDockWidget);
     mAnimationDockWidget->hide();
 
     mMainLayout->addLayout(mBoxesListKeysViewLayout);
 
+
     mMainLayout->addWidget(mFrameRangeScrollbar);
 
     mFrameRangeScrollbar->emitChange();
+
+    ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesList, this);
+    chww->updatePos();
+
+    mFrameRangeScrollbar->raise();
 }
 
 BoxesList *BoxesListAnimationDockWidget::getBoxesList()

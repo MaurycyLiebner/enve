@@ -56,7 +56,7 @@ public:
             mFillPaintSettings.setGradient(gradient);
             updateDrawGradients();
         }
-        awaitUpdate();
+        scheduleAwaitUpdate();
     }
 
     virtual void setStrokeGradient(Gradient* gradient, bool finish) {
@@ -71,7 +71,7 @@ public:
             mStrokeSettings.setGradient(gradient);
             updateDrawGradients();
         }
-        awaitUpdate();
+        scheduleAwaitUpdate();
     }
 
     virtual void setFillFlatColor(Color color, bool finish) {
@@ -84,7 +84,7 @@ public:
             }
         }
 
-        awaitUpdate();
+        scheduleAwaitUpdate();
     }
 
     virtual void setStrokeFlatColor(Color color, bool finish) {
@@ -97,7 +97,7 @@ public:
             }
         }
 
-        awaitUpdate();
+        scheduleAwaitUpdate();
     }
 
     virtual void setFillPaintType(PaintType paintType, Color color,
@@ -113,7 +113,7 @@ public:
 
         updateDrawGradients();
 
-        awaitUpdate();
+        scheduleAwaitUpdate();
     }
 
     virtual void setStrokePaintType(PaintType paintType, Color color,
@@ -128,7 +128,7 @@ public:
         }
         mStrokeSettings.setPaintType(paintType);
 
-        awaitUpdate();
+        scheduleAwaitUpdate();
     }
 
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
@@ -146,7 +146,12 @@ public:
         if(finish) {
             mStrokeSettings.getStrokeWidthAnimator()->finishTransform();
         }
-        awaitUpdate();
+        //scheduleOutlinePathUpdate();
+    }
+
+    void setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
+        mStrokeSettings.setOutlineCompositionMode(compositionMode);
+        scheduleAwaitUpdate();
     }
 
     void startStrokeWidthTransform() {
@@ -198,7 +203,6 @@ protected:
 
     bool mUpdatePathUpdateNeeded = false;
     bool mUpdateOutlinePathUpdateNeeded = false;
-
 
     QPainterPath mPath;
     QPainterPath mOutlinePath;

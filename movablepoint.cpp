@@ -56,16 +56,16 @@ void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
     mRelPos.setCurrentValue(relPos, saveUndoRedo);
 }
 
-QPointF MovablePoint::getRelativePos()
+QPointF MovablePoint::getRelativePos() const
 {
-    return mRelPos.getCurrentValue();
+    return mRelPos.getCurrentValueWithNoise();
 }
 
-QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) {
+QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) const {
     return mParent->getCombinedTransform().map(relPos);
 }
 
-QPointF MovablePoint::getAbsolutePos()
+QPointF MovablePoint::getAbsolutePos() const
 {
     return mapRelativeToAbsolute(getRelativePos());
 }

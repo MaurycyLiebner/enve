@@ -14,6 +14,43 @@ enum CanvasMode : short;
 
 class PathPoint;
 
+class VectorPathShape {
+public:
+    VectorPathShape() {
+        mInfluence.blockPointer();
+        mInfluence.setName("influence");
+    }
+
+    QString getName() {
+        return mName;
+    }
+
+    void setName(QString name) {
+        mName = name;
+    }
+
+    bool isRelative() {
+        return mRelative;
+    }
+
+    void setRelative(bool bT) {
+        mRelative = bT;
+    }
+
+    qreal getCurrentInfluence() {
+        return mInfluence.getCurrentValue();
+    }
+
+    void setCurrentInfluence(qreal value, bool finish = false) {
+        mInfluence.setCurrentValue(value, finish);
+    }
+
+private:
+    bool mRelative;
+    QString mName;
+    QrealAnimator mInfluence;
+};
+
 struct PathPointValues {
     PathPointValues(QPointF startPosT,
                     QPointF pointPosT,
@@ -29,6 +66,58 @@ struct PathPointValues {
     QPointF startRelPos;
     QPointF pointRelPos;
     QPointF endRelPos;
+
+    PathPointValues &operator/=(const qreal &val)
+    {
+        startRelPos /= val;
+        pointRelPos /= val;
+        endRelPos /= val;
+        return *this;
+    }
+    PathPointValues &operator*=(const qreal &val)
+    {
+        startRelPos *= val;
+        pointRelPos *= val;
+        endRelPos *= val;
+        return *this;
+    }
+    PathPointValues &operator+=(const PathPointValues &ppv)
+    {
+        startRelPos += ppv.startRelPos;
+        pointRelPos += ppv.pointRelPos;
+        endRelPos += ppv.endRelPos;
+        return *this;
+    }
+};
+
+PathPointValues operator+(const PathPointValues &ppv1, const PathPointValues &ppv2);
+PathPointValues operator/(const PathPointValues &ppv, const qreal &val);
+PathPointValues operator*(const PathPointValues &ppv, const qreal &val);
+PathPointValues operator*(const qreal &val, const PathPointValues &ppv);
+
+class PointShapeValues {
+public:
+    PointShapeValues();
+    PointShapeValues(VectorPathShape *shape, PathPointValues values) {
+        mShape = shape;
+        mValues = values;
+    }
+
+    const PathPointValues &getValues() const {
+        return mValues;
+    }
+
+    VectorPathShape *getParentShape() const {
+        return mShape;
+    }
+
+    void setPointValues(const PathPointValues &values) {
+        mValues = values;
+    }
+
+private:
+    PathPointValues mValues;
+    VectorPathShape *mShape;
 };
 
 struct PosExpectation {
@@ -119,12 +208,14 @@ public:
 
     void moveBy(QPointF relTranslation);
 
-    QPointF getStartCtrlPtAbsPos();
-    QPointF getStartCtrlPtValue();
+    QPointF getShapesInfluencedRelPos();
+
+    QPointF getStartCtrlPtAbsPos() const;
+    QPointF getStartCtrlPtValue() const;
     CtrlPoint *getStartCtrlPt();
 
     QPointF getEndCtrlPtAbsPos();
-    QPointF getEndCtrlPtValue();
+    QPointF getEndCtrlPtValue() const;
     CtrlPoint *getEndCtrlPt();
 
     void draw(QPainter *p, CanvasMode mode);
@@ -196,7 +287,8 @@ public:
     bool hasFullInfluence();
     bool hasSomeInfluence();
 
-    PathPointValues getPointValues();
+    PathPointValues getPointValues() const;
+    void savePointValuesToShapeValues(VectorPathShape *shape);
 
     void clearInfluenceAdjustedPointValues();
     PathPointValues getInfluenceAdjustedPointValues();
@@ -211,7 +303,10 @@ public:
     void moveByAbs(QPointF absTranslatione);
     void loadFromSql(int pathPointId, int movablePointId);
     QPointF getInfluenceRelativePos();
+    PathPointValues getShapesInfluencedPointValues() const;
 private:
+    QList<PointShapeValues> mShapeValues;
+
     bool mStartExternalInfluence = false;
     QPointF mStartAdjustedForExternalInfluence;
     bool mEndExternalInfluence = false;

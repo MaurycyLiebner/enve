@@ -11,12 +11,12 @@ QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
     qreal pixelsPerFrame =  mKeysView->getPixelsPerFrame();
     QrealKey *collectionKey = NULL;
     qreal currY = relY;
-    if(currY <= LIST_ITEM_HEIGHT) {
+    if(currY <= BoxesList::getListItemHeight()) {
         collectionKey = mAnimatorsCollection.getKeyAtPos(relX, relY,
                                minViewedFrame,
                                pixelsPerFrame);
     }
-    currY -= LIST_ITEM_HEIGHT;
+    currY -= BoxesList::getListItemHeight();
     if(collectionKey == NULL) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
             qreal animatorHeight = animator->getBoxesListHeight();
@@ -41,13 +41,13 @@ void BoundingBox::handleListItemMousePress(qreal boxesListX,
     if(relX < 0) {
         return;
     }
-    if(relY < LIST_ITEM_HEIGHT) {
+    if(relY < BoxesList::getListItemHeight()) {
         if(event->button() == Qt::LeftButton) {
-            if(relX < LIST_ITEM_HEIGHT) {
+            if(relX < BoxesList::getListItemHeight()) {
                 setChildrenListItemsVisible(!mBoxListItemDetailsVisible);
-            } else if(relX < LIST_ITEM_HEIGHT*2) {
+            } else if(relX < BoxesList::getListItemHeight()*2) {
                 setVisibile(!mVisible);
-            } else if(relX < LIST_ITEM_HEIGHT*3) {
+            } else if(relX < BoxesList::getListItemHeight()*3) {
                 setLocked(!mLocked);
             } else {
                 if(isVisibleAndUnlocked() && mParent->isCurrentGroup()) {
@@ -67,12 +67,12 @@ void BoundingBox::handleListItemMousePress(qreal boxesListX,
             showContextMenu(event->globalPos() );
         }
     } else if(mBoxListItemDetailsVisible) {
-        relY -= LIST_ITEM_HEIGHT;
+        relY -= BoxesList::getListItemHeight();
         foreach(QrealAnimator *animator, mActiveAnimators) {
             qreal animatorHeight = animator->getBoxesListHeight();
             if(relY <= animatorHeight) {
                 animator->handleListItemMousePress(boxesListX,
-                                                   relX - LIST_ITEM_CHILD_INDENT,
+                                                   relX - BoxesList::getListItemChildIndent(),
                                                    relY, event);
                 break;
             }
@@ -83,17 +83,17 @@ void BoundingBox::handleListItemMousePress(qreal boxesListX,
 
 void BoundingBox::getKeysInRect(QRectF selectionRect,
                                 QList<QrealKey*> *keysList) {
-    qreal rectMargin = (LIST_ITEM_HEIGHT - KEY_RECT_SIZE)*0.5;
+    qreal rectMargin = (BoxesList::getListItemHeight() - KEY_RECT_SIZE)*0.5;
     if(selectionRect.bottom() < rectMargin) return;
     int minViewedFrame = mKeysView->getMinViewedFrame();
     qreal pixelsPerFrame =  mKeysView->getPixelsPerFrame();
-    if(selectionRect.top() < LIST_ITEM_HEIGHT - rectMargin) {
+    if(selectionRect.top() < BoxesList::getListItemHeight() - rectMargin) {
         mAnimatorsCollection.getKeysInRect(selectionRect,
                                          minViewedFrame,
                                          pixelsPerFrame,
                                          keysList);
     }
-    selectionRect.translate(0., -LIST_ITEM_HEIGHT);
+    selectionRect.translate(0., -BoxesList::getListItemHeight());
     foreach(QrealAnimator *animator, mActiveAnimators) {
         if(selectionRect.bottom() < rectMargin) return;
         qreal heightT = animator->getBoxesListHeight();
@@ -209,7 +209,7 @@ void BoxesGroup::handleListItemMousePress(qreal boxesListX,
                                               relX, relY, event);
     } else {
         handleChildListItemMousePress(boxesListX,
-                                      relX - LIST_ITEM_HEIGHT, relY,
+                                      relX - BoxesList::getListItemHeight(), relY,
                                       heightT, event);
     }
 }
@@ -218,7 +218,7 @@ void BoundingBox::drawListItem(QPainter *p, qreal drawX, qreal drawY,
                                qreal maxY) {
     Q_UNUSED(maxY);
 
-    drawAnimationBar(p, drawX + LIST_ITEM_HEIGHT, drawY);
+    drawAnimationBar(p, drawX + BoxesList::getListItemHeight(), drawY);
 
     p->setPen(Qt::black);
     if(mSelected) {
@@ -227,29 +227,29 @@ void BoundingBox::drawListItem(QPainter *p, qreal drawX, qreal drawY,
         p->setBrush(QColor(225, 225, 225));
     }
     p->drawRect(QRectF(drawX, drawY,
-                       LIST_ITEM_MAX_WIDTH - drawX, LIST_ITEM_HEIGHT));
+                       BoxesList::getListItemMaxWidth() - drawX, BoxesList::getListItemHeight()));
 
     if(mBoxListItemDetailsVisible) {
         p->drawPixmap(drawX, drawY, *BoxesList::HIDE_CHILDREN);
     } else {
         p->drawPixmap(drawX, drawY, *BoxesList::SHOW_CHILDREN);
     }
-    drawX += LIST_ITEM_HEIGHT;
+    drawX += BoxesList::getListItemHeight();
     if(mVisible) {
         p->drawPixmap(drawX, drawY, *BoxesList::VISIBLE_PIXMAP);
     } else {
         p->drawPixmap(drawX, drawY, *BoxesList::INVISIBLE_PIXMAP);
     }
-    drawX += LIST_ITEM_HEIGHT;
+    drawX += BoxesList::getListItemHeight();
     if(mLocked) {
         p->drawPixmap(drawX, drawY, *BoxesList::LOCKED_PIXMAP);
     } else {
         p->drawPixmap(drawX, drawY, *BoxesList::UNLOCKED_PIXMAP);
     }
-    drawX += 2*LIST_ITEM_HEIGHT;
+    drawX += 2*BoxesList::getListItemHeight();
     p->drawText(QRectF(drawX, drawY,
-                       LIST_ITEM_MAX_WIDTH - drawX - LIST_ITEM_HEIGHT,
-                       LIST_ITEM_HEIGHT),
+                       BoxesList::getListItemMaxWidth() - drawX - BoxesList::getListItemHeight(),
+                       BoxesList::getListItemHeight()),
                 mName, QTextOption(Qt::AlignVCenter));
 
 }
@@ -264,7 +264,7 @@ void BoundingBox::drawKeysView(QPainter *p, qreal drawY,
 
 void BoundingBox::drawAnimationBar(QPainter *p,
                                    qreal drawX, qreal drawY) {
-    drawY += LIST_ITEM_HEIGHT;
+    drawY += BoxesList::getListItemHeight();
     if(mBoxListItemDetailsVisible) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
             animator->drawBoxesList(p, drawX, drawY);
@@ -280,10 +280,10 @@ void BoundingBox::drawKeys(QPainter *p,
     mAnimatorsCollection.drawKeys(p,
                                   pixelsPerFrame, 0., drawY, 20.,
                                   startFrame, endFrame);
-    drawY += LIST_ITEM_HEIGHT;
+    drawY += BoxesList::getListItemHeight();
     if(mBoxListItemDetailsVisible) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
-            animator->drawKeys(p, pixelsPerFrame, 0., drawY, LIST_ITEM_HEIGHT,
+            animator->drawKeys(p, pixelsPerFrame, 0., drawY, BoxesList::getListItemHeight(),
                                startFrame, endFrame);
             drawY += animator->getBoxesListHeight();
         }
@@ -330,7 +330,7 @@ void BoxesGroup::drawListItem(QPainter *p,
 {
     BoundingBox::drawListItem(p, drawX, drawY, maxY);
     if(mBoxListItemDetailsVisible) {
-        drawX += LIST_ITEM_CHILD_INDENT;
+        drawX += BoxesList::getListItemChildIndent();
         drawY += BoundingBox::getListItemHeight();
         drawChildrenListItems(p, drawX, drawY, maxY);
     }
@@ -362,14 +362,14 @@ qreal BoxesGroup::getListItemHeight() {
 
 qreal BoundingBox::getListItemHeight() {
     if(mBoxListItemDetailsVisible) {
-        qreal height = LIST_ITEM_HEIGHT;
+        qreal height = BoxesList::getListItemHeight();
         foreach(QrealAnimator *animator, mActiveAnimators) {
             height += animator->getBoxesListHeight();
         }
 
         return height;
     } else {
-        return LIST_ITEM_HEIGHT;
+        return BoxesList::getListItemHeight();
     }
 }
 

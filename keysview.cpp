@@ -142,8 +142,8 @@ void KeysView::paintEvent(QPaintEvent *) {
     if(!mGraphViewed) {
         p.setPen(Qt::NoPen);
         p.setBrush(QColor(165, 125, 125));
-        for(int i = LIST_ITEM_HEIGHT; i < height(); i += 2*LIST_ITEM_HEIGHT) {
-            p.drawRect(0, i, width(), LIST_ITEM_HEIGHT );
+        for(int i = BoxesList::getListItemHeight(); i < height(); i += 2*BoxesList::getListItemHeight()) {
+            p.drawRect(0, i, width(), BoxesList::getListItemHeight() );
         }
     }
 

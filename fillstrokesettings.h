@@ -197,6 +197,14 @@ public:
         return &mLineWidth;
     }
 
+    void setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
+        mOutlineCompositionMode = compositionMode;
+    }
+
+    QPainter::CompositionMode getOutlineCompositionMode() {
+        return mOutlineCompositionMode;
+    }
+
     void setLineWidthUpdaterTarget(PathBox *path);
     void loadFromSql(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
     void loadFromSql(int strokeSqlId, GradientWidget *gradientWidget);
@@ -204,6 +212,7 @@ private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
+    QPainter::CompositionMode mOutlineCompositionMode = QPainter::CompositionMode_Source;
 };
 
 class MainWindow;
@@ -343,8 +352,8 @@ private:
         }
     }
 
-    PaintType mCurrentFillPaintType;
-    PaintType mCurrentStrokePaintType;
+    PaintType mCurrentFillPaintType = NOPAINT;
+    PaintType mCurrentStrokePaintType = NOPAINT;
     Color mCurrentFillColor;
     Color mCurrentStrokeColor;
     Gradient *mCurrentStrokeGradient = NULL;

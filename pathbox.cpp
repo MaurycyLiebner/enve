@@ -281,6 +281,7 @@ void PathBox::draw(QPainter *p)
             p->setBrush(Qt::NoBrush);
         }
 
+        p->setCompositionMode(mStrokeSettings.getOutlineCompositionMode());
         p->drawPath(mOutlinePath);
 
         p->restore();

@@ -132,6 +132,28 @@ void PathPoint::moveBy(QPointF relTranslation)
     }
 }
 
+PathPointValues PathPoint::getShapesInfluencedPointValues() const
+{
+    if(mShapeValues.isEmpty() ) return getPointValues();
+    PathPointValues relativeValues = PathPointValues(QPointF(0., 0.),
+                                                     QPointF(0., 0.),
+                                                     QPointF(0., 0.));
+    PathPointValues absValues = getPointValues();
+
+    qreal nAbs = 1.;
+    foreach(const PointShapeValues &pointShapeValues, mShapeValues) {
+        VectorPathShape *parentShape = pointShapeValues.getParentShape();
+        qreal infl = parentShape->getCurrentInfluence();
+        if(parentShape->isRelative()) {
+            relativeValues += pointShapeValues.getValues()*infl;
+        } else {
+            absValues += pointShapeValues.getValues()*infl;
+            nAbs += infl;
+        }
+    }
+    return absValues/nAbs + relativeValues;
+}
+
 void PathPoint::moveByAbs(QPointF absTranslatione) {
     MovablePoint::moveByAbs(absTranslatione);
     if(!mStartCtrlPt->isSelected()) {
@@ -271,12 +293,12 @@ void PathPoint::moveStartCtrlPtToRelPos(QPointF startCtrlPt)
     mStartCtrlPt->setRelativePos(startCtrlPt);
 }
 
-QPointF PathPoint::getStartCtrlPtAbsPos()
+QPointF PathPoint::getStartCtrlPtAbsPos() const
 {
     return mStartCtrlPt->getAbsolutePos();
 }
 
-QPointF PathPoint::getStartCtrlPtValue()
+QPointF PathPoint::getStartCtrlPtValue() const
 {
     if(mStartCtrlPtEnabled) {
         return mStartCtrlPt->getRelativePos();
@@ -321,7 +343,7 @@ QPointF PathPoint::getEndCtrlPtAbsPos()
     return mEndCtrlPt->getAbsolutePos();
 }
 
-QPointF PathPoint::getEndCtrlPtValue()
+QPointF PathPoint::getEndCtrlPtValue() const
 {
     if(mEndCtrlPtEnabled) {
         return mEndCtrlPt->getRelativePos();
@@ -474,11 +496,26 @@ bool PathPoint::hasSomeInfluence() {
     return mInfluenceAnimator.getCurrentValue() > 0.00001;
 }
 
-PathPointValues PathPoint::getPointValues()
+PathPointValues PathPoint::getPointValues() const
 {
     return PathPointValues(getStartCtrlPtValue(),
                            getRelativePos(),
                            getEndCtrlPtValue() );
+}
+
+void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
+{
+    if(shape->isRelative()) {
+
+    } else {
+        foreach(PointShapeValues pointShapeValues, mShapeValues) {
+            if(pointShapeValues.getParentShape() == shape) {
+                pointShapeValues.setPointValues(getPointValues());
+                return;
+            }
+        }
+    }
+    mShapeValues << PointShapeValues(shape, getPointValues());
 }
 
 void PathPoint::clearInfluenceAdjustedPointValues()
@@ -912,4 +949,30 @@ PathPoint *PathPoint::addPoint(PathPoint *pointToAdd)
 
 bool PathPoint::isEndPoint() {
     return mNextPoint == NULL || mPreviousPoint == NULL;
+}
+
+PathPointValues operator+(const PathPointValues &ppv1, const PathPointValues &ppv2)
+{
+    return PathPointValues(ppv1.startRelPos + ppv2.startRelPos,
+                           ppv1.pointRelPos + ppv2.pointRelPos,
+                           ppv1.endRelPos + ppv2.endRelPos);
+}
+
+PathPointValues operator/(const PathPointValues &ppv, const qreal &val)
+{
+    return PathPointValues(ppv.startRelPos / val,
+                           ppv.pointRelPos / val,
+                           ppv.endRelPos / val);
+}
+
+PathPointValues operator*(const qreal &val, const PathPointValues &ppv)
+{
+    return ppv*val;
+}
+
+PathPointValues operator*(const PathPointValues &ppv, const qreal &val)
+{
+    return PathPointValues(ppv.startRelPos * val,
+                           ppv.pointRelPos * val,
+                           ppv.endRelPos * val);
 }

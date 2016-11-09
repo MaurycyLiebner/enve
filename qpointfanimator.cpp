@@ -53,14 +53,30 @@ QPointF QPointFAnimator::getCurrentValue()
     return QPointF(mXAnimator.getCurrentValue(), mYAnimator.getCurrentValue());
 }
 
+QPointF QPointFAnimator::getCurrentValueWithNoise() const
+{
+    return QPointF(mXAnimator.getCurrentValueWithNoise(),
+                   mYAnimator.getCurrentValueWithNoise());
+}
+
 qreal QPointFAnimator::getXValue()
 {
     return mXAnimator.getCurrentValue();
 }
 
+qreal QPointFAnimator::getXValueWithNoise()
+{
+    return mXAnimator.getCurrentValueWithNoise();
+}
+
 qreal QPointFAnimator::getYValue()
 {
     return mYAnimator.getCurrentValue();
+}
+
+qreal QPointFAnimator::getYValueWithNoise()
+{
+    return mYAnimator.getCurrentValueWithNoise();
 }
 
 void QPointFAnimator::setCurrentValue(QPointF val, bool finish)

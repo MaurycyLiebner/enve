@@ -97,6 +97,12 @@ void VectorPath::loadPointsFromSql(int boundingBoxId) {
     }
 }
 
+void VectorPath::saveCurrentPathToShape(VectorPathShape *shape) {
+    foreach(PathPoint *point, mPoints) {
+        point->savePointValuesToShapeValues(shape);
+    }
+}
+
 qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
     QPointF dPoint = point1 - point2;
     return sqrt(dPoint.x()*dPoint.x() + dPoint.y()*dPoint.y());

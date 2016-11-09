@@ -14,6 +14,7 @@
 #include "boxeslist.h"
 #include "boxeslistanimationdockwidget.h"
 #include "paintcontroler.h"
+#include "qdoubleslider.h"
 
 MainWindow *MainWindow::mMainWindowInstance;
 
@@ -26,7 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     mMainWindowInstance = this;
-    mPaintControlerThread = new QThread();
+    //int nThreads = QThread::idealThreadCount();
+    mPaintControlerThread = new QThread(this);
     mPaintControler = new PaintControler();
     mPaintControler->moveToThread(mPaintControlerThread);
     connect(mPaintControler, SIGNAL(finishedUpdatingLastBox()),
@@ -269,7 +271,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-
+    //mPaintControlerThread->terminate();
+    mPaintControlerThread->quit();
 }
 
 MainWindow *MainWindow::getInstance()

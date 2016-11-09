@@ -12,6 +12,8 @@
 
 const int KEY_RECT_SIZE = 10;
 
+class ValueNoise;
+
 class ComplexAnimator;
 
 #include <QDoubleSpinBox>
@@ -179,6 +181,10 @@ public:
     void loadKeysFromSql(int qrealAnimatorId);
     virtual void incSavedValueToCurrentValue(qreal incBy);
     virtual void multSavedValueToCurrentValue(qreal multBy);
+
+    void setNoise(ValueNoise *noise);
+    qreal getValueAtFrameWithNoise(int frame) const;
+    qreal getCurrentValueWithNoise() const;
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 
@@ -215,6 +221,8 @@ protected:
     qreal mPrefferedValueStep = 1.;
 
     QColor mAnimatorColor;
+
+    ValueNoise *mNoise = NULL;
 };
 #include <QMenu>
 class QrealAnimatorSpin : public QMenu

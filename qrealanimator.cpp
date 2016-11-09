@@ -6,6 +6,7 @@
 #include "animationdockwidget.h"
 #include "boxeslist.h"
 #include <QMenu>
+#include "valuenoise.h"
 
 QrealAnimator::QrealAnimator() : ConnectedToMainWindow()
 {
@@ -156,7 +157,7 @@ void QrealAnimator::setBoxesListDetailVisible(bool bT)
 
 qreal QrealAnimator::getBoxesListHeight()
 {
-    return LIST_ITEM_HEIGHT;
+    return BoxesList::getListItemHeight();
 }
 
 QString QrealAnimator::getValueText() {
@@ -168,10 +169,10 @@ void QrealAnimator::drawBoxesList(QPainter *p,
 {
     if(mIsCurrentAnimator) {
         p->fillRect(drawX - 5, drawY,
-                    5, LIST_ITEM_HEIGHT,
+                    5, BoxesList::getListItemHeight(),
                     mAnimatorColor);
         p->fillRect(drawX, drawY,
-                    LIST_ITEM_MAX_WIDTH - drawX, LIST_ITEM_HEIGHT,
+                    BoxesList::getListItemMaxWidth() - drawX, BoxesList::getListItemHeight(),
                     QColor(255, 255, 255, 125));
     }
     if(mIsRecording) {
@@ -180,14 +181,14 @@ void QrealAnimator::drawBoxesList(QPainter *p,
         p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_NOT_RECORDING);
     }
     p->setPen(Qt::black);
-    drawX += 2*LIST_ITEM_CHILD_INDENT;
+    drawX += 2*BoxesList::getListItemChildIndent();
     p->drawText(drawX, drawY,
-                LIST_ITEM_MAX_WIDTH - 80. - drawX, LIST_ITEM_HEIGHT,
+                BoxesList::getListItemMaxWidth() - 80. - drawX, BoxesList::getListItemHeight(),
                 Qt::AlignVCenter | Qt::AlignLeft,
                 getName() );
     p->setPen(Qt::blue);
-    p->drawText(LIST_ITEM_MAX_WIDTH - 80., drawY,
-                70., LIST_ITEM_HEIGHT,
+    p->drawText(BoxesList::getListItemMaxWidth() - 80., drawY,
+                70., BoxesList::getListItemHeight(),
                 Qt::AlignVCenter | Qt::AlignLeft,
                 " " + getValueText() );
 }
@@ -195,6 +196,7 @@ void QrealAnimator::drawBoxesList(QPainter *p,
 void QrealAnimator::openContextMenu(QPoint pos) {
     QMenu menu;
     menu.addAction("Add Key");
+    menu.addAction("Apply Noise");
     QAction *selected_action = menu.exec(pos);
     if(selected_action != NULL)
     {
@@ -204,6 +206,8 @@ void QrealAnimator::openContextMenu(QPoint pos) {
                 setRecording(true);
             }
             saveCurrentValueAsKey();
+        } else if(selected_action->text() == "Apply Noise") {
+            setNoise(new ValueNoise());
         }
     } else {
 
@@ -222,11 +226,11 @@ void QrealAnimator::handleListItemMousePress(qreal boxesListX,
     if(event->button() == Qt::RightButton) {
         openContextMenu(event->globalPos());
     } else {
-        if(relX < LIST_ITEM_CHILD_INDENT) {
+        if(relX < BoxesList::getListItemChildIndent()) {
             setRecording(!mIsRecording);
-        } else if(relX < 2*LIST_ITEM_CHILD_INDENT) {
+        } else if(relX < 2*BoxesList::getListItemChildIndent()) {
             setBoxesListDetailVisible(!mBoxesListDetailVisible);
-        } else if(boxesListX < LIST_ITEM_MAX_WIDTH - 80 || mIsComplexAnimator) {
+        } else if(boxesListX < BoxesList::getListItemMaxWidth() - 80 || mIsComplexAnimator) {
             if(mIsCurrentAnimator) {
                 removeThisFromGraphAnimator();
             } else {
@@ -237,7 +241,7 @@ void QrealAnimator::handleListItemMousePress(qreal boxesListX,
             QrealAnimatorSpin *spin = new QrealAnimatorSpin(this);
             spin->show();
             spin->move(event->globalPos() +
-                       QPoint(LIST_ITEM_MAX_WIDTH - 83. - boxesListX,
+                       QPoint(BoxesList::getListItemMaxWidth() - 83. - boxesListX,
                               -relY - 3.));
         }
     }
@@ -352,13 +356,26 @@ qreal QrealAnimator::getValueAtFrame(int frame) const
 {
     int prevId;
     int nextId;
+    qreal returnVal;
     if(getNextAndPreviousKeyId(&prevId, &nextId, frame) ) {
-        if(nextId == prevId) return mKeys.at(nextId)->getValue();
-        QrealKey *prevKey = mKeys.at(prevId);
-        QrealKey *nextKey = mKeys.at(nextId);
-        return getValueAtFrame(frame, prevKey, nextKey);
+        if(nextId == prevId) {
+            returnVal = mKeys.at(nextId)->getValue();
+        } else {
+            QrealKey *prevKey = mKeys.at(prevId);
+            QrealKey *nextKey = mKeys.at(nextId);
+            returnVal = getValueAtFrame(frame, prevKey, nextKey);
+        }
     } else {
-        return mCurrentValue;
+        returnVal = mCurrentValue;
+    }
+    return returnVal;
+}
+
+qreal QrealAnimator::getValueAtFrameWithNoise(int frame) const {
+    if(mNoise == NULL) {
+        return getValueAtFrame(frame);
+    } else {
+        return getValueAtFrame(frame) + mNoise->getValueAtFrame(frame);
     }
 }
 
@@ -382,6 +399,15 @@ qreal QrealAnimator::getCurrentValue() const
     return mCurrentValue;
 }
 
+qreal QrealAnimator::getCurrentValueWithNoise() const
+{
+    if(mNoise == NULL) {
+        return mCurrentValue;
+    } else {
+        return mCurrentValue + mNoise->getCurrentValue();
+    }
+}
+
 void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
 {
     if(finish) {
@@ -397,7 +423,7 @@ void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
 
 void QrealAnimator::updateValueFromCurrentFrame()
 {
-    setCurrentValue(getValueAtFrame(mCurrentFrame) );
+    setCurrentValue(getValueAtFrame(mCurrentFrame));
 }
 
 void QrealAnimator::saveCurrentValueToKey(QrealKey *key)
@@ -478,6 +504,7 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
 
 void QrealAnimator::setFrame(int frame)
 {
+    if(mNoise != NULL) mNoise->setFrame(frame);
     mCurrentFrame = frame;
     updateValueFromCurrentFrame();
 
@@ -829,6 +856,11 @@ void QrealAnimator::incSavedValueToCurrentValue(qreal incBy) {
 
 void QrealAnimator::multSavedValueToCurrentValue(qreal multBy) {
     setCurrentValue(mSavedCurrentValue * multBy);
+}
+
+void QrealAnimator::setNoise(ValueNoise *noise)
+{
+    mNoise = noise;
 }
 
 void QrealAnimator::incCurrentValue(qreal incBy)

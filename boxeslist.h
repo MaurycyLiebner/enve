@@ -5,10 +5,6 @@
 
 class AnimationWidget;
 
-const qreal LIST_ITEM_HEIGHT = 20;
-const qreal LIST_ITEM_MAX_WIDTH = 250;
-const qreal LIST_ITEM_CHILD_INDENT = 20;
-
 class QrealAnimator;
 
 class QrealPoint;
@@ -42,6 +38,11 @@ public:
     qreal getViewedBottom();
 
     void handleWheelEvent(QWheelEvent *event);
+
+    static qreal getListItemHeight() { return LIST_ITEM_HEIGHT; }
+    static qreal getListItemMaxWidth() { return LIST_ITEM_MAX_WIDTH; }
+    static qreal getListItemChildIndent() { return LIST_ITEM_CHILD_INDENT; }
+    static void setListItemMaxWidth(int widthT) { LIST_ITEM_MAX_WIDTH = widthT; }
 protected:
     void paintEvent(QPaintEvent *);
     void resizeEvent(QResizeEvent *e);
@@ -49,10 +50,37 @@ protected:
     void mousePressEvent(QMouseEvent *event);
 
 private:
+    static qreal LIST_ITEM_HEIGHT;
+    static qreal LIST_ITEM_MAX_WIDTH;
+    static qreal LIST_ITEM_CHILD_INDENT;
+
     Canvas *mCanvas;
     qreal mViewedTop = 0.;
     qreal mViewedBottom;
     MainWindow *mMainWindow;
+};
+#include <QPainter>
+class ChangeWidthWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    ChangeWidthWidget(BoxesList *boxesList, QWidget *parent = 0);
+
+    void updatePos();
+
+    void paintEvent(QPaintEvent *) {
+        QPainter p(this);
+        if(mouseGrabber() == this) {
+            p.fillRect(rect(), Qt::black);
+        }
+        p.end();
+    }
+
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+private:
+    int mPressX;
+    BoxesList *mBoxesList;
 };
 
 #endif // BOXESLIST_H

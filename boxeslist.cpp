@@ -5,6 +5,10 @@
 #include "mainwindow.h"
 #include "qrealkey.h"
 
+qreal BoxesList::LIST_ITEM_HEIGHT = 20;
+qreal BoxesList::LIST_ITEM_MAX_WIDTH = 250;
+qreal BoxesList::LIST_ITEM_CHILD_INDENT = 20;
+
 QPixmap *BoxesList::VISIBLE_PIXMAP;
 QPixmap *BoxesList::INVISIBLE_PIXMAP;
 QPixmap *BoxesList::HIDE_CHILDREN;
@@ -36,7 +40,7 @@ BoxesList::BoxesList(QWidget *parent) : QWidget(parent)
     mMainWindow = MainWindow::getInstance();
     mCanvas = mMainWindow->getCanvas();
 
-    setFixedWidth(LIST_ITEM_MAX_WIDTH);
+    setFixedWidth(BoxesList::getListItemMaxWidth());
     setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -47,8 +51,8 @@ void BoxesList::paintEvent(QPaintEvent *)
 
     p.setBrush(QColor(125, 125, 125));
     p.setPen(Qt::NoPen);
-    for(int i = LIST_ITEM_HEIGHT; i < height(); i += 2*LIST_ITEM_HEIGHT) {
-        p.drawRect(0, i, width(), LIST_ITEM_HEIGHT );
+    for(int i = BoxesList::getListItemHeight(); i < height(); i += 2*BoxesList::getListItemHeight()) {
+        p.drawRect(0, i, width(), BoxesList::getListItemHeight() );
     }
 
     p.setPen(QPen(Qt::black, 1.));
@@ -56,13 +60,13 @@ void BoxesList::paintEvent(QPaintEvent *)
     mCanvas->drawChildrenListItems(&p, 0., -mViewedTop, mViewedBottom);
 
     p.setPen(QPen(Qt::black, 1.) );
-    p.drawLine(LIST_ITEM_MAX_WIDTH - 1., 0, LIST_ITEM_MAX_WIDTH - 1., height());
+    p.drawLine(BoxesList::getListItemMaxWidth() - 1., 0, BoxesList::getListItemMaxWidth() - 1., height());
 
     if(hasFocus() ) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::red, 4.));
         p.drawRect(0, 0,
-                   LIST_ITEM_MAX_WIDTH, height());
+                   BoxesList::getListItemMaxWidth(), height());
     }
 
     p.end();
@@ -87,12 +91,12 @@ void BoxesList::translateViewed(qreal translateBy) {
 
 void BoxesList::handleWheelEvent(QWheelEvent *event) {
     if(event->delta() > 0) {
-        translateViewed(-LIST_ITEM_HEIGHT);
+        translateViewed(-BoxesList::getListItemHeight());
         if(mViewedTop < 0) {
             translateViewed(-mViewedTop);
         }
     } else {
-        translateViewed(LIST_ITEM_HEIGHT);
+        translateViewed(BoxesList::getListItemHeight());
     }
     repaint();
     mMainWindow->getKeysView()->repaint();
@@ -119,4 +123,31 @@ qreal BoxesList::getViewedTop() {
 
 qreal BoxesList::getViewedBottom() {
     return mViewedBottom;
+}
+
+ChangeWidthWidget::ChangeWidthWidget(BoxesList *boxesList, QWidget *parent) :
+    QWidget(parent) {
+    mBoxesList = boxesList;
+    setFixedWidth(10);
+    setFixedHeight(4000);
+    setCursor(Qt::SplitHCursor);
+}
+
+void ChangeWidthWidget::updatePos()
+{
+    move(mBoxesList->width() - 5, 0);
+}
+
+void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    int newWidth = mBoxesList->width() + event->x() - mPressX;
+    newWidth = qMax(200, newWidth);
+    BoxesList::setListItemMaxWidth(newWidth);
+    mBoxesList->setFixedWidth(newWidth);
+    updatePos();
+}
+
+void ChangeWidthWidget::mousePressEvent(QMouseEvent *event)
+{
+    mPressX = event->x();
 }
