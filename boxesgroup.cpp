@@ -129,6 +129,16 @@ void BoxesGroup::setSelectedFontSize(qreal size)
     finishUndoRedoSet();
 }
 
+void BoxesGroup::applyBlurToSelected() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new BlurEffect(10.));
+    }
+
+    finishUndoRedoSet();
+}
+
 void BoxesGroup::resetSelectedTranslation() {
     startNewUndoRedoSet();
 
@@ -829,6 +839,7 @@ void BoxesGroup::addBoxToSelection(BoundingBox *box) {
     mSelectedBoxes.append(box); schedulePivotUpdate();
     qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
     setCurrentFillStrokeSettingsFromBox(box);
+    mMainWindow->setCurrentShapesMenuBox(box);
 }
 
 void BoxesGroup::addPointToSelection(MovablePoint *point)

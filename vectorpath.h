@@ -16,6 +16,8 @@ enum CanvasMode : short;
 
 class Edge;
 
+class VectorShapesMenu;
+
 class VectorPath : public PathBox
 {
 public:
@@ -94,7 +96,15 @@ public:
     void deletePointAndApproximate(PathPoint *pointToRemove);
     virtual void loadFromSql(int boundingBoxId);
     void saveCurrentPathToShape(VectorPathShape *shape);
+    void addShapesToShapesMenu(VectorShapesMenu *menu);
+    VectorPathShape *createNewShape();
+    void removeShape(VectorPathShape *shape);
+    void editShape(VectorPathShape *shape);
+    void finishEditingShape(VectorPathShape *shape);
+    void cancelEditingShape();
 protected:
+    ComplexAnimator *mShapesAnimator = NULL;
+
     QList<VectorPathShape*> mShapes;
 
     bool mInfluenceEnabled = false;
@@ -113,6 +123,9 @@ protected:
     QList<PathPoint*> mPoints;
     QPainterPath mEditPath;
     void centerPivotPosition();
+
+    bool mShapesEnabled = false;
+    VectorPathShape *mCurrentEditedShape = NULL;
 };
 
 #endif // VECTORPATH_H

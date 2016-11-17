@@ -64,23 +64,7 @@ QRectF TextBox::getTextRect() {
 
 bool TextBox::absPointInsidePath(QPointF point)
 {
-    if(mPathText) {
-        return PathBox::absPointInsidePath(point);
-    } else {
-        QPainterPath mapped;
-        mapped.addRect(getTextRect());
-        mapped = mCombinedTransformMatrix.map(mapped);
-        return mapped.contains(point);
-    }
-}
-
-void TextBox::updateBoundingRect() {
-    if(mPathText) {
-        PathBox::updateBoundingRect();
-    } else {
-        mPixBoundingRect = mUpdateTransform.mapRect(getTextRect() );
-        updatePixBoundingRectClippedToView();
-    }
+    return PathBox::absPointInsidePath(point);
 }
 
 void TextBox::centerPivotPosition() {
@@ -103,33 +87,6 @@ void TextBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
     }
 }
 
-
-void TextBox::draw(QPainter *p)
-{
-    if(mPathText) {
-        PathBox::draw(p);
-    } else {
-        if(mVisible) {
-            p->save();
-
-            if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
-                p->setPen(QPen(QBrush(mDrawStrokeGradient), 1.));
-            } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
-                p->setPen(mStrokeSettings.getCurrentColor().qcol);
-            } else{
-                p->setPen(Qt::NoPen);
-            }
-
-            p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
-            p->setTransform(QTransform(mUpdateTransform), true);
-            p->setFont(mFont);
-            p->drawText(getTextRect(), mAlignment, mText);
-
-            p->restore();
-        }
-    }
-}
-
 #include <QApplication>
 #include <QDesktopWidget>
 
@@ -149,26 +106,26 @@ void TextBox::openTextEditor()
 void TextBox::setText(QString text)
 {
     mText = text;
-    schedulePathUpdateIfPathText();
+    schedulePathUpdate();
 }
 
 void TextBox::setFont(QFont font)
 {
     mFont = font;
-    schedulePathUpdateIfPathText();
+    schedulePathUpdate();
 }
 
 void TextBox::setFontSize(qreal size)
 {
     mFont.setPointSize(size);
-    schedulePathUpdateIfPathText();
+    schedulePathUpdate();
 }
 
 void TextBox::setFontFamilyAndStyle(QString fontFamily, QString fontStyle)
 {
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);
-    schedulePathUpdateIfPathText();
+    schedulePathUpdate();
 }
 
 MovablePoint *TextBox::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
@@ -195,39 +152,24 @@ qreal textForQPainterPath(Qt::Alignment alignment,
     }
 }
 
-void TextBox::setPathText(bool pathText) {
-    mPathText = pathText;
-    schedulePathUpdateIfPathText();
-}
-
-void TextBox::schedulePathUpdateIfPathText() {
-    if(mPathText) {
-        schedulePathUpdate();
-    }
-}
-
 void TextBox::updatePath()
 {
-    if(mPathText) {
-        mPath = QPainterPath();
+    mPath = QPainterPath();
 
-        QStringList lines = mText.split(QRegExp("\n|\r\n|\r"));
-        QFontMetricsF fm(mFont);
-        qreal yT = 0.;
-        qreal maxWidth = 0.;
-        foreach(QString line, lines) {
-            qreal lineWidth = fm.width(line);
-            if(lineWidth > maxWidth) maxWidth = lineWidth;
-        }
-        foreach(QString line, lines) {
-            qreal lineWidth = fm.width(line);
-            mPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth), yT,
-                          mFont, line);
-            yT += fm.height();
-        }
-
-        updateOutlinePath();
-    } else {
-        updateBoundingRect();
+    QStringList lines = mText.split(QRegExp("\n|\r\n|\r"));
+    QFontMetricsF fm(mFont);
+    qreal yT = 0.;
+    qreal maxWidth = 0.;
+    foreach(QString line, lines) {
+        qreal lineWidth = fm.width(line);
+        if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
+    foreach(QString line, lines) {
+        qreal lineWidth = fm.width(line);
+        mPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth), yT,
+                      mFont, line);
+        yT += fm.height();
+    }
+
+    updateOutlinePath();
 }

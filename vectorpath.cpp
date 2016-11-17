@@ -97,6 +97,67 @@ void VectorPath::loadPointsFromSql(int boundingBoxId) {
     }
 }
 
+#include "vectorshapesmenu.h"
+void VectorPath::addShapesToShapesMenu(VectorShapesMenu *menu) {
+    foreach(VectorPathShape *shape, mShapes) {
+        menu->addShapeWidgetForShape(shape);
+    }
+}
+
+VectorPathShape *VectorPath::createNewShape() {
+    mShapesEnabled = true;
+    if(mShapesAnimator == NULL) {
+        mShapesAnimator = new ComplexAnimator();
+        mShapesAnimator->setName("shapes");
+        mShapesAnimator->blockPointer();
+        addActiveAnimator(mShapesAnimator);
+    }
+
+    VectorPathShape *shape = new VectorPathShape();
+    shape->setName("shape " + QString::number(mShapes.count() + 1));
+
+    mShapesAnimator->addChildAnimator(shape->getInfluenceAnimator());
+
+    PathPointUpdater *updater = new PathPointUpdater(this);
+    shape->getInfluenceAnimator()->setUpdater(updater);
+
+    saveCurrentPathToShape(shape);
+    mShapes << shape;
+    return shape;
+}
+
+void VectorPath::removeShape(VectorPathShape *shape) {
+    mShapes.removeOne(shape);
+    foreach(PathPoint *point, mPoints) {
+        point->removeShapeValues(shape);
+    }
+    if(mShapes.isEmpty()) {
+        removeActiveAnimator(mShapesAnimator);
+        delete mShapesAnimator;
+        mShapesEnabled = false;
+    }
+    delete shape;
+    schedulePathUpdate();
+}
+
+void VectorPath::editShape(VectorPathShape *shape) {
+    foreach(PathPoint *point, mPoints) {
+        point->editShape(shape);
+    }
+}
+
+void VectorPath::finishEditingShape(VectorPathShape *shape) {
+    foreach(PathPoint *point, mPoints) {
+        point->finishEditingShape(shape);
+    }
+}
+
+void VectorPath::cancelEditingShape() {
+    foreach(PathPoint *point, mPoints) {
+        point->cancelEditingShape();
+    }
+}
+
 void VectorPath::saveCurrentPathToShape(VectorPathShape *shape) {
     foreach(PathPoint *point, mPoints) {
         point->savePointValuesToShapeValues(shape);
@@ -407,7 +468,7 @@ Edge *VectorPath::getEdgeFromEditPath(QPointF absPos)
 
 Edge *VectorPath::getEgde(QPointF absPos) {
     Edge *edgeT = NULL;
-    if(mInfluenceEnabled) {
+    if(mInfluenceEnabled || mShapesEnabled) {
         edgeT = getEdgeFromEditPath(absPos);
     }
     if(edgeT == NULL) {
@@ -474,7 +535,7 @@ void VectorPath::updatePath()
         point->clearInfluenceAdjustedPointValues();
     }
 
-    if(mInfluenceEnabled) {
+    if(mInfluenceEnabled || mShapesEnabled) {
         mEditPath = QPainterPath();
 
         bool moreNeeded = true;
@@ -494,12 +555,12 @@ void VectorPath::updatePath()
 
     foreach (PathPoint *firstPointInPath, mSeparatePaths) {
         PathPoint *point = firstPointInPath;
-        PathPointValues lastPointValues = point->getInfluenceAdjustedPointValues();
+        PathPointValues lastPointValues = point->getShapesInfluencedPointValues();//getInfluenceAdjustedPointValues();
         mPath.moveTo(lastPointValues.pointRelPos);
         while(true) {
             point = point->getNextPoint();
             if(point == NULL) break;
-            PathPointValues pointValues = point->getInfluenceAdjustedPointValues();
+            PathPointValues pointValues = point->getShapesInfluencedPointValues();//getInfluenceAdjustedPointValues();
 
             mPath.cubicTo(lastPointValues.endRelPos,
                           pointValues.startRelPos,
@@ -510,7 +571,7 @@ void VectorPath::updatePath()
             if(point == firstPointInPath) break;
         }
 
-        if(mInfluenceEnabled) {
+        if(mInfluenceEnabled || mShapesEnabled) {
             point = firstPointInPath;
             lastPointValues = point->getPointValues();
             mEditPath.moveTo(lastPointValues.pointRelPos);
@@ -644,7 +705,7 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
         p->save();
         //drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            if(mInfluenceEnabled) {
+            if(mInfluenceEnabled || mShapesEnabled) {
                 p->save();
                 p->setBrush(Qt::NoBrush);
                 p->setPen(QPen(Qt::blue, 1., Qt::DashLine) );

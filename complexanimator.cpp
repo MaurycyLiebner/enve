@@ -89,6 +89,11 @@ void ComplexAnimator::clearFromGraphView()
     }
 }
 
+bool ComplexAnimator::hasChildAnimators()
+{
+    return !mChildAnimators.isEmpty();
+}
+
 void ComplexAnimator::startTransform()
 {
     foreach(QrealAnimator *animator, mChildAnimators) {

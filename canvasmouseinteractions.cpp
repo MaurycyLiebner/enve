@@ -71,6 +71,9 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                     menu.addAction("Ungroup");
                     menu.addAction("Delete");
 
+                    QMenu *effectsMenu = menu.addMenu("Effects");
+                    effectsMenu->addAction("Blur");
+
                     QAction *selectedAction = menu.exec(event->globalPos());
                     if(selectedAction != NULL) {
                         if(selectedAction->text() == "Delete") {
@@ -81,6 +84,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                             mCurrentBoxesGroup->ungroupSelected();
                         } else if(selectedAction->text() == "Center Pivot") {
                             mCurrentBoxesGroup->centerPivotForSelected();
+                        } else if(selectedAction->text() == "Blur") {
+                            mCurrentBoxesGroup->applyBlurToSelected();
                         }
 
                         callUpdateSchedulers();

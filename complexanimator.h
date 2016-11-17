@@ -51,6 +51,8 @@ public:
     QString getValueText();
     void swapChildAnimators(QrealAnimator *animator1, QrealAnimator *animator2);
     void clearFromGraphView();
+
+    bool hasChildAnimators();
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

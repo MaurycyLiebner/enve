@@ -6,9 +6,6 @@ class TextBox : public PathBox
 {
 public:
     TextBox(BoxesGroup *parent);
-    //void draw(QPainter *p);
-
-    //QRectF getBoundingRect();
 
     void setText(QString text);
 
@@ -23,16 +20,12 @@ public:
     void loadFromSql(int boundingBoxId);
     void updatePath();
     MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
-    void schedulePathUpdateIfPathText();
-    void draw(QPainter *p);
     QRectF getTextRect();
     bool absPointInsidePath(QPointF point);
     void setPathText(bool pathText);
 
     void centerPivotPosition();
-    void updateBoundingRect();
 private:
-    bool mPathText = true;
     QString mText;
     QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;

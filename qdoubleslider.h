@@ -14,6 +14,8 @@ public:
     QDoubleSlider(QWidget *parent = 0);
     ~QDoubleSlider();
 
+    bool eventFilter(QObject *obj, QEvent *event);
+
     void setValueSliderVisibile(bool valueSliderVisible);
     void setNameVisible(bool nameVisible);
     void setName(QString name);
@@ -25,17 +27,21 @@ public:
     QString getValueString();
 
     void setValueRange(qreal min, qreal max);
+
+    virtual void paint(QPainter *p);
 protected:
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-    bool eventFilter(QObject *obj, QEvent *event);
+
+    virtual void emitValueChanged(qreal value);
+    virtual void emitEditingFinished(qreal value);
 signals:
     void valueChanged(qreal);
     void editingFinished(qreal);
 public slots:
-private:
+protected:
     int mDecimals = 3;
 
     QString mName;
@@ -52,7 +58,8 @@ private:
     qreal mPrefferedValueStep = 1.;
     void finishTextEditing();
 
-    qreal mPressX;
+    QPoint mGlobalPressPos;
+    int mPressX;
     qreal mPressValue;
     bool mShowValueSlider = true;
 private slots:

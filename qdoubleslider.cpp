@@ -99,6 +99,33 @@ void QDoubleSlider::setValueRange(qreal min, qreal max)
     fitWidthToContent();
 }
 
+void QDoubleSlider::paint(QPainter *p)
+{
+    p->fillRect(rect(), QColor(245, 245, 245));
+    if(!mTextEdit) {
+        if(mShowValueSlider) {
+            qreal valWidth = mValue*width()/(mMaxValue - mMinValue);
+            p->fillRect(QRectF(0., 0., valWidth, height()), QColor(255, 200, 200));
+        }
+        if(mShowName) {
+            p->drawText(rect(), Qt::AlignCenter, mName + ": " + getValueString());
+        } else {
+            p->drawText(rect(), Qt::AlignCenter, getValueString());
+        }
+    }
+    p->drawRect(rect().adjusted(0, 0, -1, -1));
+}
+
+void QDoubleSlider::emitValueChanged(qreal value)
+{
+    emit valueChanged(value);
+}
+
+void QDoubleSlider::emitEditingFinished(qreal value)
+{
+    emit editingFinished(value);
+}
+
 void QDoubleSlider::fitWidthToContent()
 {
     QFontMetrics fm = QFontMetrics(QFont());
@@ -121,19 +148,7 @@ void QDoubleSlider::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
 
-    p.fillRect(rect(), QColor(245, 245, 245));
-    if(!mTextEdit) {
-        if(mShowValueSlider) {
-            qreal valWidth = mValue*width()/(mMaxValue - mMinValue);
-            p.fillRect(QRectF(0., 0., valWidth, height()), QColor(255, 200, 200));
-        }
-        if(mShowName) {
-            p.drawText(rect(), Qt::AlignCenter, mName + ": " + getValueString());
-        } else {
-            p.drawText(rect(), Qt::AlignCenter, getValueString());
-        }
-    }
-    p.drawRect(rect().adjusted(0, 0, -1, -1));
+    paint(&p);
 
     p.end();
 }
@@ -144,7 +159,9 @@ void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event)
 
 void QDoubleSlider::mousePressEvent(QMouseEvent *event)
 {
+    setCursor(Qt::BlankCursor);
     mPressX = event->x();
+    mGlobalPressPos = event->globalPos();
     mPressValue = mValue;
 }
 
@@ -154,7 +171,10 @@ void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
     setValue(mPressValue + dValue);
     update();
 
-    emit valueChanged(mValue);
+    mPressValue = mValue;
+    cursor().setPos(mGlobalPressPos);
+
+    emitValueChanged(mValue);
 }
 
 #include <QApplication>
@@ -188,7 +208,8 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::MouseButtonRelease) {
         if(!mTextEdit) {
             if(mMouseMoved) {
-                emit editingFinished(mValue);
+                setCursor(Qt::ArrowCursor);
+                emitEditingFinished(mValue);
             } else {
                 updateLineEditFromValue();
                 mLineEdit->setCursor(Qt::IBeamCursor);
@@ -245,6 +266,6 @@ void QDoubleSlider::lineEditingFinished()
     setValue(text.toDouble());
     mLineEdit->releaseMouse();
 
-    emit valueChanged(mValue);
-    emit editingFinished(mValue);
+    emitValueChanged(mValue);
+    emitEditingFinished(mValue);
 }

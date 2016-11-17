@@ -123,7 +123,7 @@ public:
     virtual int saveToSql(int parentId);
 
     virtual PathPoint *createNewPointOnLineNear(QPointF, bool) { return NULL; }
-    bool isPath();
+    bool isVectorPath();
     void saveTransformPivot(QPointF absPivot);
 
     //
@@ -282,6 +282,7 @@ protected:
     BoxesGroup *mParent = NULL;
 
     AnimatorsCollection mAnimatorsCollection;
+    ComplexAnimator mEffectsAnimators;
 
     TransformAnimator mTransformAnimator;
 

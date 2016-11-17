@@ -267,6 +267,11 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(mCanvas);
 
     showMaximized();
+
+    QDockWidget *shapesMenuWidget = new QDockWidget(this);
+    mVectorShapesMenu = new VectorShapesMenu(this);
+    shapesMenuWidget->setWidget(mVectorShapesMenu);
+    addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
 }
 
 MainWindow::~MainWindow()
@@ -391,6 +396,11 @@ void MainWindow::callUpdateSchedulers()
     mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
+}
+
+void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
+    if(mVectorShapesMenu == NULL) return;
+    mVectorShapesMenu->setSelectedBoundingBox(box);
 }
 
 FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {

@@ -17,6 +17,7 @@ class PathPoint;
 class VectorPathShape {
 public:
     VectorPathShape() {
+        mInfluence.setValueRange(0., 1.);
         mInfluence.blockPointer();
         mInfluence.setName("influence");
     }
@@ -27,6 +28,7 @@ public:
 
     void setName(QString name) {
         mName = name;
+        mInfluence.setName(name);
     }
 
     bool isRelative() {
@@ -45,8 +47,11 @@ public:
         mInfluence.setCurrentValue(value, finish);
     }
 
+    QrealAnimator *getInfluenceAnimator() {
+        return &mInfluence;
+    }
 private:
-    bool mRelative;
+    bool mRelative = false;
     QString mName;
     QrealAnimator mInfluence;
 };
@@ -304,8 +309,18 @@ public:
     void loadFromSql(int pathPointId, int movablePointId);
     QPointF getInfluenceRelativePos();
     PathPointValues getShapesInfluencedPointValues() const;
+    void removeShapeValues(VectorPathShape *shape);
+
+    void setPointValues(const PathPointValues &values);
+
+    void editShape(VectorPathShape *shape);
+    void finishEditingShape(VectorPathShape *shape);
+    void cancelEditingShape();
 private:
-    QList<PointShapeValues> mShapeValues;
+    QList<PointShapeValues*> mShapeValues;
+
+    bool mEditingShape = true;
+    PathPointValues mBasisShapeSavedValues;
 
     bool mStartExternalInfluence = false;
     QPointF mStartAdjustedForExternalInfluence;

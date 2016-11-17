@@ -188,6 +188,7 @@ public:
     void resetSelectedTranslation();
     void resetSelectedRotation();
     void convertSelectedBoxesToPath();
+    void applyBlurToSelected();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

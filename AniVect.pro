@@ -77,7 +77,9 @@ SOURCES += main.cpp\
     pixmapeffect.cpp \
     valuenoise.cpp \
     vectorshapesmenu.cpp \
-    qdoubleslider.cpp
+    qdoubleslider.cpp \
+    qrealanimatorvalueslider.cpp \
+    vectorshapeswidget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -140,4 +142,6 @@ HEADERS  += mainwindow.h \
     pixmapeffect.h \
     valuenoise.h \
     vectorshapesmenu.h \
-    qdoubleslider.h
+    qdoubleslider.h \
+    qrealanimatorvalueslider.h \
+    vectorshapeswidget.h

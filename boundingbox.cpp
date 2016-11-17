@@ -9,6 +9,8 @@
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     Transformable()
 {
+    mEffectsAnimators.blockPointer();
+    mEffectsAnimators.setName("Effects");
     addActiveAnimator(&mTransformAnimator);
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
     mTransformAnimator.blockPointer();
@@ -259,7 +261,7 @@ bool BoundingBox::isGroup() {
     return mType == TYPE_GROUP;
 }
 
-bool BoundingBox::isPath() {
+bool BoundingBox::isVectorPath() {
     return mType == TYPE_VECTOR_PATH;
 }
 

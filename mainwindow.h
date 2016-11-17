@@ -11,6 +11,7 @@
 #include "animationdockwidget.h"
 #include "keysview.h"
 #include "fontswidget.h"
+#include "vectorshapesmenu.h"
 
 class PaintControler;
 
@@ -96,6 +97,8 @@ private:
     bool mShiftPressed = false;
     bool mAltPressed = false;
     bool mCtrlPressed = false;
+
+    VectorShapesMenu *mVectorShapesMenu = NULL;
 protected:    
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -154,6 +157,7 @@ public:
     void updateCanvasModeButtonsChecked(CanvasMode currentMode);
 
     void addBoxAwaitingUpdate(BoundingBox *box);
+    void setCurrentShapesMenuBox(BoundingBox *box);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);
