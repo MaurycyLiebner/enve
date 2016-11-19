@@ -79,7 +79,8 @@ SOURCES += main.cpp\
     vectorshapesmenu.cpp \
     qdoubleslider.cpp \
     qrealanimatorvalueslider.cpp \
-    vectorshapeswidget.cpp
+    vectorshapeswidget.cpp \
+    renderoutputwidget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -144,4 +145,5 @@ HEADERS  += mainwindow.h \
     vectorshapesmenu.h \
     qdoubleslider.h \
     qrealanimatorvalueslider.h \
-    vectorshapeswidget.h
+    vectorshapeswidget.h \
+    renderoutputwidget.h

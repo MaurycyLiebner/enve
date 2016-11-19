@@ -108,6 +108,7 @@ void BoundingBox::getKeysInRect(QRectF selectionRect,
 }
 
 void BoundingBox::addEffect(PixmapEffect *effect) {
+    effect->setUpdater(new PixmapEffectUpdater(this));
     effect->incNumberPointers();
     mEffects << effect;
 

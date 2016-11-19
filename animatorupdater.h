@@ -84,4 +84,14 @@ private:
     Rectangle *mTarget;
 };
 
+class PixmapEffectUpdater : public AnimatorUpdater
+{
+public:
+    PixmapEffectUpdater(BoundingBox *target);
+
+    void update();
+private:
+    BoundingBox *mTarget;
+};
+
 #endif // ANIMATORUPDATER_H

@@ -10,7 +10,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     Transformable()
 {
     mEffectsAnimators.blockPointer();
-    mEffectsAnimators.setName("Effects");
+    mEffectsAnimators.setName("effects");
     addActiveAnimator(&mTransformAnimator);
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
     mTransformAnimator.blockPointer();
@@ -33,12 +33,12 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
     mCombinedTransformMatrix.reset();
 }
 
-QPixmap BoundingBox::applyEffects(const QPixmap& pixmap) {
+QPixmap BoundingBox::applyEffects(const QPixmap& pixmap, qreal scale) {
     if(mEffects.isEmpty() ) return pixmap;
     QImage im = pixmap.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);;
     fmt_filters::image img(im.bits(), im.width(), im.height());
     foreach(PixmapEffect *effect, mEffects) {
-        effect->apply(img);
+        effect->apply(img, scale);
     }
     return QPixmap::fromImage(im);
 }
@@ -101,18 +101,20 @@ void BoundingBox::updateUpdateTransform() {
 void BoundingBox::setAwaitingUpdate(bool bT) {
     mAwaitingUpdate = bT;
     if(bT) {
-        mOldPixmap = mNewPixmap;
-        mOldPixBoundingRect = mPixBoundingRectClippedToView;
-        mOldTransform = mUpdateTransform;
+        updateUpdateTransform();
+    } else {
+        afterSuccessfulUpdate();
+
+        if(mHighQualityPaint) {
+            mOldPixmap = mNewPixmap;
+            mOldPixBoundingRect = mPixBoundingRectClippedToView;
+            mOldTransform = mUpdateTransform;
+        }
 
         mOldAllUglyPixmap = mAllUglyPixmap;
         mOldAllUglyBoundingRect = mAllUglyBoundingRect;
         mOldAllUglyTransform = mAllUglyTransform;
-
-        updateUpdateTransform();
         updateUglyPaintTransform();
-    } else {
-        afterSuccessfulUpdate();
     }
 }
 
@@ -133,7 +135,7 @@ void BoundingBox::updatePrettyPixmap() {
     draw(&p);
     p.end();
 
-    mNewPixmap = applyEffects(mNewPixmap);
+    mNewPixmap = applyEffects(mNewPixmap, mUpdateCanvasTransform.m11());
 }
 
 void BoundingBox::updateAllUglyPixmap() {
@@ -170,8 +172,9 @@ void BoundingBox::redoUpdate() {
 void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
     p->setCompositionMode(mCompositionMode);
-    if(mAwaitingUpdate) {
-        bool paintOld = mUglyPaintTransform.m11() < mOldAllUglyPaintTransform.m11();
+    if(mAwaitingUpdate || !mHighQualityPaint) {
+        bool paintOld = mUglyPaintTransform.m11() < mOldAllUglyPaintTransform.m11()
+                && mHighQualityPaint;
 
         if(paintOld) {
             p->save();
@@ -195,7 +198,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
             p->setTransform(QTransform(mUglyPaintTransform), true);
             p->drawPixmap(mOldPixBoundingRect.topLeft(), mOldPixmap);
         }
-    } else {
+    } else if(mHighQualityPaint) {
         p->drawPixmap(mPixBoundingRectClippedToView.topLeft(), mNewPixmap);
     }
 
@@ -225,6 +228,28 @@ void BoundingBox::setCompositionMode(QPainter::CompositionMode compositionMode)
 {
     mCompositionMode = compositionMode;
     scheduleAwaitUpdate();
+}
+
+void BoundingBox::updateEffectsMarginIfNeeded() {
+    if(mEffectsMarginUpdateNeeded) {
+        mEffectsMarginUpdateNeeded = false;
+        updateEffectsMargin();
+    }
+}
+
+void BoundingBox::updateEffectsMargin() {
+    qreal newMargin = 0.;
+    foreach(PixmapEffect *effect, mEffects) {
+        qreal effectMargin = effect->getMargin();
+        if(effectMargin > newMargin) newMargin = effectMargin;
+    }
+
+    mEffectsMargin = newMargin;
+}
+
+void BoundingBox::scheduleEffectsMarginUpdate() {
+    scheduleAwaitUpdate();
+    mEffectsMarginUpdateNeeded = true;
 }
 
 void BoundingBox::resetScale() {
@@ -414,10 +439,6 @@ void BoundingBox::setRelativePos(QPointF relPos, bool saveUndoRedo) {
     mTransformAnimator.setPosition(relPos.x(), relPos.y() );
 }
 
-void BoundingBox::setRenderCombinedTransform() {
-    mCombinedTransformMatrix = getCombinedRenderTransform();
-}
-
 void BoundingBox::saveTransformPivot(QPointF absPivot) {
     mSavedTransformPivot =
             mParent->mapAbsPosToRel(absPivot) -
@@ -520,4 +541,10 @@ QMatrix BoundingBox::getCombinedRenderTransform() {
     if(mParent == NULL) return QMatrix();
     return mTransformAnimator.getCurrentValue()*
             mParent->getCombinedRenderTransform();
+}
+
+QMatrix BoundingBox::getCombinedFinalRenderTransform() {
+    if(mParent == NULL) return QMatrix();
+    return mTransformAnimator.getCurrentValue()*
+            mParent->getCombinedFinalRenderTransform();
 }

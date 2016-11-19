@@ -13,11 +13,16 @@ BlurEffect::BlurEffect(qreal radius) {
     addChildAnimator(&mBlurRadius);
 }
 
-void BlurEffect::apply(const fmt_filters::image &img) {
-    qreal radius = mBlurRadius.getCurrentValue();
+void BlurEffect::apply(const fmt_filters::image &img, qreal scale) {
+    qreal radius = mBlurRadius.getCurrentValue()*scale;
     fmt_filters::blur(img, radius, radius*0.3333);
 }
 
 void BlurEffect::setRadius(qreal radius) {
     mBlurRadius.setCurrentValue(radius);
+}
+
+qreal BlurEffect::getMargin()
+{
+    return mBlurRadius.getCurrentValue();
 }

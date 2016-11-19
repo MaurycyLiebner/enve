@@ -187,6 +187,8 @@ public:
     void afterSuccessfulUpdate();
 
     void updateUpdateTransform();
+    void render(QPainter *p);
+    void renderFinal(QPainter *p);
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

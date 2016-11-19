@@ -117,12 +117,18 @@ void PathBox::updatePrettyPixmap() {
         updateUpdateTransform();
     }
 
+    updateEffectsMarginIfNeeded();
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
     updateBoundingRect();
 
     BoundingBox::updateAllUglyPixmap();
-    BoundingBox::updatePrettyPixmap();
+    if(mMainWindow->getCanvas()->highQualityPaint()) {
+        BoundingBox::updatePrettyPixmap();
+        mHighQualityPaint = true;
+    } else {
+        mHighQualityPaint = false;
+    }
 }
 
 void PathBox::schedulePathUpdate()
@@ -245,7 +251,8 @@ void PathBox::updateUpdateTransform()
 }
 
 void PathBox::updateBoundingRect() {
-    QRectF relBoundingRect = mWholePath.boundingRect();
+    QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
+                                                                mEffectsMargin, mEffectsMargin);
     mPixBoundingRect = mUpdateTransform.mapRect(relBoundingRect);
     mBoundingRect = QPainterPath();
     mBoundingRect.addRect(relBoundingRect);
@@ -256,6 +263,48 @@ void PathBox::updateBoundingRect() {
 QRectF PathBox::getPixBoundingRect()
 {
     return mPixBoundingRect;
+}
+
+void PathBox::render(QPainter *p) {
+    p->save();
+
+    p->setTransform(QTransform(getCombinedRenderTransform()), true);
+    draw(p);
+
+    p->restore();
+}
+
+void PathBox::renderFinal(QPainter *p) {
+    p->save();
+
+    if(mEffects.isEmpty() ) {
+        p->setTransform(QTransform(getCombinedFinalRenderTransform()), false);
+        draw(p);
+    } else {
+        QMatrix renderTransform = getCombinedFinalRenderTransform();
+        QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
+                                                                    mEffectsMargin, mEffectsMargin);
+        QRectF pixBoundingRect = renderTransform.mapRect(relBoundingRect);
+
+        QSizeF sizeF = pixBoundingRect.size();
+        QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
+                                             ceil(sizeF.height())) );
+        renderPixmap.fill(Qt::transparent);
+
+        QPainter pixP(&renderPixmap);
+        pixP.setRenderHint(QPainter::Antialiasing);
+        pixP.translate(-pixBoundingRect.topLeft());
+        pixP.setTransform(QTransform(renderTransform), true);
+
+        draw(&pixP);
+        pixP.end();
+
+        renderPixmap = applyEffects(renderPixmap);
+
+        p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
+    }
+
+    p->restore();
 }
 
 void PathBox::draw(QPainter *p)

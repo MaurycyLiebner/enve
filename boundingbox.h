@@ -60,6 +60,7 @@ public:
 
     virtual void drawPixmap(QPainter *p);
     virtual void render(QPainter *) {}
+    virtual void renderFinal(QPainter *) {}
     virtual void draw(QPainter *) {}
     virtual void drawSelected(QPainter *, CanvasMode) {}
 
@@ -193,7 +194,6 @@ public:
     }
     void setAbsolutePos(QPointF pos, bool saveUndoRedo);
     void setRelativePos(QPointF relPos, bool saveUndoRedo);
-    virtual void setRenderCombinedTransform();
 
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
     virtual void drawKeysView(QPainter *p, qreal drawY, qreal maxY,
@@ -240,11 +240,21 @@ public:
     void setAwaitUpdateScheduled(bool bT);
 
     void setCompositionMode(QPainter::CompositionMode compositionMode);
+
+    void updateEffectsMargin();
+
+    void scheduleEffectsMarginUpdate();
+    void updateEffectsMarginIfNeeded();
+    virtual QMatrix getCombinedFinalRenderTransform();
 protected:
+    bool mHighQualityPaint = false;
+    bool mEffectsMarginUpdateNeeded = false;
+    qreal mEffectsMargin = 0.;
+
     bool mAwaitUpdateScheduled = false;
 
     virtual void updateAfterCombinedTransformationChanged() {}
-    QPixmap applyEffects(const QPixmap &pixmap);
+    QPixmap applyEffects(const QPixmap &pixmap, qreal scale = 1.);
 
     QMatrix mAllUglyTransform;
     QMatrix mAllUglyPaintTransform;

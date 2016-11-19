@@ -73,6 +73,7 @@ private:
     QMenu *mPathMenu;
     QMenu *mEffectsMenu;
     QMenu *mViewMenu;
+    QMenu *mRenderMenu;
 
     Canvas *mCanvas;
     UndoRedoStack mUndoRedoStack;
@@ -165,6 +166,8 @@ public slots:
     void playPreview();
     void stopPreview();
 private slots:
+    void saveOutput(QString renderDest);
+    void renderOutput();
     void sendNextBoxForUpdate();
 
     void newFile();

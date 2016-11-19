@@ -15,7 +15,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     QWidget(parent),
     BoxesGroup(fillStrokeSettings)
 {
-    setAttribute(Qt::WA_OpaquePaintEvent);
+    setAttribute(Qt::WA_OpaquePaintEvent, true);
 
     mBoxListItemDetailsVisible = true;
     incNumberPointers();
@@ -40,6 +40,19 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 Canvas::~Canvas()
 {
     delete mRotPivot;
+}
+
+void Canvas::enableHighQualityPaint() {
+    mHighQualityPaint = true;
+}
+
+void Canvas::disableHighQualityPaint() {
+    mHighQualityPaint = false;
+}
+
+
+bool Canvas::highQualityPaint() {
+    return mHighQualityPaint;
 }
 
 void Canvas::updateDisplayedFillStrokeSettings() {
@@ -214,7 +227,7 @@ void Canvas::paintEvent(QPaintEvent *)
         p.setPen(Qt::NoPen);
         p.drawPath(path.subtracted(viewRectPath));
 
-        p.drawImage(absPos, *mCurrentPreviewImg);
+        p.drawImage(mRenderRect.topLeft(), *mCurrentPreviewImg);
     } else if(mFullRepaint) {
         p.fillRect(0, 0, width() + 1, height() + 1, QColor(75, 75, 75));
         p.fillRect(viewRect, Qt::white);
@@ -283,6 +296,7 @@ QSize Canvas::getCanvasSize()
 
 void Canvas::playPreview()
 {
+    setAttribute(Qt::WA_OpaquePaintEvent, false);
     if(mPreviewFrames.isEmpty() ) return;
     mCurrentPreviewFrameId = 0;
     mCurrentPreviewImg = mPreviewFrames.first();
@@ -301,6 +315,8 @@ void Canvas::clearPreview() {
         }
         mPreviewFrames.clear();
         mMainWindow->previewFinished();
+
+        setAttribute(Qt::WA_OpaquePaintEvent, true);
     }
 }
 
@@ -340,22 +356,49 @@ void Canvas::objectsToPathAction()
     mCurrentBoxesGroup->convertSelectedBoxesToPath();
 }
 
+void Canvas::updateRenderRect() {
+    mRenderRect = QRectF(qMax(mCombinedTransformMatrix.dx(), 0.),
+                         qMax(mCombinedTransformMatrix.dy(), 0.),
+                         qMin(mVisibleWidth, (qreal)width()),
+                         qMin(mVisibleHeight, (qreal)height()));
+}
+
 void Canvas::renderCurrentFrameToPreview()
 {
-    QImage *image = new QImage(mVisibleWidth, mVisibleHeight,
+    QImage *image = new QImage(mRenderRect.size().toSize(),
                                QImage::Format_ARGB32);
     image->fill(Qt::transparent);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
 }
 
+void Canvas::renderCurrentFrameToOutput(QString renderDest)
+{
+    QImage *image = new QImage(mWidth, mHeight,
+                               QImage::Format_ARGB32);
+    image->fill(Qt::transparent);
+    renderFinalCurrentFrameToQImage(image);
+    image->save(renderDest + QString::number(getCurrentFrame()) + ".png");
+    delete image;
+}
+
 void Canvas::renderCurrentFrameToQImage(QImage *frame)
+{
+    QPainter p(frame);
+    p.translate(getAbsolutePos() - mRenderRect.topLeft());
+    p.setRenderHint(QPainter::Antialiasing);
+
+    BoxesGroup::render(&p);
+
+    p.end();
+}
+
+void Canvas::renderFinalCurrentFrameToQImage(QImage *frame)
 {
     QPainter p(frame);
     p.setRenderHint(QPainter::Antialiasing);
 
-    setChildrenRenderCombinedTransform();
-    BoxesGroup::draw(&p);
+    BoxesGroup::renderFinal(&p);
 
     p.end();
 }
@@ -366,6 +409,11 @@ QMatrix Canvas::getCombinedRenderTransform()
     matrix.scale(mCombinedTransformMatrix.m11(),
                  mCombinedTransformMatrix.m22() );
     return matrix;
+}
+
+QMatrix Canvas::getCombinedFinalRenderTransform()
+{
+    return QMatrix();
 }
 
 void Canvas::schedulePivotUpdate()

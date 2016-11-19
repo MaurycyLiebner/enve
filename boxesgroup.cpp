@@ -209,17 +209,6 @@ void BoxesGroup::updateAfterFrameChanged(int currentFrame)
     }
 }
 
-void BoxesGroup::setChildrenRenderCombinedTransform() {
-    foreach(BoundingBox *box, mChildren) {
-        box->setRenderCombinedTransform();
-    }
-}
-
-void BoxesGroup::setRenderCombinedTransform() {
-    BoundingBox::setRenderCombinedTransform();
-    setChildrenRenderCombinedTransform();
-}
-
 void BoxesGroup::clearPointsSelectionOrDeselect() {
     if(mSelectedPoints.isEmpty() ) {
         deselectAllBoxes();
@@ -478,6 +467,20 @@ void BoxesGroup::render(QPainter *p)
         p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
         foreach(BoundingBox *box, mChildren){
             box->render(p);
+        }
+
+        p->restore();
+    }
+}
+
+void BoxesGroup::renderFinal(QPainter *p)
+{
+    if(mVisible) {
+        p->save();
+
+        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
+        foreach(BoundingBox *box, mChildren){
+            box->renderFinal(p);
         }
 
         p->restore();

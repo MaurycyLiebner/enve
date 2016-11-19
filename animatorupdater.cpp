@@ -67,3 +67,13 @@ void RectangleBottomRightUpdater::update()
 {
     mTarget->updateRadiusXAndRange();
 }
+
+PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target)
+{
+    mTarget = target;
+}
+
+void PixmapEffectUpdater::update()
+{
+    mTarget->scheduleEffectsMarginUpdate();
+}

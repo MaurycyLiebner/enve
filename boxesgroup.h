@@ -164,8 +164,7 @@ public:
     void clearPointsSelectionOrDeselect();
     Edge *getPressedEdge(QPointF absPos);
     void setDisplayedFillStrokeSettingsFromLastSelected();
-    void setRenderCombinedTransform();
-    void setChildrenRenderCombinedTransform();
+
     void drawChildrenKeysView(QPainter *p,
                               qreal drawY, qreal maxY,
                               qreal pixelsPerFrame,
@@ -189,6 +188,7 @@ public:
     void resetSelectedRotation();
     void convertSelectedBoxesToPath();
     void applyBlurToSelected();
+    void renderFinal(QPainter *p);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

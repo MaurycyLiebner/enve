@@ -15,6 +15,7 @@
 #include "boxeslistanimationdockwidget.h"
 #include "paintcontroler.h"
 #include "qdoubleslider.h"
+#include "renderoutputwidget.h"
 
 MainWindow *MainWindow::mMainWindowInstance;
 
@@ -261,6 +262,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     mEffectsMenu->addAction("Blur");
 
+    mRenderMenu = mMenuBar->addMenu("Render");
+    mRenderMenu->addAction("Render", this, SLOT(renderOutput()));
+
     setMenuBar(mMenuBar);
 //
 
@@ -331,6 +335,7 @@ void MainWindow::playPreview()
 {
     mCanvas->clearPreview();
     mSavedCurrentFrame = mCurrentFrame;
+    mCanvas->updateRenderRect();
     for(int i = mSavedCurrentFrame; i <= mMaxFrame; i++) {
         mBoxesListAnimationDockWidget->setCurrentFrame(i);
         mCanvas->renderCurrentFrameToPreview();
@@ -340,6 +345,16 @@ void MainWindow::playPreview()
     mCanvas->playPreview();
 }
 
+void MainWindow::saveOutput(QString renderDest)
+{
+    mSavedCurrentFrame = mCurrentFrame;
+    for(int i = mMinFrame; i <= mMaxFrame; i++) {
+        mBoxesListAnimationDockWidget->setCurrentFrame(i);
+        mCanvas->renderCurrentFrameToOutput(renderDest);
+    }
+    mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+}
+
 void MainWindow::previewFinished() {
     mBoxesListAnimationDockWidget->previewFinished();
 }
@@ -347,6 +362,13 @@ void MainWindow::previewFinished() {
 void MainWindow::stopPreview() {
     mCanvas->clearPreview();
     mCanvas->repaint();
+}
+
+void MainWindow::renderOutput()
+{
+    RenderOutputWidget *dialog = new RenderOutputWidget(this);
+    connect(dialog, SIGNAL(render(QString)), this, SLOT(saveOutput(QString)));
+    dialog->exec();
 }
 
 UndoRedoStack *MainWindow::getUndoRedoStack()

@@ -1007,7 +1007,8 @@ void blur(const image &im, double radius, double sigma)
     for(x = 0;x < im.w;++x)
     {
         for(y = 0;y < im.h;++y)
-            scanline[y] = *(bits + im.rw*y + x);
+            scanline[y] = *(dest + im.rw*y + x);
+            //scanline[y] = *(bits + im.rw*y + x);
 
         blurScanLine(kernel, width, scanline, temp, im.h);
 

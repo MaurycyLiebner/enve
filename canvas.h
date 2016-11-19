@@ -206,6 +206,7 @@ public:
     void updateAfterFrameChanged(int currentFrame);
 
     void renderCurrentFrameToQImage(QImage *frame);
+    void renderFinalCurrentFrameToQImage(QImage *frame);
 
     QSize getCanvasSize();
 
@@ -289,6 +290,12 @@ public:
     void repaintPartially();
     void makePartialRepaintInclude(QPointF pointToInclude);
     void partialRepaintRectToPoint(QPointF point);
+    void enableHighQualityPaint();
+    void disableHighQualityPaint();
+    bool highQualityPaint();
+    void updateRenderRect();
+    QMatrix getCombinedFinalRenderTransform();
+    void renderCurrentFrameToOutput(QString renderDest);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -364,6 +371,8 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    QRectF mRenderRect;
+
     QRectF mPartialRepaintRect;
     bool mFullRepaint = true;
     Circle *mCurrentCircle = NULL;
