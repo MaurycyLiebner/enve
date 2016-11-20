@@ -91,7 +91,7 @@ void BrushEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal sca
             ctrls.setY(2);
         }
         QColor strokeColor = imgPtr->pixelColor(startPos.toPoint());
-        strokeColor.setHslF(strokeColor.hueF() + 0.01*(qrand() % 10 - 5),
+        strokeColor.setHslF(qclamp(strokeColor.hueF() + 0.01*(qrand() % 10 - 5), 0., 1.),
                             strokeColor.saturationF(),
                             strokeColor.lightnessF(),
                             strokeColor.alphaF());
@@ -159,11 +159,15 @@ void BrushStroke::drawOnImage(QImage *img) const {
     p.end();
 }
 
-QColor colorMix(QColor col1, QColor col2, qreal col1Infl) {
-    return QColor(col1.red()*col1Infl + col2.red()*(1. - col1Infl),
-                  col1.green()*col1Infl + col2.green()*(1. - col1Infl),
-                  col1.blue()*col1Infl + col2.blue()*(1. - col1Infl),
-                  col1.alpha()*col1Infl + col2.alpha()*(1. - col1Infl) );
+QColor colorMix(QColor col1, QColor col2) {
+    qreal a1 = col1.alphaF();
+    qreal a2 = col2.alphaF();
+    qreal aSum = a1 + a2;
+    if(aSum < 0.001) return QColor(Qt::transparent);
+    return QColor((col1.red()*a1 + col2.red()*a2)/aSum,
+                  (col1.green()*a1 + col2.green()*a2)/aSum,
+                  (col1.blue()*a1 + col2.blue()*a2)/aSum,
+                  qMin(a1, a2)*255);
 }
 
 void BrushStroke::prepareToDrawOnImage(QImage *img)
@@ -180,7 +184,7 @@ void BrushStroke::prepareToDrawOnImage(QImage *img)
     QLinearGradient gradient = QLinearGradient(0., 0., dabsWidth, 0.);
     //gradient.setColorAt(0., mColor);
     for(qreal xTex = 0; xTex < dabsWidth; xTex += mRadius) {
-        QColor col = colorMix(img->pixelColor(mStrokePath.pointAtPercent(mStrokePath.percentAtLength(xTex)).toPoint() ), mColor, 0.5);
+        QColor col = colorMix(img->pixelColor(mStrokePath.pointAtPercent(mStrokePath.percentAtLength(xTex)).toPoint() ), mColor);
         gradient.setColorAt((xTex /*+ mRadius*/)/dabsWidth, col);
     }
 
