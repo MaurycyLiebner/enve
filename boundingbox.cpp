@@ -38,7 +38,7 @@ QPixmap BoundingBox::applyEffects(const QPixmap& pixmap, qreal scale) {
     QImage im = pixmap.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);;
     fmt_filters::image img(im.bits(), im.width(), im.height());
     foreach(PixmapEffect *effect, mEffects) {
-        effect->apply(img, scale);
+        effect->apply(&im, img, scale);
     }
     return QPixmap::fromImage(im);
 }

@@ -16,6 +16,8 @@ VectorPath::VectorPath(BoxesGroup *group) :
     mAnimatorsCollection.addAnimator(&mPathAnimator);
 
     mPathAnimator.blockPointer();
+
+    addEffect(new BrushEffect(25., 25.));
 }
 
 #include <QSqlError>
