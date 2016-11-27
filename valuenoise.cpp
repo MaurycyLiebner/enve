@@ -1,11 +1,6 @@
 #include "valuenoise.h"
 #include "mainwindow.h"
-
-qreal qRandF(qreal fMin, qreal fMax)
-{
-    qreal f = (qreal)qrand() / RAND_MAX;
-    return fMin + f * (fMax - fMin);
-}
+#include "pointhelpers.h"
 
 ValueNoise::ValueNoise()
 {

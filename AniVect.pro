@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg opengl sql
+QT       += core gui svg opengl sql xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -80,7 +80,10 @@ SOURCES += main.cpp\
     qdoubleslider.cpp \
     qrealanimatorvalueslider.cpp \
     vectorshapeswidget.cpp \
-    renderoutputwidget.cpp
+    renderoutputwidget.cpp \
+    intanimator.cpp \
+    boolanimator.cpp \
+    qstringanimator.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -146,4 +149,7 @@ HEADERS  += mainwindow.h \
     qdoubleslider.h \
     qrealanimatorvalueslider.h \
     vectorshapeswidget.h \
-    renderoutputwidget.h
+    renderoutputwidget.h \
+    intanimator.h \
+    boolanimator.h \
+    qstringanimator.h

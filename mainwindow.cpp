@@ -16,6 +16,7 @@
 #include "paintcontroler.h"
 #include "qdoubleslider.h"
 #include "renderoutputwidget.h"
+#include "svgimporter.h"
 
 MainWindow *MainWindow::mMainWindowInstance;
 
@@ -276,6 +277,8 @@ MainWindow::MainWindow(QWidget *parent)
     mVectorShapesMenu = new VectorShapesMenu(this);
     shapesMenuWidget->setWidget(mVectorShapesMenu);
     addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
+
+    loadSVGFile("/home/ailuropoda/example_svg.svg", mCanvas);
 }
 
 MainWindow::~MainWindow()

@@ -268,8 +268,32 @@ QRectF PathBox::getPixBoundingRect()
 void PathBox::render(QPainter *p) {
     p->save();
 
-    p->setTransform(QTransform(getCombinedRenderTransform()), true);
-    draw(p);
+    if(mEffects.isEmpty() ) {
+        p->setTransform(QTransform(getCombinedRenderTransform()), false);
+        draw(p);
+    } else {
+        QMatrix renderTransform = getCombinedRenderTransform();
+        QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
+                                                                    mEffectsMargin, mEffectsMargin);
+        QRectF pixBoundingRect = renderTransform.mapRect(relBoundingRect);
+
+        QSizeF sizeF = pixBoundingRect.size();
+        QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
+                                             ceil(sizeF.height())) );
+        renderPixmap.fill(Qt::transparent);
+
+        QPainter pixP(&renderPixmap);
+        pixP.setRenderHint(QPainter::Antialiasing);
+        pixP.translate(-pixBoundingRect.topLeft());
+        pixP.setTransform(QTransform(renderTransform), true);
+
+        draw(&pixP);
+        pixP.end();
+
+        renderPixmap = applyEffects(renderPixmap);
+
+        p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
+    }
 
     p->restore();
 }

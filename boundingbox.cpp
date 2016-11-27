@@ -267,6 +267,7 @@ void BoundingBox::resetRotation() {
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
     mTransformAnimator.setFrame(currentFrame);
     mAnimatorsCollection.setFrame(currentFrame);
+    mEffectsAnimators.setFrame(currentFrame);
 }
 
 void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {

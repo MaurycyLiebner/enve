@@ -9,6 +9,8 @@ enum CtrlsMode {
     CTRLS_CORNER
 };
 
+extern qreal qRandF(qreal fMin, qreal fMax);
+
 extern QPointF symmetricToPos(QPointF toMirror, QPointF mirrorCenter);
 extern QPointF symmetricToPosNewLen(QPointF toMirror, QPointF mirrorCenter,
                                     qreal newLen);

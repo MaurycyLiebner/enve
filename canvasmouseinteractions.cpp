@@ -73,6 +73,9 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
                     QMenu *effectsMenu = menu.addMenu("Effects");
                     effectsMenu->addAction("Blur");
+                    effectsMenu->addAction("Brush");
+                    effectsMenu->addAction("Lines");
+                    effectsMenu->addAction("Circles");
 
                     QAction *selectedAction = menu.exec(event->globalPos());
                     if(selectedAction != NULL) {
@@ -86,6 +89,12 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                             mCurrentBoxesGroup->centerPivotForSelected();
                         } else if(selectedAction->text() == "Blur") {
                             mCurrentBoxesGroup->applyBlurToSelected();
+                        } else if(selectedAction->text() == "Brush") {
+                            mCurrentBoxesGroup->applyBrushEffectToSelected();
+                        } else if(selectedAction->text() == "Lines") {
+                            mCurrentBoxesGroup->applyLinesEffectToSelected();
+                        } else if(selectedAction->text() == "Circles") {
+                            mCurrentBoxesGroup->applyCirclesEffectToSelected();
                         }
 
                         callUpdateSchedulers();

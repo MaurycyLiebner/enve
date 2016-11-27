@@ -9,13 +9,14 @@ public:
     PixmapEffect();
     virtual void apply(QImage *imgPtr,
                        const fmt_filters::image &img, qreal scale = 1.) {}
+
     virtual qreal getMargin() {}
 };
 
 class BlurEffect : public PixmapEffect
 {
 public:
-    BlurEffect(qreal radius = 0.);
+    BlurEffect(qreal radius = 10.);
 
     void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
 
@@ -60,13 +61,13 @@ private:
 class BrushEffect : public PixmapEffect
 {
 public:
-    BrushEffect(qreal brushMinRadius = 0.,
-                qreal brushMaxRadius = 0.,
-                qreal strokeMinLength = 0.,
-                qreal strokeMaxLength = 0.,
+    BrushEffect(qreal numberStrokes = 100.,
+                qreal brushMinRadius = 20.,
+                qreal brushMaxRadius = 30.,
+                qreal strokeMaxLength = 200.,
                 qreal strokeMinDirectionAngle = 0.,
-                qreal strokeMaxDirectionAngle = 0.,
-                qreal strokeCurvature = 0.);
+                qreal strokeMaxDirectionAngle = 360.,
+                qreal strokeCurvature = 0.5);
 
     void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
 
@@ -74,11 +75,38 @@ public:
 private:
     QrealAnimator mMinBrushRadius;
     QrealAnimator mMaxBrushRadius;
-    QrealAnimator mStrokeMinLength;
     QrealAnimator mStrokeMaxLength;
     QrealAnimator mStrokeMinDirectionAngle;
     QrealAnimator mStrokeMaxDirectionAngle;
     QrealAnimator mStrokeCurvature;
+    QrealAnimator mNumberStrokes;
+};
+
+class LinesEffect : public PixmapEffect
+{
+public:
+    LinesEffect(qreal linesWidth = 5., qreal linesDistance = 5.);
+
+    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
+
+    qreal getMargin() { return 0.; }
+private:
+    QrealAnimator mLinesDistance;
+    QrealAnimator mLinesWidth;
+    bool mVertical = false;
+};
+
+class CirclesEffect : public PixmapEffect
+{
+public:
+    CirclesEffect(qreal circlesRadius = 5., qreal circlesDistance = 5.);
+
+    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
+
+    qreal getMargin() { return 0.; }
+private:
+    QrealAnimator mCirclesDistance;
+    QrealAnimator mCirclesRadius;
 };
 
 #endif // PIXMAPEFFECT_H

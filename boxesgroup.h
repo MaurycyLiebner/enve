@@ -16,7 +16,7 @@ class Edge;
 class BoxesGroup : public BoundingBox
 {
 public:
-    BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent);
+    BoxesGroup(BoxesGroup *parent);
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
     ~BoxesGroup();
     virtual void loadFromSql(int boundingBoxId);
@@ -189,6 +189,10 @@ public:
     void convertSelectedBoxesToPath();
     void applyBlurToSelected();
     void renderFinal(QPainter *p);
+    void applyBrushEffectToSelected();
+    void applyLinesEffectToSelected();
+    void applyCirclesEffectToSelected();
+    void drawPixmap(QPainter *p);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

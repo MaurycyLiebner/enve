@@ -214,11 +214,15 @@ void BoxesGroup::handleListItemMousePress(qreal boxesListX,
                                           QMouseEvent *event) {
     qreal heightT = BoundingBox::getListItemHeight();
     if(relY < heightT) {
+        if(mType == BoundingBoxType::TYPE_CANVAS) {
+            showContextMenu(event->globalPos() );
+            return;
+        }
         BoundingBox::handleListItemMousePress(boxesListX,
                                               relX, relY, event);
     } else {
         handleChildListItemMousePress(boxesListX,
-                                      relX - BoxesList::getListItemHeight(), relY,
+                                      (mType == BoundingBoxType::TYPE_CANVAS) ? relX : relX - BoxesList::getListItemHeight(), relY,
                                       heightT, event);
     }
 }
@@ -331,6 +335,31 @@ void BoxesGroup::drawChildrenKeysView(QPainter *p,
         }
         currentY += boxHeight;
     }
+}
+
+void Canvas::drawListItem(QPainter *p, qreal drawX, qreal drawY,
+                               qreal maxY) {
+    Q_UNUSED(maxY);
+
+    drawAnimationBar(p, drawX + BoxesList::getListItemHeight(), drawY);
+
+    p->setPen(Qt::black);
+    if(mSelected) {
+        p->setBrush(QColor(185, 185, 255));
+    } else {
+        p->setBrush(QColor(225, 225, 225));
+    }
+    p->drawRect(QRectF(drawX, drawY,
+                       BoxesList::getListItemMaxWidth() - drawX, BoxesList::getListItemHeight()));
+
+    p->drawText(QRectF(drawX, drawY,
+                       BoxesList::getListItemMaxWidth() - drawX - BoxesList::getListItemHeight(),
+                       BoxesList::getListItemHeight()),
+                "Canvas", QTextOption(Qt::AlignCenter));
+
+    drawY += BoundingBox::getListItemHeight();
+    drawChildrenListItems(p, drawX, drawY, maxY);
+
 }
 
 void BoxesGroup::drawListItem(QPainter *p,

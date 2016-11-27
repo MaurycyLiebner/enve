@@ -1,5 +1,11 @@
 #include "pointhelpers.h"
 
+qreal qRandF(qreal fMin, qreal fMax)
+{
+    qreal f = (qreal)qrand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
 QPointF symmetricToPos(QPointF toMirror, QPointF mirrorCenter) {
     QPointF posDist = toMirror - mirrorCenter;
     return mirrorCenter - posDist;

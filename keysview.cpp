@@ -184,11 +184,11 @@ void KeysView::paintEvent(QPaintEvent *) {
     if(mGraphViewed) {
         graphPaint(&p);
     } else {
-        mCanvas->drawChildrenKeysView(&p,
-                                      -mBoxesList->getViewedTop(),
-                                      mBoxesList->getViewedBottom(),
-                                      mPixelsPerFrame,
-                                      mMinViewedFrame, mMaxViewedFrame);
+        mCanvas->drawKeysView(&p,
+                              -mBoxesList->getViewedTop(),
+                              mBoxesList->getViewedBottom(),
+                              mPixelsPerFrame,
+                              mMinViewedFrame, mMaxViewedFrame);
     }
 
     if(mSelecting) {

@@ -57,7 +57,7 @@ void BoxesList::paintEvent(QPaintEvent *)
 
     p.setPen(QPen(Qt::black, 1.));
 
-    mCanvas->drawChildrenListItems(&p, 0., -mViewedTop, mViewedBottom);
+    mCanvas->drawListItem(&p, 0., -mViewedTop, mViewedBottom);
 
     p.setPen(QPen(Qt::black, 1.) );
     p.drawLine(BoxesList::getListItemMaxWidth() - 1., 0, BoxesList::getListItemMaxWidth() - 1., height());
@@ -109,10 +109,10 @@ void BoxesList::wheelEvent(QWheelEvent *event)
 
 void BoxesList::mousePressEvent(QMouseEvent *event)
 {
-    mCanvas->handleChildListItemMousePress(event->x(),
-                                           event->x(),
-                                           event->y() + mViewedTop,
-                                           0.f, event);
+    mCanvas->handleListItemMousePress(event->x(),
+                                      event->x(),
+                                      event->y() + mViewedTop,
+                                      event);
 
     mMainWindow->callUpdateSchedulers();
 }

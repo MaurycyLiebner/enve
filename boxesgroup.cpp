@@ -13,10 +13,16 @@ bool zLessThan(BoundingBox *box1, BoundingBox *box2)
     return box1->getZIndex() > box2->getZIndex();
 }
 
-BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting, BoxesGroup *parent) :
+BoxesGroup::BoxesGroup(BoxesGroup *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_GROUP)
 {
     setName("Group");
+    mFillStrokeSettingsWidget = getMainWindow()->getFillStrokeSettings();
+}
+
+BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
+    BoundingBox(BoundingBoxType::TYPE_CANVAS)
+{
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
@@ -39,7 +45,7 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
                                             bool loadInBox) {
     QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
     if(loadInBox) {
-        BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
+        BoxesGroup *newGroup = new BoxesGroup(this);
         newGroup->loadChildrenFromSql(thisBoundingBoxId, false);
         newGroup->centerPivotPosition();
         return newGroup;
@@ -56,7 +62,7 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
                 VectorPath::createPathFromSql(query.value(idId).toInt(), this);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_GROUP ) {
-                BoxesGroup *group = new BoxesGroup(mFillStrokeSettingsWidget, this);
+                BoxesGroup *group = new BoxesGroup(this);
                 group->loadFromSql(query.value(idId).toInt());
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_CIRCLE ) {
@@ -133,7 +139,37 @@ void BoxesGroup::applyBlurToSelected() {
     startNewUndoRedoSet();
 
     foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new BlurEffect(10.));
+        box->addEffect(new BlurEffect());
+    }
+
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::applyBrushEffectToSelected() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new BrushEffect());
+    }
+
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::applyLinesEffectToSelected() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new LinesEffect());
+    }
+
+    finishUndoRedoSet();
+}
+
+void BoxesGroup::applyCirclesEffectToSelected() {
+    startNewUndoRedoSet();
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new CirclesEffect());
     }
 
     finishUndoRedoSet();
@@ -183,12 +219,6 @@ PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos,
 void BoxesGroup::setDisplayedFillStrokeSettingsFromLastSelected() {
     if(mSelectedBoxes.isEmpty()) return;
     setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
-}
-
-BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
-    BoundingBox(BoundingBoxType::TYPE_CANVAS)
-{
-    mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
 bool BoxesGroup::absPointInsidePath(QPointF absPos)
@@ -456,6 +486,17 @@ void BoxesGroup::draw(QPainter *p)
         }
 
         p->restore();
+    }
+}
+
+void BoxesGroup::drawPixmap(QPainter *p) {
+    if(mEffects.isEmpty()) {
+        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
+        foreach(BoundingBox *box, mChildren) {
+            box->drawPixmap(p);
+        }
+    } else {
+
     }
 }
 
@@ -1136,7 +1177,7 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
         return NULL;
     }
     startNewUndoRedoSet();
-    BoxesGroup *newGroup = new BoxesGroup(mFillStrokeSettingsWidget, this);
+    BoxesGroup *newGroup = new BoxesGroup(this);
     BoundingBox *box;
     foreachInverted(box, mSelectedBoxes) {
         removeChild(box);

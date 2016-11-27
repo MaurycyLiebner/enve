@@ -296,6 +296,8 @@ public:
     void updateRenderRect();
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(QString renderDest);
+    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
+    void showContextMenu(QPoint globalPos);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
