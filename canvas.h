@@ -326,8 +326,6 @@ protected:
     bool isMovingPath();
 signals:
 private slots:
-    void fillSettingsChanged(PaintSettings fillSettings, bool saveUndoRedo);
-    void strokeSettingsChanged(StrokeSettings strokeSettings, bool saveUndoRedo);
 
     void nextPreviewFrame();
 public slots:

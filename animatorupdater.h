@@ -68,9 +68,11 @@ private:
 class DisplayedFillStrokeSettingsUpdater : public AnimatorUpdater
 {
 public:
-    DisplayedFillStrokeSettingsUpdater();
+    DisplayedFillStrokeSettingsUpdater(PathBox *path);
 
     void update();
+private:
+    PathBox *mTarget;
 };
 
 class RectangleBottomRightUpdater : public AnimatorUpdater

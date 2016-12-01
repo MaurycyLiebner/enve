@@ -496,18 +496,6 @@ void Canvas::updatePivotIfNeeded()
     }
 }
 
-void Canvas::fillSettingsChanged(PaintSettings fillSettings, bool saveUndoRedo)
-{
-    mCurrentBoxesGroup->setSelectedFillSettings(fillSettings, saveUndoRedo);
-    callUpdateSchedulers();
-}
-
-void Canvas::strokeSettingsChanged(StrokeSettings strokeSettings, bool saveUndoRedo)
-{
-    mCurrentBoxesGroup->setSelectedStrokeSettings(strokeSettings, saveUndoRedo);
-    callUpdateSchedulers();
-}
-
 void Canvas::connectPointsSlot()
 {
     mCurrentBoxesGroup->connectPoints();

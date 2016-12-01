@@ -47,13 +47,14 @@ void StrokeWidthUpdater::update()
     MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
-DisplayedFillStrokeSettingsUpdater::DisplayedFillStrokeSettingsUpdater()
+DisplayedFillStrokeSettingsUpdater::DisplayedFillStrokeSettingsUpdater(PathBox *path)
 {
-
+    mTarget = path;
 }
 
 void DisplayedFillStrokeSettingsUpdater::update()
 {
+    mTarget->scheduleAwaitUpdate();
     MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 

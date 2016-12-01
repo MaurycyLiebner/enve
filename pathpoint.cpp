@@ -491,6 +491,10 @@ void PathPoint::removeShapeValues(VectorPathShape *shape) {
     }
 }
 
+void PathPoint::addShapeValues(VectorPathShape *shape) {
+    mShapeValues << new PointShapeValues(shape, mPointId);
+}
+
 void PathPoint::setPointValues(const PathPointValues &values) {
     setRelativePos(values.pointRelPos);
     mEndCtrlPt->setRelativePos(values.endRelPos);
@@ -526,6 +530,27 @@ void PathPoint::cancelEditingShape()
     setPointValues(mBasisShapeSavedValues);
 }
 
+void PathPoint::saveInitialPointValuesToShapeValues(VectorPathShape *shape)
+{
+    if(shape->isRelative()) {
+        foreach(PointShapeValues *pointShapeValues, mShapeValues) {
+            if(pointShapeValues->getParentShape() == shape) {
+                pointShapeValues->setPointValues(PathPointValues(QPointF(0., 0.),
+                                                                 QPointF(0., 0.),
+                                                                 QPointF(0., 0.)));
+                return;
+            }
+        }
+    } else {
+        foreach(PointShapeValues *pointShapeValues, mShapeValues) {
+            if(pointShapeValues->getParentShape() == shape) {
+                pointShapeValues->setPointValues(getPointValues());
+                return;
+            }
+        }
+    }
+}
+
 void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
 {
     if(shape->isRelative()) {
@@ -535,9 +560,6 @@ void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
                 return;
             }
         }
-        mShapeValues << new PointShapeValues(shape, PathPointValues(QPointF(0., 0.),
-                                                                    QPointF(0., 0.),
-                                                                    QPointF(0., 0.)));
     } else {
         foreach(PointShapeValues *pointShapeValues, mShapeValues) {
             if(pointShapeValues->getParentShape() == shape) {
@@ -545,7 +567,6 @@ void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
                 return;
             }
         }
-        mShapeValues << new PointShapeValues(shape, getPointValues());
     }
 }
 

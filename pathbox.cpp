@@ -22,6 +22,7 @@ PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
     mStrokeSettings.setGradientPoints(&mStrokeGradientPoints);
 
     mStrokeSettings.setLineWidthUpdaterTarget(this);
+    mFillPaintSettings.setPaintPathTarget(this);
 }
 
 PathBox::~PathBox()

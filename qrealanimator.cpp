@@ -891,7 +891,7 @@ void QrealAnimator::setUpdater(AnimatorUpdater *updater)
 {
     if(mUpdater != NULL) mUpdater->decNumberPointers();
     mUpdater = updater;
-    mUpdater->incNumberPointers();
+    if(mUpdater != NULL) mUpdater->incNumberPointers();
 }
 
 void QrealAnimator::callUpdater()

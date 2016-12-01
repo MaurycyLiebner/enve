@@ -106,9 +106,6 @@ public:
     bool isGroup();
     virtual BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
 
-    virtual void setStrokeSettings(StrokeSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
-    virtual void setFillSettings(PaintSettings, bool saveUndoRedo = true) { Q_UNUSED(saveUndoRedo) }
-
     virtual const PaintSettings *getFillSettings();
     virtual const StrokeSettings *getStrokeSettings();
 

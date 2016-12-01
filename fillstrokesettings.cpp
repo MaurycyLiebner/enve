@@ -246,8 +246,10 @@ PaintSettings::PaintSettings(Color colorT,
     mGradient = gradientT;
 
     addChildAnimator(&mColor);
+}
 
-    mColor.setUpdater(new DisplayedFillStrokeSettingsUpdater() );
+void PaintSettings::setPaintPathTarget(PathBox *path) {
+    mColor.setUpdater(new DisplayedFillStrokeSettingsUpdater(path));
 }
 
 void PaintSettings::loadFromSql(int sqlId, GradientWidget *gradientWidget) {
@@ -307,6 +309,7 @@ StrokeSettings::StrokeSettings(Color colorT,
 
 void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
     setUpdater(new StrokeWidthUpdater(path));
+    setPaintPathTarget(path);
 }
 
 void StrokeSettings::loadFromSql(int strokeSqlId, GradientWidget *gradientWidget) {

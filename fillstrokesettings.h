@@ -154,6 +154,7 @@ public:
     }
 
     virtual void loadFromSql(int sqlId, GradientWidget *gradientWidget);
+    void setPaintPathTarget(PathBox *path);
 private:
     GradientPoints *mGradientPoints = NULL;
     ColorAnimator mColor;

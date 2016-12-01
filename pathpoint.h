@@ -14,48 +14,6 @@ enum CanvasMode : short;
 
 class PathPoint;
 
-class VectorPathShape {
-public:
-    VectorPathShape() {
-        mInfluence.setValueRange(0., 1.);
-        mInfluence.blockPointer();
-        mInfluence.setName("influence");
-    }
-
-    QString getName() {
-        return mName;
-    }
-
-    void setName(QString name) {
-        mName = name;
-        mInfluence.setName(name);
-    }
-
-    bool isRelative() {
-        return mRelative;
-    }
-
-    void setRelative(bool bT) {
-        mRelative = bT;
-    }
-
-    qreal getCurrentInfluence() {
-        return mInfluence.getCurrentValue();
-    }
-
-    void setCurrentInfluence(qreal value, bool finish = false) {
-        mInfluence.setCurrentValue(value, finish);
-    }
-
-    QrealAnimator *getInfluenceAnimator() {
-        return &mInfluence;
-    }
-private:
-    bool mRelative = false;
-    QString mName;
-    QrealAnimator mInfluence;
-};
-
 struct PathPointValues {
     PathPointValues(QPointF startPosT,
                     QPointF pointPosT,
@@ -108,16 +66,70 @@ PathPointValues operator/(const PathPointValues &ppv, const qreal &val);
 PathPointValues operator*(const PathPointValues &ppv, const qreal &val);
 PathPointValues operator*(const qreal &val, const PathPointValues &ppv);
 
+class VectorPathShape : public SmartPointerTarget {
+public:
+    VectorPathShape() : SmartPointerTarget() {
+        mInfluence.setValueRange(0., 1.);
+        mInfluence.blockPointer();
+        mInfluence.setName("influence");
+    }
+
+    QString getName() {
+        return mName;
+    }
+
+    void setName(QString name) {
+        mName = name;
+        mInfluence.setName(name);
+    }
+
+    bool isRelative() {
+        return mRelative;
+    }
+
+    void setRelative(bool bT) {
+        mRelative = bT;
+    }
+
+    qreal getCurrentInfluence() {
+        return mInfluence.getCurrentValue();
+    }
+
+    void setCurrentInfluence(qreal value, bool finish = false) {
+        mInfluence.setCurrentValue(value, finish);
+    }
+
+    QrealAnimator *getInfluenceAnimator() {
+        return &mInfluence;
+    }
+
+    void setNumberPoints(int n) {
+        for(int i = 0; i < n; i++) {
+            mPointsValues << new PathPointValues();
+        }
+    }
+
+    PathPointValues *getPathPointValuesForPoint(int pointId) {
+        return mPointsValues.at(pointId);
+    }
+
+private:
+    QList<PathPointValues*> mPointsValues;
+    bool mRelative = false;
+    QString mName;
+    QrealAnimator mInfluence;
+};
+
 class PointShapeValues {
 public:
     PointShapeValues();
-    PointShapeValues(VectorPathShape *shape, PathPointValues values) {
+    PointShapeValues(VectorPathShape *shape, int pointId) {
         mShape = shape;
-        mValues = values;
+        mValues = shape->getPathPointValuesForPoint(pointId);
     }
 
     const PathPointValues &getValues() const {
-        return mValues;
+        return *mValues;
     }
 
     VectorPathShape *getParentShape() const {
@@ -125,12 +137,12 @@ public:
     }
 
     void setPointValues(const PathPointValues &values) {
-        mValues = values;
+        *mValues = values;
     }
 
 private:
-    PathPointValues mValues;
-    VectorPathShape *mShape;
+    PathPointValues *mValues = NULL;
+    VectorPathShape *mShape = NULL;
 };
 
 struct PosExpectation {
@@ -324,6 +336,8 @@ public:
     void editShape(VectorPathShape *shape);
     void finishEditingShape(VectorPathShape *shape);
     void cancelEditingShape();
+    void addShapeValues(VectorPathShape *shape);
+    void saveInitialPointValuesToShapeValues(VectorPathShape *shape);
 private:
     QList<PointShapeValues*> mShapeValues;
 

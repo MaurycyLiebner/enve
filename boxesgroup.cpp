@@ -588,62 +588,6 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
     return boxAtPos;
 }
 
-void BoxesGroup::setFillSettings(PaintSettings fillSettings,
-                                 bool saveUndoRedo)
-{
-    if(saveUndoRedo) {
-        startNewUndoRedoSet();
-    }
-    foreach(BoundingBox *box, mChildren) {
-        box->setFillSettings(fillSettings, saveUndoRedo);
-    }
-    if(saveUndoRedo) {
-        finishUndoRedoSet();
-    }
-}
-
-void BoxesGroup::setStrokeSettings(StrokeSettings strokeSettings,
-                                   bool saveUndoRedo)
-{
-    if(saveUndoRedo) {
-        startNewUndoRedoSet();
-    }
-    foreach(BoundingBox *box, mChildren) {
-        box->setStrokeSettings(strokeSettings, saveUndoRedo);
-    }
-    if(saveUndoRedo) {
-        finishUndoRedoSet();
-    }
-}
-
-void BoxesGroup::setSelectedFillSettings(PaintSettings fillSettings,
-                                         bool saveUndoRedo)
-{
-    if(saveUndoRedo) {
-        startNewUndoRedoSet();
-    }
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setFillSettings(fillSettings, saveUndoRedo);
-    }
-    if(saveUndoRedo) {
-        finishUndoRedoSet();
-    }
-}
-
-void BoxesGroup::setSelectedStrokeSettings(StrokeSettings strokeSettings,
-                                           bool saveUndoRedo)
-{
-    if(saveUndoRedo) {
-        startNewUndoRedoSet();
-    }
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeSettings(strokeSettings, saveUndoRedo);
-    }
-    if(saveUndoRedo) {
-        finishUndoRedoSet();
-    }
-}
-
 void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
                                   bool startTrans)
 {

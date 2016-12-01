@@ -105,6 +105,21 @@ void VectorPath::addShapesToShapesMenu(VectorShapesMenu *menu) {
 }
 
 VectorPathShape *VectorPath::createNewShape(bool relative) {
+    VectorPathShape *shape = new VectorPathShape();
+    shape->setRelative(relative);
+    shape->setName("shape " + QString::number(mShapes.count() + 1));
+
+    shape->setNumberPoints(mPoints.count());
+    addShape(shape);
+
+    foreach(PathPoint *point, mPoints) {
+        point->saveInitialPointValuesToShapeValues(shape);
+    }
+
+    return shape;
+}
+
+void VectorPath::addShape(VectorPathShape *shape, bool saveUndoRedo) {
     mShapesEnabled = true;
     if(mShapesAnimator == NULL) {
         mShapesAnimator = new ComplexAnimator();
@@ -113,31 +128,42 @@ VectorPathShape *VectorPath::createNewShape(bool relative) {
         addActiveAnimator(mShapesAnimator);
     }
 
-    VectorPathShape *shape = new VectorPathShape();
-    shape->setRelative(relative);
-    shape->setName("shape " + QString::number(mShapes.count() + 1));
+    if(saveUndoRedo) {
+        addUndoRedo(new AddShapeUndoRedo(this, shape));
+    }
 
     mShapesAnimator->addChildAnimator(shape->getInfluenceAnimator());
-
+    shape->incNumberPointers();
     PathPointUpdater *updater = new PathPointUpdater(this);
     shape->getInfluenceAnimator()->setUpdater(updater);
 
-    saveCurrentPathToShape(shape);
     mShapes << shape;
-    return shape;
+    foreach(PathPoint *point, mPoints) {
+        point->addShapeValues(shape);
+    }
+
+    schedulePathUpdate();
 }
 
-void VectorPath::removeShape(VectorPathShape *shape) {
+void VectorPath::removeShape(VectorPathShape *shape, bool saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new RemoveShapeUndoRedo(this, shape));
+    }
+    shape->getInfluenceAnimator()->setUpdater(NULL);
     mShapes.removeOne(shape);
     foreach(PathPoint *point, mPoints) {
         point->removeShapeValues(shape);
     }
+    mShapesAnimator->removeChildAnimator(shape->getInfluenceAnimator());
     if(mShapes.isEmpty()) {
         removeActiveAnimator(mShapesAnimator);
         delete mShapesAnimator;
+        mShapesAnimator = NULL;
         mShapesEnabled = false;
     }
-    delete shape;
+    shape->decNumberPointers();
+
+
     schedulePathUpdate();
 }
 
@@ -643,7 +669,7 @@ PathPoint *VectorPath::addPointRelPos(QPointF relPos,
 
 void VectorPath::updatePathPointIds()
 {
-    int pointId = 1;
+    int pointId = 0;
     foreach(PathPoint *point, mSeparatePaths) {
         PathPoint *nextPoint = point;
         while(true) {

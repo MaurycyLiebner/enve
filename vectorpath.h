@@ -98,10 +98,11 @@ public:
     void saveCurrentPathToShape(VectorPathShape *shape);
     void addShapesToShapesMenu(VectorShapesMenu *menu);
     VectorPathShape *createNewShape(bool relative);
-    void removeShape(VectorPathShape *shape);
+    void removeShape(VectorPathShape *shape, bool saveUndoRedo = true);
     void editShape(VectorPathShape *shape);
     void finishEditingShape(VectorPathShape *shape);
     void cancelEditingShape();
+    void addShape(VectorPathShape *shape, bool saveUndoRedo = true);
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 

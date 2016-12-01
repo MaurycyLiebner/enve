@@ -68,6 +68,7 @@ void VectorShapesMenu::createNewShape(bool relative) {
 void VectorShapesMenu::removeCurrentShape() {
     if(mSelectedShapeWidget == NULL) return;
     mCurrentVectorPath->removeShape(mSelectedShapeWidget->getShape());
+    mShapeWidgets.removeOne(mSelectedShapeWidget);
     delete mSelectedShapeWidget;
     mSelectedShapeWidget = NULL;
 }
@@ -124,6 +125,7 @@ void VectorShapesMenu::cancelEditCurrentShape()
 }
 
 void VectorShapesMenu::setSelectedBoundingBox(BoundingBox *box) {
+    if(mEditingShape) cancelEditCurrentShape();
     if(mCurrentVectorPath != NULL) {
         clearShapes();
     }
@@ -141,6 +143,7 @@ void VectorShapesMenu::clearShapes() {
         delete widget;
     }
     mShapeWidgets.clear();
+    mSelectedShapeWidget = NULL;
 }
 
 void VectorShapesMenu::addShapeWidgetForShape(VectorPathShape *shape) {

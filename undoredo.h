@@ -536,83 +536,77 @@ private:
     BoxesGroup *mNewParent;
 };
 
-class StrokeSettingsChangedUndoRedo : public UndoRedo
-{
-public:
-    StrokeSettingsChangedUndoRedo(StrokeSettings oldStrokeSettings,
-                                  StrokeSettings newStrokeSettings,
-                                  VectorPath *target) : UndoRedo("StrokeSettingsChangedUndoRedo") {
-        mOldSettings = oldStrokeSettings;
-        mNewSettings = newStrokeSettings;
-        mTarget = target;
-        mTarget->incNumberPointers();
-    }
+//class StrokeSettingsChangedUndoRedo : public UndoRedo
+//{
+//public:
+//    StrokeSettingsChangedUndoRedo(StrokeSettings oldStrokeSettings,
+//                                  StrokeSettings newStrokeSettings,
+//                                  VectorPath *target) : UndoRedo("StrokeSettingsChangedUndoRedo") {
+//        mOldSettings = oldStrokeSettings;
+//        mNewSettings = newStrokeSettings;
+//        mTarget = target;
+//        mTarget->incNumberPointers();
+//    }
 
-    ~StrokeSettingsChangedUndoRedo() {
-        mTarget->decNumberPointers();
-    }
+//    ~StrokeSettingsChangedUndoRedo() {
+//        mTarget->decNumberPointers();
+//    }
 
-    void updateDisplayedSettings() {
-        if(mTarget->isSelected()) {
-            mTarget->getParent()->
-                    setCurrentFillStrokeSettingsFromBox(mTarget);
-        }
-    }
+//    void updateDisplayedSettings() {
+//        if(mTarget->isSelected()) {
+//            mTarget->getParent()->
+//                    setCurrentFillStrokeSettingsFromBox(mTarget);
+//        }
+//    }
 
-    void redo() {
-        mTarget->setStrokeSettings(mNewSettings, false);
-        updateDisplayedSettings();
-    }
+//    void redo() {
+//        mTarget->setStrokeSettings(mNewSettings, false);
+//        updateDisplayedSettings();
+//    }
 
-    void undo() {
-        mTarget->setStrokeSettings(mOldSettings, false);
-        updateDisplayedSettings();
-    }
+//    void undo() {
+//        mTarget->setStrokeSettings(mOldSettings, false);
+//        updateDisplayedSettings();
+//    }
 
-private:
-    StrokeSettings mOldSettings;
-    StrokeSettings mNewSettings;
-    VectorPath *mTarget;
-};
+//private:
+//    StrokeSettings mOldSettings;
+//    StrokeSettings mNewSettings;
+//    VectorPath *mTarget;
+//};
 
-class FillSettingsChangedUndoRedo : public UndoRedo
-{
-public:
-    FillSettingsChangedUndoRedo(PaintSettings oldStrokeSettings,
-                                PaintSettings newStrokeSettings,
-                                VectorPath *target) : UndoRedo("FillSettingsChangedUndoRedo") {
-        mOldSettings = oldStrokeSettings;
-        mNewSettings = newStrokeSettings;
-        mTarget = target;
-        mTarget->incNumberPointers();
-    }
+//class FillSettingsChangedUndoRedo : public UndoRedo
+//{
+//public:
+//    FillSettingsChangedUndoRedo(VectorPath *target) : UndoRedo("FillSettingsChangedUndoRedo") {
+//        mTarget = target;
+//        mTarget->incNumberPointers();
+//    }
 
-    ~FillSettingsChangedUndoRedo() {
-        mTarget->decNumberPointers();
-    }
+//    ~FillSettingsChangedUndoRedo() {
+//        mTarget->decNumberPointers();
+//    }
 
-    void updateDisplayedSettings() {
-        if(mTarget->isSelected()) {
-            mTarget->getParent()->
-                    setCurrentFillStrokeSettingsFromBox(mTarget);
-        }
-    }
+//    void updateDisplayedSettings() {
+//        if(mTarget->isSelected()) {
+//            mTarget->getParent()->
+//                    setCurrentFillStrokeSettingsFromBox(mTarget);
+//        }
+//    }
 
-    void redo() {
-        mTarget->setFillSettings(mNewSettings, false);
-        updateDisplayedSettings();
-    }
+//    void redo() {
+//        mTarget->scheduleAwaitUpdate();
+//        updateDisplayedSettings();
+//    }
 
-    void undo() {
-        mTarget->setFillSettings(mOldSettings, false);
-        updateDisplayedSettings();
-    }
+//    void undo() {
+//        mTarget->scheduleAwaitUpdate();
+//        updateDisplayedSettings();
+//    }
 
-private:
-    PaintSettings mOldSettings;
-    PaintSettings mNewSettings;
-    VectorPath *mTarget;
-};
+//private:
+//    VectorPath *mTarget;
+//};
 
 class ChangeGradientColorsUndoRedo : public UndoRedo
 {
@@ -731,6 +725,50 @@ private:
     qreal mOldValue;
     qreal mNewValue;
     QrealAnimator *mAnimator;
+};
+
+class RemoveShapeUndoRedo : public UndoRedo
+{
+public:
+    RemoveShapeUndoRedo(VectorPath *targetPath, VectorPathShape *shape) :
+        UndoRedo("RemoveShapeUndoRedo") {
+        mTargetPath = targetPath;
+        mShape = shape;
+        mShape->incNumberPointers();
+    }
+
+    ~RemoveShapeUndoRedo() {
+        mShape->decNumberPointers();
+    }
+
+    void redo() {
+        mTargetPath->removeShape(mShape, false);
+    }
+
+    void undo() {
+        mTargetPath->addShape(mShape, false);
+    }
+
+private:
+    VectorPath *mTargetPath;
+    VectorPathShape *mShape;
+};
+
+class AddShapeUndoRedo : public RemoveShapeUndoRedo
+{
+public:
+    AddShapeUndoRedo(VectorPath *targetPath, VectorPathShape *shape) :
+        RemoveShapeUndoRedo(targetPath, shape) {
+
+    }
+
+    void redo() {
+        RemoveShapeUndoRedo::undo();
+    }
+
+    void undo() {
+        RemoveShapeUndoRedo::redo();
+    }
 };
 
 #endif // UNDOREDO_H
