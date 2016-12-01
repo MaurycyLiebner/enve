@@ -48,6 +48,7 @@ protected:
     void resizeEvent(QResizeEvent *e);
     void wheelEvent(QWheelEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 
 private:
     static qreal LIST_ITEM_HEIGHT;

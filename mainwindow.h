@@ -60,6 +60,8 @@ private:
     QAction *mActionSmoothPointCtrls;
     QAction *mActionCornerPointCtrls;
 //
+    QAction *mActionHighQualityView;
+    QAction *mActionEffectsPaintEnabled;
 
     FontsWidget *mFontWidget = NULL;
 
@@ -180,6 +182,9 @@ private slots:
     void importFile();
     void exportSelected();
     void revert();
+
+    void setHighQualityView(bool bT);
+    void setEffectsPaintEnabled(bool bT);
 signals:
     void updateBox(BoundingBox*);
 };

@@ -8,6 +8,12 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
     QDoubleSlider(minVal, maxVal, parent)
 {
     mAnimator = animator;
+    animator->addSlider(this);
+}
+
+QrealAnimatorValueSlider::~QrealAnimatorValueSlider()
+{
+    mAnimator->removeSlider(this);
 }
 
 void QrealAnimatorValueSlider::emitValueChanged(qreal value)

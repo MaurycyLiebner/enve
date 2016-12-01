@@ -117,6 +117,11 @@ void BoxesList::mousePressEvent(QMouseEvent *event)
     mMainWindow->callUpdateSchedulers();
 }
 
+void BoxesList::mouseDoubleClickEvent(QMouseEvent *event)
+{
+
+}
+
 qreal BoxesList::getViewedTop() {
     return mViewedTop;
 }

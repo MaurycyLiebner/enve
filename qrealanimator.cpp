@@ -6,14 +6,12 @@
 #include "animationdockwidget.h"
 #include "boxeslist.h"
 #include <QMenu>
-#include "valuenoise.h"
+#include "qrealanimatorvalueslider.h"
 
-QrealAnimator::QrealAnimator() : ConnectedToMainWindow()
-{
+QrealAnimator::QrealAnimator() : ConnectedToMainWindow() {
 }
 
-QrealAnimator::~QrealAnimator()
-{
+QrealAnimator::~QrealAnimator() {
     foreach(QrealKey *key, mKeys) {
         key->decNumberPointers();
     }
@@ -22,6 +20,20 @@ QrealAnimator::~QrealAnimator()
     }
 }
 
+void QrealAnimator::addSlider(QrealAnimatorValueSlider *valueSlider) {
+    mSliders << valueSlider;
+}
+
+void QrealAnimator::removeSlider(QrealAnimatorValueSlider *valueSlider) {
+    mSliders.removeOne(valueSlider);
+}
+
+void QrealAnimator::sendValueChangeToSliders() {
+    foreach(QrealAnimatorValueSlider *valueSlider, mSliders) {
+        valueSlider->setValue(mCurrentValue);
+        valueSlider->update();
+    }
+}
 
 #include <QSqlError>
 #include <QSqlQuery>
@@ -196,7 +208,6 @@ void QrealAnimator::drawBoxesList(QPainter *p,
 void QrealAnimator::openContextMenu(QPoint pos) {
     QMenu menu;
     menu.addAction("Add Key");
-    menu.addAction("Apply Noise");
     QAction *selected_action = menu.exec(pos);
     if(selected_action != NULL)
     {
@@ -206,8 +217,6 @@ void QrealAnimator::openContextMenu(QPoint pos) {
                 setRecording(true);
             }
             saveCurrentValueAsKey();
-        } else if(selected_action->text() == "Apply Noise") {
-            setNoise(new ValueNoise());
         }
     } else {
 
@@ -371,14 +380,6 @@ qreal QrealAnimator::getValueAtFrame(int frame) const
     return returnVal;
 }
 
-qreal QrealAnimator::getValueAtFrameWithNoise(int frame) const {
-    if(mNoise == NULL) {
-        return getValueAtFrame(frame);
-    } else {
-        return getValueAtFrame(frame) + mNoise->getValueAtFrame(frame);
-    }
-}
-
 qreal QrealAnimator::getValueAtFrame(int frame,
                                     QrealKey *prevKey,
                                     QrealKey *nextKey) const
@@ -397,15 +398,6 @@ qreal QrealAnimator::getValueAtFrame(int frame,
 qreal QrealAnimator::getCurrentValue() const
 {
     return mCurrentValue;
-}
-
-qreal QrealAnimator::getCurrentValueWithNoise() const
-{
-    if(mNoise == NULL) {
-        return mCurrentValue;
-    } else {
-        return mCurrentValue + mNoise->getCurrentValue();
-    }
 }
 
 void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
@@ -504,7 +496,6 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
 
 void QrealAnimator::setFrame(int frame)
 {
-    if(mNoise != NULL) mNoise->setFrame(frame);
     mCurrentFrame = frame;
     updateValueFromCurrentFrame();
 
@@ -858,11 +849,6 @@ void QrealAnimator::multSavedValueToCurrentValue(qreal multBy) {
     setCurrentValue(mSavedCurrentValue * multBy);
 }
 
-void QrealAnimator::setNoise(ValueNoise *noise)
-{
-    mNoise = noise;
-}
-
 void QrealAnimator::incCurrentValue(qreal incBy)
 {
     setCurrentValue(mCurrentValue + incBy);
@@ -889,6 +875,8 @@ void QrealAnimator::finishTransform()
         if(mIsCurrentAnimator) {
             graphScheduleUpdateAfterKeysChanged();
         }
+
+        sendValueChangeToSliders();
     }
 }
 

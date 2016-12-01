@@ -6,7 +6,7 @@
 #include <QDebug>
 
 PathPoint::PathPoint(VectorPath *vectorPath) :
-    MovablePoint(vectorPath, MovablePointType::TYPE_PATH_POINT, 10.)
+    MovablePoint(vectorPath, MovablePointType::TYPE_PATH_POINT)
 {
     mVectorPath = vectorPath;
     mStartCtrlPt = new CtrlPoint(this, true);
@@ -503,7 +503,11 @@ void PathPoint::editShape(VectorPathShape *shape)
     mBasisShapeSavedValues = getPointValues();
     foreach(PointShapeValues *pointShapeValues, mShapeValues) {
         if(pointShapeValues->getParentShape() == shape) {
-            setPointValues(pointShapeValues->getValues());
+            if(shape->isRelative()) {
+                setPointValues(pointShapeValues->getValues() + mBasisShapeSavedValues);
+            } else {
+                setPointValues(pointShapeValues->getValues());
+            }
             return;
         }
     }
@@ -525,7 +529,15 @@ void PathPoint::cancelEditingShape()
 void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
 {
     if(shape->isRelative()) {
-
+        foreach(PointShapeValues *pointShapeValues, mShapeValues) {
+            if(pointShapeValues->getParentShape() == shape) {
+                pointShapeValues->setPointValues(getPointValues() - mBasisShapeSavedValues);
+                return;
+            }
+        }
+        mShapeValues << new PointShapeValues(shape, PathPointValues(QPointF(0., 0.),
+                                                                    QPointF(0., 0.),
+                                                                    QPointF(0., 0.)));
     } else {
         foreach(PointShapeValues *pointShapeValues, mShapeValues) {
             if(pointShapeValues->getParentShape() == shape) {
@@ -533,8 +545,8 @@ void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
                 return;
             }
         }
+        mShapeValues << new PointShapeValues(shape, getPointValues());
     }
-    mShapeValues << new PointShapeValues(shape, getPointValues());
 }
 
 PathPointValues PathPoint::getShapesInfluencedPointValues() const
@@ -996,6 +1008,13 @@ PathPoint *PathPoint::addPoint(PathPoint *pointToAdd)
 
 bool PathPoint::isEndPoint() {
     return mNextPoint == NULL || mPreviousPoint == NULL;
+}
+
+PathPointValues operator-(const PathPointValues &ppv1, const PathPointValues &ppv2)
+{
+    return PathPointValues(ppv1.startRelPos - ppv2.startRelPos,
+                           ppv1.pointRelPos - ppv2.pointRelPos,
+                           ppv1.endRelPos - ppv2.endRelPos);
 }
 
 PathPointValues operator+(const PathPointValues &ppv1, const PathPointValues &ppv2)

@@ -97,7 +97,7 @@ public:
     virtual void loadFromSql(int boundingBoxId);
     void saveCurrentPathToShape(VectorPathShape *shape);
     void addShapesToShapesMenu(VectorShapesMenu *menu);
-    VectorPathShape *createNewShape();
+    VectorPathShape *createNewShape(bool relative);
     void removeShape(VectorPathShape *shape);
     void editShape(VectorPathShape *shape);
     void finishEditingShape(VectorPathShape *shape);

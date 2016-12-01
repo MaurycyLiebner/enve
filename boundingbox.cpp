@@ -130,12 +130,21 @@ void BoundingBox::updatePrettyPixmap() {
     QPainter p(&mNewPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-mPixBoundingRectClippedToView.topLeft());
+    p.translate(mPixBoundingRectClippedToView.topLeft() -
+                QPointF(qRound(mPixBoundingRectClippedToView.left()),
+                        qRound(mPixBoundingRectClippedToView.top())) );
     p.setTransform(QTransform(mUpdateTransform), true);
 
     draw(&p);
     p.end();
 
-    mNewPixmap = applyEffects(mNewPixmap, mUpdateCanvasTransform.m11());
+    if(Canvas::effectsPaintEnabled()) {
+        mNewPixmap = applyEffects(mNewPixmap, mUpdateCanvasTransform.m11());
+    }
+}
+
+void BoundingBox::updateAllBoxes() {
+    scheduleAwaitUpdate();
 }
 
 void BoundingBox::updateAllUglyPixmap() {
@@ -149,12 +158,17 @@ void BoundingBox::updateAllUglyPixmap() {
     QPainter p(&mAllUglyPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-mAllUglyBoundingRect.topLeft());
+    p.translate(mAllUglyBoundingRect.topLeft() -
+                QPointF(qRound(mAllUglyBoundingRect.left()),
+                        qRound(mAllUglyBoundingRect.top())) );
     p.setTransform(QTransform(mAllUglyTransform), true);
 
     draw(&p);
     p.end();
 
-    mAllUglyPixmap = applyEffects(mAllUglyPixmap);
+    if(Canvas::effectsPaintEnabled()) {
+        mAllUglyPixmap = applyEffects(mAllUglyPixmap);
+    }
 }
 
 bool BoundingBox::shouldRedoUpdate() {
@@ -238,7 +252,7 @@ void BoundingBox::updateEffectsMarginIfNeeded() {
 }
 
 void BoundingBox::updateEffectsMargin() {
-    qreal newMargin = 0.;
+    qreal newMargin = 1.;
     foreach(PixmapEffect *effect, mEffects) {
         qreal effectMargin = effect->getMargin();
         if(effectMargin > newMargin) newMargin = effectMargin;

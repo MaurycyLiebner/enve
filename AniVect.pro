@@ -75,7 +75,6 @@ SOURCES += main.cpp\
     paintcontroler.cpp \
     fmt_filters.cpp \
     pixmapeffect.cpp \
-    valuenoise.cpp \
     vectorshapesmenu.cpp \
     qdoubleslider.cpp \
     qrealanimatorvalueslider.cpp \
@@ -144,7 +143,6 @@ HEADERS  += mainwindow.h \
     paintcontroler.h \
     fmt_filters.h \
     pixmapeffect.h \
-    valuenoise.h \
     vectorshapesmenu.h \
     qdoubleslider.h \
     qrealanimatorvalueslider.h \

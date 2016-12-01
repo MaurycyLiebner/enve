@@ -37,7 +37,12 @@ public:
     void drawOnImage(QImage *img) const;
 
     void prepareToDrawOnImage(QImage *img);
+
+    static void loadStrokePixmaps();
 private:
+    static QList<QPixmap*> mStrokeTexPixmaps;
+    static QPixmap *mEndPix;
+
     QPixmap mTexPix;
     qreal mStrokeTexHeight;
     qreal mStrokeTexWidth;

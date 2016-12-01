@@ -735,7 +735,7 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
 
     return matrix;
 }
-
+#include "mainwindow.h"
 void loadSVGFile(const QString &filename, Canvas *canvas) {
     getMatrixFromString("matrix(-0.01793887,-0.99983909,0.99983909,-0.01793887,207.06247,684.50864)");
     QFile file(filename);
@@ -754,6 +754,7 @@ void loadSVGFile(const QString &filename, Canvas *canvas) {
     } else {
         qDebug() << "Cannot open file " + filename;
     }
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 struct SvgAttribute {

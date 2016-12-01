@@ -93,9 +93,17 @@ struct PathPointValues {
         endRelPos += ppv.endRelPos;
         return *this;
     }
+    PathPointValues &operator-=(const PathPointValues &ppv)
+    {
+        startRelPos -= ppv.startRelPos;
+        pointRelPos -= ppv.pointRelPos;
+        endRelPos -= ppv.endRelPos;
+        return *this;
+    }
 };
 
 PathPointValues operator+(const PathPointValues &ppv1, const PathPointValues &ppv2);
+PathPointValues operator-(const PathPointValues &ppv1, const PathPointValues &ppv2);
 PathPointValues operator/(const PathPointValues &ppv, const qreal &val);
 PathPointValues operator*(const PathPointValues &ppv, const qreal &val);
 PathPointValues operator*(const qreal &val, const PathPointValues &ppv);

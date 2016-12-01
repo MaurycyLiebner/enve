@@ -165,7 +165,9 @@ void BoxesGroup::getKeysInRect(QRectF selectionRect,
 
 void Canvas::getKeysInRect(QRectF selectionRect,
                            QList<QrealKey *> *keysList) {
-    getKeysInRectFromChildren(selectionRect, keysList);
+    qreal heightT = BoundingBox::getListItemHeight();
+    getKeysInRectFromChildren(selectionRect.translated(0., -heightT),
+                              keysList);
 }
 
 QrealKey *BoxesGroup::getKeyAtPosFromChildren(qreal relX, qreal relY,
@@ -190,7 +192,7 @@ QrealKey *BoxesGroup::getKeyAtPos(qreal relX, qreal relY,
 
 QrealKey *Canvas::getKeyAtPos(qreal relX, qreal relY,
                                qreal y0) {
-    return getKeyAtPosFromChildren(relX, relY, y0);
+    return getKeyAtPosFromChildren(relX, relY, BoundingBox::getListItemHeight());
 }
 
 void BoxesGroup::handleChildListItemMousePress(qreal boxesListX,

@@ -7,7 +7,7 @@ class QPointFAnimator : public ComplexAnimator
 {
 public:
     QPointFAnimator();
-    QPointF getCurrentValue();
+    QPointF getCurrentValue() const;
     qreal getXValue();
     qreal getYValue();
     void setCurrentValue(QPointF val, bool finish = false);
@@ -26,9 +26,6 @@ public:
     void loadFromSql(int posAnimatorId);
     void multSavedValueToCurrentValue(qreal sx, qreal sy);
     void incSavedValueToCurrentValue(qreal incXBy, qreal incYBy);
-    qreal getYValueWithNoise();
-    qreal getXValueWithNoise();
-    QPointF getCurrentValueWithNoise() const;
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

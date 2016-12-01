@@ -10,6 +10,8 @@
 #include "boxeslist.h"
 #include "imagebox.h"
 
+bool Canvas::mEffectsPaintEnabled = true;
+
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                MainWindow *parent) :
     QWidget(parent),
@@ -85,9 +87,28 @@ void Canvas::disableHighQualityPaint() {
     mHighQualityPaint = false;
 }
 
+void Canvas::updateAllBoxes() {
+    BoxesGroup::updateAllBoxes();
+    callUpdateSchedulers();
+}
 
 bool Canvas::highQualityPaint() {
     return mHighQualityPaint;
+}
+
+void Canvas::enableEffectsPaint()
+{
+    mEffectsPaintEnabled = true;
+}
+
+void Canvas::disableEffectsPaint()
+{
+    mEffectsPaintEnabled = false;
+}
+
+bool Canvas::effectsPaintEnabled()
+{
+    return mEffectsPaintEnabled;
 }
 
 void Canvas::updateDisplayedFillStrokeSettings() {

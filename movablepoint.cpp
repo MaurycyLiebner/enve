@@ -58,7 +58,7 @@ void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 
 QPointF MovablePoint::getRelativePos() const
 {
-    return mRelPos.getCurrentValueWithNoise();
+    return mRelPos.getCurrentValue();
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) const {

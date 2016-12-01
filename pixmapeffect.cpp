@@ -74,7 +74,7 @@ void BrushEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal sca
     int height = imgPtr->height();
     QList<BrushStroke*> strokes;
     for(int i = 0; i < mNumberStrokes.getCurrentValue(); i++) {
-        qreal radius = qRandF(mMinBrushRadius.getCurrentValue(), mMaxBrushRadius.getCurrentValue());
+        qreal radius = qRandF(mMinBrushRadius.getCurrentValue(), mMaxBrushRadius.getCurrentValue())*scale;
         QPointF startPos = QPointF(qrand() % width, qrand() % height);
         qreal angle;
         if(qrand() % 2 == 1) {
@@ -82,7 +82,7 @@ void BrushEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal sca
         } else {
             angle = qRandF(mStrokeMinDirectionAngle.getCurrentValue() + 180, mStrokeMaxDirectionAngle.getCurrentValue() + 180);
         }
-        qreal length = qRandF(2*radius, mStrokeMaxLength.getCurrentValue());
+        qreal length = qRandF(2*radius, mStrokeMaxLength.getCurrentValue()*scale);
         QLineF line = QLineF(startPos, QPointF(startPos.x() + length, startPos.y()));
         line.setAngle(angle);
         QPointF endPos = line.p2();
@@ -189,10 +189,47 @@ QColor colorMix(QColor col1, QColor col2) {
                   (col1.blue()*a1 + col2.blue()*a2)/aSum,
                   qMin(a1, a2)*255);
 }
+
+bool isTooDifferent(const QColor &col1, const QColor &col2) {
+    qreal val1 = col1.alphaF();
+    qreal val2 = col2.alphaF();
+    if(qAbs(val1 - val2) > 0.2) return true;
+    return false;
+}
+
+QList<QPixmap*> BrushStroke::mStrokeTexPixmaps;
+QPixmap *BrushStroke::mEndPix;
+
+void BrushStroke::loadStrokePixmaps()
+{
+    mEndPix = new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/end.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/1.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/2.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/3.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/4.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/5.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/6.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/7.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/8.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/9.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/10.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/11.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/12.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/13.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/14.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/15.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/16.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/17.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/18.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/19.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/20.png");
+    mStrokeTexPixmaps << new QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/21.png");
+}
+
 #include <QDebug>
 void BrushStroke::prepareToDrawOnImage(QImage *img)
 {
-    mTexPix = QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/" + QString::number(qrand() % 21 + 1) + ".png").scaledToHeight(mRadius*2, Qt::SmoothTransformation);
+    mTexPix = mStrokeTexPixmaps.at(qrand() % 21)->scaledToHeight(mRadius*2, Qt::SmoothTransformation);
     mStrokeTexHeight = mTexPix.height();
     mStrokeTexWidth = mTexPix.width();
     mMaxTexDabs = mStrokeTexWidth*0.5;
@@ -203,14 +240,21 @@ void BrushStroke::prepareToDrawOnImage(QImage *img)
     QLinearGradient gradient = QLinearGradient(0., 0., dabsWidth, 0.);
     //gradient.setColorAt(0., mColor);
     for(qreal xTex = 0; xTex < dabsWidth; xTex += mRadius) {
-        QColor col = colorMix(img->pixelColor(mStrokePath.pointAtPercent(mStrokePath.percentAtLength(xTex)).toPoint() ), mColor);
+        QColor colAtPix = img->pixelColor(mStrokePath.pointAtPercent(mStrokePath.percentAtLength(xTex)).toPoint() );
+        if(isTooDifferent(colAtPix, mColor)) {
+            mMaxStrokeDabs = xTex*0.5;
+            mNDabs = mMaxStrokeDabs;
+            dabsWidth = xTex;
+            break;
+        }
+        QColor col = colorMix(colAtPix, mColor);
         gradient.setColorAt((xTex /*+ mRadius*/)/dabsWidth, col);
     }
 
     QPainter pTex(&mTexPix);
     pTex.setCompositionMode(QPainter::CompositionMode_SourceIn);
     if(mMaxTexDabs > mMaxStrokeDabs) {
-        QPixmap endPix = QPixmap("/home/ailuropoda/Downloads/036-distressed-halfton-brush-strokes/PNGs/end.png").scaledToHeight(mRadius*2);
+        QPixmap endPix = mEndPix->scaledToHeight(mRadius*2);
         pTex.drawPixmap(dabsWidth - endPix.width() + 2, 0,
                         endPix );
     }

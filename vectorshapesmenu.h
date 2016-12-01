@@ -48,11 +48,13 @@ public slots:
 protected:
     void setAllButEditButtonEnabled(bool enabled);
 protected slots:
-    void createNewShape();
+    void createNewShape(bool relative);
     void removeCurrentShape();
     void editCurrrentShape();
     void finishEditingCurrrentShape();
     void cancelEditCurrentShape();
+    void createNewRelativeShape();
+    void createNewAbsoluteShape();
 private:
     bool mEditingShape = false;
 
@@ -75,6 +77,7 @@ private:
     QList<ShapeWidget*> mShapeWidgets;
 
     ShapeWidget *mSelectedShapeWidget = NULL;
+    QMenu *mNewShapeMenu;
 };
 
 #endif // VECTORSHAPESMENU_H

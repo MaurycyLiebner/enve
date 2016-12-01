@@ -28,6 +28,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    BrushStroke::loadStrokePixmaps();
     mMainWindowInstance = this;
     //int nThreads = QThread::idealThreadCount();
     mPaintControlerThread = new QThread(this);
@@ -262,6 +263,20 @@ MainWindow::MainWindow(QWidget *parent)
     mEffectsMenu = mMenuBar->addMenu("Effects");
 
     mEffectsMenu->addAction("Blur");
+
+    mViewMenu = mMenuBar->addMenu("View");
+    mActionHighQualityView = mViewMenu->addAction("High Quality");
+    mActionHighQualityView->setCheckable(true);
+    mActionHighQualityView->setChecked(false);
+    connect(mActionHighQualityView, SIGNAL(toggled(bool)),
+            this, SLOT(setHighQualityView(bool)));
+
+    mActionEffectsPaintEnabled = mViewMenu->addAction("Effects");
+    mActionEffectsPaintEnabled->setCheckable(true);
+    mActionEffectsPaintEnabled->setChecked(true);
+    mActionEffectsPaintEnabled->setShortcut(QKeySequence(Qt::Key_E));
+    connect(mActionEffectsPaintEnabled, SIGNAL(toggled(bool)),
+            this, SLOT(setEffectsPaintEnabled(bool)));
 
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render", this, SLOT(renderOutput()));
@@ -752,6 +767,28 @@ void MainWindow::revert()
 {
     loadFile(mCurrentFilePath);
     setFileChangedSinceSaving(false);
+}
+
+void MainWindow::setHighQualityView(bool bT)
+{
+    if(bT) {
+        mCanvas->enableHighQualityPaint();
+    } else {
+        mCanvas->disableHighQualityPaint();
+    }
+
+    mCanvas->updateAllBoxes();
+}
+
+void MainWindow::setEffectsPaintEnabled(bool bT)
+{
+    if(bT) {
+        mCanvas->enableEffectsPaint();
+    } else {
+        mCanvas->disableEffectsPaint();
+    }
+
+    mCanvas->updateAllBoxes();
 }
 
 void MainWindow::importFile(QString path, bool loadInBox) {

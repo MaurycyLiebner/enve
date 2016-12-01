@@ -104,7 +104,7 @@ void VectorPath::addShapesToShapesMenu(VectorShapesMenu *menu) {
     }
 }
 
-VectorPathShape *VectorPath::createNewShape() {
+VectorPathShape *VectorPath::createNewShape(bool relative) {
     mShapesEnabled = true;
     if(mShapesAnimator == NULL) {
         mShapesAnimator = new ComplexAnimator();
@@ -114,6 +114,7 @@ VectorPathShape *VectorPath::createNewShape() {
     }
 
     VectorPathShape *shape = new VectorPathShape();
+    shape->setRelative(relative);
     shape->setName("shape " + QString::number(mShapes.count() + 1));
 
     mShapesAnimator->addChildAnimator(shape->getInfluenceAnimator());
@@ -251,6 +252,9 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
 {
     foreach(PathPoint *point, mPoints) {
         point->updateAfterFrameChanged(currentFrame);
+    }
+    if(mShapesAnimator != NULL) {
+        mShapesAnimator->setFrame(currentFrame);
     }
     mPathAnimator.setFrame(currentFrame);
     PathBox::updateAfterFrameChanged(currentFrame);

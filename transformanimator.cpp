@@ -306,14 +306,14 @@ qreal TransformAnimator::getOpacity()
 QMatrix TransformAnimator::getCurrentValue()
 {
     QMatrix matrix;
-    qreal pivotX = mPivotAnimator.getXValueWithNoise();
-    qreal pivotY = mPivotAnimator.getYValueWithNoise();
-    matrix.translate(pivotX + mPosAnimator.getXValueWithNoise(),
-                     pivotY + mPosAnimator.getYValueWithNoise());
+    qreal pivotX = mPivotAnimator.getXValue();
+    qreal pivotY = mPivotAnimator.getYValue();
+    matrix.translate(pivotX + mPosAnimator.getXValue(),
+                     pivotY + mPosAnimator.getYValue());
 
-    matrix.rotate(mRotAnimator.getCurrentValueWithNoise() );
-    matrix.scale(mScaleAnimator.getXValueWithNoise(),
-                 mScaleAnimator.getYValueWithNoise() );
+    matrix.rotate(mRotAnimator.getCurrentValue() );
+    matrix.scale(mScaleAnimator.getXValue(),
+                 mScaleAnimator.getYValue() );
 
     matrix.translate(-pivotX,
                      -pivotY);

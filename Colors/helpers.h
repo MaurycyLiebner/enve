@@ -45,18 +45,6 @@ extern void qhsl_to_hsv(qreal* h, qreal* s, qreal *l);
 
 extern bool isNonZero(GLfloat val_t);
 extern bool isZero(GLfloat val_t);
-extern GLfloat getUNoise(GLfloat noise_scale);
-extern GLfloat getNoise(GLfloat noise_scale);
-extern void applyXYNoise(GLfloat noise_t,
-                  GLfloat *previous_noise_x, GLfloat *next_noise_x,
-                  GLfloat *previous_noise_y, GLfloat *next_noise_y,
-                  GLfloat noise_frequency, uchar *noise_count,
-                  GLfloat *value_x, GLfloat *value_y);
-extern void applyUNoise(GLfloat noise_t, GLfloat *previous_noise, GLfloat *next_noise,
-                GLfloat noise_frequency, uchar *noise_count, GLfloat *value);
-extern void applyNoise(GLfloat noise_t, GLfloat *previous_noise, GLfloat *next_noise,
-                GLfloat noise_frequency, uchar *noise_count, GLfloat *value);
-
 
 class Brush;
 

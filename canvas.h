@@ -293,11 +293,17 @@ public:
     void enableHighQualityPaint();
     void disableHighQualityPaint();
     bool highQualityPaint();
+
+    static void enableEffectsPaint();
+    static void disableEffectsPaint();
+    static bool effectsPaintEnabled();
+
     void updateRenderRect();
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(QString renderDest);
     void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
     void showContextMenu(QPoint globalPos);
+    void updateAllBoxes();
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -373,6 +379,8 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    static bool mEffectsPaintEnabled;
+
     QRectF mRenderRect;
 
     QRectF mPartialRepaintRect;

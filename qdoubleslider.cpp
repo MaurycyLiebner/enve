@@ -262,6 +262,7 @@ void QDoubleSlider::finishTextEditing()
 void QDoubleSlider::lineEditingFinished()
 {
     mLineEdit->setCursor(Qt::ArrowCursor);
+    setCursor(Qt::ArrowCursor);
     QString text = mLineEdit->text();
     setValue(text.toDouble());
     mLineEdit->releaseMouse();

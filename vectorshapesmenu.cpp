@@ -28,8 +28,13 @@ VectorShapesMenu::VectorShapesMenu(QWidget *parent) : QWidget(parent) {
     mEditShapeButton = new QPushButton("edit", this);
     mCancelEditButton = new QPushButton("cancel", this);
 
-    connect(mNewShapeButton, SIGNAL(pressed()),
-            this, SLOT(createNewShape()));
+    mNewShapeMenu = new QMenu(this);
+    mNewShapeMenu->addAction("Relative", this, SLOT(createNewRelativeShape()) );
+    mNewShapeMenu->addAction("Absolute", this, SLOT(createNewAbsoluteShape()) );
+    mNewShapeButton->setMenu(mNewShapeMenu);
+
+//    connect(mNewShapeButton, SIGNAL(pressed()),
+//            this, SLOT(createNewShape()));
     connect(mRemoveShapeButton, SIGNAL(pressed()),
             this, SLOT(removeCurrentShape()));
     connect(mEditShapeButton, SIGNAL(pressed()),
@@ -47,9 +52,17 @@ VectorShapesMenu::VectorShapesMenu(QWidget *parent) : QWidget(parent) {
     mMainLayout->addLayout(mButtonsLayout);
 }
 
-void VectorShapesMenu::createNewShape() {
+void VectorShapesMenu::createNewRelativeShape() {
+    createNewShape(true);
+}
+
+void VectorShapesMenu::createNewAbsoluteShape() {
+    createNewShape(false);
+}
+
+void VectorShapesMenu::createNewShape(bool relative) {
     if(mCurrentVectorPath == NULL) return;
-    addShapeWidgetForShape(mCurrentVectorPath->createNewShape());
+    addShapeWidgetForShape(mCurrentVectorPath->createNewShape(relative));
 }
 
 void VectorShapesMenu::removeCurrentShape() {

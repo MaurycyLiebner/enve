@@ -9,6 +9,7 @@ class QrealAnimatorValueSlider : public QDoubleSlider
 public:
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                              QrealAnimator *animator, QWidget *parent = 0);
+    ~QrealAnimatorValueSlider();
 
     void paint(QPainter *p);
 protected:

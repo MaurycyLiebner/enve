@@ -246,6 +246,7 @@ public:
     void scheduleEffectsMarginUpdate();
     void updateEffectsMarginIfNeeded();
     virtual QMatrix getCombinedFinalRenderTransform();
+    virtual void updateAllBoxes();
 protected:
     bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;

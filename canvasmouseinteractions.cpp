@@ -45,10 +45,24 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                     QMenu menu;
 
                     menu.addAction("Paste");
+                    QMenu *effectsMenu = menu.addMenu("Effects");
+                    effectsMenu->addAction("Blur");
+                    effectsMenu->addAction("Brush");
+                    effectsMenu->addAction("Lines");
+                    effectsMenu->addAction("Circles");
+
 
                     QAction *selectedAction = menu.exec(event->globalPos());
                     if(selectedAction != NULL) {
                         if(selectedAction->text() == "Paste") {
+                        } else if(selectedAction->text() == "Blur") {
+                            addEffect(new BlurEffect());
+                        } else if(selectedAction->text() == "Brush") {
+                            addEffect(new BrushEffect());
+                        } else if(selectedAction->text() == "Lines") {
+                            addEffect(new LinesEffect());
+                        } else if(selectedAction->text() == "Circles") {
+                            addEffect(new CirclesEffect());
                         }
 
                         callUpdateSchedulers();

@@ -22,7 +22,7 @@ class MovablePoint : public Transformable
 {
 public:
     MovablePoint(BoundingBox *parent, MovablePointType type,
-                 qreal radius = 7.5f);
+                 qreal radius = 7.5);
 
     virtual void startTransform();
     virtual void finishTransform();

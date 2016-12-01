@@ -20,6 +20,12 @@ BoxesGroup::BoxesGroup(BoxesGroup *parent) :
     mFillStrokeSettingsWidget = getMainWindow()->getFillStrokeSettings();
 }
 
+void BoxesGroup::updateAllBoxes() {
+    foreach(BoundingBox *child, mChildren) {
+        child->updateAllBoxes();
+    }
+}
+
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     BoundingBox(BoundingBoxType::TYPE_CANVAS)
 {
