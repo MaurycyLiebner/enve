@@ -8,7 +8,8 @@ class PixmapEffect : public ComplexAnimator
 public:
     PixmapEffect();
     virtual void apply(QImage *imgPtr,
-                       const fmt_filters::image &img, qreal scale = 1.) {}
+                       const fmt_filters::image &img, qreal scale,
+                       bool highQuality) {}
 
     virtual qreal getMargin() {}
 };
@@ -18,7 +19,8 @@ class BlurEffect : public PixmapEffect
 public:
     BlurEffect(qreal radius = 10.);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
+    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale,
+               bool highQuality);
 
     qreal getMargin();
 private:
@@ -74,7 +76,7 @@ public:
                 qreal strokeMaxDirectionAngle = 360.,
                 qreal strokeCurvature = 0.5);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
+    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality);
 
     qreal getMargin();
 private:
@@ -92,7 +94,7 @@ class LinesEffect : public PixmapEffect
 public:
     LinesEffect(qreal linesWidth = 5., qreal linesDistance = 5.);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
+    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality);
 
     qreal getMargin() { return 0.; }
 private:
@@ -106,7 +108,7 @@ class CirclesEffect : public PixmapEffect
 public:
     CirclesEffect(qreal circlesRadius = 5., qreal circlesDistance = 5.);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale = 1.);
+    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality);
 
     qreal getMargin() { return 0.; }
 private:

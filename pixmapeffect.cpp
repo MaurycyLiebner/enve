@@ -14,10 +14,14 @@ BlurEffect::BlurEffect(qreal radius) {
 }
 
 void BlurEffect::apply(QImage *imgPtr,
-                       const fmt_filters::image &img, qreal scale) {
+                       const fmt_filters::image &img, qreal scale, bool highQuality) {
     Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius.getCurrentValue()*scale;
-    fmt_filters::blur(img, radius, radius*0.3333);
+    if(highQuality) {
+        fmt_filters::blur(img, radius, radius*0.3333);
+    } else {
+        fmt_filters::fast_blur(img, radius*0.75);
+    }
 }
 
 qreal BlurEffect::getMargin()
@@ -69,7 +73,8 @@ BrushEffect::BrushEffect(qreal numberStrokes,
     addChildAnimator(&mStrokeCurvature);
 }
 
-void BrushEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale) {
+void BrushEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale,
+                        bool highQuality) {
     int width = imgPtr->width();
     int height = imgPtr->height();
     QList<BrushStroke*> strokes;
@@ -305,7 +310,7 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect()
     addChildAnimator(&mLinesDistance);
 }
 
-void LinesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale)
+void LinesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality)
 {
     qreal linesWidth = mLinesWidth.getCurrentValue()*scale;
     qreal linesDistance = mLinesDistance.getCurrentValue()*scale;
@@ -362,7 +367,7 @@ CirclesEffect::CirclesEffect(qreal circlesRadius, qreal circlesDistance) : Pixma
     addChildAnimator(&mCirclesDistance);
 }
 
-void CirclesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale)
+void CirclesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality)
 {
     qreal radius = mCirclesRadius.getCurrentValue()*scale;
     qreal distance = mCirclesDistance.getCurrentValue()*scale;
