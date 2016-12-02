@@ -287,6 +287,7 @@ void QrealAnimator::removeAllKeys() {
 void QrealAnimator::setRecording(bool rec)
 {
     mIsRecording = rec;
+    setTraceKeyOnCurrentFrame(rec); // !!!
     if(rec) {
         saveCurrentValueAsKey();
     } else {
@@ -307,6 +308,7 @@ void QrealAnimator::updateKeyOnCurrrentFrame()
 {
     if(mTraceKeyOnCurrentFrame) {
         mKeyOnCurrentFrame = getKeyAtFrame(mCurrentFrame) != NULL;
+        sendValueChangeToSliders();
     }
 }
 

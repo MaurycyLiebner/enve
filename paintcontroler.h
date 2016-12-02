@@ -12,8 +12,10 @@ public:
 
 signals:
     void finishedUpdatingLastBox();
+    void finishedPrettyUpdatingLastBox();
 public slots:
     void updateBoxPrettyPixmap(BoundingBox *box);
+    void updateBoxPixmaps(BoundingBox *box);
 private:
 };
 

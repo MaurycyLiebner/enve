@@ -12,6 +12,21 @@ public:
                        bool highQuality) {}
 
     virtual qreal getMargin() {}
+
+    bool interrupted() {
+        if(mInterrupted) {
+            mInterrupted = false;
+            return true;
+        }
+        return false;
+    }
+
+public slots:
+    void interrupt() {
+        mInterrupted = true;
+    }
+protected:
+    bool mInterrupted = false;
 };
 
 class BlurEffect : public PixmapEffect

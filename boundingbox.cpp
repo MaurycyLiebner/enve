@@ -158,9 +158,9 @@ void BoundingBox::updateAllUglyPixmap() {
     QPainter p(&mAllUglyPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-mAllUglyBoundingRect.topLeft());
-    p.translate(mAllUglyBoundingRect.topLeft() -
-                QPointF(qRound(mAllUglyBoundingRect.left()),
-                        qRound(mAllUglyBoundingRect.top())) );
+//    p.translate(mAllUglyBoundingRect.topLeft() -
+//                QPointF(qRound(mAllUglyBoundingRect.left()),
+//                        qRound(mAllUglyBoundingRect.top())) );
     p.setTransform(QTransform(mAllUglyTransform), true);
 
     draw(&p);
@@ -229,9 +229,13 @@ void BoundingBox::awaitUpdate() {
 
 #include "updatescheduler.h"
 void BoundingBox::scheduleAwaitUpdate() {
-    if(mAwaitUpdateScheduled) return;
-    setAwaitUpdateScheduled(true);
-    addUpdateScheduler(new AwaitUpdateUpdateScheduler(this));
+    if(mAwaitingUpdate) {
+        redoUpdate();
+    } else {
+        if(mAwaitUpdateScheduled) return;
+        setAwaitUpdateScheduled(true);
+        addUpdateScheduler(new AwaitUpdateUpdateScheduler(this));
+    }
 }
 
 void BoundingBox::setAwaitUpdateScheduled(bool bT) {
@@ -534,11 +538,7 @@ void BoundingBox::updateCombinedTransform() {
 
         updateAfterCombinedTransformationChanged();
 
-        if(mAwaitingUpdate) {
-            redoUpdate();
-        } else {
-            scheduleAwaitUpdate();
-        }
+        scheduleAwaitUpdate();
         updateUglyPaintTransform();
     }
 }

@@ -495,8 +495,6 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     connect(mFillStrokePickerButton, SIGNAL(pressed()),
             this, SLOT(startLoadingSettingsFromPath()) );
     mMainLayout->addLayout(mPickersLayout);
-    QDoubleSlider *slider = new QDoubleSlider(this);
-    mMainLayout->addWidget(slider);
 
     setFillTarget();
     setCapStyle(Qt::RoundCap);

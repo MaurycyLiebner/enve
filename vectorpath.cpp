@@ -565,9 +565,9 @@ void VectorPath::updatePath()
         point->clearInfluenceAdjustedPointValues();
     }
 
-    if(mInfluenceEnabled || mShapesEnabled) {
+    //if(mInfluenceEnabled || mShapesEnabled || !mEffects.isEmpty()) {
         mEditPath = QPainterPath();
-
+    if(mInfluenceEnabled) {
         bool moreNeeded = true;
         while(moreNeeded) {
             moreNeeded = false;
@@ -582,15 +582,27 @@ void VectorPath::updatePath()
             point->finishInfluenceAdjusted();
         }
     }
+    //}
 
     foreach (PathPoint *firstPointInPath, mSeparatePaths) {
         PathPoint *point = firstPointInPath;
-        PathPointValues lastPointValues = point->getShapesInfluencedPointValues();//getInfluenceAdjustedPointValues();
+        PathPointValues lastPointValues;
+        if(mInfluenceEnabled) {
+            lastPointValues = point->getInfluenceAdjustedPointValues();
+        } else {
+            lastPointValues = point->getShapesInfluencedPointValues();
+        }
         mPath.moveTo(lastPointValues.pointRelPos);
         while(true) {
             point = point->getNextPoint();
             if(point == NULL) break;
-            PathPointValues pointValues = point->getShapesInfluencedPointValues();//getInfluenceAdjustedPointValues();
+            PathPointValues pointValues;
+
+            if(mInfluenceEnabled) {
+                pointValues = point->getInfluenceAdjustedPointValues();
+            } else {
+                pointValues = point->getShapesInfluencedPointValues();
+            }
 
             mPath.cubicTo(lastPointValues.endRelPos,
                           pointValues.startRelPos,
@@ -601,7 +613,7 @@ void VectorPath::updatePath()
             if(point == firstPointInPath) break;
         }
 
-        if(mInfluenceEnabled || mShapesEnabled) {
+        //if(mInfluenceEnabled || mShapesEnabled || !mEffects.isEmpty()) {
             point = firstPointInPath;
             lastPointValues = point->getPointValues();
             mEditPath.moveTo(lastPointValues.pointRelPos);
@@ -618,7 +630,7 @@ void VectorPath::updatePath()
 
                 if(point == firstPointInPath) break;
             }
-        }
+        //}
     }
 
     updateOutlinePath();
@@ -729,20 +741,19 @@ void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
     newEdge.makePassThrough(absPos);
 }
 
-void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
-{
+void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode) {
     if(mVisible) {
         p->save();
         //drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            if(mInfluenceEnabled || mShapesEnabled) {
+            //if(mInfluenceEnabled || mShapesEnabled || !mEffects.isEmpty()) {
                 p->save();
                 p->setBrush(Qt::NoBrush);
                 p->setPen(QPen(Qt::blue, 1., Qt::DashLine) );
                 p->setTransform(QTransform(mCombinedTransformMatrix), true);
                 p->drawPath(mEditPath);
                 p->restore();
-            }
+            //}
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
             PathPoint *point;
             foreachInverted(point, mPoints) {

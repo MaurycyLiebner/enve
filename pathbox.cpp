@@ -112,7 +112,7 @@ void PathBox::updatePathIfNeeded()
     }
 }
 
-void PathBox::updatePrettyPixmap() {
+void PathBox::updatePixmaps() {
     if(mRedoUpdate) {
         mRedoUpdate = false;
         updateUpdateTransform();
@@ -125,7 +125,7 @@ void PathBox::updatePrettyPixmap() {
 
     BoundingBox::updateAllUglyPixmap();
     if(mMainWindow->getCanvas()->highQualityPaint()) {
-        BoundingBox::updatePrettyPixmap();
+        updatePrettyPixmap();
         mHighQualityPaint = true;
     } else {
         mHighQualityPaint = false;
@@ -291,7 +291,7 @@ void PathBox::render(QPainter *p) {
         draw(&pixP);
         pixP.end();
 
-        renderPixmap = applyEffects(renderPixmap, mHighQualityPaint);
+        renderPixmap = applyEffects(renderPixmap, mHighQualityPaint, getCurrentCanvasScale());
 
         p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
     }

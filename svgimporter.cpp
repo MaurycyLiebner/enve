@@ -545,7 +545,6 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
 
 void loadBoundingBoxAttributes(const QString &attributesStr,
                                BoundingBox *targetBox) {
-    /*
     QList<SvgAttribute> styleAttributes;
     extractSvgAttributes(attributesStr, &styleAttributes);
     foreach(const SvgAttribute &attribute, styleAttributes) {
@@ -645,7 +644,7 @@ void loadBoundingBoxAttributes(const QString &attributesStr,
         default:
             break;
         }
-    }*/
+    }
 }
 
 void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup) {

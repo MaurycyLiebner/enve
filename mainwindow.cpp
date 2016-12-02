@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(mPaintControler, SIGNAL(finishedUpdatingLastBox()),
             this, SLOT(sendNextBoxForUpdate()) );
     connect(this, SIGNAL(updateBox(BoundingBox*)),
-            mPaintControler, SLOT(updateBoxPrettyPixmap(BoundingBox*)) );
+            mPaintControler, SLOT(updateBoxPixmaps(BoundingBox*)) );
     mPaintControlerThread->start();
 
     mUndoRedoStack.setWindow(this);
@@ -330,13 +330,10 @@ void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)
 void MainWindow::sendNextBoxForUpdate()
 {
     if(mLastUpdatedBox != NULL) {
+        mLastUpdatedBox->setAwaitingUpdate(false);
         if(mLastUpdatedBox->shouldRedoUpdate()) {
             mLastUpdatedBox->setRedoUpdateToFalse();
-            mLastUpdatedBox->setAwaitingUpdate(true);
-            emit updateBox(mLastUpdatedBox);
-            return;
-        } else {
-            mLastUpdatedBox->setAwaitingUpdate(false);
+            mLastUpdatedBox->awaitUpdate();
         }
     }
     if(mBoxesAwaitingUpdate.isEmpty()) {

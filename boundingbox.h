@@ -212,7 +212,8 @@ public:
     virtual VectorPath *objectToPath() { return NULL; }
     virtual void loadFromSql(int boundingBoxId);
 
-    virtual void updatePrettyPixmap();
+    virtual void updatePixmaps() {}
+    void updatePrettyPixmap();
     void setAwaitingUpdate(bool bT);
     void awaitUpdate();
     QRectF getBoundingRectClippedToView();

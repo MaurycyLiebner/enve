@@ -181,7 +181,7 @@ public:
     int saveToSql(int parentId);
     void loadFromSql(int boundingBoxId);
     virtual void updateBoundingRect();
-    void updatePrettyPixmap();
+    void updatePixmaps();
     void updatePixBoundingRectClippedToView();
 
     void afterSuccessfulUpdate();
