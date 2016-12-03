@@ -33,6 +33,7 @@ void QrealAnimatorValueSlider::emitEditingFinished(qreal value)
 {
     if(mAnimator == NULL) return;
     mAnimator->setCurrentValue(value, true);
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void QrealAnimatorValueSlider::paint(QPainter *p)

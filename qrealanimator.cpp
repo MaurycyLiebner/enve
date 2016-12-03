@@ -30,7 +30,7 @@ void QrealAnimator::removeSlider(QrealAnimatorValueSlider *valueSlider) {
 
 void QrealAnimator::sendValueChangeToSliders() {
     foreach(QrealAnimatorValueSlider *valueSlider, mSliders) {
-        valueSlider->setValue(mCurrentValue);
+        valueSlider->setValueNoUpdate(mCurrentValue);
         valueSlider->update();
     }
 }

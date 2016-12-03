@@ -21,7 +21,7 @@ public:
     void setName(QString name);
     void setNumberDecimals(int decimals);
 
-    void setValue(qreal value);
+    void setValueNoUpdate(qreal value);
     void updateLineEditFromValue();
     void fitWidthToContent();
     QString getValueString();
@@ -41,6 +41,7 @@ signals:
     void valueChanged(qreal);
     void editingFinished(qreal);
 public slots:
+    void setValue(qreal value);
 protected:
     int mDecimals = 3;
 

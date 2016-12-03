@@ -76,7 +76,7 @@ void QDoubleSlider::setNumberDecimals(int decimals)
     fitWidthToContent();
 }
 
-void QDoubleSlider::setValue(qreal value)
+void QDoubleSlider::setValueNoUpdate(qreal value)
 {
     mValue = qclamp(value, mMinValue, mMaxValue);
 }
@@ -94,7 +94,7 @@ void QDoubleSlider::setValueRange(qreal min, qreal max)
 {
     mMinValue = min;
     mMaxValue = max;
-    setValue(mValue);
+    setValueNoUpdate(mValue);
     updateLineEditFromValue();
     fitWidthToContent();
 }
@@ -124,6 +124,12 @@ void QDoubleSlider::emitValueChanged(qreal value)
 void QDoubleSlider::emitEditingFinished(qreal value)
 {
     emit editingFinished(value);
+}
+
+void QDoubleSlider::setValue(qreal value)
+{
+    setValueNoUpdate(value);
+    update();
 }
 
 void QDoubleSlider::fitWidthToContent()
@@ -168,7 +174,7 @@ void QDoubleSlider::mousePressEvent(QMouseEvent *event)
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
 {
     qreal dValue = (event->x() - mPressX)*0.008*(mMaxValue - mMinValue);
-    setValue(mPressValue + dValue);
+    setValueNoUpdate(mPressValue + dValue);
     update();
 
     mPressValue = mValue;
@@ -238,9 +244,9 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
         if(obj == mLineEdit) return true;
         QWheelEvent *wheelEvent = (QWheelEvent*)event;
         if(wheelEvent->delta() > 0) {
-            setValue(mValue + mPrefferedValueStep);
+            setValueNoUpdate(mValue + mPrefferedValueStep);
         } else {
-            setValue(mValue - mPrefferedValueStep);
+            setValueNoUpdate(mValue - mPrefferedValueStep);
         }
         if(mTextEdit) {
             updateLineEditFromValue();
@@ -264,7 +270,7 @@ void QDoubleSlider::lineEditingFinished()
     mLineEdit->setCursor(Qt::ArrowCursor);
     setCursor(Qt::ArrowCursor);
     QString text = mLineEdit->text();
-    setValue(text.toDouble());
+    setValueNoUpdate(text.toDouble());
     mLineEdit->releaseMouse();
 
     emitValueChanged(mValue);
