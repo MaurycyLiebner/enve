@@ -4,6 +4,7 @@
 GradientPoint::GradientPoint(PathBox *parent) :
     MovablePoint(parent, TYPE_GRADIENT_POINT)
 {
+    getRelativePosAnimatorPtr()->setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
     mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 

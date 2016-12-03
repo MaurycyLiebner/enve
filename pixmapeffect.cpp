@@ -20,7 +20,7 @@ void BlurEffect::apply(QImage *imgPtr,
     if(highQuality) {
         fmt_filters::blur(img, radius, radius*0.3333);
     } else {
-        fmt_filters::fast_blur(img, radius*0.75);
+        fmt_filters::fast_blur(img, radius*0.5);
     }
 }
 

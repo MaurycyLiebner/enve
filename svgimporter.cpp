@@ -3,7 +3,35 @@
 #include "boxesgroup.h"
 #include "canvas.h"
 
-void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup) {
+struct SvgAttribute {
+    SvgAttribute(const QString &nameValueStr) {
+        QStringList nameValueList = nameValueStr.split(":");
+        name = nameValueList.first();
+        value = nameValueList.last();
+    }
+
+    QString getName() const {
+        return name;
+    }
+
+    QString getValue() const {
+        return value;
+    }
+
+    QString name;
+    QString value;
+};
+
+void extractSvgAttributes(const QString &string, QList<SvgAttribute> *attributesList) {
+    QStringList attributesStrList = string.split(";");
+    foreach(const QString &attributeStr, attributesStrList) {
+        attributesList->append(SvgAttribute(attributeStr));
+    }
+}
+
+
+void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup,
+                    BoundingBoxSvgAttributes *attributes) {
     QDomNodeList allRootChildNodes = groupElement.childNodes();
     BoxesGroup *boxesGroup;
     if(allRootChildNodes.count() > 1) {
@@ -15,7 +43,7 @@ void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup) {
     for(int i = 0; i < allRootChildNodes.count(); i++) {
         QDomNode iNode = allRootChildNodes.at(i);
         if(iNode.isElement()) {
-            loadElement(iNode.toElement(), boxesGroup);
+            loadElement(iNode.toElement(), boxesGroup, attributes);
         }
     }
 }
@@ -542,11 +570,10 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
     return true;
 }
 
-
-void loadBoundingBoxAttributes(const QString &attributesStr,
-                               BoundingBox *targetBox) {
+void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
     QList<SvgAttribute> styleAttributes;
-    extractSvgAttributes(attributesStr, &styleAttributes);
+    QString styleAttributesStr = element.attribute("style");
+    extractSvgAttributes(styleAttributesStr, &styleAttributes);
     foreach(const SvgAttribute &attribute, styleAttributes) {
         QString name = attribute.getName();
         if(name.isEmpty()) continue;
@@ -554,112 +581,133 @@ void loadBoundingBoxAttributes(const QString &attributesStr,
 
         switch (name.at(0).unicode()) {
         case 'c':
-            if (name == "color")
-                color = value;
-            else if (name == "color-opacity")
-                colorOpacity = value;
-            else if (name == "comp-op")
-                compOp = value;
+            if (name == "color") {
+                //color = value;
+            } else if (name == "color-opacity") {
+                //colorOpacity = value;
+            } else if (name == "comp-op") {
+                //compOp = value;
+            }
             break;
 
         case 'd':
-            if (name == "display")
-                display = value;
+            if (name == "display") {
+                //display = value;
+            }
             break;
 
         case 'f':
-            if (name == "fill")
-                fill = value;
-            else if (name == "fill-rule")
-                fillRule = value;
-            else if (name == "fill-opacity")
-                fillOpacity = value;
-            else if (name == "font-family")
-                fontFamily = value;
-            else if (name == "font-size")
-                fontSize = value;
-            else if (name == "font-style")
-                fontStyle = value;
-            else if (name == "font-weight")
-                fontWeight = value;
-            else if (name == "font-variant")
-                fontVariant = value;
+            if (name == "fill") {
+                Color color;
+                getColorFromString(value, &color);
+                mFillAttributes.setColor(color);
+            } else if (name == "fill-rule") {
+                //fillRule = value;
+            } else if (name == "fill-opacity") {
+                //fillOpacity = value;
+            } else if (name == "font-family") {
+                //fontFamily = value;
+            } else if (name == "font-size") {
+                //fontSize = value;
+            } else if (name == "font-style") {
+                //fontStyle = value;
+            } else if (name == "font-weight") {
+                //fontWeight = value;
+            } else if (name == "font-variant") {
+                //fontVariant = value;
+            }
             break;
 
         case 'i':
             if (name == "id")
-                id = value.toString();
+                mId = value;
             break;
 
         case 'o':
-            if (name == "opacity")
-                opacity = value;
-            if (name == "offset")
-                offset = value;
+            if (name == "opacity") {
+                //opacity = value;
+            } else if (name == "offset") {
+                //offset = value;
+            }
             break;
 
         case 's':
             if(name.contains("stroke")) {
-                if(name == "stroke")
-                    stroke = value;
-                else if (strokeRef == "stroke-dasharray")
-                    strokeDashArray = value;
-                else if (strokeRef == "stroke-dashoffset")
-                    strokeDashOffset = value;
-                else if (strokeRef == "stroke-linecap")
-                    strokeLineCap = value;
-                else if (strokeRef == "stroke-linejoin")
-                    strokeLineJoin = value;
-                else if (strokeRef == "stroke-miterlimit")
-                    strokeMiterLimit = value;
-                else if (strokeRef == "stroke-opacity")
-                    strokeOpacity = value;
-                else if (strokeRef == "stroke-width")
-                    strokeWidth = value;
+                if(name == "stroke") {
+                    //stroke = value;
+                    Color color;
+                    getColorFromString(value, &color);
+                    mStrokeAttributes.setColor(color);
+                } else if (name == "stroke-dasharray") {
+                    //strokeDashArray = value;
+                } else if (name == "stroke-dashoffset") {
+                    //strokeDashOffset = value;
+                } else if (name == "stroke-linecap") {
+                    //strokeLineCap = value;
+                } else if (name == "stroke-linejoin") {
+                    //strokeLineJoin = value;
+                } else if (name == "stroke-miterlimit") {
+                    //strokeMiterLimit = value;
+                } else if (name == "stroke-opacity") {
+                    //strokeOpacity = value;
+                } else if (name == "stroke-width") {
+                    mStrokeAttributes.setLineWidth(value.toDouble());
+                }
             } else if (name == "stop-color") {
-                stopColor = value;
+                //stopColor = value;
             } else if (name == "stop-opacity") {
-                stopOpacity = value;
+                //stopOpacity = value;
             }
             break;
         case 't':
-            if(name == "text-anchor")
-                textAnchor = value;
-            else if(name == "transform")
-                transform = value;
+            if(name == "text-anchor") {
+                //textAnchor = value;
+            } else if(name == "transform") {
+                //transform = value;
+            }
             break;
 
         case 'v':
-            if (name == "vector-effect")
-                vectorEffect = value;
-            else if (name == "visibility")
-                visibility = value;
+            if (name == "vector-effect") {
+                //vectorEffect = value;
+            } else if (name == "visibility") {
+                //visibility = value;
+            }
             break;
 
         case 'x':
-            if (name == "xml:id")
-                id = value.toString();
+            if (name == "xml:id") {
+                mId = value;
+            }
             break;
 
         default:
             break;
         }
     }
+
+    QString matrixStr = element.attribute("transform");
+    mCombinedTransform = getMatrixFromString(matrixStr);
 }
 
-void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup) {
+void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup,
+                    BoundingBoxSvgAttributes *attributes) {
     VectorPath *vectorPath = new VectorPath(parentGroup);
-    loadBoundingBoxAttributes(pathElement.attribute("style"), vectorPath);
 
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, vectorPath);
+    attributes->apply(vectorPath);
 }
 
-void loadElement(const QDomElement &element, BoxesGroup *parentGroup) {
+void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
+                 BoundingBoxSvgAttributes *parentGroupAttributes) {
+    BoundingBoxSvgAttributes attributes;
+    attributes.loadBoundingBoxAttributes(element);
+    attributes *= (*parentGroupAttributes);
     if(element.tagName() == "g") {
-        loadBoxesGroup(element, parentGroup);
+        loadBoxesGroup(element, parentGroup, &attributes);
     } else if(element.tagName() == "path") {
-        loadVectorPath(element, parentGroup);
+        loadVectorPath(element, parentGroup, &attributes);
     }
 }
 
@@ -675,29 +723,29 @@ bool getUrlId(const QString &urlStr, QString *id) {
     return false;
 }
 
-bool getColorFromString(const QString &colorStr, QColor *color) {
+bool getColorFromString(const QString &colorStr, Color *color) {
     QRegExp rx = QRegExp("rgb\\(.*\\)", Qt::CaseInsensitive);
     if(rx.exactMatch(colorStr)) {
         rx = QRegExp("rgb\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)", Qt::CaseInsensitive);
         if(rx.exactMatch(colorStr)) {
             rx.indexIn(colorStr);
             QStringList intRGB = rx.capturedTexts();
-            color->setRed( ((const QString &)intRGB.at(1)).toInt() );
-            color->setGreen( ((const QString &)intRGB.at(2)).toInt() );
-            color->setBlue( ((const QString &)intRGB.at(3)).toInt() );
+            color->setRGB(((const QString &)intRGB.at(1)).toInt()/255.,
+                          ((const QString &)intRGB.at(2)).toInt()/255.,
+                          ((const QString &)intRGB.at(3)).toInt()/255. );
         } else {
             rx = QRegExp("rgb\\(\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*,\\s*(\\d+)\\s*%\\s*\\)", Qt::CaseInsensitive);
             rx.indexIn(colorStr);
             QStringList intRGB = rx.capturedTexts();
-            color->setRedF( ((const QString &)intRGB.at(1)).toInt()/100. );
-            color->setGreenF( ((const QString &)intRGB.at(2)).toInt()/100. );
-            color->setBlueF( ((const QString &)intRGB.at(3)).toInt()/100. );
+            color->setRGB(((const QString &)intRGB.at(1)).toInt()/100.,
+                          ((const QString &)intRGB.at(2)).toInt()/100.,
+                          ((const QString &)intRGB.at(3)).toInt()/100. );
 
         }
     } else {
-        rx = QRegExp("#(\\d+)", Qt::CaseInsensitive);
+        rx = QRegExp("#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})", Qt::CaseInsensitive);
         if(rx.exactMatch(colorStr)) {
-            color->setNamedColor(colorStr);
+            color->setQColor(QColor(colorStr));
         } else {
             qDebug() << "getColorFromString: Color format not recognised";
             return false;
@@ -709,6 +757,7 @@ bool getColorFromString(const QString &colorStr, QColor *color) {
 
 QMatrix getMatrixFromString(const QString &matrixStr) {
     QMatrix matrix;
+    if(matrixStr.isEmpty()) return matrix;
 
     QRegExp rx = QRegExp("matrix\\("
                          "\\s*(-?\\d+(\\.\\d*)?),"
@@ -736,14 +785,14 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
 }
 #include "mainwindow.h"
 void loadSVGFile(const QString &filename, Canvas *canvas) {
-    getMatrixFromString("matrix(-0.01793887,-0.99983909,0.99983909,-0.01793887,207.06247,684.50864)");
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
         if(document.setContent(&file) ) {
             QDomElement rootElement = document.firstChildElement("svg");
             if(!rootElement.isNull()) {
-                loadBoxesGroup(rootElement, canvas);
+                BoundingBoxSvgAttributes attributes;
+                loadBoxesGroup(rootElement, canvas, &attributes);
             } else {
                 qDebug() << "File does not have svg root element";
             }
@@ -754,32 +803,6 @@ void loadSVGFile(const QString &filename, Canvas *canvas) {
         qDebug() << "Cannot open file " + filename;
     }
     MainWindow::getInstance()->callUpdateSchedulers();
-}
-
-struct SvgAttribute {
-    SvgAttribute(const QString &nameValueStr) {
-        QStringList nameValueList = nameValueStr.split(":");
-        name = nameValueList.first();
-        value = nameValueList.last();
-    }
-
-    QString getName() const {
-        return name;
-    }
-
-    QString getValue() const {
-        return value;
-    }
-
-    QString name;
-    QString value;
-};
-
-void extractSvgAttributes(const QString &string, QList<SvgAttribute> *attributesList) {
-    QStringList attributesStrList = string.split(";");
-    foreach(const QString &attributeStr, attributesStrList) {
-        attributesList->append(SvgAttribute(attributeStr));
-    }
 }
 
 /*
@@ -1498,3 +1521,20 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
     }
     return true;
 }*/
+
+void FillSvgAttributes::apply(BoundingBox *box)
+{
+    box->setFillPaintType(mPaintType, mColor, mGradient);
+}
+
+void StrokeSvgAttributes::apply(BoundingBox *box)
+{
+    box->setStrokeWidth(mLineWidth, false);
+    box->setStrokePaintType(mPaintType, mColor, mGradient);
+}
+
+void BoundingBoxSvgAttributes::apply(BoundingBox *box)
+{
+    mStrokeAttributes.apply(box);
+    mFillAttributes.apply(box);
+}

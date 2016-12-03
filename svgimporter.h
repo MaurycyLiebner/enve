@@ -6,14 +6,21 @@
 
 class TextSvgAttributes {
 public:
-    TextSvgAttributes();
+    TextSvgAttributes() {}
 
+    TextSvgAttributes &operator*=(const TextSvgAttributes &overwritter)
+    {
+//        if(overwritter.wasColorAssigned()) {
+//            mColor = overwritter.getColor();
+//        }
+        return *this;
+    }
 private:
 };
 
 class FillSvgAttributes {
 public:
-    FillSvgAttributes();
+    FillSvgAttributes() {}
 
     FillSvgAttributes &operator*=(const FillSvgAttributes &overwritter)
     {
@@ -29,25 +36,46 @@ public:
         return *this;
     }
 
+    void setColor(const Color &val) {
+        mColor = val;
+        mColorAssigned = true;
+        setPaintType(FLATPAINT);
+    }
+
+    void setPaintType(const PaintType &type) {
+        mPaintType = type;
+        mPaintTypeAssigned = true;
+    }
+
+    void setGradient(Gradient *gradient) {
+        mGradient = gradient;
+        mGradientAssigned = true;
+        setPaintType(GRADIENTPAINT);
+    }
+
     bool wasColorAssigned() const { return mColorAssigned; }
     bool wasPaintTypeAssigned() const { return mPaintTypeAssigned; }
     bool wasGradientAssigned() const { return mGradientAssigned; }
 
-    Color getColor() const { return mColor; }
-    PaintType getPaintType() const { return mPaintType; }
+    const Color &getColor() const { return mColor; }
+    const PaintType &getPaintType() const { return mPaintType; }
     Gradient *getGradient() const { return mGradient; }
+
+    void apply(BoundingBox *box);
 protected:
     bool mColorAssigned = false;
     Color mColor;
     bool mPaintTypeAssigned = false;
-    PaintType mPaintType = FLATPAINT;
+    PaintType mPaintType = NOPAINT;
     bool mGradientAssigned = false;
     Gradient *mGradient = NULL;
 };
 
 class StrokeSvgAttributes : public FillSvgAttributes {
 public:
-    StrokeSvgAttributes();
+    StrokeSvgAttributes() {}
+
+
 
     StrokeSvgAttributes &operator*=(const StrokeSvgAttributes &overwritter)
     {
@@ -81,10 +109,32 @@ public:
     bool wasJoinStyleAssigned() const { return mJoinStyleAssigned; }
     bool wasOutlineCompositionModeAssigned() const { return mOutlineCompositionModeAssigned; }
 
-    qreal getLineWidth() const { return mLineWidth; }
-    Qt::PenCapStyle getCapStyle() const { return mCapStyle; }
-    Qt::PenJoinStyle getJoinStyle() const { return mJoinStyle; }
-    QPainter::CompositionMode getOutlineCompositionMode() const { return mOutlineCompositionMode; }
+    const qreal &getLineWidth() const { return mLineWidth; }
+    const Qt::PenCapStyle &getCapStyle() const { return mCapStyle; }
+    const Qt::PenJoinStyle &getJoinStyle() const { return mJoinStyle; }
+    const QPainter::CompositionMode &getOutlineCompositionMode() const { return mOutlineCompositionMode; }
+
+    void setLineWidth(const qreal &val) {
+        mLineWidth = val;
+        mLineWidthAssigned = true;
+    }
+
+    void setCapStyle(const Qt::PenCapStyle &capStyle) {
+        mCapStyle = capStyle;
+        mCapStyleAssigned = true;
+    }
+
+    void setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+        mJoinStyle = joinStyle;
+        mJoinStyleAssigned = true;
+    }
+
+    void setOutlineCompositionMode(const QPainter::CompositionMode &compMode) {
+        mOutlineCompositionMode = compMode;
+        mOutlineCompositionModeAssigned = true;
+    }
+
+    void apply(BoundingBox *box);
 protected:
     bool mLineWidthAssigned = false;
     qreal mLineWidth;
@@ -98,8 +148,27 @@ protected:
 
 class BoundingBoxSvgAttributes {
 public:
-    BoundingBoxSvgAttributes();
+    BoundingBoxSvgAttributes() {}
 
+    BoundingBoxSvgAttributes &operator*=(const BoundingBoxSvgAttributes &overwritter)
+    {
+        mCombinedTransform *= overwritter.getCombinedTransform();
+
+        mFillAttributes *= overwritter.getFillAttributes();
+        mStrokeAttributes *= overwritter.getStrokeAttributes();
+        mTextAttributes *= overwritter.getTextAttributes();
+
+        return *this;
+    }
+
+    const QMatrix &getCombinedTransform() const { return mCombinedTransform; }
+    const FillSvgAttributes &getFillAttributes() const { return mFillAttributes; }
+    const StrokeSvgAttributes &getStrokeAttributes() const { return mStrokeAttributes; }
+    const TextSvgAttributes &getTextAttributes() const { return mTextAttributes; }
+
+    void loadBoundingBoxAttributes(const QDomElement &element);
+
+    void apply(BoundingBox *box);
 protected:
     QString mId;
     QMatrix mCombinedTransform;
@@ -108,23 +177,26 @@ protected:
     TextSvgAttributes mTextAttributes;
 };
 
-class VectorPathSvgAttributes : public BoundingBoxSvgAttributes {
-public:
-    VectorPathSvgAttributes();
+//class VectorPathSvgAttributes : public BoundingBoxSvgAttributes {
+//public:
+//    VectorPathSvgAttributes();
 
-protected:
+//protected:
 
-};
+//};
 
 class VectorPath;
 class Canvas;
 class BoxesGroup;
 
-extern void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup);
+extern void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup, BoundingBoxSvgAttributes *attributes);
 extern bool parsePathDataFast(const QString &dataStr, VectorPath *path);
-extern void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup);
-extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup);
+extern void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup, BoundingBoxSvgAttributes *attributes);
+extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup, BoundingBoxSvgAttributes *parentGroupAttributes);
 extern void loadSVGFile(const QString &filename, Canvas *canvas);
+
+extern QMatrix getMatrixFromString(const QString &matrixStr);
+extern bool getColorFromString(const QString &colorStr, Color *color);
 
 /*
 #include <QStringRef>

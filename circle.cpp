@@ -11,10 +11,10 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
     mCenter->setRelativePos(QPointF(0., 0.), false);
     mHorizontalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
                                                    false, mCenter);
-    mCenter->setRelativePos(QPointF(0., 0.), false);
+    mHorizontalRadiusPoint->setRelativePos(QPointF(10., 0.), false);
     mVerticalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
                                                  true, mCenter);
-    mCenter->setRelativePos(QPointF(0., 0.), false);
+    mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.), false);
 
     QrealAnimator *hXAnimator = mHorizontalRadiusPoint->
                                     getRelativePosAnimatorPtr()->getXAnimator();
@@ -245,14 +245,14 @@ MovablePoint *Circle::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
         }
     }
     if(pointToReturn == NULL) {
-        if(mCenter->isPointAt(absPtPos)) {
-            return mCenter;
-        }
         if(mHorizontalRadiusPoint->isPointAt(absPtPos) ) {
             return mHorizontalRadiusPoint;
         }
         if(mVerticalRadiusPoint->isPointAt(absPtPos) ) {
             return mVerticalRadiusPoint;
+        }
+        if(mCenter->isPointAt(absPtPos)) {
+            return mCenter;
         }
     }
     return pointToReturn;

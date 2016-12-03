@@ -130,9 +130,11 @@ void BoundingBox::updatePrettyPixmap() {
     QPainter p(&mNewPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-mPixBoundingRectClippedToView.topLeft());
-    p.translate(mPixBoundingRectClippedToView.topLeft() -
-                QPointF(qRound(mPixBoundingRectClippedToView.left()),
-                        qRound(mPixBoundingRectClippedToView.top())) );
+    QPointF transF = mPixBoundingRectClippedToView.topLeft() -
+            QPointF(qRound(mPixBoundingRectClippedToView.left()),
+                    qRound(mPixBoundingRectClippedToView.top()));
+    mPixBoundingRectClippedToView.translate(-transF);
+    p.translate(transF);
     p.setTransform(QTransform(mUpdateTransform), true);
 
     draw(&p);
@@ -158,9 +160,11 @@ void BoundingBox::updateAllUglyPixmap() {
     QPainter p(&mAllUglyPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-mAllUglyBoundingRect.topLeft());
-//    p.translate(mAllUglyBoundingRect.topLeft() -
-//                QPointF(qRound(mAllUglyBoundingRect.left()),
-//                        qRound(mAllUglyBoundingRect.top())) );
+    QPointF transF = mAllUglyBoundingRect.topLeft() -
+            QPointF(qRound(mAllUglyBoundingRect.left()),
+                    qRound(mAllUglyBoundingRect.top()));
+    mAllUglyBoundingRect.translate(-transF);
+    p.translate(transF);
     p.setTransform(QTransform(mAllUglyTransform), true);
 
     draw(&p);

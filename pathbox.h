@@ -122,11 +122,12 @@ public:
                            paintType == GRADIENTPAINT, true);
         if(paintType == GRADIENTPAINT) {
             mStrokeSettings.setGradient(gradient);
-            updateDrawGradients();
         } else if(paintType == FLATPAINT) {
             mStrokeSettings.setCurrentColor(color);
         }
         mStrokeSettings.setPaintType(paintType);
+
+        updateDrawGradients();
 
         scheduleAwaitUpdate();
     }
