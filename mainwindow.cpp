@@ -134,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
     mToolBar->addSeparator();
 
     mActionConnectPoints = new QAction(
-                QIcon("pixmaps/icons/ink_node_join.png"),
+                QIcon("pixmaps/icons/ink_node_join_segment.png"),
                 "CONNECT POINTS", this);
     mToolBar->addAction(mActionConnectPoints);
     connect(mActionConnectPoints, SIGNAL(triggered(bool)),
@@ -292,8 +292,6 @@ MainWindow::MainWindow(QWidget *parent)
     mVectorShapesMenu = new VectorShapesMenu(this);
     shapesMenuWidget->setWidget(mVectorShapesMenu);
     addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
-
-    loadSVGFile("/home/ailuropoda/example_svg.svg", mCanvas);
 }
 
 MainWindow::~MainWindow()
@@ -339,6 +337,9 @@ void MainWindow::sendNextBoxForUpdate()
     if(mBoxesAwaitingUpdate.isEmpty()) {
         mNoBoxesAwaitUpdate = true;
         mLastUpdatedBox = NULL;
+        if(mBoxesUpdateFinishedFunction != NULL) {
+            (*this.*mBoxesUpdateFinishedFunction)();
+        }
         callUpdateSchedulers();
     } else {
         mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
@@ -349,25 +350,48 @@ void MainWindow::sendNextBoxForUpdate()
 void MainWindow::playPreview()
 {
     mCanvas->clearPreview();
-    mSavedCurrentFrame = mCurrentFrame;
     mCanvas->updateRenderRect();
-    for(int i = mSavedCurrentFrame; i <= mMaxFrame; i++) {
-        mBoxesListAnimationDockWidget->setCurrentFrame(i);
-        mCanvas->renderCurrentFrameToPreview();
-    }
-    mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+    mBoxesUpdateFinishedFunction = &MainWindow::nextPlayPreviewFrame;
+    mSavedCurrentFrame = mCurrentFrame;
 
-    mCanvas->playPreview();
+    mPreviewInterrupted = false;
+    mCurrentRenderFrame = mSavedCurrentFrame;
+    setCurrentFrame(mSavedCurrentFrame);
+}
+
+void MainWindow::nextPlayPreviewFrame() {
+    mCanvas->renderCurrentFrameToPreview();
+    if(mCurrentRenderFrame >= mMaxFrame) {
+        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+        mBoxesUpdateFinishedFunction = NULL;
+        if(!mPreviewInterrupted) {
+            mCanvas->playPreview();
+        }
+    } else {
+        mCurrentRenderFrame++;
+        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
+    }
+}
+
+void MainWindow::nextSaveOutputFrame() {
+    mCanvas->renderCurrentFrameToOutput(mOutputString);
+    if(mCurrentRenderFrame >= mMaxFrame) {
+        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+        mBoxesUpdateFinishedFunction = NULL;
+    } else {
+        mCurrentRenderFrame++;
+        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
+    }
 }
 
 void MainWindow::saveOutput(QString renderDest)
 {
+    mOutputString = renderDest;
+    mBoxesUpdateFinishedFunction = &MainWindow::nextSaveOutputFrame;
     mSavedCurrentFrame = mCurrentFrame;
-    for(int i = mMinFrame; i <= mMaxFrame; i++) {
-        mBoxesListAnimationDockWidget->setCurrentFrame(i);
-        mCanvas->renderCurrentFrameToOutput(renderDest);
-    }
-    mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+
+    mCurrentRenderFrame = mMinFrame;
+    mBoxesListAnimationDockWidget->setCurrentFrame(mMinFrame);
 }
 
 void MainWindow::previewFinished() {
@@ -375,8 +399,11 @@ void MainWindow::previewFinished() {
 }
 
 void MainWindow::stopPreview() {
+    mPreviewInterrupted = true;
+    mCurrentRenderFrame = mMaxFrame;
     mCanvas->clearPreview();
     mCanvas->repaint();
+    previewFinished();
 }
 
 void MainWindow::renderOutput()
@@ -741,7 +768,7 @@ void MainWindow::importFile()
 {
     disableEventFilter();
     QString importPath = QFileDialog::getOpenFileName(this,
-        "Open File", "", "AniVect Files (*.av)");
+        "Open File", "", "AniVect Files (*.av, *.svg)");
     enableEventFilter();
     if(!importPath.isEmpty()) {
         importFile(importPath, true);
@@ -796,14 +823,19 @@ void MainWindow::importFile(QString path, bool loadInBox) {
     if(!file.exists()) {
         return;
     }
-    QSqlDatabase db = QSqlDatabase::database();//not dbConnection
-    db.setDatabaseName(path);
-    db.open();
+    QString extension = path.split(".").last();
+    if(extension == "svg") {
+        loadSVGFile(path, mCanvas);
+    } else {
+        QSqlDatabase db = QSqlDatabase::database();//not dbConnection
+        db.setDatabaseName(path);
+        db.open();
 
-    mFillStrokeSettings->loadAllGradientsFromSql();
-    mCanvas->loadAllBoxesFromSql(loadInBox);
+        mFillStrokeSettings->loadAllGradientsFromSql();
+        mCanvas->loadAllBoxesFromSql(loadInBox);
 
-    db.close();
+        db.close();
+    }
     mUndoRedoStack.finishSet();
     enable();
 

@@ -3,16 +3,18 @@
 #include "mainwindow.h"
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
+                                                   qreal prefferedStep,
                                                    QWidget *parent) :
-    QDoubleSlider(minVal, maxVal, parent)
+    QDoubleSlider(minVal, maxVal, prefferedStep, parent)
 {
 
 }
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
+                                                   qreal prefferedStep,
                                                    QrealAnimator *animator,
                                                    QWidget *parent) :
-    QDoubleSlider(minVal, maxVal, parent)
+    QDoubleSlider(minVal, maxVal, prefferedStep, parent)
 {
     setAnimator(animator);
 }

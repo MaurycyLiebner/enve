@@ -122,7 +122,15 @@ public:
     }
 
     void setGradient(Gradient *gradient) {
+        if(mPaintType == GRADIENTPAINT && mGradient != NULL) {
+            removeChildAnimator(mGradient);
+            removeChildAnimator((QrealAnimator*) mGradientPoints);
+        }
         mGradient = gradient;
+        if(mPaintType == GRADIENTPAINT && mGradient != NULL) {
+            addChildAnimator(mGradient);
+            addChildAnimator((QrealAnimator*) mGradientPoints);
+        }
     }
 
     void setCurrentColor(Color color) {
@@ -209,6 +217,7 @@ public:
     void setLineWidthUpdaterTarget(PathBox *path);
     void loadFromSql(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
     void loadFromSql(int strokeSqlId, GradientWidget *gradientWidget);
+    bool nonZeroLineWidth();
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
@@ -218,6 +227,7 @@ private:
 
 class MainWindow;
 class Canvas;
+class QDoubleSlider;
 
 class FillStrokeSettingsWidget : public QWidget
 {
@@ -392,7 +402,7 @@ private:
 
     QHBoxLayout *mLineWidthLayout = new QHBoxLayout();
     QLabel *mLineWidthLabel = new QLabel("Width:");
-    QDoubleSpinBox *mLineWidthSpin;
+    QDoubleSlider *mLineWidthSpin;
 
     ColorSettingsWidget *mColorsSettingsWidget;
 

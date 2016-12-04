@@ -24,6 +24,7 @@ public:
     void setSelected(bool bT);
     void mousePressEvent(QMouseEvent *event);
     VectorPathShape *getShape();
+    void paintEvent(QPaintEvent *);
 private:
     VectorPathShape *mParentShape;
     bool mSelected = false;

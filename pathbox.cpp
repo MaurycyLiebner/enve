@@ -164,16 +164,20 @@ void PathBox::updateAfterCombinedTransformationChanged()
 }
 
 void PathBox::updateOutlinePath() {
-    mStrokeSettings.setStrokerSettings(&mPathStroker);
-    if(mOutlineAffectedByScale) {
-        mOutlinePath = mPathStroker.createStroke(mPath);
+    if(mStrokeSettings.nonZeroLineWidth()) {
+        mStrokeSettings.setStrokerSettings(&mPathStroker);
+        if(mOutlineAffectedByScale) {
+            mOutlinePath = mPathStroker.createStroke(mPath);
+        } else {
+            QPainterPathStroker stroker;
+            stroker.setCapStyle(mPathStroker.capStyle());
+            stroker.setJoinStyle(mPathStroker.joinStyle());
+            stroker.setMiterLimit(mPathStroker.miterLimit());
+            stroker.setWidth(mPathStroker.width()*getCurrentCanvasScale() );
+            mOutlinePath = stroker.createStroke(mPath);
+        }
     } else {
-        QPainterPathStroker stroker;
-        stroker.setCapStyle(mPathStroker.capStyle());
-        stroker.setJoinStyle(mPathStroker.joinStyle());
-        stroker.setMiterLimit(mPathStroker.miterLimit());
-        stroker.setWidth(mPathStroker.width()*getCurrentCanvasScale() );
-        mOutlinePath = stroker.createStroke(mPath);
+        mOutlinePath = QPainterPath();
     }
     updateWholePath();
 }

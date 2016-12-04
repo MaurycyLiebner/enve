@@ -20,6 +20,14 @@ VectorShapesMenu::VectorShapesMenu(QWidget *parent) : QWidget(parent) {
                                  QSizePolicy::MinimumExpanding);
     mScrollLayout = new QVBoxLayout(mScrollWidget);
     mScrollWidget->setLayout(mScrollLayout);
+    mScrollLayout->setAlignment(Qt::AlignTop);
+    mScrollLayout->setSpacing(0);
+    mScrollLayout->setMargin(0);
+    QLabel *label = new QLabel(this);
+    label->setStyleSheet("background-color: black");
+    label->setFixedHeight(1);
+    mScrollLayout->addWidget(label);
+
     mScrollArea->setWidget(mScrollWidget);
 
     mButtonsLayout = new QHBoxLayout();
@@ -148,7 +156,7 @@ void VectorShapesMenu::clearShapes() {
 
 void VectorShapesMenu::addShapeWidgetForShape(VectorPathShape *shape) {
     ShapeWidget *shapeWidget = new ShapeWidget(shape, this);
-    mScrollLayout->addWidget(shapeWidget);
+    mScrollLayout->insertWidget(mScrollLayout->count() - 1, shapeWidget);
     mShapeWidgets << shapeWidget;
 }
 
@@ -168,24 +176,38 @@ ShapeWidget::ShapeWidget(VectorPathShape *shape, VectorShapesMenu *parent) :
 
     mLayout = new QHBoxLayout(this);
     QLabel *label = new QLabel(shape->getName(), this);
+    label->setFixedHeight(20);
     mLayout->addWidget(label);
-    mLayout->addWidget(new QrealAnimatorValueSlider(0., 1.,
+    mLayout->addWidget(new QrealAnimatorValueSlider(0., 1., 0.1,
                                                 shape->getInfluenceAnimator(),
-                                                this));
+                                                this) );
     mLayout->setSpacing(0);
     mLayout->setMargin(0);
+
     setLayout(mLayout);
     setSelected(false);
 
-    setFixedHeight(25);
+    setFixedHeight(19);
+}
+
+void ShapeWidget::paintEvent(QPaintEvent *)
+ {
+    QStyleOption opt;
+    opt.init(this);
+    QPainter p(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
 void ShapeWidget::setSelected(bool bT)
 {
     if(bT) {
-        setStyleSheet("background-color: rgb(125, 125, 255)");
+        setStyleSheet("background-color: rgb(125, 125, 255); "
+                      "border: 1px solid black; "
+                      "border-right-width: 0px");
     } else {
-        setStyleSheet("background-color: rgb(255, 255, 255)");
+        setStyleSheet("background-color: rgb(255, 255, 255); "
+                      "border: 1px solid black; "
+                      "border-right-width: 0px");
     }
     mSelected = bT;
 }

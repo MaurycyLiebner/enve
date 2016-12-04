@@ -102,6 +102,11 @@ private:
     bool mCtrlPressed = false;
 
     VectorShapesMenu *mVectorShapesMenu = NULL;
+
+    QString mOutputString;
+    int mCurrentRenderFrame;
+
+    bool mPreviewInterrupted = false;
 protected:    
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -109,6 +114,8 @@ protected:
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
 
     static MainWindow *getInstance();
 
@@ -161,6 +168,8 @@ public:
 
     void addBoxAwaitingUpdate(BoundingBox *box);
     void setCurrentShapesMenuBox(BoundingBox *box);
+    void nextSaveOutputFrame();
+    void nextPlayPreviewFrame();
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);

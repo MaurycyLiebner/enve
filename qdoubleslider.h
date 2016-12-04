@@ -9,8 +9,10 @@ class QDoubleSlider : public QWidget
 {
     Q_OBJECT
 public:
-    QDoubleSlider(qreal minVal, qreal maxVal, QWidget *parent = 0);
-    QDoubleSlider(QString name, qreal minVal, qreal maxVal, QWidget *parent = 0);
+    QDoubleSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
+                  QWidget *parent = 0);
+    QDoubleSlider(QString name, qreal minVal, qreal maxVal, qreal prefferedStep,
+                  QWidget *parent = 0);
     QDoubleSlider(QWidget *parent = 0);
     ~QDoubleSlider();
 
@@ -29,6 +31,10 @@ public:
     void setValueRange(qreal min, qreal max);
 
     virtual void paint(QPainter *p);
+    void setPrefferedValueStep(qreal step);
+
+    qreal maximum();
+    qreal minimum();
 protected:
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);

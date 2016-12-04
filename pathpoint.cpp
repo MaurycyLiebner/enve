@@ -723,7 +723,6 @@ void PathPoint::clearInfluenceAdjustedPointValues()
 //}
 
 PathPointValues PathPoint::getInfluenceAdjustedPointValues() {
-    if(hasFullInfluence()) return getShapesInfluencedPointValues();
     return mInfluenceAdjustedPointValues;
 }
 
@@ -780,17 +779,17 @@ bool PathPoint::updateInfluenceAdjustedPointValues()
 
     if(pointToLen(mInfluenceAdjustedPointValues.pointRelPos - newPointPos) > 0.001) {
         updateNeeded = true;
+    } else if(pointToLen(mInfluenceAdjustedPointValues.endRelPos - newPointEnd) > 0.001) {
+        updateNeeded = true;
+    } else if(pointToLen(mInfluenceAdjustedPointValues.startRelPos - newPointStart) > 0.001) {
+        updateNeeded = true;
     }
     mInfluenceAdjustedPointValues.pointRelPos = newPointPos;
 
-    if(pointToLen(mInfluenceAdjustedPointValues.endRelPos - newPointEnd) > 0.001) {
-        updateNeeded = true;
-    }
+
     mInfluenceAdjustedPointValues.endRelPos = newPointEnd;
 
-    if(pointToLen(mInfluenceAdjustedPointValues.startRelPos - newPointStart) > 0.001) {
-        updateNeeded = true;
-    }
+
     mInfluenceAdjustedPointValues.startRelPos = newPointStart;
 
     if(mPreviousPoint != NULL) {

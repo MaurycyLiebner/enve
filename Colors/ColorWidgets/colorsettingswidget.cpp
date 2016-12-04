@@ -3,6 +3,7 @@
 #include <QResizeEvent>
 #include <QMenu>
 #include "Colors/colorpickingwidget.h"
+#include "qdoubleslider.h"
 
 void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
                             int rect_width, int rect_height,

@@ -7,8 +7,9 @@ class QrealAnimator;
 class QrealAnimatorValueSlider : public QDoubleSlider
 {
 public:
-    QrealAnimatorValueSlider(qreal minVal, qreal maxVal, QWidget *parent);
-    QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
+    QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
+                             QWidget *parent);
+    QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
                              QrealAnimator *animator, QWidget *parent = 0);
     ~QrealAnimatorValueSlider();
 

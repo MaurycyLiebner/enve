@@ -375,6 +375,11 @@ void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
     stroker->setCapStyle(mCapStyle);
     stroker->setJoinStyle(mJoinStyle);
 }
+
+bool StrokeSettings::nonZeroLineWidth() {
+    return !isZero(mLineWidth.getCurrentValue());
+}
+
 #include "qdoubleslider.h"
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget(parent)
 {
@@ -448,10 +453,13 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
 
     mStrokeSettingsLayout->addLayout(mCapStyleLayout);
 
-    mLineWidthSpin = new QDoubleSpinBox(this);
-    mLineWidthSpin->setRange(0.0, 1000.0);
-    mLineWidthSpin->setSuffix(" px");
-    mLineWidthSpin->setSingleStep(0.1);
+    //mLineWidthSpin = new QDoubleSpinBox(this);
+    mLineWidthSpin = new QDoubleSlider("line width", 0., 1000., 1., this);
+    mLineWidthSpin->setNameVisible(false);
+    //mLineWidthSpin->setValueSliderVisibile(false);
+    //mLineWidthSpin->setRange(0.0, 1000.0);
+    //mLineWidthSpin->setSuffix(" px");
+    //mLineWidthSpin->setSingleStep(0.1);
     mLineWidthLayout->addWidget(mLineWidthLabel);
     mLineWidthLayout->addWidget(mLineWidthSpin);
 

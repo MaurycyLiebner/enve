@@ -3,12 +3,14 @@
 #include <QKeyEvent>
 #include "pointhelpers.h"
 
-QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal, QWidget *parent) :
+QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
+                             QWidget *parent) :
     QWidget(parent)
 {
     mValue = minVal;
     mMinValue = minVal;
     mMaxValue = maxVal;
+    mPrefferedValueStep = prefferedStep;
     setFixedHeight(20);
     mLineEdit = new QLineEdit(QString::number(mValue, 'f', mDecimals), this);
     mLineEdit->setAttribute(Qt::WA_TranslucentBackground);
@@ -30,13 +32,14 @@ QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal, QWidget *parent) :
 
 QDoubleSlider::QDoubleSlider(QString name,
                              qreal minVal, qreal maxVal,
+                             qreal prefferedStep,
                              QWidget *parent) :
-    QDoubleSlider(minVal, maxVal,parent)
+    QDoubleSlider(minVal, maxVal, prefferedStep, parent)
 {
     setName(name);
 }
 
-QDoubleSlider::QDoubleSlider(QWidget *parent) : QDoubleSlider(0., 100., parent)
+QDoubleSlider::QDoubleSlider(QWidget *parent) : QDoubleSlider(0., 100., 1., parent)
 {
 
 }
@@ -101,11 +104,11 @@ void QDoubleSlider::setValueRange(qreal min, qreal max)
 
 void QDoubleSlider::paint(QPainter *p)
 {
-    p->fillRect(rect(), QColor(245, 245, 245));
+    p->fillRect(rect(), QColor(200, 200, 255));
     if(!mTextEdit) {
         if(mShowValueSlider) {
             qreal valWidth = mValue*width()/(mMaxValue - mMinValue);
-            p->fillRect(QRectF(0., 0., valWidth, height()), QColor(255, 200, 200));
+            p->fillRect(QRectF(0., 0., valWidth, height()), QColor(160, 160, 255));
         }
         if(mShowName) {
             p->drawText(rect(), Qt::AlignCenter, mName + ": " + getValueString());
@@ -171,9 +174,21 @@ void QDoubleSlider::mousePressEvent(QMouseEvent *event)
     mPressValue = mValue;
 }
 
+void QDoubleSlider::setPrefferedValueStep(qreal step) {
+    mPrefferedValueStep = step;
+}
+
+qreal QDoubleSlider::maximum() {
+    return mMaxValue;
+}
+
+qreal QDoubleSlider::minimum() {
+    return mMinValue;
+}
+
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
 {
-    qreal dValue = (event->x() - mPressX)*0.008*(mMaxValue - mMinValue);
+    qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
     setValueNoUpdate(mPressValue + dValue);
     update();
 
@@ -253,6 +268,8 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
         }
         update();
         event->setAccepted(true);
+
+        emitValueChanged(mValue);
         return true;
     }
     return false;
