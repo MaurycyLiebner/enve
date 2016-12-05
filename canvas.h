@@ -221,7 +221,7 @@ public:
     void getKeysInRect(QRectF selectionRect,
                        QList<QrealKey *> *keysList);
 
-    void centerPivotPosition() {}
+    void centerPivotPosition(bool finish = false) {}
     bool processUnfilteredKeyEvent(QKeyEvent *event);
 
     void fillGradientChanged(Gradient* gradient, bool finish) {

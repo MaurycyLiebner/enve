@@ -347,7 +347,7 @@ void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
                         mPivotChanged, pivotChanged));
     }
     mPivotChanged = pivotChanged;
-    mTransformAnimator.setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
+    mTransformAnimator.setPivotWithoutChangingTransformation(relPos, saveUndoRedo);//setPivot(relPos, saveUndoRedo);//setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
     schedulePivotUpdate();
 }
 

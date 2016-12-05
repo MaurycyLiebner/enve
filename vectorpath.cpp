@@ -382,7 +382,7 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
 }
 
 Edge *VectorPath::getEdgeFromPath(QPointF absPos) {
-    qreal maxDist = 14.;
+    qreal maxDist = 8.;
     QPointF relPos = mapAbsPosToRel(absPos);
     if(!mPath.intersects(QRectF(relPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
@@ -449,7 +449,7 @@ Edge *VectorPath::getEdgeFromPath(QPointF absPos) {
 
 Edge *VectorPath::getEdgeFromEditPath(QPointF absPos)
 {
-    qreal maxDist = 14.;
+    qreal maxDist = 8.;
     QPointF relPos = mapAbsPosToRel(absPos);
     if(!mEditPath.intersects(QRectF(relPos - QPointF(maxDist, maxDist),
                                      QSizeF(maxDist*2, maxDist*2))) ) {
@@ -507,14 +507,14 @@ Edge *VectorPath::getEgde(QPointF absPos) {
     return edgeT;
 }
 
-void VectorPath::centerPivotPosition() {
+void VectorPath::centerPivotPosition(bool finish) {
     QPointF posSum = QPointF(0., 0.);
     int count = mPoints.length();
     if(count == 0) return;
     foreach(PathPoint *point, mPoints) {
         posSum += point->getRelativePos();
     }
-    mTransformAnimator.setPivotWithoutChangingTransformation(posSum/count);
+    mTransformAnimator.setPivotWithoutChangingTransformation(posSum/count, finish);
 }
 
 /*void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)

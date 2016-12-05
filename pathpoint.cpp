@@ -6,7 +6,7 @@
 #include <QDebug>
 
 PathPoint::PathPoint(VectorPath *vectorPath) :
-    MovablePoint(vectorPath, MovablePointType::TYPE_PATH_POINT)
+    MovablePoint(vectorPath, MovablePointType::TYPE_PATH_POINT, 9.5)
 {
     mVectorPath = vectorPath;
     mStartCtrlPt = new CtrlPoint(this, true);
@@ -345,7 +345,7 @@ void PathPoint::draw(QPainter *p, CanvasMode mode)
     }
     QPointF absPos = getAbsolutePos();
     p->drawEllipse(absPos,
-                   mRadius, mRadius);
+                   mRadius - 2, mRadius - 2);
 
     if(mRelPos.isKeyOnCurrentFrame() ) {
         p->save();

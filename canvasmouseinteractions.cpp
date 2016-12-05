@@ -426,7 +426,15 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
     if(mPreviewing) return;
-    if(event->button() != Qt::LeftButton) return;
+    if(event->button() != Qt::LeftButton) {
+        if(mTransformationFinishedBeforeMouseRelease) {
+            mTransformationFinishedBeforeMouseRelease = false;
+            return;
+        }
+        if(mIsMouseGrabbing) {
+            releaseMouseAndDontTrack();
+        }
+    }
     handleMouseRelease(event->pos());
 }
 

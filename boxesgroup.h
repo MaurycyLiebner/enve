@@ -71,13 +71,13 @@ public:
 
     void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
 
-    QPointF getSelectedBoxesPivotPos();
+    QPointF getSelectedBoxesAbsPivotPos();
     bool isSelectionEmpty();
     void setSelectedPivotAbsPos(QPointF absPos);
 
     void ungroupSelected();
     void ungroup();
-    void centerPivotPosition();
+    void centerPivotPosition(bool finish = false);
 
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();

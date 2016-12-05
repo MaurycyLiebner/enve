@@ -52,7 +52,7 @@ public:
 
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
     void updatePath();
-    void centerPivotPosition();
+    void centerPivotPosition(bool finish = false);
     MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
     void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint *> *list);
     void moveRadiusesByAbs(QPointF absTrans);

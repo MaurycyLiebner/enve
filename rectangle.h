@@ -61,7 +61,7 @@ public:
     void selectAndAddContainedPointsToList(QRectF absRect,
                                            QList<MovablePoint *> *list);
     void updatePath();
-    void centerPivotPosition();
+    void centerPivotPosition(bool finish = false);
     void updateRadiusXAndRange();
     void updateAfterFrameChanged(int currentFrame);
     VectorPath *objectToPath();

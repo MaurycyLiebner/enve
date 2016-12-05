@@ -67,8 +67,9 @@ bool TextBox::absPointInsidePath(QPointF point)
     return PathBox::absPointInsidePath(point);
 }
 
-void TextBox::centerPivotPosition() {
-    mTransformAnimator.setPivotWithoutChangingTransformation(getTextRect().center() );
+void TextBox::centerPivotPosition(bool finish) {
+    mTransformAnimator.setPivotWithoutChangingTransformation(getTextRect().center(),
+                                                             finish);
 }
 
 void TextBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)

@@ -282,8 +282,10 @@ void Rectangle::updatePath()
     updateOutlinePath();
 }
 
-void Rectangle::centerPivotPosition() {
-    mTransformAnimator.setPivotWithoutChangingTransformation(mBottomRightPoint->getRelativePos() * 0.5);
+void Rectangle::centerPivotPosition(bool finish) {
+    mTransformAnimator.setPivotWithoutChangingTransformation(
+                mBottomRightPoint->getRelativePos() * 0.5,
+                finish);
 }
 
 RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :

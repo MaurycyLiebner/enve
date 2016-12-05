@@ -24,7 +24,7 @@ public:
     bool absPointInsidePath(QPointF point);
     void setPathText(bool pathText);
 
-    void centerPivotPosition();
+    void centerPivotPosition(bool finish = false);
 private:
     QString mText;
     QFont mFont;

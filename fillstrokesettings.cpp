@@ -15,10 +15,8 @@ Gradient::Gradient(Color color1, Color color2, GradientWidget *gradientWidget) :
     updateQGradientStops();
 }
 
-
 Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget) :
-    ComplexAnimator()
-{
+    ComplexAnimator() {
     setName("gradient");
     mGradientWidget = gradientWidget;
     foreach (ColorAnimator *color, fromGradient->mColors) {
@@ -175,15 +173,14 @@ bool Gradient::affectsPaths() {
     return !mAffectedPaths.isEmpty();
 }
 
-void Gradient::updatePaths()
-{
+void Gradient::updatePaths() {
     foreach (PathBox *path, mAffectedPaths) {
         path->updateDrawGradients();
+        path->scheduleAwaitUpdate();
     }
 }
 
-void Gradient::finishTransform()
-{
+void Gradient::finishTransform() {
     ComplexAnimator::finishTransform();
     //addUndoRedo(new ChangeGradientColorsUndoRedo(savedColors, colors, this));
     //savedColors = colors;
@@ -193,7 +190,7 @@ void Gradient::finishTransform()
 void Gradient::scheduleQGradientStopsUpdate() {
     if(mQGradientStopsUpdateNeeded) return;
     mQGradientStopsUpdateNeeded = true;
-    addUpdateScheduler(new QGradientStopsUpdateScheduler(this) );
+    //addUpdateScheduler(new QGradientStopsUpdateScheduler(this) );
 }
 
 void Gradient::updateQGradientStopsIfNeeded() {
@@ -203,8 +200,7 @@ void Gradient::updateQGradientStopsIfNeeded() {
     }
 }
 
-void Gradient::startColorIdTransform(int id)
-{
+void Gradient::startColorIdTransform(int id) {
     if(mColors.count() <= id || id < 0) return;
     mColors.at(id)->startTransform();
 }
@@ -225,11 +221,9 @@ int Gradient::getSqlId() {
     return mSqlId;
 }
 
-void Gradient::setSqlId(int id)
-{
+void Gradient::setSqlId(int id) {
     mSqlId = id;
 }
-
 
 PaintSettings::PaintSettings() : PaintSettings(Color(255, 255, 255),
                                                PaintType::FLATPAINT,
@@ -295,8 +289,7 @@ StrokeSettings::StrokeSettings(Color colorT,
                                PaintType paintTypeT,
                                Gradient *gradientT) : PaintSettings(colorT,
                                                                     paintTypeT,
-                                                                    gradientT)
-{
+                                                                    gradientT) {
     setName("stroke");
     mLineWidth.setCurrentValue(1.);
     mLineWidth.setName("thickness");

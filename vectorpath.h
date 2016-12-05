@@ -123,7 +123,7 @@ protected:
     QList<PathPoint*> mSeparatePaths;
     QList<PathPoint*> mPoints;
     QPainterPath mEditPath;
-    void centerPivotPosition();
+    void centerPivotPosition(bool finish = false);
 
     bool mShapesEnabled = false;
     VectorPathShape *mCurrentEditedShape = NULL;

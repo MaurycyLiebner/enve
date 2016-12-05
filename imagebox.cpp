@@ -69,7 +69,7 @@ void ImageBox::setFilePath(QString path)
     reloadPixmap();
 }
 
-void ImageBox::centerPivotPosition()
+void ImageBox::centerPivotPosition(bool finish)
 {
-    mTransformAnimator.setPivotWithoutChangingTransformation(mPixmap.rect().bottomRight()*0.5);
+    mTransformAnimator.setPivotWithoutChangingTransformation(mPixmap.rect().bottomRight()*0.5, finish);
 }

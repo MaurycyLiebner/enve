@@ -474,6 +474,7 @@ QMatrix Canvas::getCombinedFinalRenderTransform()
 
 void Canvas::schedulePivotUpdate()
 {
+    if(mRotPivot->isRotating() || mRotPivot->isScaling()) return;
     mPivotUpdateNeeded = true;
 }
 
@@ -545,7 +546,7 @@ void Canvas::updatePivot() {
         mRotPivot->hide();
     } else {
         mRotPivot->show();
-        mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedBoxesPivotPos(),
+        mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedBoxesAbsPivotPos(),
                                   false);
     }
 }

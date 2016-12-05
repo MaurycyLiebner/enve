@@ -677,7 +677,7 @@ void BoxesGroup::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
     }
 }
 
-QPointF BoxesGroup::getSelectedBoxesPivotPos()
+QPointF BoxesGroup::getSelectedBoxesAbsPivotPos()
 {
     if(mSelectedBoxes.isEmpty()) return QPointF(0.f, 0.f);
     QPointF posSum = QPointF(0.f, 0.f);
@@ -737,7 +737,7 @@ void BoxesGroup::centerPivotForSelected() {
     startNewUndoRedoSet();
 
     foreach(BoundingBox *box, mSelectedBoxes) {
-        box->centerPivotPosition();
+        box->centerPivotPosition(true);
     }
 
     finishUndoRedoSet();
@@ -1112,14 +1112,14 @@ void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect)
     }
 }
 
-void BoxesGroup::centerPivotPosition() {
+void BoxesGroup::centerPivotPosition(bool finish) {
     if(mChildren.isEmpty()) return;
     QPointF posSum = QPointF(0.f, 0.f);
     int count = mChildren.length();
     foreach(BoundingBox *box, mChildren) {
         posSum += box->getPivotAbsPos();
     }
-    setPivotAbsPos(posSum/count, false, mPivotChanged);
+    setPivotAbsPos(posSum/count, finish, mPivotChanged);
 }
 
 BoxesGroup* BoxesGroup::groupSelectedBoxes() {

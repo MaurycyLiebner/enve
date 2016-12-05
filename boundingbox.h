@@ -54,7 +54,7 @@ public:
     virtual void setFontFamilyAndStyle(QString,
                                        QString) {}
 
-    virtual void centerPivotPosition() {}
+    virtual void centerPivotPosition(bool finish = false) {}
     virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getPixBoundingRect() { return QRectF(); }
 

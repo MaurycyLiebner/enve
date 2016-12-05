@@ -12,7 +12,7 @@ public:
     void draw(QPainter *p);
     void reloadPixmap();
     void setFilePath(QString path);
-    void centerPivotPosition();
+    void centerPivotPosition(bool finish = false);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
     bool absPointInsidePath(QPointF point);
 private:
