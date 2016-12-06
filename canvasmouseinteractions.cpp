@@ -259,6 +259,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 }
 
 void Canvas::cancelCurrentTransform() {
+    mTransformationFinishedBeforeMouseRelease = true;
     if(mCurrentMode == CanvasMode::MOVE_POINT) {
         mCurrentBoxesGroup->cancelSelectedPointsTransform();
     } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
@@ -276,7 +277,7 @@ void Canvas::cancelCurrentTransform() {
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
         setCanvasMode(MOVE_PATH);
     }
-    mTransformationFinishedBeforeMouseRelease = true;
+
     if(mIsMouseGrabbing) {
         releaseMouseAndDontTrack();
     }

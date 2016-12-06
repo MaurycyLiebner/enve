@@ -474,7 +474,8 @@ QMatrix Canvas::getCombinedFinalRenderTransform()
 
 void Canvas::schedulePivotUpdate()
 {
-    if(mRotPivot->isRotating() || mRotPivot->isScaling()) return;
+    if(mRotPivot->isRotating() || mRotPivot->isScaling() ||
+       mTransformationFinishedBeforeMouseRelease) return;
     mPivotUpdateNeeded = true;
 }
 
