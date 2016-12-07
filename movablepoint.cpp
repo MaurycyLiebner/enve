@@ -36,6 +36,10 @@ void MovablePoint::startTransform()
     mSavedRelPos = getRelativePos();
 }
 
+void MovablePoint::applyTransform(QMatrix transform){
+    mRelPos.setCurrentValue(transform.map(mRelPos.getCurrentValue()), true);
+}
+
 void MovablePoint::finishTransform()
 {
     if(mTransformStarted) {

@@ -61,6 +61,13 @@ PathPoint::~PathPoint()
     mEndCtrlPt->decNumberPointers();
 }
 
+void PathPoint::applyTransform(QMatrix transform)
+{
+    mStartCtrlPt->applyTransform(transform);
+    mEndCtrlPt->applyTransform(transform);
+    MovablePoint::applyTransform(transform);
+}
+
 void PathPoint::loadFromSql(int pathPointId, int movablePointId) {
     MovablePoint::loadFromSql(movablePointId);
     QSqlQuery query;

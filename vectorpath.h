@@ -103,6 +103,8 @@ public:
     void finishEditingShape(VectorPathShape *shape);
     void cancelEditingShape();
     void addShape(VectorPathShape *shape, bool saveUndoRedo = true);
+    void applyTransformToPoints(QMatrix transform);
+    void applyCurrentTransformationToPoints();
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 

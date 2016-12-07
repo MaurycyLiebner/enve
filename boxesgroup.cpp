@@ -863,6 +863,14 @@ void BoxesGroup::clearBoxesSelection()
     mSelectedBoxes.clear(); schedulePivotUpdate();
 }
 
+void BoxesGroup::applyCurrentTransformationToSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->isVectorPath()) {
+            ((VectorPath*)box)->applyCurrentTransformationToPoints();
+        }
+    }
+}
+
 void BoxesGroup::raiseSelectedBoxesToTop() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->bringToFront();

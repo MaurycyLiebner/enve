@@ -195,6 +195,7 @@ public:
     void drawPixmap(QPainter *p);
     void updateAllBoxes();
     void handleListItemMouseDoubleClick(qreal boxesListX, qreal relX, qreal relY, QMouseEvent *event);
+    void applyCurrentTransformationToSelected();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

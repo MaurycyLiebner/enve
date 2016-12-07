@@ -437,7 +437,7 @@ void BoundingBox::rotateRelativeToSavedPivot(qreal rot) {
 }
 
 void BoundingBox::scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy) {
-    mTransformAnimator.scale(scaleXBy, scaleYBy, mSavedTransformPivot);
+    mTransformAnimator.scaleRelativeToSavedValue(scaleXBy, scaleYBy, mSavedTransformPivot);
 }
 
 void BoundingBox::scaleRelativeToSavedPivot(qreal scaleBy) {

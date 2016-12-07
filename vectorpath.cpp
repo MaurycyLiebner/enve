@@ -51,6 +51,25 @@ VectorPath::~VectorPath()
     }
 }
 
+void VectorPath::applyCurrentTransformationToPoints() {
+    startNewUndoRedoSet();
+
+    mTransformAnimator.startTransform();
+    applyTransformToPoints(mTransformAnimator.getCurrentValue());
+    mTransformAnimator.finishTransform();
+
+    mTransformAnimator.reset(true);
+    centerPivotPosition(true);
+
+    finishUndoRedoSet();
+}
+
+void VectorPath::applyTransformToPoints(QMatrix transform) {
+    foreach(PathPoint *point, mPoints) {
+        point->applyTransform(transform);
+    }
+}
+
 void VectorPath::loadPointsFromSql(int boundingBoxId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT id, isfirst, isendpoint, movablepointid "

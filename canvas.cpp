@@ -474,8 +474,7 @@ QMatrix Canvas::getCombinedFinalRenderTransform()
 
 void Canvas::schedulePivotUpdate()
 {
-    if(mRotPivot->isRotating() || mRotPivot->isScaling() ||
-       mTransformationFinishedBeforeMouseRelease) return;
+    if(mRotPivot->isRotating() || mRotPivot->isScaling()) return;
     mPivotUpdateNeeded = true;
 }
 
@@ -796,7 +795,6 @@ void Canvas::keyPressEvent(QKeyEvent *event)
            mCurrentBoxesGroup->selectAllBoxes();
        }
     }
-
     schedulePivotUpdate();
 
     callUpdateSchedulers();

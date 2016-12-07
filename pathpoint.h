@@ -228,6 +228,8 @@ public:
 
     ~PathPoint();
 
+    void applyTransform(QMatrix transform);
+
     void startTransform();
     void finishTransform();
 

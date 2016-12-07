@@ -8,16 +8,16 @@ class TransformAnimator : public ComplexAnimator
 public:
     TransformAnimator();
 
-    void resetScale();
-    void resetTranslation();
-    void resetRotation();
-    void reset();
+    void resetScale(bool finish = false);
+    void resetTranslation(bool finish = false);
+    void resetRotation(bool finish = false);
+    void reset(bool finish = false);
 
     QMatrix getCurrentValue();
     void rotateRelativeToSavedValue(qreal rotRel);
     void translate(qreal dX, qreal dY);
     void scale(qreal sx, qreal sy);
-    void scale(qreal sx, qreal sy, QPointF pivot);
+    void scaleRelativeToSavedValue(qreal sx, qreal sy, QPointF pivot);
 
     void setScale(qreal sx, qreal sy);
     void setPosition(qreal x, qreal y);

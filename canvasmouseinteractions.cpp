@@ -77,6 +77,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
                     QMenu menu;
 
+                    menu.addAction("Apply Transformation");
                     menu.addAction("Center Pivot");
                     menu.addAction("Copy");
                     menu.addAction("Cut");
@@ -95,6 +96,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                     if(selectedAction != NULL) {
                         if(selectedAction->text() == "Delete") {
                             mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
+                        } else if(selectedAction->text() == "Apply Transformation") {
+                            mCurrentBoxesGroup->applyCurrentTransformationToSelected();
                         } else if(selectedAction->text() == "Group") {
                             groupSelectedBoxesAction();
                         } else if(selectedAction->text() == "Ungroup") {
@@ -267,10 +270,10 @@ void Canvas::cancelCurrentTransform() {
                 mRotPivot->isSelected()) {
             mRotPivot->cancelTransform();
         } else {
+            mCurrentBoxesGroup->cancelSelectedBoxesTransform();
             if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
                 mRotPivot->handleMouseRelease();
             }
-            mCurrentBoxesGroup->cancelSelectedBoxesTransform();
         }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
 
