@@ -314,7 +314,7 @@ void LinesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal sca
 {
     qreal linesWidth = mLinesWidth.getCurrentValue()*scale;
     qreal linesDistance = mLinesDistance.getCurrentValue()*scale;
-    if((linesWidth < 0.1 && linesDistance < linesWidth) || (linesDistance <= linesWidth)) return;
+    if((linesWidth < 0.1 && linesDistance < linesWidth) || (linesDistance <= linesWidth*0.5)) return;
 
     QImage linesImg = QImage(imgPtr->size(), QImage::Format_ARGB32_Premultiplied);
     linesImg.fill(Qt::transparent);

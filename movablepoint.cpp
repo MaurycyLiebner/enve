@@ -118,6 +118,30 @@ bool MovablePoint::isContainedInRect(QRectF absRect)
     return absRect.contains(getAbsolutePos());
 }
 
+void MovablePoint::rotateRelativeToSavedPivot(qreal rot) {
+    QMatrix mat;
+    mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    mat.rotate(rot);
+    mat.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    moveToRel(mat.map(mSavedRelPos));
+}
+
+void MovablePoint::scaleRelativeToSavedPivot(qreal sx, qreal sy) {
+    QMatrix mat;
+    mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    mat.scale(sx, sy);
+    mat.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    moveToRel(mat.map(mSavedRelPos));
+}
+
+void MovablePoint::saveTransformPivot(QPointF absPivot) {
+    mSavedTransformPivot = mParent->mapAbsPosToRel(absPivot);
+}
+
+void MovablePoint::moveToRel(QPointF relPos) {
+    moveBy(relPos - mSavedRelPos);
+}
+
 void MovablePoint::moveBy(QPointF relTranslation) {
     mRelPos.incSavedValueToCurrentValue(relTranslation.x(), relTranslation.y());
 }
@@ -202,10 +226,10 @@ void MovablePoint::scale(qreal scaleXBy, qreal scaleYBy)
     setRelativePos(mSavedRelPos*scaleMatrix, false);
 }
 
-void MovablePoint::saveTransformPivot(QPointF absPivot)
-{
-    mSavedTransformPivot = -mParent->mapAbsPosToRel(absPivot);
-}
+//void MovablePoint::saveTransformPivot(QPointF absPivot)
+//{
+//    mSavedTransformPivot = -mParent->mapAbsPosToRel(absPivot);
+//}
 
 void MovablePoint::select()
 {

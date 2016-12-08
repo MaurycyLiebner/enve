@@ -618,6 +618,24 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
     }
 }
 
+void BoxesGroup::rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin,
+                                        bool startTrans)
+{
+    if(mSelectedPoints.isEmpty()) return;
+    if(startTrans) {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->startTransform();
+            point->saveTransformPivot(absOrigin);
+            point->rotateRelativeToSavedPivot(rotBy);
+        }
+    } else {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->rotateRelativeToSavedPivot(rotBy);
+        }
+    }
+}
+
+
 void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
                                  bool startTrans) {
     if(mSelectedBoxes.count() == 1) {
@@ -677,15 +695,50 @@ void BoxesGroup::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
     }
 }
 
+void BoxesGroup::scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy,
+                                       QPointF absOrigin,
+                                       bool startTrans) {
+    if(mSelectedPoints.isEmpty()) return;
+    if(startTrans) {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->startTransform();
+            point->saveTransformPivot(absOrigin);
+            point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+        }
+    } else {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+        }
+    }
+}
+
 QPointF BoxesGroup::getSelectedBoxesAbsPivotPos()
 {
-    if(mSelectedBoxes.isEmpty()) return QPointF(0.f, 0.f);
-    QPointF posSum = QPointF(0.f, 0.f);
+    if(mSelectedBoxes.isEmpty()) return QPointF(0., 0.);
+    QPointF posSum = QPointF(0., 0.);
     int count = mSelectedBoxes.length();
     foreach(BoundingBox *box, mSelectedBoxes) {
         posSum += box->getPivotAbsPos();
     }
     return posSum/count;
+}
+
+QPointF BoxesGroup::getSelectedPointsAbsPivotPos() {
+    if(mSelectedPoints.isEmpty()) return QPointF(0., 0.);
+    QPointF posSum = QPointF(0., 0.);
+    int count = mSelectedPoints.length();
+    foreach(MovablePoint *point, mSelectedPoints) {
+        posSum += point->getAbsolutePos();
+    }
+    return posSum/count;
+}
+
+bool BoxesGroup::isPointsSelectionEmpty() {
+    return mSelectedPoints.isEmpty();
+}
+
+int BoxesGroup::getPointsSelectionCount() {
+    return mSelectedPoints.length();
 }
 
 bool BoxesGroup::isSelectionEmpty()
@@ -786,7 +839,7 @@ void BoxesGroup::clearPointsSelection()
     foreach(MovablePoint *point, mSelectedPoints) {
         point->deselect();
     }
-    mSelectedPoints.clear();
+    mSelectedPoints.clear(); schedulePivotUpdate();
 }
 
 const PaintSettings *BoxesGroup::getFillSettings() {
@@ -842,7 +895,7 @@ void BoxesGroup::addPointToSelection(MovablePoint *point)
         return;
     }
     point->select();
-    mSelectedPoints.append(point);
+    mSelectedPoints.append(point); schedulePivotUpdate();
 }
 
 void BoxesGroup::removeBoxFromSelection(BoundingBox *box) {
@@ -852,7 +905,7 @@ void BoxesGroup::removeBoxFromSelection(BoundingBox *box) {
 
 void BoxesGroup::removePointFromSelection(MovablePoint *point) {
     point->deselect();
-    mSelectedPoints.removeOne(point);
+    mSelectedPoints.removeOne(point); schedulePivotUpdate();
 }
 
 void BoxesGroup::clearBoxesSelection()

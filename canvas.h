@@ -304,6 +304,8 @@ public:
     void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
     void showContextMenu(QPoint globalPos);
     void updateAllBoxes();
+    void scalePointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
+    void rotatePointsBy(qreal rotChange, QPointF absOrigin, bool startTrans);
 protected:
 //    void updateAfterCombinedTransformationChanged();
     void paintEvent(QPaintEvent *);
@@ -377,6 +379,7 @@ public slots:
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
 private:
+    bool mPivotVisibleDuringPointEdit = true;
     static bool mEffectsPaintEnabled;
 
     QRectF mRenderRect;

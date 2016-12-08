@@ -349,7 +349,7 @@ void MainWindow::sendNextBoxForUpdate()
 
 void MainWindow::playPreview()
 {
-    mCanvas->clearPreview();
+    //mCanvas->clearPreview();
     mCanvas->updateRenderRect();
     mBoxesUpdateFinishedFunction = &MainWindow::nextPlayPreviewFrame;
     mSavedCurrentFrame = mCurrentFrame;

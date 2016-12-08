@@ -196,6 +196,11 @@ public:
     void updateAllBoxes();
     void handleListItemMouseDoubleClick(qreal boxesListX, qreal relX, qreal relY, QMouseEvent *event);
     void applyCurrentTransformationToSelected();
+    QPointF getSelectedPointsAbsPivotPos();
+    bool isPointsSelectionEmpty();
+    void scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
+    void rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin, bool startTrans);
+    int getPointsSelectionCount();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

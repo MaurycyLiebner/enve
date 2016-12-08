@@ -4,6 +4,8 @@
 
 class Canvas;
 
+enum CanvasMode : short;
+
 class PathPivot : public MovablePoint
 {
 public:
@@ -20,7 +22,7 @@ public:
                          bool xOnly, bool yOnly,
                          bool inputTransformationEnabled,
                          qreal inputTransformationValue,
-                         bool startTransform);
+                         bool startTransform, CanvasMode mode);
 //    void updateRotationMappedPath();
     void finishTransform();
     void startRotating();

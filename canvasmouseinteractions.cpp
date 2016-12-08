@@ -11,19 +11,16 @@ QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
 }
 
 void Canvas::handleMovePathMousePressEvent() {
-    if((mCurrentMode == CanvasMode::MOVE_PATH) ?
-            !mRotPivot->handleMousePress(mLastMouseEventPos) : true) {
-        mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPos);
-        if(mLastPressedBox == NULL) {
-            if(!isShiftPressed() ) {
-                mCurrentBoxesGroup->clearBoxesSelection();
-            }
-            mSelecting = true;
-            startSelectionAtPoint(mLastMouseEventPos);
-        } else {
-            if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
-                mCurrentBoxesGroup->clearBoxesSelection();
-            }
+    mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPos);
+    if(mLastPressedBox == NULL) {
+        if(!isShiftPressed() ) {
+            mCurrentBoxesGroup->clearBoxesSelection();
+        }
+        mSelecting = true;
+        startSelectionAtPoint(mLastMouseEventPos);
+    } else {
+        if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
+            mCurrentBoxesGroup->clearBoxesSelection();
         }
     }
 }
@@ -137,7 +134,8 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
     mLastPressPos = mLastMouseEventPos;
 
-    if(isMovingPath()) {
+    if(mRotPivot->handleMousePress(mLastMouseEventPos)) {
+    } else if(isMovingPath()) {
         handleMovePathMousePressEvent();
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
         mLastPressedBox = getPathAtFromAllAncestors(mLastPressPos);
@@ -265,9 +263,11 @@ void Canvas::cancelCurrentTransform() {
     mTransformationFinishedBeforeMouseRelease = true;
     if(mCurrentMode == CanvasMode::MOVE_POINT) {
         mCurrentBoxesGroup->cancelSelectedPointsTransform();
+        if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
+            mRotPivot->handleMouseRelease();
+        }
     } else if(mCurrentMode == CanvasMode::MOVE_PATH) {
-        if(mCurrentMode == CanvasMode::MOVE_PATH &&
-                mRotPivot->isSelected()) {
+        if(mRotPivot->isSelected()) {
             mRotPivot->cancelTransform();
         } else {
             mCurrentBoxesGroup->cancelSelectedBoxesTransform();
@@ -289,7 +289,12 @@ void Canvas::cancelCurrentTransform() {
 }
 
 void Canvas::handleMovePointMouseRelease(QPointF pos) {
-    if(mSelecting) {
+    if(mRotPivot->isSelected()) {
+        mRotPivot->deselect();
+    } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
+        mRotPivot->handleMouseRelease();
+        mCurrentBoxesGroup->finishSelectedPointsTransform();
+    } else if(mSelecting) {
         mSelecting = false;
         if(mFirstMouseMove) {
             mLastPressedBox = mCurrentBoxesGroup->getBoxAt(pos);
@@ -346,8 +351,7 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
 
 
 void Canvas::handleMovePathMouseRelease(QPointF pos) {
-    if(mCurrentMode == CanvasMode::MOVE_PATH &&
-            mRotPivot->isSelected()) {
+    if(mRotPivot->isSelected()) {
         if(!mFirstMouseMove) {
             mRotPivot->finishTransform();
         }
@@ -384,10 +388,6 @@ void Canvas::handleAddPointMouseRelease() {
 }
 
 void Canvas::handleMouseRelease(QPointF eventPos) {
-    if(mTransformationFinishedBeforeMouseRelease) {
-        mTransformationFinishedBeforeMouseRelease = false;
-        return;
-    }
     if(mIsMouseGrabbing) {
         releaseMouseAndDontTrack();
     }
@@ -410,8 +410,6 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
             }
         }
     }
-    mXOnlyTransform = false;
-    mYOnlyTransform = false;
 
     mLastPressedBox = NULL;
     mLastPressedPoint = NULL;
@@ -422,7 +420,6 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
         delete mCurrentEdge;
         mCurrentEdge = NULL;
     }
-    clearAndDisableInput();
 
     callUpdateSchedulers();
 }
@@ -430,11 +427,14 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
     if(mPreviewing) return;
+    mXOnlyTransform = false;
+    mYOnlyTransform = false;
+    clearAndDisableInput();
+    if(mTransformationFinishedBeforeMouseRelease) {
+        mTransformationFinishedBeforeMouseRelease = false;
+        return;
+    }
     if(event->button() != Qt::LeftButton) {
-        if(mTransformationFinishedBeforeMouseRelease) {
-            mTransformationFinishedBeforeMouseRelease = false;
-            return;
-        }
         if(mIsMouseGrabbing) {
             releaseMouseAndDontTrack();
         }
@@ -457,7 +457,19 @@ QPointF Canvas::getMoveByValueForEventPos(QPointF eventPos) {
 }
 
 void Canvas::handleMovePointMouseMove(QPointF eventPos) {
-    if(mCurrentEdge != NULL) {
+    if(mRotPivot->isSelected()) {
+        if(mFirstMouseMove) {
+            mRotPivot->startTransform();
+        }
+        mRotPivot->moveByAbs(getMoveByValueForEventPos(eventPos));
+    } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
+           mRotPivot->handleMouseMove(eventPos, mLastPressPos,
+                                      mXOnlyTransform, mYOnlyTransform,
+                                      mInputTransformationEnabled,
+                                      mInputTransformationValue,
+                                      mFirstMouseMove,
+                                      mCurrentMode);
+    } else if(mCurrentEdge != NULL) {
         if(mFirstMouseMove) {
             mCurrentEdge->startTransform();
         }
@@ -471,11 +483,14 @@ void Canvas::handleMovePointMouseMove(QPointF eventPos) {
                     mLastPressedPoint->startTransform();
                 }
                 mLastPressedPoint->moveByAbs(getMoveByValueForEventPos(eventPos) );
-            } else {
+                return;//
+            }/* else {
                 mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
                                                          mFirstMouseMove);
-            }
+            }*/
         }
+        mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
+                                                 mFirstMouseMove);
     }
 }
 
@@ -484,20 +499,18 @@ void Canvas::setPivotPositionForSelected() {
 }
 
 void Canvas::handleMovePathMouseMove(QPointF eventPos) {
-    if(mCurrentMode == CanvasMode::MOVE_PATH &&
-            mRotPivot->isSelected()) {
+    if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) {
             mRotPivot->startTransform();
         }
 
         mRotPivot->moveByAbs(getMoveByValueForEventPos(eventPos));
-    } else if((mCurrentMode == CanvasMode::MOVE_PATH && mRotPivot->isRotating()) ||
-              (mCurrentMode == CanvasMode::MOVE_PATH && mRotPivot->isScaling()) ) {
+    } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
         mRotPivot->handleMouseMove(eventPos, mLastPressPos,
                                    mXOnlyTransform, mYOnlyTransform,
                                    mInputTransformationEnabled,
                                    mInputTransformationValue,
-                                   mFirstMouseMove);
+                                   mFirstMouseMove, mCurrentMode);
     } else {
         if(mLastPressedBox != NULL) {
             mCurrentBoxesGroup->addBoxToSelection(mLastPressedBox);

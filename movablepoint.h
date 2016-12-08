@@ -83,6 +83,9 @@ public:
     void loadFromSql(int movablePointId);
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
     virtual void applyTransform(QMatrix transform);
+    void moveToRel(QPointF relPos);
+    void scaleRelativeToSavedPivot(qreal sx, qreal sy);
+    void rotateRelativeToSavedPivot(qreal rot);
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;
