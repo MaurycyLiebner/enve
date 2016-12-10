@@ -35,6 +35,19 @@ QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
     return NULL;
 }
 
+void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
+    if(shiftPressed) {
+        if(mSelected) {
+            mParent->removeBoxFromSelection(this);
+        } else {
+            mParent->addBoxToSelection(this);
+        }
+    } else {
+        mParent->clearBoxesSelection();
+        mParent->addBoxToSelection(this);
+    }
+}
+
 void BoundingBox::handleListItemMousePress(qreal boxesListX,
                                            qreal relX, qreal relY,
                                            QMouseEvent *event) {
@@ -51,16 +64,7 @@ void BoundingBox::handleListItemMousePress(qreal boxesListX,
                 setLocked(!mLocked);
             } else {
                 if(isVisibleAndUnlocked() && mParent->isCurrentGroup()) {
-                    if(isShiftPressed()) {
-                        if(mSelected) {
-                            mParent->removeBoxFromSelection(this);
-                        } else {
-                            mParent->addBoxToSelection(this);
-                        }
-                    } else {
-                        mParent->clearBoxesSelection();
-                        mParent->addBoxToSelection(this);
-                    }
+                    selectionChangeTriggered(isShiftPressed());
                 }
             }
         } else if(event->button() == Qt::RightButton) {

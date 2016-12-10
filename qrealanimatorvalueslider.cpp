@@ -19,9 +19,17 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
     setAnimator(animator);
 }
 
+QrealAnimatorValueSlider::QrealAnimatorValueSlider(QrealAnimator *animator, QWidget *parent) :
+    QDoubleSlider(animator->getMinPossibleValue(),
+                  animator->getMaxPossibleValue(),
+                  animator->getPrefferedValueStep(),
+                  parent)
+{
+    setAnimator(animator);
+}
+
 QrealAnimatorValueSlider::~QrealAnimatorValueSlider()
 {
-    setAnimator(NULL);
 }
 
 void QrealAnimatorValueSlider::emitValueChanged(qreal value)
@@ -63,9 +71,15 @@ void QrealAnimatorValueSlider::paint(QPainter *p)
     }
 }
 
-void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator)
-{
-    if(mAnimator != NULL) mAnimator->removeSlider(this);
+void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
+    if(mAnimator != NULL) {
+        disconnect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
+                   this, SLOT(setValue(qreal)));
+    }
     mAnimator = animator;
-    if(mAnimator != NULL) mAnimator->addSlider(this);
+    if(mAnimator != NULL) {
+        connect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
+                this, SLOT(setValue(qreal)));
+        setValue(mAnimator->getCurrentValue());
+    }
 }

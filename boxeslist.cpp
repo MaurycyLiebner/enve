@@ -130,7 +130,7 @@ qreal BoxesList::getViewedBottom() {
     return mViewedBottom;
 }
 
-ChangeWidthWidget::ChangeWidthWidget(BoxesList *boxesList, QWidget *parent) :
+ChangeWidthWidget::ChangeWidthWidget(QWidget *boxesList, QWidget *parent) :
     QWidget(parent) {
     mBoxesList = boxesList;
     setFixedWidth(10);
@@ -147,7 +147,7 @@ void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int newWidth = mBoxesList->width() + event->x() - mPressX;
     newWidth = qMax(200, newWidth);
-    BoxesList::setListItemMaxWidth(newWidth);
+    BoxesListWidget::setListItemMaxWidth(newWidth);
     mBoxesList->setFixedWidth(newWidth);
     updatePos();
 }

@@ -12,6 +12,7 @@
 #include "keysview.h"
 #include "fontswidget.h"
 #include "vectorshapesmenu.h"
+#include "boxeslistwidget.h"
 
 class PaintControler;
 
@@ -40,7 +41,7 @@ private:
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
-    BoxesList *mBoxListWidget;
+    BoxesListWidget *mBoxListWidget;
     KeysView *mKeysView;
 
     QToolBar *mToolBar;
@@ -132,7 +133,7 @@ public:
 
     AnimationDockWidget *getAnimationDockWidget();
     KeysView *getKeysView();
-    BoxesList *getBoxesList();
+    BoxesListWidget *getBoxesList();
     Canvas *getCanvas();
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);

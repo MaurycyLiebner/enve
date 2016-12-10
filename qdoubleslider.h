@@ -35,6 +35,8 @@ public:
 
     qreal maximum();
     qreal minimum();
+
+    void setWheelInteractionEnabled(bool bT);
 protected:
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);
@@ -49,6 +51,7 @@ signals:
 public slots:
     void setValue(qreal value);
 protected:
+    bool mWheelEnabled = true;
     int mDecimals = 3;
 
     QString mName;

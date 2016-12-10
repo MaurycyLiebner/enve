@@ -1316,6 +1316,8 @@ void BoxesGroup::moveChildInList(int from, int to, bool saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new MoveChildInListUndoRedo(from, to, this) );
     }
+
+    emit changeChildZSignal(from, to);
 }
 
 void BoxesGroup::updateAfterCombinedTransformationChanged()

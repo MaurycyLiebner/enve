@@ -17,8 +17,9 @@ class QrealAnimatorValueSlider;
 
 #include <QDoubleSpinBox>
 
-class QrealAnimator : public ConnectedToMainWindow
+class QrealAnimator :  public QObject, public ConnectedToMainWindow
 {
+    Q_OBJECT
 public:
     QrealAnimator();
 
@@ -183,6 +184,11 @@ public:
     void loadKeysFromSql(int qrealAnimatorId);
     virtual void incSavedValueToCurrentValue(qreal incBy);
     virtual void multSavedValueToCurrentValue(qreal multBy);
+
+    bool isCurrentAnimator() { return mIsCurrentAnimator; }
+    const QColor &getAnimatorColor() { return mAnimatorColor; }
+
+    bool isComplexAnimator() { return mIsComplexAnimator; }
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 
@@ -220,9 +226,10 @@ protected:
 
     QColor mAnimatorColor;
 
-    QList<QrealAnimatorValueSlider*> mSliders;
-private:
-    void sendValueChangeToSliders();
+signals:
+    void valueChangedSignal(qreal);
+    void childAnimatorAdded(QrealAnimator*);
+    void childAnimatorRemoved(QrealAnimator*);
 };
 
 #include <QMenu>

@@ -3,6 +3,7 @@
 #include "qrealanimator.h"
 
 class ComplexKey;
+class ComplexAnimatorItemWidgetContainer;
 
 class ComplexAnimator : public QrealAnimator
 {
@@ -53,6 +54,8 @@ public:
     void clearFromGraphView();
 
     bool hasChildAnimators();
+    void addAllAnimatorsToComplexAnimatorItemWidgetContainer(
+            ComplexAnimatorItemWidgetContainer *itemWidget);
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

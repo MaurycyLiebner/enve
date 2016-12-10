@@ -4,7 +4,7 @@
 #include "mainwindow.h"
 #include "boxeslist.h"
 
-KeysView::KeysView(BoxesList *boxesList, QWidget *parent) : QWidget(parent)
+KeysView::KeysView(BoxesListWidget *boxesList, QWidget *parent) : QWidget(parent)
 {
     mMainWindow = MainWindow::getInstance();
     mCanvas = mMainWindow->getCanvas();
@@ -30,6 +30,13 @@ void KeysView::middlePress(QPointF pressPos)
     mMiddlePressPos = pressPos;
 }
 
+void KeysView::setViewedRange(int top, int bottom)
+{
+    mViewedTop = top;
+    mViewedBottom = bottom;
+    update();
+}
+
 void KeysView::middleMove(QPointF movePos)
 {
     qreal diffFrame = (movePos.x() - mMiddlePressPos.x() ) / mPixelsPerFrame;
@@ -49,7 +56,7 @@ void KeysView::deleteSelectedKeys()
 
 void KeysView::selectKeysInSelectionRect() {
     QList<QrealKey*> listKeys;
-    mCanvas->getKeysInRect(mSelectionRect.translated(0., mBoxesList->getViewedTop() ),
+    mCanvas->getKeysInRect(mSelectionRect.translated(0., mViewedTop),
                            &listKeys);
     foreach(QrealKey *key, listKeys) {
         addKeyToSelection(key);
@@ -68,7 +75,7 @@ void KeysView::wheelEvent(QWheelEvent *e) {
     if(mGraphViewed) {
         graphWheelEvent(e);
     } else {
-        mBoxesList->handleWheelEvent(e);
+        //mBoxesList->handleWheelEvent(e);
     }
 }
 
@@ -84,7 +91,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
             mLastPressPos = e->pos();
 
             mLastPressedKey = mCanvas->getKeyAtPos(e->x(),
-                                                   e->y() + mBoxesList->getViewedTop(),
+                                                   e->y() + mViewedTop,
                                                    0.);
             if(mLastPressedKey == NULL) {
                 mSelecting = true;
@@ -185,8 +192,8 @@ void KeysView::paintEvent(QPaintEvent *) {
         graphPaint(&p);
     } else {
         mCanvas->drawKeysView(&p,
-                              -mBoxesList->getViewedTop(),
-                              mBoxesList->getViewedBottom(),
+                              -mViewedTop,
+                              mViewedBottom,
                               mPixelsPerFrame,
                               mMinViewedFrame, mMaxViewedFrame);
     }

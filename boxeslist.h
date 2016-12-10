@@ -60,12 +60,15 @@ private:
     qreal mViewedBottom;
     MainWindow *mMainWindow;
 };
+
+class BoxesListWidget;
+
 #include <QPainter>
 class ChangeWidthWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ChangeWidthWidget(BoxesList *boxesList, QWidget *parent = 0);
+    ChangeWidthWidget(QWidget *boxesList, QWidget *parent = 0);
 
     void updatePos();
 
@@ -81,7 +84,7 @@ public:
     void mousePressEvent(QMouseEvent *event);
 private:
     int mPressX;
-    BoxesList *mBoxesList;
+    QWidget *mBoxesList;
 };
 
 #endif // BOXESLIST_H

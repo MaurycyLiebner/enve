@@ -35,7 +35,7 @@ enum BoundingBoxType {
 
 class BoxesGroup;
 
-class BoxesList;
+class BoxesListWidget;
 
 class CtrlPoint;
 
@@ -43,8 +43,11 @@ class Edge;
 
 class VectorPath;
 
-class BoundingBox : public Transformable
+class BoxItemWidgetContainer;
+
+class BoundingBox : public QObject, public Transformable
 {
+    Q_OBJECT
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
     BoundingBox(BoundingBoxType type);
@@ -245,6 +248,8 @@ public:
     void updateEffectsMarginIfNeeded();
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
+    void selectionChangeTriggered(bool shiftPressed);
+    void addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container);
 protected:
     bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;
@@ -283,7 +288,7 @@ protected:
     QPainterPath mBoundingRect;
     QPainterPath mMappedBoundingRect;
 
-    BoxesList *mBoxesList;
+    BoxesListWidget *mBoxesList;
     KeysView *mKeysView;
 
     bool mScheduledForRemove = false;

@@ -7,7 +7,7 @@
 #include "keysview.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
-    Transformable()
+    QObject(), Transformable()
 {
     mEffectsAnimators.blockPointer();
     mEffectsAnimators.setName("effects");
@@ -16,6 +16,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mTransformAnimator.blockPointer();
 
     mBoxesList = getMainWindow()->getBoxesList();
+    mBoxesList->addItemForBox(this);
     mKeysView = getMainWindow()->getKeysView();
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;
@@ -363,6 +364,12 @@ QPointF BoundingBox::getPivotAbsPos() {
 
 void BoundingBox::select() {
     mSelected = true;
+}
+
+void BoundingBox::addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container) {
+    foreach(QrealAnimator *animator, mActiveAnimators) {
+        container->addAnimatorWidgetForAnimator(animator);
+    }
 }
 
 void BoundingBox::deselect() {

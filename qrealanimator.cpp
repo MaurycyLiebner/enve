@@ -8,7 +8,7 @@
 #include <QMenu>
 #include "qrealanimatorvalueslider.h"
 
-QrealAnimator::QrealAnimator() : ConnectedToMainWindow() {
+QrealAnimator::QrealAnimator() : QObject(), ConnectedToMainWindow() {
 }
 
 QrealAnimator::~QrealAnimator() {
@@ -17,21 +17,6 @@ QrealAnimator::~QrealAnimator() {
     }
     if(mUpdater != NULL) {
         mUpdater->decNumberPointers();
-    }
-}
-
-void QrealAnimator::addSlider(QrealAnimatorValueSlider *valueSlider) {
-    mSliders << valueSlider;
-}
-
-void QrealAnimator::removeSlider(QrealAnimatorValueSlider *valueSlider) {
-    mSliders.removeOne(valueSlider);
-}
-
-void QrealAnimator::sendValueChangeToSliders() {
-    foreach(QrealAnimatorValueSlider *valueSlider, mSliders) {
-        valueSlider->setValueNoUpdate(mCurrentValue);
-        valueSlider->update();
     }
 }
 
@@ -308,7 +293,6 @@ void QrealAnimator::updateKeyOnCurrrentFrame()
 {
     if(mTraceKeyOnCurrentFrame) {
         mKeyOnCurrentFrame = getKeyAtFrame(mCurrentFrame) != NULL;
-        sendValueChangeToSliders();
     }
 }
 
@@ -404,13 +388,17 @@ qreal QrealAnimator::getCurrentValue() const
 
 void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
 {
+    newValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+
     if(finish) {
         startTransform();
-        mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
+        mCurrentValue = newValue;
         finishTransform();
-    } else {
-        mCurrentValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
     }
+    if(newValue == mCurrentValue) return;
+    mCurrentValue = newValue;
+
+    emit valueChangedSignal(mCurrentValue);
 
     callUpdater();
 }
@@ -877,8 +865,6 @@ void QrealAnimator::finishTransform()
         if(mIsCurrentAnimator) {
             graphScheduleUpdateAfterKeysChanged();
         }
-
-        sendValueChangeToSliders();
     }
 }
 

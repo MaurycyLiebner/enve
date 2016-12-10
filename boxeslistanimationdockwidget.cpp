@@ -2,6 +2,16 @@
 #include "mainwindow.h"
 #include <QKeyEvent>
 #include "animationdockwidget.h"
+#include <QScrollBar>
+
+void BoxesListAnimationDockWidget::moveSlider(int val) {
+    int diff = val%BoxesListWidget::getListItemHeight();
+    if(diff != 0) {
+        val -= diff;
+        mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
+    }
+    emit visibleRangeChanged(val, val + mBoxesListScrollArea->height());
+}
 
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     QWidget(parent)
@@ -30,7 +40,19 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                              QSizePolicy::Maximum);
-    mBoxesList = new BoxesList(this);
+    mBoxesListScrollArea = new QScrollArea(this);
+    mBoxesListScrollArea->verticalScrollBar()->setSingleStep(BoxesListWidget::getListItemHeight());
+    connect(mBoxesListScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
+            this, SLOT(moveSlider(int)));
+
+    mBoxesListScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    mBoxesListScrollArea->setBackgroundRole(QPalette::Window);
+    mBoxesListScrollArea->setFrameShadow(QFrame::Plain);
+    mBoxesListScrollArea->setFrameShape(QFrame::NoFrame);
+    mBoxesListScrollArea->setWidgetResizable(true);
+    mBoxesListScrollArea->setFixedWidth(BoxesListWidget::getListItemMaxWidth());
+    mBoxesList = new BoxesListWidget(this);
+    mBoxesListScrollArea->setWidget(mBoxesList);
 
     mBoxesListLayout = new QVBoxLayout();
     mBoxesListLayout->setSpacing(0);
@@ -43,6 +65,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
             mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int, int)) );
     connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             mKeysView, SLOT(setFramesRange(int,int)) );
+
+    connect(this, SIGNAL(visibleRangeChanged(int,int)),
+            mKeysView, SLOT(setViewedRange(int,int)) );
 
     mAnimationDockWidget = new AnimationDockWidget(mBoxesList, mKeysView);
     mKeysView->setAnimationDockWidget(mAnimationDockWidget);
@@ -126,7 +151,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mKeysViewLayout = new QVBoxLayout();
 
     mBoxesListLayout->addWidget(mControlButtonsWidget);
-    mBoxesListLayout->addWidget(mBoxesList);
+    mBoxesListLayout->addWidget(mBoxesListScrollArea);
 
     mBoxesListKeysViewLayout->addLayout(mBoxesListLayout);
     mBoxesListKeysViewLayout->addLayout(mKeysViewLayout);
@@ -143,13 +168,13 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mFrameRangeScrollbar->emitChange();
 
-    ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesList, this);
+    ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesListScrollArea, this);
     chww->updatePos();
 
     mFrameRangeScrollbar->raise();
 }
 
-BoxesList *BoxesListAnimationDockWidget::getBoxesList()
+BoxesListWidget *BoxesListAnimationDockWidget::getBoxesList()
 {
     return mBoxesList;
 }
@@ -172,7 +197,7 @@ bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(QKeyEvent *event) {
 
 bool BoxesListAnimationDockWidget::processFilteredKeyEvent(QKeyEvent *event) {
     if(processUnfilteredKeyEvent(event) ) return true;
-    return mBoxesList->processFilteredKeyEvent(event);
+    return false;//mBoxesList->processFilteredKeyEvent(event);
 }
 
 void BoxesListAnimationDockWidget::setPlaying(bool playing) {

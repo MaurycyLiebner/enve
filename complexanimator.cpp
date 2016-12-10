@@ -284,6 +284,13 @@ QString ComplexAnimator::getValueText()
     return "";
 }
 
+void ComplexAnimator::addAllAnimatorsToComplexAnimatorItemWidgetContainer(
+        ComplexAnimatorItemWidgetContainer *itemWidget) {
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        itemWidget->addChildAnimator(animator);
+    }
+}
+
 void ComplexAnimator::setRecording(bool rec)
 {
     foreach(QrealAnimator *childAnimator, mChildAnimators) {

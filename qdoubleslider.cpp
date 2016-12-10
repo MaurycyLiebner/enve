@@ -95,6 +95,7 @@ QString QDoubleSlider::getValueString() {
 
 void QDoubleSlider::setValueRange(qreal min, qreal max)
 {
+    mValidator->setRange(min, max, 3);
     mMinValue = min;
     mMaxValue = max;
     setValueNoUpdate(mValue);
@@ -148,7 +149,7 @@ void QDoubleSlider::fitWidthToContent()
         textMin = QString::number(mMinValue, 'f', mDecimals);
     }
     int textWidth = qMax(fm.width(textMax), fm.width(textMin));
-    int newWidth = textWidth + textWidth%2 + 10;
+    int newWidth = qMin(60, textWidth + textWidth%2 + 10);
     setFixedWidth(newWidth);
     mLineEdit->setFixedWidth(newWidth);
 }
@@ -184,6 +185,11 @@ qreal QDoubleSlider::maximum() {
 
 qreal QDoubleSlider::minimum() {
     return mMinValue;
+}
+
+void QDoubleSlider::setWheelInteractionEnabled(bool bT)
+{
+    mWheelEnabled = bT;
 }
 
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
@@ -256,21 +262,25 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::FocusIn) {
         mTextEdit = true;
     } else if(event->type() == QEvent::Wheel) {
-        if(obj == mLineEdit) return true;
-        QWheelEvent *wheelEvent = (QWheelEvent*)event;
-        if(wheelEvent->delta() > 0) {
-            setValueNoUpdate(mValue + mPrefferedValueStep);
-        } else {
-            setValueNoUpdate(mValue - mPrefferedValueStep);
-        }
-        if(mTextEdit) {
-            updateLineEditFromValue();
-        }
-        update();
-        event->setAccepted(true);
+        if(mWheelEnabled || mTextEdit) {
+            if(obj == mLineEdit) return true;
+            QWheelEvent *wheelEvent = (QWheelEvent*)event;
+            if(wheelEvent->delta() > 0) {
+                setValueNoUpdate(mValue + mPrefferedValueStep);
+            } else {
+                setValueNoUpdate(mValue - mPrefferedValueStep);
+            }
+            if(mTextEdit) {
+                updateLineEditFromValue();
+            }
+            update();
+            event->setAccepted(true);
 
-        emitValueChanged(mValue);
-        return true;
+            emitValueChanged(mValue);
+            return true;
+        } else {
+            return false;
+        }
     }
     return false;
 }

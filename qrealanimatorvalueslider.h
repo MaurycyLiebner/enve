@@ -6,11 +6,13 @@ class QrealAnimator;
 
 class QrealAnimatorValueSlider : public QDoubleSlider
 {
+    Q_OBJECT
 public:
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
                              QWidget *parent);
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
                              QrealAnimator *animator, QWidget *parent = 0);
+    QrealAnimatorValueSlider(QrealAnimator *animator, QWidget *parent = 0);
     ~QrealAnimatorValueSlider();
 
     void paint(QPainter *p);

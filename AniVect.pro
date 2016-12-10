@@ -82,7 +82,8 @@ SOURCES += main.cpp\
     renderoutputwidget.cpp \
     intanimator.cpp \
     boolanimator.cpp \
-    qstringanimator.cpp
+    qstringanimator.cpp \
+    boxeslistwidget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -150,4 +151,5 @@ HEADERS  += mainwindow.h \
     renderoutputwidget.h \
     intanimator.h \
     boolanimator.h \
-    qstringanimator.h
+    qstringanimator.h \
+    boxeslistwidget.h

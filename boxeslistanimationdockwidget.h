@@ -9,6 +9,8 @@
 #include "boxeslist.h"
 #include "animatonwidgetscrollbar.h"
 #include "keysview.h"
+#include "boxeslistwidget.h"
+#include <qscrollarea.h>
 
 class AnimationDockWidget;
 
@@ -17,7 +19,7 @@ class BoxesListAnimationDockWidget : public QWidget
     Q_OBJECT
 public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
-    BoxesList *getBoxesList();
+    BoxesListWidget *getBoxesList();
     KeysView *getKeysView();
     void setCurrentFrame(int frame);
     bool processUnfilteredKeyEvent(QKeyEvent *event);
@@ -25,7 +27,7 @@ public:
     void previewFinished();
     void setPlaying(bool playing);
 signals:
-
+    void visibleRangeChanged(int, int);
 private slots:
     void setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible);
 
@@ -34,7 +36,10 @@ private slots:
     void setGraphEnabled(bool recording);
 
     void setAllPointsRecord(bool allPointsRecord);
+    void moveSlider(int val);
 private:
+    QScrollArea *mBoxesListScrollArea;
+
     MainWindow *mMainWindow;
     QVBoxLayout *mMainLayout;
 
@@ -54,7 +59,7 @@ private:
     QHBoxLayout *mBoxesListKeysViewLayout;
     QVBoxLayout *mBoxesListLayout;
     QVBoxLayout *mKeysViewLayout;
-    BoxesList *mBoxesList;
+    BoxesListWidget *mBoxesList;
     KeysView *mKeysView;
     AnimatonWidgetScrollBar *mFrameRangeScrollbar;
     AnimatonWidgetScrollBar *mAnimationWidgetScrollbar;

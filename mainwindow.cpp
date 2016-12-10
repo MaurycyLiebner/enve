@@ -500,7 +500,7 @@ KeysView *MainWindow::getKeysView()
     return mKeysView;
 }
 
-BoxesList *MainWindow::getBoxesList()
+BoxesListWidget *MainWindow::getBoxesList()
 {
     return mBoxesListAnimationDockWidget->getBoxesList();
 }

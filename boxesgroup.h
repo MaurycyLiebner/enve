@@ -15,6 +15,7 @@ class Edge;
 
 class BoxesGroup : public BoundingBox
 {
+    Q_OBJECT
 public:
     BoxesGroup(BoxesGroup *parent);
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
@@ -208,6 +209,8 @@ protected:
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;
     QList<BoundingBox*> mChildren;
+signals:
+    void changeChildZSignal(int, int);
 };
 
 #endif // BOXESGROUP_H
