@@ -17,6 +17,7 @@
 #include "qdoubleslider.h"
 #include "renderoutputwidget.h"
 #include "svgimporter.h"
+#include "canvaswidget.h"
 
 MainWindow *MainWindow::mMainWindowInstance;
 
@@ -58,7 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
     mRightDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
 
-    mCanvas = new Canvas(mFillStrokeSettings, this);
+    mCanvasWidget = new CanvasWidget(mFillStrokeSettings, this);
+    mCanvas = mCanvasWidget->getCanvas();
 
     mFillStrokeSettings->setCanvasPtr(mCanvas);
 
@@ -284,7 +286,7 @@ MainWindow::MainWindow(QWidget *parent)
     setMenuBar(mMenuBar);
 //
 
-    setCentralWidget(mCanvas);
+    setCentralWidget(mCanvasWidget);
 
     showMaximized();
 
@@ -402,7 +404,7 @@ void MainWindow::stopPreview() {
     mPreviewInterrupted = true;
     mCurrentRenderFrame = mMaxFrame;
     mCanvas->clearPreview();
-    mCanvas->repaint();
+    mCanvasWidget->repaint();
     previewFinished();
 }
 
@@ -455,7 +457,7 @@ void MainWindow::callUpdateSchedulers()
 
     mUpdateSchedulers.clear();
     mCanvas->updatePivotIfNeeded();
-    mCanvas->repaint();
+    mCanvasWidget->repaint();
     mBoxListWidget->repaint();
     mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();
@@ -651,6 +653,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
         openFile();
     } else if(mCanvas->processFilteredKeyEvent(event) ) {
+    } else if(mKeysView->processFilteredKeyEvent(event)) {
     } else if(mBoxesListAnimationDockWidget->processFilteredKeyEvent(event) ) {
     } else {
         returnBool = false;

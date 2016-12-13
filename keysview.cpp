@@ -56,8 +56,9 @@ void KeysView::deleteSelectedKeys()
 
 void KeysView::selectKeysInSelectionRect() {
     QList<QrealKey*> listKeys;
-    mCanvas->getKeysInRect(mSelectionRect.translated(0., mViewedTop),
-                           &listKeys);
+    mBoxesList->getKeysInRect(mSelectionRect, mViewedTop,
+                              mPixelsPerFrame, mMinViewedFrame,
+                              &listKeys);
     foreach(QrealKey *key, listKeys) {
         addKeyToSelection(key);
     }
@@ -75,6 +76,7 @@ void KeysView::wheelEvent(QWheelEvent *e) {
     if(mGraphViewed) {
         graphWheelEvent(e);
     } else {
+        emit wheelEventSignal(e);
         //mBoxesList->handleWheelEvent(e);
     }
 }
@@ -90,9 +92,9 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
             mFirstMove = true;
             mLastPressPos = e->pos();
 
-            mLastPressedKey = mCanvas->getKeyAtPos(e->x(),
-                                                   e->y() + mViewedTop,
-                                                   0.);
+            mLastPressedKey = mBoxesList->getKeyAtPos(e->x(), e->y(),
+                                                      mPixelsPerFrame,
+                                                      mViewedTop, mMinViewedFrame);
             if(mLastPressedKey == NULL) {
                 mSelecting = true;
                 mSelectionRect.setTopLeft(e->pos() );
@@ -121,6 +123,8 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
 bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
     if(mGraphViewed) {
+        return graphProcessFilteredKeyEvent(event);
+    } else {
         if(event->key() == Qt::Key_Delete) {
             deleteSelectedKeys();
             repaint();
@@ -136,8 +140,6 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
             return false;
         }
         return true;
-    } else {
-        return graphProcessFilteredKeyEvent(event);
     }
 }
 
@@ -191,11 +193,13 @@ void KeysView::paintEvent(QPaintEvent *) {
     if(mGraphViewed) {
         graphPaint(&p);
     } else {
-        mCanvas->drawKeysView(&p,
-                              -mViewedTop,
-                              mViewedBottom,
-                              mPixelsPerFrame,
-                              mMinViewedFrame, mMaxViewedFrame);
+        mBoxesList->drawKeys(&p, mPixelsPerFrame, mViewedTop,
+                             mMinViewedFrame, mMaxViewedFrame);
+//        mCanvas->drawKeysView(&p,
+//                              -mViewedTop,
+//                              mViewedBottom,
+//                              mPixelsPerFrame,
+//                              mMinViewedFrame, mMaxViewedFrame);
     }
 
     if(mSelecting) {

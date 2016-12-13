@@ -29,6 +29,10 @@ public:
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
 
+    void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                  int animatorTop, int maxY,
+                  int minViewedFrame, int maxViewedFrame);
+
     QrealAnimator *getTargetAnimator() { return mTargetAnimator; }
 protected:
     QrealAnimator *mTargetAnimator;
@@ -57,10 +61,20 @@ class ComplexAnimatorItemWidgetContainer : public WidgetContainer
 public:
     ComplexAnimatorItemWidgetContainer(QrealAnimator *target,
                                        QWidget *parent = 0);
-    void addChildAnimator(QrealAnimator *animator);
-    void removeChildAnimator(QrealAnimator *animator);
 
     QrealAnimator *getTargetAnimator() { return mTargetAnimatorWidget->getTargetAnimator(); }
+    void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                  int animatorTop, int maxY,
+                  int minViewedFrame, int maxViewedFrame);
+    QrealKey *getKeyAtPos(qreal pressX, qreal pressY,
+                          qreal pixelsPerFrame, int maxY,
+                          int animatorTop, int minViewedFrame);
+    void getKeysInRect(QRectF selectionRect, int viewedTop,
+                       qreal pixelsPerFrame, int minViewedFrame,
+                       QList<QrealKey*> *listKeys);
+public slots:
+    void addChildAnimator(QrealAnimator *animator);
+    void removeChildAnimator(QrealAnimator *animator);
 private:
     QrealAnimatorItemWidget *mTargetAnimatorWidget;
     QList<ComplexAnimatorItemWidgetContainer*> mChildWidgets;
@@ -83,6 +97,10 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *e);
     void rename();
+
+    void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                  int containerTop, int maxY,
+                  int minViewedFrame, int maxViewedFrame);
 signals:
     void detailsVisibilityChanged(bool);
 private:
@@ -96,10 +114,20 @@ class BoxItemWidgetContainer : public WidgetContainer
 public:
     BoxItemWidgetContainer(BoundingBox *target, QWidget *parent = 0);
 
-    void addAnimatorWidgetForAnimator(QrealAnimator *animator);
-    void removeAnimatorWidgetForAnimator(QrealAnimator *animator);
 
     BoundingBox *getTargetBox() { return mTargetBoxWidget->getTargetBox(); }
+
+    void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                  int containerTop, int maxY,
+                  int minViewedFrame, int maxViewedFrame);
+    QrealKey *getKeyAtPos(qreal pressX, qreal pressY, qreal pixelsPerFrame, int maxY,
+                          int containerTop, int minViewedFrame);
+    void getKeysInRect(QRectF selectionRect, int containerTop,
+                       qreal pixelsPerFrame, int minViewedFrame,
+                       QList<QrealKey*> *listKeys);
+public slots:
+    void addAnimatorWidgetForAnimator(QrealAnimator *animator);
+    void removeAnimatorWidgetForAnimator(QrealAnimator *animator);
 private:
     void addAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget);
     void removeAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget);
@@ -127,13 +155,19 @@ public:
     static bool mStaticPixmapsLoaded;
     static void loadStaticPixmaps();
 
-    void addItemForBox(BoundingBox *box);
-    void removeItemFromBox(BoundingBox *box);
 
     static int getListItemHeight() { return LIST_ITEM_HEIGHT; }
     static int getListItemMaxWidth() { return LIST_ITEM_MAX_WIDTH; }
     static int getListItemChildIndent() { return LIST_ITEM_CHILD_INDENT; }
     static void setListItemMaxWidth(int widthT) { LIST_ITEM_MAX_WIDTH = widthT; }
+
+    void drawKeys(QPainter *p, qreal pixelsPerFrame, int viewedTop,
+                  int minViewedFrame, int maxViewedFrame);
+    QrealKey *getKeyAtPos(int pressX, int pressY, qreal pixelsPerFrame,
+                          int viewedTop, int minViewedFrame);
+    void getKeysInRect(QRectF selectionRect, int viewedTop,
+                       qreal pixelsPerFrame, int minViewedFrame,
+                       QList<QrealKey*> *listKeys);
 private:
     static int LIST_ITEM_HEIGHT;
     static int LIST_ITEM_MAX_WIDTH;
@@ -144,6 +178,8 @@ private:
 signals:
 
 public slots:
+    void addItemForBox(BoundingBox *box);
+    void removeItemForBox(BoundingBox *box);
 private slots:
     void changeItemZ(int from, int to);
 };

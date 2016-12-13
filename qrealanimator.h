@@ -112,11 +112,8 @@ public:
 
     virtual void callUpdater();
 
-    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame,
-                          qreal startX, qreal startY, qreal height,
+    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal startY,
                           int startFrame, int endFrame);
-    virtual QrealKey *getKeyAtPos(qreal relX, qreal relY,
-                                  int minViewedFrame, qreal pixelsPerFrame);
     virtual void getKeysInRect(QRectF selectionRect,
                                int minViewedFrame,
                                qreal pixelsPerFrame,
@@ -189,6 +186,7 @@ public:
     const QColor &getAnimatorColor() { return mAnimatorColor; }
 
     bool isComplexAnimator() { return mIsComplexAnimator; }
+    QrealKey *getKeyAtPos(qreal relX, int minViewedFrame, qreal pixelsPerFrame);
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 

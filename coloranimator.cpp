@@ -129,30 +129,6 @@ Color ColorAnimator::getCurrentValue() const
     return color;
 }
 
-QrealKey *ColorAnimator::getKeyAtPos(qreal relX, qreal relY,
-                                     int minViewedFrame,
-                                     qreal pixelsPerFrame) {
-    if(relY <= BoxesList::getListItemHeight()) {
-        return QrealAnimator::getKeyAtPos(relX, relY,
-                                   minViewedFrame, pixelsPerFrame);
-    } else if(mBoxesListDetailVisible) {
-        if(relY <= 2*BoxesList::getListItemHeight()) {
-            return mVal1Animator.getKeyAtPos(relX, relY,
-                                     minViewedFrame, pixelsPerFrame);
-        } else if(relY <= 3*BoxesList::getListItemHeight()) {
-            return mVal2Animator.getKeyAtPos(relX, relY,
-                                       minViewedFrame, pixelsPerFrame);
-        } else if(relY <= 4*BoxesList::getListItemHeight()) {
-            return mVal3Animator.getKeyAtPos(relX, relY,
-                                     minViewedFrame, pixelsPerFrame);
-        } else if(relY <= 5*BoxesList::getListItemHeight()) {
-            return mAlphaAnimator.getKeyAtPos(relX, relY,
-                                       minViewedFrame, pixelsPerFrame);
-        }
-    }
-    return NULL;
-}
-
 void ColorAnimator::setColorMode(ColorMode colorMode)
 {
     if(colorMode == RGBMODE) {

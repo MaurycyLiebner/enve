@@ -162,9 +162,6 @@ public:
     virtual void drawAnimationBar(QPainter *p, qreal drawX, qreal drawY);
     virtual void updateAfterFrameChanged(int currentFrame);
     virtual QMatrix getCombinedRenderTransform();
-    virtual QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal);
-    virtual void getKeysInRect(QRectF selectionRect,
-                               QList<QrealKey *> *keysList);
 
     virtual void startAllPointsTransform() {}
     virtual void finishAllPointsTransform() {}
@@ -250,6 +247,7 @@ public:
     virtual void updateAllBoxes();
     void selectionChangeTriggered(bool shiftPressed);
     void addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container);
+    QrealAnimator *getAnimatorsCollection();
 protected:
     bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;
@@ -315,6 +313,9 @@ protected:
     QList<QrealAnimator*> mActiveAnimators;
 
     QList<PixmapEffect*> mEffects;
+signals:
+    void addActiveAnimatorSignal(QrealAnimator*);
+    void removeActiveAnimatorSignal(QrealAnimator*);
 };
 
 

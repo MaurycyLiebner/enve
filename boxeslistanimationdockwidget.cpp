@@ -40,12 +40,14 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                              QSizePolicy::Maximum);
-    mBoxesListScrollArea = new QScrollArea(this);
+    mBoxesListScrollArea = new ScrollArea(this);
+    mBoxesListScrollArea->setFocusPolicy(Qt::NoFocus);
     mBoxesListScrollArea->verticalScrollBar()->setSingleStep(BoxesListWidget::getListItemHeight());
     connect(mBoxesListScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
             this, SLOT(moveSlider(int)));
 
     mBoxesListScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    mBoxesListScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     mBoxesListScrollArea->setBackgroundRole(QPalette::Window);
     mBoxesListScrollArea->setFrameShadow(QFrame::Plain);
     mBoxesListScrollArea->setFrameShape(QFrame::NoFrame);
@@ -65,6 +67,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
             mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int, int)) );
     connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             mKeysView, SLOT(setFramesRange(int,int)) );
+
+    connect(mKeysView, SIGNAL(wheelEventSignal(QWheelEvent*)),
+            mBoxesListScrollArea, SLOT(callWheelEvent(QWheelEvent*)));
 
     connect(this, SIGNAL(visibleRangeChanged(int,int)),
             mKeysView, SLOT(setViewedRange(int,int)) );
@@ -155,6 +160,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mBoxesListKeysViewLayout->addLayout(mBoxesListLayout);
     mBoxesListKeysViewLayout->addLayout(mKeysViewLayout);
+    QHBoxLayout *keysViewScrollbarLayout = new QHBoxLayout();
+    mKeysView->setLayout(keysViewScrollbarLayout);
+    keysViewScrollbarLayout->setAlignment(Qt::AlignRight);
+    keysViewScrollbarLayout->addWidget(mBoxesListScrollArea->verticalScrollBar());
+    keysViewScrollbarLayout->setContentsMargins(0, 0, 0, 0);
 
     mKeysViewLayout->addWidget(mAnimationWidgetScrollbar);
     mKeysViewLayout->addWidget(mKeysView);

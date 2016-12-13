@@ -87,11 +87,18 @@ void QrealAnimator::getKeysInRect(QRectF selectionRect,
                                   int minViewedFrame,
                                   qreal pixelsPerFrame,
                                   QList<QrealKey*> *keysList) {
-    int keyRectFramesSpan = KEY_RECT_SIZE/pixelsPerFrame;
-    int selLeftFrame = selectionRect.left()/pixelsPerFrame + minViewedFrame -
-            keyRectFramesSpan;
-    int selRightFrame = selectionRect.right()/pixelsPerFrame + minViewedFrame -
-            keyRectFramesSpan;
+    int selLeftFrame = selectionRect.left()/pixelsPerFrame;
+    if(0.5*pixelsPerFrame + KEY_RECT_SIZE*0.5 <
+       selectionRect.left() - selLeftFrame*pixelsPerFrame) {
+        selLeftFrame++;
+    }
+    selLeftFrame += minViewedFrame;
+    int selRightFrame = selectionRect.right()/pixelsPerFrame;
+    if(0.5*pixelsPerFrame - KEY_RECT_SIZE*0.5 >
+       selectionRect.right() - selRightFrame*pixelsPerFrame) {
+        selRightFrame--;
+    }
+    selRightFrame += minViewedFrame;
     for(int i = selRightFrame; i >= selLeftFrame; i--) {
         QrealKey *keyAtPos = getKeyAtFrame(i);
         if(keyAtPos != NULL) {
@@ -296,10 +303,9 @@ void QrealAnimator::updateKeyOnCurrrentFrame()
     }
 }
 
-QrealKey *QrealAnimator::getKeyAtPos(qreal relX, qreal relY,
+QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
                                      int minViewedFrame,
                                      qreal pixelsPerFrame) {
-    Q_UNUSED(relY);
     qreal relFrame = relX/pixelsPerFrame;
     qreal pressFrame = relFrame + minViewedFrame;
     if(pixelsPerFrame > KEY_RECT_SIZE) {
@@ -308,6 +314,7 @@ QrealKey *QrealAnimator::getKeyAtPos(qreal relX, qreal relY,
             return NULL;
         }
     }
+    if(pressFrame < 0) pressFrame -= 1.;
     qreal keyRectFramesSpan = 0.5*KEY_RECT_SIZE/pixelsPerFrame;
     int minPossibleKey = pressFrame - keyRectFramesSpan;
     int maxPossibleKey = pressFrame + keyRectFramesSpan;
@@ -466,6 +473,8 @@ void QrealAnimator::removeKey(QrealKey *removeKey) {
         }
 
         updateKeyOnCurrrentFrame();
+
+        updateValueFromCurrentFrame();
     }
 }
 
@@ -892,7 +901,7 @@ void QrealAnimator::callUpdater()
 }
 
 void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
-                             qreal startX, qreal startY, qreal height,
+                             qreal startY,
                              int startFrame, int endFrame)
 {
     p->setPen(QPen(Qt::black, 1.));
@@ -905,9 +914,8 @@ void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
             }
             p->drawRect(
                 QRectF(
-                    QPointF((key->getFrame() - startFrame + 0.5)*pixelsPerFrame +
-                            startX - KEY_RECT_SIZE*0.5,
-                            startY + (height - KEY_RECT_SIZE)*0.5 ),
+                    QPointF((key->getFrame() - startFrame + 0.5)*pixelsPerFrame - KEY_RECT_SIZE*0.5,
+                            startY + (BoxesListWidget::getListItemHeight() - KEY_RECT_SIZE)*0.5 ),
                     QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
         }
     }

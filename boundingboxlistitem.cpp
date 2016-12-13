@@ -5,36 +5,6 @@
 #include <QPainter>
 #include "keysview.h"
 
-QrealKey *BoundingBox::getKeyAtPos(qreal relX, qreal relY, qreal) {
-    if(relY < 0.) return NULL;
-    int minViewedFrame = mKeysView->getMinViewedFrame();
-    qreal pixelsPerFrame =  mKeysView->getPixelsPerFrame();
-    QrealKey *collectionKey = NULL;
-    qreal currY = relY;
-    if(currY <= BoxesList::getListItemHeight()) {
-        collectionKey = mAnimatorsCollection.getKeyAtPos(relX, relY,
-                               minViewedFrame,
-                               pixelsPerFrame);
-    }
-    currY -= BoxesList::getListItemHeight();
-    if(collectionKey == NULL) {
-        foreach(QrealAnimator *animator, mActiveAnimators) {
-            qreal animatorHeight = animator->getBoxesListHeight();
-            if(currY <= animatorHeight) {
-                QrealKey *animatorKey = animator->getKeyAtPos(relX, currY,
-                                       minViewedFrame,
-                                       pixelsPerFrame);
-                if(animatorKey == NULL) continue;
-                return animatorKey;
-            }
-            currY -= animatorHeight;
-        }
-    } else {
-        return collectionKey;
-    }
-    return NULL;
-}
-
 void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
     if(shiftPressed) {
         if(mSelected) {
@@ -85,32 +55,6 @@ void BoundingBox::handleListItemMousePress(qreal boxesListX,
     }
 }
 
-void BoundingBox::getKeysInRect(QRectF selectionRect,
-                                QList<QrealKey*> *keysList) {
-    qreal rectMargin = (BoxesList::getListItemHeight() - KEY_RECT_SIZE)*0.5;
-    if(selectionRect.bottom() < rectMargin) return;
-    int minViewedFrame = mKeysView->getMinViewedFrame();
-    qreal pixelsPerFrame =  mKeysView->getPixelsPerFrame();
-    if(selectionRect.top() < BoxesList::getListItemHeight() - rectMargin) {
-        mAnimatorsCollection.getKeysInRect(selectionRect,
-                                         minViewedFrame,
-                                         pixelsPerFrame,
-                                         keysList);
-    }
-    selectionRect.translate(0., -BoxesList::getListItemHeight());
-    foreach(QrealAnimator *animator, mActiveAnimators) {
-        if(selectionRect.bottom() < rectMargin) return;
-        qreal heightT = animator->getBoxesListHeight();
-        if(heightT - rectMargin > selectionRect.top() ) {
-            animator->getKeysInRect(selectionRect,
-                                   minViewedFrame,
-                                   pixelsPerFrame,
-                                   keysList);
-        }
-        selectionRect.translate(0., -heightT);
-    }
-}
-
 void BoundingBox::addEffect(PixmapEffect *effect) {
     effect->setUpdater(new PixmapEffectUpdater(this));
     effect->incNumberPointers();
@@ -135,68 +79,20 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
     effect->decNumberPointers();
 }
 
+QrealAnimator *BoundingBox::getAnimatorsCollection() {
+    return &mAnimatorsCollection;
+}
+
 void BoundingBox::addActiveAnimator(QrealAnimator *animator)
 {
     mActiveAnimators << animator;
+    emit addActiveAnimatorSignal(animator);
 }
 
 void BoundingBox::removeActiveAnimator(QrealAnimator *animator)
 {
     mActiveAnimators.removeOne(animator);
-}
-
-void BoxesGroup::getKeysInRectFromChildren(QRectF selectionRect,
-                                           QList<QrealKey *> *keysList) {
-    foreach(BoundingBox *box, mChildren) {
-        if(selectionRect.bottom() < 0.) return;
-        qreal boxHeight = box->getListItemHeight();
-        QRectF boxRect = QRectF(selectionRect.left(), 0.,
-                                selectionRect.width(), boxHeight);
-        if(boxRect.intersects(selectionRect)) {
-            box->getKeysInRect(selectionRect, keysList);
-        }
-        selectionRect.translate(0., -boxHeight);
-    }
-}
-
-void BoxesGroup::getKeysInRect(QRectF selectionRect,
-                                QList<QrealKey*> *keysList) {
-    BoundingBox::getKeysInRect(selectionRect, keysList);
-    qreal heightT = BoundingBox::getListItemHeight();
-    getKeysInRectFromChildren(selectionRect.translated(0., -heightT),
-                              keysList);
-}
-
-void Canvas::getKeysInRect(QRectF selectionRect,
-                           QList<QrealKey *> *keysList) {
-    qreal heightT = BoundingBox::getListItemHeight();
-    getKeysInRectFromChildren(selectionRect.translated(0., -heightT),
-                              keysList);
-}
-
-QrealKey *BoxesGroup::getKeyAtPosFromChildren(qreal relX, qreal relY,
-                               qreal y0) {
-    qreal currentY = y0;
-    foreach(BoundingBox *box, mChildren) {
-        qreal boxHeight = box->getListItemHeight();
-        if(relY - currentY < boxHeight) {
-            return box->getKeyAtPos(relX, relY - currentY, currentY);
-        }
-        currentY += boxHeight;
-    }
-    return NULL;
-}
-
-QrealKey *BoxesGroup::getKeyAtPos(qreal relX, qreal relY,
-                               qreal y0) {
-    QrealKey *keyFromThis = BoundingBox::getKeyAtPos(relX, relY, y0);
-    if(keyFromThis != NULL) return keyFromThis;
-    return getKeyAtPosFromChildren(relX, relY, BoundingBox::getListItemHeight());
-}
-
-QrealKey *Canvas::getKeyAtPos(qreal relX, qreal relY,
-                               qreal y0) {
-    return getKeyAtPosFromChildren(relX, relY, BoundingBox::getListItemHeight());
+    emit removeActiveAnimatorSignal(animator);
 }
 
 void BoxesGroup::handleChildListItemMousePress(qreal boxesListX,
@@ -297,12 +193,12 @@ void BoundingBox::drawKeys(QPainter *p,
                            qreal drawY,
                            int startFrame, int endFrame) {
     mAnimatorsCollection.drawKeys(p,
-                                  pixelsPerFrame, 0., drawY, 20.,
+                                  pixelsPerFrame, drawY,
                                   startFrame, endFrame);
     drawY += BoxesList::getListItemHeight();
     if(mBoxListItemDetailsVisible) {
         foreach(QrealAnimator *animator, mActiveAnimators) {
-            animator->drawKeys(p, pixelsPerFrame, 0., drawY, BoxesList::getListItemHeight(),
+            animator->drawKeys(p, pixelsPerFrame, drawY,
                                startFrame, endFrame);
             drawY += animator->getBoxesListHeight();
         }

@@ -116,10 +116,6 @@ public:
     void cancelSelectedPointsTransform();
 
     void updateAfterFrameChanged(int currentFrame);
-    QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
-    void getKeysInRect(QRectF selectionRect, QList<QrealKey *> *keysList);
-    QrealKey *getKeyAtPosFromChildren(qreal relX, qreal relY, qreal y0);
-    void getKeysInRectFromChildren(QRectF selectionRect, QList<QrealKey *> *keysList);
 
     void setSelectedFillGradient(Gradient* gradient, bool finish);
 
@@ -202,7 +198,10 @@ public:
     void scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
     void rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin, bool startTrans);
     int getPointsSelectionCount();
+
 protected:
+    void sortSelectedBoxesByZAscending();
+
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
@@ -211,6 +210,8 @@ protected:
     QList<BoundingBox*> mChildren;
 signals:
     void changeChildZSignal(int, int);
+    void removeBoundingBoxSignal(BoundingBox*);
+    void addBoundingBoxSignal(BoundingBox*);
 };
 
 #endif // BOXESGROUP_H

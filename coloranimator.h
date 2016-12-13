@@ -25,8 +25,6 @@ public:
     void startVal3Transform();
     void startAlphaTransform();
 
-    QrealKey *getKeyAtPos(qreal relX, qreal relY,
-                          int minViewedFrame, qreal pixelsPerFrame);
     void openContextMenu(QPoint pos);
     void loadFromSql(int sqlId);
     int saveToSql();

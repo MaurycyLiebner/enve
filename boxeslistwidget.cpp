@@ -59,6 +59,11 @@ ComplexAnimatorItemWidgetContainer::ComplexAnimatorItemWidgetContainer(QrealAnim
         connect((ComplexAnimatorItemWidget*)mTargetAnimatorWidget, SIGNAL(detailsVisibilityChanged(bool)),
                 mDetailsWidget, SLOT(setVisible(bool)));
         ((ComplexAnimator*)target)->addAllAnimatorsToComplexAnimatorItemWidgetContainer(this);
+
+        connect(target, SIGNAL(childAnimatorAdded(QrealAnimator*)),
+                this, SLOT(addChildAnimator(QrealAnimator*)));
+        connect(target, SIGNAL(childAnimatorRemoved(QrealAnimator*)),
+                this, SLOT(removeChildAnimator(QrealAnimator*)));
     } else {
         mTargetAnimatorWidget = new QrealAnimatorItemWidget(target, this);
     }
@@ -89,6 +94,143 @@ BoxItemWidgetContainer::BoxItemWidgetContainer(BoundingBox *target,
             mDetailsWidget, SLOT(setVisible(bool)));
 
     target->addAllAnimatorsToBoxItemWidgetContainer(this);
+
+    connect(target, SIGNAL(addActiveAnimatorSignal(QrealAnimator*)),
+            this, SLOT(addAnimatorWidgetForAnimator(QrealAnimator*)));
+    connect(target, SIGNAL(removeActiveAnimatorSignal(QrealAnimator*)),
+            this, SLOT(removeAnimatorWidgetForAnimator(QrealAnimator*)));
+}
+
+void QrealAnimatorItemWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
+                                       int animatorTop, int maxY,
+                                       int minViewedFrame, int maxViewedFrame) {
+    mTargetAnimator->drawKeys(p, pixelsPerFrame, animatorTop,
+                              minViewedFrame, maxViewedFrame);
+}
+
+void ComplexAnimatorItemWidgetContainer::drawKeys(QPainter *p, qreal pixelsPerFrame,
+                                                  int animatorTop, int maxY,
+                                                  int minViewedFrame, int maxViewedFrame) {
+    mTargetAnimatorWidget->drawKeys(p, pixelsPerFrame,
+                                    animatorTop, maxY,
+                                    minViewedFrame, maxViewedFrame);
+    if(mDetailsWidget->isVisible()) {
+        foreach(ComplexAnimatorItemWidgetContainer *animatorContainer, mChildWidgets) {
+            int childAnimatorTop = animatorTop + BoxesListWidget::getListItemHeight() + animatorContainer->y();
+            int childAnimatorBottom = childAnimatorTop + animatorContainer->height();
+            if(childAnimatorTop > maxY || childAnimatorBottom < 0) continue;
+            animatorContainer->drawKeys(p, pixelsPerFrame,
+                                        childAnimatorTop, maxY,
+                                        minViewedFrame, maxViewedFrame);
+        }
+    }
+}
+
+QrealKey *ComplexAnimatorItemWidgetContainer::getKeyAtPos(qreal pressX, qreal pressY,
+                                                          qreal pixelsPerFrame, int maxY,
+                                                          int animatorTop, int minViewedFrame)
+{
+    if(pressY - animatorTop <= BoxesListWidget::getListItemHeight()) {
+        return mTargetAnimatorWidget->getTargetAnimator()->
+                        getKeyAtPos(pressX, minViewedFrame, pixelsPerFrame);
+    }
+    if(mDetailsWidget->isVisible()) {
+        foreach(ComplexAnimatorItemWidgetContainer *animatorContainer, mChildWidgets) {
+            int childAnimatorTop = animatorTop + BoxesListWidget::getListItemHeight() + animatorContainer->y();
+            int childAnimatorBottom = childAnimatorTop + animatorContainer->height();
+            if(childAnimatorTop > maxY || childAnimatorBottom < 0) continue;
+            if(pressY > childAnimatorTop && pressY < childAnimatorBottom) {
+                return animatorContainer->getKeyAtPos(pressX, pressY,
+                                               pixelsPerFrame, maxY,
+                                               childAnimatorTop, minViewedFrame);
+            }
+        }
+    }
+    return NULL;
+}
+
+void ComplexAnimatorItemWidgetContainer::
+getKeysInRect(QRectF selectionRect, int containerTop,
+              qreal pixelsPerFrame, int minViewedFrame,
+              QList<QrealKey*> *listKeys) {
+    if(selectionRect.top() < containerTop &&
+       selectionRect.bottom() > containerTop + BoxesListWidget::getListItemHeight()) {
+        mTargetAnimatorWidget->getTargetAnimator()->
+                        getKeysInRect(selectionRect, minViewedFrame,
+                                      pixelsPerFrame, listKeys);
+    }
+    if(mDetailsWidget->isVisible()) {
+        foreach(ComplexAnimatorItemWidgetContainer *animatorContainer, mChildWidgets) {
+            int childAnimatorTop = containerTop + BoxesListWidget::getListItemHeight() + animatorContainer->y();
+            int childAnimatorBottom = childAnimatorTop + animatorContainer->height();
+            if(childAnimatorTop > selectionRect.bottom() || childAnimatorBottom < selectionRect.top()) continue;
+            animatorContainer->getKeysInRect(selectionRect, childAnimatorTop,
+                                             pixelsPerFrame, minViewedFrame,
+                                             listKeys);
+        }
+    }
+}
+
+void BoxItemWidgetContainer::drawKeys(QPainter *p, qreal pixelsPerFrame,
+                                      int containerTop, int maxY,
+                                      int minViewedFrame, int maxViewedFrame) {
+    mTargetBoxWidget->drawKeys(p, pixelsPerFrame,
+                               containerTop, maxY,
+                               minViewedFrame, maxViewedFrame);
+    if(mDetailsWidget->isVisible()) {
+        foreach(ComplexAnimatorItemWidgetContainer *animatorContainer, mAnimatorsContainers) {
+            int animatorTop = containerTop + BoxesListWidget::getListItemHeight() + animatorContainer->y();
+            int animatorBottom = animatorTop + animatorContainer->height();
+            if(animatorTop > maxY || animatorBottom < 0) continue;
+            animatorContainer->drawKeys(p, pixelsPerFrame,
+                                        animatorTop, maxY,
+                                        minViewedFrame, maxViewedFrame);
+        }
+    }
+}
+
+QrealKey *BoxItemWidgetContainer::getKeyAtPos(qreal pressX, qreal pressY,
+                                              qreal pixelsPerFrame, int maxY,
+                                              int containerTop, int minViewedFrame) {
+    if(pressY - containerTop <= BoxesListWidget::getListItemHeight()) {
+        return mTargetBoxWidget->getTargetBox()->getAnimatorsCollection()->
+                        getKeyAtPos(pressX, minViewedFrame, pixelsPerFrame);
+    }
+    if(mDetailsWidget->isVisible()) {
+        foreach(ComplexAnimatorItemWidgetContainer *animatorContainer, mAnimatorsContainers) {
+            int animatorTop = containerTop + BoxesListWidget::getListItemHeight() + animatorContainer->y();
+            int animatorBottom = animatorTop + animatorContainer->height();
+            if(animatorTop > maxY || animatorBottom < 0) continue;
+            if(pressY > animatorTop && pressY < animatorBottom) {
+                return animatorContainer->getKeyAtPos(pressX, pressY,
+                                               pixelsPerFrame, maxY,
+                                               animatorTop, minViewedFrame);
+            }
+        }
+    }
+    return NULL;
+}
+
+void BoxItemWidgetContainer::getKeysInRect(QRectF selectionRect, int containerTop,
+                                           qreal pixelsPerFrame, int minViewedFrame,
+                                           QList<QrealKey*> *listKeys) {
+    if(selectionRect.top() < containerTop &&
+       selectionRect.bottom() > containerTop + BoxesListWidget::getListItemHeight()) {
+        mTargetBoxWidget->getTargetBox()->getAnimatorsCollection()->
+                getKeysInRect(selectionRect,
+                              minViewedFrame, pixelsPerFrame,
+                              listKeys);
+    }
+    if(mDetailsWidget->isVisible()) {
+        foreach(ComplexAnimatorItemWidgetContainer *animatorContainer, mAnimatorsContainers) {
+            int animatorTop = containerTop + BoxesListWidget::getListItemHeight() + animatorContainer->y();
+            int animatorBottom = animatorTop + animatorContainer->height();
+            if(animatorTop > selectionRect.bottom() || animatorBottom < selectionRect.top()) continue;
+            animatorContainer->getKeysInRect(selectionRect, animatorTop,
+                                             pixelsPerFrame, minViewedFrame,
+                                             listKeys);
+        }
+    }
 }
 
 BoxItemWidget::BoxItemWidget(BoundingBox *target, QWidget *parent) : QWidget(parent)
@@ -126,6 +268,7 @@ void BoxItemWidget::paintEvent(QPaintEvent *) {
         p.drawPixmap(drawX, 0, *BoxesListWidget::UNLOCKED_PIXMAP);
     }
     drawX += 2*BoxesListWidget::getListItemHeight();
+    p.setPen(Qt::black);
     p.drawText(QRect(drawX, 0,
                      width() - drawX -
                      BoxesListWidget::getListItemHeight(),
@@ -184,6 +327,8 @@ void BoxItemWidget::mouseDoubleClickEvent(QMouseEvent *e)
         } else {
             rename();
         }
+    } else {
+        mousePressEvent(e);
     }
 }
 
@@ -196,6 +341,15 @@ void BoxItemWidget::rename() {
         mTargetBox->setName(text);
         update();
     }
+}
+
+void BoxItemWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
+                             int containerTop, int maxY,
+                             int minViewedFrame, int maxViewedFrame)
+{
+    mTargetBox->drawKeys(p, pixelsPerFrame,
+                         containerTop,
+                         minViewedFrame, maxViewedFrame);
 }
 
 void BoxItemWidgetContainer::addAnimatorWidgetForAnimator(QrealAnimator *animator)
@@ -216,6 +370,7 @@ void BoxItemWidgetContainer::removeAnimatorWidgetForAnimator(QrealAnimator *anim
 void BoxItemWidgetContainer::addAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget)
 {
     mChildWidgetsLayout->addWidget(widget);
+    mAnimatorsContainers << widget;
 }
 
 void BoxItemWidgetContainer::removeAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget)
@@ -333,6 +488,7 @@ void ComplexAnimatorItemWidget::setDetailsVisibile(bool bT) {
 
 BoxesListWidget::BoxesListWidget(QWidget *parent) : QWidget(parent)
 {
+    setFocusPolicy(Qt::NoFocus);
     loadStaticPixmaps();
     mBoxesLayout = new QVBoxLayout(this);
     setLayout(mBoxesLayout);
@@ -342,8 +498,13 @@ BoxesListWidget::BoxesListWidget(QWidget *parent) : QWidget(parent)
     mBoxesLayout->setContentsMargins(0, 0, 0, 20);
     setContentsMargins(0, 0, 0, 0);
 
-    connect(MainWindow::getInstance()->getCanvas(), SIGNAL(changeChildZSignal(int,int)),
+    Canvas *canvas = MainWindow::getInstance()->getCanvas();
+    connect(canvas, SIGNAL(changeChildZSignal(int,int)),
             this, SLOT(changeItemZ(int,int)));
+    connect(canvas, SIGNAL(addBoundingBoxSignal(BoundingBox*)),
+            this, SLOT(addItemForBox(BoundingBox*)));
+    connect(canvas, SIGNAL(removeBoundingBoxSignal(BoundingBox*)),
+            this, SLOT(removeItemForBox(BoundingBox*)));
 //    QLabel *label = new QLabel(this);
 //    label->setStyleSheet("background-color: black");
 //    label->setFixedHeight(1);
@@ -370,22 +531,65 @@ void BoxesListWidget::loadStaticPixmaps()
     mStaticPixmapsLoaded = true;
 }
 
+void BoxesListWidget::drawKeys(QPainter *p, qreal pixelsPerFrame, int viewedTop,
+                               int minViewedFrame, int maxViewedFrame) {
+    foreach(BoxItemWidgetContainer *container, mBoxWidgetContainers) {
+        int containerTop = container->y() - viewedTop;
+        int containerBottom = containerTop + container->height();
+        if(containerTop > height() || containerBottom < 0) continue;
+        container->drawKeys(p, pixelsPerFrame,
+                            containerTop, height(),
+                            minViewedFrame, maxViewedFrame);
+    }
+}
+
+QrealKey *BoxesListWidget::getKeyAtPos(int pressX, int pressY, qreal pixelsPerFrame,
+                                       int viewedTop, int minViewedFrame) {
+    int remaining = pressY % getListItemHeight();
+    if(remaining < (getListItemHeight() - KEY_RECT_SIZE)/2 ||
+       remaining > (getListItemHeight() + KEY_RECT_SIZE)/2) return NULL;
+    foreach(BoxItemWidgetContainer *container, mBoxWidgetContainers) {
+        int containerTop = container->y() - viewedTop;
+        int containerBottom = containerTop + container->height();
+        if(containerTop > pressY || containerBottom < pressY) continue;
+        return container->getKeyAtPos(pressX, pressY, pixelsPerFrame,
+                               height(), containerTop, minViewedFrame);
+    }
+    return NULL;
+}
+
+void BoxesListWidget::getKeysInRect(QRectF selectionRect, int viewedTop,
+                                    qreal pixelsPerFrame, int minViewedFrame,
+                                    QList<QrealKey*> *listKeys) {
+    selectionRect.adjust(0, -getListItemHeight()*0.75,
+                         0, getListItemHeight()*0.75);
+    foreach(BoxItemWidgetContainer *container, mBoxWidgetContainers) {
+        int containerTop = container->y() - viewedTop;
+        int containerBottom = containerTop + container->height();
+        if(containerTop > selectionRect.bottom() || containerBottom < selectionRect.top()) continue;
+        container->getKeysInRect(selectionRect, containerTop,
+                                 pixelsPerFrame, minViewedFrame,
+                                 listKeys);
+    }
+}
+
 void BoxesListWidget::addItemForBox(BoundingBox *box)
 {
     BoxItemWidgetContainer *itemWidgetContainer = new BoxItemWidgetContainer(box, this);
-    mBoxesLayout->addWidget(itemWidgetContainer);
+    mBoxesLayout->insertWidget(0, itemWidgetContainer);
     mBoxWidgetContainers << itemWidgetContainer;
 }
 
-void BoxesListWidget::removeItemFromBox(BoundingBox *box) {
+void BoxesListWidget::removeItemForBox(BoundingBox *box) {
     foreach(BoxItemWidgetContainer *widget, mBoxWidgetContainers) {
         if(widget->getTargetBox() == box) {
-            mBoxWidgetContainers.removeOne(widget);
             delete widget;
         }
     }
 }
 
 void BoxesListWidget::changeItemZ(int from, int to) {
-    mBoxesLayout->insertItem(to, mBoxesLayout->takeAt(from));
+    int count = mBoxesLayout->count();
+    mBoxesLayout->insertItem(count - 1 - to,
+                             mBoxesLayout->takeAt(count - 1 - from));
 }

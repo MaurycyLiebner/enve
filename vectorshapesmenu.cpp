@@ -8,6 +8,7 @@ VectorShapesMenu::VectorShapesMenu(QWidget *parent) : QWidget(parent) {
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
 
+    setFocusPolicy(Qt::NoFocus);
     setMinimumSize(200, 200);
     mScrollArea = new QScrollArea(this);
     mScrollArea->setBackgroundRole(QPalette::Window);

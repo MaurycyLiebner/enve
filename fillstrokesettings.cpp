@@ -399,7 +399,9 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     mColorTypeBar->addTab(QIcon("pixmaps/icons/ink_fill_gradient.png"),"Gradient");
 
     mFillTargetButton->setCheckable(true);
+    mFillTargetButton->setFocusPolicy(Qt::NoFocus);
     mStrokeTargetButton->setCheckable(true);
+    mStrokeTargetButton->setFocusPolicy(Qt::NoFocus);
     mTargetLayout->addWidget(mFillTargetButton);
     mTargetLayout->addWidget(mStrokeTargetButton);
 
@@ -478,15 +480,19 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
                 QIcon("pixmaps/icons/ink_fill_dropper.png"), "", this);
     mFillPickerButton->setSizePolicy(QSizePolicy::Maximum,
                                      QSizePolicy::Maximum);
+    mFillPickerButton->setFocusPolicy(Qt::NoFocus);
     mStrokePickerButton = new QPushButton(
                 QIcon("pixmaps/icons/ink_stroke_dropper.png"), "", this);
     mStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
+    mStrokePickerButton->setFocusPolicy(Qt::NoFocus);
     mFillStrokePickerButton = new QPushButton(
                 QIcon("pixmaps/icons/ink_fill_stroke_dropper.png"), "", this);
     mFillStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
                                            QSizePolicy::Maximum);
+    mFillStrokePickerButton->setFocusPolicy(Qt::NoFocus);
     mPickersLayout->addWidget(mFillPickerButton);
+
     connect(mFillPickerButton, SIGNAL(pressed()),
             this, SLOT(startLoadingFillFromPath()) );
     mPickersLayout->addWidget(mStrokePickerButton);
@@ -702,21 +708,22 @@ void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
     if(mLoadFillFromPath) {
         mLoadFillFromPath = false;
         setFillValuesFromFillSettings(path->getFillSettings());
-
-        setFillTarget();
-
-        emitPaintTypeChanged();
+        mCanvas->fillPaintTypeChanged(mCurrentFillPaintType,
+                                    mCurrentFillColor,
+                                    mCurrentFillGradient);
     }
     if(mLoadStrokeFromPath) {
         mLoadStrokeFromPath = false;
         setStrokeValuesFromStrokeSettings(path->getStrokeSettings());
 
-        setStrokeTarget();
-
-        emitPaintTypeChanged();
-        emitCapStyleChanged();
-        emitJoinStyleChanged();
+        mCanvas->strokePaintTypeChanged(mCurrentStrokePaintType,
+                                        mCurrentStrokeColor,
+                                        mCurrentStrokeGradient);
+        mCanvas->strokeCapStyleChanged(mCurrentCapStyle);
+        mCanvas->strokeJoinStyleChanged(mCurrentJoinStyle);
+        mCanvas->strokeWidthChanged(mCurrentStrokeWidth, true);
     }
+    mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitStrokeFlatColorChanged() {

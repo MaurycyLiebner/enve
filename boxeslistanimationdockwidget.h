@@ -11,8 +11,30 @@
 #include "keysview.h"
 #include "boxeslistwidget.h"
 #include <qscrollarea.h>
+#include <QScrollArea>
+#include <QApplication>
+#include <QScrollBar>
 
 class AnimationDockWidget;
+
+class ScrollArea : public QScrollArea {
+    Q_OBJECT
+public:
+    ScrollArea(QWidget *parent = 0) : QScrollArea(parent) {
+
+    }
+
+public slots:
+    void callWheelEvent(QWheelEvent *event) {
+        //scrollContentsBy(event->delta(), 0);
+        //QApplication::sendEvent(this, event);
+        //wheelEvent(event);
+        verticalScrollBar()->triggerAction(
+                    (event->delta() > 0) ?
+                    QAbstractSlider::SliderSingleStepSub :
+                    QAbstractSlider::SliderSingleStepAdd);
+    }
+};
 
 class BoxesListAnimationDockWidget : public QWidget
 {
@@ -38,7 +60,7 @@ private slots:
     void setAllPointsRecord(bool allPointsRecord);
     void moveSlider(int val);
 private:
-    QScrollArea *mBoxesListScrollArea;
+    ScrollArea *mBoxesListScrollArea;
 
     MainWindow *mMainWindow;
     QVBoxLayout *mMainLayout;

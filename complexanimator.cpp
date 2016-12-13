@@ -19,25 +19,25 @@ ComplexAnimator::~ComplexAnimator()
 
 #include <QDebug>
 void ComplexAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
-                               qreal startX, qreal startY, qreal height,
+                               qreal startY,
                                int startFrame, int endFrame)
 {
-    QrealAnimator::drawKeys(p, pixelsPerFrame, startX, startY, height,
+    QrealAnimator::drawKeys(p, pixelsPerFrame, startY,
                             startFrame, endFrame);
 
     if(mBoxesListDetailVisible) {
-        drawChildAnimatorKeys(p, pixelsPerFrame, startX, startY, height,
+        drawChildAnimatorKeys(p, pixelsPerFrame, startY,
                               startFrame, endFrame);
     }
 }
 
 void ComplexAnimator::drawChildAnimatorKeys(QPainter *p, qreal pixelsPerFrame,
-                                            qreal startX, qreal startY, qreal height,
+                                            qreal startY,
                                             int startFrame, int endFrame)
 {
     startY += BoxesList::getListItemHeight();
     foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->drawKeys(p, pixelsPerFrame, startX, startY, height,
+        animator->drawKeys(p, pixelsPerFrame, startY,
                            startFrame, endFrame);
         startY += animator->getBoxesListHeight();
     }
@@ -61,6 +61,8 @@ void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
     childAnimatorIsRecordingChanged();
     childAnimator->setFrame(mCurrentFrame);
     updateKeysPath();
+
+    emit childAnimatorAdded(childAnimator);
 }
 
 void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
@@ -71,6 +73,8 @@ void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
     removeAnimator->decNumberPointers();
     childAnimatorIsRecordingChanged();
     updateKeysPath();
+
+    emit childAnimatorRemoved(removeAnimator);
 }
 
 void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,
@@ -175,50 +179,6 @@ void ComplexAnimator::drawBoxesList(QPainter *p,
         }
     } else {
         p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_CHILDREN_HIDDEN);
-    }
-}
-
-QrealKey *ComplexAnimator::getKeyAtPos(qreal relX, qreal relY,
-                                     int minViewedFrame,
-                                     qreal pixelsPerFrame) {
-    if(relY <= BoxesList::getListItemHeight()) {
-        return QrealAnimator::getKeyAtPos(relX, relY,
-                                   minViewedFrame, pixelsPerFrame);
-    } else if(mBoxesListDetailVisible) {
-        relY -= BoxesList::getListItemHeight();
-        foreach(QrealAnimator *animator, mChildAnimators) {
-            qreal heightT = animator->getBoxesListHeight();
-            if(relY <= heightT) {
-                return animator->getKeyAtPos(relX, relY,
-                                         minViewedFrame, pixelsPerFrame);
-            }
-            relY -= heightT;
-        }
-    }
-    return NULL;
-}
-
-void ComplexAnimator::getKeysInRect(QRectF selectionRect,
-                                    int minViewedFrame,
-                                    qreal pixelsPerFrame,
-                                    QList<QrealKey *> *keysList)
-{
-    qreal rectMargin = (BoxesList::getListItemHeight() - KEY_RECT_SIZE)*0.5;
-    if(selectionRect.top() <= BoxesList::getListItemHeight() - rectMargin) {
-        QrealAnimator::getKeysInRect(selectionRect, minViewedFrame,
-                                     pixelsPerFrame, keysList);
-    }
-    if(mBoxesListDetailVisible) {
-        selectionRect.translate(0., -BoxesList::getListItemHeight());
-        foreach(QrealAnimator *animator, mChildAnimators) {
-            if(selectionRect.bottom() < rectMargin) break;
-            qreal heightT = animator->getBoxesListHeight();
-            if(selectionRect.top() <= heightT - rectMargin) {
-                animator->getKeysInRect(selectionRect, minViewedFrame,
-                                        pixelsPerFrame, keysList);
-            }
-            selectionRect.translate(0., -heightT);
-        }
     }
 }
 

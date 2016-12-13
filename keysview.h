@@ -89,6 +89,7 @@ protected:
     void paintEvent(QPaintEvent *);
 signals:
     void changedViewedFrames(int, int);
+    void wheelEventSignal(QWheelEvent*);
 public slots:
     void graphUpdateAfterKeysChangedAndRepaint();
 

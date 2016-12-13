@@ -64,7 +64,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p)
                 p->drawText(rect(), Qt::AlignCenter, getValueString());
             }
         }
-        if(mAnimator->isKeyOnCurrentFrame()) {
+        if(mAnimator->isRecording() && mAnimator->isKeyOnCurrentFrame()) {
             p->setPen(QPen(Qt::red));
         }
         p->drawRect(rect().adjusted(0, 0, -1, -1));

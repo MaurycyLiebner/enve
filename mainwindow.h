@@ -24,6 +24,8 @@ class ColorSettingsWidget;
 
 class BoxesListAnimationDockWidget;
 
+class CanvasWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -79,6 +81,7 @@ private:
     QMenu *mRenderMenu;
 
     Canvas *mCanvas;
+    CanvasWidget *mCanvasWidget;
     UndoRedoStack mUndoRedoStack;
     QList<UpdateScheduler*> mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
@@ -135,6 +138,7 @@ public:
     KeysView *getKeysView();
     BoxesListWidget *getBoxesList();
     Canvas *getCanvas();
+    CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
     void loadFile(QString path);

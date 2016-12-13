@@ -16,7 +16,6 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mTransformAnimator.blockPointer();
 
     mBoxesList = getMainWindow()->getBoxesList();
-    mBoxesList->addItemForBox(this);
     mKeysView = getMainWindow()->getKeysView();
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;

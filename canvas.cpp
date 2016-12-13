@@ -13,12 +13,10 @@
 bool Canvas::mEffectsPaintEnabled = true;
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-               MainWindow *parent) :
-    QWidget(parent),
+               CanvasWidget *canvasWidget) :
     BoxesGroup(fillStrokeSettings)
 {
-    setAttribute(Qt::WA_OpaquePaintEvent, true);
-
+    mCanvasWidget = canvasWidget;
     mBoxListItemDetailsVisible = true;
     incNumberPointers();
 
@@ -29,11 +27,9 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
-    setFocusPolicy(Qt::StrongFocus);
+
     mRotPivot = new PathPivot(this);
     mRotPivot->hide();
-    setMinimumSize(500, 500);
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
     mCurrentMode = MOVE_PATH;
     //setCanvasMode(MOVE_PATH);
@@ -166,7 +162,7 @@ bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
 
 bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     if(processUnfilteredKeyEvent(event)) return true;
-    if(!hasFocus()) return false;
+    if(!mCanvasWidget->hasFocus()) return false;
     if(isCtrlPressed() && event->key() == Qt::Key_G) {
         if(isShiftPressed()) {
             mCurrentBoxesGroup->ungroupSelected();
@@ -247,40 +243,10 @@ void Canvas::loadAllBoxesFromSql(bool loadInBox) {
                                                                     loadInBox);
 }
 
-void Canvas::setPartialRepaintRect(QRectF absRect) {
-    mPartialRepaintRect = absRect;
-}
-
-void Canvas::partialRepaintRectToPoint(QPointF point) {
-    mPartialRepaintRect.setTopLeft(point);
-    mPartialRepaintRect.setBottomRight(point);
-}
-
-void Canvas::makePartialRepaintInclude(QPointF pointToInclude) {
-    if(pointToInclude.x() > mPartialRepaintRect.right() ) {
-        mPartialRepaintRect.setRight(pointToInclude.x() );
-    } else if(pointToInclude.x() < mPartialRepaintRect.left() ) {
-        mPartialRepaintRect.setLeft(pointToInclude.x() );
-    }
-    if(pointToInclude.y() > mPartialRepaintRect.bottom() ) {
-        mPartialRepaintRect.setBottom(pointToInclude.y() );
-    } else if(pointToInclude.y() < mPartialRepaintRect.top() ) {
-        mPartialRepaintRect.setTop(pointToInclude.y() );
-    }
-}
-
-void Canvas::repaintPartially() {
-    mFullRepaint = false;
-    repaint();
-    mFullRepaint = true;
-}
-
-void Canvas::paintEvent(QPaintEvent *)
+void Canvas::paintEvent(QPainter *p)
 {
-    QPainter p(this);
-
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setRenderHint(QPainter::SmoothPixmapTransform);
+    p->setRenderHint(QPainter::Antialiasing);
+    p->setRenderHint(QPainter::SmoothPixmapTransform);
 
     QPointF absPos = getAbsolutePos();
     QRectF viewRect = QRectF(absPos,
@@ -288,39 +254,39 @@ void Canvas::paintEvent(QPaintEvent *)
 
     if(mPreviewing) {
         QPainterPath path;
-        path.addRect(0, 0, width() + 1, height() + 1);
+        path.addRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1);
         QPainterPath viewRectPath;
         viewRectPath.addRect(viewRect);
-        p.setBrush(QColor(0, 0, 0));
-        p.setPen(Qt::NoPen);
-        p.drawPath(path.subtracted(viewRectPath));
+        p->setBrush(QColor(0, 0, 0));
+        p->setPen(Qt::NoPen);
+        p->drawPath(path.subtracted(viewRectPath));
 
-        p.drawImage(mRenderRect.topLeft(), *mCurrentPreviewImg);
-    } else if(mFullRepaint) {
-        p.fillRect(0, 0, width() + 1, height() + 1, QColor(75, 75, 75));
-        p.fillRect(viewRect, Qt::white);
+        p->drawImage(mRenderRect.topLeft(), *mCurrentPreviewImg);
+    } else {
+        p->fillRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1, QColor(75, 75, 75));
+        p->fillRect(viewRect, Qt::white);
 
         foreach(BoundingBox *box, mChildren){
-            box->drawPixmap(&p);
+            box->drawPixmap(p);
         }
-        mCurrentBoxesGroup->drawSelected(&p, mCurrentMode);
+        mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
 
-        p.setPen(QPen(Qt::black, 2.f));
-        p.setBrush(Qt::NoBrush);
-        p.drawRect(viewRect.adjusted(-1., -1., 1., 1.));
+        p->setPen(QPen(Qt::black, 2.));
+        p->setBrush(Qt::NoBrush);
+        p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
 
-        p.setPen(QPen(QColor(0, 0, 255, 125), 2.f, Qt::DotLine));
+        p->setPen(QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine));
         if(mSelecting) {
-            p.drawRect(mSelectionRect);
+            p->drawRect(mSelectionRect);
         }
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
-            mRotPivot->draw(&p);
+            mRotPivot->draw(p);
         }
 
         if(mInputTransformationEnabled) {
-            QRect inputRect = QRect(40, height() - 20, 100, 20);
-            p.fillRect(inputRect, QColor(225, 225, 225));
+            QRect inputRect = QRect(40, mCanvasWidget->height() - 20, 100, 20);
+            p->fillRect(inputRect, QColor(225, 225, 225));
             QString text;
             if(mXOnlyTransform) {
                 text = " x: " + mInputText + "|";
@@ -329,19 +295,17 @@ void Canvas::paintEvent(QPaintEvent *)
             } else {
                 text = " x, y: " + mInputText + "|";
             }
-            p.drawText(inputRect, Qt::AlignVCenter, text);
+            p->drawText(inputRect, Qt::AlignVCenter, text);
         }
     }
 
-    if(hasFocus() ) {
-        p.setPen(QPen(Qt::red, 4.));
+    if(mCanvasWidget->hasFocus() ) {
+        p->setPen(QPen(Qt::red, 4.));
     } else {
-        p.setPen(Qt::NoPen);
+        p->setPen(Qt::NoPen);
     }
-    p.setBrush(Qt::NoBrush);
-    p.drawRect(rect());
-
-    p.end();
+    p->setBrush(Qt::NoBrush);
+    p->drawRect(mCanvasWidget->rect());
 }
 
 bool Canvas::isMovingPath() {
@@ -365,12 +329,12 @@ QSize Canvas::getCanvasSize()
 
 void Canvas::playPreview()
 {
-    setAttribute(Qt::WA_OpaquePaintEvent, false);
+    mCanvasWidget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     if(mPreviewFrames.isEmpty() ) return;
     mCurrentPreviewFrameId = 0;
     mCurrentPreviewImg = mPreviewFrames.first();
     mPreviewing = true;
-    repaint();
+    mCanvasWidget->repaint();
 
     mPreviewFPSTimer->start();
 }
@@ -385,7 +349,7 @@ void Canvas::clearPreview() {
         mPreviewFrames.clear();
         mMainWindow->previewFinished();
 
-        setAttribute(Qt::WA_OpaquePaintEvent, true);
+        mCanvasWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);
     }
 }
 
@@ -397,7 +361,7 @@ void Canvas::nextPreviewFrame()
     } else {
         mCurrentPreviewImg = mPreviewFrames.at(mCurrentPreviewFrameId);
     }
-    repaint();
+    mCanvasWidget->repaint();
 }
 
 void Canvas::raiseAction()
@@ -428,8 +392,8 @@ void Canvas::objectsToPathAction()
 void Canvas::updateRenderRect() {
     mRenderRect = QRectF(qMax(mCombinedTransformMatrix.dx(), 0.),
                          qMax(mCombinedTransformMatrix.dy(), 0.),
-                         qMin(mVisibleWidth, (qreal)width()),
-                         qMin(mVisibleHeight, (qreal)height()));
+                         qMin(mVisibleWidth, (qreal)mCanvasWidget->width()),
+                         qMin(mVisibleHeight, (qreal)mCanvasWidget->height()));
 }
 
 void Canvas::renderCurrentFrameToPreview()
@@ -585,19 +549,19 @@ void Canvas::updatePivot() {
 void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
     if(mCurrentMode == MOVE_PATH) {
-        setCursor(QCursor(Qt::ArrowCursor) );
+        mCanvasWidget->setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mCurrentMode == MOVE_POINT) {
-        setCursor(QCursor(QPixmap("pixmaps/cursor-node.xpm"), 0, 0) );
+        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-node.xpm"), 0, 0) );
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        setCursor(QCursor(QPixmap("pixmaps/cursor_color_picker.png"), 2, 20) );
+        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor_color_picker.png"), 2, 20) );
     } else if(mCurrentMode == ADD_CIRCLE) {
-        setCursor(QCursor(QPixmap("pixmaps/cursor-ellipse.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-ellipse.xpm"), 4, 4) );
     } else if(mCurrentMode == ADD_RECTANGLE) {
-        setCursor(QCursor(QPixmap("pixmaps/cursor-rect.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-rect.xpm"), 4, 4) );
     } else if(mCurrentMode == ADD_TEXT) {
-        setCursor(QCursor(QPixmap("pixmaps/cursor-text.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-text.xpm"), 4, 4) );
     } else {
-        setCursor(QCursor(QPixmap("pixmaps/cursor-pen.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-pen.xpm"), 4, 4) );
     }
     clearAllPointsSelection();
     if(mCurrentMode == MOVE_PATH || mCurrentMode == MOVE_POINT) {
@@ -625,8 +589,8 @@ void Canvas::updateInputValue() {
 
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
-    setMouseTracking(true);
-    grabMouse();
+    mCanvasWidget->setMouseTracking(true);
+    mCanvasWidget->grabMouse();
 }
 
 void Canvas::setFontFamilyAndStyle(QString family, QString style)
@@ -645,8 +609,8 @@ void Canvas::setFontSize(qreal size)
 
 void Canvas::releaseMouseAndDontTrack() {
     mIsMouseGrabbing = false;
-    setMouseTracking(false);
-    releaseMouse();
+    mCanvasWidget->setMouseTracking(false);
+    mCanvasWidget->releaseMouse();
 }
 
 void Canvas::groupSelectedBoxesAction() {
@@ -659,7 +623,7 @@ void Canvas::groupSelectedBoxesAction() {
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
     if(mPreviewing) return;
-    bool isGrabbingMouse = mouseGrabber() == this;
+    bool isGrabbingMouse = mCanvasWidget->mouseGrabber() == mCanvasWidget;
     if(isGrabbingMouse) {
         if(event->key() == Qt::Key_Escape) {
             cancelCurrentTransform();
@@ -782,7 +746,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     } else if(event->key() == Qt::Key_R && (isMovingPath() ||
               mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
        mTransformationFinishedBeforeMouseRelease = false;
-       mLastMouseEventPos = mapFromGlobal(QCursor::pos());
+       mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
        mLastPressPos = mLastMouseEventPos;
        mRotPivot->startRotating();
        mDoubleClick = false;
@@ -795,7 +759,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
        mXOnlyTransform = false;
        mYOnlyTransform = false;
 
-       mLastMouseEventPos = mapFromGlobal(QCursor::pos());
+       mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
        mLastPressPos = mLastMouseEventPos;
        mRotPivot->startScaling();
        mDoubleClick = false;
@@ -809,7 +773,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         mXOnlyTransform = false;
         mYOnlyTransform = false;
 
-        mLastMouseEventPos = mapFromGlobal(QCursor::pos());
+        mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
         mLastPressPos = mLastMouseEventPos;
         mDoubleClick = false;
         mFirstMouseMove = true;
@@ -886,13 +850,13 @@ void Canvas::fitCanvasToSize() {
     mVisibleHeight = mHeight + 20;
     mVisibleWidth = mWidth + 20;
     updateAfterCombinedTransformationChanged();
-    qreal widthScale = width()/mVisibleWidth;
-    qreal heightScale = height()/mVisibleHeight;
-    scale(qMin(heightScale, widthScale), QPointF(0.f, 0.f));
+    qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
+    qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
+    scale(qMin(heightScale, widthScale), QPointF(0., 0.));
     mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
-    moveBy(QPointF( (width() - mVisibleWidth)*0.5f,
-                    (height() - mVisibleHeight)*0.5f) );
+    moveBy(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
+                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
     updateAfterCombinedTransformationChanged();
 
 }

@@ -14,14 +14,13 @@ public:
     QMatrix getCurrentValue();
 
     void drawKeys(QPainter *p, qreal pixelsPerFrame,
-                  qreal startX, qreal startY, qreal height,
+                  qreal startY,
                   int startFrame, int endFrame);
 
     void addChildQrealKey(QrealKey *key);
     ComplexKey *getKeyCollectionAtFrame(int frame);
     void removeChildQrealKey(QrealKey *key);
-    void drawChildAnimatorKeys(QPainter *p, qreal pixelsPerFrame,
-                               qreal startX, qreal startY, qreal height,
+    void drawChildAnimatorKeys(QPainter *p, qreal pixelsPerFrame, qreal startY,
                                int startFrame, int endFrame);
     qreal clampValue(qreal value);
     void addChildAnimator(QrealAnimator *childAnimator);
@@ -34,10 +33,6 @@ public:
     qreal getBoxesListHeight();
     void drawBoxesList(QPainter *p,
                        qreal drawX, qreal drawY);
-    QrealKey *getKeyAtPos(qreal relX, qreal relY, int minViewedFrame, qreal pixelsPerFrame);
-    void getKeysInRect(QRectF selectionRect, int minViewedFrame,
-                       qreal pixelsPerFrame,
-                       QList<QrealKey *> *keysList);
     void handleListItemMousePress(qreal boxesListX, qreal relX, qreal relY, QMouseEvent *event);
     void retrieveSavedValue();
     void finishTransform();

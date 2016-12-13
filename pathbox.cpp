@@ -235,7 +235,7 @@ void PathBox::updateDrawGradients()
 
 void PathBox::updatePixBoundingRectClippedToView() {
     mPixBoundingRectClippedToView = mPixBoundingRect.intersected(
-                mMainWindow->getCanvas()->rect());
+                mMainWindow->getCanvasWidget()->rect());
 }
 
 void PathBox::afterSuccessfulUpdate()

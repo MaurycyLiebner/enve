@@ -1,7 +1,6 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include <QWidget>
 #include "boxesgroup.h"
 #include "Colors/color.h"
 #include "fillstrokesettings.h"
@@ -157,12 +156,14 @@ private:
     qreal mPressedT;
 };
 
-class Canvas : public QWidget, public BoxesGroup
+#include "canvaswidget.h"
+
+class Canvas : public BoxesGroup
 {
     Q_OBJECT
 public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-                    MainWindow *parent = 0);
+                    CanvasWidget *canvasWidget);
     ~Canvas();
     QRectF getPixBoundingRect();
     void addBoxToSelection(BoundingBox *box);
@@ -217,9 +218,6 @@ public:
     QMatrix getCombinedRenderTransform();
 
     void clearPreview();
-    QrealKey *getKeyAtPos(qreal relX, qreal relY, qreal y0);
-    void getKeysInRect(QRectF selectionRect,
-                       QList<QrealKey *> *keysList);
 
     void centerPivotPosition(bool finish = false) {}
     bool processUnfilteredKeyEvent(QKeyEvent *event);
@@ -287,7 +285,6 @@ public:
     void grabMouseAndTrack();
 
     void setPartialRepaintRect(QRectF absRect);
-    void repaintPartially();
     void makePartialRepaintInclude(QPointF pointToInclude);
     void partialRepaintRectToPoint(QPointF point);
     void enableHighQualityPaint();
@@ -306,9 +303,8 @@ public:
     void updateAllBoxes();
     void scalePointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
     void rotatePointsBy(qreal rotChange, QPointF absOrigin, bool startTrans);
-protected:
-//    void updateAfterCombinedTransformationChanged();
-    void paintEvent(QPaintEvent *);
+
+    void paintEvent(QPainter *p);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -316,6 +312,9 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
+protected:
+//    void updateAfterCombinedTransformationChanged();
+
     void addPointToSelection(MovablePoint *point);
 
     void setCurrentEndPoint(PathPoint *point);
@@ -382,10 +381,10 @@ private:
     bool mPivotVisibleDuringPointEdit = true;
     static bool mEffectsPaintEnabled;
 
+    CanvasWidget *mCanvasWidget;
+
     QRectF mRenderRect;
 
-    QRectF mPartialRepaintRect;
-    bool mFullRepaint = true;
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;
     TextBox *mCurrentTextBox = NULL;

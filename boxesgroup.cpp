@@ -13,6 +13,11 @@ bool zLessThan(BoundingBox *box1, BoundingBox *box2)
     return box1->getZIndex() > box2->getZIndex();
 }
 
+//bool zMoreThan(BoundingBox *box1, BoundingBox *box2)
+//{
+//    return box1->getZIndex() < box2->getZIndex();
+//}
+
 BoxesGroup::BoxesGroup(BoxesGroup *parent) :
     BoundingBox(parent, BoundingBoxType::TYPE_GROUP)
 {
@@ -884,7 +889,7 @@ void BoxesGroup::addBoxToSelection(BoundingBox *box) {
     }
     box->select();
     mSelectedBoxes.append(box); schedulePivotUpdate();
-    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
+    sortSelectedBoxesByZAscending();
     setCurrentFillStrokeSettingsFromBox(box);
     mMainWindow->setCurrentShapesMenuBox(box);
 }
@@ -924,28 +929,56 @@ void BoxesGroup::applyCurrentTransformationToSelected() {
     }
 }
 
+void BoxesGroup::sortSelectedBoxesByZAscending() {
+    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
+}
+
 void BoxesGroup::raiseSelectedBoxesToTop() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    startNewUndoRedoSet();
+    BoundingBox *box;
+    foreachInverted(box, mSelectedBoxes) {
         box->bringToFront();
     }
+    finishUndoRedoSet();
 }
 
 void BoxesGroup::lowerSelectedBoxesToBottom() {
+    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->bringToEnd();
     }
+    finishUndoRedoSet();
 }
 
 void BoxesGroup::lowerSelectedBoxes() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->moveDown();
+    startNewUndoRedoSet();
+    BoundingBox *box;
+    int lastZ = -10000;
+    bool lastBoxChanged = true;
+    foreachInverted(box, mSelectedBoxes) {
+        int boxZ = box->getZIndex();
+        if(boxZ - 1 != lastZ || lastBoxChanged) {
+            box->moveDown();
+        }
+        lastZ = boxZ;
+        lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
+    finishUndoRedoSet();
 }
 
 void BoxesGroup::raiseSelectedBoxes() {
+    startNewUndoRedoSet();
+    int lastZ = -10000;
+    bool lastBoxChanged = true;
     foreach(BoundingBox *box, mSelectedBoxes) {
-        box->moveUp();
+        int boxZ = box->getZIndex();
+        if(boxZ + 1 != lastZ || lastBoxChanged) {
+            box->moveUp();
+        }
+        lastZ = boxZ;
+        lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
+    finishUndoRedoSet();
 }
 
 void BoxesGroup::deselectAllBoxes() {
@@ -1217,6 +1250,8 @@ void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRe
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
     child->incNumberPointers();
+
+    emit addBoundingBoxSignal(child);
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -1250,6 +1285,8 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
     updateChildrenId(id, saveUndoRedo);
 
     box->decNumberPointers();
+
+    emit removeBoundingBoxSignal(box);
 }
 
 void BoxesGroup::removeChild(BoundingBox *child)
