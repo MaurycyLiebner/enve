@@ -359,6 +359,9 @@ void MainWindow::playPreview()
     mPreviewInterrupted = false;
     mCurrentRenderFrame = mSavedCurrentFrame;
     setCurrentFrame(mSavedCurrentFrame);
+    if(mNoBoxesAwaitUpdate) {
+        nextPlayPreviewFrame();
+    }
 }
 
 void MainWindow::nextPlayPreviewFrame() {
@@ -372,6 +375,9 @@ void MainWindow::nextPlayPreviewFrame() {
     } else {
         mCurrentRenderFrame++;
         mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
+        while(mNoBoxesAwaitUpdate) {
+            nextPlayPreviewFrame();
+        }
     }
 }
 
@@ -383,6 +389,9 @@ void MainWindow::nextSaveOutputFrame() {
     } else {
         mCurrentRenderFrame++;
         mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
+        while(mNoBoxesAwaitUpdate) {
+            nextPlayPreviewFrame();
+        }
     }
 }
 
@@ -394,6 +403,9 @@ void MainWindow::saveOutput(QString renderDest)
 
     mCurrentRenderFrame = mMinFrame;
     mBoxesListAnimationDockWidget->setCurrentFrame(mMinFrame);
+    if(mNoBoxesAwaitUpdate) {
+        nextSaveOutputFrame();
+    }
 }
 
 void MainWindow::previewFinished() {

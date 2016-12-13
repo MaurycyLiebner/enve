@@ -132,7 +132,7 @@ void AnimatonWidgetScrollBar::wheelEvent(QWheelEvent *event)
         }
         setFramesSpan(newFramesSpan);
     } else {
-        if(event->delta() > 0) {
+        if(event->delta() < 0) {
             setFirstViewedFrame(mFirstViewedFrame - 1);
         } else {
             setFirstViewedFrame(mFirstViewedFrame + 1);
