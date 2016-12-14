@@ -219,7 +219,7 @@ public:
 
     void clearPreview();
 
-    void centerPivotPosition(bool finish = false) {}
+    void centerPivotPosition(bool finish = false) { Q_UNUSED(finish); }
     bool processUnfilteredKeyEvent(QKeyEvent *event);
 
     void fillGradientChanged(Gradient* gradient, bool finish) {

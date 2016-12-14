@@ -83,8 +83,14 @@ SOURCES += main.cpp\
     intanimator.cpp \
     boolanimator.cpp \
     qstringanimator.cpp \
-    boxeslistwidget.cpp \
-    canvaswidget.cpp
+    canvaswidget.cpp \
+    BoxesList/boxeslistwidget.cpp \
+    BoxesList/widgetcontainer.cpp \
+    BoxesList/qrealanimatoritemwidget.cpp \
+    BoxesList/complexanimatoritemwidget.cpp \
+    BoxesList/complexanimatoritemwidgetcontainer.cpp \
+    BoxesList/boxitemwidgetcontainer.cpp \
+    BoxesList/boxitemwidget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -153,5 +159,12 @@ HEADERS  += mainwindow.h \
     intanimator.h \
     boolanimator.h \
     qstringanimator.h \
-    boxeslistwidget.h \
-    canvaswidget.h
+    canvaswidget.h \
+    keypoint.h \
+    BoxesList/boxeslistwidget.h \
+    BoxesList/widgetcontainer.h \
+    BoxesList/qrealanimatoritemwidget.h \
+    BoxesList/complexanimatoritemwidget.h \
+    BoxesList/complexanimatoritemwidgetcontainer.h \
+    BoxesList/boxitemwidgetcontainer.h \
+    BoxesList/boxitemwidget.h

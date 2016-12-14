@@ -57,7 +57,7 @@ public:
     virtual void setFontFamilyAndStyle(QString,
                                        QString) {}
 
-    virtual void centerPivotPosition(bool finish = false) {}
+    virtual void centerPivotPosition(bool finish = false) { Q_UNUSED(finish); }
     virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getPixBoundingRect() { return QRectF(); }
 
@@ -127,14 +127,6 @@ public:
     bool isVectorPath();
     void saveTransformPivot(QPointF absPivot);
 
-    //
-
-    virtual void drawListItem(QPainter *p,
-                              qreal drawX, qreal drawY,
-                              qreal maxY);
-    virtual qreal getListItemHeight();
-    void showChildrenListItems();
-    void hideChildrenListItems();
     void setName(QString name);
     QString getName();
 
@@ -142,8 +134,7 @@ public:
     void show();
     bool isVisible();
     void setVisibile(bool visible, bool saveUndoRedo = true);
-    virtual void handleListItemMousePress(qreal boxesListX, qreal relX, qreal relY,
-                                          QMouseEvent *event);
+
     void setChildrenListItemsVisible(bool bt);
     void lock();
     void unlock();
@@ -159,7 +150,6 @@ public:
     virtual void startPosTransform();
     virtual void startRotTransform();
     virtual void startScaleTransform();
-    virtual void drawAnimationBar(QPainter *p, qreal drawX, qreal drawY);
     virtual void updateAfterFrameChanged(int currentFrame);
     virtual QMatrix getCombinedRenderTransform();
 
@@ -193,8 +183,7 @@ public:
     void setRelativePos(QPointF relPos, bool saveUndoRedo);
 
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
-    virtual void drawKeysView(QPainter *p, qreal drawY, qreal maxY,
-                              qreal pixelsPerFrame, int startFrame, int endFrame);
+
     virtual void drawKeys(QPainter *p, qreal pixelsPerFrame,
                           qreal drawY, int startFrame, int endFrame);
     void scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy);
@@ -306,9 +295,7 @@ protected:
 
     bool mVisible = true;
     bool mLocked = false;
-    //
 
-    bool mBoxListItemDetailsVisible = false;
     QString mName = "";
     QList<QrealAnimator*> mActiveAnimators;
 

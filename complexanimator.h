@@ -13,10 +13,6 @@ public:
 
     QMatrix getCurrentValue();
 
-    void drawKeys(QPainter *p, qreal pixelsPerFrame,
-                  qreal startY,
-                  int startFrame, int endFrame);
-
     void addChildQrealKey(QrealKey *key);
     ComplexKey *getKeyCollectionAtFrame(int frame);
     void removeChildQrealKey(QrealKey *key);
@@ -30,10 +26,7 @@ public:
     void setFrame(int frame);
     void sortKeys();
     void updateKeysPath();
-    qreal getBoxesListHeight();
-    void drawBoxesList(QPainter *p,
-                       qreal drawX, qreal drawY);
-    void handleListItemMousePress(qreal boxesListX, qreal relX, qreal relY, QMouseEvent *event);
+
     void retrieveSavedValue();
     void finishTransform();
     void cancelTransform();

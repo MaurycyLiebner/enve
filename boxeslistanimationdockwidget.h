@@ -9,7 +9,7 @@
 #include "boxeslist.h"
 #include "animatonwidgetscrollbar.h"
 #include "keysview.h"
-#include "boxeslistwidget.h"
+#include "BoxesList/boxeslistwidget.h"
 #include <qscrollarea.h>
 #include <QScrollArea>
 #include <QApplication>

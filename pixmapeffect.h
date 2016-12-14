@@ -7,11 +7,11 @@ class PixmapEffect : public ComplexAnimator
 {
 public:
     PixmapEffect();
-    virtual void apply(QImage *imgPtr,
-                       const fmt_filters::image &img, qreal scale,
-                       bool highQuality) {}
+    virtual void apply(QImage *,
+                       const fmt_filters::image &, qreal,
+                       bool) {}
 
-    virtual qreal getMargin() {}
+    virtual qreal getMargin() { return 0.; }
 
     bool interrupted() {
         if(mInterrupted) {

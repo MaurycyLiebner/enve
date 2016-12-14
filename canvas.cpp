@@ -18,7 +18,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     BoxesGroup(fillStrokeSettings)
 {
     mCanvasWidget = canvasWidget;
-    mBoxListItemDetailsVisible = true;
     incNumberPointers();
 
     mPreviewFPSTimer = new QTimer(this);

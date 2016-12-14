@@ -12,7 +12,7 @@
 #include "keysview.h"
 #include "fontswidget.h"
 #include "vectorshapesmenu.h"
-#include "boxeslistwidget.h"
+#include "BoxesList/boxeslistwidget.h"
 
 class PaintControler;
 

@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "keysview.h"
+#include "BoxesList/boxitemwidgetcontainer.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     QObject(), Transformable()

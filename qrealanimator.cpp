@@ -7,6 +7,7 @@
 #include "boxeslist.h"
 #include <QMenu>
 #include "qrealanimatorvalueslider.h"
+#include <QWidgetAction>
 
 QrealAnimator::QrealAnimator() : QObject(), ConnectedToMainWindow() {
 }
@@ -149,52 +150,9 @@ bool QrealAnimator::isKeyOnCurrentFrame() {
     return mKeyOnCurrentFrame;
 }
 
-bool QrealAnimator::isBoxesListDetailVisible()
-{
-    return mBoxesListDetailVisible;
-}
-
-void QrealAnimator::setBoxesListDetailVisible(bool bT)
-{
-    mBoxesListDetailVisible = bT;
-}
-
-qreal QrealAnimator::getBoxesListHeight()
-{
-    return BoxesList::getListItemHeight();
-}
 
 QString QrealAnimator::getValueText() {
     return QString::number(mCurrentValue, 'f', 2);
-}
-
-void QrealAnimator::drawBoxesList(QPainter *p,
-                                  qreal drawX, qreal drawY)
-{
-    if(mIsCurrentAnimator) {
-        p->fillRect(drawX - 5, drawY,
-                    5, BoxesList::getListItemHeight(),
-                    mAnimatorColor);
-        p->fillRect(drawX, drawY,
-                    BoxesList::getListItemMaxWidth() - drawX, BoxesList::getListItemHeight(),
-                    QColor(255, 255, 255, 125));
-    }
-    if(mIsRecording) {
-        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_RECORDING);
-    } else {
-        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_NOT_RECORDING);
-    }
-    p->setPen(Qt::black);
-    drawX += 2*BoxesList::getListItemChildIndent();
-    p->drawText(drawX, drawY,
-                BoxesList::getListItemMaxWidth() - 80. - drawX, BoxesList::getListItemHeight(),
-                Qt::AlignVCenter | Qt::AlignLeft,
-                getName() );
-    p->setPen(Qt::blue);
-    p->drawText(BoxesList::getListItemMaxWidth() - 80., drawY,
-                70., BoxesList::getListItemHeight(),
-                Qt::AlignVCenter | Qt::AlignLeft,
-                " " + getValueText() );
 }
 
 void QrealAnimator::openContextMenu(QPoint pos) {
@@ -212,39 +170,6 @@ void QrealAnimator::openContextMenu(QPoint pos) {
         }
     } else {
 
-    }
-}
-
-#include <QWidgetAction>
-void QrealAnimator::handleListItemMousePress(qreal boxesListX,
-                                             qreal relX, qreal relY,
-                                             QMouseEvent *event)
-{
-    if(relX < 0) {
-        return;
-    }
-    Q_UNUSED(relY);
-    if(event->button() == Qt::RightButton) {
-        openContextMenu(event->globalPos());
-    } else {
-        if(relX < BoxesList::getListItemChildIndent()) {
-            setRecording(!mIsRecording);
-        } else if(relX < 2*BoxesList::getListItemChildIndent()) {
-            setBoxesListDetailVisible(!mBoxesListDetailVisible);
-        } else if(boxesListX < BoxesList::getListItemMaxWidth() - 80 || mIsComplexAnimator) {
-            if(mIsCurrentAnimator) {
-                removeThisFromGraphAnimator();
-            } else {
-                mMainWindow->getKeysView()->
-                        graphAddViewedAnimator(this);
-            }
-        } else {
-            QrealAnimatorSpin *spin = new QrealAnimatorSpin(this);
-            spin->show();
-            spin->move(event->globalPos() +
-                       QPoint(BoxesList::getListItemMaxWidth() - 83. - boxesListX,
-                              -relY - 3.));
-        }
     }
 }
 
@@ -401,6 +326,10 @@ void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
         startTransform();
         mCurrentValue = newValue;
         finishTransform();
+
+        emit valueChangedSignal(mCurrentValue);
+
+        return;
     }
     if(newValue == mCurrentValue) return;
     mCurrentValue = newValue;

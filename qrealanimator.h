@@ -132,17 +132,6 @@ public:
     void updateKeyOnCurrrentFrame();
     bool isKeyOnCurrentFrame();
 
-    bool isBoxesListDetailVisible();
-    void setBoxesListDetailVisible(bool bT);
-    virtual qreal getBoxesListHeight();
-
-    virtual void drawBoxesList(QPainter *p,
-                               qreal drawX, qreal drawY);
-
-    virtual void handleListItemMousePress(qreal boxesListX,
-                                          qreal relX, qreal relY,
-                                          QMouseEvent *event);
-
     virtual void setRecording(bool rec);
     bool isRecording();
     void removeAllKeys();
@@ -199,7 +188,6 @@ protected:
     qreal mMinPossibleVal = -DBL_MAX;
 
     bool mIsRecording = false;
-    bool mBoxesListDetailVisible = false;
     bool mKeyOnCurrentFrame = false;
 
     QString mName = "";

@@ -1,6 +1,6 @@
 #include "complexanimator.h"
-#include "boxeslist.h"
 #include "mainwindow.h"
+#include "BoxesList/complexanimatoritemwidgetcontainer.h"
 
 ComplexAnimator::ComplexAnimator() :
     QrealAnimator()
@@ -15,32 +15,6 @@ ComplexAnimator::~ComplexAnimator()
         animator->decNumberPointers();
     }
     mChildAnimators.clear();
-}
-
-#include <QDebug>
-void ComplexAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
-                               qreal startY,
-                               int startFrame, int endFrame)
-{
-    QrealAnimator::drawKeys(p, pixelsPerFrame, startY,
-                            startFrame, endFrame);
-
-    if(mBoxesListDetailVisible) {
-        drawChildAnimatorKeys(p, pixelsPerFrame, startY,
-                              startFrame, endFrame);
-    }
-}
-
-void ComplexAnimator::drawChildAnimatorKeys(QPainter *p, qreal pixelsPerFrame,
-                                            qreal startY,
-                                            int startFrame, int endFrame)
-{
-    startY += BoxesList::getListItemHeight();
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->drawKeys(p, pixelsPerFrame, startY,
-                           startFrame, endFrame);
-        startY += animator->getBoxesListHeight();
-    }
 }
 
 qreal ComplexAnimator::clampValue(qreal value)
@@ -138,67 +112,6 @@ void ComplexAnimator::updateKeysPath()
 
     foreach(QrealAnimator *animator, mChildAnimators) {
         animator->updateKeysPath();
-    }
-}
-
-qreal ComplexAnimator::getBoxesListHeight()
-{
-    if(mBoxesListDetailVisible) {
-        qreal heightT = BoxesList::getListItemHeight();
-        foreach(QrealAnimator *animator, mChildAnimators) {
-            heightT += animator->getBoxesListHeight();
-        }
-        return heightT;
-    } else {
-        return BoxesList::getListItemHeight();
-    }
-}
-
-void ComplexAnimator::drawBoxesList(QPainter *p,
-                                    qreal drawX, qreal drawY)
-{
-    QrealAnimator::drawBoxesList(p, drawX, drawY);
-    if(mChildAnimatorRecording && !mIsRecording) {
-        p->save();
-        p->setRenderHint(QPainter::Antialiasing);
-        p->setBrush(Qt::red);
-        p->setPen(Qt::NoPen);
-        p->drawEllipse(QPointF(BoxesList::getListItemChildIndent()*0.5 + drawX,
-                               BoxesList::getListItemHeight()*0.5 + drawY),
-                       2.5, 2.5);
-        p->restore();
-    }
-    drawX += BoxesList::getListItemChildIndent();
-    if(mBoxesListDetailVisible) {
-        p->drawPixmap(drawX, drawY,
-                      *BoxesList::ANIMATOR_CHILDREN_VISIBLE);
-        drawY += BoxesList::getListItemHeight();
-        foreach(QrealAnimator *animator, mChildAnimators) {
-            animator->drawBoxesList(p, drawX, drawY);
-            drawY += animator->getBoxesListHeight();
-        }
-    } else {
-        p->drawPixmap(drawX, drawY, *BoxesList::ANIMATOR_CHILDREN_HIDDEN);
-    }
-}
-
-void ComplexAnimator::handleListItemMousePress(qreal boxesListX, qreal relX, qreal relY,
-                                               QMouseEvent *event)
-{
-    if(relY < BoxesList::getListItemHeight()) {
-        QrealAnimator::handleListItemMousePress(boxesListX, relX, relY, event);
-    } else {
-        relY -= BoxesList::getListItemHeight();
-        foreach(QrealAnimator *animator, mChildAnimators) {
-            qreal heightT = animator->getBoxesListHeight();
-            if(heightT > relY) {
-                animator->handleListItemMousePress(boxesListX,
-                            relX - BoxesList::getListItemChildIndent(),
-                            relY, event);
-                break;
-            }
-            relY -= heightT;
-        }
     }
 }
 
