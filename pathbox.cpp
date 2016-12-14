@@ -274,7 +274,7 @@ void PathBox::render(QPainter *p) {
     p->save();
 
     if(mEffects.isEmpty() ) {
-        p->setTransform(QTransform(getCombinedRenderTransform()), false);
+        p->setTransform(QTransform(getCombinedRenderTransform()), true);
         draw(p);
     } else {
         QMatrix renderTransform = getCombinedRenderTransform();

@@ -295,6 +295,9 @@ public:
     static void disableEffectsPaint();
     static bool effectsPaintEnabled();
 
+    static qreal getResolutionPercent();
+    static void setResolutionPercent(qreal percent);
+
     void updateRenderRect();
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(QString renderDest);
@@ -380,6 +383,7 @@ public slots:
 private:
     bool mPivotVisibleDuringPointEdit = true;
     static bool mEffectsPaintEnabled;
+    static qreal mResolutionPercent;
 
     CanvasWidget *mCanvasWidget;
 

@@ -11,6 +11,7 @@
 #include "imagebox.h"
 
 bool Canvas::mEffectsPaintEnabled = true;
+qreal Canvas::mResolutionPercent = 1.;
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWidget *canvasWidget) :
@@ -105,6 +106,16 @@ void Canvas::disableEffectsPaint()
 bool Canvas::effectsPaintEnabled()
 {
     return mEffectsPaintEnabled;
+}
+
+qreal Canvas::getResolutionPercent()
+{
+    return Canvas::mResolutionPercent;
+}
+
+void Canvas::setResolutionPercent(qreal percent)
+{
+    mResolutionPercent = percent;
 }
 
 void Canvas::updateDisplayedFillStrokeSettings() {
@@ -390,17 +401,20 @@ void Canvas::objectsToPathAction()
 }
 
 void Canvas::updateRenderRect() {
-    mRenderRect = QRectF(qMax(mCombinedTransformMatrix.dx(), 0.),
-                         qMax(mCombinedTransformMatrix.dy(), 0.),
-                         qMin(mVisibleWidth, (qreal)mCanvasWidget->width()),
-                         qMin(mVisibleHeight, (qreal)mCanvasWidget->height()));
+    QRectF canvasRect = QRectF(mCombinedTransformMatrix.dx(),
+                               mCombinedTransformMatrix.dy(),
+                               mVisibleWidth, mVisibleHeight);
+    QRectF canvasWidgetRect = QRectF(0., 0.,
+                                     (qreal)mCanvasWidget->width(),
+                                     (qreal)mCanvasWidget->height());
+    mRenderRect = canvasWidgetRect.intersected(canvasRect);
 }
 
 void Canvas::renderCurrentFrameToPreview()
 {
     QImage *image = new QImage(mRenderRect.size().toSize(),
                                QImage::Format_ARGB32);
-    image->fill(Qt::transparent);
+    image->fill(Qt::red);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
 }
@@ -418,8 +432,8 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest)
 void Canvas::renderCurrentFrameToQImage(QImage *frame)
 {
     QPainter p(frame);
-    p.translate(getAbsolutePos() - mRenderRect.topLeft());
     p.setRenderHint(QPainter::Antialiasing);
+    p.translate(getAbsolutePos() - mRenderRect.topLeft());
 
     BoxesGroup::render(&p);
 

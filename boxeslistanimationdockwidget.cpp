@@ -29,7 +29,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mAnimationWidgetScrollbar = new AnimatonWidgetScrollBar(1, 1,
                                                             10, 30,
                                                             false,
-                                                            true, this);
+                                                            false, this);
 
     connect(mAnimationWidgetScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             parent, SLOT(setCurrentFrame(int)) );
@@ -77,14 +77,24 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mAnimationDockWidget = new AnimationDockWidget(mBoxesList, mKeysView);
     mKeysView->setAnimationDockWidget(mAnimationDockWidget);
 
-    mGoToPreviousKeyButton = new QPushButton(
-                QIcon("pixmaps/icons/prev_key_button.png"), "", this);
-    mGoToPreviousKeyButton->setSizePolicy(QSizePolicy::Maximum,
-                                          QSizePolicy::Maximum);
-    mGoToNextKeyButton = new QPushButton(
-                QIcon("pixmaps/icons/next_key_button.png"), "", this);
-    mGoToNextKeyButton->setSizePolicy(QSizePolicy::Maximum,
-                                      QSizePolicy::Maximum);
+//    mGoToPreviousKeyButton = new QPushButton(
+//                QIcon("pixmaps/icons/prev_key_button.png"), "", this);
+//    mGoToPreviousKeyButton->setSizePolicy(QSizePolicy::Maximum,
+//                                          QSizePolicy::Maximum);
+//    mGoToNextKeyButton = new QPushButton(
+//                QIcon("pixmaps/icons/next_key_button.png"), "", this);
+//    mGoToNextKeyButton->setSizePolicy(QSizePolicy::Maximum,
+//                                      QSizePolicy::Maximum);
+    mResolutionComboBox = new QComboBox(this);
+    mResolutionComboBox->addItem("100 %");
+    mResolutionComboBox->addItem("75 %");
+    mResolutionComboBox->addItem("50 %");
+    mResolutionComboBox->addItem("25 %");
+    connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
+            mMainWindow, SLOT(setResolutionPercentId(int)));
+    mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
+                                       QSizePolicy::Maximum);
+
     mPlayButton = new QPushButton(
                 QIcon("pixmaps/icons/play_button.png"), "", this);
     mPlayButton->setSizePolicy(QSizePolicy::Maximum,
@@ -123,10 +133,10 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
             this, SLOT(setCtrlsAlwaysVisible(bool)) );
 
     mControlButtonsLayout = new QHBoxLayout();
-    mControlButtonsWidget = new QWidget(this);
+    mControlButtonsWidget = new QLabel(this);
     mControlButtonsWidget->setFixedHeight(30);
     mControlButtonsWidget->setLayout(mControlButtonsLayout);
-    mControlButtonsWidget->setStyleSheet("QWidget {"
+    mControlButtonsWidget->setStyleSheet("QLabel {"
                                             "background-color: rgb(0, 0, 0);"
                                          "}"
                                          "QPushButton {"
@@ -138,10 +148,13 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlButtonsLayout->setSpacing(0);
     mControlButtonsLayout->setMargin(0);
 
-    mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
-    mGoToPreviousKeyButton->setFocusPolicy(Qt::NoFocus);
-    mControlButtonsLayout->addWidget(mGoToNextKeyButton);
-    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
+//    mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
+//    mGoToPreviousKeyButton->setFocusPolicy(Qt::NoFocus);
+//    mControlButtonsLayout->addWidget(mGoToNextKeyButton);
+//    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
+    mControlButtonsLayout->addWidget(mResolutionComboBox);
+    mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
+
     mControlButtonsLayout->addWidget(mPlayButton);
     mPlayButton->setFocusPolicy(Qt::NoFocus);
 

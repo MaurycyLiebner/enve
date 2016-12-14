@@ -375,7 +375,7 @@ void MainWindow::nextPlayPreviewFrame() {
     } else {
         mCurrentRenderFrame++;
         mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
-        while(mNoBoxesAwaitUpdate) {
+        if(mNoBoxesAwaitUpdate) {
             nextPlayPreviewFrame();
         }
     }
@@ -389,8 +389,8 @@ void MainWindow::nextSaveOutputFrame() {
     } else {
         mCurrentRenderFrame++;
         mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
-        while(mNoBoxesAwaitUpdate) {
-            nextPlayPreviewFrame();
+        if(mNoBoxesAwaitUpdate) {
+            nextSaveOutputFrame();
         }
     }
 }
@@ -418,6 +418,11 @@ void MainWindow::stopPreview() {
     mCanvas->clearPreview();
     mCanvasWidget->repaint();
     previewFinished();
+}
+
+void MainWindow::setResolutionPercentId(int id)
+{
+    setResolutionPercent(1. - id*0.25);
 }
 
 void MainWindow::renderOutput()
@@ -826,6 +831,13 @@ void MainWindow::setEffectsPaintEnabled(bool bT)
     } else {
         mCanvas->disableEffectsPaint();
     }
+
+    mCanvas->updateAllBoxes();
+}
+
+void MainWindow::setResolutionPercent(qreal percent)
+{
+    mCanvas->setResolutionPercent(percent);
 
     mCanvas->updateAllBoxes();
 }

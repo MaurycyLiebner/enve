@@ -14,6 +14,7 @@
 #include <QScrollArea>
 #include <QApplication>
 #include <QScrollBar>
+#include <QComboBox>
 
 class AnimationDockWidget;
 
@@ -65,11 +66,12 @@ private:
     MainWindow *mMainWindow;
     QVBoxLayout *mMainLayout;
 
-    QWidget *mControlButtonsWidget;
+    QLabel *mControlButtonsWidget;
     QHBoxLayout *mControlButtonsLayout;
 
-    QPushButton *mGoToPreviousKeyButton;
-    QPushButton *mGoToNextKeyButton;
+    QComboBox *mResolutionComboBox;
+//    QPushButton *mGoToPreviousKeyButton;
+//    QPushButton *mGoToNextKeyButton;
 
     QPushButton *mPlayButton;
 

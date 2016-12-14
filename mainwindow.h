@@ -175,12 +175,15 @@ public:
     void setCurrentShapesMenuBox(BoundingBox *box);
     void nextSaveOutputFrame();
     void nextPlayPreviewFrame();
+
+    void setResolutionPercent(qreal percent);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);
     void setAllPointsRecord(bool allPointsRecord);
     void playPreview();
     void stopPreview();
+    void setResolutionPercentId(int id);
 private slots:
     void saveOutput(QString renderDest);
     void renderOutput();

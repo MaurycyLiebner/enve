@@ -150,7 +150,8 @@ void BoundingBox::updateAllBoxes() {
 }
 
 void BoundingBox::updateAllUglyPixmap() {
-    QMatrix inverted = mUpdateCanvasTransform.inverted();
+    QMatrix inverted = mUpdateCanvasTransform.inverted().scale(Canvas::getResolutionPercent(),
+                                                               Canvas::getResolutionPercent());
     mAllUglyTransform = inverted*mUpdateTransform;
     mAllUglyBoundingRect = (mUpdateTransform.inverted()*mAllUglyTransform).mapRect(mPixBoundingRect);
     QSizeF sizeF = mAllUglyBoundingRect.size();
@@ -166,6 +167,7 @@ void BoundingBox::updateAllUglyPixmap() {
     mAllUglyBoundingRect.translate(-transF);
     p.translate(transF);
     p.setTransform(QTransform(mAllUglyTransform), true);
+
 
     draw(&p);
     p.end();
