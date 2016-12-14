@@ -141,7 +141,7 @@ void BoundingBox::updatePrettyPixmap() {
     p.end();
 
     if(Canvas::effectsPaintEnabled()) {
-        mNewPixmap = applyEffects(mNewPixmap, mUpdateCanvasTransform.m11(), mHighQualityPaint);
+        mNewPixmap = applyEffects(mNewPixmap, mHighQualityPaint, mUpdateCanvasTransform.m11());
     }
 }
 
@@ -173,7 +173,7 @@ void BoundingBox::updateAllUglyPixmap() {
     p.end();
 
     if(Canvas::effectsPaintEnabled()) {
-        mAllUglyPixmap = applyEffects(mAllUglyPixmap, false);
+        mAllUglyPixmap = applyEffects(mAllUglyPixmap, false, Canvas::getResolutionPercent());
     }
 }
 

@@ -272,7 +272,12 @@ void Canvas::paintEvent(QPainter *p)
         p->setPen(Qt::NoPen);
         p->drawPath(path.subtracted(viewRectPath));
 
-        p->drawImage(mRenderRect.topLeft(), *mCurrentPreviewImg);
+        p->save();
+        qreal reversedRes = 1/mResolutionPercent;
+        p->translate(mRenderRect.topLeft());
+        p->scale(reversedRes, reversedRes);
+        p->drawImage(QPointF(0., 0.), *mCurrentPreviewImg);
+        p->restore();
     } else {
         p->fillRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1, QColor(75, 75, 75));
         p->fillRect(viewRect, Qt::white);
@@ -375,52 +380,47 @@ void Canvas::nextPreviewFrame()
     mCanvasWidget->repaint();
 }
 
-void Canvas::raiseAction()
-{
+void Canvas::raiseAction() {
     mCurrentBoxesGroup->raiseSelectedBoxes();
 }
 
-void Canvas::lowerAction()
-{
+void Canvas::lowerAction() {
     mCurrentBoxesGroup->lowerSelectedBoxes();
 }
 
-void Canvas::raiseToTopAction()
-{
+void Canvas::raiseToTopAction() {
     mCurrentBoxesGroup->raiseSelectedBoxesToTop();
 }
 
-void Canvas::lowerToBottomAction()
-{
+void Canvas::lowerToBottomAction() {
     mCurrentBoxesGroup->lowerSelectedBoxesToBottom();
 }
 
-void Canvas::objectsToPathAction()
-{
+void Canvas::objectsToPathAction() {
     mCurrentBoxesGroup->convertSelectedBoxesToPath();
 }
 
 void Canvas::updateRenderRect() {
-    QRectF canvasRect = QRectF(mCombinedTransformMatrix.dx(),
-                               mCombinedTransformMatrix.dy(),
-                               mVisibleWidth, mVisibleHeight);
+    QRectF canvasRect = QRectF(qMax(mCombinedTransformMatrix.dx()*mResolutionPercent,
+                                    mCombinedTransformMatrix.dx()),
+                               qMax(mCombinedTransformMatrix.dy()*mResolutionPercent,
+                                                                   mCombinedTransformMatrix.dy()),
+                               mVisibleWidth*mResolutionPercent, mVisibleHeight*mResolutionPercent);
     QRectF canvasWidgetRect = QRectF(0., 0.,
                                      (qreal)mCanvasWidget->width(),
                                      (qreal)mCanvasWidget->height());
     mRenderRect = canvasWidgetRect.intersected(canvasRect);
 }
 
-void Canvas::renderCurrentFrameToPreview()
-{
+void Canvas::renderCurrentFrameToPreview() {
     QImage *image = new QImage(mRenderRect.size().toSize(),
                                QImage::Format_ARGB32);
-    image->fill(Qt::red);
+    image->fill(Qt::transparent);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
 }
 
-void Canvas::renderCurrentFrameToOutput(QString renderDest)
-{
+void Canvas::renderCurrentFrameToOutput(QString renderDest) {
     QImage *image = new QImage(mWidth, mHeight,
                                QImage::Format_ARGB32);
     image->fill(Qt::transparent);
@@ -433,6 +433,8 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
 {
     QPainter p(frame);
     p.setRenderHint(QPainter::Antialiasing);
+
+    p.scale(mResolutionPercent, mResolutionPercent);
     p.translate(getAbsolutePos() - mRenderRect.topLeft());
 
     BoxesGroup::render(&p);

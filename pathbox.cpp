@@ -295,7 +295,7 @@ void PathBox::render(QPainter *p) {
         draw(&pixP);
         pixP.end();
 
-        renderPixmap = applyEffects(renderPixmap, mHighQualityPaint, getCurrentCanvasScale());
+        renderPixmap = applyEffects(renderPixmap, mHighQualityPaint, getCurrentCanvasScale()*Canvas::getResolutionPercent());
 
         p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
     }
