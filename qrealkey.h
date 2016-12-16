@@ -20,7 +20,7 @@ public:
     void updateCtrlFromCtrl(QrealPointType type);
 
     virtual qreal getValue();
-    virtual void setValue(qreal value);
+    virtual void setValue(qreal value, bool saveUndoRedo = true);
     virtual void setStartValue(qreal value);
     virtual void setEndValue(qreal value);
 

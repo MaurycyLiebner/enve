@@ -152,6 +152,8 @@ void GradientWidget::setCurrentGradient(Gradient *gradient)
     mCurrentGradient = gradient;
     setCurrentColorId(0);
     repaint();
+
+    emit currentGradientChanged(mCurrentGradient);
 }
 
 Gradient *GradientWidget::getCurrentGradient()
@@ -169,7 +171,6 @@ void GradientWidget::setCurrentGradient(int listId)
 {
     if(listId >= mGradients.length()) return;
     setCurrentGradient(mGradients.at(listId));
-    emit currentGradientChanged(mCurrentGradient);
 }
 
 void GradientWidget::mousePressEvent(QMouseEvent *event)

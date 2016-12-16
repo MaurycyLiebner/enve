@@ -54,9 +54,7 @@ VectorPath::~VectorPath()
 void VectorPath::applyCurrentTransformationToPoints() {
     startNewUndoRedoSet();
 
-    mTransformAnimator.startTransform();
     applyTransformToPoints(mTransformAnimator.getCurrentValue());
-    mTransformAnimator.finishTransform();
 
     mTransformAnimator.reset(true);
     centerPivotPosition(true);
@@ -768,7 +766,9 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode) {
             //if(mInfluenceEnabled || mShapesEnabled || !mEffects.isEmpty()) {
                 p->save();
                 p->setBrush(Qt::NoBrush);
-                p->setPen(QPen(Qt::blue, 1., Qt::DashLine) );
+                QPen editPen = QPen(Qt::blue, 1., Qt::DashLine);
+                editPen.setCosmetic(true);
+                p->setPen(editPen);
                 p->setTransform(QTransform(mCombinedTransformMatrix), true);
                 p->drawPath(mEditPath);
                 p->restore();

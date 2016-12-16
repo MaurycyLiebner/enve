@@ -43,9 +43,11 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
+    virtual void emitEditingStarted(qreal value);
     virtual void emitValueChanged(qreal value);
     virtual void emitEditingFinished(qreal value);
 signals:
+    void editingStarted(qreal);
     void valueChanged(qreal);
     void editingFinished(qreal);
 public slots:

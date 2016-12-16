@@ -32,6 +32,12 @@ QrealAnimatorValueSlider::~QrealAnimatorValueSlider()
 {
 }
 
+void QrealAnimatorValueSlider::emitEditingStarted(qreal value)
+{
+    if(mAnimator == NULL) return;
+    mAnimator->startTransform();
+}
+
 void QrealAnimatorValueSlider::emitValueChanged(qreal value)
 {
     if(mAnimator == NULL) return;
@@ -42,7 +48,7 @@ void QrealAnimatorValueSlider::emitValueChanged(qreal value)
 void QrealAnimatorValueSlider::emitEditingFinished(qreal value)
 {
     if(mAnimator == NULL) return;
-    mAnimator->setCurrentValue(value, true);
+    mAnimator->finishTransform();
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 

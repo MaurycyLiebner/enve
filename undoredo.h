@@ -11,14 +11,17 @@
 class UndoRedo
 {
 public:
-    UndoRedo(QString name) { mName = name; printName(); }
+    UndoRedo(QString name);
     virtual ~UndoRedo() {}
     virtual void undo() {}
     virtual void redo() {}
     void printName() { qDebug() << mName; }
     void printUndoName() { qDebug() << "UNDO " << mName; }
     void printRedoName() { qDebug() << "REDO " << mName; }
+
+    int getFrame() { return mFrame; }
 private:
+    int mFrame;
     QString mName;
 };
 
@@ -126,26 +129,12 @@ public:
 
     void addUndoRedo(UndoRedo *undoRedo);
 
-    void redo() {
-        if(mRedoStack.isEmpty()) {
-            return;
-        }
-        UndoRedo *toRedo = mRedoStack.takeLast();
-        toRedo->printRedoName();
-        toRedo->redo();
-        mUndoStack << toRedo;
-    }
-    void undo() {
-        if(mUndoStack.isEmpty()) {
-            return;
-        }
-        UndoRedo *toUndo = mUndoStack.takeLast();
-        toUndo->printUndoName();
-        toUndo->undo();
-        mRedoStack << toUndo;
-    }
+    void redo();
+
+    void undo();
 
 private:
+    int mLastUndoRedoFrame = INT_MAX;
     MainWindow *mMainWindow;
     int mNumberOfSets = 0;
     UndoRedoSet *mCurrentSet = NULL;
@@ -711,6 +700,11 @@ public:
         mOldValue = oldValue;
         mNewValue = newValue;
         mAnimator = animator;
+        mAnimator->incNumberPointers();
+    }
+
+    ~ChangeQrealAnimatorValue() {
+        mAnimator->decNumberPointers();
     }
 
     void redo() {
@@ -725,6 +719,35 @@ private:
     qreal mOldValue;
     qreal mNewValue;
     QrealAnimator *mAnimator;
+};
+
+class ChangeQrealKeyValue : public UndoRedo
+{
+public:
+    ChangeQrealKeyValue(qreal oldValue, qreal newValue, QrealKey *key) :
+        UndoRedo("ChangeQrealKeyValue") {
+        mOldValue = oldValue;
+        mNewValue = newValue;
+        mTargetKey = key;
+        key->incNumberPointers();
+    }
+
+    ~ChangeQrealKeyValue() {
+        mTargetKey->decNumberPointers();
+    }
+
+    void redo() {
+        mTargetKey->getParentAnimator()->saveValueToKey(mTargetKey, mNewValue, false);
+    }
+
+    void undo() {
+        mTargetKey->getParentAnimator()->saveValueToKey(mTargetKey, mOldValue, false);
+    }
+
+private:
+    qreal mOldValue;
+    qreal mNewValue;
+    QrealKey *mTargetKey;
 };
 
 class RemoveShapeUndoRedo : public UndoRedo

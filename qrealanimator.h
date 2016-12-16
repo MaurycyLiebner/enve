@@ -37,7 +37,7 @@ public:
     void setCurrentValue(qreal newValue, bool finish = false);
     void updateValueFromCurrentFrame();
     void saveCurrentValueToKey(QrealKey *key);
-    void saveValueToKey(QrealKey *key, qreal value);
+    void saveValueToKey(QrealKey *key, qreal value, bool saveUndoRedo = true);
 
     virtual void setFrame(int frame);
     QrealKey *getKeyAtFrame(int frame);

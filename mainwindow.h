@@ -177,6 +177,8 @@ public:
     void nextPlayPreviewFrame();
 
     void setResolutionPercent(qreal percent);
+
+    void setCurrentFrameForAllWidgets(int frame);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);

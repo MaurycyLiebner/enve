@@ -328,6 +328,7 @@ void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
         finishTransform();
 
         emit valueChangedSignal(mCurrentValue);
+        callUpdater();
 
         return;
     }
@@ -363,9 +364,9 @@ void QrealAnimator::saveValueToKey(int frame, qreal value)
     }
 }
 
-void QrealAnimator::saveValueToKey(QrealKey *key, qreal value)
+void QrealAnimator::saveValueToKey(QrealKey *key, qreal value, bool saveUndoRedo)
 {
-    key->setValue(value);
+    key->setValue(value, saveUndoRedo);
     updateKeysPath();
 
     if(mIsCurrentAnimator) {
@@ -784,6 +785,7 @@ void QrealAnimator::incCurrentValue(qreal incBy)
 
 void QrealAnimator::startTransform()
 {
+    if(mTransformed) return;
     mSavedCurrentValue = mCurrentValue;
     mTransformed = true;
 }
@@ -791,17 +793,21 @@ void QrealAnimator::startTransform()
 void QrealAnimator::finishTransform()
 {
     if(mTransformed) {
-        addUndoRedo(
-                    new ChangeQrealAnimatorValue(mSavedCurrentValue,
-                                                 mCurrentValue,
-                                                 this) );
-        if(mIsRecording) {
-            saveCurrentValueAsKey();
-        }
-        mTransformed = false;
+        if(mSavedCurrentValue == mCurrentValue) {
+            mTransformed = false;
+        } else {
+            addUndoRedo(
+                        new ChangeQrealAnimatorValue(mSavedCurrentValue,
+                                                     mCurrentValue,
+                                                     this) );
+            if(mIsRecording) {
+                saveCurrentValueAsKey();
+            }
+            mTransformed = false;
 
-        if(mIsCurrentAnimator) {
-            graphScheduleUpdateAfterKeysChanged();
+            if(mIsCurrentAnimator) {
+                graphScheduleUpdateAfterKeysChanged();
+            }
         }
     }
 }

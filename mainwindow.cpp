@@ -842,6 +842,11 @@ void MainWindow::setResolutionPercent(qreal percent)
     mCanvas->updateAllBoxes();
 }
 
+void MainWindow::setCurrentFrameForAllWidgets(int frame)
+{
+    mBoxesListAnimationDockWidget->setCurrentFrame(frame);
+}
+
 void MainWindow::importFile(QString path, bool loadInBox) {
     disable();
     mUndoRedoStack.startNewSet();

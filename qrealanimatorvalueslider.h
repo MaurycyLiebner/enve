@@ -19,6 +19,7 @@ public:
 
     void setAnimator(QrealAnimator *animator);
 protected:
+    void emitEditingStarted(qreal value);
     void emitValueChanged(qreal value);
     void emitEditingFinished(qreal value);
 private:

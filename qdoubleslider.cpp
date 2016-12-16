@@ -120,6 +120,10 @@ void QDoubleSlider::paint(QPainter *p)
     p->drawRect(rect().adjusted(0, 0, -1, -1));
 }
 
+void QDoubleSlider::emitEditingStarted(qreal value) {
+    emit editingStarted(value);
+}
+
 void QDoubleSlider::emitValueChanged(qreal value)
 {
     emit valueChanged(value);
@@ -194,6 +198,7 @@ void QDoubleSlider::setWheelInteractionEnabled(bool bT)
 
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
 {
+    if(!mMouseMoved) emitEditingStarted(mValue);
     qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
     setValueNoUpdate(mPressValue + dValue);
     update();
@@ -251,8 +256,8 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
         if(!mTextEdit) {
             mMovesCount++;
             if(mMovesCount > 2) {
-                mMouseMoved = true;
                 mouseMoveEvent((QMouseEvent*) event);
+                mMouseMoved = true;
             }
         }
         return !mTextEdit;
@@ -264,6 +269,8 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
     } else if(event->type() == QEvent::Wheel) {
         if(mWheelEnabled || mTextEdit) {
             if(obj == mLineEdit) return true;
+            emitEditingStarted(mValue);
+
             QWheelEvent *wheelEvent = (QWheelEvent*)event;
             if(wheelEvent->delta() > 0) {
                 setValueNoUpdate(mValue + mPrefferedValueStep);
@@ -276,7 +283,9 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
             update();
             event->setAccepted(true);
 
+
             emitValueChanged(mValue);
+            emitEditingFinished(mValue);
             return true;
         } else {
             return false;
@@ -300,6 +309,7 @@ void QDoubleSlider::lineEditingFinished()
     setValueNoUpdate(text.toDouble());
     mLineEdit->releaseMouse();
 
+    emitEditingStarted(mValue);
     emitValueChanged(mValue);
     emitEditingFinished(mValue);
 }
