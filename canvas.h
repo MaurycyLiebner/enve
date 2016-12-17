@@ -328,6 +328,9 @@ protected:
     void handleMovePointMouseRelease(QPointF pos);
 
     bool isMovingPath();
+    bool handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event);
+    void handleRightButtonMousePress(QMouseEvent *event);
+    void handleLeftButtonMousePress(QMouseEvent *event);
 signals:
 private slots:
 

@@ -26,8 +26,6 @@ public:
     void addUpdateScheduler(UpdateScheduler *scheduler);
     void callUpdateSchedulers();
     MainWindow *getMainWindow();
-    void startNewUndoRedoSet();
-    void finishUndoRedoSet();
     virtual void schedulePivotUpdate();
     bool isShiftPressed();
     bool isCtrlPressed();

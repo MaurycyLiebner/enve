@@ -1,7 +1,8 @@
 #include "boxitemwidget.h"
 #include "boxeslistwidget.h"
 
-BoxItemWidget::BoxItemWidget(BoundingBox *target, QWidget *parent) : QWidget(parent)
+BoxItemWidget::BoxItemWidget(BoundingBox *target, QWidget *parent) :
+    QWidget(parent), ConnectedToMainWindow()
 {
     setFixedHeight(BoxesListWidget::getListItemHeight());
     mTargetBox = target;
@@ -83,8 +84,7 @@ void BoxItemWidget::mousePressEvent(QMouseEvent *event)
             mTargetBox->selectionChangeTriggered(event->modifiers() & Qt::ShiftModifier);
         }
     }
-
-    MainWindow::getInstance()->callUpdateSchedulers();
+    callUpdateSchedulers();
 }
 
 void BoxItemWidget::mouseDoubleClickEvent(QMouseEvent *e)

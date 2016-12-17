@@ -52,14 +52,10 @@ VectorPath::~VectorPath()
 }
 
 void VectorPath::applyCurrentTransformationToPoints() {
-    startNewUndoRedoSet();
-
     applyTransformToPoints(mTransformAnimator.getCurrentValue());
 
     mTransformAnimator.reset(true);
     centerPivotPosition(true);
-
-    finishUndoRedoSet();
 }
 
 void VectorPath::applyTransformToPoints(QMatrix transform) {
@@ -344,8 +340,6 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
     qreal maxPercent = qMax(percent1, percent2);
     qreal pressedT = (nearestPercent - minPercent) / (maxPercent - minPercent);
     if(pressedT > 0.0001 && pressedT < 0.9999) {
-        startNewUndoRedoSet();
-
         QPointF prevPointEnd = prevPoint->getEndCtrlPtValue();
         QPointF nextPointStart = nextPoint->getStartCtrlPtValue();
         QPointF newPointPos;
@@ -392,7 +386,6 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust)
 
         appendToPointsList(newPoint);
 
-        finishUndoRedoSet();
         return newPoint;
     }
     return NULL;
@@ -851,8 +844,6 @@ void VectorPath::removePointFromSeparatePaths(PathPoint *pointToRemove,
 
 PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
 {
-    startNewUndoRedoSet();
-
     if(toPoint == NULL) {
         addPointToSeparatePaths(pointToAdd);
     } else {
@@ -865,7 +856,6 @@ PathPoint *VectorPath::addPoint(PathPoint *pointToAdd, PathPoint *toPoint)
     }
 
     appendToPointsList(pointToAdd);
-    finishUndoRedoSet();
 
     return pointToAdd;
 }
@@ -911,13 +901,11 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
     point->hide();
     point->deselect();
     if(saveUndoRedo) {
-        startNewUndoRedoSet();
         RemoveFromPointsListUndoRedo *undoRedo = new RemoveFromPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
         if(mPoints.count() < 2) {
             mParent->removeChild(this);
         }
-        finishUndoRedoSet();
     }
     point->decNumberPointers();
 
@@ -927,7 +915,6 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
 }
 
 void VectorPath::removePoint(PathPoint *point) {
-    startNewUndoRedoSet();
     PathPoint *prevPoint = point->getPreviousPoint();
     PathPoint *nextPoint = point->getNextPoint();
 
@@ -943,16 +930,12 @@ void VectorPath::removePoint(PathPoint *point) {
         removePointFromSeparatePaths(point);
     }
     removeFromPointsList(point);
-
-    finishUndoRedoSet();
 }
 
 void VectorPath::replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
                                           PathPoint *newPoint) {
-    startNewUndoRedoSet();
     removePointFromSeparatePaths(pointBeingReplaced);
     addPointToSeparatePaths(newPoint);
-    finishUndoRedoSet();
 }
 
 void VectorPath::startAllPointsTransform()

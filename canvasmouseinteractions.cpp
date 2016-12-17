@@ -25,101 +25,92 @@ void Canvas::handleMovePathMousePressEvent() {
     }
 }
 
-void Canvas::mousePressEvent(QMouseEvent *event)
-{
-    if(mPreviewing) return;
-    mLastMouseEventPos = event->pos();
-    if(event->button() != Qt::LeftButton) {
-        if(event->button() == Qt::RightButton) {
-            if(mIsMouseGrabbing) {
-                cancelCurrentTransform();
-            } else {
-                BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(
-                                                                event->pos());
-                if(pressedBox == NULL) {
-                    mCurrentBoxesGroup->clearBoxesSelection();
+void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
+    if(mIsMouseGrabbing) {
+        cancelCurrentTransform();
+    } else {
+        BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(
+                                                        event->pos());
+        if(pressedBox == NULL) {
+            mCurrentBoxesGroup->clearBoxesSelection();
 
-                    QMenu menu;
+            QMenu menu;
 
-                    menu.addAction("Paste");
-                    QMenu *effectsMenu = menu.addMenu("Effects");
-                    effectsMenu->addAction("Blur");
-                    effectsMenu->addAction("Brush");
-                    effectsMenu->addAction("Lines");
-                    effectsMenu->addAction("Circles");
+            menu.addAction("Paste");
+            QMenu *effectsMenu = menu.addMenu("Effects");
+            effectsMenu->addAction("Blur");
+            effectsMenu->addAction("Brush");
+            effectsMenu->addAction("Lines");
+            effectsMenu->addAction("Circles");
 
 
-                    QAction *selectedAction = menu.exec(event->globalPos());
-                    if(selectedAction != NULL) {
-                        if(selectedAction->text() == "Paste") {
-                        } else if(selectedAction->text() == "Blur") {
-                            addEffect(new BlurEffect());
-                        } else if(selectedAction->text() == "Brush") {
-                            addEffect(new BrushEffect());
-                        } else if(selectedAction->text() == "Lines") {
-                            addEffect(new LinesEffect());
-                        } else if(selectedAction->text() == "Circles") {
-                            addEffect(new CirclesEffect());
-                        }
-
-                        callUpdateSchedulers();
-                    } else {
-
-                    }
-                } else {
-                    if(!pressedBox->isSelected()) {
-                        mCurrentBoxesGroup->clearBoxesSelection();
-                        mCurrentBoxesGroup->addBoxToSelection(pressedBox);
-                    }
-
-                    QMenu menu;
-
-                    menu.addAction("Apply Transformation");
-                    menu.addAction("Center Pivot");
-                    menu.addAction("Copy");
-                    menu.addAction("Cut");
-                    menu.addAction("Duplicate");
-                    menu.addAction("Group");
-                    menu.addAction("Ungroup");
-                    menu.addAction("Delete");
-
-                    QMenu *effectsMenu = menu.addMenu("Effects");
-                    effectsMenu->addAction("Blur");
-                    effectsMenu->addAction("Brush");
-                    effectsMenu->addAction("Lines");
-                    effectsMenu->addAction("Circles");
-
-                    QAction *selectedAction = menu.exec(event->globalPos());
-                    if(selectedAction != NULL) {
-                        if(selectedAction->text() == "Delete") {
-                            mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
-                        } else if(selectedAction->text() == "Apply Transformation") {
-                            mCurrentBoxesGroup->applyCurrentTransformationToSelected();
-                        } else if(selectedAction->text() == "Group") {
-                            groupSelectedBoxesAction();
-                        } else if(selectedAction->text() == "Ungroup") {
-                            mCurrentBoxesGroup->ungroupSelected();
-                        } else if(selectedAction->text() == "Center Pivot") {
-                            mCurrentBoxesGroup->centerPivotForSelected();
-                        } else if(selectedAction->text() == "Blur") {
-                            mCurrentBoxesGroup->applyBlurToSelected();
-                        } else if(selectedAction->text() == "Brush") {
-                            mCurrentBoxesGroup->applyBrushEffectToSelected();
-                        } else if(selectedAction->text() == "Lines") {
-                            mCurrentBoxesGroup->applyLinesEffectToSelected();
-                        } else if(selectedAction->text() == "Circles") {
-                            mCurrentBoxesGroup->applyCirclesEffectToSelected();
-                        }
-
-                        callUpdateSchedulers();
-                    } else {
-
-                    }
+            QAction *selectedAction = menu.exec(event->globalPos());
+            if(selectedAction != NULL) {
+                if(selectedAction->text() == "Paste") {
+                } else if(selectedAction->text() == "Blur") {
+                    addEffect(new BlurEffect());
+                } else if(selectedAction->text() == "Brush") {
+                    addEffect(new BrushEffect());
+                } else if(selectedAction->text() == "Lines") {
+                    addEffect(new LinesEffect());
+                } else if(selectedAction->text() == "Circles") {
+                    addEffect(new CirclesEffect());
                 }
+            } else {
+
+            }
+        } else {
+            if(!pressedBox->isSelected()) {
+                mCurrentBoxesGroup->clearBoxesSelection();
+                mCurrentBoxesGroup->addBoxToSelection(pressedBox);
+            }
+
+            QMenu menu;
+
+            menu.addAction("Apply Transformation");
+            menu.addAction("Center Pivot");
+            menu.addAction("Copy");
+            menu.addAction("Cut");
+            menu.addAction("Duplicate");
+            menu.addAction("Group");
+            menu.addAction("Ungroup");
+            menu.addAction("Delete");
+
+            QMenu *effectsMenu = menu.addMenu("Effects");
+            effectsMenu->addAction("Blur");
+            effectsMenu->addAction("Brush");
+            effectsMenu->addAction("Lines");
+            effectsMenu->addAction("Circles");
+
+            QAction *selectedAction = menu.exec(event->globalPos());
+            if(selectedAction != NULL) {
+                if(selectedAction->text() == "Delete") {
+                    mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
+                } else if(selectedAction->text() == "Apply Transformation") {
+                    mCurrentBoxesGroup->applyCurrentTransformationToSelected();
+                } else if(selectedAction->text() == "Group") {
+                    groupSelectedBoxesAction();
+                } else if(selectedAction->text() == "Ungroup") {
+                    mCurrentBoxesGroup->ungroupSelected();
+                } else if(selectedAction->text() == "Center Pivot") {
+                    mCurrentBoxesGroup->centerPivotForSelected();
+                } else if(selectedAction->text() == "Blur") {
+                    mCurrentBoxesGroup->applyBlurToSelected();
+                } else if(selectedAction->text() == "Brush") {
+                    mCurrentBoxesGroup->applyBrushEffectToSelected();
+                } else if(selectedAction->text() == "Lines") {
+                    mCurrentBoxesGroup->applyLinesEffectToSelected();
+                } else if(selectedAction->text() == "Circles") {
+                    mCurrentBoxesGroup->applyCirclesEffectToSelected();
+                }
+            } else {
+
             }
         }
-        return;
     }
+}
+
+void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
 
     if(mIsMouseGrabbing) {
         releaseMouseAndDontTrack();
@@ -158,7 +149,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 return;
             }
             if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
-                startNewUndoRedoSet();
 
                 VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
                 mCurrentBoxesGroup->clearBoxesSelection();
@@ -167,7 +157,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                             newPath->addPointAbsPos(mLastMouseEventPos,
                                                     mCurrentEndPoint) );
 
-                finishUndoRedoSet();
             } else {
                 if(pathPointUnderMouse == NULL) {
                     setCurrentEndPoint(mCurrentEndPoint->addPointAbsPos(mLastMouseEventPos) );
@@ -215,7 +204,6 @@ void Canvas::mousePressEvent(QMouseEvent *event)
                 }
             }
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
-            startNewUndoRedoSet();
 
             Circle *newPath = new Circle(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPos, false);
@@ -225,9 +213,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
             mCurrentCircle = newPath;
 
-            finishUndoRedoSet();
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-            startNewUndoRedoSet();
 
             new ImageBox(mCurrentBoxesGroup, "/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/pixmaps/mypaint_logo.png");
 
@@ -239,10 +225,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
 
             mCurrentRectangle = newPath;
 
-            finishUndoRedoSet();
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
-            startNewUndoRedoSet();
-
 
             TextBox *newPath = new TextBox(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPos, false);
@@ -252,9 +235,21 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             mCurrentBoxesGroup->clearBoxesSelection();
             mCurrentBoxesGroup->addBoxToSelection(newPath);
 
-            finishUndoRedoSet();
         }
     } // current mode allows interaction with points
+}
+
+void Canvas::mousePressEvent(QMouseEvent *event)
+{
+    if(mPreviewing) return;
+    mLastMouseEventPos = event->pos();
+    if(event->button() != Qt::LeftButton) {
+        if(event->button() == Qt::RightButton) {
+            handleRightButtonMousePress(event);
+        }
+    } else {
+        handleLeftButtonMousePress(event);
+    }
 
     callUpdateSchedulers();
 }
@@ -284,8 +279,6 @@ void Canvas::cancelCurrentTransform() {
     if(mIsMouseGrabbing) {
         releaseMouseAndDontTrack();
     }
-
-    callUpdateSchedulers();
 }
 
 void Canvas::handleMovePointMouseRelease(QPointF pos) {
@@ -420,8 +413,6 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
         delete mCurrentEdge;
         mCurrentEdge = NULL;
     }
-
-    callUpdateSchedulers();
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
@@ -432,14 +423,15 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     clearAndDisableInput();
     if(mTransformationFinishedBeforeMouseRelease) {
         mTransformationFinishedBeforeMouseRelease = false;
-        return;
-    }
-    if(event->button() != Qt::LeftButton) {
-        if(mIsMouseGrabbing) {
-            releaseMouseAndDontTrack();
+    } else {
+        if(event->button() != Qt::LeftButton) {
+            if(mIsMouseGrabbing) {
+                releaseMouseAndDontTrack();
+            }
         }
+        handleMouseRelease(event->pos());
     }
-    handleMouseRelease(event->pos());
+    callUpdateSchedulers();
 }
 
 QPointF Canvas::getMoveByValueForEventPos(QPointF eventPos) {
@@ -541,8 +533,6 @@ void Canvas::updateTransformation() {
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
         handleAddPointMouseMove(eventPos);
     }
-
-    callUpdateSchedulers();
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *event)

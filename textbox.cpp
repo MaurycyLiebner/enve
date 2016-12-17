@@ -99,8 +99,6 @@ void TextBox::openTextEditor()
                                            "Text:", mText, &ok);
     if(ok) {
         setText(text);
-
-        callUpdateSchedulers();
     }
 }
 

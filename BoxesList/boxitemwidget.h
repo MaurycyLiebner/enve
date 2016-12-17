@@ -2,9 +2,10 @@
 #define BOXITEMWIDGET_H
 
 #include <QWidget>
+#include "connectedtomainwindow.h"
 class BoundingBox;
 
-class BoxItemWidget : public QWidget
+class BoxItemWidget : public QWidget, public ConnectedToMainWindow
 {
     Q_OBJECT
 public:

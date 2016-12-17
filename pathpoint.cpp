@@ -118,7 +118,6 @@ void PathPoint::cancelTransform()
 
 void PathPoint::finishTransform()
 {
-    startNewUndoRedoSet();
     MovablePoint::finishTransform();
     if(!mStartCtrlPt->isSelected()) {
         mStartCtrlPt->MovablePoint::finishTransform();
@@ -126,7 +125,6 @@ void PathPoint::finishTransform()
     if(!mEndCtrlPt->isSelected()) {
         mEndCtrlPt->MovablePoint::finishTransform();
     }
-    finishUndoRedoSet();
 }
 
 void PathPoint::moveBy(QPointF relTranslation)
@@ -907,7 +905,6 @@ bool PathPoint::isSeparatePathPoint()
 void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
 {
     if(saveUndoRedo) {
-        startNewUndoRedoSet();
         addUndoRedo(new SetPathPointModeUndoRedo(this, mCtrlsMode, mode));
     }
     mCtrlsMode = mode;
@@ -970,8 +967,6 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
         setCtrlPtEnabled(true, true);
         setCtrlPtEnabled(true, false);
         mVectorPath->schedulePathUpdate();
-
-        finishUndoRedoSet();
     }
 }
 
@@ -997,8 +992,6 @@ bool PathPoint::hasPreviousPoint() {
 }
 
 void PathPoint::setPointAsNext(PathPoint *pointToSet, bool saveUndoRedo) {
-    if(saveUndoRedo) startNewUndoRedoSet();
-
     if(hasNextPoint()) {
         mNextPoint->setPreviousPoint(NULL, saveUndoRedo);
     }
@@ -1006,13 +999,9 @@ void PathPoint::setPointAsNext(PathPoint *pointToSet, bool saveUndoRedo) {
     if(pointToSet != NULL) {
         pointToSet->setPreviousPoint(this, saveUndoRedo);
     }
-
-    if(saveUndoRedo) finishUndoRedoSet();
 }
 
 void PathPoint::setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo) {
-    if(saveUndoRedo) startNewUndoRedoSet();
-
     if(hasPreviousPoint()) {
         mPreviousPoint->setNextPoint(NULL, saveUndoRedo);
     }
@@ -1020,8 +1009,6 @@ void PathPoint::setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo) {
     if(pointToSet != NULL) {
         pointToSet->setNextPoint(this, saveUndoRedo);
     }
-
-    if(saveUndoRedo) finishUndoRedoSet();
 }
 
 PathPoint *PathPoint::addPointAbsPos(QPointF absPos)

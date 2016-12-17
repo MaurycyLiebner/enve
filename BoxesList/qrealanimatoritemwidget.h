@@ -2,9 +2,10 @@
 #define QREALANIMATORITEMWIDGET_H
 
 #include <QWidget>
+#include "connectedtomainwindow.h"
 class QrealAnimator;
 
-class QrealAnimatorItemWidget : public QWidget
+class QrealAnimatorItemWidget : public QWidget, public ConnectedToMainWindow
 {
     Q_OBJECT
 public:

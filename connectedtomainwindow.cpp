@@ -88,16 +88,6 @@ void ConnectedToMainWindow::graphScheduleUpdateAfterKeysChanged() {
     mMainWindow->getKeysView()->scheduleGraphUpdateAfterKeysChanged();
 }
 
-void ConnectedToMainWindow::startNewUndoRedoSet()
-{
-     mMainWindow->getUndoRedoStack()->startNewSet();
-}
-
-void ConnectedToMainWindow::finishUndoRedoSet()
-{
-     mMainWindow->getUndoRedoStack()->finishSet();
-}
-
 void ConnectedToMainWindow::schedulePivotUpdate() {
     mMainWindow->schedulePivotUpdate();
 }

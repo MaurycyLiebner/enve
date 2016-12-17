@@ -80,7 +80,7 @@ public:
 
     bool isEmpty();
 
-    void setValue(qreal);
+    void setValue(qreal, bool finish = false);
 
     qreal getValue();
 
@@ -91,6 +91,9 @@ public:
     void margeAllKeysToKey(ComplexKey *target);
 
     bool isDescendantSelected();
+
+    void startFrameTransform();
+    void finishFrameTransform();
 private:
     QList<QrealKey*> mKeys;
 };

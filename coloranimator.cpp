@@ -255,8 +255,6 @@ void ColorAnimator::openContextMenu(QPoint pos) {
         } else if(selected_action == hslAction) {
             setColorMode(HSLMODE);
         }
-
-        callUpdateSchedulers();
     } else {
 
     }

@@ -9,7 +9,7 @@
 #include "qrealanimatorvalueslider.h"
 #include <QWidgetAction>
 
-QrealAnimator::QrealAnimator() : QObject(), ConnectedToMainWindow() {
+QrealAnimator::QrealAnimator() : Animator() {
 }
 
 QrealAnimator::~QrealAnimator() {
@@ -163,10 +163,11 @@ void QrealAnimator::openContextMenu(QPoint pos) {
     {
         if(selected_action->text() == "Add Key")
         {
-            if(!mIsRecording) {
+            if(mIsRecording) {
+                saveCurrentValueAsKey();
+            } else {
                 setRecording(true);
             }
-            saveCurrentValueAsKey();
         }
     } else {
 
@@ -201,18 +202,27 @@ void QrealAnimator::removeAllKeys() {
     setCurrentValue(currentValue);
 }
 
-void QrealAnimator::setRecording(bool rec)
-{
+void QrealAnimator::setRecordingWithoutChangingKeys(bool rec, bool saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new QrealAnimatorRecordingSetUndoRedo(mIsRecording,
+                                                          rec,
+                                                          this));
+    }
     mIsRecording = rec;
     setTraceKeyOnCurrentFrame(rec); // !!!
-    if(rec) {
+    if(mParentAnimator != NULL) {
+        mParentAnimator->childAnimatorIsRecordingChanged();
+    }
+}
+
+void QrealAnimator::setRecording(bool rec)
+{
+    setRecordingWithoutChangingKeys(rec);
+    if(mIsRecording) {
         saveCurrentValueAsKey();
     } else {
         removeAllKeys();
         updateKeysPath();
-    }
-    if(mParentAnimator != NULL) {
-        mParentAnimator->childAnimatorIsRecordingChanged();
     }
 }
 
@@ -269,14 +279,6 @@ void QrealAnimator::clearFromGraphView() {
 void QrealAnimator::freezeMinMaxValues()
 {
     mMinMaxValuesFrozen = true;
-}
-
-void QrealAnimator::setParentAnimator(ComplexAnimator *parentAnimator)
-{
-    mParentAnimator = parentAnimator;
-    if(parentAnimator == NULL) {
-        clearFromGraphView();
-    }
 }
 
 qreal QrealAnimator::getValueAtFrame(int frame) const
@@ -368,13 +370,17 @@ void QrealAnimator::saveValueToKey(QrealKey *key, qreal value, bool saveUndoRedo
 {
     key->setValue(value, saveUndoRedo);
     updateKeysPath();
+    updateValueFromCurrentFrame();
 
     if(mIsCurrentAnimator) {
         graphScheduleUpdateAfterKeysChanged();
     }
 }
 
-void QrealAnimator::appendKey(QrealKey *newKey) {
+void QrealAnimator::appendKey(QrealKey *newKey, bool saveUndoRedo) {
+    if(saveUndoRedo && !isComplexAnimator()) {
+        addUndoRedo(new AddQrealKeyToAnimatorUndoRedo(newKey, this));
+    }
     mKeys.append(newKey);
     newKey->incNumberPointers();
     sortKeys();
@@ -388,10 +394,16 @@ void QrealAnimator::appendKey(QrealKey *newKey) {
     }
 
     updateKeyOnCurrrentFrame();
+    updateValueFromCurrentFrame();
 }
 
-void QrealAnimator::removeKey(QrealKey *removeKey) {
+void QrealAnimator::removeKey(QrealKey *removeKey, bool saveUndoRedo) {
     if(mKeys.removeOne(removeKey) ) {
+
+        if(saveUndoRedo && !isComplexAnimator()) {
+            addUndoRedo(new RemoveQrealKeyFromAnimatorUndoRedo(removeKey, this));
+        }
+
         if(mParentAnimator != NULL) {
             mParentAnimator->removeChildQrealKey(removeKey);
         }

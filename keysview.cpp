@@ -229,18 +229,24 @@ void KeysView::mouseMoveEvent(QMouseEvent *event)
             emit changedViewedFrames(mMinViewedFrame,
                                      mMaxViewedFrame);
         } else {
-            mFirstMove = false;
             if(mMovingKeys) {
                 int dFrame = qRound( (event->x() - mLastPressPos.x())/mPixelsPerFrame );
                 int dDFrame = dFrame - mMoveDFrame;
-                if(dDFrame == 0) return;
-                mMoveDFrame = dFrame;
-                foreach(QrealKey *key, mSelectedKeys) {
-                    key->incFrameAndUpdateParentAnimator(dDFrame);
+                if(mFirstMove) {
+                    foreach(QrealKey *key, mSelectedKeys) {
+                        key->startFrameTransform();
+                    }
+                }
+                if(dDFrame != 0) {
+                    mMoveDFrame = dFrame;
+                    foreach(QrealKey *key, mSelectedKeys) {
+                        key->incFrameAndUpdateParentAnimator(dDFrame);
+                    }
                 }
             } else if(mSelecting) {
                 mSelectionRect.setBottomRight(event->pos() );
             }
+            mFirstMove = false;
         }
     }
 
@@ -292,6 +298,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e)
             }
             QList<QrealAnimator*> parentAnimators;
             foreach(QrealKey *key, mSelectedKeys) {
+                key->finishFrameTransform();
                 if(parentAnimators.contains(key->getParentAnimator()) ) continue;
                 parentAnimators << key->getParentAnimator();
             }

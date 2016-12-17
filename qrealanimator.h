@@ -9,6 +9,7 @@
 #include "connectedtomainwindow.h"
 #include "animatorupdater.h"
 #include "float.h"
+#include "animator.h"
 
 const int KEY_RECT_SIZE = 10;
 
@@ -17,7 +18,7 @@ class QrealAnimatorValueSlider;
 
 #include <QDoubleSpinBox>
 
-class QrealAnimator :  public QObject, public ConnectedToMainWindow
+class QrealAnimator :  public Animator
 {
     Q_OBJECT
 public:
@@ -30,8 +31,6 @@ public:
 
     void setValueRange(qreal minVal, qreal maxVal);
 
-    void setParentAnimator(ComplexAnimator *parentAnimator);
-
     qreal getValueAtFrame(int frame) const;
     qreal getCurrentValue() const;
     void setCurrentValue(qreal newValue, bool finish = false);
@@ -43,8 +42,8 @@ public:
     QrealKey *getKeyAtFrame(int frame);
     void saveCurrentValueAsKey();
     virtual void updateKeysPath();
-    void appendKey(QrealKey *newKey);
-    void removeKey(QrealKey *removeKey);
+    void appendKey(QrealKey *newKey, bool saveUndoRedo = true);
+    void removeKey(QrealKey *removeKey, bool saveUndoRedo = true);
 
     void moveKeyToFrame(QrealKey *key, int newFrame);
 
@@ -119,11 +118,6 @@ public:
                                qreal pixelsPerFrame,
                                QList<QrealKey *> *keysList);
 
-    void addAllKeysToComplexAnimator();
-    void removeAllKeysFromComplexAnimator();
-
-    bool hasKeys();
-
     void incAllValues(qreal valInc);
 
     QString getName();
@@ -174,28 +168,22 @@ public:
     bool isCurrentAnimator() { return mIsCurrentAnimator; }
     const QColor &getAnimatorColor() { return mAnimatorColor; }
 
-    bool isComplexAnimator() { return mIsComplexAnimator; }
     QrealKey *getKeyAtPos(qreal relX, int minViewedFrame, qreal pixelsPerFrame);
+    void removeAllKeysFromComplexAnimator();
+    void addAllKeysToComplexAnimator();
+
+    bool hasKeys();
+    void setRecordingWithoutChangingKeys(bool rec, bool saveUndoRedo = true);
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 
     bool mMinMaxValuesFrozen = false;
 
-    bool mIsCurrentAnimator = false;
     bool mDrawPathUpdateNeeded = false;
 
     qreal mMaxPossibleVal = DBL_MAX;
     qreal mMinPossibleVal = -DBL_MAX;
-
-    bool mIsRecording = false;
-    bool mKeyOnCurrentFrame = false;
-
-    QString mName = "";
-
-    ComplexAnimator *mParentAnimator = NULL;
-
     AnimatorUpdater *mUpdater = NULL;
-
     bool mTransformed = false;
 
     qreal mCurrentValue = 0.;
@@ -206,16 +194,12 @@ protected:
 
     int mCurrentFrame = 0;
 
-    bool mIsComplexAnimator = false;
-
     qreal mPrefferedValueStep = 1.;
 
     QColor mAnimatorColor;
 
 signals:
     void valueChangedSignal(qreal);
-    void childAnimatorAdded(QrealAnimator*);
-    void childAnimatorRemoved(QrealAnimator*);
 };
 
 #include <QMenu>

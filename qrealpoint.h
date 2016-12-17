@@ -22,7 +22,7 @@ public:
 
     virtual qreal getValue();
 
-    virtual void setValue(qreal value);
+    virtual void setValue(qreal value, bool finish = false);
 
     bool isSelected();
 

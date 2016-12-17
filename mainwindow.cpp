@@ -465,6 +465,8 @@ bool MainWindow::isAltPressed()
 
 void MainWindow::callUpdateSchedulers()
 {
+    mUndoRedoStack.finishSet();
+
     mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
     foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
@@ -479,6 +481,8 @@ void MainWindow::callUpdateSchedulers()
     mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
+
+    mUndoRedoStack.startNewSet();
 }
 
 void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
@@ -849,7 +853,6 @@ void MainWindow::setCurrentFrameForAllWidgets(int frame)
 
 void MainWindow::importFile(QString path, bool loadInBox) {
     disable();
-    mUndoRedoStack.startNewSet();
 
     QFile file(path);
     if(!file.exists()) {
@@ -868,7 +871,6 @@ void MainWindow::importFile(QString path, bool loadInBox) {
 
         db.close();
     }
-    mUndoRedoStack.finishSet();
     enable();
 
     callUpdateSchedulers();

@@ -38,7 +38,7 @@ void ComplexAnimatorItemWidget::mousePressEvent(QMouseEvent *event)
         setDetailsVisibile(!mDetailsVisible);
     }
 
-    MainWindow::getInstance()->callUpdateSchedulers();
+    callUpdateSchedulers();
 }
 
 void ComplexAnimatorItemWidget::setDetailsVisibile(bool bT) {

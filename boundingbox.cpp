@@ -494,11 +494,7 @@ void BoundingBox::startTransform() {
 }
 
 void BoundingBox::finishTransform() {
-    startNewUndoRedoSet();
-
     mTransformAnimator.finishTransform();
-
-    finishUndoRedoSet();
 }
 
 void BoundingBox::cancelTransform() {

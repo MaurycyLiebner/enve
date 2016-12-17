@@ -44,11 +44,9 @@ void CtrlPoint::startTransform()
 
 void CtrlPoint::finishTransform()
 {
-    startNewUndoRedoSet();
     mParentPoint->MovablePoint::finishTransform();
     MovablePoint::finishTransform();
     mOtherCtrlPt->MovablePoint::finishTransform();
-    finishUndoRedoSet();
 }
 
 void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {

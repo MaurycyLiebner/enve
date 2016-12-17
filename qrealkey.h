@@ -24,6 +24,9 @@ public:
     virtual void setStartValue(qreal value);
     virtual void setEndValue(qreal value);
 
+    virtual void startFrameTransform();
+    virtual void finishFrameTransform();
+
     int getFrame();
     virtual void setFrame(int frame);
     virtual void setStartFrame(qreal startFrame);
@@ -92,7 +95,7 @@ protected:
 
     qreal mValue;
     int mFrame;
-    qreal mSavedFrame;
+    int mSavedFrame;
     qreal mSavedValue;
 
     qreal mSavedMaxStartFrameDist;

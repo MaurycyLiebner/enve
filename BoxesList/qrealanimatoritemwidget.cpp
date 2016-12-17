@@ -5,7 +5,7 @@
 
 QrealAnimatorItemWidget::QrealAnimatorItemWidget(QrealAnimator *target,
                                                  QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent), ConnectedToMainWindow()
 {
     setContentsMargins(0, 0, 0, 0);
     setFixedHeight(BoxesListWidget::getListItemHeight());
@@ -66,8 +66,7 @@ void QrealAnimatorItemWidget::mousePressEvent(QMouseEvent *event) {
             mTargetAnimator->setRecording(!mTargetAnimator->isRecording());
         }
     }
-
-    MainWindow::getInstance()->callUpdateSchedulers();
+    callUpdateSchedulers();
 }
 
 void QrealAnimatorItemWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,

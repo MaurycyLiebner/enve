@@ -124,13 +124,9 @@ void ComplexAnimator::retrieveSavedValue()
 
 void ComplexAnimator::finishTransform()
 {
-    startNewUndoRedoSet();
-
     foreach(QrealAnimator *animator, mChildAnimators) {
         animator->finishTransform();
     }
-
-    finishUndoRedoSet();
 }
 
 void ComplexAnimator::cancelTransform()
@@ -299,7 +295,7 @@ void ComplexKey::setStartEnabled(bool bT)
 
 void ComplexKey::removeAnimatorKey(QrealKey *key) {
     if(mKeys.removeOne(key) ) {
-        key->setParentKey(NULL);
+        //key->setParentKey(NULL);
         key->decNumberPointers();
     }
 }
@@ -308,13 +304,13 @@ bool ComplexKey::isEmpty() {
     return mKeys.isEmpty();
 }
 
-void ComplexKey::setValue(qreal) { QrealKey::setValue(mFrame); }
+void ComplexKey::setValue(qreal, bool) { QrealKey::setValue(mFrame, false); }
 
 qreal ComplexKey::getValue() { return mFrame; }
 
 void ComplexKey::setFrame(int frame) {
     QrealKey::setFrame(frame);
-    QrealKey::setValue(frame);
+    ComplexKey::setValue(frame);
 
     foreach(QrealKey *key, mKeys) {
         key->setFrame(frame);
@@ -340,4 +336,20 @@ bool ComplexKey::isDescendantSelected() {
         if(key->isDescendantSelected()) return true;
     }
     return false;
+}
+
+void ComplexKey::startFrameTransform()
+{
+    foreach(QrealKey *key, mKeys) {
+        if(key->isSelected()) continue;
+        key->startFrameTransform();
+    }
+}
+
+void ComplexKey::finishFrameTransform()
+{
+    foreach(QrealKey *key, mKeys) {
+        if(key->isSelected()) continue;
+        key->finishFrameTransform();
+    }
 }

@@ -184,7 +184,7 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
         }
         schedulePivotUpdate();
 
-        callUpdateSchedulers();
+
     } else if(event->key() == Qt::Key_PageUp) {
         mCurrentBoxesGroup->raiseSelectedBoxes();
     } else if(event->key() == Qt::Key_PageDown) {
@@ -196,7 +196,6 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     } else {
         return false;
     }
-
     return true;
 }
 
@@ -611,14 +610,12 @@ void Canvas::grabMouseAndTrack() {
 void Canvas::setFontFamilyAndStyle(QString family, QString style)
 {
     mCurrentBoxesGroup->setSelectedFontFamilyAndStyle(family, style);
-
     callUpdateSchedulers();
 }
 
 void Canvas::setFontSize(qreal size)
 {
     mCurrentBoxesGroup->setSelectedFontSize(size);
-
     callUpdateSchedulers();
 }
 
@@ -635,175 +632,167 @@ void Canvas::groupSelectedBoxesAction() {
     }
 }
 
+bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape) {
+        cancelCurrentTransform();
+    } else if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        mTransformationFinishedBeforeMouseRelease = true;
+        handleMouseRelease(mLastMouseEventPos);
+    } else if(event->key() == Qt::Key_Minus) {
+        if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
+            mInputText.remove("-");
+        } else {
+            mInputText.prepend("-");
+        }
+        updateInputValue();
+    } else if(event->key() == Qt::Key_0) {
+        mInputText += "0";
+        if(mInputText == "0" || mInputText == "-0") mInputText += ".";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_1) {
+        mInputText += "1";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_2) {
+        mInputText += "2";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_3) {
+        mInputText += "3";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_4) {
+        mInputText += "4";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_5) {
+        mInputText += "5";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_6) {
+        mInputText += "6";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_7) {
+        mInputText += "7";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_8) {
+        mInputText += "8";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_9) {
+        mInputText += "9";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_Period ||
+              event->key() == Qt::Key_Comma) {
+        if(!mInputText.contains(".")) {
+            mInputText += ".";
+            updateInputValue();
+        }
+    } else if(event->key() == Qt::Key_Backspace) {
+        mInputText.chop(1);
+        if(mInputText == "0" ||
+           mInputText == "-" ||
+           mInputText == "-0") mInputText = "";
+        updateInputValue();
+    } else if(event->key() == Qt::Key_X) {
+        mXOnlyTransform = !mXOnlyTransform;
+        mYOnlyTransform = false;
+
+        updateTransformation();
+    } else if(event->key() == Qt::Key_Y) {
+        mYOnlyTransform = !mYOnlyTransform;
+        mXOnlyTransform = false;
+
+        updateTransformation();
+    } else {
+        return false;
+    }
+
+    return true;
+}
+
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
     if(mPreviewing) return;
+
     bool isGrabbingMouse = mCanvasWidget->mouseGrabber() == mCanvasWidget;
-    if(isGrabbingMouse) {
-        if(event->key() == Qt::Key_Escape) {
-            cancelCurrentTransform();
-            return;
-        } else if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
-            mTransformationFinishedBeforeMouseRelease = true;
-            handleMouseRelease(mLastMouseEventPos);
-            return;
-        } else if(event->key() == Qt::Key_Minus) {
-            if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
-                mInputText.remove("-");
-            } else {
-                mInputText.prepend("-");
-            }
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_0) {
-            mInputText += "0";
-            if(mInputText == "0" || mInputText == "-0") mInputText += ".";
-            updateInputValue();
-            return;
+    if(isGrabbingMouse ? !handleKeyPressEventWhileMouseGrabbing(event) : true) {
+        if(event->key() == Qt::Key_0) {
+            fitCanvasToSize();
         } else if(event->key() == Qt::Key_1) {
-            mInputText += "1";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_2) {
-            mInputText += "2";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_3) {
-            mInputText += "3";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_4) {
-            mInputText += "4";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_5) {
-            mInputText += "5";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_6) {
-            mInputText += "6";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_7) {
-            mInputText += "7";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_8) {
-            mInputText += "8";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_9) {
-            mInputText += "9";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_Period ||
-                  event->key() == Qt::Key_Comma) {
-            if(mInputText.contains(".")) return;
-            mInputText += ".";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_Backspace) {
-            mInputText.chop(1);
-            if(mInputText == "0" ||
-               mInputText == "-" ||
-               mInputText == "-0") mInputText = "";
-            updateInputValue();
-            return;
-        } else if(event->key() == Qt::Key_X) {
-            mXOnlyTransform = !mXOnlyTransform;
+            resetTransormation();
+        } else if(event->key() == Qt::Key_Delete) {
+           if(mCurrentMode == MOVE_POINT) {
+               if(isShiftPressed()) {
+                   mCurrentBoxesGroup->removeSelectedPointsApproximateAndClearList();
+               } else {
+                   mCurrentBoxesGroup->removeSelectedPointsAndClearList();
+               }
+           } else if(mCurrentMode == MOVE_PATH) {
+               mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
+           }
+        } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
+           if(isShiftPressed()) {
+               mCurrentBoxesGroup->ungroupSelected();
+           } else {
+               groupSelectedBoxesAction();
+           }
+
+        } else if(event->key() == Qt::Key_PageUp) {
+           raiseAction();
+        } else if(event->key() == Qt::Key_PageDown) {
+           lowerAction();
+        } else if(event->key() == Qt::Key_End) {
+           lowerToBottomAction();
+        } else if(event->key() == Qt::Key_Home) {
+           raiseToTopAction();
+        } else if(event->key() == Qt::Key_G && isAltPressed(event)) {
+            mCurrentBoxesGroup->resetSelectedTranslation();
+        } else if(event->key() == Qt::Key_S && isAltPressed(event)) {
+            mCurrentBoxesGroup->resetSelectedScale();
+        } else if(event->key() == Qt::Key_R && isAltPressed(event)) {
+            mCurrentBoxesGroup->resetSelectedRotation();
+        } else if(event->key() == Qt::Key_R && (isMovingPath() ||
+                  mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
+           mTransformationFinishedBeforeMouseRelease = false;
+           mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+           mLastPressPos = mLastMouseEventPos;
+           mRotPivot->startRotating();
+           mDoubleClick = false;
+           mFirstMouseMove = true;
+
+           grabMouseAndTrack();
+        } else if(event->key() == Qt::Key_S && (isMovingPath() ||
+                  mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
+           mTransformationFinishedBeforeMouseRelease = false;
+           mXOnlyTransform = false;
+           mYOnlyTransform = false;
+
+           mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+           mLastPressPos = mLastMouseEventPos;
+           mRotPivot->startScaling();
+           mDoubleClick = false;
+           mFirstMouseMove = true;
+
+           grabMouseAndTrack();
+        } else if(event->key() == Qt::Key_G && (isMovingPath() ||
+                                                mCurrentMode == MOVE_POINT) &&
+                  !isGrabbingMouse) {
+            mTransformationFinishedBeforeMouseRelease = false;
+            mXOnlyTransform = false;
             mYOnlyTransform = false;
 
-            updateTransformation();
-            return;
-        } else if(event->key() == Qt::Key_Y) {
-            mYOnlyTransform = !mYOnlyTransform;
-            mXOnlyTransform = false;
+            mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+            mLastPressPos = mLastMouseEventPos;
+            mDoubleClick = false;
+            mFirstMouseMove = true;
 
-            updateTransformation();
-            return;
-        }
-    }
-    if(event->key() == Qt::Key_0) {
-        fitCanvasToSize();
-    } else if(event->key() == Qt::Key_1) {
-        resetTransormation();
-    } else if(event->key() == Qt::Key_Delete) {
-       if(mCurrentMode == MOVE_POINT) {
+            grabMouseAndTrack();
+         } else if(event->key() == Qt::Key_A && isCtrlPressed(event) && !isGrabbingMouse) {
            if(isShiftPressed()) {
-               mCurrentBoxesGroup->removeSelectedPointsApproximateAndClearList();
+               mCurrentBoxesGroup->deselectAllBoxes();
            } else {
-               mCurrentBoxesGroup->removeSelectedPointsAndClearList();
+               mCurrentBoxesGroup->selectAllBoxes();
            }
-       } else if(mCurrentMode == MOVE_PATH) {
-           mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
-       }
-    } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
-       if(isShiftPressed()) {
-           mCurrentBoxesGroup->ungroupSelected();
-       } else {
-           groupSelectedBoxesAction();
-       }
-
-    } else if(event->key() == Qt::Key_PageUp) {
-       raiseAction();
-    } else if(event->key() == Qt::Key_PageDown) {
-       lowerAction();
-    } else if(event->key() == Qt::Key_End) {
-       lowerToBottomAction();
-    } else if(event->key() == Qt::Key_Home) {
-       raiseToTopAction();
-    } else if(event->key() == Qt::Key_G && isAltPressed(event)) {
-        mCurrentBoxesGroup->resetSelectedTranslation();
-    } else if(event->key() == Qt::Key_S && isAltPressed(event)) {
-        mCurrentBoxesGroup->resetSelectedScale();
-    } else if(event->key() == Qt::Key_R && isAltPressed(event)) {
-        mCurrentBoxesGroup->resetSelectedRotation();
-    } else if(event->key() == Qt::Key_R && (isMovingPath() ||
-              mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
-       mTransformationFinishedBeforeMouseRelease = false;
-       mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
-       mLastPressPos = mLastMouseEventPos;
-       mRotPivot->startRotating();
-       mDoubleClick = false;
-       mFirstMouseMove = true;
-
-       grabMouseAndTrack();
-    } else if(event->key() == Qt::Key_S && (isMovingPath() ||
-              mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
-       mTransformationFinishedBeforeMouseRelease = false;
-       mXOnlyTransform = false;
-       mYOnlyTransform = false;
-
-       mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
-       mLastPressPos = mLastMouseEventPos;
-       mRotPivot->startScaling();
-       mDoubleClick = false;
-       mFirstMouseMove = true;
-
-       grabMouseAndTrack();
-    } else if(event->key() == Qt::Key_G && (isMovingPath() ||
-                                            mCurrentMode == MOVE_POINT) &&
-              !isGrabbingMouse) {
-        mTransformationFinishedBeforeMouseRelease = false;
-        mXOnlyTransform = false;
-        mYOnlyTransform = false;
-
-        mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
-        mLastPressPos = mLastMouseEventPos;
-        mDoubleClick = false;
-        mFirstMouseMove = true;
-
-        grabMouseAndTrack();
-     } else if(event->key() == Qt::Key_A && isCtrlPressed(event) && !isGrabbingMouse) {
-       if(isShiftPressed()) {
-           mCurrentBoxesGroup->deselectAllBoxes();
-       } else {
-           mCurrentBoxesGroup->selectAllBoxes();
-       }
-    } else if(event->key() == Qt::Key_P) {
-        mPivotVisibleDuringPointEdit = !mPivotVisibleDuringPointEdit;
+        } else if(event->key() == Qt::Key_P) {
+            mPivotVisibleDuringPointEdit = !mPivotVisibleDuringPointEdit;
+        }
+        schedulePivotUpdate();
     }
-    schedulePivotUpdate();
 
     callUpdateSchedulers();
 }
@@ -915,7 +904,6 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
     }
     VectorPath *pathSrc = pointSrc->getParentPath();
     VectorPath *pathDest = pointDest->getParentPath();
-    startNewUndoRedoSet();
     setCurrentEndPoint(pointDest);
     if(pointSrc->hasNextPoint()) {
         PathPoint *point = pointSrc;
@@ -952,6 +940,4 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
         }
     }
     mCurrentBoxesGroup->removeChild(pathSrc);
-
-    finishUndoRedoSet();
 }

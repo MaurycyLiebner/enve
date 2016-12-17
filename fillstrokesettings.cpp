@@ -723,7 +723,6 @@ void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
         mCanvas->strokeJoinStyleChanged(mCurrentJoinStyle);
         mCanvas->strokeWidthChanged(mCurrentStrokeWidth, true);
     }
-    mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitStrokeFlatColorChanged() {

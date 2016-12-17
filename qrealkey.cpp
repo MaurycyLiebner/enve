@@ -257,7 +257,7 @@ void QrealKey::setValue(qreal value, bool saveUndoRedo) {
     setEndValue(mEndValue + dVal);
     setStartValue(mStartValue + dVal);
     if(saveUndoRedo) {
-        mParentAnimator->addUndoRedo(new ChangeQrealKeyValue(mValue, value, this) );
+        mParentAnimator->addUndoRedo(new ChangeQrealKeyValueUndoRedo(mValue, value, this) );
     }
     mValue = value;
 }
@@ -280,6 +280,16 @@ void QrealKey::setStartValue(qreal value)
 void QrealKey::setEndValue(qreal value)
 {
     mEndValue = value;
+}
+
+void QrealKey::startFrameTransform() {
+    mSavedFrame = getFrame();
+}
+
+void QrealKey::finishFrameTransform()
+{
+    if(mParentAnimator == NULL) return;
+    mParentAnimator->addUndoRedo(new ChangeQrealKeyFrameUndoRedo(mSavedFrame, mFrame, this));
 }
 
 int QrealKey::getFrame() { return mFrame; }

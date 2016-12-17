@@ -28,7 +28,6 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
         addActiveAnimator(&mEffectsAnimators);
     }
     mEffectsAnimators.addChildAnimator(effect);
-    effect->callUpdateSchedulers();
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
@@ -40,7 +39,6 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
         mAnimatorsCollection.removeAnimator(&mEffectsAnimators);
         removeActiveAnimator(&mEffectsAnimators);
     }
-    effect->callUpdateSchedulers();
     effect->decNumberPointers();
 }
 

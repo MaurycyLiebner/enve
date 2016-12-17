@@ -27,9 +27,9 @@ qreal QrealPoint::getValue() {
     if(mType == END_POINT) return mParentKey->getEndValue();
 }
 
-void QrealPoint::setValue(qreal value)
+void QrealPoint::setValue(qreal value, bool finish)
 {
-    if(mType == KEY_POINT) return mParentKey->setValue(value);
+    if(mType == KEY_POINT) return mParentKey->setValue(value, finish);
     if(mType == START_POINT) return mParentKey->setStartValue(value);
     if(mType == END_POINT) return mParentKey->setEndValue(value);
 }

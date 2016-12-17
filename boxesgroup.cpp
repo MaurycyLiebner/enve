@@ -115,105 +115,65 @@ void BoxesGroup::saveSelectedToSql()
 }
 
 void BoxesGroup::convertSelectedBoxesToPath() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->objectToPath();
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setSelectedFontFamilyAndStyle(QString family, QString style)
 {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFontFamilyAndStyle(family, style);
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setSelectedFontSize(qreal size)
 {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFontSize(size);
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::applyBlurToSelected() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->addEffect(new BlurEffect());
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::applyBrushEffectToSelected() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->addEffect(new BrushEffect());
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::applyLinesEffectToSelected() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->addEffect(new LinesEffect());
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::applyCirclesEffectToSelected() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->addEffect(new CirclesEffect());
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::resetSelectedTranslation() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->resetTranslation();
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::resetSelectedScale() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->resetScale();
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::resetSelectedRotation() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->resetRotation();
     }
-
-    finishUndoRedoSet();
 }
 
 PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos,
@@ -259,168 +219,118 @@ void BoxesGroup::clearPointsSelectionOrDeselect() {
 }
 
 void BoxesGroup::setSelectedFillGradient(Gradient *gradient, bool finish) {
-    if(finish) {
-        startNewUndoRedoSet();
-    }
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFillGradient(gradient, finish);
-    }
-    if(finish) {
-        finishUndoRedoSet();
     }
 }
 
 void BoxesGroup::setSelectedStrokeGradient(Gradient *gradient, bool finish) {
-    if(finish) {
-        startNewUndoRedoSet();
-    }
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeGradient(gradient, finish);
-    }
-    if(finish) {
-        finishUndoRedoSet();
     }
 }
 
 void BoxesGroup::setSelectedFillFlatColor(Color color, bool finish) {
-    if(finish) {
-        startNewUndoRedoSet();
-    }
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFillFlatColor(color, finish);
-    }
-    if(finish) {
-        finishUndoRedoSet();
     }
 }
 
 void BoxesGroup::setSelectedStrokeFlatColor(Color color, bool finish) {
-    if(finish) {
-        startNewUndoRedoSet();
-    }
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeFlatColor(color, finish);
-    }
-    if(finish) {
-        finishUndoRedoSet();
     }
 }
 
 void BoxesGroup::setSelectedFillPaintType(PaintType paintType,
                                           Color color, Gradient *gradient) {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFillPaintType(paintType, color, gradient);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setSelectedStrokePaintType(PaintType paintType,
                                             Color color, Gradient *gradient) {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokePaintType(paintType, color, gradient);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setSelectedCapStyle(Qt::PenCapStyle capStyle) {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setSelectedJoinStyle(Qt::PenJoinStyle joinStyle) {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setFillGradient(Gradient *gradient, bool finish)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setFillGradient(gradient, finish);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setStrokeGradient(Gradient *gradient, bool finish)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setStrokeGradient(gradient, finish);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setFillFlatColor(Color color, bool finish)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setFillFlatColor(color, finish);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setStrokeFlatColor(Color color, bool finish)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setStrokeFlatColor(color, finish);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setFillPaintType(PaintType paintType,
                                   Color color, Gradient *gradient)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setFillPaintType(paintType, color, gradient);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setStrokePaintType(PaintType paintType,
                                     Color color, Gradient *gradient)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setStrokePaintType(paintType, color, gradient);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setStrokeCapStyle(Qt::PenCapStyle capStyle)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setStrokeCapStyle(capStyle);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setStrokeJoinStyle(Qt::PenJoinStyle joinStyle)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setStrokeJoinStyle(joinStyle);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::setStrokeWidth(qreal strokeWidth, bool finish)
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mChildren) {
         box->setStrokeWidth(strokeWidth, finish);
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::startStrokeWidthTransform()
@@ -445,14 +355,8 @@ void BoxesGroup::startFillColorTransform()
 }
 
 void BoxesGroup::setSelectedStrokeWidth(qreal strokeWidth, bool finish) {
-    if(finish) {
-        startNewUndoRedoSet();
-    }
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeWidth(strokeWidth, finish);
-    }
-    if(finish) {
-        finishUndoRedoSet();
     }
 }
 
@@ -759,7 +663,6 @@ void BoxesGroup::setSelectedPivotAbsPos(QPointF absPos)
 }
 
 void BoxesGroup::ungroup() {
-    startNewUndoRedoSet();
     clearBoxesSelection();
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
     BoundingBox *box;
@@ -769,7 +672,6 @@ void BoxesGroup::ungroup() {
         parentGroup->addChild(box);
     }
     mParent->removeChild(this);
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::ungroupSelected()
@@ -792,51 +694,35 @@ void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 }
 
 void BoxesGroup::centerPivotForSelected() {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->centerPivotPosition(true);
     }
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::removeSelectedPointsApproximateAndClearList() {
-    startNewUndoRedoSet();
-
     foreach(MovablePoint *point, mSelectedPoints) {
         point->deselect();
         point->removeApproximate();
     }
     mSelectedPoints.clear(); schedulePivotUpdate();
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::removeSelectedPointsAndClearList()
 {
-    startNewUndoRedoSet();
-
     foreach(MovablePoint *point, mSelectedPoints) {
         point->deselect();
         point->remove();
     }
     mSelectedPoints.clear(); schedulePivotUpdate();
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::removeSelectedBoxesAndClearList()
 {
-    startNewUndoRedoSet();
-
     foreach(BoundingBox *box, mSelectedBoxes) {
         removeChild(box);
         box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
-
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::clearPointsSelection()
@@ -934,24 +820,19 @@ void BoxesGroup::sortSelectedBoxesByZAscending() {
 }
 
 void BoxesGroup::raiseSelectedBoxesToTop() {
-    startNewUndoRedoSet();
     BoundingBox *box;
     foreachInverted(box, mSelectedBoxes) {
         box->bringToFront();
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::lowerSelectedBoxesToBottom() {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->bringToEnd();
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::lowerSelectedBoxes() {
-    startNewUndoRedoSet();
     BoundingBox *box;
     int lastZ = -10000;
     bool lastBoxChanged = true;
@@ -963,11 +844,9 @@ void BoxesGroup::lowerSelectedBoxes() {
         lastZ = boxZ;
         lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::raiseSelectedBoxes() {
-    startNewUndoRedoSet();
     int lastZ = -10000;
     bool lastBoxChanged = true;
     foreach(BoundingBox *box, mSelectedBoxes) {
@@ -978,7 +857,6 @@ void BoxesGroup::raiseSelectedBoxes() {
         lastZ = boxZ;
         lastBoxChanged = boxZ - box->getZIndex() != 0;
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::deselectAllBoxes() {
@@ -1003,18 +881,13 @@ void BoxesGroup::connectPoints()
         }
     }
     if(selectedPathPoints.count() == 2) {
-        startNewUndoRedoSet();
 
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
         if(firstPoint->isEndPoint() && secondPoint->isEndPoint()) {
             firstPoint->connectToPoint(secondPoint);
-        }
-        finishUndoRedoSet();
-        
+        }        
     }
-
-    callUpdateSchedulers();
 }
 
 void BoxesGroup::disconnectPoints()
@@ -1026,17 +899,10 @@ void BoxesGroup::disconnectPoints()
         }
     }
     if(selectedPathPoints.count() == 2) {
-        startNewUndoRedoSet();
-
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
         firstPoint->disconnectFromPoint(secondPoint);
-
-        finishUndoRedoSet();
-        
     }
-
-    callUpdateSchedulers();
 }
 
 void BoxesGroup::mergePoints()
@@ -1048,32 +914,20 @@ void BoxesGroup::mergePoints()
         }
     }
     if(selectedPathPoints.count() == 2) {
-        startNewUndoRedoSet();
-
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
         QPointF sumPos = firstPoint->getAbsolutePos() + secondPoint->getAbsolutePos();
         firstPoint->remove();
-        secondPoint->moveToAbs(sumPos/2);
-
-        finishUndoRedoSet();
-        
+        secondPoint->moveToAbs(sumPos/2);        
     }
-
-    callUpdateSchedulers();
 }
 
 void BoxesGroup::setPointCtrlsMode(CtrlsMode mode) {
-    startNewUndoRedoSet();
     foreach(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
             ( (PathPoint*)point)->setCtrlsMode(mode);
         }
     }
-    finishUndoRedoSet();
-    
-
-    callUpdateSchedulers();
 }
 
 BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
@@ -1104,7 +958,6 @@ MovablePoint *BoxesGroup::getPointAt(QPointF absPos, CanvasMode currentMode) {
 
 void BoxesGroup::finishSelectedPointsTransform()
 {
-    startNewUndoRedoSet();
     if(isRecordingAllPoints() ) {
         QList<BoundingBox*> parentBoxes;
         foreach(MovablePoint *point, mSelectedPoints) {
@@ -1120,7 +973,6 @@ void BoxesGroup::finishSelectedPointsTransform()
             point->finishTransform();
         }
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
@@ -1136,11 +988,9 @@ void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 
 void BoxesGroup::finishSelectedBoxesTransform()
 {
-    startNewUndoRedoSet();
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->finishTransform();
     }
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::cancelSelectedBoxesTransform() {
@@ -1220,7 +1070,6 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) {
         return NULL;
     }
-    startNewUndoRedoSet();
     BoxesGroup *newGroup = new BoxesGroup(this);
     BoundingBox *box;
     foreachInverted(box, mSelectedBoxes) {
@@ -1230,17 +1079,14 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     }
     newGroup->selectAllBoxes();
     mSelectedBoxes.clear(); schedulePivotUpdate();
-    finishUndoRedoSet();
     return newGroup;
 }
 
 void BoxesGroup::addChild(BoundingBox *child)
 {
-    startNewUndoRedoSet();
     child->setParent(this);
     addChildToListAt(mChildren.count(), child);
     if(!mPivotChanged) centerPivotPosition();
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
@@ -1259,11 +1105,9 @@ void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
 }
 
 void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
-    if(saveUndoRedo) startNewUndoRedoSet();
     for(int i = firstId; i <= lastId; i++) {
         mChildren.at(i)->setZListIndex(i, saveUndoRedo);
     }
-    if(saveUndoRedo) finishUndoRedoSet();
 }
 
 void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
@@ -1295,11 +1139,9 @@ void BoxesGroup::removeChild(BoundingBox *child)
     if(index < 0) {
         return;
     }
-    startNewUndoRedoSet();
     removeChildFromList(index);
     child->setParent(NULL);
     if(!mPivotChanged) centerPivotPosition();
-    finishUndoRedoSet();
 }
 
 
@@ -1309,9 +1151,7 @@ void BoxesGroup::increaseChildZInList(BoundingBox *child)
     if(index == mChildren.count() - 1) {
         return;
     }
-    startNewUndoRedoSet();
     moveChildInList(index, index + 1);
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::decreaseChildZInList(BoundingBox *child)
@@ -1320,9 +1160,7 @@ void BoxesGroup::decreaseChildZInList(BoundingBox *child)
     if(index == 0) {
         return;
     }
-    startNewUndoRedoSet();
     moveChildInList(index, index - 1);
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::bringChildToEndList(BoundingBox *child)
@@ -1331,9 +1169,7 @@ void BoxesGroup::bringChildToEndList(BoundingBox *child)
     if(index == mChildren.count() - 1) {
         return;
     }
-    startNewUndoRedoSet();
     moveChildInList(index, mChildren.length() - 1);
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::bringChildToFrontList(BoundingBox *child)
@@ -1342,9 +1178,7 @@ void BoxesGroup::bringChildToFrontList(BoundingBox *child)
     if(index == 0) {
         return;
     }
-    startNewUndoRedoSet();
     moveChildInList(index, 0);
-    finishUndoRedoSet();
 }
 
 void BoxesGroup::moveChildInList(int from, int to, bool saveUndoRedo) {

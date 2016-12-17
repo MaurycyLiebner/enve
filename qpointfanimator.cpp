@@ -65,12 +65,8 @@ qreal QPointFAnimator::getYValue()
 
 void QPointFAnimator::setCurrentValue(QPointF val, bool finish)
 {
-    startNewUndoRedoSet();
-
     mXAnimator.setCurrentValue(val.x(), finish);
     mYAnimator.setCurrentValue(val.y(), finish);
-
-    finishUndoRedoSet();
 }
 
 void QPointFAnimator::incCurrentValue(qreal x, qreal y)
