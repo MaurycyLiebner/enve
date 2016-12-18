@@ -1491,6 +1491,7 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box)
 void VectorPathSvgAttributes::apply(VectorPath *path)
 {
     foreach(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
+        separatePath->applyTransfromation(mCombinedTransform);
         separatePath->apply(path);
     }
 

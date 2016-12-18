@@ -241,6 +241,11 @@ public:
         return mEndPointSet;
     }
 
+    void applyTransfromation(const QMatrix &transformation) {
+        mPoint = transformation.map(mPoint);
+        mEndPoint = transformation.map(mEndPoint);
+        mStartPoint = transformation.map(mStartPoint);
+    }
 private:
     bool mStartPointSet = false;
     QPointF mStartPoint;
@@ -262,9 +267,12 @@ public:
     void apply(VectorPath *path);
 
     void closePath() {
-        mFirstPoint->setStartPoint(mLastPoint->getStartPoint());
-        delete mPoints.takeLast();
-        mLastPoint = mPoints.last();
+        if(mLastPoint->getStartPointEnabled()) {
+            mFirstPoint->setStartPoint(mLastPoint->getStartPoint());
+            delete mPoints.takeLast();
+            mLastPoint = mPoints.last();
+        }
+
         mClosedPath = true;
     }
 
@@ -291,6 +299,12 @@ public:
         QPointF c1((prev.x() + 2*c.x()) / 3, (prev.y() + 2*c.y()) / 3);
         QPointF c2((e.x() + 2*c.x()) / 3, (e.y() + 2*c.y()) / 3);
         cubicTo(c1, c2, e);
+    }
+
+    void applyTransfromation(const QMatrix &transformation) {
+        foreach(SvgPathPoint *point, mPoints) {
+            point->applyTransfromation(transformation);
+        }
     }
 
     void pathArc(qreal rx,
