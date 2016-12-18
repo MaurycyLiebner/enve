@@ -696,7 +696,8 @@ bool getColorFromString(const QString &colorStr, Color *color) {
         if(rx.exactMatch(colorStr)) {
             color->setQColor(QColor(colorStr));
         } else {
-            qDebug() << "getColorFromString: Color format not recognised";
+            qDebug() << "getColorFromString: Color format not recognised" <<
+                        endl << colorStr;
             return false;
         }
     }
@@ -726,8 +727,19 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
                           ( (const QString&)capturedTxt.at(9)).toDouble(),
                           ( (const QString&)capturedTxt.at(11)).toDouble());
     } else {
-        qDebug() << "getMatrixFromString - could not extract values from string: "
-                 << endl << matrixStr;
+        QRegExp rx2 = QRegExp("translate\\("
+                             "\\s*(-?\\d+(\\.\\d*)?),"
+                             "\\s*(-?\\d+(\\.\\d*)?)"
+                             "\\)", Qt::CaseInsensitive);
+        if(rx2.exactMatch(matrixStr)) {
+            rx2.indexIn(matrixStr);
+            QStringList capturedTxt = rx2.capturedTexts();
+            matrix.translate(((const QString&)capturedTxt.at(1)).toDouble(),
+                             ((const QString&)capturedTxt.at(3)).toDouble());
+        } else {
+            qDebug() << "getMatrixFromString - could not extract values from string: "
+                     << endl << matrixStr;
+        }
     }
 
     return matrix;
