@@ -172,7 +172,7 @@ static void parseNumbersArray(const QChar *&str, QVarLengthArray<qreal, 8> &poin
     }
 }
 
-bool parsePathDataFast(const QString &dataStr, VectorPath *path)
+bool parsePathDataFast(const QString &dataStr, VectorPathSvgAttributes *attributes)
 {
     qreal x0 = 0, y0 = 0;              // starting point
     qreal x = 0, y = 0;                // current point
@@ -181,8 +181,7 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
     const QChar *str = dataStr.constData();
     const QChar *end = str + dataStr.size();
 
-    PathPoint *firstPointAfterM = NULL;
-    PathPoint *lastAddedPoint = NULL;
+    SvgSeparatePath *lastPath = NULL;
     while (str != end) {
         while (str->isSpace())
             ++str;
@@ -200,13 +199,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
         while (count > 0) {
             qreal offsetX = x;        // correction offsets
             qreal offsetY = y;        // for relative commands
-            if(firstPointAfterM == NULL) {
-                firstPointAfterM = lastAddedPoint;
-            }
             switch (pathElem.unicode()) {
             case 'm': {
-                firstPointAfterM = NULL;
-                lastAddedPoint = NULL;
                 if (count < 2) {
                     num++;
                     count--;
@@ -216,8 +210,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 y = y0 = num[1] + offsetY;
                 num += 2;
                 count -= 2;
-                //path.moveTo(x0, y0);
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
+                lastPath = attributes->newSeparatePath();
+                lastPath->moveTo(QPointF(x0, y0));
 
                  // As per 1.2  spec 8.3.2 The "moveto" commands
                  // If a 'moveto' is followed by multiple pairs of coordinates without explicit commands,
@@ -226,8 +220,6 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
             }
                 break;
             case 'M': {
-                firstPointAfterM = NULL;
-                lastAddedPoint = NULL;
                 if (count < 2) {
                     num++;
                     count--;
@@ -237,8 +229,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 y = y0 = num[1];
                 num += 2;
                 count -= 2;
-                //path.moveTo(x0, y0);
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
+                lastPath = attributes->newSeparatePath();
+                lastPath->moveTo(QPointF(x0, y0));
 
                 // As per 1.2  spec 8.3.2 The "moveto" commands
                 // If a 'moveto' is followed by multiple pairs of coordinates without explicit commands,
@@ -252,11 +244,7 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 y = y0;
                 count--; // skip dummy
                 num++;
-                if(firstPointAfterM != NULL && lastAddedPoint != NULL) {
-                    firstPointAfterM->connectToPoint(lastAddedPoint);
-                    firstPointAfterM = NULL;
-                    lastAddedPoint = NULL;
-                }
+                lastPath->closePath();
             }
                 break;
             case 'l': {
@@ -269,10 +257,7 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 y = num[1] + offsetY;
                 num += 2;
                 count -= 2;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
-                // !!!
+                lastPath->lineTo(QPointF(x, y));
             }
                 break;
             case 'L': {
@@ -285,50 +270,35 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 y = num[1];
                 num += 2;
                 count -= 2;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
-                // !!!
+                lastPath->lineTo(QPointF(x, y));
             }
                 break;
             case 'h': {
                 x = num[0] + offsetX;
                 num++;
                 count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
-                // !!!
+                lastPath->lineTo(QPointF(x, y));
             }
                 break;
             case 'H': {
                 x = num[0];
                 num++;
                 count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
-                // !!!
+                lastPath->lineTo(QPointF(x, y));
             }
                 break;
             case 'v': {
                 y = num[0] + offsetY;
                 num++;
                 count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
-                // !!!
+                lastPath->lineTo(QPointF(x, y));
             }
                 break;
             case 'V': {
                 y = num[0];
                 num++;
                 count--;
-                //path.lineTo(x, y);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(QPointF(x, y), lastAddedPoint);
-                // !!!
+                lastPath->lineTo(QPointF(x, y));
             }
                 break;
             case 'c': {
@@ -342,10 +312,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 QPointF e(num[4] + offsetX, num[5] + offsetY);
                 num += 6;
                 count -= 6;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
+                lastPath->cubicTo(c1, c2, e);
+
                 ctrlPt = c2;
                 x = e.x();
                 y = e.y();
@@ -362,10 +330,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 QPointF e(num[4], num[5]);
                 num += 6;
                 count -= 6;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
+                lastPath->cubicTo(c1, c2, e);
+
                 ctrlPt = c2;
                 x = e.x();
                 y = e.y();
@@ -387,10 +353,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 QPointF e(num[2] + offsetX, num[3] + offsetY);
                 num += 4;
                 count -= 4;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
+                lastPath->cubicTo(c1, c2, e);
+
                 ctrlPt = c2;
                 x = e.x();
                 y = e.y();
@@ -412,10 +376,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 QPointF e(num[2], num[3]);
                 num += 4;
                 count -= 4;
-                //path.cubicTo(c1, c2, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c2, c1, lastAddedPoint);
-                // !!!
+                lastPath->cubicTo(c1, c2, e);
+
                 ctrlPt = c2;
                 x = e.x();
                 y = e.y();
@@ -431,12 +393,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 QPointF e(num[2] + offsetX, num[3] + offsetY);
                 num += 4;
                 count -= 4;
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
+                lastPath->quadTo(c, e);
+
                 ctrlPt = c;
                 x = e.x();
                 y = e.y();
@@ -452,12 +410,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 QPointF e(num[2], num[3]);
                 num += 4;
                 count -= 4;
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
+                lastPath->quadTo(c, e);
+
                 ctrlPt = c;
                 x = e.x();
                 y = e.y();
@@ -478,12 +432,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                     c = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
                 else
                     c = QPointF(x, y);
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
+                lastPath->quadTo(c, e);
+
                 ctrlPt = c;
                 x = e.x();
                 y = e.y();
@@ -504,12 +454,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                     c = QPointF(2*x-ctrlPt.x(), 2*y-ctrlPt.y());
                 else
                     c = QPointF(x, y);
-                //path.quadTo(c, e);
-                // !!!
-                lastAddedPoint = path->addPointRelPos(e, c,
-                                                      QPointF(0.f, 0.f),
-                                                      lastAddedPoint);
-                // !!!
+                lastPath->quadTo(c, e);
+
                 ctrlPt = c;
                 x = e.x();
                 y = e.y();
@@ -531,8 +477,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 count -= 7;
                 qreal curx = x;
                 qreal cury = y;
-                //pathArc(path, rx, ry, xAxisRotation, int(largeArcFlag),
-                //        int(sweepFlag), ex, ey, curx, cury);
+                lastPath->pathArc(rx, ry, xAxisRotation, int(largeArcFlag),
+                                  int(sweepFlag), ex, ey, curx, cury);
 
                 x = ex;
                 y = ey;
@@ -554,8 +500,8 @@ bool parsePathDataFast(const QString &dataStr, VectorPath *path)
                 count -= 7;
                 qreal curx = x;
                 qreal cury = y;
-                //pathArc(path, rx, ry, xAxisRotation, int(largeArcFlag),
-                //        int(sweepFlag), ex, ey, curx, cury);
+                lastPath->pathArc(rx, ry, xAxisRotation, int(largeArcFlag),
+                                  int(sweepFlag), ex, ey, curx, cury);
 
                 x = ex;
                 y = ey;
@@ -691,22 +637,25 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
 }
 
 void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup,
-                    BoundingBoxSvgAttributes *attributes) {
+                    VectorPathSvgAttributes *attributes) {
     VectorPath *vectorPath = new VectorPath(parentGroup);
 
     QString pathStr = pathElement.attribute("d");
-    parsePathDataFast(pathStr, vectorPath);
+    parsePathDataFast(pathStr, attributes);
     attributes->apply(vectorPath);
 }
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
                  BoundingBoxSvgAttributes *parentGroupAttributes) {
-    BoundingBoxSvgAttributes attributes;
-    attributes.loadBoundingBoxAttributes(element);
-    attributes *= (*parentGroupAttributes);
     if(element.tagName() == "g") {
+        BoundingBoxSvgAttributes attributes;
+        attributes.loadBoundingBoxAttributes(element);
+        attributes *= (*parentGroupAttributes);
         loadBoxesGroup(element, parentGroup, &attributes);
     } else if(element.tagName() == "path") {
+        VectorPathSvgAttributes attributes;
+        attributes.loadBoundingBoxAttributes(element);
+        attributes *= (*parentGroupAttributes);
         loadVectorPath(element, parentGroup, &attributes);
     }
 }
@@ -1537,4 +1486,37 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box)
 {
     mStrokeAttributes.apply(box);
     mFillAttributes.apply(box);
+}
+
+void VectorPathSvgAttributes::apply(VectorPath *path)
+{
+    foreach(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
+        separatePath->apply(path);
+    }
+
+    BoundingBoxSvgAttributes::apply((BoundingBox*)path);
+}
+
+void SvgSeparatePath::apply(VectorPath *path)
+{
+    PathPoint *lastPoint = NULL;
+    PathPoint *firstPoint = NULL;
+    foreach(SvgPathPoint *point, mPoints) {
+        PathPoint *newPoint = new PathPoint(path);
+        if(firstPoint == NULL) firstPoint = newPoint;
+        path->addPoint(newPoint, lastPoint);
+        newPoint->setRelativePos(point->getPoint());
+        newPoint->setCtrlsMode(point->getCtrlsMode());
+
+        newPoint->moveEndCtrlPtToRelPos(point->getEndPoint());
+        newPoint->setEndCtrlPtEnabled(point->getEndPointEnabled());
+
+        newPoint->moveStartCtrlPtToRelPos(point->getStartPoint());
+        newPoint->setStartCtrlPtEnabled(point->getStartPointEnabled());
+
+        lastPoint = newPoint;
+    }
+    if(mClosedPath) {
+        lastPoint->connectToPoint(firstPoint);
+    }
 }

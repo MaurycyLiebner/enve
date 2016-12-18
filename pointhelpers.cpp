@@ -49,6 +49,14 @@ bool isZero(qreal val) {
     return qAbs(val) < 0.0001;
 }
 
+bool isZero2Dec(qreal val) {
+    return qAbs(val) < 0.01;
+}
+
+bool isZero1Dec(qreal val) {
+    return qAbs(val) < 0.1;
+}
+
 bool isPointZero(QPointF pos) {
     return pointToLen(pos) < 0.0001;
 }

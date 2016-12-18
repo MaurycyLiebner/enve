@@ -35,6 +35,10 @@ extern qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x);
 
 extern bool isZero(qreal val);
 
+extern bool isZero2Dec(qreal val);
+
+extern bool isZero1Dec(qreal val);
+
 extern QString boolToSql(bool bT);
 
 #endif // POINTHELPERS_H
