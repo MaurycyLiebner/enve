@@ -1,6 +1,8 @@
 #include "boxeslistwidget.h"
 #include "mainwindow.h"
 #include "boxitemwidgetcontainer.h"
+#include "boxesgroupwidgetcontainer.h"
+#include "boxesgroup.h"
 
 QPixmap *BoxesListWidget::VISIBLE_PIXMAP;
 QPixmap *BoxesListWidget::INVISIBLE_PIXMAP;
@@ -107,7 +109,19 @@ void BoxesListWidget::getKeysInRect(QRectF selectionRect, int viewedTop,
 
 void BoxesListWidget::addItemForBox(BoundingBox *box)
 {
-    BoxItemWidgetContainer *itemWidgetContainer = new BoxItemWidgetContainer(box, this);
+    BoxItemWidgetContainer *itemWidgetContainer;
+    if(box->isGroup()) {
+        BoxesGroup *group = (BoxesGroup*)box;
+        itemWidgetContainer = new BoxesGroupWidgetContainer(group, this);
+        connect(group, &BoxesGroup::addBoundingBoxSignal,
+                (BoxesGroupWidgetContainer*)itemWidgetContainer,
+                &BoxesGroupWidgetContainer::addWidgetForChildBox);
+        connect(group, &BoxesGroup::removeBoundingBoxSignal,
+                (BoxesGroupWidgetContainer*)itemWidgetContainer,
+                &BoxesGroupWidgetContainer::removeWidgetForChildBox);
+    } else {
+        itemWidgetContainer = new BoxItemWidgetContainer(box, this);
+    }
     mBoxesLayout->insertWidget(0, itemWidgetContainer);
     mBoxWidgetContainers << itemWidgetContainer;
 }

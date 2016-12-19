@@ -10,10 +10,11 @@ class WidgetContainer : public QWidget
 public:
     WidgetContainer(QWidget *parent = 0);
 
-    void setTopWidget(QWidget *widget);
-    void addChildWidget(QWidget *widget);
     void setDetailsVisible(bool visible);
 protected:
+    void setTopWidget(QWidget *widget);
+    void addChildWidget(QWidget *widget);
+
     QVBoxLayout *mAllLayout;
     QWidget *mDetailsWidget;
     QVBoxLayout *mChildWidgetsLayout;

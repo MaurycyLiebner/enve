@@ -91,7 +91,8 @@ SOURCES += main.cpp\
     BoxesList/complexanimatoritemwidgetcontainer.cpp \
     BoxesList/boxitemwidgetcontainer.cpp \
     BoxesList/boxitemwidget.cpp \
-    animator.cpp
+    animator.cpp \
+    BoxesList/boxesgroupwidgetcontainer.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -169,4 +170,5 @@ HEADERS  += mainwindow.h \
     BoxesList/complexanimatoritemwidgetcontainer.h \
     BoxesList/boxitemwidgetcontainer.h \
     BoxesList/boxitemwidget.h \
-    animator.h
+    animator.h \
+    BoxesList/boxesgroupwidgetcontainer.h

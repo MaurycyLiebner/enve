@@ -27,7 +27,7 @@ public:
 public slots:
     void addAnimatorWidgetForAnimator(QrealAnimator *animator);
     void removeAnimatorWidgetForAnimator(QrealAnimator *animator);
-private:
+protected:
     void addAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget);
     void removeAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget);
 
