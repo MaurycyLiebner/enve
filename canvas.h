@@ -192,6 +192,8 @@ public:
     void setPivotPositionForSelected();
     void scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
 
+    void awaitUpdate() {}
+
     void saveToSql();
     void loadAllBoxesFromSql(bool loadInBox);
     void clearAll();

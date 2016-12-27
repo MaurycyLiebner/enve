@@ -47,8 +47,6 @@ void ImageBox::draw(QPainter *p)
     if(mVisible) {
         p->save();
 
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
-
         p->setTransform(QTransform(mCombinedTransformMatrix) );
         p->drawPixmap(0, 0, mPixmap);
 

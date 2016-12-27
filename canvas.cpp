@@ -7,7 +7,6 @@
 #include "mainwindow.h"
 #include "updatescheduler.h"
 #include "pathpivot.h"
-#include "boxeslist.h"
 #include "imagebox.h"
 
 bool Canvas::mEffectsPaintEnabled = true;

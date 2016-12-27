@@ -384,28 +384,33 @@ private:
 class MoveChildInListUndoRedo : public UndoRedo
 {
 public:
-    MoveChildInListUndoRedo(int fromIndex,
+    MoveChildInListUndoRedo(BoundingBox *child,
+                            int fromIndex,
                             int toIndex,
                             BoxesGroup *parentBox) : UndoRedo("MoveChildInListUndoRedo") {
         mParentBox = parentBox;
         mParentBox->incNumberPointers();
         mFromIndex = fromIndex;
         mToIndex = toIndex;
+        mChild = child;
+        mChild->incNumberPointers();
     }
 
     ~MoveChildInListUndoRedo() {
         mParentBox->decNumberPointers();
+        mChild->decNumberPointers();
     }
 
     void redo() {
-        mParentBox->moveChildInList(mFromIndex, mToIndex, false);
+        mParentBox->moveChildInList(mChild, mFromIndex, mToIndex, false);
     }
 
     void undo() {
-        mParentBox->moveChildInList(mToIndex, mFromIndex, false);
+        mParentBox->moveChildInList(mChild, mToIndex, mFromIndex, false);
     }
 private:
     BoxesGroup *mParentBox;
+    BoundingBox *mChild;
     int mFromIndex;
     int mToIndex;
 };

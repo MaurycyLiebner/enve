@@ -4,7 +4,6 @@
 #include <QApplication>
 #include "mainwindow.h"
 #include "animationdockwidget.h"
-#include "boxeslist.h"
 #include <QMenu>
 #include "qrealanimatorvalueslider.h"
 #include <QWidgetAction>

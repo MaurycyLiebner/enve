@@ -76,7 +76,7 @@ void TextBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     if(mVisible) {
         p->save();
-
+        drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
 

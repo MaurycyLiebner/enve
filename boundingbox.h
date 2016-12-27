@@ -59,9 +59,9 @@ public:
 
     virtual void centerPivotPosition(bool finish = false) { Q_UNUSED(finish); }
     virtual bool isContainedIn(QRectF absRect);
-    virtual QRectF getPixBoundingRect() { return QRectF(); }
+    virtual QRectF getPixBoundingRect();
 
-    virtual void drawPixmap(QPainter *p);
+    void drawPixmap(QPainter *p);
     virtual void render(QPainter *) {}
     virtual void renderFinal(QPainter *) {}
     virtual void draw(QPainter *) {}
@@ -201,10 +201,10 @@ public:
     virtual VectorPath *objectToPath() { return NULL; }
     virtual void loadFromSql(int boundingBoxId);
 
-    virtual void updatePixmaps() {}
+    virtual void updatePixmaps();
     void updatePrettyPixmap();
     void setAwaitingUpdate(bool bT);
-    void awaitUpdate();
+    virtual void awaitUpdate();
     QRectF getBoundingRectClippedToView();
     void saveOldPixmap();
 
@@ -237,6 +237,13 @@ public:
     void selectionChangeTriggered(bool shiftPressed);
     void addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container);
     QrealAnimator *getAnimatorsCollection();
+
+    bool isAnimated() { return mAnimated; }
+    void setAnimated(bool bT);
+    virtual void updateBoundingRect() {}
+    void updatePixBoundingRectClippedToView();
+    const QPainterPath &getBoundingRectPath();
+    QMatrix getRelativeTransform() const;
 protected:
     bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;
@@ -300,6 +307,7 @@ protected:
     QList<QrealAnimator*> mActiveAnimators;
 
     QList<PixmapEffect*> mEffects;
+    bool mAnimated = false;
 signals:
     void addActiveAnimatorSignal(QrealAnimator*);
     void removeActiveAnimatorSignal(QrealAnimator*);

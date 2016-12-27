@@ -35,9 +35,9 @@ BoxesListWidget::BoxesListWidget(QWidget *parent) : QWidget(parent)
     Canvas *canvas = MainWindow::getInstance()->getCanvas();
     connect(canvas, SIGNAL(changeChildZSignal(int,int)),
             this, SLOT(changeItemZ(int,int)));
-    connect(canvas, SIGNAL(addBoundingBoxSignal(BoundingBox*)),
+    connect(canvas, SIGNAL(addAnimatedBoundingBoxSignal(BoundingBox*)),
             this, SLOT(addItemForBox(BoundingBox*)));
-    connect(canvas, SIGNAL(removeBoundingBoxSignal(BoundingBox*)),
+    connect(canvas, SIGNAL(removeAnimatedBoundingBoxSignal(BoundingBox*)),
             this, SLOT(removeItemForBox(BoundingBox*)));
 //    QLabel *label = new QLabel(this);
 //    label->setStyleSheet("background-color: black");
@@ -110,32 +110,49 @@ void BoxesListWidget::getKeysInRect(QRectF selectionRect, int viewedTop,
 void BoxesListWidget::addItemForBox(BoundingBox *box)
 {
     BoxItemWidgetContainer *itemWidgetContainer;
+    int insertIndex = 0;
+    int boxZ = box->getZIndex();
+    foreach(BoxItemWidgetContainer *widget, mBoxWidgetContainers) {
+        int zT = widget->getTargetBox()->getZIndex();
+        if(zT > boxZ) insertIndex++;
+    }
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*)box;
         itemWidgetContainer = new BoxesGroupWidgetContainer(group, this);
-        connect(group, &BoxesGroup::addBoundingBoxSignal,
+        connect(group, &BoxesGroup::addAnimatedBoundingBoxSignal,
                 (BoxesGroupWidgetContainer*)itemWidgetContainer,
                 &BoxesGroupWidgetContainer::addWidgetForChildBox);
-        connect(group, &BoxesGroup::removeBoundingBoxSignal,
+        connect(group, &BoxesGroup::removeAnimatedBoundingBoxSignal,
                 (BoxesGroupWidgetContainer*)itemWidgetContainer,
                 &BoxesGroupWidgetContainer::removeWidgetForChildBox);
     } else {
         itemWidgetContainer = new BoxItemWidgetContainer(box, this);
     }
-    mBoxesLayout->insertWidget(0, itemWidgetContainer);
+    mBoxesLayout->insertWidget(insertIndex, itemWidgetContainer);
     mBoxWidgetContainers << itemWidgetContainer;
 }
 
 void BoxesListWidget::removeItemForBox(BoundingBox *box) {
     foreach(BoxItemWidgetContainer *widget, mBoxWidgetContainers) {
         if(widget->getTargetBox() == box) {
+            mBoxWidgetContainers.removeOne(widget);
             delete widget;
         }
     }
 }
 
 void BoxesListWidget::changeItemZ(int from, int to) {
-    int count = mBoxesLayout->count();
-    mBoxesLayout->insertItem(count - 1 - to,
-                             mBoxesLayout->takeAt(count - 1 - from));
+    BoxItemWidgetContainer *toInsert;
+    int insertIndex = 0;
+    foreach(BoxItemWidgetContainer *widget, mBoxWidgetContainers) {
+        int zT = widget->getTargetBox()->getZIndex();
+        if(zT == to) {
+            toInsert = widget;
+            mBoxesLayout->removeWidget(toInsert);
+            continue;
+        }
+        if(zT > to) insertIndex++;
+    }
+    mBoxesLayout->insertWidget(insertIndex,
+                               toInsert);
 }

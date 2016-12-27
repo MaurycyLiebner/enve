@@ -10,6 +10,7 @@ BlurEffect::BlurEffect(qreal radius) {
     setName("blur");
     mBlurRadius.setName("radius");
     mBlurRadius.blockPointer();
+    mBlurRadius.setValueRange(0., 1000.);
     addChildAnimator(&mBlurRadius);
 }
 

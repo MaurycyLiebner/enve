@@ -25,7 +25,6 @@ public:
     void setSelectedFontFamilyAndStyle(QString family, QString style);
     void setSelectedFontSize(qreal size);
     bool absPointInsidePath(QPointF absPos);
-    QRectF getPixBoundingRect();
     void draw(QPainter *p);
     void render(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
@@ -110,7 +109,9 @@ public:
     void decreaseChildZInList(BoundingBox *child);
     void bringChildToEndList(BoundingBox *child);
     void bringChildToFrontList(BoundingBox *child);
-    void moveChildInList(int from, int to, bool saveUndoRedo = true);
+    void moveChildInList(BoundingBox *child,
+                         int from, int to,
+                         bool saveUndoRedo = true);
     void updateAfterCombinedTransformationChanged();
     void removeChildFromList(int id, bool saveUndoRedo = true);
     void cancelSelectedPointsTransform();
@@ -189,7 +190,7 @@ public:
     void applyBrushEffectToSelected();
     void applyLinesEffectToSelected();
     void applyCirclesEffectToSelected();
-    void drawPixmap(QPainter *p);
+    //void drawPixmap(QPainter *p);
     void updateAllBoxes();
     void handleListItemMouseDoubleClick(qreal boxesListX, qreal relX, qreal relY, QMouseEvent *event);
     void applyCurrentTransformationToSelected();
@@ -199,6 +200,8 @@ public:
     void rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin, bool startTrans);
     int getPointsSelectionCount();
 
+    void setSelectedAnimated(bool animated);
+    void updateBoundingRect();
 protected:
     void sortSelectedBoxesByZAscending();
 
@@ -210,8 +213,8 @@ protected:
     QList<BoundingBox*> mChildren;
 signals:
     void changeChildZSignal(int, int);
-    void removeBoundingBoxSignal(BoundingBox*);
-    void addBoundingBoxSignal(BoundingBox*);
+    void removeAnimatedBoundingBoxSignal(BoundingBox*);
+    void addAnimatedBoundingBoxSignal(BoundingBox*);
 };
 
 #endif // BOXESGROUP_H

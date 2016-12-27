@@ -754,7 +754,7 @@ void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
 void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode) {
     if(mVisible) {
         p->save();
-        //drawBoundingRect(p);
+        drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             //if(mInfluenceEnabled || mShapesEnabled || !mEffects.isEmpty()) {
                 p->save();

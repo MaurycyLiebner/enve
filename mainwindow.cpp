@@ -11,7 +11,6 @@
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "boxeslist.h"
 #include "boxeslistanimationdockwidget.h"
 #include "paintcontroler.h"
 #include "qdoubleslider.h"

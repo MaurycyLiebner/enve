@@ -94,6 +94,26 @@ void BoundingBox::loadFromSql(int boundingBoxId) {
     }
 }
 
+void BoundingBox::updatePixmaps() {
+    if(mRedoUpdate) {
+        mRedoUpdate = false;
+        updateUpdateTransform();
+    }
+
+    updateEffectsMarginIfNeeded();
+    updateBoundingRect();
+
+    BoundingBox::updateAllUglyPixmap();
+    if(mMainWindow->getCanvas()->highQualityPaint()) {
+        updatePrettyPixmap();
+        mHighQualityPaint = true;
+    } else {
+        mHighQualityPaint = false;
+    }
+
+    if(mParent != NULL) mParent->awaitUpdate();
+}
+
 void BoundingBox::updateUpdateTransform() {
     mUpdateCanvasTransform = mMainWindow->getCanvas()->getCombinedTransform();
     mUpdateTransform = mCombinedTransformMatrix;
@@ -150,6 +170,16 @@ void BoundingBox::updateAllBoxes() {
     scheduleAwaitUpdate();
 }
 
+QRectF BoundingBox::getPixBoundingRect()
+{
+    return mPixBoundingRect;
+}
+
+void BoundingBox::updatePixBoundingRectClippedToView() {
+    mPixBoundingRectClippedToView = mPixBoundingRect.intersected(
+                mMainWindow->getCanvasWidget()->rect());
+}
+
 void BoundingBox::updateAllUglyPixmap() {
     QMatrix inverted = mUpdateCanvasTransform.inverted().scale(Canvas::getResolutionPercent(),
                                                                Canvas::getResolutionPercent());
@@ -168,7 +198,6 @@ void BoundingBox::updateAllUglyPixmap() {
     mAllUglyBoundingRect.translate(-transF);
     p.translate(transF);
     p.setTransform(QTransform(mAllUglyTransform), true);
-
 
     draw(&p);
     p.end();
@@ -193,6 +222,7 @@ void BoundingBox::redoUpdate() {
 void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
     p->setCompositionMode(mCompositionMode);
+    p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
     if(mAwaitingUpdate || !mHighQualityPaint) {
         bool paintOld = mUglyPaintTransform.m11() < mOldAllUglyPaintTransform.m11()
                 && mHighQualityPaint;
@@ -204,7 +234,8 @@ void BoundingBox::drawPixmap(QPainter *p) {
             QRegion clipRegion;
             clipRegion = clipMatrix.map(clipRegion.united(mOldPixmap.rect()));
             QRegion clipRegion2;
-            clipRegion2 = clipRegion2.united(QRect(-100000, -100000, 200000, 200000));
+            clipRegion2 = clipRegion2.united(QRect(-100000, -100000,
+                                                   200000, 200000));
             clipRegion = clipRegion2.subtracted(clipRegion);
 
             p->setClipRegion(clipRegion);
@@ -225,7 +256,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
 
     p->restore();
 
-    if(mSelected) drawBoundingRect(p);
+    //if(mSelected) drawBoundingRect(p);
 }
 
 void BoundingBox::awaitUpdate() {
@@ -374,6 +405,17 @@ void BoundingBox::addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer
     }
 }
 
+void BoundingBox::setAnimated(bool bT) {
+    mAnimated = bT;
+    if(mParent != NULL) {
+        if(mAnimated) {
+            emit mParent->addAnimatedBoundingBoxSignal(this);
+        } else {
+            emit mParent->removeAnimatedBoundingBoxSignal(this);
+        }
+    }
+}
+
 void BoundingBox::deselect() {
     mSelected = false;
 }
@@ -421,8 +463,16 @@ void BoundingBox::drawBoundingRect(QPainter *p) {
     drawAsBoundingRect(p, mBoundingRect);
 }
 
+const QPainterPath &BoundingBox::getBoundingRectPath() {
+    return mBoundingRect;
+}
+
 QMatrix BoundingBox::getCombinedTransform() const {
     return mCombinedTransformMatrix;
+}
+
+QMatrix BoundingBox::getRelativeTransform() const {
+    return mRelativeTransformMatrix;
 }
 
 void BoundingBox::applyTransformation(TransformAnimator *transAnimator) {

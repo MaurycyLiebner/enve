@@ -2,7 +2,6 @@
 #include "mainwindow.h"
 #include "updatescheduler.h"
 #include <QApplication>
-#include "boxeslist.h"
 
 ConnectedToMainWindow::ConnectedToMainWindow() :
     SmartPointerTarget()

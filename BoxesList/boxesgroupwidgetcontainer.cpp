@@ -35,10 +35,10 @@ void BoxesGroupWidgetContainer::addWidgetForChildBox(BoundingBox *box)
         BoxesGroup *group = (BoxesGroup*)box;
         boxContainer = new BoxesGroupWidgetContainer(group,
                                                      this);
-        connect(group, &BoxesGroup::addBoundingBoxSignal,
+        connect(group, &BoxesGroup::addAnimatedBoundingBoxSignal,
                 (BoxesGroupWidgetContainer*)boxContainer,
                 &BoxesGroupWidgetContainer::addWidgetForChildBox);
-        connect(group, &BoxesGroup::removeBoundingBoxSignal,
+        connect(group, &BoxesGroup::removeAnimatedBoundingBoxSignal,
                 (BoxesGroupWidgetContainer*)boxContainer,
                 &BoxesGroupWidgetContainer::removeWidgetForChildBox);
     } else {

@@ -354,6 +354,12 @@ void BoxesGroup::startFillColorTransform()
     }
 }
 
+void BoxesGroup::setSelectedAnimated(bool animated) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setAnimated(animated);
+    }
+}
+
 void BoxesGroup::setSelectedStrokeWidth(qreal strokeWidth, bool finish) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeWidth(strokeWidth, finish);
@@ -381,37 +387,35 @@ void BoxesGroup::startSelectedFillColorTransform()
     }
 }
 
-QRectF BoxesGroup::getPixBoundingRect()
-{
-    QRectF rect;
-    foreach(BoundingBox *box, mChildren) {
-        rect = rect.united(box->getPixBoundingRect());
+void BoxesGroup::updateBoundingRect() {
+    QPainterPath boundingPaths = QPainterPath();
+    foreach(BoundingBox *child, mChildren) {
+        boundingPaths.addPath(
+                    child->getRelativeTransform().
+                    map(child->getBoundingRectPath()));
     }
-    return rect;
+    QRectF boundingPathsRect = boundingPaths.boundingRect().
+                    adjusted(-mEffectsMargin, -mEffectsMargin,
+                             mEffectsMargin, mEffectsMargin);
+    mBoundingRect = QPainterPath();
+    mBoundingRect.addRect(boundingPathsRect);
+
+    mPixBoundingRect = mUpdateTransform.mapRect(boundingPathsRect);
+    mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
+    updatePixBoundingRectClippedToView();
 }
 
 void BoxesGroup::draw(QPainter *p)
 {
     if(mVisible) {
         p->save();
-
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
+        p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
         foreach(BoundingBox *box, mChildren) {
-            box->draw(p);
+            //box->draw(p);
+            box->drawPixmap(p);
         }
 
         p->restore();
-    }
-}
-
-void BoxesGroup::drawPixmap(QPainter *p) {
-    if(mEffects.isEmpty()) {
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
-        foreach(BoundingBox *box, mChildren) {
-            box->drawPixmap(p);
-        }
-    } else {
-
     }
 }
 
@@ -420,7 +424,6 @@ void BoxesGroup::render(QPainter *p)
     if(mVisible) {
         p->save();
 
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
         foreach(BoundingBox *box, mChildren){
             box->render(p);
         }
@@ -434,7 +437,6 @@ void BoxesGroup::renderFinal(QPainter *p)
     if(mVisible) {
         p->save();
 
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01 );
         foreach(BoundingBox *box, mChildren){
             box->renderFinal(p);
         }
@@ -444,15 +446,22 @@ void BoxesGroup::renderFinal(QPainter *p)
 }
 
 void BoxesGroup::drawBoundingRect(QPainter *p) {
-    QPen pen = p->pen();
+    p->save();
+
+    QPen pen;
     if(mIsCurrentGroup) {
-        p->setPen(QPen(QColor(255, 0, 0, 125), 1.f, Qt::DashLine));
+        pen = QPen(QColor(255, 0, 0, 125), 1.f, Qt::DashLine);
     } else {
-        p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
+        pen = QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine);
     }
-    p->setBrush(Qt::NoBrush);
-    p->drawRect(getPixBoundingRect());
+    pen.setCosmetic(true);
     p->setPen(pen);
+    p->setBrush(Qt::NoBrush);
+
+    p->setTransform(QTransform(mCombinedTransformMatrix), true);
+    p->drawPath(mBoundingRect);
+
+    p->restore();
 }
 
 void BoxesGroup::setIsCurrentGroup(bool bT)
@@ -1097,7 +1106,9 @@ void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRe
     }
     child->incNumberPointers();
 
-    emit addBoundingBoxSignal(child);
+    if(child->isAnimated()) {
+        emit addAnimatedBoundingBoxSignal(child);
+    }
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -1130,7 +1141,9 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
 
     box->decNumberPointers();
 
-    emit removeBoundingBoxSignal(box);
+    if(box->isAnimated()) {
+        emit removeAnimatedBoundingBoxSignal(box);
+    }
 }
 
 void BoxesGroup::removeChild(BoundingBox *child)
@@ -1151,7 +1164,7 @@ void BoxesGroup::increaseChildZInList(BoundingBox *child)
     if(index == mChildren.count() - 1) {
         return;
     }
-    moveChildInList(index, index + 1);
+    moveChildInList(child, index, index + 1);
 }
 
 void BoxesGroup::decreaseChildZInList(BoundingBox *child)
@@ -1160,7 +1173,7 @@ void BoxesGroup::decreaseChildZInList(BoundingBox *child)
     if(index == 0) {
         return;
     }
-    moveChildInList(index, index - 1);
+    moveChildInList(child, index, index - 1);
 }
 
 void BoxesGroup::bringChildToEndList(BoundingBox *child)
@@ -1169,7 +1182,7 @@ void BoxesGroup::bringChildToEndList(BoundingBox *child)
     if(index == mChildren.count() - 1) {
         return;
     }
-    moveChildInList(index, mChildren.length() - 1);
+    moveChildInList(child, index, mChildren.length() - 1);
 }
 
 void BoxesGroup::bringChildToFrontList(BoundingBox *child)
@@ -1178,17 +1191,21 @@ void BoxesGroup::bringChildToFrontList(BoundingBox *child)
     if(index == 0) {
         return;
     }
-    moveChildInList(index, 0);
+    moveChildInList(child, index, 0);
 }
 
-void BoxesGroup::moveChildInList(int from, int to, bool saveUndoRedo) {
+void BoxesGroup::moveChildInList(BoundingBox *child,
+                                 int from, int to,
+                                 bool saveUndoRedo) {
     mChildren.move(from, to);
     updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
     if(saveUndoRedo) {
-        addUndoRedo(new MoveChildInListUndoRedo(from, to, this) );
+        addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }
 
-    emit changeChildZSignal(from, to);
+    if(child->isAnimated()) {
+        emit changeChildZSignal(from, to);
+    }
 }
 
 void BoxesGroup::updateAfterCombinedTransformationChanged()

@@ -6,7 +6,6 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QLabel>
-#include "boxeslist.h"
 #include "animatonwidgetscrollbar.h"
 #include "keysview.h"
 #include "BoxesList/boxeslistwidget.h"
@@ -15,6 +14,29 @@
 #include <QApplication>
 #include <QScrollBar>
 #include <QComboBox>
+
+class ChangeWidthWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    ChangeWidthWidget(QWidget *boxesList, QWidget *parent = 0);
+
+    void updatePos();
+
+    void paintEvent(QPaintEvent *) {
+        QPainter p(this);
+        if(mouseGrabber() == this) {
+            p.fillRect(rect(), Qt::black);
+        }
+        p.end();
+    }
+
+    void mouseMoveEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+private:
+    int mPressX;
+    QWidget *mBoxesList;
+};
 
 class AnimationDockWidget;
 

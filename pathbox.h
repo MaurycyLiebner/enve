@@ -9,7 +9,6 @@ public:
     PathBox(BoxesGroup *parent, BoundingBoxType type);
     ~PathBox();
 
-    QRectF getPixBoundingRect();
     void draw(QPainter *p);
 
     void schedulePathUpdate();
@@ -181,9 +180,8 @@ public:
     void setOutlineAffectedByScale(bool bT);
     int saveToSql(int parentId);
     void loadFromSql(int boundingBoxId);
-    virtual void updateBoundingRect();
+    void updateBoundingRect();
     void updatePixmaps();
-    void updatePixBoundingRectClippedToView();
 
     void afterSuccessfulUpdate();
 

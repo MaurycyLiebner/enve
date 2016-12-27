@@ -1,6 +1,5 @@
 #include "transformanimator.h"
 #include "undoredo.h"
-#include "boxeslist.h"
 #include <QDebug>
 
 TransformAnimator::TransformAnimator() : ComplexAnimator()

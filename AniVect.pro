@@ -43,7 +43,6 @@ SOURCES += main.cpp\
     gradientpoint.cpp \
     svgimporter.cpp \
     boundingboxlistitem.cpp \
-    boxeslist.cpp \
     transformable.cpp \
     qrealanimator.cpp \
     qpointfanimator.cpp \
@@ -123,7 +122,6 @@ HEADERS  += mainwindow.h \
     Colors/ColorWidgets/glwidget.h \
     gradientpoint.h \
     svgimporter.h \
-    boxeslist.h \
     transformable.h \
     qrealanimator.h \
     qpointfanimator.h \

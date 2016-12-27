@@ -130,6 +130,8 @@ void PathBox::updatePixmaps() {
     } else {
         mHighQualityPaint = false;
     }
+
+    if(mParent != NULL) mParent->awaitUpdate();
 }
 
 void PathBox::schedulePathUpdate()
@@ -233,9 +235,14 @@ void PathBox::updateDrawGradients()
     }
 }
 
-void PathBox::updatePixBoundingRectClippedToView() {
-    mPixBoundingRectClippedToView = mPixBoundingRect.intersected(
-                mMainWindow->getCanvasWidget()->rect());
+void PathBox::updateBoundingRect() {
+    QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
+                                                                mEffectsMargin, mEffectsMargin);
+    mPixBoundingRect = mUpdateTransform.mapRect(relBoundingRect);
+    mBoundingRect = QPainterPath();
+    mBoundingRect.addRect(relBoundingRect);
+    mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
+    updatePixBoundingRectClippedToView();
 }
 
 void PathBox::afterSuccessfulUpdate()
@@ -253,21 +260,6 @@ void PathBox::updateUpdateTransform()
     mPathUpdateNeeded = false;
     mOutlinePathUpdateNeeded = false;
     BoundingBox::updateUpdateTransform();
-}
-
-void PathBox::updateBoundingRect() {
-    QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
-                                                                mEffectsMargin, mEffectsMargin);
-    mPixBoundingRect = mUpdateTransform.mapRect(relBoundingRect);
-    mBoundingRect = QPainterPath();
-    mBoundingRect.addRect(relBoundingRect);
-    mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
-    updatePixBoundingRectClippedToView();
-}
-
-QRectF PathBox::getPixBoundingRect()
-{
-    return mPixBoundingRect;
 }
 
 void PathBox::render(QPainter *p) {
@@ -341,7 +333,6 @@ void PathBox::draw(QPainter *p)
     if(mVisible) {
         p->save();
 
-        p->setOpacity(p->opacity()*mTransformAnimator.getOpacity()*0.01);
         p->setPen(Qt::NoPen);
         if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawFillGradient);

@@ -2,7 +2,6 @@
 #include "qrealkey.h"
 #include <QPainter>
 #include "mainwindow.h"
-#include "boxeslist.h"
 
 KeysView::KeysView(BoxesListWidget *boxesList, QWidget *parent) : QWidget(parent)
 {

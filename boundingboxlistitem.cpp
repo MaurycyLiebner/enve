@@ -1,5 +1,4 @@
 #include "boundingbox.h"
-#include "boxeslist.h"
 #include "boxesgroup.h"
 #include "undoredo.h"
 #include <QPainter>
