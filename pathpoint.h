@@ -145,20 +145,6 @@ private:
     VectorPathShape *mShape = NULL;
 };
 
-struct PosExpectation {
-    PosExpectation(QPointF posT, qreal influenceT) {
-        pos = posT;
-        influence = influenceT;
-    }
-
-    QPointF getPosMultByInf() {
-        return pos*influence;
-    }
-
-    QPointF pos;
-    qreal influence;
-};
-
 class PathPointAnimators : public ComplexAnimator {
 public:
     PathPointAnimators() : ComplexAnimator() {
@@ -168,9 +154,7 @@ public:
     void setAllVars(PathPoint *parentPathPointT,
                     QPointFAnimator *endPosAnimatorT,
                     QPointFAnimator *startPosAnimatorT,
-                    QPointFAnimator *pathPointPosAnimatorT,
-                    QrealAnimator *influenceAnimatorT,
-                    QrealAnimator *influenceTAnimatorT) {
+                    QPointFAnimator *pathPointPosAnimatorT) {
         parentPathPoint = parentPathPointT;
         endPosAnimator = endPosAnimatorT;
         endPosAnimator->setName("ctrl pt 1 pos");
@@ -178,20 +162,6 @@ public:
         startPosAnimator->setName("ctrl pt 2 pos");
         pathPointPosAnimator = pathPointPosAnimatorT;
         pathPointPosAnimator->setName("point pos");
-        influenceAnimatorT->setName("influence");
-        influenceAnimatorT->setValueRange(0., 1.);
-        influenceAnimatorT->setPrefferedValueStep(0.01);
-        influenceTAnimatorT->setName("influence T");
-        influenceTAnimatorT->setValueRange(0., 1.);
-        influenceTAnimatorT->setPrefferedValueStep(0.01);
-
-        influenceAnimatorT->setCurrentValue(1.);
-        influenceTAnimatorT->setCurrentValue(0.5);
-
-        influenceAnimator = influenceAnimatorT;
-        influenceAnimator->incNumberPointers();
-        influenceTAnimator = influenceTAnimatorT;
-        influenceTAnimator->incNumberPointers();
 
         addChildAnimator(pathPointPosAnimator);
         addChildAnimator(endPosAnimator);
@@ -201,24 +171,11 @@ public:
     bool isOfPathPoint(PathPoint *checkPoint) {
         return parentPathPoint == checkPoint;
     }
-
-    void enableInfluenceAnimators() {
-        addChildAnimator(influenceAnimator);
-        addChildAnimator(influenceTAnimator);
-    }
-
-    void disableInfluenceAnimators() {
-        removeChildAnimator(influenceAnimator);
-        removeChildAnimator(influenceTAnimator);
-    }
 private:
     PathPoint *parentPathPoint;
     QPointFAnimator *endPosAnimator;
     QPointFAnimator *startPosAnimator;
     QPointFAnimator *pathPointPosAnimator;
-
-    QrealAnimator *influenceAnimator;
-    QrealAnimator *influenceTAnimator;
 }; 
 
 class PathPoint : public MovablePoint
@@ -234,8 +191,6 @@ public:
     void finishTransform();
 
     void moveBy(QPointF relTranslation);
-
-    QPointF getShapesInfluencedRelPos();
 
     QPointF getStartCtrlPtAbsPos() const;
     QPointF getStartCtrlPtValue() const;
@@ -306,30 +261,14 @@ public:
     void setPointId(int idT);
     int getPointId();
 
-    qreal getCurrentInfluence();
-    qreal getCurrentInfluenceT();
-
     CtrlsMode getCurrentCtrlsMode();
-    bool hasNoInfluence();
-    bool hasFullInfluence();
-    bool hasSomeInfluence();
 
     PathPointValues getPointValues() const;
     void savePointValuesToShapeValues(VectorPathShape *shape);
 
-    void clearInfluenceAdjustedPointValues();
-    PathPointValues getInfluenceAdjustedPointValues();
-    bool updateInfluenceAdjustedPointValues();
-    void setInfluenceAdjustedEnd(QPointF newEnd, qreal infl);
-    void setInfluenceAdjustedStart(QPointF newStart, qreal infl);
-    void finishInfluenceAdjusted();
-    void enableInfluenceAnimators();
-    void disableInfluenceAnimators();
-    QPointF getInfluenceAbsolutePos();
     bool isNeighbourSelected();
     void moveByAbs(QPointF absTranslatione);
     void loadFromSql(int pathPointId, int movablePointId);
-    QPointF getInfluenceRelativePos();
     PathPointValues getShapesInfluencedPointValues() const;
     void removeShapeValues(VectorPathShape *shape);
 
@@ -345,12 +284,6 @@ private:
 
     bool mEditingShape = true;
     PathPointValues mBasisShapeSavedValues;
-
-    bool mStartExternalInfluence = false;
-    QPointF mStartAdjustedForExternalInfluence;
-    bool mEndExternalInfluence = false;
-    QPointF mEndAdjustedForExternalInfluence;
-    PathPointValues mInfluenceAdjustedPointValues;
 
     QrealAnimator mInfluenceAnimator;
     QrealAnimator mInfluenceTAnimator;

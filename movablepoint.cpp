@@ -66,11 +66,10 @@ QPointF MovablePoint::getRelativePos() const
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) const {
-    return mParent->getCombinedTransform().map(relPos);
+    return mParent->mapRelativeToAbsolute(relPos);
 }
 
-QPointF MovablePoint::getAbsolutePos() const
-{
+QPointF MovablePoint::getAbsolutePos() const {
     return mapRelativeToAbsolute(getRelativePos());
 }
 

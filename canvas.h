@@ -107,10 +107,26 @@ public:
             mPoint1->setEndCtrlPtEnabled(true);
         }
 
+
         QPointF p0Pos = mPoint1->getAbsolutePos();
         QPointF p1Pos = mPoint1EndPt->getAbsolutePos();
         QPointF p2Pos = mPoint2StartPt->getAbsolutePos();
         QPointF p3Pos = mPoint2->getAbsolutePos();
+
+        if(!mEditPath) {
+            BoundingBox *parentBox = mPoint1->getParent();
+            PathPointValues p1Values = mPoint1->getShapesInfluencedPointValues();
+            p0Pos = parentBox->getCombinedTransform().map(
+                        p1Values.pointRelPos);
+            p1Pos = parentBox->getCombinedTransform().map(
+                        p1Values.endRelPos);
+            PathPointValues p2Values = mPoint2->getShapesInfluencedPointValues();
+            p2Pos = parentBox->getCombinedTransform().map(
+                        p2Values.startRelPos);
+            p3Pos = parentBox->getCombinedTransform().map(
+                        p2Values.pointRelPos);
+        }
+
         qreal x0 = p0Pos.x();
         qreal y0 = p0Pos.y();
         qreal x1 = p1Pos.x();
@@ -147,11 +163,16 @@ public:
         mPoint2StartPt->startTransform();
     }
 
+    void setEditPath(bool bT) {
+        mEditPath = bT;
+    }
+
 private:
     PathPoint *mPoint1;
     CtrlPoint *mPoint1EndPt;
     PathPoint *mPoint2;
     CtrlPoint *mPoint2StartPt;
+    bool mEditPath = true;
 
     qreal mPressedT;
 };

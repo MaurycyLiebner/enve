@@ -60,39 +60,8 @@ public:
     void startAllPointsTransform();
     void finishAllPointsTransform();
 
-    Edge *getEgde(QPointF absPos);
-
-    void setInfluenceEnabled(bool bT) {
-        if(bT) {
-            enableInfluence();
-        } else {
-            disableInfluence();
-        }
-    }
-
-    void disableInfluence() {
-        mInfluenceEnabled = false;
-
-        foreach(PathPoint *point, mPoints) {
-            point->disableInfluenceAnimators();
-        }
-    }
-
-    void enableInfluence() {
-        mInfluenceEnabled = true;
-        schedulePathUpdate();
-
-        foreach(PathPoint *point, mPoints) {
-            point->enableInfluenceAnimators();
-        }
-    }
-
     void showContextMenu(QPoint globalPos);
 
-    PathPoint *findPointNearestToPercentEditPath(qreal percent, qreal *foundAtPercent);
-    qreal findPercentForPointEditPath(QPointF point, qreal minPercent = 0., qreal maxPercent = 1.);
-    Edge *getEdgeFromEditPath(QPointF absPos);
-    Edge *getEdgeFromPath(QPointF absPos);
     void deletePointAndApproximate(PathPoint *pointToRemove);
     virtual void loadFromSql(int boundingBoxId);
     void saveCurrentPathToShape(VectorPathShape *shape);
@@ -104,13 +73,13 @@ public:
     void cancelEditingShape();
     void addShape(VectorPathShape *shape, bool saveUndoRedo = true);
     void applyTransformToPoints(QMatrix transform);
-    void applyCurrentTransformationToPoints();
+    void applyCurrentTransformation();
+    Edge *getEgde(QPointF absPos);
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 
     QList<VectorPathShape*> mShapes;
 
-    bool mInfluenceEnabled = false;
     void updatePath();
     void updatePathPointIds();
     PathAnimator mPathAnimator;

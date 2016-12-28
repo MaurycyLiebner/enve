@@ -492,23 +492,30 @@ void BoundingBox::rotateBy(qreal rot) {
 }
 
 void BoundingBox::rotateRelativeToSavedPivot(qreal rot) {
-    mTransformAnimator.rotateRelativeToSavedValue(rot, mSavedTransformPivot);
+    mTransformAnimator.rotateRelativeToSavedValue(rot,
+                                                  mSavedTransformPivot);
 }
 
 void BoundingBox::scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy) {
-    mTransformAnimator.scaleRelativeToSavedValue(scaleXBy, scaleYBy, mSavedTransformPivot);
+    mTransformAnimator.scaleRelativeToSavedValue(scaleXBy, scaleYBy,
+                                                 mSavedTransformPivot);
 }
 
 void BoundingBox::scaleRelativeToSavedPivot(qreal scaleBy) {
     scaleRelativeToSavedPivot(scaleBy, scaleBy);
 }
 
+QPointF BoundingBox::mapRelativeToAbsolute(QPointF relPos) const {
+    return getCombinedTransform().map(relPos);
+}
+
 void BoundingBox::moveBy(QPointF trans) {
-    trans /= getCurrentCanvasScale();
+
+    //trans /= getCurrentCanvasScale();
 
     mTransformAnimator.moveRelativeToSavedValue(trans.x(), trans.y());
 
-    //mTransformAnimator.translate(trans.x(), trans.y());
+    // //mTransformAnimator.translate(trans.x(), trans.y());
 }
 
 void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo) {

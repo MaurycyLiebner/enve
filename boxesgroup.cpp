@@ -808,19 +808,35 @@ void BoxesGroup::removePointFromSelection(MovablePoint *point) {
     mSelectedPoints.removeOne(point); schedulePivotUpdate();
 }
 
-void BoxesGroup::clearBoxesSelection()
-{
+void BoxesGroup::clearBoxesSelection() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
 }
 
+void BoxesGroup::applyCurrentTransformation() {
+    QPointF absPivot = getPivotAbsPos();
+    qreal rotation = mTransformAnimator.rot();
+    qreal scaleX = mTransformAnimator.xScale();
+    qreal scaleY = mTransformAnimator.yScale();
+    foreach(BoundingBox *box, mChildren) {
+        box->saveTransformPivot(absPivot);
+        box->startTransform();
+        box->rotateRelativeToSavedPivot(rotation);
+        box->finishTransform();
+        box->startTransform();
+        box->scaleRelativeToSavedPivot(scaleX, scaleY);
+        box->finishTransform();
+    }
+
+    mTransformAnimator.resetRotation(true);
+    mTransformAnimator.resetScale(true);
+}
+
 void BoxesGroup::applyCurrentTransformationToSelected() {
     foreach(BoundingBox *box, mSelectedBoxes) {
-        if(box->isVectorPath()) {
-            ((VectorPath*)box)->applyCurrentTransformationToPoints();
-        }
+        box->applyCurrentTransformation();
     }
 }
 
@@ -1046,6 +1062,7 @@ void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
 
 void BoxesGroup::moveSelectedBoxesBy(QPointF by, bool startTransform)
 {
+    by = mapAbsPosToRel(by) - mapAbsPosToRel(QPointF(0., 0.));
     if(startTransform) {
         foreach(BoundingBox *box, mSelectedBoxes) {
             box->startPosTransform();

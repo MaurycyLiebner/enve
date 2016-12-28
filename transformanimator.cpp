@@ -123,7 +123,8 @@ void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel) {
     mRotAnimator.incSavedValueToCurrentValue(rotRel);
 }
 
-void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel, QPointF pivot) {
+void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel,
+                                                   QPointF pivot) {
     QMatrix matrix;
     matrix.translate(pivot.x(),
                      pivot.y());
@@ -148,7 +149,8 @@ void TransformAnimator::scale(qreal sx, qreal sy)
     mScaleAnimator.multSavedValueToCurrentValue(sx, sy);
 }
 
-void TransformAnimator::scaleRelativeToSavedValue(qreal sx, qreal sy, QPointF pivot)
+void TransformAnimator::scaleRelativeToSavedValue(qreal sx, qreal sy,
+                                                  QPointF pivot)
 {
     QMatrix matrix;
 

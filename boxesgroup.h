@@ -202,6 +202,7 @@ public:
 
     void setSelectedAnimated(bool animated);
     void updateBoundingRect();
+    void applyCurrentTransformation();
 protected:
     void sortSelectedBoxesByZAscending();
 

@@ -71,9 +71,6 @@ public:
 
     void applyTransformation(TransformAnimator *transAnimator);
 
-    void scale(qreal scaleBy, QPointF absOrigin);
-    void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
-
     void rotateBy(qreal rot, QPointF absOrigin);
 
     QPointF getAbsolutePos();
@@ -244,6 +241,9 @@ public:
     void updatePixBoundingRectClippedToView();
     const QPainterPath &getBoundingRectPath();
     QMatrix getRelativeTransform() const;
+    QPointF mapRelativeToAbsolute(QPointF relPos) const;
+
+    virtual void applyCurrentTransformation() {}
 protected:
     bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;
