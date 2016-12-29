@@ -1,6 +1,5 @@
 #include "coloranimator.h"
 #include "Colors/helpers.h"
-#include "boxeslist.h"
 #include <QDebug>
 
 ColorAnimator::ColorAnimator() : ComplexAnimator()

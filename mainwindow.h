@@ -83,6 +83,9 @@ private:
     Canvas *mCanvas;
     CanvasWidget *mCanvasWidget;
     UndoRedoStack mUndoRedoStack;
+    bool mDetachedUndoRedoStack = false;
+    UndoRedoStack *mCurrentUndoRedoStack;
+
     QList<UpdateScheduler*> mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
@@ -122,6 +125,9 @@ public:
     void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
 
     static MainWindow *getInstance();
+
+    void createDetachedUndoRedoStack();
+    void deleteDetachedUndoRedoStack();
 
     UndoRedoStack *getUndoRedoStack();
 
@@ -179,6 +185,7 @@ public:
     void setResolutionPercent(qreal percent);
 
     void setCurrentFrameForAllWidgets(int frame);
+    void updateDisplayedShapesInMenu();
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);

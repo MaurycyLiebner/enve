@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     BrushStroke::loadStrokePixmaps();
+    mCurrentUndoRedoStack = &mUndoRedoStack;
+
     mMainWindowInstance = this;
     //int nThreads = QThread::idealThreadCount();
     mPaintControlerThread = new QThread(this);
@@ -306,6 +308,20 @@ MainWindow *MainWindow::getInstance()
     return mMainWindowInstance;
 }
 
+void MainWindow::createDetachedUndoRedoStack()
+{
+    mCurrentUndoRedoStack = new UndoRedoStack();
+    mCurrentUndoRedoStack->setWindow(this);
+    mDetachedUndoRedoStack = true;
+}
+
+void MainWindow::deleteDetachedUndoRedoStack()
+{
+    mDetachedUndoRedoStack = false;
+    delete mCurrentUndoRedoStack;
+    mCurrentUndoRedoStack = &mUndoRedoStack;
+}
+
 void MainWindow::updateCanvasModeButtonsChecked(CanvasMode currentMode) {
     mMovePathMode->setChecked(currentMode == MOVE_PATH);
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
@@ -433,7 +449,7 @@ void MainWindow::renderOutput()
 
 UndoRedoStack *MainWindow::getUndoRedoStack()
 {
-    return &mUndoRedoStack;
+    return mCurrentUndoRedoStack;
 }
 
 void MainWindow::setFileChangedSinceSaving(bool changed) {
@@ -464,7 +480,7 @@ bool MainWindow::isAltPressed()
 
 void MainWindow::callUpdateSchedulers()
 {
-    mUndoRedoStack.finishSet();
+    mCurrentUndoRedoStack->finishSet();
 
     mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
@@ -481,12 +497,17 @@ void MainWindow::callUpdateSchedulers()
     updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
 
-    mUndoRedoStack.startNewSet();
+    mCurrentUndoRedoStack->startNewSet();
 }
 
 void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
     if(mVectorShapesMenu == NULL) return;
     mVectorShapesMenu->setSelectedBoundingBox(box);
+}
+
+void MainWindow::updateDisplayedShapesInMenu() {
+    if(mVectorShapesMenu == NULL) return;
+    mVectorShapesMenu->updateDisplayedShapes();
 }
 
 FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
@@ -664,9 +685,9 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_Z &&
             isCtrlPressed()) {
         if(isShiftPressed()) {
-            mUndoRedoStack.redo();
+            mCurrentUndoRedoStack->redo();
         } else {
-            mUndoRedoStack.undo();
+            mCurrentUndoRedoStack->undo();
         }
     } else if(isCtrlPressed() && event->key() == Qt::Key_S) {
         saveFile();

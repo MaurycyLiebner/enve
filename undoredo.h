@@ -907,4 +907,28 @@ public:
     }
 };
 
+class ChangePointShapeValuesUndoRedo : public UndoRedo {
+public:
+    ChangePointShapeValuesUndoRedo(PointShapeValues *target,
+                                   const PathPointValues &oldValues,
+                                   const PathPointValues &newValues) :
+        UndoRedo("ChangePointShapeValuesUndoRedo") {
+        mTarget = target;
+        mOldValues = oldValues;
+        mNewValues = newValues;
+    }
+
+    void redo() {
+        mTarget->setPointValues(mNewValues);
+    }
+
+    void undo() {
+        mTarget->setPointValues(mOldValues);
+    }
+private:
+    PointShapeValues *mTarget;
+    PathPointValues mOldValues;
+    PathPointValues mNewValues;
+};
+
 #endif // UNDOREDO_H

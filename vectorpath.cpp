@@ -156,6 +156,10 @@ void VectorPath::addShape(VectorPathShape *shape, bool saveUndoRedo) {
     }
 
     schedulePathUpdate();
+
+    if(mSelected) {
+        getMainWindow()->updateDisplayedShapesInMenu();
+    }
 }
 
 void VectorPath::removeShape(VectorPathShape *shape, bool saveUndoRedo) {
@@ -176,23 +180,29 @@ void VectorPath::removeShape(VectorPathShape *shape, bool saveUndoRedo) {
     }
     shape->decNumberPointers();
 
-
     schedulePathUpdate();
+
+    if(mSelected) {
+        getMainWindow()->updateDisplayedShapesInMenu();
+    }
 }
 
 void VectorPath::editShape(VectorPathShape *shape) {
     foreach(PathPoint *point, mPoints) {
         point->editShape(shape);
     }
+    createDetachedUndoRedoStack();
 }
 
 void VectorPath::finishEditingShape(VectorPathShape *shape) {
+    deleteDetachedUndoRedoStack();
     foreach(PathPoint *point, mPoints) {
         point->finishEditingShape(shape);
     }
 }
 
 void VectorPath::cancelEditingShape() {
+    deleteDetachedUndoRedoStack();
     foreach(PathPoint *point, mPoints) {
         point->cancelEditingShape();
     }
@@ -567,10 +577,11 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode) {
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             p->save();
             p->setBrush(Qt::NoBrush);
-            QPen editPen = QPen(Qt::blue, 1., Qt::DashLine);
+            QPen editPen = QPen(Qt::white, 1., Qt::DashLine);
             editPen.setCosmetic(true);
             p->setPen(editPen);
             p->setTransform(QTransform(mCombinedTransformMatrix), true);
+            p->setCompositionMode(QPainter::CompositionMode_Difference);
             p->drawPath(mEditPath);
             p->restore();
 

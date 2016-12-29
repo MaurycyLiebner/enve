@@ -442,6 +442,9 @@ int PathPoint::getPointId() {
 
 PathPointValues PathPoint::getPointValues() const
 {
+//    if(mEditingShape) {
+//        return mBasisShapeSavedValues;
+//    }
     return PathPointValues(getStartCtrlPtValue(),
                            getRelativePos(),
                            getEndCtrlPtValue() );
@@ -461,15 +464,15 @@ void PathPoint::addShapeValues(VectorPathShape *shape) {
 }
 
 void PathPoint::setPointValues(const PathPointValues &values) {
-    setRelativePos(values.pointRelPos);
-    mEndCtrlPt->setRelativePos(values.endRelPos);
-    mStartCtrlPt->setRelativePos(values.startRelPos);
+    setRelativePos(values.pointRelPos, false);
+    mEndCtrlPt->setRelativePos(values.endRelPos, false);
+    mStartCtrlPt->setRelativePos(values.startRelPos, false);
 }
 
 void PathPoint::editShape(VectorPathShape *shape)
 {
-    mEditingShape = true;
     mBasisShapeSavedValues = getPointValues();
+    mEditingShape = true;
     foreach(PointShapeValues *pointShapeValues, mShapeValues) {
         if(pointShapeValues->getParentShape() == shape) {
             if(shape->isRelative()) {
@@ -518,19 +521,20 @@ void PathPoint::saveInitialPointValuesToShapeValues(VectorPathShape *shape)
 
 void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
 {
+    PathPointValues values;
     if(shape->isRelative()) {
-        foreach(PointShapeValues *pointShapeValues, mShapeValues) {
-            if(pointShapeValues->getParentShape() == shape) {
-                pointShapeValues->setPointValues(getPointValues() - mBasisShapeSavedValues);
-                return;
-            }
-        }
+        values = getPointValues() - mBasisShapeSavedValues;
     } else {
-        foreach(PointShapeValues *pointShapeValues, mShapeValues) {
-            if(pointShapeValues->getParentShape() == shape) {
-                pointShapeValues->setPointValues(getPointValues());
-                return;
-            }
+        values = getPointValues();
+    }
+    foreach(PointShapeValues *pointShapeValues, mShapeValues) {
+        if(pointShapeValues->getParentShape() == shape) {
+            addUndoRedo(new ChangePointShapeValuesUndoRedo(
+                            pointShapeValues,
+                            pointShapeValues->getValues(),
+                            values));
+            pointShapeValues->setPointValues(values);
+            return;
         }
     }
 }
@@ -557,7 +561,11 @@ PathPointValues PathPoint::getShapesInfluencedPointValues() const
         }
     }
     if(nAbs < 1.) {
-        absValues += getPointValues()*(1. - nAbs);
+        if(mEditingShape) {
+            absValues += mBasisShapeSavedValues*(1. - nAbs);
+        } else {
+            absValues += getPointValues()*(1. - nAbs);
+        }
         nAbs = 1.;
     }
     return absValues/nAbs + relativeValues;
@@ -690,6 +698,8 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
 //                    getAbsolutePos();
 //            mStartCtrlPt->setAbsolutePos(newStartCtrlPtPos);
 //            mEndCtrlPt->setAbsolutePos(newEndCtrlPtPos);
+        } else {
+            return;
         }
 
         setCtrlPtEnabled(true, true);

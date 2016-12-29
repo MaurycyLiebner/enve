@@ -22,6 +22,12 @@ public:
     ConnectedToMainWindow();
     ~ConnectedToMainWindow() {}
 
+    void startNewUndoRedoSet();
+    void finishUndoRedoSet();
+
+    void createDetachedUndoRedoStack();
+    void deleteDetachedUndoRedoStack();
+
     void addUndoRedo(UndoRedo *undoRedo);
     void addUpdateScheduler(UpdateScheduler *scheduler);
     void callUpdateSchedulers();

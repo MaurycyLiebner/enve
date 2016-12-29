@@ -1,5 +1,4 @@
 #include "qpointfanimator.h"
-#include "boxeslist.h"
 
 QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 {

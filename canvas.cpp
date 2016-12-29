@@ -490,36 +490,41 @@ void Canvas::updatePivotIfNeeded()
 void Canvas::connectPointsSlot()
 {
     mCurrentBoxesGroup->connectPoints();
+    callUpdateSchedulers();
 }
 
 void Canvas::disconnectPointsSlot()
 {
     mCurrentBoxesGroup->disconnectPoints();
+    callUpdateSchedulers();
 }
 
 void Canvas::mergePointsSlot()
 {
     mCurrentBoxesGroup->mergePoints();
+    callUpdateSchedulers();
 }
 
 void Canvas::makePointCtrlsSymmetric()
 {
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+    callUpdateSchedulers();
 }
 
 void Canvas::makePointCtrlsSmooth()
 {
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+    callUpdateSchedulers();
 }
 
 void Canvas::makePointCtrlsCorner()
 {
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    callUpdateSchedulers();
 }
 
 void Canvas::moveSecondSelectionPoint(QPointF pos) {
     mSelectionRect.setBottomRight(pos);
-
 }
 
 void Canvas::startSelectionAtPoint(QPointF pos) {

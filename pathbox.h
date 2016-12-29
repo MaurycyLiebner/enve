@@ -117,6 +117,10 @@ public:
 
     virtual void setStrokePaintType(PaintType paintType, Color color,
                                     Gradient* gradient) {
+        if(mStrokeSettings.getPaintType() == NOPAINT ||
+           paintType == NOPAINT) {
+            scheduleOutlinePathUpdate();
+        }
         changeStrokeGradient(mStrokeSettings.getPaintType() == GRADIENTPAINT,
                            paintType == GRADIENTPAINT, true);
         if(paintType == GRADIENTPAINT) {
@@ -127,6 +131,7 @@ public:
         mStrokeSettings.setPaintType(paintType);
 
         updateDrawGradients();
+
 
         scheduleAwaitUpdate();
     }

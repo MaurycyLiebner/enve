@@ -9,6 +9,24 @@ ConnectedToMainWindow::ConnectedToMainWindow() :
     mMainWindow = MainWindow::getInstance();
 }
 
+void ConnectedToMainWindow::startNewUndoRedoSet()
+{
+    mMainWindow->getUndoRedoStack()->startNewSet();
+}
+
+void ConnectedToMainWindow::finishUndoRedoSet()
+{
+    mMainWindow->getUndoRedoStack()->finishSet();
+}
+
+void ConnectedToMainWindow::createDetachedUndoRedoStack() {
+    mMainWindow->createDetachedUndoRedoStack();
+}
+
+void ConnectedToMainWindow::deleteDetachedUndoRedoStack() {
+    mMainWindow->deleteDetachedUndoRedoStack();
+}
+
 void ConnectedToMainWindow::addUndoRedo(UndoRedo *undoRedo)
 {
     mMainWindow->getUndoRedoStack()->addUndoRedo(undoRedo);

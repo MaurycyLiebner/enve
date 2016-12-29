@@ -139,7 +139,6 @@ public:
     void setPointValues(const PathPointValues &values) {
         *mValues = values;
     }
-
 private:
     PathPointValues *mValues = NULL;
     VectorPathShape *mShape = NULL;
@@ -282,7 +281,7 @@ public:
 private:
     QList<PointShapeValues*> mShapeValues;
 
-    bool mEditingShape = true;
+    bool mEditingShape = false;
     PathPointValues mBasisShapeSavedValues;
 
     QrealAnimator mInfluenceAnimator;
@@ -292,7 +291,7 @@ private:
     PathPointAnimators mPathPointAnimators;
 
     VectorPath *mVectorPath;
-    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_CORNER;
 
     bool mSeparatePathPoint = false;
     PathPoint *mNextPoint = NULL;

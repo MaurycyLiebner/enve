@@ -43,6 +43,7 @@ public:
     void addShapeWidgetForShape(VectorPathShape *shape);
 
     void setSelected(ShapeWidget *widget);
+    void updateDisplayedShapes();
 signals:
 
 public slots:

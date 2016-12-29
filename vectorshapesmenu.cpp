@@ -147,6 +147,10 @@ void VectorShapesMenu::setSelectedBoundingBox(BoundingBox *box) {
     }
 }
 
+void VectorShapesMenu::updateDisplayedShapes() {
+    setSelectedBoundingBox(mCurrentVectorPath);
+}
+
 void VectorShapesMenu::clearShapes() {
     foreach(ShapeWidget *widget, mShapeWidgets) {
         delete widget;
