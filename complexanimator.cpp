@@ -79,6 +79,12 @@ void ComplexAnimator::startTransform()
     }
 }
 
+void ComplexAnimator::setTransformed(bool bT) {
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        animator->setTransformed(bT);
+    }
+}
+
 void ComplexAnimator::setUpdater(AnimatorUpdater *updater)
 {
     QrealAnimator::setUpdater(updater);

@@ -27,6 +27,7 @@ public:
     void finishTransform();
     void startRotating();
     void startScaling();
+    void startTransform();
 private:
     qreal mLastDRot = 0.;
     int mRotHalfCycles = 0;

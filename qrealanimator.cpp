@@ -830,6 +830,10 @@ void QrealAnimator::cancelTransform() {
     }
 }
 
+void QrealAnimator::setTransformed(bool bT) {
+    mTransformed = bT;
+}
+
 void QrealAnimator::setUpdater(AnimatorUpdater *updater)
 {
     if(mUpdater != NULL) mUpdater->decNumberPointers();

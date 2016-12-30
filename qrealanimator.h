@@ -174,6 +174,7 @@ public:
 
     bool hasKeys();
     void setRecordingWithoutChangingKeys(bool rec, bool saveUndoRedo = true);
+    virtual void setTransformed(bool bT);
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 

@@ -11,6 +11,11 @@ PathPivot::PathPivot(Canvas *parent) :
 //    mRotationPath -= removeEllipse;
 }
 
+void PathPivot::startTransform() {
+    mRelPos.setTransformed(false);
+    MovablePoint::startTransform();
+}
+
 void PathPivot::draw(QPainter *p)
 {
     if(mHidden) {
