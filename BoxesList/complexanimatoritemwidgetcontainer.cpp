@@ -9,6 +9,7 @@ ComplexAnimatorItemWidgetContainer::ComplexAnimatorItemWidgetContainer(QrealAnim
                                                                        QWidget *parent) :
     WidgetContainer(parent)
 {
+    initialize();
     if(target->isComplexAnimator()) {
         mTargetAnimatorWidget = new ComplexAnimatorItemWidget(target, this);
 
@@ -33,15 +34,23 @@ QrealAnimator *ComplexAnimatorItemWidgetContainer::getTargetAnimator() {
 
 void ComplexAnimatorItemWidgetContainer::addChildAnimator(QrealAnimator *animator)
 {
-    ComplexAnimatorItemWidgetContainer *itemWidget = new ComplexAnimatorItemWidgetContainer(animator, this);
+    ComplexAnimatorItemWidgetContainer *itemWidget =
+            new ComplexAnimatorItemWidgetContainer(animator, this);
 
     addChildWidget(itemWidget);
 
     mChildWidgets << itemWidget;
 }
 
-void ComplexAnimatorItemWidgetContainer::removeChildAnimator(QrealAnimator *animator) {
-
+void ComplexAnimatorItemWidgetContainer::removeChildAnimator(
+        QrealAnimator *animator) {
+    foreach(ComplexAnimatorItemWidgetContainer *child, mChildWidgets) {
+        if(child->getTargetAnimator() == animator) {
+            mChildWidgets.removeOne(child);
+            delete child;
+            break;
+        }
+    }
 }
 
 void ComplexAnimatorItemWidgetContainer::drawKeys(QPainter *p, qreal pixelsPerFrame,

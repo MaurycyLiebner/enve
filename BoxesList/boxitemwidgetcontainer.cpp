@@ -6,19 +6,33 @@
 
 BoxItemWidgetContainer::BoxItemWidgetContainer(BoundingBox *target,
                                                QWidget *parent) :
-    WidgetContainer(parent)
-{
+    WidgetContainer(parent) {
     mTargetBoxWidget = new BoxItemWidget(target, this);
+
+}
+
+void BoxItemWidgetContainer::initialize()
+{
+    WidgetContainer::initialize();
     setTopWidget(mTargetBoxWidget);
     connect(mTargetBoxWidget, SIGNAL(detailsVisibilityChanged(bool)),
             mDetailsWidget, SLOT(setVisible(bool)));
 
+    BoundingBox *target = mTargetBoxWidget->getTargetBox();
     target->addAllAnimatorsToBoxItemWidgetContainer(this);
 
     connect(target, SIGNAL(addActiveAnimatorSignal(QrealAnimator*)),
             this, SLOT(addAnimatorWidgetForAnimator(QrealAnimator*)));
     connect(target, SIGNAL(removeActiveAnimatorSignal(QrealAnimator*)),
             this, SLOT(removeAnimatorWidgetForAnimator(QrealAnimator*)));
+}
+
+BoxItemWidgetContainer *BoxItemWidgetContainer::createBoxItemWidgetContainer(
+                                        BoundingBox *target, QWidget *parent) {
+    BoxItemWidgetContainer *newWidget =
+            new BoxItemWidgetContainer(target, parent);
+    newWidget->initialize();
+    return newWidget;
 }
 
 BoundingBox *BoxItemWidgetContainer::getTargetBox() {

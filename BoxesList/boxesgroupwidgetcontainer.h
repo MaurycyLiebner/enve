@@ -9,9 +9,14 @@ class BoxesGroupWidgetContainer : public BoxItemWidgetContainer
     Q_OBJECT
 public:
     BoxesGroupWidgetContainer(BoxesGroup *target, QWidget *parent = 0);
+
+    void initialize();
+    static BoxesGroupWidgetContainer *createBoxesGroupWidgetContainer(
+                                            BoxesGroup *target,
+                                            QWidget *parent);
 protected:
-//    QVBoxLayout *mDetailsLayout;
-//    QVBoxLayout *mChildBoxesLayout;
+    QVBoxLayout *mDetailsLayout;
+    QVBoxLayout *mChildBoxesLayout;
     QList<BoxItemWidgetContainer*> mBoxWidgetsList;
 signals:
 

@@ -11,6 +11,8 @@ public:
     WidgetContainer(QWidget *parent = 0);
 
     void setDetailsVisible(bool visible);
+
+    virtual void initialize();
 protected:
     void setTopWidget(QWidget *widget);
     void addChildWidget(QWidget *widget);

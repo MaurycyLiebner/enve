@@ -1,8 +1,15 @@
 #include "widgetcontainer.h"
 #include "boxeslistwidget.h"
 
-WidgetContainer::WidgetContainer(QWidget *parent) : QWidget(parent)
-{
+WidgetContainer::WidgetContainer(QWidget *parent) : QWidget(parent) {
+
+}
+
+void WidgetContainer::setDetailsVisible(bool visible) {
+    mDetailsWidget->setVisible(visible);
+}
+
+void WidgetContainer::initialize() {
     setContentsMargins(0, 0, 0, 0);
     mAllLayout = new QVBoxLayout(this);
     mAllLayout->setAlignment(Qt::AlignTop);
@@ -19,11 +26,6 @@ WidgetContainer::WidgetContainer(QWidget *parent) : QWidget(parent)
     mAllLayout->addWidget(mDetailsWidget);
 
     mDetailsWidget->hide();
-}
-
-void WidgetContainer::setDetailsVisible(bool visible)
-{
-    mDetailsWidget->setVisible(visible);
 }
 
 void WidgetContainer::setTopWidget(QWidget *widget) {

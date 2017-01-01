@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg opengl sql xml
+QT       += multimedia core gui svg opengl sql xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -91,7 +91,9 @@ SOURCES += main.cpp\
     BoxesList/boxitemwidgetcontainer.cpp \
     BoxesList/boxitemwidget.cpp \
     animator.cpp \
-    BoxesList/boxesgroupwidgetcontainer.cpp
+    BoxesList/boxesgroupwidgetcontainer.cpp \
+    Sound/singlesound.cpp \
+    Sound/soundcomposition.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -169,4 +171,6 @@ HEADERS  += mainwindow.h \
     BoxesList/boxitemwidgetcontainer.h \
     BoxesList/boxitemwidget.h \
     animator.h \
-    BoxesList/boxesgroupwidgetcontainer.h
+    BoxesList/boxesgroupwidgetcontainer.h \
+    Sound/singlesound.h \
+    Sound/soundcomposition.h

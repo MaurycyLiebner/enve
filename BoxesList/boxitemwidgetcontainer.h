@@ -13,8 +13,13 @@ class BoxItemWidgetContainer : public WidgetContainer
 public:
     BoxItemWidgetContainer(BoundingBox *target, QWidget *parent = 0);
 
+    static BoxItemWidgetContainer *createBoxItemWidgetContainer(
+                                                          BoundingBox *target,
+                                                          QWidget *parent = 0);
 
     BoundingBox *getTargetBox();
+
+    void initialize();
 
     void drawKeys(QPainter *p, qreal pixelsPerFrame,
                   int containerTop, int maxY,

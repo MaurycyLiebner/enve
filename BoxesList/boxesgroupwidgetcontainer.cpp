@@ -1,31 +1,69 @@
 #include "boxesgroupwidgetcontainer.h"
 #include "boxesgroup.h"
 #include "boxeslistwidget.h"
+#include "boxitemwidget.h"
 
 BoxesGroupWidgetContainer::BoxesGroupWidgetContainer(BoxesGroup *target,
                                                      QWidget *parent) :
-    BoxItemWidgetContainer(target, parent)
-{
-//    delete mChildWidgetsLayout;
-//    mChildWidgetsLayout = new QVBoxLayout();
+    BoxItemWidgetContainer(target, parent) {
 
-//    mDetailsLayout = new QVBoxLayout(mDetailsWidget);
-//    mDetailsLayout->setAlignment(Qt::AlignTop);
-//    mDetailsLayout->setSpacing(0);
-//    mDetailsLayout->setContentsMargins(BoxesListWidget::getListItemChildIndent(), 0, 0, 0);
+}
 
-//    mChildBoxesLayout = new QVBoxLayout();
-//    mChildBoxesLayout->setAlignment(Qt::AlignTop);
-//    mChildBoxesLayout->setSpacing(0);
-//    mChildBoxesLayout->setContentsMargins(0, 0, 0, 0);
+BoxesGroupWidgetContainer *BoxesGroupWidgetContainer::
+    createBoxesGroupWidgetContainer(BoxesGroup *target,
+                                    QWidget *parent) {
+    BoxesGroupWidgetContainer *newWidget =
+            new BoxesGroupWidgetContainer(target, parent);
+    newWidget->initialize();
+    return newWidget;
+}
 
-//    mChildWidgetsLayout->setAlignment(Qt::AlignTop);
-//    mChildWidgetsLayout->setSpacing(0);
-//    mChildWidgetsLayout->setContentsMargins(0, 0, 0, 0);
+void BoxesGroupWidgetContainer::initialize() {
+    setContentsMargins(0, 0, 0, 0);
+    mAllLayout = new QVBoxLayout(this);
+    mAllLayout->setAlignment(Qt::AlignTop);
+    mAllLayout->setSpacing(0);
+    mAllLayout->setContentsMargins(0, 0, 0, 0);
+    setLayout(mAllLayout);
 
-//    mDetailsLayout->addLayout(mChildWidgetsLayout);
-//    mDetailsLayout->addLayout(mChildBoxesLayout);
-//    mDetailsWidget->setLayout(mDetailsLayout);
+    mDetailsWidget = new QWidget(this);
+
+    mChildWidgetsLayout = new QVBoxLayout();
+
+    mDetailsLayout = new QVBoxLayout(mDetailsWidget);
+    mDetailsLayout->setAlignment(Qt::AlignTop);
+    mDetailsLayout->setSpacing(0);
+    mDetailsLayout->setContentsMargins(
+                BoxesListWidget::getListItemChildIndent(), 0, 0, 0);
+
+    mChildBoxesLayout = new QVBoxLayout();
+    mChildBoxesLayout->setAlignment(Qt::AlignTop);
+    mChildBoxesLayout->setSpacing(0);
+    mChildBoxesLayout->setContentsMargins(0, 0, 0, 0);
+
+    mChildWidgetsLayout->setAlignment(Qt::AlignTop);
+    mChildWidgetsLayout->setSpacing(0);
+    mChildWidgetsLayout->setContentsMargins(0, 0, 0, 0);
+
+    mDetailsLayout->addLayout(mChildWidgetsLayout);
+    mDetailsLayout->addLayout(mChildBoxesLayout);
+    mDetailsWidget->setLayout(mDetailsLayout);
+
+    mAllLayout->addWidget(mDetailsWidget);
+
+    mDetailsWidget->hide();
+
+    setTopWidget(mTargetBoxWidget);
+    connect(mTargetBoxWidget, SIGNAL(detailsVisibilityChanged(bool)),
+            mDetailsWidget, SLOT(setVisible(bool)));
+
+    BoundingBox *target = mTargetBoxWidget->getTargetBox();
+    target->addAllAnimatorsToBoxItemWidgetContainer(this);
+
+    connect(target, SIGNAL(addActiveAnimatorSignal(QrealAnimator*)),
+            this, SLOT(addAnimatorWidgetForAnimator(QrealAnimator*)));
+    connect(target, SIGNAL(removeActiveAnimatorSignal(QrealAnimator*)),
+            this, SLOT(removeAnimatorWidgetForAnimator(QrealAnimator*)));
 }
 
 void BoxesGroupWidgetContainer::addWidgetForChildBox(BoundingBox *box)
@@ -33,8 +71,8 @@ void BoxesGroupWidgetContainer::addWidgetForChildBox(BoundingBox *box)
     BoxItemWidgetContainer *boxContainer;
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*)box;
-        boxContainer = new BoxesGroupWidgetContainer(group,
-                                                     this);
+        boxContainer = createBoxesGroupWidgetContainer(group,
+                                                       this);
         connect(group, &BoxesGroup::addAnimatedBoundingBoxSignal,
                 (BoxesGroupWidgetContainer*)boxContainer,
                 &BoxesGroupWidgetContainer::addWidgetForChildBox);
@@ -42,9 +80,10 @@ void BoxesGroupWidgetContainer::addWidgetForChildBox(BoundingBox *box)
                 (BoxesGroupWidgetContainer*)boxContainer,
                 &BoxesGroupWidgetContainer::removeWidgetForChildBox);
     } else {
-        boxContainer = new BoxItemWidgetContainer(box, this);
+        boxContainer =
+                BoxItemWidgetContainer::createBoxItemWidgetContainer(box, this);
     }
-    mChildWidgetsLayout->addWidget(boxContainer);
+    mChildBoxesLayout->addWidget(boxContainer);
     mBoxWidgetsList << boxContainer;
 }
 

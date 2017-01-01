@@ -26,6 +26,8 @@ class BoxesListAnimationDockWidget;
 
 class CanvasWidget;
 
+//class SoundComposition;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -79,6 +81,8 @@ private:
     QMenu *mEffectsMenu;
     QMenu *mViewMenu;
     QMenu *mRenderMenu;
+
+//    SoundComposition *mSoundComposition = NULL;
 
     Canvas *mCanvas;
     CanvasWidget *mCanvasWidget;

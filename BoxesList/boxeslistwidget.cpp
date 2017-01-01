@@ -118,7 +118,10 @@ void BoxesListWidget::addItemForBox(BoundingBox *box)
     }
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*)box;
-        itemWidgetContainer = new BoxesGroupWidgetContainer(group, this);
+        itemWidgetContainer =
+                BoxesGroupWidgetContainer::createBoxesGroupWidgetContainer(
+                                                                        group,
+                                                                        this);
         connect(group, &BoxesGroup::addAnimatedBoundingBoxSignal,
                 (BoxesGroupWidgetContainer*)itemWidgetContainer,
                 &BoxesGroupWidgetContainer::addWidgetForChildBox);
@@ -126,7 +129,8 @@ void BoxesListWidget::addItemForBox(BoundingBox *box)
                 (BoxesGroupWidgetContainer*)itemWidgetContainer,
                 &BoxesGroupWidgetContainer::removeWidgetForChildBox);
     } else {
-        itemWidgetContainer = new BoxItemWidgetContainer(box, this);
+        itemWidgetContainer =
+                BoxItemWidgetContainer::createBoxItemWidgetContainer(box, this);
     }
     mBoxesLayout->insertWidget(insertIndex, itemWidgetContainer);
     mBoxWidgetContainers << itemWidgetContainer;

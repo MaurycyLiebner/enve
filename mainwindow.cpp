@@ -18,6 +18,10 @@
 #include "svgimporter.h"
 #include "canvaswidget.h"
 
+#include <QAudioOutput>
+#include "Sound/soundcomposition.h"
+#include "Sound/singlesound.h"
+
 MainWindow *MainWindow::mMainWindowInstance;
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -28,6 +32,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    //mSoundComposition = new SoundComposition();
+//    mSoundComposition->addSound(
+//                new SingleSound("/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/lektor.wav"));
+
     BrushStroke::loadStrokePixmaps();
     mCurrentUndoRedoStack = &mUndoRedoStack;
 
@@ -385,6 +393,22 @@ void MainWindow::nextPlayPreviewFrame() {
         mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
         if(!mPreviewInterrupted) {
+//            mSoundComposition->setFirstAndLastVideoFrame(0, 240);
+//            mSoundComposition->generateData();
+
+            QAudioFormat desiredFormat;
+            desiredFormat.setChannelCount(2);
+            desiredFormat.setCodec("audio/x-raw");
+            desiredFormat.setSampleType(QAudioFormat::UnSignedInt);
+            desiredFormat.setSampleRate(48000);
+            desiredFormat.setSampleSize(16);
+
+            QAudioOutput *audio = new QAudioOutput(
+                                    QAudioDeviceInfo::defaultOutputDevice(),
+                                    desiredFormat,
+                                    this);
+//            mSoundComposition->start();
+//            audio->start(mSoundComposition);
             mCanvas->playPreview();
         }
     } else {
