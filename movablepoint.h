@@ -8,6 +8,7 @@
 
 class BoundingBox;
 class PathPoint;
+class QSqlQuery;
 
 class AnimatorUpdater;
 
@@ -71,7 +72,7 @@ public:
     void setRadius(qreal radius);
 
     bool isBeingTransformed();
-    virtual int saveToSql();
+    virtual int saveToSql(QSqlQuery *query);
 
     virtual void setPosAnimatorUpdater(AnimatorUpdater *updater);
 

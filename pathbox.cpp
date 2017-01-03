@@ -36,19 +36,18 @@ PathBox::~PathBox()
 }
 
 #include <QSqlError>
-int PathBox::saveToSql(int parentId)
+int PathBox::saveToSql(QSqlQuery *query, int parentId)
 {
-    int boundingBoxId = BoundingBox::saveToSql(parentId);
-    QSqlQuery query;
+    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
 
-    int fillStartPt = mFillGradientPoints.startPoint->saveToSql();
-    int fillEndPt = mFillGradientPoints.endPoint->saveToSql();
-    int strokeStartPt = mStrokeGradientPoints.startPoint->saveToSql();
-    int strokeEndPt = mStrokeGradientPoints.endPoint->saveToSql();
+    int fillStartPt = mFillGradientPoints.startPoint->saveToSql(query);
+    int fillEndPt = mFillGradientPoints.endPoint->saveToSql(query);
+    int strokeStartPt = mStrokeGradientPoints.startPoint->saveToSql(query);
+    int strokeEndPt = mStrokeGradientPoints.endPoint->saveToSql(query);
 
     int fillSettingsId = mFillPaintSettings.saveToSql();
     int strokeSettingsId = mStrokeSettings.saveToSql();
-    if(!query.exec(
+    if(!query->exec(
             QString(
             "INSERT INTO pathbox (fillgradientstartid, fillgradientendid, "
             "strokegradientstartid, strokegradientendid, "
@@ -61,7 +60,7 @@ int PathBox::saveToSql(int parentId)
             arg(boundingBoxId).
             arg(fillSettingsId).
             arg(strokeSettingsId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
     return boundingBoxId;
@@ -236,11 +235,11 @@ void PathBox::updateDrawGradients()
 }
 
 void PathBox::updateBoundingRect() {
-    QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
+    mRelBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
                                                                 mEffectsMargin, mEffectsMargin);
-    mPixBoundingRect = mUpdateTransform.mapRect(relBoundingRect);
+    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect);
     mBoundingRect = QPainterPath();
-    mBoundingRect.addRect(relBoundingRect);
+    mBoundingRect.addRect(mRelBoundingRect);
     mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
     updatePixBoundingRectClippedToView();
 }
@@ -260,72 +259,6 @@ void PathBox::updateUpdateTransform()
     mPathUpdateNeeded = false;
     mOutlinePathUpdateNeeded = false;
     BoundingBox::updateUpdateTransform();
-}
-
-void PathBox::render(QPainter *p) {
-    p->save();
-
-    if(mEffects.isEmpty() ) {
-        p->setTransform(QTransform(getCombinedRenderTransform()), true);
-        draw(p);
-    } else {
-        QMatrix renderTransform = getCombinedRenderTransform();
-        QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
-                                                                    mEffectsMargin, mEffectsMargin);
-        QRectF pixBoundingRect = renderTransform.mapRect(relBoundingRect);
-
-        QSizeF sizeF = pixBoundingRect.size();
-        QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
-                                             ceil(sizeF.height())) );
-        renderPixmap.fill(Qt::transparent);
-
-        QPainter pixP(&renderPixmap);
-        pixP.setRenderHint(QPainter::Antialiasing);
-        pixP.translate(-pixBoundingRect.topLeft());
-        pixP.setTransform(QTransform(renderTransform), true);
-
-        draw(&pixP);
-        pixP.end();
-
-        renderPixmap = applyEffects(renderPixmap, mHighQualityPaint, getCurrentCanvasScale()*Canvas::getResolutionPercent());
-
-        p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
-    }
-
-    p->restore();
-}
-
-void PathBox::renderFinal(QPainter *p) {
-    p->save();
-
-    if(mEffects.isEmpty() ) {
-        p->setTransform(QTransform(getCombinedFinalRenderTransform()), false);
-        draw(p);
-    } else {
-        QMatrix renderTransform = getCombinedFinalRenderTransform();
-        QRectF relBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
-                                                                    mEffectsMargin, mEffectsMargin);
-        QRectF pixBoundingRect = renderTransform.mapRect(relBoundingRect);
-
-        QSizeF sizeF = pixBoundingRect.size();
-        QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
-                                             ceil(sizeF.height())) );
-        renderPixmap.fill(Qt::transparent);
-
-        QPainter pixP(&renderPixmap);
-        pixP.setRenderHint(QPainter::Antialiasing);
-        pixP.translate(-pixBoundingRect.topLeft());
-        pixP.setTransform(QTransform(renderTransform), true);
-
-        draw(&pixP);
-        pixP.end();
-
-        renderPixmap = applyEffects(renderPixmap, true);
-
-        p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
-    }
-
-    p->restore();
 }
 
 void PathBox::draw(QPainter *p)

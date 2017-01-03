@@ -41,21 +41,20 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
 
 
 #include <QSqlError>
-int Circle::saveToSql(int parentId)
+int Circle::saveToSql(QSqlQuery *query, int parentId)
 {
-    int boundingBoxId = PathBox::saveToSql(parentId);
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
 
-    int horizontalRadiusPointId = mHorizontalRadiusPoint->saveToSql();
-    int verticalRadiusPointId = mVerticalRadiusPoint->saveToSql();
+    int horizontalRadiusPointId = mHorizontalRadiusPoint->saveToSql(query);
+    int verticalRadiusPointId = mVerticalRadiusPoint->saveToSql(query);
 
-    QSqlQuery query;
-    if(!query.exec(QString("INSERT INTO circle (boundingboxid, "
+    if(!query->exec(QString("INSERT INTO circle (boundingboxid, "
                            "horizontalradiuspointid, verticalradiuspointid) "
                 "VALUES (%1, %2, %3)").
                 arg(boundingBoxId).
                 arg(horizontalRadiusPointId).
                 arg(verticalRadiusPointId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
     return boundingBoxId;
@@ -370,7 +369,7 @@ void CircleRadiusPoint::setAbsPosRadius(QPointF pos)
 
 void CircleRadiusPoint::moveByAbs(QPointF absTranslatione) {
     if(mCenterPoint->isSelected() ) return;
-    mRelPos.setCurrentValue(mSavedRelPos);
+    //mRelPos.setCurrentValue(mSavedRelPos);
     setAbsPosRadius(getAbsolutePos() + absTranslatione);
 }
 

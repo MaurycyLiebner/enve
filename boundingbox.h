@@ -62,8 +62,8 @@ public:
     virtual QRectF getPixBoundingRect();
 
     void drawPixmap(QPainter *p);
-    virtual void render(QPainter *) {}
-    virtual void renderFinal(QPainter *) {}
+    virtual void render(QPainter *p);
+    virtual void renderFinal(QPainter *p);
     virtual void draw(QPainter *) {}
     virtual void drawSelected(QPainter *, CanvasMode) {}
 
@@ -118,7 +118,7 @@ public:
     void cancelTransform();
     void scale(qreal scaleXBy, qreal scaleYBy);
 
-    virtual int saveToSql(int parentId);
+    virtual int saveToSql(QSqlQuery *query, int parentId);
 
     virtual PathPoint *createNewPointOnLineNear(QPointF, bool) { return NULL; }
     bool isVectorPath();
@@ -245,6 +245,8 @@ public:
 
     virtual void applyCurrentTransformation() {}
 protected:
+    QRectF mRelBoundingRect;
+
     bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;
     qreal mEffectsMargin = 0.;

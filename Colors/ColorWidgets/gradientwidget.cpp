@@ -80,15 +80,15 @@ void GradientWidget::removeGradient(int gradientId)
     repaint();
 }
 
-void GradientWidget::saveGradientsToQuery() {
+void GradientWidget::saveGradientsToQuery(QSqlQuery *query) {
     foreach(Gradient *gradient, mGradients) {
-        gradient->saveToSql();
+        gradient->saveToSql(query);
     }
 }
 
-void GradientWidget::saveGradientsToSqlIfPathSelected() {
+void GradientWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
     foreach(Gradient *gradient, mGradients) {
-        gradient->saveToSqlIfPathSelected();
+        gradient->saveToSqlIfPathSelected(query);
     }
 }
 

@@ -26,7 +26,7 @@ public:
     void setSelectedFontSize(qreal size);
     bool absPointInsidePath(QPointF absPos);
     void draw(QPainter *p);
-    void render(QPainter *p);
+//    void render(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
     void removeSelectedPointsAndClearList();
     void removeSelectedBoxesAndClearList();
@@ -82,10 +82,10 @@ public:
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
 
-    int saveToSql(int parentId);
+    int saveToSql(QSqlQuery *query, int parentId);
     BoxesGroup *loadChildrenFromSql(int thisBoundingBoxId, bool loadInBox);
     PathPoint *createNewPointOnLineNearSelected(QPointF absPos, bool adjust);
-    void saveSelectedToSql();
+    void saveSelectedToSql(QSqlQuery *query);
 
     //
 
@@ -186,7 +186,7 @@ public:
     void resetSelectedRotation();
     void convertSelectedBoxesToPath();
     void applyBlurToSelected();
-    void renderFinal(QPainter *p);
+//    void renderFinal(QPainter *p);
     void applyBrushEffectToSelected();
     void applyLinesEffectToSelected();
     void applyCirclesEffectToSelected();

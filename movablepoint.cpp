@@ -175,16 +175,15 @@ bool MovablePoint::isBeingTransformed()
 }
 
 #include <QSqlError>
-int MovablePoint::saveToSql()
+int MovablePoint::saveToSql(QSqlQuery *query)
 {
     int posAnimatorId = mRelPos.saveToSql();
-    QSqlQuery query;
-    if(!query.exec(QString("INSERT INTO movablepoint (posanimatorid) "
+    if(!query->exec(QString("INSERT INTO movablepoint (posanimatorid) "
                 "VALUES (%1)").
                 arg(posAnimatorId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
-    return query.lastInsertId().toInt();
+    return query->lastInsertId().toInt();
 }
 
 void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater)

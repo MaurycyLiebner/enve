@@ -96,7 +96,8 @@ private:
 
     bool mChangedSinceSaving = false;
     bool mEventFilterDisabled = false;
-    QWidget *grayOutWidget = NULL;
+    bool isEnabled();
+    QWidget *mGrayOutWidget = NULL;
 
     qreal mFPS = 24.;
     int mMinFrame = 0;
@@ -156,7 +157,7 @@ public:
     void importFile(QString path, bool loadInBox);
     void exportSelected(QString path);
     void setCurrentPath(QString newPath);
-    void createTablesInSaveDatabase();
+    void createTablesInSaveDatabase(QSqlQuery *query);
     void updateTitle();
     void setFileChangedSinceSaving(bool changed);
     void disableEventFilter();

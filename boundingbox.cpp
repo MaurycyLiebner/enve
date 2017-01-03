@@ -45,10 +45,9 @@ QPixmap BoundingBox::applyEffects(const QPixmap& pixmap, bool highQuality, qreal
 }
 
 #include <QSqlError>
-int BoundingBox::saveToSql(int parentId) {
+int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
     int transfromAnimatorId = mTransformAnimator.saveToSql();
-    QSqlQuery query;
-    if(!query.exec(
+    if(!query->exec(
         QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
                 "pivotchanged, visible, locked, "
                 "parentboundingboxid) "
@@ -61,10 +60,10 @@ int BoundingBox::saveToSql(int parentId) {
                 arg(boolToSql(mLocked) ).
                 arg(parentId)
                 ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
-    return query.lastInsertId().toInt();
+    return query->lastInsertId().toInt();
 }
 
 void BoundingBox::loadFromSql(int boundingBoxId) {
@@ -205,6 +204,78 @@ void BoundingBox::updateAllUglyPixmap() {
     if(Canvas::effectsPaintEnabled()) {
         mAllUglyPixmap = applyEffects(mAllUglyPixmap, false, Canvas::getResolutionPercent());
     }
+}
+
+void BoundingBox::render(QPainter *p) {
+    p->save();
+
+    if(mEffects.isEmpty() ) {
+        p->setTransform(QTransform(getCombinedRenderTransform()), true);
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+        draw(p);
+    } else {
+        QMatrix renderTransform = getCombinedRenderTransform();
+
+        QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect);
+
+        QSizeF sizeF = pixBoundingRect.size();
+        QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
+                                             ceil(sizeF.height())) );
+        renderPixmap.fill(Qt::transparent);
+
+        QPainter pixP(&renderPixmap);
+        pixP.setRenderHint(QPainter::Antialiasing);
+        pixP.setRenderHint(QPainter::SmoothPixmapTransform);
+        pixP.translate(-pixBoundingRect.topLeft());
+        pixP.setTransform(QTransform(renderTransform), true);
+
+        draw(&pixP);
+        pixP.end();
+
+        renderPixmap = applyEffects(renderPixmap, mHighQualityPaint,
+                                    getCurrentCanvasScale()*
+                                    Canvas::getResolutionPercent());
+
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+        p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
+    }
+
+    p->restore();
+}
+
+void BoundingBox::renderFinal(QPainter *p) {
+    p->save();
+
+    if(mEffects.isEmpty() ) {
+        p->setTransform(QTransform(getCombinedFinalRenderTransform()), false);
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+        draw(p);
+    } else {
+        QMatrix renderTransform = getCombinedFinalRenderTransform();
+
+        QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect);
+
+        QSizeF sizeF = pixBoundingRect.size();
+        QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
+                                             ceil(sizeF.height())) );
+        renderPixmap.fill(Qt::transparent);
+
+        QPainter pixP(&renderPixmap);
+        pixP.setRenderHint(QPainter::Antialiasing);
+        pixP.setRenderHint(QPainter::SmoothPixmapTransform);
+        pixP.translate(-pixBoundingRect.topLeft());
+        pixP.setTransform(QTransform(renderTransform), true);
+
+        draw(&pixP);
+        pixP.end();
+
+        renderPixmap = applyEffects(renderPixmap, true);
+
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+        p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
+    }
+
+    p->restore();
 }
 
 bool BoundingBox::shouldRedoUpdate() {

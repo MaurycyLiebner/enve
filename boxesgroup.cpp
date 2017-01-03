@@ -95,22 +95,21 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
     return this;
 }
 
-int BoxesGroup::saveToSql(int parentId)
+int BoxesGroup::saveToSql(QSqlQuery *query, int parentId)
 {
-    QSqlQuery query;
-    int boundingBoxId = BoundingBox::saveToSql(parentId);
-    query.exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
+    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
+    query->exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
                 arg(boundingBoxId));
     foreach(BoundingBox *box, mChildren) {
-        box->saveToSql(boundingBoxId);
+        box->saveToSql(query, boundingBoxId);
     }
     return boundingBoxId;
 }
 
-void BoxesGroup::saveSelectedToSql()
+void BoxesGroup::saveSelectedToSql(QSqlQuery *query)
 {
     foreach(BoundingBox *box, mSelectedBoxes) {
-        box->saveToSql(0);
+        box->saveToSql(query, 0);
     }
 }
 
@@ -394,13 +393,13 @@ void BoxesGroup::updateBoundingRect() {
                     child->getRelativeTransform().
                     map(child->getBoundingRectPath()));
     }
-    QRectF boundingPathsRect = boundingPaths.boundingRect().
+    mRelBoundingRect = boundingPaths.boundingRect().
                     adjusted(-mEffectsMargin, -mEffectsMargin,
                              mEffectsMargin, mEffectsMargin);
     mBoundingRect = QPainterPath();
-    mBoundingRect.addRect(boundingPathsRect);
+    mBoundingRect.addRect(mRelBoundingRect);
 
-    mPixBoundingRect = mUpdateTransform.mapRect(boundingPathsRect);
+    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect);
     mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
     updatePixBoundingRectClippedToView();
 }
@@ -413,32 +412,6 @@ void BoxesGroup::draw(QPainter *p)
         foreach(BoundingBox *box, mChildren) {
             //box->draw(p);
             box->drawPixmap(p);
-        }
-
-        p->restore();
-    }
-}
-
-void BoxesGroup::render(QPainter *p)
-{
-    if(mVisible) {
-        p->save();
-
-        foreach(BoundingBox *box, mChildren){
-            box->render(p);
-        }
-
-        p->restore();
-    }
-}
-
-void BoxesGroup::renderFinal(QPainter *p)
-{
-    if(mVisible) {
-        p->save();
-
-        foreach(BoundingBox *box, mChildren){
-            box->renderFinal(p);
         }
 
         p->restore();

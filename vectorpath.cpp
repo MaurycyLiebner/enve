@@ -19,11 +19,11 @@ VectorPath::VectorPath(BoxesGroup *group) :
 }
 
 #include <QSqlError>
-int VectorPath::saveToSql(int parentId)
+int VectorPath::saveToSql(QSqlQuery *query, int parentId)
 {
-    int boundingBoxId = PathBox::saveToSql(parentId);
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
     foreach(PathPoint *point, mSeparatePaths) {
-        point->saveToSql(boundingBoxId);
+        point->saveToSql(query, boundingBoxId);
     }
 
     return boundingBoxId;

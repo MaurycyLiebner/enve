@@ -29,11 +29,11 @@ public:
 
     void finishGradientTransform();
     void startGradientTransform();
-    void saveGradientsToQuery();
+    void saveGradientsToQuery(QSqlQuery *query);
     Gradient *getGradientBySqlId(int id);
     void loadAllGradientsFromSql();
     void clearAll();
-    void saveGradientsToSqlIfPathSelected();
+    void saveGradientsToSqlIfPathSelected(QSqlQuery *query);
     void addGradientToList(Gradient *gradient);
     void removeGradientFromList(Gradient *toRemove);
     void startSelectedColorTransform();

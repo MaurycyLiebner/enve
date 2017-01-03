@@ -242,7 +242,7 @@ public:
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
     VectorPath *getParentPath();
 
-    void saveToSql(int boundingBoxId);
+    void saveToSql(QSqlQuery *query, int boundingBoxId);
 
     void cancelTransform();
 

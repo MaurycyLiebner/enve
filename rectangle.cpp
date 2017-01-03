@@ -43,16 +43,15 @@ Rectangle::~Rectangle()
 }
 
 #include <QSqlError>
-int Rectangle::saveToSql(int parentId)
+int Rectangle::saveToSql(QSqlQuery *query, int parentId)
 {
-    int boundingBoxId = PathBox::saveToSql(parentId);
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
 
-    int bottomRightPointId = mTopLeftPoint->saveToSql();
-    int topLeftPointId = mTopLeftPoint->saveToSql();
-    int radiusPointId = mRadiusPoint->saveToSql();
+    int bottomRightPointId = mTopLeftPoint->saveToSql(query);
+    int topLeftPointId = mTopLeftPoint->saveToSql(query);
+    int radiusPointId = mRadiusPoint->saveToSql(query);
 
-    QSqlQuery query;
-    if(!query.exec(QString("INSERT INTO rectangle (boundingboxid, "
+    if(!query->exec(QString("INSERT INTO rectangle (boundingboxid, "
                            "topleftpointid, bottomrightpointid, "
                            "radiuspointid) "
                 "VALUES (%1, %2, %3, %4)").
@@ -60,7 +59,7 @@ int Rectangle::saveToSql(int parentId)
                 arg(topLeftPointId).
                 arg(bottomRightPointId).
                 arg(radiusPointId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
     return boundingBoxId;

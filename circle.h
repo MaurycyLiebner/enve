@@ -62,7 +62,7 @@ public:
                                         QPointF *topCtrlPtr, QPointF *topPtr);
 
     VectorPath *objectToPath();
-    int saveToSql(int parentId);
+    int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
 private:
     CircleCenterPoint *mCenter;

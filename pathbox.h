@@ -183,7 +183,7 @@ public:
     void updateAfterFrameChanged(int currentFrame);
 
     void setOutlineAffectedByScale(bool bT);
-    int saveToSql(int parentId);
+    int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
     void updateBoundingRect();
     void updatePixmaps();
@@ -191,8 +191,6 @@ public:
     void afterSuccessfulUpdate();
 
     void updateUpdateTransform();
-    void render(QPainter *p);
-    void renderFinal(QPainter *p);
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

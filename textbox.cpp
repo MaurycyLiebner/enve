@@ -8,12 +8,11 @@ TextBox::TextBox(BoxesGroup *parent) : PathBox(parent, TYPE_TEXT)
 }
 
 #include <QSqlError>
-int TextBox::saveToSql(int parentId)
+int TextBox::saveToSql(QSqlQuery *query, int parentId)
 {
-    int boundingBoxId = PathBox::saveToSql(parentId);
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
 
-    QSqlQuery query;
-    if(!query.exec(QString("INSERT INTO textbox (boundingboxid, "
+    if(!query->exec(QString("INSERT INTO textbox (boundingboxid, "
                            "text, fontfamily, fontstyle, fontsize) "
                 "VALUES ('%1', '%2', '%3', '%4', %5)").
                 arg(boundingBoxId).
@@ -21,7 +20,7 @@ int TextBox::saveToSql(int parentId)
                 arg(mFont.family()).
                 arg(mFont.style()).
                 arg(mFont.pointSizeF()) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
     return boundingBoxId;

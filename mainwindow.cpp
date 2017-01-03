@@ -504,6 +504,9 @@ bool MainWindow::isAltPressed()
 
 void MainWindow::callUpdateSchedulers()
 {
+    if(!isEnabled()) {
+        return;
+    }
     mCurrentUndoRedoStack->finishSet();
 
     mKeysView->graphUpdateAfterKeysChangedIfNeeded();
@@ -587,18 +590,18 @@ void MainWindow::enableEventFilter() {
 
 void MainWindow::disable()
 {
-    grayOutWidget = new QWidget(this);
-    grayOutWidget->setFixedSize(size());
-    grayOutWidget->setStyleSheet("QWidget { background-color: rgb(0, 0, 0, 125) }");
-    grayOutWidget->show();
-    grayOutWidget->repaint();
+    mGrayOutWidget = new QWidget(this);
+    mGrayOutWidget->setFixedSize(size());
+    mGrayOutWidget->setStyleSheet("QWidget { background-color: rgb(0, 0, 0, 125) }");
+    mGrayOutWidget->show();
+    mGrayOutWidget->repaint();
 }
 
 void MainWindow::enable()
 {
-    if(grayOutWidget == NULL) return;
-    delete grayOutWidget;
-    grayOutWidget = NULL;
+    if(mGrayOutWidget == NULL) return;
+    delete mGrayOutWidget;
+    mGrayOutWidget = NULL;
 }
 
 int MainWindow::getCurrentFrame()
@@ -728,6 +731,10 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     return returnBool;
 }
 
+bool MainWindow::isEnabled() {
+    return mGrayOutWidget == NULL;
+}
+
 void MainWindow::clearAll() {
     foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
         delete sheduler;
@@ -750,12 +757,15 @@ void MainWindow::exportSelected(QString path) {
     QSqlDatabase db = QSqlDatabase::database();
     db.setDatabaseName(path);
     db.open();
+    QSqlQuery query;
+    createTablesInSaveDatabase(&query);
 
-    createTablesInSaveDatabase();
+    query.exec("BEGIN TRANSACTION");
 
-    mFillStrokeSettings->saveGradientsToSqlIfPathSelected();
-    mCanvas->saveSelectedToSqlForCurrentBox();
+    mFillStrokeSettings->saveGradientsToSqlIfPathSelected(&query);
+    mCanvas->saveSelectedToSqlForCurrentBox(&query);
 
+    query.exec("COMMIT TRANSACTION");
     db.close();
 
     enable();
@@ -929,14 +939,12 @@ void MainWindow::loadFile(QString path) {
     setFileChangedSinceSaving(false);
 }
 
-void MainWindow::createTablesInSaveDatabase() {
-    QSqlQuery query;
-
-    query.exec("CREATE TABLE qrealanimator "
+void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
+    query->exec("CREATE TABLE qrealanimator "
                "(id INTEGER PRIMARY KEY,"
                "currentvalue REAL )");
 
-    query.exec("CREATE TABLE qrealkey "
+    query->exec("CREATE TABLE qrealkey "
                "(id INTEGER PRIMARY KEY, "
                "value REAL, "
                "frame INTEGER, "
@@ -950,7 +958,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "qrealanimatorid INTEGER, "
                "FOREIGN KEY(qrealanimatorid) REFERENCES qrealanimator(id) )");
 
-    query.exec("CREATE TABLE transformanimator "
+    query->exec("CREATE TABLE transformanimator "
                "(id INTEGER PRIMARY KEY, "
                "posanimatorid INTEGER, "
                "scaleanimatorid INTEGER, "
@@ -963,7 +971,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(rotanimatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(opacityanimatorid) REFERENCES qrealanimator(id) )");
 
-    query.exec("CREATE TABLE qpointfanimator "
+    query->exec("CREATE TABLE qpointfanimator "
                "(id INTEGER PRIMARY KEY, "
                "xanimatorid INTEGER, "
                "yanimatorid INTEGER, "
@@ -971,7 +979,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(yanimatorid) REFERENCES qrealanimator(id) )");
 
 
-    query.exec("CREATE TABLE coloranimator "
+    query->exec("CREATE TABLE coloranimator "
                "(id INTEGER PRIMARY KEY, "
                "colormode INTEGER, "
                "val1animatorid INTEGER, "
@@ -983,22 +991,22 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(val3animatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(alphaanimatorid) REFERENCES qrealanimator(id) )");
 
-    query.exec("CREATE TABLE gradient "
+    query->exec("CREATE TABLE gradient "
                "(id INTEGER PRIMARY KEY)");
-    query.exec("CREATE TABLE gradientcolor "
+    query->exec("CREATE TABLE gradientcolor "
                "(colorid INTEGER, "
                "gradientid INTEGER, "
                "positioningradient INTEGER, "
                "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
-    query.exec("CREATE TABLE paintsettings "
+    query->exec("CREATE TABLE paintsettings "
                "(id INTEGER PRIMARY KEY, "
                "painttype INTEGER, "
                "colorid INTEGER, "
                "gradientid INTEGER, "
                "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
-    query.exec("CREATE TABLE strokesettings "
+    query->exec("CREATE TABLE strokesettings "
                "(id INTEGER PRIMARY KEY, "
                "linewidthanimatorid INTEGER, "
                "capstyle INTEGER, "
@@ -1007,7 +1015,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(linewidthanimatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(paintsettingsid) REFERENCES paintsettings(id) )");
 
-    query.exec("CREATE TABLE boundingbox "
+    query->exec("CREATE TABLE boundingbox "
                "(id INTEGER PRIMARY KEY, "
                "name TEXT, "
                "boxtype INTEGER, "
@@ -1018,11 +1026,11 @@ void MainWindow::createTablesInSaveDatabase() {
                "parentboundingboxid INTEGER, "
                "FOREIGN KEY(transformanimatorid) REFERENCES transformanimator(id), "
                "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
-    query.exec("CREATE TABLE boxesgroup "
+    query->exec("CREATE TABLE boxesgroup "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
-    query.exec("CREATE TABLE pathbox "
+    query->exec("CREATE TABLE pathbox "
                "(id INTEGER PRIMARY KEY, "
                "fillgradientstartid INTEGER, "
                "fillgradientendid INTEGER, "
@@ -1039,11 +1047,11 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
                "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
                "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
-    query.exec("CREATE TABLE movablepoint "
+    query->exec("CREATE TABLE movablepoint "
                "(id INTEGER PRIMARY KEY, "
                "posanimatorid INTEGER, "
                "FOREIGN KEY(posanimatorid) REFERENCES qrealanimator(id) )");
-    query.exec("CREATE TABLE pathpoint "
+    query->exec("CREATE TABLE pathpoint "
                "(id INTEGER PRIMARY KEY, "
                "isfirst BOOLEAN, "
                "isendpoint BOOLEAN, "
@@ -1062,7 +1070,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
                "FOREIGN KEY(influenceanimatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(influencetanimatorid) REFERENCES qrealanimator(id) )");
-    query.exec("CREATE TABLE circle "
+    query->exec("CREATE TABLE circle "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
                "horizontalradiuspointid INTEGER, "
@@ -1071,7 +1079,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(verticalradiuspointid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 
-    query.exec("CREATE TABLE rectangle "
+    query->exec("CREATE TABLE rectangle "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
                "topleftpointid INTEGER, "
@@ -1082,7 +1090,7 @@ void MainWindow::createTablesInSaveDatabase() {
                "FOREIGN KEY(radiuspointid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 
-    query.exec("CREATE TABLE textbox "
+    query->exec("CREATE TABLE textbox "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
                "text TEXT, "
@@ -1090,7 +1098,6 @@ void MainWindow::createTablesInSaveDatabase() {
                "fontstyle TEXT, "
                "fontsize REAL, "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
-
 }
 
 void MainWindow::saveToFile(QString path) {
@@ -1104,10 +1111,15 @@ void MainWindow::saveToFile(QString path) {
     db.setDatabaseName(path);
     db.open();
 
-    createTablesInSaveDatabase();
+    QSqlQuery query;
+    createTablesInSaveDatabase(&query);
 
-    mFillStrokeSettings->saveGradientsToQuery();
-    mCanvas->saveToSql();
+    query.exec("BEGIN TRANSACTION");
+
+    mFillStrokeSettings->saveGradientsToQuery(&query);
+    mCanvas->saveToSql(&query);
+
+    query.exec("COMMIT TRANSACTION");
     db.close();
 
     enable();

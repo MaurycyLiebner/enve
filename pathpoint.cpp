@@ -201,15 +201,14 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
 }
 
 #include <QSqlError>
-void PathPoint::saveToSql(int boundingBoxId)
+void PathPoint::saveToSql(QSqlQuery *query, int boundingBoxId)
 {
-    int movablePtId = MovablePoint::saveToSql();
-    int startPtId = mStartCtrlPt->saveToSql();
-    int endPtId = mEndCtrlPt->saveToSql();
-    QSqlQuery query;
+    int movablePtId = MovablePoint::saveToSql(query);
+    int startPtId = mStartCtrlPt->saveToSql(query);
+    int endPtId = mEndCtrlPt->saveToSql(query);
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
     QString isEnd = ( (isEndPoint()) ? "1" : "0" );
-    if(!query.exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, "
+    if(!query->exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, "
                 "movablepointid, startctrlptid, endctrlptid, boundingboxid, "
                 "ctrlsmode, startpointenabled, endpointenabled) "
                 "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
@@ -222,11 +221,11 @@ void PathPoint::saveToSql(int boundingBoxId)
                 arg(mCtrlsMode).
                 arg(mStartCtrlPtEnabled).
                 arg(mEndCtrlPtEnabled) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
     if(mNextPoint != NULL) {
         if(!mNextPoint->isSeparatePathPoint()) {
-            mNextPoint->saveToSql(boundingBoxId);
+            mNextPoint->saveToSql(query, boundingBoxId);
         }
     }
 }

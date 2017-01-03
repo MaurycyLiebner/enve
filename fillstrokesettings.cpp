@@ -96,14 +96,13 @@ QGradientStops Gradient::getQGradientStops()
     return mQGradientStops;
 }
 
-int Gradient::saveToSql() {
-    QSqlQuery query;
-    query.exec("INSERT INTO gradient DEFAULT VALUES");
-    mSqlId = query.lastInsertId().toInt();
+int Gradient::saveToSql(QSqlQuery *query) {
+    query->exec("INSERT INTO gradient DEFAULT VALUES");
+    mSqlId = query->lastInsertId().toInt();
     int posInGradient = 0;
     foreach(ColorAnimator *color, mColors) {
         int colorId = color->saveToSql();
-        query.exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
+        query->exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
                             "VALUES (%1, %2, %3)").
                     arg(colorId).
                     arg(mSqlId).
@@ -113,12 +112,12 @@ int Gradient::saveToSql() {
     return mSqlId;
 }
 
-void Gradient::saveToSqlIfPathSelected() {
+void Gradient::saveToSqlIfPathSelected(QSqlQuery *query) {
     foreach(PathBox *path, mAffectedPaths) {
         BoundingBox *parent = (BoundingBox *) path;
         while(parent != NULL) {
             if(parent->isSelected()) {
-                saveToSql();
+                saveToSql(query);
                 return;
             }
             parent = parent->getParent();
@@ -508,8 +507,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     setJoinStyle(Qt::RoundJoin);
 }
 
-void FillStrokeSettingsWidget::saveGradientsToSqlIfPathSelected() {
-    mGradientWidget->saveGradientsToSqlIfPathSelected();
+void FillStrokeSettingsWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
+    mGradientWidget->saveGradientsToSqlIfPathSelected(query);
 }
 
 void FillStrokeSettingsWidget::updateAfterTargetChanged() {
@@ -576,9 +575,9 @@ void FillStrokeSettingsWidget::setCurrentColor(Color color) {
     mColorsSettingsWidget->setCurrentColor(color);
 }
 
-void FillStrokeSettingsWidget::saveGradientsToQuery()
+void FillStrokeSettingsWidget::saveGradientsToQuery(QSqlQuery *query)
 {
-    mGradientWidget->saveGradientsToQuery();
+    mGradientWidget->saveGradientsToQuery(query);
 }
 
 void FillStrokeSettingsWidget::loadAllGradientsFromSql() {

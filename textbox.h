@@ -16,7 +16,7 @@ public:
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
 
     void openTextEditor();
-    int saveToSql(int parentId);
+    int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
     void updatePath();
     MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);

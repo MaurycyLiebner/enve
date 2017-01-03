@@ -42,9 +42,9 @@ public:
     Gradient(int sqlIdT,
              GradientWidget *gradientWidget);
 
-    int saveToSql();
+    int saveToSql(QSqlQuery *query);
 
-    void saveToSqlIfPathSelected();
+    void saveToSqlIfPathSelected(QSqlQuery *query);
 
     void swapColors(int id1, int id2);
 
@@ -243,12 +243,12 @@ public:
     void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
     void setCurrentColor(Color color);
 
-    void saveGradientsToQuery();
+    void saveGradientsToQuery(QSqlQuery *query);
     void loadAllGradientsFromSql();
     GradientWidget *getGradientWidget();
 
     void clearAll();
-    void saveGradientsToSqlIfPathSelected();
+    void saveGradientsToSqlIfPathSelected(QSqlQuery *query);
     void loadSettingsFromPath(PathBox *path);
     void setFillValuesFromFillSettings(const PaintSettings *settings);
     void setStrokeValuesFromStrokeSettings(const StrokeSettings *settings);

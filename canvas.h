@@ -215,12 +215,12 @@ public:
 
     void awaitUpdate() {}
 
-    void saveToSql();
+    void saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);
     void clearAll();
     void resetTransormation();
     void fitCanvasToSize();
-    void saveSelectedToSqlForCurrentBox();
+    void saveSelectedToSqlForCurrentBox(QSqlQuery *query);
     bool processFilteredKeyEvent(QKeyEvent *event);
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
     void scale(qreal scaleBy, QPointF absOrigin);
@@ -338,6 +338,8 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
+    void render(QPainter *p);
+    void renderFinal(QPainter *p);
 protected:
 //    void updateAfterCombinedTransformationChanged();
 

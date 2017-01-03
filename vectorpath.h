@@ -47,7 +47,7 @@ public:
     PathPoint *addPointRelPos(QPointF relPos,
                               QPointF startRelPos, QPointF endRelPos,
                               PathPoint *toPoint = NULL);
-    int saveToSql(int parentId);
+    int saveToSql(QSqlQuery *query, int parentId);
 
     PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
     qreal percentAtPoint(QPointF absPos, qreal distTolerance,

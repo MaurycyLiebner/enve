@@ -235,15 +235,15 @@ void Canvas::scalePointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin,
                                               startTrans);
 }
 
-void Canvas::saveToSql()
+void Canvas::saveToSql(QSqlQuery *query)
 {
     foreach(BoundingBox *box, mChildren) {
-        box->saveToSql(0);
+        box->saveToSql(query, 0);
     }
 }
 
-void Canvas::saveSelectedToSqlForCurrentBox() {
-    mCurrentBoxesGroup->saveSelectedToSql();
+void Canvas::saveSelectedToSqlForCurrentBox(QSqlQuery *query) {
+    mCurrentBoxesGroup->saveSelectedToSql(query);
 }
 
 void Canvas::loadAllBoxesFromSql(bool loadInBox) {
@@ -426,15 +426,42 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest) {
     delete image;
 }
 
+void Canvas::render(QPainter *p)
+{
+    if(mVisible) {
+        p->save();
+        //p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
+        foreach(BoundingBox *box, mChildren){
+            box->render(p);
+        }
+
+        p->restore();
+    }
+}
+
+void Canvas::renderFinal(QPainter *p)
+{
+    if(mVisible) {
+        p->save();
+
+        foreach(BoundingBox *box, mChildren){
+            box->renderFinal(p);
+        }
+
+        p->restore();
+    }
+}
+
 void Canvas::renderCurrentFrameToQImage(QImage *frame)
 {
     QPainter p(frame);
     p.setRenderHint(QPainter::Antialiasing);
+    p.setRenderHint(QPainter::SmoothPixmapTransform);
 
     p.scale(mResolutionPercent, mResolutionPercent);
     p.translate(getAbsolutePos() - mRenderRect.topLeft());
 
-    BoxesGroup::render(&p);
+    Canvas::render(&p);
 
     p.end();
 }
@@ -443,8 +470,9 @@ void Canvas::renderFinalCurrentFrameToQImage(QImage *frame)
 {
     QPainter p(frame);
     p.setRenderHint(QPainter::Antialiasing);
+    p.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    BoxesGroup::renderFinal(&p);
+    Canvas::renderFinal(&p);
 
     p.end();
 }
