@@ -34,9 +34,12 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
     mCombinedTransformMatrix.reset();
 }
 
-QPixmap BoundingBox::applyEffects(const QPixmap& pixmap, bool highQuality, qreal scale) {
+QPixmap BoundingBox::applyEffects(const QPixmap& pixmap,
+                                  bool highQuality,
+                                  qreal scale) {
     if(mEffects.isEmpty() ) return pixmap;
-    QImage im = pixmap.toImage().convertToFormat(QImage::Format_ARGB32_Premultiplied);;
+    QImage im = pixmap.toImage().convertToFormat(
+                QImage::Format_ARGB32_Premultiplied);;
     fmt_filters::image img(im.bits(), im.width(), im.height());
     foreach(PixmapEffect *effect, mEffects) {
         effect->apply(&im, img, scale, highQuality);
@@ -161,7 +164,9 @@ void BoundingBox::updatePrettyPixmap() {
     p.end();
 
     if(Canvas::effectsPaintEnabled()) {
-        mNewPixmap = applyEffects(mNewPixmap, mHighQualityPaint, mUpdateCanvasTransform.m11());
+        mNewPixmap = applyEffects(mNewPixmap,
+                                  mHighQualityPaint,
+                                  mUpdateCanvasTransform.m11());
     }
 }
 

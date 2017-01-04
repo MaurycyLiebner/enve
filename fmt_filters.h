@@ -191,6 +191,10 @@ namespace fmt_filters
     // blend
         // opacity = [0.0; 1.0]
     void blend(const image &im, const rgb &rgb, float opacity);
+    void replaceColor(const image &im,
+                      const int &rInt,
+                      const int &gInt,
+                      const int &bInt);
 
         // val = [0.0; 1.0]
         void fade(const image &im, const rgb &rgb, float val);

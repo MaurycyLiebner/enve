@@ -39,7 +39,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             menu.addAction("Paste");
             QMenu *effectsMenu = menu.addMenu("Effects");
             effectsMenu->addAction("Blur");
-            effectsMenu->addAction("Brush");
+//            effectsMenu->addAction("Brush");
             effectsMenu->addAction("Lines");
             effectsMenu->addAction("Circles");
 
@@ -81,7 +81,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
             QMenu *effectsMenu = menu.addMenu("Effects");
             effectsMenu->addAction("Blur");
-            effectsMenu->addAction("Brush");
+            effectsMenu->addAction("Shadow");
+//            effectsMenu->addAction("Brush");
             effectsMenu->addAction("Lines");
             effectsMenu->addAction("Circles");
 
@@ -99,6 +100,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     mCurrentBoxesGroup->centerPivotForSelected();
                 } else if(selectedAction->text() == "Blur") {
                     mCurrentBoxesGroup->applyBlurToSelected();
+                } else if(selectedAction->text() == "Shadow") {
+                    mCurrentBoxesGroup->applyShadowToSelected();
                 } else if(selectedAction->text() == "Brush") {
                     mCurrentBoxesGroup->applyBrushEffectToSelected();
                 } else if(selectedAction->text() == "Lines") {

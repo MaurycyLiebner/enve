@@ -348,29 +348,39 @@ CircleRadiusPoint::~CircleRadiusPoint()
 
 }
 
-void CircleRadiusPoint::moveBy(QPointF absTranslatione)
+void CircleRadiusPoint::moveBy(QPointF relTranslation)
 {
     if(mCenterPoint->isSelected() ) return;
-    MovablePoint::moveBy(QPointF( (mXBlocked ? 0. : absTranslatione.x() ),
-                         (mXBlocked ? absTranslatione.y() : 0. ) ) );
+    if(mXBlocked) {
+        relTranslation.setX(0.);
+    } else {
+        relTranslation.setY(0.);
+    }
+    MovablePoint::moveBy(relTranslation);
 }
 
-void CircleRadiusPoint::setAbsPosRadius(QPointF pos)
-{
-    QMatrix combinedM = mParent->getCombinedTransform();
-    QPointF newPos = combinedM.inverted().map(pos);
-    if(mXBlocked) {
-        newPos.setX(getRelativePos().x() );
-    } else {
-        newPos.setY(getRelativePos().y() );
-    }
-    setRelativePos(newPos, false );
-}
+//void CircleRadiusPoint::setAbsPosRadius(QPointF pos)
+//{
+//    QMatrix combinedM = mParent->getCombinedTransform();
+//    QPointF newPos = combinedM.inverted().map(pos);
+//    if(mXBlocked) {
+//        newPos.setX(mRelPos.getSavedXValue());
+//    } else {
+//        newPos.setY(mRelPos.getSavedYValue());
+//    }
+//    setRelativePos(newPos, false );
+//}
 
 void CircleRadiusPoint::moveByAbs(QPointF absTranslatione) {
     if(mCenterPoint->isSelected() ) return;
+    if(mXBlocked) {
+        absTranslatione.setX(0.);
+    } else {
+        absTranslatione.setY(0.);
+    }
+    MovablePoint::moveByAbs(absTranslatione);
     //mRelPos.setCurrentValue(mSavedRelPos);
-    setAbsPosRadius(getAbsolutePos() + absTranslatione);
+    //setAbsPosRadius(getAbsolutePos() + absTranslatione);
 }
 
 void CircleRadiusPoint::startTransform()

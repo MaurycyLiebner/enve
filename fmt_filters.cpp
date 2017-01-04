@@ -383,6 +383,36 @@ void blend(const image &im, const rgb &rgb, float opacity)
     }
 }
 
+void replaceColor(const image &im,
+                  const int &rInt,
+                  const int &gInt,
+                  const int &bInt)
+{
+    // check parameters
+    if(!checkImage(im))
+    return;
+
+    rgba *bits;
+    unsigned char r = rInt;
+    unsigned char g = gInt;
+    unsigned char b = bInt;
+
+    // blend!
+    for(s32 y = 0; y < im.h; ++y)
+    {
+        bits = (rgba *)im.data + im.rw * y;
+
+        for(s32 x = 0; x < im.w; x++)
+        {
+            bits->r = b*bits->a/255;
+            bits->g = g*bits->a/255;
+            bits->b = r*bits->a/255;
+
+            bits++;
+        }
+    }
+}
+
 void flatten(const image &im, const rgb &ca, const rgb &cb)
 {
     if(!checkImage(im))

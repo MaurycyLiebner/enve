@@ -139,6 +139,12 @@ void BoxesGroup::applyBlurToSelected() {
     }
 }
 
+void BoxesGroup::applyShadowToSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new ShadowEffect());
+    }
+}
+
 void BoxesGroup::applyBrushEffectToSelected() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->addEffect(new BrushEffect());
@@ -393,9 +399,10 @@ void BoxesGroup::updateBoundingRect() {
                     child->getRelativeTransform().
                     map(child->getBoundingRectPath()));
     }
+    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
     mRelBoundingRect = boundingPaths.boundingRect().
-                    adjusted(-mEffectsMargin, -mEffectsMargin,
-                             mEffectsMargin, mEffectsMargin);
+                    adjusted(-effectsMargin, -effectsMargin,
+                             effectsMargin, effectsMargin);
     mBoundingRect = QPainterPath();
     mBoundingRect.addRect(mRelBoundingRect);
 

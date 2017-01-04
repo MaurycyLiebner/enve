@@ -1,14 +1,16 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
 #include "fmt_filters.h"
-#include "complexanimator.h"
+#include "coloranimator.h"
+#include "qpointfanimator.h"
 
 class PixmapEffect : public ComplexAnimator
 {
 public:
     PixmapEffect();
     virtual void apply(QImage *,
-                       const fmt_filters::image &, qreal,
+                       const fmt_filters::image &,
+                       qreal,
                        bool) {}
 
     virtual qreal getMargin() { return 0.; }
@@ -34,12 +36,33 @@ class BlurEffect : public PixmapEffect
 public:
     BlurEffect(qreal radius = 10.);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale,
+    void apply(QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
                bool highQuality);
 
     qreal getMargin();
 private:
     QrealAnimator mBlurRadius;
+};
+
+class ShadowEffect : public PixmapEffect
+{
+public:
+    ShadowEffect(qreal radius = 10.);
+
+    void apply(QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
+
+    qreal getMargin();
+private:
+//    QrealAnimator mScale;
+    QPointFAnimator mTranslation;
+    ColorAnimator mColor;
+    QrealAnimator mBlurRadius;
+    QrealAnimator mOpacity;
 };
 
 class BrushStroke {
@@ -91,7 +114,10 @@ public:
                 qreal strokeMaxDirectionAngle = 360.,
                 qreal strokeCurvature = 0.5);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality);
+    void apply(QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
 
     qreal getMargin();
 private:
@@ -107,9 +133,13 @@ private:
 class LinesEffect : public PixmapEffect
 {
 public:
-    LinesEffect(qreal linesWidth = 5., qreal linesDistance = 5.);
+    LinesEffect(qreal linesWidth = 5.,
+                qreal linesDistance = 5.);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality);
+    void apply(QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
 
     qreal getMargin() { return 0.; }
 private:
@@ -121,9 +151,13 @@ private:
 class CirclesEffect : public PixmapEffect
 {
 public:
-    CirclesEffect(qreal circlesRadius = 5., qreal circlesDistance = 5.);
+    CirclesEffect(qreal circlesRadius = 5.,
+                  qreal circlesDistance = 5.);
 
-    void apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality);
+    void apply(QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
 
     qreal getMargin() { return 0.; }
 private:

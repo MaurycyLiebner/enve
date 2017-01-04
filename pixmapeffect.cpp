@@ -30,10 +30,85 @@ qreal BlurEffect::getMargin()
     return mBlurRadius.getCurrentValue();
 }
 
+ShadowEffect::ShadowEffect(qreal radius) {
+    mBlurRadius.setCurrentValue(radius);
+    setName("shadow");
+    mBlurRadius.setName("blur radius");
+    mBlurRadius.blockPointer();
+    mBlurRadius.setValueRange(0., 1000.);
+    addChildAnimator(&mBlurRadius);
+
+    mTranslation.setCurrentValue(QPointF(0., 0.));
+    mTranslation.setName("translation");
+    mTranslation.blockPointer();
+    mTranslation.setValueRange(-1000., 1000.);
+    addChildAnimator(&mTranslation);
+
+    mColor.setCurrentValue(Qt::black);
+    mColor.setName("color");
+    mColor.blockPointer();
+    addChildAnimator(&mColor);
+
+    mOpacity.setCurrentValue(100.);
+    mOpacity.setName("opacity");
+    mOpacity.blockPointer();
+    mOpacity.setValueRange(0., 100.);
+    addChildAnimator(&mOpacity);
+//    mScale.setCurrentValue(1.);
+//    mScale.setName("scale");
+//    mScale.blockPointer();
+//    mScale.setValueRange(0., 10.);
+//    addChildAnimator(&mScale);
+}
+
+void ShadowEffect::apply(QImage *imgPtr,
+                         const fmt_filters::image &img,
+                         qreal scale,
+                         bool highQuality) {
+    Q_UNUSED(imgPtr);
+
+    QImage shadowQImg = imgPtr->copy();
+    fmt_filters::image shadowImg(shadowQImg.bits(),
+                                 shadowQImg.width(),
+                                 shadowQImg.height());
+
+    QColor currentColor = mColor.getCurrentValue().qcol;
+
+    fmt_filters::replaceColor(shadowImg,
+                              currentColor.red(),
+                              currentColor.green(),
+                              currentColor.blue());
+
+//    QPainter p0(&shadowQImg);
+//    p0.setCompositionMode(QPainter::CompositionMode_Xor);
+//    p0.fillRect(shadowQImg.rect(), Qt::black);
+//    p0.end();
+
+
+    qreal radius = mBlurRadius.getCurrentValue()*scale;
+    if(highQuality) {
+        fmt_filters::blur(shadowImg, radius, radius*0.3333);
+    } else {
+        fmt_filters::fast_blur(shadowImg, radius*0.5);
+    }
+
+    QPainter p(imgPtr);
+    p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
+    p.setOpacity(mOpacity.getCurrentValue()*0.01);
+    p.drawImage(mTranslation.getCurrentValue(), shadowQImg);
+    p.end();
+}
+
+qreal ShadowEffect::getMargin() {
+    return mBlurRadius.getCurrentValue() +
+            pointToLen(mTranslation.getCurrentValue());
+}
+
 BrushEffect::BrushEffect(qreal numberStrokes,
                          qreal brushMinRadius, qreal brushMaxRadius,
                          qreal strokeMaxLength,
-                         qreal strokeMinDirectionAngle, qreal strokeMaxDirectionAngle,
+                         qreal strokeMinDirectionAngle,
+                         qreal strokeMaxDirectionAngle,
                          qreal strokeCurvature)
 {
     setName("brush");
@@ -74,36 +149,52 @@ BrushEffect::BrushEffect(qreal numberStrokes,
     addChildAnimator(&mStrokeCurvature);
 }
 
-void BrushEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale,
+void BrushEffect::apply(QImage *imgPtr,
+                        const fmt_filters::image &img,
+                        qreal scale,
                         bool highQuality) {
     int width = imgPtr->width();
     int height = imgPtr->height();
     QList<BrushStroke*> strokes;
     for(int i = 0; i < mNumberStrokes.getCurrentValue(); i++) {
-        qreal radius = qRandF(mMinBrushRadius.getCurrentValue(), mMaxBrushRadius.getCurrentValue())*scale;
+        qreal radius = qRandF(mMinBrushRadius.getCurrentValue(),
+                              mMaxBrushRadius.getCurrentValue())*scale;
         QPointF startPos = QPointF(qrand() % width, qrand() % height);
         qreal angle;
         if(qrand() % 2 == 1) {
-            angle = qRandF(mStrokeMinDirectionAngle.getCurrentValue(), mStrokeMaxDirectionAngle.getCurrentValue());
+            angle = qRandF(mStrokeMinDirectionAngle.getCurrentValue(),
+                           mStrokeMaxDirectionAngle.getCurrentValue());
         } else {
-            angle = qRandF(mStrokeMinDirectionAngle.getCurrentValue() + 180, mStrokeMaxDirectionAngle.getCurrentValue() + 180);
+            angle = qRandF(mStrokeMinDirectionAngle.getCurrentValue() + 180,
+                           mStrokeMaxDirectionAngle.getCurrentValue() + 180);
         }
-        qreal length = qRandF(2*radius, mStrokeMaxLength.getCurrentValue()*scale);
-        QLineF line = QLineF(startPos, QPointF(startPos.x() + length, startPos.y()));
+        qreal length = qRandF(2*radius,
+                              mStrokeMaxLength.getCurrentValue()*scale);
+        QLineF line = QLineF(startPos,
+                             QPointF(startPos.x() + length,
+                                     startPos.y()));
         line.setAngle(angle);
         QPointF endPos = line.p2();
         QPointF point;
-        if(line.intersect(QLineF(0., 0., 0., height - 1), &point) == QLineF::BoundedIntersection) {
+        if(line.intersect(QLineF(0., 0., 0., height - 1),
+                          &point) == QLineF::BoundedIntersection) {
             endPos = point;
-        } else if(line.intersect(QLineF(width - 1, 0., width - 1, height - 1), &point) == QLineF::BoundedIntersection) {
+        } else if(line.intersect(QLineF(width - 1, 0.,
+                                        width - 1, height - 1),
+                                 &point) == QLineF::BoundedIntersection) {
             endPos = point;
-        } else if(line.intersect(QLineF(0., 0., width - 1, 0.), &point) == QLineF::BoundedIntersection) {
+        } else if(line.intersect(QLineF(0., 0.,
+                                        width - 1, 0.),
+                                 &point) == QLineF::BoundedIntersection) {
             endPos = point;
-        } else if(line.intersect(QLineF(0., height - 1, width - 1, height - 1), &point) == QLineF::BoundedIntersection) {
+        } else if(line.intersect(QLineF(0., height - 1,
+                                        width - 1, height - 1),
+                                 &point) == QLineF::BoundedIntersection) {
             endPos = point;
         }
         line = line.normalVector().translated((endPos - startPos)*0.5);
-        line.setLength(line.length()*qRandF(-mStrokeCurvature.getCurrentValue(), mStrokeCurvature.getCurrentValue()));
+        line.setLength(line.length()*qRandF(-mStrokeCurvature.getCurrentValue(),
+                                            mStrokeCurvature.getCurrentValue()));
         QPointF ctrls = line.p2();
         if(ctrls.x() >= width) {
             ctrls.setX(width - 2);
@@ -118,7 +209,8 @@ void BrushEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal sca
             ctrls.setY(2);
         }
         QColor strokeColor = imgPtr->pixelColor(startPos.toPoint());
-        strokeColor.setHslF(qclamp(strokeColor.hueF() + qRandF(-0.05, 0.05), 0., 1.),
+        strokeColor.setHslF(qclamp(strokeColor.hueF() +
+                                   qRandF(-0.05, 0.05), 0., 1.),
                             strokeColor.saturationF(),
                             strokeColor.lightnessF(),
                             strokeColor.alphaF());
@@ -166,7 +258,8 @@ BrushStroke::BrushStroke(QPointF startPos, QPointF startCtrlPos,
 }
 
 void BrushStroke::drawOnImage(QImage *img) const {
-    QImage strokeImg = QImage(mBoundingRect.size().toSize(), QImage::Format_ARGB32_Premultiplied);
+    QImage strokeImg = QImage(mBoundingRect.size().toSize(),
+                              QImage::Format_ARGB32_Premultiplied);
     strokeImg.fill(Qt::transparent);
     QPainter pStroke(&strokeImg);
     pStroke.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -235,7 +328,8 @@ void BrushStroke::loadStrokePixmaps()
 #include <QDebug>
 void BrushStroke::prepareToDrawOnImage(QImage *img)
 {
-    mTexPix = mStrokeTexPixmaps.at(qrand() % 21)->scaledToHeight(mRadius*2, Qt::SmoothTransformation);
+    mTexPix = mStrokeTexPixmaps.at(qrand() % 21)->
+            scaledToHeight(mRadius*2, Qt::SmoothTransformation);
     mStrokeTexHeight = mTexPix.height();
     mStrokeTexWidth = mTexPix.width();
     mMaxTexDabs = mStrokeTexWidth*0.5;
@@ -246,7 +340,9 @@ void BrushStroke::prepareToDrawOnImage(QImage *img)
     QLinearGradient gradient = QLinearGradient(0., 0., dabsWidth, 0.);
     //gradient.setColorAt(0., mColor);
     for(qreal xTex = 0; xTex < dabsWidth; xTex += mRadius) {
-        QColor colAtPix = img->pixelColor(mStrokePath.pointAtPercent(mStrokePath.percentAtLength(xTex)).toPoint() );
+        QColor colAtPix = img->pixelColor(
+                    mStrokePath.pointAtPercent(
+                        mStrokePath.percentAtLength(xTex)).toPoint());
         if(isTooDifferent(colAtPix, mColor)) {
             mMaxStrokeDabs = xTex*0.5;
             mNDabs = mMaxStrokeDabs;
@@ -285,7 +381,8 @@ void BrushStroke::prepareToDrawOnImage(QImage *img)
                 radAngle += M_PI;
             }
         }
-        qreal paintWidth = ((i == 0) ? 3. : 3. + sin(qAbs(lastRadAngle - radAngle)*0.5)*mRadius);
+        qreal paintWidth = ((i == 0) ? 3. : 3. +
+                            sin(qAbs(lastRadAngle - radAngle)*0.5)*mRadius);
         lastRadAngle = radAngle;
         mFragments[i] = QPainter::PixmapFragment::create(
                     mStrokePath.pointAtPercent(perc) - mBoundingRect.topLeft(),
@@ -315,9 +412,11 @@ void LinesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal sca
 {
     qreal linesWidth = mLinesWidth.getCurrentValue()*scale;
     qreal linesDistance = mLinesDistance.getCurrentValue()*scale;
-    if((linesWidth < 0.1 && linesDistance < linesWidth) || (linesDistance <= linesWidth*0.5)) return;
+    if((linesWidth < 0.1 && linesDistance < linesWidth) ||
+            (linesDistance <= linesWidth*0.5)) return;
 
-    QImage linesImg = QImage(imgPtr->size(), QImage::Format_ARGB32_Premultiplied);
+    QImage linesImg = QImage(imgPtr->size(),
+                             QImage::Format_ARGB32_Premultiplied);
     linesImg.fill(Qt::transparent);
 
     int height = imgPtr->height();
@@ -352,7 +451,9 @@ void LinesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal sca
     p.end();
 }
 
-CirclesEffect::CirclesEffect(qreal circlesRadius, qreal circlesDistance) : PixmapEffect() {
+CirclesEffect::CirclesEffect(qreal circlesRadius,
+                             qreal circlesDistance) :
+    PixmapEffect() {
     setName("circles");
 
     mCirclesRadius.setValueRange(0., 100000.);
@@ -368,7 +469,10 @@ CirclesEffect::CirclesEffect(qreal circlesRadius, qreal circlesDistance) : Pixma
     addChildAnimator(&mCirclesDistance);
 }
 
-void CirclesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality)
+void CirclesEffect::apply(QImage *imgPtr,
+                          const fmt_filters::image &img,
+                          qreal scale,
+                          bool highQuality)
 {
     qreal radius = mCirclesRadius.getCurrentValue()*scale;
     qreal distance = mCirclesDistance.getCurrentValue()*scale;
@@ -392,7 +496,8 @@ void CirclesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal s
         qreal circleY = radius + distance*0.5;
         while(circleY - radius < height) {
             while(circleX - radius < width) {
-                circlesImgP.drawEllipse(QPointF(circleX, circleY), radius, radius);
+                circlesImgP.drawEllipse(QPointF(circleX, circleY),
+                                        radius, radius);
                 circleX += 2*radius + distance;
             }
             circleY += 2*radius + distance;

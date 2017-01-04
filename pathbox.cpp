@@ -235,9 +235,11 @@ void PathBox::updateDrawGradients()
 }
 
 void PathBox::updateBoundingRect() {
-    mRelBoundingRect = mWholePath.boundingRect().adjusted(-mEffectsMargin, -mEffectsMargin,
-                                                                mEffectsMargin, mEffectsMargin);
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect);
+    mRelBoundingRect = mWholePath.boundingRect();
+    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
+    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
+                        adjusted(-effectsMargin, -effectsMargin,
+                                 effectsMargin, effectsMargin);
     mBoundingRect = QPainterPath();
     mBoundingRect.addRect(mRelBoundingRect);
     mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);

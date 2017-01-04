@@ -254,7 +254,9 @@ protected:
     bool mAwaitUpdateScheduled = false;
 
     virtual void updateAfterCombinedTransformationChanged() {}
-    QPixmap applyEffects(const QPixmap &pixmap, bool highQuality, qreal scale = 1.);
+    QPixmap applyEffects(const QPixmap &pixmap,
+                         bool highQuality,
+                         qreal scale = 1.);
 
     QMatrix mAllUglyTransform;
     QMatrix mAllUglyPaintTransform;

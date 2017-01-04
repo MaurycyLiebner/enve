@@ -30,8 +30,8 @@ public:
                       bool blockX, MovablePoint *centerPoint);
     ~CircleRadiusPoint();
 
-    void moveBy(QPointF absTranslatione);
-    void setAbsPosRadius(QPointF pos);
+    void moveBy(QPointF relTranslation);
+//    void setAbsPosRadius(QPointF pos);
     void moveByAbs(QPointF absTranslatione);
 
     void startTransform();

@@ -27,6 +27,9 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
         addActiveAnimator(&mEffectsAnimators);
     }
     mEffectsAnimators.addChildAnimator(effect);
+
+    scheduleEffectsMarginUpdate();
+    scheduleAwaitUpdate();
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
@@ -39,6 +42,9 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
         removeActiveAnimator(&mEffectsAnimators);
     }
     effect->decNumberPointers();
+
+    scheduleEffectsMarginUpdate();
+    scheduleAwaitUpdate();
 }
 
 QrealAnimator *BoundingBox::getAnimatorsCollection() {
