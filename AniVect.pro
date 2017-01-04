@@ -93,7 +93,11 @@ SOURCES += main.cpp\
     animator.cpp \
     BoxesList/boxesgroupwidgetcontainer.cpp \
     Sound/singlesound.cpp \
-    Sound/soundcomposition.cpp
+    Sound/soundcomposition.cpp \
+    ObjectSettings/objectsettingswidget.cpp \
+    ObjectSettings/effectssettingswidget.cpp \
+    ObjectSettings/transformationsettingswidget.cpp \
+    ObjectSettings/othersettingswidget.cpp
 
 HEADERS  += mainwindow.h \
     vectorpath.h \
@@ -173,4 +177,8 @@ HEADERS  += mainwindow.h \
     animator.h \
     BoxesList/boxesgroupwidgetcontainer.h \
     Sound/singlesound.h \
-    Sound/soundcomposition.h
+    Sound/soundcomposition.h \
+    ObjectSettings/objectsettingswidget.h \
+    ObjectSettings/effectssettingswidget.h \
+    ObjectSettings/transformationsettingswidget.h \
+    ObjectSettings/othersettingswidget.h
