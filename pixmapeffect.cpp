@@ -1,8 +1,36 @@
 #include "pixmapeffect.h"
+#include <QDrag>
+#include <QMimeData>
+
+QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr) {
+    qulonglong ptrval(*reinterpret_cast<qulonglong *>(&ptr));
+    return s << ptrval;
+}
+
+QDataStream & operator >> (QDataStream & s, PixmapEffect *& ptr) {
+    qulonglong ptrval;
+    s >> ptrval;
+    ptr = *reinterpret_cast<PixmapEffect **>(&ptrval);
+    return s;
+}
 
 PixmapEffect::PixmapEffect() : ComplexAnimator()
 {
 
+}
+
+void PixmapEffect::startDragging() {
+    QMimeData *mimeData = new QMimeData;
+
+    QByteArray itemData;
+    QDataStream dataStream(&itemData, QIODevice::WriteOnly);
+    dataStream << (PixmapEffect*)this;
+
+    mimeData->setData("effect", itemData);
+
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mimeData);
+    drag->exec();
 }
 
 BlurEffect::BlurEffect(qreal radius) {

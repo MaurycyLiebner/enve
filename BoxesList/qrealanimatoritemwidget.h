@@ -20,6 +20,7 @@ public:
                   int minViewedFrame, int maxViewedFrame);
 
     QrealAnimator *getTargetAnimator() { return mTargetAnimator; }
+    void mouseMoveEvent(QMouseEvent *);
 protected:
     QrealAnimator *mTargetAnimator;
 };

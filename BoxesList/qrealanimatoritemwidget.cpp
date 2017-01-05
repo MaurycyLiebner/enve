@@ -75,3 +75,8 @@ void QrealAnimatorItemWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
     mTargetAnimator->drawKeys(p, pixelsPerFrame, animatorTop,
                               minViewedFrame, maxViewedFrame);
 }
+
+void QrealAnimatorItemWidget::mouseMoveEvent(QMouseEvent *)
+{
+    mTargetAnimator->startDragging();
+}

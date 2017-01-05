@@ -43,16 +43,6 @@ void ComplexAnimatorItemWidget::mousePressEvent(QMouseEvent *event)
     callUpdateSchedulers();
 }
 
-void ComplexAnimatorItemWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setData("effect", QByteArray());
-
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-    drag->exec();
-}
-
 void ComplexAnimatorItemWidget::setDetailsVisibile(bool bT) {
     mDetailsVisible = bT;
     emit detailsVisibilityChanged(bT);

@@ -57,8 +57,19 @@ void EffectsSettingsWidget::dragLeaveEvent(QDragLeaveEvent *event) {
 void EffectsSettingsWidget::dropEvent(QDropEvent *event)
 {
     if (event->mimeData()->hasFormat("effect")) {
-        ComplexAnimatorItemWidget *effectWidget =
-                (ComplexAnimatorItemWidget*)event->source();
+        QByteArray itemData = event->mimeData()->data("effect");
+        QDataStream dataStream(&itemData, QIODevice::ReadOnly);
+        PixmapEffect *effectPtr = NULL;
+        dataStream >> effectPtr;
+
+        ComplexAnimatorItemWidgetContainer *effectWidget = NULL;
+
+        foreach(ComplexAnimatorItemWidgetContainer *widget, mWidgets) {
+            if((PixmapEffect*)widget->getTargetAnimator() == effectPtr) {
+                effectWidget = widget;
+                break;
+            }
+        }
 
         int insertY = event->pos().y();
 
@@ -73,11 +84,11 @@ void EffectsSettingsWidget::dropEvent(QDropEvent *event)
         }
 
         if(widgetBefore == NULL) {
-            mEffectsLayout->insertWidget(0, effectWidget->parentWidget());
+            mEffectsLayout->insertWidget(0, effectWidget);
         } else {
             mEffectsLayout->insertWidget(
                         mEffectsLayout->indexOf(widgetBefore) + 1,
-                        effectWidget->parentWidget());
+                        effectWidget);
         }
 
         event->acceptProposedAction();

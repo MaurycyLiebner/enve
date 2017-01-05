@@ -23,6 +23,10 @@ public:
         return false;
     }
 
+    void startDragging();
+
+    friend QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr);
+    friend QDataStream & operator >> (QDataStream & s, PixmapEffect *& ptr);
 public slots:
     void interrupt() {
         mInterrupted = true;
