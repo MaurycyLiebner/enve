@@ -4,7 +4,7 @@
 //#include <QObject>
 //#include <QAudioFormat>
 //#include <QAudioDecoder>
-//#include "qrealanimator.h"
+//#include "Animators/qrealanimator.h"
 //#include <QVector>
 
 //class SingleSound : public QObject

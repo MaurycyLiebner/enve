@@ -3,7 +3,7 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPainter>
-#include "qpointfanimator.h"
+#include "Animators/qpointfanimator.h"
 #include "transformable.h"
 
 class BoundingBox;

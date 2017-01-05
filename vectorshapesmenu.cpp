@@ -1,7 +1,7 @@
 #include "vectorshapesmenu.h"
 #include "pathpoint.h"
 #include "qrealanimatorvalueslider.h"
-#include "vectorpath.h"
+#include "Boxes/vectorpath.h"
 #include "mainwindow.h"
 
 VectorShapesMenu::VectorShapesMenu(QWidget *parent) : QWidget(parent) {

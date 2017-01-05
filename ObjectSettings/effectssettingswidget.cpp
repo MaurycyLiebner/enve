@@ -1,7 +1,7 @@
 #include "effectssettingswidget.h"
 #include <QDropEvent>
 #include <QMimeData>
-#include "boundingbox.h"
+#include "Boxes/boundingbox.h"
 #include "BoxesList/complexanimatoritemwidget.h"
 
 EffectsSettingsWidget::EffectsSettingsWidget(QWidget *parent) :

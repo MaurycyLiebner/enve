@@ -1,7 +1,7 @@
 ﻿#ifndef UPDATESCHEDULER_H
 #define UPDATESCHEDULER_H
 
-#include "vectorpath.h"
+#include "Boxes/vectorpath.h"
 #include "canvas.h"
 #include <QDebug>
 

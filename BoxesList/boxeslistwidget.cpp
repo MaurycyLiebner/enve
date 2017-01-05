@@ -2,7 +2,7 @@
 #include "mainwindow.h"
 #include "boxitemwidgetcontainer.h"
 #include "boxesgroupwidgetcontainer.h"
-#include "boxesgroup.h"
+#include "Boxes/boxesgroup.h"
 
 QPixmap *BoxesListWidget::VISIBLE_PIXMAP;
 QPixmap *BoxesListWidget::INVISIBLE_PIXMAP;

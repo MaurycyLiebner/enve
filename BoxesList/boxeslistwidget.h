@@ -2,7 +2,7 @@
 #define BOXESLISTWIDGET_H
 
 #include <QWidget>
-#include "boundingbox.h"
+#include "Boxes/boundingbox.h"
 
 class BoxesListWidget : public QWidget
 {

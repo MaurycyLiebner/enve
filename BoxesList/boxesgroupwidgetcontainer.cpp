@@ -1,5 +1,5 @@
 #include "boxesgroupwidgetcontainer.h"
-#include "boxesgroup.h"
+#include "Boxes/boxesgroup.h"
 #include "boxeslistwidget.h"
 #include "boxitemwidget.h"
 

@@ -1,8 +1,8 @@
 #include "complexanimatoritemwidgetcontainer.h"
 #include "qrealanimatoritemwidget.h"
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 #include "complexanimatoritemwidget.h"
-#include "complexanimator.h"
+#include "Animators/complexanimator.h"
 #include "boxeslistwidget.h"
 
 ComplexAnimatorItemWidgetContainer::ComplexAnimatorItemWidgetContainer(QrealAnimator *target,

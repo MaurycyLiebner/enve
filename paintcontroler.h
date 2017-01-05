@@ -2,7 +2,7 @@
 #define PAINTCONTROLER_H
 #include <QObject>
 #include <QTimer>
-#include "boundingbox.h"
+#include "Boxes/boundingbox.h"
 
 class PaintControler : public QObject
 {

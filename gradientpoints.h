@@ -1,6 +1,6 @@
 #ifndef GRADIENTPOINTS_H
 #define GRADIENTPOINTS_H
-#include "complexanimator.h"
+#include "Animators/complexanimator.h"
 #include "gradientpoint.h"
 
 class MovablePoint;

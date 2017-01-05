@@ -1,6 +1,6 @@
 #include "svgimporter.h"
-#include "vectorpath.h"
-#include "boxesgroup.h"
+#include "Boxes/vectorpath.h"
+#include "Boxes/boxesgroup.h"
 #include "canvas.h"
 
 struct SvgAttribute {

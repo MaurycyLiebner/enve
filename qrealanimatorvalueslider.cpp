@@ -1,5 +1,5 @@
 #include "qrealanimatorvalueslider.h"
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 #include "mainwindow.h"
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,

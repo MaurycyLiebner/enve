@@ -3,9 +3,9 @@
 
 #include <QList>
 #include "canvas.h"
-#include "vectorpath.h"
+#include "Boxes/vectorpath.h"
 #include "movablepoint.h"
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 #include <QDebug>
 
 class UndoRedo

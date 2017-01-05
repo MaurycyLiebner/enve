@@ -1,7 +1,7 @@
 #include "ctrlpoint.h"
 #include "pathpoint.h"
-#include "vectorpath.h"
-#include "boxesgroup.h"
+#include "Boxes/vectorpath.h"
+#include "Boxes/boxesgroup.h"
 
 CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
     MovablePoint(parentPoint->getParentPath(),

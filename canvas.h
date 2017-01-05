@@ -1,13 +1,13 @@
 #ifndef CANVAS_H
 #define CANVAS_H
 
-#include "boxesgroup.h"
+#include "Boxes/boxesgroup.h"
 #include "Colors/color.h"
 #include "fillstrokesettings.h"
 #include <QSqlQuery>
 #include <QThread>
 #include "ctrlpoint.h"
-#include "textbox.h"
+#include "Boxes/textbox.h"
 
 class MainWindow;
 

@@ -1,5 +1,5 @@
 #include "movablepoint.h"
-#include "vectorpath.h"
+#include "Boxes/vectorpath.h"
 #include "mainwindow.h"
 #include "undoredo.h"
 

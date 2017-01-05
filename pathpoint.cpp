@@ -1,5 +1,5 @@
 #include "pathpoint.h"
-#include "vectorpath.h"
+#include "Boxes/vectorpath.h"
 #include "undoredo.h"
 #include "ctrlpoint.h"
 #include <QPainter>

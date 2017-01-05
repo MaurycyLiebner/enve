@@ -1,6 +1,6 @@
 #include "boxitemwidgetcontainer.h"
 #include "boxitemwidget.h"
-#include "boundingbox.h"
+#include "Boxes/boundingbox.h"
 #include "boxeslistwidget.h"
 #include "complexanimatoritemwidgetcontainer.h"
 

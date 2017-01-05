@@ -1,5 +1,5 @@
 #include "complexanimatoritemwidget.h"
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 #include "boxeslistwidget.h"
 #include "mainwindow.h"
 #include <QDrag>

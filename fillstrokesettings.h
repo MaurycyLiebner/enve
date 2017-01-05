@@ -14,7 +14,7 @@
 #include "connectedtomainwindow.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
-#include "coloranimator.h"
+#include "Animators/coloranimator.h"
 
 class GradientWidget;
 

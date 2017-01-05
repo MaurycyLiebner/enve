@@ -1,6 +1,6 @@
 #ifndef QREALPOINTVALUEDIALOG_H
 #define QREALPOINTVALUEDIALOG_H
-#include "qrealanimator.h"
+#include "Animators/qrealanimator.h"
 #include <QDialog>
 #include <QDoubleSpinBox>
 #include <QHBoxLayout>

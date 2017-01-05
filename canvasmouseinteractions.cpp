@@ -1,10 +1,10 @@
 #include "canvas.h"
 #include <QMouseEvent>
 #include "pathpivot.h"
-#include "circle.h"
-#include "rectangle.h"
-#include "imagebox.h"
-#include "textbox.h"
+#include "Boxes/circle.h"
+#include "Boxes/rectangle.h"
+#include "Boxes/imagebox.h"
+#include "Boxes/textbox.h"
 
 QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
     return point/mCombinedTransformMatrix.m11();

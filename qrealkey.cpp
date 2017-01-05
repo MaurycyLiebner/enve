@@ -1,6 +1,6 @@
 #include "qrealkey.h"
-#include "qrealanimator.h"
-#include "complexanimator.h"
+#include "Animators/qrealanimator.h"
+#include "Animators/complexanimator.h"
 
 QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     QrealPoint(KEY_POINT, this) {

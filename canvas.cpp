@@ -7,7 +7,7 @@
 #include "mainwindow.h"
 #include "updatescheduler.h"
 #include "pathpivot.h"
-#include "imagebox.h"
+#include "Boxes/imagebox.h"
 
 bool Canvas::mEffectsPaintEnabled = true;
 qreal Canvas::mResolutionPercent = 1.;
