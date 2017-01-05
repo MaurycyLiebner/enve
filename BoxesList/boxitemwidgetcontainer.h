@@ -36,6 +36,10 @@ protected:
     void addAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget);
     void removeAnimatorWidget(ComplexAnimatorItemWidgetContainer *widget);
 
+//    void dragEnterEvent(QDragEnterEvent *event);
+//    void dragMoveEvent(QDragMoveEvent *event);
+//    void dropEvent(QDropEvent *event);
+
     BoxItemWidget *mTargetBoxWidget = NULL;
     QList<ComplexAnimatorItemWidgetContainer*> mAnimatorsContainers;
 };

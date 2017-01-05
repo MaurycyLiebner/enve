@@ -2,6 +2,8 @@
 #include "qrealanimator.h"
 #include "boxeslistwidget.h"
 #include "mainwindow.h"
+#include <QDrag>
+#include <QMimeData>
 
 ComplexAnimatorItemWidget::ComplexAnimatorItemWidget(QrealAnimator *target,
                                                      QWidget *parent) :
@@ -39,6 +41,16 @@ void ComplexAnimatorItemWidget::mousePressEvent(QMouseEvent *event)
     }
 
     callUpdateSchedulers();
+}
+
+void ComplexAnimatorItemWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData("effect", QByteArray());
+
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mimeData);
+    drag->exec();
 }
 
 void ComplexAnimatorItemWidget::setDetailsVisibile(bool bT) {

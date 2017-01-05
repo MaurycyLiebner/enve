@@ -12,6 +12,8 @@ public:
 
     void mousePressEvent(QMouseEvent *event);
 
+    void mouseMoveEvent(QMouseEvent *event);
+
     void setDetailsVisibile(bool bT);
 signals:
     void detailsVisibilityChanged(bool);

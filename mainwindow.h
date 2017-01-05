@@ -119,6 +119,8 @@ private:
     int mCurrentRenderFrame;
 
     bool mPreviewInterrupted = false;
+
+    EffectsSettingsWidget *mEffectsSettingsWidget = NULL;
 protected:    
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -184,6 +186,7 @@ public:
 
     void addBoxAwaitingUpdate(BoundingBox *box);
     void setCurrentShapesMenuBox(BoundingBox *box);
+    void setCurrentEffectsSettingsWidgetBox(BoundingBox *box);
     void nextSaveOutputFrame();
     void nextPlayPreviewFrame();
 

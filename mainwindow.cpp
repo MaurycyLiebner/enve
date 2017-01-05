@@ -17,6 +17,7 @@
 #include "renderoutputwidget.h"
 #include "svgimporter.h"
 #include "canvaswidget.h"
+#include "ObjectSettings/effectssettingswidget.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -303,6 +304,11 @@ MainWindow::MainWindow(QWidget *parent)
     mVectorShapesMenu = new VectorShapesMenu(this);
     shapesMenuWidget->setWidget(mVectorShapesMenu);
     addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
+
+    QDockWidget *effectsMenuWidget = new QDockWidget(this);
+    mEffectsSettingsWidget = new EffectsSettingsWidget(this);
+    effectsMenuWidget->setWidget(mEffectsSettingsWidget);
+    addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
 }
 
 MainWindow::~MainWindow()
@@ -530,6 +536,11 @@ void MainWindow::callUpdateSchedulers()
 void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
     if(mVectorShapesMenu == NULL) return;
     mVectorShapesMenu->setSelectedBoundingBox(box);
+}
+
+void MainWindow::setCurrentEffectsSettingsWidgetBox(BoundingBox *box) {
+    if(mEffectsSettingsWidget == NULL) return;
+    mEffectsSettingsWidget->setBoundingBox(box);
 }
 
 void MainWindow::updateDisplayedShapesInMenu() {

@@ -45,6 +45,8 @@ class VectorPath;
 
 class BoxItemWidgetContainer;
 
+class EffectsSettingsWidget;
+
 class BoundingBox : public QObject, public Transformable
 {
     Q_OBJECT
@@ -244,6 +246,7 @@ public:
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
 
     virtual void applyCurrentTransformation() {}
+    void addAllEffectsToEffectsSettingsWidget(EffectsSettingsWidget *widget);
 protected:
     QRectF mRelBoundingRect;
 

@@ -1,7 +1,10 @@
 #ifndef EFFECTSSETTINGSWIDGET_H
 #define EFFECTSSETTINGSWIDGET_H
 
-#include <QWidget>
+#include <QLabel>
+#include <QVBoxLayout>
+#include "BoxesList/complexanimatoritemwidgetcontainer.h"
+#include "pixmapeffect.h"
 
 class EffectsSettingsWidget : public QWidget
 {
@@ -9,6 +12,21 @@ class EffectsSettingsWidget : public QWidget
 public:
     explicit EffectsSettingsWidget(QWidget *parent = 0);
 
+    void addWidgetForEffect(PixmapEffect *effect);
+    void addWidget(ComplexAnimatorItemWidgetContainer *widget);
+    void removeWidgetForEffect(PixmapEffect *effect);
+    void removeWidget(ComplexAnimatorItemWidgetContainer *widget);
+
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void setBoundingBox(BoundingBox *box);
+    void dropEvent(QDropEvent *event);
+protected:
+    QVBoxLayout *mEffectsLayout;
+    QLabel *mDragHighlightWidget;
+
+    QList<ComplexAnimatorItemWidgetContainer*> mWidgets;
 signals:
 
 public slots:

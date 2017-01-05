@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "keysview.h"
+#include "ObjectSettings/effectssettingswidget.h"
 #include "BoxesList/boxitemwidgetcontainer.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
@@ -45,6 +46,13 @@ QPixmap BoundingBox::applyEffects(const QPixmap& pixmap,
         effect->apply(&im, img, scale, highQuality);
     }
     return QPixmap::fromImage(im);
+}
+
+void BoundingBox::addAllEffectsToEffectsSettingsWidget(
+        EffectsSettingsWidget *widget) {
+    foreach(PixmapEffect *effect, mEffects) {
+        widget->addWidgetForEffect(effect);
+    }
 }
 
 #include <QSqlError>
