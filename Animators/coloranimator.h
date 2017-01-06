@@ -27,7 +27,7 @@ public:
 
     void openContextMenu(QPoint pos);
     void loadFromSql(int sqlId);
-    int saveToSql();
+    int saveToSql(QSqlQuery *query);
 private:
     ColorMode mColorMode = RGBMODE;
     QrealAnimator mVal1Animator;

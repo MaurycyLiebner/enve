@@ -33,6 +33,20 @@ void PixmapEffect::startDragging() {
     drag->exec();
 }
 
+int PixmapEffect::saveToSql(QSqlQuery *query,
+                            const int &boundingBoxSqlId,
+                            const PixmapEffectType &type) {
+    if(!query->exec(
+        QString("INSERT INTO pixmapeffect (boundingboxid, type) "
+                "VALUES (%1, %2)").
+                arg(boundingBoxSqlId).
+                arg(type) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+
+    return query->lastInsertId().toInt();
+}
+
 BlurEffect::BlurEffect(qreal radius) {
     mBlurRadius.setCurrentValue(radius);
     setName("blur");
@@ -43,7 +57,9 @@ BlurEffect::BlurEffect(qreal radius) {
 }
 
 void BlurEffect::apply(QImage *imgPtr,
-                       const fmt_filters::image &img, qreal scale, bool highQuality) {
+                       const fmt_filters::image &img,
+                       qreal scale,
+                       bool highQuality) {
     Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius.getCurrentValue()*scale;
     if(highQuality) {
@@ -56,6 +72,23 @@ void BlurEffect::apply(QImage *imgPtr,
 qreal BlurEffect::getMargin()
 {
     return mBlurRadius.getCurrentValue();
+}
+
+#include <QSqlError>
+int BlurEffect::saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::saveToSql(query,
+                                                 boundingBoxSqlId,
+                                                 EFFECT_BLUR);
+    int radiusId = mBlurRadius.saveToSql(query);
+    if(!query->exec(
+        QString("INSERT INTO blureffect (pixmapeffectid, radiusid) "
+                "VALUES (%1, %2)").
+                arg(pixmapEffectId).
+                arg(radiusId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+
+    return query->lastInsertId().toInt();
 }
 
 ShadowEffect::ShadowEffect(qreal radius) {

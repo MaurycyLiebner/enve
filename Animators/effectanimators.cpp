@@ -7,6 +7,17 @@ EffectAnimators::EffectAnimators() :
 
 }
 
+#include <QSqlError>
+void EffectAnimators::saveToSql(QSqlQuery *query, int boundingBoxSqlId) {
+    foreach(QrealAnimator *effect, mChildAnimators) {
+        ((PixmapEffect*)effect)->saveToSql(query, boundingBoxSqlId);
+    }
+}
+
+void EffectAnimators::loadFromSql(int boundingBoxSqlId) {
+
+}
+
 void EffectAnimators::applyEffects(QImage *imgPtr,
                                    const fmt_filters::image &img,
                                    const qreal &scale,

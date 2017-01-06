@@ -14,19 +14,18 @@ QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
-int QPointFAnimator::saveToSql() {
-    int xAnimatorId = mXAnimator.saveToSql();
-    int yAnimatorId = mYAnimator.saveToSql();
-    QSqlQuery query;
-    if(!query.exec(
+int QPointFAnimator::saveToSql(QSqlQuery *query) {
+    int xAnimatorId = mXAnimator.saveToSql(query);
+    int yAnimatorId = mYAnimator.saveToSql(query);
+    if(!query->exec(
         QString("INSERT INTO qpointfanimator (xanimatorid, yanimatorid ) "
                 "VALUES (%1, %2)").
                 arg(xAnimatorId).
                 arg(yAnimatorId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
-    return query.lastInsertId().toInt();
+    return query->lastInsertId().toInt();
 }
 
 #include <QSqlRecord>

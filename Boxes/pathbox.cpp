@@ -45,8 +45,8 @@ int PathBox::saveToSql(QSqlQuery *query, int parentId)
     int strokeStartPt = mStrokeGradientPoints.startPoint->saveToSql(query);
     int strokeEndPt = mStrokeGradientPoints.endPoint->saveToSql(query);
 
-    int fillSettingsId = mFillPaintSettings.saveToSql();
-    int strokeSettingsId = mStrokeSettings.saveToSql();
+    int fillSettingsId = mFillPaintSettings.saveToSql(query);
+    int strokeSettingsId = mStrokeSettings.saveToSql(query);
     if(!query->exec(
             QString(
             "INSERT INTO pathbox (fillgradientstartid, fillgradientendid, "

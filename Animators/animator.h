@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QColor>
+#include <QSqlQuery>
 #include "connectedtomainwindow.h"
 
 class ComplexAnimator;
@@ -58,7 +59,7 @@ public:
 
     virtual void openContextMenu(QPoint pos) = 0;
 
-    virtual int saveToSql() = 0;
+    virtual int saveToSql(QSqlQuery*) = 0;
 
     bool isCurrentAnimator() { return mIsCurrentAnimator; }
 

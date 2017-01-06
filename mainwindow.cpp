@@ -1109,6 +1109,19 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "fontstyle TEXT, "
                "fontsize REAL, "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE pixmapeffect "
+                "(id INTEGER PRIMARY KEY, "
+                "boundingboxid INTEGER, "
+                "type INTEGER, "
+                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE blureffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "radiusid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(radiusid) REFERENCES qrealanimator(id) )");
 }
 
 void MainWindow::saveToFile(QString path) {

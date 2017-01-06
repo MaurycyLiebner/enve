@@ -22,16 +22,15 @@ QrealAnimator::~QrealAnimator() {
 
 #include <QSqlError>
 #include <QSqlQuery>
-int QrealAnimator::saveToSql() {
-    QSqlQuery query;
-    if(!query.exec(
+int QrealAnimator::saveToSql(QSqlQuery *query) {
+    if(!query->exec(
         QString("INSERT INTO qrealanimator (currentvalue) "
                 "VALUES (%1)").
                 arg(mCurrentValue, 0, 'f') ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
-    int thisSqlId = query.lastInsertId().toInt();
+    int thisSqlId = query->lastInsertId().toInt();
 
     foreach(QrealKey *key, mKeys) {
         key->saveToSql(thisSqlId);

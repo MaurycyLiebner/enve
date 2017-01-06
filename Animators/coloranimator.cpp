@@ -56,14 +56,13 @@ void ColorAnimator::loadFromSql(int sqlId)
 }
 
 #include <QSqlError>
-int ColorAnimator::saveToSql()
+int ColorAnimator::saveToSql(QSqlQuery *query)
 {
-    int val1AnimatorId = mVal1Animator.saveToSql();
-    int val2AnimatorId = mVal2Animator.saveToSql();
-    int val3AnimatorId = mVal3Animator.saveToSql();
-    int alphaAnimatorId = mAlphaAnimator.saveToSql();
-    QSqlQuery query;
-    if(!query.exec(QString("INSERT INTO coloranimator (colormode, val1animatorid, "
+    int val1AnimatorId = mVal1Animator.saveToSql(query);
+    int val2AnimatorId = mVal2Animator.saveToSql(query);
+    int val3AnimatorId = mVal3Animator.saveToSql(query);
+    int alphaAnimatorId = mAlphaAnimator.saveToSql(query);
+    if(!query->exec(QString("INSERT INTO coloranimator (colormode, val1animatorid, "
                        "val2animatorid, val3animatorid, alphaanimatorid) "
                 "VALUES (%1, %2, %3, %4, %5)").
                 arg(mColorMode).
@@ -71,9 +70,9 @@ int ColorAnimator::saveToSql()
                 arg(val2AnimatorId).
                 arg(val3AnimatorId).
                 arg(alphaAnimatorId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
-    return query.lastInsertId().toInt();
+    return query->lastInsertId().toInt();
 }
 
 void ColorAnimator::setCurrentValue(Color colorValue, bool finish)

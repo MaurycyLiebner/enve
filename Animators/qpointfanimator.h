@@ -22,7 +22,7 @@ public:
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();
-    int saveToSql();
+    int saveToSql(QSqlQuery *query);
     void loadFromSql(int posAnimatorId);
     void multSavedValueToCurrentValue(qreal sx, qreal sy);
     void incSavedValueToCurrentValue(qreal incXBy, qreal incYBy);

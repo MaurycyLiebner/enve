@@ -159,7 +159,7 @@ public:
     void removeThisFromGraphAnimator();
 
     void setAnimatorColor(QColor color);
-    virtual int saveToSql();
+    virtual int saveToSql(QSqlQuery *query);
     void loadFromSql(int qrealAnimatorId);
     void loadKeysFromSql(int qrealAnimatorId);
     virtual void incSavedValueToCurrentValue(qreal incBy);

@@ -51,7 +51,7 @@ public:
     void moveRelativeToSavedValue(qreal dX, qreal dY);
     void copyTransformationTo(TransformAnimator *targetAnimator);
     void setPivot(QPointF point, bool finish = false);
-    int saveToSql();
+    int saveToSql(QSqlQuery *query);
     void loadFromSql(int transformAnimatorId);
 private:
     QPointFAnimator mPivotAnimator;

@@ -4,6 +4,13 @@
 #include "Animators/coloranimator.h"
 #include "Animators/qpointfanimator.h"
 
+enum PixmapEffectType {
+    EFFECT_BLUR,
+    EFFECT_SHADOW,
+    EFFECT_LINES,
+    EFFECT_CIRCLES
+};
+
 class PixmapEffect : public ComplexAnimator
 {
 public:
@@ -24,6 +31,10 @@ public:
     }
 
     void startDragging();
+
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId, const PixmapEffectType &type);
+    virtual void saveToSql(QSqlQuery *,
+                           const int &) {}
 
     friend QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr);
     friend QDataStream & operator >> (QDataStream & s, PixmapEffect *& ptr);
@@ -46,6 +57,8 @@ public:
                bool highQuality);
 
     qreal getMargin();
+
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
 private:
     QrealAnimator mBlurRadius;
 };

@@ -34,14 +34,13 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
 }
 
 #include <QSqlError>
-int TransformAnimator::saveToSql() {
-    int posAnimatorId = mPosAnimator.saveToSql();
-    int scaleAnimatorId = mScaleAnimator.saveToSql();
-    int pivotAnimatorId = mPivotAnimator.saveToSql();
-    int rotAnimatorId = mRotAnimator.saveToSql();
-    int opacityAnimatorId = mOpacityAnimator.saveToSql();
-    QSqlQuery query;
-    if(!query.exec(
+int TransformAnimator::saveToSql(QSqlQuery *query) {
+    int posAnimatorId = mPosAnimator.saveToSql(query);
+    int scaleAnimatorId = mScaleAnimator.saveToSql(query);
+    int pivotAnimatorId = mPivotAnimator.saveToSql(query);
+    int rotAnimatorId = mRotAnimator.saveToSql(query);
+    int opacityAnimatorId = mOpacityAnimator.saveToSql(query);
+    if(!query->exec(
         QString("INSERT INTO transformanimator (posanimatorid, scaleanimatorid, "
                 "pivotanimatorid, rotanimatorid, opacityanimatorid ) "
                 "VALUES (%1, %2, %3, %4, %5)").
@@ -50,10 +49,10 @@ int TransformAnimator::saveToSql() {
                 arg(pivotAnimatorId).
                 arg(rotAnimatorId).
                 arg(opacityAnimatorId) ) ) {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
-    return query.lastInsertId().toInt();
+    return query->lastInsertId().toInt();
 }
 
 void TransformAnimator::loadFromSql(int transformAnimatorId) {

@@ -101,7 +101,7 @@ int Gradient::saveToSql(QSqlQuery *query) {
     mSqlId = query->lastInsertId().toInt();
     int posInGradient = 0;
     foreach(ColorAnimator *color, mColors) {
-        int colorId = color->saveToSql();
+        int colorId = color->saveToSql(query);
         query->exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
                             "VALUES (%1, %2, %3)").
                     arg(colorId).
@@ -265,18 +265,17 @@ void PaintSettings::loadFromSql(int sqlId, GradientWidget *gradientWidget) {
     }
 }
 
-int PaintSettings::saveToSql() {
-    QSqlQuery query;
-    int colorId = mColor.saveToSql();
+int PaintSettings::saveToSql(QSqlQuery *query) {
+    int colorId = mColor.saveToSql(query);
     QString gradientId = (mGradient == NULL) ? "NULL" :
                                                QString::number(
                                                    mGradient->getSqlId());
-    query.exec(QString("INSERT INTO paintsettings (painttype, colorid, gradientid) "
+    query->exec(QString("INSERT INTO paintsettings (painttype, colorid, gradientid) "
                         "VALUES (%1, %2, %3)").
                 arg(mPaintType).
                 arg(colorId).
                 arg(gradientId) );
-    return query.lastInsertId().toInt();
+    return query->lastInsertId().toInt();
 }
 
 StrokeSettings::StrokeSettings() : StrokeSettings(Color(0, 0, 0),
@@ -336,18 +335,17 @@ void StrokeSettings::loadFromSql(int strokeSqlId, int paintSqlId,
     }
 }
 
-int StrokeSettings::saveToSql() {
-    QSqlQuery query;
-    int paintSettingsId = PaintSettings::saveToSql();
-    int lineWidthId = mLineWidth.saveToSql();
-    query.exec(QString("INSERT INTO strokesettings (linewidthanimatorid, "
+int StrokeSettings::saveToSql(QSqlQuery *query) {
+    int paintSettingsId = PaintSettings::saveToSql(query);
+    int lineWidthId = mLineWidth.saveToSql(query);
+    query->exec(QString("INSERT INTO strokesettings (linewidthanimatorid, "
                        "capstyle, joinstyle, paintsettingsid) "
                        "VALUES (%1, %2, %3, %4)").
                 arg(lineWidthId).
                 arg(mCapStyle).
                 arg(mJoinStyle).
                 arg(paintSettingsId) );
-    return query.lastInsertId().toInt();
+    return query->lastInsertId().toInt();
 }
 
 void StrokeSettings::setCurrentStrokeWidth(qreal newWidth) {

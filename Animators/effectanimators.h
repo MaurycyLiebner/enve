@@ -19,6 +19,9 @@ public:
     void addAllEffectsToEffectsSettingsWidget(EffectsSettingsWidget *widget);
 
     bool isEffectsAnimator() { return true; }
+
+    void saveToSql(QSqlQuery *query, int boundingBoxSqlId);
+    void loadFromSql(int boundingBoxSqlId);
 };
 
 #endif // EFFECTANIMATORS_H

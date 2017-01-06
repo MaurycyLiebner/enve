@@ -107,7 +107,7 @@ public:
                   PaintType paintTypeT,
                   Gradient *gradientT = NULL);
 
-    virtual int saveToSql();
+    virtual int saveToSql(QSqlQuery *query);
 
     Color getCurrentColor() const {
         return mColor.getCurrentValue();
@@ -179,7 +179,7 @@ public:
                    PaintType paintTypeT,
                    Gradient *gradientT = NULL);
 
-    int saveToSql();
+    int saveToSql(QSqlQuery *query);
 
     void setCurrentStrokeWidth(qreal newWidth);
 

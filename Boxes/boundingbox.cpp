@@ -55,7 +55,7 @@ void BoundingBox::addAllEffectsToEffectsSettingsWidget(
 
 #include <QSqlError>
 int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
-    int transfromAnimatorId = mTransformAnimator.saveToSql();
+    int transfromAnimatorId = mTransformAnimator.saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
                 "pivotchanged, visible, locked, "
