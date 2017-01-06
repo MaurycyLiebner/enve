@@ -223,7 +223,10 @@ void BoundingBox::render(QPainter *p) {
     if(mEffectsAnimators.hasChildAnimators()) {
         QMatrix renderTransform = getCombinedRenderTransform();
 
-        QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect);
+        qreal effectsMargin = mEffectsMargin*getCurrentCanvasScale();
+        QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
+                                adjusted(-effectsMargin, -effectsMargin,
+                                         effectsMargin, effectsMargin);
 
         QSizeF sizeF = pixBoundingRect.size();
         QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
@@ -260,7 +263,9 @@ void BoundingBox::renderFinal(QPainter *p) {
     if(mEffectsAnimators.hasChildAnimators()) {
         QMatrix renderTransform = getCombinedFinalRenderTransform();
 
-        QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect);
+        QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
+                                adjusted(-mEffectsMargin, -mEffectsMargin,
+                                         mEffectsMargin, mEffectsMargin);
 
         QSizeF sizeF = pixBoundingRect.size();
         QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
