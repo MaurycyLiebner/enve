@@ -13,6 +13,8 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
 {
     mEffectsAnimators.blockPointer();
     mEffectsAnimators.setName("effects");
+    mEffectsAnimators.setUpdater(new PixmapEffectUpdater(this));
+
     addActiveAnimator(&mTransformAnimator);
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
     mTransformAnimator.blockPointer();
@@ -38,21 +40,17 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 QPixmap BoundingBox::applyEffects(const QPixmap& pixmap,
                                   bool highQuality,
                                   qreal scale) {
-    if(mEffects.isEmpty() ) return pixmap;
+    if(!mEffectsAnimators.hasChildAnimators()) return pixmap;
     QImage im = pixmap.toImage().convertToFormat(
                 QImage::Format_ARGB32_Premultiplied);;
     fmt_filters::image img(im.bits(), im.width(), im.height());
-    foreach(PixmapEffect *effect, mEffects) {
-        effect->apply(&im, img, scale, highQuality);
-    }
+    mEffectsAnimators.applyEffects(&im, img, scale, highQuality);
     return QPixmap::fromImage(im);
 }
 
 void BoundingBox::addAllEffectsToEffectsSettingsWidget(
         EffectsSettingsWidget *widget) {
-    foreach(PixmapEffect *effect, mEffects) {
-        widget->addWidgetForEffect(effect);
-    }
+    mEffectsAnimators.addAllEffectsToEffectsSettingsWidget(widget);
 }
 
 #include <QSqlError>
@@ -222,11 +220,7 @@ void BoundingBox::updateAllUglyPixmap() {
 void BoundingBox::render(QPainter *p) {
     p->save();
 
-    if(mEffects.isEmpty() ) {
-        p->setTransform(QTransform(getCombinedRenderTransform()), true);
-        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
-        draw(p);
-    } else {
+    if(mEffectsAnimators.hasChildAnimators()) {
         QMatrix renderTransform = getCombinedRenderTransform();
 
         QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect);
@@ -251,6 +245,10 @@ void BoundingBox::render(QPainter *p) {
 
         p->setOpacity(mTransformAnimator.getOpacity()*0.01);
         p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
+    } else {
+        p->setTransform(QTransform(getCombinedRenderTransform()), true);
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+        draw(p);
     }
 
     p->restore();
@@ -259,11 +257,7 @@ void BoundingBox::render(QPainter *p) {
 void BoundingBox::renderFinal(QPainter *p) {
     p->save();
 
-    if(mEffects.isEmpty() ) {
-        p->setTransform(QTransform(getCombinedFinalRenderTransform()), false);
-        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
-        draw(p);
-    } else {
+    if(mEffectsAnimators.hasChildAnimators()) {
         QMatrix renderTransform = getCombinedFinalRenderTransform();
 
         QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect);
@@ -286,6 +280,10 @@ void BoundingBox::renderFinal(QPainter *p) {
 
         p->setOpacity(mTransformAnimator.getOpacity()*0.01);
         p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
+    } else {
+        p->setTransform(QTransform(getCombinedFinalRenderTransform()), false);
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+        draw(p);
     }
 
     p->restore();
@@ -378,13 +376,7 @@ void BoundingBox::updateEffectsMarginIfNeeded() {
 }
 
 void BoundingBox::updateEffectsMargin() {
-    qreal newMargin = 1.;
-    foreach(PixmapEffect *effect, mEffects) {
-        qreal effectMargin = effect->getMargin();
-        if(effectMargin > newMargin) newMargin = effectMargin;
-    }
-
-    mEffectsMargin = newMargin;
+    mEffectsMargin = mEffectsAnimators.getEffectsMargin();
 }
 
 void BoundingBox::scheduleEffectsMarginUpdate() {
@@ -730,7 +722,6 @@ void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
 void BoundingBox::addEffect(PixmapEffect *effect) {
     effect->setUpdater(new PixmapEffectUpdater(this));
     effect->incNumberPointers();
-    mEffects << effect;
 
     if(!mEffectsAnimators.hasChildAnimators()) {
         mAnimatorsCollection.addAnimator(&mEffectsAnimators);
@@ -744,7 +735,6 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
 
-    mEffects.removeOne(effect);
     removeActiveAnimator(effect);
     mEffectsAnimators.removeChildAnimator(effect);
     if(!mEffectsAnimators.hasChildAnimators()) {

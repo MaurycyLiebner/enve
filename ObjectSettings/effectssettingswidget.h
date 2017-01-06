@@ -23,6 +23,7 @@ public:
     void setBoundingBox(BoundingBox *box);
     void dropEvent(QDropEvent *event);
 protected:
+    BoundingBox *mCurrentBox = NULL;
     QVBoxLayout *mEffectsLayout;
     QLabel *mDragHighlightWidget;
 

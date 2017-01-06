@@ -9,6 +9,8 @@
 #include "Animators/animatorscollection.h"
 #include "pixmapeffect.h"
 
+#include "Animators/effectanimators.h"
+
 class KeysView;
 
 class UndoRedo;
@@ -297,7 +299,7 @@ protected:
     BoxesGroup *mParent = NULL;
 
     AnimatorsCollection mAnimatorsCollection;
-    ComplexAnimator mEffectsAnimators;
+    EffectAnimators mEffectsAnimators;
 
     TransformAnimator mTransformAnimator;
 

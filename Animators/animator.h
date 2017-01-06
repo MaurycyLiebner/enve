@@ -68,6 +68,7 @@ public:
 
     ComplexAnimator *getParentAnimator() const { return mParentAnimator; }
     void setParentAnimator(ComplexAnimator *parentAnimator);
+    void setZValue(const int &newIndex);
 
     virtual void startDragging() {}
 protected:

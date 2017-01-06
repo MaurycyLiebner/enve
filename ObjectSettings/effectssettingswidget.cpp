@@ -41,6 +41,8 @@ void EffectsSettingsWidget::setBoundingBox(BoundingBox *box) {
     }
     mWidgets.clear();
 
+    mCurrentBox = box;
+    if(box == NULL) return;
     box->addAllEffectsToEffectsSettingsWidget(this);
 }
 
@@ -53,7 +55,7 @@ void EffectsSettingsWidget::removeWidget(
 void EffectsSettingsWidget::dragLeaveEvent(QDragLeaveEvent *event) {
     mDragHighlightWidget->hide();
 }
-
+#include "mainwindow.h"
 void EffectsSettingsWidget::dropEvent(QDropEvent *event)
 {
     if (event->mimeData()->hasFormat("effect")) {
@@ -82,13 +84,24 @@ void EffectsSettingsWidget::dropEvent(QDropEvent *event)
             }
             widgetBefore = widgetObj;
         }
+        int widgetBeforeId = mEffectsLayout->indexOf(widgetBefore);
+        int effectWidgetId = mEffectsLayout->indexOf(effectWidget);
 
-        if(widgetBefore == NULL) {
-            mEffectsLayout->insertWidget(0, effectWidget);
-        } else {
-            mEffectsLayout->insertWidget(
-                        mEffectsLayout->indexOf(widgetBefore) + 1,
-                        effectWidget);
+        if(effectWidgetId != widgetBeforeId &&
+           effectWidgetId != widgetBeforeId + 1) {
+            int targetId;
+            if(widgetBefore == NULL) {
+                targetId = 0;
+            } else {
+                targetId = widgetBeforeId;
+                if(targetId < effectWidgetId) {
+                    targetId++;
+                }
+            }
+            mEffectsLayout->insertWidget(targetId, effectWidget);
+            effectPtr->setZValue(targetId);
+
+            MainWindow::getInstance()->callUpdateSchedulers();
         }
 
         event->acceptProposedAction();

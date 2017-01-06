@@ -45,6 +45,9 @@ public:
     void addAllAnimatorsToComplexAnimatorItemWidgetContainer(
             ComplexAnimatorItemWidgetContainer *itemWidget);
     void setTransformed(bool bT);
+
+    void changeChildAnimatorZ(Animator *childAnimator,
+                              const int &newIndex);
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

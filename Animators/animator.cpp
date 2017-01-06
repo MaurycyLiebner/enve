@@ -13,3 +13,9 @@ void Animator::setParentAnimator(ComplexAnimator *parentAnimator)
         clearFromGraphView();
     }
 }
+
+void Animator::setZValue(const int &newIndex)
+{
+    if(mParentAnimator == NULL) return;
+    mParentAnimator->changeChildAnimatorZ(this, newIndex);
+}

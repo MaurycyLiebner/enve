@@ -85,6 +85,21 @@ void ComplexAnimator::setTransformed(bool bT) {
     }
 }
 
+void ComplexAnimator::changeChildAnimatorZ(Animator *childAnimator,
+                                           const int &newIndex) {
+    int currentIndex;
+    foreach(Animator *child, mChildAnimators) {
+        if(child == childAnimator) {
+            currentIndex = mChildAnimators.indexOf((QrealAnimator*)child);
+            break;
+        }
+    }
+
+    mChildAnimators.move(currentIndex, newIndex);
+
+    callUpdater();
+}
+
 void ComplexAnimator::setUpdater(AnimatorUpdater *updater)
 {
     QrealAnimator::setUpdater(updater);

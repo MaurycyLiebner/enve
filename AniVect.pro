@@ -95,7 +95,8 @@ SOURCES += main.cpp\
     Animators/qrealanimator.cpp \
     Boxes/pathbox.cpp \
     Boxes/boundingbox.cpp \
-    Boxes/boxesgroup.cpp
+    Boxes/boxesgroup.cpp \
+    Animators/effectanimators.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -178,4 +179,5 @@ HEADERS  += mainwindow.h \
     Animators/pathanimator.h \
     Boxes/rectangle.h \
     Boxes/textbox.h \
-    Boxes/vectorpath.h
+    Boxes/vectorpath.h \
+    Animators/effectanimators.h
