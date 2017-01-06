@@ -11,6 +11,7 @@ public:
     void draw(QPainter *p);
 
     void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
     void setDetailsVisibile(bool bT);
 signals:

@@ -36,6 +36,14 @@ void ComplexAnimatorItemWidget::mousePressEvent(QMouseEvent *event)
 {
     if(event->x() < 20) {
         mTargetAnimator->setRecording(!mTargetAnimator->isRecording());
+    }
+
+    callUpdateSchedulers();
+}
+
+void ComplexAnimatorItemWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->x() < 20) {
     } else {
         setDetailsVisibile(!mDetailsVisible);
     }

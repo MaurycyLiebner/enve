@@ -96,7 +96,8 @@ SOURCES += main.cpp\
     Boxes/pathbox.cpp \
     Boxes/boundingbox.cpp \
     Boxes/boxesgroup.cpp \
-    Animators/effectanimators.cpp
+    Animators/effectanimators.cpp \
+    BoxesList/effectanimatorsitemwidgetcontainer.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -180,4 +181,5 @@ HEADERS  += mainwindow.h \
     Boxes/rectangle.h \
     Boxes/textbox.h \
     Boxes/vectorpath.h \
-    Animators/effectanimators.h
+    Animators/effectanimators.h \
+    BoxesList/effectanimatorsitemwidgetcontainer.h

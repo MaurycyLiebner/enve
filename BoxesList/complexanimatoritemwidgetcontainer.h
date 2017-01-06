@@ -26,7 +26,8 @@ public:
 public slots:
     void addChildAnimator(QrealAnimator *animator);
     void removeChildAnimator(QrealAnimator *animator);
-private:
+    void changeChildAnimatorZ(const int &from, const int &to);
+protected:
     QrealAnimatorItemWidget *mTargetAnimatorWidget;
     QList<ComplexAnimatorItemWidgetContainer*> mChildWidgets;
 };

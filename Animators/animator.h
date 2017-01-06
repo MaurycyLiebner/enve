@@ -68,8 +68,9 @@ public:
 
     ComplexAnimator *getParentAnimator() const { return mParentAnimator; }
     void setParentAnimator(ComplexAnimator *parentAnimator);
-    void setZValue(const int &newIndex);
+    void setZValue(const int &oldIndex, const int &newIndex);
 
+    virtual bool isEffectsAnimator() { return false; }
     virtual void startDragging() {}
 protected:
     bool mIsComplexAnimator = false;
@@ -82,6 +83,7 @@ protected:
 signals:
     void childAnimatorAdded(QrealAnimator*);
     void childAnimatorRemoved(QrealAnimator*);
+    void childAnimatorZChanged(int, int);
 public slots:
 };
 

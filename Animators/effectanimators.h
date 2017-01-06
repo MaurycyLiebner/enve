@@ -17,6 +17,8 @@ public:
                       const bool &highQuality);
     qreal getEffectsMargin() const;
     void addAllEffectsToEffectsSettingsWidget(EffectsSettingsWidget *widget);
+
+    bool isEffectsAnimator() { return true; }
 };
 
 #endif // EFFECTANIMATORS_H

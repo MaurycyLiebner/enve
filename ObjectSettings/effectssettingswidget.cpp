@@ -52,7 +52,7 @@ void EffectsSettingsWidget::removeWidget(
     delete widget;
 }
 
-void EffectsSettingsWidget::dragLeaveEvent(QDragLeaveEvent *event) {
+void EffectsSettingsWidget::dragLeaveEvent(QDragLeaveEvent *) {
     mDragHighlightWidget->hide();
 }
 #include "mainwindow.h"
@@ -72,6 +72,7 @@ void EffectsSettingsWidget::dropEvent(QDropEvent *event)
                 break;
             }
         }
+        if(effectWidget == NULL) return;
 
         int insertY = event->pos().y();
 
@@ -88,7 +89,8 @@ void EffectsSettingsWidget::dropEvent(QDropEvent *event)
         int effectWidgetId = mEffectsLayout->indexOf(effectWidget);
 
         if(effectWidgetId != widgetBeforeId &&
-           effectWidgetId != widgetBeforeId + 1) {
+           effectWidgetId != widgetBeforeId + 1 ||
+           widgetBefore == NULL) {
             int targetId;
             if(widgetBefore == NULL) {
                 targetId = 0;
@@ -99,7 +101,7 @@ void EffectsSettingsWidget::dropEvent(QDropEvent *event)
                 }
             }
             mEffectsLayout->insertWidget(targetId, effectWidget);
-            effectPtr->setZValue(targetId);
+            effectPtr->setZValue(effectWidgetId, targetId);
 
             MainWindow::getInstance()->callUpdateSchedulers();
         }

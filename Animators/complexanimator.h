@@ -46,7 +46,7 @@ public:
             ComplexAnimatorItemWidgetContainer *itemWidget);
     void setTransformed(bool bT);
 
-    void changeChildAnimatorZ(Animator *childAnimator,
+    void changeChildAnimatorZ(const int &oldIndex,
                               const int &newIndex);
 protected:
     bool mChildAnimatorRecording = false;

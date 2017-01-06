@@ -3,6 +3,7 @@
 #include "Boxes/boundingbox.h"
 #include "boxeslistwidget.h"
 #include "complexanimatoritemwidgetcontainer.h"
+#include "effectanimatorsitemwidgetcontainer.h"
 
 BoxItemWidgetContainer::BoxItemWidgetContainer(BoundingBox *target,
                                                QWidget *parent) :
@@ -104,7 +105,15 @@ void BoxItemWidgetContainer::getKeysInRect(QRectF selectionRect, int containerTo
 
 void BoxItemWidgetContainer::addAnimatorWidgetForAnimator(QrealAnimator *animator)
 {
-    addAnimatorWidget(new ComplexAnimatorItemWidgetContainer(animator, this));
+    ComplexAnimatorItemWidgetContainer *itemWidget;
+    if(animator->isEffectsAnimator()) {
+        itemWidget =
+            new EffectAnimatorsItemWidgetContainer(animator, this);
+    } else {
+        itemWidget =
+            new ComplexAnimatorItemWidgetContainer(animator, this);
+    }
+    addAnimatorWidget(itemWidget);
 }
 
 void BoxItemWidgetContainer::removeAnimatorWidgetForAnimator(QrealAnimator *animator)

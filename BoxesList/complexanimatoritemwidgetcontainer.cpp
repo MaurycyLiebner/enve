@@ -4,11 +4,13 @@
 #include "complexanimatoritemwidget.h"
 #include "Animators/complexanimator.h"
 #include "boxeslistwidget.h"
+#include "effectanimatorsitemwidgetcontainer.h"
 
 ComplexAnimatorItemWidgetContainer::ComplexAnimatorItemWidgetContainer(QrealAnimator *target,
                                                                        QWidget *parent) :
     WidgetContainer(parent)
 {
+    setAcceptDrops(true);
     initialize();
     if(target->isComplexAnimator()) {
         mTargetAnimatorWidget = new ComplexAnimatorItemWidget(target, this);
@@ -21,6 +23,8 @@ ComplexAnimatorItemWidgetContainer::ComplexAnimatorItemWidgetContainer(QrealAnim
                 this, SLOT(addChildAnimator(QrealAnimator*)));
         connect(target, SIGNAL(childAnimatorRemoved(QrealAnimator*)),
                 this, SLOT(removeChildAnimator(QrealAnimator*)));
+        connect(target, SIGNAL(childAnimatorZChanged(int,int)),
+                this, SLOT(changeChildAnimatorZ(int,int)));
     } else {
         mTargetAnimatorWidget = new QrealAnimatorItemWidget(target, this);
     }
@@ -34,8 +38,14 @@ QrealAnimator *ComplexAnimatorItemWidgetContainer::getTargetAnimator() {
 
 void ComplexAnimatorItemWidgetContainer::addChildAnimator(QrealAnimator *animator)
 {
-    ComplexAnimatorItemWidgetContainer *itemWidget =
+    ComplexAnimatorItemWidgetContainer *itemWidget;
+    if(animator->isEffectsAnimator()) {
+        itemWidget =
+            new EffectAnimatorsItemWidgetContainer(animator, this);
+    } else {
+        itemWidget =
             new ComplexAnimatorItemWidgetContainer(animator, this);
+    }
 
     addChildWidget(itemWidget);
 
@@ -51,6 +61,12 @@ void ComplexAnimatorItemWidgetContainer::removeChildAnimator(
             break;
         }
     }
+}
+
+void ComplexAnimatorItemWidgetContainer::changeChildAnimatorZ(const int &from,
+                                                              const int &to) {
+    mChildWidgetsLayout->insertWidget(to,
+                                mChildWidgetsLayout->itemAt(from)->widget());
 }
 
 void ComplexAnimatorItemWidgetContainer::drawKeys(QPainter *p, qreal pixelsPerFrame,

@@ -17,7 +17,7 @@ public:
     void removeWidgetForEffect(PixmapEffect *effect);
     void removeWidget(ComplexAnimatorItemWidgetContainer *widget);
 
-    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *);
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void setBoundingBox(BoundingBox *box);
