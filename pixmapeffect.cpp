@@ -1,6 +1,8 @@
 #include "pixmapeffect.h"
 #include <QDrag>
 #include <QMimeData>
+#include <QDebug>
+#include <QSqlError>
 
 QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr) {
     qulonglong ptrval(*reinterpret_cast<qulonglong *>(&ptr));
@@ -47,6 +49,15 @@ int PixmapEffect::saveToSql(QSqlQuery *query,
     return query->lastInsertId().toInt();
 }
 
+PixmapEffect *PixmapEffect::loadFromSql(int pixmapEffectId,
+                                        PixmapEffectType typeT) {
+    if(typeT == EFFECT_BLUR) {
+        BlurEffect *blurEffect = new BlurEffect();
+        blurEffect->loadBlurEffectFromSql(pixmapEffectId);
+        return blurEffect;
+    }
+}
+
 BlurEffect::BlurEffect(qreal radius) {
     mBlurRadius.setCurrentValue(radius);
     setName("blur");
@@ -56,14 +67,16 @@ BlurEffect::BlurEffect(qreal radius) {
     addChildAnimator(&mBlurRadius);
 }
 
-void BlurEffect::apply(QImage *imgPtr,
+void BlurEffect::apply(BoundingBox *target,
+                       QImage *imgPtr,
                        const fmt_filters::image &img,
                        qreal scale,
                        bool highQuality) {
     Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius.getCurrentValue()*scale;
     if(highQuality) {
-        fmt_filters::blur(img, radius, radius*0.3333);
+        fmt_filters::fast_blur(img, radius*0.5);
+        //fmt_filters::blur(img, radius, radius*0.3333);
     } else {
         fmt_filters::fast_blur(img, radius*0.5);
     }
@@ -75,7 +88,7 @@ qreal BlurEffect::getMargin()
 }
 
 #include <QSqlError>
-int BlurEffect::saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+void BlurEffect::saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::saveToSql(query,
                                                  boundingBoxSqlId,
                                                  EFFECT_BLUR);
@@ -87,8 +100,19 @@ int BlurEffect::saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
                 arg(radiusId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+}
 
-    return query->lastInsertId().toInt();
+void BlurEffect::loadBlurEffectFromSql(int pixmapEffectId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM blureffect WHERE pixmapeffectid = " +
+            QString::number(pixmapEffectId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mBlurRadius.loadFromSql(query.value("radiusid").toInt() );
+    } else {
+        qDebug() << "Could not load blureffect with id " << pixmapEffectId;
+    }
 }
 
 ShadowEffect::ShadowEffect(qreal radius) {
@@ -122,7 +146,8 @@ ShadowEffect::ShadowEffect(qreal radius) {
 //    addChildAnimator(&mScale);
 }
 
-void ShadowEffect::apply(QImage *imgPtr,
+void ShadowEffect::apply(BoundingBox *target,
+                         QImage *imgPtr,
                          const fmt_filters::image &img,
                          qreal scale,
                          bool highQuality) {
@@ -210,7 +235,7 @@ BrushEffect::BrushEffect(qreal numberStrokes,
     addChildAnimator(&mStrokeCurvature);
 }
 
-void BrushEffect::apply(QImage *imgPtr,
+void BrushEffect::apply(BoundingBox *target, QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale,
                         bool highQuality) {
@@ -469,7 +494,11 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect()
     addChildAnimator(&mLinesDistance);
 }
 
-void LinesEffect::apply(QImage *imgPtr, const fmt_filters::image &img, qreal scale, bool highQuality)
+void LinesEffect::apply(BoundingBox *target,
+                        QImage *imgPtr,
+                        const fmt_filters::image &img,
+                        qreal scale,
+                        bool highQuality)
 {
     qreal linesWidth = mLinesWidth.getCurrentValue()*scale;
     qreal linesDistance = mLinesDistance.getCurrentValue()*scale;
@@ -517,29 +546,31 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
     PixmapEffect() {
     setName("circles");
 
-    mCirclesRadius.setValueRange(0., 100000.);
+    mCirclesRadius.setValueRange(0., 1000.);
     mCirclesRadius.setCurrentValue(circlesRadius);
     mCirclesRadius.setName("radius");
     mCirclesRadius.blockPointer();
     addChildAnimator(&mCirclesRadius);
 
-    mCirclesRadius.setValueRange(-100000., 100000.);
+    mCirclesDistance.setValueRange(-1000., 1000.);
     mCirclesDistance.setCurrentValue(circlesDistance);
     mCirclesDistance.setName("distance");
     mCirclesDistance.blockPointer();
     addChildAnimator(&mCirclesDistance);
 }
-
-void CirclesEffect::apply(QImage *imgPtr,
+#include "Boxes/boundingbox.h"
+void CirclesEffect::apply(BoundingBox *target,
+                          QImage *imgPtr,
                           const fmt_filters::image &img,
                           qreal scale,
                           bool highQuality)
 {
     qreal radius = mCirclesRadius.getCurrentValue()*scale;
     qreal distance = mCirclesDistance.getCurrentValue()*scale;
-    if((radius < 0.1 && distance < radius) || (distance <= -2*radius)) return;
+    if((radius < 0.1 && distance < radius) || (distance <= -0.6*radius)) return;
 
-    QImage circlesImg = QImage(imgPtr->size(), QImage::Format_ARGB32_Premultiplied);
+    QImage circlesImg = QImage(imgPtr->size(),
+                               QImage::Format_ARGB32_Premultiplied);
     circlesImg.fill(Qt::transparent);
 
     int height = imgPtr->height();
@@ -553,8 +584,11 @@ void CirclesEffect::apply(QImage *imgPtr,
     if(radius < 0.1 && distance >= radius) {
 
     } else {
-        qreal circleX = radius + distance*0.5;
-        qreal circleY = radius + distance*0.5;
+        //QPointF topleft = target->getRelBoundingRect().topLeft();
+        qreal circleX = radius + distance*0.5;// - fmod(topleft.x(),
+                                              //        2*radius + distance);
+        qreal circleY = radius + distance*0.5;// - fmod(topleft.y(),
+                                              //        2*radius + distance);
         while(circleY - radius < height) {
             while(circleX - radius < width) {
                 circlesImgP.drawEllipse(QPointF(circleX, circleY),
@@ -562,7 +596,8 @@ void CirclesEffect::apply(QImage *imgPtr,
                 circleX += 2*radius + distance;
             }
             circleY += 2*radius + distance;
-            circleX = radius + distance*0.5;
+            circleX = radius + distance*0.5;// - fmod(topleft.x(),
+                                           //         2*radius + distance);
         }
     }
 

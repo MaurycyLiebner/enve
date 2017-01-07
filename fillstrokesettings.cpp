@@ -312,8 +312,9 @@ void StrokeSettings::loadFromSql(int strokeSqlId, GradientWidget *gradientWidget
         int idPaintSettingsId = query.record().indexOf("paintsettingsid");
         int paintSettingsId = static_cast<PaintType>(query.value(idPaintSettingsId).toInt());
         loadFromSql(strokeSqlId, paintSettingsId, gradientWidget);
+    } else {
+        qDebug() << "Could not load strokesettings with id " << strokeSqlId;
     }
-    qDebug() << "Could not load strokesettings with id " << strokeSqlId;
 }
 
 void StrokeSettings::loadFromSql(int strokeSqlId, int paintSqlId,

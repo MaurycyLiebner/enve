@@ -9,6 +9,7 @@ class WidgetContainer : public QWidget
     Q_OBJECT
 public:
     WidgetContainer(QWidget *parent = 0);
+    virtual ~WidgetContainer() {}
 
     void setDetailsVisible(bool visible);
 

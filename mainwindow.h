@@ -26,6 +26,8 @@ class BoxesListAnimationDockWidget;
 
 class CanvasWidget;
 
+class ObjectSettingsWidget;
+
 //class SoundComposition;
 
 class MainWindow : public QMainWindow
@@ -120,7 +122,7 @@ private:
 
     bool mPreviewInterrupted = false;
 
-    EffectsSettingsWidget *mEffectsSettingsWidget = NULL;
+    ObjectSettingsWidget *mObjectSettingsWidget = NULL;
 protected:    
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -186,7 +188,7 @@ public:
 
     void addBoxAwaitingUpdate(BoundingBox *box);
     void setCurrentShapesMenuBox(BoundingBox *box);
-    void setCurrentEffectsSettingsWidgetBox(BoundingBox *box);
+    void setCurrentObjectSettingsWidgetBox(BoundingBox *box);
     void nextSaveOutputFrame();
     void nextPlayPreviewFrame();
 

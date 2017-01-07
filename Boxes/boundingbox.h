@@ -247,8 +247,11 @@ public:
     QMatrix getRelativeTransform() const;
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
 
+    QRectF getRelBoundingRect() const {
+        return mRelBoundingRect;
+    }
+
     virtual void applyCurrentTransformation() {}
-    void addAllEffectsToEffectsSettingsWidget(EffectsSettingsWidget *widget);
 protected:
     QRectF mRelBoundingRect;
 
@@ -315,7 +318,6 @@ protected:
     QString mName = "";
     QList<QrealAnimator*> mActiveAnimators;
 
-    QList<PixmapEffect*> mEffects;
     bool mAnimated = false;
 signals:
     void addActiveAnimatorSignal(QrealAnimator*);

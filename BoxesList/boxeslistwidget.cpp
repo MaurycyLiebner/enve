@@ -31,14 +31,6 @@ BoxesListWidget::BoxesListWidget(QWidget *parent) : QWidget(parent)
     mBoxesLayout->setMargin(0);
     mBoxesLayout->setContentsMargins(0, 0, 0, 20);
     setContentsMargins(0, 0, 0, 0);
-
-    Canvas *canvas = MainWindow::getInstance()->getCanvas();
-    connect(canvas, SIGNAL(changeChildZSignal(int,int)),
-            this, SLOT(changeItemZ(int,int)));
-    connect(canvas, SIGNAL(addAnimatedBoundingBoxSignal(BoundingBox*)),
-            this, SLOT(addItemForBox(BoundingBox*)));
-    connect(canvas, SIGNAL(removeAnimatedBoundingBoxSignal(BoundingBox*)),
-            this, SLOT(removeItemForBox(BoundingBox*)));
 //    QLabel *label = new QLabel(this);
 //    label->setStyleSheet("background-color: black");
 //    label->setFixedHeight(1);
@@ -105,6 +97,13 @@ void BoxesListWidget::getKeysInRect(QRectF selectionRect, int viewedTop,
                                  pixelsPerFrame, minViewedFrame,
                                  listKeys);
     }
+}
+
+void BoxesListWidget::clearAll() {
+    foreach(BoxItemWidgetContainer *container, mBoxWidgetContainers) {
+        delete container;
+    }
+    mBoxWidgetContainers.clear();
 }
 
 void BoxesListWidget::addItemForBox(BoundingBox *box)

@@ -11,17 +11,16 @@ class EffectAnimators : public ComplexAnimator
 public:
     EffectAnimators();
 
-    void applyEffects(QImage *imgPtr,
+    void applyEffects(BoundingBox *target, QImage *imgPtr,
                       const fmt_filters::image &img,
                       const qreal &scale,
                       const bool &highQuality);
     qreal getEffectsMargin() const;
-    void addAllEffectsToEffectsSettingsWidget(EffectsSettingsWidget *widget);
 
     bool isEffectsAnimator() { return true; }
 
     void saveToSql(QSqlQuery *query, int boundingBoxSqlId);
-    void loadFromSql(int boundingBoxSqlId);
+    void loadFromSql(int boundingBoxSqlId, BoundingBox *box);
 };
 
 #endif // EFFECTANIMATORS_H

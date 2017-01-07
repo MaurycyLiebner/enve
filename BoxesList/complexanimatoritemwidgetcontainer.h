@@ -12,6 +12,7 @@ class ComplexAnimatorItemWidgetContainer : public WidgetContainer
 public:
     ComplexAnimatorItemWidgetContainer(QrealAnimator *target,
                                        QWidget *parent = 0);
+    ~ComplexAnimatorItemWidgetContainer();
 
     QrealAnimator *getTargetAnimator();
     void drawKeys(QPainter *p, qreal pixelsPerFrame,

@@ -5,7 +5,6 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "keysview.h"
-#include "ObjectSettings/effectssettingswidget.h"
 #include "BoxesList/boxitemwidgetcontainer.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
@@ -44,14 +43,14 @@ QPixmap BoundingBox::applyEffects(const QPixmap& pixmap,
     QImage im = pixmap.toImage().convertToFormat(
                 QImage::Format_ARGB32_Premultiplied);;
     fmt_filters::image img(im.bits(), im.width(), im.height());
-    mEffectsAnimators.applyEffects(&im, img, scale, highQuality);
+    mEffectsAnimators.applyEffects(this,
+                                   &im,
+                                   img,
+                                   scale,
+                                   highQuality);
     return QPixmap::fromImage(im);
 }
 
-void BoundingBox::addAllEffectsToEffectsSettingsWidget(
-        EffectsSettingsWidget *widget) {
-    mEffectsAnimators.addAllEffectsToEffectsSettingsWidget(widget);
-}
 
 #include <QSqlError>
 int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
@@ -72,7 +71,11 @@ int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
-    return query->lastInsertId().toInt();
+    int boxId = query->lastInsertId().toInt();
+    if(mEffectsAnimators.hasChildAnimators()) {
+        mEffectsAnimators.saveToSql(query, boxId);
+    }
+    return boxId;
 }
 
 void BoundingBox::loadFromSql(int boundingBoxId) {
@@ -93,6 +96,7 @@ void BoundingBox::loadFromSql(int boundingBoxId) {
         bool visible = query.value(idVisible).toBool();
         bool locked = query.value(idLocked).toBool();
         mTransformAnimator.loadFromSql(transformAnimatorId);
+        mEffectsAnimators.loadFromSql(boundingBoxId, this);
         mPivotChanged = pivotChanged;
         mLocked = locked;
         mVisible = visible;
@@ -213,7 +217,9 @@ void BoundingBox::updateAllUglyPixmap() {
     p.end();
 
     if(Canvas::effectsPaintEnabled()) {
-        mAllUglyPixmap = applyEffects(mAllUglyPixmap, false, Canvas::getResolutionPercent());
+        mAllUglyPixmap = applyEffects(mAllUglyPixmap,
+                                      false,
+                                      Canvas::getResolutionPercent());
     }
 }
 

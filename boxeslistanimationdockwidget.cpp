@@ -83,6 +83,14 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mBoxesList = new BoxesListWidget(this);
     mBoxesListScrollArea->setWidget(mBoxesList);
 
+    Canvas *canvas = MainWindow::getInstance()->getCanvas();
+    connect(canvas, SIGNAL(changeChildZSignal(int,int)),
+            mBoxesList, SLOT(changeItemZ(int,int)));
+    connect(canvas, SIGNAL(addAnimatedBoundingBoxSignal(BoundingBox*)),
+            mBoxesList, SLOT(addItemForBox(BoundingBox*)));
+    connect(canvas, SIGNAL(removeAnimatedBoundingBoxSignal(BoundingBox*)),
+            mBoxesList, SLOT(removeItemForBox(BoundingBox*)));
+
     mBoxesListLayout = new QVBoxLayout();
     mBoxesListLayout->setSpacing(0);
     mBoxesListLayout->setMargin(0);

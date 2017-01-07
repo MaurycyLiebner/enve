@@ -23,7 +23,6 @@ public:
     static bool mStaticPixmapsLoaded;
     static void loadStaticPixmaps();
 
-
     static int getListItemHeight() { return LIST_ITEM_HEIGHT; }
     static int getListItemMaxWidth() { return LIST_ITEM_MAX_WIDTH; }
     static int getListItemChildIndent() { return LIST_ITEM_CHILD_INDENT; }
@@ -36,7 +35,9 @@ public:
     void getKeysInRect(QRectF selectionRect, int viewedTop,
                        qreal pixelsPerFrame, int minViewedFrame,
                        QList<QrealKey*> *listKeys);
-private:
+
+    void clearAll();
+protected:
     static int LIST_ITEM_HEIGHT;
     static int LIST_ITEM_MAX_WIDTH;
     static int LIST_ITEM_CHILD_INDENT;
@@ -48,7 +49,6 @@ signals:
 public slots:
     void addItemForBox(BoundingBox *box);
     void removeItemForBox(BoundingBox *box);
-private slots:
     void changeItemZ(int from, int to);
 };
 

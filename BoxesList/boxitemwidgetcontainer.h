@@ -12,6 +12,7 @@ class BoxItemWidgetContainer : public WidgetContainer
     Q_OBJECT
 public:
     BoxItemWidgetContainer(BoundingBox *target, QWidget *parent = 0);
+    ~BoxItemWidgetContainer();
 
     static BoxItemWidgetContainer *createBoxItemWidgetContainer(
                                                           BoundingBox *target,

@@ -69,6 +69,7 @@ void QrealAnimator::loadKeysFromSql(int qrealAnimatorId) {
         while(query.next() ) {
             QrealKey *key = new QrealKey(this);
             key->loadFromSql(query.value(idId).toInt());
+            appendKey(key);
         }
     } else {
         qDebug() << "Could not load qpointfanimator with id " << qrealAnimatorId;

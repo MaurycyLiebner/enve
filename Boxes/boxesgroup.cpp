@@ -767,7 +767,7 @@ void BoxesGroup::addBoxToSelection(BoundingBox *box) {
     sortSelectedBoxesByZAscending();
     setCurrentFillStrokeSettingsFromBox(box);
     mMainWindow->setCurrentShapesMenuBox(box);
-    mMainWindow->setCurrentEffectsSettingsWidgetBox(box);
+    mMainWindow->setCurrentObjectSettingsWidgetBox(box);
 }
 
 void BoxesGroup::addPointToSelection(MovablePoint *point)

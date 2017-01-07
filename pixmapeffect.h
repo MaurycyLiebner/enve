@@ -15,7 +15,8 @@ class PixmapEffect : public ComplexAnimator
 {
 public:
     PixmapEffect();
-    virtual void apply(QImage *,
+    virtual void apply(BoundingBox *,
+                       QImage *,
                        const fmt_filters::image &,
                        qreal,
                        bool) {}
@@ -32,7 +33,11 @@ public:
 
     void startDragging();
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId, const PixmapEffectType &type);
+    int saveToSql(QSqlQuery *query,
+                  const int &boundingBoxSqlId,
+                  const PixmapEffectType &type);
+    static PixmapEffect *loadFromSql(int pixmapEffectId,
+                                     PixmapEffectType typeT);
     virtual void saveToSql(QSqlQuery *,
                            const int &) {}
 
@@ -51,14 +56,17 @@ class BlurEffect : public PixmapEffect
 public:
     BlurEffect(qreal radius = 10.);
 
-    void apply(QImage *imgPtr,
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale,
                bool highQuality);
 
     qreal getMargin();
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadBlurEffectFromSql(int pixmapEffectId);
+
+    void saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
 private:
     QrealAnimator mBlurRadius;
 };
@@ -68,7 +76,8 @@ class ShadowEffect : public PixmapEffect
 public:
     ShadowEffect(qreal radius = 10.);
 
-    void apply(QImage *imgPtr,
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale,
                bool highQuality);
@@ -131,7 +140,8 @@ public:
                 qreal strokeMaxDirectionAngle = 360.,
                 qreal strokeCurvature = 0.5);
 
-    void apply(QImage *imgPtr,
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale,
                bool highQuality);
@@ -153,7 +163,8 @@ public:
     LinesEffect(qreal linesWidth = 5.,
                 qreal linesDistance = 5.);
 
-    void apply(QImage *imgPtr,
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale,
                bool highQuality);
@@ -171,7 +182,8 @@ public:
     CirclesEffect(qreal circlesRadius = 5.,
                   qreal circlesDistance = 5.);
 
-    void apply(QImage *imgPtr,
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale,
                bool highQuality);

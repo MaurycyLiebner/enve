@@ -32,6 +32,14 @@ ComplexAnimatorItemWidgetContainer::ComplexAnimatorItemWidgetContainer(QrealAnim
     setTopWidget(mTargetAnimatorWidget);
 }
 
+ComplexAnimatorItemWidgetContainer::~ComplexAnimatorItemWidgetContainer()
+{
+    foreach(ComplexAnimatorItemWidgetContainer *container,
+            mChildWidgets) {
+        delete container;
+    }
+}
+
 QrealAnimator *ComplexAnimatorItemWidgetContainer::getTargetAnimator() {
     return mTargetAnimatorWidget->getTargetAnimator();
 }

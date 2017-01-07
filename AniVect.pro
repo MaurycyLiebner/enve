@@ -72,9 +72,6 @@ SOURCES += main.cpp\
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
     ObjectSettings/objectsettingswidget.cpp \
-    ObjectSettings/effectssettingswidget.cpp \
-    ObjectSettings/transformationsettingswidget.cpp \
-    ObjectSettings/othersettingswidget.cpp \
     Animators/animatorscollection.cpp \
     Animators/transformanimator.cpp \
     Animators/animator.cpp \
@@ -158,9 +155,6 @@ HEADERS  += mainwindow.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
     ObjectSettings/objectsettingswidget.h \
-    ObjectSettings/effectssettingswidget.h \
-    ObjectSettings/transformationsettingswidget.h \
-    ObjectSettings/othersettingswidget.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
     Animators/complexanimator.h \

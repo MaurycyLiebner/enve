@@ -12,6 +12,13 @@ BoxItemWidgetContainer::BoxItemWidgetContainer(BoundingBox *target,
 
 }
 
+BoxItemWidgetContainer::~BoxItemWidgetContainer() {
+    foreach(ComplexAnimatorItemWidgetContainer *container,
+            mAnimatorsContainers) {
+        delete container;
+    }
+}
+
 void BoxItemWidgetContainer::initialize()
 {
     WidgetContainer::initialize();

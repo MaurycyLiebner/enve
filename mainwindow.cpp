@@ -17,7 +17,7 @@
 #include "renderoutputwidget.h"
 #include "svgimporter.h"
 #include "canvaswidget.h"
-#include "ObjectSettings/effectssettingswidget.h"
+#include "ObjectSettings/objectsettingswidget.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -306,8 +306,9 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
 
     QDockWidget *effectsMenuWidget = new QDockWidget(this);
-    mEffectsSettingsWidget = new EffectsSettingsWidget(this);
-    effectsMenuWidget->setWidget(mEffectsSettingsWidget);
+    effectsMenuWidget->setMinimumWidth(200);
+    mObjectSettingsWidget = new ObjectSettingsWidget(this);
+    effectsMenuWidget->setWidget(mObjectSettingsWidget);
     addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
 }
 
@@ -538,9 +539,9 @@ void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
     mVectorShapesMenu->setSelectedBoundingBox(box);
 }
 
-void MainWindow::setCurrentEffectsSettingsWidgetBox(BoundingBox *box) {
-    if(mEffectsSettingsWidget == NULL) return;
-    mEffectsSettingsWidget->setBoundingBox(box);
+void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
+    if(mObjectSettingsWidget == NULL) return;
+    mObjectSettingsWidget->setBoundingBox(box);
 }
 
 void MainWindow::updateDisplayedShapesInMenu() {
@@ -755,6 +756,8 @@ void MainWindow::clearAll() {
     mUndoRedoStack.clearAll();
     mCanvas->clearAll();
     mFillStrokeSettings->clearAll();
+    mObjectSettingsWidget->clearAll();
+    mBoxListWidget->clearAll();
 }
 
 void MainWindow::exportSelected(QString path) {
@@ -948,6 +951,7 @@ void MainWindow::loadFile(QString path) {
 
     mUndoRedoStack.clearAll();
     setFileChangedSinceSaving(false);
+    setCurrentFrame(0);
 }
 
 void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
