@@ -175,6 +175,7 @@ VectorPath *Rectangle::objectToPath()
     }
 
     copyTransformationTo(newPath);
+    copyStrokeAndFillSettingsTo(newPath);
 
     return newPath;
 }

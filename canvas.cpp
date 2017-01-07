@@ -451,6 +451,10 @@ void Canvas::renderFinal(QPainter *p)
         p->restore();
     }
 }
+#include "Boxes/animationbox.h"
+void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
+    new AnimationBox(mCurrentBoxesGroup, paths);
+}
 
 void Canvas::renderCurrentFrameToQImage(QImage *frame)
 {

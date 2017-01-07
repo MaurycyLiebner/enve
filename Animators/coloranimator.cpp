@@ -214,6 +214,7 @@ void ColorAnimator::startAlphaTransform()
     mAlphaAnimator.startTransform();
 }
 
+#include <QMenu>
 void ColorAnimator::openContextMenu(QPoint pos) {
     QMenu menu;
     menu.addAction("Add Key");

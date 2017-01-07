@@ -72,8 +72,7 @@ void QDoubleSlider::setName(QString name)
     fitWidthToContent();
 }
 
-void QDoubleSlider::setNumberDecimals(int decimals)
-{
+void QDoubleSlider::setNumberDecimals(int decimals) {
     mDecimals = decimals;
     updateLineEditFromValue();
     fitWidthToContent();

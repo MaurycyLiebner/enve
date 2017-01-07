@@ -164,6 +164,19 @@ void PathBox::updateAfterCombinedTransformationChanged()
 {
 }
 
+void PathBox::copyStrokeAndFillSettingsTo(PathBox *target) {
+
+    target->setFillPaintType(mFillPaintSettings.getPaintType(),
+                             mFillPaintSettings.getCurrentColor(),
+                             mFillPaintSettings.getGradient());
+    target->setStrokePaintType(mStrokeSettings.getPaintType(),
+                               mStrokeSettings.getCurrentColor(),
+                               mStrokeSettings.getGradient());
+    target->setStrokeCapStyle(mStrokeSettings.getCapStyle());
+    target->setStrokeJoinStyle(mStrokeSettings.getJoinStyle());
+    target->setStrokeWidth(mStrokeSettings.getCurrentStrokeWidth(), false);
+}
+
 void PathBox::updateOutlinePath() {
     if(mStrokeSettings.nonZeroLineWidth()) {
         mStrokeSettings.setStrokerSettings(&mPathStroker);

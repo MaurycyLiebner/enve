@@ -534,6 +534,7 @@ void VectorPath::updatePathPointIds()
     }
 }
 
+#include <QMenu>
 void VectorPath::showContextMenu(QPoint globalPos) {
     QMenu menu(mMainWindow);
 

@@ -204,6 +204,7 @@ MainWindow::MainWindow(QWidget *parent)
     mFileMenu->addAction("New...", this, SLOT(newFile()));
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
     mFileMenu->addAction("Import...", this, SLOT(importFile()));
+    mFileMenu->addAction("Import Animation...", this, SLOT(importAnimation()));
     mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
     mFileMenu->addAction("Revert", this, SLOT(revert()));
     mFileMenu->addSeparator();
@@ -859,11 +860,24 @@ void MainWindow::closeProject()
 void MainWindow::importFile()
 {
     disableEventFilter();
-    QString importPath = QFileDialog::getOpenFileName(this,
-        "Open File", "", "AniVect Files (*.av, *.svg)");
+    QStringList importPaths = QFileDialog::getOpenFileNames(this,
+        "Import File", "", "AniVect Files (*.av *.svg *.png *.jpg)");
     enableEventFilter();
-    if(!importPath.isEmpty()) {
-        importFile(importPath, true);
+    if(!importPaths.isEmpty()) {
+        foreach(const QString &path, importPaths) {
+            if(path.isEmpty()) continue;
+            importFile(path, true);
+        }
+    }
+}
+
+void MainWindow::importAnimation() {
+    disableEventFilter();
+    QStringList importPaths = QFileDialog::getOpenFileNames(this,
+        "Import Animation", "", "Images (*.png *.jpg)");
+    enableEventFilter();
+    if(!importPaths.isEmpty()) {
+        mCanvas->createAnimationBoxForPaths(importPaths);
     }
 }
 
@@ -929,7 +943,7 @@ void MainWindow::importFile(QString path, bool loadInBox) {
     QString extension = path.split(".").last();
     if(extension == "svg") {
         loadSVGFile(path, mCanvas);
-    } else {
+    } else if(extension == "av") {
         QSqlDatabase db = QSqlDatabase::database();//not dbConnection
         db.setDatabaseName(path);
         db.open();

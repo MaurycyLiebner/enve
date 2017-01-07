@@ -191,6 +191,7 @@ public:
     void afterSuccessfulUpdate();
 
     void updateUpdateTransform();
+    void copyStrokeAndFillSettingsTo(PathBox *target);
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

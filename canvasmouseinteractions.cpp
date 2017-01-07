@@ -25,6 +25,7 @@ void Canvas::handleMovePathMousePressEvent() {
     }
 }
 
+#include <QMenu>
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();

@@ -84,6 +84,7 @@ void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
     }
     mAnimator = animator;
     if(mAnimator != NULL) {
+        setNumberDecimals(mAnimator->getNumberDecimals());
         connect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
                 this, SLOT(setValue(qreal)));
         setValue(mAnimator->getCurrentValue());

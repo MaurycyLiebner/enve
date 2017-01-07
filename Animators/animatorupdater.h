@@ -96,4 +96,15 @@ private:
     BoundingBox *mTarget;
 };
 
+class AnimationBox;
+class AnimationBoxFrameUpdater : public AnimatorUpdater
+{
+public:
+    AnimationBoxFrameUpdater(AnimationBox *target);
+
+    void update();
+private:
+    AnimationBox *mTarget;
+};
+
 #endif // ANIMATORUPDATER_H

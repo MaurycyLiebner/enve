@@ -36,19 +36,25 @@ public:
     void setCurrentValue(qreal newValue, bool finish = false);
     void updateValueFromCurrentFrame();
     void saveCurrentValueToKey(QrealKey *key);
-    void saveValueToKey(QrealKey *key, qreal value, bool saveUndoRedo = true);
+    void saveValueToKey(QrealKey *key,
+                        qreal value,
+                        bool saveUndoRedo = true);
 
     virtual void setFrame(int frame);
     QrealKey *getKeyAtFrame(int frame);
     void saveCurrentValueAsKey();
     virtual void updateKeysPath();
-    void appendKey(QrealKey *newKey, bool saveUndoRedo = true);
-    void removeKey(QrealKey *removeKey, bool saveUndoRedo = true);
+    void appendKey(QrealKey *newKey,
+                   bool saveUndoRedo = true);
+    void removeKey(QrealKey *removeKey,
+                   bool saveUndoRedo = true);
 
     void moveKeyToFrame(QrealKey *key, int newFrame);
 
     virtual void sortKeys();
-    bool getNextAndPreviousKeyId(int *prevIdP, int *nextIdP, int frame) const;
+    bool getNextAndPreviousKeyId(int *prevIdP,
+                                 int *nextIdP,
+                                 int frame) const;
 
     void mousePress(QPointF pressPos);
     void mouseMove(QPointF mousePos);
@@ -75,7 +81,9 @@ public:
     QrealPoint *getPointAt(qreal value, qreal frame,
                            qreal pixelsPerFrame, qreal pixelsPerValUnit);
     void deletePressed();
-    qreal getValueAtFrame(int frame, QrealKey *prevKey, QrealKey *nextKey) const;
+    qreal getValueAtFrame(int frame,
+                          QrealKey *prevKey,
+                          QrealKey *nextKey) const;
 
     void middlePress(QPointF pressPos);
     void middleMove(QPointF movePos);
@@ -168,13 +176,18 @@ public:
     bool isCurrentAnimator() { return mIsCurrentAnimator; }
     const QColor &getAnimatorColor() { return mAnimatorColor; }
 
-    QrealKey *getKeyAtPos(qreal relX, int minViewedFrame, qreal pixelsPerFrame);
+    QrealKey *getKeyAtPos(qreal relX, int minViewedFrame,
+                          qreal pixelsPerFrame);
     void removeAllKeysFromComplexAnimator();
     void addAllKeysToComplexAnimator();
 
     bool hasKeys();
-    void setRecordingWithoutChangingKeys(bool rec, bool saveUndoRedo = true);
+    void setRecordingWithoutChangingKeys(bool rec,
+                                         bool saveUndoRedo = true);
     virtual void setTransformed(bool bT);
+
+    int getNumberDecimals() { return mDecimals; }
+    void setNumberDecimals(int decimals) { mDecimals = decimals; }
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 
@@ -199,21 +212,9 @@ protected:
 
     QColor mAnimatorColor;
 
+    int mDecimals = 3;
 signals:
     void valueChangedSignal(qreal);
-};
-
-#include <QMenu>
-class QrealAnimatorSpin : public QMenu
-{
-    Q_OBJECT
-public:
-    QrealAnimatorSpin(QrealAnimator *animator);
-public slots:
-    void valueEdited(double newVal);
-    void finishValueEdit();
-private:
-    QrealAnimator *mAnimator;
 };
 
 #endif // VALUEANIMATORS_H

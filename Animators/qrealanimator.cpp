@@ -807,8 +807,7 @@ void QrealAnimator::finishTransform()
         if(mSavedCurrentValue == mCurrentValue) {
             mTransformed = false;
         } else {
-            addUndoRedo(
-                        new ChangeQrealAnimatorValue(mSavedCurrentValue,
+            addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
                                                      mCurrentValue,
                                                      this) );
             if(mIsRecording) {
@@ -856,7 +855,8 @@ void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
 {
     p->setPen(QPen(Qt::black, 1.));
     foreach(QrealKey *key, mKeys) {
-        if(key->getFrame() >= startFrame && key->getFrame() <= endFrame) {
+        if(key->getFrame() >= startFrame &&
+           key->getFrame() <= endFrame) {
             if(key->isSelected() ) {
                 p->setBrush(Qt::yellow);
             } else {
@@ -864,20 +864,20 @@ void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
             }
             p->drawRect(
                 QRectF(
-                    QPointF((key->getFrame() - startFrame + 0.5)*pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                            startY + (BoxesListWidget::getListItemHeight() - KEY_RECT_SIZE)*0.5 ),
+                    QPointF((key->getFrame() - startFrame + 0.5)*
+                            pixelsPerFrame - KEY_RECT_SIZE*0.5,
+                            startY + (BoxesListWidget::getListItemHeight() -
+                                      KEY_RECT_SIZE)*0.5 ),
                     QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
         }
     }
 }
 
-void QrealAnimator::multCurrentValue(qreal mult)
-{
+void QrealAnimator::multCurrentValue(qreal mult) {
     setCurrentValue(mCurrentValue*mult);
 }
 
-qreal QrealAnimator::getSavedValue()
-{
+qreal QrealAnimator::getSavedValue() {
     return mSavedCurrentValue;
 }
 
@@ -932,46 +932,4 @@ void QrealAnimator::setIsCurrentAnimator(bool bT)
     if(bT) {
         updateKeysPath();
     }
-}
-
-QrealAnimatorSpin::QrealAnimatorSpin(QrealAnimator *animator) : QMenu()
-{
-    setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_TranslucentBackground);
-    setStyleSheet("background-color: rgba(0, 0, 0, 0); "
-                       "color: rgba(0, 0, 0, 0);");
-    QWidgetAction *widgetAction = new QWidgetAction(MainWindow::getInstance());
-    QDoubleSpinBox *spinBox = new QDoubleSpinBox();
-    spinBox->setStyleSheet("background-color: rgba(200, 200, 200); "
-                       "color: rgba(0, 0, 255);");
-    spinBox->setFixedWidth(70);
-    spinBox->setFocus();
-    widgetAction->setDefaultWidget(spinBox);
-    addAction(widgetAction);
-
-    spinBox->setRange(animator->getMinPossibleValue(),
-             animator->getMaxPossibleValue());
-    spinBox->setValue(animator->getCurrentValue() );
-    spinBox->setSingleStep(animator->getPrefferedValueStep());
-    mAnimator = animator;
-    mAnimator->startTransform();
-
-    connect(spinBox, SIGNAL(valueChanged(double)),
-            this, SLOT(valueEdited(double)));
-    connect(spinBox, SIGNAL(editingFinished()),
-            this, SLOT(finishValueEdit()));
-}
-
-void QrealAnimatorSpin::valueEdited(double newVal)
-{
-    mAnimator->setCurrentValue(newVal);
-    MainWindow::getInstance()->callUpdateSchedulers();
-}
-
-void QrealAnimatorSpin::finishValueEdit()
-{
-    mAnimator->finishTransform();
-    MainWindow::getInstance()->callUpdateSchedulers();
-    mAnimator->startTransform();
-    close();
 }

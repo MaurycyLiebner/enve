@@ -216,6 +216,7 @@ private slots:
     void saveBackup();
     void closeProject();
     void importFile();
+    void importAnimation();
     void exportSelected();
     void revert();
 

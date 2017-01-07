@@ -340,6 +340,7 @@ public:
     void keyPressEvent(QKeyEvent *event);
     void render(QPainter *p);
     void renderFinal(QPainter *p);
+    void createAnimationBoxForPaths(const QStringList &paths);
 protected:
 //    void updateAfterCombinedTransformationChanged();
 

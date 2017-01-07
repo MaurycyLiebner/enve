@@ -3,6 +3,7 @@
 #include "qrealanimatorvalueslider.h"
 #include "Boxes/vectorpath.h"
 #include "mainwindow.h"
+#include <QMenu>
 
 VectorShapesMenu::VectorShapesMenu(QWidget *parent) : QWidget(parent) {
     mMainLayout = new QVBoxLayout(this);

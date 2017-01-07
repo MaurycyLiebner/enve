@@ -177,6 +177,7 @@ VectorPath *Circle::objectToPath()
     prevPoint->connectToPoint(leftPoint);
 
     copyTransformationTo(newPath);
+    copyStrokeAndFillSettingsTo(newPath);
 
     return newPath;
 }

@@ -47,34 +47,38 @@ void StrokeWidthUpdater::update()
     MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
-DisplayedFillStrokeSettingsUpdater::DisplayedFillStrokeSettingsUpdater(PathBox *path)
-{
+DisplayedFillStrokeSettingsUpdater::
+DisplayedFillStrokeSettingsUpdater(PathBox *path) {
     mTarget = path;
 }
 
-void DisplayedFillStrokeSettingsUpdater::update()
-{
+void DisplayedFillStrokeSettingsUpdater::update() {
     mTarget->scheduleAwaitUpdate();
     MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
 RectangleBottomRightUpdater::RectangleBottomRightUpdater(Rectangle *target) :
-    AnimatorUpdater()
-{
+    AnimatorUpdater() {
     mTarget = target;
 }
 
-void RectangleBottomRightUpdater::update()
-{
+void RectangleBottomRightUpdater::update() {
     mTarget->updateRadiusXAndRange();
 }
 
-PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target)
-{
+PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
     mTarget = target;
 }
 
-void PixmapEffectUpdater::update()
-{
+void PixmapEffectUpdater::update() {
     mTarget->scheduleEffectsMarginUpdate();
+}
+
+#include "Boxes/animationbox.h"
+AnimationBoxFrameUpdater::AnimationBoxFrameUpdater(AnimationBox *target) {
+    mTarget = target;
+}
+
+void AnimationBoxFrameUpdater::update() {
+    mTarget->updateAnimationFrame();
 }

@@ -54,6 +54,7 @@ void BoxItemWidget::setDetailsVisibile(bool bT)
 }
 
 #include <QInputDialog>
+#include <QMenu>
 #include "mainwindow.h"
 void BoxItemWidget::mousePressEvent(QMouseEvent *event)
 {
