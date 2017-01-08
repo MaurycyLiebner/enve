@@ -252,6 +252,10 @@ public:
     }
 
     virtual void applyCurrentTransformation() {}
+
+    static void setPixmapUpdateBlocked(bool bT) {
+        mPixmapUpdateBlocked = bT;
+    }
 protected:
     QRectF mRelBoundingRect;
 
@@ -319,6 +323,8 @@ protected:
     QList<QrealAnimator*> mActiveAnimators;
 
     bool mAnimated = false;
+
+    static bool mPixmapUpdateBlocked;
 signals:
     void addActiveAnimatorSignal(QrealAnimator*);
     void removeActiveAnimatorSignal(QrealAnimator*);

@@ -273,7 +273,9 @@ void Canvas::paintEvent(QPainter *p)
         qreal reversedRes = 1/mResolutionPercent;
         p->translate(mRenderRect.topLeft());
         p->scale(reversedRes, reversedRes);
-        p->drawImage(QPointF(0., 0.), *mCurrentPreviewImg);
+        if(mCurrentPreviewImg != NULL) {
+            p->drawImage(QPointF(0., 0.), *mCurrentPreviewImg);
+        }
         p->restore();
     } else {
         p->fillRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1, QColor(75, 75, 75));
@@ -340,13 +342,18 @@ QSize Canvas::getCanvasSize()
     return QSize(mWidth, mHeight);
 }
 
+void Canvas::setPreviewing(bool bT) {
+    mPreviewing = bT;
+    mCanvasWidget->setAttribute(Qt::WA_OpaquePaintEvent, !bT);
+    BoundingBox::setPixmapUpdateBlocked(bT);
+}
+
 void Canvas::playPreview()
 {
-    mCanvasWidget->setAttribute(Qt::WA_OpaquePaintEvent, false);
     if(mPreviewFrames.isEmpty() ) return;
     mCurrentPreviewFrameId = 0;
     mCurrentPreviewImg = mPreviewFrames.first();
-    mPreviewing = true;
+    setPreviewing(true);
     mCanvasWidget->repaint();
 
     mPreviewFPSTimer->start();
@@ -355,14 +362,13 @@ void Canvas::playPreview()
 void Canvas::clearPreview() {
     if(!mPreviewFrames.isEmpty()) {
         mPreviewFPSTimer->stop();
-        mPreviewing = false;
+        setPreviewing(false);
+        mCurrentPreviewImg = NULL;
         for(int i = 0; i < mPreviewFrames.length(); i++) {
             delete mPreviewFrames.at(i);
         }
         mPreviewFrames.clear();
         mMainWindow->previewFinished();
-
-        mCanvasWidget->setAttribute(Qt::WA_OpaquePaintEvent, true);
     }
 }
 
@@ -415,6 +421,7 @@ void Canvas::renderCurrentFrameToPreview() {
     image->fill(Qt::transparent);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
+    mCurrentPreviewImg = image;
 }
 
 void Canvas::renderCurrentFrameToOutput(QString renderDest) {

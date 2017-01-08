@@ -370,10 +370,11 @@ void MainWindow::sendNextBoxForUpdate()
     if(mBoxesAwaitingUpdate.isEmpty()) {
         mNoBoxesAwaitUpdate = true;
         mLastUpdatedBox = NULL;
+        callUpdateSchedulers();
         if(mBoxesUpdateFinishedFunction != NULL) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
-        callUpdateSchedulers();
+        //callUpdateSchedulers();
     } else {
         mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
         emit updateBox(mLastUpdatedBox);
@@ -390,6 +391,7 @@ void MainWindow::playPreview()
     mPreviewInterrupted = false;
     mCurrentRenderFrame = mSavedCurrentFrame;
     setCurrentFrame(mSavedCurrentFrame);
+    mCanvas->setPreviewing(true);
     if(mNoBoxesAwaitUpdate) {
         nextPlayPreviewFrame();
     }
@@ -404,17 +406,17 @@ void MainWindow::nextPlayPreviewFrame() {
 //            mSoundComposition->setFirstAndLastVideoFrame(0, 240);
 //            mSoundComposition->generateData();
 
-            QAudioFormat desiredFormat;
-            desiredFormat.setChannelCount(2);
-            desiredFormat.setCodec("audio/x-raw");
-            desiredFormat.setSampleType(QAudioFormat::UnSignedInt);
-            desiredFormat.setSampleRate(48000);
-            desiredFormat.setSampleSize(16);
+//            QAudioFormat desiredFormat;
+//            desiredFormat.setChannelCount(2);
+//            desiredFormat.setCodec("audio/x-raw");
+//            desiredFormat.setSampleType(QAudioFormat::UnSignedInt);
+//            desiredFormat.setSampleRate(48000);
+//            desiredFormat.setSampleSize(16);
 
-            QAudioOutput *audio = new QAudioOutput(
-                                    QAudioDeviceInfo::defaultOutputDevice(),
-                                    desiredFormat,
-                                    this);
+//            QAudioOutput *audio = new QAudioOutput(
+//                                    QAudioDeviceInfo::defaultOutputDevice(),
+//                                    desiredFormat,
+//                                    this);
 //            mSoundComposition->start();
 //            audio->start(mSoundComposition);
             mCanvas->playPreview();

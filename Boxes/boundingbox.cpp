@@ -7,6 +7,8 @@
 #include "keysview.h"
 #include "BoxesList/boxitemwidgetcontainer.h"
 
+bool BoundingBox::mPixmapUpdateBlocked = false;
+
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     QObject(), Transformable()
 {
@@ -195,12 +197,16 @@ void BoundingBox::updatePixBoundingRectClippedToView() {
 }
 
 void BoundingBox::updateAllUglyPixmap() {
-    QMatrix inverted = mUpdateCanvasTransform.inverted().scale(Canvas::getResolutionPercent(),
-                                                               Canvas::getResolutionPercent());
+    QMatrix inverted = mUpdateCanvasTransform.inverted().
+                            scale(Canvas::getResolutionPercent(),
+                                  Canvas::getResolutionPercent());
+
     mAllUglyTransform = inverted*mUpdateTransform;
-    mAllUglyBoundingRect = (mUpdateTransform.inverted()*mAllUglyTransform).mapRect(mPixBoundingRect);
+    mAllUglyBoundingRect = (mUpdateTransform.inverted()*
+                            mAllUglyTransform).mapRect(mPixBoundingRect);
     QSizeF sizeF = mAllUglyBoundingRect.size();
-    mAllUglyPixmap = QPixmap(QSize(ceil(sizeF.width()), ceil(sizeF.height())) );
+    mAllUglyPixmap = QPixmap(QSize(ceil(sizeF.width()),
+                                   ceil(sizeF.height())) );
     mAllUglyPixmap.fill(Qt::transparent);
 
     QPainter p(&mAllUglyPixmap);
@@ -355,6 +361,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
 void BoundingBox::awaitUpdate() {
     if(mAwaitingUpdate) return;
     setAwaitingUpdate(true);
+    if(mPixmapUpdateBlocked) return;
     mMainWindow->addBoxAwaitingUpdate(this);
 }
 

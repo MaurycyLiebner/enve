@@ -341,6 +341,7 @@ public:
     void render(QPainter *p);
     void renderFinal(QPainter *p);
     void createAnimationBoxForPaths(const QStringList &paths);
+    void setPreviewing(bool bT);
 protected:
 //    void updateAfterCombinedTransformationChanged();
 
