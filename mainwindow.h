@@ -225,7 +225,7 @@ private slots:
     void setHighQualityView(bool bT);
     void setEffectsPaintEnabled(bool bT);
 signals:
-    void updateBox(BoundingBox*);
+    void updateBoxPixmaps(BoundingBox*);
 };
 
 #endif // MAINWINDOW_H

@@ -345,7 +345,6 @@ QSize Canvas::getCanvasSize()
 void Canvas::setPreviewing(bool bT) {
     mPreviewing = bT;
     mCanvasWidget->setAttribute(Qt::WA_OpaquePaintEvent, !bT);
-    BoundingBox::setPixmapUpdateBlocked(bT);
 }
 
 void Canvas::playPreview()

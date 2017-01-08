@@ -253,10 +253,7 @@ void PathBox::updateBoundingRect() {
     mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
                         adjusted(-effectsMargin, -effectsMargin,
                                  effectsMargin, effectsMargin);
-    mBoundingRect = QPainterPath();
-    mBoundingRect.addRect(mRelBoundingRect);
-    mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
-    updatePixBoundingRectClippedToView();
+    BoundingBox::updateBoundingRect();
 }
 
 void PathBox::afterSuccessfulUpdate()

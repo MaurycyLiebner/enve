@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     mPaintControler->moveToThread(mPaintControlerThread);
     connect(mPaintControler, SIGNAL(finishedUpdatingLastBox()),
             this, SLOT(sendNextBoxForUpdate()) );
-    connect(this, SIGNAL(updateBox(BoundingBox*)),
+    connect(this, SIGNAL(updateBoxPixmaps(BoundingBox*)),
             mPaintControler, SLOT(updateBoxPixmaps(BoundingBox*)) );
     mPaintControlerThread->start();
 
@@ -352,7 +352,7 @@ void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
         mLastUpdatedBox = box;
-        emit updateBox(box);
+        emit updateBoxPixmaps(box);
     } else {
         mBoxesAwaitingUpdate << box;
     }
@@ -377,7 +377,7 @@ void MainWindow::sendNextBoxForUpdate()
         //callUpdateSchedulers();
     } else {
         mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
-        emit updateBox(mLastUpdatedBox);
+        emit updateBoxPixmaps(mLastUpdatedBox);
     }
 }
 

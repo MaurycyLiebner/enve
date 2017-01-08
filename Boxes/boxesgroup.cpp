@@ -394,21 +394,23 @@ void BoxesGroup::startSelectedFillColorTransform()
 
 void BoxesGroup::updateBoundingRect() {
     QPainterPath boundingPaths = QPainterPath();
+    qreal childrenMargin = 0.;
     foreach(BoundingBox *child, mChildren) {
         boundingPaths.addPath(
                     child->getRelativeTransform().
                     map(child->getBoundingRectPath()));
+        childrenMargin = qMax(child->getEffectsMargin(), childrenMargin);
     }
-    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
-    mRelBoundingRect = boundingPaths.boundingRect().
-                    adjusted(-effectsMargin, -effectsMargin,
-                             effectsMargin, effectsMargin);
-    mBoundingRect = QPainterPath();
-    mBoundingRect.addRect(mRelBoundingRect);
+    mRelBoundingRect = boundingPaths.boundingRect();
 
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect);
-    mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
-    updatePixBoundingRectClippedToView();
+    qreal effectsMargin = (mEffectsMargin + childrenMargin)*
+                           mUpdateCanvasTransform.m11();
+
+    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
+                        adjusted(-effectsMargin, -effectsMargin,
+                                 effectsMargin, effectsMargin);
+
+    BoundingBox::updateBoundingRect();
 }
 
 void BoxesGroup::draw(QPainter *p)

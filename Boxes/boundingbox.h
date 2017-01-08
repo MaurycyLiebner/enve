@@ -241,7 +241,7 @@ public:
 
     bool isAnimated() { return mAnimated; }
     void setAnimated(bool bT);
-    virtual void updateBoundingRect() {}
+    virtual void updateBoundingRect();
     void updatePixBoundingRectClippedToView();
     const QPainterPath &getBoundingRectPath();
     QMatrix getRelativeTransform() const;
@@ -252,10 +252,12 @@ public:
     }
 
     virtual void applyCurrentTransformation() {}
+    void updatePreviewPixmap();
 
-    static void setPixmapUpdateBlocked(bool bT) {
-        mPixmapUpdateBlocked = bT;
+    qreal getEffectsMargin() {
+        return mEffectsMargin;
     }
+
 protected:
     QRectF mRelBoundingRect;
 
@@ -324,7 +326,7 @@ protected:
 
     bool mAnimated = false;
 
-    static bool mPixmapUpdateBlocked;
+    QPixmap mRenderPixmap;
 signals:
     void addActiveAnimatorSignal(QrealAnimator*);
     void removeActiveAnimatorSignal(QrealAnimator*);

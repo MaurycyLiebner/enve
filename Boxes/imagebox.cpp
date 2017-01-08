@@ -16,10 +16,8 @@ void ImageBox::updateBoundingRect() {
     mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
                         adjusted(-effectsMargin, -effectsMargin,
                                  effectsMargin, effectsMargin);
-    mBoundingRect = QPainterPath();
-    mBoundingRect.addRect(mRelBoundingRect);
-    mMappedBoundingRect = mUpdateTransform.map(mBoundingRect);
-    updatePixBoundingRectClippedToView();
+
+    BoundingBox::updateBoundingRect();
 }
 
 void ImageBox::drawSelected(QPainter *p, CanvasMode)
