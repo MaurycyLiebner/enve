@@ -766,8 +766,7 @@ void BoxesGroup::addBoxToSelection(BoundingBox *box) {
     mSelectedBoxes.append(box); schedulePivotUpdate();
     sortSelectedBoxesByZAscending();
     setCurrentFillStrokeSettingsFromBox(box);
-    mMainWindow->setCurrentShapesMenuBox(box);
-    mMainWindow->setCurrentObjectSettingsWidgetBox(box);
+    mMainWindow->setCurrentBox(box);
 }
 
 void BoxesGroup::addPointToSelection(MovablePoint *point)
@@ -782,6 +781,11 @@ void BoxesGroup::addPointToSelection(MovablePoint *point)
 void BoxesGroup::removeBoxFromSelection(BoundingBox *box) {
     box->deselect();
     mSelectedBoxes.removeOne(box); schedulePivotUpdate();
+    if(mSelectedBoxes.isEmpty()) {
+        mMainWindow->setCurrentBox(NULL);
+    } else {
+        mMainWindow->setCurrentBox(mSelectedBoxes.last());
+    }
 }
 
 void BoxesGroup::removePointFromSelection(MovablePoint *point) {
@@ -794,6 +798,7 @@ void BoxesGroup::clearBoxesSelection() {
         box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
+    mMainWindow->setCurrentBox(NULL);
 }
 
 void BoxesGroup::applyCurrentTransformation() {

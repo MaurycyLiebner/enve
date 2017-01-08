@@ -189,6 +189,8 @@ public:
     void addBoxAwaitingUpdate(BoundingBox *box);
     void setCurrentShapesMenuBox(BoundingBox *box);
     void setCurrentObjectSettingsWidgetBox(BoundingBox *box);
+    void setCurrentBox(BoundingBox *box);
+
     void nextSaveOutputFrame();
     void nextPlayPreviewFrame();
 

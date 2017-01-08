@@ -528,6 +528,7 @@ void MainWindow::callUpdateSchedulers()
     mCanvas->updatePivotIfNeeded();
     mCanvasWidget->repaint();
     mBoxListWidget->repaint();
+    mObjectSettingsWidget->repaint();
     mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
@@ -543,6 +544,11 @@ void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
 void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
     if(mObjectSettingsWidget == NULL) return;
     mObjectSettingsWidget->setBoundingBox(box);
+}
+
+void MainWindow::setCurrentBox(BoundingBox *box) {
+    setCurrentShapesMenuBox(box);
+    setCurrentObjectSettingsWidgetBox(box);
 }
 
 void MainWindow::updateDisplayedShapesInMenu() {
