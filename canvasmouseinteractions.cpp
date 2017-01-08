@@ -29,6 +29,7 @@ void Canvas::handleMovePathMousePressEvent() {
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
+        clearAndDisableInput();
     } else {
         BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(
                                                         event->pos());
@@ -121,9 +122,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 }
 
 void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
-
     if(mIsMouseGrabbing) {
-        releaseMouseAndDontTrack();
+        //handleMouseRelease(event->pos());
+        //releaseMouseAndDontTrack();
         return;
     }
 
