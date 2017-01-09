@@ -20,7 +20,7 @@ public:
     void loadFromSql(int boundingBoxId);
     void updatePath();
     MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
-    QRectF getTextRect();
+//    QRectF getTextRect();
     bool absPointInsidePath(QPointF point);
     void setPathText(bool pathText);
 

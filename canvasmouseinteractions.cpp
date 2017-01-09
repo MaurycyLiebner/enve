@@ -431,6 +431,9 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
     if(mPreviewing) return;
     mXOnlyTransform = false;
     mYOnlyTransform = false;
+    if(mInputTransformationEnabled) {
+        mFirstMouseMove = false;
+    }
     clearAndDisableInput();
     if(mTransformationFinishedBeforeMouseRelease) {
         mTransformationFinishedBeforeMouseRelease = false;

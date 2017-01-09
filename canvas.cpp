@@ -636,7 +636,7 @@ void Canvas::updateInputValue() {
     if(mInputText.isEmpty()) {
         mInputTransformationEnabled = false;
     } else {
-        mFirstMouseMove = false;
+        //mFirstMouseMove = false;
         mInputTransformationEnabled = true;
         mInputTransformationValue = mInputText.toDouble();
     }

@@ -52,14 +52,14 @@ void TextBox::loadFromSql(int boundingBoxId) {
 }
 
 
-#include <QApplication>
-#include <QDesktopWidget>
-QRectF TextBox::getTextRect() {
-    QFontMetrics fm(mFont);
-    QRectF rect = fm.boundingRect(QApplication::desktop()->geometry(),
-                           mAlignment, mText);
-    return rect.translated(-rect.topLeft() );
-}
+//#include <QApplication>
+//#include <QDesktopWidget>
+//QRectF TextBox::getTextRect() {
+//    QFontMetrics fm(mFont);
+//    QRectF rect = fm.boundingRect(QApplication::desktop()->geometry(),
+//                           mAlignment, mText);
+//    return rect.translated(QPointF(0., -fm.height()));
+//}
 
 bool TextBox::absPointInsidePath(QPointF point)
 {
@@ -67,7 +67,7 @@ bool TextBox::absPointInsidePath(QPointF point)
 }
 
 void TextBox::centerPivotPosition(bool finish) {
-    mTransformAnimator.setPivotWithoutChangingTransformation(getTextRect().center(),
+    mTransformAnimator.setPivotWithoutChangingTransformation(mRelBoundingRect.center(),
                                                              finish);
 }
 
