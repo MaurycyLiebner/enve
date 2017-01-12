@@ -182,7 +182,6 @@ TValues getTValuesforBezier1D(const qreal &x0n,
     return values;
 }
 
-
 qreal getTforBezierPoint(const qreal &x0,
                          const qreal &x1,
                          const qreal &x2,

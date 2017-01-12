@@ -53,7 +53,6 @@ public:
     qreal percentAtPoint(QPointF absPos, qreal distTolerance,
                          qreal maxPercent, qreal minPercent,
                          bool *found = NULL, QPointF *posInPath = NULL);
-    PathPoint *findPointNearestToPercent(qreal percent, qreal *foundAtPercent);
 
     void updateAfterFrameChanged(int currentFrame);
 
@@ -88,8 +87,9 @@ protected:
 
     void loadPointsFromSql(int boundingBoxId);
 
-    qreal findPercentForPoint(QPointF point, qreal minPercent = 0.,
-                              qreal maxPercent = 1.);
+    qreal findPercentForPoint(QPointF point,
+                              PathPoint **prevPoint,
+                              qreal *error);
 
     bool mClosedPath = false;
 
