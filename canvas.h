@@ -410,6 +410,8 @@ public slots:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
+    void pathsUnionAction();
+    void pathsDifferenceAction();
 private:
     bool mPivotVisibleDuringPointEdit = true;
     static bool mEffectsPaintEnabled;

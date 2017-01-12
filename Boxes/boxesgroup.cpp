@@ -1096,6 +1096,32 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     return newGroup;
 }
 
+void BoxesGroup::selectedPathsDifference() {
+
+}
+
+void BoxesGroup::selectedPathsUnion() {
+    QPainterPath effPath;
+    foreach(BoundingBox *box, mChildren) {
+        if(box->isVectorPath() ||
+           box->isCircle() ||
+           box->isRect() ||
+           box->isText()) {
+            const QPainterPath &boxPath = box->getRelativeTransform().map(
+                                        ((PathBox*)box)->getRelativePath());
+            QRectF boxPathRect = boxPath.controlPointRect();
+            QRectF effPathRect = effPath.controlPointRect();
+            if(boxPathRect.intersects(effPathRect)) {
+                //effPath
+            } else {
+                effPath.addPath(boxPath);
+            }
+        }
+    }
+    VectorPath *newPath = new VectorPath(this);
+    newPath->loadPathFromQPainterPath(effPath);
+}
+
 void BoxesGroup::addChild(BoundingBox *child)
 {
     child->setParent(this);

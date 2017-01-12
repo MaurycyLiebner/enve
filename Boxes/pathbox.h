@@ -192,6 +192,9 @@ public:
 
     void updateUpdateTransform();
     void copyStrokeAndFillSettingsTo(PathBox *target);
+
+    VectorPath *objectToPath();
+    const QPainterPath &getRelativePath() const { return mPath; }
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

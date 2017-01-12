@@ -204,6 +204,8 @@ public:
     void updateBoundingRect();
     void applyCurrentTransformation();
     void applyShadowToSelected();
+    void selectedPathsUnion();
+    void selectedPathsDifference();
 protected:
     void sortSelectedBoxesByZAscending();
 

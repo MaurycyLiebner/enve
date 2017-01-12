@@ -75,6 +75,8 @@ public:
     void applyTransformToPoints(QMatrix transform);
     void applyCurrentTransformation();
     Edge *getEgde(QPointF absPos);
+
+    void loadPathFromQPainterPath(const QPainterPath &path);
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 

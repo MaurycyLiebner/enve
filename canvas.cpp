@@ -402,6 +402,14 @@ void Canvas::objectsToPathAction() {
     mCurrentBoxesGroup->convertSelectedBoxesToPath();
 }
 
+void Canvas::pathsUnionAction() {
+    mCurrentBoxesGroup->selectedPathsUnion();
+}
+
+void Canvas::pathsDifferenceAction() {
+    mCurrentBoxesGroup->selectedPathsDifference();
+}
+
 void Canvas::updateRenderRect() {
     QRectF canvasRect = QRectF(qMax(mCombinedTransformMatrix.dx()*mResolutionPercent,
                                     mCombinedTransformMatrix.dx()),

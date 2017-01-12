@@ -41,4 +41,23 @@ extern bool isZero1Dec(qreal val);
 
 extern QString boolToSql(bool bT);
 
+extern qreal getTforBezierPoint(const qreal &x0,
+                                const qreal &x1,
+                                const qreal &x2,
+                                const qreal &x3,
+                                const qreal &x,
+                                const qreal &y0,
+                                const qreal &y1,
+                                const qreal &y2,
+                                const qreal &y3,
+                                const qreal &y,
+                                qreal *error);
+
+extern qreal getTforBezierPoint(const QPointF &p0,
+                                const QPointF &p1,
+                                const QPointF &p2,
+                                const QPointF &p3,
+                                const QPointF &p,
+                                qreal *error);
+
 #endif // POINTHELPERS_H

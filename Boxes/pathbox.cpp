@@ -177,6 +177,14 @@ void PathBox::copyStrokeAndFillSettingsTo(PathBox *target) {
     target->setStrokeWidth(mStrokeSettings.getCurrentStrokeWidth(), false);
 }
 
+VectorPath *PathBox::objectToPath() {
+    VectorPath *newPath = new VectorPath(mParent);
+    newPath->loadPathFromQPainterPath(mPath);
+    copyTransformationTo(newPath);
+    copyStrokeAndFillSettingsTo(newPath);
+    return newPath;
+}
+
 void PathBox::updateOutlinePath() {
     if(mStrokeSettings.nonZeroLineWidth()) {
         mStrokeSettings.setStrokerSettings(&mPathStroker);

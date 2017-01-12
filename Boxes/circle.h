@@ -58,10 +58,7 @@ public:
     void moveRadiusesByAbs(QPointF absTrans);
     void startPointsTransform();
     void updateAfterFrameChanged(int currentFrame);
-    void getTopLeftQuadrantVectorPoints(QPointF *leftPtr, QPointF *leftCtrlPtr,
-                                        QPointF *topCtrlPtr, QPointF *topPtr);
 
-    VectorPath *objectToPath();
     int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
 private:

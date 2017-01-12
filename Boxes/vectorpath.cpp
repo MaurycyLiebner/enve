@@ -221,26 +221,51 @@ qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
 
 qreal VectorPath::findPercentForPoint(QPointF point,
                                       qreal minPercent, qreal maxPercent) {
-    qreal smallestStep = 0.00001;
-    QPointF nearestPoint;
-    qreal smallestDist = 1000000.;
-    qreal nearestPercent = minPercent;
-    qreal percentStep = (maxPercent - minPercent)*0.01;
-    if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5;
-    qreal currPercent = minPercent;
-    while(currPercent < maxPercent) {
-        QPointF testPoint = mEditPath.pointAtPercent(currPercent);
-        qreal dist = distBetweenTwoPoints(testPoint, point);
-        if(dist < smallestDist) {
-            smallestDist = dist;
-            nearestPoint = testPoint;
-            nearestPercent = currPercent;
+    PathPoint *currentPoint = NULL;
+    PathPoint *nextPoint = NULL;
+    qreal bestTVal = 0.;
+    qreal minError = 10000000.;
+    foreach(PathPoint *separatePoint, mSeparatePaths) {
+        currentPoint = separatePoint;
+        while(currentPoint->hasNextPoint() &&
+              nextPoint != separatePoint) {
+            nextPoint = currentPoint->getNextPoint();
+            qreal error;
+            qreal tVal = getTforBezierPoint(currentPoint->getRelativePos(),
+                                            currentPoint->getEndCtrlPtValue(),
+                                            nextPoint->getStartCtrlPtValue(),
+                                            nextPoint->getRelativePos(),
+                                            point,
+                                            &error);
+            if(error < minError) {
+                bestTVal = tVal;
+                minError = error;
+            }
+            currentPoint = nextPoint;
         }
-        currPercent += percentStep;
     }
-    return findPercentForPoint(point,
-                               qclamp(nearestPercent - percentStep, 0., 1.),
-                               qclamp(nearestPercent + percentStep, 0., 1.) );
+
+    return bestTVal;
+//    qreal smallestStep = 0.00001;
+//    QPointF nearestPoint;
+//    qreal smallestDist = 1000000.;
+//    qreal nearestPercent = minPercent;
+//    qreal percentStep = (maxPercent - minPercent)*0.01;
+//    if(percentStep < smallestStep) return (maxPercent + minPercent)*0.5;
+//    qreal currPercent = minPercent;
+//    while(currPercent < maxPercent) {
+//        QPointF testPoint = mEditPath.pointAtPercent(currPercent);
+//        qreal dist = distBetweenTwoPoints(testPoint, point);
+//        if(dist < smallestDist) {
+//            smallestDist = dist;
+//            nearestPoint = testPoint;
+//            nearestPercent = currPercent;
+//        }
+//        currPercent += percentStep;
+//    }
+//    return findPercentForPoint(point,
+//                               qclamp(nearestPercent - percentStep, 0., 1.),
+//                               qclamp(nearestPercent + percentStep, 0., 1.) );
 }
 
 PathPoint *VectorPath::findPointNearestToPercent(qreal percent,
@@ -508,6 +533,57 @@ void VectorPath::updatePath()
     }
 
     updateOutlinePath();
+}
+
+void VectorPath::loadPathFromQPainterPath(const QPainterPath &path) {
+    PathPoint *firstPoint = NULL;
+    PathPoint *lastPoint = NULL;
+    bool firstOther = true;
+    QPointF startCtrlPoint;
+
+    for(int i = 0; i < path.elementCount(); i++) {
+        const QPainterPath::Element &elem = path.elementAt(i);
+
+        if (elem.isMoveTo()) { // move
+            lastPoint = addPointRelPos(QPointF(elem.x, elem.y), NULL);
+            firstPoint = lastPoint;
+        } else if (elem.isLineTo()) { // line
+            if((QPointF(elem.x, elem.y) == firstPoint->getRelativePos()) ?
+                    ((path.elementCount() > i + 1) ?
+                                path.elementAt(i + 1).isMoveTo() :
+                                true) :
+                    false) {
+                lastPoint->connectToPoint(firstPoint);
+                lastPoint = firstPoint;
+            } else {
+                lastPoint = addPointRelPos(QPointF(elem.x, elem.y),
+                                           lastPoint);
+            }
+        } else if (elem.isCurveTo()) { // curve
+            lastPoint->setEndCtrlPtEnabled(true);
+            lastPoint->moveEndCtrlPtToRelPos(QPointF(elem.x, elem.y));
+            firstOther = true;
+        } else { // other
+            if(firstOther) {
+                startCtrlPoint = QPointF(elem.x, elem.y);
+            } else {
+                if((QPointF(elem.x, elem.y) == firstPoint->getRelativePos()) ?
+                        ((path.elementCount() > i + 1) ?
+                                    path.elementAt(i + 1).isMoveTo() :
+                                    true) :
+                        false) {
+                    lastPoint->connectToPoint(firstPoint);
+                    lastPoint = firstPoint;
+                } else {
+                    lastPoint = addPointRelPos(QPointF(elem.x, elem.y),
+                                               lastPoint);
+                }
+                lastPoint->setStartCtrlPtEnabled(true);
+                lastPoint->moveStartCtrlPtToRelPos(startCtrlPoint);
+            }
+            firstOther = !firstOther;
+        }
+    }
 }
 
 PathPoint *VectorPath::addPointRelPos(QPointF relPos,

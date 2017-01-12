@@ -245,10 +245,14 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectMenu = mMenuBar->addMenu("Object");
 
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Raise", mCanvas, SLOT(raiseAction()));
-    mObjectMenu->addAction("Lower", mCanvas, SLOT(lowerAction()));
-    mObjectMenu->addAction("Rasie to Top", mCanvas, SLOT(raiseToTopAction()));
-    mObjectMenu->addAction("Lower to Bottom", mCanvas, SLOT(lowerToBottomAction()));
+    mObjectMenu->addAction("Raise", mCanvas,
+                           SLOT(raiseAction()));
+    mObjectMenu->addAction("Lower", mCanvas,
+                           SLOT(lowerAction()));
+    mObjectMenu->addAction("Rasie to Top", mCanvas,
+                           SLOT(raiseToTopAction()));
+    mObjectMenu->addAction("Lower to Bottom", mCanvas,
+                           SLOT(lowerToBottomAction()));
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° Right");
     mObjectMenu->addAction("Rotate 90° Left");
@@ -260,18 +264,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     mPathMenu = mMenuBar->addMenu("Path");
 
-    mPathMenu->addAction("Object to Path", mCanvas, SLOT(objectsToPathAction()));
+    mPathMenu->addAction("Object to Path", mCanvas,
+                         SLOT(objectsToPathAction()));
     mPathMenu->addAction("Stroke to Path");
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Union");
-    mPathMenu->addAction("Difference");
-    mPathMenu->addAction("Intersection");
-    mPathMenu->addAction("Exclusion");
-    mPathMenu->addAction("Division");
-    mPathMenu->addAction("Cut Path");
+    mPathMenu->addAction("Union", mCanvas,
+                         SLOT(pathsUnionAction()));
+    mPathMenu->addAction("Difference", mCanvas,
+                         SLOT(pathsDifferenceAction()));
+    mPathMenu->addAction("Intersection", mCanvas,
+                         SLOT(pathsIntersectionAction()));
+    mPathMenu->addAction("Exclusion", mCanvas,
+                         SLOT(pathsExclusionAction()));
+    mPathMenu->addAction("Division", mCanvas,
+                         SLOT(pathsDivisionAction()));
+    mPathMenu->addAction("Cut Path", mCanvas,
+                         SLOT(pathsCutAction()));
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Combine");
-    mPathMenu->addAction("Break Apart");
+    mPathMenu->addAction("Combine", mCanvas,
+                         SLOT(pathsCombineAction()));
+    mPathMenu->addAction("Break Apart", mCanvas,
+                         SLOT(pathsBreakApartAction()));
 
     mEffectsMenu = mMenuBar->addMenu("Effects");
 

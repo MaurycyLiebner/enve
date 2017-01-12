@@ -64,7 +64,6 @@ public:
     void centerPivotPosition(bool finish = false);
     void updateRadiusXAndRange();
     void updateAfterFrameChanged(int currentFrame);
-    VectorPath *objectToPath();
     void loadFromSql(int boundingBoxId);
     int saveToSql(QSqlQuery *query, int parentId);
 private:
