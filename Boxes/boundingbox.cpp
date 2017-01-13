@@ -697,6 +697,7 @@ void BoundingBox::updateCombinedTransform() {
         mCombinedTransformMatrix = mRelativeTransformMatrix*
                 mParent->getCombinedTransform();
 
+
         updateAfterCombinedTransformationChanged();
 
         scheduleAwaitUpdate();

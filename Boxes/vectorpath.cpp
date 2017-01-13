@@ -424,8 +424,12 @@ QPointF getPointClosestOnPathTo(const QPainterPath &path,
 
 Edge *VectorPath::getEgde(QPointF absPos)
 {
-    qreal maxDistX = 8./mCombinedTransformMatrix.m11();
-    qreal maxDistY = 8./mCombinedTransformMatrix.m22();
+    qreal xScaling = mCombinedTransformMatrix.map(
+                        QLineF(0., 0., 1., 0.)).length();
+    qreal yScaling = mCombinedTransformMatrix.map(
+                        QLineF(0., 0., 0., 1.)).length();
+    qreal maxDistX = 8./xScaling;
+    qreal maxDistY = 8./yScaling;
     QPointF relPos = mapAbsPosToRel(absPos);
     QRectF distRect = QRectF(relPos - QPointF(maxDistX, maxDistY),
                              QSizeF(maxDistX*2, maxDistY*2));
@@ -434,8 +438,8 @@ Edge *VectorPath::getEgde(QPointF absPos)
     }
 
     relPos = getPointClosestOnPathTo(mEditPath, relPos,
-                                     1./mCombinedTransformMatrix.m11(),
-                                     1./mCombinedTransformMatrix.m22());
+                                     1./xScaling,
+                                     1./yScaling);
 
 
     PathPoint *prevPoint = NULL;
