@@ -60,4 +60,13 @@ extern qreal getTforBezierPoint(const QPointF &p0,
                                 const QPointF &p,
                                 qreal *error);
 
+
+extern qreal qMin4(qreal v1, qreal v2,
+                   qreal v3, qreal v4);
+extern qreal qMax4(qreal v1, qreal v2,
+                   qreal v3, qreal v4);
+#include <QRectF>
+extern QRectF qRectF4Points(QPointF p1, QPointF c1,
+                            QPointF c2, QPointF p2);
+
 #endif // POINTHELPERS_H

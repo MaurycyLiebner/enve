@@ -6,14 +6,6 @@ PathOperations::PathOperations()
 }
 /*
 
-qreal qMin4(qreal v1, qreal v2, qreal v3, qreal v4) {
-    return qMin(v1, qMin(v2, qMin(v3, v4) ) );
-}
-
-qreal qMax4(qreal v1, qreal v2, qreal v3, qreal v4) {
-    return qMax(v1, qMax(v2, qMax(v3, v4) ) );
-}
-
 struct MinimalPathPoint {
     MinimalPathPoint() {}
 
@@ -196,7 +188,7 @@ public:
         return false;
     }
 
-    QRectF getPointsBoundingRect() const {
+    QRectF getPointsBoundingRect() const { // qrectF4Points()
         return QRectF(QPointF(qMin4(mP1.x(), mC1.x(), mC2.x(), mP2.x()),
                               qMin4(mP1.y(), mC1.y(), mC2.y(), mP2.y())),
 

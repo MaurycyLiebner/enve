@@ -231,17 +231,23 @@ qreal VectorPath::findPercentForPoint(QPointF point,
         while(currentPoint->hasNextPoint() &&
               nextPoint != separatePoint) {
             nextPoint = currentPoint->getNextPoint();
-            qreal error;
-            qreal tVal = getTforBezierPoint(currentPoint->getRelativePos(),
-                                            currentPoint->getEndCtrlPtValue(),
-                                            nextPoint->getStartCtrlPtValue(),
-                                            nextPoint->getRelativePos(),
-                                            point,
-                                            &error);
-            if(error < minError) {
-                bestTVal = tVal;
-                minError = error;
-                *prevPoint = currentPoint;
+            QRectF rect = qRectF4Points(currentPoint->getRelativePos(),
+                                        currentPoint->getEndCtrlPtValue(),
+                                        nextPoint->getStartCtrlPtValue(),
+                                        nextPoint->getRelativePos());
+            if(rect.adjusted(-15., -15, 15., 15.).contains(point)) {
+                qreal error;
+                qreal tVal = getTforBezierPoint(currentPoint->getRelativePos(),
+                                                currentPoint->getEndCtrlPtValue(),
+                                                nextPoint->getStartCtrlPtValue(),
+                                                nextPoint->getRelativePos(),
+                                                point,
+                                                &error);
+                if(error < minError && tVal > 0. && tVal < 1.) {
+                    bestTVal = tVal;
+                    minError = error;
+                    *prevPoint = currentPoint;
+                }
             }
             currentPoint = nextPoint;
         }
@@ -356,24 +362,87 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos,
     return NULL;
 }
 
+bool doesPathIntersectWithCircle(const QPainterPath &path,
+                                 qreal xRadius, qreal yRadius,
+                                 QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return circlePath.intersects(path);
+}
+
+bool doesPathNotContainCircle(const QPainterPath &path,
+                              qreal xRadius, qreal yRadius,
+                              QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return !path.contains(circlePath);
+}
+
+QPointF getCenterOfPathIntersectionWithCircle(const QPainterPath &path,
+                                              qreal xRadius, qreal yRadius,
+                                              QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return circlePath.intersected(path).boundingRect().center();
+}
+
+QPointF getCenterOfPathDifferenceWithCircle(const QPainterPath &path,
+                                            qreal xRadius, qreal yRadius,
+                                            QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return circlePath.subtracted(path).boundingRect().center();
+}
+
+QPointF getPointClosestOnPathTo(const QPainterPath &path,
+                                QPointF relPos,
+                                qreal xRadiusScaling,
+                                qreal yRadiusScaling) {
+    bool (*checkerFunc)(const QPainterPath &, qreal, qreal, QPointF);
+    QPointF (*centerFunc)(const QPainterPath &, qreal, qreal, QPointF);
+    if(path.contains(relPos)) {
+        checkerFunc = &doesPathNotContainCircle;
+        centerFunc = &getCenterOfPathDifferenceWithCircle;
+    } else {
+        checkerFunc = &doesPathIntersectWithCircle;
+        centerFunc = &getCenterOfPathIntersectionWithCircle;
+    }
+    qreal radius = 1.;
+    while(true) {
+        if(checkerFunc(path,
+                       xRadiusScaling*radius,
+                       yRadiusScaling*radius,
+                       relPos)) {
+            return centerFunc(path,
+                              xRadiusScaling*radius,
+                              yRadiusScaling*radius,
+                              relPos);
+        }
+        radius += 1.;
+    }
+}
+
 Edge *VectorPath::getEgde(QPointF absPos)
 {
-    qreal maxDist = 8.;
+    qreal maxDistX = 8./mCombinedTransformMatrix.m11();
+    qreal maxDistY = 8./mCombinedTransformMatrix.m22();
     QPointF relPos = mapAbsPosToRel(absPos);
-    if(!mEditPath.intersects(QRectF(relPos - QPointF(maxDist, maxDist),
-                                     QSizeF(maxDist*2, maxDist*2))) ) {
+    QRectF distRect = QRectF(relPos - QPointF(maxDistX, maxDistY),
+                             QSizeF(maxDistX*2, maxDistY*2));
+    if(!mEditPath.intersects(distRect) || mEditPath.contains(distRect)) {
         return NULL;
     }
+
+    relPos = getPointClosestOnPathTo(mEditPath, relPos,
+                                     1./mCombinedTransformMatrix.m11(),
+                                     1./mCombinedTransformMatrix.m22());
+
 
     PathPoint *prevPoint = NULL;
     qreal error;
     qreal pressedT = findPercentForPoint(relPos, &prevPoint, &error);
 
     if(prevPoint == NULL) return NULL;
-
-    if(error > maxDist ) {
-        return NULL;
-    }
 
     PathPoint *nextPoint = prevPoint->getNextPoint();
     if(nextPoint == NULL) return NULL;
