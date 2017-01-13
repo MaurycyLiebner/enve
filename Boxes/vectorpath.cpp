@@ -291,73 +291,60 @@ void VectorPath::updateAfterFrameChanged(int currentFrame)
 
 PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos,
                                                 bool adjust) {
-    qreal maxDist = 14.;
-    QPointF relPos = mapAbsPosToRel(absPos);
-    if(!mPath.intersects(QRectF(relPos - QPointF(maxDist, maxDist),
-                                     QSizeF(maxDist*2, maxDist*2))) ) {
-        return NULL;
-    }
+    qreal pressedT;
+    PathPoint *prevPoint = NULL;
+    PathPoint *nextPoint = NULL;
+    if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
+                                            &prevPoint, &nextPoint)) {
+        if(pressedT > 0.0001 && pressedT < 0.9999) {
+            QPointF prevPointEnd = prevPoint->getEndCtrlPtValue();
+            QPointF nextPointStart = nextPoint->getStartCtrlPtValue();
+            QPointF newPointPos;
+            QPointF newPointStart;
+            QPointF newPointEnd;
+            Edge::getNewRelPosForKnotInsertionAtT(prevPoint->getRelativePos(),
+                                                  &prevPointEnd,
+                                                  &nextPointStart,
+                                                  nextPoint->getRelativePos(),
+                                                  &newPointPos,
+                                                  &newPointStart,
+                                                  &newPointEnd,
+                                                  pressedT);
 
-    PathPoint *prevPoint;
-    qreal error;
-    qreal pressedT = findPercentForPoint(relPos, &prevPoint, &error);
-    if(error > maxDist ) {
-        return NULL;
-    }
-    if(prevPoint == NULL) return NULL;
+            PathPoint *newPoint = new PathPoint(this);
+            newPoint->setRelativePos(newPointPos, false);
 
-    PathPoint *nextPoint = prevPoint->getNextPoint();
+            nextPoint->setPointAsPrevious(newPoint);
+            prevPoint->setPointAsNext(newPoint);
 
-    if(nextPoint == NULL) return NULL;
+            if(adjust) {
+                if(!prevPoint->isEndCtrlPtEnabled() && !nextPoint->isStartCtrlPtEnabled()) {
+                    newPoint->setStartCtrlPtEnabled(false);
+                    newPoint->setEndCtrlPtEnabled(false);
+                } else {
+                    newPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH, false);
+                    newPoint->setStartCtrlPtEnabled(true);
+                    newPoint->moveStartCtrlPtToRelPos(newPointStart);
+                    newPoint->setEndCtrlPtEnabled(true);
+                    newPoint->moveEndCtrlPtToRelPos(newPointEnd);
 
-    if(pressedT > 0.0001 && pressedT < 0.9999) {
-        QPointF prevPointEnd = prevPoint->getEndCtrlPtValue();
-        QPointF nextPointStart = nextPoint->getStartCtrlPtValue();
-        QPointF newPointPos;
-        QPointF newPointStart;
-        QPointF newPointEnd;
-        Edge::getNewRelPosForKnotInsertionAtT(prevPoint->getRelativePos(),
-                                              &prevPointEnd,
-                                              &nextPointStart,
-                                              nextPoint->getRelativePos(),
-                                              &newPointPos,
-                                              &newPointStart,
-                                              &newPointEnd,
-                                              pressedT);
-
-        PathPoint *newPoint = new PathPoint(this);
-        newPoint->setRelativePos(newPointPos, false);
-
-        nextPoint->setPointAsPrevious(newPoint);
-        prevPoint->setPointAsNext(newPoint);
-
-        if(adjust) {
-            if(!prevPoint->isEndCtrlPtEnabled() && !nextPoint->isStartCtrlPtEnabled()) {
-                newPoint->setStartCtrlPtEnabled(false);
-                newPoint->setEndCtrlPtEnabled(false);
-            } else {
-                newPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH, false);
-                newPoint->setStartCtrlPtEnabled(true);
-                newPoint->moveStartCtrlPtToRelPos(newPointStart);
-                newPoint->setEndCtrlPtEnabled(true);
-                newPoint->moveEndCtrlPtToRelPos(newPointEnd);
-
-                if(prevPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
-                    prevPoint->isEndCtrlPtEnabled() && prevPoint->isStartCtrlPtEnabled()) {
-                    prevPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+                    if(prevPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
+                        prevPoint->isEndCtrlPtEnabled() && prevPoint->isStartCtrlPtEnabled()) {
+                        prevPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+                    }
+                    if(nextPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
+                        nextPoint->isEndCtrlPtEnabled() && nextPoint->isStartCtrlPtEnabled()) {
+                        nextPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+                    }
+                    prevPoint->moveEndCtrlPtToRelPos(prevPointEnd);
+                    nextPoint->moveStartCtrlPtToRelPos(nextPointStart);
                 }
-                if(nextPoint->getCurrentCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC &&
-                    nextPoint->isEndCtrlPtEnabled() && nextPoint->isStartCtrlPtEnabled()) {
-                    nextPoint->setCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
-                }
-                prevPoint->moveEndCtrlPtToRelPos(prevPointEnd);
-                nextPoint->moveStartCtrlPtToRelPos(nextPointStart);
             }
+
+            appendToPointsList(newPoint);
+
+            return newPoint;
         }
-
-        appendToPointsList(newPoint);
-
-        return newPoint;
     }
     return NULL;
 }
@@ -422,8 +409,10 @@ QPointF getPointClosestOnPathTo(const QPainterPath &path,
     }
 }
 
-Edge *VectorPath::getEgde(QPointF absPos)
-{
+bool VectorPath::getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
+                                                      qreal *pressedT,
+                                                      PathPoint **prevPoint,
+                                                      PathPoint **nextPoint) {
     qreal xScaling = mCombinedTransformMatrix.map(
                         QLineF(0., 0., 1., 0.)).length();
     qreal yScaling = mCombinedTransformMatrix.map(
@@ -434,7 +423,7 @@ Edge *VectorPath::getEgde(QPointF absPos)
     QRectF distRect = QRectF(relPos - QPointF(maxDistX, maxDistY),
                              QSizeF(maxDistX*2, maxDistY*2));
     if(!mEditPath.intersects(distRect) || mEditPath.contains(distRect)) {
-        return NULL;
+        return false;
     }
 
     relPos = getPointClosestOnPathTo(mEditPath, relPos,
@@ -442,19 +431,26 @@ Edge *VectorPath::getEgde(QPointF absPos)
                                      1./yScaling);
 
 
-    PathPoint *prevPoint = NULL;
     qreal error;
-    qreal pressedT = findPercentForPoint(relPos, &prevPoint, &error);
+    *pressedT = findPercentForPoint(relPos, prevPoint, &error);
 
-    if(prevPoint == NULL) return NULL;
+    *nextPoint = (*prevPoint)->getNextPoint();
 
-    PathPoint *nextPoint = prevPoint->getNextPoint();
-    if(nextPoint == NULL) return NULL;
+    return true;
+}
 
-    if(pressedT > 0.0001 && pressedT < 0.9999) {
-        return new Edge(prevPoint, nextPoint, pressedT);
-    } else {
-        return NULL;
+Edge *VectorPath::getEgde(QPointF absPos)
+{
+    qreal pressedT;
+    PathPoint *prevPoint = NULL;
+    PathPoint *nextPoint = NULL;
+    if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
+                                         &prevPoint, &nextPoint)) {
+        if(pressedT > 0.0001 && pressedT < 0.9999) {
+            return new Edge(prevPoint, nextPoint, pressedT);
+        } else {
+            return NULL;
+        }
     }
 }
 

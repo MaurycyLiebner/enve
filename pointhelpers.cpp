@@ -223,7 +223,8 @@ qreal getTforBezierPoint(const qreal &x0,
         }
     }
 
-    *error = minErrorT;
+    if(error != NULL) *error = minErrorT;
+
     qDebug() << bestT << minErrorT;
     return bestT;
 }

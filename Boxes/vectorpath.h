@@ -100,6 +100,10 @@ protected:
 
     bool mShapesEnabled = false;
     VectorPathShape *mCurrentEditedShape = NULL;
+    bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
+                                              qreal *pressedT,
+                                              PathPoint **prevPoint,
+                                              PathPoint **nextPoint);
 };
 
 #endif // VECTORPATH_H

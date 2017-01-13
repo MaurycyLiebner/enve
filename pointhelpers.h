@@ -51,14 +51,14 @@ extern qreal getTforBezierPoint(const qreal &x0,
                                 const qreal &y2,
                                 const qreal &y3,
                                 const qreal &y,
-                                qreal *error);
+                                qreal *error = NULL);
 
 extern qreal getTforBezierPoint(const QPointF &p0,
                                 const QPointF &p1,
                                 const QPointF &p2,
                                 const QPointF &p3,
                                 const QPointF &p,
-                                qreal *error);
+                                qreal *error = NULL);
 
 
 extern qreal qMin4(qreal v1, qreal v2,

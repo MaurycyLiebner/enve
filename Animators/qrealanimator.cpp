@@ -804,9 +804,9 @@ void QrealAnimator::startTransform()
 void QrealAnimator::finishTransform()
 {
     if(mTransformed) {
-        if(mSavedCurrentValue == mCurrentValue) {
-            mTransformed = false;
-        } else {
+//        if(mSavedCurrentValue == mCurrentValue) {
+//            mTransformed = false;
+//        } else {
             addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
                                                      mCurrentValue,
                                                      this) );
@@ -818,7 +818,7 @@ void QrealAnimator::finishTransform()
             if(mIsCurrentAnimator) {
                 graphScheduleUpdateAfterKeysChanged();
             }
-        }
+//        }
     }
 }
 
