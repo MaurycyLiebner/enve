@@ -1100,26 +1100,35 @@ void BoxesGroup::selectedPathsDifference() {
 
 }
 
+#include "pathoperations.h"
 void BoxesGroup::selectedPathsUnion() {
-    QPainterPath effPath;
-    foreach(BoundingBox *box, mChildren) {
+    VectorPath *newPath = new VectorPath(this);
+    FullVectorPath *targetPath = new FullVectorPath();
+    FullVectorPath *addToPath = NULL;
+    FullVectorPath *addedPath = NULL;
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->isVectorPath() ||
            box->isCircle() ||
            box->isRect() ||
            box->isText()) {
             const QPainterPath &boxPath = box->getRelativeTransform().map(
                                         ((PathBox*)box)->getRelativePath());
-            QRectF boxPathRect = boxPath.controlPointRect();
-            QRectF effPathRect = effPath.controlPointRect();
-            if(boxPathRect.intersects(effPathRect)) {
-                //effPath
-            } else {
-                effPath.addPath(boxPath);
-            }
+            addToPath = targetPath;
+            addToPath->generateSignlePathPaths();
+            addedPath = new FullVectorPath();
+            addedPath->generateFromPath(boxPath);
+            addToPath->intersectWith(addedPath);
+            targetPath = new FullVectorPath();
+            targetPath->getSeparatePathsFromOther(addToPath);
+            targetPath->getSeparatePathsFromOther(addedPath);
+
+            delete addedPath;
+            delete addToPath;
         }
     }
-    VectorPath *newPath = new VectorPath(this);
-    newPath->loadPathFromQPainterPath(effPath);
+
+    targetPath->addAllToVectorPath(newPath);
 }
 
 void BoxesGroup::addChild(BoundingBox *child)

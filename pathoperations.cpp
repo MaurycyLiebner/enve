@@ -84,6 +84,79 @@ MinimalVectorPath::MinimalVectorPath() {
 
 }
 
+void MinimalVectorPath::closePath() {
+    mFirstPoint->setPrevPoint(mLastPoint);
+    mLastPoint->setNextPoint(mFirstPoint);
+}
+
+void FullVectorPath::generateFromPath(const QPainterPath &path) {
+    MinimalPathPoint *firstPoint = NULL;
+    MinimalPathPoint *lastPoint = NULL;
+    bool firstOther = true;
+    QPointF startCtrlPoint;
+    MinimalVectorPath *currentTarget = NULL;
+
+    for(int i = 0; i < path.elementCount(); i++) {
+        const QPainterPath::Element &elem = path.elementAt(i);
+
+        if (elem.isMoveTo()) { // move
+            if(currentTarget != NULL) {
+                currentTarget->generateQPainterPath();
+            }
+            currentTarget = new MinimalVectorPath();
+            mSeparatePaths.append(currentTarget);
+            lastPoint = new MinimalPathPoint(QPointF(),
+                                             QPointF(elem.x, elem.y),
+                                             QPointF());
+            currentTarget->addPoint(lastPoint);
+            firstPoint = lastPoint;
+        } else if (elem.isLineTo()) { // line
+            if((QPointF(elem.x, elem.y) == firstPoint->getPos()) ?
+                    ((path.elementCount() > i + 1) ?
+                                path.elementAt(i + 1).isMoveTo() :
+                                true) :
+                    false) {
+                firstPoint->setPrevPoint(lastPoint);
+                lastPoint->setNextPoint(firstPoint);
+                lastPoint = firstPoint;
+            } else {
+                lastPoint = new MinimalPathPoint(QPointF(),
+                                                 QPointF(elem.x, elem.y),
+                                                 QPointF());
+                currentTarget->addPoint(lastPoint);
+            }
+        } else if (elem.isCurveTo()) { // curve
+            lastPoint->setEndCtrlPos(QPointF(elem.x, elem.y));
+            firstOther = true;
+        } else { // other
+            if(firstOther) {
+                startCtrlPoint = QPointF(elem.x, elem.y);
+            } else {
+                if((QPointF(elem.x, elem.y) == firstPoint->getPos()) ?
+                        ((path.elementCount() > i + 1) ?
+                                    path.elementAt(i + 1).isMoveTo() :
+                                    true) :
+                        false) {
+                    firstPoint->setPrevPoint(lastPoint);
+                    lastPoint->setNextPoint(firstPoint);
+                    lastPoint = firstPoint;
+                } else {
+                    lastPoint = new MinimalPathPoint(QPointF(),
+                                                     QPointF(elem.x, elem.y),
+                                                     QPointF());
+                    currentTarget->addPoint(lastPoint);
+                }
+                //lastPoint->setStartCtrlPtEnabled(true);
+                lastPoint->setStartCtrlPos(startCtrlPoint);
+            }
+            firstOther = !firstOther;
+        }
+    }
+    if(currentTarget != NULL) {
+        currentTarget->generateQPainterPath();
+    }
+}
+
 void MinimalVectorPath::setLastPointStart(QPointF start) {
     mLastPoint->setStartCtrlPos(start);
 }
@@ -102,6 +175,7 @@ void MinimalVectorPath::addPoint(MinimalPathPoint *point) {
         mFirstPoint = point;
     } else {
         mLastPoint->setNextPoint(point);
+        point->setPrevPoint(mLastPoint);
     }
     mLastPoint = point;
 }
@@ -120,80 +194,157 @@ MinimalPathPoint *MinimalVectorPath::getFirstPoint() {
 }
 
 void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath) {
-    MinimalPathPoint *point = otherPath->getFirstPoint();
-    if(point == NULL) return;
-    MinimalPathPoint *nextPoint = point->getNextPoint();
-    QList<PointsBezierCubic*> otherCubics;
-    while(nextPoint != NULL) {
-        otherCubics << new PointsBezierCubic(point, nextPoint);
-
-        nextPoint = point->getNextPoint();
-    }
-
-    QList<PointsBezierCubic*> thisCubics;
-    point = getFirstPoint();
-    if(point == NULL) return;
-    nextPoint = point->getNextPoint();
-    while(nextPoint != NULL) {
-        thisCubics << new PointsBezierCubic(point, nextPoint);
-
-        nextPoint = point->getNextPoint();
-    }
-
-    foreach(PointsBezierCubic *cubic1, thisCubics) {
-        foreach(PointsBezierCubic *cubic2, otherCubics) {
-            cubic1->intersectWith(cubic2);
-        }
-        delete cubic1;
-    }
-    foreach(PointsBezierCubic *cubic2, otherCubics) {
-        delete cubic2;
-    }
-    thisCubics.clear();
-    otherCubics.clear();
-
-    otherPath->removeNonIntersectionPointsContainedInAndSaveIntersectionPoints(this);
-    removeNonIntersectionPointsContainedInAndSaveIntersectionPoints(otherPath);
-}
-
-void MinimalVectorPath::addAllPointsToPath(MinimalVectorPath *target) {
-    MinimalPathPoint *firstFirstPoint = mIntersectionPoints.first();
-    MinimalPathPoint *point = firstFirstPoint;
-    MinimalPathPoint *nextPoint = point;
-    while(true) {
-        while(nextPoint != NULL) {
-            target->addPoint(new MinimalPathPoint(point));
+    if(mPath.intersects(otherPath->getPath())) {
+        MinimalPathPoint *firstPoint = otherPath->getFirstPoint();
+        MinimalPathPoint *point = firstPoint;
+        if(point == NULL) return;
+        MinimalPathPoint *nextPoint = point->getNextPoint();
+        if(nextPoint == NULL) return;
+        QList<PointsBezierCubic*> otherCubics;
+        do {
+            otherCubics << new PointsBezierCubic(point, nextPoint);
 
             point = nextPoint;
             nextPoint = point->getNextPoint();
-        }
+        } while(point != firstPoint);
 
-        if(point->isIntersection()) {
-            target->addPoint(new MinimalPathPoint(point));
-            point = ((IntersectionPathPoint*)point)->getSibling();
-            if(point == firstFirstPoint) {
-                firstFirstPoint->setStartCtrlPos(point->getStartPos());
-                return;
-            }
-            target->setLastPointEnd(point->getEndPos());
-            point = point->getNextPoint();
+        QList<PointsBezierCubic*> thisCubics;
+        firstPoint = getFirstPoint();
+        point = firstPoint;
+        if(point == NULL) return;
+        nextPoint = point->getNextPoint();
+        if(nextPoint == NULL) return;
+        do {
+            thisCubics << new PointsBezierCubic(point, nextPoint);
+
+            point = nextPoint;
             nextPoint = point->getNextPoint();
-        }
+        }  while(point != firstPoint);
 
+        foreach(PointsBezierCubic *cubic1, thisCubics) {
+            foreach(PointsBezierCubic *cubic2, otherCubics) {
+                cubic1->intersectWith(cubic2);
+            }
+            delete cubic1;
+        }
+        foreach(PointsBezierCubic *cubic2, otherCubics) {
+            delete cubic2;
+        }
+        thisCubics.clear();
+        otherCubics.clear();
+
+        otherPath->removeNonIntersectionPointsContainedInAndSaveIntersectionPoints(this);
+        removeNonIntersectionPointsContainedInAndSaveIntersectionPoints(otherPath);
     }
 }
 
-void MinimalVectorPath::removeNonIntersectionPointsContainedInAndSaveIntersectionPoints(MinimalVectorPath *path) {
+void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList) {
+    if(mIntersectionPoints.isEmpty()) {
+        if(mPoints.isEmpty()) return;
+        MinimalVectorPath *newPath = new MinimalVectorPath();
+        MinimalPathPoint *point = mFirstPoint;
+        do {
+            newPath->addPoint(new MinimalPathPoint(point));
+            point = point->getNextPoint();
+        } while(point != mFirstPoint);
+        newPath->closePath();
+        targetsList->append(newPath);
+        return;
+    }
+    while(!mIntersectionPoints.isEmpty()) {
+        MinimalPathPoint *firstFirstPoint = mIntersectionPoints.takeFirst();
+        if(firstFirstPoint->wasAdded()) continue;
+        MinimalVectorPath *target = new MinimalVectorPath();
+        targetsList->append(target);
+        MinimalPathPoint *point = firstFirstPoint;
+
+        bool reversed = point->getNextPoint() == NULL;
+        MinimalPathPoint *nextPoint;
+        if(reversed) {
+            nextPoint = point->getPrevPoint();
+        } else {
+            nextPoint = point->getNextPoint();
+        }
+        while(true) {
+            while(nextPoint != NULL) {
+                target->addPoint(new MinimalPathPoint(point));
+                point->setAdded();
+
+                point = nextPoint;
+                if(reversed) {
+                    nextPoint = point->getPrevPoint();
+                } else {
+                    nextPoint = point->getNextPoint();
+                }
+            }
+
+            if(point->isIntersection()) {
+                mIntersectionPoints.removeOne((IntersectionPathPoint*)point);
+                target->addPoint(new MinimalPathPoint(point));
+                point->setAdded();
+                point = ((IntersectionPathPoint*)point)->getSibling();
+                point->setAdded();
+                if(point == firstFirstPoint) {
+                    bool firstReversed = firstFirstPoint->getNextPoint() == NULL;
+                    bool siblingReversed = firstFirstPoint->getNextPoint() == NULL;
+                    QPointF ctrlPt;
+                    if(siblingReversed) {
+                        ctrlPt = ((IntersectionPathPoint*)firstFirstPoint)->
+                                getSibling()->getEndPos();
+                    } else {
+                        ctrlPt = ((IntersectionPathPoint*)firstFirstPoint)->
+                                getSibling()->getStartPos();
+                    }
+                    if(firstReversed) {
+                        target->getFirstPoint()->setEndCtrlPos(ctrlPt);
+                    } else {
+                        target->getFirstPoint()->setStartCtrlPos(ctrlPt);
+                    }
+
+                    break;
+                }
+
+
+                bool wasReversed = reversed;
+                reversed = point->getNextPoint() == NULL;
+                QPointF ctrlVal;
+                if(reversed) {
+                    ctrlVal = point->getStartPos();
+
+                    point = point->getPrevPoint();
+                    nextPoint = point->getPrevPoint();
+                } else {
+                    ctrlVal = point->getEndPos();
+
+                    point = point->getNextPoint();
+                    nextPoint = point->getNextPoint();
+                }
+                if(wasReversed) {
+                    target->setLastPointStart(ctrlVal);
+                } else {
+                    target->setLastPointEnd(ctrlVal);
+                }
+            }
+        }
+        target->closePath();
+    }
+}
+
+void MinimalVectorPath::
+removeNonIntersectionPointsContainedInAndSaveIntersectionPoints(
+        MinimalVectorPath *path) {
     QList<MinimalPathPoint*> pointsToDelete;
-    foreach(MinimalPathPoint *point, mPoints) {
+    MinimalPathPoint *point = mFirstPoint;
+    do {
         if(point->isIntersection()) {
             mIntersectionPoints << (IntersectionPathPoint*)point;
-            continue;
+        } else {
+            if(path->pointInsidePath(point->getPos()) ) {
+                pointsToDelete << point;
+            }
         }
-        if(path->pointInsidePath(point->getPos()) ) {
-            pointsToDelete << point;
-        }
-    }
+        point = point->getNextPoint();
+    } while(point != mFirstPoint);
     foreach(MinimalPathPoint *point, pointsToDelete) {
         MinimalPathPoint *nextPoint = point->getNextPoint();
         if(nextPoint != NULL) {
@@ -206,11 +357,31 @@ void MinimalVectorPath::removeNonIntersectionPointsContainedInAndSaveIntersectio
         mPoints.removeOne(point);
         delete point;
     }
+
+    foreach(IntersectionPathPoint *point, mIntersectionPoints) {
+        MinimalPathPoint *next = point->getNextPoint();
+        if(next != NULL) {
+            if(next->isIntersection()) {
+                point->setNextPoint(NULL);
+                next->setPrevPoint(NULL);
+            }
+        }
+        MinimalPathPoint *prev = point->getPrevPoint();
+        if(prev != NULL) {
+            if(prev->isIntersection()) {
+                point->setPrevPoint(NULL);
+                prev->setNextPoint(NULL);
+            }
+        }
+    }
+
+    mFirstPoint = NULL;
 }
 
 void MinimalVectorPath::generateQPainterPath() {
     MinimalPathPoint *point = mFirstPoint;
     QPointF lastPointEnd = point->getEndPos();
+    mPath.moveTo(point->getPos());
     while(true) {
         point = point->getNextPoint();
         if(point == NULL) break;
@@ -267,7 +438,8 @@ bool BezierCubic::intersects(BezierCubic *bezier) const {
     return false;
 }
 
-void BezierCubic::intersectWithSub(PointsBezierCubic *otherBezier, PointsBezierCubic *parentBezier) const {
+void BezierCubic::intersectWithSub(PointsBezierCubic *otherBezier,
+                                   PointsBezierCubic *parentBezier) const {
     if(intersects(otherBezier)) {
         qreal totalLen = mPainterPath.length();
         if(totalLen < 1.) {
