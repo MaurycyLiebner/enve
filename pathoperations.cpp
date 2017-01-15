@@ -293,6 +293,7 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList) {
     while(!mIntersectionPoints.isEmpty()) {
         MinimalPathPoint *firstFirstPoint = mIntersectionPoints.takeFirst();
         if(firstFirstPoint->wasAdded()) continue;
+        ((IntersectionPathPoint*)firstFirstPoint)->getSibling()->setAdded();
 
         MinimalVectorPath *target = new MinimalVectorPath();
         targetsList->append(target);
@@ -368,20 +369,28 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList) {
                 reversed = point->getNextPoint() == NULL;
                 QPointF ctrlVal;
                 if(reversed) {
-                    ctrlVal = point->getStartPos();
+                    if(wasReversed) {
+                        ctrlVal = point->getEndPos();
+                    } else {
+                        ctrlVal = point->getStartPos();
+                    }
 
                     point = point->getPrevPoint();
                     nextPoint = point->getPrevPoint();
                 } else {
-                    ctrlVal = point->getEndPos();
+                    if(wasReversed) {
+                        ctrlVal = point->getStartPos();
+                    } else {
+                        ctrlVal = point->getEndPos();
+                    }
 
                     point = point->getNextPoint();
                     nextPoint = point->getNextPoint();
                 }
                 if(wasReversed) {
-                    target->setLastPointStart(ctrlVal);
-                } else {
                     target->setLastPointEnd(ctrlVal);
+                } else {
+                    target->setLastPointStart(ctrlVal);
                 }
             }
         }
