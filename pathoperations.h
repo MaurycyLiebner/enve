@@ -48,6 +48,25 @@ public:
 
     void setSibling(IntersectionPathPoint *sibling);
     IntersectionPathPoint *getSibling();
+
+    void fixSiblingSideCtrlPoint() {
+        MinimalPathPoint *siblingNext = mSiblingIntPoint->getNextPoint();
+
+        bool siblingReversed = siblingNext == NULL;
+        bool thisReversed = getNextPoint() == NULL;
+        QPointF siblingCtrlPt;
+        if(siblingReversed) {
+            siblingCtrlPt = mSiblingIntPoint->getStartPos();
+        } else {
+            siblingCtrlPt = mSiblingIntPoint->getEndPos();
+        }
+        if(thisReversed) {
+            setEndCtrlPos(siblingCtrlPt);
+        } else {
+            setStartCtrlPos(siblingCtrlPt);
+        }
+    }
+
 private:
     IntersectionPathPoint *mSiblingIntPoint;
 };

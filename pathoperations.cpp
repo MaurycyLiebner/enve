@@ -275,6 +275,11 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath) {
             delete otherCubic;
             otherCubic = nextCubic;
         }
+
+        foreach(IntersectionPathPoint *interPt, mIntersectionPoints) {
+            interPt->fixSiblingSideCtrlPoint();
+            interPt->getSibling()->fixSiblingSideCtrlPoint();
+        }
     }
 }
 
@@ -365,32 +370,13 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList) {
                 point = ((IntersectionPathPoint*)point)->getSibling();
                 point->setAdded();
 
-                bool wasReversed = reversed;
                 reversed = point->getNextPoint() == NULL;
-                QPointF ctrlVal;
                 if(reversed) {
-                    if(wasReversed) {
-                        ctrlVal = point->getEndPos();
-                    } else {
-                        ctrlVal = point->getStartPos();
-                    }
-
                     point = point->getPrevPoint();
                     nextPoint = point->getPrevPoint();
                 } else {
-                    if(wasReversed) {
-                        ctrlVal = point->getStartPos();
-                    } else {
-                        ctrlVal = point->getEndPos();
-                    }
-
                     point = point->getNextPoint();
                     nextPoint = point->getNextPoint();
-                }
-                if(wasReversed) {
-                    target->setLastPointEnd(ctrlVal);
-                } else {
-                    target->setLastPointStart(ctrlVal);
                 }
             }
         }
@@ -463,7 +449,7 @@ bool BezierCubic::intersectWithSub(PointsBezierCubic *otherBezier,
                                    PointsBezierCubic *parentBezier) const {
     if(intersects(otherBezier)) {
         qreal totalLen = mPainterPath.length();
-        if(totalLen < 1.) {
+        if(totalLen < 0.1) {
             IntersectionPathPoint *newPoint1 =
                     otherBezier->divideCubicAtPointAndReturnIntersection(mP1);
             IntersectionPathPoint *newPoint2 =

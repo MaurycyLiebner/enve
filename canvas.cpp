@@ -384,30 +384,37 @@ void Canvas::nextPreviewFrame()
 
 void Canvas::raiseAction() {
     mCurrentBoxesGroup->raiseSelectedBoxes();
+    callUpdateSchedulers();
 }
 
 void Canvas::lowerAction() {
     mCurrentBoxesGroup->lowerSelectedBoxes();
+    callUpdateSchedulers();
 }
 
 void Canvas::raiseToTopAction() {
     mCurrentBoxesGroup->raiseSelectedBoxesToTop();
+    callUpdateSchedulers();
 }
 
 void Canvas::lowerToBottomAction() {
     mCurrentBoxesGroup->lowerSelectedBoxesToBottom();
+    callUpdateSchedulers();
 }
 
 void Canvas::objectsToPathAction() {
     mCurrentBoxesGroup->convertSelectedBoxesToPath();
+    callUpdateSchedulers();
 }
 
 void Canvas::pathsUnionAction() {
     mCurrentBoxesGroup->selectedPathsUnion();
+    callUpdateSchedulers();
 }
 
 void Canvas::pathsDifferenceAction() {
     mCurrentBoxesGroup->selectedPathsDifference();
+    callUpdateSchedulers();
 }
 
 void Canvas::updateRenderRect() {
