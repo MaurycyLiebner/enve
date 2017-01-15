@@ -28,6 +28,7 @@ public:
     virtual bool isIntersection();
     bool wasAdded() { return mAdded; }
     void setAdded() { mAdded = true; }
+    bool hasNoConnections();
 private:
     MinimalPathPoint *mNextPoint = NULL;
     MinimalPathPoint *mPrevPoint = NULL;
@@ -70,19 +71,20 @@ public:
 
     void addAllPaths(QList<MinimalVectorPath *> *targetsList);
 
-    void removeNonIntersectionPointsContainedInAndSaveIntersectionPoints(
-            MinimalVectorPath *path);
-
     void generateQPainterPath();
 
     bool pointInsidePath(QPointF point);
 
     const QPainterPath &getPath() { return mPath; }
+
+    void addIntersectionPoint(IntersectionPathPoint *point) {
+        mIntersectionPoints << point;
+    }
+
 private:
     MinimalPathPoint *mFirstPoint = NULL;
     MinimalPathPoint *mLastPoint = NULL;
     QList<IntersectionPathPoint*> mIntersectionPoints;
-    QList<MinimalPathPoint*> mPoints;
     QPainterPath mPath;
 
 };
@@ -157,13 +159,14 @@ class BezierCubic {
 public:
     BezierCubic(QPointF p1, QPointF c1, QPointF c2, QPointF p2);
     BezierCubic(BezierCubic *cubic);
+    virtual ~BezierCubic() {}
 
     qreal getTForPoint(QPointF point);
     void generatePath();
     const QPainterPath &getAsPainterPath();
     bool intersects(BezierCubic *bezier) const;
     QRectF getPointsBoundingRect() const;
-    void intersectWithSub(PointsBezierCubic *otherBezier,
+    bool intersectWithSub(PointsBezierCubic *otherBezier,
                           PointsBezierCubic *parentBezier) const;
     qreal percentAtLength(qreal length);
 
@@ -171,7 +174,6 @@ public:
     const QPointF &getC1();
     const QPointF &getC2();
     const QPointF &getP2();
-
 protected:
     QPointF mP1;
     QPointF mC1;
@@ -183,14 +185,66 @@ protected:
 class PointsBezierCubic : public BezierCubic {
 public:
     PointsBezierCubic(MinimalPathPoint *mpp1,
-                      MinimalPathPoint *mpp2);
+                      MinimalPathPoint *mpp2,
+                      MinimalVectorPath *parentPath);
+
+    void setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2) {
+        mP1 = mpp1->getPos();
+        mC1 = mpp1->getEndPos();
+        mC2 = mpp2->getStartPos();
+        mP2 = mpp2->getPos();
+        mMPP1 = mpp1;
+        mMPP2 = mpp2;
+        generatePath();
+    }
 
     void intersectWith(PointsBezierCubic *bezier);
 
     IntersectionPathPoint *addIntersectionPointAt(QPointF pos);
+
+    void setNextCubic(PointsBezierCubic *cubic) { mNextCubic = cubic; }
+    void setPrevCubic(PointsBezierCubic *cubic) { mPrevCubic = cubic; }
+
+    PointsBezierCubic *getNextCubic() { return mNextCubic; }
+    PointsBezierCubic *getPrevCubic() { return mPrevCubic; }
+
+    IntersectionPathPoint *divideCubicAtPointAndReturnIntersection(
+                                const QPointF &pos) {
+        IntersectionPathPoint *interPt = addIntersectionPointAt(pos);
+        PointsBezierCubic *newCubic = new PointsBezierCubic(interPt,
+                                                            mMPP2,
+                                                            mParentPath);
+        setPoints(mMPP1, interPt);
+
+        newCubic->setNextCubic(mNextCubic);
+        newCubic->setPrevCubic(this);
+        setNextCubic(newCubic);
+        mNextCubic->setPrevCubic(newCubic);
+
+        return interPt;
+    }
+
+    void disconnect() {
+        mMPP1->setNextPoint(NULL);
+        mMPP2->setPrevPoint(NULL);
+        if(mMPP1->hasNoConnections()) {
+            qDebug() << "delete " << mMPP1;
+            delete mMPP1;
+            mMPP1 = NULL;
+        }
+        if(mMPP2->hasNoConnections()) {
+            qDebug() << "delete " << mMPP2;
+            delete mMPP2;
+            mMPP2 = NULL;
+        }
+    }
+
 private:
+    PointsBezierCubic *mNextCubic = NULL;
+    PointsBezierCubic *mPrevCubic = NULL;
     MinimalPathPoint *mMPP1;
     MinimalPathPoint *mMPP2;
+    MinimalVectorPath *mParentPath = NULL;
 };
 
 #endif // PATHOPERATIONS_H
