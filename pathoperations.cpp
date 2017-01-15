@@ -293,8 +293,28 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList) {
     while(!mIntersectionPoints.isEmpty()) {
         MinimalPathPoint *firstFirstPoint = mIntersectionPoints.takeFirst();
         if(firstFirstPoint->wasAdded()) continue;
+
         MinimalVectorPath *target = new MinimalVectorPath();
         targetsList->append(target);
+
+        // set first point control point
+        bool firstReversed = firstFirstPoint->getNextPoint() == NULL;
+        bool siblingReversed = firstFirstPoint->getNextPoint() == NULL;
+        QPointF ctrlPt;
+        if(siblingReversed) {
+            ctrlPt = ((IntersectionPathPoint*)firstFirstPoint)->
+                    getSibling()->getEndPos();
+        } else {
+            ctrlPt = ((IntersectionPathPoint*)firstFirstPoint)->
+                    getSibling()->getStartPos();
+        }
+        if(firstReversed) {
+            firstFirstPoint->setEndCtrlPos(ctrlPt);
+        } else {
+            firstFirstPoint->setStartCtrlPos(ctrlPt);
+        }
+        //
+
         MinimalPathPoint *point = firstFirstPoint;
 
         bool reversed = point->getNextPoint() == NULL;
@@ -306,7 +326,15 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList) {
         }
         while(true) {
             while(nextPoint != NULL) {
-                target->addPoint(new MinimalPathPoint(point));
+                MinimalPathPoint *newPoint = NULL;
+                if(reversed) {
+                    newPoint = new MinimalPathPoint(point->getEndPos(),
+                                                    point->getPos(),
+                                                    point->getStartPos());
+                } else {
+                    newPoint = new MinimalPathPoint(point);
+                }
+                target->addPoint(newPoint);
                 point->setAdded();
 
                 point = nextPoint;
@@ -318,31 +346,23 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList) {
             }
 
             if(point->isIntersection()) {
+                if(((IntersectionPathPoint*)point)->getSibling() ==
+                        firstFirstPoint) {
+                    break;
+                }
                 mIntersectionPoints.removeOne((IntersectionPathPoint*)point);
-                target->addPoint(new MinimalPathPoint(point));
+                MinimalPathPoint *newPoint = NULL;
+                if(reversed) {
+                    newPoint = new MinimalPathPoint(point->getEndPos(),
+                                                    point->getPos(),
+                                                    point->getStartPos());
+                } else {
+                    newPoint = new MinimalPathPoint(point);
+                }
+                target->addPoint(newPoint);
                 point->setAdded();
                 point = ((IntersectionPathPoint*)point)->getSibling();
                 point->setAdded();
-                if(point == firstFirstPoint) {
-                    bool firstReversed = firstFirstPoint->getNextPoint() == NULL;
-                    bool siblingReversed = firstFirstPoint->getNextPoint() == NULL;
-                    QPointF ctrlPt;
-                    if(siblingReversed) {
-                        ctrlPt = ((IntersectionPathPoint*)firstFirstPoint)->
-                                getSibling()->getEndPos();
-                    } else {
-                        ctrlPt = ((IntersectionPathPoint*)firstFirstPoint)->
-                                getSibling()->getStartPos();
-                    }
-                    if(firstReversed) {
-                        target->getFirstPoint()->setEndCtrlPos(ctrlPt);
-                    } else {
-                        target->getFirstPoint()->setStartCtrlPos(ctrlPt);
-                    }
-
-                    break;
-                }
-
 
                 bool wasReversed = reversed;
                 reversed = point->getNextPoint() == NULL;
@@ -435,10 +455,6 @@ bool BezierCubic::intersectWithSub(PointsBezierCubic *otherBezier,
     if(intersects(otherBezier)) {
         qreal totalLen = mPainterPath.length();
         if(totalLen < 1.) {
-            if(pointToLen(mP1 - otherBezier->getP1()) < 5. ||
-               pointToLen(mP1 - otherBezier->getP2()) < 5.) return false;
-            if(pointToLen(mP1 - parentBezier->getP1()) < 5. ||
-               pointToLen(mP1 - parentBezier->getP2()) < 5.) return false;
             IntersectionPathPoint *newPoint1 =
                     otherBezier->divideCubicAtPointAndReturnIntersection(mP1);
             IntersectionPathPoint *newPoint2 =
@@ -506,6 +522,10 @@ PointsBezierCubic::PointsBezierCubic(MinimalPathPoint *mpp1,
 
 void PointsBezierCubic::intersectWith(PointsBezierCubic *bezier) {
 
+    if(pointToLen(mP1 - bezier->getP1()) < 1. ||
+       pointToLen(mP1 - bezier->getP2()) < 1.) return;
+    if(pointToLen(mP2 - bezier->getP1()) < 1. ||
+       pointToLen(mP2 - bezier->getP2()) < 1.) return;
     intersectWithSub(bezier, this);
 }
 
