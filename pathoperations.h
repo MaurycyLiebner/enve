@@ -43,29 +43,14 @@ class IntersectionPathPoint : public MinimalPathPoint
 public:
     IntersectionPathPoint();
     IntersectionPathPoint(QPointF start, QPointF pos, QPointF end);
+    ~IntersectionPathPoint();
 
     bool isIntersection();
 
     void setSibling(IntersectionPathPoint *sibling);
     IntersectionPathPoint *getSibling();
 
-    void fixSiblingSideCtrlPoint() {
-        MinimalPathPoint *siblingNext = mSiblingIntPoint->getNextPoint();
-
-        bool siblingReversed = siblingNext == NULL;
-        bool thisReversed = getNextPoint() == NULL;
-        QPointF siblingCtrlPt;
-        if(siblingReversed) {
-            siblingCtrlPt = mSiblingIntPoint->getStartPos();
-        } else {
-            siblingCtrlPt = mSiblingIntPoint->getEndPos();
-        }
-        if(thisReversed) {
-            setEndCtrlPos(siblingCtrlPt);
-        } else {
-            setStartCtrlPos(siblingCtrlPt);
-        }
-    }
+    void fixSiblingSideCtrlPoint();
 
 private:
     IntersectionPathPoint *mSiblingIntPoint;
@@ -110,63 +95,23 @@ private:
 
 class FullVectorPath {
 public:
-    FullVectorPath() {}
+    FullVectorPath();
 
-    void generateSignlePathPaths() {
-        foreach(MinimalVectorPath *separatePath, mSeparatePaths) {
-            separatePath->generateQPainterPath();
-        }
-    }
+    void generateSignlePathPaths();
 
     void generateFromPath(const QPainterPath &path);
 
-    int getSeparatePathsCount() {
-        return mSeparatePaths.count();
-    }
+    int getSeparatePathsCount();
 
-    MinimalVectorPath *getSeparatePathAt(int id) {
-        return mSeparatePaths.at(id);
-    }
+    MinimalVectorPath *getSeparatePathAt(int id);
 
-    void intersectWith(FullVectorPath *otherPath) {
-        int otherCount = otherPath->getSeparatePathsCount();
-        for(int i = 0; i < otherCount; i++) {
-            MinimalVectorPath *otherSPath = otherPath->getSeparatePathAt(i);
-            foreach(MinimalVectorPath *thisSPath, mSeparatePaths) {
-                thisSPath->intersectWith(otherSPath);
-            }
-        }
-    }
+    void intersectWith(FullVectorPath *otherPath);
 
-    void getListOfGeneratedSeparatePaths(QList<MinimalVectorPath*> *separate) {
-        foreach(MinimalVectorPath *thisSPath, mSeparatePaths) {
-            thisSPath->addAllPaths(separate);
-        }
-    }
+    void getListOfGeneratedSeparatePaths(QList<MinimalVectorPath*> *separate);
 
-    void addAllToVectorPath(VectorPath *path) {
-        foreach(MinimalVectorPath *separatePath, mSeparatePaths) {
-            MinimalPathPoint *firstPoint = separatePath->getFirstPoint();
-            MinimalPathPoint *point = firstPoint;
-            PathPoint *firstPathPoint = NULL;
-            PathPoint *lastPathPoint = NULL;
-            do {
-                lastPathPoint = path->addPointRelPos(point->getPos(),
-                                     point->getStartPos(),
-                                     point->getEndPos(),
-                                     lastPathPoint);
-                if(firstPathPoint == NULL) {
-                    firstPathPoint = lastPathPoint;
-                }
-                point = point->getNextPoint();
-            } while(point != firstPoint);
-            lastPathPoint->connectToPoint(firstPathPoint);
-        }
-    }
+    void addAllToVectorPath(VectorPath *path);
 
-    void getSeparatePathsFromOther(FullVectorPath *other) {
-        other->getListOfGeneratedSeparatePaths(&mSeparatePaths);
-    }
+    void getSeparatePathsFromOther(FullVectorPath *other);
 
 private:
     QList<MinimalVectorPath*> mSeparatePaths;
@@ -207,56 +152,22 @@ public:
                       MinimalPathPoint *mpp2,
                       MinimalVectorPath *parentPath);
 
-    void setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2) {
-        mP1 = mpp1->getPos();
-        mC1 = mpp1->getEndPos();
-        mC2 = mpp2->getStartPos();
-        mP2 = mpp2->getPos();
-        mMPP1 = mpp1;
-        mMPP2 = mpp2;
-        generatePath();
-    }
+    void setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2);
 
     void intersectWith(PointsBezierCubic *bezier);
 
     IntersectionPathPoint *addIntersectionPointAt(QPointF pos);
 
-    void setNextCubic(PointsBezierCubic *cubic) { mNextCubic = cubic; }
-    void setPrevCubic(PointsBezierCubic *cubic) { mPrevCubic = cubic; }
+    void setNextCubic(PointsBezierCubic *cubic);
+    void setPrevCubic(PointsBezierCubic *cubic);
 
-    PointsBezierCubic *getNextCubic() { return mNextCubic; }
-    PointsBezierCubic *getPrevCubic() { return mPrevCubic; }
+    PointsBezierCubic *getNextCubic();
+    PointsBezierCubic *getPrevCubic();
 
     IntersectionPathPoint *divideCubicAtPointAndReturnIntersection(
-                                const QPointF &pos) {
-        IntersectionPathPoint *interPt = addIntersectionPointAt(pos);
-        PointsBezierCubic *newCubic = new PointsBezierCubic(interPt,
-                                                            mMPP2,
-                                                            mParentPath);
-        setPoints(mMPP1, interPt);
+                                const QPointF &pos);
 
-        newCubic->setNextCubic(mNextCubic);
-        newCubic->setPrevCubic(this);
-        setNextCubic(newCubic);
-        mNextCubic->setPrevCubic(newCubic);
-
-        return interPt;
-    }
-
-    void disconnect() {
-        mMPP1->setNextPoint(NULL);
-        mMPP2->setPrevPoint(NULL);
-        if(mMPP1->hasNoConnections()) {
-            qDebug() << "delete " << mMPP1;
-            delete mMPP1;
-            mMPP1 = NULL;
-        }
-        if(mMPP2->hasNoConnections()) {
-            qDebug() << "delete " << mMPP2;
-            delete mMPP2;
-            mMPP2 = NULL;
-        }
-    }
+    void disconnect();
 
 private:
     PointsBezierCubic *mNextCubic = NULL;
