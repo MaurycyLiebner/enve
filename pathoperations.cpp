@@ -558,7 +558,7 @@ bool BezierCubic::intersects(BezierCubic *bezier) const {
                 currentDistBetween = pointToLen(currentBezierPos -
                                                 currentThisPos);
                 if(currentDistBetween < lowestDistBetween) {
-                    if(currentDistBetween < 0.0001) {
+                    if(currentDistBetween < 0.000001) {
                         return true;
                     }
                     lowestDistBetween = currentDistBetween;
@@ -696,7 +696,8 @@ PointsBezierCubic *PointsBezierCubic::getNextCubic() { return mNextCubic; }
 
 PointsBezierCubic *PointsBezierCubic::getPrevCubic() { return mPrevCubic; }
 
-IntersectionPathPoint *PointsBezierCubic::divideCubicAtPointAndReturnIntersection(const QPointF &pos) {
+IntersectionPathPoint *PointsBezierCubic::
+divideCubicAtPointAndReturnIntersection(const QPointF &pos) {
     IntersectionPathPoint *interPt = addIntersectionPointAt(pos);
     PointsBezierCubic *newCubic = new PointsBezierCubic(interPt,
                                                         mMPP2,
