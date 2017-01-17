@@ -580,7 +580,8 @@ bool BezierCubic::intersectWithSub(PointsBezierCubic *otherBezier,
                                    PointsBezierCubic *parentBezier) const {
     if(intersects(otherBezier)) {
         QRectF boundingRect = getPointsBoundingRect();
-        qreal totalLen = boundingRect.width() + boundingRect.height();
+        qreal totalLen = pointToLen(QPointF(boundingRect.width(),
+                                            boundingRect.height()));
         if(totalLen < 0.1) {
             IntersectionPathPoint *newPoint1 =
                     otherBezier->divideCubicAtPointAndReturnIntersection(mP1);
@@ -654,10 +655,10 @@ void PointsBezierCubic::setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2
 
 void PointsBezierCubic::intersectWith(PointsBezierCubic *bezier) {
 
-    if(pointToLen(mP1 - bezier->getP1()) < 1. ||
-            pointToLen(mP1 - bezier->getP2()) < 1.) return;
-    if(pointToLen(mP2 - bezier->getP1()) < 1. ||
-            pointToLen(mP2 - bezier->getP2()) < 1.) return;
+    if(pointToLen(mP1 - bezier->getP1()) < .1 ||
+       pointToLen(mP1 - bezier->getP2()) < .1) return;
+    if(pointToLen(mP2 - bezier->getP1()) < .1 ||
+       pointToLen(mP2 - bezier->getP2()) < .1) return;
     intersectWithSub(bezier, this);
 }
 
