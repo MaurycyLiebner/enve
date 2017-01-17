@@ -125,14 +125,15 @@ public:
     BezierCubic(BezierCubic *cubic);
     virtual ~BezierCubic() {}
 
+    QPointF getPointAtT(const qreal &t) {
+        return calcCubicBezierVal(mP1, mC1, mC2, mP2, t);
+    }
+
     qreal getTForPoint(QPointF point);
-    void generatePath();
-    const QPainterPath &getAsPainterPath();
     bool intersects(BezierCubic *bezier) const;
     QRectF getPointsBoundingRect() const;
     bool intersectWithSub(PointsBezierCubic *otherBezier,
                           PointsBezierCubic *parentBezier) const;
-    qreal percentAtLength(qreal length);
 
     const QPointF &getP1();
     const QPointF &getC1();
@@ -143,7 +144,6 @@ protected:
     QPointF mC1;
     QPointF mC2;
     QPointF mP2;
-    QPainterPath mPainterPath;
 };
 
 class PointsBezierCubic : public BezierCubic {

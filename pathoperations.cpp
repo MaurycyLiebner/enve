@@ -337,7 +337,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath) {
         thisCubic = firstThisCubic;
         while(thisCubic != NULL) {
             if(otherPainterPath.contains(
-                        thisCubic->getAsPainterPath().pointAtPercent(0.5))) {
+                        thisCubic->getPointAtT(0.5))) {
                 thisCubic->disconnect();
             }
             PointsBezierCubic *nextCubic = thisCubic->getNextCubic();
@@ -347,7 +347,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath) {
         otherCubic = firstOtherCubic;
         while(otherCubic != NULL) {
             if(mPath.contains(
-                        otherCubic->getAsPainterPath().pointAtPercent(0.5))) {
+                        otherCubic->getPointAtT(0.5))) {
                 otherCubic->disconnect();
             }
             PointsBezierCubic *nextCubic = otherCubic->getNextCubic();
@@ -493,7 +493,6 @@ BezierCubic::BezierCubic(QPointF p1, QPointF c1, QPointF c2, QPointF p2) {
     mC1 = c1;
     mC2 = c2;
     mP2 = p2;
-    generatePath();
 }
 
 BezierCubic::BezierCubic(BezierCubic *cubic) {
@@ -501,27 +500,77 @@ BezierCubic::BezierCubic(BezierCubic *cubic) {
     mC1 = cubic->getC1();
     mC2 = cubic->getC2();
     mP2 = cubic->getP2();
-    generatePath();
 }
 
 qreal BezierCubic::getTForPoint(QPointF point) {
     return getTforBezierPoint(mP1, mC1, mC2, mP2, point);
 }
 
-void BezierCubic::generatePath() {
-    mPainterPath = QPainterPath();
-    mPainterPath.moveTo(mP1);
-    mPainterPath.cubicTo(mC1, mC2, mP2);
-}
-
-const QPainterPath &BezierCubic::getAsPainterPath() {
-    return mPainterPath;
-}
-
 bool BezierCubic::intersects(BezierCubic *bezier) const {
     if(bezier->getPointsBoundingRect().intersects(getPointsBoundingRect())) {
-        if(mPainterPath.intersects(bezier->getAsPainterPath())) {
-            return true;
+        QPointF bP1 = bezier->getP1();
+        QPointF bC1 = bezier->getC1();
+        QPointF bC2 = bezier->getC2();
+        QPointF bP2 = bezier->getP2();
+        qreal thisT = 0.;
+
+        QPointF lastBezierPos;
+        QPointF currentBezierPos;
+
+        QPointF lastThisPos = mP1;
+        qreal thisTStep = 0.0001;
+
+        QPointF currentThisPos;
+        qreal bezierTStep;
+        qreal lastDistBetween;
+        qreal currentDistBetween;
+        qreal lowestDistBetween = pointToLen(bP1 - mP1);
+        while(thisT < 1.) {
+            qreal currThisT = thisT + thisTStep;
+            currentThisPos = calcCubicBezierVal(mP1, mC1,
+                                                mC2, mP2, currThisT);
+            qreal thisInc = pointToLen(lastThisPos - currentThisPos);
+
+            thisTStep *= 0.5*qclamp(lowestDistBetween/thisInc, .1, 10.);
+            if(thisInc > 0.5*lowestDistBetween) {
+                continue;
+            }
+
+            lowestDistBetween = 10000000.;
+            bezierTStep = 0.0001;
+            currentBezierPos = calcCubicBezierVal(bP1, bC1,
+                                                  bC2, bP2,
+                                                  bezierTStep);
+            lastBezierPos = bP1;
+            lastDistBetween = pointToLen(currentThisPos - bP1);
+            qreal bezierT = 0.;
+            while(bezierT < 1.) {
+                qreal currBezierT = bezierT + bezierTStep;
+                currentBezierPos = calcCubicBezierVal(bP1, bC1,
+                                                      bC2, bP2, currBezierT);
+
+                qreal bezierInc = pointToLen(lastBezierPos -
+                                             currentBezierPos);
+                bezierTStep *= 0.5*qclamp(lastDistBetween/bezierInc, .1, 10.);
+                if(bezierInc > 0.5*lastDistBetween) {
+                    continue;
+                }
+                currentDistBetween = pointToLen(currentBezierPos -
+                                                currentThisPos);
+                if(currentDistBetween < lowestDistBetween) {
+                    if(currentDistBetween < 0.0001) {
+                        return true;
+                    }
+                    lowestDistBetween = currentDistBetween;
+                }
+
+                lastBezierPos = currentBezierPos;
+                lastDistBetween = currentDistBetween;
+                bezierT = currBezierT;
+            }
+
+            lastThisPos = currentThisPos;
+            thisT = currThisT;
         }
     }
     return false;
@@ -530,7 +579,8 @@ bool BezierCubic::intersects(BezierCubic *bezier) const {
 bool BezierCubic::intersectWithSub(PointsBezierCubic *otherBezier,
                                    PointsBezierCubic *parentBezier) const {
     if(intersects(otherBezier)) {
-        qreal totalLen = mPainterPath.length();
+        QRectF boundingRect = getPointsBoundingRect();
+        qreal totalLen = boundingRect.width() + boundingRect.height();
         if(totalLen < 0.1) {
             IntersectionPathPoint *newPoint1 =
                     otherBezier->divideCubicAtPointAndReturnIntersection(mP1);
@@ -575,10 +625,6 @@ QRectF BezierCubic::getPointsBoundingRect() const {
                           qMax4(mP1.y(), mC1.y(), mC2.y(), mP2.y())));
 }
 
-qreal BezierCubic::percentAtLength(qreal length) {
-    return mPainterPath.percentAtLength(length);
-}
-
 const QPointF &BezierCubic::getP1() { return mP1; }
 
 const QPointF &BezierCubic::getC1() { return mC1; }
@@ -604,7 +650,6 @@ void PointsBezierCubic::setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2
     mP2 = mpp2->getPos();
     mMPP1 = mpp1;
     mMPP2 = mpp2;
-    generatePath();
 }
 
 void PointsBezierCubic::intersectWith(PointsBezierCubic *bezier) {

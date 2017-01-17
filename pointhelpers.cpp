@@ -17,6 +17,13 @@ QPointF symmetricToPosNewLen(QPointF toMirror, QPointF mirrorCenter, qreal newLe
     return mirrorCenter - scalePointToNewLen(posDist, newLen);
 }
 
+QPointF calcCubicBezierVal(QPointF p0, QPointF p1,
+                           QPointF p2, QPointF p3,
+                           qreal t) {
+    return QPointF(calcCubicBezierVal(p0.x(), p1.x(), p2.x(), p3.x(), t),
+                   calcCubicBezierVal(p0.y(), p1.y(), p2.y(), p3.y(), t));
+}
+
 qreal calcCubicBezierVal(qreal p0, qreal p1, qreal p2, qreal p3, qreal t) {
     return pow(1 - t, 3)*p0 +
             3*pow(1 - t, 2)*t*p1 +
