@@ -1115,7 +1115,7 @@ void BoxesGroup::selectedPathsUnion() {
             const QPainterPath &boxPath = box->getRelativeTransform().map(
                                         ((PathBox*)box)->getRelativePath());
             addToPath = targetPath;
-            addToPath->generateSignlePathPaths();
+            addToPath->generateSinglePathPaths();
             addedPath = new FullVectorPath();
             addedPath->generateFromPath(boxPath);
             addToPath->intersectWith(addedPath);
@@ -1129,6 +1129,9 @@ void BoxesGroup::selectedPathsUnion() {
     }
 
     targetPath->addAllToVectorPath(newPath);
+
+    clearBoxesSelection();
+    addBoxToSelection(newPath);
 }
 
 void BoxesGroup::addChild(BoundingBox *child)

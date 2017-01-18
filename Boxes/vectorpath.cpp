@@ -507,7 +507,7 @@ void VectorPath::setFillSettings(PaintSettings fillSettings, bool saveUndoRedo)
 void VectorPath::updatePath()
 {
     mPath = QPainterPath();
-    mPath.setFillRule(Qt::WindingFill);
+    //mPath.setFillRule(Qt::WindingFill);
 
     mEditPath = QPainterPath();
 
