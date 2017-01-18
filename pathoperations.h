@@ -130,10 +130,8 @@ public:
     }
 
     qreal getTForPoint(QPointF point);
-    bool intersects(BezierCubic *bezier) const;
+    bool intersects(BezierCubic *bezier, QPointF *intersectionPt) const;
     QRectF getPointsBoundingRect() const;
-    bool intersectWithSub(PointsBezierCubic *otherBezier,
-                          PointsBezierCubic *parentBezier) const;
 
     const QPointF &getP1();
     const QPointF &getC1();

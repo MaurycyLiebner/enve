@@ -506,7 +506,8 @@ qreal BezierCubic::getTForPoint(QPointF point) {
     return getTforBezierPoint(mP1, mC1, mC2, mP2, point);
 }
 
-bool BezierCubic::intersects(BezierCubic *bezier) const {
+bool BezierCubic::intersects(BezierCubic *bezier,
+                             QPointF *intersectionPt) const {
     if(bezier->getPointsBoundingRect().intersects(getPointsBoundingRect())) {
         QPointF bP1 = bezier->getP1();
         QPointF bC1 = bezier->getC1();
@@ -559,6 +560,7 @@ bool BezierCubic::intersects(BezierCubic *bezier) const {
                                                 currentThisPos);
                 if(currentDistBetween < lowestDistBetween) {
                     if(currentDistBetween < 0.000001) {
+                        *intersectionPt = currentThisPos;
                         return true;
                     }
                     lowestDistBetween = currentDistBetween;
@@ -571,48 +573,6 @@ bool BezierCubic::intersects(BezierCubic *bezier) const {
 
             lastThisPos = currentThisPos;
             thisT = currThisT;
-        }
-    }
-    return false;
-}
-
-bool BezierCubic::intersectWithSub(PointsBezierCubic *otherBezier,
-                                   PointsBezierCubic *parentBezier) const {
-    if(intersects(otherBezier)) {
-        QRectF boundingRect = getPointsBoundingRect();
-        qreal totalLen = pointToLen(QPointF(boundingRect.width(),
-                                            boundingRect.height()));
-        if(totalLen < 0.1) {
-            IntersectionPathPoint *newPoint1 =
-                    otherBezier->divideCubicAtPointAndReturnIntersection(mP1);
-            IntersectionPathPoint *newPoint2 =
-                    parentBezier->divideCubicAtPointAndReturnIntersection(mP1);
-            newPoint1->setSibling(newPoint2);
-            newPoint2->setSibling(newPoint1);
-            return true;
-        }
-
-        QPointF sp1 = mP1;
-        QPointF sc1 = mC1;
-        QPointF sc2;
-        QPointF sp2;
-        QPointF sc3;
-        QPointF sc4 = mC2;
-        QPointF sp3 = mP2;
-        Edge::getNewRelPosForKnotInsertionAtT(
-                    sp1, &sc1, &sc4, sp3,
-                    &sp2, &sc2, &sc3,
-                    0.5);
-        BezierCubic subBezier1(sp1, sc1, sc2, sp2);
-        if(subBezier1.intersectWithSub(otherBezier,
-                                       parentBezier) ) {
-            return true;
-        }
-
-        BezierCubic subBezier2(sp2, sc3, sc4, sp3);
-        if(subBezier2.intersectWithSub(otherBezier,
-                                       parentBezier) ) {
-            return true;
         }
     }
     return false;
@@ -653,13 +613,21 @@ void PointsBezierCubic::setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2
     mMPP2 = mpp2;
 }
 
-void PointsBezierCubic::intersectWith(PointsBezierCubic *bezier) {
+void PointsBezierCubic::intersectWith(PointsBezierCubic *otherBezier) {
 
-    if(pointToLen(mP1 - bezier->getP1()) < .1 ||
-       pointToLen(mP1 - bezier->getP2()) < .1) return;
-    if(pointToLen(mP2 - bezier->getP1()) < .1 ||
-       pointToLen(mP2 - bezier->getP2()) < .1) return;
-    intersectWithSub(bezier, this);
+    if(pointToLen(mP1 - otherBezier->getP1()) < .1 ||
+       pointToLen(mP1 - otherBezier->getP2()) < .1) return;
+    if(pointToLen(mP2 - otherBezier->getP1()) < .1 ||
+       pointToLen(mP2 - otherBezier->getP2()) < .1) return;
+    QPointF interPt;
+    if(intersects(otherBezier, &interPt)) {
+        IntersectionPathPoint *newPoint1 =
+                otherBezier->divideCubicAtPointAndReturnIntersection(interPt);
+        IntersectionPathPoint *newPoint2 =
+                this->divideCubicAtPointAndReturnIntersection(interPt);
+        newPoint1->setSibling(newPoint2);
+        newPoint2->setSibling(newPoint1);
+    }
 }
 
 IntersectionPathPoint *PointsBezierCubic::addIntersectionPointAt(
@@ -716,12 +684,10 @@ void PointsBezierCubic::disconnect() {
     mMPP1->setNextPoint(NULL);
     mMPP2->setPrevPoint(NULL);
     if(mMPP1->hasNoConnections()) {
-        qDebug() << "delete " << mMPP1;
         delete mMPP1;
         mMPP1 = NULL;
     }
     if(mMPP2->hasNoConnections()) {
-        qDebug() << "delete " << mMPP2;
         delete mMPP2;
         mMPP2 = NULL;
     }
