@@ -540,8 +540,18 @@ bool BezierCubic::intersects(BezierCubic *bezier,
                                                 currentThisPos);
                 if(currentDistBetween < lowestDistBetween) {
                     if(currentDistBetween < 0.000001) {
-                        *intersectionPt = currentThisPos;
-                        return true;
+                        if(((pointToLen(mP1 - bezier->getP1()) < .001 ||
+                           pointToLen(mP1 - bezier->getP2()) < .001) &&
+                           pointToLen(mP1 - currentBezierPos) < .001) ||
+                           ((pointToLen(mP2 - bezier->getP1()) < .001 ||
+                           pointToLen(mP2 - bezier->getP2()) < .001) &&
+                           pointToLen(mP2 - currentBezierPos) < .001)) {
+                            bezierTStep *= 10;
+                            currentDistBetween *= 10;
+                        } else {
+                            *intersectionPt = currentThisPos;
+                            return true;
+                        }
                     }
                     lowestDistBetween = currentDistBetween;
                 }
@@ -594,11 +604,6 @@ void PointsBezierCubic::setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2
 }
 
 void PointsBezierCubic::intersectWith(PointsBezierCubic *otherBezier) {
-
-    if(pointToLen(mP1 - otherBezier->getP1()) < .1 ||
-       pointToLen(mP1 - otherBezier->getP2()) < .1) return;
-    if(pointToLen(mP2 - otherBezier->getP1()) < .1 ||
-       pointToLen(mP2 - otherBezier->getP2()) < .1) return;
     QPointF interPt;
     if(intersects(otherBezier, &interPt)) {
         IntersectionPathPoint *newPoint1 =
