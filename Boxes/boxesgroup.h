@@ -204,9 +204,16 @@ public:
     void updateBoundingRect();
     void applyCurrentTransformation();
     void applyShadowToSelected();
+
     void selectedPathsUnion();
     void selectedPathsDifference();
+    void selectedPathsIntersection();
+    void selectedPathsDivision();
+    void selectedPathsExclusion();
 protected:
+    VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
+                                              const bool &unionInterOther);
+
     void sortSelectedBoxesByZAscending();
 
     static bool mCtrlsAlwaysVisible;

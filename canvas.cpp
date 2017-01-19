@@ -417,6 +417,21 @@ void Canvas::pathsDifferenceAction() {
     callUpdateSchedulers();
 }
 
+void Canvas::pathsIntersectionAction() {
+    mCurrentBoxesGroup->selectedPathsIntersection();
+    callUpdateSchedulers();
+}
+
+void Canvas::pathsDivisionAction() {
+    mCurrentBoxesGroup->selectedPathsDivision();
+    callUpdateSchedulers();
+}
+
+void Canvas::pathsExclusionAction() {
+    mCurrentBoxesGroup->selectedPathsExclusion();
+    callUpdateSchedulers();
+}
+
 void Canvas::updateRenderRect() {
     QRectF canvasRect = QRectF(qMax(mCombinedTransformMatrix.dx()*mResolutionPercent,
                                     mCombinedTransformMatrix.dx()),

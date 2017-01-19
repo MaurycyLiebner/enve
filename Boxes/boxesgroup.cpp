@@ -1096,12 +1096,10 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     return newGroup;
 }
 
-void BoxesGroup::selectedPathsDifference() {
-
-}
-
 #include "pathoperations.h"
-void BoxesGroup::selectedPathsUnion() {
+VectorPath *BoxesGroup::getPathResultingFromOperation(
+                                const bool &unionInterThis,
+                                const bool &unionInterOther) {
     VectorPath *newPath = new VectorPath(this);
     FullVectorPath *targetPath = new FullVectorPath();
     FullVectorPath *addToPath = NULL;
@@ -1118,7 +1116,9 @@ void BoxesGroup::selectedPathsUnion() {
             addToPath->generateSinglePathPaths();
             addedPath = new FullVectorPath();
             addedPath->generateFromPath(boxPath);
-            addToPath->intersectWith(addedPath);
+            addToPath->intersectWith(addedPath,
+                                     unionInterThis,
+                                     unionInterOther);
             targetPath = new FullVectorPath();
             targetPath->getSeparatePathsFromOther(addToPath);
             targetPath->getSeparatePathsFromOther(addedPath);
@@ -1129,6 +1129,52 @@ void BoxesGroup::selectedPathsUnion() {
     }
 
     targetPath->addAllToVectorPath(newPath);
+
+    return newPath;
+}
+
+void BoxesGroup::selectedPathsDifference() {
+    VectorPath *newPath = getPathResultingFromOperation(false,
+                                                        true);
+
+    clearBoxesSelection();
+    addBoxToSelection(newPath);
+}
+
+void BoxesGroup::selectedPathsIntersection() {
+    VectorPath *newPath = getPathResultingFromOperation(false,
+                                                        false);
+
+    clearBoxesSelection();
+    addBoxToSelection(newPath);
+}
+
+void BoxesGroup::selectedPathsDivision() {
+    VectorPath *newPath1 = getPathResultingFromOperation(false,
+                                                        false);
+
+    VectorPath *newPath2 = getPathResultingFromOperation(false,
+                                                        true);
+
+    clearBoxesSelection();
+    addBoxToSelection(newPath1);
+    addBoxToSelection(newPath2);
+}
+
+void BoxesGroup::selectedPathsExclusion() {
+    VectorPath *newPath1 = getPathResultingFromOperation(false,
+                                                         true);
+    VectorPath *newPath2 = getPathResultingFromOperation(true,
+                                                         false);
+
+    clearBoxesSelection();
+    addBoxToSelection(newPath1);
+    addBoxToSelection(newPath2);
+}
+
+void BoxesGroup::selectedPathsUnion() {
+    VectorPath *newPath = getPathResultingFromOperation(true,
+                                                        true);
 
     clearBoxesSelection();
     addBoxToSelection(newPath);

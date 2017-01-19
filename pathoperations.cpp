@@ -192,12 +192,16 @@ MinimalVectorPath *FullVectorPath::getSeparatePathAt(int id) {
     return mSeparatePaths.at(id);
 }
 
-void FullVectorPath::intersectWith(FullVectorPath *otherPath) {
+void FullVectorPath::intersectWith(FullVectorPath *otherPath,
+                                   const bool &unionInterThis,
+                                   const bool &unionInterOther) {
     int otherCount = otherPath->getSeparatePathsCount();
     for(int i = 0; i < otherCount; i++) {
         MinimalVectorPath *otherSPath = otherPath->getSeparatePathAt(i);
         foreach(MinimalVectorPath *thisSPath, mSeparatePaths) {
-            thisSPath->intersectWith(otherSPath);
+            thisSPath->intersectWith(otherSPath,
+                                     unionInterThis,
+                                     unionInterOther);
         }
     }
 }
@@ -265,7 +269,9 @@ MinimalPathPoint *MinimalVectorPath::getFirstPoint() {
     return mFirstPoint;
 }
 
-void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath) {
+void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
+                                      const bool &unionInterThis,
+                                      const bool &unionInterOther) {
     if(mPath.intersects(otherPath->getPath())) {
         MinimalPathPoint *firstPoint = otherPath->getFirstPoint();
         MinimalPathPoint *point = firstPoint;
@@ -330,7 +336,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath) {
         thisCubic = firstThisCubic;
         while(thisCubic != NULL) {
             if(otherPainterPath.contains(
-                        thisCubic->getPointAtT(0.5))) {
+                        thisCubic->getPointAtT(0.5)) == unionInterThis) {
                 thisCubic->disconnect();
             }
             PointsBezierCubic *nextCubic = thisCubic->getNextCubic();
@@ -341,7 +347,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath) {
         const QPainterPath &thisPainterPath = getParentFullPath();
         while(otherCubic != NULL) {
             if(thisPainterPath.contains(
-                        otherCubic->getPointAtT(0.5))) {
+                        otherCubic->getPointAtT(0.5)) == unionInterOther) {
                 otherCubic->disconnect();
             }
             PointsBezierCubic *nextCubic = otherCubic->getNextCubic();

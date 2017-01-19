@@ -72,7 +72,9 @@ public:
 
     MinimalVectorPath *getSeparatePathAt(int id);
 
-    void intersectWith(FullVectorPath *otherPath);
+    void intersectWith(FullVectorPath *otherPath,
+                       const bool &unionInterThis,
+                       const bool &unionInterOther);
 
     void getListOfGeneratedSeparatePaths(QList<MinimalVectorPath*> *separate, FullVectorPath *target);
 
@@ -101,7 +103,9 @@ public:
 
     MinimalPathPoint *getFirstPoint();
 
-    void intersectWith(MinimalVectorPath *otherPath);
+    void intersectWith(MinimalVectorPath *otherPath,
+                       const bool &unionInterThis,
+                       const bool &unionInterOther);
 
     void addAllPaths(QList<MinimalVectorPath *> *targetsList,
                      FullVectorPath *targetFull);

@@ -412,6 +412,9 @@ public slots:
     void makePointCtrlsCorner();
     void pathsUnionAction();
     void pathsDifferenceAction();
+    void pathsIntersectionAction();
+    void pathsDivisionAction();
+    void pathsExclusionAction();
 private:
     bool mPivotVisibleDuringPointEdit = true;
     static bool mEffectsPaintEnabled;
