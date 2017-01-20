@@ -278,8 +278,8 @@ MainWindow::MainWindow(QWidget *parent)
                          SLOT(pathsExclusionAction()));
     mPathMenu->addAction("Division", mCanvas,
                          SLOT(pathsDivisionAction()));
-    mPathMenu->addAction("Cut Path", mCanvas,
-                         SLOT(pathsCutAction()));
+//    mPathMenu->addAction("Cut Path", mCanvas,
+//                         SLOT(pathsCutAction()));
     mPathMenu->addSeparator();
     mPathMenu->addAction("Combine", mCanvas,
                          SLOT(pathsCombineAction()));

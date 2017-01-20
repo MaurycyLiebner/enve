@@ -3,7 +3,9 @@
 
 MinimalPathPoint::MinimalPathPoint() {}
 
-MinimalPathPoint::MinimalPathPoint(QPointF ctrlStart, QPointF pos, QPointF ctrlEnd) {
+MinimalPathPoint::MinimalPathPoint(QPointF ctrlStart,
+                                   QPointF pos,
+                                   QPointF ctrlEnd) {
     mPos = pos;
     mStartCtrlPos = ctrlStart;
     mEndCtrlPos = ctrlEnd;
@@ -63,7 +65,9 @@ IntersectionPathPoint::IntersectionPathPoint() : MinimalPathPoint() {
 
 }
 
-IntersectionPathPoint::IntersectionPathPoint(QPointF start, QPointF pos, QPointF end) :
+IntersectionPathPoint::IntersectionPathPoint(QPointF start,
+                                             QPointF pos,
+                                             QPointF end) :
     MinimalPathPoint(start, pos, end) {
 
 }
@@ -206,8 +210,9 @@ void FullVectorPath::intersectWith(FullVectorPath *otherPath,
     }
 }
 
-void FullVectorPath::getListOfGeneratedSeparatePaths(QList<MinimalVectorPath *> *separate,
-                                                     FullVectorPath *target) {
+void FullVectorPath::getListOfGeneratedSeparatePaths(
+                        QList<MinimalVectorPath *> *separate,
+                        FullVectorPath *target) {
     foreach(MinimalVectorPath *thisSPath, mSeparatePaths) {
         thisSPath->addAllPaths(separate, target);
     }
@@ -474,7 +479,8 @@ bool MinimalVectorPath::pointInsidePath(QPointF point) {
     return mPath.contains(point);
 }
 
-BezierCubic::BezierCubic(QPointF p1, QPointF c1, QPointF c2, QPointF p2) {
+BezierCubic::BezierCubic(QPointF p1, QPointF c1,
+                         QPointF c2, QPointF p2) {
     mP1 = p1;
     mC1 = c1;
     mC2 = c2;
@@ -600,7 +606,8 @@ PointsBezierCubic::PointsBezierCubic(MinimalPathPoint *mpp1,
     mMPP2 = mpp2;
 }
 
-void PointsBezierCubic::setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2) {
+void PointsBezierCubic::setPoints(MinimalPathPoint *mpp1,
+                                  MinimalPathPoint *mpp2) {
     mP1 = mpp1->getPos();
     mC1 = mpp1->getEndPos();
     mC2 = mpp2->getStartPos();
@@ -647,13 +654,21 @@ IntersectionPathPoint *PointsBezierCubic::addIntersectionPointAt(
     return newPoint;
 }
 
-void PointsBezierCubic::setNextCubic(PointsBezierCubic *cubic) { mNextCubic = cubic; }
+void PointsBezierCubic::setNextCubic(PointsBezierCubic *cubic) {
+    mNextCubic = cubic;
+}
 
-void PointsBezierCubic::setPrevCubic(PointsBezierCubic *cubic) { mPrevCubic = cubic; }
+void PointsBezierCubic::setPrevCubic(PointsBezierCubic *cubic) {
+    mPrevCubic = cubic;
+}
 
-PointsBezierCubic *PointsBezierCubic::getNextCubic() { return mNextCubic; }
+PointsBezierCubic *PointsBezierCubic::getNextCubic() {
+    return mNextCubic;
+}
 
-PointsBezierCubic *PointsBezierCubic::getPrevCubic() { return mPrevCubic; }
+PointsBezierCubic *PointsBezierCubic::getPrevCubic() {
+    return mPrevCubic;
+}
 
 IntersectionPathPoint *PointsBezierCubic::
 divideCubicAtPointAndReturnIntersection(const QPointF &pos) {
