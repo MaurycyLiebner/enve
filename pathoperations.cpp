@@ -135,6 +135,12 @@ void FullVectorPath::generateFromPath(const QPainterPath &path) {
         const QPainterPath::Element &elem = path.elementAt(i);
 
         if (elem.isMoveTo()) { // move
+            if(lastPoint != firstPoint) {
+                firstPoint->setPrevPoint(lastPoint);
+                firstPoint->setStartCtrlPos(firstPoint->getPos());
+                lastPoint->setNextPoint(firstPoint);
+                lastPoint->setEndCtrlPos(lastPoint->getPos());
+            }
             currentTarget = new MinimalVectorPath(this);
             mSeparatePaths.append(currentTarget);
             lastPoint = new MinimalPathPoint(QPointF(),
@@ -183,6 +189,12 @@ void FullVectorPath::generateFromPath(const QPainterPath &path) {
             }
             firstOther = !firstOther;
         }
+    }
+    if(lastPoint != firstPoint) {
+        firstPoint->setPrevPoint(lastPoint);
+        firstPoint->setStartCtrlPos(firstPoint->getPos());
+        lastPoint->setNextPoint(firstPoint);
+        lastPoint->setEndCtrlPos(lastPoint->getPos());
     }
 
     generateSinglePathPaths();

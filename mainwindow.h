@@ -67,6 +67,9 @@ private:
     QAction *mActionSmoothPointCtrls;
     QAction *mActionCornerPointCtrls;
 //
+    QAction *mActionLine;
+    QAction *mActionCurve;
+//
     QAction *mActionHighQualityView;
     QAction *mActionEffectsPaintEnabled;
 

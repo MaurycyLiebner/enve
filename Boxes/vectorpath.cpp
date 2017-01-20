@@ -605,10 +605,13 @@ void VectorPath::loadPathFromQPainterPath(const QPainterPath &path) {
 }
 
 PathPoint *VectorPath::addPointRelPos(QPointF relPos,
-                                      QPointF startRelPos, QPointF endRelPos,
+                                      QPointF startRelPos,
+                                      QPointF endRelPos,
                                       PathPoint *toPoint) {
     PathPoint *newPoint = addPointRelPos(relPos, toPoint);
-    newPoint->setCtrlsMode(CTRLS_SYMMETRIC);
+    //newPoint->setCtrlsMode(CTRLS_SYMMETRIC);
+    newPoint->setStartCtrlPtEnabled(true);
+    newPoint->setEndCtrlPtEnabled(true);
     newPoint->moveStartCtrlPtToRelPos(startRelPos);
     newPoint->moveEndCtrlPtToRelPos(endRelPos);
     return newPoint;

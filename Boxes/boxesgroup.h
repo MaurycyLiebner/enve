@@ -210,6 +210,8 @@ public:
     void selectedPathsIntersection();
     void selectedPathsDivision();
     void selectedPathsExclusion();
+    void makeSelectedPointsSegmentsCurves();
+    void makeSelectedPointsSegmentsLines();
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

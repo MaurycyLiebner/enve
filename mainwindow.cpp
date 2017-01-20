@@ -187,6 +187,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(mActionCornerPointCtrls, SIGNAL(triggered(bool)),
             mCanvas, SLOT(makePointCtrlsCorner()) );
 //
+    mToolBar->addSeparator();
+
+    mActionLine = new QAction(
+                QIcon("pixmaps/icons/ink_node_line.png"),
+                "MAKE SEGMENT LINE", this);
+    mToolBar->addAction(mActionLine);
+    connect(mActionLine, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(makeSegmentLine()) );
+
+    mActionCurve = new QAction(
+                QIcon("pixmaps/icons/ink_node_curve.png"),
+                "MAKE SEGMENT CURVE", this);
+    mToolBar->addAction(mActionCurve);
+    connect(mActionCurve, SIGNAL(triggered(bool)),
+            mCanvas, SLOT(makeSegmentCurve()) );
+
+    mToolBar->addSeparator();
+//
     addToolBar(mToolBar);
 
     mFontWidget = new FontsWidget(this);

@@ -918,8 +918,7 @@ void BoxesGroup::disconnectPoints()
     }
 }
 
-void BoxesGroup::mergePoints()
-{
+void BoxesGroup::mergePoints() {
     QList<PathPoint*> selectedPathPoints;
     foreach(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
@@ -939,6 +938,46 @@ void BoxesGroup::setPointCtrlsMode(CtrlsMode mode) {
     foreach(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
             ( (PathPoint*)point)->setCtrlsMode(mode);
+        }
+    }
+}
+
+void BoxesGroup::makeSelectedPointsSegmentsCurves() {
+    QList<PathPoint*> selectedPathPoints;
+    foreach(MovablePoint *point, mSelectedPoints) {
+        if(point->isPathPoint()) {
+            selectedPathPoints.append( (PathPoint*) point);
+        }
+    }
+    foreach(PathPoint *selectedPoint,
+            selectedPathPoints) {
+        PathPoint *nextPoint = selectedPoint->getNextPoint();
+        PathPoint *prevPoint = selectedPoint->getPreviousPoint();
+        if(selectedPathPoints.contains(nextPoint)) {
+            selectedPoint->setEndCtrlPtEnabled(true);
+        }
+        if(selectedPathPoints.contains(prevPoint)) {
+            selectedPoint->setStartCtrlPtEnabled(true);
+        }
+    }
+}
+
+void BoxesGroup::makeSelectedPointsSegmentsLines() {
+    QList<PathPoint*> selectedPathPoints;
+    foreach(MovablePoint *point, mSelectedPoints) {
+        if(point->isPathPoint()) {
+            selectedPathPoints.append( (PathPoint*) point);
+        }
+    }
+    foreach(PathPoint *selectedPoint,
+            selectedPathPoints) {
+        PathPoint *nextPoint = selectedPoint->getNextPoint();
+        PathPoint *prevPoint = selectedPoint->getPreviousPoint();
+        if(selectedPathPoints.contains(nextPoint)) {
+            selectedPoint->setEndCtrlPtEnabled(false);
+        }
+        if(selectedPathPoints.contains(prevPoint)) {
+            selectedPoint->setStartCtrlPtEnabled(false);
         }
     }
 }

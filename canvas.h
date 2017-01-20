@@ -410,6 +410,10 @@ public slots:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
+
+    void makeSegmentLine();
+    void makeSegmentCurve();
+
     void pathsUnionAction();
     void pathsDifferenceAction();
     void pathsIntersectionAction();

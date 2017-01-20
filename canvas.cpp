@@ -591,6 +591,16 @@ void Canvas::makePointCtrlsCorner()
     callUpdateSchedulers();
 }
 
+void Canvas::makeSegmentLine() {
+    mCurrentBoxesGroup->makeSelectedPointsSegmentsLines();
+    callUpdateSchedulers();
+}
+
+void Canvas::makeSegmentCurve() {
+    mCurrentBoxesGroup->makeSelectedPointsSegmentsCurves();
+    callUpdateSchedulers();
+}
+
 void Canvas::moveSecondSelectionPoint(QPointF pos) {
     mSelectionRect.setBottomRight(pos);
 }
