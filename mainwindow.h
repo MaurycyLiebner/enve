@@ -13,6 +13,7 @@
 #include "fontswidget.h"
 #include "vectorshapesmenu.h"
 #include "BoxesList/boxeslistwidget.h"
+#include "actionbutton.h"
 
 class PaintControler;
 
@@ -52,23 +53,24 @@ private:
 
     QToolBar *mToolBar;
 
-    QAction *mMovePathMode;
-    QAction *mMovePointMode;
-    QAction *mAddPointMode;
-    QAction *mCircleMode;
-    QAction *mRectangleMode;
-    QAction *mTextMode;
+    ActionButton *mMovePathMode;
+    ActionButton *mMovePointMode;
+    ActionButton *mAddPointMode;
+    ActionButton *mCircleMode;
 //
-    QAction *mActionConnectPoints;
-    QAction *mActionDisconnectPoints;
-    QAction *mActionMergePoints;
+    ActionButton *mRectangleMode;
+    ActionButton *mTextMode;
 //
-    QAction *mActionSymmetricPointCtrls;
-    QAction *mActionSmoothPointCtrls;
-    QAction *mActionCornerPointCtrls;
+    ActionButton *mActionConnectPoints;
+    ActionButton *mActionDisconnectPoints;
+    ActionButton *mActionMergePoints;
 //
-    QAction *mActionLine;
-    QAction *mActionCurve;
+    ActionButton *mActionSymmetricPointCtrls;
+    ActionButton *mActionSmoothPointCtrls;
+    ActionButton *mActionCornerPointCtrls;
+//
+    ActionButton *mActionLine;
+    ActionButton *mActionCurve;
 //
     QAction *mActionHighQualityView;
     QAction *mActionEffectsPaintEnabled;
@@ -221,6 +223,7 @@ private slots:
     void saveBackup();
     void closeProject();
     void importFile();
+    void linkFile();
     void importAnimation();
     void exportSelected();
     void revert();

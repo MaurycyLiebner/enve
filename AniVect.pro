@@ -96,7 +96,9 @@ SOURCES += main.cpp\
     Animators/effectanimators.cpp \
     BoxesList/effectanimatorsitemwidgetcontainer.cpp \
     Boxes/animationbox.cpp \
-    pathoperations.cpp
+    pathoperations.cpp \
+    Boxes/linkbox.cpp \
+    actionbutton.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -180,4 +182,12 @@ HEADERS  += mainwindow.h \
     Animators/effectanimators.h \
     BoxesList/effectanimatorsitemwidgetcontainer.h \
     Boxes/animationbox.h \
-    pathoperations.h
+    pathoperations.h \
+    Boxes/linkbox.h \
+    actionbutton.h
+
+RESOURCES += \
+    resources.qrc
+
+DISTFILES += \
+    stylesheet.qss

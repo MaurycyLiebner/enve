@@ -169,7 +169,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
     aLayout->addWidget(aSpin->getSpinBox());
 
 
-    mPickingButton = new QPushButton(QIcon("pixmaps/icons/ink_draw_dropper.png"),
+    mPickingButton = new QPushButton(QIcon(":/icons/draw_dropper.png"),
                                      "", this);
     mPickingButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     connect(mPickingButton, SIGNAL(pressed()),

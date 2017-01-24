@@ -20,7 +20,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     mButtonsLayout->setSpacing(0);
 
     mSymmetricButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_node_symmetric_white.png"),
+                QIcon(":/icons/node_symmetric_white.png"),
                 "", this);
 //    mSymmetricButton->setSizePolicy(QSizePolicy::Maximum,
 //                                    QSizePolicy::Maximum);
@@ -28,7 +28,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, SLOT(graphSetSymmetricCtrl()) );
 
     mSmoothButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_node_smooth_white.png"),
+                QIcon(":/icons/node_smooth_white.png"),
                 "", this);
 //    mSmoothButton->setSizePolicy(QSizePolicy::Maximum,
 //                                 QSizePolicy::Maximum);
@@ -36,7 +36,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, SLOT(graphSetSmoothCtrl()) );
 
     mCornerButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_node_cusp_white.png"),
+                QIcon(":/icons/node_cusp_white.png"),
                 "", this);
 //    mCornerButton->setSizePolicy(QSizePolicy::Maximum,
 //                                 QSizePolicy::Maximum);
@@ -44,7 +44,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, SLOT(graphSetCornerCtrl()) );
 
     mTwoSideCtrlButton = new QPushButton(
-                QIcon("pixmaps/icons/two_side_ctrl_white.png"),
+                QIcon(":/icons/two_side_ctrl_white.png"),
                 "", this);
 //    mTwoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                     QSizePolicy::Maximum);
@@ -52,7 +52,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, SLOT(graphSetTwoSideCtrlForSelected()) );
 
     mLeftSideCtrlButton = new QPushButton(
-                QIcon("pixmaps/icons/left_side_ctrl_white.png"),
+                QIcon(":/icons/left_side_ctrl_white.png"),
                 "", this);
 //    mLeftSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                       QSizePolicy::Maximum);
@@ -60,7 +60,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, SLOT(graphSetLeftSideCtrlForSelected()) );
 
     mRightSideCtrlButton = new QPushButton(
-                QIcon("pixmaps/icons/right_side_ctrl_white.png"),
+                QIcon(":/icons/right_side_ctrl_white.png"),
                 "", this);
 //    mRightSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                        QSizePolicy::Maximum);
@@ -68,7 +68,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
             keysView, SLOT(graphSetRightSideCtrlForSelected()) );
 
     mNoSideCtrlButton = new QPushButton(
-                QIcon("pixmaps/icons/no_side_ctrl_white.png"),
+                QIcon(":/icons/no_side_ctrl_white.png"),
                 "", this);
 //    mNoSideCtrlButton->setSizePolicy(QSizePolicy::Maximum,
 //                                     QSizePolicy::Maximum);

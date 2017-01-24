@@ -55,12 +55,6 @@ MainWindow::MainWindow(QWidget *parent)
     setCurrentPath("");
     QSqlDatabase::addDatabase("QSQLITE");
     QApplication::instance()->installEventFilter((QObject*)this);
-    setStyleSheet(
-        "QMainWindow::separator {\
-            background: rgb(0, 0, 0);\
-            width: 10px;\
-            height: 10px;\
-        }");
 
     mRightDock = new QDockWidget(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
@@ -86,121 +80,125 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     mToolBar = new QToolBar(this);
+    mToolBar->setMovable(false);
 
-    mMovePathMode = new QAction(
-                QIcon("pixmaps/icons/ink_draw_select.png"),
-                "CONNECT POINTS", this);
-    mMovePathMode->setToolTip("F1");
-    mMovePathMode->setCheckable(true);
+
+    mToolBar->setIconSize(QSize(24, 24));
+
+    mToolBar->addSeparator();
+
+    mMovePathMode = new ActionButton(
+                ":/icons/draw_select.png",
+                "F1", this);
+    mMovePathMode->setCheckable(":/icons/draw_select_checked.png");
     mMovePathMode->setChecked(true);
-    mToolBar->addAction(mMovePathMode);
-    connect(mMovePathMode, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mMovePathMode);
+    connect(mMovePathMode, SIGNAL(pressed()),
             mCanvas, SLOT(setMovePathMode()) );
 
-    mMovePointMode = new QAction(
-                QIcon("pixmaps/icons/ink_draw_node.png"),
-                "CONNECT POINTS", this);
-    mMovePointMode->setToolTip("F2");
-    mMovePointMode->setCheckable(true);
-    mToolBar->addAction(mMovePointMode);
-    connect(mMovePointMode, SIGNAL(triggered(bool)),
+    mMovePointMode = new ActionButton(
+                ":/icons/draw_node.png",
+                "F2", this);
+    mMovePointMode->setCheckable(":/icons/draw_node_checked.png");
+    mToolBar->addWidget(mMovePointMode);
+    connect(mMovePointMode, SIGNAL(pressed()),
             mCanvas, SLOT(setMovePointMode()) );
 
-    mAddPointMode = new QAction(
-                QIcon("pixmaps/icons/ink_draw_pen.png"),
-                "CONNECT POINTS", this);
-    mAddPointMode->setToolTip("F3");
-    mAddPointMode->setCheckable(true);
-    mToolBar->addAction(mAddPointMode);
-    connect(mAddPointMode, SIGNAL(triggered(bool)),
+    mAddPointMode = new ActionButton(
+                ":/icons/draw_pen.png",
+                "F3", this);
+    mAddPointMode->setCheckable(":/icons/draw_pen_checked.png");
+    mToolBar->addWidget(mAddPointMode);
+    connect(mAddPointMode, SIGNAL(pressed()),
             mCanvas, SLOT(setAddPointMode()) );
 
-    mCircleMode = new QAction(
-                QIcon("pixmaps/icons/ink_draw_arc.png"),
-                "CONNECT POINTS", this);
-    mCircleMode->setToolTip("F4");
-    mCircleMode->setCheckable(true);
-    mToolBar->addAction(mCircleMode);
-    connect(mCircleMode, SIGNAL(triggered(bool)),
+    mCircleMode = new ActionButton(
+                ":/icons/draw_arc.png",
+                "F4", this);
+    mCircleMode->setCheckable(":/icons/draw_arc_checked.png");
+    mToolBar->addWidget(mCircleMode);
+    connect(mCircleMode, SIGNAL(pressed()),
             mCanvas, SLOT(setCircleMode()) );
 
-    mRectangleMode = new QAction(
-                QIcon("pixmaps/icons/ink_draw_rect.png"),
-                "CONNECT POINTS", this);
-    mRectangleMode->setToolTip("F5");
-    mRectangleMode->setCheckable(true);
-    mToolBar->addAction(mRectangleMode);
-    connect(mRectangleMode, SIGNAL(triggered(bool)),
+    mToolBar->addSeparator();
+
+    mRectangleMode = new ActionButton(
+                ":/icons/draw_rect.png",
+                "F5", this);
+    mRectangleMode->setCheckable(":/icons/draw_rect_checked.png");
+    mToolBar->addWidget(mRectangleMode);
+    connect(mRectangleMode, SIGNAL(pressed()),
             mCanvas, SLOT(setRectangleMode()) );
 
-    mTextMode = new QAction(
-                QIcon("pixmaps/icons/ink_draw_text.png"),
-                "CONNECT POINTS", this);
-    mTextMode->setToolTip("F6");
-    mTextMode->setCheckable(true);
-    mToolBar->addAction(mTextMode);
-    connect(mTextMode, SIGNAL(triggered(bool)),
+    mTextMode = new ActionButton(
+                ":/icons/draw_text.png",
+                "F6", this);
+    mTextMode->setCheckable(":/icons/draw_text_checked.png");
+    mToolBar->addWidget(mTextMode);
+    connect(mTextMode, SIGNAL(pressed()),
             mCanvas, SLOT(setTextMode()) );
 
 
     mToolBar->addSeparator();
 
-    mActionConnectPoints = new QAction(
-                QIcon("pixmaps/icons/ink_node_join_segment.png"),
+    mActionConnectPoints = new ActionButton(
+                ":/icons/node_join_segment.png",
                 "CONNECT POINTS", this);
-    mToolBar->addAction(mActionConnectPoints);
-    connect(mActionConnectPoints, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionConnectPoints);
+    connect(mActionConnectPoints, SIGNAL(pressed()),
             mCanvas, SLOT(connectPointsSlot()) );
 
-    mActionDisconnectPoints = new QAction(
-                QIcon("pixmaps/icons/ink_node_delete_segment.png"),
+    mActionDisconnectPoints = new ActionButton(
+                ":/icons/node_delete_segment.png",
                 "DISCONNECT POINTS", this);
-    mToolBar->addAction(mActionDisconnectPoints);
-    connect(mActionDisconnectPoints, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionDisconnectPoints);
+    connect(mActionDisconnectPoints, SIGNAL(pressed()),
             mCanvas, SLOT(disconnectPointsSlot()) );
 
-    mActionMergePoints = new QAction(
-                QIcon("pixmaps/icons/ink_node_join.png"),
+    mActionMergePoints = new ActionButton(
+                ":/icons/node_join.png",
                 "MERGE POINTS", this);
-    mToolBar->addAction(mActionMergePoints);
-    connect(mActionMergePoints, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionMergePoints);
+    connect(mActionMergePoints, SIGNAL(pressed()),
             mCanvas, SLOT(mergePointsSlot()) );
 //
-    mActionSymmetricPointCtrls = new QAction(
-                QIcon("pixmaps/icons/ink_node_symmetric.png"),
+    mToolBar->addSeparator();
+
+    mActionSymmetricPointCtrls = new ActionButton(
+                ":/icons/node_symmetric.png",
                 "SYMMETRIC POINTS", this);
-    mToolBar->addAction(mActionSymmetricPointCtrls);
-    connect(mActionSymmetricPointCtrls, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionSymmetricPointCtrls);
+    connect(mActionSymmetricPointCtrls, SIGNAL(pressed()),
             mCanvas, SLOT(makePointCtrlsSymmetric()) );
 
-    mActionSmoothPointCtrls = new QAction(
-                QIcon("pixmaps/icons/ink_node_smooth.png"),
+    mActionSmoothPointCtrls = new ActionButton(
+                ":/icons/node_smooth.png",
                 "SMOOTH POINTS", this);
-    mToolBar->addAction(mActionSmoothPointCtrls);
-    connect(mActionSmoothPointCtrls, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionSmoothPointCtrls);
+    connect(mActionSmoothPointCtrls, SIGNAL(pressed()),
             mCanvas, SLOT(makePointCtrlsSmooth()) );
 
-    mActionCornerPointCtrls = new QAction(
-                QIcon("pixmaps/icons/ink_node_cusp.png"),
+    mActionCornerPointCtrls = new ActionButton(
+                ":/icons/node_cusp.png",
                 "CORNER POINTS", this);
-    mToolBar->addAction(mActionCornerPointCtrls);
-    connect(mActionCornerPointCtrls, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionCornerPointCtrls);
+    connect(mActionCornerPointCtrls, SIGNAL(pressed()),
             mCanvas, SLOT(makePointCtrlsCorner()) );
 //
     mToolBar->addSeparator();
 
-    mActionLine = new QAction(
-                QIcon("pixmaps/icons/ink_node_line.png"),
+    mActionLine = new ActionButton(
+                ":/icons/node_line.png",
                 "MAKE SEGMENT LINE", this);
-    mToolBar->addAction(mActionLine);
-    connect(mActionLine, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionLine);
+    connect(mActionLine, SIGNAL(pressed()),
             mCanvas, SLOT(makeSegmentLine()) );
 
-    mActionCurve = new QAction(
-                QIcon("pixmaps/icons/ink_node_curve.png"),
+    mActionCurve = new ActionButton(
+                ":/icons/node_curve.png",
                 "MAKE SEGMENT CURVE", this);
-    mToolBar->addAction(mActionCurve);
-    connect(mActionCurve, SIGNAL(triggered(bool)),
+    mToolBar->addWidget(mActionCurve);
+    connect(mActionCurve, SIGNAL(pressed()),
             mCanvas, SLOT(makeSegmentCurve()) );
 
     mToolBar->addSeparator();
@@ -222,6 +220,7 @@ MainWindow::MainWindow(QWidget *parent)
     mFileMenu->addAction("New...", this, SLOT(newFile()));
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
     mFileMenu->addAction("Import...", this, SLOT(importFile()));
+    mFileMenu->addAction("Link...", this, SLOT(linkFile()));
     mFileMenu->addAction("Import Animation...", this, SLOT(importAnimation()));
     mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
     mFileMenu->addAction("Revert", this, SLOT(revert()));
@@ -900,12 +899,26 @@ void MainWindow::importFile()
 {
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Import File", "", "AniVect Files (*.av *.svg *.png *.jpg)");
+        "Import File", "", "Files (*.av *.svg *.png *.jpg)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         foreach(const QString &path, importPaths) {
             if(path.isEmpty()) continue;
             importFile(path, true);
+        }
+    }
+}
+
+void MainWindow::linkFile()
+{
+    disableEventFilter();
+    QStringList importPaths = QFileDialog::getOpenFileNames(this,
+        "Link File", "", "AniVect Files (*.av)");
+    enableEventFilter();
+    if(!importPaths.isEmpty()) {
+        foreach(const QString &path, importPaths) {
+            if(path.isEmpty()) continue;
+            mCanvas->createLinkToFileWithPath(path);
         }
     }
 }

@@ -32,7 +32,8 @@ enum BoundingBoxType {
     TYPE_RECTANGLE,
     TYPE_TEXT,
     TYPE_GROUP,
-    TYPE_CANVAS
+    TYPE_CANVAS,
+    TYPE_LINK
 };
 
 class BoxesGroup;
@@ -304,6 +305,8 @@ protected:
     KeysView *mKeysView;
 
     bool mScheduledForRemove = false;
+
+    void setType(const BoundingBoxType &type) { mType = type; }
     BoundingBoxType mType;
     BoxesGroup *mParent = NULL;
 

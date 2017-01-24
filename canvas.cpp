@@ -491,6 +491,10 @@ void Canvas::renderFinal(QPainter *p)
 void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
     new AnimationBox(mCurrentBoxesGroup, paths);
 }
+#include "Boxes/linkbox.h"
+void Canvas::createLinkToFileWithPath(const QString &path) {
+    new LinkBox(path, mCurrentBoxesGroup);
+}
 
 void Canvas::renderCurrentFrameToQImage(QImage *frame)
 {
@@ -647,17 +651,17 @@ void Canvas::setCanvasMode(CanvasMode mode) {
     if(mCurrentMode == MOVE_PATH) {
         mCanvasWidget->setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mCurrentMode == MOVE_POINT) {
-        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-node.xpm"), 0, 0) );
+        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-node.xpm"), 0, 0) );
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor_color_picker.png"), 2, 20) );
+        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor_color_picker.png"), 2, 20) );
     } else if(mCurrentMode == ADD_CIRCLE) {
-        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-ellipse.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-ellipse.xpm"), 4, 4) );
     } else if(mCurrentMode == ADD_RECTANGLE) {
-        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-rect.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-rect.xpm"), 4, 4) );
     } else if(mCurrentMode == ADD_TEXT) {
-        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-text.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-text.xpm"), 4, 4) );
     } else {
-        mCanvasWidget->setCursor(QCursor(QPixmap("pixmaps/cursor-pen.xpm"), 4, 4) );
+        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-pen.xpm"), 4, 4) );
     }
     clearAllPointsSelection();
     if(mCurrentMode == MOVE_PATH || mCurrentMode == MOVE_POINT) {

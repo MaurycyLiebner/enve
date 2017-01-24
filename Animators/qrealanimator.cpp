@@ -53,6 +53,8 @@ void QrealAnimator::loadFromSql(int qrealAnimatorId) {
 
         if(mKeys.isEmpty()) {
             setCurrentValue(query.value(currentValue).toReal());
+        } else {
+            setRecordingWithoutChangingKeys(true, false);
         }
     } else {
         qDebug() << "Could not load qpointfanimator with id " << qrealAnimatorId;

@@ -40,20 +40,20 @@ BoxesListWidget::BoxesListWidget(QWidget *parent) : QWidget(parent)
 void BoxesListWidget::loadStaticPixmaps()
 {
     if(mStaticPixmapsLoaded) return;
-    VISIBLE_PIXMAP = new QPixmap("pixmaps/icons/ink_visible.png");
-    INVISIBLE_PIXMAP = new QPixmap("pixmaps/icons/ink_hidden.png");
-    HIDE_CHILDREN = new QPixmap("pixmaps/icons/list_hide_children.png");
-    SHOW_CHILDREN = new QPixmap("pixmaps/icons/list_show_children.png");
-    LOCKED_PIXMAP = new QPixmap("pixmaps/icons/ink_lock_locked.png");
-    UNLOCKED_PIXMAP = new QPixmap("pixmaps/icons/ink_lock_unlocked.png");
+    VISIBLE_PIXMAP = new QPixmap(":/icons/visible.png");
+    INVISIBLE_PIXMAP = new QPixmap(":/icons/hidden.png");
+    HIDE_CHILDREN = new QPixmap(":/icons/list_hide_children.png");
+    SHOW_CHILDREN = new QPixmap(":/icons/list_show_children.png");
+    LOCKED_PIXMAP = new QPixmap(":/icons/lock_locked.png");
+    UNLOCKED_PIXMAP = new QPixmap(":/icons/lock_unlocked.png");
     ANIMATOR_CHILDREN_VISIBLE = new QPixmap(
-                "pixmaps/icons/animator_children_visible.png");
+                ":/icons/animator_children_visible.png");
     ANIMATOR_CHILDREN_HIDDEN = new QPixmap(
-                "pixmaps/icons/animator_children_hidden.png");
+                ":/icons/animator_children_hidden.png");
     ANIMATOR_RECORDING = new QPixmap(
-                "pixmaps/icons/recording.png");
+                ":/icons/recording.png");
     ANIMATOR_NOT_RECORDING = new QPixmap(
-                "pixmaps/icons/not_recording.png");
+                ":/icons/not_recording.png");
     mStaticPixmapsLoaded = true;
 }
 

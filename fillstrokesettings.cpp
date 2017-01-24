@@ -379,22 +379,41 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     mUndoRedoSaveTimer = new QTimer(this);
 
     mGradientWidget = new GradientWidget(this, mMainWindow);
-    mColorTypeBar = new QTabBar(this);
-    mColorTypeBar->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
     mStrokeSettingsWidget = new QWidget(this);
     mColorsSettingsWidget = new ColorSettingsWidget(this);
     mFillTargetButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_properties_fill.png"),
+                QIcon(":/icons/properties_fill.png"),
                 "Fill", this);
     mStrokeTargetButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_properties_stroke_paint.png"),
+                QIcon(":/icons/properties_stroke_paint.png"),
                 "Stroke", this);
     setLayout(mMainLayout);
     mMainLayout->setAlignment(Qt::AlignTop);
 
-    mColorTypeBar->addTab(QIcon("pixmaps/icons/ink_fill_none.png"), "No");
-    mColorTypeBar->addTab(QIcon("pixmaps/icons/ink_fill_solid.png"), "Flat");
-    mColorTypeBar->addTab(QIcon("pixmaps/icons/ink_fill_gradient.png"),"Gradient");
+    mColorTypeLayout = new QHBoxLayout();
+    mColorTypeLayout->setAlignment(Qt::AlignLeft);
+    mFillNoneButton = new ActionButton(
+                ":/icons/fill_none.png",
+                "", this);
+    mFillNoneButton->setCheckable(":icons/fill_none_checked.png");
+    connect(mFillNoneButton, SIGNAL(pressed()),
+            this, SLOT(setNoneFill()));
+    mFillFlatButton = new ActionButton(
+                ":/icons/fill_flat.png",
+                "", this);
+    mFillFlatButton->setCheckable(":icons/fill_flat_checked.png");
+    connect(mFillFlatButton, SIGNAL(pressed()),
+            this, SLOT(setFlatFill()));
+    mFillGradientButton = new ActionButton(
+                ":/icons/fill_gradient.png",
+                "", this);
+    mFillGradientButton->setCheckable(":icons/fill_gradient_checked.png");
+    connect(mFillGradientButton, SIGNAL(pressed()),
+            this, SLOT(setGradientFill()));
+
+    mColorTypeLayout->addWidget(mFillNoneButton);
+    mColorTypeLayout->addWidget(mFillFlatButton);
+    mColorTypeLayout->addWidget(mFillGradientButton);
 
     mFillTargetButton->setCheckable(true);
     mFillTargetButton->setFocusPolicy(Qt::NoFocus);
@@ -404,15 +423,15 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     mTargetLayout->addWidget(mStrokeTargetButton);
 
     mMainLayout->addLayout(mTargetLayout);
-    mMainLayout->addWidget(mColorTypeBar);
+    mMainLayout->addLayout(mColorTypeLayout);
     mMainLayout->addWidget(mStrokeSettingsWidget);
     mMainLayout->addWidget(mGradientWidget);
     mMainLayout->addWidget(mColorsSettingsWidget);
 
 
-    mBevelJoinStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_bevel.png"), "", this);
-    mMiterJointStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_miter.png"), "", this);
-    mRoundJoinStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_join_round.png"), "", this);
+    mBevelJoinStyleButton = new QPushButton(QIcon(":/icons/join_bevel.png"), "", this);
+    mMiterJointStyleButton = new QPushButton(QIcon(":/icons/join_miter.png"), "", this);
+    mRoundJoinStyleButton = new QPushButton(QIcon(":/icons/join_round.png"), "", this);
     mBevelJoinStyleButton->setCheckable(true);
     mMiterJointStyleButton->setCheckable(true);
     mRoundJoinStyleButton->setCheckable(true);
@@ -428,9 +447,9 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
 
     mStrokeSettingsLayout->addLayout(mJoinStyleLayout);
 
-    mFlatCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_flat.png"), "", this);
-    mSquareCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_square.png"), "", this);
-    mRoundCapStyleButton = new QPushButton(QIcon("pixmaps/icons/ink_cap_round.png"), "", this);
+    mFlatCapStyleButton = new QPushButton(QIcon(":/icons/cap_flat.png"), "", this);
+    mSquareCapStyleButton = new QPushButton(QIcon(":/icons/cap_square.png"), "", this);
+    mRoundCapStyleButton = new QPushButton(QIcon(":/icons/cap_round.png"), "", this);
     mFlatCapStyleButton->setCheckable(true);
     mSquareCapStyleButton->setCheckable(true);
     mRoundCapStyleButton->setCheckable(true);
@@ -467,25 +486,23 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
             this, SLOT(setFillTarget()) );
     connect(mStrokeTargetButton, SIGNAL(released()),
             this, SLOT(setStrokeTarget()) );
-    connect(mColorTypeBar, SIGNAL(tabBarClicked(int)),
-            this, SLOT(colorTypeSet(int)) );
 
     connect(mColorsSettingsWidget,
                 SIGNAL(colorChangedHSVSignal(GLfloat,GLfloat,GLfloat,GLfloat)),
                 this, SLOT(colorChangedTMP(GLfloat,GLfloat,GLfloat,GLfloat)) );
 
     mFillPickerButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_fill_dropper.png"), "", this);
+                QIcon(":/icons/fill_dropper.png"), "", this);
     mFillPickerButton->setSizePolicy(QSizePolicy::Maximum,
                                      QSizePolicy::Maximum);
     mFillPickerButton->setFocusPolicy(Qt::NoFocus);
     mStrokePickerButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_stroke_dropper.png"), "", this);
+                QIcon(":/icons/stroke_dropper.png"), "", this);
     mStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
     mStrokePickerButton->setFocusPolicy(Qt::NoFocus);
     mFillStrokePickerButton = new QPushButton(
-                QIcon("pixmaps/icons/ink_fill_stroke_dropper.png"), "", this);
+                QIcon(":/icons/fill_stroke_dropper.png"), "", this);
     mFillStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
                                            QSizePolicy::Maximum);
     mFillStrokePickerButton->setFocusPolicy(Qt::NoFocus);
@@ -493,6 +510,8 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
 
     connect(mFillPickerButton, SIGNAL(pressed()),
             this, SLOT(startLoadingFillFromPath()) );
+
+    mPickersLayout->setAlignment(Qt::AlignLeft);
     mPickersLayout->addWidget(mStrokePickerButton);
     connect(mStrokePickerButton, SIGNAL(pressed()),
             this, SLOT(startLoadingStrokeFromPath()) );
@@ -506,6 +525,27 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget
     setJoinStyle(Qt::RoundJoin);
 }
 
+void FillStrokeSettingsWidget::setGradientFill() {
+    mFillGradientButton->setChecked(true);
+    mFillFlatButton->setChecked(false);
+    mFillNoneButton->setChecked(false);
+    colorTypeSet(2);
+}
+
+void FillStrokeSettingsWidget::setFlatFill() {
+    mFillGradientButton->setChecked(false);
+    mFillFlatButton->setChecked(true);
+    mFillNoneButton->setChecked(false);
+    colorTypeSet(1);
+}
+
+void FillStrokeSettingsWidget::setNoneFill() {
+    mFillGradientButton->setChecked(false);
+    mFillFlatButton->setChecked(false);
+    mFillNoneButton->setChecked(true);
+    colorTypeSet(0);
+}
+
 void FillStrokeSettingsWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
     mGradientWidget->saveGradientsToSqlIfPathSelected(query);
 }
@@ -515,7 +555,19 @@ void FillStrokeSettingsWidget::updateAfterTargetChanged() {
         mGradientWidget->setCurrentGradient(getCurrentGradientVal() );
     }
     setCurrentPaintType(getCurrentPaintTypeVal());
-    mColorTypeBar->setCurrentIndex(getCurrentPaintTypeVal());
+    if(getCurrentPaintTypeVal() == 0) {
+        mFillGradientButton->setChecked(false);
+        mFillFlatButton->setChecked(false);
+        mFillNoneButton->setChecked(true);
+    } else if(getCurrentPaintTypeVal() == 1) {
+        mFillGradientButton->setChecked(false);
+        mFillFlatButton->setChecked(true);
+        mFillNoneButton->setChecked(false);
+    } else {
+        mFillGradientButton->setChecked(true);
+        mFillFlatButton->setChecked(false);
+        mFillNoneButton->setChecked(false);
+    }
 }
 
 void FillStrokeSettingsWidget::setCurrentPaintType(PaintType paintType)

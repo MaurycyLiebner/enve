@@ -225,9 +225,6 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             mCurrentCircle = newPath;
 
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-
-            new ImageBox(mCurrentBoxesGroup, "/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/pixmaps/mypaint_logo.png");
-
             Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPos, false);
             newPath->startAllPointsTransform();

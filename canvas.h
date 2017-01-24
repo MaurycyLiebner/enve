@@ -342,6 +342,7 @@ public:
     void renderFinal(QPainter *p);
     void createAnimationBoxForPaths(const QStringList &paths);
     void setPreviewing(bool bT);
+    void createLinkToFileWithPath(const QString &path);
 protected:
 //    void updateAfterCombinedTransformationChanged();
 

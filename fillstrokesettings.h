@@ -15,6 +15,7 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include "Animators/coloranimator.h"
+#include "actionbutton.h"
 
 class GradientWidget;
 
@@ -293,6 +294,9 @@ private slots:
     void startLoadingFillFromPath();
     void startLoadingStrokeFromPath();
     void startLoadingSettingsFromPath();
+    void setGradientFill();
+    void setFlatFill();
+    void setNoneFill();
 private:
     Canvas *mCanvas;
     bool mLoadFillFromPath = false;
@@ -385,7 +389,10 @@ private:
     QPushButton *mFillTargetButton;
     QPushButton *mStrokeTargetButton;
 
-    QTabBar *mColorTypeBar;
+    QHBoxLayout *mColorTypeLayout;
+    ActionButton *mFillNoneButton = NULL;
+    ActionButton *mFillFlatButton = NULL;
+    ActionButton *mFillGradientButton = NULL;
 
     QWidget *mStrokeSettingsWidget;
     QVBoxLayout *mStrokeSettingsLayout = new QVBoxLayout();
