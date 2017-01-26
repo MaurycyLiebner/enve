@@ -493,7 +493,7 @@ void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 }
 #include "Boxes/linkbox.h"
 void Canvas::createLinkToFileWithPath(const QString &path) {
-    new LinkBox(path, mCurrentBoxesGroup);
+    new ExternalLinkBox(path, mCurrentBoxesGroup);
 }
 
 void Canvas::renderCurrentFrameToQImage(QImage *frame)

@@ -179,7 +179,6 @@ public:
     void scheduleOutlinePathUpdate();
     void updateOutlinePathIfNeeded();
 
-    bool absPointInsidePath(QPointF absPoint);
     void updateAfterFrameChanged(int currentFrame);
 
     void setOutlineAffectedByScale(bool bT);
@@ -195,6 +194,7 @@ public:
 
     VectorPath *objectToPath();
     const QPainterPath &getRelativePath() const { return mPath; }
+    bool relPointInsidePath(QPointF relPos);
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

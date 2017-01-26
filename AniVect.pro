@@ -98,7 +98,8 @@ SOURCES += main.cpp\
     Boxes/animationbox.cpp \
     pathoperations.cpp \
     Boxes/linkbox.cpp \
-    actionbutton.cpp
+    actionbutton.cpp \
+    Boxes/boxpainthandler.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -184,7 +185,8 @@ HEADERS  += mainwindow.h \
     Boxes/animationbox.h \
     pathoperations.h \
     Boxes/linkbox.h \
-    actionbutton.h
+    actionbutton.h \
+    Boxes/boxpainthandler.h
 
 RESOURCES += \
     resources.qrc

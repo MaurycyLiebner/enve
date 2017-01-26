@@ -197,11 +197,12 @@ void BoxesGroup::setDisplayedFillStrokeSettingsFromLastSelected() {
     setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
 }
 
-bool BoxesGroup::absPointInsidePath(QPointF absPos)
-{
-    foreach(BoundingBox *box, mChildren) {
-        if(box->absPointInsidePath(absPos)) {
-            return true;
+bool BoxesGroup::relPointInsidePath(QPointF relPos) {
+    if(mRelBoundingRect.contains(relPos)) {
+        foreach(BoundingBox *box, mChildren) {
+            if(box->relPointInsidePath(box->getRelativeTransform().map(relPos))) {
+                return true;
+            }
         }
     }
     return false;
@@ -441,7 +442,7 @@ void BoxesGroup::drawBoundingRect(QPainter *p) {
     p->setBrush(Qt::NoBrush);
 
     p->setTransform(QTransform(mCombinedTransformMatrix), true);
-    p->drawPath(mBoundingRect);
+    p->drawPath(mRelBoundingRectPath);
 
     p->restore();
 }
@@ -1109,14 +1110,20 @@ void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect)
     }
 }
 
-void BoxesGroup::centerPivotPosition(bool finish) {
-    if(mChildren.isEmpty()) return;
-    QPointF posSum = QPointF(0.f, 0.f);
+QPointF BoxesGroup::getRelCenterPosition() {
+    QPointF posSum = QPointF(0., 0.);
+    if(mChildren.isEmpty()) return posSum;
     int count = mChildren.length();
     foreach(BoundingBox *box, mChildren) {
         posSum += box->getPivotAbsPos();
     }
-    setPivotAbsPos(posSum/count, finish, mPivotChanged);
+    return mapAbsPosToRel(posSum/count);
+}
+#include "Boxes/linkbox.h"
+void BoxesGroup::createLinkBoxForSelected() {
+    foreach(BoundingBox *selectedBox, mSelectedBoxes) {
+        new InternalLinkBox(selectedBox, this);
+    }
 }
 
 BoxesGroup* BoxesGroup::groupSelectedBoxes() {

@@ -452,16 +452,17 @@ Edge *VectorPath::getEgde(QPointF absPos)
             return NULL;
         }
     }
+    return NULL;
 }
 
-void VectorPath::centerPivotPosition(bool finish) {
+QPointF VectorPath::getRelCenterPosition() {
     QPointF posSum = QPointF(0., 0.);
     int count = mPoints.length();
-    if(count == 0) return;
+    if(count == 0) return posSum;
     foreach(PathPoint *point, mPoints) {
         posSum += point->getRelativePos();
     }
-    mTransformAnimator.setPivotWithoutChangingTransformation(posSum/count, finish);
+    return posSum/count;
 }
 
 /*void VectorPath::setStrokeSettings(StrokeSettings strokeSettings, bool saveUndoRedo)

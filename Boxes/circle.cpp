@@ -194,10 +194,6 @@ void Circle::updatePath()
     updateOutlinePath();
 }
 
-void Circle::centerPivotPosition(bool finish) {
-    mTransformAnimator.setPivotWithoutChangingTransformation(mCenter->getRelativePos()), finish;
-}
-
 CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,
                                      MovablePointType type) :
     MovablePoint(parent, type)

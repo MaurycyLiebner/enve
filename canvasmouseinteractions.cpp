@@ -70,6 +70,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             QMenu menu;
 
             menu.addAction("Apply Transformation");
+            menu.addAction("Create Link");
             menu.addAction("Center Pivot");
             menu.addAction("Copy");
             menu.addAction("Cut");
@@ -94,6 +95,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
                 } else if(selectedAction->text() == "Apply Transformation") {
                     mCurrentBoxesGroup->applyCurrentTransformationToSelected();
+                } else if(selectedAction->text() == "Create Link") {
+                    mCurrentBoxesGroup->createLinkBoxForSelected();
                 } else if(selectedAction->text() == "Group") {
                     groupSelectedBoxesAction();
                 } else if(selectedAction->text() == "Ungroup") {

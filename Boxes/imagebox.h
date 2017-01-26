@@ -11,10 +11,9 @@ public:
     void draw(QPainter *p);
     void reloadPixmap();
     void setFilePath(QString path);
-    void centerPivotPosition(bool finish = false);
     void drawSelected(QPainter *p, CanvasMode);
-    bool absPointInsidePath(QPointF point);
     void updateBoundingRect();
+    bool relPointInsidePath(QPointF point);
 private:
     QPixmap mPixmap;
     QString mImageFilePath;

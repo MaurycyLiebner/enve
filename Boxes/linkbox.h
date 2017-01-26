@@ -2,10 +2,10 @@
 #define LINKBOX_H
 #include "boxesgroup.h"
 
-class LinkBox : public BoxesGroup
+class ExternalLinkBox : public BoxesGroup
 {
 public:
-    LinkBox(QString srcFile, BoxesGroup *parent);
+    ExternalLinkBox(QString srcFile, BoxesGroup *parent);
     void reload();
 
     void changeSrc();
@@ -14,6 +14,37 @@ public:
 
 private:
     QString mSrc;
+};
+
+class InternalLinkBox : public BoundingBox
+{
+public:
+    InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
+        BoundingBox(parent, TYPE_LINK) {
+        mLinkTarget = linkTarget;
+    }
+
+    QPixmap renderPixProvidedTransform(
+                        const QMatrix &renderTransform,
+                        QPointF *drawPos) {
+        return mLinkTarget->renderPixProvidedTransform(renderTransform,
+                                                       drawPos);
+    }
+
+    QPixmap getAllUglyPixmapProvidedTransform(
+                        const QMatrix &allUglyTransform,
+                        QRectF *allUglyBoundingRectP) {
+        return mLinkTarget->getAllUglyPixmapProvidedTransform(allUglyTransform,
+                                                       allUglyBoundingRectP);
+    }
+
+    void drawSelected(QPainter *p, CanvasMode);
+    void updateBoundingRect();
+    bool relPointInsidePath(QPointF point);
+    QPointF getRelCenterPosition();
+    qreal getEffectsMargin();
+private:
+    BoundingBox *mLinkTarget = NULL;
 };
 
 #endif // LINKBOX_H

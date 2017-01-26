@@ -61,16 +61,6 @@ void TextBox::loadFromSql(int boundingBoxId) {
 //    return rect.translated(QPointF(0., -fm.height()));
 //}
 
-bool TextBox::absPointInsidePath(QPointF point)
-{
-    return PathBox::absPointInsidePath(point);
-}
-
-void TextBox::centerPivotPosition(bool finish) {
-    mTransformAnimator.setPivotWithoutChangingTransformation(mRelBoundingRect.center(),
-                                                             finish);
-}
-
 void TextBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 {
     if(mVisible) {

@@ -194,12 +194,6 @@ void Rectangle::updatePath()
     updateOutlinePath();
 }
 
-void Rectangle::centerPivotPosition(bool finish) {
-    mTransformAnimator.setPivotWithoutChangingTransformation(
-                mBottomRightPoint->getRelativePos() * 0.5,
-                finish);
-}
-
 RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :
     MovablePoint(parent, TYPE_PATH_POINT) {
 

@@ -2,7 +2,7 @@
 #include <QFileDialog>
 #include "mainwindow.h"
 
-LinkBox::LinkBox(QString srcFile, BoxesGroup *parent) :
+ExternalLinkBox::ExternalLinkBox(QString srcFile, BoxesGroup *parent) :
     BoxesGroup(parent) {
     mSrc = srcFile;
     reload();
@@ -10,7 +10,7 @@ LinkBox::LinkBox(QString srcFile, BoxesGroup *parent) :
     setName("Link " + srcFile);
 }
 
-void LinkBox::reload() {
+void ExternalLinkBox::reload() {
     foreach(BoundingBox *box, mChildren) {
         box->decNumberPointers();
     }
@@ -26,7 +26,7 @@ void LinkBox::reload() {
     scheduleAwaitUpdate();
 }
 
-void LinkBox::changeSrc() {
+void ExternalLinkBox::changeSrc() {
     QString src = QFileDialog::getOpenFileName(mMainWindow,
                                                "Link File",
                                                "",
@@ -36,7 +36,50 @@ void LinkBox::changeSrc() {
     }
 }
 
-void LinkBox::setSrc(const QString &src) {
+void ExternalLinkBox::setSrc(const QString &src) {
     mSrc = src;
     reload();
+}
+
+QPointF InternalLinkBox::getRelCenterPosition() {
+    return mLinkTarget->getRelCenterPosition();
+}
+
+qreal InternalLinkBox::getEffectsMargin() {
+    return mLinkTarget->getEffectsMargin();
+}
+
+void InternalLinkBox::updateBoundingRect() {
+    mRelBoundingRect = mLinkTarget->getRelBoundingRect();
+    qreal effectsMargin = mLinkTarget->getEffectsMargin()*
+                          mUpdateCanvasTransform.m11();
+    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
+                        adjusted(-effectsMargin, -effectsMargin,
+                                 effectsMargin, effectsMargin);
+
+    BoundingBox::updateBoundingRect();
+}
+
+void InternalLinkBox::drawSelected(QPainter *p, CanvasMode)
+{
+    if(mVisible) {
+        p->save();
+
+//        QPainterPath mapped;
+//        mapped.addRect(mPixmap.rect());
+//        mapped = mCombinedTransformMatrix.map(mapped);
+//        QPen pen = p->pen();
+//        p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
+//        p->setBrush(Qt::NoBrush);
+//        p->drawPath(mapped);
+//        p->setPen(pen);
+
+        drawBoundingRect(p);
+        p->restore();
+    }
+}
+
+bool InternalLinkBox::relPointInsidePath(QPointF point)
+{
+    return mLinkTarget->relPointInsidePath(point);
 }

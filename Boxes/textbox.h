@@ -21,10 +21,7 @@ public:
     void updatePath();
     MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
 //    QRectF getTextRect();
-    bool absPointInsidePath(QPointF point);
     void setPathText(bool pathText);
-
-    void centerPivotPosition(bool finish = false);
 private:
     QString mText;
     QFont mFont;

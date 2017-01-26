@@ -61,7 +61,6 @@ public:
     void selectAndAddContainedPointsToList(QRectF absRect,
                                            QList<MovablePoint *> *list);
     void updatePath();
-    void centerPivotPosition(bool finish = false);
     void updateRadiusXAndRange();
     void updateAfterFrameChanged(int currentFrame);
     void loadFromSql(int boundingBoxId);

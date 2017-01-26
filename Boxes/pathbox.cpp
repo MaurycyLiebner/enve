@@ -310,9 +310,9 @@ void PathBox::draw(QPainter *p)
     }
 }
 
-bool PathBox::absPointInsidePath(QPointF absPoint) {
-    if(mMappedBoundingRect.contains(absPoint) ) {
-        return mWholePath.contains(mapAbsPosToRel(absPoint));
+bool PathBox::relPointInsidePath(QPointF relPos) {
+    if(mRelBoundingRectPath.contains(relPos) ) {
+        return mWholePath.contains(relPos);
     } else {
         return false;
     }

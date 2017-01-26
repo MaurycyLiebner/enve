@@ -24,7 +24,6 @@ public:
 
     void setSelectedFontFamilyAndStyle(QString family, QString style);
     void setSelectedFontSize(qreal size);
-    bool absPointInsidePath(QPointF absPos);
     void draw(QPainter *p);
 //    void render(QPainter *p);
     void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
@@ -77,7 +76,6 @@ public:
 
     void ungroupSelected();
     void ungroup();
-    void centerPivotPosition(bool finish = false);
 
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
@@ -212,6 +210,9 @@ public:
     void selectedPathsExclusion();
     void makeSelectedPointsSegmentsCurves();
     void makeSelectedPointsSegmentsLines();
+    bool relPointInsidePath(QPointF relPos);
+    QPointF getRelCenterPosition();
+    void createLinkBoxForSelected();
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

@@ -62,7 +62,11 @@ public:
     virtual void setFontFamilyAndStyle(QString,
                                        QString) {}
 
-    virtual void centerPivotPosition(bool finish = false) { Q_UNUSED(finish); }
+    virtual QPointF getRelCenterPosition() { return mRelBoundingRect.center(); }
+    virtual void centerPivotPosition(bool finish = false) {
+        mTransformAnimator.setPivotWithoutChangingTransformation(
+                    getRelCenterPosition(), finish);
+    }
     virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getPixBoundingRect();
 
@@ -87,7 +91,8 @@ public:
     void finishTransform();
 
 
-    virtual bool absPointInsidePath(QPointF) { return false; }
+    virtual bool relPointInsidePath(QPointF) { return false; }
+    bool absPointInsidePath(QPointF absPos);
     virtual MovablePoint *getPointAt(QPointF, CanvasMode) { return NULL; }
 
     void moveUp();
@@ -255,12 +260,18 @@ public:
     virtual void applyCurrentTransformation() {}
     void updatePreviewPixmap();
 
-    qreal getEffectsMargin() {
+    virtual qreal getEffectsMargin() {
         return mEffectsMargin;
     }
 
     void setBaseTransformation(const QMatrix &matrix);
     bool hasBaseTransformation();
+    virtual QPixmap renderPixProvidedTransform(
+                        const QMatrix &renderTransform,
+                        QPointF *drawPos);
+    virtual QPixmap getAllUglyPixmapProvidedTransform(
+                        const QMatrix &allUglyTransform,
+                        QRectF *allUglyBoundingRectP);
 protected:
     QRectF mRelBoundingRect;
 
@@ -300,8 +311,8 @@ protected:
 
     QRectF mPixBoundingRect;
     QRectF mPixBoundingRectClippedToView;
-    QPainterPath mBoundingRect;
-    QPainterPath mMappedBoundingRect;
+    QPainterPath mRelBoundingRectPath;
+    QPainterPath mMappedBoundingRectPath;
 
     BoxesListWidget *mBoxesList;
     KeysView *mKeysView;

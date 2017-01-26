@@ -39,12 +39,10 @@ void ImageBox::drawSelected(QPainter *p, CanvasMode)
     }
 }
 
-bool ImageBox::absPointInsidePath(QPointF point)
+bool ImageBox::relPointInsidePath(QPointF point)
 {
-    QPainterPath mapped;
-    mapped.addRect(mPixmap.rect());
-    mapped = mCombinedTransformMatrix.map(mapped);
-    return mapped.contains(point);
+    return mPixmap.rect().contains(point.toPoint()
+                                   );
 }
 
 void ImageBox::draw(QPainter *p)
@@ -69,10 +67,4 @@ void ImageBox::setFilePath(QString path)
 {
     mImageFilePath = path;
     reloadPixmap();
-}
-
-void ImageBox::centerPivotPosition(bool finish)
-{
-    mTransformAnimator.setPivotWithoutChangingTransformation(
-                mPixmap.rect().bottomRight()*0.5, finish);
 }

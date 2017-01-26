@@ -345,8 +345,6 @@ bool TransformAnimator::hasBaseTransformation() {
 
 void TransformAnimator::setBaseTransformation(const QMatrix &matrix) {
     mBaseTransformation = matrix;
-    mPosAnimator.setCurrentValue(mPosAnimator.getCurrentValue() +
-                                 QPointF(matrix.dx(), matrix.dy()));
-    mBaseTransformation.translate(-matrix.dx(), -matrix.dy());
+    //mBaseTransformation.translate(-matrix.dx(), -matrix.dy());
     mBaseTransformationSet = true;
 }
