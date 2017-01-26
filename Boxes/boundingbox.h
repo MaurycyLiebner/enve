@@ -259,6 +259,8 @@ public:
         return mEffectsMargin;
     }
 
+    void setBaseTransformation(const QMatrix &matrix);
+    bool hasBaseTransformation();
 protected:
     QRectF mRelBoundingRect;
 

@@ -36,6 +36,14 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
     mCombinedTransformMatrix.reset();
 }
 
+void BoundingBox::setBaseTransformation(const QMatrix &matrix) {
+    mTransformAnimator.setBaseTransformation(matrix);
+}
+
+bool BoundingBox::hasBaseTransformation() {
+    return mTransformAnimator.hasBaseTransformation();
+}
+
 QPixmap BoundingBox::applyEffects(const QPixmap& pixmap,
                                   bool highQuality,
                                   qreal scale) {

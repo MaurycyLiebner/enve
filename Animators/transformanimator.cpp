@@ -332,5 +332,21 @@ QMatrix TransformAnimator::getCurrentValue()
 
     matrix.translate(-pivotX,
                      -pivotY);
-    return matrix;
+    if(mBaseTransformationSet) {
+        return mBaseTransformation*matrix;
+    } else {
+        return matrix;
+    }
+}
+
+bool TransformAnimator::hasBaseTransformation() {
+    return mBaseTransformationSet;
+}
+
+void TransformAnimator::setBaseTransformation(const QMatrix &matrix) {
+    mBaseTransformation = matrix;
+    mPosAnimator.setCurrentValue(mPosAnimator.getCurrentValue() +
+                                 QPointF(matrix.dx(), matrix.dy()));
+    mBaseTransformation.translate(-matrix.dx(), -matrix.dy());
+    mBaseTransformationSet = true;
 }

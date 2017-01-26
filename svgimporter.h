@@ -158,7 +158,7 @@ public:
 
     BoundingBoxSvgAttributes &operator*=(const BoundingBoxSvgAttributes &overwritter)
     {
-        mCombinedTransform *= overwritter.getCombinedTransform();
+        //mRelTransform *= overwritter.getRelTransform();
 
         mFillAttributes *= overwritter.getFillAttributes();
         mStrokeAttributes *= overwritter.getStrokeAttributes();
@@ -167,7 +167,7 @@ public:
         return *this;
     }
 
-    const QMatrix &getCombinedTransform() const { return mCombinedTransform; }
+    const QMatrix &getRelTransform() const { return mRelTransform; }
     const FillSvgAttributes &getFillAttributes() const { return mFillAttributes; }
     const StrokeSvgAttributes &getStrokeAttributes() const { return mStrokeAttributes; }
     const TextSvgAttributes &getTextAttributes() const { return mTextAttributes; }
@@ -177,7 +177,7 @@ public:
     void apply(BoundingBox *box);
 protected:
     QString mId;
-    QMatrix mCombinedTransform;
+    QMatrix mRelTransform;
     FillSvgAttributes mFillAttributes;
     StrokeSvgAttributes mStrokeAttributes;
     TextSvgAttributes mTextAttributes;
