@@ -18,10 +18,13 @@ private:
 
 class InternalLinkBox : public BoundingBox
 {
+    Q_OBJECT
 public:
     InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
         BoundingBox(parent, TYPE_LINK) {
         mLinkTarget = linkTarget;
+        connect(linkTarget, SIGNAL(scheduleAwaitUpdateAllLinkBoxes()),
+                this, SLOT(scheduleAwaitUpdateSLOT()));
     }
 
     QPixmap renderPixProvidedTransform(
@@ -43,6 +46,11 @@ public:
     bool relPointInsidePath(QPointF point);
     QPointF getRelCenterPosition();
     qreal getEffectsMargin();
+public slots:
+    void scheduleAwaitUpdateSLOT() {
+        scheduleAwaitUpdate();
+    }
+
 private:
     BoundingBox *mLinkTarget = NULL;
 };

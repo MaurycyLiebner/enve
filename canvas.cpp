@@ -270,7 +270,7 @@ void Canvas::paintEvent(QPainter *p)
         p->drawPath(path.subtracted(viewRectPath));
 
         p->save();
-        qreal reversedRes = 1/mResolutionPercent;
+        qreal reversedRes = 1./mResolutionPercent;
         p->translate(mRenderRect.topLeft());
         p->scale(reversedRes, reversedRes);
         if(mCurrentPreviewImg != NULL) {
@@ -432,12 +432,19 @@ void Canvas::pathsExclusionAction() {
     callUpdateSchedulers();
 }
 
+QRectF Canvas::getRenderRect() {
+    return mRenderRect;
+    QRectF rectT = mRenderRect;
+    rectT.setSize(mRenderRect.size()*mResolutionPercent);
+    rectT.moveTo(rectT.topLeft()*mResolutionPercent);
+    return rectT;
+}
+
 void Canvas::updateRenderRect() {
-    QRectF canvasRect = QRectF(qMax(mCombinedTransformMatrix.dx()*mResolutionPercent,
-                                    mCombinedTransformMatrix.dx()),
-                               qMax(mCombinedTransformMatrix.dy()*mResolutionPercent,
-                                                                   mCombinedTransformMatrix.dy()),
-                               mVisibleWidth*mResolutionPercent, mVisibleHeight*mResolutionPercent);
+    QRectF canvasRect = QRectF(mCombinedTransformMatrix.dx(),
+                               mCombinedTransformMatrix.dy(),
+                               mVisibleWidth*mResolutionPercent,
+                               mVisibleHeight*mResolutionPercent);
     QRectF canvasWidgetRect = QRectF(0., 0.,
                                      (qreal)mCanvasWidget->width(),
                                      (qreal)mCanvasWidget->height());
@@ -447,7 +454,7 @@ void Canvas::updateRenderRect() {
 void Canvas::renderCurrentFrameToPreview() {
     QImage *image = new QImage(mRenderRect.size().toSize(),
                                QImage::Format_ARGB32);
-    image->fill(Qt::transparent);
+    image->fill(Qt::red);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
     mCurrentPreviewImg = image;
@@ -502,9 +509,10 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
     p.setRenderHint(QPainter::Antialiasing);
     p.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    p.scale(mResolutionPercent, mResolutionPercent);
-    p.translate(getAbsolutePos() - mRenderRect.topLeft());
+    //p.scale(mResolutionPercent, mResolutionPercent);
+    //p.translate(getAbsolutePos() - mRenderRect.topLeft());
 
+    p.translate(-getRenderRect().topLeft());
     Canvas::render(&p);
 
     p.end();

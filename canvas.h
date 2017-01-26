@@ -343,6 +343,7 @@ public:
     void createAnimationBoxForPaths(const QStringList &paths);
     void setPreviewing(bool bT);
     void createLinkToFileWithPath(const QString &path);
+    QRectF getRenderRect();
 protected:
 //    void updateAfterCombinedTransformationChanged();
 

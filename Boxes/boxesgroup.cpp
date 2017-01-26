@@ -1103,8 +1103,7 @@ void BoxesGroup::moveSelectedBoxesBy(QPointF by, bool startTransform)
     }
 }
 
-void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect)
-{
+void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->selectAndAddContainedPointsToList(absRect, &mSelectedPoints);
     }
@@ -1119,6 +1118,7 @@ QPointF BoxesGroup::getRelCenterPosition() {
     }
     return mapAbsPosToRel(posSum/count);
 }
+
 #include "Boxes/linkbox.h"
 void BoxesGroup::createLinkBoxForSelected() {
     foreach(BoundingBox *selectedBox, mSelectedBoxes) {

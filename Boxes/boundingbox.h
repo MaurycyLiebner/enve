@@ -344,6 +344,7 @@ protected:
 
     QPixmap mRenderPixmap;
 signals:
+    void scheduleAwaitUpdateAllLinkBoxes();
     void addActiveAnimatorSignal(QrealAnimator*);
     void removeActiveAnimatorSignal(QrealAnimator*);
 };
