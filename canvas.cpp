@@ -271,7 +271,7 @@ void Canvas::paintEvent(QPainter *p)
 
         p->save();
         qreal reversedRes = 1./mResolutionPercent;
-        p->translate(mRenderRect.topLeft());
+        p->translate(getRenderRect().topLeft());
         p->scale(reversedRes, reversedRes);
         if(mCurrentPreviewImg != NULL) {
             p->drawImage(QPointF(0., 0.), *mCurrentPreviewImg);
@@ -441,14 +441,18 @@ QRectF Canvas::getRenderRect() {
 }
 
 void Canvas::updateRenderRect() {
-    QRectF canvasRect = QRectF(mCombinedTransformMatrix.dx(),
-                               mCombinedTransformMatrix.dy(),
-                               mVisibleWidth*mResolutionPercent,
-                               mVisibleHeight*mResolutionPercent);
+    mCanvasRect = QRectF(qMax(mCombinedTransformMatrix.dx(),
+                              mCombinedTransformMatrix.dx()*
+                              mResolutionPercent),
+                              qMax(mCombinedTransformMatrix.dy(),
+                              mCombinedTransformMatrix.dy()*
+                              mResolutionPercent),
+                              mVisibleWidth*mResolutionPercent,
+                              mVisibleHeight*mResolutionPercent);
     QRectF canvasWidgetRect = QRectF(0., 0.,
                                      (qreal)mCanvasWidget->width(),
                                      (qreal)mCanvasWidget->height());
-    mRenderRect = canvasWidgetRect.intersected(canvasRect);
+    mRenderRect = canvasWidgetRect.intersected(mCanvasRect);
 }
 
 void Canvas::renderCurrentFrameToPreview() {
@@ -512,7 +516,9 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
     //p.scale(mResolutionPercent, mResolutionPercent);
     //p.translate(getAbsolutePos() - mRenderRect.topLeft());
 
-    p.translate(-getRenderRect().topLeft());
+    p.translate(-mRenderRect.topLeft());
+    //p.translate(-mCanvasRect.topLeft());
+
     Canvas::render(&p);
 
     p.end();

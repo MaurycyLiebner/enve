@@ -49,7 +49,7 @@ void EffectAnimators::applyEffects(BoundingBox *target,
 }
 
 qreal EffectAnimators::getEffectsMargin() const {
-    qreal newMargin = 5.;
+    qreal newMargin = 2.;
     foreach(QrealAnimator *effect, mChildAnimators) {
         qreal effectMargin = ((PixmapEffect*)effect)->getMargin();
         newMargin += effectMargin;

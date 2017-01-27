@@ -41,6 +41,13 @@ public:
                                                        allUglyBoundingRectP);
     }
 
+    QPixmap getPrettyPixmapProvidedTransform(
+                            const QMatrix &transform,
+                            QRectF *pixBoundingRectClippedToViewP) {
+        return mLinkTarget->getPrettyPixmapProvidedTransform(transform,
+                                                pixBoundingRectClippedToViewP);
+    }
+
     void drawSelected(QPainter *p, CanvasMode);
     void updateBoundingRect();
     bool relPointInsidePath(QPointF point);

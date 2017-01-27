@@ -272,12 +272,15 @@ public:
     virtual QPixmap getAllUglyPixmapProvidedTransform(
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
+    virtual QPixmap getPrettyPixmapProvidedTransform(
+                        const QMatrix &transform,
+                        QRectF *pixBoundingRectClippedToViewP);
 protected:
     QRectF mRelBoundingRect;
 
     bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;
-    qreal mEffectsMargin = 0.;
+    qreal mEffectsMargin = 2.;
 
     bool mAwaitUpdateScheduled = false;
 

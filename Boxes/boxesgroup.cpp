@@ -199,8 +199,9 @@ void BoxesGroup::setDisplayedFillStrokeSettingsFromLastSelected() {
 
 bool BoxesGroup::relPointInsidePath(QPointF relPos) {
     if(mRelBoundingRect.contains(relPos)) {
+        QPointF absPos = mapRelativeToAbsolute(relPos);
         foreach(BoundingBox *box, mChildren) {
-            if(box->relPointInsidePath(box->getRelativeTransform().map(relPos))) {
+            if(box->absPointInsidePath(absPos)) {
                 return true;
             }
         }
