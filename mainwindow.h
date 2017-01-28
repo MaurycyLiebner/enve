@@ -37,6 +37,7 @@ class MainWindow : public QMainWindow
 private:
     static MainWindow *mMainWindowInstance;
 
+    QComboBox *mCurrentCanvasComboBox;
     bool mCancelLastBoxUpdate = false;
     BoundingBox *mLastUpdatedBox = NULL;
     QList<BoundingBox*> mBoxesAwaitingUpdate;
@@ -210,6 +211,7 @@ public slots:
     void playPreview();
     void stopPreview();
     void setResolutionPercentId(int id);
+    void createNewCanvas();
 private slots:
     void saveOutput(QString renderDest);
     void renderOutput();

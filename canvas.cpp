@@ -13,9 +13,14 @@ bool Canvas::mEffectsPaintEnabled = true;
 qreal Canvas::mResolutionPercent = 1.;
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-               CanvasWidget *canvasWidget) :
+               CanvasWidget *canvasWidget,
+               int canvasWidth, int canvasHeight) :
     BoxesGroup(fillStrokeSettings)
 {
+    mWidth = canvasWidth;
+    mHeight = canvasHeight;
+    mVisibleWidth = mWidth;
+    mVisibleHeight = mHeight;
     mCanvasWidget = canvasWidget;
     incNumberPointers();
 
@@ -34,8 +39,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     //setCanvasMode(MOVE_PATH);
 }
 
-Canvas::~Canvas()
-{
+Canvas::~Canvas() {
     delete mRotPivot;
 }
 

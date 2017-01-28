@@ -12,9 +12,16 @@ public:
     explicit CanvasWidget(FillStrokeSettingsWidget *fillStrokeSettingsWidget,
                           QWidget *parent = 0);
 
-    Canvas *getCanvas();
+    Canvas *getCurrentCanvas();
+
+    void setCurrentCanvas(Canvas *canvas);
+    void addCanvasToList(Canvas *canvas);
+    void addCanvasToListAndSetAsCurrent(Canvas *canvas);
+    void renameCanvas(Canvas *canvas, const QString &newName);
+    void renameCanvas(const int &id, const QString &newName);
 protected:
-    Canvas *mCanvas;
+    Canvas *mCurrentCanvas = NULL;
+    QList<Canvas*> mCanvasList;
 
     void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
@@ -27,6 +34,8 @@ protected:
 signals:
 
 public slots:
+    void renameCurrentCanvas(const QString &newName);
+    void setCurrentCanvas(const int &id);
 };
 
 #endif // CANVASWIDGET_H

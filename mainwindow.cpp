@@ -64,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
 
     mCanvasWidget = new CanvasWidget(mFillStrokeSettings, this);
-    mCanvas = mCanvasWidget->getCanvas();
+    mCanvas = mCanvasWidget->getCurrentCanvas();
 
     mFillStrokeSettings->setCanvasPtr(mCanvas);
 
@@ -207,6 +207,21 @@ MainWindow::MainWindow(QWidget *parent)
 
     mFontWidget = new FontsWidget(this);
     mToolBar->addWidget(mFontWidget);
+
+    mCurrentCanvasComboBox = new QComboBox(mToolBar);
+    mCurrentCanvasComboBox->addItem(mCanvas->getName());
+    QPushButton *newCanvasButton = new QPushButton("+", mToolBar);
+    mToolBar->addWidget(newCanvasButton);
+
+    connect(mCurrentCanvasComboBox, SIGNAL(editTextChanged(QString)),
+            mCanvasWidget, SLOT(renameCurrentCanvas(QString)));
+    connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
+            mCanvasWidget, SLOT(setCurrentCanvas(int)));
+    connect(newCanvasButton, SIGNAL(pressed()),
+            this, SLOT(createNewCanvas()));
+
+
+    mToolBar->addWidget(mCurrentCanvasComboBox);
 
     connect(mFontWidget, SIGNAL(fontSizeChanged(qreal)),
             mCanvas, SLOT(setFontSize(qreal)) );
@@ -352,6 +367,31 @@ MainWindow::~MainWindow()
 MainWindow *MainWindow::getInstance()
 {
     return mMainWindowInstance;
+}
+#include "newcanvasdialog.h"
+void MainWindow::createNewCanvas() {
+    QString defName = "Canvas " +
+            QString::number(mCurrentCanvasComboBox->count());
+    NewCanvasDialog dialog(defName, this);
+
+    if(dialog.exec() == QDialog::Accepted) {
+        Canvas *newCanvas = new Canvas(getFillStrokeSettings(),
+                                       mCanvasWidget,
+                                       dialog.getCanvasWidth(),
+                                       dialog.getCanvasHeight());
+
+        newCanvas->setName(dialog.getCanvasName());
+
+        mCanvasWidget->addCanvasToListAndSetAsCurrent(newCanvas);
+
+        disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
+                mCanvasWidget, SLOT(setCurrentCanvas(int)));
+        mCurrentCanvasComboBox->addItem(dialog.getCanvasName());
+        mCurrentCanvasComboBox->setCurrentIndex(
+                    mCurrentCanvasComboBox->count() - 1);
+        connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
+                mCanvasWidget, SLOT(setCurrentCanvas(int)));
+    }
 }
 
 void MainWindow::createDetachedUndoRedoStack()

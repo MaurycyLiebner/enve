@@ -99,7 +99,8 @@ SOURCES += main.cpp\
     pathoperations.cpp \
     Boxes/linkbox.cpp \
     actionbutton.cpp \
-    Boxes/boxpainthandler.cpp
+    Boxes/boxpainthandler.cpp \
+    newcanvasdialog.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -186,7 +187,8 @@ HEADERS  += mainwindow.h \
     pathoperations.h \
     Boxes/linkbox.h \
     actionbutton.h \
-    Boxes/boxpainthandler.h
+    Boxes/boxpainthandler.h \
+    newcanvasdialog.h
 
 RESOURCES += \
     resources.qrc

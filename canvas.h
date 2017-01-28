@@ -184,7 +184,9 @@ class Canvas : public BoxesGroup
     Q_OBJECT
 public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-                    CanvasWidget *canvasWidget);
+                    CanvasWidget *canvasWidget,
+                    int canvasWidth = 1920,
+                    int canvasHeight = 1080);
     ~Canvas();
     QRectF getPixBoundingRect();
     void addBoxToSelection(BoundingBox *box);
@@ -461,11 +463,11 @@ private:
 
     BoxesGroup *mCurrentBoxesGroup;
 
-    int mWidth = 1920;
-    int mHeight = 1080;
+    int mWidth;
+    int mHeight;
 
-    qreal mVisibleWidth = 1920;
-    qreal mVisibleHeight = 1080;
+    qreal mVisibleWidth;
+    qreal mVisibleHeight;
     bool mPivotUpdateNeeded = false;
 
     bool mFirstMouseMove = false;
