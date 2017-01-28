@@ -131,7 +131,6 @@ private:
     QPointF mLastPressPos;
     bool mMovingKeys = false;
 
-    Canvas *mCanvas;
     MainWindow *mMainWindow;
     QList<QrealKey*> mSelectedKeys;
 

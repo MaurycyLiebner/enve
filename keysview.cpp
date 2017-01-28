@@ -6,7 +6,6 @@
 KeysView::KeysView(BoxesListWidget *boxesList, QWidget *parent) : QWidget(parent)
 {
     mMainWindow = MainWindow::getInstance();
-    mCanvas = mMainWindow->getCanvas();
     mBoxesList = boxesList;
 
     setFocusPolicy(Qt::StrongFocus);

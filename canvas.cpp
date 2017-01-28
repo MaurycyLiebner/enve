@@ -36,6 +36,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mRotPivot->hide();
 
     mCurrentMode = MOVE_PATH;
+
+    //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
 }
 
@@ -155,22 +157,7 @@ void Canvas::scale(qreal scaleBy, QPointF absOrigin)
 }
 
 bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_F1) {
-        setCanvasMode(CanvasMode::MOVE_PATH);
-    } else if(event->key() == Qt::Key_F2) {
-        setCanvasMode(CanvasMode::MOVE_POINT);
-    } else if(event->key() == Qt::Key_F3) {
-        setCanvasMode(CanvasMode::ADD_POINT);
-    } else if(event->key() == Qt::Key_F4) {
-        setCanvasMode(CanvasMode::ADD_CIRCLE);
-    } else if(event->key() == Qt::Key_F5) {
-        setCanvasMode(CanvasMode::ADD_RECTANGLE);
-    } else if(event->key() == Qt::Key_F6) {
-        setCanvasMode(CanvasMode::ADD_TEXT);
-    } else {
-        return false;
-    }
-    return true;
+    return false;
 }
 
 bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
@@ -666,27 +653,11 @@ void Canvas::updatePivot() {
 
 void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
-    if(mCurrentMode == MOVE_PATH) {
-        mCanvasWidget->setCursor(QCursor(Qt::ArrowCursor) );
-    } else if(mCurrentMode == MOVE_POINT) {
-        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-node.xpm"), 0, 0) );
-    } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor_color_picker.png"), 2, 20) );
-    } else if(mCurrentMode == ADD_CIRCLE) {
-        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-ellipse.xpm"), 4, 4) );
-    } else if(mCurrentMode == ADD_RECTANGLE) {
-        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-rect.xpm"), 4, 4) );
-    } else if(mCurrentMode == ADD_TEXT) {
-        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-text.xpm"), 4, 4) );
-    } else {
-        mCanvasWidget->setCursor(QCursor(QPixmap(":/curors/cursor-pen.xpm"), 4, 4) );
-    }
+
     clearAllPointsSelection();
     if(mCurrentMode == MOVE_PATH || mCurrentMode == MOVE_POINT) {
         schedulePivotUpdate();
     }
-
-    mMainWindow->updateCanvasModeButtonsChecked(mode);
 }
 
 void Canvas::clearAndDisableInput() {

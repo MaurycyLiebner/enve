@@ -378,22 +378,20 @@ public slots:
     void setFontFamilyAndStyle(QString family, QString style);
     void setFontSize(qreal size);
 
+    const CanvasMode &getCurrentCanvasMode() const {
+        return mCurrentMode;
+    }
+
     void setMovePathMode() {
         setCanvasMode(MOVE_PATH);
-
-        callUpdateSchedulers();
     }
 
     void setMovePointMode() {
         setCanvasMode(MOVE_POINT);
-
-        callUpdateSchedulers();
     }
 
     void setAddPointMode() {
         setCanvasMode(ADD_POINT);
-
-        callUpdateSchedulers();
     }
 
     void setRectangleMode() {

@@ -76,6 +76,8 @@ private:
     QAction *mActionHighQualityView;
     QAction *mActionEffectsPaintEnabled;
 
+    QPushButton *mNewCanvasButton;
+
     FontsWidget *mFontWidget = NULL;
 
     QString mCurrentFilePath = "";
@@ -129,7 +131,9 @@ private:
     bool mPreviewInterrupted = false;
 
     ObjectSettingsWidget *mObjectSettingsWidget = NULL;
-protected:    
+    void setupToolBar();
+    void connectToolBarActions();
+protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
     void closeEvent(QCloseEvent *e);
@@ -190,7 +194,7 @@ public:
     void updateDisplayedFillStrokeSettings();
     void scheduleDisplayedFillStrokeSettingsUpdate();
     void updateDisplayedFillStrokeSettingsIfNeeded();
-    void updateCanvasModeButtonsChecked(CanvasMode currentMode);
+    void updateCanvasModeButtonsChecked();
 
     void addBoxAwaitingUpdate(BoundingBox *box);
     void setCurrentShapesMenuBox(BoundingBox *box);

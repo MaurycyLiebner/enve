@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    mSoundComposition->addSound(
 //                new SingleSound("/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/lektor.wav"));
 
+    setupToolBar();
+
     BrushStroke::loadStrokePixmaps();
     mCurrentUndoRedoStack = &mUndoRedoStack;
 
@@ -63,170 +65,20 @@ MainWindow::MainWindow(QWidget *parent)
     mRightDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
 
-    mCanvasWidget = new CanvasWidget(mFillStrokeSettings, this);
-    mCanvas = mCanvasWidget->getCurrentCanvas();
-
-    mFillStrokeSettings->setCanvasPtr(mCanvas);
-
     mBottomDock = new QDockWidget(this);
-    mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
-    mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();
-    mKeysView = mBoxesListAnimationDockWidget->getKeysView();
-    mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mBottomDock->setFeatures(0);
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
+    mCanvasWidget = new CanvasWidget(this);
 
-    mToolBar = new QToolBar(this);
-    mToolBar->setMovable(false);
+    mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
+    mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();
+    mKeysView = mBoxesListAnimationDockWidget->getKeysView();
+    mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
-
-    mToolBar->setIconSize(QSize(24, 24));
-
-    mToolBar->addSeparator();
-
-    mMovePathMode = new ActionButton(
-                ":/icons/draw_select.png",
-                "F1", this);
-    mMovePathMode->setCheckable(":/icons/draw_select_checked.png");
-    mMovePathMode->setChecked(true);
-    mToolBar->addWidget(mMovePathMode);
-    connect(mMovePathMode, SIGNAL(pressed()),
-            mCanvas, SLOT(setMovePathMode()) );
-
-    mMovePointMode = new ActionButton(
-                ":/icons/draw_node.png",
-                "F2", this);
-    mMovePointMode->setCheckable(":/icons/draw_node_checked.png");
-    mToolBar->addWidget(mMovePointMode);
-    connect(mMovePointMode, SIGNAL(pressed()),
-            mCanvas, SLOT(setMovePointMode()) );
-
-    mAddPointMode = new ActionButton(
-                ":/icons/draw_pen.png",
-                "F3", this);
-    mAddPointMode->setCheckable(":/icons/draw_pen_checked.png");
-    mToolBar->addWidget(mAddPointMode);
-    connect(mAddPointMode, SIGNAL(pressed()),
-            mCanvas, SLOT(setAddPointMode()) );
-
-    mCircleMode = new ActionButton(
-                ":/icons/draw_arc.png",
-                "F4", this);
-    mCircleMode->setCheckable(":/icons/draw_arc_checked.png");
-    mToolBar->addWidget(mCircleMode);
-    connect(mCircleMode, SIGNAL(pressed()),
-            mCanvas, SLOT(setCircleMode()) );
-
-    mToolBar->addSeparator();
-
-    mRectangleMode = new ActionButton(
-                ":/icons/draw_rect.png",
-                "F5", this);
-    mRectangleMode->setCheckable(":/icons/draw_rect_checked.png");
-    mToolBar->addWidget(mRectangleMode);
-    connect(mRectangleMode, SIGNAL(pressed()),
-            mCanvas, SLOT(setRectangleMode()) );
-
-    mTextMode = new ActionButton(
-                ":/icons/draw_text.png",
-                "F6", this);
-    mTextMode->setCheckable(":/icons/draw_text_checked.png");
-    mToolBar->addWidget(mTextMode);
-    connect(mTextMode, SIGNAL(pressed()),
-            mCanvas, SLOT(setTextMode()) );
-
-
-    mToolBar->addSeparator();
-
-    mActionConnectPoints = new ActionButton(
-                ":/icons/node_join_segment.png",
-                "CONNECT POINTS", this);
-    mToolBar->addWidget(mActionConnectPoints);
-    connect(mActionConnectPoints, SIGNAL(pressed()),
-            mCanvas, SLOT(connectPointsSlot()) );
-
-    mActionDisconnectPoints = new ActionButton(
-                ":/icons/node_delete_segment.png",
-                "DISCONNECT POINTS", this);
-    mToolBar->addWidget(mActionDisconnectPoints);
-    connect(mActionDisconnectPoints, SIGNAL(pressed()),
-            mCanvas, SLOT(disconnectPointsSlot()) );
-
-    mActionMergePoints = new ActionButton(
-                ":/icons/node_join.png",
-                "MERGE POINTS", this);
-    mToolBar->addWidget(mActionMergePoints);
-    connect(mActionMergePoints, SIGNAL(pressed()),
-            mCanvas, SLOT(mergePointsSlot()) );
-//
-    mToolBar->addSeparator();
-
-    mActionSymmetricPointCtrls = new ActionButton(
-                ":/icons/node_symmetric.png",
-                "SYMMETRIC POINTS", this);
-    mToolBar->addWidget(mActionSymmetricPointCtrls);
-    connect(mActionSymmetricPointCtrls, SIGNAL(pressed()),
-            mCanvas, SLOT(makePointCtrlsSymmetric()) );
-
-    mActionSmoothPointCtrls = new ActionButton(
-                ":/icons/node_smooth.png",
-                "SMOOTH POINTS", this);
-    mToolBar->addWidget(mActionSmoothPointCtrls);
-    connect(mActionSmoothPointCtrls, SIGNAL(pressed()),
-            mCanvas, SLOT(makePointCtrlsSmooth()) );
-
-    mActionCornerPointCtrls = new ActionButton(
-                ":/icons/node_cusp.png",
-                "CORNER POINTS", this);
-    mToolBar->addWidget(mActionCornerPointCtrls);
-    connect(mActionCornerPointCtrls, SIGNAL(pressed()),
-            mCanvas, SLOT(makePointCtrlsCorner()) );
-//
-    mToolBar->addSeparator();
-
-    mActionLine = new ActionButton(
-                ":/icons/node_line.png",
-                "MAKE SEGMENT LINE", this);
-    mToolBar->addWidget(mActionLine);
-    connect(mActionLine, SIGNAL(pressed()),
-            mCanvas, SLOT(makeSegmentLine()) );
-
-    mActionCurve = new ActionButton(
-                ":/icons/node_curve.png",
-                "MAKE SEGMENT CURVE", this);
-    mToolBar->addWidget(mActionCurve);
-    connect(mActionCurve, SIGNAL(pressed()),
-            mCanvas, SLOT(makeSegmentCurve()) );
-
-    mToolBar->addSeparator();
-//
-    addToolBar(mToolBar);
-
-    mFontWidget = new FontsWidget(this);
-    mToolBar->addWidget(mFontWidget);
-
-    mCurrentCanvasComboBox = new QComboBox(mToolBar);
-    mCurrentCanvasComboBox->addItem(mCanvas->getName());
-    QPushButton *newCanvasButton = new QPushButton("+", mToolBar);
-    mToolBar->addWidget(newCanvasButton);
-
-    connect(mCurrentCanvasComboBox, SIGNAL(editTextChanged(QString)),
-            mCanvasWidget, SLOT(renameCurrentCanvas(QString)));
-    connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-            mCanvasWidget, SLOT(setCurrentCanvas(int)));
-    connect(newCanvasButton, SIGNAL(pressed()),
-            this, SLOT(createNewCanvas()));
-
-
-    mToolBar->addWidget(mCurrentCanvasComboBox);
-
-    connect(mFontWidget, SIGNAL(fontSizeChanged(qreal)),
-            mCanvas, SLOT(setFontSize(qreal)) );
-    connect(mFontWidget, SIGNAL(fontFamilyAndStyleChanged(QString, QString)),
-            mCanvas, SLOT(setFontFamilyAndStyle(QString, QString)) );
+    mFillStrokeSettings->setCanvasPtr(mCanvas);
 
 //
     mMenuBar = new QMenuBar(this);
@@ -356,12 +208,170 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectSettingsWidget = new ObjectSettingsWidget(this);
     effectsMenuWidget->setWidget(mObjectSettingsWidget);
     addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
+
+    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
+    canvas->setName("Canvas 0");
+    mCanvasWidget->addCanvasToListAndSetAsCurrent(canvas);
+    mCanvas = mCanvasWidget->getCurrentCanvas();
+    mCurrentCanvasComboBox->addItem(mCanvas->getName());
+
+    connectToolBarActions();
 }
 
 MainWindow::~MainWindow()
 {
     //mPaintControlerThread->terminate();
     mPaintControlerThread->quit();
+}
+
+void MainWindow::setupToolBar() {
+    mToolBar = new QToolBar(this);
+    mToolBar->setMovable(false);
+
+
+    mToolBar->setIconSize(QSize(24, 24));
+
+    mToolBar->addSeparator();
+
+    mMovePathMode = new ActionButton(
+                ":/icons/draw_select.png",
+                "F1", this);
+    mMovePathMode->setCheckable(":/icons/draw_select_checked.png");
+    mMovePathMode->setChecked(true);
+    mToolBar->addWidget(mMovePathMode);
+
+    mMovePointMode = new ActionButton(
+                ":/icons/draw_node.png",
+                "F2", this);
+    mMovePointMode->setCheckable(":/icons/draw_node_checked.png");
+    mToolBar->addWidget(mMovePointMode);
+
+    mAddPointMode = new ActionButton(
+                ":/icons/draw_pen.png",
+                "F3", this);
+    mAddPointMode->setCheckable(":/icons/draw_pen_checked.png");
+    mToolBar->addWidget(mAddPointMode);
+
+    mCircleMode = new ActionButton(
+                ":/icons/draw_arc.png",
+                "F4", this);
+    mCircleMode->setCheckable(":/icons/draw_arc_checked.png");
+    mToolBar->addWidget(mCircleMode);
+
+    mToolBar->addSeparator();
+
+    mRectangleMode = new ActionButton(
+                ":/icons/draw_rect.png",
+                "F5", this);
+    mRectangleMode->setCheckable(":/icons/draw_rect_checked.png");
+    mToolBar->addWidget(mRectangleMode);
+
+    mTextMode = new ActionButton(
+                ":/icons/draw_text.png",
+                "F6", this);
+    mTextMode->setCheckable(":/icons/draw_text_checked.png");
+    mToolBar->addWidget(mTextMode);
+
+
+    mToolBar->addSeparator();
+
+    mActionConnectPoints = new ActionButton(
+                ":/icons/node_join_segment.png",
+                "CONNECT POINTS", this);
+    mToolBar->addWidget(mActionConnectPoints);
+
+    mActionDisconnectPoints = new ActionButton(
+                ":/icons/node_delete_segment.png",
+                "DISCONNECT POINTS", this);
+    mToolBar->addWidget(mActionDisconnectPoints);
+
+    mActionMergePoints = new ActionButton(
+                ":/icons/node_join.png",
+                "MERGE POINTS", this);
+    mToolBar->addWidget(mActionMergePoints);
+//
+    mToolBar->addSeparator();
+
+    mActionSymmetricPointCtrls = new ActionButton(
+                ":/icons/node_symmetric.png",
+                "SYMMETRIC POINTS", this);
+    mToolBar->addWidget(mActionSymmetricPointCtrls);
+
+    mActionSmoothPointCtrls = new ActionButton(
+                ":/icons/node_smooth.png",
+                "SMOOTH POINTS", this);
+    mToolBar->addWidget(mActionSmoothPointCtrls);
+
+    mActionCornerPointCtrls = new ActionButton(
+                ":/icons/node_cusp.png",
+                "CORNER POINTS", this);
+    mToolBar->addWidget(mActionCornerPointCtrls);
+
+//
+    mToolBar->addSeparator();
+
+    mActionLine = new ActionButton(
+                ":/icons/node_line.png",
+                "MAKE SEGMENT LINE", this);
+    mToolBar->addWidget(mActionLine);
+
+    mActionCurve = new ActionButton(
+                ":/icons/node_curve.png",
+                "MAKE SEGMENT CURVE", this);
+    mToolBar->addWidget(mActionCurve);
+
+    mToolBar->addSeparator();
+//
+    mFontWidget = new FontsWidget(this);
+    mToolBar->addWidget(mFontWidget);
+
+    mCurrentCanvasComboBox = new QComboBox(mToolBar);
+    mNewCanvasButton = new QPushButton("+", mToolBar);
+    mToolBar->addWidget(mNewCanvasButton);
+    mToolBar->addWidget(mCurrentCanvasComboBox);
+
+    addToolBar(mToolBar);
+}
+
+void MainWindow::connectToolBarActions() {
+    connect(mMovePathMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setMovePathMode()) );
+    connect(mMovePointMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setMovePointMode()) );
+    connect(mAddPointMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setAddPointMode()) );
+    connect(mCircleMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setCircleMode()) );
+    connect(mRectangleMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setRectangleMode()) );
+    connect(mTextMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setTextMode()) );
+    connect(mActionConnectPoints, SIGNAL(pressed()),
+            mCanvas, SLOT(connectPointsSlot()) );
+    connect(mActionDisconnectPoints, SIGNAL(pressed()),
+            mCanvas, SLOT(disconnectPointsSlot()) );
+    connect(mActionMergePoints, SIGNAL(pressed()),
+            mCanvas, SLOT(mergePointsSlot()) );
+    connect(mActionSymmetricPointCtrls, SIGNAL(pressed()),
+            mCanvas, SLOT(makePointCtrlsSymmetric()) );
+    connect(mActionSmoothPointCtrls, SIGNAL(pressed()),
+            mCanvas, SLOT(makePointCtrlsSmooth()) );
+    connect(mActionCornerPointCtrls, SIGNAL(pressed()),
+            mCanvas, SLOT(makePointCtrlsCorner()) );
+    connect(mActionLine, SIGNAL(pressed()),
+            mCanvas, SLOT(makeSegmentLine()) );
+    connect(mActionCurve, SIGNAL(pressed()),
+            mCanvas, SLOT(makeSegmentCurve()) );
+    connect(mCurrentCanvasComboBox, SIGNAL(editTextChanged(QString)),
+            mCanvasWidget, SLOT(renameCurrentCanvas(QString)));
+    connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
+            mCanvasWidget, SLOT(setCurrentCanvas(int)));
+    connect(mNewCanvasButton, SIGNAL(pressed()),
+            this, SLOT(createNewCanvas()));
+    connect(mFontWidget, SIGNAL(fontSizeChanged(qreal)),
+            mCanvas, SLOT(setFontSize(qreal)) );
+    connect(mFontWidget, SIGNAL(fontFamilyAndStyleChanged(QString, QString)),
+            mCanvas, SLOT(setFontFamilyAndStyle(QString, QString)) );
 }
 
 MainWindow *MainWindow::getInstance()
@@ -408,7 +418,10 @@ void MainWindow::deleteDetachedUndoRedoStack()
     mCurrentUndoRedoStack = &mUndoRedoStack;
 }
 
-void MainWindow::updateCanvasModeButtonsChecked(CanvasMode currentMode) {
+void MainWindow::updateCanvasModeButtonsChecked() {
+    if(mCanvasWidget->hasNoCanvas()) return;
+    const CanvasMode &currentMode =
+            mCanvasWidget->getCurrentCanvas()->getCurrentCanvasMode();
     mMovePathMode->setChecked(currentMode == MOVE_PATH);
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
     mAddPointMode->setChecked(currentMode == ADD_POINT);
@@ -811,7 +824,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         saveFile();
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
         openFile();
-    } else if(mCanvas->processFilteredKeyEvent(event) ) {
+    } else if(mCanvasWidget->processFilteredKeyEvent(event) ) {
     } else if(mKeysView->processFilteredKeyEvent(event)) {
     } else if(mBoxesListAnimationDockWidget->processFilteredKeyEvent(event) ) {
     } else {
