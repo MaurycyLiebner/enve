@@ -73,17 +73,13 @@ QPointF MovablePoint::getAbsolutePos() const {
     return mapRelativeToAbsolute(getRelativePos());
 }
 
-void MovablePoint::draw(QPainter *p)
-{
-    if(isHidden()) {
-        return;
-    }
+void MovablePoint::drawOnAbsPos(QPainter *p,
+                                const QPointF &absPos) {
     if(mSelected) {
         p->setBrush(QColor(255, 0, 0));
     } else {
         p->setBrush(QColor(255, 175, 175));
     }
-    QPointF absPos = getAbsolutePos();
     p->drawEllipse(absPos,
                    mRadius, mRadius);
     if(mRelPos.isKeyOnCurrentFrame()) {
@@ -95,12 +91,20 @@ void MovablePoint::draw(QPainter *p)
     }
 }
 
+void MovablePoint::draw(QPainter *p) {
+    if(isHidden()) {
+        return;
+    }
+    QPointF absPos = getAbsolutePos();
+    drawOnAbsPos(p, absPos);
+}
+
 BoundingBox *MovablePoint::getParent()
 {
     return mParent;
 }
 
-bool MovablePoint::isPointAt(QPointF absPoint)
+bool MovablePoint::isPointAtAbsPos(QPointF absPoint)
 {
     if(isHidden()) {
         return false;
@@ -133,7 +137,7 @@ void MovablePoint::scaleRelativeToSavedPivot(qreal sx, qreal sy) {
     moveToRel(mat.map(mSavedRelPos));
 }
 
-void MovablePoint::saveTransformPivot(QPointF absPivot) {
+void MovablePoint::saveTransformPivotAbsPos(QPointF absPivot) {
     mSavedTransformPivot = mParent->mapAbsPosToRel(absPivot);
 }
 
@@ -142,15 +146,16 @@ void MovablePoint::moveToRel(QPointF relPos) {
 }
 
 void MovablePoint::moveBy(QPointF relTranslation) {
-    mRelPos.incSavedValueToCurrentValue(relTranslation.x(), relTranslation.y());
+    mRelPos.incSavedValueToCurrentValue(relTranslation.x(),
+                                        relTranslation.y());
 }
 
 void MovablePoint::moveByAbs(QPointF absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(mRelPos.getSavedValue()) + absTranslatione);
+    moveToAbs(mapRelativeToAbsolute(mRelPos.getSavedValue()) +
+              absTranslatione);
 }
 
-void MovablePoint::moveToAbs(QPointF absPos)
-{
+void MovablePoint::moveToAbs(QPointF absPos) {
     setAbsolutePos(absPos, false);
 }
 

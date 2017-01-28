@@ -36,6 +36,15 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
     mCombinedTransformMatrix.reset();
 }
 
+#include "linkbox.h"
+BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
+    return new InternalLinkBox(this, parent);
+}
+
+BoundingBox *BoundingBox::createSameTransformationLink(BoxesGroup *parent) {
+    return new SameTransformInternalLink(this, parent);
+}
+
 void BoundingBox::setBaseTransformation(const QMatrix &matrix) {
     mTransformAnimator.setBaseTransformation(matrix);
 }
@@ -470,6 +479,8 @@ void BoundingBox::updateEffectsMargin() {
 void BoundingBox::scheduleEffectsMarginUpdate() {
     scheduleAwaitUpdate();
     mEffectsMarginUpdateNeeded = true;
+    if(mParent == NULL) return;
+    mParent->scheduleEffectsMarginUpdate();
 }
 
 void BoundingBox::resetScale() {
@@ -521,6 +532,14 @@ bool BoundingBox::isRect() {
 
 bool BoundingBox::isText() {
     return mType == TYPE_TEXT;
+}
+
+bool BoundingBox::isInternalLink() {
+    return mType == TYPE_INTERNAL_LINK;
+}
+
+bool BoundingBox::isExternalLink() {
+    return mType == TYPE_EXTERNAL_LINK;
 }
 
 void BoundingBox::copyTransformationTo(BoundingBox *box) {
@@ -634,7 +653,7 @@ void BoundingBox::drawBoundingRect(QPainter *p) {
     drawAsBoundingRect(p, mRelBoundingRectPath);
 }
 
-const QPainterPath &BoundingBox::getBoundingRectPath() {
+const QPainterPath &BoundingBox::getRelBoundingRectPath() {
     return mRelBoundingRectPath;
 }
 
@@ -699,7 +718,7 @@ void BoundingBox::setRelativePos(QPointF relPos, bool saveUndoRedo) {
     mTransformAnimator.setPosition(relPos.x(), relPos.y() );
 }
 
-void BoundingBox::saveTransformPivot(QPointF absPivot) {
+void BoundingBox::saveTransformPivotAbsPos(QPointF absPivot) {
     mSavedTransformPivot =
             mParent->mapAbsPosToRel(absPivot) -
             mTransformAnimator.getPivot();

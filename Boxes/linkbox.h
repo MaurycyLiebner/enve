@@ -20,46 +20,85 @@ class InternalLinkBox : public BoundingBox
 {
     Q_OBJECT
 public:
-    InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
-        BoundingBox(parent, TYPE_LINK) {
-        mLinkTarget = linkTarget;
-        connect(linkTarget, SIGNAL(scheduleAwaitUpdateAllLinkBoxes()),
-                this, SLOT(scheduleAwaitUpdateSLOT()));
-    }
+    InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent);
 
     QPixmap renderPixProvidedTransform(
                         const QMatrix &renderTransform,
-                        QPointF *drawPos) {
-        return mLinkTarget->renderPixProvidedTransform(renderTransform,
-                                                       drawPos);
-    }
+                        QPointF *drawPos);
 
     QPixmap getAllUglyPixmapProvidedTransform(
                         const QMatrix &allUglyTransform,
-                        QRectF *allUglyBoundingRectP) {
-        return mLinkTarget->getAllUglyPixmapProvidedTransform(allUglyTransform,
-                                                       allUglyBoundingRectP);
-    }
+                        QRectF *allUglyBoundingRectP);
 
     QPixmap getPrettyPixmapProvidedTransform(
                             const QMatrix &transform,
-                            QRectF *pixBoundingRectClippedToViewP) {
-        return mLinkTarget->getPrettyPixmapProvidedTransform(transform,
-                                                pixBoundingRectClippedToViewP);
-    }
+                            QRectF *pixBoundingRectClippedToViewP);
 
     void drawSelected(QPainter *p, CanvasMode);
     void updateBoundingRect();
     bool relPointInsidePath(QPointF point);
     QPointF getRelCenterPosition();
     qreal getEffectsMargin();
+
+    BoundingBox *getLinkTarget();
+
+    BoundingBox *createLink(BoxesGroup *parent);
+
+    BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 public slots:
-    void scheduleAwaitUpdateSLOT() {
-        scheduleAwaitUpdate();
+    void scheduleAwaitUpdateSLOT();
+
+protected:
+    BoundingBox *mLinkTarget = NULL;
+};
+
+class SameTransformInternalLink : public InternalLinkBox
+{
+public:
+    SameTransformInternalLink(BoundingBox *linkTarget,
+                              BoxesGroup *parent);
+
+    void updateCombinedTransform();
+
+    QMatrix getRelativeTransform() const;
+
+    virtual const QPainterPath &getRelBoundingRectPath();
+
+    qreal getEffectsMargin();
+};
+
+class InternalLinkBoxesGroup : public BoxesGroup
+{
+public:
+    InternalLinkBoxesGroup(BoxesGroup *linkTarget,
+                           BoxesGroup *parent) : BoxesGroup(parent) {
+        mLinkTarget = linkTarget;
+        setType(TYPE_INTERNAL_LINK);
     }
 
-private:
+    BoundingBox *createLink(BoxesGroup *parent) {
+        return mLinkTarget->createLink(parent);
+    }
+
+    BoundingBox *createSameTransformationLink(BoxesGroup *parent) {
+        return mLinkTarget->createSameTransformationLink(parent);
+    }
+protected:
     BoundingBox *mLinkTarget = NULL;
+};
+
+class SameTransformInternalLinkBoxesGroup : public InternalLinkBoxesGroup {
+public:
+    SameTransformInternalLinkBoxesGroup(BoxesGroup *linkTarget,
+                                        BoxesGroup *parent);
+
+    void updateCombinedTransform();
+
+    QMatrix getRelativeTransform() const;
+
+    virtual const QPainterPath &getRelBoundingRectPath();
+
+    qreal getEffectsMargin();
 };
 
 #endif // LINKBOX_H

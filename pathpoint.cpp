@@ -188,13 +188,13 @@ void PathPoint::rectPointsSelection(QRectF absRect, QList<MovablePoint*> *list) 
 MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
 {
     if(canvasMode == CanvasMode::MOVE_POINT) {
-        if(mStartCtrlPt->isPointAt(absPos)) {
+        if(mStartCtrlPt->isPointAtAbsPos(absPos)) {
             return mStartCtrlPt;
-        } else if (mEndCtrlPt->isPointAt(absPos)) {
+        } else if (mEndCtrlPt->isPointAtAbsPos(absPos)) {
             return mEndCtrlPt;
         }
     }
-    if (isPointAt(absPos)) {
+    if (isPointAtAbsPos(absPos)) {
         return this;
     }
     return NULL;

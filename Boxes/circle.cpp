@@ -147,13 +147,13 @@ MovablePoint *Circle::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
         }
     }
     if(pointToReturn == NULL) {
-        if(mHorizontalRadiusPoint->isPointAt(absPtPos) ) {
+        if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos) ) {
             return mHorizontalRadiusPoint;
         }
-        if(mVerticalRadiusPoint->isPointAt(absPtPos) ) {
+        if(mVerticalRadiusPoint->isPointAtAbsPos(absPtPos) ) {
             return mVerticalRadiusPoint;
         }
-        if(mCenter->isPointAt(absPtPos)) {
+        if(mCenter->isPointAtAbsPos(absPtPos)) {
             return mCenter;
         }
     }

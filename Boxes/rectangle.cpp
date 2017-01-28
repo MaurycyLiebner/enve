@@ -147,13 +147,13 @@ MovablePoint *Rectangle::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMo
         }
     }
     if(pointToReturn == NULL) {
-        if(mTopLeftPoint->isPointAt(absPtPos)) {
+        if(mTopLeftPoint->isPointAtAbsPos(absPtPos)) {
             return mTopLeftPoint;
         }
-        if(mBottomRightPoint->isPointAt(absPtPos) ) {
+        if(mBottomRightPoint->isPointAtAbsPos(absPtPos) ) {
             return mBottomRightPoint;
         }
-        if(mRadiusPoint->isPointAt(absPtPos) ) {
+        if(mRadiusPoint->isPointAtAbsPos(absPtPos) ) {
             return mRadiusPoint;
         }
     }

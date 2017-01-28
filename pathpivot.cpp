@@ -89,7 +89,7 @@ void PathPivot::startScaling()
 bool PathPivot::handleMousePress(QPointF absPressPos)
 {
     if(mHidden) return false;
-    if(isPointAt(absPressPos)) {
+    if(isPointAtAbsPos(absPressPos)) {
         select();
         return true;
     }/* else {

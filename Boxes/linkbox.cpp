@@ -4,9 +4,10 @@
 
 ExternalLinkBox::ExternalLinkBox(QString srcFile, BoxesGroup *parent) :
     BoxesGroup(parent) {
+
     mSrc = srcFile;
     reload();
-    setType(TYPE_LINK);
+    setType(TYPE_EXTERNAL_LINK);
     setName("Link " + srcFile);
 }
 
@@ -49,6 +50,22 @@ qreal InternalLinkBox::getEffectsMargin() {
     return mLinkTarget->getEffectsMargin();
 }
 
+BoundingBox *InternalLinkBox::getLinkTarget() {
+    return mLinkTarget;
+}
+
+BoundingBox *InternalLinkBox::createLink(BoxesGroup *parent) {
+    return mLinkTarget->createLink(parent);
+}
+
+BoundingBox *InternalLinkBox::createSameTransformationLink(BoxesGroup *parent) {
+    return mLinkTarget->createSameTransformationLink(parent);
+}
+
+void InternalLinkBox::scheduleAwaitUpdateSLOT() {
+    scheduleAwaitUpdate();
+}
+
 void InternalLinkBox::updateBoundingRect() {
     mRelBoundingRect = mLinkTarget->getRelBoundingRect();
     qreal effectsMargin = mLinkTarget->getEffectsMargin()*
@@ -60,16 +77,38 @@ void InternalLinkBox::updateBoundingRect() {
     BoundingBox::updateBoundingRect();
 }
 
+InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
+    BoundingBox(parent, TYPE_INTERNAL_LINK) {
+    mLinkTarget = linkTarget;
+    connect(linkTarget, SIGNAL(scheduleAwaitUpdateAllLinkBoxes()),
+            this, SLOT(scheduleAwaitUpdateSLOT()));
+}
+
+QPixmap InternalLinkBox::renderPixProvidedTransform(const QMatrix &renderTransform, QPointF *drawPos) {
+    return mLinkTarget->renderPixProvidedTransform(renderTransform,
+                                                   drawPos);
+}
+
+QPixmap InternalLinkBox::getAllUglyPixmapProvidedTransform(const QMatrix &allUglyTransform, QRectF *allUglyBoundingRectP) {
+    return mLinkTarget->getAllUglyPixmapProvidedTransform(allUglyTransform,
+                                                          allUglyBoundingRectP);
+}
+
+QPixmap InternalLinkBox::getPrettyPixmapProvidedTransform(const QMatrix &transform, QRectF *pixBoundingRectClippedToViewP) {
+    return mLinkTarget->getPrettyPixmapProvidedTransform(transform,
+                                                         pixBoundingRectClippedToViewP);
+}
+
 void InternalLinkBox::drawSelected(QPainter *p, CanvasMode)
 {
     if(mVisible) {
         p->save();
 
-//        QPainterPath mapped;
-//        mapped.addRect(mPixmap.rect());
-//        mapped = mCombinedTransformMatrix.map(mapped);
-//        QPen pen = p->pen();
-//        p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
+        //        QPainterPath mapped;
+        //        mapped.addRect(mPixmap.rect());
+        //        mapped = mCombinedTransformMatrix.map(mapped);
+        //        QPen pen = p->pen();
+        //        p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
 //        p->setBrush(Qt::NoBrush);
 //        p->drawPath(mapped);
 //        p->setPen(pen);
@@ -82,4 +121,68 @@ void InternalLinkBox::drawSelected(QPainter *p, CanvasMode)
 bool InternalLinkBox::relPointInsidePath(QPointF point)
 {
     return mLinkTarget->relPointInsidePath(point);
+}
+
+SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget, BoxesGroup *parent) :
+    InternalLinkBox(linkTarget, parent) {
+
+}
+
+void SameTransformInternalLink::updateCombinedTransform() {
+    if(mParent == NULL) {
+        updateAfterCombinedTransformationChanged();
+    } else {
+        mCombinedTransformMatrix = mLinkTarget->getRelativeTransform()*
+                mParent->getCombinedTransform();
+
+
+        updateAfterCombinedTransformationChanged();
+
+        scheduleAwaitUpdate();
+        updateUglyPaintTransform();
+    }
+}
+
+QMatrix SameTransformInternalLink::getRelativeTransform() const {
+    return mLinkTarget->getRelativeTransform();
+}
+
+const QPainterPath &SameTransformInternalLink::getRelBoundingRectPath() {
+    return mLinkTarget->getRelBoundingRectPath();
+}
+
+qreal SameTransformInternalLink::getEffectsMargin() {
+    return mLinkTarget->getEffectsMargin();
+}
+
+SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(BoxesGroup *linkTarget, BoxesGroup *parent) :
+    InternalLinkBoxesGroup(linkTarget, parent) {
+
+}
+
+void SameTransformInternalLinkBoxesGroup::updateCombinedTransform() {
+    if(mParent == NULL) {
+        updateAfterCombinedTransformationChanged();
+    } else {
+        mCombinedTransformMatrix = mLinkTarget->getRelativeTransform()*
+                mParent->getCombinedTransform();
+
+
+        updateAfterCombinedTransformationChanged();
+
+        scheduleAwaitUpdate();
+        updateUglyPaintTransform();
+    }
+}
+
+QMatrix SameTransformInternalLinkBoxesGroup::getRelativeTransform() const {
+    return mLinkTarget->getRelativeTransform();
+}
+
+const QPainterPath &SameTransformInternalLinkBoxesGroup::getRelBoundingRectPath() {
+    return mLinkTarget->getRelBoundingRectPath();
+}
+
+qreal SameTransformInternalLinkBoxesGroup::getEffectsMargin() {
+    return mLinkTarget->getEffectsMargin();
 }

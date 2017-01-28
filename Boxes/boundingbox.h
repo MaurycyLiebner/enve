@@ -33,7 +33,8 @@ enum BoundingBoxType {
     TYPE_TEXT,
     TYPE_GROUP,
     TYPE_CANVAS,
-    TYPE_LINK
+    TYPE_INTERNAL_LINK,
+    TYPE_EXTERNAL_LINK
 };
 
 class BoxesGroup;
@@ -56,6 +57,9 @@ class BoundingBox : public QObject, public Transformable
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
     BoundingBox(BoundingBoxType type);
+
+    virtual BoundingBox *createLink(BoxesGroup *parent);
+    virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 
     virtual void setFont(QFont) {}
     virtual void setFontSize(qreal) {}
@@ -84,7 +88,7 @@ public:
 
     QPointF getAbsolutePos();
 
-    void updateCombinedTransform();
+    virtual void updateCombinedTransform();
     void moveBy(QPointF trans);
 
     void startTransform();
@@ -132,7 +136,7 @@ public:
 
     virtual PathPoint *createNewPointOnLineNear(QPointF, bool) { return NULL; }
     bool isVectorPath();
-    void saveTransformPivot(QPointF absPivot);
+    void saveTransformPivotAbsPos(QPointF absPivot);
 
     void setName(QString name);
     QString getName();
@@ -200,6 +204,8 @@ public:
     bool isCircle();
     bool isRect();
     bool isText();
+    bool isInternalLink();
+    bool isExternalLink();
     TransformAnimator *getTransformAnimator();
     void disablePivotAutoAdjust();
     void enablePivotAutoAdjust();
@@ -235,7 +241,7 @@ public:
 
     void setCompositionMode(QPainter::CompositionMode compositionMode);
 
-    void updateEffectsMargin();
+    virtual void updateEffectsMargin();
 
     void scheduleEffectsMarginUpdate();
     void updateEffectsMarginIfNeeded();
@@ -249,8 +255,8 @@ public:
     void setAnimated(bool bT);
     virtual void updateBoundingRect();
     void updatePixBoundingRectClippedToView();
-    const QPainterPath &getBoundingRectPath();
-    QMatrix getRelativeTransform() const;
+    virtual const QPainterPath &getRelBoundingRectPath();
+    virtual QMatrix getRelativeTransform() const;
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
 
     QRectF getRelBoundingRect() const {
@@ -274,7 +280,7 @@ public:
                         QRectF *allUglyBoundingRectP);
     virtual QPixmap getPrettyPixmapProvidedTransform(
                         const QMatrix &transform,
-                        QRectF *pixBoundingRectClippedToViewP);
+            QRectF *pixBoundingRectClippedToViewP);
 protected:
     QRectF mRelBoundingRect;
 

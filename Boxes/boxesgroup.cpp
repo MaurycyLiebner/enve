@@ -51,6 +51,25 @@ void BoxesGroup::loadFromSql(int boundingBoxId) {
     loadChildrenFromSql(boundingBoxId, false);
 }
 
+#include "linkbox.h"
+BoundingBox *BoxesGroup::createLink(BoxesGroup *parent) {
+    InternalLinkBoxesGroup *linkGroup =
+                        new InternalLinkBoxesGroup(this, parent);
+    foreach(BoundingBox *box, mChildren) {
+        box->createSameTransformationLink(linkGroup);
+    }
+    return linkGroup;
+}
+
+BoundingBox *BoxesGroup::createSameTransformationLink(BoxesGroup *parent) {
+    SameTransformInternalLinkBoxesGroup *linkGroup =
+                        new SameTransformInternalLinkBoxesGroup(this, parent);
+    foreach(BoundingBox *box, mChildren) {
+        box->createSameTransformationLink(linkGroup);
+    }
+    return linkGroup;
+}
+
 
 BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
                                             bool loadInBox) {
@@ -396,23 +415,30 @@ void BoxesGroup::startSelectedFillColorTransform()
 
 void BoxesGroup::updateBoundingRect() {
     QPainterPath boundingPaths = QPainterPath();
-    qreal childrenMargin = 0.;
     foreach(BoundingBox *child, mChildren) {
         boundingPaths.addPath(
                     child->getRelativeTransform().
-                    map(child->getBoundingRectPath()));
-        childrenMargin = qMax(child->getEffectsMargin(), childrenMargin);
+                    map(child->getRelBoundingRectPath()));
     }
     mRelBoundingRect = boundingPaths.boundingRect();
 
-    qreal effectsMargin = (mEffectsMargin + childrenMargin)*
-                           mUpdateCanvasTransform.m11();
+    qreal effectsMargin = mEffectsMargin*
+                          mUpdateCanvasTransform.m11();
 
     mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
                         adjusted(-effectsMargin, -effectsMargin,
                                  effectsMargin, effectsMargin);
 
     BoundingBox::updateBoundingRect();
+}
+
+void BoxesGroup::updateEffectsMargin() {
+    qreal childrenMargin = 0.;
+    foreach(BoundingBox *child, mChildren) {
+        childrenMargin = qMax(child->getEffectsMargin(), childrenMargin);
+    }
+    BoundingBox::updateEffectsMargin();
+    mEffectsMargin += childrenMargin;
 }
 
 void BoxesGroup::draw(QPainter *p)
@@ -509,7 +535,7 @@ void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
             foreach(BoundingBox *box, mSelectedBoxes) {
                 box->startRotTransform();
                 box->startPosTransform();
-                box->saveTransformPivot(absOrigin);
+                box->saveTransformPivotAbsPos(absOrigin);
                 box->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
@@ -527,7 +553,7 @@ void BoxesGroup::rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin,
     if(startTrans) {
         foreach(MovablePoint *point, mSelectedPoints) {
             point->startTransform();
-            point->saveTransformPivot(absOrigin);
+            point->saveTransformPivotAbsPos(absOrigin);
             point->rotateRelativeToSavedPivot(rotBy);
         }
     } else {
@@ -556,7 +582,7 @@ void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
             foreach(BoundingBox *box, mSelectedBoxes) {
                 box->startScaleTransform();
                 box->startPosTransform();
-                box->saveTransformPivot(absOrigin);
+                box->saveTransformPivotAbsPos(absOrigin);
                 box->scaleRelativeToSavedPivot(scaleBy);
             }
         } else {
@@ -586,7 +612,7 @@ void BoxesGroup::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
             foreach(BoundingBox *box, mSelectedBoxes) {
                 box->startScaleTransform();
                 box->startPosTransform();
-                box->saveTransformPivot(absOrigin);
+                box->saveTransformPivotAbsPos(absOrigin);
                 box->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         } else {
@@ -604,7 +630,7 @@ void BoxesGroup::scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy,
     if(startTrans) {
         foreach(MovablePoint *point, mSelectedPoints) {
             point->startTransform();
-            point->saveTransformPivot(absOrigin);
+            point->saveTransformPivotAbsPos(absOrigin);
             point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
         }
     } else {
@@ -811,7 +837,7 @@ void BoxesGroup::applyCurrentTransformation() {
     qreal scaleX = mTransformAnimator.xScale();
     qreal scaleY = mTransformAnimator.yScale();
     foreach(BoundingBox *box, mChildren) {
-        box->saveTransformPivot(absPivot);
+        box->saveTransformPivotAbsPos(absPivot);
         box->startTransform();
         box->rotateRelativeToSavedPivot(rotation);
         box->finishTransform();
@@ -1110,20 +1136,20 @@ void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect) {
     }
 }
 
-QPointF BoxesGroup::getRelCenterPosition() {
-    QPointF posSum = QPointF(0., 0.);
-    if(mChildren.isEmpty()) return posSum;
-    int count = mChildren.length();
-    foreach(BoundingBox *box, mChildren) {
-        posSum += box->getPivotAbsPos();
-    }
-    return mapAbsPosToRel(posSum/count);
-}
+//QPointF BoxesGroup::getRelCenterPosition() {
+//    QPointF posSum = QPointF(0., 0.);
+//    if(mChildren.isEmpty()) return posSum;
+//    int count = mChildren.length();
+//    foreach(BoundingBox *box, mChildren) {
+//        posSum += box->getPivotAbsPos();
+//    }
+//    return mapAbsPosToRel(posSum/count);
+//}
 
 #include "Boxes/linkbox.h"
 void BoxesGroup::createLinkBoxForSelected() {
     foreach(BoundingBox *selectedBox, mSelectedBoxes) {
-        new InternalLinkBox(selectedBox, this);
+        selectedBox->createLink(this);
     }
 }
 

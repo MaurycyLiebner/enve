@@ -35,8 +35,9 @@ public:
 
     virtual void draw(QPainter *p);
 
-    bool isPointAt(QPointF absPoint);
-    void setAbsolutePos(QPointF pos, bool saveUndoRedo = true);
+    bool isPointAtAbsPos(QPointF absPoint);
+    void setAbsolutePos(QPointF pos,
+                        bool saveUndoRedo = true);
 
     BoundingBox *getParent();
 
@@ -65,7 +66,7 @@ public:
     virtual void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
     void rotateBy(qreal rot);
     void scale(qreal scaleXBy, qreal scaleYBy);
-    void saveTransformPivot(QPointF absPivot);
+    void saveTransformPivotAbsPos(QPointF absPivot);
     void scale(qreal scaleBy);
     void cancelTransform();
 
@@ -95,6 +96,7 @@ protected:
     QPointFAnimator mRelPos;
     QPointF mSavedRelPos;
     BoundingBox *mParent = NULL;
+    void drawOnAbsPos(QPainter *p, const QPointF &absPos);
 };
 
 #endif // MOVABLEPOINT_H

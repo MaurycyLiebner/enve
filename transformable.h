@@ -29,7 +29,7 @@ public:
 
     virtual bool isBeingTransformed() { return mSelected; }
 
-    virtual void saveTransformPivot(QPointF absPivot) { Q_UNUSED(absPivot); }
+    virtual void saveTransformPivotAbsPos(QPointF absPivot) { Q_UNUSED(absPivot); }
 
     virtual void cancelTransform() {}
 protected:

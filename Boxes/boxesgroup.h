@@ -22,6 +22,9 @@ public:
     ~BoxesGroup();
     virtual void loadFromSql(int boundingBoxId);
 
+    BoundingBox *createLink(BoxesGroup *parent);
+    BoundingBox *createSameTransformationLink(BoxesGroup *parent);
+
     void setSelectedFontFamilyAndStyle(QString family, QString style);
     void setSelectedFontSize(qreal size);
     void draw(QPainter *p);
@@ -211,8 +214,9 @@ public:
     void makeSelectedPointsSegmentsCurves();
     void makeSelectedPointsSegmentsLines();
     bool relPointInsidePath(QPointF relPos);
-    QPointF getRelCenterPosition();
+//    QPointF getRelCenterPosition();
     void createLinkBoxForSelected();
+    void updateEffectsMargin();
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
