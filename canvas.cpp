@@ -9,14 +9,14 @@
 #include "pathpivot.h"
 #include "Boxes/imagebox.h"
 
-bool Canvas::mEffectsPaintEnabled = true;
-qreal Canvas::mResolutionPercent = 1.;
-
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWidget *canvasWidget,
                int canvasWidth, int canvasHeight) :
     BoxesGroup(fillStrokeSettings)
 {
+    mEffectsPaintEnabled = true;
+    mResolutionPercent = 1.;
+
     mWidth = canvasWidth;
     mHeight = canvasHeight;
     mVisibleWidth = mWidth;
@@ -80,12 +80,8 @@ void Canvas::showContextMenu(QPoint globalPos) {
 //    }
 }
 
-void Canvas::enableHighQualityPaint() {
-    mHighQualityPaint = true;
-}
-
-void Canvas::disableHighQualityPaint() {
-    mHighQualityPaint = false;
+void Canvas::setHighQualityPaint(const bool &bT) {
+    mHighQualityPaint = bT;
 }
 
 void Canvas::updateAllBoxes() {
@@ -97,14 +93,8 @@ bool Canvas::highQualityPaint() {
     return mHighQualityPaint;
 }
 
-void Canvas::enableEffectsPaint()
-{
-    mEffectsPaintEnabled = true;
-}
-
-void Canvas::disableEffectsPaint()
-{
-    mEffectsPaintEnabled = false;
+void Canvas::setEffectsPaintEnabled(const bool &bT) {
+    mEffectsPaintEnabled = bT;
 }
 
 bool Canvas::effectsPaintEnabled()
@@ -117,7 +107,7 @@ qreal Canvas::getResolutionPercent()
     return Canvas::mResolutionPercent;
 }
 
-void Canvas::setResolutionPercent(qreal percent)
+void Canvas::setResolutionPercent(const qreal &percent)
 {
     mResolutionPercent = percent;
 }
@@ -130,10 +120,6 @@ QRectF Canvas::getPixBoundingRect()
 {
     QPointF absPos = getAbsolutePos();
     return QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight));
-}
-
-void Canvas::pickPathForSettings() {
-    setCanvasMode(PICK_PATH_SETTINGS);
 }
 
 void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
@@ -375,52 +361,42 @@ void Canvas::nextPreviewFrame()
 
 void Canvas::raiseAction() {
     mCurrentBoxesGroup->raiseSelectedBoxes();
-    callUpdateSchedulers();
 }
 
 void Canvas::lowerAction() {
     mCurrentBoxesGroup->lowerSelectedBoxes();
-    callUpdateSchedulers();
 }
 
 void Canvas::raiseToTopAction() {
     mCurrentBoxesGroup->raiseSelectedBoxesToTop();
-    callUpdateSchedulers();
 }
 
 void Canvas::lowerToBottomAction() {
     mCurrentBoxesGroup->lowerSelectedBoxesToBottom();
-    callUpdateSchedulers();
 }
 
 void Canvas::objectsToPathAction() {
     mCurrentBoxesGroup->convertSelectedBoxesToPath();
-    callUpdateSchedulers();
 }
 
 void Canvas::pathsUnionAction() {
     mCurrentBoxesGroup->selectedPathsUnion();
-    callUpdateSchedulers();
 }
 
 void Canvas::pathsDifferenceAction() {
     mCurrentBoxesGroup->selectedPathsDifference();
-    callUpdateSchedulers();
 }
 
 void Canvas::pathsIntersectionAction() {
     mCurrentBoxesGroup->selectedPathsIntersection();
-    callUpdateSchedulers();
 }
 
 void Canvas::pathsDivisionAction() {
     mCurrentBoxesGroup->selectedPathsDivision();
-    callUpdateSchedulers();
 }
 
 void Canvas::pathsExclusionAction() {
     mCurrentBoxesGroup->selectedPathsExclusion();
-    callUpdateSchedulers();
 }
 
 QRectF Canvas::getRenderRect() {
@@ -567,47 +543,39 @@ void Canvas::updatePivotIfNeeded()
 void Canvas::connectPointsSlot()
 {
     mCurrentBoxesGroup->connectPoints();
-    callUpdateSchedulers();
 }
 
 void Canvas::disconnectPointsSlot()
 {
     mCurrentBoxesGroup->disconnectPoints();
-    callUpdateSchedulers();
 }
 
 void Canvas::mergePointsSlot()
 {
     mCurrentBoxesGroup->mergePoints();
-    callUpdateSchedulers();
 }
 
 void Canvas::makePointCtrlsSymmetric()
 {
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
-    callUpdateSchedulers();
 }
 
 void Canvas::makePointCtrlsSmooth()
 {
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
-    callUpdateSchedulers();
 }
 
 void Canvas::makePointCtrlsCorner()
 {
     mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
-    callUpdateSchedulers();
 }
 
 void Canvas::makeSegmentLine() {
     mCurrentBoxesGroup->makeSelectedPointsSegmentsLines();
-    callUpdateSchedulers();
 }
 
 void Canvas::makeSegmentCurve() {
     mCurrentBoxesGroup->makeSelectedPointsSegmentsCurves();
-    callUpdateSchedulers();
 }
 
 void Canvas::moveSecondSelectionPoint(QPointF pos) {
@@ -683,16 +651,12 @@ void Canvas::grabMouseAndTrack() {
     mCanvasWidget->grabMouse();
 }
 
-void Canvas::setFontFamilyAndStyle(QString family, QString style)
-{
+void Canvas::setFontFamilyAndStyle(QString family, QString style) {
     mCurrentBoxesGroup->setSelectedFontFamilyAndStyle(family, style);
-    callUpdateSchedulers();
 }
 
-void Canvas::setFontSize(qreal size)
-{
+void Canvas::setFontSize(qreal size) {
     mCurrentBoxesGroup->setSelectedFontSize(size);
-    callUpdateSchedulers();
 }
 
 void Canvas::releaseMouseAndDontTrack() {

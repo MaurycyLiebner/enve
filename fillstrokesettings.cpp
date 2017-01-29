@@ -591,7 +591,7 @@ void FillStrokeSettingsWidget::setTransformFinishEmitter(const char *slot) {
 
 void FillStrokeSettingsWidget::setStrokeWidth(qreal width)
 {
-    mCanvas->startSelectedStrokeWidthTransform();
+    mCanvasWidget->startSelectedStrokeWidthTransform();
     startTransform(SLOT(emitStrokeWidthChanged()));
     mCurrentStrokeWidth = width;
     emitStrokeWidthChangedTMP();
@@ -667,13 +667,13 @@ void FillStrokeSettingsWidget::colorChangedTMP(GLfloat h, GLfloat s, GLfloat v,
         if(mCurrentFillPaintType == GRADIENTPAINT) {
             mGradientWidget->startSelectedColorTransform();
         } else if(mCurrentFillPaintType == FLATPAINT) {
-            mCanvas->startSelectedFillColorTransform();
+            mCanvasWidget->startSelectedFillColorTransform();
         }
     } else {
         if(mCurrentStrokePaintType == GRADIENTPAINT) {
             mGradientWidget->startSelectedColorTransform();
         } else if(mCurrentStrokePaintType == FLATPAINT) {
-            mCanvas->startSelectedStrokeColorTransform();
+            mCanvasWidget->startSelectedStrokeColorTransform();
         }
     }
     startTransform(SLOT(emitColorSettingsChanged()));
@@ -749,16 +749,16 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
     mCurrentJoinStyle = settings->getJoinStyle();
 }
 
-void FillStrokeSettingsWidget::setCanvasPtr(Canvas *canvas)
+void FillStrokeSettingsWidget::setCanvasWidgetPtr(CanvasWidget *canvasWidget)
 {
-    mCanvas = canvas;
+    mCanvasWidget = canvasWidget;
 }
 
 void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
     if(mLoadFillFromPath) {
         mLoadFillFromPath = false;
         setFillValuesFromFillSettings(path->getFillSettings());
-        mCanvas->fillPaintTypeChanged(mCurrentFillPaintType,
+        mCanvasWidget->fillPaintTypeChanged(mCurrentFillPaintType,
                                     mCurrentFillColor,
                                     mCurrentFillGradient);
     }
@@ -766,41 +766,41 @@ void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
         mLoadStrokeFromPath = false;
         setStrokeValuesFromStrokeSettings(path->getStrokeSettings());
 
-        mCanvas->strokePaintTypeChanged(mCurrentStrokePaintType,
+        mCanvasWidget->strokePaintTypeChanged(mCurrentStrokePaintType,
                                         mCurrentStrokeColor,
                                         mCurrentStrokeGradient);
-        mCanvas->strokeCapStyleChanged(mCurrentCapStyle);
-        mCanvas->strokeJoinStyleChanged(mCurrentJoinStyle);
-        mCanvas->strokeWidthChanged(mCurrentStrokeWidth, true);
+        mCanvasWidget->strokeCapStyleChanged(mCurrentCapStyle);
+        mCanvasWidget->strokeJoinStyleChanged(mCurrentJoinStyle);
+        mCanvasWidget->strokeWidthChanged(mCurrentStrokeWidth, true);
     }
 }
 
 void FillStrokeSettingsWidget::emitStrokeFlatColorChanged() {
-    mCanvas->strokeFlatColorChanged(mCurrentStrokeColor, true);
+    mCanvasWidget->strokeFlatColorChanged(mCurrentStrokeColor, true);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitStrokeFlatColorChangedTMP() {
-    mCanvas->strokeFlatColorChanged(mCurrentStrokeColor, false);
+    mCanvasWidget->strokeFlatColorChanged(mCurrentStrokeColor, false);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitStrokeGradientChanged() {
-    mCanvas->strokeGradientChanged(mCurrentStrokeGradient, true);
+    mCanvasWidget->strokeGradientChanged(mCurrentStrokeGradient, true);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitStrokeGradientChangedTMP() {
-    mCanvas->strokeGradientChanged(mCurrentStrokeGradient, false);
+    mCanvasWidget->strokeGradientChanged(mCurrentStrokeGradient, false);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitStrokePaintTypeChanged() {
-    mCanvas->strokePaintTypeChanged(mCurrentStrokePaintType,
+    mCanvasWidget->strokePaintTypeChanged(mCurrentStrokePaintType,
                                     mCurrentStrokeColor,
                                     mCurrentStrokeGradient);
 
@@ -808,31 +808,31 @@ void FillStrokeSettingsWidget::emitStrokePaintTypeChanged() {
 }
 
 void FillStrokeSettingsWidget::emitFillFlatColorChanged() {
-    mCanvas->fillFlatColorChanged(mCurrentFillColor, true);
+    mCanvasWidget->fillFlatColorChanged(mCurrentFillColor, true);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitFillFlatColorChangedTMP() {
-    mCanvas->fillFlatColorChanged(mCurrentFillColor, false);
+    mCanvasWidget->fillFlatColorChanged(mCurrentFillColor, false);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitFillGradientChanged() {
-    mCanvas->fillGradientChanged(mCurrentFillGradient, true);
+    mCanvasWidget->fillGradientChanged(mCurrentFillGradient, true);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitFillGradientChangedTMP() {
-    mCanvas->fillGradientChanged(mCurrentFillGradient, false);
+    mCanvasWidget->fillGradientChanged(mCurrentFillGradient, false);
 
     mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::emitFillPaintTypeChanged() {
-    mCanvas->fillPaintTypeChanged(mCurrentFillPaintType,
+    mCanvasWidget->fillPaintTypeChanged(mCurrentFillPaintType,
                                 mCurrentFillColor,
                                 mCurrentFillGradient);
 
@@ -898,42 +898,38 @@ void FillStrokeSettingsWidget::emitPaintTypeChanged() {
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChanged() {
-    mCanvas->strokeWidthChanged(mCurrentStrokeWidth, true);
-    mMainWindow->callUpdateSchedulers();
+    mCanvasWidget->strokeWidthChanged(mCurrentStrokeWidth, true);
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChangedTMP() {
-    mCanvas->strokeWidthChanged(mCurrentStrokeWidth, false);
-    mMainWindow->callUpdateSchedulers();
+    mCanvasWidget->strokeWidthChanged(mCurrentStrokeWidth, false);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {
-    mCanvas->strokeCapStyleChanged(mCurrentCapStyle);
-    mMainWindow->callUpdateSchedulers();
+    mCanvasWidget->strokeCapStyleChanged(mCurrentCapStyle);
 }
 
 void FillStrokeSettingsWidget::emitJoinStyleChanged() {
-    mCanvas->strokeJoinStyleChanged(mCurrentJoinStyle);
-    mMainWindow->callUpdateSchedulers();
+    mCanvasWidget->strokeJoinStyleChanged(mCurrentJoinStyle);
 }
 
 void FillStrokeSettingsWidget::startLoadingFillFromPath()
 {
     mLoadFillFromPath = true;
-    mMainWindow->getCanvas()->pickPathForSettings();
+    mCanvasWidget->pickPathForSettings();
 }
 
 void FillStrokeSettingsWidget::startLoadingStrokeFromPath()
 {
     mLoadStrokeFromPath = true;
-    mMainWindow->getCanvas()->pickPathForSettings();
+    mCanvasWidget->pickPathForSettings();
 }
 
 void FillStrokeSettingsWidget::startLoadingSettingsFromPath()
 {
     mLoadFillFromPath = true;
     mLoadStrokeFromPath = true;
-    mMainWindow->getCanvas()->pickPathForSettings();
+    mCanvasWidget->pickPathForSettings();
 }
 
 void FillStrokeSettingsWidget::finishTransform()

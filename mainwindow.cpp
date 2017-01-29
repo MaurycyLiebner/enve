@@ -78,9 +78,41 @@ MainWindow::MainWindow(QWidget *parent)
     mKeysView = mBoxesListAnimationDockWidget->getKeysView();
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
-    mFillStrokeSettings->setCanvasPtr(mCanvas);
+    mFillStrokeSettings->setCanvasWidgetPtr(mCanvasWidget);
 
-//
+    setupMenuBar();
+
+    setCentralWidget(mCanvasWidget);
+
+    showMaximized();
+
+    QDockWidget *shapesMenuWidget = new QDockWidget(this);
+    mVectorShapesMenu = new VectorShapesMenu(this);
+    shapesMenuWidget->setWidget(mVectorShapesMenu);
+    addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
+
+    QDockWidget *effectsMenuWidget = new QDockWidget(this);
+    effectsMenuWidget->setMinimumWidth(200);
+    mObjectSettingsWidget = new ObjectSettingsWidget(this);
+    effectsMenuWidget->setWidget(mObjectSettingsWidget);
+    addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
+
+    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
+    canvas->setName("Canvas 0");
+    mCanvasWidget->addCanvasToListAndSetAsCurrent(canvas);
+    mCanvas = mCanvasWidget->getCurrentCanvas();
+    mCurrentCanvasComboBox->addItem(mCanvas->getName());
+
+    connectToolBarActions();
+}
+
+MainWindow::~MainWindow()
+{
+    //mPaintControlerThread->terminate();
+    mPaintControlerThread->quit();
+}
+
+void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(this);
 
     mFileMenu = mMenuBar->addMenu("File");
@@ -129,13 +161,13 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectMenu = mMenuBar->addMenu("Object");
 
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Raise", mCanvas,
+    mObjectMenu->addAction("Raise", mCanvasWidget,
                            SLOT(raiseAction()));
-    mObjectMenu->addAction("Lower", mCanvas,
+    mObjectMenu->addAction("Lower", mCanvasWidget,
                            SLOT(lowerAction()));
-    mObjectMenu->addAction("Rasie to Top", mCanvas,
+    mObjectMenu->addAction("Rasie to Top", mCanvasWidget,
                            SLOT(raiseToTopAction()));
-    mObjectMenu->addAction("Lower to Bottom", mCanvas,
+    mObjectMenu->addAction("Lower to Bottom", mCanvasWidget,
                            SLOT(lowerToBottomAction()));
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° Right");
@@ -148,26 +180,26 @@ MainWindow::MainWindow(QWidget *parent)
 
     mPathMenu = mMenuBar->addMenu("Path");
 
-    mPathMenu->addAction("Object to Path", mCanvas,
+    mPathMenu->addAction("Object to Path", mCanvasWidget,
                          SLOT(objectsToPathAction()));
     mPathMenu->addAction("Stroke to Path");
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Union", mCanvas,
+    mPathMenu->addAction("Union", mCanvasWidget,
                          SLOT(pathsUnionAction()));
-    mPathMenu->addAction("Difference", mCanvas,
+    mPathMenu->addAction("Difference", mCanvasWidget,
                          SLOT(pathsDifferenceAction()));
-    mPathMenu->addAction("Intersection", mCanvas,
+    mPathMenu->addAction("Intersection", mCanvasWidget,
                          SLOT(pathsIntersectionAction()));
-    mPathMenu->addAction("Exclusion", mCanvas,
+    mPathMenu->addAction("Exclusion", mCanvasWidget,
                          SLOT(pathsExclusionAction()));
-    mPathMenu->addAction("Division", mCanvas,
+    mPathMenu->addAction("Division", mCanvasWidget,
                          SLOT(pathsDivisionAction()));
 //    mPathMenu->addAction("Cut Path", mCanvas,
 //                         SLOT(pathsCutAction()));
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Combine", mCanvas,
+    mPathMenu->addAction("Combine", mCanvasWidget,
                          SLOT(pathsCombineAction()));
-    mPathMenu->addAction("Break Apart", mCanvas,
+    mPathMenu->addAction("Break Apart", mCanvasWidget,
                          SLOT(pathsBreakApartAction()));
 
     mEffectsMenu = mMenuBar->addMenu("Effects");
@@ -178,15 +210,11 @@ MainWindow::MainWindow(QWidget *parent)
     mActionHighQualityView = mViewMenu->addAction("High Quality");
     mActionHighQualityView->setCheckable(true);
     mActionHighQualityView->setChecked(false);
-    connect(mActionHighQualityView, SIGNAL(toggled(bool)),
-            this, SLOT(setHighQualityView(bool)));
 
     mActionEffectsPaintEnabled = mViewMenu->addAction("Effects");
     mActionEffectsPaintEnabled->setCheckable(true);
     mActionEffectsPaintEnabled->setChecked(true);
     mActionEffectsPaintEnabled->setShortcut(QKeySequence(Qt::Key_E));
-    connect(mActionEffectsPaintEnabled, SIGNAL(toggled(bool)),
-            this, SLOT(setEffectsPaintEnabled(bool)));
 
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render", this, SLOT(renderOutput()));
@@ -194,34 +222,18 @@ MainWindow::MainWindow(QWidget *parent)
     setMenuBar(mMenuBar);
 //
 
-    setCentralWidget(mCanvasWidget);
-
-    showMaximized();
-
-    QDockWidget *shapesMenuWidget = new QDockWidget(this);
-    mVectorShapesMenu = new VectorShapesMenu(this);
-    shapesMenuWidget->setWidget(mVectorShapesMenu);
-    addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
-
-    QDockWidget *effectsMenuWidget = new QDockWidget(this);
-    effectsMenuWidget->setMinimumWidth(200);
-    mObjectSettingsWidget = new ObjectSettingsWidget(this);
-    effectsMenuWidget->setWidget(mObjectSettingsWidget);
-    addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
-
-    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
-    canvas->setName("Canvas 0");
-    mCanvasWidget->addCanvasToListAndSetAsCurrent(canvas);
-    mCanvas = mCanvasWidget->getCurrentCanvas();
-    mCurrentCanvasComboBox->addItem(mCanvas->getName());
-
-    connectToolBarActions();
+    connect(mActionHighQualityView, SIGNAL(toggled(bool)),
+            mCanvasWidget, SLOT(setHighQualityView(bool)));
+    connect(mActionEffectsPaintEnabled, SIGNAL(toggled(bool)),
+            mCanvasWidget, SLOT(setEffectsPaintEnabled(bool)));
 }
 
-MainWindow::~MainWindow()
-{
-    //mPaintControlerThread->terminate();
-    mPaintControlerThread->quit();
+void MainWindow::updateSettingsForCurrentCanvas() {
+    if(mCanvasWidget->hasNoCanvas()) return;
+    Canvas *canvas = mCanvasWidget->getCurrentCanvas();
+    mActionHighQualityView->setChecked(canvas->highQualityPaint());
+    mActionEffectsPaintEnabled->setChecked(canvas->effectsPaintEnabled());
+    mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
 }
 
 void MainWindow::setupToolBar() {
@@ -347,21 +359,21 @@ void MainWindow::connectToolBarActions() {
     connect(mTextMode, SIGNAL(pressed()),
             mCanvasWidget, SLOT(setTextMode()) );
     connect(mActionConnectPoints, SIGNAL(pressed()),
-            mCanvas, SLOT(connectPointsSlot()) );
+            mCanvasWidget, SLOT(connectPointsSlot()) );
     connect(mActionDisconnectPoints, SIGNAL(pressed()),
-            mCanvas, SLOT(disconnectPointsSlot()) );
+            mCanvasWidget, SLOT(disconnectPointsSlot()) );
     connect(mActionMergePoints, SIGNAL(pressed()),
-            mCanvas, SLOT(mergePointsSlot()) );
+            mCanvasWidget, SLOT(mergePointsSlot()) );
     connect(mActionSymmetricPointCtrls, SIGNAL(pressed()),
-            mCanvas, SLOT(makePointCtrlsSymmetric()) );
+            mCanvasWidget, SLOT(makePointCtrlsSymmetric()) );
     connect(mActionSmoothPointCtrls, SIGNAL(pressed()),
-            mCanvas, SLOT(makePointCtrlsSmooth()) );
+            mCanvasWidget, SLOT(makePointCtrlsSmooth()) );
     connect(mActionCornerPointCtrls, SIGNAL(pressed()),
-            mCanvas, SLOT(makePointCtrlsCorner()) );
+            mCanvasWidget, SLOT(makePointCtrlsCorner()) );
     connect(mActionLine, SIGNAL(pressed()),
-            mCanvas, SLOT(makeSegmentLine()) );
+            mCanvasWidget, SLOT(makeSegmentLine()) );
     connect(mActionCurve, SIGNAL(pressed()),
-            mCanvas, SLOT(makeSegmentCurve()) );
+            mCanvasWidget, SLOT(makeSegmentCurve()) );
     connect(mCurrentCanvasComboBox, SIGNAL(editTextChanged(QString)),
             mCanvasWidget, SLOT(renameCurrentCanvas(QString)));
     connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
@@ -369,9 +381,9 @@ void MainWindow::connectToolBarActions() {
     connect(mNewCanvasButton, SIGNAL(pressed()),
             this, SLOT(createNewCanvas()));
     connect(mFontWidget, SIGNAL(fontSizeChanged(qreal)),
-            mCanvas, SLOT(setFontSize(qreal)) );
+            mCanvasWidget, SLOT(setFontSize(qreal)) );
     connect(mFontWidget, SIGNAL(fontFamilyAndStyleChanged(QString, QString)),
-            mCanvas, SLOT(setFontFamilyAndStyle(QString, QString)) );
+            mCanvasWidget, SLOT(setFontFamilyAndStyle(QString, QString)) );
 }
 
 MainWindow *MainWindow::getInstance()
@@ -554,7 +566,7 @@ void MainWindow::stopPreview() {
 
 void MainWindow::setResolutionPercentId(int id)
 {
-    setResolutionPercent(1. - id*0.25);
+    mCanvasWidget->setResolutionPercent(1. - id*0.25);
 }
 
 void MainWindow::renderOutput()
@@ -679,11 +691,6 @@ BoxesListWidget *MainWindow::getBoxesList()
     return mBoxesListAnimationDockWidget->getBoxesList();
 }
 
-Canvas *MainWindow::getCanvas()
-{
-    return mCanvas;
-}
-
 void MainWindow::disableEventFilter() {
     mEventFilterDisabled = true;
 }
@@ -796,7 +803,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 }
 
 void MainWindow::updateDisplayedFillStrokeSettings() {
-    mCanvas->updateDisplayedFillStrokeSettings();
+    mCanvasWidget->updateDisplayedFillStrokeSettings();
 }
 
 void MainWindow::updateDisplayedFillStrokeSettingsIfNeeded() {
@@ -1002,35 +1009,6 @@ void MainWindow::revert()
 {
     loadFile(mCurrentFilePath);
     setFileChangedSinceSaving(false);
-}
-
-void MainWindow::setHighQualityView(bool bT)
-{
-    if(bT) {
-        mCanvas->enableHighQualityPaint();
-    } else {
-        mCanvas->disableHighQualityPaint();
-    }
-
-    mCanvas->updateAllBoxes();
-}
-
-void MainWindow::setEffectsPaintEnabled(bool bT)
-{
-    if(bT) {
-        mCanvas->enableEffectsPaint();
-    } else {
-        mCanvas->disableEffectsPaint();
-    }
-
-    mCanvas->updateAllBoxes();
-}
-
-void MainWindow::setResolutionPercent(qreal percent)
-{
-    mCanvas->setResolutionPercent(percent);
-
-    mCanvas->updateAllBoxes();
 }
 
 void MainWindow::setCurrentFrameForAllWidgets(int frame)

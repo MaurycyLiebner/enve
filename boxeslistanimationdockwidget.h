@@ -71,6 +71,7 @@ public:
     bool processFilteredKeyEvent(QKeyEvent *event);
     void previewFinished();
     void setPlaying(bool playing);
+    void updateSettingsForCurrentCanvas(Canvas *canvas);
 signals:
     void visibleRangeChanged(int, int);
 private slots:

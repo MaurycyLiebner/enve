@@ -3,8 +3,11 @@
 
 #include <QWidget>
 class Canvas;
-class FillStrokeSettingsWidget;
 enum CanvasMode : short;
+class Color;
+class Gradient;
+
+#include "fillstrokesettings.h"
 
 class CanvasWidget : public QWidget
 {
@@ -26,6 +29,27 @@ public:
     void callUpdateSchedulers();
     bool processUnfilteredKeyEvent(QKeyEvent *event);
     bool processFilteredKeyEvent(QKeyEvent *event);
+
+    void startSelectedStrokeWidthTransform();
+    void startSelectedStrokeColorTransform();
+    void startSelectedFillColorTransform();
+    void fillPaintTypeChanged(const PaintType &paintType,
+                              const Color &color,
+                              Gradient *gradient);
+    void strokePaintTypeChanged(const PaintType &paintType,
+                                const Color &color,
+                                Gradient *gradient);
+    void strokeCapStyleChanged(const Qt::PenCapStyle &capStyle);
+    void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
+    void strokeWidthChanged(const qreal &strokeWidth, const bool &finish);
+    void strokeFlatColorChanged(const Color &color, const bool &finish);
+    void fillFlatColorChanged(const Color &color, const bool &finish);
+    void fillGradientChanged(Gradient *gradient, const bool &finish);
+    void strokeGradientChanged(Gradient *gradient, const bool &finish);
+    void pickPathForSettings();
+    void updateDisplayedFillStrokeSettings();
+
+    void setResolutionPercent(const qreal &percent);
 protected:
     Canvas *mCurrentCanvas = NULL;
     QList<Canvas*> mCanvasList;
@@ -48,8 +72,38 @@ public slots:
     void setCircleMode();
     void setTextMode();
 
+    void raiseAction();
+    void lowerAction();
+    void raiseToTopAction();
+    void lowerToBottomAction();
+
+    void objectsToPathAction();
+
+    void setFontFamilyAndStyle(QString family, QString style);
+    void setFontSize(qreal size);
+
+    void connectPointsSlot();
+    void disconnectPointsSlot();
+    void mergePointsSlot();
+
+    void makePointCtrlsSymmetric();
+    void makePointCtrlsSmooth();
+    void makePointCtrlsCorner();
+
+    void makeSegmentLine();
+    void makeSegmentCurve();
+
+    void pathsUnionAction();
+    void pathsDifferenceAction();
+    void pathsIntersectionAction();
+    void pathsDivisionAction();
+    void pathsExclusionAction();
+
     void renameCurrentCanvas(const QString &newName);
     void setCurrentCanvas(const int &id);
+
+    void setEffectsPaintEnabled(const bool &bT);
+    void setHighQualityView(const bool &bT);
 };
 
 #endif // CANVASWIDGET_H

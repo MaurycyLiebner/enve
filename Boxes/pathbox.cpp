@@ -123,7 +123,7 @@ void PathBox::updatePixmaps() {
     updateBoundingRect();
 
     BoundingBox::updateAllUglyPixmap();
-    if(mMainWindow->getCanvas()->highQualityPaint()) {
+    if(getParentCanvas()->highQualityPaint()) {
         updatePrettyPixmap();
         mHighQualityPaint = true;
     } else {

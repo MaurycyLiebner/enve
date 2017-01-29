@@ -226,7 +226,6 @@ public:
     bool processFilteredKeyEvent(QKeyEvent *event);
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
     void scale(qreal scaleBy, QPointF absOrigin);
-    void pickPathForSettings();
     void moveBy(QPointF trans);
 
     void updateAfterFrameChanged(int currentFrame);
@@ -312,16 +311,14 @@ public:
     void setPartialRepaintRect(QRectF absRect);
     void makePartialRepaintInclude(QPointF pointToInclude);
     void partialRepaintRectToPoint(QPointF point);
-    void enableHighQualityPaint();
-    void disableHighQualityPaint();
+    void setHighQualityPaint(const bool &bT);
     bool highQualityPaint();
 
-    static void enableEffectsPaint();
-    static void disableEffectsPaint();
-    static bool effectsPaintEnabled();
+    void setEffectsPaintEnabled(const bool &bT);
+    bool effectsPaintEnabled();
 
-    static qreal getResolutionPercent();
-    static void setResolutionPercent(qreal percent);
+    qreal getResolutionPercent();
+    void setResolutionPercent(const qreal &percent);
 
     void updateRenderRect();
     QMatrix getCombinedFinalRenderTransform();
@@ -347,6 +344,15 @@ public:
     void createLinkToFileWithPath(const QString &path);
 
     QRectF getRenderRect();
+
+    const CanvasMode &getCurrentCanvasMode() const {
+        return mCurrentMode;
+    }
+
+    Canvas *getParentCanvas() {
+        return this;
+    }
+
 protected:
 //    void updateAfterCombinedTransformationChanged();
 
@@ -365,9 +371,8 @@ protected:
     void handleLeftButtonMousePress(QMouseEvent *event);
 signals:
 private slots:
-
     void nextPreviewFrame();
-public slots:
+public:
     void raiseAction();
     void lowerAction();
     void raiseToTopAction();
@@ -377,34 +382,6 @@ public slots:
 
     void setFontFamilyAndStyle(QString family, QString style);
     void setFontSize(qreal size);
-
-    const CanvasMode &getCurrentCanvasMode() const {
-        return mCurrentMode;
-    }
-
-    void setMovePathMode() {
-        setCanvasMode(MOVE_PATH);
-    }
-
-    void setMovePointMode() {
-        setCanvasMode(MOVE_POINT);
-    }
-
-    void setAddPointMode() {
-        setCanvasMode(ADD_POINT);
-    }
-
-    void setRectangleMode() {
-        setCanvasMode(ADD_RECTANGLE);
-    }
-
-    void setCircleMode() {
-        setCanvasMode(ADD_CIRCLE);
-    }
-
-    void setTextMode() {
-        setCanvasMode(ADD_TEXT);
-    }
 
     void connectPointsSlot();
     void disconnectPointsSlot();
@@ -424,8 +401,8 @@ public slots:
     void pathsExclusionAction();
 private:
     bool mPivotVisibleDuringPointEdit = true;
-    static bool mEffectsPaintEnabled;
-    static qreal mResolutionPercent;
+    bool mEffectsPaintEnabled;
+    qreal mResolutionPercent;
 
     CanvasWidget *mCanvasWidget;
 

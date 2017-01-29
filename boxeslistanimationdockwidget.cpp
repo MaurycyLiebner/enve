@@ -40,7 +40,8 @@ void BoxesListAnimationDockWidget::moveSlider(int val) {
     emit visibleRangeChanged(val, val + mBoxesListScrollArea->height());
 }
 
-BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
+BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
+        MainWindow *parent) :
     QWidget(parent)
 {
     mMainWindow = parent;
@@ -69,27 +70,27 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
                                              QSizePolicy::Maximum);
     mBoxesListScrollArea = new ScrollArea(this);
     mBoxesListScrollArea->setFocusPolicy(Qt::NoFocus);
-    mBoxesListScrollArea->verticalScrollBar()->setSingleStep(BoxesListWidget::getListItemHeight());
-    connect(mBoxesListScrollArea->verticalScrollBar(), SIGNAL(valueChanged(int)),
+    mBoxesListScrollArea->verticalScrollBar()->setSingleStep(
+                BoxesListWidget::getListItemHeight());
+    connect(mBoxesListScrollArea->verticalScrollBar(),
+            SIGNAL(valueChanged(int)),
             this, SLOT(moveSlider(int)));
 
-    mBoxesListScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    mBoxesListScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    mBoxesListScrollArea->setBackgroundRole(QPalette::Window);
-    mBoxesListScrollArea->setFrameShadow(QFrame::Plain);
-    mBoxesListScrollArea->setFrameShape(QFrame::NoFrame);
+    mBoxesListScrollArea->setHorizontalScrollBarPolicy(
+                Qt::ScrollBarAlwaysOff);
+    mBoxesListScrollArea->setVerticalScrollBarPolicy(
+                Qt::ScrollBarAlwaysOff);
+    mBoxesListScrollArea->setBackgroundRole(
+                QPalette::Window);
+    mBoxesListScrollArea->setFrameShadow(
+                QFrame::Plain);
+    mBoxesListScrollArea->setFrameShape(
+                QFrame::NoFrame);
     mBoxesListScrollArea->setWidgetResizable(true);
-    mBoxesListScrollArea->setFixedWidth(BoxesListWidget::getListItemMaxWidth());
+    mBoxesListScrollArea->setFixedWidth(
+                BoxesListWidget::getListItemMaxWidth());
     mBoxesList = new BoxesListWidget(this);
     mBoxesListScrollArea->setWidget(mBoxesList);
-
-    Canvas *canvas = MainWindow::getInstance()->getCanvas();
-    connect(canvas, SIGNAL(changeChildZSignal(int,int)),
-            mBoxesList, SLOT(changeItemZ(int,int)));
-    connect(canvas, SIGNAL(addAnimatedBoundingBoxSignal(BoundingBox*)),
-            mBoxesList, SLOT(addItemForBox(BoundingBox*)));
-    connect(canvas, SIGNAL(removeAnimatedBoundingBoxSignal(BoundingBox*)),
-            mBoxesList, SLOT(removeItemForBox(BoundingBox*)));
 
     mBoxesListLayout = new QVBoxLayout();
     mBoxesListLayout->setSpacing(0);
@@ -109,7 +110,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     connect(this, SIGNAL(visibleRangeChanged(int,int)),
             mKeysView, SLOT(setViewedRange(int,int)) );
 
-    mAnimationDockWidget = new AnimationDockWidget(mBoxesList, mKeysView);
+    mAnimationDockWidget = new AnimationDockWidget(mBoxesList,
+                                                   mKeysView);
     mKeysView->setAnimationDockWidget(mAnimationDockWidget);
 
 //    mGoToPreviousKeyButton = new QPushButton(
@@ -125,10 +127,10 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mResolutionComboBox->addItem("75 %");
     mResolutionComboBox->addItem("50 %");
     mResolutionComboBox->addItem("25 %");
-    connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
-            mMainWindow, SLOT(setResolutionPercentId(int)));
     mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
+    connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
+            mMainWindow, SLOT(setResolutionPercentId(int)));
 
     mPlayButton = new QPushButton(
                 QIcon(":/icons/play.png"), "", this);
@@ -171,14 +173,15 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     mControlButtonsWidget = new QLabel(this);
     mControlButtonsWidget->setFixedHeight(30);
     mControlButtonsWidget->setLayout(mControlButtonsLayout);
-    mControlButtonsWidget->setStyleSheet("QLabel {"
-                                            "background-color: rgb(0, 0, 0);"
-                                         "}"
-                                         "QPushButton {"
-                                            "qproperty-iconSize: 20px;"
-                                            "border: 1px solid black;"
-                                            "background-color: rgb(55, 55, 55);"
-                                         "}");
+    mControlButtonsWidget->setStyleSheet(
+                "QLabel {"
+                   "background-color: rgb(0, 0, 0);"
+                "}"
+                "QPushButton {"
+                   "qproperty-iconSize: 20px;"
+                   "border: 1px solid black;"
+                   "background-color: rgb(55, 55, 55);"
+                "}");
 
     mControlButtonsLayout->setSpacing(0);
     mControlButtonsLayout->setMargin(0);
@@ -211,7 +214,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
     QHBoxLayout *keysViewScrollbarLayout = new QHBoxLayout();
     mKeysView->setLayout(keysViewScrollbarLayout);
     keysViewScrollbarLayout->setAlignment(Qt::AlignRight);
-    keysViewScrollbarLayout->addWidget(mBoxesListScrollArea->verticalScrollBar());
+    keysViewScrollbarLayout->addWidget(
+                mBoxesListScrollArea->verticalScrollBar());
     keysViewScrollbarLayout->setContentsMargins(0, 0, 0, 0);
 
     mKeysViewLayout->addWidget(mAnimationWidgetScrollbar);
@@ -226,7 +230,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(MainWindow *parent) :
 
     mFrameRangeScrollbar->emitChange();
 
-    ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesListScrollArea, this);
+    ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesListScrollArea,
+                                                    this);
     chww->updatePos();
 
     mFrameRangeScrollbar->raise();
@@ -242,7 +247,8 @@ KeysView *BoxesListAnimationDockWidget::getKeysView()
     return mKeysView;
 }
 
-bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(QKeyEvent *event) {
+bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
+        QKeyEvent *event) {
     if(event->key() == Qt::Key_Right && mMainWindow->isCtrlPressed()) {
         setCurrentFrame(mMainWindow->getCurrentFrame() + 1);
     } else if(event->key() == Qt::Key_Left && mMainWindow->isCtrlPressed()) {
@@ -253,7 +259,8 @@ bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(QKeyEvent *event) {
     return true;
 }
 
-bool BoxesListAnimationDockWidget::processFilteredKeyEvent(QKeyEvent *event) {
+bool BoxesListAnimationDockWidget::processFilteredKeyEvent(
+        QKeyEvent *event) {
     if(processUnfilteredKeyEvent(event) ) return true;
     return false;//mBoxesList->processFilteredKeyEvent(event);
 }
@@ -305,7 +312,8 @@ void BoxesListAnimationDockWidget::setAllPointsRecord(bool allPointsRecord)
     }
 }
 
-void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible) {
+void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
+        bool ctrlsAlwaysVisible) {
     if(ctrlsAlwaysVisible) {
         mCtrlsAlwaysVisible->setIcon(
                     QIcon(":/icons/ctrlsAlwaysVisible.png"));
@@ -321,4 +329,14 @@ void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
     mAnimationWidgetScrollbar->emitChange();
     mAnimationWidgetScrollbar->repaint();
+}
+
+void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
+                                        Canvas *canvas) {
+    disconnect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
+               mMainWindow, SLOT(setResolutionPercentId(int)));
+    mResolutionComboBox->setCurrentIndex(
+                        qRound((1. - canvas->getResolutionPercent())*4.));
+    connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
+            mMainWindow, SLOT(setResolutionPercentId(int)));
 }

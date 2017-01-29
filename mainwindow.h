@@ -133,6 +133,7 @@ private:
     ObjectSettingsWidget *mObjectSettingsWidget = NULL;
     void setupToolBar();
     void connectToolBarActions();
+    void setupMenuBar();
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
@@ -162,7 +163,6 @@ public:
     AnimationDockWidget *getAnimationDockWidget();
     KeysView *getKeysView();
     BoxesListWidget *getBoxesList();
-    Canvas *getCanvas();
     CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
@@ -208,6 +208,7 @@ public:
 
     void setCurrentFrameForAllWidgets(int frame);
     void updateDisplayedShapesInMenu();
+    void updateSettingsForCurrentCanvas();
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);
@@ -233,9 +234,6 @@ private slots:
     void importAnimation();
     void exportSelected();
     void revert();
-
-    void setHighQualityView(bool bT);
-    void setEffectsPaintEnabled(bool bT);
 signals:
     void updateBoxPixmaps(BoundingBox*);
 };

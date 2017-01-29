@@ -5,8 +5,13 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
-struct Color
+class Color
 {
+public:
+    Color();
+    Color(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a_t = 1.0f);
+    Color(int r_t, int g_t, int b_t, int a_t = 255);
+
     GLfloat gl_r = 1.0f;
     GLfloat gl_g = 1.0f;
     GLfloat gl_b = 1.0f;
@@ -54,11 +59,7 @@ struct Color
     void setGLColorB(GLfloat b_t);
     void setQColor(QColor col_t);
     void setGLColorA(GLfloat a_t);
-    Color(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a_t = 1.0f);
-    Color(int r_t, int g_t, int b_t, int a_t = 255);
-    Color();
 
-public:
     void setHSL(GLfloat h, GLfloat s, GLfloat l, GLfloat a);
 };
 

@@ -777,10 +777,9 @@ bool BoxesGroup::getCtrlsAlwaysVisible()
     return BoxesGroup::mCtrlsAlwaysVisible;
 }
 
-void BoxesGroup::setCtrlsAlwaysVisible(bool bT)
-{
+void BoxesGroup::setCtrlsAlwaysVisible(bool bT) {
     BoxesGroup::mCtrlsAlwaysVisible = bT;
-    MainWindow::getInstance()->getCanvas()->ctrlsVisiblityChanged();
+    MainWindow::getInstance()->getCanvasWidget()->getCurrentCanvas()->ctrlsVisiblityChanged();
 }
 
 void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {
@@ -1290,13 +1289,15 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
         removeBoxFromSelection(box);
     }
     if(saveUndoRedo) {
-        addUndoRedo(new RemoveChildFromListUndoRedo(this, id, mChildren.at(id)) );
+        addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
+                                                    mChildren.at(id)) );
     }
     mChildren.removeAt(id);
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*) box;
         if(group->isCurrentGroup()) {
-            mMainWindow->getCanvas()->setCurrentBoxesGroup(group->getParent());
+            mMainWindow->getCanvasWidget()->getCurrentCanvas()->
+                    setCurrentBoxesGroup(group->getParent());
         }
     }
     updateChildrenId(id, saveUndoRedo);

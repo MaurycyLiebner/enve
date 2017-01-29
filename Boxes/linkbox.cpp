@@ -84,18 +84,30 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
             this, SLOT(scheduleAwaitUpdateSLOT()));
 }
 
-QPixmap InternalLinkBox::renderPixProvidedTransform(const QMatrix &renderTransform, QPointF *drawPos) {
-    return mLinkTarget->renderPixProvidedTransform(renderTransform,
+QPixmap InternalLinkBox::renderPixProvidedTransform(
+                                                Canvas *parentCanvas,
+                                                const QMatrix &renderTransform,
+                                                QPointF *drawPos) {
+    return mLinkTarget->renderPixProvidedTransform(parentCanvas,
+                                                   renderTransform,
                                                    drawPos);
 }
 
-QPixmap InternalLinkBox::getAllUglyPixmapProvidedTransform(const QMatrix &allUglyTransform, QRectF *allUglyBoundingRectP) {
-    return mLinkTarget->getAllUglyPixmapProvidedTransform(allUglyTransform,
+QPixmap InternalLinkBox::getAllUglyPixmapProvidedTransform(
+                                             Canvas *parentCanvas,
+                                             const QMatrix &allUglyTransform,
+                                             QRectF *allUglyBoundingRectP) {
+    return mLinkTarget->getAllUglyPixmapProvidedTransform(parentCanvas,
+                                                          allUglyTransform,
                                                           allUglyBoundingRectP);
 }
 
-QPixmap InternalLinkBox::getPrettyPixmapProvidedTransform(const QMatrix &transform, QRectF *pixBoundingRectClippedToViewP) {
-    return mLinkTarget->getPrettyPixmapProvidedTransform(transform,
+QPixmap InternalLinkBox::getPrettyPixmapProvidedTransform(
+                                                Canvas *parentCanvas,
+                                                const QMatrix &transform,
+                                                QRectF *pixBoundingRectClippedToViewP) {
+    return mLinkTarget->getPrettyPixmapProvidedTransform(parentCanvas,
+                                                         transform,
                                                          pixBoundingRectClippedToViewP);
 }
 
