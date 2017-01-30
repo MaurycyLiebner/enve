@@ -12,7 +12,7 @@ ColorPickingWidget::ColorPickingWidget(ColorSettingsWidget *parent)
     : QWidget()
 {
     mColorSettingsWidget = parent;
-    QPixmap picker("pixmaps/cursor_color_picker.png");
+    QPixmap picker(":cursors/cursor_color_picker.png");
     QApplication::setOverrideCursor(QCursor(picker, 2, 20) );
     grabMouse();
     grabKeyboard();

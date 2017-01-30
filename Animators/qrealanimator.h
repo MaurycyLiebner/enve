@@ -188,6 +188,9 @@ public:
 
     int getNumberDecimals() { return mDecimals; }
     void setNumberDecimals(int decimals) { mDecimals = decimals; }
+
+    virtual void makeDuplicate(QrealAnimator *target);
+    virtual QrealAnimator *makeDuplicate();
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 

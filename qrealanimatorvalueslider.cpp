@@ -57,23 +57,14 @@ void QrealAnimatorValueSlider::paint(QPainter *p)
     if(mAnimator == NULL) {
         QDoubleSlider::paint(p);
     } else {
-        p->fillRect(rect(), (mAnimator->isRecording() ? QColor(255, 200, 200) : QColor(200, 200, 255)));
-        if(!mTextEdit) {
-            if(mShowValueSlider) {
-                qreal valWidth = mValue*width()/(mMaxValue - mMinValue);
-                p->fillRect(QRectF(0., 0., valWidth, height()),
-                           (mAnimator->isRecording() ? QColor(255, 160, 160) : QColor(160, 160, 255)));
-            }
-            if(mShowName) {
-                p->drawText(rect(), Qt::AlignCenter, mName + ": " + getValueString());
-            } else {
-                p->drawText(rect(), Qt::AlignCenter, getValueString());
-            }
-        }
-        if(mAnimator->isRecording() && mAnimator->isKeyOnCurrentFrame()) {
-            p->setPen(QPen(Qt::red));
-        }
-        p->drawRect(rect().adjusted(0, 0, -1, -1));
+        QDoubleSlider::paint(p,
+                       (mAnimator->isRecording() ? QColor(255, 200, 200) :
+                                                   QColor(200, 200, 255)),
+                       (mAnimator->isRecording() ? QColor(255, 160, 160) :
+                                                   QColor(160, 160, 255)),
+                       ((mAnimator->isRecording() &&
+                        mAnimator->isKeyOnCurrentFrame()) ? Qt::red :
+                                                            Qt::blue) );
     }
 }
 

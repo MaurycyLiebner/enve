@@ -273,20 +273,21 @@ public:
     void setBaseTransformation(const QMatrix &matrix);
     bool hasBaseTransformation();
     virtual QPixmap renderPixProvidedTransform(
-                        Canvas *parentCanvas,
+                        const qreal &effectsMargin,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);
     virtual QPixmap getAllUglyPixmapProvidedTransform(
-                        Canvas *parentCanvas,
+                        const qreal &effectsMargin,
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
     virtual QPixmap getPrettyPixmapProvidedTransform(
-                        Canvas *parentCanvas,
-                        const QMatrix &transform,
+            const QMatrix &transform,
             QRectF *pixBoundingRectClippedToViewP);
 
     virtual Canvas *getParentCanvas();
 
+
+    void duplicateTransformAnimatorFrom(TransformAnimator *source);
 protected:
     QRectF mRelBoundingRect;
 

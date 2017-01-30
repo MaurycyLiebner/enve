@@ -102,21 +102,51 @@ void QDoubleSlider::setValueRange(qreal min, qreal max)
     fitWidthToContent();
 }
 
-void QDoubleSlider::paint(QPainter *p)
+void QDoubleSlider::paint(QPainter *p) {
+    paint(p,
+          QColor(255, 255, 255),
+          QColor(220, 220, 220),
+          Qt::black);
+}
+
+void QDoubleSlider::paint(QPainter *p,
+                          const QColor &allFill,
+                          const QColor &sliderFill,
+                          const QColor &stroke)
 {
-    p->fillRect(rect(), QColor(200, 200, 255));
+    p->save();
+
+    p->setRenderHint(QPainter::Antialiasing);
+    QRectF boundingRect = rect().adjusted(1, 1, -1, -1);
+    p->setPen(Qt::NoPen);
+    p->setBrush(allFill);
+    p->drawRoundedRect(boundingRect, 5., 5.);
     if(!mTextEdit) {
         if(mShowValueSlider) {
-            qreal valWidth = mValue*width()/(mMaxValue - mMinValue);
-            p->fillRect(QRectF(0., 0., valWidth, height()), QColor(160, 160, 255));
+            p->setPen(Qt::NoPen);
+            qreal valWidth = qclamp(mValue*width()/(mMaxValue - mMinValue),
+                                    0., width() - 1.);
+            p->setBrush(sliderFill);
+            qreal heightRemoval = qMax(0., 10. - valWidth)*0.5;
+            p->drawRoundedRect(QRectF(1., 1.,
+                                      valWidth,
+                                      height() - 2.).
+                               adjusted(0., heightRemoval,
+                                        0., -heightRemoval), 5., 5.);
         }
+        p->setPen(Qt::black);
         if(mShowName) {
             p->drawText(rect(), Qt::AlignCenter, mName + ": " + getValueString());
         } else {
             p->drawText(rect(), Qt::AlignCenter, getValueString());
         }
     }
-    p->drawRect(rect().adjusted(0, 0, -1, -1));
+    p->setPen(QPen(stroke, 1.));
+    p->setBrush(Qt::NoBrush);
+
+    p->drawRoundedRect(boundingRect, 5., 5.);
+
+    p->restore();
 }
 
 void QDoubleSlider::emitEditingStarted(qreal value) {
@@ -157,8 +187,7 @@ void QDoubleSlider::fitWidthToContent()
     mLineEdit->setFixedWidth(newWidth);
 }
 
-void QDoubleSlider::paintEvent(QPaintEvent *)
-{
+void QDoubleSlider::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
     paint(&p);

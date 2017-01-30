@@ -45,15 +45,14 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             effectsMenu->addAction("Lines");
             effectsMenu->addAction("Circles");
 
-
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
                 if(selectedAction->text() == "Paste") {
                 } else if(selectedAction->text() == "Blur") {
                     addEffect(new BlurEffect());
-                } else if(selectedAction->text() == "Brush") {
+                } /*else if(selectedAction->text() == "Brush") {
                     addEffect(new BrushEffect());
-                } else if(selectedAction->text() == "Lines") {
+                }*/ else if(selectedAction->text() == "Lines") {
                     addEffect(new LinesEffect());
                 } else if(selectedAction->text() == "Circles") {
                     addEffect(new CirclesEffect());
@@ -407,7 +406,7 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
                 mFillStrokeSettingsWidget->loadSettingsFromPath(
                             (VectorPath*) mLastPressedBox);
             }
-            setCanvasMode(MOVE_PATH);
+            mCanvasWidget->setCanvasMode(MOVE_PATH);
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             if(mCurrentTextBox != NULL) {
                 mCurrentTextBox->openTextEditor();

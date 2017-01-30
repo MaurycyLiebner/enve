@@ -258,3 +258,32 @@ void ColorAnimator::openContextMenu(QPoint pos) {
 
     }
 }
+
+void ColorAnimator::makeDuplicate(QrealAnimator *target) {
+    ColorAnimator *colorTarget = (ColorAnimator*)target;
+
+    colorTarget->duplicateVal1AnimatorFrom(&mVal1Animator);
+    colorTarget->duplicateVal2AnimatorFrom(&mVal2Animator);
+    colorTarget->duplicateVal3AnimatorFrom(&mVal3Animator);
+    colorTarget->duplicateAlphaAnimatorFrom(&mAlphaAnimator);
+}
+
+void ColorAnimator::duplicateVal1AnimatorFrom(
+        QrealAnimator *source) {
+    source->makeDuplicate(&mVal1Animator);
+}
+
+void ColorAnimator::duplicateVal2AnimatorFrom(
+        QrealAnimator *source) {
+    source->makeDuplicate(&mVal2Animator);
+}
+
+void ColorAnimator::duplicateVal3AnimatorFrom(
+        QrealAnimator *source) {
+    source->makeDuplicate(&mVal3Animator);
+}
+
+void ColorAnimator::duplicateAlphaAnimatorFrom(
+        QrealAnimator *source) {
+    source->makeDuplicate(&mAlphaAnimator);
+}

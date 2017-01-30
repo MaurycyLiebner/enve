@@ -183,8 +183,6 @@ public:
 
     int getCurrentFrame();
 
-    bool isRecording();
-
     bool isRecordingAllPoints();
 
     int getMinFrame();

@@ -24,6 +24,19 @@ QrealKey::~QrealKey()
     mEndPoint->decNumberPointers();
 }
 
+QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
+    QrealKey *target = new QrealKey(targetParent);
+    target->setValue(mValue);
+    target->setFrame(mFrame);
+    target->setCtrlsMode(mCtrlsMode);
+    target->setStartEnabled(mStartEnabled);
+    target->setStartFrame(mStartFrame);
+    target->setStartValue(mStartValue);
+    target->setEndEnabled(mEndEnabled);
+    target->setEndFrame(mEndFrame);
+    target->setEndValue(mEndValue);
+}
+
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>

@@ -29,8 +29,11 @@ public:
     QString getValueString();
 
     void setValueRange(qreal min, qreal max);
-
     virtual void paint(QPainter *p);
+    void paint(QPainter *p,
+               const QColor &allFill,
+               const QColor &sliderFill,
+               const QColor &stroke);
     void setPrefferedValueStep(qreal step);
 
     qreal maximum();

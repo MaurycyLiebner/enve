@@ -40,7 +40,6 @@ public:
     int getCurrentFrame();
     int getMaxFrame();
     int getMinFrame();
-    bool isRecording();
     bool isRecordingAllPoints();
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();

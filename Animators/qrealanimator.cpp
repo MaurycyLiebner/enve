@@ -835,6 +835,25 @@ void QrealAnimator::setTransformed(bool bT) {
     mTransformed = bT;
 }
 
+void QrealAnimator::makeDuplicate(QrealAnimator *target) {
+    target->setName(mName);
+    target->setRecording(false);
+    target->setCurrentValue(mCurrentValue, true);
+    if(mIsRecording) {
+        target->setRecordingWithoutChangingKeys(mIsRecording);
+    }
+    foreach(QrealKey *key, mKeys) {
+        QrealKey *duplicate = key->makeQrealKeyDuplicate(target);
+        target->appendKey(duplicate);
+    }
+}
+
+QrealAnimator *QrealAnimator::makeDuplicate() {
+    QrealAnimator *target = new QrealAnimator();
+    makeDuplicate(target);
+    return target;
+}
+
 void QrealAnimator::setUpdater(AnimatorUpdater *updater)
 {
     if(mUpdater != NULL) mUpdater->decNumberPointers();

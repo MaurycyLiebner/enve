@@ -50,6 +50,8 @@ public:
     void updateDisplayedFillStrokeSettings();
 
     void setResolutionPercent(const qreal &percent);
+    void updatePivotIfNeeded();
+    void schedulePivotUpdate();
 protected:
     Canvas *mCurrentCanvas = NULL;
     QList<Canvas*> mCanvasList;

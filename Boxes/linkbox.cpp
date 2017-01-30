@@ -85,30 +85,29 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
 }
 
 QPixmap InternalLinkBox::renderPixProvidedTransform(
-                                                Canvas *parentCanvas,
-                                                const QMatrix &renderTransform,
-                                                QPointF *drawPos) {
-    return mLinkTarget->renderPixProvidedTransform(parentCanvas,
+                                const qreal &effectsMargin,
+                                const QMatrix &renderTransform,
+                                QPointF *drawPos) {
+    return mLinkTarget->renderPixProvidedTransform(effectsMargin,
                                                    renderTransform,
                                                    drawPos);
 }
 
 QPixmap InternalLinkBox::getAllUglyPixmapProvidedTransform(
-                                             Canvas *parentCanvas,
-                                             const QMatrix &allUglyTransform,
-                                             QRectF *allUglyBoundingRectP) {
-    return mLinkTarget->getAllUglyPixmapProvidedTransform(parentCanvas,
+                                const qreal &effectsMargin,
+                                const QMatrix &allUglyTransform,
+                                QRectF *allUglyBoundingRectP) {
+    return mLinkTarget->getAllUglyPixmapProvidedTransform(effectsMargin,
                                                           allUglyTransform,
                                                           allUglyBoundingRectP);
 }
 
 QPixmap InternalLinkBox::getPrettyPixmapProvidedTransform(
-                                                Canvas *parentCanvas,
-                                                const QMatrix &transform,
-                                                QRectF *pixBoundingRectClippedToViewP) {
-    return mLinkTarget->getPrettyPixmapProvidedTransform(parentCanvas,
-                                                         transform,
-                                                         pixBoundingRectClippedToViewP);
+                                const QMatrix &transform,
+                                QRectF *pixBoundingRectClippedToViewP) {
+    return mLinkTarget->getPrettyPixmapProvidedTransform(
+                                        transform,
+                                        pixBoundingRectClippedToViewP);
 }
 
 void InternalLinkBox::drawSelected(QPainter *p, CanvasMode)

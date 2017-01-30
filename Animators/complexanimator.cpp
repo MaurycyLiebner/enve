@@ -17,6 +17,14 @@ ComplexAnimator::~ComplexAnimator()
     mChildAnimators.clear();
 }
 
+int ComplexAnimator::getNumberOfChildren() {
+    return mChildAnimators.count();
+}
+
+QrealAnimator *ComplexAnimator::getChildAt(const int &i) {
+    return mChildAnimators.at(i);
+}
+
 qreal ComplexAnimator::clampValue(qreal value)
 {
     return value;//clamp(value, mMinMoveValue, mMaxMoveValue);

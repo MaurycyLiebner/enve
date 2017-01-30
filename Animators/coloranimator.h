@@ -28,6 +28,12 @@ public:
     void openContextMenu(QPoint pos);
     void loadFromSql(int sqlId);
     int saveToSql(QSqlQuery *query);
+
+    void makeDuplicate(QrealAnimator *target);
+    void duplicateVal1AnimatorFrom(QrealAnimator *source);
+    void duplicateVal2AnimatorFrom(QrealAnimator *source);
+    void duplicateVal3AnimatorFrom(QrealAnimator *source);
+    void duplicateAlphaAnimatorFrom(QrealAnimator *source);
 private:
     ColorMode mColorMode = RGBMODE;
     QrealAnimator mVal1Animator;

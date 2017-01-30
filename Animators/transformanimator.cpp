@@ -343,6 +343,41 @@ bool TransformAnimator::hasBaseTransformation() {
     return mBaseTransformationSet;
 }
 
+void TransformAnimator::makeDuplicate(QrealAnimator *target) {
+    TransformAnimator *transformPtr = (TransformAnimator*)target;
+
+    transformPtr->duplicatePivotAnimatorFrom(&mPivotAnimator);
+    transformPtr->duplicatePosAnimatorFrom(&mPosAnimator);
+    transformPtr->duplicateScaleAnimatorFrom(&mScaleAnimator);
+    transformPtr->duplicateRotAnimatorFrom(&mRotAnimator);
+    transformPtr->duplicateOpacityAnimatorFrom(&mOpacityAnimator);
+}
+
+void TransformAnimator::duplicatePivotAnimatorFrom(
+        QPointFAnimator *source) {
+    source->makeDuplicate(&mPivotAnimator);
+}
+
+void TransformAnimator::duplicatePosAnimatorFrom(
+        QPointFAnimator *source) {
+    source->makeDuplicate(&mPosAnimator);
+}
+
+void TransformAnimator::duplicateScaleAnimatorFrom(
+        QPointFAnimator *source) {
+    source->makeDuplicate(&mScaleAnimator);
+}
+
+void TransformAnimator::duplicateRotAnimatorFrom(
+        QrealAnimator *source) {
+    source->makeDuplicate(&mRotAnimator);
+}
+
+void TransformAnimator::duplicateOpacityAnimatorFrom(
+        QrealAnimator *source) {
+    source->makeDuplicate(&mOpacityAnimator);
+}
+
 void TransformAnimator::setBaseTransformation(const QMatrix &matrix) {
     mBaseTransformation = matrix;
     //mBaseTransformation.translate(-matrix.dx(), -matrix.dy());

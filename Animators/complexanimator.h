@@ -48,6 +48,8 @@ public:
 
     void changeChildAnimatorZ(const int &oldIndex,
                               const int &newIndex);
+    int getNumberOfChildren();
+    QrealAnimator *getChildAt(const int &i);
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

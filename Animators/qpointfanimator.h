@@ -26,6 +26,10 @@ public:
     void loadFromSql(int posAnimatorId);
     void multSavedValueToCurrentValue(qreal sx, qreal sy);
     void incSavedValueToCurrentValue(qreal incXBy, qreal incYBy);
+
+    void makeDuplicate(QrealAnimator *target);
+    void duplicateYAnimatorFrom(QrealAnimator *source);
+    void duplicateXAnimatorFrom(QrealAnimator *source);
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

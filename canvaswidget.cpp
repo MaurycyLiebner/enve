@@ -419,3 +419,13 @@ void CanvasWidget::setResolutionPercent(const qreal &percent) {
     mCurrentCanvas->setResolutionPercent(percent);
     mCurrentCanvas->updateAllBoxes();
 }
+
+void CanvasWidget::updatePivotIfNeeded() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->updatePivotIfNeeded();
+}
+
+void CanvasWidget::schedulePivotUpdate() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->schedulePivotUpdate();
+}

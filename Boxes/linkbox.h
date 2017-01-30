@@ -23,19 +23,18 @@ public:
     InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent);
 
     QPixmap renderPixProvidedTransform(
-                        Canvas *parentCanvas,
+                        const qreal &effectsMargin,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);
 
     QPixmap getAllUglyPixmapProvidedTransform(
-                        Canvas *parentCanvas,
+                        const qreal &effectsMargin,
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
 
     QPixmap getPrettyPixmapProvidedTransform(
-                            Canvas *parentCanvas,
-                            const QMatrix &transform,
-                            QRectF *pixBoundingRectClippedToViewP);
+                        const QMatrix &transform,
+                        QRectF *pixBoundingRectClippedToViewP);
 
     void drawSelected(QPainter *p, CanvasMode);
     void updateBoundingRect();

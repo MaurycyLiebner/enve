@@ -71,24 +71,16 @@ bool ConnectedToMainWindow::isAltPressed(QKeyEvent *event) {
     return event->modifiers() & Qt::AltModifier;
 }
 
-int ConnectedToMainWindow::getCurrentFrame()
-{
+int ConnectedToMainWindow::getCurrentFrame() {
     return mMainWindow->getCurrentFrame();
 }
 
-int ConnectedToMainWindow::getMaxFrame()
-{
+int ConnectedToMainWindow::getMaxFrame() {
     return mMainWindow->getMaxFrame();
 }
 
-int ConnectedToMainWindow::getMinFrame()
-{
+int ConnectedToMainWindow::getMinFrame() {
     return mMainWindow->getMinFrame();
-}
-
-bool ConnectedToMainWindow::isRecording()
-{
-    return mMainWindow->isRecording();
 }
 
 bool ConnectedToMainWindow::isRecordingAllPoints()

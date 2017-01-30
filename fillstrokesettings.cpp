@@ -5,7 +5,8 @@
 #include "canvas.h"
 #include "updatescheduler.h"
 
-Gradient::Gradient(Color color1, Color color2, GradientWidget *gradientWidget) :
+Gradient::Gradient(Color color1, Color color2,
+                   GradientWidget *gradientWidget) :
     ComplexAnimator()
 {
     setName("gradient");
@@ -35,7 +36,8 @@ Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
             arg(mSqlId);
     if(query.exec(queryStr) ) {
         query.next();
-        queryStr = QString("SELECT colorid FROM gradientcolor WHERE gradientid = %1 ORDER BY positioningradient ASC").
+        queryStr = QString("SELECT colorid FROM gradientcolor WHERE "
+                           "gradientid = %1 ORDER BY positioningradient ASC").
                 arg(mSqlId);
         if(query.exec(queryStr) ) {
             int idColorId = query.record().indexOf("colorid");
@@ -46,7 +48,8 @@ Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
                 addColorToList(newAnimator);
             }
         } else {
-            qDebug() << "Could not load gradientcolors for gradient with id " << mSqlId;
+            qDebug() << "Could not load gradientcolors "
+                        "for gradient with id " << mSqlId;
         }
     } else {
         qDebug() << "Could not load gradient with id " << mSqlId;
@@ -102,7 +105,8 @@ int Gradient::saveToSql(QSqlQuery *query) {
     int posInGradient = 0;
     foreach(ColorAnimator *color, mColors) {
         int colorId = color->saveToSql(query);
-        query->exec(QString("INSERT INTO gradientcolor (colorid, gradientid, positioningradient) "
+        query->exec(QString("INSERT INTO gradientcolor "
+                            "(colorid, gradientid, positioningradient) "
                             "VALUES (%1, %2, %3)").
                     arg(colorId).
                     arg(mSqlId).
@@ -270,7 +274,8 @@ int PaintSettings::saveToSql(QSqlQuery *query) {
     QString gradientId = (mGradient == NULL) ? "NULL" :
                                                QString::number(
                                                    mGradient->getSqlId());
-    query->exec(QString("INSERT INTO paintsettings (painttype, colorid, gradientid) "
+    query->exec(QString("INSERT INTO paintsettings "
+                        "(painttype, colorid, gradientid) "
                         "VALUES (%1, %2, %3)").
                 arg(mPaintType).
                 arg(colorId).
@@ -305,12 +310,14 @@ void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
 
 void StrokeSettings::loadFromSql(int strokeSqlId, GradientWidget *gradientWidget) {
     QSqlQuery query;
-    QString queryStr = QString("SELECT paintsettingsid FROM strokesettings WHERE id = %1").
+    QString queryStr = QString("SELECT paintsettingsid FROM "
+                               "strokesettings WHERE id = %1").
             arg(strokeSqlId);
     if(query.exec(queryStr) ) {
         query.next();
         int idPaintSettingsId = query.record().indexOf("paintsettingsid");
-        int paintSettingsId = static_cast<PaintType>(query.value(idPaintSettingsId).toInt());
+        int paintSettingsId = static_cast<PaintType>(
+                    query.value(idPaintSettingsId).toInt());
         loadFromSql(strokeSqlId, paintSettingsId, gradientWidget);
     } else {
         qDebug() << "Could not load strokesettings with id " << strokeSqlId;
@@ -372,7 +379,8 @@ bool StrokeSettings::nonZeroLineWidth() {
 }
 
 #include "qdoubleslider.h"
-FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) : QWidget(parent)
+FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
+    QWidget(parent)
 {
     //setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mMainWindow = parent;

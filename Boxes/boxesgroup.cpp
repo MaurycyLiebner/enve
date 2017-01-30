@@ -166,7 +166,7 @@ void BoxesGroup::applyShadowToSelected() {
 
 void BoxesGroup::applyBrushEffectToSelected() {
     foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new BrushEffect());
+        //box->addEffect(new BrushEffect());
     }
 }
 

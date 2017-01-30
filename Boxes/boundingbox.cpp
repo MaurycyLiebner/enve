@@ -38,7 +38,14 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 
 #include "linkbox.h"
 BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
-    return new InternalLinkBox(this, parent);
+    InternalLinkBox *linkBox = new InternalLinkBox(this, parent);
+    linkBox->duplicateTransformAnimatorFrom(&mTransformAnimator);
+    int effectsCount = mEffectsAnimators.getNumberOfChildren();
+    for(int i = 0; i < effectsCount; i++) {
+        linkBox->addEffect((PixmapEffect*)mEffectsAnimators.
+                           getChildAt(i)->makeDuplicate() );
+    }
+    return linkBox;
 }
 
 BoundingBox *BoundingBox::createSameTransformationLink(BoxesGroup *parent) {
@@ -173,7 +180,6 @@ QRectF BoundingBox::getBoundingRectClippedToView() {
 }
 
 QPixmap BoundingBox::getPrettyPixmapProvidedTransform(
-                                         Canvas *parentCanvas,
                                          const QMatrix &transform,
                                          QRectF *pixBoundingRectClippedToViewP) {
     QRectF pixBoundingRectClippedToView = *pixBoundingRectClippedToViewP;
@@ -195,11 +201,11 @@ QPixmap BoundingBox::getPrettyPixmapProvidedTransform(
     draw(&p);
     p.end();
 
-    if(parentCanvas->effectsPaintEnabled()) {
-        newPixmap = applyEffects(newPixmap,
-                                 true,
-                                 mUpdateCanvasTransform.m11());
-    }
+//    if(parentCanvas->effectsPaintEnabled()) {
+//        newPixmap = applyEffects(newPixmap,
+//                                 true,
+//                                 mUpdateCanvasTransform.m11());
+//    }
 
     *pixBoundingRectClippedToViewP = pixBoundingRectClippedToView;
 
@@ -210,10 +216,21 @@ Canvas *BoundingBox::getParentCanvas() {
     return mParent->getParentCanvas();
 }
 
+void BoundingBox::duplicateTransformAnimatorFrom(
+        TransformAnimator *source) {
+    source->makeDuplicate(&mTransformAnimator);
+}
+
 void BoundingBox::updatePrettyPixmap() {
-    mNewPixmap = getPrettyPixmapProvidedTransform(getParentCanvas(),
-                                                  mUpdateTransform,
+    Canvas *parentCanvas = getParentCanvas();
+    mNewPixmap = getPrettyPixmapProvidedTransform(mUpdateTransform,
                                                   &mPixBoundingRectClippedToView);
+
+    if(parentCanvas->effectsPaintEnabled()) {
+        mNewPixmap = applyEffects(mNewPixmap,
+                                  true,
+                                  mUpdateCanvasTransform.m11());
+    }
 }
 
 void BoundingBox::updateAllBoxes() {
@@ -231,10 +248,9 @@ void BoundingBox::updatePixBoundingRectClippedToView() {
 }
 
 QPixmap BoundingBox::getAllUglyPixmapProvidedTransform(
-        Canvas *parentCanvas,
+        const qreal &effectsMargin,
         const QMatrix &allUglyTransform,
         QRectF *allUglyBoundingRectP) {
-    qreal effectsMargin = mEffectsMargin*parentCanvas->getResolutionPercent();
     QRectF allUglyBoundingRect = allUglyTransform.mapRect(mRelBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,
                      effectsMargin, effectsMargin);
@@ -257,35 +273,40 @@ QPixmap BoundingBox::getAllUglyPixmapProvidedTransform(
     draw(&p);
     p.end();
 
-    if(parentCanvas->effectsPaintEnabled()) {
-        allUglyPixmap = applyEffects(allUglyPixmap,
-                                     false,
-                                     parentCanvas->getResolutionPercent());
-    }
+//    if(parentCanvas->effectsPaintEnabled()) {
+//        allUglyPixmap = applyEffects(allUglyPixmap,
+//                                     false,
+//                                     parentCanvas->getResolutionPercent());
+//    }
 
     *allUglyBoundingRectP = allUglyBoundingRect;
     return allUglyPixmap;
 }
 
 void BoundingBox::updateAllUglyPixmap() {
+    Canvas *parentCanvas = getParentCanvas();
     QMatrix inverted = mUpdateCanvasTransform.inverted().
-                            scale(getParentCanvas()->getResolutionPercent(),
-                                  getParentCanvas()->getResolutionPercent());
+                            scale(parentCanvas->getResolutionPercent(),
+                                  parentCanvas->getResolutionPercent());
 
     mAllUglyTransform = inverted*mUpdateTransform;
 
     mAllUglyPixmap = getAllUglyPixmapProvidedTransform(
-                                      getParentCanvas(),
-                                      mAllUglyTransform,
-                                      &mAllUglyBoundingRect);
+                      mEffectsMargin*parentCanvas->getResolutionPercent(),
+                      mAllUglyTransform,
+                      &mAllUglyBoundingRect);
+
+    if(parentCanvas->effectsPaintEnabled()) {
+        mAllUglyPixmap = applyEffects(mAllUglyPixmap,
+                                      false,
+                                      parentCanvas->getResolutionPercent());
+    }
 }
 
 QPixmap BoundingBox::renderPixProvidedTransform(
-                        Canvas *parentCanvas,
+                        const qreal &effectsMargin,
                         const QMatrix &renderTransform,
                         QPointF *drawPos) {
-    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11()*
-                            parentCanvas->getResolutionPercent();
     QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
                         adjusted(-effectsMargin, -effectsMargin,
                                  effectsMargin, effectsMargin);
@@ -309,12 +330,12 @@ QPixmap BoundingBox::renderPixProvidedTransform(
     draw(&p);
     p.end();
 
-    if(parentCanvas->effectsPaintEnabled()) {
-        newPixmap = applyEffects(newPixmap,
-                                 true,
-                                 mUpdateCanvasTransform.m11()*
-                                 parentCanvas->getResolutionPercent());
-    }
+//    if(parentCanvas->effectsPaintEnabled()) {
+//        newPixmap = applyEffects(newPixmap,
+//                                 true,
+//                                 mUpdateCanvasTransform.m11()*
+//                                 parentCanvas->getResolutionPercent());
+//    }
     *drawPos = pixBoundingRectClippedToView.topLeft();
     return newPixmap;
 //    qreal effectsMargin = mEffectsMargin*getCurrentCanvasScale();
@@ -352,10 +373,19 @@ void BoundingBox::render(QPainter *p) {
     transformMatrix.
             scale(getParentCanvas()->getResolutionPercent(),
                   getParentCanvas()->getResolutionPercent());
+
+    Canvas *parentCanvas = getParentCanvas();
     mRenderPixmap = renderPixProvidedTransform(
-                                    getParentCanvas(),
-                                    transformMatrix,
-                                    &drawPos);
+                mEffectsMargin*mUpdateCanvasTransform.m11()*
+                    parentCanvas->getResolutionPercent(),
+                transformMatrix,
+                &drawPos);
+    if(parentCanvas->effectsPaintEnabled()) {
+        mRenderPixmap = applyEffects(mRenderPixmap,
+                                 true,
+                                 mUpdateCanvasTransform.m11()*
+                                 parentCanvas->getResolutionPercent());
+    }
 
     p->setOpacity(mTransformAnimator.getOpacity()*0.01);
 
@@ -458,6 +488,7 @@ void BoundingBox::awaitUpdate() {
 
 #include "updatescheduler.h"
 void BoundingBox::scheduleAwaitUpdate() {
+    if(mParent == NULL) return;
     if(mAwaitingUpdate) {
         redoUpdate();
     } else {

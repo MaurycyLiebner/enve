@@ -100,7 +100,8 @@ SOURCES += main.cpp\
     Boxes/linkbox.cpp \
     actionbutton.cpp \
     Boxes/boxpainthandler.cpp \
-    newcanvasdialog.cpp
+    newcanvasdialog.cpp \
+    PixmapEffects/brusheffect.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -188,7 +189,8 @@ HEADERS  += mainwindow.h \
     Boxes/linkbox.h \
     actionbutton.h \
     Boxes/boxpainthandler.h \
-    newcanvasdialog.h
+    newcanvasdialog.h \
+    PixmapEffects/brusheffect.h
 
 RESOURCES += \
     resources.qrc

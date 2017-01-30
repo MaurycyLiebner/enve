@@ -67,6 +67,10 @@ public:
     void loadBlurEffectFromSql(int pixmapEffectId);
 
     void saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+
+    QrealAnimator *makeDuplicate();
+    void makeDuplicate(QrealAnimator *target);
+    void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 private:
     QrealAnimator mBlurRadius;
 };
@@ -83,78 +87,19 @@ public:
                bool highQuality);
 
     qreal getMargin();
+
+    QrealAnimator *makeDuplicate();
+    void makeDuplicate(QrealAnimator *target);
+    void duplicateTranslationAnimatorFrom(QPointFAnimator *source);
+    void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
+    void duplicateColorAnimatorFrom(ColorAnimator *source);
+    void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 private:
 //    QrealAnimator mScale;
     QPointFAnimator mTranslation;
     ColorAnimator mColor;
     QrealAnimator mBlurRadius;
     QrealAnimator mOpacity;
-};
-
-class BrushStroke {
-public:
-    BrushStroke(QPointF startPos,
-                QPointF startCtrlPos,
-                QPointF endCtrlPos,
-                QPointF endPos,
-                qreal radius,
-                QColor color);
-
-    void drawOnImage(QImage *img) const;
-
-    void prepareToDrawOnImage(QImage *img);
-
-    static void loadStrokePixmaps();
-private:
-    static QList<QPixmap*> mStrokeTexPixmaps;
-    static QPixmap *mEndPix;
-
-    QPixmap mTexPix;
-    qreal mStrokeTexHeight;
-    qreal mStrokeTexWidth;
-    int mMaxTexDabs;
-    int mMaxStrokeDabs;
-    int mNDabs;
-    QPainter::PixmapFragment *mFragments;
-
-    QPainterPath mStrokePath;
-    QPainterPath mWholeStrokePath;
-    QRectF mBoundingRect;
-
-    QPointF mStartPos;
-    QPointF mStartCtrlPos;
-    QPointF mEndCtrlPos;
-    QPointF mEndPos;
-    qreal mRadius;
-    QColor mColor;
-};
-
-class BrushEffect : public PixmapEffect
-{
-public:
-    BrushEffect(qreal numberStrokes = 100.,
-                qreal brushMinRadius = 20.,
-                qreal brushMaxRadius = 30.,
-                qreal strokeMaxLength = 200.,
-                qreal strokeMinDirectionAngle = 0.,
-                qreal strokeMaxDirectionAngle = 360.,
-                qreal strokeCurvature = 0.5);
-
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale,
-               bool highQuality);
-
-    qreal getMargin();
-private:
-    QrealAnimator mMinBrushRadius;
-    QrealAnimator mMaxBrushRadius;
-    QrealAnimator mStrokeMaxLength;
-    QrealAnimator mStrokeMinDirectionAngle;
-    QrealAnimator mStrokeMaxDirectionAngle;
-    QrealAnimator mStrokeCurvature;
-    QrealAnimator mNumberStrokes;
 };
 
 class LinesEffect : public PixmapEffect

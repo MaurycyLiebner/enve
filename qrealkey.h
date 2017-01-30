@@ -17,6 +17,8 @@ public:
                     qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~QrealKey();
 
+    QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
+
     void updateCtrlFromCtrl(QrealPointType type);
 
     virtual qreal getValue();

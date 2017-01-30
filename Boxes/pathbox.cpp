@@ -160,8 +160,7 @@ void PathBox::updateOutlinePathIfNeeded() {
     }
 }
 
-void PathBox::updateAfterCombinedTransformationChanged()
-{
+void PathBox::updateAfterCombinedTransformationChanged() {
 }
 
 void PathBox::copyStrokeAndFillSettingsTo(PathBox *target) {

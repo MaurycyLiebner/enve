@@ -1,4 +1,5 @@
 #include "fontswidget.h"
+#include <QLineEdit>
 
 FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent)
 {
@@ -6,6 +7,13 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent)
     mFontFamilyCombo = new QComboBox(this);
     mFontSizeCombo = new QComboBox(this);
     mFontSizeCombo->setEditable(true);
+    mFontSizeCombo->lineEdit()->setStyleSheet(
+                "QLineEdit {"
+                    "background: rgb(200, 200, 200);"
+                "} "
+                "QLineEdit:focus {"
+                    "background: rgb(255, 255, 255);"
+                "}");
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
     connect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),

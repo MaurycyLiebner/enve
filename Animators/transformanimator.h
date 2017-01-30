@@ -55,6 +55,14 @@ public:
     void loadFromSql(int transformAnimatorId);
     void setBaseTransformation(const QMatrix &matrix);
     bool hasBaseTransformation();
+
+    void makeDuplicate(QrealAnimator *target);
+
+    void duplicatePivotAnimatorFrom(QPointFAnimator *source);
+    void duplicatePosAnimatorFrom(QPointFAnimator *source);
+    void duplicateScaleAnimatorFrom(QPointFAnimator *source);
+    void duplicateRotAnimatorFrom(QrealAnimator *source);
+    void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 private:
     bool mBaseTransformationSet = false;
     QMatrix mBaseTransformation;

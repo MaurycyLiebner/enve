@@ -39,7 +39,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupToolBar();
 
-    BrushStroke::loadStrokePixmaps();
     mCurrentUndoRedoStack = &mUndoRedoStack;
 
     mMainWindowInstance = this;
@@ -337,10 +336,28 @@ void MainWindow::setupToolBar() {
     mFontWidget = new FontsWidget(this);
     mToolBar->addWidget(mFontWidget);
 
+    QWidget *canvasComboWidget = new QWidget(this);
+    canvasComboWidget->setAttribute(Qt::WA_TranslucentBackground);
+    QHBoxLayout *canvasComboLayout = new QHBoxLayout();
+    canvasComboLayout->setSpacing(0);
+    canvasComboWidget->setLayout(canvasComboLayout);
     mCurrentCanvasComboBox = new QComboBox(mToolBar);
+
     mNewCanvasButton = new QPushButton("+", mToolBar);
-    mToolBar->addWidget(mNewCanvasButton);
-    mToolBar->addWidget(mCurrentCanvasComboBox);
+    mNewCanvasButton->setStyleSheet(
+                "border-top-right-radius: 0;"
+                "border-bottom-right-radius: 0;"
+                "border-right: 0px solid black;");
+    mCurrentCanvasComboBox->setStyleSheet(
+                "border-top-left-radius: 0;"
+                "border-bottom-left-radius: 0;");
+    mNewCanvasButton->setFixedHeight(
+                mCurrentCanvasComboBox->sizeHint().height() + 2);
+
+    canvasComboLayout->addWidget(mNewCanvasButton);
+    canvasComboLayout->addWidget(mCurrentCanvasComboBox);
+
+    mToolBar->addWidget(canvasComboWidget);
 
     addToolBar(mToolBar);
 }
@@ -622,7 +639,7 @@ void MainWindow::callUpdateSchedulers()
     }
 
     mUpdateSchedulers.clear();
-    mCanvas->updatePivotIfNeeded();
+    mCanvasWidget->updatePivotIfNeeded();
     mCanvasWidget->repaint();
     mBoxListWidget->repaint();
     mObjectSettingsWidget->repaint();
@@ -676,9 +693,8 @@ bool MainWindow::askForSaving() {
     return true;
 }
 
-void MainWindow::schedulePivotUpdate()
-{
-    mCanvas->schedulePivotUpdate();
+void MainWindow::schedulePivotUpdate() {
+    mCanvasWidget->schedulePivotUpdate();
 }
 
 KeysView *MainWindow::getKeysView()
@@ -708,35 +724,25 @@ void MainWindow::disable()
     mGrayOutWidget->repaint();
 }
 
-void MainWindow::enable()
-{
+void MainWindow::enable() {
     if(mGrayOutWidget == NULL) return;
     delete mGrayOutWidget;
     mGrayOutWidget = NULL;
 }
 
-int MainWindow::getCurrentFrame()
-{
+int MainWindow::getCurrentFrame() {
     return mCurrentFrame;
 }
 
-bool MainWindow::isRecording()
-{
-    return mRecording;
-}
-
-bool MainWindow::isRecordingAllPoints()
-{
+bool MainWindow::isRecordingAllPoints() {
     return mAllPointsRecording;
 }
 
-int MainWindow::getMinFrame()
-{
+int MainWindow::getMinFrame() {
     return mMinFrame;
 }
 
-int MainWindow::getMaxFrame()
-{
+int MainWindow::getMaxFrame() {
     return mMaxFrame;
 }
 
