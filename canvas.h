@@ -337,7 +337,7 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
-    void render(QPainter *p);
+    void updateAndDrawPreviewPixmap(QPainter *p);
     void renderFinal(QPainter *p);
     void createAnimationBoxForPaths(const QStringList &paths);
     void setPreviewing(bool bT);

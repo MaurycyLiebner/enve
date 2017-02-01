@@ -22,7 +22,7 @@ class InternalLinkBox : public BoundingBox
 public:
     InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent);
 
-    QPixmap renderPixProvidedTransform(
+    QPixmap renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);
@@ -89,19 +89,22 @@ protected:
     BoxesGroup *mLinkTarget = NULL;
 };
 
-class InternalLinkCanvas : public InternalLinkBoxesGroup
-{
+class InternalLinkCanvas : public InternalLinkBoxesGroup {
 public:
     InternalLinkCanvas(BoxesGroup *canvas,
                        BoxesGroup *parent) :
         InternalLinkBoxesGroup(canvas, parent) {
-
+        updateBoundingRect();
+        centerPivotPosition();
     }
 
     void updateBoundingRect();
+    void setClippedToCanvasSize(const bool &clipped);
 
     void draw(QPainter *p);
+    void drawForPreview(QPainter *p);
 protected:
+    bool mClipToCanvasSize = true;
 };
 
 class SameTransformInternalLinkBoxesGroup : public InternalLinkBoxesGroup {

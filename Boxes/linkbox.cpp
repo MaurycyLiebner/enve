@@ -84,11 +84,11 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
             this, SLOT(scheduleAwaitUpdateSLOT()));
 }
 
-QPixmap InternalLinkBox::renderPixProvidedTransform(
+QPixmap InternalLinkBox::renderPreviewProvidedTransform(
                                 const qreal &effectsMargin,
                                 const QMatrix &renderTransform,
                                 QPointF *drawPos) {
-    return mLinkTarget->renderPixProvidedTransform(effectsMargin,
+    return mLinkTarget->renderPreviewProvidedTransform(effectsMargin,
                                                    renderTransform,
                                                    drawPos);
 }
@@ -199,32 +199,44 @@ qreal SameTransformInternalLinkBoxesGroup::getEffectsMargin() {
 }
 
 void InternalLinkCanvas::updateBoundingRect() {
-    //        QPainterPath boundingPaths = QPainterPath();
-    //        foreach(BoundingBox *child, mChildren) {
-    //            boundingPaths.addPath(
-    //                        child->getRelativeTransform().
-    //                        map(child->getRelBoundingRectPath()));
-    //        }
-    mRelBoundingRect = QRectF(QPointF(0., 0.),
-                              ((Canvas*)mLinkTarget)->getCanvasSize());
-    //boundingPaths.boundingRect();
+    if(mClipToCanvasSize) {
+        //        QPainterPath boundingPaths = QPainterPath();
+        //        foreach(BoundingBox *child, mChildren) {
+        //            boundingPaths.addPath(
+        //                        child->getRelativeTransform().
+        //                        map(child->getRelBoundingRectPath()));
+        //        }
+        mRelBoundingRect = QRectF(QPointF(0., 0.),
+                                  ((Canvas*)mLinkTarget)->getCanvasSize());
+        //boundingPaths.boundingRect();
 
-    qreal effectsMargin = mEffectsMargin*
-            mUpdateCanvasTransform.m11();
+        qreal effectsMargin = mEffectsMargin*
+                mUpdateCanvasTransform.m11();
 
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-            adjusted(-effectsMargin, -effectsMargin,
-                     effectsMargin, effectsMargin);
+        mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
+                adjusted(-effectsMargin, -effectsMargin,
+                         effectsMargin, effectsMargin);
 
-    BoundingBox::updateBoundingRect();
+        BoundingBox::updateBoundingRect();
+    } else {
+        BoxesGroup::updateBoundingRect();
+    }
+}
+
+void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
+    mClipToCanvasSize = clipped;
+    scheduleAwaitUpdate();
 }
 
 void InternalLinkCanvas::draw(QPainter *p)
 {
     if(mVisible) {
         p->save();
-        p->setClipRect(mRelBoundingRect);
         p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
+        if(mClipToCanvasSize) {
+            p->setClipPath(mMappedBoundingRectPath);
+            //p->setClipRect(mRelBoundingRect);
+        }
         foreach(BoundingBox *box, mChildren) {
             //box->draw(p);
             box->drawPixmap(p);
@@ -233,3 +245,23 @@ void InternalLinkCanvas::draw(QPainter *p)
         p->restore();
     }
 }
+
+void InternalLinkCanvas::drawForPreview(QPainter *p) {
+    if(mVisible) {
+        p->save();
+        p->setTransform(QTransform(
+                            mCombinedTransformMatrix.inverted()),
+                            true);
+        if(mClipToCanvasSize) {
+            p->setClipPath(mMappedBoundingRectPath);
+            //p->setClipRect(mRelBoundingRect);
+        }
+        foreach(BoundingBox *box, mChildren) {
+            //box->draw(p);
+            box->updateAndDrawPreviewPixmap(p);
+        }
+
+        p->restore();
+    }
+}
+

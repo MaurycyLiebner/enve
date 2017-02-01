@@ -303,7 +303,7 @@ void BoundingBox::updateAllUglyPixmap() {
     }
 }
 
-QPixmap BoundingBox::renderPixProvidedTransform(
+QPixmap BoundingBox::renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &renderTransform,
                         QPointF *drawPos) {
@@ -327,45 +327,14 @@ QPixmap BoundingBox::renderPixProvidedTransform(
     p.translate(transF);
     p.setTransform(QTransform(renderTransform), true);
 
-    draw(&p);
+    drawForPreview(&p);
     p.end();
 
-//    if(parentCanvas->effectsPaintEnabled()) {
-//        newPixmap = applyEffects(newPixmap,
-//                                 true,
-//                                 mUpdateCanvasTransform.m11()*
-//                                 parentCanvas->getResolutionPercent());
-//    }
     *drawPos = pixBoundingRectClippedToView.topLeft();
     return newPixmap;
-//    qreal effectsMargin = mEffectsMargin*getCurrentCanvasScale();
-//    QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
-//                            adjusted(-effectsMargin, -effectsMargin,
-//                                     effectsMargin, effectsMargin);
-
-//    QSizeF sizeF = pixBoundingRect.size();
-//    QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
-//                                       ceil(sizeF.height())) );
-//    renderPixmap.fill(Qt::transparent);
-
-//    QPainter pixP(&renderPixmap);
-//    pixP.setRenderHint(QPainter::Antialiasing);
-//    pixP.setRenderHint(QPainter::SmoothPixmapTransform);
-//    pixP.translate(-pixBoundingRect.topLeft());
-//    pixP.setTransform(QTransform(renderTransform), true);
-
-//    draw(&pixP);
-//    pixP.end();
-
-//    renderPixmap = applyEffects(renderPixmap, mHighQualityPaint,
-//                                getCurrentCanvasScale()*
-//                                getParentCanvas()->getResolutionPercent());
-
-//    *drawPos = pixBoundingRect.topLeft();
-//    return renderPixmap;
 }
 
-void BoundingBox::render(QPainter *p) {
+void BoundingBox::updateAndDrawPreviewPixmap(QPainter *p) {
     p->save();
 
     QPointF drawPos;
@@ -375,7 +344,7 @@ void BoundingBox::render(QPainter *p) {
                   getParentCanvas()->getResolutionPercent());
 
     Canvas *parentCanvas = getParentCanvas();
-    mRenderPixmap = renderPixProvidedTransform(
+    mRenderPixmap = renderPreviewProvidedTransform(
                 mEffectsMargin*mUpdateCanvasTransform.m11()*
                     parentCanvas->getResolutionPercent(),
                 transformMatrix,

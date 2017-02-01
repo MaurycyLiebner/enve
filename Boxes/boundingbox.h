@@ -75,9 +75,12 @@ public:
     virtual QRectF getPixBoundingRect();
 
     void drawPixmap(QPainter *p);
-    virtual void render(QPainter *p);
+    virtual void updateAndDrawPreviewPixmap(QPainter *p);
     virtual void renderFinal(QPainter *p);
+
     virtual void draw(QPainter *) {}
+    virtual void drawForPreview(QPainter *p) { draw(p); }
+
     virtual void drawSelected(QPainter *, CanvasMode) {}
 
     QMatrix getCombinedTransform() const;
@@ -272,7 +275,7 @@ public:
 
     void setBaseTransformation(const QMatrix &matrix);
     bool hasBaseTransformation();
-    virtual QPixmap renderPixProvidedTransform(
+    virtual QPixmap renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);

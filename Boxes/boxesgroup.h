@@ -218,6 +218,7 @@ public:
     void createLinkBoxForSelected();
     void updateEffectsMargin();
     void startSelectedPointsTransform();
+    void drawForPreview(QPainter *p);
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

@@ -435,17 +435,35 @@ void BoxesGroup::updateBoundingRect() {
 void BoxesGroup::updateEffectsMargin() {
     qreal childrenMargin = 0.;
     foreach(BoundingBox *child, mChildren) {
-        childrenMargin = qMax(child->getEffectsMargin(), childrenMargin);
+        childrenMargin = qMax(child->getEffectsMargin(),
+                              childrenMargin);
     }
     BoundingBox::updateEffectsMargin();
     mEffectsMargin += childrenMargin;
+}
+
+void BoxesGroup::drawForPreview(QPainter *p) {
+    if(mVisible) {
+        p->save();
+        p->setTransform(QTransform(
+                            mCombinedTransformMatrix.inverted()),
+                            true);
+        foreach(BoundingBox *box, mChildren) {
+            //box->draw(p);
+            box->updateAndDrawPreviewPixmap(p);
+        }
+
+        p->restore();
+    }
 }
 
 void BoxesGroup::draw(QPainter *p)
 {
     if(mVisible) {
         p->save();
-        p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
+        p->setTransform(QTransform(
+                            mCombinedTransformMatrix.inverted()),
+                            true);
         foreach(BoundingBox *box, mChildren) {
             //box->draw(p);
             box->drawPixmap(p);
