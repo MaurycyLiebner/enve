@@ -9,6 +9,7 @@ CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
 {
     mIsStartCtrlPt = isStartCtrlPt;
     mParentPoint = parentPoint;
+    mParent = mParentPoint->getParent();
     mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 

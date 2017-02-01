@@ -16,6 +16,9 @@ public:
     explicit CanvasWidget(QWidget *parent = 0);
 
     Canvas *getCurrentCanvas();
+    const QList<Canvas*> &getCanvasList() {
+        return mCanvasList;
+    }
 
     void setCurrentCanvas(Canvas *canvas);
     void addCanvasToList(Canvas *canvas);

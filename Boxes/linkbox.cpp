@@ -197,3 +197,39 @@ const QPainterPath &SameTransformInternalLinkBoxesGroup::getRelBoundingRectPath(
 qreal SameTransformInternalLinkBoxesGroup::getEffectsMargin() {
     return mLinkTarget->getEffectsMargin();
 }
+
+void InternalLinkCanvas::updateBoundingRect() {
+    //        QPainterPath boundingPaths = QPainterPath();
+    //        foreach(BoundingBox *child, mChildren) {
+    //            boundingPaths.addPath(
+    //                        child->getRelativeTransform().
+    //                        map(child->getRelBoundingRectPath()));
+    //        }
+    mRelBoundingRect = QRectF(QPointF(0., 0.),
+                              ((Canvas*)mLinkTarget)->getCanvasSize());
+    //boundingPaths.boundingRect();
+
+    qreal effectsMargin = mEffectsMargin*
+            mUpdateCanvasTransform.m11();
+
+    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
+            adjusted(-effectsMargin, -effectsMargin,
+                     effectsMargin, effectsMargin);
+
+    BoundingBox::updateBoundingRect();
+}
+
+void InternalLinkCanvas::draw(QPainter *p)
+{
+    if(mVisible) {
+        p->save();
+        p->setClipRect(mRelBoundingRect);
+        p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
+        foreach(BoundingBox *box, mChildren) {
+            //box->draw(p);
+            box->drawPixmap(p);
+        }
+
+        p->restore();
+    }
+}

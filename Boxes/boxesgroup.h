@@ -217,6 +217,7 @@ public:
 //    QPointF getRelCenterPosition();
     void createLinkBoxForSelected();
     void updateEffectsMargin();
+    void startSelectedPointsTransform();
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

@@ -40,6 +40,12 @@ void MovablePoint::applyTransform(QMatrix transform){
     mRelPos.setCurrentValue(transform.map(mRelPos.getCurrentValue()), true);
 }
 
+void MovablePoint::removeAnimations() {
+    if(mRelPos.isRecording()) {
+        mRelPos.setRecording(false);
+    }
+}
+
 void MovablePoint::finishTransform()
 {
     if(mTransformStarted) {

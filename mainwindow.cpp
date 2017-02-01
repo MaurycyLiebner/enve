@@ -345,9 +345,17 @@ void MainWindow::setupToolBar() {
 
     mNewCanvasButton = new QPushButton("+", mToolBar);
     mNewCanvasButton->setStyleSheet(
-                "border-top-right-radius: 0;"
-                "border-bottom-right-radius: 0;"
-                "border-right: 0px solid black;");
+                "QPushButton {"
+                    "border-top-right-radius: 0;"
+                    "border-bottom-right-radius: 0;"
+                    "border-right: 0px solid black;"
+                    "background-color: rgb(51, 51, 51);"
+                    "color: white;"
+                    "font-weight: bold;"
+                "}"
+                "QPushButton:hover {"
+                    "background-color: rgb(70, 70, 70);"
+                "}");
     mCurrentCanvasComboBox->setStyleSheet(
                 "border-top-left-radius: 0;"
                 "border-bottom-left-radius: 0;");

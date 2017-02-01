@@ -86,7 +86,22 @@ public:
         return mLinkTarget->createSameTransformationLink(parent);
     }
 protected:
-    BoundingBox *mLinkTarget = NULL;
+    BoxesGroup *mLinkTarget = NULL;
+};
+
+class InternalLinkCanvas : public InternalLinkBoxesGroup
+{
+public:
+    InternalLinkCanvas(BoxesGroup *canvas,
+                       BoxesGroup *parent) :
+        InternalLinkBoxesGroup(canvas, parent) {
+
+    }
+
+    void updateBoundingRect();
+
+    void draw(QPainter *p);
+protected:
 };
 
 class SameTransformInternalLinkBoxesGroup : public InternalLinkBoxesGroup {

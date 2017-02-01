@@ -37,8 +37,33 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             mCurrentBoxesGroup->clearBoxesSelection();
 
             QMenu menu;
+            menu.setStyleSheet(
+                           "QMenu {"
+                               "background-color: rgb(200, 200, 200);"
+                               "border: 1px solid rgb(170, 170, 170);"
+                           "}"
+                           "QMenu::item {"
+                               "spacing: 3px;"
+                               "padding: 2px 25px 2px 25px;"
+                               "background: transparent;"
+                               "border-radius: 4px;"
+                           "}"
+                           "QMenu::item:selected {"
+                               "background-color: #a8a8a8;"
+                               "color: black;"
+                           "}");
 
             menu.addAction("Paste");
+            QMenu *linkCanvasMenu = menu.addMenu("Link Canvas");
+            const QList<Canvas*> &listOfCanvas = mCanvasWidget->getCanvasList();
+            foreach(Canvas *canvas, listOfCanvas) {
+                QAction *action = linkCanvasMenu->addAction(canvas->getName());
+                if(canvas == this) {
+                    action->setEnabled(false);
+                    action->setVisible(false);
+                }
+            }
+
             QMenu *effectsMenu = menu.addMenu("Effects");
             effectsMenu->addAction("Blur");
 //            effectsMenu->addAction("Brush");
@@ -56,6 +81,14 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     addEffect(new LinesEffect());
                 } else if(selectedAction->text() == "Circles") {
                     addEffect(new CirclesEffect());
+                } else { // link canvas
+                    const QList<QAction*> &canvasActions =
+                            linkCanvasMenu->actions();
+                    int id = canvasActions.indexOf(selectedAction);
+                    if(id >= 0) {
+                        listOfCanvas.at(id)->createLink(
+                                    mCurrentBoxesGroup)->centerPivotPosition();
+                    }
                 }
             } else {
 
@@ -67,6 +100,21 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             }
 
             QMenu menu;
+            menu.setStyleSheet(
+                           "QMenu {"
+                               "background-color: rgb(200, 200, 200);"
+                               "border: 1px solid rgb(170, 170, 170);"
+                           "}"
+                           "QMenu::item {"
+                               "spacing: 3px;"
+                               "padding: 2px 25px 2px 25px;"
+                               "background: transparent;"
+                               "border-radius: 4px;"
+                           "}"
+                           "QMenu::item:selected {"
+                               "background-color: #a8a8a8;"
+                               "color: black;"
+                           "}");
 
             menu.addAction("Apply Transformation");
             menu.addAction("Create Link");
@@ -485,7 +533,7 @@ void Canvas::handleMovePointMouseMove(QPointF eventPos) {
 
             if(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible() ) {
                 if(mFirstMouseMove) {
-                    mLastPressedPoint->startTransform();
+                    mCurrentBoxesGroup->startSelectedPointsTransform();
                 }
                 mLastPressedPoint->moveByAbs(getMoveByValueForEventPos(eventPos) );
                 return;//

@@ -80,6 +80,16 @@ void Canvas::showContextMenu(QPoint globalPos) {
 //    }
 }
 
+#include "Boxes/linkbox.h"
+BoundingBox *Canvas::createLink(BoxesGroup *parent) {
+    InternalLinkCanvas *linkGroup =
+                        new InternalLinkCanvas(this, parent);
+    foreach(BoundingBox *box, mChildren) {
+        box->createSameTransformationLink(linkGroup);
+    }
+    return linkGroup;
+}
+
 void Canvas::setHighQualityPaint(const bool &bT) {
     mHighQualityPaint = bT;
 }

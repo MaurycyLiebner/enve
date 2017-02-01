@@ -411,6 +411,12 @@ void PathPoint::updateEndCtrlPtVisibility() {
 
 void PathPoint::setEndCtrlPtEnabled(bool enabled)
 {
+    if(enabled == mEndCtrlPtEnabled) return;
+    if(mEndCtrlPtEnabled) {
+        setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        mEndCtrlPt->removeAnimations();
+        mEndCtrlPt->setRelativePos(getRelativePos());
+    }
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();
@@ -418,6 +424,12 @@ void PathPoint::setEndCtrlPtEnabled(bool enabled)
 
 void PathPoint::setStartCtrlPtEnabled(bool enabled)
 {
+    if(enabled == mStartCtrlPtEnabled) return;
+    if(mStartCtrlPtEnabled) {
+        setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        mStartCtrlPt->removeAnimations();
+        mStartCtrlPt->setRelativePos(getRelativePos());
+    }
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();

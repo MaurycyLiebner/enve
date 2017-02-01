@@ -399,6 +399,7 @@ public:
     void pathsIntersectionAction();
     void pathsDivisionAction();
     void pathsExclusionAction();
+    BoundingBox *createLink(BoxesGroup *parent);
 private:
     bool mPivotVisibleDuringPointEdit = true;
     bool mEffectsPaintEnabled;

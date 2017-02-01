@@ -1035,11 +1035,11 @@ MovablePoint *BoxesGroup::getPointAt(QPointF absPos, CanvasMode currentMode) {
     return pointAtPos;
 }
 
-void BoxesGroup::finishSelectedPointsTransform()
-{
+void BoxesGroup::finishSelectedPointsTransform() {
     if(isRecordingAllPoints() ) {
         QList<BoundingBox*> parentBoxes;
         foreach(MovablePoint *point, mSelectedPoints) {
+            point->finishTransform();
             BoundingBox *parentBox = point->getParent();
             if(parentBoxes.contains(parentBox) ) continue;
             parentBoxes << parentBox;
@@ -1050,6 +1050,25 @@ void BoxesGroup::finishSelectedPointsTransform()
     } else {
         foreach(MovablePoint *point, mSelectedPoints) {
             point->finishTransform();
+        }
+    }
+}
+
+void BoxesGroup::startSelectedPointsTransform() {
+    if(isRecordingAllPoints() ) {
+        QList<BoundingBox*> parentBoxes;
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->startTransform();
+            BoundingBox *parentBox = point->getParent();
+            if(parentBoxes.contains(parentBox) ) continue;
+            parentBoxes << parentBox;
+        }
+        foreach(BoundingBox *parentBox, parentBoxes) {
+            parentBox->startAllPointsTransform();
+        }
+    } else {
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->startTransform();
         }
     }
 }
@@ -1087,25 +1106,9 @@ void BoxesGroup::cancelSelectedPointsTransform() {
 void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
 {
     if(startTransform) {
-        if(isRecordingAllPoints() ) {
-            QList<BoundingBox*> parentBoxes;
-            foreach(MovablePoint *point, mSelectedPoints) {
-                BoundingBox *parentBox = point->getParent();
-                if(parentBoxes.contains(parentBox) ) continue;
-                parentBoxes << parentBox;
-            }
-            foreach(BoundingBox *parentBox, parentBoxes) {
-                parentBox->startAllPointsTransform();
-            }
-
-            foreach(MovablePoint *point, mSelectedPoints) {
-                point->moveByAbs(by);
-            }
-        } else {
-            foreach(MovablePoint *point, mSelectedPoints) {
-                point->startTransform();
-                point->moveByAbs(by);
-            }
+        startSelectedPointsTransform();
+        foreach(MovablePoint *point, mSelectedPoints) {
+            point->moveByAbs(by);
         }
     } else {
         foreach(MovablePoint *point, mSelectedPoints) {

@@ -88,6 +88,7 @@ public:
     void moveToRel(QPointF relPos);
     void scaleRelativeToSavedPivot(qreal sx, qreal sy);
     void rotateRelativeToSavedPivot(qreal rot);
+    void removeAnimations();
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;
