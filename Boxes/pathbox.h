@@ -185,7 +185,6 @@ public:
     int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
     void updateBoundingRect();
-    void updatePixmaps();
 
     void afterSuccessfulUpdate();
 
@@ -195,6 +194,7 @@ public:
     VectorPath *objectToPath();
     const QPainterPath &getRelativePath() const { return mPath; }
     bool relPointInsidePath(QPointF relPos);
+    void preUpdatePixmapsUpdates();
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

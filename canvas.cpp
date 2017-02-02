@@ -450,12 +450,12 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest) {
     delete image;
 }
 
-void Canvas::updateAndDrawPreviewPixmap(QPainter *p) {
+void Canvas::drawPreviewPixmap(QPainter *p) {
     if(mVisible) {
         p->save();
         //p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
         foreach(BoundingBox *box, mChildren){
-            box->updateAndDrawPreviewPixmap(p);
+            box->drawPreviewPixmap(p);
         }
 
         p->restore();
@@ -494,7 +494,7 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
     p.translate(-mRenderRect.topLeft());
     //p.translate(-mCanvasRect.topLeft());
 
-    Canvas::updateAndDrawPreviewPixmap(&p);
+    Canvas::drawPreviewPixmap(&p);
 
     p.end();
 }

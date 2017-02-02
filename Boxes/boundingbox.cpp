@@ -130,16 +130,24 @@ void BoundingBox::loadFromSql(int boundingBoxId) {
     }
 }
 
+void BoundingBox::preUpdatePixmapsUpdates() {
+    updateEffectsMarginIfNeeded();
+    updateBoundingRect();
+}
+
 void BoundingBox::updatePixmaps() {
     if(mRedoUpdate) {
         mRedoUpdate = false;
         updateUpdateTransform();
     }
 
-    updateEffectsMarginIfNeeded();
-    updateBoundingRect();
+    preUpdatePixmapsUpdates();
 
-    BoundingBox::updateAllUglyPixmap();
+    if(getParentCanvas()->isPreviewing()) {
+        BoundingBox::updatePreviewPixmap();
+    } else {
+        BoundingBox::updateAllUglyPixmap();
+    }
     if(getParentCanvas()->highQualityPaint()) {
         updatePrettyPixmap();
         mHighQualityPaint = true;
@@ -334,10 +342,16 @@ QPixmap BoundingBox::renderPreviewProvidedTransform(
     return newPixmap;
 }
 
-void BoundingBox::updateAndDrawPreviewPixmap(QPainter *p) {
+void BoundingBox::drawPreviewPixmap(QPainter *p) {
     p->save();
 
-    QPointF drawPos;
+    p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+
+    p->drawPixmap(mPreviewDrawPos, mRenderPixmap);
+    p->restore();
+}
+
+void BoundingBox::updatePreviewPixmap() {
     QMatrix transformMatrix = getCombinedTransform();
     transformMatrix.
             scale(getParentCanvas()->getResolutionPercent(),
@@ -348,22 +362,13 @@ void BoundingBox::updateAndDrawPreviewPixmap(QPainter *p) {
                 mEffectsMargin*mUpdateCanvasTransform.m11()*
                     parentCanvas->getResolutionPercent(),
                 transformMatrix,
-                &drawPos);
+                &mPreviewDrawPos);
     if(parentCanvas->effectsPaintEnabled()) {
         mRenderPixmap = applyEffects(mRenderPixmap,
                                  true,
                                  mUpdateCanvasTransform.m11()*
                                  parentCanvas->getResolutionPercent());
     }
-
-    p->setOpacity(mTransformAnimator.getOpacity()*0.01);
-
-    p->drawPixmap(drawPos, mRenderPixmap);
-    p->restore();
-}
-
-void BoundingBox::updatePreviewPixmap() {
-
 }
 
 void BoundingBox::renderFinal(QPainter *p) {

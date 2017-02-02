@@ -512,6 +512,7 @@ void MainWindow::playPreview()
     mCurrentRenderFrame = mSavedCurrentFrame;
     setCurrentFrame(mSavedCurrentFrame);
     mCanvas->setPreviewing(true);
+    mCanvas->updateAllBoxes();
     if(mNoBoxesAwaitUpdate) {
         nextPlayPreviewFrame();
     }
@@ -564,8 +565,7 @@ void MainWindow::nextSaveOutputFrame() {
     }
 }
 
-void MainWindow::saveOutput(QString renderDest)
-{
+void MainWindow::saveOutput(QString renderDest) {
     mOutputString = renderDest;
     mBoxesUpdateFinishedFunction = &MainWindow::nextSaveOutputFrame;
     mSavedCurrentFrame = mCurrentFrame;

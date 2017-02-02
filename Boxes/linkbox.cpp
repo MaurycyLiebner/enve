@@ -258,7 +258,7 @@ void InternalLinkCanvas::drawForPreview(QPainter *p) {
         }
         foreach(BoundingBox *box, mChildren) {
             //box->draw(p);
-            box->updateAndDrawPreviewPixmap(p);
+            box->drawPreviewPixmap(p);
         }
 
         p->restore();

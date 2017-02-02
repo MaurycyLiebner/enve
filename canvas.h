@@ -337,7 +337,7 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
-    void updateAndDrawPreviewPixmap(QPainter *p);
+    void drawPreviewPixmap(QPainter *p);
     void renderFinal(QPainter *p);
     void createAnimationBoxForPaths(const QStringList &paths);
     void setPreviewing(bool bT);
@@ -353,6 +353,7 @@ public:
         return this;
     }
 
+    bool isPreviewing() { return mPreviewing; }
 protected:
 //    void updateAfterCombinedTransformationChanged();
 

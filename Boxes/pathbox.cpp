@@ -111,26 +111,11 @@ void PathBox::updatePathIfNeeded()
     }
 }
 
-void PathBox::updatePixmaps() {
-    if(mRedoUpdate) {
-        mRedoUpdate = false;
-        updateUpdateTransform();
-    }
-
+void PathBox::preUpdatePixmapsUpdates() {
     updateEffectsMarginIfNeeded();
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
     updateBoundingRect();
-
-    BoundingBox::updateAllUglyPixmap();
-    if(getParentCanvas()->highQualityPaint()) {
-        updatePrettyPixmap();
-        mHighQualityPaint = true;
-    } else {
-        mHighQualityPaint = false;
-    }
-
-    if(mParent != NULL) mParent->awaitUpdate();
 }
 
 void PathBox::schedulePathUpdate()

@@ -75,7 +75,7 @@ public:
     virtual QRectF getPixBoundingRect();
 
     void drawPixmap(QPainter *p);
-    virtual void updateAndDrawPreviewPixmap(QPainter *p);
+    virtual void drawPreviewPixmap(QPainter *p);
     virtual void renderFinal(QPainter *p);
 
     virtual void draw(QPainter *) {}
@@ -267,7 +267,6 @@ public:
     }
 
     virtual void applyCurrentTransformation() {}
-    void updatePreviewPixmap();
 
     virtual qreal getEffectsMargin() {
         return mEffectsMargin;
@@ -291,7 +290,10 @@ public:
 
 
     void duplicateTransformAnimatorFrom(TransformAnimator *source);
+    virtual void preUpdatePixmapsUpdates();
+    void updatePreviewPixmap();
 protected:
+    QPointF mPreviewDrawPos;
     QRectF mRelBoundingRect;
 
     bool mHighQualityPaint = false;

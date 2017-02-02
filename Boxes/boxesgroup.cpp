@@ -29,6 +29,7 @@ void BoxesGroup::updateAllBoxes() {
     foreach(BoundingBox *child, mChildren) {
         child->updateAllBoxes();
     }
+    scheduleAwaitUpdate();
 }
 
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
@@ -450,7 +451,7 @@ void BoxesGroup::drawForPreview(QPainter *p) {
                             true);
         foreach(BoundingBox *box, mChildren) {
             //box->draw(p);
-            box->updateAndDrawPreviewPixmap(p);
+            box->drawPreviewPixmap(p);
         }
 
         p->restore();
