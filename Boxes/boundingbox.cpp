@@ -313,6 +313,7 @@ void BoundingBox::updateAllUglyPixmap() {
 
 QPixmap BoundingBox::renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
+                        const qreal &resolutionScale,
                         const QMatrix &renderTransform,
                         QPointF *drawPos) {
     QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
@@ -320,25 +321,27 @@ QPixmap BoundingBox::renderPreviewProvidedTransform(
                                  effectsMargin, effectsMargin);
     QRectF pixBoundingRectClippedToView = pixBoundingRect.intersected(
                                 mMainWindow->getCanvasWidget()->rect());
-    QSizeF sizeF = pixBoundingRectClippedToView.size();
+    QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
     QPixmap newPixmap = QPixmap(QSize(ceil(sizeF.width()),
                                       ceil(sizeF.height())) );
     newPixmap.fill(Qt::transparent);
 
     QPainter p(&newPixmap);
     p.setRenderHint(QPainter::Antialiasing);
-    p.translate(-pixBoundingRectClippedToView.topLeft());
     QPointF transF = pixBoundingRectClippedToView.topLeft() -
             QPointF(qRound(pixBoundingRectClippedToView.left()),
                     qRound(pixBoundingRectClippedToView.top()));
-    pixBoundingRectClippedToView.translate(-transF);
     p.translate(transF);
+    p.scale(resolutionScale, resolutionScale);
+    p.translate(-pixBoundingRectClippedToView.topLeft());
     p.setTransform(QTransform(renderTransform), true);
+
 
     drawForPreview(&p);
     p.end();
 
-    *drawPos = pixBoundingRectClippedToView.topLeft();
+    *drawPos = (pixBoundingRectClippedToView.topLeft() - transF)*
+                resolutionScale;
     return newPixmap;
 }
 
@@ -353,14 +356,14 @@ void BoundingBox::drawPreviewPixmap(QPainter *p) {
 
 void BoundingBox::updatePreviewPixmap() {
     QMatrix transformMatrix = getCombinedTransform();
-    transformMatrix.
-            scale(getParentCanvas()->getResolutionPercent(),
-                  getParentCanvas()->getResolutionPercent());
+//    transformMatrix.
+//            scale(getParentCanvas()->getResolutionPercent(),
+//                  getParentCanvas()->getResolutionPercent());
 
     Canvas *parentCanvas = getParentCanvas();
     mRenderPixmap = renderPreviewProvidedTransform(
-                mEffectsMargin*mUpdateCanvasTransform.m11()*
-                    parentCanvas->getResolutionPercent(),
+                mEffectsMargin*mUpdateCanvasTransform.m11(),
+                parentCanvas->getResolutionPercent(),
                 transformMatrix,
                 &mPreviewDrawPos);
     if(parentCanvas->effectsPaintEnabled()) {
@@ -583,7 +586,9 @@ void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
                         mPivotChanged, pivotChanged));
     }
     mPivotChanged = pivotChanged;
-    mTransformAnimator.setPivotWithoutChangingTransformation(relPos, saveUndoRedo);//setPivot(relPos, saveUndoRedo);//setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
+    mTransformAnimator.
+            setPivotWithoutChangingTransformation(relPos,
+                                                  saveUndoRedo);//setPivot(relPos, saveUndoRedo);//setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
     schedulePivotUpdate();
 }
 

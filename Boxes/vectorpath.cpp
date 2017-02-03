@@ -863,9 +863,29 @@ void VectorPath::startAllPointsTransform()
     }
 }
 
-void VectorPath::finishAllPointsTransform()
-{
+void VectorPath::finishAllPointsTransform() {
     foreach(PathPoint *point, mPoints) {
         point->finishTransform();
+    }
+}
+
+void VectorPath::duplicatePathPointsTo(
+        VectorPath *target) {
+    foreach(PathPoint *sepPoint, mSeparatePaths) {
+        PathPoint *currPoint = sepPoint;
+        PathPoint *lastAddedPoint = NULL;
+        while(true) {
+            PathPoint *pointToAdd = new PathPoint(target);
+            currPoint->makeDuplicate(pointToAdd);
+            target->addPoint(pointToAdd, lastAddedPoint);
+            lastAddedPoint = pointToAdd;
+            PathPoint *nextPoint = currPoint->getNextPoint();
+            if(nextPoint == sepPoint) {
+                currPoint->connectToPoint(sepPoint);
+                break;
+            }
+            if(nextPoint == NULL) break;
+            currPoint = nextPoint;
+        }
     }
 }

@@ -86,9 +86,11 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
 
 QPixmap InternalLinkBox::renderPreviewProvidedTransform(
                                 const qreal &effectsMargin,
+                                const qreal &resolutionScale,
                                 const QMatrix &renderTransform,
                                 QPointF *drawPos) {
     return mLinkTarget->renderPreviewProvidedTransform(effectsMargin,
+                                                       resolutionScale,
                                                    renderTransform,
                                                    drawPos);
 }

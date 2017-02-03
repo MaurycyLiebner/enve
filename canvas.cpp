@@ -435,7 +435,7 @@ void Canvas::updateRenderRect() {
 void Canvas::renderCurrentFrameToPreview() {
     QImage *image = new QImage(mRenderRect.size().toSize(),
                                QImage::Format_ARGB32);
-    image->fill(Qt::red);
+    image->fill(Qt::transparent);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
     mCurrentPreviewImg = image;
@@ -491,7 +491,7 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
     //p.scale(mResolutionPercent, mResolutionPercent);
     //p.translate(getAbsolutePos() - mRenderRect.topLeft());
 
-    p.translate(-mRenderRect.topLeft());
+    p.translate(-mRenderRect.topLeft()*mResolutionPercent);
     //p.translate(-mCanvasRect.topLeft());
 
     Canvas::drawPreviewPixmap(&p);

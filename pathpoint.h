@@ -278,14 +278,15 @@ public:
     void cancelEditingShape();
     void addShapeValues(VectorPathShape *shape);
     void saveInitialPointValuesToShapeValues(VectorPathShape *shape);
+
+    void makeDuplicate(MovablePoint *targetPoint);
+    void duplicateCtrlPointsFrom(CtrlPoint *endPt,
+                                 CtrlPoint *startPt);
 private:
     QList<PointShapeValues*> mShapeValues;
 
     bool mEditingShape = false;
     PathPointValues mBasisShapeSavedValues;
-
-    QrealAnimator mInfluenceAnimator;
-    QrealAnimator mInfluenceTAnimator;
 
     int mPointId;
     PathPointAnimators mPathPointAnimators;

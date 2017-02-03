@@ -76,6 +76,8 @@ public:
     Edge *getEgde(QPointF absPos);
 
     void loadPathFromQPainterPath(const QPainterPath &path);
+
+    void duplicatePathPointsTo(VectorPath *target);
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 

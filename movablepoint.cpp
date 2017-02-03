@@ -46,6 +46,14 @@ void MovablePoint::removeAnimations() {
     }
 }
 
+void MovablePoint::makeDuplicate(MovablePoint *targetPoint) {
+    targetPoint->duplicatePosAnimatorFrom(&mRelPos);
+}
+
+void MovablePoint::duplicatePosAnimatorFrom(QPointFAnimator *source) {
+    source->makeDuplicate(&mRelPos);
+}
+
 void MovablePoint::finishTransform()
 {
     if(mTransformStarted) {

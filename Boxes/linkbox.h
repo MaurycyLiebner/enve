@@ -24,6 +24,7 @@ public:
 
     QPixmap renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
+                        const qreal &resolutionScale,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);
 

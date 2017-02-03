@@ -195,6 +195,12 @@ public:
     const QPainterPath &getRelativePath() const { return mPath; }
     bool relPointInsidePath(QPointF relPos);
     void preUpdatePixmapsUpdates();
+
+    void duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
+                                     GradientPoints *strokeGradientPoints);
+    void duplicatePaintSettingsFrom(PaintSettings *fillSettings,
+                                    StrokeSettings *strokeSettings);
+
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

@@ -530,6 +530,19 @@ void PathPoint::saveInitialPointValuesToShapeValues(VectorPathShape *shape)
     }
 }
 
+void PathPoint::makeDuplicate(MovablePoint *targetPoint) {
+    MovablePoint::makeDuplicate(targetPoint);
+    PathPoint *target = (PathPoint*)targetPoint;
+    target->duplicateCtrlPointsFrom(mEndCtrlPt,
+                                    mStartCtrlPt);
+}
+
+void PathPoint::duplicateCtrlPointsFrom(CtrlPoint *endPt,
+                                        CtrlPoint *startPt) {
+    endPt->makeDuplicate(mEndCtrlPt);
+    startPt->makeDuplicate(mStartCtrlPt);
+}
+
 void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
 {
     PathPointValues values;

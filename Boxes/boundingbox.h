@@ -276,6 +276,7 @@ public:
     bool hasBaseTransformation();
     virtual QPixmap renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
+                        const qreal &resolutionScale,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);
     virtual QPixmap getAllUglyPixmapProvidedTransform(

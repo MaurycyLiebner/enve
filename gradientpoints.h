@@ -33,6 +33,10 @@ public:
 
     void setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo = true);
     void loadFromSql(int fillGradientStartId, int fillGradientEndId);
+
+    void makeDuplicate(QrealAnimator *target);
+    void duplicatePointsFrom(GradientPoint *startPointT,
+                             GradientPoint *endPointT);
 };
 
 #endif // GRADIENTPOINTS_H

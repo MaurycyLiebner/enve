@@ -89,6 +89,9 @@ public:
     void scaleRelativeToSavedPivot(qreal sx, qreal sy);
     void rotateRelativeToSavedPivot(qreal rot);
     void removeAnimations();
+
+    void makeDuplicate(MovablePoint *targetPoint);
+    void duplicatePosAnimatorFrom(QPointFAnimator *source);
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

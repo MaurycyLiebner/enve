@@ -31,6 +31,18 @@ void GradientPoints::loadFromSql(int fillGradientStartId, int fillGradientEndId)
     startPoint->loadFromSql(fillGradientEndId);
 }
 
+void GradientPoints::duplicatePointsFrom(GradientPoint *startPointT,
+                                         GradientPoint *endPointT) {
+    startPointT->makeDuplicate(startPoint);
+    endPointT->makeDuplicate(endPoint);
+}
+
+void GradientPoints::makeDuplicate(QrealAnimator *target) {
+    GradientPoints *gradientPointsTarget = (GradientPoints*)target;
+    gradientPointsTarget->duplicatePointsFrom(startPoint,
+                                              endPoint);
+}
+
 void GradientPoints::enable()
 {
     if(enabled) {

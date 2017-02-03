@@ -118,8 +118,19 @@ void PathBox::preUpdatePixmapsUpdates() {
     updateBoundingRect();
 }
 
-void PathBox::schedulePathUpdate()
-{
+void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
+                                          GradientPoints *strokeGradientPoints) {
+    fillGradientPoints->makeDuplicate(&mFillGradientPoints);
+    strokeGradientPoints->makeDuplicate(&mStrokeGradientPoints);
+}
+
+void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
+                                         StrokeSettings *strokeSettings) {
+    fillSettings->makeDuplicate(&mFillPaintSettings);
+    strokeSettings->makeDuplicate(&mStrokeSettings);
+}
+
+void PathBox::schedulePathUpdate() {
     scheduleAwaitUpdate();
     if(mPathUpdateNeeded) {
         return;

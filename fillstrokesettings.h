@@ -164,6 +164,18 @@ public:
 
     virtual void loadFromSql(int sqlId, GradientWidget *gradientWidget);
     void setPaintPathTarget(PathBox *path);
+
+    void makeDuplicate(QrealAnimator *target) {
+        PaintSettings *paintSettingsTarget = (PaintSettings*)target;
+        paintSettingsTarget->duplicateColorAnimatorFrom(&mColor);
+        paintSettingsTarget->setGradient(mGradient);
+        paintSettingsTarget->setPaintType(mPaintType);
+    }
+
+    void duplicateColorAnimatorFrom(ColorAnimator *source) {
+        source->makeDuplicate(&mColor);
+    }
+
 private:
     GradientPoints *mGradientPoints = NULL;
     ColorAnimator mColor;
