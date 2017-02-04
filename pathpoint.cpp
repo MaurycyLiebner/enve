@@ -126,6 +126,19 @@ void PathPoint::moveByAbs(QPointF absTranslatione) {
     }
 }
 
+void PathPoint::reversePointsDirection() {
+    PathPoint *nextT = mNextPoint;
+    mNextPoint = mPreviousPoint;
+    mPreviousPoint = nextT;
+    mEndCtrlPt->setIsStartCtrlPt(true);
+    mStartCtrlPt->setIsStartCtrlPt(false);
+    CtrlPoint *endPointT = mEndCtrlPt;
+    mEndCtrlPt = mStartCtrlPt;
+    mStartCtrlPt = endPointT;
+    if(nextT == NULL) return;
+    nextT->reversePointsDirection();
+}
+
 void PathPoint::connectToPoint(PathPoint *point)
 {
     if(point == NULL) {
@@ -154,7 +167,7 @@ void PathPoint::disconnectFromPoint(PathPoint *point)
     }
 }
 
-void PathPoint::remove()
+void PathPoint::removeFromVectorPath()
 {
     mVectorPath->removePoint(this);
 }
@@ -256,7 +269,7 @@ void PathPoint::moveStartCtrlPtToRelPos(QPointF startCtrlPt)
 
 QPointF PathPoint::getStartCtrlPtAbsPos() const
 {
-    return mStartCtrlPt->getAbsolutePos();
+    return mapRelativeToAbsolute(getStartCtrlPtValue());
 }
 
 QPointF PathPoint::getStartCtrlPtValue() const
@@ -299,9 +312,8 @@ void PathPoint::moveEndCtrlPtToAbsPos(QPointF endCtrlPt)
     mEndCtrlPt->moveToAbs(endCtrlPt);
 }
 
-QPointF PathPoint::getEndCtrlPtAbsPos()
-{
-    return mEndCtrlPt->getAbsolutePos();
+QPointF PathPoint::getEndCtrlPtAbsPos() {
+    return mapRelativeToAbsolute(getEndCtrlPtValue());
 }
 
 QPointF PathPoint::getEndCtrlPtValue() const
@@ -375,9 +387,14 @@ PathPoint* PathPoint::getNextPoint()
     return mNextPoint;
 }
 
-PathPoint *PathPoint::getPreviousPoint()
-{
+PathPoint *PathPoint::getPreviousPoint() {
     return mPreviousPoint;
+}
+
+PathPoint *PathPoint::getConnectedSeparatePathPoint() {
+    if(isSeparatePathPoint() ||
+       mPreviousPoint == NULL) return this;
+    return mPreviousPoint->getConnectedSeparatePathPoint();
 }
 
 void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
@@ -415,8 +432,8 @@ void PathPoint::setEndCtrlPtEnabled(bool enabled)
     if(mEndCtrlPtEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
         mEndCtrlPt->removeAnimations();
-        mEndCtrlPt->setRelativePos(getRelativePos());
     }
+    mEndCtrlPt->setRelativePos(getRelativePos());
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();
@@ -428,8 +445,8 @@ void PathPoint::setStartCtrlPtEnabled(bool enabled)
     if(mStartCtrlPtEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER);
         mStartCtrlPt->removeAnimations();
-        mStartCtrlPt->setRelativePos(getRelativePos());
     }
+    mStartCtrlPt->setRelativePos(getRelativePos());
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();

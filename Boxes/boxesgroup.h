@@ -219,6 +219,10 @@ public:
     void updateEffectsMargin();
     void startSelectedPointsTransform();
     void drawForPreview(QPainter *p);
+    QPixmap renderPreviewProvidedTransform(const qreal &effectsMargin,
+                                           const qreal &resolutionScale,
+                                           const QMatrix &renderTransform,
+                                           QPointF *drawPos);
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

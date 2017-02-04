@@ -17,6 +17,18 @@ void ChangeWidthWidget::updatePos()
     move(mBoxesList->width() - 5, 0);
 }
 
+void ChangeWidthWidget::paintEvent(QPaintEvent *) {
+    QPainter p(this);
+    if(mPressed) {
+        p.fillRect(rect().adjusted(2, 0, -2, 0), Qt::black);
+    } else if(mHover) {
+        p.fillRect(rect().adjusted(3, 0, -3, 0), Qt::black);
+    } else {
+        p.fillRect(rect().adjusted(4, 0, -4, 0), Qt::black);
+    }
+    p.end();
+}
+
 void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int newWidth = mBoxesList->width() + event->x() - mPressX;
@@ -28,7 +40,24 @@ void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
 
 void ChangeWidthWidget::mousePressEvent(QMouseEvent *event)
 {
+    mPressed = true;
     mPressX = event->x();
+    update();
+}
+
+void ChangeWidthWidget::mouseReleaseEvent(QMouseEvent *) {
+    mPressed = false;
+    update();
+}
+
+void ChangeWidthWidget::enterEvent(QEvent *) {
+    mHover = true;
+    update();
+}
+
+void ChangeWidthWidget::leaveEvent(QEvent *) {
+    mHover = false;
+    update();
 }
 
 void BoxesListAnimationDockWidget::moveSlider(int val) {

@@ -192,8 +192,6 @@ public:
     void addBoxToSelection(BoundingBox *box);
     void clearBoxesSelection();
     void selectOnlyLastPressedBox();
-    void removePointFromSelection(MovablePoint *point);
-    void removeBoxFromSelection(BoundingBox *box);
     void selectOnlyLastPressedPoint();
     void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
 

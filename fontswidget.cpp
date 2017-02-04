@@ -1,12 +1,13 @@
 #include "fontswidget.h"
 #include <QLineEdit>
+#include <QIntValidator>
 
-FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent)
-{
+FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mFontStyleCombo = new QComboBox(this);
     mFontFamilyCombo = new QComboBox(this);
     mFontSizeCombo = new QComboBox(this);
     mFontSizeCombo->setEditable(true);
+    mFontSizeCombo->setMinimumContentsLength(3);
     mFontSizeCombo->lineEdit()->setStyleSheet(
                 "QLineEdit {"
                     "background: rgb(200, 200, 200);"
@@ -14,6 +15,8 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent)
                 "QLineEdit:focus {"
                     "background: rgb(255, 255, 255);"
                 "}");
+
+    mFontSizeCombo->setValidator(new QIntValidator(0, 9999, mFontSizeCombo));
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
     connect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),
@@ -37,8 +40,7 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent)
     mMainLayout->addWidget(mFontSizeCombo);
 }
 
-void FontsWidget::updateStylesFromCurrentFamily(QString family)
-{
+void FontsWidget::updateStylesFromCurrentFamily(QString family) {
     disconnect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
             this, SLOT(emitFamilyAndStyleChanged()));
 
@@ -75,33 +77,27 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
             this, SLOT(emitSizeChanged()) );
 }
 
-void FontsWidget::updateStylesFromCurrentFamily()
-{
+void FontsWidget::updateStylesFromCurrentFamily() {
     updateStylesFromCurrentFamily(getCurrentFontFamily() );
 }
 
-qreal FontsWidget::getCurrentFontSize()
-{
+qreal FontsWidget::getCurrentFontSize() {
     return mFontSizeCombo->currentText().toDouble();
 }
 
-QString FontsWidget::getCurrentFontStyle()
-{
+QString FontsWidget::getCurrentFontStyle() {
     return mFontStyleCombo->currentText();
 }
 
-QString FontsWidget::getCurrentFontFamily()
-{
+QString FontsWidget::getCurrentFontFamily() {
     return mFontFamilyCombo->currentText();
 }
 
-void FontsWidget::emitFamilyAndStyleChanged()
-{
+void FontsWidget::emitFamilyAndStyleChanged() {
     emit fontFamilyAndStyleChanged(getCurrentFontFamily(),
                                    getCurrentFontStyle());
 }
 
-void FontsWidget::emitSizeChanged()
-{
+void FontsWidget::emitSizeChanged() {
     emit fontSizeChanged(getCurrentFontSize());
 }

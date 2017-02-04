@@ -224,12 +224,14 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
                 } else if(mCurrentEndPoint == NULL) {
                     setCurrentEndPoint(pathPointUnderMouse);
                 } else {
-                    if(mCurrentEndPoint->getParentPath() == pathPointUnderMouse->getParentPath())
-                    {
-                        pathPointUnderMouse->connectToPoint(mCurrentEndPoint);
+                    if(mCurrentEndPoint->getParentPath() ==
+                       pathPointUnderMouse->getParentPath()) {
+                        mCurrentEndPoint->getParentPath()->
+                                connectPoints(mCurrentEndPoint, pathPointUnderMouse);
                     }
                     else {
-                        connectPointsFromDifferentPaths(mCurrentEndPoint, pathPointUnderMouse);
+                        connectPointsFromDifferentPaths(mCurrentEndPoint,
+                                                        pathPointUnderMouse);
                     }
                     setCurrentEndPoint(pathPointUnderMouse);
                 }

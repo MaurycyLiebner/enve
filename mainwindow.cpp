@@ -336,12 +336,15 @@ void MainWindow::setupToolBar() {
     mFontWidget = new FontsWidget(this);
     mToolBar->addWidget(mFontWidget);
 
+    mToolBar->addSeparator();
+
     QWidget *canvasComboWidget = new QWidget(this);
     canvasComboWidget->setAttribute(Qt::WA_TranslucentBackground);
     QHBoxLayout *canvasComboLayout = new QHBoxLayout();
     canvasComboLayout->setSpacing(0);
     canvasComboWidget->setLayout(canvasComboLayout);
     mCurrentCanvasComboBox = new QComboBox(mToolBar);
+    mCurrentCanvasComboBox->setMinimumContentsLength(20);
 
     mNewCanvasButton = new QPushButton("+", mToolBar);
     mNewCanvasButton->setStyleSheet(

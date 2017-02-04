@@ -78,6 +78,8 @@ public:
     void loadPathFromQPainterPath(const QPainterPath &path);
 
     void duplicatePathPointsTo(VectorPath *target);
+    void disconnectPoints(PathPoint *point1, PathPoint *point2);
+    void connectPoints(PathPoint *point1, PathPoint *point2);
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 

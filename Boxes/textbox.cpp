@@ -159,5 +159,8 @@ void TextBox::updatePath()
         yT += fm.height();
     }
 
+    QRectF boundingRect = mPath.boundingRect();
+    mPath.translate(-boundingRect.center());
+
     updateOutlinePath();
 }

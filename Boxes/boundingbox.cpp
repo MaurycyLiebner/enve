@@ -136,6 +136,7 @@ void BoundingBox::preUpdatePixmapsUpdates() {
 }
 
 void BoundingBox::updatePixmaps() {
+    if(mParent == NULL) return;
     if(mRedoUpdate) {
         mRedoUpdate = false;
         updateUpdateTransform();
@@ -328,9 +329,9 @@ QPixmap BoundingBox::renderPreviewProvidedTransform(
 
     QPainter p(&newPixmap);
     p.setRenderHint(QPainter::Antialiasing);
-    QPointF transF = pixBoundingRectClippedToView.topLeft() -
-            QPointF(qRound(pixBoundingRectClippedToView.left()),
-                    qRound(pixBoundingRectClippedToView.top()));
+    QPointF transF = pixBoundingRectClippedToView.topLeft()*resolutionScale -
+            QPointF(qRound(pixBoundingRectClippedToView.left()*resolutionScale),
+                    qRound(pixBoundingRectClippedToView.top()*resolutionScale));
     p.translate(transF);
     p.scale(resolutionScale, resolutionScale);
     p.translate(-pixBoundingRectClippedToView.topLeft());
@@ -340,8 +341,8 @@ QPixmap BoundingBox::renderPreviewProvidedTransform(
     drawForPreview(&p);
     p.end();
 
-    *drawPos = (pixBoundingRectClippedToView.topLeft() - transF)*
-                resolutionScale;
+    *drawPos = pixBoundingRectClippedToView.topLeft()*
+                resolutionScale - transF;
     return newPixmap;
 }
 
@@ -458,6 +459,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
 }
 
 void BoundingBox::awaitUpdate() {
+    if(mParent == NULL) return;
     if(mAwaitingUpdate) return;
     setAwaitingUpdate(true);
     mMainWindow->addBoxAwaitingUpdate(this);
@@ -628,6 +630,8 @@ void BoundingBox::updateBoundingRect() {
     mRelBoundingRectPath.addRect(mRelBoundingRect);
     mMappedBoundingRectPath = mUpdateTransform.map(mRelBoundingRectPath);
     updatePixBoundingRectClippedToView();
+
+    if(!mPivotChanged) centerPivotPosition();
 }
 
 void BoundingBox::deselect() {

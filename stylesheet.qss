@@ -14,7 +14,7 @@ QComboBox {
     border-radius: 5px;
 /*  border-top-right-radius: 8px */
 /*  border-bottom-right-radius: 8px */
-    min-width: 6em;
+    /*min-width: 6em;*/
     padding: 0px 5px 0px 5px;
 }
 QComboBox:on { /* shift the text when the popup opens */

@@ -64,6 +64,85 @@ void VectorPath::applyTransformToPoints(QMatrix transform) {
     }
 }
 
+void VectorPath::disconnectPoints(PathPoint *point1,
+                                  PathPoint *point2) {
+    if(point1->getNextPoint() != point2 &&
+       point1->getPreviousPoint() != point2) return;
+    if(point1->getPreviousPoint() == point2) {
+        PathPoint *point2T = point2;
+        point2 = point1;
+        point1 = point2T;
+    }
+    point1->disconnectFromPoint(point2);
+
+    if(mSeparatePaths.contains(point2)) return;
+    bool stillConnected = false;
+    PathPoint *currPoint = point1;
+    PathPoint *prevPoint = point1->getPreviousPoint();
+    PathPoint *firstPoint;
+    while(prevPoint != NULL) {
+        if(currPoint->isSeparatePathPoint()) {
+            firstPoint = currPoint;
+        }
+        currPoint = prevPoint;
+        prevPoint = currPoint->getPreviousPoint();
+    }
+    stillConnected = currPoint == point2;
+    if(stillConnected) {
+        removePointFromSeparatePaths(firstPoint);
+    }
+    addPointToSeparatePaths(point2);
+
+    updatePathPointIds();
+    schedulePathUpdate();
+}
+
+void VectorPath::connectPoints(PathPoint *point1,
+                               PathPoint *point2) {
+    PathPoint *point1FirstPoint = point1;
+    PathPoint *point2FirstPoint = point2;
+    while(point1FirstPoint->getNextPoint() != NULL) {
+        point1FirstPoint = point1FirstPoint->getNextPoint();
+    }
+    while(point2FirstPoint->getNextPoint() != NULL) {
+        point2FirstPoint = point2FirstPoint->getNextPoint();
+    }
+    if(point1FirstPoint == point2FirstPoint) {
+        point1->connectToPoint(point2);
+        return;
+    }
+
+    if(point1->isSeparatePathPoint() &&
+       point2->isSeparatePathPoint()) {
+        point1->reversePointsDirection();
+
+        removePointFromSeparatePaths(point1);
+        removePointFromSeparatePaths(point2);
+
+        point1->connectToPoint(point2);
+        PathPoint *firstPtCandidate = point1->getConnectedSeparatePathPoint();
+        addPointToSeparatePaths(firstPtCandidate);
+        qDebug() << "1";
+    } else if(point1->isSeparatePathPoint()) {
+        removePointFromSeparatePaths(point1);
+        point1->connectToPoint(point2);
+        qDebug() << "2";
+    } else if(point2->isSeparatePathPoint()) {
+        removePointFromSeparatePaths(point2);
+        point1->connectToPoint(point2);
+        qDebug() << "3";
+    } else {
+        PathPoint *point1ConnectedFirst =
+                point1->getConnectedSeparatePathPoint();
+        removePointFromSeparatePaths(point1ConnectedFirst);
+        point1ConnectedFirst->reversePointsDirection();
+        point1->connectToPoint(point2);
+        qDebug() << "4";
+    }
+
+    updatePathPointIds();
+}
+
 void VectorPath::loadPointsFromSql(int boundingBoxId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT id, isfirst, isendpoint, movablepointid "
@@ -422,7 +501,8 @@ bool VectorPath::getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
     QPointF relPos = mapAbsPosToRel(absPos);
     QRectF distRect = QRectF(relPos - QPointF(maxDistX, maxDistY),
                              QSizeF(maxDistX*2, maxDistY*2));
-    if(!mEditPath.intersects(distRect) || mEditPath.contains(distRect)) {
+    if(!mEditPath.intersects(distRect) ||
+        mEditPath.contains(distRect)) {
         return false;
     }
 
@@ -433,8 +513,10 @@ bool VectorPath::getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
 
     qreal error;
     *pressedT = findPercentForPoint(relPos, prevPoint, &error);
+    if(*prevPoint == NULL) return false;
 
     *nextPoint = (*prevPoint)->getNextPoint();
+    if(*nextPoint == NULL) return false;
 
     return true;
 }
@@ -663,7 +745,7 @@ void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
 
     QPointF absPos = pointToRemove->getAbsolutePos();
 
-    pointToRemove->remove();
+    pointToRemove->removeFromVectorPath();
 
     Edge newEdge = Edge(prevPoint, nextPoint, 0.5);
     newEdge.makePassThrough(absPos);
@@ -817,9 +899,10 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.removeOne(point);
     mPathAnimator.removeChildAnimator(point->getPathPointAnimatorsPtr());
     point->hide();
-    point->deselect();
+    mParent->removePointFromSelection(point);
     if(saveUndoRedo) {
-        RemoveFromPointsListUndoRedo *undoRedo = new RemoveFromPointsListUndoRedo(point, this);
+        RemoveFromPointsListUndoRedo *undoRedo =
+                new RemoveFromPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
         if(mPoints.count() < 2) {
             mParent->removeChild(this);

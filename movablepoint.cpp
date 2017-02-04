@@ -258,7 +258,7 @@ void MovablePoint::deselect()
     mSelected = false;
 }
 
-void MovablePoint::remove()
+void MovablePoint::removeFromVectorPath()
 {
 
 }

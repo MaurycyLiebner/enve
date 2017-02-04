@@ -13,6 +13,10 @@ CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
     mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
+void CtrlPoint::setIsStartCtrlPt(const bool &bT) {
+    mIsStartCtrlPt = bT;
+}
+
 void CtrlPoint::moveToWithoutUpdatingTheOther(QPointF absPos)
 {
     MovablePoint::moveToAbs(absPos);
@@ -54,7 +58,7 @@ void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {
     mOtherCtrlPt = ctrlPt;
 }
 
-void CtrlPoint::remove()
+void CtrlPoint::removeFromVectorPath()
 {
     mParentPoint->setCtrlPtEnabled(false, mIsStartCtrlPt);
 }

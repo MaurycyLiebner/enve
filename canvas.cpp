@@ -164,9 +164,9 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
             mCurrentBoxesGroup->ungroupSelected();
         } else {
             BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
-            if(newGroup != NULL) {
-                setCurrentBoxesGroup(newGroup);
-            }
+//            if(newGroup != NULL) {
+//                setCurrentBoxesGroup(newGroup);
+//            }
         }
         schedulePivotUpdate();
 
@@ -675,9 +675,9 @@ void Canvas::releaseMouseAndDontTrack() {
 
 void Canvas::groupSelectedBoxesAction() {
     BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
-    if(newGroup != NULL) {
-        setCurrentBoxesGroup(newGroup);
-    }
+//    if(newGroup != NULL) {
+//        setCurrentBoxesGroup(newGroup);
+//    }
 }
 
 bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {

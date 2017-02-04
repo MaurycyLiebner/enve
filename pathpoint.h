@@ -220,7 +220,7 @@ public:
     void connectToPoint(PathPoint *point);
     void disconnectFromPoint(PathPoint *point);
 
-    void remove();
+    void removeFromVectorPath();
     void removeApproximate();
 
     MovablePoint *getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode);
@@ -282,6 +282,8 @@ public:
     void makeDuplicate(MovablePoint *targetPoint);
     void duplicateCtrlPointsFrom(CtrlPoint *endPt,
                                  CtrlPoint *startPt);
+    void reversePointsDirection();
+    PathPoint *getConnectedSeparatePathPoint();
 private:
     QList<PointShapeValues*> mShapeValues;
 

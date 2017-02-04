@@ -51,7 +51,7 @@ public:
     void select();
     void deselect();
 
-    virtual void remove();
+    virtual void removeFromVectorPath();
 
     void hide();
     void show();

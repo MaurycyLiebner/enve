@@ -13,9 +13,10 @@ public:
     void startTransform();
     void finishTransform();
     void setOtherCtrlPt(CtrlPoint *ctrlPt);
-    void remove();
+    void removeFromVectorPath();
 
     bool isHidden();
+    void setIsStartCtrlPt(const bool &bT);
 private:
     bool mIsStartCtrlPt;
     PathPoint *mParentPoint;

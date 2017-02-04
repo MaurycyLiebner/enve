@@ -443,12 +443,45 @@ void BoxesGroup::updateEffectsMargin() {
     mEffectsMargin += childrenMargin;
 }
 
+QPixmap BoxesGroup::renderPreviewProvidedTransform(
+                        const qreal &effectsMargin,
+                        const qreal &resolutionScale,
+                        const QMatrix &renderTransform,
+                        QPointF *drawPos) {
+    QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
+                        adjusted(-effectsMargin, -effectsMargin,
+                                 effectsMargin, effectsMargin);
+    QRectF pixBoundingRectClippedToView = pixBoundingRect.intersected(
+                                mMainWindow->getCanvasWidget()->rect());
+    QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
+    QPixmap newPixmap = QPixmap(QSize(ceil(sizeF.width()),
+                                      ceil(sizeF.height())) );
+    newPixmap.fill(Qt::transparent);
+
+    QPainter p(&newPixmap);
+    p.setRenderHint(QPainter::Antialiasing);
+    QPointF transF = pixBoundingRectClippedToView.topLeft()*resolutionScale -
+            QPointF(qRound(pixBoundingRectClippedToView.left()*resolutionScale),
+                    qRound(pixBoundingRectClippedToView.top()*resolutionScale));
+//    p.translate(transF);
+//    p.scale(resolutionScale, resolutionScale);
+//    p.translate(-pixBoundingRectClippedToView.topLeft());
+//    p.setTransform(QTransform(renderTransform), true);
+
+    *drawPos = pixBoundingRectClippedToView.topLeft()*
+                resolutionScale - transF;
+    p.translate(-*drawPos);
+
+    drawForPreview(&p);
+    p.end();
+
+
+    return newPixmap;
+}
+
 void BoxesGroup::drawForPreview(QPainter *p) {
     if(mVisible) {
         p->save();
-        p->setTransform(QTransform(
-                            mCombinedTransformMatrix.inverted()),
-                            true);
         foreach(BoundingBox *box, mChildren) {
             //box->draw(p);
             box->drawPreviewPixmap(p);
@@ -703,8 +736,8 @@ void BoxesGroup::setSelectedPivotAbsPos(QPointF absPos)
 void BoxesGroup::ungroup() {
     clearBoxesSelection();
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
-    BoundingBox *box;
-    foreachInverted(box, mChildren) {
+    //BoundingBox *box;
+    foreach(BoundingBox *box, mChildren) {
         box->applyTransformation(&mTransformAnimator);
         removeChild(box);
         parentGroup->addChild(box);
@@ -749,7 +782,7 @@ void BoxesGroup::removeSelectedPointsAndClearList()
 {
     foreach(MovablePoint *point, mSelectedPoints) {
         point->deselect();
-        point->remove();
+        point->removeFromVectorPath();
     }
     mSelectedPoints.clear(); schedulePivotUpdate();
 }
@@ -931,52 +964,78 @@ void BoxesGroup::selectAllBoxes() {
     }
 }
 
-void BoxesGroup::connectPoints()
-{
+void BoxesGroup::connectPoints() {
     QList<PathPoint*> selectedPathPoints;
     foreach(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
+            if(((PathPoint*)point)->isEndPoint()) {
+                selectedPathPoints.append( (PathPoint*) point);
+            }
         }
     }
     if(selectedPathPoints.count() == 2) {
-
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
-        if(firstPoint->isEndPoint() && secondPoint->isEndPoint()) {
-            firstPoint->connectToPoint(secondPoint);
-        }        
+        if(firstPoint->getParent() == secondPoint->getParent()) {
+            ((VectorPath*)firstPoint->getParent())->
+                    connectPoints(firstPoint, secondPoint);
+        }
     }
 }
 
-void BoxesGroup::disconnectPoints()
-{
+void BoxesGroup::disconnectPoints() {
     QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
+        foreach(MovablePoint *point, mSelectedPoints) {
+            if(point->isPathPoint()) {
+                PathPoint *nextPoint = ((PathPoint*)point)->getNextPoint();
+                if(nextPoint == NULL) continue;
+                if(nextPoint->isSelected()) {
+                    selectedPathPoints.append( (PathPoint*) point);
+                }
+            }
         }
-    }
-    if(selectedPathPoints.count() == 2) {
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
-        firstPoint->disconnectFromPoint(secondPoint);
-    }
+        foreach(PathPoint *point, selectedPathPoints) {
+            PathPoint *secondPoint = point->getNextPoint();
+            if(point->getParent() == secondPoint->getParent()) {
+                ((VectorPath*)point->getParent())->
+                        disconnectPoints(point, secondPoint);
+            }
+        }
 }
 
 void BoxesGroup::mergePoints() {
     QList<PathPoint*> selectedPathPoints;
     foreach(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
+            if(((PathPoint*)point)->isEndPoint()) {
+                selectedPathPoints.append( (PathPoint*) point);
+            }
         }
     }
     if(selectedPathPoints.count() == 2) {
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
-        QPointF sumPos = firstPoint->getAbsolutePos() + secondPoint->getAbsolutePos();
-        firstPoint->remove();
-        secondPoint->moveToAbs(sumPos/2);        
+        if(secondPoint->getParent() == secondPoint->getParent()) {
+            ((VectorPath*)secondPoint->getParent())->connectPoints(firstPoint,
+                                                                   secondPoint);
+            QPointF sumPos = firstPoint->getAbsolutePos() +
+                    secondPoint->getAbsolutePos();
+            bool firstWasPrevious = firstPoint ==
+                    secondPoint->getPreviousPoint();
+
+            secondPoint->startTransform();
+            secondPoint->moveToAbs(sumPos/2);
+            if(firstWasPrevious) {
+                secondPoint->moveStartCtrlPtToAbsPos(
+                            firstPoint->getStartCtrlPtAbsPos());
+            } else {
+                secondPoint->moveEndCtrlPtToAbsPos(
+                            firstPoint->getEndCtrlPtAbsPos());
+            }
+            secondPoint->finishTransform();
+
+            firstPoint->removeFromVectorPath();
+        }
     }
 }
 
@@ -1185,7 +1244,6 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
         box->deselect();
         newGroup->addChild(box);
     }
-    newGroup->selectAllBoxes();
     mSelectedBoxes.clear(); schedulePivotUpdate();
     return newGroup;
 }
@@ -1278,7 +1336,6 @@ void BoxesGroup::addChild(BoundingBox *child)
 {
     child->setParent(this);
     addChildToListAt(mChildren.count(), child);
-    if(!mPivotChanged) centerPivotPosition();
 }
 
 void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
@@ -1292,6 +1349,8 @@ void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRe
     if(child->isAnimated()) {
         emit addAnimatedBoundingBoxSignal(child);
     }
+
+    scheduleAwaitUpdate();
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {

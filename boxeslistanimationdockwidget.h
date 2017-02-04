@@ -23,17 +23,19 @@ public:
 
     void updatePos();
 
-    void paintEvent(QPaintEvent *) {
-        QPainter p(this);
-        if(mouseGrabber() == this) {
-            p.fillRect(rect(), Qt::black);
-        }
-        p.end();
-    }
+    void paintEvent(QPaintEvent *);
 
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *);
+
+    void enterEvent(QEvent *);
+
+    void leaveEvent(QEvent *);
+
 private:
+    bool mHover = false;
+    bool mPressed = false;
     int mPressX;
     QWidget *mBoxesList;
 };
