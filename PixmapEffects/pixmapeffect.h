@@ -139,4 +139,64 @@ private:
     QrealAnimator mCirclesRadius;
 };
 
+class SwirlEffect : public PixmapEffect {
+public:
+    SwirlEffect(qreal degrees = 45.);
+
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
+
+    qreal getMargin() { return 0.; }
+private:
+    QrealAnimator mDegreesAnimator;
+};
+
+class OilEffect : public PixmapEffect {
+public:
+    OilEffect(qreal radius = 2.);
+
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
+
+    qreal getMargin() { return 0.; }
+private:
+    QrealAnimator mRadiusAnimator;
+};
+
+class ImplodeEffect : public PixmapEffect {
+public:
+    ImplodeEffect(qreal radius = 10.);
+
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
+
+    qreal getMargin() { return 0.; }
+private:
+    QrealAnimator mFactorAnimator;
+};
+
+class DesaturateEffect : public PixmapEffect {
+public:
+    DesaturateEffect(qreal influence = .5);
+
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale,
+               bool highQuality);
+
+    qreal getMargin() { return 0.; }
+private:
+    QrealAnimator mInfluenceAnimator;
+};
+
 #endif // PIXMAPEFFECT_H

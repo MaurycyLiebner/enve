@@ -1,5 +1,5 @@
 #include "effectanimators.h"
-#include "pixmapeffect.h"
+#include "PixmapEffects/pixmapeffect.h"
 #include "Boxes/boundingbox.h"
 #include <QSqlError>
 #include <QDebug>

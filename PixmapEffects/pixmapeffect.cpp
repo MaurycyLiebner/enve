@@ -198,7 +198,7 @@ void ShadowEffect::apply(BoundingBox *target,
     QPainter p(imgPtr);
     p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
     p.setOpacity(mOpacity.getCurrentValue()*0.01);
-    p.drawImage(mTranslation.getCurrentValue(), shadowQImg);
+    p.drawImage(mTranslation.getCurrentValue()*scale, shadowQImg);
     p.end();
 }
 
@@ -370,4 +370,87 @@ void CirclesEffect::apply(BoundingBox *target,
     p.drawImage(0, 0, circlesImg);
 
     p.end();
+}
+
+SwirlEffect::SwirlEffect(qreal degrees) {
+    setName("swirl");
+
+    mDegreesAnimator.setValueRange(-3600., 3600.);
+    mDegreesAnimator.setCurrentValue(degrees);
+    mDegreesAnimator.setName("degrees");
+    mDegreesAnimator.blockPointer();
+    addChildAnimator(&mDegreesAnimator);
+}
+
+void SwirlEffect::apply(BoundingBox *target,
+                        QImage *imgPtr,
+                        const fmt_filters::image &img,
+                        qreal scale,
+                        bool highQuality) {
+    Q_UNUSED(imgPtr);
+    fmt_filters::swirl(img,
+                       mDegreesAnimator.getCurrentValue(),
+                       fmt_filters::rgba(0, 0, 0, 0));
+}
+
+OilEffect::OilEffect(qreal radius) {
+    setName("oil");
+
+    mRadiusAnimator.setValueRange(1., 5.);
+    mRadiusAnimator.setCurrentValue(radius);
+    mRadiusAnimator.setName("radius");
+    mRadiusAnimator.blockPointer();
+    addChildAnimator(&mRadiusAnimator);
+}
+
+void OilEffect::apply(BoundingBox *target,
+                        QImage *imgPtr,
+                        const fmt_filters::image &img,
+                        qreal scale,
+                        bool highQuality) {
+    Q_UNUSED(imgPtr);
+    fmt_filters::oil(img,
+                     mRadiusAnimator.getCurrentValue());
+}
+
+ImplodeEffect::ImplodeEffect(qreal radius) {
+    setName("implode");
+
+    mFactorAnimator.setValueRange(0., 100.);
+    mFactorAnimator.setCurrentValue(radius);
+    mFactorAnimator.setName("factor");
+    mFactorAnimator.blockPointer();
+    addChildAnimator(&mFactorAnimator);
+}
+
+void ImplodeEffect::apply(BoundingBox *target,
+                        QImage *imgPtr,
+                        const fmt_filters::image &img,
+                        qreal scale,
+                        bool highQuality) {
+    Q_UNUSED(imgPtr);
+    fmt_filters::implode(img,
+                         mFactorAnimator.getCurrentValue(),
+                         fmt_filters::rgba(0, 0, 0, 0));
+}
+
+
+DesaturateEffect::DesaturateEffect(qreal radius) {
+    setName("desaturate");
+
+    mInfluenceAnimator.setValueRange(0., 1.);
+    mInfluenceAnimator.setCurrentValue(radius);
+    mInfluenceAnimator.setName("factor");
+    mInfluenceAnimator.blockPointer();
+    addChildAnimator(&mInfluenceAnimator);
+}
+
+void DesaturateEffect::apply(BoundingBox *target,
+                        QImage *imgPtr,
+                        const fmt_filters::image &img,
+                        qreal scale,
+                        bool highQuality) {
+    Q_UNUSED(imgPtr);
+    fmt_filters::desaturate(img,
+                            mInfluenceAnimator.getCurrentValue());
 }

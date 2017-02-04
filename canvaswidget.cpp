@@ -57,17 +57,17 @@ void CanvasWidget::setCanvasMode(const CanvasMode &mode) {
     if(mode == MOVE_PATH) {
         setCursor(QCursor(Qt::ArrowCursor) );
     } else if(mode == MOVE_POINT) {
-        setCursor(QCursor(QPixmap(":/curors/cursor-node.xpm"), 0, 0) );
+        setCursor(QCursor(QPixmap(":/cursors/cursor-node.xpm"), 0, 0) );
     } else if(mode == PICK_PATH_SETTINGS) {
-        setCursor(QCursor(QPixmap(":/curors/cursor_color_picker.png"), 2, 20) );
+        setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
     } else if(mode == ADD_CIRCLE) {
-        setCursor(QCursor(QPixmap(":/curors/cursor-ellipse.xpm"), 4, 4) );
+        setCursor(QCursor(QPixmap(":/cursors/cursor-ellipse.xpm"), 4, 4) );
     } else if(mode == ADD_RECTANGLE) {
-        setCursor(QCursor(QPixmap(":/curors/cursor-rect.xpm"), 4, 4) );
+        setCursor(QCursor(QPixmap(":/cursors/cursor-rect.xpm"), 4, 4) );
     } else if(mode == ADD_TEXT) {
-        setCursor(QCursor(QPixmap(":/curors/cursor-text.xpm"), 4, 4) );
+        setCursor(QCursor(QPixmap(":/cursors/cursor-text.xpm"), 4, 4) );
     } else {
-        setCursor(QCursor(QPixmap(":/curors/cursor-pen.xpm"), 4, 4) );
+        setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     }
 
     mCurrentCanvas->setCanvasMode(mode);

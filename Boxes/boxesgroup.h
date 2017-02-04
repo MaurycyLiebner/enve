@@ -1,4 +1,4 @@
-#ifndef BOXESGROUP_H
+﻿#ifndef BOXESGROUP_H
 #define BOXESGROUP_H
 #include "Boxes/boundingbox.h"
 #include "Boxes/vectorpath.h"
@@ -191,6 +191,10 @@ public:
     void applyBrushEffectToSelected();
     void applyLinesEffectToSelected();
     void applyCirclesEffectToSelected();
+    void applySwirlEffectToSelected();
+    void applyOilEffectToSelected();
+    void applyImplodeEffectToSelected();
+    void applyDesaturateEffectToSelected();
     //void drawPixmap(QPainter *p);
     void updateAllBoxes();
     void handleListItemMouseDoubleClick(qreal boxesListX, qreal relX, qreal relY, QMouseEvent *event);

@@ -399,6 +399,7 @@ public:
     void pathsDivisionAction();
     void pathsExclusionAction();
     BoundingBox *createLink(BoxesGroup *parent);
+    void createImageBox(const QString &path);
 private:
     bool mPivotVisibleDuringPointEdit = true;
     bool mEffectsPaintEnabled;

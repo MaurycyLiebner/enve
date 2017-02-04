@@ -7,7 +7,7 @@
 #include "Animators/transformanimator.h"
 
 #include "Animators/animatorscollection.h"
-#include "pixmapeffect.h"
+#include "PixmapEffects/pixmapeffect.h"
 
 #include "Animators/effectanimators.h"
 
@@ -293,7 +293,9 @@ public:
     void duplicateTransformAnimatorFrom(TransformAnimator *source);
     virtual void preUpdatePixmapsUpdates();
     void updatePreviewPixmap();
+    void scheduleCenterPivot();
 protected:
+    bool mCenterPivotScheduled = false;
     QPointF mPreviewDrawPos;
     QRectF mRelBoundingRect;
 

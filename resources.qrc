@@ -88,7 +88,7 @@
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>
     </qresource>
-    <qresource prefix="/curors">
+    <qresource prefix="/cursors">
         <file alias="cursor-node.xpm">pixmaps/cursor-node.xpm</file>
         <file alias="cursor_color_picker.png">pixmaps/cursor_color_picker.png</file>
         <file alias="cursor-ellipse.xpm">pixmaps/cursor-ellipse.xpm</file>

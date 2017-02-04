@@ -625,13 +625,20 @@ void BoundingBox::setAnimated(bool bT) {
     }
 }
 
+void BoundingBox::scheduleCenterPivot() {
+    mCenterPivotScheduled = true;
+}
+
 void BoundingBox::updateBoundingRect() {
     mRelBoundingRectPath = QPainterPath();
     mRelBoundingRectPath.addRect(mRelBoundingRect);
     mMappedBoundingRectPath = mUpdateTransform.map(mRelBoundingRectPath);
     updatePixBoundingRectClippedToView();
 
-    if(!mPivotChanged) centerPivotPosition();
+    if(mCenterPivotScheduled) {
+        mCenterPivotScheduled = false;
+        centerPivotPosition();
+    }
 }
 
 void BoundingBox::deselect() {

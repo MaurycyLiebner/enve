@@ -1034,6 +1034,7 @@ void MainWindow::setCurrentFrameForAllWidgets(int frame)
 }
 
 void MainWindow::importFile(QString path, bool loadInBox) {
+    if(mCanvasWidget->hasNoCanvas()) return;
     disable();
 
     QFile file(path);
@@ -1042,16 +1043,19 @@ void MainWindow::importFile(QString path, bool loadInBox) {
     }
     QString extension = path.split(".").last();
     if(extension == "svg") {
-        loadSVGFile(path, mCanvas);
+        loadSVGFile(path, mCanvasWidget->getCurrentCanvas());
     } else if(extension == "av") {
         QSqlDatabase db = QSqlDatabase::database();//not dbConnection
         db.setDatabaseName(path);
         db.open();
 
         mFillStrokeSettings->loadAllGradientsFromSql();
-        mCanvas->loadAllBoxesFromSql(loadInBox);
+        mCanvasWidget->getCurrentCanvas()->loadAllBoxesFromSql(loadInBox);
 
         db.close();
+    } else if(extension == "png" ||
+              extension == "jpg") {
+        mCanvasWidget->getCurrentCanvas()->createImageBox(path);
     }
     enable();
 

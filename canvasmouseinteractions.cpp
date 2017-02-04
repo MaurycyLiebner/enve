@@ -69,6 +69,10 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 //            effectsMenu->addAction("Brush");
             effectsMenu->addAction("Lines");
             effectsMenu->addAction("Circles");
+            effectsMenu->addAction("Swirl");
+            effectsMenu->addAction("Oil");
+            effectsMenu->addAction("Implode");
+            effectsMenu->addAction("Desaturate");
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
@@ -81,6 +85,14 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     addEffect(new LinesEffect());
                 } else if(selectedAction->text() == "Circles") {
                     addEffect(new CirclesEffect());
+                } else if(selectedAction->text() == "Swirl") {
+                    addEffect(new SwirlEffect());
+                } else if(selectedAction->text() == "Oil") {
+                    addEffect(new OilEffect());
+                } else if(selectedAction->text() == "Implode") {
+                    addEffect(new ImplodeEffect());
+                } else if(selectedAction->text() == "Desaturate") {
+                    addEffect(new DesaturateEffect());
                 } else { // link canvas
                     const QList<QAction*> &canvasActions =
                             linkCanvasMenu->actions();
@@ -135,6 +147,10 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 //            effectsMenu->addAction("Brush");
             effectsMenu->addAction("Lines");
             effectsMenu->addAction("Circles");
+            effectsMenu->addAction("Swirl");
+            effectsMenu->addAction("Oil");
+            effectsMenu->addAction("Implode");
+            effectsMenu->addAction("Desaturate");
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
@@ -160,6 +176,14 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     mCurrentBoxesGroup->applyLinesEffectToSelected();
                 } else if(selectedAction->text() == "Circles") {
                     mCurrentBoxesGroup->applyCirclesEffectToSelected();
+                } else if(selectedAction->text() == "Swirl") {
+                    mCurrentBoxesGroup->applySwirlEffectToSelected();
+                } else if(selectedAction->text() == "Oil") {
+                    mCurrentBoxesGroup->applyOilEffectToSelected();
+                } else if(selectedAction->text() == "Implode") {
+                    mCurrentBoxesGroup->applyImplodeEffectToSelected();
+                } else if(selectedAction->text() == "Desaturate") {
+                    mCurrentBoxesGroup->applyDesaturateEffectToSelected();
                 } else if(selectedAction->text() == "Animated") {
                     mCurrentBoxesGroup->setSelectedAnimated(
                                 !pressedBox->isAnimated());

@@ -183,6 +183,30 @@ void BoxesGroup::applyCirclesEffectToSelected() {
     }
 }
 
+void BoxesGroup::applySwirlEffectToSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new SwirlEffect());
+    }
+}
+
+void BoxesGroup::applyOilEffectToSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new OilEffect());
+    }
+}
+
+void BoxesGroup::applyImplodeEffectToSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new ImplodeEffect());
+    }
+}
+
+void BoxesGroup::applyDesaturateEffectToSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new DesaturateEffect());
+    }
+}
+
 void BoxesGroup::resetSelectedTranslation() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->resetTranslation();
@@ -1332,8 +1356,7 @@ void BoxesGroup::selectedPathsUnion() {
     addBoxToSelection(newPath);
 }
 
-void BoxesGroup::addChild(BoundingBox *child)
-{
+void BoxesGroup::addChild(BoundingBox *child) {
     child->setParent(this);
     addChildToListAt(mChildren.count(), child);
 }
@@ -1350,7 +1373,9 @@ void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRe
         emit addAnimatedBoundingBoxSignal(child);
     }
 
+    scheduleEffectsMarginUpdate();
     scheduleAwaitUpdate();
+    if(!mPivotChanged) scheduleCenterPivot();
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -1388,6 +1413,8 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
     if(box->isAnimated()) {
         emit removeAnimatedBoundingBoxSignal(box);
     }
+
+    scheduleEffectsMarginUpdate();
 }
 
 void BoxesGroup::removeChild(BoundingBox *child)

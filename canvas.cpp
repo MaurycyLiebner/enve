@@ -238,6 +238,10 @@ void Canvas::loadAllBoxesFromSql(bool loadInBox) {
                                                                     loadInBox);
 }
 
+void Canvas::createImageBox(const QString &path) {
+    mCurrentBoxesGroup->addChild(new ImageBox(mCurrentBoxesGroup, path));
+}
+
 void Canvas::paintEvent(QPainter *p)
 {
     p->setRenderHint(QPainter::Antialiasing);

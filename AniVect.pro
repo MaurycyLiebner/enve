@@ -54,7 +54,6 @@ SOURCES += main.cpp\
     gradientpoints.cpp \
     fontswidget.cpp \
     paintcontroler.cpp \
-    fmt_filters.cpp \
     vectorshapesmenu.cpp \
     qdoubleslider.cpp \
     qrealanimatorvalueslider.cpp \
@@ -80,7 +79,6 @@ SOURCES += main.cpp\
     Animators/complexanimator.cpp \
     Animators/pathanimator.cpp \
     Animators/qstringanimator.cpp \
-    pixmapeffect.cpp \
     Animators/qpointfanimator.cpp \
     Animators/animatorupdater.cpp \
     Boxes/circle.cpp \
@@ -101,7 +99,9 @@ SOURCES += main.cpp\
     actionbutton.cpp \
     Boxes/boxpainthandler.cpp \
     newcanvasdialog.cpp \
-    PixmapEffects/brusheffect.cpp
+    PixmapEffects/brusheffect.cpp \
+    PixmapEffects/fmt_filters.cpp \
+    PixmapEffects/pixmapeffect.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -142,8 +142,6 @@ HEADERS  += mainwindow.h \
     gradientpoints.h \
     fontswidget.h \
     paintcontroler.h \
-    fmt_filters.h \
-    pixmapeffect.h \
     vectorshapesmenu.h \
     qdoubleslider.h \
     qrealanimatorvalueslider.h \
@@ -190,7 +188,9 @@ HEADERS  += mainwindow.h \
     actionbutton.h \
     Boxes/boxpainthandler.h \
     newcanvasdialog.h \
-    PixmapEffects/brusheffect.h
+    PixmapEffects/brusheffect.h \
+    PixmapEffects/pixmapeffect.h \
+    PixmapEffects/fmt_filters.h
 
 RESOURCES += \
     resources.qrc
