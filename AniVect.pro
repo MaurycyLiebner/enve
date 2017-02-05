@@ -101,7 +101,8 @@ SOURCES += main.cpp\
     newcanvasdialog.cpp \
     PixmapEffects/brusheffect.cpp \
     PixmapEffects/fmt_filters.cpp \
-    PixmapEffects/pixmapeffect.cpp
+    PixmapEffects/pixmapeffect.cpp \
+    Boxes/particlebox.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -190,7 +191,8 @@ HEADERS  += mainwindow.h \
     newcanvasdialog.h \
     PixmapEffects/brusheffect.h \
     PixmapEffects/pixmapeffect.h \
-    PixmapEffects/fmt_filters.h
+    PixmapEffects/fmt_filters.h \
+    Boxes/particlebox.h
 
 RESOURCES += \
     resources.qrc
