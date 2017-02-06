@@ -194,7 +194,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         }
     }
 }
-
+#include "Boxes/particlebox.h"
 void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         //handleMouseRelease(event->pos());
@@ -301,6 +301,8 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             mCurrentCircle = newPath;
 
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
+            ParticleBox *newBox = new ParticleBox(mCurrentBoxesGroup);
+
             Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPos, false);
             newPath->startAllPointsTransform();

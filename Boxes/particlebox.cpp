@@ -1,8 +1,19 @@
 #include "particlebox.h"
+#include "mainwindow.h"
+
+
+double fRand(double fMin, double fMax)
+{
+    double f = (double)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
 
 ParticleBox::ParticleBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_PARTICLES) {
+    ParticleEmitter *newEmitter = new ParticleEmitter(this);
+    mEmitters << newEmitter;
 
+    addActiveAnimator(newEmitter);
 }
 
 void ParticleBox::getAccelerationAt(const QPointF &pos,
@@ -12,9 +23,12 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
 }
 
 void ParticleBox::updateAfterFrameChanged(int currentFrame) {
+    BoundingBox::updateAfterFrameChanged(currentFrame);
     foreach(ParticleEmitter *emitter, mEmitters) {
-        emitter->updateParticlesForFrame(currentFrame);
+        emitter->setFrame(currentFrame);
+        emitter->scheduleUpdateParticlesForFrame();
     }
+    scheduleAwaitUpdate();
 }
 
 void ParticleBox::updateBoundingRect() {
@@ -29,6 +43,28 @@ void ParticleBox::updateBoundingRect() {
                         adjusted(-effectsMargin, -effectsMargin,
                                  effectsMargin, effectsMargin);
     BoundingBox::updateBoundingRect();
+}
+
+void ParticleBox::preUpdatePixmapsUpdates() {
+    foreach(ParticleEmitter *emitter, mEmitters) {
+        emitter->generateParticlesIfNeeded();
+        emitter->updateParticlesForFrameIfNeeded();
+    }
+
+    BoundingBox::preUpdatePixmapsUpdates();
+}
+
+bool ParticleBox::relPointInsidePath(QPointF relPos) {
+    if(mRelBoundingRectPath.contains(relPos) ) {
+        foreach(ParticleEmitter *emitter, mEmitters) {
+            if(emitter->relPointInsidePath(relPos)) {
+                return true;
+            }
+        }
+        return false;
+    } else {
+        return false;
+    }
 }
 
 void ParticleBox::draw(QPainter *p)
@@ -50,28 +86,60 @@ Particle::Particle(ParticleBox *parentBox) {
 
 void Particle::initializeParticle(int firstFrame, int nFrames,
                                   const QPointF &iniPos,
-                                  const QPointF &iniVel) {
+                                  const QPointF &iniVel,
+                                  const qreal &partSize) {
+    mSize = partSize;
+    mPrevVelocityVar = QPointF(0., 0.);
+    mNextVelocityVar = QPointF(0., 0.);
+    mPrevVelocityDuration = 10000000.;
+    mLastScale = 1.;
+    mLastOpacity = 1.;
+
     mFirstFrame = firstFrame;
-    if(mPos != NULL) {
-        if(nFrames == mNumberFrames) return;
-        delete[] mPos;
-    }
-    mNumberFrames = nFrames;
-    mPos = new QPointF[nFrames];
     mLastPos = iniPos;
     mLastVel = iniVel;
+    if(mParticleStates != NULL) {
+        if(nFrames == mNumberFrames) return;
+        delete[] mParticleStates;
+    }
+    mNumberFrames = nFrames;
+    mParticleStates = new ParticleState[nFrames];
 }
 
-void Particle::generatePathNextFrame(int frame) {
-    QPointF acc;
-    mParentBox->getAccelerationAt(mLastPos,
-                                  frame,
-                                  &acc);
+void Particle::generatePathNextFrame(const int &frame,
+                                     const qreal &velocityVar,
+                                     const qreal &velocityVarPeriod,
+                                     const QPointF &acc,
+                                     const qreal &finalScale,
+                                     const qreal &finalOpacity,
+                                     const qreal &decayFrames) {
+    if(mPrevVelocityDuration > velocityVarPeriod) {
+        mPrevVelocityVar = mNextVelocityVar;
+        mNextVelocityVar = QPointF(fRand(-velocityVar, velocityVar),
+                                   fRand(-velocityVar, velocityVar));
+        mPrevVelocityDuration = 0.;
+    }
+    qreal perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
+                            velocityVarPeriod;
+    mLastPos += mLastVel +
+            perPrevVelVar*mPrevVelocityVar +
+            (1. - perPrevVelVar)*mNextVelocityVar;
     mLastVel += acc;
 
-    mLastPos += mLastVel;
+    mPrevVelocityDuration += 1.;
 
-    mPos[frame] = mLastPos;
+    int arrayId = frame - mFirstFrame;
+
+    int remaining = mNumberFrames - arrayId;
+    if(remaining <= decayFrames) {
+        mLastScale += (finalScale - 1.)/decayFrames;
+        mLastOpacity += (finalOpacity - 1.)/decayFrames;
+    }
+
+    mParticleStates[arrayId] = ParticleState(mLastPos,
+                                             mLastScale,
+                                             mSize,
+                                             mLastOpacity);
 }
 
 bool Particle::isVisibleAtFrame(const int &frame) {
@@ -80,21 +148,164 @@ bool Particle::isVisibleAtFrame(const int &frame) {
     return true;
 }
 
-QPointF Particle::getPosAtFrame(const int &frame) {
+ParticleState Particle::getParticleStateAtFrame(const int &frame) {
     int arrayId = frame - mFirstFrame;
-    return mPos[arrayId];
+    return mParticleStates[arrayId];
 }
 
-ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) {
+ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
+    ComplexAnimator(){
+    setName("particle emitter");
+
     mParentBox = parentBox;
 
-    generateParticles();
+    mPos.setName("pos");
+    mPos.setCurrentValue(QPointF(0., 0.));
+
+    mWidth.setName("width");
+    mWidth.setValueRange(0., 6000.);
+    mWidth.setCurrentValue(0.);
+
+    mIniVelocity.setName("ini vel");
+    mIniVelocity.setValueRange(-1000., 1000.);
+    mIniVelocity.setCurrentValue(10.);
+
+    mIniVelocityVar.setName("ini vel var");
+    mIniVelocityVar.setValueRange(0., 1000.);
+    mIniVelocityVar.setCurrentValue(5.);
+
+    mIniVelocityAngle.setName("ini vel angle");
+    mIniVelocityAngle.setValueRange(-3600., 3600.);
+    mIniVelocityAngle.setCurrentValue(-90.);
+
+    mIniVelocityAngleVar.setName("ini vel angle var");
+    mIniVelocityAngleVar.setValueRange(0., 3600.);
+    mIniVelocityAngleVar.setCurrentValue(15.);
+
+    mAcceleration.setName("acceleration");
+    mAcceleration.setValueRange(-100., 100.);
+    mAcceleration.setCurrentValue(QPointF(0., 9.8));
+
+    mParticlesPerSecond.setName("particles per second");
+    mParticlesPerSecond.setValueRange(0., 10000.);
+    mParticlesPerSecond.setCurrentValue(120);
+
+    mParticlesFrameLifetime.setName("particles lifetime");
+    mParticlesFrameLifetime.setValueRange(1., 1000.);
+    mParticlesFrameLifetime.setCurrentValue(50.);
+
+    mVelocityRandomVar.setName("velocity random var");
+    mVelocityRandomVar.setValueRange(0., 1000.);
+    mVelocityRandomVar.setCurrentValue(5.);
+
+    mVelocityRandomVarPeriod.setName("velocity random var period");
+    mVelocityRandomVarPeriod.setValueRange(1., 100.);
+    mVelocityRandomVarPeriod.setCurrentValue(10.);
+
+    mParticleSize.setName("particle size");
+    mParticleSize.setValueRange(0., 100.);
+    mParticleSize.setCurrentValue(5.);
+
+    mParticleSizeVar.setName("particle size var");
+    mParticleSizeVar.setValueRange(0., 100.);
+    mParticleSizeVar.setCurrentValue(1.);
+
+//    mParticleAspectRatio.setName("particle aspect ratio");
+//    mParticleAspectRatio.setValueRange(1., 100.);
+
+//    mParticleRotation;
+//    mParticleRotationVar;
+
+//    mParticleRotationRandomVar;
+//    mParticleRotationRandomVarPeriod;
+
+    mParticlesDecayFrames.setName("decay frames");
+    mParticlesDecayFrames.setValueRange(0., 1000.);
+    mParticlesDecayFrames.setCurrentValue(10.);
+
+    mParticlesSizeDecay.setName("final scale");
+    mParticlesSizeDecay.setValueRange(0., 10.);
+    mParticlesSizeDecay.setCurrentValue(0.);
+
+    mParticlesOpacityDecay.setName("final opacity");
+    mParticlesOpacityDecay.setValueRange(0., 1.);
+    mParticlesOpacityDecay.setCurrentValue(0.);
+
+    mPos.blockPointer();
+    mWidth.blockPointer();
+
+    mIniVelocity.blockPointer();
+    mIniVelocityVar.blockPointer();
+
+    mIniVelocityAngle.blockPointer();
+    mIniVelocityAngleVar.blockPointer();
+
+    mAcceleration.blockPointer();
+
+    mParticlesPerSecond.blockPointer();
+    mParticlesFrameLifetime.blockPointer();
+
+    mVelocityRandomVar.blockPointer();
+    mVelocityRandomVarPeriod.blockPointer();
+
+    mParticleSize.blockPointer();
+    mParticleSizeVar.blockPointer();
+
+    mParticlesDecayFrames.blockPointer();
+    mParticlesSizeDecay.blockPointer();
+    mParticlesOpacityDecay.blockPointer();
+
+    addChildAnimator(&mPos);
+    addChildAnimator(&mWidth);
+
+    addChildAnimator(&mIniVelocity);
+    addChildAnimator(&mIniVelocityVar);
+
+    addChildAnimator(&mIniVelocityAngle);
+    addChildAnimator(&mIniVelocityAngleVar);
+
+    addChildAnimator(&mAcceleration);
+
+    addChildAnimator(&mParticlesPerSecond);
+    addChildAnimator(&mParticlesFrameLifetime);
+
+    addChildAnimator(&mVelocityRandomVar);
+    addChildAnimator(&mVelocityRandomVarPeriod);
+
+    addChildAnimator(&mParticleSize);
+    addChildAnimator(&mParticleSizeVar);
+
+    addChildAnimator(&mParticlesDecayFrames);
+    addChildAnimator(&mParticlesSizeDecay);
+    addChildAnimator(&mParticlesOpacityDecay);
+
+    scheduleGenerateParticles();
+
+    setUpdater(new ParticlesUpdater(this));
 }
 
-double fRand(double fMin, double fMax)
-{
-    double f = (double)rand() / RAND_MAX;
-    return fMin + f * (fMax - fMin);
+void ParticleEmitter::scheduleGenerateParticles() {
+    mGenerateParticlesScheduled = true;
+    mParentBox->scheduleAwaitUpdate();
+}
+
+void ParticleEmitter::scheduleUpdateParticlesForFrame() {
+    mUpdateParticlesForFrameScheduled = true;
+    mParentBox->scheduleAwaitUpdate();
+}
+
+void ParticleEmitter::updateParticlesForFrameIfNeeded() {
+    if(mUpdateParticlesForFrameScheduled) {
+        mUpdateParticlesForFrameScheduled = false;
+        updateParticlesForFrame(MainWindow::getInstance()->getCurrentFrame());
+    }
+}
+
+void ParticleEmitter::generateParticlesIfNeeded() {
+    if(mGenerateParticlesScheduled) {
+        mGenerateParticlesScheduled = false;
+        generateParticles();
+    }
 }
 
 void ParticleEmitter::generateParticles() {
@@ -118,6 +329,25 @@ void ParticleEmitter::generateParticles() {
                 mParticlesPerSecond.getValueAtFrame(i)/24.;
         qreal particlesFrameLifetime =
                 mParticlesFrameLifetime.getValueAtFrame(i);
+        QPointF pos =
+                mPos.getPointValueAtFrame(i);
+        qreal width =
+                mWidth.getValueAtFrame(i);
+        qreal velocityVar =
+                mVelocityRandomVar.getValueAtFrame(i);
+        qreal velocityVarPeriod =
+                mVelocityRandomVarPeriod.getValueAtFrame(i);
+        QPointF acceleration = mAcceleration.getPointValueAtFrame(i)/24.;
+        qreal finalScale =
+                mParticlesSizeDecay.getValueAtFrame(i);
+        qreal finalOpacity =
+                mParticlesOpacityDecay.getValueAtFrame(i);
+        qreal decayFrames =
+                mParticlesDecayFrames.getValueAtFrame(i);
+        qreal particleSize =
+                mParticleSize.getValueAtFrame(i);
+        qreal particleSizeVar =
+                mParticleSizeVar.getValueAtFrame(i);
 
         int particlesToCreate = remainingPartFromFrame + particlesPerFrame;
         remainingPartFromFrame += particlesPerFrame - particlesToCreate;
@@ -143,8 +373,16 @@ void ParticleEmitter::generateParticles() {
             rotVelM.rotate(velDeg);
             QPointF partVel = rotVelM.map(QPointF(partVelAmp, 0.));
 
+            qreal partSize = fRand(particleSize - particleSizeVar,
+                                   particleSize + particleSizeVar);
+
+            qreal xTrans = fRand(-width,
+                                 width);
+
             newParticle->initializeParticle(i, particlesFrameLifetime,
-                                            partVel, mPos);
+                                            QPointF(pos.x() + xTrans,
+                                                    pos.y()),
+                                            partVel, partSize);
             notFinishedParticles << newParticle;
         }
         int nNotFinished = notFinishedParticles.count();
@@ -153,7 +391,13 @@ void ParticleEmitter::generateParticles() {
             Particle *particle = notFinishedParticles.at(currPart);
 
             if(particle->isVisibleAtFrame(i)) {
-                particle->generatePathNextFrame(i);
+                particle->generatePathNextFrame(i,
+                                                velocityVar,
+                                                velocityVarPeriod,
+                                                acceleration,
+                                                finalScale,
+                                                finalOpacity,
+                                                decayFrames);
                 currPart++;
             } else {
                 notFinishedParticles.removeAt(currPart);
@@ -166,27 +410,35 @@ void ParticleEmitter::generateParticles() {
     for(int i = 0; i < nToRemove; i++) {
         delete mParticles.takeLast();
     }
+
+    mUpdateParticlesForFrameScheduled = true;
 }
 
 void ParticleEmitter::drawParticles(QPainter *p) {
     p->setBrush(Qt::black);
-    foreach(const QPointF &pos, mParticlePos) {
-        p->drawEllipse(pos,
-                       5., 5.);
+    p->setPen(Qt::NoPen);
+    foreach(const ParticleState &state, mParticleStates) {
+        p->save();
+        p->translate(state.pos);
+        p->scale(state.scale, state.scale);
+        p->setOpacity(state.opacity);
+        qreal radius = state.size*0.5;
+        p->drawEllipse(QPointF(0., 0.),
+                       radius, radius);
+        p->restore();
     }
 }
 
 void ParticleEmitter::updateParticlesForFrame(const int &frame) {
+    mParticleStates.clear();
     foreach(Particle *particle, mParticles) {
         if(particle->isVisibleAtFrame(frame)) {
-            mParticlePos << particle->getPosAtFrame(frame);
+            mParticleStates << particle->getParticleStateAtFrame(frame);
         }
     }
-}
-
-QRectF ParticleEmitter::getParticlesBoundingRect() {
     QRectF rect;
-    foreach(const QPointF &pos, mParticlePos) {
+    foreach(const ParticleState &state, mParticleStates) {
+        const QPointF &pos = state.pos;
         if(rect.isNull()) {
             rect.setTopLeft(pos);
             rect.setTopRight(pos);
@@ -202,10 +454,13 @@ QRectF ParticleEmitter::getParticlesBoundingRect() {
                 rect.setBottom(pos.y());
             }
         }
-        p->drawEllipse(pos,
-                       5., 5.);
     }
-    if(rect.isNull()) return rect;
-    rect.adjust(-5., -5, 5, 5);
-    return rect;
+    if(!rect.isNull()) {
+        rect.adjust(-5., -5, 5, 5);
+    }
+    mParticlesBoundingRect = rect;
+}
+
+QRectF ParticleEmitter::getParticlesBoundingRect() {
+    return mParticlesBoundingRect;
 }

@@ -8,6 +8,7 @@ class QPointFAnimator : public ComplexAnimator
 public:
     QPointFAnimator();
     QPointF getCurrentValue() const;
+    QPointF getPointValueAtFrame(const int &frame);
     qreal getXValue();
     qreal getYValue();
     void setCurrentValue(QPointF val, bool finish = false);
@@ -30,6 +31,7 @@ public:
     void makeDuplicate(QrealAnimator *target);
     void duplicateYAnimatorFrom(QrealAnimator *source);
     void duplicateXAnimatorFrom(QrealAnimator *source);
+    void setValueRange(qreal minVal, qreal maxVal);
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

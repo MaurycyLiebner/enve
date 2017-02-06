@@ -78,8 +78,7 @@ void QrealAnimator::loadKeysFromSql(int qrealAnimatorId) {
     }
 }
 
-void QrealAnimator::setValueRange(qreal minVal, qreal maxVal)
-{
+void QrealAnimator::setValueRange(qreal minVal, qreal maxVal) {
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
     setCurrentValue(mCurrentValue);

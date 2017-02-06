@@ -46,9 +46,13 @@ void QPointFAnimator::loadFromSql(int posAnimatorId) {
     }
 }
 
-QPointF QPointFAnimator::getCurrentValue() const
-{
+QPointF QPointFAnimator::getCurrentValue() const {
     return QPointF(mXAnimator.getCurrentValue(), mYAnimator.getCurrentValue());
+}
+
+QPointF QPointFAnimator::getPointValueAtFrame(const int &frame) {
+    return QPointF(mXAnimator.getValueAtFrame(frame),
+                   mYAnimator.getValueAtFrame(frame));
 }
 
 qreal QPointFAnimator::getXValue()
@@ -65,6 +69,11 @@ void QPointFAnimator::setCurrentValue(QPointF val, bool finish)
 {
     mXAnimator.setCurrentValue(val.x(), finish);
     mYAnimator.setCurrentValue(val.y(), finish);
+}
+
+void QPointFAnimator::setValueRange(qreal minVal, qreal maxVal) {
+    mXAnimator.setValueRange(minVal, maxVal);
+    mYAnimator.setValueRange(minVal, maxVal);
 }
 
 void QPointFAnimator::incCurrentValue(qreal x, qreal y)

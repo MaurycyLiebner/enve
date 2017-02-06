@@ -75,10 +75,14 @@ void BlurEffect::apply(BoundingBox *target,
     Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius.getCurrentValue()*scale;
     if(highQuality) {
-        fmt_filters::fast_blur(img, radius*0.5);
+        //fmt_filters::fast_blur(img, radius*0.5);
+        fmt_filters::fast_blur(img, radius*0.25);
+        fmt_filters::fast_blur(img, radius*0.25);
         //fmt_filters::blur(img, radius, radius*0.3333);
     } else {
-        fmt_filters::fast_blur(img, radius*0.5);
+        fmt_filters::fast_blur(img, radius*0.25);
+        fmt_filters::fast_blur(img, radius*0.25);
+        //fmt_filters::fast_blur(img, radius*0.5);
     }
 }
 
@@ -190,9 +194,13 @@ void ShadowEffect::apply(BoundingBox *target,
 
     qreal radius = mBlurRadius.getCurrentValue()*scale;
     if(highQuality) {
-        fmt_filters::blur(shadowImg, radius, radius*0.3333);
+        //fmt_filters::blur(shadowImg, radius, radius*0.3333);
+        fmt_filters::fast_blur(shadowImg, radius*0.25);
+        fmt_filters::fast_blur(shadowImg, radius*0.25);
     } else {
-        fmt_filters::fast_blur(shadowImg, radius*0.5);
+        //fmt_filters::fast_blur(shadowImg, radius*0.5);
+        fmt_filters::fast_blur(shadowImg, radius*0.25);
+        fmt_filters::fast_blur(shadowImg, radius*0.25);
     }
 
     QPainter p(imgPtr);

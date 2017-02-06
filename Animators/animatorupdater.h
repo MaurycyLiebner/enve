@@ -107,4 +107,14 @@ private:
     AnimationBox *mTarget;
 };
 
+class ParticleEmitter;
+class ParticlesUpdater : public AnimatorUpdater {
+public:
+    ParticlesUpdater(ParticleEmitter *target);
+
+    void update();
+private:
+    ParticleEmitter *mTarget;
+};
+
 #endif // ANIMATORUPDATER_H
