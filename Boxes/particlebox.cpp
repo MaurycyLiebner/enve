@@ -112,7 +112,8 @@ void Particle::generatePathNextFrame(const int &frame,
                                      const QPointF &acc,
                                      const qreal &finalScale,
                                      const qreal &finalOpacity,
-                                     const qreal &decayFrames) {
+                                     const qreal &decayFrames,
+                                     const qreal &length) {
     if(mPrevVelocityDuration > velocityVarPeriod) {
         mPrevVelocityVar = mNextVelocityVar;
         mNextVelocityVar = QPointF(fRand(-velocityVar, velocityVar),
@@ -136,10 +137,39 @@ void Particle::generatePathNextFrame(const int &frame,
         mLastOpacity += (finalOpacity - 1.)/decayFrames;
     }
 
-    mParticleStates[arrayId] = ParticleState(mLastPos,
-                                             mLastScale,
-                                             mSize,
-                                             mLastOpacity);
+    if(length > 0.1) {
+        QPainterPath linePath;
+        qreal currLen = 0.;
+        int currId = arrayId - 1;
+        linePath.moveTo(mLastPos);
+        QPointF lastPos = mLastPos;
+        while(currId > -1) {
+            QPointF currPos = mParticleStates[currId].pos;
+            qreal lenInc = pointToLen(lastPos - currPos);
+            qreal newLen = currLen + lenInc;
+            if(newLen > length) {
+                linePath.lineTo(lastPos + (currPos - lastPos)*
+                                (length - currLen)/lenInc);
+                break;
+            } else {
+                linePath.lineTo(currPos);
+            }
+            currLen = newLen;
+            lastPos = currPos;
+            currId--;
+        }
+
+        mParticleStates[arrayId] = ParticleState(mLastPos,
+                                                 mLastScale,
+                                                 mSize,
+                                                 mLastOpacity,
+                                                 linePath);
+    } else {
+        mParticleStates[arrayId] = ParticleState(mLastPos,
+                                                 mLastScale,
+                                                 mSize,
+                                                 mLastOpacity);
+    }
 }
 
 bool Particle::isVisibleAtFrame(const int &frame) {
@@ -210,14 +240,9 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mParticleSizeVar.setValueRange(0., 100.);
     mParticleSizeVar.setCurrentValue(1.);
 
-//    mParticleAspectRatio.setName("particle aspect ratio");
-//    mParticleAspectRatio.setValueRange(1., 100.);
-
-//    mParticleRotation;
-//    mParticleRotationVar;
-
-//    mParticleRotationRandomVar;
-//    mParticleRotationRandomVarPeriod;
+    mParticleLength.setName("length");
+    mParticleLength.setValueRange(0., 100.);
+    mParticleLength.setCurrentValue(0.);
 
     mParticlesDecayFrames.setName("decay frames");
     mParticlesDecayFrames.setValueRange(0., 1000.);
@@ -251,6 +276,8 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mParticleSize.blockPointer();
     mParticleSizeVar.blockPointer();
 
+    mParticleLength.blockPointer();
+
     mParticlesDecayFrames.blockPointer();
     mParticlesSizeDecay.blockPointer();
     mParticlesOpacityDecay.blockPointer();
@@ -274,6 +301,8 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
 
     addChildAnimator(&mParticleSize);
     addChildAnimator(&mParticleSizeVar);
+
+    addChildAnimator(&mParticleLength);
 
     addChildAnimator(&mParticlesDecayFrames);
     addChildAnimator(&mParticlesSizeDecay);
@@ -348,6 +377,7 @@ void ParticleEmitter::generateParticles() {
                 mParticleSize.getValueAtFrame(i);
         qreal particleSizeVar =
                 mParticleSizeVar.getValueAtFrame(i);
+        qreal length = mParticleLength.getValueAtFrame(i);
 
         int particlesToCreate = remainingPartFromFrame + particlesPerFrame;
         remainingPartFromFrame += particlesPerFrame - particlesToCreate;
@@ -397,7 +427,8 @@ void ParticleEmitter::generateParticles() {
                                                 acceleration,
                                                 finalScale,
                                                 finalOpacity,
-                                                decayFrames);
+                                                decayFrames,
+                                                length);
                 currPart++;
             } else {
                 notFinishedParticles.removeAt(currPart);
@@ -415,18 +446,20 @@ void ParticleEmitter::generateParticles() {
 }
 
 void ParticleEmitter::drawParticles(QPainter *p) {
-    p->setBrush(Qt::black);
-    p->setPen(Qt::NoPen);
-    foreach(const ParticleState &state, mParticleStates) {
-        p->save();
-        p->translate(state.pos);
-        p->scale(state.scale, state.scale);
-        p->setOpacity(state.opacity);
-        qreal radius = state.size*0.5;
-        p->drawEllipse(QPointF(0., 0.),
-                       radius, radius);
-        p->restore();
+    p->save();
+    if(mParticleLength.getCurrentValue() > 0.1) {
+        QPen pen = QPen(Qt::black);
+        pen.setCapStyle(Qt::RoundCap);
+        p->setPen(pen);
+        p->setBrush(Qt::NoBrush);
+    } else {
+        p->setBrush(Qt::black);
+        p->setPen(Qt::NoPen);
     }
+    foreach(const ParticleState &state, mParticleStates) {
+        state.draw(p);
+    }
+    p->restore();
 }
 
 void ParticleEmitter::updateParticlesForFrame(const int &frame) {

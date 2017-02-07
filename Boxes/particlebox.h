@@ -11,13 +11,44 @@ struct ParticleState {
                   const qreal &sizeT,
                   const qreal &opacityT) {
         pos = posT;
-        scale = scaleT;
-        size = sizeT;
+        size = scaleT*sizeT*0.5;
         opacity = opacityT;
+        isLine = false;
+    }
+    ParticleState(const QPointF &posT,
+              const qreal &scaleT,
+              const qreal &sizeT,
+              const qreal &opacityT,
+              const QPainterPath &path) {
+//        QPainterPathStroker stroker;
+//        stroker.setWidth(radius);
+//        stroker.setCapStyle(Qt::RoundCap);
+//        linePath = stroker.createStroke(path);
+        pos = posT;
+        size = scaleT*sizeT;
+        opacity = opacityT;
+        isLine = true;
+
+        linePath = path;
     }
 
+    void draw(QPainter *p) const {
+        p->setOpacity(opacity);
+
+        if(isLine) {
+            QPen pen = p->pen();
+            pen.setWidthF(size);
+            p->setPen(pen);
+            p->drawPath(linePath);
+        } else {
+            p->drawEllipse(pos,
+                           size, size);
+        }
+    }
+
+    bool isLine;
+    QPainterPath linePath;
     QPointF pos;
-    qreal scale;
     qreal size;
     qreal opacity;
 };
@@ -36,7 +67,8 @@ public:
                                const QPointF &acc,
                                const qreal &finalScale,
                                const qreal &finalOpacity,
-                               const qreal &decayFrames);
+                               const qreal &decayFrames,
+                               const qreal &length);
 
     bool isVisibleAtFrame(const int &frame);
     ParticleState getParticleStateAtFrame(const int &frame);
@@ -109,13 +141,7 @@ private:
     QrealAnimator mParticleSize;
     QrealAnimator mParticleSizeVar;
 
-//    QrealAnimator mParticleAspectRatio;
-
-//    QrealAnimator mParticleRotation;
-//    QrealAnimator mParticleRotationVar;
-
-//    QrealAnimator mParticleRotationRandomVar;
-//    QrealAnimator mParticleRotationRandomVarPeriod;
+    QrealAnimator mParticleLength;
 
     QrealAnimator mParticlesDecayFrames;
     QrealAnimator mParticlesSizeDecay;

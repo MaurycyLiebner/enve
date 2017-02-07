@@ -82,7 +82,14 @@ public:
     virtual void draw(QPainter *) {}
     virtual void drawForPreview(QPainter *p) { draw(p); }
 
-    virtual void drawSelected(QPainter *, CanvasMode) {}
+    virtual void drawSelected(QPainter *p, CanvasMode) {
+        if(mVisible) {
+            p->save();
+            drawBoundingRect(p);
+            p->restore();
+        }
+    }
+
 
     QMatrix getCombinedTransform() const;
 
