@@ -18,8 +18,6 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mAnimatorsCollection.addAnimator(&mTransformAnimator);
     mTransformAnimator.blockPointer();
 
-    mBoxesList = getMainWindow()->getBoxesList();
-    mKeysView = getMainWindow()->getKeysView();
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;
 
@@ -986,4 +984,11 @@ void BoundingBox::setLocked(bool bt) {
         ((BoxesGroup*) mParent)->removeBoxFromSelection(this);
     }
     mLocked = bt;
+}
+
+void BoundingBox::SWT_addChildrenAbstractions(
+        SingleWidgetAbstraction *abstraction,
+        ScrollWidgetVisiblePart *visiblePartWidget) {
+    mAnimatorsCollection.SWT_addChildrenAbstractions(abstraction,
+                                                 visiblePartWidget);
 }

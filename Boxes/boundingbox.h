@@ -11,6 +11,8 @@
 
 #include "Animators/effectanimators.h"
 
+#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+
 class KeysView;
 
 class UndoRedo;
@@ -52,7 +54,9 @@ class BoxItemWidgetContainer;
 
 class EffectsSettingsWidget;
 
-class BoundingBox : public QObject, public Transformable
+class BoundingBox : public QObject,
+        public Transformable,
+        public SingleWidgetTarget
 {
     Q_OBJECT
 public:
@@ -302,6 +306,10 @@ public:
     virtual void preUpdatePixmapsUpdates();
     void updatePreviewPixmap();
     void scheduleCenterPivot();
+
+    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
+                                     ScrollWidgetVisiblePart *visiblePartWidget);
+    SingleWidgetTargetType SWT_getType() { return SWT_BoundingBox; }
 protected:
     bool mCenterPivotScheduled = false;
     QPointF mPreviewDrawPos;
@@ -345,9 +353,6 @@ protected:
     QRectF mPixBoundingRectClippedToView;
     QPainterPath mRelBoundingRectPath;
     QPainterPath mMappedBoundingRectPath;
-
-    BoxesListWidget *mBoxesList;
-    KeysView *mKeysView;
 
     bool mScheduledForRemove = false;
 

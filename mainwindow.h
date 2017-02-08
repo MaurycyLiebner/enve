@@ -28,12 +28,109 @@ class BoxesListAnimationDockWidget;
 class CanvasWidget;
 
 class ObjectSettingsWidget;
+class BoxScrollWidget;
 
 //class SoundComposition;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+public:
+    MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+
+    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
+
+    static MainWindow *getInstance();
+
+    void createDetachedUndoRedoStack();
+    void deleteDetachedUndoRedoStack();
+
+    UndoRedoStack *getUndoRedoStack();
+
+    void addUpdateScheduler(UpdateScheduler *scheduler);
+
+    bool isShiftPressed();
+    bool isCtrlPressed();
+    bool isAltPressed();
+
+    void callUpdateSchedulers();
+    void schedulePivotUpdate();
+
+    AnimationDockWidget *getAnimationDockWidget();
+    KeysView *getKeysView();
+    ScrollWidget *getBoxesList();
+    CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
+    FillStrokeSettingsWidget *getFillStrokeSettings();
+    void saveToFile(QString path);
+    void loadFile(QString path);
+    void clearAll();
+    void importFile(QString path, bool loadInBox);
+    void exportSelected(QString path);
+    void setCurrentPath(QString newPath);
+    void createTablesInSaveDatabase(QSqlQuery *query);
+    void updateTitle();
+    void setFileChangedSinceSaving(bool changed);
+    void disableEventFilter();
+    void enableEventFilter();
+
+    void scheduleBoxesListRepaint();
+    void disable();
+    void enable();
+
+    int getCurrentFrame();
+
+    bool isRecordingAllPoints();
+
+    int getMinFrame();
+    int getMaxFrame();
+
+    void previewFinished();
+    void updateDisplayedFillStrokeSettings();
+    void scheduleDisplayedFillStrokeSettingsUpdate();
+    void updateDisplayedFillStrokeSettingsIfNeeded();
+    void updateCanvasModeButtonsChecked();
+
+    void addBoxAwaitingUpdate(BoundingBox *box);
+    void setCurrentShapesMenuBox(BoundingBox *box);
+    void setCurrentObjectSettingsWidgetBox(BoundingBox *box);
+    void setCurrentBox(BoundingBox *box);
+
+    void nextSaveOutputFrame();
+    void nextPlayPreviewFrame();
+
+    void setResolutionPercent(qreal percent);
+
+    void setCurrentFrameForAllWidgets(int frame);
+    void updateDisplayedShapesInMenu();
+    void updateSettingsForCurrentCanvas();
+public slots:
+    void setCurrentFrame(int frame);
+    void setGraphEnabled(bool graphEnabled);
+    void setAllPointsRecord(bool allPointsRecord);
+    void playPreview();
+    void stopPreview();
+    void setResolutionPercentId(int id);
+    void createNewCanvas();
+private slots:
+    void saveOutput(QString renderDest);
+    void renderOutput();
+    void sendNextBoxForUpdate();
+
+    void newFile();
+    bool askForSaving();
+    void openFile();
+    void saveFile();
+    void saveFileAs();
+    void saveBackup();
+    void closeProject();
+    void importFile();
+    void linkFile();
+    void importAnimation();
+    void exportSelected();
+    void revert();
+signals:
+    void updateBoxPixmaps(BoundingBox*);
 private:
     static MainWindow *mMainWindowInstance;
 
@@ -49,7 +146,7 @@ private:
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
-    BoxesListWidget *mBoxListWidget;
+    BoxScrollWidget *mBoxListWidget;
     KeysView *mKeysView;
 
     QToolBar *mToolBar;
@@ -138,102 +235,6 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *, QEvent *e);
     void closeEvent(QCloseEvent *e);
-public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
-
-    static MainWindow *getInstance();
-
-    void createDetachedUndoRedoStack();
-    void deleteDetachedUndoRedoStack();
-
-    UndoRedoStack *getUndoRedoStack();
-
-    void addUpdateScheduler(UpdateScheduler *scheduler);
-
-    bool isShiftPressed();
-    bool isCtrlPressed();
-    bool isAltPressed();
-
-    void callUpdateSchedulers();
-    void schedulePivotUpdate();
-
-    AnimationDockWidget *getAnimationDockWidget();
-    KeysView *getKeysView();
-    BoxesListWidget *getBoxesList();
-    CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
-    FillStrokeSettingsWidget *getFillStrokeSettings();
-    void saveToFile(QString path);
-    void loadFile(QString path);
-    void clearAll();
-    void importFile(QString path, bool loadInBox);
-    void exportSelected(QString path);
-    void setCurrentPath(QString newPath);
-    void createTablesInSaveDatabase(QSqlQuery *query);
-    void updateTitle();
-    void setFileChangedSinceSaving(bool changed);
-    void disableEventFilter();
-    void enableEventFilter();
-
-    void scheduleBoxesListRepaint();
-    void disable();
-    void enable();
-
-    int getCurrentFrame();
-
-    bool isRecordingAllPoints();
-
-    int getMinFrame();
-    int getMaxFrame();
-
-    void previewFinished();
-    void updateDisplayedFillStrokeSettings();
-    void scheduleDisplayedFillStrokeSettingsUpdate();
-    void updateDisplayedFillStrokeSettingsIfNeeded();
-    void updateCanvasModeButtonsChecked();
-
-    void addBoxAwaitingUpdate(BoundingBox *box);
-    void setCurrentShapesMenuBox(BoundingBox *box);
-    void setCurrentObjectSettingsWidgetBox(BoundingBox *box);
-    void setCurrentBox(BoundingBox *box);
-
-    void nextSaveOutputFrame();
-    void nextPlayPreviewFrame();
-
-    void setResolutionPercent(qreal percent);
-
-    void setCurrentFrameForAllWidgets(int frame);
-    void updateDisplayedShapesInMenu();
-    void updateSettingsForCurrentCanvas();
-public slots:
-    void setCurrentFrame(int frame);
-    void setGraphEnabled(bool graphEnabled);
-    void setAllPointsRecord(bool allPointsRecord);
-    void playPreview();
-    void stopPreview();
-    void setResolutionPercentId(int id);
-    void createNewCanvas();
-private slots:
-    void saveOutput(QString renderDest);
-    void renderOutput();
-    void sendNextBoxForUpdate();
-
-    void newFile();
-    bool askForSaving();
-    void openFile();
-    void saveFile();
-    void saveFileAs();
-    void saveBackup();
-    void closeProject();
-    void importFile();
-    void linkFile();
-    void importAnimation();
-    void exportSelected();
-    void revert();
-signals:
-    void updateBoxPixmaps(BoundingBox*);
 };
 
 #endif // MAINWINDOW_H

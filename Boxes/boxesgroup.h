@@ -227,6 +227,9 @@ public:
                                            const qreal &resolutionScale,
                                            const QMatrix &renderTransform,
                                            QPointF *drawPos);
+    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
+                                     ScrollWidgetVisiblePart *visiblePartWidget);
+    SingleWidgetTargetType SWT_getType() { return SWT_BoxesGroup; }
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

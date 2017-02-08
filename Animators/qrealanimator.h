@@ -192,6 +192,8 @@ public:
 
     virtual void makeDuplicate(QrealAnimator *target);
     virtual QrealAnimator *makeDuplicate();
+
+    SingleWidgetTargetType SWT_getType() { return SWT_QrealAnimator; }
 protected:
     bool mTraceKeyOnCurrentFrame = false;
 

@@ -1485,3 +1485,16 @@ void BoxesGroup::updateAfterCombinedTransformationChanged()
         child->updateCombinedTransform();
     }
 }
+
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+void BoxesGroup::SWT_addChildrenAbstractions(
+        SingleWidgetAbstraction *abstraction,
+        ScrollWidgetVisiblePart *visiblePartWidget) {
+    BoundingBox::SWT_addChildrenAbstractions(abstraction,
+                                             visiblePartWidget);
+
+    foreach(BoundingBox *child, mChildren) {
+        abstraction->addChildAbstraction(
+                    child->SWT_createAbstraction(visiblePartWidget));
+    }
+}

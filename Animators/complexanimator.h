@@ -50,6 +50,10 @@ public:
                               const int &newIndex);
     int getNumberOfChildren();
     QrealAnimator *getChildAt(const int &i);
+
+    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
+                                     ScrollWidgetVisiblePart *visiblePartWidget);
+    SingleWidgetTargetType SWT_getType() { return SWT_ComplexAnimator; }
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

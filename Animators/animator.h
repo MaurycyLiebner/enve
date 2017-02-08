@@ -5,6 +5,7 @@
 #include <QColor>
 #include <QSqlQuery>
 #include "connectedtomainwindow.h"
+#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 
 class ComplexAnimator;
 class QrealKey;
@@ -12,7 +13,10 @@ class QrealAnimator;
 class QPainter;
 class AnimatorUpdater;
 
-class Animator :  public QObject, public ConnectedToMainWindow
+class Animator :
+        public QObject,
+        public ConnectedToMainWindow,
+        public SingleWidgetTarget
 {
     Q_OBJECT
 public:

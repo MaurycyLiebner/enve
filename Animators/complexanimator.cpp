@@ -25,6 +25,16 @@ QrealAnimator *ComplexAnimator::getChildAt(const int &i) {
     return mChildAnimators.at(i);
 }
 
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+void ComplexAnimator::SWT_addChildrenAbstractions(
+        SingleWidgetAbstraction *abstraction,
+        ScrollWidgetVisiblePart *visiblePartWidget) {
+    foreach(QrealAnimator *animator, mChildAnimators) {
+        abstraction->addChildAbstraction(
+                    animator->SWT_createAbstraction(visiblePartWidget));
+    }
+}
+
 qreal ComplexAnimator::clampValue(qreal value)
 {
     return value;//clamp(value, mMinMoveValue, mMaxMoveValue);

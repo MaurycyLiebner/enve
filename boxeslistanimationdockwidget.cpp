@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include "animationdockwidget.h"
 #include <QScrollBar>
+#include "BoxesList/boxscrollwidget.h"
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *boxesList, QWidget *parent) :
     QWidget(parent) {
@@ -97,29 +98,22 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                              QSizePolicy::Maximum);
+
     mBoxesListScrollArea = new ScrollArea(this);
-    mBoxesListScrollArea->setFocusPolicy(Qt::NoFocus);
+    mBoxesListWidget = new BoxScrollWidget(mBoxesListScrollArea);
+    mBoxesListScrollArea->setWidget(mBoxesListWidget);
+
+    connect(mBoxesListScrollArea->verticalScrollBar(),
+            SIGNAL(valueChanged(int)),
+            mBoxesListWidget, SLOT(changeVisibleTop(int)));
+    connect(mBoxesListScrollArea, SIGNAL(heightChanged(int)),
+            mBoxesListWidget, SLOT(changeVisibleHeight(int)));
+
     mBoxesListScrollArea->verticalScrollBar()->setSingleStep(
                 BoxesListWidget::getListItemHeight());
     connect(mBoxesListScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),
             this, SLOT(moveSlider(int)));
-
-    mBoxesListScrollArea->setHorizontalScrollBarPolicy(
-                Qt::ScrollBarAlwaysOff);
-    mBoxesListScrollArea->setVerticalScrollBarPolicy(
-                Qt::ScrollBarAlwaysOff);
-    mBoxesListScrollArea->setBackgroundRole(
-                QPalette::Window);
-    mBoxesListScrollArea->setFrameShadow(
-                QFrame::Plain);
-    mBoxesListScrollArea->setFrameShape(
-                QFrame::NoFrame);
-    mBoxesListScrollArea->setWidgetResizable(true);
-    mBoxesListScrollArea->setFixedWidth(
-                BoxesListWidget::getListItemMaxWidth());
-    mBoxesList = new BoxesListWidget(this);
-    mBoxesListScrollArea->setWidget(mBoxesList);
 
 //    Canvas *canvas = MainWindow::getInstance()->getCanvas();
 //    connect(canvas, SIGNAL(changeChildZSignal(int,int)),
@@ -133,7 +127,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mBoxesListLayout->setSpacing(0);
     mBoxesListLayout->setMargin(0);
 
-    mKeysView = new KeysView(mBoxesList, this);
+    mKeysView = new KeysView(mBoxesListWidget, this);
     connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
             mFrameRangeScrollbar, SLOT(setViewedFramesRange(int, int)) );
     connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
@@ -147,7 +141,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(this, SIGNAL(visibleRangeChanged(int,int)),
             mKeysView, SLOT(setViewedRange(int,int)) );
 
-    mAnimationDockWidget = new AnimationDockWidget(mBoxesList,
+    mAnimationDockWidget = new AnimationDockWidget(mBoxesListWidget,
                                                    mKeysView);
     mKeysView->setAnimationDockWidget(mAnimationDockWidget);
 
@@ -274,9 +268,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mFrameRangeScrollbar->raise();
 }
 
-BoxesListWidget *BoxesListAnimationDockWidget::getBoxesList()
+BoxScrollWidget *BoxesListAnimationDockWidget::getBoxesList()
 {
-    return mBoxesList;
+    return mBoxesListWidget;
 }
 
 KeysView *BoxesListAnimationDockWidget::getKeysView()
@@ -376,4 +370,6 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                         qRound((1. - canvas->getResolutionPercent())*4.));
     connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
             mMainWindow, SLOT(setResolutionPercentId(int)));
+
+    mBoxesListWidget->setMainTarget(canvas);
 }

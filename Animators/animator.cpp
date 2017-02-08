@@ -2,7 +2,9 @@
 #include "Animators/complexanimator.h"
 
 Animator::Animator() :
-    QObject(), ConnectedToMainWindow() {
+    QObject(),
+    ConnectedToMainWindow(),
+    SingleWidgetTarget() {
 
 }
 

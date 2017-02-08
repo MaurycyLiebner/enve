@@ -18,6 +18,7 @@
 #include "svgimporter.h"
 #include "canvaswidget.h"
 #include "ObjectSettings/objectsettingswidget.h"
+#include "BoxesList/boxscrollwidget.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -713,9 +714,9 @@ KeysView *MainWindow::getKeysView()
     return mKeysView;
 }
 
-BoxesListWidget *MainWindow::getBoxesList()
+ScrollWidget *MainWindow::getBoxesList()
 {
-    return mBoxesListAnimationDockWidget->getBoxesList();
+    return mBoxListWidget;
 }
 
 void MainWindow::disableEventFilter() {
@@ -873,7 +874,7 @@ void MainWindow::clearAll() {
     mCanvas->clearAll();
     mFillStrokeSettings->clearAll();
     mObjectSettingsWidget->clearAll();
-    mBoxListWidget->clearAll();
+    //mBoxListWidget->clearAll();
 }
 
 void MainWindow::exportSelected(QString path) {

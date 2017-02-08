@@ -14,7 +14,7 @@ class Canvas;
 
 class MainWindow;
 
-class BoxesListWidget;
+class ScrollWidget;
 
 class AnimationDockWidget;
 
@@ -22,7 +22,7 @@ class KeysView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit KeysView(BoxesListWidget *boxesList, QWidget *parent = 0);
+    explicit KeysView(ScrollWidget *boxesList, QWidget *parent = 0);
 
     void setAnimationDockWidget(AnimationDockWidget *graphControls);
     void setGraphViewed(bool bT);
@@ -115,7 +115,7 @@ private:
     int mViewedTop = 0;
     int mViewedBottom = 0;
 
-    BoxesListWidget *mBoxesList;
+    ScrollWidget *mBoxesList;
     QRectF mSelectionRect;
     bool mSelecting = false;
     bool mGraphViewed = false;

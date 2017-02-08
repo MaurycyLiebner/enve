@@ -14,6 +14,7 @@
 #include <QApplication>
 #include <QScrollBar>
 #include <QComboBox>
+#include "BoxesList/OptimalScrollArea/scrollarea.h"
 
 class ChangeWidthWidget : public QWidget
 {
@@ -41,32 +42,14 @@ private:
 };
 
 class AnimationDockWidget;
-
-class ScrollArea : public QScrollArea {
-    Q_OBJECT
-public:
-    ScrollArea(QWidget *parent = 0) : QScrollArea(parent) {
-
-    }
-
-public slots:
-    void callWheelEvent(QWheelEvent *event) {
-        //scrollContentsBy(event->delta(), 0);
-        //QApplication::sendEvent(this, event);
-        //wheelEvent(event);
-        verticalScrollBar()->triggerAction(
-                    (event->delta() > 0) ?
-                    QAbstractSlider::SliderSingleStepSub :
-                    QAbstractSlider::SliderSingleStepAdd);
-    }
-};
+class BoxScrollWidget;
 
 class BoxesListAnimationDockWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
-    BoxesListWidget *getBoxesList();
+    BoxScrollWidget *getBoxesList();
     KeysView *getKeysView();
     void setCurrentFrame(int frame);
     bool processUnfilteredKeyEvent(QKeyEvent *event);
@@ -108,7 +91,7 @@ private:
     QHBoxLayout *mBoxesListKeysViewLayout;
     QVBoxLayout *mBoxesListLayout;
     QVBoxLayout *mKeysViewLayout;
-    BoxesListWidget *mBoxesList;
+    BoxScrollWidget *mBoxesListWidget;
     KeysView *mKeysView;
     AnimatonWidgetScrollBar *mFrameRangeScrollbar;
     AnimatonWidgetScrollBar *mAnimationWidgetScrollbar;
