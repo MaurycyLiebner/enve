@@ -19,6 +19,9 @@ public:
     virtual ~AnimatorUpdater() {}
 
     virtual void update() {}
+    virtual void softUpdate() {
+        update();
+    }
 };
 
 class TransUpdater : public AnimatorUpdater
@@ -113,6 +116,7 @@ public:
     ParticlesUpdater(ParticleEmitter *target);
 
     void update();
+    void softUpdate() {}
 private:
     ParticleEmitter *mTarget;
 };

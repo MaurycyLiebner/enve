@@ -258,14 +258,14 @@ void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, boo
 
     mPivotAnimator.setCurrentValue(point, finish);
 
-    callUpdater();
+    //callUpdater();
 }
 
 void TransformAnimator::setPivot(QPointF point, bool finish) {
 
     mPivotAnimator.setCurrentValue(point, finish);
 
-    callUpdater();
+    //callUpdater();
 }
 
 QPointF TransformAnimator::getPivot()

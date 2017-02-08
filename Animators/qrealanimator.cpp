@@ -438,9 +438,16 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
 void QrealAnimator::setFrame(int frame)
 {
     mCurrentFrame = frame;
-    updateValueFromCurrentFrame();
+    //updateValueFromCurrentFrame();
 
     updateKeyOnCurrrentFrame();
+    qreal newValue = getValueAtFrame(mCurrentFrame);
+    if(newValue == mCurrentValue) return;
+    mCurrentValue = newValue;
+
+    emit valueChangedSignal(mCurrentValue);
+
+    callSoftUpdater();
 }
 
 bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
@@ -866,6 +873,14 @@ void QrealAnimator::callUpdater()
         return;
     } else {
         mUpdater->update();
+    }
+}
+
+void QrealAnimator::callSoftUpdater() {
+    if(mUpdater == NULL) {
+        return;
+    } else {
+        mUpdater->softUpdate();
     }
 }
 

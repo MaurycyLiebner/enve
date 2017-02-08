@@ -120,16 +120,14 @@ void Particle::generatePathNextFrame(const int &frame,
                                    fRand(-velocityVar, velocityVar));
         mPrevVelocityDuration = 0.;
     }
-    qreal perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
-                            velocityVarPeriod;
-    mLastPos += mLastVel +
-            perPrevVelVar*mPrevVelocityVar +
-            (1. - perPrevVelVar)*mNextVelocityVar;
-    mLastVel += acc;
-
-    mPrevVelocityDuration += 1.;
 
     int arrayId = frame - mFirstFrame;
+
+    if(arrayId == 0) {
+        qreal iniTime = fRand(0., 1.);
+        mLastPos += mLastVel*iniTime;
+        mLastVel += acc*iniTime;
+    }
 
     int remaining = mNumberFrames - arrayId;
     if(remaining <= decayFrames) {
@@ -170,6 +168,15 @@ void Particle::generatePathNextFrame(const int &frame,
                                                  mSize,
                                                  mLastOpacity);
     }
+
+    qreal perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
+                            velocityVarPeriod;
+    mLastPos += mLastVel +
+            perPrevVelVar*mPrevVelocityVar +
+            (1. - perPrevVelVar)*mNextVelocityVar;
+    mLastVel += acc;
+
+    mPrevVelocityDuration += 1.;
 }
 
 bool Particle::isVisibleAtFrame(const int &frame) {
@@ -241,7 +248,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mParticleSizeVar.setCurrentValue(1.);
 
     mParticleLength.setName("length");
-    mParticleLength.setValueRange(0., 100.);
+    mParticleLength.setValueRange(0., 2000.);
     mParticleLength.setCurrentValue(0.);
 
     mParticlesDecayFrames.setName("decay frames");
