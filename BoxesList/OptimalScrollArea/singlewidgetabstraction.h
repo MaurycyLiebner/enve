@@ -24,13 +24,13 @@ public:
     int getHeight();
 
     void addChildAbstraction(SingleWidgetAbstraction *abs);
+    void removeChildAbstraction(SingleWidgetAbstraction *abs);
 
     void setContentVisible(const bool &bT);
 
     SingleWidgetTarget *getTarget() {
         return mTarget;
     }
-
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mContentVisible = true;

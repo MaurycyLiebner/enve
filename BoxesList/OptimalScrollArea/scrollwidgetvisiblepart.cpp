@@ -22,6 +22,17 @@ void ScrollWidgetVisiblePart::setVisibleHeight(
     updateVisibleWidgets();
 }
 
+void ScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
+    mVisibleWidgetsContentUpdateScheduled = true;
+}
+
+void ScrollWidgetVisiblePart::updateVisibleWidgetsContentIfNeeded() {
+    if(mVisibleWidgetsContentUpdateScheduled) {
+        mVisibleWidgetsContentUpdateScheduled = false;
+        updateVisibleWidgetsContent();
+    }
+}
+
 void ScrollWidgetVisiblePart::updateVisibleWidgets() {
     int neededWidgets = ceil(mVisibleHeight/20.);
     int currentNWidgets = mSingleWidgets.count();
@@ -40,7 +51,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgets() {
 
     int yT = 0;
     foreach(SingleWidget *widget, mSingleWidgets) {
-        widget->move(0, yT);
+        widget->move(widget->x(), yT);
         widget->setFixedWidth(100);
         yT += 20;
     }

@@ -20,7 +20,9 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
     if(currY > maxY) return true;
     if(currY > minY) {
         if(*currentWidgetId < widgets->count()) {
-            widgets->at(*currentWidgetId)->setTargetAbstraction(this);
+            SingleWidget *currWidget = widgets->at(*currentWidgetId);
+            currWidget->move(currX, currWidget->y());
+            currWidget->setTargetAbstraction(this);
             *currentWidgetId = *currentWidgetId + 1;
         }
     }
@@ -56,6 +58,11 @@ int SingleWidgetAbstraction::getHeight() {
 void SingleWidgetAbstraction::addChildAbstraction(
         SingleWidgetAbstraction *abs) {
     mChildren.append(abs);
+}
+
+void SingleWidgetAbstraction::removeChildAbstraction(
+        SingleWidgetAbstraction *abs) {
+    mChildren.removeOne(abs);
 }
 
 void SingleWidgetAbstraction::setContentVisible(const bool &bT) {

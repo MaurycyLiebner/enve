@@ -7,14 +7,17 @@ class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidget;
 
-class ScrollWidgetVisiblePart : public QWidget
-{
+class ScrollWidgetVisiblePart :
+        public QWidget {
     Q_OBJECT
 public:
     ScrollWidgetVisiblePart(ScrollWidget *parent = 0);
 
     void setVisibleTop(const int &top);
     void setVisibleHeight(const int &height);
+
+    void scheduledUpdateVisibleWidgetsContent();
+    void updateVisibleWidgetsContentIfNeeded();
 
     void updateVisibleWidgets();
     void updateVisibleWidgetsContent();
@@ -25,6 +28,7 @@ public:
 
     virtual SingleWidget *createNewSingleWidget();
 private:
+    bool mVisibleWidgetsContentUpdateScheduled = false;
     ScrollWidget *mParentWidget;
 
     SingleWidgetAbstraction *mMainAbstraction = NULL;
