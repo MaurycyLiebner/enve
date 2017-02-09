@@ -1,13 +1,20 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
-#include "scrollwidgetvisiblepart.h"
 #include "singlewidget.h"
+#include "scrollwidgetvisiblepart.h"
 
 SingleWidgetAbstraction::SingleWidgetAbstraction(
         SingleWidgetTarget *target,
-        ScrollWidgetVisiblePart *visiblePartWidget) {
+        ScrollWidgetVisiblePart *visiblePart) {
     mTarget = target;
-    mVisiblePartWidget = visiblePartWidget;
+    mVisiblePartWidget = visiblePart;
+}
+
+SingleWidgetAbstraction::~SingleWidgetAbstraction() {
+    mTarget->SWT_removeAbstractionFromList(this);
+    foreach(SingleWidgetAbstraction *abs, mChildren) {
+        delete abs;
+    }
 }
 
 bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
@@ -21,7 +28,9 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
     if(currY > minY) {
         if(*currentWidgetId < widgets->count()) {
             SingleWidget *currWidget = widgets->at(*currentWidgetId);
+            int currWx = currWidget->x();
             currWidget->move(currX, currWidget->y());
+            currWidget->setFixedWidth(currWx - currX + currWidget->width());
             currWidget->setTargetAbstraction(this);
             *currentWidgetId = *currentWidgetId + 1;
         }
@@ -58,11 +67,36 @@ int SingleWidgetAbstraction::getHeight() {
 void SingleWidgetAbstraction::addChildAbstraction(
         SingleWidgetAbstraction *abs) {
     mChildren.append(abs);
+
+    if(mContentVisible) {
+        mVisiblePartWidget->updateVisibleWidgetsContent();
+        mVisiblePartWidget->updateParentHeight();
+    }
 }
 
-void SingleWidgetAbstraction::removeChildAbstraction(
-        SingleWidgetAbstraction *abs) {
-    mChildren.removeOne(abs);
+void SingleWidgetAbstraction::removeChildAbstractionForTarget(
+        SingleWidgetTarget *target) {
+    SingleWidgetAbstraction *abstraction;
+    foreach(SingleWidgetAbstraction *abs, mChildren) {
+        if(abs->getTarget() == target) {
+            abstraction = abs;
+        }
+    }
+    mChildren.removeOne(abstraction);
+    delete abstraction;
+
+    if(mContentVisible) {
+        mVisiblePartWidget->updateVisibleWidgetsContent();
+        mVisiblePartWidget->updateParentHeight();
+    }
+}
+
+void SingleWidgetAbstraction::switchContentVisible() {
+    setContentVisible(!mContentVisible);
+}
+
+bool SingleWidgetAbstraction::contentVisible() {
+    return mContentVisible;
 }
 
 void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
@@ -70,4 +104,9 @@ void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
     mContentVisible = bT;
     mVisiblePartWidget->updateVisibleWidgetsContent();
     mVisiblePartWidget->updateParentHeight();
+}
+
+void SingleWidgetAbstraction::addChildAbstractionForTarget(
+        SingleWidgetTarget *target) {
+    addChildAbstraction(target->SWT_createAbstraction(mVisiblePartWidget));
 }

@@ -2,19 +2,15 @@
 #define SINGLEWIDGETABSTRACTION_H
 
 #include <QWidget>
-class ScrollWidgetVisiblePart;
 class SingleWidgetTarget;
 class SingleWidget;
+class ScrollWidgetVisiblePart;
 
 class SingleWidgetAbstraction {
 public:
     SingleWidgetAbstraction(SingleWidgetTarget *target,
-                            ScrollWidgetVisiblePart *visiblePartWidget);
-    ~SingleWidgetAbstraction() {
-        foreach(SingleWidgetAbstraction *abs, mChildren) {
-            delete abs;
-        }
-    }
+                            ScrollWidgetVisiblePart *visiblePart);
+    ~SingleWidgetAbstraction();
 
     bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
                                      int currY, int currX,
@@ -23,17 +19,23 @@ public:
 
     int getHeight();
 
-    void addChildAbstraction(SingleWidgetAbstraction *abs);
-    void removeChildAbstraction(SingleWidgetAbstraction *abs);
-
     void setContentVisible(const bool &bT);
 
     SingleWidgetTarget *getTarget() {
         return mTarget;
     }
+
+    void addChildAbstractionForTarget(SingleWidgetTarget *target);
+    void addChildAbstraction(SingleWidgetAbstraction *abs);
+    void removeChildAbstractionForTarget(SingleWidgetTarget *target);
+
+    void switchContentVisible();
+
+    bool contentVisible();
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
-    bool mContentVisible = true;
+
+    bool mContentVisible = false;
     SingleWidgetTarget *mTarget;
 
     QList<SingleWidgetAbstraction*> mChildren;

@@ -22,6 +22,12 @@ void ScrollWidgetVisiblePart::setVisibleHeight(
     updateVisibleWidgets();
 }
 
+void ScrollWidgetVisiblePart::updateWidgetsWidth() {
+    foreach(SingleWidget *widget, mSingleWidgets) {
+        widget->setFixedWidth(width() - widget->x());
+    }
+}
+
 void ScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
     mVisibleWidgetsContentUpdateScheduled = true;
 }
@@ -52,7 +58,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgets() {
     int yT = 0;
     foreach(SingleWidget *widget, mSingleWidgets) {
         widget->move(widget->x(), yT);
-        widget->setFixedWidth(100);
+        widget->setFixedWidth(width() - widget->x());
         yT += 20;
     }
 
@@ -80,6 +86,8 @@ void ScrollWidgetVisiblePart::setMainAbstraction(
     mMainAbstraction = abs;
     if(abs == NULL) return;
     abs->setContentVisible(true);
+//    updateVisibleWidgetsContent();
+//    updateParentHeight();
 }
 
 void ScrollWidgetVisiblePart::updateParentHeight() {

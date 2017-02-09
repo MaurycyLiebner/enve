@@ -281,6 +281,11 @@ void QrealAnimator::freezeMinMaxValues()
     mMinMaxValuesFrozen = true;
 }
 
+qreal QrealAnimator::getCurrentValueAtFrame(const int &frame) const {
+    if(frame == mCurrentFrame) return mCurrentValue;
+    return getValueAtFrame(frame);
+}
+
 qreal QrealAnimator::getValueAtFrame(int frame) const
 {
     int prevId;

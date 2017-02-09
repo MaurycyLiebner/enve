@@ -354,37 +354,37 @@ void ParticleEmitter::generateParticles() {
     int totalNeededParticles = 0;
     for(int i = mMinFrame; i < mMaxFrame; i++) {
         qreal iniVelocity =
-                mIniVelocity.getValueAtFrame(i);
+                mIniVelocity.getCurrentValueAtFrame(i);
         qreal iniVelocityVar =
-                mIniVelocityVar.getValueAtFrame(i);
+                mIniVelocityVar.getCurrentValueAtFrame(i);
         qreal iniVelocityAngle =
-                mIniVelocityAngle.getValueAtFrame(i);
+                mIniVelocityAngle.getCurrentValueAtFrame(i);
         qreal iniVelocityAngleVar =
-                mIniVelocityAngleVar.getValueAtFrame(i);
+                mIniVelocityAngleVar.getCurrentValueAtFrame(i);
         qreal particlesPerFrame =
-                mParticlesPerSecond.getValueAtFrame(i)/24.;
+                mParticlesPerSecond.getCurrentValueAtFrame(i)/24.;
         qreal particlesFrameLifetime =
-                mParticlesFrameLifetime.getValueAtFrame(i);
+                mParticlesFrameLifetime.getCurrentValueAtFrame(i);
         QPointF pos =
-                mPos.getPointValueAtFrame(i);
+                mPos.getCurrentPointValueAtFrame(i);
         qreal width =
-                mWidth.getValueAtFrame(i);
+                mWidth.getCurrentValueAtFrame(i);
         qreal velocityVar =
-                mVelocityRandomVar.getValueAtFrame(i);
+                mVelocityRandomVar.getCurrentValueAtFrame(i);
         qreal velocityVarPeriod =
-                mVelocityRandomVarPeriod.getValueAtFrame(i);
-        QPointF acceleration = mAcceleration.getPointValueAtFrame(i)/24.;
+                mVelocityRandomVarPeriod.getCurrentValueAtFrame(i);
+        QPointF acceleration = mAcceleration.getCurrentPointValueAtFrame(i)/24.;
         qreal finalScale =
-                mParticlesSizeDecay.getValueAtFrame(i);
+                mParticlesSizeDecay.getCurrentValueAtFrame(i);
         qreal finalOpacity =
-                mParticlesOpacityDecay.getValueAtFrame(i);
+                mParticlesOpacityDecay.getCurrentValueAtFrame(i);
         qreal decayFrames =
-                mParticlesDecayFrames.getValueAtFrame(i);
+                mParticlesDecayFrames.getCurrentValueAtFrame(i);
         qreal particleSize =
-                mParticleSize.getValueAtFrame(i);
+                mParticleSize.getCurrentValueAtFrame(i);
         qreal particleSizeVar =
-                mParticleSizeVar.getValueAtFrame(i);
-        qreal length = mParticleLength.getValueAtFrame(i);
+                mParticleSizeVar.getCurrentValueAtFrame(i);
+        qreal length = mParticleLength.getCurrentValueAtFrame(i);
 
         int particlesToCreate = remainingPartFromFrame + particlesPerFrame;
         remainingPartFromFrame += particlesPerFrame - particlesToCreate;

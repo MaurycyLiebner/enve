@@ -22,9 +22,15 @@ ScrollArea::ScrollArea(QWidget *parent) : QScrollArea(parent)
 
 void ScrollArea::resizeEvent(QResizeEvent *e) {
     int newHeight = e->size().height();
-    if(newHeight == mLastHeight) return;
-    mLastHeight = newHeight;
-    emit heightChanged(newHeight);
+    if(newHeight != mLastHeight) {
+        mLastHeight = newHeight;
+        emit heightChanged(newHeight);
+    }
+    int newWidth = e->size().width();
+    if(newWidth != mLastWidth) {
+        mLastWidth = newWidth;
+        emit widthChanged(newWidth);
+    }
     QScrollArea::resizeEvent(e);
 }
 

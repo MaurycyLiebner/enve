@@ -24,7 +24,7 @@ int ComplexAnimator::getNumberOfChildren() {
 QrealAnimator *ComplexAnimator::getChildAt(const int &i) {
     return mChildAnimators.at(i);
 }
-
+#include <QDebug>
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
@@ -33,6 +33,7 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
         abstraction->addChildAbstraction(
                     animator->SWT_createAbstraction(visiblePartWidget));
     }
+
 }
 
 qreal ComplexAnimator::clampValue(qreal value)
@@ -55,6 +56,8 @@ void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
     updateKeysPath();
 
     emit childAnimatorAdded(childAnimator);
+
+    SWT_addChildAbstractionForTargetToAll(childAnimator);
 }
 
 void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
@@ -67,6 +70,8 @@ void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
     updateKeysPath();
 
     emit childAnimatorRemoved(removeAnimator);
+
+    SWT_removeChildAbstractionForTargetFromAll(removeAnimator);
 }
 
 void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,

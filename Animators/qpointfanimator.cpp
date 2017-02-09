@@ -50,6 +50,11 @@ QPointF QPointFAnimator::getCurrentValue() const {
     return QPointF(mXAnimator.getCurrentValue(), mYAnimator.getCurrentValue());
 }
 
+QPointF QPointFAnimator::getCurrentPointValueAtFrame(const int &frame) {
+    return QPointF(mXAnimator.getCurrentValueAtFrame(frame),
+                   mYAnimator.getCurrentValueAtFrame(frame));
+}
+
 QPointF QPointFAnimator::getPointValueAtFrame(const int &frame) {
     return QPointF(mXAnimator.getValueAtFrame(frame),
                    mYAnimator.getValueAtFrame(frame));

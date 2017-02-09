@@ -108,6 +108,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
             mBoxesListWidget, SLOT(changeVisibleTop(int)));
     connect(mBoxesListScrollArea, SIGNAL(heightChanged(int)),
             mBoxesListWidget, SLOT(changeVisibleHeight(int)));
+    connect(mBoxesListScrollArea, SIGNAL(widthChanged(int)),
+            mBoxesListWidget, SLOT(setWidth(int)));
 
     mBoxesListScrollArea->verticalScrollBar()->setSingleStep(
                 BoxesListWidget::getListItemHeight());

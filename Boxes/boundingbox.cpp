@@ -907,12 +907,14 @@ void BoundingBox::addActiveAnimator(QrealAnimator *animator)
 {
     mActiveAnimators << animator;
     emit addActiveAnimatorSignal(animator);
+    SWT_addChildAbstractionForTargetToAll(animator);
 }
 
 void BoundingBox::removeActiveAnimator(QrealAnimator *animator)
 {
     mActiveAnimators.removeOne(animator);
     emit removeActiveAnimatorSignal(animator);
+    SWT_removeChildAbstractionForTargetFromAll(animator);
 }
 
 void BoundingBox::drawKeys(QPainter *p,

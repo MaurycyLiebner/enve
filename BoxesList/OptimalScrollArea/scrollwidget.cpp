@@ -23,6 +23,12 @@ void ScrollWidget::updateAbstraction() {
     updateHeight();
 }
 
+void ScrollWidget::setWidth(const int &width) {
+    setFixedWidth(width);
+    mVisiblePartWidget->setFixedWidth(width);
+    mVisiblePartWidget->updateWidgetsWidth();
+}
+
 void ScrollWidget::changeVisibleTop(const int &top) {
     mVisiblePartWidget->move(0, top);
     mVisiblePartWidget->setVisibleTop(top);

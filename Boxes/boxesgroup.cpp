@@ -1376,6 +1376,8 @@ void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRe
     scheduleEffectsMarginUpdate();
     scheduleAwaitUpdate();
     if(!mPivotChanged) scheduleCenterPivot();
+
+    SWT_addChildAbstractionForTargetToAll(child);
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -1415,6 +1417,8 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
     }
 
     scheduleEffectsMarginUpdate();
+
+    SWT_removeChildAbstractionForTargetFromAll(box);
 }
 
 void BoxesGroup::removeChild(BoundingBox *child)

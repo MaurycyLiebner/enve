@@ -25,6 +25,7 @@ signals:
 public slots:
     void changeVisibleTop(const int &top);
     void changeVisibleHeight(const int &height);
+    void setWidth(const int &width);
 protected:
     virtual void createVisiblePartWidget();
     SingleWidgetTarget *mMainTarget = NULL;

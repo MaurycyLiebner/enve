@@ -27,6 +27,7 @@ public:
     void updateParentHeight();
 
     virtual SingleWidget *createNewSingleWidget();
+    void updateWidgetsWidth();
 private:
     bool mVisibleWidgetsContentUpdateScheduled = false;
     ScrollWidget *mParentWidget;

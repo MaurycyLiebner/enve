@@ -21,12 +21,25 @@ SingleWidgetAbstraction *SingleWidgetTarget::SWT_createAbstraction(
                                         visiblePartWidget);
     SWT_addChildrenAbstractions(SWT_Abstraction,
                                 visiblePartWidget);
+    mSWT_allAbstractions << SWT_Abstraction;
     return SWT_Abstraction;
 }
 
-void SingleWidgetTarget::SWT_addChildrenAbstractions(
-        SingleWidgetAbstraction *abstraction,
-        ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_UNUSED(abstraction);
-    Q_UNUSED(visiblePartWidget);
+void SingleWidgetTarget::SWT_removeAbstractionFromList(
+        SingleWidgetAbstraction *abs) {
+    mSWT_allAbstractions.removeOne(abs);
+}
+
+void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
+        SingleWidgetTarget *target) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        abs->addChildAbstractionForTarget(target);
+    }
+}
+
+void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
+        SingleWidgetTarget *target) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        abs->removeChildAbstractionForTarget(target);
+    }
 }

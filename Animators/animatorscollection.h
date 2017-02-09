@@ -11,7 +11,7 @@ public:
     void updateKeysPath();
     void sortKeys();
 private:
-    QList<QrealAnimator*> mChildAnimators;
+    //QList<QrealAnimator*> mChildAnimators;
 };
 
 #endif // ANIMATORSCOLLECTION_H
