@@ -23,6 +23,7 @@
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
 #include "Sound/singlesound.h"
+#include "BoxesList/boxsinglewidget.h"
 
 MainWindow *MainWindow::mMainWindowInstance;
 
@@ -37,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     //mSoundComposition = new SoundComposition();
 //    mSoundComposition->addSound(
 //                new SingleSound("/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/lektor.wav"));
-
+    BoxSingleWidget::loadStaticPixmaps();
     setupToolBar();
 
     mCurrentUndoRedoStack = &mUndoRedoStack;

@@ -36,8 +36,13 @@ void ScrollWidgetVisiblePart::updateWidgetsWidth() {
 }
 
 void ScrollWidgetVisiblePart::callUpdaters() {
-    updateParentHeightIfNeeded();
-    updateVisibleWidgetsContentIfNeeded();
+    if(mVisibleWidgetsContentUpdateScheduled ||
+       mParentHeightUpdateScheduled) {
+        updateParentHeightIfNeeded();
+        updateVisibleWidgetsContentIfNeeded();
+    } else {
+        update();
+    }
 }
 
 void ScrollWidgetVisiblePart::callAllInstanceUpdaters() {
@@ -112,9 +117,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
                                                   -10, -20,
                                                   &mSingleWidgets,
                                                   &idP);
-    if(mSingleWidgets.count() > 0) {
-        mSingleWidgets.at(0)->setStyleSheet("background-color: green;");
-    }
+
     for(int i = idP; i < mSingleWidgets.count(); i++) {
         mSingleWidgets.at(i)->hide();
     }

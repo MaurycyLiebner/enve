@@ -889,26 +889,33 @@ void QrealAnimator::callSoftUpdater() {
     }
 }
 
+void QrealAnimator::drawKey(QPainter *p,
+                            QrealKey *key,
+                            const qreal &pixelsPerFrame,
+                            const qreal &drawY,
+                            const int &startFrame) {
+    if(key->isSelected() ) {
+        p->setBrush(Qt::yellow);
+    } else {
+        p->setBrush(Qt::red);
+    }
+    p->drawEllipse(
+        QRectF(
+            QPointF((key->getFrame() - startFrame + 0.5)*
+                    pixelsPerFrame - KEY_RECT_SIZE*0.5,
+                    drawY + (BoxesListWidget::getListItemHeight() -
+                              KEY_RECT_SIZE)*0.5 ),
+            QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
+}
+
 void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
-                             qreal startY,
+                             qreal drawY,
                              int startFrame, int endFrame)
 {
-    p->setPen(QPen(Qt::black, 1.));
     foreach(QrealKey *key, mKeys) {
         if(key->getFrame() >= startFrame &&
            key->getFrame() <= endFrame) {
-            if(key->isSelected() ) {
-                p->setBrush(Qt::yellow);
-            } else {
-                p->setBrush(Qt::red);
-            }
-            p->drawRect(
-                QRectF(
-                    QPointF((key->getFrame() - startFrame + 0.5)*
-                            pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                            startY + (BoxesListWidget::getListItemHeight() -
-                                      KEY_RECT_SIZE)*0.5 ),
-                    QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
+            drawKey(p, key, pixelsPerFrame, drawY, startFrame);
         }
     }
 }

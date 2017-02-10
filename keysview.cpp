@@ -2,13 +2,14 @@
 #include "qrealkey.h"
 #include <QPainter>
 #include "mainwindow.h"
+#include "BoxesList/boxscrollwidgetvisiblepart.h"
 
-KeysView::KeysView(ScrollWidget *boxesList,
+KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
     QWidget(parent)
 {
     mMainWindow = MainWindow::getInstance();
-    mBoxesList = boxesList;
+    mBoxesListVisible = boxesListVisible;
 
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -57,9 +58,9 @@ void KeysView::deleteSelectedKeys()
 
 void KeysView::selectKeysInSelectionRect() {
     QList<QrealKey*> listKeys;
-//    mBoxesList->getKeysInRect(mSelectionRect, mViewedTop,
-//                              mPixelsPerFrame, mMinViewedFrame,
-//                              &listKeys);
+    mBoxesListVisible->getKeysInRect(mSelectionRect,
+                                     mPixelsPerFrame, mMinViewedFrame,
+                                     &listKeys);
     foreach(QrealKey *key, listKeys) {
         addKeyToSelection(key);
     }
@@ -93,9 +94,10 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
             mFirstMove = true;
             mLastPressPos = e->pos();
 
-//            mLastPressedKey = mBoxesList->getKeyAtPos(e->x(), e->y(),
-//                                                      mPixelsPerFrame,
-//                                                      mViewedTop, mMinViewedFrame);
+            mLastPressedKey = mBoxesListVisible->getKeyAtPos(
+                                                      e->x(), e->y(),
+                                                      mPixelsPerFrame,
+                                                      mMinViewedFrame);
             if(mLastPressedKey == NULL) {
                 mSelecting = true;
                 mSelectionRect.setTopLeft(e->pos() );
@@ -144,16 +146,18 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
     }
 }
 
+#include "BoxesList/boxsinglewidget.h"
+
 void KeysView::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
-    p.fillRect(rect(), QColor(200, 155, 155));
+    if(!mGraphViewed) {    
+        int currY = BOX_HEIGHT;
+        p.setPen(QPen(QColor(40, 40, 40), 1.));
+        while(currY < height()) {
+            p.drawLine(0, currY, width(), currY);
 
-    if(!mGraphViewed) {
-        p.setPen(Qt::NoPen);
-        p.setBrush(QColor(165, 125, 125));
-        for(int i = BoxesListWidget::getListItemHeight(); i < height(); i += 2*BoxesListWidget::getListItemHeight()) {
-            p.drawRect(0, i, width(), BoxesListWidget::getListItemHeight() );
+            currY += BOX_HEIGHT;
         }
     }
 
@@ -185,7 +189,7 @@ void KeysView::paintEvent(QPaintEvent *) {
             mMainWindow->getCurrentFrame() >= mMinViewedFrame) {
         xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
                 mPixelsPerFrame*0.5;
-        p.setPen(QPen(Qt::green, 2.));
+        p.setPen(QPen(Qt::darkGray, 2.));
         p.drawLine(QPointF(xT, 0.), QPointF(xT, height()) );
     }
 
@@ -194,8 +198,13 @@ void KeysView::paintEvent(QPaintEvent *) {
     if(mGraphViewed) {
         graphPaint(&p);
     } else {
-//        mBoxesList->drawKeys(&p, mPixelsPerFrame, mViewedTop,
-//                             mMinViewedFrame, mMaxViewedFrame);
+        p.save();
+        p.setRenderHint(QPainter::Antialiasing);
+        mBoxesListVisible->drawKeys(&p,
+                                    mPixelsPerFrame,
+                                    mMinViewedFrame,
+                                    mMaxViewedFrame);
+        p.restore();
     }
 
     if(mSelecting) {
@@ -226,7 +235,9 @@ void KeysView::mouseMoveEvent(QMouseEvent *event)
                                      mMaxViewedFrame);
         } else {
             if(mMovingKeys) {
-                int dFrame = qRound( (event->x() - mLastPressPos.x())/mPixelsPerFrame );
+                int dFrame = qRound(
+                            (event->x() - mLastPressPos.x())/
+                            mPixelsPerFrame );
                 int dDFrame = dFrame - mMoveDFrame;
                 if(mFirstMove) {
                     foreach(QrealKey *key, mSelectedKeys) {
@@ -295,7 +306,8 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e)
             QList<QrealAnimator*> parentAnimators;
             foreach(QrealKey *key, mSelectedKeys) {
                 key->finishFrameTransform();
-                if(parentAnimators.contains(key->getParentAnimator()) ) continue;
+                if(parentAnimators.contains(
+                            key->getParentAnimator()) ) continue;
                 parentAnimators << key->getParentAnimator();
             }
             foreach(QrealAnimator *animator, parentAnimators) {

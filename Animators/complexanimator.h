@@ -16,7 +16,8 @@ public:
     void addChildQrealKey(QrealKey *key);
     ComplexKey *getKeyCollectionAtFrame(int frame);
     void removeChildQrealKey(QrealKey *key);
-    void drawChildAnimatorKeys(QPainter *p, qreal pixelsPerFrame, qreal startY,
+    void drawChildAnimatorKeys(QPainter *p,
+                               qreal pixelsPerFrame, qreal startY,
                                int startFrame, int endFrame);
     qreal clampValue(qreal value);
     void addChildAnimator(QrealAnimator *childAnimator);
@@ -54,6 +55,9 @@ public:
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
     SingleWidgetTargetType SWT_getType() { return SWT_ComplexAnimator; }
+    void drawKey(QPainter *p, QrealKey *key,
+                 const qreal &pixelsPerFrame,
+                 const qreal &drawY, const int &startFrame);
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

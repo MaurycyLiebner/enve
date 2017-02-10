@@ -1,5 +1,6 @@
 QWidget {
-    background: rgb(144, 144, 144);
+    background: rgb(60, 60, 60);
+    color: white;
     outline: 0;
 }
 
@@ -15,6 +16,7 @@ QComboBox {
 /*  border-top-right-radius: 8px */
 /*  border-bottom-right-radius: 8px */
     /*min-width: 6em;*/
+    color: black;
     padding: 0px 5px 0px 5px;
 }
 QComboBox:on { /* shift the text when the popup opens */
@@ -45,8 +47,10 @@ QComboBox::drop-down:pressed {
 QComboBox::drop-down:on {
     border-bottom-right-radius: 0px;
 }
+
 QAbstractItemView {
     background-color: rgb(200, 200, 200);
+    color: black;
     border: 1px solid black;
     selection-background-color: rgb(255, 255, 255);
     selection-color: black;
@@ -70,6 +74,7 @@ QMenu::item:selected { /* when user selects item using mouse or keyboard */
 }
 
 QMenuBar {
+    color: black;
     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                       stop:0 lightgray, stop:1 darkgray);
 }
@@ -211,8 +216,9 @@ QToolBar {
     spacing: 4;
     background: qlineargradient(x1:0, y1:0,
                                 x2:0, y2:1,
-        stop:0.5 rgb(124, 124, 124),
-        stop:1 rgb(70, 70, 70));
+        stop:0.5 rgb(110, 110, 110),
+        stop:1 rgb(90, 90, 90));
+    border-bottom: 1px solid black;
 }
 
 QToolBar::separator {
@@ -226,14 +232,20 @@ QToolBar::separator {
     margin: 4px 4px 4px 4px
 }
 
-QComboBox QScrollBar {
-    border-right: 0px solid black;
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
 }
 
 QScrollBar {
     border: 1px solid black;
-    background: rgb(170, 170, 170);
+    background-color: rgb(50, 50, 50);
 }
+
+QComboBox QScrollBar {
+    background-color: rgb(50, 50, 50);
+    border-right: 0px solid black;
+}
+
 QScrollBar::add-line, QScrollBar::sub-line {
     border: 1px solid black;
     background-color: rgb(50, 50, 50);
@@ -249,15 +261,15 @@ QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
 }
 
 QScrollBar::handle {
-    background: rgb(50, 50, 50);
+    background: rgb(100, 100, 100);
 }
 
 QScrollBar::handle:hover {
-    background: rgb(70, 70, 70);
+    background: rgb(120, 120, 120);
 }
 
 QScrollBar::handle:pressed {
-    background: rgb(31, 31, 31);
+    background: rgb(140, 140, 140);
 }
 
 QScrollBar:vertical {

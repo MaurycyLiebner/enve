@@ -9,7 +9,7 @@ class BoxScrollWidget : public ScrollWidget
     Q_OBJECT
 public:
     explicit BoxScrollWidget(QWidget *parent = 0);
-
+    BoxScrollWidgetVisiblePart *getVisiblePartWidget();
 protected:
     void createVisiblePartWidget();
 };

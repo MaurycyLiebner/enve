@@ -29,7 +29,7 @@ class CanvasWidget;
 
 class ObjectSettingsWidget;
 class BoxScrollWidget;
-
+class ScrollWidget;
 //class SoundComposition;
 
 class MainWindow : public QMainWindow

@@ -5,7 +5,11 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include "boxeslistactionbutton.h"
 class QrealAnimatorValueSlider;
+class QrealKey;
+
+const int BOX_HEIGHT = 20;
 
 class BoxSingleWidget : public SingleWidget
 {
@@ -17,13 +21,48 @@ public:
 
     void setName(const QString &name);
 
+    static QPixmap *VISIBLE_PIXMAP;
+    static QPixmap *INVISIBLE_PIXMAP;
+    static QPixmap *HIDE_CHILDREN;
+    static QPixmap *SHOW_CHILDREN;
+    static QPixmap *LOCKED_PIXMAP;
+    static QPixmap *UNLOCKED_PIXMAP;
+    static QPixmap *ANIMATOR_CHILDREN_VISIBLE;
+    static QPixmap *ANIMATOR_CHILDREN_HIDDEN;
+    static QPixmap *ANIMATOR_RECORDING;
+    static QPixmap *ANIMATOR_NOT_RECORDING;
+    static bool mStaticPixmapsLoaded;
+    static void loadStaticPixmaps();
+
+    void rename();
+    void drawKeys(QPainter *p, qreal pixelsPerFrame,
+                  int containerTop,
+                  int minViewedFrame, int maxViewedFrame);
+    QrealKey *getKeyAtPos(const int &pressX,
+                          const qreal &pixelsPerFrame,
+                          const int &minViewedFrame);
+    void getKeysInRect(QRectF selectionRect,
+                       qreal pixelsPerFrame,
+                       const int &minViewedFrame,
+                       QList<QrealKey *> *listKeys);
+protected:
+    void mousePressEvent(QMouseEvent *e);
+    void paintEvent(QPaintEvent *);
+    void mouseDoubleClickEvent(QMouseEvent *e);
 signals:
 
 public slots:
     void switchContentVisibleAction();
+    void switchRecordingAction();
+    void switchBoxVisibleAction();
 private:
-    QPushButton *mContentButton;
-    QLabel *mNameLabel;
+    BoxesListActionButton *mRecordButton;
+    BoxesListActionButton *mContentButton;
+    BoxesListActionButton *mVisibleButton;
+    BoxesListActionButton *mLockedButton;
+
+    QWidget *mFillWidget;
+    QString mName;
     QHBoxLayout *mMainLayout;
     QrealAnimatorValueSlider *mValueSlider;
 };

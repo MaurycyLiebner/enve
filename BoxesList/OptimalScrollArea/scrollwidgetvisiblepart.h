@@ -38,7 +38,7 @@ public:
 
     static void addInstance(ScrollWidgetVisiblePart *instance);
     static void removeInstance(ScrollWidgetVisiblePart *instance);
-private:
+protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 
     bool mVisibleWidgetsContentUpdateScheduled = false;

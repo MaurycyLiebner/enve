@@ -160,6 +160,7 @@ public:
     void show();
     bool isVisible();
     void setVisibile(bool visible, bool saveUndoRedo = true);
+    void switchVisible();
 
     void setChildrenListItemsVisible(bool bt);
     void lock();

@@ -125,7 +125,7 @@ void QDoubleSlider::paint(QPainter *p,
         if(mShowValueSlider) {
             p->setPen(Qt::NoPen);
             qreal valWidth = qclamp(mValue*width()/(mMaxValue - mMinValue),
-                                    0., width() - 1.);
+                                    0., width() - 3.);
             p->setBrush(sliderFill);
             qreal heightRemoval = qMax(0., 10. - valWidth)*0.5;
             p->drawRoundedRect(QRectF(1., 1.,
@@ -136,7 +136,8 @@ void QDoubleSlider::paint(QPainter *p,
         }
         p->setPen(Qt::black);
         if(mShowName) {
-            p->drawText(rect(), Qt::AlignCenter, mName + ": " + getValueString());
+            p->drawText(rect(), Qt::AlignCenter,
+                        mName + ": " + getValueString());
         } else {
             p->drawText(rect(), Qt::AlignCenter, getValueString());
         }

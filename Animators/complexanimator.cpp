@@ -108,6 +108,26 @@ void ComplexAnimator::setTransformed(bool bT) {
     }
 }
 
+void ComplexAnimator::drawKey(
+                            QPainter *p,
+                            QrealKey *key,
+                            const qreal &pixelsPerFrame,
+                            const qreal &drawY,
+                            const int &startFrame) {
+    if(key->isSelected() ) {
+        p->setBrush(Qt::yellow);
+    } else {
+        p->setBrush(Qt::red);
+    }
+    p->drawEllipse(
+        QRectF(
+            QPointF((key->getFrame() - startFrame + 0.5)*
+                    pixelsPerFrame - KEY_RECT_SIZE*0.35,
+                    drawY + (BoxesListWidget::getListItemHeight() -
+                              KEY_RECT_SIZE*0.7)*0.5 ),
+            QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
+}
+
 void ComplexAnimator::changeChildAnimatorZ(const int &oldIndex,
                                            const int &newIndex) {
     mChildAnimators.move(oldIndex, newIndex);

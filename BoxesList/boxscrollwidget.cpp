@@ -5,6 +5,10 @@ BoxScrollWidget::BoxScrollWidget(QWidget *parent) :
     createVisiblePartWidget();
 }
 
+BoxScrollWidgetVisiblePart *BoxScrollWidget::getVisiblePartWidget() {
+    return (BoxScrollWidgetVisiblePart*)mVisiblePartWidget;
+}
+
 void BoxScrollWidget::createVisiblePartWidget() {
     mVisiblePartWidget = new BoxScrollWidgetVisiblePart(this);
 }

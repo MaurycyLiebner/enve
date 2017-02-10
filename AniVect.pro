@@ -111,7 +111,8 @@ SOURCES += main.cpp\
     BoxesList/OptimalScrollArea/singlewidget.cpp \
     BoxesList/boxsinglewidget.cpp \
     BoxesList/boxscrollwidgetvisiblepart.cpp \
-    BoxesList/boxscrollwidget.cpp
+    BoxesList/boxscrollwidget.cpp \
+    BoxesList/boxeslistactionbutton.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -210,7 +211,8 @@ HEADERS  += mainwindow.h \
     BoxesList/OptimalScrollArea/singlewidget.h \
     BoxesList/boxsinglewidget.h \
     BoxesList/boxscrollwidgetvisiblepart.h \
-    BoxesList/boxscrollwidget.h
+    BoxesList/boxscrollwidget.h \
+    BoxesList/boxeslistactionbutton.h
 
 RESOURCES += \
     resources.qrc

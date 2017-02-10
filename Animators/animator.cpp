@@ -8,6 +8,10 @@ Animator::Animator() :
 
 }
 
+void Animator::switchRecording() {
+    setRecording(!mIsRecording);
+}
+
 void Animator::setParentAnimator(ComplexAnimator *parentAnimator) {
     mParentAnimator = parentAnimator;
     if(parentAnimator == NULL) {

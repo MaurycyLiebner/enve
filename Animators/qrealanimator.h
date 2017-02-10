@@ -120,7 +120,7 @@ public:
     virtual void callUpdater();
     virtual void callSoftUpdater();
 
-    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal startY,
+    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY,
                           int startFrame, int endFrame);
     virtual void getKeysInRect(QRectF selectionRect,
                                int minViewedFrame,
@@ -220,6 +220,11 @@ protected:
     QColor mAnimatorColor;
 
     int mDecimals = 3;
+    virtual void drawKey(QPainter *p,
+                         QrealKey *key,
+                         const qreal &pixelsPerFrame,
+                         const qreal &drawY,
+                         const int &startFrame);
 signals:
     void valueChangedSignal(qreal);
 };

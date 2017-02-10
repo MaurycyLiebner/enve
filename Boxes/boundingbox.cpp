@@ -949,6 +949,10 @@ void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
     scheduleAwaitUpdate();
 }
 
+void BoundingBox::switchVisible() {
+    setVisibile(!mVisible);
+}
+
 void BoundingBox::hide()
 {
     setVisibile(false);

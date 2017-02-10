@@ -27,7 +27,7 @@ public:
 
     virtual void callUpdater() = 0;
 
-    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal startY,
+    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY,
                           int startFrame, int endFrame) = 0;
     virtual void getKeysInRect(QRectF selectionRect,
                                int minViewedFrame,
@@ -50,6 +50,8 @@ public:
     virtual void setFrame(int frame) = 0;
 
     virtual void setRecording(bool rec) = 0;
+
+    virtual void switchRecording();
 
     virtual void updateKeyOnCurrrentFrame() = 0;
 

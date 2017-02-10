@@ -129,7 +129,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mBoxesListLayout->setSpacing(0);
     mBoxesListLayout->setMargin(0);
 
-    mKeysView = new KeysView(mBoxesListWidget, this);
+    mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(), this);
     connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
             mFrameRangeScrollbar, SLOT(setViewedFramesRange(int, int)) );
     connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
@@ -249,6 +249,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     keysViewScrollbarLayout->setAlignment(Qt::AlignRight);
     keysViewScrollbarLayout->addWidget(
                 mBoxesListScrollArea->verticalScrollBar());
+    mBoxesListScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     keysViewScrollbarLayout->setContentsMargins(0, 0, 0, 0);
 
     mKeysViewLayout->addWidget(mAnimationWidgetScrollbar);
@@ -265,6 +266,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesListScrollArea,
                                                     this);
+    mBoxesListScrollArea->setFixedWidth(400);
     chww->updatePos();
 
     mFrameRangeScrollbar->raise();

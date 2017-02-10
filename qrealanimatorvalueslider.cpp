@@ -57,12 +57,12 @@ void QrealAnimatorValueSlider::paint(QPainter *p)
     } else {
         QDoubleSlider::paint(p,
                        (mAnimator->isRecording() ? QColor(255, 200, 200) :
-                                                   QColor(200, 200, 255)),
+                                                   QColor(255, 255, 255)),
                        (mAnimator->isRecording() ? QColor(255, 160, 160) :
-                                                   QColor(160, 160, 255)),
+                                                   QColor(220, 220, 220)),
                        ((mAnimator->isRecording() &&
                         mAnimator->isKeyOnCurrentFrame()) ? Qt::red :
-                                                            Qt::blue) );
+                                                            Qt::black));
     }
 }
 
