@@ -1,11 +1,12 @@
 #include "boxsinglewidget.h"
 #include "OptimalScrollArea/singlewidgetabstraction.h"
 #include "OptimalScrollArea/singlewidgettarget.h"
+#include "OptimalScrollArea/scrollwidgetvisiblepart.h"
 
 #include "Boxes/boxesgroup.h"
 #include "qrealanimatorvalueslider.h"
 
-BoxSingleWidget::BoxSingleWidget(QWidget *parent) :
+BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     SingleWidget(parent) {
     mMainLayout = new QHBoxLayout(this);
     setLayout(mMainLayout);
@@ -17,7 +18,7 @@ BoxSingleWidget::BoxSingleWidget(QWidget *parent) :
     mContentButton = new QPushButton(this);
     mMainLayout->addWidget(mContentButton);
     connect(mContentButton, SIGNAL(pressed()),
-            this, SLOT(switchContentVisible()));
+            this, SLOT(switchContentVisibleAction()));
     mContentButton->setFixedWidth(20);
 
     mNameLabel = new QLabel(this);
@@ -77,6 +78,7 @@ void BoxSingleWidget::setName(const QString &name) {
     mNameLabel->setText(name);
 }
 
-void BoxSingleWidget::switchContentVisible() {
+void BoxSingleWidget::switchContentVisibleAction() {
     mTarget->switchContentVisible();
+    mParent->callUpdaters();
 }

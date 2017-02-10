@@ -1,8 +1,10 @@
 #include "singlewidget.h"
 #include "singlewidgetabstraction.h"
+#include "scrollwidgetvisiblepart.h"
 
-SingleWidget::SingleWidget(QWidget *parent) :
+SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
     QWidget(parent) {
+    mParent = parent;
     setFixedHeight(20);
 }
 

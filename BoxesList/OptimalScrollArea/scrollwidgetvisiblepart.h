@@ -12,12 +12,16 @@ class ScrollWidgetVisiblePart :
     Q_OBJECT
 public:
     ScrollWidgetVisiblePart(ScrollWidget *parent = 0);
+    ~ScrollWidgetVisiblePart();
 
     void setVisibleTop(const int &top);
     void setVisibleHeight(const int &height);
 
     void scheduledUpdateVisibleWidgetsContent();
     void updateVisibleWidgetsContentIfNeeded();
+
+    void scheduleUpdateParentHeight();
+    void updateParentHeightIfNeeded();
 
     void updateVisibleWidgets();
     void updateVisibleWidgetsContent();
@@ -28,8 +32,18 @@ public:
 
     virtual SingleWidget *createNewSingleWidget();
     void updateWidgetsWidth();
+
+    void callUpdaters();
+    static void callAllInstanceUpdaters();
+
+    static void addInstance(ScrollWidgetVisiblePart *instance);
+    static void removeInstance(ScrollWidgetVisiblePart *instance);
 private:
+    static QList<ScrollWidgetVisiblePart*> mAllInstances;
+
     bool mVisibleWidgetsContentUpdateScheduled = false;
+    bool mParentHeightUpdateScheduled = false;
+
     ScrollWidget *mParentWidget;
 
     SingleWidgetAbstraction *mMainAbstraction = NULL;

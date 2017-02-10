@@ -4,10 +4,17 @@
 #include "singlewidget.h"
 #include "scrollwidget.h"
 
+QList<ScrollWidgetVisiblePart*> ScrollWidgetVisiblePart::mAllInstances;
+
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(
         ScrollWidget *parent) :
     QWidget(parent) {
     mParentWidget = parent;
+    addInstance(this);
+}
+
+ScrollWidgetVisiblePart::~ScrollWidgetVisiblePart() {
+    removeInstance(this);
 }
 
 void ScrollWidgetVisiblePart::setVisibleTop(
@@ -28,6 +35,27 @@ void ScrollWidgetVisiblePart::updateWidgetsWidth() {
     }
 }
 
+void ScrollWidgetVisiblePart::callUpdaters() {
+    updateParentHeightIfNeeded();
+    updateVisibleWidgetsContentIfNeeded();
+}
+
+void ScrollWidgetVisiblePart::callAllInstanceUpdaters() {
+    foreach(ScrollWidgetVisiblePart *instance, mAllInstances) {
+        instance->callUpdaters();
+    }
+}
+
+void ScrollWidgetVisiblePart::addInstance(
+        ScrollWidgetVisiblePart *instance) {
+    mAllInstances.append(instance);
+}
+
+void ScrollWidgetVisiblePart::removeInstance(
+        ScrollWidgetVisiblePart *instance) {
+    mAllInstances.removeOne(instance);
+}
+
 void ScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
     mVisibleWidgetsContentUpdateScheduled = true;
 }
@@ -36,6 +64,17 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContentIfNeeded() {
     if(mVisibleWidgetsContentUpdateScheduled) {
         mVisibleWidgetsContentUpdateScheduled = false;
         updateVisibleWidgetsContent();
+    }
+}
+
+void ScrollWidgetVisiblePart::scheduleUpdateParentHeight() {
+    mParentHeightUpdateScheduled = true;
+}
+
+void ScrollWidgetVisiblePart::updateParentHeightIfNeeded() {
+    if(mParentHeightUpdateScheduled) {
+        mParentHeightUpdateScheduled = false;
+        updateParentHeight();
     }
 }
 

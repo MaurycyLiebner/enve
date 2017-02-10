@@ -653,7 +653,7 @@ void MainWindow::callUpdateSchedulers()
     mUpdateSchedulers.clear();
     mCanvasWidget->updatePivotIfNeeded();
     mCanvasWidget->repaint();
-    mBoxListWidget->repaint();
+    ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mObjectSettingsWidget->repaint();
     mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();

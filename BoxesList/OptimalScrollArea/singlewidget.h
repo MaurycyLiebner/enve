@@ -3,15 +3,17 @@
 
 #include <QWidget>
 class SingleWidgetAbstraction;
+class ScrollWidgetVisiblePart;
 
 class SingleWidget : public QWidget
 {
     Q_OBJECT
 public:
-    SingleWidget(QWidget *parent = 0);
+    SingleWidget(ScrollWidgetVisiblePart *parent = 0);
     virtual void setTargetAbstraction(SingleWidgetAbstraction *abs);
 protected:
     SingleWidgetAbstraction *mTarget;
+    ScrollWidgetVisiblePart *mParent;
 };
 
 #endif // SINGLEWIDGET_H

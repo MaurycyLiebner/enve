@@ -11,7 +11,7 @@ class BoxSingleWidget : public SingleWidget
 {
     Q_OBJECT
 public:
-    explicit BoxSingleWidget(QWidget *parent = 0);
+    explicit BoxSingleWidget(ScrollWidgetVisiblePart *parent = 0);
 
     void setTargetAbstraction(SingleWidgetAbstraction *abs);
 
@@ -20,7 +20,7 @@ public:
 signals:
 
 public slots:
-    void switchContentVisible();
+    void switchContentVisibleAction();
 private:
     QPushButton *mContentButton;
     QLabel *mNameLabel;

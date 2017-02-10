@@ -69,8 +69,8 @@ void SingleWidgetAbstraction::addChildAbstraction(
     mChildren.append(abs);
 
     if(mContentVisible) {
-        mVisiblePartWidget->updateVisibleWidgetsContent();
-        mVisiblePartWidget->updateParentHeight();
+        mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
+        mVisiblePartWidget->scheduleUpdateParentHeight();
     }
 }
 
@@ -86,8 +86,8 @@ void SingleWidgetAbstraction::removeChildAbstractionForTarget(
     delete abstraction;
 
     if(mContentVisible) {
-        mVisiblePartWidget->updateVisibleWidgetsContent();
-        mVisiblePartWidget->updateParentHeight();
+        mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
+        mVisiblePartWidget->scheduleUpdateParentHeight();
     }
 }
 
@@ -102,8 +102,8 @@ bool SingleWidgetAbstraction::contentVisible() {
 void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
     //if(bT == mContentVisible) return;
     mContentVisible = bT;
-    mVisiblePartWidget->updateVisibleWidgetsContent();
-    mVisiblePartWidget->updateParentHeight();
+    mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
+    mVisiblePartWidget->scheduleUpdateParentHeight();
 }
 
 void SingleWidgetAbstraction::addChildAbstractionForTarget(
