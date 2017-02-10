@@ -6,6 +6,8 @@
 #include "mainwindow.h"
 #include "keysview.h"
 #include "BoxesList/boxitemwidgetcontainer.h"
+#include "BoxesList/boxscrollwidget.h"
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     QObject(), Transformable()
@@ -25,13 +27,25 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mTransformAnimator.reset();
     mCombinedTransformMatrix.reset();
     updateCombinedTransform();
+
+    mSelectedAbstraction = SWT_createAbstraction(
+            MainWindow::getInstance()->
+                getObjectSettingsList()->getVisiblePartWidget());
+    mSelectedAbstraction->setContentVisible(true);
 }
 
 BoundingBox::BoundingBox(BoundingBoxType type) :
     Transformable() {
+    mSelectedAbstraction = SWT_createAbstraction(
+            MainWindow::getInstance()->getBoxesList()->
+                getVisiblePartWidget());
     mType = type;
     mTransformAnimator.reset();
     mCombinedTransformMatrix.reset();
+}
+
+BoundingBox::~BoundingBox() {
+    delete mSelectedAbstraction;
 }
 
 #include "linkbox.h"
@@ -609,17 +623,6 @@ void BoundingBox::select() {
 void BoundingBox::addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container) {
     foreach(QrealAnimator *animator, mActiveAnimators) {
         container->addAnimatorWidgetForAnimator(animator);
-    }
-}
-
-void BoundingBox::setAnimated(bool bT) {
-    mAnimated = bT;
-    if(mParent != NULL) {
-        if(mAnimated) {
-            emit mParent->addAnimatedBoundingBoxSignal(this);
-        } else {
-            emit mParent->removeAnimatedBoundingBoxSignal(this);
-        }
     }
 }
 

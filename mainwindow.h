@@ -30,6 +30,7 @@ class CanvasWidget;
 class ObjectSettingsWidget;
 class BoxScrollWidget;
 class ScrollWidget;
+class ScrollArea;
 //class SoundComposition;
 
 class MainWindow : public QMainWindow
@@ -59,7 +60,9 @@ public:
 
     AnimationDockWidget *getAnimationDockWidget();
     KeysView *getKeysView();
-    ScrollWidget *getBoxesList();
+    BoxScrollWidget *getBoxesList();
+    BoxScrollWidget *getObjectSettingsList();
+
     CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
@@ -227,7 +230,9 @@ private:
 
     bool mPreviewInterrupted = false;
 
-    ObjectSettingsWidget *mObjectSettingsWidget = NULL;
+    BoxScrollWidget *mObjectSettingsWidget = NULL;
+    ScrollArea *mObjectSettingsScrollArea;
+
     void setupToolBar();
     void connectToolBarActions();
     void setupMenuBar();

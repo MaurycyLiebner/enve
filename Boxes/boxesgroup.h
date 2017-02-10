@@ -205,7 +205,6 @@ public:
     void rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin, bool startTrans);
     int getPointsSelectionCount();
 
-    void setSelectedAnimated(bool animated);
     void updateBoundingRect();
     void applyCurrentTransformation();
     void applyShadowToSelected();
@@ -241,7 +240,7 @@ protected:
     bool mIsCurrentGroup = false;
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;
-    QList<BoundingBox*> mChildren;
+    QList<BoundingBox*> mChildBoxes;
 signals:
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);

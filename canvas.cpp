@@ -84,7 +84,7 @@ void Canvas::showContextMenu(QPoint globalPos) {
 BoundingBox *Canvas::createLink(BoxesGroup *parent) {
     InternalLinkCanvas *linkGroup =
                         new InternalLinkCanvas(this, parent);
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->createSameTransformationLink(linkGroup);
     }
     return linkGroup;
@@ -224,7 +224,7 @@ void Canvas::scalePointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin,
 
 void Canvas::saveToSql(QSqlQuery *query)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->saveToSql(query, 0);
     }
 }
@@ -272,7 +272,7 @@ void Canvas::paintEvent(QPainter *p)
         p->fillRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1, QColor(75, 75, 75));
         p->fillRect(viewRect, Qt::white);
 
-        foreach(BoundingBox *box, mChildren){
+        foreach(BoundingBox *box, mChildBoxes){
             box->drawPixmap(p);
         }
         mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
@@ -458,7 +458,7 @@ void Canvas::drawPreviewPixmap(QPainter *p) {
     if(mVisible) {
         p->save();
         //p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
-        foreach(BoundingBox *box, mChildren){
+        foreach(BoundingBox *box, mChildBoxes){
             box->drawPreviewPixmap(p);
         }
 
@@ -470,7 +470,7 @@ void Canvas::renderFinal(QPainter *p) {
     if(mVisible) {
         p->save();
 
-        foreach(BoundingBox *box, mChildren){
+        foreach(BoundingBox *box, mChildBoxes){
             box->renderFinal(p);
         }
 
@@ -536,10 +536,10 @@ void Canvas::schedulePivotUpdate()
 void Canvas::clearAll() {
     setCurrentBoxesGroup(this);
 
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->decNumberPointers();
     }
-    mChildren.clear();
+    mChildBoxes.clear();
 
     resetTransormation();
 }
@@ -933,7 +933,7 @@ void Canvas::moveBy(QPointF trans)
 
 void Canvas::updateAfterFrameChanged(int currentFrame)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
 }

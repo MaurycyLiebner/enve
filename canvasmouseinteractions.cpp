@@ -137,9 +137,6 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             menu.addAction("Group");
             menu.addAction("Ungroup");
             menu.addAction("Delete");
-            QAction *animatedAction = menu.addAction("Animated");
-            animatedAction->setCheckable(true);
-            animatedAction->setChecked(pressedBox->isAnimated());
 
             QMenu *effectsMenu = menu.addMenu("Effects");
             effectsMenu->addAction("Blur");
@@ -184,9 +181,6 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     mCurrentBoxesGroup->applyImplodeEffectToSelected();
                 } else if(selectedAction->text() == "Desaturate") {
                     mCurrentBoxesGroup->applyDesaturateEffectToSelected();
-                } else if(selectedAction->text() == "Animated") {
-                    mCurrentBoxesGroup->setSelectedAnimated(
-                                !pressedBox->isAnimated());
                 }
             } else {
 

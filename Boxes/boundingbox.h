@@ -62,6 +62,7 @@ class BoundingBox : public QObject,
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
     BoundingBox(BoundingBoxType type);
+    virtual ~BoundingBox();
 
     virtual BoundingBox *createLink(BoxesGroup *parent);
     virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
@@ -186,17 +187,26 @@ public:
     void addActiveAnimator(QrealAnimator *animator);
     void removeActiveAnimator(QrealAnimator *animator);
 
-    virtual void setFillGradient(Gradient* gradient, bool finish) { Q_UNUSED(gradient); Q_UNUSED(finish); }
-    virtual void setStrokeGradient(Gradient* gradient, bool finish) { Q_UNUSED(gradient); Q_UNUSED(finish); }
-    virtual void setFillFlatColor(Color color, bool finish) { Q_UNUSED(color); Q_UNUSED(finish); }
-    virtual void setStrokeFlatColor(Color color, bool finish) { Q_UNUSED(color); Q_UNUSED(finish); }
+    virtual void setFillGradient(Gradient* gradient, bool finish) {
+        Q_UNUSED(gradient); Q_UNUSED(finish); }
+    virtual void setStrokeGradient(Gradient* gradient, bool finish) {
+        Q_UNUSED(gradient); Q_UNUSED(finish); }
+    virtual void setFillFlatColor(Color color, bool finish) {
+        Q_UNUSED(color); Q_UNUSED(finish); }
+    virtual void setStrokeFlatColor(Color color, bool finish) {
+        Q_UNUSED(color); Q_UNUSED(finish); }
     virtual void setFillPaintType(PaintType paintType, Color color,
-                                  Gradient* gradient) { Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
+                                  Gradient* gradient) {
+        Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
     virtual void setStrokePaintType(PaintType paintType, Color color,
-                                    Gradient* gradient) { Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
-    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) { Q_UNUSED(capStyle); }
-    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) { Q_UNUSED(joinStyle); }
-    virtual void setStrokeWidth(qreal strokeWidth, bool finish) { Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
+                                    Gradient* gradient) {
+        Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
+    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
+        Q_UNUSED(capStyle); }
+    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
+        Q_UNUSED(joinStyle); }
+    virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
+        Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
 
     virtual void startStrokeWidthTransform() {}
     virtual void startStrokeColorTransform() {}
@@ -267,8 +277,7 @@ public:
     void addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container);
     QrealAnimator *getAnimatorsCollection();
 
-    bool isAnimated() { return mAnimated; }
-    void setAnimated(bool bT);
+    bool isAnimated() { return mAnimatorsCollection.isDescendantRecording(); }
     virtual void updateBoundingRect();
     void updatePixBoundingRectClippedToView();
     virtual const QPainterPath &getRelBoundingRectPath();
@@ -311,7 +320,13 @@ public:
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
     SingleWidgetTargetType SWT_getType() { return SWT_BoundingBox; }
+
+    SingleWidgetAbstraction *getTargetAbstraction() {
+        return mSelectedAbstraction; // is timeline abstraction for canvas
+    }
 protected:
+    SingleWidgetAbstraction *mSelectedAbstraction = NULL;
+
     bool mCenterPivotScheduled = false;
     QPointF mPreviewDrawPos;
     QRectF mRelBoundingRect;

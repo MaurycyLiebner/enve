@@ -362,7 +362,8 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 
 void BoxSingleWidget::switchContentVisibleAction() {
     mTarget->switchContentVisible();
-    mParent->callUpdaters();
+    MainWindow::getInstance()->callUpdateSchedulers();
+    //mParent->callUpdaters();
 }
 
 void BoxSingleWidget::switchRecordingAction() {

@@ -38,6 +38,8 @@ public:
 
     static void addInstance(ScrollWidgetVisiblePart *instance);
     static void removeInstance(ScrollWidgetVisiblePart *instance);
+
+    void setSkipMainAbstraction(const bool &bT);
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 
@@ -53,6 +55,7 @@ protected:
     QVBoxLayout *mLayout;
     int mVisibleTop = 0;
     int mVisibleHeight = 0;
+    bool mSkipMainAbstraction = false;
 };
 
 

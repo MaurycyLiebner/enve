@@ -26,7 +26,7 @@ BoxesGroup::BoxesGroup(BoxesGroup *parent) :
 }
 
 void BoxesGroup::updateAllBoxes() {
-    foreach(BoundingBox *child, mChildren) {
+    foreach(BoundingBox *child, mChildBoxes) {
         child->updateAllBoxes();
     }
     scheduleAwaitUpdate();
@@ -42,7 +42,7 @@ BoxesGroup::~BoxesGroup()
 {
     clearBoxesSelection();
     clearPointsSelection();
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->decNumberPointers();
     }
 }
@@ -56,7 +56,7 @@ void BoxesGroup::loadFromSql(int boundingBoxId) {
 BoundingBox *BoxesGroup::createLink(BoxesGroup *parent) {
     InternalLinkBoxesGroup *linkGroup =
                         new InternalLinkBoxesGroup(this, parent);
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->createSameTransformationLink(linkGroup);
     }
     return linkGroup;
@@ -65,7 +65,7 @@ BoundingBox *BoxesGroup::createLink(BoxesGroup *parent) {
 BoundingBox *BoxesGroup::createSameTransformationLink(BoxesGroup *parent) {
     SameTransformInternalLinkBoxesGroup *linkGroup =
                         new SameTransformInternalLinkBoxesGroup(this, parent);
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->createSameTransformationLink(linkGroup);
     }
     return linkGroup;
@@ -120,7 +120,7 @@ int BoxesGroup::saveToSql(QSqlQuery *query, int parentId)
     int boundingBoxId = BoundingBox::saveToSql(query, parentId);
     query->exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
                 arg(boundingBoxId));
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->saveToSql(query, boundingBoxId);
     }
     return boundingBoxId;
@@ -244,7 +244,7 @@ void BoxesGroup::setDisplayedFillStrokeSettingsFromLastSelected() {
 bool BoxesGroup::relPointInsidePath(QPointF relPos) {
     if(mRelBoundingRect.contains(relPos)) {
         QPointF absPos = mapRelativeToAbsolute(relPos);
-        foreach(BoundingBox *box, mChildren) {
+        foreach(BoundingBox *box, mChildBoxes) {
             if(box->absPointInsidePath(absPos)) {
                 return true;
             }
@@ -256,7 +256,7 @@ bool BoxesGroup::relPointInsidePath(QPointF relPos) {
 void BoxesGroup::updateAfterFrameChanged(int currentFrame)
 {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
 }
@@ -321,28 +321,28 @@ void BoxesGroup::setSelectedJoinStyle(Qt::PenJoinStyle joinStyle) {
 
 void BoxesGroup::setFillGradient(Gradient *gradient, bool finish)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setFillGradient(gradient, finish);
     }
 }
 
 void BoxesGroup::setStrokeGradient(Gradient *gradient, bool finish)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setStrokeGradient(gradient, finish);
     }
 }
 
 void BoxesGroup::setFillFlatColor(Color color, bool finish)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setFillFlatColor(color, finish);
     }
 }
 
 void BoxesGroup::setStrokeFlatColor(Color color, bool finish)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setStrokeFlatColor(color, finish);
     }
 }
@@ -350,7 +350,7 @@ void BoxesGroup::setStrokeFlatColor(Color color, bool finish)
 void BoxesGroup::setFillPaintType(PaintType paintType,
                                   Color color, Gradient *gradient)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setFillPaintType(paintType, color, gradient);
     }
 }
@@ -358,56 +358,50 @@ void BoxesGroup::setFillPaintType(PaintType paintType,
 void BoxesGroup::setStrokePaintType(PaintType paintType,
                                     Color color, Gradient *gradient)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setStrokePaintType(paintType, color, gradient);
     }
 }
 
 void BoxesGroup::setStrokeCapStyle(Qt::PenCapStyle capStyle)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
 void BoxesGroup::setStrokeJoinStyle(Qt::PenJoinStyle joinStyle)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
 }
 
 void BoxesGroup::setStrokeWidth(qreal strokeWidth, bool finish)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->setStrokeWidth(strokeWidth, finish);
     }
 }
 
 void BoxesGroup::startStrokeWidthTransform()
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->startStrokeWidthTransform();
     }
 }
 
 void BoxesGroup::startStrokeColorTransform()
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->startStrokeColorTransform();
     }
 }
 
 void BoxesGroup::startFillColorTransform()
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->startFillColorTransform();
-    }
-}
-
-void BoxesGroup::setSelectedAnimated(bool animated) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setAnimated(animated);
     }
 }
 
@@ -440,7 +434,7 @@ void BoxesGroup::startSelectedFillColorTransform()
 
 void BoxesGroup::updateBoundingRect() {
     QPainterPath boundingPaths = QPainterPath();
-    foreach(BoundingBox *child, mChildren) {
+    foreach(BoundingBox *child, mChildBoxes) {
         boundingPaths.addPath(
                     child->getRelativeTransform().
                     map(child->getRelBoundingRectPath()));
@@ -459,7 +453,7 @@ void BoxesGroup::updateBoundingRect() {
 
 void BoxesGroup::updateEffectsMargin() {
     qreal childrenMargin = 0.;
-    foreach(BoundingBox *child, mChildren) {
+    foreach(BoundingBox *child, mChildBoxes) {
         childrenMargin = qMax(child->getEffectsMargin(),
                               childrenMargin);
     }
@@ -506,7 +500,7 @@ QPixmap BoxesGroup::renderPreviewProvidedTransform(
 void BoxesGroup::drawForPreview(QPainter *p) {
     if(mVisible) {
         p->save();
-        foreach(BoundingBox *box, mChildren) {
+        foreach(BoundingBox *box, mChildBoxes) {
             //box->draw(p);
             box->drawPreviewPixmap(p);
         }
@@ -522,7 +516,7 @@ void BoxesGroup::draw(QPainter *p)
         p->setTransform(QTransform(
                             mCombinedTransformMatrix.inverted()),
                             true);
-        foreach(BoundingBox *box, mChildren) {
+        foreach(BoundingBox *box, mChildBoxes) {
             //box->draw(p);
             box->drawPixmap(p);
         }
@@ -554,7 +548,7 @@ void BoxesGroup::setIsCurrentGroup(bool bT)
 {
     mIsCurrentGroup = bT;
     if(!bT) {
-        if(mChildren.isEmpty() && mParent != NULL) {
+        if(mChildBoxes.isEmpty() && mParent != NULL) {
             mParent->removeChild(this);
         }
     }
@@ -581,7 +575,7 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
     BoundingBox *boxAtPos = NULL;
     //foreachBoxInListInverted(mChildren) {
     BoundingBox *box;
-    foreachInverted(box, mChildren) {
+    foreachInverted(box, mChildBoxes) {
         if(box->isVisibleAndUnlocked()) {
             boxAtPos = box->getPathAtFromAllAncestors(absPos);
             if(boxAtPos != NULL) {
@@ -761,7 +755,7 @@ void BoxesGroup::ungroup() {
     clearBoxesSelection();
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
     //BoundingBox *box;
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->applyTransformation(&mTransformAnimator);
         removeChild(box);
         parentGroup->addChild(box);
@@ -829,11 +823,11 @@ void BoxesGroup::clearPointsSelection()
 }
 
 const PaintSettings *BoxesGroup::getFillSettings() {
-    return mChildren.first()->getFillSettings();
+    return mChildBoxes.first()->getFillSettings();
 }
 
 const StrokeSettings *BoxesGroup::getStrokeSettings() {
-    return mChildren.first()->getStrokeSettings();
+    return mChildBoxes.first()->getStrokeSettings();
 }
 
 void BoxesGroup::updateSelectedPointsAfterCtrlsVisiblityChanged() {
@@ -911,7 +905,7 @@ void BoxesGroup::applyCurrentTransformation() {
     qreal rotation = mTransformAnimator.rot();
     qreal scaleX = mTransformAnimator.xScale();
     qreal scaleY = mTransformAnimator.yScale();
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->saveTransformPivotAbsPos(absPivot);
         box->startTransform();
         box->rotateRelativeToSavedPivot(rotation);
@@ -982,7 +976,7 @@ void BoxesGroup::deselectAllBoxes() {
 }
 
 void BoxesGroup::selectAllBoxes() {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         if(box->isSelected()) continue;
         addBoxToSelection(box);
     }
@@ -1115,7 +1109,7 @@ BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
     BoundingBox *boxAtPos = NULL;
 
     BoundingBox *box;
-    foreachInverted(box, mChildren) {
+    foreachInverted(box, mChildBoxes) {
         if(box->isVisibleAndUnlocked()) {
             if(box->absPointInsidePath(absPos)) {
                 boxAtPos = box;
@@ -1177,7 +1171,7 @@ void BoxesGroup::startSelectedPointsTransform() {
 
 void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         if(box->isVisibleAndUnlocked()) {
             if(box->isContainedIn(rect) ) {
                 addBoxToSelection(box);
@@ -1358,20 +1352,16 @@ void BoxesGroup::selectedPathsUnion() {
 
 void BoxesGroup::addChild(BoundingBox *child) {
     child->setParent(this);
-    addChildToListAt(mChildren.count(), child);
+    addChildToListAt(mChildBoxes.count(), child);
 }
 
 void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
-    mChildren.insert(index, child);
+    mChildBoxes.insert(index, child);
     updateChildrenId(index, saveUndoRedo);
     if(saveUndoRedo) {
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
     child->incNumberPointers();
-
-    if(child->isAnimated()) {
-        emit addAnimatedBoundingBoxSignal(child);
-    }
 
     scheduleEffectsMarginUpdate();
     scheduleAwaitUpdate();
@@ -1381,26 +1371,26 @@ void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRe
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
-    updateChildrenId(firstId, mChildren.length() - 1, saveUndoRedo);
+    updateChildrenId(firstId, mChildBoxes.length() - 1, saveUndoRedo);
 }
 
 void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
     for(int i = firstId; i <= lastId; i++) {
-        mChildren.at(i)->setZListIndex(i, saveUndoRedo);
+        mChildBoxes.at(i)->setZListIndex(i, saveUndoRedo);
     }
 }
 
 void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
 {
-    BoundingBox *box = mChildren.at(id);
+    BoundingBox *box = mChildBoxes.at(id);
     if(box->isSelected()) {
         removeBoxFromSelection(box);
     }
     if(saveUndoRedo) {
         addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
-                                                    mChildren.at(id)) );
+                                                    mChildBoxes.at(id)) );
     }
-    mChildren.removeAt(id);
+    mChildBoxes.removeAt(id);
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*) box;
         if(group->isCurrentGroup()) {
@@ -1412,10 +1402,6 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
 
     box->decNumberPointers();
 
-    if(box->isAnimated()) {
-        emit removeAnimatedBoundingBoxSignal(box);
-    }
-
     scheduleEffectsMarginUpdate();
 
     SWT_removeChildAbstractionForTargetFromAll(box);
@@ -1423,7 +1409,7 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
 
 void BoxesGroup::removeChild(BoundingBox *child)
 {
-    int index = mChildren.indexOf(child);
+    int index = mChildBoxes.indexOf(child);
     if(index < 0) {
         return;
     }
@@ -1435,8 +1421,8 @@ void BoxesGroup::removeChild(BoundingBox *child)
 
 void BoxesGroup::increaseChildZInList(BoundingBox *child)
 {
-    int index = mChildren.indexOf(child);
-    if(index == mChildren.count() - 1) {
+    int index = mChildBoxes.indexOf(child);
+    if(index == mChildBoxes.count() - 1) {
         return;
     }
     moveChildInList(child, index, index + 1);
@@ -1444,7 +1430,7 @@ void BoxesGroup::increaseChildZInList(BoundingBox *child)
 
 void BoxesGroup::decreaseChildZInList(BoundingBox *child)
 {
-    int index = mChildren.indexOf(child);
+    int index = mChildBoxes.indexOf(child);
     if(index == 0) {
         return;
     }
@@ -1453,16 +1439,16 @@ void BoxesGroup::decreaseChildZInList(BoundingBox *child)
 
 void BoxesGroup::bringChildToEndList(BoundingBox *child)
 {
-    int index = mChildren.indexOf(child);
-    if(index == mChildren.count() - 1) {
+    int index = mChildBoxes.indexOf(child);
+    if(index == mChildBoxes.count() - 1) {
         return;
     }
-    moveChildInList(child, index, mChildren.length() - 1);
+    moveChildInList(child, index, mChildBoxes.length() - 1);
 }
 
 void BoxesGroup::bringChildToFrontList(BoundingBox *child)
 {
-    int index = mChildren.indexOf(child);
+    int index = mChildBoxes.indexOf(child);
     if(index == 0) {
         return;
     }
@@ -1472,20 +1458,16 @@ void BoxesGroup::bringChildToFrontList(BoundingBox *child)
 void BoxesGroup::moveChildInList(BoundingBox *child,
                                  int from, int to,
                                  bool saveUndoRedo) {
-    mChildren.move(from, to);
+    mChildBoxes.move(from, to);
     updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
     if(saveUndoRedo) {
         addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
-    }
-
-    if(child->isAnimated()) {
-        emit changeChildZSignal(from, to);
     }
 }
 
 void BoxesGroup::updateAfterCombinedTransformationChanged()
 {
-    foreach(BoundingBox *child, mChildren) {
+    foreach(BoundingBox *child, mChildBoxes) {
         child->updateCombinedTransform();
     }
 }
@@ -1497,7 +1479,7 @@ void BoxesGroup::SWT_addChildrenAbstractions(
     BoundingBox::SWT_addChildrenAbstractions(abstraction,
                                              visiblePartWidget);
 
-    foreach(BoundingBox *child, mChildren) {
+    foreach(BoundingBox *child, mChildBoxes) {
         abstraction->addChildAbstraction(
                     child->SWT_createAbstraction(visiblePartWidget));
     }

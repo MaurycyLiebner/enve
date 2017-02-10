@@ -12,7 +12,7 @@ ExternalLinkBox::ExternalLinkBox(QString srcFile, BoxesGroup *parent) :
 }
 
 void ExternalLinkBox::reload() {
-    foreach(BoundingBox *box, mChildren) {
+    foreach(BoundingBox *box, mChildBoxes) {
         box->decNumberPointers();
     }
 
@@ -239,7 +239,7 @@ void InternalLinkCanvas::draw(QPainter *p)
             p->setClipPath(mMappedBoundingRectPath);
             //p->setClipRect(mRelBoundingRect);
         }
-        foreach(BoundingBox *box, mChildren) {
+        foreach(BoundingBox *box, mChildBoxes) {
             //box->draw(p);
             box->drawPixmap(p);
         }
@@ -258,7 +258,7 @@ void InternalLinkCanvas::drawForPreview(QPainter *p) {
             p->setClipPath(mMappedBoundingRectPath);
             //p->setClipRect(mRelBoundingRect);
         }
-        foreach(BoundingBox *box, mChildren) {
+        foreach(BoundingBox *box, mChildBoxes) {
             //box->draw(p);
             box->drawPreviewPixmap(p);
         }

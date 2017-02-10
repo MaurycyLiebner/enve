@@ -61,6 +61,10 @@ void ScrollWidgetVisiblePart::removeInstance(
     mAllInstances.removeOne(instance);
 }
 
+void ScrollWidgetVisiblePart::setSkipMainAbstraction(const bool &bT) {
+    mSkipMainAbstraction = bT;
+}
+
 void ScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
     mVisibleWidgetsContentUpdateScheduled = true;
 }
@@ -112,9 +116,18 @@ void ScrollWidgetVisiblePart::updateVisibleWidgets() {
 void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     if(mMainAbstraction == NULL) return;
     int idP = 0;
+    int currX;
+    int currY;
+    if(mSkipMainAbstraction) {
+        currX = -20;
+        currY = -10;
+    } else {
+        currX = 0;
+        currY = 10;
+    }
     mMainAbstraction->setSingleWidgetAbstractions(mVisibleTop,
                                                   mVisibleTop + mVisibleHeight + 10,
-                                                  -10, -20,
+                                                  currY, currX,
                                                   &mSingleWidgets,
                                                   &idP);
 

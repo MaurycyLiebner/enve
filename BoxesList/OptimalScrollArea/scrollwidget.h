@@ -19,7 +19,7 @@ public:
     void updateHeight();
     void updateAfterContentChange();
     void setMainTarget(SingleWidgetTarget *target);
-    void updateAbstraction();
+    virtual void updateAbstraction();
 signals:
 
 public slots:

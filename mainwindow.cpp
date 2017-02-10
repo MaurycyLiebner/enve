@@ -94,8 +94,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     QDockWidget *effectsMenuWidget = new QDockWidget(this);
     effectsMenuWidget->setMinimumWidth(200);
-    mObjectSettingsWidget = new ObjectSettingsWidget(this);
-    effectsMenuWidget->setWidget(mObjectSettingsWidget);
+
+    mObjectSettingsScrollArea = new ScrollArea(this);
+    mObjectSettingsWidget = new BoxScrollWidget(mObjectSettingsScrollArea);
+    mObjectSettingsScrollArea->setWidget(mObjectSettingsWidget);
+
+    connect(mObjectSettingsScrollArea->verticalScrollBar(),
+            SIGNAL(valueChanged(int)),
+            mObjectSettingsWidget, SLOT(changeVisibleTop(int)));
+    connect(mObjectSettingsScrollArea, SIGNAL(heightChanged(int)),
+            mObjectSettingsWidget, SLOT(changeVisibleHeight(int)));
+    connect(mObjectSettingsScrollArea, SIGNAL(widthChanged(int)),
+            mObjectSettingsWidget, SLOT(setWidth(int)));
+
+    mObjectSettingsScrollArea->verticalScrollBar()->setSingleStep(
+                BoxesListWidget::getListItemHeight());
+
+    effectsMenuWidget->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
 
     Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
@@ -669,8 +684,8 @@ void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
 }
 
 void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
-    if(mObjectSettingsWidget == NULL) return;
-    mObjectSettingsWidget->setBoundingBox(box);
+    //if(mObjectSettingsWidget == NULL) return;
+    mObjectSettingsWidget->setMainTarget(box);
 }
 
 void MainWindow::setCurrentBox(BoundingBox *box) {
@@ -715,9 +730,13 @@ KeysView *MainWindow::getKeysView()
     return mKeysView;
 }
 
-ScrollWidget *MainWindow::getBoxesList()
+BoxScrollWidget *MainWindow::getBoxesList()
 {
     return mBoxListWidget;
+}
+
+BoxScrollWidget *MainWindow::getObjectSettingsList() {
+    return mObjectSettingsWidget;
 }
 
 void MainWindow::disableEventFilter() {
@@ -874,7 +893,7 @@ void MainWindow::clearAll() {
     mUndoRedoStack.clearAll();
     mCanvas->clearAll();
     mFillStrokeSettings->clearAll();
-    mObjectSettingsWidget->clearAll();
+    //mObjectSettingsWidget->clearAll();
     //mBoxListWidget->clearAll();
 }
 
