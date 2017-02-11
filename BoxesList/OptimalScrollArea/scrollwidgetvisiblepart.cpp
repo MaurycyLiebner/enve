@@ -63,9 +63,21 @@ void ScrollWidgetVisiblePart::removeInstance(
     mAllInstances.removeOne(instance);
 }
 
-void ScrollWidgetVisiblePart::setCurrentRule(const SWT_Rule &rule) {
+void ScrollWidgetVisiblePart::setCurrentRule(
+        const SWT_Rule &rule) {
     mCurrentRule = rule;
     updateVisibleWidgetsContent();
+}
+
+void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
+        const SWT_Rule &rule) {
+    if(isCurrentRule(rule)) {
+        scheduledUpdateVisibleWidgetsContent();
+    }
+}
+
+bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
+    return rule == mCurrentRule;
 }
 
 void ScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {

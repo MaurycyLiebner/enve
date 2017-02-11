@@ -1,8 +1,13 @@
 #include "Animators/animatorscollection.h"
+#include "Boxes/boundingbox.h"
 
 AnimatorsCollection::AnimatorsCollection() : ComplexAnimator()
 {
 
+}
+
+void AnimatorsCollection::setParentBoundingBox(BoundingBox *box) {
+    mParentBox = box;
 }
 
 void AnimatorsCollection::addAnimator(QrealAnimator *animator)
@@ -37,4 +42,10 @@ void AnimatorsCollection::sortKeys()
     foreach(QrealAnimator *animator, mChildAnimators) {
         animator->sortKeys();
     }
+}
+
+void AnimatorsCollection::childAnimatorIsRecordingChanged() {
+    ComplexAnimator::childAnimatorIsRecordingChanged();
+    mParentBox->SWT_scheduleWidgetsContentUpdateWithRule(SWT_Animated);
+    mParentBox->SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }

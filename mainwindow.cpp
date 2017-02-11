@@ -534,6 +534,7 @@ void MainWindow::playPreview()
     mBoxesUpdateFinishedFunction = &MainWindow::nextPlayPreviewFrame;
     mSavedCurrentFrame = mCurrentFrame;
 
+    mRendering = true;
     mPreviewInterrupted = false;
     mCurrentRenderFrame = mSavedCurrentFrame;
     setCurrentFrame(mSavedCurrentFrame);
@@ -546,10 +547,11 @@ void MainWindow::playPreview()
 
 void MainWindow::nextPlayPreviewFrame() {
     mCanvas->renderCurrentFrameToPreview();
-    if(mCurrentRenderFrame >= mMaxFrame) {
+    if(mCurrentRenderFrame >= mMaxFrame || mPreviewInterrupted) {
+        mRendering = false;
         mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
-        if(!mPreviewInterrupted) {
+//        if(!mPreviewInterrupted) {
 //            mSoundComposition->setFirstAndLastVideoFrame(0, 240);
 //            mSoundComposition->generateData();
 
@@ -567,7 +569,7 @@ void MainWindow::nextPlayPreviewFrame() {
 //            mSoundComposition->start();
 //            audio->start(mSoundComposition);
             mCanvas->playPreview();
-        }
+//        }
     } else {
         mCurrentRenderFrame++;
         mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
@@ -609,10 +611,12 @@ void MainWindow::previewFinished() {
 
 void MainWindow::stopPreview() {
     mPreviewInterrupted = true;
-    mCurrentRenderFrame = mMaxFrame;
-    mCanvas->clearPreview();
-    mCanvasWidget->repaint();
-    previewFinished();
+    if(!mRendering) {
+        mCurrentRenderFrame = mMaxFrame;
+        mCanvas->clearPreview();
+        mCanvasWidget->repaint();
+        previewFinished();
+    }
 }
 
 void MainWindow::setResolutionPercentId(int id)

@@ -12,6 +12,7 @@
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     QObject(), Transformable()
 {
+    mAnimatorsCollection.setParentBoundingBox(this);
     mSelectedAbstraction = SWT_createAbstraction(
             MainWindow::getInstance()->
                 getObjectSettingsList()->getVisiblePartWidget());
@@ -43,6 +44,8 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
 
 BoundingBox::BoundingBox(BoundingBoxType type) :
     Transformable() {
+    mAnimatorsCollection.setParentBoundingBox(this);
+
     mTimelineAbstraction = SWT_createAbstraction(
             MainWindow::getInstance()->
                 getBoxesList()->getVisiblePartWidget());
@@ -972,6 +975,9 @@ void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
     mVisible = visible;
 
     scheduleAwaitUpdate();
+
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
 }
 
 void BoundingBox::switchVisible() {
@@ -1015,6 +1021,8 @@ void BoundingBox::setLocked(bool bt) {
         ((BoxesGroup*) mParent)->removeBoxFromSelection(this);
     }
     mLocked = bt;
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Locked);
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Unlocked);
 }
 
 void BoundingBox::SWT_addChildrenAbstractions(

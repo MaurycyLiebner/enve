@@ -84,24 +84,25 @@ void KeysView::wheelEvent(QWheelEvent *e) {
 }
 
 void KeysView::mousePressEvent(QMouseEvent *e) {
+    QPoint posU = e->pos() + QPoint(-10, 0);
     if(mGraphViewed) {
-        graphMousePressEvent(e->pos(),
+        graphMousePressEvent(posU,
                              e->button());
     } else {
         if(e->button() == Qt::MiddleButton) {
-            middlePress(e->pos() );
+            middlePress(posU);
         } else {
             mFirstMove = true;
-            mLastPressPos = e->pos();
+            mLastPressPos = posU;
 
             mLastPressedKey = mBoxesListVisible->getKeyAtPos(
-                                                      e->x(), e->y(),
+                                                      posU.x(), posU.y(),
                                                       mPixelsPerFrame,
                                                       mMinViewedFrame);
             if(mLastPressedKey == NULL) {
                 mSelecting = true;
-                mSelectionRect.setTopLeft(e->pos() );
-                mSelectionRect.setBottomRight(e->pos() );
+                mSelectionRect.setTopLeft(posU);
+                mSelectionRect.setBottomRight(posU);
             }
             else {
                 if(!mMainWindow->isShiftPressed() &&
@@ -151,6 +152,26 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
 void KeysView::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
+    p.fillRect(rect(), QColor(60, 60, 60));
+
+//    QRect rect1(0, 0, 10, height());
+//    QLinearGradient gradient1(QPoint(rect1.left(), 0),
+//                              QPoint(rect1.right(), 0));
+//    gradient1.setColorAt(0, QColor(30, 30, 30));
+//    gradient1.setColorAt(1, QColor(60, 60, 60));
+
+//    QRect rect2(width() - 30, 0, 30, height());
+//    QLinearGradient gradient2(QPoint(rect2.left(), 0),
+//                              QPoint(rect2.right(), 0));
+//    gradient2.setColorAt(0, QColor(60, 60, 60));
+//    gradient2.setColorAt(1, QColor(30, 30, 30));
+
+//    p.fillRect(rect1, gradient1);
+//    p.fillRect(rect2, gradient2);
+//    p.fillRect(0, 0, 10, height(), QColor(30, 30, 30));
+//    p.fillRect(width() - 30, 0, 30, height(), QColor(30, 30, 30));
+
+
     if(!mGraphViewed) {    
         int currY = BOX_HEIGHT;
         p.setPen(QPen(QColor(40, 40, 40), 1.));
@@ -160,6 +181,7 @@ void KeysView::paintEvent(QPaintEvent *) {
             currY += BOX_HEIGHT;
         }
     }
+    p.translate(10, 0);
 
     p.setPen(QPen(QColor(75, 75, 75), 1.));
     qreal xT = mPixelsPerFrame*0.5;
@@ -172,21 +194,24 @@ void KeysView::paintEvent(QPaintEvent *) {
             iInc *= 2;
         }
     }
-    int minFrame = mMainWindow->getMinFrame();
+    int minFrame = mMinViewedFrame;//mMainWindow->getMinFrame();
+    int maxFrame = mMaxViewedFrame;
     if(mGraphViewed) {
         while(xT + minFrame*mPixelsPerFrame < 38.) {
             minFrame++;
         }
     }
-    for(int i = minFrame; i <= mMainWindow->getMaxFrame(); i += iInc) {
+    minFrame = ceil((-xT)/mPixelsPerFrame);
+    maxFrame = floor((width() - 40. - xT)/mPixelsPerFrame);
+    for(int i = minFrame; i <= maxFrame; i += iInc) {
         qreal xTT = xT + i*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, height()) );
     }
 
 
 
-    if(mMainWindow->getCurrentFrame() <= mMaxViewedFrame &&
-            mMainWindow->getCurrentFrame() >= mMinViewedFrame) {
+    if(mMainWindow->getCurrentFrame() <= maxFrame &&
+       mMainWindow->getCurrentFrame() >= minFrame) {
         xT = (mMainWindow->getCurrentFrame() - mMinViewedFrame)*mPixelsPerFrame +
                 mPixelsPerFrame*0.5;
         p.setPen(QPen(Qt::darkGray, 2.));
@@ -213,6 +238,7 @@ void KeysView::paintEvent(QPaintEvent *) {
         p.drawRect(mSelectionRect);
     }
 
+    p.resetTransform();
     if(hasFocus() ) {
         p.setBrush(Qt::NoBrush);
         p.setPen(QPen(Qt::red, 4.));
@@ -223,20 +249,20 @@ void KeysView::paintEvent(QPaintEvent *) {
     p.end();
 }
 
-void KeysView::mouseMoveEvent(QMouseEvent *event)
-{
+void KeysView::mouseMoveEvent(QMouseEvent *event) {
+    QPoint posU = event->pos() + QPoint(-10, 0);
     if(mGraphViewed) {
-        graphMouseMoveEvent(event->pos(),
+        graphMouseMoveEvent(posU,
                             event->buttons());
     } else {
         if(event->buttons() == Qt::MiddleButton) {
-            middleMove(event->pos() );
+            middleMove(posU);
             emit changedViewedFrames(mMinViewedFrame,
                                      mMaxViewedFrame);
         } else {
             if(mMovingKeys) {
                 int dFrame = qRound(
-                            (event->x() - mLastPressPos.x())/
+                            (posU.x() - mLastPressPos.x())/
                             mPixelsPerFrame );
                 int dDFrame = dFrame - mMoveDFrame;
                 if(mFirstMove) {
@@ -251,7 +277,7 @@ void KeysView::mouseMoveEvent(QMouseEvent *event)
                     }
                 }
             } else if(mSelecting) {
-                mSelectionRect.setBottomRight(event->pos() );
+                mSelectionRect.setBottomRight(posU);
             }
             mFirstMove = false;
         }
@@ -352,7 +378,7 @@ qreal KeysView::getPixelsPerFrame()
 
 void KeysView::updatePixelsPerFrame()
 {
-    qreal animWidth = width();
+    qreal animWidth = width() - 40.;
     qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
     mPixelsPerFrame = animWidth/dFrame;
 }

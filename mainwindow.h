@@ -33,6 +33,24 @@ class ScrollWidget;
 class ScrollArea;
 //class SoundComposition;
 
+const QString MENU_STYLESHEET =
+        "QMenu {\
+            background-color: rgb(255, 255, 255);\
+            border: 1px solid black;\
+        }\
+        \
+        QMenu::item {\
+            spacing: 3px;\
+            padding: 2px 25px 2px 25px;\
+            background: transparent;\
+            color: black;\
+        }\
+        \
+        QMenu::item:selected {\
+            background-color: rgb(200, 200, 200);\
+            color: black;\
+        };";
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -136,6 +154,8 @@ signals:
     void updateBoxPixmaps(BoundingBox*);
 private:
     static MainWindow *mMainWindowInstance;
+
+    bool mRendering = false;
 
     QComboBox *mCurrentCanvasComboBox;
     bool mCancelLastBoxUpdate = false;

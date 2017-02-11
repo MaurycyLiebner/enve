@@ -36,22 +36,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         if(pressedBox == NULL) {
             mCurrentBoxesGroup->clearBoxesSelection();
 
-            QMenu menu;
-            menu.setStyleSheet(
-                           "QMenu {"
-                               "background-color: rgb(200, 200, 200);"
-                               "border: 1px solid rgb(170, 170, 170);"
-                           "}"
-                           "QMenu::item {"
-                               "spacing: 3px;"
-                               "padding: 2px 25px 2px 25px;"
-                               "background: transparent;"
-                               "border-radius: 4px;"
-                           "}"
-                           "QMenu::item:selected {"
-                               "background-color: #a8a8a8;"
-                               "color: black;"
-                           "}");
+            QMenu menu(mCanvasWidget);
 
             menu.addAction("Paste");
             QMenu *linkCanvasMenu = menu.addMenu("Link Canvas");
@@ -111,22 +96,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                 mCurrentBoxesGroup->addBoxToSelection(pressedBox);
             }
 
-            QMenu menu;
-            menu.setStyleSheet(
-                           "QMenu {"
-                               "background-color: rgb(200, 200, 200);"
-                               "border: 1px solid rgb(170, 170, 170);"
-                           "}"
-                           "QMenu::item {"
-                               "spacing: 3px;"
-                               "padding: 2px 25px 2px 25px;"
-                               "background: transparent;"
-                               "border-radius: 4px;"
-                           "}"
-                           "QMenu::item:selected {"
-                               "background-color: #a8a8a8;"
-                               "color: black;"
-                           "}");
+            QMenu menu(mCanvasWidget);
 
             menu.addAction("Apply Transformation");
             menu.addAction("Create Link");

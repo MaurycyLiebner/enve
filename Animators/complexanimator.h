@@ -34,7 +34,7 @@ public:
 
     void setRecording(bool rec);
 
-    void childAnimatorIsRecordingChanged();
+    virtual void childAnimatorIsRecordingChanged();
     void setRecordingValue(bool rec);
 
     bool isDescendantRecording();

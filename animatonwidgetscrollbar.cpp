@@ -28,30 +28,34 @@ AnimatonWidgetScrollBar::AnimatonWidgetScrollBar(int minSpan, int maxSpan,
 
 qreal AnimatonWidgetScrollBar::posToFrame(int xPos)
 {
-    return xPos*(mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
-            ((qreal)width()) + mMinFrame;
+    return (xPos - 10.)*(mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
+            ((qreal)width() - 40.) + mMinFrame;
 }
 
 void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
 
-    p.setPen(Qt::NoPen);
 
-    p.fillRect(rect(), QColor(75, 75, 75));
+    p.fillRect(rect(), QColor(60, 60, 60));
+
+    p.translate(10., 0.);
+    int dFrame = mMaxFrame - mMinFrame;
+    if(!mRange) dFrame++;
+    qreal pixPerFrame = ((qreal)width() - 40.)/dFrame;
 
     QColor col;
     if(mPressed) {
-        col = QColor(255, 0, 0);
+        col = QColor(140, 140, 140);
     } else {
-        col = QColor(0, 0, 0);
+        col = QColor(100, 100, 100);
     }
-    p.setBrush(col);
-    int dFrame = mMaxFrame - mMinFrame;
-    if(!mRange) dFrame++;
-    qreal pixPerFrame = ((qreal)width())/dFrame;
-    p.drawRect(QRectF((mFirstViewedFrame - mMinFrame)*pixPerFrame, 0,
-               mFramesSpan*pixPerFrame, height()) );
+
+    p.fillRect(QRectF((mFirstViewedFrame - mMinFrame)*pixPerFrame, 0,
+               mFramesSpan*pixPerFrame, height()), col);
+
+    p.fillRect(-10, 0, 10, height(), QColor(30, 30, 30));
+    p.fillRect(width() - 40, 0, 30, height(), QColor(30, 30, 30));
 
     p.setPen(Qt::white);
 
@@ -85,7 +89,7 @@ void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
     qreal fullHeight = height();
     qreal maxX = width() + 20;
     while(xL < maxX ) {
-        p.drawLine(QPointF(xL, 0.), QPointF(xL, qorterHeight - 2 ));
+//        p.drawLine(QPointF(xL, 0.), QPointF(xL, qorterHeight - 2 ));
         p.drawText(QRectF(xL - inc, qorterHeight, 2*inc, halfHeight),
                    Qt::AlignCenter, QString::number(currentFrame));
         p.drawLine(QPointF(xL, threeFourthsHeight + 2),
@@ -94,14 +98,19 @@ void AnimatonWidgetScrollBar::paintEvent(QPaintEvent *)
         currentFrame += frameInc;
     }
 
-    p.setPen(QPen(Qt::white, 2.));
-    p.drawLine(1, 0, 1, fullHeight);
+//    p.setPen(QPen(Qt::white, 2.));
+//    p.drawLine(1, 0, 1, fullHeight);
 
+    p.setPen(QPen(Qt::white, 1.));
     if(!mRange) {
         p.drawText(QRectF(10, 0, 100, fullHeight),
                    Qt::AlignVCenter | Qt::AlignLeft,
                    QString::number(mFirstViewedFrame));
     }
+
+    p.setPen(QPen(Qt::black, 1.));
+    p.drawLine(0, height() - 1, width(), height() - 1);
+    p.drawLine(0, 0, width(), 0);
 
     p.end();
 }

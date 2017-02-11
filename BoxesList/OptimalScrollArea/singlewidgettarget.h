@@ -50,6 +50,10 @@ public:
         Q_UNUSED(rule);
         return parentSatisfies;
     }
+
+    void SWT_scheduleWidgetsContentUpdateWithRule(
+            const SWT_Rule &rule);
+
 protected:
     QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
 

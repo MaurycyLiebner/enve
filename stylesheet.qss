@@ -5,10 +5,11 @@ QWidget {
 }
 
 QMainWindow::separator {
-    background: rgb(0, 0, 0);
-    width: 10px;
-    height: 10px;
+    background: rgb(30, 30, 30);
+    width: 8px;
+    height: 8px;
 }
+
 QComboBox {
     background-color: rgb(200, 200, 200);
     border: 1px solid black;
@@ -49,27 +50,27 @@ QComboBox::drop-down:on {
 }
 
 QAbstractItemView {
-    background-color: rgb(200, 200, 200);
+    background-color: rgb(255, 255, 255);
     color: black;
     border: 1px solid black;
-    selection-background-color: rgb(255, 255, 255);
+    selection-background-color: rgb(200, 200, 200);
     selection-color: black;
 }
 
 QMenu {
-    background-color: rgb(200, 200, 200); /* sets background of the menu */
-    border: 1px solid rgb(170, 170, 170);
+    background-color: rgb(255, 255, 255);
+    border: 1px solid black;
 }
 
 QMenu::item {
-    spacing: 3px; /* spacing between menu bar items */
+    spacing: 3px;
     padding: 2px 25px 2px 25px;
     background: transparent;
-    border-radius: 4px;
+    color: black;
 }
 
-QMenu::item:selected { /* when user selects item using mouse or keyboard */
-    background-color: #a8a8a8;
+QMenu::item:selected {
+    background-color: rgb(200, 200, 200);
     color: black;
 }
 

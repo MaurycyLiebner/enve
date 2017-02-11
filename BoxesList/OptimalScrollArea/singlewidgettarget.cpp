@@ -44,6 +44,13 @@ void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
     }
 }
 
+void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
+        const SWT_Rule &rule) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        abs->scheduleWidgetContentUpdateIfIsCurrentRule(rule);
+    }
+}
+
 void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
         SingleWidgetTarget *target) {
     foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {

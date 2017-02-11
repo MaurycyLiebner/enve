@@ -21,11 +21,11 @@ void ChangeWidthWidget::updatePos()
 void ChangeWidthWidget::paintEvent(QPaintEvent *) {
     QPainter p(this);
     if(mPressed) {
-        p.fillRect(rect().adjusted(2, 0, -2, 0), Qt::black);
+        p.fillRect(rect().adjusted(3, 0, -4, 0), Qt::black);
     } else if(mHover) {
-        p.fillRect(rect().adjusted(3, 0, -3, 0), Qt::black);
-    } else {
         p.fillRect(rect().adjusted(4, 0, -4, 0), Qt::black);
+    } else {
+        p.fillRect(rect().adjusted(5, 0, -4, 0), Qt::black);
     }
     p.end();
 }
@@ -81,11 +81,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
     mFrameRangeScrollbar = new AnimatonWidgetScrollBar(20, 200,
-                                                       20, 30,
+                                                       20, 20,
                                                        true,
                                                        true, this);
     mAnimationWidgetScrollbar = new AnimatonWidgetScrollBar(1, 1,
-                                                            10, 30,
+                                                            10, 20,
                                                             false,
                                                             false, this);
 
@@ -203,19 +203,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
             this, SLOT(setCtrlsAlwaysVisible(bool)) );
 
     mControlButtonsLayout = new QHBoxLayout();
-    mControlButtonsWidget = new QLabel(this);
-    mControlButtonsWidget->setFixedHeight(30);
-    mControlButtonsWidget->setLayout(mControlButtonsLayout);
-    mControlButtonsWidget->setStyleSheet(
-                "QLabel {"
-                   "background-color: rgb(0, 0, 0);"
-                "}"
-                "QPushButton {"
-                   "qproperty-iconSize: 20px;"
-                   "border: 1px solid black;"
-                   "background-color: rgb(55, 55, 55);"
-                "}");
-
     mControlButtonsLayout->setSpacing(0);
     mControlButtonsLayout->setMargin(0);
 
@@ -239,7 +226,27 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mBoxesListKeysViewLayout = new QHBoxLayout();
     mKeysViewLayout = new QVBoxLayout();
 
-    mBoxesListLayout->addWidget(mControlButtonsWidget);
+    mBoxesListMenuBar = new QMenuBar(this);
+    mBoxesListMenuBar->setFixedHeight(20);
+    mBoxesListMenuBar->setStyleSheet("QMenuBar {"
+                                        "border-top: 1px solid black;"
+                                        "border-bottom: 1px solid black;"
+                                     "}"
+                                     "QMenuBar::item {"
+                                        "margin-top: 2px;"
+                                        "padding-top: 1px;"
+                                     "}");
+    QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
+    viewMenu->addAction("All", this, SLOT(setRuleNone()));
+    viewMenu->addAction("Selected", this, SLOT(setRuleSelected()));
+    viewMenu->addAction("Animated", this, SLOT(setRuleAnimated()));
+    viewMenu->addAction("Not Animated", this, SLOT(setRuleNotAnimated()));
+    viewMenu->addAction("Visible", this, SLOT(setRuleVisible()));
+    viewMenu->addAction("Invisible", this, SLOT(setRuleInvisible()));
+    viewMenu->addAction("Unlocked", this, SLOT(setRuleUnloced()));
+    viewMenu->addAction("Locked", this, SLOT(setRuleLocked()));
+
+    mBoxesListLayout->addWidget(mBoxesListMenuBar);
     mBoxesListLayout->addWidget(mBoxesListScrollArea);
 
     mBoxesListKeysViewLayout->addLayout(mBoxesListLayout);
@@ -257,8 +264,10 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mKeysViewLayout->addWidget(mAnimationDockWidget);
     mAnimationDockWidget->hide();
 
-    mMainLayout->addLayout(mBoxesListKeysViewLayout);
 
+    mMainLayout->addLayout(mControlButtonsLayout);
+
+    mMainLayout->addLayout(mBoxesListKeysViewLayout);
 
     mMainLayout->addWidget(mFrameRangeScrollbar);
 
@@ -267,6 +276,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesListScrollArea,
                                                     this);
     mBoxesListScrollArea->setFixedWidth(400);
+    mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum,
+                                     QSizePolicy::Fixed);
     chww->updatePos();
 
     mFrameRangeScrollbar->raise();
@@ -376,4 +387,44 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
             mMainWindow, SLOT(setResolutionPercentId(int)));
 
     mBoxesListWidget->setMainTarget(canvas);
+}
+
+void BoxesListAnimationDockWidget::setRuleNone() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_NoRule);
+}
+
+void BoxesListAnimationDockWidget::setRuleSelected() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_Selected);
+}
+
+void BoxesListAnimationDockWidget::setRuleAnimated() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_Animated);
+}
+
+void BoxesListAnimationDockWidget::setRuleNotAnimated() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_NotAnimated);
+}
+
+void BoxesListAnimationDockWidget::setRuleVisible() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_Visible);
+}
+
+void BoxesListAnimationDockWidget::setRuleInvisible() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_Invisible);
+}
+
+void BoxesListAnimationDockWidget::setRuleUnloced() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_Unlocked);
+}
+
+void BoxesListAnimationDockWidget::setRuleLocked() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_Locked);
 }

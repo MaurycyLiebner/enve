@@ -332,6 +332,8 @@ public:
             return isSelected() || parentSatisfies;
         } else if(rule == SWT_Animated) {
             return isAnimated() || parentSatisfies;
+        } else if(rule == SWT_NotAnimated) {
+            return !isAnimated() || parentSatisfies;
         } else if(rule == SWT_Visible) {
             return isVisible() || parentSatisfies;
         } else if(rule == SWT_Invisible) {

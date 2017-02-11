@@ -50,12 +50,13 @@ void ScrollWidget::setMainTarget(SingleWidgetTarget *target) {
     updateAbstraction();
 }
 
-#include <QDebug>
 void ScrollWidget::updateHeight() {
     if(mMainAbstraction == NULL) {
         hide();
         return;
     }
-    setFixedHeight(mMainAbstraction->getHeight());
+    setFixedHeight(mMainAbstraction->getHeight(
+                       mVisiblePartWidget->getCurrentRule(),
+                       false) + 2);
     if(isHidden()) show();
 }

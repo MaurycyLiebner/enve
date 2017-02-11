@@ -42,6 +42,14 @@ public:
     static void removeInstance(ScrollWidgetVisiblePart *instance);
 
     void setCurrentRule(const SWT_Rule &rule);
+
+    void scheduleContentUpdateIfIsCurrentRule(const SWT_Rule &rule);
+    bool isCurrentRule(const SWT_Rule &rule);
+
+    SWT_Rule getCurrentRule() {
+        return mCurrentRule;
+    }
+
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 

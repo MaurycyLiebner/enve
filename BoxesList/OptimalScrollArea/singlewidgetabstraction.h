@@ -1,4 +1,4 @@
-#ifndef SINGLEWIDGETABSTRACTION_H
+﻿#ifndef SINGLEWIDGETABSTRACTION_H
 #define SINGLEWIDGETABSTRACTION_H
 
 #include <QWidget>
@@ -21,7 +21,8 @@ public:
                                      const SWT_Rule &rule,
                                      const bool &parentSatisfiesRule);
 
-    int getHeight();
+    int getHeight(const SWT_Rule &rule,
+                  const bool &parentSatisfiesRule);
 
     void setContentVisible(const bool &bT);
 
@@ -55,6 +56,9 @@ public:
     ScrollWidgetVisiblePart *getParentVisiblePartWidget() {
         return mVisiblePartWidget;
     }
+
+    void scheduleWidgetContentUpdateIfIsCurrentRule(
+            const SWT_Rule &rule);
 
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
