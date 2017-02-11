@@ -319,13 +319,33 @@ public:
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
-    SingleWidgetTargetType SWT_getType() { return SWT_BoundingBox; }
+    SWT_Type SWT_getType() { return SWT_BoundingBox; }
 
-    SingleWidgetAbstraction *getTargetAbstraction() {
-        return mSelectedAbstraction; // is timeline abstraction for canvas
+    SingleWidgetAbstraction *SWT_getAbstractionForWidget(
+            ScrollWidgetVisiblePart *visiblePartWidget);
+
+    bool SWT_satisfiesRule(const bool &parentSatisfies,
+                           const SWT_Rule &rule) {
+        if(rule == SWT_NoRule) {
+            return true;
+        } else if(rule == SWT_Selected) {
+            return isSelected() || parentSatisfies;
+        } else if(rule == SWT_Animated) {
+            return isAnimated() || parentSatisfies;
+        } else if(rule == SWT_Visible) {
+            return isVisible() || parentSatisfies;
+        } else if(rule == SWT_Invisible) {
+            return !isVisible() || parentSatisfies;
+        } else if(rule == SWT_Locked) {
+            return isLocked() || parentSatisfies;
+        } else if(rule == SWT_Unlocked) {
+            return !isLocked() || parentSatisfies;
+        }
+        return false;
     }
 protected:
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
+    SingleWidgetAbstraction *mTimelineAbstraction = NULL;
 
     bool mCenterPivotScheduled = false;
     QPointF mPreviewDrawPos;

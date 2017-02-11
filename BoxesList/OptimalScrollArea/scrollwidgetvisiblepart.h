@@ -7,6 +7,8 @@ class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidget;
 
+enum SWT_Rule : short;
+
 class ScrollWidgetVisiblePart :
         public QWidget {
     Q_OBJECT
@@ -39,9 +41,11 @@ public:
     static void addInstance(ScrollWidgetVisiblePart *instance);
     static void removeInstance(ScrollWidgetVisiblePart *instance);
 
-    void setSkipMainAbstraction(const bool &bT);
+    void setCurrentRule(const SWT_Rule &rule);
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
+
+    SWT_Rule mCurrentRule;
 
     bool mVisibleWidgetsContentUpdateScheduled = false;
     bool mParentHeightUpdateScheduled = false;
@@ -55,7 +59,6 @@ protected:
     QVBoxLayout *mLayout;
     int mVisibleTop = 0;
     int mVisibleHeight = 0;
-    bool mSkipMainAbstraction = false;
 };
 
 

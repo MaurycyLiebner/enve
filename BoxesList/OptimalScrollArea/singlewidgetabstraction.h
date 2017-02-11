@@ -6,6 +6,8 @@ class SingleWidgetTarget;
 class SingleWidget;
 class ScrollWidgetVisiblePart;
 
+enum SWT_Rule : short;
+
 class SingleWidgetAbstraction {
 public:
     SingleWidgetAbstraction(SingleWidgetTarget *target,
@@ -15,7 +17,9 @@ public:
     bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
                                      int currY, int currX,
                                      QList<SingleWidget*> *widgets,
-                                     int *currentWidgetId);
+                                     int *currentWidgetId,
+                                     const SWT_Rule &rule,
+                                     const bool &parentSatisfiesRule);
 
     int getHeight();
 
@@ -26,15 +30,36 @@ public:
     }
 
     void addChildAbstractionForTarget(SingleWidgetTarget *target);
+    void addChildAbstractionForTargetAt(
+            SingleWidgetTarget *target,
+            const int &id);
     void addChildAbstraction(SingleWidgetAbstraction *abs);
+    void addChildAbstractionAt(SingleWidgetAbstraction *abs,
+                             const int &id);
+
     void removeChildAbstractionForTarget(SingleWidgetTarget *target);
+    void removeChildAbstraction(SingleWidgetAbstraction *abs);
 
     void switchContentVisible();
 
     bool contentVisible();
+
+    bool isDeletable() {
+        return mDeletable;
+    }
+
+    void setDeletable(const bool &bT) {
+        mDeletable = bT;
+    }
+
+    ScrollWidgetVisiblePart *getParentVisiblePartWidget() {
+        return mVisiblePartWidget;
+    }
+
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 
+    bool mDeletable = true;
     bool mContentVisible = false;
     SingleWidgetTarget *mTarget;
 

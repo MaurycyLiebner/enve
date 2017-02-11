@@ -101,7 +101,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     mBoxesListScrollArea = new ScrollArea(this);
     mBoxesListWidget = new BoxScrollWidget(mBoxesListScrollArea);
-    mBoxesListWidget->getVisiblePartWidget()->setSkipMainAbstraction(true);
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
 
     connect(mBoxesListScrollArea->verticalScrollBar(),

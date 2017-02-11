@@ -228,7 +228,16 @@ public:
                                            QPointF *drawPos);
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
-    SingleWidgetTargetType SWT_getType() { return SWT_BoxesGroup; }
+    SWT_Type SWT_getType() { return SWT_BoxesGroup; }
+
+    bool SWT_satisfiesRule(const bool &parentSatisfies,
+                           const SWT_Rule &rule) {
+        if(rule == SWT_Selected) {
+            return (isSelected() || parentSatisfies) && !isCurrentGroup();
+        }
+        return BoundingBox::SWT_satisfiesRule(parentSatisfies,
+                                              rule);
+    }
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

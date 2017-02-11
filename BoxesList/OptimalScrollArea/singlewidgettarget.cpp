@@ -37,6 +37,13 @@ void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
     }
 }
 
+void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
+        SingleWidgetTarget *target, const int &id) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        abs->addChildAbstractionForTargetAt(target, id);
+    }
+}
+
 void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
         SingleWidgetTarget *target) {
     foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {

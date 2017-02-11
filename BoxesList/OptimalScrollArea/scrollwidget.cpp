@@ -11,12 +11,14 @@ ScrollWidget::ScrollWidget(QWidget *parent) :
 
 void ScrollWidget::updateAbstraction() {
     if(mMainAbstraction != NULL) {
-        delete mMainAbstraction;
+        if(mMainAbstraction->isDeletable()) {
+            delete mMainAbstraction;
+        }
     }
     if(mMainTarget == NULL) {
         mMainAbstraction = NULL;
     } else {
-        mMainAbstraction = mMainTarget->SWT_createAbstraction(
+        mMainAbstraction = mMainTarget->SWT_getAbstractionForWidget(
                     mVisiblePartWidget);
     }
     mVisiblePartWidget->setMainAbstraction(mMainAbstraction);

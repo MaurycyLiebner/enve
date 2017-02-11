@@ -5,6 +5,7 @@
 #include "ctrlpoint.h"
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
+#include "BoxesList/boxscrollwidget.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -34,7 +35,7 @@ void BoxesGroup::updateAllBoxes() {
 
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     BoundingBox(BoundingBoxType::TYPE_CANVAS)
-{
+{   
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
@@ -1481,6 +1482,6 @@ void BoxesGroup::SWT_addChildrenAbstractions(
 
     foreach(BoundingBox *child, mChildBoxes) {
         abstraction->addChildAbstraction(
-                    child->SWT_createAbstraction(visiblePartWidget));
+                    child->SWT_getAbstractionForWidget(visiblePartWidget));
     }
 }

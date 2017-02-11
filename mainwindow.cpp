@@ -98,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(mObjectSettingsScrollArea);
     mObjectSettingsScrollArea->setWidget(mObjectSettingsWidget);
+    mObjectSettingsWidget->getVisiblePartWidget()->setCurrentRule(SWT_Selected);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),
@@ -245,11 +246,16 @@ void MainWindow::setupMenuBar() {
 }
 
 void MainWindow::updateSettingsForCurrentCanvas() {
-    if(mCanvasWidget->hasNoCanvas()) return;
+    if(mCanvasWidget->hasNoCanvas()) {
+        mObjectSettingsWidget->setMainTarget(NULL);
+        return;
+    }
     Canvas *canvas = mCanvasWidget->getCurrentCanvas();
     mActionHighQualityView->setChecked(canvas->highQualityPaint());
     mActionEffectsPaintEnabled->setChecked(canvas->effectsPaintEnabled());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
+    mObjectSettingsWidget->setMainTarget(
+                canvas->getCurrentBoxesGroup());
 }
 
 void MainWindow::setupToolBar() {
@@ -690,7 +696,9 @@ void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
 
 void MainWindow::setCurrentBox(BoundingBox *box) {
     setCurrentShapesMenuBox(box);
-    setCurrentObjectSettingsWidgetBox(box);
+    mObjectSettingsWidget->getVisiblePartWidget()->
+            updateVisibleWidgetsContent();
+    //setCurrentObjectSettingsWidgetBox(box);
 }
 
 void MainWindow::updateDisplayedShapesInMenu() {

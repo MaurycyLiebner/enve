@@ -54,7 +54,7 @@ public:
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
-    SingleWidgetTargetType SWT_getType() { return SWT_ComplexAnimator; }
+    SWT_Type SWT_getType() { return SWT_ComplexAnimator; }
     void drawKey(QPainter *p, QrealKey *key,
                  const qreal &pixelsPerFrame,
                  const qreal &drawY, const int &startFrame);

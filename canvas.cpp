@@ -184,13 +184,15 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     }
     return true;
 }
-
+#include "BoxesList/boxscrollwidget.h"
 void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     mCurrentBoxesGroup->setIsCurrentGroup(false);
     clearAllPathsSelection();
     clearAllPointsSelection();
     mCurrentBoxesGroup = group;
     group->setIsCurrentGroup(true);
+
+    mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
 }
 
 void Canvas::rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans)

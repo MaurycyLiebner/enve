@@ -57,7 +57,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     SingleWidget::setTargetAbstraction(abs);
     SingleWidgetTarget *target = abs->getTarget();
-    const SingleWidgetTargetType &type = target->SWT_getType();
+    const SWT_Type &type = target->SWT_getType();
 
     if(type == SWT_BoundingBox) {
         BoundingBox *bb_target = (BoundingBox*)target;
@@ -143,7 +143,7 @@ void BoxSingleWidget::loadStaticPixmaps() {
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
 {
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SingleWidgetTargetType &type = target->SWT_getType();
+    const SWT_Type &type = target->SWT_getType();
     if(event->button() == Qt::RightButton) {
         QMenu menu(this);
 
@@ -183,7 +183,7 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e)
 
 void BoxSingleWidget::rename() {
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SingleWidgetTargetType &type = target->SWT_getType();
+    const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
@@ -203,7 +203,7 @@ void BoxSingleWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
                              int minViewedFrame, int maxViewedFrame) {
     if(isHidden()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SingleWidgetTargetType &type = target->SWT_getType();
+    const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
@@ -224,7 +224,7 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
                                        const int &minViewedFrame) {
     if(isHidden()) return NULL;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SingleWidgetTargetType &type = target->SWT_getType();
+    const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
@@ -247,7 +247,7 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
                                     QList<QrealKey *> *listKeys) {
     if(isHidden()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SingleWidgetTargetType &type = target->SWT_getType();
+    const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
@@ -271,7 +271,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(mTarget == NULL) return;
     QPainter p(this);
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SingleWidgetTargetType &type = target->SWT_getType();
+    const SWT_Type &type = target->SWT_getType();
 
     int nameX;
     if(type == SWT_BoundingBox ||

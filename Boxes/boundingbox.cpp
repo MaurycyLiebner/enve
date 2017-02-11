@@ -12,6 +12,18 @@
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     QObject(), Transformable()
 {
+    mSelectedAbstraction = SWT_createAbstraction(
+            MainWindow::getInstance()->
+                getObjectSettingsList()->getVisiblePartWidget());
+    mSelectedAbstraction->setDeletable(false);
+    //mSelectedAbstraction->setContentVisible(true);
+
+    mTimelineAbstraction = SWT_createAbstraction(
+            MainWindow::getInstance()->
+                getBoxesList()->getVisiblePartWidget());
+    mTimelineAbstraction->setDeletable(false);
+    //mTimelineAbstraction->setContentVisible(true);
+
     mEffectsAnimators.blockPointer();
     mEffectsAnimators.setName("effects");
     mEffectsAnimators.setUpdater(new PixmapEffectUpdater(this));
@@ -27,18 +39,20 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mTransformAnimator.reset();
     mCombinedTransformMatrix.reset();
     updateCombinedTransform();
-
-    mSelectedAbstraction = SWT_createAbstraction(
-            MainWindow::getInstance()->
-                getObjectSettingsList()->getVisiblePartWidget());
-    mSelectedAbstraction->setContentVisible(true);
 }
 
 BoundingBox::BoundingBox(BoundingBoxType type) :
     Transformable() {
+    mTimelineAbstraction = SWT_createAbstraction(
+            MainWindow::getInstance()->
+                getBoxesList()->getVisiblePartWidget());
+    mTimelineAbstraction->setDeletable(false);
+
     mSelectedAbstraction = SWT_createAbstraction(
-            MainWindow::getInstance()->getBoxesList()->
-                getVisiblePartWidget());
+            MainWindow::getInstance()->
+                getObjectSettingsList()->getVisiblePartWidget());
+    mSelectedAbstraction->setDeletable(false);
+
     mType = type;
     mTransformAnimator.reset();
     mCombinedTransformMatrix.reset();
@@ -46,6 +60,17 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 
 BoundingBox::~BoundingBox() {
     delete mSelectedAbstraction;
+    delete mTimelineAbstraction;
+}
+
+SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
+            ScrollWidgetVisiblePart *visiblePartWidget) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
+            return abs;
+        }
+    }
+    return SWT_createAbstraction(visiblePartWidget);
 }
 
 #include "linkbox.h"
@@ -910,7 +935,9 @@ void BoundingBox::addActiveAnimator(QrealAnimator *animator)
 {
     mActiveAnimators << animator;
     emit addActiveAnimatorSignal(animator);
-    SWT_addChildAbstractionForTargetToAll(animator);
+    //SWT_addChildAbstractionForTargetToAll(animator);
+    SWT_addChildAbstractionForTargetToAllAt(animator,
+                                            mActiveAnimators.count() - 1);
 }
 
 void BoundingBox::removeActiveAnimator(QrealAnimator *animator)

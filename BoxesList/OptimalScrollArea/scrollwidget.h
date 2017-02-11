@@ -17,7 +17,6 @@ public:
     explicit ScrollWidget(QWidget *parent = 0);
 
     void updateHeight();
-    void updateAfterContentChange();
     void setMainTarget(SingleWidgetTarget *target);
     virtual void updateAbstraction();
 signals:

@@ -10,7 +10,8 @@ void BoxScrollWidget::updateAbstraction() {
     if(mMainTarget == NULL) {
         mMainAbstraction = NULL;
     } else {
-        mMainAbstraction = ((BoundingBox*)mMainTarget)->getTargetAbstraction();
+        mMainAbstraction = ((BoundingBox*)mMainTarget)->
+                SWT_getAbstractionForWidget(mVisiblePartWidget);
     }
     mVisiblePartWidget->setMainAbstraction(mMainAbstraction);
     updateHeight();

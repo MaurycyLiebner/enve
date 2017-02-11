@@ -11,7 +11,9 @@ SingleWidgetAbstraction::SingleWidgetAbstraction(
 }
 
 SingleWidgetAbstraction::~SingleWidgetAbstraction() {
-    mTarget->SWT_removeAbstractionFromList(this);
+    if(mTarget != NULL) {
+        mTarget->SWT_removeAbstractionFromList(this);
+    }
     foreach(SingleWidgetAbstraction *abs, mChildren) {
         delete abs;
     }
@@ -21,11 +23,15 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         const int &minY, const int &maxY,
         int currY, int currX,
         QList<SingleWidget *> *widgets,
-        int *currentWidgetId) { // returns whether should abort
+        int *currentWidgetId,
+        const SWT_Rule &rule,
+        const bool &parentSatisfiesRule) { // returns whether should abort
     int thisHeight = getHeight();
     if(currY + thisHeight < minY) return false;
     if(currY > maxY) return true;
-    if(currY > minY) {
+    bool satisfiesRule = mTarget->SWT_satisfiesRule(parentSatisfiesRule,
+                                                    rule);
+    if(currY > minY && satisfiesRule) {
         if(*currentWidgetId < widgets->count()) {
             SingleWidget *currWidget = widgets->at(*currentWidgetId);
             int currWx = currWidget->x();
@@ -35,14 +41,18 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
             *currentWidgetId = *currentWidgetId + 1;
         }
     }
-    currX += 20;
     if(mContentVisible) {
-        currY += 20;
+        if(satisfiesRule) {
+            currX += 20;
+            currY += 20;
+        }
         foreach(SingleWidgetAbstraction *abs, mChildren) {
             if(abs->setSingleWidgetAbstractions(minY, maxY,
                                                 currY, currX,
                                                 widgets,
-                                                currentWidgetId) ) {
+                                                currentWidgetId,
+                                                rule,
+                                                satisfiesRule) ) {
                 return true;
             }
             currY += abs->getHeight();
@@ -74,6 +84,16 @@ void SingleWidgetAbstraction::addChildAbstraction(
     }
 }
 
+void SingleWidgetAbstraction::addChildAbstractionAt(
+        SingleWidgetAbstraction *abs, const int &id) {
+    mChildren.insert(id, abs);
+
+    if(mContentVisible) {
+        mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
+        mVisiblePartWidget->scheduleUpdateParentHeight();
+    }
+}
+
 void SingleWidgetAbstraction::removeChildAbstractionForTarget(
         SingleWidgetTarget *target) {
     SingleWidgetAbstraction *abstraction;
@@ -82,8 +102,15 @@ void SingleWidgetAbstraction::removeChildAbstractionForTarget(
             abstraction = abs;
         }
     }
-    mChildren.removeOne(abstraction);
-    delete abstraction;
+    removeChildAbstraction(abstraction);
+}
+
+void SingleWidgetAbstraction::removeChildAbstraction(
+        SingleWidgetAbstraction *abs) {
+    mChildren.removeOne(abs);
+    if(abs->isDeletable()) {
+        delete abs;
+    }
 
     if(mContentVisible) {
         mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
@@ -108,5 +135,14 @@ void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
 
 void SingleWidgetAbstraction::addChildAbstractionForTarget(
         SingleWidgetTarget *target) {
-    addChildAbstraction(target->SWT_createAbstraction(mVisiblePartWidget));
+    addChildAbstraction(
+                target->SWT_getAbstractionForWidget(mVisiblePartWidget));
+}
+
+void SingleWidgetAbstraction::addChildAbstractionForTargetAt(
+        SingleWidgetTarget *target, const int &id) {
+    addChildAbstractionAt(
+                target->SWT_getAbstractionForWidget(mVisiblePartWidget),
+                id);
+
 }

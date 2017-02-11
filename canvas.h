@@ -352,6 +352,18 @@ public:
     }
 
     bool isPreviewing() { return mPreviewing; }
+
+    bool SWT_satisfiesRule(const bool &parentSatisfies,
+                           const SWT_Rule &rule) {
+        Q_UNUSED(parentSatisfies);
+        Q_UNUSED(rule);
+        return false;
+    }
+
+    BoxesGroup *getCurrentBoxesGroup() {
+        return mCurrentBoxesGroup;
+    }
+
 protected:
 //    void updateAfterCombinedTransformationChanged();
 

@@ -3,12 +3,14 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidget.h"
 #include "scrollwidget.h"
+#include "singlewidgettarget.h"
 
 QList<ScrollWidgetVisiblePart*> ScrollWidgetVisiblePart::mAllInstances;
 
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(
         ScrollWidget *parent) :
     QWidget(parent) {
+    mCurrentRule = SWT_NoRule;
     mParentWidget = parent;
     addInstance(this);
 }
@@ -61,8 +63,9 @@ void ScrollWidgetVisiblePart::removeInstance(
     mAllInstances.removeOne(instance);
 }
 
-void ScrollWidgetVisiblePart::setSkipMainAbstraction(const bool &bT) {
-    mSkipMainAbstraction = bT;
+void ScrollWidgetVisiblePart::setCurrentRule(const SWT_Rule &rule) {
+    mCurrentRule = rule;
+    updateVisibleWidgetsContent();
 }
 
 void ScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
@@ -118,18 +121,21 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     int idP = 0;
     int currX;
     int currY;
-    if(mSkipMainAbstraction) {
-        currX = -20;
-        currY = -10;
-    } else {
+//    if(mSkipMainAbstraction) {
+//        currX = -20;
+//        currY = -10;
+//    } else {
         currX = 0;
         currY = 10;
-    }
-    mMainAbstraction->setSingleWidgetAbstractions(mVisibleTop,
-                                                  mVisibleTop + mVisibleHeight + 10,
-                                                  currY, currX,
-                                                  &mSingleWidgets,
-                                                  &idP);
+//    }
+    mMainAbstraction->setSingleWidgetAbstractions(
+                mVisibleTop,
+                mVisibleTop + mVisibleHeight + 10,
+                currY, currX,
+                &mSingleWidgets,
+                &idP,
+                mCurrentRule,
+                true);
 
     for(int i = idP; i < mSingleWidgets.count(); i++) {
         mSingleWidgets.at(i)->hide();

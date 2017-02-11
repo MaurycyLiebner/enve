@@ -4,11 +4,23 @@
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
 
-enum SingleWidgetTargetType {
+enum SWT_Type : short {
     SWT_BoundingBox,
     SWT_BoxesGroup,
     SWT_QrealAnimator,
-    SWT_ComplexAnimator
+    SWT_ComplexAnimator,
+    SWT_Canvas
+};
+
+enum SWT_Rule : short {
+    SWT_NoRule,
+    SWT_Selected,
+    SWT_Visible,
+    SWT_Invisible,
+    SWT_Locked,
+    SWT_Unlocked,
+    SWT_Animated,
+    SWT_NotAnimated
 };
 
 class SingleWidgetTarget {
@@ -24,8 +36,20 @@ public:
             SingleWidgetAbstraction *,
             ScrollWidgetVisiblePart *) {}
 
-    virtual SingleWidgetTargetType SWT_getType() = 0;
+    virtual SWT_Type SWT_getType() = 0;
 
+    virtual SingleWidgetAbstraction* SWT_getAbstractionForWidget(
+            ScrollWidgetVisiblePart *visiblePartWidget) {
+        return SWT_createAbstraction(visiblePartWidget);
+    }
+    void SWT_addChildAbstractionForTargetToAllAt(
+            SingleWidgetTarget *target, const int &id);
+
+    virtual bool SWT_satisfiesRule(const bool &parentSatisfies,
+                                   const SWT_Rule &rule) {
+        Q_UNUSED(rule);
+        return parentSatisfies;
+    }
 protected:
     QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
 
