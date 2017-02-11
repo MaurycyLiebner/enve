@@ -173,7 +173,7 @@ void BoundingBox::preUpdatePixmapsUpdates() {
 }
 
 void BoundingBox::updatePixmaps() {
-    if(mParent == NULL) return;
+    if(mUpdateDisabled) return;
     if(mRedoUpdate) {
         mRedoUpdate = false;
         updateUpdateTransform();
@@ -193,7 +193,7 @@ void BoundingBox::updatePixmaps() {
         mHighQualityPaint = false;
     }
 
-    if(mParent != NULL) mParent->awaitUpdate();
+    mParent->awaitUpdate();
 }
 
 void BoundingBox::updateUpdateTransform() {
@@ -496,7 +496,6 @@ void BoundingBox::drawPixmap(QPainter *p) {
 }
 
 void BoundingBox::awaitUpdate() {
-    if(mParent == NULL) return;
     if(mAwaitingUpdate) return;
     setAwaitingUpdate(true);
     mMainWindow->addBoxAwaitingUpdate(this);
@@ -504,7 +503,7 @@ void BoundingBox::awaitUpdate() {
 
 #include "updatescheduler.h"
 void BoundingBox::scheduleAwaitUpdate() {
-    if(mParent == NULL) return;
+    if(mUpdateDisabled) return;
     if(mAwaitingUpdate) {
         redoUpdate();
     } else {
@@ -540,7 +539,6 @@ void BoundingBox::updateEffectsMargin() {
 void BoundingBox::scheduleEffectsMarginUpdate() {
     scheduleAwaitUpdate();
     mEffectsMarginUpdateNeeded = true;
-    if(mParent == NULL) return;
     mParent->scheduleEffectsMarginUpdate();
 }
 
@@ -645,7 +643,8 @@ void BoundingBox::select() {
     mSelected = true;
 }
 
-void BoundingBox::addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container) {
+void BoundingBox::addAllAnimatorsToBoxItemWidgetContainer(
+        BoxItemWidgetContainer *container) {
     foreach(QrealAnimator *animator, mActiveAnimators) {
         container->addAnimatorWidgetForAnimator(animator);
     }
@@ -851,23 +850,21 @@ void BoundingBox::updateRelativeTransform() {
 }
 
 void BoundingBox::updateCombinedTransform() {
-    if(mParent == NULL) {
-        updateAfterCombinedTransformationChanged();
-    } else {
-        mCombinedTransformMatrix = mRelativeTransformMatrix*
-                mParent->getCombinedTransform();
+    mCombinedTransformMatrix = mRelativeTransformMatrix*
+            mParent->getCombinedTransform();
 
 
-        updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged();
 
-        scheduleAwaitUpdate();
-        updateUglyPaintTransform();
-    }
+    scheduleAwaitUpdate();
+    updateUglyPaintTransform();
 }
 
 void BoundingBox::updateUglyPaintTransform() {
-    mUglyPaintTransform = mOldTransform.inverted()*mCombinedTransformMatrix;
-    mOldAllUglyPaintTransform = mOldAllUglyTransform.inverted()*mCombinedTransformMatrix;
+    mUglyPaintTransform = mOldTransform.inverted()*
+            mCombinedTransformMatrix;
+    mOldAllUglyPaintTransform = mOldAllUglyTransform.inverted()*
+            mCombinedTransformMatrix;
 }
 
 TransformAnimator *BoundingBox::getTransformAnimator() {
@@ -875,13 +872,11 @@ TransformAnimator *BoundingBox::getTransformAnimator() {
 }
 
 QMatrix BoundingBox::getCombinedRenderTransform() {
-    if(mParent == NULL) return QMatrix();
     return mTransformAnimator.getCurrentValue()*
             mParent->getCombinedRenderTransform();
 }
 
 QMatrix BoundingBox::getCombinedFinalRenderTransform() {
-    if(mParent == NULL) return QMatrix();
     return mTransformAnimator.getCurrentValue()*
             mParent->getCombinedFinalRenderTransform();
 }

@@ -269,7 +269,7 @@ public:
 
     virtual void updateEffectsMargin();
 
-    void scheduleEffectsMarginUpdate();
+    virtual void scheduleEffectsMarginUpdate();
     void updateEffectsMarginIfNeeded();
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
@@ -343,7 +343,14 @@ public:
         }
         return false;
     }
+
+    void setUpdateDisabled(const bool &bT) {
+        mUpdateDisabled = bT;
+    }
+
 protected:
+    bool mUpdateDisabled = false;
+
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
     SingleWidgetAbstraction *mTimelineAbstraction = NULL;
 

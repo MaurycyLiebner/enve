@@ -176,7 +176,9 @@ void AnimatonWidgetScrollBar::mouseMoveEvent(QMouseEvent *event)
 {
     qreal newFrame = posToFrame(event->x() );
     int moveFrame = qRound(newFrame - mLastMousePressFrame);
-    if(setFirstViewedFrame(mSavedFirstFrame + moveFrame) ) {
+    if(setFirstViewedFrame(clampInt2(mSavedFirstFrame + moveFrame,
+                                     mMinFrame,
+                                     mMaxFrame)) ) {
         emitChange();
         repaint();
     }

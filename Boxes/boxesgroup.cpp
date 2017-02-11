@@ -1356,7 +1356,10 @@ void BoxesGroup::addChild(BoundingBox *child) {
     addChildToListAt(mChildBoxes.count(), child);
 }
 
-void BoxesGroup::addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo) {
+void BoxesGroup::addChildToListAt(int index,
+                                  BoundingBox *child,
+                                  bool saveUndoRedo) {
+    child->setUpdateDisabled(false);
     mChildBoxes.insert(index, child);
     updateChildrenId(index, saveUndoRedo);
     if(saveUndoRedo) {
@@ -1384,6 +1387,7 @@ void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
 void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
 {
     BoundingBox *box = mChildBoxes.at(id);
+    box->setUpdateDisabled(true);
     if(box->isSelected()) {
         removeBoxFromSelection(box);
     }
@@ -1415,7 +1419,7 @@ void BoxesGroup::removeChild(BoundingBox *child)
         return;
     }
     removeChildFromList(index);
-    child->setParent(NULL);
+    //child->setParent(NULL);
     if(!mPivotChanged) centerPivotPosition();
 }
 

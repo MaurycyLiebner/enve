@@ -364,6 +364,10 @@ public:
         return mCurrentBoxesGroup;
     }
 
+    void updateCombinedTransform() {
+        updateAfterCombinedTransformationChanged();
+    }
+    void scheduleEffectsMarginUpdate() {}
 protected:
 //    void updateAfterCombinedTransformationChanged();
 
