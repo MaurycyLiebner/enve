@@ -23,6 +23,8 @@ enum SWT_Rule : short {
     SWT_NotAnimated
 };
 
+enum SWT_Target : short;
+
 struct SWT_RulesCollection;
 
 class SingleWidgetTarget {
@@ -56,6 +58,17 @@ public:
     void SWT_scheduleWidgetsContentUpdateWithRule(
             const SWT_Rule &rule);
 
+    virtual bool SWT_isMainTarget(const SWT_RulesCollection &rules) {
+        Q_UNUSED(rules);
+        return false;
+    }
+
+    virtual bool SWT_visibleOnlyIfParentDescendant() {
+        return true;
+    }
+
+    void SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
+    void SWT_scheduleWidgetsContentUpdateWithTarget(const SWT_Target &target);
 protected:
     QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
 

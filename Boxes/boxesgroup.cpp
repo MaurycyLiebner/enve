@@ -1501,3 +1501,10 @@ bool BoxesGroup::SWT_satisfiesRule(const SWT_RulesCollection &rules,
     return BoundingBox::SWT_satisfiesRule(rules,
                                           parentSatisfies);
 }
+
+bool BoxesGroup::SWT_isMainTarget(const SWT_RulesCollection &rules) {
+    if(rules.target == SWT_CurrentGroup) {
+        return mIsCurrentGroup;
+    }
+    return false;
+}

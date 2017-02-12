@@ -98,7 +98,10 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(mObjectSettingsScrollArea);
     mObjectSettingsScrollArea->setWidget(mObjectSettingsWidget);
-    mObjectSettingsWidget->getVisiblePartWidget()->setCurrentRule(SWT_Selected);
+    mObjectSettingsWidget->getVisiblePartWidget()->
+            setCurrentRule(SWT_Selected);
+    mObjectSettingsWidget->getVisiblePartWidget()->
+            setCurrentTarget(SWT_CurrentGroup);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),

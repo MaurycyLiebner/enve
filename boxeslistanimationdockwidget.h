@@ -15,6 +15,8 @@
 #include <QScrollBar>
 #include <QComboBox>
 #include <QMenuBar>
+#include <QLineEdit>
+#include <QWidgetAction>
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 
 class ChangeWidthWidget : public QWidget
@@ -67,6 +69,12 @@ public slots:
     void setRuleInvisible();
     void setRuleUnloced();
     void setRuleLocked();
+
+    void setTargetAll();
+    void setTargetCurrentCanvas();
+    void setTargetCurrentGroup();
+
+    void setSearchText(const QString &text);
 signals:
     void visibleRangeChanged(int, int);
 private slots:
@@ -79,7 +87,10 @@ private slots:
     void setAllPointsRecord(bool allPointsRecord);
     void moveSlider(int val);
 private:
+    QHBoxLayout *mBoxesListMenuLayout;
+    QLineEdit *mSearchLine;
     QMenuBar *mBoxesListMenuBar;
+
     ScrollArea *mBoxesListScrollArea;
 
     MainWindow *mMainWindow;

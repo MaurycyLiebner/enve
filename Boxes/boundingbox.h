@@ -331,6 +331,9 @@ public:
         mUpdateDisabled = bT;
     }
 
+    bool SWT_visibleOnlyIfParentDescendant() {
+        return false;
+    }
 protected:
     bool mUpdateDisabled = false;
 

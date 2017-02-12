@@ -355,6 +355,7 @@ public:
 
     bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
                            const bool &parentSatisfies);
+    virtual bool SWT_isMainTarget(const SWT_RulesCollection &rules);
 
     BoxesGroup *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
@@ -413,6 +414,8 @@ public:
     BoundingBox *createLink(BoxesGroup *parent);
     void createImageBox(const QString &path);
 private:
+    bool mIsCurrentCanvas = true;
+
     bool mPivotVisibleDuringPointEdit = true;
     bool mEffectsPaintEnabled;
     qreal mResolutionPercent;

@@ -51,6 +51,19 @@ void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
     }
 }
 
+void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithTarget(
+        const SWT_Target &target) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        abs->scheduleWidgetContentUpdateIfIsCurrentTarget(target);
+    }
+}
+
+void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty() {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        abs->scheduleWidgetContentUpdateIfSearchNotEmpty();
+    }
+}
+
 void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
         SingleWidgetTarget *target) {
     foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {

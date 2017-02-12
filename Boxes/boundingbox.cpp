@@ -516,6 +516,9 @@ void BoundingBox::scheduleAwaitUpdate() {
     }
 
     emit scheduleAwaitUpdateAllLinkBoxes();
+    if(mParent != NULL) {
+        mParent->scheduleAwaitUpdate();
+    }
 }
 
 void BoundingBox::setAwaitUpdateScheduled(bool bT) {

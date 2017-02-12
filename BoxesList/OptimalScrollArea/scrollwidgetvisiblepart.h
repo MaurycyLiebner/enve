@@ -66,6 +66,9 @@ public:
     static void removeInstance(ScrollWidgetVisiblePart *instance);
 
     void setCurrentRule(const SWT_Rule &rule);
+    void setCurrentTarget(const SWT_Target &target);
+    void setAlwaysShowChildren(const bool &alwaysShowChildren);
+    void setCurrentSearchText(const QString &text);
 
     void scheduleContentUpdateIfIsCurrentRule(const SWT_Rule &rule);
     bool isCurrentRule(const SWT_Rule &rule);
@@ -78,6 +81,8 @@ public:
         return mAlwaysShowChildren;
     }
 
+    void scheduleContentUpdateIfSearchNotEmpty();
+    void scheduleContentUpdateIfIsCurrentTarget(const SWT_Target &target);
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 

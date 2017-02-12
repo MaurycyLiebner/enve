@@ -194,6 +194,9 @@ void BoxSingleWidget::rename() {
         if(ok) {
             bb_target->setName(text);
             setName(text);
+
+            bb_target->
+                    SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
         }
     }
 }

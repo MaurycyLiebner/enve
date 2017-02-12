@@ -7,6 +7,7 @@ class SingleWidget;
 class ScrollWidgetVisiblePart;
 
 enum SWT_Rule : short;
+enum SWT_Target : short;
 struct SWT_RulesCollection;
 
 class SingleWidgetAbstraction {
@@ -20,10 +21,12 @@ public:
                                      QList<SingleWidget*> *widgets,
                                      int *currentWidgetId,
                                      const SWT_RulesCollection &rules,
-                                     const bool &parentSatisfiesRule);
+                                     const bool &parentSatisfiesRule,
+                                     const bool &targetDescendant);
 
     int getHeight(const SWT_RulesCollection &rules,
-                  const bool &parentSatisfiesRule);
+                  const bool &parentSatisfiesRule,
+                  const bool &targetDescendant);
 
     void setContentVisible(const bool &bT);
 
@@ -61,6 +64,10 @@ public:
     void scheduleWidgetContentUpdateIfIsCurrentRule(
             const SWT_Rule &rule);
 
+    bool isMainTarget(const SWT_RulesCollection &rules);
+    void scheduleWidgetContentUpdateIfSearchNotEmpty();
+    void scheduleWidgetContentUpdateIfIsCurrentTarget(
+            const SWT_Target &target);
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 

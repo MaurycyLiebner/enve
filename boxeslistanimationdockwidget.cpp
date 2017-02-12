@@ -236,17 +236,34 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
                                         "margin-top: 2px;"
                                         "padding-top: 1px;"
                                      "}");
-    QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
-    viewMenu->addAction("All", this, SLOT(setRuleNone()));
-    viewMenu->addAction("Selected", this, SLOT(setRuleSelected()));
-    viewMenu->addAction("Animated", this, SLOT(setRuleAnimated()));
-    viewMenu->addAction("Not Animated", this, SLOT(setRuleNotAnimated()));
-    viewMenu->addAction("Visible", this, SLOT(setRuleVisible()));
-    viewMenu->addAction("Invisible", this, SLOT(setRuleInvisible()));
-    viewMenu->addAction("Unlocked", this, SLOT(setRuleUnloced()));
-    viewMenu->addAction("Locked", this, SLOT(setRuleLocked()));
+    QMenu *objectsMenu = mBoxesListMenuBar->addMenu("Objects");
+    objectsMenu->addAction("All", this, SLOT(setRuleNone()));
+    objectsMenu->addAction("Selected", this, SLOT(setRuleSelected()));
+    objectsMenu->addAction("Animated", this, SLOT(setRuleAnimated()));
+    objectsMenu->addAction("Not Animated", this, SLOT(setRuleNotAnimated()));
+    objectsMenu->addAction("Visible", this, SLOT(setRuleVisible()));
+    objectsMenu->addAction("Invisible", this, SLOT(setRuleInvisible()));
+    objectsMenu->addAction("Unlocked", this, SLOT(setRuleUnloced()));
+    objectsMenu->addAction("Locked", this, SLOT(setRuleLocked()));
 
-    mBoxesListLayout->addWidget(mBoxesListMenuBar);
+    QMenu *targetMenu = mBoxesListMenuBar->addMenu("Target");
+    targetMenu->addAction("All", this, SLOT(setTargetAll()));
+    targetMenu->addAction("Current Canvas", this,
+                          SLOT(setTargetCurrentCanvas()));
+    targetMenu->addAction("Current Group", this,
+                          SLOT(setTargetCurrentGroup()));
+
+    mBoxesListMenuLayout = new QHBoxLayout();
+    mSearchLine = new QLineEdit("", mBoxesListMenuBar);
+    connect(mSearchLine, SIGNAL(textChanged(QString)),
+            this, SLOT(setSearchText(QString)));
+    mSearchLine->setSizePolicy(QSizePolicy::Maximum,
+                               QSizePolicy::Fixed);
+
+    mBoxesListMenuLayout->addWidget(mBoxesListMenuBar);
+    mBoxesListMenuLayout->addWidget(mSearchLine);
+
+    mBoxesListLayout->addLayout(mBoxesListMenuLayout);
     mBoxesListLayout->addWidget(mBoxesListScrollArea);
 
     mBoxesListKeysViewLayout->addLayout(mBoxesListLayout);
@@ -434,5 +451,30 @@ void BoxesListAnimationDockWidget::setRuleUnloced() {
 void BoxesListAnimationDockWidget::setRuleLocked() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Locked);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListAnimationDockWidget::setTargetAll() {
+//    mBoxesListWidget->getVisiblePartWidget()->
+//            setCurrentRule(SWT_All);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListAnimationDockWidget::setTargetCurrentCanvas() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentTarget(SWT_CurrentCanvas);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListAnimationDockWidget::setTargetCurrentGroup() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentTarget(SWT_CurrentGroup);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListAnimationDockWidget::setSearchText(
+        const QString &text) {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentSearchText(text);
     mMainWindow->callUpdateSchedulers();
 }

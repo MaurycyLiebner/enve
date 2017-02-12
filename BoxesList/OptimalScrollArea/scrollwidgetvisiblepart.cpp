@@ -70,12 +70,46 @@ void ScrollWidgetVisiblePart::setCurrentRule(
     updateVisibleWidgetsContent();
 }
 
+void ScrollWidgetVisiblePart::setCurrentTarget(const SWT_Target &target) {
+    mCurrentRulesCollection.target = target;
+    updateParentHeight();
+    updateVisibleWidgetsContent();
+}
+
+void ScrollWidgetVisiblePart::setAlwaysShowChildren(
+        const bool &alwaysShowChildren) {
+    mCurrentRulesCollection.alwaysShowChildren = alwaysShowChildren;
+    updateParentHeight();
+    updateVisibleWidgetsContent();
+}
+
+void ScrollWidgetVisiblePart::setCurrentSearchText(
+        const QString &text) {
+    mCurrentRulesCollection.searchString = text;
+    updateParentHeight();
+    updateVisibleWidgetsContent();
+}
+
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
         const SWT_Rule &rule) {
     if(isCurrentRule(rule)) {
         scheduleUpdateParentHeight();
         scheduledUpdateVisibleWidgetsContent();
     }
+}
+
+void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
+        const SWT_Target &target) {
+    if(mCurrentRulesCollection.target == target) {
+        scheduleUpdateParentHeight();
+        scheduledUpdateVisibleWidgetsContent();
+    }
+}
+
+void ScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
+    if(mCurrentRulesCollection.searchString.isEmpty()) return;
+    scheduleUpdateParentHeight();
+    scheduledUpdateVisibleWidgetsContent();
 }
 
 bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
@@ -150,7 +184,8 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
                 &mSingleWidgets,
                 &idP,
                 mCurrentRulesCollection,
-                true);
+                true,
+                false);
 
     for(int i = idP; i < mSingleWidgets.count(); i++) {
         mSingleWidgets.at(i)->hide();
