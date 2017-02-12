@@ -84,7 +84,7 @@ int SingleWidgetAbstraction::getHeight(
     if(satisfiesRule && targetDescendant) {
         height += 20;
     }
-    if(mContentVisible) {
+    if(mContentVisible || !targetDescendant) {
         bool childrenDescendants = targetDescendant ||
                 isMainTarget(rules);
         foreach(SingleWidgetAbstraction *abs, mChildren) {

@@ -176,7 +176,6 @@ void BoundingBox::preUpdatePixmapsUpdates() {
 }
 
 void BoundingBox::updatePixmaps() {
-    if(mUpdateDisabled) return;
     if(mRedoUpdate) {
         mRedoUpdate = false;
         updateUpdateTransform();
@@ -506,7 +505,7 @@ void BoundingBox::awaitUpdate() {
 
 #include "updatescheduler.h"
 void BoundingBox::scheduleAwaitUpdate() {
-    if(mUpdateDisabled) return;
+    //if(mUpdateDisabled) return;
     if(mAwaitingUpdate) {
         redoUpdate();
     } else {
@@ -516,9 +515,6 @@ void BoundingBox::scheduleAwaitUpdate() {
     }
 
     emit scheduleAwaitUpdateAllLinkBoxes();
-    if(mParent != NULL) {
-        mParent->scheduleAwaitUpdate();
-    }
 }
 
 void BoundingBox::setAwaitUpdateScheduled(bool bT) {
