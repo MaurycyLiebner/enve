@@ -427,11 +427,11 @@ void Canvas::updateRenderRect() {
     mCanvasRect = QRectF(qMax(mCombinedTransformMatrix.dx(),
                               mCombinedTransformMatrix.dx()*
                               mResolutionPercent),
-                              qMax(mCombinedTransformMatrix.dy(),
+                         qMax(mCombinedTransformMatrix.dy(),
                               mCombinedTransformMatrix.dy()*
                               mResolutionPercent),
-                              mVisibleWidth*mResolutionPercent,
-                              mVisibleHeight*mResolutionPercent);
+                         mVisibleWidth*mResolutionPercent,
+                         mVisibleHeight*mResolutionPercent);
     QRectF canvasWidgetRect = QRectF(0., 0.,
                                      (qreal)mCanvasWidget->width(),
                                      (qreal)mCanvasWidget->height());
@@ -994,4 +994,33 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
         }
     }
     mCurrentBoxesGroup->removeChild(pathSrc);
+}
+
+bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                               const bool &parentSatisfies) {
+    Q_UNUSED(parentSatisfies);
+    const SWT_Rule &rule = rules.rule;
+    const bool &alwaysShowChildren = rules.alwaysShowChildren;
+    if(alwaysShowChildren) {
+        return false;
+    } else {
+        if(rule == SWT_NoRule) {
+            return true;
+        } else if(rule == SWT_Selected) {
+            return false;
+        } else if(rule == SWT_Animated) {
+            return false;
+        } else if(rule == SWT_NotAnimated) {
+            return false;
+        } else if(rule == SWT_Visible) {
+            return true;
+        } else if(rule == SWT_Invisible) {
+            return false;
+        } else if(rule == SWT_Locked) {
+            return false;
+        } else if(rule == SWT_Unlocked) {
+            return true;
+        }
+    }
+    return false;
 }

@@ -324,27 +324,8 @@ public:
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
 
-    bool SWT_satisfiesRule(const bool &parentSatisfies,
-                           const SWT_Rule &rule) {
-        if(rule == SWT_NoRule) {
-            return true;
-        } else if(rule == SWT_Selected) {
-            return isSelected() || parentSatisfies;
-        } else if(rule == SWT_Animated) {
-            return isAnimated() || parentSatisfies;
-        } else if(rule == SWT_NotAnimated) {
-            return !isAnimated() || parentSatisfies;
-        } else if(rule == SWT_Visible) {
-            return isVisible() || parentSatisfies;
-        } else if(rule == SWT_Invisible) {
-            return !isVisible() || parentSatisfies;
-        } else if(rule == SWT_Locked) {
-            return isLocked() || parentSatisfies;
-        } else if(rule == SWT_Unlocked) {
-            return !isLocked() || parentSatisfies;
-        }
-        return false;
-    }
+    bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                           const bool &parentSatisfies);
 
     void setUpdateDisabled(const bool &bT) {
         mUpdateDisabled = bT;

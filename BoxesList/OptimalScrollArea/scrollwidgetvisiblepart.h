@@ -9,6 +9,30 @@ class SingleWidget;
 
 enum SWT_Rule : short;
 
+enum SWT_Target : short {
+    SWT_CurrentCanvas,
+    SWT_CurrentGroup//,
+//    SWT_All
+};
+
+struct SWT_RulesCollection {
+    SWT_RulesCollection();
+    SWT_RulesCollection(const SWT_Rule &ruleT,
+                        const bool &alwaysShowChildrenT,
+                        const SWT_Target &targetT,
+                        const QString &searchStringT) {
+        rule = ruleT;
+        alwaysShowChildren = alwaysShowChildrenT;
+        target = targetT;
+        searchString = searchStringT;
+    }
+
+    SWT_Rule rule;
+    bool alwaysShowChildren;
+    SWT_Target target;
+    QString searchString;
+};
+
 class ScrollWidgetVisiblePart :
         public QWidget {
     Q_OBJECT
@@ -46,16 +70,22 @@ public:
     void scheduleContentUpdateIfIsCurrentRule(const SWT_Rule &rule);
     bool isCurrentRule(const SWT_Rule &rule);
 
-    SWT_Rule getCurrentRule() {
-        return mCurrentRule;
+    SWT_RulesCollection getCurrentRulesCollection() {
+        return mCurrentRulesCollection;
     }
+
+    bool getAlwaysShowChildren() {
+        return mAlwaysShowChildren;
+    }
+
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 
-    SWT_Rule mCurrentRule;
+    SWT_RulesCollection mCurrentRulesCollection;
 
     bool mVisibleWidgetsContentUpdateScheduled = false;
     bool mParentHeightUpdateScheduled = false;
+    bool mAlwaysShowChildren = false;
 
     ScrollWidget *mParentWidget;
 

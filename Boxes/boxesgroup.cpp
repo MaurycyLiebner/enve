@@ -1489,3 +1489,15 @@ void BoxesGroup::SWT_addChildrenAbstractions(
                     child->SWT_getAbstractionForWidget(visiblePartWidget));
     }
 }
+
+bool BoxesGroup::SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                                   const bool &parentSatisfies) {
+    const SWT_Rule &rule = rules.rule;
+    if(rule == SWT_Selected) {
+        return BoundingBox::SWT_satisfiesRule(rules,
+                                              parentSatisfies) &&
+                !isCurrentGroup();
+    }
+    return BoundingBox::SWT_satisfiesRule(rules,
+                                          parentSatisfies);
+}

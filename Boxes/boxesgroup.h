@@ -230,14 +230,8 @@ public:
                                      ScrollWidgetVisiblePart *visiblePartWidget);
     SWT_Type SWT_getType() { return SWT_BoxesGroup; }
 
-    bool SWT_satisfiesRule(const bool &parentSatisfies,
-                           const SWT_Rule &rule) {
-        if(rule == SWT_Selected) {
-            return (isSelected() || parentSatisfies) && !isCurrentGroup();
-        }
-        return BoundingBox::SWT_satisfiesRule(parentSatisfies,
-                                              rule);
-    }
+    bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                           const bool &parentSatisfies);
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

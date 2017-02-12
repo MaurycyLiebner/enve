@@ -56,7 +56,7 @@ void ScrollWidget::updateHeight() {
         return;
     }
     setFixedHeight(mMainAbstraction->getHeight(
-                       mVisiblePartWidget->getCurrentRule(),
+                       mVisiblePartWidget->getCurrentRulesCollection(),
                        false) + 2);
     if(isHidden()) show();
 }

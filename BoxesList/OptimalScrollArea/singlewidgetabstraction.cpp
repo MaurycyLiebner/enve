@@ -24,13 +24,14 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         int currY, int currX,
         QList<SingleWidget *> *widgets,
         int *currentWidgetId,
-        const SWT_Rule &rule,
+        const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule) { // returns whether should abort
-    int thisHeight = getHeight(rule, parentSatisfiesRule);
+    int thisHeight = getHeight(rules,
+                               parentSatisfiesRule);
     if(currY + thisHeight < minY) return false;
     if(currY > maxY) return true;
-    bool satisfiesRule = mTarget->SWT_satisfiesRule(parentSatisfiesRule,
-                                                    rule);
+    bool satisfiesRule = mTarget->SWT_satisfiesRule(rules,
+                                                    parentSatisfiesRule);
     if(currY > minY && satisfiesRule) {
         if(*currentWidgetId < widgets->count()) {
             SingleWidget *currWidget = widgets->at(*currentWidgetId);
@@ -51,11 +52,12 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
                                                 currY, currX,
                                                 widgets,
                                                 currentWidgetId,
-                                                rule,
+                                                rules,
                                                 satisfiesRule) ) {
                 return true;
             }
-            currY += abs->getHeight(rule, satisfiesRule);
+            currY += abs->getHeight(rules,
+                                    satisfiesRule);
         }
     }
 
@@ -63,17 +65,17 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
 }
 
 int SingleWidgetAbstraction::getHeight(
-        const SWT_Rule &rule,
+        const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule) {
     int height = 0;
-    bool satisfiesRule = mTarget->SWT_satisfiesRule(parentSatisfiesRule,
-                                                    rule);
+    bool satisfiesRule = mTarget->SWT_satisfiesRule(rules,
+                                                    parentSatisfiesRule);
     if(satisfiesRule) {
         height += 20;
     }
     if(mContentVisible) {
         foreach(SingleWidgetAbstraction *abs, mChildren) {
-            height += abs->getHeight(rule, satisfiesRule);
+            height += abs->getHeight(rules, satisfiesRule);
         }
         return height;
     }

@@ -10,7 +10,7 @@ QList<ScrollWidgetVisiblePart*> ScrollWidgetVisiblePart::mAllInstances;
 ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(
         ScrollWidget *parent) :
     QWidget(parent) {
-    mCurrentRule = SWT_NoRule;
+    mCurrentRulesCollection.rule = SWT_NoRule;
     mParentWidget = parent;
     addInstance(this);
 }
@@ -65,7 +65,7 @@ void ScrollWidgetVisiblePart::removeInstance(
 
 void ScrollWidgetVisiblePart::setCurrentRule(
         const SWT_Rule &rule) {
-    mCurrentRule = rule;
+    mCurrentRulesCollection.rule = rule;
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
@@ -79,7 +79,7 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
 }
 
 bool ScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
-    return rule == mCurrentRule;
+    return rule == mCurrentRulesCollection.rule;
 }
 
 void ScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
@@ -149,7 +149,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
                 currY, currX,
                 &mSingleWidgets,
                 &idP,
-                mCurrentRule,
+                mCurrentRulesCollection,
                 true);
 
     for(int i = idP; i < mSingleWidgets.count(); i++) {
@@ -172,4 +172,11 @@ void ScrollWidgetVisiblePart::updateParentHeight() {
 
 SingleWidget *ScrollWidgetVisiblePart::createNewSingleWidget() {
     return new SingleWidget(this);
+}
+
+SWT_RulesCollection::SWT_RulesCollection() {
+    rule = SWT_NoRule;
+    alwaysShowChildren = false;
+    target = SWT_CurrentCanvas;
+    searchString = "";
 }

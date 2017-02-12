@@ -23,6 +23,8 @@ enum SWT_Rule : short {
     SWT_NotAnimated
 };
 
+struct SWT_RulesCollection;
+
 class SingleWidgetTarget {
 public:
     SingleWidgetTarget();
@@ -45,9 +47,9 @@ public:
     void SWT_addChildAbstractionForTargetToAllAt(
             SingleWidgetTarget *target, const int &id);
 
-    virtual bool SWT_satisfiesRule(const bool &parentSatisfies,
-                                   const SWT_Rule &rule) {
-        Q_UNUSED(rule);
+    virtual bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                                   const bool &parentSatisfies) {
+        Q_UNUSED(rules);
         return parentSatisfies;
     }
 

@@ -120,8 +120,8 @@ QPixmap BoundingBox::applyEffects(const QPixmap& pixmap,
 int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
     int transfromAnimatorId = mTransformAnimator.saveToSql(query);
     if(!query->exec(
-        QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
-                "pivotchanged, visible, locked, "
+                QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
+                        "pivotchanged, visible, locked, "
                 "parentboundingboxid) "
                 "VALUES ('%1', %2, %3, %4, %5, %6, %7)").
                 arg(mName).
@@ -1034,4 +1034,55 @@ void BoundingBox::SWT_addChildrenAbstractions(
         ScrollWidgetVisiblePart *visiblePartWidget) {
     mAnimatorsCollection.SWT_addChildrenAbstractions(abstraction,
                                                  visiblePartWidget);
+}
+
+bool BoundingBox::SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                                    const bool &parentSatisfies) {
+    const SWT_Rule &rule = rules.rule;
+    bool satisfies;
+    bool alwaysShowChildren = rules.alwaysShowChildren;
+    if(alwaysShowChildren) {
+        if(rule == SWT_NoRule) {
+            satisfies = true;
+        } else if(rule == SWT_Selected) {
+            satisfies = isSelected() || parentSatisfies;
+        } else if(rule == SWT_Animated) {
+            satisfies = isAnimated() || parentSatisfies;
+        } else if(rule == SWT_NotAnimated) {
+            satisfies = !isAnimated() || parentSatisfies;
+        } else if(rule == SWT_Visible) {
+            satisfies = isVisible() || parentSatisfies;
+        } else if(rule == SWT_Invisible) {
+            satisfies = !isVisible() || parentSatisfies;
+        } else if(rule == SWT_Locked) {
+            satisfies = isLocked() || parentSatisfies;
+        } else if(rule == SWT_Unlocked) {
+            satisfies = !isLocked() || parentSatisfies;
+        }
+    } else {
+        if(rule == SWT_NoRule) {
+            satisfies = true;
+        } else if(rule == SWT_Selected) {
+            satisfies = isSelected();
+        } else if(rule == SWT_Animated) {
+            satisfies = isAnimated();
+        } else if(rule == SWT_NotAnimated) {
+            satisfies = !isAnimated();
+        } else if(rule == SWT_Visible) {
+            satisfies = isVisible() && parentSatisfies;
+        } else if(rule == SWT_Invisible) {
+            satisfies = !isVisible() || parentSatisfies;
+        } else if(rule == SWT_Locked) {
+            satisfies = isLocked() || parentSatisfies;
+        } else if(rule == SWT_Unlocked) {
+            satisfies = !isLocked() && parentSatisfies;
+        }
+    }
+    if(satisfies) {
+        const QString &nameSearch = rules.searchString;
+        if(!nameSearch.isEmpty()) {
+            satisfies = mName.contains(nameSearch);
+        }
+    }
+    return satisfies;
 }

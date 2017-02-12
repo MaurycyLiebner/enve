@@ -353,12 +353,8 @@ public:
 
     bool isPreviewing() { return mPreviewing; }
 
-    bool SWT_satisfiesRule(const bool &parentSatisfies,
-                           const SWT_Rule &rule) {
-        Q_UNUSED(parentSatisfies);
-        Q_UNUSED(rule);
-        return false;
-    }
+    bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                           const bool &parentSatisfies);
 
     BoxesGroup *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
