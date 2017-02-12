@@ -6,13 +6,14 @@
 class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidget;
+class SingleWidgetTarget;
 
 enum SWT_Rule : short;
 
 enum SWT_Target : short {
     SWT_CurrentCanvas,
-    SWT_CurrentGroup//,
-//    SWT_All
+    SWT_CurrentGroup,
+    SWT_All
 };
 
 struct SWT_RulesCollection {
@@ -66,7 +67,8 @@ public:
     static void removeInstance(ScrollWidgetVisiblePart *instance);
 
     void setCurrentRule(const SWT_Rule &rule);
-    void setCurrentTarget(const SWT_Target &target);
+    void setCurrentTarget(SingleWidgetTarget *targetP,
+                          const SWT_Target &target);
     void setAlwaysShowChildren(const bool &alwaysShowChildren);
     void setCurrentSearchText(const QString &text);
 
@@ -82,7 +84,8 @@ public:
     }
 
     void scheduleContentUpdateIfSearchNotEmpty();
-    void scheduleContentUpdateIfIsCurrentTarget(const SWT_Target &target);
+    void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
+                                                const SWT_Target &target);
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 

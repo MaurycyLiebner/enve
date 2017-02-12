@@ -102,6 +102,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mBoxesListScrollArea = new ScrollArea(this);
     mBoxesListWidget = new BoxScrollWidget(mBoxesListScrollArea);
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
+    mBoxesListWidget->setMainTarget(mMainWindow->getCanvasWidget());
 
     connect(mBoxesListScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),
@@ -402,8 +403,6 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                         qRound((1. - canvas->getResolutionPercent())*4.));
     connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
             mMainWindow, SLOT(setResolutionPercentId(int)));
-
-    mBoxesListWidget->setMainTarget(canvas);
 }
 
 void BoxesListAnimationDockWidget::setRuleNone() {
@@ -455,20 +454,26 @@ void BoxesListAnimationDockWidget::setRuleLocked() {
 }
 
 void BoxesListAnimationDockWidget::setTargetAll() {
-//    mBoxesListWidget->getVisiblePartWidget()->
-//            setCurrentRule(SWT_All);
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentTarget(
+                mMainWindow->getCanvasWidget(),
+                SWT_All);
     mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setTargetCurrentCanvas() {
     mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(SWT_CurrentCanvas);
+            setCurrentTarget(
+                mMainWindow->getCanvasWidget()->getCurrentCanvas(),
+                SWT_CurrentCanvas);
     mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setTargetCurrentGroup() {
     mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(SWT_CurrentGroup);
+            setCurrentTarget(
+                mMainWindow->getCanvasWidget()->getCurrentGroup(),
+                SWT_CurrentGroup);
     mMainWindow->callUpdateSchedulers();
 }
 

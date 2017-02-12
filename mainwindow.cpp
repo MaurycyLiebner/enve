@@ -101,7 +101,9 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectSettingsWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Selected);
     mObjectSettingsWidget->getVisiblePartWidget()->
-            setCurrentTarget(SWT_CurrentGroup);
+            setCurrentTarget(
+                mMainWindowInstance->getCanvasWidget()->getCurrentGroup(),
+                SWT_CurrentGroup);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),

@@ -6,10 +6,11 @@ class Canvas;
 enum CanvasMode : short;
 class Color;
 class Gradient;
+class BoxesGroup;
 
 #include "fillstrokesettings.h"
 
-class CanvasWidget : public QWidget
+class CanvasWidget : public QWidget, public SingleWidgetTarget
 {
     Q_OBJECT
 public:
@@ -55,6 +56,12 @@ public:
     void setResolutionPercent(const qreal &percent);
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
+
+    SWT_Type SWT_getType() {
+        return SWT_Canvas;
+    }
+
+    BoxesGroup *getCurrentGroup();
 protected:
     Canvas *mCurrentCanvas = NULL;
     QList<Canvas*> mCanvasList;

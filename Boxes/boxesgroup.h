@@ -232,7 +232,6 @@ public:
 
     bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
                            const bool &parentSatisfies);
-    bool SWT_isMainTarget(const SWT_RulesCollection &rules);
 protected:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

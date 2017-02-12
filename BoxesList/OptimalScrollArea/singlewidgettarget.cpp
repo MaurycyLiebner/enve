@@ -52,9 +52,11 @@ void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithTarget(
+        SingleWidgetTarget *targetP,
         const SWT_Target &target) {
     foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
-        abs->scheduleWidgetContentUpdateIfIsCurrentTarget(target);
+        abs->scheduleWidgetContentUpdateIfIsCurrentTarget(targetP,
+                                                          target);
     }
 }
 

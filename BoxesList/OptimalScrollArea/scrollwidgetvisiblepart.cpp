@@ -70,8 +70,11 @@ void ScrollWidgetVisiblePart::setCurrentRule(
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setCurrentTarget(const SWT_Target &target) {
+void ScrollWidgetVisiblePart::setCurrentTarget(
+        SingleWidgetTarget *targetP,
+        const SWT_Target &target) {
     mCurrentRulesCollection.target = target;
+    mParentWidget->setMainTarget(targetP);
     updateParentHeight();
     updateVisibleWidgetsContent();
 }
@@ -99,8 +102,10 @@ void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentTarget(
+        SingleWidgetTarget *targetP,
         const SWT_Target &target) {
     if(mCurrentRulesCollection.target == target) {
+        mParentWidget->setMainTarget(targetP);
         scheduleUpdateParentHeight();
         scheduledUpdateVisibleWidgetsContent();
     }
@@ -184,8 +189,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
                 &mSingleWidgets,
                 &idP,
                 mCurrentRulesCollection,
-                true,
-                false);
+                true);
 
     for(int i = idP; i < mSingleWidgets.count(); i++) {
         mSingleWidgets.at(i)->hide();

@@ -11,6 +11,7 @@ ScrollWidget::ScrollWidget(QWidget *parent) :
 
 void ScrollWidget::updateAbstraction() {
     if(mMainAbstraction != NULL) {
+        mMainAbstraction->setIsMainTarget(false);
         if(mMainAbstraction->isDeletable()) {
             delete mMainAbstraction;
         }
@@ -18,6 +19,7 @@ void ScrollWidget::updateAbstraction() {
     if(mMainTarget == NULL) {
         mMainAbstraction = NULL;
     } else {
+        mMainAbstraction->setIsMainTarget(true);
         mMainAbstraction = mMainTarget->SWT_getAbstractionForWidget(
                     mVisiblePartWidget);
     }
@@ -57,7 +59,6 @@ void ScrollWidget::updateHeight() {
     }
     setFixedHeight(mMainAbstraction->getHeight(
                        mVisiblePartWidget->getCurrentRulesCollection(),
-                       false,
-                       false) + 2);
+                       false) + 10);
     if(isHidden()) show();
 }

@@ -21,12 +21,10 @@ public:
                                      QList<SingleWidget*> *widgets,
                                      int *currentWidgetId,
                                      const SWT_RulesCollection &rules,
-                                     const bool &parentSatisfiesRule,
-                                     const bool &targetDescendant);
+                                     const bool &parentSatisfiesRule);
 
     int getHeight(const SWT_RulesCollection &rules,
-                  const bool &parentSatisfiesRule,
-                  const bool &targetDescendant);
+                  const bool &parentSatisfiesRule);
 
     void setContentVisible(const bool &bT);
 
@@ -64,13 +62,23 @@ public:
     void scheduleWidgetContentUpdateIfIsCurrentRule(
             const SWT_Rule &rule);
 
-    bool isMainTarget(const SWT_RulesCollection &rules);
+    bool isMainTarget() {
+        return mIsMainTarget;
+    }
+
     void scheduleWidgetContentUpdateIfSearchNotEmpty();
     void scheduleWidgetContentUpdateIfIsCurrentTarget(
+            SingleWidgetTarget *targetP,
             const SWT_Target &target);
+
+    void setIsMainTarget(const bool &bT) {
+        mIsMainTarget = bT;
+    }
+
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 
+    bool mIsMainTarget = false;
     bool mDeletable = true;
     bool mContentVisible = false;
     SingleWidgetTarget *mTarget;

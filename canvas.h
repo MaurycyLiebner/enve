@@ -355,7 +355,6 @@ public:
 
     bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
                            const bool &parentSatisfies);
-    virtual bool SWT_isMainTarget(const SWT_RulesCollection &rules);
 
     BoxesGroup *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;
@@ -364,6 +363,9 @@ public:
     void updateCombinedTransform() {
         updateAfterCombinedTransformationChanged();
     }
+
+    void setIsCurrentCanvas(const bool &bT);
+
     void scheduleEffectsMarginUpdate() {}
 protected:
 //    void updateAfterCombinedTransformationChanged();

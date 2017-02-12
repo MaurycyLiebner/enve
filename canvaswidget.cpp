@@ -2,6 +2,8 @@
 #include "canvas.h"
 #include <QComboBox>
 #include "mainwindow.h"
+#include "BoxesList/boxscrollwidgetvisiblepart.h"
+
 CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_OpaquePaintEvent, true);
     setFocusPolicy(Qt::StrongFocus);
@@ -22,10 +24,18 @@ void CanvasWidget::setCurrentCanvas(const int &id) {
 }
 
 void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
+    if(mCurrentCanvas != NULL) {
+        mCurrentCanvas->setIsCurrentCanvas(false);
+    }
     mCurrentCanvas = canvas;
     if(mCurrentCanvas != NULL) {
+        mCurrentCanvas->setIsCurrentCanvas(true);
+
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
     }
+    SWT_scheduleWidgetsContentUpdateWithTarget(
+                mCurrentCanvas,
+                SWT_CurrentCanvas);
     updateDisplayedFillStrokeSettings();
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
     update();
@@ -34,10 +44,12 @@ void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
 void CanvasWidget::addCanvasToList(Canvas *canvas) {
     canvas->incNumberPointers();
     mCanvasList << canvas;
+    SWT_addChildAbstractionForTargetToAll(canvas);
 }
 
 void CanvasWidget::removeCanvas(const int &id) {
     Canvas *canvas = mCanvasList.takeAt(id);
+    SWT_removeChildAbstractionForTargetFromAll(canvas);
     canvas->decNumberPointers();
     if(mCanvasList.isEmpty()) {
         setCurrentCanvas((Canvas*)NULL);
@@ -428,4 +440,9 @@ void CanvasWidget::updatePivotIfNeeded() {
 void CanvasWidget::schedulePivotUpdate() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->schedulePivotUpdate();
+}
+
+BoxesGroup *CanvasWidget::getCurrentGroup() {
+    if(hasNoCanvas()) return NULL;
+    return mCurrentCanvas->getCurrentBoxesGroup();
 }

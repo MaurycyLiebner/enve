@@ -193,7 +193,8 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     group->setIsCurrentGroup(true);
 
     mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
-    SWT_scheduleWidgetsContentUpdateWithTarget(SWT_CurrentGroup);
+    SWT_scheduleWidgetsContentUpdateWithTarget(this,
+                                               SWT_CurrentGroup);
 }
 
 void Canvas::rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans)
@@ -1026,11 +1027,6 @@ bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,
     return false;
 }
 
-bool Canvas::SWT_isMainTarget(const SWT_RulesCollection &rules) {
-    if(rules.target == SWT_CurrentCanvas) {
-        return mIsCurrentCanvas;
-    } else if(rules.target == SWT_CurrentGroup) {
-        return mIsCurrentGroup;
-    }
-    return false;
+void Canvas::setIsCurrentCanvas(const bool &bT) {
+    mIsCurrentCanvas = bT;
 }
