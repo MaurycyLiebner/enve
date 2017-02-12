@@ -700,8 +700,8 @@ void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
 
 void MainWindow::setCurrentBox(BoundingBox *box) {
     setCurrentShapesMenuBox(box);
-    mObjectSettingsWidget->getVisiblePartWidget()->
-            updateVisibleWidgetsContent();
+//    mObjectSettingsWidget->getVisiblePartWidget()->
+//            updateVisibleWidgetsContent();
     //setCurrentObjectSettingsWidgetBox(box);
 }
 

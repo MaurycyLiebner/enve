@@ -16,6 +16,7 @@ SingleWidget *BoxScrollWidgetVisiblePart::createNewSingleWidget() {
 void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
+//    p.fillRect(rect(), Qt::red);
     int currY = BOX_HEIGHT;
     p.setPen(QPen(QColor(40, 40, 40), 1.));
     while(currY < height()) {

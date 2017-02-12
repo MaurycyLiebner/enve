@@ -228,17 +228,18 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
-        bb_target->getAnimatorsCollection()->getKeyAtPos(
+        return bb_target->getAnimatorsCollection()->getKeyAtPos(
                     pressX,
                     minViewedFrame,
                     pixelsPerFrame);
     } else if(type == SWT_QrealAnimator ||
               type == SWT_ComplexAnimator) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
-        qa_target->getKeyAtPos(pressX,
+        return qa_target->getKeyAtPos(pressX,
                                minViewedFrame,
                                pixelsPerFrame);
     }
+    return NULL;
 }
 
 void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
@@ -369,9 +370,11 @@ void BoxSingleWidget::switchContentVisibleAction() {
 void BoxSingleWidget::switchRecordingAction() {
     ((Animator*)mTarget->getTarget())->switchRecording();
     MainWindow::getInstance()->callUpdateSchedulers();
+    update();
 }
 
 void BoxSingleWidget::switchBoxVisibleAction() {
     ((BoundingBox*)mTarget->getTarget())->switchVisible();
     MainWindow::getInstance()->callUpdateSchedulers();
+    update();
 }

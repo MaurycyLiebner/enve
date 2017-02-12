@@ -49,7 +49,6 @@ public:
     SWT_Rule getCurrentRule() {
         return mCurrentRule;
     }
-
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 

@@ -9,6 +9,7 @@
 #include <QWidgetAction>
 
 QrealAnimator::QrealAnimator() : Animator() {
+
 }
 
 QrealAnimator::~QrealAnimator() {

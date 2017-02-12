@@ -66,12 +66,14 @@ void ScrollWidgetVisiblePart::removeInstance(
 void ScrollWidgetVisiblePart::setCurrentRule(
         const SWT_Rule &rule) {
     mCurrentRule = rule;
+    updateParentHeight();
     updateVisibleWidgetsContent();
 }
 
 void ScrollWidgetVisiblePart::scheduleContentUpdateIfIsCurrentRule(
         const SWT_Rule &rule) {
     if(isCurrentRule(rule)) {
+        scheduleUpdateParentHeight();
         scheduledUpdateVisibleWidgetsContent();
     }
 }
@@ -130,6 +132,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgets() {
 
 void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     if(mMainAbstraction == NULL) return;
+    //updateParentHeight();
     int idP = 0;
     int currX;
     int currY;

@@ -644,6 +644,8 @@ QPointF BoundingBox::getPivotAbsPos() {
 
 void BoundingBox::select() {
     mSelected = true;
+
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
 }
 
 void BoundingBox::addAllAnimatorsToBoxItemWidgetContainer(
@@ -671,6 +673,8 @@ void BoundingBox::updateBoundingRect() {
 
 void BoundingBox::deselect() {
     mSelected = false;
+
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
 }
 
 bool BoundingBox::isContainedIn(QRectF absRect) {

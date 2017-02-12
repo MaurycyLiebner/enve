@@ -213,8 +213,6 @@ protected:
     QPainterPath mKeysPath;
     QPainterPath mKeysDrawPath;
 
-    int mCurrentFrame = 0;
-
     qreal mPrefferedValueStep = 1.;
 
     QColor mAnimatorColor;

@@ -80,6 +80,7 @@ public:
     virtual bool isEffectsAnimator() { return false; }
     virtual void startDragging() {}
 protected:
+    int mCurrentFrame = 0;
     bool mIsComplexAnimator = false;
     bool mIsCurrentAnimator = false;
     bool mIsRecording = false;

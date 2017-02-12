@@ -392,39 +392,47 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
 void BoxesListAnimationDockWidget::setRuleNone() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_NoRule);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setRuleSelected() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Selected);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setRuleAnimated() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Animated);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setRuleNotAnimated() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_NotAnimated);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setRuleVisible() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Visible);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setRuleInvisible() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Invisible);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setRuleUnloced() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Unlocked);
+    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setRuleLocked() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Locked);
+    mMainWindow->callUpdateSchedulers();
 }

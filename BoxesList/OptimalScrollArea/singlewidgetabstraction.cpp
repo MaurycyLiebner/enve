@@ -55,7 +55,7 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
                                                 satisfiesRule) ) {
                 return true;
             }
-            currY += abs->getHeight(rule, parentSatisfiesRule);
+            currY += abs->getHeight(rule, satisfiesRule);
         }
     }
 
@@ -141,8 +141,8 @@ void SingleWidgetAbstraction::scheduleWidgetContentUpdateIfIsCurrentRule(
 void SingleWidgetAbstraction::setContentVisible(const bool &bT) {
     //if(bT == mContentVisible) return;
     mContentVisible = bT;
-    mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
-    mVisiblePartWidget->scheduleUpdateParentHeight();
+    mVisiblePartWidget->updateParentHeight();
+    mVisiblePartWidget->updateVisibleWidgetsContent();
 }
 
 void SingleWidgetAbstraction::addChildAbstractionForTarget(
