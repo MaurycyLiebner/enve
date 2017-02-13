@@ -6,16 +6,16 @@ BoxScrollWidget::BoxScrollWidget(QWidget *parent) :
     createVisiblePartWidget();
 }
 
-void BoxScrollWidget::updateAbstraction() {
-    if(mMainTarget == NULL) {
-        mMainAbstraction = NULL;
-    } else {
-        mMainAbstraction = mMainTarget->
-                SWT_getAbstractionForWidget(mVisiblePartWidget);
-    }
-    mVisiblePartWidget->setMainAbstraction(mMainAbstraction);
-    updateHeight();
-}
+//void BoxScrollWidget::updateAbstraction() {
+//    if(mMainTarget == NULL) {
+//        mMainAbstraction = NULL;
+//    } else {
+//        mMainAbstraction = mMainTarget->
+//                SWT_getAbstractionForWidget(mVisiblePartWidget);
+//    }
+//    mVisiblePartWidget->setMainAbstraction(mMainAbstraction);
+//    updateHeight();
+//}
 
 BoxScrollWidgetVisiblePart *BoxScrollWidget::getVisiblePartWidget() {
     return (BoxScrollWidgetVisiblePart*)mVisiblePartWidget;

@@ -199,8 +199,8 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 void ScrollWidgetVisiblePart::setMainAbstraction(
         SingleWidgetAbstraction *abs) {
     mMainAbstraction = abs;
-    if(abs == NULL) return;
-    abs->setContentVisible(true);
+//    if(abs == NULL) return;
+//    abs->setContentVisible(true);
 //    updateVisibleWidgetsContent();
 //    updateParentHeight();
 }

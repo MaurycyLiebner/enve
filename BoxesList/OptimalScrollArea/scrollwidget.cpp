@@ -19,9 +19,9 @@ void ScrollWidget::updateAbstraction() {
     if(mMainTarget == NULL) {
         mMainAbstraction = NULL;
     } else {
-        mMainAbstraction->setIsMainTarget(true);
         mMainAbstraction = mMainTarget->SWT_getAbstractionForWidget(
                     mVisiblePartWidget);
+        mMainAbstraction->setIsMainTarget(true);
     }
     mVisiblePartWidget->setMainAbstraction(mMainAbstraction);
     updateHeight();

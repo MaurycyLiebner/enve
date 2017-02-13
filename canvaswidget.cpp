@@ -3,6 +3,7 @@
 #include <QComboBox>
 #include "mainwindow.h"
 #include "BoxesList/boxscrollwidgetvisiblepart.h"
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 
 CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -14,6 +15,19 @@ CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
 Canvas *CanvasWidget::getCurrentCanvas() {
     return mCurrentCanvas;
 }
+
+SingleWidgetAbstraction* CanvasWidget::SWT_getAbstractionForWidget(
+            ScrollWidgetVisiblePart *visiblePartWidget) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
+            return abs;
+        }
+    }
+    SingleWidgetAbstraction *abs = SWT_createAbstraction(visiblePartWidget);
+    abs->setDeletable(false);
+    return abs;
+}
+
 
 void CanvasWidget::setCurrentCanvas(const int &id) {
     if(mCanvasList.isEmpty()) {

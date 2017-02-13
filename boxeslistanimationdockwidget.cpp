@@ -102,7 +102,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mBoxesListScrollArea = new ScrollArea(this);
     mBoxesListWidget = new BoxScrollWidget(mBoxesListScrollArea);
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
-    mBoxesListWidget->setMainTarget(mMainWindow->getCanvasWidget());
+//    mBoxesListWidget->setMainTarget(mMainWindow->getCanvasWidget());
 
     connect(mBoxesListScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),

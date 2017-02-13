@@ -62,6 +62,8 @@ public:
     }
 
     BoxesGroup *getCurrentGroup();
+    SingleWidgetAbstraction *SWT_getAbstractionForWidget(
+            ScrollWidgetVisiblePart *visiblePartWidget);
 protected:
     Canvas *mCurrentCanvas = NULL;
     QList<Canvas*> mCanvasList;

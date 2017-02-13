@@ -102,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent)
             setCurrentRule(SWT_Selected);
     mObjectSettingsWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindowInstance->getCanvasWidget()->getCurrentGroup(),
+                NULL,
                 SWT_CurrentGroup);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
@@ -118,6 +118,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     effectsMenuWidget->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
+
+    mCanvasWidget->SWT_getAbstractionForWidget(
+                mBoxListWidget->getVisiblePartWidget());
 
     Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
     canvas->setName("Canvas 0");
