@@ -12,6 +12,7 @@
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     QObject(), Transformable()
 {
+    mParent = parent;
     mAnimatorsCollection.setParentBoundingBox(this);
     mSelectedAbstraction = SWT_createAbstraction(
             MainWindow::getInstance()->
@@ -62,8 +63,6 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 }
 
 BoundingBox::~BoundingBox() {
-    delete mSelectedAbstraction;
-    delete mTimelineAbstraction;
 }
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(

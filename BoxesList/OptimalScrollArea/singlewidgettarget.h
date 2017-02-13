@@ -30,11 +30,7 @@ struct SWT_RulesCollection;
 class SingleWidgetTarget {
 public:
     SingleWidgetTarget();
-    ~SingleWidgetTarget() {
-        foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
-            delete abs;
-        }
-    }
+    virtual ~SingleWidgetTarget();
 
     SingleWidgetAbstraction *SWT_createAbstraction(
             ScrollWidgetVisiblePart *visiblePartWidget);
@@ -69,6 +65,9 @@ public:
     void SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
     void SWT_scheduleWidgetsContentUpdateWithTarget(SingleWidgetTarget *targetP,
                                                     const SWT_Target &target);
+
+    void SWT_moveChildAbstractionForTargetToInAll(SingleWidgetTarget *target,
+                                                  const int &id);
 protected:
     QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
 

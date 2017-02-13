@@ -75,6 +75,11 @@ public:
         mIsMainTarget = bT;
     }
 
+    SingleWidgetAbstraction *getChildAbstractionForTarget(
+            SingleWidgetTarget *target);
+
+    void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
+                                         const int &id);
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 

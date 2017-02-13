@@ -115,15 +115,19 @@ void SingleWidgetAbstraction::addChildAbstractionAt(
     }
 }
 
-void SingleWidgetAbstraction::removeChildAbstractionForTarget(
+SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
         SingleWidgetTarget *target) {
-    SingleWidgetAbstraction *abstraction;
     foreach(SingleWidgetAbstraction *abs, mChildren) {
         if(abs->getTarget() == target) {
-            abstraction = abs;
+            return abs;
         }
     }
-    removeChildAbstraction(abstraction);
+    return NULL;
+}
+
+void SingleWidgetAbstraction::removeChildAbstractionForTarget(
+        SingleWidgetTarget *target) {
+    removeChildAbstraction(getChildAbstractionForTarget(target));
 }
 
 void SingleWidgetAbstraction::removeChildAbstraction(
@@ -182,4 +186,27 @@ void SingleWidgetAbstraction::addChildAbstractionForTargetAt(
                 target->SWT_getAbstractionForWidget(mVisiblePartWidget),
                 id);
 
+}
+
+void SingleWidgetAbstraction::moveChildAbstractionForTargetTo(
+        SingleWidgetTarget *target, const int &id) {
+    SingleWidgetAbstraction *abs = getChildAbstractionForTarget(target);
+    int targetId = id;
+    if(!abs->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
+        for(int i = 0; i < mChildren.count(); i++) {
+            SingleWidgetAbstraction *abs1 = mChildren.at(i);
+            if(abs1->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
+                targetId++;
+            } else {
+                break;
+            }
+        }
+    }
+    int currId = mChildren.indexOf(abs);
+    mChildren.move(currId, targetId);
+
+    if(mContentVisible || mIsMainTarget) {
+        mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
+        mVisiblePartWidget->scheduleUpdateParentHeight();
+    }
 }

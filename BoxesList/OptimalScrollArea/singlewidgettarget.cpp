@@ -5,6 +5,12 @@
 SingleWidgetTarget::SingleWidgetTarget() {
 }
 
+SingleWidgetTarget::~SingleWidgetTarget() {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        delete abs;
+    }
+}
+
 //void SingleWidgetTarget::SWT_addChildrenAbstractions(
 //        SingleWidgetAbstraction *SWT_Abstraction,
 //        ScrollWidgetVisiblePart *visiblePartWidget) {
@@ -70,5 +76,12 @@ void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
         SingleWidgetTarget *target) {
     foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->removeChildAbstractionForTarget(target);
+    }
+}
+
+void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
+        SingleWidgetTarget *target, const int &id) {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        abs->moveChildAbstractionForTargetTo(target, id);
     }
 }
