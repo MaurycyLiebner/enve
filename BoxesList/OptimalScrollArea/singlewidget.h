@@ -11,6 +11,10 @@ class SingleWidget : public QWidget
 public:
     SingleWidget(ScrollWidgetVisiblePart *parent = 0);
     virtual void setTargetAbstraction(SingleWidgetAbstraction *abs);
+    SingleWidgetAbstraction *getTargetAbstraction() {
+        return mTarget;
+    }
+
 protected:
     SingleWidgetAbstraction *mTarget;
     ScrollWidgetVisiblePart *mParent;

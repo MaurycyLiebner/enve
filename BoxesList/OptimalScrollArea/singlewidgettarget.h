@@ -2,6 +2,7 @@
 #define SINGLEWIDGETTARGET_H
 #include <QList>
 #include <QMenu>
+#include <QMimeData>
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
 
@@ -77,6 +78,9 @@ public:
         Q_UNUSED(selectedAction);
     }
 
+    virtual QMimeData *SWT_createMimeData() {
+        return NULL;
+    }
 protected:
     QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
 

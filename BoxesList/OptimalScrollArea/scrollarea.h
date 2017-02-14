@@ -8,6 +8,8 @@ class ScrollArea : public QScrollArea
 public:
     ScrollArea(QWidget *parent = NULL);
 
+    void scrollBy(const int &x,
+                  const int &y);
 protected:
     int mLastHeight = 0;
     int mLastWidth = 0;

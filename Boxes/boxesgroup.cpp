@@ -1471,6 +1471,30 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
     }
 }
 
+void BoxesGroup::moveChildBelow(BoundingBox *boxToMove,
+                                BoundingBox *below) {
+    int indexFrom = mChildBoxes.indexOf(boxToMove);
+    int indexTo = mChildBoxes.indexOf(below);
+    if(indexFrom > indexTo) {
+        indexTo++;
+    }
+    moveChildInList(boxToMove,
+                    indexFrom,
+                    indexTo);
+}
+
+void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
+                                BoundingBox *above) {
+    int indexFrom = mChildBoxes.indexOf(boxToMove);
+    int indexTo = mChildBoxes.indexOf(above);
+    if(indexFrom < indexTo) {
+        indexTo--;
+    }
+    moveChildInList(boxToMove,
+                    indexFrom,
+                    indexTo);
+}
+
 void BoxesGroup::updateAfterCombinedTransformationChanged()
 {
     foreach(BoundingBox *child, mChildBoxes) {

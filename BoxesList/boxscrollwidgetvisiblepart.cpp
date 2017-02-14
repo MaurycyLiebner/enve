@@ -2,11 +2,15 @@
 #include "boxsinglewidget.h"
 #include <QPainter>
 #include "Animators/qrealanimator.h"
+#include "boxscrollwidget.h"
+#include <QTimer>
+#include <QMimeData>
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
         ScrollWidget *parent) :
     ScrollWidgetVisiblePart(parent) {
-
+    setAcceptDrops(true);
+    mScrollTimer = new QTimer(this);
 }
 
 SingleWidget *BoxScrollWidgetVisiblePart::createNewSingleWidget() {
@@ -23,6 +27,12 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
         p.drawLine(0, currY, width(), currY);
 
         currY += BOX_HEIGHT;
+    }
+
+    if(mDragging) {
+        p.setPen(QPen(QColor(40, 40, 40), 3.));
+        p.drawLine(0, mCurrentDragPosId*BOX_HEIGHT,
+                   width(), mCurrentDragPosId*BOX_HEIGHT);
     }
 
     p.end();
@@ -76,4 +86,119 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
                               minViewedFrame,
                               listKeys);
     }
+}
+#include "Boxes/boundingbox.h"
+#include "Boxes/boxesgroup.h"
+#include "mainwindow.h"
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+void BoxScrollWidgetVisiblePart::dropEvent(
+        QDropEvent *event) {
+    if(event->mimeData()->hasFormat("boundingbox")) {
+        int yPos = event->pos().y();
+        int singleWidgetUnderMouseId = yPos / 20;
+        int currentDragPosId = (yPos + 10) / 20;
+
+        if(singleWidgetUnderMouseId < mSingleWidgets.count() &&
+           singleWidgetUnderMouseId >= 0) {
+            BoundingBox *box = ((BoundingBoxMimeData*)event->mimeData())->
+                    getBoundingBox();
+
+            BoxSingleWidget *singleWidgetUnderMouse = (BoxSingleWidget*)
+                    mSingleWidgets.at(
+                        singleWidgetUnderMouseId);
+            while(singleWidgetUnderMouse->isHidden()) {
+                singleWidgetUnderMouseId--;
+                if(singleWidgetUnderMouseId < 0) return;
+                singleWidgetUnderMouse = (BoxSingleWidget*)
+                        mSingleWidgets.at(
+                            singleWidgetUnderMouseId);
+            }
+            SingleWidgetTarget *widgetUnderMouseTarget =
+                    singleWidgetUnderMouse->getTargetAbstraction()->
+                                    getTarget();
+            if(widgetUnderMouseTarget->SWT_getType() == SWT_BoundingBox) {
+                BoxesGroup *parentGroup =
+                        ((BoundingBox*)widgetUnderMouseTarget)->getParent();
+                if(parentGroup == NULL) return;
+                if(parentGroup != box->getParent()) {
+                    box->getParent()->removeChild(box);
+                    parentGroup->addChild(box);
+                }
+                if(currentDragPosId > singleWidgetUnderMouseId) { // add box below
+                    parentGroup->moveChildAbove( // boxesgroup list is reversed
+                                box,
+                                (BoundingBox*)widgetUnderMouseTarget);
+                } else { // add box above
+                    parentGroup->moveChildBelow(
+                                box,
+                                (BoundingBox*)widgetUnderMouseTarget);
+                }
+            }
+        }
+    }
+    mDragging = false;
+    updateVisibleWidgetsContent();
+    MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+void BoxScrollWidgetVisiblePart::dragEnterEvent(
+        QDragEnterEvent *event)
+{
+    //mDragging = true;
+    if(event->mimeData()->hasFormat("boundingbox")) {
+        event->acceptProposedAction();
+    }
+}
+
+void BoxScrollWidgetVisiblePart::dragLeaveEvent(
+        QDragLeaveEvent *) {
+    mDragging = false;
+    if(mScrollTimer->isActive()) {
+        QPoint mousePos = mapFromGlobal(QCursor::pos());
+        if(mousePos.x() < 20 || mousePos.x() > width() - 20) {
+            mScrollTimer->disconnect();
+            mScrollTimer->stop();
+        } else {
+            mScrollTimer->setInterval(100);
+        }
+    }
+    update();
+}
+
+#include <QDebug>
+void BoxScrollWidgetVisiblePart::dragMoveEvent(
+        QDragMoveEvent *event) {
+    if(event->mimeData()->hasFormat("boundingbox") )
+
+    mDragging = true;
+    int yPos = event->pos().y();
+    int currentDragPosId = (yPos + 10) / 20;
+    if(yPos < 30) {
+        if(!mScrollTimer->isActive()) {
+            connect(mScrollTimer, SIGNAL(timeout()),
+                    this, SLOT(scrollUp()));
+            mScrollTimer->start(300);
+        }
+    } else if(yPos > height() - 30) {
+        if(!mScrollTimer->isActive()) {
+            connect(mScrollTimer, SIGNAL(timeout()),
+                    this, SLOT(scrollDown()));
+            mScrollTimer->start(300);
+        }
+    } else {
+        mScrollTimer->disconnect();
+        mScrollTimer->stop();
+    }
+    if(currentDragPosId != mCurrentDragPosId) {
+        mCurrentDragPosId = currentDragPosId;
+        update();
+    }
+}
+
+void BoxScrollWidgetVisiblePart::scrollUp() {
+    mParentWidget->scrollParentAreaBy(-20);
+}
+
+void BoxScrollWidgetVisiblePart::scrollDown() {
+    mParentWidget->scrollParentAreaBy(20);
 }

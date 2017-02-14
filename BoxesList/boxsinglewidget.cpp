@@ -161,6 +161,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
 
         }
     } else {
+        mDragStartPos = event->pos();
         if(type == SWT_BoundingBox ||
            type == SWT_BoxesGroup) {
             BoundingBox *bb_target = (BoundingBox*)target;
@@ -169,6 +170,23 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
         }
     }
     MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+#include <QApplication>
+#include <QDrag>
+void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
+    if (!(event->buttons() & Qt::LeftButton)) {
+        return;
+    }
+    if ((event->pos() - mDragStartPos).manhattanLength()
+         < QApplication::startDragDistance()) {
+        return;
+    }
+    QDrag *drag = new QDrag(this);
+
+    drag->setMimeData(mTarget->getTarget()->SWT_createMimeData());
+
+    Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
 void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e)

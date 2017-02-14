@@ -5,9 +5,11 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QMimeData>
 #include "boxeslistactionbutton.h"
 class QrealAnimatorValueSlider;
 class QrealKey;
+class BoundingBox;
 
 const int BOX_HEIGHT = 20;
 
@@ -47,6 +49,8 @@ public:
                        QList<QrealKey *> *listKeys);
 protected:
     void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *event);
+
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *e);
 signals:
@@ -61,6 +65,7 @@ private:
     BoxesListActionButton *mVisibleButton;
     BoxesListActionButton *mLockedButton;
 
+    QPoint mDragStartPos;
     QWidget *mFillWidget;
     QString mName;
     QHBoxLayout *mMainLayout;

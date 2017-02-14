@@ -9,16 +9,19 @@ class ScrollWidgetVisiblePart;
 class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidgetTarget;
+class ScrollArea;
 
 class ScrollWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ScrollWidget(QWidget *parent = 0);
+    explicit ScrollWidget(ScrollArea *parent = 0);
 
     void updateHeight();
     void setMainTarget(SingleWidgetTarget *target);
     virtual void updateAbstraction();
+
+    void scrollParentAreaBy(const int &by);
 signals:
 
 public slots:
@@ -30,6 +33,7 @@ protected:
     SingleWidgetTarget *mMainTarget = NULL;
     SingleWidgetAbstraction *mMainAbstraction = NULL;
     ScrollWidgetVisiblePart *mVisiblePartWidget;
+    ScrollArea *mParentScrollArea;
 };
 
 #endif // SCROLLWIDGET_H

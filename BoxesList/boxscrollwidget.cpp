@@ -1,7 +1,8 @@
 #include "boxscrollwidget.h"
+#include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "Boxes/boundingbox.h"
 
-BoxScrollWidget::BoxScrollWidget(QWidget *parent) :
+BoxScrollWidget::BoxScrollWidget(ScrollArea *parent) :
     ScrollWidget(parent) {
     createVisiblePartWidget();
 }

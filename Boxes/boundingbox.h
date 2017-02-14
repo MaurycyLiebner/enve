@@ -54,6 +54,27 @@ class BoxItemWidgetContainer;
 
 class EffectsSettingsWidget;
 
+class BoundngBox;
+
+class BoundingBoxMimeData : public QMimeData {
+    Q_OBJECT
+public:
+    BoundingBoxMimeData(BoundingBox *target) : QMimeData() {
+        mBoundingBox = target;
+    }
+
+    BoundingBox *getBoundingBox() {
+        return mBoundingBox;
+    }
+
+    bool hasFormat(const QString &mimetype) const {
+        if(mimetype == "boundingbox") return true;
+        return false;
+    }
+private:
+    BoundingBox *mBoundingBox;
+};
+
 class BoundingBox : public QObject,
         public Transformable,
         public SingleWidgetTarget
@@ -336,6 +357,11 @@ public:
 
     void SWT_addToContextMenu(QMenu *menu);
     bool SWT_handleContextMenuActionSelected(QAction *selectedAction);
+
+    QMimeData *SWT_createMimeData() {
+        return new BoundingBoxMimeData(this);
+    }
+
 protected:
     bool mUpdateDisabled = false;
 

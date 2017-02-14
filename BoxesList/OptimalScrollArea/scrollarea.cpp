@@ -20,6 +20,10 @@ ScrollArea::ScrollArea(QWidget *parent) : QScrollArea(parent)
     setWidgetResizable(true);
 }
 
+void ScrollArea::scrollBy(const int &x, const int &y) {
+    verticalScrollBar()->setValue(verticalScrollBar()->value() + y);
+}
+
 void ScrollArea::resizeEvent(QResizeEvent *e) {
     int newHeight = e->size().height();
     if(newHeight != mLastHeight) {

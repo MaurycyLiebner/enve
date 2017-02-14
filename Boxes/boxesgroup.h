@@ -113,6 +113,11 @@ public:
     void moveChildInList(BoundingBox *child,
                          int from, int to,
                          bool saveUndoRedo = true);
+    void moveChildBelow(BoundingBox *boxToMove,
+                        BoundingBox *below);
+    void moveChildAbove(BoundingBox *boxToMove,
+                        BoundingBox *above);
+
     void updateAfterCombinedTransformationChanged();
     void removeChildFromList(int id, bool saveUndoRedo = true);
     void cancelSelectedPointsTransform();

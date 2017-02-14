@@ -26,9 +26,23 @@ public:
                        qreal pixelsPerFrame,
                        const int &minViewedFrame,
                        QList<QrealKey *> *listKeys);
+
+protected:
+    void dropEvent(QDropEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *);
+    void dragMoveEvent(QDragMoveEvent *event);
+
+    QTimer *mScrollTimer = NULL;
+
+    bool mDragging = false;
+    int mCurrentDragPosId = 0;
+
+    void dragEnterEvent(QDragEnterEvent *event);
 signals:
 
 public slots:
+    void scrollUp();
+    void scrollDown();
 };
 
 #endif // BOXSCROLLWIDGETVISIBLEPART_H

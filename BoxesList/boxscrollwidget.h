@@ -4,11 +4,13 @@
 #include "OptimalScrollArea/scrollwidget.h"
 #include "boxscrollwidgetvisiblepart.h"
 
+class ScrollArea;
+
 class BoxScrollWidget : public ScrollWidget
 {
     Q_OBJECT
 public:
-    explicit BoxScrollWidget(QWidget *parent = 0);
+    explicit BoxScrollWidget(ScrollArea *parent = 0);
     BoxScrollWidgetVisiblePart *getVisiblePartWidget();
 //    void updateAbstraction();
 protected:

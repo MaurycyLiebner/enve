@@ -3,9 +3,11 @@
 #include "singlewidget.h"
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
+#include "scrollarea.h"
 
-ScrollWidget::ScrollWidget(QWidget *parent) :
+ScrollWidget::ScrollWidget(ScrollArea *parent) :
     QWidget(parent) {
+    mParentScrollArea = parent;
     //createVisiblePartWidget();
 }
 
@@ -25,6 +27,10 @@ void ScrollWidget::updateAbstraction() {
     }
     mVisiblePartWidget->setMainAbstraction(mMainAbstraction);
     updateHeight();
+}
+
+void ScrollWidget::scrollParentAreaBy(const int &by) {
+    mParentScrollArea->scrollBy(0, by);
 }
 
 void ScrollWidget::setWidth(const int &width) {
