@@ -5,7 +5,6 @@
 #include <QDebug>
 #include "mainwindow.h"
 #include "keysview.h"
-#include "BoxesList/boxitemwidgetcontainer.h"
 #include "BoxesList/boxscrollwidget.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 
@@ -646,13 +645,6 @@ void BoundingBox::select() {
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
 }
 
-void BoundingBox::addAllAnimatorsToBoxItemWidgetContainer(
-        BoxItemWidgetContainer *container) {
-    foreach(QrealAnimator *animator, mActiveAnimators) {
-        container->addAnimatorWidgetForAnimator(animator);
-    }
-}
-
 void BoundingBox::scheduleCenterPivot() {
     mCenterPivotScheduled = true;
 }
@@ -1083,4 +1075,68 @@ bool BoundingBox::SWT_satisfiesRule(const SWT_RulesCollection &rules,
         }
     }
     return satisfies;
+}
+
+void BoundingBox::SWT_addToContextMenu(
+        QMenu *menu) {
+    menu->addAction("Apply Transformation");
+    menu->addAction("Create Link");
+    menu->addAction("Center Pivot");
+    menu->addAction("Copy");
+    menu->addAction("Cut");
+    menu->addAction("Duplicate");
+    menu->addAction("Group");
+    menu->addAction("Ungroup");
+    menu->addAction("Delete");
+
+    QMenu *effectsMenu = menu->addMenu("Effects");
+    effectsMenu->addAction("Blur");
+    effectsMenu->addAction("Shadow");
+//            effectsMenu->addAction("Brush");
+    effectsMenu->addAction("Lines");
+    effectsMenu->addAction("Circles");
+    effectsMenu->addAction("Swirl");
+    effectsMenu->addAction("Oil");
+    effectsMenu->addAction("Implode");
+    effectsMenu->addAction("Desaturate");
+}
+
+bool BoundingBox::SWT_handleContextMenuActionSelected(
+        QAction *selectedAction) {
+    if(selectedAction != NULL) {
+        if(selectedAction->text() == "Delete") {
+            mParent->removeChild(this);
+        } else if(selectedAction->text() == "Apply Transformation") {
+            applyCurrentTransformation();
+        } else if(selectedAction->text() == "Create Link") {
+            createLink(mParent);
+        } else if(selectedAction->text() == "Group") {
+            mParent->groupSelectedBoxes();
+            return true;
+//        } else if(selectedAction->text() == "Ungroup") {
+//            ungroupSelected();
+//        } else if(selectedAction->text() == "Center Pivot") {
+//            mCurrentBoxesGroup->centerPivotForSelected();
+//        } else if(selectedAction->text() == "Blur") {
+//            mCurrentBoxesGroup->applyBlurToSelected();
+//        } else if(selectedAction->text() == "Shadow") {
+//            mCurrentBoxesGroup->applyShadowToSelected();
+//        } else if(selectedAction->text() == "Brush") {
+//            mCurrentBoxesGroup->applyBrushEffectToSelected();
+//        } else if(selectedAction->text() == "Lines") {
+//            mCurrentBoxesGroup->applyLinesEffectToSelected();
+//        } else if(selectedAction->text() == "Circles") {
+//            mCurrentBoxesGroup->applyCirclesEffectToSelected();
+//        } else if(selectedAction->text() == "Swirl") {
+//            mCurrentBoxesGroup->applySwirlEffectToSelected();
+//        } else if(selectedAction->text() == "Oil") {
+//            mCurrentBoxesGroup->applyOilEffectToSelected();
+//        } else if(selectedAction->text() == "Implode") {
+//            mCurrentBoxesGroup->applyImplodeEffectToSelected();
+//        } else if(selectedAction->text() == "Desaturate") {
+//            mCurrentBoxesGroup->applyDesaturateEffectToSelected();
+        }
+    } else {
+
+    }
 }

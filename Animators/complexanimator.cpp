@@ -1,6 +1,6 @@
 #include "Animators/complexanimator.h"
 #include "mainwindow.h"
-#include "BoxesList/complexanimatoritemwidgetcontainer.h"
+#include "BoxesList/boxsinglewidget.h"
 
 ComplexAnimator::ComplexAnimator() :
     QrealAnimator()
@@ -123,7 +123,7 @@ void ComplexAnimator::drawKey(
         QRectF(
             QPointF((key->getFrame() - startFrame + 0.5)*
                     pixelsPerFrame - KEY_RECT_SIZE*0.35,
-                    drawY + (BoxesListWidget::getListItemHeight() -
+                    drawY + (BOX_HEIGHT -
                               KEY_RECT_SIZE*0.7)*0.5 ),
             QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
 }
@@ -209,13 +209,6 @@ bool ComplexAnimator::isDescendantRecording()
 QString ComplexAnimator::getValueText()
 {
     return "";
-}
-
-void ComplexAnimator::addAllAnimatorsToComplexAnimatorItemWidgetContainer(
-        ComplexAnimatorItemWidgetContainer *itemWidget) {
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        itemWidget->addChildAnimator(animator);
-    }
 }
 
 void ComplexAnimator::setRecording(bool rec)

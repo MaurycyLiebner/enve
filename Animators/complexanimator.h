@@ -43,8 +43,7 @@ public:
     void clearFromGraphView();
 
     bool hasChildAnimators();
-    void addAllAnimatorsToComplexAnimatorItemWidgetContainer(
-            ComplexAnimatorItemWidgetContainer *itemWidget);
+
     void setTransformed(bool bT);
 
     void changeChildAnimatorZ(const int &oldIndex,

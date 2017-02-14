@@ -810,7 +810,6 @@ void BoxesGroup::removeSelectedBoxesAndClearList()
 {
     foreach(BoundingBox *box, mSelectedBoxes) {
         removeChild(box);
-        box->deselect();
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
 }
@@ -1260,7 +1259,6 @@ BoxesGroup* BoxesGroup::groupSelectedBoxes() {
     BoundingBox *box;
     foreachInverted(box, mSelectedBoxes) {
         removeChild(box);
-        box->deselect();
         newGroup->addChild(box);
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
@@ -1370,7 +1368,9 @@ void BoxesGroup::addChildToListAt(int index,
     scheduleEffectsMarginUpdate();
     if(!mPivotChanged) scheduleCenterPivot();
 
-    SWT_addChildAbstractionForTargetToAll(child);
+    //SWT_addChildAbstractionForTargetToAll(child);
+    SWT_addChildAbstractionForTargetToAllAt(child,
+                                            mActiveAnimators.count());
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -1464,7 +1464,8 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
                                  bool saveUndoRedo) {
     mChildBoxes.move(from, to);
     updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
-    SWT_moveChildAbstractionForTargetToInAll(child, to);
+    SWT_moveChildAbstractionForTargetToInAll(child, mChildBoxes.count() - to - 1
+                                                    + mActiveAnimators.count());
     if(saveUndoRedo) {
         addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }

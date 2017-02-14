@@ -274,7 +274,6 @@ public:
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
     void selectionChangeTriggered(bool shiftPressed);
-    void addAllAnimatorsToBoxItemWidgetContainer(BoxItemWidgetContainer *container);
     QrealAnimator *getAnimatorsCollection();
 
     bool isAnimated() { return mAnimatorsCollection.isDescendantRecording(); }
@@ -334,6 +333,9 @@ public:
     bool SWT_visibleOnlyIfParentDescendant() {
         return false;
     }
+
+    void SWT_addToContextMenu(QMenu *menu);
+    bool SWT_handleContextMenuActionSelected(QAction *selectedAction);
 protected:
     bool mUpdateDisabled = false;
 

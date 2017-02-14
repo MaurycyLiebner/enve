@@ -8,7 +8,6 @@
 #include <QLabel>
 #include "animatonwidgetscrollbar.h"
 #include "keysview.h"
-#include "BoxesList/boxeslistwidget.h"
 #include <qscrollarea.h>
 #include <QScrollArea>
 #include <QApplication>

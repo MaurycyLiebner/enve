@@ -7,6 +7,7 @@
 #include <QMenu>
 #include "qrealanimatorvalueslider.h"
 #include <QWidgetAction>
+#include "BoxesList/boxsinglewidget.h"
 
 QrealAnimator::QrealAnimator() : Animator() {
 
@@ -904,7 +905,7 @@ void QrealAnimator::drawKey(QPainter *p,
         QRectF(
             QPointF((key->getFrame() - startFrame + 0.5)*
                     pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                    drawY + (BoxesListWidget::getListItemHeight() -
+                    drawY + (BOX_HEIGHT -
                               KEY_RECT_SIZE)*0.5 ),
             QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
 }

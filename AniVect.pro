@@ -60,17 +60,8 @@ SOURCES += main.cpp\
     vectorshapeswidget.cpp \
     renderoutputwidget.cpp \
     canvaswidget.cpp \
-    BoxesList/boxeslistwidget.cpp \
-    BoxesList/widgetcontainer.cpp \
-    BoxesList/qrealanimatoritemwidget.cpp \
-    BoxesList/complexanimatoritemwidget.cpp \
-    BoxesList/complexanimatoritemwidgetcontainer.cpp \
-    BoxesList/boxitemwidgetcontainer.cpp \
-    BoxesList/boxitemwidget.cpp \
-    BoxesList/boxesgroupwidgetcontainer.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
-    ObjectSettings/objectsettingswidget.cpp \
     Animators/animatorscollection.cpp \
     Animators/transformanimator.cpp \
     Animators/animator.cpp \
@@ -92,7 +83,6 @@ SOURCES += main.cpp\
     Boxes/boundingbox.cpp \
     Boxes/boxesgroup.cpp \
     Animators/effectanimators.cpp \
-    BoxesList/effectanimatorsitemwidgetcontainer.cpp \
     Boxes/animationbox.cpp \
     pathoperations.cpp \
     Boxes/linkbox.cpp \
@@ -160,17 +150,8 @@ HEADERS  += mainwindow.h \
     renderoutputwidget.h \
     canvaswidget.h \
     keypoint.h \
-    BoxesList/boxeslistwidget.h \
-    BoxesList/widgetcontainer.h \
-    BoxesList/qrealanimatoritemwidget.h \
-    BoxesList/complexanimatoritemwidget.h \
-    BoxesList/complexanimatoritemwidgetcontainer.h \
-    BoxesList/boxitemwidgetcontainer.h \
-    BoxesList/boxitemwidget.h \
-    BoxesList/boxesgroupwidgetcontainer.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
-    ObjectSettings/objectsettingswidget.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
     Animators/complexanimator.h \
@@ -192,7 +173,6 @@ HEADERS  += mainwindow.h \
     Boxes/textbox.h \
     Boxes/vectorpath.h \
     Animators/effectanimators.h \
-    BoxesList/effectanimatorsitemwidgetcontainer.h \
     Boxes/animationbox.h \
     pathoperations.h \
     Boxes/linkbox.h \

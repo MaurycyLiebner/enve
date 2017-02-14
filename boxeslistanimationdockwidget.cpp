@@ -4,6 +4,7 @@
 #include "animationdockwidget.h"
 #include <QScrollBar>
 #include "BoxesList/boxscrollwidget.h"
+#include "BoxesList/boxsinglewidget.h"
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *boxesList, QWidget *parent) :
     QWidget(parent) {
@@ -34,7 +35,6 @@ void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int newWidth = mBoxesList->width() + event->x() - mPressX;
     newWidth = qMax(200, newWidth);
-    BoxesListWidget::setListItemMaxWidth(newWidth);
     mBoxesList->setFixedWidth(newWidth);
     updatePos();
 }
@@ -62,7 +62,7 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
 }
 
 void BoxesListAnimationDockWidget::moveSlider(int val) {
-    int diff = val%BoxesListWidget::getListItemHeight();
+    int diff = val%BOX_HEIGHT;
     if(diff != 0) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
@@ -113,7 +113,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
             mBoxesListWidget, SLOT(setWidth(int)));
 
     mBoxesListScrollArea->verticalScrollBar()->setSingleStep(
-                BoxesListWidget::getListItemHeight());
+                BOX_HEIGHT);
     connect(mBoxesListScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),
             this, SLOT(moveSlider(int)));

@@ -17,7 +17,6 @@
 #include "renderoutputwidget.h"
 #include "svgimporter.h"
 #include "canvaswidget.h"
-#include "ObjectSettings/objectsettingswidget.h"
 #include "BoxesList/boxscrollwidget.h"
 
 #include <QAudioOutput>
@@ -114,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
             mObjectSettingsWidget, SLOT(setWidth(int)));
 
     mObjectSettingsScrollArea->verticalScrollBar()->setSingleStep(
-                BoxesListWidget::getListItemHeight());
+                BOX_HEIGHT);
 
     effectsMenuWidget->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);

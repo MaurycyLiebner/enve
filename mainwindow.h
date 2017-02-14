@@ -12,7 +12,6 @@
 #include "keysview.h"
 #include "fontswidget.h"
 #include "vectorshapesmenu.h"
-#include "BoxesList/boxeslistwidget.h"
 #include "actionbutton.h"
 
 class PaintControler;

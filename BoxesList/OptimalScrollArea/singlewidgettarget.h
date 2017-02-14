@@ -1,6 +1,7 @@
 #ifndef SINGLEWIDGETTARGET_H
 #define SINGLEWIDGETTARGET_H
 #include <QList>
+#include <QMenu>
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
 
@@ -68,6 +69,14 @@ public:
 
     void SWT_moveChildAbstractionForTargetToInAll(SingleWidgetTarget *target,
                                                   const int &id);
+
+    virtual void SWT_addToContextMenu(QMenu *menu) {
+        Q_UNUSED(menu);
+    }
+    virtual bool SWT_handleContextMenuActionSelected(QAction *selectedAction) {
+        Q_UNUSED(selectedAction);
+    }
+
 protected:
     QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
 

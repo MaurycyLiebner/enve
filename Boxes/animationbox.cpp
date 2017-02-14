@@ -1,4 +1,5 @@
 #include "animationbox.h"
+#include "BoxesList/boxsinglewidget.h"
 
 AnimationBox::AnimationBox(BoxesGroup *parent,
                            const QStringList &listOfFrames) :
@@ -50,7 +51,6 @@ void AnimationBox::updateAnimationFrame() {
     setFilePath(mListOfFrames.at(pixId));
 }
 
-#include "BoxesList/boxeslistwidget.h"
 void AnimationBox::drawKeys(QPainter *p,
                             qreal pixelsPerFrame, qreal drawY,
                             int startFrame, int endFrame) {
@@ -59,7 +59,7 @@ void AnimationBox::drawKeys(QPainter *p,
     int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
     p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
                 frameWidth*pixelsPerFrame - pixelsPerFrame,
-                BoxesListWidget::getListItemHeight(), QColor(0, 0, 255, 125));
+                BOX_HEIGHT, QColor(0, 0, 255, 125));
     BoundingBox::drawKeys(p, pixelsPerFrame, drawY,
                           startFrame, endFrame);
 }

@@ -192,16 +192,16 @@ void SingleWidgetAbstraction::moveChildAbstractionForTargetTo(
         SingleWidgetTarget *target, const int &id) {
     SingleWidgetAbstraction *abs = getChildAbstractionForTarget(target);
     int targetId = id;
-    if(!abs->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
-        for(int i = 0; i < mChildren.count(); i++) {
-            SingleWidgetAbstraction *abs1 = mChildren.at(i);
-            if(abs1->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
-                targetId++;
-            } else {
-                break;
-            }
-        }
-    }
+//    if(!abs->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
+//        for(int i = 0; i < mChildren.count(); i++) {
+//            SingleWidgetAbstraction *abs1 = mChildren.at(i);
+//            if(abs1->getTarget()->SWT_visibleOnlyIfParentDescendant()) {
+//                targetId++;
+//            } else {
+//                break;
+//            }
+//        }
+//    }
     int currId = mChildren.indexOf(abs);
     mChildren.move(currId, targetId);
 
