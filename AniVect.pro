@@ -102,7 +102,9 @@ SOURCES += main.cpp\
     BoxesList/boxsinglewidget.cpp \
     BoxesList/boxscrollwidgetvisiblepart.cpp \
     BoxesList/boxscrollwidget.cpp \
-    BoxesList/boxeslistactionbutton.cpp
+    BoxesList/boxeslistactionbutton.cpp \
+    canvasselectedpointsactions.cpp \
+    canvasselectedboxesactions.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \

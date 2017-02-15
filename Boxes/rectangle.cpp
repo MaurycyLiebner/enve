@@ -118,7 +118,8 @@ void Rectangle::moveSizePointByAbs(QPointF absTrans) {
     mBottomRightPoint->moveByAbs(absTrans);
 }
 
-void Rectangle::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
+void Rectangle::drawSelected(QPainter *p,
+                             const CanvasMode &currentCanvasMode)
 {
     if(mVisible) {
         p->save();
@@ -137,7 +138,7 @@ void Rectangle::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 }
 
 
-MovablePoint *Rectangle::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
+MovablePoint *Rectangle::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {

@@ -159,15 +159,15 @@ public:
         scheduleAwaitUpdate();
     }
 
-    void startStrokeWidthTransform() {
+    void startSelectedStrokeWidthTransform() {
         mStrokeSettings.getStrokeWidthAnimator()->startTransform();
     }
 
-    void startStrokeColorTransform() {
+    void startSelectedStrokeColorTransform() {
         mStrokeSettings.getColorAnimator()->startTransform();
     }
 
-    void startFillColorTransform() {
+    void startSelectedFillColorTransform() {
         mFillPaintSettings.getColorAnimator()->startTransform();
     }
 

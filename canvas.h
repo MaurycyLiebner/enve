@@ -189,8 +189,6 @@ public:
                     int canvasHeight = 1080);
     ~Canvas();
     QRectF getPixBoundingRect();
-    void addBoxToSelection(BoundingBox *box);
-    void clearBoxesSelection();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
     void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
@@ -199,19 +197,15 @@ public:
     void setCanvasMode(CanvasMode mode);
     void startSelectionAtPoint(QPointF pos);
     void moveSecondSelectionPoint(QPointF pos);
-    void clearAllPointsSelection();
-    void clearAllPathsSelection();
     void setPointCtrlsMode(CtrlsMode mode);
     QPointF scaleDistancePointByCurrentScale(QPointF point);
     void setCurrentBoxesGroup(BoxesGroup *group);
 
-    void rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans);
     void updatePivot();
 
     void schedulePivotUpdate();
     void updatePivotIfNeeded();
     void setPivotPositionForSelected();
-    void scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
 
     void awaitUpdate() {}
     void scheduleAwaitUpdate() {}
@@ -221,7 +215,6 @@ public:
     void clearAll();
     void resetTransormation();
     void fitCanvasToSize();
-    void saveSelectedToSqlForCurrentBox(QSqlQuery *query);
     bool processFilteredKeyEvent(QKeyEvent *event);
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
     void scale(qreal scaleBy, QPointF absOrigin);
@@ -245,66 +238,79 @@ public:
     void centerPivotPosition(bool finish = false) { Q_UNUSED(finish); }
     bool processUnfilteredKeyEvent(QKeyEvent *event);
 
-    void fillGradientChanged(Gradient* gradient, bool finish) {
-        mCurrentBoxesGroup->setSelectedFillGradient(gradient, finish);
-    }
+    //
+    void finishSelectedPointsTransform();
+    void finishSelectedBoxesTransform();
+    void moveSelectedPointsByAbs(QPointF by, bool startTransform);
+    void moveSelectedBoxesBy(QPointF by, bool startTransform);
+    BoxesGroup *groupSelectedBoxes();
 
-    void strokeGradientChanged(Gradient* gradient, bool finish) {
-        mCurrentBoxesGroup->setSelectedStrokeGradient(gradient, finish);
-    }
+    //void selectAllBoxes();
+    void deselectAllBoxes();
 
-    void fillFlatColorChanged(Color color, bool finish) {
-        mCurrentBoxesGroup->setSelectedFillFlatColor(color, finish);
-    }
+    void applyShadowToSelected();
 
-    void strokeFlatColorChanged(Color color, bool finish) {
-        mCurrentBoxesGroup->setSelectedStrokeFlatColor(color, finish);
-    }
+    void selectedPathsUnion();
+    void selectedPathsDifference();
+    void selectedPathsIntersection();
+    void selectedPathsDivision();
+    void selectedPathsExclusion();
+    void makeSelectedPointsSegmentsCurves();
+    void makeSelectedPointsSegmentsLines();
 
-    void fillPaintTypeChanged(PaintType paintType, Color color,
-                              Gradient* gradient) {
-        mCurrentBoxesGroup->setSelectedFillPaintType(paintType, color,
-                                                     gradient);
-    }
+    void updateSelectedPointsAfterCtrlsVisiblityChanged();
+    void removeSelectedPointsApproximateAndClearList();
+    void centerPivotForSelected();
+    void resetSelectedScale();
+    void resetSelectedTranslation();
+    void resetSelectedRotation();
+    void convertSelectedBoxesToPath();
 
-    void strokePaintTypeChanged(PaintType paintType, Color color,
-                                Gradient* gradient) {
-        mCurrentBoxesGroup->setSelectedStrokePaintType(paintType, color,
-                                                       gradient);
-    }
+    void applyBlurToSelected();
+    void applyBrushEffectToSelected();
+    void applyLinesEffectToSelected();
+    void applyCirclesEffectToSelected();
+    void applySwirlEffectToSelected();
+    void applyOilEffectToSelected();
+    void applyImplodeEffectToSelected();
+    void applyDesaturateEffectToSelected();
 
-    void strokeCapStyleChanged(Qt::PenCapStyle capStyle) {
-        mCurrentBoxesGroup->setSelectedCapStyle(capStyle);
-    }
+    void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
 
-    void strokeJoinStyleChanged(Qt::PenJoinStyle joinStyle) {
-        mCurrentBoxesGroup->setSelectedJoinStyle(joinStyle);
-    }
+    QPointF getSelectedBoxesAbsPivotPos();
+    bool isSelectionEmpty();
+    void setSelectedPivotAbsPos(QPointF absPos);
 
-    void strokeWidthChanged(qreal strokeWidth, bool finish) {
-        mCurrentBoxesGroup->setSelectedStrokeWidth(strokeWidth, finish);
-    }
+    void ungroupSelected();
+    void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
+    void cancelSelectedBoxesTransform();
+    void cancelSelectedPointsTransform();
+    PathPoint *createNewPointOnLineNearSelected(QPointF absPos, bool adjust);
+    void saveSelectedToSql(QSqlQuery *query);
 
-    void startStrokeWidthTransform() {
-        mCurrentBoxesGroup->startSelectedStrokeWidthTransform();
-    }
+    void setSelectedFillGradient(Gradient* gradient, bool finish);
+    void setSelectedStrokeGradient(Gradient* gradient, bool finish);
+    void setSelectedFillFlatColor(Color color, bool finish);
+    void setSelectedStrokeFlatColor(Color color, bool finish);
+    void setSelectedFillPaintType(PaintType paintType, Color color,
+                              Gradient* gradient);
+    void setSelectedStrokePaintType(PaintType paintType, Color color,
+                                Gradient* gradient);
+    void setSelectedCapStyle(Qt::PenCapStyle capStyle);
+    void setSelectedJoinStyle(Qt::PenJoinStyle joinStyle);
+    void setSelectedStrokeWidth(qreal strokeWidth, bool finish);
+    void startSelectedStrokeWidthTransform();
+    void startSelectedStrokeColorTransform();
+    void startSelectedFillColorTransform();
 
-    void startStrokeColorTransform() {
-        mCurrentBoxesGroup->startSelectedStrokeColorTransform();
-    }
-
-    void startFillColorTransform() {
-        mCurrentBoxesGroup->startSelectedFillColorTransform();
-    }
-
-    void updateDisplayedFillStrokeSettings();
-    void scaleBoxesBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
+    void setDisplayedFillStrokeSettingsFromLastSelected();
+    void scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
+                         QPointF absOrigin, bool startTrans);
     void updateInputValue();
     void clearAndDisableInput();
 
     qreal getCurrentCanvasScale();
 
-    void ctrlsVisiblityChanged();
     void grabMouseAndTrack();
 
     void setPartialRepaintRect(QRectF absRect);
@@ -325,9 +331,42 @@ public:
     void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
     void showContextMenu(QPoint globalPos);
     void updateAllBoxes();
-    void scalePointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
-    void rotatePointsBy(qreal rotChange, QPointF absOrigin, bool startTrans);
 
+    void applyCurrentTransformationToSelected();
+    QPointF getSelectedPointsAbsPivotPos();
+    bool isPointsSelectionEmpty();
+    void scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
+    void rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin, bool startTrans);
+    int getPointsSelectionCount();
+
+
+    void clearPointsSelectionOrDeselect();
+    Edge *getPressedEdge(QPointF absPos);
+
+    void createLinkBoxForSelected();
+    void startSelectedPointsTransform();
+
+    void mergePoints();
+    void disconnectPoints();
+    void connectPoints();
+
+    void setSelectedFontFamilyAndStyle(QString family, QString style);
+    void setSelectedFontSize(qreal size);
+    void removeSelectedPointsAndClearList();
+    void removeSelectedBoxesAndClearList();
+    void clearBoxesSelection();
+    void removePointFromSelection(MovablePoint *point);
+    void removeBoxFromSelection(BoundingBox *box);
+    void addPointToSelection(MovablePoint *point);
+    void addBoxToSelection(BoundingBox *box);
+    void clearPointsSelection();
+    void raiseSelectedBoxesToTop();
+    void lowerSelectedBoxesToBottom();
+    void raiseSelectedBoxes();
+    void lowerSelectedBoxes();
+
+    void selectAndAddContainedPointsToSelection(QRectF absRect);
+//
     void paintEvent(QPainter *p);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -371,8 +410,6 @@ public:
 protected:
 //    void updateAfterCombinedTransformationChanged();
 
-    void addPointToSelection(MovablePoint *point);
-
     void setCurrentEndPoint(PathPoint *point);
 
     PathPoint *getCurrentPoint();
@@ -388,20 +425,6 @@ signals:
 private slots:
     void nextPreviewFrame();
 public:
-    void raiseAction();
-    void lowerAction();
-    void raiseToTopAction();
-    void lowerToBottomAction();
-
-    void objectsToPathAction();
-
-    void setFontFamilyAndStyle(QString family, QString style);
-    void setFontSize(qreal size);
-
-    void connectPointsSlot();
-    void disconnectPointsSlot();
-    void mergePointsSlot();
-
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
     void makePointCtrlsCorner();
@@ -409,14 +432,20 @@ public:
     void makeSegmentLine();
     void makeSegmentCurve();
 
-    void pathsUnionAction();
-    void pathsDifferenceAction();
-    void pathsIntersectionAction();
-    void pathsDivisionAction();
-    void pathsExclusionAction();
     BoundingBox *createLink(BoxesGroup *parent);
     void createImageBox(const QString &path);
+    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
+    MovablePoint *getPointAt(const QPointF &absPos,
+                             const CanvasMode &currentMode);
 private:
+    VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
+                                              const bool &unionInterOther);
+
+    void sortSelectedBoxesByZAscending();
+
+    QList<MovablePoint*> mSelectedPoints;
+    QList<BoundingBox*> mSelectedBoxes;
+
     bool mIsCurrentCanvas = true;
 
     bool mPivotVisibleDuringPointEdit = true;
@@ -488,7 +517,6 @@ private:
     QPointF getMoveByValueForEventPos(QPointF eventPos);
     void cancelCurrentTransform();
     void releaseMouseAndDontTrack();
-    void groupSelectedBoxesAction();
 };
 
 #endif // CANVAS_H

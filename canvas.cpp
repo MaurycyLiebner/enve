@@ -122,10 +122,6 @@ void Canvas::setResolutionPercent(const qreal &percent)
     mResolutionPercent = percent;
 }
 
-void Canvas::updateDisplayedFillStrokeSettings() {
-    mCurrentBoxesGroup->setDisplayedFillStrokeSettingsFromLastSelected();
-}
-
 QRectF Canvas::getPixBoundingRect()
 {
     QPointF absPos = getAbsolutePos();
@@ -161,9 +157,9 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     if(!mCanvasWidget->hasFocus()) return false;
     if(isCtrlPressed() && event->key() == Qt::Key_G) {
         if(isShiftPressed()) {
-            mCurrentBoxesGroup->ungroupSelected();
+            ungroupSelected();
         } else {
-            BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
+            BoxesGroup *newGroup = groupSelectedBoxes();
 //            if(newGroup != NULL) {
 //                setCurrentBoxesGroup(newGroup);
 //            }
@@ -172,13 +168,13 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
 
 
     } else if(event->key() == Qt::Key_PageUp) {
-        mCurrentBoxesGroup->raiseSelectedBoxes();
+        raiseSelectedBoxes();
     } else if(event->key() == Qt::Key_PageDown) {
-        mCurrentBoxesGroup->lowerSelectedBoxes();
+        lowerSelectedBoxes();
     } else if(event->key() == Qt::Key_End) {
-        mCurrentBoxesGroup->lowerSelectedBoxesToBottom();
+        lowerSelectedBoxesToBottom();
     } else if(event->key() == Qt::Key_Home) {
-        mCurrentBoxesGroup->raiseSelectedBoxesToTop();
+        raiseSelectedBoxesToTop();
     } else {
         return false;
     }
@@ -187,43 +183,14 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
 #include "BoxesList/boxscrollwidget.h"
 void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     mCurrentBoxesGroup->setIsCurrentGroup(false);
-    clearAllPathsSelection();
-    clearAllPointsSelection();
+    clearBoxesSelection();
+    clearPointsSelection();
     mCurrentBoxesGroup = group;
     group->setIsCurrentGroup(true);
 
     //mMainWindow->getObjectSettingsList()->setMainTarget(mCurrentBoxesGroup);
     SWT_scheduleWidgetsContentUpdateWithTarget(mCurrentBoxesGroup,
                                                SWT_CurrentGroup);
-}
-
-void Canvas::rotateBoxesBy(qreal rotChange, QPointF absOrigin, bool startTrans)
-{
-    mCurrentBoxesGroup->rotateSelectedBy(rotChange, absOrigin, startTrans);
-}
-
-void Canvas::rotatePointsBy(qreal rotChange, QPointF absOrigin, bool startTrans)
-{
-    mCurrentBoxesGroup->rotateSelectedPointsBy(rotChange, absOrigin, startTrans);
-}
-
-void Canvas::scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans)
-{
-    mCurrentBoxesGroup->scaleSelectedBy(scaleBy, absOrigin, startTrans);
-}
-
-void Canvas::scaleBoxesBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin,
-                          bool startTrans)
-{
-    mCurrentBoxesGroup->scaleSelectedBy(scaleXBy, scaleYBy, absOrigin,
-                                        startTrans);
-}
-
-void Canvas::scalePointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin,
-                            bool startTrans)
-{
-    mCurrentBoxesGroup->scaleSelectedPointsBy(scaleXBy, scaleYBy, absOrigin,
-                                              startTrans);
 }
 
 void Canvas::saveToSql(QSqlQuery *query)
@@ -233,10 +200,6 @@ void Canvas::saveToSql(QSqlQuery *query)
     }
 }
 
-void Canvas::saveSelectedToSqlForCurrentBox(QSqlQuery *query) {
-    mCurrentBoxesGroup->saveSelectedToSql(query);
-}
-
 void Canvas::loadAllBoxesFromSql(bool loadInBox) {
     BoxesGroup *container = mCurrentBoxesGroup->loadChildrenFromSql(0,
                                                                     loadInBox);
@@ -244,6 +207,12 @@ void Canvas::loadAllBoxesFromSql(bool loadInBox) {
 
 void Canvas::createImageBox(const QString &path) {
     mCurrentBoxesGroup->addChild(new ImageBox(mCurrentBoxesGroup, path));
+}
+
+void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->drawSelected(p, currentCanvasMode);
+    }
 }
 
 void Canvas::paintEvent(QPainter *p)
@@ -273,13 +242,17 @@ void Canvas::paintEvent(QPainter *p)
         }
         p->restore();
     } else {
-        p->fillRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1, QColor(75, 75, 75));
+        p->fillRect(0, 0,
+                    mCanvasWidget->width() + 1,
+                    mCanvasWidget->height() + 1,
+                    QColor(75, 75, 75));
         p->fillRect(viewRect, Qt::white);
 
         foreach(BoundingBox *box, mChildBoxes){
             box->drawPixmap(p);
         }
         mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
+        drawSelected(p, mCurrentMode);
 
         p->setPen(QPen(Qt::black, 2.));
         p->setBrush(Qt::NoBrush);
@@ -292,7 +265,7 @@ void Canvas::paintEvent(QPainter *p)
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
             mRotPivot->draw(p);
-        }
+        }      
 
         if(mInputTransformationEnabled) {
             QRect inputRect = QRect(40, mCanvasWidget->height() - 20, 100, 20);
@@ -322,14 +295,8 @@ bool Canvas::isMovingPath() {
     return mCurrentMode == CanvasMode::MOVE_PATH;
 }
 
-qreal Canvas::getCurrentCanvasScale()
-{
+qreal Canvas::getCurrentCanvasScale() {
     return mCombinedTransformMatrix.m11();
-}
-
-void Canvas::ctrlsVisiblityChanged()
-{
-    mCurrentBoxesGroup->updateSelectedPointsAfterCtrlsVisiblityChanged();
 }
 
 QSize Canvas::getCanvasSize()
@@ -375,46 +342,6 @@ void Canvas::nextPreviewFrame()
         mCurrentPreviewImg = mPreviewFrames.at(mCurrentPreviewFrameId);
     }
     mCanvasWidget->repaint();
-}
-
-void Canvas::raiseAction() {
-    mCurrentBoxesGroup->raiseSelectedBoxes();
-}
-
-void Canvas::lowerAction() {
-    mCurrentBoxesGroup->lowerSelectedBoxes();
-}
-
-void Canvas::raiseToTopAction() {
-    mCurrentBoxesGroup->raiseSelectedBoxesToTop();
-}
-
-void Canvas::lowerToBottomAction() {
-    mCurrentBoxesGroup->lowerSelectedBoxesToBottom();
-}
-
-void Canvas::objectsToPathAction() {
-    mCurrentBoxesGroup->convertSelectedBoxesToPath();
-}
-
-void Canvas::pathsUnionAction() {
-    mCurrentBoxesGroup->selectedPathsUnion();
-}
-
-void Canvas::pathsDifferenceAction() {
-    mCurrentBoxesGroup->selectedPathsDifference();
-}
-
-void Canvas::pathsIntersectionAction() {
-    mCurrentBoxesGroup->selectedPathsIntersection();
-}
-
-void Canvas::pathsDivisionAction() {
-    mCurrentBoxesGroup->selectedPathsDivision();
-}
-
-void Canvas::pathsExclusionAction() {
-    mCurrentBoxesGroup->selectedPathsExclusion();
 }
 
 QRectF Canvas::getRenderRect() {
@@ -556,42 +483,27 @@ void Canvas::updatePivotIfNeeded()
     }
 }
 
-void Canvas::connectPointsSlot()
-{
-    mCurrentBoxesGroup->connectPoints();
-}
-
-void Canvas::disconnectPointsSlot()
-{
-    mCurrentBoxesGroup->disconnectPoints();
-}
-
-void Canvas::mergePointsSlot()
-{
-    mCurrentBoxesGroup->mergePoints();
-}
-
 void Canvas::makePointCtrlsSymmetric()
 {
-    mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+    setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
 }
 
 void Canvas::makePointCtrlsSmooth()
 {
-    mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
+    setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
 }
 
 void Canvas::makePointCtrlsCorner()
 {
-    mCurrentBoxesGroup->setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
 }
 
 void Canvas::makeSegmentLine() {
-    mCurrentBoxesGroup->makeSelectedPointsSegmentsLines();
+    makeSelectedPointsSegmentsLines();
 }
 
 void Canvas::makeSegmentCurve() {
-    mCurrentBoxesGroup->makeSelectedPointsSegmentsCurves();
+    makeSelectedPointsSegmentsCurves();
 }
 
 void Canvas::moveSecondSelectionPoint(QPointF pos) {
@@ -606,24 +518,25 @@ void Canvas::startSelectionAtPoint(QPointF pos) {
 
 void Canvas::updatePivot() {
     if(mCurrentMode == MOVE_POINT) {
-        if(mCurrentBoxesGroup->isPointsSelectionEmpty() || !mPivotVisibleDuringPointEdit) {
+        if(isPointsSelectionEmpty() ||
+           !mPivotVisibleDuringPointEdit) {
             mRotPivot->hide();
         } else {
             mRotPivot->show();
         }
-        if(mCurrentBoxesGroup->getPointsSelectionCount() == 1) {
-                    mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedPointsAbsPivotPos() + QPointF(0., 20.),
+        if(getPointsSelectionCount() == 1) {
+                    mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos() + QPointF(0., 20.),
                                               false);
         } else {
-            mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedPointsAbsPivotPos(),
+            mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos(),
                                       false);
         }
     } else if(mCurrentMode == MOVE_PATH) {
-        if(mCurrentBoxesGroup->isSelectionEmpty() ) {
+        if(isSelectionEmpty() ) {
             mRotPivot->hide();
         } else {
             mRotPivot->show();
-            mRotPivot->setAbsolutePos(mCurrentBoxesGroup->getSelectedBoxesAbsPivotPos(),
+            mRotPivot->setAbsolutePos(getSelectedBoxesAbsPivotPos(),
                                       false);
         }
     }
@@ -638,7 +551,7 @@ void Canvas::updatePivot() {
 void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
 
-    clearAllPointsSelection();
+    clearPointsSelection();
     if(mCurrentMode == MOVE_PATH || mCurrentMode == MOVE_POINT) {
         schedulePivotUpdate();
     }
@@ -667,25 +580,10 @@ void Canvas::grabMouseAndTrack() {
     mCanvasWidget->grabMouse();
 }
 
-void Canvas::setFontFamilyAndStyle(QString family, QString style) {
-    mCurrentBoxesGroup->setSelectedFontFamilyAndStyle(family, style);
-}
-
-void Canvas::setFontSize(qreal size) {
-    mCurrentBoxesGroup->setSelectedFontSize(size);
-}
-
 void Canvas::releaseMouseAndDontTrack() {
     mIsMouseGrabbing = false;
     mCanvasWidget->setMouseTracking(false);
     mCanvasWidget->releaseMouse();
-}
-
-void Canvas::groupSelectedBoxesAction() {
-    BoxesGroup *newGroup = mCurrentBoxesGroup->groupSelectedBoxes();
-//    if(newGroup != NULL) {
-//        setCurrentBoxesGroup(newGroup);
-//    }
 }
 
 bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
@@ -774,34 +672,34 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         } else if(event->key() == Qt::Key_Delete) {
            if(mCurrentMode == MOVE_POINT) {
                if(isShiftPressed()) {
-                   mCurrentBoxesGroup->removeSelectedPointsApproximateAndClearList();
+                   removeSelectedPointsApproximateAndClearList();
                } else {
-                   mCurrentBoxesGroup->removeSelectedPointsAndClearList();
+                   removeSelectedPointsAndClearList();
                }
            } else if(mCurrentMode == MOVE_PATH) {
-               mCurrentBoxesGroup->removeSelectedBoxesAndClearList();
+               removeSelectedBoxesAndClearList();
            }
         } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
            if(isShiftPressed()) {
-               mCurrentBoxesGroup->ungroupSelected();
+               ungroupSelected();
            } else {
-               groupSelectedBoxesAction();
+               groupSelectedBoxes();
            }
 
         } else if(event->key() == Qt::Key_PageUp) {
-           raiseAction();
+           raiseSelectedBoxes();
         } else if(event->key() == Qt::Key_PageDown) {
-           lowerAction();
+           lowerSelectedBoxes();
         } else if(event->key() == Qt::Key_End) {
-           lowerToBottomAction();
+           lowerSelectedBoxesToBottom();
         } else if(event->key() == Qt::Key_Home) {
-           raiseToTopAction();
+           raiseSelectedBoxesToTop();
         } else if(event->key() == Qt::Key_G && isAltPressed(event)) {
-            mCurrentBoxesGroup->resetSelectedTranslation();
+            resetSelectedTranslation();
         } else if(event->key() == Qt::Key_S && isAltPressed(event)) {
-            mCurrentBoxesGroup->resetSelectedScale();
+            resetSelectedScale();
         } else if(event->key() == Qt::Key_R && isAltPressed(event)) {
-            mCurrentBoxesGroup->resetSelectedRotation();
+            resetSelectedRotation();
         } else if(event->key() == Qt::Key_R && (isMovingPath() ||
                   mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
            mTransformationFinishedBeforeMouseRelease = false;
@@ -840,9 +738,9 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             grabMouseAndTrack();
          } else if(event->key() == Qt::Key_A && isCtrlPressed(event) && !isGrabbingMouse) {
            if(isShiftPressed()) {
-               mCurrentBoxesGroup->deselectAllBoxes();
+               mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();
            } else {
-               mCurrentBoxesGroup->selectAllBoxes();
+               mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
            }
         } else if(event->key() == Qt::Key_P) {
             mPivotVisibleDuringPointEdit = !mPivotVisibleDuringPointEdit;
@@ -851,23 +749,6 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     }
 
     callUpdateSchedulers();
-}
-
-void Canvas::clearAllPathsSelection() {
-    mCurrentBoxesGroup->clearBoxesSelection();
-    if(mLastPressedBox != NULL) {
-        mLastPressedBox->deselect();
-        mLastPressedBox = NULL;
-    }
-}
-
-void Canvas::clearAllPointsSelection() {
-    mCurrentBoxesGroup->clearPointsSelection();
-    if(mLastPressedPoint != NULL) {
-        mLastPressedPoint->deselect();
-        mLastPressedPoint = NULL;
-    }
-    setCurrentEndPoint(NULL);
 }
 
 void Canvas::setCurrentEndPoint(PathPoint *point)
@@ -882,19 +763,19 @@ void Canvas::setCurrentEndPoint(PathPoint *point)
 }
 
 void Canvas::selectOnlyLastPressedBox() {
-    mCurrentBoxesGroup->clearBoxesSelection();
+    clearBoxesSelection();
     if(mLastPressedBox == NULL) {
         return;
     }
-    mCurrentBoxesGroup->addBoxToSelection(mLastPressedBox);
+    addBoxToSelection(mLastPressedBox);
 }
 
 void Canvas::selectOnlyLastPressedPoint() {
-    mCurrentBoxesGroup->clearPointsSelection();
+    clearPointsSelection();
     if(mLastPressedPoint == NULL) {
         return;
     }
-    mCurrentBoxesGroup->addPointToSelection(mLastPressedPoint);
+    addPointToSelection(mLastPressedPoint);
 }
 
 void Canvas::resetTransormation() {

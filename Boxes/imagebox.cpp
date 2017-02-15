@@ -20,7 +20,8 @@ void ImageBox::updateBoundingRect() {
     BoundingBox::updateBoundingRect();
 }
 
-void ImageBox::drawSelected(QPainter *p, CanvasMode)
+void ImageBox::drawSelected(QPainter *p,
+                            const CanvasMode &)
 {
     if(mVisible) {
         p->save();

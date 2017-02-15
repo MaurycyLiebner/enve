@@ -41,9 +41,9 @@ void TextBox::loadFromSql(int boundingBoxId) {
         int idFontSize = query.record().indexOf("fontsize");
 
         setText(query.value(idText).toString());
-        setFontFamilyAndStyle(query.value(idFontFamily).toString(),
+        setSelectedFontFamilyAndStyle(query.value(idFontFamily).toString(),
                               query.value(idFontStyle).toString() );
-        setFontSize(query.value(idFontSize).toReal());
+        setSelectedFontSize(query.value(idFontSize).toReal());
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }
@@ -61,7 +61,8 @@ void TextBox::loadFromSql(int boundingBoxId) {
 //    return rect.translated(QPointF(0., -fm.height()));
 //}
 
-void TextBox::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
+void TextBox::drawSelected(QPainter *p,
+                           const CanvasMode &currentCanvasMode)
 {
     if(mVisible) {
         p->save();
@@ -103,20 +104,20 @@ void TextBox::setFont(QFont font)
     schedulePathUpdate();
 }
 
-void TextBox::setFontSize(qreal size)
+void TextBox::setSelectedFontSize(qreal size)
 {
     mFont.setPointSize(size);
     schedulePathUpdate();
 }
 
-void TextBox::setFontFamilyAndStyle(QString fontFamily, QString fontStyle)
+void TextBox::setSelectedFontFamilyAndStyle(QString fontFamily, QString fontStyle)
 {
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);
     schedulePathUpdate();
 }
 
-MovablePoint *TextBox::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
+MovablePoint *TextBox::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {

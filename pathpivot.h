@@ -22,7 +22,7 @@ public:
                          bool xOnly, bool yOnly,
                          bool inputTransformationEnabled,
                          qreal inputTransformationValue,
-                         bool startTransform, CanvasMode mode);
+                         bool startTransform, const CanvasMode &mode);
 //    void updateRotationMappedPath();
     void finishTransform();
     void startRotating();

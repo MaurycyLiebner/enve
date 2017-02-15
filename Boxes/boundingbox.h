@@ -89,8 +89,8 @@ public:
     virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 
     virtual void setFont(QFont) {}
-    virtual void setFontSize(qreal) {}
-    virtual void setFontFamilyAndStyle(QString,
+    virtual void setSelectedFontSize(qreal) {}
+    virtual void setSelectedFontFamilyAndStyle(QString,
                                        QString) {}
 
     virtual QPointF getRelCenterPosition() { return mRelBoundingRect.center(); }
@@ -108,7 +108,8 @@ public:
     virtual void draw(QPainter *) {}
     virtual void drawForPreview(QPainter *p) { draw(p); }
 
-    virtual void drawSelected(QPainter *p, CanvasMode) {
+    virtual void drawSelected(QPainter *p,
+                              const CanvasMode &) {
         if(mVisible) {
             p->save();
             drawBoundingRect(p);
@@ -134,7 +135,8 @@ public:
 
     virtual bool relPointInsidePath(QPointF) { return false; }
     bool absPointInsidePath(QPointF absPos);
-    virtual MovablePoint *getPointAt(QPointF, CanvasMode) { return NULL; }
+    virtual MovablePoint *getPointAt(const QPointF &,
+                                     const CanvasMode &) { return NULL; }
 
     void moveUp();
     void moveDown();
@@ -229,9 +231,9 @@ public:
     virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
         Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
 
-    virtual void startStrokeWidthTransform() {}
-    virtual void startStrokeColorTransform() {}
-    virtual void startFillColorTransform() {}
+    virtual void startSelectedStrokeWidthTransform() {}
+    virtual void startSelectedStrokeColorTransform() {}
+    virtual void startSelectedFillColorTransform() {}
 
     virtual Edge *getEgde(QPointF absPos) {
         Q_UNUSED(absPos);
@@ -364,6 +366,8 @@ public:
 
     bool isAncestor(BoxesGroup *box) const;
     bool isAncestor(BoundingBox *box) const;
+    void removeFromParent();
+    void removeFromSelection();
 protected:
     bool mUpdateDisabled = false;
 

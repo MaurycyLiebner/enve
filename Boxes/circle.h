@@ -50,9 +50,9 @@ public:
     void setHorizontalRadius(qreal horizontalRadius);
     void setRadius(qreal radius);
 
-    void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
+    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
     void updatePath();
-    MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
+    MovablePoint *getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode);
     void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint *> *list);
     void moveRadiusesByAbs(QPointF absTrans);
     void startPointsTransform();

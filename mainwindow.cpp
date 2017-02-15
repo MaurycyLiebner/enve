@@ -933,7 +933,7 @@ void MainWindow::exportSelected(QString path) {
     query.exec("BEGIN TRANSACTION");
 
     mFillStrokeSettings->saveGradientsToSqlIfPathSelected(&query);
-    mCanvas->saveSelectedToSqlForCurrentBox(&query);
+    mCanvas->saveSelectedToSql(&query);
 
     query.exec("COMMIT TRANSACTION");
     db.close();

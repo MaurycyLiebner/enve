@@ -56,8 +56,9 @@ public:
 
     void moveSizePointByAbs(QPointF absTrans);
     void startAllPointsTransform();
-    void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
-    MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
+    void drawSelected(QPainter *p,
+                      const CanvasMode &currentCanvasMode);
+    MovablePoint *getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode);
     void selectAndAddContainedPointsToList(QRectF absRect,
                                            QList<MovablePoint *> *list);
     void updatePath();

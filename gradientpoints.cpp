@@ -70,7 +70,7 @@ void GradientPoints::drawGradientPoints(QPainter *p)
     }
 }
 
-MovablePoint *GradientPoints::getPointAt(QPointF absPos)
+MovablePoint *GradientPoints::getPointAt(const QPointF &absPos)
 {
     if(enabled) {
         if(startPoint->isPointAtAbsPos(absPos) ) {

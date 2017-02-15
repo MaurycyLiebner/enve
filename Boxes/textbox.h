@@ -10,16 +10,18 @@ public:
     void setText(QString text);
 
     void setFont(QFont font);
-    void setFontSize(qreal size);
-    void setFontFamilyAndStyle(QString fontFamily,
+    void setSelectedFontSize(qreal size);
+    void setSelectedFontFamilyAndStyle(QString fontFamily,
                                QString fontStyle);
-    void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
+    void drawSelected(QPainter *p,
+                      const CanvasMode &currentCanvasMode);
 
     void openTextEditor();
     int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
     void updatePath();
-    MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
+    MovablePoint *getPointAt(const QPointF &absPtPos,
+                             const CanvasMode &currentCanvasMode);
 //    QRectF getTextRect();
     void setPathText(bool pathText);
 private:

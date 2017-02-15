@@ -118,7 +118,7 @@ void Circle::setRadius(qreal radius)
     setVerticalRadius(radius);
 }
 
-void Circle::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
+void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode)
 {
     if(mVisible) {
         p->save();
@@ -137,7 +137,7 @@ void Circle::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
 }
 
 
-MovablePoint *Circle::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
+MovablePoint *Circle::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {

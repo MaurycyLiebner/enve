@@ -136,7 +136,7 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
                                 bool xOnly, bool yOnly,
                                 bool inputTransformationEnabled,
                                 qreal inputTransformationValue,
-                                bool startTransform, CanvasMode mode)
+                                bool startTransform, const CanvasMode &mode)
 {
     if(mRotating) {
         QPointF absPos = getAbsolutePos();
@@ -162,9 +162,9 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
         }
 
         if(mode == CanvasMode::MOVE_PATH) {
-            mCanvas->rotateBoxesBy(rot, absPos, startTransform);
+            mCanvas->rotateSelectedBy(rot, absPos, startTransform);
         } else {
-            mCanvas->rotatePointsBy(rot, absPos, startTransform);
+            mCanvas->rotateSelectedPointsBy(rot, absPos, startTransform);
         }
         return true;
     } else if(mScaling) {
@@ -199,9 +199,9 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
         }
 
         if(mode == CanvasMode::MOVE_PATH) {
-            mCanvas->scaleBoxesBy(scaleX, scaleY, absPos, startTransform);
+            mCanvas->scaleSelectedBy(scaleX, scaleY, absPos, startTransform);
         } else {
-            mCanvas->scalePointsBy(scaleX, scaleY, absPos, startTransform);
+            mCanvas->scaleSelectedPointsBy(scaleX, scaleY, absPos, startTransform);
         }
         return true;
     }

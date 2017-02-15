@@ -198,7 +198,7 @@ void PathPoint::rectPointsSelection(QRectF absRect, QList<MovablePoint*> *list) 
     }
 }
 
-MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode)
+MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos, const CanvasMode &canvasMode)
 {
     if(canvasMode == CanvasMode::MOVE_POINT) {
         if(mStartCtrlPt->isPointAtAbsPos(absPos)) {
@@ -330,7 +330,7 @@ CtrlPoint *PathPoint::getEndCtrlPt()
     return mEndCtrlPt;
 }
 
-void PathPoint::draw(QPainter *p, CanvasMode mode)
+void PathPoint::draw(QPainter *p, const CanvasMode &mode)
 {
     if(mSelected) {
         p->setBrush(QColor(0, 200, 255));

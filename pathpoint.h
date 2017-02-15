@@ -199,7 +199,7 @@ public:
     QPointF getEndCtrlPtValue() const;
     CtrlPoint *getEndCtrlPt();
 
-    void draw(QPainter *p, CanvasMode mode);
+    void draw(QPainter *p, const CanvasMode &mode);
 
     PathPoint *getNextPoint();
     PathPoint *getPreviousPoint();
@@ -223,7 +223,7 @@ public:
     void removeFromVectorPath();
     void removeApproximate();
 
-    MovablePoint *getPointAtAbsPos(QPointF absPos, CanvasMode canvasMode);
+    MovablePoint *getPointAtAbsPos(QPointF absPos, const CanvasMode &canvasMode);
     void rectPointsSelection(QRectF absRect, QList<MovablePoint *> *list);
     void updateStartCtrlPtVisibility();
     void updateEndCtrlPtVisibility();

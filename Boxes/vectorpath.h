@@ -26,12 +26,12 @@ public:
 
     ~VectorPath();
 
-    void drawSelected(QPainter *p, CanvasMode currentCanvasMode);
+    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
 
     PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
     PathPoint *addPointRelPos(QPointF relPtPos, PathPoint *toPoint = NULL);
 
-    MovablePoint *getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode);
+    MovablePoint *getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode);
 
     void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint*> *list);
 

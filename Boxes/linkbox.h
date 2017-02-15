@@ -37,7 +37,7 @@ public:
                         const QMatrix &transform,
                         QRectF *pixBoundingRectClippedToViewP);
 
-    void drawSelected(QPainter *p, CanvasMode);
+    void drawSelected(QPainter *p, const CanvasMode &);
     void updateBoundingRect();
     bool relPointInsidePath(QPointF point);
     QPointF getRelCenterPosition();

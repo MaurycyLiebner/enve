@@ -112,7 +112,8 @@ QPixmap InternalLinkBox::getPrettyPixmapProvidedTransform(
                                         pixBoundingRectClippedToViewP);
 }
 
-void InternalLinkBox::drawSelected(QPainter *p, CanvasMode)
+void InternalLinkBox::drawSelected(QPainter *p,
+                                   const CanvasMode &)
 {
     if(mVisible) {
         p->save();

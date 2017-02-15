@@ -215,91 +215,91 @@ bool CanvasWidget::processFilteredKeyEvent(QKeyEvent *event) {
 
 void CanvasWidget::raiseAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->raiseAction();
+    mCurrentCanvas->raiseSelectedBoxes();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::lowerAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->lowerAction();
+    mCurrentCanvas->lowerSelectedBoxes();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::raiseToTopAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->raiseToTopAction();
+    mCurrentCanvas->raiseSelectedBoxesToTop();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::lowerToBottomAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->lowerToBottomAction();
+    mCurrentCanvas->lowerSelectedBoxesToBottom();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::objectsToPathAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->objectsToPathAction();
+    mCurrentCanvas->convertSelectedBoxesToPath();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::pathsUnionAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->pathsUnionAction();
+    mCurrentCanvas->selectedPathsUnion();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::pathsDifferenceAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->pathsDifferenceAction();
+    mCurrentCanvas->selectedPathsDifference();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::pathsIntersectionAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->pathsIntersectionAction();
+    mCurrentCanvas->selectedPathsIntersection();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::pathsDivisionAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->pathsDivisionAction();
+    mCurrentCanvas->selectedPathsDivision();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::pathsExclusionAction() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->pathsExclusionAction();
+    mCurrentCanvas->selectedPathsExclusion();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::setFontFamilyAndStyle(QString family, QString style) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->setFontFamilyAndStyle(family, style);
+    mCurrentCanvas->setSelectedFontFamilyAndStyle(family, style);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::setFontSize(qreal size) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->setFontSize(size);
+    mCurrentCanvas->setSelectedFontSize(size);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::connectPointsSlot() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->connectPointsSlot();
+    mCurrentCanvas->connectPoints();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::disconnectPointsSlot() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->disconnectPointsSlot();
+    mCurrentCanvas->disconnectPoints();
     callUpdateSchedulers();
 }
 
 void CanvasWidget::mergePointsSlot() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->mergePointsSlot();
+    mCurrentCanvas->mergePoints();
     callUpdateSchedulers();
 }
 
@@ -355,7 +355,7 @@ void CanvasWidget::fillPaintTypeChanged(const PaintType &paintType,
                                         const Color &color,
                                         Gradient *gradient) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->fillPaintTypeChanged(paintType,
+    mCurrentCanvas->setSelectedFillPaintType(paintType,
                                          color,
                                          gradient);
     callUpdateSchedulers();
@@ -365,7 +365,7 @@ void CanvasWidget::strokePaintTypeChanged(const PaintType &paintType,
                                           const Color &color,
                                           Gradient *gradient) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->strokePaintTypeChanged(paintType,
+    mCurrentCanvas->setSelectedStrokePaintType(paintType,
                                            color,
                                            gradient);
     callUpdateSchedulers();
@@ -373,48 +373,48 @@ void CanvasWidget::strokePaintTypeChanged(const PaintType &paintType,
 
 void CanvasWidget::strokeCapStyleChanged(const Qt::PenCapStyle &capStyle) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->strokeCapStyleChanged(capStyle);
+    mCurrentCanvas->setSelectedCapStyle(capStyle);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->strokeJoinStyleChanged(joinStyle);
+    mCurrentCanvas->setSelectedJoinStyle(joinStyle);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::strokeWidthChanged(const qreal &strokeWidth,
                                       const bool &finish) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->strokeWidthChanged(strokeWidth, finish);
+    mCurrentCanvas->setSelectedStrokeWidth(strokeWidth, finish);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::strokeFlatColorChanged(const Color &color,
                                       const bool &finish) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->strokeFlatColorChanged(color, finish);
+    mCurrentCanvas->setSelectedStrokeFlatColor(color, finish);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::fillFlatColorChanged(const Color &color,
                                         const bool &finish) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->fillFlatColorChanged(color, finish);
+    mCurrentCanvas->setSelectedFillFlatColor(color, finish);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::fillGradientChanged(Gradient *gradient,
                                        const bool &finish) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->fillGradientChanged(gradient, finish);
+    mCurrentCanvas->setSelectedFillGradient(gradient, finish);
     callUpdateSchedulers();
 }
 
 void CanvasWidget::strokeGradientChanged(Gradient *gradient,
                                        const bool &finish) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->strokeGradientChanged(gradient, finish);
+    mCurrentCanvas->setSelectedStrokeGradient(gradient, finish);
     callUpdateSchedulers();
 }
 
@@ -425,7 +425,7 @@ void CanvasWidget::pickPathForSettings() {
 
 void CanvasWidget::updateDisplayedFillStrokeSettings() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->updateDisplayedFillStrokeSettings();
+    mCurrentCanvas->setDisplayedFillStrokeSettingsFromLastSelected();
 }
 
 void CanvasWidget::setHighQualityView(const bool &bT) {

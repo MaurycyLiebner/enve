@@ -9,11 +9,6 @@
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
-bool zLessThan(BoundingBox *box1, BoundingBox *box2)
-{
-    return box1->getZIndex() > box2->getZIndex();
-}
-
 //bool zMoreThan(BoundingBox *box1, BoundingBox *box2)
 //{
 //    return box1->getZIndex() < box2->getZIndex();
@@ -41,8 +36,6 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
 
 BoxesGroup::~BoxesGroup()
 {
-    clearBoxesSelection();
-    clearPointsSelection();
     foreach(BoundingBox *box, mChildBoxes) {
         box->decNumberPointers();
     }
@@ -127,121 +120,6 @@ int BoxesGroup::saveToSql(QSqlQuery *query, int parentId)
     return boundingBoxId;
 }
 
-void BoxesGroup::saveSelectedToSql(QSqlQuery *query)
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->saveToSql(query, 0);
-    }
-}
-
-void BoxesGroup::convertSelectedBoxesToPath() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->objectToPath();
-    }
-}
-
-void BoxesGroup::setSelectedFontFamilyAndStyle(QString family, QString style)
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setFontFamilyAndStyle(family, style);
-    }
-}
-
-void BoxesGroup::setSelectedFontSize(qreal size)
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setFontSize(size);
-    }
-}
-
-void BoxesGroup::applyBlurToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new BlurEffect());
-    }
-}
-
-void BoxesGroup::applyShadowToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new ShadowEffect());
-    }
-}
-
-void BoxesGroup::applyBrushEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        //box->addEffect(new BrushEffect());
-    }
-}
-
-void BoxesGroup::applyLinesEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new LinesEffect());
-    }
-}
-
-void BoxesGroup::applyCirclesEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new CirclesEffect());
-    }
-}
-
-void BoxesGroup::applySwirlEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new SwirlEffect());
-    }
-}
-
-void BoxesGroup::applyOilEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new OilEffect());
-    }
-}
-
-void BoxesGroup::applyImplodeEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new ImplodeEffect());
-    }
-}
-
-void BoxesGroup::applyDesaturateEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new DesaturateEffect());
-    }
-}
-
-void BoxesGroup::resetSelectedTranslation() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->resetTranslation();
-    }
-}
-
-void BoxesGroup::resetSelectedScale() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->resetScale();
-    }
-}
-
-void BoxesGroup::resetSelectedRotation() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->resetRotation();
-    }
-}
-
-PathPoint *BoxesGroup::createNewPointOnLineNearSelected(QPointF absPos,
-                                                        bool adjust) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        PathPoint *point = box->createNewPointOnLineNear(absPos, adjust);
-        if(point != NULL) {
-            return point;
-        }
-    }
-    return NULL;
-}
-
-void BoxesGroup::setDisplayedFillStrokeSettingsFromLastSelected() {
-    if(mSelectedBoxes.isEmpty()) return;
-    setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
-}
-
 bool BoxesGroup::relPointInsidePath(QPointF relPos) {
     if(mRelBoundingRect.contains(relPos)) {
         QPointF absPos = mapRelativeToAbsolute(relPos);
@@ -259,64 +137,6 @@ void BoxesGroup::updateAfterFrameChanged(int currentFrame)
     BoundingBox::updateAfterFrameChanged(currentFrame);
     foreach(BoundingBox *box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
-    }
-}
-
-void BoxesGroup::clearPointsSelectionOrDeselect() {
-    if(mSelectedPoints.isEmpty() ) {
-        deselectAllBoxes();
-    } else {
-        clearPointsSelection();
-    }
-}
-
-void BoxesGroup::setSelectedFillGradient(Gradient *gradient, bool finish) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setFillGradient(gradient, finish);
-    }
-}
-
-void BoxesGroup::setSelectedStrokeGradient(Gradient *gradient, bool finish) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeGradient(gradient, finish);
-    }
-}
-
-void BoxesGroup::setSelectedFillFlatColor(Color color, bool finish) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setFillFlatColor(color, finish);
-    }
-}
-
-void BoxesGroup::setSelectedStrokeFlatColor(Color color, bool finish) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeFlatColor(color, finish);
-    }
-}
-
-void BoxesGroup::setSelectedFillPaintType(PaintType paintType,
-                                          Color color, Gradient *gradient) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setFillPaintType(paintType, color, gradient);
-    }
-}
-
-void BoxesGroup::setSelectedStrokePaintType(PaintType paintType,
-                                            Color color, Gradient *gradient) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokePaintType(paintType, color, gradient);
-    }
-}
-
-void BoxesGroup::setSelectedCapStyle(Qt::PenCapStyle capStyle) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeCapStyle(capStyle);
-    }
-}
-
-void BoxesGroup::setSelectedJoinStyle(Qt::PenJoinStyle joinStyle) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeJoinStyle(joinStyle);
     }
 }
 
@@ -385,51 +205,24 @@ void BoxesGroup::setStrokeWidth(qreal strokeWidth, bool finish)
     }
 }
 
-void BoxesGroup::startStrokeWidthTransform()
-{
-    foreach(BoundingBox *box, mChildBoxes) {
-        box->startStrokeWidthTransform();
-    }
-}
-
-void BoxesGroup::startStrokeColorTransform()
-{
-    foreach(BoundingBox *box, mChildBoxes) {
-        box->startStrokeColorTransform();
-    }
-}
-
-void BoxesGroup::startFillColorTransform()
-{
-    foreach(BoundingBox *box, mChildBoxes) {
-        box->startFillColorTransform();
-    }
-}
-
-void BoxesGroup::setSelectedStrokeWidth(qreal strokeWidth, bool finish) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeWidth(strokeWidth, finish);
-    }
-}
-
 void BoxesGroup::startSelectedStrokeWidthTransform()
 {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->startStrokeWidthTransform();
+    foreach(BoundingBox *box, mChildBoxes) {
+        box->startSelectedStrokeWidthTransform();
     }
 }
 
 void BoxesGroup::startSelectedStrokeColorTransform()
 {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->startStrokeColorTransform();
+    foreach(BoundingBox *box, mChildBoxes) {
+        box->startSelectedStrokeColorTransform();
     }
 }
 
 void BoxesGroup::startSelectedFillColorTransform()
 {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->startFillColorTransform();
+    foreach(BoundingBox *box, mChildBoxes) {
+        box->startSelectedFillColorTransform();
     }
 }
 
@@ -560,17 +353,6 @@ bool BoxesGroup::isCurrentGroup() {
     return mIsCurrentGroup;
 }
 
-Edge *BoxesGroup::getPressedEdge(QPointF absPos) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        if(box->isSelected() ) {
-            Edge *pathEdge = box->getEgde(absPos);
-            if(pathEdge == NULL) continue;
-            return pathEdge;
-        }
-    }
-    return NULL;
-}
-
 BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
 {
     BoundingBox *boxAtPos = NULL;
@@ -587,239 +369,15 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
     return boxAtPos;
 }
 
-void BoxesGroup::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
-                                  bool startTrans)
-{
-    if(mSelectedBoxes.count() == 1) {
-        if(startTrans) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startRotTransform();
-                box->rotateBy(rotBy);
-            }
-        } else {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->rotateBy(rotBy);
-            }
-        }
-    } else {
-        if(startTrans) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startRotTransform();
-                box->startPosTransform();
-                box->saveTransformPivotAbsPos(absOrigin);
-                box->rotateRelativeToSavedPivot(rotBy);
-            }
-        } else {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->rotateRelativeToSavedPivot(rotBy);
-            }
-        }
-    }
-}
-
-void BoxesGroup::rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin,
-                                        bool startTrans)
-{
-    if(mSelectedPoints.isEmpty()) return;
-    if(startTrans) {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-            point->saveTransformPivotAbsPos(absOrigin);
-            point->rotateRelativeToSavedPivot(rotBy);
-        }
-    } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->rotateRelativeToSavedPivot(rotBy);
-        }
-    }
-}
-
-
-void BoxesGroup::scaleSelectedBy(qreal scaleBy, QPointF absOrigin,
-                                 bool startTrans) {
-    if(mSelectedBoxes.count() == 1) {
-        if(startTrans) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startScaleTransform();
-                box->scale(scaleBy);
-            }
-        } else {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->scale(scaleBy);
-            }
-        }
-    } else {
-        if(startTrans) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startScaleTransform();
-                box->startPosTransform();
-                box->saveTransformPivotAbsPos(absOrigin);
-                box->scaleRelativeToSavedPivot(scaleBy);
-            }
-        } else {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->scaleRelativeToSavedPivot(scaleBy);
-            }
-        }
-    }
-}
-
-void BoxesGroup::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
-                                 QPointF absOrigin,
-                                 bool startTrans) {
-    if(mSelectedBoxes.count() == 1) {
-        if(startTrans) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startScaleTransform();
-                box->scale(scaleXBy, scaleYBy);
-            }
-        } else {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->scale(scaleXBy, scaleYBy);
-            }
-        }
-    } else {
-        if(startTrans) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->startScaleTransform();
-                box->startPosTransform();
-                box->saveTransformPivotAbsPos(absOrigin);
-                box->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
-            }
-        } else {
-            foreach(BoundingBox *box, mSelectedBoxes) {
-                box->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
-            }
-        }
-    }
-}
-
-void BoxesGroup::scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy,
-                                       QPointF absOrigin,
-                                       bool startTrans) {
-    if(mSelectedPoints.isEmpty()) return;
-    if(startTrans) {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-            point->saveTransformPivotAbsPos(absOrigin);
-            point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
-        }
-    } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
-        }
-    }
-}
-
-QPointF BoxesGroup::getSelectedBoxesAbsPivotPos()
-{
-    if(mSelectedBoxes.isEmpty()) return QPointF(0., 0.);
-    QPointF posSum = QPointF(0., 0.);
-    int count = mSelectedBoxes.length();
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        posSum += box->getPivotAbsPos();
-    }
-    return posSum/count;
-}
-
-QPointF BoxesGroup::getSelectedPointsAbsPivotPos() {
-    if(mSelectedPoints.isEmpty()) return QPointF(0., 0.);
-    QPointF posSum = QPointF(0., 0.);
-    int count = mSelectedPoints.length();
-    foreach(MovablePoint *point, mSelectedPoints) {
-        posSum += point->getAbsolutePos();
-    }
-    return posSum/count;
-}
-
-bool BoxesGroup::isPointsSelectionEmpty() {
-    return mSelectedPoints.isEmpty();
-}
-
-int BoxesGroup::getPointsSelectionCount() {
-    return mSelectedPoints.length();
-}
-
-bool BoxesGroup::isSelectionEmpty()
-{
-    return mSelectedBoxes.isEmpty();
-}
-
-void BoxesGroup::setSelectedPivotAbsPos(QPointF absPos)
-{
-    if(mSelectedBoxes.count() == 1) {
-        mSelectedBoxes.first()->setPivotAbsPos(absPos);
-    }
-}
-
 void BoxesGroup::ungroup() {
-    clearBoxesSelection();
+    //clearBoxesSelection();
     BoxesGroup *parentGroup = (BoxesGroup*) mParent;
-    //BoundingBox *box;
     foreach(BoundingBox *box, mChildBoxes) {
         box->applyTransformation(&mTransformAnimator);
         removeChild(box);
         parentGroup->addChild(box);
     }
     mParent->removeChild(this);
-}
-
-void BoxesGroup::ungroupSelected()
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        if(box->isGroup()) {
-            ((BoxesGroup*) box)->ungroup();
-        }
-    }
-}
-
-void BoxesGroup::drawSelected(QPainter *p, CanvasMode currentCanvasMode)
-{
-    if(mVisible) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->drawSelected(p, currentCanvasMode);
-        }
-        drawBoundingRect(p);
-    }
-}
-
-void BoxesGroup::centerPivotForSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->centerPivotPosition(true);
-    }
-}
-
-void BoxesGroup::removeSelectedPointsApproximateAndClearList() {
-    foreach(MovablePoint *point, mSelectedPoints) {
-        point->deselect();
-        point->removeApproximate();
-    }
-    mSelectedPoints.clear(); schedulePivotUpdate();
-}
-
-void BoxesGroup::removeSelectedPointsAndClearList()
-{
-    foreach(MovablePoint *point, mSelectedPoints) {
-        point->deselect();
-        point->removeFromVectorPath();
-    }
-    mSelectedPoints.clear(); schedulePivotUpdate();
-}
-
-void BoxesGroup::removeSelectedBoxesAndClearList()
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        removeChild(box);
-    }
-    mSelectedBoxes.clear(); schedulePivotUpdate();
-}
-
-void BoxesGroup::clearPointsSelection()
-{
-    foreach(MovablePoint *point, mSelectedPoints) {
-        point->deselect();
-    }
-    mSelectedPoints.clear(); schedulePivotUpdate();
 }
 
 const PaintSettings *BoxesGroup::getFillSettings() {
@@ -830,18 +388,6 @@ const StrokeSettings *BoxesGroup::getStrokeSettings() {
     return mChildBoxes.first()->getStrokeSettings();
 }
 
-void BoxesGroup::updateSelectedPointsAfterCtrlsVisiblityChanged() {
-    if(!BoxesGroup::mCtrlsAlwaysVisible) {
-        QList<MovablePoint*> pointsToDeselect;
-        foreach(MovablePoint *point, mSelectedPoints) {
-            pointsToDeselect << point;
-        }
-        foreach(MovablePoint *point, pointsToDeselect) {
-            removePointFromSelection(point);
-        }
-    }
-}
-
 bool BoxesGroup::getCtrlsAlwaysVisible()
 {
     return BoxesGroup::mCtrlsAlwaysVisible;
@@ -849,55 +395,12 @@ bool BoxesGroup::getCtrlsAlwaysVisible()
 
 void BoxesGroup::setCtrlsAlwaysVisible(bool bT) {
     BoxesGroup::mCtrlsAlwaysVisible = bT;
-    MainWindow::getInstance()->getCanvasWidget()->getCurrentCanvas()->ctrlsVisiblityChanged();
+    MainWindow::getInstance()->getCanvasWidget()->getCurrentCanvas()->updateSelectedPointsAfterCtrlsVisiblityChanged();
 }
 
 void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {
     mFillStrokeSettingsWidget->setCurrentSettings(box->getFillSettings(),
                                                   box->getStrokeSettings());
-}
-
-void BoxesGroup::addBoxToSelection(BoundingBox *box) {
-    if(box->isSelected()) {
-        return;
-    }
-    box->select();
-    mSelectedBoxes.append(box); schedulePivotUpdate();
-    sortSelectedBoxesByZAscending();
-    setCurrentFillStrokeSettingsFromBox(box);
-    mMainWindow->setCurrentBox(box);
-}
-
-void BoxesGroup::addPointToSelection(MovablePoint *point)
-{
-    if(point->isSelected()) {
-        return;
-    }
-    point->select();
-    mSelectedPoints.append(point); schedulePivotUpdate();
-}
-
-void BoxesGroup::removeBoxFromSelection(BoundingBox *box) {
-    box->deselect();
-    mSelectedBoxes.removeOne(box); schedulePivotUpdate();
-    if(mSelectedBoxes.isEmpty()) {
-        mMainWindow->setCurrentBox(NULL);
-    } else {
-        mMainWindow->setCurrentBox(mSelectedBoxes.last());
-    }
-}
-
-void BoxesGroup::removePointFromSelection(MovablePoint *point) {
-    point->deselect();
-    mSelectedPoints.removeOne(point); schedulePivotUpdate();
-}
-
-void BoxesGroup::clearBoxesSelection() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->deselect();
-    }
-    mSelectedBoxes.clear(); schedulePivotUpdate();
-    mMainWindow->setCurrentBox(NULL);
 }
 
 void BoxesGroup::applyCurrentTransformation() {
@@ -919,188 +422,17 @@ void BoxesGroup::applyCurrentTransformation() {
     mTransformAnimator.resetScale(true);
 }
 
-void BoxesGroup::applyCurrentTransformationToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->applyCurrentTransformation();
-    }
-}
-
-void BoxesGroup::sortSelectedBoxesByZAscending() {
-    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), zLessThan);
-}
-
-void BoxesGroup::raiseSelectedBoxesToTop() {
-    BoundingBox *box;
-    foreachInverted(box, mSelectedBoxes) {
-        box->bringToFront();
-    }
-}
-
-void BoxesGroup::lowerSelectedBoxesToBottom() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->bringToEnd();
-    }
-}
-
-void BoxesGroup::lowerSelectedBoxes() {
-    BoundingBox *box;
-    int lastZ = -10000;
-    bool lastBoxChanged = true;
-    foreachInverted(box, mSelectedBoxes) {
-        int boxZ = box->getZIndex();
-        if(boxZ - 1 != lastZ || lastBoxChanged) {
-            box->moveDown();
-        }
-        lastZ = boxZ;
-        lastBoxChanged = boxZ - box->getZIndex() != 0;
-    }
-}
-
-void BoxesGroup::raiseSelectedBoxes() {
-    int lastZ = -10000;
-    bool lastBoxChanged = true;
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        int boxZ = box->getZIndex();
-        if(boxZ + 1 != lastZ || lastBoxChanged) {
-            box->moveUp();
-        }
-        lastZ = boxZ;
-        lastBoxChanged = boxZ - box->getZIndex() != 0;
-    }
-}
-
-void BoxesGroup::deselectAllBoxes() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        removeBoxFromSelection(box);
-    }
-}
-
-void BoxesGroup::selectAllBoxes() {
+void BoxesGroup::selectAllBoxesFromBoxesGroup() {
     foreach(BoundingBox *box, mChildBoxes) {
         if(box->isSelected()) continue;
-        addBoxToSelection(box);
+        getParentCanvas()->addBoxToSelection(box);
     }
 }
 
-void BoxesGroup::connectPoints() {
-    QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            if(((PathPoint*)point)->isEndPoint()) {
-                selectedPathPoints.append( (PathPoint*) point);
-            }
-        }
-    }
-    if(selectedPathPoints.count() == 2) {
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
-        if(firstPoint->getParent() == secondPoint->getParent()) {
-            ((VectorPath*)firstPoint->getParent())->
-                    connectPoints(firstPoint, secondPoint);
-        }
-    }
-}
-
-void BoxesGroup::disconnectPoints() {
-    QList<PathPoint*> selectedPathPoints;
-        foreach(MovablePoint *point, mSelectedPoints) {
-            if(point->isPathPoint()) {
-                PathPoint *nextPoint = ((PathPoint*)point)->getNextPoint();
-                if(nextPoint == NULL) continue;
-                if(nextPoint->isSelected()) {
-                    selectedPathPoints.append( (PathPoint*) point);
-                }
-            }
-        }
-        foreach(PathPoint *point, selectedPathPoints) {
-            PathPoint *secondPoint = point->getNextPoint();
-            if(point->getParent() == secondPoint->getParent()) {
-                ((VectorPath*)point->getParent())->
-                        disconnectPoints(point, secondPoint);
-            }
-        }
-}
-
-void BoxesGroup::mergePoints() {
-    QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            if(((PathPoint*)point)->isEndPoint()) {
-                selectedPathPoints.append( (PathPoint*) point);
-            }
-        }
-    }
-    if(selectedPathPoints.count() == 2) {
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
-        if(secondPoint->getParent() == secondPoint->getParent()) {
-            ((VectorPath*)secondPoint->getParent())->connectPoints(firstPoint,
-                                                                   secondPoint);
-            QPointF sumPos = firstPoint->getAbsolutePos() +
-                    secondPoint->getAbsolutePos();
-            bool firstWasPrevious = firstPoint ==
-                    secondPoint->getPreviousPoint();
-
-            secondPoint->startTransform();
-            secondPoint->moveToAbs(sumPos/2);
-            if(firstWasPrevious) {
-                secondPoint->moveStartCtrlPtToAbsPos(
-                            firstPoint->getStartCtrlPtAbsPos());
-            } else {
-                secondPoint->moveEndCtrlPtToAbsPos(
-                            firstPoint->getEndCtrlPtAbsPos());
-            }
-            secondPoint->finishTransform();
-
-            firstPoint->removeFromVectorPath();
-        }
-    }
-}
-
-void BoxesGroup::setPointCtrlsMode(CtrlsMode mode) {
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            ( (PathPoint*)point)->setCtrlsMode(mode);
-        }
-    }
-}
-
-void BoxesGroup::makeSelectedPointsSegmentsCurves() {
-    QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
-        }
-    }
-    foreach(PathPoint *selectedPoint,
-            selectedPathPoints) {
-        PathPoint *nextPoint = selectedPoint->getNextPoint();
-        PathPoint *prevPoint = selectedPoint->getPreviousPoint();
-        if(selectedPathPoints.contains(nextPoint)) {
-            selectedPoint->setEndCtrlPtEnabled(true);
-        }
-        if(selectedPathPoints.contains(prevPoint)) {
-            selectedPoint->setStartCtrlPtEnabled(true);
-        }
-    }
-}
-
-void BoxesGroup::makeSelectedPointsSegmentsLines() {
-    QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
-        }
-    }
-    foreach(PathPoint *selectedPoint,
-            selectedPathPoints) {
-        PathPoint *nextPoint = selectedPoint->getNextPoint();
-        PathPoint *prevPoint = selectedPoint->getPreviousPoint();
-        if(selectedPathPoints.contains(nextPoint)) {
-            selectedPoint->setEndCtrlPtEnabled(false);
-        }
-        if(selectedPathPoints.contains(prevPoint)) {
-            selectedPoint->setStartCtrlPtEnabled(false);
+void BoxesGroup::deselectAllBoxesFromBoxesGroup() {
+    foreach(BoundingBox *box, mChildBoxes) {
+        if(box->isSelected()) {
+            getParentCanvas()->removeBoxFromSelection(box);
         }
     }
 }
@@ -1120,233 +452,15 @@ BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
     return boxAtPos;
 }
 
-MovablePoint *BoxesGroup::getPointAt(QPointF absPos, CanvasMode currentMode) {
-    MovablePoint *pointAtPos = NULL;
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        pointAtPos = box->getPointAt(absPos, currentMode);
-        if(pointAtPos != NULL) {
-            break;
-        }
-    }
-    return pointAtPos;
-}
-
-void BoxesGroup::finishSelectedPointsTransform() {
-    if(isRecordingAllPoints() ) {
-        QList<BoundingBox*> parentBoxes;
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->finishTransform();
-            BoundingBox *parentBox = point->getParent();
-            if(parentBoxes.contains(parentBox) ) continue;
-            parentBoxes << parentBox;
-        }
-        foreach(BoundingBox *parentBox, parentBoxes) {
-            parentBox->finishAllPointsTransform();
-        }
-    } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->finishTransform();
-        }
-    }
-}
-
-void BoxesGroup::startSelectedPointsTransform() {
-    if(isRecordingAllPoints() ) {
-        QList<BoundingBox*> parentBoxes;
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-            BoundingBox *parentBox = point->getParent();
-            if(parentBoxes.contains(parentBox) ) continue;
-            parentBoxes << parentBox;
-        }
-        foreach(BoundingBox *parentBox, parentBoxes) {
-            parentBox->startAllPointsTransform();
-        }
-    } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-        }
-    }
-}
-
 void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 {
     foreach(BoundingBox *box, mChildBoxes) {
         if(box->isVisibleAndUnlocked()) {
             if(box->isContainedIn(rect) ) {
-                addBoxToSelection(box);
+                getParentCanvas()->addBoxToSelection(box);
             }
         }
     }
-}
-
-void BoxesGroup::finishSelectedBoxesTransform()
-{
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->finishTransform();
-    }
-}
-
-void BoxesGroup::cancelSelectedBoxesTransform() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->cancelTransform();
-    }
-}
-
-void BoxesGroup::cancelSelectedPointsTransform() {
-    foreach(MovablePoint *point, mSelectedPoints) {
-        point->cancelTransform();
-    }
-}
-
-void BoxesGroup::moveSelectedPointsBy(QPointF by, bool startTransform)
-{
-    if(startTransform) {
-        startSelectedPointsTransform();
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->moveByAbs(by);
-        }
-    } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->moveByAbs(by);
-        }
-    }
-}
-
-void BoxesGroup::moveSelectedBoxesBy(QPointF by, bool startTransform)
-{
-    by = mapAbsPosToRel(by) - mapAbsPosToRel(QPointF(0., 0.));
-    if(startTransform) {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->startPosTransform();
-            box->moveBy(by);
-        }
-    } else {
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->moveBy(by);
-        }
-    }
-}
-
-void BoxesGroup::selectAndAddContainedPointsToSelection(QRectF absRect) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->selectAndAddContainedPointsToList(absRect, &mSelectedPoints);
-    }
-}
-
-//QPointF BoxesGroup::getRelCenterPosition() {
-//    QPointF posSum = QPointF(0., 0.);
-//    if(mChildren.isEmpty()) return posSum;
-//    int count = mChildren.length();
-//    foreach(BoundingBox *box, mChildren) {
-//        posSum += box->getPivotAbsPos();
-//    }
-//    return mapAbsPosToRel(posSum/count);
-//}
-
-#include "Boxes/linkbox.h"
-void BoxesGroup::createLinkBoxForSelected() {
-    foreach(BoundingBox *selectedBox, mSelectedBoxes) {
-        selectedBox->createLink(this);
-    }
-}
-
-BoxesGroup* BoxesGroup::groupSelectedBoxes() {
-    if(mSelectedBoxes.count() == 0) {
-        return NULL;
-    }
-    BoxesGroup *newGroup = new BoxesGroup(this);
-    BoundingBox *box;
-    foreachInverted(box, mSelectedBoxes) {
-        removeChild(box);
-        newGroup->addChild(box);
-    }
-    mSelectedBoxes.clear(); schedulePivotUpdate();
-    return newGroup;
-}
-
-#include "pathoperations.h"
-VectorPath *BoxesGroup::getPathResultingFromOperation(
-                                const bool &unionInterThis,
-                                const bool &unionInterOther) {
-    VectorPath *newPath = new VectorPath(this);
-    FullVectorPath *targetPath = new FullVectorPath();
-    FullVectorPath *addToPath = NULL;
-    FullVectorPath *addedPath = NULL;
-
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        if(box->isVectorPath() ||
-           box->isCircle() ||
-           box->isRect() ||
-           box->isText()) {
-            const QPainterPath &boxPath = box->getRelativeTransform().map(
-                                        ((PathBox*)box)->getRelativePath());
-            addToPath = targetPath;
-            addToPath->generateSinglePathPaths();
-            addedPath = new FullVectorPath();
-            addedPath->generateFromPath(boxPath);
-            addToPath->intersectWith(addedPath,
-                                     unionInterThis,
-                                     unionInterOther);
-            targetPath = new FullVectorPath();
-            targetPath->getSeparatePathsFromOther(addToPath);
-            targetPath->getSeparatePathsFromOther(addedPath);
-
-            delete addedPath;
-            delete addToPath;
-        }
-    }
-
-    targetPath->addAllToVectorPath(newPath);
-
-    return newPath;
-}
-
-void BoxesGroup::selectedPathsDifference() {
-    VectorPath *newPath = getPathResultingFromOperation(false,
-                                                        true);
-
-    clearBoxesSelection();
-    addBoxToSelection(newPath);
-}
-
-void BoxesGroup::selectedPathsIntersection() {
-    VectorPath *newPath = getPathResultingFromOperation(false,
-                                                        false);
-
-    clearBoxesSelection();
-    addBoxToSelection(newPath);
-}
-
-void BoxesGroup::selectedPathsDivision() {
-    VectorPath *newPath1 = getPathResultingFromOperation(false,
-                                                        false);
-
-    VectorPath *newPath2 = getPathResultingFromOperation(false,
-                                                        true);
-
-    clearBoxesSelection();
-    addBoxToSelection(newPath1);
-    addBoxToSelection(newPath2);
-}
-
-void BoxesGroup::selectedPathsExclusion() {
-    VectorPath *newPath1 = getPathResultingFromOperation(false,
-                                                         true);
-    VectorPath *newPath2 = getPathResultingFromOperation(true,
-                                                         false);
-
-    clearBoxesSelection();
-    addBoxToSelection(newPath1);
-    addBoxToSelection(newPath2);
-}
-
-void BoxesGroup::selectedPathsUnion() {
-    VectorPath *newPath = getPathResultingFromOperation(true,
-                                                        true);
-
-    clearBoxesSelection();
-    addBoxToSelection(newPath);
 }
 
 void BoxesGroup::addChild(BoundingBox *child) {
@@ -1388,7 +502,7 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
     BoundingBox *box = mChildBoxes.at(id);
     box->setUpdateDisabled(true);
     if(box->isSelected()) {
-        removeBoxFromSelection(box);
+        box->removeFromSelection();
     }
     if(saveUndoRedo) {
         addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
@@ -1419,8 +533,7 @@ void BoxesGroup::removeChild(BoundingBox *child)
     }
     removeChildFromList(index);
     if(mChildBoxes.isEmpty() &&
-       mParent != NULL &&
-       !mIsCurrentGroup) {
+       mParent != NULL) {
         mParent->removeChild(this);
     }
     //child->setParent(NULL);

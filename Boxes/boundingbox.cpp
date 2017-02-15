@@ -892,15 +892,16 @@ QMatrix BoundingBox::getCombinedFinalRenderTransform() {
 }
 
 void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
+    Canvas *parentCanvas = getParentCanvas();
     if(shiftPressed) {
         if(mSelected) {
-            mParent->removeBoxFromSelection(this);
+            parentCanvas->removeBoxFromSelection(this);
         } else {
-            mParent->addBoxToSelection(this);
+            parentCanvas->addBoxToSelection(this);
         }
     } else {
-        mParent->clearBoxesSelection();
-        mParent->addBoxToSelection(this);
+        parentCanvas->clearBoxesSelection();
+        parentCanvas->addBoxToSelection(this);
     }
 }
 
@@ -974,7 +975,7 @@ QString BoundingBox::getName()
 void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
     if(mVisible == visible) return;
     if(mSelected) {
-        ((BoxesGroup*) mParent)->removeBoxFromSelection(this);
+        removeFromSelection();
     }
     if(saveUndoRedo) {
         addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
@@ -1025,7 +1026,7 @@ void BoundingBox::unlock() {
 void BoundingBox::setLocked(bool bt) {
     if(bt == mLocked) return;
     if(mSelected) {
-        ((BoxesGroup*) mParent)->removeBoxFromSelection(this);
+        getParentCanvas()->removeBoxFromSelection(this);
     }
     mLocked = bt;
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Locked);
@@ -1114,6 +1115,16 @@ void BoundingBox::SWT_addToContextMenu(
     effectsMenu->addAction("Desaturate");
 }
 
+void BoundingBox::removeFromParent() {
+    mParent->removeChild(this);
+}
+
+void BoundingBox::removeFromSelection() {
+    if(mSelected) {
+        getParentCanvas()->removeBoxFromSelection(this);
+    }
+}
+
 bool BoundingBox::SWT_handleContextMenuActionSelected(
         QAction *selectedAction) {
     if(selectedAction != NULL) {
@@ -1124,7 +1135,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
         } else if(selectedAction->text() == "Create Link") {
             createLink(mParent);
         } else if(selectedAction->text() == "Group") {
-            mParent->groupSelectedBoxes();
+            getParentCanvas()->groupSelectedBoxes();
             return true;
 //        } else if(selectedAction->text() == "Ungroup") {
 //            ungroupSelected();

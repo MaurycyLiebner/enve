@@ -751,7 +751,8 @@ void VectorPath::deletePointAndApproximate(PathPoint *pointToRemove) {
     newEdge.makePassThrough(absPos);
 }
 
-void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode) {
+void VectorPath::drawSelected(QPainter *p,
+                              const CanvasMode &currentCanvasMode) {
     if(mVisible) {
         p->save();
         drawBoundingRect(p);
@@ -786,7 +787,7 @@ void VectorPath::drawSelected(QPainter *p, CanvasMode currentCanvasMode) {
     }
 }
 
-MovablePoint *VectorPath::getPointAt(QPointF absPtPos, CanvasMode currentCanvasMode)
+MovablePoint *VectorPath::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
@@ -899,7 +900,7 @@ void VectorPath::removeFromPointsList(PathPoint *point, bool saveUndoRedo) {
     mPoints.removeOne(point);
     mPathAnimator.removeChildAnimator(point->getPathPointAnimatorsPtr());
     point->hide();
-    mParent->removePointFromSelection(point);
+    getParentCanvas()->removePointFromSelection(point);
     if(saveUndoRedo) {
         RemoveFromPointsListUndoRedo *undoRedo =
                 new RemoveFromPointsListUndoRedo(point, this);
