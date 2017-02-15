@@ -1418,6 +1418,11 @@ void BoxesGroup::removeChild(BoundingBox *child)
         return;
     }
     removeChildFromList(index);
+    if(mChildBoxes.isEmpty() &&
+       mParent != NULL &&
+       !mIsCurrentGroup) {
+        mParent->removeChild(this);
+    }
     //child->setParent(NULL);
     if(!mPivotChanged) centerPivotPosition();
 }
@@ -1469,6 +1474,8 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
     if(saveUndoRedo) {
         addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }
+
+    scheduleAwaitUpdate();
 }
 
 void BoxesGroup::moveChildBelow(BoundingBox *boxToMove,

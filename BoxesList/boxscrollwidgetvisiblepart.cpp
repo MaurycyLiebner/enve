@@ -5,6 +5,10 @@
 #include "boxscrollwidget.h"
 #include <QTimer>
 #include <QMimeData>
+#include "Boxes/boundingbox.h"
+#include "Boxes/boxesgroup.h"
+#include "mainwindow.h"
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
         ScrollWidget *parent) :
@@ -87,58 +91,120 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
                               listKeys);
     }
 }
-#include "Boxes/boundingbox.h"
-#include "Boxes/boxesgroup.h"
-#include "mainwindow.h"
-#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+
+BoxSingleWidget *BoxScrollWidgetVisiblePart::
+            getClosestsSingleWidgetWithTargetTypeLookBelow(
+                const SWT_Type &type,
+                const int &yPos,
+                bool *isBelow) {
+    int idAtYPos = yPos / 20;
+    int targetId = (yPos + 10) / 20;
+    if(idAtYPos < mSingleWidgets.count() &&
+       idAtYPos >= 0) {
+        BoxSingleWidget *singleWidgetUnderMouse = (BoxSingleWidget*)
+                mSingleWidgets.at(
+                    idAtYPos);
+        while(singleWidgetUnderMouse->isHidden()) {
+            idAtYPos++;
+            if(idAtYPos >= mSingleWidgets.count()) return NULL;
+            singleWidgetUnderMouse = (BoxSingleWidget*)
+                    mSingleWidgets.at(
+                        idAtYPos);
+        }
+        while(singleWidgetUnderMouse->getTargetAbstraction()->
+              getTarget()->SWT_getType() != type) {
+            idAtYPos++;
+            if(idAtYPos >= mSingleWidgets.count()) return NULL;
+            singleWidgetUnderMouse = (BoxSingleWidget*)
+                    mSingleWidgets.at(
+                        idAtYPos);
+        }
+        *isBelow = targetId > idAtYPos;
+        return singleWidgetUnderMouse;
+    }
+    return NULL;
+}
+
+BoxSingleWidget *BoxScrollWidgetVisiblePart::
+            getClosestsSingleWidgetWithTargetType(
+                const SWT_Type &type,
+                const int &yPos,
+                bool *isBelow) {
+    int idAtYPos = yPos / 20;
+    int targetId = (yPos + 10) / 20;
+    if(idAtYPos < mSingleWidgets.count() &&
+       idAtYPos >= 0) {
+        BoxSingleWidget *singleWidgetUnderMouse = (BoxSingleWidget*)
+                mSingleWidgets.at(
+                    idAtYPos);
+        while(singleWidgetUnderMouse->isHidden()) {
+            idAtYPos--;
+            if(idAtYPos < 0) {
+                return getClosestsSingleWidgetWithTargetTypeLookBelow(
+                            type, yPos, isBelow);
+            }
+            singleWidgetUnderMouse = (BoxSingleWidget*)
+                    mSingleWidgets.at(
+                        idAtYPos);
+        }
+        while(singleWidgetUnderMouse->getTargetAbstraction()->
+              getTarget()->SWT_getType() != type) {
+            idAtYPos--;
+            if(idAtYPos < 0) {
+                return getClosestsSingleWidgetWithTargetTypeLookBelow(
+                            type, yPos, isBelow);
+            }
+            singleWidgetUnderMouse = (BoxSingleWidget*)
+                    mSingleWidgets.at(
+                        idAtYPos);
+        }
+        *isBelow = targetId > idAtYPos;
+        return singleWidgetUnderMouse;
+    }
+    return NULL;
+}
+
 void BoxScrollWidgetVisiblePart::dropEvent(
         QDropEvent *event) {
     if(event->mimeData()->hasFormat("boundingbox")) {
         int yPos = event->pos().y();
-        int singleWidgetUnderMouseId = yPos / 20;
-        int currentDragPosId = (yPos + 10) / 20;
+        bool below;
+        BoxSingleWidget *singleWidgetUnderMouse =
+                getClosestsSingleWidgetWithTargetType(SWT_BoundingBox,
+                                                      yPos,
+                                                      &below);
+        if(singleWidgetUnderMouse == NULL) return;
 
-        if(singleWidgetUnderMouseId < mSingleWidgets.count() &&
-           singleWidgetUnderMouseId >= 0) {
-            BoundingBox *box = ((BoundingBoxMimeData*)event->mimeData())->
-                    getBoundingBox();
+        BoundingBox *box = ((BoundingBoxMimeData*)event->mimeData())->
+                getBoundingBox();
+        BoundingBox *boxUnderMouse =
+                ((BoundingBox*)singleWidgetUnderMouse->
+                 getTargetAbstraction()->getTarget());
 
-            BoxSingleWidget *singleWidgetUnderMouse = (BoxSingleWidget*)
-                    mSingleWidgets.at(
-                        singleWidgetUnderMouseId);
-            while(singleWidgetUnderMouse->isHidden()) {
-                singleWidgetUnderMouseId--;
-                if(singleWidgetUnderMouseId < 0) return;
-                singleWidgetUnderMouse = (BoxSingleWidget*)
-                        mSingleWidgets.at(
-                            singleWidgetUnderMouseId);
-            }
-            SingleWidgetTarget *widgetUnderMouseTarget =
-                    singleWidgetUnderMouse->getTargetAbstraction()->
-                                    getTarget();
-            if(widgetUnderMouseTarget->SWT_getType() == SWT_BoundingBox) {
-                BoxesGroup *parentGroup =
-                        ((BoundingBox*)widgetUnderMouseTarget)->getParent();
-                if(parentGroup == NULL) return;
-                if(parentGroup != box->getParent()) {
-                    box->getParent()->removeChild(box);
-                    parentGroup->addChild(box);
-                }
-                if(currentDragPosId > singleWidgetUnderMouseId) { // add box below
-                    parentGroup->moveChildAbove( // boxesgroup list is reversed
-                                box,
-                                (BoundingBox*)widgetUnderMouseTarget);
-                } else { // add box above
-                    parentGroup->moveChildBelow(
-                                box,
-                                (BoundingBox*)widgetUnderMouseTarget);
-                }
-            }
+        BoxesGroup *parentGroup = boxUnderMouse->getParent();
+        if(parentGroup == NULL ||
+           boxUnderMouse->isAncestor(box)) return;
+        if(parentGroup != box->getParent()) {
+            box->getParent()->removeChild(box);
+            parentGroup->addChild(box);
+        }
+        if(below) { // add box below
+            parentGroup->moveChildAbove( // boxesgroup list is reversed
+                        box,
+                       boxUnderMouse);
+        } else { // add box above
+            parentGroup->moveChildBelow(
+                        box,
+                        boxUnderMouse);
         }
     }
     mDragging = false;
-    updateVisibleWidgetsContent();
+    scheduledUpdateVisibleWidgetsContent();
     MainWindow::getInstance()->callUpdateSchedulers();
+    if(mScrollTimer->isActive()) {
+        mScrollTimer->disconnect();
+        mScrollTimer->stop();
+    }
 }
 
 void BoxScrollWidgetVisiblePart::dragEnterEvent(
@@ -167,12 +233,9 @@ void BoxScrollWidgetVisiblePart::dragLeaveEvent(
 
 #include <QDebug>
 void BoxScrollWidgetVisiblePart::dragMoveEvent(
-        QDragMoveEvent *event) {
-    if(event->mimeData()->hasFormat("boundingbox") )
-
-    mDragging = true;
+        QDragMoveEvent *event) {    
     int yPos = event->pos().y();
-    int currentDragPosId = (yPos + 10) / 20;
+
     if(yPos < 30) {
         if(!mScrollTimer->isActive()) {
             connect(mScrollTimer, SIGNAL(timeout()),
@@ -189,16 +252,38 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(
         mScrollTimer->disconnect();
         mScrollTimer->stop();
     }
-    if(currentDragPosId != mCurrentDragPosId) {
-        mCurrentDragPosId = currentDragPosId;
-        update();
+    mLastDragMoveY = yPos;
+    if(event->mimeData()->hasFormat("boundingbox")) {
+        mLastDragMoveTargetType = SWT_BoundingBox;
     }
+
+    updateDraggingHighlight();
+}
+
+void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
+    mDragging = false;
+    bool below;
+    BoxSingleWidget *singleWidgetUnderMouse =
+            getClosestsSingleWidgetWithTargetType(mLastDragMoveTargetType,
+                                                  mLastDragMoveY,
+                                                  &below);
+    if(singleWidgetUnderMouse != NULL) {
+        int currentDragPosId = singleWidgetUnderMouse->y()/20;
+        if(below) {
+            currentDragPosId++;
+        }
+        mDragging = true;
+        mCurrentDragPosId = currentDragPosId;
+    }
+    update();
 }
 
 void BoxScrollWidgetVisiblePart::scrollUp() {
     mParentWidget->scrollParentAreaBy(-20);
+    updateDraggingHighlight();
 }
 
 void BoxScrollWidgetVisiblePart::scrollDown() {
     mParentWidget->scrollParentAreaBy(20);
+    updateDraggingHighlight();
 }

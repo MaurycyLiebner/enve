@@ -94,6 +94,19 @@ void BoundingBox::setBaseTransformation(const QMatrix &matrix) {
     mTransformAnimator.setBaseTransformation(matrix);
 }
 
+bool BoundingBox::isAncestor(BoxesGroup *box) const {
+    if(mParent == box) return true;
+    if(mParent == NULL) return false;
+    return mParent->isAncestor(box);
+}
+
+bool BoundingBox::isAncestor(BoundingBox *box) const {
+    if(box->isGroup()) {
+        return isAncestor((BoxesGroup*)box);
+    }
+    return false;
+}
+
 bool BoundingBox::hasBaseTransformation() {
     return mTransformAnimator.hasBaseTransformation();
 }

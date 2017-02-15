@@ -1,8 +1,12 @@
 #ifndef BOXSCROLLWIDGETVISIBLEPART_H
 #define BOXSCROLLWIDGETVISIBLEPART_H
 
+enum SWT_Type : short;
+
 #include <QWidget>
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
+
+class BoxSingleWidget;
 class QrealKey;
 
 class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart
@@ -27,12 +31,20 @@ public:
                        const int &minViewedFrame,
                        QList<QrealKey *> *listKeys);
 
+    BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
+            const SWT_Type &type, const int &yPos, bool *isBelow);
+    void updateDraggingHighlight();
+    BoxSingleWidget *getClosestsSingleWidgetWithTargetTypeLookBelow(
+            const SWT_Type &type, const int &yPos, bool *isBelow);
 protected:
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *);
     void dragMoveEvent(QDragMoveEvent *event);
 
     QTimer *mScrollTimer = NULL;
+
+    int mLastDragMoveY;
+    SWT_Type mLastDragMoveTargetType;
 
     bool mDragging = false;
     int mCurrentDragPosId = 0;

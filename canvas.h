@@ -214,6 +214,7 @@ public:
     void scaleBoxesBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
 
     void awaitUpdate() {}
+    void scheduleAwaitUpdate() {}
 
     void saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);

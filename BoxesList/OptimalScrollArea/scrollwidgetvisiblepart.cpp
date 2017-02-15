@@ -42,9 +42,8 @@ void ScrollWidgetVisiblePart::callUpdaters() {
        mParentHeightUpdateScheduled) {
         updateParentHeightIfNeeded();
         updateVisibleWidgetsContentIfNeeded();
-    } else {
-        update();
     }
+    update();
 }
 
 void ScrollWidgetVisiblePart::callAllInstanceUpdaters() {

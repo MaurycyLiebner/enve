@@ -283,7 +283,7 @@ public:
     QPointF mapAbsPosToRel(QPointF absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
-    void scheduleAwaitUpdate();
+    virtual void scheduleAwaitUpdate();
     void setAwaitUpdateScheduled(bool bT);
 
     void setCompositionMode(QPainter::CompositionMode compositionMode);
@@ -362,6 +362,8 @@ public:
         return new BoundingBoxMimeData(this);
     }
 
+    bool isAncestor(BoxesGroup *box) const;
+    bool isAncestor(BoundingBox *box) const;
 protected:
     bool mUpdateDisabled = false;
 
