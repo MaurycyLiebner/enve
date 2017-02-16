@@ -80,6 +80,8 @@ public:
     void duplicatePathPointsTo(VectorPath *target);
     void disconnectPoints(PathPoint *point1, PathPoint *point2);
     void connectPoints(PathPoint *point1, PathPoint *point2);
+    void makeDuplicate(BoundingBox *targetBox);
+    BoundingBox *createNewDuplicate(BoxesGroup *parent);
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 

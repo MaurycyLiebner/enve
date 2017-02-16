@@ -139,6 +139,9 @@ public:
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
+
+    void makeDuplicate(BoundingBox *targetBox);
+    BoundingBox *createNewDuplicate(BoxesGroup *parent);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

@@ -14,9 +14,9 @@ void GradientPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
     ((VectorPath*)mParent)->updateDrawGradients();
 }
 
-void GradientPoint::moveBy(QPointF absTranslatione)
+void GradientPoint::moveByRel(QPointF relTranslatione)
 {
-    MovablePoint::moveBy(absTranslatione);
+    MovablePoint::moveByRel(relTranslatione);
     ((VectorPath*)mParent)->updateDrawGradients();
 }
 

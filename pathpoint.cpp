@@ -105,14 +105,14 @@ void PathPoint::finishTransform()
     }
 }
 
-void PathPoint::moveBy(QPointF relTranslation)
+void PathPoint::moveByRel(QPointF relTranslation)
 {
-    MovablePoint::moveBy(relTranslation);
+    MovablePoint::moveByRel(relTranslation);
     if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->MovablePoint::moveBy(relTranslation);
+        mStartCtrlPt->MovablePoint::moveByRel(relTranslation);
     }
     if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->MovablePoint::moveBy(relTranslation);
+        mEndCtrlPt->MovablePoint::moveByRel(relTranslation);
     }
 }
 
@@ -295,10 +295,10 @@ void PathPoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
                                     CtrlPoint *pointToUpdate) {
     QPointF changedPointPos = pointChanged->getAbsolutePos();
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-        pointToUpdate->moveToWithoutUpdatingTheOther(symmetricToAbsPos(changedPointPos));
+        pointToUpdate->moveToAbsWithoutUpdatingTheOther(symmetricToAbsPos(changedPointPos));
     } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
         if(!isPointZero(changedPointPos) ) {
-            pointToUpdate->moveToWithoutUpdatingTheOther(
+            pointToUpdate->moveToAbsWithoutUpdatingTheOther(
                         symmetricToAbsPosNewLen(
                             changedPointPos,
                             pointToLen(pointToUpdate->getAbsolutePos() -
@@ -550,6 +550,9 @@ void PathPoint::saveInitialPointValuesToShapeValues(VectorPathShape *shape)
 void PathPoint::makeDuplicate(MovablePoint *targetPoint) {
     MovablePoint::makeDuplicate(targetPoint);
     PathPoint *target = (PathPoint*)targetPoint;
+    target->setCtrlsMode(mCtrlsMode);
+    target->setEndCtrlPtEnabled(mEndCtrlPtEnabled);
+    target->setStartCtrlPtEnabled(mStartCtrlPtEnabled);
     target->duplicateCtrlPointsFrom(mEndCtrlPt,
                                     mStartCtrlPt);
 }

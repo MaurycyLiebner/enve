@@ -104,7 +104,8 @@ SOURCES += main.cpp\
     BoxesList/boxscrollwidget.cpp \
     BoxesList/boxeslistactionbutton.cpp \
     canvasselectedpointsactions.cpp \
-    canvasselectedboxesactions.cpp
+    canvasselectedboxesactions.cpp \
+    clipboardcontainer.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -194,7 +195,8 @@ HEADERS  += mainwindow.h \
     BoxesList/boxsinglewidget.h \
     BoxesList/boxscrollwidgetvisiblepart.h \
     BoxesList/boxscrollwidget.h \
-    BoxesList/boxeslistactionbutton.h
+    BoxesList/boxeslistactionbutton.h \
+    clipboardcontainer.h
 
 RESOURCES += \
     resources.qrc

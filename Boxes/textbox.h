@@ -24,6 +24,24 @@ public:
                              const CanvasMode &currentCanvasMode);
 //    QRectF getTextRect();
     void setPathText(bool pathText);
+
+    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
+        return new TextBox(parent);
+    }
+
+    void setTextAlignment(const Qt::Alignment &alignment) {
+        mAlignment = alignment;
+        scheduleAwaitUpdate();
+    }
+
+    void makeDuplicate(BoundingBox *targetBox) {
+        PathBox::makeDuplicate(targetBox);
+        TextBox *textTarget = (TextBox*)targetBox;
+        textTarget->setText(mText);
+        textTarget->setFont(mFont);
+        textTarget->setTextAlignment(mAlignment);
+    }
+
 private:
     QString mText;
     QFont mFont;

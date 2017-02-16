@@ -189,7 +189,7 @@ public:
     void startTransform();
     void finishTransform();
 
-    void moveBy(QPointF relTranslation);
+    void moveByRel(QPointF relTranslation);
 
     QPointF getStartCtrlPtAbsPos() const;
     QPointF getStartCtrlPtValue() const;

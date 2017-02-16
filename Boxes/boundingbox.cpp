@@ -77,13 +77,23 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 #include "linkbox.h"
 BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
     InternalLinkBox *linkBox = new InternalLinkBox(this, parent);
-    linkBox->duplicateTransformAnimatorFrom(&mTransformAnimator);
+    BoundingBox::makeDuplicate(linkBox);
+    return linkBox;
+}
+
+void BoundingBox::makeDuplicate(BoundingBox *targetBox) {
+    targetBox->duplicateTransformAnimatorFrom(&mTransformAnimator);
     int effectsCount = mEffectsAnimators.getNumberOfChildren();
     for(int i = 0; i < effectsCount; i++) {
-        linkBox->addEffect((PixmapEffect*)mEffectsAnimators.
+        targetBox->addEffect((PixmapEffect*)mEffectsAnimators.
                            getChildAt(i)->makeDuplicate() );
     }
-    return linkBox;
+}
+
+BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
+    BoundingBox *target = createNewDuplicate(parent);
+    makeDuplicate(target);
+    return target;
 }
 
 BoundingBox *BoundingBox::createSameTransformationLink(BoxesGroup *parent) {
@@ -769,13 +779,17 @@ QPointF BoundingBox::mapRelativeToAbsolute(QPointF relPos) const {
     return getCombinedTransform().map(relPos);
 }
 
-void BoundingBox::moveBy(QPointF trans) {
+void BoundingBox::moveByAbs(QPointF trans) {
+    QPointF by = mParent->mapAbsPosToRel(trans) -
+                 mParent->mapAbsPosToRel(QPointF(0., 0.));
+//    QPointF by = mapAbsPosToRel(
+//                trans - mapRelativeToAbsolute(QPointF(0., 0.)));
 
-    //trans /= getCurrentCanvasScale();
+    mTransformAnimator.moveRelativeToSavedValue(by.x(), by.y());
+}
 
+void BoundingBox::moveByRel(QPointF trans) {
     mTransformAnimator.moveRelativeToSavedValue(trans.x(), trans.y());
-
-    // //mTransformAnimator.translate(trans.x(), trans.y());
 }
 
 void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo) {

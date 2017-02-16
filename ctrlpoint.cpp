@@ -17,7 +17,7 @@ void CtrlPoint::setIsStartCtrlPt(const bool &bT) {
     mIsStartCtrlPt = bT;
 }
 
-void CtrlPoint::moveToWithoutUpdatingTheOther(QPointF absPos)
+void CtrlPoint::moveToAbsWithoutUpdatingTheOther(QPointF absPos)
 {
     MovablePoint::moveToAbs(absPos);
 }
@@ -31,9 +31,9 @@ void CtrlPoint::moveToAbs(QPointF absPos)
     mParentPoint->ctrlPointPosChanged(mIsStartCtrlPt);
 }
 
-void CtrlPoint::moveBy(QPointF absTranslation)
+void CtrlPoint::moveByRel(QPointF relTranslation)
 {
-    MovablePoint::moveBy(absTranslation);
+    MovablePoint::moveByRel(relTranslation);
     if(mOtherCtrlPt->isSelected()) {
         return;
     }

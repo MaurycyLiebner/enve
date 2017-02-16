@@ -226,6 +226,17 @@ void BoxesGroup::startSelectedFillColorTransform()
     }
 }
 
+void BoxesGroup::makeDuplicate(BoundingBox *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
+    foreach(BoundingBox *child, mChildBoxes) {
+        child->createDuplicate((BoxesGroup*)targetBox);
+    }
+}
+
+BoundingBox *BoxesGroup::createNewDuplicate(BoxesGroup *parent) {
+    return new BoxesGroup(parent);
+}
+
 void BoxesGroup::updateBoundingRect() {
     QPainterPath boundingPaths = QPainterPath();
     foreach(BoundingBox *child, mChildBoxes) {

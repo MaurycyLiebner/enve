@@ -2,13 +2,10 @@
 #include <QFileDialog>
 #include "mainwindow.h"
 
-ExternalLinkBox::ExternalLinkBox(QString srcFile, BoxesGroup *parent) :
+ExternalLinkBox::ExternalLinkBox(BoxesGroup *parent) :
     BoxesGroup(parent) {
-
-    mSrc = srcFile;
-    reload();
     setType(TYPE_EXTERNAL_LINK);
-    setName("Link " + srcFile);
+    setName("Link Empty");
 }
 
 void ExternalLinkBox::reload() {
@@ -39,6 +36,7 @@ void ExternalLinkBox::changeSrc() {
 
 void ExternalLinkBox::setSrc(const QString &src) {
     mSrc = src;
+    setName("Link " + src);
     reload();
 }
 
@@ -77,11 +75,13 @@ void InternalLinkBox::updateBoundingRect() {
     BoundingBox::updateBoundingRect();
 }
 
-InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
+InternalLinkBox::InternalLinkBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_INTERNAL_LINK) {
-    mLinkTarget = linkTarget;
-    connect(linkTarget, SIGNAL(scheduleAwaitUpdateAllLinkBoxes()),
-            this, SLOT(scheduleAwaitUpdateSLOT()));
+}
+
+InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
+    InternalLinkBox(parent) {
+    setLinkTarget(linkTarget);
 }
 
 QPixmap InternalLinkBox::renderPreviewProvidedTransform(
@@ -137,12 +137,19 @@ bool InternalLinkBox::relPointInsidePath(QPointF point)
     return mLinkTarget->relPointInsidePath(point);
 }
 
-SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget, BoxesGroup *parent) :
-    InternalLinkBox(linkTarget, parent) {
+SameTransformInternalLink::SameTransformInternalLink(
+        BoxesGroup *parent) :
+    InternalLinkBox(parent) {
 
 }
 
+SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
+                                                     BoxesGroup *parent) :
+    InternalLinkBox(linkTarget, parent) {
+}
+
 void SameTransformInternalLink::updateCombinedTransform() {
+    if(mLinkTarget == NULL) return;
     mCombinedTransformMatrix = mLinkTarget->getRelativeTransform()*
             mParent->getCombinedTransform();
 
@@ -154,18 +161,28 @@ void SameTransformInternalLink::updateCombinedTransform() {
 }
 
 QMatrix SameTransformInternalLink::getRelativeTransform() const {
+    if(mLinkTarget == NULL) return QMatrix();
     return mLinkTarget->getRelativeTransform();
 }
 
 const QPainterPath &SameTransformInternalLink::getRelBoundingRectPath() {
+    if(mLinkTarget == NULL) return QPainterPath();
     return mLinkTarget->getRelBoundingRectPath();
 }
 
 qreal SameTransformInternalLink::getEffectsMargin() {
+    if(mLinkTarget == NULL) return 0.;
     return mLinkTarget->getEffectsMargin();
 }
 
-SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(BoxesGroup *linkTarget, BoxesGroup *parent) :
+SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
+        BoxesGroup *parent) :
+    InternalLinkBoxesGroup(parent) {
+
+}
+
+SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
+        BoxesGroup *linkTarget, BoxesGroup *parent) :
     InternalLinkBoxesGroup(linkTarget, parent) {
 
 }

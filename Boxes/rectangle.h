@@ -7,7 +7,7 @@ class RectangleTopLeftPoint : public MovablePoint
 public:
     RectangleTopLeftPoint(BoundingBox *parent);
 
-    void moveBy(QPointF absTranslatione);
+    void moveByRel(QPointF absTranslatione);
     void moveByAbs(QPointF absTranslatione);
     void startTransform();
     void finishTransform();
@@ -23,7 +23,7 @@ public:
     RectangleBottomRightPoint(BoundingBox *parent);
     void setPoints(MovablePoint *topLeftPoint, MovablePoint *radiusPoint);
 
-    void moveBy(QPointF absTranslatione);
+    void moveByRel(QPointF absTranslatione);
     void moveByAbs(QPointF absTranslatione);
     void startTransform();
     void finishTransform();
@@ -38,7 +38,7 @@ public:
     RectangleRadiusPoint(BoundingBox *parent);
     void setPoints(MovablePoint *topLeftPoint, MovablePoint *bottomRightPoint);
 
-    void moveBy(QPointF absTranslatione);
+    void moveByRel(QPointF absTranslatione);
     void moveByAbs(QPointF absTranslatione);
     void startTransform();
     void finishTransform();
@@ -66,6 +66,20 @@ public:
     void updateAfterFrameChanged(int currentFrame);
     void loadFromSql(int boundingBoxId);
     int saveToSql(QSqlQuery *query, int parentId);
+
+    void makeDuplicate(BoundingBox *targetBox) {
+        PathBox::makeDuplicate(targetBox);
+        Rectangle *rectTarget = (Rectangle*)targetBox;
+        rectTarget->duplicateRectanglePointsFrom(
+                    mTopLeftPoint,
+                    mBottomRightPoint,
+                    mRadiusPoint);
+    }
+    void duplicateRectanglePointsFrom(
+                        RectangleTopLeftPoint *topLeftPoint,
+                        RectangleBottomRightPoint *bottomRightPoint,
+                        RectangleRadiusPoint *radiusPoint);
+    BoundingBox *createNewDuplicate(BoxesGroup *parent);
 private:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;

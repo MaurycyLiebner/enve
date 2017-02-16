@@ -218,7 +218,7 @@ public:
     bool processFilteredKeyEvent(QKeyEvent *event);
     void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
     void scale(qreal scaleBy, QPointF absOrigin);
-    void moveBy(QPointF trans);
+    void moveByRel(QPointF trans);
 
     void updateAfterFrameChanged(int currentFrame);
 
@@ -242,7 +242,7 @@ public:
     void finishSelectedPointsTransform();
     void finishSelectedBoxesTransform();
     void moveSelectedPointsByAbs(QPointF by, bool startTransform);
-    void moveSelectedBoxesBy(QPointF by, bool startTransform);
+    void moveSelectedBoxesByAbs(QPointF by, bool startTransform);
     BoxesGroup *groupSelectedBoxes();
 
     //void selectAllBoxes();
@@ -437,6 +437,7 @@ public:
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
     MovablePoint *getPointAt(const QPointF &absPos,
                              const CanvasMode &currentMode);
+    void duplicateSelectedBoxes();
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

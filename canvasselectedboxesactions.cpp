@@ -433,17 +433,16 @@ void Canvas::cancelSelectedBoxesTransform() {
     }
 }
 
-void Canvas::moveSelectedBoxesBy(QPointF by, bool startTransform)
+void Canvas::moveSelectedBoxesByAbs(QPointF by, bool startTransform)
 {
-    by = mapAbsPosToRel(by) - mapAbsPosToRel(QPointF(0., 0.));
     if(startTransform) {
         foreach(BoundingBox *box, mSelectedBoxes) {
             box->startPosTransform();
-            box->moveBy(by);
+            box->moveByAbs(by);
         }
     } else {
         foreach(BoundingBox *box, mSelectedBoxes) {
-            box->moveBy(by);
+            box->moveByAbs(by);
         }
     }
 }
@@ -462,6 +461,12 @@ void Canvas::moveSelectedBoxesBy(QPointF by, bool startTransform)
 void Canvas::createLinkBoxForSelected() {
     foreach(BoundingBox *selectedBox, mSelectedBoxes) {
         selectedBox->createLink(mCurrentBoxesGroup);
+    }
+}
+
+void Canvas::duplicateSelectedBoxes() {
+    foreach(BoundingBox *selectedBox, mSelectedBoxes) {
+        selectedBox->createDuplicate();
     }
 }
 

@@ -6,12 +6,21 @@
 class AnimationBox : public ImageBox
 {
 public:
-    AnimationBox(BoxesGroup *parent, const QStringList &listOfFrames);
+    AnimationBox(BoxesGroup *parent);
     void updateAfterFrameChanged(int currentFrame);
     void updateAnimationFrame();
     void drawKeys(QPainter *p,
                   qreal pixelsPerFrame, qreal drawY,
                   int startFrame, int endFrame);
+
+    void setListOfFrames(const QStringList &listOfFrames);
+
+    void makeDuplicate(BoundingBox *targetBox);
+
+    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    void duplicateAnimationBoxAnimatorsFrom(
+            IntAnimator *firstFrameAnimator,
+            QrealAnimator *timeScaleAnimator);
 private:
     IntAnimator mFirstFrameAnimator;
     QrealAnimator mTimeScaleAnimator;

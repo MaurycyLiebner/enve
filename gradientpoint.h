@@ -9,7 +9,7 @@ class GradientPoint : public MovablePoint
 public:
     GradientPoint(PathBox *parent);
     void setRelativePos(QPointF relPos, bool saveUndoRedo);
-    void moveBy(QPointF absTranslatione);
+    void moveByRel(QPointF relTranslatione);
     void setColor(QColor fillColor);
     void draw(QPainter *p);
 private:

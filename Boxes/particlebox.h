@@ -91,7 +91,13 @@ private:
 
 class ParticleEmitter : public ComplexAnimator {
 public:
+    ParticleEmitter();
     ParticleEmitter(ParticleBox *parentBox);
+
+    void setParentBox(ParticleBox *parentBox) {
+        mParentBox = parentBox;
+        scheduleGenerateParticles();
+    }
 
     void generateParticles();
 
@@ -112,6 +118,95 @@ public:
         return false;
     }
 
+    QrealAnimator *makeDuplicate() {
+        ParticleEmitter *emitterDupli = new ParticleEmitter();
+        makeDuplicate(emitterDupli);
+        return emitterDupli;
+    }
+
+    void duplicateAnimatorsFrom(
+            QPointFAnimator *pos,
+            QrealAnimator *width,
+
+            QrealAnimator *iniVelocity,
+            QrealAnimator *iniVelocityVar,
+            QrealAnimator *iniVelocityAngle,
+            QrealAnimator *iniVelocityAngleVar,
+            QPointFAnimator *acceleration,
+
+            QrealAnimator *particlesPerSecond,
+            QrealAnimator *particlesFrameLifetime,
+
+            QrealAnimator *velocityRandomVar,
+            QrealAnimator *velocityRandomVarPeriod,
+
+            QrealAnimator *particleSize,
+            QrealAnimator *particleSizeVar,
+
+            QrealAnimator *particleLength,
+
+            QrealAnimator *particlesDecayFrames,
+            QrealAnimator *particlesSizeDecay,
+            QrealAnimator *particlesOpacityDecay) {
+        pos->makeDuplicate(&mPos);
+        width->makeDuplicate(&mWidth);
+
+        iniVelocity->makeDuplicate(&mIniVelocity);
+        iniVelocityVar->makeDuplicate(&mIniVelocityVar);
+        iniVelocityAngle->makeDuplicate(&mIniVelocityAngle);
+        iniVelocityAngleVar->makeDuplicate(&mIniVelocityAngleVar);
+        acceleration->makeDuplicate(&mAcceleration);
+
+        particlesPerSecond->makeDuplicate(&mParticlesPerSecond);
+        particlesFrameLifetime->makeDuplicate(&mParticlesFrameLifetime);
+
+        velocityRandomVar->makeDuplicate(&mVelocityRandomVar);
+        velocityRandomVarPeriod->makeDuplicate(&mVelocityRandomVarPeriod);
+
+        particleSize->makeDuplicate(&mParticleSize);
+        particleSizeVar->makeDuplicate(&mParticleSizeVar);
+
+        particleLength->makeDuplicate(&mParticleLength);
+
+        particlesDecayFrames->makeDuplicate(&mParticlesDecayFrames);
+        particlesSizeDecay->makeDuplicate(&mParticlesSizeDecay);
+        particlesOpacityDecay->makeDuplicate(&mParticlesOpacityDecay);
+    }
+
+    void makeDuplicate(QrealAnimator *target) {
+        ParticleEmitter *peTarget = ((ParticleEmitter*)target);
+        peTarget->duplicateAnimatorsFrom(
+                    &mPos,
+                    &mWidth,
+                    &mIniVelocity,
+                    &mIniVelocityVar,
+                    &mIniVelocityAngle,
+                    &mIniVelocityAngleVar,
+                    &mAcceleration,
+                    &mParticlesPerSecond,
+                    &mParticlesFrameLifetime,
+                    &mVelocityRandomVar,
+                    &mVelocityRandomVarPeriod,
+                    &mParticleSize,
+                    &mParticleSizeVar,
+                    &mParticleLength,
+                    &mParticlesDecayFrames,
+                    &mParticlesSizeDecay,
+                    &mParticlesOpacityDecay);
+        peTarget->setMinFrame(mMinFrame);
+        peTarget->setMaxFrame(mMaxFrame);
+    }
+
+    void setMinFrame(const int &minFrame) {
+        mMinFrame = minFrame;
+        scheduleGenerateParticles();
+    }
+
+    void setMaxFrame(const int &maxFrame) {
+        mMaxFrame = maxFrame;
+        scheduleGenerateParticles();
+    }
+
 private:
     QRectF mParticlesBoundingRect;
     bool mGenerateParticlesScheduled = false;
@@ -121,7 +216,7 @@ private:
 
     QList<ParticleState> mParticleStates;
     QList<Particle*> mParticles;
-    ParticleBox *mParentBox;
+    ParticleBox *mParentBox = NULL;
 
     QPointFAnimator mPos;
     QrealAnimator mWidth;
@@ -160,6 +255,22 @@ public:
     void updateBoundingRect();
     void preUpdatePixmapsUpdates();
     bool relPointInsidePath(QPointF relPos);
+
+    void addEmitter(ParticleEmitter *emitter);
+
+    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
+        return new ParticleBox(parent);
+    }
+
+    void makeDuplicate(BoundingBox *targetBox) {
+        BoundingBox::makeDuplicate(targetBox);
+        ParticleBox *pbTarget = (ParticleBox*)targetBox;
+        foreach(ParticleEmitter *emitter, mEmitters) {
+            pbTarget->addEmitter((ParticleEmitter*)
+                                 emitter->makeDuplicate());
+        }
+    }
+
 private:
     QList<ParticleEmitter*> mEmitters;
 };

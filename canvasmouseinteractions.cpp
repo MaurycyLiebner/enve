@@ -121,7 +121,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
-                if(selectedAction->text() == "Delete") {
+                if(selectedAction->text() == "Duplicate") {
+                    duplicateSelectedBoxes();
+                } else if(selectedAction->text() == "Delete") {
                     removeSelectedBoxesAndClearList();
                 } else if(selectedAction->text() == "Apply Transformation") {
                     applyCurrentTransformationToSelected();
@@ -561,7 +563,7 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
             mLastPressedBox = NULL;
         }
 
-        moveSelectedBoxesBy(getMoveByValueForEventPos(eventPos),
+        moveSelectedBoxesByAbs(getMoveByValueForEventPos(eventPos),
                     mFirstMouseMove);
     }
 }
@@ -596,7 +598,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
     QPointF eventPos = event->pos();
 
     if(event->buttons() & Qt::MiddleButton) {
-        moveBy(event->pos() - mLastMouseEventPos);
+        moveByRel(event->pos() - mLastMouseEventPos);
     } else if(!mTransformationFinishedBeforeMouseRelease) {
         if(mSelecting) {
             moveSecondSelectionPoint(eventPos);

@@ -6,10 +6,10 @@ class CtrlPoint : public MovablePoint
 {
 public:
     CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt);
-    void moveToWithoutUpdatingTheOther(QPointF absPos);
+    void moveToAbsWithoutUpdatingTheOther(QPointF absPos);
     void moveToAbs(QPointF absPos);
-    void moveByWithoutUpdatingTheOther(QPointF absTranslation);
-    void moveBy(QPointF absTranslation);
+    //void moveByWithoutUpdatingTheOther(QPointF absTranslation);
+    void moveByRel(QPointF relTranslation);
     void startTransform();
     void finishTransform();
     void setOtherCtrlPt(CtrlPoint *ctrlPt);

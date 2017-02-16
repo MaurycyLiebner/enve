@@ -10,10 +10,7 @@ double fRand(double fMin, double fMax)
 
 ParticleBox::ParticleBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_PARTICLES) {
-    ParticleEmitter *newEmitter = new ParticleEmitter(this);
-    mEmitters << newEmitter;
-
-    addActiveAnimator(newEmitter);
+    addEmitter(new ParticleEmitter(this));
 }
 
 void ParticleBox::getAccelerationAt(const QPointF &pos,
@@ -65,6 +62,11 @@ bool ParticleBox::relPointInsidePath(QPointF relPos) {
     } else {
         return false;
     }
+}
+
+void ParticleBox::addEmitter(ParticleEmitter *emitter) {
+    mEmitters << emitter;
+    addActiveAnimator(emitter);
 }
 
 void ParticleBox::draw(QPainter *p)
@@ -190,11 +192,10 @@ ParticleState Particle::getParticleStateAtFrame(const int &frame) {
     return mParticleStates[arrayId];
 }
 
-ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
-    ComplexAnimator(){
-    setName("particle emitter");
+ParticleEmitter::ParticleEmitter() :
+    ComplexAnimator() {
 
-    mParentBox = parentBox;
+    setName("particle emitter");
 
     mPos.setName("pos");
     mPos.setCurrentValue(QPointF(0., 0.));
@@ -315,9 +316,12 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     addChildAnimator(&mParticlesSizeDecay);
     addChildAnimator(&mParticlesOpacityDecay);
 
-    scheduleGenerateParticles();
-
     setUpdater(new ParticlesUpdater(this));
+}
+
+ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
+    ParticleEmitter(){
+    setParentBox(parentBox);
 }
 
 void ParticleEmitter::scheduleGenerateParticles() {

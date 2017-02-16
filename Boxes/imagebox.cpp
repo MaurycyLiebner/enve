@@ -46,6 +46,16 @@ bool ImageBox::relPointInsidePath(QPointF point)
                                    );
 }
 
+void ImageBox::makeDuplicate(BoundingBox *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
+    ImageBox *imgTarget = (ImageBox*)targetBox;
+    imgTarget->setFilePath(mImageFilePath);
+}
+
+BoundingBox *ImageBox::createNewDuplicate(BoxesGroup *parent) {
+    return new ImageBox(parent);
+}
+
 void ImageBox::draw(QPainter *p)
 {
     if(mVisible) {

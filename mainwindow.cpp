@@ -40,6 +40,10 @@ MainWindow::MainWindow(QWidget *parent)
     BoxSingleWidget::loadStaticPixmaps();
     setupToolBar();
 
+    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
+        mClipboardContainers << NULL;
+    }
+
     mCurrentUndoRedoStack = &mUndoRedoStack;
 
     mMainWindowInstance = this;
@@ -263,6 +267,20 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(
                 canvas->getCurrentBoxesGroup());
+}
+
+void MainWindow::replaceClipboard(ClipboardContainer *container) {
+    ClipboardContainer *clipboardContainer = mClipboardContainers.at(
+                                                container->getType());
+    if(clipboardContainer != NULL) {
+        delete clipboardContainer;
+    }
+    mClipboardContainers.replace(container->getType(),
+                                 container);
+}
+
+void MainWindow::pasteFromClipboard(const ClipboardContainerType &type) {
+
 }
 
 void MainWindow::setupToolBar() {

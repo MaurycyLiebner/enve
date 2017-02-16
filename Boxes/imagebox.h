@@ -15,6 +15,9 @@ public:
                       const CanvasMode &);
     void updateBoundingRect();
     bool relPointInsidePath(QPointF point);
+
+    void makeDuplicate(BoundingBox *targetBox);
+    BoundingBox *createNewDuplicate(BoxesGroup *parent);
 private:
     QPixmap mPixmap;
     QString mImageFilePath;

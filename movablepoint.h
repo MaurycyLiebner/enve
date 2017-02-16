@@ -42,7 +42,7 @@ public:
     BoundingBox *getParent();
 
     bool isContainedInRect(QRectF absRect);
-    virtual void moveBy(QPointF relTranslation);
+    virtual void moveByRel(QPointF relTranslation);
     virtual void moveToAbs(QPointF absPos);
     virtual void moveByAbs(QPointF absTranslatione);
 

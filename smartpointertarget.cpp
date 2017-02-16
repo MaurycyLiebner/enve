@@ -1,8 +1,7 @@
 #include "smartpointertarget.h"
 #include <QDebug>
-SmartPointerTarget::SmartPointerTarget()
-{
-
+SmartPointerTarget::SmartPointerTarget() {
+    mPointerToThis = this;
 }
 
 void SmartPointerTarget::incNumberPointers()

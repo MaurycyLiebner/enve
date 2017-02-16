@@ -156,10 +156,10 @@ void MovablePoint::saveTransformPivotAbsPos(QPointF absPivot) {
 }
 
 void MovablePoint::moveToRel(QPointF relPos) {
-    moveBy(relPos - mSavedRelPos);
+    moveByRel(relPos - mSavedRelPos);
 }
 
-void MovablePoint::moveBy(QPointF relTranslation) {
+void MovablePoint::moveByRel(QPointF relTranslation) {
     mRelPos.incSavedValueToCurrentValue(relTranslation.x(),
                                         relTranslation.y());
 }

@@ -851,7 +851,7 @@ void QrealAnimator::setTransformed(bool bT) {
 void QrealAnimator::makeDuplicate(QrealAnimator *target) {
     target->setName(mName);
     target->setRecording(false);
-    target->setCurrentValue(mCurrentValue, true);
+    target->setCurrentValue(mCurrentValue, false);
     if(mIsRecording) {
         target->setRecordingWithoutChangingKeys(mIsRecording);
     }

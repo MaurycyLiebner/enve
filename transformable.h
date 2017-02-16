@@ -12,7 +12,12 @@ public:
     virtual void startTransform() {}
     virtual void finishTransform() {}
 
-    virtual void moveBy(QPointF absTranslatione) { Q_UNUSED(absTranslatione); }
+    virtual void moveByRel(QPointF relTranslatione) {
+        Q_UNUSED(relTranslatione);
+    }
+    virtual void moveByAbs(QPointF absTranslatione) {
+        Q_UNUSED(absTranslatione);
+    }
 
     virtual void scale(qreal scaleXBy, qreal scaleYBy) {
         Q_UNUSED(scaleXBy); Q_UNUSED(scaleYBy);
@@ -29,7 +34,9 @@ public:
 
     virtual bool isBeingTransformed() { return mSelected; }
 
-    virtual void saveTransformPivotAbsPos(QPointF absPivot) { Q_UNUSED(absPivot); }
+    virtual void saveTransformPivotAbsPos(QPointF absPivot) {
+        Q_UNUSED(absPivot);
+    }
 
     virtual void cancelTransform() {}
 protected:

@@ -130,6 +130,14 @@ void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
     strokeSettings->makeDuplicate(&mStrokeSettings);
 }
 
+void PathBox::makeDuplicate(BoundingBox *targetBox) {
+    PathBox *pathBoxTarget = ((PathBox*)targetBox);
+    pathBoxTarget->duplicatePaintSettingsFrom(&mFillPaintSettings,
+                                              &mStrokeSettings);
+    pathBoxTarget->duplicateGradientPointsFrom(&mFillGradientPoints,
+                                               &mStrokeGradientPoints);
+}
+
 void PathBox::schedulePathUpdate() {
     scheduleAwaitUpdate();
     if(mPathUpdateNeeded) {

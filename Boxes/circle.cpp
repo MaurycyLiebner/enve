@@ -84,6 +84,15 @@ void Circle::loadFromSql(int boundingBoxId) {
     if(!mPivotChanged) centerPivotPosition();
 }
 
+void Circle::duplicateCirclePointsFrom(
+        CircleCenterPoint *center,
+        CircleRadiusPoint *horizontalRadiusPoint,
+        CircleRadiusPoint *verticalRadiusPoint) {
+    center->makeDuplicate(mCenter);
+    horizontalRadiusPoint->makeDuplicate(mHorizontalRadiusPoint);
+    verticalRadiusPoint->makeDuplicate(mVerticalRadiusPoint);
+}
+
 void Circle::updateAfterFrameChanged(int currentFrame)
 {
     mVerticalRadiusPoint->updateAfterFrameChanged(currentFrame);
@@ -215,13 +224,13 @@ void CircleCenterPoint::setVerticalAndHorizontalPoints(
     mHorizontalPoint = horizontalPoint;
 }
 
-void CircleCenterPoint::moveBy(QPointF absTranslatione)
+void CircleCenterPoint::moveByRel(QPointF absTranslatione)
 {
-    mParent->moveBy(absTranslatione);
+    mParent->moveByRel(absTranslatione);
 }
 
 void CircleCenterPoint::moveByAbs(QPointF absTranslatione) {
-    mParent->moveBy(absTranslatione);
+    mParent->moveByAbs(absTranslatione);
 }
 
 void CircleCenterPoint::startTransform()
@@ -247,7 +256,7 @@ CircleRadiusPoint::~CircleRadiusPoint()
 
 }
 
-void CircleRadiusPoint::moveBy(QPointF relTranslation)
+void CircleRadiusPoint::moveByRel(QPointF relTranslation)
 {
     if(mCenterPoint->isSelected() ) return;
     if(mXBlocked) {
@@ -255,7 +264,7 @@ void CircleRadiusPoint::moveBy(QPointF relTranslation)
     } else {
         relTranslation.setY(0.);
     }
-    MovablePoint::moveBy(relTranslation);
+    MovablePoint::moveByRel(relTranslation);
 }
 
 //void CircleRadiusPoint::setAbsPosRadius(QPointF pos)

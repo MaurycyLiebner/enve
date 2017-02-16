@@ -1,10 +1,8 @@
 #include "animationbox.h"
 #include "BoxesList/boxsinglewidget.h"
 
-AnimationBox::AnimationBox(BoxesGroup *parent,
-                           const QStringList &listOfFrames) :
+AnimationBox::AnimationBox(BoxesGroup *parent) :
     ImageBox(parent) {
-    mListOfFrames = listOfFrames;
     mFirstFrameAnimator.setName("start frame");
     mFirstFrameAnimator.blockPointer();
     mFirstFrameAnimator.setCurrentIntValue(getCurrentFrame());
@@ -20,7 +18,32 @@ AnimationBox::AnimationBox(BoxesGroup *parent,
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
 //    mFrameAnimator.setCurrentIntValue(0);
+}
+
+void AnimationBox::setListOfFrames(const QStringList &listOfFrames) {
+    mListOfFrames = listOfFrames;
+    if(listOfFrames.isEmpty()) return;
     setFilePath(listOfFrames.first());
+}
+
+void AnimationBox::makeDuplicate(BoundingBox *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
+    AnimationBox *animationBoxTarget = (AnimationBox*)targetBox;
+    animationBoxTarget->setListOfFrames(mListOfFrames);
+    animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
+                &mFirstFrameAnimator,
+                &mTimeScaleAnimator);
+}
+
+void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
+        IntAnimator *firstFrameAnimator,
+        QrealAnimator *timeScaleAnimator) {
+    firstFrameAnimator->makeDuplicate(&mFirstFrameAnimator);
+    timeScaleAnimator->makeDuplicate(&mTimeScaleAnimator);
+}
+
+BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
+    return new AnimationBox(parent);
 }
 
 void AnimationBox::updateAfterFrameChanged(int currentFrame) {

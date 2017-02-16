@@ -231,11 +231,26 @@ public:
     void loadFromSql(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
     void loadFromSql(int strokeSqlId, GradientWidget *gradientWidget);
     bool nonZeroLineWidth();
+
+    void makeDuplicate(QrealAnimator *target) {
+        PaintSettings::makeDuplicate(target);
+        StrokeSettings *strokeSettingsTarget = (StrokeSettings*)target;
+        strokeSettingsTarget->duplicateLineWidthFrom(&mLineWidth);
+        strokeSettingsTarget->setCapStyle(mCapStyle);
+        strokeSettingsTarget->setJoinStyle(mJoinStyle);
+        strokeSettingsTarget->setOutlineCompositionMode(mOutlineCompositionMode);
+    }
+
+    void duplicateLineWidthFrom(QrealAnimator *source) {
+        source->makeDuplicate(&mLineWidth);
+    }
+
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
-    QPainter::CompositionMode mOutlineCompositionMode = QPainter::CompositionMode_Source;
+    QPainter::CompositionMode mOutlineCompositionMode =
+            QPainter::CompositionMode_Source;
 };
 
 class MainWindow;

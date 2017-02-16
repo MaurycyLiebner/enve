@@ -124,6 +124,9 @@ public:
     void setCurrentFrameForAllWidgets(int frame);
     void updateDisplayedShapesInMenu();
     void updateSettingsForCurrentCanvas();
+
+    void replaceClipboard(ClipboardContainer *container);
+    void pasteFromClipboard(const ClipboardContainerType &type);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);
@@ -154,6 +157,7 @@ signals:
 private:
     static MainWindow *mMainWindowInstance;
 
+    QList<ClipboardContainer*> mClipboardContainers;
     bool mRendering = false;
 
     QComboBox *mCurrentCanvasComboBox;

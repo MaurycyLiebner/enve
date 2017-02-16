@@ -12,7 +12,7 @@ public:
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
                                         MovablePoint *horizontalPoint);
 
-    void moveBy(QPointF absTranslatione);
+    void moveByRel(QPointF absTranslatione);
 
     void startTransform();
 
@@ -30,7 +30,7 @@ public:
                       bool blockX, MovablePoint *centerPoint);
     ~CircleRadiusPoint();
 
-    void moveBy(QPointF relTranslation);
+    void moveByRel(QPointF relTranslation);
 //    void setAbsPosRadius(QPointF pos);
     void moveByAbs(QPointF absTranslatione);
 
@@ -60,6 +60,23 @@ public:
 
     int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
+
+    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
+        return new Circle(parent);
+    }
+
+    void makeDuplicate(BoundingBox *targetBox) {
+        PathBox::makeDuplicate(targetBox);
+        Circle *circleTarget = (Circle*)targetBox;
+        circleTarget->duplicateCirclePointsFrom(
+                    mCenter,
+                    mHorizontalRadiusPoint,
+                    mVerticalRadiusPoint);
+    }
+    void duplicateCirclePointsFrom(
+                        CircleCenterPoint *center,
+                        CircleRadiusPoint *horizontalRadiusPoint,
+                        CircleRadiusPoint *verticalRadiusPoint);
 private:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;

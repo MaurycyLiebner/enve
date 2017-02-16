@@ -953,20 +953,34 @@ void VectorPath::finishAllPointsTransform() {
     }
 }
 
+void VectorPath::makeDuplicate(BoundingBox *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
+    PathBox::makeDuplicate(targetBox);
+    duplicatePathPointsTo((VectorPath*)targetBox);
+}
+
+BoundingBox *VectorPath::createNewDuplicate(BoxesGroup *parent) {
+    return new VectorPath(parent);
+}
+
 void VectorPath::duplicatePathPointsTo(
         VectorPath *target) {
     foreach(PathPoint *sepPoint, mSeparatePaths) {
         PathPoint *currPoint = sepPoint;
         PathPoint *lastAddedPoint = NULL;
+        PathPoint *firstAddedPoint = NULL;
         while(true) {
             PathPoint *pointToAdd = new PathPoint(target);
             currPoint->makeDuplicate(pointToAdd);
             target->addPoint(pointToAdd, lastAddedPoint);
-            lastAddedPoint = pointToAdd;
             PathPoint *nextPoint = currPoint->getNextPoint();
             if(nextPoint == sepPoint) {
-                currPoint->connectToPoint(sepPoint);
+                pointToAdd->connectToPoint(firstAddedPoint);
                 break;
+            }
+            lastAddedPoint = pointToAdd;
+            if(firstAddedPoint == NULL) {
+                firstAddedPoint = pointToAdd;
             }
             if(nextPoint == NULL) break;
             currPoint = nextPoint;

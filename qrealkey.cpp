@@ -108,6 +108,7 @@ void QrealKey::incValue(qreal incBy) {
 
 void QrealKey::removeFromAnimator()
 {
+    if(mParentAnimator == NULL) return;
     mParentAnimator->removeKey(this);
 }
 
@@ -149,21 +150,25 @@ bool QrealKey::isStartPointEnabled()
 
 qreal QrealKey::getPrevKeyValue()
 {
+    if(mParentAnimator == NULL) return mValue;
     return mParentAnimator->getPrevKeyValue(this);
 }
 
 qreal QrealKey::getNextKeyValue()
 {
+    if(mParentAnimator == NULL) return mValue;
     return mParentAnimator->getNextKeyValue(this);
 }
 
 bool QrealKey::hasPrevKey()
 {
+    if(mParentAnimator == NULL) return false;
     return mParentAnimator->hasPrevKey(this);
 }
 
 bool QrealKey::hasNextKey()
 {
+    if(mParentAnimator == NULL) return false;
     return mParentAnimator->hasNextKey(this);
 }
 
@@ -263,19 +268,25 @@ qreal QrealKey::getValue() { return mValue; }
 
 #include "undoredo.h"
 void QrealKey::setValue(qreal value, bool saveUndoRedo) {
-    value = clamp(value,
-                  mParentAnimator->getMinPossibleValue(),
-                  mParentAnimator->getMaxPossibleValue());
+    if(mParentAnimator != NULL) {
+        value = clamp(value,
+                      mParentAnimator->getMinPossibleValue(),
+                      mParentAnimator->getMaxPossibleValue());
+    }
     qreal dVal = value - mValue;
     setEndValue(mEndValue + dVal);
     setStartValue(mStartValue + dVal);
     if(saveUndoRedo) {
-        mParentAnimator->addUndoRedo(new ChangeQrealKeyValueUndoRedo(mValue, value, this) );
+        if(mParentAnimator != NULL) {
+            mParentAnimator->addUndoRedo(
+                        new ChangeQrealKeyValueUndoRedo(mValue, value, this) );
+        }
     }
     mValue = value;
 }
 
 void QrealKey::incFrameAndUpdateParentAnimator(int inc) {
+    if(mParentAnimator == NULL) return;
     if((mParentKey == NULL) ? false : mParentKey->isAncestorSelected() ) return;
     mParentAnimator->moveKeyToFrame(this, mFrame + inc);
 }
@@ -313,6 +324,7 @@ void QrealKey::setFrame(int frame) {
     setEndFrame(mEndFrame + dFrame);
     setStartFrame(mStartFrame + dFrame);
     mFrame = frame;
+    if(mParentAnimator == NULL) return;
     mParentAnimator->updateKeyOnCurrrentFrame();
 }
 

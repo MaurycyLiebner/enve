@@ -201,6 +201,7 @@ public:
     void duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                     StrokeSettings *strokeSettings);
 
+    void makeDuplicate(BoundingBox *targetBox);
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

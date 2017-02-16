@@ -127,7 +127,7 @@ public:
     QPointF getAbsolutePos();
 
     virtual void updateCombinedTransform();
-    void moveBy(QPointF trans);
+    void moveByRel(QPointF trans);
 
     void startTransform();
     void finishTransform();
@@ -368,6 +368,14 @@ public:
     bool isAncestor(BoundingBox *box) const;
     void removeFromParent();
     void removeFromSelection();
+    void moveByAbs(QPointF trans);
+    virtual void makeDuplicate(BoundingBox *targetBox);
+    BoundingBox *createDuplicate(BoxesGroup *parent);
+    virtual BoundingBox *createNewDuplicate(BoxesGroup *) = 0;
+    BoundingBox *createDuplicate() {
+        return createDuplicate(mParent);
+    }
+
 protected:
     bool mUpdateDisabled = false;
 

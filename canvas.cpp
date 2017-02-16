@@ -410,11 +410,13 @@ void Canvas::renderFinal(QPainter *p) {
 }
 #include "Boxes/animationbox.h"
 void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
-    new AnimationBox(mCurrentBoxesGroup, paths);
+    AnimationBox *aniBox = new AnimationBox(mCurrentBoxesGroup);
+    aniBox->setListOfFrames(paths);
 }
 #include "Boxes/linkbox.h"
 void Canvas::createLinkToFileWithPath(const QString &path) {
-    new ExternalLinkBox(path, mCurrentBoxesGroup);
+    ExternalLinkBox *extLinkBox = new ExternalLinkBox(mCurrentBoxesGroup);
+    extLinkBox->setSrc(path);
 }
 
 void Canvas::renderCurrentFrameToQImage(QImage *frame)
@@ -796,13 +798,13 @@ void Canvas::fitCanvasToSize() {
     scale(qMin(heightScale, widthScale), QPointF(0., 0.));
     mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
-    moveBy(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
+    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
     updateAfterCombinedTransformationChanged();
 
 }
 
-void Canvas::moveBy(QPointF trans)
+void Canvas::moveByRel(QPointF trans)
 {
     trans = mapAbsPosToRel(trans) -
             mapAbsPosToRel(QPointF(0, 0));

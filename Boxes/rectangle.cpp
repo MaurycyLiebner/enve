@@ -65,6 +65,19 @@ int Rectangle::saveToSql(QSqlQuery *query, int parentId)
     return boundingBoxId;
 }
 
+void Rectangle::duplicateRectanglePointsFrom(
+        RectangleTopLeftPoint *topLeftPoint,
+        RectangleBottomRightPoint *bottomRightPoint,
+        RectangleRadiusPoint *radiusPoint) {
+    topLeftPoint->makeDuplicate(mTopLeftPoint);
+    bottomRightPoint->makeDuplicate(mBottomRightPoint);
+    radiusPoint->makeDuplicate(mRadiusPoint);
+}
+
+BoundingBox *Rectangle::createNewDuplicate(BoxesGroup *parent) {
+    return new Rectangle(parent);
+}
+
 
 void Rectangle::loadFromSql(int boundingBoxId) {
     PathBox::loadFromSql(boundingBoxId);
@@ -200,14 +213,14 @@ RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :
 
 }
 
-void RectangleTopLeftPoint::moveBy(QPointF absTranslatione) {
-    mParent->moveBy(absTranslatione);
+void RectangleTopLeftPoint::moveByRel(QPointF absTranslatione) {
+    mParent->moveByRel(absTranslatione);
     if(mBottomRightPoint->isSelected()) return;
-    mBottomRightPoint->MovablePoint::moveBy(-absTranslatione);
+    mBottomRightPoint->MovablePoint::moveByRel(-absTranslatione);
 }
 
 void RectangleTopLeftPoint::moveByAbs(QPointF absTranslatione) {
-    mParent->moveBy(absTranslatione);
+    mParent->moveByRel(absTranslatione);
     if(mBottomRightPoint->isSelected()) return;
     mBottomRightPoint->MovablePoint::moveByAbs(-absTranslatione);
 }
@@ -240,9 +253,9 @@ void RectangleBottomRightPoint::setPoints(MovablePoint *topLeftPoint,
     mRadiusPoint = radiusPoint;
 }
 
-void RectangleBottomRightPoint::moveBy(QPointF absTranslatione) {
+void RectangleBottomRightPoint::moveByRel(QPointF absTranslatione) {
     if(mTopLeftPoint->isSelected()) return;
-    MovablePoint::moveBy(absTranslatione);
+    MovablePoint::moveByRel(absTranslatione);
 }
 
 void RectangleBottomRightPoint::moveByAbs(QPointF absTranslatione) {
@@ -272,9 +285,9 @@ void RectangleRadiusPoint::setPoints(MovablePoint *topLeftPoint,
     mBottomRightPoint = bottomRightPoint;
 }
 
-void RectangleRadiusPoint::moveBy(QPointF absTranslatione) {
+void RectangleRadiusPoint::moveByRel(QPointF absTranslatione) {
     if(mTopLeftPoint->isSelected() || mBottomRightPoint->isSelected() ) return;
-    MovablePoint::moveBy(QPointF( 0., absTranslatione.y()) );
+    MovablePoint::moveByRel(QPointF( 0., absTranslatione.y()) );
 }
 
 void RectangleRadiusPoint::setAbsPosRadius(QPointF pos) {
