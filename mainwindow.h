@@ -14,6 +14,10 @@
 #include "vectorshapesmenu.h"
 #include "actionbutton.h"
 
+enum ClipboardContainerType : short;
+
+class ClipboardContainer;
+
 class PaintControler;
 
 class BoxesList;
@@ -126,7 +130,8 @@ public:
     void updateSettingsForCurrentCanvas();
 
     void replaceClipboard(ClipboardContainer *container);
-    void pasteFromClipboard(const ClipboardContainerType &type);
+    ClipboardContainer *getClipboardContainer(
+            const ClipboardContainerType &type);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);

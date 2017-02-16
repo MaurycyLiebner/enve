@@ -660,14 +660,29 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
 
     return true;
 }
-
+#include "clipboardcontainer.h"
 void Canvas::keyPressEvent(QKeyEvent *event)
 {
     if(mPreviewing) return;
 
     bool isGrabbingMouse = mCanvasWidget->mouseGrabber() == mCanvasWidget;
     if(isGrabbingMouse ? !handleKeyPressEventWhileMouseGrabbing(event) : true) {
-        if(event->key() == Qt::Key_0) {
+        if(isCtrlPressed() && event->key() == Qt::Key_V) {
+            if(event->isAutoRepeat()) return;
+            BoxesClipboardContainer *container =
+                    (BoxesClipboardContainer*)
+                    mMainWindow->getClipboardContainer(CCT_BOXES);
+            if(container == NULL) return;
+            container->pasteTo(mCurrentBoxesGroup);
+        } else if(isCtrlPressed() && event->key() == Qt::Key_C) {
+            if(event->isAutoRepeat()) return;
+            BoxesClipboardContainer *container =
+                    new BoxesClipboardContainer();
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                container->copyBoxToContainer(box);
+            }
+            mMainWindow->replaceClipboard(container);
+        } else if(event->key() == Qt::Key_0) {
             fitCanvasToSize();
         } else if(event->key() == Qt::Key_1) {
             resetTransormation();

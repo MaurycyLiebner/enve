@@ -36,9 +36,10 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mTransformAnimator.setUpdater(new TransUpdater(this) );
     mType = type;
 
-    parent->addChild(this);
     mTransformAnimator.reset();
     mCombinedTransformMatrix.reset();
+    if(parent == NULL) return;
+    parent->addChild(this);
     updateCombinedTransform();
 }
 
@@ -519,7 +520,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
 }
 
 void BoundingBox::awaitUpdate() {
-    if(mAwaitingUpdate) return;
+    if(mAwaitingUpdate || mParent == NULL) return;
     setAwaitingUpdate(true);
     mMainWindow->addBoxAwaitingUpdate(this);
 }
@@ -562,6 +563,7 @@ void BoundingBox::updateEffectsMargin() {
 void BoundingBox::scheduleEffectsMarginUpdate() {
     scheduleAwaitUpdate();
     mEffectsMarginUpdateNeeded = true;
+    if(mParent == NULL) return;
     mParent->scheduleEffectsMarginUpdate();
 }
 
@@ -874,6 +876,7 @@ void BoundingBox::updateRelativeTransform() {
 }
 
 void BoundingBox::updateCombinedTransform() {
+    if(mParent == NULL) return;
     mCombinedTransformMatrix = mRelativeTransformMatrix*
             mParent->getCombinedTransform();
 

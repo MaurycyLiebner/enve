@@ -8,6 +8,7 @@ class ComplexAnimator;
 class ComplexKey;
 
 class QrealAnimator;
+class KeysClipboardContainer;
 
 class QrealKey : public QrealPoint
 {
@@ -86,6 +87,8 @@ public:
     CtrlsMode getCtrlsMode();
     int saveToSql(int parentAnimatorSqlId);
     void loadFromSql(int keyId);
+
+    virtual void copyToContainer(KeysClipboardContainer *container);
 protected:
     QrealAnimator *mParentAnimator = NULL;
     ComplexKey *mParentKey = NULL;

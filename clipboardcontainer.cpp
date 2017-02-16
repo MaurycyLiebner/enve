@@ -32,7 +32,8 @@ void BoxesClipboardContainer::pasteTo(BoxesGroup *parent) {
     }
 }
 
-KeysClipboardContainer::KeysClipboardContainer() {
+KeysClipboardContainer::KeysClipboardContainer() :
+    ClipboardContainer(CCT_KEYS) {
 
 }
 
@@ -51,7 +52,9 @@ void KeysClipboardContainer::copyKeyToContainer(QrealKey *key) {
     key->getParentAnimator()->incNumberPointers();
 }
 
-void KeysClipboardContainer::paste(const int &pasteFrame) {
+#include "keysview.h"
+void KeysClipboardContainer::paste(const int &pasteFrame,
+                                   KeysView *keysView) {
     int firstKeyFrame = 1000000;
     foreach(QrealKey *key, mKeysList) {
         if(key->getFrame() < firstKeyFrame) {
@@ -60,13 +63,25 @@ void KeysClipboardContainer::paste(const int &pasteFrame) {
     }
     int dFrame = pasteFrame - firstKeyFrame;
 
+    QList<QrealAnimator*> animators;
+    foreach(QrealAnimator *animator, mTargetAnimators) {
+        if(animators.contains(animator)) continue;
+        animators << animator;
+    }
+
+    keysView->clearKeySelection();
+
     int count = mKeysList.count();
     for(int i = 0; i < count; i++) {
         QrealKey *key = mKeysList.at(i);
         QrealAnimator *animator = mTargetAnimators.at(i);
-        key = key->makeQrealKeyDuplicate(NULL);
-
         key->setFrame(key->getFrame() + dFrame);
+        key = key->makeQrealKeyDuplicate(animator);
         animator->appendKey(key);
+        keysView->addKeyToSelection(key);
+    }
+
+    foreach(QrealAnimator *animator, animators) {
+        animator->mergeKeysIfNeeded();
     }
 }

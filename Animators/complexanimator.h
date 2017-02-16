@@ -107,6 +107,7 @@ public:
 
     void startFrameTransform();
     void finishFrameTransform();
+    void copyToContainer(KeysClipboardContainer *container);
 private:
     QList<QrealKey*> mKeys;
 };

@@ -18,6 +18,7 @@
 #include "svgimporter.h"
 #include "canvaswidget.h"
 #include "BoxesList/boxscrollwidget.h"
+#include "clipboardcontainer.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -279,8 +280,9 @@ void MainWindow::replaceClipboard(ClipboardContainer *container) {
                                  container);
 }
 
-void MainWindow::pasteFromClipboard(const ClipboardContainerType &type) {
-
+ClipboardContainer *MainWindow::getClipboardContainer(
+        const ClipboardContainerType &type) {
+    return mClipboardContainers.at(type);
 }
 
 void MainWindow::setupToolBar() {

@@ -36,8 +36,7 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
-qreal ComplexAnimator::clampValue(qreal value)
-{
+qreal ComplexAnimator::clampValue(qreal value) {
     return value;//clamp(value, mMinMoveValue, mMaxMoveValue);
 }
 
@@ -353,6 +352,13 @@ void ComplexKey::removeAnimatorKey(QrealKey *key) {
 
 bool ComplexKey::isEmpty() {
     return mKeys.isEmpty();
+}
+
+void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
+    foreach(QrealKey *key, mKeys) {
+        if(key->isSelected()) continue;
+        key->copyToContainer(container);
+    }
 }
 
 void ComplexKey::setValue(qreal, bool) { QrealKey::setValue(mFrame, false); }

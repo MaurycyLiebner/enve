@@ -1,6 +1,7 @@
 #include "qrealkey.h"
 #include "Animators/qrealanimator.h"
 #include "Animators/complexanimator.h"
+#include "clipboardcontainer.h"
 
 QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     QrealPoint(KEY_POINT, this) {
@@ -93,6 +94,10 @@ void QrealKey::loadFromSql(int keyId) {
     } else {
         qDebug() << "Could not load qrealkey with id " << keyId;
     }
+}
+
+void QrealKey::copyToContainer(KeysClipboardContainer *container) {
+    container->copyKeyToContainer(this);
 }
 
 void QrealKey::constrainEndCtrlMaxFrame(int maxFrame) {

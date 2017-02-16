@@ -123,13 +123,29 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
 
     mMainWindow->callUpdateSchedulers();
 }
-
+#include "clipboardcontainer.h"
 bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
     if(mGraphViewed) {
         return graphProcessFilteredKeyEvent(event);
     } else {
-        if(event->key() == Qt::Key_Delete) {
+        if(mMainWindow->isCtrlPressed() && event->key() == Qt::Key_V) {
+            if(event->isAutoRepeat()) return false;
+            KeysClipboardContainer *container =
+                    (KeysClipboardContainer*)
+                    mMainWindow->getClipboardContainer(CCT_KEYS);
+            if(container == NULL) return false;
+            container->paste(mMainWindow->getCurrentFrame(),
+                             this);
+        } else if(mMainWindow->isCtrlPressed() && event->key() == Qt::Key_C) {
+            if(event->isAutoRepeat()) return false;
+            KeysClipboardContainer *container =
+                    new KeysClipboardContainer();
+            foreach(QrealKey *key, mSelectedKeys) {
+                key->copyToContainer(container);
+            }
+            mMainWindow->replaceClipboard(container);
+        } else if(event->key() == Qt::Key_Delete) {
             deleteSelectedKeys();
             repaint();
         } else if(event->key() == Qt::Key_Right) {
@@ -201,10 +217,11 @@ void KeysView::paintEvent(QPaintEvent *) {
             minFrame++;
         }
     }
-    minFrame = ceil((-xT)/mPixelsPerFrame);
-    maxFrame = floor((width() - 40. - xT)/mPixelsPerFrame);
+    minFrame += ceil((-xT)/mPixelsPerFrame);
+    minFrame = minFrame - minFrame%iInc;
+    maxFrame += floor((width() - 40. - xT)/mPixelsPerFrame) - maxFrame%iInc;
     for(int i = minFrame; i <= maxFrame; i += iInc) {
-        qreal xTT = xT + i*mPixelsPerFrame;
+        qreal xTT = xT + (i - mMinViewedFrame)*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, height()) );
     }
 
