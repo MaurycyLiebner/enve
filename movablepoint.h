@@ -92,6 +92,13 @@ public:
 
     void makeDuplicate(MovablePoint *targetPoint);
     void duplicatePosAnimatorFrom(QPointFAnimator *source);
+
+    virtual void drawHovered(QPainter *p) {
+        p->setBrush(Qt::NoBrush);
+        p->setPen(QPen(Qt::red, 2.));
+        p->drawEllipse(getAbsolutePos(),
+                       mRadius, mRadius);
+    }
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

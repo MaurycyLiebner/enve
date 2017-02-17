@@ -241,6 +241,17 @@ void Canvas::clearPointsSelection()
 //    setCurrentEndPoint(NULL);
 }
 
+void Canvas::clearLastPressedPoint() {
+    if(mLastPressedPoint != NULL) {
+        mLastPressedPoint->deselect();
+        mLastPressedPoint = NULL;
+    }
+}
+
+void Canvas::clearCurrentEndPoint() {
+    setCurrentEndPoint(NULL);
+}
+
 QPointF Canvas::getSelectedPointsAbsPivotPos() {
     if(mSelectedPoints.isEmpty()) return QPointF(0., 0.);
     QPointF posSum = QPointF(0., 0.);
@@ -298,5 +309,7 @@ void Canvas::clearPointsSelectionOrDeselect() {
         deselectAllBoxes();
     } else {
         clearPointsSelection();
+        clearCurrentEndPoint();
+        clearLastPressedPoint();
     }
 }

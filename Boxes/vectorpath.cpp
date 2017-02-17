@@ -496,8 +496,8 @@ bool VectorPath::getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
                         QLineF(0., 0., 1., 0.)).length();
     qreal yScaling = mCombinedTransformMatrix.map(
                         QLineF(0., 0., 0., 1.)).length();
-    qreal maxDistX = 8./xScaling;
-    qreal maxDistY = 8./yScaling;
+    qreal maxDistX = 4./xScaling;
+    qreal maxDistY = 4./yScaling;
     QPointF relPos = mapAbsPosToRel(absPos);
     QRectF distRect = QRectF(relPos - QPointF(maxDistX, maxDistY),
                              QSizeF(maxDistX*2, maxDistY*2));

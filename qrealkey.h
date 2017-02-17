@@ -89,6 +89,9 @@ public:
     void loadFromSql(int keyId);
 
     virtual void copyToContainer(KeysClipboardContainer *container);
+    void cancelFrameTransform();
+    void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
+                                           const qreal &scaleFactor);
 protected:
     QrealAnimator *mParentAnimator = NULL;
     ComplexKey *mParentKey = NULL;

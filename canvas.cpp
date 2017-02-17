@@ -185,6 +185,8 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     mCurrentBoxesGroup->setIsCurrentGroup(false);
     clearBoxesSelection();
     clearPointsSelection();
+    clearCurrentEndPoint();
+    clearLastPressedPoint();
     mCurrentBoxesGroup = group;
     group->setIsCurrentGroup(true);
 
@@ -279,6 +281,16 @@ void Canvas::paintEvent(QPainter *p)
                 text = " x, y: " + mInputText + "|";
             }
             p->drawText(inputRect, Qt::AlignVCenter, text);
+        }
+
+        if(mHoveredPoint != NULL) {
+            mHoveredPoint->drawHovered(p);
+        } else if(mHoveredEdge != NULL) {
+            mHoveredEdge->drawHover(p);
+        } else if(mHoveredBox != NULL) {
+            if(mCurrentEdge == NULL) {
+                mHoveredBox->drawHovered(p);
+            }
         }
     }
 
@@ -553,7 +565,14 @@ void Canvas::updatePivot() {
 void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
 
+    mHoveredPoint = NULL;
+    if(mHoveredEdge != NULL) {
+        delete mHoveredEdge;
+        mHoveredEdge = NULL;
+    }
     clearPointsSelection();
+    clearCurrentEndPoint();
+    clearLastPressedPoint();
     if(mCurrentMode == MOVE_PATH || mCurrentMode == MOVE_POINT) {
         schedulePivotUpdate();
     }
@@ -578,13 +597,13 @@ void Canvas::updateInputValue() {
 
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
-    mCanvasWidget->setMouseTracking(true);
+    //mCanvasWidget->setMouseTracking(true);
     mCanvasWidget->grabMouse();
 }
 
 void Canvas::releaseMouseAndDontTrack() {
     mIsMouseGrabbing = false;
-    mCanvasWidget->setMouseTracking(false);
+    //mCanvasWidget->setMouseTracking(false);
     mCanvasWidget->releaseMouse();
 }
 

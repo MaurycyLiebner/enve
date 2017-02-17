@@ -82,6 +82,16 @@ public:
     void connectPoints(PathPoint *point1, PathPoint *point2);
     void makeDuplicate(BoundingBox *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
+
+//    virtual void drawHovered(QPainter *p) {
+//        p->save();
+//        p->setCompositionMode(QPainter::CompositionMode_Difference);
+//        p->setTransform(QTransform(mCombinedTransformMatrix), true);
+//        p->setPen(Qt::red);
+//        p->setBrush(Qt::NoBrush);
+//        p->drawPath(mEditPath);
+//        p->restore();
+//    }
 protected:
     ComplexAnimator *mShapesAnimator = NULL;
 

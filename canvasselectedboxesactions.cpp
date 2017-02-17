@@ -187,7 +187,7 @@ void Canvas::startSelectedFillColorTransform()
     }
 }
 
-Edge *Canvas::getPressedEdge(QPointF absPos) {
+Edge *Canvas::getEdgeAt(QPointF absPos) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->isSelected() ) {
             Edge *pathEdge = box->getEgde(absPos);
@@ -410,14 +410,18 @@ void Canvas::deselectAllBoxes() {
 
 MovablePoint *Canvas::getPointAt(const QPointF &absPos,
                                  const CanvasMode &currentMode) {
-    MovablePoint *pointAtPos = NULL;
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        pointAtPos = box->getPointAt(absPos, currentMode);
-        if(pointAtPos != NULL) {
-            break;
+    if(currentMode == MOVE_POINT ||
+       currentMode == ADD_POINT) {
+        MovablePoint *pointAtPos = NULL;
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            pointAtPos = box->getPointAt(absPos, currentMode);
+            if(pointAtPos != NULL) {
+                break;
+            }
         }
+        return pointAtPos;
     }
-    return pointAtPos;
+    return NULL;
 }
 
 void Canvas::finishSelectedBoxesTransform()

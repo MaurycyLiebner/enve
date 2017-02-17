@@ -10,6 +10,7 @@ CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     setFocusPolicy(Qt::StrongFocus);
     setMinimumSize(500, 500);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setMouseTracking(true);
 }
 
 Canvas *CanvasWidget::getCurrentCanvas() {

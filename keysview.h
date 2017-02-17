@@ -130,6 +130,7 @@ private:
     int mMoveDFrame = 0;
     QPointF mLastPressPos;
     bool mMovingKeys = false;
+    bool mScalingKeys = false;
 
     MainWindow *mMainWindow;
     QList<QrealKey*> mSelectedKeys;

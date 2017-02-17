@@ -184,7 +184,6 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
     } else {
         mLastPressedPoint = getPointAt(mLastMouseEventPos, mCurrentMode);
 
-
         if(mCurrentMode == CanvasMode::ADD_POINT) {
             if(mCurrentEndPoint != NULL) {
                 if(mCurrentEndPoint->isHidden()) {
@@ -234,12 +233,18 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
                     mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPos,
                                                              isShiftPressed());
                 } else {
-                    mCurrentEdge = getPressedEdge(mLastPressPos);
+                    mCurrentEdge = getEdgeAt(mLastPressPos);
                     if(mCurrentEdge == NULL) {
                         mSelecting = true;
                         startSelectionAtPoint(mLastMouseEventPos);
                     } else {
+                        if(mHoveredEdge != NULL) {
+                            delete mHoveredEdge;
+                            mHoveredEdge = NULL;
+                        }
                         clearPointsSelection();
+                        clearCurrentEndPoint();
+                        clearLastPressedPoint();
                     }
                 }
             } else {
@@ -350,6 +355,8 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
                     }
                 } else {
                     clearPointsSelection();
+                    clearCurrentEndPoint();
+                    clearLastPressedPoint();
                     setCurrentBoxesGroup((BoxesGroup*) pressedBox->getParent());
                     addBoxToSelection(pressedBox);
                 }
@@ -363,6 +370,8 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
                     }
                 } else {
                     clearPointsSelection();
+                    clearCurrentEndPoint();
+                    clearLastPressedPoint();
                     selectOnlyLastPressedBox();
                 }
             }
@@ -591,6 +600,42 @@ void Canvas::updateTransformation() {
 void Canvas::mouseMoveEvent(QMouseEvent *event)
 {
     if(mPreviewing) return;
+    if(!(event->buttons() & Qt::MiddleButton) &&
+       !(event->buttons() & Qt::RightButton) &&
+       !(event->buttons() & Qt::LeftButton) &&
+       !mIsMouseGrabbing) {
+        MovablePoint *lastHoveredPoint = mHoveredPoint;
+        mHoveredPoint = getPointAt(event->pos(), mCurrentMode);
+
+        if(mRotPivot->isVisible() && mHoveredPoint == NULL) {
+            if(mRotPivot->isPointAtAbsPos(event->pos()) ) {
+                mHoveredPoint = mRotPivot;
+            }
+        }
+
+        BoundingBox *lastHoveredBox = mHoveredBox;
+        mHoveredBox = getBoxAt(event->pos());
+
+        Edge *lastEdge = mHoveredEdge;
+        if(mHoveredEdge != NULL) {
+            delete mHoveredEdge;
+            mHoveredEdge = NULL;
+        }
+        if(mCurrentMode == MOVE_POINT) {
+            mHoveredEdge = getEdgeAt(event->pos());
+            if(mHoveredEdge != NULL) {
+                mHoveredEdge->generatePainterPath();
+            }
+        }
+
+        if(mHoveredPoint != lastHoveredPoint ||
+           mHoveredBox != lastHoveredBox ||
+           mHoveredEdge != lastEdge) {
+            callUpdateSchedulers();
+        }
+        return;
+    }
+
     if(mMovesToSkip > 0) {
         mMovesToSkip--;
         return;

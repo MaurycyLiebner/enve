@@ -376,6 +376,11 @@ public:
         return createDuplicate(mParent);
     }
 
+    virtual void drawHovered(QPainter *p) {
+        p->setPen(Qt::red);
+        p->setBrush(Qt::NoBrush);
+        p->drawPath(mMappedBoundingRectPath);
+    }
 protected:
     bool mUpdateDisabled = false;
 

@@ -315,10 +315,23 @@ void QrealKey::startFrameTransform() {
     mSavedFrame = getFrame();
 }
 
+void QrealKey::cancelFrameTransform() {
+    mParentAnimator->moveKeyToFrame(this, mSavedFrame);
+}
+
+void QrealKey::scaleFrameAndUpdateParentAnimator(
+        const int &relativeToFrame,
+        const qreal &scaleFactor) {
+    int newFrame = mSavedFrame + (mSavedFrame - relativeToFrame)*scaleFactor;
+    if(newFrame == mFrame) return;
+    incFrameAndUpdateParentAnimator(newFrame - mFrame);
+}
+
 void QrealKey::finishFrameTransform()
 {
     if(mParentAnimator == NULL) return;
-    mParentAnimator->addUndoRedo(new ChangeQrealKeyFrameUndoRedo(mSavedFrame, mFrame, this));
+    mParentAnimator->addUndoRedo(
+                new ChangeQrealKeyFrameUndoRedo(mSavedFrame, mFrame, this));
 }
 
 int QrealKey::getFrame() { return mFrame; }

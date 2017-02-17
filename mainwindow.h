@@ -266,7 +266,7 @@ private:
     void setupMenuBar();
 protected:
     void keyPressEvent(QKeyEvent *event);
-    bool eventFilter(QObject *, QEvent *e);
+    bool eventFilter(QObject *obj, QEvent *e);
     void closeEvent(QCloseEvent *e);
 };
 

@@ -284,6 +284,13 @@ public:
                                  CtrlPoint *startPt);
     void reversePointsDirection();
     PathPoint *getConnectedSeparatePathPoint();
+
+    virtual void drawHovered(QPainter *p) {
+        p->setBrush(Qt::NoBrush);
+        p->setPen(QPen(Qt::red, 2.));
+        p->drawEllipse(getAbsolutePos(),
+                       mRadius - 2, mRadius - 2);
+    }
 private:
     QList<PointShapeValues*> mShapeValues;
 

@@ -91,7 +91,10 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     } else {
         if(e->button() == Qt::MiddleButton) {
             middlePress(posU);
-        } else {
+        } else if(e->button() == Qt::LeftButton) {
+            if(mScalingKeys) {
+                return;
+            }
             mFirstMove = true;
             mLastPressPos = posU;
 
@@ -117,6 +120,19 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
 
                     mMovingKeys = true;
                 }
+            }
+        } else {
+            if(mMovingKeys) {
+                if(!mFirstMove) {
+                    foreach(QrealKey *key, mSelectedKeys) {
+                        key->cancelFrameTransform();
+                    }
+                }
+
+                mMovingKeys = false;
+                mScalingKeys = false;
+                setMouseTracking(false);
+                releaseMouse();
             }
         }
     }
@@ -145,6 +161,13 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                 key->copyToContainer(container);
             }
             mMainWindow->replaceClipboard(container);
+        } else if(event->key() == Qt::Key_S) {
+            mMovingKeys = true;
+            mFirstMove = true;
+            mScalingKeys = true;
+            mLastPressPos = mapFromGlobal(QCursor::pos());
+            setMouseTracking(true);
+            grabMouse();
         } else if(event->key() == Qt::Key_Delete) {
             deleteSelectedKeys();
             repaint();
@@ -278,19 +301,30 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                                      mMaxViewedFrame);
         } else {
             if(mMovingKeys) {
-                int dFrame = qRound(
-                            (posU.x() - mLastPressPos.x())/
-                            mPixelsPerFrame );
-                int dDFrame = dFrame - mMoveDFrame;
                 if(mFirstMove) {
                     foreach(QrealKey *key, mSelectedKeys) {
                         key->startFrameTransform();
                     }
                 }
-                if(dDFrame != 0) {
-                    mMoveDFrame = dFrame;
+                if(mScalingKeys) {
+                    qreal keysScale = (event->x() - mLastPressPos.x())/
+                                       300.;
                     foreach(QrealKey *key, mSelectedKeys) {
-                        key->incFrameAndUpdateParentAnimator(dDFrame);
+                        key->scaleFrameAndUpdateParentAnimator(
+                                    mMainWindow->getCurrentFrame(),
+                                    keysScale);
+                    }
+                } else {
+                    int dFrame = qRound(
+                                (posU.x() - mLastPressPos.x())/
+                                mPixelsPerFrame );
+                    int dDFrame = dFrame - mMoveDFrame;
+
+                    if(dDFrame != 0) {
+                        mMoveDFrame = dFrame;
+                        foreach(QrealKey *key, mSelectedKeys) {
+                            key->incFrameAndUpdateParentAnimator(dDFrame);
+                        }
                     }
                 }
             } else if(mSelecting) {
@@ -309,56 +343,61 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e)
     if(mGraphViewed) {
         graphMouseReleaseEvent(e->button());
     } else {
-        if(mSelecting) {
-            if(mFirstMove) {
-                if(!mMainWindow->isShiftPressed()) {
-                    clearKeySelection();
-                }
-            } else {
-                if(mSelectionRect.left() > mSelectionRect.right()) {
-                    qreal rightT = mSelectionRect.right();
-                    qreal leftT = mSelectionRect.left();
-                    mSelectionRect.setLeft(rightT);
-                    mSelectionRect.setRight(leftT);
-                }
-                if(mSelectionRect.top() > mSelectionRect.bottom()) {
-                    qreal bottomT = mSelectionRect.bottom();
-                    qreal topT = mSelectionRect.top();
-                    mSelectionRect.setTop(bottomT);
-                    mSelectionRect.setBottom(topT);
-                }
-                if(!mMainWindow->isShiftPressed()) {
-                    clearKeySelection();
-                }
-                selectKeysInSelectionRect();
-            }
-            mSelecting = false;
-        } else if(mMovingKeys) {
-            if(mFirstMove) {
-                if(mMainWindow->isShiftPressed()) {
-                    if(mLastPressedKey->isSelected() ) {
-                        removeKeyFromSelection(mLastPressedKey);
-                    } else {
-                        addKeyToSelection(mLastPressedKey);
+        if(e->button() == Qt::LeftButton) {
+            if(mSelecting) {
+                if(mFirstMove) {
+                    if(!mMainWindow->isShiftPressed()) {
+                        clearKeySelection();
                     }
                 } else {
-                    clearKeySelection();
-                    addKeyToSelection(mLastPressedKey);
+                    if(mSelectionRect.left() > mSelectionRect.right()) {
+                        qreal rightT = mSelectionRect.right();
+                        qreal leftT = mSelectionRect.left();
+                        mSelectionRect.setLeft(rightT);
+                        mSelectionRect.setRight(leftT);
+                    }
+                    if(mSelectionRect.top() > mSelectionRect.bottom()) {
+                        qreal bottomT = mSelectionRect.bottom();
+                        qreal topT = mSelectionRect.top();
+                        mSelectionRect.setTop(bottomT);
+                        mSelectionRect.setBottom(topT);
+                    }
+                    if(!mMainWindow->isShiftPressed()) {
+                        clearKeySelection();
+                    }
+                    selectKeysInSelectionRect();
                 }
-            }
-            QList<QrealAnimator*> parentAnimators;
-            foreach(QrealKey *key, mSelectedKeys) {
-                key->finishFrameTransform();
-                if(parentAnimators.contains(
-                            key->getParentAnimator()) ) continue;
-                parentAnimators << key->getParentAnimator();
-            }
-            foreach(QrealAnimator *animator, parentAnimators) {
-                animator->mergeKeysIfNeeded();
-            }
+                mSelecting = false;
+            } else if(mMovingKeys) {
+                if(mFirstMove) {
+                    if(mMainWindow->isShiftPressed()) {
+                        if(mLastPressedKey->isSelected() ) {
+                            removeKeyFromSelection(mLastPressedKey);
+                        } else {
+                            addKeyToSelection(mLastPressedKey);
+                        }
+                    } else {
+                        clearKeySelection();
+                        addKeyToSelection(mLastPressedKey);
+                    }
+                }
+                QList<QrealAnimator*> parentAnimators;
+                foreach(QrealKey *key, mSelectedKeys) {
+                    key->finishFrameTransform();
+                    if(parentAnimators.contains(
+                                key->getParentAnimator()) ) continue;
+                    parentAnimators << key->getParentAnimator();
+                }
+                foreach(QrealAnimator *animator, parentAnimators) {
+                    animator->mergeKeysIfNeeded();
+                }
 
-            mMoveDFrame = 0;
-            mMovingKeys = false;
+                mMoveDFrame = 0;
+                mMovingKeys = false;
+                mScalingKeys = false;
+                setMouseTracking(false);
+                releaseMouse();
+            }
         }
     }
 

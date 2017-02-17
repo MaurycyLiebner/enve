@@ -167,7 +167,24 @@ public:
         mEditPath = bT;
     }
 
+    void generatePainterPath() {
+        mPath = QPainterPath();
+        mPath.moveTo(mPoint1->getAbsolutePos());
+        mPath.cubicTo(mPoint1->getEndCtrlPtAbsPos(),
+                      mPoint2->getStartCtrlPtAbsPos(),
+                      mPoint2->getAbsolutePos());
+    }
+
+    void drawHover(QPainter *p) {
+        p->setBrush(Qt::NoBrush);
+        QPen pen = QPen(Qt::red, 2.);
+        pen.setCosmetic(true);
+        p->setPen(pen);
+        p->drawPath(mPath);
+    }
 private:
+    QPainterPath mPath;
+
     PathPoint *mPoint1;
     CtrlPoint *mPoint1EndPt;
     PathPoint *mPoint2;
@@ -341,7 +358,7 @@ public:
 
 
     void clearPointsSelectionOrDeselect();
-    Edge *getPressedEdge(QPointF absPos);
+    Edge *getEdgeAt(QPointF absPos);
 
     void createLinkBoxForSelected();
     void startSelectedPointsTransform();
@@ -438,11 +455,17 @@ public:
     MovablePoint *getPointAt(const QPointF &absPos,
                              const CanvasMode &currentMode);
     void duplicateSelectedBoxes();
+    void clearLastPressedPoint();
+    void clearCurrentEndPoint();
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
 
     void sortSelectedBoxesByZAscending();
+
+    MovablePoint *mHoveredPoint = NULL;
+    BoundingBox *mHoveredBox = NULL;
+    Edge *mHoveredEdge = NULL;
 
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;

@@ -35,6 +35,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    //setMouseTracking(true);
     //mSoundComposition = new SoundComposition();
 //    mSoundComposition->addSound(
 //                new SingleSound("/home/ailuropoda/.Qt_pro/build-AniVect-Desktop_Qt_5_7_0_GCC_64bit-Debug/lektor.wav"));
@@ -133,6 +134,9 @@ MainWindow::MainWindow(QWidget *parent)
     mCurrentCanvasComboBox->addItem(mCanvas->getName());
 
     connectToolBarActions();
+
+    this->setMouseTracking(true);
+    centralWidget()->setMouseTracking(true);
 }
 
 MainWindow::~MainWindow()
@@ -842,10 +846,10 @@ void MainWindow::newFile()
     }
 }
 
-bool MainWindow::eventFilter(QObject *, QEvent *e)
+bool MainWindow::eventFilter(QObject *obj, QEvent *e)
 {
     if(mEventFilterDisabled) {
-        return false;
+        return QMainWindow::eventFilter(obj, e);
     }
     if (e->type() == QEvent::KeyPress)
     {
@@ -869,7 +873,7 @@ bool MainWindow::eventFilter(QObject *, QEvent *e)
             mAltPressed = false;
         }
     }
-    return false;
+    return QMainWindow::eventFilter(obj, e);
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)
