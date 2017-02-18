@@ -113,7 +113,9 @@ void ComplexAnimator::drawKey(
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame) {
-    if(key->isSelected() ) {
+    if(key->isSelected() ||
+       key->areAllChildrenSelected() ||
+       key->isAncestorSelected()) {
         p->setBrush(Qt::yellow);
     } else {
         p->setBrush(Qt::red);
@@ -372,6 +374,7 @@ QrealKey *ComplexKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     target->setEndEnabled(mEndEnabled);
     target->setEndFrame(mEndFrame);
     target->setEndValue(mEndValue);
+    //targetParent->appendKey(target);
     foreach(QrealKey *key, mKeys) {
         if(key->isSelected()) continue;
         QrealKey *keyDuplicate = key->makeQrealKeyDuplicate(
@@ -383,13 +386,8 @@ QrealKey *ComplexKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     return target;
 }
 
-void ComplexKey::setValue(qreal, bool) { QrealKey::setValue(mFrame, false); }
-
-qreal ComplexKey::getValue() { return mFrame; }
-
 void ComplexKey::setFrame(int frame) {
     QrealKey::setFrame(frame);
-    ComplexKey::setValue(frame);
 
     foreach(QrealKey *key, mKeys) {
         key->setFrame(frame);

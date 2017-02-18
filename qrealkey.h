@@ -10,12 +10,12 @@ class ComplexKey;
 class QrealAnimator;
 class KeysClipboardContainer;
 
-class QrealKey : public QrealPoint
+class QrealKey : public SmartPointerTarget
 {
 public:
     QrealKey(QrealAnimator *parentAnimator);
-    QrealPoint *mousePress(qreal frameT, qreal valueT,
-                    qreal pixelsPerFrame, qreal pixelsPerValue);
+//    QrealPoint *mousePress(qreal frameT, qreal valueT,
+//                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~QrealKey();
 
     virtual QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
@@ -92,7 +92,19 @@ public:
     virtual void cancelFrameTransform();
     virtual void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
                                                    const qreal &scaleFactor);
+    virtual void setSelected(bool bT);
+    bool isSelected();
+
+    bool hasParentKey() {
+        return mParentKey != NULL;
+    }
+
+    virtual bool areAllChildrenSelected() {
+        return false;
+    }
+
 protected:
+    bool mIsSelected = false;
     QrealAnimator *mParentAnimator = NULL;
     ComplexKey *mParentKey = NULL;
 

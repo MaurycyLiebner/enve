@@ -392,7 +392,7 @@ void QrealAnimator::appendKey(QrealKey *newKey, bool saveUndoRedo) {
     newKey->incNumberPointers();
     sortKeys();
     //mergeKeysIfNeeded();
-    if(mParentAnimator != NULL) {
+    if(mParentAnimator != NULL && !newKey->hasParentKey()) {
         mParentAnimator->addChildQrealKey(newKey);
     }
 
@@ -896,7 +896,8 @@ void QrealAnimator::drawKey(QPainter *p,
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame) {
-    if(key->isSelected() ) {
+    if(key->isSelected() ||
+       key->isAncestorSelected()) {
         p->setBrush(Qt::yellow);
     } else {
         p->setBrush(Qt::red);
@@ -934,8 +935,8 @@ QrealPoint *QrealAnimator::getPointAt(qreal value, qreal frame,
                                 qreal pixelsPerFrame, qreal pixelsPerValUnit) {
     QrealPoint *point = NULL;
     foreach(QrealKey *key, mKeys) {
-        point = key->mousePress(frame, value,
-                                pixelsPerFrame, pixelsPerValUnit);
+//        point = key->mousePress(frame, value,
+//                                pixelsPerFrame, pixelsPerValUnit);
         if(point != NULL) {
             break;
         }

@@ -4,7 +4,7 @@
 #include "clipboardcontainer.h"
 
 QrealKey::QrealKey(QrealAnimator *parentAnimator) :
-    QrealPoint(KEY_POINT, this) {
+    SmartPointerTarget() {
     mParentAnimator = parentAnimator;
     mFrame = 0;
     mEndFrame = mFrame + 5;
@@ -36,6 +36,7 @@ QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     target->setEndEnabled(mEndEnabled);
     target->setEndFrame(mEndFrame);
     target->setEndValue(mEndValue);
+    //targetParent->appendKey(target);
     return target;
 }
 
@@ -97,6 +98,8 @@ void QrealKey::loadFromSql(int keyId) {
     }
 }
 
+bool QrealKey::isSelected() { return mIsSelected; }
+
 void QrealKey::copyToContainer(KeysClipboardContainer *container) {
     container->copyKeyToContainer(this);
 }
@@ -126,7 +129,8 @@ void QrealKey::setParentKey(ComplexKey *parentKey)
 bool QrealKey::isAncestorSelected()
 {
     if(mParentKey == NULL) return isSelected();
-    return isSelected() || mParentKey->isAncestorSelected();
+    if(isSelected()) return true;
+    return mParentKey->isAncestorSelected();
 }
 
 CtrlsMode QrealKey::getCtrlsMode()
@@ -185,26 +189,35 @@ void QrealKey::constrainStartCtrlMinFrame(int minFrame) {
     mStartPoint->moveTo(newFrame, change*(mStartValue - mValue) + mValue);
 }
 
-QrealPoint *QrealKey::mousePress(qreal frameT, qreal valueT,
-                          qreal pixelsPerFrame, qreal pixelsPerValue)
-{
-    if(isSelected() ) {
-        if( (mStartEnabled) ?
-            mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
-            false ) {
-            return mStartPoint;
-        }
-        if((mEndEnabled) ?
-            mEndPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
-            false ) {
-            return mEndPoint;
-        }
-    }
-    if(isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue)) {
-        return this;
-    }
-    return NULL;
-}
+//bool QrealKey::isNear(qreal frameT, qreal valueT,
+//                        qreal pixelsPerFrame, qreal pixelsPerValue) {
+//    qreal value = getValue();
+//    qreal frame = getFrame();
+//    if(qAbs(frameT - frame)*pixelsPerFrame > mRadius) return false;
+//    if(qAbs(valueT - value)*pixelsPerValue > mRadius) return false;
+//    return true;
+//}
+
+//QrealPoint *QrealKey::mousePress(qreal frameT, qreal valueT,
+//                          qreal pixelsPerFrame, qreal pixelsPerValue)
+//{
+//    if(isSelected() ) {
+//        if( (mStartEnabled) ?
+//            mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
+//            false ) {
+//            return mStartPoint;
+//        }
+//        if((mEndEnabled) ?
+//            mEndPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
+//            false ) {
+//            return mEndPoint;
+//        }
+//    }
+//    if(isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue)) {
+//        return this;
+//    }
+//    return NULL;
+//}
 
 void QrealKey::setCtrlsMode(CtrlsMode mode)
 {
@@ -314,7 +327,6 @@ void QrealKey::setEndValue(qreal value)
 
 void QrealKey::startFrameTransform() {
     mSavedFrame = getFrame();
-    qDebug() << "start";
 }
 
 void QrealKey::cancelFrameTransform() {
@@ -328,6 +340,10 @@ void QrealKey::scaleFrameAndUpdateParentAnimator(
                           (mSavedFrame - relativeToFrame)*scaleFactor);
     if(newFrame == mFrame) return;
     incFrameAndUpdateParentAnimator(newFrame - mFrame);
+}
+
+void QrealKey::setSelected(bool bT) {
+    mIsSelected = bT;
 }
 
 void QrealKey::finishFrameTransform()
@@ -414,7 +430,7 @@ void QrealKey::drawGraphKey(QPainter *p,
         }
         p->restore();
     }
-    QrealPoint::draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);
+//    QrealPoint::draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);
     if(isSelected() ) {
         if(mStartEnabled) {
             mStartPoint->draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);

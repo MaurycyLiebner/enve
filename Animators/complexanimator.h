@@ -93,10 +93,6 @@ public:
 
     bool isEmpty();
 
-    void setValue(qreal, bool finish = false);
-
-    qreal getValue();
-
     void setFrame(int frame);
 
     void mergeWith(QrealKey *key);
@@ -111,6 +107,16 @@ public:
     void cancelFrameTransform();
     //void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame, const qreal &scaleFactor);
     QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
+
+    bool areAllChildrenSelected() {
+        foreach(QrealKey *key, mKeys) {
+            if(key->isSelected() ||
+               key->areAllChildrenSelected()) continue;
+            return false;
+        }
+
+        return true;
+    }
 private:
     QList<QrealKey*> mKeys;
 };
