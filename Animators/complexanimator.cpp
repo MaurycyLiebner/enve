@@ -361,6 +361,28 @@ void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
     }
 }
 
+QrealKey *ComplexKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
+    ComplexKey *target = new ComplexKey((ComplexAnimator*)targetParent);
+    target->setValue(mValue);
+    target->setFrame(mFrame);
+    target->setCtrlsMode(mCtrlsMode);
+    target->setStartEnabled(mStartEnabled);
+    target->setStartFrame(mStartFrame);
+    target->setStartValue(mStartValue);
+    target->setEndEnabled(mEndEnabled);
+    target->setEndFrame(mEndFrame);
+    target->setEndValue(mEndValue);
+    foreach(QrealKey *key, mKeys) {
+        if(key->isSelected()) continue;
+        QrealKey *keyDuplicate = key->makeQrealKeyDuplicate(
+                    key->getParentAnimator());
+        target->addAnimatorKey(keyDuplicate);
+        key->getParentAnimator()->appendKey(keyDuplicate);
+    }
+
+    return target;
+}
+
 void ComplexKey::setValue(qreal, bool) { QrealKey::setValue(mFrame, false); }
 
 qreal ComplexKey::getValue() { return mFrame; }
@@ -395,8 +417,26 @@ bool ComplexKey::isDescendantSelected() {
     return false;
 }
 
+//void ComplexKey::scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
+//                                                   const qreal &scaleFactor) {
+//    foreach(QrealKey *key, mKeys) {
+//        if(key->isSelected()) continue;
+//        key->scaleFrameAndUpdateParentAnimator(relativeToFrame,
+//                                               scaleFactor);
+//    }
+//}
+
+void ComplexKey::cancelFrameTransform() {
+    QrealKey::cancelFrameTransform();
+//    foreach(QrealKey *key, mKeys) {
+//        if(key->isSelected()) continue;
+//        key->cancelFrameTransform();
+//    }
+}
+
 void ComplexKey::startFrameTransform()
 {
+    QrealKey::startFrameTransform();
     foreach(QrealKey *key, mKeys) {
         if(key->isSelected()) continue;
         key->startFrameTransform();

@@ -818,6 +818,8 @@ void Canvas::resetTransormation() {
     mCombinedTransformMatrix.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
+    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
+                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
     updateAfterCombinedTransformationChanged();
 
 }

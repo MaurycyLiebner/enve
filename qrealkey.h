@@ -18,7 +18,7 @@ public:
                     qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~QrealKey();
 
-    QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
+    virtual QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     void updateCtrlFromCtrl(QrealPointType type);
 
@@ -89,9 +89,9 @@ public:
     void loadFromSql(int keyId);
 
     virtual void copyToContainer(KeysClipboardContainer *container);
-    void cancelFrameTransform();
-    void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
-                                           const qreal &scaleFactor);
+    virtual void cancelFrameTransform();
+    virtual void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
+                                                   const qreal &scaleFactor);
 protected:
     QrealAnimator *mParentAnimator = NULL;
     ComplexKey *mParentKey = NULL;

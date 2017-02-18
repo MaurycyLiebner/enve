@@ -787,7 +787,8 @@ void VectorPath::drawSelected(QPainter *p,
     }
 }
 
-MovablePoint *VectorPath::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
+MovablePoint *VectorPath::getPointAt(const QPointF &absPtPos,
+                                     const CanvasMode &currentCanvasMode)
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {

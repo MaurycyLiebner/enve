@@ -160,6 +160,14 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         }
     }
 }
+
+void Canvas::clearHoveredEdge() {
+    if(mHoveredEdge != NULL) {
+        delete mHoveredEdge;
+        mHoveredEdge = NULL;
+    }
+}
+
 #include "Boxes/particlebox.h"
 void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
@@ -232,21 +240,19 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
                     clearPointsSelection();
                     mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPos,
                                                              isShiftPressed());
+
                 } else {
                     mCurrentEdge = getEdgeAt(mLastPressPos);
                     if(mCurrentEdge == NULL) {
                         mSelecting = true;
                         startSelectionAtPoint(mLastMouseEventPos);
                     } else {
-                        if(mHoveredEdge != NULL) {
-                            delete mHoveredEdge;
-                            mHoveredEdge = NULL;
-                        }
                         clearPointsSelection();
                         clearCurrentEndPoint();
                         clearLastPressedPoint();
                     }
                 }
+                clearHoveredEdge();
             } else {
                 if(mLastPressedPoint->isSelected()) {
                     return;
@@ -681,9 +687,9 @@ void Canvas::wheelEvent(QWheelEvent *event)
 {
     if(mPreviewing) return;
     if(event->delta() > 0) {
-        scale(1.2, event->posF());
+        scale(1.1, event->posF());
     } else {
-        scale(0.8, event->posF());
+        scale(0.9, event->posF());
     }
     mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;

@@ -36,6 +36,7 @@ QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     target->setEndEnabled(mEndEnabled);
     target->setEndFrame(mEndFrame);
     target->setEndValue(mEndValue);
+    return target;
 }
 
 #include <QSqlError>
@@ -313,6 +314,7 @@ void QrealKey::setEndValue(qreal value)
 
 void QrealKey::startFrameTransform() {
     mSavedFrame = getFrame();
+    qDebug() << "start";
 }
 
 void QrealKey::cancelFrameTransform() {
@@ -322,7 +324,8 @@ void QrealKey::cancelFrameTransform() {
 void QrealKey::scaleFrameAndUpdateParentAnimator(
         const int &relativeToFrame,
         const qreal &scaleFactor) {
-    int newFrame = mSavedFrame + (mSavedFrame - relativeToFrame)*scaleFactor;
+    int newFrame = qRound(mSavedFrame +
+                          (mSavedFrame - relativeToFrame)*scaleFactor);
     if(newFrame == mFrame) return;
     incFrameAndUpdateParentAnimator(newFrame - mFrame);
 }

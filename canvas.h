@@ -457,6 +457,7 @@ public:
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
     void clearCurrentEndPoint();
+    void clearHoveredEdge();
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
