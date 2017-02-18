@@ -251,6 +251,7 @@ void ComplexAnimator::addChildQrealKey(QrealKey *key)
 void ComplexAnimator::removeChildQrealKey(QrealKey *key)
 {
     ComplexKey *collection = getKeyCollectionAtFrame(key->getFrame() );
+    if(collection == NULL) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
         removeKey(collection);

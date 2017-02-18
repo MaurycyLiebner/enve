@@ -113,7 +113,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                     clearKeySelection();
                 }
                 if(mMainWindow->isShiftPressed() &&
-                        mLastPressedKey->isSelected()) {
+                   mLastPressedKey->isSelected()) {
                     removeKeyFromSelection(mLastPressedKey);
                 } else {
                     addKeyToSelection(mLastPressedKey);
@@ -403,13 +403,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e)
                 mSelecting = false;
             } else if(mMovingKeys) {
                 if(mFirstMove) {
-                    if(mMainWindow->isShiftPressed()) {
-                        if(mLastPressedKey->isSelected() ) {
-                            removeKeyFromSelection(mLastPressedKey);
-                        } else {
-                            addKeyToSelection(mLastPressedKey);
-                        }
-                    } else {
+                    if(!mMainWindow->isShiftPressed()) {
                         clearKeySelection();
                         addKeyToSelection(mLastPressedKey);
                     }
