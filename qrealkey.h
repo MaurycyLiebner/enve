@@ -103,6 +103,8 @@ public:
         return false;
     }
 
+    virtual void addToSelection(QList<QrealKey *> *selectedKeys);
+    virtual void removeFromSelection(QList<QrealKey *> *selectedKeys);
 protected:
     bool mIsSelected = false;
     QrealAnimator *mParentAnimator = NULL;

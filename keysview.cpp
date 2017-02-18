@@ -106,14 +106,15 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 mSelecting = true;
                 mSelectionRect.setTopLeft(posU);
                 mSelectionRect.setBottomRight(posU);
-            }
-            else {
+            } else {
                 if(!mMainWindow->isShiftPressed() &&
-                        !mLastPressedKey->isSelected()) {
+                    !(mLastPressedKey->isSelected() ||
+                      mLastPressedKey->areAllChildrenSelected())) {
                     clearKeySelection();
                 }
                 if(mMainWindow->isShiftPressed() &&
-                   mLastPressedKey->isSelected()) {
+                    (mLastPressedKey->isSelected() ||
+                     mLastPressedKey->areAllChildrenSelected())) {
                     removeKeyFromSelection(mLastPressedKey);
                 } else {
                     addKeyToSelection(mLastPressedKey);
@@ -468,26 +469,19 @@ void KeysView::updatePixelsPerFrame()
 
 void KeysView::addKeyToSelection(QrealKey *key)
 {
-    if(key->isSelected()) return;
-    key->setSelected(true);
-    mSelectedKeys << key;
-    key->incNumberPointers();
+    key->addToSelection(&mSelectedKeys);
 }
 
 void KeysView::removeKeyFromSelection(QrealKey *key)
 {
-    if(key->isSelected()) {
-        key->setSelected(false);
-        if(mSelectedKeys.removeOne(key) ) {
-            key->decNumberPointers();
-        }
-    }
+    key->removeFromSelection(&mSelectedKeys);
 }
 
 void KeysView::clearKeySelection()
 {
     foreach(QrealKey *key, mSelectedKeys) {
         key->setSelected(false);
+        key->decNumberPointers();
     }
     mSelectedKeys.clear();
 }

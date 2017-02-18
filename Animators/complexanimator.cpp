@@ -113,9 +113,7 @@ void ComplexAnimator::drawKey(
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame) {
-    if(key->isSelected() ||
-       key->areAllChildrenSelected() ||
-       key->isAncestorSelected()) {
+    if(key->areAllChildrenSelected()) {
         p->setBrush(Qt::yellow);
     } else {
         p->setBrush(Qt::red);
@@ -431,6 +429,18 @@ void ComplexKey::cancelFrameTransform() {
 //        if(key->isSelected()) continue;
 //        key->cancelFrameTransform();
 //    }
+}
+
+void ComplexKey::addToSelection(QList<QrealKey *> *selectedKeys) {
+    foreach(QrealKey *key, mKeys) {
+        key->addToSelection(selectedKeys);
+    }
+}
+
+void ComplexKey::removeFromSelection(QList<QrealKey *> *selectedKeys) {
+    foreach(QrealKey *key, mKeys) {
+        key->removeFromSelection(selectedKeys);
+    }
 }
 
 void ComplexKey::startFrameTransform()

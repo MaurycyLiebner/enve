@@ -117,6 +117,8 @@ public:
 
         return true;
     }
+    void removeFromSelection(QList<QrealKey *> *selectedKeys);
+    void addToSelection(QList<QrealKey *> *selectedKeys);
 private:
     QList<QrealKey*> mKeys;
 };

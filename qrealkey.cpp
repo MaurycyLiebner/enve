@@ -310,6 +310,22 @@ void QrealKey::incFrameAndUpdateParentAnimator(int inc) {
     mParentAnimator->moveKeyToFrame(this, mFrame + inc);
 }
 
+void QrealKey::addToSelection(QList<QrealKey*> *selectedKeys) {
+    if(isSelected()) return;
+    setSelected(true);
+    selectedKeys->append(this);
+    incNumberPointers();
+}
+
+void QrealKey::removeFromSelection(QList<QrealKey *> *selectedKeys) {
+    if(isSelected()) {
+        setSelected(false);
+        if(selectedKeys->removeOne(this) ) {
+            decNumberPointers();
+        }
+    }
+}
+
 QrealAnimator *QrealKey::getParentAnimator()
 {
     return mParentAnimator;
