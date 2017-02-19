@@ -22,6 +22,10 @@ public:
     void paint(QPainter *p);
 
     void setAnimator(QrealAnimator *animator);
+    bool hasTargetAnimator() {
+        return mAnimator != NULL;
+    }
+    void openContextMenu(const QPoint &globalPos);
 protected:
     void emitEditingStarted(qreal value);
     void emitValueChanged(qreal value);

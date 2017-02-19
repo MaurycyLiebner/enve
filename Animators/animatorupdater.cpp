@@ -32,7 +32,8 @@ GradientUpdater::GradientUpdater(Gradient *gradient)
 
 void GradientUpdater::update()
 {
-    mTarget->scheduleQGradientStopsUpdate();
+    mTarget->updateQGradientStops();
+    //mTarget->scheduleQGradientStopsUpdate();
     MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 

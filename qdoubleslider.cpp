@@ -203,10 +203,14 @@ void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event)
 
 void QDoubleSlider::mousePressEvent(QMouseEvent *event)
 {
-    setCursor(Qt::BlankCursor);
-    mPressX = event->x();
-    mGlobalPressPos = event->globalPos();
-    mPressValue = mValue;
+    if(event->button() == Qt::RightButton) {
+        openContextMenu(event->globalPos());
+    } else if(event->button() == Qt::LeftButton) {
+        setCursor(Qt::BlankCursor);
+        mPressX = event->x();
+        mGlobalPressPos = event->globalPos();
+        mPressValue = mValue;
+    }
 }
 
 void QDoubleSlider::setPrefferedValueStep(qreal step) {

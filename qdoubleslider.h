@@ -40,6 +40,9 @@ public:
     qreal minimum();
 
     void setWheelInteractionEnabled(bool bT);
+    virtual void openContextMenu(const QPoint &globalPos) {
+        Q_UNUSED(globalPos);
+    }
 protected:
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *event);

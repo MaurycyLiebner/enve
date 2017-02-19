@@ -546,6 +546,7 @@ void QrealAnimator::setTraceKeyOnCurrentFrame(bool bT)
 
 void QrealAnimator::saveCurrentValueAsKey()
 {
+    if(!mIsRecording) setRecording(true);
     QrealKey *keyAtFrame = getKeyAtFrame(mCurrentFrame);
     if(keyAtFrame == NULL) {
         keyAtFrame = new QrealKey(this);
@@ -869,9 +870,14 @@ QrealAnimator *QrealAnimator::makeDuplicate() {
 
 void QrealAnimator::setUpdater(AnimatorUpdater *updater)
 {
+    if(mUpdaterBlocked) return;
     if(mUpdater != NULL) mUpdater->decNumberPointers();
     mUpdater = updater;
     if(mUpdater != NULL) mUpdater->incNumberPointers();
+}
+
+void QrealAnimator::blockUpdater() {
+    mUpdaterBlocked = true;
 }
 
 void QrealAnimator::callUpdater()

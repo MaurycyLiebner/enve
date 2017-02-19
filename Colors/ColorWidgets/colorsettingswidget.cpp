@@ -49,7 +49,17 @@ void ColorSettingsWidget::setCurrentColor(Color color)
 }
 
 void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
+    rSpin->getSpinBox()->setAnimator(NULL);
+    gSpin->getSpinBox()->setAnimator(NULL);
+    bSpin->getSpinBox()->setAnimator(NULL);
+    hSpin->getSpinBox()->setAnimator(NULL);
+    hslSSpin->getSpinBox()->setAnimator(NULL);
+    lSpin->getSpinBox()->setAnimator(NULL);
+    hsvSSpin->getSpinBox()->setAnimator(NULL);
+    vSpin->getSpinBox()->setAnimator(NULL);
+    aSpin->getSpinBox()->setAnimator(NULL);
     if(target != NULL) {
+        setCurrentColor(target->getCurrentValue());
         if(target->getColorMode() == RGBMODE) {
             rSpin->getSpinBox()->setAnimator(target->getVal1Animator());
             gSpin->getSpinBox()->setAnimator(target->getVal2Animator());
@@ -336,9 +346,12 @@ void ColorSettingsWidget::connectSignalsAndSlots()
                                     SLOT(setColorHSV_f(GLfloat, GLfloat, GLfloat) ) );
     //
 
+    connectColorWidgetSignalToSlots(a_rect, SIGNAL(colorChangedHSV(GLfloat,GLfloat,GLfloat)),
+                                    SLOT(setColorHSV_f(GLfloat, GLfloat, GLfloat) ) );
     connectRectToSpin(a_rect, aSpin);
 
-    connect(a_rect, SIGNAL(valChanged(GLfloat)), color_label, SLOT(setAlpha(GLfloat)));
+    connect(a_rect, SIGNAL(valChanged(GLfloat)),
+            color_label, SLOT(setAlpha(GLfloat)));
 
     connect(a_rect, SIGNAL(valChanged(GLfloat)),
             this, SLOT(alphaChanged(GLfloat)));

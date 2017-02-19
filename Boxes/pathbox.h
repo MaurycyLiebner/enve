@@ -171,8 +171,8 @@ public:
         mFillPaintSettings.getColorAnimator()->startTransform();
     }
 
-    const StrokeSettings *getStrokeSettings();
-    const PaintSettings *getFillSettings();
+    StrokeSettings *getStrokeSettings();
+    PaintSettings *getFillSettings();
     void updateDrawGradients();
 
     void updateOutlinePath();

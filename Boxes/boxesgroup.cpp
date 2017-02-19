@@ -391,11 +391,11 @@ void BoxesGroup::ungroup() {
     mParent->removeChild(this);
 }
 
-const PaintSettings *BoxesGroup::getFillSettings() {
+PaintSettings *BoxesGroup::getFillSettings() {
     return mChildBoxes.first()->getFillSettings();
 }
 
-const StrokeSettings *BoxesGroup::getStrokeSettings() {
+StrokeSettings *BoxesGroup::getStrokeSettings() {
     return mChildBoxes.first()->getStrokeSettings();
 }
 

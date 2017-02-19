@@ -47,6 +47,7 @@ ComplexKey *ComplexAnimator::getKeyCollectionAtFrame(int frame) {
 void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
 {
     mChildAnimators << childAnimator;
+    childAnimator->setUpdater(mUpdater);
     childAnimator->incNumberPointers();
     childAnimator->setParentAnimator(this);
     childAnimator->addAllKeysToComplexAnimator();
@@ -61,6 +62,7 @@ void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
 
 void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
 {
+    removeAnimator->setUpdater(NULL);
     removeAnimator->removeAllKeysFromComplexAnimator();
     mChildAnimators.removeOne(removeAnimator);
     removeAnimator->setParentAnimator(NULL);
@@ -152,6 +154,7 @@ void ComplexAnimator::changeChildAnimatorZ(const int &oldIndex,
 
 void ComplexAnimator::setUpdater(AnimatorUpdater *updater)
 {
+    if(mUpdaterBlocked) return;
     QrealAnimator::setUpdater(updater);
 
     foreach(QrealAnimator *animator, mChildAnimators) {

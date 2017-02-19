@@ -110,8 +110,8 @@ public:
                       qreal pixelsPerFrame,
                       int startFrame, int endFrame);
 
-    const PaintSettings *getFillSettings();
-    const StrokeSettings *getStrokeSettings();
+    PaintSettings *getFillSettings();
+    StrokeSettings *getStrokeSettings();
 
     static bool getCtrlsAlwaysVisible();
     static void setCtrlsAlwaysVisible(bool bT);

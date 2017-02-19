@@ -49,8 +49,6 @@ public:
 
     virtual void setFrame(int frame) = 0;
 
-    virtual void setRecording(bool rec) = 0;
-
     virtual void switchRecording();
 
     virtual void updateKeyOnCurrrentFrame() = 0;
@@ -93,6 +91,7 @@ signals:
     void childAnimatorRemoved(QrealAnimator*);
     void childAnimatorZChanged(int, int);
 public slots:
+    virtual void setRecording(bool rec) = 0;
 };
 
 #endif // ANIMATOR_H

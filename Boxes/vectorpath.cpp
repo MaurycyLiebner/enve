@@ -14,6 +14,7 @@ VectorPath::VectorPath(BoxesGroup *group) :
     setName("Path");
     addActiveAnimator(&mPathAnimator);
     mAnimatorsCollection.addAnimator(&mPathAnimator);
+    mPathAnimator.setUpdater(new PathPointUpdater(this));
 
     mPathAnimator.blockPointer();
 }

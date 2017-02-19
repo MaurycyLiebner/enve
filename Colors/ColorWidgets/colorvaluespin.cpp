@@ -22,13 +22,13 @@ QrealAnimatorValueSlider *ColorValueSpin::getSpinBox()
     return mSpinBox;
 }
 
-void ColorValueSpin::setVal(GLfloat val_t)
-{
-    if(mBlockValue) return;
+void ColorValueSpin::setVal(GLfloat val_t) {
+    if(mBlockValue || mSpinBox->hasTargetAnimator()) return;
     mEmit = false;
-    mSpinBox->setValue(
-                qRound(val_t*(mSpinBox->maximum() - mSpinBox->minimum()) +
-                       mSpinBox->minimum()) );
+//    mSpinBox->setValue(
+//                qRound(val_t*(mSpinBox->maximum() - mSpinBox->minimum()) +
+//                       mSpinBox->minimum()) );
+    mSpinBox->setValue(val_t);
     mEmit = true;
 }
 
@@ -36,7 +36,7 @@ void ColorValueSpin::spinBoxValSet(double spin_box_val_t)
 {
     if(mEmit) {
         mBlockValue = true;
-        emit valSet( ( (GLfloat)spin_box_val_t)/mSpinBox->maximum() );
+        emit valSet( ( (GLfloat)spin_box_val_t)/*/mSpinBox->maximum()*/ );
         mBlockValue = false;
     }
 }

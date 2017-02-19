@@ -10,6 +10,8 @@ Gradient::Gradient(Color color1, Color color2,
                    GradientWidget *gradientWidget) :
     ComplexAnimator()
 {
+    setUpdater(new GradientUpdater(this));
+    blockUpdater();
     setName("gradient");
     mGradientWidget = gradientWidget;
     addColorToList(color1);
@@ -19,6 +21,8 @@ Gradient::Gradient(Color color1, Color color2,
 
 Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget) :
     ComplexAnimator() {
+    setUpdater(new GradientUpdater(this));
+    blockUpdater();
     setName("gradient");
     mGradientWidget = gradientWidget;
     foreach (ColorAnimator *color, fromGradient->mColors) {
@@ -29,6 +33,8 @@ Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget) :
 
 Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
     ComplexAnimator() {
+    setUpdater(new GradientUpdater(this));
+    blockUpdater();
     setName("gradient");
     QSqlQuery query;
     mGradientWidget = gradientWidget;
@@ -69,7 +75,6 @@ void Gradient::addColorToList(Color color) {
 }
 
 void Gradient::addColorToList(ColorAnimator *newColorAnimator) {
-    newColorAnimator->setUpdater(new GradientUpdater(this) );
     mColors << newColorAnimator;
 
     addChildAnimator(newColorAnimator);
@@ -199,7 +204,7 @@ void Gradient::finishTransform() {
 void Gradient::scheduleQGradientStopsUpdate() {
     if(mQGradientStopsUpdateNeeded) return;
     mQGradientStopsUpdateNeeded = true;
-    //addUpdateScheduler(new QGradientStopsUpdateScheduler(this) );
+    addUpdateScheduler(new QGradientStopsUpdateScheduler(this) );
 }
 
 void Gradient::updateQGradientStopsIfNeeded() {
@@ -253,6 +258,7 @@ PaintSettings::PaintSettings(Color colorT,
 
 void PaintSettings::setPaintPathTarget(PathBox *path) {
     mColor.setUpdater(new DisplayedFillStrokeSettingsUpdater(path));
+    mColor.blockUpdater();
 }
 
 void PaintSettings::loadFromSql(int sqlId, GradientWidget *gradientWidget) {
@@ -310,7 +316,7 @@ StrokeSettings::StrokeSettings(Color colorT,
 }
 
 void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
-    setUpdater(new StrokeWidthUpdater(path));
+    mLineWidth.setUpdater(new StrokeWidthUpdater(path));
     setPaintPathTarget(path);
 }
 
@@ -564,6 +570,20 @@ void FillStrokeSettingsWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query
     mGradientWidget->saveGradientsToSqlIfPathSelected(query);
 }
 
+void FillStrokeSettingsWidget::updateColorAnimator() {
+    if(getCurrentPaintTypeVal() == 0) {
+        setColorAnimatorTarget(NULL);
+    } else if(getCurrentPaintTypeVal() == 1) {
+        if(mTargetId == 0) {
+            setColorAnimatorTarget(mCurrentFillColorAnimator);
+        } else {
+            setColorAnimatorTarget(mCurrentStrokeColorAnimator);
+        }
+    } else {// if(getCurrentPaintTypeVal() == 2) {
+        setColorAnimatorTarget(mGradientWidget->getCurrentColorAnimator());
+    }
+}
+
 void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
         mGradientWidget->setCurrentGradient(getCurrentGradientVal() );
@@ -611,16 +631,15 @@ void FillStrokeSettingsWidget::setStrokeWidth(qreal width)
     emitStrokeWidthChangedTMP();
 }
 
-void FillStrokeSettingsWidget::setCurrentSettings(const PaintSettings *fillPaintSettings,
-                                            const StrokeSettings *strokePaintSettings)
-{
-    if(fillPaintSettings == NULL || strokePaintSettings == NULL) return;
+void FillStrokeSettingsWidget::setCurrentSettings(
+        PaintSettings *fillPaintSettings,
+        StrokeSettings *strokePaintSettings) {
     disconnect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
 
     setFillValuesFromFillSettings(fillPaintSettings);
     setStrokeValuesFromStrokeSettings(strokePaintSettings);
-    mLineWidthSpin->setValue(strokePaintSettings->getCurrentStrokeWidth());
+    //mLineWidthSpin->setValue(strokePaintSettings->getCurrentStrokeWidth());
 
     if(mTargetId == 0) {
         setFillTarget();
@@ -630,14 +649,6 @@ void FillStrokeSettingsWidget::setCurrentSettings(const PaintSettings *fillPaint
 
     connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
-}
-
-void FillStrokeSettingsWidget::setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a) {
-    mColorsSettingsWidget->setCurrentColor(h, s, v, a);
-}
-
-void FillStrokeSettingsWidget::setCurrentColor(Color color) {
-    mColorsSettingsWidget->setCurrentColor(color);
 }
 
 void FillStrokeSettingsWidget::saveGradientsToQuery(QSqlQuery *query)
@@ -730,6 +741,11 @@ void FillStrokeSettingsWidget::disconnectGradient()
             this, SLOT(setGradient(Gradient*)) );
 }
 
+void FillStrokeSettingsWidget::setColorAnimatorTarget(
+        ColorAnimator *animator) {
+    mColorsSettingsWidget->setColorAnimatorTarget(animator);
+}
+
 void FillStrokeSettingsWidget::setJoinStyle(Qt::PenJoinStyle joinStyle)
 {
     mCurrentJoinStyle = joinStyle;
@@ -747,20 +763,32 @@ void FillStrokeSettingsWidget::setCapStyle(Qt::PenCapStyle capStyle)
 }
 
 void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
-        const PaintSettings *settings) {
-    mCurrentFillColor = settings->getCurrentColor();
-    mCurrentFillGradient = settings->getGradient();
-    mCurrentFillPaintType = settings->getPaintType();
+        PaintSettings *settings) {
+    if(settings == NULL) {
+        mCurrentFillColorAnimator = NULL;
+    } else {
+        mCurrentFillColor = settings->getCurrentColor();
+        mCurrentFillColorAnimator = settings->getColorAnimator();
+        mCurrentFillGradient = settings->getGradient();
+        mCurrentFillPaintType = settings->getPaintType();
+    }
 }
 
 void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
-        const StrokeSettings *settings) {
-    mCurrentStrokeColor = settings->getCurrentColor();
-    mCurrentStrokeGradient = settings->getGradient();
-    mCurrentStrokePaintType = settings->getPaintType();
-    mCurrentStrokeWidth = settings->getCurrentStrokeWidth();
-    mCurrentCapStyle = settings->getCapStyle();
-    mCurrentJoinStyle = settings->getJoinStyle();
+        StrokeSettings *settings) {
+    if(settings == NULL) {
+        mCurrentFillColorAnimator = NULL;
+        mLineWidthSpin->setAnimator(NULL);
+    } else {
+        mCurrentStrokeColor = settings->getCurrentColor();
+        mCurrentStrokeColorAnimator = settings->getColorAnimator();
+        mCurrentStrokeGradient = settings->getGradient();
+        mCurrentStrokePaintType = settings->getPaintType();
+        mCurrentStrokeWidth = settings->getCurrentStrokeWidth();
+        mLineWidthSpin->setAnimator(settings->getLineWidthAnimator());
+        mCurrentCapStyle = settings->getCapStyle();
+        mCurrentJoinStyle = settings->getJoinStyle();
+    }
 }
 
 void FillStrokeSettingsWidget::setCanvasWidgetPtr(CanvasWidget *canvasWidget)
@@ -1032,6 +1060,7 @@ void FillStrokeSettingsWidget::setFillTarget()
     mStrokeTargetButton->setChecked(false);
     mStrokeSettingsWidget->hide();
     updateAfterTargetChanged();
+    updateColorAnimator();
 }
 
 void FillStrokeSettingsWidget::setStrokeTarget()
@@ -1041,6 +1070,8 @@ void FillStrokeSettingsWidget::setStrokeTarget()
     mFillTargetButton->setChecked(false);
     mStrokeSettingsWidget->show();
     updateAfterTargetChanged();
+    updateColorAnimator();
+
 }
 
 void FillStrokeSettingsWidget::setNoPaintType()
@@ -1048,6 +1079,8 @@ void FillStrokeSettingsWidget::setNoPaintType()
     setCurrentPaintTypeVal(NOPAINT);
     mColorsSettingsWidget->hide();
     mGradientWidget->hide();
+    updateColorAnimator();
+
 }
 
 void FillStrokeSettingsWidget::setFlatPaintType()
@@ -1055,8 +1088,8 @@ void FillStrokeSettingsWidget::setFlatPaintType()
     disconnectGradient();
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
-    mColorsSettingsWidget->setCurrentColor(getCurrentColorVal());
     setCurrentPaintTypeVal(FLATPAINT);
+    updateColorAnimator();
 }
 
 void FillStrokeSettingsWidget::setGradientPaintType()
@@ -1075,7 +1108,7 @@ void FillStrokeSettingsWidget::setGradientPaintType()
     }
     mColorsSettingsWidget->show();
     mGradientWidget->show();
-    mColorsSettingsWidget->setCurrentColor(mGradientWidget->getCurrentColor());
+    updateColorAnimator();
 
     mGradientWidget->update();
 }

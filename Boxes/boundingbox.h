@@ -159,8 +159,8 @@ public:
     bool isGroup();
     virtual BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
 
-    virtual const PaintSettings *getFillSettings();
-    virtual const StrokeSettings *getStrokeSettings();
+    virtual PaintSettings *getFillSettings();
+    virtual StrokeSettings *getStrokeSettings();
 
     virtual qreal getCurrentCanvasScale();
 

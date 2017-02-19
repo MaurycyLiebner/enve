@@ -707,10 +707,10 @@ void MainWindow::callUpdateSchedulers()
         delete sheduler;
     }
 
+    ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mUpdateSchedulers.clear();
     mCanvasWidget->updatePivotIfNeeded();
     mCanvasWidget->repaint();
-    ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mObjectSettingsWidget->repaint();
     mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();
@@ -731,6 +731,13 @@ void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
 
 void MainWindow::setCurrentBox(BoundingBox *box) {
     setCurrentShapesMenuBox(box);
+    if(box == NULL) {
+        mFillStrokeSettings->setCurrentSettings(NULL,
+                                                NULL);
+    } else {
+        mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
+                                                box->getStrokeSettings());
+    }
 //    mObjectSettingsWidget->getVisiblePartWidget()->
 //            updateVisibleWidgetsContent();
     //setCurrentObjectSettingsWidgetBox(box);

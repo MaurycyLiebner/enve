@@ -105,8 +105,12 @@ PathPoint *Canvas::createNewPointOnLineNearSelected(QPointF absPos,
 }
 
 void Canvas::setDisplayedFillStrokeSettingsFromLastSelected() {
-    if(mSelectedBoxes.isEmpty()) return;
-    setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
+    if(mSelectedBoxes.isEmpty()) {
+        mFillStrokeSettingsWidget->setCurrentSettings(NULL,
+                                                      NULL);
+    } else {
+        setCurrentFillStrokeSettingsFromBox(mSelectedBoxes.last() );
+    }
 }
 
 
@@ -321,7 +325,7 @@ void Canvas::addBoxToSelection(BoundingBox *box) {
     box->select();
     mSelectedBoxes.append(box); schedulePivotUpdate();
     sortSelectedBoxesByZAscending();
-    setCurrentFillStrokeSettingsFromBox(box);
+    //setCurrentFillStrokeSettingsFromBox(box);
     mMainWindow->setCurrentBox(box);
 }
 

@@ -20,8 +20,8 @@ PathPoint::PathPoint(VectorPath *vectorPath) :
     mStartCtrlPt->hide();
     mEndCtrlPt->hide();
 
-    PathPointUpdater *updater = new PathPointUpdater(vectorPath);
-    setPosAnimatorUpdater(updater);
+    //PathPointUpdater *updater = new PathPointUpdater(vectorPath);
+    //setPosAnimatorUpdater(updater);
 
     mPathPointAnimators.setAllVars(this,
                                    mEndCtrlPt->getRelativePosAnimatorPtr(),

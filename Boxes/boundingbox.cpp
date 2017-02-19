@@ -708,11 +708,11 @@ QPointF BoundingBox::mapAbsPosToRel(QPointF absPos) {
     return mCombinedTransformMatrix.inverted().map(absPos);
 }
 
-const PaintSettings *BoundingBox::getFillSettings() {
+PaintSettings *BoundingBox::getFillSettings() {
     return NULL;
 }
 
-const StrokeSettings *BoundingBox::getStrokeSettings() {
+StrokeSettings *BoundingBox::getStrokeSettings() {
     return NULL;
 }
 

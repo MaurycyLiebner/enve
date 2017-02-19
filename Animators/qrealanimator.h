@@ -42,7 +42,6 @@ public:
 
     virtual void setFrame(int frame);
     QrealKey *getKeyAtFrame(int frame);
-    void saveCurrentValueAsKey();
     virtual void updateKeysPath();
     void appendKey(QrealKey *newKey,
                    bool saveUndoRedo = true);
@@ -135,7 +134,6 @@ public:
     void updateKeyOnCurrrentFrame();
     bool isKeyOnCurrentFrame();
 
-    virtual void setRecording(bool rec);
     bool isRecording();
     void removeAllKeys();
 
@@ -175,7 +173,7 @@ public:
     virtual void multSavedValueToCurrentValue(qreal multBy);
 
     bool isCurrentAnimator() { return mIsCurrentAnimator; }
-    const QColor &getAnimatorColor() { return mAnimatorColor; }
+    const QColor &getAnimatorColor() const { return mAnimatorColor; }
 
     QrealKey *getKeyAtPos(qreal relX, int minViewedFrame,
                           qreal pixelsPerFrame);
@@ -195,7 +193,9 @@ public:
 
     SWT_Type SWT_getType() { return SWT_QrealAnimator; }
     qreal getCurrentValueAtFrame(const int &frame) const;
+    void blockUpdater();
 protected:
+    bool mUpdaterBlocked = false;
     bool mTraceKeyOnCurrentFrame = false;
 
     bool mMinMaxValuesFrozen = false;
@@ -225,6 +225,14 @@ protected:
                          const int &startFrame);
 signals:
     void valueChangedSignal(qreal);
+public slots:
+    void setRecording(bool rec);
+    void deleteCurrentKey() {
+        QrealKey *keyAtFrame = getKeyAtFrame(mCurrentFrame);
+        if(keyAtFrame == NULL) return;
+        keyAtFrame->deleteKey();
+    }
+    void saveCurrentValueAsKey();
 };
 
 #endif // VALUEANIMATORS_H

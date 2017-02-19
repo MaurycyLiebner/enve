@@ -604,7 +604,7 @@ void KeysView::graphRemoveViewedAnimator(QrealAnimator *animator)
 void KeysView::graphRepaint()
 {
     graphUpdateDrawPathIfNeeded();
-    repaint();
+    //repaint();
 }
 
 void KeysView::graphUpdateDrawPathIfNeeded() {

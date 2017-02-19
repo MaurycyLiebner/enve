@@ -14,6 +14,7 @@ public:
     void setCurrentGradient(Gradient *gradient);
     Gradient *getCurrentGradient();
     Color getCurrentColor();
+    ColorAnimator *getCurrentColorAnimator();
 
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

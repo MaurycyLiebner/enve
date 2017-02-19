@@ -42,31 +42,25 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 
 void QrealAnimatorValueSlider::emitEditingStarted(qreal value)
 {
-    if(mAnimator == NULL) {
-        QDoubleSlider::emitEditingStarted(value);
-    } else {
-        mAnimator->startTransform();
-    }
+    QDoubleSlider::emitEditingStarted(value);
+    if(mAnimator == NULL) return;
+    mAnimator->startTransform();
 }
 
 void QrealAnimatorValueSlider::emitValueChanged(qreal value)
 {
-    if(mAnimator == NULL) {
-        QDoubleSlider::emitValueChanged(value);
-    } else {
-        mAnimator->setCurrentValue(value);
-        MainWindow::getInstance()->callUpdateSchedulers();
-    }
+    QDoubleSlider::emitValueChanged(value);
+    if(mAnimator == NULL) return;
+    mAnimator->setCurrentValue(value);
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void QrealAnimatorValueSlider::emitEditingFinished(qreal value)
 {
-    if(mAnimator == NULL) {
-        QDoubleSlider::emitEditingFinished(value);
-    } else {
-        mAnimator->finishTransform();
-        MainWindow::getInstance()->callUpdateSchedulers();
-    }
+    QDoubleSlider::emitEditingFinished(value);
+    if(mAnimator == NULL) return;
+    mAnimator->finishTransform();
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void QrealAnimatorValueSlider::paint(QPainter *p)
@@ -101,5 +95,36 @@ void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
         setPrefferedValueStep(mAnimator->getPrefferedValueStep());
 
         setValue(mAnimator->getCurrentValue());
+    }
+}
+
+void QrealAnimatorValueSlider::openContextMenu(
+        const QPoint &globalPos) {
+    if(mAnimator == NULL) return;
+    QMenu menu(this);
+
+    if(mAnimator->isKeyOnCurrentFrame()) {
+        menu.addAction("Delete Keyframe",
+                       mAnimator,
+                       SLOT(deleteCurrentKey()));
+    } else {
+        menu.addAction("Add Keyframe",
+                       mAnimator,
+                       SLOT(saveCurrentValueAsKey()));
+    }
+
+    menu.addSeparator();
+
+    QAction *recAct = menu.addAction("Recording");
+    recAct->setCheckable(true);
+    recAct->setChecked(mAnimator->isRecording());
+    connect(recAct, SIGNAL(toggled(bool)),
+            mAnimator, SLOT(setRecording(bool)));
+
+    QAction *selectedAction = menu.exec(globalPos);
+    if(selectedAction == NULL) {
+        return;
+    } else {
+        MainWindow::getInstance()->callUpdateSchedulers();
     }
 }

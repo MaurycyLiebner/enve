@@ -334,12 +334,10 @@ void PathBox::setOutlineAffectedByScale(bool bT)
     scheduleOutlinePathUpdate();
 }
 
-const PaintSettings *PathBox::getFillSettings()
-{
+PaintSettings *PathBox::getFillSettings() {
     return &mFillPaintSettings;
 }
 
-const StrokeSettings *PathBox::getStrokeSettings()
-{
+StrokeSettings *PathBox::getStrokeSettings() {
     return &mStrokeSettings;
 }

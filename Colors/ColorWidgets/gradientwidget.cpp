@@ -168,6 +168,11 @@ Color GradientWidget::getCurrentColor()
     return mCurrentGradient->getCurrentColorAt(mCurrentColorId);
 }
 
+ColorAnimator *GradientWidget::getCurrentColorAnimator() {
+    if(mCurrentGradient == NULL) return NULL;
+    mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
+}
+
 void GradientWidget::setCurrentGradient(int listId)
 {
     if(listId >= mGradients.length()) return;

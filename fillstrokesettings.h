@@ -124,6 +124,7 @@ public:
     }
 
     void setGradient(Gradient *gradient) {
+        if(gradient == mGradient) return;
         if(mPaintType == GRADIENTPAINT && mGradient != NULL) {
             removeChildAnimator(mGradient);
             removeChildAnimator((QrealAnimator*) mGradientPoints);
@@ -246,6 +247,10 @@ public:
         source->makeDuplicate(&mLineWidth);
     }
 
+    QrealAnimator *getLineWidthAnimator() {
+        return &mLineWidth;
+    }
+
 private:
     QrealAnimator mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
@@ -265,13 +270,10 @@ class FillStrokeSettingsWidget : public QWidget
 public:
     explicit FillStrokeSettingsWidget(MainWindow *parent = 0);
 
-    void setCurrentSettings(const PaintSettings *fillPaintSettings,
-                            const StrokeSettings *strokePaintSettings);
+    void setCurrentSettings(PaintSettings *fillPaintSettings,
+                            StrokeSettings *strokePaintSettings);
     void updateAfterTargetChanged();
     void setCurrentPaintType(PaintType paintType);
-
-    void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
-    void setCurrentColor(Color color);
 
     void saveGradientsToQuery(QSqlQuery *query);
     void loadAllGradientsFromSql();
@@ -280,10 +282,11 @@ public:
     void clearAll();
     void saveGradientsToSqlIfPathSelected(QSqlQuery *query);
     void loadSettingsFromPath(PathBox *path);
-    void setFillValuesFromFillSettings(const PaintSettings *settings);
-    void setStrokeValuesFromStrokeSettings(const StrokeSettings *settings);
+    void setFillValuesFromFillSettings(PaintSettings *settings);
+    void setStrokeValuesFromStrokeSettings(StrokeSettings *settings);
 
     void setCanvasWidgetPtr(CanvasWidget *canvasWidget);
+    void updateColorAnimator();
 public slots:
     void emitColorSettingsChangedTMP();
     void emitColorSettingsChanged();
@@ -326,6 +329,8 @@ private slots:
     void setGradientFill();
     void setFlatFill();
     void setNoneFill();
+
+    void setColorAnimatorTarget(ColorAnimator *animator);
 private:
     CanvasWidget *mCanvasWidget;
 
@@ -397,6 +402,9 @@ private:
         }
     }
 
+
+    ColorAnimator *mCurrentFillColorAnimator = NULL;
+    ColorAnimator *mCurrentStrokeColorAnimator = NULL;
     PaintType mCurrentFillPaintType = NOPAINT;
     PaintType mCurrentStrokePaintType = NOPAINT;
     Color mCurrentFillColor;
