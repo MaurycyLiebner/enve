@@ -2,6 +2,7 @@
 #include "OptimalScrollArea/singlewidgetabstraction.h"
 #include "OptimalScrollArea/singlewidgettarget.h"
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
+#include "Colors/ColorWidgets/colorsettingswidget.h"
 
 #include "Boxes/boxesgroup.h"
 #include "qrealanimatorvalueslider.h"
@@ -49,6 +50,12 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 
     mValueSlider = new QrealAnimatorValueSlider(NULL, this);
     mMainLayout->addWidget(mValueSlider, Qt::AlignRight);
+
+    mColorButton = new BoxesListActionButton(this);
+    mMainLayout->addWidget(mColorButton, Qt::AlignRight);
+    connect(mColorButton, SIGNAL(pressed()),
+            this, SLOT(openColorSettingsDialog()));
+
     mMainLayout->addSpacing(10);
 
     hide();
@@ -70,6 +77,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mVisibleButton->show();
 
+        mColorButton->hide();
+
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
     } else if(type == SWT_BoxesGroup) {
@@ -82,6 +91,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mContentButton->show();
 
         mVisibleButton->show();
+
+        mColorButton->hide();
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
@@ -96,9 +107,12 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mVisibleButton->hide();
 
+        mColorButton->hide();
+
         mValueSlider->setAnimator(qa_target);
         mValueSlider->show();
-    } else if(type == SWT_ComplexAnimator) {
+    } else if(type == SWT_ComplexAnimator ||
+              type == SWT_ColorAnimator) {
         ComplexAnimator *ca_target = (ComplexAnimator*)target;
 
         setName(ca_target->getName());
@@ -108,6 +122,12 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mContentButton->show();
 
         mVisibleButton->hide();
+
+        if(type == SWT_ColorAnimator) {
+            mColorButton->show();
+        } else {
+            mColorButton->hide();
+        }
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
@@ -232,7 +252,8 @@ void BoxSingleWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
                             containerTop,
                             minViewedFrame, maxViewedFrame);
     } else if(type == SWT_QrealAnimator ||
-              type == SWT_ComplexAnimator) {
+              type == SWT_ComplexAnimator ||
+              type == SWT_ColorAnimator) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         qa_target->drawKeys(p, pixelsPerFrame,
                             containerTop,
@@ -254,7 +275,8 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
                     minViewedFrame,
                     pixelsPerFrame);
     } else if(type == SWT_QrealAnimator ||
-              type == SWT_ComplexAnimator) {
+              type == SWT_ComplexAnimator ||
+              type == SWT_ColorAnimator) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         return qa_target->getKeyAtPos(pressX,
                                minViewedFrame,
@@ -279,7 +301,8 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
                     pixelsPerFrame,
                     listKeys);
     } else if(type == SWT_QrealAnimator ||
-              type == SWT_ComplexAnimator) {
+              type == SWT_ComplexAnimator ||
+              type == SWT_ColorAnimator) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         qa_target->getKeysInRect(selectionRect,
                                  minViewedFrame,
@@ -318,7 +341,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                          *BoxSingleWidget::INVISIBLE_PIXMAP);
         }
 
-        nameX = mVisibleButton->x() + 25;
+        nameX = mVisibleButton->x() + BOX_HEIGHT + 5;
         if(bb_target->isSelected()) {
             p.fillRect(QRect(mFillWidget->pos(), mFillWidget->size()),
                        QColor(180, 180, 180));
@@ -340,9 +363,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                          *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
         }
 
-        nameX = mRecordButton->x() + 40;
+        nameX = mRecordButton->x() + 2*BOX_HEIGHT;
         p.setPen(Qt::white);
-    } else if(type == SWT_ComplexAnimator) {
+    } else if(type == SWT_ComplexAnimator ||
+              type == SWT_ColorAnimator) {
         ComplexAnimator *ca_target = (ComplexAnimator*)target;
 
         if(ca_target->isRecording()) {
@@ -370,13 +394,21 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.drawPixmap(mContentButton->x(), 0,
                          *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
         }
-        nameX = mContentButton->x() + 20;
+        nameX = mContentButton->x() + BOX_HEIGHT;
         p.setPen(Qt::white);
+
+        if(type == SWT_ColorAnimator) {
+            ColorAnimator *col_target = (ColorAnimator*)ca_target;
+            p.setBrush(col_target->getCurrentValue().qcol);
+            p.drawRect(mColorButton->x(), 2,
+                       BOX_HEIGHT, BOX_HEIGHT - 6);
+            nameX = mColorButton->x() + BOX_HEIGHT;
+        }
     }
-    p.drawText(QRect(nameX, 0,
-                     width() - nameX -
-                     20,
-                     20),
+    p.drawText(QRect(mFillWidget->x(), 0,
+                     width() - mFillWidget->x() -
+                     BOX_HEIGHT,
+                     BOX_HEIGHT),
                mName, QTextOption(Qt::AlignVCenter));
 
     p.end();
@@ -398,4 +430,16 @@ void BoxSingleWidget::switchBoxVisibleAction() {
     ((BoundingBox*)mTarget->getTarget())->switchVisible();
     MainWindow::getInstance()->callUpdateSchedulers();
     update();
+}
+
+void BoxSingleWidget::openColorSettingsDialog() {
+    QDialog *dialog = new QDialog(this);
+    dialog->setLayout(new QVBoxLayout(dialog));
+    ColorSettingsWidget *colorSettingsWidget =
+            new ColorSettingsWidget(dialog);
+    colorSettingsWidget->setColorAnimatorTarget(
+                (ColorAnimator*)mTarget->getTarget());
+    dialog->layout()->addWidget(colorSettingsWidget);
+
+    dialog->show();
 }

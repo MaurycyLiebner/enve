@@ -32,6 +32,8 @@ protected:
     void emitEditingFinished(qreal value);
 private:
     QrealAnimator *mAnimator = NULL;
+private slots:
+    void nullifyAnimator();
 };
 
 #endif // QREALANIMATORVALUESLIDER_H

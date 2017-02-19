@@ -55,6 +55,7 @@ public:
         return &mAlphaAnimator;
     }
 
+    SWT_Type SWT_getType() { return SWT_ColorAnimator; }
 private:
     ColorMode mColorMode = RGBMODE;
     QrealAnimator mVal1Animator;

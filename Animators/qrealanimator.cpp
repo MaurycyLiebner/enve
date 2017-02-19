@@ -14,6 +14,7 @@ QrealAnimator::QrealAnimator() : Animator() {
 }
 
 QrealAnimator::~QrealAnimator() {
+    emit beingDeleted();
     foreach(QrealKey *key, mKeys) {
         key->decNumberPointers();
     }

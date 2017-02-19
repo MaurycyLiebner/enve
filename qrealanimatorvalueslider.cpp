@@ -63,6 +63,10 @@ void QrealAnimatorValueSlider::emitEditingFinished(qreal value)
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 
+void QrealAnimatorValueSlider::nullifyAnimator() {
+    setAnimator(NULL);
+}
+
 void QrealAnimatorValueSlider::paint(QPainter *p)
 {
     if(mAnimator == NULL) {
@@ -83,12 +87,16 @@ void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
     if(mAnimator != NULL) {
         disconnect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
                    this, SLOT(setValue(qreal)));
+        disconnect(mAnimator, SIGNAL(beingDeleted()),
+                   this, SLOT(nullifyAnimator()));
     }
     mAnimator = animator;
     if(mAnimator != NULL) {
         setNumberDecimals(mAnimator->getNumberDecimals());
         connect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
                 this, SLOT(setValue(qreal)));
+        connect(mAnimator, SIGNAL(beingDeleted()),
+                this, SLOT(nullifyAnimator()));
 
         setValueRange(mAnimator->getMinPossibleValue(),
                       mAnimator->getMaxPossibleValue());

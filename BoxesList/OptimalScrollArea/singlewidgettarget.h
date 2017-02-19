@@ -11,6 +11,7 @@ enum SWT_Type : short {
     SWT_BoxesGroup,
     SWT_QrealAnimator,
     SWT_ComplexAnimator,
+    SWT_ColorAnimator,
     SWT_Canvas
 };
 

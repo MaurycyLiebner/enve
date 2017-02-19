@@ -11,8 +11,7 @@ class ColorValueSpin : public QObject
 {
     Q_OBJECT
 public:
-    ColorValueSpin(int min_val_t, int max_val_t,
-                   int val_t, QWidget *parent = 0);
+    ColorValueSpin(QWidget *parent = 0);
     ~ColorValueSpin();
     QrealAnimatorValueSlider *getSpinBox();
 signals:

@@ -24,7 +24,7 @@ class QrealAnimator :  public Animator
 public:
     QrealAnimator();
 
-    ~QrealAnimator();
+    virtual ~QrealAnimator();
 
     void addSlider(QrealAnimatorValueSlider *valueSlider);
     void removeSlider(QrealAnimatorValueSlider *valueSlider);
@@ -225,6 +225,7 @@ protected:
                          const int &startFrame);
 signals:
     void valueChangedSignal(qreal);
+    void beingDeleted();
 public slots:
     void setRecording(bool rec);
     void deleteCurrentKey() {

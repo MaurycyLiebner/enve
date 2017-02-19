@@ -59,11 +59,13 @@ public slots:
     void switchContentVisibleAction();
     void switchRecordingAction();
     void switchBoxVisibleAction();
+    void openColorSettingsDialog();
 private:
     BoxesListActionButton *mRecordButton;
     BoxesListActionButton *mContentButton;
     BoxesListActionButton *mVisibleButton;
     BoxesListActionButton *mLockedButton;
+    BoxesListActionButton *mColorButton;
 
     QPoint mDragStartPos;
     QWidget *mFillWidget;
