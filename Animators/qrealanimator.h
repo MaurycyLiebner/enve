@@ -11,7 +11,7 @@
 #include "float.h"
 #include "animator.h"
 
-const int KEY_RECT_SIZE = 10;
+const int KEY_RECT_SIZE = 12;
 
 class ComplexAnimator;
 class QrealAnimatorValueSlider;

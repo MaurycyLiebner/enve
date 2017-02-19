@@ -110,8 +110,12 @@ public slots:
 
     void setViewedRange(int top, int bottom);
 private:
+    void updateHoveredPointFromPos(const QPoint &posU);
+
+    QrealKey *mHoveredKey = NULL;
     AnimationDockWidget *mGraphControls = NULL;
 
+    bool mIsMouseGrabbing = false;
     int mViewedTop = 0;
     int mViewedBottom = 0;
 
@@ -157,6 +161,7 @@ private:
     qreal mValueInc;
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
+    void clearHoveredPoint();
 };
 
 #endif // KEYSVIEW_H

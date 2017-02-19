@@ -105,6 +105,15 @@ public:
 
     virtual void addToSelection(QList<QrealKey *> *selectedKeys);
     virtual void removeFromSelection(QList<QrealKey *> *selectedKeys);
+
+    bool isHovered() {
+        return mHovered;
+    }
+
+    void setHovered(const bool &bT) {
+        mHovered = bT;
+    }
+
 protected:
     bool mIsSelected = false;
     QrealAnimator *mParentAnimator = NULL;
@@ -129,6 +138,7 @@ protected:
     qreal mEndFrame = 0.;
     bool mStartEnabled = false;
     bool mEndEnabled = false;
+    bool mHovered = false;
 };
 
 struct QrealKeyPair {

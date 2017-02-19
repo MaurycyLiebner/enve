@@ -26,28 +26,42 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QrealAnimator *animator,
     setAnimator(animator);
 }
 
+QrealAnimatorValueSlider::QrealAnimatorValueSlider(QWidget *parent) :
+    QrealAnimatorValueSlider(NULL, parent) {
+
+}
+
 QrealAnimatorValueSlider::~QrealAnimatorValueSlider()
 {
 }
 
 void QrealAnimatorValueSlider::emitEditingStarted(qreal value)
 {
-    if(mAnimator == NULL) return;
-    mAnimator->startTransform();
+    if(mAnimator == NULL) {
+        QDoubleSlider::emitEditingStarted(value);
+    } else {
+        mAnimator->startTransform();
+    }
 }
 
 void QrealAnimatorValueSlider::emitValueChanged(qreal value)
 {
-    if(mAnimator == NULL) return;
-    mAnimator->setCurrentValue(value);
-    MainWindow::getInstance()->callUpdateSchedulers();
+    if(mAnimator == NULL) {
+        QDoubleSlider::emitValueChanged(value);
+    } else {
+        mAnimator->setCurrentValue(value);
+        MainWindow::getInstance()->callUpdateSchedulers();
+    }
 }
 
 void QrealAnimatorValueSlider::emitEditingFinished(qreal value)
 {
-    if(mAnimator == NULL) return;
-    mAnimator->finishTransform();
-    MainWindow::getInstance()->callUpdateSchedulers();
+    if(mAnimator == NULL) {
+        QDoubleSlider::emitEditingFinished(value);
+    } else {
+        mAnimator->finishTransform();
+        MainWindow::getInstance()->callUpdateSchedulers();
+    }
 }
 
 void QrealAnimatorValueSlider::paint(QPainter *p)

@@ -13,6 +13,7 @@ public:
     QrealAnimatorValueSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
                              QrealAnimator *animator, QWidget *parent = 0);
     QrealAnimatorValueSlider(QrealAnimator *animator, QWidget *parent = 0);
+    QrealAnimatorValueSlider(QWidget *parent = 0);
     ~QrealAnimatorValueSlider();
 
     void paint(QPainter *p);

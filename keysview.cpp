@@ -12,6 +12,7 @@ KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
     mBoxesListVisible = boxesListVisible;
 
     setFocusPolicy(Qt::StrongFocus);
+    setMouseTracking(true);
 }
 
 void KeysView::setAnimationDockWidget(
@@ -49,6 +50,11 @@ void KeysView::middleMove(QPointF movePos)
 
 void KeysView::deleteSelectedKeys()
 {
+    if(mHoveredKey != NULL) {
+        if(mHoveredKey->isSelected()) {
+            clearHoveredPoint();
+        }
+    }
     foreach(QrealKey *key, mSelectedKeys) {
         key->deleteKey();
         key->decNumberPointers();
@@ -92,7 +98,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         if(e->button() == Qt::MiddleButton) {
             middlePress(posU);
         } else if(e->button() == Qt::LeftButton) {
-            if(mouseGrabber() == this) {
+            if(mIsMouseGrabbing) {
                 return;
             }
             mFirstMove = true;
@@ -133,7 +139,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 mMoveDFrame = 0;
                 mMovingKeys = false;
                 mScalingKeys = false;
-                setMouseTracking(false);
+                //setMouseTracking(false);
                 releaseMouse();
             }
         }
@@ -171,16 +177,18 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                 mMovingKeys = true;
                 mFirstMove = true;
                 mLastPressPos = mapFromGlobal(QCursor::pos());
-                setMouseTracking(true);
-                grabMouse();
+                mIsMouseGrabbing = true;
+                //setMouseTracking(true);
+                //grabMouse();
             }
         } else if(event->key() == Qt::Key_G) {
             if(!mMovingKeys) {
                 mMovingKeys = true;
                 mFirstMove = true;
                 mLastPressPos = mapFromGlobal(QCursor::pos());
-                setMouseTracking(true);
-                grabMouse();
+                mIsMouseGrabbing = true;
+                //setMouseTracking(true);
+                //grabMouse();
             }
         } else if(mMainWindow->isShiftPressed() &&
                   event->key() == Qt::Key_D) {
@@ -198,8 +206,9 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                     mMovingKeys = true;
                     mFirstMove = true;
                     mLastPressPos = mapFromGlobal(QCursor::pos());
-                    setMouseTracking(true);
-                    grabMouse();
+                    mIsMouseGrabbing = true;
+                    //setMouseTracking(true);
+                    //grabMouse();
                 }
             }
         } else if(event->key() == Qt::Key_Delete) {
@@ -323,51 +332,73 @@ void KeysView::paintEvent(QPaintEvent *) {
     p.end();
 }
 
+void KeysView::updateHoveredPointFromPos(const QPoint &posU) {
+    QrealKey *lastKey = mHoveredKey;
+    mHoveredKey = mBoxesListVisible->getKeyAtPos(
+                                    posU.x(), posU.y(),
+                                    mPixelsPerFrame,
+                                    mMinViewedFrame);
+    if(lastKey != NULL) lastKey->setHovered(false);
+    if(mHoveredKey != NULL) mHoveredKey->setHovered(true);
+}
+
+void KeysView::clearHoveredPoint() {
+    if(mHoveredKey == NULL) return;
+    mHoveredKey->setHovered(false);
+    mHoveredKey = NULL;
+}
+
 void KeysView::mouseMoveEvent(QMouseEvent *event) {
     QPoint posU = event->pos() + QPoint(-10, 0);
-    if(mGraphViewed) {
-        graphMouseMoveEvent(posU,
-                            event->buttons());
-    } else {
-        if(event->buttons() == Qt::MiddleButton) {
-            middleMove(posU);
-            emit changedViewedFrames(mMinViewedFrame,
-                                     mMaxViewedFrame);
+    if(mIsMouseGrabbing ||
+       (event->buttons() & Qt::LeftButton ||
+         event->buttons() & Qt::RightButton ||
+         event->buttons() & Qt::MiddleButton)) {
+        if(mGraphViewed) {
+            graphMouseMoveEvent(posU,
+                                event->buttons());
         } else {
-            if(mMovingKeys) {
-                if(mFirstMove) {
-                    foreach(QrealKey *key, mSelectedKeys) {
-                        key->startFrameTransform();
-                    }
-                }
-                if(mScalingKeys) {
-                    qreal keysScale = (event->x() - mLastPressPos.x())/
-                                       300.;
-                    foreach(QrealKey *key, mSelectedKeys) {
-                        key->scaleFrameAndUpdateParentAnimator(
-                                    mMainWindow->getCurrentFrame(),
-                                    keysScale);
-                    }
-                } else {
-                    int dFrame = qRound(
-                                (posU.x() - mLastPressPos.x())/
-                                mPixelsPerFrame );
-                    int dDFrame = dFrame - mMoveDFrame;
-
-                    if(dDFrame != 0) {
-                        mMoveDFrame = dFrame;
+            if(event->buttons() == Qt::MiddleButton) {
+                middleMove(posU);
+                emit changedViewedFrames(mMinViewedFrame,
+                                         mMaxViewedFrame);
+            } else {
+                if(mMovingKeys) {
+                    if(mFirstMove) {
                         foreach(QrealKey *key, mSelectedKeys) {
-                            key->incFrameAndUpdateParentAnimator(dDFrame);
+                            key->startFrameTransform();
                         }
                     }
-                }
-            } else if(mSelecting) {
-                mSelectionRect.setBottomRight(posU);
-            }
-            mFirstMove = false;
-        }
-    }
+                    if(mScalingKeys) {
+                        qreal keysScale = (event->x() - mLastPressPos.x())/
+                                           300.;
+                        foreach(QrealKey *key, mSelectedKeys) {
+                            key->scaleFrameAndUpdateParentAnimator(
+                                        mMainWindow->getCurrentFrame(),
+                                        keysScale);
+                        }
+                    } else {
+                        int dFrame = qRound(
+                                    (posU.x() - mLastPressPos.x())/
+                                    mPixelsPerFrame );
+                        int dDFrame = dFrame - mMoveDFrame;
 
+                        if(dDFrame != 0) {
+                            mMoveDFrame = dFrame;
+                            foreach(QrealKey *key, mSelectedKeys) {
+                                key->incFrameAndUpdateParentAnimator(dDFrame);
+                            }
+                        }
+                    }
+                } else if(mSelecting) {
+                    mSelectionRect.setBottomRight(posU);
+                }
+                mFirstMove = false;
+            }
+        }
+    } else {
+        updateHoveredPointFromPos(posU);
+    }
 
     mMainWindow->callUpdateSchedulers();
 }
@@ -423,12 +454,13 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e)
                 mMoveDFrame = 0;
                 mMovingKeys = false;
                 mScalingKeys = false;
-                setMouseTracking(false);
-                releaseMouse();
+                mIsMouseGrabbing = false;
+                //setMouseTracking(false);
+                //releaseMouse();
             }
         }
     }
-
+    updateHoveredPointFromPos(e->pos() + QPoint(-10, 0));
 
     mMainWindow->callUpdateSchedulers();
 }

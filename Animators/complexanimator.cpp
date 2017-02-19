@@ -118,13 +118,27 @@ void ComplexAnimator::drawKey(
     } else {
         p->setBrush(Qt::red);
     }
-    p->drawEllipse(
-        QRectF(
-            QPointF((key->getFrame() - startFrame + 0.5)*
-                    pixelsPerFrame - KEY_RECT_SIZE*0.35,
-                    drawY + (BOX_HEIGHT -
-                              KEY_RECT_SIZE*0.7)*0.5 ),
-            QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
+
+    if(key->isHovered()) {
+        p->save();
+        p->setPen(QPen(Qt::black, 1.5));
+        p->drawEllipse(
+            QRectF(
+                QPointF((key->getFrame() - startFrame + 0.5)*
+                        pixelsPerFrame - KEY_RECT_SIZE*0.35,
+                        drawY + (BOX_HEIGHT -
+                                  KEY_RECT_SIZE*0.7)*0.5 ),
+                QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
+        p->restore();
+    } else {
+        p->drawEllipse(
+            QRectF(
+                QPointF((key->getFrame() - startFrame + 0.5)*
+                        pixelsPerFrame - KEY_RECT_SIZE*0.35,
+                        drawY + (BOX_HEIGHT -
+                                  KEY_RECT_SIZE*0.7)*0.5 ),
+                QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
+    }
 }
 
 void ComplexAnimator::changeChildAnimatorZ(const int &oldIndex,

@@ -14,7 +14,8 @@ QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
     setFixedHeight(20);
     mLineEdit = new QLineEdit(QString::number(mValue, 'f', mDecimals), this);
     mLineEdit->setAttribute(Qt::WA_TranslucentBackground);
-    mLineEdit->setStyleSheet("background-color: rgba(0, 0, 0, 0);");
+    mLineEdit->setStyleSheet("background-color: rgba(0, 0, 0, 0);"
+                             "color: black;");
     mLineEdit->setFocusPolicy(Qt::NoFocus);
     mLineEdit->installEventFilter(this);
     installEventFilter(this);
