@@ -4,6 +4,7 @@
 #include "undoredo.h"
 #include "canvas.h"
 #include "updatescheduler.h"
+#include "qrealanimatorvalueslider.h"
 
 Gradient::Gradient(Color color1, Color color2,
                    GradientWidget *gradientWidget) :
@@ -77,6 +78,11 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator) {
 Color Gradient::getCurrentColorAt(int id)
 {
     return mColors.at(id)->getCurrentValue();
+}
+
+ColorAnimator *Gradient::getColorAnimatorAt(int id)
+{
+    return mColors.at(id);
 }
 
 int Gradient::getColorCount()
@@ -474,7 +480,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mStrokeSettingsLayout->addLayout(mCapStyleLayout);
 
     //mLineWidthSpin = new QDoubleSpinBox(this);
-    mLineWidthSpin = new QDoubleSlider("line width", 0., 1000., 1., this);
+    mLineWidthSpin = new QrealAnimatorValueSlider("line width", 0., 1000., 1., this);
     mLineWidthSpin->setNameVisible(false);
     //mLineWidthSpin->setValueSliderVisibile(false);
     //mLineWidthSpin->setRange(0.0, 1000.0);
@@ -707,9 +713,9 @@ void FillStrokeSettingsWidget::flatColorSet(GLfloat h, GLfloat s, GLfloat v,
 void FillStrokeSettingsWidget::connectGradient()
 {
     connect(mGradientWidget,
-            SIGNAL(selectedColorChanged(GLfloat,GLfloat,GLfloat,GLfloat)),
+            SIGNAL(selectedColorChanged(ColorAnimator*)),
             mColorsSettingsWidget,
-            SLOT(setCurrentColor(GLfloat,GLfloat,GLfloat,GLfloat) ) );
+            SLOT(setColorAnimatorTarget(ColorAnimator*)) );
     connect(mGradientWidget, SIGNAL(currentGradientChanged(Gradient*)),
             this, SLOT(setGradient(Gradient*)) );
 }
@@ -717,9 +723,9 @@ void FillStrokeSettingsWidget::connectGradient()
 void FillStrokeSettingsWidget::disconnectGradient()
 {
     disconnect(mGradientWidget,
-            SIGNAL(selectedColorChanged(GLfloat,GLfloat,GLfloat,GLfloat)),
+            SIGNAL(selectedColorChanged(ColorAnimator*)),
             mColorsSettingsWidget,
-            SLOT(setCurrentColor(GLfloat,GLfloat,GLfloat,GLfloat) ) );
+            SLOT(setColorAnimatorTarget(ColorAnimator*) ) );
     disconnect(mGradientWidget, SIGNAL(currentGradientChanged(Gradient*)),
             this, SLOT(setGradient(Gradient*)) );
 }

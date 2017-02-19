@@ -31,8 +31,13 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QWidget *parent) :
 
 }
 
-QrealAnimatorValueSlider::~QrealAnimatorValueSlider()
+QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
+                                                   qreal minVal, qreal maxVal,
+                                                   qreal prefferedStep,
+                                                   QWidget *parent) :
+    QDoubleSlider(name, minVal, maxVal, prefferedStep, parent)
 {
+
 }
 
 void QrealAnimatorValueSlider::emitEditingStarted(qreal value)

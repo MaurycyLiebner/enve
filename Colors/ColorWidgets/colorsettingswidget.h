@@ -11,6 +11,8 @@
 #include "colorvaluespin.h"
 #include <QPushButton>
 
+class ColorAnimator;
+
 class ColorSettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -24,6 +26,7 @@ signals:
 public slots:
     void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
     void colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t);
+    void setColorAnimatorTarget(ColorAnimator *target);
 private slots:
     void alphaChanged(GLfloat a_t);
 

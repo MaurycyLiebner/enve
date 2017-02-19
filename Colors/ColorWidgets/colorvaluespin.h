@@ -5,15 +5,16 @@
 #include <QDoubleSpinBox>
 #include <GL/gl.h>
 
-class QDoubleSlider;
+class QrealAnimatorValueSlider;
 
 class ColorValueSpin : public QObject
 {
     Q_OBJECT
 public:
-    ColorValueSpin(int min_val_t, int max_val_t, int val_t, QWidget *parent = 0);
+    ColorValueSpin(int min_val_t, int max_val_t,
+                   int val_t, QWidget *parent = 0);
     ~ColorValueSpin();
-    QDoubleSlider *getSpinBox();
+    QrealAnimatorValueSlider *getSpinBox();
 signals:
     void valSet(GLfloat);
 public slots:
@@ -23,7 +24,7 @@ private slots:
 private:
     bool mEmit = true;
     bool mBlockValue = false;
-    QDoubleSlider *spin_box = NULL;
+    QrealAnimatorValueSlider *mSpinBox = NULL;
 };
 
 #endif // COLORVALUESPIN_H

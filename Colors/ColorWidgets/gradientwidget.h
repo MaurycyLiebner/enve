@@ -38,7 +38,7 @@ public:
     void removeGradientFromList(Gradient *toRemove);
     void startSelectedColorTransform();
 signals:
-    void selectedColorChanged(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
+    void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);
     void gradientSettingsChanged();
 public slots:

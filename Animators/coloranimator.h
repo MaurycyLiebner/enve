@@ -34,6 +34,27 @@ public:
     void duplicateVal2AnimatorFrom(QrealAnimator *source);
     void duplicateVal3AnimatorFrom(QrealAnimator *source);
     void duplicateAlphaAnimatorFrom(QrealAnimator *source);
+
+    ColorMode getColorMode() {
+        return mColorMode;
+    }
+
+    QrealAnimator *getVal1Animator() {
+        return &mVal1Animator;
+    }
+
+    QrealAnimator *getVal2Animator() {
+        return &mVal2Animator;
+    }
+
+    QrealAnimator *getVal3Animator() {
+        return &mVal3Animator;
+    }
+
+    QrealAnimator *getAlphaAnimator() {
+        return &mAlphaAnimator;
+    }
+
 private:
     ColorMode mColorMode = RGBMODE;
     QrealAnimator mVal1Animator;

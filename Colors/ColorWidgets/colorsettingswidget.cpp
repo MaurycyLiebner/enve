@@ -3,7 +3,8 @@
 #include <QResizeEvent>
 #include <QMenu>
 #include "Colors/colorpickingwidget.h"
-#include "qdoubleslider.h"
+#include "qrealanimatorvalueslider.h"
+#include "Animators/coloranimator.h"
 
 void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
                             int rect_width, int rect_height,
@@ -18,7 +19,8 @@ void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
     rect_t->resize(rect_width, rect_height);
 }
 
-void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t)
+void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t,
+                                          GLfloat v_t, GLfloat a_t)
 {
     wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
     r_rect->setColorHSV_f(h_t, s_t, v_t);
@@ -44,6 +46,25 @@ void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t,
 void ColorSettingsWidget::setCurrentColor(Color color)
 {
     setCurrentColor(color.gl_h, color.gl_s, color.gl_v, color.gl_a);
+}
+
+void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
+    if(target != NULL) {
+        if(target->getColorMode() == RGBMODE) {
+            rSpin->getSpinBox()->setAnimator(target->getVal1Animator());
+            gSpin->getSpinBox()->setAnimator(target->getVal2Animator());
+            bSpin->getSpinBox()->setAnimator(target->getVal3Animator());
+        } else if(target->getColorMode() == HSLMODE) {
+            hSpin->getSpinBox()->setAnimator(target->getVal1Animator());
+            hslSSpin->getSpinBox()->setAnimator(target->getVal2Animator());
+            lSpin->getSpinBox()->setAnimator(target->getVal3Animator());
+        } else { // HSVMODE
+            hSpin->getSpinBox()->setAnimator(target->getVal1Animator());
+            hsvSSpin->getSpinBox()->setAnimator(target->getVal2Animator());
+            vSpin->getSpinBox()->setAnimator(target->getVal3Animator());
+        }
+        aSpin->getSpinBox()->setAnimator(target->getAlphaAnimator());
+    }
 }
 
 void ColorSettingsWidget::alphaChanged(GLfloat a_t)

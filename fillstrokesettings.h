@@ -90,6 +90,7 @@ public:
     void updateQGradientStopsIfNeeded();
     void startColorIdTransform(int id);
     void addColorToList(ColorAnimator *newColorAnimator);
+    ColorAnimator *getColorAnimatorAt(int id);
 private:
     int mSqlId = -1;
     GradientWidget *mGradientWidget;
@@ -438,7 +439,7 @@ private:
 
     QHBoxLayout *mLineWidthLayout = new QHBoxLayout();
     QLabel *mLineWidthLabel = new QLabel("Width:");
-    QDoubleSlider *mLineWidthSpin;
+    QrealAnimatorValueSlider *mLineWidthSpin;
 
     ColorSettingsWidget *mColorsSettingsWidget;
 

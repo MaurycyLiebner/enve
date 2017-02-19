@@ -22,8 +22,9 @@ GradientWidget::~GradientWidget()
 
 void GradientWidget::setCurrentColorId(int id) {
     mCurrentColorId = id;
-    Color col = mCurrentGradient->getCurrentColorAt(mCurrentColorId);
-    emit selectedColorChanged(col.gl_h, col.gl_s, col.gl_v, col.gl_a);
+    //Color col = mCurrentGradient->getCurrentColorAt(mCurrentColorId);
+    emit selectedColorChanged(
+                mCurrentGradient->getColorAnimatorAt(mCurrentColorId));
     repaint();
 }
 
