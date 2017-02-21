@@ -391,6 +391,22 @@ void CanvasWidget::strokeWidthChanged(const qreal &strokeWidth,
     callUpdateSchedulers();
 }
 
+void CanvasWidget::applyPaintSettingToSelected(
+        const PaintSetting &setting) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->applyPaintSettingToSelected(setting);
+}
+
+void CanvasWidget::setSelectedFillColorMode(const ColorMode &mode) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setSelectedFillColorMode(mode);
+}
+
+void CanvasWidget::setSelectedStrokeColorMode(const ColorMode &mode) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setSelectedStrokeColorMode(mode);
+}
+
 void CanvasWidget::strokeFlatColorChanged(const Color &color,
                                       const bool &finish) {
     if(hasNoCanvas()) return;

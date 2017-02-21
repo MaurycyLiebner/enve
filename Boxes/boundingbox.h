@@ -54,8 +54,6 @@ class BoxItemWidgetContainer;
 
 class EffectsSettingsWidget;
 
-class BoundngBox;
-
 class BoundingBoxMimeData : public QMimeData {
     Q_OBJECT
 public:
@@ -380,6 +378,18 @@ public:
         p->setPen(Qt::red);
         p->setBrush(Qt::NoBrush);
         p->drawPath(mMappedBoundingRectPath);
+    }
+
+    virtual void applyPaintSetting(
+            const PaintSetting &setting) {
+        Q_UNUSED(setting);
+    }
+
+    virtual void setFillColorMode(const ColorMode &colorMode) {
+        Q_UNUSED(colorMode);
+    }
+    virtual void setStrokeColorMode(const ColorMode &colorMode) {
+        Q_UNUSED(colorMode);
     }
 protected:
     bool mUpdateDisabled = false;

@@ -69,7 +69,7 @@ public:
 
     void updatePaths();
 
-    void finishTransform();
+    //void finishTransform();
 
     void updateQGradientStops();
 
@@ -99,6 +99,36 @@ private:
     QList<PathBox*> mAffectedPaths;
 
     bool mQGradientStopsUpdateNeeded = false;
+};
+
+class PaintSetting{
+public:
+    PaintSetting(const bool &targetFillSettings,
+                      const ColorSetting &colorSetting) {
+        mTargetFillSettings = targetFillSettings;
+        mColorSetting = colorSetting;
+        mPaintType = FLATPAINT;
+    }
+
+    PaintSetting(const bool &targetFillSettings) {
+        mTargetFillSettings = targetFillSettings;
+        mPaintType = NOPAINT;
+    }
+
+    PaintSetting(const bool &targetFillSettings,
+                      Gradient *gradient) {
+        mTargetFillSettings = targetFillSettings;
+        mPaintType = GRADIENTPAINT;
+        mGradient = gradient;
+    }
+
+    void apply(PathBox *box) const;
+
+private:
+    bool mTargetFillSettings;
+    Gradient *mGradient;
+    PaintType mPaintType;
+    ColorSetting mColorSetting;
 };
 
 class PaintSettings : public ComplexAnimator {
@@ -144,10 +174,10 @@ public:
         if(mPaintType == GRADIENTPAINT && paintType != GRADIENTPAINT) {
             removeChildAnimator(mGradient);
             removeChildAnimator((QrealAnimator*) mGradientPoints);
-        } else if(paintType == GRADIENTPAINT && mPaintType != GRADIENTPAINT) {
+        }/* else if(paintType == GRADIENTPAINT && mPaintType != GRADIENTPAINT) {
             addChildAnimator(mGradient);
             addChildAnimator((QrealAnimator*) mGradientPoints);
-        }
+        }*/
         if(mPaintType == FLATPAINT && paintType != FLATPAINT) {
             removeChildAnimator(&mColor);
         } else if(paintType == FLATPAINT && mPaintType != FLATPAINT) {
@@ -288,26 +318,17 @@ public:
     void setCanvasWidgetPtr(CanvasWidget *canvasWidget);
     void updateColorAnimator();
 public slots:
-    void emitColorSettingsChangedTMP();
-    void emitColorSettingsChanged();
-    void emitPaintTypeChanged();
     void emitStrokeWidthChanged();
     void emitStrokeWidthChangedTMP();
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
-    void emitGradientChangedTMP();
-    void emitGradientChanged();
-    void emitFlatColorChangedTMP();
-    void emitFlatColorChanged();
 private slots:
-    void colorChangedTMP(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
     void setStrokeWidth(qreal width);
 
     void colorTypeSet(int id);
     void setFillTarget();
     void setStrokeTarget();
 
-    void flatColorSet(GLfloat h, GLfloat s, GLfloat v, GLfloat a);
     void setGradient(Gradient* gradient);
 
     void setBevelJoinStyle();
@@ -331,7 +352,10 @@ private slots:
     void setNoneFill();
 
     void setColorAnimatorTarget(ColorAnimator *animator);
+    void colorSettingReceived(const ColorSetting &colorSetting);
+    void setCurrentColorMode(const ColorMode &mode);
 private:
+
     CanvasWidget *mCanvasWidget;
 
     bool mLoadFillFromPath = false;
@@ -458,16 +482,6 @@ private:
     QPushButton *mStrokePickerButton;
     QPushButton *mFillStrokePickerButton;
     void setTransformFinishEmitter(const char *slot);
-    void emitStrokeFlatColorChanged();
-    void emitStrokeFlatColorChangedTMP();
-    void emitStrokeGradientChanged();
-    void emitStrokeGradientChangedTMP();
-    void emitStrokePaintTypeChanged();
-    void emitFillFlatColorChanged();
-    void emitFillFlatColorChangedTMP();
-    void emitFillGradientChanged();
-    void emitFillGradientChangedTMP();
-    void emitFillPaintTypeChanged();
 };
 
 #endif // FILLSTROKESETTINGS_H

@@ -4,13 +4,14 @@
 #include "Colors/color.h"
 
 enum ColorMode {
+    RGBMODE,
     HSVMODE,
-    HSLMODE,
-    RGBMODE
+    HSLMODE
 };
 
 class ColorAnimator : public ComplexAnimator
 {
+    Q_OBJECT
 public:
     ColorAnimator();
 
@@ -24,6 +25,15 @@ public:
     void startVal2Transform();
     void startVal3Transform();
     void startAlphaTransform();
+
+    void setCurrentVal1Value(const qreal &val1,
+                             const bool &finish = false);
+    void setCurrentVal2Value(const qreal &val2,
+                             const bool &finish = false);
+    void setCurrentVal3Value(const qreal &val3,
+                             const bool &finish = false);
+    void setCurrentAlphaValue(const qreal &alpha,
+                              const bool &finish = false);
 
     void openContextMenu(QPoint pos);
     void loadFromSql(int sqlId);
@@ -62,6 +72,8 @@ private:
     QrealAnimator mVal2Animator;
     QrealAnimator mVal3Animator;
     QrealAnimator mAlphaAnimator;
+signals:
+    void colorModeChanged(ColorMode);
 };
 
 #endif // COLORANIMATOR_H

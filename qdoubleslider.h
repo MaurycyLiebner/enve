@@ -38,8 +38,10 @@ public:
 
     qreal maximum();
     qreal minimum();
+    qreal value() {
+        return mValue;
+    }
 
-    void setWheelInteractionEnabled(bool bT);
     virtual void openContextMenu(const QPoint &globalPos) {
         Q_UNUSED(globalPos);
     }
@@ -57,9 +59,8 @@ signals:
     void valueChanged(qreal);
     void editingFinished(qreal);
 public slots:
-    void setValue(qreal value);
+    void setDisplayedValue(qreal value);
 protected:
-    bool mWheelEnabled = true;
     int mDecimals = 3;
 
     QString mName;

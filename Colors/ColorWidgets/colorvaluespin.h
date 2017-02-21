@@ -16,12 +16,14 @@ public:
     QrealAnimatorValueSlider *getSpinBox();
 signals:
     void valSet(GLfloat);
+    void displayedValueChanged(GLfloat);
 public slots:
-    void setVal(GLfloat val_t);
+    void setDisplayedValue(GLfloat val_t);
+    void setValueExternal(const GLfloat &val);
 private slots:
+    void spinBoxDisplayedValueChanged(const qreal &val);
     void spinBoxValSet(double spin_box_val_t);
 private:
-    bool mEmit = true;
     bool mBlockValue = false;
     QrealAnimatorValueSlider *mSpinBox = NULL;
 };

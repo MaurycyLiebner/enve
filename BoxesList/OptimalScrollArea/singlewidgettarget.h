@@ -77,6 +77,7 @@ public:
     }
     virtual bool SWT_handleContextMenuActionSelected(QAction *selectedAction) {
         Q_UNUSED(selectedAction);
+        return false;
     }
 
     virtual QMimeData *SWT_createMimeData() {

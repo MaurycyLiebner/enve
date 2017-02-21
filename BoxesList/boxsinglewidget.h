@@ -21,8 +21,6 @@ public:
 
     void setTargetAbstraction(SingleWidgetAbstraction *abs);
 
-    void setName(const QString &name);
-
     static QPixmap *VISIBLE_PIXMAP;
     static QPixmap *INVISIBLE_PIXMAP;
     static QPixmap *HIDE_CHILDREN;
@@ -69,7 +67,6 @@ private:
 
     QPoint mDragStartPos;
     QWidget *mFillWidget;
-    QString mName;
     QHBoxLayout *mMainLayout;
     QrealAnimatorValueSlider *mValueSlider;
 };

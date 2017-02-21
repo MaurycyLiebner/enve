@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include "pointhelpers.h"
+#include "mainwindow.h"
 
 QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
                              QWidget *parent) :
@@ -165,7 +166,7 @@ void QDoubleSlider::emitEditingFinished(qreal value)
     emit editingFinished(value);
 }
 
-void QDoubleSlider::setValue(qreal value)
+void QDoubleSlider::setDisplayedValue(qreal value)
 {
     setValueNoUpdate(value);
     update();
@@ -225,11 +226,6 @@ qreal QDoubleSlider::minimum() {
     return mMinValue;
 }
 
-void QDoubleSlider::setWheelInteractionEnabled(bool bT)
-{
-    mWheelEnabled = bT;
-}
-
 void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
 {
     if(!mMouseMoved) emitEditingStarted(mValue);
@@ -253,6 +249,7 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
         if(keyEvent->key() == Qt::Key_Return ||
            keyEvent->key() == Qt::Key_Enter) {
             finishTextEditing();
+            MainWindow::getInstance()->callUpdateSchedulers();
         }
         return !mTextEdit;
     } else if(event->type() == QEvent::KeyRelease) {
@@ -264,6 +261,7 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
         if(mTextEdit) {
             if(!rect().contains(mouseEvent->pos()) ) {
                 finishTextEditing();
+                MainWindow::getInstance()->callUpdateSchedulers();
 //                QApplication::setOverrideCursor(QApplication::widgetAt(mouseEvent->globalPos())->cursor());
 //                QApplication::restoreOverrideCursor();
             }
@@ -276,6 +274,7 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
             if(mMouseMoved) {
                 setCursor(Qt::ArrowCursor);
                 emitEditingFinished(mValue);
+                MainWindow::getInstance()->callUpdateSchedulers();
             } else {
                 updateLineEditFromValue();
                 mLineEdit->setCursor(Qt::IBeamCursor);
@@ -292,6 +291,7 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
             if(mMovesCount > 2) {
                 mouseMoveEvent((QMouseEvent*) event);
                 mMouseMoved = true;
+                MainWindow::getInstance()->callUpdateSchedulers();
             }
         }
         return !mTextEdit;
@@ -300,7 +300,7 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
         mLineEdit->hide();
     } else if(event->type() == QEvent::FocusIn) {
         mTextEdit = true;
-    } else if(event->type() == QEvent::Wheel) {
+    }/* else if(event->type() == QEvent::Wheel) {
         if(mWheelEnabled || mTextEdit) {
             if(obj == mLineEdit) return true;
             emitEditingStarted(mValue);
@@ -320,11 +320,12 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
 
             emitValueChanged(mValue);
             emitEditingFinished(mValue);
+            MainWindow::getInstance()->callUpdateSchedulers();
             return true;
         } else {
             return false;
         }
-    }
+    }*/
     return false;
 }
 

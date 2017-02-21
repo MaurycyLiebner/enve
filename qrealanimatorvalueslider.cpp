@@ -42,29 +42,52 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 
 void QrealAnimatorValueSlider::emitEditingStarted(qreal value)
 {
+    if(mAnimator != NULL) {
+        mBlockAnimatorSignals = true;
+        mAnimator->startTransform();
+    }
     QDoubleSlider::emitEditingStarted(value);
-    if(mAnimator == NULL) return;
-    mAnimator->startTransform();
+}
+
+void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
+    setDisplayedValue(value);
+    emitValueChanged(value);
 }
 
 void QrealAnimatorValueSlider::emitValueChanged(qreal value)
 {
+    if(mAnimator != NULL) {
+        mAnimator->setCurrentValue(value);
+    }
     QDoubleSlider::emitValueChanged(value);
-    if(mAnimator == NULL) return;
-    mAnimator->setCurrentValue(value);
-    MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+void QrealAnimatorValueSlider::setValueExternal(const qreal &value) {
+    if(mAnimator != NULL) {
+        mBlockAnimatorSignals = true;
+        mAnimator->setCurrentValue(value);
+        mBlockAnimatorSignals = false;
+    }
+    setDisplayedValue(value);
 }
 
 void QrealAnimatorValueSlider::emitEditingFinished(qreal value)
 {
+    if(mAnimator != NULL) {
+        mAnimator->finishTransform();
+        mBlockAnimatorSignals = false;
+    }
     QDoubleSlider::emitEditingFinished(value);
-    if(mAnimator == NULL) return;
-    mAnimator->finishTransform();
-    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void QrealAnimatorValueSlider::nullifyAnimator() {
     setAnimator(NULL);
+}
+
+void QrealAnimatorValueSlider::setValueFromAnimator(const qreal &val) {
+    if(mBlockAnimatorSignals) return;
+    setDisplayedValue(val);
+    emit displayedValueChanged(val);
 }
 
 void QrealAnimatorValueSlider::paint(QPainter *p)
@@ -86,7 +109,7 @@ void QrealAnimatorValueSlider::paint(QPainter *p)
 void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
     if(mAnimator != NULL) {
         disconnect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
-                   this, SLOT(setValue(qreal)));
+                   this, SLOT(setValueFromAnimator(qreal)));
         disconnect(mAnimator, SIGNAL(beingDeleted()),
                    this, SLOT(nullifyAnimator()));
     }
@@ -94,7 +117,7 @@ void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
     if(mAnimator != NULL) {
         setNumberDecimals(mAnimator->getNumberDecimals());
         connect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(setValue(qreal)));
+                this, SLOT(setValueFromAnimator(qreal)));
         connect(mAnimator, SIGNAL(beingDeleted()),
                 this, SLOT(nullifyAnimator()));
 
@@ -102,7 +125,7 @@ void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
                       mAnimator->getMaxPossibleValue());
         setPrefferedValueStep(mAnimator->getPrefferedValueStep());
 
-        setValue(mAnimator->getCurrentValue());
+        setDisplayedValue(mAnimator->getCurrentValue());
     }
 }
 

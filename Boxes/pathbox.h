@@ -214,6 +214,18 @@ public:
         p->drawPath(mPath);
         p->restore();
     }
+
+    void applyPaintSetting(
+            const PaintSetting &setting) {
+        setting.apply(this);
+    }
+
+    void setFillColorMode(const ColorMode &colorMode) {
+        mFillPaintSettings.getColorAnimator()->setColorMode(colorMode);
+    }
+    void setStrokeColorMode(const ColorMode &colorMode) {
+        mFillPaintSettings.getColorAnimator()->setColorMode(colorMode);
+    }
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

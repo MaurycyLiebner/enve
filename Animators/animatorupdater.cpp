@@ -34,7 +34,7 @@ void GradientUpdater::update()
 {
     mTarget->updateQGradientStops();
     //mTarget->scheduleQGradientStopsUpdate();
-    MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+    //MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
 StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path)
@@ -45,7 +45,7 @@ StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path)
 void StrokeWidthUpdater::update()
 {
     mTarget->scheduleOutlinePathUpdate();
-    MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+    //MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
 DisplayedFillStrokeSettingsUpdater::
@@ -55,7 +55,7 @@ DisplayedFillStrokeSettingsUpdater(PathBox *path) {
 
 void DisplayedFillStrokeSettingsUpdater::update() {
     mTarget->scheduleAwaitUpdate();
-    MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+    //MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
 RectangleBottomRightUpdater::RectangleBottomRightUpdater(Rectangle *target) :

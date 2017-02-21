@@ -186,12 +186,16 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
     mVal3Animator.setCurrentValue(cbF);
 
     if(!mKeys.isEmpty()) {
-        mVal1Animator.setRecording(true);
-        mVal2Animator.setRecording(true);
-        mVal3Animator.setRecording(true);
+        mVal1Animator.setRecordingWithoutChangingKeys(true);
+        mVal2Animator.setRecordingWithoutChangingKeys(true);
+        mVal3Animator.setRecordingWithoutChangingKeys(true);
     }
 
     mColorMode = colorMode;
+
+    emit colorModeChanged(mColorMode);
+
+    callUpdater();
 }
 
 void ColorAnimator::startVal1Transform()
@@ -212,6 +216,26 @@ void ColorAnimator::startVal3Transform()
 void ColorAnimator::startAlphaTransform()
 {
     mAlphaAnimator.startTransform();
+}
+
+void ColorAnimator::setCurrentVal1Value(const qreal &val1,
+                                        const bool &finish) {
+    mVal1Animator.setCurrentValue(val1, finish);
+}
+
+void ColorAnimator::setCurrentVal2Value(const qreal &val2,
+                                        const bool &finish) {
+    mVal2Animator.setCurrentValue(val2, finish);
+}
+
+void ColorAnimator::setCurrentVal3Value(const qreal &val3,
+                                        const bool &finish) {
+    mVal3Animator.setCurrentValue(val3, finish);
+}
+
+void ColorAnimator::setCurrentAlphaValue(const qreal &alpha,
+                                         const bool &finish) {
+    mAlphaAnimator.setCurrentValue(alpha, finish);
 }
 
 #include <QMenu>

@@ -114,6 +114,25 @@ void Canvas::setDisplayedFillStrokeSettingsFromLastSelected() {
 }
 
 
+void Canvas::applyPaintSettingToSelected(
+        const PaintSetting &setting) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->applyPaintSetting(setting);
+    }
+}
+
+void Canvas::setSelectedFillColorMode(const ColorMode &mode) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setFillColorMode(mode);
+    }
+}
+
+void Canvas::setSelectedStrokeColorMode(const ColorMode &mode) {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->setStrokeColorMode(mode);
+    }
+}
+
 void Canvas::setSelectedFillGradient(Gradient *gradient, bool finish) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setFillGradient(gradient, finish);

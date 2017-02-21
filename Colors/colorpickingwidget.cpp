@@ -30,7 +30,8 @@ void ColorPickingWidget::mousePressEvent(QMouseEvent *e)
     Color color;
     color.setQColor(pickedColor);
     mColorSettingsWidget->setCurrentColor(color);
-    mColorSettingsWidget->colorChangedHSVSlot(color.gl_h, color.gl_s, color.gl_v);
+    mColorSettingsWidget->emitFullColorChangedSignal();
+    MainWindow::getInstance()->callUpdateSchedulers();
     endThis();
 }
 
@@ -60,7 +61,8 @@ void ColorPickingWidget::mouseMoveEvent(QMouseEvent *e)
 QColor ColorPickingWidget::colorFromPoint(int x_t, int y_t)
 {
     QPixmap *pix = new QPixmap;
-    *pix = QGuiApplication::primaryScreen()->grabWindow(QApplication::desktop()->winId(), x_t, y_t, 1, 1);
+    *pix = QGuiApplication::primaryScreen()->grabWindow(
+                QApplication::desktop()->winId(), x_t, y_t, 1, 1);
     QImage *img = new QImage;
     *img = pix->toImage();
     QRgb b = img->pixel(0, 0);

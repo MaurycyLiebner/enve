@@ -26,14 +26,22 @@ public:
         return mAnimator != NULL;
     }
     void openContextMenu(const QPoint &globalPos);
-protected:
+public slots:
+    void setValueExternal(const qreal &value);
+
     void emitEditingStarted(qreal value);
-    void emitValueChanged(qreal value);
+    void emitValueChangedExternal(qreal value);
     void emitEditingFinished(qreal value);
+protected:
+    void emitValueChanged(qreal value);
 private:
     QrealAnimator *mAnimator = NULL;
+    bool mBlockAnimatorSignals = false;
 private slots:
     void nullifyAnimator();
+    void setValueFromAnimator(const qreal &val);
+signals:
+    void displayedValueChanged(qreal);
 };
 
 #endif // QREALANIMATORVALUESLIDER_H

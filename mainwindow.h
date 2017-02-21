@@ -76,7 +76,6 @@ public:
     bool isCtrlPressed();
     bool isAltPressed();
 
-    void callUpdateSchedulers();
     void schedulePivotUpdate();
 
     AnimationDockWidget *getAnimationDockWidget();
@@ -140,6 +139,8 @@ public slots:
     void stopPreview();
     void setResolutionPercentId(int id);
     void createNewCanvas();
+
+    void callUpdateSchedulers();
 private slots:
     void saveOutput(QString renderDest);
     void renderOutput();
@@ -159,6 +160,7 @@ private slots:
     void revert();
 signals:
     void updateBoxPixmaps(BoundingBox*);
+    void updateAll();
 private:
     static MainWindow *mMainWindowInstance;
 

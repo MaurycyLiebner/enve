@@ -3,11 +3,14 @@
 #include <QMenu>
 #include <QAction>
 #include "Colors/helpers.h"
+#include "mainwindow.h"
 
 GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) : GLWidget(parent)
 {
     mMainWindow = mainWindow;
     setFixedHeight(6*20 + 10);
+    connect(mMainWindow, SIGNAL(updateAll()),
+            this, SLOT(update()));
 //    newGradient();
 //    newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
 //    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
@@ -170,7 +173,7 @@ Color GradientWidget::getCurrentColor()
 
 ColorAnimator *GradientWidget::getCurrentColorAnimator() {
     if(mCurrentGradient == NULL) return NULL;
-    mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
+    return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
 }
 
 void GradientWidget::setCurrentGradient(int listId)

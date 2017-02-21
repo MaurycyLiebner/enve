@@ -64,6 +64,9 @@ public:
     BoxesGroup *getCurrentGroup();
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
+    void applyPaintSettingToSelected(const PaintSetting &setting);
+    void setSelectedFillColorMode(const ColorMode &mode);
+    void setSelectedStrokeColorMode(const ColorMode &mode);
 protected:
     Canvas *mCurrentCanvas = NULL;
     QList<Canvas*> mCanvasList;

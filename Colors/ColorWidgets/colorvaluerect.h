@@ -14,7 +14,8 @@ enum CVR_TYPE
 
     CVR_HSLSATURATION,
     CVR_LIGHTNESS,
-    CVR_ALPHA
+    CVR_ALPHA,
+    CVR_ALL
 };
 
 class ColorValueRect : public ColorWidget
@@ -24,21 +25,22 @@ public:
     ColorValueRect(CVR_TYPE type_t, QWidget *parent = NULL);
     void updateVal();
     GLfloat getVal();
+    void setDisplayedValue(const GLfloat &val_t);
+
 private:
     void paintGL();
     void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *);
-    void wheelEvent(QWheelEvent *e);
+    //void wheelEvent(QWheelEvent *e);
 
     void mouseInteraction(int x_t);
     void setColorParameterFromVal();
-public slots:
-    void setVal(GLfloat val_t, bool emit_signal = false);
-    void setValAndEmitSignal(GLfloat val_t);
+    void setValueAndEmitValueChanged(GLfloat val_t);
 signals:
-    void valChanged(GLfloat);
-    void valUpdated(GLfloat);
+    void valChanged(qreal);
+    void editingFinished(qreal);
+    void editingStarted(qreal);
 private:
     CVR_TYPE type;
     GLfloat val = 0.f;

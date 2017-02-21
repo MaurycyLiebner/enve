@@ -3,16 +3,11 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QPainter>
-
-void updateValExt(ColorWidget *color_widget_t)
-{
-    ( (ColorValueRect*) color_widget_t)->updateVal();
-}
+#include "mainwindow.h"
 
 ColorValueRect::ColorValueRect(CVR_TYPE type_t, QWidget *parent) : ColorWidget(parent)
 {
     type = type_t;
-    setInternalColorChangeFunc(&updateValExt);
 }
 
 void ColorValueRect::paintGL()
@@ -230,6 +225,7 @@ void ColorValueRect::paintGL()
 void ColorValueRect::mouseMoveEvent(QMouseEvent *e)
 {
     mouseInteraction(e->x());
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void ColorValueRect::mousePressEvent(QMouseEvent *e)
@@ -238,124 +234,32 @@ void ColorValueRect::mousePressEvent(QMouseEvent *e)
     {
         return;
     }
+    emit editingStarted(val);
     mouseInteraction(e->x());
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void ColorValueRect::mouseReleaseEvent(QMouseEvent *)
 {
     hsl_saturaton_tmp = -1.f;
+    emit editingFinished(val);
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
-void ColorValueRect::wheelEvent(QWheelEvent *e)
-{
-    if(e->delta() > 0)
-    {
-        setVal(clamp(val + 0.01f, 0.f, 1.f), true);
-    }
-    else
-    {
-        setVal(clamp(val - 0.01f, 0.f, 1.f), true);
-    }
-    setColorParameterFromVal();
-}
+//void ColorValueRect::wheelEvent(QWheelEvent *e)
+//{
+//    if(e->delta() > 0) {
+//        setValueAndEmitValueChanged(clamp(val + 0.01f, 0.f, 1.f));
+//    }
+//    else {
+//        setValueAndEmitValueChanged(clamp(val - 0.01f, 0.f, 1.f));
+//    }
+//    MainWindow::getInstance()->callUpdateSchedulers();
+//}
 
 void ColorValueRect::mouseInteraction(int x_t)
 {
-    setVal(clamp( ((GLfloat)x_t)/width(), 0.f, 1.f), true);
-    setColorParameterFromVal();
-}
-
-void ColorValueRect::setColorParameterFromVal()
-{
-    if(type == CVR_RED)
-    {
-        setR_f(val, true);
-    }
-    else if(type == CVR_GREEN)
-    {
-        setG_f(val, true);
-    }
-    else if(type == CVR_BLUE)
-    {
-        setB_f(val, true);
-    }
-    else if(type == CVR_HUE)
-    {
-        setHue_f(val, true);
-    }
-    else if(type == CVR_HSVSATURATION)
-    {
-        setHSVSaturation_f(val, true);
-    }
-    else if(type == CVR_VALUE)
-    {
-        setValue_f(val, true);
-    }
-    else if(type == CVR_HSLSATURATION)
-    {
-        setHSLSaturation_f(val, true);
-    }
-    else if(type == CVR_LIGHTNESS)
-    {
-        setLightness_f(val, true);
-    }
-}
-
-void ColorValueRect::updateVal()
-{
-    if(type == CVR_RED)
-    {
-        GLfloat r_t = hue;
-        GLfloat g_t = saturation;
-        GLfloat b_t = value;
-        hsv_to_rgb_float(&r_t, &g_t, &b_t);
-        setVal(r_t);
-    }
-    else if(type == CVR_GREEN)
-    {
-        GLfloat r_t = hue;
-        GLfloat g_t = saturation;
-        GLfloat b_t = value;
-        hsv_to_rgb_float(&r_t, &g_t, &b_t);
-        setVal(g_t);
-    }
-    else if(type == CVR_BLUE)
-    {
-        GLfloat r_t = hue;
-        GLfloat g_t = saturation;
-        GLfloat b_t = value;
-        hsv_to_rgb_float(&r_t, &g_t, &b_t);
-        setVal(b_t);
-    }
-    else if(type == CVR_HUE)
-    {
-        setVal(hue);
-    }
-    else if(type == CVR_HSVSATURATION)
-    {
-        setVal(saturation);
-    }
-    else if(type == CVR_VALUE)
-    {
-        setVal(value);
-    }
-    else if(type == CVR_HSLSATURATION)
-    {
-        GLfloat hue_t = hue;
-        GLfloat saturation_t = saturation;
-        GLfloat lightness_t = value;
-        hsv_to_hsl(&hue_t, &saturation_t, &lightness_t);
-        setVal(saturation_t);
-    }
-    else if(type == CVR_LIGHTNESS)
-    {
-        GLfloat hue_t = hue;
-        GLfloat saturation_t = saturation;
-        GLfloat lightness_t = value;
-        hsv_to_hsl(&hue_t, &saturation_t, &lightness_t);
-        setVal(lightness_t);
-    }
-    emit valUpdated(val);
+    setValueAndEmitValueChanged(clamp( ((GLfloat)x_t)/width(), 0.f, 1.f));
 }
 
 GLfloat ColorValueRect::getVal()
@@ -363,19 +267,13 @@ GLfloat ColorValueRect::getVal()
     return val;
 }
 
-void ColorValueRect::setVal(GLfloat val_t, bool emit_signal)
-{
+void ColorValueRect::setDisplayedValue(const GLfloat &val_t) {
     val = val_t;
     update();
-    if(emit_signal)
-    {
-        emit valChanged(val);
-    }
 }
 
-void ColorValueRect::setValAndEmitSignal(GLfloat val_t)
+void ColorValueRect::setValueAndEmitValueChanged(GLfloat val_t)
 {
-    setVal(val_t);
-    setColorParameterFromVal();
-    emit colorChangedHSV(hue, saturation, value);
+    setDisplayedValue(val_t);
+    emit valChanged(val);
 }

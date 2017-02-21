@@ -197,7 +197,6 @@ void H_Wheel_SV_Triangle::wheelEvent(QWheelEvent *e)
             hue += 1;
         }
     }
-    emitColorChangedSignal();
     //drawTriangle();
     update();
 }
@@ -207,7 +206,6 @@ void H_Wheel_SV_Triangle::wheelInteraction(int x_t, int y_t)
     double radial_x = x_t - wheel_dim*0.5;
     double radial_y = y_t - wheel_dim*0.5;
     hue = getAngleF(1, 0, -radial_x, radial_y);
-    emitColorChangedSignal();
     //drawTriangle();
     update();
 }
@@ -231,7 +229,6 @@ void H_Wheel_SV_Triangle::triangleInteraction(int x_t, int y_t)
 
     saturation = clamp( (tr_x_t - row_x_0)/row_width_t , 0.f, 1.f);
     value = clamp(tr_y_t/(inner_circle_r*1.5f), 0.f, 1.f);
-    emitColorChangedSignal();
 
     update();
 }

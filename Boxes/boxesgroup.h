@@ -142,6 +142,24 @@ public:
 
     void makeDuplicate(BoundingBox *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
+
+    void applyPaintSetting(
+            const PaintSetting &setting) {
+        foreach(BoundingBox *box, mChildBoxes) {
+            box->applyPaintSetting(setting);
+        }
+    }
+
+    void setFillColorMode(const ColorMode &colorMode) {
+        foreach(BoundingBox *box, mChildBoxes) {
+            box->setFillColorMode(colorMode);
+        }
+    }
+    void setStrokeColorMode(const ColorMode &colorMode) {
+        foreach(BoundingBox *box, mChildBoxes) {
+            box->setStrokeColorMode(colorMode);
+        }
+    }
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

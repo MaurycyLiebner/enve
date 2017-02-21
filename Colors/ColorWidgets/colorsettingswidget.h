@@ -10,8 +10,52 @@
 #include <QLabel>
 #include "colorvaluespin.h"
 #include <QPushButton>
+#include <QComboBox>
+#include "qrealanimatorvalueslider.h"
+#include "Animators/coloranimator.h"
 
-class ColorAnimator;
+enum ColorSettingType : short {
+    CST_START,
+    CST_CHANGE,
+    CST_FINISH
+};
+
+class ColorSetting {
+public:
+    ColorSetting() {}
+    ColorSetting(
+            const ColorMode &settingModeT,
+            const CVR_TYPE &changedValueT,
+            const qreal &val1T,
+            const qreal &val2T,
+            const qreal &val3T,
+            const qreal &alphaT,
+            const ColorSettingType &typeT,
+            ColorAnimator *excludeT = NULL);
+    void apply(ColorAnimator *target) const;
+
+    const ColorSettingType &getType() const { return mType; }
+    const ColorMode &getSettingMode() const { return mSettingMode; }
+    const CVR_TYPE &getChangedValue() const { return mChangedValue; }
+    const qreal &getVal1() const { return mVal1; }
+    const qreal &getVal2() const { return mVal2; }
+    const qreal &getVal3() const { return mVal3; }
+    const qreal &getAlpa() const { return mAlpha; }
+private:
+    void finishColorTransform(ColorAnimator *target) const;
+
+    void changeColor(ColorAnimator *target) const;
+
+    void startColorTransform(ColorAnimator *target) const;
+    ColorSettingType mType = CST_FINISH;
+    ColorMode mSettingMode = RGBMODE;
+    CVR_TYPE mChangedValue = CVR_ALL;
+    qreal mVal1 = 1.;
+    qreal mVal2 = 1.;
+    qreal mVal3 = 1.;
+    qreal mAlpha = 1.;
+    ColorAnimator *mExclude = NULL;
+};
 
 class ColorSettingsWidget : public QWidget
 {
@@ -22,76 +66,120 @@ public:
 
     void setCurrentColor(Color color);
 signals:
-    void colorChangedHSVSignal(GLfloat, GLfloat, GLfloat, GLfloat);
+    void colorSettingSignal(const ColorSetting&);
+    void colorModeChanged(const ColorMode&);
 public slots:
     void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
-    void colorChangedHSVSlot(GLfloat h_t, GLfloat s_t, GLfloat v_t);
     void setColorAnimatorTarget(ColorAnimator *target);
-private slots:
-    void alphaChanged(GLfloat a_t);
+    void emitColorChangedSignal();
+    void emitEditingFinishedSignal();
+    void emitEditingStartedSignal();
 
+    void emitEditingStartedRed();
+    void emitEditingStartedGreen();
+    void emitEditingStartedBlue();
+
+    void emitEditingStartedHue();
+    void emitEditingStartedHSVSaturation();
+    void emitEditingStartedValue();
+
+    void emitEditingStartedHSLSaturation();
+    void emitEditingStartedLightness();
+
+    void emitEditingStartedAlpha();
+
+    void emitFullColorChangedSignal();
+private slots:
     void moveAlphaWidgetToTab(int tabId);
 
     void startColorPicking();
+
+    void setAlphaFromSpin(const qreal &val);
+
+    void updateValuesFromRGB();
+    void updateValuesFromHSV();
+    void updateValuesFromHSL();
+    void setValuesFromRGB();
+    void setValuesFromHSV();
+    void setValuesFromHSL();
+    void updateAlphaFromSpin();
+
+    void setColorMode(const int &colorMode);
+    void refreshColorAnimatorTarget();
+    void nullifyAnimator();
 private:
     void connectSignalsAndSlots();
+
+    CVR_TYPE mLastTriggeredCVR;
+
+    ColorAnimator *mTargetAnimator = NULL;
+
+    QHBoxLayout *mColorModeLayout = new QHBoxLayout();
+    QLabel *mColorModeLabel = new QLabel("Color model:", this);
+    QComboBox *mColorModeCombo = new QComboBox(this);
 
     QTabWidget *mTabWidget = new QTabWidget();
     QVBoxLayout *mWidgetsLayout = new QVBoxLayout();
 
-    QWidget *mWheelWidget = new QWidget();
-    QVBoxLayout *mWheelLayout = new QVBoxLayout();
-    H_Wheel_SV_Triangle *wheel_triangle_widget = NULL;
+//    QWidget *mWheelWidget = new QWidget();
+//    QVBoxLayout *mWheelLayout = new QVBoxLayout();
+//    H_Wheel_SV_Triangle *wheel_triangle_widget = NULL;
 
     QWidget *mRGBWidget = new QWidget();
     QVBoxLayout *mRGBLayout = new QVBoxLayout();
     QHBoxLayout *rLayout = new QHBoxLayout();
     QLabel *rLabel = new QLabel("R:");
     ColorValueRect *r_rect = NULL;
-    ColorValueSpin *rSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *rSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *gLayout = new QHBoxLayout();
     QLabel *gLabel = new QLabel("G:");
     ColorValueRect *g_rect = NULL;
-    ColorValueSpin *gSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *gSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *bLayout = new QHBoxLayout();
     QLabel *bLabel = new QLabel("B:");
     ColorValueRect *b_rect = NULL;
-    ColorValueSpin *bSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *bSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
     QWidget *mHSVWidget = new QWidget();
     QVBoxLayout *mHSVLayout = new QVBoxLayout();
     QHBoxLayout *hLayout = new QHBoxLayout();
     QLabel *hLabel = new QLabel("H:");
     ColorValueRect *h_rect = NULL;
-    ColorValueSpin *hSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *hSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *hsvSLayout = new QHBoxLayout();
     QLabel *hsvSLabel = new QLabel("S:");
     ColorValueRect *hsv_s_rect = NULL;
-    ColorValueSpin *hsvSSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *hsvSSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *vLayout = new QHBoxLayout();
     QLabel *vLabel = new QLabel("V:");
     ColorValueRect *v_rect = NULL;
-    ColorValueSpin *vSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *vSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
     QWidget *mHSLWidget = new QWidget();
     QVBoxLayout *mHSLLayout = new QVBoxLayout();
-    QHBoxLayout *hslHLayout = new QHBoxLayout();
-    QLabel *hslHLabel = new QLabel("H:");
-    ColorValueRect *hsl_h_rect = NULL;
-    ColorValueSpin *hslHSpin = new ColorValueSpin(this);
+
     QHBoxLayout *hslSLayout = new QHBoxLayout();
     QLabel *hslSLabel = new QLabel("S:");
     ColorValueRect *hsl_s_rect = NULL;
-    ColorValueSpin *hslSSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *hslSSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
     QHBoxLayout *lLayout = new QHBoxLayout();
     QLabel *lLabel = new QLabel("L:");
     ColorValueRect *l_rect = NULL;
-    ColorValueSpin *lSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *lSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
     QHBoxLayout *aLayout = new QHBoxLayout();
     QLabel *aLabel = new QLabel("A:");
     ColorValueRect *a_rect = NULL;
-    ColorValueSpin *aSpin = new ColorValueSpin(this);
+    QrealAnimatorValueSlider *aSpin =
+            new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
     QHBoxLayout *mColorLabelLayout = new QHBoxLayout();
     QPushButton *mPickingButton;
@@ -101,6 +189,13 @@ private:
                                         ColorWidget *signal_src, const char *signal);
     void connectColorWidgetSignalToSlots(ColorWidget *signal_src,
                                          const char *signal, const char *slot );
+    void connectColorWidgetSignalToSlotsWithoutThis(ColorWidget *signal_src,
+                                                    const char *signal,
+                                                    const char *slot);
+    void setRectValuesAndColor(
+            const qreal &red, const qreal &green, const qreal &blue,
+            const qreal &hue, const qreal &hsvSaturation, const qreal &value,
+            const qreal &hslSaturation, const qreal &lightness);
 };
 
 #endif // COLORSETTINGSWIDGET_H

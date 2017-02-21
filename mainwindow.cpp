@@ -715,6 +715,7 @@ void MainWindow::callUpdateSchedulers()
     mKeysView->repaint();
     updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
+    emit updateAll();
 
     mCurrentUndoRedoStack->startNewSet();
 }

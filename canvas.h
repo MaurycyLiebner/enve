@@ -458,6 +458,9 @@ public:
     void clearLastPressedPoint();
     void clearCurrentEndPoint();
     void clearHoveredEdge();
+    void applyPaintSettingToSelected(const PaintSetting &setting);
+    void setSelectedFillColorMode(const ColorMode &mode);
+    void setSelectedStrokeColorMode(const ColorMode &mode);
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

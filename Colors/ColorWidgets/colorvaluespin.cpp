@@ -9,6 +9,8 @@ ColorValueSpin::ColorValueSpin(QWidget *parent)
     //spin_box->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     connect(mSpinBox, SIGNAL(valueChanged(double) ),
             this, SLOT(spinBoxValSet(double)) );
+    connect(mSpinBox, SIGNAL(displayedValueChanged(qreal)),
+            this, SLOT(spinBoxDisplayedValueChanged(qreal)));
 }
 
 ColorValueSpin::~ColorValueSpin()
@@ -21,21 +23,27 @@ QrealAnimatorValueSlider *ColorValueSpin::getSpinBox()
     return mSpinBox;
 }
 
-void ColorValueSpin::setVal(GLfloat val_t) {
+void ColorValueSpin::setDisplayedValue(GLfloat val_t) {
     if(mBlockValue/* || mSpinBox->hasTargetAnimator()*/) return;
-    mEmit = false;
+    //mEmit = false;
 //    mSpinBox->setValue(
 //                qRound(val_t*(mSpinBox->maximum() - mSpinBox->minimum()) +
 //                       mSpinBox->minimum()) );
-    mSpinBox->setValue(val_t);
-    mEmit = true;
+    mSpinBox->setDisplayedValue(val_t);
+    //mEmit = true;
+}
+
+void ColorValueSpin::setValueExternal(const GLfloat &val) {
+    mSpinBox->setValueExternal(val);
+}
+
+void ColorValueSpin::spinBoxDisplayedValueChanged(const qreal &val) {
+    emit displayedValueChanged(val);
 }
 
 void ColorValueSpin::spinBoxValSet(double spin_box_val_t)
 {
-    if(mEmit) {
-        mBlockValue = true;
-        emit valSet( ( (GLfloat)spin_box_val_t)/*/mSpinBox->maximum()*/ );
-        mBlockValue = false;
-    }
+    mBlockValue = true;
+    emit valSet( ( (GLfloat)spin_box_val_t)/*/mSpinBox->maximum()*/ );
+    mBlockValue = false;
 }
