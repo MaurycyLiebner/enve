@@ -53,9 +53,11 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *e);
 signals:
 
-public slots:
+private slots:
     void switchContentVisibleAction();
     void switchRecordingAction();
+    void switchBoxLockedAction();
+
     void switchBoxVisibleAction();
     void openColorSettingsDialog();
 private:

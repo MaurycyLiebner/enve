@@ -198,6 +198,40 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                         box,
                         boxUnderMouse);
         }
+    } else if(event->mimeData()->hasFormat("pixmapeffect")) {
+        int yPos = event->pos().y();
+        bool below;
+        BoxSingleWidget *singleWidgetUnderMouse =
+                getClosestsSingleWidgetWithTargetType(SWT_PixmapEffect,
+                                                      yPos,
+                                                      &below);
+        if(singleWidgetUnderMouse == NULL) return;
+
+        PixmapEffect *effect = ((PixmapEffectMimeData*)event->mimeData())->
+                getPixmapEffect();
+        PixmapEffect *effectUnderMouse =
+                ((PixmapEffect*)singleWidgetUnderMouse->
+                 getTargetAbstraction()->getTarget());
+
+        EffectAnimators *underMouseAnimator = (EffectAnimators*)
+                                 effectUnderMouse->getParentAnimator();
+        EffectAnimators *draggedAnimator = (EffectAnimators*)
+                                 effect->getParentAnimator();
+        if(draggedAnimator != underMouseAnimator) {
+            effect->incNumberPointers();
+            draggedAnimator->getParentBox()->removeEffect(effect);
+            underMouseAnimator->getParentBox()->addEffect(effect);
+            effect->decNumberPointers();
+        }
+        if(below) { // add box below
+            underMouseAnimator->moveChildAbove( // boxesgroup list is reversed
+                        effect,
+                        effectUnderMouse);
+        } else { // add box above
+            underMouseAnimator->moveChildBelow(
+                        effect,
+                        effectUnderMouse);
+        }
     }
     mDragging = false;
     scheduledUpdateVisibleWidgetsContent();
@@ -212,7 +246,8 @@ void BoxScrollWidgetVisiblePart::dragEnterEvent(
         QDragEnterEvent *event)
 {
     //mDragging = true;
-    if(event->mimeData()->hasFormat("boundingbox")) {
+    if(event->mimeData()->hasFormat("boundingbox") ||
+       event->mimeData()->hasFormat("pixmapeffect")) {
         event->acceptProposedAction();
     }
 }
@@ -256,6 +291,8 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(
     mLastDragMoveY = yPos;
     if(event->mimeData()->hasFormat("boundingbox")) {
         mLastDragMoveTargetType = SWT_BoundingBox;
+    } else if(event->mimeData()->hasFormat("pixmapeffect")) {
+        mLastDragMoveTargetType = SWT_PixmapEffect;
     }
 
     updateDraggingHighlight();

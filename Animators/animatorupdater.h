@@ -121,4 +121,18 @@ private:
     ParticleEmitter *mTarget;
 };
 
+class GradientPointsUpdater : public AnimatorUpdater {
+public:
+    GradientPointsUpdater(const bool &isFill, PathBox *target) :
+        AnimatorUpdater() {
+        mTarget = target;
+        mIsFill = isFill;
+    }
+
+    void update();
+
+private:
+    PathBox *mTarget;
+    bool mIsFill;
+};
 #endif // ANIMATORUPDATER_H

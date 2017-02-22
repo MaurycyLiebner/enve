@@ -58,6 +58,47 @@ void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
     emit childAnimatorAdded(childAnimator);
 
     SWT_addChildAbstractionForTargetToAll(childAnimator);
+
+    callUpdater();
+}
+
+void ComplexAnimator::moveChildAbove(QrealAnimator *move,
+                                     QrealAnimator *above) {
+    int indexFrom = mChildAnimators.indexOf(move);
+    int indexTo = mChildAnimators.indexOf(above);
+    if(indexFrom > indexTo) {
+        indexTo++;
+    }
+    moveChildInList(move,
+                    indexFrom,
+                    indexTo);
+}
+
+void ComplexAnimator::moveChildBelow(QrealAnimator *move,
+                                     QrealAnimator *below) {
+    int indexFrom = mChildAnimators.indexOf(move);
+    int indexTo = mChildAnimators.indexOf(below);
+    if(indexFrom < indexTo) {
+        indexTo--;
+    }
+    moveChildInList(move,
+                    indexFrom,
+                    indexTo);
+}
+
+void ComplexAnimator::moveChildInList(
+                                 QrealAnimator *child,
+                                 int from, int to,
+                                 bool saveUndoRedo) {
+    mChildAnimators.move(from, to);
+    SWT_moveChildAbstractionForTargetToInAll(child,
+                                             to);
+    if(saveUndoRedo) {
+        addUndoRedo(new MoveChildAnimatorInListUndoRedo(
+                        child, from, to, this) );
+    }
+
+    callUpdater();
 }
 
 void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
@@ -73,6 +114,8 @@ void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
     emit childAnimatorRemoved(removeAnimator);
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator);
+
+    callUpdater();
 }
 
 void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,
@@ -80,6 +123,8 @@ void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,
     int id1 = mChildAnimators.indexOf(animator1);
     int id2 = mChildAnimators.indexOf(animator2);
     mChildAnimators.swap(id1, id2);
+
+    callUpdater();
 }
 
 void ComplexAnimator::clearFromGraphView()

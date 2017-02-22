@@ -27,6 +27,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
 
     mEffectsAnimators.blockPointer();
     mEffectsAnimators.setName("effects");
+    mEffectsAnimators.setParentBox(this);
     mEffectsAnimators.setUpdater(new PixmapEffectUpdater(this));
 
     addActiveAnimator(&mTransformAnimator);
@@ -923,7 +924,7 @@ void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
 }
 
 void BoundingBox::addEffect(PixmapEffect *effect) {
-    effect->setUpdater(new PixmapEffectUpdater(this));
+    //effect->setUpdater(new PixmapEffectUpdater(this));
     effect->incNumberPointers();
 
     if(!mEffectsAnimators.hasChildAnimators()) {
@@ -937,8 +938,6 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
-
-    removeActiveAnimator(effect);
     mEffectsAnimators.removeChildAnimator(effect);
     if(!mEffectsAnimators.hasChildAnimators()) {
         mAnimatorsCollection.removeAnimator(&mEffectsAnimators);
@@ -1007,6 +1006,10 @@ void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
 
 void BoundingBox::switchVisible() {
     setVisibile(!mVisible);
+}
+
+void BoundingBox::switchLocked() {
+    setLocked(!mLocked);
 }
 
 void BoundingBox::hide()

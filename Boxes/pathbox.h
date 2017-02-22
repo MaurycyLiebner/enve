@@ -27,115 +27,6 @@ public:
                      getPixBoundingRect().bottomRight(), finish);
     }
 
-    void changeFillGradient(bool wasGradient, bool isGradient, bool finish) {
-        if(wasGradient) {
-            mFillPaintSettings.getGradient()->removePath(this);
-        } else if(isGradient) {
-            resetFillGradientPointsPos(finish);
-        }
-    }
-
-    void changeStrokeGradient(bool wasGradient, bool isGradient, bool finish) {
-        if(wasGradient) {
-            mStrokeSettings.getGradient()->removePath(this);
-        } else if(isGradient) {
-            resetStrokeGradientPointsPos(finish);
-        }
-    }
-
-    virtual void setFillGradient(Gradient* gradient, bool finish) {
-        if(mFillPaintSettings.getPaintType() != GRADIENTPAINT) {
-            setFillPaintType(GRADIENTPAINT,
-                              mFillPaintSettings.getCurrentColor(),
-                              gradient);
-        } else {
-            changeFillGradient(mFillPaintSettings.getPaintType() == GRADIENTPAINT,
-                                 true, finish);
-
-            mFillPaintSettings.setGradient(gradient);
-            updateDrawGradients();
-        }
-        scheduleAwaitUpdate();
-    }
-
-    virtual void setStrokeGradient(Gradient* gradient, bool finish) {
-        if(mStrokeSettings.getPaintType() != GRADIENTPAINT) {
-            setStrokePaintType(GRADIENTPAINT,
-                               mStrokeSettings.getCurrentColor(),
-                               gradient);
-        } else {
-            changeStrokeGradient(mStrokeSettings.getPaintType() == GRADIENTPAINT,
-                                 true, finish);
-
-            mStrokeSettings.setGradient(gradient);
-            updateDrawGradients();
-        }
-        scheduleAwaitUpdate();
-    }
-
-    virtual void setFillFlatColor(Color color, bool finish) {
-        if(mFillPaintSettings.getPaintType() != FLATPAINT) {
-            setFillPaintType(FLATPAINT, color, NULL);
-        } else {
-            mFillPaintSettings.setCurrentColor(color);
-            if(finish) {
-                mFillPaintSettings.getColorAnimator()->finishTransform();
-            }
-        }
-
-        scheduleAwaitUpdate();
-    }
-
-    virtual void setStrokeFlatColor(Color color, bool finish) {
-        if(mStrokeSettings.getPaintType() != FLATPAINT) {
-            setStrokePaintType(FLATPAINT, color, NULL);
-        } else {
-            mStrokeSettings.setCurrentColor(color);
-            if(finish) {
-                mStrokeSettings.getColorAnimator()->finishTransform();
-            }
-        }
-
-        scheduleAwaitUpdate();
-    }
-
-    virtual void setFillPaintType(PaintType paintType, Color color,
-                                  Gradient* gradient) {
-        changeFillGradient(mFillPaintSettings.getPaintType() == GRADIENTPAINT,
-                           paintType == GRADIENTPAINT, true);
-        if(paintType == GRADIENTPAINT) {
-            mFillPaintSettings.setGradient(gradient);
-        } else if(paintType == FLATPAINT) {
-            mFillPaintSettings.setCurrentColor(color);
-        }
-        mFillPaintSettings.setPaintType(paintType);
-
-        updateDrawGradients();
-
-        scheduleAwaitUpdate();
-    }
-
-    virtual void setStrokePaintType(PaintType paintType, Color color,
-                                    Gradient* gradient) {
-        if(mStrokeSettings.getPaintType() == NOPAINT ||
-           paintType == NOPAINT) {
-            scheduleOutlinePathUpdate();
-        }
-        changeStrokeGradient(mStrokeSettings.getPaintType() == GRADIENTPAINT,
-                           paintType == GRADIENTPAINT, true);
-        if(paintType == GRADIENTPAINT) {
-            mStrokeSettings.setGradient(gradient);
-        } else if(paintType == FLATPAINT) {
-            mStrokeSettings.setCurrentColor(color);
-        }
-        mStrokeSettings.setPaintType(paintType);
-
-        updateDrawGradients();
-
-
-        scheduleAwaitUpdate();
-    }
-
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
         mStrokeSettings.setCapStyle(capStyle);
         scheduleOutlinePathUpdate();
@@ -218,6 +109,7 @@ public:
     void applyPaintSetting(
             const PaintSetting &setting) {
         setting.apply(this);
+        scheduleAwaitUpdate();
     }
 
     void setFillColorMode(const ColorMode &colorMode) {
@@ -226,6 +118,8 @@ public:
     void setStrokeColorMode(const ColorMode &colorMode) {
         mFillPaintSettings.getColorAnimator()->setColorMode(colorMode);
     }
+    void updateStrokeDrawGradient();
+    void updateFillDrawGradient();
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;

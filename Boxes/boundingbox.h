@@ -391,6 +391,7 @@ public:
     virtual void setStrokeColorMode(const ColorMode &colorMode) {
         Q_UNUSED(colorMode);
     }
+    void switchLocked();
 protected:
     bool mUpdateDisabled = false;
 

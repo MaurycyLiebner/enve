@@ -38,6 +38,10 @@ void EffectAnimators::loadFromSql(int boundingBoxSqlId,
     }
 }
 
+void EffectAnimators::setParentBox(BoundingBox *box) {
+    mParentBox = box;
+}
+
 void EffectAnimators::applyEffects(BoundingBox *target,
                                    QImage *imgPtr,
                                    const fmt_filters::image &img,

@@ -5,6 +5,9 @@
 PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
     BoundingBox(parent, type)
 {
+    mFillPaintSettings.setTargetPathBox(this);
+    mStrokeSettings.setTargetPathBox(this);
+
     addActiveAnimator(&mFillPaintSettings);
     addActiveAnimator(&mStrokeSettings);
     mAnimatorsCollection.addAnimator(&mFillPaintSettings);
@@ -17,6 +20,11 @@ PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
     mFillGradientPoints.blockPointer();
     mStrokeGradientPoints.initialize(this);
     mStrokeGradientPoints.blockPointer();
+
+    mFillGradientPoints.setUpdater(new GradientPointsUpdater(true, this));
+    mFillGradientPoints.blockUpdater();
+    mStrokeGradientPoints.setUpdater(new GradientPointsUpdater(false, this));
+    mStrokeGradientPoints.blockUpdater();
 
     mFillPaintSettings.setGradientPoints(&mFillGradientPoints);
     mStrokeSettings.setGradientPoints(&mStrokeGradientPoints);
@@ -219,8 +227,7 @@ void PathBox::updateWholePath() {
     updateBoundingRect();
 }
 
-void PathBox::updateDrawGradients()
-{
+void PathBox::updateFillDrawGradient() {
     if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
         Gradient *gradient = mFillPaintSettings.getGradient();
         if(!gradient->isInPaths(this)) {
@@ -239,6 +246,9 @@ void PathBox::updateDrawGradients()
     } else if(mFillGradientPoints.enabled) {
         mFillGradientPoints.disable();
     }
+}
+
+void PathBox::updateStrokeDrawGradient() {
     if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
         Gradient *gradient = mStrokeSettings.getGradient();
         if(!gradient->isInPaths(this)) {
@@ -256,6 +266,11 @@ void PathBox::updateDrawGradients()
     } else if(mStrokeGradientPoints.enabled) {
         mStrokeGradientPoints.disable();
     }
+}
+
+void PathBox::updateDrawGradients() {
+    updateFillDrawGradient();
+    updateStrokeDrawGradient();
 }
 
 void PathBox::updateBoundingRect() {

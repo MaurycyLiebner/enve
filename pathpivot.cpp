@@ -187,7 +187,7 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
             scaleX = 1.;
             scaleY = scaleBy;
         } else {
-            if(isShiftPressed() || inputTransformationEnabled) {
+            if(isShiftPressed() || inputTransformationEnabled || true) { // always
                 scaleX = scaleBy;
                 scaleY = scaleBy;
             } else {

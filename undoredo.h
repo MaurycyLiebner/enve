@@ -415,6 +415,40 @@ private:
     int mToIndex;
 };
 
+class MoveChildAnimatorInListUndoRedo : public UndoRedo
+{
+public:
+    MoveChildAnimatorInListUndoRedo(QrealAnimator *child,
+                            int fromIndex,
+                            int toIndex,
+                            ComplexAnimator *parentAnimator) : UndoRedo("MoveChildInListUndoRedo") {
+        mParentAnimator = parentAnimator;
+        mParentAnimator->incNumberPointers();
+        mFromIndex = fromIndex;
+        mToIndex = toIndex;
+        mChild = child;
+        mChild->incNumberPointers();
+    }
+
+    ~MoveChildAnimatorInListUndoRedo() {
+        mParentAnimator->decNumberPointers();
+        mChild->decNumberPointers();
+    }
+
+    void redo() {
+        mParentAnimator->moveChildInList(mChild, mFromIndex, mToIndex, false);
+    }
+
+    void undo() {
+        mParentAnimator->moveChildInList(mChild, mToIndex, mFromIndex, false);
+    }
+private:
+    ComplexAnimator *mParentAnimator;
+    QrealAnimator *mChild;
+    int mFromIndex;
+    int mToIndex;
+};
+
 class SetBoundingBoxZListIndexUnoRedo : public UndoRedo
 {
 public:

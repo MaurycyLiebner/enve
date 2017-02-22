@@ -704,7 +704,7 @@ void FillStrokeSettingsWidget::colorTypeSet(int id)
             mCanvasWidget->applyPaintSettingToSelected(paintSetting);
         } else if(mCurrentFillPaintType == GRADIENTPAINT) {
             PaintSetting paintSetting =
-                    PaintSetting(true, mCurrentStrokeGradient);
+                    PaintSetting(true, mCurrentFillGradient);
             mCanvasWidget->applyPaintSettingToSelected(paintSetting);
         } else{
             PaintSetting paintSetting =
@@ -726,6 +726,8 @@ void FillStrokeSettingsWidget::colorTypeSet(int id)
             mCanvasWidget->applyPaintSettingToSelected(paintSetting);
         }
     }
+
+    mMainWindow->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::colorSettingReceived(
@@ -909,7 +911,7 @@ void FillStrokeSettingsWidget::setGradient(Gradient *gradient)
     setCurrentGradientVal(gradient);
     if(mTargetId == 0) {
         PaintSetting paintSetting =
-                PaintSetting(true, mCurrentStrokeGradient);
+                PaintSetting(true, mCurrentFillGradient);
         mCanvasWidget->applyPaintSettingToSelected(paintSetting);
     } else {
         PaintSetting paintSetting =
@@ -1032,10 +1034,25 @@ void PaintSetting::apply(PathBox *box) const {
     } else {
         fillSettings = box->getStrokeSettings();
     }
+    bool paintTypeChanged = fillSettings->getPaintType() != mPaintType;
     fillSettings->setPaintType(mPaintType);
     if(mPaintType == FLATPAINT) {
         mColorSetting.apply(fillSettings->getColorAnimator());
     } else if(mPaintType == GRADIENTPAINT) {
         fillSettings->setGradient(mGradient);
+        if(mTargetFillSettings) {
+            box->resetFillGradientPointsPos(true);
+        } else {
+            box->resetStrokeGradientPointsPos(true);
+        }
+
+        //box->updateDrawGradients();
+    }
+    if(paintTypeChanged) {
+        if(mTargetFillSettings) {
+            box->updateFillDrawGradient();
+        } else {
+            box->updateStrokeDrawGradient();
+        }
     }
 }

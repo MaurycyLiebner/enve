@@ -9,6 +9,7 @@ class ScrollWidgetVisiblePart;
 enum SWT_Type : short {
     SWT_BoundingBox,
     SWT_BoxesGroup,
+    SWT_PixmapEffect,
     SWT_QrealAnimator,
     SWT_ComplexAnimator,
     SWT_ColorAnimator,

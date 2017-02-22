@@ -21,6 +21,13 @@ public:
 
     void saveToSql(QSqlQuery *query, int boundingBoxSqlId);
     void loadFromSql(int boundingBoxSqlId, BoundingBox *box);
+    void setParentBox(BoundingBox *box);
+    BoundingBox *getParentBox() {
+        return mParentBox;
+    }
+
+private:
+    BoundingBox *mParentBox;
 };
 
 #endif // EFFECTANIMATORS_H

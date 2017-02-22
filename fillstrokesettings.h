@@ -158,11 +158,13 @@ public:
         if(mPaintType == GRADIENTPAINT && mGradient != NULL) {
             removeChildAnimator(mGradient);
             removeChildAnimator((QrealAnimator*) mGradientPoints);
+            mGradient->removePath(mTarget);
         }
         mGradient = gradient;
         if(mPaintType == GRADIENTPAINT && mGradient != NULL) {
             addChildAnimator(mGradient);
             addChildAnimator((QrealAnimator*) mGradientPoints);
+            mGradient->addPath(mTarget);
         }
     }
 
@@ -172,12 +174,8 @@ public:
 
     void setPaintType(PaintType paintType) {
         if(mPaintType == GRADIENTPAINT && paintType != GRADIENTPAINT) {
-            removeChildAnimator(mGradient);
-            removeChildAnimator((QrealAnimator*) mGradientPoints);
-        }/* else if(paintType == GRADIENTPAINT && mPaintType != GRADIENTPAINT) {
-            addChildAnimator(mGradient);
-            addChildAnimator((QrealAnimator*) mGradientPoints);
-        }*/
+            setGradient(NULL);
+        }
         if(mPaintType == FLATPAINT && paintType != FLATPAINT) {
             removeChildAnimator(&mColor);
         } else if(paintType == FLATPAINT && mPaintType != FLATPAINT) {
@@ -208,7 +206,12 @@ public:
         source->makeDuplicate(&mColor);
     }
 
+    void setTargetPathBox(PathBox *target) {
+        mTarget = target;
+    }
+
 private:
+    PathBox *mTarget;
     GradientPoints *mGradientPoints = NULL;
     ColorAnimator mColor;
     PaintType mPaintType = FLATPAINT;

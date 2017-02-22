@@ -57,6 +57,11 @@ public:
     void drawKey(QPainter *p, QrealKey *key,
                  const qreal &pixelsPerFrame,
                  const qreal &drawY, const int &startFrame);
+    void moveChildInList(QrealAnimator *child,
+                         int from, int to,
+                         bool saveUndoRedo = true);
+    void moveChildBelow(QrealAnimator *move, QrealAnimator *below);
+    void moveChildAbove(QrealAnimator *move, QrealAnimator *above);
 protected:
     bool mChildAnimatorRecording = false;
     QList<QrealAnimator*> mChildAnimators;

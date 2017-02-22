@@ -161,10 +161,6 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
         return;
     }
 
-    qreal crF = mVal1Animator.getCurrentValue();
-    qreal cgF = mVal2Animator.getCurrentValue();
-    qreal cbF = mVal3Animator.getCurrentValue();
-
     foreach(QrealKey *key, mKeys) {
         int frame = key->getFrame();
 
@@ -179,23 +175,25 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
         mVal3Animator.saveValueToKey(frame, bF);
     }
 
-    foo(&crF, &cgF, &cbF);
-
-    mVal1Animator.setCurrentValue(crF);
-    mVal2Animator.setCurrentValue(cgF);
-    mVal3Animator.setCurrentValue(cbF);
-
     if(!mKeys.isEmpty()) {
         mVal1Animator.setRecordingWithoutChangingKeys(true);
         mVal2Animator.setRecordingWithoutChangingKeys(true);
         mVal3Animator.setRecordingWithoutChangingKeys(true);
+    } else {
+        qreal crF = mVal1Animator.getCurrentValue();
+        qreal cgF = mVal2Animator.getCurrentValue();
+        qreal cbF = mVal3Animator.getCurrentValue();
+
+        foo(&crF, &cgF, &cbF);
+
+        mVal1Animator.setCurrentValue(crF);
+        mVal2Animator.setCurrentValue(cgF);
+        mVal3Animator.setCurrentValue(cbF);
     }
 
     mColorMode = colorMode;
 
     emit colorModeChanged(mColorMode);
-
-    callUpdater();
 }
 
 void ColorAnimator::startVal1Transform()

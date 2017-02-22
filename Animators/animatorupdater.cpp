@@ -92,3 +92,12 @@ ParticlesUpdater::ParticlesUpdater(ParticleEmitter *target) {
 void ParticlesUpdater::update() {
     mTarget->scheduleGenerateParticles();
 }
+
+void GradientPointsUpdater::update() {
+    if(mIsFill) {
+        mTarget->updateFillDrawGradient();
+    } else {
+        mTarget->updateStrokeDrawGradient();
+    }
+    mTarget->scheduleAwaitUpdate();
+}

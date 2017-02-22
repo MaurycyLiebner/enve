@@ -3,6 +3,28 @@
 #include "fmt_filters.h"
 #include "Animators/coloranimator.h"
 #include "Animators/qpointfanimator.h"
+#include <QObject>
+
+class PixmapEffect;
+
+class PixmapEffectMimeData : public QMimeData {
+    Q_OBJECT
+public:
+    PixmapEffectMimeData(PixmapEffect *target) : QMimeData() {
+        mPixmapEffect = target;
+    }
+
+    PixmapEffect *getPixmapEffect() {
+        return mPixmapEffect;
+    }
+
+    bool hasFormat(const QString &mimetype) const {
+        if(mimetype == "pixmapeffect") return true;
+        return false;
+    }
+private:
+    PixmapEffect *mPixmapEffect;
+};
 
 enum PixmapEffectType {
     EFFECT_BLUR,
@@ -13,6 +35,7 @@ enum PixmapEffectType {
 
 class PixmapEffect : public ComplexAnimator
 {
+    Q_OBJECT
 public:
     PixmapEffect();
     virtual void apply(BoundingBox *,
@@ -43,6 +66,13 @@ public:
 
     friend QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr);
     friend QDataStream & operator >> (QDataStream & s, PixmapEffect *& ptr);
+
+    virtual QMimeData *SWT_createMimeData() {
+        return new PixmapEffectMimeData(this);
+    }
+
+    SWT_Type SWT_getType() { return SWT_PixmapEffect; }
+
 public slots:
     void interrupt() {
         mInterrupted = true;

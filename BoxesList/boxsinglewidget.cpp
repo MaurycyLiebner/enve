@@ -44,6 +44,11 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     connect(mVisibleButton, SIGNAL(pressed()),
             this, SLOT(switchBoxVisibleAction()));
 
+    mLockedButton = new BoxesListActionButton(this);
+    mMainLayout->addWidget(mLockedButton);
+    connect(mLockedButton, SIGNAL(pressed()),
+            this, SLOT(switchBoxLockedAction()));
+
     mFillWidget = new QWidget(this);
     mMainLayout->addWidget(mFillWidget);
     mFillWidget->setStyleSheet("background-color: rgba(0, 0, 0, 0)");
@@ -75,6 +80,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mVisibleButton->show();
 
+        mLockedButton->show();
+
         mColorButton->hide();
 
         mValueSlider->setAnimator(NULL);
@@ -90,6 +97,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mVisibleButton->show();
 
+        mLockedButton->show();
+
         mColorButton->hide();
 
         mValueSlider->setAnimator(NULL);
@@ -103,12 +112,15 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mVisibleButton->hide();
 
+        mLockedButton->hide();
+
         mColorButton->hide();
 
         mValueSlider->setAnimator(qa_target);
         mValueSlider->show();
     } else if(type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator) {
+              type == SWT_ColorAnimator ||
+              type == SWT_PixmapEffect) {
         //ComplexAnimator *ca_target = (ComplexAnimator*)target;
 
         mRecordButton->show();
@@ -116,6 +128,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mContentButton->show();
 
         mVisibleButton->hide();
+
+        mLockedButton->hide();
 
         if(type == SWT_ColorAnimator) {
             mColorButton->show();
@@ -194,7 +208,9 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     }
     QDrag *drag = new QDrag(this);
 
-    drag->setMimeData(mTarget->getTarget()->SWT_createMimeData());
+    QMimeData *mimeData = mTarget->getTarget()->SWT_createMimeData();
+    if(mimeData == NULL) return;
+    drag->setMimeData(mimeData);
 
     Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
 }
@@ -242,7 +258,8 @@ void BoxSingleWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
                             minViewedFrame, maxViewedFrame);
     } else if(type == SWT_QrealAnimator ||
               type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator) {
+              type == SWT_ColorAnimator ||
+              type == SWT_PixmapEffect) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         qa_target->drawKeys(p, pixelsPerFrame,
                             containerTop,
@@ -265,7 +282,8 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
                     pixelsPerFrame);
     } else if(type == SWT_QrealAnimator ||
               type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator) {
+              type == SWT_ColorAnimator ||
+              type == SWT_PixmapEffect) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         return qa_target->getKeyAtPos(pressX,
                                minViewedFrame,
@@ -291,7 +309,8 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
                     listKeys);
     } else if(type == SWT_QrealAnimator ||
               type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator) {
+              type == SWT_ColorAnimator ||
+              type == SWT_PixmapEffect) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         qa_target->getKeysInRect(selectionRect,
                                  minViewedFrame,
@@ -307,12 +326,13 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
 
-    int nameX;
+    int nameX = mFillWidget->x();
     QString name;
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
 
+        nameX += 5;
         name = bb_target->getName();
 
         p.fillRect(rect(), QColor(0, 0, 0, 50));
@@ -333,7 +353,14 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                          *BoxSingleWidget::INVISIBLE_PIXMAP);
         }
 
-        nameX = mVisibleButton->x() + BOX_HEIGHT + 5;
+        if(bb_target->isLocked()) {
+            p.drawPixmap(mLockedButton->x(), 0,
+                         *BoxSingleWidget::LOCKED_PIXMAP);
+        } else {
+            p.drawPixmap(mLockedButton->x(), 0,
+                         *BoxSingleWidget::UNLOCKED_PIXMAP);
+        }
+
         if(bb_target->isSelected()) {
             p.fillRect(QRect(mFillWidget->pos(), mFillWidget->size()),
                        QColor(180, 180, 180));
@@ -348,6 +375,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     } */else if(type == SWT_QrealAnimator) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         name = qa_target->getName();
+        nameX += 20;
         if(qa_target->isRecording()) {
             p.drawPixmap(mRecordButton->x(), 0,
                          *BoxSingleWidget::ANIMATOR_RECORDING);
@@ -356,10 +384,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                          *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
         }
 
-        nameX = mRecordButton->x() + 2*BOX_HEIGHT;
         p.setPen(Qt::white);
     } else if(type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator) {
+              type == SWT_ColorAnimator ||
+              type == SWT_PixmapEffect) {
         ComplexAnimator *ca_target = (ComplexAnimator*)target;
         name = ca_target->getName();
 
@@ -388,7 +416,6 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.drawPixmap(mContentButton->x(), 0,
                          *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
         }
-        nameX = mContentButton->x() + BOX_HEIGHT;
         p.setPen(Qt::white);
 
         if(type == SWT_ColorAnimator) {
@@ -396,11 +423,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.setBrush(col_target->getCurrentValue().qcol);
             p.drawRect(mColorButton->x(), 3,
                        BOX_HEIGHT, BOX_HEIGHT - 6);
-            nameX = mColorButton->x() + BOX_HEIGHT;
         }
     }
-    p.drawText(QRect(mFillWidget->x(), 0,
-                     width() - mFillWidget->x() -
+    p.drawText(QRect(nameX, 0,
+                     width() - nameX -
                      BOX_HEIGHT,
                      BOX_HEIGHT),
                name, QTextOption(Qt::AlignVCenter));
@@ -422,6 +448,12 @@ void BoxSingleWidget::switchRecordingAction() {
 
 void BoxSingleWidget::switchBoxVisibleAction() {
     ((BoundingBox*)mTarget->getTarget())->switchVisible();
+    MainWindow::getInstance()->callUpdateSchedulers();
+    update();
+}
+
+void BoxSingleWidget::switchBoxLockedAction() {
+    ((BoundingBox*)mTarget->getTarget())->switchLocked();
     MainWindow::getInstance()->callUpdateSchedulers();
     update();
 }
