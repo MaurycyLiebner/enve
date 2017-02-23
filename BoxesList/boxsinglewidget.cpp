@@ -164,6 +164,7 @@ void BoxSingleWidget::loadStaticPixmaps() {
 #include <QInputDialog>
 #include <QMenu>
 #include "mainwindow.h"
+#include "clipboardcontainer.h"
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
 {
     SingleWidgetTarget *target = mTarget->getTarget();
@@ -174,12 +175,34 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
         if(type == SWT_BoundingBox ||
            type == SWT_BoxesGroup) {
             menu.addAction("Rename");
+        } else if(type == SWT_QrealAnimator ||
+                  type == SWT_ColorAnimator ||
+                  type == SWT_ComplexAnimator) {
+            AnimatorClipboardContainer *clipboard =
+                    (AnimatorClipboardContainer*)
+                    MainWindow::getInstance()->getClipboardContainer(
+                                                CCT_ANIMATOR);
+            menu.addAction("Copy");
+            if(clipboard != NULL) {
+                menu.addAction("Paste");
+            }
         }
         QAction *selected_action = menu.exec(event->globalPos());
         if(selected_action != NULL)
         {
             if(selected_action->text() == "Rename") {
                 rename();
+            } else if(selected_action->text() == "Copy") {
+                AnimatorClipboardContainer *container =
+                        new AnimatorClipboardContainer();
+                container->setAnimator((QrealAnimator*)target);
+                MainWindow::getInstance()->replaceClipboard(container);
+            } else if(selected_action->text() == "Paste") {
+                AnimatorClipboardContainer *clipboard =
+                        (AnimatorClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_ANIMATOR);
+                clipboard->paste((QrealAnimator*)target);
             }
         } else {
 

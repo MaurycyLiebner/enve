@@ -585,7 +585,10 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
 
 void Canvas::handleAddPointMouseMove(QPointF eventPos) {
     if(mCurrentEndPoint == NULL) return;
-    mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+    if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+       CtrlsMode::CTRLS_SYMMETRIC) {
+        mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC, false);
+    }
     mCurrentEndPoint->moveEndCtrlPtToAbsPos(eventPos);
 }
 

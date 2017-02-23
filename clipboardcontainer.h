@@ -10,6 +10,7 @@ class KeysView;
 enum  ClipboardContainerType : short {
     CCT_BOXES,
     CCT_KEYS,
+    CCT_ANIMATOR,
     CCT_COUNT
 };
 
@@ -47,6 +48,18 @@ public:
 private:
     QList<QrealKey*> mKeysList;
     QList<QrealAnimator*> mTargetAnimators;
+};
+
+class AnimatorClipboardContainer : public ClipboardContainer {
+public:
+    AnimatorClipboardContainer();
+    ~AnimatorClipboardContainer();
+
+    void setAnimator(QrealAnimator *animator);
+
+    void paste(QrealAnimator *target);
+private:
+    QrealAnimator *mAnimator;
 };
 
 #endif // CLIPBOARDCONTAINER_H

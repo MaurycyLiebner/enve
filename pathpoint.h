@@ -246,8 +246,8 @@ public:
 
     void cancelTransform();
 
-    void setEndCtrlPtEnabled(bool enabled);
-    void setStartCtrlPtEnabled(bool enabled);
+    void setEndCtrlPtEnabled(bool enabled, bool saveUndoRedo = true);
+    void setStartCtrlPtEnabled(bool enabled, bool saveUndoRedo = true);
 
     bool isEndCtrlPtEnabled();
     bool isStartCtrlPtEnabled();

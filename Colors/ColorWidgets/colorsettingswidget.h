@@ -13,49 +13,7 @@
 #include <QComboBox>
 #include "qrealanimatorvalueslider.h"
 #include "Animators/coloranimator.h"
-
-enum ColorSettingType : short {
-    CST_START,
-    CST_CHANGE,
-    CST_FINISH
-};
-
-class ColorSetting {
-public:
-    ColorSetting() {}
-    ColorSetting(
-            const ColorMode &settingModeT,
-            const CVR_TYPE &changedValueT,
-            const qreal &val1T,
-            const qreal &val2T,
-            const qreal &val3T,
-            const qreal &alphaT,
-            const ColorSettingType &typeT,
-            ColorAnimator *excludeT = NULL);
-    void apply(ColorAnimator *target) const;
-
-    const ColorSettingType &getType() const { return mType; }
-    const ColorMode &getSettingMode() const { return mSettingMode; }
-    const CVR_TYPE &getChangedValue() const { return mChangedValue; }
-    const qreal &getVal1() const { return mVal1; }
-    const qreal &getVal2() const { return mVal2; }
-    const qreal &getVal3() const { return mVal3; }
-    const qreal &getAlpa() const { return mAlpha; }
-private:
-    void finishColorTransform(ColorAnimator *target) const;
-
-    void changeColor(ColorAnimator *target) const;
-
-    void startColorTransform(ColorAnimator *target) const;
-    ColorSettingType mType = CST_FINISH;
-    ColorMode mSettingMode = RGBMODE;
-    CVR_TYPE mChangedValue = CVR_ALL;
-    qreal mVal1 = 1.;
-    qreal mVal2 = 1.;
-    qreal mVal3 = 1.;
-    qreal mAlpha = 1.;
-    ColorAnimator *mExclude = NULL;
-};
+#include "Animators/paintsettings.h"
 
 class ColorSettingsWidget : public QWidget
 {

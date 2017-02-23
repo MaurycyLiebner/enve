@@ -964,5 +964,67 @@ private:
     PathPointValues mOldValues;
     PathPointValues mNewValues;
 };
+#include "Animators/paintsettings.h"
+
+class PaintTypeChangeUndoRedo : public UndoRedo {
+public:
+    PaintTypeChangeUndoRedo(const PaintType &oldType,
+                            const PaintType &newType,
+                            PaintSettings *target) :
+        UndoRedo("PaintTypeChangeUndoRedo") {
+        mOldType = oldType;
+        mNewType = newType;
+        mTarget = target;
+        mTarget->incNumberPointers();
+    }
+
+    ~PaintTypeChangeUndoRedo() {
+        mTarget->decNumberPointers();
+    }
+
+    void redo() {
+        mTarget->setPaintType(mNewType, false);
+    }
+
+    void undo() {
+        mTarget->setPaintType(mOldType, false);
+    }
+
+private:
+    PaintType mOldType;
+    PaintType mNewType;
+    PaintSettings *mTarget;
+};
+
+class GradientChangeUndoRedo : public UndoRedo {
+public:
+    GradientChangeUndoRedo(Gradient *oldGradient,
+                           Gradient *newGradient,
+                           PaintSettings *target) :
+        UndoRedo("GradientChangeUndoRedo") {
+        mTarget = target;
+        mTarget->incNumberPointers();
+        mOldGradient = oldGradient;
+        mNewGradient = newGradient;
+    }
+
+    ~GradientChangeUndoRedo() {
+        mTarget->decNumberPointers();
+    }
+
+    void redo() {
+        mTarget->setGradient(mNewGradient, false);
+    }
+
+    void undo() {
+        mTarget->setGradient(mOldGradient, false);
+    }
+
+private:
+    Gradient *mOldGradient;
+    Gradient *mNewGradient;
+    PaintSettings *mTarget;
+};
+
 
 #endif // UNDOREDO_H

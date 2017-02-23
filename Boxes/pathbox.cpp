@@ -230,9 +230,7 @@ void PathBox::updateWholePath() {
 void PathBox::updateFillDrawGradient() {
     if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
         Gradient *gradient = mFillPaintSettings.getGradient();
-        if(!gradient->isInPaths(this)) {
-            gradient->addPath(this);
-        }
+
         mFillGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
                                       gradient->getLastQGradientStopQColor());
         if(!mFillGradientPoints.enabled) {
@@ -251,9 +249,7 @@ void PathBox::updateFillDrawGradient() {
 void PathBox::updateStrokeDrawGradient() {
     if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
         Gradient *gradient = mStrokeSettings.getGradient();
-        if(!gradient->isInPaths(this)) {
-            gradient->addPath(this);
-        }
+
         mStrokeGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
                                       gradient->getLastQGradientStopQColor() );
 

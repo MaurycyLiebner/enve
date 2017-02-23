@@ -431,27 +431,29 @@ void PathPoint::updateEndCtrlPtVisibility() {
     }
 }
 
-void PathPoint::setEndCtrlPtEnabled(bool enabled)
+void PathPoint::setEndCtrlPtEnabled(bool enabled,
+                                    bool saveUndoRedo)
 {
     if(enabled == mEndCtrlPtEnabled) return;
     if(mEndCtrlPtEnabled) {
-        setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        setCtrlsMode(CtrlsMode::CTRLS_CORNER, saveUndoRedo);
         mEndCtrlPt->removeAnimations();
     }
-    mEndCtrlPt->setRelativePos(getRelativePos());
+    //mEndCtrlPt->setRelativePos(getRelativePos());
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();
 }
 
-void PathPoint::setStartCtrlPtEnabled(bool enabled)
+void PathPoint::setStartCtrlPtEnabled(bool enabled,
+                                      bool saveUndoRedo)
 {
     if(enabled == mStartCtrlPtEnabled) return;
     if(mStartCtrlPtEnabled) {
-        setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        setCtrlsMode(CtrlsMode::CTRLS_CORNER, saveUndoRedo);
         mStartCtrlPt->removeAnimations();
     }
-    mStartCtrlPt->setRelativePos(getRelativePos());
+    //mStartCtrlPt->setRelativePos(getRelativePos());
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
     mVectorPath->schedulePathUpdate();
@@ -750,11 +752,10 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
         } else {
             return;
         }
-
-        setCtrlPtEnabled(true, true);
-        setCtrlPtEnabled(true, false);
-        mVectorPath->schedulePathUpdate();
     }
+    setCtrlPtEnabled(true, true, saveUndoRedo);
+    setCtrlPtEnabled(true, false, saveUndoRedo);
+    mVectorPath->schedulePathUpdate();
 }
 
 void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)

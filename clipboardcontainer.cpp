@@ -85,3 +85,26 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
         animator->mergeKeysIfNeeded();
     }
 }
+
+AnimatorClipboardContainer::AnimatorClipboardContainer() :
+    ClipboardContainer(CCT_ANIMATOR) {
+
+}
+
+AnimatorClipboardContainer::~AnimatorClipboardContainer() {
+    mAnimator->decNumberPointers();
+}
+
+void AnimatorClipboardContainer::setAnimator(QrealAnimator *animator) {
+    mAnimator = animator;
+    mAnimator->incNumberPointers();
+}
+
+void AnimatorClipboardContainer::paste(QrealAnimator *target) {
+    QString nameT = target->getName();
+    if(nameT == mAnimator->getName() ||
+       !(target->isComplexAnimator() || mAnimator->isComplexAnimator())) {
+        mAnimator->makeDuplicate(target);
+        target->setName(nameT);
+    }
+}

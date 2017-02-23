@@ -2,6 +2,7 @@
 #define PATHBOX_H
 #include "Boxes/boundingbox.h"
 #include "gradientpoints.h"
+#include "Animators/paintsettings.h"
 
 class PathBox : public BoundingBox
 {
