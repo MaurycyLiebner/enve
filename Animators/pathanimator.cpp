@@ -664,9 +664,11 @@ void PathAnimator::removeFromPointsList(PathPoint *point,
         RemoveFromPointsListUndoRedo *undoRedo =
                 new RemoveFromPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
-//        if(mPoints.count() < 2) {
-//            mParent->removeChild(this);
-//        }
+        if(mPoints.count() == 0) {
+            point->decNumberPointers();
+            mParentBox->removeChildPathAnimator(this);
+            return;
+        }
     }
     point->decNumberPointers();
 

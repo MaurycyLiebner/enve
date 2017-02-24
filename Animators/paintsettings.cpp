@@ -199,10 +199,17 @@ void Gradient::addColorToList(Color color) {
     addColorToList(newColorAnimator);
 }
 
-void Gradient::addColorToList(ColorAnimator *newColorAnimator) {
+void Gradient::addColorToList(ColorAnimator *newColorAnimator,
+                              const bool &saveUndoRedo) {
     mColors << newColorAnimator;
+    newColorAnimator->incNumberPointers();
 
     addChildAnimator(newColorAnimator);
+
+    if(saveUndoRedo) {
+        addUndoRedo(new GradientColorAddedToListUndoRedo(this,
+                                                         newColorAnimator));
+    }
 }
 
 Color Gradient::getCurrentColorAt(int id)
@@ -265,15 +272,29 @@ void Gradient::saveToSqlIfPathSelected(QSqlQuery *query) {
     }
 }
 
-void Gradient::swapColors(int id1, int id2) {
+void Gradient::swapColors(int id1, int id2,
+                          const bool &saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new GradientSwapColorsUndoRedo(this, id1, id2));
+    }
     swapChildAnimators(mColors.at(id1), mColors.at(id2));
     mColors.swap(id1, id2);
     updateQGradientStops();
 }
 
-void Gradient::removeColor(int id) {
-    removeChildAnimator(mColors.at(id) );
-    mColors.takeAt(id)->decNumberPointers();
+void Gradient::removeColor(const int &id) {
+    removeColor(mColors.at(id));
+}
+
+void Gradient::removeColor(ColorAnimator *color,
+                           const bool &saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new GradientColorRemovedFromListUndoRedo(
+                        this, color));
+    }
+    removeChildAnimator(color);
+    mColors.removeOne(color);
+    color->decNumberPointers();
     updateQGradientStops();
 }
 

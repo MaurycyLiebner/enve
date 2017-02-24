@@ -14,7 +14,6 @@ enum PaintType {
 
 class PathBox;
 
-class ChangeGradientColorsUndoRedo;
 
 class GradientPoints;
 
@@ -77,9 +76,11 @@ public:
 
     void saveToSqlIfPathSelected(QSqlQuery *query);
 
-    void swapColors(int id1, int id2);
+    void swapColors(int id1, int id2,
+                    const bool &saveUndoRedo = true);
 
-    void removeColor(int id);
+    void removeColor(ColorAnimator *color,
+                     const bool &saveUndoRedo = true);
 
     void addColor(Color color);
 
@@ -119,8 +120,10 @@ public:
     void scheduleQGradientStopsUpdate();
     void updateQGradientStopsIfNeeded();
     void startColorIdTransform(int id);
-    void addColorToList(ColorAnimator *newColorAnimator);
+    void addColorToList(ColorAnimator *newColorAnimator,
+                        const bool &saveUndoRedo = true);
     ColorAnimator *getColorAnimatorAt(int id);
+    void removeColor(const int &id);
 private:
     int mSqlId = -1;
     GradientWidget *mGradientWidget;

@@ -611,9 +611,10 @@ void Canvas::releaseMouseAndDontTrack() {
 bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
     if(event->key() == Qt::Key_Escape) {
         cancelCurrentTransform();
-    } else if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
-        mTransformationFinishedBeforeMouseRelease = true;
+    } else if(event->key() == Qt::Key_Return ||
+              event->key() == Qt::Key_Enter) {
         handleMouseRelease(mLastMouseEventPos);
+        clearAndDisableInput();
     } else if(event->key() == Qt::Key_Minus) {
         if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
             mInputText.remove("-");

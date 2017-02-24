@@ -14,6 +14,7 @@ struct PathPointAnimators;
 
 class PathAnimator : public ComplexAnimator
 {
+    Q_OBJECT
 public:
     PathAnimator(BoundingBox *parentBox);
     PathAnimator();
@@ -84,6 +85,8 @@ private:
                                               PathPoint **prevPoint,
                                               PathPoint **nextPoint);
     void updatePathPointIds();
+signals:
+    void lastPointRemoved();
 };
 
 #endif // PATHANIMATOR_H

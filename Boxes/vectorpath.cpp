@@ -31,6 +31,14 @@ PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust) {
     return mPathAnimator.createNewPointOnLineNear(absPos, adjust);
 }
 
+void VectorPath::removeChildPathAnimator(PathAnimator *path) {
+    if(path == &mPathAnimator) {
+        removeFromParent();
+    } else {
+        BoundingBox::removeChildPathAnimator(path);
+    }
+}
+
 void VectorPath::loadFromSql(int boundingBoxId) {
     PathBox::loadFromSql(boundingBoxId);
     mPathAnimator.loadPointsFromSql(boundingBoxId);

@@ -25,6 +25,8 @@ class MovablePoint;
 
 class PathPoint;
 
+class PathAnimator;
+
 enum CanvasMode : short;
 
 enum BoundingBoxType {
@@ -392,6 +394,11 @@ public:
         Q_UNUSED(colorMode);
     }
     void switchLocked();
+
+    virtual void removeChildPathAnimator(PathAnimator *path) {
+        Q_UNUSED(path);
+    }
+
 protected:
     bool mUpdateDisabled = false;
 

@@ -34,8 +34,7 @@ PathPoint::PathPoint(PathAnimator *parentAnimator) :
     mRelPos.setTraceKeyOnCurrentFrame(true);
 }
 
-PathPoint::~PathPoint()
-{
+PathPoint::~PathPoint() {
     mStartCtrlPt->decNumberPointers();
     mEndCtrlPt->decNumberPointers();
 }

@@ -82,6 +82,7 @@ public:
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     PathAnimator *getPathAnimator();
     void duplicatePathAnimatorFrom(PathAnimator *source);
+    void removeChildPathAnimator(PathAnimator *path);
 protected:
     void updatePath();
     void updatePathPointIds();
@@ -92,7 +93,6 @@ protected:
     qreal findPercentForPoint(QPointF point,
                               PathPoint **prevPoint,
                               qreal *error);
-    QPainterPath mEditPath;
     QPointF getRelCenterPosition();
 
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,

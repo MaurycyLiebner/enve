@@ -588,36 +588,6 @@ private:
     BoxesGroup *mNewParent;
 };
 
-class ChangeGradientColorsUndoRedo : public UndoRedo
-{
-public:
-    ChangeGradientColorsUndoRedo(QList<Color> oldColors,
-                                 QList<Color> newColors,
-                                 Gradient *gradient) : UndoRedo("ChangeGradientColorsUndoRedo") {
-        mGradient = gradient;
-        mGradient->incNumberPointers();
-        mOldColors = oldColors;
-        mNewColors = newColors;
-    }
-
-    ~ChangeGradientColorsUndoRedo() {
-        mGradient->decNumberPointers();
-    }
-
-    void redo() {
-        mGradient->setColors(mNewColors);
-    }
-
-    void undo() {
-        mGradient->setColors(mOldColors);
-    }
-
-private:
-    Gradient *mGradient;
-    QList<Color> mOldColors;
-    QList<Color> mNewColors;
-};
-
 class SetPivotRelPosUndoRedo : public UndoRedo
 {
 public:
@@ -909,5 +879,82 @@ private:
     PaintSettings *mTarget;
 };
 
+
+class GradientColorAddedToListUndoRedo : public UndoRedo {
+public:
+    GradientColorAddedToListUndoRedo(Gradient *target,
+                                     ColorAnimator *color) :
+        UndoRedo("GradientColorAddedToListUndoRedo") {
+        mGradient = target;
+        mColor = color;
+        mColor->incNumberPointers();
+        mGradient->incNumberPointers();
+    }
+
+    ~GradientColorAddedToListUndoRedo() {
+        mColor->decNumberPointers();
+        mGradient->decNumberPointers();
+    }
+
+    void undo() {
+        mGradient->removeColor(mColor, false);
+    }
+
+    void redo() {
+        mGradient->addColorToList(mColor, false);
+    }
+
+private:
+    ColorAnimator *mColor;
+    Gradient *mGradient;
+};
+
+class GradientColorRemovedFromListUndoRedo :
+        public GradientColorAddedToListUndoRedo {
+public:
+    GradientColorRemovedFromListUndoRedo(Gradient *target,
+                                     ColorAnimator *color) :
+        GradientColorAddedToListUndoRedo(target,
+                                         color) {
+    }
+
+    void undo() {
+        GradientColorAddedToListUndoRedo::redo();
+    }
+
+    void redo() {
+        GradientColorAddedToListUndoRedo::undo();
+    }
+};
+
+class GradientSwapColorsUndoRedo : public UndoRedo {
+public:
+    GradientSwapColorsUndoRedo(Gradient *target,
+                               const int id1,
+                               const int id2) :
+        UndoRedo("GradientSwapColorsUndoRedo") {
+        mGradient = target;
+        mGradient->incNumberPointers();
+        mId1 = id1;
+        mId2 = id2;
+    }
+
+    ~GradientSwapColorsUndoRedo() {
+        mGradient->decNumberPointers();
+    }
+
+    void undo() {
+        mGradient->swapColors(mId2, mId1, false);
+    }
+
+    void redo() {
+        mGradient->swapColors(mId1, mId2, false);
+    }
+
+private:
+    int mId1;
+    int mId2;
+    Gradient *mGradient;
+};
 
 #endif // UNDOREDO_H

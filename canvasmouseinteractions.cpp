@@ -471,16 +471,6 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
             }
         }
     }
-
-    mLastPressedBox = NULL;
-    mLastPressedPoint = NULL;
-    if(mCurrentEdge != NULL) {
-        if(!mFirstMouseMove) {
-            mCurrentEdge->finishTransform();
-        }
-        delete mCurrentEdge;
-        mCurrentEdge = NULL;
-    }
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
@@ -502,6 +492,20 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         }
         handleMouseRelease(event->pos());
     }
+
+    mLastPressedBox = NULL;
+    mHoveredPoint = mLastPressedPoint;
+    mLastPressedPoint = NULL;
+
+    if(mCurrentEdge != NULL) {
+        if(!mFirstMouseMove) {
+            mCurrentEdge->finishTransform();
+        }
+        mHoveredEdge = mCurrentEdge;
+        mHoveredEdge->generatePainterPath();
+        mCurrentEdge = NULL;
+    }
+
     callUpdateSchedulers();
 }
 
@@ -699,6 +703,10 @@ void Canvas::wheelEvent(QWheelEvent *event)
     mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
     
+    if(mHoveredEdge != NULL) {
+        mHoveredEdge->generatePainterPath();
+    }
+
     callUpdateSchedulers();
 }
 
