@@ -12,8 +12,9 @@ void Canvas::connectPoints() {
     if(selectedPathPoints.count() == 2) {
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
-        if(firstPoint->getParent() == secondPoint->getParent()) {
-            ((VectorPath*)firstPoint->getParent())->
+        if(firstPoint->getParentPath() ==
+                secondPoint->getParentPath()) {
+            firstPoint->getParentPath()->
                     connectPoints(firstPoint, secondPoint);
         }
     }
@@ -32,8 +33,9 @@ void Canvas::disconnectPoints() {
         }
         foreach(PathPoint *point, selectedPathPoints) {
             PathPoint *secondPoint = point->getNextPoint();
-            if(point->getParent() == secondPoint->getParent()) {
-                ((VectorPath*)point->getParent())->
+            if(point->getParentPath() ==
+                    secondPoint->getParentPath()) {
+                point->getParentPath()->
                         disconnectPoints(point, secondPoint);
             }
         }
@@ -51,9 +53,10 @@ void Canvas::mergePoints() {
     if(selectedPathPoints.count() == 2) {
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
-        if(secondPoint->getParent() == secondPoint->getParent()) {
-            ((VectorPath*)secondPoint->getParent())->connectPoints(firstPoint,
-                                                                   secondPoint);
+        if(secondPoint->getParentPath() ==
+           secondPoint->getParentPath()) {
+            secondPoint->getParentPath()->connectPoints(firstPoint,
+                                                  secondPoint);
             QPointF sumPos = firstPoint->getAbsolutePos() +
                     secondPoint->getAbsolutePos();
             bool firstWasPrevious = firstPoint ==

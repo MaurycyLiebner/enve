@@ -666,7 +666,7 @@ void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup,
 
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
-    attributes->apply(vectorPath);
+    attributes->apply(vectorPath->getPathAnimator());
 }
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
@@ -1524,7 +1524,7 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box)
     mFillAttributes.apply(box);
 }
 
-void VectorPathSvgAttributes::apply(VectorPath *path)
+void VectorPathSvgAttributes::apply(PathAnimator *path)
 {
     foreach(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
@@ -1534,7 +1534,7 @@ void VectorPathSvgAttributes::apply(VectorPath *path)
     BoundingBoxSvgAttributes::apply((BoundingBox*)path);
 }
 
-void SvgSeparatePath::apply(VectorPath *path)
+void SvgSeparatePath::apply(PathAnimator *path)
 {
     PathPoint *lastPoint = NULL;
     PathPoint *firstPoint = NULL;

@@ -92,11 +92,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     showMaximized();
 
-    QDockWidget *shapesMenuWidget = new QDockWidget(this);
-    mVectorShapesMenu = new VectorShapesMenu(this);
-    shapesMenuWidget->setWidget(mVectorShapesMenu);
-    addDockWidget(Qt::RightDockWidgetArea, shapesMenuWidget);
-
     QDockWidget *effectsMenuWidget = new QDockWidget(this);
     effectsMenuWidget->setMinimumWidth(200);
 
@@ -720,18 +715,12 @@ void MainWindow::callUpdateSchedulers()
     mCurrentUndoRedoStack->startNewSet();
 }
 
-void MainWindow::setCurrentShapesMenuBox(BoundingBox *box) {
-    if(mVectorShapesMenu == NULL) return;
-    mVectorShapesMenu->setSelectedBoundingBox(box);
-}
-
 void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
     //if(mObjectSettingsWidget == NULL) return;
     mObjectSettingsWidget->setMainTarget(box);
 }
 
 void MainWindow::setCurrentBox(BoundingBox *box) {
-    setCurrentShapesMenuBox(box);
     if(box == NULL) {
         mFillStrokeSettings->setCurrentSettings(NULL,
                                                 NULL);
@@ -742,11 +731,6 @@ void MainWindow::setCurrentBox(BoundingBox *box) {
 //    mObjectSettingsWidget->getVisiblePartWidget()->
 //            updateVisibleWidgetsContent();
     //setCurrentObjectSettingsWidgetBox(box);
-}
-
-void MainWindow::updateDisplayedShapesInMenu() {
-    if(mVectorShapesMenu == NULL) return;
-    mVectorShapesMenu->updateDisplayedShapes();
 }
 
 FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {
@@ -802,7 +786,8 @@ void MainWindow::disable()
 {
     mGrayOutWidget = new QWidget(this);
     mGrayOutWidget->setFixedSize(size());
-    mGrayOutWidget->setStyleSheet("QWidget { background-color: rgb(0, 0, 0, 125) }");
+    mGrayOutWidget->setStyleSheet(
+                "QWidget { background-color: rgb(0, 0, 0, 125) }");
     mGrayOutWidget->show();
     mGrayOutWidget->repaint();
 }

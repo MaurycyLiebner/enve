@@ -66,84 +66,6 @@ PathPointValues operator/(const PathPointValues &ppv, const qreal &val);
 PathPointValues operator*(const PathPointValues &ppv, const qreal &val);
 PathPointValues operator*(const qreal &val, const PathPointValues &ppv);
 
-class VectorPathShape : public SmartPointerTarget {
-public:
-    VectorPathShape() : SmartPointerTarget() {
-        mInfluence.setValueRange(0., 1.);
-        mInfluence.blockPointer();
-        mInfluence.setName("influence");
-    }
-
-    QString getName() {
-        return mName;
-    }
-
-    void setName(QString name) {
-        mName = name;
-        mInfluence.setName(name);
-    }
-
-    bool isRelative() {
-        return mRelative;
-    }
-
-    void setRelative(bool bT) {
-        mRelative = bT;
-    }
-
-    qreal getCurrentInfluence() {
-        return mInfluence.getCurrentValue();
-    }
-
-    void setCurrentInfluence(qreal value, bool finish = false) {
-        mInfluence.setCurrentValue(value, finish);
-    }
-
-    QrealAnimator *getInfluenceAnimator() {
-        return &mInfluence;
-    }
-
-    void setNumberPoints(int n) {
-        for(int i = 0; i < n; i++) {
-            mPointsValues << new PathPointValues();
-        }
-    }
-
-    PathPointValues *getPathPointValuesForPoint(int pointId) {
-        return mPointsValues.at(pointId);
-    }
-
-private:
-    QList<PathPointValues*> mPointsValues;
-    bool mRelative = false;
-    QString mName;
-    QrealAnimator mInfluence;
-};
-
-class PointShapeValues {
-public:
-    PointShapeValues();
-    PointShapeValues(VectorPathShape *shape, int pointId) {
-        mShape = shape;
-        mValues = shape->getPathPointValuesForPoint(pointId);
-    }
-
-    const PathPointValues &getValues() const {
-        return *mValues;
-    }
-
-    VectorPathShape *getParentShape() const {
-        return mShape;
-    }
-
-    void setPointValues(const PathPointValues &values) {
-        *mValues = values;
-    }
-private:
-    PathPointValues *mValues = NULL;
-    VectorPathShape *mShape = NULL;
-};
-
 class PathPointAnimators : public ComplexAnimator {
 public:
     PathPointAnimators() : ComplexAnimator() {
@@ -177,10 +99,12 @@ private:
     QPointFAnimator *pathPointPosAnimator;
 }; 
 
+class PathAnimator;
+
 class PathPoint : public MovablePoint
 {
 public:
-    PathPoint(VectorPath *vectorPath);
+    PathPoint(PathAnimator *parentAnimator);
 
     ~PathPoint();
 
@@ -240,7 +164,7 @@ public:
     void moveEndCtrlPtToRelPos(QPointF endCtrlPt);
     void moveStartCtrlPtToRelPos(QPointF startCtrlPt);
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
-    VectorPath *getParentPath();
+    PathAnimator *getParentPath();
 
     void saveToSql(QSqlQuery *query, int boundingBoxId);
 
@@ -263,21 +187,13 @@ public:
     CtrlsMode getCurrentCtrlsMode();
 
     PathPointValues getPointValues() const;
-    void savePointValuesToShapeValues(VectorPathShape *shape);
 
     bool isNeighbourSelected();
     void moveByAbs(QPointF absTranslatione);
     void loadFromSql(int pathPointId, int movablePointId);
-    PathPointValues getShapesInfluencedPointValues() const;
-    void removeShapeValues(VectorPathShape *shape);
 
     void setPointValues(const PathPointValues &values);
 
-    void editShape(VectorPathShape *shape);
-    void finishEditingShape(VectorPathShape *shape);
-    void cancelEditingShape();
-    void addShapeValues(VectorPathShape *shape);
-    void saveInitialPointValuesToShapeValues(VectorPathShape *shape);
 
     void makeDuplicate(MovablePoint *targetPoint);
     void duplicateCtrlPointsFrom(CtrlPoint *endPt,
@@ -292,15 +208,11 @@ public:
                        mRadius - 2, mRadius - 2);
     }
 private:
-    QList<PointShapeValues*> mShapeValues;
-
-    bool mEditingShape = false;
-    PathPointValues mBasisShapeSavedValues;
 
     int mPointId;
     PathPointAnimators mPathPointAnimators;
 
-    VectorPath *mVectorPath;
+    PathAnimator *mParentPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_CORNER;
 
     bool mSeparatePathPoint = false;

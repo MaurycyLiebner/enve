@@ -8,6 +8,7 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 #include "Boxes/imagebox.h"
+#include "edge.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWidget *canvasWidget,
@@ -877,8 +878,8 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
     if(pointSrc->getParentPath() == pointDest->getParentPath()) {
         return;
     }
-    VectorPath *pathSrc = pointSrc->getParentPath();
-    VectorPath *pathDest = pointDest->getParentPath();
+    PathAnimator *pathSrc = pointSrc->getParentPath();
+    PathAnimator *pathDest = pointDest->getParentPath();
     setCurrentEndPoint(pointDest);
     if(pointSrc->hasNextPoint()) {
         PathPoint *point = pointSrc;
@@ -914,7 +915,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
             point = point->getPreviousPoint();
         }
     }
-    mCurrentBoxesGroup->removeChild(pathSrc);
+    mCurrentBoxesGroup->removeChild(pathSrc->getParentBox());
 }
 
 bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,

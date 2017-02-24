@@ -4,7 +4,7 @@
 #include "Boxes/boxesgroup.h"
 
 CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
-    MovablePoint(parentPoint->getParentPath(),
+    MovablePoint(parentPoint->getParent(),
                  MovablePointType::TYPE_CTRL_POINT, 5.)
 {
     mIsStartCtrlPt = isStartCtrlPt;

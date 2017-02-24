@@ -11,7 +11,6 @@
 #include "animationdockwidget.h"
 #include "keysview.h"
 #include "fontswidget.h"
-#include "vectorshapesmenu.h"
 #include "actionbutton.h"
 
 enum ClipboardContainerType : short;
@@ -115,7 +114,6 @@ public:
     void updateCanvasModeButtonsChecked();
 
     void addBoxAwaitingUpdate(BoundingBox *box);
-    void setCurrentShapesMenuBox(BoundingBox *box);
     void setCurrentObjectSettingsWidgetBox(BoundingBox *box);
     void setCurrentBox(BoundingBox *box);
 
@@ -125,7 +123,6 @@ public:
     void setResolutionPercent(qreal percent);
 
     void setCurrentFrameForAllWidgets(int frame);
-    void updateDisplayedShapesInMenu();
     void updateSettingsForCurrentCanvas();
 
     void replaceClipboard(ClipboardContainer *container);
@@ -253,7 +250,6 @@ private:
     bool mAltPressed = false;
     bool mCtrlPressed = false;
 
-    VectorShapesMenu *mVectorShapesMenu = NULL;
 
     QString mOutputString;
     int mCurrentRenderFrame;

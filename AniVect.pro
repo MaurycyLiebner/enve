@@ -54,10 +54,8 @@ SOURCES += main.cpp\
     gradientpoints.cpp \
     fontswidget.cpp \
     paintcontroler.cpp \
-    vectorshapesmenu.cpp \
     qdoubleslider.cpp \
     qrealanimatorvalueslider.cpp \
-    vectorshapeswidget.cpp \
     renderoutputwidget.cpp \
     canvaswidget.cpp \
     Sound/singlesound.cpp \
@@ -106,7 +104,8 @@ SOURCES += main.cpp\
     canvasselectedpointsactions.cpp \
     canvasselectedboxesactions.cpp \
     clipboardcontainer.cpp \
-    Animators/paintsettings.cpp
+    Animators/paintsettings.cpp \
+    edge.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -147,10 +146,8 @@ HEADERS  += mainwindow.h \
     gradientpoints.h \
     fontswidget.h \
     paintcontroler.h \
-    vectorshapesmenu.h \
     qdoubleslider.h \
     qrealanimatorvalueslider.h \
-    vectorshapeswidget.h \
     renderoutputwidget.h \
     canvaswidget.h \
     keypoint.h \
@@ -198,7 +195,8 @@ HEADERS  += mainwindow.h \
     BoxesList/boxscrollwidget.h \
     BoxesList/boxeslistactionbutton.h \
     clipboardcontainer.h \
-    Animators/paintsettings.h
+    Animators/paintsettings.h \
+    edge.h
 
 RESOURCES += \
     resources.qrc

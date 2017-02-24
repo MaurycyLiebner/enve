@@ -56,21 +56,19 @@ public:
 
     void updateAfterFrameChanged(int currentFrame);
 
-    void startAllPointsTransform();
-    void finishAllPointsTransform();
+    void startAllPointsTransform() {
+        mPathAnimator.startAllPointsTransform();
+    }
+
+    void finishAllPointsTransform() {
+        mPathAnimator.finishAllPointsTransform();
+    }
 
     void showContextMenu(QPoint globalPos);
 
     void deletePointAndApproximate(PathPoint *pointToRemove);
     virtual void loadFromSql(int boundingBoxId);
-    void saveCurrentPathToShape(VectorPathShape *shape);
-    void addShapesToShapesMenu(VectorShapesMenu *menu);
-    VectorPathShape *createNewShape(bool relative);
-    void removeShape(VectorPathShape *shape, bool saveUndoRedo = true);
-    void editShape(VectorPathShape *shape);
-    void finishEditingShape(VectorPathShape *shape);
-    void cancelEditingShape();
-    void addShape(VectorPathShape *shape, bool saveUndoRedo = true);
+
     void applyTransformToPoints(QMatrix transform);
     void applyCurrentTransformation();
     Edge *getEgde(QPointF absPos);
@@ -78,25 +76,13 @@ public:
     void loadPathFromQPainterPath(const QPainterPath &path);
 
     void duplicatePathPointsTo(VectorPath *target);
-    void disconnectPoints(PathPoint *point1, PathPoint *point2);
-    void connectPoints(PathPoint *point1, PathPoint *point2);
+//    void disconnectPoints(PathPoint *point1, PathPoint *point2);
+//    void connectPoints(PathPoint *point1, PathPoint *point2);
     void makeDuplicate(BoundingBox *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
-
-//    virtual void drawHovered(QPainter *p) {
-//        p->save();
-//        p->setCompositionMode(QPainter::CompositionMode_Difference);
-//        p->setTransform(QTransform(mCombinedTransformMatrix), true);
-//        p->setPen(Qt::red);
-//        p->setBrush(Qt::NoBrush);
-//        p->drawPath(mEditPath);
-//        p->restore();
-//    }
+    PathAnimator *getPathAnimator();
+    void duplicatePathAnimatorFrom(PathAnimator *source);
 protected:
-    ComplexAnimator *mShapesAnimator = NULL;
-
-    QList<VectorPathShape*> mShapes;
-
     void updatePath();
     void updatePathPointIds();
     PathAnimator mPathAnimator;
@@ -106,16 +92,9 @@ protected:
     qreal findPercentForPoint(QPointF point,
                               PathPoint **prevPoint,
                               qreal *error);
-
-    bool mClosedPath = false;
-
-    QList<PathPoint*> mSeparatePaths;
-    QList<PathPoint*> mPoints;
     QPainterPath mEditPath;
     QPointF getRelCenterPosition();
 
-    bool mShapesEnabled = false;
-    VectorPathShape *mCurrentEditedShape = NULL;
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
                                               qreal *pressedT,
                                               PathPoint **prevPoint,

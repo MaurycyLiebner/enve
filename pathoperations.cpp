@@ -1,5 +1,6 @@
 #include "pathoperations.h"
 #include "pointhelpers.h"
+#include "edge.h"
 
 MinimalPathPoint::MinimalPathPoint() {}
 
@@ -230,7 +231,7 @@ void FullVectorPath::getListOfGeneratedSeparatePaths(
     }
 }
 
-void FullVectorPath::addAllToVectorPath(VectorPath *path) {
+void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
     foreach(MinimalVectorPath *separatePath, mSeparatePaths) {
         MinimalPathPoint *firstPoint = separatePath->getFirstPoint();
         MinimalPathPoint *point = firstPoint;

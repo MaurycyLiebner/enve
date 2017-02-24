@@ -543,7 +543,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
         }
     }
 
-    targetPath->addAllToVectorPath(newPath);
+    targetPath->addAllToVectorPath(newPath->getPathAnimator());
 
     return newPath;
 }

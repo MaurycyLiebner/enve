@@ -177,7 +177,9 @@ private:
 class AppendToPointsListUndoRedo : public UndoRedo
 {
 public:
-    AppendToPointsListUndoRedo(PathPoint *pointToAdd, VectorPath *path) : UndoRedo("AppendToPointsListUndoRedo") {
+    AppendToPointsListUndoRedo(PathPoint *pointToAdd,
+                               PathAnimator *path) :
+        UndoRedo("AppendToPointsListUndoRedo") {
         mPoint = pointToAdd;
         mPath = path;
         mPoint->incNumberPointers();
@@ -199,13 +201,15 @@ public:
 
 private:
     PathPoint *mPoint;
-    VectorPath *mPath;
+    PathAnimator *mPath;
 };
 
 class RemoveFromPointsListUndoRedo : public AppendToPointsListUndoRedo
 {
 public:
-    RemoveFromPointsListUndoRedo(PathPoint *pointToRemove, VectorPath *path) : AppendToPointsListUndoRedo(pointToRemove, path) {
+    RemoveFromPointsListUndoRedo(PathPoint *pointToRemove,
+                                 PathAnimator *path) :
+        AppendToPointsListUndoRedo(pointToRemove, path) {
     }
 
     void redo() {
@@ -220,7 +224,10 @@ public:
 class SetNextPointUndoRedo : public UndoRedo
 {
 public:
-    SetNextPointUndoRedo(PathPoint *point, PathPoint *oldNext, PathPoint *newNext) : UndoRedo("SetNextPointUndoRedo") {
+    SetNextPointUndoRedo(PathPoint *point,
+                         PathPoint *oldNext,
+                         PathPoint *newNext) :
+        UndoRedo("SetNextPointUndoRedo") {
         mNewNext = newNext;
         mOldNext = oldNext;
         mPoint = point;
@@ -252,7 +259,10 @@ private:
 class SetPreviousPointUndoRedo : public UndoRedo
 {
 public:
-    SetPreviousPointUndoRedo(PathPoint *point, PathPoint *oldPrevious, PathPoint *newPrevious) : UndoRedo("SetPreviousPointUndoRedo") {
+    SetPreviousPointUndoRedo(PathPoint *point,
+                             PathPoint *oldPrevious,
+                             PathPoint *newPrevious) :
+        UndoRedo("SetPreviousPointUndoRedo") {
         mNewPrev = newPrevious;
         mOldPrev = oldPrevious;
         mPoint = point;
@@ -284,7 +294,9 @@ private:
 class AddPointToSeparatePathsUndoRedo : public UndoRedo
 {
 public:
-    AddPointToSeparatePathsUndoRedo(VectorPath *path, PathPoint *point) : UndoRedo("AddPointToSeparatePathsUndoRedo") {
+    AddPointToSeparatePathsUndoRedo(PathAnimator *path,
+                                    PathPoint *point) :
+        UndoRedo("AddPointToSeparatePathsUndoRedo") {
         mPath = path;
         mPath->incNumberPointers();
         mPoint = point;
@@ -305,14 +317,17 @@ public:
     }
 
 private:
-    VectorPath *mPath;
+    PathAnimator *mPath;
     PathPoint *mPoint;
 };
 
-class RemovePointFromSeparatePathsUndoRedo : public AddPointToSeparatePathsUndoRedo
+class RemovePointFromSeparatePathsUndoRedo :
+        public AddPointToSeparatePathsUndoRedo
 {
 public:
-    RemovePointFromSeparatePathsUndoRedo(VectorPath *path, PathPoint *point) : AddPointToSeparatePathsUndoRedo(path, point) {
+    RemovePointFromSeparatePathsUndoRedo(PathAnimator *path,
+                                         PathPoint *point) :
+        AddPointToSeparatePathsUndoRedo(path, point) {
 
     }
 
@@ -328,7 +343,10 @@ public:
 class SetPathPointModeUndoRedo : public UndoRedo
 {
 public:
-    SetPathPointModeUndoRedo(PathPoint *point, CtrlsMode modeBefore, CtrlsMode modeAfter) : UndoRedo("SetPathPointModeUndoRedo") {
+    SetPathPointModeUndoRedo(PathPoint *point,
+                             CtrlsMode modeBefore,
+                             CtrlsMode modeAfter) :
+        UndoRedo("SetPathPointModeUndoRedo") {
         mPoint = point;
         mPoint->incNumberPointers();
         mBefore = modeBefore;
@@ -356,7 +374,9 @@ private:
 class SetCtrlPtEnabledUndoRedo : public UndoRedo
 {
 public:
-    SetCtrlPtEnabledUndoRedo(bool enabled, bool isStartPt, PathPoint* parentPoint) : UndoRedo("SetCtrlPtEnabledUndoRedo") {
+    SetCtrlPtEnabledUndoRedo(bool enabled, bool isStartPt,
+                             PathPoint* parentPoint) :
+        UndoRedo("SetCtrlPtEnabledUndoRedo") {
         mParentPoint = parentPoint;
         mParentPoint->incNumberPointers();
         mEnabled = enabled;
@@ -387,7 +407,8 @@ public:
     MoveChildInListUndoRedo(BoundingBox *child,
                             int fromIndex,
                             int toIndex,
-                            BoxesGroup *parentBox) : UndoRedo("MoveChildInListUndoRedo") {
+                            BoxesGroup *parentBox) :
+        UndoRedo("MoveChildInListUndoRedo") {
         mParentBox = parentBox;
         mParentBox->incNumberPointers();
         mFromIndex = fromIndex;
@@ -421,7 +442,8 @@ public:
     MoveChildAnimatorInListUndoRedo(QrealAnimator *child,
                             int fromIndex,
                             int toIndex,
-                            ComplexAnimator *parentAnimator) : UndoRedo("MoveChildInListUndoRedo") {
+                            ComplexAnimator *parentAnimator) :
+        UndoRedo("MoveChildInListUndoRedo") {
         mParentAnimator = parentAnimator;
         mParentAnimator->incNumberPointers();
         mFromIndex = fromIndex;
@@ -565,78 +587,6 @@ private:
     BoxesGroup *mOldParent;
     BoxesGroup *mNewParent;
 };
-
-//class StrokeSettingsChangedUndoRedo : public UndoRedo
-//{
-//public:
-//    StrokeSettingsChangedUndoRedo(StrokeSettings oldStrokeSettings,
-//                                  StrokeSettings newStrokeSettings,
-//                                  VectorPath *target) : UndoRedo("StrokeSettingsChangedUndoRedo") {
-//        mOldSettings = oldStrokeSettings;
-//        mNewSettings = newStrokeSettings;
-//        mTarget = target;
-//        mTarget->incNumberPointers();
-//    }
-
-//    ~StrokeSettingsChangedUndoRedo() {
-//        mTarget->decNumberPointers();
-//    }
-
-//    void updateDisplayedSettings() {
-//        if(mTarget->isSelected()) {
-//            mTarget->getParent()->
-//                    setCurrentFillStrokeSettingsFromBox(mTarget);
-//        }
-//    }
-
-//    void redo() {
-//        mTarget->setStrokeSettings(mNewSettings, false);
-//        updateDisplayedSettings();
-//    }
-
-//    void undo() {
-//        mTarget->setStrokeSettings(mOldSettings, false);
-//        updateDisplayedSettings();
-//    }
-
-//private:
-//    StrokeSettings mOldSettings;
-//    StrokeSettings mNewSettings;
-//    VectorPath *mTarget;
-//};
-
-//class FillSettingsChangedUndoRedo : public UndoRedo
-//{
-//public:
-//    FillSettingsChangedUndoRedo(VectorPath *target) : UndoRedo("FillSettingsChangedUndoRedo") {
-//        mTarget = target;
-//        mTarget->incNumberPointers();
-//    }
-
-//    ~FillSettingsChangedUndoRedo() {
-//        mTarget->decNumberPointers();
-//    }
-
-//    void updateDisplayedSettings() {
-//        if(mTarget->isSelected()) {
-//            mTarget->getParent()->
-//                    setCurrentFillStrokeSettingsFromBox(mTarget);
-//        }
-//    }
-
-//    void redo() {
-//        mTarget->scheduleAwaitUpdate();
-//        updateDisplayedSettings();
-//    }
-
-//    void undo() {
-//        mTarget->scheduleAwaitUpdate();
-//        updateDisplayedSettings();
-//    }
-
-//private:
-//    VectorPath *mTarget;
-//};
 
 class ChangeGradientColorsUndoRedo : public UndoRedo
 {
@@ -897,73 +847,6 @@ public:
     }
 };
 
-class RemoveShapeUndoRedo : public UndoRedo
-{
-public:
-    RemoveShapeUndoRedo(VectorPath *targetPath, VectorPathShape *shape) :
-        UndoRedo("RemoveShapeUndoRedo") {
-        mTargetPath = targetPath;
-        mShape = shape;
-        mShape->incNumberPointers();
-    }
-
-    ~RemoveShapeUndoRedo() {
-        mShape->decNumberPointers();
-    }
-
-    void redo() {
-        mTargetPath->removeShape(mShape, false);
-    }
-
-    void undo() {
-        mTargetPath->addShape(mShape, false);
-    }
-
-private:
-    VectorPath *mTargetPath;
-    VectorPathShape *mShape;
-};
-
-class AddShapeUndoRedo : public RemoveShapeUndoRedo
-{
-public:
-    AddShapeUndoRedo(VectorPath *targetPath, VectorPathShape *shape) :
-        RemoveShapeUndoRedo(targetPath, shape) {
-
-    }
-
-    void redo() {
-        RemoveShapeUndoRedo::undo();
-    }
-
-    void undo() {
-        RemoveShapeUndoRedo::redo();
-    }
-};
-
-class ChangePointShapeValuesUndoRedo : public UndoRedo {
-public:
-    ChangePointShapeValuesUndoRedo(PointShapeValues *target,
-                                   const PathPointValues &oldValues,
-                                   const PathPointValues &newValues) :
-        UndoRedo("ChangePointShapeValuesUndoRedo") {
-        mTarget = target;
-        mOldValues = oldValues;
-        mNewValues = newValues;
-    }
-
-    void redo() {
-        mTarget->setPointValues(mNewValues);
-    }
-
-    void undo() {
-        mTarget->setPointValues(mOldValues);
-    }
-private:
-    PointShapeValues *mTarget;
-    PathPointValues mOldValues;
-    PathPointValues mNewValues;
-};
 #include "Animators/paintsettings.h"
 
 class PaintTypeChangeUndoRedo : public UndoRedo {

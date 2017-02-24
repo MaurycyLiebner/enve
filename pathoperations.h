@@ -78,7 +78,7 @@ public:
 
     void getListOfGeneratedSeparatePaths(QList<MinimalVectorPath*> *separate, FullVectorPath *target);
 
-    void addAllToVectorPath(VectorPath *path);
+    void addAllToVectorPath(PathAnimator *path);
 
     void getSeparatePathsFromOther(FullVectorPath *other);
 

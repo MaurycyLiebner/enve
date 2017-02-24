@@ -255,6 +255,7 @@ private:
     CtrlsMode mCtrlsMode = CTRLS_CORNER;
 };
 
+class PathAnimator;
 class SvgSeparatePath {
 public:
     SvgSeparatePath() {}
@@ -264,7 +265,7 @@ public:
         }
     }
 
-    void apply(VectorPath *path);
+    void apply(PathAnimator *path);
 
     void closePath() {
         if(mLastPoint->getStartPointEnabled()) {
@@ -441,7 +442,7 @@ public:
         mSvgSeparatePaths << lastPath;
         return lastPath;
     }
-    void apply(VectorPath *path);
+    void apply(PathAnimator *path);
 protected:
     QList<SvgSeparatePath*> mSvgSeparatePaths;
 };

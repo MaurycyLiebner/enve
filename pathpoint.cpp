@@ -1,14 +1,15 @@
 #include "pathpoint.h"
-#include "Boxes/vectorpath.h"
+#include "Animators/pathanimator.h"
 #include "undoredo.h"
 #include "ctrlpoint.h"
 #include <QPainter>
 #include <QDebug>
 
-PathPoint::PathPoint(VectorPath *vectorPath) :
-    MovablePoint(vectorPath, MovablePointType::TYPE_PATH_POINT, 9.5)
+PathPoint::PathPoint(PathAnimator *parentAnimator) :
+    MovablePoint(parentAnimator->getParentBox(),
+                 MovablePointType::TYPE_PATH_POINT, 9.5)
 {
-    mVectorPath = vectorPath;
+    mParentPath = parentAnimator;
     mStartCtrlPt = new CtrlPoint(this, true);
     mEndCtrlPt = new CtrlPoint(this, false);
     mStartCtrlPt->incNumberPointers();
@@ -169,12 +170,12 @@ void PathPoint::disconnectFromPoint(PathPoint *point)
 
 void PathPoint::removeFromVectorPath()
 {
-    mVectorPath->removePoint(this);
+    mParentPath->removePoint(this);
 }
 
 void PathPoint::removeApproximate()
 {
-    mVectorPath->deletePointAndApproximate(this);
+    mParentPath->deletePointAndApproximate(this);
 }
 
 void PathPoint::rectPointsSelection(QRectF absRect, QList<MovablePoint*> *list) {
@@ -412,7 +413,8 @@ void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
     }
     mNextPoint = nextPoint;
     updateEndCtrlPtVisibility();
-    mVectorPath->schedulePathUpdate();
+    mRelPos.callUpdater();
+    //mParentPath->schedulePathUpdate();
 }
 
 void PathPoint::updateStartCtrlPtVisibility() {
@@ -442,7 +444,8 @@ void PathPoint::setEndCtrlPtEnabled(bool enabled,
     //mEndCtrlPt->setRelativePos(getRelativePos());
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
-    mVectorPath->schedulePathUpdate();
+    mRelPos.callUpdater();
+    //mParentPath->schedulePathUpdate();
 }
 
 void PathPoint::setStartCtrlPtEnabled(bool enabled,
@@ -456,7 +459,8 @@ void PathPoint::setStartCtrlPtEnabled(bool enabled,
     //mStartCtrlPt->setRelativePos(getRelativePos());
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
-    mVectorPath->schedulePathUpdate();
+    mRelPos.callUpdater();
+    //mParentPath->schedulePathUpdate();
 }
 
 void PathPoint::updateAfterFrameChanged(int frame)
@@ -475,83 +479,16 @@ int PathPoint::getPointId() {
     return mPointId;
 }
 
-PathPointValues PathPoint::getPointValues() const
-{
-//    if(mEditingShape) {
-//        return mBasisShapeSavedValues;
-//    }
+PathPointValues PathPoint::getPointValues() const {
     return PathPointValues(getStartCtrlPtValue(),
                            getRelativePos(),
                            getEndCtrlPtValue() );
-}
-
-void PathPoint::removeShapeValues(VectorPathShape *shape) {
-    for(int i = 0; i < mShapeValues.count(); i++) {
-        if(mShapeValues.at(i)->getParentShape() == shape) {
-            delete mShapeValues.takeAt(i);
-            return;
-        }
-    }
-}
-
-void PathPoint::addShapeValues(VectorPathShape *shape) {
-    mShapeValues << new PointShapeValues(shape, mPointId);
 }
 
 void PathPoint::setPointValues(const PathPointValues &values) {
     setRelativePos(values.pointRelPos, false);
     mEndCtrlPt->setRelativePos(values.endRelPos, false);
     mStartCtrlPt->setRelativePos(values.startRelPos, false);
-}
-
-void PathPoint::editShape(VectorPathShape *shape)
-{
-    mBasisShapeSavedValues = getPointValues();
-    mEditingShape = true;
-    foreach(PointShapeValues *pointShapeValues, mShapeValues) {
-        if(pointShapeValues->getParentShape() == shape) {
-            if(shape->isRelative()) {
-                setPointValues(pointShapeValues->getValues() + mBasisShapeSavedValues);
-            } else {
-                setPointValues(pointShapeValues->getValues());
-            }
-            return;
-        }
-    }
-}
-
-void PathPoint::finishEditingShape(VectorPathShape *shape)
-{
-    mEditingShape = false;
-    savePointValuesToShapeValues(shape);
-    setPointValues(mBasisShapeSavedValues);
-}
-
-void PathPoint::cancelEditingShape()
-{
-    mEditingShape = false;
-    setPointValues(mBasisShapeSavedValues);
-}
-
-void PathPoint::saveInitialPointValuesToShapeValues(VectorPathShape *shape)
-{
-    if(shape->isRelative()) {
-        foreach(PointShapeValues *pointShapeValues, mShapeValues) {
-            if(pointShapeValues->getParentShape() == shape) {
-                pointShapeValues->setPointValues(PathPointValues(QPointF(0., 0.),
-                                                                 QPointF(0., 0.),
-                                                                 QPointF(0., 0.)));
-                return;
-            }
-        }
-    } else {
-        foreach(PointShapeValues *pointShapeValues, mShapeValues) {
-            if(pointShapeValues->getParentShape() == shape) {
-                pointShapeValues->setPointValues(getPointValues());
-                return;
-            }
-        }
-    }
 }
 
 void PathPoint::makeDuplicate(MovablePoint *targetPoint) {
@@ -568,58 +505,6 @@ void PathPoint::duplicateCtrlPointsFrom(CtrlPoint *endPt,
                                         CtrlPoint *startPt) {
     endPt->makeDuplicate(mEndCtrlPt);
     startPt->makeDuplicate(mStartCtrlPt);
-}
-
-void PathPoint::savePointValuesToShapeValues(VectorPathShape *shape)
-{
-    PathPointValues values;
-    if(shape->isRelative()) {
-        values = getPointValues() - mBasisShapeSavedValues;
-    } else {
-        values = getPointValues();
-    }
-    foreach(PointShapeValues *pointShapeValues, mShapeValues) {
-        if(pointShapeValues->getParentShape() == shape) {
-            addUndoRedo(new ChangePointShapeValuesUndoRedo(
-                            pointShapeValues,
-                            pointShapeValues->getValues(),
-                            values));
-            pointShapeValues->setPointValues(values);
-            return;
-        }
-    }
-}
-
-PathPointValues PathPoint::getShapesInfluencedPointValues() const
-{
-    if(mShapeValues.isEmpty() ) return getPointValues();
-    PathPointValues relativeValues = PathPointValues(QPointF(0., 0.),
-                                                     QPointF(0., 0.),
-                                                     QPointF(0., 0.));
-    PathPointValues absValues = PathPointValues(QPointF(0., 0.),
-                                                QPointF(0., 0.),
-                                                QPointF(0., 0.));
-
-    qreal nAbs = 0.;
-    foreach(PointShapeValues *pointShapeValues, mShapeValues) {
-        VectorPathShape *parentShape = pointShapeValues->getParentShape();
-        qreal infl = parentShape->getCurrentInfluence();
-        if(parentShape->isRelative()) {
-            relativeValues += pointShapeValues->getValues()*infl;
-        } else {
-            absValues += pointShapeValues->getValues()*infl;
-            nAbs += infl;
-        }
-    }
-    if(nAbs < 1.) {
-        if(mEditingShape) {
-            absValues += mBasisShapeSavedValues*(1. - nAbs);
-        } else {
-            absValues += getPointValues()*(1. - nAbs);
-        }
-        nAbs = 1.;
-    }
-    return absValues/nAbs + relativeValues;
 }
 
 CtrlsMode PathPoint::getCurrentCtrlsMode()
@@ -674,9 +559,8 @@ bool PathPoint::isNeighbourSelected() {
     return isSelected() || nextSelected || prevSelected;
 }
 
-VectorPath *PathPoint::getParentPath()
-{
-    return mVectorPath;
+PathAnimator *PathPoint::getParentPath() {
+    return mParentPath;
 }
 
 void PathPoint::setSeparatePathPoint(bool separatePathPoint)
@@ -755,7 +639,8 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
     }
     setCtrlPtEnabled(true, true, saveUndoRedo);
     setCtrlPtEnabled(true, false, saveUndoRedo);
-    mVectorPath->schedulePathUpdate();
+    //mParentPath->schedulePathUpdate();
+    mRelPos.callUpdater();
 }
 
 void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
@@ -768,7 +653,8 @@ void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
     }
     mPreviousPoint = previousPoint;
     updateStartCtrlPtVisibility();
-    mVectorPath->schedulePathUpdate();
+    //mParentPath->schedulePathUpdate();
+    mRelPos.callUpdater();
 }
 
 bool PathPoint::hasNextPoint() {
@@ -801,12 +687,12 @@ void PathPoint::setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo) {
 
 PathPoint *PathPoint::addPointAbsPos(QPointF absPos)
 {
-    return mVectorPath->addPointAbsPos(absPos, this);
+    return mParentPath->addPointAbsPos(absPos, this);
 }
 
 PathPoint *PathPoint::addPoint(PathPoint *pointToAdd)
 {
-    return mVectorPath->addPoint(pointToAdd, this);
+    return mParentPath->addPoint(pointToAdd, this);
 }
 
 bool PathPoint::isEndPoint() {

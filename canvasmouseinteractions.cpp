@@ -5,6 +5,7 @@
 #include "Boxes/rectangle.h"
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
+#include "edge.h"
 
 QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
     return point/mCombinedTransformMatrix.m11();
@@ -212,7 +213,8 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
                 clearBoxesSelection();
                 addBoxToSelection(newPath);
                 setCurrentEndPoint(
-                            newPath->addPointAbsPos(mLastMouseEventPos,
+                            newPath->getPathAnimator()->
+                                    addPointAbsPos(mLastMouseEventPos,
                                                     mCurrentEndPoint) );
 
             } else {
