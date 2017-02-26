@@ -99,12 +99,12 @@ private:
     QPointFAnimator *pathPointPosAnimator;
 }; 
 
-class PathAnimator;
+class SinglePathAnimator;
 
 class PathPoint : public MovablePoint
 {
 public:
-    PathPoint(PathAnimator *parentAnimator);
+    PathPoint(SinglePathAnimator *parentAnimator);
 
     ~PathPoint();
 
@@ -164,7 +164,7 @@ public:
     void moveEndCtrlPtToRelPos(QPointF endCtrlPt);
     void moveStartCtrlPtToRelPos(QPointF startCtrlPt);
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
-    PathAnimator *getParentPath();
+    SinglePathAnimator *getParentPath();
 
     void saveToSql(QSqlQuery *query, int boundingBoxId);
 
@@ -207,12 +207,13 @@ public:
         p->drawEllipse(getAbsolutePos(),
                        mRadius - 2, mRadius - 2);
     }
+    void setParentPath(SinglePathAnimator *path);
 private:
 
     int mPointId;
     PathPointAnimators mPathPointAnimators;
 
-    PathAnimator *mParentPath;
+    SinglePathAnimator *mParentPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_CORNER;
 
     bool mSeparatePathPoint = false;

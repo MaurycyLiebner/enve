@@ -105,7 +105,8 @@ SOURCES += main.cpp\
     canvasselectedboxesactions.cpp \
     clipboardcontainer.cpp \
     Animators/paintsettings.cpp \
-    edge.cpp
+    edge.cpp \
+    Animators/singlepathanimator.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -196,7 +197,8 @@ HEADERS  += mainwindow.h \
     BoxesList/boxeslistactionbutton.h \
     clipboardcontainer.h \
     Animators/paintsettings.h \
-    edge.h
+    edge.h \
+    Animators/singlepathanimator.h
 
 RESOURCES += \
     resources.qrc

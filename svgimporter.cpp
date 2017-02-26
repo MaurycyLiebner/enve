@@ -2,6 +2,7 @@
 #include "Boxes/vectorpath.h"
 #include "Boxes/boxesgroup.h"
 #include "canvas.h"
+#include "Animators/singlepathanimator.h"
 
 void getTranslationShearRotationScaleFromMatrix(const QMatrix &matrix,
                                                 qreal *tx, qreal *ty,
@@ -27,7 +28,8 @@ struct SvgAttribute {
     QString value;
 };
 
-void extractSvgAttributes(const QString &string, QList<SvgAttribute> *attributesList) {
+void extractSvgAttributes(const QString &string,
+                          QList<SvgAttribute> *attributesList) {
     QStringList attributesStrList = string.split(";");
     foreach(const QString &attributeStr, attributesStrList) {
         attributesList->append(SvgAttribute(attributeStr));
@@ -1528,13 +1530,15 @@ void VectorPathSvgAttributes::apply(PathAnimator *path)
 {
     foreach(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
-        separatePath->apply(path);
+        SinglePathAnimator *singlePath = new SinglePathAnimator(path);
+        separatePath->apply(singlePath);
+        path->addSinglePathAnimator(singlePath);
     }
 
     BoundingBoxSvgAttributes::apply((BoundingBox*)path);
 }
 
-void SvgSeparatePath::apply(PathAnimator *path)
+void SvgSeparatePath::apply(SinglePathAnimator *path)
 {
     PathPoint *lastPoint = NULL;
     PathPoint *firstPoint = NULL;

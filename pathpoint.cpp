@@ -1,12 +1,12 @@
 #include "pathpoint.h"
-#include "Animators/pathanimator.h"
+#include "Animators/singlepathanimator.h"
 #include "undoredo.h"
 #include "ctrlpoint.h"
 #include <QPainter>
 #include <QDebug>
 
-PathPoint::PathPoint(PathAnimator *parentAnimator) :
-    MovablePoint(parentAnimator->getParentBox(),
+PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
+    MovablePoint(parentAnimator->getParentPathAnimator()->getParentBox(),
                  MovablePointType::TYPE_PATH_POINT, 9.5)
 {
     mParentPath = parentAnimator;
@@ -37,6 +37,10 @@ PathPoint::PathPoint(PathAnimator *parentAnimator) :
 PathPoint::~PathPoint() {
     mStartCtrlPt->decNumberPointers();
     mEndCtrlPt->decNumberPointers();
+}
+
+void PathPoint::setParentPath(SinglePathAnimator *path) {
+    mParentPath = path;
 }
 
 void PathPoint::applyTransform(QMatrix transform)
@@ -558,7 +562,7 @@ bool PathPoint::isNeighbourSelected() {
     return isSelected() || nextSelected || prevSelected;
 }
 
-PathAnimator *PathPoint::getParentPath() {
+SinglePathAnimator *PathPoint::getParentPath() {
     return mParentPath;
 }
 

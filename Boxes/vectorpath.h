@@ -57,11 +57,11 @@ public:
     void updateAfterFrameChanged(int currentFrame);
 
     void startAllPointsTransform() {
-        mPathAnimator.startAllPointsTransform();
+        //mPathAnimator.startAllPointsTransform();
     }
 
     void finishAllPointsTransform() {
-        mPathAnimator.finishAllPointsTransform();
+        //mPathAnimator.finishAllPointsTransform();
     }
 
     void showContextMenu(QPoint globalPos);

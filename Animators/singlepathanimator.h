@@ -1,26 +1,26 @@
-#ifndef PATHANIMATOR_H
-#define PATHANIMATOR_H
+#ifndef SINGLEPATHANIMATOR_H
+#define SINGLEPATHANIMATOR_H
+
 #include <QPainterPath>
 #include "complexanimator.h"
 
 enum CanvasMode : short;
 
+class PathAnimator;
 class Edge;
 class MovablePoint;
 
 class PathPoint;
-class SinglePathAnimator;
 
 struct PathPointAnimators;
 
-class PathAnimator : public ComplexAnimator
+class SinglePathAnimator : public ComplexAnimator
 {
     Q_OBJECT
 public:
-    PathAnimator(BoundingBox *parentBox);
-    PathAnimator();
+    SinglePathAnimator(PathAnimator *parentPath);
 
-    ~PathAnimator();
+    ~SinglePathAnimator();
 
     Edge *getEgde(QPointF absPos);
     QPointF getRelCenterPosition();
@@ -33,25 +33,29 @@ public:
 
     void loadPointsFromSql(int boundingBoxId);
     void savePointsToSql(QSqlQuery *query, const int &boundingBoxId);
-    PathPoint *createNewPointOnLineNear(const QPointF &absPos,
-                                        const bool &adjust);
-    void updateAfterFrameChanged(const int &currentFrame);
+    PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
+    void updateAfterFrameChanged(int currentFrame);
     qreal findPercentForPoint(const QPointF &point,
                               PathPoint **prevPoint,
                               qreal *error);
     void applyTransformToPoints(const QMatrix &transform);
     void disconnectPoints(PathPoint *point1, PathPoint *point2);
     void connectPoints(PathPoint *point1, PathPoint *point2);
+    PathPoint *addPointRelPos(const QPointF &relPos,
+                              const QPointF &startRelPos,
+                              const QPointF &endRelPos,
+                              PathPoint *toPoint);
+    PathPoint *addPointRelPos(const QPointF &relPtPos,
+                              PathPoint *toPoint);
     void appendToPointsList(PathPoint *point,
                             const bool &saveUndoRedo = true);
     void removeFromPointsList(PathPoint *point,
                               const bool &saveUndoRedo = true);
     void removePoint(PathPoint *point);
-    void replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
-                                  PathPoint *newPoint);
+    void replaceSeparatePathPoint(PathPoint *newPoint);
     void startAllPointsTransform();
     void finishAllPointsTransform();
-    void duplicatePathsTo(PathAnimator *target);
+    void duplicatePathPointsTo(SinglePathAnimator *target);
     void removePointFromSeparatePaths(PathPoint *pointToRemove,
                                       bool saveUndoRedo = true);
     PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
@@ -63,22 +67,27 @@ public:
     void selectAndAddContainedPointsToList(
             const QRectF &absRect, QList<MovablePoint *> *list);
 
-    BoundingBox *getParentBox() {
-        return mParentBox;
+    PathAnimator *getParentPathAnimator() {
+        return mParentPathAnimator;
     }
 
-    void loadPathFromQPainterPath(const QPainterPath &path);
+    //void loadPathFromQPainterPath(const QPainterPath &path);
     void addPointToSeparatePaths(PathPoint *pointToAdd,
                                  const bool &saveUndoRedo = true);
-    void setParentBox(BoundingBox *parent);
-    void addSinglePathAnimator(SinglePathAnimator *path);
-    void removeSinglePathAnimator(SinglePathAnimator *path);
+    void changeAllPointsParentPathTo(SinglePathAnimator *path);
+    void addPoint(PathPoint *pointToAdd);
 private:
-    BoundingBox *mParentBox = NULL;
+    PathAnimator *mParentPathAnimator = NULL;
     QPainterPath mPath;
-    QList<SinglePathAnimator*> mSinglePaths;
+    PathPoint *mFirstPoint = NULL;
+    QList<PathPoint*> mPoints;
+    bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
+                                              qreal *pressedT,
+                                              PathPoint **prevPoint,
+                                              PathPoint **nextPoint);
+    void updatePathPointIds();
 signals:
-    void lastSinglePathRemoved();
+    void lastPointRemoved();
 };
 
-#endif // PATHANIMATOR_H
+#endif // SINGLEPATHANIMATOR_H

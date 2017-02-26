@@ -1,4 +1,5 @@
 #include "canvas.h"
+#include "Animators/singlepathanimator.h"
 
 void Canvas::connectPoints() {
     QList<PathPoint*> selectedPathPoints;
@@ -12,8 +13,8 @@ void Canvas::connectPoints() {
     if(selectedPathPoints.count() == 2) {
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
-        if(firstPoint->getParentPath() ==
-                secondPoint->getParentPath()) {
+        if(firstPoint->getParentPath()->getParentPathAnimator() ==
+                secondPoint->getParentPath()->getParentPathAnimator()) {
             firstPoint->getParentPath()->
                     connectPoints(firstPoint, secondPoint);
         }

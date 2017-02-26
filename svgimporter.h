@@ -256,6 +256,7 @@ private:
 };
 
 class PathAnimator;
+class SinglePathAnimator;
 class SvgSeparatePath {
 public:
     SvgSeparatePath() {}
@@ -265,7 +266,7 @@ public:
         }
     }
 
-    void apply(PathAnimator *path);
+    void apply(SinglePathAnimator *path);
 
     void closePath() {
         if(mLastPoint->getStartPointEnabled()) {

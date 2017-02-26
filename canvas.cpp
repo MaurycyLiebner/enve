@@ -876,47 +876,47 @@ void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,
 
 void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
                                              PathPoint *pointDest) {
-    if(pointSrc->getParentPath() == pointDest->getParentPath()) {
-        return;
-    }
-    PathAnimator *pathSrc = pointSrc->getParentPath();
-    PathAnimator *pathDest = pointDest->getParentPath();
-    setCurrentEndPoint(pointDest);
-    if(pointSrc->hasNextPoint()) {
-        PathPoint *point = pointSrc;
-        bool mirror = pointDest->hasNextPoint();
-        while(point != NULL) {
-            QPointF startCtrlPtPos;
-            QPointF endCtrlPtPos;
-            getMirroredCtrlPtAbsPos(mirror, point,
-                                    &startCtrlPtPos, &endCtrlPtPos);
-            PathPoint *newPoint = new PathPoint(pathDest);
-            newPoint->setAbsolutePos(point->getAbsolutePos());
-            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
-            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
+//    if(pointSrc->getParentPath() == pointDest->getParentPath()) {
+//        return;
+//    }
+//    PathAnimator *pathSrc = pointSrc->getParentPath();
+//    PathAnimator *pathDest = pointDest->getParentPath();
+//    setCurrentEndPoint(pointDest);
+//    if(pointSrc->hasNextPoint()) {
+//        PathPoint *point = pointSrc;
+//        bool mirror = pointDest->hasNextPoint();
+//        while(point != NULL) {
+//            QPointF startCtrlPtPos;
+//            QPointF endCtrlPtPos;
+//            getMirroredCtrlPtAbsPos(mirror, point,
+//                                    &startCtrlPtPos, &endCtrlPtPos);
+//            PathPoint *newPoint = new PathPoint(pathDest);
+//            newPoint->setAbsolutePos(point->getAbsolutePos());
+//            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
+//            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
 
-            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
-            point = point->getNextPoint();
-        }
-    } else {
-        PathPoint *point = pointSrc;
-        bool mirror = pointDest->hasPreviousPoint();
-        while(point != NULL) {
-            QPointF startCtrlPtPos;
-            QPointF endCtrlPtPos;
-            getMirroredCtrlPtAbsPos(mirror, point,
-                                    &startCtrlPtPos, &endCtrlPtPos);
+//            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
+//            point = point->getNextPoint();
+//        }
+//    } else {
+//        PathPoint *point = pointSrc;
+//        bool mirror = pointDest->hasPreviousPoint();
+//        while(point != NULL) {
+//            QPointF startCtrlPtPos;
+//            QPointF endCtrlPtPos;
+//            getMirroredCtrlPtAbsPos(mirror, point,
+//                                    &startCtrlPtPos, &endCtrlPtPos);
 
-            PathPoint *newPoint = new PathPoint(pathDest);
-            newPoint->setAbsolutePos(point->getAbsolutePos());
-            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
-            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
+//            PathPoint *newPoint = new PathPoint(pathDest);
+//            newPoint->setAbsolutePos(point->getAbsolutePos());
+//            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
+//            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
 
-            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
-            point = point->getPreviousPoint();
-        }
-    }
-    mCurrentBoxesGroup->removeChild(pathSrc->getParentBox());
+//            setCurrentEndPoint(mCurrentEndPoint->addPoint(newPoint) );
+//            point = point->getPreviousPoint();
+//        }
+//    }
+//    mCurrentBoxesGroup->removeChild(pathSrc->getParentBox());
 }
 
 bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,

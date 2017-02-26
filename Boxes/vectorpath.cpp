@@ -165,7 +165,7 @@ void VectorPath::selectAndAddContainedPointsToList(QRectF absRect,
 
 void VectorPath::duplicatePathAnimatorFrom(
         PathAnimator *source) {
-    source->duplicatePathPointsTo(&mPathAnimator);
+    source->duplicatePathsTo(&mPathAnimator);
 }
 
 void VectorPath::makeDuplicate(BoundingBox *targetBox) {

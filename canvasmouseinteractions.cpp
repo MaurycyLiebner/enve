@@ -6,6 +6,7 @@
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
 #include "edge.h"
+#include "Animators/singlepathanimator.h"
 
 QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
     return point/mCombinedTransformMatrix.m11();
@@ -212,8 +213,11 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
                 VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
                 clearBoxesSelection();
                 addBoxToSelection(newPath);
-                setCurrentEndPoint(
-                            newPath->getPathAnimator()->
+                PathAnimator *newPathAnimator = newPath->getPathAnimator();
+                SinglePathAnimator *newSinglePath = new SinglePathAnimator(
+                                                            newPathAnimator);
+                newPathAnimator->addSinglePathAnimator(newSinglePath);
+                setCurrentEndPoint(newSinglePath->
                                     addPointAbsPos(mLastMouseEventPos,
                                                     mCurrentEndPoint) );
 

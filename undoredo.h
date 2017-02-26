@@ -6,6 +6,7 @@
 #include "Boxes/vectorpath.h"
 #include "movablepoint.h"
 #include "Animators/qrealanimator.h"
+#include "Animators/singlepathanimator.h"
 #include <QDebug>
 
 class UndoRedo
@@ -178,7 +179,7 @@ class AppendToPointsListUndoRedo : public UndoRedo
 {
 public:
     AppendToPointsListUndoRedo(PathPoint *pointToAdd,
-                               PathAnimator *path) :
+                               SinglePathAnimator *path) :
         UndoRedo("AppendToPointsListUndoRedo") {
         mPoint = pointToAdd;
         mPath = path;
@@ -201,14 +202,14 @@ public:
 
 private:
     PathPoint *mPoint;
-    PathAnimator *mPath;
+    SinglePathAnimator *mPath;
 };
 
 class RemoveFromPointsListUndoRedo : public AppendToPointsListUndoRedo
 {
 public:
     RemoveFromPointsListUndoRedo(PathPoint *pointToRemove,
-                                 PathAnimator *path) :
+                                 SinglePathAnimator *path) :
         AppendToPointsListUndoRedo(pointToRemove, path) {
     }
 

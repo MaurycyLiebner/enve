@@ -231,14 +231,16 @@ void FullVectorPath::getListOfGeneratedSeparatePaths(
     }
 }
 
+#include "Animators/singlepathanimator.h"
 void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
     foreach(MinimalVectorPath *separatePath, mSeparatePaths) {
         MinimalPathPoint *firstPoint = separatePath->getFirstPoint();
         MinimalPathPoint *point = firstPoint;
         PathPoint *firstPathPoint = NULL;
         PathPoint *lastPathPoint = NULL;
+        SinglePathAnimator *singlePath = new SinglePathAnimator(path);
         do {
-            lastPathPoint = path->addPointRelPos(point->getPos(),
+            lastPathPoint = singlePath->addPointRelPos(point->getPos(),
                                                  point->getStartPos(),
                                                  point->getEndPos(),
                                                  lastPathPoint);
@@ -248,6 +250,7 @@ void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
             point = point->getNextPoint();
         } while(point != firstPoint);
         lastPathPoint->connectToPoint(firstPathPoint);
+        path->addSinglePathAnimator(singlePath);
     }
 }
 
