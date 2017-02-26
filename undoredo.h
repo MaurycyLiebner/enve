@@ -150,7 +150,8 @@ class MoveMovablePointUndoRedo : public UndoRedo
 public:
     MoveMovablePointUndoRedo(MovablePoint *movedPoint,
                          QPointF relPosBefore,
-                         QPointF relPosAfter) : UndoRedo("MoveMovablePointUndoRedo") {
+                         QPointF relPosAfter) :
+        UndoRedo("MoveMovablePointUndoRedo") {
         mMovedPoint = movedPoint;
         mMovedPoint->incNumberPointers();
         mRelPosAfter = relPosAfter;
@@ -477,7 +478,8 @@ class SetBoundingBoxZListIndexUnoRedo : public UndoRedo
 public:
     SetBoundingBoxZListIndexUnoRedo(int indexBefore,
                                     int indexAfter,
-                                    BoundingBox *box) : UndoRedo("SetBoundingBoxZListIndexUnoRedo") {
+                                    BoundingBox *box) :
+        UndoRedo("SetBoundingBoxZListIndexUnoRedo") {
         mBox = box;
         mBox->incNumberPointers();
         mIndexAfter = indexAfter;
@@ -507,7 +509,8 @@ class AddChildToListUndoRedo : public UndoRedo
 public:
     AddChildToListUndoRedo(BoxesGroup *parent,
                            int index,
-                           BoundingBox *child) : UndoRedo("AddChildToListUndoRedo") {
+                           BoundingBox *child) :
+        UndoRedo("AddChildToListUndoRedo") {
         mParent = parent;
         mParent->incNumberPointers();
         mAddAtId = index;
@@ -559,7 +562,8 @@ class SetBoxParentUndoRedo : public UndoRedo
 public:
     SetBoxParentUndoRedo(BoundingBox *childBox,
                          BoxesGroup *oldParent,
-                         BoxesGroup *newParent) : UndoRedo("SetBoxParentUndoRedo")
+                         BoxesGroup *newParent) :
+        UndoRedo("SetBoxParentUndoRedo")
     {
         mChildBox = childBox;
         if(childBox != NULL) mChildBox->incNumberPointers();
@@ -592,7 +596,8 @@ private:
 class SetPivotRelPosUndoRedo : public UndoRedo
 {
 public:
-    SetPivotRelPosUndoRedo(BoundingBox *target, QPointF prevRelPos, QPointF newRelPos,
+    SetPivotRelPosUndoRedo(BoundingBox *target,
+                           QPointF prevRelPos, QPointF newRelPos,
                            bool prevPivotChanged, bool newPivotChanged) :
         UndoRedo("SetPivotRelPosUndoRedo") {
         mTarget = target;
@@ -956,6 +961,118 @@ private:
     int mId1;
     int mId2;
     Gradient *mGradient;
+};
+
+class AddSinglePathAnimatorUndoRedo : public UndoRedo {
+public:
+    AddSinglePathAnimatorUndoRedo(PathAnimator *target,
+                                  SinglePathAnimator *path) :
+        UndoRedo("AddSinglePathAnimatorUndoRedo") {
+        mTarget = target;
+        mPath = path;
+        target->incNumberPointers();
+        path->incNumberPointers();
+    }
+
+    ~AddSinglePathAnimatorUndoRedo() {
+        mTarget->decNumberPointers();
+        mPath->decNumberPointers();
+    }
+
+    void undo() {
+        mTarget->removeSinglePathAnimator(mPath, false);
+    }
+
+    void redo() {
+        mTarget->addSinglePathAnimator(mPath, false);
+    }
+private:
+    PathAnimator *mTarget;
+    SinglePathAnimator *mPath;
+};
+
+class RemoveSinglePathAnimatorUndoRedo :
+        public AddSinglePathAnimatorUndoRedo {
+public:
+    RemoveSinglePathAnimatorUndoRedo(PathAnimator *target,
+                                     SinglePathAnimator *path) :
+        AddSinglePathAnimatorUndoRedo(target, path) {
+    }
+
+    void undo() {
+        AddSinglePathAnimatorUndoRedo::redo();
+    }
+
+    void redo() {
+        AddSinglePathAnimatorUndoRedo::undo();
+    }
+};
+
+class ChangeSinglePathFirstPoint :
+        public UndoRedo {
+public:
+    ChangeSinglePathFirstPoint(SinglePathAnimator *target,
+                               PathPoint *oldPoint,
+                               PathPoint *newPoint) :
+        UndoRedo("ChangeSinglePathFirstPoint") {
+        mTarget = target;
+        mOldPoint = oldPoint;
+        mNewPoint = newPoint;
+        if(oldPoint != NULL) {
+            oldPoint->incNumberPointers();
+        }
+        if(newPoint != NULL) {
+            newPoint->incNumberPointers();
+        }
+        target->incNumberPointers();
+    }
+
+    ~ChangeSinglePathFirstPoint() {
+        if(mNewPoint != NULL) {
+            mNewPoint->decNumberPointers();
+        }
+        if(mOldPoint != NULL) {
+            mOldPoint->decNumberPointers();
+        }
+        mTarget->decNumberPointers();
+    }
+
+    void undo() {
+        mTarget->replaceSeparatePathPoint(mOldPoint, false);
+    }
+
+    void redo() {
+        mTarget->replaceSeparatePathPoint(mNewPoint, false);
+    }
+
+private:
+    SinglePathAnimator *mTarget;
+    PathPoint *mOldPoint;
+    PathPoint *mNewPoint;
+};
+
+class ReversePointsDirectionUndoRedo :
+        public UndoRedo {
+public:
+    ReversePointsDirectionUndoRedo(PathPoint *target) :
+        UndoRedo("ReversePointsDirectionUndoRedo") {
+        mTarget = target;
+        mTarget->incNumberPointers();
+    }
+
+    ~ReversePointsDirectionUndoRedo() {
+        mTarget->decNumberPointers();
+    }
+
+    void undo() {
+        mTarget->reversePointsDirectionReverse();
+    }
+
+    void redo() {
+        mTarget->reversePointsDirection();
+    }
+private:
+    PathPoint *mTarget;
 };
 
 #endif // UNDOREDO_H

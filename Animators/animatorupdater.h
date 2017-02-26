@@ -71,11 +71,11 @@ private:
 class DisplayedFillStrokeSettingsUpdater : public AnimatorUpdater
 {
 public:
-    DisplayedFillStrokeSettingsUpdater(PathBox *path);
+    DisplayedFillStrokeSettingsUpdater(BoundingBox *path);
 
     void update();
 private:
-    PathBox *mTarget;
+    BoundingBox *mTarget;
 };
 
 class RectangleBottomRightUpdater : public AnimatorUpdater

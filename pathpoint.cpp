@@ -130,6 +130,14 @@ void PathPoint::moveByAbs(QPointF absTranslatione) {
     }
 }
 
+void PathPoint::reversePointsDirectionStartingFromThis(
+        const bool &saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new ReversePointsDirectionUndoRedo(this));
+    }
+    reversePointsDirection();
+}
+
 void PathPoint::reversePointsDirection() {
     PathPoint *nextT = mNextPoint;
     mNextPoint = mPreviousPoint;
@@ -141,6 +149,19 @@ void PathPoint::reversePointsDirection() {
     mStartCtrlPt = endPointT;
     if(nextT == NULL) return;
     nextT->reversePointsDirection();
+}
+
+void PathPoint::reversePointsDirectionReverse() {
+    PathPoint *prevT = mPreviousPoint;
+    mPreviousPoint = mNextPoint;
+    mNextPoint = prevT;
+    mEndCtrlPt->setIsStartCtrlPt(true);
+    mStartCtrlPt->setIsStartCtrlPt(false);
+    CtrlPoint *endPointT = mEndCtrlPt;
+    mEndCtrlPt = mStartCtrlPt;
+    mStartCtrlPt = endPointT;
+    if(prevT == NULL) return;
+    prevT->reversePointsDirectionReverse();
 }
 
 void PathPoint::connectToPoint(PathPoint *point)

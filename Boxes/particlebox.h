@@ -96,6 +96,7 @@ public:
 
     void setParentBox(ParticleBox *parentBox) {
         mParentBox = parentBox;
+
         scheduleGenerateParticles();
     }
 
@@ -217,6 +218,8 @@ private:
     QList<ParticleState> mParticleStates;
     QList<Particle*> mParticles;
     ParticleBox *mParentBox = NULL;
+
+    ColorAnimator mColorAnimator;
 
     QPointFAnimator mPos;
     QrealAnimator mWidth;

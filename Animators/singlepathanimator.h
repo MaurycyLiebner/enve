@@ -52,7 +52,8 @@ public:
     void removeFromPointsList(PathPoint *point,
                               const bool &saveUndoRedo = true);
     void removePoint(PathPoint *point);
-    void replaceSeparatePathPoint(PathPoint *newPoint);
+    void replaceSeparatePathPoint(PathPoint *newPoint,
+                                  const bool &saveUndoRedo = true);
     void startAllPointsTransform();
     void finishAllPointsTransform();
     void duplicatePathPointsTo(SinglePathAnimator *target);

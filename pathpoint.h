@@ -208,6 +208,9 @@ public:
                        mRadius - 2, mRadius - 2);
     }
     void setParentPath(SinglePathAnimator *path);
+    void reversePointsDirectionStartingFromThis(
+            const bool &saveUndoRedo = true);
+    void reversePointsDirectionReverse();
 private:
 
     int mPointId;

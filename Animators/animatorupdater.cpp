@@ -49,7 +49,7 @@ void StrokeWidthUpdater::update()
 }
 
 DisplayedFillStrokeSettingsUpdater::
-DisplayedFillStrokeSettingsUpdater(PathBox *path) {
+DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
     mTarget = path;
 }
 

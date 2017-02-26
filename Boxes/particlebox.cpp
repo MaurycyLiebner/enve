@@ -200,6 +200,10 @@ ParticleEmitter::ParticleEmitter() :
     mPos.setName("pos");
     mPos.setCurrentValue(QPointF(0., 0.));
 
+    mColorAnimator.setName("color");
+    mColorAnimator.setCurrentValue(Color(0, 0, 0));
+    addChildAnimator(&mColorAnimator);
+
     mWidth.setName("width");
     mWidth.setValueRange(0., 6000.);
     mWidth.setCurrentValue(0.);
@@ -459,12 +463,12 @@ void ParticleEmitter::generateParticles() {
 void ParticleEmitter::drawParticles(QPainter *p) {
     p->save();
     if(mParticleLength.getCurrentValue() > 0.1) {
-        QPen pen = QPen(Qt::black);
+        QPen pen = QPen(mColorAnimator.getCurrentValue().qcol);
         pen.setCapStyle(Qt::RoundCap);
         p->setPen(pen);
         p->setBrush(Qt::NoBrush);
     } else {
-        p->setBrush(Qt::black);
+        p->setBrush(mColorAnimator.getCurrentValue().qcol);
         p->setPen(Qt::NoPen);
     }
     foreach(const ParticleState &state, mParticleStates) {

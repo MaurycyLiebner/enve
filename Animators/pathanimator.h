@@ -71,8 +71,10 @@ public:
     void addPointToSeparatePaths(PathPoint *pointToAdd,
                                  const bool &saveUndoRedo = true);
     void setParentBox(BoundingBox *parent);
-    void addSinglePathAnimator(SinglePathAnimator *path);
-    void removeSinglePathAnimator(SinglePathAnimator *path);
+    void addSinglePathAnimator(SinglePathAnimator *path,
+                               const bool &saveUndoRedo = true);
+    void removeSinglePathAnimator(SinglePathAnimator *path,
+                                  const bool &saveUndoRedo = true);
 private:
     BoundingBox *mParentBox = NULL;
     QPainterPath mPath;

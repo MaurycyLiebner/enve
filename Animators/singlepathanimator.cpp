@@ -423,7 +423,7 @@ void SinglePathAnimator::connectPoints(PathPoint *point1,
     SinglePathAnimator *point2ParentPath = point2->getParentPath();
     if(point1->isSeparatePathPoint() &&
        point2->isSeparatePathPoint()) {
-        point1->reversePointsDirection();
+        point1->reversePointsDirectionStartingFromThis();
         point1ParentPath->changeAllPointsParentPathTo(point2ParentPath);
         mParentPathAnimator->removeSinglePathAnimator(point1ParentPath);
 
@@ -447,7 +447,7 @@ void SinglePathAnimator::connectPoints(PathPoint *point1,
         PathPoint *point1ConnectedFirst =
                 point1->getConnectedSeparatePathPoint();
 
-        point1ConnectedFirst->reversePointsDirection();
+        point1ConnectedFirst->reversePointsDirectionStartingFromThis();
 
         point1ParentPath->changeAllPointsParentPathTo(
                     point2ParentPath);
@@ -765,7 +765,13 @@ void SinglePathAnimator::removePoint(PathPoint *point) {
     removeFromPointsList(point);
 }
 
-void SinglePathAnimator::replaceSeparatePathPoint(PathPoint *newPoint) {
+void SinglePathAnimator::replaceSeparatePathPoint(PathPoint *newPoint,
+                                                  const bool &saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new ChangeSinglePathFirstPoint(this,
+                                                   mFirstPoint,
+                                                   newPoint));
+    }
     if(mFirstPoint != NULL) {
         mFirstPoint->setSeparatePathPoint(false);
     }

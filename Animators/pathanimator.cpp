@@ -45,14 +45,22 @@ QPointF PathAnimator::getRelCenterPosition() {
     return mPath.controlPointRect().center();
 }
 
-void PathAnimator::addSinglePathAnimator(SinglePathAnimator *path) {
+void PathAnimator::addSinglePathAnimator(SinglePathAnimator *path,
+                                         const bool &saveUndoRedo) {
     mSinglePaths << path;
     path->incNumberPointers();
     addChildAnimator(path);
+    if(saveUndoRedo) {
+        addUndoRedo(new AddSinglePathAnimatorUndoRedo(this, path));
+    }
 }
 
-void PathAnimator::removeSinglePathAnimator(SinglePathAnimator *path) {
+void PathAnimator::removeSinglePathAnimator(SinglePathAnimator *path,
+                                            const bool &saveUndoRedo) {
     if(mSinglePaths.removeOne(path) ) {
+        if(saveUndoRedo) {
+            addUndoRedo(new RemoveSinglePathAnimatorUndoRedo(this, path));
+        }
         path->decNumberPointers();
         removeChildAnimator(path);
     }
