@@ -101,8 +101,7 @@ void ComplexAnimator::moveChildInList(
     callUpdater();
 }
 
-void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator)
-{
+void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator) {
     removeAnimator->setUpdater(NULL);
     removeAnimator->removeAllKeysFromComplexAnimator();
     mChildAnimators.removeOne(removeAnimator);

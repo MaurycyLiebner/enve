@@ -72,10 +72,8 @@ public:
     }
 
     //void loadPathFromQPainterPath(const QPainterPath &path);
-    void addPointToSeparatePaths(PathPoint *pointToAdd,
-                                 const bool &saveUndoRedo = true);
     void changeAllPointsParentPathTo(SinglePathAnimator *path);
-    void addPoint(PathPoint *pointToAdd);
+    void updatePathPointIds();
 private:
     PathAnimator *mParentPathAnimator = NULL;
     QPainterPath mPath;
@@ -85,7 +83,6 @@ private:
                                               qreal *pressedT,
                                               PathPoint **prevPoint,
                                               PathPoint **nextPoint);
-    void updatePathPointIds();
 signals:
     void lastPointRemoved();
 };

@@ -46,36 +46,40 @@ void Canvas::mergePoints() {
     QList<PathPoint*> selectedPathPoints;
     foreach(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
-            if(((PathPoint*)point)->isEndPoint()) {
+            //if(((PathPoint*)point)->isEndPoint()) {
                 selectedPathPoints.append( (PathPoint*) point);
-            }
+            //}
         }
     }
     if(selectedPathPoints.count() == 2) {
         PathPoint *firstPoint = selectedPathPoints.first();
         PathPoint *secondPoint = selectedPathPoints.last();
-        if(secondPoint->getParentPath() ==
-           secondPoint->getParentPath()) {
+        if(firstPoint->isEndPoint() &&
+           secondPoint->isEndPoint()) {
+
             secondPoint->getParentPath()->connectPoints(firstPoint,
                                                   secondPoint);
-            QPointF sumPos = firstPoint->getAbsolutePos() +
-                    secondPoint->getAbsolutePos();
-            bool firstWasPrevious = firstPoint ==
-                    secondPoint->getPreviousPoint();
-
-            secondPoint->startTransform();
-            secondPoint->moveToAbs(sumPos/2);
-            if(firstWasPrevious) {
-                secondPoint->moveStartCtrlPtToAbsPos(
-                            firstPoint->getStartCtrlPtAbsPos());
-            } else {
-                secondPoint->moveEndCtrlPtToAbsPos(
-                            firstPoint->getEndCtrlPtAbsPos());
-            }
-            secondPoint->finishTransform();
-
-            firstPoint->removeFromVectorPath();
+        } else if(firstPoint->getNextPoint() != secondPoint &&
+                  firstPoint->getPreviousPoint() != secondPoint) {
+            return;
         }
+        QPointF sumPos = firstPoint->getAbsolutePos() +
+                secondPoint->getAbsolutePos();
+        bool firstWasPrevious = firstPoint ==
+                secondPoint->getPreviousPoint();
+
+        secondPoint->startTransform();
+        secondPoint->moveToAbs(sumPos/2);
+        if(firstWasPrevious) {
+            secondPoint->moveStartCtrlPtToAbsPos(
+                        firstPoint->getStartCtrlPtAbsPos());
+        } else {
+            secondPoint->moveEndCtrlPtToAbsPos(
+                        firstPoint->getEndCtrlPtAbsPos());
+        }
+        secondPoint->finishTransform();
+
+        firstPoint->removeFromVectorPath();
     }
 }
 

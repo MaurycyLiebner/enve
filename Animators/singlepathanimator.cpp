@@ -386,14 +386,16 @@ void SinglePathAnimator::disconnectPoints(PathPoint *point1,
     } else {
         SinglePathAnimator *newPath = new SinglePathAnimator(
                                                 mParentPathAnimator);
-        newPath->replaceSeparatePathPoint(point2);
         PathPoint *currPt = point2;
         while(true) {
-            newPath->addPoint(currPt);
             removeFromPointsList(currPt);
+            newPath->appendToPointsList(currPt);
             currPt = currPt->getNextPoint();
             if(currPt == point2 || currPt == NULL) break;
         }
+        newPath->replaceSeparatePathPoint(point2);
+
+        newPath->updatePathPointIds();
         mParentPathAnimator->addSinglePathAnimator(newPath);
     }
 
@@ -430,14 +432,17 @@ void SinglePathAnimator::connectPoints(PathPoint *point1,
         point1->connectToPoint(point2);
         PathPoint *firstPtCandidate = point1->getConnectedSeparatePathPoint();
         point2ParentPath->replaceSeparatePathPoint(firstPtCandidate);
+        point2ParentPath->updatePathPointIds();
     } else if(point1->isSeparatePathPoint()) {
         point1ParentPath->changeAllPointsParentPathTo(point2ParentPath);
         mParentPathAnimator->removeSinglePathAnimator(point1ParentPath);
         point1->connectToPoint(point2);
+        point2ParentPath->updatePathPointIds();
     } else if(point2->isSeparatePathPoint()) {
         point2ParentPath->changeAllPointsParentPathTo(point1ParentPath);
         mParentPathAnimator->removeSinglePathAnimator(point2ParentPath);
         point1->connectToPoint(point2);
+        point1ParentPath->updatePathPointIds();
     } else {
         PathPoint *point1ConnectedFirst =
                 point1->getConnectedSeparatePathPoint();
@@ -450,6 +455,7 @@ void SinglePathAnimator::connectPoints(PathPoint *point1,
                     point1ParentPath);
 
         point1->connectToPoint(point2);
+        point2ParentPath->updatePathPointIds();
     }
 
 //    if(point1->isSeparatePathPoint() &&
@@ -476,7 +482,7 @@ void SinglePathAnimator::connectPoints(PathPoint *point1,
 //        point1->connectToPoint(point2);
 //    }
 
-    updatePathPointIds();
+    //updatePathPointIds();
 }
 
 //void SinglePathAnimator::disconnectPoints(PathPoint *point1,
@@ -533,8 +539,10 @@ void SinglePathAnimator::changeAllPointsParentPathTo(SinglePathAnimator *path) {
     replaceSeparatePathPoint(NULL);
     QList<PathPoint*> allPoints = mPoints;
     foreach(PathPoint *point, allPoints) {
-        path->addPoint(point);
+        point->incNumberPointers();
         removeFromPointsList(point);
+        path->appendToPointsList(point);
+        point->decNumberPointers();
     }
     mPoints.clear();
 }
@@ -673,11 +681,6 @@ PathPoint *SinglePathAnimator::addPoint(PathPoint *pointToAdd,
     return pointToAdd;
 }
 
-void SinglePathAnimator::addPoint(PathPoint *pointToAdd) {
-    pointToAdd->setParentPath(this);
-    appendToPointsList(pointToAdd);
-}
-
 PathPoint* SinglePathAnimator::addPointAbsPos(const QPointF &absPtPos,
                                         PathPoint *toPoint)
 {
@@ -703,6 +706,7 @@ PathPoint *SinglePathAnimator::addPointRelPos(const QPointF &relPtPos,
 void SinglePathAnimator::appendToPointsList(PathPoint *point,
                                       const bool &saveUndoRedo) {
     mPoints.append(point);
+    point->setParentPath(this);
     addChildAnimator(point->getPathPointAnimatorsPtr());
     //point->show();
     if(saveUndoRedo) {
@@ -768,6 +772,7 @@ void SinglePathAnimator::replaceSeparatePathPoint(PathPoint *newPoint) {
     mFirstPoint = newPoint;
     if(mFirstPoint != NULL) {
         mFirstPoint->setSeparatePathPoint(true);
+        updatePathPointIds();
     }
 }
 
