@@ -84,7 +84,7 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
     setLinkTarget(linkTarget);
 }
 
-QPixmap InternalLinkBox::renderPreviewProvidedTransform(
+QImage InternalLinkBox::renderPreviewProvidedTransform(
                                 const qreal &effectsMargin,
                                 const qreal &resolutionScale,
                                 const QMatrix &renderTransform,
@@ -95,7 +95,7 @@ QPixmap InternalLinkBox::renderPreviewProvidedTransform(
                                                    drawPos);
 }
 
-QPixmap InternalLinkBox::getAllUglyPixmapProvidedTransform(
+QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
                                 const qreal &effectsMargin,
                                 const QMatrix &allUglyTransform,
                                 QRectF *allUglyBoundingRectP) {
@@ -104,7 +104,7 @@ QPixmap InternalLinkBox::getAllUglyPixmapProvidedTransform(
                                                           allUglyBoundingRectP);
 }
 
-QPixmap InternalLinkBox::getPrettyPixmapProvidedTransform(
+QImage InternalLinkBox::getPrettyPixmapProvidedTransform(
                                 const QMatrix &transform,
                                 QRectF *pixBoundingRectClippedToViewP) {
     return mLinkTarget->getPrettyPixmapProvidedTransform(

@@ -33,9 +33,9 @@ void ActionButton::paintEvent(QPaintEvent *)
     QPainter p(this);
 
     if(mChecked) {
-        p.drawPixmap(0, 0, mCheckedPixmap);
+        p.drawImage(0, 0, mCheckedPixmap);
     } else {
-        p.drawPixmap(0, 0, mNotCheckedPixmap);
+        p.drawImage(0, 0, mNotCheckedPixmap);
     }
     if(mHover) {
         p.setRenderHint(QPainter::Antialiasing);

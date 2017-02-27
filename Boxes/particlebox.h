@@ -204,6 +204,7 @@ public:
         scheduleGenerateParticles();
     }
 
+    ColorAnimator *getColorAnimator();
 private:
     QRectF mParticlesBoundingRect;
     bool mGenerateParticlesScheduled = false;
@@ -272,8 +273,11 @@ public:
 
     void startAllPointsTransform();
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
-    MovablePoint *getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode);
-    void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint *> *list);
+    MovablePoint *getPointAt(const QPointF &absPtPos,
+                             const CanvasMode &currentCanvasMode);
+    void selectAndAddContainedPointsToList(QRectF absRect,
+                                           QList<MovablePoint *> *list);
+    void applyPaintSetting(const PaintSetting &setting);
 private:
     MovablePoint *mTopLeftPoint;
     MovablePoint *mBottomRightPoint;

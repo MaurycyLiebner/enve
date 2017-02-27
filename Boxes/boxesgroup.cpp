@@ -266,7 +266,7 @@ void BoxesGroup::updateEffectsMargin() {
     mEffectsMargin += childrenMargin;
 }
 
-QPixmap BoxesGroup::renderPreviewProvidedTransform(
+QImage BoxesGroup::renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
                         const qreal &resolutionScale,
                         const QMatrix &renderTransform,
@@ -277,8 +277,9 @@ QPixmap BoxesGroup::renderPreviewProvidedTransform(
     QRectF pixBoundingRectClippedToView = pixBoundingRect.intersected(
                                 mMainWindow->getCanvasWidget()->rect());
     QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
-    QPixmap newPixmap = QPixmap(QSize(ceil(sizeF.width()),
-                                      ceil(sizeF.height())) );
+    QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
+                                      ceil(sizeF.height())),
+                              QImage::Format_ARGB32);
     newPixmap.fill(Qt::transparent);
 
     QPainter p(&newPixmap);

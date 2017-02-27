@@ -708,3 +708,7 @@ void PaintSetting::apply(PathBox *box) const {
         }
     }
 }
+
+void PaintSetting::applyColorSetting(ColorAnimator *animator) const {
+    mColorSetting.apply(animator);
+}

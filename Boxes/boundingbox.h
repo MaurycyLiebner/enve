@@ -318,16 +318,16 @@ public:
 
     void setBaseTransformation(const QMatrix &matrix);
     bool hasBaseTransformation();
-    virtual QPixmap renderPreviewProvidedTransform(
+    virtual QImage renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
                         const qreal &resolutionScale,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);
-    virtual QPixmap getAllUglyPixmapProvidedTransform(
+    virtual QImage getAllUglyPixmapProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
-    virtual QPixmap getPrettyPixmapProvidedTransform(
+    virtual QImage getPrettyPixmapProvidedTransform(
             const QMatrix &transform,
             QRectF *pixBoundingRectClippedToViewP);
 
@@ -416,9 +416,9 @@ protected:
     bool mAwaitUpdateScheduled = false;
 
     virtual void updateAfterCombinedTransformationChanged() {}
-    QPixmap applyEffects(const QPixmap &pixmap,
-                         bool highQuality,
-                         qreal scale = 1.);
+    void applyEffects(QImage *im,
+                      bool highQuality,
+                      qreal scale = 1.);
 
     QMatrix mAllUglyTransform;
     QMatrix mAllUglyPaintTransform;
@@ -427,16 +427,16 @@ protected:
     QMatrix mOldAllUglyTransform;
     QMatrix mOldAllUglyPaintTransform;
     QRectF mOldAllUglyBoundingRect;
-    QPixmap mOldAllUglyPixmap;
+    QImage mOldAllUglyPixmap;
 
     QMatrix mRelativeTransformMatrix;
 
     QMatrix mUpdateCanvasTransform;
     QMatrix mUpdateTransform;
     QMatrix mOldTransform;
-    QPixmap mNewPixmap;
-    QPixmap mOldPixmap;
-    QPixmap mAllUglyPixmap;
+    QImage mNewPixmap;
+    QImage mOldPixmap;
+    QImage mAllUglyPixmap;
     QRectF mOldPixBoundingRect;
 
     bool mRedoUpdate = false;
@@ -473,7 +473,7 @@ protected:
 
     bool mAnimated = false;
 
-    QPixmap mRenderPixmap;
+    QImage mRenderPixmap;
 signals:
     void scheduleAwaitUpdateAllLinkBoxes();
     void addActiveAnimatorSignal(QrealAnimator*);

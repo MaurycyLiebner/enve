@@ -124,19 +124,17 @@ bool BoundingBox::hasBaseTransformation() {
     return mTransformAnimator.hasBaseTransformation();
 }
 
-QPixmap BoundingBox::applyEffects(const QPixmap& pixmap,
-                                  bool highQuality,
-                                  qreal scale) {
-    if(!mEffectsAnimators.hasChildAnimators()) return pixmap;
-    QImage im = pixmap.toImage().convertToFormat(
-                QImage::Format_ARGB32_Premultiplied);;
-    fmt_filters::image img(im.bits(), im.width(), im.height());
-    mEffectsAnimators.applyEffects(this,
-                                   &im,
-                                   img,
-                                   scale,
-                                   highQuality);
-    return QPixmap::fromImage(im);
+void BoundingBox::applyEffects(QImage *im,
+                                 bool highQuality,
+                                 qreal scale) {
+    if(mEffectsAnimators.hasChildAnimators()) {
+        fmt_filters::image img(im->bits(), im->width(), im->height());
+        mEffectsAnimators.applyEffects(this,
+                                       im,
+                                       img,
+                                       scale,
+                                       highQuality);
+    }
 }
 
 
@@ -251,13 +249,14 @@ QRectF BoundingBox::getBoundingRectClippedToView() {
     return mPixBoundingRectClippedToView;
 }
 
-QPixmap BoundingBox::getPrettyPixmapProvidedTransform(
+QImage BoundingBox::getPrettyPixmapProvidedTransform(
                                          const QMatrix &transform,
                                          QRectF *pixBoundingRectClippedToViewP) {
     QRectF pixBoundingRectClippedToView = *pixBoundingRectClippedToViewP;
     QSizeF sizeF = pixBoundingRectClippedToView.size();
-    QPixmap newPixmap = QPixmap(QSize(ceil(sizeF.width()),
-                                      ceil(sizeF.height())) );
+    QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
+                                      ceil(sizeF.height())),
+                              QImage::Format_ARGB32);
     newPixmap.fill(Qt::transparent);
 
     QPainter p(&newPixmap);
@@ -299,9 +298,9 @@ void BoundingBox::updatePrettyPixmap() {
                                                   &mPixBoundingRectClippedToView);
 
     if(parentCanvas->effectsPaintEnabled()) {
-        mNewPixmap = applyEffects(mNewPixmap,
-                                  true,
-                                  mUpdateCanvasTransform.m11());
+        applyEffects(&mNewPixmap,
+                     true,
+                     mUpdateCanvasTransform.m11());
     }
 }
 
@@ -319,7 +318,7 @@ void BoundingBox::updatePixBoundingRectClippedToView() {
                 mMainWindow->getCanvasWidget()->rect());
 }
 
-QPixmap BoundingBox::getAllUglyPixmapProvidedTransform(
+QImage BoundingBox::getAllUglyPixmapProvidedTransform(
         const qreal &effectsMargin,
         const QMatrix &allUglyTransform,
         QRectF *allUglyBoundingRectP) {
@@ -328,8 +327,9 @@ QPixmap BoundingBox::getAllUglyPixmapProvidedTransform(
                      effectsMargin, effectsMargin);
 
     QSizeF sizeF = allUglyBoundingRect.size();
-    QPixmap allUglyPixmap = QPixmap(QSize(ceil(sizeF.width()),
-                                   ceil(sizeF.height())) );
+    QImage allUglyPixmap = QImage(QSize(ceil(sizeF.width()),
+                                   ceil(sizeF.height())),
+                                  QImage::Format_ARGB32);
     allUglyPixmap.fill(Qt::transparent);
 
     QPainter p(&allUglyPixmap);
@@ -369,13 +369,13 @@ void BoundingBox::updateAllUglyPixmap() {
                       &mAllUglyBoundingRect);
 
     if(parentCanvas->effectsPaintEnabled()) {
-        mAllUglyPixmap = applyEffects(mAllUglyPixmap,
-                                      false,
-                                      parentCanvas->getResolutionPercent());
+        applyEffects(&mAllUglyPixmap,
+                     false,
+                     parentCanvas->getResolutionPercent());
     }
 }
 
-QPixmap BoundingBox::renderPreviewProvidedTransform(
+QImage BoundingBox::renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
                         const qreal &resolutionScale,
                         const QMatrix &renderTransform,
@@ -386,8 +386,9 @@ QPixmap BoundingBox::renderPreviewProvidedTransform(
     QRectF pixBoundingRectClippedToView = pixBoundingRect.intersected(
                                 mMainWindow->getCanvasWidget()->rect());
     QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
-    QPixmap newPixmap = QPixmap(QSize(ceil(sizeF.width()),
-                                      ceil(sizeF.height())) );
+    QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
+                                      ceil(sizeF.height())),
+                              QImage::Format_ARGB32);
     newPixmap.fill(Qt::transparent);
 
     QPainter p(&newPixmap);
@@ -414,7 +415,7 @@ void BoundingBox::drawPreviewPixmap(QPainter *p) {
 
     p->setOpacity(mTransformAnimator.getOpacity()*0.01);
 
-    p->drawPixmap(mPreviewDrawPos, mRenderPixmap);
+    p->drawImage(mPreviewDrawPos, mRenderPixmap);
     p->restore();
 }
 
@@ -431,10 +432,10 @@ void BoundingBox::updatePreviewPixmap() {
                 transformMatrix,
                 &mPreviewDrawPos);
     if(parentCanvas->effectsPaintEnabled()) {
-        mRenderPixmap = applyEffects(mRenderPixmap,
-                                 true,
-                                 mUpdateCanvasTransform.m11()*
-                                 parentCanvas->getResolutionPercent());
+        applyEffects(&mRenderPixmap,
+                     true,
+                     mUpdateCanvasTransform.m11()*
+                     parentCanvas->getResolutionPercent());
     }
 }
 
@@ -448,8 +449,9 @@ void BoundingBox::renderFinal(QPainter *p) {
                                      mEffectsMargin, mEffectsMargin);
 
     QSizeF sizeF = pixBoundingRect.size();
-    QPixmap renderPixmap = QPixmap(QSize(ceil(sizeF.width()),
-                                         ceil(sizeF.height())) );
+    QImage renderPixmap = QImage(QSize(ceil(sizeF.width()),
+                                         ceil(sizeF.height())),
+                                 QImage::Format_ARGB32);
     renderPixmap.fill(Qt::transparent);
 
     QPainter pixP(&renderPixmap);
@@ -461,10 +463,10 @@ void BoundingBox::renderFinal(QPainter *p) {
     draw(&pixP);
     pixP.end();
 
-    renderPixmap = applyEffects(renderPixmap, true);
+    applyEffects(&renderPixmap, true);
 
     p->setOpacity(mTransformAnimator.getOpacity()*0.01);
-    p->drawPixmap(pixBoundingRect.topLeft(), renderPixmap);
+    p->drawImage(pixBoundingRect.topLeft(), renderPixmap);
 
     p->restore();
 }
@@ -504,16 +506,16 @@ void BoundingBox::drawPixmap(QPainter *p) {
         }
 
         p->setTransform(QTransform(mOldAllUglyPaintTransform), true);
-        p->drawPixmap(mOldAllUglyBoundingRect.topLeft(), mOldAllUglyPixmap);
+        p->drawImage(mOldAllUglyBoundingRect.topLeft(), mOldAllUglyPixmap);
 
         if(paintOld) {
             p->restore();
 
             p->setTransform(QTransform(mUglyPaintTransform), true);
-            p->drawPixmap(mOldPixBoundingRect.topLeft(), mOldPixmap);
+            p->drawImage(mOldPixBoundingRect.topLeft(), mOldPixmap);
         }
     } else if(mHighQualityPaint) {
-        p->drawPixmap(mPixBoundingRectClippedToView.topLeft(), mNewPixmap);
+        p->drawImage(mPixBoundingRectClippedToView.topLeft(), mNewPixmap);
     }
 
     p->restore();

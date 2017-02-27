@@ -91,13 +91,22 @@ void ParticleBox::draw(QPainter *p)
     if(mVisible) {
         p->save();
 
+        p->setClipRect(mRelBoundingRect);
         foreach(ParticleEmitter *emitter, mEmitters) {
             emitter->drawParticles(p);
         }
 
-        p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
-        p->fillRect(mRelBoundingRect, Qt::white);
+        //p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
+        //p->fillRect(mRelBoundingRect, Qt::white);
         p->restore();
+    }
+}
+
+void ParticleBox::applyPaintSetting(const PaintSetting &setting) {
+    if(setting.targetsFill()) {
+        foreach(ParticleEmitter *emitter, mEmitters) {
+            setting.applyColorSetting(emitter->getColorAnimator());
+        }
     }
 }
 
@@ -427,6 +436,10 @@ void ParticleEmitter::updateParticlesForFrameIfNeeded() {
         mUpdateParticlesForFrameScheduled = false;
         updateParticlesForFrame(MainWindow::getInstance()->getCurrentFrame());
     }
+}
+
+ColorAnimator *ParticleEmitter::getColorAnimator() {
+    return &mColorAnimator;
 }
 
 void ParticleEmitter::generateParticlesIfNeeded() {

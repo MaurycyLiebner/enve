@@ -22,8 +22,8 @@ protected:
     bool mHover = false;
     bool mChecked = false;
 
-    QPixmap mCheckedPixmap;
-    QPixmap mNotCheckedPixmap;
+    QImage mCheckedPixmap;
+    QImage mNotCheckedPixmap;
 signals:
     void pressed();
 public slots:

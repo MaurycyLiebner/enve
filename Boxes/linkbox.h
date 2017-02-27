@@ -45,18 +45,18 @@ public:
                 this, SLOT(scheduleAwaitUpdateSLOT()));
     }
 
-    QPixmap renderPreviewProvidedTransform(
+    QImage renderPreviewProvidedTransform(
                         const qreal &effectsMargin,
                         const qreal &resolutionScale,
                         const QMatrix &renderTransform,
                         QPointF *drawPos);
 
-    QPixmap getAllUglyPixmapProvidedTransform(
+    QImage getAllUglyPixmapProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
 
-    QPixmap getPrettyPixmapProvidedTransform(
+    QImage getPrettyPixmapProvidedTransform(
                         const QMatrix &transform,
                         QRectF *pixBoundingRectClippedToViewP);
 

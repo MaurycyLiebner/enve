@@ -11,7 +11,7 @@ ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
 }
 
 void ImageBox::updateBoundingRect() {
-    mRelBoundingRect = mPixmap.rect();
+    mRelBoundingRect = mImage.rect();
     qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
     mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
                         adjusted(-effectsMargin, -effectsMargin,
@@ -42,7 +42,7 @@ void ImageBox::drawSelected(QPainter *p,
 
 bool ImageBox::relPointInsidePath(QPointF point)
 {
-    return mPixmap.rect().contains(point.toPoint()
+    return mImage.rect().contains(point.toPoint()
                                    );
 }
 
@@ -60,7 +60,7 @@ void ImageBox::draw(QPainter *p)
 {
     if(mVisible) {
         p->setRenderHint(QPainter::SmoothPixmapTransform);
-        p->drawPixmap(0, 0, mPixmap);
+        p->drawImage(0, 0, mImage);
     }
 }
 
@@ -68,7 +68,7 @@ void ImageBox::reloadPixmap()
 {
     if(mImageFilePath.isEmpty()) {
     } else {
-        mPixmap.load(mImageFilePath);
+        mImage.load(mImageFilePath);
     }
 
     if(!mPivotChanged) centerPivotPosition();

@@ -126,7 +126,7 @@ public:
     void updateEffectsMargin();
 
     void drawForPreview(QPainter *p);
-    QPixmap renderPreviewProvidedTransform(const qreal &effectsMargin,
+    QImage renderPreviewProvidedTransform(const qreal &effectsMargin,
                                            const qreal &resolutionScale,
                                            const QMatrix &renderTransform,
                                            QPointF *drawPos);

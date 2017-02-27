@@ -257,7 +257,8 @@ void H_Wheel_SV_Triangle::mousePressEvent(QMouseEvent *e)
         value_focus = NONE;
         return;
     }
-    QApplication::setOverrideCursor(QCursor(QPixmap("pixmaps/cursor_crosshair_open.png") ) );
+    QApplication::setOverrideCursor(
+                QCursor(QPixmap("pixmaps/cursor_crosshair_open.png") ) );
 }
 
 void H_Wheel_SV_Triangle::mouseReleaseEvent(QMouseEvent *)

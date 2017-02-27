@@ -146,6 +146,9 @@ public:
 
     void apply(PathBox *box) const;
 
+    void applyColorSetting(ColorAnimator *animator) const;
+
+    bool targetsFill() const { return mTargetFillSettings; }
 private:
     bool mTargetFillSettings;
     Gradient *mGradient;

@@ -1,7 +1,7 @@
 #ifndef IMAGEBOX_H
 #define IMAGEBOX_H
 #include "Boxes/boundingbox.h"
-#include <QPixmap>
+#include <QImage>
 
 class ImageBox : public BoundingBox
 {
@@ -19,7 +19,7 @@ public:
     void makeDuplicate(BoundingBox *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
 private:
-    QPixmap mPixmap;
+    QImage mImage;
     QString mImageFilePath;
 };
 
