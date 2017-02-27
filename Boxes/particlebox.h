@@ -94,11 +94,7 @@ public:
     ParticleEmitter();
     ParticleEmitter(ParticleBox *parentBox);
 
-    void setParentBox(ParticleBox *parentBox) {
-        mParentBox = parentBox;
-
-        scheduleGenerateParticles();
-    }
+    void setParentBox(ParticleBox *parentBox);
 
     void generateParticles();
 
@@ -274,7 +270,13 @@ public:
         }
     }
 
+    void startAllPointsTransform();
+    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
+    MovablePoint *getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode);
+    void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint *> *list);
 private:
+    MovablePoint *mTopLeftPoint;
+    MovablePoint *mBottomRightPoint;
     QList<ParticleEmitter*> mEmitters;
 };
 

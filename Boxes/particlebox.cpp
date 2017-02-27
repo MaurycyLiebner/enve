@@ -10,6 +10,20 @@ double fRand(double fMin, double fMax)
 
 ParticleBox::ParticleBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_PARTICLES) {
+    mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
+    mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
+    QrealAnimator *topLeftAnimator = mTopLeftPoint->
+                                        getRelativePosAnimatorPtr();
+    QrealAnimator *bottomRightAnimator = mBottomRightPoint->
+                                        getRelativePosAnimatorPtr();
+    addActiveAnimator(topLeftAnimator);
+    addActiveAnimator(bottomRightAnimator);
+
+    topLeftAnimator->setUpdater(new DisplayedFillStrokeSettingsUpdater(this));
+    topLeftAnimator->setName("top left");
+    bottomRightAnimator->setUpdater(new DisplayedFillStrokeSettingsUpdater(this));
+    bottomRightAnimator->setName("bottom right");
+
     addEmitter(new ParticleEmitter(this));
 }
 
@@ -21,6 +35,8 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
 
 void ParticleBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
+    mTopLeftPoint->updateAfterFrameChanged(currentFrame);
+    mBottomRightPoint->updateAfterFrameChanged(currentFrame);
     foreach(ParticleEmitter *emitter, mEmitters) {
         emitter->setFrame(currentFrame);
         emitter->scheduleUpdateParticlesForFrame();
@@ -29,11 +45,12 @@ void ParticleBox::updateAfterFrameChanged(int currentFrame) {
 }
 
 void ParticleBox::updateBoundingRect() {
-    mRelBoundingRect = QRectF();
-    foreach(ParticleEmitter *emitter, mEmitters) {
-        mRelBoundingRect = mRelBoundingRect.united(
-                    emitter->getParticlesBoundingRect());
-    }
+    mRelBoundingRect = QRectF(mTopLeftPoint->getRelativePos(),
+                              mBottomRightPoint->getRelativePos());
+//    foreach(ParticleEmitter *emitter, mEmitters) {
+//        mRelBoundingRect = mRelBoundingRect.united(
+//                    emitter->getParticlesBoundingRect());
+//    }
 
     qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
     mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
@@ -78,7 +95,61 @@ void ParticleBox::draw(QPainter *p)
             emitter->drawParticles(p);
         }
 
+        p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
+        p->fillRect(mRelBoundingRect, Qt::white);
         p->restore();
+    }
+}
+
+void ParticleBox::startAllPointsTransform() {
+    mBottomRightPoint->startTransform();
+    mTopLeftPoint->startTransform();
+    startTransform();
+}
+
+void ParticleBox::drawSelected(QPainter *p,
+                             const CanvasMode &currentCanvasMode)
+{
+    if(mVisible) {
+        p->save();
+        drawBoundingRect(p);
+        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+            p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
+            mTopLeftPoint->draw(p);
+            mBottomRightPoint->draw(p);
+        }
+        p->restore();
+    }
+}
+
+
+MovablePoint *ParticleBox::getPointAt(const QPointF &absPtPos,
+                                    const CanvasMode &currentCanvasMode)
+{
+    MovablePoint *pointToReturn = NULL;
+    if(mTopLeftPoint->isPointAtAbsPos(absPtPos)) {
+        return mTopLeftPoint;
+    }
+    if(mBottomRightPoint->isPointAtAbsPos(absPtPos) ) {
+        return mBottomRightPoint;
+    }
+    return pointToReturn;
+}
+
+void ParticleBox::selectAndAddContainedPointsToList(QRectF absRect,
+                                                  QList<MovablePoint *> *list)
+{
+    if(!mTopLeftPoint->isSelected()) {
+        if(mTopLeftPoint->isContainedInRect(absRect)) {
+            mTopLeftPoint->select();
+            list->append(mTopLeftPoint);
+        }
+    }
+    if(!mBottomRightPoint->isSelected()) {
+        if(mBottomRightPoint->isContainedInRect(absRect)) {
+            mBottomRightPoint->select();
+            list->append(mBottomRightPoint);
+        }
     }
 }
 
@@ -321,11 +392,24 @@ ParticleEmitter::ParticleEmitter() :
     addChildAnimator(&mParticlesOpacityDecay);
 
     setUpdater(new ParticlesUpdater(this));
+    blockUpdater();
 }
 
 ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     ParticleEmitter(){
     setParentBox(parentBox);
+}
+
+void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
+    mParentBox = parentBox;
+
+    scheduleGenerateParticles();
+    if(parentBox == NULL) {
+        mColorAnimator.setUpdater(NULL);
+    } else {
+        mColorAnimator.setUpdater(
+                    new DisplayedFillStrokeSettingsUpdater(parentBox));
+    }
 }
 
 void ParticleEmitter::scheduleGenerateParticles() {
@@ -353,6 +437,7 @@ void ParticleEmitter::generateParticlesIfNeeded() {
 }
 
 void ParticleEmitter::generateParticles() {
+    srand(0);
     qreal remainingPartFromFrame = 0.;
     QList<Particle*> notFinishedParticles;
     int nReuseParticles = mParticles.count();

@@ -58,15 +58,6 @@ void DisplayedFillStrokeSettingsUpdater::update() {
     //MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
-RectangleBottomRightUpdater::RectangleBottomRightUpdater(Rectangle *target) :
-    AnimatorUpdater() {
-    mTarget = target;
-}
-
-void RectangleBottomRightUpdater::update() {
-    mTarget->updateRadiusXAndRange();
-}
-
 PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
     mTarget = target;
 }

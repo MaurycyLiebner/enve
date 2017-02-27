@@ -473,6 +473,14 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
             if(mCurrentTextBox != NULL) {
                 mCurrentTextBox->openTextEditor();
             }
+        } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
+            if(mCurrentCircle != NULL) {
+                mCurrentCircle->finishAllPointsTransform();
+            }
+        } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
+            if(mCurrentRectangle != NULL) {
+                mCurrentRectangle->finishAllPointsTransform();
+            }
         }
     }
 }

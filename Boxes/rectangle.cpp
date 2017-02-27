@@ -9,32 +9,25 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
     mTopLeftPoint->setRelativePos(QPointF(0., 0.), false);
     mBottomRightPoint = new RectangleBottomRightPoint(this);
     mBottomRightPoint->setRelativePos(QPointF(0., 0.), false);
-    mRadiusPoint = new RectangleRadiusPoint(this);
-    mRadiusPoint->setRelativePos(QPointF(0., 0.), false);
 
-    mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
-    mRadiusPoint->setPoints(mTopLeftPoint, mBottomRightPoint);
-    mBottomRightPoint->setPoints(mTopLeftPoint, mRadiusPoint);
+    //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
+    //mBottomRightPoint->setRadiusPoint(mRadiusPoint);
 
-    QrealAnimator *widthAnimator = mBottomRightPoint->
-            getRelativePosAnimatorPtr()->getXAnimator();
-    QrealAnimator *heightAnimator = mBottomRightPoint->
-            getRelativePosAnimatorPtr()->getYAnimator();
+    QrealAnimator *topLeftPt = mTopLeftPoint->
+            getRelativePosAnimatorPtr();
+    QrealAnimator *bottomRightPt = mBottomRightPoint->
+            getRelativePosAnimatorPtr();
 
-    widthAnimator->setName("width");
-    heightAnimator->setName("height");
+    topLeftPt->setName("top left");
+    bottomRightPt->setName("bottom right");
 
-    addActiveAnimator(widthAnimator);
-    addActiveAnimator(heightAnimator);
+    addActiveAnimator(topLeftPt);
+    addActiveAnimator(bottomRightPt);
 
-    mRadiusAnimator = mRadiusPoint->
-            getRelativePosAnimatorPtr()->getYAnimator();
+    mRadiusAnimator.setName("radius");
+    addActiveAnimator(&mRadiusAnimator);
 
-    mRadiusAnimator->setName("radius");
-    addActiveAnimator(mRadiusAnimator);
-
-    mBottomRightPoint->setPosAnimatorUpdater(new RectangleBottomRightUpdater(this) );
-    mRadiusPoint->setPosAnimatorUpdater(new PathPointUpdater(this) );
+    mAnimatorsCollection.setUpdater(new PathPointUpdater(this));
 }
 
 Rectangle::~Rectangle()
@@ -49,7 +42,7 @@ int Rectangle::saveToSql(QSqlQuery *query, int parentId)
 
     int bottomRightPointId = mTopLeftPoint->saveToSql(query);
     int topLeftPointId = mTopLeftPoint->saveToSql(query);
-    int radiusPointId = mRadiusPoint->saveToSql(query);
+    int radiusPointId = mRadiusAnimator.saveToSql(query);
 
     if(!query->exec(QString("INSERT INTO rectangle (boundingboxid, "
                            "topleftpointid, bottomrightpointid, "
@@ -68,10 +61,10 @@ int Rectangle::saveToSql(QSqlQuery *query, int parentId)
 void Rectangle::duplicateRectanglePointsFrom(
         RectangleTopLeftPoint *topLeftPoint,
         RectangleBottomRightPoint *bottomRightPoint,
-        RectangleRadiusPoint *radiusPoint) {
+        QrealAnimator *radiusAnimator) {
     topLeftPoint->makeDuplicate(mTopLeftPoint);
     bottomRightPoint->makeDuplicate(mBottomRightPoint);
-    radiusPoint->makeDuplicate(mRadiusPoint);
+    radiusAnimator->makeDuplicate(&mRadiusAnimator);
 }
 
 BoundingBox *Rectangle::createNewDuplicate(BoxesGroup *parent) {
@@ -97,7 +90,7 @@ void Rectangle::loadFromSql(int boundingBoxId) {
 
         mBottomRightPoint->loadFromSql(bottomRightPointId);
         mTopLeftPoint->loadFromSql(topLeftPointId);
-        mRadiusPoint->loadFromSql(radiusPointId);
+        mRadiusAnimator.loadFromSql(radiusPointId);
     } else {
         qDebug() << "Could not load rectangle with id " << boundingBoxId;
     }
@@ -107,28 +100,29 @@ void Rectangle::loadFromSql(int boundingBoxId) {
 
 void Rectangle::updateAfterFrameChanged(int currentFrame)
 {
+    mTopLeftPoint->updateAfterFrameChanged(currentFrame);
     mBottomRightPoint->updateAfterFrameChanged(currentFrame);
-    mRadiusPoint->updateAfterFrameChanged(currentFrame);
     PathBox::updateAfterFrameChanged(currentFrame);
 }
 
-void Rectangle::updateRadiusXAndRange() {
-    QPointF bttmPos = mBottomRightPoint->getRelativePos();
-    mRadiusPoint->getRelativePosAnimatorPtr()->getXAnimator()->
-            setValueRange(bttmPos.x(), bttmPos.x());
-
-    mRadiusPoint->getRelativePosAnimatorPtr()->getYAnimator()->
-            setValueRange(0., bttmPos.y()*0.5 );
+void Rectangle::startAllPointsTransform() {
+    mTopLeftPoint->startTransform();
+    mBottomRightPoint->startTransform();
+    startTransform();
 }
 
-void Rectangle::startAllPointsTransform() {
-    mBottomRightPoint->startTransform();
-    mRadiusPoint->startTransform();
-    startTransform();
+void Rectangle::finishAllPointsTransform() {
+    mTopLeftPoint->finishTransform();
+    mBottomRightPoint->finishTransform();
+    finishTransform();
 }
 
 void Rectangle::moveSizePointByAbs(QPointF absTrans) {
     mBottomRightPoint->moveByAbs(absTrans);
+}
+
+MovablePoint *Rectangle::getBottomRightPoint() {
+    return mBottomRightPoint;
 }
 
 void Rectangle::drawSelected(QPainter *p,
@@ -141,7 +135,6 @@ void Rectangle::drawSelected(QPainter *p,
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
             mTopLeftPoint->draw(p);
             mBottomRightPoint->draw(p);
-            mRadiusPoint->draw(p);
 
             mFillGradientPoints.drawGradientPoints(p);
             mStrokeGradientPoints.drawGradientPoints(p);
@@ -151,7 +144,8 @@ void Rectangle::drawSelected(QPainter *p,
 }
 
 
-MovablePoint *Rectangle::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
+MovablePoint *Rectangle::getPointAt(const QPointF &absPtPos,
+                                    const CanvasMode &currentCanvasMode)
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
@@ -167,15 +161,12 @@ MovablePoint *Rectangle::getPointAt(const QPointF &absPtPos, const CanvasMode &c
         if(mBottomRightPoint->isPointAtAbsPos(absPtPos) ) {
             return mBottomRightPoint;
         }
-        if(mRadiusPoint->isPointAtAbsPos(absPtPos) ) {
-            return mRadiusPoint;
-        }
     }
     return pointToReturn;
 }
 
 void Rectangle::selectAndAddContainedPointsToList(QRectF absRect,
-                                                   QList<MovablePoint *> *list)
+                                                  QList<MovablePoint *> *list)
 {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
@@ -189,21 +180,16 @@ void Rectangle::selectAndAddContainedPointsToList(QRectF absRect,
             list->append(mBottomRightPoint);
         }
     }
-    if(!mRadiusPoint->isSelected()) {
-        if(mRadiusPoint->isContainedInRect(absRect)) {
-            mRadiusPoint->select();
-            list->append(mRadiusPoint);
-        }
-    }
 }
 
 void Rectangle::updatePath()
 {
     mPath = QPainterPath();
+    QPointF topPos = mTopLeftPoint->getRelativePos();
     QPointF botPos = mBottomRightPoint->getRelativePos();
-    QPointF radPos = mRadiusPoint->getRelativePos();
-    qreal radius = radPos.y();
-    mPath.addRoundedRect(0., 0., botPos.x(), botPos.y(), radius, radius);
+    qreal radius = mRadiusAnimator.getCurrentValue();
+    mPath.addRoundedRect(QRectF(topPos, botPos),
+                         radius, radius);
 
     updateOutlinePath();
 }
@@ -213,102 +199,7 @@ RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :
 
 }
 
-void RectangleTopLeftPoint::moveByRel(QPointF absTranslatione) {
-    mParent->moveByRel(absTranslatione);
-    if(mBottomRightPoint->isSelected()) return;
-    mBottomRightPoint->MovablePoint::moveByRel(-absTranslatione);
-}
-
-void RectangleTopLeftPoint::moveByAbs(QPointF absTranslatione) {
-    mParent->moveByRel(absTranslatione);
-    if(mBottomRightPoint->isSelected()) return;
-    mBottomRightPoint->MovablePoint::moveByAbs(-absTranslatione);
-}
-
-void RectangleTopLeftPoint::startTransform() {
-    mParent->startTransform();
-    if(mBottomRightPoint->isSelected()) return;
-    mBottomRightPoint->MovablePoint::startTransform();
-}
-
-void RectangleTopLeftPoint::finishTransform() {
-    mParent->finishTransform();
-    if(mBottomRightPoint->isSelected()) return;
-    mBottomRightPoint->MovablePoint::finishTransform();
-}
-
-void RectangleTopLeftPoint::setBottomRightPoint(
-        MovablePoint *bottomRightPoint) {
-    mBottomRightPoint = bottomRightPoint;
-}
-
 RectangleBottomRightPoint::RectangleBottomRightPoint(BoundingBox *parent) :
     MovablePoint(parent, TYPE_PATH_POINT) {
 
-}
-
-void RectangleBottomRightPoint::setPoints(MovablePoint *topLeftPoint,
-                                          MovablePoint *radiusPoint) {
-    mTopLeftPoint = topLeftPoint;
-    mRadiusPoint = radiusPoint;
-}
-
-void RectangleBottomRightPoint::moveByRel(QPointF absTranslatione) {
-    if(mTopLeftPoint->isSelected()) return;
-    MovablePoint::moveByRel(absTranslatione);
-}
-
-void RectangleBottomRightPoint::moveByAbs(QPointF absTranslatione) {
-    if(mTopLeftPoint->isSelected()) return;
-    MovablePoint::moveByAbs(absTranslatione);
-}
-
-void RectangleBottomRightPoint::startTransform() {
-    if(mTopLeftPoint->isSelected()) return;
-    MovablePoint::startTransform();
-}
-
-void RectangleBottomRightPoint::finishTransform() {
-    if(mTopLeftPoint->isSelected()) return;
-    MovablePoint::finishTransform();
-
-}
-
-RectangleRadiusPoint::RectangleRadiusPoint(BoundingBox *parent) :
-    MovablePoint(parent, TYPE_PATH_POINT) {
-
-}
-
-void RectangleRadiusPoint::setPoints(MovablePoint *topLeftPoint,
-                                     MovablePoint *bottomRightPoint) {
-    mTopLeftPoint = topLeftPoint;
-    mBottomRightPoint = bottomRightPoint;
-}
-
-void RectangleRadiusPoint::moveByRel(QPointF absTranslatione) {
-    if(mTopLeftPoint->isSelected() || mBottomRightPoint->isSelected() ) return;
-    MovablePoint::moveByRel(QPointF( 0., absTranslatione.y()) );
-}
-
-void RectangleRadiusPoint::setAbsPosRadius(QPointF pos) {
-    QMatrix combinedM = mParent->getCombinedTransform();
-    QPointF newPos = combinedM.inverted().map(pos);
-
-    setRelativePos(newPos, false );
-}
-
-void RectangleRadiusPoint::moveByAbs(QPointF absTranslatione) {
-    if(mTopLeftPoint->isSelected() || mBottomRightPoint->isSelected() ) return;
-    mRelPos.setCurrentValue(mSavedRelPos);
-    setAbsPosRadius(getAbsolutePos() + absTranslatione);
-}
-
-void RectangleRadiusPoint::startTransform() {
-    if(mTopLeftPoint->isSelected() || mBottomRightPoint->isSelected() ) return;
-    MovablePoint::startTransform();
-}
-
-void RectangleRadiusPoint::finishTransform() {
-    if(mTopLeftPoint->isSelected() || mBottomRightPoint->isSelected() ) return;
-    MovablePoint::finishTransform();
 }

@@ -29,12 +29,13 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mEffectsAnimators.setName("effects");
     mEffectsAnimators.setParentBox(this);
     mEffectsAnimators.setUpdater(new PixmapEffectUpdater(this));
+    mEffectsAnimators.blockUpdater();
 
     addActiveAnimator(&mTransformAnimator);
-    mAnimatorsCollection.addAnimator(&mTransformAnimator);
     mTransformAnimator.blockPointer();
 
     mTransformAnimator.setUpdater(new TransUpdater(this) );
+    mTransformAnimator.blockUpdater();
     mType = type;
 
     mTransformAnimator.reset();
@@ -928,7 +929,6 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     effect->incNumberPointers();
 
     if(!mEffectsAnimators.hasChildAnimators()) {
-        mAnimatorsCollection.addAnimator(&mEffectsAnimators);
         addActiveAnimator(&mEffectsAnimators);
     }
     mEffectsAnimators.addChildAnimator(effect);
@@ -940,7 +940,6 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
 void BoundingBox::removeEffect(PixmapEffect *effect) {
     mEffectsAnimators.removeChildAnimator(effect);
     if(!mEffectsAnimators.hasChildAnimators()) {
-        mAnimatorsCollection.removeAnimator(&mEffectsAnimators);
         removeActiveAnimator(&mEffectsAnimators);
     }
     effect->decNumberPointers();
@@ -955,6 +954,7 @@ QrealAnimator *BoundingBox::getAnimatorsCollection() {
 
 void BoundingBox::addActiveAnimator(QrealAnimator *animator)
 {
+    mAnimatorsCollection.addChildAnimator(animator);
     mActiveAnimators << animator;
     emit addActiveAnimatorSignal(animator);
     //SWT_addChildAbstractionForTargetToAll(animator);
@@ -965,6 +965,7 @@ void BoundingBox::addActiveAnimator(QrealAnimator *animator)
 void BoundingBox::removeActiveAnimator(QrealAnimator *animator)
 {
     mActiveAnimators.removeOne(animator);
+    mAnimatorsCollection.removeChildAnimator(animator);
     emit removeActiveAnimatorSignal(animator);
     SWT_removeChildAbstractionForTargetFromAll(animator);
 }

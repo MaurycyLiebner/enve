@@ -10,8 +10,6 @@ PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
 
     addActiveAnimator(&mFillPaintSettings);
     addActiveAnimator(&mStrokeSettings);
-    mAnimatorsCollection.addAnimator(&mFillPaintSettings);
-    mAnimatorsCollection.addAnimator(&mStrokeSettings);
 
     mFillPaintSettings.blockPointer();
     mStrokeSettings.blockPointer();
@@ -115,7 +113,8 @@ void PathBox::updatePathIfNeeded()
 {
     if(mUpdatePathUpdateNeeded) {
         updatePath();
-        if(!mAnimatorsCollection.hasKeys() && !mPivotChanged ) centerPivotPosition();
+        if(!mAnimatorsCollection.hasKeys() &&
+           !mPivotChanged ) centerPivotPosition();
     }
 }
 

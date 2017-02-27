@@ -78,17 +78,6 @@ private:
     BoundingBox *mTarget;
 };
 
-class RectangleBottomRightUpdater : public AnimatorUpdater
-{
-public:
-    RectangleBottomRightUpdater(Rectangle *target);
-
-    void update();
-
-private:
-    Rectangle *mTarget;
-};
-
 class PixmapEffectUpdater : public AnimatorUpdater
 {
 public:
