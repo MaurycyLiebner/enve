@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += multimedia core gui svg opengl sql xml
+LIBS     += -lavutil -lavformat -lavcodec -lswscale -lswresample
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -106,7 +107,8 @@ SOURCES += main.cpp\
     clipboardcontainer.cpp \
     Animators/paintsettings.cpp \
     edge.cpp \
-    Animators/singlepathanimator.cpp
+    Animators/singlepathanimator.cpp \
+    Boxes/videobox.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -198,7 +200,8 @@ HEADERS  += mainwindow.h \
     clipboardcontainer.h \
     Animators/paintsettings.h \
     edge.h \
-    Animators/singlepathanimator.h
+    Animators/singlepathanimator.h \
+    Boxes/videobox.h
 
 RESOURCES += \
     resources.qrc

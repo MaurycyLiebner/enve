@@ -7,6 +7,7 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mFirstFrameAnimator.blockPointer();
     mFirstFrameAnimator.setCurrentIntValue(getCurrentFrame());
     mFirstFrameAnimator.setUpdater(new AnimationBoxFrameUpdater(this));
+    mFirstFrameAnimator.blockUpdater();
     addActiveAnimator(&mFirstFrameAnimator);
 
     mTimeScaleAnimator.setName("time scale");
@@ -14,6 +15,7 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mTimeScaleAnimator.setValueRange(-100, 100);
     mTimeScaleAnimator.setCurrentValue(1.);
     mTimeScaleAnimator.setUpdater(new AnimationBoxFrameUpdater(this));
+    mTimeScaleAnimator.blockUpdater();
     addActiveAnimator(&mTimeScaleAnimator);
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
@@ -48,8 +50,9 @@ BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
 
 void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     //mFrameAnimator.setFrame(currentFrame);
-
+    BoundingBox::updateAfterFrameChanged(currentFrame);
     mFirstFrameAnimator.setFrame(currentFrame);
+    mTimeScaleAnimator.setFrame(currentFrame);
     updateAnimationFrame();
     //setFilePath(mListOfFrames.at(mFrameAnimator.getCurrentIntValue()));
 }

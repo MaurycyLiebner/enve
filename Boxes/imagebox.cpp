@@ -72,6 +72,7 @@ void ImageBox::reloadPixmap()
     }
 
     if(!mPivotChanged) centerPivotPosition();
+    scheduleAwaitUpdate();
 }
 
 void ImageBox::setFilePath(QString path)

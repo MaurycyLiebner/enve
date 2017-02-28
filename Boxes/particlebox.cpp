@@ -10,6 +10,7 @@ double fRand(double fMin, double fMax)
 
 ParticleBox::ParticleBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_PARTICLES) {
+    setName("Particle Box");
     mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
     mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
     QrealAnimator *topLeftAnimator = mTopLeftPoint->

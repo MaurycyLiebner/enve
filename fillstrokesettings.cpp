@@ -427,7 +427,7 @@ void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
 void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         StrokeSettings *settings) {
     if(settings == NULL) {
-        mCurrentFillColorAnimator = NULL;
+        mCurrentStrokeColorAnimator = NULL;
         mLineWidthSpin->setAnimator(NULL);
     } else {
         mCurrentStrokeColor = settings->getCurrentColor();

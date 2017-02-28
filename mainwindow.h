@@ -153,6 +153,7 @@ private slots:
     void importFile();
     void linkFile();
     void importAnimation();
+    void importVideo();
     void exportSelected();
     void revert();
 signals:

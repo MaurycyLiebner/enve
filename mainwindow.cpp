@@ -1058,12 +1058,24 @@ void MainWindow::linkFile()
 }
 
 void MainWindow::importAnimation() {
+    importVideo();
+    return;
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
         "Import Animation", "", "Images (*.png *.jpg)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         mCanvas->createAnimationBoxForPaths(importPaths);
+    }
+}
+
+void MainWindow::importVideo() {
+    disableEventFilter();
+    QStringList importPaths = QFileDialog::getOpenFileNames(this,
+        "Import Video", "", "Video (*.mp4 *.mov *.avi)");
+    enableEventFilter();
+    foreach(const QString &path, importPaths) {
+        mCanvas->createVideoForPath(path);
     }
 }
 

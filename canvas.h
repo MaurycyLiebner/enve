@@ -230,6 +230,8 @@ public:
     void drawPreviewPixmap(QPainter *p);
     void renderFinal(QPainter *p);
     void createAnimationBoxForPaths(const QStringList &paths);
+    void createVideoForPath(const QString &path);
+
     void setPreviewing(bool bT);
     void createLinkToFileWithPath(const QString &path);
 

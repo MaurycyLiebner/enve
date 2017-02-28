@@ -426,6 +426,12 @@ void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
     AnimationBox *aniBox = new AnimationBox(mCurrentBoxesGroup);
     aniBox->setListOfFrames(paths);
 }
+
+#include "Boxes/videobox.h"
+void Canvas::createVideoForPath(const QString &path) {
+    VideoBox *vidBox = new VideoBox(path, mCurrentBoxesGroup);
+}
+
 #include "Boxes/linkbox.h"
 void Canvas::createLinkToFileWithPath(const QString &path) {
     ExternalLinkBox *extLinkBox = new ExternalLinkBox(mCurrentBoxesGroup);
