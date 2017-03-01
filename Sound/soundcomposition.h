@@ -1,41 +1,50 @@
-//#ifndef SOUNDCOMPOSITION_H
-//#define SOUNDCOMPOSITION_H
+#ifndef SOUNDCOMPOSITION_H
+#define SOUNDCOMPOSITION_H
 
-//#include <QIODevice>
-//#include <QAudioBuffer>
 
-//class SingleSound;
 
-//class SoundComposition : public QIODevice
-//{
-//    Q_OBJECT
-//public:
-//    SoundComposition(QObject *parent = 0);
-//    ~SoundComposition();
+#include <math.h>
 
-//    void setFirstAndLastVideoFrame(const int &firstVideoFrame,
-//                                   const int &lastVideoFrame);
-//    void generateData();
+#include <QAudioOutput>
+#include <QByteArray>
+#include <QComboBox>
+#include <QIODevice>
+#include <QLabel>
+#include <QMainWindow>
+#include <QObject>
+#include <QPushButton>
+#include <QSlider>
+#include <QTimer>
+#include "singlesound.h"
+static int SAMPLERATE = 44100;
 
-//    void start();
-//    void stop();
-//    qint64 readData(char *data, qint64 len);
-//    qint64 writeData(const char *data, qint64 len);
-//    qint64 bytesAvailable() const;
+class SoundComposition : public QIODevice
+{
+    Q_OBJECT
 
-//    void addSound(SingleSound *sound);
-//    void removeSound(SingleSound *sound);
-//private:
-//    QList<SingleSound*> mSounds;
-//    QAudioBuffer::S16U *mData = NULL;
-//    QByteArray mBuffer = NULL;
+public:
+    SoundComposition(QObject *parent);
+    ~SoundComposition();
 
-//    qint64 mFirstAudioFrame;
-//    qint64 mLastAudioFrame;
+    void start();
+    void stop();
 
-//    qint64 mPos;
-//signals:
+    qint64 readData(char *data, qint64 maxlen);
+    qint64 writeData(const char *data, qint64 len);
+    qint64 bytesAvailable() const;
 
-//};
+    void generateData(const int &startFrame, const int &endFrame,
+                      const int &fps);
 
-//#endif // SOUNDCOMPOSITION_H
+    void addSound(SingleSound *sound);
+    void removeSound(SingleSound *sound);
+
+    ComplexAnimator *getSoundsAnimatorContainer();
+private:
+    ComplexAnimator mSoundsAnimatorContainer;
+    QList<SingleSound*> mSounds;
+    qint64 mPos;
+    QByteArray mBuffer;
+};
+
+#endif // SOUNDCOMPOSITION_H

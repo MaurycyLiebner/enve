@@ -1,72 +1,191 @@
-//#include "singlesound.h"
+#include "singlesound.h"
+#include "soundcomposition.h"
 
-//SingleSound::SingleSound(const QString &fileName) :
-//    QObject() {
-//    mFileName = fileName;
-//    mDecoder = new QAudioDecoder(this);
+extern "C" {
+    #include <libavutil/opt.h>
+    #include <libavcodec/avcodec.h>
+    #include <libavformat/avformat.h>
+    #include <libswresample/swresample.h>
+    #include <libswscale/swscale.h>
+}
 
-//    connect(mDecoder, SIGNAL(bufferReady()), this, SLOT(processBuffer()));
-//    connect(mDecoder, SIGNAL(error(QAudioDecoder::Error)),
-//            this, SLOT(error()));
-//    connect(mDecoder, SIGNAL(finished()),
-//            this, SLOT(processAfterFinished()));
-//    reload();
-//}
+int decode_audio_file(const char* path,
+                      const int sample_rate,
+                      float** audioData,
+                      int* size) {
 
-//const unsigned char *SingleSound::getConstData() const
-//{
-//    return mData;
-//}
+    // initialize all muxers, demuxers and protocols for libavformat
+    // (does nothing if called twice during the course of one program execution)
+    av_register_all();
 
-//void SingleSound::reload() {
-//    mBuffer = QAudioBuffer();
-////    QAudioFormat desiredFormat;
-////    desiredFormat.setChannelCount(2);
-////    desiredFormat.setCodec("audio/x-raw");
-////    desiredFormat.setSampleType(QAudioFormat::UnSignedInt);
-////    desiredFormat.setSampleRate(48000);
-////    desiredFormat.setSampleSize(16);
-////    QAudioFormat format;
-////    format.setChannelCount(2);
-////    format.setSampleSize(16);
-////    format.setSampleRate(48000);
-////    format.setCodec("audio/pcm");
-////    format.setSampleType(QAudioFormat::SignedInt);
+    // get format from audio file
+    AVFormatContext* format = avformat_alloc_context();
+    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+        fprintf(stderr, "Could not open file '%s'\n", path);
+        return -1;
+    }
+    if (avformat_find_stream_info(format, NULL) < 0) {
+        fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
+        return -1;
+    }
 
-//    //mDecoder->setAudioFormat(format);
-//    mDecoder->setSourceFilename(mFileName);
+    // Find the index of the first audio stream
+    int audioStreamIndex = -1;
+    for (uint i = 0; i< format->nb_streams; i++) {
+        const AVMediaType &mediaType = format->streams[i]->codec->codec_type;
+        if(mediaType == AVMEDIA_TYPE_AUDIO) {
+            audioStreamIndex = i;
+            break;
+        }
+    }
+    if (audioStreamIndex == -1) {
+        fprintf(stderr,
+                "Could not retrieve audio stream from file '%s'\n", path);
+        return -1;
+    }
+    AVCodecContext *audioCodec = NULL;
+    struct SwrContext *swr = NULL;
 
-//    mData.clear();
-//    mDecoder->start();
-//}
+    AVStream* audioStream = format->streams[audioStreamIndex];
+    // find & open codec
+    audioCodec = audioStream->codec;
+    if (avcodec_open2(audioCodec, avcodec_find_decoder(audioCodec->codec_id), NULL) < 0) {
+        fprintf(stderr, "Failed to open decoder for stream #%u in file '%s'\n",
+                audioStreamIndex, path);
+        return -1;
+    }
 
-//int SingleSound::getStartAudioFrame() {
-//    return mStartVideoFrame*48000;
-//}
+    // prepare resampler
+    swr = swr_alloc();
+    av_opt_set_int(swr, "in_channel_count",  audioCodec->channels, 0);
+    av_opt_set_int(swr, "out_channel_count", 1, 0);
+    av_opt_set_int(swr, "in_channel_layout",  audioCodec->channel_layout, 0);
+    av_opt_set_int(swr, "out_channel_layout", AV_CH_LAYOUT_MONO, 0);
+    av_opt_set_int(swr, "in_sample_rate", audioCodec->sample_rate, 0);
+    av_opt_set_int(swr, "out_sample_rate", sample_rate, 0);
+    av_opt_set_sample_fmt(swr, "in_sample_fmt",  audioCodec->sample_fmt, 0);
+    av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLT,  0);
+    swr_init(swr);
+    if (!swr_is_initialized(swr)) {
+        fprintf(stderr, "Resampler has not been properly initialized\n");
+        return -1;
+    }
 
-//int SingleSound::getAudioFrameLength() {
-//    return mBuffer.frameCount();
-//}
+    // prepare to read data
+    AVPacket packet;
+    av_init_packet(&packet);
+    AVFrame* frame = av_frame_alloc();
+    if (!frame) {
+        fprintf(stderr, "Error allocating the frame\n");
+        return -1;
+    }
 
-//#include <QDebug>
-//void SingleSound::error() {
-//    qDebug() << mDecoder->errorString() << mDecoder->error();
-//}
+    // iterate through frames
+    *audioData = NULL;
+    *size = 0;
+    while(av_read_frame(format, &packet) >= 0) {
+        if(packet.stream_index == audioStreamIndex) {
+            // decode one frame
+            int gotFrame;
+            if (avcodec_decode_audio4(audioCodec, frame, &gotFrame, &packet) < 0) {
+                break;
+            }
+            if (!gotFrame) {
+                continue;
+            }
+            // resample frames
+            double* buffer;
+            av_samples_alloc((uint8_t**) &buffer, NULL, 1,
+                             frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
+            int frame_count = swr_convert(swr,
+                                          (uint8_t**) &buffer,
+                                          frame->nb_samples,
+                                          (const uint8_t**) frame->data,
+                                          frame->nb_samples);
+            // append resampled frames to data
+            *audioData = (float*) realloc(*audioData,
+                                     (*size + frame->nb_samples) * sizeof(float));
+            memcpy(*audioData + *size, buffer, frame_count * sizeof(float));
+            *size += frame_count;
+        }
+        av_free_packet(&packet);
+    }
 
-//void SingleSound::processAfterFinished() {
-//    mSrcFormat = mBuffer.format();
+    // clean up
+    av_frame_free(&frame);
+    if(swr != NULL) {
+        swr_free(&swr);
+    }
+    if(audioCodec != NULL) {
+        avcodec_close(audioCodec);
+    }
+    avformat_free_context(format);
 
+    // success
+    return 0;
+}
 
-//}
+SingleSound::SingleSound() :
+    ComplexAnimator() {
+    setName("Sound");
 
-//void SingleSound::processBuffer()
-//{
-//    mBuffer = mDecoder->read();
+    mVolumeAnimator.incNumberPointers();
+    addChildAnimator(&mVolumeAnimator);
+    mVolumeAnimator.setValueRange(0, 200);
+    mVolumeAnimator.setCurrentValue(100);
+    mVolumeAnimator.setName("Volume");
+}
 
-//    unsigned char *data = mBuffer.constData<unsigned char>();
-//    qint64 nFrames = mBuffer.frameCount();
+SingleSound::SingleSound(const QString &path) :
+    SingleSound() {
+    setFilePath(path);
+}
 
-//    for(qint64 i = 0; i < nFrames; i++) {
-//        mData.append(data[i]);
-//    }
-//}
+void SingleSound::setFilePath(const QString &path) {
+    mPath = path;
+    reloadDataFromFile();
+}
+
+void SingleSound::reloadDataFromFile() {
+    if(mSrcData != NULL) {
+        delete[] mSrcData;
+        mSrcData = NULL;
+        mSrcSampleCount = 0;
+    }
+    if(!mPath.isEmpty()) {
+        if(QFile(mPath).exists()) {
+            decode_audio_file(mPath.toLatin1().data(), SAMPLERATE,
+                              &mSrcData, &mSrcSampleCount);
+        }
+    }
+    prepareFinalData();
+}
+
+int SingleSound::getStartFrame() const {
+    return mStartFrame;
+}
+
+int SingleSound::getSampleCount() const {
+    return mFinalSampleCount;
+}
+
+void SingleSound::prepareFinalData() {
+    if(mSrcData == NULL) {
+        mFinalData = NULL;
+        mFinalSampleCount = 0;
+    } else {
+        memcpy(mFinalData, mSrcData, mSrcSampleCount*sizeof(float));
+        if(mVolumeAnimator.hasKeys() ||
+           qAbs(mVolumeAnimator.getCurrentValue() - 100.) > 0.1) {
+            for(int i = 0; i < mSrcSampleCount; i++) {
+                mFinalData[i] = mFinalData[i]*
+                        mVolumeAnimator.getCurrentValue()/100.;
+            }
+        }
+        mFinalSampleCount = mSrcSampleCount;
+    }
+}
+
+const float *SingleSound::getData() const {
+    return mFinalData;
+}

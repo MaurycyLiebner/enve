@@ -74,8 +74,7 @@ void VideoBox::draw(QPainter *p)
 }
 
 int VideoBox::getImageAtFrame(const char* path,
-                    const int &frameId,
-                    QImage *targetImg) {
+                    const int &frameId) {
 
     // initialize all muxers, demuxers and protocols for libavformat
     // (does nothing if called twice during the course of one program execution)
@@ -207,8 +206,7 @@ void VideoBox::reloadPixmap()
     if(mSrcFilePath.isEmpty()) {
     } else {
         getImageAtFrame(mSrcFilePath.toLatin1().data(),
-                        mCurrentFrame,
-                        &mImage);
+                        mCurrentFrame);
     }
 
     if(!mPivotChanged) centerPivotPosition();

@@ -59,8 +59,6 @@ SOURCES += main.cpp\
     qrealanimatorvalueslider.cpp \
     renderoutputwidget.cpp \
     canvaswidget.cpp \
-    Sound/singlesound.cpp \
-    Sound/soundcomposition.cpp \
     Animators/animatorscollection.cpp \
     Animators/transformanimator.cpp \
     Animators/animator.cpp \
@@ -108,7 +106,9 @@ SOURCES += main.cpp\
     Animators/paintsettings.cpp \
     edge.cpp \
     Animators/singlepathanimator.cpp \
-    Boxes/videobox.cpp
+    Boxes/videobox.cpp \
+    Sound/singlesound.cpp \
+    Sound/soundcomposition.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -154,8 +154,6 @@ HEADERS  += mainwindow.h \
     renderoutputwidget.h \
     canvaswidget.h \
     keypoint.h \
-    Sound/singlesound.h \
-    Sound/soundcomposition.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
     Animators/complexanimator.h \
@@ -201,7 +199,9 @@ HEADERS  += mainwindow.h \
     Animators/paintsettings.h \
     edge.h \
     Animators/singlepathanimator.h \
-    Boxes/videobox.h
+    Boxes/videobox.h \
+    Sound/singlesound.h \
+    Sound/soundcomposition.h
 
 RESOURCES += \
     resources.qrc

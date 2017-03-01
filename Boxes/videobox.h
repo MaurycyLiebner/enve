@@ -23,7 +23,7 @@ private:
     QString mSrcFilePath;
     QImage mImage;
     int mCurrentFrame = 0;
-    int getImageAtFrame(const char *path, const int &frameId, QImage *targetImg);
+    int getImageAtFrame(const char *path, const int &frameId);
 };
 
 #endif // VIDEOBOX_H

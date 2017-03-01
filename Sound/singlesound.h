@@ -1,39 +1,28 @@
-//#ifndef SINGLESOUND_H
-//#define SINGLESOUND_H
-//#include <QString>
-//#include <QObject>
-//#include <QAudioFormat>
-//#include <QAudioDecoder>
-//#include "Animators/qrealanimator.h"
-//#include <QVector>
+#ifndef SINGLESOUND_H
+#define SINGLESOUND_H
+#include "Animators/complexanimator.h"
 
-//class SingleSound : public QObject
-//{
-//    Q_OBJECT
-//public:
-//    SingleSound(const QString &fileName);
+class SingleSound : public ComplexAnimator
+{
+public:
+    SingleSound();
+    SingleSound(const QString &path);
 
-//    const unsigned char *getConstData() const;
-//    void reload();
+    void setFilePath(const QString &path);
+    void reloadDataFromFile();
 
-//    int getStartAudioFrame();
-//    int getAudioFrameLength();
+    int getStartFrame() const;
+    int getSampleCount() const;
+    const float *getFinalData() const;
+    void prepareFinalData();
+private:
+    float *mSrcData = NULL;
+    float *mFinalData = NULL;
+    int mStartFrame = 0;
+    int mFinalSampleCount = 0;
+    int mSrcSampleCount = 0;
+    QrealAnimator mVolumeAnimator;
+    QString mPath;
+};
 
-//    qint64 getCurrentBufferStartAudioFrame();
-//    qint64 getCurrentBufferLength();
-//public slots:
-//    void processBuffer();
-//    void error();
-//    void processAfterFinished();
-//private:
-//    QAudioFormat mSrcFormat;
-//    int mStartVideoFrame = 0;
-//    QString mFileName;
-//    QAudioDecoder *mDecoder;
-//    QAudioBuffer mBuffer;
-//    QVector<unsigned char> mData;
-//    //QrealAnimator mVolumeAnimator;
-//    //qreal mScale = 100.;
-//};
-
-//#endif // SINGLESOUND_H
+#endif // SINGLESOUND_H
