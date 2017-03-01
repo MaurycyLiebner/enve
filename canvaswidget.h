@@ -7,14 +7,17 @@ enum CanvasMode : short;
 class Color;
 class Gradient;
 class BoxesGroup;
+class PaintControler;
 
 #include "fillstrokesettings.h"
+#include "boxeslistanimationdockwidget.h"
 
 class CanvasWidget : public QWidget, public SingleWidgetTarget
 {
     Q_OBJECT
 public:
     explicit CanvasWidget(QWidget *parent = 0);
+    ~CanvasWidget();
 
     Canvas *getCurrentCanvas();
     const QList<Canvas*> &getCanvasList() {
@@ -67,7 +70,35 @@ public:
     void applyPaintSettingToSelected(const PaintSetting &setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
+
+    void updateAfterFrameChanged(const int &currentFrame);
+    void saveSelectedToSql(QSqlQuery *query);
+    void clearAll();
+    void createAnimationBoxForPaths(const QStringList &importPaths);
+    void createLinkToFileWithPath(const QString &path);
+    void saveToSql(QSqlQuery *query);
+    void createVideoForPath(const QString &path);
+    int getCurrentFrame();
+    int getMaxFrame();
+    int getMinFrame();
+    void addBoxAwaitingUpdate(BoundingBox *box);
 protected:
+    QThread *mPaintControlerThread;
+    PaintControler *mPaintControler;
+
+    int mSavedCurrentFrame = 0;
+    bool mRendering = false;
+    bool mNoBoxesAwaitUpdate = true;
+    bool mCancelLastBoxUpdate = false;
+    BoundingBox *mLastUpdatedBox = NULL;
+    QList<BoundingBox*> mBoxesAwaitingUpdate;
+
+    QString mOutputString;
+    int mCurrentRenderFrame;
+
+    bool mPreviewInterrupted = false;
+
+    void (CanvasWidget::*mBoxesUpdateFinishedFunction)(void) = NULL;
     Canvas *mCurrentCanvas = NULL;
     QList<Canvas*> mCanvasList;
 
@@ -80,7 +111,8 @@ protected:
 
     void keyPressEvent(QKeyEvent *event);
 signals:
-
+    void updateBoxPixmaps(BoundingBox*);
+    void changeCurrentFrame(int);
 public slots:
     void setMovePathMode();
     void setMovePointMode();
@@ -121,6 +153,15 @@ public slots:
 
     void setEffectsPaintEnabled(const bool &bT);
     void setHighQualityView(const bool &bT);
+
+    void stopPreview();
+    void playPreview();
+    void renderOutput();
+private slots:
+    void sendNextBoxForUpdate();
+    void nextSaveOutputFrame();
+    void nextPlayPreviewFrame();
+    void saveOutput(QString renderDest);
 };
 
 #endif // CANVASWIDGET_H

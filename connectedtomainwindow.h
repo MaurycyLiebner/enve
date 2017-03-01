@@ -37,7 +37,7 @@ public:
     bool isCtrlPressed();
     bool isAltPressed();
 
-    int getCurrentFrame();
+    int getCurrentFrameFromMainWindow();
     int getMaxFrame();
     int getMinFrame();
     bool isRecordingAllPoints();

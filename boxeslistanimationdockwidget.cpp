@@ -335,11 +335,11 @@ void BoxesListAnimationDockWidget::setPlaying(bool playing) {
         disconnect(mPlayButton, SIGNAL(pressed()),
                 this, SLOT(playPreview()) );
         connect(mPlayButton, SIGNAL(pressed()),
-                mMainWindow, SLOT(stopPreview()) );
+                mMainWindow->getCanvasWidget(), SLOT(stopPreview()) );
     } else {
         mPlayButton->setIcon(QIcon(":/icons/play.png") );
         disconnect(mPlayButton, SIGNAL(pressed()),
-                mMainWindow, SLOT(stopPreview()) );
+                mMainWindow->getCanvasWidget(), SLOT(stopPreview()) );
         connect(mPlayButton, SIGNAL(pressed()),
                 this, SLOT(playPreview()) );
     }
@@ -353,7 +353,7 @@ void BoxesListAnimationDockWidget::previewFinished()
 void BoxesListAnimationDockWidget::playPreview()
 {
     setPlaying(true);
-    mMainWindow->playPreview();
+    mMainWindow->getCanvasWidget()->playPreview();
 }
 
 void BoxesListAnimationDockWidget::setGraphEnabled(bool graphEnabled)

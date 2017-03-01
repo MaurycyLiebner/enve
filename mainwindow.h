@@ -17,8 +17,6 @@ enum ClipboardContainerType : short;
 
 class ClipboardContainer;
 
-class PaintControler;
-
 class BoxesList;
 
 class UpdateScheduler;
@@ -60,7 +58,7 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
+//    void (MainWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
 
     static MainWindow *getInstance();
 
@@ -113,12 +111,12 @@ public:
     void updateDisplayedFillStrokeSettingsIfNeeded();
     void updateCanvasModeButtonsChecked();
 
-    void addBoxAwaitingUpdate(BoundingBox *box);
+    //void addBoxAwaitingUpdate(BoundingBox *box);
     void setCurrentObjectSettingsWidgetBox(BoundingBox *box);
     void setCurrentBox(BoundingBox *box);
 
-    void nextSaveOutputFrame();
-    void nextPlayPreviewFrame();
+//    void nextSaveOutputFrame();
+//    void nextPlayPreviewFrame();
 
     void setResolutionPercent(qreal percent);
 
@@ -132,16 +130,16 @@ public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);
     void setAllPointsRecord(bool allPointsRecord);
-    void playPreview();
-    void stopPreview();
+    //void playPreview();
+   // void stopPreview();
     void setResolutionPercentId(int id);
     void createNewCanvas();
 
     void callUpdateSchedulers();
 private slots:
-    void saveOutput(QString renderDest);
-    void renderOutput();
-    void sendNextBoxForUpdate();
+    //void saveOutput(QString renderDest);
+    //void renderOutput();
+    //void sendNextBoxForUpdate();
 
     void newFile();
     bool askForSaving();
@@ -157,22 +155,18 @@ private slots:
     void exportSelected();
     void revert();
 signals:
-    void updateBoxPixmaps(BoundingBox*);
     void updateAll();
 private:
     static MainWindow *mMainWindowInstance;
 
     QList<ClipboardContainer*> mClipboardContainers;
-    bool mRendering = false;
+//    bool mRendering = false;
 
     QComboBox *mCurrentCanvasComboBox;
-    bool mCancelLastBoxUpdate = false;
-    BoundingBox *mLastUpdatedBox = NULL;
-    QList<BoundingBox*> mBoxesAwaitingUpdate;
-    bool mNoBoxesAwaitUpdate = true;
-
-    QThread *mPaintControlerThread;
-    PaintControler *mPaintControler;
+//    bool mCancelLastBoxUpdate = false;
+//    BoundingBox *mLastUpdatedBox = NULL;
+//    QList<BoundingBox*> mBoxesAwaitingUpdate;
+//    bool mNoBoxesAwaitUpdate = true;
 
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
@@ -220,9 +214,6 @@ private:
     QMenu *mViewMenu;
     QMenu *mRenderMenu;
 
-//    SoundComposition *mSoundComposition = NULL;
-
-    Canvas *mCanvas;
     CanvasWidget *mCanvasWidget;
     UndoRedoStack mUndoRedoStack;
     bool mDetachedUndoRedoStack = false;
@@ -238,24 +229,13 @@ private:
     QWidget *mGrayOutWidget = NULL;
 
     qreal mFPS = 24.;
-    int mMinFrame = 0;
-    int mMaxFrame = 200;
-    int mSavedCurrentFrame = 0;
-    int mCurrentFrame = 0;
-    bool mRecording = false;
-    bool mAllPointsRecording = false;
 
+    bool mAllPointsRecording = false;
     bool mDisplayedFillStrokeSettingsUpdateNeeded = false;
 
     bool mShiftPressed = false;
     bool mAltPressed = false;
     bool mCtrlPressed = false;
-
-
-    QString mOutputString;
-    int mCurrentRenderFrame;
-
-    bool mPreviewInterrupted = false;
 
     BoxScrollWidget *mObjectSettingsWidget = NULL;
     ScrollArea *mObjectSettingsScrollArea;

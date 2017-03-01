@@ -71,7 +71,7 @@ bool ConnectedToMainWindow::isAltPressed(QKeyEvent *event) {
     return event->modifiers() & Qt::AltModifier;
 }
 
-int ConnectedToMainWindow::getCurrentFrame() {
+int ConnectedToMainWindow::getCurrentFrameFromMainWindow() {
     return mMainWindow->getCurrentFrame();
 }
 

@@ -4,6 +4,8 @@
 #include "mainwindow.h"
 #include "BoxesList/boxscrollwidgetvisiblepart.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "paintcontroler.h"
+#include "renderoutputwidget.h"
 
 CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -11,6 +13,19 @@ CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     setMinimumSize(500, 500);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     setMouseTracking(true);
+
+    mPaintControlerThread = new QThread(this);
+    mPaintControler = new PaintControler();
+    mPaintControler->moveToThread(mPaintControlerThread);
+    connect(mPaintControler, SIGNAL(finishedUpdatingLastBox()),
+            this, SLOT(sendNextBoxForUpdate()) );
+    connect(this, SIGNAL(updateBoxPixmaps(BoundingBox*)),
+            mPaintControler, SLOT(updateBoxPixmaps(BoundingBox*)) );
+    mPaintControlerThread->start();
+}
+
+CanvasWidget::~CanvasWidget() {
+    mPaintControlerThread->quit();
 }
 
 Canvas *CanvasWidget::getCurrentCanvas() {
@@ -35,6 +50,7 @@ void CanvasWidget::setCurrentCanvas(const int &id) {
         setCurrentCanvas((Canvas*)NULL);
     } else {
         setCurrentCanvas(mCanvasList.at(id));
+        emit changeCurrentFrame(getCurrentFrame());
     }
 }
 
@@ -407,6 +423,11 @@ void CanvasWidget::setSelectedStrokeColorMode(const ColorMode &mode) {
     mCurrentCanvas->setSelectedStrokeColorMode(mode);
 }
 
+void CanvasWidget::updateAfterFrameChanged(const int &currentFrame) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->updateAfterFrameChanged(currentFrame);
+}
+
 void CanvasWidget::strokeFlatColorChanged(const Color &color,
                                       const bool &finish) {
     if(hasNoCanvas()) return;
@@ -476,4 +497,161 @@ void CanvasWidget::schedulePivotUpdate() {
 BoxesGroup *CanvasWidget::getCurrentGroup() {
     if(hasNoCanvas()) return NULL;
     return mCurrentCanvas->getCurrentBoxesGroup();
+}
+
+void CanvasWidget::renderOutput() {
+    RenderOutputWidget *dialog = new RenderOutputWidget(this);
+    connect(dialog, SIGNAL(render(QString)),
+            this, SLOT(saveOutput(QString)));
+    dialog->exec();
+}
+
+void CanvasWidget::playPreview() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->updateRenderRect();
+    mBoxesUpdateFinishedFunction = &CanvasWidget::nextPlayPreviewFrame;
+    mSavedCurrentFrame = getCurrentFrame();
+
+    mRendering = true;
+    mPreviewInterrupted = false;
+    mCurrentRenderFrame = mSavedCurrentFrame;
+    mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
+    mCurrentCanvas->setPreviewing(true);
+    mCurrentCanvas->updateAllBoxes();
+    if(mNoBoxesAwaitUpdate) {
+        nextPlayPreviewFrame();
+    }
+}
+
+void CanvasWidget::addBoxAwaitingUpdate(BoundingBox *box) {
+    if(mNoBoxesAwaitUpdate) {
+        mNoBoxesAwaitUpdate = false;
+        mLastUpdatedBox = box;
+        emit updateBoxPixmaps(box);
+    } else {
+        mBoxesAwaitingUpdate << box;
+    }
+}
+
+void CanvasWidget::sendNextBoxForUpdate() {
+    if(mLastUpdatedBox != NULL) {
+        mLastUpdatedBox->setAwaitingUpdate(false);
+        if(mLastUpdatedBox->shouldRedoUpdate()) {
+            mLastUpdatedBox->setRedoUpdateToFalse();
+            mLastUpdatedBox->awaitUpdate();
+        }
+    }
+    if(mBoxesAwaitingUpdate.isEmpty()) {
+        mNoBoxesAwaitUpdate = true;
+        mLastUpdatedBox = NULL;
+        callUpdateSchedulers();
+        if(mBoxesUpdateFinishedFunction != NULL) {
+            (*this.*mBoxesUpdateFinishedFunction)();
+        }
+        //callUpdateSchedulers();
+    } else {
+        mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
+        emit updateBoxPixmaps(mLastUpdatedBox);
+    }
+}
+
+void CanvasWidget::stopPreview() {
+    mPreviewInterrupted = true;
+    if(!mRendering) {
+        mCurrentRenderFrame = getMaxFrame();
+        mCurrentCanvas->clearPreview();
+        repaint();
+        MainWindow::getInstance()->previewFinished();
+    }
+}
+
+void CanvasWidget::nextPlayPreviewFrame() {
+    mCurrentCanvas->renderCurrentFrameToPreview();
+    if(mCurrentRenderFrame >= getMaxFrame() || mPreviewInterrupted) {
+        mRendering = false;
+        emit changeCurrentFrame(mSavedCurrentFrame);
+        mBoxesUpdateFinishedFunction = NULL;
+            mCurrentCanvas->playPreview();
+    } else {
+        mCurrentRenderFrame++;
+        emit changeCurrentFrame(mCurrentRenderFrame);
+        if(mNoBoxesAwaitUpdate) {
+            nextPlayPreviewFrame();
+        }
+    }
+}
+
+void CanvasWidget::nextSaveOutputFrame() {
+    mCurrentCanvas->renderCurrentFrameToOutput(mOutputString);
+    if(mCurrentRenderFrame >= getMaxFrame()) {
+        emit changeCurrentFrame(mSavedCurrentFrame);
+        mBoxesUpdateFinishedFunction = NULL;
+    } else {
+        mCurrentRenderFrame++;
+        emit changeCurrentFrame(mCurrentRenderFrame);
+        if(mNoBoxesAwaitUpdate) {
+            nextSaveOutputFrame();
+        }
+    }
+}
+
+void CanvasWidget::saveOutput(QString renderDest) {
+    mOutputString = renderDest;
+    mBoxesUpdateFinishedFunction = &CanvasWidget::nextSaveOutputFrame;
+    mSavedCurrentFrame = getCurrentFrame();
+
+    mCurrentRenderFrame = getMinFrame();
+    emit changeCurrentFrame(getMinFrame());
+    if(mNoBoxesAwaitUpdate) {
+        nextSaveOutputFrame();
+    }
+}
+
+void CanvasWidget::clearAll() {
+    foreach(Canvas *canvas, mCanvasList) {
+        canvas->clearAll();
+        canvas->decNumberPointers();
+    }
+    mCanvasList.clear();
+}
+
+void CanvasWidget::saveSelectedToSql(QSqlQuery *query) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->saveSelectedToSql(query);
+}
+
+void CanvasWidget::createLinkToFileWithPath(const QString &path) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->createLinkToFileWithPath(path);
+}
+
+void CanvasWidget::createAnimationBoxForPaths(
+        const QStringList &importPaths) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->createAnimationBoxForPaths(importPaths);
+}
+
+void CanvasWidget::createVideoForPath(const QString &path) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->createVideoForPath(path);
+}
+
+void CanvasWidget::saveToSql(QSqlQuery *query) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->saveToSql(query);
+}
+
+int CanvasWidget::getCurrentFrame() {
+    if(hasNoCanvas()) return 0;
+    return mCurrentCanvas->getCurrentFrame();
+}
+
+int CanvasWidget::getMaxFrame() {
+    if(hasNoCanvas()) return 0;
+    return mCurrentCanvas->getMaxFrame();
+}
+
+int CanvasWidget::getMinFrame() {
+    if(hasNoCanvas()) return 0;
+    return mCurrentCanvas->getMinFrame();
 }

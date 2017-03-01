@@ -14,7 +14,6 @@
 #include "boxeslistanimationdockwidget.h"
 #include "paintcontroler.h"
 #include "qdoubleslider.h"
-#include "renderoutputwidget.h"
 #include "svgimporter.h"
 #include "canvaswidget.h"
 #include "BoxesList/boxscrollwidget.h"
@@ -35,6 +34,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    QFile file("/home/ailuropoda/.Qt_pro/AniVect/stylesheet.qss");
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        setStyleSheet(file.readAll());
+        file.close();
+    }
     //setMouseTracking(true);
     //mSoundComposition = new SoundComposition();
 //    mSoundComposition->addSound(
@@ -50,14 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     mMainWindowInstance = this;
     //int nThreads = QThread::idealThreadCount();
-    mPaintControlerThread = new QThread(this);
-    mPaintControler = new PaintControler();
-    mPaintControler->moveToThread(mPaintControlerThread);
-    connect(mPaintControler, SIGNAL(finishedUpdatingLastBox()),
-            this, SLOT(sendNextBoxForUpdate()) );
-    connect(this, SIGNAL(updateBoxPixmaps(BoundingBox*)),
-            mPaintControler, SLOT(updateBoxPixmaps(BoundingBox*)) );
-    mPaintControlerThread->start();
 
     mUndoRedoStack.setWindow(this);
     setCurrentPath("");
@@ -80,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent)
     mCanvasWidget = new CanvasWidget(this);
 
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
+    connect(mCanvasWidget, SIGNAL(changeCurrentFrame(int)),
+            mBoxesListAnimationDockWidget, SLOT(setCurrentFrame(int)));
     mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();
     mKeysView = mBoxesListAnimationDockWidget->getKeysView();
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
@@ -122,22 +120,24 @@ MainWindow::MainWindow(QWidget *parent)
     mCanvasWidget->SWT_getAbstractionForWidget(
                 mBoxListWidget->getVisiblePartWidget());
 
-    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
-    canvas->setName("Canvas 0");
-    mCanvasWidget->addCanvasToListAndSetAsCurrent(canvas);
-    mCanvas = mCanvasWidget->getCurrentCanvas();
-    mCurrentCanvasComboBox->addItem(mCanvas->getName());
+//    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
+//    canvas->setName("Canvas 0");
+//    mCanvasWidget->addCanvasToListAndSetAsCurrent(canvas);
+//    mCanvas = mCanvasWidget->getCurrentCanvas();
+//    mCurrentCanvasComboBox->addItem(mCanvas->getName());
 
     connectToolBarActions();
 
     this->setMouseTracking(true);
     centralWidget()->setMouseTracking(true);
+
+    createNewCanvas();
 }
 
 MainWindow::~MainWindow()
 {
     //mPaintControlerThread->terminate();
-    mPaintControlerThread->quit();
+    //mPaintControlerThread->quit();
 }
 
 void MainWindow::setupMenuBar() {
@@ -245,7 +245,7 @@ void MainWindow::setupMenuBar() {
     mActionEffectsPaintEnabled->setShortcut(QKeySequence(Qt::Key_E));
 
     mRenderMenu = mMenuBar->addMenu("Render");
-    mRenderMenu->addAction("Render", this, SLOT(renderOutput()));
+    mRenderMenu->addAction("Render", mCanvasWidget, SLOT(renderOutput()));
 
     setMenuBar(mMenuBar);
 //
@@ -477,7 +477,8 @@ void MainWindow::createNewCanvas() {
         Canvas *newCanvas = new Canvas(getFillStrokeSettings(),
                                        mCanvasWidget,
                                        dialog.getCanvasWidth(),
-                                       dialog.getCanvasHeight());
+                                       dialog.getCanvasHeight(),
+                                       dialog.getCanvasFrameCount());
 
         newCanvas->setName(dialog.getCanvasName());
 
@@ -519,142 +520,117 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mTextMode->setChecked(currentMode == ADD_TEXT);
 }
 
-void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)
-{
-    if(mNoBoxesAwaitUpdate) {
-        mNoBoxesAwaitUpdate = false;
-        mLastUpdatedBox = box;
-        emit updateBoxPixmaps(box);
-    } else {
-        mBoxesAwaitingUpdate << box;
-    }
-}
+//void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)
+//{
+//    if(mNoBoxesAwaitUpdate) {
+//        mNoBoxesAwaitUpdate = false;
+//        mLastUpdatedBox = box;
+//        emit updateBoxPixmaps(box);
+//    } else {
+//        mBoxesAwaitingUpdate << box;
+//    }
+//}
 
-void MainWindow::sendNextBoxForUpdate()
-{
-    if(mLastUpdatedBox != NULL) {
-        mLastUpdatedBox->setAwaitingUpdate(false);
-        if(mLastUpdatedBox->shouldRedoUpdate()) {
-            mLastUpdatedBox->setRedoUpdateToFalse();
-            mLastUpdatedBox->awaitUpdate();
-        }
-    }
-    if(mBoxesAwaitingUpdate.isEmpty()) {
-        mNoBoxesAwaitUpdate = true;
-        mLastUpdatedBox = NULL;
-        callUpdateSchedulers();
-        if(mBoxesUpdateFinishedFunction != NULL) {
-            (*this.*mBoxesUpdateFinishedFunction)();
-        }
-        //callUpdateSchedulers();
-    } else {
-        mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
-        emit updateBoxPixmaps(mLastUpdatedBox);
-    }
-}
-
-void MainWindow::playPreview()
-{
-    //mCanvas->clearPreview();
-    mCanvas->updateRenderRect();
-    mBoxesUpdateFinishedFunction = &MainWindow::nextPlayPreviewFrame;
-    mSavedCurrentFrame = mCurrentFrame;
-
-    mRendering = true;
-    mPreviewInterrupted = false;
-    mCurrentRenderFrame = mSavedCurrentFrame;
-    setCurrentFrame(mSavedCurrentFrame);
-    mCanvas->setPreviewing(true);
-    mCanvas->updateAllBoxes();
-    if(mNoBoxesAwaitUpdate) {
-        nextPlayPreviewFrame();
-    }
-}
-
-void MainWindow::nextPlayPreviewFrame() {
-    mCanvas->renderCurrentFrameToPreview();
-    if(mCurrentRenderFrame >= mMaxFrame || mPreviewInterrupted) {
-        mRendering = false;
-        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
-        mBoxesUpdateFinishedFunction = NULL;
-//        if(!mPreviewInterrupted) {
-//            mSoundComposition->setFirstAndLastVideoFrame(0, 240);
-//            mSoundComposition->generateData();
-
-//            QAudioFormat desiredFormat;
-//            desiredFormat.setChannelCount(2);
-//            desiredFormat.setCodec("audio/x-raw");
-//            desiredFormat.setSampleType(QAudioFormat::UnSignedInt);
-//            desiredFormat.setSampleRate(48000);
-//            desiredFormat.setSampleSize(16);
-
-//            QAudioOutput *audio = new QAudioOutput(
-//                                    QAudioDeviceInfo::defaultOutputDevice(),
-//                                    desiredFormat,
-//                                    this);
-//            mSoundComposition->start();
-//            audio->start(mSoundComposition);
-            mCanvas->playPreview();
+//void MainWindow::sendNextBoxForUpdate()
+//{
+//    if(mLastUpdatedBox != NULL) {
+//        mLastUpdatedBox->setAwaitingUpdate(false);
+//        if(mLastUpdatedBox->shouldRedoUpdate()) {
+//            mLastUpdatedBox->setRedoUpdateToFalse();
+//            mLastUpdatedBox->awaitUpdate();
 //        }
-    } else {
-        mCurrentRenderFrame++;
-        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
-        if(mNoBoxesAwaitUpdate) {
-            nextPlayPreviewFrame();
-        }
-    }
-}
+//    }
+//    if(mBoxesAwaitingUpdate.isEmpty()) {
+//        mNoBoxesAwaitUpdate = true;
+//        mLastUpdatedBox = NULL;
+//        callUpdateSchedulers();
+//        if(mBoxesUpdateFinishedFunction != NULL) {
+//            (*this.*mBoxesUpdateFinishedFunction)();
+//        }
+//        //callUpdateSchedulers();
+//    } else {
+//        mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
+//        emit updateBoxPixmaps(mLastUpdatedBox);
+//    }
+//}
 
-void MainWindow::nextSaveOutputFrame() {
-    mCanvas->renderCurrentFrameToOutput(mOutputString);
-    if(mCurrentRenderFrame >= mMaxFrame) {
-        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
-        mBoxesUpdateFinishedFunction = NULL;
-    } else {
-        mCurrentRenderFrame++;
-        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
-        if(mNoBoxesAwaitUpdate) {
-            nextSaveOutputFrame();
-        }
-    }
-}
+//void MainWindow::playPreview()
+//{
+//    //mCanvas->clearPreview();
+//    mCanvas->updateRenderRect();
+//    mBoxesUpdateFinishedFunction = &MainWindow::nextPlayPreviewFrame;
+//    mSavedCurrentFrame = mCurrentFrame;
 
-void MainWindow::saveOutput(QString renderDest) {
-    mOutputString = renderDest;
-    mBoxesUpdateFinishedFunction = &MainWindow::nextSaveOutputFrame;
-    mSavedCurrentFrame = mCurrentFrame;
+//    mRendering = true;
+//    mPreviewInterrupted = false;
+//    mCurrentRenderFrame = mSavedCurrentFrame;
+//    setCurrentFrame(mSavedCurrentFrame);
+//    mCanvas->setPreviewing(true);
+//    mCanvas->updateAllBoxes();
+//    if(mNoBoxesAwaitUpdate) {
+//        nextPlayPreviewFrame();
+//    }
+//}
 
-    mCurrentRenderFrame = mMinFrame;
-    mBoxesListAnimationDockWidget->setCurrentFrame(mMinFrame);
-    if(mNoBoxesAwaitUpdate) {
-        nextSaveOutputFrame();
-    }
-}
+//void MainWindow::nextPlayPreviewFrame() {
+//    mCanvas->renderCurrentFrameToPreview();
+//    if(mCurrentRenderFrame >= mMaxFrame || mPreviewInterrupted) {
+//        mRendering = false;
+//        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+//        mBoxesUpdateFinishedFunction = NULL;
+//            mCanvas->playPreview();
+//    } else {
+//        mCurrentRenderFrame++;
+//        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
+//        if(mNoBoxesAwaitUpdate) {
+//            nextPlayPreviewFrame();
+//        }
+//    }
+//}
+
+//void MainWindow::nextSaveOutputFrame() {
+//    mCanvas->renderCurrentFrameToOutput(mOutputString);
+//    if(mCurrentRenderFrame >= mMaxFrame) {
+//        mBoxesListAnimationDockWidget->setCurrentFrame(mSavedCurrentFrame);
+//        mBoxesUpdateFinishedFunction = NULL;
+//    } else {
+//        mCurrentRenderFrame++;
+//        mBoxesListAnimationDockWidget->setCurrentFrame(mCurrentRenderFrame);
+//        if(mNoBoxesAwaitUpdate) {
+//            nextSaveOutputFrame();
+//        }
+//    }
+//}
+
+//void MainWindow::saveOutput(QString renderDest) {
+//    mOutputString = renderDest;
+//    mBoxesUpdateFinishedFunction = &MainWindow::nextSaveOutputFrame;
+//    mSavedCurrentFrame = mCurrentFrame;
+
+//    mCurrentRenderFrame = mMinFrame;
+//    mBoxesListAnimationDockWidget->setCurrentFrame(mMinFrame);
+//    if(mNoBoxesAwaitUpdate) {
+//        nextSaveOutputFrame();
+//    }
+//}
 
 void MainWindow::previewFinished() {
     mBoxesListAnimationDockWidget->previewFinished();
 }
 
-void MainWindow::stopPreview() {
-    mPreviewInterrupted = true;
-    if(!mRendering) {
-        mCurrentRenderFrame = mMaxFrame;
-        mCanvas->clearPreview();
-        mCanvasWidget->repaint();
-        previewFinished();
-    }
-}
+//void MainWindow::stopPreview() {
+//    mPreviewInterrupted = true;
+//    if(!mRendering) {
+//        mCurrentRenderFrame = mMaxFrame;
+//        mCanvas->clearPreview();
+//        mCanvasWidget->repaint();
+//        previewFinished();
+//    }
+//}
 
 void MainWindow::setResolutionPercentId(int id)
 {
     mCanvasWidget->setResolutionPercent(1. - id*0.25);
-}
-
-void MainWindow::renderOutput()
-{
-    RenderOutputWidget *dialog = new RenderOutputWidget(this);
-    connect(dialog, SIGNAL(render(QString)), this, SLOT(saveOutput(QString)));
-    dialog->exec();
 }
 
 UndoRedoStack *MainWindow::getUndoRedoStack()
@@ -799,7 +775,7 @@ void MainWindow::enable() {
 }
 
 int MainWindow::getCurrentFrame() {
-    return mCurrentFrame;
+    return mCanvasWidget->getCurrentFrame();
 }
 
 bool MainWindow::isRecordingAllPoints() {
@@ -807,17 +783,15 @@ bool MainWindow::isRecordingAllPoints() {
 }
 
 int MainWindow::getMinFrame() {
-    return mMinFrame;
+    return mCanvasWidget->getMinFrame();
 }
 
 int MainWindow::getMaxFrame() {
-    return mMaxFrame;
+    return mCanvasWidget->getMaxFrame();
 }
 
-void MainWindow::setCurrentFrame(int frame)
-{
-    mCurrentFrame = frame;
-    mCanvas->updateAfterFrameChanged(mCurrentFrame);
+void MainWindow::setCurrentFrame(int frame) {
+    mCanvasWidget->updateAfterFrameChanged(frame);
 
     callUpdateSchedulers();
 }
@@ -927,7 +901,7 @@ void MainWindow::clearAll() {
     mUpdateSchedulers.clear();
 
     mUndoRedoStack.clearAll();
-    mCanvas->clearAll();
+    mCanvasWidget->clearAll();
     mFillStrokeSettings->clearAll();
     //mObjectSettingsWidget->clearAll();
     //mBoxListWidget->clearAll();
@@ -950,7 +924,7 @@ void MainWindow::exportSelected(QString path) {
     query.exec("BEGIN TRANSACTION");
 
     mFillStrokeSettings->saveGradientsToSqlIfPathSelected(&query);
-    mCanvas->saveSelectedToSql(&query);
+    mCanvasWidget->saveSelectedToSql(&query);
 
     query.exec("COMMIT TRANSACTION");
     db.close();
@@ -1052,7 +1026,7 @@ void MainWindow::linkFile()
     if(!importPaths.isEmpty()) {
         foreach(const QString &path, importPaths) {
             if(path.isEmpty()) continue;
-            mCanvas->createLinkToFileWithPath(path);
+            mCanvasWidget->createLinkToFileWithPath(path);
         }
     }
 }
@@ -1065,7 +1039,7 @@ void MainWindow::importAnimation() {
         "Import Animation", "", "Images (*.png *.jpg)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
-        mCanvas->createAnimationBoxForPaths(importPaths);
+        mCanvasWidget->createAnimationBoxForPaths(importPaths);
     }
 }
 
@@ -1075,7 +1049,7 @@ void MainWindow::importVideo() {
         "Import Video", "", "Video (*.mp4 *.mov *.avi)");
     enableEventFilter();
     foreach(const QString &path, importPaths) {
-        mCanvas->createVideoForPath(path);
+        mCanvasWidget->createVideoForPath(path);
     }
 }
 
@@ -1332,7 +1306,7 @@ void MainWindow::saveToFile(QString path) {
     query.exec("BEGIN TRANSACTION");
 
     mFillStrokeSettings->saveGradientsToQuery(&query);
-    mCanvas->saveToSql(&query);
+    mCanvasWidget->saveToSql(&query);
 
     query.exec("COMMIT TRANSACTION");
     db.close();

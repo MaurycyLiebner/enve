@@ -38,7 +38,8 @@ public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                     CanvasWidget *canvasWidget,
                     int canvasWidth = 1920,
-                    int canvasHeight = 1080);
+                    int canvasHeight = 1080,
+                    const int &frameCount = 200);
     ~Canvas();
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
@@ -298,6 +299,9 @@ public:
     void applyPaintSettingToSelected(const PaintSetting &setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
+    int getCurrentFrame();
+    int getMinFrame();
+    int getMaxFrame();
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
@@ -312,6 +316,9 @@ private:
     QList<BoundingBox*> mSelectedBoxes;
 
     bool mIsCurrentCanvas = true;
+    int mCurrentFrame = 0;
+    int mMinFrame = 0;
+    int mMaxFrame = 0;
 
     bool mPivotVisibleDuringPointEdit = true;
     bool mEffectsPaintEnabled;

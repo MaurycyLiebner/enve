@@ -526,7 +526,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
 void BoundingBox::awaitUpdate() {
     if(mAwaitingUpdate || mParent == NULL) return;
     setAwaitingUpdate(true);
-    mMainWindow->addBoxAwaitingUpdate(this);
+    mMainWindow->getCanvasWidget()->addBoxAwaitingUpdate(this);
 }
 
 #include "updatescheduler.h"

@@ -12,9 +12,11 @@
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWidget *canvasWidget,
-               int canvasWidth, int canvasHeight) :
-    BoxesGroup(fillStrokeSettings)
-{
+               int canvasWidth, int canvasHeight,
+               const int &frameCount) :
+    BoxesGroup(fillStrokeSettings) {
+    mMaxFrame = frameCount;
+
     mEffectsPaintEnabled = true;
     mResolutionPercent = 1.;
 
@@ -394,7 +396,7 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest) {
                                QImage::Format_ARGB32);
     image->fill(Qt::transparent);
     renderFinalCurrentFrameToQImage(image);
-    image->save(renderDest + QString::number(getCurrentFrame()) + ".png");
+    image->save(renderDest + QString::number(mCurrentFrame) + ".png");
     delete image;
 }
 
@@ -862,8 +864,8 @@ void Canvas::moveByRel(QPointF trans)
     schedulePivotUpdate();
 }
 
-void Canvas::updateAfterFrameChanged(int currentFrame)
-{
+void Canvas::updateAfterFrameChanged(int currentFrame) {
+    mCurrentFrame = currentFrame;
     foreach(BoundingBox *box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
@@ -956,4 +958,16 @@ bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,
 
 void Canvas::setIsCurrentCanvas(const bool &bT) {
     mIsCurrentCanvas = bT;
+}
+
+int Canvas::getCurrentFrame() {
+    return mCurrentFrame;
+}
+
+int Canvas::getMinFrame() {
+    return mMinFrame;
+}
+
+int Canvas::getMaxFrame() {
+    return mMaxFrame;
 }

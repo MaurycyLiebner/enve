@@ -5,7 +5,7 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     ImageBox(parent) {
     mFirstFrameAnimator.setName("start frame");
     mFirstFrameAnimator.blockPointer();
-    mFirstFrameAnimator.setCurrentIntValue(getCurrentFrame());
+    mFirstFrameAnimator.setCurrentIntValue(getCurrentFrameFromMainWindow());
     mFirstFrameAnimator.setUpdater(new AnimationBoxFrameUpdater(this));
     mFirstFrameAnimator.blockUpdater();
     addActiveAnimator(&mFirstFrameAnimator);
@@ -61,10 +61,10 @@ void AnimationBox::updateAnimationFrame() {
     qreal timeScale = mTimeScaleAnimator.getCurrentValue();
     int pixId;
     if(timeScale > 0.) {
-        pixId = (getCurrentFrame() -
+        pixId = (getCurrentFrameFromMainWindow() -
                 mFirstFrameAnimator.getCurrentIntValue())*timeScale;
     } else {
-        pixId = mListOfFrames.count() - 1 + (getCurrentFrame() -
+        pixId = mListOfFrames.count() - 1 + (getCurrentFrameFromMainWindow() -
                 mFirstFrameAnimator.getCurrentIntValue())*timeScale;
     }
 

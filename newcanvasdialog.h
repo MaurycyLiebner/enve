@@ -15,6 +15,7 @@ public:
     int getCanvasWidth();
     int getCanvasHeight();
     QString getCanvasName();
+    int getCanvasFrameCount();
 private:
     QVBoxLayout *mMainLayout;
 
@@ -23,8 +24,14 @@ private:
     QLineEdit *mNameEdit;
 
     QHBoxLayout *mSizeLayout;
+    QLabel *mWidthLabel;
     QSpinBox *mWidthSpinBox;
+    QLabel *mHeightLabel;
     QSpinBox *mHeightSpinBox;
+
+    QHBoxLayout *mFrameCountLayout;
+    QLabel *mFrameCountLabel;
+    QSpinBox *mFrameCountSpinBox;
 
     QPushButton *mOkButton;
     QPushButton *mCancelButton;

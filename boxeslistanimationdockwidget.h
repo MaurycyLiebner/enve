@@ -53,7 +53,6 @@ public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
     BoxScrollWidget *getBoxesList();
     KeysView *getKeysView();
-    void setCurrentFrame(int frame);
     bool processUnfilteredKeyEvent(QKeyEvent *event);
     bool processFilteredKeyEvent(QKeyEvent *event);
     void previewFinished();
@@ -74,9 +73,11 @@ public slots:
     void setTargetCurrentGroup();
 
     void setSearchText(const QString &text);
+    void setCurrentFrame(int frame);
 signals:
     void visibleRangeChanged(int, int);
 private slots:
+
     void setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible);
 
     void playPreview();

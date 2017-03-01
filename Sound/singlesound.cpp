@@ -186,6 +186,6 @@ void SingleSound::prepareFinalData() {
     }
 }
 
-const float *SingleSound::getData() const {
+const float *SingleSound::getFinalData() const {
     return mFinalData;
 }
