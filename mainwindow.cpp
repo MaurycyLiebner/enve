@@ -24,6 +24,10 @@
 #include "Sound/singlesound.h"
 #include "BoxesList/boxsinglewidget.h"
 
+extern "C" {
+    #include <libavformat/avformat.h>
+}
+
 MainWindow *MainWindow::mMainWindowInstance;
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -34,6 +38,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    av_register_all();
     QFile file("/home/ailuropoda/.Qt_pro/AniVect/stylesheet.qss");
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setStyleSheet(file.readAll());

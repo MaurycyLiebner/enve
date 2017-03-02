@@ -335,11 +335,11 @@ void BoxesListAnimationDockWidget::setPlaying(bool playing) {
         disconnect(mPlayButton, SIGNAL(pressed()),
                 this, SLOT(playPreview()) );
         connect(mPlayButton, SIGNAL(pressed()),
-                mMainWindow->getCanvasWidget(), SLOT(stopPreview()) );
+                mMainWindow->getCanvasWidget(), SLOT(interruptPreview()) );
     } else {
         mPlayButton->setIcon(QIcon(":/icons/play.png") );
         disconnect(mPlayButton, SIGNAL(pressed()),
-                mMainWindow->getCanvasWidget(), SLOT(stopPreview()) );
+                mMainWindow->getCanvasWidget(), SLOT(interruptPreview()) );
         connect(mPlayButton, SIGNAL(pressed()),
                 this, SLOT(playPreview()) );
     }

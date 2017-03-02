@@ -172,6 +172,8 @@ public slots:
     void setEffectsPaintEnabled(const bool &bT);
     void setHighQualityView(const bool &bT);
 
+    void interruptPreview();
+
     void stopPreview();
     void playPreview();
     void renderOutput();

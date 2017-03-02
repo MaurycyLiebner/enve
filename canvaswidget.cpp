@@ -570,13 +570,16 @@ void CanvasWidget::sendNextBoxForUpdate() {
     }
 }
 
-void CanvasWidget::stopPreview() {
+void CanvasWidget::interruptPreview() {
     mPreviewInterrupted = true;
+    mCurrentCanvas->clearPreview();
+}
+
+void CanvasWidget::stopPreview() {
     if(!mRendering) {
         mCurrentRenderFrame = getMaxFrame();
         mPreviewFPSTimer->stop();
         stopAudio();
-        mCurrentCanvas->clearPreview();
         repaint();
         MainWindow::getInstance()->previewFinished();
     }

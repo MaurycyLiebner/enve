@@ -15,8 +15,10 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWidget *canvasWidget,
                int canvasWidth, int canvasHeight,
                const int &frameCount) :
-    BoxesGroup(fillStrokeSettings) {
+    BoxesGroup(fillStrokeSettings) {    
     mSoundComposition = new SoundComposition(this);
+    addActiveAnimator(mSoundComposition->getSoundsAnimatorContainer());
+
     mMaxFrame = frameCount;
 
     mEffectsPaintEnabled = true;
@@ -341,8 +343,7 @@ void Canvas::clearPreview() {
     mCanvasWidget->stopPreview();
 }
 
-void Canvas::nextPreviewFrame()
-{
+void Canvas::nextPreviewFrame() {
     mCurrentPreviewFrameId++;
     if(mCurrentPreviewFrameId >= mPreviewFrames.length() ) {
         clearPreview();

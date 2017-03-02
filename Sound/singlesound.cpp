@@ -13,11 +13,6 @@ int decode_audio_file(const char* path,
                       const int sample_rate,
                       float** audioData,
                       int* size) {
-
-    // initialize all muxers, demuxers and protocols for libavformat
-    // (does nothing if called twice during the course of one program execution)
-    av_register_all();
-
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
     if (avformat_open_input(&format, path, NULL, NULL) != 0) {
@@ -150,7 +145,7 @@ void SingleSound::setFilePath(const QString &path) {
 
 void SingleSound::reloadDataFromFile() {
     if(mSrcData != NULL) {
-        delete[] mSrcData;
+        free(mSrcData);
         mSrcData = NULL;
         mSrcSampleCount = 0;
     }
@@ -172,10 +167,14 @@ int SingleSound::getSampleCount() const {
 }
 
 void SingleSound::prepareFinalData() {
+    if(mFinalData != NULL) {
+        free(mFinalData);
+    }
     if(mSrcData == NULL) {
         mFinalData = NULL;
         mFinalSampleCount = 0;
     } else {
+        mFinalData = (float*)malloc(mSrcSampleCount*sizeof(float));
         memcpy(mFinalData, mSrcData, mSrcSampleCount*sizeof(float));
         if(mVolumeAnimator.hasKeys() ||
            qAbs(mVolumeAnimator.getCurrentValue() - 100.) > 0.1) {

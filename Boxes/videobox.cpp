@@ -6,6 +6,7 @@ extern "C" {
 }
 #include "mainwindow.h"
 #include <QDebug>
+#include "Sound/singlesound.h"
 
 VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
     BoundingBox(parent, TYPE_IMAGE) {
@@ -16,8 +17,10 @@ VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
 
 void VideoBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
+    bool skipReload = mCurrentFrame >= mFramesCount - 1 &&
+                        currentFrame >= mFramesCount - 1;
     mCurrentFrame = currentFrame;
-
+    if(skipReload) return;
     reloadPixmap();
 }
 
@@ -73,13 +76,31 @@ void VideoBox::draw(QPainter *p)
     }
 }
 
+void VideoBox::updateFrameCount(const char* path) {
+    AVFormatContext* format = avformat_alloc_context();
+    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+        fprintf(stderr, "Could not open file '%s'\n", path);
+        return;
+    }
+    if (avformat_find_stream_info(format, NULL) < 0) {
+        fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
+        return;
+    }
+
+    // Find the index of the first audio stream
+    for (uint i = 0; i < format->nb_streams; i++) {
+        const AVMediaType &mediaType = format->streams[i]->codec->codec_type;
+        if(mediaType == AVMEDIA_TYPE_VIDEO) {
+            mFramesCount = format->streams[i]->nb_frames;
+            break;
+        }
+    }
+
+    avformat_free_context(format);
+}
+
 int VideoBox::getImageAtFrame(const char* path,
                     const int &frameId) {
-
-    // initialize all muxers, demuxers and protocols for libavformat
-    // (does nothing if called twice during the course of one program execution)
-    av_register_all();
-
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
     if (avformat_open_input(&format, path, NULL, NULL) != 0) {
@@ -143,7 +164,8 @@ int VideoBox::getImageAtFrame(const char* path,
 
     frame /= 1000;
 
-    if (avformat_seek_file(format, videoStreamIndex, 0, frame, frame,
+    if (avformat_seek_file(format, videoStreamIndex, 0,
+                           frame, frame,
             AVSEEK_FLAG_FRAME)< 0) {
         return 0;
     }
@@ -169,8 +191,6 @@ int VideoBox::getImageAtFrame(const char* path,
         pts = av_rescale_q ( pts, videoStream->time_base, AV_TIME_BASE_Q );
     } while ( pts/1000 <= tsms);
 
-    qDebug() << pts/1000 << tsms;
-
     sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
               0, videoCodec->height,
               frameRGBA->data, frameRGBA->linesize);
@@ -182,7 +202,7 @@ int VideoBox::getImageAtFrame(const char* path,
               frameRGBA->data[0] + y * frameRGBA->linesize[0],
               frameRGBA->linesize[0] );
     }
-    mImage.convertToFormat(QImage::Format_ARGB32);
+    //mImage.convertToFormat(QImage::Format_ARGB32);
 
     //av_free_packet(&packet);
 
@@ -206,7 +226,7 @@ void VideoBox::reloadPixmap()
     if(mSrcFilePath.isEmpty()) {
     } else {
         getImageAtFrame(mSrcFilePath.toLatin1().data(),
-                        mCurrentFrame);
+                        qMin(mFramesCount - 2, mCurrentFrame));
     }
 
     if(!mPivotChanged) centerPivotPosition();
@@ -216,5 +236,48 @@ void VideoBox::reloadPixmap()
 void VideoBox::setFilePath(QString path)
 {
     mSrcFilePath = path;
+    reloadFile();
+}
+
+void VideoBox::reloadFile() {
+    updateFrameCount(mSrcFilePath.toLatin1().data());
     reloadPixmap();
+    reloadSound();
+}
+
+bool hasSound(const char* path) {
+    // get format from audio file
+    AVFormatContext* format = avformat_alloc_context();
+    if (avformat_open_input(&format, path, NULL, NULL) != 0) {
+        fprintf(stderr, "Could not open file '%s'\n", path);
+        return false;
+    }
+    if(avformat_find_stream_info(format, NULL) < 0) {
+        fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
+        return false;
+    }
+
+    // Find the index of the first audio stream
+    for (uint i = 0; i < format->nb_streams; i++) {
+        const AVMediaType &mediaType = format->streams[i]->codec->codec_type;
+        if(mediaType == AVMEDIA_TYPE_AUDIO) {
+            return true;
+        }
+    }
+
+    avformat_free_context(format);
+
+    // success
+    return false;
+}
+#include "Sound/soundcomposition.h"
+void VideoBox::reloadSound() {
+    if(hasSound(mSrcFilePath.toLatin1().data())) {
+        if(mSound == NULL) {
+            mSound = new SingleSound(mSrcFilePath);
+            getParentCanvas()->getSoundComposition()->addSound(mSound);
+        }
+        mSound->reloadDataFromFile();
+    } else {
+    }
 }

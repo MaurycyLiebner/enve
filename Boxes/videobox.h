@@ -3,6 +3,8 @@
 #include <QString>
 #include "imagebox.h"
 
+class SingleSound;
+
 class VideoBox : public BoundingBox
 {
 public:
@@ -19,7 +21,13 @@ public:
 
     void makeDuplicate(BoundingBox *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    void reloadSound();
+    void reloadFile();
+protected:
+    void updateFrameCount(const char *path);
 private:
+    int mFramesCount = 0;
+    SingleSound *mSound = NULL;
     QString mSrcFilePath;
     QImage mImage;
     int mCurrentFrame = 0;
