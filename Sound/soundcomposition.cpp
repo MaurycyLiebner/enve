@@ -29,10 +29,15 @@ void SoundComposition::generateData(const int &startFrame,
     mBuffer.clear();
 
     int nSamples = (endFrame - startFrame)*SAMPLERATE/fps;
-    float *data = new float[nSamples];
-    for(int i = 0; i < nSamples; i++) {
-        data[i] = 0.f;
-    }
+    float *data = NULL;
+//    float *data = new float[nSamples];
+//    for(int i = 0; i < nSamples; i++) {
+//        data[i] = 0.f;
+//    }
+    decode_audio_file("/home/ailuropoda/lektor.wav",
+                      SAMPLERATE,
+                      &data,
+                      &nSamples);
 
     foreach(SingleSound *sound, mSounds) {
         const int &soundStartFrame = sound->getStartFrame();

@@ -9,12 +9,14 @@
 #include "pathpivot.h"
 #include "Boxes/imagebox.h"
 #include "edge.h"
+#include "Sound/soundcomposition.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWidget *canvasWidget,
                int canvasWidth, int canvasHeight,
                const int &frameCount) :
     BoxesGroup(fillStrokeSettings) {
+    mSoundComposition = new SoundComposition(this);
     mMaxFrame = frameCount;
 
     mEffectsPaintEnabled = true;
@@ -26,11 +28,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mVisibleHeight = mHeight;
     mCanvasWidget = canvasWidget;
     incNumberPointers();
-
-    mPreviewFPSTimer = new QTimer(this);
-    mPreviewFPSTimer->setInterval(1000/24.);
-    connect(mPreviewFPSTimer, SIGNAL(timeout()),
-            this, SLOT(nextPreviewFrame()) );
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -331,13 +328,10 @@ void Canvas::playPreview()
     mCurrentPreviewImg = mPreviewFrames.first();
     setPreviewing(true);
     mCanvasWidget->repaint();
-
-    mPreviewFPSTimer->start();
 }
 
 void Canvas::clearPreview() {
     if(!mPreviewFrames.isEmpty()) {
-        mPreviewFPSTimer->stop();
         setPreviewing(false);
         mCurrentPreviewImg = NULL;
         for(int i = 0; i < mPreviewFrames.length(); i++) {
@@ -970,4 +964,8 @@ int Canvas::getMinFrame() {
 
 int Canvas::getMaxFrame() {
     return mMaxFrame;
+}
+
+SoundComposition *Canvas::getSoundComposition() {
+    return mSoundComposition;
 }

@@ -18,6 +18,7 @@ class UndoRedoStack;
 class Circle;
 
 class Rectangle;
+class SoundComposition;
 
 enum CanvasMode : short {
     MOVE_PATH,
@@ -302,11 +303,15 @@ public:
     int getCurrentFrame();
     int getMinFrame();
     int getMaxFrame();
+
+    SoundComposition *getSoundComposition();
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
 
     void sortSelectedBoxesByZAscending();
+
+    SoundComposition *mSoundComposition;
 
     MovablePoint *mHoveredPoint = NULL;
     BoundingBox *mHoveredBox = NULL;
@@ -345,7 +350,6 @@ private:
 
     bool mPreviewing = false;
     QImage *mCurrentPreviewImg = NULL;
-    QTimer *mPreviewFPSTimer = NULL;
     int mCurrentPreviewFrameId;
 
     bool mIsMouseGrabbing = false;

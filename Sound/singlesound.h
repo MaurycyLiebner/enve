@@ -2,6 +2,11 @@
 #define SINGLESOUND_H
 #include "Animators/complexanimator.h"
 
+extern int decode_audio_file(const char* path,
+                             const int sample_rate,
+                             float** audioData,
+                             int* size);
+
 class SingleSound : public ComplexAnimator
 {
 public:

@@ -1,7 +1,7 @@
 #ifndef SOUNDCOMPOSITION_H
 #define SOUNDCOMPOSITION_H
 
-
+#include "Animators/complexanimator.h"
 
 #include <math.h>
 
@@ -16,12 +16,11 @@
 #include <QSlider>
 #include <QTimer>
 #include "singlesound.h"
-static int SAMPLERATE = 44100;
+const int SAMPLERATE = 44100;
 
 class SoundComposition : public QIODevice
 {
     Q_OBJECT
-
 public:
     SoundComposition(QObject *parent);
     ~SoundComposition();

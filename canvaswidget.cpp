@@ -6,6 +6,7 @@
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 #include "paintcontroler.h"
 #include "renderoutputwidget.h"
+#include "Sound/soundcomposition.h"
 
 CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -21,7 +22,13 @@ CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
             this, SLOT(sendNextBoxForUpdate()) );
     connect(this, SIGNAL(updateBoxPixmaps(BoundingBox*)),
             mPaintControler, SLOT(updateBoxPixmaps(BoundingBox*)) );
+
     mPaintControlerThread->start();
+
+    mPreviewFPSTimer = new QTimer(this);
+    mPreviewFPSTimer->setInterval(1000/24.);
+
+    initializeAudio();
 }
 
 CanvasWidget::~CanvasWidget() {
@@ -57,9 +64,17 @@ void CanvasWidget::setCurrentCanvas(const int &id) {
 void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
     if(mCurrentCanvas != NULL) {
         mCurrentCanvas->setIsCurrentCanvas(false);
+        disconnect(mPreviewFPSTimer, SIGNAL(timeout()),
+                   mCurrentCanvas, SLOT(nextPreviewFrame()) );
     }
     mCurrentCanvas = canvas;
-    if(mCurrentCanvas != NULL) {
+    if(mCurrentCanvas == NULL) {
+        mCurrentSoundComposition = NULL;
+    } else {
+        mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
+        connect(mPreviewFPSTimer, SIGNAL(timeout()),
+                mCurrentCanvas, SLOT(nextPreviewFrame()) );
+
         mCurrentCanvas->setIsCurrentCanvas(true);
 
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
@@ -559,6 +574,8 @@ void CanvasWidget::stopPreview() {
     mPreviewInterrupted = true;
     if(!mRendering) {
         mCurrentRenderFrame = getMaxFrame();
+        mPreviewFPSTimer->stop();
+        stopAudio();
         mCurrentCanvas->clearPreview();
         repaint();
         MainWindow::getInstance()->previewFinished();
@@ -572,6 +589,11 @@ void CanvasWidget::nextPlayPreviewFrame() {
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
             mCurrentCanvas->playPreview();
+            mCurrentSoundComposition->generateData(mSavedCurrentFrame,
+                                                   mCurrentRenderFrame,
+                                                   24);
+            startAudio();
+            mPreviewFPSTimer->start();
     } else {
         mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
@@ -654,4 +676,68 @@ int CanvasWidget::getMaxFrame() {
 int CanvasWidget::getMinFrame() {
     if(hasNoCanvas()) return 0;
     return mCurrentCanvas->getMinFrame();
+}
+
+void CanvasWidget::initializeAudio()
+{
+    connect(mPreviewFPSTimer, SIGNAL(timeout()),
+            this, SLOT(pushTimerExpired()));
+
+    mAudioDevice = QAudioDeviceInfo::defaultOutputDevice();
+    mAudioFormat.setSampleRate(SAMPLERATE);
+    mAudioFormat.setChannelCount(1);
+    mAudioFormat.setSampleSize(32);
+    mAudioFormat.setCodec("audio/pcm");
+    mAudioFormat.setByteOrder(QAudioFormat::LittleEndian);
+    mAudioFormat.setSampleType(QAudioFormat::Float);
+
+    QAudioDeviceInfo info(mAudioDevice);
+    if (!info.isFormatSupported(mAudioFormat)) {
+        qWarning() << "Default format not supported - trying to use nearest";
+        mAudioFormat = info.nearestFormat(mAudioFormat);
+    }
+
+    createAudioOutput();
+}
+
+void CanvasWidget::createAudioOutput() {
+    mAudioOutput = new QAudioOutput(mAudioDevice, mAudioFormat, this);
+
+    //m_volumeSlider->setValue(int(m_audioOutput->volume()*100.));
+
+    //mCurrentSoundComposition->start();
+    //m_audioOutput->start(m_generator);
+    //mAudioIOOutput = mAudioOutput->start();
+    //m_pushTimer->start(20);
+}
+
+void CanvasWidget::startAudio() {
+    mCurrentSoundComposition->start();
+    mAudioIOOutput = mAudioOutput->start();
+}
+
+void CanvasWidget::stopAudio() {
+    mCurrentSoundComposition->stop();
+    mAudioOutput->stop();
+}
+
+void CanvasWidget::volumeChanged(int value) {
+    if (mAudioOutput)
+        mAudioOutput->setVolume(qreal(value/100.));
+}
+
+void CanvasWidget::pushTimerExpired() {
+    if (mAudioOutput && mAudioOutput->state() != QAudio::StoppedState) {
+        int chunks = mAudioOutput->bytesFree()/mAudioOutput->periodSize();
+        while (chunks) {
+           const qint64 len = mCurrentSoundComposition->read(
+                                                mAudioBuffer.data(),
+                                                mAudioOutput->periodSize());
+           if (len)
+               mAudioIOOutput->write(mAudioBuffer.data(), len);
+           if (len != mAudioOutput->periodSize())
+               break;
+           --chunks;
+        }
+    }
 }

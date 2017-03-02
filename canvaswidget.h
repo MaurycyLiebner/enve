@@ -8,9 +8,11 @@ class Color;
 class Gradient;
 class BoxesGroup;
 class PaintControler;
+class SoundComposition;
 
 #include "fillstrokesettings.h"
 #include "boxeslistanimationdockwidget.h"
+#include <QAudioOutput>
 
 class CanvasWidget : public QWidget, public SingleWidgetTarget
 {
@@ -83,6 +85,7 @@ public:
     int getMinFrame();
     void addBoxAwaitingUpdate(BoundingBox *box);
 protected:
+    QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;
     PaintControler *mPaintControler;
 
@@ -110,6 +113,22 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
+
+    // AUDIO
+    void initializeAudio();
+    void createAudioOutput();
+    void startAudio();
+    void stopAudio();
+    void volumeChanged(int value);
+
+    QAudioDeviceInfo mAudioDevice;
+    SoundComposition *mCurrentSoundComposition;
+    QAudioOutput *mAudioOutput;
+    QIODevice *mAudioIOOutput; // not owned
+    QAudioFormat mAudioFormat;
+
+    QByteArray mAudioBuffer;
+    // AUDIO
 signals:
     void updateBoxPixmaps(BoundingBox*);
     void changeCurrentFrame(int);
@@ -162,6 +181,8 @@ private slots:
     void nextSaveOutputFrame();
     void nextPlayPreviewFrame();
     void saveOutput(QString renderDest);
+
+    void pushTimerExpired();
 };
 
 #endif // CANVASWIDGET_H
