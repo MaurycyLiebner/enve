@@ -678,8 +678,11 @@ int CanvasWidget::getMinFrame() {
     return mCurrentCanvas->getMinFrame();
 }
 
+const int BufferSize = 32768;
+
 void CanvasWidget::initializeAudio()
 {
+    mAudioBuffer = QByteArray(BufferSize, 0);
     connect(mPreviewFPSTimer, SIGNAL(timeout()),
             this, SLOT(pushTimerExpired()));
 
@@ -697,18 +700,7 @@ void CanvasWidget::initializeAudio()
         mAudioFormat = info.nearestFormat(mAudioFormat);
     }
 
-    createAudioOutput();
-}
-
-void CanvasWidget::createAudioOutput() {
     mAudioOutput = new QAudioOutput(mAudioDevice, mAudioFormat, this);
-
-    //m_volumeSlider->setValue(int(m_audioOutput->volume()*100.));
-
-    //mCurrentSoundComposition->start();
-    //m_audioOutput->start(m_generator);
-    //mAudioIOOutput = mAudioOutput->start();
-    //m_pushTimer->start(20);
 }
 
 void CanvasWidget::startAudio() {
@@ -717,26 +709,33 @@ void CanvasWidget::startAudio() {
 }
 
 void CanvasWidget::stopAudio() {
-    mCurrentSoundComposition->stop();
+    //mAudioOutput->suspend();
+    //mCurrentSoundComposition->stop();
+    mAudioIOOutput = NULL;
     mAudioOutput->stop();
+    mAudioOutput->reset();
+    mCurrentSoundComposition->stop();
 }
 
 void CanvasWidget::volumeChanged(int value) {
-    if (mAudioOutput)
+    if(mAudioOutput) {
         mAudioOutput->setVolume(qreal(value/100.));
+    }
 }
 
 void CanvasWidget::pushTimerExpired() {
-    if (mAudioOutput && mAudioOutput->state() != QAudio::StoppedState) {
+    if(mAudioOutput && mAudioOutput->state() != QAudio::StoppedState) {
         int chunks = mAudioOutput->bytesFree()/mAudioOutput->periodSize();
-        while (chunks) {
+        while(chunks) {
            const qint64 len = mCurrentSoundComposition->read(
                                                 mAudioBuffer.data(),
                                                 mAudioOutput->periodSize());
-           if (len)
+           if(len) {
                mAudioIOOutput->write(mAudioBuffer.data(), len);
-           if (len != mAudioOutput->periodSize())
+           }
+           if(len != mAudioOutput->periodSize()) {
                break;
+           }
            --chunks;
         }
     }

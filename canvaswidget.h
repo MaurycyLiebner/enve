@@ -116,7 +116,6 @@ protected:
 
     // AUDIO
     void initializeAudio();
-    void createAudioOutput();
     void startAudio();
     void stopAudio();
     void volumeChanged(int value);

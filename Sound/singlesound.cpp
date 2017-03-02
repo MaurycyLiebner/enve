@@ -94,7 +94,7 @@ int decode_audio_file(const char* path,
                 continue;
             }
             // resample frames
-            double* buffer;
+            float *buffer;
             av_samples_alloc((uint8_t**) &buffer, NULL, 1,
                              frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
             int frame_count = swr_convert(swr,
@@ -106,6 +106,8 @@ int decode_audio_file(const char* path,
             *audioData = (float*) realloc(*audioData,
                                      (*size + frame->nb_samples) * sizeof(float));
             memcpy(*audioData + *size, buffer, frame_count * sizeof(float));
+
+            av_freep(&((uint8_t**) &buffer)[0]);
             *size += frame_count;
         }
         av_free_packet(&packet);

@@ -17,8 +17,7 @@ void SoundComposition::start()
     open(QIODevice::ReadOnly);
 }
 
-void SoundComposition::stop()
-{
+void SoundComposition::stop() {
     mPos = 0;
     close();
 }
@@ -29,15 +28,21 @@ void SoundComposition::generateData(const int &startFrame,
     mBuffer.clear();
 
     int nSamples = (endFrame - startFrame)*SAMPLERATE/fps;
-    float *data = NULL;
+    float *data1 = NULL;
 //    float *data = new float[nSamples];
 //    for(int i = 0; i < nSamples; i++) {
 //        data[i] = 0.f;
 //    }
+    int size;
     decode_audio_file("/home/ailuropoda/lektor.wav",
                       SAMPLERATE,
-                      &data,
-                      &nSamples);
+                      &data1,
+                      &size);
+    float *data = new float[nSamples];
+    for(int i = 0; i < nSamples; i++) {
+        data[i] = data1[i];
+    }
+    free(data1);
 
     foreach(SingleSound *sound, mSounds) {
         const int &soundStartFrame = sound->getStartFrame();
@@ -89,7 +94,7 @@ ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {
 qint64 SoundComposition::readData(char *data, qint64 len) {
     qint64 total = 0;
     if (!mBuffer.isEmpty()) {
-        while (len - total > 0) {
+        while(len - total > 0) {
             const qint64 chunk = qMin((mBuffer.size() - mPos), len - total);
             memcpy(data + total, mBuffer.constData() + mPos, chunk);
             mPos = (mPos + chunk) % mBuffer.size();

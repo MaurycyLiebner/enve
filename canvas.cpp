@@ -331,15 +331,14 @@ void Canvas::playPreview()
 }
 
 void Canvas::clearPreview() {
-    if(!mPreviewFrames.isEmpty()) {
-        setPreviewing(false);
-        mCurrentPreviewImg = NULL;
-        for(int i = 0; i < mPreviewFrames.length(); i++) {
-            delete mPreviewFrames.at(i);
-        }
-        mPreviewFrames.clear();
-        mMainWindow->previewFinished();
+    setPreviewing(false);
+    mCurrentPreviewImg = NULL;
+    for(int i = 0; i < mPreviewFrames.length(); i++) {
+        delete mPreviewFrames.at(i);
     }
+    mPreviewFrames.clear();
+    mMainWindow->previewFinished();
+    mCanvasWidget->stopPreview();
 }
 
 void Canvas::nextPreviewFrame()
