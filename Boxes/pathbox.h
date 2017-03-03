@@ -12,7 +12,7 @@ public:
 
     void draw(QPainter *p);
 
-    void schedulePathUpdate();
+    void schedulePathUpdate(const bool &replaceCache = true);
 
     void updatePathIfNeeded();
 
@@ -68,7 +68,7 @@ public:
     void updateDrawGradients();
 
     void updateOutlinePath();
-    void scheduleOutlinePathUpdate();
+    void scheduleOutlinePathUpdate(const bool &replaceCache = true);
     void updateOutlinePathIfNeeded();
 
     void updateAfterFrameChanged(int currentFrame);

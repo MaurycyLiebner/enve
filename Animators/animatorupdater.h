@@ -31,6 +31,7 @@ public:
 
     void update();
 
+    void softUpdate();
 private:
     BoundingBox *mTarget;
 };
@@ -42,6 +43,7 @@ public:
 
     void update();
 
+    void softUpdate();
 private:
     PathBox *mTarget;
 };
@@ -64,6 +66,7 @@ public:
 
     void update();
 
+    void softUpdate();
 private:
     PathBox *mTarget;
 };
@@ -74,6 +77,7 @@ public:
     DisplayedFillStrokeSettingsUpdater(BoundingBox *path);
 
     void update();
+    void softUpdate();
 private:
     BoundingBox *mTarget;
 };
@@ -84,6 +88,7 @@ public:
     PixmapEffectUpdater(BoundingBox *target);
 
     void update();
+    void softUpdate();
 private:
     BoundingBox *mTarget;
 };
@@ -120,6 +125,7 @@ public:
 
     void update();
 
+    void softUpdate();
 private:
     PathBox *mTarget;
     bool mIsFill;

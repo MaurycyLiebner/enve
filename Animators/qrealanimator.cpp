@@ -443,8 +443,7 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
     updateKeyOnCurrrentFrame();
 }
 
-void QrealAnimator::setFrame(int frame)
-{
+void QrealAnimator::setFrame(int frame) {
     mCurrentFrame = frame;
     //updateValueFromCurrentFrame();
 

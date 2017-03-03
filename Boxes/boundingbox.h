@@ -14,6 +14,8 @@
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 #include <unordered_map>
 
+#include "boundingboxrendercontainer.h"
+
 class KeysView;
 
 class UndoRedo;
@@ -76,16 +78,6 @@ private:
     BoundingBox *mBoundingBox;
 };
 
-class BoundingBoxRenderContainer {
-
-
-private:
-    QMatrix mTransform;
-    QMatrix mPaintTransform;
-    QRectF mBoundingRect;
-    QImage mPixmap;
-};
-
 class BoundingBox :
         public QObject,
         public Transformable,
@@ -137,7 +129,7 @@ public:
 
     QPointF getAbsolutePos();
 
-    virtual void updateCombinedTransform();
+    virtual void updateCombinedTransform(const bool &replaceCache = true);
     void moveByRel(QPointF trans);
 
     void startTransform();
@@ -291,19 +283,20 @@ public:
 
     virtual void afterSuccessfulUpdate() {}
 
-    void updateRelativeTransform();
+    void updateRelativeTransform(const bool &replaceCache = true);
     void updateAllUglyPixmap();
     QPointF mapAbsPosToRel(QPointF absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
-    virtual void scheduleAwaitUpdate();
+    virtual void scheduleAwaitUpdate(const bool &replaceCache = true);
     void setAwaitUpdateScheduled(bool bT);
 
     void setCompositionMode(QPainter::CompositionMode compositionMode);
 
     virtual void updateEffectsMargin();
 
-    virtual void scheduleEffectsMarginUpdate();
+    virtual void scheduleEffectsMarginUpdate(
+                            const bool &replaceCached = true);
     void updateEffectsMarginIfNeeded();
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
@@ -410,6 +403,10 @@ public:
         Q_UNUSED(path);
     }
 
+    void applyEffects(QImage *im,
+                      bool highQuality,
+                      qreal scale = 1.);
+    void setUpdateAndReplaceCache(const bool &bT);
 protected:
     bool mUpdateDisabled = false;
 
@@ -427,26 +424,23 @@ protected:
     bool mAwaitUpdateScheduled = false;
 
     virtual void updateAfterCombinedTransformationChanged() {}
-    void applyEffects(QImage *im,
-                      bool highQuality,
-                      qreal scale = 1.);
 
     std::unordered_map<int, BoundingBoxRenderContainer*> mRenderContainers;
 
-    BoundingBoxRenderContainer *mCurrentRenderContainer = NULL;
-    QMatrix mAllUglyTransform;
-    QMatrix mAllUglyPaintTransform;
-    QRectF mAllUglyBoundingRect;
-    QImage mAllUglyPixmap;
+    BoundingBoxRenderContainer *getRenderContainerAtFrame(
+                                    const int &frame);
 
-    BoundingBoxRenderContainer *mOldRenderContainer = NULL;
-    QMatrix mOldAllUglyTransform;
-    QMatrix mOldAllUglyPaintTransform;
-    QRectF mOldAllUglyBoundingRect;
-    QImage mOldAllUglyPixmap;
+    BoundingBoxRenderContainer *mUpdateRenderContainer =
+            new BoundingBoxRenderContainer();
+
+    BoundingBoxRenderContainer *mOldRenderContainer = mUpdateRenderContainer;
+
+    bool mReplaceCache = false;
 
     QMatrix mRelativeTransformMatrix;
 
+    int mUpdateFrame = 0;
+    int mCurrentFrame = 0;
     QMatrix mUpdateCanvasTransform;
     QMatrix mUpdateTransform;
     QMatrix mOldTransform;

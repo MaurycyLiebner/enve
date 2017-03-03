@@ -630,7 +630,7 @@ void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
 void BoxesGroup::updateAfterCombinedTransformationChanged()
 {
     foreach(BoundingBox *child, mChildBoxes) {
-        child->updateCombinedTransform();
+        child->updateCombinedTransform(mType != TYPE_CANVAS);
     }
 }
 

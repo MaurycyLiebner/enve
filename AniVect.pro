@@ -108,7 +108,8 @@ SOURCES += main.cpp\
     Animators/singlepathanimator.cpp \
     Boxes/videobox.cpp \
     Sound/singlesound.cpp \
-    Sound/soundcomposition.cpp
+    Sound/soundcomposition.cpp \
+    Boxes/boundingboxrendercontainer.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -201,7 +202,8 @@ HEADERS  += mainwindow.h \
     Animators/singlepathanimator.h \
     Boxes/videobox.h \
     Sound/singlesound.h \
-    Sound/soundcomposition.h
+    Sound/soundcomposition.h \
+    Boxes/boundingboxrendercontainer.h
 
 RESOURCES += \
     resources.qrc

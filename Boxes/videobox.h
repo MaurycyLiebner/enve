@@ -44,7 +44,6 @@ private:
     QImage mUpdateVideoImage;
     QImage mOldVideoImage;
     int mOldVideoFrame = 0;
-    int mCurrentFrame = 0;
     int mCurrentVideoFrame = 0;
     int mUpdateVideoFrame = 0;
     int getImageAtFrame(const char *path, const int &frameId);

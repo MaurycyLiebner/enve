@@ -25,14 +25,13 @@ void VideoBox::updateAfterFrameChanged(int currentFrame) {
     }
     BoundingBox::updateAfterFrameChanged(currentFrame);
 
-    mCurrentFrame = currentFrame;
     mCurrentVideoFrame = qMin(mFramesCount - 2, mCurrentFrame);
     auto searchCurrentFrame = mVideoFramesCache.find(mCurrentVideoFrame);
     if(searchCurrentFrame == mVideoFramesCache.end()) {
         schedulePixmapReload();
     } else {
         mOldVideoImage = searchCurrentFrame->second;
-        scheduleAwaitUpdate();
+        scheduleAwaitUpdate(false);
     }
 }
 

@@ -62,7 +62,7 @@ public:
     void setPivotPositionForSelected();
 
     void awaitUpdate() {}
-    void scheduleAwaitUpdate() {}
+    void scheduleAwaitUpdate(const bool &) {}
 
     void saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);

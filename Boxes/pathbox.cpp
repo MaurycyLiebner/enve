@@ -145,8 +145,8 @@ void PathBox::makeDuplicate(BoundingBox *targetBox) {
                                                &mStrokeGradientPoints);
 }
 
-void PathBox::schedulePathUpdate() {
-    scheduleAwaitUpdate();
+void PathBox::schedulePathUpdate(const bool &replaceCache) {
+    scheduleAwaitUpdate(replaceCache);
     if(mPathUpdateNeeded) {
         return;
     }
@@ -155,9 +155,9 @@ void PathBox::schedulePathUpdate() {
     mOutlinePathUpdateNeeded = false;
 }
 
-void PathBox::scheduleOutlinePathUpdate()
+void PathBox::scheduleOutlinePathUpdate(const bool &replaceCache)
 {
-    scheduleAwaitUpdate();
+    scheduleAwaitUpdate(replaceCache);
     if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
     }

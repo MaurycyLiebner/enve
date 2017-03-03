@@ -15,37 +15,41 @@ void TransUpdater::update() {
     mTarget->schedulePivotUpdate();
 }
 
-PathPointUpdater::PathPointUpdater(PathBox *vectorPath)
-{
+void TransUpdater::softUpdate() {
+    mTarget->updateRelativeTransform(false);
+    mTarget->schedulePivotUpdate();
+}
+
+PathPointUpdater::PathPointUpdater(PathBox *vectorPath) {
     mTarget = vectorPath;
 }
 
-void PathPointUpdater::update()
-{
+void PathPointUpdater::update() {
     mTarget->schedulePathUpdate();
 }
 
-GradientUpdater::GradientUpdater(Gradient *gradient)
-{
+void PathPointUpdater::softUpdate() {
+    mTarget->schedulePathUpdate(false);
+}
+
+GradientUpdater::GradientUpdater(Gradient *gradient) {
     mTarget = gradient;
 }
 
-void GradientUpdater::update()
-{
+void GradientUpdater::update() {
     mTarget->updateQGradientStops();
-    //mTarget->scheduleQGradientStopsUpdate();
-    //MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
 }
 
-StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path)
-{
+StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path) {
     mTarget = path;
 }
 
-void StrokeWidthUpdater::update()
-{
+void StrokeWidthUpdater::update() {
     mTarget->scheduleOutlinePathUpdate();
-    //MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+}
+
+void StrokeWidthUpdater::softUpdate() {
+    mTarget->scheduleOutlinePathUpdate(false);
 }
 
 DisplayedFillStrokeSettingsUpdater::
@@ -55,7 +59,10 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 
 void DisplayedFillStrokeSettingsUpdater::update() {
     mTarget->scheduleAwaitUpdate();
-    //MainWindow::getInstance()->scheduleDisplayedFillStrokeSettingsUpdate();
+}
+
+void DisplayedFillStrokeSettingsUpdater::softUpdate() {
+    mTarget->scheduleAwaitUpdate(false);
 }
 
 PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
@@ -64,6 +71,10 @@ PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
 
 void PixmapEffectUpdater::update() {
     mTarget->scheduleEffectsMarginUpdate();
+}
+
+void PixmapEffectUpdater::softUpdate() {
+    mTarget->scheduleEffectsMarginUpdate(false);
 }
 
 #include "Boxes/animationbox.h"
@@ -91,4 +102,8 @@ void GradientPointsUpdater::update() {
         mTarget->updateStrokeDrawGradient();
     }
     mTarget->scheduleAwaitUpdate();
+}
+
+void GradientPointsUpdater::softUpdate() {
+    mTarget->scheduleAwaitUpdate(false);
 }
