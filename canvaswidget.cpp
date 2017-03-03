@@ -57,7 +57,6 @@ void CanvasWidget::setCurrentCanvas(const int &id) {
         setCurrentCanvas((Canvas*)NULL);
     } else {
         setCurrentCanvas(mCanvasList.at(id));
-        emit changeCurrentFrame(getCurrentFrame());
     }
 }
 
@@ -78,6 +77,9 @@ void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
         mCurrentCanvas->setIsCurrentCanvas(true);
 
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
+
+        emit changeFrameRange(getMinFrame(), getMaxFrame());
+        emit changeCurrentFrame(getCurrentFrame());
     }
     SWT_scheduleWidgetsContentUpdateWithTarget(
                 mCurrentCanvas,

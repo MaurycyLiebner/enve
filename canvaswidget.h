@@ -131,6 +131,7 @@ protected:
 signals:
     void updateBoxPixmaps(BoundingBox*);
     void changeCurrentFrame(int);
+    void changeFrameRange(int, int);
 public slots:
     void setMovePathMode();
     void setMovePointMode();

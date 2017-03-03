@@ -83,6 +83,8 @@ MainWindow::MainWindow(QWidget *parent)
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
     connect(mCanvasWidget, SIGNAL(changeCurrentFrame(int)),
             mBoxesListAnimationDockWidget, SLOT(setCurrentFrame(int)));
+    connect(mCanvasWidget, SIGNAL(changeFrameRange(int,int)),
+            mBoxesListAnimationDockWidget, SLOT(setMinMaxFrame(int,int)));
     mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();
     mKeysView = mBoxesListAnimationDockWidget->getKeysView();
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);

@@ -3,6 +3,7 @@ extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
     #include <libswscale/swscale.h>
+    #include <libavutil/imgutils.h>
 }
 #include "mainwindow.h"
 #include <QDebug>
@@ -21,7 +22,7 @@ void VideoBox::updateAfterFrameChanged(int currentFrame) {
                         currentFrame >= mFramesCount - 1;
     mCurrentFrame = currentFrame;
     if(skipReload) return;
-    reloadPixmap();
+    schedulePixmapReload();
 }
 
 void VideoBox::updateBoundingRect() {
@@ -128,7 +129,6 @@ int VideoBox::getImageAtFrame(const char* path,
     }
     AVCodecContext *videoCodec = NULL;
     struct SwsContext *sws = NULL;
-    AVFrame *frameRGBA = NULL;
 
     AVStream *videoStream = format->streams[videoStreamIndex];
     videoCodec = videoStream->codec;
@@ -142,9 +142,6 @@ int VideoBox::getImageAtFrame(const char* path,
                          videoCodec->pix_fmt,
                          videoCodec->width, videoCodec->height,
                          AV_PIX_FMT_RGBA, SWS_BICUBIC, NULL, NULL, NULL);
-    frameRGBA = av_frame_alloc();
-    avpicture_alloc( ( AVPicture *) frameRGBA, AV_PIX_FMT_RGBA,
-                     videoCodec->width, videoCodec->height);
 
     // prepare to read data
     AVPacket packet;
@@ -191,25 +188,25 @@ int VideoBox::getImageAtFrame(const char* path,
         pts = av_rescale_q ( pts, videoStream->time_base, AV_TIME_BASE_Q );
     } while ( pts/1000 <= tsms);
 
+    if(mImage.width() != videoCodec->width ||
+       mImage.height() != videoCodec->height) {
+        mImage = QImage(videoCodec->width, videoCodec->height,
+                   QImage::Format_RGBA8888);
+    }
+
+    /* 2. Convert and write into image buffer  */
+    uint8_t *dst[] = {mImage.bits()};
+    int linesizes[4];
+
+    av_image_fill_linesizes(linesizes, AV_PIX_FMT_RGBA, decodedFrame->width);
+
     sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
               0, videoCodec->height,
-              frameRGBA->data, frameRGBA->linesize);
+              dst, linesizes);
 
-    mImage = QImage(videoCodec->width, videoCodec->height,
-               QImage::Format_RGBA8888);
-    for(int y = 0; y < videoCodec->height; ++y ) {
-       memcpy(mImage.scanLine(y),
-              frameRGBA->data[0] + y * frameRGBA->linesize[0],
-              frameRGBA->linesize[0] );
-    }
-    //mImage.convertToFormat(QImage::Format_ARGB32);
-
-    //av_free_packet(&packet);
 
     // clean up
     av_frame_free(&decodedFrame);
-    avpicture_free(( AVPicture *)frameRGBA);
-    av_frame_free(&frameRGBA);
 
     sws_freeContext(sws);
     avcodec_close(videoCodec);
@@ -218,11 +215,27 @@ int VideoBox::getImageAtFrame(const char* path,
 
     // success
     return 0;
-
 }
 
-void VideoBox::reloadPixmap()
-{
+void VideoBox::schedulePixmapReload() {
+    if(mPixmapReloadScheduled) return;
+    mPixmapReloadScheduled = true;
+    scheduleAwaitUpdate();
+}
+
+void VideoBox::preUpdatePixmapsUpdates() {
+    reloadPixmapIfNeeded();
+    BoundingBox::preUpdatePixmapsUpdates();
+}
+
+void VideoBox::reloadPixmapIfNeeded() {
+    if(mPixmapReloadScheduled) {
+        mPixmapReloadScheduled = false;
+        reloadPixmap();
+    }
+}
+
+void VideoBox::reloadPixmap() {
     if(mSrcFilePath.isEmpty()) {
     } else {
         getImageAtFrame(mSrcFilePath.toLatin1().data(),
@@ -230,7 +243,6 @@ void VideoBox::reloadPixmap()
     }
 
     if(!mPivotChanged) centerPivotPosition();
-    scheduleAwaitUpdate();
 }
 
 void VideoBox::setFilePath(QString path)
@@ -241,7 +253,7 @@ void VideoBox::setFilePath(QString path)
 
 void VideoBox::reloadFile() {
     updateFrameCount(mSrcFilePath.toLatin1().data());
-    reloadPixmap();
+    schedulePixmapReload();
     reloadSound();
 }
 

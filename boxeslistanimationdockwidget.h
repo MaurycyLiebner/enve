@@ -74,6 +74,7 @@ public slots:
 
     void setSearchText(const QString &text);
     void setCurrentFrame(int frame);
+    void setMinMaxFrame(const int &minFrame, const int &maxFrame);
 signals:
     void visibleRangeChanged(int, int);
 private slots:

@@ -483,3 +483,9 @@ void BoxesListAnimationDockWidget::setSearchText(
             setCurrentSearchText(text);
     mMainWindow->callUpdateSchedulers();
 }
+
+void BoxesListAnimationDockWidget::setMinMaxFrame(
+                                    const int &minFrame,
+                                    const int &maxFrame) {
+    mFrameRangeScrollbar->setMinMaxFrames(minFrame, maxFrame);
+}

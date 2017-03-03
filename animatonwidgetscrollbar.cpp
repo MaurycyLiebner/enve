@@ -13,8 +13,7 @@ AnimatonWidgetScrollBar::AnimatonWidgetScrollBar(int minSpan, int maxSpan,
                                                  bool range,
                                                  bool clamp,
                                                  QWidget *parent) :
-    QWidget(parent)
-{
+    QWidget(parent) {
     mMinSpan = minSpan;
     mMaxSpan = maxSpan;
     mSpanInc = spanInc;
@@ -26,8 +25,7 @@ AnimatonWidgetScrollBar::AnimatonWidgetScrollBar(int minSpan, int maxSpan,
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 }
 
-qreal AnimatonWidgetScrollBar::posToFrame(int xPos)
-{
+qreal AnimatonWidgetScrollBar::posToFrame(int xPos) {
     return (xPos - 10.)*(mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
             ((qreal)width() - 40.) + mMinFrame;
 }
@@ -210,6 +208,7 @@ void AnimatonWidgetScrollBar::setMinMaxFrames(int minFrame, int maxFrame)
 {
     mMinFrame = minFrame;
     mMaxFrame = maxFrame;
+    mMaxSpan = mMaxFrame - mMinFrame;
     repaint();
 }
 

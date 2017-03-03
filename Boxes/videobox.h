@@ -12,7 +12,7 @@ public:
 
     void updateAfterFrameChanged(int currentFrame);
     void draw(QPainter *p);
-    void reloadPixmap();
+    void reloadPixmapIfNeeded();
     void setFilePath(QString path);
     void drawSelected(QPainter *p,
                       const CanvasMode &);
@@ -23,9 +23,13 @@ public:
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void reloadSound();
     void reloadFile();
+    void schedulePixmapReload();
+    void preUpdatePixmapsUpdates();
+    void reloadPixmap();
 protected:
     void updateFrameCount(const char *path);
 private:
+    bool mPixmapReloadScheduled = false;
     int mFramesCount = 0;
     SingleSound *mSound = NULL;
     QString mSrcFilePath;
