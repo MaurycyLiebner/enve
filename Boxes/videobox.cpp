@@ -14,19 +14,36 @@ VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
     setName("Video");
 
     setFilePath(filePath);
+    connect(this, SIGNAL(pixmapReloadFinished()),
+            this, SLOT(setPixmapReloadFinished()));
 }
 
 void VideoBox::updateAfterFrameChanged(int currentFrame) {
+    auto searchLastFrame = mVideoFramesCache.find(mOldVideoFrame);
+    if(searchLastFrame == mVideoFramesCache.end()) {
+        mVideoFramesCache.insert({mOldVideoFrame, mOldVideoImage});
+    }
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    bool skipReload = mCurrentFrame >= mFramesCount - 1 &&
-                        currentFrame >= mFramesCount - 1;
+
     mCurrentFrame = currentFrame;
-    if(skipReload) return;
-    schedulePixmapReload();
+    mCurrentVideoFrame = qMin(mFramesCount - 2, mCurrentFrame);
+    auto searchCurrentFrame = mVideoFramesCache.find(mCurrentVideoFrame);
+    if(searchCurrentFrame == mVideoFramesCache.end()) {
+        schedulePixmapReload();
+    } else {
+        mOldVideoImage = searchCurrentFrame->second;
+        scheduleAwaitUpdate();
+    }
+}
+
+void VideoBox::setPixmapReloadFinished() {
+    mPixmapReloadScheduled = false;
+    mOldVideoImage = mUpdateVideoImage;
+    mOldVideoFrame = mUpdateVideoFrame;
 }
 
 void VideoBox::updateBoundingRect() {
-    mRelBoundingRect = mImage.rect();
+    mRelBoundingRect = mOldVideoImage.rect();
     qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
     mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
                         adjusted(-effectsMargin, -effectsMargin,
@@ -57,7 +74,7 @@ void VideoBox::drawSelected(QPainter *p,
 
 bool VideoBox::relPointInsidePath(QPointF point)
 {
-    return mImage.rect().contains(point.toPoint()
+    return mOldVideoImage.rect().contains(point.toPoint()
                                    );
 }
 
@@ -73,7 +90,7 @@ void VideoBox::draw(QPainter *p)
 {
     if(mVisible) {
         p->setRenderHint(QPainter::SmoothPixmapTransform);
-        p->drawImage(0, 0, mImage);
+        p->drawImage(0, 0, mOldVideoImage);
     }
 }
 
@@ -188,14 +205,16 @@ int VideoBox::getImageAtFrame(const char* path,
         pts = av_rescale_q ( pts, videoStream->time_base, AV_TIME_BASE_Q );
     } while ( pts/1000 <= tsms);
 
-    if(mImage.width() != videoCodec->width ||
-       mImage.height() != videoCodec->height) {
-        mImage = QImage(videoCodec->width, videoCodec->height,
-                   QImage::Format_RGBA8888);
-    }
+//    if(mImage.width() != videoCodec->width ||
+//       mImage.height() != videoCodec->height) {
+//        mImage = QImage(videoCodec->width, videoCodec->height,
+//                   QImage::Format_RGBA8888);
+//    }
+    mUpdateVideoImage = QImage(videoCodec->width, videoCodec->height,
+                    QImage::Format_RGBA8888);
 
     /* 2. Convert and write into image buffer  */
-    uint8_t *dst[] = {mImage.bits()};
+    uint8_t *dst[] = {mUpdateVideoImage.bits()};
     int linesizes[4];
 
     av_image_fill_linesizes(linesizes, AV_PIX_FMT_RGBA, decodedFrame->width);
@@ -217,6 +236,11 @@ int VideoBox::getImageAtFrame(const char* path,
     return 0;
 }
 
+void VideoBox::updateUpdateTransform() {
+    BoundingBox::updateUpdateTransform();
+    mUpdateVideoFrame = mCurrentVideoFrame;
+}
+
 void VideoBox::schedulePixmapReload() {
     if(mPixmapReloadScheduled) return;
     mPixmapReloadScheduled = true;
@@ -230,8 +254,8 @@ void VideoBox::preUpdatePixmapsUpdates() {
 
 void VideoBox::reloadPixmapIfNeeded() {
     if(mPixmapReloadScheduled) {
-        mPixmapReloadScheduled = false;
         reloadPixmap();
+        emit pixmapReloadFinished();
     }
 }
 
@@ -239,7 +263,7 @@ void VideoBox::reloadPixmap() {
     if(mSrcFilePath.isEmpty()) {
     } else {
         getImageAtFrame(mSrcFilePath.toLatin1().data(),
-                        qMin(mFramesCount - 2, mCurrentFrame));
+                        mUpdateVideoFrame);
     }
 
     if(!mPivotChanged) centerPivotPosition();
@@ -252,6 +276,7 @@ void VideoBox::setFilePath(QString path)
 }
 
 void VideoBox::reloadFile() {
+    mVideoFramesCache.clear();
     updateFrameCount(mSrcFilePath.toLatin1().data());
     schedulePixmapReload();
     reloadSound();

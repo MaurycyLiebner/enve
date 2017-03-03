@@ -12,6 +12,7 @@
 #include "Animators/effectanimators.h"
 
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include <unordered_map>
 
 class KeysView;
 
@@ -75,10 +76,20 @@ private:
     BoundingBox *mBoundingBox;
 };
 
-class BoundingBox : public QObject,
+class BoundingBoxRenderContainer {
+
+
+private:
+    QMatrix mTransform;
+    QMatrix mPaintTransform;
+    QRectF mBoundingRect;
+    QImage mPixmap;
+};
+
+class BoundingBox :
+        public QObject,
         public Transformable,
-        public SingleWidgetTarget
-{
+        public SingleWidgetTarget {
     Q_OBJECT
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
@@ -420,10 +431,15 @@ protected:
                       bool highQuality,
                       qreal scale = 1.);
 
+    std::unordered_map<int, BoundingBoxRenderContainer*> mRenderContainers;
+
+    BoundingBoxRenderContainer *mCurrentRenderContainer = NULL;
     QMatrix mAllUglyTransform;
     QMatrix mAllUglyPaintTransform;
     QRectF mAllUglyBoundingRect;
+    QImage mAllUglyPixmap;
 
+    BoundingBoxRenderContainer *mOldRenderContainer = NULL;
     QMatrix mOldAllUglyTransform;
     QMatrix mOldAllUglyPaintTransform;
     QRectF mOldAllUglyBoundingRect;
@@ -436,7 +452,6 @@ protected:
     QMatrix mOldTransform;
     QImage mNewPixmap;
     QImage mOldPixmap;
-    QImage mAllUglyPixmap;
     QRectF mOldPixBoundingRect;
 
     bool mRedoUpdate = false;
