@@ -86,7 +86,6 @@ void BlurEffect::apply(BoundingBox *target,
         fmt_filters::fast_blur(img, radius*0.25);
         //fmt_filters::fast_blur(img, radius*0.5);
     }
-    imgPtr->save("/home/ailuropoda/test.png");
 }
 
 qreal BlurEffect::getMargin()
@@ -278,7 +277,7 @@ void LinesEffect::apply(BoundingBox *target,
             (linesDistance <= linesWidth*0.5)) return;
 
     QImage linesImg = QImage(imgPtr->size(),
-                             QImage::Format_ARGB32);
+                             QImage::Format_ARGB32_Premultiplied);
     linesImg.fill(Qt::transparent);
 
     int height = imgPtr->height();
@@ -342,7 +341,7 @@ void CirclesEffect::apply(BoundingBox *target,
     if((radius < 0.1 && distance < radius) || (distance <= -0.6*radius)) return;
 
     QImage circlesImg = QImage(imgPtr->size(),
-                               QImage::Format_ARGB32);
+                               QImage::Format_ARGB32_Premultiplied);
     circlesImg.fill(Qt::transparent);
 
     int height = imgPtr->height();

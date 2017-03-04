@@ -306,7 +306,7 @@ QImage BoundingBox::getPrettyPixmapProvidedTransform(
     QSizeF sizeF = pixBoundingRectClippedToView.size();
     QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
                                       ceil(sizeF.height())),
-                              QImage::Format_ARGB32);
+                              QImage::Format_ARGB32_Premultiplied);
     newPixmap.fill(Qt::transparent);
 
     QPainter p(&newPixmap);
@@ -379,7 +379,7 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
     QSizeF sizeF = allUglyBoundingRect.size();
     QImage allUglyPixmap = QImage(QSize(ceil(sizeF.width()),
                                    ceil(sizeF.height())),
-                                  QImage::Format_ARGB32);
+                                  QImage::Format_ARGB32_Premultiplied);
     allUglyPixmap.fill(Qt::transparent);
 
     QPainter p(&allUglyPixmap);
@@ -431,7 +431,7 @@ QImage BoundingBox::renderPreviewProvidedTransform(
     QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
     QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
                                       ceil(sizeF.height())),
-                              QImage::Format_ARGB32);
+                              QImage::Format_ARGB32_Premultiplied);
     newPixmap.fill(Qt::transparent);
 
     QPainter p(&newPixmap);
@@ -494,7 +494,7 @@ void BoundingBox::renderFinal(QPainter *p) {
     QSizeF sizeF = pixBoundingRect.size();
     QImage renderPixmap = QImage(QSize(ceil(sizeF.width()),
                                          ceil(sizeF.height())),
-                                 QImage::Format_ARGB32);
+                                 QImage::Format_ARGB32_Premultiplied);
     renderPixmap.fill(Qt::transparent);
 
     QPainter pixP(&renderPixmap);

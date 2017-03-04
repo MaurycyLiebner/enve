@@ -279,7 +279,7 @@ QImage BoxesGroup::renderPreviewProvidedTransform(
     QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
     QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
                                       ceil(sizeF.height())),
-                              QImage::Format_ARGB32);
+                              QImage::Format_ARGB32_Premultiplied);
     newPixmap.fill(Qt::transparent);
 
     QPainter p(&newPixmap);

@@ -378,7 +378,7 @@ void Canvas::updateRenderRect() {
 
 void Canvas::renderCurrentFrameToPreview() {
     QImage *image = new QImage(mRenderRect.size().toSize(),
-                               QImage::Format_ARGB32);
+                               QImage::Format_ARGB32_Premultiplied);
     image->fill(Qt::transparent);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
@@ -387,7 +387,7 @@ void Canvas::renderCurrentFrameToPreview() {
 
 void Canvas::renderCurrentFrameToOutput(QString renderDest) {
     QImage *image = new QImage(mWidth, mHeight,
-                               QImage::Format_ARGB32);
+                               QImage::Format_ARGB32_Premultiplied);
     image->fill(Qt::transparent);
     renderFinalCurrentFrameToQImage(image);
     image->save(renderDest + QString::number(mCurrentFrame) + ".png");
