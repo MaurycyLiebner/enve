@@ -125,8 +125,8 @@ bool BoundingBox::hasBaseTransformation() {
 }
 
 void BoundingBox::applyEffects(QImage *im,
-                                 bool highQuality,
-                                 qreal scale) {
+                               bool highQuality,
+                               qreal scale) {
     if(mEffectsAnimators.hasChildAnimators()) {
         fmt_filters::image img(im->bits(), im->width(), im->height());
         mEffectsAnimators.applyEffects(this,
@@ -213,6 +213,7 @@ void BoundingBox::updatePixmaps() {
     }
 
     preUpdatePixmapsUpdates();
+    qDebug() << "2 " << mUpdateReplaceCache;
     if(mUpdateReplaceCache || getRenderContainerAtFrame(mUpdateFrame) == NULL) {
 
         if(getParentCanvas()->isPreviewing()) {
@@ -235,7 +236,9 @@ void BoundingBox::updateUpdateTransform() {
     mUpdateCanvasTransform = getParentCanvas()->getCombinedTransform();
     mUpdateTransform = mCombinedTransformMatrix;
     mUpdateFrame = mCurrentFrame;
-    mUpdateReplaceCache = mReplaceCache;
+    //mReplaceCache = false;
+    mUpdateReplaceCache = mReplaceCache || mUpdateReplaceCache;
+    mReplaceCache = false;
 }
 
 void BoundingBox::setAwaitingUpdate(bool bT) {
@@ -253,7 +256,7 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
         }
     } else {
         afterSuccessfulUpdate();
-        mReplaceCache = false;
+        //mReplaceCache = false;
 
         if(mHighQualityPaint) {
             mOldPixmap = mNewPixmap;
@@ -287,6 +290,7 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
                 mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
             }
         }
+        mUpdateReplaceCache = false;
         updateUglyPaintTransform();
     }
 }
@@ -572,11 +576,11 @@ void BoundingBox::awaitUpdate() {
 #include "updatescheduler.h"
 void BoundingBox::scheduleAwaitUpdate(const bool &replaceCache) {
     //if(mUpdateDisabled) return;
-
+    qDebug() << "1 " << replaceCache;
+    mReplaceCache = replaceCache || mReplaceCache;
     if(mAwaitingUpdate) {
         redoUpdate();
     } else {
-        mReplaceCache = replaceCache || mReplaceCache;
         if(mAwaitUpdateScheduled) return;
         setAwaitUpdateScheduled(true);
         addUpdateScheduler(new AwaitUpdateUpdateScheduler(this));
