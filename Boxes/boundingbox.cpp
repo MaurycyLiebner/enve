@@ -213,7 +213,7 @@ void BoundingBox::updatePixmaps() {
     }
 
     preUpdatePixmapsUpdates();
-    if(mReplaceCache || getRenderContainerAtFrame(mUpdateFrame) == NULL) {
+    if(mUpdateReplaceCache || getRenderContainerAtFrame(mUpdateFrame) == NULL) {
 
         if(getParentCanvas()->isPreviewing()) {
             BoundingBox::updatePreviewPixmap();
@@ -235,12 +235,20 @@ void BoundingBox::updateUpdateTransform() {
     mUpdateCanvasTransform = getParentCanvas()->getCombinedTransform();
     mUpdateTransform = mCombinedTransformMatrix;
     mUpdateFrame = mCurrentFrame;
+    mUpdateReplaceCache = mReplaceCache;
 }
 
 void BoundingBox::setAwaitingUpdate(bool bT) {
     mAwaitingUpdate = bT;
     if(bT) {
         updateUpdateTransform();
+        if(!mReplaceCache) {
+            BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
+                                                    mUpdateFrame);
+            if(cont != NULL) {
+                mOldRenderContainer = cont;
+            }
+        }
     } else {
         afterSuccessfulUpdate();
 
@@ -253,7 +261,7 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
         mUpdateRenderContainer->updatePaintTransformGivenNewCombinedTransform(
                                             mCombinedTransformMatrix);
 
-        if(mReplaceCache) {
+        if(mUpdateReplaceCache) {
             for(auto pair : mRenderContainers) {
                 delete pair.second;
             }
@@ -559,20 +567,17 @@ void BoundingBox::awaitUpdate() {
     mMainWindow->getCanvasWidget()->addBoxAwaitingUpdate(this);
 }
 
-void BoundingBox::setUpdateAndReplaceCache(const bool &bT) {
-    mReplaceCache = bT;
-}
-
 #include "updatescheduler.h"
 void BoundingBox::scheduleAwaitUpdate(const bool &replaceCache) {
     //if(mUpdateDisabled) return;
-    mReplaceCache = replaceCache;
+
     if(mAwaitingUpdate) {
         redoUpdate();
     } else {
         if(mAwaitUpdateScheduled) return;
         setAwaitUpdateScheduled(true);
         addUpdateScheduler(new AwaitUpdateUpdateScheduler(this));
+        mReplaceCache = replaceCache;
     }
 
     emit scheduleAwaitUpdateAllLinkBoxes();

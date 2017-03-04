@@ -29,21 +29,17 @@ public:
     void preUpdatePixmapsUpdates();
     void reloadPixmap();
     void updateUpdateTransform();
-public slots:
-    void setPixmapReloadFinished();
-signals:
-    void pixmapReloadFinished();
+    void afterSuccessfulUpdate();
 protected:
     void updateFrameCount(const char *path);
 private:
     std::unordered_map<int, QImage> mVideoFramesCache;
     bool mPixmapReloadScheduled = false;
+    bool mUpdatePixmapReloadScheduled = false;
     int mFramesCount = 0;
     SingleSound *mSound = NULL;
     QString mSrcFilePath;
     QImage mUpdateVideoImage;
-    QImage mOldVideoImage;
-    int mOldVideoFrame = 0;
     int mCurrentVideoFrame = 0;
     int mUpdateVideoFrame = 0;
     int getImageAtFrame(const char *path, const int &frameId);

@@ -14,15 +14,9 @@ VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
     setName("Video");
 
     setFilePath(filePath);
-    connect(this, SIGNAL(pixmapReloadFinished()),
-            this, SLOT(setPixmapReloadFinished()));
 }
 
 void VideoBox::updateAfterFrameChanged(int currentFrame) {
-    auto searchLastFrame = mVideoFramesCache.find(mOldVideoFrame);
-    if(searchLastFrame == mVideoFramesCache.end()) {
-        mVideoFramesCache.insert({mOldVideoFrame, mOldVideoImage});
-    }
     BoundingBox::updateAfterFrameChanged(currentFrame);
 
     mCurrentVideoFrame = qMin(mFramesCount - 2, mCurrentFrame);
@@ -30,19 +24,23 @@ void VideoBox::updateAfterFrameChanged(int currentFrame) {
     if(searchCurrentFrame == mVideoFramesCache.end()) {
         schedulePixmapReload();
     } else {
-        mOldVideoImage = searchCurrentFrame->second;
+        mPixmapReloadScheduled = false;
         scheduleAwaitUpdate(false);
     }
 }
 
-void VideoBox::setPixmapReloadFinished() {
-    mPixmapReloadScheduled = false;
-    mOldVideoImage = mUpdateVideoImage;
-    mOldVideoFrame = mUpdateVideoFrame;
+void VideoBox::afterSuccessfulUpdate() {
+    if(mUpdatePixmapReloadScheduled) {
+        auto searchLastFrame = mVideoFramesCache.find(mUpdateVideoFrame);
+        if(searchLastFrame == mVideoFramesCache.end()) {
+            mVideoFramesCache.insert({mUpdateVideoFrame, mUpdateVideoImage});
+        }
+    }
+    mRelBoundingRect = mUpdateVideoImage.rect();
 }
 
 void VideoBox::updateBoundingRect() {
-    mRelBoundingRect = mOldVideoImage.rect();
+    //mRelBoundingRect = mOldVideoImage.rect();
     qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
     mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
                         adjusted(-effectsMargin, -effectsMargin,
@@ -73,8 +71,7 @@ void VideoBox::drawSelected(QPainter *p,
 
 bool VideoBox::relPointInsidePath(QPointF point)
 {
-    return mOldVideoImage.rect().contains(point.toPoint()
-                                   );
+    return mRelBoundingRect.contains(point.toPoint());
 }
 
 void VideoBox::makeDuplicate(BoundingBox *targetBox) {
@@ -89,7 +86,7 @@ void VideoBox::draw(QPainter *p)
 {
     if(mVisible) {
         p->setRenderHint(QPainter::SmoothPixmapTransform);
-        p->drawImage(0, 0, mOldVideoImage);
+        p->drawImage(0, 0, mUpdateVideoImage);
     }
 }
 
@@ -210,7 +207,7 @@ int VideoBox::getImageAtFrame(const char* path,
 //                   QImage::Format_RGBA8888);
 //    }
     mUpdateVideoImage = QImage(videoCodec->width, videoCodec->height,
-                    QImage::Format_RGBA8888);
+                        QImage::Format_RGBA8888);
 
     /* 2. Convert and write into image buffer  */
     uint8_t *dst[] = {mUpdateVideoImage.bits()};
@@ -237,7 +234,14 @@ int VideoBox::getImageAtFrame(const char* path,
 
 void VideoBox::updateUpdateTransform() {
     BoundingBox::updateUpdateTransform();
+    mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
     mUpdateVideoFrame = mCurrentVideoFrame;
+    if(!mUpdatePixmapReloadScheduled) {
+        auto searchCurrentFrame = mVideoFramesCache.find(mUpdateVideoFrame);
+        if(searchCurrentFrame != mVideoFramesCache.end()) {
+            mUpdateVideoImage = searchCurrentFrame->second;
+        }
+    }
 }
 
 void VideoBox::schedulePixmapReload() {
@@ -254,7 +258,6 @@ void VideoBox::preUpdatePixmapsUpdates() {
 void VideoBox::reloadPixmapIfNeeded() {
     if(mPixmapReloadScheduled) {
         reloadPixmap();
-        emit pixmapReloadFinished();
     }
 }
 

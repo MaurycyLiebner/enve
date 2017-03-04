@@ -406,7 +406,6 @@ public:
     void applyEffects(QImage *im,
                       bool highQuality,
                       qreal scale = 1.);
-    void setUpdateAndReplaceCache(const bool &bT);
 protected:
     bool mUpdateDisabled = false;
 
@@ -443,6 +442,7 @@ protected:
     int mCurrentFrame = 0;
     QMatrix mUpdateCanvasTransform;
     QMatrix mUpdateTransform;
+    bool mUpdateReplaceCache = false;
     QMatrix mOldTransform;
     QImage mNewPixmap;
     QImage mOldPixmap;
