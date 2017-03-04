@@ -1058,6 +1058,7 @@ void MainWindow::importVideo() {
     foreach(const QString &path, importPaths) {
         mCanvasWidget->createVideoForPath(path);
     }
+    callUpdateSchedulers();
 }
 
 void MainWindow::exportSelected()

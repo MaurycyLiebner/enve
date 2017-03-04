@@ -242,15 +242,18 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
     mAwaitingUpdate = bT;
     if(bT) {
         updateUpdateTransform();
-        if(!mReplaceCache) {
+        if(!mUpdateReplaceCache) {
             BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
                                                     mUpdateFrame);
             if(cont != NULL) {
                 mOldRenderContainer = cont;
+                mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+                            mCombinedTransformMatrix);
             }
         }
     } else {
         afterSuccessfulUpdate();
+        mReplaceCache = false;
 
         if(mHighQualityPaint) {
             mOldPixmap = mNewPixmap;
@@ -523,38 +526,37 @@ void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
     p->setCompositionMode(mCompositionMode);
     p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
-    if(mAwaitingUpdate || !mHighQualityPaint) {
-        bool paintOld = mUglyPaintTransform.m11() <
-                        mOldRenderContainer->getPaintTransform().m11()
-                        && mHighQualityPaint;
+    mOldRenderContainer->draw(p);
+//    if(mAwaitingUpdate || !mHighQualityPaint) {
+//        bool paintOld = mUglyPaintTransform.m11() <
+//                        mOldRenderContainer->getPaintTransform().m11()
+//                        && mHighQualityPaint;
 
-        if(paintOld) {
-            p->save();
-            QMatrix clipMatrix = mUglyPaintTransform;
-            clipMatrix.translate(mOldPixBoundingRect.left(), mOldPixBoundingRect.top());
-            QRegion clipRegion;
-            clipRegion = clipMatrix.map(clipRegion.united(mOldPixmap.rect()));
-            QRegion clipRegion2;
-            clipRegion2 = clipRegion2.united(QRect(-100000, -100000,
-                                                   200000, 200000));
-            clipRegion = clipRegion2.subtracted(clipRegion);
+//        if(paintOld) {
+//            p->save();
+//            QMatrix clipMatrix = mUglyPaintTransform;
+//            clipMatrix.translate(mOldPixBoundingRect.left(), mOldPixBoundingRect.top());
+//            QRegion clipRegion;
+//            clipRegion = clipMatrix.map(clipRegion.united(mOldPixmap.rect()));
+//            QRegion clipRegion2;
+//            clipRegion2 = clipRegion2.united(QRect(-100000, -100000,
+//                                                   200000, 200000));
+//            clipRegion = clipRegion2.subtracted(clipRegion);
 
-            p->setClipRegion(clipRegion);
-        }
+//            p->setClipRegion(clipRegion);
+//        }
 
-        mOldRenderContainer->draw(p);
-//        p->setTransform(QTransform(mOldAllUglyPaintTransform), true);
-//        p->drawImage(mOldAllUglyBoundingRect.topLeft(), mOldAllUglyPixmap);
+//        mOldRenderContainer->draw(p);
 
-        if(paintOld) {
-            p->restore();
+//        if(paintOld) {
+//            p->restore();
 
-            p->setTransform(QTransform(mUglyPaintTransform), true);
-            p->drawImage(mOldPixBoundingRect.topLeft(), mOldPixmap);
-        }
-    } else if(mHighQualityPaint) {
-        p->drawImage(mPixBoundingRectClippedToView.topLeft(), mNewPixmap);
-    }
+//            p->setTransform(QTransform(mUglyPaintTransform), true);
+//            p->drawImage(mOldPixBoundingRect.topLeft(), mOldPixmap);
+//        }
+//    } else if(mHighQualityPaint) {
+//        p->drawImage(mPixBoundingRectClippedToView.topLeft(), mNewPixmap);
+//    }
 
     p->restore();
 
@@ -574,10 +576,10 @@ void BoundingBox::scheduleAwaitUpdate(const bool &replaceCache) {
     if(mAwaitingUpdate) {
         redoUpdate();
     } else {
+        mReplaceCache = replaceCache || mReplaceCache;
         if(mAwaitUpdateScheduled) return;
         setAwaitUpdateScheduled(true);
         addUpdateScheduler(new AwaitUpdateUpdateScheduler(this));
-        mReplaceCache = replaceCache;
     }
 
     emit scheduleAwaitUpdateAllLinkBoxes();

@@ -30,6 +30,7 @@ void VideoBox::updateAfterFrameChanged(int currentFrame) {
 }
 
 void VideoBox::afterSuccessfulUpdate() {
+    mPixmapReloadScheduled = false;
     if(mUpdatePixmapReloadScheduled) {
         auto searchLastFrame = mVideoFramesCache.find(mUpdateVideoFrame);
         if(searchLastFrame == mVideoFramesCache.end()) {
@@ -271,8 +272,7 @@ void VideoBox::reloadPixmap() {
     if(!mPivotChanged) centerPivotPosition();
 }
 
-void VideoBox::setFilePath(QString path)
-{
+void VideoBox::setFilePath(QString path) {
     mSrcFilePath = path;
     reloadFile();
 }
