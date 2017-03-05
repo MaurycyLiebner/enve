@@ -26,6 +26,8 @@ public:
 
     const QRectF &getBoundingRect() const;
 
+    const qreal &getResolutionPercent() const;
+
     const int &getFrame() const;
 
     void updateVariables(const QMatrix &transform,
@@ -39,9 +41,10 @@ public:
                       const QMatrix &paintTransform,
                       const QRectF &rect,
                       const QImage &img,
-                      const int &frame);
+                      const int &frame, const qreal &res);
 private:
     int mFrame;
+    qreal mResolutionPercent;
     QMatrix mTransform;
     QMatrix mPaintTransform;
     QRectF mBoundingRect;

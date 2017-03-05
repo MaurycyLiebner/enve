@@ -45,12 +45,6 @@ public:
                 this, SLOT(scheduleAwaitUpdateSLOT()));
     }
 
-    QImage renderPreviewProvidedTransform(
-                        const qreal &effectsMargin,
-                        const qreal &resolutionScale,
-                        const QMatrix &renderTransform,
-                        QPointF *drawPos);
-
     QImage getAllUglyPixmapProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &allUglyTransform,
@@ -174,11 +168,10 @@ public:
     void setClippedToCanvasSize(const bool &clipped);
 
     void draw(QPainter *p);
-    void drawForPreview(QPainter *p);
 
     void makeDuplicate(BoundingBox *targetBox) {
         InternalLinkBoxesGroup::makeDuplicate(targetBox);
-        InternalLinkCanvas *ilcTarget = (InternalLinkCanvas*)ilcTarget;
+        InternalLinkCanvas *ilcTarget = (InternalLinkCanvas*)targetBox;
         ilcTarget->setClippedToCanvasSize(mClipToCanvasSize);
     }
 

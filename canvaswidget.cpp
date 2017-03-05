@@ -487,18 +487,21 @@ void CanvasWidget::setHighQualityView(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setHighQualityPaint(bT);
     mCurrentCanvas->updateAllBoxes();
+    callUpdateSchedulers();
 }
 
 void CanvasWidget::setEffectsPaintEnabled(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setEffectsPaintEnabled(bT);
     mCurrentCanvas->updateAllBoxes();
+    callUpdateSchedulers();
 }
 
 void CanvasWidget::setResolutionPercent(const qreal &percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionPercent(percent);
-    mCurrentCanvas->updateAllBoxes();
+    mCurrentCanvas->clearCache();
+    callUpdateSchedulers();
 }
 
 void CanvasWidget::updatePivotIfNeeded() {

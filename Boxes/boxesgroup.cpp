@@ -28,6 +28,13 @@ void BoxesGroup::updateAllBoxes() {
     scheduleAwaitUpdate();
 }
 
+void BoxesGroup::clearCache() {
+    BoundingBox::clearCache();
+    foreach(BoundingBox *child, mChildBoxes) {
+        child->clearCache();
+    }
+}
+
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     BoundingBox(BoundingBoxType::TYPE_CANVAS)
 {   
@@ -264,55 +271,6 @@ void BoxesGroup::updateEffectsMargin() {
     }
     BoundingBox::updateEffectsMargin();
     mEffectsMargin += childrenMargin;
-}
-
-QImage BoxesGroup::renderPreviewProvidedTransform(
-                        const qreal &effectsMargin,
-                        const qreal &resolutionScale,
-                        const QMatrix &renderTransform,
-                        QPointF *drawPos) {
-    QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
-    QRectF pixBoundingRectClippedToView = pixBoundingRect.intersected(
-                                mMainWindow->getCanvasWidget()->rect());
-    QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
-    QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
-                                      ceil(sizeF.height())),
-                              QImage::Format_ARGB32_Premultiplied);
-    newPixmap.fill(Qt::transparent);
-
-    QPainter p(&newPixmap);
-    p.setRenderHint(QPainter::Antialiasing);
-    QPointF transF = pixBoundingRectClippedToView.topLeft()*resolutionScale -
-            QPointF(qRound(pixBoundingRectClippedToView.left()*resolutionScale),
-                    qRound(pixBoundingRectClippedToView.top()*resolutionScale));
-//    p.translate(transF);
-//    p.scale(resolutionScale, resolutionScale);
-//    p.translate(-pixBoundingRectClippedToView.topLeft());
-//    p.setTransform(QTransform(renderTransform), true);
-
-    *drawPos = pixBoundingRectClippedToView.topLeft()*
-                resolutionScale - transF;
-    p.translate(-*drawPos);
-
-    drawForPreview(&p);
-    p.end();
-
-
-    return newPixmap;
-}
-
-void BoxesGroup::drawForPreview(QPainter *p) {
-    if(mVisible) {
-        p->save();
-        foreach(BoundingBox *box, mChildBoxes) {
-            //box->draw(p);
-            box->drawPreviewPixmap(p);
-        }
-
-        p->restore();
-    }
 }
 
 void BoxesGroup::draw(QPainter *p)

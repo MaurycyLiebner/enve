@@ -125,11 +125,6 @@ public:
 //    QPointF getRelCenterPosition();
     void updateEffectsMargin();
 
-    void drawForPreview(QPainter *p);
-    QImage renderPreviewProvidedTransform(const qreal &effectsMargin,
-                                           const qreal &resolutionScale,
-                                           const QMatrix &renderTransform,
-                                           QPointF *drawPos);
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
     SWT_Type SWT_getType() { return SWT_BoxesGroup; }
@@ -160,6 +155,7 @@ public:
             box->setStrokeColorMode(colorMode);
         }
     }
+    void clearCache();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

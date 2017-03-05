@@ -84,17 +84,6 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
     setLinkTarget(linkTarget);
 }
 
-QImage InternalLinkBox::renderPreviewProvidedTransform(
-                                const qreal &effectsMargin,
-                                const qreal &resolutionScale,
-                                const QMatrix &renderTransform,
-                                QPointF *drawPos) {
-    return mLinkTarget->renderPreviewProvidedTransform(effectsMargin,
-                                                       resolutionScale,
-                                                   renderTransform,
-                                                   drawPos);
-}
-
 QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
                                 const qreal &effectsMargin,
                                 const QMatrix &allUglyTransform,
@@ -257,23 +246,3 @@ void InternalLinkCanvas::draw(QPainter *p)
         p->restore();
     }
 }
-
-void InternalLinkCanvas::drawForPreview(QPainter *p) {
-    if(mVisible) {
-        p->save();
-        p->setTransform(QTransform(
-                            mCombinedTransformMatrix.inverted()),
-                            true);
-        if(mClipToCanvasSize) {
-            p->setClipPath(mMappedBoundingRectPath);
-            //p->setClipRect(mRelBoundingRect);
-        }
-        foreach(BoundingBox *box, mChildBoxes) {
-            //box->draw(p);
-            box->drawPreviewPixmap(p);
-        }
-
-        p->restore();
-    }
-}
-

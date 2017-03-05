@@ -109,7 +109,6 @@ public:
     virtual void renderFinal(QPainter *p);
 
     virtual void draw(QPainter *) {}
-    virtual void drawForPreview(QPainter *p) { draw(p); }
 
     virtual void drawSelected(QPainter *p,
                               const CanvasMode &) {
@@ -167,9 +166,13 @@ public:
 
     virtual qreal getCurrentCanvasScale();
 
-    void setPivotAbsPos(QPointF absPos, bool saveUndoRedo = true, bool pivotChanged = true);
+    void setPivotAbsPos(QPointF absPos,
+                        bool saveUndoRedo = true,
+                        bool pivotChanged = true);
 
-    void setPivotRelPos(QPointF relPos, bool saveUndoRedo = true, bool pivotChanged = true);
+    void setPivotRelPos(QPointF relPos,
+                        bool saveUndoRedo = true,
+                        bool pivotChanged = true);
 
     void cancelTransform();
     void scale(qreal scaleXBy, qreal scaleYBy);
@@ -322,11 +325,7 @@ public:
 
     void setBaseTransformation(const QMatrix &matrix);
     bool hasBaseTransformation();
-    virtual QImage renderPreviewProvidedTransform(
-                        const qreal &effectsMargin,
-                        const qreal &resolutionScale,
-                        const QMatrix &renderTransform,
-                        QPointF *drawPos);
+
     virtual QImage getAllUglyPixmapProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &allUglyTransform,
@@ -340,7 +339,6 @@ public:
 
     void duplicateTransformAnimatorFrom(TransformAnimator *source);
     virtual void preUpdatePixmapsUpdates();
-    void updatePreviewPixmap();
     void scheduleCenterPivot();
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
@@ -406,6 +404,7 @@ public:
     void applyEffects(QImage *im,
                       bool highQuality,
                       qreal scale = 1.);
+    virtual void clearCache();
 protected:
     bool mUpdateDisabled = false;
 

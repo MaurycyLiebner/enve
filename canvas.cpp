@@ -96,11 +96,6 @@ void Canvas::setHighQualityPaint(const bool &bT) {
     mHighQualityPaint = bT;
 }
 
-void Canvas::updateAllBoxes() {
-    BoxesGroup::updateAllBoxes();
-    callUpdateSchedulers();
-}
-
 bool Canvas::highQualityPaint() {
     return mHighQualityPaint;
 }
@@ -445,6 +440,7 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
 
     p.translate(-mRenderRect.topLeft()*mResolutionPercent);
     //p.translate(-mCanvasRect.topLeft());
+    p.scale(mResolutionPercent, mResolutionPercent);
 
     Canvas::drawPreviewPixmap(&p);
 

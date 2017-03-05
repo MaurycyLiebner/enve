@@ -11,7 +11,7 @@ void BoundingBoxRenderContainer::draw(QPainter *p) {
 }
 
 void BoundingBoxRenderContainer::updatePaintTransformGivenNewCombinedTransform(
-        const QMatrix &combinedTransform) {
+                                    const QMatrix &combinedTransform) {
     mPaintTransform = mTransform.inverted()*combinedTransform;
 }
 
@@ -43,6 +43,10 @@ const QRectF &BoundingBoxRenderContainer::getBoundingRect() const {
     return mBoundingRect;
 }
 
+const qreal &BoundingBoxRenderContainer::getResolutionPercent() const {
+    return mResolutionPercent;
+}
+
 const int &BoundingBoxRenderContainer::getFrame() const {
     return mFrame;
 }
@@ -53,6 +57,7 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &transform,
                                                  BoundingBox *target) {
     mTransform = transform;
 
+    mResolutionPercent = resolutionPer;
     mImage = target->getAllUglyPixmapProvidedTransform(
                 resolutionPer*effectsMargin,
                 mTransform,
@@ -69,17 +74,20 @@ void BoundingBoxRenderContainer::duplicateFrom(BoundingBoxRenderContainer *src) 
                  src->getPaintTransform(),
                  src->getBoundingRect(),
                  src->getImage(),
-                 src->getFrame());
+                 src->getFrame(),
+                 src->getResolutionPercent());
 }
 
 void BoundingBoxRenderContainer::setVariables(const QMatrix &transform,
                                               const QMatrix &paintTransform,
                                               const QRectF &rect,
                                               const QImage &img,
-                                              const int &frame) {
+                                              const int &frame,
+                                              const qreal &res) {
     mTransform = transform;
     mPaintTransform = paintTransform;
     mImage = img;
     mBoundingRect = rect;
     mFrame = frame;
+    mResolutionPercent = res;
 }

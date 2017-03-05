@@ -213,14 +213,8 @@ void BoundingBox::updatePixmaps() {
     }
 
     preUpdatePixmapsUpdates();
-    qDebug() << "2 " << mUpdateReplaceCache;
     if(mUpdateReplaceCache || getRenderContainerAtFrame(mUpdateFrame) == NULL) {
-
-        if(getParentCanvas()->isPreviewing()) {
-            BoundingBox::updatePreviewPixmap();
-        } else {
-            BoundingBox::updateAllUglyPixmap();
-        }
+        BoundingBox::updateAllUglyPixmap();
         if(getParentCanvas()->highQualityPaint()) {
             updatePrettyPixmap();
             mHighQualityPaint = true;
@@ -358,6 +352,19 @@ void BoundingBox::updateAllBoxes() {
     scheduleAwaitUpdate();
 }
 
+void BoundingBox::clearCache() {
+    for(auto cont : mRenderContainers) {
+        delete cont.second;
+    }
+    mRenderContainers.clear();
+    mOldRenderContainer = new BoundingBoxRenderContainer();
+    mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+    mRenderContainers.insert({mOldRenderContainer->getFrame(),
+                              mOldRenderContainer});
+
+    scheduleAwaitUpdate();
+}
+
 QRectF BoundingBox::getPixBoundingRect()
 {
     return mPixBoundingRect;
@@ -418,68 +425,14 @@ void BoundingBox::updateAllUglyPixmap() {
                 this);
 }
 
-QImage BoundingBox::renderPreviewProvidedTransform(
-                        const qreal &effectsMargin,
-                        const qreal &resolutionScale,
-                        const QMatrix &renderTransform,
-                        QPointF *drawPos) {
-    QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
-    QRectF pixBoundingRectClippedToView = pixBoundingRect.intersected(
-                                mMainWindow->getCanvasWidget()->rect());
-    QSizeF sizeF = pixBoundingRectClippedToView.size()*resolutionScale;
-    QImage newPixmap = QImage(QSize(ceil(sizeF.width()),
-                                      ceil(sizeF.height())),
-                              QImage::Format_ARGB32_Premultiplied);
-    newPixmap.fill(Qt::transparent);
-
-    QPainter p(&newPixmap);
-    p.setRenderHint(QPainter::Antialiasing);
-    QPointF transF = pixBoundingRectClippedToView.topLeft()*resolutionScale -
-            QPointF(qRound(pixBoundingRectClippedToView.left()*resolutionScale),
-                    qRound(pixBoundingRectClippedToView.top()*resolutionScale));
-    p.translate(transF);
-    p.scale(resolutionScale, resolutionScale);
-    p.translate(-pixBoundingRectClippedToView.topLeft());
-    p.setTransform(QTransform(renderTransform), true);
-
-
-    drawForPreview(&p);
-    p.end();
-
-    *drawPos = pixBoundingRectClippedToView.topLeft()*
-                resolutionScale - transF;
-    return newPixmap;
-}
-
 void BoundingBox::drawPreviewPixmap(QPainter *p) {
-    p->save();
+    drawPixmap(p);
+//    p->save();
 
-    p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+//    p->setOpacity(mTransformAnimator.getOpacity()*0.01);
 
-    p->drawImage(mPreviewDrawPos, mRenderPixmap);
-    p->restore();
-}
-
-void BoundingBox::updatePreviewPixmap() {
-    QMatrix transformMatrix = getCombinedTransform();
-//    transformMatrix.
-//            scale(getParentCanvas()->getResolutionPercent(),
-//                  getParentCanvas()->getResolutionPercent());
-
-    Canvas *parentCanvas = getParentCanvas();
-    mRenderPixmap = renderPreviewProvidedTransform(
-                mEffectsMargin*mUpdateCanvasTransform.m11(),
-                parentCanvas->getResolutionPercent(),
-                transformMatrix,
-                &mPreviewDrawPos);
-    if(parentCanvas->effectsPaintEnabled()) {
-        applyEffects(&mRenderPixmap,
-                     true,
-                     mUpdateCanvasTransform.m11()*
-                     parentCanvas->getResolutionPercent());
-    }
+//    p->drawImage(mPreviewDrawPos, mRenderPixmap);
+//    p->restore();
 }
 
 void BoundingBox::renderFinal(QPainter *p) {
