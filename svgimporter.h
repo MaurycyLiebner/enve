@@ -28,14 +28,17 @@ public:
 
     FillSvgAttributes &operator*=(const FillSvgAttributes &overwritter)
     {
-        if(overwritter.wasColorAssigned()) {
-            mColor = overwritter.getColor();
+        if(overwritter.wasColorAssigned() &&
+           !mColorAssigned) {
+            setColor(overwritter.getColor());
         }
-        if(overwritter.wasPaintTypeAssigned()) {
-            mPaintType = overwritter.getPaintType();
+        if(overwritter.wasPaintTypeAssigned() &&
+           !mPaintTypeAssigned) {
+            setPaintType(overwritter.getPaintType());
         }
-        if(overwritter.wasGradientAssigned()) {
-            mGradient = overwritter.getGradient();
+        if(overwritter.wasGradientAssigned() &&
+           !mGradientAssigned) {
+            setGradient(overwritter.getGradient());
         }
         return *this;
     }
@@ -83,27 +86,34 @@ public:
 
     StrokeSvgAttributes &operator*=(const StrokeSvgAttributes &overwritter)
     {
-        if(overwritter.wasColorAssigned()) {
-            mColor = overwritter.getColor();
+        if(overwritter.wasColorAssigned() &&
+           !mColorAssigned) {
+            setColor(overwritter.getColor());
         }
-        if(overwritter.wasPaintTypeAssigned()) {
-            mPaintType = overwritter.getPaintType();
+        if(overwritter.wasPaintTypeAssigned() &&
+           !mPaintTypeAssigned) {
+            setPaintType(overwritter.getPaintType());
         }
-        if(overwritter.wasGradientAssigned()) {
-            mGradient = overwritter.getGradient();
+        if(overwritter.wasGradientAssigned() &&
+           !mGradientAssigned) {
+            setGradient(overwritter.getGradient());
         }
 
-        if(overwritter.wasLineWidthAssigned()) {
-            mLineWidth = overwritter.getLineWidth();
+        if(overwritter.wasLineWidthAssigned() &&
+           !mLineWidthAssigned) {
+            setLineWidth(mLineWidth = overwritter.getLineWidth());
         }
-        if(overwritter.wasCapStyleAssigned()) {
-            mCapStyle = overwritter.getCapStyle();
+        if(overwritter.wasCapStyleAssigned() &&
+           !mCapStyleAssigned) {
+            setCapStyle(mCapStyle = overwritter.getCapStyle());
         }
-        if(overwritter.wasJoinStyleAssigned()) {
-            mJoinStyle = overwritter.getJoinStyle();
+        if(overwritter.wasJoinStyleAssigned() &&
+           !mJoinStyleAssigned) {
+            setJoinStyle(overwritter.getJoinStyle());
         }
-        if(overwritter.wasOutlineCompositionModeAssigned()) {
-            mOutlineCompositionMode = overwritter.getOutlineCompositionMode();
+        if(overwritter.wasOutlineCompositionModeAssigned() &&
+           !mOutlineCompositionModeAssigned) {
+            setOutlineCompositionMode(overwritter.getOutlineCompositionMode());
         }
         return *this;
     }
@@ -269,7 +279,8 @@ public:
     void apply(SinglePathAnimator *path);
 
     void closePath() {
-        if(mLastPoint->getStartPointEnabled()) {
+        if(mLastPoint->getStartPointEnabled() &&
+           pointToLen(mLastPoint->getPoint() - mFirstPoint->getPoint()) < 0.1) {
             mFirstPoint->setStartPoint(mLastPoint->getStartPoint());
             delete mPoints.takeLast();
             mLastPoint = mPoints.last();
@@ -443,7 +454,7 @@ public:
         mSvgSeparatePaths << lastPath;
         return lastPath;
     }
-    void apply(PathAnimator *path);
+    void apply(VectorPath *path);
 protected:
     QList<SvgSeparatePath*> mSvgSeparatePaths;
 };

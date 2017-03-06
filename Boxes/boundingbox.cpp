@@ -221,8 +221,6 @@ void BoundingBox::updatePixmaps() {
         } else {
             mHighQualityPaint = false;
         }
-
-        mParent->awaitUpdate();
     }
 }
 
@@ -286,6 +284,8 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
         }
         mUpdateReplaceCache = false;
         updateUglyPaintTransform();
+
+        mParent->scheduleAwaitUpdate();
     }
 }
 

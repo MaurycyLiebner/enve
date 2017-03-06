@@ -563,9 +563,13 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
 
         case 'f':
             if (name == "fill") {
-                Color color;
-                getColorFromString(value, &color);
-                mFillAttributes.setColor(color);
+                if(value.contains("none")) {
+                    mFillAttributes.setPaintType(NOPAINT);
+                } else {
+                    Color color;
+                    getColorFromString(value, &color);
+                    mFillAttributes.setColor(color);
+                }
             } else if (name == "fill-rule") {
                 //fillRule = value;
             } else if (name == "fill-opacity") {
@@ -599,10 +603,13 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
         case 's':
             if(name.contains("stroke")) {
                 if(name == "stroke") {
-                    //stroke = value;
-                    Color color;
-                    getColorFromString(value, &color);
-                    mStrokeAttributes.setColor(color);
+                    if(value.contains("none")) {
+                        mStrokeAttributes.setPaintType(NOPAINT);
+                    } else {
+                        Color color;
+                        getColorFromString(value, &color);
+                        mStrokeAttributes.setColor(color);
+                    }
                 } else if (name == "stroke-dasharray") {
                     //strokeDashArray = value;
                 } else if (name == "stroke-dashoffset") {
@@ -668,7 +675,7 @@ void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup,
 
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
-    attributes->apply(vectorPath->getPathAnimator());
+    attributes->apply(vectorPath);
 }
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
@@ -1508,16 +1515,51 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
     }
     return true;
 }*/
-
-void FillSvgAttributes::apply(BoundingBox *box)
-{
-    box->setFillPaintType(mPaintType, mColor, mGradient);
+#include "Animators/paintsettings.h"
+void FillSvgAttributes::apply(BoundingBox *box) {
+    PaintSetting *setting;
+    if(mPaintType == FLATPAINT) {
+        setting = new PaintSetting(true, ColorSetting(RGBMODE,
+                                                      CVR_ALL,
+                                                      mColor.gl_r,
+                                                      mColor.gl_g,
+                                                      mColor.gl_b,
+                                                      mColor.gl_a,
+                                                      CST_CHANGE));
+    } else if(mPaintType == GRADIENTPAINT) {
+        setting = new PaintSetting(true, mGradient);
+    } else {
+        setting = new PaintSetting(true);
+    }
+    if(box->isVectorPath()) {
+        setting->apply((PathBox*)box);
+    }
+    delete setting;
 }
 
 void StrokeSvgAttributes::apply(BoundingBox *box)
 {
     box->setStrokeWidth(mLineWidth, false);
-    box->setStrokePaintType(mPaintType, mColor, mGradient);
+
+    PaintSetting *setting;
+    if(mPaintType == FLATPAINT) {
+        setting = new PaintSetting(false, ColorSetting(RGBMODE,
+                                                      CVR_ALL,
+                                                      mColor.gl_r,
+                                                      mColor.gl_g,
+                                                      mColor.gl_b,
+                                                      mColor.gl_a,
+                                                      CST_CHANGE));
+    } else if(mPaintType == GRADIENTPAINT) {
+        setting = new PaintSetting(false, mGradient);
+    } else {
+        setting = new PaintSetting(false);
+    }
+    if(box->isVectorPath()) {
+        setting->apply((PathBox*)box);
+    }
+    delete setting;
+    //box->setStrokePaintType(mPaintType, mColor, mGradient);
 }
 
 void BoundingBoxSvgAttributes::apply(BoundingBox *box)
@@ -1526,13 +1568,15 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box)
     mFillAttributes.apply(box);
 }
 
-void VectorPathSvgAttributes::apply(PathAnimator *path)
+void VectorPathSvgAttributes::apply(VectorPath *path)
 {
+    PathAnimator *pathAnimator = path->getPathAnimator();
     foreach(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
-        SinglePathAnimator *singlePath = new SinglePathAnimator(path);
+        SinglePathAnimator *singlePath =
+                new SinglePathAnimator(pathAnimator);
         separatePath->apply(singlePath);
-        path->addSinglePathAnimator(singlePath);
+        pathAnimator->addSinglePathAnimator(singlePath);
     }
 
     BoundingBoxSvgAttributes::apply((BoundingBox*)path);
