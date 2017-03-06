@@ -19,6 +19,48 @@ SingleWidgetAbstraction::~SingleWidgetAbstraction() {
     }
 }
 
+bool SingleWidgetAbstraction::getAbstractions(
+        const int &minY, const int &maxY,
+        int currY, int currX,
+        QList<SingleWidgetAbstraction*> *abstractions,
+        const SWT_RulesCollection &rules,
+        const bool &parentSatisfiesRule) { // returns whether should abort
+    int thisHeight = getHeight(rules,
+                               parentSatisfiesRule);
+    if(currY + thisHeight < minY) return false;
+    if(currY > maxY) return true;
+    bool satisfiesRule = mTarget->SWT_satisfiesRule(rules,
+                                                    parentSatisfiesRule);
+    if(currY > minY && satisfiesRule && !mIsMainTarget) {
+        abstractions->append(this);
+    }
+    if(mContentVisible || mIsMainTarget) {
+        if(satisfiesRule && !mIsMainTarget) {
+            currX += 20;
+            currY += 20;
+        }
+        foreach(SingleWidgetAbstraction *abs, mChildren) {
+            bool childVisible =
+                (abs->getTarget()->SWT_visibleOnlyIfParentDescendant()
+                 ? !mIsMainTarget
+                 : true);
+            if(childVisible) {
+                if(abs->getAbstractions(minY, maxY,
+                                        currY, currX,
+                                        abstractions,
+                                        rules,
+                                        satisfiesRule) ) {
+                    return true;
+                }
+                currY += abs->getHeight(rules,
+                                        satisfiesRule);
+            }
+        }
+    }
+
+    return false;
+}
+
 bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         const int &minY, const int &maxY,
         int currY, int currX,

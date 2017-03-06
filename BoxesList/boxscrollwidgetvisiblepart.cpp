@@ -76,21 +76,48 @@ QrealKey *BoxScrollWidgetVisiblePart::getKeyAtPos(
 void BoxScrollWidgetVisiblePart::getKeysInRect(
         QRectF selectionRect,
         qreal pixelsPerFrame,
-        const int &minViewedFrame,
         QList<QrealKey*> *listKeys) {
-    selectionRect.adjust(0, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
-                         0, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
-    foreach(SingleWidget *container, mSingleWidgets) {
-        int containerTop = container->y();
-        int containerBottom = containerTop + container->height();
-        if(containerTop > selectionRect.bottom() ||
-           containerBottom < selectionRect.top()) continue;
-        ((BoxSingleWidget*)container)->
-                getKeysInRect(selectionRect,
-                              pixelsPerFrame,
-                              minViewedFrame,
-                              listKeys);
+    QList<SingleWidgetAbstraction*> abstractions;
+//    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
+//                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
+    selectionRect.adjust(0.5, 0., 0.5, 0);
+    mMainAbstraction->getAbstractions(selectionRect.top() - 10,
+                                      selectionRect.bottom() - 10,
+                                      0, 0,
+                                      &abstractions,
+                                      mCurrentRulesCollection,
+                                      true);
+
+    foreach(SingleWidgetAbstraction *abs, abstractions) {
+        SingleWidgetTarget *target = abs->getTarget();
+        const SWT_Type &type = target->SWT_getType();
+        if(type == SWT_BoundingBox ||
+           type == SWT_BoxesGroup) {
+            BoundingBox *bb_target = (BoundingBox*)target;
+            bb_target->getAnimatorsCollection()->getKeysInRect(
+                        selectionRect,
+                        pixelsPerFrame,
+                        listKeys);
+        } else if(type == SWT_QrealAnimator ||
+                  type == SWT_ComplexAnimator ||
+                  type == SWT_ColorAnimator ||
+                  type == SWT_PixmapEffect) {
+            QrealAnimator *qa_target = (QrealAnimator*)target;
+            qa_target->getKeysInRect(selectionRect,
+                                     pixelsPerFrame,
+                                     listKeys);
+        }
     }
+//    foreach(SingleWidget *container, mSingleWidgets) {
+//        int containerTop = container->y();
+//        int containerBottom = containerTop + container->height();
+//        if(containerTop > selectionRect.bottom() ||
+//           containerBottom < selectionRect.top()) continue;
+//        ((BoxSingleWidget*)container)->
+//                getKeysInRect(selectionRect,
+//                              pixelsPerFrame,
+//                              listKeys);
+//    }
 }
 
 BoxSingleWidget *BoxScrollWidgetVisiblePart::

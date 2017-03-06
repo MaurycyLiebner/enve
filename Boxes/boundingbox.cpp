@@ -529,7 +529,6 @@ void BoundingBox::awaitUpdate() {
 #include "updatescheduler.h"
 void BoundingBox::scheduleAwaitUpdate(const bool &replaceCache) {
     //if(mUpdateDisabled) return;
-    qDebug() << "1 " << replaceCache;
     mReplaceCache = replaceCache || mReplaceCache;
     if(mAwaitingUpdate) {
         redoUpdate();

@@ -28,7 +28,6 @@ public:
                           const int &minViewedFrame);
     void getKeysInRect(QRectF selectionRect,
                        qreal pixelsPerFrame,
-                       const int &minViewedFrame,
                        QList<QrealKey *> *listKeys);
 
     BoxSingleWidget *getClosestsSingleWidgetWithTargetType(

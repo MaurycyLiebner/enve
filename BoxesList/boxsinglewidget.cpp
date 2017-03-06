@@ -317,7 +317,6 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
 
 void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
                                     qreal pixelsPerFrame,
-                                    const int &minViewedFrame,
                                     QList<QrealKey *> *listKeys) {
     if(isHidden()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
@@ -327,7 +326,6 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
         BoundingBox *bb_target = (BoundingBox*)target;
         bb_target->getAnimatorsCollection()->getKeysInRect(
                     selectionRect,
-                    minViewedFrame,
                     pixelsPerFrame,
                     listKeys);
     } else if(type == SWT_QrealAnimator ||
@@ -336,7 +334,6 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
               type == SWT_PixmapEffect) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         qa_target->getKeysInRect(selectionRect,
-                                 minViewedFrame,
                                  pixelsPerFrame,
                                  listKeys);
     }

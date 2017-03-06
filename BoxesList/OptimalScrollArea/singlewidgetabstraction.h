@@ -80,6 +80,11 @@ public:
 
     void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
                                          const int &id);
+    bool getAbstractions(const int &minY, const int &maxY,
+                         int currY, int currX,
+                         QList<SingleWidgetAbstraction *> *abstractions,
+                         const SWT_RulesCollection &rules,
+                         const bool &parentSatisfiesRule);
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 

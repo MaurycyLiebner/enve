@@ -109,7 +109,12 @@ public slots:
     void graphClearAnimatorSelection();
 
     void setViewedRange(int top, int bottom);
+private slots:
+    void scrollRight();
+    void scrollLeft();
 private:
+    QTimer *mScrollTimer;
+
     void updateHoveredPointFromPos(const QPoint &posU);
 
     QrealKey *mHoveredKey = NULL;

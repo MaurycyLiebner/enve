@@ -122,7 +122,6 @@ public:
     virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY,
                           int startFrame, int endFrame);
     virtual void getKeysInRect(QRectF selectionRect,
-                               int minViewedFrame,
                                qreal pixelsPerFrame,
                                QList<QrealKey *> *keysList);
 

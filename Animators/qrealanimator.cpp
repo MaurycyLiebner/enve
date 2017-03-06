@@ -88,21 +88,18 @@ void QrealAnimator::setValueRange(qreal minVal, qreal maxVal) {
 }
 
 void QrealAnimator::getKeysInRect(QRectF selectionRect,
-                                  int minViewedFrame,
                                   qreal pixelsPerFrame,
                                   QList<QrealKey*> *keysList) {
-    int selLeftFrame = selectionRect.left()/pixelsPerFrame;
+    int selLeftFrame = selectionRect.left();
     if(0.5*pixelsPerFrame + KEY_RECT_SIZE*0.5 <
        selectionRect.left() - selLeftFrame*pixelsPerFrame) {
         selLeftFrame++;
     }
-    selLeftFrame += minViewedFrame;
-    int selRightFrame = selectionRect.right()/pixelsPerFrame;
+    int selRightFrame = selectionRect.right();
     if(0.5*pixelsPerFrame - KEY_RECT_SIZE*0.5 >
        selectionRect.right() - selRightFrame*pixelsPerFrame) {
         selRightFrame--;
     }
-    selRightFrame += minViewedFrame;
     for(int i = selRightFrame; i >= selLeftFrame; i--) {
         QrealKey *keyAtPos = getKeyAtFrame(i);
         if(keyAtPos != NULL) {

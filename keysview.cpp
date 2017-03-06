@@ -13,6 +13,7 @@ KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
 
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
+    mScrollTimer = new QTimer(this);
 }
 
 void KeysView::setAnimationDockWidget(
@@ -65,7 +66,7 @@ void KeysView::deleteSelectedKeys()
 void KeysView::selectKeysInSelectionRect() {
     QList<QrealKey*> listKeys;
     mBoxesListVisible->getKeysInRect(mSelectionRect,
-                                     mPixelsPerFrame, mMinViewedFrame,
+                                     mPixelsPerFrame,
                                      &listKeys);
     foreach(QrealKey *key, listKeys) {
         addKeyToSelection(key);
@@ -85,6 +86,10 @@ void KeysView::wheelEvent(QWheelEvent *e) {
         graphWheelEvent(e);
     } else {
         emit wheelEventSignal(e);
+        if(mSelecting) {
+            QPointF posU = mapFromGlobal(QCursor::pos()) + QPointF(-10., 0.);
+            mSelectionRect.setBottom(posU.y() + mViewedTop);
+        }
         //mBoxesList->handleWheelEvent(e);
     }
 }
@@ -110,8 +115,11 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                                                       mMinViewedFrame);
             if(mLastPressedKey == NULL) {
                 mSelecting = true;
-                mSelectionRect.setTopLeft(posU);
-                mSelectionRect.setBottomRight(posU);
+                qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
+                mSelectionRect.setTopLeft(QPointF(posUXFrame,
+                                                  posU.y() + mViewedTop));
+                mSelectionRect.setBottomRight(QPointF(posUXFrame,
+                                                      posU.y() + mViewedTop));
             } else {
                 if(!mMainWindow->isShiftPressed() &&
                     !(mLastPressedKey->isSelected() ||
@@ -318,7 +326,10 @@ void KeysView::paintEvent(QPaintEvent *) {
     if(mSelecting) {
         p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
         p.setBrush(Qt::NoBrush);
-        p.drawRect(mSelectionRect);
+        p.drawRect(QRectF((mSelectionRect.x() - mMinViewedFrame)*mPixelsPerFrame,
+                          mSelectionRect.y() - mViewedTop,
+                          mSelectionRect.width()*mPixelsPerFrame,
+                          mSelectionRect.height()));
     }
 
     p.resetTransform();
@@ -348,8 +359,31 @@ void KeysView::clearHoveredPoint() {
     mHoveredKey = NULL;
 }
 
+void KeysView::scrollRight() {
+    mMinViewedFrame++;
+    mMaxViewedFrame++;
+    emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
+    if(mSelecting) {
+        mSelectionRect.setBottomRight(mSelectionRect.bottomRight() +
+                                      QPointF(1. ,0.));
+    }
+    update();
+}
+
+void KeysView::scrollLeft() {
+    mMinViewedFrame--;
+    mMaxViewedFrame--;
+    emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
+    if(mSelecting) {
+        mSelectionRect.setBottomRight(mSelectionRect.bottomRight() -
+                                      QPointF(1. ,0.));
+    }
+    update();
+}
+
 void KeysView::mouseMoveEvent(QMouseEvent *event) {
     QPoint posU = event->pos() + QPoint(-10, 0);
+
     if(mIsMouseGrabbing ||
        (event->buttons() & Qt::LeftButton ||
          event->buttons() & Qt::RightButton ||
@@ -363,6 +397,22 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                 emit changedViewedFrames(mMinViewedFrame,
                                          mMaxViewedFrame);
             } else {
+                if(posU.x() < -10) {
+                    if(!mScrollTimer->isActive()) {
+                        connect(mScrollTimer, SIGNAL(timeout()),
+                                this, SLOT(scrollLeft()));
+                        mScrollTimer->start(300);
+                    }
+                } else if(posU.x() > width() - 20) {
+                    if(!mScrollTimer->isActive()) {
+                        connect(mScrollTimer, SIGNAL(timeout()),
+                                this, SLOT(scrollRight()));
+                        mScrollTimer->start(300);
+                    }
+                } else {
+                    mScrollTimer->disconnect();
+                    mScrollTimer->stop();
+                }
                 if(mMovingKeys) {
                     if(mFirstMove) {
                         foreach(QrealKey *key, mSelectedKeys) {
@@ -391,7 +441,9 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                         }
                     }
                 } else if(mSelecting) {
-                    mSelectionRect.setBottomRight(posU);
+                    qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
+                    mSelectionRect.setBottomRight(
+                                    QPointF(posUXFrame, posU.y() + mViewedTop));
                 }
                 mFirstMove = false;
             }
@@ -403,8 +455,11 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
     mMainWindow->callUpdateSchedulers();
 }
 
-void KeysView::mouseReleaseEvent(QMouseEvent *e)
-{
+void KeysView::mouseReleaseEvent(QMouseEvent *e) {
+    if(mScrollTimer->isActive()) {
+        mScrollTimer->disconnect();
+        mScrollTimer->stop();
+    }
     if(mGraphViewed) {
         graphMouseReleaseEvent(e->button());
     } else {
