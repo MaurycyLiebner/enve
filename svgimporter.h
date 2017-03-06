@@ -19,50 +19,62 @@ public:
 //        }
         return *this;
     }
+
+    void setFontFamily(const QString &family) {
+        mFont.setFamily(family);
+    }
+
+    void setFontSize(const int &size) {
+        mFont.setPixelSize(size);
+    }
+
+    void setFontStyle(const QFont::Style &style) {
+        mFont.setStyle(style);
+    }
+
+    void setFontWeight(const int &weight) {
+        mFont.setWeight(weight);
+    }
+
+    void setFontAlignment(const Qt::Alignment &alignment) {
+        mAlignment = alignment;
+    }
+
 private:
+    QFont mFont;
+    Qt::Alignment mAlignment = Qt::AlignLeft;
 };
 
 class FillSvgAttributes {
 public:
     FillSvgAttributes() {}
 
-    FillSvgAttributes &operator*=(const FillSvgAttributes &overwritter)
-    {
-        if(overwritter.wasColorAssigned() &&
-           !mColorAssigned) {
-            setColor(overwritter.getColor());
-        }
-        if(overwritter.wasPaintTypeAssigned() &&
-           !mPaintTypeAssigned) {
-            setPaintType(overwritter.getPaintType());
-        }
-        if(overwritter.wasGradientAssigned() &&
-           !mGradientAssigned) {
-            setGradient(overwritter.getGradient());
-        }
+    FillSvgAttributes &operator*=(const FillSvgAttributes &overwritter) {
+        setColor(overwritter.getColor());
+        setPaintType(overwritter.getPaintType());
+        setGradient(overwritter.getGradient());
         return *this;
     }
 
     void setColor(const Color &val) {
+        qreal opacity = val.gl_a;
         mColor = val;
-        mColorAssigned = true;
+        mColor.setGLColorA(opacity);
         setPaintType(FLATPAINT);
+    }
+
+    void setColorOpacity(const qreal &opacity) {
+        mColor.setGLColorA(opacity);
     }
 
     void setPaintType(const PaintType &type) {
         mPaintType = type;
-        mPaintTypeAssigned = true;
     }
 
     void setGradient(Gradient *gradient) {
         mGradient = gradient;
-        mGradientAssigned = true;
         setPaintType(GRADIENTPAINT);
     }
-
-    bool wasColorAssigned() const { return mColorAssigned; }
-    bool wasPaintTypeAssigned() const { return mPaintTypeAssigned; }
-    bool wasGradientAssigned() const { return mGradientAssigned; }
 
     const Color &getColor() const { return mColor; }
     const PaintType &getPaintType() const { return mPaintType; }
@@ -70,11 +82,8 @@ public:
 
     void apply(BoundingBox *box);
 protected:
-    bool mColorAssigned = false;
     Color mColor;
-    bool mPaintTypeAssigned = false;
     PaintType mPaintType = NOPAINT;
-    bool mGradientAssigned = false;
     Gradient *mGradient = NULL;
 };
 
@@ -84,45 +93,17 @@ public:
 
 
 
-    StrokeSvgAttributes &operator*=(const StrokeSvgAttributes &overwritter)
-    {
-        if(overwritter.wasColorAssigned() &&
-           !mColorAssigned) {
-            setColor(overwritter.getColor());
-        }
-        if(overwritter.wasPaintTypeAssigned() &&
-           !mPaintTypeAssigned) {
-            setPaintType(overwritter.getPaintType());
-        }
-        if(overwritter.wasGradientAssigned() &&
-           !mGradientAssigned) {
-            setGradient(overwritter.getGradient());
-        }
+    StrokeSvgAttributes &operator*=(const StrokeSvgAttributes &overwritter) {
+        setColor(overwritter.getColor());
+        setPaintType(overwritter.getPaintType());
+        setGradient(overwritter.getGradient());
 
-        if(overwritter.wasLineWidthAssigned() &&
-           !mLineWidthAssigned) {
-            setLineWidth(mLineWidth = overwritter.getLineWidth());
-        }
-        if(overwritter.wasCapStyleAssigned() &&
-           !mCapStyleAssigned) {
-            setCapStyle(mCapStyle = overwritter.getCapStyle());
-        }
-        if(overwritter.wasJoinStyleAssigned() &&
-           !mJoinStyleAssigned) {
-            setJoinStyle(overwritter.getJoinStyle());
-        }
-        if(overwritter.wasOutlineCompositionModeAssigned() &&
-           !mOutlineCompositionModeAssigned) {
-            setOutlineCompositionMode(overwritter.getOutlineCompositionMode());
-        }
+        setLineWidth(overwritter.getLineWidth());
+        setCapStyle(overwritter.getCapStyle());
+        setJoinStyle(overwritter.getJoinStyle());
+        setOutlineCompositionMode(overwritter.getOutlineCompositionMode());
         return *this;
     }
-
-    bool wasLineWidthAssigned() const { return mLineWidthAssigned; }
-    bool wasCapStyleAssigned() const { return mCapStyleAssigned; }
-    bool wasJoinStyleAssigned() const { return mJoinStyleAssigned; }
-    bool wasOutlineCompositionModeAssigned() const { return mOutlineCompositionModeAssigned; }
-
     const qreal &getLineWidth() const { return mLineWidth; }
     const Qt::PenCapStyle &getCapStyle() const { return mCapStyle; }
     const Qt::PenJoinStyle &getJoinStyle() const { return mJoinStyle; }
@@ -130,33 +111,25 @@ public:
 
     void setLineWidth(const qreal &val) {
         mLineWidth = val;
-        mLineWidthAssigned = true;
     }
 
     void setCapStyle(const Qt::PenCapStyle &capStyle) {
         mCapStyle = capStyle;
-        mCapStyleAssigned = true;
     }
 
     void setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
         mJoinStyle = joinStyle;
-        mJoinStyleAssigned = true;
     }
 
     void setOutlineCompositionMode(const QPainter::CompositionMode &compMode) {
         mOutlineCompositionMode = compMode;
-        mOutlineCompositionModeAssigned = true;
     }
 
     void apply(BoundingBox *box);
 protected:
-    bool mLineWidthAssigned = false;
     qreal mLineWidth;
-    bool mCapStyleAssigned = false;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
-    bool mJoinStyleAssigned = false;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
-    bool mOutlineCompositionModeAssigned = false;
     QPainter::CompositionMode mOutlineCompositionMode = QPainter::CompositionMode_Source;
 };
 
@@ -173,10 +146,12 @@ public:
         mFillAttributes *= overwritter.getFillAttributes();
         mStrokeAttributes *= overwritter.getStrokeAttributes();
         mTextAttributes *= overwritter.getTextAttributes();
+        mFillRule = overwritter.getFillRule();
 
         return *this;
     }
 
+    const Qt::FillRule &getFillRule() const { return mFillRule; }
     const QMatrix &getRelTransform() const { return mRelTransform; }
     const FillSvgAttributes &getFillAttributes() const { return mFillAttributes; }
     const StrokeSvgAttributes &getStrokeAttributes() const { return mStrokeAttributes; }
@@ -191,6 +166,8 @@ protected:
     FillSvgAttributes mFillAttributes;
     StrokeSvgAttributes mStrokeAttributes;
     TextSvgAttributes mTextAttributes;
+    qreal mOpacity = 100.;
+    Qt::FillRule mFillRule = Qt::OddEvenFill;
 };
 
 class SvgPathPoint {

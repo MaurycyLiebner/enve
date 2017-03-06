@@ -233,11 +233,10 @@ void InternalLinkCanvas::draw(QPainter *p)
 {
     if(mVisible) {
         p->save();
-        p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
         if(mClipToCanvasSize) {
-            p->setClipPath(mMappedBoundingRectPath);
-            //p->setClipRect(mRelBoundingRect);
+            p->setClipRect(mRelBoundingRect);
         }
+        p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
         foreach(BoundingBox *box, mChildBoxes) {
             //box->draw(p);
             box->drawPixmap(p);

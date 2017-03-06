@@ -681,7 +681,6 @@ void BoundingBox::scheduleCenterPivot() {
 void BoundingBox::updateBoundingRect() {
     mRelBoundingRectPath = QPainterPath();
     mRelBoundingRectPath.addRect(mRelBoundingRect);
-    mMappedBoundingRectPath = mUpdateTransform.map(mRelBoundingRectPath);
     updatePixBoundingRectClippedToView();
 
     if(mCenterPivotScheduled) {

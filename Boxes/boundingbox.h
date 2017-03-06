@@ -379,9 +379,14 @@ public:
     }
 
     virtual void drawHovered(QPainter *p) {
-        p->setPen(Qt::red);
+        p->save();
+        p->setTransform(QTransform(mCombinedTransformMatrix), true);
+        QPen pen = QPen(Qt::red, 1.);
+        pen.setCosmetic(true);
+        p->setPen(pen);
         p->setBrush(Qt::NoBrush);
-        p->drawPath(mMappedBoundingRectPath);
+        p->drawPath(mRelBoundingRectPath);
+        p->restore();
     }
 
     virtual void applyPaintSetting(
@@ -454,7 +459,6 @@ protected:
     QRectF mPixBoundingRect;
     QRectF mPixBoundingRectClippedToView;
     QPainterPath mRelBoundingRectPath;
-    QPainterPath mMappedBoundingRectPath;
 
     bool mScheduledForRemove = false;
 
