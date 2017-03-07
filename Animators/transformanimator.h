@@ -53,8 +53,6 @@ public:
     void setPivot(QPointF point, bool finish = false);
     int saveToSql(QSqlQuery *query);
     void loadFromSql(int transformAnimatorId);
-    void setBaseTransformation(const QMatrix &matrix);
-    bool hasBaseTransformation();
 
     void makeDuplicate(QrealAnimator *target);
 
@@ -64,8 +62,6 @@ public:
     void duplicateRotAnimatorFrom(QrealAnimator *source);
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 private:
-    bool mBaseTransformationSet = false;
-    QMatrix mBaseTransformation;
     QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;
     QPointFAnimator mScaleAnimator;

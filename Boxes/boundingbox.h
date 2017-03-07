@@ -120,8 +120,6 @@ public:
     }
 
 
-    QMatrix getCombinedTransform() const;
-
     void applyTransformation(TransformAnimator *transAnimator);
 
     void rotateBy(qreal rot, QPointF absOrigin);
@@ -323,9 +321,6 @@ public:
         return mEffectsMargin;
     }
 
-    void setBaseTransformation(const QMatrix &matrix);
-    bool hasBaseTransformation();
-
     virtual QImage getAllUglyPixmapProvidedTransform(
                         const qreal &effectsMargin,
                         const QMatrix &allUglyTransform,
@@ -410,6 +405,7 @@ public:
                       bool highQuality,
                       qreal scale = 1.);
     virtual void clearCache();
+    QMatrix getCombinedTransform() const;
 protected:
     bool mUpdateDisabled = false;
 

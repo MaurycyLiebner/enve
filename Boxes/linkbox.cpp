@@ -139,7 +139,8 @@ SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
 
 void SameTransformInternalLink::updateCombinedTransform() {
     if(mLinkTarget == NULL) return;
-    mCombinedTransformMatrix = mLinkTarget->getRelativeTransform()*
+    mCombinedTransformMatrix =
+            mLinkTarget->getRelativeTransform()*
             mParent->getCombinedTransform();
 
 

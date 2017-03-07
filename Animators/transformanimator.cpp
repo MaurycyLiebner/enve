@@ -138,8 +138,7 @@ void TransformAnimator::moveRelativeToSavedValue(qreal dX, qreal dY) {
     mPosAnimator.incSavedValueToCurrentValue(dX, dY);
 }
 
-void TransformAnimator::translate(qreal dX, qreal dY)
-{
+void TransformAnimator::translate(qreal dX, qreal dY) {
     mPosAnimator.incCurrentValue(dX, dY);
 }
 
@@ -318,11 +317,14 @@ qreal TransformAnimator::getOpacity()
     return mOpacityAnimator.getCurrentValue();
 }
 
-QMatrix TransformAnimator::getCurrentValue()
-{
-    QMatrix matrix;
+QMatrix TransformAnimator::getCurrentValue() {
+    QMatrix matrix;// = mBaseTransformation;
     qreal pivotX = mPivotAnimator.getXValue();
     qreal pivotY = mPivotAnimator.getYValue();
+//    if(mBaseTransformationSet) {
+//        matrix.translate(mBaseTransformation.dx(),
+//                         mBaseTransformation.dy());
+//    }
     matrix.translate(pivotX + mPosAnimator.getXValue(),
                      pivotY + mPosAnimator.getYValue());
 
@@ -332,15 +334,11 @@ QMatrix TransformAnimator::getCurrentValue()
 
     matrix.translate(-pivotX,
                      -pivotY);
-    if(mBaseTransformationSet) {
-        return mBaseTransformation*matrix;
-    } else {
+//    if(mBaseTransformationSet) {
+//        return mBaseTransformation*matrix;
+//    } else {
         return matrix;
-    }
-}
-
-bool TransformAnimator::hasBaseTransformation() {
-    return mBaseTransformationSet;
+//    }
 }
 
 void TransformAnimator::makeDuplicate(QrealAnimator *target) {
@@ -376,10 +374,4 @@ void TransformAnimator::duplicateRotAnimatorFrom(
 void TransformAnimator::duplicateOpacityAnimatorFrom(
         QrealAnimator *source) {
     source->makeDuplicate(&mOpacityAnimator);
-}
-
-void TransformAnimator::setBaseTransformation(const QMatrix &matrix) {
-    mBaseTransformation = matrix;
-    //mBaseTransformation.translate(-matrix.dx(), -matrix.dy());
-    mBaseTransformationSet = true;
 }

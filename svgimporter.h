@@ -125,7 +125,7 @@ public:
         mOutlineCompositionMode = compMode;
     }
 
-    void apply(BoundingBox *box);
+    void apply(BoundingBox *box, const qreal &scale);
 protected:
     qreal mLineWidth;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
@@ -141,7 +141,7 @@ public:
 
     BoundingBoxSvgAttributes &operator*=(const BoundingBoxSvgAttributes &overwritter)
     {
-        //mRelTransform *= overwritter.getRelTransform();
+        mRelTransform = overwritter.getRelTransform();
 
         mFillAttributes *= overwritter.getFillAttributes();
         mStrokeAttributes *= overwritter.getStrokeAttributes();
@@ -159,8 +159,31 @@ public:
 
     void loadBoundingBoxAttributes(const QDomElement &element);
 
+    bool hasTransform() const {
+        return !(isZero(mRelTransform.dx()) &&
+                 isZero(mRelTransform.dy()) &&
+                 isZero(mRelTransform.m11() - 1.) &&
+                 isZero(mRelTransform.m22() - 1) &&
+                 isZero(mRelTransform.m12()) &&
+                 isZero(mRelTransform.m21())); /*&&
+                 isZero(mDx) && isZero(mDy) &&
+                 isZero(mScaleX - 1.) && isZero(mScaleY - 1.) &&
+                 isZero(mShearX) && isZero(mShearY) &&
+                 isZero(mRot));*/
+    }
+
+    void applySingleTransformations(BoundingBox *box);
+
     void apply(BoundingBox *box);
 protected:
+    qreal mDx = 0.;
+    qreal mDy = 0.;
+    qreal mScaleX = 1.;
+    qreal mScaleY = 1.;
+    qreal mShearX = 0.;
+    qreal mShearY = 0.;
+    qreal mRot = 0.;
+
     QString mId;
     QMatrix mRelTransform;
     FillSvgAttributes mFillAttributes;

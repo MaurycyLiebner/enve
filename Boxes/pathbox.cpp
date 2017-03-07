@@ -111,18 +111,19 @@ void PathBox::loadFromSql(int boundingBoxId) {
 
 void PathBox::updatePathIfNeeded()
 {
-    if(mUpdatePathUpdateNeeded) {
+    if(mPathUpdateNeeded) {
         updatePath();
         if(!mAnimatorsCollection.hasKeys() &&
            !mPivotChanged ) centerPivotPosition();
+        mPathUpdateNeeded = false;
     }
 }
 
 void PathBox::preUpdatePixmapsUpdates() {
     updateEffectsMarginIfNeeded();
-    updatePathIfNeeded();
-    updateOutlinePathIfNeeded();
-    updateBoundingRect();
+//    updatePathIfNeeded();
+//    updateOutlinePathIfNeeded();
+    //updateBoundingRect();
 }
 
 void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
@@ -166,8 +167,9 @@ void PathBox::scheduleOutlinePathUpdate(const bool &replaceCache)
 }
 
 void PathBox::updateOutlinePathIfNeeded() {
-    if(mUpdateOutlinePathUpdateNeeded) {
+    if(mOutlinePathUpdateNeeded) {
         updateOutlinePath();
+        mOutlinePathUpdateNeeded = false;
     }
 }
 
@@ -277,20 +279,10 @@ void PathBox::updateBoundingRect() {
     BoundingBox::updateBoundingRect();
 }
 
-void PathBox::afterSuccessfulUpdate()
-{
-    mUpdatePathUpdateNeeded = false;
-    mUpdateOutlinePathUpdateNeeded = false;
-}
-
 void PathBox::updateUpdateTransform()
 {
-    mUpdatePathUpdateNeeded = mPathUpdateNeeded ||
-            mUpdatePathUpdateNeeded;
-    mUpdateOutlinePathUpdateNeeded = mOutlinePathUpdateNeeded ||
-            mUpdateOutlinePathUpdateNeeded;
-    mPathUpdateNeeded = false;
-    mOutlinePathUpdateNeeded = false;
+    updatePathIfNeeded();
+    updateOutlinePathIfNeeded();
     BoundingBox::updateUpdateTransform();
 }
 

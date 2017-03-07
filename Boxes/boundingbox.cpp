@@ -39,7 +39,6 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mType = type;
 
     mTransformAnimator.reset();
-    mCombinedTransformMatrix.reset();
     if(parent == NULL) return;
     parent->addChild(this);
     updateCombinedTransform();
@@ -61,7 +60,6 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 
     mType = type;
     mTransformAnimator.reset();
-    mCombinedTransformMatrix.reset();
 }
 
 BoundingBox::~BoundingBox() {
@@ -103,10 +101,6 @@ BoundingBox *BoundingBox::createSameTransformationLink(BoxesGroup *parent) {
     return new SameTransformInternalLink(this, parent);
 }
 
-void BoundingBox::setBaseTransformation(const QMatrix &matrix) {
-    mTransformAnimator.setBaseTransformation(matrix);
-}
-
 bool BoundingBox::isAncestor(BoxesGroup *box) const {
     if(mParent == box) return true;
     if(mParent == NULL) return false;
@@ -118,10 +112,6 @@ bool BoundingBox::isAncestor(BoundingBox *box) const {
         return isAncestor((BoxesGroup*)box);
     }
     return false;
-}
-
-bool BoundingBox::hasBaseTransformation() {
-    return mTransformAnimator.hasBaseTransformation();
 }
 
 void BoundingBox::applyEffects(QImage *im,
@@ -203,15 +193,16 @@ void BoundingBox::loadFromSql(int boundingBoxId) {
 
 void BoundingBox::preUpdatePixmapsUpdates() {
     updateEffectsMarginIfNeeded();
-    updateBoundingRect();
+    //updateBoundingRect();
 }
 
 void BoundingBox::updatePixmaps() {
-    if(mRedoUpdate) {
-        mRedoUpdate = false;
-        updateUpdateTransform();
-    }
+//    if(mRedoUpdate) {
+//        mRedoUpdate = false;
+//        updateUpdateTransform();
+//    }
 
+    qDebug() << mName;
     preUpdatePixmapsUpdates();
     if(mUpdateReplaceCache || getRenderContainerAtFrame(mUpdateFrame) == NULL) {
         BoundingBox::updateAllUglyPixmap();
@@ -231,6 +222,8 @@ void BoundingBox::updateUpdateTransform() {
     //mReplaceCache = false;
     mUpdateReplaceCache = mReplaceCache || mUpdateReplaceCache;
     mReplaceCache = false;
+
+    updateBoundingRect();
 }
 
 void BoundingBox::setAwaitingUpdate(bool bT) {
@@ -282,10 +275,10 @@ void BoundingBox::setAwaitingUpdate(bool bT) {
                 mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
             }
         }
-        mUpdateReplaceCache = false;
         updateUglyPaintTransform();
 
-        mParent->scheduleAwaitUpdate();
+        mParent->scheduleAwaitUpdate(mUpdateReplaceCache);
+        mUpdateReplaceCache = false;
     }
 }
 
@@ -790,7 +783,7 @@ void BoundingBox::moveByAbs(QPointF trans) {
 //    QPointF by = mapAbsPosToRel(
 //                trans - mapRelativeToAbsolute(QPointF(0., 0.)));
 
-    mTransformAnimator.moveRelativeToSavedValue(by.x(), by.y());
+    moveByRel(by);
 }
 
 void BoundingBox::moveByRel(QPointF trans) {
@@ -881,7 +874,7 @@ void BoundingBox::updateRelativeTransform(const bool &replaceCache) {
 void BoundingBox::updateCombinedTransform(const bool &replaceCache) {
     if(mParent == NULL) return;
     mCombinedTransformMatrix = mRelativeTransformMatrix*
-            mParent->getCombinedTransform();
+                               mParent->getCombinedTransform();
 
 
     updateAfterCombinedTransformationChanged();

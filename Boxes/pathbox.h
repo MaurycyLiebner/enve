@@ -78,8 +78,6 @@ public:
     void loadFromSql(int boundingBoxId);
     void updateBoundingRect();
 
-    void afterSuccessfulUpdate();
-
     void updateUpdateTransform();
     void copyStrokeAndFillSettingsTo(PathBox *target);
 
@@ -134,9 +132,6 @@ protected:
 
     bool mPathUpdateNeeded = false;
     bool mOutlinePathUpdateNeeded = false;
-
-    bool mUpdatePathUpdateNeeded = false;
-    bool mUpdateOutlinePathUpdateNeeded = false;
 
     QPainterPath mPath;
     QPainterPath mOutlinePath;
