@@ -137,7 +137,7 @@ void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 
     mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
 
-    updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged(false);
 }
 
 void Canvas::scale(qreal scaleBy, QPointF absOrigin)
@@ -820,7 +820,7 @@ void Canvas::resetTransormation() {
     mVisibleWidth = mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
-    updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged(false);
 
 }
 
@@ -828,7 +828,7 @@ void Canvas::fitCanvasToSize() {
     mCombinedTransformMatrix.reset();
     mVisibleHeight = mHeight + 20;
     mVisibleWidth = mWidth + 20;
-    updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged(false);
     qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
     qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
     scale(qMin(heightScale, widthScale), QPointF(0., 0.));
@@ -836,7 +836,7 @@ void Canvas::fitCanvasToSize() {
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
-    updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged(false);
 
 }
 
@@ -850,7 +850,7 @@ void Canvas::moveByRel(QPointF trans)
     mCombinedTransformMatrix.translate(trans.x(), trans.y());
 
     mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
-    updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged(false);
     schedulePivotUpdate();
 }
 
@@ -948,6 +948,13 @@ bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,
 
 void Canvas::setIsCurrentCanvas(const bool &bT) {
     mIsCurrentCanvas = bT;
+}
+
+void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
+    BoxesGroup::addChildAwaitingUpdate(child);
+    if(mAwaitingUpdate) return;
+    mAwaitingUpdate = true;
+    mCanvasWidget->addBoxAwaitingUpdate(this);
 }
 
 int Canvas::getCurrentFrame() {

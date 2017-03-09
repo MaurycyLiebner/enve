@@ -28,7 +28,7 @@ public:
     void schedulePixmapReload();
     void preUpdatePixmapsUpdates();
     void reloadPixmap();
-    void updateUpdateTransform();
+    void setUpdateVars();
     void afterSuccessfulUpdate();
 protected:
     void updateFrameCount(const char *path);

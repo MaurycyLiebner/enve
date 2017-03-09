@@ -42,7 +42,7 @@ void ParticleBox::updateAfterFrameChanged(int currentFrame) {
         emitter->setFrame(currentFrame);
         emitter->scheduleUpdateParticlesForFrame();
     }
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void ParticleBox::updateBoundingRect() {
@@ -424,12 +424,12 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
 
 void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
-    mParentBox->scheduleAwaitUpdate();
+    mParentBox->scheduleUpdate();
 }
 
 void ParticleEmitter::scheduleUpdateParticlesForFrame() {
     mUpdateParticlesForFrameScheduled = true;
-    mParentBox->scheduleAwaitUpdate();
+    mParentBox->scheduleUpdate();
 }
 
 void ParticleEmitter::updateParticlesForFrameIfNeeded() {

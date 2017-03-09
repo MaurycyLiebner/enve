@@ -83,7 +83,6 @@ public:
     void moveChildAbove(BoundingBox *boxToMove,
                         BoundingBox *above);
 
-    void updateAfterCombinedTransformationChanged();
     void removeChildFromList(int id, bool saveUndoRedo = true);
 
     void updateAfterFrameChanged(int currentFrame);
@@ -156,11 +155,29 @@ public:
         }
     }
     void clearCache();
+    void drawPixmap(QPainter *p);
+    void updateAllUglyPixmap();
+    void setDescendantCurrentGroup(const bool &bT);
+    bool isDescendantCurrentGroup();
+    bool shouldPaintOnImage();
+    void drawUpdatePixmap(QPainter *p);
+
+    virtual void addChildAwaitingUpdate(BoundingBox *child);
+    void beforeUpdate();
+    void processUpdate();
+    void afterUpdate();
+    void updateCombinedTransform(const bool &replaceCache);
+    void updateAfterCombinedTransformationChanged(const bool &replaceCache);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
+    bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mChildBoxes;
+
+    bool mUpdateProcessThis = false;
+    QList<BoundingBox*> mChildrenAwaitingUpdate;
+    QList<BoundingBox*> mUpdateChildrenAwaitingUpdate;
 signals:
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);

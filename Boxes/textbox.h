@@ -31,7 +31,7 @@ public:
 
     void setTextAlignment(const Qt::Alignment &alignment) {
         mAlignment = alignment;
-        scheduleAwaitUpdate();
+        scheduleUpdate();
     }
 
     void makeDuplicate(BoundingBox *targetBox) {

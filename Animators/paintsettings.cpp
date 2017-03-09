@@ -336,7 +336,7 @@ bool Gradient::affectsPaths() {
 void Gradient::updatePaths() {
     foreach (PathBox *path, mAffectedPaths) {
         path->updateDrawGradients();
-        path->scheduleAwaitUpdate();
+        path->scheduleUpdate();
     }
 }
 

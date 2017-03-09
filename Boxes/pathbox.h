@@ -48,7 +48,7 @@ public:
 
     void setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
         mStrokeSettings.setOutlineCompositionMode(compositionMode);
-        scheduleAwaitUpdate();
+        scheduleUpdate();
     }
 
     void startSelectedStrokeWidthTransform() {
@@ -78,7 +78,7 @@ public:
     void loadFromSql(int boundingBoxId);
     void updateBoundingRect();
 
-    void updateUpdateTransform();
+    void setUpdateVars();
     void copyStrokeAndFillSettingsTo(PathBox *target);
 
     VectorPath *objectToPath();
@@ -108,7 +108,7 @@ public:
     void applyPaintSetting(
             const PaintSetting &setting) {
         setting.apply(this);
-        scheduleAwaitUpdate();
+        scheduleUpdate();
     }
 
     void setFillColorMode(const ColorMode &colorMode) {
@@ -133,13 +133,15 @@ protected:
     bool mPathUpdateNeeded = false;
     bool mOutlinePathUpdateNeeded = false;
 
+    QPainterPath mUpdatePath;
+    QPainterPath mUpdateOutlinePath;
     QPainterPath mPath;
     QPainterPath mOutlinePath;
     QPainterPathStroker mPathStroker;
     QPainterPath mWholePath;
     void updateWholePath();
     void updateAfterTransformationChanged();
-    void updateAfterCombinedTransformationChanged();
+    void updateAfterCombinedTransformationChanged(const bool &replaceCache);
 
     virtual void updatePath() {}
 

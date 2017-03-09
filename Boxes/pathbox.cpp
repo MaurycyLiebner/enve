@@ -113,6 +113,7 @@ void PathBox::updatePathIfNeeded()
 {
     if(mPathUpdateNeeded) {
         updatePath();
+        mUpdatePath = mPath;
         if(!mAnimatorsCollection.hasKeys() &&
            !mPivotChanged ) centerPivotPosition();
         mPathUpdateNeeded = false;
@@ -147,7 +148,7 @@ void PathBox::makeDuplicate(BoundingBox *targetBox) {
 }
 
 void PathBox::schedulePathUpdate(const bool &replaceCache) {
-    scheduleAwaitUpdate(replaceCache);
+    scheduleUpdate(replaceCache);
     if(mPathUpdateNeeded) {
         return;
     }
@@ -158,7 +159,7 @@ void PathBox::schedulePathUpdate(const bool &replaceCache) {
 
 void PathBox::scheduleOutlinePathUpdate(const bool &replaceCache)
 {
-    scheduleAwaitUpdate(replaceCache);
+    scheduleUpdate(replaceCache);
     if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
     }
@@ -169,11 +170,12 @@ void PathBox::scheduleOutlinePathUpdate(const bool &replaceCache)
 void PathBox::updateOutlinePathIfNeeded() {
     if(mOutlinePathUpdateNeeded) {
         updateOutlinePath();
+        mUpdateOutlinePath = mOutlinePath;
         mOutlinePathUpdateNeeded = false;
     }
 }
 
-void PathBox::updateAfterCombinedTransformationChanged() {
+void PathBox::updateAfterCombinedTransformationChanged(const bool &replaceCache) {
 }
 
 void PathBox::copyStrokeAndFillSettingsTo(PathBox *target) {
@@ -279,11 +281,11 @@ void PathBox::updateBoundingRect() {
     BoundingBox::updateBoundingRect();
 }
 
-void PathBox::updateUpdateTransform()
+void PathBox::setUpdateVars()
 {
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
-    BoundingBox::updateUpdateTransform();
+    BoundingBox::setUpdateVars();
 }
 
 void PathBox::draw(QPainter *p)
@@ -299,7 +301,7 @@ void PathBox::draw(QPainter *p)
         } else{
             p->setBrush(Qt::NoBrush);
         }
-        p->drawPath(mPath);
+        p->drawPath(mUpdatePath);
         if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawStrokeGradient);
         } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
@@ -309,7 +311,7 @@ void PathBox::draw(QPainter *p)
         }
 
         p->setCompositionMode(mStrokeSettings.getOutlineCompositionMode());
-        p->drawPath(mOutlinePath);
+        p->drawPath(mUpdateOutlinePath);
 
         p->restore();
     }

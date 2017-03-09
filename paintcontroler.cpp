@@ -6,6 +6,6 @@ PaintControler::PaintControler(QObject *parent) : QObject(parent)
 }
 
 void PaintControler::updateBoxPixmaps(BoundingBox *box) {
-    box->updatePixmaps();
+    box->processUpdate();
     emit finishedUpdatingLastBox();
 }

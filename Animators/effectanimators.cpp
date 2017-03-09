@@ -60,3 +60,7 @@ qreal EffectAnimators::getEffectsMargin() const {
     }
     return newMargin;
 }
+
+bool EffectAnimators::hasEffects() {
+    return !mChildAnimators.isEmpty();
+}

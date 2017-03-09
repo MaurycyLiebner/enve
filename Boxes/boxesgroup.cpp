@@ -25,7 +25,7 @@ void BoxesGroup::updateAllBoxes() {
     foreach(BoundingBox *child, mChildBoxes) {
         child->updateAllBoxes();
     }
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void BoxesGroup::clearCache() {
@@ -273,8 +273,58 @@ void BoxesGroup::updateEffectsMargin() {
     mEffectsMargin += childrenMargin;
 }
 
-void BoxesGroup::draw(QPainter *p)
-{
+void BoxesGroup::drawUpdatePixmap(QPainter *p) {
+    if(shouldPaintOnImage()) {
+        BoundingBox::drawUpdatePixmap(p);
+    } else {
+        foreach(BoundingBox *box, mChildBoxes) {
+            box->drawUpdatePixmap(p);
+        }
+    }
+}
+
+void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
+    mChildrenAwaitingUpdate << child;
+    qDebug() << "add child " + child->getName() + " to " + mName;
+
+    if(mParent == NULL) return;
+    scheduleUpdate(shouldPaintOnImage());
+}
+
+void BoxesGroup::beforeUpdate() {
+    qDebug() << "Group before " + mName + " " << mChildrenAwaitingUpdate.count();
+    foreach(BoundingBox *child, mChildrenAwaitingUpdate) {
+        child->beforeUpdate();
+        mUpdateChildrenAwaitingUpdate.append(child);
+    }
+    mUpdateProcessThis = shouldPaintOnImage();
+
+    mChildrenAwaitingUpdate.clear();
+    BoundingBox::beforeUpdate();
+}
+
+void BoxesGroup::processUpdate() {
+    qDebug() << "Group process " + mName + " " << mUpdateChildrenAwaitingUpdate.count();
+    foreach(BoundingBox *child, mUpdateChildrenAwaitingUpdate) {
+        child->processUpdate();
+    }
+    if(mUpdateProcessThis) {
+        BoundingBox::processUpdate();
+    }
+}
+
+void BoxesGroup::afterUpdate() {
+    qDebug() << "Group after " + mName;
+    foreach(BoundingBox *child, mUpdateChildrenAwaitingUpdate) {
+        child->afterUpdate();
+    }
+    mUpdateChildrenAwaitingUpdate.clear();
+    if(mUpdateProcessThis) {
+        BoundingBox::afterUpdate();
+    }
+}
+
+void BoxesGroup::draw(QPainter *p) {
     if(mVisible) {
         p->save();
         p->setTransform(QTransform(
@@ -282,10 +332,35 @@ void BoxesGroup::draw(QPainter *p)
                             true);
         foreach(BoundingBox *box, mChildBoxes) {
             //box->draw(p);
-            box->drawPixmap(p);
+            box->drawUpdatePixmap(p);
         }
 
         p->restore();
+    }
+}
+
+void BoxesGroup::updateAllUglyPixmap() {
+    if(shouldPaintOnImage()) {
+        Canvas *parentCanvas = getParentCanvas();
+        QMatrix inverted = mUpdateCanvasTransform.inverted().
+                                scale(parentCanvas->getResolutionPercent(),
+                                      parentCanvas->getResolutionPercent());
+        mUpdateRenderContainer->updateVariables(
+                    mUpdateTransform,
+                    inverted*mUpdateTransform,
+                    mEffectsMargin,
+                    parentCanvas->getResolutionPercent(),
+                    this);
+    }
+}
+void BoxesGroup::drawPixmap(QPainter *p) {
+    if(shouldPaintOnImage()) {
+        BoundingBox::drawPixmap(p);
+    } else {
+        foreach(BoundingBox *box, mChildBoxes) {
+            //box->draw(p);
+            box->drawPixmap(p);
+        }
     }
 }
 
@@ -308,23 +383,36 @@ void BoxesGroup::drawBoundingRect(QPainter *p) {
     p->restore();
 }
 
-void BoxesGroup::setIsCurrentGroup(bool bT)
-{
+void BoxesGroup::setIsCurrentGroup(bool bT) {
     mIsCurrentGroup = bT;
     if(!bT) {
         if(mChildBoxes.isEmpty() && mParent != NULL) {
             mParent->removeChild(this);
         }
     }
-    
+    setDescendantCurrentGroup(bT);
 }
 
 bool BoxesGroup::isCurrentGroup() {
     return mIsCurrentGroup;
 }
 
-BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos)
-{
+bool BoxesGroup::isDescendantCurrentGroup() {
+    return mIsDescendantCurrentGroup;
+}
+
+bool BoxesGroup::shouldPaintOnImage() {
+    return mEffectsAnimators.hasEffects() &&
+           !mIsDescendantCurrentGroup;
+}
+
+void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
+    mIsDescendantCurrentGroup = bT;
+    if(mParent == NULL) return;
+    mParent->setDescendantCurrentGroup(bT);
+}
+
+BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos) {
     BoundingBox *boxAtPos = NULL;
     //foreachBoxInListInverted(mChildren) {
     BoundingBox *box;
@@ -558,7 +646,7 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
         addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }
 
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void BoxesGroup::moveChildBelow(BoundingBox *boxToMove,
@@ -585,9 +673,13 @@ void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
                     indexTo);
 }
 
-void BoxesGroup::updateAfterCombinedTransformationChanged() {
+void BoxesGroup::updateCombinedTransform(const bool &replaceCache) {
+    BoundingBox::updateCombinedTransform(replaceCache);
+}
+
+void BoxesGroup::updateAfterCombinedTransformationChanged(const bool &replaceCache) {
     foreach(BoundingBox *child, mChildBoxes) {
-        child->updateCombinedTransform(mType != TYPE_CANVAS);
+        child->updateCombinedTransform(mType != TYPE_CANVAS && replaceCache);
     }
 }
 

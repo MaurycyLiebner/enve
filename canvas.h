@@ -62,7 +62,7 @@ public:
     void setPivotPositionForSelected();
 
     void awaitUpdate() {}
-    void scheduleAwaitUpdate(const bool &) {}
+    void scheduleUpdate(const bool &) {}
 
     void saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);
@@ -256,12 +256,14 @@ public:
     }
 
     void updateCombinedTransform() {
-        updateAfterCombinedTransformationChanged();
+        updateAfterCombinedTransformationChanged(false);
     }
 
     void setIsCurrentCanvas(const bool &bT);
 
     void scheduleEffectsMarginUpdate() {}
+
+    void addChildAwaitingUpdate(BoundingBox *child);
 protected:
 //    void updateAfterCombinedTransformationChanged();
 

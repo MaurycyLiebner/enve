@@ -51,7 +51,8 @@ const int &BoundingBoxRenderContainer::getFrame() const {
     return mFrame;
 }
 
-void BoundingBoxRenderContainer::updateVariables(const QMatrix &transform,
+void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransform,
+                                                 const QMatrix &transform,
                                                  const qreal &effectsMargin,
                                                  const qreal &resolutionPer,
                                                  BoundingBox *target) {
@@ -62,7 +63,7 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &transform,
                 resolutionPer*effectsMargin,
                 mTransform,
                 &mBoundingRect);
-    mPaintTransform.reset();
+    updatePaintTransformGivenNewCombinedTransform(combinedTransform);
 
     target->applyEffects(&mImage,
                          false,

@@ -58,11 +58,11 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 }
 
 void DisplayedFillStrokeSettingsUpdater::update() {
-    mTarget->scheduleAwaitUpdate();
+    mTarget->scheduleUpdate();
 }
 
 void DisplayedFillStrokeSettingsUpdater::softUpdate() {
-    mTarget->scheduleAwaitUpdate(false);
+    mTarget->scheduleUpdate(false);
 }
 
 PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
@@ -101,9 +101,9 @@ void GradientPointsUpdater::update() {
     } else {
         mTarget->updateStrokeDrawGradient();
     }
-    mTarget->scheduleAwaitUpdate();
+    mTarget->scheduleUpdate();
 }
 
 void GradientPointsUpdater::softUpdate() {
-    mTarget->scheduleAwaitUpdate(false);
+    mTarget->scheduleUpdate(false);
 }

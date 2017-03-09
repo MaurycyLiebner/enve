@@ -21,7 +21,7 @@ void ExternalLinkBox::reload() {
 
     db.close();
 
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void ExternalLinkBox::changeSrc() {
@@ -61,7 +61,7 @@ BoundingBox *InternalLinkBox::createSameTransformationLink(BoxesGroup *parent) {
 }
 
 void InternalLinkBox::scheduleAwaitUpdateSLOT() {
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void InternalLinkBox::updateBoundingRect() {
@@ -137,16 +137,16 @@ SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
     InternalLinkBox(linkTarget, parent) {
 }
 
-void SameTransformInternalLink::updateCombinedTransform() {
+void SameTransformInternalLink::updateCombinedTransform(const bool &replaceCache) {
     if(mLinkTarget == NULL) return;
     mCombinedTransformMatrix =
             mLinkTarget->getRelativeTransform()*
             mParent->getCombinedTransform();
 
 
-    updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged(replaceCache);
 
-    scheduleAwaitUpdate();
+    scheduleUpdate();
     updateUglyPaintTransform();
 }
 
@@ -182,9 +182,9 @@ void SameTransformInternalLinkBoxesGroup::updateCombinedTransform() {
             mParent->getCombinedTransform();
 
 
-    updateAfterCombinedTransformationChanged();
+    updateAfterCombinedTransformationChanged(false);
 
-    scheduleAwaitUpdate();
+    scheduleUpdate();
     updateUglyPaintTransform();
 }
 
@@ -227,7 +227,7 @@ void InternalLinkCanvas::updateBoundingRect() {
 
 void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
     mClipToCanvasSize = clipped;
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void InternalLinkCanvas::draw(QPainter *p)

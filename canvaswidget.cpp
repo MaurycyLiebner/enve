@@ -547,6 +547,7 @@ void CanvasWidget::addBoxAwaitingUpdate(BoundingBox *box) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
         mLastUpdatedBox = box;
+        mLastUpdatedBox->beforeUpdate();
         emit updateBoxPixmaps(box);
     } else {
         mBoxesAwaitingUpdate << box;
@@ -555,11 +556,12 @@ void CanvasWidget::addBoxAwaitingUpdate(BoundingBox *box) {
 
 void CanvasWidget::sendNextBoxForUpdate() {
     if(mLastUpdatedBox != NULL) {
-        mLastUpdatedBox->setAwaitingUpdate(false);
-        if(mLastUpdatedBox->shouldRedoUpdate()) {
-            mLastUpdatedBox->setRedoUpdateToFalse();
-            mLastUpdatedBox->awaitUpdate();
-        }
+        mLastUpdatedBox->afterUpdate();
+//        mLastUpdatedBox->setAwaitingUpdate(false);
+//        if(mLastUpdatedBox->shouldRedoUpdate()) {
+//            mLastUpdatedBox->setRedoUpdateToFalse();
+//            mLastUpdatedBox->awaitUpdate();
+//        }
     }
     if(mBoxesAwaitingUpdate.isEmpty()) {
         mNoBoxesAwaitUpdate = true;
@@ -571,6 +573,7 @@ void CanvasWidget::sendNextBoxForUpdate() {
         //callUpdateSchedulers();
     } else {
         mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
+        mLastUpdatedBox->beforeUpdate();
         emit updateBoxPixmaps(mLastUpdatedBox);
     }
 }

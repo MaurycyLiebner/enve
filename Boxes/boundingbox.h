@@ -104,7 +104,7 @@ public:
     virtual bool isContainedIn(QRectF absRect);
     virtual QRectF getPixBoundingRect();
 
-    void drawPixmap(QPainter *p);
+    virtual void drawPixmap(QPainter *p);
     virtual void drawPreviewPixmap(QPainter *p);
     virtual void renderFinal(QPainter *p);
 
@@ -269,14 +269,13 @@ public:
 
     virtual void updatePixmaps();
     void updatePrettyPixmap();
-    void setAwaitingUpdate(bool bT);
-    virtual void awaitUpdate();
+
     QRectF getBoundingRectClippedToView();
     void saveOldPixmap();
 
     void saveUglyPaintTransform();
     void drawAsBoundingRect(QPainter *p, QPainterPath path);
-    virtual void updateUpdateTransform();
+    virtual void setUpdateVars();
     void updateUglyPaintTransform();
     void redoUpdate();
     bool shouldRedoUpdate();
@@ -285,11 +284,11 @@ public:
     virtual void afterSuccessfulUpdate() {}
 
     void updateRelativeTransform(const bool &replaceCache = true);
-    void updateAllUglyPixmap();
+    virtual void updateAllUglyPixmap();
     QPointF mapAbsPosToRel(QPointF absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
-    virtual void scheduleAwaitUpdate(const bool &replaceCache = true);
+    virtual void scheduleUpdate(const bool &replaceCache = true);
     void setAwaitUpdateScheduled(bool bT);
 
     void setCompositionMode(QPainter::CompositionMode compositionMode);
@@ -406,6 +405,11 @@ public:
                       qreal scale = 1.);
     virtual void clearCache();
     QMatrix getCombinedTransform() const;
+    virtual void drawUpdatePixmap(QPainter *p);
+
+    virtual void processUpdate();
+    virtual void afterUpdate();
+    virtual void beforeUpdate();
 protected:
     bool mUpdateDisabled = false;
 
@@ -422,7 +426,7 @@ protected:
 
     bool mAwaitUpdateScheduled = false;
 
-    virtual void updateAfterCombinedTransformationChanged() {}
+    virtual void updateAfterCombinedTransformationChanged(const bool &replaceCache) {}
 
     std::unordered_map<int, BoundingBoxRenderContainer*> mRenderContainers;
 

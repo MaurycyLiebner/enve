@@ -25,7 +25,7 @@ void VideoBox::updateAfterFrameChanged(int currentFrame) {
         schedulePixmapReload();
     } else {
         mPixmapReloadScheduled = false;
-        scheduleAwaitUpdate(false);
+        scheduleUpdate(false);
     }
 }
 
@@ -233,8 +233,8 @@ int VideoBox::getImageAtFrame(const char* path,
     return 0;
 }
 
-void VideoBox::updateUpdateTransform() {
-    BoundingBox::updateUpdateTransform();
+void VideoBox::setUpdateVars() {
+    BoundingBox::setUpdateVars();
     mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
     mUpdateVideoFrame = mCurrentVideoFrame;
     if(!mUpdatePixmapReloadScheduled) {
@@ -248,7 +248,7 @@ void VideoBox::updateUpdateTransform() {
 void VideoBox::schedulePixmapReload() {
     if(mPixmapReloadScheduled) return;
     mPixmapReloadScheduled = true;
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void VideoBox::preUpdatePixmapsUpdates() {

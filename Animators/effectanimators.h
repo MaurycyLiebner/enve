@@ -26,6 +26,7 @@ public:
         return mParentBox;
     }
 
+    bool hasEffects();
 private:
     BoundingBox *mParentBox;
 };

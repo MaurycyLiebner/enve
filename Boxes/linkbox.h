@@ -35,7 +35,7 @@ public:
 
     void setLinkTarget(BoundingBox *linkTarget) {
         mLinkTarget = linkTarget;
-        scheduleAwaitUpdate();
+        scheduleUpdate();
         if(linkTarget == NULL) {
             setName("Link Empty");
             return;
@@ -90,7 +90,7 @@ public:
     SameTransformInternalLink(BoundingBox *linkTarget,
                               BoxesGroup *parent);
 
-    void updateCombinedTransform();
+    void updateCombinedTransform(const bool &replaceCache = true);
 
     QMatrix getRelativeTransform() const;
 

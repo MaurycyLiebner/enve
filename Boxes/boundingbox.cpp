@@ -202,10 +202,9 @@ void BoundingBox::updatePixmaps() {
 //        updateUpdateTransform();
 //    }
 
-    qDebug() << mName;
     preUpdatePixmapsUpdates();
     if(mUpdateReplaceCache || getRenderContainerAtFrame(mUpdateFrame) == NULL) {
-        BoundingBox::updateAllUglyPixmap();
+        updateAllUglyPixmap();
         if(getParentCanvas()->highQualityPaint()) {
             updatePrettyPixmap();
             mHighQualityPaint = true;
@@ -215,72 +214,61 @@ void BoundingBox::updatePixmaps() {
     }
 }
 
-void BoundingBox::updateUpdateTransform() {
-    mUpdateCanvasTransform = getParentCanvas()->getCombinedTransform();
-    mUpdateTransform = mCombinedTransformMatrix;
-    mUpdateFrame = mCurrentFrame;
-    //mReplaceCache = false;
-    mUpdateReplaceCache = mReplaceCache || mUpdateReplaceCache;
-    mReplaceCache = false;
+//void BoundingBox::setAwaitingUpdate(bool bT) {
+//    mAwaitingUpdate = bT;
+//    if(bT) {
+//        setUpdateVars();
+//        if(!mUpdateReplaceCache) {
+//            BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
+//                                                    mUpdateFrame);
+//            if(cont != NULL) {
+//                mOldRenderContainer = cont;
+//                mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+//                            mCombinedTransformMatrix);
+//            }
+//        }
+//    } else {
+//        afterSuccessfulUpdate();
+//        //mReplaceCache = false;
 
-    updateBoundingRect();
-}
+//        if(mHighQualityPaint) {
+//            mOldPixmap = mNewPixmap;
+//            mOldPixBoundingRect = mPixBoundingRectClippedToView;
+//            mOldTransform = mUpdateTransform;
+//        }
 
-void BoundingBox::setAwaitingUpdate(bool bT) {
-    mAwaitingUpdate = bT;
-    if(bT) {
-        updateUpdateTransform();
-        if(!mUpdateReplaceCache) {
-            BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
-                                                    mUpdateFrame);
-            if(cont != NULL) {
-                mOldRenderContainer = cont;
-                mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
-                            mCombinedTransformMatrix);
-            }
-        }
-    } else {
-        afterSuccessfulUpdate();
-        //mReplaceCache = false;
+////        mUpdateRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+////                                            mCombinedTransformMatrix);
 
-        if(mHighQualityPaint) {
-            mOldPixmap = mNewPixmap;
-            mOldPixBoundingRect = mPixBoundingRectClippedToView;
-            mOldTransform = mUpdateTransform;
-        }
+//        if(mUpdateReplaceCache) {
+//            for(auto pair : mRenderContainers) {
+//                delete pair.second;
+//            }
 
-        mUpdateRenderContainer->updatePaintTransformGivenNewCombinedTransform(
-                                            mCombinedTransformMatrix);
+//            mRenderContainers.clear();
+//            mOldRenderContainer = getRenderContainerAtFrame(
+//                                            mUpdateFrame);
 
-        if(mUpdateReplaceCache) {
-            for(auto pair : mRenderContainers) {
-                delete pair.second;
-            }
+//            if(mOldRenderContainer == NULL) {
+//                mOldRenderContainer = new BoundingBoxRenderContainer();
+//                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+//            }
+//            mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+//        } else {
+//            mOldRenderContainer = getRenderContainerAtFrame(
+//                                            mUpdateFrame);
+//            if(mOldRenderContainer == NULL) {
+//                mOldRenderContainer = new BoundingBoxRenderContainer();
+//                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+//                mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+//            }
+//        }
+//        updateUglyPaintTransform();
 
-            mRenderContainers.clear();
-            mOldRenderContainer = getRenderContainerAtFrame(
-                                            mUpdateFrame);
-
-            if(mOldRenderContainer == NULL) {
-                mOldRenderContainer = new BoundingBoxRenderContainer();
-                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
-            }
-            mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-        } else {
-            mOldRenderContainer = getRenderContainerAtFrame(
-                                            mUpdateFrame);
-            if(mOldRenderContainer == NULL) {
-                mOldRenderContainer = new BoundingBoxRenderContainer();
-                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
-                mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-            }
-        }
-        updateUglyPaintTransform();
-
-        mParent->scheduleAwaitUpdate(mUpdateReplaceCache);
-        mUpdateReplaceCache = false;
-    }
-}
+//        mParent->scheduleUpdate(mUpdateReplaceCache);
+//        mUpdateReplaceCache = false;
+//    }
+//}
 
 QRectF BoundingBox::getBoundingRectClippedToView() {
     return mPixBoundingRectClippedToView;
@@ -342,7 +330,7 @@ void BoundingBox::updatePrettyPixmap() {
 }
 
 void BoundingBox::updateAllBoxes() {
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void BoundingBox::clearCache() {
@@ -355,7 +343,7 @@ void BoundingBox::clearCache() {
     mRenderContainers.insert({mOldRenderContainer->getFrame(),
                               mOldRenderContainer});
 
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 QRectF BoundingBox::getPixBoundingRect()
@@ -412,6 +400,7 @@ void BoundingBox::updateAllUglyPixmap() {
                                   parentCanvas->getResolutionPercent());
 
     mUpdateRenderContainer->updateVariables(
+                mUpdateTransform,
                 inverted*mUpdateTransform,
                 mEffectsMargin,
                 parentCanvas->getResolutionPercent(),
@@ -472,6 +461,15 @@ void BoundingBox::redoUpdate() {
     mRedoUpdate = true;
 }
 
+void BoundingBox::drawUpdatePixmap(QPainter *p) {
+    p->save();
+    p->setCompositionMode(mCompositionMode);
+    p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
+    mUpdateRenderContainer->draw(p);
+    p->restore();
+}
+
+
 void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
     p->setCompositionMode(mCompositionMode);
@@ -513,35 +511,10 @@ void BoundingBox::drawPixmap(QPainter *p) {
     //if(mSelected) drawBoundingRect(p);
 }
 
-void BoundingBox::awaitUpdate() {
-    if(mAwaitingUpdate || mParent == NULL) return;
-    setAwaitingUpdate(true);
-    mMainWindow->getCanvasWidget()->addBoxAwaitingUpdate(this);
-}
-
-#include "updatescheduler.h"
-void BoundingBox::scheduleAwaitUpdate(const bool &replaceCache) {
-    //if(mUpdateDisabled) return;
-    mReplaceCache = replaceCache || mReplaceCache;
-    if(mAwaitingUpdate) {
-        redoUpdate();
-    } else {
-        if(mAwaitUpdateScheduled) return;
-        setAwaitUpdateScheduled(true);
-        addUpdateScheduler(new AwaitUpdateUpdateScheduler(this));
-    }
-
-    emit scheduleAwaitUpdateAllLinkBoxes();
-}
-
-void BoundingBox::setAwaitUpdateScheduled(bool bT) {
-    mAwaitUpdateScheduled = bT;
-}
-
 void BoundingBox::setCompositionMode(QPainter::CompositionMode compositionMode)
 {
     mCompositionMode = compositionMode;
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void BoundingBox::updateEffectsMarginIfNeeded() {
@@ -557,7 +530,7 @@ void BoundingBox::updateEffectsMargin() {
 
 void BoundingBox::scheduleEffectsMarginUpdate(
                             const bool &replaceCached) {
-    scheduleAwaitUpdate(replaceCached);
+    scheduleUpdate(replaceCached);
     mEffectsMarginUpdateNeeded = true;
     if(mParent == NULL) return;
     mParent->scheduleEffectsMarginUpdate();
@@ -651,7 +624,8 @@ void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
     schedulePivotUpdate();
 }
 
-void BoundingBox::setPivotAbsPos(QPointF absPos, bool saveUndoRedo, bool pivotChanged) {
+void BoundingBox::setPivotAbsPos(QPointF absPos,
+                                 bool saveUndoRedo, bool pivotChanged) {
     QPointF newPos = mapAbsPosToRel(absPos);
     setPivotRelPos(newPos, saveUndoRedo, pivotChanged);
     updateCombinedTransform();
@@ -877,15 +851,14 @@ void BoundingBox::updateCombinedTransform(const bool &replaceCache) {
                                mParent->getCombinedTransform();
 
 
-    updateAfterCombinedTransformationChanged();
-
-    scheduleAwaitUpdate(replaceCache);
+    updateAfterCombinedTransformationChanged(replaceCache);
+    scheduleUpdate(replaceCache);
     updateUglyPaintTransform();
 }
 
 void BoundingBox::updateUglyPaintTransform() {
     mUglyPaintTransform = mOldTransform.inverted()*
-            mCombinedTransformMatrix;
+                          mCombinedTransformMatrix;
     mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
                                             mCombinedTransformMatrix);
 }
@@ -928,7 +901,7 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     mEffectsAnimators.addChildAnimator(effect);
 
     scheduleEffectsMarginUpdate();
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
@@ -939,7 +912,7 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
     effect->decNumberPointers();
 
     scheduleEffectsMarginUpdate();
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 }
 
 QrealAnimator *BoundingBox::getAnimatorsCollection() {
@@ -993,7 +966,7 @@ void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
     }
     mVisible = visible;
 
-    scheduleAwaitUpdate();
+    scheduleUpdate();
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
@@ -1178,4 +1151,76 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
     } else {
 
     }
+    return false;
+}
+
+void BoundingBox::beforeUpdate() {
+    qDebug() << "Box before " + mName;
+    setUpdateVars();
+//    if(!mUpdateReplaceCache) {
+//        BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
+//                                                mUpdateFrame);
+//        if(cont != NULL) {
+//            mOldRenderContainer = cont;
+//            mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+//                        mCombinedTransformMatrix);
+//        }
+//    }
+    mAwaitingUpdate = false;
+}
+
+void BoundingBox::processUpdate() {
+    qDebug() << "Box process " + mName;
+
+    updatePixmaps();
+}
+
+void BoundingBox::afterUpdate() {
+    qDebug() << "Box after " + mName;
+
+    afterSuccessfulUpdate();
+
+    if(mUpdateReplaceCache) {
+        for(auto pair : mRenderContainers) {
+            delete pair.second;
+        }
+
+        mRenderContainers.clear();
+        mOldRenderContainer = getRenderContainerAtFrame(
+                                        mUpdateFrame);
+
+        if(mOldRenderContainer == NULL) {
+            mOldRenderContainer = new BoundingBoxRenderContainer();
+            mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+        }
+        mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+    } else {
+        mOldRenderContainer = getRenderContainerAtFrame(
+                                        mUpdateFrame);
+        if(mOldRenderContainer == NULL) {
+            mOldRenderContainer = new BoundingBoxRenderContainer();
+            mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+            mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+        }
+    }
+    //updateUglyPaintTransform();
+
+    mUpdateReplaceCache = false;
+}
+
+void BoundingBox::setUpdateVars() {
+    mUpdateCanvasTransform = getParentCanvas()->getCombinedTransform();
+    mUpdateTransform = mCombinedTransformMatrix;
+    mUpdateFrame = mCurrentFrame;
+    mUpdateReplaceCache = mReplaceCache || mUpdateReplaceCache || true;
+    mReplaceCache = false;
+
+    updateBoundingRect();
+}
+
+void BoundingBox::scheduleUpdate(const bool &replaceCache) {
+    mReplaceCache = replaceCache || mReplaceCache;
+    if(mAwaitingUpdate) return;
+    mAwaitingUpdate = true;
+    mParent->addChildAwaitingUpdate(this);
 }
