@@ -70,22 +70,15 @@ BlurEffect::BlurEffect(qreal radius) {
 void BlurEffect::apply(BoundingBox *target,
                        QImage *imgPtr,
                        const fmt_filters::image &img,
-                       qreal scale,
-                       bool highQuality) {
+                       qreal scale) {
     Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius.getCurrentValue()*scale;
     //fmt_filters::blur(img, radius, radius*0.3333);
     //return;
-    if(highQuality) {
-        //fmt_filters::fast_blur(img, radius*0.5);
-        fmt_filters::fast_blur(img, radius*0.25);
-        fmt_filters::fast_blur(img, radius*0.25);
-        //fmt_filters::blur(img, radius, radius*0.3333);
-    } else {
-        fmt_filters::fast_blur(img, radius*0.25);
-        fmt_filters::fast_blur(img, radius*0.25);
-        //fmt_filters::fast_blur(img, radius*0.5);
-    }
+    //fmt_filters::fast_blur(img, radius*0.5);
+    fmt_filters::fast_blur(img, radius*0.25);
+    fmt_filters::fast_blur(img, radius*0.25);
+    //fmt_filters::blur(img, radius, radius*0.3333);
 }
 
 qreal BlurEffect::getMargin()
@@ -172,8 +165,7 @@ ShadowEffect::ShadowEffect(qreal radius) {
 void ShadowEffect::apply(BoundingBox *target,
                          QImage *imgPtr,
                          const fmt_filters::image &img,
-                         qreal scale,
-                         bool highQuality) {
+                         qreal scale) {
     Q_UNUSED(imgPtr);
 
     QImage shadowQImg = imgPtr->copy();
@@ -195,15 +187,10 @@ void ShadowEffect::apply(BoundingBox *target,
 
 
     qreal radius = mBlurRadius.getCurrentValue()*scale;
-    if(highQuality) {
-        //fmt_filters::blur(shadowImg, radius, radius*0.3333);
-        fmt_filters::fast_blur(shadowImg, radius*0.25);
-        fmt_filters::fast_blur(shadowImg, radius*0.25);
-    } else {
-        //fmt_filters::fast_blur(shadowImg, radius*0.5);
-        fmt_filters::fast_blur(shadowImg, radius*0.25);
-        fmt_filters::fast_blur(shadowImg, radius*0.25);
-    }
+    //fmt_filters::blur(shadowImg, radius, radius*0.3333);
+    fmt_filters::fast_blur(shadowImg, radius*0.25);
+    fmt_filters::fast_blur(shadowImg, radius*0.25);
+    //fmt_filters::fast_blur(shadowImg, radius*0.5);
 
     QPainter p(imgPtr);
     p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
@@ -268,8 +255,7 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect()
 void LinesEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
-                        qreal scale,
-                        bool highQuality)
+                        qreal scale)
 {
     qreal linesWidth = mLinesWidth.getCurrentValue()*scale;
     qreal linesDistance = mLinesDistance.getCurrentValue()*scale;
@@ -333,8 +319,7 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
 void CirclesEffect::apply(BoundingBox *target,
                           QImage *imgPtr,
                           const fmt_filters::image &img,
-                          qreal scale,
-                          bool highQuality)
+                          qreal scale)
 {
     qreal radius = mCirclesRadius.getCurrentValue()*scale;
     qreal distance = mCirclesDistance.getCurrentValue()*scale;
@@ -395,8 +380,7 @@ SwirlEffect::SwirlEffect(qreal degrees) {
 void SwirlEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
-                        qreal scale,
-                        bool highQuality) {
+                        qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::swirl(img,
                        mDegreesAnimator.getCurrentValue(),
@@ -416,8 +400,7 @@ OilEffect::OilEffect(qreal radius) {
 void OilEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
-                        qreal scale,
-                        bool highQuality) {
+                        qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::oil(img,
                      mRadiusAnimator.getCurrentValue());
@@ -436,8 +419,7 @@ ImplodeEffect::ImplodeEffect(qreal radius) {
 void ImplodeEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
-                        qreal scale,
-                        bool highQuality) {
+                        qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::implode(img,
                          mFactorAnimator.getCurrentValue(),
@@ -458,8 +440,7 @@ DesaturateEffect::DesaturateEffect(qreal radius) {
 void DesaturateEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
-                        qreal scale,
-                        bool highQuality) {
+                        qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::desaturate(img,
                             mInfluenceAnimator.getCurrentValue());

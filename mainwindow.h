@@ -195,7 +195,6 @@ private:
     ActionButton *mActionLine;
     ActionButton *mActionCurve;
 //
-    QAction *mActionHighQualityView;
     QAction *mActionEffectsPaintEnabled;
 
     QPushButton *mNewCanvasButton;

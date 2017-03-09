@@ -54,8 +54,7 @@ public:
     void apply(BoundingBox *target,
                QImage *imgPtr,
                const fmt_filters::image &img,
-               qreal scale,
-               bool highQuality);
+               qreal scale);
 
     qreal getMargin();
 private:

@@ -13,8 +13,7 @@ public:
 
     void applyEffects(BoundingBox *target, QImage *imgPtr,
                       const fmt_filters::image &img,
-                      const qreal &scale,
-                      const bool &highQuality);
+                      const qreal &scale);
     qreal getEffectsMargin() const;
 
     bool isEffectsAnimator() { return true; }

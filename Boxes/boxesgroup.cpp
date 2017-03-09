@@ -253,12 +253,6 @@ void BoxesGroup::updateBoundingRect() {
     }
     mRelBoundingRect = boundingPaths.boundingRect();
 
-    qreal effectsMargin = mEffectsMargin*
-                          mUpdateCanvasTransform.m11();
-
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
 
     BoundingBox::updateBoundingRect();
 }
@@ -328,7 +322,7 @@ void BoxesGroup::draw(QPainter *p) {
     if(mVisible) {
         p->save();
         p->setTransform(QTransform(
-                            mCombinedTransformMatrix.inverted()),
+                            mUpdateTransform.inverted()),
                             true);
         foreach(BoundingBox *box, mChildBoxes) {
             //box->draw(p);
@@ -339,20 +333,6 @@ void BoxesGroup::draw(QPainter *p) {
     }
 }
 
-void BoxesGroup::updateAllUglyPixmap() {
-    if(shouldPaintOnImage()) {
-        Canvas *parentCanvas = getParentCanvas();
-        QMatrix inverted = mUpdateCanvasTransform.inverted().
-                                scale(parentCanvas->getResolutionPercent(),
-                                      parentCanvas->getResolutionPercent());
-        mUpdateRenderContainer->updateVariables(
-                    mUpdateTransform,
-                    inverted*mUpdateTransform,
-                    mEffectsMargin,
-                    parentCanvas->getResolutionPercent(),
-                    this);
-    }
-}
 void BoxesGroup::drawPixmap(QPainter *p) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawPixmap(p);
@@ -402,12 +382,16 @@ bool BoxesGroup::isDescendantCurrentGroup() {
 }
 
 bool BoxesGroup::shouldPaintOnImage() {
+    return !mIsDescendantCurrentGroup;
     return mEffectsAnimators.hasEffects() &&
            !mIsDescendantCurrentGroup;
 }
 
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
+    if(!bT) {
+        scheduleUpdate();
+    }
     if(mParent == NULL) return;
     mParent->setDescendantCurrentGroup(bT);
 }
@@ -673,13 +657,9 @@ void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
                     indexTo);
 }
 
-void BoxesGroup::updateCombinedTransform(const bool &replaceCache) {
-    BoundingBox::updateCombinedTransform(replaceCache);
-}
-
 void BoxesGroup::updateAfterCombinedTransformationChanged(const bool &replaceCache) {
     foreach(BoundingBox *child, mChildBoxes) {
-        child->updateCombinedTransform(mType != TYPE_CANVAS && replaceCache);
+        child->updateCombinedTransform(replaceCache);
     }
 }
 

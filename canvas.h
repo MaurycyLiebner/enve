@@ -170,8 +170,6 @@ public:
     void setPartialRepaintRect(QRectF absRect);
     void makePartialRepaintInclude(QPointF pointToInclude);
     void partialRepaintRectToPoint(QPointF point);
-    void setHighQualityPaint(const bool &bT);
-    bool highQualityPaint();
 
     void setEffectsPaintEnabled(const bool &bT);
     bool effectsPaintEnabled();

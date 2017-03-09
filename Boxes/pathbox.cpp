@@ -3,8 +3,7 @@
 #include "mainwindow.h"
 
 PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
-    BoundingBox(parent, type)
-{
+    BoundingBox(parent, type) {
     mFillPaintSettings.setTargetPathBox(this);
     mStrokeSettings.setTargetPathBox(this);
 
@@ -29,6 +28,8 @@ PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
 
     mStrokeSettings.setLineWidthUpdaterTarget(this);
     mFillPaintSettings.setPaintPathTarget(this);
+
+    schedulePathUpdate();
 }
 
 PathBox::~PathBox()
@@ -114,6 +115,7 @@ void PathBox::updatePathIfNeeded()
     if(mPathUpdateNeeded) {
         updatePath();
         mUpdatePath = mPath;
+        mUpdateOutlinePath = mOutlinePath;
         if(!mAnimatorsCollection.hasKeys() &&
            !mPivotChanged ) centerPivotPosition();
         mPathUpdateNeeded = false;
@@ -274,15 +276,11 @@ void PathBox::updateDrawGradients() {
 
 void PathBox::updateBoundingRect() {
     mRelBoundingRect = mWholePath.boundingRect();
-    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
+
     BoundingBox::updateBoundingRect();
 }
 
-void PathBox::setUpdateVars()
-{
+void PathBox::setUpdateVars() {
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
     BoundingBox::setUpdateVars();
@@ -294,24 +292,28 @@ void PathBox::draw(QPainter *p)
         p->save();
 
         p->setPen(Qt::NoPen);
-        if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
-            p->setBrush(mDrawFillGradient);
-        } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
-            p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
-        } else{
-            p->setBrush(Qt::NoBrush);
+        if(!mUpdatePath.isEmpty()) {
+            if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
+                p->setBrush(mDrawFillGradient);
+            } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
+                p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
+            } else {
+                p->setBrush(Qt::NoBrush);
+            }
+            p->drawPath(mUpdatePath);
         }
-        p->drawPath(mUpdatePath);
-        if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
-            p->setBrush(mDrawStrokeGradient);
-        } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
-            p->setBrush(mStrokeSettings.getCurrentColor().qcol);
-        } else{
-            p->setBrush(Qt::NoBrush);
-        }
+        if(!mUpdateOutlinePath.isEmpty()) {
+            if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
+                p->setBrush(mDrawStrokeGradient);
+            } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
+                p->setBrush(mStrokeSettings.getCurrentColor().qcol);
+            } else{
+                p->setBrush(Qt::NoBrush);
+            }
 
-        p->setCompositionMode(mStrokeSettings.getOutlineCompositionMode());
-        p->drawPath(mUpdateOutlinePath);
+            p->setCompositionMode(mStrokeSettings.getOutlineCompositionMode());
+            p->drawPath(mUpdateOutlinePath);
+        }
 
         p->restore();
     }
@@ -325,15 +327,13 @@ bool PathBox::relPointInsidePath(QPointF relPos) {
     }
 }
 
-void PathBox::updateAfterFrameChanged(int currentFrame)
-{
+void PathBox::updateAfterFrameChanged(int currentFrame) {
     mFillPaintSettings.setFrame(currentFrame);
     mStrokeSettings.setFrame(currentFrame);
     BoundingBox::updateAfterFrameChanged(currentFrame);
 }
 
-void PathBox::setOutlineAffectedByScale(bool bT)
-{
+void PathBox::setOutlineAffectedByScale(bool bT) {
     mOutlineAffectedByScale = bT;
     scheduleOutlinePathUpdate();
 }

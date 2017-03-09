@@ -53,10 +53,6 @@ void ParticleBox::updateBoundingRect() {
 //                    emitter->getParticlesBoundingRect());
 //    }
 
-    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
     BoundingBox::updateBoundingRect();
 }
 

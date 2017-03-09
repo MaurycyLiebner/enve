@@ -171,8 +171,6 @@ public slots:
     void setCurrentCanvas(const int &id);
 
     void setEffectsPaintEnabled(const bool &bT);
-    void setHighQualityView(const bool &bT);
-
     void interruptPreview();
 
     void stopPreview();

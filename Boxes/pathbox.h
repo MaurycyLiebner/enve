@@ -18,14 +18,16 @@ public:
 
     void resetStrokeGradientPointsPos(bool finish) {
         mStrokeGradientPoints.setRecording(false);
-        mStrokeGradientPoints.setPositions(getPixBoundingRect().topLeft(),
-                     getPixBoundingRect().bottomRight(), finish);
+        mStrokeGradientPoints.setPositions(mRelBoundingRect.topLeft(),
+                                           mRelBoundingRect.bottomRight(),
+                                           finish);
     }
 
     void resetFillGradientPointsPos(bool finish) {
         mFillGradientPoints.setRecording(false);
-        mFillGradientPoints.setPositions(getPixBoundingRect().topLeft(),
-                     getPixBoundingRect().bottomRight(), finish);
+        mFillGradientPoints.setPositions(mRelBoundingRect.topLeft(),
+                                         mRelBoundingRect.bottomRight(),
+                                         finish);
     }
 
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {

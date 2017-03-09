@@ -92,14 +92,6 @@ BoundingBox *Canvas::createLink(BoxesGroup *parent) {
     return linkGroup;
 }
 
-void Canvas::setHighQualityPaint(const bool &bT) {
-    mHighQualityPaint = bT;
-}
-
-bool Canvas::highQualityPaint() {
-    return mHighQualityPaint;
-}
-
 void Canvas::setEffectsPaintEnabled(const bool &bT) {
     mEffectsPaintEnabled = bT;
 }

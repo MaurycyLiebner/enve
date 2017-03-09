@@ -66,7 +66,6 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransfor
     updatePaintTransformGivenNewCombinedTransform(combinedTransform);
 
     target->applyEffects(&mImage,
-                         false,
                          resolutionPer);
 }
 

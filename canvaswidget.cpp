@@ -483,13 +483,6 @@ void CanvasWidget::updateDisplayedFillStrokeSettings() {
     mCurrentCanvas->setDisplayedFillStrokeSettingsFromLastSelected();
 }
 
-void CanvasWidget::setHighQualityView(const bool &bT) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setHighQualityPaint(bT);
-    mCurrentCanvas->updateAllBoxes();
-    callUpdateSchedulers();
-}
-
 void CanvasWidget::setEffectsPaintEnabled(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setEffectsPaintEnabled(bT);

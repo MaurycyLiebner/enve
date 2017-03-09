@@ -242,9 +242,6 @@ void MainWindow::setupMenuBar() {
     mEffectsMenu->addAction("Blur");
 
     mViewMenu = mMenuBar->addMenu("View");
-    mActionHighQualityView = mViewMenu->addAction("High Quality");
-    mActionHighQualityView->setCheckable(true);
-    mActionHighQualityView->setChecked(false);
 
     mActionEffectsPaintEnabled = mViewMenu->addAction("Effects");
     mActionEffectsPaintEnabled->setCheckable(true);
@@ -257,8 +254,6 @@ void MainWindow::setupMenuBar() {
     setMenuBar(mMenuBar);
 //
 
-    connect(mActionHighQualityView, SIGNAL(toggled(bool)),
-            mCanvasWidget, SLOT(setHighQualityView(bool)));
     connect(mActionEffectsPaintEnabled, SIGNAL(toggled(bool)),
             mCanvasWidget, SLOT(setEffectsPaintEnabled(bool)));
 }
@@ -269,7 +264,6 @@ void MainWindow::updateSettingsForCurrentCanvas() {
         return;
     }
     Canvas *canvas = mCanvasWidget->getCurrentCanvas();
-    mActionHighQualityView->setChecked(canvas->highQualityPaint());
     mActionEffectsPaintEnabled->setChecked(canvas->effectsPaintEnabled());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(

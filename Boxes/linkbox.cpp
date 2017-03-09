@@ -66,12 +66,6 @@ void InternalLinkBox::scheduleAwaitUpdateSLOT() {
 
 void InternalLinkBox::updateBoundingRect() {
     mRelBoundingRect = mLinkTarget->getRelBoundingRect();
-    qreal effectsMargin = mLinkTarget->getEffectsMargin()*
-                          mUpdateCanvasTransform.m11();
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
-
     BoundingBox::updateBoundingRect();
 }
 
@@ -211,13 +205,6 @@ void InternalLinkCanvas::updateBoundingRect() {
         mRelBoundingRect = QRectF(QPointF(0., 0.),
                                   ((Canvas*)mLinkTarget)->getCanvasSize());
         //boundingPaths.boundingRect();
-
-        qreal effectsMargin = mEffectsMargin*
-                mUpdateCanvasTransform.m11();
-
-        mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-                adjusted(-effectsMargin, -effectsMargin,
-                         effectsMargin, effectsMargin);
 
         BoundingBox::updateBoundingRect();
     } else {

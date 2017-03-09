@@ -641,7 +641,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         }
 
         BoundingBox *lastHoveredBox = mHoveredBox;
-        mHoveredBox = getBoxAt(event->pos());
+        mHoveredBox = mCurrentBoxesGroup->getBoxAt(event->pos());
 
         Edge *lastEdge = mHoveredEdge;
         if(mHoveredEdge != NULL) {

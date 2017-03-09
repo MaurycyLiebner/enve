@@ -49,8 +49,7 @@ BrushEffect::BrushEffect(qreal numberStrokes,
 
 void BrushEffect::apply(BoundingBox *target, QImage *imgPtr,
                         const fmt_filters::image &img,
-                        qreal scale,
-                        bool highQuality) {
+                        qreal scale) {
     int width = imgPtr->width();
     int height = imgPtr->height();
     QList<BrushStroke*> strokes;

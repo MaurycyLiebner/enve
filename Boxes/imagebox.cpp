@@ -12,10 +12,6 @@ ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
 
 void ImageBox::updateBoundingRect() {
     mRelBoundingRect = mImage.rect();
-    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
 
     BoundingBox::updateBoundingRect();
 }

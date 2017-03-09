@@ -98,11 +98,11 @@ public:
 
     virtual QPointF getRelCenterPosition() { return mRelBoundingRect.center(); }
     virtual void centerPivotPosition(bool finish = false) {
+        return;
         mTransformAnimator.setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), finish);
     }
     virtual bool isContainedIn(QRectF absRect);
-    virtual QRectF getPixBoundingRect();
 
     virtual void drawPixmap(QPainter *p);
     virtual void drawPreviewPixmap(QPainter *p);
@@ -270,7 +270,6 @@ public:
     virtual void updatePixmaps();
     void updatePrettyPixmap();
 
-    QRectF getBoundingRectClippedToView();
     void saveOldPixmap();
 
     void saveUglyPaintTransform();
@@ -305,7 +304,6 @@ public:
 
     bool isAnimated() { return mAnimatorsCollection.isDescendantRecording(); }
     virtual void updateBoundingRect();
-    void updatePixBoundingRectClippedToView();
     virtual const QPainterPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
@@ -401,7 +399,6 @@ public:
     }
 
     void applyEffects(QImage *im,
-                      bool highQuality,
                       qreal scale = 1.);
     virtual void clearCache();
     QMatrix getCombinedTransform() const;
@@ -420,13 +417,12 @@ protected:
     QPointF mPreviewDrawPos;
     QRectF mRelBoundingRect;
 
-    bool mHighQualityPaint = false;
     bool mEffectsMarginUpdateNeeded = false;
     qreal mEffectsMargin = 2.;
 
     bool mAwaitUpdateScheduled = false;
 
-    virtual void updateAfterCombinedTransformationChanged(const bool &replaceCache) {}
+    virtual void updateAfterCombinedTransformationChanged(const bool &) {}
 
     std::unordered_map<int, BoundingBoxRenderContainer*> mRenderContainers;
 
@@ -444,20 +440,14 @@ protected:
 
     int mUpdateFrame = 0;
     int mCurrentFrame = 0;
+    QRectF mUpdateRelBoundingRect;
     QMatrix mUpdateCanvasTransform;
     QMatrix mUpdateTransform;
     bool mUpdateReplaceCache = false;
-    QMatrix mOldTransform;
-    QImage mNewPixmap;
-    QImage mOldPixmap;
-    QRectF mOldPixBoundingRect;
 
     bool mRedoUpdate = false;
     bool mAwaitingUpdate = false;
-    QMatrix mUglyPaintTransform;
 
-    QRectF mPixBoundingRect;
-    QRectF mPixBoundingRectClippedToView;
     QPainterPath mRelBoundingRectPath;
 
     bool mScheduledForRemove = false;

@@ -42,10 +42,6 @@ void VideoBox::afterSuccessfulUpdate() {
 
 void VideoBox::updateBoundingRect() {
     //mRelBoundingRect = mOldVideoImage.rect();
-    qreal effectsMargin = mEffectsMargin*mUpdateCanvasTransform.m11();
-    mPixBoundingRect = mUpdateTransform.mapRect(mRelBoundingRect).
-                        adjusted(-effectsMargin, -effectsMargin,
-                                 effectsMargin, effectsMargin);
 
     BoundingBox::updateBoundingRect();
 }

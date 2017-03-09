@@ -45,10 +45,9 @@ void EffectAnimators::setParentBox(BoundingBox *box) {
 void EffectAnimators::applyEffects(BoundingBox *target,
                                    QImage *imgPtr,
                                    const fmt_filters::image &img,
-                                   const qreal &scale,
-                                   const bool &highQuality) {
+                                   const qreal &scale) {
     foreach(QrealAnimator *effect, mChildAnimators) {
-        ((PixmapEffect*)effect)->apply(target, imgPtr, img, scale, highQuality);
+        ((PixmapEffect*)effect)->apply(target, imgPtr, img, scale);
     }
 }
 

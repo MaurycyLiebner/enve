@@ -156,7 +156,6 @@ public:
     }
     void clearCache();
     void drawPixmap(QPainter *p);
-    void updateAllUglyPixmap();
     void setDescendantCurrentGroup(const bool &bT);
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
@@ -166,7 +165,6 @@ public:
     void beforeUpdate();
     void processUpdate();
     void afterUpdate();
-    void updateCombinedTransform(const bool &replaceCache);
     void updateAfterCombinedTransformationChanged(const bool &replaceCache);
 protected:
     static bool mCtrlsAlwaysVisible;
