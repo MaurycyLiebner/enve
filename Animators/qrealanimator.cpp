@@ -451,7 +451,7 @@ void QrealAnimator::setFrame(int frame) {
 
     emit valueChangedSignal(mCurrentValue);
 
-    callSoftUpdater();
+    callFrameChangeUpdater();
 }
 
 bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
@@ -886,11 +886,11 @@ void QrealAnimator::callUpdater()
     }
 }
 
-void QrealAnimator::callSoftUpdater() {
+void QrealAnimator::callFrameChangeUpdater() {
     if(mUpdater == NULL) {
         return;
     } else {
-        mUpdater->softUpdate();
+        mUpdater->frameChangeUpdate();
     }
 }
 

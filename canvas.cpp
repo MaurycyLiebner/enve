@@ -129,7 +129,7 @@ void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
 
     mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
 
-    updateAfterCombinedTransformationChanged(false);
+    updateAfterCombinedTransformationChanged();
 }
 
 void Canvas::scale(qreal scaleBy, QPointF absOrigin)
@@ -812,7 +812,7 @@ void Canvas::resetTransormation() {
     mVisibleWidth = mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
-    updateAfterCombinedTransformationChanged(false);
+    updateAfterCombinedTransformationChanged();
 
 }
 
@@ -820,7 +820,7 @@ void Canvas::fitCanvasToSize() {
     mCombinedTransformMatrix.reset();
     mVisibleHeight = mHeight + 20;
     mVisibleWidth = mWidth + 20;
-    updateAfterCombinedTransformationChanged(false);
+    updateAfterCombinedTransformationChanged();
     qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
     qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
     scale(qMin(heightScale, widthScale), QPointF(0., 0.));
@@ -828,7 +828,7 @@ void Canvas::fitCanvasToSize() {
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
-    updateAfterCombinedTransformationChanged(false);
+    updateAfterCombinedTransformationChanged();
 
 }
 
@@ -842,7 +842,7 @@ void Canvas::moveByRel(QPointF trans)
     mCombinedTransformMatrix.translate(trans.x(), trans.y());
 
     mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
-    updateAfterCombinedTransformationChanged(false);
+    updateAfterCombinedTransformationChanged();
     schedulePivotUpdate();
 }
 
@@ -942,11 +942,12 @@ void Canvas::setIsCurrentCanvas(const bool &bT) {
     mIsCurrentCanvas = bT;
 }
 
-void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
-    BoxesGroup::addChildAwaitingUpdate(child);
+void Canvas::addChildAwaitingUpdate(BoundingBox *child, const bool &) {
+    BoxesGroup::addChildAwaitingUpdate(child, false);
     if(mAwaitingUpdate) return;
     mAwaitingUpdate = true;
-    mCanvasWidget->addBoxAwaitingUpdate(this);
+    addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));
+    //mCanvasWidget->addBoxAwaitingUpdate(this);
 }
 
 int Canvas::getCurrentFrame() {

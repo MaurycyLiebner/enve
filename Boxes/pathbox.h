@@ -142,8 +142,6 @@ protected:
     QPainterPathStroker mPathStroker;
     QPainterPath mWholePath;
     void updateWholePath();
-    void updateAfterTransformationChanged();
-    void updateAfterCombinedTransformationChanged(const bool &replaceCache);
 
     virtual void updatePath() {}
 

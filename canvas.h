@@ -253,17 +253,21 @@ public:
         return mCurrentBoxesGroup;
     }
 
-    void updateCombinedTransform() {
-        updateAfterCombinedTransformationChanged(false);
-    }
+    void updateCombinedTransform(const bool &) { }
 
     void setIsCurrentCanvas(const bool &bT);
 
     void scheduleEffectsMarginUpdate() {}
 
-    void addChildAwaitingUpdate(BoundingBox *child);
+    void addChildAwaitingUpdate(BoundingBox *child, const bool &);
 protected:
-//    void updateAfterCombinedTransformationChanged();
+    void updateAfterCombinedTransformationChanged(const bool &replaceCache = true) {
+        Q_UNUSED(replaceCache);
+        foreach(BoundingBox *child, mChildBoxes) {
+            child->updateCombinedTransformTmp();
+            child->scheduleUpdate(false);
+        }
+    }
 
     void setCurrentEndPoint(PathPoint *point);
 

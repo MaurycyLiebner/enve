@@ -177,9 +177,6 @@ void PathBox::updateOutlinePathIfNeeded() {
     }
 }
 
-void PathBox::updateAfterCombinedTransformationChanged(const bool &replaceCache) {
-}
-
 void PathBox::copyStrokeAndFillSettingsTo(PathBox *target) {
 
     target->setFillPaintType(mFillPaintSettings.getPaintType(),

@@ -201,13 +201,7 @@ void BoundingBox::updatePixmaps() {
 //    }
 
     preUpdatePixmapsUpdates();
-    if(mUpdateReplaceCache || getRenderContainerAtFrame(mUpdateFrame) == NULL) {
-        qDebug() << "update pixmaps " + mName;
-        updateAllUglyPixmap();
-    } else {
-        mUpdateRenderContainer->updatePaintTransformGivenNewCombinedTransform(
-                                                mUpdateTransform);
-    }
+    updateAllUglyPixmap();
 }
 
 //void BoundingBox::setAwaitingUpdate(bool bT) {
@@ -734,6 +728,7 @@ void BoundingBox::startTransform() {
 
 void BoundingBox::finishTransform() {
     mTransformAnimator.finishTransform();
+    updateCombinedTransform();
 }
 
 bool BoundingBox::absPointInsidePath(QPointF absPoint) {
@@ -742,6 +737,7 @@ bool BoundingBox::absPointInsidePath(QPointF absPoint) {
 
 void BoundingBox::cancelTransform() {
     mTransformAnimator.cancelTransform();
+    updateCombinedTransformTmp();
 }
 
 void BoundingBox::moveUp() {
@@ -776,24 +772,29 @@ QPointF BoundingBox::getAbsolutePos() {
     return QPointF(mCombinedTransformMatrix.dx(), mCombinedTransformMatrix.dy());
 }
 
-void BoundingBox::updateRelativeTransform(const bool &replaceCache) {
+void BoundingBox::updateRelativeTransformTmp() {
     mRelativeTransformMatrix = mTransformAnimator.getCurrentValue();
-    updateCombinedTransform(replaceCache);
+    updateCombinedTransformTmp();
+    //updateCombinedTransform(replaceCache);
+}
+
+void BoundingBox::updateRelativeTransformAfterFrameChange() {
+    mRelativeTransformMatrix = mTransformAnimator.getCurrentValue();
+    updateCombinedTransform(false);
 }
 
 void BoundingBox::updateCombinedTransform(const bool &replaceCache) {
     if(mParent == NULL) return;
-    qDebug() << "update transform " << mName;
     mCombinedTransformMatrix = mRelativeTransformMatrix*
                                mParent->getCombinedTransform();
 
-
     updateAfterCombinedTransformationChanged(replaceCache);
     scheduleUpdate(replaceCache);
-    updateUglyPaintTransform();
 }
 
-void BoundingBox::updateUglyPaintTransform() {
+void BoundingBox::updateCombinedTransformTmp() {
+    mCombinedTransformMatrix = mRelativeTransformMatrix*
+                               mParent->getCombinedTransform();
     mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
                                             mCombinedTransformMatrix);
 }
@@ -1090,7 +1091,6 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::beforeUpdate() {
-    qDebug() << "Box before " + mName;
     setUpdateVars();
 //    if(!mUpdateReplaceCache) {
 //        BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
@@ -1105,14 +1105,10 @@ void BoundingBox::beforeUpdate() {
 }
 
 void BoundingBox::processUpdate() {
-    qDebug() << "Box process " + mName;
-
     updatePixmaps();
 }
 
 void BoundingBox::afterUpdate() {
-    qDebug() << "Box after " + mName;
-
     afterSuccessfulUpdate();
 
     if(mUpdateReplaceCache) {
@@ -1146,7 +1142,6 @@ void BoundingBox::afterUpdate() {
 }
 
 void BoundingBox::setUpdateVars() {
-    qDebug() << "set update transform " << mName;
     mUpdateCanvasTransform = getParentCanvas()->getCombinedTransform();
     mUpdateTransform = mCombinedTransformMatrix;
     mUpdateFrame = mCurrentFrame;
@@ -1158,8 +1153,17 @@ void BoundingBox::setUpdateVars() {
 }
 
 void BoundingBox::scheduleUpdate(const bool &replaceCache) {
-    mReplaceCache = replaceCache || mReplaceCache;
-    if(mAwaitingUpdate) return;
-    mAwaitingUpdate = true;
-    mParent->addChildAwaitingUpdate(this);
+    if(mAwaitingUpdate) {
+        if(mReplaceCache) return;
+        if(replaceCache) {
+            qDebug() << mName + " scheduleUpdate replaceCache";
+            mReplaceCache = true;
+            mParent->scheduleUpdate(true);
+        }
+    } else {
+        mReplaceCache = replaceCache || mReplaceCache;
+        mAwaitingUpdate = true;
+        qDebug() << mName + " first scheduleUpdate " << replaceCache;
+        mParent->addChildAwaitingUpdate(this, mReplaceCache);
+    }
 }

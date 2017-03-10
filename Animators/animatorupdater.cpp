@@ -11,12 +11,12 @@ TransUpdater::TransUpdater(BoundingBox *boundingBox) : AnimatorUpdater()
 }
 
 void TransUpdater::update() {
-    mTarget->updateRelativeTransform();
+    mTarget->updateRelativeTransformTmp();
     mTarget->schedulePivotUpdate();
 }
 
-void TransUpdater::softUpdate() {
-    mTarget->updateRelativeTransform(false);
+void TransUpdater::frameChangeUpdate() {
+    mTarget->updateRelativeTransformAfterFrameChange();
     mTarget->schedulePivotUpdate();
 }
 
@@ -28,7 +28,7 @@ void PathPointUpdater::update() {
     mTarget->schedulePathUpdate();
 }
 
-void PathPointUpdater::softUpdate() {
+void PathPointUpdater::frameChangeUpdate() {
     mTarget->schedulePathUpdate(false);
 }
 
@@ -48,7 +48,7 @@ void StrokeWidthUpdater::update() {
     mTarget->scheduleOutlinePathUpdate();
 }
 
-void StrokeWidthUpdater::softUpdate() {
+void StrokeWidthUpdater::frameChangeUpdate() {
     mTarget->scheduleOutlinePathUpdate(false);
 }
 
@@ -61,7 +61,7 @@ void DisplayedFillStrokeSettingsUpdater::update() {
     mTarget->scheduleUpdate();
 }
 
-void DisplayedFillStrokeSettingsUpdater::softUpdate() {
+void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
     mTarget->scheduleUpdate(false);
 }
 
@@ -73,7 +73,7 @@ void PixmapEffectUpdater::update() {
     mTarget->scheduleEffectsMarginUpdate();
 }
 
-void PixmapEffectUpdater::softUpdate() {
+void PixmapEffectUpdater::frameChangeUpdate() {
     mTarget->scheduleEffectsMarginUpdate(false);
 }
 
@@ -104,6 +104,6 @@ void GradientPointsUpdater::update() {
     mTarget->scheduleUpdate();
 }
 
-void GradientPointsUpdater::softUpdate() {
+void GradientPointsUpdater::frameChangeUpdate() {
     mTarget->scheduleUpdate(false);
 }

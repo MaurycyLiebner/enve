@@ -19,7 +19,7 @@ public:
     virtual ~AnimatorUpdater() {}
 
     virtual void update() {}
-    virtual void softUpdate() {
+    virtual void frameChangeUpdate() {
         update();
     }
 };
@@ -31,7 +31,7 @@ public:
 
     void update();
 
-    void softUpdate();
+    void frameChangeUpdate();
 private:
     BoundingBox *mTarget;
 };
@@ -43,7 +43,7 @@ public:
 
     void update();
 
-    void softUpdate();
+    void frameChangeUpdate();
 private:
     PathBox *mTarget;
 };
@@ -66,7 +66,7 @@ public:
 
     void update();
 
-    void softUpdate();
+    void frameChangeUpdate();
 private:
     PathBox *mTarget;
 };
@@ -77,7 +77,7 @@ public:
     DisplayedFillStrokeSettingsUpdater(BoundingBox *path);
 
     void update();
-    void softUpdate();
+    void frameChangeUpdate();
 private:
     BoundingBox *mTarget;
 };
@@ -88,7 +88,7 @@ public:
     PixmapEffectUpdater(BoundingBox *target);
 
     void update();
-    void softUpdate();
+    void frameChangeUpdate();
 private:
     BoundingBox *mTarget;
 };
@@ -110,7 +110,7 @@ public:
     ParticlesUpdater(ParticleEmitter *target);
 
     void update();
-    void softUpdate() {}
+    void frameChangeUpdate() {}
 private:
     ParticleEmitter *mTarget;
 };
@@ -125,7 +125,7 @@ public:
 
     void update();
 
-    void softUpdate();
+    void frameChangeUpdate();
 private:
     PathBox *mTarget;
     bool mIsFill;

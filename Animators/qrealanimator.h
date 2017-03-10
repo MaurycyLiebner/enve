@@ -117,7 +117,7 @@ public:
     virtual void setUpdater(AnimatorUpdater *updater);
 
     virtual void callUpdater();
-    virtual void callSoftUpdater();
+    virtual void callFrameChangeUpdater();
 
     virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY,
                           int startFrame, int endFrame);

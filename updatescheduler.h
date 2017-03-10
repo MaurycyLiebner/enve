@@ -20,4 +20,14 @@ public:
 private:
     Gradient *mGradient;
 };
+
+class AddBoxAwaitingUpdateScheduler : public UpdateScheduler {
+public:
+    AddBoxAwaitingUpdateScheduler(Canvas *canvas);
+
+    void update();
+private:
+    Canvas *mCanvas;
+};
+
 #endif // UPDATESCHEDULER_H

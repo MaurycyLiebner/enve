@@ -161,11 +161,14 @@ public:
     bool shouldPaintOnImage();
     void drawUpdatePixmap(QPainter *p);
 
-    virtual void addChildAwaitingUpdate(BoundingBox *child);
+    virtual void addChildAwaitingUpdate(BoundingBox *child,
+                                        const bool &replaceCache);
     void beforeUpdate();
     void processUpdate();
     void afterUpdate();
-    void updateAfterCombinedTransformationChanged(const bool &replaceCache);
+    void updateAfterCombinedTransformationChanged(
+                                    const bool &replaceCache = true);
+    void updateCombinedTransformTmp();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
@@ -173,7 +176,6 @@ protected:
     bool mIsDescendantCurrentGroup = false;
     QList<BoundingBox*> mChildBoxes;
 
-    bool mUpdateProcessThis = false;
     QList<BoundingBox*> mChildrenAwaitingUpdate;
     QList<BoundingBox*> mUpdateChildrenAwaitingUpdate;
 signals:

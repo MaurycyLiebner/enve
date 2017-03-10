@@ -26,6 +26,7 @@ void SoundComposition::generateData(const int &startFrame,
                                     const int &endFrame,
                                     const int &fps) {
     mBuffer.clear();
+    if(mSounds.isEmpty()) return;
 
     int nSamples = (endFrame - startFrame)*SAMPLERATE/fps;
     //float *data1 = NULL;
@@ -93,7 +94,7 @@ ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {
 
 qint64 SoundComposition::readData(char *data, qint64 len) {
     qint64 total = 0;
-    if (!mBuffer.isEmpty()) {
+    if(!mBuffer.isEmpty()) {
         while(len - total > 0) {
             const qint64 chunk = qMin((mBuffer.size() - mPos), len - total);
             memcpy(data + total, mBuffer.constData() + mPos, chunk);

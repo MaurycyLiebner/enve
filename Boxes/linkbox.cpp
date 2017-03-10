@@ -131,17 +131,16 @@ SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
     InternalLinkBox(linkTarget, parent) {
 }
 
-void SameTransformInternalLink::updateCombinedTransform(const bool &replaceCache) {
+void SameTransformInternalLink::updateCombinedTransform() {
     if(mLinkTarget == NULL) return;
     mCombinedTransformMatrix =
             mLinkTarget->getRelativeTransform()*
             mParent->getCombinedTransform();
 
 
-    updateAfterCombinedTransformationChanged(replaceCache);
+    updateAfterCombinedTransformationChanged();
 
     scheduleUpdate();
-    updateUglyPaintTransform();
 }
 
 QMatrix SameTransformInternalLink::getRelativeTransform() const {
@@ -176,10 +175,9 @@ void SameTransformInternalLinkBoxesGroup::updateCombinedTransform() {
             mParent->getCombinedTransform();
 
 
-    updateAfterCombinedTransformationChanged(false);
+    updateAfterCombinedTransformationChanged();
 
     scheduleUpdate();
-    updateUglyPaintTransform();
 }
 
 QMatrix SameTransformInternalLinkBoxesGroup::getRelativeTransform() const {

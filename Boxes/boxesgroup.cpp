@@ -35,6 +35,19 @@ void BoxesGroup::clearCache() {
     }
 }
 
+void BoxesGroup::updateCombinedTransformTmp() {
+    mCombinedTransformMatrix = mRelativeTransformMatrix*
+                               mParent->getCombinedTransform();
+    if(mIsDescendantCurrentGroup) {
+        foreach(BoundingBox *child, mChildBoxes) {
+            child->updateCombinedTransformTmp();
+        }
+    } else {
+        mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+                                                mCombinedTransformMatrix);
+    }
+}
+
 BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     BoundingBox(BoundingBoxType::TYPE_CANVAS)
 {   
@@ -277,45 +290,38 @@ void BoxesGroup::drawUpdatePixmap(QPainter *p) {
     }
 }
 
-void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
+void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child,
+                                        const bool &replaceCache) {
     mChildrenAwaitingUpdate << child;
-    qDebug() << "add child " + child->getName() + " to " + mName;
 
     if(mParent == NULL) return;
-    scheduleUpdate(shouldPaintOnImage());
+    scheduleUpdate(replaceCache);
 }
 
 void BoxesGroup::beforeUpdate() {
-    qDebug() << "Group before " + mName + " " << mChildrenAwaitingUpdate.count();
     foreach(BoundingBox *child, mChildrenAwaitingUpdate) {
         child->beforeUpdate();
         mUpdateChildrenAwaitingUpdate.append(child);
     }
-    mUpdateProcessThis = shouldPaintOnImage();
 
     mChildrenAwaitingUpdate.clear();
     BoundingBox::beforeUpdate();
 }
 
 void BoxesGroup::processUpdate() {
-    qDebug() << "Group process " + mName + " " << mUpdateChildrenAwaitingUpdate.count();
     foreach(BoundingBox *child, mUpdateChildrenAwaitingUpdate) {
         child->processUpdate();
     }
-    if(mUpdateProcessThis) {
-        BoundingBox::processUpdate();
-    }
+    BoundingBox::processUpdate();
 }
 
 void BoxesGroup::afterUpdate() {
-    qDebug() << "Group after " + mName;
     foreach(BoundingBox *child, mUpdateChildrenAwaitingUpdate) {
         child->afterUpdate();
     }
     mUpdateChildrenAwaitingUpdate.clear();
-    if(mUpdateProcessThis) {
-        BoundingBox::afterUpdate();
-    }
+    BoundingBox::afterUpdate();
+
 }
 
 void BoxesGroup::draw(QPainter *p) {
@@ -657,7 +663,8 @@ void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
                     indexTo);
 }
 
-void BoxesGroup::updateAfterCombinedTransformationChanged(const bool &replaceCache) {
+void BoxesGroup::updateAfterCombinedTransformationChanged(
+                                    const bool &replaceCache) {
     foreach(BoundingBox *child, mChildBoxes) {
         child->updateCombinedTransform(replaceCache);
     }

@@ -98,7 +98,6 @@ public:
 
     virtual QPointF getRelCenterPosition() { return mRelBoundingRect.center(); }
     virtual void centerPivotPosition(bool finish = false) {
-        return;
         mTransformAnimator.setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), finish);
     }
@@ -275,14 +274,14 @@ public:
     void saveUglyPaintTransform();
     void drawAsBoundingRect(QPainter *p, QPainterPath path);
     virtual void setUpdateVars();
-    void updateUglyPaintTransform();
     void redoUpdate();
     bool shouldRedoUpdate();
     void setRedoUpdateToFalse();
 
     virtual void afterSuccessfulUpdate() {}
 
-    void updateRelativeTransform(const bool &replaceCache = true);
+    void updateRelativeTransformTmp();
+
     virtual void updateAllUglyPixmap();
     QPointF mapAbsPosToRel(QPointF absPos);
     void addEffect(PixmapEffect *effect);
@@ -407,6 +406,8 @@ public:
     virtual void processUpdate();
     virtual void afterUpdate();
     virtual void beforeUpdate();
+    virtual void updateCombinedTransformTmp();
+    void updateRelativeTransformAfterFrameChange();
 protected:
     bool mUpdateDisabled = false;
 
@@ -422,7 +423,7 @@ protected:
 
     bool mAwaitUpdateScheduled = false;
 
-    virtual void updateAfterCombinedTransformationChanged(const bool &) {}
+    virtual void updateAfterCombinedTransformationChanged(const bool &replaceCache = true) {}
 
     std::unordered_map<int, BoundingBoxRenderContainer*> mRenderContainers;
 
