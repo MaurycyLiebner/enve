@@ -152,16 +152,22 @@ bool BoxesGroup::relPointInsidePath(QPointF relPos) {
     return false;
 }
 
-void BoxesGroup::updateAfterFrameChanged(int currentFrame)
-{
+void BoxesGroup::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
+    BoundingBoxRenderContainer *cont =
+                    getRenderContainerAtFrame(currentFrame);
+    if(cont != NULL) {
+        mOldRenderContainer = cont;
+        mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+                                        mCombinedTransformMatrix);
+        if(getParentCanvas()->isPreviewing()) return;
+    }
     foreach(BoundingBox *box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
 }
 
-void BoxesGroup::setFillGradient(Gradient *gradient, bool finish)
-{
+void BoxesGroup::setFillGradient(Gradient *gradient, bool finish) {
     foreach(BoundingBox *box, mChildBoxes) {
         box->setFillGradient(gradient, finish);
     }
@@ -519,6 +525,7 @@ void BoxesGroup::addChild(BoundingBox *child) {
 void BoxesGroup::addChildToListAt(int index,
                                   BoundingBox *child,
                                   bool saveUndoRedo) {
+    child->setNoCache(mType != TYPE_CANVAS);
     child->setUpdateDisabled(false);
     mChildBoxes.insert(index, child);
     updateChildrenId(index, saveUndoRedo);
@@ -545,9 +552,9 @@ void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
     }
 }
 
-void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo)
-{
+void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
     BoundingBox *box = mChildBoxes.at(id);
+    box->clearCache();
     box->setUpdateDisabled(true);
     if(box->isSelected()) {
         box->removeFromSelection();

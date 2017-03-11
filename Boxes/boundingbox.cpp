@@ -314,9 +314,13 @@ void BoundingBox::clearCache() {
     mRenderContainers.clear();
     mOldRenderContainer = new BoundingBoxRenderContainer();
     mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-    mRenderContainers.insert({mOldRenderContainer->getFrame(),
-                              mOldRenderContainer});
+    if(!mNoCache) {
+        mRenderContainers.insert({mOldRenderContainer->getFrame(),
+                                  mOldRenderContainer});
+    }
 
+    if(mParent == NULL) return;
+    mParent->BoundingBox::clearCache();
     scheduleUpdate();
 }
 
@@ -1105,33 +1109,44 @@ void BoundingBox::beforeUpdate() {
 }
 
 void BoundingBox::processUpdate() {
-    updatePixmaps();
+    //if(mUpdateReplaceCache) {
+        updatePixmaps();
+    //}
+}
+
+void BoundingBox::setNoCache(const bool &bT) {
+    mNoCache = bT;
+    clearCache();
 }
 
 void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
 
-    if(mUpdateReplaceCache) {
-        for(auto pair : mRenderContainers) {
-            delete pair.second;
-        }
-
-        mRenderContainers.clear();
-        mOldRenderContainer = getRenderContainerAtFrame(
-                                        mUpdateFrame);
-
-        if(mOldRenderContainer == NULL) {
-            mOldRenderContainer = new BoundingBoxRenderContainer();
-            mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
-        }
+    if(mNoCache) {
         mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
     } else {
-        mOldRenderContainer = getRenderContainerAtFrame(
-                                        mUpdateFrame);
-        if(mOldRenderContainer == NULL) {
-            mOldRenderContainer = new BoundingBoxRenderContainer();
-            mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+        if(mUpdateReplaceCache) {
+            for(auto pair : mRenderContainers) {
+                delete pair.second;
+            }
+
+            mRenderContainers.clear();
+            mOldRenderContainer = getRenderContainerAtFrame(
+                                            mUpdateFrame);
+
+            if(mOldRenderContainer == NULL) {
+                mOldRenderContainer = new BoundingBoxRenderContainer();
+                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+            }
             mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+        } else {
+            mOldRenderContainer = getRenderContainerAtFrame(
+                                            mUpdateFrame);
+            if(mOldRenderContainer == NULL) {
+                mOldRenderContainer = new BoundingBoxRenderContainer();
+                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+                mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+            }
         }
     }
     mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(

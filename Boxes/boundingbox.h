@@ -408,6 +408,7 @@ public:
     virtual void beforeUpdate();
     virtual void updateCombinedTransformTmp();
     void updateRelativeTransformAfterFrameChange();
+    void setNoCache(const bool &bT);
 protected:
     bool mUpdateDisabled = false;
 
@@ -439,6 +440,7 @@ protected:
 
     QMatrix mRelativeTransformMatrix;
 
+    bool mNoCache = false;
     int mUpdateFrame = 0;
     int mCurrentFrame = 0;
     QRectF mUpdateRelBoundingRect;
