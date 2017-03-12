@@ -13,7 +13,8 @@ enum SWT_Type : short {
     SWT_QrealAnimator,
     SWT_ComplexAnimator,
     SWT_ColorAnimator,
-    SWT_Canvas
+    SWT_Canvas,
+    SWT_BoxTarget
 };
 
 enum SWT_Rule : short {

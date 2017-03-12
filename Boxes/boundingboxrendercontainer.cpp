@@ -10,6 +10,10 @@ void BoundingBoxRenderContainer::draw(QPainter *p) {
     p->restore();
 }
 
+void BoundingBoxRenderContainer::drawWithoutTransform(QPainter *p) {
+    p->drawImage(0, 0, mImage);
+}
+
 void BoundingBoxRenderContainer::updatePaintTransformGivenNewCombinedTransform(
                                     const QMatrix &combinedTransform) {
     mPaintTransform = mTransform.inverted()*combinedTransform;

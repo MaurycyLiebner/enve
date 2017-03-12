@@ -6,7 +6,9 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QMimeData>
+#include <QComboBox>
 #include "boxeslistactionbutton.h"
+#include "boxtargetwidget.h"
 class QrealAnimatorValueSlider;
 class QrealKey;
 class BoundingBox;
@@ -50,6 +52,10 @@ protected:
 
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *e);
+    void resizeEvent(QResizeEvent *);
+
+    bool mCompositionModeVisible = false;
+    void updateCompositionBoxVisible();
 signals:
 
 private slots:
@@ -59,17 +65,20 @@ private slots:
 
     void switchBoxVisibleAction();
     void openColorSettingsDialog();
+    void setCompositionMode(const int &id);
 private:
     BoxesListActionButton *mRecordButton;
     BoxesListActionButton *mContentButton;
     BoxesListActionButton *mVisibleButton;
     BoxesListActionButton *mLockedButton;
     BoxesListActionButton *mColorButton;
+    BoxTargetWidget *mBoxTargetWidget;
 
     QPoint mDragStartPos;
     QWidget *mFillWidget;
     QHBoxLayout *mMainLayout;
     QrealAnimatorValueSlider *mValueSlider;
+    QComboBox *mCompositionModeCombo;
 };
 
 #endif // BOXSINGLEWIDGET_H

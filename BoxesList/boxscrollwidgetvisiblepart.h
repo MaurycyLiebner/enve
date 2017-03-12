@@ -35,6 +35,7 @@ public:
     void updateDraggingHighlight();
     BoxSingleWidget *getClosestsSingleWidgetWithTargetTypeLookBelow(
             const SWT_Type &type, const int &yPos, bool *isBelow);
+    void stopScrolling();
 protected:
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *);

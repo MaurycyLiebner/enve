@@ -61,9 +61,64 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     connect(mColorButton, SIGNAL(pressed()),
             this, SLOT(openColorSettingsDialog()));
 
+    mCompositionModeCombo = new QComboBox(this);
+    mMainLayout->addWidget(mCompositionModeCombo);
+    mCompositionModeCombo->addItems(QStringList() <<
+                                    "Source Over" <<
+                                    "Destination Over" <<
+                                    "Clear" <<
+                                    "Source" <<
+                                    "Destination" <<
+                                    "Source in" <<
+                                    "Destination in" <<
+                                    "Source Out" <<
+                                    "Destination Out" <<
+                                    "Source Atop" <<
+                                    "Destination Atop" <<
+                                    "Xor" <<
+                                    "Plus" <<
+                                    "Multiply" <<
+                                    "Screen" <<
+                                    "Overlay" <<
+                                    "Darken" <<
+                                    "Lighten" <<
+                                    "Color Burn" <<
+                                    "Hard Light" <<
+                                    "Soft Light" <<
+                                    "Difference" <<
+                                    "Exclusion" <<
+                                    "Source or Destination" <<
+                                    "Source and Destination" <<
+                                    "Source Xor Destination" <<
+                                    "Not Source And Not Destination" <<
+                                    "Not Source or Not Destination" <<
+                                    "Not Source Xor Destination" <<
+                                    "Not Source" <<
+                                    "Not Source And Destination" <<
+                                    "Source And Not Destination" <<
+                                    "Not Source or Destination");
+    connect(mCompositionModeCombo, SIGNAL(activated(int)),
+            this, SLOT(setCompositionMode(int)));
+    mCompositionModeCombo->setSizePolicy(QSizePolicy::Maximum,
+                    mCompositionModeCombo->sizePolicy().horizontalPolicy());
+
+    mBoxTargetWidget = new BoxTargetWidget(this);
+    mMainLayout->addWidget(mBoxTargetWidget);
+
     mMainLayout->addSpacing(10);
 
     hide();
+}
+
+void BoxSingleWidget::setCompositionMode(const int &id) {
+    SingleWidgetTarget *target = mTarget->getTarget();
+    const SWT_Type &type = target->SWT_getType();
+
+    if(type == SWT_BoundingBox) {
+        ((BoundingBox*)target)->setCompositionMode(
+                    static_cast<QPainter::CompositionMode>(id));
+    }
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
@@ -84,6 +139,13 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mColorButton->hide();
 
+        mCompositionModeVisible = true;
+        mCompositionModeCombo->setCurrentIndex(
+                    ((BoundingBox*)target)->getCompositionMode());
+        updateCompositionBoxVisible();
+
+        mBoxTargetWidget->hide();
+
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
     } else if(type == SWT_BoxesGroup) {
@@ -101,6 +163,13 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mColorButton->hide();
 
+        mCompositionModeVisible = true;
+        mCompositionModeCombo->setCurrentIndex(
+                    ((BoundingBox*)target)->getCompositionMode());
+        updateCompositionBoxVisible();
+
+        mBoxTargetWidget->hide();
+
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
     } else if(type == SWT_QrealAnimator) {
@@ -115,6 +184,11 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mLockedButton->hide();
 
         mColorButton->hide();
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
 
         mValueSlider->setAnimator(qa_target);
         mValueSlider->show();
@@ -137,7 +211,30 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
             mColorButton->hide();
         }
 
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
+
         mValueSlider->setAnimator(NULL);
+        mValueSlider->hide();
+    } else if(type == SWT_BoxTarget) {
+        mRecordButton->hide();
+
+        mContentButton->hide();
+
+        mVisibleButton->hide();
+
+        mLockedButton->hide();
+
+        mColorButton->hide();
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->show();
+        mBoxTargetWidget->setTargetProperty((BoxTargetProperty*)target);
+
         mValueSlider->hide();
     }
 }
@@ -444,6 +541,8 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.drawRect(mColorButton->x(), 3,
                        BOX_HEIGHT, BOX_HEIGHT - 6);
         }
+    } else if(type == SWT_BoxTarget) {
+        nameX += 40;
     }
     p.drawText(QRect(nameX, 0,
                      width() - nameX -
@@ -490,4 +589,18 @@ void BoxSingleWidget::openColorSettingsDialog() {
             dialog, SLOT(update()));
 
     dialog->show();
+}
+
+void BoxSingleWidget::updateCompositionBoxVisible() {
+    if(mCompositionModeVisible) {
+        if(width() > 500) {
+            mCompositionModeCombo->show();
+        } else {
+            mCompositionModeCombo->hide();
+        }
+    }
+}
+
+void BoxSingleWidget::resizeEvent(QResizeEvent *) {
+    updateCompositionBoxVisible();
 }

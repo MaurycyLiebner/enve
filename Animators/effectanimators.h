@@ -16,8 +16,6 @@ public:
                       const qreal &scale);
     qreal getEffectsMargin() const;
 
-    bool isEffectsAnimator() { return true; }
-
     void saveToSql(QSqlQuery *query, int boundingBoxSqlId);
     void loadFromSql(int boundingBoxSqlId, BoundingBox *box);
     void setParentBox(BoundingBox *box);

@@ -3,6 +3,7 @@
 #include "fmt_filters.h"
 #include "Animators/coloranimator.h"
 #include "Animators/qpointfanimator.h"
+#include "Properties/boxtargetproperty.h"
 #include <QObject>
 
 class PixmapEffect;
@@ -218,6 +219,22 @@ public:
     qreal getMargin() { return 0.; }
 private:
     QrealAnimator mInfluenceAnimator;
+};
+
+class AlphaMatteEffect : public PixmapEffect {
+public:
+    AlphaMatteEffect();
+
+    void apply(BoundingBox *target,
+               QImage *imgPtr,
+               const fmt_filters::image &img,
+               qreal scale);
+
+    qreal getMargin() { return 0.; }
+private:
+    QrealAnimator mInfluenceAnimator;
+    BoxTargetProperty mBoxTarget;
+    bool mDestinationIn = true;
 };
 
 #endif // PIXMAPEFFECT_H

@@ -10,7 +10,7 @@ EffectAnimators::EffectAnimators() :
 }
 
 void EffectAnimators::saveToSql(QSqlQuery *query, int boundingBoxSqlId) {
-    foreach(QrealAnimator *effect, mChildAnimators) {
+    foreach(Property *effect, mChildAnimators) {
         ((PixmapEffect*)effect)->saveToSql(query, boundingBoxSqlId);
     }
 }
@@ -46,14 +46,14 @@ void EffectAnimators::applyEffects(BoundingBox *target,
                                    QImage *imgPtr,
                                    const fmt_filters::image &img,
                                    const qreal &scale) {
-    foreach(QrealAnimator *effect, mChildAnimators) {
+    foreach(Property *effect, mChildAnimators) {
         ((PixmapEffect*)effect)->apply(target, imgPtr, img, scale);
     }
 }
 
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
-    foreach(QrealAnimator *effect, mChildAnimators) {
+    foreach(Property *effect, mChildAnimators) {
         qreal effectMargin = ((PixmapEffect*)effect)->getMargin();
         newMargin += effectMargin;
     }

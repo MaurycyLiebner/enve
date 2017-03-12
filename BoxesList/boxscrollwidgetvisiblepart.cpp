@@ -192,8 +192,17 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
     return NULL;
 }
 
+void BoxScrollWidgetVisiblePart::stopScrolling() {
+    if(mScrollTimer->isActive()) {
+        mScrollTimer->disconnect();
+        mScrollTimer->stop();
+    }
+}
+
 void BoxScrollWidgetVisiblePart::dropEvent(
         QDropEvent *event) {
+    stopScrolling();
+    mDragging = false;
     if(event->mimeData()->hasFormat("boundingbox")) {
         int yPos = event->pos().y();
         bool below;
@@ -260,13 +269,8 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                         effectUnderMouse);
         }
     }
-    mDragging = false;
     scheduledUpdateVisibleWidgetsContent();
     MainWindow::getInstance()->callUpdateSchedulers();
-    if(mScrollTimer->isActive()) {
-        mScrollTimer->disconnect();
-        mScrollTimer->stop();
-    }
 }
 
 void BoxScrollWidgetVisiblePart::dragEnterEvent(

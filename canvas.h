@@ -128,6 +128,7 @@ public:
     void applyOilEffectToSelected();
     void applyImplodeEffectToSelected();
     void applyDesaturateEffectToSelected();
+    void applyAlphaMatteToSelected();
 
     void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
 

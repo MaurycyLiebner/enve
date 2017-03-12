@@ -120,6 +120,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             effectsMenu->addAction("Oil");
             effectsMenu->addAction("Implode");
             effectsMenu->addAction("Desaturate");
+            effectsMenu->addAction("Alpha Matte");
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
@@ -155,6 +156,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     applyImplodeEffectToSelected();
                 } else if(selectedAction->text() == "Desaturate") {
                     applyDesaturateEffectToSelected();
+                } else if(selectedAction->text() == "Alpha Matte") {
+                    applyAlphaMatteToSelected();
                 }
             } else {
 

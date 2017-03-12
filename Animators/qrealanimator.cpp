@@ -136,16 +136,6 @@ void QrealAnimator::incAllValues(qreal valInc)
     incCurrentValue(valInc);
 }
 
-QString QrealAnimator::getName()
-{
-    return mName;
-}
-
-void QrealAnimator::setName(QString newName)
-{
-    mName = newName;
-}
-
 bool QrealAnimator::isKeyOnCurrentFrame() {
     return mKeyOnCurrentFrame;
 }

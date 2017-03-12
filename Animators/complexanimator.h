@@ -20,13 +20,11 @@ public:
                                qreal pixelsPerFrame, qreal startY,
                                int startFrame, int endFrame);
     qreal clampValue(qreal value);
-    void addChildAnimator(QrealAnimator *childAnimator);
-    void removeChildAnimator(QrealAnimator *removeAnimator);
+    void addChildAnimator(Property *childAnimator);
+    void removeChildAnimator(Property *removeAnimator);
     void startTransform();
     void setUpdater(AnimatorUpdater *updater);
     void setFrame(int frame);
-    void sortKeys();
-    void updateKeysPath();
 
     void retrieveSavedValue();
     void finishTransform();
@@ -39,7 +37,7 @@ public:
 
     bool isDescendantRecording();
     QString getValueText();
-    void swapChildAnimators(QrealAnimator *animator1, QrealAnimator *animator2);
+    void swapChildAnimators(Property *animator1, Property *animator2);
     void clearFromGraphView();
 
     bool hasChildAnimators();
@@ -49,7 +47,7 @@ public:
     void changeChildAnimatorZ(const int &oldIndex,
                               const int &newIndex);
     int getNumberOfChildren();
-    QrealAnimator *getChildAt(const int &i);
+    Property *getChildAt(const int &i);
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
@@ -57,14 +55,14 @@ public:
     void drawKey(QPainter *p, QrealKey *key,
                  const qreal &pixelsPerFrame,
                  const qreal &drawY, const int &startFrame);
-    void moveChildInList(QrealAnimator *child,
+    void moveChildInList(Property *child,
                          int from, int to,
                          bool saveUndoRedo = true);
-    void moveChildBelow(QrealAnimator *move, QrealAnimator *below);
-    void moveChildAbove(QrealAnimator *move, QrealAnimator *above);
+    void moveChildBelow(Property *move, Property *below);
+    void moveChildAbove(Property *move, Property *above);
 protected:
     bool mChildAnimatorRecording = false;
-    QList<QrealAnimator*> mChildAnimators;
+    QList<Property*> mChildAnimators;
     qreal mMinMoveValue;
     qreal mMaxMoveValue;
 };

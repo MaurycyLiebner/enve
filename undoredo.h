@@ -441,7 +441,7 @@ private:
 class MoveChildAnimatorInListUndoRedo : public UndoRedo
 {
 public:
-    MoveChildAnimatorInListUndoRedo(QrealAnimator *child,
+    MoveChildAnimatorInListUndoRedo(Property *child,
                             int fromIndex,
                             int toIndex,
                             ComplexAnimator *parentAnimator) :
@@ -468,7 +468,7 @@ public:
     }
 private:
     ComplexAnimator *mParentAnimator;
-    QrealAnimator *mChild;
+    Property *mChild;
     int mFromIndex;
     int mToIndex;
 };

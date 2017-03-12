@@ -1,11 +1,7 @@
 #ifndef ANIMATOR_H
 #define ANIMATOR_H
 
-#include <QObject>
-#include <QColor>
-#include <QSqlQuery>
-#include "connectedtomainwindow.h"
-#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include "Properties/property.h"
 
 class ComplexAnimator;
 class QrealKey;
@@ -14,10 +10,7 @@ class QPainter;
 class AnimatorUpdater;
 
 class Animator :
-        public QObject,
-        public ConnectedToMainWindow,
-        public SingleWidgetTarget
-{
+    public Property {
     Q_OBJECT
 public:
     Animator();
@@ -70,11 +63,7 @@ public:
 
     virtual bool hasKeys() = 0;
 
-    ComplexAnimator *getParentAnimator() const { return mParentAnimator; }
-    void setParentAnimator(ComplexAnimator *parentAnimator);
-    void setZValue(const int &oldIndex, const int &newIndex);
-
-    virtual bool isEffectsAnimator() { return false; }
+    virtual bool isAnimator() { return true; }
     virtual void startDragging() {}
 protected:
     int mCurrentFrame = 0;
@@ -82,13 +71,7 @@ protected:
     bool mIsCurrentAnimator = false;
     bool mIsRecording = false;
     bool mKeyOnCurrentFrame = false;
-    QString mName = "";
-    ComplexAnimator *mParentAnimator = NULL;
     QColor mAnimatorColor;
-signals:
-    void childAnimatorAdded(QrealAnimator*);
-    void childAnimatorRemoved(QrealAnimator*);
-    void childAnimatorZChanged(int, int);
 public slots:
     virtual void setRecording(bool rec) = 0;
 };

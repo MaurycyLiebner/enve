@@ -33,6 +33,12 @@ void Canvas::applyShadowToSelected() {
     }
 }
 
+void Canvas::applyAlphaMatteToSelected() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new AlphaMatteEffect());
+    }
+}
+
 void Canvas::applyBrushEffectToSelected() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         //box->addEffect(new BrushEffect());

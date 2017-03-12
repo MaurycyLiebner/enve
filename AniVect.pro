@@ -109,7 +109,10 @@ SOURCES += main.cpp\
     Boxes/videobox.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
-    Boxes/boundingboxrendercontainer.cpp
+    Boxes/boundingboxrendercontainer.cpp \
+    BoxesList/boxtargetwidget.cpp \
+    Properties/boxtargetproperty.cpp \
+    Properties/property.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -203,7 +206,10 @@ HEADERS  += mainwindow.h \
     Boxes/videobox.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
-    Boxes/boundingboxrendercontainer.h
+    Boxes/boundingboxrendercontainer.h \
+    BoxesList/boxtargetwidget.h \
+    Properties/boxtargetproperty.h \
+    Properties/property.h
 
 RESOURCES += \
     resources.qrc

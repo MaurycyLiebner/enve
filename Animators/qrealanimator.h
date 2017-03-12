@@ -127,9 +127,6 @@ public:
 
     void incAllValues(qreal valInc);
 
-    QString getName();
-    void setName(QString newName);
-
     void updateKeyOnCurrrentFrame();
     bool isKeyOnCurrentFrame();
 

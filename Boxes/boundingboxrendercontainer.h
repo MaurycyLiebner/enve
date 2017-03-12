@@ -43,6 +43,7 @@ public:
                       const QRectF &rect,
                       const QImage &img,
                       const int &frame, const qreal &res);
+    void drawWithoutTransform(QPainter *p);
 private:
     int mFrame;
     qreal mResolutionPercent;

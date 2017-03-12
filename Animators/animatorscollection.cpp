@@ -10,39 +10,21 @@ void AnimatorsCollection::setParentBoundingBox(BoundingBox *box) {
     mParentBox = box;
 }
 
-void AnimatorsCollection::addAnimator(QrealAnimator *animator)
-{
-    animator->setParentAnimator(this);
+//void AnimatorsCollection::updateKeysPath()
+//{
+//    QrealAnimator::updateKeysPath();
+//    foreach(QrealAnimator *animator, mChildAnimators) {
+//        animator->updateKeysPath();
+//    }
+//}
 
-    animator->addAllKeysToComplexAnimator();
-
-    mChildAnimators.append(animator);
-}
-
-void AnimatorsCollection::removeAnimator(QrealAnimator *animator)
-{
-    animator->removeAllKeysFromComplexAnimator();
-
-    animator->setParentAnimator(NULL);
-
-    mChildAnimators.removeOne(animator);
-}
-
-void AnimatorsCollection::updateKeysPath()
-{
-    QrealAnimator::updateKeysPath();
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->updateKeysPath();
-    }
-}
-
-void AnimatorsCollection::sortKeys()
-{
-    QrealAnimator::sortKeys();
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->sortKeys();
-    }
-}
+//void AnimatorsCollection::sortKeys()
+//{
+//    QrealAnimator::sortKeys();
+//    foreach(QrealAnimator *animator, mChildAnimators) {
+//        animator->sortKeys();
+//    }
+//}
 
 void AnimatorsCollection::childAnimatorIsRecordingChanged() {
     ComplexAnimator::childAnimatorIsRecordingChanged();

@@ -3,6 +3,7 @@
 #include <QMimeData>
 #include <QDebug>
 #include <QSqlError>
+#include "Boxes/boxesgroup.h"
 
 QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr) {
     qulonglong ptrval(*reinterpret_cast<qulonglong *>(&ptr));
@@ -444,4 +445,58 @@ void DesaturateEffect::apply(BoundingBox *target,
     Q_UNUSED(imgPtr);
     fmt_filters::desaturate(img,
                             mInfluenceAnimator.getCurrentValue());
+}
+
+AlphaMatteEffect::AlphaMatteEffect() {
+    setName("alpha matte");
+
+    mInfluenceAnimator.setValueRange(0., 1.);
+    mInfluenceAnimator.setCurrentValue(1.);
+    mInfluenceAnimator.setName("influence");
+    mInfluenceAnimator.blockPointer();
+    addChildAnimator(&mInfluenceAnimator);
+
+    mBoxTarget.setName("target");
+    mBoxTarget.blockPointer();
+    addChildAnimator(&mBoxTarget);
+}
+
+void AlphaMatteEffect::apply(BoundingBox *target,
+                             QImage *imgPtr,
+                             const fmt_filters::image &img,
+                             qreal scale) {
+    BoundingBox *boxTarget = mBoxTarget.getTarget();
+    if(boxTarget) {
+        QRectF boxTargetRect = boxTarget->getRelativeTransform().mapRect(
+                    boxTarget->getRelBoundingRect());
+        QRectF targetRect = target->getRelativeTransform().mapRect(
+                    target->getRelBoundingRect());
+
+        if(mDestinationIn) {
+            QImage imgTmp = QImage(imgPtr->size(),
+                                   QImage::Format_ARGB32_Premultiplied);
+            imgTmp.fill(Qt::transparent);
+            QPainter p(&imgTmp);
+
+            p.translate(boxTargetRect.topLeft() - targetRect.topLeft());
+
+            boxTarget->drawUpdatePixmapForEffect(&p);
+            p.end();
+
+            QPainter p2(imgPtr);
+
+            p2.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+            p2.drawImage(0, 0, imgTmp);
+
+            p2.end();
+        } else {
+            QPainter p(imgPtr);
+            p.setCompositionMode(QPainter::CompositionMode_DestinationOut);
+
+            p.translate(boxTargetRect.topLeft() - targetRect.topLeft());
+
+            boxTarget->drawUpdatePixmapForEffect(&p);
+            p.end();
+        }
+    }
 }

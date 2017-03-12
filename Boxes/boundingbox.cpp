@@ -86,8 +86,8 @@ void BoundingBox::makeDuplicate(BoundingBox *targetBox) {
     targetBox->duplicateTransformAnimatorFrom(&mTransformAnimator);
     int effectsCount = mEffectsAnimators.getNumberOfChildren();
     for(int i = 0; i < effectsCount; i++) {
-        targetBox->addEffect((PixmapEffect*)mEffectsAnimators.
-                           getChildAt(i)->makeDuplicate() );
+        targetBox->addEffect((PixmapEffect*)((PixmapEffect*)mEffectsAnimators.
+                           getChildAt(i))->makeDuplicate() );
     }
 }
 
@@ -437,6 +437,12 @@ void BoundingBox::drawUpdatePixmap(QPainter *p) {
     p->restore();
 }
 
+void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
+    p->save();
+    p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
+    mUpdateRenderContainer->drawWithoutTransform(p);
+    p->restore();
+}
 
 void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
@@ -446,10 +452,14 @@ void BoundingBox::drawPixmap(QPainter *p) {
     p->restore();
 }
 
-void BoundingBox::setCompositionMode(QPainter::CompositionMode compositionMode)
-{
+void BoundingBox::setCompositionMode(
+        QPainter::CompositionMode compositionMode) {
     mCompositionMode = compositionMode;
     scheduleUpdate();
+}
+
+QPainter::CompositionMode BoundingBox::getCompositionMode() {
+    return mCompositionMode;
 }
 
 void BoundingBox::updateEffectsMarginIfNeeded() {

@@ -11,8 +11,8 @@ ComplexAnimator::ComplexAnimator() :
 
 ComplexAnimator::~ComplexAnimator()
 {
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->decNumberPointers();
+    foreach(Property *property, mChildAnimators) {
+        property->decNumberPointers();
     }
     mChildAnimators.clear();
 }
@@ -21,7 +21,7 @@ int ComplexAnimator::getNumberOfChildren() {
     return mChildAnimators.count();
 }
 
-QrealAnimator *ComplexAnimator::getChildAt(const int &i) {
+Property *ComplexAnimator::getChildAt(const int &i) {
     return mChildAnimators.at(i);
 }
 #include <QDebug>
@@ -29,9 +29,9 @@ QrealAnimator *ComplexAnimator::getChildAt(const int &i) {
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    foreach(QrealAnimator *animator, mChildAnimators) {
+    foreach(Property *property, mChildAnimators) {
         abstraction->addChildAbstraction(
-                    animator->SWT_createAbstraction(visiblePartWidget));
+                    property->SWT_createAbstraction(visiblePartWidget));
     }
 
 }
@@ -44,26 +44,25 @@ ComplexKey *ComplexAnimator::getKeyCollectionAtFrame(int frame) {
     return (ComplexKey *) getKeyAtFrame(frame);
 }
 
-void ComplexAnimator::addChildAnimator(QrealAnimator *childAnimator)
+void ComplexAnimator::addChildAnimator(Property *childAnimator)
 {
     mChildAnimators << childAnimator;
     childAnimator->setUpdater(mUpdater);
     childAnimator->incNumberPointers();
     childAnimator->setParentAnimator(this);
+
     childAnimator->addAllKeysToComplexAnimator();
     childAnimatorIsRecordingChanged();
     childAnimator->setFrame(mCurrentFrame);
-    updateKeysPath();
-
-    emit childAnimatorAdded(childAnimator);
+    //updateKeysPath();
 
     SWT_addChildAbstractionForTargetToAll(childAnimator);
 
     callUpdater();
 }
 
-void ComplexAnimator::moveChildAbove(QrealAnimator *move,
-                                     QrealAnimator *above) {
+void ComplexAnimator::moveChildAbove(Property *move,
+                                     Property *above) {
     int indexFrom = mChildAnimators.indexOf(move);
     int indexTo = mChildAnimators.indexOf(above);
     if(indexFrom > indexTo) {
@@ -74,8 +73,8 @@ void ComplexAnimator::moveChildAbove(QrealAnimator *move,
                     indexTo);
 }
 
-void ComplexAnimator::moveChildBelow(QrealAnimator *move,
-                                     QrealAnimator *below) {
+void ComplexAnimator::moveChildBelow(Property *move,
+                                     Property *below) {
     int indexFrom = mChildAnimators.indexOf(move);
     int indexTo = mChildAnimators.indexOf(below);
     if(indexFrom < indexTo) {
@@ -87,7 +86,7 @@ void ComplexAnimator::moveChildBelow(QrealAnimator *move,
 }
 
 void ComplexAnimator::moveChildInList(
-                                 QrealAnimator *child,
+                                 Property *child,
                                  int from, int to,
                                  bool saveUndoRedo) {
     mChildAnimators.move(from, to);
@@ -101,7 +100,7 @@ void ComplexAnimator::moveChildInList(
     callUpdater();
 }
 
-void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator) {
+void ComplexAnimator::removeChildAnimator(Property *removeAnimator) {
     removeAnimator->setUpdater(NULL);
     removeAnimator->removeAllKeysFromComplexAnimator();
     mChildAnimators.removeOne(removeAnimator);
@@ -110,15 +109,13 @@ void ComplexAnimator::removeChildAnimator(QrealAnimator *removeAnimator) {
     childAnimatorIsRecordingChanged();
     updateKeysPath();
 
-    emit childAnimatorRemoved(removeAnimator);
-
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator);
 
     callUpdater();
 }
 
-void ComplexAnimator::swapChildAnimators(QrealAnimator *animator1,
-                                         QrealAnimator *animator2) {
+void ComplexAnimator::swapChildAnimators(Property *animator1,
+                                         Property *animator2) {
     int id1 = mChildAnimators.indexOf(animator1);
     int id2 = mChildAnimators.indexOf(animator2);
     mChildAnimators.swap(id1, id2);
@@ -130,8 +127,8 @@ void ComplexAnimator::clearFromGraphView()
 {
     QrealAnimator::clearFromGraphView();
 
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->clearFromGraphView();
+    foreach(Property *property, mChildAnimators) {
+        property->clearFromGraphView();
     }
 }
 
@@ -142,14 +139,14 @@ bool ComplexAnimator::hasChildAnimators()
 
 void ComplexAnimator::startTransform()
 {
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->startTransform();
+    foreach(Property *property, mChildAnimators) {
+        property->startTransform();
     }
 }
 
 void ComplexAnimator::setTransformed(bool bT) {
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->setTransformed(bT);
+    foreach(Property *property, mChildAnimators) {
+        property->setTransformed(bT);
     }
 }
 
@@ -192,8 +189,6 @@ void ComplexAnimator::changeChildAnimatorZ(const int &oldIndex,
     mChildAnimators.move(oldIndex, newIndex);
 
     callUpdater();
-
-    emit childAnimatorZChanged(oldIndex, newIndex);
 }
 
 void ComplexAnimator::setUpdater(AnimatorUpdater *updater)
@@ -201,8 +196,8 @@ void ComplexAnimator::setUpdater(AnimatorUpdater *updater)
     if(mUpdaterBlocked) return;
     QrealAnimator::setUpdater(updater);
 
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->setUpdater(updater);
+    foreach(Property *property, mChildAnimators) {
+        property->setUpdater(updater);
     }
 }
 
@@ -210,47 +205,29 @@ void ComplexAnimator::setFrame(int frame)
 {
     QrealAnimator::setFrame(frame);
 
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->setFrame(frame);
-    }
-}
-
-void ComplexAnimator::sortKeys()
-{
-    QrealAnimator::sortKeys();
-
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->sortKeys();
-    }
-}
-
-void ComplexAnimator::updateKeysPath()
-{
-    QrealAnimator::updateKeysPath();
-
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->updateKeysPath();
+    foreach(Property *property, mChildAnimators) {
+        property->setFrame(frame);
     }
 }
 
 void ComplexAnimator::retrieveSavedValue()
 {
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->retrieveSavedValue();
+    foreach(Property *property, mChildAnimators) {
+        property->retrieveSavedValue();
     }
 }
 
 void ComplexAnimator::finishTransform()
 {
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->finishTransform();
+    foreach(Property *property, mChildAnimators) {
+        property->finishTransform();
     }
 }
 
 void ComplexAnimator::cancelTransform()
 {
-    foreach(QrealAnimator *animator, mChildAnimators) {
-        animator->cancelTransform();
+    foreach(Property *property, mChildAnimators) {
+        property->cancelTransform();
     }
 }
 
@@ -273,8 +250,8 @@ QString ComplexAnimator::getValueText()
 
 void ComplexAnimator::setRecording(bool rec)
 {
-    foreach(QrealAnimator *childAnimator, mChildAnimators) {
-        childAnimator->setRecording(rec);
+    foreach(Property *property, mChildAnimators) {
+        property->setRecording(rec);
     }
     setRecordingValue(rec);
 }
@@ -283,9 +260,9 @@ void ComplexAnimator::childAnimatorIsRecordingChanged()
 {
     bool rec = true;
     mChildAnimatorRecording = false;
-    foreach(QrealAnimator *childAnimator, mChildAnimators) {
-        bool isChildRec = childAnimator->isRecording();
-        bool isChildDescRec = childAnimator->isDescendantRecording();
+    foreach(Property *property, mChildAnimators) {
+        bool isChildRec = property->isRecording();
+        bool isChildDescRec = property->isDescendantRecording();
         if(isChildDescRec) {
             mChildAnimatorRecording = true;
         }

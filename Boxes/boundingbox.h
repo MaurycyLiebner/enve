@@ -88,6 +88,8 @@ public:
     BoundingBox(BoundingBoxType type);
     virtual ~BoundingBox();
 
+    QMatrix getUpdateTransform() { return mUpdateTransform; }
+
     virtual BoundingBox *createLink(BoxesGroup *parent);
     virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 
@@ -409,6 +411,8 @@ public:
     virtual void updateCombinedTransformTmp();
     void updateRelativeTransformAfterFrameChange();
     void setNoCache(const bool &bT);
+    QPainter::CompositionMode getCompositionMode();
+    void drawUpdatePixmapForEffect(QPainter *p);
 protected:
     bool mUpdateDisabled = false;
 
