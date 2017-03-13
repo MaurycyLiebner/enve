@@ -286,15 +286,16 @@ void BoxScrollWidgetVisiblePart::dragEnterEvent(
 void BoxScrollWidgetVisiblePart::dragLeaveEvent(
         QDragLeaveEvent *) {
     mDragging = false;
-    if(mScrollTimer->isActive()) {
-        QPoint mousePos = mapFromGlobal(QCursor::pos());
-        if(mousePos.x() < 20 || mousePos.x() > width() - 20) {
-            mScrollTimer->disconnect();
-            mScrollTimer->stop();
-        } else {
-            mScrollTimer->setInterval(100);
-        }
-    }
+    stopScrolling();
+//    if(mScrollTimer->isActive()) {
+//        QPoint mousePos = mapFromGlobal(QCursor::pos());
+//        if(mousePos.x() < 20 || mousePos.x() > width() - 20) {
+//            mScrollTimer->disconnect();
+//            mScrollTimer->stop();
+//        } else {
+//            mScrollTimer->setInterval(100);
+//        }
+//    }
     update();
 }
 

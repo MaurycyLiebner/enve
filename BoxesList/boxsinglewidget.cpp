@@ -332,7 +332,8 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     if(mimeData == NULL) return;
     drag->setMimeData(mimeData);
 
-    Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
+    drag->installEventFilter(MainWindow::getInstance());
+    drag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
 void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e)
