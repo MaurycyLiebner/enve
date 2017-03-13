@@ -1,13 +1,13 @@
-#ifndef ANIMATONWIDGETSCROLLBAR_H
-#define ANIMATONWIDGETSCROLLBAR_H
+#ifndef ANIMATiONWIDGETSCROLLBAR_H
+#define ANIMATiONWIDGETSCROLLBAR_H
 
 #include <QWidget>
 
-class AnimatonWidgetScrollBar : public QWidget
+class AnimationWidgetScrollBar : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimatonWidgetScrollBar(int minSpan, int maxSpan,
+    explicit AnimationWidgetScrollBar(int minSpan, int maxSpan,
                                      int spanInc, int height, bool range,
                                      bool clamp,
                                      QWidget *parent = 0);
@@ -50,4 +50,4 @@ private:
     int mSpanInc;
 };
 
-#endif // ANIMATONWIDGETSCROLLBAR_H
+#endif // ANIMATiONWIDGETSCROLLBAR_H

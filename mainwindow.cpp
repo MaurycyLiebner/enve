@@ -85,8 +85,6 @@ MainWindow::MainWindow(QWidget *parent)
             mBoxesListAnimationDockWidget, SLOT(setCurrentFrame(int)));
     connect(mCanvasWidget, SIGNAL(changeFrameRange(int,int)),
             mBoxesListAnimationDockWidget, SLOT(setMinMaxFrame(int,int)));
-    mBoxListWidget = mBoxesListAnimationDockWidget->getBoxesList();
-    mKeysView = mBoxesListAnimationDockWidget->getKeysView();
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
     mFillStrokeSettings->setCanvasWidgetPtr(mCanvasWidget);
@@ -124,8 +122,8 @@ MainWindow::MainWindow(QWidget *parent)
     effectsMenuWidget->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
 
-    mCanvasWidget->SWT_getAbstractionForWidget(
-                mBoxListWidget->getVisiblePartWidget());
+//    mCanvasWidget->SWT_getAbstractionForWidget(
+//                mBoxListWidget->getVisiblePartWidget());
 
 //    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
 //    canvas->setName("Canvas 0");
@@ -672,7 +670,7 @@ void MainWindow::callUpdateSchedulers()
     }
     mCurrentUndoRedoStack->finishSet();
 
-    mKeysView->graphUpdateAfterKeysChangedIfNeeded();
+    //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
     foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
         sheduler->update();
@@ -684,7 +682,8 @@ void MainWindow::callUpdateSchedulers()
     mCanvasWidget->updatePivotIfNeeded();
     mCanvasWidget->repaint();
     mObjectSettingsWidget->repaint();
-    mKeysView->repaint();
+    //mKeysView->repaint();
+    mBoxesListAnimationDockWidget->update();
     updateDisplayedFillStrokeSettingsIfNeeded();
     mFillStrokeSettings->repaint();
     emit updateAll();
@@ -735,16 +734,6 @@ bool MainWindow::askForSaving() {
 
 void MainWindow::schedulePivotUpdate() {
     mCanvasWidget->schedulePivotUpdate();
-}
-
-KeysView *MainWindow::getKeysView()
-{
-    return mKeysView;
-}
-
-BoxScrollWidget *MainWindow::getBoxesList()
-{
-    return mBoxListWidget;
 }
 
 BoxScrollWidget *MainWindow::getObjectSettingsList() {
@@ -799,7 +788,7 @@ void MainWindow::setCurrentFrame(int frame) {
 
 void MainWindow::setGraphEnabled(bool graphEnabled)
 {
-    mKeysView->setGraphViewed(graphEnabled);
+    //mKeysView->setGraphViewed(graphEnabled);
 }
 
 void MainWindow::setAllPointsRecord(bool allPointsRecord)
@@ -881,7 +870,6 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
         openFile();
     } else if(mCanvasWidget->processFilteredKeyEvent(event) ) {
-    } else if(mKeysView->processFilteredKeyEvent(event)) {
     } else if(mBoxesListAnimationDockWidget->processFilteredKeyEvent(event) ) {
     } else {
         returnBool = false;

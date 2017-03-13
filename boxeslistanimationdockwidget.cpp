@@ -6,9 +6,8 @@
 #include "BoxesList/boxscrollwidget.h"
 #include "BoxesList/boxsinglewidget.h"
 
-ChangeWidthWidget::ChangeWidthWidget(QWidget *boxesList, QWidget *parent) :
+ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     QWidget(parent) {
-    mBoxesList = boxesList;
     setFixedWidth(10);
     setFixedHeight(4000);
     setCursor(Qt::SplitHCursor);
@@ -16,7 +15,7 @@ ChangeWidthWidget::ChangeWidthWidget(QWidget *boxesList, QWidget *parent) :
 
 void ChangeWidthWidget::updatePos()
 {
-    move(mBoxesList->width() - 5, 0);
+    move(mCurrentWidth - 5, 0);
 }
 
 void ChangeWidthWidget::paintEvent(QPaintEvent *) {
@@ -33,9 +32,10 @@ void ChangeWidthWidget::paintEvent(QPaintEvent *) {
 
 void ChangeWidthWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    int newWidth = mBoxesList->width() + event->x() - mPressX;
-    newWidth = qMax(200, newWidth);
-    mBoxesList->setFixedWidth(newWidth);
+    int newWidth = mCurrentWidth + event->x() - mPressX;
+    mCurrentWidth = qMax(200, newWidth);
+    emit widthSet(mCurrentWidth);
+    //mBoxesList->setFixedWidth(newWidth);
     updatePos();
 }
 
@@ -61,15 +61,6 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
     update();
 }
 
-void BoxesListAnimationDockWidget::moveSlider(int val) {
-    int diff = val%BOX_HEIGHT;
-    if(diff != 0) {
-        val -= diff;
-        mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
-    }
-    emit visibleRangeChanged(val, val + mBoxesListScrollArea->height());
-}
-
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
     QWidget(parent)
@@ -80,11 +71,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
-    mFrameRangeScrollbar = new AnimatonWidgetScrollBar(20, 200,
+    mFrameRangeScrollbar = new AnimationWidgetScrollBar(20, 200,
                                                        20, 20,
                                                        true,
                                                        true, this);
-    mAnimationWidgetScrollbar = new AnimatonWidgetScrollBar(1, 1,
+    mAnimationWidgetScrollbar = new AnimationWidgetScrollBar(1, 1,
                                                             10, 20,
                                                             false,
                                                             false, this);
@@ -99,54 +90,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mAnimationWidgetScrollbar->setSizePolicy(QSizePolicy::MinimumExpanding,
                                              QSizePolicy::Maximum);
 
-    mBoxesListScrollArea = new ScrollArea(this);
-    mBoxesListWidget = new BoxScrollWidget(mBoxesListScrollArea);
-    mBoxesListScrollArea->setWidget(mBoxesListWidget);
-//    mBoxesListWidget->setMainTarget(mMainWindow->getCanvasWidget());
 
-    connect(mBoxesListScrollArea->verticalScrollBar(),
-            SIGNAL(valueChanged(int)),
-            mBoxesListWidget, SLOT(changeVisibleTop(int)));
-    connect(mBoxesListScrollArea, SIGNAL(heightChanged(int)),
-            mBoxesListWidget, SLOT(changeVisibleHeight(int)));
-    connect(mBoxesListScrollArea, SIGNAL(widthChanged(int)),
-            mBoxesListWidget, SLOT(setWidth(int)));
 
-    mBoxesListScrollArea->verticalScrollBar()->setSingleStep(
-                BOX_HEIGHT);
-    connect(mBoxesListScrollArea->verticalScrollBar(),
-            SIGNAL(valueChanged(int)),
-            this, SLOT(moveSlider(int)));
-
-//    Canvas *canvas = MainWindow::getInstance()->getCanvas();
-//    connect(canvas, SIGNAL(changeChildZSignal(int,int)),
-//            mBoxesList, SLOT(changeItemZ(int,int)));
-//    connect(canvas, SIGNAL(addAnimatedBoundingBoxSignal(BoundingBox*)),
-//            mBoxesList, SLOT(addItemForBox(BoundingBox*)));
-//    connect(canvas, SIGNAL(removeAnimatedBoundingBoxSignal(BoundingBox*)),
-//            mBoxesList, SLOT(removeItemForBox(BoundingBox*)));
-
-    mBoxesListLayout = new QVBoxLayout();
-    mBoxesListLayout->setSpacing(0);
-    mBoxesListLayout->setMargin(0);
-
-    mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(), this);
-    connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
-            mFrameRangeScrollbar, SLOT(setViewedFramesRange(int, int)) );
-    connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
-            mAnimationWidgetScrollbar, SLOT(setMinMaxFrames(int, int)) );
-    connect(mFrameRangeScrollbar, SIGNAL(viewedFramesChanged(int,int)),
-            mKeysView, SLOT(setFramesRange(int,int)) );
-
-    connect(mKeysView, SIGNAL(wheelEventSignal(QWheelEvent*)),
-            mBoxesListScrollArea, SLOT(callWheelEvent(QWheelEvent*)));
-
-    connect(this, SIGNAL(visibleRangeChanged(int,int)),
-            mKeysView, SLOT(setViewedRange(int,int)) );
-
-    mAnimationDockWidget = new AnimationDockWidget(mBoxesListWidget,
-                                                   mKeysView);
-    mKeysView->setAnimationDockWidget(mAnimationDockWidget);
+//    mAnimationDockWidget = new AnimationDockWidget(mBoxesListWidget,
+//                                                   mKeysView);
+//    mKeysView->setAnimationDockWidget(mAnimationDockWidget);
 
 //    mGoToPreviousKeyButton = new QPushButton(
 //                QIcon(":/icons/prev_key.png"), "", this);
@@ -224,91 +172,43 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mControlButtonsLayout->addWidget(mCtrlsAlwaysVisible);
     mCtrlsAlwaysVisible->setFocusPolicy(Qt::NoFocus);
 
-    mBoxesListKeysViewLayout = new QHBoxLayout();
-    mKeysViewLayout = new QVBoxLayout();
+    mMainLayout->addLayout(mControlButtonsLayout,
+                           Qt::AlignTop);
 
-    mBoxesListMenuBar = new QMenuBar(this);
-    mBoxesListMenuBar->setFixedHeight(20);
-    mBoxesListMenuBar->setStyleSheet("QMenuBar {"
-                                        "border-top: 1px solid black;"
-                                        "border-bottom: 1px solid black;"
-                                     "}"
-                                     "QMenuBar::item {"
-                                        "margin-top: 2px;"
-                                        "padding-top: 1px;"
-                                     "}");
-    QMenu *objectsMenu = mBoxesListMenuBar->addMenu("Objects");
-    objectsMenu->addAction("All", this, SLOT(setRuleNone()));
-    objectsMenu->addAction("Selected", this, SLOT(setRuleSelected()));
-    objectsMenu->addAction("Animated", this, SLOT(setRuleAnimated()));
-    objectsMenu->addAction("Not Animated", this, SLOT(setRuleNotAnimated()));
-    objectsMenu->addAction("Visible", this, SLOT(setRuleVisible()));
-    objectsMenu->addAction("Invisible", this, SLOT(setRuleInvisible()));
-    objectsMenu->addAction("Unlocked", this, SLOT(setRuleUnloced()));
-    objectsMenu->addAction("Locked", this, SLOT(setRuleLocked()));
-
-    QMenu *targetMenu = mBoxesListMenuBar->addMenu("Target");
-    targetMenu->addAction("All", this, SLOT(setTargetAll()));
-    targetMenu->addAction("Current Canvas", this,
-                          SLOT(setTargetCurrentCanvas()));
-    targetMenu->addAction("Current Group", this,
-                          SLOT(setTargetCurrentGroup()));
-
-    mBoxesListMenuLayout = new QHBoxLayout();
-    mSearchLine = new QLineEdit("", mBoxesListMenuBar);
-    connect(mSearchLine, SIGNAL(textChanged(QString)),
-            this, SLOT(setSearchText(QString)));
-    mSearchLine->setSizePolicy(QSizePolicy::Maximum,
-                               QSizePolicy::Fixed);
-
-    mBoxesListMenuLayout->addWidget(mBoxesListMenuBar);
-    mBoxesListMenuLayout->addWidget(mSearchLine);
-
-    mBoxesListLayout->addLayout(mBoxesListMenuLayout);
-    mBoxesListLayout->addWidget(mBoxesListScrollArea);
-
-    mBoxesListKeysViewLayout->addLayout(mBoxesListLayout);
-    mBoxesListKeysViewLayout->addLayout(mKeysViewLayout);
-    QHBoxLayout *keysViewScrollbarLayout = new QHBoxLayout();
-    mKeysView->setLayout(keysViewScrollbarLayout);
-    keysViewScrollbarLayout->setAlignment(Qt::AlignRight);
-    keysViewScrollbarLayout->addWidget(
-                mBoxesListScrollArea->verticalScrollBar());
-    mBoxesListScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    keysViewScrollbarLayout->setContentsMargins(0, 0, 0, 0);
-
-    mKeysViewLayout->addWidget(mAnimationWidgetScrollbar);
-    mKeysViewLayout->addWidget(mKeysView);
-    mKeysViewLayout->addWidget(mAnimationDockWidget);
-    mAnimationDockWidget->hide();
-
-
-    mMainLayout->addLayout(mControlButtonsLayout);
-
-    mMainLayout->addLayout(mBoxesListKeysViewLayout);
-
-    mMainLayout->addWidget(mFrameRangeScrollbar);
+    mMainLayout->addWidget(mFrameRangeScrollbar,
+                           Qt::AlignBottom);
 
     mFrameRangeScrollbar->emitChange();
 
-    ChangeWidthWidget *chww = new ChangeWidthWidget(mBoxesListScrollArea,
-                                                    this);
-    mBoxesListScrollArea->setFixedWidth(400);
-    mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum,
-                                     QSizePolicy::Fixed);
-    chww->updatePos();
+    mChww = new ChangeWidthWidget(this);
+
+    mChww->updatePos();
 
     mFrameRangeScrollbar->raise();
+
+    addNewBoxesListKeysViewWidget(0);
+    addNewBoxesListKeysViewWidget(1);
 }
 
-BoxScrollWidget *BoxesListAnimationDockWidget::getBoxesList()
-{
-    return mBoxesListWidget;
-}
+void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
+                                        const int &id) {
+    BoxesListKeysViewWidget *newWidget;
+    if(id == 0) {
+        newWidget = new BoxesListKeysViewWidget(mAnimationWidgetScrollbar,
+                                                this);
+    } else {
+        newWidget = new BoxesListKeysViewWidget(NULL,
+                                                this);
+    }
+    newWidget->connectToChangeWidthWidget(mChww);
+    newWidget->connectToFrameWidgets(mAnimationWidgetScrollbar,
+                                     mFrameRangeScrollbar);
+    mMainLayout->insertWidget(qMin(mMainLayout->count() - 1, id + 1),
+                              newWidget);
+    mBoxesListKeysViewWidgets << newWidget;
 
-KeysView *BoxesListAnimationDockWidget::getKeysView()
-{
-    return mKeysView;
+    mChww->raise();
+    mAnimationWidgetScrollbar->raise();
 }
 
 bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
@@ -325,6 +225,9 @@ bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
 
 bool BoxesListAnimationDockWidget::processFilteredKeyEvent(
         QKeyEvent *event) {
+    foreach(BoxesListKeysViewWidget *blk, mBoxesListKeysViewWidgets) {
+        blk->processFilteredKeyEvent(event);
+    }
     if(processUnfilteredKeyEvent(event) ) return true;
     return false;//mBoxesList->processFilteredKeyEvent(event);
 }
@@ -403,85 +306,6 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                         qRound((1. - canvas->getResolutionPercent())*4.));
     connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
             mMainWindow, SLOT(setResolutionPercentId(int)));
-}
-
-void BoxesListAnimationDockWidget::setRuleNone() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_NoRule);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setRuleSelected() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Selected);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setRuleAnimated() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Animated);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setRuleNotAnimated() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_NotAnimated);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setRuleVisible() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Visible);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setRuleInvisible() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Invisible);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setRuleUnloced() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Unlocked);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setRuleLocked() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentRule(SWT_Locked);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setTargetAll() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                mMainWindow->getCanvasWidget(),
-                SWT_All);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setTargetCurrentCanvas() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                mMainWindow->getCanvasWidget()->getCurrentCanvas(),
-                SWT_CurrentCanvas);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setTargetCurrentGroup() {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                mMainWindow->getCanvasWidget()->getCurrentGroup(),
-                SWT_CurrentGroup);
-    mMainWindow->callUpdateSchedulers();
-}
-
-void BoxesListAnimationDockWidget::setSearchText(
-        const QString &text) {
-    mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentSearchText(text);
-    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setMinMaxFrame(

@@ -254,7 +254,7 @@ QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
 }
 
 void QrealAnimator::removeThisFromGraphAnimator() {
-    mMainWindow->getKeysView()->graphRemoveViewedAnimator(this);
+    //mMainWindow->getKeysView()->graphRemoveViewedAnimator(this);
 }
 
 void QrealAnimator::setAnimatorColor(QColor color)
@@ -592,8 +592,8 @@ void QrealAnimator::getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
         return;
     }
     if(mIsComplexAnimator) {
-        *minValP = mMainWindow->getKeysView()->getMinViewedFrame();
-        *maxValP = mMainWindow->getKeysView()->getMaxViewedFrame();
+//        *minValP = mMainWindow->getKeysView()->getMinViewedFrame();
+//        *maxValP = mMainWindow->getKeysView()->getMaxViewedFrame();
         return;
     }
     qreal minVal = 100000.;

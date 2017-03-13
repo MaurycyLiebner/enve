@@ -13,17 +13,6 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
 {
     mParent = parent;
     mAnimatorsCollection.setParentBoundingBox(this);
-    mSelectedAbstraction = SWT_createAbstraction(
-            MainWindow::getInstance()->
-                getObjectSettingsList()->getVisiblePartWidget());
-    mSelectedAbstraction->setDeletable(false);
-    //mSelectedAbstraction->setContentVisible(true);
-
-    mTimelineAbstraction = SWT_createAbstraction(
-            MainWindow::getInstance()->
-                getBoxesList()->getVisiblePartWidget());
-    mTimelineAbstraction->setDeletable(false);
-    //mTimelineAbstraction->setContentVisible(true);
 
     mEffectsAnimators.blockPointer();
     mEffectsAnimators.setName("effects");
@@ -47,16 +36,6 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
 BoundingBox::BoundingBox(BoundingBoxType type) :
     Transformable() {
     mAnimatorsCollection.setParentBoundingBox(this);
-
-    mTimelineAbstraction = SWT_createAbstraction(
-            MainWindow::getInstance()->
-                getBoxesList()->getVisiblePartWidget());
-    mTimelineAbstraction->setDeletable(false);
-
-    mSelectedAbstraction = SWT_createAbstraction(
-            MainWindow::getInstance()->
-                getObjectSettingsList()->getVisiblePartWidget());
-    mSelectedAbstraction->setDeletable(false);
 
     mType = type;
     mTransformAnimator.reset();

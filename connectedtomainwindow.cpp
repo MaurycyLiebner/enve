@@ -90,11 +90,11 @@ bool ConnectedToMainWindow::isRecordingAllPoints()
 
 void ConnectedToMainWindow::graphUpdateAfterKeysChanged()
 {
-    mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();
+    //mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();
 }
 
 void ConnectedToMainWindow::graphScheduleUpdateAfterKeysChanged() {
-    mMainWindow->getKeysView()->scheduleGraphUpdateAfterKeysChanged();
+    //mMainWindow->getKeysView()->scheduleGraphUpdateAfterKeysChanged();
 }
 
 void ConnectedToMainWindow::schedulePivotUpdate() {

@@ -41,7 +41,6 @@ SOURCES += main.cpp\
     gradientpoint.cpp \
     svgimporter.cpp \
     transformable.cpp \
-    animatonwidgetscrollbar.cpp \
     animationdockwidget.cpp \
     qrealpointvaluedialog.cpp \
     boxeslistanimationdockwidget.cpp \
@@ -112,7 +111,9 @@ SOURCES += main.cpp\
     Boxes/boundingboxrendercontainer.cpp \
     BoxesList/boxtargetwidget.cpp \
     Properties/boxtargetproperty.cpp \
-    Properties/property.cpp
+    Properties/property.cpp \
+    boxeslistkeysviewwidget.cpp \
+    animationwidgetscrollbar.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -141,7 +142,6 @@ HEADERS  += mainwindow.h \
     gradientpoint.h \
     svgimporter.h \
     transformable.h \
-    animatonwidgetscrollbar.h \
     animationdockwidget.h \
     qrealpointvaluedialog.h \
     boxeslistanimationdockwidget.h \
@@ -209,7 +209,9 @@ HEADERS  += mainwindow.h \
     Boxes/boundingboxrendercontainer.h \
     BoxesList/boxtargetwidget.h \
     Properties/boxtargetproperty.h \
-    Properties/property.h
+    Properties/property.h \
+    boxeslistkeysviewwidget.h \
+    animationwidgetscrollbar.h
 
 RESOURCES += \
     resources.qrc

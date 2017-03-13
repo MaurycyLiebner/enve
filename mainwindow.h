@@ -76,8 +76,6 @@ public:
     void schedulePivotUpdate();
 
     AnimationDockWidget *getAnimationDockWidget();
-    KeysView *getKeysView();
-    BoxScrollWidget *getBoxesList();
     BoxScrollWidget *getObjectSettingsList();
 
     CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
@@ -171,7 +169,6 @@ private:
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
-    BoxScrollWidget *mBoxListWidget;
     KeysView *mKeysView;
 
     QToolBar *mToolBar;

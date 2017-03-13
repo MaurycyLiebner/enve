@@ -6,7 +6,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QLabel>
-#include "animatonwidgetscrollbar.h"
+#include "animationwidgetscrollbar.h"
 #include "keysview.h"
 #include <qscrollarea.h>
 #include <QScrollArea>
@@ -17,12 +17,13 @@
 #include <QLineEdit>
 #include <QWidgetAction>
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "boxeslistkeysviewwidget.h"
 
 class ChangeWidthWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ChangeWidthWidget(QWidget *boxesList, QWidget *parent = 0);
+    ChangeWidthWidget(QWidget *parent = 0);
 
     void updatePos();
 
@@ -35,12 +36,13 @@ public:
     void enterEvent(QEvent *);
 
     void leaveEvent(QEvent *);
-
+signals:
+    void widthSet(int);
 private:
+    int mCurrentWidth = 400;
     bool mHover = false;
     bool mPressed = false;
     int mPressX;
-    QWidget *mBoxesList;
 };
 
 class AnimationDockWidget;
@@ -51,28 +53,13 @@ class BoxesListAnimationDockWidget : public QWidget
     Q_OBJECT
 public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
-    BoxScrollWidget *getBoxesList();
-    KeysView *getKeysView();
     bool processUnfilteredKeyEvent(QKeyEvent *event);
     bool processFilteredKeyEvent(QKeyEvent *event);
     void previewFinished();
     void setPlaying(bool playing);
     void updateSettingsForCurrentCanvas(Canvas *canvas);
+    void addNewBoxesListKeysViewWidget(const int &id);
 public slots:
-    void setRuleNone();
-    void setRuleSelected();
-    void setRuleAnimated();
-    void setRuleNotAnimated();
-    void setRuleVisible();
-    void setRuleInvisible();
-    void setRuleUnloced();
-    void setRuleLocked();
-
-    void setTargetAll();
-    void setTargetCurrentCanvas();
-    void setTargetCurrentGroup();
-
-    void setSearchText(const QString &text);
     void setCurrentFrame(int frame);
     void setMinMaxFrame(const int &minFrame, const int &maxFrame);
 signals:
@@ -86,14 +73,10 @@ private slots:
     void setGraphEnabled(bool recording);
 
     void setAllPointsRecord(bool allPointsRecord);
-    void moveSlider(int val);
 private:
-    QHBoxLayout *mBoxesListMenuLayout;
-    QLineEdit *mSearchLine;
-    QMenuBar *mBoxesListMenuBar;
+    QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
 
-    ScrollArea *mBoxesListScrollArea;
-
+    ChangeWidthWidget *mChww;
     MainWindow *mMainWindow;
     QVBoxLayout *mMainLayout;
 
@@ -111,13 +94,9 @@ private:
     QPushButton *mCtrlsAlwaysVisible;
 
     AnimationDockWidget *mAnimationDockWidget;
-    QHBoxLayout *mBoxesListKeysViewLayout;
-    QVBoxLayout *mBoxesListLayout;
-    QVBoxLayout *mKeysViewLayout;
-    BoxScrollWidget *mBoxesListWidget;
-    KeysView *mKeysView;
-    AnimatonWidgetScrollBar *mFrameRangeScrollbar;
-    AnimatonWidgetScrollBar *mAnimationWidgetScrollbar;
+
+    AnimationWidgetScrollBar *mFrameRangeScrollbar;
+    AnimationWidgetScrollBar *mAnimationWidgetScrollbar;
 };
 
 #endif // BOXESLISTANIMATIONDOCKWIDGET_H
