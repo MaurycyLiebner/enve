@@ -217,3 +217,11 @@ void AnimationWidgetScrollBar::emitChange()
     emit viewedFramesChanged(mFirstViewedFrame,
                              mFirstViewedFrame + mFramesSpan);
 }
+
+int AnimationWidgetScrollBar::getFirstViewedFrame() {
+    return mFirstViewedFrame;
+}
+
+int AnimationWidgetScrollBar::getLastViewedFrame() {
+    return mFirstViewedFrame + mFramesSpan;
+}

@@ -15,7 +15,7 @@ ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
 
 void ChangeWidthWidget::updatePos()
 {
-    move(mCurrentWidth - 5, 0);
+    move(mCurrentWidth - 5, 22);
 }
 
 void ChangeWidthWidget::paintEvent(QPaintEvent *) {
@@ -201,14 +201,13 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
                                                 this);
     }
     newWidget->connectToChangeWidthWidget(mChww);
-    newWidget->connectToFrameWidgets(mAnimationWidgetScrollbar,
-                                     mFrameRangeScrollbar);
+    newWidget->connectToFrameWidget(mFrameRangeScrollbar);
     mMainLayout->insertWidget(qMin(mMainLayout->count() - 1, id + 1),
                               newWidget);
     mBoxesListKeysViewWidgets << newWidget;
 
     mChww->raise();
-    mAnimationWidgetScrollbar->raise();
+    mFrameRangeScrollbar->raise();
 }
 
 bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(

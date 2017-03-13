@@ -17,6 +17,8 @@ public:
 
     int getMaxFrame();
     int getMinFrame();
+    int getFirstViewedFrame();
+    int getLastViewedFrame();
 protected:
     qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);

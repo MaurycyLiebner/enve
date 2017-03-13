@@ -109,6 +109,12 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
     mBoxesListScrollArea->setFixedWidth(400);
 
     setLayout(mMainLayout);
+
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentTarget(
+                mMainWindow->getCanvasWidget(),
+                SWT_CurrentCanvas);
+
 }
 
 void BoxesListKeysViewWidget::moveSlider(int val) {
@@ -117,18 +123,19 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
     }
-    emit mAnimationDockWidget->visibleRangeChanged(val, val + mBoxesListScrollArea->height());
+    emit mAnimationDockWidget->visibleRangeChanged(
+                        val,
+                        val + mBoxesListScrollArea->height());
 }
 
-void BoxesListKeysViewWidget::connectToFrameWidgets(
-        AnimationWidgetScrollBar *singleFrame,
+void BoxesListKeysViewWidget::connectToFrameWidget(
         AnimationWidgetScrollBar *frameRange) {
     connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
-            frameRange, SLOT(setViewedFramesRange(int, int)) );
-    connect(mKeysView, SIGNAL(changedViewedFrames(int,int)),
-            singleFrame, SLOT(setMinMaxFrames(int, int)) );
+            frameRange, SIGNAL(viewedFramesChanged(int,int)));
     connect(frameRange, SIGNAL(viewedFramesChanged(int,int)),
             mKeysView, SLOT(setFramesRange(int,int)) );
+    mKeysView->setFramesRange(frameRange->getFirstViewedFrame(),
+                              frameRange->getLastViewedFrame());
 }
 
 void BoxesListKeysViewWidget::connectToChangeWidthWidget(

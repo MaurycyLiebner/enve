@@ -19,8 +19,7 @@ public:
                                      BoxesListAnimationDockWidget *parent);
 
     bool processFilteredKeyEvent(QKeyEvent *event);
-    void connectToFrameWidgets(AnimationWidgetScrollBar *singleFrame,
-                               AnimationWidgetScrollBar *frameRange);
+    void connectToFrameWidget(AnimationWidgetScrollBar *frameRange);
     void connectToChangeWidthWidget(
                                ChangeWidthWidget *changeWidthWidget);
 signals:

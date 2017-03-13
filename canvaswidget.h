@@ -84,6 +84,8 @@ public:
     int getMaxFrame();
     int getMinFrame();
     void addBoxAwaitingUpdate(BoundingBox *box);
+    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
+                                     ScrollWidgetVisiblePart *visiblePartWidget);
 protected:
     QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;

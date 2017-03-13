@@ -3,7 +3,7 @@
 SoundComposition::SoundComposition(QObject *parent)
     :   QIODevice(parent) {
     mSoundsAnimatorContainer.incNumberPointers();
-    mSoundsAnimatorContainer.setName("Sounds");
+    mSoundsAnimatorContainer.setName("sounds");
 }
 
 SoundComposition::~SoundComposition() {

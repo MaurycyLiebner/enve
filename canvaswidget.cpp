@@ -51,6 +51,14 @@ SingleWidgetAbstraction* CanvasWidget::SWT_getAbstractionForWidget(
     return abs;
 }
 
+void CanvasWidget::SWT_addChildrenAbstractions(
+        SingleWidgetAbstraction *abstraction,
+        ScrollWidgetVisiblePart *visiblePartWidget) {
+    foreach(Canvas *child, mCanvasList) {
+        abstraction->addChildAbstraction(
+                    child->SWT_getAbstractionForWidget(visiblePartWidget));
+    }
+}
 
 void CanvasWidget::setCurrentCanvas(const int &id) {
     if(mCanvasList.isEmpty()) {
