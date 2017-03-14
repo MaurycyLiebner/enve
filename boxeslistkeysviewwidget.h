@@ -17,11 +17,12 @@ class BoxesListKeysViewWidget : public QWidget
 public:
     explicit BoxesListKeysViewWidget(QWidget *topWidget,
                                      BoxesListAnimationDockWidget *parent);
+    ~BoxesListKeysViewWidget();
 
     bool processFilteredKeyEvent(QKeyEvent *event);
     void connectToFrameWidget(AnimationWidgetScrollBar *frameRange);
     void connectToChangeWidthWidget(
-                               ChangeWidthWidget *changeWidthWidget);
+            ChangeWidthWidget *changeWidthWidget);
 signals:
 
 public slots:

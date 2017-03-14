@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include "boxeslistanimationdockwidget.h"
 #include "BoxesList/boxsinglewidget.h"
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 
 BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
                                                  BoxesListAnimationDockWidget *parent) :
@@ -117,7 +118,11 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
             setCurrentTarget(
                 NULL,
                 SWT_CurrentCanvas);
+}
 
+BoxesListKeysViewWidget::~BoxesListKeysViewWidget() {
+    delete mMainWindow->getCanvasWidget()->SWT_getAbstractionForWidget(
+                mBoxesListWidget->getVisiblePartWidget());
 }
 
 void BoxesListKeysViewWidget::moveSlider(int val) {

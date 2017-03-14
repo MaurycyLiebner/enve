@@ -18,6 +18,7 @@
 #include <QWidgetAction>
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "boxeslistkeysviewwidget.h"
+class VerticalWidgetsStack;
 
 class ChangeWidthWidget : public QWidget
 {
@@ -58,7 +59,7 @@ public:
     void previewFinished();
     void setPlaying(bool playing);
     void updateSettingsForCurrentCanvas(Canvas *canvas);
-    void addNewBoxesListKeysViewWidget(const int &id);
+    void addNewBoxesListKeysViewWidget(int id);
 public slots:
     void setCurrentFrame(int frame);
     void setMinMaxFrame(const int &minFrame, const int &maxFrame);
@@ -76,6 +77,7 @@ private slots:
 private:
     QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
 
+    VerticalWidgetsStack *mBoxesListKeysViewStack;
     ChangeWidthWidget *mChww;
     MainWindow *mMainWindow;
     QVBoxLayout *mMainLayout;

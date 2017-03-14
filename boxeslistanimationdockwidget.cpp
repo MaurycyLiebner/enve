@@ -5,6 +5,7 @@
 #include <QScrollBar>
 #include "BoxesList/boxscrollwidget.h"
 #include "BoxesList/boxsinglewidget.h"
+#include "verticalwidgetsstack.h"
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     QWidget(parent) {
@@ -175,6 +176,9 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mMainLayout->addLayout(mControlButtonsLayout,
                            Qt::AlignTop);
 
+    mBoxesListKeysViewStack = new VerticalWidgetsStack(this);
+    mMainLayout->addWidget(mBoxesListKeysViewStack);
+
     mMainLayout->addWidget(mFrameRangeScrollbar,
                            Qt::AlignBottom);
 
@@ -186,12 +190,16 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     mFrameRangeScrollbar->raise();
 
+
     addNewBoxesListKeysViewWidget(0);
     addNewBoxesListKeysViewWidget(1);
+    addNewBoxesListKeysViewWidget(0);
 }
 
 void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
-                                        const int &id) {
+                                        int id) {
+    if(id < 0) id = 0;
+    id = qMin(id, mBoxesListKeysViewWidgets.count());
     BoxesListKeysViewWidget *newWidget;
     if(id == 0) {
         newWidget = new BoxesListKeysViewWidget(mAnimationWidgetScrollbar,
@@ -202,9 +210,7 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
     }
     newWidget->connectToChangeWidthWidget(mChww);
     newWidget->connectToFrameWidget(mFrameRangeScrollbar);
-    mMainLayout->insertWidget(qMin(mMainLayout->count() - 1, id + 1),
-                              newWidget);
-    mBoxesListKeysViewWidgets << newWidget;
+    mBoxesListKeysViewStack->insertWidget(id, newWidget);
 
     mChww->raise();
     mFrameRangeScrollbar->raise();

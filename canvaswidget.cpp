@@ -93,7 +93,7 @@ void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
                 SWT_CurrentCanvas);
     updateDisplayedFillStrokeSettings();
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
-    update();
+    callUpdateSchedulers();
 }
 
 void CanvasWidget::addCanvasToList(Canvas *canvas) {

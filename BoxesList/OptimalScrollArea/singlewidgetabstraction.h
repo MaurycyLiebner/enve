@@ -14,7 +14,7 @@ class SingleWidgetAbstraction {
 public:
     SingleWidgetAbstraction(SingleWidgetTarget *target,
                             ScrollWidgetVisiblePart *visiblePart);
-    ~SingleWidgetAbstraction();
+    virtual ~SingleWidgetAbstraction();
 
     bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
                                      int currY, int currX,

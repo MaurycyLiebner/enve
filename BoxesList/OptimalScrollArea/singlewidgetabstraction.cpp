@@ -14,9 +14,9 @@ SingleWidgetAbstraction::~SingleWidgetAbstraction() {
     if(mTarget != NULL) {
         mTarget->SWT_removeAbstractionFromList(this);
     }
-//    foreach(SingleWidgetAbstraction *abs, mChildren) {
-//        delete abs;
-//    }
+    foreach(SingleWidgetAbstraction *abs, mChildren) {
+        delete abs;
+    }
 }
 
 bool SingleWidgetAbstraction::getAbstractions(

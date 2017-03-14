@@ -113,7 +113,8 @@ SOURCES += main.cpp\
     Properties/boxtargetproperty.cpp \
     Properties/property.cpp \
     boxeslistkeysviewwidget.cpp \
-    animationwidgetscrollbar.cpp
+    animationwidgetscrollbar.cpp \
+    verticalwidgetsstack.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -211,7 +212,8 @@ HEADERS  += mainwindow.h \
     Properties/boxtargetproperty.h \
     Properties/property.h \
     boxeslistkeysviewwidget.h \
-    animationwidgetscrollbar.h
+    animationwidgetscrollbar.h \
+    verticalwidgetsstack.h
 
 RESOURCES += \
     resources.qrc
