@@ -22,9 +22,9 @@ void BoxesListKeysViewWidgetResizer::paintEvent(QPaintEvent *) {
     }
     p.end();
 }
-
-void BoxesListKeysViewWidgetResizer::mouseMoveEvent(QMouseEvent *event) {
-    int dY = event->y() - mPressY;
+#include <QDebug>
+void BoxesListKeysViewWidgetResizer::displace(int totDy) {
+    int dY = totDy;
     int newAboveHeight = mAboveWidget->height() + dY;
     int newBelowHeight = mBelowWidget->height() - dY;
     if(newAboveHeight < 40) {
@@ -32,10 +32,26 @@ void BoxesListKeysViewWidgetResizer::mouseMoveEvent(QMouseEvent *event) {
     } else if(newBelowHeight < 40) {
         dY = mBelowWidget->height() - 40;
     }
+    qDebug() << totDy << dY;
+    if(totDy != dY) {
+        if(totDy > 0) {
+            if(mBelowResizer != NULL) {
+                mBelowResizer->displace(totDy - dY);
+            }
+        } else {
+            if(mAboveResizer != NULL) {
+                mAboveResizer->displace(totDy - dY);
+            }
+        }
+    }
     mAboveWidget->setFixedHeight(mAboveWidget->height() + dY);
     mBelowWidget->setFixedHeight(mBelowWidget->height() - dY);
     mBelowWidget->move(0, mBelowWidget->y() + dY);
     move(0, y() + dY);
+}
+
+void BoxesListKeysViewWidgetResizer::mouseMoveEvent(QMouseEvent *event) {
+    displace(event->y() - mPressY);
 }
 
 void BoxesListKeysViewWidgetResizer::mousePressEvent(QMouseEvent *event) {
@@ -66,6 +82,16 @@ void BoxesListKeysViewWidgetResizer::setAboveWidget(QWidget *aboveWidget) {
 
 void BoxesListKeysViewWidgetResizer::setBelowWidget(QWidget *belowWidget) {
     mBelowWidget = belowWidget;
+}
+
+void BoxesListKeysViewWidgetResizer::setAboveResizer(
+        BoxesListKeysViewWidgetResizer *aboveResizer) {
+    mAboveResizer = aboveResizer;
+}
+
+void BoxesListKeysViewWidgetResizer::setBelowResizer(
+        BoxesListKeysViewWidgetResizer *belowResizer) {
+    mBelowResizer = belowResizer;
 }
 
 VerticalWidgetsStack::VerticalWidgetsStack(QWidget *parent) :
@@ -102,6 +128,7 @@ void VerticalWidgetsStack::updateSizesAndPositions() {
 
 void VerticalWidgetsStack::updateResizers() {
     int resId = 0;
+    BoxesListKeysViewWidgetResizer *lastRes = NULL;
     for(int i = 0; i < mWidgets.count() - 1; i++) {
         QWidget *currWid = mWidgets.at(i);
         QWidget *nextWid = mWidgets.at(i + 1);
@@ -119,6 +146,14 @@ void VerticalWidgetsStack::updateResizers() {
         res->setBelowWidget(nextWid);
         resId++;
         res->move(0, nextWid->y());
+        res->setAboveResizer(lastRes);
+        if(lastRes != NULL) {
+            lastRes->setBelowResizer(res);
+        }
+        lastRes = res;
+    }
+    if(lastRes != NULL) {
+        lastRes->setBelowResizer(NULL);
     }
     for(int i = resId; i < mResizers.count(); i++) {
         delete mResizers.takeAt(i);

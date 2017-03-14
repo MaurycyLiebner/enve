@@ -21,9 +21,16 @@ public:
 
     void setAboveWidget(QWidget *aboveWidget);
     void setBelowWidget(QWidget *belowWidget);
+
+    void setAboveResizer(BoxesListKeysViewWidgetResizer *aboveResizer);
+    void setBelowResizer(BoxesListKeysViewWidgetResizer *belowResizer);
+    void displace(int totDy);
 signals:
     void finishedChanging();
 private:
+    BoxesListKeysViewWidgetResizer *mAboveResizer = NULL;
+    BoxesListKeysViewWidgetResizer *mBelowResizer = NULL;
+
     QWidget *mAboveWidget;
     QWidget *mBelowWidget;
     bool mHover = false;
