@@ -110,7 +110,6 @@ public:
     void updateCanvasModeButtonsChecked();
 
     //void addBoxAwaitingUpdate(BoundingBox *box);
-    void setCurrentObjectSettingsWidgetBox(BoundingBox *box);
     void setCurrentBox(BoundingBox *box);
 
 //    void nextSaveOutputFrame();

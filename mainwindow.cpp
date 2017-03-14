@@ -691,11 +691,6 @@ void MainWindow::callUpdateSchedulers()
     mCurrentUndoRedoStack->startNewSet();
 }
 
-void MainWindow::setCurrentObjectSettingsWidgetBox(BoundingBox *box) {
-    //if(mObjectSettingsWidget == NULL) return;
-    mObjectSettingsWidget->setMainTarget(box);
-}
-
 void MainWindow::setCurrentBox(BoundingBox *box) {
     if(box == NULL) {
         mFillStrokeSettings->setCurrentSettings(NULL,
@@ -704,9 +699,6 @@ void MainWindow::setCurrentBox(BoundingBox *box) {
         mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
                                                 box->getStrokeSettings());
     }
-//    mObjectSettingsWidget->getVisiblePartWidget()->
-//            updateVisibleWidgetsContent();
-    //setCurrentObjectSettingsWidgetBox(box);
 }
 
 FillStrokeSettingsWidget *MainWindow::getFillStrokeSettings() {

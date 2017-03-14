@@ -110,9 +110,12 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
 
     setLayout(mMainLayout);
 
+    mMainWindow->getCanvasWidget()->SWT_getAbstractionForWidget(
+                mBoxesListWidget->getVisiblePartWidget());
+    mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(SWT_NoRule);
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindow->getCanvasWidget(),
+                NULL,
                 SWT_CurrentCanvas);
 
 }

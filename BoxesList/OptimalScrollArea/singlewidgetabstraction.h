@@ -47,14 +47,6 @@ public:
 
     bool contentVisible();
 
-    bool isDeletable() {
-        return mDeletable;
-    }
-
-    void setDeletable(const bool &bT) {
-        mDeletable = bT;
-    }
-
     ScrollWidgetVisiblePart *getParentVisiblePartWidget() {
         return mVisiblePartWidget;
     }
@@ -89,7 +81,6 @@ private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 
     bool mIsMainTarget = false;
-    bool mDeletable = true;
     bool mContentVisible = false;
     SingleWidgetTarget *mTarget;
 

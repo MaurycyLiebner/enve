@@ -47,7 +47,6 @@ SingleWidgetAbstraction* CanvasWidget::SWT_getAbstractionForWidget(
         }
     }
     SingleWidgetAbstraction *abs = SWT_createAbstraction(visiblePartWidget);
-    abs->setDeletable(false);
     return abs;
 }
 

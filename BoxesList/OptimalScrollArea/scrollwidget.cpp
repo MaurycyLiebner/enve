@@ -14,9 +14,9 @@ ScrollWidget::ScrollWidget(ScrollArea *parent) :
 void ScrollWidget::updateAbstraction() {
     if(mMainAbstraction != NULL) {
         mMainAbstraction->setIsMainTarget(false);
-        if(mMainAbstraction->isDeletable()) {
-            delete mMainAbstraction;
-        }
+//        if(mMainAbstraction->isDeletable()) {
+//            delete mMainAbstraction;
+//        }
     }
     if(mMainTarget == NULL) {
         mMainAbstraction = NULL;

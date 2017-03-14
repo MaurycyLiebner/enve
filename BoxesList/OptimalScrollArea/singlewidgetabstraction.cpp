@@ -175,9 +175,7 @@ void SingleWidgetAbstraction::removeChildAbstractionForTarget(
 void SingleWidgetAbstraction::removeChildAbstraction(
         SingleWidgetAbstraction *abs) {
     mChildren.removeOne(abs);
-    if(abs->isDeletable()) {
-        delete abs;
-    }
+    delete abs;
 
     if(mContentVisible || mIsMainTarget) {
         mVisiblePartWidget->scheduledUpdateVisibleWidgetsContent();
