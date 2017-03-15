@@ -164,11 +164,14 @@ void VerticalWidgetsStack::updatePercent() {
     qreal totHeight = 0.;
     foreach(QWidget *wid, mWidgets) {
         totHeight += wid->height();
+        if(wid->height() == 0) totHeight += 40;
     }
 
     mHeightPercent.clear();
     for(int i = 0; i < mWidgets.count(); i++) {
-        mHeightPercent << mWidgets.at(i)->height()/(qreal)totHeight;
+        int widHeight = mWidgets.at(i)->height();
+        if(widHeight == 0) widHeight = 40;
+        mHeightPercent << widHeight/(qreal)totHeight;
     }
 }
 
