@@ -35,7 +35,7 @@ void Canvas::applyShadowToSelected() {
 
 void Canvas::applyAlphaMatteToSelected() {
     foreach(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new AlphaMatteEffect());
+        box->addEffect(new AlphaMatteEffect(box));
     }
 }
 

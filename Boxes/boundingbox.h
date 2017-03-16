@@ -286,7 +286,6 @@ public:
     QPointF mapAbsPosToRel(QPointF absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
-    virtual void scheduleUpdate();
     void setAwaitUpdateScheduled(bool bT);
 
     void setCompositionMode(QPainter::CompositionMode compositionMode);
@@ -480,9 +479,12 @@ protected:
 
     QImage mRenderPixmap;
 signals:
+    void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
     void addActiveAnimatorSignal(QrealAnimator*);
     void removeActiveAnimatorSignal(QrealAnimator*);
+public slots:
+    virtual void scheduleUpdate();
 };
 
 

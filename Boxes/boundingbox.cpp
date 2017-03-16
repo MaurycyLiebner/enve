@@ -1151,4 +1151,5 @@ void BoundingBox::scheduleUpdate() {
     if(mAwaitingUpdate) return;
     mAwaitingUpdate = true;
     mParent->addChildAwaitingUpdate(this);
+    emit scheduledUpdate();
 }

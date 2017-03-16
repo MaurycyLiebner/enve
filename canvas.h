@@ -61,7 +61,6 @@ public:
     void setPivotPositionForSelected();
 
     void awaitUpdate() {}
-    void scheduleUpdate() {}
 
     void saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);
@@ -408,6 +407,8 @@ private:
     void setLastMousePressPosAbs(const QPoint &abs);
     void setCurrentMouseEventPosAbs(const QPoint &abs);
     void setCurrentMousePressPosAbs(const QPoint &abs);
+public slots:
+    void scheduleUpdate() {}
 };
 
 #endif // CANVAS_H

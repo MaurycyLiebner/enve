@@ -447,7 +447,7 @@ void DesaturateEffect::apply(BoundingBox *target,
                             mInfluenceAnimator.getCurrentValue());
 }
 
-AlphaMatteEffect::AlphaMatteEffect() {
+AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) {
     setName("alpha matte");
 
     mInfluenceAnimator.setValueRange(0., 1.);
@@ -458,6 +458,7 @@ AlphaMatteEffect::AlphaMatteEffect() {
 
     mBoxTarget.setName("target");
     mBoxTarget.blockPointer();
+    mBoxTarget.setParentBox(parentBox);
     addChildAnimator(&mBoxTarget);
 }
 

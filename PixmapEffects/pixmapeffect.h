@@ -223,7 +223,7 @@ private:
 
 class AlphaMatteEffect : public PixmapEffect {
 public:
-    AlphaMatteEffect();
+    AlphaMatteEffect(BoundingBox *parentBox);
 
     void apply(BoundingBox *target,
                QImage *imgPtr,
