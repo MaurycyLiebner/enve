@@ -8,18 +8,14 @@
 #include "edge.h"
 #include "Animators/singlepathanimator.h"
 
-QPointF Canvas::scaleDistancePointByCurrentScale(QPointF point) {
-    return point/mCombinedTransformMatrix.m11();
-}
-
 void Canvas::handleMovePathMousePressEvent() {
-    mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPos);
+    mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
     if(mLastPressedBox == NULL) {
         if(!isShiftPressed() ) {
             clearBoxesSelection();
         }
         mSelecting = true;
-        startSelectionAtPoint(mLastMouseEventPos);
+        startSelectionAtPoint(mLastMouseEventPosRel);
     } else {
         if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
             clearBoxesSelection();
@@ -33,8 +29,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         cancelCurrentTransform();
         clearAndDisableInput();
     } else {
-        BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(
-                                                        event->pos());
+        QPointF eventPos = mCombinedTransformMatrix.inverted().map(event->pos());
+        BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(eventPos);
         if(pressedBox == NULL) {
             clearBoxesSelection();
 
@@ -187,15 +183,15 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
     mMovesToSkip = 2;
     mFirstMouseMove = true;
 
-    mLastPressPos = mLastMouseEventPos;
+    mLastPressPosRel = mLastMouseEventPosRel;
 
-    if(mRotPivot->handleMousePress(mLastMouseEventPos)) {
+    if(mRotPivot->handleMousePress(mLastMouseEventPosRel)) {
     } else if(isMovingPath()) {
         handleMovePathMousePressEvent();
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        mLastPressedBox = getPathAtFromAllAncestors(mLastPressPos);
+        mLastPressedBox = getPathAtFromAllAncestors(mLastPressPosRel);
     } else {
-        mLastPressedPoint = getPointAt(mLastMouseEventPos, mCurrentMode);
+        mLastPressedPoint = getPointAt(mLastMouseEventPosRel, mCurrentMode);
 
         if(mCurrentMode == CanvasMode::ADD_POINT) {
             if(mCurrentEndPoint != NULL) {
@@ -221,12 +217,12 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
                                                             newPathAnimator);
                 newPathAnimator->addSinglePathAnimator(newSinglePath);
                 setCurrentEndPoint(newSinglePath->
-                                    addPointAbsPos(mLastMouseEventPos,
+                                    addPointAbsPos(mLastMouseEventPosRel,
                                                     mCurrentEndPoint) );
 
             } else {
                 if(pathPointUnderMouse == NULL) {
-                    setCurrentEndPoint(mCurrentEndPoint->addPointAbsPos(mLastMouseEventPos) );
+                    setCurrentEndPoint(mCurrentEndPoint->addPointAbsPos(mLastMouseEventPosRel) );
                 } else if(mCurrentEndPoint == NULL) {
                     setCurrentEndPoint(pathPointUnderMouse);
                 } else {
@@ -247,14 +243,14 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             if (mLastPressedPoint == NULL) {
                 if(isCtrlPressed() ) {
                     clearPointsSelection();
-                    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPos,
+                    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel,
                                                              isShiftPressed());
 
                 } else {
-                    mCurrentEdge = getEdgeAt(mLastPressPos);
+                    mCurrentEdge = getEdgeAt(mLastPressPosRel);
                     if(mCurrentEdge == NULL) {
                         mSelecting = true;
-                        startSelectionAtPoint(mLastMouseEventPos);
+                        startSelectionAtPoint(mLastMouseEventPosRel);
                     } else {
                         clearPointsSelection();
                         clearCurrentEndPoint();
@@ -278,7 +274,7 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
 
             Circle *newPath = new Circle(mCurrentBoxesGroup);
-            newPath->setAbsolutePos(mLastMouseEventPos, false);
+            newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             newPath->startAllPointsTransform();
             clearBoxesSelection();
             addBoxToSelection(newPath);
@@ -289,7 +285,7 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             ParticleBox *newBox = new ParticleBox(mCurrentBoxesGroup);
 
             Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
-            newPath->setAbsolutePos(mLastMouseEventPos, false);
+            newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             newPath->startAllPointsTransform();
             clearBoxesSelection();
             addBoxToSelection(newPath);
@@ -299,7 +295,7 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
 
             TextBox *newPath = new TextBox(mCurrentBoxesGroup);
-            newPath->setAbsolutePos(mLastMouseEventPos, false);
+            newPath->setAbsolutePos(mLastMouseEventPosRel, false);
 
             mCurrentTextBox = newPath;
 
@@ -310,10 +306,34 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
     } // current mode allows interaction with points
 }
 
+void Canvas::setLastMouseEventPosAbs(const QPoint &abs) {
+    mLastMouseEventPosAbs = abs;
+    mLastMouseEventPosRel = mCombinedTransformMatrix.inverted().map(
+                                                    mLastMouseEventPosAbs);
+}
+
+void Canvas::setLastMousePressPosAbs(const QPoint &abs) {
+    mLastPressPosAbs = abs;
+    mLastPressPosRel = mCombinedTransformMatrix.inverted().map(
+                                mLastMouseEventPosAbs);
+}
+
+void Canvas::setCurrentMouseEventPosAbs(const QPoint &abs) {
+    mCurrentMouseEventPosAbs = abs;
+    mCurrentMouseEventPosRel = mCombinedTransformMatrix.inverted().map(
+                                                    mCurrentMouseEventPosAbs);
+}
+
+void Canvas::setCurrentMousePressPosAbs(const QPoint &abs) {
+    mCurrentPressPosAbs = abs;
+    mCurrentPressPosRel = mCombinedTransformMatrix.inverted().map(
+                                mCurrentMouseEventPosAbs);
+}
+
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
     if(mPreviewing) return;
-    mLastMouseEventPos = event->pos();
+    setLastMouseEventPosAbs(event->pos());
     if(event->button() != Qt::LeftButton) {
         if(event->button() == Qt::RightButton) {
             handleRightButtonMousePress(event);
@@ -352,7 +372,7 @@ void Canvas::cancelCurrentTransform() {
     }
 }
 
-void Canvas::handleMovePointMouseRelease(QPointF pos) {
+void Canvas::handleMovePointMouseRelease() {
     if(mRotPivot->isSelected()) {
         mRotPivot->deselect();
     } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
@@ -361,9 +381,9 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
     } else if(mSelecting) {
         mSelecting = false;
         if(mFirstMouseMove) {
-            mLastPressedBox = mCurrentBoxesGroup->getBoxAt(pos);
+            mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
             if((mLastPressedBox == NULL) ? true : mLastPressedBox->isGroup()) {
-                BoundingBox *pressedBox = getPathAtFromAllAncestors(pos);
+                BoundingBox *pressedBox = getPathAtFromAllAncestors(mCurrentMouseEventPosRel);
                 if(pressedBox == NULL) {
                     if(!(isShiftPressed()) ) {
                         clearPointsSelectionOrDeselect();
@@ -393,7 +413,7 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
             return;
         }
         if(!isShiftPressed()) clearPointsSelection();
-        moveSecondSelectionPoint(pos);
+        moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         selectAndAddContainedPointsToSelection(mSelectionRect);
     } else if(mFirstMouseMove) {
         if(isShiftPressed()) {
@@ -410,7 +430,8 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
     } else {
         finishSelectedPointsTransform();
         if(mLastPressedPoint != NULL) {
-            if(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible() ) {
+            if(mLastPressedPoint->isCtrlPoint() &&
+               !BoxesGroup::getCtrlsAlwaysVisible() ) {
                 removePointFromSelection(mLastPressedPoint);
             }
         }
@@ -418,7 +439,7 @@ void Canvas::handleMovePointMouseRelease(QPointF pos) {
 }
 
 
-void Canvas::handleMovePathMouseRelease(QPointF pos) {
+void Canvas::handleMovePathMouseRelease() {
     if(mRotPivot->isSelected()) {
         if(!mFirstMouseMove) {
             mRotPivot->finishTransform();
@@ -439,7 +460,7 @@ void Canvas::handleMovePathMouseRelease(QPointF pos) {
             selectOnlyLastPressedBox();
         }
     } else if(mSelecting) {
-        moveSecondSelectionPoint(pos);
+        moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         mCurrentBoxesGroup->addContainedBoxesToSelection(mSelectionRect);
         mSelecting = false;
     } else {
@@ -455,15 +476,15 @@ void Canvas::handleAddPointMouseRelease() {
     }
 }
 
-void Canvas::handleMouseRelease(QPointF eventPos) {
+void Canvas::handleMouseRelease() {
     if(mIsMouseGrabbing) {
         releaseMouseAndDontTrack();
     }
     if(!mDoubleClick) {
         if(mCurrentMode == CanvasMode::MOVE_POINT) {
-            handleMovePointMouseRelease(eventPos);
+            handleMovePointMouseRelease();
         } else if(isMovingPath()) {
-            handleMovePathMouseRelease(eventPos);
+            handleMovePathMouseRelease();
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseRelease();
         } else if(mCurrentMode == PICK_PATH_SETTINGS) {
@@ -491,6 +512,7 @@ void Canvas::handleMouseRelease(QPointF eventPos) {
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
     if(mPreviewing) return;
+    setCurrentMouseEventPosAbs(event->pos());
     mXOnlyTransform = false;
     mYOnlyTransform = false;
     if(mInputTransformationEnabled) {
@@ -505,7 +527,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
                 releaseMouseAndDontTrack();
             }
         }
-        handleMouseRelease(event->pos());
+        handleMouseRelease();
     }
 
     mLastPressedBox = NULL;
@@ -521,11 +543,12 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
         mCurrentEdge = NULL;
     }
 
+    setLastMouseEventPosAbs(event->pos());
     callUpdateSchedulers();
 }
 
 QPointF Canvas::getMoveByValueForEventPos(QPointF eventPos) {
-    QPointF moveByPoint = eventPos - mLastPressPos;
+    QPointF moveByPoint = eventPos - mLastPressPosRel;
     if(mInputTransformationEnabled) {
         moveByPoint = QPointF(mInputTransformationValue,
                               mInputTransformationValue);
@@ -538,14 +561,15 @@ QPointF Canvas::getMoveByValueForEventPos(QPointF eventPos) {
     return moveByPoint;
 }
 
-void Canvas::handleMovePointMouseMove(QPointF eventPos) {
+void Canvas::handleMovePointMouseMove() {
     if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) {
             mRotPivot->startTransform();
         }
-        mRotPivot->moveByAbs(getMoveByValueForEventPos(eventPos));
+        mRotPivot->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel));
     } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
-           mRotPivot->handleMouseMove(eventPos, mLastPressPos,
+           mRotPivot->handleMouseMove(mCurrentMouseEventPosAbs,
+                                      mLastPressPosAbs,
                                       mXOnlyTransform, mYOnlyTransform,
                                       mInputTransformationEnabled,
                                       mInputTransformationValue,
@@ -555,7 +579,7 @@ void Canvas::handleMovePointMouseMove(QPointF eventPos) {
         if(mFirstMouseMove) {
             mCurrentEdge->startTransform();
         }
-        mCurrentEdge->makePassThrough(eventPos);
+        mCurrentEdge->makePassThrough(mCurrentMouseEventPosRel);
     } else {
         if(mLastPressedPoint != NULL) {
             addPointToSelection(mLastPressedPoint);
@@ -564,14 +588,14 @@ void Canvas::handleMovePointMouseMove(QPointF eventPos) {
                 if(mFirstMouseMove) {
                     startSelectedPointsTransform();
                 }
-                mLastPressedPoint->moveByAbs(getMoveByValueForEventPos(eventPos) );
+                mLastPressedPoint->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel) );
                 return;//
             }/* else {
                 mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
                                                          mFirstMouseMove);
             }*/
         }
-        moveSelectedPointsByAbs(getMoveByValueForEventPos(eventPos),
+        moveSelectedPointsByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel),
                                 mFirstMouseMove);
     }
 }
@@ -580,15 +604,16 @@ void Canvas::setPivotPositionForSelected() {
     setSelectedPivotAbsPos(mRotPivot->getAbsolutePos());
 }
 
-void Canvas::handleMovePathMouseMove(QPointF eventPos) {
+void Canvas::handleMovePathMouseMove() {
     if(mRotPivot->isSelected()) {
         if(mFirstMouseMove) {
             mRotPivot->startTransform();
         }
 
-        mRotPivot->moveByAbs(getMoveByValueForEventPos(eventPos));
+        mRotPivot->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel));
     } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
-        mRotPivot->handleMouseMove(eventPos, mLastPressPos,
+        mRotPivot->handleMouseMove(mCurrentMouseEventPosRel,
+                                   mLastPressPosRel,
                                    mXOnlyTransform, mYOnlyTransform,
                                    mInputTransformationEnabled,
                                    mInputTransformationValue,
@@ -599,52 +624,53 @@ void Canvas::handleMovePathMouseMove(QPointF eventPos) {
             mLastPressedBox = NULL;
         }
 
-        moveSelectedBoxesByAbs(getMoveByValueForEventPos(eventPos),
+        moveSelectedBoxesByAbs(
+                    getMoveByValueForEventPos(
+                        mCurrentMouseEventPosRel),
                     mFirstMouseMove);
     }
 }
 
-void Canvas::handleAddPointMouseMove(QPointF eventPos) {
+void Canvas::handleAddPointMouseMove() {
     if(mCurrentEndPoint == NULL) return;
     if(mCurrentEndPoint->getCurrentCtrlsMode() !=
        CtrlsMode::CTRLS_SYMMETRIC) {
         mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC, false);
     }
-    mCurrentEndPoint->moveEndCtrlPtToAbsPos(eventPos);
+    mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
 }
 
 void Canvas::updateTransformation() {
-    QPointF eventPos = mLastMouseEventPos;
-
     if(mSelecting) {
-        moveSecondSelectionPoint(eventPos);
+        moveSecondSelectionPoint(mLastMouseEventPosRel);
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
-        handleMovePointMouseMove(eventPos);
+        handleMovePointMouseMove();
     } else if(isMovingPath()) {
-        handleMovePathMouseMove(eventPos);
+        handleMovePathMouseMove();
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-        handleAddPointMouseMove(eventPos);
+        handleAddPointMouseMove();
     }
 }
 
-void Canvas::mouseMoveEvent(QMouseEvent *event)
-{
+void Canvas::mouseMoveEvent(QMouseEvent *event) {
     if(mPreviewing) return;
+    setCurrentMouseEventPosAbs(event->pos());
     if(!(event->buttons() & Qt::MiddleButton) &&
        !(event->buttons() & Qt::RightButton) &&
        !(event->buttons() & Qt::LeftButton) &&
        !mIsMouseGrabbing) {
         MovablePoint *lastHoveredPoint = mHoveredPoint;
-        mHoveredPoint = getPointAt(event->pos(), mCurrentMode);
+        mHoveredPoint = getPointAt(mCurrentMouseEventPosRel,
+                                   mCurrentMode);
 
         if(mRotPivot->isVisible() && mHoveredPoint == NULL) {
-            if(mRotPivot->isPointAtAbsPos(event->pos()) ) {
+            if(mRotPivot->isPointAtAbsPos(mCurrentMouseEventPosRel) ) {
                 mHoveredPoint = mRotPivot;
             }
         }
 
         BoundingBox *lastHoveredBox = mHoveredBox;
-        mHoveredBox = mCurrentBoxesGroup->getBoxAt(event->pos());
+        mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
 
         Edge *lastEdge = mHoveredEdge;
         if(mHoveredEdge != NULL) {
@@ -652,7 +678,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
             mHoveredEdge = NULL;
         }
         if(mCurrentMode == MOVE_POINT) {
-            mHoveredEdge = getEdgeAt(event->pos());
+            mHoveredEdge = getEdgeAt(mCurrentMouseEventPosRel);
             if(mHoveredEdge != NULL) {
                 mHoveredEdge->generatePainterPath();
             }
@@ -670,40 +696,42 @@ void Canvas::mouseMoveEvent(QMouseEvent *event)
         mMovesToSkip--;
         return;
     }
-    QPointF eventPos = event->pos();
 
     if(event->buttons() & Qt::MiddleButton) {
-        moveByRel(event->pos() - mLastMouseEventPos);
+        moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
     } else if(!mTransformationFinishedBeforeMouseRelease) {
         if(mSelecting) {
-            moveSecondSelectionPoint(eventPos);
+            moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
-            handleMovePointMouseMove(eventPos);
+            handleMovePointMouseMove();
         } else if(isMovingPath()) {
-            handleMovePathMouseMove(eventPos);
+            handleMovePathMouseMove();
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
-            handleAddPointMouseMove(eventPos);
+            handleAddPointMouseMove();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
             if(isShiftPressed() ) {
-                qreal lenR = pointToLen(eventPos - mLastPressPos);
+                qreal lenR = pointToLen(mCurrentMouseEventPosRel -
+                                        mLastPressPosRel);
                 mCurrentCircle->moveRadiusesByAbs(QPointF(lenR, lenR));
             } else {
-                mCurrentCircle->moveRadiusesByAbs(eventPos - mLastPressPos);
+                mCurrentCircle->moveRadiusesByAbs(mCurrentMouseEventPosRel -
+                                                  mLastPressPosRel);
             }
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
             if(isShiftPressed()) {
-                QPointF trans = eventPos - mLastPressPos;
+                QPointF trans = mCurrentMouseEventPosRel - mLastPressPosRel;
                 qreal valF = qMax(trans.x(), trans.y() );
                 trans = QPointF(valF, valF);
                 mCurrentRectangle->moveSizePointByAbs(trans);
             } else {
-                mCurrentRectangle->moveSizePointByAbs(eventPos - mLastPressPos);
+                mCurrentRectangle->moveSizePointByAbs(mCurrentMouseEventPosRel -
+                                                      mLastPressPosRel);
             }
         }
     }
-    mLastMouseEventPos = event->pos();
+    mLastMouseEventPosRel = mCurrentMouseEventPosRel;
     mFirstMouseMove = false;
-
+    setLastMouseEventPosAbs(event->pos());
     callUpdateSchedulers();
 }
 
@@ -725,14 +753,13 @@ void Canvas::wheelEvent(QWheelEvent *event)
     callUpdateSchedulers();
 }
 
-void Canvas::mouseDoubleClickEvent(QMouseEvent *event)
-{
+void Canvas::mouseDoubleClickEvent(QMouseEvent *event) {
     mDoubleClick = true;
 
-    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPos, true);
+    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel, true);
 
     if(mLastPressedPoint == NULL) {
-        BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(event->pos());
+        BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);
         if(boxAt == NULL) {
             if(mCurrentBoxesGroup != this) {
                 setCurrentBoxesGroup((BoxesGroup*)

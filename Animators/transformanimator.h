@@ -61,6 +61,16 @@ public:
     void duplicateScaleAnimatorFrom(QPointFAnimator *source);
     void duplicateRotAnimatorFrom(QrealAnimator *source);
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
+
+    void setRelativePos(QPointF relPos,
+                        bool saveUndoRedo = false);
+    void setAbsolutePos(const QMatrix &combinedTrans,
+                        QPointF pos,
+                        bool saveUndoRedo);
+    void moveToAbs(const QMatrix &combinedTrans,
+                   QPointF absPos);
+    void moveByAbs(const QMatrix &combinedTrans,
+                   const QPointF &absTrans);
 private:
     QPointFAnimator mPivotAnimator;
     QPointFAnimator mPosAnimator;

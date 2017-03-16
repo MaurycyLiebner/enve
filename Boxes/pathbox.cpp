@@ -149,8 +149,8 @@ void PathBox::makeDuplicate(BoundingBox *targetBox) {
                                                &mStrokeGradientPoints);
 }
 
-void PathBox::schedulePathUpdate(const bool &replaceCache) {
-    scheduleUpdate(replaceCache);
+void PathBox::schedulePathUpdate() {
+    scheduleUpdate();
     if(mPathUpdateNeeded) {
         return;
     }
@@ -159,9 +159,9 @@ void PathBox::schedulePathUpdate(const bool &replaceCache) {
     mOutlinePathUpdateNeeded = false;
 }
 
-void PathBox::scheduleOutlinePathUpdate(const bool &replaceCache)
+void PathBox::scheduleOutlinePathUpdate()
 {
-    scheduleUpdate(replaceCache);
+    scheduleUpdate();
     if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
     }
@@ -208,7 +208,7 @@ void PathBox::updateOutlinePath() {
             stroker.setCapStyle(mPathStroker.capStyle());
             stroker.setJoinStyle(mPathStroker.joinStyle());
             stroker.setMiterLimit(mPathStroker.miterLimit());
-            stroker.setWidth(mPathStroker.width()*getCurrentCanvasScale() );
+            stroker.setWidth(mPathStroker.width());
             mOutlinePath = stroker.createStroke(mPath);
         }
     } else {

@@ -127,7 +127,7 @@ public:
 
     QPointF getAbsolutePos();
 
-    virtual void updateCombinedTransform(const bool &replaceCache = true);
+    virtual void updateCombinedTransform();
     void moveByRel(QPointF trans);
 
     void startTransform();
@@ -162,8 +162,6 @@ public:
 
     virtual PaintSettings *getFillSettings();
     virtual StrokeSettings *getStrokeSettings();
-
-    virtual qreal getCurrentCanvasScale();
 
     void setPivotAbsPos(QPointF absPos,
                         bool saveUndoRedo = true,
@@ -288,15 +286,14 @@ public:
     QPointF mapAbsPosToRel(QPointF absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
-    virtual void scheduleUpdate(const bool &replaceCache = true);
+    virtual void scheduleUpdate();
     void setAwaitUpdateScheduled(bool bT);
 
     void setCompositionMode(QPainter::CompositionMode compositionMode);
 
     virtual void updateEffectsMargin();
 
-    virtual void scheduleEffectsMarginUpdate(
-                            const bool &replaceCached = true);
+    virtual void scheduleEffectsMarginUpdate();
     void updateEffectsMarginIfNeeded();
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
@@ -402,7 +399,7 @@ public:
     void applyEffects(QImage *im,
                       qreal scale = 1.);
     virtual void clearCache();
-    QMatrix getCombinedTransform() const;
+    virtual QMatrix getCombinedTransform() const;
     virtual void drawUpdatePixmap(QPainter *p);
 
     virtual void processUpdate();
@@ -413,6 +410,7 @@ public:
     void setNoCache(const bool &bT);
     QPainter::CompositionMode getCompositionMode();
     void drawUpdatePixmapForEffect(QPainter *p);
+    QRectF getUpdateRenderRect();
 protected:
     bool mUpdateDisabled = false;
 
@@ -428,7 +426,7 @@ protected:
 
     bool mAwaitUpdateScheduled = false;
 
-    virtual void updateAfterCombinedTransformationChanged(const bool &replaceCache = true) {}
+    virtual void updateAfterCombinedTransformationChanged() {}
 
     std::unordered_map<int, BoundingBoxRenderContainer*> mRenderContainers;
 
@@ -440,8 +438,6 @@ protected:
 
     BoundingBoxRenderContainer *mOldRenderContainer = mUpdateRenderContainer;
 
-    bool mReplaceCache = false;
-
     QMatrix mRelativeTransformMatrix;
 
     bool mNoCache = false;
@@ -450,7 +446,7 @@ protected:
     QRectF mUpdateRelBoundingRect;
     QMatrix mUpdateCanvasTransform;
     QMatrix mUpdateTransform;
-    bool mUpdateReplaceCache = false;
+    QRectF mUpdatePixmapRect;
 
     bool mRedoUpdate = false;
     bool mAwaitingUpdate = false;

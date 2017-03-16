@@ -3,6 +3,7 @@
 
 BoxTargetProperty::BoxTargetProperty() :
     Property() {
+    setName("target");
 }
 
 BoundingBox *BoxTargetProperty::getTarget() {

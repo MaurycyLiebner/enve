@@ -161,13 +161,11 @@ public:
     bool shouldPaintOnImage();
     void drawUpdatePixmap(QPainter *p);
 
-    virtual void addChildAwaitingUpdate(BoundingBox *child,
-                                        const bool &replaceCache);
+    virtual void addChildAwaitingUpdate(BoundingBox *child);
     void beforeUpdate();
     void processUpdate();
     void afterUpdate();
-    void updateAfterCombinedTransformationChanged(
-                                    const bool &replaceCache = true);
+    void updateAfterCombinedTransformationChanged();
     void updateCombinedTransformTmp();
 protected:
     static bool mCtrlsAlwaysVisible;

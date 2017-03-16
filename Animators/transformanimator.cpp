@@ -375,3 +375,27 @@ void TransformAnimator::duplicateOpacityAnimatorFrom(
         QrealAnimator *source) {
     source->makeDuplicate(&mOpacityAnimator);
 }
+
+void TransformAnimator::moveByAbs(const QMatrix &combinedTrans,
+                                  const QPointF &absTrans) {
+    moveToAbs(combinedTrans,
+              combinedTrans.map(mPosAnimator.getSavedValue()) +
+              absTrans);
+}
+
+void TransformAnimator::moveToAbs(const QMatrix &combinedTrans,
+                                  QPointF absPos) {
+    setAbsolutePos(combinedTrans, absPos, false);
+}
+
+void TransformAnimator::setAbsolutePos(const QMatrix &combinedTrans,
+                                       QPointF pos,
+                                       bool saveUndoRedo) {
+    QPointF newPos = combinedTrans.inverted().map(pos);
+    setRelativePos(newPos, saveUndoRedo);
+}
+
+void TransformAnimator::setRelativePos(QPointF relPos,
+                                       bool saveUndoRedo) {
+    mPosAnimator.setCurrentValue(relPos, saveUndoRedo);
+}

@@ -117,19 +117,14 @@ QRectF Canvas::getPixBoundingRect()
     return QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight));
 }
 
-void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin)
-{
+void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin) {
     QPointF transPoint = -mapAbsPosToRel(absOrigin);
-
-    mLastPressPos = mapAbsPosToRel(mLastPressPos);
 
     mCombinedTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mCombinedTransformMatrix.scale(scaleXBy, scaleYBy);
     mCombinedTransformMatrix.translate(transPoint.x(), transPoint.y());
 
-    mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
-
-    updateAfterCombinedTransformationChanged();
+    mLastPressPosAbs = mCombinedTransformMatrix.map(mLastPressPosRel);
 }
 
 void Canvas::scale(qreal scaleBy, QPointF absOrigin)
@@ -239,15 +234,12 @@ void Canvas::paintEvent(QPainter *p)
                     QColor(75, 75, 75));
         p->fillRect(viewRect, Qt::white);
 
+        p->setTransform(QTransform(mCombinedTransformMatrix), true);
         foreach(BoundingBox *box, mChildBoxes){
             box->drawPixmap(p);
         }
         mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
         drawSelected(p, mCurrentMode);
-
-        p->setPen(QPen(Qt::black, 2.));
-        p->setBrush(Qt::NoBrush);
-        p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
 
         p->setPen(QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine));
         if(mSelecting) {
@@ -281,6 +273,11 @@ void Canvas::paintEvent(QPainter *p)
                 mHoveredBox->drawHovered(p);
             }
         }
+
+        p->resetTransform();
+        p->setPen(QPen(Qt::black, 2.));
+        p->setBrush(Qt::NoBrush);
+        p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
     }
 
     if(mCanvasWidget->hasFocus() ) {
@@ -294,10 +291,6 @@ void Canvas::paintEvent(QPainter *p)
 
 bool Canvas::isMovingPath() {
     return mCurrentMode == CanvasMode::MOVE_PATH;
-}
-
-qreal Canvas::getCurrentCanvasScale() {
-    return mCombinedTransformMatrix.m11();
 }
 
 QSize Canvas::getCanvasSize()
@@ -433,6 +426,7 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
     p.translate(-mRenderRect.topLeft()*mResolutionPercent);
     //p.translate(-mCanvasRect.topLeft());
     p.scale(mResolutionPercent, mResolutionPercent);
+    p.setTransform(QTransform(mCombinedTransformMatrix), true);
 
     Canvas::drawPreviewPixmap(&p);
 
@@ -603,7 +597,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
         cancelCurrentTransform();
     } else if(event->key() == Qt::Key_Return ||
               event->key() == Qt::Key_Enter) {
-        handleMouseRelease(mLastMouseEventPos);
+        handleMouseRelease();
         clearAndDisableInput();
     } else if(event->key() == Qt::Key_Minus) {
         if( ((mInputText.isEmpty()) ? false : mInputText.at(0) == '-') ) {
@@ -731,8 +725,9 @@ void Canvas::keyPressEvent(QKeyEvent *event)
         } else if(event->key() == Qt::Key_R && (isMovingPath() ||
                   mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
            mTransformationFinishedBeforeMouseRelease = false;
-           mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
-           mLastPressPos = mLastMouseEventPos;
+           QPoint cursorPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+           setLastMouseEventPosAbs(cursorPos);
+           setLastMousePressPosAbs(cursorPos);
            mRotPivot->startRotating();
            mDoubleClick = false;
            mFirstMouseMove = true;
@@ -744,8 +739,9 @@ void Canvas::keyPressEvent(QKeyEvent *event)
            mXOnlyTransform = false;
            mYOnlyTransform = false;
 
-           mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
-           mLastPressPos = mLastMouseEventPos;
+           QPoint cursorPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+           setLastMouseEventPosAbs(cursorPos);
+           setLastMousePressPosAbs(cursorPos);
            mRotPivot->startScaling();
            mDoubleClick = false;
            mFirstMouseMove = true;
@@ -758,8 +754,9 @@ void Canvas::keyPressEvent(QKeyEvent *event)
             mXOnlyTransform = false;
             mYOnlyTransform = false;
 
-            mLastMouseEventPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
-            mLastPressPos = mLastMouseEventPos;
+            QPoint cursorPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+            setLastMouseEventPosAbs(cursorPos);
+            setLastMousePressPosAbs(cursorPos);
             mDoubleClick = false;
             mFirstMouseMove = true;
 
@@ -812,7 +809,6 @@ void Canvas::resetTransormation() {
     mVisibleWidth = mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
-    updateAfterCombinedTransformationChanged();
 
 }
 
@@ -820,7 +816,6 @@ void Canvas::fitCanvasToSize() {
     mCombinedTransformMatrix.reset();
     mVisibleHeight = mHeight + 20;
     mVisibleWidth = mWidth + 20;
-    updateAfterCombinedTransformationChanged();
     qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
     qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
     scale(qMin(heightScale, widthScale), QPointF(0., 0.));
@@ -828,21 +823,18 @@ void Canvas::fitCanvasToSize() {
     mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
-    updateAfterCombinedTransformationChanged();
 
 }
 
-void Canvas::moveByRel(QPointF trans)
-{
+void Canvas::moveByRel(QPointF trans) {
     trans = mapAbsPosToRel(trans) -
             mapAbsPosToRel(QPointF(0, 0));
 
-    mLastPressPos = mapAbsPosToRel(mLastPressPos);
+    mLastPressPosRel = mapAbsPosToRel(mLastPressPosRel);
 
     mCombinedTransformMatrix.translate(trans.x(), trans.y());
 
-    mLastPressPos = mCombinedTransformMatrix.map(mLastPressPos);
-    updateAfterCombinedTransformationChanged();
+    mLastPressPosRel = mCombinedTransformMatrix.map(mLastPressPosRel);
     schedulePivotUpdate();
 }
 
@@ -942,8 +934,8 @@ void Canvas::setIsCurrentCanvas(const bool &bT) {
     mIsCurrentCanvas = bT;
 }
 
-void Canvas::addChildAwaitingUpdate(BoundingBox *child, const bool &) {
-    BoxesGroup::addChildAwaitingUpdate(child, false);
+void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
+    BoxesGroup::addChildAwaitingUpdate(child);
     if(mAwaitingUpdate) return;
     mAwaitingUpdate = true;
     addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));

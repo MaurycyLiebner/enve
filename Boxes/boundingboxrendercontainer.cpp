@@ -56,11 +56,11 @@ const int &BoundingBoxRenderContainer::getFrame() const {
 }
 
 void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransform,
-                                                 const QMatrix &transform,
                                                  const qreal &effectsMargin,
                                                  const qreal &resolutionPer,
                                                  BoundingBox *target) {
-    mTransform = transform;
+    mTransform = combinedTransform;
+    mTransform.scale(resolutionPer, resolutionPer);
 
     mResolutionPercent = resolutionPer;
     mImage = target->getAllUglyPixmapProvidedTransform(

@@ -52,7 +52,6 @@ public:
     void startSelectionAtPoint(QPointF pos);
     void moveSecondSelectionPoint(QPointF pos);
     void setPointCtrlsMode(CtrlsMode mode);
-    QPointF scaleDistancePointByCurrentScale(QPointF point);
     void setCurrentBoxesGroup(BoxesGroup *group);
 
     void updatePivot();
@@ -62,7 +61,7 @@ public:
     void setPivotPositionForSelected();
 
     void awaitUpdate() {}
-    void scheduleUpdate(const bool &) {}
+    void scheduleUpdate() {}
 
     void saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);
@@ -164,8 +163,6 @@ public:
     void updateInputValue();
     void clearAndDisableInput();
 
-    qreal getCurrentCanvasScale();
-
     void grabMouseAndTrack();
 
     void setPartialRepaintRect(QRectF absRect);
@@ -254,28 +251,30 @@ public:
         return mCurrentBoxesGroup;
     }
 
-    void updateCombinedTransform(const bool &) { }
+    void updateCombinedTransform() {}
+
+    QMatrix getCombinedTransform() const { return QMatrix(); }
+    QMatrix getRelativeTransform() const { return QMatrix(); }
 
     void setIsCurrentCanvas(const bool &bT);
 
     void scheduleEffectsMarginUpdate() {}
 
-    void addChildAwaitingUpdate(BoundingBox *child, const bool &);
+    void addChildAwaitingUpdate(BoundingBox *child);
 protected:
-    void updateAfterCombinedTransformationChanged(const bool &replaceCache = true) {
-        Q_UNUSED(replaceCache);
-        foreach(BoundingBox *child, mChildBoxes) {
-            child->updateCombinedTransformTmp();
-            child->scheduleUpdate(false);
-        }
+    void updateAfterCombinedTransformationChanged() {
+//        foreach(BoundingBox *child, mChildBoxes) {
+//            child->updateCombinedTransformTmp();
+//            child->scheduleUpdate();
+//        }
     }
 
     void setCurrentEndPoint(PathPoint *point);
 
     PathPoint *getCurrentPoint();
 
-    void handleMovePathMouseRelease(QPointF pos);
-    void handleMovePointMouseRelease(QPointF pos);
+    void handleMovePathMouseRelease();
+    void handleMovePointMouseRelease();
 
     bool isMovingPath();
     bool handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event);
@@ -376,8 +375,16 @@ private:
     bool mFirstMouseMove = false;
     bool mSelecting = false;
 //    bool mMoving = false;
-    QPoint mLastMouseEventPos;
-    QPointF mLastPressPos;
+    QPointF mLastMouseEventPosRel;
+    QPointF mLastMouseEventPosAbs;
+    QPointF mLastPressPosAbs;
+    QPointF mLastPressPosRel;
+
+    QPointF mCurrentMouseEventPosRel;
+    QPointF mCurrentMouseEventPosAbs;
+    QPointF mCurrentPressPosAbs;
+    QPointF mCurrentPressPosRel;
+
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
     MovablePoint *mLastPressedPoint = NULL;
@@ -385,18 +392,22 @@ private:
     BoundingBox *mLastPressedBox = NULL;
     void setCtrlPointsEnabled(bool enabled);
     PathPivot *mRotPivot;
-    void handleMovePointMouseMove(QPointF eventPos);
-    void handleMovePathMouseMove(QPointF eventPos);
-    void handleAddPointMouseMove(QPointF eventPos);
+    void handleMovePointMouseMove();
+    void handleMovePathMouseMove();
+    void handleAddPointMouseMove();
     void handleMovePathMousePressEvent();
     void handleAddPointMouseRelease();
 
     QList<QImage*> mPreviewFrames;
     void updateTransformation();
-    void handleMouseRelease(QPointF eventPos);
+    void handleMouseRelease();
     QPointF getMoveByValueForEventPos(QPointF eventPos);
     void cancelCurrentTransform();
     void releaseMouseAndDontTrack();
+    void setLastMouseEventPosAbs(const QPoint &abs);
+    void setLastMousePressPosAbs(const QPoint &abs);
+    void setCurrentMouseEventPosAbs(const QPoint &abs);
+    void setCurrentMousePressPosAbs(const QPoint &abs);
 };
 
 #endif // CANVAS_H

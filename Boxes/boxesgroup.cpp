@@ -38,11 +38,10 @@ void BoxesGroup::clearCache() {
 void BoxesGroup::updateCombinedTransformTmp() {
     mCombinedTransformMatrix = mRelativeTransformMatrix*
                                mParent->getCombinedTransform();
-    if(mIsDescendantCurrentGroup) {
-        foreach(BoundingBox *child, mChildBoxes) {
-            child->updateCombinedTransformTmp();
-        }
-    } else {
+    foreach(BoundingBox *child, mChildBoxes) {
+        child->updateCombinedTransformTmp();
+    }
+    if(!mIsDescendantCurrentGroup) {
         mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
                                                 mCombinedTransformMatrix);
     }
@@ -296,12 +295,11 @@ void BoxesGroup::drawUpdatePixmap(QPainter *p) {
     }
 }
 
-void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child,
-                                        const bool &replaceCache) {
+void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
     mChildrenAwaitingUpdate << child;
 
     if(mParent == NULL) return;
-    scheduleUpdate(replaceCache);
+    scheduleUpdate();
 }
 
 void BoxesGroup::beforeUpdate() {
@@ -670,10 +668,9 @@ void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
                     indexTo);
 }
 
-void BoxesGroup::updateAfterCombinedTransformationChanged(
-                                    const bool &replaceCache) {
+void BoxesGroup::updateAfterCombinedTransformationChanged() {
     foreach(BoundingBox *child, mChildBoxes) {
-        child->updateCombinedTransform(replaceCache);
+        child->updateCombinedTransform();
     }
 }
 

@@ -342,13 +342,9 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
 
 void BoundingBox::updateAllUglyPixmap() {
     Canvas *parentCanvas = getParentCanvas();
-    QMatrix inverted = mUpdateCanvasTransform.inverted().
-                            scale(parentCanvas->getResolutionPercent(),
-                                  parentCanvas->getResolutionPercent());
 
     mUpdateRenderContainer->updateVariables(
                 mUpdateTransform,
-                inverted*mUpdateTransform,
                 mEffectsMargin,
                 parentCanvas->getResolutionPercent(),
                 this);
@@ -423,6 +419,10 @@ void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
     p->restore();
 }
 
+QRectF BoundingBox::getUpdateRenderRect() {
+    return mUpdateRenderContainer->getBoundingRect();
+}
+
 void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
     p->setCompositionMode(mCompositionMode);
@@ -452,9 +452,8 @@ void BoundingBox::updateEffectsMargin() {
     mEffectsMargin = mEffectsAnimators.getEffectsMargin();
 }
 
-void BoundingBox::scheduleEffectsMarginUpdate(
-                            const bool &replaceCached) {
-    scheduleUpdate(replaceCached);
+void BoundingBox::scheduleEffectsMarginUpdate() {
+    scheduleUpdate();
     mEffectsMarginUpdateNeeded = true;
     if(mParent == NULL) return;
     mParent->scheduleEffectsMarginUpdate();
@@ -609,10 +608,6 @@ StrokeSettings *BoundingBox::getStrokeSettings() {
     return NULL;
 }
 
-qreal BoundingBox::getCurrentCanvasScale() {
-     return getParentCanvas()->getCurrentCanvasScale();
-}
-
 void BoundingBox::drawAsBoundingRect(QPainter *p, QPainterPath path) {
     p->save();
     QPen pen = QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine);
@@ -675,12 +670,13 @@ QPointF BoundingBox::mapRelativeToAbsolute(QPointF relPos) const {
 }
 
 void BoundingBox::moveByAbs(QPointF trans) {
-    QPointF by = mParent->mapAbsPosToRel(trans) -
-                 mParent->mapAbsPosToRel(QPointF(0., 0.));
-//    QPointF by = mapAbsPosToRel(
-//                trans - mapRelativeToAbsolute(QPointF(0., 0.)));
+    mTransformAnimator.moveByAbs(mParent->getCombinedTransform(), trans);
+//    QPointF by = mParent->mapAbsPosToRel(trans) -
+//                 mParent->mapAbsPosToRel(QPointF(0., 0.));
+// //    QPointF by = mapAbsPosToRel(
+// //                trans - mapRelativeToAbsolute(QPointF(0., 0.)));
 
-    moveByRel(by);
+//    moveByRel(by);
 }
 
 void BoundingBox::moveByRel(QPointF trans) {
@@ -773,16 +769,16 @@ void BoundingBox::updateRelativeTransformTmp() {
 
 void BoundingBox::updateRelativeTransformAfterFrameChange() {
     mRelativeTransformMatrix = mTransformAnimator.getCurrentValue();
-    updateCombinedTransform(false);
+    updateCombinedTransform();
 }
 
-void BoundingBox::updateCombinedTransform(const bool &replaceCache) {
+void BoundingBox::updateCombinedTransform() {
     if(mParent == NULL) return;
     mCombinedTransformMatrix = mRelativeTransformMatrix*
                                mParent->getCombinedTransform();
 
-    updateAfterCombinedTransformationChanged(replaceCache);
-    scheduleUpdate(replaceCache);
+    updateAfterCombinedTransformationChanged();
+    scheduleUpdate();
 }
 
 void BoundingBox::updateCombinedTransformTmp() {
@@ -1114,60 +1110,45 @@ void BoundingBox::afterUpdate() {
     if(mNoCache) {
         mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
     } else {
-        if(mUpdateReplaceCache) {
-            for(auto pair : mRenderContainers) {
-                delete pair.second;
-            }
-
-            mRenderContainers.clear();
-            mOldRenderContainer = getRenderContainerAtFrame(
-                                            mUpdateFrame);
-
-            if(mOldRenderContainer == NULL) {
-                mOldRenderContainer = new BoundingBoxRenderContainer();
-                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
-            }
-            mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-        } else {
-            mOldRenderContainer = getRenderContainerAtFrame(
-                                            mUpdateFrame);
-            if(mOldRenderContainer == NULL) {
-                mOldRenderContainer = new BoundingBoxRenderContainer();
-                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
-                mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-            }
+        for(auto pair : mRenderContainers) {
+            delete pair.second;
         }
+
+        mRenderContainers.clear();
+        mOldRenderContainer = getRenderContainerAtFrame(
+                                        mUpdateFrame);
+
+        if(mOldRenderContainer == NULL) {
+            mOldRenderContainer = new BoundingBoxRenderContainer();
+            mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+        }
+        mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+//        if(!mUpdateReplaceCache) {
+//            mOldRenderContainer = getRenderContainerAtFrame(
+//                                            mUpdateFrame);
+//            if(mOldRenderContainer == NULL) {
+//                mOldRenderContainer = new BoundingBoxRenderContainer();
+//                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+//                mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+//            }
+//        }
     }
     mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
                                             mCombinedTransformMatrix);
     //updateUglyPaintTransform();
-
-    mUpdateReplaceCache = false;
 }
 
 void BoundingBox::setUpdateVars() {
     mUpdateCanvasTransform = getParentCanvas()->getCombinedTransform();
     mUpdateTransform = mCombinedTransformMatrix;
     mUpdateFrame = mCurrentFrame;
-    mUpdateReplaceCache = mReplaceCache || mUpdateReplaceCache;
-    mReplaceCache = false;
     mUpdateRelBoundingRect = mRelBoundingRect;
 
     updateBoundingRect();
 }
 
-void BoundingBox::scheduleUpdate(const bool &replaceCache) {
-    if(mAwaitingUpdate) {
-        if(mReplaceCache) return;
-        if(replaceCache) {
-            qDebug() << mName + " scheduleUpdate replaceCache";
-            mReplaceCache = true;
-            mParent->scheduleUpdate(true);
-        }
-    } else {
-        mReplaceCache = replaceCache || mReplaceCache;
-        mAwaitingUpdate = true;
-        qDebug() << mName + " first scheduleUpdate " << replaceCache;
-        mParent->addChildAwaitingUpdate(this, mReplaceCache);
-    }
+void BoundingBox::scheduleUpdate() {
+    if(mAwaitingUpdate) return;
+    mAwaitingUpdate = true;
+    mParent->addChildAwaitingUpdate(this);
 }

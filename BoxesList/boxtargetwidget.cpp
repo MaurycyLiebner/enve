@@ -7,6 +7,7 @@
 
 BoxTargetWidget::BoxTargetWidget(QWidget *parent) : QWidget(parent) {
     setAcceptDrops(true);
+    setMaximumWidth(150);
 }
 
 void BoxTargetWidget::setTargetProperty(BoxTargetProperty *property) {
@@ -43,6 +44,16 @@ void BoxTargetWidget::dragLeaveEvent(
 void BoxTargetWidget::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setBrush(Qt::white);
+    if(mDragging) {
+        p.setPen(Qt::white);
+    } else {
+        p.setPen(Qt::black);
+    }
+    p.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 5., 5.);
+
+    p.setPen(Qt::black);
     if(mProperty) {
         BoundingBox *target = mProperty->getTarget();
         if(target == NULL) {
@@ -51,10 +62,6 @@ void BoxTargetWidget::paintEvent(QPaintEvent *) {
             p.drawText(rect(), Qt::AlignCenter, target->getName());
         }
     }
-    if(mDragging) {
-        p.setPen(Qt::white);
-    }
-    p.drawRoundedRect(rect(), 2., 2.);
 
     p.end();
 }

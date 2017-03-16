@@ -467,10 +467,8 @@ void AlphaMatteEffect::apply(BoundingBox *target,
                              qreal scale) {
     BoundingBox *boxTarget = mBoxTarget.getTarget();
     if(boxTarget) {
-        QRectF boxTargetRect = boxTarget->getRelativeTransform().mapRect(
-                    boxTarget->getRelBoundingRect());
-        QRectF targetRect = target->getRelativeTransform().mapRect(
-                    target->getRelBoundingRect());
+        QRectF boxTargetRect = boxTarget->getUpdateRenderRect();
+        QRectF targetRect = target->getUpdateRenderRect();
 
         if(mDestinationIn) {
             QImage imgTmp = QImage(imgPtr->size(),

@@ -29,7 +29,7 @@ void PathPointUpdater::update() {
 }
 
 void PathPointUpdater::frameChangeUpdate() {
-    mTarget->schedulePathUpdate(false);
+    mTarget->schedulePathUpdate();
 }
 
 GradientUpdater::GradientUpdater(Gradient *gradient) {
@@ -49,7 +49,7 @@ void StrokeWidthUpdater::update() {
 }
 
 void StrokeWidthUpdater::frameChangeUpdate() {
-    mTarget->scheduleOutlinePathUpdate(false);
+    mTarget->scheduleOutlinePathUpdate();
 }
 
 DisplayedFillStrokeSettingsUpdater::
@@ -62,7 +62,7 @@ void DisplayedFillStrokeSettingsUpdater::update() {
 }
 
 void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate(false);
+    mTarget->scheduleUpdate();
 }
 
 PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
@@ -74,7 +74,7 @@ void PixmapEffectUpdater::update() {
 }
 
 void PixmapEffectUpdater::frameChangeUpdate() {
-    mTarget->scheduleEffectsMarginUpdate(false);
+    mTarget->scheduleEffectsMarginUpdate();
 }
 
 #include "Boxes/animationbox.h"
@@ -105,5 +105,5 @@ void GradientPointsUpdater::update() {
 }
 
 void GradientPointsUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate(false);
+    mTarget->scheduleUpdate();
 }

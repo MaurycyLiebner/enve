@@ -136,8 +136,7 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
                                 bool xOnly, bool yOnly,
                                 bool inputTransformationEnabled,
                                 qreal inputTransformationValue,
-                                bool startTransform, const CanvasMode &mode)
-{
+                                bool startTransform, const CanvasMode &mode) {
     if(mRotating) {
         QPointF absPos = getAbsolutePos();
         qreal rot;
@@ -176,7 +175,7 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
         if(inputTransformationEnabled) {
             scaleBy = inputTransformationValue;
         } else {
-            scaleBy = 1. + distSign(distMoved)*0.005;
+            scaleBy = 1. + distSign(distMoved)*0.003;
         }
         qreal scaleX;
         qreal scaleY;
@@ -192,9 +191,9 @@ bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
                 scaleY = scaleBy;
             } else {
                 scaleX = 1. +
-                        distSign(distMoved - QPointF(0., distMoved.y()) )*0.005;
+                        distSign(distMoved - QPointF(0., distMoved.y()) )*0.003;
                 scaleY = 1. +
-                        distSign(distMoved - QPointF(distMoved.x(), 0.) )*0.005;
+                        distSign(distMoved - QPointF(distMoved.x(), 0.) )*0.003;
             }
         }
 

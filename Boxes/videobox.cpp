@@ -25,7 +25,7 @@ void VideoBox::updateAfterFrameChanged(int currentFrame) {
         schedulePixmapReload();
     } else {
         mPixmapReloadScheduled = false;
-        scheduleUpdate(false);
+        scheduleUpdate();
     }
 }
 

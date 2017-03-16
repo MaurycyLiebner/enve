@@ -544,6 +544,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
     } else if(type == SWT_BoxTarget) {
         nameX += 40;
+        name = ((BoxTargetProperty*)target)->getName();
     }
     p.drawText(QRect(nameX, 0,
                      width() - nameX -

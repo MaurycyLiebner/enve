@@ -360,8 +360,7 @@ CtrlPoint *PathPoint::getEndCtrlPt()
     return mEndCtrlPt;
 }
 
-void PathPoint::draw(QPainter *p, const CanvasMode &mode)
-{
+void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
     if(mSelected) {
         p->setBrush(QColor(0, 200, 255));
     } else {
