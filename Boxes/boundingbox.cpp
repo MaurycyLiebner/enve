@@ -423,6 +423,10 @@ QRectF BoundingBox::getUpdateRenderRect() {
     return mUpdateRenderContainer->getBoundingRect();
 }
 
+QMatrix BoundingBox::getUpdatePaintTransform() {
+    return mUpdateRenderContainer->getPaintTransform();
+}
+
 void BoundingBox::drawPixmap(QPainter *p) {
     p->save();
     p->setCompositionMode(mCompositionMode);
@@ -1148,7 +1152,7 @@ void BoundingBox::setUpdateVars() {
 }
 
 void BoundingBox::scheduleUpdate() {
-    if(mAwaitingUpdate) return;
+    //if(mAwaitingUpdate) return;
     mAwaitingUpdate = true;
     mParent->addChildAwaitingUpdate(this);
     emit scheduledUpdate();

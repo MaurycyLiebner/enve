@@ -296,6 +296,7 @@ void BoxesGroup::drawUpdatePixmap(QPainter *p) {
 }
 
 void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
+    mChildrenAwaitingUpdate.removeOne(child);
     mChildrenAwaitingUpdate << child;
 
     if(mParent == NULL) return;

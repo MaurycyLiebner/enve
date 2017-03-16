@@ -477,7 +477,10 @@ void AlphaMatteEffect::apply(BoundingBox *target,
             imgTmp.fill(Qt::transparent);
             QPainter p(&imgTmp);
 
-            p.translate(boxTargetRect.topLeft() - targetRect.topLeft());
+            p.translate(-targetRect.topLeft());
+            p.setTransform(
+                        QTransform(target->getUpdatePaintTransform().inverted()),
+                        true);
 
             boxTarget->drawUpdatePixmapForEffect(&p);
             p.end();

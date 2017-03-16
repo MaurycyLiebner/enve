@@ -11,6 +11,8 @@ void BoundingBoxRenderContainer::draw(QPainter *p) {
 }
 
 void BoundingBoxRenderContainer::drawWithoutTransform(QPainter *p) {
+    draw(p); return;
+    //p->setTransform(QTransform(mPaintTransform), true);
     p->drawImage(0, 0, mImage);
 }
 

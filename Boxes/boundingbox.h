@@ -410,6 +410,7 @@ public:
     QPainter::CompositionMode getCompositionMode();
     void drawUpdatePixmapForEffect(QPainter *p);
     QRectF getUpdateRenderRect();
+    QMatrix getUpdatePaintTransform();
 protected:
     bool mUpdateDisabled = false;
 
