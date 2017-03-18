@@ -10,10 +10,10 @@ ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
     reloadPixmap();
 }
 
-void ImageBox::updateBoundingRect() {
+void ImageBox::updateRelBoundingRect() {
     mRelBoundingRect = mImage.rect();
 
-    BoundingBox::updateBoundingRect();
+    BoundingBox::updateRelBoundingRect();
 }
 
 void ImageBox::drawSelected(QPainter *p,

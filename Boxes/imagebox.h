@@ -13,7 +13,7 @@ public:
     void setFilePath(QString path);
     void drawSelected(QPainter *p,
                       const CanvasMode &);
-    void updateBoundingRect();
+    void updateRelBoundingRect();
     bool relPointInsidePath(QPointF point);
 
     void makeDuplicate(BoundingBox *targetBox);

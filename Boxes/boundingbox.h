@@ -29,6 +29,7 @@ class MovablePoint;
 class PathPoint;
 
 class PathAnimator;
+class DurationRectangleMovable;
 
 enum CanvasMode : short;
 
@@ -300,7 +301,7 @@ public:
     QrealAnimator *getAnimatorsCollection();
 
     bool isAnimated() { return mAnimatorsCollection.isDescendantRecording(); }
-    virtual void updateBoundingRect();
+    virtual void updateRelBoundingRect();
     virtual const QPainterPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
@@ -339,10 +340,6 @@ public:
 
     bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
                            const bool &parentSatisfies);
-
-    void setUpdateDisabled(const bool &bT) {
-        mUpdateDisabled = bT;
-    }
 
     bool SWT_visibleOnlyIfParentDescendant() {
         return false;
@@ -411,9 +408,16 @@ public:
     void drawUpdatePixmapForEffect(QPainter *p);
     QRectF getUpdateRenderRect();
     QMatrix getUpdatePaintTransform();
+    bool isParticleBox();
+    virtual DurationRectangleMovable *getRectangleMovableAtPos(qreal relX,
+                                                       int minViewedFrame,
+                                                       qreal pixelsPerFrame) {
+        Q_UNUSED(relX);
+        Q_UNUSED(minViewedFrame);
+        Q_UNUSED(pixelsPerFrame);
+        return NULL;
+    }
 protected:
-    bool mUpdateDisabled = false;
-
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
     SingleWidgetAbstraction *mTimelineAbstraction = NULL;
 
@@ -444,9 +448,7 @@ protected:
     int mUpdateFrame = 0;
     int mCurrentFrame = 0;
     QRectF mUpdateRelBoundingRect;
-    QMatrix mUpdateCanvasTransform;
     QMatrix mUpdateTransform;
-    QRectF mUpdatePixmapRect;
 
     bool mRedoUpdate = false;
     bool mAwaitingUpdate = false;

@@ -91,7 +91,6 @@ private:
 
 class ParticleEmitter : public ComplexAnimator {
 public:
-    ParticleEmitter();
     ParticleEmitter(ParticleBox *parentBox);
 
     void setParentBox(ParticleBox *parentBox);
@@ -116,9 +115,9 @@ public:
     }
 
     QrealAnimator *makeDuplicate() {
-        ParticleEmitter *emitterDupli = new ParticleEmitter();
-        makeDuplicate(emitterDupli);
-        return emitterDupli;
+        //ParticleEmitter *emitterDupli = new ParticleEmitter();
+        //makeDuplicate(emitterDupli);
+        //return emitterDupli;
     }
 
     void duplicateAnimatorsFrom(
@@ -144,55 +143,9 @@ public:
 
             QrealAnimator *particlesDecayFrames,
             QrealAnimator *particlesSizeDecay,
-            QrealAnimator *particlesOpacityDecay) {
-        pos->makeDuplicate(&mPos);
-        width->makeDuplicate(&mWidth);
+            QrealAnimator *particlesOpacityDecay);
 
-        iniVelocity->makeDuplicate(&mIniVelocity);
-        iniVelocityVar->makeDuplicate(&mIniVelocityVar);
-        iniVelocityAngle->makeDuplicate(&mIniVelocityAngle);
-        iniVelocityAngleVar->makeDuplicate(&mIniVelocityAngleVar);
-        acceleration->makeDuplicate(&mAcceleration);
-
-        particlesPerSecond->makeDuplicate(&mParticlesPerSecond);
-        particlesFrameLifetime->makeDuplicate(&mParticlesFrameLifetime);
-
-        velocityRandomVar->makeDuplicate(&mVelocityRandomVar);
-        velocityRandomVarPeriod->makeDuplicate(&mVelocityRandomVarPeriod);
-
-        particleSize->makeDuplicate(&mParticleSize);
-        particleSizeVar->makeDuplicate(&mParticleSizeVar);
-
-        particleLength->makeDuplicate(&mParticleLength);
-
-        particlesDecayFrames->makeDuplicate(&mParticlesDecayFrames);
-        particlesSizeDecay->makeDuplicate(&mParticlesSizeDecay);
-        particlesOpacityDecay->makeDuplicate(&mParticlesOpacityDecay);
-    }
-
-    void makeDuplicate(QrealAnimator *target) {
-        ParticleEmitter *peTarget = ((ParticleEmitter*)target);
-        peTarget->duplicateAnimatorsFrom(
-                    &mPos,
-                    &mWidth,
-                    &mIniVelocity,
-                    &mIniVelocityVar,
-                    &mIniVelocityAngle,
-                    &mIniVelocityAngleVar,
-                    &mAcceleration,
-                    &mParticlesPerSecond,
-                    &mParticlesFrameLifetime,
-                    &mVelocityRandomVar,
-                    &mVelocityRandomVarPeriod,
-                    &mParticleSize,
-                    &mParticleSizeVar,
-                    &mParticleLength,
-                    &mParticlesDecayFrames,
-                    &mParticlesSizeDecay,
-                    &mParticlesOpacityDecay);
-        peTarget->setMinFrame(mMinFrame);
-        peTarget->setMaxFrame(mMaxFrame);
-    }
+    void makeDuplicate(QrealAnimator *target);
 
     void setMinFrame(const int &minFrame) {
         mMinFrame = minFrame;
@@ -205,11 +158,15 @@ public:
     }
 
     ColorAnimator *getColorAnimator();
+    MovablePoint *getPosPoint() {
+        return mPos;
+    }
+
 private:
     QRectF mParticlesBoundingRect;
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;
-    int mMinFrame = 0;
+    int mMinFrame = -10;
     int mMaxFrame = 200;
 
     QList<ParticleState> mParticleStates;
@@ -218,7 +175,7 @@ private:
 
     ColorAnimator mColorAnimator;
 
-    QPointFAnimator mPos;
+    MovablePoint *mPos;
     QrealAnimator mWidth;
 
     QrealAnimator mIniVelocity;
@@ -252,7 +209,7 @@ public:
                            QPointF *acc);
     void updateAfterFrameChanged(int currentFrame);
     void draw(QPainter *p);
-    void updateBoundingRect();
+    void updateRelBoundingRect();
     void preUpdatePixmapsUpdates();
     bool relPointInsidePath(QPointF relPos);
 
@@ -278,6 +235,8 @@ public:
     void selectAndAddContainedPointsToList(QRectF absRect,
                                            QList<MovablePoint *> *list);
     void applyPaintSetting(const PaintSetting &setting);
+    MovablePoint *getBottomRightPoint();
+    void addEmitterAtAbsPos(const QPointF &absPos);
 private:
     MovablePoint *mTopLeftPoint;
     MovablePoint *mBottomRightPoint;

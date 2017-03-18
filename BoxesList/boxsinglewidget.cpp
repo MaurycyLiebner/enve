@@ -413,6 +413,24 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
     return NULL;
 }
 
+DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
+                            const int &pressX,
+                            const qreal &pixelsPerFrame,
+                            const int &minViewedFrame) {
+    if(isHidden()) return NULL;
+    SingleWidgetTarget *target = mTarget->getTarget();
+    const SWT_Type &type = target->SWT_getType();
+    if(type == SWT_BoundingBox ||
+       type == SWT_BoxesGroup) {
+        BoundingBox *bb_target = (BoundingBox*)target;
+        return bb_target->getRectangleMovableAtPos(
+                    pressX,
+                    minViewedFrame,
+                    pixelsPerFrame);
+    }
+    return NULL;
+}
+
 void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
                                     qreal pixelsPerFrame,
                                     QList<QrealKey *> *listKeys) {

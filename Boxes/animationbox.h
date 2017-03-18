@@ -2,13 +2,14 @@
 #define ANIMATIONBOX_H
 #include "imagebox.h"
 #include "Animators/intanimator.h"
+#include "durationrectangle.h"
 
 class AnimationBox : public ImageBox
 {
+    Q_OBJECT
 public:
     AnimationBox(BoxesGroup *parent);
     void updateAfterFrameChanged(int currentFrame);
-    void updateAnimationFrame();
     void drawKeys(QPainter *p,
                   qreal pixelsPerFrame, qreal drawY,
                   int startFrame, int endFrame);
@@ -18,14 +19,18 @@ public:
     void makeDuplicate(BoundingBox *targetBox);
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
-    void duplicateAnimationBoxAnimatorsFrom(
-            IntAnimator *firstFrameAnimator,
-            QrealAnimator *timeScaleAnimator);
+    void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
+    DurationRectangleMovable *getRectangleMovableAtPos(
+                                    qreal relX,
+                                    int minViewedFrame,
+                                    qreal pixelsPerFrame);
+public slots:
+    void updateAnimationFrame();
 private:
-    IntAnimator mFirstFrameAnimator;
     QrealAnimator mTimeScaleAnimator;
     //IntAnimator mFrameAnimator;
     QStringList mListOfFrames;
+    DurationRectangle mDurationRectangle;
 };
 
 #endif // ANIMATIONBOX_H

@@ -16,7 +16,7 @@ class UndoRedo;
 class UndoRedoStack;
 
 class Circle;
-
+class ParticleBox;
 class Rectangle;
 class SoundComposition;
 
@@ -27,6 +27,8 @@ enum CanvasMode : short {
     ADD_CIRCLE,
     ADD_RECTANGLE,
     ADD_TEXT,
+    ADD_PARTICLE_BOX,
+    ADD_PARTICLE_EMITTER,
     PICK_PATH_SETTINGS
 };
 
@@ -307,6 +309,12 @@ public:
     int getMaxFrame();
 
     SoundComposition *getSoundComposition();
+
+    void processUpdate() {
+        foreach(BoundingBox *child, mUpdateChildrenAwaitingUpdate) {
+            child->processUpdate();
+        }
+    }
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
@@ -339,6 +347,7 @@ private:
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;
     TextBox *mCurrentTextBox = NULL;
+    ParticleBox *mCurrentParticleBox = NULL;
 
     bool mTransformationFinishedBeforeMouseRelease = false;
     QString mInputText;

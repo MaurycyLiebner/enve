@@ -1,13 +1,13 @@
 #ifndef BOXSCROLLWIDGETVISIBLEPART_H
 #define BOXSCROLLWIDGETVISIBLEPART_H
 
-enum SWT_Type : short;
-
 #include <QWidget>
 #include "OptimalScrollArea/scrollwidgetvisiblepart.h"
+#include "OptimalScrollArea/singlewidgettarget.h"
 
 class BoxSingleWidget;
 class QrealKey;
+class DurationRectangleMovable;
 
 class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart
 {
@@ -31,11 +31,16 @@ public:
                        QList<QrealKey *> *listKeys);
 
     BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
-            const SWT_Type &type, const int &yPos, bool *isBelow);
+            const SWT_Types &type, const int &yPos, bool *isBelow);
     void updateDraggingHighlight();
     BoxSingleWidget *getClosestsSingleWidgetWithTargetTypeLookBelow(
-            const SWT_Type &type, const int &yPos, bool *isBelow);
+            const SWT_Types &type, const int &yPos, bool *isBelow);
     void stopScrolling();
+    DurationRectangleMovable *getRectangleMovableAtPos(
+                                        const int &pressX,
+                                        const int &pressY,
+                                        const qreal &pixelsPerFrame,
+                                        const int &minViewedFrame);
 protected:
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *);
@@ -44,7 +49,7 @@ protected:
     QTimer *mScrollTimer = NULL;
 
     int mLastDragMoveY;
-    SWT_Type mLastDragMoveTargetType;
+    SWT_Types mLastDragMoveTargetTypes;
 
     bool mDragging = false;
     int mCurrentDragPosId = 0;

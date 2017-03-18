@@ -262,7 +262,7 @@ BoundingBox *BoxesGroup::createNewDuplicate(BoxesGroup *parent) {
     return new BoxesGroup(parent);
 }
 
-void BoxesGroup::updateBoundingRect() {
+void BoxesGroup::updateRelBoundingRect() {
     QPainterPath boundingPaths = QPainterPath();
     foreach(BoundingBox *child, mChildBoxes) {
         boundingPaths.addPath(
@@ -271,8 +271,7 @@ void BoxesGroup::updateBoundingRect() {
     }
     mRelBoundingRect = boundingPaths.boundingRect();
 
-
-    BoundingBox::updateBoundingRect();
+    BoundingBox::updateRelBoundingRect();
 }
 
 void BoxesGroup::updateEffectsMargin() {
@@ -517,16 +516,17 @@ void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 }
 
 void BoxesGroup::addChild(BoundingBox *child) {
-    child->setParent(this);
+    //child->setParent(this);
     addChildToListAt(mChildBoxes.count(), child);
 }
 
 void BoxesGroup::addChildToListAt(int index,
                                   BoundingBox *child,
                                   bool saveUndoRedo) {
+    child->setParent(this);
     child->setNoCache(mType != TYPE_CANVAS);
-    child->setUpdateDisabled(false);
     mChildBoxes.insert(index, child);
+    updateRelBoundingRect();
     updateChildrenId(index, saveUndoRedo);
     if(saveUndoRedo) {
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
@@ -554,7 +554,6 @@ void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
 void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
     BoundingBox *box = mChildBoxes.at(id);
     box->clearCache();
-    box->setUpdateDisabled(true);
     if(box->isSelected()) {
         box->removeFromSelection();
     }
@@ -563,6 +562,7 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
                                                     mChildBoxes.at(id)) );
     }
     mChildBoxes.removeAt(id);
+    updateRelBoundingRect();
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*) box;
         if(group->isCurrentGroup()) {

@@ -154,6 +154,7 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addAction("Import...", this, SLOT(importFile()));
     mFileMenu->addAction("Link...", this, SLOT(linkFile()));
     mFileMenu->addAction("Import Animation...", this, SLOT(importAnimation()));
+    mFileMenu->addAction("Import Video...", this, SLOT(importVideo()));
     mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
     mFileMenu->addAction("Revert", this, SLOT(revert()));
     mFileMenu->addSeparator();
@@ -331,6 +332,12 @@ void MainWindow::setupToolBar() {
     mTextMode->setCheckable(":/icons/draw_text_checked.png");
     mToolBar->addWidget(mTextMode);
 
+    mParticleBoxMode = new ActionButton(
+                ":/icons/draw_rect.png",
+                "F7", this);
+    mParticleBoxMode->setCheckable(":/icons/draw_rect_checked.png");
+    mToolBar->addWidget(mParticleBoxMode);
+
 
     mToolBar->addSeparator();
 
@@ -434,6 +441,8 @@ void MainWindow::connectToolBarActions() {
             mCanvasWidget, SLOT(setRectangleMode()) );
     connect(mTextMode, SIGNAL(pressed()),
             mCanvasWidget, SLOT(setTextMode()) );
+    connect(mParticleBoxMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setParticleBoxMode()) );
     connect(mActionConnectPoints, SIGNAL(pressed()),
             mCanvasWidget, SLOT(connectPointsSlot()) );
     connect(mActionDisconnectPoints, SIGNAL(pressed()),
@@ -1013,8 +1022,6 @@ void MainWindow::linkFile()
 }
 
 void MainWindow::importAnimation() {
-    importVideo();
-    return;
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
         "Import Animation", "", "Images (*.png *.jpg)");

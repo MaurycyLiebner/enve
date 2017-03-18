@@ -179,6 +179,8 @@ private:
 //
     ActionButton *mRectangleMode;
     ActionButton *mTextMode;
+
+    ActionButton *mParticleBoxMode;
 //
     ActionButton *mActionConnectPoints;
     ActionButton *mActionDisconnectPoints;

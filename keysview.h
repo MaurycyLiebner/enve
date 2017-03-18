@@ -18,6 +18,8 @@ class BoxScrollWidgetVisiblePart;
 
 class AnimationDockWidget;
 
+class DurationRectangleMovable;
+
 class KeysView : public QWidget
 {
     Q_OBJECT
@@ -117,6 +119,7 @@ private:
 
     void updateHoveredPointFromPos(const QPoint &posU);
 
+    DurationRectangleMovable *mHoveredMovable = NULL;
     QrealKey *mHoveredKey = NULL;
     AnimationDockWidget *mGraphControls = NULL;
 
@@ -134,12 +137,14 @@ private:
 
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
+    DurationRectangleMovable *mLastPressedDurationRectangleMovable = NULL;
     QrealKey *mLastPressedKey = NULL;
     bool mFirstMove = false;
     int mMoveDFrame = 0;
     QPointF mLastPressPos;
     bool mMovingKeys = false;
     bool mScalingKeys = false;
+    bool mMovingRect = false;
 
     MainWindow *mMainWindow;
     QList<QrealKey*> mSelectedKeys;

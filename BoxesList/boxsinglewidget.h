@@ -12,6 +12,7 @@
 class QrealAnimatorValueSlider;
 class QrealKey;
 class BoundingBox;
+class DurationRectangleMovable;
 
 const int BOX_HEIGHT = 20;
 
@@ -46,6 +47,10 @@ public:
     void getKeysInRect(QRectF selectionRect,
                        qreal pixelsPerFrame,
                        QList<QrealKey *> *listKeys);
+    DurationRectangleMovable *getRectangleMovableAtPos(
+                                const int &pressX,
+                                const qreal &pixelsPerFrame,
+                                const int &minViewedFrame);
 protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *event);

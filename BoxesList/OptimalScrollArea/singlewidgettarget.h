@@ -3,19 +3,24 @@
 #include <QList>
 #include <QMenu>
 #include <QMimeData>
+#include <QFlags>
+
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
 
 enum SWT_Type : short {
-    SWT_BoundingBox,
-    SWT_BoxesGroup,
-    SWT_PixmapEffect,
-    SWT_QrealAnimator,
-    SWT_ComplexAnimator,
-    SWT_ColorAnimator,
-    SWT_Canvas,
-    SWT_BoxTarget
+    SWT_BoundingBox = 1,
+    SWT_BoxesGroup = 2,
+    SWT_PixmapEffect = 4,
+    SWT_QrealAnimator = 8,
+    SWT_ComplexAnimator = 16,
+    SWT_ColorAnimator = 32,
+    SWT_Canvas = 64,
+    SWT_BoxTarget = 128
 };
+
+Q_DECLARE_FLAGS(SWT_Types, SWT_Type)
+Q_DECLARE_OPERATORS_FOR_FLAGS(SWT_Types)
 
 enum SWT_Rule : short {
     SWT_NoRule,

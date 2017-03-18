@@ -117,7 +117,7 @@ public:
 
     void updateAllBoxes();
 
-    void updateBoundingRect();
+    void updateRelBoundingRect();
     void applyCurrentTransformation();
 
     bool relPointInsidePath(QPointF relPos);

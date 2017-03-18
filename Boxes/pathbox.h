@@ -78,7 +78,7 @@ public:
     void setOutlineAffectedByScale(bool bT);
     int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
-    void updateBoundingRect();
+    void updateRelBoundingRect();
 
     void setUpdateVars();
     void copyStrokeAndFillSettingsTo(PathBox *target);

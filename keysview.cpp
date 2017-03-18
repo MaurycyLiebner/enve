@@ -3,6 +3,7 @@
 #include <QPainter>
 #include "mainwindow.h"
 #include "BoxesList/boxscrollwidgetvisiblepart.h"
+#include "durationrectangle.h"
 
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
@@ -114,12 +115,21 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                                                       mPixelsPerFrame,
                                                       mMinViewedFrame);
             if(mLastPressedKey == NULL) {
-                mSelecting = true;
-                qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
-                mSelectionRect.setTopLeft(QPointF(posUXFrame,
-                                                  posU.y() + mViewedTop));
-                mSelectionRect.setBottomRight(QPointF(posUXFrame,
+                mLastPressedDurationRectangleMovable =
+                        mBoxesListVisible->getRectangleMovableAtPos(
+                                            posU.x(), posU.y(),
+                                            mPixelsPerFrame,
+                                            mMinViewedFrame);
+                if(mLastPressedDurationRectangleMovable == NULL) {
+                    mSelecting = true;
+                    qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
+                    mSelectionRect.setTopLeft(QPointF(posUXFrame,
                                                       posU.y() + mViewedTop));
+                    mSelectionRect.setBottomRight(QPointF(posUXFrame,
+                                                          posU.y() + mViewedTop));
+                } else {
+                    mMovingRect = true;
+                }
             } else {
                 if(!mMainWindow->isShiftPressed() &&
                     !(mLastPressedKey->isSelected() ||
@@ -147,6 +157,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                 mMoveDFrame = 0;
                 mMovingKeys = false;
                 mScalingKeys = false;
+                mMovingRect = false;
                 //setMouseTracking(false);
                 releaseMouse();
             }
@@ -344,13 +355,25 @@ void KeysView::paintEvent(QPaintEvent *) {
 }
 
 void KeysView::updateHoveredPointFromPos(const QPoint &posU) {
-    QrealKey *lastKey = mHoveredKey;
+    if(mHoveredKey != NULL) mHoveredKey->setHovered(false);
     mHoveredKey = mBoxesListVisible->getKeyAtPos(
                                     posU.x(), posU.y(),
                                     mPixelsPerFrame,
                                     mMinViewedFrame);
-    if(lastKey != NULL) lastKey->setHovered(false);
-    if(mHoveredKey != NULL) mHoveredKey->setHovered(true);
+    if(mHoveredKey != NULL) {
+        mHoveredKey->setHovered(true);
+    } else {
+        if(mHoveredMovable != NULL) {
+            mHoveredMovable->setHovered(false);
+        }
+        mHoveredMovable = mBoxesListVisible->getRectangleMovableAtPos(
+                            posU.x(), posU.y(),
+                            mPixelsPerFrame,
+                            mMinViewedFrame);
+        if(mHoveredMovable != NULL) {
+            mHoveredMovable->setHovered(true);
+        }
+    }
 }
 
 void KeysView::clearHoveredPoint() {
@@ -440,6 +463,17 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                             }
                         }
                     }
+                } else if(mMovingRect) {
+                    int dFrame = qRound(
+                                (posU.x() - mLastPressPos.x())/
+                                mPixelsPerFrame );
+                    int dDFrame = dFrame - mMoveDFrame;
+
+                    if(dDFrame != 0) {
+                        mMoveDFrame = dFrame;
+                        mLastPressedDurationRectangleMovable->changeFramePosBy(
+                                    dDFrame);
+                    }
                 } else if(mSelecting) {
                     qreal posUXFrame = posU.x()/mPixelsPerFrame + mMinViewedFrame;
                     mSelectionRect.setBottomRight(
@@ -512,6 +546,9 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                 mIsMouseGrabbing = false;
                 //setMouseTracking(false);
                 //releaseMouse();
+            } else if(mMovingRect) {
+                mMoveDFrame = 0;
+                mMovingRect = false;
             }
         }
     }

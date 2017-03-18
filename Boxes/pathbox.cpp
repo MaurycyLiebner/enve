@@ -226,7 +226,7 @@ void PathBox::updateWholePath() {
             mStrokeSettings.getPaintType() == NOPAINT) {
         mWholePath += mPath;
     }
-    updateBoundingRect();
+    updateRelBoundingRect();
 }
 
 void PathBox::updateFillDrawGradient() {
@@ -271,10 +271,10 @@ void PathBox::updateDrawGradients() {
     updateStrokeDrawGradient();
 }
 
-void PathBox::updateBoundingRect() {
+void PathBox::updateRelBoundingRect() {
     mRelBoundingRect = mWholePath.boundingRect();
 
-    BoundingBox::updateBoundingRect();
+    BoundingBox::updateRelBoundingRect();
 }
 
 void PathBox::setUpdateVars() {

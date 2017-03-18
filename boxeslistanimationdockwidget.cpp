@@ -192,8 +192,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
 
     addNewBoxesListKeysViewWidget(0);
-    addNewBoxesListKeysViewWidget(1);
-    addNewBoxesListKeysViewWidget(0);
+    //addNewBoxesListKeysViewWidget(1);
+    //addNewBoxesListKeysViewWidget(0);
 }
 
 void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(

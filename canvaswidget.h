@@ -141,6 +141,7 @@ public slots:
     void setRectangleMode();
     void setCircleMode();
     void setTextMode();
+    void setParticleBoxMode();
 
     void raiseAction();
     void lowerAction();

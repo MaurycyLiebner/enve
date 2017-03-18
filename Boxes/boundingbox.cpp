@@ -300,7 +300,7 @@ void BoundingBox::clearCache() {
 
     if(mParent == NULL) return;
     mParent->BoundingBox::clearCache();
-    scheduleUpdate();
+    //scheduleUpdate();
 }
 
 QImage BoundingBox::getAllUglyPixmapProvidedTransform(
@@ -515,6 +515,10 @@ bool BoundingBox::isText() {
     return mType == TYPE_TEXT;
 }
 
+bool BoundingBox::isParticleBox() {
+    return mType == TYPE_PARTICLES;
+}
+
 bool BoundingBox::isInternalLink() {
     return mType == TYPE_INTERNAL_LINK;
 }
@@ -572,7 +576,7 @@ void BoundingBox::scheduleCenterPivot() {
     mCenterPivotScheduled = true;
 }
 
-void BoundingBox::updateBoundingRect() {
+void BoundingBox::updateRelBoundingRect() {
     mRelBoundingRectPath = QPainterPath();
     mRelBoundingRectPath.addRect(mRelBoundingRect);
 
@@ -1084,6 +1088,8 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::beforeUpdate() {
+    qDebug() << "before update " + mName;
+
     setUpdateVars();
 //    if(!mUpdateReplaceCache) {
 //        BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
@@ -1098,6 +1104,7 @@ void BoundingBox::beforeUpdate() {
 }
 
 void BoundingBox::processUpdate() {
+    qDebug() << "process update " + mName;
     //if(mUpdateReplaceCache) {
         updatePixmaps();
     //}
@@ -1109,11 +1116,14 @@ void BoundingBox::setNoCache(const bool &bT) {
 }
 
 void BoundingBox::afterUpdate() {
+    qDebug() << "after update " + mName;
     afterSuccessfulUpdate();
 
     if(mNoCache) {
         mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+        qDebug() << "0";
     } else {
+        qDebug() << "1";
         for(auto pair : mRenderContainers) {
             delete pair.second;
         }
@@ -1143,16 +1153,16 @@ void BoundingBox::afterUpdate() {
 }
 
 void BoundingBox::setUpdateVars() {
-    mUpdateCanvasTransform = getParentCanvas()->getCombinedTransform();
+    updateRelBoundingRect();
+
     mUpdateTransform = mCombinedTransformMatrix;
     mUpdateFrame = mCurrentFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
-
-    updateBoundingRect();
 }
 
 void BoundingBox::scheduleUpdate() {
     //if(mAwaitingUpdate) return;
+    qDebug() << "schedule update " + mName;
     mAwaitingUpdate = true;
     mParent->addChildAwaitingUpdate(this);
     emit scheduledUpdate();

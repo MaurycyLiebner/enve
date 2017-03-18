@@ -34,7 +34,7 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
     }
 
     if(mDragging) {
-        p.setPen(QPen(QColor(40, 40, 40), 3.));
+        p.setPen(QPen(Qt::white, 3.));
         p.drawLine(0, mCurrentDragPosId*BOX_HEIGHT,
                    width(), mCurrentDragPosId*BOX_HEIGHT);
     }
@@ -69,6 +69,25 @@ QrealKey *BoxScrollWidgetVisiblePart::getKeyAtPos(
         return ((BoxSingleWidget*)container)->
                 getKeyAtPos(pressX, pixelsPerFrame,
                             minViewedFrame);
+    }
+    return NULL;
+}
+
+DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
+        const int &pressX,
+        const int &pressY,
+        const qreal &pixelsPerFrame,
+        const int &minViewedFrame) {
+    int remaining = pressY % BOX_HEIGHT;
+    if(remaining < (BOX_HEIGHT - KEY_RECT_SIZE)/2 ||
+       remaining > (BOX_HEIGHT + KEY_RECT_SIZE)/2) return NULL;
+    foreach(SingleWidget *container, mSingleWidgets) {
+        int containerTop = container->y();
+        int containerBottom = containerTop + container->height();
+        if(containerTop > pressY || containerBottom < pressY) continue;
+        return ((BoxSingleWidget*)container)->
+                getRectangleMovableAtPos(pressX, pixelsPerFrame,
+                                         minViewedFrame);
     }
     return NULL;
 }
@@ -122,7 +141,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
 
 BoxSingleWidget *BoxScrollWidgetVisiblePart::
             getClosestsSingleWidgetWithTargetTypeLookBelow(
-                const SWT_Type &type,
+                const SWT_Types &type,
                 const int &yPos,
                 bool *isBelow) {
     int idAtYPos = yPos / 20;
@@ -139,8 +158,8 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                     mSingleWidgets.at(
                         idAtYPos);
         }
-        while(singleWidgetUnderMouse->getTargetAbstraction()->
-              getTarget()->SWT_getType() != type) {
+        while(!type.testFlag(singleWidgetUnderMouse->getTargetAbstraction()->
+              getTarget()->SWT_getType()) ) {
             idAtYPos++;
             if(idAtYPos >= mSingleWidgets.count()) return NULL;
             singleWidgetUnderMouse = (BoxSingleWidget*)
@@ -155,7 +174,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
 
 BoxSingleWidget *BoxScrollWidgetVisiblePart::
             getClosestsSingleWidgetWithTargetType(
-                const SWT_Type &type,
+                const SWT_Types &type,
                 const int &yPos,
                 bool *isBelow) {
     int idAtYPos = yPos / 20;
@@ -175,8 +194,8 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                     mSingleWidgets.at(
                         idAtYPos);
         }
-        while(singleWidgetUnderMouse->getTargetAbstraction()->
-              getTarget()->SWT_getType() != type) {
+        while(!type.testFlag(singleWidgetUnderMouse->getTargetAbstraction()->
+              getTarget()->SWT_getType())) {
             idAtYPos--;
             if(idAtYPos < 0) {
                 return getClosestsSingleWidgetWithTargetTypeLookBelow(
@@ -207,7 +226,7 @@ void BoxScrollWidgetVisiblePart::dropEvent(
         int yPos = event->pos().y();
         bool below;
         BoxSingleWidget *singleWidgetUnderMouse =
-                getClosestsSingleWidgetWithTargetType(SWT_BoundingBox,
+                getClosestsSingleWidgetWithTargetType(SWT_BoundingBox | SWT_BoxesGroup,
                                                       yPos,
                                                       &below);
         if(singleWidgetUnderMouse == NULL) return;
@@ -322,9 +341,9 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(
     }
     mLastDragMoveY = yPos;
     if(event->mimeData()->hasFormat("boundingbox")) {
-        mLastDragMoveTargetType = SWT_BoundingBox;
+        mLastDragMoveTargetTypes = SWT_BoundingBox | SWT_BoxesGroup;
     } else if(event->mimeData()->hasFormat("pixmapeffect")) {
-        mLastDragMoveTargetType = SWT_PixmapEffect;
+        mLastDragMoveTargetTypes = SWT_PixmapEffect;
     }
 
     updateDraggingHighlight();
@@ -334,7 +353,7 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
     mDragging = false;
     bool below;
     BoxSingleWidget *singleWidgetUnderMouse =
-            getClosestsSingleWidgetWithTargetType(mLastDragMoveTargetType,
+            getClosestsSingleWidgetWithTargetType(mLastDragMoveTargetTypes,
                                                   mLastDragMoveY,
                                                   &below);
     if(singleWidgetUnderMouse != NULL) {

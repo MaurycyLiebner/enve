@@ -3,13 +3,6 @@
 
 AnimationBox::AnimationBox(BoxesGroup *parent) :
     ImageBox(parent) {
-    mFirstFrameAnimator.setName("start frame");
-    mFirstFrameAnimator.blockPointer();
-    mFirstFrameAnimator.setCurrentIntValue(getCurrentFrameFromMainWindow());
-    mFirstFrameAnimator.setUpdater(new AnimationBoxFrameUpdater(this));
-    mFirstFrameAnimator.blockUpdater();
-    addActiveAnimator(&mFirstFrameAnimator);
-
     mTimeScaleAnimator.setName("time scale");
     mTimeScaleAnimator.blockPointer();
     mTimeScaleAnimator.setValueRange(-100, 100);
@@ -17,6 +10,10 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mTimeScaleAnimator.setUpdater(new AnimationBoxFrameUpdater(this));
     mTimeScaleAnimator.blockUpdater();
     addActiveAnimator(&mTimeScaleAnimator);
+
+    mDurationRectangle.setPossibleFrameRangeVisible();
+    connect(&mDurationRectangle, SIGNAL(changed()),
+            this, SLOT(updateAnimationFrame()));
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
 //    mFrameAnimator.setCurrentIntValue(0);
@@ -25,7 +22,7 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
 void AnimationBox::setListOfFrames(const QStringList &listOfFrames) {
     mListOfFrames = listOfFrames;
     if(listOfFrames.isEmpty()) return;
-    setFilePath(listOfFrames.first());
+    updateAnimationFrame();
 }
 
 void AnimationBox::makeDuplicate(BoundingBox *targetBox) {
@@ -33,15 +30,21 @@ void AnimationBox::makeDuplicate(BoundingBox *targetBox) {
     AnimationBox *animationBoxTarget = (AnimationBox*)targetBox;
     animationBoxTarget->setListOfFrames(mListOfFrames);
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
-                &mFirstFrameAnimator,
                 &mTimeScaleAnimator);
 }
 
 void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
-        IntAnimator *firstFrameAnimator,
         QrealAnimator *timeScaleAnimator) {
-    firstFrameAnimator->makeDuplicate(&mFirstFrameAnimator);
     timeScaleAnimator->makeDuplicate(&mTimeScaleAnimator);
+}
+
+DurationRectangleMovable *AnimationBox::getRectangleMovableAtPos(
+                            qreal relX,
+                            int minViewedFrame,
+                            qreal pixelsPerFrame) {
+    return mDurationRectangle.getMovableAt(relX,
+                                           pixelsPerFrame,
+                                           minViewedFrame);
 }
 
 BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
@@ -51,7 +54,6 @@ BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
 void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     //mFrameAnimator.setFrame(currentFrame);
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    mFirstFrameAnimator.setFrame(currentFrame);
     mTimeScaleAnimator.setFrame(currentFrame);
     updateAnimationFrame();
     //setFilePath(mListOfFrames.at(mFrameAnimator.getCurrentIntValue()));
@@ -59,13 +61,15 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
 
 void AnimationBox::updateAnimationFrame() {
     qreal timeScale = mTimeScaleAnimator.getCurrentValue();
+    mDurationRectangle.setPossibleFrameDuration(
+                qAbs(timeScale*mListOfFrames.count()));
     int pixId;
     if(timeScale > 0.) {
         pixId = (getCurrentFrameFromMainWindow() -
-                mFirstFrameAnimator.getCurrentIntValue())*timeScale;
+                mDurationRectangle.getMinPossibleFrame())/timeScale;
     } else {
         pixId = mListOfFrames.count() - 1 + (getCurrentFrameFromMainWindow() -
-                mFirstFrameAnimator.getCurrentIntValue())*timeScale;
+                mDurationRectangle.getMinPossibleFrame())/timeScale;
     }
 
     if(pixId < 0) {
@@ -80,12 +84,14 @@ void AnimationBox::updateAnimationFrame() {
 void AnimationBox::drawKeys(QPainter *p,
                             qreal pixelsPerFrame, qreal drawY,
                             int startFrame, int endFrame) {
-    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
-    int startDFrame = mFirstFrameAnimator.getCurrentIntValue() - startFrame;
-    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
-    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
-                frameWidth*pixelsPerFrame - pixelsPerFrame,
-                BOX_HEIGHT, QColor(0, 0, 255, 125));
+//    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
+//    int startDFrame = mDurationRectangle.getMinPossibleFrame() - startFrame;
+//    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
+//    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
+//                frameWidth*pixelsPerFrame - pixelsPerFrame,
+//                BOX_HEIGHT, QColor(0, 0, 255, 125));
+    mDurationRectangle.draw(p, pixelsPerFrame,
+                            drawY, startFrame);
     BoundingBox::drawKeys(p, pixelsPerFrame, drawY,
                           startFrame, endFrame);
 }

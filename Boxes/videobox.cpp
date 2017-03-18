@@ -40,10 +40,10 @@ void VideoBox::afterSuccessfulUpdate() {
     mRelBoundingRect = mUpdateVideoImage.rect();
 }
 
-void VideoBox::updateBoundingRect() {
+void VideoBox::updateRelBoundingRect() {
     //mRelBoundingRect = mOldVideoImage.rect();
 
-    BoundingBox::updateBoundingRect();
+    BoundingBox::updateRelBoundingRect();
 }
 
 void VideoBox::drawSelected(QPainter *p,

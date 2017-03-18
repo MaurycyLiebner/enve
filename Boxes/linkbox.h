@@ -55,7 +55,7 @@ public:
                         QRectF *pixBoundingRectClippedToViewP);
 
     void drawSelected(QPainter *p, const CanvasMode &);
-    void updateBoundingRect();
+    void updateRelBoundingRect();
     bool relPointInsidePath(QPointF point);
     QPointF getRelCenterPosition();
     qreal getEffectsMargin();
@@ -154,17 +154,17 @@ public:
     InternalLinkCanvas(BoxesGroup *canvas,
                        BoxesGroup *parent) :
         InternalLinkBoxesGroup(canvas, parent) {
-        updateBoundingRect();
+        updateRelBoundingRect();
         centerPivotPosition();
     }
 
     void setLinkTarget(BoxesGroup *linkTarget) {
         InternalLinkBoxesGroup::setLinkTarget(linkTarget);
-        updateBoundingRect();
+        updateRelBoundingRect();
         centerPivotPosition();
     }
 
-    void updateBoundingRect();
+    void updateRelBoundingRect();
     void setClippedToCanvasSize(const bool &clipped);
 
     void draw(QPainter *p);

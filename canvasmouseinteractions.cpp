@@ -282,8 +282,6 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             mCurrentCircle = newPath;
 
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-            ParticleBox *newBox = new ParticleBox(mCurrentBoxesGroup);
-
             Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             newPath->startAllPointsTransform();
@@ -291,7 +289,6 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             addBoxToSelection(newPath);
 
             mCurrentRectangle = newPath;
-
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
 
             TextBox *newPath = new TextBox(mCurrentBoxesGroup);
@@ -302,6 +299,25 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             clearBoxesSelection();
             addBoxToSelection(newPath);
 
+        } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+            //setCanvasMode(CanvasMode::MOVE_POINT);
+            ParticleBox *partBox = new ParticleBox(mCurrentBoxesGroup);
+            partBox->setAbsolutePos(mLastMouseEventPosRel, false);
+            clearBoxesSelection();
+            addBoxToSelection(partBox);
+
+            mLastPressedPoint = partBox->getBottomRightPoint();
+        } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                if(box->isParticleBox()) {
+                    if(box->getRelBoundingRectPath().contains(
+                                box->mapAbsPosToRel(mLastMouseEventPosRel))) {
+                        ((ParticleBox*)box)->addEmitterAtAbsPos(
+                                    mLastMouseEventPosRel);
+                        break;
+                    }
+                }
+            }
         }
     } // current mode allows interaction with points
 }
@@ -364,7 +380,7 @@ void Canvas::cancelCurrentTransform() {
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
 
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        setCanvasMode(MOVE_PATH);
+        mCanvasWidget->setCanvasMode(MOVE_PATH);
     }
 
     if(mIsMouseGrabbing) {
@@ -481,8 +497,12 @@ void Canvas::handleMouseRelease() {
         releaseMouseAndDontTrack();
     }
     if(!mDoubleClick) {
-        if(mCurrentMode == CanvasMode::MOVE_POINT) {
+        if(mCurrentMode == CanvasMode::MOVE_POINT ||
+           mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseRelease();
+            if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+                mCanvasWidget->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+            }
         } else if(isMovingPath()) {
             handleMovePathMouseRelease();
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
@@ -702,7 +722,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
     } else if(!mTransformationFinishedBeforeMouseRelease) {
         if(mSelecting) {
             moveSecondSelectionPoint(mCurrentMouseEventPosRel);
-        } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
+        } else if(mCurrentMode == CanvasMode::MOVE_POINT ||
+                  mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseMove();
         } else if(isMovingPath()) {
             handleMovePathMouseMove();
@@ -773,7 +794,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event) {
             } else if(boxAt->isCircle() ) {
                 ((Circle*) boxAt)->objectToPath();
             } else if(mCurrentMode == MOVE_PATH) {
-                setCanvasMode(MOVE_PATH);
+                mCanvasWidget->setCanvasMode(MOVE_PATH);
             }
         }
     }

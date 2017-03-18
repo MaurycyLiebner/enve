@@ -64,9 +64,9 @@ void InternalLinkBox::scheduleAwaitUpdateSLOT() {
     scheduleUpdate();
 }
 
-void InternalLinkBox::updateBoundingRect() {
+void InternalLinkBox::updateRelBoundingRect() {
     mRelBoundingRect = mLinkTarget->getRelBoundingRect();
-    BoundingBox::updateBoundingRect();
+    BoundingBox::updateRelBoundingRect();
 }
 
 InternalLinkBox::InternalLinkBox(BoxesGroup *parent) :
@@ -192,7 +192,7 @@ qreal SameTransformInternalLinkBoxesGroup::getEffectsMargin() {
     return mLinkTarget->getEffectsMargin();
 }
 
-void InternalLinkCanvas::updateBoundingRect() {
+void InternalLinkCanvas::updateRelBoundingRect() {
     if(mClipToCanvasSize) {
         //        QPainterPath boundingPaths = QPainterPath();
         //        foreach(BoundingBox *child, mChildren) {
@@ -204,9 +204,9 @@ void InternalLinkCanvas::updateBoundingRect() {
                                   ((Canvas*)mLinkTarget)->getCanvasSize());
         //boundingPaths.boundingRect();
 
-        BoundingBox::updateBoundingRect();
+        BoundingBox::updateRelBoundingRect();
     } else {
-        BoxesGroup::updateBoundingRect();
+        BoxesGroup::updateRelBoundingRect();
     }
 }
 
