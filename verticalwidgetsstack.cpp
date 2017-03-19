@@ -196,6 +196,7 @@ void VerticalWidgetsStack::insertWidget(const int &id,
     updatePercent();
     updateResizers();
     updateSizesAndPositions();
+    widget->show();
 }
 
 void VerticalWidgetsStack::removeWidget(QWidget *widget) {

@@ -868,7 +868,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
 //        PathPoint *point = pointSrc;
 //        bool mirror = pointDest->hasNextPoint();
 //        while(point != NULL) {
-//            QPointF startCtrlPtPos;
+//            QPointF startCtrlPpclab.pltPos;
 //            QPointF endCtrlPtPos;
 //            getMirroredCtrlPtAbsPos(mirror, point,
 //                                    &startCtrlPtPos, &endCtrlPtPos);

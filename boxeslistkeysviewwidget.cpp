@@ -5,18 +5,13 @@
 #include "BoxesList/boxsinglewidget.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 
-BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
-                                                 BoxesListAnimationDockWidget *parent) :
+BoxesListKeysViewWidget::BoxesListKeysViewWidget(
+                            QWidget *topWidget,
+                            BoxesListAnimationDockWidget *animationDock,
+                            QWidget *parent) :
     QWidget(parent) {
-    if(topWidget == NULL) {
-        mTopWidget = new QWidget(this);
-        mTopWidget->setFixedHeight(20);
-        mTopWidget->setStyleSheet("background-color: rgb(50, 50, 50)");
-    } else {
-        mTopWidget = topWidget;
-    }
     mMainWindow = MainWindow::getInstance();
-    mAnimationDockWidget = parent;
+    mAnimationDockWidget = animationDock;
 
     mMainLayout = new QHBoxLayout(this);
     mMainLayout->setSpacing(0);
@@ -80,7 +75,6 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
     mKeysViewLayout = new QVBoxLayout();
     mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(),
                              this);
-    mKeysViewLayout->addWidget(mTopWidget);
     mKeysViewLayout->addWidget(mKeysView);
     mMainLayout->addLayout(mKeysViewLayout);
 
@@ -122,11 +116,27 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
             setCurrentTarget(
                 NULL,
                 SWT_CurrentCanvas);
+
+    setTopWidget(topWidget);
 }
 
 BoxesListKeysViewWidget::~BoxesListKeysViewWidget() {
     delete mMainWindow->getCanvasWidget()->SWT_getAbstractionForWidget(
                 mBoxesListWidget->getVisiblePartWidget());
+}
+
+void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
+    if(mTopWidget != NULL) {
+        delete mTopWidget;
+    }
+    if(topWidget == NULL) {
+        mTopWidget = new QWidget(this);
+        mTopWidget->setFixedHeight(20);
+        mTopWidget->setStyleSheet("background-color: rgb(50, 50, 50)");
+    } else {
+        mTopWidget = topWidget;
+    }
+    mKeysViewLayout->insertWidget(0, mTopWidget);
 }
 
 void BoxesListKeysViewWidget::moveSlider(int val) {

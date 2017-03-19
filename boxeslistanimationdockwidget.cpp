@@ -66,6 +66,24 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
     QWidget(parent)
 {
+    mAddBoxesListKeysViewWidgetsBar->hide();
+    mAddBoxesListKeysViewWidgetsBar->addAction(
+                        "+", this,
+                        SLOT(addNewBoxesListKeysViewWidget()));
+    mAddBoxesListKeysViewWidgetsBar->setStyleSheet(
+               "QMenuBar {"
+                   "color: white;"
+                   "background-color: rgb(50, 50, 50)"
+               "} QMenuBar::item {"
+                   "spacing: 3px;"
+                   "padding: 1px 4px;"
+                   "background: transparent;"
+                   "border-radius: 4px;"
+               "} QMenuBar::item:selected {"
+                   "background: rgb(75, 75, 75);"
+               "} QMenuBar::item:pressed {"
+                   "background: rgb(90, 90, 90);"
+               "}");
     mMainWindow = parent;
     setMinimumSize(200, 200);
     mMainLayout = new QVBoxLayout(this);
@@ -179,6 +197,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mBoxesListKeysViewStack = new VerticalWidgetsStack(this);
     mMainLayout->addWidget(mBoxesListKeysViewStack);
 
+    mMainLayout->addWidget(mAddBoxesListKeysViewWidgetsBar);
+
     mMainLayout->addWidget(mFrameRangeScrollbar,
                            Qt::AlignBottom);
 
@@ -198,20 +218,28 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
 void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
                                         int id) {
+    if(mBoxesListKeysViewStack->isHidden()) {
+        mBoxesListKeysViewStack->show();
+        mAddBoxesListKeysViewWidgetsBar->hide();
+        setMinimumHeight(200);
+        setMaximumHeight(2000);
+    }
     if(id < 0) id = 0;
     id = qMin(id, mBoxesListKeysViewWidgets.count());
     BoxesListKeysViewWidget *newWidget;
     if(id == 0) {
         newWidget = new BoxesListKeysViewWidget(mAnimationWidgetScrollbar,
-                                                this);
+                                                this,
+                                                mBoxesListKeysViewStack);
     } else {
         newWidget = new BoxesListKeysViewWidget(NULL,
-                                                this);
+                                                this,
+                                                mBoxesListKeysViewStack);
     }
     newWidget->connectToChangeWidthWidget(mChww);
     newWidget->connectToFrameWidget(mFrameRangeScrollbar);
     mBoxesListKeysViewStack->insertWidget(id, newWidget);
-    mBoxesListKeysViewWidgets << newWidget;
+    mBoxesListKeysViewWidgets.insert(id, newWidget);
 
     mChww->raise();
     mFrameRangeScrollbar->raise();
@@ -219,6 +247,18 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
 
 void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
                                         BoxesListKeysViewWidget *widget) {
+    if(mBoxesListKeysViewWidgets.indexOf(widget) == 0) {
+        if(mBoxesListKeysViewWidgets.count() > 1) {
+            mBoxesListKeysViewWidgets.at(1)->setTopWidget(
+                                            mAnimationWidgetScrollbar);
+        } else {
+            mMainLayout->insertWidget(1, mAnimationWidgetScrollbar);
+            mAddBoxesListKeysViewWidgetsBar->show();
+            mBoxesListKeysViewStack->hide();
+            setMinimumHeight(80);
+            setMaximumHeight(80);
+        }
+    }
     mBoxesListKeysViewWidgets.removeOne(widget);
     mBoxesListKeysViewStack->removeWidget(widget);
 }

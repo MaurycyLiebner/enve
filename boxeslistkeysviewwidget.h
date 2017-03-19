@@ -16,9 +16,11 @@ class BoxesListKeysViewWidget : public QWidget
     Q_OBJECT
 public:
     explicit BoxesListKeysViewWidget(QWidget *topWidget,
-                                     BoxesListAnimationDockWidget *parent);
+                                     BoxesListAnimationDockWidget *animationDock,
+                                     QWidget *parent);
     ~BoxesListKeysViewWidget();
 
+    void setTopWidget(QWidget *topWidget);
     bool processFilteredKeyEvent(QKeyEvent *event);
     void connectToFrameWidget(AnimationWidgetScrollBar *frameRange);
     void connectToChangeWidthWidget(
@@ -51,7 +53,7 @@ private:
     QVBoxLayout *mBoxesListLayout;
     QVBoxLayout *mKeysViewLayout;
     QHBoxLayout *mMenuLayout;
-    QWidget *mTopWidget;
+    QWidget *mTopWidget = NULL;
     QMenuBar *mBoxesListMenuBar;
     QLineEdit *mSearchLine;
     ScrollArea *mBoxesListScrollArea;

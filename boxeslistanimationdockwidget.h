@@ -63,7 +63,7 @@ public:
 public slots:
     void setCurrentFrame(int frame);
     void setMinMaxFrame(const int &minFrame, const int &maxFrame);
-    void addNewBoxesListKeysViewWidget(int id);
+    void addNewBoxesListKeysViewWidget(int id = 0);
     void removeBoxesListKeysViewWidget(BoxesListKeysViewWidget *widget);
 signals:
     void visibleRangeChanged(int, int);
@@ -77,6 +77,7 @@ private slots:
 
     void setAllPointsRecord(bool allPointsRecord);
 private:
+    QMenuBar *mAddBoxesListKeysViewWidgetsBar = new QMenuBar(this);
     QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
 
     VerticalWidgetsStack *mBoxesListKeysViewStack;
