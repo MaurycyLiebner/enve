@@ -113,7 +113,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
         if(type == SWT_BoundingBox ||
            type == SWT_BoxesGroup) {
             BoundingBox *bb_target = (BoundingBox*)target;
-            bb_target->getAnimatorsCollection()->getKeysInRect(
+            bb_target->getKeysInRect(
                         selectionRect,
                         pixelsPerFrame,
                         listKeys);

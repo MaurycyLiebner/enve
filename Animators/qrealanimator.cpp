@@ -90,6 +90,7 @@ void QrealAnimator::setValueRange(qreal minVal, qreal maxVal) {
 void QrealAnimator::getKeysInRect(QRectF selectionRect,
                                   qreal pixelsPerFrame,
                                   QList<QrealKey*> *keysList) {
+    selectionRect.translate(-getFrameShift(), 0.);
     int selLeftFrame = selectionRect.left();
     if(0.5*pixelsPerFrame + KEY_RECT_SIZE*0.5 <
        selectionRect.left() - selLeftFrame*pixelsPerFrame) {
@@ -107,6 +108,7 @@ void QrealAnimator::getKeysInRect(QRectF selectionRect,
         }
     }
 }
+
 void QrealAnimator::addAllKeysToComplexAnimator()
 {
     if(mParentAnimator == NULL) return;
@@ -231,7 +233,7 @@ void QrealAnimator::updateKeyOnCurrrentFrame()
 QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
                                      int minViewedFrame,
                                      qreal pixelsPerFrame) {
-    qreal relFrame = relX/pixelsPerFrame;
+    qreal relFrame = relX/pixelsPerFrame - getFrameShift();
     qreal pressFrame = relFrame + minViewedFrame;
     if(pixelsPerFrame > KEY_RECT_SIZE) {
         int relFrameInt = relFrame;
@@ -278,6 +280,7 @@ qreal QrealAnimator::getCurrentValueAtFrame(const int &frame) const {
 
 qreal QrealAnimator::getValueAtFrame(int frame) const
 {
+    frame -= getFrameShift();
     int prevId;
     int nextId;
     qreal returnVal;
@@ -431,7 +434,7 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
 }
 
 void QrealAnimator::setFrame(int frame) {
-    mCurrentFrame = frame;
+    mCurrentFrame = frame - getFrameShift();
     //updateValueFromCurrentFrame();
 
     updateKeyOnCurrrentFrame();
@@ -921,12 +924,15 @@ void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
                              qreal drawY,
                              int startFrame, int endFrame)
 {
+    p->save();
+    p->translate(getFrameShift()*pixelsPerFrame, 0.);
     foreach(QrealKey *key, mKeys) {
         if(key->getFrame() >= startFrame &&
            key->getFrame() <= endFrame) {
             drawKey(p, key, pixelsPerFrame, drawY, startFrame);
         }
     }
+    p->restore();
 }
 
 void QrealAnimator::multCurrentValue(qreal mult) {

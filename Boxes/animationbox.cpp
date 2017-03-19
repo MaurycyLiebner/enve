@@ -11,8 +11,9 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mTimeScaleAnimator.blockUpdater();
     addActiveAnimator(&mTimeScaleAnimator);
 
-    mDurationRectangle.setPossibleFrameRangeVisible();
-    connect(&mDurationRectangle, SIGNAL(changed()),
+    setDurationRectangle(new DurationRectangle());
+    mDurationRectangle->setPossibleFrameRangeVisible();
+    connect(mDurationRectangle, SIGNAL(changed()),
             this, SLOT(updateAnimationFrame()));
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
@@ -42,7 +43,7 @@ DurationRectangleMovable *AnimationBox::getRectangleMovableAtPos(
                             qreal relX,
                             int minViewedFrame,
                             qreal pixelsPerFrame) {
-    return mDurationRectangle.getMovableAt(relX,
+    return mDurationRectangle->getMovableAt(relX,
                                            pixelsPerFrame,
                                            minViewedFrame);
 }
@@ -58,15 +59,15 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
 
 void AnimationBox::updateAnimationFrame() {
     qreal timeScale = mTimeScaleAnimator.getCurrentValue();
-    mDurationRectangle.setPossibleFrameDuration(
+    mDurationRectangle->setPossibleFrameDuration(
                 qRound(qAbs(timeScale*mListOfFrames.count())));
     int pixId;
     if(timeScale > 0.) {
         pixId = (getCurrentFrameFromMainWindow() -
-                mDurationRectangle.getMinPossibleFrame())/timeScale;
+                mDurationRectangle->getMinPossibleFrame())/timeScale;
     } else {
         pixId = mListOfFrames.count() - 1 + (getCurrentFrameFromMainWindow() -
-                mDurationRectangle.getMinPossibleFrame())/timeScale;
+                mDurationRectangle->getMinPossibleFrame())/timeScale;
     }
 
     if(pixId < 0) {
@@ -87,7 +88,7 @@ void AnimationBox::drawKeys(QPainter *p,
 //    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
 //                frameWidth*pixelsPerFrame - pixelsPerFrame,
 //                BOX_HEIGHT, QColor(0, 0, 255, 125));
-    mDurationRectangle.draw(p, pixelsPerFrame,
+    mDurationRectangle->draw(p, pixelsPerFrame,
                             drawY, startFrame);
     BoundingBox::drawKeys(p, pixelsPerFrame, drawY,
                           startFrame, endFrame);

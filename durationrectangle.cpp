@@ -51,6 +51,8 @@ void DurationRectangleMovable::setMinPos(const int &minPos) {
 }
 
 DurationRectangle::DurationRectangle() : DurationRectangleMovable() {
+    setMinPos(-1000000);
+    setMaxPos(1000000);
     mMinFrame.setMinPos(-1000000);
     mMaxFrame.setMaxPos(1000000);
     connect(&mMinFrame, SIGNAL(posChanged(int)),
@@ -153,7 +155,7 @@ void DurationRectangle::changeFramePosBy(const int &change) {
     mMaxFrame.setMinPos(getMinFrame());
     mMaxFrame.changeFramePosByWithoutSignal(change);
     mMinFrame.setMaxPos(getMaxFrame());
-    emit changed();
+    DurationRectangleMovable::changeFramePosBy(change);
 }
 
 void DurationRectangle::setPossibleFrameRangeVisible() {

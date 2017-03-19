@@ -7,6 +7,7 @@
 #include "keysview.h"
 #include "BoxesList/boxscrollwidget.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "durationrectangle.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     QObject(), Transformable()
@@ -477,10 +478,8 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
-    //mTransformAnimator.setFrame(currentFrame);
-    mAnimatorsCollection.setFrame(currentFrame);
-    //mEffectsAnimators.setFrame(currentFrame);
     mCurrentFrame = currentFrame;
+    mAnimatorsCollection.setFrame(currentFrame);
 }
 
 void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
@@ -849,8 +848,35 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
     scheduleUpdate();
 }
 
-QrealAnimator *BoundingBox::getAnimatorsCollection() {
-    return &mAnimatorsCollection;
+void BoundingBox::getKeysInRect(const QRectF &selectionRect,
+                                const qreal &pixelsPerFrame,
+                                QList<QrealKey*> *keysList) {
+    mAnimatorsCollection.getKeysInRect(selectionRect,
+                                       pixelsPerFrame,
+                                       keysList);
+}
+
+QrealKey *BoundingBox::getKeyAtPos(const qreal &relX,
+                                   const int &minViewedFrame,
+                                   const qreal &pixelsPerFrame) {
+    return mAnimatorsCollection.getKeyAtPos(
+                                     relX,
+                                     minViewedFrame,
+                                     pixelsPerFrame);
+}
+
+int BoundingBox::getFrameShift() {
+    int parentShift;
+    if(mParent == NULL) {
+        parentShift = 0;
+    } else {
+        parentShift = mParent->getFrameShift();
+    }
+    if(mDurationRectangle == NULL) {
+        return parentShift;
+    } else {
+        return mDurationRectangle->getFramePos() + parentShift;
+    }
 }
 
 void BoundingBox::addActiveAnimator(QrealAnimator *animator)

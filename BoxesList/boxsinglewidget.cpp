@@ -397,7 +397,7 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
-        return bb_target->getAnimatorsCollection()->getKeyAtPos(
+        return bb_target->getKeyAtPos(
                     pressX,
                     minViewedFrame,
                     pixelsPerFrame);
@@ -440,7 +440,7 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
-        bb_target->getAnimatorsCollection()->getKeysInRect(
+        bb_target->getKeysInRect(
                     selectionRect,
                     pixelsPerFrame,
                     listKeys);

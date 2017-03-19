@@ -438,7 +438,7 @@ void ParticleEmitter::scheduleUpdateParticlesForFrame() {
 void ParticleEmitter::updateParticlesForFrameIfNeeded() {
     if(mUpdateParticlesForFrameScheduled) {
         mUpdateParticlesForFrameScheduled = false;
-        updateParticlesForFrame(MainWindow::getInstance()->getCurrentFrame());
+        updateParticlesForFrame(mCurrentFrame);
     }
 }
 

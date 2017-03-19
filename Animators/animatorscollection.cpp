@@ -31,3 +31,10 @@ void AnimatorsCollection::childAnimatorIsRecordingChanged() {
     mParentBox->SWT_scheduleWidgetsContentUpdateWithRule(SWT_Animated);
     mParentBox->SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }
+
+int AnimatorsCollection::getFrameShift() const {
+    if(mParentBox == NULL) {
+        return 0;
+    }
+    return mParentBox->getFrameShift();
+}

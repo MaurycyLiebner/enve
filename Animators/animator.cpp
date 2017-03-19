@@ -4,7 +4,6 @@
 
 Animator::Animator() :
     Property() {
-    setFrame(mMainWindow->getCurrentFrame());
 }
 
 void Animator::setFrame(int frame) {
@@ -13,4 +12,11 @@ void Animator::setFrame(int frame) {
 
 void Animator::switchRecording() {
     setRecording(!mIsRecording);
+}
+
+int Animator::getFrameShift() const {
+    if(mParentAnimator == NULL) {
+        return 0;
+    }
+    return mParentAnimator->getFrameShift();
 }

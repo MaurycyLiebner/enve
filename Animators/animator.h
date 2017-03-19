@@ -65,6 +65,8 @@ public:
 
     virtual bool isAnimator() { return true; }
     virtual void startDragging() {}
+
+    virtual int getFrameShift() const;
 protected:
     int mCurrentFrame = 0;
     bool mIsComplexAnimator = false;

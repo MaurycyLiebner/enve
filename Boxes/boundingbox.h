@@ -60,6 +60,8 @@ class BoxItemWidgetContainer;
 
 class EffectsSettingsWidget;
 
+class DurationRectangle;
+
 class BoundingBoxMimeData : public QMimeData {
     Q_OBJECT
 public:
@@ -298,7 +300,6 @@ public:
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
     void selectionChangeTriggered(bool shiftPressed);
-    QrealAnimator *getAnimatorsCollection();
 
     bool isAnimated() { return mAnimatorsCollection.isDescendantRecording(); }
     virtual void updateRelBoundingRect();
@@ -417,7 +418,20 @@ public:
         Q_UNUSED(pixelsPerFrame);
         return NULL;
     }
+    void getKeysInRect(const QRectF &selectionRect,
+                       const qreal &pixelsPerFrame,
+                       QList<QrealKey *> *keysList);
+    QrealKey *getKeyAtPos(const qreal &relX,
+                          const int &minViewedFrame,
+                          const qreal &pixelsPerFrame);
+    int getFrameShift();
+
+    void setDurationRectangle(DurationRectangle *durationRect) {
+        mDurationRectangle = durationRect;
+    }
+
 protected:
+    DurationRectangle *mDurationRectangle = NULL;
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
     SingleWidgetAbstraction *mTimelineAbstraction = NULL;
 

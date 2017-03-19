@@ -30,7 +30,6 @@ private:
     QrealAnimator mTimeScaleAnimator;
     //IntAnimator mFrameAnimator;
     QStringList mListOfFrames;
-    DurationRectangle mDurationRectangle;
 };
 
 #endif // ANIMATIONBOX_H
