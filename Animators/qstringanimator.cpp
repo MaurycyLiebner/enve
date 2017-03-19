@@ -9,21 +9,21 @@ void QStringAnimator::setCurrentTextValue(const QString &text)
 {
     if(isKeyOnCurrentFrame()) {
         foreach(QStringKey *key, mTextValues) {
-            if(key->keyFrame == mCurrentFrame) {
+            if(key->keyFrame == mCurrentAbsFrame) {
                 key->string = text;
                 break;
             }
         }
-        setCurrentIntValue(mCurrentFrame, true);
+        setCurrentIntValue(mCurrentAbsFrame, true);
     } else {
-        mTextValues << new QStringKey(text, mCurrentFrame);
-        setCurrentIntValue(mCurrentFrame, true);
+        mTextValues << new QStringKey(text, mCurrentAbsFrame);
+        setCurrentIntValue(mCurrentAbsFrame, true);
     }
 }
 
 QString QStringAnimator::getCurrentTextValue()
 {
-    return getStringKeyWithLowerFrame(mCurrentFrame);
+    return getStringKeyWithLowerFrame(mCurrentAbsFrame);
 }
 
 QString QStringAnimator::getStringKeyWithLowerFrame(int frame)

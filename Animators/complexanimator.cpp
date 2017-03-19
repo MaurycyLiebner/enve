@@ -40,8 +40,12 @@ qreal ComplexAnimator::clampValue(qreal value) {
     return value;//clamp(value, mMinMoveValue, mMaxMoveValue);
 }
 
-ComplexKey *ComplexAnimator::getKeyCollectionAtFrame(int frame) {
-    return (ComplexKey *) getKeyAtFrame(frame);
+ComplexKey *ComplexAnimator::getKeyCollectionAtAbsFrame(int frame) {
+    return (ComplexKey *) getKeyAtAbsFrame(frame);
+}
+
+ComplexKey *ComplexAnimator::getKeyCollectionAtRelFrame(int frame) {
+    return (ComplexKey *) getKeyAtRelFrame(frame);
 }
 
 void ComplexAnimator::addChildAnimator(Property *childAnimator)
@@ -53,7 +57,7 @@ void ComplexAnimator::addChildAnimator(Property *childAnimator)
 
     childAnimator->addAllKeysToComplexAnimator();
     childAnimatorIsRecordingChanged();
-    childAnimator->setFrame(mCurrentFrame);
+    childAnimator->setAbsFrame(mCurrentAbsFrame);
     //updateKeysPath();
 
     SWT_addChildAbstractionForTargetToAll(childAnimator);
@@ -167,7 +171,7 @@ void ComplexAnimator::drawKey(
         p->setPen(QPen(Qt::black, 1.5));
         p->drawEllipse(
             QRectF(
-                QPointF((key->getFrame() - startFrame + 0.5)*
+                QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.35,
                         drawY + (BOX_HEIGHT -
                                   KEY_RECT_SIZE*0.7)*0.5 ),
@@ -176,7 +180,7 @@ void ComplexAnimator::drawKey(
     } else {
         p->drawEllipse(
             QRectF(
-                QPointF((key->getFrame() - startFrame + 0.5)*
+                QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.35,
                         drawY + (BOX_HEIGHT -
                                   KEY_RECT_SIZE*0.7)*0.5 ),
@@ -201,12 +205,12 @@ void ComplexAnimator::setUpdater(AnimatorUpdater *updater)
     }
 }
 
-void ComplexAnimator::setFrame(int frame)
+void ComplexAnimator::setAbsFrame(int frame)
 {
-    QrealAnimator::setFrame(frame);
+    QrealAnimator::setAbsFrame(frame);
 
     foreach(Property *property, mChildAnimators) {
-        property->setFrame(frame);
+        property->setAbsFrame(frame);
     }
 }
 
@@ -273,20 +277,18 @@ void ComplexAnimator::childAnimatorIsRecordingChanged()
     setRecordingValue(rec);
 }
 
-void ComplexAnimator::addChildQrealKey(QrealKey *key)
-{
-    ComplexKey *collection = getKeyCollectionAtFrame(key->getFrame() );
+void ComplexAnimator::addChildQrealKey(QrealKey *key) {
+    ComplexKey *collection = getKeyCollectionAtAbsFrame(key->getAbsFrame() );
     if(collection == NULL) {
         collection = new ComplexKey(this);
-        collection->setFrame(key->getFrame());
+        collection->setAbsFrame(key->getAbsFrame());
         appendKey(collection);
     }
     collection->addAnimatorKey(key);
 }
 
-void ComplexAnimator::removeChildQrealKey(QrealKey *key)
-{
-    ComplexKey *collection = getKeyCollectionAtFrame(key->getFrame() );
+void ComplexAnimator::removeChildQrealKey(QrealKey *key) {
+    ComplexKey *collection = getKeyCollectionAtAbsFrame(key->getAbsFrame() );
     if(collection == NULL) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
@@ -403,7 +405,7 @@ void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
 QrealKey *ComplexKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     ComplexKey *target = new ComplexKey((ComplexAnimator*)targetParent);
     target->setValue(mValue);
-    target->setFrame(mFrame);
+    target->setRelFrame(mRelFrame);
     target->setCtrlsMode(mCtrlsMode);
     target->setStartEnabled(mStartEnabled);
     target->setStartFrame(mStartFrame);
@@ -423,11 +425,11 @@ QrealKey *ComplexKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     return target;
 }
 
-void ComplexKey::setFrame(int frame) {
-    QrealKey::setFrame(frame);
+void ComplexKey::setRelFrame(int frame) {
+    QrealKey::setRelFrame(frame);
 
     foreach(QrealKey *key, mKeys) {
-        key->setFrame(frame);
+        key->setRelFrame(frame);
     }
 }
 

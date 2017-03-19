@@ -102,7 +102,7 @@ void QrealAnimator::getKeysInRect(QRectF selectionRect,
         selRightFrame--;
     }
     for(int i = selRightFrame; i >= selLeftFrame; i--) {
-        QrealKey *keyAtPos = getKeyAtFrame(i);
+        QrealKey *keyAtPos = getKeyAtAbsFrame(i);
         if(keyAtPos != NULL) {
             keysList->append(keyAtPos);
         }
@@ -226,7 +226,7 @@ bool QrealAnimator::isRecording()
 void QrealAnimator::updateKeyOnCurrrentFrame()
 {
     if(mTraceKeyOnCurrentFrame) {
-        mKeyOnCurrentFrame = getKeyAtFrame(mCurrentFrame) != NULL;
+        mKeyOnCurrentFrame = getKeyAtAbsFrame(mCurrentAbsFrame) != NULL;
     }
 }
 
@@ -247,7 +247,7 @@ QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
     int maxPossibleKey = pressFrame + keyRectFramesSpan;
     QrealKey *keyAtPos = NULL;
     for(int i = maxPossibleKey; i >= minPossibleKey; i--) {
-        keyAtPos = getKeyAtFrame(i);
+        keyAtPos = getKeyAtRelFrame(i);
         if(keyAtPos != NULL) {
             return keyAtPos;
         }
@@ -273,24 +273,26 @@ void QrealAnimator::freezeMinMaxValues()
     mMinMaxValuesFrozen = true;
 }
 
-qreal QrealAnimator::getCurrentValueAtFrame(const int &frame) const {
-    if(frame == mCurrentFrame) return mCurrentValue;
-    return getValueAtFrame(frame);
+qreal QrealAnimator::getCurrentValueAtAbsFrame(const int &frame) const {
+    if(frame == mCurrentAbsFrame) return mCurrentValue;
+    return getValueAtAbsFrame(frame);
 }
 
-qreal QrealAnimator::getValueAtFrame(int frame) const
-{
-    frame -= getFrameShift();
+qreal QrealAnimator::getValueAtAbsFrame(int frame) const {
+    return getValueAtRelFrame(absFrameToRelFrame(frame));
+}
+
+qreal QrealAnimator::getValueAtRelFrame(int frame) const {
     int prevId;
     int nextId;
     qreal returnVal;
-    if(getNextAndPreviousKeyId(&prevId, &nextId, frame) ) {
+    if(getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, frame) ) {
         if(nextId == prevId) {
             returnVal = mKeys.at(nextId)->getValue();
         } else {
             QrealKey *prevKey = mKeys.at(prevId);
             QrealKey *nextKey = mKeys.at(nextId);
-            returnVal = getValueAtFrame(frame, prevKey, nextKey);
+            returnVal = getValueAtRelFrame(frame, prevKey, nextKey);
         }
     } else {
         returnVal = mCurrentValue;
@@ -298,14 +300,14 @@ qreal QrealAnimator::getValueAtFrame(int frame) const
     return returnVal;
 }
 
-qreal QrealAnimator::getValueAtFrame(int frame,
+qreal QrealAnimator::getValueAtRelFrame(int frame,
                                     QrealKey *prevKey,
                                     QrealKey *nextKey) const
 {
-    qreal t = tFromX(prevKey->getFrame(),
+    qreal t = tFromX(prevKey->getRelFrame(),
                      prevKey->getEndValueFrame(),
                      nextKey->getStartValueFrame(),
-                     nextKey->getFrame(), frame);
+                     nextKey->getRelFrame(), frame);
     qreal p0y = prevKey->getValue();
     qreal p1y = prevKey->getEndValue();
     qreal p2y = nextKey->getStartValue();
@@ -342,7 +344,7 @@ void QrealAnimator::setCurrentValue(qreal newValue, bool finish)
 
 void QrealAnimator::updateValueFromCurrentFrame()
 {
-    setCurrentValue(getValueAtFrame(mCurrentFrame));
+    setCurrentValue(getValueAtAbsFrame(mCurrentAbsFrame));
 }
 
 void QrealAnimator::saveCurrentValueToKey(QrealKey *key)
@@ -352,10 +354,10 @@ void QrealAnimator::saveCurrentValueToKey(QrealKey *key)
 
 void QrealAnimator::saveValueToKey(int frame, qreal value)
 {
-    QrealKey *keyAtFrame = getKeyAtFrame(frame);
+    QrealKey *keyAtFrame = getKeyAtAbsFrame(frame);
     if(keyAtFrame == NULL) {
         keyAtFrame = new QrealKey(this);
-        keyAtFrame->setFrame(frame);
+        keyAtFrame->setRelFrame(frame);
         keyAtFrame->setValue(value);
         appendKey(keyAtFrame);
         updateKeysPath();
@@ -423,7 +425,7 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
     if(mParentAnimator != NULL) {
         mParentAnimator->removeChildQrealKey(key);
     }
-    key->setFrame(newFrame);
+    key->setRelFrame(newFrame);
     if(mParentAnimator != NULL) {
         mParentAnimator->addChildQrealKey(key);
     }
@@ -433,12 +435,12 @@ void QrealAnimator::moveKeyToFrame(QrealKey *key, int newFrame)
     updateKeyOnCurrrentFrame();
 }
 
-void QrealAnimator::setFrame(int frame) {
-    mCurrentFrame = frame - getFrameShift();
+void QrealAnimator::setAbsFrame(int frame) {
+    Animator::setAbsFrame(frame);
     //updateValueFromCurrentFrame();
 
     updateKeyOnCurrrentFrame();
-    qreal newValue = getValueAtFrame(mCurrentFrame);
+    qreal newValue = getValueAtAbsFrame(mCurrentAbsFrame);
     if(newValue == mCurrentValue) return;
     mCurrentValue = newValue;
 
@@ -447,24 +449,25 @@ void QrealAnimator::setFrame(int frame) {
     callFrameChangeUpdater();
 }
 
-bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
-                                            int frame) const {
+bool QrealAnimator::getNextAndPreviousKeyIdForRelFrame(
+                                int *prevIdP, int *nextIdP,
+                                int frame) const {
     if(mKeys.isEmpty()) return false;
     int minId = 0;
     int maxId = mKeys.count() - 1;
-    if(frame >= mKeys.last()->getFrame()) {
+    if(frame >= mKeys.last()->getRelFrame()) {
         *prevIdP = maxId;
         *nextIdP = maxId;
         return true;
     }
-    if(frame <= mKeys.first()->getFrame()) {
+    if(frame <= mKeys.first()->getRelFrame()) {
         *prevIdP = minId;
         *nextIdP = minId;
         return true;
     }
     while(maxId - minId > 1) {
         int guess = (maxId + minId)/2;
-        int keyFrame = mKeys.at(guess)->getFrame();
+        int keyFrame = mKeys.at(guess)->getRelFrame();
         if(keyFrame > frame) {
             maxId = guess;
         } else if(keyFrame < frame) {
@@ -478,11 +481,11 @@ bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
 
     if(minId == maxId) {
         QrealKey *key = mKeys.at(minId);
-        if(key->getFrame() > frame) {
+        if(key->getRelFrame() > frame) {
             if(minId != 0) {
                 minId = minId - 1;
             }
-        } else if(key->getFrame() < frame) {
+        } else if(key->getRelFrame() < frame) {
             if(minId < mKeys.count() - 1) {
                 maxId = minId + 1;
             }
@@ -493,34 +496,37 @@ bool QrealAnimator::getNextAndPreviousKeyId(int *prevIdP, int *nextIdP,
     return true;
 }
 
-QrealKey *QrealAnimator::getKeyAtFrame(int frame)
-{
+QrealKey *QrealAnimator::getKeyAtAbsFrame(const int &frame) {
+    return getKeyAtRelFrame(absFrameToRelFrame(frame));
+}
+
+QrealKey *QrealAnimator::getKeyAtRelFrame(const int &frame) {
     if(mKeys.isEmpty()) return NULL;
-    if(frame > mKeys.last()->getFrame()) return NULL;
-    if(frame < mKeys.first()->getFrame()) return NULL;
+    if(frame > mKeys.last()->getRelFrame()) return NULL;
+    if(frame < mKeys.first()->getRelFrame()) return NULL;
     int minId = 0;
     int maxId = mKeys.count() - 1;
     while(maxId - minId > 1) {
         int guess = (maxId + minId)/2;
-        if(mKeys.at(guess)->getFrame() > frame) {
+        if(mKeys.at(guess)->getRelFrame() > frame) {
             maxId = guess;
         } else {
             minId = guess;
         }
     }
     QrealKey *minIdKey = mKeys.at(minId);
-    if(minIdKey->getFrame() == frame) return minIdKey;
+    if(minIdKey->getRelFrame() == frame) return minIdKey;
     QrealKey *maxIdKey = mKeys.at(maxId);
-    if(maxIdKey->getFrame() == frame) return maxIdKey;
+    if(maxIdKey->getRelFrame() == frame) return maxIdKey;
     return NULL;
 }
 
-void QrealAnimator::saveValueAtFrameAsKey(int frame) {
-    QrealKey *keyAtFrame = getKeyAtFrame(frame);
+void QrealAnimator::saveValueAtAbsFrameAsKey(int frame) {
+    QrealKey *keyAtFrame = getKeyAtAbsFrame(frame);
     if(keyAtFrame == NULL) {
-        qreal value = getValueAtFrame(frame);
+        qreal value = getValueAtAbsFrame(frame);
         keyAtFrame = new QrealKey(this);
-        keyAtFrame->setFrame(frame);
+        keyAtFrame->setRelFrame(frame);
         keyAtFrame->setValue(value);
         appendKey(keyAtFrame);
         updateKeysPath();
@@ -537,10 +543,10 @@ void QrealAnimator::setTraceKeyOnCurrentFrame(bool bT)
 void QrealAnimator::saveCurrentValueAsKey()
 {
     if(!mIsRecording) setRecording(true);
-    QrealKey *keyAtFrame = getKeyAtFrame(mCurrentFrame);
+    QrealKey *keyAtFrame = getKeyAtAbsFrame(mCurrentAbsFrame);
     if(keyAtFrame == NULL) {
         keyAtFrame = new QrealKey(this);
-        keyAtFrame->setFrame(mCurrentFrame);
+        keyAtFrame->setRelFrame(mCurrentAbsFrame);
         keyAtFrame->setValue(mCurrentValue);
         appendKey(keyAtFrame);
         updateKeysPath();
@@ -554,7 +560,7 @@ void QrealAnimator::updateKeysPath()
     mKeysPath = QPainterPath();
     QrealKey *lastKey = NULL;
     foreach(QrealKey *key, mKeys) {
-        int keyFrame = key->getFrame();
+        int keyFrame = key->getAbsFrame();
         if(lastKey == NULL) {
             mKeysPath.moveTo(-5000, -key->getValue());
             mKeysPath.lineTo(keyFrame, -key->getValue());
@@ -580,7 +586,7 @@ void QrealAnimator::updateKeysPath()
 
 bool keysFrameSort(QrealKey *key1, QrealKey *key2)
 {
-    return key1->getFrame() < key2->getFrame();
+    return key1->getAbsFrame() < key2->getAbsFrame();
 }
 
 void QrealAnimator::sortKeys()
@@ -631,7 +637,7 @@ void QrealAnimator::getMinAndMaxValuesBetweenFrames(
     } else {
         bool first = true;
         foreach(QrealKey *key, mKeys) {
-            int keyFrame = key->getFrame();
+            int keyFrame = key->getAbsFrame();
             if(keyFrame > endFrame || keyFrame < startFrame) continue;
             if(first) first = false;
             qreal keyVal = key->getValue();
@@ -644,7 +650,7 @@ void QrealAnimator::getMinAndMaxValuesBetweenFrames(
         }
         if(first) {
             int midFrame = (startFrame + endFrame)/2;
-            qreal value = getValueAtFrame(midFrame);
+            qreal value = getValueAtAbsFrame(midFrame);
             *minValP = value;
             *maxValP = value;
         } else {
@@ -699,7 +705,7 @@ void QrealAnimator::getMinAndMaxMoveFrame(
                                      QrealKey *key, QrealPoint *currentPoint,
                                      qreal *minMoveFrame, qreal *maxMoveFrame) {
     if(currentPoint->isKeyPoint()) return;
-    qreal keyFrame = key->getFrame();
+    qreal keyFrame = key->getAbsFrame();
 
     qreal startMinMoveFrame;
     qreal endMaxMoveFrame;
@@ -708,14 +714,14 @@ void QrealAnimator::getMinAndMaxMoveFrame(
     if(keyId == mKeys.count() - 1) {
         endMaxMoveFrame = keyFrame + 5000.;
     } else {
-        endMaxMoveFrame = mKeys.at(keyId + 1)->getFrame();
+        endMaxMoveFrame = mKeys.at(keyId + 1)->getAbsFrame();
     }
 
     if(keyId == 0) {
         startMinMoveFrame = keyFrame - 5000.;
     } else {
         QrealKey *prevKey = mKeys.at(keyId - 1);
-        startMinMoveFrame = prevKey->getFrame();
+        startMinMoveFrame = prevKey->getAbsFrame();
     }
 
     if(key->getCtrlsMode() == CtrlsMode::CTRLS_SYMMETRIC) {
@@ -741,8 +747,8 @@ void QrealAnimator::constrainCtrlsFrameValues() {
     QrealKey *lastKey = NULL;
     foreach(QrealKey *key, mKeys) {
         if(lastKey != NULL) {
-            lastKey->constrainEndCtrlMaxFrame(key->getFrame());
-            key->constrainStartCtrlMinFrame(lastKey->getFrame());
+            lastKey->constrainEndCtrlMaxFrame(key->getAbsFrame());
+            key->constrainStartCtrlMinFrame(lastKey->getAbsFrame());
         }
         lastKey = key;
     }
@@ -903,7 +909,7 @@ void QrealAnimator::drawKey(QPainter *p,
         p->setPen(QPen(Qt::black, 1.5));
         p->drawEllipse(
             QRectF(
-                QPointF((key->getFrame() - startFrame + 0.5)*
+                QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.5,
                         drawY + (BOX_HEIGHT -
                                   KEY_RECT_SIZE)*0.5 ),
@@ -912,7 +918,7 @@ void QrealAnimator::drawKey(QPainter *p,
     } else {
         p->drawEllipse(
             QRectF(
-                QPointF((key->getFrame() - startFrame + 0.5)*
+                QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.5,
                         drawY + (BOX_HEIGHT -
                                   KEY_RECT_SIZE)*0.5 ),
@@ -925,10 +931,10 @@ void QrealAnimator::drawKeys(QPainter *p, qreal pixelsPerFrame,
                              int startFrame, int endFrame)
 {
     p->save();
-    p->translate(getFrameShift()*pixelsPerFrame, 0.);
+    //p->translate(getFrameShift()*pixelsPerFrame, 0.);
     foreach(QrealKey *key, mKeys) {
-        if(key->getFrame() >= startFrame &&
-           key->getFrame() <= endFrame) {
+        if(key->getAbsFrame() >= startFrame &&
+           key->getAbsFrame() <= endFrame) {
             drawKey(p, key, pixelsPerFrame, drawY, startFrame);
         }
     }
@@ -961,7 +967,7 @@ void QrealAnimator::mergeKeysIfNeeded() {
     QList<QrealKeyPair> keyPairsToMerge;
     foreach(QrealKey *key, mKeys) {
         if(lastKey != NULL) {
-            if(key->getFrame() == lastKey->getFrame() ) {
+            if(key->getAbsFrame() == lastKey->getAbsFrame() ) {
                 if(key->isDescendantSelected()) {
                     keyPairsToMerge << QrealKeyPair(key, lastKey);
                 } else {

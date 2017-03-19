@@ -438,7 +438,7 @@ void ParticleEmitter::scheduleUpdateParticlesForFrame() {
 void ParticleEmitter::updateParticlesForFrameIfNeeded() {
     if(mUpdateParticlesForFrameScheduled) {
         mUpdateParticlesForFrameScheduled = false;
-        updateParticlesForFrame(mCurrentFrame);
+        updateParticlesForFrame(mCurrentAbsFrame);
     }
 }
 
@@ -530,37 +530,37 @@ void ParticleEmitter::generateParticles() {
     int totalNeededParticles = 0;
     for(int i = mMinFrame; i < mMaxFrame; i++) {
         qreal iniVelocity =
-                mIniVelocity.getCurrentValueAtFrame(i);
+                mIniVelocity.getCurrentValueAtAbsFrame(i);
         qreal iniVelocityVar =
-                mIniVelocityVar.getCurrentValueAtFrame(i);
+                mIniVelocityVar.getCurrentValueAtAbsFrame(i);
         qreal iniVelocityAngle =
-                mIniVelocityAngle.getCurrentValueAtFrame(i);
+                mIniVelocityAngle.getCurrentValueAtAbsFrame(i);
         qreal iniVelocityAngleVar =
-                mIniVelocityAngleVar.getCurrentValueAtFrame(i);
+                mIniVelocityAngleVar.getCurrentValueAtAbsFrame(i);
         qreal particlesPerFrame =
-                mParticlesPerSecond.getCurrentValueAtFrame(i)/24.;
+                mParticlesPerSecond.getCurrentValueAtAbsFrame(i)/24.;
         qreal particlesFrameLifetime =
-                mParticlesFrameLifetime.getCurrentValueAtFrame(i);
+                mParticlesFrameLifetime.getCurrentValueAtAbsFrame(i);
         QPointF pos =
                 mPos->getRelativePosAnimatorPtr()->getCurrentPointValueAtFrame(i);
         qreal width =
-                mWidth.getCurrentValueAtFrame(i);
+                mWidth.getCurrentValueAtAbsFrame(i);
         qreal velocityVar =
-                mVelocityRandomVar.getCurrentValueAtFrame(i);
+                mVelocityRandomVar.getCurrentValueAtAbsFrame(i);
         qreal velocityVarPeriod =
-                mVelocityRandomVarPeriod.getCurrentValueAtFrame(i);
+                mVelocityRandomVarPeriod.getCurrentValueAtAbsFrame(i);
         QPointF acceleration = mAcceleration.getCurrentPointValueAtFrame(i)/24.;
         qreal finalScale =
-                mParticlesSizeDecay.getCurrentValueAtFrame(i);
+                mParticlesSizeDecay.getCurrentValueAtAbsFrame(i);
         qreal finalOpacity =
-                mParticlesOpacityDecay.getCurrentValueAtFrame(i);
+                mParticlesOpacityDecay.getCurrentValueAtAbsFrame(i);
         qreal decayFrames =
-                mParticlesDecayFrames.getCurrentValueAtFrame(i);
+                mParticlesDecayFrames.getCurrentValueAtAbsFrame(i);
         qreal particleSize =
-                mParticleSize.getCurrentValueAtFrame(i);
+                mParticleSize.getCurrentValueAtAbsFrame(i);
         qreal particleSizeVar =
-                mParticleSizeVar.getCurrentValueAtFrame(i);
-        qreal length = mParticleLength.getCurrentValueAtFrame(i);
+                mParticleSizeVar.getCurrentValueAtAbsFrame(i);
+        qreal length = mParticleLength.getCurrentValueAtAbsFrame(i);
 
         int particlesToCreate = remainingPartFromFrame + particlesPerFrame;
         remainingPartFromFrame += particlesPerFrame - particlesToCreate;
@@ -681,7 +681,7 @@ QRectF ParticleEmitter::getParticlesBoundingRect() {
     return mParticlesBoundingRect;
 }
 
-void ParticleEmitter::setFrame(int frame) {
-    ComplexAnimator::setFrame(frame);
+void ParticleEmitter::setAbsFrame(int frame) {
+    ComplexAnimator::setAbsFrame(frame);
     scheduleUpdateParticlesForFrame();
 }

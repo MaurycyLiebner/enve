@@ -6,8 +6,21 @@ Animator::Animator() :
     Property() {
 }
 
-void Animator::setFrame(int frame) {
-    mCurrentFrame = frame;
+void Animator::setAbsFrame(int frame) {
+    mCurrentAbsFrame = frame;
+    updateRelFrame();
+}
+
+void Animator::updateRelFrame() {
+    mCurrentRelFrame = mCurrentAbsFrame - getFrameShift();
+}
+
+int Animator::absFrameToRelFrame(const int &absFrame) const {
+    return absFrame - getFrameShift();
+}
+
+int Animator::relFrameToAbsFrame(const int &relFrame) const {
+    return relFrame + getFrameShift();
 }
 
 void Animator::switchRecording() {

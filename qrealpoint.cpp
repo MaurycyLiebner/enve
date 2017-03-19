@@ -9,14 +9,14 @@ SmartPointerTarget() {
 }
 
 qreal QrealPoint::getFrame() {
-    if(mType == KEY_POINT) return mParentKey->getFrame();
+    if(mType == KEY_POINT) return mParentKey->getAbsFrame();
     if(mType == START_POINT) return mParentKey->getStartValueFrame();
     if(mType == END_POINT) return mParentKey->getEndValueFrame();
 }
 
 void QrealPoint::setFrame(qreal frame)
 {
-    if(mType == KEY_POINT) return mParentKey->setFrame(qRound(frame));
+    if(mType == KEY_POINT) return mParentKey->setRelFrame(qRound(frame));
     if(mType == START_POINT) return mParentKey->setStartFrame(frame);
     if(mType == END_POINT) return mParentKey->setEndFrame(frame);
 }

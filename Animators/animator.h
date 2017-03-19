@@ -39,7 +39,7 @@ public:
 
     virtual void sortKeys() = 0;
 
-    virtual void setFrame(int frame) = 0;
+    virtual void setAbsFrame(int frame) = 0;
 
     virtual void switchRecording();
 
@@ -67,8 +67,12 @@ public:
     virtual void startDragging() {}
 
     virtual int getFrameShift() const;
+    void updateRelFrame();
+    int absFrameToRelFrame(const int &absFrame) const;
+    int relFrameToAbsFrame(const int &relFrame) const;
 protected:
-    int mCurrentFrame = 0;
+    int mCurrentAbsFrame = 0;
+    int mCurrentRelFrame = 0;
     bool mIsComplexAnimator = false;
     bool mIsCurrentAnimator = false;
     bool mIsRecording = false;

@@ -162,11 +162,11 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
     }
 
     foreach(QrealKey *key, mKeys) {
-        int frame = key->getFrame();
+        int frame = key->getAbsFrame();
 
-        qreal rF = mVal1Animator.getValueAtFrame(frame);
-        qreal gF = mVal2Animator.getValueAtFrame(frame);
-        qreal bF = mVal3Animator.getValueAtFrame(frame);
+        qreal rF = mVal1Animator.getValueAtAbsFrame(frame);
+        qreal gF = mVal2Animator.getValueAtAbsFrame(frame);
+        qreal bF = mVal3Animator.getValueAtAbsFrame(frame);
 
         foo(&rF, &gF, &bF);
 

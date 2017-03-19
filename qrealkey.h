@@ -30,8 +30,8 @@ public:
     virtual void startFrameTransform();
     virtual void finishFrameTransform();
 
-    int getFrame();
-    virtual void setFrame(int frame);
+    int getAbsFrame();
+    virtual void setRelFrame(int frame);
     virtual void setStartFrame(qreal startFrame);
     virtual void setEndFrame(qreal endFrame);
 
@@ -114,6 +114,8 @@ public:
         mHovered = bT;
     }
 
+    int getRelFrame();
+    void setAbsFrame(const int &frame);
 protected:
     bool mIsSelected = false;
     QrealAnimator *mParentAnimator = NULL;
@@ -125,7 +127,7 @@ protected:
     QrealPoint *mEndPoint;
 
     qreal mValue;
-    int mFrame;
+    int mRelFrame;
     int mSavedFrame;
     qreal mSavedValue;
 

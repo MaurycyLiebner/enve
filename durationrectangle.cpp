@@ -130,6 +130,7 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
         p->setPen(QPen(Qt::black));
     }
     p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + BOX_HEIGHT));
+    p->setPen(Qt::black);
 }
 
 DurationRectangleMovable *DurationRectangle::getMovableAt(

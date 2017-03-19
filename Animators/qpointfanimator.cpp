@@ -51,13 +51,13 @@ QPointF QPointFAnimator::getCurrentValue() const {
 }
 
 QPointF QPointFAnimator::getCurrentPointValueAtFrame(const int &frame) {
-    return QPointF(mXAnimator.getCurrentValueAtFrame(frame),
-                   mYAnimator.getCurrentValueAtFrame(frame));
+    return QPointF(mXAnimator.getCurrentValueAtAbsFrame(frame),
+                   mYAnimator.getCurrentValueAtAbsFrame(frame));
 }
 
 QPointF QPointFAnimator::getPointValueAtFrame(const int &frame) {
-    return QPointF(mXAnimator.getValueAtFrame(frame),
-                   mYAnimator.getValueAtFrame(frame));
+    return QPointF(mXAnimator.getValueAtAbsFrame(frame),
+                   mYAnimator.getValueAtAbsFrame(frame));
 }
 
 qreal QPointFAnimator::getXValue()

@@ -60,7 +60,7 @@ public:
 
     virtual void sortKeys() {}
 
-    virtual void setFrame(int frame) { Q_UNUSED(frame); }
+    virtual void setAbsFrame(int frame) { Q_UNUSED(frame); }
 
     virtual void switchRecording() {}
 

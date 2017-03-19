@@ -31,7 +31,7 @@ public:
 
     void setValueRange(qreal minVal, qreal maxVal);
 
-    qreal getValueAtFrame(int frame) const;
+    qreal getValueAtAbsFrame(int frame) const;
     qreal getCurrentValue() const;
     void setCurrentValue(qreal newValue, bool finish = false);
     void updateValueFromCurrentFrame();
@@ -40,8 +40,8 @@ public:
                         qreal value,
                         bool saveUndoRedo = true);
 
-    virtual void setFrame(int frame);
-    QrealKey *getKeyAtFrame(int frame);
+    virtual void setAbsFrame(int frame);
+    QrealKey *getKeyAtAbsFrame(const int &frame);
     virtual void updateKeysPath();
     void appendKey(QrealKey *newKey,
                    bool saveUndoRedo = true);
@@ -51,7 +51,7 @@ public:
     void moveKeyToFrame(QrealKey *key, int newFrame);
 
     virtual void sortKeys();
-    bool getNextAndPreviousKeyId(int *prevIdP,
+    bool getNextAndPreviousKeyIdForRelFrame(int *prevIdP,
                                  int *nextIdP,
                                  int frame) const;
 
@@ -80,7 +80,7 @@ public:
     QrealPoint *getPointAt(qreal value, qreal frame,
                            qreal pixelsPerFrame, qreal pixelsPerValUnit);
     void deletePressed();
-    qreal getValueAtFrame(int frame,
+    qreal getValueAtRelFrame(int frame,
                           QrealKey *prevKey,
                           QrealKey *nextKey) const;
 
@@ -154,7 +154,7 @@ public:
     virtual void clearFromGraphView();
 
     void freezeMinMaxValues();
-    void saveValueAtFrameAsKey(int frame);
+    void saveValueAtAbsFrameAsKey(int frame);
 
     void setTraceKeyOnCurrentFrame(bool bT);
     virtual void openContextMenu(QPoint pos);
@@ -188,8 +188,10 @@ public:
     virtual QrealAnimator *makeDuplicate();
 
     SWT_Type SWT_getType() { return SWT_QrealAnimator; }
-    qreal getCurrentValueAtFrame(const int &frame) const;
+    qreal getCurrentValueAtAbsFrame(const int &frame) const;
     void blockUpdater();
+    qreal getValueAtRelFrame(int frame) const;
+    QrealKey *getKeyAtRelFrame(const int &frame);
 protected:
     bool mUpdaterBlocked = false;
     bool mTraceKeyOnCurrentFrame = false;
@@ -225,7 +227,7 @@ signals:
 public slots:
     void setRecording(bool rec);
     void deleteCurrentKey() {
-        QrealKey *keyAtFrame = getKeyAtFrame(mCurrentFrame);
+        QrealKey *keyAtFrame = getKeyAtAbsFrame(mCurrentAbsFrame);
         if(keyAtFrame == NULL) return;
         keyAtFrame->deleteKey();
     }

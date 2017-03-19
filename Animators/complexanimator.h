@@ -14,7 +14,9 @@ public:
     QMatrix getCurrentValue();
 
     void addChildQrealKey(QrealKey *key);
-    ComplexKey *getKeyCollectionAtFrame(int frame);
+    ComplexKey *getKeyCollectionAtAbsFrame(int frame);
+    ComplexKey *getKeyCollectionAtRelFrame(int frame);
+
     void removeChildQrealKey(QrealKey *key);
     void drawChildAnimatorKeys(QPainter *p,
                                qreal pixelsPerFrame, qreal startY,
@@ -24,7 +26,7 @@ public:
     void removeChildAnimator(Property *removeAnimator);
     void startTransform();
     void setUpdater(AnimatorUpdater *updater);
-    void setFrame(int frame);
+    void setAbsFrame(int frame);
 
     void retrieveSavedValue();
     void finishTransform();
@@ -96,7 +98,7 @@ public:
 
     bool isEmpty();
 
-    void setFrame(int frame);
+    void setRelFrame(int frame);
 
     void mergeWith(QrealKey *key);
 

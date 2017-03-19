@@ -57,8 +57,8 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
                                    KeysView *keysView) {
     int firstKeyFrame = 1000000;
     foreach(QrealKey *key, mKeysList) {
-        if(key->getFrame() < firstKeyFrame) {
-            firstKeyFrame = key->getFrame();
+        if(key->getAbsFrame() < firstKeyFrame) {
+            firstKeyFrame = key->getAbsFrame();
         }
     }
     int dFrame = pasteFrame - firstKeyFrame;
@@ -75,7 +75,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     for(int i = 0; i < count; i++) {
         QrealKey *key = mKeysList.at(i);
         QrealAnimator *animator = mTargetAnimators.at(i);
-        key->setFrame(key->getFrame() + dFrame);
+        key->setRelFrame(key->getAbsFrame() + dFrame);
         key = key->makeQrealKeyDuplicate(animator);
         animator->appendKey(key);
         keysView->addKeyToSelection(key);

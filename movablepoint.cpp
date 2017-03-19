@@ -221,7 +221,7 @@ qreal MovablePoint::getRadius()
 
 void MovablePoint::updateAfterFrameChanged(int frame)
 {
-    mRelPos.setFrame(frame);
+    mRelPos.setAbsFrame(frame);
 }
 
 void MovablePoint::rotateBy(qreal rot)
