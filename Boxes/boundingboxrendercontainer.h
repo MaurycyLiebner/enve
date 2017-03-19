@@ -30,6 +30,8 @@ public:
 
     const int &getFrame() const;
 
+    void setFrame(const int &frame);
+
     void updateVariables(const QMatrix &combinedTransform,
                          const qreal &effectsMargin,
                          const qreal &resolutionPer,

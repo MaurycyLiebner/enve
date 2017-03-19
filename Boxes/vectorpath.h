@@ -54,8 +54,6 @@ public:
                          qreal maxPercent, qreal minPercent,
                          bool *found = NULL, QPointF *posInPath = NULL);
 
-    void updateAfterFrameChanged(int currentFrame);
-
     void startAllPointsTransform() {
         //mPathAnimator.startAllPointsTransform();
     }

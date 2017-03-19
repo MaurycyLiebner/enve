@@ -69,11 +69,6 @@ void VectorPath::applyCurrentTransformation() {
     centerPivotPosition(true);
 }
 
-void VectorPath::updateAfterFrameChanged(int currentFrame) {
-    mPathAnimator.setFrame(currentFrame);
-    PathBox::updateAfterFrameChanged(currentFrame);
-}
-
 Edge *VectorPath::getEgde(QPointF absPos) {
     return mPathAnimator.getEgde(absPos);
 }

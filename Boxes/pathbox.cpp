@@ -324,12 +324,6 @@ bool PathBox::relPointInsidePath(QPointF relPos) {
     }
 }
 
-void PathBox::updateAfterFrameChanged(int currentFrame) {
-    mFillPaintSettings.setFrame(currentFrame);
-    mStrokeSettings.setFrame(currentFrame);
-    BoundingBox::updateAfterFrameChanged(currentFrame);
-}
-
 void PathBox::setOutlineAffectedByScale(bool bT) {
     mOutlineAffectedByScale = bT;
     scheduleOutlinePathUpdate();

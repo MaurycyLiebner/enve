@@ -29,7 +29,6 @@ public:
     void selectAndAddContainedPointsToList(QRectF absRect,
                                            QList<MovablePoint *> *list);
     void updatePath();
-    void updateAfterFrameChanged(int currentFrame);
     void loadFromSql(int boundingBoxId);
     int saveToSql(QSqlQuery *query, int parentId);
 

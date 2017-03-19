@@ -162,6 +162,7 @@ public:
         return mPos;
     }
 
+    void setFrame(int frame);
 private:
     QRectF mParticlesBoundingRect;
     bool mGenerateParticlesScheduled = false;

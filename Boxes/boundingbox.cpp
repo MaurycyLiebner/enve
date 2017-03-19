@@ -348,6 +348,7 @@ void BoundingBox::updateAllUglyPixmap() {
                 mEffectsMargin,
                 parentCanvas->getResolutionPercent(),
                 this);
+    mUpdateRenderContainer->setFrame(mUpdateFrame);
 }
 
 void BoundingBox::drawPreviewPixmap(QPainter *p) {
@@ -476,9 +477,9 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
-    mTransformAnimator.setFrame(currentFrame);
+    //mTransformAnimator.setFrame(currentFrame);
     mAnimatorsCollection.setFrame(currentFrame);
-    mEffectsAnimators.setFrame(currentFrame);
+    //mEffectsAnimators.setFrame(currentFrame);
     mCurrentFrame = currentFrame;
 }
 

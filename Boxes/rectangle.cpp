@@ -98,13 +98,6 @@ void Rectangle::loadFromSql(int boundingBoxId) {
     if(!mPivotChanged) centerPivotPosition();
 }
 
-void Rectangle::updateAfterFrameChanged(int currentFrame)
-{
-    mTopLeftPoint->updateAfterFrameChanged(currentFrame);
-    mBottomRightPoint->updateAfterFrameChanged(currentFrame);
-    PathBox::updateAfterFrameChanged(currentFrame);
-}
-
 void Rectangle::startAllPointsTransform() {
     mTopLeftPoint->startTransform();
     mBottomRightPoint->startTransform();

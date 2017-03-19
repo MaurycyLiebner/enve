@@ -36,12 +36,6 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
 
 void ParticleBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    mTopLeftPoint->updateAfterFrameChanged(currentFrame);
-    mBottomRightPoint->updateAfterFrameChanged(currentFrame);
-    foreach(ParticleEmitter *emitter, mEmitters) {
-        emitter->setFrame(currentFrame);
-        emitter->scheduleUpdateParticlesForFrame();
-    }
     scheduleUpdate();
 }
 
@@ -685,4 +679,9 @@ void ParticleEmitter::updateParticlesForFrame(const int &frame) {
 
 QRectF ParticleEmitter::getParticlesBoundingRect() {
     return mParticlesBoundingRect;
+}
+
+void ParticleEmitter::setFrame(int frame) {
+    ComplexAnimator::setFrame(frame);
+    scheduleUpdateParticlesForFrame();
 }

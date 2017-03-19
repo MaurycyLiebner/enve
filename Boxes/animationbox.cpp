@@ -52,11 +52,8 @@ BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
 }
 
 void AnimationBox::updateAfterFrameChanged(int currentFrame) {
-    //mFrameAnimator.setFrame(currentFrame);
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    mTimeScaleAnimator.setFrame(currentFrame);
     updateAnimationFrame();
-    //setFilePath(mListOfFrames.at(mFrameAnimator.getCurrentIntValue()));
 }
 
 void AnimationBox::updateAnimationFrame() {

@@ -93,13 +93,6 @@ void Circle::duplicateCirclePointsFrom(
     verticalRadiusPoint->makeDuplicate(mVerticalRadiusPoint);
 }
 
-void Circle::updateAfterFrameChanged(int currentFrame)
-{
-    mVerticalRadiusPoint->updateAfterFrameChanged(currentFrame);
-    mHorizontalRadiusPoint->updateAfterFrameChanged(currentFrame);
-    PathBox::updateAfterFrameChanged(currentFrame);
-}
-
 void Circle::moveRadiusesByAbs(QPointF absTrans) {
     mVerticalRadiusPoint->moveByAbs(absTrans);
     mHorizontalRadiusPoint->moveByAbs(absTrans);

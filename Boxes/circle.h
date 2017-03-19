@@ -56,7 +56,6 @@ public:
     void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint *> *list);
     void moveRadiusesByAbs(QPointF absTrans);
     void startPointsTransform();
-    void updateAfterFrameChanged(int currentFrame);
 
     int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);

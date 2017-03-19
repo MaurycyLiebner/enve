@@ -57,6 +57,10 @@ const int &BoundingBoxRenderContainer::getFrame() const {
     return mFrame;
 }
 
+void BoundingBoxRenderContainer::setFrame(const int &frame) {
+    mFrame = frame;
+}
+
 void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransform,
                                                  const qreal &effectsMargin,
                                                  const qreal &resolutionPer,

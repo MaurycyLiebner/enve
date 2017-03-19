@@ -73,8 +73,6 @@ public:
     void scheduleOutlinePathUpdate();
     void updateOutlinePathIfNeeded();
 
-    void updateAfterFrameChanged(int currentFrame);
-
     void setOutlineAffectedByScale(bool bT);
     int saveToSql(QSqlQuery *query, int parentId);
     void loadFromSql(int boundingBoxId);
