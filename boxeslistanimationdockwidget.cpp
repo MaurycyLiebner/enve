@@ -192,7 +192,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
 
     addNewBoxesListKeysViewWidget(0);
-    //addNewBoxesListKeysViewWidget(1);
+    addNewBoxesListKeysViewWidget(1);
     //addNewBoxesListKeysViewWidget(0);
 }
 
@@ -211,9 +211,21 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
     newWidget->connectToChangeWidthWidget(mChww);
     newWidget->connectToFrameWidget(mFrameRangeScrollbar);
     mBoxesListKeysViewStack->insertWidget(id, newWidget);
+    mBoxesListKeysViewWidgets << newWidget;
 
     mChww->raise();
     mFrameRangeScrollbar->raise();
+}
+
+void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
+                                        BoxesListKeysViewWidget *widget) {
+    mBoxesListKeysViewWidgets.removeOne(widget);
+    mBoxesListKeysViewStack->removeWidget(widget);
+}
+
+void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
+                                        BoxesListKeysViewWidget *widget) {
+    addNewBoxesListKeysViewWidget(mBoxesListKeysViewStack->getIdOf(widget) + 1);
 }
 
 bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(

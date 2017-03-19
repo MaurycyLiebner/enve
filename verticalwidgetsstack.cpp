@@ -160,6 +160,10 @@ void VerticalWidgetsStack::updateResizers() {
     }
 }
 
+int VerticalWidgetsStack::getIdOf(QWidget *idOf) {
+    return mWidgets.indexOf(idOf);
+}
+
 void VerticalWidgetsStack::updatePercent() {
     qreal totHeight = 0.;
     foreach(QWidget *wid, mWidgets) {
@@ -196,6 +200,7 @@ void VerticalWidgetsStack::insertWidget(const int &id,
 
 void VerticalWidgetsStack::removeWidget(QWidget *widget) {
     if(mWidgets.removeOne(widget) ) {
+        delete widget;
         updatePercent();
         updateResizers();
         updateSizesAndPositions();

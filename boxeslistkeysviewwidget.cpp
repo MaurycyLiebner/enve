@@ -52,6 +52,10 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(QWidget *topWidget,
     targetMenu->addAction("Current Group", this,
                           SLOT(setTargetCurrentGroup()));
 
+    mBoxesListMenuBar->addSeparator();
+    mBoxesListMenuBar->addAction("+", this, SLOT(addNewBelowThis()));
+    mBoxesListMenuBar->addAction("-", this, SLOT(removeThis()));
+
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
     connect(mSearchLine, SIGNAL(textChanged(QString)),
             this, SLOT(setSearchText(QString)));
@@ -154,6 +158,14 @@ void BoxesListKeysViewWidget::connectToChangeWidthWidget(
 
 void BoxesListKeysViewWidget::setBoxesListWidth(const int &width) {
     mBoxesListScrollArea->setFixedWidth(width);
+}
+
+void BoxesListKeysViewWidget::addNewBelowThis() {
+    mAnimationDockWidget->addNewBoxesListKeysViewWidgetBelow(this);
+}
+
+void BoxesListKeysViewWidget::removeThis() {
+    mAnimationDockWidget->removeBoxesListKeysViewWidget(this);
 }
 
 void BoxesListKeysViewWidget::setRuleNone() {

@@ -141,6 +141,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
                      mLastPressedKey->areAllChildrenSelected())) {
                     removeKeyFromSelection(mLastPressedKey);
                 } else {
+                    clearHoveredPoint();
                     addKeyToSelection(mLastPressedKey);
 
                     mMovingKeys = true;

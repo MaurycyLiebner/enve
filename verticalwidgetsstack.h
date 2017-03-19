@@ -51,6 +51,7 @@ public:
     void removeWidget(QWidget *widget);
 
     void resizeEvent(QResizeEvent *);
+    int getIdOf(QWidget *idOf);
 signals:
 
 public slots:

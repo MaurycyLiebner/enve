@@ -91,16 +91,20 @@ int DurationRectangle::getMaxFrame() const {
 void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
                              const qreal &drawY, const int &startFrame) {
     int startDFrame;
+    int xT;
+    int widthT;
     if(mShowPossibleFrameRange) {
         startDFrame = getMinPossibleFrame() - startFrame;
-        p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
-                    getPossibleFrameDuration()*pixelsPerFrame - pixelsPerFrame,
+        xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
+        widthT = getPossibleFrameDuration()*pixelsPerFrame - pixelsPerFrame;
+        p->fillRect(xT, drawY,
+                    widthT,
                     BOX_HEIGHT, QColor(125, 125, 255, 180));
     }
 
     startDFrame = getMinFrame() - startFrame;
-    int xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
-    int widthT = getFrameDuration()*pixelsPerFrame - pixelsPerFrame;
+    xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
+    widthT = getFrameDuration()*pixelsPerFrame - pixelsPerFrame;
     QColor fillColor;
     if(mHovered) {
         fillColor = QColor(50, 50, 255, 180);

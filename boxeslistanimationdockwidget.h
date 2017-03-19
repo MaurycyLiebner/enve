@@ -59,10 +59,12 @@ public:
     void previewFinished();
     void setPlaying(bool playing);
     void updateSettingsForCurrentCanvas(Canvas *canvas);
-    void addNewBoxesListKeysViewWidget(int id);
+    void addNewBoxesListKeysViewWidgetBelow(BoxesListKeysViewWidget *widget);
 public slots:
     void setCurrentFrame(int frame);
     void setMinMaxFrame(const int &minFrame, const int &maxFrame);
+    void addNewBoxesListKeysViewWidget(int id);
+    void removeBoxesListKeysViewWidget(BoxesListKeysViewWidget *widget);
 signals:
     void visibleRangeChanged(int, int);
 private slots:

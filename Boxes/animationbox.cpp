@@ -62,7 +62,7 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
 void AnimationBox::updateAnimationFrame() {
     qreal timeScale = mTimeScaleAnimator.getCurrentValue();
     mDurationRectangle.setPossibleFrameDuration(
-                qAbs(timeScale*mListOfFrames.count()));
+                qRound(qAbs(timeScale*mListOfFrames.count())));
     int pixId;
     if(timeScale > 0.) {
         pixId = (getCurrentFrameFromMainWindow() -

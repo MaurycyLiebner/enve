@@ -43,6 +43,9 @@ public slots:
     void moveSlider(int val);
 protected slots:
     void setBoxesListWidth(const int &width);
+
+    void addNewBelowThis();
+    void removeThis();
 private:
     QHBoxLayout *mMainLayout;
     QVBoxLayout *mBoxesListLayout;

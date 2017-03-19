@@ -44,7 +44,7 @@ public:
                       const int &frame, const qreal &res);
     void drawWithoutTransform(QPainter *p);
 private:
-    int mFrame;
+    int mFrame = 0;
     qreal mResolutionPercent;
     QMatrix mTransform;
     QMatrix mPaintTransform;
