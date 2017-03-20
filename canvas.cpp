@@ -370,7 +370,7 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest) {
                                QImage::Format_ARGB32_Premultiplied);
     image->fill(Qt::transparent);
     renderFinalCurrentFrameToQImage(image);
-    image->save(renderDest + QString::number(mCurrentFrame) + ".png");
+    image->save(renderDest + QString::number(mCurrentAbsFrame) + ".png");
     delete image;
 }
 
@@ -839,7 +839,7 @@ void Canvas::moveByRel(QPointF trans) {
 }
 
 void Canvas::updateAfterFrameChanged(int currentFrame) {
-    mCurrentFrame = currentFrame;
+    mCurrentAbsFrame = currentFrame;
     foreach(BoundingBox *box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
@@ -943,7 +943,7 @@ void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
 }
 
 int Canvas::getCurrentFrame() {
-    return mCurrentFrame;
+    return mCurrentAbsFrame;
 }
 
 int Canvas::getMinFrame() {

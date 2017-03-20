@@ -349,7 +349,7 @@ void BoundingBox::updateAllUglyPixmap() {
                 mEffectsMargin,
                 parentCanvas->getResolutionPercent(),
                 this);
-    mUpdateRenderContainer->setFrame(mUpdateFrame);
+    mUpdateRenderContainer->setFrame(mUpdateRelFrame);
 }
 
 void BoundingBox::drawPreviewPixmap(QPainter *p) {
@@ -478,7 +478,8 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
-    mCurrentFrame = currentFrame;
+    mCurrentAbsFrame = currentFrame;
+    mCurrentRelFrame = mCurrentAbsFrame - getFrameShift();
     mAnimatorsCollection.setAbsFrame(currentFrame);
 }
 
@@ -1157,11 +1158,11 @@ void BoundingBox::afterUpdate() {
 
         mRenderContainers.clear();
         mOldRenderContainer = getRenderContainerAtFrame(
-                                        mUpdateFrame);
+                                        mUpdateRelFrame);
 
         if(mOldRenderContainer == NULL) {
             mOldRenderContainer = new BoundingBoxRenderContainer();
-            mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
+            mRenderContainers.insert({mUpdateRelFrame, mOldRenderContainer});
         }
         mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
 //        if(!mUpdateReplaceCache) {
@@ -1183,7 +1184,7 @@ void BoundingBox::setUpdateVars() {
     updateRelBoundingRect();
 
     mUpdateTransform = mCombinedTransformMatrix;
-    mUpdateFrame = mCurrentFrame;
+    mUpdateRelFrame = mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
 }
 

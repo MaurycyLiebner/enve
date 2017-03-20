@@ -14,10 +14,14 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     setDurationRectangle(new DurationRectangle());
     mDurationRectangle->setPossibleFrameRangeVisible();
     connect(mDurationRectangle, SIGNAL(changed()),
-            this, SLOT(updateAnimationFrame()));
+            this, SLOT(updateAfterDurationRectangleChanged()));
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
 //    mFrameAnimator.setCurrentIntValue(0);
+}
+
+void AnimationBox::updateAfterDurationRectangleChanged() {
+    updateAfterFrameChanged(mCurrentAbsFrame);
 }
 
 void AnimationBox::setListOfFrames(const QStringList &listOfFrames) {

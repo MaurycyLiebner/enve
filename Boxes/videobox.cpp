@@ -19,7 +19,7 @@ VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
 void VideoBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
 
-    mCurrentVideoFrame = qMin(mFramesCount - 2, mCurrentFrame);
+    mCurrentVideoFrame = qMin(mFramesCount - 2, mCurrentAbsFrame);
     auto searchCurrentFrame = mVideoFramesCache.find(mCurrentVideoFrame);
     if(searchCurrentFrame == mVideoFramesCache.end()) {
         schedulePixmapReload();

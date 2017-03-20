@@ -546,7 +546,7 @@ void QrealAnimator::saveCurrentValueAsKey()
     QrealKey *keyAtFrame = getKeyAtAbsFrame(mCurrentAbsFrame);
     if(keyAtFrame == NULL) {
         keyAtFrame = new QrealKey(this);
-        keyAtFrame->setRelFrame(mCurrentAbsFrame);
+        keyAtFrame->setRelFrame(mCurrentRelFrame);
         keyAtFrame->setValue(mCurrentValue);
         appendKey(keyAtFrame);
         updateKeysPath();

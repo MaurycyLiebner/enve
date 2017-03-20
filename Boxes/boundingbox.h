@@ -459,8 +459,9 @@ protected:
     QMatrix mRelativeTransformMatrix;
 
     bool mNoCache = false;
-    int mUpdateFrame = 0;
-    int mCurrentFrame = 0;
+    int mUpdateRelFrame = 0;
+    int mCurrentAbsFrame = 0;
+    int mCurrentRelFrame = 0;
     QRectF mUpdateRelBoundingRect;
     QMatrix mUpdateTransform;
 

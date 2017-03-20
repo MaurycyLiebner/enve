@@ -26,6 +26,7 @@ public:
                                     qreal pixelsPerFrame);
 public slots:
     void updateAnimationFrame();
+    void updateAfterDurationRectangleChanged();
 private:
     QrealAnimator mTimeScaleAnimator;
     //IntAnimator mFrameAnimator;

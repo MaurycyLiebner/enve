@@ -64,6 +64,8 @@ DurationRectangle::DurationRectangle() : DurationRectangleMovable() {
             this, SIGNAL(changed()));
     connect(&mMaxFrame, SIGNAL(posChanged(int)),
             this, SIGNAL(changed()));
+    connect(this, SIGNAL(posChanged(int)),
+            this, SIGNAL(changed()));
 }
 
 void DurationRectangle::setFramesDuration(const int &duration) {

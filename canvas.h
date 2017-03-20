@@ -331,7 +331,7 @@ private:
     QList<BoundingBox*> mSelectedBoxes;
 
     bool mIsCurrentCanvas = true;
-    int mCurrentFrame = 0;
+    int mCurrentAbsFrame = 0;
     int mMinFrame = 0;
     int mMaxFrame = 0;
 
