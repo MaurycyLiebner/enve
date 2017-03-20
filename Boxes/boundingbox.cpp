@@ -880,6 +880,17 @@ int BoundingBox::getFrameShift() {
     }
 }
 
+void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
+    if(mDurationRectangle != NULL) {
+        disconnect(mDurationRectangle, SIGNAL(changed()),
+                   this, SLOT(updateAfterDurationRectangleChanged()));
+    }
+    mDurationRectangle = durationRect;
+    if(mDurationRectangle == NULL) return;
+    connect(mDurationRectangle, SIGNAL(changed()),
+            this, SLOT(updateAfterDurationRectangleChanged()));
+}
+
 void BoundingBox::addActiveAnimator(QrealAnimator *animator)
 {
     mAnimatorsCollection.addChildAnimator(animator);

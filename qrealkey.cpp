@@ -342,18 +342,21 @@ void QrealKey::setEndValue(qreal value)
 }
 
 void QrealKey::startFrameTransform() {
-    mSavedFrame = getAbsFrame();
+    mSavedRelFrame = mRelFrame;
 }
 
 void QrealKey::cancelFrameTransform() {
-    mParentAnimator->moveKeyToFrame(this, mSavedFrame);
+    mParentAnimator->moveKeyToFrame(this, mSavedRelFrame);
 }
 
 void QrealKey::scaleFrameAndUpdateParentAnimator(
         const int &relativeToFrame,
         const qreal &scaleFactor) {
-    int newFrame = qRound(mSavedFrame +
-                          (mSavedFrame - relativeToFrame)*scaleFactor);
+    int newFrame =
+            qRound(mSavedRelFrame +
+                  (mSavedRelFrame -
+                   mParentAnimator->absFrameToRelFrame(relativeToFrame))*
+                   scaleFactor);
     if(newFrame == mRelFrame) return;
     incFrameAndUpdateParentAnimator(newFrame - mRelFrame);
 }
@@ -366,7 +369,7 @@ void QrealKey::finishFrameTransform()
 {
     if(mParentAnimator == NULL) return;
     mParentAnimator->addUndoRedo(
-                new ChangeQrealKeyFrameUndoRedo(mSavedFrame, mRelFrame, this));
+                new ChangeQrealKeyFrameUndoRedo(mSavedRelFrame, mRelFrame, this));
 }
 
 int QrealKey::getAbsFrame() {
@@ -468,14 +471,14 @@ void QrealKey::drawGraphKey(QPainter *p,
 }
 
 void QrealKey::saveCurrentFrameAndValue() {
-    mSavedFrame = getAbsFrame();
+    mSavedRelFrame = getRelFrame();
     mSavedValue = getValue();
 }
 
 void QrealKey::changeFrameAndValueBy(QPointF frameValueChange)
 {
     setValue(frameValueChange.y() + mSavedValue);
-    int newFrame = qRound(frameValueChange.x() + mSavedFrame);
+    int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
     if(mParentAnimator != NULL) {
         mParentAnimator->moveKeyToFrame(this, newFrame);
     } else {

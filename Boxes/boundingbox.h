@@ -426,9 +426,7 @@ public:
                           const qreal &pixelsPerFrame);
     int getFrameShift();
 
-    void setDurationRectangle(DurationRectangle *durationRect) {
-        mDurationRectangle = durationRect;
-    }
+    void setDurationRectangle(DurationRectangle *durationRect);
 
 protected:
     DurationRectangle *mDurationRectangle = NULL;

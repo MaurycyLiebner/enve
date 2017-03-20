@@ -90,7 +90,7 @@ void QrealAnimator::setValueRange(qreal minVal, qreal maxVal) {
 void QrealAnimator::getKeysInRect(QRectF selectionRect,
                                   qreal pixelsPerFrame,
                                   QList<QrealKey*> *keysList) {
-    selectionRect.translate(-getFrameShift(), 0.);
+    //selectionRect.translate(-getFrameShift(), 0.);
     int selLeftFrame = selectionRect.left();
     if(0.5*pixelsPerFrame + KEY_RECT_SIZE*0.5 <
        selectionRect.left() - selLeftFrame*pixelsPerFrame) {

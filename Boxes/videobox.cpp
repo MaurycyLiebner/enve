@@ -19,7 +19,7 @@ VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
 void VideoBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
 
-    mCurrentVideoFrame = qMin(mFramesCount - 2, mCurrentAbsFrame);
+    mCurrentVideoFrame = qMax(0, qMin(mFramesCount - 2, mCurrentAbsFrame));
     auto searchCurrentFrame = mVideoFramesCache.find(mCurrentVideoFrame);
     if(searchCurrentFrame == mVideoFramesCache.end()) {
         schedulePixmapReload();
@@ -47,20 +47,9 @@ void VideoBox::updateRelBoundingRect() {
 }
 
 void VideoBox::drawSelected(QPainter *p,
-                            const CanvasMode &)
-{
+                            const CanvasMode &) {
     if(mVisible) {
         p->save();
-
-//        QPainterPath mapped;
-//        mapped.addRect(mPixmap.rect());
-//        mapped = mCombinedTransformMatrix.map(mapped);
-//        QPen pen = p->pen();
-//        p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
-//        p->setBrush(Qt::NoBrush);
-//        p->drawPath(mapped);
-//        p->setPen(pen);
-
         drawBoundingRect(p);
         p->restore();
     }
@@ -79,8 +68,7 @@ BoundingBox *VideoBox::createNewDuplicate(BoxesGroup *parent) {
     return new VideoBox(mSrcFilePath, parent);
 }
 
-void VideoBox::draw(QPainter *p)
-{
+void VideoBox::draw(QPainter *p) {
     if(mVisible) {
         p->setRenderHint(QPainter::SmoothPixmapTransform);
         p->drawImage(0, 0, mUpdateVideoImage);

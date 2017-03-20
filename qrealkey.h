@@ -128,7 +128,7 @@ protected:
 
     qreal mValue;
     int mRelFrame;
-    int mSavedFrame;
+    int mSavedRelFrame;
     qreal mSavedValue;
 
     qreal mSavedMaxStartFrameDist;

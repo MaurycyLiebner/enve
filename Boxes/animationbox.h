@@ -4,7 +4,7 @@
 #include "Animators/intanimator.h"
 #include "durationrectangle.h"
 
-class AnimationBox : public ImageBox
+class AnimationBox : public BoundingBox
 {
     Q_OBJECT
 public:
@@ -23,11 +23,29 @@ public:
     DurationRectangleMovable *getRectangleMovableAtPos(
                                     qreal relX,
                                     int minViewedFrame,
-                                    qreal pixelsPerFrame);
+            qreal pixelsPerFrame);
+    void drawSelected(QPainter *p, const CanvasMode &);
+    bool relPointInsidePath(QPointF point);
+    void draw(QPainter *p);
+    void reloadPixmap();
+    void reloadPixmapIfNeeded();
+    void preUpdatePixmapsUpdates();
+    void schedulePixmapReload();
+    void setUpdateVars();
+    void afterSuccessfulUpdate();
+    void updateDurationRectanglePossibleRange();
 public slots:
-    void updateAnimationFrame();
     void updateAfterDurationRectangleChanged();
 private:
+    bool mPixmapReloadScheduled = false;
+    bool mUpdatePixmapReloadScheduled = false;
+    int mUpdateAnimationFrame = 0;
+    int mCurrentAnimationFrame = 0;
+    int mFramesCount = 0;
+    std::unordered_map<int, QImage> mAnimationFramesCache;
+    QImage mUpdateAnimationImage;
+    QString mUpdateFramePath = "";
+
     QrealAnimator mTimeScaleAnimator;
     //IntAnimator mFrameAnimator;
     QStringList mListOfFrames;

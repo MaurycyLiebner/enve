@@ -61,6 +61,7 @@ void ParticleBox::preUpdatePixmapsUpdates() {
 
 bool ParticleBox::relPointInsidePath(QPointF relPos) {
     if(mRelBoundingRectPath.contains(relPos) ) {
+        if(mEmitters.isEmpty()) return true;
         foreach(ParticleEmitter *emitter, mEmitters) {
             if(emitter->relPointInsidePath(relPos)) {
                 return true;
@@ -123,6 +124,10 @@ void ParticleBox::drawSelected(QPainter *p,
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
             mTopLeftPoint->draw(p);
             mBottomRightPoint->draw(p);
+            foreach(ParticleEmitter *emitter, mEmitters) {
+                MovablePoint *pt = emitter->getPosPoint();
+                pt->draw(p);
+            }
         }
         p->restore();
     }
@@ -130,8 +135,7 @@ void ParticleBox::drawSelected(QPainter *p,
 
 
 MovablePoint *ParticleBox::getPointAt(const QPointF &absPtPos,
-                                    const CanvasMode &currentCanvasMode)
-{
+                                      const CanvasMode &currentCanvasMode) {
     MovablePoint *pointToReturn = NULL;
     if(mTopLeftPoint->isPointAtAbsPos(absPtPos)) {
         return mTopLeftPoint;
@@ -141,8 +145,9 @@ MovablePoint *ParticleBox::getPointAt(const QPointF &absPtPos,
     }
     foreach(ParticleEmitter *emitter, mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
-        pt->isPointAtAbsPos(absPtPos);
-        return pt;
+        if(pt->isPointAtAbsPos(absPtPos)) {
+            return pt;
+        }
     }
 
     return pointToReturn;
@@ -161,6 +166,13 @@ void ParticleBox::selectAndAddContainedPointsToList(QRectF absRect,
         if(mBottomRightPoint->isContainedInRect(absRect)) {
             mBottomRightPoint->select();
             list->append(mBottomRightPoint);
+        }
+    }
+    foreach(ParticleEmitter *emitter, mEmitters) {
+        MovablePoint *pt = emitter->getPosPoint();
+        if(pt->isContainedInRect(absRect)) {
+            pt->select();
+            list->append(pt);
         }
     }
 }
