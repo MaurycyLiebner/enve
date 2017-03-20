@@ -452,6 +452,7 @@ AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) {
 
     mInfluenceAnimator.setValueRange(0., 1.);
     mInfluenceAnimator.setCurrentValue(1.);
+    mInfluenceAnimator.setPrefferedValueStep(0.05);
     mInfluenceAnimator.setName("influence");
     mInfluenceAnimator.blockPointer();
     addChildAnimator(&mInfluenceAnimator);
@@ -460,6 +461,10 @@ AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) {
     mBoxTarget.blockPointer();
     mBoxTarget.setParentBox(parentBox);
     addChildAnimator(&mBoxTarget);
+
+    mInvertedProperty.setName("invert");
+    mInvertedProperty.blockPointer();
+    addChildAnimator(&mInvertedProperty);
 }
 
 void AlphaMatteEffect::apply(BoundingBox *target,
@@ -468,37 +473,33 @@ void AlphaMatteEffect::apply(BoundingBox *target,
                              qreal scale) {
     BoundingBox *boxTarget = mBoxTarget.getTarget();
     if(boxTarget) {
-        QRectF boxTargetRect = boxTarget->getUpdateRenderRect();
+        qreal influence = mInfluenceAnimator.getCurrentValue();
         QRectF targetRect = target->getUpdateRenderRect();
 
-        if(mDestinationIn) {
-            QImage imgTmp = QImage(imgPtr->size(),
-                                   QImage::Format_ARGB32_Premultiplied);
-            imgTmp.fill(Qt::transparent);
-            QPainter p(&imgTmp);
+        QImage imgTmp = QImage(imgPtr->size(),
+                               QImage::Format_ARGB32_Premultiplied);
+        imgTmp.fill(Qt::transparent);
+        QPainter p(&imgTmp);
 
-            p.translate(-targetRect.topLeft());
-            p.setTransform(
-                        QTransform(target->getUpdatePaintTransform().inverted()),
-                        true);
+        p.translate(-targetRect.topLeft());
+        p.setTransform(
+                    QTransform(target->getUpdatePaintTransform().inverted()),
+                    true);
 
-            boxTarget->drawUpdatePixmapForEffect(&p);
-            p.end();
+        boxTarget->drawUpdatePixmapForEffect(&p);
+        p.end();
 
-            QPainter p2(imgPtr);
+        QPainter p2(imgPtr);
 
+        p2.setOpacity(influence);
+        if(mInvertedProperty.getValue()) {
             p2.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-            p2.drawImage(0, 0, imgTmp);
-
-            p2.end();
         } else {
-            QPainter p(imgPtr);
-            p.setCompositionMode(QPainter::CompositionMode_DestinationOut);
-
-            p.translate(boxTargetRect.topLeft() - targetRect.topLeft());
-
-            boxTarget->drawUpdatePixmapForEffect(&p);
-            p.end();
+            p2.setCompositionMode(QPainter::CompositionMode_DestinationOut);
         }
+
+        p2.drawImage(0, 0, imgTmp);
+
+        p2.end();
     }
 }

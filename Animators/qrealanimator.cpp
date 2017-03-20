@@ -179,8 +179,7 @@ qreal QrealAnimator::getPrefferedValueStep()
     return mPrefferedValueStep;
 }
 
-void QrealAnimator::setPrefferedValueStep(qreal valueStep)
-{
+void QrealAnimator::setPrefferedValueStep(const qreal &valueStep) {
     mPrefferedValueStep = valueStep;
 }
 

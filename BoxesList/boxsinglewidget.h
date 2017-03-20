@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include "boxeslistactionbutton.h"
 #include "boxtargetwidget.h"
+#include "BoxesList/boolpropertywidget.h"
 class QrealAnimatorValueSlider;
 class QrealKey;
 class BoundingBox;
@@ -81,6 +82,7 @@ private:
 
     QPoint mDragStartPos;
     QWidget *mFillWidget;
+    BoolPropertyWidget *mCheckBox;
     QHBoxLayout *mMainLayout;
     QrealAnimatorValueSlider *mValueSlider;
     QComboBox *mCompositionModeCombo;

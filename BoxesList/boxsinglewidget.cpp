@@ -105,6 +105,9 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mBoxTargetWidget = new BoxTargetWidget(this);
     mMainLayout->addWidget(mBoxTargetWidget);
 
+    mCheckBox = new BoolPropertyWidget(this);
+    mMainLayout->addWidget(mCheckBox);
+
     mMainLayout->addSpacing(10);
 
     hide();
@@ -145,6 +148,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         updateCompositionBoxVisible();
 
         mBoxTargetWidget->hide();
+        mCheckBox->hide();
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
@@ -169,6 +173,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         updateCompositionBoxVisible();
 
         mBoxTargetWidget->hide();
+        mCheckBox->hide();
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
@@ -189,6 +194,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeVisible = false;
 
         mBoxTargetWidget->hide();
+        mCheckBox->hide();
 
         mValueSlider->setAnimator(qa_target);
         mValueSlider->show();
@@ -215,6 +221,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeVisible = false;
 
         mBoxTargetWidget->hide();
+        mCheckBox->hide();
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
@@ -234,6 +241,27 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mBoxTargetWidget->show();
         mBoxTargetWidget->setTargetProperty((BoxTargetProperty*)target);
+        mCheckBox->hide();
+
+        mValueSlider->hide();
+    } else if(type == SWT_BoolProperty) {
+        mRecordButton->hide();
+
+        mContentButton->hide();
+
+        mVisibleButton->hide();
+
+        mLockedButton->hide();
+
+        mColorButton->hide();
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
+
+        mCheckBox->show();
+        mCheckBox->setTarget((BoolProperty*)target);
 
         mValueSlider->hide();
     }
@@ -563,6 +591,9 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     } else if(type == SWT_BoxTarget) {
         nameX += 40;
         name = ((BoxTargetProperty*)target)->getName();
+    } else if(type == SWT_BoolProperty) {
+        nameX += 40;
+        name = ((BoolProperty*)target)->getName();
     }
     p.drawText(QRect(nameX, 0,
                      width() - nameX -

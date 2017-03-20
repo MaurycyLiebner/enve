@@ -60,6 +60,11 @@ QPointF QPointFAnimator::getPointValueAtFrame(const int &frame) {
                    mYAnimator.getValueAtAbsFrame(frame));
 }
 
+void QPointFAnimator::setPrefferedValueStep(const qreal &valueStep) {
+    mXAnimator.setPrefferedValueStep(valueStep);
+    mYAnimator.setPrefferedValueStep(valueStep);
+}
+
 qreal QPointFAnimator::getXValue()
 {
     return mXAnimator.getCurrentValue();

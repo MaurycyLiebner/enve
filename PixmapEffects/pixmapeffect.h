@@ -4,6 +4,7 @@
 #include "Animators/coloranimator.h"
 #include "Animators/qpointfanimator.h"
 #include "Properties/boxtargetproperty.h"
+#include "Properties/boolproperty.h"
 #include <QObject>
 
 class PixmapEffect;
@@ -232,9 +233,9 @@ public:
 
     qreal getMargin() { return 0.; }
 private:
+    BoolProperty mInvertedProperty;
     QrealAnimator mInfluenceAnimator;
     BoxTargetProperty mBoxTarget;
-    bool mDestinationIn = true;
 };
 
 #endif // PIXMAPEFFECT_H

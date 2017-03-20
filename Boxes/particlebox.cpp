@@ -25,7 +25,7 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
     bottomRightAnimator->setUpdater(new DisplayedFillStrokeSettingsUpdater(this));
     bottomRightAnimator->setName("bottom right");
 
-    addEmitter(new ParticleEmitter(this));
+    //addEmitter(new ParticleEmitter(this));
 }
 
 void ParticleBox::getAccelerationAt(const QPointF &pos,
@@ -61,7 +61,7 @@ void ParticleBox::preUpdatePixmapsUpdates() {
 
 bool ParticleBox::relPointInsidePath(QPointF relPos) {
     if(mRelBoundingRectPath.contains(relPos) ) {
-        if(mEmitters.isEmpty()) return true;
+        /*if(mEmitters.isEmpty()) */return true;
         foreach(ParticleEmitter *emitter, mEmitters) {
             if(emitter->relPointInsidePath(relPos)) {
                 return true;
@@ -115,8 +115,7 @@ void ParticleBox::startAllPointsTransform() {
 }
 
 void ParticleBox::drawSelected(QPainter *p,
-                             const CanvasMode &currentCanvasMode)
-{
+                             const CanvasMode &currentCanvasMode) {
     if(mVisible) {
         p->save();
         drawBoundingRect(p);
@@ -154,8 +153,7 @@ MovablePoint *ParticleBox::getPointAt(const QPointF &absPtPos,
 }
 
 void ParticleBox::selectAndAddContainedPointsToList(QRectF absRect,
-                                                  QList<MovablePoint *> *list)
-{
+                                                  QList<MovablePoint *> *list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
@@ -292,7 +290,7 @@ ParticleState Particle::getParticleStateAtFrame(const int &frame) {
 }
 
 ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
-    ComplexAnimator(){
+    ComplexAnimator() {
     setParentBox(parentBox);
 
     setName("particle emitter");
@@ -395,6 +393,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mParticlesSizeDecay.blockPointer();
     mParticlesOpacityDecay.blockPointer();
 
+    mPos->getRelativePosAnimatorPtr()->setName("pos");
     addChildAnimator(mPos->getRelativePosAnimatorPtr());
     addChildAnimator(&mWidth);
 

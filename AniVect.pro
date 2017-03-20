@@ -115,7 +115,9 @@ SOURCES += main.cpp\
     boxeslistkeysviewwidget.cpp \
     animationwidgetscrollbar.cpp \
     verticalwidgetsstack.cpp \
-    durationrectangle.cpp
+    durationrectangle.cpp \
+    Properties/boolproperty.cpp \
+    BoxesList/boolpropertywidget.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -215,7 +217,9 @@ HEADERS  += mainwindow.h \
     boxeslistkeysviewwidget.h \
     animationwidgetscrollbar.h \
     verticalwidgetsstack.h \
-    durationrectangle.h
+    durationrectangle.h \
+    Properties/boolproperty.h \
+    BoxesList/boolpropertywidget.h
 
 RESOURCES += \
     resources.qrc

@@ -33,6 +33,7 @@ public:
     void duplicateXAnimatorFrom(QrealAnimator *source);
     void setValueRange(qreal minVal, qreal maxVal);
     QPointF getCurrentPointValueAtFrame(const int &frame);
+    void setPrefferedValueStep(const qreal &valueStep);
 private:
     QrealAnimator mXAnimator;
     QrealAnimator mYAnimator;

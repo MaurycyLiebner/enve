@@ -150,7 +150,7 @@ public:
     qreal getMaxPossibleValue();
 
     qreal getPrefferedValueStep();
-    void setPrefferedValueStep(qreal valueStep);
+    virtual void setPrefferedValueStep(const qreal &valueStep);
     virtual void clearFromGraphView();
 
     void freezeMinMaxValues();

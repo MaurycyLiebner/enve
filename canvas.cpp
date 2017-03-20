@@ -201,8 +201,7 @@ void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
     }
 }
 
-void Canvas::paintEvent(QPainter *p)
-{
+void Canvas::paintEvent(QPainter *p) {
     p->setRenderHint(QPainter::Antialiasing);
     p->setRenderHint(QPainter::SmoothPixmapTransform);
 
@@ -250,6 +249,18 @@ void Canvas::paintEvent(QPainter *p)
             mRotPivot->draw(p);
         }      
 
+        if(mHoveredPoint != NULL) {
+            mHoveredPoint->drawHovered(p);
+        } else if(mHoveredEdge != NULL) {
+            mHoveredEdge->drawHover(p);
+        } else if(mHoveredBox != NULL) {
+            if(mCurrentEdge == NULL) {
+                mHoveredBox->drawHovered(p);
+            }
+        }
+
+        p->resetTransform();
+
         if(mInputTransformationEnabled) {
             QRect inputRect = QRect(40, mCanvasWidget->height() - 20, 100, 20);
             p->fillRect(inputRect, QColor(225, 225, 225));
@@ -263,18 +274,6 @@ void Canvas::paintEvent(QPainter *p)
             }
             p->drawText(inputRect, Qt::AlignVCenter, text);
         }
-
-        if(mHoveredPoint != NULL) {
-            mHoveredPoint->drawHovered(p);
-        } else if(mHoveredEdge != NULL) {
-            mHoveredEdge->drawHover(p);
-        } else if(mHoveredBox != NULL) {
-            if(mCurrentEdge == NULL) {
-                mHoveredBox->drawHovered(p);
-            }
-        }
-
-        p->resetTransform();
         p->setPen(QPen(Qt::black, 2.));
         p->setBrush(Qt::NoBrush);
         p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
