@@ -200,7 +200,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mValueSlider->show();
     } else if(type == SWT_ComplexAnimator ||
               type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect) {
+              type == SWT_PixmapEffect ||
+              type == SWT_SingleSound) {
         //ComplexAnimator *ca_target = (ComplexAnimator*)target;
 
         mRecordButton->show();
@@ -302,7 +303,8 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
             menu.addAction("Rename");
         } else if(type == SWT_QrealAnimator ||
                   type == SWT_ColorAnimator ||
-                  type == SWT_ComplexAnimator) {
+                  type == SWT_ComplexAnimator ||
+                  type == SWT_SingleSound) {
             AnimatorClipboardContainer *clipboard =
                     (AnimatorClipboardContainer*)
                     MainWindow::getInstance()->getClipboardContainer(
@@ -408,7 +410,8 @@ void BoxSingleWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
     } else if(type == SWT_QrealAnimator ||
               type == SWT_ComplexAnimator ||
               type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect) {
+              type == SWT_PixmapEffect ||
+              type == SWT_SingleSound) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         qa_target->drawKeys(p, pixelsPerFrame,
                             containerTop,
@@ -432,7 +435,8 @@ QrealKey *BoxSingleWidget::getKeyAtPos(const int &pressX,
     } else if(type == SWT_QrealAnimator ||
               type == SWT_ComplexAnimator ||
               type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect) {
+              type == SWT_PixmapEffect ||
+              type == SWT_SingleSound) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         return qa_target->getKeyAtPos(pressX,
                                minViewedFrame,
@@ -451,6 +455,12 @@ DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
     if(type == SWT_BoundingBox ||
        type == SWT_BoxesGroup) {
         BoundingBox *bb_target = (BoundingBox*)target;
+        return bb_target->getRectangleMovableAtPos(
+                    pressX,
+                    minViewedFrame,
+                    pixelsPerFrame);
+    } else if(type == SWT_ComplexAnimator) {
+        QrealAnimator *bb_target = (QrealAnimator*)target;
         return bb_target->getRectangleMovableAtPos(
                     pressX,
                     minViewedFrame,
@@ -475,7 +485,8 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
     } else if(type == SWT_QrealAnimator ||
               type == SWT_ComplexAnimator ||
               type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect) {
+              type == SWT_PixmapEffect ||
+              type == SWT_SingleSound) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         qa_target->getKeysInRect(selectionRect,
                                  pixelsPerFrame,

@@ -39,6 +39,8 @@ public:
     void removeSound(SingleSound *sound);
 
     ComplexAnimator *getSoundsAnimatorContainer();
+    void addSoundAnimator(SingleSound *sound);
+    void removeSoundAnimator(SingleSound *sound);
 private:
     ComplexAnimator mSoundsAnimatorContainer;
     QList<SingleSound*> mSounds;

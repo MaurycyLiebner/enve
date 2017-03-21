@@ -315,6 +315,7 @@ public:
             child->processUpdate();
         }
     }
+    void createSoundForPath(const QString &path);
 private:
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

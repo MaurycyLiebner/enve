@@ -86,6 +86,8 @@ public:
     void addBoxAwaitingUpdate(BoundingBox *box);
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
+    void createImageForPath(const QString &path);
+    void createSoundForPath(const QString &path);
 protected:
     QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;

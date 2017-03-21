@@ -73,15 +73,26 @@ void SoundComposition::generateData(const int &startFrame,
     }
 
     mBuffer.setRawData((char*)data, nSamples*sizeof(float));
+    mPos = 0;
 }
 
 void SoundComposition::addSound(SingleSound *sound) {
     mSounds.append(sound);
     sound->incNumberPointers();
-    mSoundsAnimatorContainer.addChildAnimator(sound);
 }
 
 void SoundComposition::removeSound(SingleSound *sound) {
+    if(mSounds.removeOne(sound)) {
+        sound->decNumberPointers();
+    }
+}
+
+void SoundComposition::addSoundAnimator(SingleSound *sound) {
+    addSound(sound);
+    mSoundsAnimatorContainer.addChildAnimator(sound);
+}
+
+void SoundComposition::removeSoundAnimator(SingleSound *sound) {
     if(mSounds.removeOne(sound)) {
         sound->decNumberPointers();
         mSoundsAnimatorContainer.removeChildAnimator(sound);

@@ -17,7 +17,8 @@ enum SWT_Type : short {
     SWT_ColorAnimator = 32,
     SWT_Canvas = 64,
     SWT_BoxTarget = 128,
-    SWT_BoolProperty = 256
+    SWT_BoolProperty = 256,
+    SWT_SingleSound = 512
 };
 
 Q_DECLARE_FLAGS(SWT_Types, SWT_Type)

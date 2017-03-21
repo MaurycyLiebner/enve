@@ -8,6 +8,7 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mTimeScaleAnimator.blockPointer();
     mTimeScaleAnimator.setValueRange(-100, 100);
     mTimeScaleAnimator.setCurrentValue(1.);
+    mTimeScaleAnimator.setPrefferedValueStep(0.05);
     mTimeScaleAnimator.setUpdater(new AnimationBoxFrameUpdater(this));
     mTimeScaleAnimator.blockUpdater();
     addActiveAnimator(&mTimeScaleAnimator);
@@ -77,7 +78,6 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     }
 
     mCurrentAnimationFrame = pixId;
-    qDebug() << mCurrentAnimationFrame;
     auto searchCurrentFrame = mAnimationFramesCache.find(
                                             mCurrentAnimationFrame);
     if(searchCurrentFrame == mAnimationFramesCache.end()) {
@@ -111,7 +111,6 @@ void AnimationBox::afterSuccessfulUpdate() {
         if(searchLastFrame == mAnimationFramesCache.end()) {
             mAnimationFramesCache.insert({mUpdateAnimationFrame,
                                           mUpdateAnimationImage});
-            qDebug() << "insert " << mUpdateAnimationFrame;
         }
     }
     mRelBoundingRect = mUpdateAnimationImage.rect();
@@ -119,7 +118,6 @@ void AnimationBox::afterSuccessfulUpdate() {
 
 void AnimationBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
-    qDebug() << "set update vars " << mCurrentAnimationFrame;
     mUpdateAnimationFrame = mCurrentAnimationFrame;
     mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
     if(!mUpdatePixmapReloadScheduled) {

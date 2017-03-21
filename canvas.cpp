@@ -195,6 +195,10 @@ void Canvas::createImageBox(const QString &path) {
     mCurrentBoxesGroup->addChild(new ImageBox(mCurrentBoxesGroup, path));
 }
 
+void Canvas::createSoundForPath(const QString &path) {
+    getSoundComposition()->addSoundAnimator(new SingleSound(path));
+}
+
 void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->drawSelected(p, currentCanvasMode);

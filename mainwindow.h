@@ -147,8 +147,8 @@ private slots:
     void closeProject();
     void importFile();
     void linkFile();
-    void importAnimation();
-    void importVideo();
+    void importImageSequence();
+    //void importVideo();
     void exportSelected();
     void revert();
 signals:

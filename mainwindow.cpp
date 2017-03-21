@@ -139,10 +139,9 @@ MainWindow::MainWindow(QWidget *parent)
     createNewCanvas();
 }
 
-MainWindow::~MainWindow()
-{
-    //mPaintControlerThread->terminate();
-    //mPaintControlerThread->quit();
+MainWindow::~MainWindow() {
+//    mPaintControlerThread->terminate();
+//    mPaintControlerThread->quit();
 }
 
 void MainWindow::setupMenuBar() {
@@ -151,10 +150,9 @@ void MainWindow::setupMenuBar() {
     mFileMenu = mMenuBar->addMenu("File");
     mFileMenu->addAction("New...", this, SLOT(newFile()));
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
-    mFileMenu->addAction("Import...", this, SLOT(importFile()));
+    mFileMenu->addAction("Import File...", this, SLOT(importFile()));
     mFileMenu->addAction("Link...", this, SLOT(linkFile()));
-    mFileMenu->addAction("Import Animation...", this, SLOT(importAnimation()));
-    mFileMenu->addAction("Import Video...", this, SLOT(importVideo()));
+    mFileMenu->addAction("Import Image Sequence...", this, SLOT(importImageSequence()));
     mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
     mFileMenu->addAction("Revert", this, SLOT(revert()));
     mFileMenu->addSeparator();
@@ -933,8 +931,7 @@ void MainWindow::updateTitle() {
     setWindowTitle(mCurrentFilePath.split("/").last() + star + " - AniVect");
 }
 
-void MainWindow::openFile()
-{
+void MainWindow::openFile() {
     if(askForSaving()) {
         disableEventFilter();
         QString openPath = QFileDialog::getOpenFileName(this,
@@ -997,7 +994,10 @@ void MainWindow::importFile()
 {
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Import File", "", "Files (*.av *.svg *.png *.jpg)");
+        "Import File", "", "Files (*.av *.svg "
+                                  "*.mp4 *.mov *.avi "
+                                  "*.png *.jpg "
+                                  "*.wav *.mp3)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         foreach(const QString &path, importPaths) {
@@ -1021,26 +1021,26 @@ void MainWindow::linkFile()
     }
 }
 
-void MainWindow::importAnimation() {
+void MainWindow::importImageSequence() {
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Import Animation", "", "Images (*.png *.jpg)");
+        "Import Image Sequence", "", "Images (*.png *.jpg)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
         mCanvasWidget->createAnimationBoxForPaths(importPaths);
     }
 }
 
-void MainWindow::importVideo() {
-    disableEventFilter();
-    QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Import Video", "", "Video (*.mp4 *.mov *.avi)");
-    enableEventFilter();
-    foreach(const QString &path, importPaths) {
-        mCanvasWidget->createVideoForPath(path);
-    }
-    callUpdateSchedulers();
-}
+//void MainWindow::importVideo() {
+//    disableEventFilter();
+//    QStringList importPaths = QFileDialog::getOpenFileNames(this,
+//        "Import Video", "", "Video (*.mp4 *.mov *.avi)");
+//    enableEventFilter();
+//    foreach(const QString &path, importPaths) {
+//        mCanvasWidget->createVideoForPath(path);
+//    }
+//    callUpdateSchedulers();
+//}
 
 void MainWindow::exportSelected()
 {
@@ -1087,7 +1087,14 @@ void MainWindow::importFile(QString path, bool loadInBox) {
         db.close();
     } else if(extension == "png" ||
               extension == "jpg") {
-        mCanvasWidget->getCurrentCanvas()->createImageBox(path);
+        mCanvasWidget->createImageForPath(path);
+    } else if(extension == "avi" ||
+              extension == "mp4" ||
+              extension == "mov") {
+        mCanvasWidget->createVideoForPath(path);
+    } else if(extension == "mp3" ||
+              extension == "wav") {
+        mCanvasWidget->createSoundForPath(path);
     }
     enable();
 

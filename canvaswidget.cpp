@@ -33,6 +33,7 @@ CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
 
 CanvasWidget::~CanvasWidget() {
     mPaintControlerThread->quit();
+    mPaintControlerThread->wait();
 }
 
 Canvas *CanvasWidget::getCurrentCanvas() {
@@ -673,6 +674,16 @@ void CanvasWidget::createAnimationBoxForPaths(
 void CanvasWidget::createVideoForPath(const QString &path) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->createVideoForPath(path);
+}
+
+void CanvasWidget::createImageForPath(const QString &path) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->createImageBox(path);
+}
+
+void CanvasWidget::createSoundForPath(const QString &path) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->createSoundForPath(path);
 }
 
 void CanvasWidget::saveToSql(QSqlQuery *query) {

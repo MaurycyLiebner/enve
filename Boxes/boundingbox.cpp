@@ -1155,7 +1155,6 @@ void BoundingBox::setNoCache(const bool &bT) {
 }
 
 void BoundingBox::afterUpdate() {
-    qDebug() << "after update " + mName;
     afterSuccessfulUpdate();
 
     if(mNoCache) {

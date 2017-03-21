@@ -120,7 +120,8 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
         } else if(type == SWT_QrealAnimator ||
                   type == SWT_ComplexAnimator ||
                   type == SWT_ColorAnimator ||
-                  type == SWT_PixmapEffect) {
+                  type == SWT_PixmapEffect ||
+                  type == SWT_SingleSound) {
             QrealAnimator *qa_target = (QrealAnimator*)target;
             qa_target->getKeysInRect(selectionRect,
                                      pixelsPerFrame,

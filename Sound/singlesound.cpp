@@ -1,5 +1,6 @@
 #include "singlesound.h"
 #include "soundcomposition.h"
+#include "durationrectangle.h"
 
 extern "C" {
     #include <libavutil/opt.h>
@@ -122,21 +123,59 @@ int decode_audio_file(const char* path,
     return 0;
 }
 
-SingleSound::SingleSound() :
+SingleSound::SingleSound(const QString &path,
+                         DurationRectangle *durRect) :
     ComplexAnimator() {
-    setName("Sound");
+    setDurationRect(durRect);
+    setFilePath(path);
+
+    setName("sound");
 
     mVolumeAnimator.incNumberPointers();
     addChildAnimator(&mVolumeAnimator);
     mVolumeAnimator.setValueRange(0, 200);
     mVolumeAnimator.setCurrentValue(100);
-    mVolumeAnimator.setName("Volume");
+    mVolumeAnimator.setName("volume");
 }
 
-SingleSound::SingleSound(const QString &path) :
-    SingleSound() {
-    setFilePath(path);
+void SingleSound::drawKeys(QPainter *p,
+                            qreal pixelsPerFrame, qreal drawY,
+                            int startFrame, int endFrame) {
+//    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
+//    int startDFrame = mDurationRectangle.getMinPossibleFrame() - startFrame;
+//    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
+//    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
+//                frameWidth*pixelsPerFrame - pixelsPerFrame,
+//                BOX_HEIGHT, QColor(0, 0, 255, 125));
+    mDurationRectangle->draw(p, pixelsPerFrame,
+                            drawY, startFrame);
+    QrealAnimator::drawKeys(p, pixelsPerFrame, drawY,
+                            startFrame, endFrame);
 }
+
+void SingleSound::setDurationRect(DurationRectangle *durRect) {
+    if(mDurationRectangle != NULL) {
+        delete mDurationRectangle;
+    }
+    if(durRect == NULL) {
+        mOwnDurationRectangle = true;
+        mDurationRectangle = new DurationRectangle();
+        mDurationRectangle->setPossibleFrameRangeVisible();
+    } else {
+        mOwnDurationRectangle = false;
+        mDurationRectangle = durRect;
+    }
+}
+
+DurationRectangleMovable *SingleSound::getRectangleMovableAtPos(
+                            qreal relX,
+                            int minViewedFrame,
+                            qreal pixelsPerFrame) {
+    return mDurationRectangle->getMovableAt(relX,
+                                           pixelsPerFrame,
+                                           minViewedFrame);
+}
+
 
 void SingleSound::setFilePath(const QString &path) {
     mPath = path;
@@ -159,7 +198,7 @@ void SingleSound::reloadDataFromFile() {
 }
 
 int SingleSound::getStartFrame() const {
-    return mStartFrame;
+    return mDurationRectangle->getMinPossibleFrame();
 }
 
 int SingleSound::getSampleCount() const {
@@ -184,6 +223,10 @@ void SingleSound::prepareFinalData() {
             }
         }
         mFinalSampleCount = mSrcSampleCount;
+        if(mOwnDurationRectangle) {
+            mDurationRectangle->setPossibleFrameDuration(
+                        mFinalSampleCount/SAMPLERATE*24.);
+        }
     }
 }
 

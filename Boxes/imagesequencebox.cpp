@@ -37,7 +37,6 @@ void ImageSequenceBox::loadUpdatePixmap() {
     if(mUpdateFramePath.isEmpty()) {
     } else {
         mUpdateAnimationImage.load(mUpdateFramePath);
-        qDebug() << "load " << (mUpdateFramePath == mListOfFrames.at(mUpdateAnimationFrame));
     }
 
     if(!mPivotChanged) centerPivotPosition();

@@ -1,6 +1,7 @@
 #ifndef SINGLESOUND_H
 #define SINGLESOUND_H
 #include "Animators/complexanimator.h"
+class DurationRectangle;
 
 extern int decode_audio_file(const char* path,
                              const int sample_rate,
@@ -10,8 +11,9 @@ extern int decode_audio_file(const char* path,
 class SingleSound : public ComplexAnimator
 {
 public:
-    SingleSound();
-    SingleSound(const QString &path);
+    SingleSound(const QString &path, DurationRectangle *durRect = NULL);
+
+    void setDurationRect(DurationRectangle *durRect);
 
     void setFilePath(const QString &path);
     void reloadDataFromFile();
@@ -20,10 +22,19 @@ public:
     int getSampleCount() const;
     const float *getFinalData() const;
     void prepareFinalData();
+    void drawKeys(QPainter *p,
+                  qreal pixelsPerFrame,
+                  qreal drawY,
+                  int startFrame, int endFrame);
+    DurationRectangleMovable *getRectangleMovableAtPos(qreal relX,
+                                                       int minViewedFrame,
+                                                       qreal pixelsPerFrame);
+    SWT_Type SWT_getType() { return SWT_SingleSound; }
 private:
+    bool mOwnDurationRectangle;
+    DurationRectangle *mDurationRectangle = NULL;
     float *mSrcData = NULL;
     float *mFinalData = NULL;
-    int mStartFrame = 0;
     int mFinalSampleCount = 0;
     int mSrcSampleCount = 0;
     QrealAnimator mVolumeAnimator;

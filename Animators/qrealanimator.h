@@ -11,6 +11,8 @@
 #include "float.h"
 #include "animator.h"
 
+class DurationRectangleMovable;
+
 const int KEY_RECT_SIZE = 12;
 
 class ComplexAnimator;
@@ -192,6 +194,15 @@ public:
     void blockUpdater();
     qreal getValueAtRelFrame(int frame) const;
     QrealKey *getKeyAtRelFrame(const int &frame);
+
+    virtual DurationRectangleMovable *getRectangleMovableAtPos(qreal relX,
+                                                       int minViewedFrame,
+                                                       qreal pixelsPerFrame) {
+        Q_UNUSED(relX);
+        Q_UNUSED(minViewedFrame);
+        Q_UNUSED(pixelsPerFrame);
+        return NULL;
+    }
 protected:
     bool mUpdaterBlocked = false;
     bool mTraceKeyOnCurrentFrame = false;
