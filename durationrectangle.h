@@ -25,6 +25,10 @@ public:
 
     void setHovered(const bool &hovered);
     bool isHovered();
+    virtual Qt::CursorShape getHoverCursorShape() {
+        return Qt::SplitHCursor;
+    }
+
 public slots:
     void setMaxPos(const int &maxPos);
 
@@ -81,6 +85,9 @@ public:
 
     int getPossibleFrameDuration();
 
+    Qt::CursorShape getHoverCursorShape() {
+        return Qt::OpenHandCursor;
+    }
 signals:
     void changed();
 protected:

@@ -1160,9 +1160,7 @@ void BoundingBox::afterUpdate() {
 
     if(mNoCache) {
         mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-        qDebug() << "0";
     } else {
-        qDebug() << "1";
         for(auto pair : mRenderContainers) {
             delete pair.second;
         }

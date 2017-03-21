@@ -10,69 +10,22 @@ extern "C" {
 #include "Sound/singlesound.h"
 
 VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
-    BoundingBox(parent, TYPE_IMAGE) {
+    AnimationBox(parent) {
     setName("Video");
 
     setFilePath(filePath);
 }
 
-void VideoBox::updateAfterFrameChanged(int currentFrame) {
-    BoundingBox::updateAfterFrameChanged(currentFrame);
-
-    mCurrentVideoFrame = qMax(0, qMin(mFramesCount - 2, mCurrentAbsFrame));
-    auto searchCurrentFrame = mVideoFramesCache.find(mCurrentVideoFrame);
-    if(searchCurrentFrame == mVideoFramesCache.end()) {
-        schedulePixmapReload();
-    } else {
-        mPixmapReloadScheduled = false;
-        scheduleUpdate();
-    }
-}
-
-void VideoBox::afterSuccessfulUpdate() {
-    mPixmapReloadScheduled = false;
-    if(mUpdatePixmapReloadScheduled) {
-        auto searchLastFrame = mVideoFramesCache.find(mUpdateVideoFrame);
-        if(searchLastFrame == mVideoFramesCache.end()) {
-            mVideoFramesCache.insert({mUpdateVideoFrame, mUpdateVideoImage});
-        }
-    }
-    mRelBoundingRect = mUpdateVideoImage.rect();
-}
-
-void VideoBox::updateRelBoundingRect() {
-    //mRelBoundingRect = mOldVideoImage.rect();
-
-    BoundingBox::updateRelBoundingRect();
-}
-
-void VideoBox::drawSelected(QPainter *p,
-                            const CanvasMode &) {
-    if(mVisible) {
-        p->save();
-        drawBoundingRect(p);
-        p->restore();
-    }
-}
-
-bool VideoBox::relPointInsidePath(QPointF point)
-{
-    return mRelBoundingRect.contains(point.toPoint());
-}
-
 void VideoBox::makeDuplicate(BoundingBox *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
+    AnimationBox::makeDuplicate(targetBox);
+    VideoBox *animationBoxTarget = (VideoBox*)targetBox;
+    animationBoxTarget->setFilePath(mSrcFilePath);
+    animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
+                &mTimeScaleAnimator);
 }
 
 BoundingBox *VideoBox::createNewDuplicate(BoxesGroup *parent) {
     return new VideoBox(mSrcFilePath, parent);
-}
-
-void VideoBox::draw(QPainter *p) {
-    if(mVisible) {
-        p->setRenderHint(QPainter::SmoothPixmapTransform);
-        p->drawImage(0, 0, mUpdateVideoImage);
-    }
 }
 
 void VideoBox::updateFrameCount(const char* path) {
@@ -90,7 +43,7 @@ void VideoBox::updateFrameCount(const char* path) {
     for (uint i = 0; i < format->nb_streams; i++) {
         const AVMediaType &mediaType = format->streams[i]->codec->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
-            mFramesCount = format->streams[i]->nb_frames;
+            mFramesCount = format->streams[i]->nb_frames - 1;
             break;
         }
     }
@@ -150,7 +103,7 @@ int VideoBox::getImageAtFrame(const char* path,
         return -1;
     }
 
-    int tsms = qRound((frameId)*1000*
+    int tsms = qRound(frameId*1000*
             videoStream->avg_frame_rate.den/
             (double)videoStream->avg_frame_rate.num);
 
@@ -191,11 +144,11 @@ int VideoBox::getImageAtFrame(const char* path,
 //        mImage = QImage(videoCodec->width, videoCodec->height,
 //                   QImage::Format_RGBA8888);
 //    }
-    mUpdateVideoImage = QImage(videoCodec->width, videoCodec->height,
+    mUpdateAnimationImage = QImage(videoCodec->width, videoCodec->height,
                         QImage::Format_RGBA8888);
 
     /* 2. Convert and write into image buffer  */
-    uint8_t *dst[] = {mUpdateVideoImage.bits()};
+    uint8_t *dst[] = {mUpdateAnimationImage.bits()};
     int linesizes[4];
 
     av_image_fill_linesizes(linesizes, AV_PIX_FMT_RGBA, decodedFrame->width);
@@ -217,40 +170,11 @@ int VideoBox::getImageAtFrame(const char* path,
     return 0;
 }
 
-void VideoBox::setUpdateVars() {
-    BoundingBox::setUpdateVars();
-    mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
-    mUpdateVideoFrame = mCurrentVideoFrame;
-    if(!mUpdatePixmapReloadScheduled) {
-        auto searchCurrentFrame = mVideoFramesCache.find(mUpdateVideoFrame);
-        if(searchCurrentFrame != mVideoFramesCache.end()) {
-            mUpdateVideoImage = searchCurrentFrame->second;
-        }
-    }
-}
-
-void VideoBox::schedulePixmapReload() {
-    if(mPixmapReloadScheduled) return;
-    mPixmapReloadScheduled = true;
-    scheduleUpdate();
-}
-
-void VideoBox::preUpdatePixmapsUpdates() {
-    reloadPixmapIfNeeded();
-    BoundingBox::preUpdatePixmapsUpdates();
-}
-
-void VideoBox::reloadPixmapIfNeeded() {
-    if(mPixmapReloadScheduled) {
-        reloadPixmap();
-    }
-}
-
-void VideoBox::reloadPixmap() {
+void VideoBox::loadUpdatePixmap() {
     if(mSrcFilePath.isEmpty()) {
     } else {
         getImageAtFrame(mSrcFilePath.toLatin1().data(),
-                        mUpdateVideoFrame);
+                        mUpdateAnimationFrame);
     }
 
     if(!mPivotChanged) centerPivotPosition();
@@ -262,10 +186,11 @@ void VideoBox::setFilePath(QString path) {
 }
 
 void VideoBox::reloadFile() {
-    mVideoFramesCache.clear();
+    mAnimationFramesCache.clear();
     updateFrameCount(mSrcFilePath.toLatin1().data());
-    schedulePixmapReload();
     reloadSound();
+    updateDurationRectanglePossibleRange();
+    schedulePixmapReload();
 }
 
 bool hasSound(const char* path) {

@@ -23,17 +23,9 @@ void AnimationBox::updateAfterDurationRectangleChanged() {
     updateAfterFrameChanged(mCurrentAbsFrame);
 }
 
-void AnimationBox::setListOfFrames(const QStringList &listOfFrames) {
-    mListOfFrames = listOfFrames;
-    mFramesCount = mListOfFrames.count();
-    updateDurationRectanglePossibleRange();
-    schedulePixmapReload();
-}
-
 void AnimationBox::makeDuplicate(BoundingBox *targetBox) {
     BoundingBox::makeDuplicate(targetBox);
     AnimationBox *animationBoxTarget = (AnimationBox*)targetBox;
-    animationBoxTarget->setListOfFrames(mListOfFrames);
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
                 &mTimeScaleAnimator);
 }
@@ -52,9 +44,9 @@ DurationRectangleMovable *AnimationBox::getRectangleMovableAtPos(
                                            minViewedFrame);
 }
 
-BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
-    return new AnimationBox(parent);
-}
+//BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
+//    return new AnimationBox(parent);
+//}
 
 void AnimationBox::updateDurationRectanglePossibleRange() {
     qreal timeScale = mTimeScaleAnimator.getCurrentValue();
@@ -74,7 +66,7 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
         pixId = (mCurrentAbsFrame -
                 mDurationRectangle->getMinPossibleFrame())/timeScale;
     } else {
-        pixId = mListOfFrames.count() - 1 + (mCurrentAbsFrame -
+        pixId = mFramesCount - 1 + (mCurrentAbsFrame -
                 mDurationRectangle->getMinPossibleFrame())/timeScale;
     }
 
@@ -85,6 +77,7 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     }
 
     mCurrentAnimationFrame = pixId;
+    qDebug() << mCurrentAnimationFrame;
     auto searchCurrentFrame = mAnimationFramesCache.find(
                                             mCurrentAnimationFrame);
     if(searchCurrentFrame == mAnimationFramesCache.end()) {
@@ -118,6 +111,7 @@ void AnimationBox::afterSuccessfulUpdate() {
         if(searchLastFrame == mAnimationFramesCache.end()) {
             mAnimationFramesCache.insert({mUpdateAnimationFrame,
                                           mUpdateAnimationImage});
+            qDebug() << "insert " << mUpdateAnimationFrame;
         }
     }
     mRelBoundingRect = mUpdateAnimationImage.rect();
@@ -125,9 +119,9 @@ void AnimationBox::afterSuccessfulUpdate() {
 
 void AnimationBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
-    mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
+    qDebug() << "set update vars " << mCurrentAnimationFrame;
     mUpdateAnimationFrame = mCurrentAnimationFrame;
-    mUpdateFramePath = mListOfFrames.at(mUpdateAnimationFrame);
+    mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
     if(!mUpdatePixmapReloadScheduled) {
         auto searchCurrentFrame = mAnimationFramesCache.find(mUpdateAnimationFrame);
         if(searchCurrentFrame != mAnimationFramesCache.end()) {
@@ -149,17 +143,8 @@ void AnimationBox::preUpdatePixmapsUpdates() {
 
 void AnimationBox::reloadPixmapIfNeeded() {
     if(mPixmapReloadScheduled) {
-        reloadPixmap();
+        loadUpdatePixmap();
     }
-}
-
-void AnimationBox::reloadPixmap() {
-    if(mUpdateFramePath.isEmpty()) {
-    } else {
-        mUpdateAnimationImage.load(mUpdateFramePath);
-    }
-
-    if(!mPivotChanged) centerPivotPosition();
 }
 
 void AnimationBox::draw(QPainter *p) {

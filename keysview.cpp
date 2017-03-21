@@ -364,16 +364,23 @@ void KeysView::updateHoveredPointFromPos(const QPoint &posU) {
     if(mHoveredKey != NULL) {
         mHoveredKey->setHovered(true);
     } else {
-        if(mHoveredMovable != NULL) {
-            mHoveredMovable->setHovered(false);
-        }
+        DurationRectangleMovable *lastMovable = mHoveredMovable;
         mHoveredMovable = mBoxesListVisible->getRectangleMovableAtPos(
                             posU.x(), posU.y(),
                             mPixelsPerFrame,
                             mMinViewedFrame);
-        if(mHoveredMovable != NULL) {
-            mHoveredMovable->setHovered(true);
+        if(lastMovable != mHoveredMovable) {
+            if(lastMovable != NULL) {
+                lastMovable->setHovered(false);
+            }
+            if(mHoveredMovable != NULL) {
+                mHoveredMovable->setHovered(true);
+                setCursor(mHoveredMovable->getHoverCursorShape());
+            } else {
+                setCursor(Qt::ArrowCursor);
+            }
         }
+
     }
 }
 

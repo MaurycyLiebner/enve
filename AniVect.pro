@@ -117,7 +117,8 @@ SOURCES += main.cpp\
     verticalwidgetsstack.cpp \
     durationrectangle.cpp \
     Properties/boolproperty.cpp \
-    BoxesList/boolpropertywidget.cpp
+    BoxesList/boolpropertywidget.cpp \
+    Boxes/imagesequencebox.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -219,7 +220,8 @@ HEADERS  += mainwindow.h \
     verticalwidgetsstack.h \
     durationrectangle.h \
     Properties/boolproperty.h \
-    BoxesList/boolpropertywidget.h
+    BoxesList/boolpropertywidget.h \
+    Boxes/imagesequencebox.h
 
 RESOURCES += \
     resources.qrc

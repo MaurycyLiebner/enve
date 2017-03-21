@@ -396,9 +396,9 @@ void Canvas::renderFinal(QPainter *p) {
         p->restore();
     }
 }
-#include "Boxes/animationbox.h"
+#include "Boxes/imagesequencebox.h"
 void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
-    AnimationBox *aniBox = new AnimationBox(mCurrentBoxesGroup);
+    ImageSequenceBox *aniBox = new ImageSequenceBox(mCurrentBoxesGroup);
     aniBox->setListOfFrames(paths);
 }
 

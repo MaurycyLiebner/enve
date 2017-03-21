@@ -14,11 +14,10 @@ public:
                   qreal pixelsPerFrame, qreal drawY,
                   int startFrame, int endFrame);
 
-    void setListOfFrames(const QStringList &listOfFrames);
 
     void makeDuplicate(BoundingBox *targetBox);
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+//    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
     DurationRectangleMovable *getRectangleMovableAtPos(
                                     qreal relX,
@@ -27,16 +26,17 @@ public:
     void drawSelected(QPainter *p, const CanvasMode &);
     bool relPointInsidePath(QPointF point);
     void draw(QPainter *p);
-    void reloadPixmap();
+    virtual void loadUpdatePixmap() = 0;
     void reloadPixmapIfNeeded();
     void preUpdatePixmapsUpdates();
     void schedulePixmapReload();
     void setUpdateVars();
     void afterSuccessfulUpdate();
     void updateDurationRectanglePossibleRange();
+    virtual void reloadFile() = 0;
 public slots:
     void updateAfterDurationRectangleChanged();
-private:
+protected:
     bool mPixmapReloadScheduled = false;
     bool mUpdatePixmapReloadScheduled = false;
     int mUpdateAnimationFrame = 0;
@@ -44,11 +44,9 @@ private:
     int mFramesCount = 0;
     std::unordered_map<int, QImage> mAnimationFramesCache;
     QImage mUpdateAnimationImage;
-    QString mUpdateFramePath = "";
 
     QrealAnimator mTimeScaleAnimator;
     //IntAnimator mFrameAnimator;
-    QStringList mListOfFrames;
 };
 
 #endif // ANIMATIONBOX_H
