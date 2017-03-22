@@ -244,7 +244,8 @@ QrealKey *QrealAnimator::getKeyAtPos(qreal relX,
     qreal pressFrame = relFrame + minViewedFrame;
     if(pixelsPerFrame > KEY_RECT_SIZE) {
         int relFrameInt = relFrame;
-        if( qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX) > KEY_RECT_SIZE*0.5) {
+        if( qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX +
+                 getFrameShift()*pixelsPerFrame) > KEY_RECT_SIZE*0.5) {
             return NULL;
         }
     }

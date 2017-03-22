@@ -150,10 +150,13 @@ void MainWindow::setupMenuBar() {
     mFileMenu = mMenuBar->addMenu("File");
     mFileMenu->addAction("New...", this, SLOT(newFile()));
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
-    mFileMenu->addAction("Import File...", this, SLOT(importFile()));
+    mFileMenu->addSeparator();
     mFileMenu->addAction("Link...", this, SLOT(linkFile()));
+    mFileMenu->addAction("Import File...", this, SLOT(importFile()));
     mFileMenu->addAction("Import Image Sequence...", this, SLOT(importImageSequence()));
+    mFileMenu->addSeparator();
     mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
+    mFileMenu->addSeparator();
     mFileMenu->addAction("Revert", this, SLOT(revert()));
     mFileMenu->addSeparator();
     mFileMenu->addAction("Save", this, SLOT(saveFile()));
@@ -1029,6 +1032,7 @@ void MainWindow::importImageSequence() {
     if(!importPaths.isEmpty()) {
         mCanvasWidget->createAnimationBoxForPaths(importPaths);
     }
+    callUpdateSchedulers();
 }
 
 //void MainWindow::importVideo() {

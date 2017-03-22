@@ -562,7 +562,8 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         p.setPen(Qt::white);
     } else if(type == SWT_ComplexAnimator ||
               type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect) {
+              type == SWT_PixmapEffect ||
+              type == SWT_SingleSound) {
         ComplexAnimator *ca_target = (ComplexAnimator*)target;
         name = ca_target->getName();
 

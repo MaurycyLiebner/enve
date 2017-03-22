@@ -106,8 +106,7 @@ qreal Canvas::getResolutionPercent()
     return Canvas::mResolutionPercent;
 }
 
-void Canvas::setResolutionPercent(const qreal &percent)
-{
+void Canvas::setResolutionPercent(const qreal &percent) {
     mResolutionPercent = percent;
 }
 

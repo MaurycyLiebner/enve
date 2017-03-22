@@ -175,6 +175,7 @@ void VideoBox::loadUpdatePixmap() {
     } else {
         getImageAtFrame(mSrcFilePath.toLatin1().data(),
                         mUpdateAnimationFrame);
+        mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
     }
 
     if(!mPivotChanged) centerPivotPosition();

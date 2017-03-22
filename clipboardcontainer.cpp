@@ -47,7 +47,7 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 }
 
 void KeysClipboardContainer::copyKeyToContainer(QrealKey *key) {
-    mKeysList << key->makeQrealKeyDuplicate(NULL);
+    mKeysList << key->makeQrealKeyDuplicate(key->getParentAnimator());
     mTargetAnimators << key->getParentAnimator();
     key->getParentAnimator()->incNumberPointers();
 }
@@ -75,7 +75,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     for(int i = 0; i < count; i++) {
         QrealKey *key = mKeysList.at(i);
         QrealAnimator *animator = mTargetAnimators.at(i);
-        key->setRelFrame(key->getAbsFrame() + dFrame);
+        key->setAbsFrame(key->getAbsFrame() + dFrame);
         key = key->makeQrealKeyDuplicate(animator);
         animator->appendKey(key);
         keysView->addKeyToSelection(key);

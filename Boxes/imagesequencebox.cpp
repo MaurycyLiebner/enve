@@ -37,7 +37,6 @@ void ImageSequenceBox::loadUpdatePixmap() {
     if(mUpdateFramePath.isEmpty()) {
     } else {
         mUpdateAnimationImage.load(mUpdateFramePath);
-    }
-
-    if(!mPivotChanged) centerPivotPosition();
+        mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
+    } 
 }

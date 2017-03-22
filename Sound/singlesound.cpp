@@ -165,14 +165,14 @@ void SingleSound::setDurationRect(DurationRectangle *durRect) {
         mOwnDurationRectangle = true;
         mDurationRectangle = new DurationRectangle();
         mDurationRectangle->setPossibleFrameRangeVisible();
+        connect(mDurationRectangle, SIGNAL(changed()),
+                this, SLOT(updateAfterShifted()));
     } else {
         mOwnDurationRectangle = false;
         mDurationRectangle = durRect;
     }
     connect(mDurationRectangle, SIGNAL(changed()),
             this, SLOT(scheduleFinalDataUpdate()));
-    connect(mDurationRectangle, SIGNAL(changed()),
-            this, SLOT(updateAfterShifted()));
 }
 
 DurationRectangleMovable *SingleSound::getRectangleMovableAtPos(

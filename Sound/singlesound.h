@@ -10,6 +10,7 @@ extern int decode_audio_file(const char* path,
 
 class SingleSound : public ComplexAnimator
 {
+    Q_OBJECT
 public:
     SingleSound(const QString &path, DurationRectangle *durRect = NULL);
 

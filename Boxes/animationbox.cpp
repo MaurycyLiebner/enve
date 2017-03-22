@@ -113,7 +113,9 @@ void AnimationBox::afterSuccessfulUpdate() {
                                           mUpdateAnimationImage});
         }
     }
-    mRelBoundingRect = mUpdateAnimationImage.rect();
+    mRelBoundingRect = mUpdateRelBoundingRect;
+    updateRelBoundingRect();
+    if(!mPivotChanged) centerPivotPosition();
 }
 
 void AnimationBox::setUpdateVars() {
@@ -124,6 +126,7 @@ void AnimationBox::setUpdateVars() {
         auto searchCurrentFrame = mAnimationFramesCache.find(mUpdateAnimationFrame);
         if(searchCurrentFrame != mAnimationFramesCache.end()) {
             mUpdateAnimationImage = searchCurrentFrame->second;
+            mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
         }
     }
 }

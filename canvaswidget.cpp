@@ -508,6 +508,7 @@ void CanvasWidget::setResolutionPercent(const qreal &percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionPercent(percent);
     mCurrentCanvas->clearCache();
+    mCurrentCanvas->updateAllBoxes();
     callUpdateSchedulers();
 }
 

@@ -81,6 +81,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *e);
     void graphRemoveViewedAnimator(QrealAnimator *animator);
     void updateAnimatorsColors();
+    void clearHoveredMovable();
 protected:
     void resizeEvent(QResizeEvent *e);
 
