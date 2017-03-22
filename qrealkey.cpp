@@ -121,9 +121,12 @@ void QrealKey::removeFromAnimator()
     mParentAnimator->removeKey(this);
 }
 
-void QrealKey::setParentKey(ComplexKey *parentKey)
-{
+void QrealKey::setParentKey(ComplexKey *parentKey) {
     mParentKey = parentKey;
+}
+
+ComplexKey *QrealKey::getParentKey() {
+    return mParentKey;
 }
 
 bool QrealKey::isAncestorSelected()

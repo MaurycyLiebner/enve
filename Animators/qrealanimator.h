@@ -236,6 +236,7 @@ signals:
     void valueChangedSignal(qreal);
     void beingDeleted();
 public slots:
+    void updateAfterShifted();
     void setRecording(bool rec);
     void deleteCurrentKey() {
         QrealKey *keyAtFrame = getKeyAtAbsFrame(mCurrentAbsFrame);

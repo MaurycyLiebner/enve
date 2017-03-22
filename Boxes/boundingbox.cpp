@@ -891,8 +891,7 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
             this, SLOT(updateAfterDurationRectangleChanged()));
 }
 
-void BoundingBox::addActiveAnimator(QrealAnimator *animator)
-{
+void BoundingBox::addActiveAnimator(QrealAnimator *animator) {
     mAnimatorsCollection.addChildAnimator(animator);
     mActiveAnimators << animator;
     emit addActiveAnimatorSignal(animator);
@@ -901,8 +900,7 @@ void BoundingBox::addActiveAnimator(QrealAnimator *animator)
                                             mActiveAnimators.count() - 1);
 }
 
-void BoundingBox::removeActiveAnimator(QrealAnimator *animator)
-{
+void BoundingBox::removeActiveAnimator(QrealAnimator *animator) {
     mActiveAnimators.removeOne(animator);
     mAnimatorsCollection.removeChildAnimator(animator);
     emit removeActiveAnimatorSignal(animator);

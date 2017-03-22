@@ -171,6 +171,8 @@ void SingleSound::setDurationRect(DurationRectangle *durRect) {
     }
     connect(mDurationRectangle, SIGNAL(changed()),
             this, SLOT(scheduleFinalDataUpdate()));
+    connect(mDurationRectangle, SIGNAL(changed()),
+            this, SLOT(updateAfterShifted()));
 }
 
 DurationRectangleMovable *SingleSound::getRectangleMovableAtPos(

@@ -125,6 +125,14 @@ void QrealAnimator::removeAllKeysFromComplexAnimator()
     }
 }
 
+void QrealAnimator::updateAfterShifted() {
+    if(mParentAnimator == NULL) return;
+    foreach(QrealKey *key, mKeys) {
+        mParentAnimator->removeChildQrealKey(key);
+        mParentAnimator->addChildQrealKey(key);
+    }
+}
+
 bool QrealAnimator::hasKeys()
 {
     return !mKeys.isEmpty();

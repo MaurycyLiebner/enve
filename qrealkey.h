@@ -116,6 +116,7 @@ public:
 
     int getRelFrame();
     void setAbsFrame(const int &frame);
+    ComplexKey *getParentKey();
 protected:
     bool mIsSelected = false;
     QrealAnimator *mParentAnimator = NULL;

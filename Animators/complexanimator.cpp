@@ -288,7 +288,7 @@ void ComplexAnimator::addChildQrealKey(QrealKey *key) {
 }
 
 void ComplexAnimator::removeChildQrealKey(QrealKey *key) {
-    ComplexKey *collection = getKeyCollectionAtAbsFrame(key->getAbsFrame() );
+    ComplexKey *collection = key->getParentKey();//getKeyCollectionAtAbsFrame(key->getAbsFrame() );
     if(collection == NULL) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
