@@ -189,8 +189,8 @@ void VideoBox::setFilePath(QString path) {
 void VideoBox::reloadFile() {
     mAnimationFramesCache.clear();
     updateFrameCount(mSrcFilePath.toLatin1().data());
-    reloadSound();
     updateDurationRectanglePossibleRange();
+    reloadSound();
     schedulePixmapReload();
 }
 
