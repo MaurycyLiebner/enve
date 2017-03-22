@@ -130,4 +130,19 @@ private:
     PathBox *mTarget;
     bool mIsFill;
 };
+
+class SingleSound;
+class SingleSoundUpdater : public AnimatorUpdater {
+public:
+    SingleSoundUpdater(SingleSound *sound);
+    ~SingleSoundUpdater();
+
+    void update();
+
+    void frameChangeUpdate() {}
+private:
+    SingleSound *mTarget;
+};
+
+
 #endif // ANIMATORUPDATER_H

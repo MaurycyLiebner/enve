@@ -24,7 +24,7 @@ void SoundComposition::stop() {
 
 void SoundComposition::generateData(const int &startFrame,
                                     const int &endFrame,
-                                    const int &fps) {
+                                    const qreal &fps) {
     mBuffer.clear();
     if(mSounds.isEmpty()) return;
 
@@ -46,21 +46,24 @@ void SoundComposition::generateData(const int &startFrame,
 //    free(data1);
 
     foreach(SingleSound *sound, mSounds) {
+        sound->updateFinalDataIfNeeded(fps, startFrame, endFrame);
         const int &soundStartFrame = sound->getStartFrame();
         const int &soundSampleCount = sound->getSampleCount();
         int firstSampleFromSound;
         int sampleCountNeeded;
         int firstTargetSample;
+        int samplesInSoundFrameRange = (endFrame - soundStartFrame)*SAMPLERATE/fps;
+
         if(soundStartFrame >= startFrame) {
             firstTargetSample = (soundStartFrame - startFrame)*SAMPLERATE/fps;
             firstSampleFromSound = 0;
             sampleCountNeeded = qMin(soundSampleCount,
-                                     (endFrame - soundStartFrame)*SAMPLERATE/fps);
+                                     samplesInSoundFrameRange);
         } else {
             firstTargetSample = 0;
             firstSampleFromSound = (startFrame - soundStartFrame)*SAMPLERATE/fps;
             sampleCountNeeded = qMin(soundSampleCount - firstSampleFromSound,
-                                     (endFrame - soundStartFrame)*SAMPLERATE/fps);
+                                     samplesInSoundFrameRange);
         }
         if(sampleCountNeeded <= 0) continue;
         int lastSampleFromSound = firstSampleFromSound + sampleCountNeeded;
@@ -116,15 +119,13 @@ qint64 SoundComposition::readData(char *data, qint64 len) {
     return total;
 }
 
-qint64 SoundComposition::writeData(const char *data, qint64 len)
-{
+qint64 SoundComposition::writeData(const char *data, qint64 len) {
     Q_UNUSED(data);
     Q_UNUSED(len);
 
     return 0;
 }
 
-qint64 SoundComposition::bytesAvailable() const
-{
+qint64 SoundComposition::bytesAvailable() const {
     return mBuffer.size() + QIODevice::bytesAvailable();
 }

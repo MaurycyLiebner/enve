@@ -225,8 +225,9 @@ void VideoBox::reloadSound() {
             mSound = new SingleSound(mSrcFilePath, mDurationRectangle);
             addActiveAnimator(mSound);
             getParentCanvas()->getSoundComposition()->addSound(mSound);
+        } else {
+            mSound->reloadDataFromFile();
         }
-        mSound->reloadDataFromFile();
     } else {
     }
 }

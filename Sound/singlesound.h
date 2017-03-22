@@ -21,7 +21,7 @@ public:
     int getStartFrame() const;
     int getSampleCount() const;
     const float *getFinalData() const;
-    void prepareFinalData();
+    void prepareFinalData(const qreal &fps, const int &minFrame, const int &maxFrame);
     void drawKeys(QPainter *p,
                   qreal pixelsPerFrame,
                   qreal drawY,
@@ -30,7 +30,14 @@ public:
                                                        int minViewedFrame,
                                                        qreal pixelsPerFrame);
     SWT_Type SWT_getType() { return SWT_SingleSound; }
+    void updateFinalDataIfNeeded(const qreal &fps,
+                                 const int &minFrame,
+                                 const int &maxFrame);
+    int getFrameShift() const;
+public slots:
+    void scheduleFinalDataUpdate();
 private:
+    bool mFinalDataUpdateNeeded = false;
     bool mOwnDurationRectangle;
     DurationRectangle *mDurationRectangle = NULL;
     float *mSrcData = NULL;

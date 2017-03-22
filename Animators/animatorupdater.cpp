@@ -107,3 +107,17 @@ void GradientPointsUpdater::update() {
 void GradientPointsUpdater::frameChangeUpdate() {
     mTarget->scheduleUpdate();
 }
+
+#include "Sound/singlesound.h"
+SingleSoundUpdater::SingleSoundUpdater(SingleSound *sound) : AnimatorUpdater() {
+    mTarget = sound;
+    mTarget->incNumberPointers();
+}
+
+SingleSoundUpdater::~SingleSoundUpdater() {
+    mTarget->decNumberPointers();
+}
+
+void SingleSoundUpdater::update() {
+    mTarget->scheduleFinalDataUpdate();
+}

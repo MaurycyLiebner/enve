@@ -127,7 +127,9 @@ SingleSound::SingleSound(const QString &path,
                          DurationRectangle *durRect) :
     ComplexAnimator() {
     setDurationRect(durRect);
-    setFilePath(path);
+
+    setUpdater(new SingleSoundUpdater(this));
+    blockUpdater();
 
     setName("sound");
 
@@ -136,6 +138,8 @@ SingleSound::SingleSound(const QString &path,
     mVolumeAnimator.setValueRange(0, 200);
     mVolumeAnimator.setCurrentValue(100);
     mVolumeAnimator.setName("volume");
+
+    setFilePath(path);
 }
 
 void SingleSound::drawKeys(QPainter *p,
@@ -165,6 +169,8 @@ void SingleSound::setDurationRect(DurationRectangle *durRect) {
         mOwnDurationRectangle = false;
         mDurationRectangle = durRect;
     }
+    connect(mDurationRectangle, SIGNAL(changed()),
+            this, SLOT(scheduleFinalDataUpdate()));
 }
 
 DurationRectangleMovable *SingleSound::getRectangleMovableAtPos(
@@ -173,7 +179,20 @@ DurationRectangleMovable *SingleSound::getRectangleMovableAtPos(
                             qreal pixelsPerFrame) {
     return mDurationRectangle->getMovableAt(relX,
                                            pixelsPerFrame,
-                                           minViewedFrame);
+                                            minViewedFrame);
+}
+
+void SingleSound::updateFinalDataIfNeeded(const qreal &fps,
+                                          const int &minFrame,
+                                          const int &maxFrame) {
+    if(mFinalDataUpdateNeeded) {
+        prepareFinalData(fps, minFrame, maxFrame);
+        mFinalDataUpdateNeeded = false;
+    }
+}
+
+void SingleSound::scheduleFinalDataUpdate() {
+    mFinalDataUpdateNeeded = true;
 }
 
 
@@ -194,18 +213,25 @@ void SingleSound::reloadDataFromFile() {
                               &mSrcData, &mSrcSampleCount);
         }
     }
-    prepareFinalData();
+    if(mOwnDurationRectangle) {
+        mDurationRectangle->setPossibleFrameDuration(
+                    qCeil(mSrcSampleCount*24./SAMPLERATE));
+    }
+
+    scheduleFinalDataUpdate();
 }
 
 int SingleSound::getStartFrame() const {
-    return mDurationRectangle->getMinPossibleFrame();
+    return mDurationRectangle->getMinFrame();
 }
 
 int SingleSound::getSampleCount() const {
     return mFinalSampleCount;
 }
 
-void SingleSound::prepareFinalData() {
+void SingleSound::prepareFinalData(const qreal &fps,
+                                   const int &minFrame,
+                                   const int &maxFrame) {
     if(mFinalData != NULL) {
         free(mFinalData);
     }
@@ -213,21 +239,60 @@ void SingleSound::prepareFinalData() {
         mFinalData = NULL;
         mFinalSampleCount = 0;
     } else {
-        mFinalData = (float*)malloc(mSrcSampleCount*sizeof(float));
-        memcpy(mFinalData, mSrcData, mSrcSampleCount*sizeof(float));
-        if(mVolumeAnimator.hasKeys() ||
-           qAbs(mVolumeAnimator.getCurrentValue() - 100.) > 0.1) {
-            for(int i = 0; i < mSrcSampleCount; i++) {
-                mFinalData[i] = mFinalData[i]*
-                        mVolumeAnimator.getCurrentValue()/100.;
+        int finalMinFrame =
+                qMax(minFrame,
+                       qMax(mDurationRectangle->getMinFrame(),
+                            mDurationRectangle->getMinPossibleFrame()) );
+        int finalMaxFrame =
+                qMin(maxFrame,
+                       qMin(mDurationRectangle->getMaxFrame(),
+                            mDurationRectangle->getMaxPossibleFrame()) );
+        int minFrameFromSrc = finalMinFrame -
+                              mDurationRectangle->getMinPossibleFrame();
+        int maxFrameFromSrc = qMin(finalMaxFrame,
+                                   mDurationRectangle->getMaxPossibleFrame());
+        int minSampleFromSrc = minFrameFromSrc*SAMPLERATE/fps;
+        int maxSampleFromSrc = qMin(mSrcSampleCount,
+                                    qCeil(maxFrameFromSrc*SAMPLERATE/fps));
+
+
+        mFinalSampleCount = maxSampleFromSrc - minSampleFromSrc;
+        mFinalData = (float*)malloc(mFinalSampleCount*sizeof(float));
+        if(mVolumeAnimator.hasKeys()) {
+            int j = 0;
+            int frame = 0;
+            qreal lastFrameVol =
+                    mVolumeAnimator.getValueAtRelFrame(frame)/100.;
+            qreal volStep = fps/SAMPLERATE;
+            while(j < mFinalSampleCount) {
+                frame++;
+                qreal nextFrameVol =
+                        mVolumeAnimator.getValueAtRelFrame(frame)/100.;
+                qreal volDiff = (nextFrameVol - lastFrameVol);
+                qreal currVolFrac = lastFrameVol;
+                for(int i = 0;
+                    i < SAMPLERATE/fps && j < mFinalSampleCount;
+                    i++, j++) {
+                    currVolFrac += volStep*volDiff;
+                    mFinalData[j] = (float)(mSrcData[j + minSampleFromSrc]*
+                                            currVolFrac);
+                }
+                lastFrameVol = nextFrameVol;
+            }
+        } else {
+            qreal volFrac = mVolumeAnimator.getCurrentValue()/100.;
+            for(int i = 0; i < mFinalSampleCount; i++) {
+                mFinalData[i] = mSrcData[i + minSampleFromSrc]*volFrac;
             }
         }
-        mFinalSampleCount = mSrcSampleCount;
-        if(mOwnDurationRectangle) {
-            mDurationRectangle->setPossibleFrameDuration(
-                        mFinalSampleCount/SAMPLERATE*24.);
-        }
     }
+}
+
+int SingleSound::getFrameShift() const {
+    if(mOwnDurationRectangle) {
+        return mDurationRectangle->getFramePos() + Animator::getFrameShift();
+    }
+    return Animator::getFrameShift();
 }
 
 const float *SingleSound::getFinalData() const {

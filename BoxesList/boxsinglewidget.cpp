@@ -459,7 +459,7 @@ DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
                     pressX,
                     minViewedFrame,
                     pixelsPerFrame);
-    } else if(type == SWT_ComplexAnimator) {
+    } else if(type == SWT_SingleSound) {
         QrealAnimator *bb_target = (QrealAnimator*)target;
         return bb_target->getRectangleMovableAtPos(
                     pressX,
