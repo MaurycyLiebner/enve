@@ -116,7 +116,7 @@ public:
 
     virtual void drawSelected(QPainter *p,
                               const CanvasMode &) {
-        if(mVisible) {
+        if(isVisibleAndInVisibleDurationRect()) {
             p->save();
             drawBoundingRect(p);
             p->restore();
@@ -428,6 +428,12 @@ public:
 
     void setDurationRectangle(DurationRectangle *durationRect);
 
+    bool isInVisibleDurationRect();
+    bool isVisibleAndInVisibleDurationRect();
+    bool isUsedAsTarget();
+    void incUsedAsTarget();
+    void decUsedAsTarget();
+    bool shouldUpdateAndDraw();
 protected:
     DurationRectangle *mDurationRectangle = NULL;
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
@@ -462,11 +468,14 @@ protected:
     int mCurrentRelFrame = 0;
     QRectF mUpdateRelBoundingRect;
     QMatrix mUpdateTransform;
+    bool mUpdateDrawOnParentBox = true;
 
     bool mRedoUpdate = false;
     bool mAwaitingUpdate = false;
 
     QPainterPath mRelBoundingRectPath;
+
+    int mUsedAsTargetCount = 0;
 
     bool mScheduledForRemove = false;
 

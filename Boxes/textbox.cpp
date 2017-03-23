@@ -64,7 +64,7 @@ void TextBox::loadFromSql(int boundingBoxId) {
 void TextBox::drawSelected(QPainter *p,
                            const CanvasMode &currentCanvasMode)
 {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {

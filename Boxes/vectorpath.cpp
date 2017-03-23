@@ -120,7 +120,7 @@ void VectorPath::showContextMenu(QPoint globalPos) {
 
 void VectorPath::drawSelected(QPainter *p,
                               const CanvasMode &currentCanvasMode) {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         drawBoundingRect(p);
         mPathAnimator.drawSelected(p,
                                    currentCanvasMode,

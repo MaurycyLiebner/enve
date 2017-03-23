@@ -377,7 +377,7 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest) {
 }
 
 void Canvas::drawPreviewPixmap(QPainter *p) {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         //p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
         foreach(BoundingBox *box, mChildBoxes){
@@ -389,7 +389,7 @@ void Canvas::drawPreviewPixmap(QPainter *p) {
 }
 
 void Canvas::renderFinal(QPainter *p) {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
 
         foreach(BoundingBox *box, mChildBoxes){

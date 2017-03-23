@@ -19,7 +19,7 @@ void ImageBox::updateRelBoundingRect() {
 void ImageBox::drawSelected(QPainter *p,
                             const CanvasMode &)
 {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
 
 //        QPainterPath mapped;
@@ -54,7 +54,7 @@ BoundingBox *ImageBox::createNewDuplicate(BoxesGroup *parent) {
 
 void ImageBox::draw(QPainter *p)
 {
-    if(mVisible) {
+    if(shouldUpdateAndDraw()) {
         p->setRenderHint(QPainter::SmoothPixmapTransform);
         p->drawImage(0, 0, mImage);
     }

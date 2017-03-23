@@ -16,6 +16,7 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
         if(mTarget != NULL) {
             QObject::disconnect(mTarget, SIGNAL(scheduledUpdate()),
                                 mParentBox, SLOT(scheduleUpdate()));
+            mTarget->decUsedAsTarget();
         }
     }
     mTarget = box;
@@ -23,6 +24,7 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
         if(mTarget != NULL) {
             QObject::connect(mTarget, SIGNAL(scheduledUpdate()),
                              mParentBox, SLOT(scheduleUpdate()));
+            mTarget->incUsedAsTarget();
         }
     }
     mParentAnimator->callUpdater();

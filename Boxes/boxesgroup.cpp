@@ -329,7 +329,7 @@ void BoxesGroup::afterUpdate() {
 }
 
 void BoxesGroup::draw(QPainter *p) {
-    if(mVisible) {
+    if(shouldUpdateAndDraw()) {
         p->save();
         p->setTransform(QTransform(
                             mUpdateTransform.inverted()),

@@ -285,7 +285,7 @@ void PathBox::setUpdateVars() {
 
 void PathBox::draw(QPainter *p)
 {
-    if(mVisible) {
+    if(shouldUpdateAndDraw()) {
         p->save();
 
         p->setPen(Qt::NoPen);

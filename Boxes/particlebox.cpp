@@ -86,7 +86,7 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 
 void ParticleBox::draw(QPainter *p)
 {
-    if(mVisible) {
+    if(shouldUpdateAndDraw()) {
         p->save();
 
         p->setClipRect(mRelBoundingRect);
@@ -116,7 +116,7 @@ void ParticleBox::startAllPointsTransform() {
 
 void ParticleBox::drawSelected(QPainter *p,
                              const CanvasMode &currentCanvasMode) {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {

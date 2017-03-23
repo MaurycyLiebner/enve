@@ -58,8 +58,6 @@ void AnimationBox::updateDurationRectanglePossibleRange() {
 
 void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    mVisible = mCurrentAbsFrame < mDurationRectangle->getMaxFrame() &&
-               mCurrentAbsFrame >= mDurationRectangle->getMinFrame();
     qreal timeScale = mTimeScaleAnimator.getCurrentValue();
 
     int pixId;
@@ -149,7 +147,7 @@ void AnimationBox::reloadPixmapIfNeeded() {
 }
 
 void AnimationBox::draw(QPainter *p) {
-    if(mVisible) {
+    if(shouldUpdateAndDraw()) {
         p->setRenderHint(QPainter::SmoothPixmapTransform);
         p->drawImage(0, 0, mUpdateAnimationImage);
     }
@@ -161,7 +159,7 @@ bool AnimationBox::relPointInsidePath(QPointF point) {
 
 void AnimationBox::drawSelected(QPainter *p,
                             const CanvasMode &) {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         drawBoundingRect(p);
         p->restore();

@@ -114,15 +114,13 @@ void Circle::setHorizontalRadius(qreal horizontalRadius)
     mHorizontalRadiusPoint->setRelativePos(QPointF(horizontalRadius, 0.) );
 }
 
-void Circle::setRadius(qreal radius)
-{
+void Circle::setRadius(qreal radius) {
     setHorizontalRadius(radius);
     setVerticalRadius(radius);
 }
 
-void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode)
-{
-    if(mVisible) {
+void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         drawBoundingRect(p);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
@@ -139,8 +137,8 @@ void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode)
 }
 
 
-MovablePoint *Circle::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
-{
+MovablePoint *Circle::getPointAt(const QPointF &absPtPos,
+                                 const CanvasMode &currentCanvasMode) {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
         pointToReturn = mStrokeGradientPoints.getPointAt(absPtPos);

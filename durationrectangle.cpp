@@ -94,16 +94,19 @@ int DurationRectangle::getMaxFrame() const {
 
 void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
                              const qreal &drawY, const int &startFrame) {
+    p->save();
     int startDFrame;
     int xT;
     int widthT;
+    QRect drawRect;
     if(mShowPossibleFrameRange) {
         startDFrame = getMinPossibleFrame() - startFrame;
         xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
         widthT = getPossibleFrameDuration()*pixelsPerFrame - pixelsPerFrame;
-        p->fillRect(xT, drawY,
-                    widthT,
-                    BOX_HEIGHT, QColor(125, 125, 255, 180));
+        QRect drawRect = QRect(xT, drawY,
+                               widthT,
+                               BOX_HEIGHT);
+        p->fillRect(drawRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
     }
 
     startDFrame = getMinFrame() - startFrame;
@@ -115,9 +118,10 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
     } else {
         fillColor = QColor(0, 0, 255, 180);
     }
-    p->fillRect(xT, drawY,
-                widthT,
-                BOX_HEIGHT, fillColor);
+    drawRect = QRect(xT, drawY,
+                     widthT, BOX_HEIGHT);
+
+    p->fillRect(drawRect.adjusted(0, 1, 0, -1), fillColor);
 
     if(mMinFrame.isHovered()) {
         p->setPen(QPen(Qt::white));
@@ -132,7 +136,10 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
         p->setPen(QPen(Qt::black));
     }
     p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + BOX_HEIGHT));
-    p->setPen(Qt::black);
+//    p->setPen(Qt::black);
+//    p->setBrush(Qt::NoBrush);
+    //p->drawRect(drawRect);
+    p->restore();
 }
 
 DurationRectangleMovable *DurationRectangle::getMovableAt(

@@ -98,7 +98,7 @@ QImage InternalLinkBox::getPrettyPixmapProvidedTransform(
 void InternalLinkBox::drawSelected(QPainter *p,
                                    const CanvasMode &)
 {
-    if(mVisible) {
+    if(isVisibleAndInVisibleDurationRect()) {
         p->save();
 
         //        QPainterPath mapped;
@@ -217,7 +217,7 @@ void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
 
 void InternalLinkCanvas::draw(QPainter *p)
 {
-    if(mVisible) {
+    if(shouldUpdateAndDraw()) {
         p->save();
         if(mClipToCanvasSize) {
             p->setClipRect(mRelBoundingRect);

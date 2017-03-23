@@ -407,11 +407,13 @@ void BoundingBox::redoUpdate() {
 }
 
 void BoundingBox::drawUpdatePixmap(QPainter *p) {
-    p->save();
-    p->setCompositionMode(mCompositionMode);
-    p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
-    mUpdateRenderContainer->draw(p);
-    p->restore();
+    if(mUpdateDrawOnParentBox) {
+        p->save();
+        p->setCompositionMode(mCompositionMode);
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
+        mUpdateRenderContainer->draw(p);
+        p->restore();
+    }
 }
 
 void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
@@ -430,11 +432,13 @@ QMatrix BoundingBox::getUpdatePaintTransform() {
 }
 
 void BoundingBox::drawPixmap(QPainter *p) {
-    p->save();
-    p->setCompositionMode(mCompositionMode);
-    p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
-    mOldRenderContainer->draw(p);
-    p->restore();
+    if(isVisibleAndInVisibleDurationRect()) {
+        p->save();
+        p->setCompositionMode(mCompositionMode);
+        p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
+        mOldRenderContainer->draw(p);
+        p->restore();
+    }
 }
 
 void BoundingBox::setCompositionMode(
@@ -926,6 +930,16 @@ QString BoundingBox::getName()
     return mName;
 }
 
+bool BoundingBox::isInVisibleDurationRect() {
+    if(mDurationRectangle == NULL) return true;
+    return mCurrentAbsFrame < mDurationRectangle->getMaxFrame() &&
+           mCurrentAbsFrame >= mDurationRectangle->getMinFrame();
+}
+
+bool BoundingBox::isVisibleAndInVisibleDurationRect() {
+    return isInVisibleDurationRect() && mVisible;
+}
+
 void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
     if(mVisible == visible) return;
     if(mSelected) {
@@ -1192,12 +1206,32 @@ void BoundingBox::setUpdateVars() {
     mUpdateTransform = mCombinedTransformMatrix;
     mUpdateRelFrame = mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
+    mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
+}
+
+bool BoundingBox::isUsedAsTarget() {
+    return mUsedAsTargetCount > 0;
+}
+
+void BoundingBox::incUsedAsTarget() {
+    mUsedAsTargetCount++;
+}
+
+void BoundingBox::decUsedAsTarget() {
+    mUsedAsTargetCount--;
+}
+
+bool BoundingBox::shouldUpdateAndDraw() {
+    return isVisibleAndInVisibleDurationRect() ||
+           (isInVisibleDurationRect() && isUsedAsTarget());
 }
 
 void BoundingBox::scheduleUpdate() {
     //if(mAwaitingUpdate) return;
-    qDebug() << "schedule update " + mName;
-    mAwaitingUpdate = true;
-    mParent->addChildAwaitingUpdate(this);
-    emit scheduledUpdate();
+    if(shouldUpdateAndDraw()) {
+        qDebug() << "schedule update " + mName;
+        mAwaitingUpdate = true;
+        mParent->addChildAwaitingUpdate(this);
+        emit scheduledUpdate();
+    }
 }
