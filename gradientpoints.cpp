@@ -62,12 +62,14 @@ void GradientPoints::disable()
     enabled = false;
 }
 
-void GradientPoints::drawGradientPoints(QPainter *p)
-{
+void GradientPoints::drawGradientPoints(QPainter *p) {
     if(enabled) {
-       p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
-       startPoint->draw(p);
-       endPoint->draw(p);
+        p->setPen(QPen(Qt::black, 1.5));
+        p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
+        p->setPen(QPen(Qt::white, 0.75));
+        p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
+        startPoint->draw(p);
+        endPoint->draw(p);
     }
 }
 

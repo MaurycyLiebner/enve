@@ -15,6 +15,10 @@ void TransUpdater::update() {
     mTarget->schedulePivotUpdate();
 }
 
+void TransUpdater::updateFinal() {
+    mTarget->updateCombinedTransform();
+}
+
 void TransUpdater::frameChangeUpdate() {
     mTarget->updateRelativeTransformAfterFrameChange();
     mTarget->schedulePivotUpdate();

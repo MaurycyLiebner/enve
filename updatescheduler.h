@@ -30,4 +30,13 @@ private:
     Canvas *mCanvas;
 };
 
+class PathUpdateScheduler : public UpdateScheduler {
+public:
+    PathUpdateScheduler(PathBox *path);
+
+    void update();
+private:
+    PathBox *mPath;
+};
+
 #endif // UPDATESCHEDULER_H

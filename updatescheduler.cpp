@@ -18,3 +18,11 @@ AddBoxAwaitingUpdateScheduler::AddBoxAwaitingUpdateScheduler(Canvas *canvas) {
 void AddBoxAwaitingUpdateScheduler::update() {
     MainWindow::getInstance()->getCanvasWidget()->addBoxAwaitingUpdate(mCanvas);
 }
+
+PathUpdateScheduler::PathUpdateScheduler(PathBox *path) {
+    mPath = path;
+}
+
+void PathUpdateScheduler::update() {
+    mPath->updatePath();
+}

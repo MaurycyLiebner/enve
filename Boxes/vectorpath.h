@@ -81,8 +81,8 @@ public:
     PathAnimator *getPathAnimator();
     void duplicatePathAnimatorFrom(PathAnimator *source);
     void removeChildPathAnimator(PathAnimator *path);
-protected:
     void updatePath();
+protected:
     void updatePathPointIds();
     PathAnimator mPathAnimator;
 

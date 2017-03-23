@@ -32,9 +32,15 @@ void GradientPoint::draw(QPainter *p)
         return;
     }
     p->setBrush(mFillColor);
+    p->setPen(Qt::black);
     QPointF absPos = getAbsolutePos();
-    p->drawRoundRect(QRectF(absPos - QPointF(mRadius, mRadius),
-                            QSize(2*mRadius, 2*mRadius)) );
+    QRectF rect = QRectF(absPos - QPointF(mRadius, mRadius),
+                         QSize(2*mRadius, 2*mRadius));
+    p->setPen(QPen(Qt::black, 1.5));
+    p->drawEllipse(rect);
+    p->setBrush(Qt::NoBrush);
+    p->setPen(QPen(Qt::white, 0.75));
+    p->drawEllipse(rect);
 
     if(mRelPos.isKeyOnCurrentFrame() ) {
         p->setBrush(Qt::red);

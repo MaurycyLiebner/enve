@@ -217,8 +217,7 @@ Color Gradient::getCurrentColorAt(int id)
     return mColors.at(id)->getCurrentValue();
 }
 
-ColorAnimator *Gradient::getColorAnimatorAt(int id)
-{
+ColorAnimator *Gradient::getColorAnimatorAt(int id) {
     return mColors.at(id);
 }
 
@@ -293,6 +292,7 @@ void Gradient::removeColor(ColorAnimator *color,
                         this, color));
     }
     removeChildAnimator(color);
+    mGradientWidget->resetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
     color->decNumberPointers();
     updateQGradientStops();

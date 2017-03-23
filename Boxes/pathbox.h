@@ -119,6 +119,8 @@ public:
     }
     void updateStrokeDrawGradient();
     void updateFillDrawGradient();
+
+    virtual void updatePath() {}
 protected:
     GradientPoints mFillGradientPoints;
     GradientPoints mStrokeGradientPoints;
@@ -140,8 +142,6 @@ protected:
     QPainterPathStroker mPathStroker;
     QPainterPath mWholePath;
     void updateWholePath();
-
-    virtual void updatePath() {}
 
     bool mOutlineAffectedByScale = true;
 };

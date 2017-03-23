@@ -110,8 +110,7 @@ void PathBox::loadFromSql(int boundingBoxId) {
     }
 }
 
-void PathBox::updatePathIfNeeded()
-{
+void PathBox::updatePathIfNeeded() {
     if(mPathUpdateNeeded) {
         updatePath();
         mUpdatePath = mPath;
@@ -154,6 +153,7 @@ void PathBox::schedulePathUpdate() {
     if(mPathUpdateNeeded) {
         return;
     }
+    addUpdateScheduler(new PathUpdateScheduler(this));
 
     mPathUpdateNeeded = true;
     mOutlinePathUpdateNeeded = false;

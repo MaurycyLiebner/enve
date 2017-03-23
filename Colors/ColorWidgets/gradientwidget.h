@@ -38,6 +38,7 @@ public:
     void addGradientToList(Gradient *gradient);
     void removeGradientFromList(Gradient *toRemove);
     void startSelectedColorTransform();
+    void resetColorIdIfEquals(Gradient *gradient, const int &id);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);

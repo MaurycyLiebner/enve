@@ -203,6 +203,7 @@ public:
         Q_UNUSED(pixelsPerFrame);
         return NULL;
     }
+    void callFinishUpdater();
 protected:
     bool mUpdaterBlocked = false;
     bool mTraceKeyOnCurrentFrame = false;

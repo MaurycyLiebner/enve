@@ -827,18 +827,19 @@ void QrealAnimator::finishTransform()
 //        if(mSavedCurrentValue == mCurrentValue) {
 //            mTransformed = false;
 //        } else {
-            addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
-                                                     mCurrentValue,
-                                                     this) );
-            if(mIsRecording) {
-                saveCurrentValueAsKey();
-            }
-            mTransformed = false;
+        addUndoRedo(new ChangeQrealAnimatorValue(mSavedCurrentValue,
+                                                 mCurrentValue,
+                                                 this) );
+        if(mIsRecording) {
+            saveCurrentValueAsKey();
+        }
+        mTransformed = false;
 
-            if(mIsCurrentAnimator) {
-                graphScheduleUpdateAfterKeysChanged();
-            }
+        if(mIsCurrentAnimator) {
+            graphScheduleUpdateAfterKeysChanged();
+        }
 //        }
+        callFinishUpdater();
     }
 }
 
@@ -846,6 +847,7 @@ void QrealAnimator::cancelTransform() {
     if(mTransformed) {
         mTransformed = false;
         retrieveSavedValue();
+        callFinishUpdater();
     }
 }
 
@@ -891,6 +893,11 @@ void QrealAnimator::callUpdater()
     } else {
         mUpdater->update();
     }
+}
+
+void QrealAnimator::callFinishUpdater() {
+    if(mUpdater == NULL) return;
+    mUpdater->updateFinal();
 }
 
 void QrealAnimator::callFrameChangeUpdater() {

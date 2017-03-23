@@ -22,6 +22,7 @@ public:
     virtual void frameChangeUpdate() {
         update();
     }
+    virtual void updateFinal() {}
 };
 
 class TransUpdater : public AnimatorUpdater
@@ -30,6 +31,7 @@ public:
     TransUpdater(BoundingBox *boundingBox);
 
     void update();
+    void updateFinal();
 
     void frameChangeUpdate();
 private:

@@ -176,6 +176,14 @@ ColorAnimator *GradientWidget::getCurrentColorAnimator() {
     return mCurrentGradient->getColorAnimatorAt(mCurrentColorId);
 }
 
+void GradientWidget::resetColorIdIfEquals(Gradient *gradient, const int &id) {
+    if(gradient == mCurrentGradient) {
+        if(id == mCurrentColorId) {
+            mCurrentColorId = 0;
+        }
+    }
+}
+
 void GradientWidget::setCurrentGradient(int listId)
 {
     if(listId >= mGradients.length()) return;

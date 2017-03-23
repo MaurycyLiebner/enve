@@ -730,7 +730,7 @@ void BoundingBox::startTransform() {
 
 void BoundingBox::finishTransform() {
     mTransformAnimator.finishTransform();
-    updateCombinedTransform();
+    //updateCombinedTransform();
 }
 
 bool BoundingBox::absPointInsidePath(QPointF absPoint) {
@@ -739,7 +739,7 @@ bool BoundingBox::absPointInsidePath(QPointF absPoint) {
 
 void BoundingBox::cancelTransform() {
     mTransformAnimator.cancelTransform();
-    updateCombinedTransformTmp();
+    //updateCombinedTransform();
 }
 
 void BoundingBox::moveUp() {
@@ -795,10 +795,14 @@ void BoundingBox::updateCombinedTransform() {
 }
 
 void BoundingBox::updateCombinedTransformTmp() {
-    mCombinedTransformMatrix = mRelativeTransformMatrix*
-                               mParent->getCombinedTransform();
-    mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
-                                            mCombinedTransformMatrix);
+    if(mAwaitingUpdate) {
+        mCombinedTransformMatrix = mRelativeTransformMatrix*
+                                   mParent->getCombinedTransform();
+        mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+                                                mCombinedTransformMatrix);
+    } else {
+        updateCombinedTransform();
+    }
 }
 
 TransformAnimator *BoundingBox::getTransformAnimator() {
