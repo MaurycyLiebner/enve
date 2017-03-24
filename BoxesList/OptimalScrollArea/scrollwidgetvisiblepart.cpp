@@ -78,6 +78,13 @@ void ScrollWidgetVisiblePart::setCurrentTarget(
     updateVisibleWidgetsContent();
 }
 
+void ScrollWidgetVisiblePart::setCurrentType(
+                        const SWT_Type &type) {
+    mCurrentRulesCollection.type = type;
+    updateParentHeight();
+    updateVisibleWidgetsContent();
+}
+
 void ScrollWidgetVisiblePart::setAlwaysShowChildren(
         const bool &alwaysShowChildren) {
     mCurrentRulesCollection.alwaysShowChildren = alwaysShowChildren;

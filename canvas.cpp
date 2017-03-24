@@ -302,7 +302,6 @@ QSize Canvas::getCanvasSize()
 
 void Canvas::setPreviewing(bool bT) {
     mPreviewing = bT;
-    mCanvasWidget->setAttribute(Qt::WA_OpaquePaintEvent, !bT);
 }
 
 void Canvas::playPreview()
@@ -463,17 +462,6 @@ void Canvas::schedulePivotUpdate()
 {
     if(mRotPivot->isRotating() || mRotPivot->isScaling()) return;
     mPivotUpdateNeeded = true;
-}
-
-void Canvas::clearAll() {
-    setCurrentBoxesGroup(this);
-
-    foreach(BoundingBox *box, mChildBoxes) {
-        box->decNumberPointers();
-    }
-    mChildBoxes.clear();
-
-    resetTransormation();
 }
 
 void Canvas::updatePivotIfNeeded()
@@ -908,10 +896,15 @@ bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,
                                const bool &parentSatisfies) {
     Q_UNUSED(parentSatisfies);
     const SWT_Rule &rule = rules.rule;
+    const SWT_Type &type = rules.type;
     const bool &alwaysShowChildren = rules.alwaysShowChildren;
     if(alwaysShowChildren) {
         return false;
     } else {
+        if(type == SWT_All) {
+        } else if(type == SWT_SingleSound) {
+            return false;
+        }
         if(rule == SWT_NoRule) {
             return true;
         } else if(rule == SWT_Selected) {

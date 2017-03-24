@@ -204,6 +204,7 @@ public:
         return NULL;
     }
     void callFinishUpdater();
+    int getClosestsKeyOccupiedRelFrame(const int &frame);
 protected:
     bool mUpdaterBlocked = false;
     bool mTraceKeyOnCurrentFrame = false;

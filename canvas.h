@@ -66,7 +66,6 @@ public:
 
     void saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);
-    void clearAll();
     void resetTransormation();
     void fitCanvasToSize();
     bool processFilteredKeyEvent(QKeyEvent *event);

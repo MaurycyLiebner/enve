@@ -291,8 +291,7 @@ void BoxSingleWidget::loadStaticPixmaps() {
 #include <QMenu>
 #include "mainwindow.h"
 #include "clipboardcontainer.h"
-void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
-{
+void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
     if(event->button() == Qt::RightButton) {
@@ -336,12 +335,12 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event)
         }
     } else {
         mDragStartPos = event->pos();
-        if(type == SWT_BoundingBox ||
-           type == SWT_BoxesGroup) {
-            BoundingBox *bb_target = (BoundingBox*)target;
-            bb_target->selectionChangeTriggered(event->modifiers() &
-                                                Qt::ShiftModifier);
-        }
+//        if(type == SWT_BoundingBox ||
+//           type == SWT_BoxesGroup) {
+//            BoundingBox *bb_target = (BoundingBox*)target;
+//            bb_target->selectionChangeTriggered(event->modifiers() &
+//                                                Qt::ShiftModifier);
+//        }
     }
     MainWindow::getInstance()->callUpdateSchedulers();
 }
@@ -366,10 +365,23 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
     drag->exec(Qt::CopyAction | Qt::MoveAction);
 }
 
+void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
+    if(pointToLen(event->pos() - mDragStartPos) > 10.) return;
+    SingleWidgetTarget *target = mTarget->getTarget();
+    const SWT_Type &type = target->SWT_getType();
+    if(type == SWT_BoundingBox ||
+       type == SWT_BoxesGroup) {
+        BoundingBox *bb_target = (BoundingBox*)target;
+        bb_target->selectionChangeTriggered(event->modifiers() &
+                                            Qt::ShiftModifier);
+        MainWindow::getInstance()->callUpdateSchedulers();
+    }
+}
+
 void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e)
 {
     if(e->modifiers() & Qt::ShiftModifier) {
-        mousePressEvent(e);
+        //mousePressEvent(e);
     } else {
         rename();
         MainWindow::getInstance()->callUpdateSchedulers();

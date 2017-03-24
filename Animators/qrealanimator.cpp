@@ -508,6 +508,15 @@ QrealKey *QrealAnimator::getKeyAtAbsFrame(const int &frame) {
     return getKeyAtRelFrame(absFrameToRelFrame(frame));
 }
 
+int QrealAnimator::getClosestsKeyOccupiedRelFrame(const int &frame) {
+    if(mKeys.isEmpty()) return 0;
+    int firstFrame = mKeys.first()->getRelFrame();
+    int lastFrame = mKeys.last()->getRelFrame();
+    if(frame < firstFrame) return firstFrame;
+    if(frame > lastFrame) return lastFrame;
+    return frame;
+}
+
 QrealKey *QrealAnimator::getKeyAtRelFrame(const int &frame) {
     if(mKeys.isEmpty()) return NULL;
     if(frame > mKeys.last()->getRelFrame()) return NULL;

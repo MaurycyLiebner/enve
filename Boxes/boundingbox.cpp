@@ -43,6 +43,8 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 }
 
 BoundingBox::~BoundingBox() {
+    delete mOldRenderContainer;
+    delete mUpdateRenderContainer;
 }
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
@@ -289,15 +291,12 @@ void BoundingBox::updateAllBoxes() {
 
 void BoundingBox::clearCache() {
     for(auto cont : mRenderContainers) {
+        if((BoundingBoxRenderContainer*)cont.second == mOldRenderContainer) {
+            continue;
+        }
         delete cont.second;
     }
     mRenderContainers.clear();
-    mOldRenderContainer = new BoundingBoxRenderContainer();
-    mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-    if(!mNoCache) {
-        mRenderContainers.insert({mOldRenderContainer->getFrame(),
-                                  mOldRenderContainer});
-    }
 
     if(mParent == NULL) return;
     mParent->BoundingBox::clearCache();
@@ -1019,8 +1018,10 @@ void BoundingBox::SWT_addChildrenAbstractions(
 bool BoundingBox::SWT_satisfiesRule(const SWT_RulesCollection &rules,
                                     const bool &parentSatisfies) {
     const SWT_Rule &rule = rules.rule;
+    const SWT_Type &type = rules.type;
     bool satisfies;
     bool alwaysShowChildren = rules.alwaysShowChildren;
+    if(type == SWT_SingleSound) return false;
     if(alwaysShowChildren) {
         if(rule == SWT_NoRule) {
             satisfies = true;
@@ -1160,9 +1161,9 @@ void BoundingBox::beforeUpdate() {
 
 void BoundingBox::processUpdate() {
     qDebug() << "process update " + mName;
-    //if(mUpdateReplaceCache) {
+    if(mUpdateReplaceCache) {
         updatePixmaps();
-    //}
+    }
 }
 
 void BoundingBox::setNoCache(const bool &bT) {
@@ -1176,19 +1177,27 @@ void BoundingBox::afterUpdate() {
     if(mNoCache) {
         mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
     } else {
-        for(auto pair : mRenderContainers) {
-            delete pair.second;
-        }
+//        for(auto pair : mRenderContainers) {
+//            delete pair.second;
+//        }
 
-        mRenderContainers.clear();
-        mOldRenderContainer = getRenderContainerAtFrame(
-                                        mUpdateRelFrame);
+//        mRenderContainers.clear();
 
-        if(mOldRenderContainer == NULL) {
-            mOldRenderContainer = new BoundingBoxRenderContainer();
-            mRenderContainers.insert({mUpdateRelFrame, mOldRenderContainer});
+
+        BoundingBoxRenderContainer *contAtFrame = getRenderContainerAtFrame(
+                                                    mUpdateRelFrame);
+        if(mUpdateReplaceCache) {
+            if(contAtFrame == NULL) {
+                mOldRenderContainer = new BoundingBoxRenderContainer();
+                mRenderContainers.insert({mUpdateRelFrame, mOldRenderContainer});
+            } else {
+                mOldRenderContainer = contAtFrame;
+            }
+
+            mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+        } else if(contAtFrame != NULL) {
+            mOldRenderContainer = contAtFrame;
         }
-        mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
 //        if(!mUpdateReplaceCache) {
 //            mOldRenderContainer = getRenderContainerAtFrame(
 //                                            mUpdateFrame);
@@ -1211,6 +1220,7 @@ void BoundingBox::setUpdateVars() {
     mUpdateRelFrame = mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
+    mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL;
 }
 
 bool BoundingBox::isUsedAsTarget() {
@@ -1227,7 +1237,7 @@ void BoundingBox::decUsedAsTarget() {
 
 bool BoundingBox::shouldUpdateAndDraw() {
     return isVisibleAndInVisibleDurationRect() ||
-           (isInVisibleDurationRect() && isUsedAsTarget());
+            (isInVisibleDurationRect() && isUsedAsTarget());
 }
 
 void BoundingBox::scheduleUpdate() {

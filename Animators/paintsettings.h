@@ -130,6 +130,7 @@ private:
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
     QList<PathBox*> mAffectedPaths;
+    ColorAnimator *mCurrentColor = NULL;
 
     bool mQGradientStopsUpdateNeeded = false;
 };

@@ -5,8 +5,8 @@
 #include "Colors/helpers.h"
 #include "mainwindow.h"
 
-GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) : GLWidget(parent)
-{
+GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
+    GLWidget(parent) {
     mMainWindow = mainWindow;
     setFixedHeight(6*20 + 10);
     connect(mMainWindow, SIGNAL(updateAll()),

@@ -9,7 +9,7 @@
 #include "Sound/soundcomposition.h"
 
 CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
-    setAttribute(Qt::WA_OpaquePaintEvent, true);
+    //setAttribute(Qt::WA_OpaquePaintEvent, true);
     setFocusPolicy(Qt::StrongFocus);
     setMinimumSize(500, 500);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -61,7 +61,7 @@ void CanvasWidget::SWT_addChildrenAbstractions(
 }
 
 void CanvasWidget::setCurrentCanvas(const int &id) {
-    if(mCanvasList.isEmpty()) {
+    if(id < 0 || id >= mCanvasList.count()) {
         setCurrentCanvas((Canvas*)NULL);
     } else {
         setCurrentCanvas(mCanvasList.at(id));
@@ -649,11 +649,12 @@ void CanvasWidget::saveOutput(QString renderDest) {
 }
 
 void CanvasWidget::clearAll() {
+    SWT_clearAll();
     foreach(Canvas *canvas, mCanvasList) {
-        canvas->clearAll();
         canvas->decNumberPointers();
     }
     mCanvasList.clear();
+    setCurrentCanvas((Canvas*)NULL);
 }
 
 void CanvasWidget::saveSelectedToSql(QSqlQuery *query) {

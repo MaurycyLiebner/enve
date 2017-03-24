@@ -55,6 +55,7 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
 
     void paintEvent(QPaintEvent *);
     void mouseDoubleClickEvent(QMouseEvent *e);

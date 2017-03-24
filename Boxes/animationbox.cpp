@@ -120,6 +120,7 @@ void AnimationBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
     mUpdateAnimationFrame = mCurrentAnimationFrame;
     mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
+    mUpdateReplaceCache = mUpdateReplaceCache || mUpdatePixmapReloadScheduled;
     if(!mUpdatePixmapReloadScheduled) {
         auto searchCurrentFrame = mAnimationFramesCache.find(mUpdateAnimationFrame);
         if(searchCurrentFrame != mAnimationFramesCache.end()) {

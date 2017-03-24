@@ -267,6 +267,13 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
     addNewBoxesListKeysViewWidget(mBoxesListKeysViewStack->getIdOf(widget) + 1);
 }
 
+void BoxesListAnimationDockWidget::clearAll() {
+    QList<BoxesListKeysViewWidget*> widgets = mBoxesListKeysViewWidgets;
+    foreach(BoxesListKeysViewWidget *widget, widgets) {
+        removeBoxesListKeysViewWidget(widget);
+    }
+}
+
 bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
         QKeyEvent *event) {
     if(event->key() == Qt::Key_Right && mMainWindow->isCtrlPressed()) {

@@ -60,6 +60,7 @@ public:
     void setPlaying(bool playing);
     void updateSettingsForCurrentCanvas(Canvas *canvas);
     void addNewBoxesListKeysViewWidgetBelow(BoxesListKeysViewWidget *widget);
+    void clearAll();
 public slots:
     void setCurrentFrame(int frame);
     void setMinMaxFrame(const int &minFrame, const int &maxFrame);

@@ -53,8 +53,7 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
-BoxesGroup::~BoxesGroup()
-{
+BoxesGroup::~BoxesGroup() {
     foreach(BoundingBox *box, mChildBoxes) {
         box->decNumberPointers();
     }

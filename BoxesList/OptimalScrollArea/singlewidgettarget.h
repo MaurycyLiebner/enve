@@ -18,7 +18,8 @@ enum SWT_Type : short {
     SWT_Canvas = 64,
     SWT_BoxTarget = 128,
     SWT_BoolProperty = 256,
-    SWT_SingleSound = 512
+    SWT_SingleSound = 512,
+    SWT_AllTypes = 1024
 };
 
 Q_DECLARE_FLAGS(SWT_Types, SWT_Type)
@@ -92,6 +93,9 @@ public:
     virtual QMimeData *SWT_createMimeData() {
         return NULL;
     }
+
+    virtual void SWT_clearAll();
+
 protected:
     QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
 

@@ -892,9 +892,11 @@ void MainWindow::clearAll() {
     mUpdateSchedulers.clear();
 
     mUndoRedoStack.clearAll();
+    mObjectSettingsWidget->setMainTarget(NULL);
+    mBoxesListAnimationDockWidget->clearAll();
+    mCurrentCanvasComboBox->clear();
     mCanvasWidget->clearAll();
     mFillStrokeSettings->clearAll();
-    //mObjectSettingsWidget->clearAll();
     //mBoxListWidget->clearAll();
 }
 

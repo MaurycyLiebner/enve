@@ -6,9 +6,7 @@ SingleWidgetTarget::SingleWidgetTarget() {
 }
 
 SingleWidgetTarget::~SingleWidgetTarget() {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
-        delete abs;
-    }
+    SWT_clearAll();
 }
 
 //void SingleWidgetTarget::SWT_addChildrenAbstractions(
@@ -84,4 +82,11 @@ void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
     foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->moveChildAbstractionForTargetTo(target, id);
     }
+}
+
+void SingleWidgetTarget::SWT_clearAll() {
+    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+        delete abs;
+    }
+    mSWT_allAbstractions.clear();
 }

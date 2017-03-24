@@ -503,6 +503,7 @@ protected:
     bool mAnimated = false;
 
     QImage mRenderPixmap;
+    bool mUpdateReplaceCache;
 signals:
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();

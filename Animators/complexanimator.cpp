@@ -9,12 +9,11 @@ ComplexAnimator::ComplexAnimator() :
     mCurrentValue = 0.;
 }
 
-ComplexAnimator::~ComplexAnimator()
-{
+ComplexAnimator::~ComplexAnimator() {
+    removeAllKeys();
     foreach(Property *property, mChildAnimators) {
         property->decNumberPointers();
     }
-    mChildAnimators.clear();
 }
 
 int ComplexAnimator::getNumberOfChildren() {

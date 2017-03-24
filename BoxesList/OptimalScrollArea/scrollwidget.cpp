@@ -22,7 +22,7 @@ void ScrollWidget::updateAbstraction() {
         mMainAbstraction = NULL;
     } else {
         mMainAbstraction = mMainTarget->SWT_getAbstractionForWidget(
-                    mVisiblePartWidget);
+                                                mVisiblePartWidget);
         mMainAbstraction->setIsMainTarget(true);
     }
     mVisiblePartWidget->setMainAbstraction(mMainAbstraction);

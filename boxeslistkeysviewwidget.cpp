@@ -46,6 +46,9 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                           SLOT(setTargetCurrentCanvas()));
     targetMenu->addAction("Current Group", this,
                           SLOT(setTargetCurrentGroup()));
+    QMenu *typeMenu = mBoxesListMenuBar->addMenu("Type");
+    typeMenu->addAction("All", this, SLOT(setTypeAll()));
+    typeMenu->addAction("Sound", this, SLOT(setTypeSound()));
 
     mBoxesListMenuBar->addSeparator();
     mBoxesListMenuBar->addAction("+", this, SLOT(addNewBelowThis()));
@@ -247,6 +250,18 @@ void BoxesListKeysViewWidget::setTargetCurrentGroup() {
             setCurrentTarget(
                 mMainWindow->getCanvasWidget()->getCurrentGroup(),
                 SWT_CurrentGroup);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListKeysViewWidget::setTypeSound() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentType(SWT_SingleSound);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListKeysViewWidget::setTypeAll() {
+    mBoxesListWidget->getVisiblePartWidget()->
+            setCurrentType(SWT_AllTypes);
     mMainWindow->callUpdateSchedulers();
 }
 

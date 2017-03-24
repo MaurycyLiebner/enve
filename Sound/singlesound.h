@@ -35,6 +35,9 @@ public:
                                  const int &minFrame,
                                  const int &maxFrame);
     int getFrameShift() const;
+
+    bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
+                           const bool &parentSatisfies);
 public slots:
     void scheduleFinalDataUpdate();
 private:

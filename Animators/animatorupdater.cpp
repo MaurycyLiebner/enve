@@ -11,11 +11,13 @@ TransUpdater::TransUpdater(BoundingBox *boundingBox) : AnimatorUpdater()
 }
 
 void TransUpdater::update() {
+    mTarget->clearCache();
     mTarget->updateRelativeTransformTmp();
     mTarget->schedulePivotUpdate();
 }
 
 void TransUpdater::updateFinal() {
+    mTarget->clearCache();
     mTarget->updateCombinedTransform();
 }
 
@@ -29,6 +31,7 @@ PathPointUpdater::PathPointUpdater(PathBox *vectorPath) {
 }
 
 void PathPointUpdater::update() {
+    mTarget->clearCache();
     mTarget->schedulePathUpdate();
 }
 
@@ -49,6 +52,7 @@ StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path) {
 }
 
 void StrokeWidthUpdater::update() {
+    mTarget->clearCache();
     mTarget->scheduleOutlinePathUpdate();
 }
 
@@ -62,6 +66,7 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 }
 
 void DisplayedFillStrokeSettingsUpdater::update() {
+    mTarget->clearCache();
     mTarget->scheduleUpdate();
 }
 
@@ -74,6 +79,7 @@ PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
 }
 
 void PixmapEffectUpdater::update() {
+    mTarget->clearCache();
     mTarget->scheduleEffectsMarginUpdate();
 }
 
@@ -87,6 +93,7 @@ AnimationBoxFrameUpdater::AnimationBoxFrameUpdater(AnimationBox *target) {
 }
 
 void AnimationBoxFrameUpdater::update() {
+    mTarget->clearCache();
     mTarget->updateDurationRectanglePossibleRange();
 }
 
@@ -100,6 +107,7 @@ void ParticlesUpdater::update() {
 }
 
 void GradientPointsUpdater::update() {
+    mTarget->clearCache();
     if(mIsFill) {
         mTarget->updateFillDrawGradient();
     } else {
