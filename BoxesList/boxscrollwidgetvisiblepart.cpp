@@ -78,9 +78,6 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
         const int &pressY,
         const qreal &pixelsPerFrame,
         const int &minViewedFrame) {
-    int remaining = pressY % BOX_HEIGHT;
-    if(remaining < (BOX_HEIGHT - KEY_RECT_SIZE)/2 ||
-       remaining > (BOX_HEIGHT + KEY_RECT_SIZE)/2) return NULL;
     foreach(SingleWidget *container, mSingleWidgets) {
         int containerTop = container->y();
         int containerBottom = containerTop + container->height();
@@ -99,10 +96,11 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
     QList<SingleWidgetAbstraction*> abstractions;
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
-    selectionRect.adjust(0.5, 0., 0.5, 0);
+    selectionRect.adjust(0.5, 0., 0.5, 0.);
+    int currY = 0;
     mMainAbstraction->getAbstractions(selectionRect.top() - 10,
                                       selectionRect.bottom() - 10,
-                                      0, 0,
+                                      &currY, 0,
                                       &abstractions,
                                       mCurrentRulesCollection,
                                       true,

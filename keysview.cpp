@@ -399,23 +399,25 @@ void KeysView::clearHoveredMovable() {
 }
 
 void KeysView::scrollRight() {
-    mMinViewedFrame++;
-    mMaxViewedFrame++;
+    int inc = qMax(1, (int)(40./mPixelsPerFrame) );
+    mMinViewedFrame += inc;
+    mMaxViewedFrame += inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
     if(mSelecting) {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() +
-                                      QPointF(1. ,0.));
+                                      QPointF(inc, 0.));
     }
     update();
 }
 
 void KeysView::scrollLeft() {
-    mMinViewedFrame--;
-    mMaxViewedFrame--;
+    int inc = qMax(1, (int)(40./mPixelsPerFrame) );
+    mMinViewedFrame -= inc;
+    mMaxViewedFrame -= inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
     if(mSelecting) {
         mSelectionRect.setBottomRight(mSelectionRect.bottomRight() -
-                                      QPointF(1. ,0.));
+                                      QPointF(inc, 0.));
     }
     update();
 }

@@ -30,7 +30,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                                         "margin-top: 2px;"
                                         "padding-top: 1px;"
                                      "}");
-    QMenu *objectsMenu = mBoxesListMenuBar->addMenu("Objects");
+    QMenu *objectsMenu = mBoxesListMenuBar->addMenu("State");
     objectsMenu->addAction("All", this, SLOT(setRuleNone()));
     objectsMenu->addAction("Selected", this, SLOT(setRuleSelected()));
     objectsMenu->addAction("Animated", this, SLOT(setRuleAnimated()));
