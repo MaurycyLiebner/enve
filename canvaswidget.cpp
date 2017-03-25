@@ -175,6 +175,10 @@ void CanvasWidget::setParticleBoxMode() {
     setCanvasMode(ADD_PARTICLE_BOX);
 }
 
+void CanvasWidget::setParticleEmitterMode() {
+    setCanvasMode(ADD_PARTICLE_EMITTER);
+}
+
 void CanvasWidget::addCanvasToListAndSetAsCurrent(Canvas *canvas) {
     addCanvasToList(canvas);
     setCurrentCanvas(canvas);

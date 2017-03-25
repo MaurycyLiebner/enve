@@ -298,10 +298,13 @@ int SingleSound::getFrameShift() const {
 }
 
 #include "BoxesList/boxscrollwidgetvisiblepart.h"
-bool SingleSound::SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                                    const bool &parentSatisfies) {
+bool SingleSound::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                                      const bool &parentSatisfies,
+                                      const bool &parentMainTarget) {
     if(rules.type == SWT_SingleSound) return true;
-    return SingleWidgetTarget::SWT_satisfiesRule(rules, parentSatisfies);
+    return SingleWidgetTarget::SWT_shouldBeVisible(rules,
+                                                   parentSatisfies,
+                                                   parentMainTarget);
 }
 
 const float *SingleSound::getFinalData() const {

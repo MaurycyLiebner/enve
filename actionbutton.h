@@ -26,6 +26,7 @@ protected:
     QImage mNotCheckedPixmap;
 signals:
     void pressed();
+    void toggled(bool);
 public slots:
 };
 

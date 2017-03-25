@@ -1015,8 +1015,9 @@ void BoundingBox::SWT_addChildrenAbstractions(
                                                  visiblePartWidget);
 }
 
-bool BoundingBox::SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                                    const bool &parentSatisfies) {
+bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                                      const bool &parentSatisfies,
+                                      const bool &) {
     const SWT_Rule &rule = rules.rule;
     const SWT_Type &type = rules.type;
     bool satisfies;
@@ -1024,7 +1025,7 @@ bool BoundingBox::SWT_satisfiesRule(const SWT_RulesCollection &rules,
     if(type == SWT_SingleSound) return false;
     if(alwaysShowChildren) {
         if(rule == SWT_NoRule) {
-            satisfies = true;
+            satisfies = parentSatisfies;
         } else if(rule == SWT_Selected) {
             satisfies = isSelected() || parentSatisfies;
         } else if(rule == SWT_Animated) {
@@ -1042,7 +1043,7 @@ bool BoundingBox::SWT_satisfiesRule(const SWT_RulesCollection &rules,
         }
     } else {
         if(rule == SWT_NoRule) {
-            satisfies = true;
+            satisfies = parentSatisfies;
         } else if(rule == SWT_Selected) {
             satisfies = isSelected();
         } else if(rule == SWT_Animated) {

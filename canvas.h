@@ -244,8 +244,9 @@ public:
 
     bool isPreviewing() { return mPreviewing; }
 
-    bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                           const bool &parentSatisfies);
+    bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                             const bool &parentSatisfies,
+                             const bool &);
 
     BoxesGroup *getCurrentBoxesGroup() {
         return mCurrentBoxesGroup;

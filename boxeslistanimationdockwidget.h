@@ -48,6 +48,7 @@ private:
 
 class AnimationDockWidget;
 class BoxScrollWidget;
+#include "actionbutton.h"
 
 class BoxesListAnimationDockWidget : public QWidget
 {
@@ -57,7 +58,6 @@ public:
     bool processUnfilteredKeyEvent(QKeyEvent *event);
     bool processFilteredKeyEvent(QKeyEvent *event);
     void previewFinished();
-    void setPlaying(bool playing);
     void updateSettingsForCurrentCanvas(Canvas *canvas);
     void addNewBoxesListKeysViewWidgetBelow(BoxesListKeysViewWidget *widget);
     void clearAll();
@@ -72,11 +72,11 @@ private slots:
 
     void setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible);
 
+    void playStopPreview(const bool &play);
     void playPreview();
+    void stopPreview();
 
     void setGraphEnabled(bool recording);
-
-    void setAllPointsRecord(bool allPointsRecord);
 private:
     QMenuBar *mAddBoxesListKeysViewWidgetsBar = new QMenuBar(this);
     QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
@@ -93,11 +93,11 @@ private:
 //    QPushButton *mGoToPreviousKeyButton;
 //    QPushButton *mGoToNextKeyButton;
 
-    QPushButton *mPlayButton;
+    ActionButton *mPlayButton;
 
     QPushButton *mGraphEnabledButton;
-    QPushButton *mAllPointsRecordButton;
-    QPushButton *mCtrlsAlwaysVisible;
+    ActionButton *mAllPointsRecordButton;
+    ActionButton *mCtrlsAlwaysVisible;
 
     AnimationDockWidget *mAnimationDockWidget;
 

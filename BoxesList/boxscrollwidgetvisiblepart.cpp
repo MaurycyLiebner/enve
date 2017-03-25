@@ -105,7 +105,8 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
                                       0, 0,
                                       &abstractions,
                                       mCurrentRulesCollection,
-                                      true);
+                                      true,
+                                      false);
 
     foreach(SingleWidgetAbstraction *abs, abstractions) {
         SingleWidgetTarget *target = abs->getTarget();

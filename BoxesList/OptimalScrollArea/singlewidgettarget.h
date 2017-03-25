@@ -62,10 +62,11 @@ public:
     void SWT_addChildAbstractionForTargetToAllAt(
             SingleWidgetTarget *target, const int &id);
 
-    virtual bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                                   const bool &parentSatisfies) {
+    virtual bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                                     const bool &parentSatisfies,
+                                     const bool &parentMainTarget) {
         Q_UNUSED(rules);
-        return parentSatisfies;
+        return parentSatisfies && !parentMainTarget;
     }
 
     void SWT_scheduleWidgetsContentUpdateWithRule(

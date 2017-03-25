@@ -133,12 +133,12 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
             mMainWindow, SLOT(setResolutionPercentId(int)));
 
-    mPlayButton = new QPushButton(
-                QIcon(":/icons/play.png"), "", this);
-    mPlayButton->setSizePolicy(QSizePolicy::Maximum,
-                               QSizePolicy::Maximum);
-    connect(mPlayButton, SIGNAL(pressed()),
-            this, SLOT(playPreview()) );
+    mPlayButton = new ActionButton(
+                ":/icons/play.png",
+                "start preview", this);
+    mPlayButton->setCheckable(":/icons/stop.png");
+    connect(mPlayButton, SIGNAL(toggled(bool)),
+            this, SLOT(playStopPreview(bool)) );
 
     mGraphEnabledButton = new QPushButton(
                 QIcon(":/icons/graphDisabled.png"), "", this);
@@ -151,22 +151,18 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mGraphEnabledButton, SIGNAL(toggled(bool)),
             parent, SLOT(setGraphEnabled(bool)) );
 
-    mAllPointsRecordButton = new QPushButton(
-                QIcon(":/icons/recordSinglePoint.png"), "", this);
-    mAllPointsRecordButton->setSizePolicy(QSizePolicy::Maximum,
-                                          QSizePolicy::Maximum);
-    mAllPointsRecordButton->setCheckable(true);
-    connect(mAllPointsRecordButton, SIGNAL(toggled(bool)),
-            this, SLOT(setAllPointsRecord(bool)) );
+    mAllPointsRecordButton = new ActionButton(
+                ":/icons/recordSinglePoint.png",
+                "start preview", this);
+    mAllPointsRecordButton->setCheckable(":/icons/recordAllPoints.png");
     connect(mAllPointsRecordButton, SIGNAL(toggled(bool)),
             parent, SLOT(setAllPointsRecord(bool)) );
 
-    mCtrlsAlwaysVisible = new QPushButton(
-                QIcon(":/icons/ctrlsNotAlwaysVisible.png"), "", this);
-    mCtrlsAlwaysVisible->setSizePolicy(QSizePolicy::Maximum,
-                               QSizePolicy::Maximum);
-    mCtrlsAlwaysVisible->setCheckable(true);
-    mCtrlsAlwaysVisible->setChecked(false);
+    mCtrlsAlwaysVisible = new ActionButton(
+                ":/icons/ctrlsNotAlwaysVisible.png",
+                "", this);
+
+    mCtrlsAlwaysVisible->setCheckable(":/icons/ctrlsAlwaysVisible.png");
     connect(mCtrlsAlwaysVisible, SIGNAL(toggled(bool)),
             this, SLOT(setCtrlsAlwaysVisible(bool)) );
 
@@ -295,30 +291,25 @@ bool BoxesListAnimationDockWidget::processFilteredKeyEvent(
     return false;//mBoxesList->processFilteredKeyEvent(event);
 }
 
-void BoxesListAnimationDockWidget::setPlaying(bool playing) {
-    if(playing) {
-        mPlayButton->setIcon(QIcon(":/icons/stop.png") );
-        disconnect(mPlayButton, SIGNAL(pressed()),
-                this, SLOT(playPreview()) );
-        connect(mPlayButton, SIGNAL(pressed()),
-                mMainWindow->getCanvasWidget(), SLOT(interruptPreview()) );
+void BoxesListAnimationDockWidget::previewFinished() {
+    //setPlaying(false);
+    mPlayButton->setChecked(false);
+}
+
+void BoxesListAnimationDockWidget::playStopPreview(const bool &play) {
+    if(play) {
+        playPreview();
     } else {
-        mPlayButton->setIcon(QIcon(":/icons/play.png") );
-        disconnect(mPlayButton, SIGNAL(pressed()),
-                mMainWindow->getCanvasWidget(), SLOT(interruptPreview()) );
-        connect(mPlayButton, SIGNAL(pressed()),
-                this, SLOT(playPreview()) );
+        stopPreview();
     }
 }
 
-void BoxesListAnimationDockWidget::previewFinished()
-{
-    setPlaying(false);
+void BoxesListAnimationDockWidget::stopPreview() {
+    mMainWindow->getCanvasWidget()->interruptPreview();
 }
 
-void BoxesListAnimationDockWidget::playPreview()
-{
-    setPlaying(true);
+
+void BoxesListAnimationDockWidget::playPreview() {
     mMainWindow->getCanvasWidget()->playPreview();
 }
 
@@ -331,26 +322,8 @@ void BoxesListAnimationDockWidget::setGraphEnabled(bool graphEnabled)
     }
 }
 
-void BoxesListAnimationDockWidget::setAllPointsRecord(bool allPointsRecord)
-{
-    if(allPointsRecord) {
-        mAllPointsRecordButton->setIcon(
-                    QIcon(":/icons/recordAllPoints.png") );
-    } else {
-        mAllPointsRecordButton->setIcon(
-                    QIcon(":/icons/recordSinglePoint.png") );
-    }
-}
-
 void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
         bool ctrlsAlwaysVisible) {
-    if(ctrlsAlwaysVisible) {
-        mCtrlsAlwaysVisible->setIcon(
-                    QIcon(":/icons/ctrlsAlwaysVisible.png"));
-    } else {
-        mCtrlsAlwaysVisible->setIcon(
-                    QIcon(":/icons/ctrlsNotAlwaysVisible.png"));
-    }
     BoxesGroup::setCtrlsAlwaysVisible(ctrlsAlwaysVisible);
     mMainWindow->callUpdateSchedulers();
 }

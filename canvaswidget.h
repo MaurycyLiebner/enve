@@ -144,6 +144,7 @@ public slots:
     void setCircleMode();
     void setTextMode();
     void setParticleBoxMode();
+    void setParticleEmitterMode();
 
     void raiseAction();
     void lowerAction();

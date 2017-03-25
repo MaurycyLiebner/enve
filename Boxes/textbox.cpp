@@ -2,9 +2,11 @@
 #include <QInputDialog>
 #include "mainwindow.h"
 
-TextBox::TextBox(BoxesGroup *parent) : PathBox(parent, TYPE_TEXT)
-{
+TextBox::TextBox(BoxesGroup *parent) : PathBox(parent, TYPE_TEXT) {
     setName("text");
+
+    mFillPaintSettings.setCurrentColor(Color(0, 0, 0));
+    mStrokeSettings.setPaintType(PaintType::NOPAINT);
 }
 
 #include <QSqlError>
@@ -81,37 +83,40 @@ void TextBox::drawSelected(QPainter *p,
 #include <QApplication>
 #include <QDesktopWidget>
 
-void TextBox::openTextEditor()
-{
+void TextBox::openTextEditor() {
     bool ok;
     QString text =
             QInputDialog::getMultiLineText(mMainWindow, getName() + " text",
                                            "Text:", mText, &ok);
     if(ok) {
         setText(text);
+        callUpdateSchedulers();
     }
 }
 
-void TextBox::setText(QString text)
-{
+void TextBox::setText(QString text) {
+    clearCache();
     mText = text;
     schedulePathUpdate();
 }
 
 void TextBox::setFont(QFont font)
 {
+    clearCache();
     mFont = font;
     schedulePathUpdate();
 }
 
 void TextBox::setSelectedFontSize(qreal size)
 {
+    clearCache();
     mFont.setPointSize(size);
     schedulePathUpdate();
 }
 
 void TextBox::setSelectedFontFamilyAndStyle(QString fontFamily, QString fontStyle)
 {
+    clearCache();
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);
     schedulePathUpdate();

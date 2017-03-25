@@ -16,15 +16,23 @@ public:
                             ScrollWidgetVisiblePart *visiblePart);
     virtual ~SingleWidgetAbstraction();
 
+    bool getAbstractions(const int &minY, const int &maxY,
+                         int *currY, int currX,
+                         QList<SingleWidgetAbstraction *> *abstractions,
+                         const SWT_RulesCollection &rules,
+                         const bool &parentSatisfiesRule,
+                         const bool &parentMainTarget);
     bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
-                                     int currY, int currX,
+                                     int *currY, int currX,
                                      QList<SingleWidget*> *widgets,
                                      int *currentWidgetId,
                                      const SWT_RulesCollection &rules,
-                                     const bool &parentSatisfiesRule);
+                                     const bool &parentSatisfiesRule,
+                                     const bool &parentMainTarget);
 
     int getHeight(const SWT_RulesCollection &rules,
-                  const bool &parentSatisfiesRule);
+                  const bool &parentSatisfiesRule,
+                  const bool &parentMainTarget);
 
     void setContentVisible(const bool &bT);
 
@@ -72,11 +80,6 @@ public:
 
     void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
                                          const int &id);
-    bool getAbstractions(const int &minY, const int &maxY,
-                         int currY, int currX,
-                         QList<SingleWidgetAbstraction *> *abstractions,
-                         const SWT_RulesCollection &rules,
-                         const bool &parentSatisfiesRule);
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 

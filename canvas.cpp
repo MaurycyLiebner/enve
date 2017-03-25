@@ -892,8 +892,9 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
 //    mCurrentBoxesGroup->removeChild(pathSrc->getParentBox());
 }
 
-bool Canvas::SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                               const bool &parentSatisfies) {
+bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                                 const bool &parentSatisfies,
+                                 const bool &) {
     Q_UNUSED(parentSatisfies);
     const SWT_Rule &rule = rules.rule;
     const SWT_Type &type = rules.type;

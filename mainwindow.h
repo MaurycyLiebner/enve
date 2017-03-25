@@ -181,6 +181,7 @@ private:
     ActionButton *mTextMode;
 
     ActionButton *mParticleBoxMode;
+    ActionButton *mParticleEmitterMode;
 //
     ActionButton *mActionConnectPoints;
     ActionButton *mActionDisconnectPoints;

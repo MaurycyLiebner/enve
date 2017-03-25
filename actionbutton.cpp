@@ -15,7 +15,9 @@ void ActionButton::setCheckable(const QString &checkedPix) {
 }
 
 void ActionButton::mousePressEvent(QMouseEvent *) {
+    setChecked(!mChecked);
     emit pressed();
+    emit toggled(mChecked);
 }
 
 void ActionButton::enterEvent(QEvent *) {

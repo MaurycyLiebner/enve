@@ -333,12 +333,20 @@ void MainWindow::setupToolBar() {
     mTextMode->setCheckable(":/icons/draw_text_checked.png");
     mToolBar->addWidget(mTextMode);
 
+    mToolBar->addSeparator();
+
     mParticleBoxMode = new ActionButton(
-                ":/icons/draw_rect.png",
+                ":/icons/draw_particle_box.png",
                 "F7", this);
-    mParticleBoxMode->setCheckable(":/icons/draw_rect_checked.png");
+    mParticleBoxMode->setCheckable(":/icons/draw_particle_box_checked.png");
     mToolBar->addWidget(mParticleBoxMode);
 
+    mParticleEmitterMode = new ActionButton(
+                ":/icons/draw_particle_emitter.png",
+                "F8", this);
+    mParticleEmitterMode->setCheckable(
+                ":/icons/draw_particle_emitter_checked.png");
+    mToolBar->addWidget(mParticleEmitterMode);
 
     mToolBar->addSeparator();
 
@@ -444,6 +452,8 @@ void MainWindow::connectToolBarActions() {
             mCanvasWidget, SLOT(setTextMode()) );
     connect(mParticleBoxMode, SIGNAL(pressed()),
             mCanvasWidget, SLOT(setParticleBoxMode()) );
+    connect(mParticleEmitterMode, SIGNAL(pressed()),
+            mCanvasWidget, SLOT(setParticleEmitterMode()));
     connect(mActionConnectPoints, SIGNAL(pressed()),
             mCanvasWidget, SLOT(connectPointsSlot()) );
     connect(mActionDisconnectPoints, SIGNAL(pressed()),
@@ -527,6 +537,8 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mCircleMode->setChecked(currentMode == ADD_CIRCLE);
     mRectangleMode->setChecked(currentMode == ADD_RECTANGLE);
     mTextMode->setChecked(currentMode == ADD_TEXT);
+    mParticleBoxMode->setChecked(currentMode == ADD_PARTICLE_BOX);
+    mParticleEmitterMode->setChecked(currentMode == ADD_PARTICLE_EMITTER);
 }
 
 //void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)

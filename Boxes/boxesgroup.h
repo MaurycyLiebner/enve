@@ -128,8 +128,9 @@ public:
                                      ScrollWidgetVisiblePart *visiblePartWidget);
     SWT_Type SWT_getType() { return SWT_BoxesGroup; }
 
-    bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                           const bool &parentSatisfies);
+    bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                             const bool &parentSatisfies,
+                             const bool &parentMainTarget);
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();

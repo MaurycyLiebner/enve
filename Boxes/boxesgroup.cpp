@@ -687,14 +687,17 @@ void BoxesGroup::SWT_addChildrenAbstractions(
     }
 }
 
-bool BoxesGroup::SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                                   const bool &parentSatisfies) {
+bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                                     const bool &parentSatisfies,
+                                     const bool &parentMainTarget) {
     const SWT_Rule &rule = rules.rule;
     if(rule == SWT_Selected) {
-        return BoundingBox::SWT_satisfiesRule(rules,
-                                              parentSatisfies) &&
+        return BoundingBox::SWT_shouldBeVisible(rules,
+                                                parentSatisfies,
+                                                parentMainTarget) &&
                 !isCurrentGroup();
     }
-    return BoundingBox::SWT_satisfiesRule(rules,
-                                          parentSatisfies);
+    return BoundingBox::SWT_shouldBeVisible(rules,
+                                            parentSatisfies,
+                                            parentMainTarget);
 }

@@ -339,8 +339,9 @@ public:
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
 
-    bool SWT_satisfiesRule(const SWT_RulesCollection &rules,
-                           const bool &parentSatisfies);
+    bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                             const bool &parentSatisfies,
+                             const bool &);
 
     bool SWT_visibleOnlyIfParentDescendant() {
         return false;

@@ -191,11 +191,12 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
     mMainAbstraction->setSingleWidgetAbstractions(
                 mVisibleTop,
                 mVisibleTop + mVisibleHeight + 10,
-                currY, currX,
+                &currY, currX,
                 &mSingleWidgets,
                 &idP,
                 mCurrentRulesCollection,
-                true);
+                true,
+                false);
 
     for(int i = idP; i < mSingleWidgets.count(); i++) {
         mSingleWidgets.at(i)->hide();

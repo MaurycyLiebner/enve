@@ -53,6 +53,19 @@ public:
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
+
+    bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                             const bool &parentSatisfies,
+                             const bool &parentMainTarget) {
+        if(hasChildAnimators()) {
+            return QrealAnimator::SWT_shouldBeVisible(rules,
+                                                      parentSatisfies,
+                                                      parentMainTarget);
+        } else {
+            return false;
+        }
+    }
+
     SWT_Type SWT_getType() { return SWT_ComplexAnimator; }
     void drawKey(QPainter *p, QrealKey *key,
                  const qreal &pixelsPerFrame,
