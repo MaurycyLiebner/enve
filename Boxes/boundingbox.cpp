@@ -873,17 +873,19 @@ QrealKey *BoundingBox::getKeyAtPos(const qreal &relX,
                                      pixelsPerFrame);
 }
 
-int BoundingBox::getFrameShift() {
-    int parentShift;
+int BoundingBox::getParentFrameShift() const {
     if(mParent == NULL) {
-        parentShift = 0;
+        return 0;
     } else {
-        parentShift = mParent->getFrameShift();
+        return mParent->getFrameShift();
     }
+}
+
+int BoundingBox::getFrameShift() const {
     if(mDurationRectangle == NULL) {
-        return parentShift;
+        return getParentFrameShift();
     } else {
-        return mDurationRectangle->getFramePos() + parentShift;
+        return mDurationRectangle->getFramePos() + getParentFrameShift();
     }
 }
 

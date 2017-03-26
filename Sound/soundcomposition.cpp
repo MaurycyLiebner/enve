@@ -20,12 +20,12 @@ void SoundComposition::start()
 void SoundComposition::stop() {
     mPos = 0;
     close();
+    mBuffer.clear();
 }
 
 void SoundComposition::generateData(const int &startFrame,
                                     const int &endFrame,
                                     const qreal &fps) {
-    mBuffer.clear();
     if(mSounds.isEmpty()) return;
 
     int nSamples = (endFrame - startFrame)*SAMPLERATE/fps;

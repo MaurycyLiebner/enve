@@ -14,6 +14,8 @@ public:
 
     int getFramePos() const;
 
+    int getFrameShift() const;
+
     virtual DurationRectangleMovable *getMovableAt(
                       const int &pressX,
                       const qreal &pixelsPerFrame,
@@ -46,6 +48,8 @@ class DurationRectangle : public DurationRectangleMovable {
     Q_OBJECT
 public:
     DurationRectangle();
+
+    int getFrameShift();
 
     void setFramesDuration(const int &duration);
 
@@ -88,9 +92,13 @@ public:
     Qt::CursorShape getHoverCursorShape() {
         return Qt::OpenHandCursor;
     }
+
+    void bindToPossibleFrameRange();
+    void setBindToPossibleFrameRange();
 signals:
     void changed();
 protected:
+    bool mBoundToPossible = false;
     bool mSetMaxFrameAtLeastOnce = false;
     bool mShowPossibleFrameRange = false;
     int mMinPossibleFrame = 0;

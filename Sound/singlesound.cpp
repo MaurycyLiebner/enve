@@ -165,6 +165,7 @@ void SingleSound::setDurationRect(DurationRectangle *durRect) {
         mOwnDurationRectangle = true;
         mDurationRectangle = new DurationRectangle();
         mDurationRectangle->setPossibleFrameRangeVisible();
+        mDurationRectangle->setBindToPossibleFrameRange();
         connect(mDurationRectangle, SIGNAL(changed()),
                 this, SLOT(updateAfterShifted()));
     } else {

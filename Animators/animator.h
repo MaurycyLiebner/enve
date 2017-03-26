@@ -67,6 +67,8 @@ public:
     virtual void startDragging() {}
 
     virtual int getFrameShift() const;
+    virtual int getParentFrameShift() const;
+
     void updateRelFrame();
     int absFrameToRelFrame(const int &absFrame) const;
     int relFrameToAbsFrame(const int &relFrame) const;

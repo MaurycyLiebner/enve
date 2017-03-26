@@ -425,7 +425,8 @@ public:
     QrealKey *getKeyAtPos(const qreal &relX,
                           const int &minViewedFrame,
                           const qreal &pixelsPerFrame);
-    int getFrameShift();
+    int getFrameShift() const;
+    int getParentFrameShift() const;
 
     void setDurationRectangle(DurationRectangle *durationRect);
 

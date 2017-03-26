@@ -182,6 +182,9 @@ int DurationRectangle::getMaxPossibleFrame() {
 
 void DurationRectangle::setMinPossibleFrame(const int &minPossibleFrame) {
     mMinPossibleFrame = minPossibleFrame;
+    if(mBoundToPossible) {
+        bindToPossibleFrameRange();
+    }
 }
 
 void DurationRectangle::setMaxPossibleFrame(const int &maxPossibleFrame) {
@@ -197,6 +200,9 @@ void DurationRectangle::setMaxPossibleFrame(const int &maxPossibleFrame) {
         setMaxFrame(maxPossibleFrame);
         mMinFrame.setMaxPos(maxPossibleFrame);
     }
+    if(mBoundToPossible) {
+        bindToPossibleFrameRange();
+    }
 }
 
 void DurationRectangle::setPossibleFrameDuration(const int &frameDuration) {
@@ -205,4 +211,21 @@ void DurationRectangle::setPossibleFrameDuration(const int &frameDuration) {
 
 int DurationRectangle::getPossibleFrameDuration() {
     return mMaxPossibleFrame - mMinPossibleFrame;
+}
+
+void DurationRectangle::bindToPossibleFrameRange() {
+    if(getMinFrame() < getMinPossibleFrame() ||
+       getMinFrame() >= getMaxPossibleFrame()) {
+        setMinFrame(getMinPossibleFrame());
+    }
+    mMinFrame.setMinPos(getMinPossibleFrame());
+    if(getMaxFrame() > getMaxPossibleFrame() ||
+       getMaxFrame() <= getMinPossibleFrame()) {
+        setMaxFrame(getMaxPossibleFrame());
+    }
+    mMaxFrame.setMaxPos(getMaxPossibleFrame());
+}
+
+void DurationRectangle::setBindToPossibleFrameRange() {
+    mBoundToPossible = true;
 }

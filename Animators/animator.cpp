@@ -28,6 +28,10 @@ void Animator::switchRecording() {
 }
 
 int Animator::getFrameShift() const {
+    return getParentFrameShift();
+}
+
+int Animator::getParentFrameShift() const {
     if(mParentAnimator == NULL) {
         return 0;
     }
