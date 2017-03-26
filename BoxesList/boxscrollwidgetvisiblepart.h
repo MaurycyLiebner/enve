@@ -8,6 +8,7 @@
 class BoxSingleWidget;
 class QrealKey;
 class DurationRectangleMovable;
+class Key;
 
 class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart
 {
@@ -22,13 +23,13 @@ public:
                   const qreal &pixelsPerFrame,
                   const int &minViewedFrame,
                   const int &maxViewedFrame);
-    QrealKey *getKeyAtPos(const int &pressX,
+    Key *getKeyAtPos(const int &pressX,
                           const int &pressY,
                           const qreal &pixelsPerFrame,
                           const int &minViewedFrame);
     void getKeysInRect(QRectF selectionRect,
                        qreal pixelsPerFrame,
-                       QList<QrealKey *> *listKeys);
+                       QList<Key *> *listKeys);
 
     BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
             const SWT_Types &type, const int &yPos, bool *isBelow);

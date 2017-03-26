@@ -5,9 +5,9 @@ IntAnimator::IntAnimator() : QrealAnimator() {
 }
 
 int IntAnimator::getCurrentIntValue() const {
-    return qRound(getCurrentValue());
+    return qRound(qra_getCurrentValue());
 }
 
 void IntAnimator::setCurrentIntValue(int value, bool finish) {
-    setCurrentValue(value, finish);
+    qra_setCurrentValue(value, finish);
 }

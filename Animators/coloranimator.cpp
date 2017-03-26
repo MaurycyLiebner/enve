@@ -4,8 +4,8 @@
 
 ColorAnimator::ColorAnimator() : ComplexAnimator()
 {
-    setName("color");
-    mAlphaAnimator.setName("alpha");
+    prp_setName("color");
+    mAlphaAnimator.prp_setName("alpha");
     setColorMode(RGBMODE);
 
     addChildAnimator(&mVal1Animator);
@@ -13,16 +13,16 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
     addChildAnimator(&mVal3Animator);
     addChildAnimator(&mAlphaAnimator);
 
-    mVal1Animator.setValueRange(0., 1.);
+    mVal1Animator.qra_setValueRange(0., 1.);
     mVal1Animator.setPrefferedValueStep(0.05);
     mVal1Animator.freezeMinMaxValues();
-    mVal2Animator.setValueRange(0., 1.);
+    mVal2Animator.qra_setValueRange(0., 1.);
     mVal2Animator.setPrefferedValueStep(0.05);
     mVal2Animator.freezeMinMaxValues();
-    mVal3Animator.setValueRange(0., 1.);
+    mVal3Animator.qra_setValueRange(0., 1.);
     mVal3Animator.setPrefferedValueStep(0.05);
     mVal3Animator.freezeMinMaxValues();
-    mAlphaAnimator.setValueRange(0., 1.);
+    mAlphaAnimator.qra_setValueRange(0., 1.);
     mAlphaAnimator.setPrefferedValueStep(0.05);
     mAlphaAnimator.freezeMinMaxValues();
 
@@ -56,12 +56,12 @@ void ColorAnimator::loadFromSql(int sqlId)
 }
 
 #include <QSqlError>
-int ColorAnimator::saveToSql(QSqlQuery *query)
+int ColorAnimator::prp_saveToSql(QSqlQuery *query)
 {
-    int val1AnimatorId = mVal1Animator.saveToSql(query);
-    int val2AnimatorId = mVal2Animator.saveToSql(query);
-    int val3AnimatorId = mVal3Animator.saveToSql(query);
-    int alphaAnimatorId = mAlphaAnimator.saveToSql(query);
+    int val1AnimatorId = mVal1Animator.prp_saveToSql(query);
+    int val2AnimatorId = mVal2Animator.prp_saveToSql(query);
+    int val3AnimatorId = mVal3Animator.prp_saveToSql(query);
+    int alphaAnimatorId = mAlphaAnimator.prp_saveToSql(query);
     if(!query->exec(QString("INSERT INTO coloranimator (colormode, val1animatorid, "
                        "val2animatorid, val3animatorid, alphaanimatorid) "
                 "VALUES (%1, %2, %3, %4, %5)").
@@ -75,54 +75,54 @@ int ColorAnimator::saveToSql(QSqlQuery *query)
     return query->lastInsertId().toInt();
 }
 
-void ColorAnimator::setCurrentValue(Color colorValue, bool finish)
+void ColorAnimator::qra_setCurrentValue(Color colorValue, bool finish)
 {
     if(mColorMode == RGBMODE) {
-        mVal1Animator.setCurrentValue(colorValue.gl_r, finish);
-        mVal2Animator.setCurrentValue(colorValue.gl_g, finish);
-        mVal3Animator.setCurrentValue(colorValue.gl_b, finish);
+        mVal1Animator.qra_setCurrentValue(colorValue.gl_r, finish);
+        mVal2Animator.qra_setCurrentValue(colorValue.gl_g, finish);
+        mVal3Animator.qra_setCurrentValue(colorValue.gl_b, finish);
     } else if(mColorMode == HSVMODE) {
-        mVal1Animator.setCurrentValue(colorValue.gl_h, finish);
-        mVal2Animator.setCurrentValue(colorValue.gl_s, finish);
-        mVal3Animator.setCurrentValue(colorValue.gl_v, finish);
+        mVal1Animator.qra_setCurrentValue(colorValue.gl_h, finish);
+        mVal2Animator.qra_setCurrentValue(colorValue.gl_s, finish);
+        mVal3Animator.qra_setCurrentValue(colorValue.gl_v, finish);
     } else { // HSLMODE
         float h = colorValue.gl_h;
         float s = colorValue.gl_s;
         float l = colorValue.gl_v;
         hsv_to_hsl(&h, &s, &l);
 
-        mVal1Animator.setCurrentValue(h, finish);
-        mVal2Animator.setCurrentValue(s, finish);
-        mVal3Animator.setCurrentValue(l, finish);
+        mVal1Animator.qra_setCurrentValue(h, finish);
+        mVal2Animator.qra_setCurrentValue(s, finish);
+        mVal3Animator.qra_setCurrentValue(l, finish);
     }
-    mAlphaAnimator.setCurrentValue(colorValue.gl_a, finish);
+    mAlphaAnimator.qra_setCurrentValue(colorValue.gl_a, finish);
 }
 
-void ColorAnimator::setCurrentValue(QColor qcolorValue, bool finish)
+void ColorAnimator::qra_setCurrentValue(QColor qcolorValue, bool finish)
 {
     Color color;
     color.setQColor(qcolorValue);
-    setCurrentValue(color, finish);
+    qra_setCurrentValue(color, finish);
 }
 
-Color ColorAnimator::getCurrentValue() const
+Color ColorAnimator::qra_getCurrentValue() const
 {
     Color color;
     if(mColorMode == RGBMODE) {
-        color.setRGB(mVal1Animator.getCurrentValue(),
-                     mVal2Animator.getCurrentValue(),
-                     mVal3Animator.getCurrentValue(),
-                     mAlphaAnimator.getCurrentValue() );
+        color.setRGB(mVal1Animator.qra_getCurrentValue(),
+                     mVal2Animator.qra_getCurrentValue(),
+                     mVal3Animator.qra_getCurrentValue(),
+                     mAlphaAnimator.qra_getCurrentValue() );
     } else if(mColorMode == HSVMODE) {
-        color.setHSV(mVal1Animator.getCurrentValue(),
-                     mVal2Animator.getCurrentValue(),
-                     mVal3Animator.getCurrentValue(),
-                     mAlphaAnimator.getCurrentValue() );
+        color.setHSV(mVal1Animator.qra_getCurrentValue(),
+                     mVal2Animator.qra_getCurrentValue(),
+                     mVal3Animator.qra_getCurrentValue(),
+                     mAlphaAnimator.qra_getCurrentValue() );
     } else { // HSLMODE
-        color.setHSL(mVal1Animator.getCurrentValue(),
-                     mVal2Animator.getCurrentValue(),
-                     mVal3Animator.getCurrentValue(),
-                     mAlphaAnimator.getCurrentValue() );
+        color.setHSL(mVal1Animator.qra_getCurrentValue(),
+                     mVal2Animator.qra_getCurrentValue(),
+                     mVal3Animator.qra_getCurrentValue(),
+                     mAlphaAnimator.qra_getCurrentValue() );
     }
     return color;
 }
@@ -130,17 +130,17 @@ Color ColorAnimator::getCurrentValue() const
 void ColorAnimator::setColorMode(ColorMode colorMode)
 {
     if(colorMode == RGBMODE) {
-        mVal1Animator.setName("red");
-        mVal2Animator.setName("green");
-        mVal3Animator.setName("blue");
+        mVal1Animator.prp_setName("red");
+        mVal2Animator.prp_setName("green");
+        mVal3Animator.prp_setName("blue");
     } else if(colorMode == HSVMODE) {
-        mVal1Animator.setName("hue");
-        mVal2Animator.setName("saturation");
-        mVal3Animator.setName("value");
+        mVal1Animator.prp_setName("hue");
+        mVal2Animator.prp_setName("saturation");
+        mVal3Animator.prp_setName("value");
     } else { // HSLMODE
-        mVal1Animator.setName("hue");
-        mVal2Animator.setName("saturation");
-        mVal3Animator.setName("lightness");
+        mVal1Animator.prp_setName("hue");
+        mVal2Animator.prp_setName("saturation");
+        mVal3Animator.prp_setName("lightness");
     }
     if(mColorMode == colorMode) return;
 
@@ -161,34 +161,34 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
         return;
     }
 
-    foreach(QrealKey *key, mKeys) {
+    foreach(Key *key, anim_mKeys) {
         int frame = key->getAbsFrame();
 
-        qreal rF = mVal1Animator.getValueAtAbsFrame(frame);
-        qreal gF = mVal2Animator.getValueAtAbsFrame(frame);
-        qreal bF = mVal3Animator.getValueAtAbsFrame(frame);
+        qreal rF = mVal1Animator.qra_getValueAtAbsFrame(frame);
+        qreal gF = mVal2Animator.qra_getValueAtAbsFrame(frame);
+        qreal bF = mVal3Animator.qra_getValueAtAbsFrame(frame);
 
         foo(&rF, &gF, &bF);
 
-        mVal1Animator.saveValueToKey(frame, rF);
-        mVal2Animator.saveValueToKey(frame, gF);
-        mVal3Animator.saveValueToKey(frame, bF);
+        mVal1Animator.qra_saveValueToKey(frame, rF);
+        mVal2Animator.qra_saveValueToKey(frame, gF);
+        mVal3Animator.qra_saveValueToKey(frame, bF);
     }
 
-    if(!mKeys.isEmpty()) {
-        mVal1Animator.setRecordingWithoutChangingKeys(true);
-        mVal2Animator.setRecordingWithoutChangingKeys(true);
-        mVal3Animator.setRecordingWithoutChangingKeys(true);
+    if(!anim_mKeys.isEmpty()) {
+        mVal1Animator.anim_setRecordingWithoutChangingKeys(true);
+        mVal2Animator.anim_setRecordingWithoutChangingKeys(true);
+        mVal3Animator.anim_setRecordingWithoutChangingKeys(true);
     } else {
-        qreal crF = mVal1Animator.getCurrentValue();
-        qreal cgF = mVal2Animator.getCurrentValue();
-        qreal cbF = mVal3Animator.getCurrentValue();
+        qreal crF = mVal1Animator.qra_getCurrentValue();
+        qreal cgF = mVal2Animator.qra_getCurrentValue();
+        qreal cbF = mVal3Animator.qra_getCurrentValue();
 
         foo(&crF, &cgF, &cbF);
 
-        mVal1Animator.setCurrentValue(crF);
-        mVal2Animator.setCurrentValue(cgF);
-        mVal3Animator.setCurrentValue(cbF);
+        mVal1Animator.qra_setCurrentValue(crF);
+        mVal2Animator.qra_setCurrentValue(cgF);
+        mVal3Animator.qra_setCurrentValue(cbF);
     }
 
     mColorMode = colorMode;
@@ -198,46 +198,46 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
 
 void ColorAnimator::startVal1Transform()
 {
-    mVal1Animator.startTransform();
+    mVal1Animator.prp_startTransform();
 }
 
 void ColorAnimator::startVal2Transform()
 {
-    mVal2Animator.startTransform();
+    mVal2Animator.prp_startTransform();
 }
 
 void ColorAnimator::startVal3Transform()
 {
-    mVal3Animator.startTransform();
+    mVal3Animator.prp_startTransform();
 }
 
 void ColorAnimator::startAlphaTransform()
 {
-    mAlphaAnimator.startTransform();
+    mAlphaAnimator.prp_startTransform();
 }
 
 void ColorAnimator::setCurrentVal1Value(const qreal &val1,
                                         const bool &finish) {
-    mVal1Animator.setCurrentValue(val1, finish);
+    mVal1Animator.qra_setCurrentValue(val1, finish);
 }
 
 void ColorAnimator::setCurrentVal2Value(const qreal &val2,
                                         const bool &finish) {
-    mVal2Animator.setCurrentValue(val2, finish);
+    mVal2Animator.qra_setCurrentValue(val2, finish);
 }
 
 void ColorAnimator::setCurrentVal3Value(const qreal &val3,
                                         const bool &finish) {
-    mVal3Animator.setCurrentValue(val3, finish);
+    mVal3Animator.qra_setCurrentValue(val3, finish);
 }
 
 void ColorAnimator::setCurrentAlphaValue(const qreal &alpha,
                                          const bool &finish) {
-    mAlphaAnimator.setCurrentValue(alpha, finish);
+    mAlphaAnimator.qra_setCurrentValue(alpha, finish);
 }
 
 #include <QMenu>
-void ColorAnimator::openContextMenu(QPoint pos) {
+void ColorAnimator::prp_openContextMenu(QPoint pos) {
     QMenu menu;
     menu.addAction("Add Key");
 
@@ -265,8 +265,8 @@ void ColorAnimator::openContextMenu(QPoint pos) {
     {
         if(selected_action->text() == "Add Key")
         {
-            if(!mIsRecording) {
-                setRecording(true);
+            if(!anim_mIsRecording) {
+                prp_setRecording(true);
             }
             saveCurrentValueAsKey();
         } else if(selected_action == rgbAction) {

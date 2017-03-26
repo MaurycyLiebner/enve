@@ -2,8 +2,8 @@
 
 QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 {
-    mXAnimator.setName("x");
-    mYAnimator.setName("y");
+    mXAnimator.prp_setName("x");
+    mYAnimator.prp_setName("y");
     addChildAnimator(&mXAnimator);
     addChildAnimator(&mYAnimator);
 
@@ -14,9 +14,9 @@ QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
-int QPointFAnimator::saveToSql(QSqlQuery *query) {
-    int xAnimatorId = mXAnimator.saveToSql(query);
-    int yAnimatorId = mYAnimator.saveToSql(query);
+int QPointFAnimator::prp_saveToSql(QSqlQuery *query) {
+    int xAnimatorId = mXAnimator.prp_saveToSql(query);
+    int yAnimatorId = mYAnimator.prp_saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO qpointfanimator (xanimatorid, yanimatorid ) "
                 "VALUES (%1, %2)").
@@ -46,8 +46,8 @@ void QPointFAnimator::loadFromSql(int posAnimatorId) {
     }
 }
 
-QPointF QPointFAnimator::getCurrentValue() const {
-    return QPointF(mXAnimator.getCurrentValue(), mYAnimator.getCurrentValue());
+QPointF QPointFAnimator::qra_getCurrentValue() const {
+    return QPointF(mXAnimator.qra_getCurrentValue(), mYAnimator.qra_getCurrentValue());
 }
 
 QPointF QPointFAnimator::getCurrentPointValueAtFrame(const int &frame) {
@@ -56,8 +56,8 @@ QPointF QPointFAnimator::getCurrentPointValueAtFrame(const int &frame) {
 }
 
 QPointF QPointFAnimator::getPointValueAtFrame(const int &frame) {
-    return QPointF(mXAnimator.getValueAtAbsFrame(frame),
-                   mYAnimator.getValueAtAbsFrame(frame));
+    return QPointF(mXAnimator.qra_getValueAtAbsFrame(frame),
+                   mYAnimator.qra_getValueAtAbsFrame(frame));
 }
 
 void QPointFAnimator::setPrefferedValueStep(const qreal &valueStep) {
@@ -67,34 +67,34 @@ void QPointFAnimator::setPrefferedValueStep(const qreal &valueStep) {
 
 qreal QPointFAnimator::getXValue()
 {
-    return mXAnimator.getCurrentValue();
+    return mXAnimator.qra_getCurrentValue();
 }
 
 qreal QPointFAnimator::getYValue()
 {
-    return mYAnimator.getCurrentValue();
+    return mYAnimator.qra_getCurrentValue();
 }
 
-void QPointFAnimator::setCurrentValue(QPointF val, bool finish)
+void QPointFAnimator::qra_setCurrentValue(QPointF val, bool finish)
 {
-    mXAnimator.setCurrentValue(val.x(), finish);
-    mYAnimator.setCurrentValue(val.y(), finish);
+    mXAnimator.qra_setCurrentValue(val.x(), finish);
+    mYAnimator.qra_setCurrentValue(val.y(), finish);
 }
 
-void QPointFAnimator::setValueRange(qreal minVal, qreal maxVal) {
-    mXAnimator.setValueRange(minVal, maxVal);
-    mYAnimator.setValueRange(minVal, maxVal);
+void QPointFAnimator::qra_setValueRange(qreal minVal, qreal maxVal) {
+    mXAnimator.qra_setValueRange(minVal, maxVal);
+    mYAnimator.qra_setValueRange(minVal, maxVal);
 }
 
-void QPointFAnimator::incCurrentValue(qreal x, qreal y)
+void QPointFAnimator::qra_incCurrentValue(qreal x, qreal y)
 {
-    mXAnimator.incCurrentValue(x);
-    mYAnimator.incCurrentValue(y);
+    mXAnimator.qra_incCurrentValue(x);
+    mYAnimator.qra_incCurrentValue(y);
 }
 
-void QPointFAnimator::incAllValues(qreal x, qreal y) {
-    mXAnimator.incAllValues(x);
-    mYAnimator.incAllValues(y);
+void QPointFAnimator::qra_incAllValues(qreal x, qreal y) {
+    mXAnimator.qra_incAllValues(x);
+    mYAnimator.qra_incAllValues(y);
 }
 
 void QPointFAnimator::incSavedValueToCurrentValue(qreal incXBy, qreal incYBy) {
@@ -135,23 +135,23 @@ void QPointFAnimator::multSavedValueToCurrentValue(qreal sx, qreal sy)
     mYAnimator.multSavedValueToCurrentValue(sy);
 }
 
-void QPointFAnimator::multCurrentValue(qreal sx, qreal sy)
+void QPointFAnimator::qra_multCurrentValue(qreal sx, qreal sy)
 {
-    mXAnimator.multCurrentValue(sx);
-    mYAnimator.multCurrentValue(sy);
+    mXAnimator.qra_multCurrentValue(sx);
+    mYAnimator.qra_multCurrentValue(sy);
 }
 
-QPointF QPointFAnimator::getSavedValue()
+QPointF QPointFAnimator::qra_getSavedValue()
 {
-    return QPointF(mXAnimator.getSavedValue(), mYAnimator.getSavedValue() );
+    return QPointF(mXAnimator.qra_getSavedValue(), mYAnimator.qra_getSavedValue() );
 }
 
 qreal QPointFAnimator::getSavedXValue()
 {
-    return mXAnimator.getSavedValue();
+    return mXAnimator.qra_getSavedValue();
 }
 
 qreal QPointFAnimator::getSavedYValue()
 {
-    return mYAnimator.getSavedValue();
+    return mYAnimator.qra_getSavedValue();
 }

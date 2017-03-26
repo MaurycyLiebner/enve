@@ -7,7 +7,7 @@
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 
 class ComplexAnimator;
-class QrealKey;
+class Key;
 class QrealAnimator;
 class QPainter;
 class AnimatorUpdater;
@@ -21,84 +21,86 @@ public:
     Property();
     virtual ~Property() {}
 
-    virtual void setUpdater(AnimatorUpdater *updater) {
-        Q_UNUSED(updater);
-    }
-
-    virtual void callUpdater() {}
-
-    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY,
-                          int startFrame, int endFrame) {
+    virtual void prp_drawKeys(QPainter *p,
+                              qreal pixelsPerFrame, qreal drawY,
+                              int startFrame, int endFrame) {
         Q_UNUSED(p);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(drawY);
         Q_UNUSED(startFrame);
         Q_UNUSED(endFrame);
     }
-    virtual void getKeysInRect(QRectF selectionRect,
-                               qreal pixelsPerFrame,
-                               QList<QrealKey *> *keysList) {
+    virtual void prp_getKeysInRect(QRectF selectionRect,
+                                   qreal pixelsPerFrame,
+                                   QList<Key *> *keysList) {
         Q_UNUSED(selectionRect);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(keysList);
     }
 
-    virtual QrealKey *getKeyAtPos(qreal relX, int minViewedFrame,
-                                  qreal pixelsPerFrame) {
+    virtual Key *prp_getKeyAtPos(qreal relX, int minViewedFrame,
+                                 qreal pixelsPerFrame) {
         Q_UNUSED(relX);
         Q_UNUSED(minViewedFrame);
         Q_UNUSED(pixelsPerFrame);
+        return NULL;
     }
 
-    virtual void cancelTransform() {}
+    virtual void prp_cancelTransform() {}
 
-    virtual void startTransform() {}
+    virtual void prp_startTransform() {}
 
-    virtual void finishTransform() {}
+    virtual void prp_finishTransform() {}
 
-    virtual void retrieveSavedValue() {}
+    virtual void prp_retrieveSavedValue() {}
 
-    virtual void sortKeys() {}
+    virtual void prp_setAbsFrame(int frame) { Q_UNUSED(frame); }
 
-    virtual void setAbsFrame(int frame) { Q_UNUSED(frame); }
+    virtual void prp_switchRecording() {}
 
-    virtual void switchRecording() {}
+    virtual void anim_updateKeyOnCurrrentFrame() {}
 
-    virtual void updateKeyOnCurrrentFrame() {}
+    virtual bool prp_isKeyOnCurrentFrame() { return false; }
 
-    virtual bool isKeyOnCurrentFrame() { return false; }
+    virtual bool prp_isDescendantRecording() { return false; }
 
-    virtual bool isDescendantRecording() { return false; }
+    virtual QString prp_getValueText() { return ""; }
 
-    virtual QString getValueText() {}
+    virtual void prp_clearFromGraphView() {}
 
-    virtual void clearFromGraphView() {}
+    virtual void prp_openContextMenu(QPoint pos) { Q_UNUSED(pos); }
 
-    virtual void openContextMenu(QPoint pos) { Q_UNUSED(pos); }
+    virtual int prp_saveToSql(QSqlQuery*) {} // sould be abstract
 
-    virtual int saveToSql(QSqlQuery*) {}
+    virtual bool prp_hasKeys() { return false; }
 
-    virtual bool hasKeys() { return false; }
+    ComplexAnimator *prp_getParentAnimator() const { return prp_mParentAnimator; }
+    void prp_setParentAnimator(ComplexAnimator *parentAnimator);
+    void prp_setZValue(const int &oldIndex, const int &newIndex);
 
-    ComplexAnimator *getParentAnimator() const { return mParentAnimator; }
-    void setParentAnimator(ComplexAnimator *parentAnimator);
-    void setZValue(const int &oldIndex, const int &newIndex);
+    virtual bool prp_isAnimator() { return false; }
+    virtual void prp_startDragging() {}
 
-    virtual bool isAnimator() { return false; }
-    virtual void startDragging() {}
+    virtual bool prp_isRecording() { return false; }
+    virtual void prp_removeAllKeysFromComplexAnimator() {}
+    virtual void prp_setTransformed(bool bT) { Q_UNUSED(bT); }
+    virtual void prp_addAllKeysToComplexAnimator() {}
 
-    virtual bool isRecording() { return false; }
-    virtual void removeAllKeysFromComplexAnimator() {}
-    virtual void setTransformed(bool bT) { Q_UNUSED(bT); }
-    virtual void addAllKeysToComplexAnimator() {}
+    QString prp_getName();
+    void prp_setName(QString newName);
 
-    QString getName();
-    void setName(QString newName);
+    virtual void prp_setUpdater(AnimatorUpdater *updater);
+    virtual void prp_callUpdater();
+    void prp_blockUpdater();
+    void prp_callFinishUpdater();
 public slots:
-    virtual void setRecording(bool rec) { Q_UNUSED(rec); }
+    virtual void prp_setRecording(bool rec) { Q_UNUSED(rec); }
 protected:
-    QString mName = "";
-    ComplexAnimator *mParentAnimator = NULL;
+    AnimatorUpdater *prp_mUpdater = NULL;
+    bool prp_mUpdaterBlocked = false;
+
+    QString prp_mName = "";
+    ComplexAnimator *prp_mParentAnimator = NULL;
 };
 
 #endif // PROPERTY_H

@@ -675,11 +675,11 @@ public:
     }
 
     void redo() {
-        mAnimator->setCurrentValue(mNewValue);
+        mAnimator->qra_setCurrentValue(mNewValue);
     }
 
     void undo() {
-        mAnimator->setCurrentValue(mOldValue);
+        mAnimator->qra_setCurrentValue(mOldValue);
     }
 
 private:
@@ -704,11 +704,13 @@ public:
     }
 
     void redo() {
-        mTargetKey->getParentAnimator()->saveValueToKey(mTargetKey, mNewValue, false);
+        ((QrealAnimator*)mTargetKey->getParentAnimator())->
+                qra_saveValueToKey(mTargetKey, mNewValue, false);
     }
 
     void undo() {
-        mTargetKey->getParentAnimator()->saveValueToKey(mTargetKey, mOldValue, false);
+        ((QrealAnimator*)mTargetKey->getParentAnimator())->
+                qra_saveValueToKey(mTargetKey, mOldValue, false);
     }
 
 private:
@@ -717,41 +719,41 @@ private:
     QrealKey *mTargetKey;
 };
 
-class ChangeQrealKeyFrameUndoRedo : public UndoRedo
+class ChangeKeyFrameUndoRedo : public UndoRedo
 {
 public:
-    ChangeQrealKeyFrameUndoRedo(int oldFrame, int newFrame, QrealKey *key) :
-        UndoRedo("ChangeQrealKeyFrameUndoRedo") {
+    ChangeKeyFrameUndoRedo(int oldFrame, int newFrame, Key *key) :
+        UndoRedo("ChangeKeyFrameUndoRedo") {
         mOldFrame = oldFrame;
         mNewFrame = newFrame;
         mTargetKey = key;
         key->incNumberPointers();
     }
 
-    ~ChangeQrealKeyFrameUndoRedo() {
+    ~ChangeKeyFrameUndoRedo() {
         mTargetKey->decNumberPointers();
     }
 
     void redo() {
-        mTargetKey->getParentAnimator()->moveKeyToFrame(mTargetKey, mNewFrame);
+        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey, mNewFrame);
     }
 
     void undo() {
-        mTargetKey->getParentAnimator()->moveKeyToFrame(mTargetKey, mOldFrame);
+        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey, mOldFrame);
     }
 
 private:
     int mOldFrame;
     int mNewFrame;
-    QrealKey *mTargetKey;
+    Key *mTargetKey;
 };
 
-class QrealAnimatorRecordingSetUndoRedo : public UndoRedo
+class AnimatorRecordingSetUndoRedo : public UndoRedo
 {
 public:
-    QrealAnimatorRecordingSetUndoRedo(bool recordingOld,
-                                      bool recordingNew,
-                                      QrealAnimator *animator) :
+    AnimatorRecordingSetUndoRedo(bool recordingOld,
+                                 bool recordingNew,
+                                 Animator *animator) :
     UndoRedo("QrealAnimatorRecordingSetUndoRedo") {
         mRecordingOld = recordingOld;
         mRecordingNew = recordingNew;
@@ -759,28 +761,28 @@ public:
         mAnimator->incNumberPointers();
     }
 
-    ~QrealAnimatorRecordingSetUndoRedo() {
+    ~AnimatorRecordingSetUndoRedo() {
         mAnimator->decNumberPointers();
     }
 
     void undo() {
-        mAnimator->setRecordingWithoutChangingKeys(mRecordingOld, false);
+        mAnimator->anim_setRecordingWithoutChangingKeys(mRecordingOld, false);
     }
 
     void redo() {
-        mAnimator->setRecordingWithoutChangingKeys(mRecordingNew, false);
+        mAnimator->anim_setRecordingWithoutChangingKeys(mRecordingNew, false);
     }
 
 private:
     bool mRecordingOld;
     bool mRecordingNew;
-    QrealAnimator *mAnimator;
+    Animator *mAnimator;
 };
 
-class AddQrealKeyToAnimatorUndoRedo : public UndoRedo
+class AddKeyToAnimatorUndoRedo : public UndoRedo
 {
 public:
-    AddQrealKeyToAnimatorUndoRedo(QrealKey *key, QrealAnimator *animator) :
+    AddKeyToAnimatorUndoRedo(Key *key, Animator *animator) :
         UndoRedo("AddQrealKeyToAnimatorUndoRedo") {
         mKey = key;
         mAnimator = animator;
@@ -788,38 +790,39 @@ public:
         mKey->incNumberPointers();
     }
 
-    ~AddQrealKeyToAnimatorUndoRedo() {
+    ~AddKeyToAnimatorUndoRedo() {
         mAnimator->decNumberPointers();
         mKey->decNumberPointers();
     }
 
     void redo() {
-        mAnimator->appendKey(mKey, false);
+        mAnimator->anim_appendKey(mKey, false);
     }
 
     void undo() {
-        mAnimator->removeKey(mKey, false);
+        mAnimator->anim_removeKey(mKey, false);
     }
 
 private:
-    QrealKey *mKey;
-    QrealAnimator *mAnimator;
+    Key *mKey;
+    Animator *mAnimator;
 };
 
-class RemoveQrealKeyFromAnimatorUndoRedo : public AddQrealKeyToAnimatorUndoRedo
+class RemoveKeyFromAnimatorUndoRedo :
+        public AddKeyToAnimatorUndoRedo
 {
 public:
-    RemoveQrealKeyFromAnimatorUndoRedo(QrealKey *key, QrealAnimator *animator) :
-        AddQrealKeyToAnimatorUndoRedo(key, animator) {
+    RemoveKeyFromAnimatorUndoRedo(Key *key, Animator *animator) :
+        AddKeyToAnimatorUndoRedo(key, animator) {
 
     }
 
     void redo() {
-        AddQrealKeyToAnimatorUndoRedo::undo();
+        AddKeyToAnimatorUndoRedo::undo();
     }
 
     void undo() {
-        AddQrealKeyToAnimatorUndoRedo::redo();
+        AddKeyToAnimatorUndoRedo::redo();
     }
 };
 

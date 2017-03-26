@@ -12,7 +12,7 @@ PathPivot::PathPivot(Canvas *parent) :
 }
 
 void PathPivot::startTransform() {
-    mRelPos.setTransformed(false);
+    mRelPos.prp_setTransformed(false);
     MovablePoint::startTransform();
 }
 

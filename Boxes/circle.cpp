@@ -19,12 +19,12 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
     QrealAnimator *hXAnimator = mHorizontalRadiusPoint->
                                     getRelativePosAnimatorPtr()->getXAnimator();
     addActiveAnimator(hXAnimator);
-    hXAnimator->setName("horizontal radius");
+    hXAnimator->prp_setName("horizontal radius");
 
     QrealAnimator *vYAnimator = mVerticalRadiusPoint->
                                     getRelativePosAnimatorPtr()->getYAnimator();
     addActiveAnimator(vYAnimator);
-    vYAnimator->setName("vertical radius");
+    vYAnimator->prp_setName("vertical radius");
 
 
     mCenter->setVerticalAndHorizontalPoints(mVerticalRadiusPoint,
@@ -141,9 +141,9 @@ MovablePoint *Circle::getPointAt(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode) {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
         }
     }
     if(pointToReturn == NULL) {

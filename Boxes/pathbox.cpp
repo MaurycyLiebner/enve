@@ -18,10 +18,10 @@ PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
     mStrokeGradientPoints.initialize(this);
     mStrokeGradientPoints.blockPointer();
 
-    mFillGradientPoints.setUpdater(new GradientPointsUpdater(true, this));
-    mFillGradientPoints.blockUpdater();
-    mStrokeGradientPoints.setUpdater(new GradientPointsUpdater(false, this));
-    mStrokeGradientPoints.blockUpdater();
+    mFillGradientPoints.prp_setUpdater(new GradientPointsUpdater(true, this));
+    mFillGradientPoints.prp_blockUpdater();
+    mStrokeGradientPoints.prp_setUpdater(new GradientPointsUpdater(false, this));
+    mStrokeGradientPoints.prp_blockUpdater();
 
     mFillPaintSettings.setGradientPoints(&mFillGradientPoints);
     mStrokeSettings.setGradientPoints(&mStrokeGradientPoints);
@@ -52,8 +52,8 @@ int PathBox::saveToSql(QSqlQuery *query, int parentId)
     int strokeStartPt = mStrokeGradientPoints.startPoint->saveToSql(query);
     int strokeEndPt = mStrokeGradientPoints.endPoint->saveToSql(query);
 
-    int fillSettingsId = mFillPaintSettings.saveToSql(query);
-    int strokeSettingsId = mStrokeSettings.saveToSql(query);
+    int fillSettingsId = mFillPaintSettings.prp_saveToSql(query);
+    int strokeSettingsId = mStrokeSettings.prp_saveToSql(query);
     if(!query->exec(
             QString(
             "INSERT INTO pathbox (fillgradientstartid, fillgradientendid, "
@@ -115,7 +115,7 @@ void PathBox::updatePathIfNeeded() {
         updatePath();
         mUpdatePath = mPath;
         mUpdateOutlinePath = mOutlinePath;
-        if(!mAnimatorsCollection.hasKeys() &&
+        if(!mAnimatorsCollection.prp_hasKeys() &&
            !mPivotChanged ) centerPivotPosition();
         mPathUpdateNeeded = false;
     }

@@ -18,16 +18,16 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
     QrealAnimator *bottomRightPt = mBottomRightPoint->
             getRelativePosAnimatorPtr();
 
-    topLeftPt->setName("top left");
-    bottomRightPt->setName("bottom right");
+    topLeftPt->prp_setName("top left");
+    bottomRightPt->prp_setName("bottom right");
 
     addActiveAnimator(topLeftPt);
     addActiveAnimator(bottomRightPt);
 
-    mRadiusAnimator.setName("radius");
+    mRadiusAnimator.prp_setName("radius");
     addActiveAnimator(&mRadiusAnimator);
 
-    mAnimatorsCollection.setUpdater(new PathPointUpdater(this));
+    mAnimatorsCollection.prp_setUpdater(new PathPointUpdater(this));
 }
 
 Rectangle::~Rectangle()
@@ -42,7 +42,7 @@ int Rectangle::saveToSql(QSqlQuery *query, int parentId)
 
     int bottomRightPointId = mTopLeftPoint->saveToSql(query);
     int topLeftPointId = mTopLeftPoint->saveToSql(query);
-    int radiusPointId = mRadiusAnimator.saveToSql(query);
+    int radiusPointId = mRadiusAnimator.prp_saveToSql(query);
 
     if(!query->exec(QString("INSERT INTO rectangle (boundingboxid, "
                            "topleftpointid, bottomrightpointid, "
@@ -142,9 +142,9 @@ MovablePoint *Rectangle::getPointAt(const QPointF &absPtPos,
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
         }
     }
     if(pointToReturn == NULL) {
@@ -180,7 +180,7 @@ void Rectangle::updatePath()
     mPath = QPainterPath();
     QPointF topPos = mTopLeftPoint->getRelativePos();
     QPointF botPos = mBottomRightPoint->getRelativePos();
-    qreal radius = mRadiusAnimator.getCurrentValue();
+    qreal radius = mRadiusAnimator.qra_getCurrentValue();
     mPath.addRoundedRect(QRectF(topPos, botPos),
                          radius, radius);
 

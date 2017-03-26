@@ -55,7 +55,7 @@ void BoxScrollWidgetVisiblePart::drawKeys(QPainter *p,
     }
 }
 
-QrealKey *BoxScrollWidgetVisiblePart::getKeyAtPos(
+Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
         const int &pressX, const int &pressY,
         const qreal &pixelsPerFrame,
         const int &minViewedFrame) {
@@ -89,10 +89,9 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
     return NULL;
 }
 
-void BoxScrollWidgetVisiblePart::getKeysInRect(
-        QRectF selectionRect,
+void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
         qreal pixelsPerFrame,
-        QList<QrealKey*> *listKeys) {
+        QList<Key *> *listKeys) {
     QList<SingleWidgetAbstraction*> abstractions;
 //    selectionRect.adjust(-0.5, -(BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
@@ -122,7 +121,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(
                   type == SWT_PixmapEffect ||
                   type == SWT_SingleSound) {
             QrealAnimator *qa_target = (QrealAnimator*)target;
-            qa_target->getKeysInRect(selectionRect,
+            qa_target->prp_getKeysInRect(selectionRect,
                                      pixelsPerFrame,
                                      listKeys);
         }
@@ -269,9 +268,9 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                  getTargetAbstraction()->getTarget());
 
         EffectAnimators *underMouseAnimator = (EffectAnimators*)
-                                 effectUnderMouse->getParentAnimator();
+                                 effectUnderMouse->prp_getParentAnimator();
         EffectAnimators *draggedAnimator = (EffectAnimators*)
-                                 effect->getParentAnimator();
+                                 effect->prp_getParentAnimator();
         if(draggedAnimator != underMouseAnimator) {
             effect->incNumberPointers();
             draggedAnimator->getParentBox()->removeEffect(effect);

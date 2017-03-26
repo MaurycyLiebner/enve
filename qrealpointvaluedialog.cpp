@@ -1,4 +1,5 @@
 #include "qrealpointvaluedialog.h"
+#include "qrealpoint.h"
 
 QrealPointValueDialog::QrealPointValueDialog(QrealPoint *point,
                                              QWidget *parent) :

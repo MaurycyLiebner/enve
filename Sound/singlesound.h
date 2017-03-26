@@ -23,18 +23,18 @@ public:
     int getSampleCount() const;
     const float *getFinalData() const;
     void prepareFinalData(const qreal &fps, const int &minFrame, const int &maxFrame);
-    void drawKeys(QPainter *p,
+    void prp_drawKeys(QPainter *p,
                   qreal pixelsPerFrame,
                   qreal drawY,
                   int startFrame, int endFrame);
-    DurationRectangleMovable *getRectangleMovableAtPos(qreal relX,
+    DurationRectangleMovable *anim_getRectangleMovableAtPos(qreal relX,
                                                        int minViewedFrame,
                                                        qreal pixelsPerFrame);
     SWT_Type SWT_getType() { return SWT_SingleSound; }
     void updateFinalDataIfNeeded(const qreal &fps,
                                  const int &minFrame,
                                  const int &maxFrame);
-    int getFrameShift() const;
+    int anim_getFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,

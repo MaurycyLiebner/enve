@@ -5,7 +5,7 @@
 
 class QrealKey;
 
-enum QrealPointType {
+enum QrealPointType : short {
     START_POINT,
     END_POINT,
     KEY_POINT

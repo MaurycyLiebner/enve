@@ -833,7 +833,7 @@ void Canvas::updateAfterFrameChanged(int currentFrame) {
     foreach(BoundingBox *box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
-    mSoundComposition->getSoundsAnimatorContainer()->setAbsFrame(currentFrame);
+    mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
 }
 
 void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,

@@ -31,18 +31,18 @@ void MovablePoint::loadFromSql(int movablePointId) {
 
 void MovablePoint::startTransform()
 {
-    mRelPos.startTransform();
+    mRelPos.prp_startTransform();
     mTransformStarted = true;
     mSavedRelPos = getRelativePos();
 }
 
 void MovablePoint::applyTransform(QMatrix transform){
-    mRelPos.setCurrentValue(transform.map(mRelPos.getCurrentValue()), true);
+    mRelPos.qra_setCurrentValue(transform.map(mRelPos.qra_getCurrentValue()), true);
 }
 
 void MovablePoint::removeAnimations() {
-    if(mRelPos.isRecording()) {
-        mRelPos.setRecording(false);
+    if(mRelPos.prp_isRecording()) {
+        mRelPos.prp_setRecording(false);
     }
 }
 
@@ -58,7 +58,7 @@ void MovablePoint::finishTransform()
 {
     if(mTransformStarted) {
         mTransformStarted = false;
-        mRelPos.finishTransform();
+        mRelPos.prp_finishTransform();
     }
 }
 
@@ -70,12 +70,12 @@ void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo) {
 
 void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
-    mRelPos.setCurrentValue(relPos, saveUndoRedo);
+    mRelPos.qra_setCurrentValue(relPos, saveUndoRedo);
 }
 
 QPointF MovablePoint::getRelativePos() const
 {
-    return mRelPos.getCurrentValue();
+    return mRelPos.qra_getCurrentValue();
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) const {
@@ -95,7 +95,7 @@ void MovablePoint::drawOnAbsPos(QPainter *p,
     }
     p->drawEllipse(absPos,
                    mRadius, mRadius);
-    if(mRelPos.isKeyOnCurrentFrame()) {
+    if(mRelPos.prp_isKeyOnCurrentFrame()) {
         p->save();
         p->setBrush(Qt::red);
         p->setPen(QPen(Qt::black, 1.) );
@@ -164,7 +164,7 @@ void MovablePoint::moveByRel(QPointF relTranslation) {
 }
 
 void MovablePoint::moveByAbs(QPointF absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(mRelPos.getSavedValue()) +
+    moveToAbs(mapRelativeToAbsolute(mRelPos.qra_getSavedValue()) +
               absTranslatione);
 }
 
@@ -178,7 +178,7 @@ void MovablePoint::scale(qreal scaleBy) {
 
 void MovablePoint::cancelTransform()
 {
-    mRelPos.cancelTransform();
+    mRelPos.prp_cancelTransform();
     //setRelativePos(mSavedRelPos, false);
 }
 
@@ -195,7 +195,7 @@ bool MovablePoint::isBeingTransformed()
 #include <QSqlError>
 int MovablePoint::saveToSql(QSqlQuery *query)
 {
-    int posAnimatorId = mRelPos.saveToSql(query);
+    int posAnimatorId = mRelPos.prp_saveToSql(query);
     if(!query->exec(QString("INSERT INTO movablepoint (posanimatorid) "
                 "VALUES (%1)").
                 arg(posAnimatorId) ) ) {
@@ -206,7 +206,7 @@ int MovablePoint::saveToSql(QSqlQuery *query)
 
 void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
 {
-    mRelPos.setUpdater(updater);
+    mRelPos.prp_setUpdater(updater);
 }
 
 QPointFAnimator *MovablePoint::getRelativePosAnimatorPtr()
@@ -221,7 +221,7 @@ qreal MovablePoint::getRadius()
 
 void MovablePoint::updateAfterFrameChanged(int frame)
 {
-    mRelPos.setAbsFrame(frame);
+    mRelPos.prp_setAbsFrame(frame);
 }
 
 void MovablePoint::rotateBy(qreal rot)

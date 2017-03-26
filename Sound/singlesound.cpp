@@ -128,21 +128,21 @@ SingleSound::SingleSound(const QString &path,
     ComplexAnimator() {
     setDurationRect(durRect);
 
-    setUpdater(new SingleSoundUpdater(this));
-    blockUpdater();
+    prp_setUpdater(new SingleSoundUpdater(this));
+    prp_blockUpdater();
 
-    setName("sound");
+    prp_setName("sound");
 
     mVolumeAnimator.incNumberPointers();
     addChildAnimator(&mVolumeAnimator);
-    mVolumeAnimator.setValueRange(0, 200);
-    mVolumeAnimator.setCurrentValue(100);
-    mVolumeAnimator.setName("volume");
+    mVolumeAnimator.qra_setValueRange(0, 200);
+    mVolumeAnimator.qra_setCurrentValue(100);
+    mVolumeAnimator.prp_setName("volume");
 
     setFilePath(path);
 }
 
-void SingleSound::drawKeys(QPainter *p,
+void SingleSound::prp_drawKeys(QPainter *p,
                             qreal pixelsPerFrame, qreal drawY,
                             int startFrame, int endFrame) {
 //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
@@ -153,7 +153,7 @@ void SingleSound::drawKeys(QPainter *p,
 //                BOX_HEIGHT, QColor(0, 0, 255, 125));
     mDurationRectangle->draw(p, pixelsPerFrame,
                             drawY, startFrame);
-    QrealAnimator::drawKeys(p, pixelsPerFrame, drawY,
+    QrealAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
                             startFrame, endFrame);
 }
 
@@ -167,7 +167,7 @@ void SingleSound::setDurationRect(DurationRectangle *durRect) {
         mDurationRectangle->setPossibleFrameRangeVisible();
         mDurationRectangle->setBindToPossibleFrameRange();
         connect(mDurationRectangle, SIGNAL(changed()),
-                this, SLOT(updateAfterShifted()));
+                this, SLOT(anim_updateAfterShifted()));
     } else {
         mOwnDurationRectangle = false;
         mDurationRectangle = durRect;
@@ -176,7 +176,7 @@ void SingleSound::setDurationRect(DurationRectangle *durRect) {
             this, SLOT(scheduleFinalDataUpdate()));
 }
 
-DurationRectangleMovable *SingleSound::getRectangleMovableAtPos(
+DurationRectangleMovable *SingleSound::anim_getRectangleMovableAtPos(
                             qreal relX,
                             int minViewedFrame,
                             qreal pixelsPerFrame) {
@@ -261,16 +261,16 @@ void SingleSound::prepareFinalData(const qreal &fps,
 
         mFinalSampleCount = maxSampleFromSrc - minSampleFromSrc;
         mFinalData = (float*)malloc(mFinalSampleCount*sizeof(float));
-        if(mVolumeAnimator.hasKeys()) {
+        if(mVolumeAnimator.prp_hasKeys()) {
             int j = 0;
             int frame = 0;
             qreal lastFrameVol =
-                    mVolumeAnimator.getValueAtRelFrame(frame)/100.;
+                    mVolumeAnimator.qra_getValueAtRelFrame(frame)/100.;
             qreal volStep = fps/SAMPLERATE;
             while(j < mFinalSampleCount) {
                 frame++;
                 qreal nextFrameVol =
-                        mVolumeAnimator.getValueAtRelFrame(frame)/100.;
+                        mVolumeAnimator.qra_getValueAtRelFrame(frame)/100.;
                 qreal volDiff = (nextFrameVol - lastFrameVol);
                 qreal currVolFrac = lastFrameVol;
                 for(int i = 0;
@@ -283,7 +283,7 @@ void SingleSound::prepareFinalData(const qreal &fps,
                 lastFrameVol = nextFrameVol;
             }
         } else {
-            qreal volFrac = mVolumeAnimator.getCurrentValue()/100.;
+            qreal volFrac = mVolumeAnimator.qra_getCurrentValue()/100.;
             for(int i = 0; i < mFinalSampleCount; i++) {
                 mFinalData[i] = mSrcData[i + minSampleFromSrc]*volFrac;
             }
@@ -291,11 +291,11 @@ void SingleSound::prepareFinalData(const qreal &fps,
     }
 }
 
-int SingleSound::getFrameShift() const {
+int SingleSound::anim_getFrameShift() const {
     if(mOwnDurationRectangle) {
-        return mDurationRectangle->getFramePos() + Animator::getFrameShift();
+        return mDurationRectangle->getFramePos() + Animator::anim_getFrameShift();
     }
-    return Animator::getFrameShift();
+    return Animator::anim_getFrameShift();
 }
 
 #include "BoxesList/boxscrollwidgetvisiblepart.h"

@@ -18,7 +18,7 @@ public:
 
     void drawGradientPoints(QPainter *p);
 
-    MovablePoint *getPointAt(const QPointF &absPos);
+    MovablePoint *qra_getPointAt(const QPointF &absPos);
 
     QPointF getStartPoint();
 

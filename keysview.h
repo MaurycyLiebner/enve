@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "pointhelpers.h"
 
+class Key;
 class QrealKey;
 
 class QrealAnimator;
@@ -24,7 +25,8 @@ class KeysView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit KeysView(BoxScrollWidgetVisiblePart *boxesListVisible, QWidget *parent = 0);
+    explicit KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
+                      QWidget *parent = 0);
 
     void setAnimationDockWidget(AnimationDockWidget *graphControls);
     void setGraphViewed(bool bT);
@@ -35,8 +37,8 @@ public:
 
     void updatePixelsPerFrame();
 
-    void addKeyToSelection(QrealKey *key);
-    void removeKeyFromSelection(QrealKey *key);
+    void addKeyToSelection(Key *key);
+    void removeKeyFromSelection(Key *key);
     void clearKeySelection();
     void selectKeysInSelectionRect();
 
@@ -121,7 +123,7 @@ private:
     void updateHoveredPointFromPos(const QPoint &posU);
 
     DurationRectangleMovable *mHoveredMovable = NULL;
-    QrealKey *mHoveredKey = NULL;
+    Key *mHoveredKey = NULL;
     AnimationDockWidget *mGraphControls = NULL;
 
     bool mIsMouseGrabbing = false;
@@ -139,7 +141,7 @@ private:
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
     DurationRectangleMovable *mLastPressedDurationRectangleMovable = NULL;
-    QrealKey *mLastPressedKey = NULL;
+    Key *mLastPressedKey = NULL;
     bool mFirstMove = false;
     int mMoveDFrame = 0;
     QPointF mLastPressPos;
@@ -148,7 +150,7 @@ private:
     bool mMovingRect = false;
 
     MainWindow *mMainWindow;
-    QList<QrealKey*> mSelectedKeys;
+    QList<Key*> mSelectedKeys;
 
     int mMinViewedFrame = 0;
     int mMaxViewedFrame = 50;

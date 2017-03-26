@@ -4,19 +4,19 @@
 
 TransformAnimator::TransformAnimator() : ComplexAnimator()
 {
-    setName("transformation");
-    mScaleAnimator.setName("scale");
-    mScaleAnimator.setCurrentValue(QPointF(1., 1.));
-    mRotAnimator.setName("rot");
-    mRotAnimator.setCurrentValue(0.);
-    mPosAnimator.setName("trans");
-    mPosAnimator.setCurrentValue(QPointF(0., 0.) );
-    mPivotAnimator.setName("pivot");
-    mPivotAnimator.setCurrentValue(QPointF(0., 0.) );
-    mOpacityAnimator.setName("opacity");
-    mOpacityAnimator.setValueRange(0., 100.);
+    prp_setName("transformation");
+    mScaleAnimator.prp_setName("scale");
+    mScaleAnimator.qra_setCurrentValue(QPointF(1., 1.));
+    mRotAnimator.prp_setName("rot");
+    mRotAnimator.qra_setCurrentValue(0.);
+    mPosAnimator.prp_setName("trans");
+    mPosAnimator.qra_setCurrentValue(QPointF(0., 0.) );
+    mPivotAnimator.prp_setName("pivot");
+    mPivotAnimator.qra_setCurrentValue(QPointF(0., 0.) );
+    mOpacityAnimator.prp_setName("opacity");
+    mOpacityAnimator.qra_setValueRange(0., 100.);
     mOpacityAnimator.setPrefferedValueStep(5.);
-    mOpacityAnimator.setCurrentValue(100.);
+    mOpacityAnimator.qra_setCurrentValue(100.);
     mOpacityAnimator.freezeMinMaxValues();
 
     mPosAnimator.blockPointer();
@@ -34,12 +34,12 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
 }
 
 #include <QSqlError>
-int TransformAnimator::saveToSql(QSqlQuery *query) {
-    int posAnimatorId = mPosAnimator.saveToSql(query);
-    int scaleAnimatorId = mScaleAnimator.saveToSql(query);
-    int pivotAnimatorId = mPivotAnimator.saveToSql(query);
-    int rotAnimatorId = mRotAnimator.saveToSql(query);
-    int opacityAnimatorId = mOpacityAnimator.saveToSql(query);
+int TransformAnimator::prp_saveToSql(QSqlQuery *query) {
+    int posAnimatorId = mPosAnimator.prp_saveToSql(query);
+    int scaleAnimatorId = mScaleAnimator.prp_saveToSql(query);
+    int pivotAnimatorId = mPivotAnimator.prp_saveToSql(query);
+    int rotAnimatorId = mRotAnimator.prp_saveToSql(query);
+    int opacityAnimatorId = mOpacityAnimator.prp_saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO transformanimator (posanimatorid, scaleanimatorid, "
                 "pivotanimatorid, rotanimatorid, opacityanimatorid ) "
@@ -82,11 +82,11 @@ void TransformAnimator::loadFromSql(int transformAnimatorId) {
 
 void TransformAnimator::copyTransformationTo(
                                         TransformAnimator *targetAnimator) {
-    QPointF currScale = mScaleAnimator.getCurrentValue();
-    QPointF currTrans = mPosAnimator.getCurrentValue();
-    QPointF currPivot = mPivotAnimator.getCurrentValue();
-    qreal currRot = mRotAnimator.getCurrentValue();
-    qreal currOpacity = mOpacityAnimator.getCurrentValue();
+    QPointF currScale = mScaleAnimator.qra_getCurrentValue();
+    QPointF currTrans = mPosAnimator.qra_getCurrentValue();
+    QPointF currPivot = mPivotAnimator.qra_getCurrentValue();
+    qreal currRot = mRotAnimator.qra_getCurrentValue();
+    qreal currOpacity = mOpacityAnimator.qra_getCurrentValue();
 
     targetAnimator->setScale(currScale.x(), currScale.y() );
     targetAnimator->setPosition(currTrans.x(), currTrans.y() );
@@ -97,17 +97,17 @@ void TransformAnimator::copyTransformationTo(
 
 void TransformAnimator::resetScale(bool finish)
 {
-    mScaleAnimator.setCurrentValue(QPointF(1., 1.), finish);
+    mScaleAnimator.qra_setCurrentValue(QPointF(1., 1.), finish);
 }
 
 void TransformAnimator::resetTranslation(bool finish)
 {
-    mPosAnimator.setCurrentValue(QPointF(0., 0.), finish);
+    mPosAnimator.qra_setCurrentValue(QPointF(0., 0.), finish);
 }
 
 void TransformAnimator::resetRotation(bool finish)
 {
-    mRotAnimator.setCurrentValue(0., finish);
+    mRotAnimator.qra_setCurrentValue(0., finish);
 }
 
 
@@ -131,7 +131,7 @@ void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel,
     matrix.translate(-pivot.x() + mPosAnimator.getSavedXValue(),
                      -pivot.y() + mPosAnimator.getSavedYValue() );
     rotateRelativeToSavedValue(rotRel);
-    mPosAnimator.setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
+    mPosAnimator.qra_setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
 void TransformAnimator::moveRelativeToSavedValue(qreal dX, qreal dY) {
@@ -139,7 +139,7 @@ void TransformAnimator::moveRelativeToSavedValue(qreal dX, qreal dY) {
 }
 
 void TransformAnimator::translate(qreal dX, qreal dY) {
-    mPosAnimator.incCurrentValue(dX, dY);
+    mPosAnimator.qra_incCurrentValue(dX, dY);
 }
 
 void TransformAnimator::scale(qreal sx, qreal sy)
@@ -154,50 +154,50 @@ void TransformAnimator::scaleRelativeToSavedValue(qreal sx, qreal sy,
 
     matrix.translate(pivot.x(),
                      pivot.y());
-    matrix.rotate(mRotAnimator.getCurrentValue());
+    matrix.rotate(mRotAnimator.qra_getCurrentValue());
     matrix.scale(sx, sy);
-    matrix.rotate(-mRotAnimator.getCurrentValue());
+    matrix.rotate(-mRotAnimator.qra_getCurrentValue());
     matrix.translate(-pivot.x() + mPosAnimator.getSavedXValue(),
                      -pivot.y() + mPosAnimator.getSavedYValue() );
 
     scale(sx, sy);
-    mPosAnimator.setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
+    mPosAnimator.qra_setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
 void TransformAnimator::startOpacityTransform() {
-    mOpacityAnimator.startTransform();
+    mOpacityAnimator.prp_startTransform();
 }
 
 void TransformAnimator::setOpacity(qreal newOpacity) {
-    mOpacityAnimator.setCurrentValue(newOpacity);
+    mOpacityAnimator.qra_setCurrentValue(newOpacity);
 }
 
 void TransformAnimator::setScale(qreal sx, qreal sy)
 {
-    mScaleAnimator.setCurrentValue(QPointF(sx, sy) );
+    mScaleAnimator.qra_setCurrentValue(QPointF(sx, sy) );
 }
 
 void TransformAnimator::setPosition(qreal x, qreal y)
 {
-    mPosAnimator.setCurrentValue(QPointF(x, y) );
+    mPosAnimator.qra_setCurrentValue(QPointF(x, y) );
 }
 
 void TransformAnimator::setRotation(qreal rot)
 {
-    mRotAnimator.setCurrentValue(rot);
+    mRotAnimator.qra_setCurrentValue(rot);
 }
 
 void TransformAnimator::startRotTransform()
 {
-    mRotAnimator.startTransform();
+    mRotAnimator.prp_startTransform();
 }
 
 void TransformAnimator::startPosTransform() {
-    mPosAnimator.startTransform();
+    mPosAnimator.prp_startTransform();
 }
 
 void TransformAnimator::startScaleTransform() {
-    mScaleAnimator.startTransform();
+    mScaleAnimator.prp_startTransform();
 }
 
 qreal TransformAnimator::getYScale()
@@ -217,15 +217,15 @@ void TransformAnimator::setPivotWithoutChangingTransformation(qreal x, qreal y)
 
 void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, bool finish)
 {
-    if(!mPivotAnimator.isRecording() && !mPosAnimator.isRecording() &&
-       !mRotAnimator.isRecording() && !mScaleAnimator.isRecording()) {
+    if(!mPivotAnimator.prp_isRecording() && !mPosAnimator.prp_isRecording() &&
+       !mRotAnimator.prp_isRecording() && !mScaleAnimator.prp_isRecording()) {
         QMatrix currentMatrix;
         qreal pivotX = mPivotAnimator.getXValue();
         qreal pivotY = mPivotAnimator.getYValue();
         currentMatrix.translate(pivotX + mPosAnimator.getXValue(),
                          pivotY + mPosAnimator.getYValue());
 
-        currentMatrix.rotate(mRotAnimator.getCurrentValue() );
+        currentMatrix.rotate(mRotAnimator.qra_getCurrentValue() );
         currentMatrix.scale(mScaleAnimator.getXValue(),
                             mScaleAnimator.getYValue() );
 
@@ -236,7 +236,7 @@ void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, boo
         futureMatrix.translate(point.x() + mPosAnimator.getXValue(),
                          point.y() + mPosAnimator.getYValue());
 
-        futureMatrix.rotate(mRotAnimator.getCurrentValue() );
+        futureMatrix.rotate(mRotAnimator.qra_getCurrentValue() );
         futureMatrix.scale(mScaleAnimator.getXValue(),
                            mScaleAnimator.getYValue() );
 
@@ -244,7 +244,7 @@ void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, boo
                                 -point.y());
 
 
-        mPosAnimator.incAllValues(currentMatrix.dx() - futureMatrix.dx(),
+        mPosAnimator.qra_incAllValues(currentMatrix.dx() - futureMatrix.dx(),
                                   currentMatrix.dy() - futureMatrix.dy());
     }
 //    if(!mPivotAnimator.isRecording()) {
@@ -255,21 +255,21 @@ void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, boo
 //                                 currentMatrix.dy() - futureMatrix.dy());
 //    }
 
-    mPivotAnimator.setCurrentValue(point, finish);
+    mPivotAnimator.qra_setCurrentValue(point, finish);
 
     //callUpdater();
 }
 
 void TransformAnimator::setPivot(QPointF point, bool finish) {
 
-    mPivotAnimator.setCurrentValue(point, finish);
+    mPivotAnimator.qra_setCurrentValue(point, finish);
 
     //callUpdater();
 }
 
 QPointF TransformAnimator::getPivot()
 {
-    return mPivotAnimator.getCurrentValue();
+    return mPivotAnimator.qra_getCurrentValue();
 }
 
 qreal TransformAnimator::dx()
@@ -284,7 +284,7 @@ qreal TransformAnimator::dy()
 
 qreal TransformAnimator::rot()
 {
-    return mRotAnimator.getCurrentValue();
+    return mRotAnimator.qra_getCurrentValue();
 }
 
 qreal TransformAnimator::xScale()
@@ -299,7 +299,7 @@ qreal TransformAnimator::yScale()
 
 QPointF TransformAnimator::pos()
 {
-    return mPosAnimator.getCurrentValue();
+    return mPosAnimator.qra_getCurrentValue();
 }
 
 qreal TransformAnimator::getPivotX()
@@ -314,10 +314,10 @@ qreal TransformAnimator::getPivotY()
 
 qreal TransformAnimator::getOpacity()
 {
-    return mOpacityAnimator.getCurrentValue();
+    return mOpacityAnimator.qra_getCurrentValue();
 }
 
-QMatrix TransformAnimator::getCurrentValue() {
+QMatrix TransformAnimator::qra_getCurrentValue() {
     QMatrix matrix;// = mBaseTransformation;
     qreal pivotX = mPivotAnimator.getXValue();
     qreal pivotY = mPivotAnimator.getYValue();
@@ -328,7 +328,7 @@ QMatrix TransformAnimator::getCurrentValue() {
     matrix.translate(pivotX + mPosAnimator.getXValue(),
                      pivotY + mPosAnimator.getYValue());
 
-    matrix.rotate(mRotAnimator.getCurrentValue() );
+    matrix.rotate(mRotAnimator.qra_getCurrentValue() );
     matrix.scale(mScaleAnimator.getXValue(),
                  mScaleAnimator.getYValue() );
 
@@ -379,7 +379,7 @@ void TransformAnimator::duplicateOpacityAnimatorFrom(
 void TransformAnimator::moveByAbs(const QMatrix &combinedTrans,
                                   const QPointF &absTrans) {
     moveToAbs(combinedTrans,
-              combinedTrans.map(mPosAnimator.getSavedValue()) +
+              combinedTrans.map(mPosAnimator.qra_getSavedValue()) +
               absTrans);
 }
 
@@ -397,5 +397,5 @@ void TransformAnimator::setAbsolutePos(const QMatrix &combinedTrans,
 
 void TransformAnimator::setRelativePos(QPointF relPos,
                                        bool saveUndoRedo) {
-    mPosAnimator.setCurrentValue(relPos, saveUndoRedo);
+    mPosAnimator.qra_setCurrentValue(relPos, saveUndoRedo);
 }

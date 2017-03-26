@@ -16,16 +16,16 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mAnimatorsCollection.setParentBoundingBox(this);
 
     mEffectsAnimators.blockPointer();
-    mEffectsAnimators.setName("effects");
+    mEffectsAnimators.prp_setName("effects");
     mEffectsAnimators.setParentBox(this);
-    mEffectsAnimators.setUpdater(new PixmapEffectUpdater(this));
-    mEffectsAnimators.blockUpdater();
+    mEffectsAnimators.prp_setUpdater(new PixmapEffectUpdater(this));
+    mEffectsAnimators.prp_blockUpdater();
 
     addActiveAnimator(&mTransformAnimator);
     mTransformAnimator.blockPointer();
 
-    mTransformAnimator.setUpdater(new TransUpdater(this) );
-    mTransformAnimator.blockUpdater();
+    mTransformAnimator.prp_setUpdater(new TransUpdater(this) );
+    mTransformAnimator.prp_blockUpdater();
     mType = type;
 
     mTransformAnimator.reset();
@@ -119,7 +119,7 @@ BoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
 
 #include <QSqlError>
 int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
-    int transfromAnimatorId = mTransformAnimator.saveToSql(query);
+    int transfromAnimatorId = mTransformAnimator.prp_saveToSql(query);
     if(!query->exec(
                 QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
                         "pivotchanged, visible, locked, "
@@ -138,7 +138,7 @@ int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
 
     int boxId = query->lastInsertId().toInt();
     if(mEffectsAnimators.hasChildAnimators()) {
-        mEffectsAnimators.saveToSql(query, boxId);
+        mEffectsAnimators.prp_saveToSql(query, boxId);
     }
     return boxId;
 }
@@ -483,7 +483,7 @@ void BoundingBox::resetRotation() {
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
     mCurrentAbsFrame = currentFrame;
     mCurrentRelFrame = mCurrentAbsFrame - getFrameShift();
-    mAnimatorsCollection.setAbsFrame(currentFrame);
+    mAnimatorsCollection.prp_setAbsFrame(currentFrame);
 }
 
 void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
@@ -724,11 +724,11 @@ void BoundingBox::startScaleTransform() {
 }
 
 void BoundingBox::startTransform() {
-    mTransformAnimator.startTransform();
+    mTransformAnimator.prp_startTransform();
 }
 
 void BoundingBox::finishTransform() {
-    mTransformAnimator.finishTransform();
+    mTransformAnimator.prp_finishTransform();
     //updateCombinedTransform();
 }
 
@@ -737,7 +737,7 @@ bool BoundingBox::absPointInsidePath(QPointF absPoint) {
 }
 
 void BoundingBox::cancelTransform() {
-    mTransformAnimator.cancelTransform();
+    mTransformAnimator.prp_cancelTransform();
     //updateCombinedTransform();
 }
 
@@ -774,13 +774,13 @@ QPointF BoundingBox::getAbsolutePos() {
 }
 
 void BoundingBox::updateRelativeTransformTmp() {
-    mRelativeTransformMatrix = mTransformAnimator.getCurrentValue();
+    mRelativeTransformMatrix = mTransformAnimator.qra_getCurrentValue();
     updateCombinedTransformTmp();
     //updateCombinedTransform(replaceCache);
 }
 
 void BoundingBox::updateRelativeTransformAfterFrameChange() {
-    mRelativeTransformMatrix = mTransformAnimator.getCurrentValue();
+    mRelativeTransformMatrix = mTransformAnimator.qra_getCurrentValue();
     updateCombinedTransform();
 }
 
@@ -809,12 +809,12 @@ TransformAnimator *BoundingBox::getTransformAnimator() {
 }
 
 QMatrix BoundingBox::getCombinedRenderTransform() {
-    return mTransformAnimator.getCurrentValue()*
+    return mTransformAnimator.qra_getCurrentValue()*
             mParent->getCombinedRenderTransform();
 }
 
 QMatrix BoundingBox::getCombinedFinalRenderTransform() {
-    return mTransformAnimator.getCurrentValue()*
+    return mTransformAnimator.qra_getCurrentValue()*
             mParent->getCombinedFinalRenderTransform();
 }
 
@@ -858,16 +858,16 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
 
 void BoundingBox::getKeysInRect(const QRectF &selectionRect,
                                 const qreal &pixelsPerFrame,
-                                QList<QrealKey*> *keysList) {
-    mAnimatorsCollection.getKeysInRect(selectionRect,
+                                QList<Key*> *keysList) {
+    mAnimatorsCollection.prp_getKeysInRect(selectionRect,
                                        pixelsPerFrame,
                                        keysList);
 }
 
-QrealKey *BoundingBox::getKeyAtPos(const qreal &relX,
-                                   const int &minViewedFrame,
-                                   const qreal &pixelsPerFrame) {
-    return mAnimatorsCollection.getKeyAtPos(
+Key *BoundingBox::getKeyAtPos(const qreal &relX,
+                              const int &minViewedFrame,
+                              const qreal &pixelsPerFrame) {
+    return mAnimatorsCollection.prp_getKeyAtPos(
                                      relX,
                                      minViewedFrame,
                                      pixelsPerFrame);
@@ -920,7 +920,7 @@ void BoundingBox::drawKeys(QPainter *p,
                            qreal pixelsPerFrame,
                            qreal drawY,
                            int startFrame, int endFrame) {
-    mAnimatorsCollection.drawKeys(p,
+    mAnimatorsCollection.prp_drawKeys(p,
                                   pixelsPerFrame, drawY,
                                   startFrame, endFrame);
 }

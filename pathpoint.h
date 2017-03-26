@@ -69,7 +69,7 @@ PathPointValues operator*(const qreal &val, const PathPointValues &ppv);
 class PathPointAnimators : public ComplexAnimator {
 public:
     PathPointAnimators() : ComplexAnimator() {
-        setName("point");
+        prp_setName("point");
     }
 
     void setAllVars(PathPoint *parentPathPointT,
@@ -78,11 +78,11 @@ public:
                     QPointFAnimator *pathPointPosAnimatorT) {
         parentPathPoint = parentPathPointT;
         endPosAnimator = endPosAnimatorT;
-        endPosAnimator->setName("ctrl pt 1 pos");
+        endPosAnimator->prp_setName("ctrl pt 1 pos");
         startPosAnimator = startPosAnimatorT;
-        startPosAnimator->setName("ctrl pt 2 pos");
+        startPosAnimator->prp_setName("ctrl pt 2 pos");
         pathPointPosAnimator = pathPointPosAnimatorT;
-        pathPointPosAnimator->setName("point pos");
+        pathPointPosAnimator->prp_setName("point pos");
 
         addChildAnimator(pathPointPosAnimator);
         addChildAnimator(endPosAnimator);

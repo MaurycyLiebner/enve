@@ -13,7 +13,7 @@ public:
     void resetRotation(bool finish = false);
     void reset(bool finish = false);
 
-    QMatrix getCurrentValue();
+    QMatrix qra_getCurrentValue();
     void rotateRelativeToSavedValue(qreal rotRel);
     void translate(qreal dX, qreal dY);
     void scale(qreal sx, qreal sy);
@@ -51,7 +51,7 @@ public:
     void moveRelativeToSavedValue(qreal dX, qreal dY);
     void copyTransformationTo(TransformAnimator *targetAnimator);
     void setPivot(QPointF point, bool finish = false);
-    int saveToSql(QSqlQuery *query);
+    int prp_saveToSql(QSqlQuery *query);
     void loadFromSql(int transformAnimatorId);
 
     void makeDuplicate(QrealAnimator *target);

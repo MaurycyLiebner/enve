@@ -7,23 +7,23 @@ QStringAnimator::QStringAnimator() : IntAnimator()
 
 void QStringAnimator::setCurrentTextValue(const QString &text)
 {
-    if(isKeyOnCurrentFrame()) {
+    if(prp_isKeyOnCurrentFrame()) {
         foreach(QStringKey *key, mTextValues) {
-            if(key->keyFrame == mCurrentAbsFrame) {
+            if(key->keyFrame == anim_mCurrentAbsFrame) {
                 key->string = text;
                 break;
             }
         }
-        setCurrentIntValue(mCurrentAbsFrame, true);
+        setCurrentIntValue(anim_mCurrentAbsFrame, true);
     } else {
-        mTextValues << new QStringKey(text, mCurrentAbsFrame);
-        setCurrentIntValue(mCurrentAbsFrame, true);
+        mTextValues << new QStringKey(text, anim_mCurrentAbsFrame);
+        setCurrentIntValue(anim_mCurrentAbsFrame, true);
     }
 }
 
 QString QStringAnimator::getCurrentTextValue()
 {
-    return getStringKeyWithLowerFrame(mCurrentAbsFrame);
+    return getStringKeyWithLowerFrame(anim_mCurrentAbsFrame);
 }
 
 QString QStringAnimator::getStringKeyWithLowerFrame(int frame)

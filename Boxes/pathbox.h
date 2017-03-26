@@ -17,14 +17,14 @@ public:
     void updatePathIfNeeded();
 
     void resetStrokeGradientPointsPos(bool finish) {
-        mStrokeGradientPoints.setRecording(false);
+        mStrokeGradientPoints.prp_setRecording(false);
         mStrokeGradientPoints.setPositions(mRelBoundingRect.topLeft(),
                                            mRelBoundingRect.bottomRight(),
                                            finish);
     }
 
     void resetFillGradientPointsPos(bool finish) {
-        mFillGradientPoints.setRecording(false);
+        mFillGradientPoints.prp_setRecording(false);
         mFillGradientPoints.setPositions(mRelBoundingRect.topLeft(),
                                          mRelBoundingRect.bottomRight(),
                                          finish);
@@ -43,7 +43,7 @@ public:
     virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
         mStrokeSettings.setCurrentStrokeWidth(strokeWidth);
         if(finish) {
-            mStrokeSettings.getStrokeWidthAnimator()->finishTransform();
+            mStrokeSettings.getStrokeWidthAnimator()->prp_finishTransform();
         }
         //scheduleOutlinePathUpdate();
     }
@@ -54,15 +54,15 @@ public:
     }
 
     void startSelectedStrokeWidthTransform() {
-        mStrokeSettings.getStrokeWidthAnimator()->startTransform();
+        mStrokeSettings.getStrokeWidthAnimator()->prp_startTransform();
     }
 
     void startSelectedStrokeColorTransform() {
-        mStrokeSettings.getColorAnimator()->startTransform();
+        mStrokeSettings.getColorAnimator()->prp_startTransform();
     }
 
     void startSelectedFillColorTransform() {
-        mFillPaintSettings.getColorAnimator()->startTransform();
+        mFillPaintSettings.getColorAnimator()->prp_startTransform();
     }
 
     StrokeSettings *getStrokeSettings();

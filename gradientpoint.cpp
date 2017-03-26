@@ -4,8 +4,8 @@
 GradientPoint::GradientPoint(PathBox *parent) :
     MovablePoint(parent, TYPE_GRADIENT_POINT)
 {
-    getRelativePosAnimatorPtr()->setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
-    mRelPos.setTraceKeyOnCurrentFrame(true);
+    getRelativePosAnimatorPtr()->prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
+    mRelPos.anim_setTraceKeyOnCurrentFrame(true);
 }
 
 void GradientPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
@@ -42,7 +42,7 @@ void GradientPoint::draw(QPainter *p)
     p->setPen(QPen(Qt::white, 0.75));
     p->drawEllipse(rect);
 
-    if(mRelPos.isKeyOnCurrentFrame() ) {
+    if(mRelPos.prp_isKeyOnCurrentFrame() ) {
         p->setBrush(Qt::red);
         p->setPen(QPen(Qt::black, 1.) );
         p->drawEllipse(absPos, 4, 4);

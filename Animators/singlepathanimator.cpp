@@ -6,7 +6,7 @@
 
 SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
     ComplexAnimator() {
-    setName("path");
+    prp_setName("path");
     mParentPathAnimator = parentPath;
 }
 
@@ -401,7 +401,7 @@ void SinglePathAnimator::disconnectPoints(PathPoint *point1,
 
     updatePathPointIds();
     //schedulePathUpdate();
-    callUpdater();
+    prp_callUpdater();
 }
 
 void SinglePathAnimator::connectPoints(PathPoint *point1,
@@ -560,7 +560,7 @@ void SinglePathAnimator::deletePointAndApproximate(PathPoint *pointToRemove) {
     newEdge.makePassThrough(absPos);
 }
 
-MovablePoint *SinglePathAnimator::getPointAt(const QPointF &absPtPos,
+MovablePoint *SinglePathAnimator::qra_getPointAt(const QPointF &absPtPos,
                                      const CanvasMode &currentCanvasMode)
 {
     foreach(PathPoint *point, mPoints) {
@@ -720,7 +720,7 @@ void SinglePathAnimator::appendToPointsList(PathPoint *point,
 
     updatePathPointIds();
 
-    callUpdater();
+    prp_callUpdater();
 }
 
 void SinglePathAnimator::removeFromPointsList(PathPoint *point,
@@ -742,7 +742,7 @@ void SinglePathAnimator::removeFromPointsList(PathPoint *point,
     point->decNumberPointers();
 
     //schedulePathUpdate();
-    callUpdater();
+    prp_callUpdater();
 
     updatePathPointIds();
 }

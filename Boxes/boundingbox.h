@@ -301,7 +301,7 @@ public:
     virtual void updateAllBoxes();
     void selectionChangeTriggered(bool shiftPressed);
 
-    bool isAnimated() { return mAnimatorsCollection.isDescendantRecording(); }
+    bool isAnimated() { return mAnimatorsCollection.prp_isDescendantRecording(); }
     virtual void updateRelBoundingRect();
     virtual const QPainterPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
@@ -421,10 +421,10 @@ public:
     }
     void getKeysInRect(const QRectF &selectionRect,
                        const qreal &pixelsPerFrame,
-                       QList<QrealKey *> *keysList);
-    QrealKey *getKeyAtPos(const qreal &relX,
-                          const int &minViewedFrame,
-                          const qreal &pixelsPerFrame);
+                       QList<Key *> *keysList);
+    Key *getKeyAtPos(const qreal &relX,
+                     const int &minViewedFrame,
+                     const qreal &pixelsPerFrame);
     int getFrameShift() const;
     int getParentFrameShift() const;
 

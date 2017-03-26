@@ -38,16 +38,16 @@ KeysClipboardContainer::KeysClipboardContainer() :
 }
 
 KeysClipboardContainer::~KeysClipboardContainer() {
-    foreach(QrealAnimator *animator, mTargetAnimators) {
+    foreach(Animator *animator, mTargetAnimators) {
         animator->decNumberPointers();
     }
-    foreach(QrealKey *key, mKeysList) {
+    foreach(Key *key, mKeysList) {
         key->decNumberPointers();
     }
 }
 
-void KeysClipboardContainer::copyKeyToContainer(QrealKey *key) {
-    mKeysList << key->makeQrealKeyDuplicate(key->getParentAnimator());
+void KeysClipboardContainer::copyKeyToContainer(Key *key) {
+    mKeysList << key->makeKeyDuplicate(key->getParentAnimator());
     mTargetAnimators << key->getParentAnimator();
     key->getParentAnimator()->incNumberPointers();
 }
@@ -56,15 +56,15 @@ void KeysClipboardContainer::copyKeyToContainer(QrealKey *key) {
 void KeysClipboardContainer::paste(const int &pasteFrame,
                                    KeysView *keysView) {
     int firstKeyFrame = 1000000;
-    foreach(QrealKey *key, mKeysList) {
+    foreach(Key *key, mKeysList) {
         if(key->getAbsFrame() < firstKeyFrame) {
             firstKeyFrame = key->getAbsFrame();
         }
     }
     int dFrame = pasteFrame - firstKeyFrame;
 
-    QList<QrealAnimator*> animators;
-    foreach(QrealAnimator *animator, mTargetAnimators) {
+    QList<Animator*> animators;
+    foreach(Animator *animator, mTargetAnimators) {
         if(animators.contains(animator)) continue;
         animators << animator;
     }
@@ -73,16 +73,16 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
 
     int count = mKeysList.count();
     for(int i = 0; i < count; i++) {
-        QrealKey *key = mKeysList.at(i);
-        QrealAnimator *animator = mTargetAnimators.at(i);
+        Key *key = mKeysList.at(i);
+        Animator *animator = mTargetAnimators.at(i);
         key->setAbsFrame(key->getAbsFrame() + dFrame);
-        key = key->makeQrealKeyDuplicate(animator);
-        animator->appendKey(key);
+        key = key->makeKeyDuplicate(animator);
+        animator->anim_appendKey(key);
         keysView->addKeyToSelection(key);
     }
 
-    foreach(QrealAnimator *animator, animators) {
-        animator->mergeKeysIfNeeded();
+    foreach(Animator *animator, animators) {
+        animator->anim_mergeKeysIfNeeded();
     }
 }
 
@@ -101,10 +101,11 @@ void AnimatorClipboardContainer::setAnimator(QrealAnimator *animator) {
 }
 
 void AnimatorClipboardContainer::paste(QrealAnimator *target) {
-    QString nameT = target->getName();
-    if(nameT == mAnimator->getName() ||
-       !(target->isComplexAnimator() || mAnimator->isComplexAnimator())) {
+    QString nameT = target->prp_getName();
+    if(nameT == mAnimator->prp_getName() ||
+       !(target->anim_isComplexAnimator() ||
+         mAnimator->anim_isComplexAnimator())) {
         mAnimator->makeDuplicate(target);
-        target->setName(nameT);
+        target->prp_setName(nameT);
     }
 }

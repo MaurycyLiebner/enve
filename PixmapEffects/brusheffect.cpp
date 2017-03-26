@@ -9,40 +9,40 @@ BrushEffect::BrushEffect(qreal numberStrokes,
                          qreal strokeCurvature)
 {
     BrushStroke::loadStrokePixmaps();
-    setName("brush");
+    prp_setName("brush");
 
-    mNumberStrokes.setCurrentValue(numberStrokes);
-    mNumberStrokes.setName("number strokes");
+    mNumberStrokes.qra_setCurrentValue(numberStrokes);
+    mNumberStrokes.prp_setName("number strokes");
     mNumberStrokes.blockPointer();
     addChildAnimator(&mNumberStrokes);
 
-    mMinBrushRadius.setCurrentValue(brushMinRadius);
-    mMinBrushRadius.setName("min radius");
+    mMinBrushRadius.qra_setCurrentValue(brushMinRadius);
+    mMinBrushRadius.prp_setName("min radius");
     mMinBrushRadius.blockPointer();
     addChildAnimator(&mMinBrushRadius);
 
-    mMaxBrushRadius.setCurrentValue(brushMaxRadius);
-    mMaxBrushRadius.setName("max radius");
+    mMaxBrushRadius.qra_setCurrentValue(brushMaxRadius);
+    mMaxBrushRadius.prp_setName("max radius");
     mMaxBrushRadius.blockPointer();
     addChildAnimator(&mMaxBrushRadius);
 
-    mStrokeMaxLength.setCurrentValue(strokeMaxLength);
-    mStrokeMaxLength.setName("max stroke length");
+    mStrokeMaxLength.qra_setCurrentValue(strokeMaxLength);
+    mStrokeMaxLength.prp_setName("max stroke length");
     mStrokeMaxLength.blockPointer();
     addChildAnimator(&mStrokeMaxLength);
 
-    mStrokeMinDirectionAngle.setCurrentValue(strokeMinDirectionAngle);
-    mStrokeMinDirectionAngle.setName("min stroke angle");
+    mStrokeMinDirectionAngle.qra_setCurrentValue(strokeMinDirectionAngle);
+    mStrokeMinDirectionAngle.prp_setName("min stroke angle");
     mStrokeMinDirectionAngle.blockPointer();
     addChildAnimator(&mStrokeMinDirectionAngle);
 
-    mStrokeMaxDirectionAngle.setCurrentValue(strokeMaxDirectionAngle);
-    mStrokeMaxDirectionAngle.setName("max stroke angle");
+    mStrokeMaxDirectionAngle.qra_setCurrentValue(strokeMaxDirectionAngle);
+    mStrokeMaxDirectionAngle.prp_setName("max stroke angle");
     mStrokeMaxDirectionAngle.blockPointer();
     addChildAnimator(&mStrokeMaxDirectionAngle);
 
-    mStrokeCurvature.setCurrentValue(strokeCurvature);
-    mStrokeCurvature.setName("curvature");
+    mStrokeCurvature.qra_setCurrentValue(strokeCurvature);
+    mStrokeCurvature.prp_setName("curvature");
     mStrokeCurvature.blockPointer();
     addChildAnimator(&mStrokeCurvature);
 }
@@ -53,20 +53,20 @@ void BrushEffect::apply(BoundingBox *target, QImage *imgPtr,
     int width = imgPtr->width();
     int height = imgPtr->height();
     QList<BrushStroke*> strokes;
-    for(int i = 0; i < mNumberStrokes.getCurrentValue(); i++) {
-        qreal radius = qRandF(mMinBrushRadius.getCurrentValue(),
-                              mMaxBrushRadius.getCurrentValue())*scale;
+    for(int i = 0; i < mNumberStrokes.qra_getCurrentValue(); i++) {
+        qreal radius = qRandF(mMinBrushRadius.qra_getCurrentValue(),
+                              mMaxBrushRadius.qra_getCurrentValue())*scale;
         QPointF startPos = QPointF(qrand() % width, qrand() % height);
         qreal angle;
         if(qrand() % 2 == 1) {
-            angle = qRandF(mStrokeMinDirectionAngle.getCurrentValue(),
-                           mStrokeMaxDirectionAngle.getCurrentValue());
+            angle = qRandF(mStrokeMinDirectionAngle.qra_getCurrentValue(),
+                           mStrokeMaxDirectionAngle.qra_getCurrentValue());
         } else {
-            angle = qRandF(mStrokeMinDirectionAngle.getCurrentValue() + 180,
-                           mStrokeMaxDirectionAngle.getCurrentValue() + 180);
+            angle = qRandF(mStrokeMinDirectionAngle.qra_getCurrentValue() + 180,
+                           mStrokeMaxDirectionAngle.qra_getCurrentValue() + 180);
         }
         qreal length = qRandF(2*radius,
-                              mStrokeMaxLength.getCurrentValue()*scale);
+                              mStrokeMaxLength.qra_getCurrentValue()*scale);
         QLineF line = QLineF(startPos,
                              QPointF(startPos.x() + length,
                                      startPos.y()));
@@ -90,8 +90,8 @@ void BrushEffect::apply(BoundingBox *target, QImage *imgPtr,
             endPos = point;
         }
         line = line.normalVector().translated((endPos - startPos)*0.5);
-        line.setLength(line.length()*qRandF(-mStrokeCurvature.getCurrentValue(),
-                                            mStrokeCurvature.getCurrentValue()));
+        line.setLength(line.length()*qRandF(-mStrokeCurvature.qra_getCurrentValue(),
+                                            mStrokeCurvature.qra_getCurrentValue()));
         QPointF ctrls = line.p2();
         if(ctrls.x() >= width) {
             ctrls.setX(width - 2);
@@ -130,7 +130,7 @@ void BrushEffect::apply(BoundingBox *target, QImage *imgPtr,
 }
 
 qreal BrushEffect::getMargin() {
-    return mMaxBrushRadius.getCurrentValue();
+    return mMaxBrushRadius.qra_getCurrentValue();
 }
 
 BrushStroke::BrushStroke(QPointF startPos, QPointF startCtrlPos,

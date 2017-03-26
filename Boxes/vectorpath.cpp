@@ -13,7 +13,7 @@ VectorPath::VectorPath(BoxesGroup *group) :
     setName("Path");
     mPathAnimator.setParentBox(this);
     addActiveAnimator(&mPathAnimator);
-    mPathAnimator.setUpdater(new PathPointUpdater(this));
+    mPathAnimator.prp_setUpdater(new PathPointUpdater(this));
 
     mPathAnimator.blockPointer();
 }
@@ -63,7 +63,7 @@ PathAnimator *VectorPath::getPathAnimator() {
 
 void VectorPath::applyCurrentTransformation() {
     mPathAnimator.
-            applyTransformToPoints(mTransformAnimator.getCurrentValue());
+            applyTransformToPoints(mTransformAnimator.qra_getCurrentValue());
 
     mTransformAnimator.reset(true);
     centerPivotPosition(true);
@@ -139,13 +139,13 @@ MovablePoint *VectorPath::getPointAt(const QPointF &absPtPos,
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
         }
     }
     if(pointToReturn == NULL) {
-        pointToReturn = mPathAnimator.getPointAt(absPtPos,
+        pointToReturn = mPathAnimator.qra_getPointAt(absPtPos,
                                                  currentCanvasMode);
     }
     return pointToReturn;

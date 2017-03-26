@@ -4,13 +4,13 @@
 AnimationBox::AnimationBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_IMAGE) {
     setName("Animation");
-    mTimeScaleAnimator.setName("time scale");
+    mTimeScaleAnimator.prp_setName("time scale");
     mTimeScaleAnimator.blockPointer();
-    mTimeScaleAnimator.setValueRange(-100, 100);
-    mTimeScaleAnimator.setCurrentValue(1.);
+    mTimeScaleAnimator.qra_setValueRange(-100, 100);
+    mTimeScaleAnimator.qra_setCurrentValue(1.);
     mTimeScaleAnimator.setPrefferedValueStep(0.05);
-    mTimeScaleAnimator.setUpdater(new AnimationBoxFrameUpdater(this));
-    mTimeScaleAnimator.blockUpdater();
+    mTimeScaleAnimator.prp_setUpdater(new AnimationBoxFrameUpdater(this));
+    mTimeScaleAnimator.prp_blockUpdater();
     addActiveAnimator(&mTimeScaleAnimator);
 
     setDurationRectangle(new DurationRectangle());
@@ -50,7 +50,7 @@ DurationRectangleMovable *AnimationBox::getRectangleMovableAtPos(
 //}
 
 void AnimationBox::updateDurationRectanglePossibleRange() {
-    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
+    qreal timeScale = mTimeScaleAnimator.qra_getCurrentValue();
 
     mDurationRectangle->setPossibleFrameDuration(
                 qCeil(qAbs(timeScale*mFramesCount)));
@@ -58,7 +58,7 @@ void AnimationBox::updateDurationRectanglePossibleRange() {
 
 void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
+    qreal timeScale = mTimeScaleAnimator.qra_getCurrentValue();
 
     int pixId;
     if(timeScale > 0.) {

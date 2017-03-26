@@ -72,7 +72,7 @@ public:
     Gradient(int sqlIdT,
              GradientWidget *gradientWidget);
 
-    int saveToSql(QSqlQuery *query);
+    int prp_saveToSql(QSqlQuery *query);
 
     void saveToSqlIfPathSelected(QSqlQuery *query);
 
@@ -88,7 +88,7 @@ public:
 
     void setColors(QList<Color> newColors);
 
-    void startTransform();
+    void prp_startTransform();
 
     bool isInPaths(PathBox *path);
 
@@ -165,7 +165,7 @@ public:
                   PaintType paintTypeT,
                   Gradient *gradientT = NULL);
 
-    virtual int saveToSql(QSqlQuery *query);
+    virtual int prp_saveToSql(QSqlQuery *query);
 
     Color getCurrentColor() const;
 
@@ -209,7 +209,7 @@ public:
                    PaintType paintTypeT,
                    Gradient *gradientT = NULL);
 
-    int saveToSql(QSqlQuery *query);
+    int prp_saveToSql(QSqlQuery *query);
 
     void setCurrentStrokeWidth(qreal newWidth);
 

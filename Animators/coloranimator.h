@@ -15,10 +15,10 @@ class ColorAnimator : public ComplexAnimator
 public:
     ColorAnimator();
 
-    void setCurrentValue(Color colorValue, bool finish = false);
-    void setCurrentValue(QColor qcolorValue, bool finish = false);
+    void qra_setCurrentValue(Color colorValue, bool finish = false);
+    void qra_setCurrentValue(QColor qcolorValue, bool finish = false);
 
-    Color getCurrentValue() const;
+    Color qra_getCurrentValue() const;
     void setColorMode(ColorMode colorMode);
 
     void startVal1Transform();
@@ -35,9 +35,9 @@ public:
     void setCurrentAlphaValue(const qreal &alpha,
                               const bool &finish = false);
 
-    void openContextMenu(QPoint pos);
+    void prp_openContextMenu(QPoint pos);
     void loadFromSql(int sqlId);
-    int saveToSql(QSqlQuery *query);
+    int prp_saveToSql(QSqlQuery *query);
 
     void makeDuplicate(QrealAnimator *target);
     void duplicateVal1AnimatorFrom(QrealAnimator *source);

@@ -4,84 +4,114 @@
 #include "Properties/property.h"
 
 class ComplexAnimator;
-class QrealKey;
+class Key;
 class QrealAnimator;
 class QPainter;
 class AnimatorUpdater;
+class DurationRectangleMovable;
 
 class Animator :
     public Property {
     Q_OBJECT
 public:
     Animator();
-    ~Animator() {}
+    ~Animator();
 
-    virtual void setUpdater(AnimatorUpdater *updater) = 0;
+    virtual void prp_setAbsFrame(int frame);
 
-    virtual void callUpdater() = 0;
+    virtual void prp_switchRecording();
 
-    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame, qreal drawY,
-                          int startFrame, int endFrame) = 0;
-    virtual void getKeysInRect(QRectF selectionRect,
-                               qreal pixelsPerFrame,
-                               QList<QrealKey *> *keysList) = 0;
+    virtual bool prp_isDescendantRecording() { return anim_mIsRecording; }
 
-    virtual QrealKey *getKeyAtPos(qreal relX, int minViewedFrame,
-                                  qreal pixelsPerFrame) = 0;
+    virtual QString prp_getValueText() = 0;
 
-    virtual void cancelTransform() = 0;
+    virtual void prp_clearFromGraphView() = 0;
 
-    virtual void startTransform() = 0;
+    virtual void prp_openContextMenu(QPoint pos) = 0;
 
-    virtual void finishTransform() = 0;
+    virtual int prp_saveToSql(QSqlQuery*) = 0;
 
-    virtual void retrieveSavedValue() = 0;
+    bool anim_isComplexAnimator() { return anim_mIsComplexAnimator; }
 
-    virtual void sortKeys() = 0;
+    virtual bool prp_isAnimator() { return true; }
+    virtual void prp_startDragging() {}
 
-    virtual void setAbsFrame(int frame) = 0;
+    virtual int anim_getFrameShift() const;
+    virtual int anim_getParentFrameShift() const;
 
-    virtual void switchRecording();
+    void anim_updateRelFrame();
+    int anim_absFrameToRelFrame(const int &absFrame) const;
+    int anim_relFrameToAbsFrame(const int &relFrame) const;
+    virtual void anim_mergeKeysIfNeeded();
+    int anim_getClosestsKeyOccupiedRelFrame(const int &frame);
+    Key *anim_getKeyAtRelFrame(const int &frame);
+    bool anim_hasPrevKey(Key *key);
+    bool anim_hasNextKey(Key *key);
+    virtual void anim_callFrameChangeUpdater();
+    virtual void anim_sortKeys();
 
-    virtual void updateKeyOnCurrrentFrame() = 0;
+    virtual void anim_appendKey(Key *newKey,
+                                bool saveUndoRedo = true);
+    virtual void anim_removeKey(Key *keyToRemove,
+                                bool saveUndoRedo = true);
+    virtual void anim_moveKeyToFrame(Key *key, int newFrame);
+    void anim_updateKeyOnCurrrentFrame();
+    void anim_setTraceKeyOnCurrentFrame(bool bT) {
+        anim_mTraceKeyOnCurrentFrame = bT;
+    }
+    virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(qreal relX,
+                                                       int minViewedFrame,
+                                                       qreal pixelsPerFrame) {
+        Q_UNUSED(relX);
+        Q_UNUSED(minViewedFrame);
+        Q_UNUSED(pixelsPerFrame);
+        return NULL;
+    }
 
-    virtual bool isKeyOnCurrentFrame() = 0;
+    Key *prp_getKeyAtPos(qreal relX,
+                         int minViewedFrame,
+                         qreal pixelsPerFrame);
+    void prp_removeAllKeysFromComplexAnimator();
+    void prp_addAllKeysToComplexAnimator();
+    bool prp_hasKeys();
 
-    virtual bool isDescendantRecording() = 0;
-
-    virtual QString getValueText() = 0;
-
-    virtual void clearFromGraphView() = 0;
-
-    virtual void openContextMenu(QPoint pos) = 0;
-
-    virtual int saveToSql(QSqlQuery*) = 0;
-
-    bool isCurrentAnimator() { return mIsCurrentAnimator; }
-
-    bool isComplexAnimator() { return mIsComplexAnimator; }
-
-    virtual bool hasKeys() = 0;
-
-    virtual bool isAnimator() { return true; }
-    virtual void startDragging() {}
-
-    virtual int getFrameShift() const;
-    virtual int getParentFrameShift() const;
-
-    void updateRelFrame();
-    int absFrameToRelFrame(const int &absFrame) const;
-    int relFrameToAbsFrame(const int &relFrame) const;
+    void anim_setRecordingWithoutChangingKeys(bool rec,
+                                              bool saveUndoRedo = true);
+    bool prp_isRecording();
+    virtual void anim_removeAllKeys();
+    bool prp_isKeyOnCurrentFrame();
+    virtual void prp_getKeysInRect(QRectF selectionRect,
+                                   qreal pixelsPerFrame,
+                                   QList<Key *> *keysList);
+    bool anim_getNextAndPreviousKeyIdForRelFrame(
+                                 int *prevIdP,
+                                 int *nextIdP,
+                                 int frame) const;
+    virtual void prp_drawKeys(QPainter *p,
+                              qreal pixelsPerFrame, qreal drawY,
+                              int startFrame, int endFrame);
+    Key *anim_getKeyAtAbsFrame(const int &frame);
 protected:
-    int mCurrentAbsFrame = 0;
-    int mCurrentRelFrame = 0;
-    bool mIsComplexAnimator = false;
-    bool mIsCurrentAnimator = false;
-    bool mIsRecording = false;
-    bool mKeyOnCurrentFrame = false;
-    QColor mAnimatorColor;
+    virtual void anim_drawKey(QPainter *p,
+                         Key *key,
+                         const qreal &pixelsPerFrame,
+                         const qreal &drawY,
+                         const int &startFrame);
+    bool anim_mTraceKeyOnCurrentFrame = false;
+    QList<Key*> anim_mKeys;
+    int anim_mCurrentAbsFrame = 0;
+    int anim_mCurrentRelFrame = 0;
+    bool anim_mIsComplexAnimator = false;
+    bool anim_mIsCurrentAnimator = false;
+    bool anim_mIsRecording = false;
+    bool anim_mKeyOnCurrentFrame = false;
+    QColor anim_mAnimatorColor;
 public slots:
-    virtual void setRecording(bool rec) = 0;
+    virtual void prp_setRecording(bool rec) = 0;
+    void anim_deleteCurrentKey();
+    void anim_updateAfterShifted();
+signals:
+    void beingDeleted();
 };
 
 #endif // ANIMATOR_H

@@ -57,7 +57,7 @@ void KeysView::deleteSelectedKeys()
             clearHoveredPoint();
         }
     }
-    foreach(QrealKey *key, mSelectedKeys) {
+    foreach(Key *key, mSelectedKeys) {
         key->deleteKey();
         key->decNumberPointers();
     }
@@ -65,11 +65,11 @@ void KeysView::deleteSelectedKeys()
 }
 
 void KeysView::selectKeysInSelectionRect() {
-    QList<QrealKey*> listKeys;
+    QList<Key*> listKeys;
     mBoxesListVisible->getKeysInRect(mSelectionRect,
                                      mPixelsPerFrame,
                                      &listKeys);
-    foreach(QrealKey *key, listKeys) {
+    foreach(Key *key, listKeys) {
         addKeyToSelection(key);
     }
 }
@@ -150,7 +150,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         } else {
             if(mMovingKeys) {
                 if(!mFirstMove) {
-                    foreach(QrealKey *key, mSelectedKeys) {
+                    foreach(Key *key, mSelectedKeys) {
                         key->cancelFrameTransform();
                     }
                 }
@@ -187,7 +187,7 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
             if(event->isAutoRepeat()) return false;
             KeysClipboardContainer *container =
                     new KeysClipboardContainer();
-            foreach(QrealKey *key, mSelectedKeys) {
+            foreach(Key *key, mSelectedKeys) {
                 key->copyToContainer(container);
             }
             mMainWindow->replaceClipboard(container);
@@ -214,12 +214,13 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                   event->key() == Qt::Key_D) {
             if(!mSelectedKeys.isEmpty()) {
                 if(!mMovingKeys) {
-                    QList<QrealKey*> selectedKeys = mSelectedKeys;
+                    QList<Key*> selectedKeys = mSelectedKeys;
                     clearKeySelection();
-                    foreach(QrealKey *key, selectedKeys) {
+                    QrealKey *key; foreachQK(key, selectedKeys)
                         QrealKey *duplicate =
-                                key->makeQrealKeyDuplicate(key->getParentAnimator());
-                        key->getParentAnimator()->appendKey(duplicate);
+                                key->makeQrealKeyDuplicate(
+                                        key->getParentQrealAnimator());
+                        key->getParentAnimator()->anim_appendKey(duplicate);
                         addKeyToSelection(duplicate);
                     }
 
@@ -235,11 +236,11 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
             deleteSelectedKeys();
             repaint();
         } else if(event->key() == Qt::Key_Right) {
-            foreach(QrealKey *key, mSelectedKeys) {
+            foreach(Key *key, mSelectedKeys) {
                 key->incFrameAndUpdateParentAnimator(1);
             }
         } else if(event->key() == Qt::Key_Left) {
-            foreach(QrealKey *key, mSelectedKeys) {
+            foreach(Key *key, mSelectedKeys) {
                 key->incFrameAndUpdateParentAnimator(-1);
             }
         } else {
@@ -456,14 +457,14 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                 }
                 if(mMovingKeys) {
                     if(mFirstMove) {
-                        foreach(QrealKey *key, mSelectedKeys) {
+                        foreach(Key *key, mSelectedKeys) {
                             key->startFrameTransform();
                         }
                     }
                     if(mScalingKeys) {
                         qreal keysScale = (event->x() - mLastPressPos.x())/
                                            300.;
-                        foreach(QrealKey *key, mSelectedKeys) {
+                        foreach(Key *key, mSelectedKeys) {
                             key->scaleFrameAndUpdateParentAnimator(
                                         mMainWindow->getCurrentFrame(),
                                         keysScale);
@@ -476,7 +477,7 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
 
                         if(dDFrame != 0) {
                             mMoveDFrame = dFrame;
-                            foreach(QrealKey *key, mSelectedKeys) {
+                            foreach(Key *key, mSelectedKeys) {
                                 key->incFrameAndUpdateParentAnimator(dDFrame);
                             }
                         }
@@ -547,15 +548,15 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                         addKeyToSelection(mLastPressedKey);
                     }
                 }
-                QList<QrealAnimator*> parentAnimators;
-                foreach(QrealKey *key, mSelectedKeys) {
+                QList<Animator*> parentAnimators;
+                foreach(Key *key, mSelectedKeys) {
                     key->finishFrameTransform();
                     if(parentAnimators.contains(
                                 key->getParentAnimator()) ) continue;
                     parentAnimators << key->getParentAnimator();
                 }
-                foreach(QrealAnimator *animator, parentAnimators) {
-                    animator->mergeKeysIfNeeded();
+                foreach(Animator *animator, parentAnimators) {
+                    animator->anim_mergeKeysIfNeeded();
                 }
 
                 mMoveDFrame = 0;
@@ -609,19 +610,17 @@ void KeysView::updatePixelsPerFrame()
     mPixelsPerFrame = animWidth/dFrame;
 }
 
-void KeysView::addKeyToSelection(QrealKey *key)
-{
+void KeysView::addKeyToSelection(Key *key) {
     key->addToSelection(&mSelectedKeys);
 }
 
-void KeysView::removeKeyFromSelection(QrealKey *key)
-{
+void KeysView::removeKeyFromSelection(Key *key) {
     key->removeFromSelection(&mSelectedKeys);
 }
 
 void KeysView::clearKeySelection()
 {
-    foreach(QrealKey *key, mSelectedKeys) {
+    foreach(Key *key, mSelectedKeys) {
         key->setSelected(false);
         key->decNumberPointers();
     }

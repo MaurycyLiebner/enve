@@ -126,9 +126,9 @@ MovablePoint *TextBox::getPointAt(const QPointF &absPtPos, const CanvasMode &cur
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
         }
     }
 

@@ -9,9 +9,9 @@ EffectAnimators::EffectAnimators() :
 
 }
 
-void EffectAnimators::saveToSql(QSqlQuery *query, int boundingBoxSqlId) {
+void EffectAnimators::prp_saveToSql(QSqlQuery *query, int boundingBoxSqlId) {
     foreach(Property *effect, mChildAnimators) {
-        ((PixmapEffect*)effect)->saveToSql(query, boundingBoxSqlId);
+        ((PixmapEffect*)effect)->prp_saveToSql(query, boundingBoxSqlId);
     }
 }
 

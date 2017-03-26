@@ -11,5 +11,5 @@ bool BoolProperty::getValue() {
 
 void BoolProperty::setValue(const bool &value) {
     mValue = value;
-    mParentAnimator->callUpdater();
+    prp_mParentAnimator->prp_callUpdater();
 }

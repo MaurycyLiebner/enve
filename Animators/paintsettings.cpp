@@ -36,7 +36,7 @@ void ColorSetting::apply(ColorAnimator *target) const {
 
 void ColorSetting::finishColorTransform(ColorAnimator *target) const {
     changeColor(target);
-    target->finishTransform();
+    target->prp_finishTransform();
 }
 
 void ColorSetting::changeColor(ColorAnimator *target) const {
@@ -82,11 +82,11 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
                 mChangedValue == CVR_HUE) {
             target->startVal1Transform();
 
-            qreal targetVal2 = target->getVal2Animator()->getCurrentValue();
+            qreal targetVal2 = target->getVal2Animator()->qra_getCurrentValue();
             if(qAbs(targetVal2 - mVal2) > 0.001) {
                 target->startVal2Transform();
             }
-            qreal targetVal3 = target->getVal3Animator()->getCurrentValue();
+            qreal targetVal3 = target->getVal3Animator()->qra_getCurrentValue();
             if(qAbs(targetVal3 - mVal3) > 0.001) {
                 target->startVal3Transform();
             }
@@ -95,11 +95,11 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
                   mChangedValue == CVR_HSLSATURATION) {
             target->startVal2Transform();
 
-            qreal targetVal1 = target->getVal1Animator()->getCurrentValue();
+            qreal targetVal1 = target->getVal1Animator()->qra_getCurrentValue();
             if(qAbs(targetVal1 - mVal1) > 0.001) {
                 target->startVal1Transform();
             }
-            qreal targetVal3 = target->getVal3Animator()->getCurrentValue();
+            qreal targetVal3 = target->getVal3Animator()->qra_getCurrentValue();
             if(qAbs(targetVal3 - mVal3) > 0.001) {
                 target->startVal3Transform();
             }
@@ -108,11 +108,11 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
                   mChangedValue == CVR_LIGHTNESS) {
             target->startVal3Transform();
 
-            qreal targetVal1 = target->getVal1Animator()->getCurrentValue();
+            qreal targetVal1 = target->getVal1Animator()->qra_getCurrentValue();
             if(qAbs(targetVal1 - mVal1) > 0.001) {
                 target->startVal1Transform();
             }
-            qreal targetVal2 = target->getVal2Animator()->getCurrentValue();
+            qreal targetVal2 = target->getVal2Animator()->qra_getCurrentValue();
             if(qAbs(targetVal2 - mVal2) > 0.001) {
                 target->startVal2Transform();
             }
@@ -122,7 +122,7 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
         target->startVal2Transform();
         target->startVal3Transform();
     }
-    qreal targetAlpha = target->getAlphaAnimator()->getCurrentValue();
+    qreal targetAlpha = target->getAlphaAnimator()->qra_getCurrentValue();
     if(qAbs(targetAlpha - mAlpha) > 0.001 ||
             mChangedValue == CVR_ALL ||
             mChangedValue == CVR_ALPHA) {
@@ -135,9 +135,9 @@ Gradient::Gradient(Color color1, Color color2,
                    GradientWidget *gradientWidget) :
     ComplexAnimator()
 {
-    setUpdater(new GradientUpdater(this));
-    blockUpdater();
-    setName("gradient");
+    prp_setUpdater(new GradientUpdater(this));
+    prp_blockUpdater();
+    prp_setName("gradient");
     mGradientWidget = gradientWidget;
     addColorToList(color1);
     addColorToList(color2);
@@ -146,21 +146,21 @@ Gradient::Gradient(Color color1, Color color2,
 
 Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget) :
     ComplexAnimator() {
-    setUpdater(new GradientUpdater(this));
-    blockUpdater();
-    setName("gradient");
+    prp_setUpdater(new GradientUpdater(this));
+    prp_blockUpdater();
+    prp_setName("gradient");
     mGradientWidget = gradientWidget;
     foreach (ColorAnimator *color, fromGradient->mColors) {
-        addColorToList(color->getCurrentValue());
+        addColorToList(color->qra_getCurrentValue());
     }
     updateQGradientStops();
 }
 
 Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
     ComplexAnimator() {
-    setUpdater(new GradientUpdater(this));
-    blockUpdater();
-    setName("gradient");
+    prp_setUpdater(new GradientUpdater(this));
+    prp_blockUpdater();
+    prp_setName("gradient");
     QSqlQuery query;
     mGradientWidget = gradientWidget;
     mSqlId = sqlIdT;
@@ -189,13 +189,13 @@ Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
     updateQGradientStops();
 }
 
-void Gradient::startTransform() {
+void Gradient::prp_startTransform() {
     //savedColors = colors;
 }
 
 void Gradient::addColorToList(Color color) {
     ColorAnimator *newColorAnimator = new ColorAnimator();
-    newColorAnimator->setCurrentValue(color);
+    newColorAnimator->qra_setCurrentValue(color);
     addColorToList(newColorAnimator);
 }
 
@@ -214,7 +214,7 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator,
 
 Color Gradient::getCurrentColorAt(int id)
 {
-    return mColors.at(id)->getCurrentValue();
+    return mColors.at(id)->qra_getCurrentValue();
 }
 
 ColorAnimator *Gradient::getColorAnimatorAt(int id) {
@@ -241,12 +241,12 @@ QGradientStops Gradient::getQGradientStops()
     return mQGradientStops;
 }
 
-int Gradient::saveToSql(QSqlQuery *query) {
+int Gradient::prp_saveToSql(QSqlQuery *query) {
     query->exec("INSERT INTO gradient DEFAULT VALUES");
     mSqlId = query->lastInsertId().toInt();
     int posInGradient = 0;
     foreach(ColorAnimator *color, mColors) {
-        int colorId = color->saveToSql(query);
+        int colorId = color->prp_saveToSql(query);
         query->exec(QString("INSERT INTO gradientcolor "
                             "(colorid, gradientid, positioningradient) "
                             "VALUES (%1, %2, %3)").
@@ -263,7 +263,7 @@ void Gradient::saveToSqlIfPathSelected(QSqlQuery *query) {
         BoundingBox *parent = (BoundingBox *) path;
         while(parent != NULL) {
             if(parent->isSelected()) {
-                saveToSql(query);
+                prp_saveToSql(query);
                 return;
             }
             parent = parent->getParent();
@@ -304,7 +304,7 @@ void Gradient::addColor(Color color) {
 }
 
 void Gradient::replaceColor(int id, Color color) {
-    mColors.at(id)->setCurrentValue(color);
+    mColors.at(id)->qra_setCurrentValue(color);
     updateQGradientStops();
 }
 
@@ -362,7 +362,7 @@ void Gradient::updateQGradientStopsIfNeeded() {
 
 void Gradient::startColorIdTransform(int id) {
     if(mColors.count() <= id || id < 0) return;
-    mColors.at(id)->startTransform();
+    mColors.at(id)->prp_startTransform();
 }
 
 void Gradient::updateQGradientStops() {
@@ -371,7 +371,7 @@ void Gradient::updateQGradientStops() {
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                                    mColors.at(i)->getCurrentValue().qcol) );
+                                    mColors.at(i)->qra_getCurrentValue().qcol) );
         cPos += inc;
     }
     updatePaths();
@@ -393,9 +393,9 @@ PaintSettings::PaintSettings() : PaintSettings(Color(255, 255, 255),
 PaintSettings::PaintSettings(Color colorT,
                              PaintType paintTypeT,
                              Gradient *gradientT) : ComplexAnimator() {
-    setName("fill");
+    prp_setName("fill");
     mColor.blockPointer();
-    mColor.setCurrentValue(colorT);
+    mColor.qra_setCurrentValue(colorT);
     mPaintType = paintTypeT;
     mGradient = gradientT;
 
@@ -403,8 +403,8 @@ PaintSettings::PaintSettings(Color colorT,
 }
 
 void PaintSettings::setPaintPathTarget(PathBox *path) {
-    mColor.setUpdater(new DisplayedFillStrokeSettingsUpdater(path));
-    mColor.blockUpdater();
+    mColor.prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(path));
+    mColor.prp_blockUpdater();
 }
 
 void PaintSettings::makeDuplicate(QrealAnimator *target) {
@@ -442,8 +442,8 @@ void PaintSettings::loadFromSql(int sqlId, GradientWidget *gradientWidget) {
     }
 }
 
-int PaintSettings::saveToSql(QSqlQuery *query) {
-    int colorId = mColor.saveToSql(query);
+int PaintSettings::prp_saveToSql(QSqlQuery *query) {
+    int colorId = mColor.prp_saveToSql(query);
     QString gradientId = (mGradient == NULL) ? "NULL" :
                                                QString::number(
                                                    mGradient->getSqlId());
@@ -457,7 +457,7 @@ int PaintSettings::saveToSql(QSqlQuery *query) {
 }
 
 Color PaintSettings::getCurrentColor() const {
-    return mColor.getCurrentValue();
+    return mColor.qra_getCurrentValue();
 }
 
 PaintType PaintSettings::getPaintType() const {
@@ -491,7 +491,7 @@ void PaintSettings::setGradient(Gradient *gradient,
 }
 
 void PaintSettings::setCurrentColor(Color color) {
-    mColor.setCurrentValue(color);
+    mColor.qra_setCurrentValue(color);
 }
 
 void PaintSettings::setPaintType(PaintType paintType, bool saveUndoRedo) {
@@ -531,18 +531,18 @@ StrokeSettings::StrokeSettings(Color colorT,
                                Gradient *gradientT) : PaintSettings(colorT,
                                                                     paintTypeT,
                                                                     gradientT) {
-    setName("stroke");
-    mLineWidth.setCurrentValue(1.);
-    mLineWidth.setName("thickness");
+    prp_setName("stroke");
+    mLineWidth.qra_setCurrentValue(1.);
+    mLineWidth.prp_setName("thickness");
 
     addChildAnimator(&mLineWidth);
     mLineWidth.blockPointer();
 
-    mLineWidth.setValueRange(0., mLineWidth.getMaxPossibleValue());
+    mLineWidth.qra_setValueRange(0., mLineWidth.getMaxPossibleValue());
 }
 
 void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
-    mLineWidth.setUpdater(new StrokeWidthUpdater(path));
+    mLineWidth.prp_setUpdater(new StrokeWidthUpdater(path));
     setPaintPathTarget(path);
 }
 
@@ -581,9 +581,9 @@ void StrokeSettings::loadFromSql(int strokeSqlId, int paintSqlId,
     }
 }
 
-int StrokeSettings::saveToSql(QSqlQuery *query) {
-    int paintSettingsId = PaintSettings::saveToSql(query);
-    int lineWidthId = mLineWidth.saveToSql(query);
+int StrokeSettings::prp_saveToSql(QSqlQuery *query) {
+    int paintSettingsId = PaintSettings::prp_saveToSql(query);
+    int lineWidthId = mLineWidth.prp_saveToSql(query);
     query->exec(QString("INSERT INTO strokesettings (linewidthanimatorid, "
                        "capstyle, joinstyle, paintsettingsid) "
                        "VALUES (%1, %2, %3, %4)").
@@ -595,7 +595,7 @@ int StrokeSettings::saveToSql(QSqlQuery *query) {
 }
 
 void StrokeSettings::setCurrentStrokeWidth(qreal newWidth) {
-    mLineWidth.setCurrentValue(newWidth);
+    mLineWidth.qra_setCurrentValue(newWidth);
 }
 
 void StrokeSettings::setCapStyle(Qt::PenCapStyle capStyle) {
@@ -607,13 +607,13 @@ void StrokeSettings::setJoinStyle(Qt::PenJoinStyle joinStyle) {
 }
 
 void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
-    stroker->setWidth(mLineWidth.getCurrentValue());
+    stroker->setWidth(mLineWidth.qra_getCurrentValue());
     stroker->setCapStyle(mCapStyle);
     stroker->setJoinStyle(mJoinStyle);
 }
 
 qreal StrokeSettings::getCurrentStrokeWidth() const {
-    return mLineWidth.getCurrentValue();
+    return mLineWidth.qra_getCurrentValue();
 }
 
 Qt::PenCapStyle StrokeSettings::getCapStyle() const {
@@ -637,7 +637,7 @@ QPainter::CompositionMode StrokeSettings::getOutlineCompositionMode() {
 }
 
 bool StrokeSettings::nonZeroLineWidth() {
-    return !isZero(mLineWidth.getCurrentValue());
+    return !isZero(mLineWidth.qra_getCurrentValue());
 }
 
 void StrokeSettings::makeDuplicate(QrealAnimator *target) {

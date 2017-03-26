@@ -6,6 +6,8 @@ class QrealAnimator;
 class BoundingBox;
 class BoxesGroup;
 class KeysView;
+class Key;
+class Animator;
 
 enum  ClipboardContainerType : short {
     CCT_BOXES,
@@ -41,13 +43,13 @@ public:
     KeysClipboardContainer();
     ~KeysClipboardContainer();
 
-    void copyKeyToContainer(QrealKey *key);
+    void copyKeyToContainer(Key *key);
 
     void paste(const int &pasteFrame,
                KeysView *keysView);
 private:
-    QList<QrealKey*> mKeysList;
-    QList<QrealAnimator*> mTargetAnimators;
+    QList<Key*> mKeysList;
+    QList<Animator*> mTargetAnimators;
 };
 
 class AnimatorClipboardContainer : public ClipboardContainer {

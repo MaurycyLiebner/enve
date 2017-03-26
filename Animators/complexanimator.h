@@ -11,40 +11,40 @@ public:
     ComplexAnimator();
     ~ComplexAnimator();
 
-    QMatrix getCurrentValue();
+    QMatrix qra_getCurrentValue();
 
-    void addChildQrealKey(QrealKey *key);
+    void ca_addDescendantsKey(Key *key);
     ComplexKey *getKeyCollectionAtAbsFrame(int frame);
     ComplexKey *getKeyCollectionAtRelFrame(int frame);
 
-    void removeChildQrealKey(QrealKey *key);
+    void ca_removeDescendantsKey(Key *key);
     void drawChildAnimatorKeys(QPainter *p,
                                qreal pixelsPerFrame, qreal startY,
                                int startFrame, int endFrame);
-    qreal clampValue(qreal value);
+    qreal qra_clampValue(qreal value);
     void addChildAnimator(Property *childAnimator);
     void removeChildAnimator(Property *removeAnimator);
-    void startTransform();
-    void setUpdater(AnimatorUpdater *updater);
-    void setAbsFrame(int frame);
+    void prp_startTransform();
+    void prp_setUpdater(AnimatorUpdater *updater);
+    void prp_setAbsFrame(int frame);
 
-    void retrieveSavedValue();
-    void finishTransform();
-    void cancelTransform();
+    void prp_retrieveSavedValue();
+    void prp_finishTransform();
+    void prp_cancelTransform();
 
-    void setRecording(bool rec);
+    void prp_setRecording(bool rec);
 
     virtual void childAnimatorIsRecordingChanged();
     void setRecordingValue(bool rec);
 
-    bool isDescendantRecording();
-    QString getValueText();
+    bool prp_isDescendantRecording();
+    QString prp_getValueText();
     void swapChildAnimators(Property *animator1, Property *animator2);
-    void clearFromGraphView();
+    void prp_clearFromGraphView();
 
     bool hasChildAnimators();
 
-    void setTransformed(bool bT);
+    void prp_setTransformed(bool bT);
 
     void changeChildAnimatorZ(const int &oldIndex,
                               const int &newIndex);
@@ -67,7 +67,7 @@ public:
     }
 
     SWT_Type SWT_getType() { return SWT_ComplexAnimator; }
-    void drawKey(QPainter *p, QrealKey *key,
+    void anim_drawKey(QPainter *p, QrealKey *key,
                  const qreal &pixelsPerFrame,
                  const qreal &drawY, const int &startFrame);
     void moveChildInList(Property *child,
@@ -82,38 +82,24 @@ protected:
     qreal mMaxMoveValue;
 };
 
-class ComplexKey : public QrealKey
+class ComplexKey : public Key
 {
 public:
     ComplexKey(ComplexAnimator *parentAnimator);
 
-    void setStartValue(qreal);
+    void addAnimatorKey(Key* key);
 
-    void setEndValue(qreal);
-
-    void setStartFrame(qreal startFrame);
-
-    void setEndFrame(qreal endFrame);
-
-    void addAnimatorKey(QrealKey* key);
-
-    void addOrMergeKey(QrealKey *keyAdd);
+    void addOrMergeKey(Key *keyAdd);
 
     void deleteKey();
 
-    void setCtrlsMode(CtrlsMode mode);
-
-    void setEndEnabled(bool bT);
-
-    void setStartEnabled(bool bT);
-
-    void removeAnimatorKey(QrealKey *key);
+    void removeAnimatorKey(Key *key);
 
     bool isEmpty();
 
     void setRelFrame(int frame);
 
-    void mergeWith(QrealKey *key);
+    void mergeWith(Key *key);
 
     void margeAllKeysToKey(ComplexKey *target);
 
@@ -124,10 +110,10 @@ public:
     void copyToContainer(KeysClipboardContainer *container);
     void cancelFrameTransform();
     //void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame, const qreal &scaleFactor);
-    QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
+    //QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     bool areAllChildrenSelected() {
-        foreach(QrealKey *key, mKeys) {
+        foreach(Key *key, mKeys) {
             if(key->isSelected() ||
                key->areAllChildrenSelected()) continue;
             return false;
@@ -135,10 +121,10 @@ public:
 
         return true;
     }
-    void removeFromSelection(QList<QrealKey *> *selectedKeys);
-    void addToSelection(QList<QrealKey *> *selectedKeys);
+    void removeFromSelection(QList<Key *> *selectedKeys);
+    void addToSelection(QList<Key *> *selectedKeys);
 private:
-    QList<QrealKey*> mKeys;
+    QList<Key*> mKeys;
 };
 
 #endif // COMPLEXANIMATOR_H

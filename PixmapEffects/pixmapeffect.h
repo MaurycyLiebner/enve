@@ -55,14 +55,14 @@ public:
         return false;
     }
 
-    void startDragging();
+    void prp_startDragging();
 
-    int saveToSql(QSqlQuery *query,
+    int prp_saveToSql(QSqlQuery *query,
                   const int &boundingBoxSqlId,
                   const PixmapEffectType &type);
     static PixmapEffect *loadFromSql(int pixmapEffectId,
                                      PixmapEffectType typeT);
-    virtual void saveToSql(QSqlQuery *,
+    virtual void prp_saveToSql(QSqlQuery *,
                            const int &) {}
 
     friend QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr);
@@ -96,7 +96,7 @@ public:
 
     void loadBlurEffectFromSql(int pixmapEffectId);
 
-    void saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
 
     QrealAnimator *makeDuplicate();
     void makeDuplicate(QrealAnimator *target);

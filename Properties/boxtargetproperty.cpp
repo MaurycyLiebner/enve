@@ -4,7 +4,7 @@
 
 BoxTargetProperty::BoxTargetProperty() :
     Property() {
-    setName("target");
+    prp_setName("target");
 }
 
 BoundingBox *BoxTargetProperty::getTarget() {
@@ -27,7 +27,7 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
             mTarget->incUsedAsTarget();
         }
     }
-    mParentAnimator->callUpdater();
+    prp_mParentAnimator->prp_callUpdater();
 }
 
 void BoxTargetProperty::setParentBox(BoundingBox *box) {

@@ -86,7 +86,7 @@ void GradientWidget::removeGradient(int gradientId)
 
 void GradientWidget::saveGradientsToQuery(QSqlQuery *query) {
     foreach(Gradient *gradient, mGradients) {
-        gradient->saveToSql(query);
+        gradient->prp_saveToSql(query);
     }
 }
 
@@ -417,11 +417,11 @@ void GradientWidget::startSelectedColorTransform() {
 void GradientWidget::finishGradientTransform()
 {
     if(mCurrentGradient == NULL) return;
-    mCurrentGradient->finishTransform();
+    mCurrentGradient->prp_finishTransform();
 }
 
 void GradientWidget::startGradientTransform()
 {
     if(mCurrentGradient == NULL) return;
-    mCurrentGradient->startTransform();
+    mCurrentGradient->prp_startTransform();
 }

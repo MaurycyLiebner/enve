@@ -25,7 +25,7 @@ public:
     Edge *getEgde(QPointF absPos);
     QPointF getRelCenterPosition();
     void updatePath();
-    MovablePoint *getPointAt(const QPointF &absPtPos,
+    MovablePoint *qra_getPointAt(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode);
     QPainterPath getCurrentPath() {
         return mPath;

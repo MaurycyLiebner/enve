@@ -16,7 +16,7 @@ public:
                       const qreal &scale);
     qreal getEffectsMargin() const;
 
-    void saveToSql(QSqlQuery *query, int boundingBoxSqlId);
+    void prp_saveToSql(QSqlQuery *query, int boundingBoxSqlId);
     void loadFromSql(int boundingBoxSqlId, BoundingBox *box);
     void setParentBox(BoundingBox *box);
     BoundingBox *getParentBox() {

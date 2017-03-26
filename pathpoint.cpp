@@ -31,7 +31,7 @@ PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
 
     mPathPointAnimators.incNumberPointers();
 
-    mRelPos.setTraceKeyOnCurrentFrame(true);
+    mRelPos.anim_setTraceKeyOnCurrentFrame(true);
 }
 
 PathPoint::~PathPoint() {
@@ -370,7 +370,7 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
     p->drawEllipse(absPos,
                    mRadius - 2, mRadius - 2);
 
-    if(mRelPos.isKeyOnCurrentFrame() ) {
+    if(mRelPos.prp_isKeyOnCurrentFrame() ) {
         p->save();
         p->setBrush(Qt::red);
         p->setPen(QPen(Qt::black, 1.) );
@@ -436,7 +436,7 @@ void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
     }
     mNextPoint = nextPoint;
     updateEndCtrlPtVisibility();
-    mRelPos.callUpdater();
+    mRelPos.prp_callUpdater();
     //mParentPath->schedulePathUpdate();
 }
 
@@ -467,7 +467,7 @@ void PathPoint::setEndCtrlPtEnabled(bool enabled,
     //mEndCtrlPt->setRelativePos(getRelativePos());
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
-    mRelPos.callUpdater();
+    mRelPos.prp_callUpdater();
     //mParentPath->schedulePathUpdate();
 }
 
@@ -482,7 +482,7 @@ void PathPoint::setStartCtrlPtEnabled(bool enabled,
     //mStartCtrlPt->setRelativePos(getRelativePos());
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
-    mRelPos.callUpdater();
+    mRelPos.prp_callUpdater();
     //mParentPath->schedulePathUpdate();
 }
 
@@ -494,7 +494,7 @@ void PathPoint::updateAfterFrameChanged(int frame)
 }
 
 void PathPoint::setPointId(int idT) {
-    mPathPointAnimators.setName("point " + QString::number(idT) );
+    mPathPointAnimators.prp_setName("point " + QString::number(idT) );
     mPointId = idT;
 }
 
@@ -663,7 +663,7 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
     setCtrlPtEnabled(true, true, saveUndoRedo);
     setCtrlPtEnabled(true, false, saveUndoRedo);
     //mParentPath->schedulePathUpdate();
-    mRelPos.callUpdater();
+    mRelPos.prp_callUpdater();
 }
 
 void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
@@ -677,7 +677,7 @@ void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
     mPreviousPoint = previousPoint;
     updateStartCtrlPtVisibility();
     //mParentPath->schedulePathUpdate();
-    mRelPos.callUpdater();
+    mRelPos.prp_callUpdater();
 }
 
 bool PathPoint::hasNextPoint() {

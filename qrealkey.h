@@ -1,24 +1,28 @@
 #ifndef QREALKEY_H
 #define QREALKEY_H
-#include "qrealpoint.h"
+#include "key.h"
 #include "pointhelpers.h"
 
+class QPainter;
 class ComplexAnimator;
 
 class ComplexKey;
 
 class QrealAnimator;
 class KeysClipboardContainer;
+class QrealPoint;
+enum QrealPointType : short;
 
-class QrealKey : public SmartPointerTarget
-{
+class QrealKey : public Key {
 public:
     QrealKey(QrealAnimator *parentAnimator);
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~QrealKey();
 
-    virtual QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
+
+    Key *makeKeyDuplicate(Animator *animator);
+    QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     void updateCtrlFromCtrl(QrealPointType type);
 
@@ -27,11 +31,6 @@ public:
     virtual void setStartValue(qreal value);
     virtual void setEndValue(qreal value);
 
-    virtual void startFrameTransform();
-    virtual void finishFrameTransform();
-
-    int getAbsFrame();
-    virtual void setRelFrame(int frame);
     virtual void setStartFrame(qreal startFrame);
     virtual void setEndFrame(qreal endFrame);
 
@@ -65,71 +64,25 @@ public:
     qreal getPrevKeyValue();
     qreal getNextKeyValue();
 
-    bool hasPrevKey();
-    bool hasNextKey();
     void incFrameAndUpdateParentAnimator(int inc);
 
-    QrealAnimator *getParentAnimator();
-
-    virtual void mergeWith(QrealKey *key) { key->removeFromAnimator(); }
     void incValue(qreal incBy);
-
-    virtual bool isDescendantSelected() { return isSelected(); }
-
-    void removeFromAnimator();
-
-    virtual void deleteKey() { removeFromAnimator(); }
-
-    void setParentKey(ComplexKey *parentKey);
-
-    bool isAncestorSelected();
 
     CtrlsMode getCtrlsMode();
     int saveToSql(int parentAnimatorSqlId);
     void loadFromSql(int keyId);
 
     virtual void copyToContainer(KeysClipboardContainer *container);
-    virtual void cancelFrameTransform();
-    virtual void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
-                                                   const qreal &scaleFactor);
-    virtual void setSelected(bool bT);
-    bool isSelected();
 
-    bool hasParentKey() {
-        return mParentKey != NULL;
-    }
-
-    virtual bool areAllChildrenSelected() {
-        return false;
-    }
-
-    virtual void addToSelection(QList<QrealKey *> *selectedKeys);
-    virtual void removeFromSelection(QList<QrealKey *> *selectedKeys);
-
-    bool isHovered() {
-        return mHovered;
-    }
-
-    void setHovered(const bool &bT) {
-        mHovered = bT;
-    }
-
-    int getRelFrame();
-    void setAbsFrame(const int &frame);
-    ComplexKey *getParentKey();
+    QrealAnimator *getParentQrealAnimator();
+    void setRelFrame(int frame);
 protected:
-    bool mIsSelected = false;
-    QrealAnimator *mParentAnimator = NULL;
-    ComplexKey *mParentKey = NULL;
-
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 
     QrealPoint *mStartPoint;
     QrealPoint *mEndPoint;
 
     qreal mValue;
-    int mRelFrame;
-    int mSavedRelFrame;
     qreal mSavedValue;
 
     qreal mSavedMaxStartFrameDist;
@@ -141,21 +94,6 @@ protected:
     qreal mEndFrame = 0.;
     bool mStartEnabled = false;
     bool mEndEnabled = false;
-    bool mHovered = false;
-};
-
-struct QrealKeyPair {
-    QrealKeyPair(QrealKey *key1T, QrealKey *key2T) {
-        key1 = key1T;
-        key2 = key2T;
-    }
-
-    void merge() {
-        key1->mergeWith(key2);
-    }
-
-    QrealKey *key1;
-    QrealKey *key2;
 };
 
 #endif // QREALKEY_H

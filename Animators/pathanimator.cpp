@@ -6,13 +6,13 @@
 
 PathAnimator::PathAnimator() :
     ComplexAnimator() {
-    setName("path");
+    prp_setName("path");
 }
 
 PathAnimator::PathAnimator(BoundingBox *parentBox) :
     PathAnimator() {
     setParentBox(parentBox);
-    setName("path");
+    prp_setName("path");
 }
 
 PathAnimator::~PathAnimator() {
@@ -172,11 +172,11 @@ void PathAnimator::applyTransformToPoints(const QMatrix &transform) {
     }
 }
 
-MovablePoint *PathAnimator::getPointAt(const QPointF &absPtPos,
+MovablePoint *PathAnimator::qra_getPointAt(const QPointF &absPtPos,
                                        const CanvasMode &currentCanvasMode)
 {
     foreach(SinglePathAnimator *sepAnim, mSinglePaths) {
-        MovablePoint *pt = sepAnim->getPointAt(absPtPos, currentCanvasMode);
+        MovablePoint *pt = sepAnim->qra_getPointAt(absPtPos, currentCanvasMode);
         if(pt == NULL) continue;
         return pt;
     }

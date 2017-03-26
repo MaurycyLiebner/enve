@@ -2,7 +2,7 @@
 
 GradientPoints::GradientPoints() : ComplexAnimator()
 {
-    setName("gradient points");
+    prp_setName("gradient points");
 }
 
 GradientPoints::~GradientPoints()
@@ -17,9 +17,9 @@ void GradientPoints::initialize(PathBox *parentT)
     startPoint = new GradientPoint(parent);
     startPoint->incNumberPointers();
     addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
-    startPoint->getRelativePosAnimatorPtr()->setName("point1");
+    startPoint->getRelativePosAnimatorPtr()->prp_setName("point1");
     endPoint = new GradientPoint(parent);
-    endPoint->getRelativePosAnimatorPtr()->setName("point2");
+    endPoint->getRelativePosAnimatorPtr()->prp_setName("point2");
     endPoint->incNumberPointers();
     addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
     enabled = false;
@@ -73,7 +73,7 @@ void GradientPoints::drawGradientPoints(QPainter *p) {
     }
 }
 
-MovablePoint *GradientPoints::getPointAt(const QPointF &absPos)
+MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos)
 {
     if(enabled) {
         if(startPoint->isPointAtAbsPos(absPos) ) {
