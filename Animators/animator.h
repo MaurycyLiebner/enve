@@ -23,14 +23,6 @@ public:
 
     virtual bool prp_isDescendantRecording() { return anim_mIsRecording; }
 
-    virtual QString prp_getValueText() = 0;
-
-    virtual void prp_clearFromGraphView() = 0;
-
-    virtual void prp_openContextMenu(QPoint pos) = 0;
-
-    virtual int prp_saveToSql(QSqlQuery*) = 0;
-
     bool anim_isComplexAnimator() { return anim_mIsComplexAnimator; }
 
     virtual bool prp_isAnimator() { return true; }
@@ -91,6 +83,11 @@ public:
                               qreal pixelsPerFrame, qreal drawY,
                               int startFrame, int endFrame);
     Key *anim_getKeyAtAbsFrame(const int &frame);
+
+    virtual void makeDuplicate(Animator *) {} // should be 0
+    virtual Animator *makeDuplicate() {} // should be 0
+
+    virtual void saveCurrentValueAsKey() {}
 protected:
     virtual void anim_drawKey(QPainter *p,
                          Key *key,
@@ -107,7 +104,6 @@ protected:
     bool anim_mKeyOnCurrentFrame = false;
     QColor anim_mAnimatorColor;
 public slots:
-    virtual void prp_setRecording(bool rec) = 0;
     void anim_deleteCurrentKey();
     void anim_updateAfterShifted();
 signals:

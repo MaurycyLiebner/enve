@@ -115,13 +115,13 @@ void BlurEffect::loadBlurEffectFromSql(int pixmapEffectId) {
     }
 }
 
-QrealAnimator *BlurEffect::makeDuplicate() {
+Animator *BlurEffect::makeDuplicate() {
     BlurEffect *newBlur = new BlurEffect();
     makeDuplicate(newBlur);
     return newBlur;
 }
 
-void BlurEffect::makeDuplicate(QrealAnimator *target) {
+void BlurEffect::makeDuplicate(Animator *target) {
     BlurEffect *blurTarget = (BlurEffect*)target;
 
     blurTarget->duplicateBlurRadiusAnimatorFrom(&mBlurRadius);
@@ -205,13 +205,13 @@ qreal ShadowEffect::getMargin() {
             pointToLen(mTranslation.qra_getCurrentValue());
 }
 
-QrealAnimator *ShadowEffect::makeDuplicate() {
+Animator *ShadowEffect::makeDuplicate() {
     ShadowEffect *newShadow = new ShadowEffect();
     makeDuplicate(newShadow);
     return newShadow;
 }
 
-void ShadowEffect::makeDuplicate(QrealAnimator *target) {
+void ShadowEffect::makeDuplicate(Animator *target) {
     ShadowEffect *shadowTarget = (ShadowEffect*)target;
 
     shadowTarget->duplicateTranslationAnimatorFrom(&mTranslation);

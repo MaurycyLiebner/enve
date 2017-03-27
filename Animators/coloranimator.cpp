@@ -236,6 +236,15 @@ void ColorAnimator::setCurrentAlphaValue(const qreal &alpha,
     mAlphaAnimator.qra_setCurrentValue(alpha, finish);
 }
 
+void ColorAnimator::saveCurrentValueAsKey() {
+    if(!anim_mIsRecording) {
+        prp_setRecording(true);
+    }
+    mVal1Animator.saveCurrentValueAsKey();
+    mVal2Animator.saveCurrentValueAsKey();
+    mVal3Animator.saveCurrentValueAsKey();
+}
+
 #include <QMenu>
 void ColorAnimator::prp_openContextMenu(QPoint pos) {
     QMenu menu;
@@ -265,9 +274,6 @@ void ColorAnimator::prp_openContextMenu(QPoint pos) {
     {
         if(selected_action->text() == "Add Key")
         {
-            if(!anim_mIsRecording) {
-                prp_setRecording(true);
-            }
             saveCurrentValueAsKey();
         } else if(selected_action == rgbAction) {
             setColorMode(RGBMODE);
@@ -281,7 +287,7 @@ void ColorAnimator::prp_openContextMenu(QPoint pos) {
     }
 }
 
-void ColorAnimator::makeDuplicate(QrealAnimator *target) {
+void ColorAnimator::makeDuplicate(Animator *target) {
     ColorAnimator *colorTarget = (ColorAnimator*)target;
 
     colorTarget->duplicateVal1AnimatorFrom(&mVal1Animator);

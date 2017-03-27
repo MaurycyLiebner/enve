@@ -129,8 +129,8 @@ public:
     int getNumberDecimals() { return mDecimals; }
     void setNumberDecimals(int decimals) { mDecimals = decimals; }
 
-    virtual void makeDuplicate(QrealAnimator *target);
-    virtual QrealAnimator *makeDuplicate();
+    void makeDuplicate(Animator *target);
+    Animator *makeDuplicate();
 
     SWT_Type SWT_getType() { return SWT_QrealAnimator; }
     qreal getCurrentValueAtAbsFrame(const int &frame) const;

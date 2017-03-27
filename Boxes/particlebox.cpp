@@ -13,16 +13,18 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
     setName("Particle Box");
     mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
     mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
-    QrealAnimator *topLeftAnimator = mTopLeftPoint->
+    Animator *topLeftAnimator = mTopLeftPoint->
                                         getRelativePosAnimatorPtr();
-    QrealAnimator *bottomRightAnimator = mBottomRightPoint->
+    Animator *bottomRightAnimator = mBottomRightPoint->
                                         getRelativePosAnimatorPtr();
     addActiveAnimator(topLeftAnimator);
     addActiveAnimator(bottomRightAnimator);
 
-    topLeftAnimator->prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(this));
+    topLeftAnimator->prp_setUpdater(
+                new DisplayedFillStrokeSettingsUpdater(this));
     topLeftAnimator->prp_setName("top left");
-    bottomRightAnimator->prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(this));
+    bottomRightAnimator->prp_setUpdater(
+                new DisplayedFillStrokeSettingsUpdater(this));
     bottomRightAnimator->prp_setName("bottom right");
 
     //addEmitter(new ParticleEmitter(this));
@@ -496,7 +498,7 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
     particlesOpacityDecay->makeDuplicate(&mParticlesOpacityDecay);
 }
 
-void ParticleEmitter::makeDuplicate(QrealAnimator *target) {
+void ParticleEmitter::makeDuplicate(Animator *target) {
     ParticleEmitter *peTarget = ((ParticleEmitter*)target);
     peTarget->duplicateAnimatorsFrom(
                 mPos->getRelativePosAnimatorPtr(),

@@ -102,7 +102,7 @@ void QPointFAnimator::incSavedValueToCurrentValue(qreal incXBy, qreal incYBy) {
     mYAnimator.incSavedValueToCurrentValue(incYBy);
 }
 
-void QPointFAnimator::makeDuplicate(QrealAnimator *target) {
+void QPointFAnimator::makeDuplicate(Animator *target) {
     QPointFAnimator *pointTarget = (QPointFAnimator*)target;
 
     pointTarget->duplicateXAnimatorFrom(&mXAnimator);

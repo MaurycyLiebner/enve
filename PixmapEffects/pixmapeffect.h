@@ -98,8 +98,8 @@ public:
 
     void prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
 
-    QrealAnimator *makeDuplicate();
-    void makeDuplicate(QrealAnimator *target);
+    Animator *makeDuplicate();
+    void makeDuplicate(Animator *target);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 private:
     QrealAnimator mBlurRadius;
@@ -117,8 +117,8 @@ public:
 
     qreal getMargin();
 
-    QrealAnimator *makeDuplicate();
-    void makeDuplicate(QrealAnimator *target);
+    Animator *makeDuplicate();
+    void makeDuplicate(Animator *target);
     void duplicateTranslationAnimatorFrom(QPointFAnimator *source);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
     void duplicateColorAnimatorFrom(ColorAnimator *source);

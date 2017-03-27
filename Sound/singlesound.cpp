@@ -152,9 +152,9 @@ void SingleSound::prp_drawKeys(QPainter *p,
 //                frameWidth*pixelsPerFrame - pixelsPerFrame,
 //                BOX_HEIGHT, QColor(0, 0, 255, 125));
     mDurationRectangle->draw(p, pixelsPerFrame,
-                            drawY, startFrame);
-    QrealAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
-                            startFrame, endFrame);
+                             drawY, startFrame);
+    ComplexAnimator::prp_drawKeys(p, pixelsPerFrame, drawY,
+                                  startFrame, endFrame);
 }
 
 void SingleSound::setDurationRect(DurationRectangle *durRect) {

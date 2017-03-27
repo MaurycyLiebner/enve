@@ -593,20 +593,20 @@ void QrealAnimator::prp_cancelTransform() {
     }
 }
 
-void QrealAnimator::makeDuplicate(QrealAnimator *target) {
+void QrealAnimator::makeDuplicate(Animator *target) {
     target->prp_setName(prp_mName);
     target->prp_setRecording(false);
-    target->qra_setCurrentValue(mCurrentValue, false);
+    ((QrealAnimator*)target)->qra_setCurrentValue(mCurrentValue, false);
     if(anim_mIsRecording) {
         target->anim_setRecordingWithoutChangingKeys(anim_mIsRecording);
     }
     QrealKey *key; foreachQK(key, anim_mKeys)
-        QrealKey *duplicate = key->makeQrealKeyDuplicate(target);
+        QrealKey *duplicate = key->makeQrealKeyDuplicate((QrealAnimator*)target);
         target->anim_appendKey(duplicate);
     }
 }
 
-QrealAnimator *QrealAnimator::makeDuplicate() {
+Animator *QrealAnimator::makeDuplicate() {
     QrealAnimator *target = new QrealAnimator();
     makeDuplicate(target);
     return target;

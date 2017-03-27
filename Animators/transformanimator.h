@@ -54,7 +54,7 @@ public:
     int prp_saveToSql(QSqlQuery *query);
     void loadFromSql(int transformAnimatorId);
 
-    void makeDuplicate(QrealAnimator *target);
+    void makeDuplicate(Animator *target);
 
     void duplicatePivotAnimatorFrom(QPointFAnimator *source);
     void duplicatePosAnimatorFrom(QPointFAnimator *source);

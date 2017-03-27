@@ -5,25 +5,27 @@
 class ComplexKey;
 class ComplexAnimatorItemWidgetContainer;
 
-class ComplexAnimator : public QrealAnimator
+class ComplexAnimator : public Animator
 {
 public:
     ComplexAnimator();
     ~ComplexAnimator();
-
-    QMatrix qra_getCurrentValue();
 
     void ca_addDescendantsKey(Key *key);
     ComplexKey *getKeyCollectionAtAbsFrame(int frame);
     ComplexKey *getKeyCollectionAtRelFrame(int frame);
 
     void ca_removeDescendantsKey(Key *key);
-    void drawChildAnimatorKeys(QPainter *p,
-                               qreal pixelsPerFrame, qreal startY,
-                               int startFrame, int endFrame);
-    qreal qra_clampValue(qreal value);
+
     void addChildAnimator(Property *childAnimator);
     void removeChildAnimator(Property *removeAnimator);
+    void swapChildAnimators(Property *animator1, Property *animator2);
+    void moveChildInList(Property *child,
+                         int from, int to,
+                         bool saveUndoRedo = true);
+    void moveChildBelow(Property *move, Property *below);
+    void moveChildAbove(Property *move, Property *above);
+
     void prp_startTransform();
     void prp_setUpdater(AnimatorUpdater *updater);
     void prp_setAbsFrame(int frame);
@@ -39,7 +41,6 @@ public:
 
     bool prp_isDescendantRecording();
     QString prp_getValueText();
-    void swapChildAnimators(Property *animator1, Property *animator2);
     void prp_clearFromGraphView();
 
     bool hasChildAnimators();
@@ -51,35 +52,30 @@ public:
     int getNumberOfChildren();
     Property *getChildAt(const int &i);
 
-    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
-                                     ScrollWidgetVisiblePart *visiblePartWidget);
+    void SWT_addChildrenAbstractions(
+            SingleWidgetAbstraction *abstraction,
+            ScrollWidgetVisiblePart *visiblePartWidget);
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
                              const bool &parentMainTarget) {
         if(hasChildAnimators()) {
-            return QrealAnimator::SWT_shouldBeVisible(rules,
-                                                      parentSatisfies,
-                                                      parentMainTarget);
+            return Animator::SWT_shouldBeVisible(
+                                        rules,
+                                        parentSatisfies,
+                                        parentMainTarget);
         } else {
             return false;
         }
     }
 
     SWT_Type SWT_getType() { return SWT_ComplexAnimator; }
-    void anim_drawKey(QPainter *p, QrealKey *key,
+    void anim_drawKey(QPainter *p, Key *key,
                  const qreal &pixelsPerFrame,
                  const qreal &drawY, const int &startFrame);
-    void moveChildInList(Property *child,
-                         int from, int to,
-                         bool saveUndoRedo = true);
-    void moveChildBelow(Property *move, Property *below);
-    void moveChildAbove(Property *move, Property *above);
 protected:
     bool mChildAnimatorRecording = false;
     QList<Property*> mChildAnimators;
-    qreal mMinMoveValue;
-    qreal mMaxMoveValue;
 };
 
 class ComplexKey : public Key

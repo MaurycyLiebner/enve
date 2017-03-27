@@ -37,7 +37,7 @@ void GradientPoints::duplicatePointsFrom(GradientPoint *startPointT,
     endPointT->makeDuplicate(endPoint);
 }
 
-void GradientPoints::makeDuplicate(QrealAnimator *target) {
+void GradientPoints::makeDuplicate(Animator *target) {
     GradientPoints *gradientPointsTarget = (GradientPoints*)target;
     gradientPointsTarget->duplicatePointsFrom(startPoint,
                                               endPoint);

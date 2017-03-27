@@ -13,9 +13,9 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
     //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
     //mBottomRightPoint->setRadiusPoint(mRadiusPoint);
 
-    QrealAnimator *topLeftPt = mTopLeftPoint->
+    Animator *topLeftPt = mTopLeftPoint->
             getRelativePosAnimatorPtr();
-    QrealAnimator *bottomRightPt = mBottomRightPoint->
+    Animator *bottomRightPt = mBottomRightPoint->
             getRelativePosAnimatorPtr();
 
     topLeftPt->prp_setName("top left");

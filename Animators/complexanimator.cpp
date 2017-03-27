@@ -3,10 +3,8 @@
 #include "BoxesList/boxsinglewidget.h"
 
 ComplexAnimator::ComplexAnimator() :
-    QrealAnimator()
-{
+    Animator() {
     anim_mIsComplexAnimator = true;
-    mCurrentValue = 0.;
 }
 
 ComplexAnimator::~ComplexAnimator() {
@@ -33,10 +31,6 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
                     property->SWT_createAbstraction(visiblePartWidget));
     }
 
-}
-
-qreal ComplexAnimator::qra_clampValue(qreal value) {
-    return value;//clamp(value, mMinMoveValue, mMaxMoveValue);
 }
 
 ComplexKey *ComplexAnimator::getKeyCollectionAtAbsFrame(int frame) {
@@ -110,7 +104,6 @@ void ComplexAnimator::removeChildAnimator(Property *removeAnimator) {
     removeAnimator->prp_setParentAnimator(NULL);
     removeAnimator->decNumberPointers();
     childAnimatorIsRecordingChanged();
-    qra_updateKeysPath();
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator);
 
@@ -126,10 +119,7 @@ void ComplexAnimator::swapChildAnimators(Property *animator1,
     prp_callUpdater();
 }
 
-void ComplexAnimator::prp_clearFromGraphView()
-{
-    QrealAnimator::prp_clearFromGraphView();
-
+void ComplexAnimator::prp_clearFromGraphView() {
     foreach(Property *property, mChildAnimators) {
         property->prp_clearFromGraphView();
     }
@@ -155,7 +145,7 @@ void ComplexAnimator::prp_setTransformed(bool bT) {
 
 void ComplexAnimator::anim_drawKey(
                             QPainter *p,
-                            QrealKey *key,
+                            Key *key,
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame) {
@@ -194,41 +184,36 @@ void ComplexAnimator::changeChildAnimatorZ(const int &oldIndex,
     prp_callUpdater();
 }
 
-void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater)
-{
+void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater) {
     if(prp_mUpdaterBlocked) return;
-    QrealAnimator::prp_setUpdater(updater);
+    Animator::prp_setUpdater(updater);
 
     foreach(Property *property, mChildAnimators) {
         property->prp_setUpdater(updater);
     }
 }
 
-void ComplexAnimator::prp_setAbsFrame(int frame)
-{
-    QrealAnimator::prp_setAbsFrame(frame);
+void ComplexAnimator::prp_setAbsFrame(int frame) {
+    Animator::prp_setAbsFrame(frame);
 
     foreach(Property *property, mChildAnimators) {
         property->prp_setAbsFrame(frame);
     }
 }
 
-void ComplexAnimator::prp_retrieveSavedValue()
-{
+void ComplexAnimator::prp_retrieveSavedValue() {
     foreach(Property *property, mChildAnimators) {
         property->prp_retrieveSavedValue();
     }
 }
 
-void ComplexAnimator::prp_finishTransform()
-{
+void ComplexAnimator::prp_finishTransform() {
     foreach(Property *property, mChildAnimators) {
         property->prp_finishTransform();
     }
 }
 
-void ComplexAnimator::prp_cancelTransform()
-{
+void ComplexAnimator::prp_cancelTransform() {
     foreach(Property *property, mChildAnimators) {
         property->prp_cancelTransform();
     }
@@ -292,7 +277,6 @@ void ComplexAnimator::ca_removeDescendantsKey(Key *key) {
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {
         anim_removeKey(collection);
-        if(anim_mKeys.isEmpty() ) mCurrentValue = 0.;
     }
 }
 

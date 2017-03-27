@@ -213,8 +213,8 @@ public:
     virtual void startAllPointsTransform() {}
     virtual void finishAllPointsTransform() {}
 
-    void addActiveAnimator(QrealAnimator *animator);
-    void removeActiveAnimator(QrealAnimator *animator);
+    void addActiveAnimator(Animator *animator);
+    void removeActiveAnimator(Animator *animator);
 
     virtual void setFillGradient(Gradient* gradient, bool finish) {
         Q_UNUSED(gradient); Q_UNUSED(finish); }
@@ -500,7 +500,7 @@ protected:
     bool mLocked = false;
 
     QString mName = "";
-    QList<QrealAnimator*> mActiveAnimators;
+    QList<Animator*> mActiveAnimators;
 
     bool mAnimated = false;
 
@@ -509,8 +509,9 @@ protected:
 signals:
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
-    void addActiveAnimatorSignal(QrealAnimator*);
-    void removeActiveAnimatorSignal(QrealAnimator*);
+
+    void addActiveAnimatorSignal(Animator*);
+    void removeActiveAnimatorSignal(Animator*);
 public slots:
     virtual void scheduleUpdate();
 };

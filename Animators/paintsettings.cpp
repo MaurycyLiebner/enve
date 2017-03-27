@@ -407,7 +407,7 @@ void PaintSettings::setPaintPathTarget(PathBox *path) {
     mColor.prp_blockUpdater();
 }
 
-void PaintSettings::makeDuplicate(QrealAnimator *target) {
+void PaintSettings::makeDuplicate(Animator *target) {
     PaintSettings *paintSettingsTarget = (PaintSettings*)target;
         paintSettingsTarget->duplicateColorAnimatorFrom(&mColor);
         paintSettingsTarget->setGradient(mGradient);
@@ -640,7 +640,7 @@ bool StrokeSettings::nonZeroLineWidth() {
     return !isZero(mLineWidth.qra_getCurrentValue());
 }
 
-void StrokeSettings::makeDuplicate(QrealAnimator *target) {
+void StrokeSettings::makeDuplicate(Animator *target) {
     PaintSettings::makeDuplicate(target);
     StrokeSettings *strokeSettingsTarget = (StrokeSettings*)target;
     strokeSettingsTarget->duplicateLineWidthFrom(&mLineWidth);

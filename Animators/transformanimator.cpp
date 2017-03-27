@@ -341,7 +341,7 @@ QMatrix TransformAnimator::qra_getCurrentValue() {
 //    }
 }
 
-void TransformAnimator::makeDuplicate(QrealAnimator *target) {
+void TransformAnimator::makeDuplicate(Animator *target) {
     TransformAnimator *transformPtr = (TransformAnimator*)target;
 
     transformPtr->duplicatePivotAnimatorFrom(&mPivotAnimator);
