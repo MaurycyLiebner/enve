@@ -501,16 +501,20 @@ void MainWindow::createNewCanvas() {
 
         newCanvas->setName(dialog.getCanvasName());
 
-        mCanvasWidget->addCanvasToListAndSetAsCurrent(newCanvas);
-
-        disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-                mCanvasWidget, SLOT(setCurrentCanvas(int)));
-        mCurrentCanvasComboBox->addItem(dialog.getCanvasName());
-        mCurrentCanvasComboBox->setCurrentIndex(
-                    mCurrentCanvasComboBox->count() - 1);
-        connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-                mCanvasWidget, SLOT(setCurrentCanvas(int)));
+        addCanvas(newCanvas);
     }
+}
+
+void MainWindow::addCanvas(Canvas *newCanvas) {
+    mCanvasWidget->addCanvasToListAndSetAsCurrent(newCanvas);
+
+    disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
+            mCanvasWidget, SLOT(setCurrentCanvas(int)));
+    mCurrentCanvasComboBox->addItem(dialog.getCanvasName());
+    mCurrentCanvasComboBox->setCurrentIndex(
+                mCurrentCanvasComboBox->count() - 1);
+    connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
+            mCanvasWidget, SLOT(setCurrentCanvas(int)));
 }
 
 void MainWindow::createDetachedUndoRedoStack()
@@ -1100,7 +1104,12 @@ void MainWindow::importFile(QString path, bool loadInBox) {
         db.open();
 
         mFillStrokeSettings->loadAllGradientsFromSql();
-        mCanvasWidget->getCurrentCanvas()->loadAllBoxesFromSql(loadInBox);
+//        if(loadInBox && !mCanvasWidget->hasNoCanvas()) {
+//            mCanvasWidget->getCurrentCanvas()->loadAllBoxesFromSql(loadInBox);
+//        } else {
+//            mCanvasWidget
+//        }
+        mCanvasWidget->loadCanvasesFromSql();
 
         db.close();
     } else if(extension == "png" ||
@@ -1168,7 +1177,6 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "FOREIGN KEY(xanimatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(yanimatorid) REFERENCES qrealanimator(id) )");
 
-
     query->exec("CREATE TABLE coloranimator "
                "(id INTEGER PRIMARY KEY, "
                "colormode INTEGER, "
@@ -1183,12 +1191,14 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
 
     query->exec("CREATE TABLE gradient "
                "(id INTEGER PRIMARY KEY)");
+
     query->exec("CREATE TABLE gradientcolor "
                "(colorid INTEGER, "
                "gradientid INTEGER, "
                "positioningradient INTEGER, "
                "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
+
     query->exec("CREATE TABLE paintsettings "
                "(id INTEGER PRIMARY KEY, "
                "painttype INTEGER, "
@@ -1196,6 +1206,7 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "gradientid INTEGER, "
                "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
+
     query->exec("CREATE TABLE strokesettings "
                "(id INTEGER PRIMARY KEY, "
                "linewidthanimatorid INTEGER, "
@@ -1216,10 +1227,20 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "parentboundingboxid INTEGER, "
                "FOREIGN KEY(transformanimatorid) REFERENCES transformanimator(id), "
                "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
+
     query->exec("CREATE TABLE boxesgroup "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE canvas "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "width INTEGER, "
+               "height INTEGER, "
+               "framecount INTEGER, "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
     query->exec("CREATE TABLE pathbox "
                "(id INTEGER PRIMARY KEY, "
                "fillgradientstartid INTEGER, "
@@ -1237,10 +1258,12 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
                "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
                "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
+
     query->exec("CREATE TABLE movablepoint "
                "(id INTEGER PRIMARY KEY, "
                "posanimatorid INTEGER, "
-               "FOREIGN KEY(posanimatorid) REFERENCES qrealanimator(id) )");
+               "FOREIGN KEY(posanimatorid) REFERENCES qpointfanimator(id) )");
+
     query->exec("CREATE TABLE pathpoint "
                "(id INTEGER PRIMARY KEY, "
                "isfirst BOOLEAN, "
@@ -1252,14 +1275,11 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "ctrlsmode INTEGER, "
                "startpointenabled BOOLEAN, "
                "endpointenabled BOOLEAN, "
-               "influenceanimatorid INTEGER, "
-               "influencetanimatorid INTEGER, "
                "FOREIGN KEY(movablepointid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(startctrlptid) REFERENCES movablepoint(id), "
                "FOREIGN KEY(endctrlptid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
-               "FOREIGN KEY(influenceanimatorid) REFERENCES qrealanimator(id), "
-               "FOREIGN KEY(influencetanimatorid) REFERENCES qrealanimator(id) )");
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
     query->exec("CREATE TABLE circle "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
@@ -1301,6 +1321,75 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                 "radiusid INTEGER, "
                 "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
                 "FOREIGN KEY(radiusid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE shadoweffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "blurradiusid INTEGER, "
+                "colorid INTEGER, "
+                "opacityid INTEGER, "
+                "translationid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(blurradiusid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
+                "FOREIGN KEY(opacityid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(translationid) REFERENCES qpointfanimator(id) )");
+
+    query->exec("CREATE TABLE lineseffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "distanceid INTEGER, "
+                "widthid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(distanceid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(widthid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE circleseffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "distanceid INTEGER, "
+                "radiusid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(distanceid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(radiusid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE swirleffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "degreesid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(degreesid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE oileffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "radiusid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(radiusid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE implodeeffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "factorid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(factorid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE desaturateeffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "influenceid INTEGER, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(influenceid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE alphamatteeffect "
+                "(id INTEGER PRIMARY KEY, "
+                "pixmapeffectid INTEGER, "
+                "influenceid INTEGER, "
+                "boundingboxid INTEGER, "
+                "inverted BOOLEAN, "
+                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
+                "FOREIGN KEY(influenceid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 }
 
 void MainWindow::saveToFile(QString path) {

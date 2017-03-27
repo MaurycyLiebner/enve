@@ -48,16 +48,18 @@ public:
     virtual void qra_updateKeysPath();
 
 
-    void qra_updateDrawPathIfNeeded(qreal height, qreal margin,
+    void qra_updateDrawPathIfNeeded(
+                        qreal height, qreal margin,
                         qreal startFrame, qreal minShownVal,
                         qreal pixelsPerFrame, qreal pixelsPerValUnit);
 
     void qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP);
     void qra_getMinAndMaxValuesBetweenFrames(int startFrame, int endFrame,
-                                         qreal *minValP, qreal *maxValP);
+                                             qreal *minValP, qreal *maxValP);
 
     QrealPoint *qra_getPointAt(qreal value, qreal frame,
-                           qreal pixelsPerFrame, qreal pixelsPerValUnit);
+                               qreal pixelsPerFrame,
+                               qreal pixelsPerValUnit);
     qreal qra_getValueAtRelFrame(int frame,
                           QrealKey *prevKey,
                           QrealKey *nextKey) const;
@@ -118,9 +120,9 @@ public:
     void removeThisFromGraphAnimator();
 
     void setAnimatorColor(QColor color);
-    virtual int prp_saveToSql(QSqlQuery *query);
-    void loadFromSql(int qrealAnimatorId);
-    void loadKeysFromSql(int qrealAnimatorId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    void prp_loadFromSql(const int &qrealAnimatorId);
+    void anim_loadKeysFromSql(int qrealAnimatorId);
     virtual void incSavedValueToCurrentValue(qreal incBy);
     virtual void multSavedValueToCurrentValue(qreal multBy);
 
@@ -135,9 +137,7 @@ public:
     SWT_Type SWT_getType() { return SWT_QrealAnimator; }
     qreal getCurrentValueAtAbsFrame(const int &frame) const;
     qreal qra_getValueAtRelFrame(int frame) const;
-    void prp_setTransformed(bool bT) {
-        mTransformed = bT;
-    }
+    void prp_setTransformed(bool bT) { mTransformed = bT; }
     void anim_removeAllKeys();
     QrealKey *getQrealKeyAtId(const int &id) const;
 protected:

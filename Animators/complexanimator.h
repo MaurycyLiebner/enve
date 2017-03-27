@@ -71,6 +71,10 @@ public:
     void anim_drawKey(QPainter *p, Key *key,
                  const qreal &pixelsPerFrame,
                  const qreal &drawY, const int &startFrame);
+
+    void anim_loadKeysFromSql(int qrealAnimatorId) {
+        Q_UNUSED(qrealAnimatorId);
+    }
 protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(int frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(int frame);

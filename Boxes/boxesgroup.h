@@ -20,7 +20,7 @@ public:
     BoxesGroup(BoxesGroup *parent);
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
     ~BoxesGroup();
-    virtual void loadFromSql(int boundingBoxId);
+    virtual void prp_loadFromSql(const int &boundingBoxId);
 
     BoundingBox *createLink(BoxesGroup *parent);
     BoundingBox *createSameTransformationLink(BoxesGroup *parent);
@@ -50,7 +50,7 @@ public:
 
     void ungroup();
 
-    int saveToSql(QSqlQuery *query, int parentId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
     BoxesGroup *loadChildrenFromSql(int thisBoundingBoxId, bool loadInBox);
 
     //

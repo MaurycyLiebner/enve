@@ -14,7 +14,8 @@ QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
-int QPointFAnimator::prp_saveToSql(QSqlQuery *query) {
+int QPointFAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    Q_UNUSED(parentId);
     int xAnimatorId = mXAnimator.prp_saveToSql(query);
     int yAnimatorId = mYAnimator.prp_saveToSql(query);
     if(!query->exec(
@@ -29,7 +30,7 @@ int QPointFAnimator::prp_saveToSql(QSqlQuery *query) {
 }
 
 #include <QSqlRecord>
-void QPointFAnimator::loadFromSql(int posAnimatorId) {
+void QPointFAnimator::prp_loadFromSql(const int &posAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qpointfanimator WHERE id = " +
@@ -39,8 +40,8 @@ void QPointFAnimator::loadFromSql(int posAnimatorId) {
         int idxanimator = query.record().indexOf("xanimatorid");
         int idyanimator = query.record().indexOf("yanimatorid");
 
-        mXAnimator.loadFromSql(query.value(idxanimator).toInt() );
-        mYAnimator.loadFromSql(query.value(idyanimator).toInt() );
+        mXAnimator.prp_loadFromSql(query.value(idxanimator).toInt() );
+        mYAnimator.prp_loadFromSql(query.value(idyanimator).toInt() );
     } else {
         qDebug() << "Could not load qpointfanimator with id " << posAnimatorId;
     }
@@ -107,6 +108,12 @@ void QPointFAnimator::prp_makeDuplicate(Property *target) {
 
     pointTarget->duplicateXAnimatorFrom(&mXAnimator);
     pointTarget->duplicateYAnimatorFrom(&mYAnimator);
+}
+
+Property *QPointFAnimator::prp_makeDuplicate() {
+    QPointFAnimator *posAnim = new QPointFAnimator();
+    prp_makeDuplicate(posAnim);
+    return posAnim;
 }
 
 void QPointFAnimator::duplicateXAnimatorFrom(

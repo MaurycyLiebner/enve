@@ -36,11 +36,12 @@ public:
                               const bool &finish = false);
 
     void prp_openContextMenu(QPoint pos);
-    void loadFromSql(int sqlId);
-    int prp_saveToSql(QSqlQuery *query);
+    void prp_loadFromSql(const int &sqlId);
+    int prp_saveToSql(QSqlQuery *, const int &parentId = 0);
+    void prp_makeDuplicate(Property *target);
+    Property *prp_makeDuplicate();
 
     void anim_saveCurrentValueAsKey();
-    void prp_makeDuplicate(Property *target);
     void duplicateVal1AnimatorFrom(QrealAnimator *source);
     void duplicateVal2AnimatorFrom(QrealAnimator *source);
     void duplicateVal3AnimatorFrom(QrealAnimator *source);

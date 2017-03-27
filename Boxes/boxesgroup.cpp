@@ -59,8 +59,8 @@ BoxesGroup::~BoxesGroup() {
     }
 }
 
-void BoxesGroup::loadFromSql(int boundingBoxId) {
-    BoundingBox::loadFromSql(boundingBoxId);
+void BoxesGroup::prp_loadFromSql(const int &boundingBoxId) {
+    BoundingBox::prp_loadFromSql(boundingBoxId);
     loadChildrenFromSql(boundingBoxId, false);
 }
 
@@ -106,7 +106,7 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_GROUP ) {
                 BoxesGroup *group = new BoxesGroup(this);
-                group->loadFromSql(query.value(idId).toInt());
+                group->prp_loadFromSql(query.value(idId).toInt());
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_CIRCLE ) {
                 Circle *circle = new Circle(this);
@@ -127,7 +127,7 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
     return this;
 }
 
-int BoxesGroup::saveToSql(QSqlQuery *query, int parentId)
+int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId)
 {
     int boundingBoxId = BoundingBox::saveToSql(query, parentId);
     query->exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
@@ -537,7 +537,7 @@ void BoxesGroup::addChildToListAt(int index,
 
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(child,
-                                            mActiveAnimators.count());
+                                            ca_mChildAnimators.count());
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -636,7 +636,7 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
     mChildBoxes.move(from, to);
     updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
     SWT_moveChildAbstractionForTargetToInAll(child, mChildBoxes.count() - to - 1
-                                                    + mActiveAnimators.count());
+                                                    + ca_mChildAnimators.count());
     if(saveUndoRedo) {
         addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }

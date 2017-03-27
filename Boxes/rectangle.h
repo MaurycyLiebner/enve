@@ -29,8 +29,8 @@ public:
     void selectAndAddContainedPointsToList(QRectF absRect,
                                            QList<MovablePoint *> *list);
     void updatePath();
-    void loadFromSql(int boundingBoxId);
-    int saveToSql(QSqlQuery *query, int parentId);
+    void prp_loadFromSql(const int &boundingBoxId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
 
     void makeDuplicate(BoundingBox *targetBox) {
         PathBox::makeDuplicate(targetBox);

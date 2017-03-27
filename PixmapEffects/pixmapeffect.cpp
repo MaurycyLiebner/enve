@@ -17,9 +17,9 @@ QDataStream & operator >> (QDataStream & s, PixmapEffect *& ptr) {
     return s;
 }
 
-PixmapEffect::PixmapEffect() : ComplexAnimator()
-{
-
+PixmapEffect::PixmapEffect(const PixmapEffectType &type) :
+    ComplexAnimator() {
+    mType = type;
 }
 
 void PixmapEffect::prp_startDragging() {
@@ -37,29 +37,19 @@ void PixmapEffect::prp_startDragging() {
 }
 
 int PixmapEffect::prp_saveToSql(QSqlQuery *query,
-                            const int &boundingBoxSqlId,
-                            const PixmapEffectType &type) {
+                                const int &boundingBoxSqlId) {
     if(!query->exec(
         QString("INSERT INTO pixmapeffect (boundingboxid, type) "
                 "VALUES (%1, %2)").
                 arg(boundingBoxSqlId).
-                arg(type) ) ) {
+                arg(mType) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
     return query->lastInsertId().toInt();
 }
 
-PixmapEffect *PixmapEffect::loadFromSql(int pixmapEffectId,
-                                        PixmapEffectType typeT) {
-    if(typeT == EFFECT_BLUR) {
-        BlurEffect *blurEffect = new BlurEffect();
-        blurEffect->loadBlurEffectFromSql(pixmapEffectId);
-        return blurEffect;
-    }
-}
-
-BlurEffect::BlurEffect(qreal radius) {
+BlurEffect::BlurEffect(qreal radius) : PixmapEffect(EFFECT_BLUR) {
     mBlurRadius.qra_setCurrentValue(radius);
     prp_setName("blur");
     mBlurRadius.prp_setName("radius");
@@ -90,8 +80,7 @@ qreal BlurEffect::getMargin()
 #include <QSqlError>
 void BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
-                                                 boundingBoxSqlId,
-                                                 EFFECT_BLUR);
+                                                     boundingBoxSqlId);
     int radiusId = mBlurRadius.prp_saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO blureffect (pixmapeffectid, radiusid) "
@@ -102,14 +91,18 @@ void BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     }
 }
 
-void BlurEffect::loadBlurEffectFromSql(int pixmapEffectId) {
+void BlurEffect::prp_loadFromSql(const int &identifyingId) {
+    loadBlurEffectFromSql(identifyingId);
+}
+
+void BlurEffect::loadBlurEffectFromSql(const int &pixmapEffectId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM blureffect WHERE pixmapeffectid = " +
             QString::number(pixmapEffectId);
     if(query.exec(queryStr)) {
         query.next();
-        mBlurRadius.loadFromSql(query.value("radiusid").toInt() );
+        mBlurRadius.prp_loadFromSql(query.value("radiusid").toInt() );
     } else {
         qDebug() << "Could not load blureffect with id " << pixmapEffectId;
     }
@@ -161,6 +154,42 @@ ShadowEffect::ShadowEffect(qreal radius) {
 //    mScale.blockPointer();
 //    mScale.setValueRange(0., 10.);
 //    addChildAnimator(&mScale);
+}
+
+void ShadowEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int radiusId = mBlurRadius.prp_saveToSql(query);
+    int colorId = mColor.prp_saveToSql(query);
+    int opacityId = mOpacity.prp_saveToSql(query);
+    int translationId = mTranslation.prp_saveToSql(query);
+    if(!query->exec(
+        QString("INSERT INTO shadoweffect (pixmapeffectid, blurradiusid, "
+                "colorid, opacityid, translationid) "
+                "VALUES (%1, %2, %3, %4, %5)").
+                arg(pixmapEffectId).
+                arg(radiusId).
+                arg(colorId).
+                arg(opacityId).
+                arg(translationId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void ShadowEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM shadoweffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mBlurRadius.prp_loadFromSql(query.value("blurradiusid").toInt() );
+        mColor.prp_loadFromSql(query.value("colorid").toInt() );
+        mOpacity.prp_loadFromSql(query.value("opacityid").toInt() );
+        mTranslation.prp_loadFromSql(query.value("translationid").toInt() );
+    } else {
+        qDebug() << "Could not load shadowffect with id " << identifyingId;
+    }
 }
 
 void ShadowEffect::apply(BoundingBox *target,
@@ -253,6 +282,37 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect()
     ca_addChildAnimator(&mLinesDistance);
 }
 
+void LinesEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int distId = mLinesDistance.prp_saveToSql(query);
+    int widthId = mLinesWidth.prp_saveToSql(query);
+
+    if(!query->exec(
+        QString("INSERT INTO lineseffect (pixmapeffectid, distanceid, "
+                "widthid) "
+                "VALUES (%1, %2, %3)").
+                arg(pixmapEffectId).
+                arg(distId).
+                arg(widthId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void LinesEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM lineseffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mLinesDistance.prp_loadFromSql(query.value("distanceid").toInt() );
+        mLinesWidth.prp_loadFromSql(query.value("widthid").toInt() );
+    } else {
+        qDebug() << "Could not load lineseffect with id " << identifyingId;
+    }
+}
+
 void LinesEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
@@ -316,6 +376,38 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
     mCirclesDistance.blockPointer();
     ca_addChildAnimator(&mCirclesDistance);
 }
+
+void CirclesEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int distId = mCirclesDistance.prp_saveToSql(query);
+    int radId = mCirclesRadius.prp_saveToSql(query);
+
+    if(!query->exec(
+        QString("INSERT INTO circleseffect (pixmapeffectid, distanceid, "
+                "radiusid) "
+                "VALUES (%1, %2, %3)").
+                arg(pixmapEffectId).
+                arg(distId).
+                arg(radId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void CirclesEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM circleseffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mCirclesDistance.prp_loadFromSql(query.value("distanceid").toInt() );
+        mCirclesRadius.prp_loadFromSql(query.value("radiusid").toInt() );
+    } else {
+        qDebug() << "Could not load circleseffect with id " << identifyingId;
+    }
+}
+
 #include "Boxes/boundingbox.h"
 void CirclesEffect::apply(BoundingBox *target,
                           QImage *imgPtr,
@@ -378,6 +470,34 @@ SwirlEffect::SwirlEffect(qreal degrees) {
     ca_addChildAnimator(&mDegreesAnimator);
 }
 
+void SwirlEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int degId = mDegreesAnimator.prp_saveToSql(query);
+
+    if(!query->exec(
+        QString("INSERT INTO swirleffect (pixmapeffectid, "
+                "degreesid) "
+                "VALUES (%1, %2)").
+                arg(pixmapEffectId).
+                arg(degId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void SwirlEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM swirleffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mDegreesAnimator.prp_loadFromSql(query.value("degreesid").toInt() );
+    } else {
+        qDebug() << "Could not load swirleffect with id " << identifyingId;
+    }
+}
+
 void SwirlEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
@@ -396,6 +516,34 @@ OilEffect::OilEffect(qreal radius) {
     mRadiusAnimator.prp_setName("radius");
     mRadiusAnimator.blockPointer();
     ca_addChildAnimator(&mRadiusAnimator);
+}
+
+void OilEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int radId = mRadiusAnimator.prp_saveToSql(query);
+
+    if(!query->exec(
+        QString("INSERT INTO oileffect (pixmapeffectid, "
+                "radiusid) "
+                "VALUES (%1, %2)").
+                arg(pixmapEffectId).
+                arg(radId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void OilEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM oileffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mRadiusAnimator.prp_loadFromSql(query.value("radiusid").toInt() );
+    } else {
+        qDebug() << "Could not load oileffect with id " << identifyingId;
+    }
 }
 
 void OilEffect::apply(BoundingBox *target,
@@ -417,6 +565,34 @@ ImplodeEffect::ImplodeEffect(qreal radius) {
     ca_addChildAnimator(&mFactorAnimator);
 }
 
+void ImplodeEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int facId = mFactorAnimator.prp_saveToSql(query);
+
+    if(!query->exec(
+        QString("INSERT INTO implodeeffect (pixmapeffectid, "
+                "factorid) "
+                "VALUES (%1, %2)").
+                arg(pixmapEffectId).
+                arg(facId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void ImplodeEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM implodeeffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mFactorAnimator.prp_loadFromSql(query.value("factorid").toInt() );
+    } else {
+        qDebug() << "Could not load implodeeffect with id " << identifyingId;
+    }
+}
+
 void ImplodeEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
@@ -436,6 +612,34 @@ DesaturateEffect::DesaturateEffect(qreal radius) {
     mInfluenceAnimator.prp_setName("factor");
     mInfluenceAnimator.blockPointer();
     ca_addChildAnimator(&mInfluenceAnimator);
+}
+
+void DesaturateEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int infId = mInfluenceAnimator.prp_saveToSql(query);
+
+    if(!query->exec(
+        QString("INSERT INTO desaturateeffect (pixmapeffectid, "
+                "influenceid) "
+                "VALUES (%1, %2)").
+                arg(pixmapEffectId).
+                arg(infId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void DesaturateEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM desaturateeffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mInfluenceAnimator.prp_loadFromSql(query.value("influenceid").toInt() );
+    } else {
+        qDebug() << "Could not load desaturateeffect with id " << identifyingId;
+    }
 }
 
 void DesaturateEffect::apply(BoundingBox *target,
@@ -465,6 +669,38 @@ AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) {
     mInvertedProperty.prp_setName("invert");
     mInvertedProperty.blockPointer();
     ca_addChildAnimator(&mInvertedProperty);
+}
+
+void AlphaMatteEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
+                                                     boundingBoxSqlId);
+    int infId = mInfluenceAnimator.prp_saveToSql(query);
+    int boundingBoxId = mBoxTarget.prp_saveToSql(query);
+
+    if(!query->exec(
+        QString("INSERT INTO alphamatteeffect (pixmapeffectid, "
+                "influenceid, boundingboxid, inverted) "
+                "VALUES (%1, %2, %3, %4)").
+                arg(pixmapEffectId).
+                arg(infId).
+                arg(boundingBoxId).
+                arg(mInvertedProperty.getValue()) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void AlphaMatteEffect::prp_loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM alphamatteeffect WHERE pixmapeffectid = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        mInfluenceAnimator.prp_loadFromSql(query.value("influenceid").toInt() );
+        mInvertedProperty.setValue(query.value("inverted").toBool() );
+    } else {
+        qDebug() << "Could not load alphamatteeffect with id " << identifyingId;
+    }
 }
 
 void AlphaMatteEffect::apply(BoundingBox *target,

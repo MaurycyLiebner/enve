@@ -123,6 +123,7 @@ public:
     void replaceClipboard(ClipboardContainer *container);
     ClipboardContainer *getClipboardContainer(
             const ClipboardContainerType &type);
+    void addCanvas(Canvas *newCanvas);
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);

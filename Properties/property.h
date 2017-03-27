@@ -71,7 +71,8 @@ public:
 
     virtual void prp_openContextMenu(QPoint pos) { Q_UNUSED(pos); }
 
-    virtual int prp_saveToSql(QSqlQuery*) {} // sould be abstract
+    virtual int prp_saveToSql(QSqlQuery*, const int &parentId = 0) = 0;
+    virtual void prp_loadFromSql(const int &identifyingId) = 0;
 
     virtual bool prp_hasKeys() { return false; }
 
@@ -95,8 +96,8 @@ public:
     void prp_blockUpdater();
     void prp_callFinishUpdater();
 
-    virtual void prp_makeDuplicate(Property *) {} // should be 0
-    virtual Property *prp_makeDuplicate() {} // should be 0
+    virtual void prp_makeDuplicate(Property *) = 0;
+    virtual Property *prp_makeDuplicate() = 0;
 public slots:
     virtual void prp_setRecording(bool rec) { Q_UNUSED(rec); }
 protected:

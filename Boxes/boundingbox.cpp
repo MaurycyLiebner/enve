@@ -121,14 +121,15 @@ BoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
 
 
 #include <QSqlError>
-int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
+int BoundingBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    Q_UNUSED(parentId);
     int transfromAnimatorId = mTransformAnimator.prp_saveToSql(query);
     if(!query->exec(
                 QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
                         "pivotchanged, visible, locked, "
                 "parentboundingboxid) "
                 "VALUES ('%1', %2, %3, %4, %5, %6, %7)").
-                arg(mName).
+                arg(prp_mName).
                 arg(mType).
                 arg(transfromAnimatorId).
                 arg(boolToSql(mPivotChanged)).
@@ -146,7 +147,7 @@ int BoundingBox::saveToSql(QSqlQuery *query, int parentId) {
     return boxId;
 }
 
-void BoundingBox::loadFromSql(int boundingBoxId) {
+void BoundingBox::prp_loadFromSql(const int &boundingBoxId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM boundingbox WHERE id = " +
@@ -168,7 +169,7 @@ void BoundingBox::loadFromSql(int boundingBoxId) {
         mPivotChanged = pivotChanged;
         mLocked = locked;
         mVisible = visible;
-        mName = query.value(idName).toString();
+        prp_mName = query.value(idName).toString();
     } else {
         qDebug() << "Could not load boundingbox with id " << boundingBoxId;
     }
@@ -837,7 +838,6 @@ void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
 
 void BoundingBox::addEffect(PixmapEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
-    effect->incNumberPointers();
 
     if(!mEffectsAnimators.hasChildAnimators()) {
         ca_addChildAnimator(&mEffectsAnimators);
@@ -914,12 +914,12 @@ void BoundingBox::drawKeys(QPainter *p,
 
 void BoundingBox::setName(QString name)
 {
-    mName = name;
+    prp_mName = name;
 }
 
 QString BoundingBox::getName()
 {
-    return mName;
+    return prp_mName;
 }
 
 bool BoundingBox::isInVisibleDurationRect() {
@@ -1045,7 +1045,7 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     if(satisfies) {
         const QString &nameSearch = rules.searchString;
         if(!nameSearch.isEmpty()) {
-            satisfies = mName.contains(nameSearch);
+            satisfies = prp_mName.contains(nameSearch);
         }
     }
     return satisfies;
@@ -1127,7 +1127,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::beforeUpdate() {
-    qDebug() << "before update " + mName;
+    qDebug() << "before update " + prp_mName;
 
     setUpdateVars();
 //    if(!mUpdateReplaceCache) {
@@ -1143,7 +1143,7 @@ void BoundingBox::beforeUpdate() {
 }
 
 void BoundingBox::processUpdate() {
-    qDebug() << "process update " + mName;
+    qDebug() << "process update " + prp_mName;
     if(mUpdateReplaceCache) {
         updatePixmaps();
     }
@@ -1226,7 +1226,7 @@ bool BoundingBox::shouldUpdateAndDraw() {
 void BoundingBox::scheduleUpdate() {
     //if(mAwaitingUpdate) return;
     if(shouldUpdateAndDraw()) {
-        qDebug() << "schedule update " + mName;
+        qDebug() << "schedule update " + prp_mName;
         mAwaitingUpdate = true;
         mParent->addChildAwaitingUpdate(this);
         emit scheduledUpdate();

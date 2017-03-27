@@ -9,6 +9,12 @@ public:
 
     bool getValue();
     SWT_Type SWT_getType() { return SWT_BoolProperty; }
+
+    void prp_makeDuplicate(Property *property);
+    Property *prp_makeDuplicate();
+
+    int prp_saveToSql(QSqlQuery *, const int &) {}
+    void prp_loadFromSql(const int &) {}
 public slots:
     void setValue(const bool &value);
 private:

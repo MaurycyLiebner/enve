@@ -12,24 +12,35 @@ BoundingBox *BoxTargetProperty::getTarget() {
 }
 
 void BoxTargetProperty::setTarget(BoundingBox *box) {
-    if(mParentBox != NULL) {
-        if(mTarget != NULL) {
+    if(mTarget != NULL) {
+        if(mParentBox != NULL) {
             QObject::disconnect(mTarget, SIGNAL(scheduledUpdate()),
                                 mParentBox, SLOT(scheduleUpdate()));
-            mTarget->decUsedAsTarget();
         }
+        mTarget->decUsedAsTarget();
     }
     mTarget = box;
-    if(mParentBox != NULL) {
-        if(mTarget != NULL) {
+    if(mTarget != NULL) {
+        if(mParentBox != NULL) {
             QObject::connect(mTarget, SIGNAL(scheduledUpdate()),
                              mParentBox, SLOT(scheduleUpdate()));
-            mTarget->incUsedAsTarget();
+
         }
+        mTarget->incUsedAsTarget();
     }
     prp_mParentAnimator->prp_callUpdater();
 }
 
 void BoxTargetProperty::setParentBox(BoundingBox *box) {
     mParentBox = box;
+}
+
+void BoxTargetProperty::prp_makeDuplicate(Property *property) {
+    ((BoxTargetProperty*)property)->setTarget(mTarget);
+}
+
+Property *BoxTargetProperty::prp_makeDuplicate() {
+    BoxTargetProperty *prop = new BoxTargetProperty();
+    prp_makeDuplicate(prop);
+    return prop;
 }

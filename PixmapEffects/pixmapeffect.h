@@ -39,7 +39,7 @@ class PixmapEffect : public ComplexAnimator
 {
     Q_OBJECT
 public:
-    PixmapEffect();
+    PixmapEffect(const PixmapEffectType &type);
     virtual void apply(BoundingBox *,
                        QImage *,
                        const fmt_filters::image &,
@@ -58,15 +58,12 @@ public:
     void prp_startDragging();
 
     int prp_saveToSql(QSqlQuery *query,
-                  const int &boundingBoxSqlId,
-                  const PixmapEffectType &type);
-    static PixmapEffect *loadFromSql(int pixmapEffectId,
-                                     PixmapEffectType typeT);
-    virtual void prp_saveToSql(QSqlQuery *,
-                           const int &) {}
+                      const int &boundingBoxSqlId);
 
-    friend QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr);
-    friend QDataStream & operator >> (QDataStream & s, PixmapEffect *& ptr);
+    friend QDataStream & operator << (QDataStream & s,
+                                      const PixmapEffect *ptr);
+    friend QDataStream & operator >> (QDataStream & s,
+                                      PixmapEffect *& ptr);
 
     virtual QMimeData *SWT_createMimeData() {
         return new PixmapEffectMimeData(this);
@@ -79,6 +76,7 @@ public slots:
         mInterrupted = true;
     }
 protected:
+    PixmapEffectType mType;
     bool mInterrupted = false;
 };
 
@@ -94,14 +92,15 @@ public:
 
     qreal getMargin();
 
-    void loadBlurEffectFromSql(int pixmapEffectId);
 
-    void prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 
     Property *prp_makeDuplicate();
     void prp_makeDuplicate(Property *target);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 private:
+    void loadBlurEffectFromSql(const int &pixmapEffectId);
     QrealAnimator mBlurRadius;
 };
 
@@ -117,6 +116,9 @@ public:
 
     qreal getMargin();
 
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
+
     Property *prp_makeDuplicate();
     void prp_makeDuplicate(Property *target);
     void duplicateTranslationAnimatorFrom(QPointFAnimator *source);
@@ -125,10 +127,10 @@ public:
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 private:
 //    QrealAnimator mScale;
-    QPointFAnimator mTranslation;
-    ColorAnimator mColor;
     QrealAnimator mBlurRadius;
     QrealAnimator mOpacity;
+    ColorAnimator mColor;
+    QPointFAnimator mTranslation;
 };
 
 class LinesEffect : public PixmapEffect
@@ -143,6 +145,9 @@ public:
                qreal scale);
 
     qreal getMargin() { return 0.; }
+
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 private:
     QrealAnimator mLinesDistance;
     QrealAnimator mLinesWidth;
@@ -161,6 +166,9 @@ public:
                qreal scale);
 
     qreal getMargin() { return 0.; }
+
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 private:
     QrealAnimator mCirclesDistance;
     QrealAnimator mCirclesRadius;
@@ -176,6 +184,9 @@ public:
                qreal scale);
 
     qreal getMargin() { return 0.; }
+
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 private:
     QrealAnimator mDegreesAnimator;
 };
@@ -190,6 +201,9 @@ public:
                qreal scale);
 
     qreal getMargin() { return 0.; }
+
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 private:
     QrealAnimator mRadiusAnimator;
 };
@@ -204,6 +218,9 @@ public:
                qreal scale);
 
     qreal getMargin() { return 0.; }
+
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 private:
     QrealAnimator mFactorAnimator;
 };
@@ -218,6 +235,9 @@ public:
                qreal scale);
 
     qreal getMargin() { return 0.; }
+
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 private:
     QrealAnimator mInfluenceAnimator;
 };
@@ -232,6 +252,9 @@ public:
                qreal scale);
 
     qreal getMargin() { return 0.; }
+
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void prp_loadFromSql(const int &identifyingId);
 private:
     BoolProperty mInvertedProperty;
     QrealAnimator mInfluenceAnimator;

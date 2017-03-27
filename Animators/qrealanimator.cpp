@@ -19,7 +19,8 @@ QrealAnimator::~QrealAnimator() {
 
 #include <QSqlError>
 #include <QSqlQuery>
-int QrealAnimator::prp_saveToSql(QSqlQuery *query) {
+int QrealAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    Q_UNUSED(parentId);
     if(!query->exec(
         QString("INSERT INTO qrealanimator (currentvalue) "
                 "VALUES (%1)").
@@ -36,7 +37,7 @@ int QrealAnimator::prp_saveToSql(QSqlQuery *query) {
     return thisSqlId;
 }
 
-void QrealAnimator::loadFromSql(int qrealAnimatorId) {
+void QrealAnimator::prp_loadFromSql(const int &qrealAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qrealanimator WHERE id = " +
@@ -46,7 +47,7 @@ void QrealAnimator::loadFromSql(int qrealAnimatorId) {
         int idQrealAnimatorId = query.record().indexOf("id");
         int currentValue = query.record().indexOf("currentvalue");
 
-        loadKeysFromSql(query.value(idQrealAnimatorId).toInt() );
+        anim_loadKeysFromSql(query.value(idQrealAnimatorId).toInt() );
 
         if(anim_mKeys.isEmpty()) {
             qra_setCurrentValue(query.value(currentValue).toReal());
@@ -58,7 +59,7 @@ void QrealAnimator::loadFromSql(int qrealAnimatorId) {
     }
 }
 
-void QrealAnimator::loadKeysFromSql(int qrealAnimatorId) {
+void QrealAnimator::anim_loadKeysFromSql(int qrealAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qrealkey WHERE qrealanimatorid = " +

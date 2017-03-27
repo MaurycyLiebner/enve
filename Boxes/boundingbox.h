@@ -176,7 +176,7 @@ public:
     void cancelTransform();
     void scale(qreal scaleXBy, qreal scaleYBy);
 
-    virtual int saveToSql(QSqlQuery *query, int parentId);
+    virtual int prp_saveToSql(QSqlQuery *query, const int &parentId);
 
     virtual PathPoint *createNewPointOnLineNear(QPointF, bool) { return NULL; }
     bool isVectorPath();
@@ -265,7 +265,7 @@ public:
     void copyTransformationTo(BoundingBox *box);
 
     virtual VectorPath *objectToPath() { return NULL; }
-    virtual void loadFromSql(int boundingBoxId);
+    virtual void prp_loadFromSql(const int &boundingBoxId);
 
     virtual void updatePixmaps();
     void updatePrettyPixmap();
@@ -461,13 +461,14 @@ protected:
 
     QMatrix mRelativeTransformMatrix;
 
-    bool mNoCache = false;
-    int mUpdateRelFrame = 0;
     int mCurrentAbsFrame = 0;
     int mCurrentRelFrame = 0;
+    bool mNoCache = false;
+    int mUpdateRelFrame = 0;
     QRectF mUpdateRelBoundingRect;
     QMatrix mUpdateTransform;
     bool mUpdateDrawOnParentBox = true;
+    bool mUpdateReplaceCache;
 
     bool mRedoUpdate = false;
     bool mAwaitingUpdate = false;
@@ -495,13 +496,9 @@ protected:
     bool mVisible = true;
     bool mLocked = false;
 
-    QString mName = "";
-    QList<Animator*> mActiveAnimators;
-
     bool mAnimated = false;
 
     QImage mRenderPixmap;
-    bool mUpdateReplaceCache;
 signals:
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();

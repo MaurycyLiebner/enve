@@ -34,7 +34,8 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
 }
 
 #include <QSqlError>
-int TransformAnimator::prp_saveToSql(QSqlQuery *query) {
+int TransformAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    Q_UNUSED(parentId);
     int posAnimatorId = mPosAnimator.prp_saveToSql(query);
     int scaleAnimatorId = mScaleAnimator.prp_saveToSql(query);
     int pivotAnimatorId = mPivotAnimator.prp_saveToSql(query);
@@ -55,7 +56,7 @@ int TransformAnimator::prp_saveToSql(QSqlQuery *query) {
     return query->lastInsertId().toInt();
 }
 
-void TransformAnimator::loadFromSql(int transformAnimatorId) {
+void TransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM transformanimator WHERE id = " +
@@ -73,8 +74,8 @@ void TransformAnimator::loadFromSql(int transformAnimatorId) {
         mPosAnimator.loadFromSql(query.value(posanimatorid).toInt());
         mScaleAnimator.loadFromSql(query.value(scaleanimatorid).toInt());
         mPivotAnimator.loadFromSql(query.value(pivotanimatorid).toInt());
-        mRotAnimator.loadFromSql(query.value(rotanimatorid).toInt());
-        mOpacityAnimator.loadFromSql(query.value(opacityanimatorid).toInt());
+        mRotAnimator.prp_loadFromSql(query.value(rotanimatorid).toInt());
+        mOpacityAnimator.prp_loadFromSql(query.value(opacityanimatorid).toInt());
     } else {
         qDebug() << "Could not load qpointfanimator with id " << transformAnimatorId;
     }

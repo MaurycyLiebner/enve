@@ -74,7 +74,7 @@ public:
     void updateOutlinePathIfNeeded();
 
     void setOutlineAffectedByScale(bool bT);
-    int saveToSql(QSqlQuery *query, int parentId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
     void loadFromSql(int boundingBoxId);
     void updateRelBoundingRect();
 

@@ -51,10 +51,13 @@ public:
     void moveRelativeToSavedValue(qreal dX, qreal dY);
     void copyTransformationTo(TransformAnimator *targetAnimator);
     void setPivot(QPointF point, bool finish = false);
-    int prp_saveToSql(QSqlQuery *query);
-    void loadFromSql(int transformAnimatorId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    void prp_loadFromSql(const int &transformAnimatorId);
 
     void prp_makeDuplicate(Property *target);
+    Property *prp_makeDuplicate() {
+        return NULL;
+    }
 
     void duplicatePivotAnimatorFrom(QPointFAnimator *source);
     void duplicatePosAnimatorFrom(QPointFAnimator *source);

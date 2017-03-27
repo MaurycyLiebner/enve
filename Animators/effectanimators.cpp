@@ -9,14 +9,18 @@ EffectAnimators::EffectAnimators() :
 
 }
 
-void EffectAnimators::prp_saveToSql(QSqlQuery *query, int boundingBoxSqlId) {
+void EffectAnimators::addEffect(PixmapEffect *effect) {
+    mParentBox->addEffect(effect);
+}
+
+void EffectAnimators::prp_saveToSql(QSqlQuery *query,
+                                    const int &boundingBoxSqlId) {
     foreach(Property *effect, ca_mChildAnimators) {
         ((PixmapEffect*)effect)->prp_saveToSql(query, boundingBoxSqlId);
     }
 }
 
-void EffectAnimators::loadFromSql(int boundingBoxSqlId,
-                                  BoundingBox *box) {
+void EffectAnimators::prp_loadFromSql(const int &boundingBoxSqlId) {
     QSqlQuery query;
     QString queryStr;
     queryStr = "SELECT * FROM pixmapeffect WHERE boundingboxid = " +
@@ -31,7 +35,7 @@ void EffectAnimators::loadFromSql(int boundingBoxSqlId,
             PixmapEffect *effect = PixmapEffect::loadFromSql(
                                             query.value(idId).toInt(),
                                             typeT);
-            box->addEffect(effect);
+            addEffect(effect);
         }
     } else {
         qDebug() << query.lastError() << endl << query.lastQuery();
@@ -62,4 +66,12 @@ qreal EffectAnimators::getEffectsMargin() const {
 
 bool EffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
+}
+
+void EffectAnimators::prp_makeDuplicate(Property *target) {
+    EffectAnimators *eaTarget = ((EffectAnimators*)target);
+    foreach(Property *effect, ca_mChildAnimators) {
+        eaTarget->addEffect((PixmapEffect*)
+                    ((PixmapEffect*)effect)->prp_makeDuplicate());
+    }
 }

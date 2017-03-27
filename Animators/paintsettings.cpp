@@ -241,7 +241,8 @@ QGradientStops Gradient::getQGradientStops()
     return mQGradientStops;
 }
 
-int Gradient::prp_saveToSql(QSqlQuery *query) {
+int Gradient::prp_saveToSql(QSqlQuery *, const int &parentId) {
+    Q_UNUSED(parentId);
     query->exec("INSERT INTO gradient DEFAULT VALUES");
     mSqlId = query->lastInsertId().toInt();
     int posInGradient = 0;
@@ -442,7 +443,8 @@ void PaintSettings::loadFromSql(int sqlId, GradientWidget *gradientWidget) {
     }
 }
 
-int PaintSettings::prp_saveToSql(QSqlQuery *query) {
+int PaintSettings::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    Q_UNUSED(parentId);
     int colorId = mColor.prp_saveToSql(query);
     QString gradientId = (mGradient == NULL) ? "NULL" :
                                                QString::number(
@@ -573,7 +575,7 @@ void StrokeSettings::loadFromSql(int strokeSqlId, int paintSqlId,
         int idLineWidth = query.record().indexOf("linewidthanimatorid");
         int idCapStyle = query.record().indexOf("capstyle");
         int idJoinStyle = query.record().indexOf("joinstyle");
-        mLineWidth.loadFromSql(query.value(idLineWidth).toInt() );
+        mLineWidth.prp_loadFromSql(query.value(idLineWidth).toInt() );
         mCapStyle = static_cast<Qt::PenCapStyle>(query.value(idCapStyle).toInt());
         mJoinStyle = static_cast<Qt::PenJoinStyle>(query.value(idJoinStyle).toInt());
     } else {
@@ -581,7 +583,9 @@ void StrokeSettings::loadFromSql(int strokeSqlId, int paintSqlId,
     }
 }
 
-int StrokeSettings::prp_saveToSql(QSqlQuery *query) {
+int StrokeSettings::prp_saveToSql(QSqlQuery *query,
+                                  const int &parentId) {
+    Q_UNUSED(parentId);
     int paintSettingsId = PaintSettings::prp_saveToSql(query);
     int lineWidthId = mLineWidth.prp_saveToSql(query);
     query->exec(QString("INSERT INTO strokesettings (linewidthanimatorid, "

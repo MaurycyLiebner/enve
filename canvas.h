@@ -44,6 +44,7 @@ public:
                     int canvasHeight = 1080,
                     const int &frameCount = 200);
     ~Canvas();
+
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
@@ -64,8 +65,12 @@ public:
 
     void awaitUpdate() {}
 
-    void saveToSql(QSqlQuery *query);
+    void prp_loadFromSql(const int &) {}
+    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+    int prp_saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);
+
+
     void resetTransormation();
     void fitCanvasToSize();
     bool processFilteredKeyEvent(QKeyEvent *event);

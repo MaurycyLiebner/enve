@@ -640,6 +640,41 @@ void CanvasWidget::nextSaveOutputFrame() {
     }
 }
 
+void CanvasWidget::loadCanvasesFromSql() {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM canvas";
+    if(query.exec(queryStr)) {
+        while(query.next()) {
+            int idWidth = query.record().indexOf("width");
+            int idHeight = query.record().indexOf("height");
+            int idFrameCount = query.record().indexOf("framecount");
+            int idBoundingBoxId = query.record().indexOf("boundingboxid");
+
+            int width = query.value(idWidth).toInt();
+            int height = query.value(idHeight).toInt();
+            int frameCount = query.value(idFrameCount).toInt();
+            int boundingBoxId = query.value(idBoundingBoxId).toInt();
+
+            Canvas *canvas =
+                    new Canvas(MainWindow::getFillStrokeSettings(),
+                               this,
+                               width, height,
+                               frameCount);
+            canvas->prp_loadFromSql(boundingBoxId);
+            MainWindow::getInstance()->addCanvas(canvas);
+        }
+    } else {
+        qDebug() << "Could not load canvas with id " << boundingBoxId;
+    }
+}
+
+void CanvasWidget::saveCanvasesFromSql(QSqlQuery *query) {
+    foreach(Canvas *canvas, mCanvasList) {
+        canvas->prp_saveToSql(query);
+    }
+}
+
 void CanvasWidget::saveOutput(QString renderDest) {
     mOutputString = renderDest;
     mBoxesUpdateFinishedFunction = &CanvasWidget::nextSaveOutputFrame;
@@ -694,7 +729,7 @@ void CanvasWidget::createSoundForPath(const QString &path) {
 
 void CanvasWidget::saveToSql(QSqlQuery *query) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->saveToSql(query);
+    mCurrentCanvas->prp_saveToSql(query);
 }
 
 int CanvasWidget::getCurrentFrame() {

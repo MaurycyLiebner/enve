@@ -9,6 +9,16 @@ bool BoolProperty::getValue() {
     return mValue;
 }
 
+void BoolProperty::prp_makeDuplicate(Property *property) {
+    ((BoolProperty*)property)->setValue(mValue);
+}
+
+Property *BoolProperty::prp_makeDuplicate() {
+    BoolProperty *newProp = new BoolProperty();
+    prp_makeDuplicate(newProp);
+    return newProp;
+}
+
 void BoolProperty::setValue(const bool &value) {
     mValue = value;
     prp_mParentAnimator->prp_callUpdater();
