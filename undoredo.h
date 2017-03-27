@@ -460,11 +460,11 @@ public:
     }
 
     void redo() {
-        mParentAnimator->moveChildInList(mChild, mFromIndex, mToIndex, false);
+        mParentAnimator->ca_moveChildInList(mChild, mFromIndex, mToIndex, false);
     }
 
     void undo() {
-        mParentAnimator->moveChildInList(mChild, mToIndex, mFromIndex, false);
+        mParentAnimator->ca_moveChildInList(mChild, mToIndex, mFromIndex, false);
     }
 private:
     ComplexAnimator *mParentAnimator;

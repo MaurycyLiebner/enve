@@ -19,7 +19,10 @@ enum MovablePointType {
     TYPE_GRADIENT_POINT
 };
 
-class MovablePoint : public Transformable
+class MovablePoint :
+        public Transformable,
+        public SmartPointerTarget,
+        public ConnectedToMainWindow
 {
 public:
     MovablePoint(BoundingBox *parent, MovablePointType type,

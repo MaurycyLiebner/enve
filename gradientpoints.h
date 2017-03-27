@@ -34,7 +34,7 @@ public:
     void setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo = true);
     void loadFromSql(int fillGradientStartId, int fillGradientEndId);
 
-    void makeDuplicate(Animator *target);
+    void prp_makeDuplicate(Property *target);
     void duplicatePointsFrom(GradientPoint *startPointT,
                              GradientPoint *endPointT);
 };

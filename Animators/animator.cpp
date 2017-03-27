@@ -270,7 +270,7 @@ void Animator::anim_setRecordingWithoutChangingKeys(bool rec, bool saveUndoRedo)
     anim_mIsRecording = rec;
     anim_setTraceKeyOnCurrentFrame(rec); // !!!
     if(prp_mParentAnimator != NULL) {
-        prp_mParentAnimator->childAnimatorIsRecordingChanged();
+        prp_mParentAnimator->ca_childAnimatorIsRecordingChanged();
     }
 }
 

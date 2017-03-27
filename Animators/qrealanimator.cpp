@@ -102,7 +102,7 @@ void QrealAnimator::prp_openContextMenu(QPoint pos) {
         if(selected_action->text() == "Add Key")
         {
             if(anim_mIsRecording) {
-                saveCurrentValueAsKey();
+                anim_saveCurrentValueAsKey();
             } else {
                 prp_setRecording(true);
             }
@@ -131,7 +131,7 @@ void QrealAnimator::setPrefferedValueStep(const qreal &valueStep) {
 void QrealAnimator::prp_setRecording(bool rec) {
     anim_setRecordingWithoutChangingKeys(rec);
     if(anim_mIsRecording) {
-        saveCurrentValueAsKey();
+        anim_saveCurrentValueAsKey();
     } else {
         anim_removeAllKeys();
         qra_updateKeysPath();
@@ -288,7 +288,7 @@ void QrealAnimator::saveValueAtAbsFrameAsKey(int frame) {
     }
 }
 
-void QrealAnimator::saveCurrentValueAsKey() {
+void QrealAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) prp_setRecording(true);
     QrealKey *keyAtFrame = (QrealKey*)anim_getKeyAtAbsFrame(
                                             anim_mCurrentAbsFrame);
@@ -573,7 +573,7 @@ void QrealAnimator::prp_finishTransform() {
                                                  mCurrentValue,
                                                  this) );
         if(anim_mIsRecording) {
-            saveCurrentValueAsKey();
+            anim_saveCurrentValueAsKey();
         }
         mTransformed = false;
 
@@ -593,22 +593,23 @@ void QrealAnimator::prp_cancelTransform() {
     }
 }
 
-void QrealAnimator::makeDuplicate(Animator *target) {
-    target->prp_setName(prp_mName);
-    target->prp_setRecording(false);
-    ((QrealAnimator*)target)->qra_setCurrentValue(mCurrentValue, false);
+void QrealAnimator::prp_makeDuplicate(Property *target) {
+    QrealAnimator *qa_target = (QrealAnimator*)target;
+    qa_target->prp_setName(prp_mName);
+    qa_target->prp_setRecording(false);
+    qa_target->qra_setCurrentValue(mCurrentValue, false);
     if(anim_mIsRecording) {
-        target->anim_setRecordingWithoutChangingKeys(anim_mIsRecording);
+        qa_target->anim_setRecordingWithoutChangingKeys(anim_mIsRecording);
     }
     QrealKey *key; foreachQK(key, anim_mKeys)
-        QrealKey *duplicate = key->makeQrealKeyDuplicate((QrealAnimator*)target);
-        target->anim_appendKey(duplicate);
+        QrealKey *duplicate = key->makeQrealKeyDuplicate(qa_target);
+        qa_target->anim_appendKey(duplicate);
     }
 }
 
-Animator *QrealAnimator::makeDuplicate() {
+Property *QrealAnimator::prp_makeDuplicate() {
     QrealAnimator *target = new QrealAnimator();
-    makeDuplicate(target);
+    prp_makeDuplicate(target);
     return target;
 }
 
@@ -620,8 +621,9 @@ qreal QrealAnimator::qra_getSavedValue() {
     return mSavedCurrentValue;
 }
 
-QrealPoint *QrealAnimator::qra_getPointAt(qreal value, qreal frame,
-                                qreal pixelsPerFrame, qreal pixelsPerValUnit) {
+QrealPoint *QrealAnimator::qra_getPointAt(
+        qreal value, qreal frame,
+        qreal pixelsPerFrame, qreal pixelsPerValUnit) {
     QrealPoint *point = NULL;
     QrealKey *key; foreachQK(key, anim_mKeys)
 //        point = key->mousePress(frame, value,

@@ -28,7 +28,7 @@ public:
     void multSavedValueToCurrentValue(qreal sx, qreal sy);
     void incSavedValueToCurrentValue(qreal incXBy, qreal incYBy);
 
-    void makeDuplicate(Animator *target);
+    void prp_makeDuplicate(Property *target);
     void duplicateYAnimatorFrom(QrealAnimator *source);
     void duplicateXAnimatorFrom(QrealAnimator *source);
     void qra_setValueRange(qreal minVal, qreal maxVal);

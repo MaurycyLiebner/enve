@@ -49,7 +49,7 @@ void PathAnimator::addSinglePathAnimator(SinglePathAnimator *path,
                                          const bool &saveUndoRedo) {
     mSinglePaths << path;
     path->incNumberPointers();
-    addChildAnimator(path);
+    ca_addChildAnimator(path);
     if(saveUndoRedo) {
         addUndoRedo(new AddSinglePathAnimatorUndoRedo(this, path));
     }
@@ -62,7 +62,7 @@ void PathAnimator::removeSinglePathAnimator(SinglePathAnimator *path,
             addUndoRedo(new RemoveSinglePathAnimatorUndoRedo(this, path));
         }
         path->decNumberPointers();
-        removeChildAnimator(path);
+        ca_removeChildAnimator(path);
     }
 }
 

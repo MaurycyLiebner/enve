@@ -186,7 +186,7 @@ public:
     virtual void loadFromSql(int sqlId, GradientWidget *gradientWidget);
     void setPaintPathTarget(PathBox *path);
 
-    void makeDuplicate(Animator *target);
+    void prp_makeDuplicate(Property *target);
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
 
@@ -237,7 +237,7 @@ public:
     void loadFromSql(int strokeSqlId, GradientWidget *gradientWidget);
     bool nonZeroLineWidth();
 
-    void makeDuplicate(Animator *target);
+    void prp_makeDuplicate(Property *target);
 
     void duplicateLineWidthFrom(QrealAnimator *source);
 

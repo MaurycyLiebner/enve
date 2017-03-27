@@ -84,10 +84,7 @@ public:
                               int startFrame, int endFrame);
     Key *anim_getKeyAtAbsFrame(const int &frame);
 
-    virtual void makeDuplicate(Animator *) {} // should be 0
-    virtual Animator *makeDuplicate() {} // should be 0
-
-    virtual void saveCurrentValueAsKey() {}
+    virtual void anim_saveCurrentValueAsKey() {}
 protected:
     virtual void anim_drawKey(QPainter *p,
                          Key *key,

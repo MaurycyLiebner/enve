@@ -4,8 +4,8 @@ QPointFAnimator::QPointFAnimator() : ComplexAnimator()
 {
     mXAnimator.prp_setName("x");
     mYAnimator.prp_setName("y");
-    addChildAnimator(&mXAnimator);
-    addChildAnimator(&mYAnimator);
+    ca_addChildAnimator(&mXAnimator);
+    ca_addChildAnimator(&mYAnimator);
 
     mXAnimator.blockPointer();
     mYAnimator.blockPointer();
@@ -102,7 +102,7 @@ void QPointFAnimator::incSavedValueToCurrentValue(qreal incXBy, qreal incYBy) {
     mYAnimator.incSavedValueToCurrentValue(incYBy);
 }
 
-void QPointFAnimator::makeDuplicate(Animator *target) {
+void QPointFAnimator::prp_makeDuplicate(Property *target) {
     QPointFAnimator *pointTarget = (QPointFAnimator*)target;
 
     pointTarget->duplicateXAnimatorFrom(&mXAnimator);
@@ -111,12 +111,12 @@ void QPointFAnimator::makeDuplicate(Animator *target) {
 
 void QPointFAnimator::duplicateXAnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mXAnimator);
+    source->prp_makeDuplicate(&mXAnimator);
 }
 
 void QPointFAnimator::duplicateYAnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mYAnimator);
+    source->prp_makeDuplicate(&mYAnimator);
 }
 
 QrealAnimator *QPointFAnimator::getXAnimator()

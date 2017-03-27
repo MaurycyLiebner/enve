@@ -9,7 +9,7 @@ public:
     void setParentBoundingBox(BoundingBox *box);
 //    void updateKeysPath();
 //    void sortKeys();
-    void childAnimatorIsRecordingChanged();
+    void ca_childAnimatorIsRecordingChanged();
     int anim_getParentFrameShift() const;
 private:
     BoundingBox *mParentBox;

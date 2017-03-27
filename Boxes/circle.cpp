@@ -18,12 +18,12 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
 
     QrealAnimator *hXAnimator = mHorizontalRadiusPoint->
                                     getRelativePosAnimatorPtr()->getXAnimator();
-    addActiveAnimator(hXAnimator);
+    ca_addChildAnimator(hXAnimator);
     hXAnimator->prp_setName("horizontal radius");
 
     QrealAnimator *vYAnimator = mVerticalRadiusPoint->
                                     getRelativePosAnimatorPtr()->getYAnimator();
-    addActiveAnimator(vYAnimator);
+    ca_addChildAnimator(vYAnimator);
     vYAnimator->prp_setName("vertical radius");
 
 

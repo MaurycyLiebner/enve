@@ -25,12 +25,12 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     mPivotAnimator.blockPointer();
     mOpacityAnimator.blockPointer();
 
-    addChildAnimator(&mPosAnimator);
-    addChildAnimator(&mRotAnimator);
-    addChildAnimator(&mScaleAnimator);
+    ca_addChildAnimator(&mPosAnimator);
+    ca_addChildAnimator(&mRotAnimator);
+    ca_addChildAnimator(&mScaleAnimator);
     mScaleAnimator.setPrefferedValueStep(0.05);
-    addChildAnimator(&mPivotAnimator);
-    addChildAnimator(&mOpacityAnimator);
+    ca_addChildAnimator(&mPivotAnimator);
+    ca_addChildAnimator(&mOpacityAnimator);
 }
 
 #include <QSqlError>
@@ -341,7 +341,7 @@ QMatrix TransformAnimator::qra_getCurrentValue() {
 //    }
 }
 
-void TransformAnimator::makeDuplicate(Animator *target) {
+void TransformAnimator::prp_makeDuplicate(Property *target) {
     TransformAnimator *transformPtr = (TransformAnimator*)target;
 
     transformPtr->duplicatePivotAnimatorFrom(&mPivotAnimator);
@@ -353,27 +353,27 @@ void TransformAnimator::makeDuplicate(Animator *target) {
 
 void TransformAnimator::duplicatePivotAnimatorFrom(
         QPointFAnimator *source) {
-    source->makeDuplicate(&mPivotAnimator);
+    source->prp_makeDuplicate(&mPivotAnimator);
 }
 
 void TransformAnimator::duplicatePosAnimatorFrom(
         QPointFAnimator *source) {
-    source->makeDuplicate(&mPosAnimator);
+    source->prp_makeDuplicate(&mPosAnimator);
 }
 
 void TransformAnimator::duplicateScaleAnimatorFrom(
         QPointFAnimator *source) {
-    source->makeDuplicate(&mScaleAnimator);
+    source->prp_makeDuplicate(&mScaleAnimator);
 }
 
 void TransformAnimator::duplicateRotAnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mRotAnimator);
+    source->prp_makeDuplicate(&mRotAnimator);
 }
 
 void TransformAnimator::duplicateOpacityAnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mOpacityAnimator);
+    source->prp_makeDuplicate(&mOpacityAnimator);
 }
 
 void TransformAnimator::moveByAbs(const QMatrix &combinedTrans,

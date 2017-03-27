@@ -8,10 +8,10 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
     mAlphaAnimator.prp_setName("alpha");
     setColorMode(RGBMODE);
 
-    addChildAnimator(&mVal1Animator);
-    addChildAnimator(&mVal2Animator);
-    addChildAnimator(&mVal3Animator);
-    addChildAnimator(&mAlphaAnimator);
+    ca_addChildAnimator(&mVal1Animator);
+    ca_addChildAnimator(&mVal2Animator);
+    ca_addChildAnimator(&mVal3Animator);
+    ca_addChildAnimator(&mAlphaAnimator);
 
     mVal1Animator.qra_setValueRange(0., 1.);
     mVal1Animator.setPrefferedValueStep(0.05);
@@ -236,13 +236,13 @@ void ColorAnimator::setCurrentAlphaValue(const qreal &alpha,
     mAlphaAnimator.qra_setCurrentValue(alpha, finish);
 }
 
-void ColorAnimator::saveCurrentValueAsKey() {
+void ColorAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) {
         prp_setRecording(true);
     }
-    mVal1Animator.saveCurrentValueAsKey();
-    mVal2Animator.saveCurrentValueAsKey();
-    mVal3Animator.saveCurrentValueAsKey();
+    mVal1Animator.anim_saveCurrentValueAsKey();
+    mVal2Animator.anim_saveCurrentValueAsKey();
+    mVal3Animator.anim_saveCurrentValueAsKey();
 }
 
 #include <QMenu>
@@ -274,7 +274,7 @@ void ColorAnimator::prp_openContextMenu(QPoint pos) {
     {
         if(selected_action->text() == "Add Key")
         {
-            saveCurrentValueAsKey();
+            anim_saveCurrentValueAsKey();
         } else if(selected_action == rgbAction) {
             setColorMode(RGBMODE);
         } else if(selected_action == hsvAction) {
@@ -287,7 +287,7 @@ void ColorAnimator::prp_openContextMenu(QPoint pos) {
     }
 }
 
-void ColorAnimator::makeDuplicate(Animator *target) {
+void ColorAnimator::prp_makeDuplicate(Property *target) {
     ColorAnimator *colorTarget = (ColorAnimator*)target;
 
     colorTarget->duplicateVal1AnimatorFrom(&mVal1Animator);
@@ -298,20 +298,20 @@ void ColorAnimator::makeDuplicate(Animator *target) {
 
 void ColorAnimator::duplicateVal1AnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mVal1Animator);
+    source->prp_makeDuplicate(&mVal1Animator);
 }
 
 void ColorAnimator::duplicateVal2AnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mVal2Animator);
+    source->prp_makeDuplicate(&mVal2Animator);
 }
 
 void ColorAnimator::duplicateVal3AnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mVal3Animator);
+    source->prp_makeDuplicate(&mVal3Animator);
 }
 
 void ColorAnimator::duplicateAlphaAnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mAlphaAnimator);
+    source->prp_makeDuplicate(&mAlphaAnimator);
 }

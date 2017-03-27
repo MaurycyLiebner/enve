@@ -4,7 +4,7 @@
 #include <QPointF>
 
 
-class Transformable : public ConnectedToMainWindow
+class Transformable
 {
 public:
     Transformable();

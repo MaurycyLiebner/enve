@@ -26,8 +26,8 @@ void AnimatorsCollection::setParentBoundingBox(BoundingBox *box) {
 //    }
 //}
 
-void AnimatorsCollection::childAnimatorIsRecordingChanged() {
-    ComplexAnimator::childAnimatorIsRecordingChanged();
+void AnimatorsCollection::ca_childAnimatorIsRecordingChanged() {
+    ComplexAnimator::ca_childAnimatorIsRecordingChanged();
     mParentBox->SWT_scheduleWidgetsContentUpdateWithRule(SWT_Animated);
     mParentBox->SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }
@@ -36,5 +36,5 @@ int AnimatorsCollection::anim_getParentFrameShift() const {
     if(mParentBox == NULL) {
         return 0;
     }
-    return mParentBox->getFrameShift();
+    return mParentBox->anim_getFrameShift();
 }

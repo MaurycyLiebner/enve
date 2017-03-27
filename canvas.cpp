@@ -17,7 +17,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                const int &frameCount) :
     BoxesGroup(fillStrokeSettings) {    
     mSoundComposition = new SoundComposition(this);
-    addActiveAnimator(mSoundComposition->getSoundsAnimatorContainer());
+    ca_addChildAnimator(mSoundComposition->getSoundsAnimatorContainer());
 
     mMaxFrame = frameCount;
 

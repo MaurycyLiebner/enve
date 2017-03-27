@@ -12,19 +12,17 @@ public:
     ~ComplexAnimator();
 
     void ca_addDescendantsKey(Key *key);
-    ComplexKey *getKeyCollectionAtAbsFrame(int frame);
-    ComplexKey *getKeyCollectionAtRelFrame(int frame);
 
     void ca_removeDescendantsKey(Key *key);
 
-    void addChildAnimator(Property *childAnimator);
-    void removeChildAnimator(Property *removeAnimator);
-    void swapChildAnimators(Property *animator1, Property *animator2);
-    void moveChildInList(Property *child,
+    void ca_addChildAnimator(Property *childAnimator);
+    void ca_removeChildAnimator(Property *removeAnimator);
+    void ca_swapChildAnimators(Property *animator1, Property *animator2);
+    void ca_moveChildInList(Property *child,
                          int from, int to,
                          bool saveUndoRedo = true);
-    void moveChildBelow(Property *move, Property *below);
-    void moveChildAbove(Property *move, Property *above);
+    void ca_moveChildBelow(Property *move, Property *below);
+    void ca_moveChildAbove(Property *move, Property *above);
 
     void prp_startTransform();
     void prp_setUpdater(AnimatorUpdater *updater);
@@ -36,8 +34,8 @@ public:
 
     void prp_setRecording(bool rec);
 
-    virtual void childAnimatorIsRecordingChanged();
-    void setRecordingValue(bool rec);
+    virtual void ca_childAnimatorIsRecordingChanged();
+    void ca_setRecordingValue(bool rec);
 
     bool prp_isDescendantRecording();
     QString prp_getValueText();
@@ -47,10 +45,10 @@ public:
 
     void prp_setTransformed(bool bT);
 
-    void changeChildAnimatorZ(const int &oldIndex,
+    void ca_changeChildAnimatorZ(const int &oldIndex,
                               const int &newIndex);
-    int getNumberOfChildren();
-    Property *getChildAt(const int &i);
+    int ca_getNumberOfChildren();
+    Property *ca_getChildAt(const int &i);
 
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
@@ -74,8 +72,10 @@ public:
                  const qreal &pixelsPerFrame,
                  const qreal &drawY, const int &startFrame);
 protected:
-    bool mChildAnimatorRecording = false;
-    QList<Property*> mChildAnimators;
+    ComplexKey *ca_getKeyCollectionAtAbsFrame(int frame);
+    ComplexKey *ca_getKeyCollectionAtRelFrame(int frame);
+    bool ca_mChildAnimatorRecording = false;
+    QList<Property*> ca_mChildAnimators;
 };
 
 class ComplexKey : public Key

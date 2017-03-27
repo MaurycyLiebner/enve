@@ -5,8 +5,10 @@
 
 MovablePoint::MovablePoint(BoundingBox *parent,
                            MovablePointType type,
-                           qreal radius) : Transformable()
-{
+                           qreal radius) :
+    Transformable(),
+    SmartPointerTarget(),
+    ConnectedToMainWindow() {
     mType = type;
     mRadius = radius;
     mParent = parent;
@@ -51,7 +53,7 @@ void MovablePoint::makeDuplicate(MovablePoint *targetPoint) {
 }
 
 void MovablePoint::duplicatePosAnimatorFrom(QPointFAnimator *source) {
-    source->makeDuplicate(&mRelPos);
+    source->prp_makeDuplicate(&mRelPos);
 }
 
 void MovablePoint::finishTransform()

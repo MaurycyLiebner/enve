@@ -707,7 +707,7 @@ void SinglePathAnimator::appendToPointsList(PathPoint *point,
                                       const bool &saveUndoRedo) {
     mPoints.append(point);
     point->setParentPath(this);
-    addChildAnimator(point->getPathPointAnimatorsPtr());
+    ca_addChildAnimator(point->getPathPointAnimatorsPtr());
     //point->show();
     if(saveUndoRedo) {
         AppendToPointsListUndoRedo *undoRedo =
@@ -726,7 +726,7 @@ void SinglePathAnimator::appendToPointsList(PathPoint *point,
 void SinglePathAnimator::removeFromPointsList(PathPoint *point,
                                         const bool &saveUndoRedo) {
     mPoints.removeOne(point);
-    removeChildAnimator(point->getPathPointAnimatorsPtr());
+    ca_removeChildAnimator(point->getPathPointAnimatorsPtr());
     //point->hide();
     //getParentCanvas()->removePointFromSelection(point);
     if(saveUndoRedo) {

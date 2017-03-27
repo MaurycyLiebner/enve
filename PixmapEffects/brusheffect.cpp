@@ -14,37 +14,37 @@ BrushEffect::BrushEffect(qreal numberStrokes,
     mNumberStrokes.qra_setCurrentValue(numberStrokes);
     mNumberStrokes.prp_setName("number strokes");
     mNumberStrokes.blockPointer();
-    addChildAnimator(&mNumberStrokes);
+    ca_addChildAnimator(&mNumberStrokes);
 
     mMinBrushRadius.qra_setCurrentValue(brushMinRadius);
     mMinBrushRadius.prp_setName("min radius");
     mMinBrushRadius.blockPointer();
-    addChildAnimator(&mMinBrushRadius);
+    ca_addChildAnimator(&mMinBrushRadius);
 
     mMaxBrushRadius.qra_setCurrentValue(brushMaxRadius);
     mMaxBrushRadius.prp_setName("max radius");
     mMaxBrushRadius.blockPointer();
-    addChildAnimator(&mMaxBrushRadius);
+    ca_addChildAnimator(&mMaxBrushRadius);
 
     mStrokeMaxLength.qra_setCurrentValue(strokeMaxLength);
     mStrokeMaxLength.prp_setName("max stroke length");
     mStrokeMaxLength.blockPointer();
-    addChildAnimator(&mStrokeMaxLength);
+    ca_addChildAnimator(&mStrokeMaxLength);
 
     mStrokeMinDirectionAngle.qra_setCurrentValue(strokeMinDirectionAngle);
     mStrokeMinDirectionAngle.prp_setName("min stroke angle");
     mStrokeMinDirectionAngle.blockPointer();
-    addChildAnimator(&mStrokeMinDirectionAngle);
+    ca_addChildAnimator(&mStrokeMinDirectionAngle);
 
     mStrokeMaxDirectionAngle.qra_setCurrentValue(strokeMaxDirectionAngle);
     mStrokeMaxDirectionAngle.prp_setName("max stroke angle");
     mStrokeMaxDirectionAngle.blockPointer();
-    addChildAnimator(&mStrokeMaxDirectionAngle);
+    ca_addChildAnimator(&mStrokeMaxDirectionAngle);
 
     mStrokeCurvature.qra_setCurrentValue(strokeCurvature);
     mStrokeCurvature.prp_setName("curvature");
     mStrokeCurvature.blockPointer();
-    addChildAnimator(&mStrokeCurvature);
+    ca_addChildAnimator(&mStrokeCurvature);
 }
 
 void BrushEffect::apply(BoundingBox *target, QImage *imgPtr,

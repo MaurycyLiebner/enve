@@ -12,7 +12,7 @@ VectorPath::VectorPath(BoxesGroup *group) :
     PathBox(group, BoundingBoxType::TYPE_VECTOR_PATH) {
     setName("Path");
     mPathAnimator.setParentBox(this);
-    addActiveAnimator(&mPathAnimator);
+    ca_addChildAnimator(&mPathAnimator);
     mPathAnimator.prp_setUpdater(new PathPointUpdater(this));
 
     mPathAnimator.blockPointer();

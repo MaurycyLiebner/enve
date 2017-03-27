@@ -11,7 +11,7 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mTimeScaleAnimator.setPrefferedValueStep(0.05);
     mTimeScaleAnimator.prp_setUpdater(new AnimationBoxFrameUpdater(this));
     mTimeScaleAnimator.prp_blockUpdater();
-    addActiveAnimator(&mTimeScaleAnimator);
+    ca_addChildAnimator(&mTimeScaleAnimator);
 
     setDurationRectangle(new DurationRectangle());
     mDurationRectangle->setPossibleFrameRangeVisible();
@@ -33,7 +33,7 @@ void AnimationBox::makeDuplicate(BoundingBox *targetBox) {
 
 void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
         QrealAnimator *timeScaleAnimator) {
-    timeScaleAnimator->makeDuplicate(&mTimeScaleAnimator);
+    timeScaleAnimator->prp_makeDuplicate(&mTimeScaleAnimator);
 }
 
 DurationRectangleMovable *AnimationBox::getRectangleMovableAtPos(

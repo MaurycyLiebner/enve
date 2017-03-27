@@ -129,8 +129,8 @@ public:
     int getNumberDecimals() { return mDecimals; }
     void setNumberDecimals(int decimals) { mDecimals = decimals; }
 
-    void makeDuplicate(Animator *target);
-    Animator *makeDuplicate();
+    void prp_makeDuplicate(Property *target);
+    Property *prp_makeDuplicate();
 
     SWT_Type SWT_getType() { return SWT_QrealAnimator; }
     qreal getCurrentValueAtAbsFrame(const int &frame) const;
@@ -164,7 +164,7 @@ signals:
 public slots:
     void prp_setRecording(bool rec);
 
-    void saveCurrentValueAsKey();
+    void anim_saveCurrentValueAsKey();
 };
 
 #endif // VALUEANIMATORS_H

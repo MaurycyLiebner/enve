@@ -82,9 +82,8 @@ private:
 };
 
 class BoundingBox :
-        public QObject,
-        public Transformable,
-        public SingleWidgetTarget {
+        public ComplexAnimator,
+        public Transformable {
     Q_OBJECT
 public:
     BoundingBox(BoxesGroup *parent, BoundingBoxType type);
@@ -213,9 +212,6 @@ public:
     virtual void startAllPointsTransform() {}
     virtual void finishAllPointsTransform() {}
 
-    void addActiveAnimator(Animator *animator);
-    void removeActiveAnimator(Animator *animator);
-
     virtual void setFillGradient(Gradient* gradient, bool finish) {
         Q_UNUSED(gradient); Q_UNUSED(finish); }
     virtual void setStrokeGradient(Gradient* gradient, bool finish) {
@@ -224,10 +220,12 @@ public:
         Q_UNUSED(color); Q_UNUSED(finish); }
     virtual void setStrokeFlatColor(Color color, bool finish) {
         Q_UNUSED(color); Q_UNUSED(finish); }
-    virtual void setFillPaintType(PaintType paintType, Color color,
+    virtual void setFillPaintType(PaintType paintType,
+                                  Color color,
                                   Gradient* gradient) {
         Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
-    virtual void setStrokePaintType(PaintType paintType, Color color,
+    virtual void setStrokePaintType(PaintType paintType,
+                                    Color color,
                                     Gradient* gradient) {
         Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
@@ -301,7 +299,7 @@ public:
     virtual void updateAllBoxes();
     void selectionChangeTriggered(bool shiftPressed);
 
-    bool isAnimated() { return mAnimatorsCollection.prp_isDescendantRecording(); }
+    bool isAnimated() { return prp_isDescendantRecording(); }
     virtual void updateRelBoundingRect();
     virtual const QPainterPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
@@ -332,8 +330,6 @@ public:
     virtual void preUpdatePixmapsUpdates();
     void scheduleCenterPivot();
 
-    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
-                                     ScrollWidgetVisiblePart *visiblePartWidget);
     SWT_Type SWT_getType() { return SWT_BoundingBox; }
 
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
@@ -425,8 +421,8 @@ public:
     Key *getKeyAtPos(const qreal &relX,
                      const int &minViewedFrame,
                      const qreal &pixelsPerFrame);
-    int getFrameShift() const;
-    int getParentFrameShift() const;
+    int anim_getFrameShift() const;
+    int anim_getParentFrameShift() const;
 
     void setDurationRectangle(DurationRectangle *durationRect);
 
@@ -436,6 +432,7 @@ public:
     void incUsedAsTarget();
     void decUsedAsTarget();
     bool shouldUpdateAndDraw();
+    void ca_childAnimatorIsRecordingChanged();
 protected:
     DurationRectangle *mDurationRectangle = NULL;
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
@@ -485,7 +482,6 @@ protected:
     BoundingBoxType mType;
     BoxesGroup *mParent = NULL;
 
-    AnimatorsCollection mAnimatorsCollection;
     EffectAnimators mEffectsAnimators;
 
     TransformAnimator mTransformAnimator;
@@ -509,9 +505,6 @@ protected:
 signals:
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
-
-    void addActiveAnimatorSignal(Animator*);
-    void removeActiveAnimatorSignal(Animator*);
 public slots:
     virtual void scheduleUpdate();
 };

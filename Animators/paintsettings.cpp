@@ -204,7 +204,7 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator,
     mColors << newColorAnimator;
     newColorAnimator->incNumberPointers();
 
-    addChildAnimator(newColorAnimator);
+    ca_addChildAnimator(newColorAnimator);
 
     if(saveUndoRedo) {
         addUndoRedo(new GradientColorAddedToListUndoRedo(this,
@@ -276,7 +276,7 @@ void Gradient::swapColors(int id1, int id2,
     if(saveUndoRedo) {
         addUndoRedo(new GradientSwapColorsUndoRedo(this, id1, id2));
     }
-    swapChildAnimators(mColors.at(id1), mColors.at(id2));
+    ca_swapChildAnimators(mColors.at(id1), mColors.at(id2));
     mColors.swap(id1, id2);
     updateQGradientStops();
 }
@@ -291,7 +291,7 @@ void Gradient::removeColor(ColorAnimator *color,
         addUndoRedo(new GradientColorRemovedFromListUndoRedo(
                         this, color));
     }
-    removeChildAnimator(color);
+    ca_removeChildAnimator(color);
     mGradientWidget->resetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
     color->decNumberPointers();
@@ -399,7 +399,7 @@ PaintSettings::PaintSettings(Color colorT,
     mPaintType = paintTypeT;
     mGradient = gradientT;
 
-    addChildAnimator(&mColor);
+    ca_addChildAnimator(&mColor);
 }
 
 void PaintSettings::setPaintPathTarget(PathBox *path) {
@@ -407,7 +407,7 @@ void PaintSettings::setPaintPathTarget(PathBox *path) {
     mColor.prp_blockUpdater();
 }
 
-void PaintSettings::makeDuplicate(Animator *target) {
+void PaintSettings::prp_makeDuplicate(Property *target) {
     PaintSettings *paintSettingsTarget = (PaintSettings*)target;
         paintSettingsTarget->duplicateColorAnimatorFrom(&mColor);
         paintSettingsTarget->setGradient(mGradient);
@@ -415,7 +415,7 @@ void PaintSettings::makeDuplicate(Animator *target) {
 }
 
 void PaintSettings::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->makeDuplicate(&mColor);
+    source->prp_makeDuplicate(&mColor);
 }
 
 void PaintSettings::setTargetPathBox(PathBox *target) {
@@ -472,8 +472,8 @@ void PaintSettings::setGradient(Gradient *gradient,
                                 bool saveUndoRedo) {
     if(gradient == mGradient) return;
     if(mGradient != NULL) {
-        removeChildAnimator(mGradient);
-        removeChildAnimator((QrealAnimator*) mGradientPoints);
+        ca_removeChildAnimator(mGradient);
+        ca_removeChildAnimator((QrealAnimator*) mGradientPoints);
         mGradient->removePath(mTarget);
     }
     if(saveUndoRedo) {
@@ -481,8 +481,8 @@ void PaintSettings::setGradient(Gradient *gradient,
     }
     mGradient = gradient;
     if(mGradient != NULL) {
-        addChildAnimator(mGradient);
-        addChildAnimator((QrealAnimator*) mGradientPoints);
+        ca_addChildAnimator(mGradient);
+        ca_addChildAnimator((QrealAnimator*) mGradientPoints);
         mGradient->addPath(mTarget);
     }
     if(mTarget->isSelected()) {
@@ -498,9 +498,9 @@ void PaintSettings::setPaintType(PaintType paintType, bool saveUndoRedo) {
     if(paintType == mPaintType) return;
 
     if(mPaintType == FLATPAINT) {
-        removeChildAnimator(&mColor);
+        ca_removeChildAnimator(&mColor);
     } else if(paintType == FLATPAINT) {
-        addChildAnimator(&mColor);
+        ca_addChildAnimator(&mColor);
     }
     if(saveUndoRedo) {
         addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
@@ -535,7 +535,7 @@ StrokeSettings::StrokeSettings(Color colorT,
     mLineWidth.qra_setCurrentValue(1.);
     mLineWidth.prp_setName("thickness");
 
-    addChildAnimator(&mLineWidth);
+    ca_addChildAnimator(&mLineWidth);
     mLineWidth.blockPointer();
 
     mLineWidth.qra_setValueRange(0., mLineWidth.getMaxPossibleValue());
@@ -640,8 +640,8 @@ bool StrokeSettings::nonZeroLineWidth() {
     return !isZero(mLineWidth.qra_getCurrentValue());
 }
 
-void StrokeSettings::makeDuplicate(Animator *target) {
-    PaintSettings::makeDuplicate(target);
+void StrokeSettings::prp_makeDuplicate(Property *target) {
+    PaintSettings::prp_makeDuplicate(target);
     StrokeSettings *strokeSettingsTarget = (StrokeSettings*)target;
     strokeSettingsTarget->duplicateLineWidthFrom(&mLineWidth);
     strokeSettingsTarget->setCapStyle(mCapStyle);
@@ -650,7 +650,7 @@ void StrokeSettings::makeDuplicate(Animator *target) {
 }
 
 void StrokeSettings::duplicateLineWidthFrom(QrealAnimator *source) {
-    source->makeDuplicate(&mLineWidth);
+    source->prp_makeDuplicate(&mLineWidth);
 }
 
 QrealAnimator *StrokeSettings::getLineWidthAnimator() {

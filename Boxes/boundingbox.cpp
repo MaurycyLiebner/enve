@@ -10,10 +10,9 @@
 #include "durationrectangle.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
-    QObject(), Transformable()
+    ComplexAnimator(), Transformable()
 {
     mParent = parent;
-    mAnimatorsCollection.setParentBoundingBox(this);
 
     mEffectsAnimators.blockPointer();
     mEffectsAnimators.prp_setName("effects");
@@ -21,7 +20,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
     mEffectsAnimators.prp_setUpdater(new PixmapEffectUpdater(this));
     mEffectsAnimators.prp_blockUpdater();
 
-    addActiveAnimator(&mTransformAnimator);
+    ca_addChildAnimator(&mTransformAnimator);
     mTransformAnimator.blockPointer();
 
     mTransformAnimator.prp_setUpdater(new TransUpdater(this) );
@@ -35,9 +34,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
 }
 
 BoundingBox::BoundingBox(BoundingBoxType type) :
-    Transformable() {
-    mAnimatorsCollection.setParentBoundingBox(this);
-
+    ComplexAnimator(), Transformable() {
     mType = type;
     mTransformAnimator.reset();
 }
@@ -45,6 +42,12 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 BoundingBox::~BoundingBox() {
     delete mOldRenderContainer;
     delete mUpdateRenderContainer;
+}
+
+void BoundingBox::ca_childAnimatorIsRecordingChanged() {
+    ComplexAnimator::ca_childAnimatorIsRecordingChanged();
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_Animated);
+    SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
@@ -66,10 +69,10 @@ BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
 
 void BoundingBox::makeDuplicate(BoundingBox *targetBox) {
     targetBox->duplicateTransformAnimatorFrom(&mTransformAnimator);
-    int effectsCount = mEffectsAnimators.getNumberOfChildren();
+    int effectsCount = mEffectsAnimators.ca_getNumberOfChildren();
     for(int i = 0; i < effectsCount; i++) {
         targetBox->addEffect((PixmapEffect*)((PixmapEffect*)mEffectsAnimators.
-                           getChildAt(i))->makeDuplicate() );
+                           ca_getChildAt(i))->prp_makeDuplicate() );
     }
 }
 
@@ -282,7 +285,7 @@ Canvas *BoundingBox::getParentCanvas() {
 
 void BoundingBox::duplicateTransformAnimatorFrom(
         TransformAnimator *source) {
-    source->makeDuplicate(&mTransformAnimator);
+    source->prp_makeDuplicate(&mTransformAnimator);
 }
 
 void BoundingBox::updateAllBoxes() {
@@ -482,8 +485,8 @@ void BoundingBox::resetRotation() {
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
     mCurrentAbsFrame = currentFrame;
-    mCurrentRelFrame = mCurrentAbsFrame - getFrameShift();
-    mAnimatorsCollection.prp_setAbsFrame(currentFrame);
+    mCurrentRelFrame = mCurrentAbsFrame - anim_getFrameShift();
+    prp_setAbsFrame(currentFrame);
 }
 
 void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
@@ -837,18 +840,18 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     effect->incNumberPointers();
 
     if(!mEffectsAnimators.hasChildAnimators()) {
-        addActiveAnimator(&mEffectsAnimators);
+        ca_addChildAnimator(&mEffectsAnimators);
     }
-    mEffectsAnimators.addChildAnimator(effect);
+    mEffectsAnimators.ca_addChildAnimator(effect);
 
     scheduleEffectsMarginUpdate();
     scheduleUpdate();
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
-    mEffectsAnimators.removeChildAnimator(effect);
+    mEffectsAnimators.ca_removeChildAnimator(effect);
     if(!mEffectsAnimators.hasChildAnimators()) {
-        removeActiveAnimator(&mEffectsAnimators);
+        ca_removeChildAnimator(&mEffectsAnimators);
     }
     effect->decNumberPointers();
 
@@ -859,7 +862,7 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
 void BoundingBox::getKeysInRect(const QRectF &selectionRect,
                                 const qreal &pixelsPerFrame,
                                 QList<Key*> *keysList) {
-    mAnimatorsCollection.prp_getKeysInRect(selectionRect,
+    prp_getKeysInRect(selectionRect,
                                        pixelsPerFrame,
                                        keysList);
 }
@@ -867,25 +870,25 @@ void BoundingBox::getKeysInRect(const QRectF &selectionRect,
 Key *BoundingBox::getKeyAtPos(const qreal &relX,
                               const int &minViewedFrame,
                               const qreal &pixelsPerFrame) {
-    return mAnimatorsCollection.prp_getKeyAtPos(
+    return prp_getKeyAtPos(
                                      relX,
                                      minViewedFrame,
                                      pixelsPerFrame);
 }
 
-int BoundingBox::getParentFrameShift() const {
+int BoundingBox::anim_getParentFrameShift() const {
     if(mParent == NULL) {
         return 0;
     } else {
-        return mParent->getFrameShift();
+        return mParent->anim_getFrameShift();
     }
 }
 
-int BoundingBox::getFrameShift() const {
+int BoundingBox::anim_getFrameShift() const {
     if(mDurationRectangle == NULL) {
-        return getParentFrameShift();
+        return anim_getParentFrameShift();
     } else {
-        return mDurationRectangle->getFramePos() + getParentFrameShift();
+        return mDurationRectangle->getFramePos() + anim_getParentFrameShift();
     }
 }
 
@@ -900,27 +903,11 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
             this, SLOT(updateAfterDurationRectangleChanged()));
 }
 
-void BoundingBox::addActiveAnimator(Animator *animator) {
-    mAnimatorsCollection.addChildAnimator(animator);
-    mActiveAnimators << animator;
-    emit addActiveAnimatorSignal(animator);
-    //SWT_addChildAbstractionForTargetToAll(animator);
-    SWT_addChildAbstractionForTargetToAllAt(animator,
-                                            mActiveAnimators.count() - 1);
-}
-
-void BoundingBox::removeActiveAnimator(Animator *animator) {
-    mActiveAnimators.removeOne(animator);
-    mAnimatorsCollection.removeChildAnimator(animator);
-    emit removeActiveAnimatorSignal(animator);
-    SWT_removeChildAbstractionForTargetFromAll(animator);
-}
-
 void BoundingBox::drawKeys(QPainter *p,
                            qreal pixelsPerFrame,
                            qreal drawY,
                            int startFrame, int endFrame) {
-    mAnimatorsCollection.prp_drawKeys(p,
+    prp_drawKeys(p,
                                   pixelsPerFrame, drawY,
                                   startFrame, endFrame);
 }
@@ -1008,13 +995,6 @@ void BoundingBox::setLocked(bool bt) {
     mLocked = bt;
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Locked);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Unlocked);
-}
-
-void BoundingBox::SWT_addChildrenAbstractions(
-        SingleWidgetAbstraction *abstraction,
-        ScrollWidgetVisiblePart *visiblePartWidget) {
-    mAnimatorsCollection.SWT_addChildrenAbstractions(abstraction,
-                                                 visiblePartWidget);
 }
 
 bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,

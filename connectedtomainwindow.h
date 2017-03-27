@@ -16,7 +16,7 @@ class UpdateScheduler;
 
 class QKeyEvent;
 
-class ConnectedToMainWindow : public SmartPointerTarget
+class ConnectedToMainWindow// : public SmartPointerTarget
 {
 public:
     ConnectedToMainWindow();

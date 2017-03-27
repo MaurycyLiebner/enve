@@ -134,7 +134,7 @@ SingleSound::SingleSound(const QString &path,
     prp_setName("sound");
 
     mVolumeAnimator.incNumberPointers();
-    addChildAnimator(&mVolumeAnimator);
+    ca_addChildAnimator(&mVolumeAnimator);
     mVolumeAnimator.qra_setValueRange(0, 200);
     mVolumeAnimator.qra_setCurrentValue(100);
     mVolumeAnimator.prp_setName("volume");

@@ -278,11 +278,11 @@ void BoxScrollWidgetVisiblePart::dropEvent(
             effect->decNumberPointers();
         }
         if(below) { // add box below
-            underMouseAnimator->moveChildAbove( // boxesgroup list is reversed
+            underMouseAnimator->ca_moveChildAbove( // boxesgroup list is reversed
                         effect,
                         effectUnderMouse);
         } else { // add box above
-            underMouseAnimator->moveChildBelow(
+            underMouseAnimator->ca_moveChildBelow(
                         effect,
                         effectUnderMouse);
         }

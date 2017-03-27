@@ -92,13 +92,13 @@ void SoundComposition::removeSound(SingleSound *sound) {
 
 void SoundComposition::addSoundAnimator(SingleSound *sound) {
     addSound(sound);
-    mSoundsAnimatorContainer.addChildAnimator(sound);
+    mSoundsAnimatorContainer.ca_addChildAnimator(sound);
 }
 
 void SoundComposition::removeSoundAnimator(SingleSound *sound) {
     if(mSounds.removeOne(sound)) {
         sound->decNumberPointers();
-        mSoundsAnimatorContainer.removeChildAnimator(sound);
+        mSoundsAnimatorContainer.ca_removeChildAnimator(sound);
     }
 }
 

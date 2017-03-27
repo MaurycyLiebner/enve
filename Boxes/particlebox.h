@@ -114,7 +114,7 @@ public:
         return false;
     }
 
-    Animator *makeDuplicate() {
+    Property *prp_makeDuplicate() {
         //ParticleEmitter *emitterDupli = new ParticleEmitter();
         //makeDuplicate(emitterDupli);
         //return emitterDupli;
@@ -145,7 +145,7 @@ public:
             QrealAnimator *particlesSizeDecay,
             QrealAnimator *particlesOpacityDecay);
 
-    void makeDuplicate(Animator *target);
+    void prp_makeDuplicate(Property *target);
 
     void setMinFrame(const int &minFrame) {
         mMinFrame = minFrame;
@@ -225,7 +225,7 @@ public:
         ParticleBox *pbTarget = (ParticleBox*)targetBox;
         foreach(ParticleEmitter *emitter, mEmitters) {
             pbTarget->addEmitter((ParticleEmitter*)
-                                 emitter->makeDuplicate());
+                                 emitter->prp_makeDuplicate());
         }
     }
 

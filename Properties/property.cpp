@@ -4,7 +4,8 @@
 Property::Property() :
     QObject(),
     ConnectedToMainWindow(),
-    SingleWidgetTarget() {
+    SingleWidgetTarget(),
+    SmartPointerTarget() {
 
 }
 
@@ -15,7 +16,7 @@ void Property::prp_setParentAnimator(ComplexAnimator *parentAnimator) {
 void Property::prp_setZValue(const int &oldIndex,
                          const int &newIndex) {
     if(prp_mParentAnimator == NULL) return;
-    prp_mParentAnimator->changeChildAnimatorZ(oldIndex, newIndex);
+    prp_mParentAnimator->ca_changeChildAnimatorZ(oldIndex, newIndex);
 }
 
 QString Property::prp_getName()

@@ -1,8 +1,7 @@
 #include "transformable.h"
 #include "undoredo.h"
 
-Transformable::Transformable() :
-    ConnectedToMainWindow()
+Transformable::Transformable()
 {
 
 }

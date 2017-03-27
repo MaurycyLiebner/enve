@@ -3,8 +3,8 @@
 #include "updatescheduler.h"
 #include <QApplication>
 
-ConnectedToMainWindow::ConnectedToMainWindow() :
-    SmartPointerTarget()
+ConnectedToMainWindow::ConnectedToMainWindow()/* :
+    SmartPointerTarget()*/
 {
     mMainWindow = MainWindow::getInstance();
 }

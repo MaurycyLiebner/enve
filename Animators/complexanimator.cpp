@@ -9,47 +9,47 @@ ComplexAnimator::ComplexAnimator() :
 
 ComplexAnimator::~ComplexAnimator() {
     anim_removeAllKeys();
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->decNumberPointers();
     }
 }
 
-int ComplexAnimator::getNumberOfChildren() {
-    return mChildAnimators.count();
+int ComplexAnimator::ca_getNumberOfChildren() {
+    return ca_mChildAnimators.count();
 }
 
-Property *ComplexAnimator::getChildAt(const int &i) {
-    return mChildAnimators.at(i);
+Property *ComplexAnimator::ca_getChildAt(const int &i) {
+    return ca_mChildAnimators.at(i);
 }
 #include <QDebug>
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         abstraction->addChildAbstraction(
                     property->SWT_createAbstraction(visiblePartWidget));
     }
 
 }
 
-ComplexKey *ComplexAnimator::getKeyCollectionAtAbsFrame(int frame) {
+ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(int frame) {
     return (ComplexKey *) anim_getKeyAtAbsFrame(frame);
 }
 
-ComplexKey *ComplexAnimator::getKeyCollectionAtRelFrame(int frame) {
+ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(int frame) {
     return (ComplexKey *) anim_getKeyAtRelFrame(frame);
 }
 
-void ComplexAnimator::addChildAnimator(Property *childAnimator)
+void ComplexAnimator::ca_addChildAnimator(Property *childAnimator)
 {
-    mChildAnimators << childAnimator;
+    ca_mChildAnimators << childAnimator;
     childAnimator->prp_setUpdater(prp_mUpdater);
     childAnimator->incNumberPointers();
     childAnimator->prp_setParentAnimator(this);
 
     childAnimator->prp_addAllKeysToComplexAnimator();
-    childAnimatorIsRecordingChanged();
+    ca_childAnimatorIsRecordingChanged();
     childAnimator->prp_setAbsFrame(anim_mCurrentAbsFrame);
     //updateKeysPath();
 
@@ -58,35 +58,35 @@ void ComplexAnimator::addChildAnimator(Property *childAnimator)
     prp_callUpdater();
 }
 
-void ComplexAnimator::moveChildAbove(Property *move,
+void ComplexAnimator::ca_moveChildAbove(Property *move,
                                      Property *above) {
-    int indexFrom = mChildAnimators.indexOf(move);
-    int indexTo = mChildAnimators.indexOf(above);
+    int indexFrom = ca_mChildAnimators.indexOf(move);
+    int indexTo = ca_mChildAnimators.indexOf(above);
     if(indexFrom > indexTo) {
         indexTo++;
     }
-    moveChildInList(move,
+    ca_moveChildInList(move,
                     indexFrom,
                     indexTo);
 }
 
-void ComplexAnimator::moveChildBelow(Property *move,
+void ComplexAnimator::ca_moveChildBelow(Property *move,
                                      Property *below) {
-    int indexFrom = mChildAnimators.indexOf(move);
-    int indexTo = mChildAnimators.indexOf(below);
+    int indexFrom = ca_mChildAnimators.indexOf(move);
+    int indexTo = ca_mChildAnimators.indexOf(below);
     if(indexFrom < indexTo) {
         indexTo--;
     }
-    moveChildInList(move,
+    ca_moveChildInList(move,
                     indexFrom,
                     indexTo);
 }
 
-void ComplexAnimator::moveChildInList(
+void ComplexAnimator::ca_moveChildInList(
                                  Property *child,
                                  int from, int to,
                                  bool saveUndoRedo) {
-    mChildAnimators.move(from, to);
+    ca_mChildAnimators.move(from, to);
     SWT_moveChildAbstractionForTargetToInAll(child,
                                              to);
     if(saveUndoRedo) {
@@ -97,48 +97,48 @@ void ComplexAnimator::moveChildInList(
     prp_callUpdater();
 }
 
-void ComplexAnimator::removeChildAnimator(Property *removeAnimator) {
+void ComplexAnimator::ca_removeChildAnimator(Property *removeAnimator) {
     removeAnimator->prp_setUpdater(NULL);
     removeAnimator->prp_removeAllKeysFromComplexAnimator();
-    mChildAnimators.removeOne(removeAnimator);
+    ca_mChildAnimators.removeOne(removeAnimator);
     removeAnimator->prp_setParentAnimator(NULL);
     removeAnimator->decNumberPointers();
-    childAnimatorIsRecordingChanged();
+    ca_childAnimatorIsRecordingChanged();
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator);
 
     prp_callUpdater();
 }
 
-void ComplexAnimator::swapChildAnimators(Property *animator1,
+void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
                                          Property *animator2) {
-    int id1 = mChildAnimators.indexOf(animator1);
-    int id2 = mChildAnimators.indexOf(animator2);
-    mChildAnimators.swap(id1, id2);
+    int id1 = ca_mChildAnimators.indexOf(animator1);
+    int id2 = ca_mChildAnimators.indexOf(animator2);
+    ca_mChildAnimators.swap(id1, id2);
 
     prp_callUpdater();
 }
 
 void ComplexAnimator::prp_clearFromGraphView() {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_clearFromGraphView();
     }
 }
 
 bool ComplexAnimator::hasChildAnimators()
 {
-    return !mChildAnimators.isEmpty();
+    return !ca_mChildAnimators.isEmpty();
 }
 
 void ComplexAnimator::prp_startTransform()
 {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_startTransform();
     }
 }
 
 void ComplexAnimator::prp_setTransformed(bool bT) {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_setTransformed(bT);
     }
 }
@@ -177,9 +177,9 @@ void ComplexAnimator::anim_drawKey(
     }
 }
 
-void ComplexAnimator::changeChildAnimatorZ(const int &oldIndex,
+void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
                                            const int &newIndex) {
-    mChildAnimators.move(oldIndex, newIndex);
+    ca_mChildAnimators.move(oldIndex, newIndex);
 
     prp_callUpdater();
 }
@@ -188,7 +188,7 @@ void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater) {
     if(prp_mUpdaterBlocked) return;
     Animator::prp_setUpdater(updater);
 
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_setUpdater(updater);
     }
 }
@@ -196,39 +196,39 @@ void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater) {
 void ComplexAnimator::prp_setAbsFrame(int frame) {
     Animator::prp_setAbsFrame(frame);
 
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_setAbsFrame(frame);
     }
 }
 
 void ComplexAnimator::prp_retrieveSavedValue() {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_retrieveSavedValue();
     }
 }
 
 void ComplexAnimator::prp_finishTransform() {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_finishTransform();
     }
 }
 
 void ComplexAnimator::prp_cancelTransform() {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_cancelTransform();
     }
 }
 
-void ComplexAnimator::setRecordingValue(bool rec) {
+void ComplexAnimator::ca_setRecordingValue(bool rec) {
     anim_mIsRecording = rec;
     if(prp_mParentAnimator != NULL) {
-        prp_mParentAnimator->childAnimatorIsRecordingChanged();
+        prp_mParentAnimator->ca_childAnimatorIsRecordingChanged();
     }
 }
 
 bool ComplexAnimator::prp_isDescendantRecording()
 {
-    return mChildAnimatorRecording;
+    return ca_mChildAnimatorRecording;
 }
 
 QString ComplexAnimator::prp_getValueText()
@@ -238,31 +238,31 @@ QString ComplexAnimator::prp_getValueText()
 
 void ComplexAnimator::prp_setRecording(bool rec)
 {
-    foreach(Property *property, mChildAnimators) {
+    foreach(Property *property, ca_mChildAnimators) {
         property->prp_setRecording(rec);
     }
-    setRecordingValue(rec);
+    ca_setRecordingValue(rec);
 }
 
-void ComplexAnimator::childAnimatorIsRecordingChanged()
+void ComplexAnimator::ca_childAnimatorIsRecordingChanged()
 {
     bool rec = true;
-    mChildAnimatorRecording = false;
-    foreach(Property *property, mChildAnimators) {
+    ca_mChildAnimatorRecording = false;
+    foreach(Property *property, ca_mChildAnimators) {
         bool isChildRec = property->prp_isRecording();
         bool isChildDescRec = property->prp_isDescendantRecording();
         if(isChildDescRec) {
-            mChildAnimatorRecording = true;
+            ca_mChildAnimatorRecording = true;
         }
         if(!isChildRec) {
             rec = false;
         }
     }
-    setRecordingValue(rec);
+    ca_setRecordingValue(rec);
 }
 
 void ComplexAnimator::ca_addDescendantsKey(Key *key) {
-    ComplexKey *collection = getKeyCollectionAtAbsFrame(key->getAbsFrame() );
+    ComplexKey *collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame() );
     if(collection == NULL) {
         collection = new ComplexKey(this);
         collection->setAbsFrame(key->getAbsFrame());

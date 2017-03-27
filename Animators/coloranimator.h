@@ -39,8 +39,8 @@ public:
     void loadFromSql(int sqlId);
     int prp_saveToSql(QSqlQuery *query);
 
-    void saveCurrentValueAsKey();
-    void makeDuplicate(Animator *target);
+    void anim_saveCurrentValueAsKey();
+    void prp_makeDuplicate(Property *target);
     void duplicateVal1AnimatorFrom(QrealAnimator *source);
     void duplicateVal2AnimatorFrom(QrealAnimator *source);
     void duplicateVal3AnimatorFrom(QrealAnimator *source);

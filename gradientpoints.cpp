@@ -16,12 +16,12 @@ void GradientPoints::initialize(PathBox *parentT)
     parent = parentT;
     startPoint = new GradientPoint(parent);
     startPoint->incNumberPointers();
-    addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
+    ca_addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
     startPoint->getRelativePosAnimatorPtr()->prp_setName("point1");
     endPoint = new GradientPoint(parent);
     endPoint->getRelativePosAnimatorPtr()->prp_setName("point2");
     endPoint->incNumberPointers();
-    addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
+    ca_addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
     enabled = false;
 }
 
@@ -37,7 +37,7 @@ void GradientPoints::duplicatePointsFrom(GradientPoint *startPointT,
     endPointT->makeDuplicate(endPoint);
 }
 
-void GradientPoints::makeDuplicate(Animator *target) {
+void GradientPoints::prp_makeDuplicate(Property *target) {
     GradientPoints *gradientPointsTarget = (GradientPoints*)target;
     gradientPointsTarget->duplicatePointsFrom(startPoint,
                                               endPoint);

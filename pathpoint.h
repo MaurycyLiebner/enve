@@ -84,9 +84,9 @@ public:
         pathPointPosAnimator = pathPointPosAnimatorT;
         pathPointPosAnimator->prp_setName("point pos");
 
-        addChildAnimator(pathPointPosAnimator);
-        addChildAnimator(endPosAnimator);
-        addChildAnimator(startPosAnimator);
+        ca_addChildAnimator(pathPointPosAnimator);
+        ca_addChildAnimator(endPosAnimator);
+        ca_addChildAnimator(startPosAnimator);
     }
 
     bool isOfPathPoint(PathPoint *checkPoint) {

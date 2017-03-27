@@ -21,13 +21,13 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
     topLeftPt->prp_setName("top left");
     bottomRightPt->prp_setName("bottom right");
 
-    addActiveAnimator(topLeftPt);
-    addActiveAnimator(bottomRightPt);
+    ca_addChildAnimator(topLeftPt);
+    ca_addChildAnimator(bottomRightPt);
 
     mRadiusAnimator.prp_setName("radius");
-    addActiveAnimator(&mRadiusAnimator);
+    ca_addChildAnimator(&mRadiusAnimator);
 
-    mAnimatorsCollection.prp_setUpdater(new PathPointUpdater(this));
+    prp_setUpdater(new PathPointUpdater(this));
 }
 
 Rectangle::~Rectangle()
@@ -64,7 +64,7 @@ void Rectangle::duplicateRectanglePointsFrom(
         QrealAnimator *radiusAnimator) {
     topLeftPoint->makeDuplicate(mTopLeftPoint);
     bottomRightPoint->makeDuplicate(mBottomRightPoint);
-    radiusAnimator->makeDuplicate(&mRadiusAnimator);
+    radiusAnimator->prp_makeDuplicate(&mRadiusAnimator);
 }
 
 BoundingBox *Rectangle::createNewDuplicate(BoxesGroup *parent) {

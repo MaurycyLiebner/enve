@@ -15,7 +15,8 @@ class AnimatorUpdater;
 class Property :
     public QObject,
     public ConnectedToMainWindow,
-    public SingleWidgetTarget {
+    public SingleWidgetTarget,
+    public SmartPointerTarget {
     Q_OBJECT
 public:
     Property();
@@ -93,6 +94,9 @@ public:
     virtual void prp_callUpdater();
     void prp_blockUpdater();
     void prp_callFinishUpdater();
+
+    virtual void prp_makeDuplicate(Property *) {} // should be 0
+    virtual Property *prp_makeDuplicate() {} // should be 0
 public slots:
     virtual void prp_setRecording(bool rec) { Q_UNUSED(rec); }
 protected:

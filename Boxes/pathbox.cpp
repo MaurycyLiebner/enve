@@ -7,8 +7,8 @@ PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
     mFillPaintSettings.setTargetPathBox(this);
     mStrokeSettings.setTargetPathBox(this);
 
-    addActiveAnimator(&mFillPaintSettings);
-    addActiveAnimator(&mStrokeSettings);
+    ca_addChildAnimator(&mFillPaintSettings);
+    ca_addChildAnimator(&mStrokeSettings);
 
     mFillPaintSettings.blockPointer();
     mStrokeSettings.blockPointer();
@@ -115,7 +115,7 @@ void PathBox::updatePathIfNeeded() {
         updatePath();
         mUpdatePath = mPath;
         mUpdateOutlinePath = mOutlinePath;
-        if(!mAnimatorsCollection.prp_hasKeys() &&
+        if(!prp_hasKeys() &&
            !mPivotChanged ) centerPivotPosition();
         mPathUpdateNeeded = false;
     }
@@ -130,14 +130,14 @@ void PathBox::preUpdatePixmapsUpdates() {
 
 void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
                                           GradientPoints *strokeGradientPoints) {
-    fillGradientPoints->makeDuplicate(&mFillGradientPoints);
-    strokeGradientPoints->makeDuplicate(&mStrokeGradientPoints);
+    fillGradientPoints->prp_makeDuplicate(&mFillGradientPoints);
+    strokeGradientPoints->prp_makeDuplicate(&mStrokeGradientPoints);
 }
 
 void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                          StrokeSettings *strokeSettings) {
-    fillSettings->makeDuplicate(&mFillPaintSettings);
-    strokeSettings->makeDuplicate(&mStrokeSettings);
+    fillSettings->prp_makeDuplicate(&mFillPaintSettings);
+    strokeSettings->prp_makeDuplicate(&mStrokeSettings);
 }
 
 void PathBox::makeDuplicate(BoundingBox *targetBox) {

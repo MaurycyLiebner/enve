@@ -17,8 +17,8 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
                                         getRelativePosAnimatorPtr();
     Animator *bottomRightAnimator = mBottomRightPoint->
                                         getRelativePosAnimatorPtr();
-    addActiveAnimator(topLeftAnimator);
-    addActiveAnimator(bottomRightAnimator);
+    ca_addChildAnimator(topLeftAnimator);
+    ca_addChildAnimator(bottomRightAnimator);
 
     topLeftAnimator->prp_setUpdater(
                 new DisplayedFillStrokeSettingsUpdater(this));
@@ -77,7 +77,7 @@ bool ParticleBox::relPointInsidePath(QPointF relPos) {
 
 void ParticleBox::addEmitter(ParticleEmitter *emitter) {
     mEmitters << emitter;
-    addActiveAnimator(emitter);
+    ca_addChildAnimator(emitter);
 }
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
@@ -303,7 +303,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
 
     mColorAnimator.prp_setName("color");
     mColorAnimator.qra_setCurrentValue(Color(0, 0, 0));
-    addChildAnimator(&mColorAnimator);
+    ca_addChildAnimator(&mColorAnimator);
 
     mWidth.prp_setName("width");
     mWidth.qra_setValueRange(0., 6000.);
@@ -396,31 +396,31 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mParticlesOpacityDecay.blockPointer();
 
     mPos->getRelativePosAnimatorPtr()->prp_setName("pos");
-    addChildAnimator(mPos->getRelativePosAnimatorPtr());
-    addChildAnimator(&mWidth);
+    ca_addChildAnimator(mPos->getRelativePosAnimatorPtr());
+    ca_addChildAnimator(&mWidth);
 
-    addChildAnimator(&mIniVelocity);
-    addChildAnimator(&mIniVelocityVar);
+    ca_addChildAnimator(&mIniVelocity);
+    ca_addChildAnimator(&mIniVelocityVar);
 
-    addChildAnimator(&mIniVelocityAngle);
-    addChildAnimator(&mIniVelocityAngleVar);
+    ca_addChildAnimator(&mIniVelocityAngle);
+    ca_addChildAnimator(&mIniVelocityAngleVar);
 
-    addChildAnimator(&mAcceleration);
+    ca_addChildAnimator(&mAcceleration);
 
-    addChildAnimator(&mParticlesPerSecond);
-    addChildAnimator(&mParticlesFrameLifetime);
+    ca_addChildAnimator(&mParticlesPerSecond);
+    ca_addChildAnimator(&mParticlesFrameLifetime);
 
-    addChildAnimator(&mVelocityRandomVar);
-    addChildAnimator(&mVelocityRandomVarPeriod);
+    ca_addChildAnimator(&mVelocityRandomVar);
+    ca_addChildAnimator(&mVelocityRandomVarPeriod);
 
-    addChildAnimator(&mParticleSize);
-    addChildAnimator(&mParticleSizeVar);
+    ca_addChildAnimator(&mParticleSize);
+    ca_addChildAnimator(&mParticleSizeVar);
 
-    addChildAnimator(&mParticleLength);
+    ca_addChildAnimator(&mParticleLength);
 
-    addChildAnimator(&mParticlesDecayFrames);
-    addChildAnimator(&mParticlesSizeDecay);
-    addChildAnimator(&mParticlesOpacityDecay);
+    ca_addChildAnimator(&mParticlesDecayFrames);
+    ca_addChildAnimator(&mParticlesSizeDecay);
+    ca_addChildAnimator(&mParticlesOpacityDecay);
 
     prp_setUpdater(new ParticlesUpdater(this));
     prp_blockUpdater();
@@ -473,32 +473,32 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *particlesDecayFrames,
                                              QrealAnimator *particlesSizeDecay,
                                              QrealAnimator *particlesOpacityDecay) {
-    pos->makeDuplicate(mPos->getRelativePosAnimatorPtr());
-    width->makeDuplicate(&mWidth);
+    pos->prp_makeDuplicate(mPos->getRelativePosAnimatorPtr());
+    width->prp_makeDuplicate(&mWidth);
 
-    iniVelocity->makeDuplicate(&mIniVelocity);
-    iniVelocityVar->makeDuplicate(&mIniVelocityVar);
-    iniVelocityAngle->makeDuplicate(&mIniVelocityAngle);
-    iniVelocityAngleVar->makeDuplicate(&mIniVelocityAngleVar);
-    acceleration->makeDuplicate(&mAcceleration);
+    iniVelocity->prp_makeDuplicate(&mIniVelocity);
+    iniVelocityVar->prp_makeDuplicate(&mIniVelocityVar);
+    iniVelocityAngle->prp_makeDuplicate(&mIniVelocityAngle);
+    iniVelocityAngleVar->prp_makeDuplicate(&mIniVelocityAngleVar);
+    acceleration->prp_makeDuplicate(&mAcceleration);
 
-    particlesPerSecond->makeDuplicate(&mParticlesPerSecond);
-    particlesFrameLifetime->makeDuplicate(&mParticlesFrameLifetime);
+    particlesPerSecond->prp_makeDuplicate(&mParticlesPerSecond);
+    particlesFrameLifetime->prp_makeDuplicate(&mParticlesFrameLifetime);
 
-    velocityRandomVar->makeDuplicate(&mVelocityRandomVar);
-    velocityRandomVarPeriod->makeDuplicate(&mVelocityRandomVarPeriod);
+    velocityRandomVar->prp_makeDuplicate(&mVelocityRandomVar);
+    velocityRandomVarPeriod->prp_makeDuplicate(&mVelocityRandomVarPeriod);
 
-    particleSize->makeDuplicate(&mParticleSize);
-    particleSizeVar->makeDuplicate(&mParticleSizeVar);
+    particleSize->prp_makeDuplicate(&mParticleSize);
+    particleSizeVar->prp_makeDuplicate(&mParticleSizeVar);
 
-    particleLength->makeDuplicate(&mParticleLength);
+    particleLength->prp_makeDuplicate(&mParticleLength);
 
-    particlesDecayFrames->makeDuplicate(&mParticlesDecayFrames);
-    particlesSizeDecay->makeDuplicate(&mParticlesSizeDecay);
-    particlesOpacityDecay->makeDuplicate(&mParticlesOpacityDecay);
+    particlesDecayFrames->prp_makeDuplicate(&mParticlesDecayFrames);
+    particlesSizeDecay->prp_makeDuplicate(&mParticlesSizeDecay);
+    particlesOpacityDecay->prp_makeDuplicate(&mParticlesOpacityDecay);
 }
 
-void ParticleEmitter::makeDuplicate(Animator *target) {
+void ParticleEmitter::prp_makeDuplicate(Property *target) {
     ParticleEmitter *peTarget = ((ParticleEmitter*)target);
     peTarget->duplicateAnimatorsFrom(
                 mPos->getRelativePosAnimatorPtr(),

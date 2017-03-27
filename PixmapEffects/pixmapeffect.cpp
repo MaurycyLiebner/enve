@@ -65,7 +65,7 @@ BlurEffect::BlurEffect(qreal radius) {
     mBlurRadius.prp_setName("radius");
     mBlurRadius.blockPointer();
     mBlurRadius.qra_setValueRange(0., 1000.);
-    addChildAnimator(&mBlurRadius);
+    ca_addChildAnimator(&mBlurRadius);
 }
 
 void BlurEffect::apply(BoundingBox *target,
@@ -115,13 +115,13 @@ void BlurEffect::loadBlurEffectFromSql(int pixmapEffectId) {
     }
 }
 
-Animator *BlurEffect::makeDuplicate() {
+Property *BlurEffect::prp_makeDuplicate() {
     BlurEffect *newBlur = new BlurEffect();
-    makeDuplicate(newBlur);
+    prp_makeDuplicate(newBlur);
     return newBlur;
 }
 
-void BlurEffect::makeDuplicate(Animator *target) {
+void BlurEffect::prp_makeDuplicate(Property *target) {
     BlurEffect *blurTarget = (BlurEffect*)target;
 
     blurTarget->duplicateBlurRadiusAnimatorFrom(&mBlurRadius);
@@ -129,7 +129,7 @@ void BlurEffect::makeDuplicate(Animator *target) {
 
 void BlurEffect::duplicateBlurRadiusAnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mBlurRadius);
+    source->prp_makeDuplicate(&mBlurRadius);
 }
 
 ShadowEffect::ShadowEffect(qreal radius) {
@@ -138,24 +138,24 @@ ShadowEffect::ShadowEffect(qreal radius) {
     mBlurRadius.prp_setName("blur radius");
     mBlurRadius.blockPointer();
     mBlurRadius.qra_setValueRange(0., 1000.);
-    addChildAnimator(&mBlurRadius);
+    ca_addChildAnimator(&mBlurRadius);
 
     mTranslation.qra_setCurrentValue(QPointF(0., 0.));
     mTranslation.prp_setName("translation");
     mTranslation.blockPointer();
     mTranslation.qra_setValueRange(-1000., 1000.);
-    addChildAnimator(&mTranslation);
+    ca_addChildAnimator(&mTranslation);
 
     mColor.qra_setCurrentValue(Qt::black);
     mColor.prp_setName("color");
     mColor.blockPointer();
-    addChildAnimator(&mColor);
+    ca_addChildAnimator(&mColor);
 
     mOpacity.qra_setCurrentValue(100.);
     mOpacity.prp_setName("opacity");
     mOpacity.blockPointer();
     mOpacity.qra_setValueRange(0., 100.);
-    addChildAnimator(&mOpacity);
+    ca_addChildAnimator(&mOpacity);
 //    mScale.setCurrentValue(1.);
 //    mScale.setName("scale");
 //    mScale.blockPointer();
@@ -205,13 +205,13 @@ qreal ShadowEffect::getMargin() {
             pointToLen(mTranslation.qra_getCurrentValue());
 }
 
-Animator *ShadowEffect::makeDuplicate() {
+Property *ShadowEffect::prp_makeDuplicate() {
     ShadowEffect *newShadow = new ShadowEffect();
-    makeDuplicate(newShadow);
+    prp_makeDuplicate(newShadow);
     return newShadow;
 }
 
-void ShadowEffect::makeDuplicate(Animator *target) {
+void ShadowEffect::prp_makeDuplicate(Property *target) {
     ShadowEffect *shadowTarget = (ShadowEffect*)target;
 
     shadowTarget->duplicateTranslationAnimatorFrom(&mTranslation);
@@ -221,20 +221,20 @@ void ShadowEffect::makeDuplicate(Animator *target) {
 }
 
 void ShadowEffect::duplicateTranslationAnimatorFrom(QPointFAnimator *source) {
-    source->makeDuplicate(&mTranslation);
+    source->prp_makeDuplicate(&mTranslation);
 }
 
 void ShadowEffect::duplicateBlurRadiusAnimatorFrom(
         QrealAnimator *source) {
-    source->makeDuplicate(&mBlurRadius);
+    source->prp_makeDuplicate(&mBlurRadius);
 }
 
 void ShadowEffect::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->makeDuplicate(&mColor);
+    source->prp_makeDuplicate(&mColor);
 }
 
 void ShadowEffect::duplicateOpacityAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(&mOpacity);
+    source->prp_makeDuplicate(&mOpacity);
 }
 
 LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect() {
@@ -244,13 +244,13 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect()
     mLinesWidth.qra_setCurrentValue(linesWidth);
     mLinesWidth.prp_setName("width");
     mLinesWidth.blockPointer();
-    addChildAnimator(&mLinesWidth);
+    ca_addChildAnimator(&mLinesWidth);
 
     mLinesDistance.qra_setValueRange(0., 100000.);
     mLinesDistance.qra_setCurrentValue(linesDistance);
     mLinesDistance.prp_setName("distance");
     mLinesDistance.blockPointer();
-    addChildAnimator(&mLinesDistance);
+    ca_addChildAnimator(&mLinesDistance);
 }
 
 void LinesEffect::apply(BoundingBox *target,
@@ -308,13 +308,13 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
     mCirclesRadius.qra_setCurrentValue(circlesRadius);
     mCirclesRadius.prp_setName("radius");
     mCirclesRadius.blockPointer();
-    addChildAnimator(&mCirclesRadius);
+    ca_addChildAnimator(&mCirclesRadius);
 
     mCirclesDistance.qra_setValueRange(-1000., 1000.);
     mCirclesDistance.qra_setCurrentValue(circlesDistance);
     mCirclesDistance.prp_setName("distance");
     mCirclesDistance.blockPointer();
-    addChildAnimator(&mCirclesDistance);
+    ca_addChildAnimator(&mCirclesDistance);
 }
 #include "Boxes/boundingbox.h"
 void CirclesEffect::apply(BoundingBox *target,
@@ -375,7 +375,7 @@ SwirlEffect::SwirlEffect(qreal degrees) {
     mDegreesAnimator.qra_setCurrentValue(degrees);
     mDegreesAnimator.prp_setName("degrees");
     mDegreesAnimator.blockPointer();
-    addChildAnimator(&mDegreesAnimator);
+    ca_addChildAnimator(&mDegreesAnimator);
 }
 
 void SwirlEffect::apply(BoundingBox *target,
@@ -395,7 +395,7 @@ OilEffect::OilEffect(qreal radius) {
     mRadiusAnimator.qra_setCurrentValue(radius);
     mRadiusAnimator.prp_setName("radius");
     mRadiusAnimator.blockPointer();
-    addChildAnimator(&mRadiusAnimator);
+    ca_addChildAnimator(&mRadiusAnimator);
 }
 
 void OilEffect::apply(BoundingBox *target,
@@ -414,7 +414,7 @@ ImplodeEffect::ImplodeEffect(qreal radius) {
     mFactorAnimator.qra_setCurrentValue(radius);
     mFactorAnimator.prp_setName("factor");
     mFactorAnimator.blockPointer();
-    addChildAnimator(&mFactorAnimator);
+    ca_addChildAnimator(&mFactorAnimator);
 }
 
 void ImplodeEffect::apply(BoundingBox *target,
@@ -435,7 +435,7 @@ DesaturateEffect::DesaturateEffect(qreal radius) {
     mInfluenceAnimator.qra_setCurrentValue(radius);
     mInfluenceAnimator.prp_setName("factor");
     mInfluenceAnimator.blockPointer();
-    addChildAnimator(&mInfluenceAnimator);
+    ca_addChildAnimator(&mInfluenceAnimator);
 }
 
 void DesaturateEffect::apply(BoundingBox *target,
@@ -455,16 +455,16 @@ AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) {
     mInfluenceAnimator.setPrefferedValueStep(0.05);
     mInfluenceAnimator.prp_setName("influence");
     mInfluenceAnimator.blockPointer();
-    addChildAnimator(&mInfluenceAnimator);
+    ca_addChildAnimator(&mInfluenceAnimator);
 
     mBoxTarget.prp_setName("target");
     mBoxTarget.blockPointer();
     mBoxTarget.setParentBox(parentBox);
-    addChildAnimator(&mBoxTarget);
+    ca_addChildAnimator(&mBoxTarget);
 
     mInvertedProperty.prp_setName("invert");
     mInvertedProperty.blockPointer();
-    addChildAnimator(&mInvertedProperty);
+    ca_addChildAnimator(&mInvertedProperty);
 }
 
 void AlphaMatteEffect::apply(BoundingBox *target,
