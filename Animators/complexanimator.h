@@ -75,6 +75,11 @@ public:
     void anim_loadKeysFromSql(int qrealAnimatorId) {
         Q_UNUSED(qrealAnimatorId);
     }
+
+    void prp_makeDuplicate(Property *) {}
+    Property *prp_makeDuplicate() {}
+    int prp_saveToSql(QSqlQuery *, const int &) {}
+    void prp_loadFromSql(const int &) {}
 protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(int frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(int frame);

@@ -14,7 +14,7 @@ public:
     VideoBox(const QString &filePath, BoxesGroup *parent);
 
     void setFilePath(QString path);
-    void makeDuplicate(BoundingBox *targetBox);
+    void prp_makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void reloadSound();
     void reloadFile();

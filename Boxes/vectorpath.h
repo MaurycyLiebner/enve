@@ -47,7 +47,7 @@ public:
     PathPoint *addPointRelPos(QPointF relPos,
                               QPointF startRelPos, QPointF endRelPos,
                               PathPoint *toPoint = NULL);
-    int saveToSql(QSqlQuery *query, int parentId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
 
     PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
     qreal percentAtPoint(QPointF absPos, qreal distTolerance,
@@ -65,7 +65,7 @@ public:
     void showContextMenu(QPoint globalPos);
 
     void deletePointAndApproximate(PathPoint *pointToRemove);
-    virtual void loadFromSql(int boundingBoxId);
+    virtual void prp_loadFromSql(int boundingBoxId);
 
     void applyTransformToPoints(QMatrix transform);
     void applyCurrentTransformation();
@@ -76,7 +76,7 @@ public:
     void duplicatePathPointsTo(VectorPath *target);
 //    void disconnectPoints(PathPoint *point1, PathPoint *point2);
 //    void connectPoints(PathPoint *point1, PathPoint *point2);
-    void makeDuplicate(BoundingBox *targetBox);
+    void prp_makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     PathAnimator *getPathAnimator();
     void duplicatePathAnimatorFrom(PathAnimator *source);

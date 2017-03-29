@@ -21,8 +21,8 @@ void ImageSequenceBox::setUpdateVars() {
     mUpdateFramePath = mListOfFrames.at(mUpdateAnimationFrame);
 }
 
-void ImageSequenceBox::makeDuplicate(BoundingBox *targetBox) {
-    AnimationBox::makeDuplicate(targetBox);
+void ImageSequenceBox::prp_makeDuplicate(Property *targetBox) {
+    AnimationBox::prp_makeDuplicate(targetBox);
     ImageSequenceBox *animationBoxTarget = (ImageSequenceBox*)targetBox;
     animationBoxTarget->setListOfFrames(mListOfFrames);
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(

@@ -200,57 +200,59 @@ void PathAnimator::selectAndAddContainedPointsToList(
     }
 }
 
-void PathAnimator::savePointsToSql(QSqlQuery *query,
-                                   const int &boundingBoxId) {
+int PathAnimator::prp_saveToSql(QSqlQuery *query,
+                                const int &boundingBoxId) {
     foreach(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->savePointsToSql(query, boundingBoxId);
     }
+    return 0;
 }
 
-void PathAnimator::loadPointsFromSql(int boundingBoxId) {
-//    QSqlQuery query;
-//    QString queryStr = QString("SELECT id, isfirst, isendpoint, movablepointid "
-//                               "FROM pathpoint WHERE boundingboxid = %1 "
-//                               "ORDER BY id ASC").arg(boundingBoxId);
-//    if(query.exec(queryStr) ) {
-//        int idisfirst = query.record().indexOf("isfirst");
-//        int idisendpoint = query.record().indexOf("isendpoint");
-//        int idmovablepointid = query.record().indexOf("movablepointid");
-//        int idId = query.record().indexOf("id");
-//        PathPoint *firstPoint = NULL;
-//        PathPoint *lastPoint = NULL;
-//        while(query.next()) {
-//            int id = query.value(idId).toInt();
-//            bool isfirst = query.value(idisfirst).toBool();
-//            bool isendpoint = query.value(idisendpoint).toBool();
-//            int movablepointid = query.value(idmovablepointid).toInt();
+void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
+    QSqlQuery query;
+    QString queryStr = QString("SELECT id, isfirst, isendpoint, qpointfanimatorid "
+                               "FROM pathpoint WHERE boundingboxid = %1 "
+                               "ORDER BY id ASC").arg(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        int idisfirst = query.record().indexOf("isfirst");
+        int idisendpoint = query.record().indexOf("isendpoint");
+        int idqpointfanimatorid = query.record().indexOf("qpointfanimatorid");
+        PathPoint *firstPoint = NULL;
+        PathPoint *lastPoint = NULL;
+        SinglePathAnimator *singlePathAnimator = NULL;
+        while(query.next()) {
+            bool isfirst = query.value(idisfirst).toBool();
+            bool isendpoint = query.value(idisendpoint).toBool();
+            int qpointfanimatorid = query.value(idqpointfanimatorid).toInt();
 
-//            PathPoint *newPoint = new PathPoint(this);
-//            newPoint->loadFromSql(id, movablepointid);
-//            appendToPointsList(newPoint, false);
-//            if(lastPoint != NULL) {
-//                if(isfirst && firstPoint != NULL) {
-//                    lastPoint->setPointAsNext(firstPoint, false);
-//                } else if(!isfirst) {
-//                    lastPoint->setPointAsNext(newPoint, false);
-//                }
-//            }
-//            if(isfirst) {
-//                addPointToSeparatePaths(newPoint, false);
-//                if(isendpoint) {
-//                    firstPoint = NULL;
-//                } else {
-//                    firstPoint = newPoint;
-//                }
-//            }
-//            lastPoint = newPoint;
-//        }
-//        if(lastPoint != NULL && firstPoint != NULL) {
-//            lastPoint->setPointAsNext(firstPoint, false);
-//        }
-//    } else {
-//        qDebug() << "Could not load points for vectorpath with id " << boundingBoxId;
-//    }
+            PathPoint *newPoint;
+            if(isfirst) {
+                if(lastPoint != NULL && firstPoint != NULL) {
+                    lastPoint->setPointAsNext(firstPoint, false);
+                }
+                lastPoint = NULL;
+                singlePathAnimator = new SinglePathAnimator(this);
+                newPoint = new PathPoint(singlePathAnimator);
+                newPoint->prp_loadFromSql(qpointfanimatorid);
+
+                if(isendpoint) {
+                    firstPoint = NULL;
+                } else {
+                    firstPoint = newPoint;
+                }
+            } else {
+                newPoint = new PathPoint(singlePathAnimator);
+                newPoint->prp_loadFromSql(qpointfanimatorid);
+            }
+            singlePathAnimator->addPoint(newPoint, lastPoint);
+            lastPoint = newPoint;
+        }
+        if(lastPoint != NULL && firstPoint != NULL) {
+            lastPoint->setPointAsNext(firstPoint, false);
+        }
+    } else {
+        qDebug() << "Could not load points for vectorpath with id " << boundingBoxId;
+    }
 }
 
 void PathAnimator::duplicatePathsTo(

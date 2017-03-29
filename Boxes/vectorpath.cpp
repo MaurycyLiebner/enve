@@ -12,16 +12,16 @@ VectorPath::VectorPath(BoxesGroup *group) :
     PathBox(group, BoundingBoxType::TYPE_VECTOR_PATH) {
     setName("Path");
     mPathAnimator.setParentBox(this);
-    ca_addChildAnimator(&mPathAnimator);
     mPathAnimator.prp_setUpdater(new PathPointUpdater(this));
-
+    mPathAnimator.prp_blockUpdater();
     mPathAnimator.blockPointer();
+    ca_addChildAnimator(&mPathAnimator);
 }
 
 #include <QSqlError>
-int VectorPath::saveToSql(QSqlQuery *query, int parentId) {
-    int boundingBoxId = PathBox::saveToSql(query, parentId);
-    mPathAnimator.savePointsToSql(query, boundingBoxId);
+int VectorPath::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
+    mPathAnimator.prp_saveToSql(query, boundingBoxId);
 
     return boundingBoxId;
 }
@@ -38,16 +38,16 @@ void VectorPath::removeChildPathAnimator(PathAnimator *path) {
     }
 }
 
-void VectorPath::loadFromSql(int boundingBoxId) {
-    PathBox::loadFromSql(boundingBoxId);
-    mPathAnimator.loadPointsFromSql(boundingBoxId);
+void VectorPath::prp_loadFromSql(int boundingBoxId) {
+    PathBox::prp_loadFromSql(boundingBoxId);
+    mPathAnimator.prp_loadFromSql(boundingBoxId);
     if(!mPivotChanged) centerPivotPosition();
 }
 
 VectorPath *VectorPath::createPathFromSql(int boundingBoxId,
                                           BoxesGroup *parent) {
     VectorPath *path = new VectorPath(parent);
-    path->loadFromSql(boundingBoxId);
+    path->prp_loadFromSql(boundingBoxId);
 
     return path;
 }
@@ -162,9 +162,9 @@ void VectorPath::duplicatePathAnimatorFrom(
     source->duplicatePathsTo(&mPathAnimator);
 }
 
-void VectorPath::makeDuplicate(BoundingBox *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
-    PathBox::makeDuplicate(targetBox);
+void VectorPath::prp_makeDuplicate(Property *targetBox) {
+    BoundingBox::prp_makeDuplicate(targetBox);
+    PathBox::prp_makeDuplicate(targetBox);
     ((VectorPath*)targetBox)->
             duplicatePathAnimatorFrom(&mPathAnimator);
 }

@@ -657,7 +657,7 @@ void CanvasWidget::loadCanvasesFromSql() {
             int boundingBoxId = query.value(idBoundingBoxId).toInt();
 
             Canvas *canvas =
-                    new Canvas(MainWindow::getFillStrokeSettings(),
+                    new Canvas(MainWindow::getInstance()->getFillStrokeSettings(),
                                this,
                                width, height,
                                frameCount);
@@ -665,7 +665,7 @@ void CanvasWidget::loadCanvasesFromSql() {
             MainWindow::getInstance()->addCanvas(canvas);
         }
     } else {
-        qDebug() << "Could not load canvas with id " << boundingBoxId;
+        qDebug() << "Could not load canvases";
     }
 }
 

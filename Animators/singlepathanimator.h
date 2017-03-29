@@ -31,7 +31,7 @@ public:
         return mPath;
     }
 
-    void loadPointsFromSql(int boundingBoxId);
+    //void loadPointsFromSql(int boundingBoxId);
     void savePointsToSql(QSqlQuery *query, const int &boundingBoxId);
     PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
     void updateAfterFrameChanged(int currentFrame);

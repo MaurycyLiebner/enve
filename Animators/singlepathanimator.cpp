@@ -613,18 +613,18 @@ void SinglePathAnimator::selectAndAddContainedPointsToList(
 
 void SinglePathAnimator::savePointsToSql(QSqlQuery *query,
                                    const int &boundingBoxId) {
-    mFirstPoint->saveToSql(query, boundingBoxId);
+    mFirstPoint->prp_saveToSql(query, boundingBoxId);
 }
 
-void SinglePathAnimator::loadPointsFromSql(int boundingBoxId) {
+//void SinglePathAnimator::loadPointsFromSql(int boundingBoxId) {
 //    QSqlQuery query;
-//    QString queryStr = QString("SELECT id, isfirst, isendpoint, movablepointid "
+//    QString queryStr = QString("SELECT id, isfirst, isendpoint, qpointfanimatorid "
 //                               "FROM pathpoint WHERE boundingboxid = %1 "
 //                               "ORDER BY id ASC").arg(boundingBoxId);
 //    if(query.exec(queryStr) ) {
 //        int idisfirst = query.record().indexOf("isfirst");
 //        int idisendpoint = query.record().indexOf("isendpoint");
-//        int idmovablepointid = query.record().indexOf("movablepointid");
+//        int idqpointfanimatorid = query.record().indexOf("qpointfanimatorid");
 //        int idId = query.record().indexOf("id");
 //        PathPoint *firstPoint = NULL;
 //        PathPoint *lastPoint = NULL;
@@ -632,10 +632,10 @@ void SinglePathAnimator::loadPointsFromSql(int boundingBoxId) {
 //            int id = query.value(idId).toInt();
 //            bool isfirst = query.value(idisfirst).toBool();
 //            bool isendpoint = query.value(idisendpoint).toBool();
-//            int movablepointid = query.value(idmovablepointid).toInt();
+//            int qpointfanimatorid = query.value(idqpointfanimatorid).toInt();
 
 //            PathPoint *newPoint = new PathPoint(this);
-//            newPoint->loadFromSql(id, movablepointid);
+//            newPoint->loadFromSql(id, qpointfanimatorid);
 //            appendToPointsList(newPoint, false);
 //            if(lastPoint != NULL) {
 //                if(isfirst && firstPoint != NULL) {
@@ -660,7 +660,7 @@ void SinglePathAnimator::loadPointsFromSql(int boundingBoxId) {
 //    } else {
 //        qDebug() << "Could not load points for vectorpath with id " << boundingBoxId;
 //    }
-}
+//}
 
 PathPoint *SinglePathAnimator::addPoint(PathPoint *pointToAdd,
                                         PathPoint *toPoint)

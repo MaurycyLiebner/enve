@@ -120,7 +120,7 @@ public:
     void removeThisFromGraphAnimator();
 
     void setAnimatorColor(QColor color);
-    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
     void prp_loadFromSql(const int &qrealAnimatorId);
     void anim_loadKeysFromSql(int qrealAnimatorId);
     virtual void incSavedValueToCurrentValue(qreal incBy);

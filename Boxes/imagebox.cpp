@@ -42,8 +42,8 @@ bool ImageBox::relPointInsidePath(QPointF point)
                                    );
 }
 
-void ImageBox::makeDuplicate(BoundingBox *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
+void ImageBox::prp_makeDuplicate(Property *targetBox) {
+    BoundingBox::prp_makeDuplicate(targetBox);
     ImageBox *imgTarget = (ImageBox*)targetBox;
     imgTarget->setFilePath(mImageFilePath);
 }

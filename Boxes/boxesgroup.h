@@ -135,7 +135,7 @@ public:
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
-    void makeDuplicate(BoundingBox *targetBox);
+    void prp_makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
 
     void applyPaintSetting(

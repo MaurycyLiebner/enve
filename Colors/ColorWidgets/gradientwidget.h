@@ -31,19 +31,17 @@ public:
     void finishGradientTransform();
     void startGradientTransform();
     void saveGradientsToQuery(QSqlQuery *query);
-    Gradient *getGradientBySqlId(int id);
-    void loadAllGradientsFromSql();
     void clearAll();
     void saveGradientsToSqlIfPathSelected(QSqlQuery *query);
     void addGradientToList(Gradient *gradient);
     void removeGradientFromList(Gradient *toRemove);
     void startSelectedColorTransform();
-    void resetColorIdIfEquals(Gradient *gradient, const int &id);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);
     void gradientSettingsChanged();
 public slots:
+    void resetColorIdIfEquals(Gradient *gradient, const int &id);
     void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
 private:
     MainWindow *mMainWindow;

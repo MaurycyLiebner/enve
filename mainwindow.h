@@ -124,6 +124,9 @@ public:
     ClipboardContainer *getClipboardContainer(
             const ClipboardContainerType &type);
     void addCanvas(Canvas *newCanvas);
+
+    Gradient *getLoadedGradientBySqlId(const int &id);
+    void clearLoadedGradientsList();
 public slots:
     void setCurrentFrame(int frame);
     void setGraphEnabled(bool graphEnabled);
@@ -242,6 +245,9 @@ private:
     void setupToolBar();
     void connectToolBarActions();
     void setupMenuBar();
+
+    QList<Gradient*> mLoadedGradientsList;
+    void loadAllGradientsFromSql();
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *e);

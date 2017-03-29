@@ -67,7 +67,6 @@ public:
 
     void prp_loadFromSql(const int &) {}
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
-    int prp_saveToSql(QSqlQuery *query);
     void loadAllBoxesFromSql(bool loadInBox);
 
 

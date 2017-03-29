@@ -32,7 +32,12 @@ enum PixmapEffectType {
     EFFECT_BLUR,
     EFFECT_SHADOW,
     EFFECT_LINES,
-    EFFECT_CIRCLES
+    EFFECT_CIRCLES,
+    EFFECT_SWIRL,
+    EFFECT_DESATURATE,
+    EFFECT_OIL,
+    EFFECT_IMPLODE,
+    EFFECT_ALPHA_MATTE
 };
 
 class PixmapEffect : public ComplexAnimator

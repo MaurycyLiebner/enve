@@ -24,8 +24,8 @@ void AnimationBox::updateAfterDurationRectangleChanged() {
     updateAfterFrameChanged(mCurrentAbsFrame);
 }
 
-void AnimationBox::makeDuplicate(BoundingBox *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
+void AnimationBox::prp_makeDuplicate(Property *targetBox) {
+    BoundingBox::prp_makeDuplicate(targetBox);
     AnimationBox *animationBoxTarget = (AnimationBox*)targetBox;
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
                 &mTimeScaleAnimator);

@@ -287,10 +287,6 @@ void FillStrokeSettingsWidget::saveGradientsToQuery(QSqlQuery *query)
     mGradientWidget->saveGradientsToQuery(query);
 }
 
-void FillStrokeSettingsWidget::loadAllGradientsFromSql() {
-    mGradientWidget->loadAllGradientsFromSql();
-}
-
 GradientWidget *FillStrokeSettingsWidget::getGradientWidget() {
     return mGradientWidget;
 }

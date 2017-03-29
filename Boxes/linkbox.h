@@ -17,8 +17,8 @@ public:
         return new ExternalLinkBox(parent);
     }
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        BoundingBox::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        BoundingBox::prp_makeDuplicate(targetBox);
         ((ExternalLinkBox*)targetBox)->setSrc(mSrc);
     }
 
@@ -70,8 +70,8 @@ public:
         return new InternalLinkBox(parent);
     }
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        BoundingBox::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        BoundingBox::prp_makeDuplicate(targetBox);
         InternalLinkBox *linkBox = (InternalLinkBox*)targetBox;
         linkBox->setLinkTarget(mLinkTarget);
     }
@@ -133,8 +133,8 @@ public:
         return new InternalLinkBoxesGroup(parent);
     }
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        BoxesGroup::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        BoxesGroup::prp_makeDuplicate(targetBox);
         InternalLinkBoxesGroup *ilbgTarget =
                 (InternalLinkBoxesGroup*)targetBox;
         ilbgTarget->setLinkTarget(mLinkTarget);
@@ -169,8 +169,8 @@ public:
 
     void draw(QPainter *p);
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        InternalLinkBoxesGroup::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        InternalLinkBoxesGroup::prp_makeDuplicate(targetBox);
         InternalLinkCanvas *ilcTarget = (InternalLinkCanvas*)targetBox;
         ilcTarget->setClippedToCanvasSize(mClipToCanvasSize);
     }

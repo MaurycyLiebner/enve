@@ -60,19 +60,16 @@ private:
     ColorAnimator *mExclude = NULL;
 };
 
-class Gradient : public ComplexAnimator
-{
+class Gradient : public ComplexAnimator {
+    Q_OBJECT
 public:
-    Gradient(Color color1, Color color2,
-             GradientWidget *gradientWidget);
+    Gradient();
 
-    Gradient(Gradient *fromGradient,
-             GradientWidget *gradientWidget);
+    Gradient(Color color1, Color color2);
 
-    Gradient(int sqlIdT,
-             GradientWidget *gradientWidget);
+    Gradient(int sqlIdT);
 
-    int prp_saveToSql(QSqlQuery *, const int &parentId = 0);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
 
     void saveToSqlIfPathSelected(QSqlQuery *query);
 
@@ -124,9 +121,11 @@ public:
                         const bool &saveUndoRedo = true);
     ColorAnimator *getColorAnimatorAt(int id);
     void removeColor(const int &id);
+    Property *prp_makeDuplicate();
+signals:
+    void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:
     int mSqlId = -1;
-    GradientWidget *mGradientWidget;
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
     QList<PathBox*> mAffectedPaths;
@@ -165,8 +164,7 @@ public:
                   PaintType paintTypeT,
                   Gradient *gradientT = NULL);
 
-    virtual int prp_saveToSql(QSqlQuery *query,
-                              const int &parentId = 0);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
 
     Color getCurrentColor() const;
 
@@ -184,10 +182,13 @@ public:
 
     void setGradientPoints(GradientPoints *gradientPoints);
 
-    virtual void loadFromSql(int sqlId, GradientWidget *gradientWidget);
+    void prp_loadFromSql(const int &sqlId);
     void setPaintPathTarget(PathBox *path);
 
     void prp_makeDuplicate(Property *target);
+    Property *prp_makeDuplicate() {
+        return NULL;
+    }
 
     void duplicateColorAnimatorFrom(ColorAnimator *source);
 
@@ -235,8 +236,7 @@ public:
     QPainter::CompositionMode getOutlineCompositionMode();
 
     void setLineWidthUpdaterTarget(PathBox *path);
-    void loadFromSql(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
-    void loadFromSql(int strokeSqlId, GradientWidget *gradientWidget);
+    void prp_loadFromSql(const int &strokeSqlId);
     bool nonZeroLineWidth();
 
     void prp_makeDuplicate(Property *target);

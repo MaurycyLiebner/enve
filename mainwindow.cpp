@@ -510,7 +510,7 @@ void MainWindow::addCanvas(Canvas *newCanvas) {
 
     disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
             mCanvasWidget, SLOT(setCurrentCanvas(int)));
-    mCurrentCanvasComboBox->addItem(dialog.getCanvasName());
+    mCurrentCanvasComboBox->addItem(newCanvas->getName());
     mCurrentCanvasComboBox->setCurrentIndex(
                 mCurrentCanvasComboBox->count() - 1);
     connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
@@ -1103,7 +1103,7 @@ void MainWindow::importFile(QString path, bool loadInBox) {
         db.setDatabaseName(path);
         db.open();
 
-        mFillStrokeSettings->loadAllGradientsFromSql();
+        loadAllGradientsFromSql();
 //        if(loadInBox && !mCanvasWidget->hasNoCanvas()) {
 //            mCanvasWidget->getCurrentCanvas()->loadAllBoxesFromSql(loadInBox);
 //        } else {
@@ -1111,6 +1111,7 @@ void MainWindow::importFile(QString path, bool loadInBox) {
 //        }
         mCanvasWidget->loadCanvasesFromSql();
 
+        clearLoadedGradientsList();
         db.close();
     } else if(extension == "png" ||
               extension == "jpg") {
@@ -1136,6 +1137,34 @@ void MainWindow::loadFile(QString path) {
     mUndoRedoStack.clearAll();
     setFileChangedSinceSaving(false);
     setCurrentFrame(0);
+}
+
+
+Gradient *MainWindow::getLoadedGradientBySqlId(const int &id) {
+    foreach(Gradient *gradient, mLoadedGradientsList) {
+        if(gradient->getSqlId() == id) {
+            return gradient;
+        }
+    }
+    return NULL;
+}
+
+void MainWindow::loadAllGradientsFromSql() {
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM gradient");
+    if(query.exec(queryStr) ) {
+        int idId = query.record().indexOf("id");
+        while(query.next() ) {
+            mLoadedGradientsList <<
+                new Gradient(query.value(idId).toInt());
+        }
+    } else {
+        qDebug() << "Could not load gradients";
+    }
+}
+
+void MainWindow::clearLoadedGradientsList() {
+    mLoadedGradientsList.clear();
 }
 
 void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
@@ -1192,6 +1221,13 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
     query->exec("CREATE TABLE gradient "
                "(id INTEGER PRIMARY KEY)");
 
+    query->exec("CREATE TABLE gradientpoints "
+                "(id INTEGER PRIMARY KEY, "
+                "endpointid INTEGER, "
+                "startpointid INTEGER, "
+                "FOREIGN KEY(endpointid) REFERENCES qpointfanimator(id), "
+                "FOREIGN KEY(startpointid) REFERENCES qpointfanimator(id) )");
+
     query->exec("CREATE TABLE gradientcolor "
                "(colorid INTEGER, "
                "gradientid INTEGER, "
@@ -1243,41 +1279,34 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
 
     query->exec("CREATE TABLE pathbox "
                "(id INTEGER PRIMARY KEY, "
-               "fillgradientstartid INTEGER, "
+               "fillgradientpointsid INTEGER, "
                "fillgradientendid INTEGER, "
-               "strokegradientstartid INTEGER, "
+               "strokegradientpointsid INTEGER, "
                "strokegradientendid INTEGER, "
                "boundingboxid INTEGER, "
                "fillsettingsid INTEGER, "
                "strokesettingsid INTEGER, "
                "pointsinfluenceenabled BOOLEAN, "
-               "FOREIGN KEY(fillgradientstartid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(fillgradientendid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(strokegradientstartid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(strokegradientendid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(fillgradientpointsid) REFERENCES gradientpoints(id), "
+               "FOREIGN KEY(strokegradientpointsid) REFERENCES gradientpoints(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "
                "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
                "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
-
-    query->exec("CREATE TABLE movablepoint "
-               "(id INTEGER PRIMARY KEY, "
-               "posanimatorid INTEGER, "
-               "FOREIGN KEY(posanimatorid) REFERENCES qpointfanimator(id) )");
 
     query->exec("CREATE TABLE pathpoint "
                "(id INTEGER PRIMARY KEY, "
                "isfirst BOOLEAN, "
                "isendpoint BOOLEAN, "
-               "movablepointid INTEGER, "
+               "qpointfanimatorid INTEGER, "
                "startctrlptid INTEGER, "
                "endctrlptid INTEGER, "
                "boundingboxid INTEGER, "
                "ctrlsmode INTEGER, "
                "startpointenabled BOOLEAN, "
                "endpointenabled BOOLEAN, "
-               "FOREIGN KEY(movablepointid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(startctrlptid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(endctrlptid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(qpointfanimatorid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(startctrlptid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(endctrlptid) REFERENCES qpointfanimator(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 
     query->exec("CREATE TABLE circle "
@@ -1285,8 +1314,8 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "boundingboxid INTEGER, "
                "horizontalradiuspointid INTEGER, "
                "verticalradiuspointid INTEGER, "
-               "FOREIGN KEY(horizontalradiuspointid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(verticalradiuspointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(horizontalradiuspointid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(verticalradiuspointid) REFERENCES qpointfanimator(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 
     query->exec("CREATE TABLE rectangle "
@@ -1295,9 +1324,9 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "topleftpointid INTEGER, "
                "bottomrightpointid INTEGER, "
                "radiuspointid INTEGER, "
-               "FOREIGN KEY(topleftpointid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(bottomrightpointid) REFERENCES movablepoint(id), "
-               "FOREIGN KEY(radiuspointid) REFERENCES movablepoint(id), "
+               "FOREIGN KEY(topleftpointid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(bottomrightpointid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(radiuspointid) REFERENCES qpointfanimator(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 
     query->exec("CREATE TABLE textbox "

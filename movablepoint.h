@@ -20,10 +20,8 @@ enum MovablePointType {
 };
 
 class MovablePoint :
-        public Transformable,
-        public SmartPointerTarget,
-        public ConnectedToMainWindow
-{
+    public QPointFAnimator,
+    public Transformable {
 public:
     MovablePoint(BoundingBox *parent, MovablePointType type,
                  qreal radius = 7.5);
@@ -78,7 +76,6 @@ public:
     void setRadius(qreal radius);
 
     bool isBeingTransformed();
-    virtual int saveToSql(QSqlQuery *query);
 
     virtual void setPosAnimatorUpdater(AnimatorUpdater *updater);
 
@@ -87,7 +84,6 @@ public:
     QPointFAnimator *getRelativePosAnimatorPtr();
 
     qreal getRadius();
-    void loadFromSql(int movablePointId);
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
     virtual void applyTransform(QMatrix transform);
     void moveToRel(QPointF relPos);

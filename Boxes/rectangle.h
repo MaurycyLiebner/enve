@@ -32,8 +32,8 @@ public:
     void prp_loadFromSql(const int &boundingBoxId);
     int prp_saveToSql(QSqlQuery *query, const int &parentId);
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        PathBox::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        PathBox::prp_makeDuplicate(targetBox);
         Rectangle *rectTarget = (Rectangle*)targetBox;
         rectTarget->duplicateRectanglePointsFrom(
                     mTopLeftPoint,

@@ -220,8 +220,8 @@ public:
         return new ParticleBox(parent);
     }
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        BoundingBox::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        BoundingBox::prp_makeDuplicate(targetBox);
         ParticleBox *pbTarget = (ParticleBox*)targetBox;
         foreach(ParticleEmitter *emitter, mEmitters) {
             pbTarget->addEmitter((ParticleEmitter*)

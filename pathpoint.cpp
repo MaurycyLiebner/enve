@@ -31,7 +31,7 @@ PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
 
     mPathPointAnimators.incNumberPointers();
 
-    mRelPos.anim_setTraceKeyOnCurrentFrame(true);
+    anim_setTraceKeyOnCurrentFrame(true);
 }
 
 PathPoint::~PathPoint() {
@@ -50,11 +50,11 @@ void PathPoint::applyTransform(QMatrix transform)
     MovablePoint::applyTransform(transform);
 }
 
-void PathPoint::loadFromSql(int pathPointId, int movablePointId) {
-    MovablePoint::loadFromSql(movablePointId);
+void PathPoint::prp_loadFromSql(const int &movablePointId) {
+    MovablePoint::prp_loadFromSql(movablePointId);
     QSqlQuery query;
-    QString queryStr = "SELECT * FROM pathpoint WHERE id = " +
-            QString::number(pathPointId);
+    QString queryStr = "SELECT * FROM pathpoint WHERE qpointfanimatorid = " +
+            QString::number(movablePointId);
     if(query.exec(queryStr)) {
         query.next();
         int idisfirst = query.record().indexOf("isfirst");
@@ -69,10 +69,10 @@ void PathPoint::loadFromSql(int pathPointId, int movablePointId) {
         mEndCtrlPtEnabled = query.value(idendpointenabled).toBool();
         mCtrlsMode = static_cast<CtrlsMode>(query.value(idctrlsmode).toInt() );
 
-        mStartCtrlPt->loadFromSql(query.value(idstartctrlptid).toInt());
-        mEndCtrlPt->loadFromSql(query.value(idendctrlptid).toInt());
+        mStartCtrlPt->prp_loadFromSql(query.value(idstartctrlptid).toInt());
+        mEndCtrlPt->prp_loadFromSql(query.value(idendctrlptid).toInt());
     } else {
-        qDebug() << "Could not load pathpoint with id " << pathPointId;
+        qDebug() << "Could not load pathpoint with id " << movablePointId;
     }
 }
 
@@ -244,15 +244,15 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos,
 }
 
 #include <QSqlError>
-void PathPoint::saveToSql(QSqlQuery *query, int boundingBoxId)
+void PathPoint::prp_saveToSql(QSqlQuery *query, int boundingBoxId)
 {
-    int movablePtId = MovablePoint::saveToSql(query);
-    int startPtId = mStartCtrlPt->saveToSql(query);
-    int endPtId = mEndCtrlPt->saveToSql(query);
+    int movablePtId = MovablePoint::prp_saveToSql(query);
+    int startPtId = mStartCtrlPt->prp_saveToSql(query);
+    int endPtId = mEndCtrlPt->prp_saveToSql(query);
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
     QString isEnd = ( (isEndPoint()) ? "1" : "0" );
     if(!query->exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, "
-                "movablepointid, startctrlptid, endctrlptid, boundingboxid, "
+                "qpointfanimatorid, startctrlptid, endctrlptid, boundingboxid, "
                 "ctrlsmode, startpointenabled, endpointenabled) "
                 "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9)").
                 arg(isFirst).
@@ -268,7 +268,7 @@ void PathPoint::saveToSql(QSqlQuery *query, int boundingBoxId)
     }
     if(mNextPoint != NULL) {
         if(!mNextPoint->isSeparatePathPoint()) {
-            mNextPoint->saveToSql(query, boundingBoxId);
+            mNextPoint->prp_saveToSql(query, boundingBoxId);
         }
     }
 }
@@ -370,7 +370,7 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
     p->drawEllipse(absPos,
                    mRadius - 2, mRadius - 2);
 
-    if(mRelPos.prp_isKeyOnCurrentFrame() ) {
+    if(prp_isKeyOnCurrentFrame() ) {
         p->save();
         p->setBrush(Qt::red);
         p->setPen(QPen(Qt::black, 1.) );
@@ -436,7 +436,7 @@ void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
     }
     mNextPoint = nextPoint;
     updateEndCtrlPtVisibility();
-    mRelPos.prp_callUpdater();
+    prp_callUpdater();
     //mParentPath->schedulePathUpdate();
 }
 
@@ -467,7 +467,7 @@ void PathPoint::setEndCtrlPtEnabled(bool enabled,
     //mEndCtrlPt->setRelativePos(getRelativePos());
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
-    mRelPos.prp_callUpdater();
+    prp_callUpdater();
     //mParentPath->schedulePathUpdate();
 }
 
@@ -482,7 +482,7 @@ void PathPoint::setStartCtrlPtEnabled(bool enabled,
     //mStartCtrlPt->setRelativePos(getRelativePos());
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
-    mRelPos.prp_callUpdater();
+    prp_callUpdater();
     //mParentPath->schedulePathUpdate();
 }
 
@@ -663,7 +663,7 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
     setCtrlPtEnabled(true, true, saveUndoRedo);
     setCtrlPtEnabled(true, false, saveUndoRedo);
     //mParentPath->schedulePathUpdate();
-    mRelPos.prp_callUpdater();
+    prp_callUpdater();
 }
 
 void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
@@ -677,7 +677,7 @@ void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
     mPreviousPoint = previousPoint;
     updateStartCtrlPtVisibility();
     //mParentPath->schedulePathUpdate();
-    mRelPos.prp_callUpdater();
+    prp_callUpdater();
 }
 
 bool PathPoint::hasNextPoint() {

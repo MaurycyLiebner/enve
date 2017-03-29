@@ -178,7 +178,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
                                                SWT_CurrentGroup);
 }
 
-void Canvas::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+int Canvas::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     int boundingBoxId = BoxesGroup::prp_saveToSql(query, 0);
     query->exec(QString("INSERT INTO canvas "
@@ -187,6 +187,7 @@ void Canvas::prp_saveToSql(QSqlQuery *query, const int &parentId) {
                 arg(boundingBoxId).
                 arg(mWidth).
                 arg(mHeight));
+    return boundingBoxId;
 }
 
 void Canvas::loadAllBoxesFromSql(bool loadInBox) {

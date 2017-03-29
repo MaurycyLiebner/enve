@@ -131,38 +131,43 @@ void ColorSetting::startColorTransform(ColorAnimator *target) const {
     changeColor(target);
 }
 
-Gradient::Gradient(Color color1, Color color2,
-                   GradientWidget *gradientWidget) :
+Gradient::Gradient() : ComplexAnimator() {
+    prp_setUpdater(new GradientUpdater(this));
+    prp_blockUpdater();
+    prp_setName("gradient");
+    updateQGradientStops();
+}
+
+Gradient::Gradient(Color color1, Color color2) :
     ComplexAnimator()
 {
     prp_setUpdater(new GradientUpdater(this));
     prp_blockUpdater();
     prp_setName("gradient");
-    mGradientWidget = gradientWidget;
     addColorToList(color1);
     addColorToList(color2);
     updateQGradientStops();
 }
 
-Gradient::Gradient(Gradient *fromGradient, GradientWidget *gradientWidget) :
-    ComplexAnimator() {
-    prp_setUpdater(new GradientUpdater(this));
-    prp_blockUpdater();
-    prp_setName("gradient");
-    mGradientWidget = gradientWidget;
-    foreach (ColorAnimator *color, fromGradient->mColors) {
-        addColorToList(color->qra_getCurrentValue());
+Property *Gradient::prp_makeDuplicate() {
+    Gradient *newGradient = new Gradient();
+
+    foreach(ColorAnimator *color, mColors) {
+        newGradient->addColorToList(
+                    (ColorAnimator*)color->prp_makeDuplicate(), false);
     }
-    updateQGradientStops();
+
+    newGradient->updateQGradientStops();
+
+    return newGradient;
 }
 
-Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
+Gradient::Gradient(int sqlIdT) :
     ComplexAnimator() {
     prp_setUpdater(new GradientUpdater(this));
     prp_blockUpdater();
     prp_setName("gradient");
     QSqlQuery query;
-    mGradientWidget = gradientWidget;
     mSqlId = sqlIdT;
     QString queryStr = QString("SELECT * FROM gradient WHERE id = %1").
             arg(mSqlId);
@@ -176,7 +181,7 @@ Gradient::Gradient(int sqlIdT, GradientWidget *gradientWidget) :
             while(query.next()) {
                 int colorId = query.value(idColorId).toInt();
                 ColorAnimator *newAnimator = new ColorAnimator();
-                newAnimator->loadFromSql(colorId);
+                newAnimator->prp_loadFromSql(colorId);
                 addColorToList(newAnimator);
             }
         } else {
@@ -212,8 +217,7 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator,
     }
 }
 
-Color Gradient::getCurrentColorAt(int id)
-{
+Color Gradient::getCurrentColorAt(int id) {
     return mColors.at(id)->qra_getCurrentValue();
 }
 
@@ -221,27 +225,23 @@ ColorAnimator *Gradient::getColorAnimatorAt(int id) {
     return mColors.at(id);
 }
 
-int Gradient::getColorCount()
-{
+int Gradient::getColorCount() {
     return mColors.length();
 }
 
-QColor Gradient::getLastQGradientStopQColor()
-{
+QColor Gradient::getLastQGradientStopQColor() {
     return mQGradientStops.last().second;
 }
 
-QColor Gradient::getFirstQGradientStopQColor()
-{
+QColor Gradient::getFirstQGradientStopQColor() {
     return mQGradientStops.first().second;
 }
 
-QGradientStops Gradient::getQGradientStops()
-{
+QGradientStops Gradient::getQGradientStops() {
     return mQGradientStops;
 }
 
-int Gradient::prp_saveToSql(QSqlQuery *, const int &parentId) {
+int Gradient::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     query->exec("INSERT INTO gradient DEFAULT VALUES");
     mSqlId = query->lastInsertId().toInt();
@@ -293,7 +293,7 @@ void Gradient::removeColor(ColorAnimator *color,
                         this, color));
     }
     ca_removeChildAnimator(color);
-    mGradientWidget->resetColorIdIfEquals(this, mColors.indexOf(color));
+    emit resetGradientWidgetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
     color->decNumberPointers();
     updateQGradientStops();
@@ -423,7 +423,7 @@ void PaintSettings::setTargetPathBox(PathBox *target) {
     mTarget = target;
 }
 
-void PaintSettings::loadFromSql(int sqlId, GradientWidget *gradientWidget) {
+void PaintSettings::prp_loadFromSql(const int &sqlId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM paintsettings WHERE id = %1").
             arg(sqlId);
@@ -432,10 +432,10 @@ void PaintSettings::loadFromSql(int sqlId, GradientWidget *gradientWidget) {
         int idPaintType = query.record().indexOf("painttype");
         mPaintType = static_cast<PaintType>(query.value(idPaintType).toInt());
         int idColorId = query.record().indexOf("colorid");
-        mColor.loadFromSql(query.value(idColorId).toInt() );
+        mColor.prp_loadFromSql(query.value(idColorId).toInt() );
         int idGradientId = query.record().indexOf("gradientid");
         if(!query.value(idGradientId).isNull()) {
-            mGradient = gradientWidget->getGradientBySqlId(
+            mGradient = getLoadedGradientBySqlId(
                         query.value(idGradientId).toInt());
         }
     } else {
@@ -548,33 +548,20 @@ void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
     setPaintPathTarget(path);
 }
 
-void StrokeSettings::loadFromSql(int strokeSqlId, GradientWidget *gradientWidget) {
+void StrokeSettings::prp_loadFromSql(const int &strokeSqlId) {
     QSqlQuery query;
-    QString queryStr = QString("SELECT paintsettingsid FROM "
+    QString queryStr = QString("SELECT * FROM "
                                "strokesettings WHERE id = %1").
             arg(strokeSqlId);
     if(query.exec(queryStr) ) {
         query.next();
         int idPaintSettingsId = query.record().indexOf("paintsettingsid");
-        int paintSettingsId = static_cast<PaintType>(
-                    query.value(idPaintSettingsId).toInt());
-        loadFromSql(strokeSqlId, paintSettingsId, gradientWidget);
-    } else {
-        qDebug() << "Could not load strokesettings with id " << strokeSqlId;
-    }
-}
-
-void StrokeSettings::loadFromSql(int strokeSqlId, int paintSqlId,
-                               GradientWidget *gradientWidget) {
-    PaintSettings::loadFromSql(paintSqlId, gradientWidget);
-    QSqlQuery query;
-    QString queryStr = QString("SELECT * FROM strokesettings WHERE id = %1").
-            arg(strokeSqlId);
-    if(query.exec(queryStr) ) {
-        query.next();
         int idLineWidth = query.record().indexOf("linewidthanimatorid");
         int idCapStyle = query.record().indexOf("capstyle");
         int idJoinStyle = query.record().indexOf("joinstyle");
+        int paintSettingsId = static_cast<PaintType>(
+                    query.value(idPaintSettingsId).toInt());
+        PaintSettings::prp_loadFromSql(paintSettingsId);
         mLineWidth.prp_loadFromSql(query.value(idLineWidth).toInt() );
         mCapStyle = static_cast<Qt::PenCapStyle>(query.value(idCapStyle).toInt());
         mJoinStyle = static_cast<Qt::PenJoinStyle>(query.value(idJoinStyle).toInt());

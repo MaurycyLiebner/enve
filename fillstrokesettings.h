@@ -35,7 +35,6 @@ public:
     void setCurrentPaintType(PaintType paintType);
 
     void saveGradientsToQuery(QSqlQuery *query);
-    void loadAllGradientsFromSql();
     GradientWidget *getGradientWidget();
 
     void clearAll();

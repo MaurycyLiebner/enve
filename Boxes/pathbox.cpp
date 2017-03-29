@@ -46,23 +46,19 @@ PathBox::~PathBox()
 int PathBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = BoundingBox::prp_saveToSql(query, parentId);
 
-    int fillStartPt = mFillGradientPoints.startPoint->saveToSql(query);
-    int fillEndPt = mFillGradientPoints.endPoint->saveToSql(query);
-    int strokeStartPt = mStrokeGradientPoints.startPoint->saveToSql(query);
-    int strokeEndPt = mStrokeGradientPoints.endPoint->saveToSql(query);
+    int fillPts = mFillGradientPoints.startPoint->prp_saveToSql(query);
+    int strokePts = mStrokeGradientPoints.startPoint->prp_saveToSql(query);
 
     int fillSettingsId = mFillPaintSettings.prp_saveToSql(query);
     int strokeSettingsId = mStrokeSettings.prp_saveToSql(query);
     if(!query->exec(
             QString(
-            "INSERT INTO pathbox (fillgradientstartid, fillgradientendid, "
-            "strokegradientstartid, strokegradientendid, "
+            "INSERT INTO pathbox (fillgradientpointsid, "
+            "strokegradientpointsid, "
             "boundingboxid, fillsettingsid, strokesettingsid) "
-            "VALUES (%1, %2, %3, %4, %5, %6, %7)").
-            arg(fillStartPt).
-            arg(fillEndPt).
-            arg(strokeStartPt).
-            arg(strokeEndPt).
+            "VALUES (%1, %2, %3, %4, %5)").
+            arg(fillPts).
+            arg(strokePts).
             arg(boundingBoxId).
             arg(fillSettingsId).
             arg(strokeSettingsId) ) ) {
@@ -72,38 +68,29 @@ int PathBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
-void PathBox::loadFromSql(int boundingBoxId) {
-    BoundingBox::loadFromSql(boundingBoxId);
+void PathBox::prp_loadFromSql(const int &boundingBoxId) {
+    BoundingBox::prp_loadFromSql(boundingBoxId);
     QSqlQuery query;
     QString queryStr = "SELECT * FROM pathbox WHERE boundingboxid = " +
             QString::number(boundingBoxId);
     if(query.exec(queryStr) ) {
         query.next();
-        int idfillgradientstartid = query.record().indexOf("fillgradientstartid");
-        int idfillgradientendid = query.record().indexOf("fillgradientendid");
-        int idstrokegradientstartid = query.record().indexOf("strokegradientstartid");
-        int idstrokegradientendid = query.record().indexOf("strokegradientendid");
+        int idfillgradientpointsid = query.record().indexOf("fillgradientpointsid");
+        int idstrokegradientpointsid = query.record().indexOf("strokegradientpointsid");
         int idfillsettingsid = query.record().indexOf("fillsettingsid");
         int idstrokesettingsid = query.record().indexOf("strokesettingsid");
 
-        int fillGradientStartId = query.value(idfillgradientstartid).toInt();
-        int fillGradientEndId = query.value(idfillgradientendid).toInt();
-        int strokeGradientStartId = query.value(idstrokegradientstartid).toInt();
-        int strokeGradientEndId = query.value(idstrokegradientendid).toInt();
+        int fillGradientPointsId = query.value(idfillgradientpointsid).toInt();
+        int strokeGradientPointsId = query.value(idstrokegradientpointsid).toInt();
         int fillSettingsId = query.value(idfillsettingsid).toInt();
         int strokeSettingsId = query.value(idstrokesettingsid).toInt();
 
 
-        mFillGradientPoints.loadFromSql(fillGradientStartId,
-                                       fillGradientEndId);
-        mStrokeGradientPoints.loadFromSql(strokeGradientStartId,
-                                         strokeGradientEndId);
+        mFillGradientPoints.prp_loadFromSql(fillGradientPointsId);
+        mStrokeGradientPoints.prp_loadFromSql(strokeGradientPointsId);
 
-        GradientWidget *gradientWidget =
-                mMainWindow->getFillStrokeSettings()->getGradientWidget();
-
-        mFillPaintSettings.loadFromSql(fillSettingsId, gradientWidget);
-        mStrokeSettings.loadFromSql(strokeSettingsId, gradientWidget);
+        mFillPaintSettings.prp_loadFromSql(fillSettingsId);
+        mStrokeSettings.prp_loadFromSql(strokeSettingsId);
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }
@@ -139,7 +126,7 @@ void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
     strokeSettings->prp_makeDuplicate(&mStrokeSettings);
 }
 
-void PathBox::makeDuplicate(BoundingBox *targetBox) {
+void PathBox::prp_makeDuplicate(Property *targetBox) {
     PathBox *pathBoxTarget = ((PathBox*)targetBox);
     pathBoxTarget->duplicatePaintSettingsFrom(&mFillPaintSettings,
                                               &mStrokeSettings);

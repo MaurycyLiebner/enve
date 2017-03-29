@@ -88,6 +88,8 @@ public:
                                      ScrollWidgetVisiblePart *visiblePartWidget);
     void createImageForPath(const QString &path);
     void createSoundForPath(const QString &path);
+    void loadCanvasesFromSql();
+    void saveCanvasesFromSql(QSqlQuery *query);
 protected:
     QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;

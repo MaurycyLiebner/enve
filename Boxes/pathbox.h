@@ -75,7 +75,7 @@ public:
 
     void setOutlineAffectedByScale(bool bT);
     int prp_saveToSql(QSqlQuery *query, const int &parentId);
-    void loadFromSql(int boundingBoxId);
+    void prp_loadFromSql(const int &boundingBoxId);
     void updateRelBoundingRect();
 
     void setUpdateVars();
@@ -91,7 +91,7 @@ public:
     void duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                     StrokeSettings *strokeSettings);
 
-    void makeDuplicate(BoundingBox *targetBox);
+    void prp_makeDuplicate(Property *targetBox);
 
     virtual void drawHovered(QPainter *p) {
         p->save();

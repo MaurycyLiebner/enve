@@ -63,11 +63,12 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 #include "linkbox.h"
 BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
     InternalLinkBox *linkBox = new InternalLinkBox(this, parent);
-    BoundingBox::makeDuplicate(linkBox);
+    BoundingBox::prp_makeDuplicate(linkBox);
     return linkBox;
 }
 
-void BoundingBox::makeDuplicate(BoundingBox *targetBox) {
+void BoundingBox::prp_makeDuplicate(Property *property) {
+    BoundingBox *targetBox = (BoundingBox*)property;
     targetBox->duplicateTransformAnimatorFrom(&mTransformAnimator);
     int effectsCount = mEffectsAnimators.ca_getNumberOfChildren();
     for(int i = 0; i < effectsCount; i++) {
@@ -76,9 +77,13 @@ void BoundingBox::makeDuplicate(BoundingBox *targetBox) {
     }
 }
 
+Property *BoundingBox::prp_makeDuplicate() {
+    return createDuplicate(mParent);
+}
+
 BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
     BoundingBox *target = createNewDuplicate(parent);
-    makeDuplicate(target);
+    prp_makeDuplicate(target);
     return target;
 }
 
@@ -164,8 +169,8 @@ void BoundingBox::prp_loadFromSql(const int &boundingBoxId) {
         bool pivotChanged = query.value(idPivotChanged).toBool();
         bool visible = query.value(idVisible).toBool();
         bool locked = query.value(idLocked).toBool();
-        mTransformAnimator.loadFromSql(transformAnimatorId);
-        mEffectsAnimators.loadFromSql(boundingBoxId, this);
+        mTransformAnimator.prp_loadFromSql(transformAnimatorId);
+        mEffectsAnimators.prp_loadFromSql(boundingBoxId);
         mPivotChanged = pivotChanged;
         mLocked = locked;
         mVisible = visible;

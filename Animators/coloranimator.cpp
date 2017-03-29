@@ -32,8 +32,7 @@ ColorAnimator::ColorAnimator() : ComplexAnimator()
     mAlphaAnimator.blockPointer();
 }
 
-void ColorAnimator::prp_loadFromSql(const int &sqlId)
-{
+void ColorAnimator::prp_loadFromSql(const int &sqlId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM coloranimator WHERE id = %1").
             arg(sqlId);
@@ -56,7 +55,7 @@ void ColorAnimator::prp_loadFromSql(const int &sqlId)
 }
 
 #include <QSqlError>
-int ColorAnimator::prp_saveToSql(QSqlQuery *, const int &parentId)
+int ColorAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId)
 {
     Q_UNUSED(parentId);
     int val1AnimatorId = mVal1Animator.prp_saveToSql(query);

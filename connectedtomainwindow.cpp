@@ -37,14 +37,17 @@ void ConnectedToMainWindow::addUpdateScheduler(UpdateScheduler *scheduler)
     mMainWindow->addUpdateScheduler(scheduler);
 }
 
-void ConnectedToMainWindow::callUpdateSchedulers()
-{
+void ConnectedToMainWindow::callUpdateSchedulers() {
     mMainWindow->callUpdateSchedulers();
 }
 
-MainWindow *ConnectedToMainWindow::getMainWindow()
-{
+MainWindow *ConnectedToMainWindow::getMainWindow() {
     return mMainWindow;
+}
+
+Gradient *ConnectedToMainWindow::getLoadedGradientBySqlId(
+                                const int &id) {
+    return mMainWindow->getLoadedGradientBySqlId(id);
 }
 
 bool ConnectedToMainWindow::isShiftPressed() {

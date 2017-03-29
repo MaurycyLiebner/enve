@@ -293,54 +293,54 @@ private:
     PathPoint *mPoint;
 };
 
-class AddPointToSeparatePathsUndoRedo : public UndoRedo
-{
-public:
-    AddPointToSeparatePathsUndoRedo(PathAnimator *path,
-                                    PathPoint *point) :
-        UndoRedo("AddPointToSeparatePathsUndoRedo") {
-        mPath = path;
-        mPath->incNumberPointers();
-        mPoint = point;
-        mPoint->incNumberPointers();
-    }
+//class AddPointToSeparatePathsUndoRedo : public UndoRedo
+//{
+//public:
+//    AddPointToSeparatePathsUndoRedo(PathAnimator *path,
+//                                    PathPoint *point) :
+//        UndoRedo("AddPointToSeparatePathsUndoRedo") {
+//        mPath = path;
+//        mPath->incNumberPointers();
+//        mPoint = point;
+//        mPoint->incNumberPointers();
+//    }
 
-    ~AddPointToSeparatePathsUndoRedo() {
-        mPath->decNumberPointers();
-        mPoint->decNumberPointers();
-    }
+//    ~AddPointToSeparatePathsUndoRedo() {
+//        mPath->decNumberPointers();
+//        mPoint->decNumberPointers();
+//    }
 
-    void redo() {
-        mPath->addPointToSeparatePaths(mPoint, false);
-    }
+//    void redo() {
+//        mPath->addPointToSeparatePaths(mPoint, false);
+//    }
 
-    void undo() {
-        mPath->removePointFromSeparatePaths(mPoint, false);
-    }
+//    void undo() {
+//        mPath->removePointFromSeparatePaths(mPoint, false);
+//    }
 
-private:
-    PathAnimator *mPath;
-    PathPoint *mPoint;
-};
+//private:
+//    PathAnimator *mPath;
+//    PathPoint *mPoint;
+//};
 
-class RemovePointFromSeparatePathsUndoRedo :
-        public AddPointToSeparatePathsUndoRedo
-{
-public:
-    RemovePointFromSeparatePathsUndoRedo(PathAnimator *path,
-                                         PathPoint *point) :
-        AddPointToSeparatePathsUndoRedo(path, point) {
+//class RemovePointFromSeparatePathsUndoRedo :
+//        public AddPointToSeparatePathsUndoRedo
+//{
+//public:
+//    RemovePointFromSeparatePathsUndoRedo(PathAnimator *path,
+//                                         PathPoint *point) :
+//        AddPointToSeparatePathsUndoRedo(path, point) {
 
-    }
+//    }
 
-    void redo() {
-        AddPointToSeparatePathsUndoRedo::undo();
-    }
+//    void redo() {
+//        AddPointToSeparatePathsUndoRedo::undo();
+//    }
 
-    void undo() {
-        AddPointToSeparatePathsUndoRedo::redo();
-    }
-};
+//    void undo() {
+//        AddPointToSeparatePathsUndoRedo::redo();
+//    }
+//};
 
 class SetPathPointModeUndoRedo : public UndoRedo
 {

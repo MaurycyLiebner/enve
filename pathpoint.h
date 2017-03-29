@@ -92,6 +92,23 @@ public:
     bool isOfPathPoint(PathPoint *checkPoint) {
         return parentPathPoint == checkPoint;
     }
+
+    int prp_saveToSql(QSqlQuery *, const int &parentId) {
+
+    }
+
+    void prp_loadFromSql(const int &identifyingId) {
+
+    }
+
+    void prp_makeDuplicate(Property *) {
+
+    }
+
+    Property *prp_makeDuplicate() {
+
+    }
+
 private:
     PathPoint *parentPathPoint;
     QPointFAnimator *endPosAnimator;
@@ -166,7 +183,7 @@ public:
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
     SinglePathAnimator *getParentPath();
 
-    void saveToSql(QSqlQuery *query, int boundingBoxId);
+    void prp_saveToSql(QSqlQuery *query, int boundingBoxId);
 
     void cancelTransform();
 
@@ -190,7 +207,7 @@ public:
 
     bool isNeighbourSelected();
     void moveByAbs(QPointF absTranslatione);
-    void loadFromSql(int pathPointId, int movablePointId);
+    void prp_loadFromSql(const int &movablePointId);
 
     void setPointValues(const PathPointValues &values);
 

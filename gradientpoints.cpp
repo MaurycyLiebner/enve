@@ -25,10 +25,34 @@ void GradientPoints::initialize(PathBox *parentT)
     enabled = false;
 }
 
-void GradientPoints::loadFromSql(int fillGradientStartId, int fillGradientEndId)
-{
-    startPoint->loadFromSql(fillGradientStartId);
-    startPoint->loadFromSql(fillGradientEndId);
+#include <QSqlError>
+void GradientPoints::prp_loadFromSql(const int &identifyingId) {
+
+    QSqlQuery query;
+    QString queryStr = QString("SELECT * FROM gradientpoints WHERE id = %1").
+            arg(identifyingId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        endPoint->prp_loadFromSql(query.value("endpointid").toInt());
+        startPoint->prp_loadFromSql(query.value("startpointid").toInt());
+    } else {
+        qDebug() << "Could not load gradientpoints with id " << identifyingId;
+    }
+}
+
+int GradientPoints::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    Q_UNUSED(parentId);
+    int startPtId = startPoint->prp_saveToSql(query);
+    int endPtId = endPoint->prp_saveToSql(query);
+    if(!query->exec(QString("INSERT INTO gradientpoints (endpointid, "
+                            "startpointid) "
+                "VALUES (%1, %2)").
+                arg(endPtId).
+                arg(startPtId) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+    return query->lastInsertId().toInt();
+
 }
 
 void GradientPoints::duplicatePointsFrom(GradientPoint *startPointT,
@@ -43,8 +67,7 @@ void GradientPoints::prp_makeDuplicate(Property *target) {
                                               endPoint);
 }
 
-void GradientPoints::enable()
-{
+void GradientPoints::enable() {
     if(enabled) {
         return;
     }

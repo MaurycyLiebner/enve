@@ -57,15 +57,15 @@ public:
     void moveRadiusesByAbs(QPointF absTrans);
     void startPointsTransform();
 
-    int saveToSql(QSqlQuery *query, int parentId);
-    void loadFromSql(int boundingBoxId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    void prp_loadFromSql(int boundingBoxId);
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
         return new Circle(parent);
     }
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        PathBox::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        PathBox::prp_makeDuplicate(targetBox);
         Circle *circleTarget = (Circle*)targetBox;
         circleTarget->duplicateCirclePointsFrom(
                     mCenter,

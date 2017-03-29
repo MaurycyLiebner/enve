@@ -10,9 +10,8 @@ TextBox::TextBox(BoxesGroup *parent) : PathBox(parent, TYPE_TEXT) {
 }
 
 #include <QSqlError>
-int TextBox::saveToSql(QSqlQuery *query, int parentId)
-{
-    int boundingBoxId = PathBox::saveToSql(query, parentId);
+int TextBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
 
     if(!query->exec(QString("INSERT INTO textbox (boundingboxid, "
                            "text, fontfamily, fontstyle, fontsize) "
@@ -29,8 +28,8 @@ int TextBox::saveToSql(QSqlQuery *query, int parentId)
 }
 
 
-void TextBox::loadFromSql(int boundingBoxId) {
-    PathBox::loadFromSql(boundingBoxId);
+void TextBox::prp_loadFromSql(const int &boundingBoxId) {
+    PathBox::prp_loadFromSql(boundingBoxId);
 
     QSqlQuery query;
     QString queryStr = "SELECT * FROM textbox WHERE boundingboxid = " +

@@ -37,7 +37,7 @@ void GradientWidget::addGradientToList(Gradient *gradient) {
 }
 
 void GradientWidget::newGradient(Color color1, Color color2) {
-    Gradient *newGradient = new Gradient(color1, color2, this);
+    Gradient *newGradient = new Gradient(color1, color2);
     addGradientToList(newGradient);
     setCurrentGradient(newGradient);
     repaint();
@@ -46,7 +46,7 @@ void GradientWidget::newGradient(Color color1, Color color2) {
 void GradientWidget::newGradient(int fromGradientId)
 {
     Gradient *fromGradient = mGradients.at(fromGradientId);
-    Gradient *newGradient = new Gradient(fromGradient, this);
+    Gradient *newGradient = (Gradient*)fromGradient->prp_makeDuplicate();
     addGradientToList(newGradient);
     setCurrentGradient(mGradients.last());
     repaint();
@@ -96,35 +96,6 @@ void GradientWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
     }
 }
 
-void GradientWidget::loadAllGradientsFromSql() {
-    foreach(Gradient *gradient, mGradients) {
-        gradient->setSqlId(-1);
-    }
-
-    QSqlQuery query;
-    QString queryStr = QString("SELECT * FROM gradient");
-    if(query.exec(queryStr) ) {
-        int idId = query.record().indexOf("id");
-        while(query.next() ) {
-            addGradientToList(new Gradient(query.value(idId).toInt(), this) );
-        }
-        if(mGradients.isEmpty()) return;
-        setCurrentGradient(mGradients.last());
-        repaint();
-    } else {
-        qDebug() << "Could not load gradients";
-    }
-}
-
-Gradient *GradientWidget::getGradientBySqlId(int id) {
-    foreach (Gradient *gradient, mGradients) {
-        if(gradient->getSqlId() == id) {
-            return gradient;
-        }
-    }
-    return NULL;
-}
-
 void GradientWidget::wheelEvent(QWheelEvent *event)
 {
     if(event->y() > height()/2 || mGradients.length() < 4) return;
@@ -146,6 +117,12 @@ void GradientWidget::setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a)
 
 void GradientWidget::setCurrentGradient(Gradient *gradient)
 {
+    if(mCurrentGradient != NULL) {
+        disconnect(mCurrentGradient,
+                   SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
+                   this,
+                   SLOT(resetColorIdIfEquals(Gradient*,int)));
+    }
     if(gradient == NULL) {
         if(mGradients.isEmpty()) newGradient();
         setCurrentGradient(0);
@@ -154,6 +131,12 @@ void GradientWidget::setCurrentGradient(Gradient *gradient)
         return;
     }
     mCurrentGradient = gradient;
+    if(mCurrentGradient != NULL) {
+        connect(mCurrentGradient,
+                SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
+                this,
+                SLOT(resetColorIdIfEquals(Gradient*,int)));
+    }
     setCurrentColorId(0);
     repaint();
 

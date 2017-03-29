@@ -41,12 +41,12 @@ Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
 
 
 #include <QSqlError>
-int Circle::saveToSql(QSqlQuery *query, int parentId)
+int Circle::prp_saveToSql(QSqlQuery *query, const int &parentId)
 {
-    int boundingBoxId = PathBox::saveToSql(query, parentId);
+    int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
 
-    int horizontalRadiusPointId = mHorizontalRadiusPoint->saveToSql(query);
-    int verticalRadiusPointId = mVerticalRadiusPoint->saveToSql(query);
+    int horizontalRadiusPointId = mHorizontalRadiusPoint->prp_saveToSql(query);
+    int verticalRadiusPointId = mVerticalRadiusPoint->prp_saveToSql(query);
 
     if(!query->exec(QString("INSERT INTO circle (boundingboxid, "
                            "horizontalradiuspointid, verticalradiuspointid) "
@@ -61,8 +61,8 @@ int Circle::saveToSql(QSqlQuery *query, int parentId)
 }
 
 
-void Circle::loadFromSql(int boundingBoxId) {
-    PathBox::loadFromSql(boundingBoxId);
+void Circle::prp_loadFromSql(int boundingBoxId) {
+    PathBox::prp_loadFromSql(boundingBoxId);
 
     QSqlQuery query;
     QString queryStr = "SELECT * FROM circle WHERE boundingboxid = " +
@@ -75,8 +75,8 @@ void Circle::loadFromSql(int boundingBoxId) {
         int horizontalRadiusPointId = query.value(idHorizontalRadiusPointId).toInt();
         int verticalRadiusPointId = query.value(idVerticalRadiusPointId).toInt();
 
-        mHorizontalRadiusPoint->loadFromSql(horizontalRadiusPointId);
-        mVerticalRadiusPoint->loadFromSql(verticalRadiusPointId);
+        mHorizontalRadiusPoint->prp_loadFromSql(horizontalRadiusPointId);
+        mVerticalRadiusPoint->prp_loadFromSql(verticalRadiusPointId);
     } else {
         qDebug() << "Could not load circle with id " << boundingBoxId;
     }
@@ -263,9 +263,9 @@ void CircleRadiusPoint::moveByRel(QPointF relTranslation)
 //    QMatrix combinedM = mParent->getCombinedTransform();
 //    QPointF newPos = combinedM.inverted().map(pos);
 //    if(mXBlocked) {
-//        newPos.setX(mRelPos.getSavedXValue());
+//        newPos.setX(getSavedXValue());
 //    } else {
-//        newPos.setY(mRelPos.getSavedYValue());
+//        newPos.setY(getSavedYValue());
 //    }
 //    setRelativePos(newPos, false );
 //}
@@ -278,7 +278,7 @@ void CircleRadiusPoint::moveByAbs(QPointF absTranslatione) {
         absTranslatione.setY(0.);
     }
     MovablePoint::moveByAbs(absTranslatione);
-    //mRelPos.setCurrentValue(mSavedRelPos);
+    //setCurrentValue(mSavedRelPos);
     //setAbsPosRadius(getAbsolutePos() + absTranslatione);
 }
 

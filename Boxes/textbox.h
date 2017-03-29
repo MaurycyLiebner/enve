@@ -17,8 +17,8 @@ public:
                       const CanvasMode &currentCanvasMode);
 
     void openTextEditor();
-    int saveToSql(QSqlQuery *query, int parentId);
-    void loadFromSql(int boundingBoxId);
+    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    void prp_loadFromSql(const int &boundingBoxId);
     void updatePath();
     MovablePoint *getPointAt(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode);
@@ -34,8 +34,8 @@ public:
         scheduleUpdate();
     }
 
-    void makeDuplicate(BoundingBox *targetBox) {
-        PathBox::makeDuplicate(targetBox);
+    void prp_makeDuplicate(Property *targetBox) {
+        PathBox::prp_makeDuplicate(targetBox);
         TextBox *textTarget = (TextBox*)targetBox;
         textTarget->setText(mText);
         textTarget->setFont(mFont);

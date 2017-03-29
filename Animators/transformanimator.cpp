@@ -71,9 +71,9 @@ void TransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
 
         //loadKeysFromSql(qrealAnimatorId);
 
-        mPosAnimator.loadFromSql(query.value(posanimatorid).toInt());
-        mScaleAnimator.loadFromSql(query.value(scaleanimatorid).toInt());
-        mPivotAnimator.loadFromSql(query.value(pivotanimatorid).toInt());
+        mPosAnimator.prp_loadFromSql(query.value(posanimatorid).toInt());
+        mScaleAnimator.prp_loadFromSql(query.value(scaleanimatorid).toInt());
+        mPivotAnimator.prp_loadFromSql(query.value(pivotanimatorid).toInt());
         mRotAnimator.prp_loadFromSql(query.value(rotanimatorid).toInt());
         mOpacityAnimator.prp_loadFromSql(query.value(opacityanimatorid).toInt());
     } else {

@@ -10,7 +10,7 @@ public:
     void loadUpdatePixmap();
     void reloadFile();
     void setUpdateVars();
-    void makeDuplicate(BoundingBox *targetBox);
+    void prp_makeDuplicate(Property *targetBox);
 private:
     QStringList mListOfFrames;
     QString mUpdateFramePath = "";

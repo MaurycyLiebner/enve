@@ -31,8 +31,20 @@ public:
         return mPath;
     }
 
-    void loadPointsFromSql(int boundingBoxId);
-    void savePointsToSql(QSqlQuery *query, const int &boundingBoxId);
+    void prp_loadFromSql(const int &boundingBoxId);
+    int prp_saveToSql(QSqlQuery *query,
+                      const int &boundingBoxId);
+    void prp_makeDuplicate(Property *property) {
+        duplicatePathsTo((PathAnimator*)property);
+    }
+
+    Property *prp_makeDuplicate() {
+        PathAnimator *newAnimator = new PathAnimator();
+        prp_makeDuplicate(newAnimator);
+        return newAnimator;
+    }
+
+
     PathPoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust);
     void updateAfterFrameChanged(const int &currentFrame);
@@ -40,23 +52,11 @@ public:
                               PathPoint **prevPoint,
                               qreal *error);
     void applyTransformToPoints(const QMatrix &transform);
-    void disconnectPoints(PathPoint *point1, PathPoint *point2);
-    void connectPoints(PathPoint *point1, PathPoint *point2);
-    void appendToPointsList(PathPoint *point,
-                            const bool &saveUndoRedo = true);
-    void removeFromPointsList(PathPoint *point,
-                              const bool &saveUndoRedo = true);
-    void removePoint(PathPoint *point);
-    void replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
-                                  PathPoint *newPoint);
+
     void startAllPointsTransform();
     void finishAllPointsTransform();
     void duplicatePathsTo(PathAnimator *target);
-    void removePointFromSeparatePaths(PathPoint *pointToRemove,
-                                      bool saveUndoRedo = true);
-    PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
-    PathPoint *addPointAbsPos(const QPointF &absPtPos, PathPoint *toPoint);
-    void deletePointAndApproximate(PathPoint *pointToRemove);
+
     void drawSelected(QPainter *p,
                       const CanvasMode &currentCanvasMode,
                       const QMatrix &combinedTransform);
@@ -68,8 +68,7 @@ public:
     }
 
     void loadPathFromQPainterPath(const QPainterPath &path);
-    void addPointToSeparatePaths(PathPoint *pointToAdd,
-                                 const bool &saveUndoRedo = true);
+
     void setParentBox(BoundingBox *parent);
     void addSinglePathAnimator(SinglePathAnimator *path,
                                const bool &saveUndoRedo = true);

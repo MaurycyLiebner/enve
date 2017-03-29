@@ -110,15 +110,15 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_CIRCLE ) {
                 Circle *circle = new Circle(this);
-                circle->loadFromSql(query.value(idId).toInt());
+                circle->prp_loadFromSql(query.value(idId).toInt());
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_TEXT ) {
                 TextBox *textBox = new TextBox(this);
-                textBox->loadFromSql(query.value(idId).toInt());
+                textBox->prp_loadFromSql(query.value(idId).toInt());
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_RECTANGLE ) {
                 Rectangle *rectangle = new Rectangle(this);
-                rectangle->loadFromSql(query.value(idId).toInt());
+                rectangle->prp_loadFromSql(query.value(idId).toInt());
             }
         }
     } else {
@@ -129,11 +129,11 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
 
 int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId)
 {
-    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
+    int boundingBoxId = BoundingBox::prp_saveToSql(query, parentId);
     query->exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
                 arg(boundingBoxId));
     foreach(BoundingBox *box, mChildBoxes) {
-        box->saveToSql(query, boundingBoxId);
+        box->prp_saveToSql(query, boundingBoxId);
     }
     return boundingBoxId;
 }
@@ -250,8 +250,8 @@ void BoxesGroup::startSelectedFillColorTransform()
     }
 }
 
-void BoxesGroup::makeDuplicate(BoundingBox *targetBox) {
-    BoundingBox::makeDuplicate(targetBox);
+void BoxesGroup::prp_makeDuplicate(Property *targetBox) {
+    BoundingBox::prp_makeDuplicate(targetBox);
     foreach(BoundingBox *child, mChildBoxes) {
         child->createDuplicate((BoxesGroup*)targetBox);
     }

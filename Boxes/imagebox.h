@@ -16,7 +16,7 @@ public:
     void updateRelBoundingRect();
     bool relPointInsidePath(QPointF point);
 
-    void makeDuplicate(BoundingBox *targetBox);
+    void prp_makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
 private:
     QImage mImage;

@@ -13,13 +13,19 @@ void EffectAnimators::addEffect(PixmapEffect *effect) {
     mParentBox->addEffect(effect);
 }
 
-void EffectAnimators::prp_saveToSql(QSqlQuery *query,
+int EffectAnimators::prp_saveToSql(QSqlQuery *query,
                                     const int &boundingBoxSqlId) {
     foreach(Property *effect, ca_mChildAnimators) {
         ((PixmapEffect*)effect)->prp_saveToSql(query, boundingBoxSqlId);
     }
+    return boundingBoxSqlId;
 }
-
+//  EFFECT_BLUR
+//  EFFECT_SHADOW
+//  EFFECT_LINES
+//  EFFECT_CIRCLES
+//  EFFECT_SWIRL
+//  EFFECT_DESATURATE
 void EffectAnimators::prp_loadFromSql(const int &boundingBoxSqlId) {
     QSqlQuery query;
     QString queryStr;
@@ -32,9 +38,29 @@ void EffectAnimators::prp_loadFromSql(const int &boundingBoxSqlId) {
         while(query.next() ) {
             PixmapEffectType typeT = static_cast<PixmapEffectType>(
                                             query.value(typeId).toInt());
-            PixmapEffect *effect = PixmapEffect::loadFromSql(
-                                            query.value(idId).toInt(),
-                                            typeT);
+            PixmapEffect *effect;
+            if(typeT == EFFECT_BLUR) {
+                effect = new BlurEffect();
+            } else if(typeT == EFFECT_SHADOW) {
+                effect = new ShadowEffect();
+            } else if(typeT == EFFECT_LINES) {
+                effect = new LinesEffect();
+            } else if(typeT == EFFECT_CIRCLES) {
+                effect = new CirclesEffect();
+            } else if(typeT == EFFECT_SWIRL) {
+                effect = new SwirlEffect();
+            } else if(typeT == EFFECT_DESATURATE) {
+                effect = new DesaturateEffect();
+            } else if(typeT == EFFECT_IMPLODE) {
+                effect = new ImplodeEffect();
+            } else if(typeT == EFFECT_OIL) {
+                effect = new OilEffect();
+            } else if(typeT == EFFECT_ALPHA_MATTE) {
+                effect = new AlphaMatteEffect(mParentBox);
+            } else {
+                continue;
+            }
+            effect->prp_loadFromSql(query.value(idId).toInt());
             addEffect(effect);
         }
     } else {

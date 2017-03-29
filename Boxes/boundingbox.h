@@ -355,7 +355,8 @@ public:
     void removeFromParent();
     void removeFromSelection();
     void moveByAbs(QPointF trans);
-    virtual void makeDuplicate(BoundingBox *targetBox);
+    virtual void prp_makeDuplicate(Property *property);
+    Property *prp_makeDuplicate();
     BoundingBox *createDuplicate(BoxesGroup *parent);
     virtual BoundingBox *createNewDuplicate(BoxesGroup *) = 0;
     BoundingBox *createDuplicate() {
@@ -433,7 +434,17 @@ public:
     void decUsedAsTarget();
     bool shouldUpdateAndDraw();
     void ca_childAnimatorIsRecordingChanged();
+
+    int getSqlId() {
+        return mSqlId;
+    }
+
+    void setSqlId(int id) {
+        mSqlId = id;
+    }
 protected:
+    int mSqlId = 0;
+
     DurationRectangle *mDurationRectangle = NULL;
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
     SingleWidgetAbstraction *mTimelineAbstraction = NULL;

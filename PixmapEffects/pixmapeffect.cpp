@@ -78,7 +78,7 @@ qreal BlurEffect::getMargin()
 }
 
 #include <QSqlError>
-void BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int radiusId = mBlurRadius.prp_saveToSql(query);
@@ -89,6 +89,7 @@ void BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
                 arg(radiusId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void BlurEffect::prp_loadFromSql(const int &identifyingId) {
@@ -125,7 +126,7 @@ void BlurEffect::duplicateBlurRadiusAnimatorFrom(
     source->prp_makeDuplicate(&mBlurRadius);
 }
 
-ShadowEffect::ShadowEffect(qreal radius) {
+ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
     mBlurRadius.qra_setCurrentValue(radius);
     prp_setName("shadow");
     mBlurRadius.prp_setName("blur radius");
@@ -156,7 +157,7 @@ ShadowEffect::ShadowEffect(qreal radius) {
 //    addChildAnimator(&mScale);
 }
 
-void ShadowEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int ShadowEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int radiusId = mBlurRadius.prp_saveToSql(query);
@@ -174,6 +175,7 @@ void ShadowEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) 
                 arg(translationId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void ShadowEffect::prp_loadFromSql(const int &identifyingId) {
@@ -266,7 +268,8 @@ void ShadowEffect::duplicateOpacityAnimatorFrom(QrealAnimator *source) {
     source->prp_makeDuplicate(&mOpacity);
 }
 
-LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect() {
+LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
+    PixmapEffect(EFFECT_LINES) {
     prp_setName("lines");
 
     mLinesWidth.qra_setValueRange(0., 100000.);
@@ -282,7 +285,8 @@ LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) : PixmapEffect()
     ca_addChildAnimator(&mLinesDistance);
 }
 
-void LinesEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int LinesEffect::prp_saveToSql(QSqlQuery *query,
+                               const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int distId = mLinesDistance.prp_saveToSql(query);
@@ -297,6 +301,7 @@ void LinesEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
                 arg(widthId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void LinesEffect::prp_loadFromSql(const int &identifyingId) {
@@ -361,7 +366,7 @@ void LinesEffect::apply(BoundingBox *target,
 
 CirclesEffect::CirclesEffect(qreal circlesRadius,
                              qreal circlesDistance) :
-    PixmapEffect() {
+    PixmapEffect(EFFECT_CIRCLES) {
     prp_setName("circles");
 
     mCirclesRadius.qra_setValueRange(0., 1000.);
@@ -377,7 +382,8 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
     ca_addChildAnimator(&mCirclesDistance);
 }
 
-void CirclesEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int CirclesEffect::prp_saveToSql(QSqlQuery *query,
+                                 const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int distId = mCirclesDistance.prp_saveToSql(query);
@@ -392,6 +398,7 @@ void CirclesEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId)
                 arg(radId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void CirclesEffect::prp_loadFromSql(const int &identifyingId) {
@@ -460,7 +467,8 @@ void CirclesEffect::apply(BoundingBox *target,
     p.end();
 }
 
-SwirlEffect::SwirlEffect(qreal degrees) {
+SwirlEffect::SwirlEffect(qreal degrees) :
+    PixmapEffect(EFFECT_SWIRL) {
     prp_setName("swirl");
 
     mDegreesAnimator.qra_setValueRange(-3600., 3600.);
@@ -470,7 +478,7 @@ SwirlEffect::SwirlEffect(qreal degrees) {
     ca_addChildAnimator(&mDegreesAnimator);
 }
 
-void SwirlEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int SwirlEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int degId = mDegreesAnimator.prp_saveToSql(query);
@@ -483,6 +491,7 @@ void SwirlEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
                 arg(degId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void SwirlEffect::prp_loadFromSql(const int &identifyingId) {
@@ -508,7 +517,7 @@ void SwirlEffect::apply(BoundingBox *target,
                        fmt_filters::rgba(0, 0, 0, 0));
 }
 
-OilEffect::OilEffect(qreal radius) {
+OilEffect::OilEffect(qreal radius) : PixmapEffect(EFFECT_OIL) {
     prp_setName("oil");
 
     mRadiusAnimator.qra_setValueRange(1., 5.);
@@ -518,7 +527,8 @@ OilEffect::OilEffect(qreal radius) {
     ca_addChildAnimator(&mRadiusAnimator);
 }
 
-void OilEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int OilEffect::prp_saveToSql(QSqlQuery *query,
+                             const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int radId = mRadiusAnimator.prp_saveToSql(query);
@@ -531,6 +541,7 @@ void OilEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
                 arg(radId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void OilEffect::prp_loadFromSql(const int &identifyingId) {
@@ -555,7 +566,8 @@ void OilEffect::apply(BoundingBox *target,
                      mRadiusAnimator.qra_getCurrentValue());
 }
 
-ImplodeEffect::ImplodeEffect(qreal radius) {
+ImplodeEffect::ImplodeEffect(qreal radius) :
+    PixmapEffect(EFFECT_IMPLODE) {
     prp_setName("implode");
 
     mFactorAnimator.qra_setValueRange(0., 100.);
@@ -565,7 +577,7 @@ ImplodeEffect::ImplodeEffect(qreal radius) {
     ca_addChildAnimator(&mFactorAnimator);
 }
 
-void ImplodeEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int ImplodeEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int facId = mFactorAnimator.prp_saveToSql(query);
@@ -578,6 +590,7 @@ void ImplodeEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId)
                 arg(facId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void ImplodeEffect::prp_loadFromSql(const int &identifyingId) {
@@ -604,7 +617,8 @@ void ImplodeEffect::apply(BoundingBox *target,
 }
 
 
-DesaturateEffect::DesaturateEffect(qreal radius) {
+DesaturateEffect::DesaturateEffect(qreal radius) :
+    PixmapEffect(EFFECT_DESATURATE) {
     prp_setName("desaturate");
 
     mInfluenceAnimator.qra_setValueRange(0., 1.);
@@ -614,7 +628,8 @@ DesaturateEffect::DesaturateEffect(qreal radius) {
     ca_addChildAnimator(&mInfluenceAnimator);
 }
 
-void DesaturateEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int DesaturateEffect::prp_saveToSql(QSqlQuery *query,
+                                    const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int infId = mInfluenceAnimator.prp_saveToSql(query);
@@ -627,6 +642,7 @@ void DesaturateEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSql
                 arg(infId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void DesaturateEffect::prp_loadFromSql(const int &identifyingId) {
@@ -651,7 +667,8 @@ void DesaturateEffect::apply(BoundingBox *target,
                             mInfluenceAnimator.qra_getCurrentValue());
 }
 
-AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) {
+AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) :
+    PixmapEffect(EFFECT_ALPHA_MATTE) {
     prp_setName("alpha matte");
 
     mInfluenceAnimator.qra_setValueRange(0., 1.);
@@ -671,11 +688,18 @@ AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) {
     ca_addChildAnimator(&mInvertedProperty);
 }
 
-void AlphaMatteEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int AlphaMatteEffect::prp_saveToSql(QSqlQuery *query,
+                                    const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int infId = mInfluenceAnimator.prp_saveToSql(query);
-    int boundingBoxId = mBoxTarget.prp_saveToSql(query);
+    BoundingBox *target = mBoxTarget.getTarget();
+    int boundingBoxId;
+    if(target == NULL) {
+         boundingBoxId = -1;
+    } else {
+        boundingBoxId = target->getSqlId();
+    }
 
     if(!query->exec(
         QString("INSERT INTO alphamatteeffect (pixmapeffectid, "
@@ -687,6 +711,7 @@ void AlphaMatteEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSql
                 arg(mInvertedProperty.getValue()) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
+    return pixmapEffectId;
 }
 
 void AlphaMatteEffect::prp_loadFromSql(const int &identifyingId) {

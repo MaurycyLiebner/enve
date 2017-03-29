@@ -10,7 +10,7 @@ CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
     mIsStartCtrlPt = isStartCtrlPt;
     mParentPoint = parentPoint;
     mParent = mParentPoint->getParent();
-    mRelPos.anim_setTraceKeyOnCurrentFrame(true);
+    anim_setTraceKeyOnCurrentFrame(true);
 }
 
 void CtrlPoint::setIsStartCtrlPt(const bool &bT) {

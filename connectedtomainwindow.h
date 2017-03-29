@@ -9,15 +9,12 @@
     for(int i = (list).count() - 1; i >= 0; i--, item = getAtIndexOrGiveNull(i, (list)) )
 
 class MainWindow;
-
 class UndoRedo;
-
 class UpdateScheduler;
-
 class QKeyEvent;
+class Gradient;
 
-class ConnectedToMainWindow// : public SmartPointerTarget
-{
+class ConnectedToMainWindow {
 public:
     ConnectedToMainWindow();
     ~ConnectedToMainWindow() {}
@@ -46,6 +43,7 @@ public:
     bool isShiftPressed(QKeyEvent *event);
     bool isCtrlPressed(QKeyEvent *event);
     bool isAltPressed(QKeyEvent *event);
+    Gradient *getLoadedGradientBySqlId(const int &id);
 protected:
     MainWindow *mMainWindow;
 };
