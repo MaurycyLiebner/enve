@@ -176,14 +176,8 @@ bool MovablePoint::isBeingTransformed()
     return mSelected || mParent->isSelected();
 }
 
-void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
-{
+void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater) {
     prp_setUpdater(updater);
-}
-
-QPointFAnimator *MovablePoint::getRelativePosAnimatorPtr()
-{
-    return &mRelPos;
 }
 
 qreal MovablePoint::getRadius()

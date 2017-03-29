@@ -16,12 +16,12 @@ void GradientPoints::initialize(PathBox *parentT)
     parent = parentT;
     startPoint = new GradientPoint(parent);
     startPoint->incNumberPointers();
-    ca_addChildAnimator(startPoint->getRelativePosAnimatorPtr() );
-    startPoint->getRelativePosAnimatorPtr()->prp_setName("point1");
+    ca_addChildAnimator(startPoint );
+    startPoint->prp_setName("point1");
     endPoint = new GradientPoint(parent);
-    endPoint->getRelativePosAnimatorPtr()->prp_setName("point2");
+    endPoint->prp_setName("point2");
     endPoint->incNumberPointers();
-    ca_addChildAnimator(endPoint->getRelativePosAnimatorPtr() );
+    ca_addChildAnimator(endPoint);
     enabled = false;
 }
 

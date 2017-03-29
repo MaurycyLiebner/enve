@@ -13,19 +13,16 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
     setName("Particle Box");
     mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
     mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
-    Animator *topLeftAnimator = mTopLeftPoint->
-                                        getRelativePosAnimatorPtr();
-    Animator *bottomRightAnimator = mBottomRightPoint->
-                                        getRelativePosAnimatorPtr();
-    ca_addChildAnimator(topLeftAnimator);
-    ca_addChildAnimator(bottomRightAnimator);
 
-    topLeftAnimator->prp_setUpdater(
+    ca_addChildAnimator(mTopLeftPoint);
+    ca_addChildAnimator(mBottomRightPoint);
+
+    mTopLeftPoint->prp_setUpdater(
                 new DisplayedFillStrokeSettingsUpdater(this));
-    topLeftAnimator->prp_setName("top left");
-    bottomRightAnimator->prp_setUpdater(
+    mTopLeftPoint->prp_setName("top left");
+    mBottomRightPoint->prp_setUpdater(
                 new DisplayedFillStrokeSettingsUpdater(this));
-    bottomRightAnimator->prp_setName("bottom right");
+    mBottomRightPoint->prp_setName("bottom right");
 
     //addEmitter(new ParticleEmitter(this));
 }
@@ -395,8 +392,8 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mParticlesSizeDecay.blockPointer();
     mParticlesOpacityDecay.blockPointer();
 
-    mPos->getRelativePosAnimatorPtr()->prp_setName("pos");
-    ca_addChildAnimator(mPos->getRelativePosAnimatorPtr());
+    mPos->prp_setName("pos");
+    ca_addChildAnimator(mPos);
     ca_addChildAnimator(&mWidth);
 
     ca_addChildAnimator(&mIniVelocity);
@@ -473,7 +470,7 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *particlesDecayFrames,
                                              QrealAnimator *particlesSizeDecay,
                                              QrealAnimator *particlesOpacityDecay) {
-    pos->prp_makeDuplicate(mPos->getRelativePosAnimatorPtr());
+    pos->prp_makeDuplicate(mPos);
     width->prp_makeDuplicate(&mWidth);
 
     iniVelocity->prp_makeDuplicate(&mIniVelocity);
@@ -501,7 +498,7 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
 void ParticleEmitter::prp_makeDuplicate(Property *target) {
     ParticleEmitter *peTarget = ((ParticleEmitter*)target);
     peTarget->duplicateAnimatorsFrom(
-                mPos->getRelativePosAnimatorPtr(),
+                mPos,
                 &mWidth,
                 &mIniVelocity,
                 &mIniVelocityVar,
@@ -556,7 +553,7 @@ void ParticleEmitter::generateParticles() {
         qreal particlesFrameLifetime =
                 mParticlesFrameLifetime.getCurrentValueAtAbsFrame(i);
         QPointF pos =
-                mPos->getRelativePosAnimatorPtr()->getCurrentPointValueAtFrame(i);
+                mPos->getCurrentPointValueAtFrame(i);
         qreal width =
                 mWidth.getCurrentValueAtAbsFrame(i);
         qreal velocityVar =

@@ -81,8 +81,6 @@ public:
 
     virtual void updateAfterFrameChanged(int frame);
 
-    QPointFAnimator *getRelativePosAnimatorPtr();
-
     qreal getRadius();
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
     virtual void applyTransform(QMatrix transform);

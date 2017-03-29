@@ -25,9 +25,8 @@ PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
     //setPosAnimatorUpdater(updater);
 
     mPathPointAnimators.setAllVars(this,
-                                   mEndCtrlPt->getRelativePosAnimatorPtr(),
-                                   mStartCtrlPt->getRelativePosAnimatorPtr(),
-                                   getRelativePosAnimatorPtr());
+                                   mEndCtrlPt,
+                                   mStartCtrlPt);
 
     mPathPointAnimators.incNumberPointers();
 
@@ -535,8 +534,7 @@ CtrlsMode PathPoint::getCurrentCtrlsMode()
     return mCtrlsMode;
 }
 
-PathPointAnimators *PathPoint::getPathPointAnimatorsPtr()
-{
+PathPointAnimators *PathPoint::getPathPointAnimatorsPtr() {
     return &mPathPointAnimators;
 }
 
@@ -550,8 +548,7 @@ bool PathPoint::isStartCtrlPtEnabled()
     return mStartCtrlPtEnabled;
 }
 
-void PathPoint::setPosAnimatorUpdater(AnimatorUpdater *updater)
-{
+void PathPoint::setPosAnimatorUpdater(AnimatorUpdater *updater) {
     MovablePoint::setPosAnimatorUpdater(updater);
     mEndCtrlPt->setPosAnimatorUpdater(updater);
     mStartCtrlPt->setPosAnimatorUpdater(updater);
@@ -753,4 +750,21 @@ PathPointValues operator*(const PathPointValues &ppv, const qreal &val)
     return PathPointValues(ppv.startRelPos * val,
                            ppv.pointRelPos * val,
                            ppv.endRelPos * val);
+}
+
+PathPointAnimators::PathPointAnimators() : ComplexAnimator() {
+    prp_setName("point");
+}
+
+void PathPointAnimators::setAllVars(PathPoint *parentPathPointT, QPointFAnimator *endPosAnimatorT, QPointFAnimator *startPosAnimatorT) {
+    mParentPathPoint = parentPathPointT;
+    mParentPathPoint->prp_setName("point pos");
+    mEndPosAnimator = endPosAnimatorT;
+    mEndPosAnimator->prp_setName("ctrl pt 1 pos");
+    mStartPosAnimator = startPosAnimatorT;
+    mStartPosAnimator->prp_setName("ctrl pt 2 pos");
+
+    ca_addChildAnimator(mParentPathPoint);
+    ca_addChildAnimator(mEndPosAnimator);
+    ca_addChildAnimator(mStartPosAnimator);
 }

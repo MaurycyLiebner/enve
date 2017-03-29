@@ -13,16 +13,11 @@ Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
     //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
     //mBottomRightPoint->setRadiusPoint(mRadiusPoint);
 
-    Animator *topLeftPt = mTopLeftPoint->
-            getRelativePosAnimatorPtr();
-    Animator *bottomRightPt = mBottomRightPoint->
-            getRelativePosAnimatorPtr();
+    mTopLeftPoint->prp_setName("top left");
+    mBottomRightPoint->prp_setName("bottom right");
 
-    topLeftPt->prp_setName("top left");
-    bottomRightPt->prp_setName("bottom right");
-
-    ca_addChildAnimator(topLeftPt);
-    ca_addChildAnimator(bottomRightPt);
+    ca_addChildAnimator(mTopLeftPoint);
+    ca_addChildAnimator(mBottomRightPoint);
 
     mRadiusAnimator.prp_setName("radius");
     ca_addChildAnimator(&mRadiusAnimator);

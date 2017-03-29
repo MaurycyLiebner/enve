@@ -2,9 +2,8 @@
 #include "Boxes/vectorpath.h"
 
 GradientPoint::GradientPoint(PathBox *parent) :
-    MovablePoint(parent, TYPE_GRADIENT_POINT)
-{
-    getRelativePosAnimatorPtr()->prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
+    MovablePoint(parent, TYPE_GRADIENT_POINT) {
+    prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
     anim_setTraceKeyOnCurrentFrame(true);
 }
 

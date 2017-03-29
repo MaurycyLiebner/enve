@@ -68,29 +68,14 @@ PathPointValues operator*(const qreal &val, const PathPointValues &ppv);
 
 class PathPointAnimators : public ComplexAnimator {
 public:
-    PathPointAnimators() : ComplexAnimator() {
-        prp_setName("point");
-    }
+    PathPointAnimators();
 
     void setAllVars(PathPoint *parentPathPointT,
                     QPointFAnimator *endPosAnimatorT,
-                    QPointFAnimator *startPosAnimatorT,
-                    QPointFAnimator *pathPointPosAnimatorT) {
-        parentPathPoint = parentPathPointT;
-        endPosAnimator = endPosAnimatorT;
-        endPosAnimator->prp_setName("ctrl pt 1 pos");
-        startPosAnimator = startPosAnimatorT;
-        startPosAnimator->prp_setName("ctrl pt 2 pos");
-        pathPointPosAnimator = pathPointPosAnimatorT;
-        pathPointPosAnimator->prp_setName("point pos");
-
-        ca_addChildAnimator(pathPointPosAnimator);
-        ca_addChildAnimator(endPosAnimator);
-        ca_addChildAnimator(startPosAnimator);
-    }
+                    QPointFAnimator *startPosAnimatorT);
 
     bool isOfPathPoint(PathPoint *checkPoint) {
-        return parentPathPoint == checkPoint;
+        return mParentPathPoint == checkPoint;
     }
 
     int prp_saveToSql(QSqlQuery *, const int &parentId) {
@@ -108,12 +93,10 @@ public:
     Property *prp_makeDuplicate() {
 
     }
-
 private:
-    PathPoint *parentPathPoint;
-    QPointFAnimator *endPosAnimator;
-    QPointFAnimator *startPosAnimator;
-    QPointFAnimator *pathPointPosAnimator;
+    PathPoint *mParentPathPoint;
+    QPointFAnimator *mEndPosAnimator;
+    QPointFAnimator *mStartPosAnimator;
 }; 
 
 class SinglePathAnimator;
