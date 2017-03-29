@@ -35,8 +35,7 @@ public:
     bool isAltPressed();
 
     int getCurrentFrameFromMainWindow();
-    int getMaxFrame();
-    int getMinFrame();
+    int getFrameCount();
     bool isRecordingAllPoints();
     void graphUpdateAfterKeysChanged();
     void graphScheduleUpdateAfterKeysChanged();

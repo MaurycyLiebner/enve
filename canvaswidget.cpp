@@ -86,7 +86,7 @@ void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
 
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
-        emit changeFrameRange(getMinFrame(), getMaxFrame());
+        emit changeFrameRange(0, getFrameCount());
         emit changeCurrentFrame(getCurrentFrame());
     }
     SWT_scheduleWidgetsContentUpdateWithTarget(
@@ -597,7 +597,7 @@ void CanvasWidget::interruptPreview() {
 
 void CanvasWidget::stopPreview() {
     if(!mRendering) {
-        mCurrentRenderFrame = getMaxFrame();
+        mCurrentRenderFrame = getFrameCount();
         mPreviewFPSTimer->stop();
         stopAudio();
         repaint();
@@ -607,7 +607,7 @@ void CanvasWidget::stopPreview() {
 
 void CanvasWidget::nextPlayPreviewFrame() {
     mCurrentCanvas->renderCurrentFrameToPreview();
-    if(mCurrentRenderFrame >= getMaxFrame() || mPreviewInterrupted) {
+    if(mCurrentRenderFrame >= getFrameCount() || mPreviewInterrupted) {
         mRendering = false;
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
@@ -628,7 +628,7 @@ void CanvasWidget::nextPlayPreviewFrame() {
 
 void CanvasWidget::nextSaveOutputFrame() {
     mCurrentCanvas->renderCurrentFrameToOutput(mOutputString);
-    if(mCurrentRenderFrame >= getMaxFrame()) {
+    if(mCurrentRenderFrame >= getFrameCount()) {
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
     } else {
@@ -680,8 +680,8 @@ void CanvasWidget::saveOutput(QString renderDest) {
     mBoxesUpdateFinishedFunction = &CanvasWidget::nextSaveOutputFrame;
     mSavedCurrentFrame = getCurrentFrame();
 
-    mCurrentRenderFrame = getMinFrame();
-    emit changeCurrentFrame(getMinFrame());
+    mCurrentRenderFrame = 0;
+    emit changeCurrentFrame(0);
     if(mNoBoxesAwaitUpdate) {
         nextSaveOutputFrame();
     }
@@ -694,11 +694,6 @@ void CanvasWidget::clearAll() {
     }
     mCanvasList.clear();
     setCurrentCanvas((Canvas*)NULL);
-}
-
-void CanvasWidget::saveSelectedToSql(QSqlQuery *query) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->saveSelectedToSql(query);
 }
 
 void CanvasWidget::createLinkToFileWithPath(const QString &path) {
@@ -737,14 +732,9 @@ int CanvasWidget::getCurrentFrame() {
     return mCurrentCanvas->getCurrentFrame();
 }
 
-int CanvasWidget::getMaxFrame() {
+int CanvasWidget::getFrameCount() {
     if(hasNoCanvas()) return 0;
-    return mCurrentCanvas->getMaxFrame();
-}
-
-int CanvasWidget::getMinFrame() {
-    if(hasNoCanvas()) return 0;
-    return mCurrentCanvas->getMinFrame();
+    return mCurrentCanvas->getFrameCount();
 }
 
 const int BufferSize = 32768;

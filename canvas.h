@@ -144,7 +144,6 @@ public:
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
     PathPoint *createNewPointOnLineNearSelected(QPointF absPos, bool adjust);
-    void saveSelectedToSql(QSqlQuery *query);
 
     void setSelectedFillGradient(Gradient* gradient, bool finish);
     void setSelectedStrokeGradient(Gradient* gradient, bool finish);
@@ -309,8 +308,7 @@ public:
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
     int getCurrentFrame();
-    int getMinFrame();
-    int getMaxFrame();
+    int getFrameCount();
 
     SoundComposition *getSoundComposition();
 
@@ -336,8 +334,7 @@ private:
     QList<BoundingBox*> mSelectedBoxes;
 
     bool mIsCurrentCanvas = true;
-    int mMinFrame = 0;
-    int mMaxFrame = 0;
+    int mFrameCount = 0;
 
     bool mPivotVisibleDuringPointEdit = true;
     bool mEffectsPaintEnabled;

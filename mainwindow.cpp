@@ -155,8 +155,6 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addAction("Import File...", this, SLOT(importFile()));
     mFileMenu->addAction("Import Image Sequence...", this, SLOT(importImageSequence()));
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Export Selected...", this, SLOT(exportSelected()));
-    mFileMenu->addSeparator();
     mFileMenu->addAction("Revert", this, SLOT(revert()));
     mFileMenu->addSeparator();
     mFileMenu->addAction("Save", this, SLOT(saveFile()));
@@ -790,12 +788,8 @@ bool MainWindow::isRecordingAllPoints() {
     return mAllPointsRecording;
 }
 
-int MainWindow::getMinFrame() {
-    return mCanvasWidget->getMinFrame();
-}
-
-int MainWindow::getMaxFrame() {
-    return mCanvasWidget->getMaxFrame();
+int MainWindow::getFrameCount() {
+    return mCanvasWidget->getFrameCount();
 }
 
 void MainWindow::setCurrentFrame(int frame) {
@@ -916,31 +910,6 @@ void MainWindow::clearAll() {
     //mBoxListWidget->clearAll();
 }
 
-void MainWindow::exportSelected(QString path) {
-    disable();
-
-    QFile file(path);
-    if(file.exists()) {
-        file.remove();
-    }
-
-    QSqlDatabase db = QSqlDatabase::database();
-    db.setDatabaseName(path);
-    db.open();
-    QSqlQuery query;
-    createTablesInSaveDatabase(&query);
-
-    query.exec("BEGIN TRANSACTION");
-
-    mFillStrokeSettings->saveGradientsToSqlIfPathSelected(&query);
-    mCanvasWidget->saveSelectedToSql(&query);
-
-    query.exec("COMMIT TRANSACTION");
-    db.close();
-
-    enable();
-}
-
 void MainWindow::setCurrentPath(QString newPath) {
     mCurrentFilePath = newPath;
     updateTitle();
@@ -960,7 +929,7 @@ void MainWindow::openFile() {
         enableEventFilter();
         if(!openPath.isEmpty()) {
             setCurrentPath(openPath);
-            loadFile(mCurrentFilePath);
+            loadAVFile(mCurrentFilePath);
         }
         setFileChangedSinceSaving(false);
     }
@@ -1023,7 +992,7 @@ void MainWindow::importFile()
     if(!importPaths.isEmpty()) {
         foreach(const QString &path, importPaths) {
             if(path.isEmpty()) continue;
-            importFile(path, true);
+            importFile(path);
         }
     }
 }
@@ -1064,21 +1033,9 @@ void MainWindow::importImageSequence() {
 //    callUpdateSchedulers();
 //}
 
-void MainWindow::exportSelected()
-{
-    disableEventFilter();
-    QString saveAs = QFileDialog::getSaveFileName(this, "Export Selected",
-                               "untitled.av",
-                               "AniVect Files (*.av)");
-    enableEventFilter();
-    if(!saveAs.isEmpty()) {
-        exportSelected(saveAs);
-    }
-}
-
 void MainWindow::revert()
 {
-    loadFile(mCurrentFilePath);
+    loadAVFile(mCurrentFilePath);
     setFileChangedSinceSaving(false);
 }
 
@@ -1087,7 +1044,7 @@ void MainWindow::setCurrentFrameForAllWidgets(int frame)
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
 }
 
-void MainWindow::importFile(QString path, bool loadInBox) {
+void MainWindow::importFile(QString path) {
     if(mCanvasWidget->hasNoCanvas()) return;
     disable();
 
@@ -1095,24 +1052,10 @@ void MainWindow::importFile(QString path, bool loadInBox) {
     if(!file.exists()) {
         return;
     }
+
     QString extension = path.split(".").last();
     if(extension == "svg") {
         loadSVGFile(path, mCanvasWidget->getCurrentCanvas());
-    } else if(extension == "av") {
-        QSqlDatabase db = QSqlDatabase::database();//not dbConnection
-        db.setDatabaseName(path);
-        db.open();
-
-        loadAllGradientsFromSql();
-//        if(loadInBox && !mCanvasWidget->hasNoCanvas()) {
-//            mCanvasWidget->getCurrentCanvas()->loadAllBoxesFromSql(loadInBox);
-//        } else {
-//            mCanvasWidget
-//        }
-        mCanvasWidget->loadCanvasesFromSql();
-
-        clearLoadedGradientsList();
-        db.close();
     } else if(extension == "png" ||
               extension == "jpg") {
         mCanvasWidget->createImageForPath(path);
@@ -1129,10 +1072,19 @@ void MainWindow::importFile(QString path, bool loadInBox) {
     callUpdateSchedulers();
 }
 
-void MainWindow::loadFile(QString path) {
+void MainWindow::loadAVFile(QString path) {
     clearAll();
 
-    importFile(path, false);
+    QSqlDatabase db = QSqlDatabase::database();//not dbConnection
+    db.setDatabaseName(path);
+    db.open();
+
+    loadAllGradientsFromSql();
+
+    mCanvasWidget->loadCanvasesFromSql();
+
+    clearLoadedGradientsList();
+    db.close();
 
     mUndoRedoStack.clearAll();
     setFileChangedSinceSaving(false);

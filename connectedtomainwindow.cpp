@@ -78,12 +78,8 @@ int ConnectedToMainWindow::getCurrentFrameFromMainWindow() {
     return mMainWindow->getCurrentFrame();
 }
 
-int ConnectedToMainWindow::getMaxFrame() {
-    return mMainWindow->getMaxFrame();
-}
-
-int ConnectedToMainWindow::getMinFrame() {
-    return mMainWindow->getMinFrame();
+int ConnectedToMainWindow::getFrameCount() {
+    return mMainWindow->getFrameCount();
 }
 
 bool ConnectedToMainWindow::isRecordingAllPoints()

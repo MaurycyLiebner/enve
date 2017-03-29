@@ -74,15 +74,13 @@ public:
     void setSelectedStrokeColorMode(const ColorMode &mode);
 
     void updateAfterFrameChanged(const int &currentFrame);
-    void saveSelectedToSql(QSqlQuery *query);
     void clearAll();
     void createAnimationBoxForPaths(const QStringList &importPaths);
     void createLinkToFileWithPath(const QString &path);
     void saveToSql(QSqlQuery *query);
     void createVideoForPath(const QString &path);
     int getCurrentFrame();
-    int getMaxFrame();
-    int getMinFrame();
+    int getFrameCount();
     void addBoxAwaitingUpdate(BoundingBox *box);
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);

@@ -81,10 +81,9 @@ public:
     CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
-    void loadFile(QString path);
+    void loadAVFile(QString path);
     void clearAll();
-    void importFile(QString path, bool loadInBox);
-    void exportSelected(QString path);
+    void importFile(QString path);
     void setCurrentPath(QString newPath);
     void createTablesInSaveDatabase(QSqlQuery *query);
     void updateTitle();
@@ -100,8 +99,7 @@ public:
 
     bool isRecordingAllPoints();
 
-    int getMinFrame();
-    int getMaxFrame();
+    int getFrameCount();
 
     void previewFinished();
     void updateDisplayedFillStrokeSettings();
@@ -153,7 +151,6 @@ private slots:
     void linkFile();
     void importImageSequence();
     //void importVideo();
-    void exportSelected();
     void revert();
 signals:
     void updateAll();

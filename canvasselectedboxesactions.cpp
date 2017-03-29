@@ -600,9 +600,3 @@ void Canvas::selectedPathsUnion() {
     clearBoxesSelection();
     addBoxToSelection(newPath);
 }
-
-void Canvas::saveSelectedToSql(QSqlQuery *query) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->prp_saveToSql(query, 0);
-    }
-}
