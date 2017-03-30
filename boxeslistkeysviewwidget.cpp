@@ -89,9 +89,6 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mBoxesListScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     keysViewScrollbarLayout->setContentsMargins(0, 0, 0, 0);
 
-    mBoxesListScrollArea->verticalScrollBar()->setSingleStep(
-                BOX_HEIGHT);
-
     connect(mBoxesListScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),
             mBoxesListWidget, SLOT(changeVisibleTop(int)));

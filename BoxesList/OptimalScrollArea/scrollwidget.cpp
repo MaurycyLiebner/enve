@@ -46,7 +46,7 @@ void ScrollWidget::changeVisibleTop(const int &top) {
 }
 #include <QtMath>
 void ScrollWidget::changeVisibleHeight(const int &height) {
-    int newHeight = qCeil(height/20.)*20. + 20;
+    int newHeight = qCeil(height/20.)*20.;
     mVisiblePartWidget->setFixedHeight(newHeight);
     mVisiblePartWidget->setVisibleHeight(newHeight);
 }

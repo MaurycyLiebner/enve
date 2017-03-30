@@ -140,7 +140,11 @@ public:
     void prp_setTransformed(bool bT) { mTransformed = bT; }
     void anim_removeAllKeys();
     QrealKey *getQrealKeyAtId(const int &id) const;
+
+
 protected:
+    QList<InfluenceRange> mInfluenceRanges;
+
     bool mMinMaxValuesFrozen = false;
 
     bool mDrawPathUpdateNeeded = false;

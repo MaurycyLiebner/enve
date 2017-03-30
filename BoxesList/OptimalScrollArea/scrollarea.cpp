@@ -5,7 +5,7 @@
 ScrollArea::ScrollArea(QWidget *parent) : QScrollArea(parent)
 {
     setFocusPolicy(Qt::NoFocus);
-    verticalScrollBar()->setSingleStep(20);
+    //verticalScrollBar()->setSingleStep(20);
 
     setHorizontalScrollBarPolicy(
                 Qt::ScrollBarAlwaysOff);
