@@ -58,7 +58,7 @@ public:
     void startPointsTransform();
 
     int prp_saveToSql(QSqlQuery *query, const int &parentId);
-    void prp_loadFromSql(int boundingBoxId);
+    void prp_loadFromSql(const int &boundingBoxId);
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
         return new Circle(parent);

@@ -403,26 +403,6 @@ void CanvasWidget::startSelectedFillColorTransform() {
     callUpdateSchedulers();
 }
 
-void CanvasWidget::fillPaintTypeChanged(const PaintType &paintType,
-                                        const Color &color,
-                                        Gradient *gradient) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedFillPaintType(paintType,
-                                         color,
-                                         gradient);
-    callUpdateSchedulers();
-}
-
-void CanvasWidget::strokePaintTypeChanged(const PaintType &paintType,
-                                          const Color &color,
-                                          Gradient *gradient) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokePaintType(paintType,
-                                           color,
-                                           gradient);
-    callUpdateSchedulers();
-}
-
 void CanvasWidget::strokeCapStyleChanged(const Qt::PenCapStyle &capStyle) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedCapStyle(capStyle);

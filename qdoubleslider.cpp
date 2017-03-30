@@ -46,13 +46,13 @@ QDoubleSlider::QDoubleSlider(QWidget *parent) : QDoubleSlider(0., 100., 1., pare
 
 }
 
-QDoubleSlider::~QDoubleSlider()
-{
+QDoubleSlider::~QDoubleSlider() {
     removeEventFilter(this);
-    delete mLineEdit;
-    mLineEdit = NULL;
-    delete mValidator;
-    mValidator = NULL;
+    mLineEdit->removeEventFilter(this);
+//    delete mLineEdit;
+//    mLineEdit = NULL;
+//    delete mValidator;
+//    mValidator = NULL;
 }
 
 void QDoubleSlider::setValueSliderVisibile(bool valueSliderVisible)

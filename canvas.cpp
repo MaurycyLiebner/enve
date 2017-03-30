@@ -191,11 +191,6 @@ int Canvas::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
-void Canvas::loadAllBoxesFromSql(bool loadInBox) {
-    BoxesGroup *container = mCurrentBoxesGroup->loadChildrenFromSql(0,
-                                                                    loadInBox);
-}
-
 void Canvas::createImageBox(const QString &path) {
     mCurrentBoxesGroup->addChild(new ImageBox(mCurrentBoxesGroup, path));
 }

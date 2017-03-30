@@ -127,11 +127,9 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
     return this;
 }
 
-int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId)
-{
+int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = BoundingBox::prp_saveToSql(query, parentId);
-    query->exec(QString("INSERT INTO boxesgroup (boundingboxid) VALUES (%1)").
-                arg(boundingBoxId));
+
     foreach(BoundingBox *box, mChildBoxes) {
         box->prp_saveToSql(query, boundingBoxId);
     }
@@ -189,22 +187,6 @@ void BoxesGroup::setStrokeFlatColor(Color color, bool finish)
 {
     foreach(BoundingBox *box, mChildBoxes) {
         box->setStrokeFlatColor(color, finish);
-    }
-}
-
-void BoxesGroup::setFillPaintType(PaintType paintType,
-                                  Color color, Gradient *gradient)
-{
-    foreach(BoundingBox *box, mChildBoxes) {
-        box->setFillPaintType(paintType, color, gradient);
-    }
-}
-
-void BoxesGroup::setStrokePaintType(PaintType paintType,
-                                    Color color, Gradient *gradient)
-{
-    foreach(BoundingBox *box, mChildBoxes) {
-        box->setStrokePaintType(paintType, color, gradient);
     }
 }
 

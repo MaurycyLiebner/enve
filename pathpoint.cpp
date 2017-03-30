@@ -243,8 +243,7 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos,
 }
 
 #include <QSqlError>
-void PathPoint::prp_saveToSql(QSqlQuery *query, int boundingBoxId)
-{
+int PathPoint::prp_saveToSql(QSqlQuery *query, const int &boundingBoxId) {
     int movablePtId = MovablePoint::prp_saveToSql(query);
     int startPtId = mStartCtrlPt->prp_saveToSql(query);
     int endPtId = mEndCtrlPt->prp_saveToSql(query);
@@ -270,6 +269,7 @@ void PathPoint::prp_saveToSql(QSqlQuery *query, int boundingBoxId)
             mNextPoint->prp_saveToSql(query, boundingBoxId);
         }
     }
+    return movablePtId;
 }
 
 QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {

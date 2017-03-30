@@ -163,20 +163,6 @@ void Canvas::setSelectedStrokeFlatColor(Color color, bool finish) {
     }
 }
 
-void Canvas::setSelectedFillPaintType(PaintType paintType,
-                                          Color color, Gradient *gradient) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setFillPaintType(paintType, color, gradient);
-    }
-}
-
-void Canvas::setSelectedStrokePaintType(PaintType paintType,
-                                            Color color, Gradient *gradient) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokePaintType(paintType, color, gradient);
-    }
-}
-
 void Canvas::setSelectedCapStyle(Qt::PenCapStyle capStyle) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeCapStyle(capStyle);

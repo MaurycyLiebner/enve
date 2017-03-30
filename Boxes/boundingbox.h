@@ -220,14 +220,7 @@ public:
         Q_UNUSED(color); Q_UNUSED(finish); }
     virtual void setStrokeFlatColor(Color color, bool finish) {
         Q_UNUSED(color); Q_UNUSED(finish); }
-    virtual void setFillPaintType(PaintType paintType,
-                                  Color color,
-                                  Gradient* gradient) {
-        Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
-    virtual void setStrokePaintType(PaintType paintType,
-                                    Color color,
-                                    Gradient* gradient) {
-        Q_UNUSED(paintType); Q_UNUSED(color); Q_UNUSED(gradient); }
+
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
         Q_UNUSED(capStyle); }
     virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
@@ -262,7 +255,6 @@ public:
     TransformAnimator *getTransformAnimator();
     void disablePivotAutoAdjust();
     void enablePivotAutoAdjust();
-    void copyTransformationTo(BoundingBox *box);
 
     virtual VectorPath *objectToPath() { return NULL; }
     virtual void prp_loadFromSql(const int &boundingBoxId);

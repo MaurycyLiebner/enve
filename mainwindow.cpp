@@ -1216,11 +1216,6 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "FOREIGN KEY(transformanimatorid) REFERENCES transformanimator(id), "
                "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
 
-    query->exec("CREATE TABLE boxesgroup "
-               "(id INTEGER PRIMARY KEY, "
-               "boundingboxid INTEGER, "
-               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
-
     query->exec("CREATE TABLE canvas "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
@@ -1238,7 +1233,6 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "boundingboxid INTEGER, "
                "fillsettingsid INTEGER, "
                "strokesettingsid INTEGER, "
-               "pointsinfluenceenabled BOOLEAN, "
                "FOREIGN KEY(fillgradientpointsid) REFERENCES gradientpoints(id), "
                "FOREIGN KEY(strokegradientpointsid) REFERENCES gradientpoints(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id), "

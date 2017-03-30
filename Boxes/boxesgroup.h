@@ -92,10 +92,7 @@ public:
     void setStrokeGradient(Gradient* gradient, bool finish);
     void setFillFlatColor(Color color, bool finish);
     void setStrokeFlatColor(Color color, bool finish);
-    void setFillPaintType(PaintType paintType, Color color,
-                                  Gradient* gradient);
-    void setStrokePaintType(PaintType paintType, Color color,
-                                    Gradient* gradient);
+
     void setStrokeCapStyle(Qt::PenCapStyle capStyle);
     void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle);
     void setStrokeWidth(qreal strokeWidth, bool finish);

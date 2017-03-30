@@ -40,13 +40,15 @@ void ScrollWidget::setWidth(const int &width) {
 }
 
 void ScrollWidget::changeVisibleTop(const int &top) {
-    mVisiblePartWidget->move(0, top);
-    mVisiblePartWidget->setVisibleTop(top);
+    int newTop = top - top % 20;
+    mVisiblePartWidget->move(0, newTop);
+    mVisiblePartWidget->setVisibleTop(newTop);
 }
-
+#include <QtMath>
 void ScrollWidget::changeVisibleHeight(const int &height) {
-    mVisiblePartWidget->setFixedHeight(height);
-    mVisiblePartWidget->setVisibleHeight(height);
+    int newHeight = qCeil(height/20.)*20. + 20;
+    mVisiblePartWidget->setFixedHeight(newHeight);
+    mVisiblePartWidget->setVisibleHeight(newHeight);
 }
 
 void ScrollWidget::createVisiblePartWidget() {

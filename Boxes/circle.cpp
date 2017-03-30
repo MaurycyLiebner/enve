@@ -59,7 +59,7 @@ int Circle::prp_saveToSql(QSqlQuery *query, const int &parentId)
 }
 
 
-void Circle::prp_loadFromSql(int boundingBoxId) {
+void Circle::prp_loadFromSql(const int &boundingBoxId) {
     PathBox::prp_loadFromSql(boundingBoxId);
 
     QSqlQuery query;

@@ -145,8 +145,7 @@ void PathBox::schedulePathUpdate() {
     mOutlinePathUpdateNeeded = false;
 }
 
-void PathBox::scheduleOutlinePathUpdate()
-{
+void PathBox::scheduleOutlinePathUpdate() {
     scheduleUpdate();
     if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
@@ -163,24 +162,14 @@ void PathBox::updateOutlinePathIfNeeded() {
     }
 }
 
-void PathBox::copyStrokeAndFillSettingsTo(PathBox *target) {
-
-    target->setFillPaintType(mFillPaintSettings.getPaintType(),
-                             mFillPaintSettings.getCurrentColor(),
-                             mFillPaintSettings.getGradient());
-    target->setStrokePaintType(mStrokeSettings.getPaintType(),
-                               mStrokeSettings.getCurrentColor(),
-                               mStrokeSettings.getGradient());
-    target->setStrokeCapStyle(mStrokeSettings.getCapStyle());
-    target->setStrokeJoinStyle(mStrokeSettings.getJoinStyle());
-    target->setStrokeWidth(mStrokeSettings.getCurrentStrokeWidth(), false);
-}
-
 VectorPath *PathBox::objectToPath() {
     VectorPath *newPath = new VectorPath(mParent);
     newPath->loadPathFromQPainterPath(mPath);
-    copyTransformationTo(newPath);
-    copyStrokeAndFillSettingsTo(newPath);
+    newPath->duplicateTransformAnimatorFrom(&mTransformAnimator);
+    newPath->duplicatePaintSettingsFrom(&mFillPaintSettings,
+                                        &mStrokeSettings);
+    newPath->duplicateGradientPointsFrom(&mFillGradientPoints,
+                                         &mStrokeGradientPoints);
     return newPath;
 }
 

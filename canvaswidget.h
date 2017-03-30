@@ -42,12 +42,7 @@ public:
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
-    void fillPaintTypeChanged(const PaintType &paintType,
-                              const Color &color,
-                              Gradient *gradient);
-    void strokePaintTypeChanged(const PaintType &paintType,
-                                const Color &color,
-                                Gradient *gradient);
+
     void strokeCapStyleChanged(const Qt::PenCapStyle &capStyle);
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
     void strokeWidthChanged(const qreal &strokeWidth, const bool &finish);

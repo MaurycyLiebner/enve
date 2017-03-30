@@ -540,12 +540,6 @@ bool BoundingBox::isExternalLink() {
     return mType == TYPE_EXTERNAL_LINK;
 }
 
-void BoundingBox::copyTransformationTo(BoundingBox *box) {
-    if(mPivotChanged) box->disablePivotAutoAdjust();
-
-    mTransformAnimator.copyTransformationTo(box->getTransformAnimator());
-}
-
 void BoundingBox::disablePivotAutoAdjust() {
     mPivotChanged = true;
 }

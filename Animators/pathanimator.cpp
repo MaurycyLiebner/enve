@@ -232,6 +232,7 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
                 }
                 lastPoint = NULL;
                 singlePathAnimator = new SinglePathAnimator(this);
+                addSinglePathAnimator(singlePathAnimator);
                 newPoint = new PathPoint(singlePathAnimator);
                 newPoint->prp_loadFromSql(qpointfanimatorid);
 

@@ -48,7 +48,8 @@ public:
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
-    void connectPointsFromDifferentPaths(PathPoint *pointSrc, PathPoint *pointDest);
+    void connectPointsFromDifferentPaths(PathPoint *pointSrc,
+                                         PathPoint *pointDest);
 
     void repaintIfNeeded();
     void setCanvasMode(CanvasMode mode);
@@ -65,10 +66,7 @@ public:
 
     void awaitUpdate() {}
 
-    void prp_loadFromSql(const int &) {}
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
-    void loadAllBoxesFromSql(bool loadInBox);
-
 
     void resetTransormation();
     void fitCanvasToSize();
@@ -149,10 +147,7 @@ public:
     void setSelectedStrokeGradient(Gradient* gradient, bool finish);
     void setSelectedFillFlatColor(Color color, bool finish);
     void setSelectedStrokeFlatColor(Color color, bool finish);
-    void setSelectedFillPaintType(PaintType paintType, Color color,
-                              Gradient* gradient);
-    void setSelectedStrokePaintType(PaintType paintType, Color color,
-                                Gradient* gradient);
+
     void setSelectedCapStyle(Qt::PenCapStyle capStyle);
     void setSelectedJoinStyle(Qt::PenJoinStyle joinStyle);
     void setSelectedStrokeWidth(qreal strokeWidth, bool finish);

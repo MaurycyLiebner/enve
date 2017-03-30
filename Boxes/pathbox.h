@@ -32,11 +32,13 @@ public:
 
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
         mStrokeSettings.setCapStyle(capStyle);
+        clearCache();
         scheduleOutlinePathUpdate();
     }
 
     virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
         mStrokeSettings.setJoinStyle(joinStyle);
+        clearCache();
         scheduleOutlinePathUpdate();
     }
 
@@ -50,6 +52,7 @@ public:
 
     void setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
         mStrokeSettings.setOutlineCompositionMode(compositionMode);
+        clearCache();
         scheduleUpdate();
     }
 
@@ -79,7 +82,6 @@ public:
     void updateRelBoundingRect();
 
     void setUpdateVars();
-    void copyStrokeAndFillSettingsTo(PathBox *target);
 
     VectorPath *objectToPath();
     const QPainterPath &getRelativePath() const { return mPath; }

@@ -65,7 +65,7 @@ public:
     void showContextMenu(QPoint globalPos);
 
     void deletePointAndApproximate(PathPoint *pointToRemove);
-    virtual void prp_loadFromSql(int boundingBoxId);
+    virtual void prp_loadFromSql(const int &boundingBoxId);
 
     void applyTransformToPoints(QMatrix transform);
     void applyCurrentTransformation();

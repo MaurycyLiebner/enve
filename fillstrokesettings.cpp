@@ -532,38 +532,32 @@ void FillStrokeSettingsWidget::setGradient(Gradient *gradient)
     }
 }
 
-void FillStrokeSettingsWidget::setBevelJoinStyle()
-{
+void FillStrokeSettingsWidget::setBevelJoinStyle() {
     setJoinStyle(Qt::BevelJoin);
     emitJoinStyleChanged();
 }
 
-void FillStrokeSettingsWidget::setMiterJoinStyle()
-{
+void FillStrokeSettingsWidget::setMiterJoinStyle() {
     setJoinStyle(Qt::MiterJoin);
     emitJoinStyleChanged();
 }
 
-void FillStrokeSettingsWidget::setRoundJoinStyle()
-{
+void FillStrokeSettingsWidget::setRoundJoinStyle() {
     setJoinStyle(Qt::RoundJoin);
     emitJoinStyleChanged();
 }
 
-void FillStrokeSettingsWidget::setFlatCapStyle()
-{
+void FillStrokeSettingsWidget::setFlatCapStyle() {
     setCapStyle(Qt::FlatCap);
     emitCapStyleChanged();
 }
 
-void FillStrokeSettingsWidget::setSquareCapStyle()
-{
+void FillStrokeSettingsWidget::setSquareCapStyle() {
     setCapStyle(Qt::SquareCap);
     emitCapStyleChanged();
 }
 
-void FillStrokeSettingsWidget::setRoundCapStyle()
-{
+void FillStrokeSettingsWidget::setRoundCapStyle() {
     setCapStyle(Qt::RoundCap);
     emitCapStyleChanged();
 }

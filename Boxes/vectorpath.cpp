@@ -38,7 +38,7 @@ void VectorPath::removeChildPathAnimator(PathAnimator *path) {
     }
 }
 
-void VectorPath::prp_loadFromSql(int boundingBoxId) {
+void VectorPath::prp_loadFromSql(const int &boundingBoxId) {
     PathBox::prp_loadFromSql(boundingBoxId);
     mPathAnimator.prp_loadFromSql(boundingBoxId);
     if(!mPivotChanged) centerPivotPosition();
@@ -163,7 +163,6 @@ void VectorPath::duplicatePathAnimatorFrom(
 }
 
 void VectorPath::prp_makeDuplicate(Property *targetBox) {
-    BoundingBox::prp_makeDuplicate(targetBox);
     PathBox::prp_makeDuplicate(targetBox);
     ((VectorPath*)targetBox)->
             duplicatePathAnimatorFrom(&mPathAnimator);

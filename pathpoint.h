@@ -166,7 +166,7 @@ public:
     void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
     SinglePathAnimator *getParentPath();
 
-    void prp_saveToSql(QSqlQuery *query, int boundingBoxId);
+    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxId);
 
     void cancelTransform();
 

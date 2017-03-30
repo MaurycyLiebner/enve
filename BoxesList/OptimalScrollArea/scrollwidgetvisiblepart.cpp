@@ -21,7 +21,7 @@ ScrollWidgetVisiblePart::~ScrollWidgetVisiblePart() {
 
 void ScrollWidgetVisiblePart::setVisibleTop(
         const int &top) {
-    mVisibleTop = top - top % 20;
+    mVisibleTop = top;
     updateVisibleWidgetsContent();
 }
 
