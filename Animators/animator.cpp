@@ -80,6 +80,18 @@ Key *Animator::anim_getKeyAtAbsFrame(const int &frame) {
     return anim_getKeyAtRelFrame(anim_absFrameToRelFrame(frame));
 }
 
+Key *Animator::anim_getNextKey(Key *key) {
+    int keyId = anim_mKeys.indexOf(key);
+    if(keyId == anim_mKeys.count() - 1) return NULL;
+    return anim_mKeys.at(keyId + 1);
+}
+
+Key *Animator::anim_getPrevKey(Key *key) {
+    int keyId = anim_mKeys.indexOf(key);
+    if(keyId == 0) return NULL;
+    return anim_mKeys.at(keyId - 1);
+}
+
 void Animator::anim_deleteCurrentKey() {
     Key *keyAtFrame = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
     if(keyAtFrame == NULL) return;

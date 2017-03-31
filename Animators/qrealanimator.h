@@ -143,8 +143,6 @@ public:
 
 
 protected:
-    QList<InfluenceRange> mInfluenceRanges;
-
     bool mMinMaxValuesFrozen = false;
 
     bool mDrawPathUpdateNeeded = false;

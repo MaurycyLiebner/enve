@@ -87,6 +87,9 @@ public:
     virtual void anim_saveCurrentValueAsKey() {}
 
     virtual void anim_loadKeysFromSql(int qrealAnimatorId) = 0;
+
+    Key *anim_getNextKey(Key *key);
+    Key *anim_getPrevKey(Key *key);
 protected:
     virtual void anim_drawKey(QPainter *p,
                          Key *key,

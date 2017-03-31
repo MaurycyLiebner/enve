@@ -77,6 +77,19 @@ public:
     int getRelFrame();
     void setAbsFrame(const int &frame);
     ComplexKey *getParentKey();
+
+    Key *getNextKey();
+    Key *getPrevKey();
+
+    bool differesFromNextKey() {
+        differsFromKey(getNextKey());
+    }
+
+    bool differesFromPrevKey() {
+        differsFromKey(getPrevKey());
+    }
+
+    virtual bool differsFromKey(Key *key) = 0;
 protected:
     bool mIsSelected = false;
     Animator *mParentAnimator = NULL;

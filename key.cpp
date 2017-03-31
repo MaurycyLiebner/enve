@@ -91,6 +91,14 @@ ComplexKey *Key::getParentKey() {
     return mParentKey;
 }
 
+Key *Key::getNextKey() {
+    return mParentAnimator->anim_getNextKey(this);
+}
+
+Key *Key::getPrevKey() {
+    return mParentAnimator->anim_getPrevKey(this);
+}
+
 bool Key::isAncestorSelected() {
     if(mParentKey == NULL) return isSelected();
     if(isSelected()) return true;

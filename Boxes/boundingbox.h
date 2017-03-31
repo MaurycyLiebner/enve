@@ -435,6 +435,8 @@ public:
         mSqlId = id;
     }
 protected:
+    InfluenceRangeHandler mInfluenceRangeHandler;
+
     int mSqlId = 0;
 
     DurationRectangle *mDurationRectangle = NULL;

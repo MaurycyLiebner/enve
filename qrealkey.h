@@ -76,6 +76,8 @@ public:
 
     QrealAnimator *getParentQrealAnimator();
     void setRelFrame(int frame);
+
+    bool differsFromKey(Key *key);
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 

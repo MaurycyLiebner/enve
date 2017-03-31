@@ -128,6 +128,32 @@ public:
     }
     void removeFromSelection(QList<Key *> *selectedKeys);
     void addToSelection(QList<Key *> *selectedKeys);
+
+    bool differsFromKey(Key *key) {
+        ComplexKey *otherKey = (ComplexKey*)key;
+        if(getChildKeysCount() == otherKey->getChildKeysCount()) {
+            foreach(Key *key, mKeys) {
+                if(otherKey->hasSameKey(key)) continue;
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    int getChildKeysCount() {
+        return mKeys.count();
+    }
+
+    bool hasSameKey(Key *otherKey) {
+        foreach(Key *key, mKeys) {
+            if(key->getParentAnimator() == otherKey->getParentAnimator()) {
+                if(key->differsFromKey(otherKey)) return false;
+                return true;
+            }
+        }
+        return false;
+    }
 private:
     QList<Key*> mKeys;
 };

@@ -378,6 +378,21 @@ void QrealKey::setRelFrame(int frame) {
     mParentAnimator->anim_updateKeyOnCurrrentFrame();
 }
 
+bool QrealKey::differsFromKey(Key *key) {
+    QrealKey *qa_key = (QrealKey*)key;
+    if(qa_key->getValue() == mValue) {
+        if(key->getRelFrame() > mRelFrame) {
+            if(qa_key->isStartPointEnabled() ||
+               isEndPointEnabled()) return true;
+        } else {
+            if(qa_key->isEndPointEnabled() ||
+               isStartPointEnabled()) return true;
+        }
+        return false;
+    }
+    return true;
+}
+
 void QrealKey::changeFrameAndValueBy(QPointF frameValueChange) {
     setValue(frameValueChange.y() + mSavedValue);
     int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
