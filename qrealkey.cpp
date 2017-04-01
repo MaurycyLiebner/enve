@@ -420,3 +420,19 @@ void QrealKey::changeFrameAndValueBy(QPointF frameValueChange) {
         setRelFrame(newFrame);
     }
 }
+
+KeyCloner *QrealKey::createNewKeyCloner() {
+    return new QrealKeyCloner(this);
+}
+
+QrealKeyCloner::QrealKeyCloner(QrealKey *key) : KeyCloner(key) {
+    mValue = key->getValue();
+}
+
+Key *QrealKeyCloner::createKeyForAnimator(Animator *parentAnimator) {
+    QrealKey *key = new QrealKey(mRelFrame,
+                                 mValue,
+                                 (QrealAnimator*)parentAnimator);
+    parentAnimator->anim_appendKey(key);
+    return key;
+}

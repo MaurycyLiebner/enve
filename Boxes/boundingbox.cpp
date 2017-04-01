@@ -57,7 +57,7 @@ void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
     } else {
         maxRelFrame = prp_absFrameToRelFrame(maxFrame);
     }
-    mInfluenceRangeHandler.addRangeNeedingUpdate(minRelFrame, maxRelFrame);
+    mRenderCacheHandler.addRangeNeedingUpdate(minRelFrame, maxRelFrame);
 }
 
 void BoundingBox::ca_childAnimatorIsRecordingChanged() {
@@ -76,9 +76,9 @@ void BoundingBox::ca_addDescendantsKey(Key *key) {
             collection = new ComplexKey(this);
             collection->setAbsFrame(key->getAbsFrame());
             anim_appendKey(collection);
-            mInfluenceRangeHandler.addAddedKey(collection);
+            mRenderCacheHandler.addAddedKey(collection);
         } else {
-            mInfluenceRangeHandler.addChangedKey(collection);
+            mRenderCacheHandler.addChangedKey(collection);
         }
         collection->addAnimatorKey(key);
     }
@@ -92,10 +92,10 @@ void BoundingBox::ca_removeDescendantsKey(Key *key) {
         if(collection == NULL) return;
         collection->removeAnimatorKey(key);
         if(collection->isEmpty() ) {
-            mInfluenceRangeHandler.addRemovedKey(collection);
+            mRenderCacheHandler.addRemovedKey(collection);
             anim_removeKey(collection);
         } else {
-            mInfluenceRangeHandler.addChangedKey(collection);
+            mRenderCacheHandler.addChangedKey(collection);
         }
     }
 }
@@ -167,7 +167,7 @@ void BoundingBox::applyEffects(QImage *im,
 
 BoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
                                                 const int &frame) {
-    return mInfluenceRangeHandler.getRenderContainerAtRelFrame(frame);
+    return mRenderCacheHandler.getRenderContainerAtRelFrame(frame);
 }
 
 
@@ -345,12 +345,12 @@ void BoundingBox::updateAllBoxes() {
 }
 
 void BoundingBox::clearAllCache() {
-    mInfluenceRangeHandler.clearAllCache();
+    mRenderCacheHandler.clearAllCache();
 }
 
 void BoundingBox::clearCache() {
     return;
-    mInfluenceRangeHandler.clearAllCache();
+    mRenderCacheHandler.clearAllCache();
 
     if(mParent == NULL) return;
     mParent->BoundingBox::clearCache();
@@ -489,7 +489,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
         p->save();
         p->setCompositionMode(mCompositionMode);
         p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
-        mInfluenceRangeHandler.drawCurrentRenderContainer(p);
+        mRenderCacheHandler.drawCurrentRenderContainer(p);
         p->restore();
     }
 }
@@ -845,7 +845,7 @@ void BoundingBox::updateCombinedTransformTmp() {
     if(mAwaitingUpdate) {
         mCombinedTransformMatrix = mRelativeTransformMatrix*
                                    mParent->getCombinedTransform();
-        mInfluenceRangeHandler.updateCurrentRenderContainerTransform(
+        mRenderCacheHandler.updateCurrentRenderContainerTransform(
                                     mCombinedTransformMatrix);
     } else {
         updateCombinedTransform();
@@ -1172,7 +1172,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 
 void BoundingBox::beforeUpdate() {
     qDebug() << "before update " + prp_mName;
-    mInfluenceRangeHandler.applyChanges();
+    mRenderCacheHandler.applyChanges();
     setUpdateVars();
 //    if(!mUpdateReplaceCache) {
 //        BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
@@ -1202,17 +1202,17 @@ void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
 
     if(mNoCache) {
-        mInfluenceRangeHandler.duplicateCurrentRenderContainerFrom(
+        mRenderCacheHandler.duplicateCurrentRenderContainerFrom(
                                             mUpdateRenderContainer);
     } else {
-        mInfluenceRangeHandler.updateCurrentRenderContainerFromFrame(
+        mRenderCacheHandler.updateCurrentRenderContainerFromFrame(
                                                     mUpdateRelFrame);
         if(mUpdateReplaceCache) {
-            mInfluenceRangeHandler.duplicateCurrentRenderContainerFrom(
+            mRenderCacheHandler.duplicateCurrentRenderContainerFrom(
                                             mUpdateRenderContainer);
         }
     }
-    mInfluenceRangeHandler.updateCurrentRenderContainerTransform(
+    mRenderCacheHandler.updateCurrentRenderContainerTransform(
                                             mCombinedTransformMatrix);
 }
 

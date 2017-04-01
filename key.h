@@ -6,6 +6,7 @@
 class ComplexAnimator;
 
 class ComplexKey;
+class KeyCloner;
 
 class Animator;
 class KeysClipboardContainer;
@@ -16,6 +17,8 @@ public:
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~Key();
+
+    virtual KeyCloner *createNewKeyCloner() { return NULL; }
 
     virtual Key *makeKeyDuplicate(Animator *targetParent) {}
 
@@ -113,6 +116,22 @@ struct KeyPair {
 
     Key *key1;
     Key *key2;
+};
+
+class KeyCloner {
+public:
+    KeyCloner(Key *key);
+
+    int getRelFrame() { return mRelFrame; }
+
+    int getAbsFrame() { return mAbsFrame; }
+
+    void shiftKeyFrame(const int &frameShift);
+
+    virtual Key *createKeyForAnimator(Animator *parentAnimator) = 0;
+protected:
+    int mAbsFrame;
+    int mRelFrame;
 };
 
 #endif // KEY_H

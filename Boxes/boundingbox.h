@@ -15,6 +15,7 @@
 #include <unordered_map>
 
 #include "boundingboxrendercontainer.h"
+#include "rendercachehandler.h"
 
 class KeysView;
 
@@ -442,7 +443,7 @@ public:
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
 protected:
-    InfluenceRangeHandler mInfluenceRangeHandler;
+    RenderCacheHandler mRenderCacheHandler;
 
     int mSqlId = 0;
 

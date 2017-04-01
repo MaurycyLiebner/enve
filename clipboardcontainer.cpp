@@ -41,13 +41,13 @@ KeysClipboardContainer::~KeysClipboardContainer() {
     foreach(Animator *animator, mTargetAnimators) {
         animator->decNumberPointers();
     }
-    foreach(Key *key, mKeysList) {
-        key->decNumberPointers();
+    foreach(KeyCloner *keyCloner, mKeyClonersList) {
+        delete keyCloner;
     }
 }
 
 void KeysClipboardContainer::copyKeyToContainer(Key *key) {
-    mKeysList << key->makeKeyDuplicate(key->getParentAnimator());
+    mKeyClonersList << key->createNewKeyCloner();
     mTargetAnimators << key->getParentAnimator();
     key->getParentAnimator()->incNumberPointers();
 }
@@ -56,9 +56,9 @@ void KeysClipboardContainer::copyKeyToContainer(Key *key) {
 void KeysClipboardContainer::paste(const int &pasteFrame,
                                    KeysView *keysView) {
     int firstKeyFrame = 1000000;
-    foreach(Key *key, mKeysList) {
-        if(key->getAbsFrame() < firstKeyFrame) {
-            firstKeyFrame = key->getAbsFrame();
+    foreach(KeyCloner *keyCloner, mKeyClonersList) {
+        if(keyCloner->getAbsFrame() < firstKeyFrame) {
+            firstKeyFrame = keyCloner->getAbsFrame();
         }
     }
     int dFrame = pasteFrame - firstKeyFrame;
@@ -71,14 +71,13 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
 
     keysView->clearKeySelection();
 
-    int count = mKeysList.count();
+    int count = mKeyClonersList.count();
     for(int i = 0; i < count; i++) {
-        Key *key = mKeysList.at(i);
+        KeyCloner *keyCloner = mKeyClonersList.at(i);
         Animator *animator = mTargetAnimators.at(i);
-        key->setAbsFrame(key->getAbsFrame() + dFrame);
-        key = key->makeKeyDuplicate(animator);
-        animator->anim_appendKey(key);
-        keysView->addKeyToSelection(key);
+        keyCloner->shiftKeyFrame(dFrame);
+        Key *newKey = keyCloner->createKeyForAnimator(animator);
+        keysView->addKeyToSelection(newKey);
     }
 
     foreach(Animator *animator, animators) {

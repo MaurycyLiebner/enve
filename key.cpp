@@ -192,3 +192,13 @@ void Key::setRelFrame(int frame) {
 void Key::setAbsFrame(const int &frame) {
     setRelFrame(mParentAnimator->prp_absFrameToRelFrame(frame));
 }
+
+KeyCloner::KeyCloner(Key *key) {
+    mRelFrame = key->getRelFrame();
+    mAbsFrame = key->getAbsFrame();
+}
+
+void KeyCloner::shiftKeyFrame(const int &frameShift) {
+    mRelFrame += frameShift;
+    mAbsFrame += frameShift;
+}

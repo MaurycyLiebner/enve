@@ -7,6 +7,7 @@ class BoundingBox;
 class BoxesGroup;
 class KeysView;
 class Key;
+class KeyCloner;
 class Animator;
 
 enum  ClipboardContainerType : short {
@@ -48,7 +49,7 @@ public:
     void paste(const int &pasteFrame,
                KeysView *keysView);
 private:
-    QList<Key*> mKeysList;
+    QList<KeyCloner*> mKeyClonersList;
     QList<Animator*> mTargetAnimators;
 };
 

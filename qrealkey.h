@@ -81,6 +81,8 @@ public:
     void setRelFrame(int frame);
 
     bool differsFromKey(Key *key);
+
+    KeyCloner *createNewKeyCloner();
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 
@@ -99,6 +101,15 @@ protected:
     qreal mEndFrame = 0.;
     bool mStartEnabled = false;
     bool mEndEnabled = false;
+};
+
+class QrealKeyCloner : public KeyCloner {
+public:
+    QrealKeyCloner(QrealKey *key);
+
+    Key *createKeyForAnimator(Animator *parentAnimator);
+private:
+    qreal mValue;
 };
 
 #endif // QREALKEY_H
