@@ -32,9 +32,9 @@ void AnimatorsCollection::ca_childAnimatorIsRecordingChanged() {
     mParentBox->SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
 }
 
-int AnimatorsCollection::anim_getParentFrameShift() const {
+int AnimatorsCollection::prp_getParentFrameShift() const {
     if(mParentBox == NULL) {
         return 0;
     }
-    return mParentBox->anim_getFrameShift();
+    return mParentBox->prp_getFrameShift();
 }

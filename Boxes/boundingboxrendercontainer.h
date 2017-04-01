@@ -59,7 +59,7 @@ enum InfluenceRangeChangeType {
 //    MOVE_KEY,
     REMOVE_KEY,
     ADD_KEY,
-    CHANGE_VALUE
+    CHANGE_KEY
 };
 
 #include "key.h"
@@ -122,7 +122,7 @@ public:
 
     void updateMaxRelFrameFromKey() {
         if(mMaxKey == NULL) {
-            mMaxRelFrame = INT_MIN;
+            mMaxRelFrame = INT_MAX ;
         } else {
             mMaxRelFrame = mMaxKey->getRelFrame();
         }
@@ -202,6 +202,7 @@ public:
     BoundingBoxRenderContainer *createNewRenderContainerAtRelFrame(
                                 const int &frame) {
         BoundingBoxRenderContainer *cont = new BoundingBoxRenderContainer();
+        cont->setFrame(frame);
         cont->incNumberPointers();
         if(mInternalDifferences) {
             int contId = getRenderContainterInsertIdAtRelFrame(frame);
@@ -268,8 +269,8 @@ private:
     int mMinRelFrame;
     int mMaxRelFrame;
 
-    Key *mMinKey;
-    Key *mMaxKey;
+    Key *mMinKey = NULL;
+    Key *mMaxKey = NULL;
 };
 
 #include "Animators/complexanimator.h"
@@ -279,52 +280,131 @@ public:
         mInfluenceRange << new InfluenceRange(NULL, NULL);
     }
 
-    InfluenceRange *getInfluenceRangeContainingRelFrame(
-                                        const int &relFrame) {
-        int minId = 0;
-        int maxId = mInfluenceRange.count() - 1;
+    void applyChanges() {
+        foreach(const InfluenceRangeChange &change, mInfluenceRangeRemovals) {
+            applyChange(change);
+        }
+        mInfluenceRangeRemovals.clear();
+        foreach(const InfluenceRangeChange &change, mInfluenceRangeAdds) {
+            applyChange(change);
+        }
+        mInfluenceRangeAdds.clear();
+        foreach(const InfluenceRangeChange &change, mInfluenceRangeValueChanges) {
+            applyChange(change);
+        }
+        mInfluenceRangeValueChanges.clear();
 
-        while(minId < maxId) {
-            int guess = (minId + maxId)/2;
-            if(guess == maxId) { guess = minId; }
-            else if(guess == minId) { guess = maxId; }
-            InfluenceRange *guessRange = mInfluenceRange.at(guess);
-            if(guessRange->relFrameInRange(relFrame)) return guessRange;
+        foreach(InfluenceRange *rangeNeedingUpdate, mRangesNeedingUpdate) {
+            rangeNeedingUpdate->updateAfterKeysChanged();
+            rangeNeedingUpdate->clearCache();
+        }
+        mRangesNeedingUpdate.clear();
+    }
 
-            if(guessRange->getMinRelFrame() > relFrame) {
-                maxId = guess;
-            } else {
-                minId = guess;
-            }
+    void addInfluenceRangeChange(const InfluenceRangeChange &change) {
+        if(change.type == ADD_KEY) {
+            mInfluenceRangeAdds << change;
+        } else if(change.type == REMOVE_KEY) {
+            mInfluenceRangeRemovals << change;
+        } else if(change.type == CHANGE_KEY) {
+            mInfluenceRangeValueChanges << change;
         }
     }
 
-    void updateCurrentRenderContainerFromRelFrame() {
+    BoundingBoxRenderContainer *getRenderContainerAtRelFrame(
+                                    const int &frame) {
+        return getInfluenceRangeContainingRelFrame(frame)->
+                getRenderContainerAtRelFrame(frame);
+    }
+
+    BoundingBoxRenderContainer *createNewRenderContainerAtRelFrame(
+                                    const int &frame) {
+        return getInfluenceRangeContainingRelFrame(frame)->
+                createNewRenderContainerAtRelFrame(frame);
+    }
+
+    void clearAllCache() {
+        foreach(InfluenceRange *range, mInfluenceRange) {
+            range->clearCache();
+        }
+    }
+
+    void addRangeNeedingUpdate(const int &min, const int &max) {
+        InfluenceRange *first = getInfluenceRangeContainingRelFrame(min);
+        addRangeNeedingUpdate(first);
+        int currId = mInfluenceRange.indexOf(first) + 1;
+        while(currId < mInfluenceRange.count()) {
+            InfluenceRange *nextRange = mInfluenceRange.at(currId);
+            if(nextRange->getMinRelFrame() > max) return;
+            addRangeNeedingUpdate(nextRange);
+            currId++;
+        }
+    }
+
+    void addAddedKey(Key *key) {
+        addInfluenceRangeChange(InfluenceRangeChange(ADD_KEY, key));
+    }
+
+    void addRemovedKey(Key *key) {
+        addInfluenceRangeChange(InfluenceRangeChange(REMOVE_KEY,
+                                                     key->getRelFrame()));
+    }
+
+    void addChangedKey(Key *key) {
+        addInfluenceRangeChange(InfluenceRangeChange(CHANGE_KEY,
+                                                     key->getRelFrame()));
+    }
+
+    void updateCurrentRenderContainerFromFrame(const int &relFrame) {
+        BoundingBoxRenderContainer *contAtFrame =
+                        getRenderContainerAtRelFrame(relFrame);
+        if(contAtFrame == NULL) {
+            setCurrentRenderContainerVar(
+                createNewRenderContainerAtRelFrame(relFrame));
+        } else {
+            setCurrentRenderContainerVar(contAtFrame);
+        }
+    }
+
+    bool updateCurrentRenderContainerFromFrameIfNotNull(
+                                                const int &relFrame) {
+        BoundingBoxRenderContainer *cont =
+                        getRenderContainerAtRelFrame(relFrame);
+        if(cont != NULL) {
+            setCurrentRenderContainerVar(cont);
+            return true;
+        }
+        return false;
+    }
+
+    void duplicateCurrentRenderContainerFrom(
+            BoundingBoxRenderContainer *cont) {
+        mCurrentRenderContainer->duplicateFrom(cont);
+    }
+
+    void updateCurrentRenderContainerTransform(const QMatrix &trans) {
+        if(mCurrentRenderContainer == NULL) return;
+        mCurrentRenderContainer->
+                updatePaintTransformGivenNewCombinedTransform(trans);
+    }
+
+    void drawCurrentRenderContainer(QPainter *p) {
+        if(mCurrentRenderContainer == NULL) return;
+        mCurrentRenderContainer->draw(p);
+    }
+
+private:
+    void setCurrentRenderContainerVar(BoundingBoxRenderContainer *cont) {
         if(mCurrentRenderContainer != NULL) {
             mCurrentRenderContainer->decNumberPointers();
         }
-        mCurrentRenderContainer =
-                mCurrentInfluenceRange->
-                    getRenderContainerAtRelFrame(mCurrentRelFrame);
-        mCurrentRenderContainer->incNumberPointers();
-    }
-
-    void updateCurrentInfluenceRangeFromRelFrame() {
-        if(mCurrentInfluenceRange != NULL) {
-            if(mCurrentInfluenceRange->relFrameInRange(mCurrentRelFrame)) {
-                return;
-            }
+        mCurrentRenderContainer = cont;
+        if(mCurrentRenderContainer != NULL) {
+            mCurrentRenderContainer->incNumberPointers();
         }
-        mCurrentInfluenceRange =
-                getInfluenceRangeContainingRelFrame(mCurrentRelFrame);
     }
 
-    void setCurrentRelFrame(const int &relFrame) {
-        mCurrentRelFrame = relFrame;
-        updateCurrentInfluenceRangeFromRelFrame();
-        updateCurrentRenderContainerFromRelFrame();
-    }
-
+    BoundingBoxRenderContainer *mCurrentRenderContainer = NULL;
     void divideInfluenceRangeAtRelFrame(const int &divideRelFrame,
                                         Key *newKey) {
         InfluenceRange *oldRange =
@@ -334,13 +414,11 @@ public:
 
     void divideInfluenceRange(InfluenceRange *oldRange,
                               Key *newKey) {
-        if(oldRange == mCurrentInfluenceRange) {
-            mCurrentInfluenceRange = NULL;
-        }
         int oldId = mInfluenceRange.indexOf(oldRange);
         Key *minKey = oldRange->getMinKey();
         Key *maxKey = oldRange->getMaxKey();
         removeRangeNeedingUpdate(oldRange);
+        removeInfluenceRangeFromList(oldRange);
         InfluenceRange *range1 = new InfluenceRange(minKey,
                                                     newKey,
                                                     oldRange->getMinRelFrame(),
@@ -363,15 +441,9 @@ public:
         prevRange->setMaxKeyTMP(nextRange->getMinKey());
         removeInfluenceRangeFromList(nextRange);
         removeRangeNeedingUpdate(nextRange);
+        addRangeNeedingUpdate(prevRange);
         delete nextRange;
     }
-
-//    void moveInfluenceRangesBarrier(InfluenceRange *prevRange,
-//                                    InfluenceRange *nextRange,
-//                                    const int &moveBy) {
-//        prevRange->setMaxRelFrame(prevRange->getMaxRelFrame() + moveBy);
-//        nextRange->setMinRelFrame(nextRange->getMinRelFrame() + moveBy);
-//    }
 
     void getInfluenceRangesWithBarrierAtRelFrame(
                             InfluenceRange **prevRange,
@@ -390,52 +462,50 @@ public:
         mergeInfluenceRanges(prevRange, nextRange);
     }
 
-    BoundingBoxRenderContainer *getCurrentRenderContainer() {
-        return mCurrentRenderContainer;
+    void updateAfterBarrierValueChanged(const int &barrierRelFrame) {
+        if(mInfluenceRange.count() == 1) {
+            addRangeNeedingUpdate(mInfluenceRange.first());
+        } else {
+            InfluenceRange *prevRange;
+            InfluenceRange *nextRange;
+            getInfluenceRangesWithBarrierAtRelFrame(&prevRange,
+                                                    &nextRange,
+                                                    barrierRelFrame);
+            addRangeNeedingUpdate(prevRange);
+            addRangeNeedingUpdate(nextRange);
+        }
     }
 
-    int getRenderContainterInsertIdForInfluenceRange(InfluenceRange *range) {
+    InfluenceRange *getInfluenceRangeContainingRelFrame(
+                                        const int &relFrame) {
         int minId = 0;
         int maxId = mInfluenceRange.count() - 1;
 
+        if(relFrame == INT_MIN) {
+            return mInfluenceRange.first();
+        } else if(relFrame == INT_MAX) {
+            return mInfluenceRange.last();
+        }
+
         while(minId < maxId) {
             int guess = (minId + maxId)/2;
-            if(guess == maxId) {
-                guess = minId;
-            } else if(guess == minId) {
-                guess = maxId;
-            }
-            InfluenceRange *cont = mInfluenceRange.at(guess);
-            if(cont->getMinRelFrame() > range->getMaxRelFrame()) {
+
+            InfluenceRange *guessRange = mInfluenceRange.at(guess);
+            if(guessRange->relFrameInRange(relFrame)) return guessRange;
+
+            if(guessRange->getMinRelFrame() > relFrame) {
+                if(maxId == guess) return mInfluenceRange.at(minId);
                 maxId = guess;
-            } else if(cont->getMaxRelFrame() < range->getMinRelFrame()) {
-                minId = guess;
             } else {
-                return guess;
+                if(minId == guess) return mInfluenceRange.at(maxId);
+                minId = guess;
             }
         }
-        return 0;
-    }
-
-    void addInfluenceRange(InfluenceRange *range) {
-        mInfluenceRange.insert(
-                    getRenderContainterInsertIdForInfluenceRange(range),
-                    range);
+        return mInfluenceRange.first();
     }
 
     void removeInfluenceRangeFromList(InfluenceRange *range) {
-        if(mCurrentInfluenceRange == range) mCurrentInfluenceRange = NULL;
         mInfluenceRange.removeOne(range);
-    }
-
-    void updateAfterBarrierValueChanged(const int &barrierRelFrame) {
-        InfluenceRange *prevRange;
-        InfluenceRange *nextRange;
-        getInfluenceRangesWithBarrierAtRelFrame(&prevRange,
-                                                &nextRange,
-                                                barrierRelFrame);
-        addRangeNeedingUpdate(prevRange);
-        addRangeNeedingUpdate(nextRange);
     }
 
     void applyChange(const InfluenceRangeChange &change) {
@@ -443,32 +513,9 @@ public:
             removeRangesBarrierAtRelFrame(change.relFrame);
         } else if(change.type == ADD_KEY) {
             divideInfluenceRangeAtRelFrame(change.relFrame, change.key);
-        } else if(change.type == CHANGE_VALUE) {
+        } else if(change.type == CHANGE_KEY) {
             updateAfterBarrierValueChanged(change.relFrame);
         }
-    }
-
-    void applyChanges() {
-        foreach(const InfluenceRangeChange &change, mInfluenceRangeRemovals) {
-            applyChange(change);
-        }
-        mInfluenceRangeRemovals.clear();
-        foreach(const InfluenceRangeChange &change, mInfluenceRangeAdds) {
-            applyChange(change);
-        }
-        mInfluenceRangeAdds.clear();
-        foreach(const InfluenceRangeChange &change, mInfluenceRangeValueChanges) {
-            applyChange(change);
-        }
-        mInfluenceRangeValueChanges.clear();
-
-        foreach(InfluenceRange *rangeNeedingUpdate, mRangesNeedingUpdate) {
-            rangeNeedingUpdate->updateAfterKeysChanged();
-        }
-        mRangesNeedingUpdate.clear();
-
-        updateCurrentInfluenceRangeFromRelFrame();
-        updateCurrentRenderContainerFromRelFrame();
     }
 
     void removeRangeNeedingUpdate(InfluenceRange *range) {
@@ -480,25 +527,12 @@ public:
         mRangesNeedingUpdate << range;
     }
 
-    void addInfluenceRangeChange(const InfluenceRangeChange &change) {
-        if(change.type == ADD_KEY) {
-            mInfluenceRangeAdds << change;
-        } else if(change.type == REMOVE_KEY) {
-            mInfluenceRangeRemovals << change;
-        } else if(change.type == CHANGE_VALUE) {
-            mInfluenceRangeValueChanges << change;
-        }
-    }
-
-private:
     QList<InfluenceRangeChange> mInfluenceRangeRemovals;
     QList<InfluenceRangeChange> mInfluenceRangeAdds;
     QList<InfluenceRangeChange> mInfluenceRangeValueChanges;
+
     QList<InfluenceRange*> mRangesNeedingUpdate;
 
-    int mCurrentRelFrame = 0;
-    InfluenceRange *mCurrentInfluenceRange = NULL;
-    BoundingBoxRenderContainer *mCurrentRenderContainer = NULL;
     QList<InfluenceRange*> mInfluenceRange;
 };
 

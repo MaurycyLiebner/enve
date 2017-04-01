@@ -156,7 +156,7 @@ void Key::scaleFrameAndUpdateParentAnimator(
             qRound(mSavedRelFrame +
                   (mSavedRelFrame -
                    mParentAnimator->
-                   anim_absFrameToRelFrame(relativeToFrame))*
+                   prp_absFrameToRelFrame(relativeToFrame))*
                    scaleFactor);
     if(newFrame == mRelFrame) return;
     incFrameAndUpdateParentAnimator(newFrame - mRelFrame);
@@ -175,7 +175,7 @@ void Key::finishFrameTransform()
 }
 
 int Key::getAbsFrame() {
-    return mParentAnimator->anim_relFrameToAbsFrame(mRelFrame);
+    return mParentAnimator->prp_relFrameToAbsFrame(mRelFrame);
 }
 
 int Key::getRelFrame() {
@@ -190,5 +190,5 @@ void Key::setRelFrame(int frame) {
 }
 
 void Key::setAbsFrame(const int &frame) {
-    setRelFrame(mParentAnimator->anim_absFrameToRelFrame(frame));
+    setRelFrame(mParentAnimator->prp_absFrameToRelFrame(frame));
 }

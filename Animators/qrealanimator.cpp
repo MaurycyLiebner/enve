@@ -161,7 +161,7 @@ qreal QrealAnimator::getCurrentValueAtAbsFrame(const int &frame) const {
 }
 
 qreal QrealAnimator::qra_getValueAtAbsFrame(int frame) const {
-    return qra_getValueAtRelFrame(anim_absFrameToRelFrame(frame));
+    return qra_getValueAtRelFrame(prp_absFrameToRelFrame(frame));
 }
 
 QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
@@ -294,9 +294,7 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
     QrealKey *keyAtFrame = (QrealKey*)anim_getKeyAtAbsFrame(
                                             anim_mCurrentAbsFrame);
     if(keyAtFrame == NULL) {
-        keyAtFrame = new QrealKey(this);
-        keyAtFrame->setRelFrame(anim_mCurrentRelFrame);
-        keyAtFrame->setValue(mCurrentValue);
+        keyAtFrame = new QrealKey(anim_mCurrentRelFrame, mCurrentValue, this);
         anim_appendKey(keyAtFrame);
         qra_updateKeysPath();
     } else {
@@ -575,6 +573,8 @@ void QrealAnimator::prp_finishTransform() {
                                                  this) );
         if(anim_mIsRecording) {
             anim_saveCurrentValueAsKey();
+        } else {
+            prp_updateAfterChangedAbsFrameRange(INT_MIN, INT_MAX);
         }
         mTransformed = false;
 

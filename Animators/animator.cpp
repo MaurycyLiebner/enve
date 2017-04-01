@@ -18,6 +18,30 @@ Animator::~Animator() {
     }
 }
 
+int Animator::anim_getNextKeyRelFrame(Key *key) {
+    if(key == NULL) return INT_MAX;
+    Key *nextKey = key->getNextKey();
+    if(nextKey == NULL) {
+        return INT_MAX;
+    }
+    return nextKey->getRelFrame();
+}
+
+int Animator::anim_getPrevKeyRelFrame(Key *key) {
+    if(key == NULL) return INT_MIN;
+    Key *prevKey = key->getPrevKey();
+    if(prevKey == NULL) {
+        return INT_MIN;
+    }
+    return prevKey->getRelFrame();
+}
+
+void Animator::anim_updateAfterChangedKey(Key *key) {
+    if(anim_mIsComplexAnimator) return;
+    prp_updateAfterChangedRelFrameRange(anim_getPrevKeyRelFrame(key),
+                                        anim_getNextKeyRelFrame(key));
+}
+
 void Animator::prp_setAbsFrame(int frame) {
     anim_mCurrentAbsFrame = frame;
     anim_updateRelFrame();
@@ -27,32 +51,11 @@ void Animator::prp_setAbsFrame(int frame) {
 
 void Animator::anim_updateRelFrame() {
     anim_mCurrentRelFrame = anim_mCurrentAbsFrame -
-                            anim_getFrameShift();
-}
-
-int Animator::anim_absFrameToRelFrame(
-                            const int &absFrame) const {
-    return absFrame - anim_getFrameShift();
-}
-
-int Animator::anim_relFrameToAbsFrame(
-                            const int &relFrame) const {
-    return relFrame + anim_getFrameShift();
+                            prp_getFrameShift();
 }
 
 void Animator::prp_switchRecording() {
     prp_setRecording(!anim_mIsRecording);
-}
-
-int Animator::anim_getFrameShift() const {
-    return anim_getParentFrameShift();
-}
-
-int Animator::anim_getParentFrameShift() const {
-    if(prp_mParentAnimator == NULL) {
-        return 0;
-    }
-    return prp_mParentAnimator->anim_getFrameShift();
 }
 
 void Animator::anim_mergeKeysIfNeeded() {
@@ -77,7 +80,7 @@ void Animator::anim_mergeKeysIfNeeded() {
 }
 
 Key *Animator::anim_getKeyAtAbsFrame(const int &frame) {
-    return anim_getKeyAtRelFrame(anim_absFrameToRelFrame(frame));
+    return anim_getKeyAtRelFrame(prp_absFrameToRelFrame(frame));
 }
 
 Key *Animator::anim_getNextKey(Key *key) {
@@ -184,33 +187,36 @@ void Animator::anim_appendKey(Key *newKey,
     }
 
     anim_updateKeyOnCurrrentFrame();
+
+    anim_updateAfterChangedKey(newKey);
 }
 
 void Animator::anim_removeKey(Key *keyToRemove,
                               bool saveUndoRedo) {
-    if(anim_mKeys.removeOne(keyToRemove) ) {
+    anim_updateAfterChangedKey(keyToRemove);
+    anim_mKeys.removeOne(keyToRemove);
 
-        if(saveUndoRedo && !anim_isComplexAnimator()) {
-            addUndoRedo(new RemoveKeyFromAnimatorUndoRedo(
-                                    keyToRemove, this));
-        }
-
-        if(prp_mParentAnimator != NULL) {
-            prp_mParentAnimator->ca_removeDescendantsKey(keyToRemove);
-        }
-        keyToRemove->decNumberPointers();
-        anim_sortKeys();
-
-        if(anim_mIsCurrentAnimator) {
-            graphScheduleUpdateAfterKeysChanged();
-        }
-
-        anim_updateKeyOnCurrrentFrame();
+    if(saveUndoRedo && !anim_isComplexAnimator()) {
+        addUndoRedo(new RemoveKeyFromAnimatorUndoRedo(
+                                keyToRemove, this));
     }
+
+    if(prp_mParentAnimator != NULL) {
+        prp_mParentAnimator->ca_removeDescendantsKey(keyToRemove);
+    }
+    keyToRemove->decNumberPointers();
+    anim_sortKeys();
+
+    if(anim_mIsCurrentAnimator) {
+        graphScheduleUpdateAfterKeysChanged();
+    }
+
+    anim_updateKeyOnCurrrentFrame();
 }
 
 void Animator::anim_moveKeyToFrame(Key *key,
-                                        int newFrame) {
+                                   int newFrame) {
+    anim_updateAfterChangedKey(key);
     if(prp_mParentAnimator != NULL) {
         prp_mParentAnimator->ca_removeDescendantsKey(key);
     }
@@ -220,6 +226,11 @@ void Animator::anim_moveKeyToFrame(Key *key,
     }
     anim_sortKeys();
     anim_updateKeyOnCurrrentFrame();
+    anim_updateAfterChangedKey(key);
+}
+
+void Animator::anim_keyValueChanged(Key *key) {
+    anim_updateAfterChangedKey(key);
 }
 
 void Animator::anim_updateKeyOnCurrrentFrame() {
@@ -232,12 +243,12 @@ void Animator::anim_updateKeyOnCurrrentFrame() {
 Key *Animator::prp_getKeyAtPos(qreal relX,
                                int minViewedFrame,
                                qreal pixelsPerFrame) {
-    qreal relFrame = relX/pixelsPerFrame - anim_getFrameShift();
+    qreal relFrame = relX/pixelsPerFrame - prp_getFrameShift();
     qreal pressFrame = relFrame + minViewedFrame;
     if(pixelsPerFrame > KEY_RECT_SIZE) {
         int relFrameInt = relFrame;
         if( qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX +
-                 anim_getFrameShift()*pixelsPerFrame) > KEY_RECT_SIZE*0.5) {
+                 prp_getFrameShift()*pixelsPerFrame) > KEY_RECT_SIZE*0.5) {
             return NULL;
         }
     }

@@ -42,8 +42,8 @@ void BoxesGroup::updateCombinedTransformTmp() {
         child->updateCombinedTransformTmp();
     }
     if(!mIsDescendantCurrentGroup) {
-        mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
-                                                mCombinedTransformMatrix);
+        mInfluenceRangeHandler.updateCurrentRenderContainerTransform(
+                                    mCombinedTransformMatrix);
     }
 }
 
@@ -150,11 +150,11 @@ bool BoxesGroup::relPointInsidePath(QPointF relPos) {
 
 void BoxesGroup::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    BoundingBoxRenderContainer *cont =
-                    getRenderContainerAtFrame(currentFrame);
-    if(cont != NULL) {
-        mOldRenderContainer = cont;
-        mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+
+    bool notNull = mInfluenceRangeHandler.
+            updateCurrentRenderContainerFromFrameIfNotNull(currentFrame);
+    if(notNull) {
+        mInfluenceRangeHandler.updateCurrentRenderContainerTransform(
                                         mCombinedTransformMatrix);
         if(getParentCanvas()->isPreviewing()) return;
     }

@@ -34,7 +34,7 @@ public:
     void updateFinalDataIfNeeded(const qreal &fps,
                                  const int &minFrame,
                                  const int &maxFrame);
-    int anim_getFrameShift() const;
+    int prp_getFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,

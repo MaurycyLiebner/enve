@@ -16,6 +16,9 @@ enum QrealPointType : short;
 class QrealKey : public Key {
 public:
     QrealKey(QrealAnimator *parentAnimator);
+    QrealKey(const int &frame,
+             const qreal &val,
+             QrealAnimator *parentAnimator);
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~QrealKey();

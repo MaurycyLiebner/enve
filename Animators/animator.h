@@ -17,6 +17,8 @@ public:
     Animator();
     ~Animator();
 
+    void anim_updateAfterChangedKey(Key *key);
+
     virtual void prp_setAbsFrame(int frame);
 
     virtual void prp_switchRecording();
@@ -28,12 +30,7 @@ public:
     virtual bool prp_isAnimator() { return true; }
     virtual void prp_startDragging() {}
 
-    virtual int anim_getFrameShift() const;
-    virtual int anim_getParentFrameShift() const;
-
     void anim_updateRelFrame();
-    int anim_absFrameToRelFrame(const int &absFrame) const;
-    int anim_relFrameToAbsFrame(const int &relFrame) const;
     virtual void anim_mergeKeysIfNeeded();
     int anim_getClosestsKeyOccupiedRelFrame(const int &frame);
     Key *anim_getKeyAtRelFrame(const int &frame);
@@ -47,6 +44,9 @@ public:
     virtual void anim_removeKey(Key *keyToRemove,
                                 bool saveUndoRedo = true);
     virtual void anim_moveKeyToFrame(Key *key, int newFrame);
+
+    virtual void anim_keyValueChanged(Key *key);
+
     void anim_updateKeyOnCurrrentFrame();
     void anim_setTraceKeyOnCurrentFrame(bool bT) {
         anim_mTraceKeyOnCurrentFrame = bT;
@@ -90,6 +90,8 @@ public:
 
     Key *anim_getNextKey(Key *key);
     Key *anim_getPrevKey(Key *key);
+    int anim_getNextKeyRelFrame(Key *key);
+    int anim_getPrevKeyRelFrame(Key *key);
 protected:
     virtual void anim_drawKey(QPainter *p,
                          Key *key,

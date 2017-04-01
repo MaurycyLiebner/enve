@@ -414,8 +414,8 @@ public:
     Key *getKeyAtPos(const qreal &relX,
                      const int &minViewedFrame,
                      const qreal &pixelsPerFrame);
-    int anim_getFrameShift() const;
-    int anim_getParentFrameShift() const;
+    int prp_getFrameShift() const;
+    int prp_getParentFrameShift() const;
 
     void setDurationRectangle(DurationRectangle *durationRect);
 
@@ -434,6 +434,13 @@ public:
     void setSqlId(int id) {
         mSqlId = id;
     }
+    void clearAllCache();
+
+    void ca_addDescendantsKey(Key *key);
+    void ca_removeDescendantsKey(Key *key);
+
+    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                             const int &maxFrame);
 protected:
     InfluenceRangeHandler mInfluenceRangeHandler;
 
@@ -454,15 +461,11 @@ protected:
 
     virtual void updateAfterCombinedTransformationChanged() {}
 
-    std::unordered_map<int, BoundingBoxRenderContainer*> mRenderContainers;
-
     BoundingBoxRenderContainer *getRenderContainerAtFrame(
                                     const int &frame);
 
     BoundingBoxRenderContainer *mUpdateRenderContainer =
             new BoundingBoxRenderContainer();
-
-    BoundingBoxRenderContainer *mOldRenderContainer = mUpdateRenderContainer;
 
     QMatrix mRelativeTransformMatrix;
 

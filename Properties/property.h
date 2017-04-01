@@ -22,6 +22,35 @@ public:
     Property();
     virtual ~Property() {}
 
+    virtual void prp_valueChanged();
+
+    virtual int prp_getFrameShift() const;
+    virtual int prp_getParentFrameShift() const;
+
+    virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                                     const int &maxFrame);
+
+    virtual void prp_updateAfterChangedRelFrameRange(const int &minFrame,
+                                                     const int &maxFrame) {
+        int minFrameT;
+        if(minFrame == INT_MIN) {
+            minFrameT = minFrame;
+        } else {
+            minFrameT = prp_relFrameToAbsFrame(minFrame);
+        }
+        int maxFrameT;
+        if(maxFrame == INT_MAX) {
+            maxFrameT = maxFrame;
+        } else {
+            maxFrameT = prp_relFrameToAbsFrame(maxFrame);
+        }
+        prp_updateAfterChangedAbsFrameRange(minFrameT,
+                                            maxFrameT);
+    }
+
+    int prp_absFrameToRelFrame(const int &absFrame) const;
+    int prp_relFrameToAbsFrame(const int &relFrame) const;
+
     virtual void prp_drawKeys(QPainter *p,
                               qreal pixelsPerFrame, qreal drawY,
                               int startFrame, int endFrame) {

@@ -11,9 +11,8 @@ public:
     ComplexAnimator();
     ~ComplexAnimator();
 
-    void ca_addDescendantsKey(Key *key);
-
-    void ca_removeDescendantsKey(Key *key);
+    virtual void ca_addDescendantsKey(Key *key);
+    virtual void ca_removeDescendantsKey(Key *key);
 
     void ca_addChildAnimator(Property *childAnimator);
     void ca_removeChildAnimator(Property *removeAnimator);

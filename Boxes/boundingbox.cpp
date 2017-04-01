@@ -40,14 +40,64 @@ BoundingBox::BoundingBox(BoundingBoxType type) :
 }
 
 BoundingBox::~BoundingBox() {
-    delete mOldRenderContainer;
     delete mUpdateRenderContainer;
+}
+
+void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                                      const int &maxFrame) {
+    int minRelFrame;
+    if(minFrame == INT_MIN) {
+        minRelFrame = INT_MIN;
+    } else {
+        minRelFrame = prp_absFrameToRelFrame(minFrame);
+    }
+    int maxRelFrame;
+    if(maxFrame == INT_MAX) {
+        maxRelFrame = INT_MAX;
+    } else {
+        maxRelFrame = prp_absFrameToRelFrame(maxFrame);
+    }
+    mInfluenceRangeHandler.addRangeNeedingUpdate(minRelFrame, maxRelFrame);
 }
 
 void BoundingBox::ca_childAnimatorIsRecordingChanged() {
     ComplexAnimator::ca_childAnimatorIsRecordingChanged();
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Animated);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_NotAnimated);
+}
+
+void BoundingBox::ca_addDescendantsKey(Key *key) {
+    if(mNoCache) {
+        ComplexAnimator::ca_addDescendantsKey(key);
+    } else {
+        ComplexKey *collection =
+                ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());
+        if(collection == NULL) {
+            collection = new ComplexKey(this);
+            collection->setAbsFrame(key->getAbsFrame());
+            anim_appendKey(collection);
+            mInfluenceRangeHandler.addAddedKey(collection);
+        } else {
+            mInfluenceRangeHandler.addChangedKey(collection);
+        }
+        collection->addAnimatorKey(key);
+    }
+}
+
+void BoundingBox::ca_removeDescendantsKey(Key *key) {
+    if(mNoCache) {
+        ComplexAnimator::ca_removeDescendantsKey(key);
+    } else {
+        ComplexKey *collection = key->getParentKey();
+        if(collection == NULL) return;
+        collection->removeAnimatorKey(key);
+        if(collection->isEmpty() ) {
+            mInfluenceRangeHandler.addRemovedKey(collection);
+            anim_removeKey(collection);
+        } else {
+            mInfluenceRangeHandler.addChangedKey(collection);
+        }
+    }
 }
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
@@ -117,11 +167,7 @@ void BoundingBox::applyEffects(QImage *im,
 
 BoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
                                                 const int &frame) {
-    auto searchFrame = mRenderContainers.find(frame);
-    if(searchFrame == mRenderContainers.end()) {
-        return NULL;
-    }
-    return searchFrame->second;
+    return mInfluenceRangeHandler.getRenderContainerAtRelFrame(frame);
 }
 
 
@@ -298,14 +344,13 @@ void BoundingBox::updateAllBoxes() {
     scheduleUpdate();
 }
 
+void BoundingBox::clearAllCache() {
+    mInfluenceRangeHandler.clearAllCache();
+}
+
 void BoundingBox::clearCache() {
-    for(auto cont : mRenderContainers) {
-        if((BoundingBoxRenderContainer*)cont.second == mOldRenderContainer) {
-            continue;
-        }
-        delete cont.second;
-    }
-    mRenderContainers.clear();
+    return;
+    mInfluenceRangeHandler.clearAllCache();
 
     if(mParent == NULL) return;
     mParent->BoundingBox::clearCache();
@@ -444,7 +489,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
         p->save();
         p->setCompositionMode(mCompositionMode);
         p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
-        mOldRenderContainer->draw(p);
+        mInfluenceRangeHandler.drawCurrentRenderContainer(p);
         p->restore();
     }
 }
@@ -491,7 +536,7 @@ void BoundingBox::resetRotation() {
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
     mCurrentAbsFrame = currentFrame;
-    mCurrentRelFrame = mCurrentAbsFrame - anim_getFrameShift();
+    mCurrentRelFrame = mCurrentAbsFrame - prp_getFrameShift();
     prp_setAbsFrame(currentFrame);
 }
 
@@ -800,8 +845,8 @@ void BoundingBox::updateCombinedTransformTmp() {
     if(mAwaitingUpdate) {
         mCombinedTransformMatrix = mRelativeTransformMatrix*
                                    mParent->getCombinedTransform();
-        mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
-                                                mCombinedTransformMatrix);
+        mInfluenceRangeHandler.updateCurrentRenderContainerTransform(
+                                    mCombinedTransformMatrix);
     } else {
         updateCombinedTransform();
     }
@@ -875,19 +920,19 @@ Key *BoundingBox::getKeyAtPos(const qreal &relX,
                                      pixelsPerFrame);
 }
 
-int BoundingBox::anim_getParentFrameShift() const {
+int BoundingBox::prp_getParentFrameShift() const {
     if(mParent == NULL) {
         return 0;
     } else {
-        return mParent->anim_getFrameShift();
+        return mParent->prp_getFrameShift();
     }
 }
 
-int BoundingBox::anim_getFrameShift() const {
+int BoundingBox::prp_getFrameShift() const {
     if(mDurationRectangle == NULL) {
-        return anim_getParentFrameShift();
+        return prp_getParentFrameShift();
     } else {
-        return mDurationRectangle->getFramePos() + anim_getParentFrameShift();
+        return mDurationRectangle->getFramePos() + prp_getParentFrameShift();
     }
 }
 
@@ -1127,7 +1172,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 
 void BoundingBox::beforeUpdate() {
     qDebug() << "before update " + prp_mName;
-
+    mInfluenceRangeHandler.applyChanges();
     setUpdateVars();
 //    if(!mUpdateReplaceCache) {
 //        BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
@@ -1157,42 +1202,18 @@ void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
 
     if(mNoCache) {
-        mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
+        mInfluenceRangeHandler.duplicateCurrentRenderContainerFrom(
+                                            mUpdateRenderContainer);
     } else {
-//        for(auto pair : mRenderContainers) {
-//            delete pair.second;
-//        }
-
-//        mRenderContainers.clear();
-
-
-        BoundingBoxRenderContainer *contAtFrame = getRenderContainerAtFrame(
+        mInfluenceRangeHandler.updateCurrentRenderContainerFromFrame(
                                                     mUpdateRelFrame);
         if(mUpdateReplaceCache) {
-            if(contAtFrame == NULL) {
-                mOldRenderContainer = new BoundingBoxRenderContainer();
-                mRenderContainers.insert({mUpdateRelFrame, mOldRenderContainer});
-            } else {
-                mOldRenderContainer = contAtFrame;
-            }
-
-            mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-        } else if(contAtFrame != NULL) {
-            mOldRenderContainer = contAtFrame;
+            mInfluenceRangeHandler.duplicateCurrentRenderContainerFrom(
+                                            mUpdateRenderContainer);
         }
-//        if(!mUpdateReplaceCache) {
-//            mOldRenderContainer = getRenderContainerAtFrame(
-//                                            mUpdateFrame);
-//            if(mOldRenderContainer == NULL) {
-//                mOldRenderContainer = new BoundingBoxRenderContainer();
-//                mRenderContainers.insert({mUpdateFrame, mOldRenderContainer});
-//                mOldRenderContainer->duplicateFrom(mUpdateRenderContainer);
-//            }
-//        }
     }
-    mOldRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+    mInfluenceRangeHandler.updateCurrentRenderContainerTransform(
                                             mCombinedTransformMatrix);
-    //updateUglyPaintTransform();
 }
 
 void BoundingBox::setUpdateVars() {

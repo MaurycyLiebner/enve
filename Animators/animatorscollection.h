@@ -10,7 +10,7 @@ public:
 //    void updateKeysPath();
 //    void sortKeys();
     void ca_childAnimatorIsRecordingChanged();
-    int anim_getParentFrameShift() const;
+    int prp_getParentFrameShift() const;
 private:
     BoundingBox *mParentBox;
     //QList<QrealAnimator*> mChildAnimators;

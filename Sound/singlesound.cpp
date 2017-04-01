@@ -291,11 +291,11 @@ void SingleSound::prepareFinalData(const qreal &fps,
     }
 }
 
-int SingleSound::anim_getFrameShift() const {
+int SingleSound::prp_getFrameShift() const {
     if(mOwnDurationRectangle) {
-        return mDurationRectangle->getFramePos() + Animator::anim_getFrameShift();
+        return mDurationRectangle->getFramePos() + Animator::prp_getFrameShift();
     }
-    return Animator::anim_getFrameShift();
+    return Animator::prp_getFrameShift();
 }
 
 #include "BoxesList/boxscrollwidgetvisiblepart.h"

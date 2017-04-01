@@ -18,6 +18,23 @@ QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     mEndPoint->incNumberPointers();
 }
 
+QrealKey::QrealKey(const int &frame,
+                   const qreal &val,
+                   QrealAnimator *parentAnimator) :
+    Key(parentAnimator) {
+    mValue = val;
+    mRelFrame = frame;
+    mEndFrame = mRelFrame + 5;
+    mStartFrame = mRelFrame - 5;
+    mStartValue = mValue;
+    mEndValue = mValue;
+
+    mStartPoint = new QrealPoint(START_POINT, this, 7.5);
+    mStartPoint->incNumberPointers();
+    mEndPoint = new QrealPoint(END_POINT, this, 7.5);
+    mEndPoint->incNumberPointers();
+}
+
 QrealKey::~QrealKey() {
     mStartPoint->decNumberPointers();
     mEndPoint->decNumberPointers();
@@ -269,6 +286,7 @@ void QrealKey::setValue(qreal value, bool saveUndoRedo) {
         }
     }
     mValue = value;
+    mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
 void QrealKey::incFrameAndUpdateParentAnimator(int inc) {
