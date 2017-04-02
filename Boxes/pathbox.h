@@ -96,15 +96,7 @@ public:
     void prp_makeDuplicate(Property *targetBox);
 
     virtual void drawHovered(QPainter *p) {
-        p->save();
-        //p->setCompositionMode(QPainter::CompositionMode_Difference);
-        p->setTransform(QTransform(mCombinedTransformMatrix), true);
-        QPen pen = QPen(Qt::red, 1.);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        p->setBrush(Qt::NoBrush);
-        p->drawPath(mPath);
-        p->restore();
+        drawHoveredPath(p, mPath);
     }
 
     void applyPaintSetting(

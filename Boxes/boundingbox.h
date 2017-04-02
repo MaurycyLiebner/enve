@@ -357,13 +357,17 @@ public:
     }
 
     virtual void drawHovered(QPainter *p) {
+        drawHoveredPath(p, mRelBoundingRectPath);
+    }
+
+    void drawHoveredPath(QPainter *p, const QPainterPath &path) {
         p->save();
         p->setTransform(QTransform(mCombinedTransformMatrix), true);
         QPen pen = QPen(Qt::red, 1.);
         pen.setCosmetic(true);
         p->setPen(pen);
         p->setBrush(Qt::NoBrush);
-        p->drawPath(mRelBoundingRectPath);
+        p->drawPath(path);
         p->restore();
     }
 

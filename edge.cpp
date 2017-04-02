@@ -137,10 +137,17 @@ void Edge::generatePainterPath() {
 void Edge::drawHover(QPainter *p) {
     p->save();
     p->setBrush(Qt::NoBrush);
-    QPen pen = QPen(Qt::white, 2.);
+    //QPen pen = QPen(Qt::red, 2.);
+    //p->setCompositionMode(QPainter::CompositionMode_Difference);
+    //pen.setCosmetic(true);
+    //p->setPen(pen);
+    QPen pen = QPen(Qt::black, 2.5);
     pen.setCosmetic(true);
     p->setPen(pen);
-    p->setCompositionMode(QPainter::CompositionMode_Difference);
+    p->drawPath(mPath);
+    pen.setColor(Qt::red);
+    pen.setWidthF(1.25);
+    p->setPen(pen);
     p->drawPath(mPath);
     p->restore();
 }

@@ -21,6 +21,7 @@ protected:
 
     bool mHover = false;
     bool mChecked = false;
+    bool mCheckable = false;
 
     QImage mCheckedPixmap;
     QImage mNotCheckedPixmap;

@@ -11,13 +11,16 @@ ActionButton::ActionButton(const QString &notCheckedPix,
 }
 
 void ActionButton::setCheckable(const QString &checkedPix) {
+    mCheckable = true;
     mCheckedPixmap.load(checkedPix);
 }
 
 void ActionButton::mousePressEvent(QMouseEvent *) {
-    setChecked(!mChecked);
+    if(mCheckable) {
+        setChecked(!mChecked);
+        emit toggled(mChecked);
+    }
     emit pressed();
-    emit toggled(mChecked);
 }
 
 void ActionButton::enterEvent(QEvent *) {
