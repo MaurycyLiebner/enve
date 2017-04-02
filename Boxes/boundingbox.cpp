@@ -348,12 +348,11 @@ void BoundingBox::clearAllCache() {
     mRenderCacheHandler.clearAllCache();
 }
 
-void BoundingBox::clearCache() {
-    return;
-    mRenderCacheHandler.clearAllCache();
+void BoundingBox::replaceCurrentFrameCache() {
+    mReplaceCache = true;
 
     if(mParent == NULL) return;
-    mParent->BoundingBox::clearCache();
+    mParent->BoundingBox::replaceCurrentFrameCache();
     //scheduleUpdate();
 }
 
@@ -670,7 +669,7 @@ StrokeSettings *BoundingBox::getStrokeSettings() {
 
 void BoundingBox::drawAsBoundingRect(QPainter *p, QPainterPath path) {
     p->save();
-    QPen pen = QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine);
+    QPen pen = QPen(QColor(0, 0, 0, 125), 1., Qt::DashLine);
     pen.setCosmetic(true);
     p->setPen(pen);
     p->setBrush(Qt::NoBrush);
@@ -1195,7 +1194,7 @@ void BoundingBox::processUpdate() {
 
 void BoundingBox::setNoCache(const bool &bT) {
     mNoCache = bT;
-    clearCache();
+    replaceCurrentFrameCache();
 }
 
 void BoundingBox::afterUpdate() {
@@ -1223,7 +1222,9 @@ void BoundingBox::setUpdateVars() {
     mUpdateRelFrame = mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
-    mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL;
+    mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL ||
+                          mReplaceCache;
+    mReplaceCache = false;
 }
 
 bool BoundingBox::isUsedAsTarget() {

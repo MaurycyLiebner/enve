@@ -94,28 +94,28 @@ void TextBox::openTextEditor() {
 }
 
 void TextBox::setText(QString text) {
-    clearCache();
+    replaceCurrentFrameCache();
     mText = text;
     schedulePathUpdate();
 }
 
 void TextBox::setFont(QFont font)
 {
-    clearCache();
+    replaceCurrentFrameCache();
     mFont = font;
     schedulePathUpdate();
 }
 
 void TextBox::setSelectedFontSize(qreal size)
 {
-    clearCache();
+    replaceCurrentFrameCache();
     mFont.setPointSize(size);
     schedulePathUpdate();
 }
 
 void TextBox::setSelectedFontFamilyAndStyle(QString fontFamily, QString fontStyle)
 {
-    clearCache();
+    replaceCurrentFrameCache();
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);
     schedulePathUpdate();

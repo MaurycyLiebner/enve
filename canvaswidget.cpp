@@ -491,7 +491,7 @@ void CanvasWidget::setEffectsPaintEnabled(const bool &bT) {
 void CanvasWidget::setResolutionPercent(const qreal &percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionPercent(percent);
-    mCurrentCanvas->clearCache();
+    mCurrentCanvas->replaceCurrentFrameCache();
     mCurrentCanvas->updateAllBoxes();
     callUpdateSchedulers();
 }

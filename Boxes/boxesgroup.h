@@ -152,7 +152,7 @@ public:
             box->setStrokeColorMode(colorMode);
         }
     }
-    void clearCache();
+    void replaceCurrentFrameCache();
     void drawPixmap(QPainter *p);
     void setDescendantCurrentGroup(const bool &bT);
     bool isDescendantCurrentGroup();

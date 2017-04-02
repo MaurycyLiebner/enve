@@ -221,6 +221,8 @@ void RenderCacheHandler::applyChanges() {
         rangeNeedingUpdate->clearCache();
     }
     mRangesNeedingUpdate.clear();
+
+    //updateCurrentRenderContainerFromFrame();
 }
 
 void RenderCacheHandler::addRenderCacheRangeChange(

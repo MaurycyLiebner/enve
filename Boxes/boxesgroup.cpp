@@ -28,10 +28,10 @@ void BoxesGroup::updateAllBoxes() {
     scheduleUpdate();
 }
 
-void BoxesGroup::clearCache() {
-    BoundingBox::clearCache();
+void BoxesGroup::replaceCurrentFrameCache() {
+    BoundingBox::replaceCurrentFrameCache();
     foreach(BoundingBox *child, mChildBoxes) {
-        child->clearCache();
+        child->replaceCurrentFrameCache();
     }
 }
 
@@ -534,7 +534,7 @@ void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
 
 void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
     BoundingBox *box = mChildBoxes.at(id);
-    box->clearCache();
+    box->replaceCurrentFrameCache();
     if(box->isSelected()) {
         box->removeFromSelection();
     }

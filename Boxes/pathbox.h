@@ -32,13 +32,13 @@ public:
 
     virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
         mStrokeSettings.setCapStyle(capStyle);
-        clearCache();
+        replaceCurrentFrameCache();
         scheduleOutlinePathUpdate();
     }
 
     virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
         mStrokeSettings.setJoinStyle(joinStyle);
-        clearCache();
+        replaceCurrentFrameCache();
         scheduleOutlinePathUpdate();
     }
 
@@ -52,7 +52,7 @@ public:
 
     void setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
         mStrokeSettings.setOutlineCompositionMode(compositionMode);
-        clearCache();
+        replaceCurrentFrameCache();
         scheduleUpdate();
     }
 

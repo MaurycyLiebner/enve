@@ -386,7 +386,7 @@ public:
 
     void applyEffects(QImage *im,
                       qreal scale = 1.);
-    virtual void clearCache();
+    virtual void replaceCurrentFrameCache();
     virtual QMatrix getCombinedTransform() const;
     virtual void drawUpdatePixmap(QPainter *p);
 
@@ -443,6 +443,7 @@ public:
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
 protected:
+    bool mReplaceCache = false;
     RenderCacheHandler mRenderCacheHandler;
 
     int mSqlId = 0;
