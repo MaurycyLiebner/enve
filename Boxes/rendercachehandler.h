@@ -133,6 +133,8 @@ public:
                              const qreal &drawY,
                              const int &startFrame, const int &endFrame);
 private:
+    bool mNoCache = false;
+
     void setCurrentRenderContainerVar(BoundingBoxRenderContainer *cont);
 
     BoundingBoxRenderContainer *mCurrentRenderContainer = NULL;

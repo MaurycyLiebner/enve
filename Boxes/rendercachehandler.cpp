@@ -390,7 +390,7 @@ void RenderCacheHandler::divideRenderCacheRange(RenderCacheRange *oldRange,
 void RenderCacheHandler::mergeRenderCacheRanges(RenderCacheRange *prevRange,
                                                 RenderCacheRange *nextRange) {
     prevRange->setMaxRelFrame(nextRange->getMaxRelFrame());
-    prevRange->setMaxKeyTMP(nextRange->getMinKey());
+    prevRange->setMaxKeyTMP(nextRange->getMaxKey());
     removeRenderCacheRangeFromList(nextRange);
     removeRangeNeedingUpdate(nextRange);
     addRangeNeedingUpdate(prevRange);
