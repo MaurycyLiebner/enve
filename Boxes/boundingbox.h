@@ -446,7 +446,11 @@ public:
 
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
+
+    void applyRenderCacheChanges();
+    void scheduleRenderCacheChange();
 protected:
+    bool mRenderCacheChangeNeeded = false;
     bool mReplaceCache = false;
     RenderCacheHandler mRenderCacheHandler;
 

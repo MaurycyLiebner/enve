@@ -39,4 +39,13 @@ private:
     PathBox *mPath;
 };
 
+class ApplyRenderCacheChangesScheduler : public UpdateScheduler {
+public:
+    ApplyRenderCacheChangesScheduler(BoundingBox *box);
+
+    void update();
+private:
+    BoundingBox *mTarget;
+};
+
 #endif // UPDATESCHEDULER_H

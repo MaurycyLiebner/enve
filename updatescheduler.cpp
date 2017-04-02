@@ -26,3 +26,12 @@ PathUpdateScheduler::PathUpdateScheduler(PathBox *path) {
 void PathUpdateScheduler::update() {
     mPath->updatePath();
 }
+
+ApplyRenderCacheChangesScheduler::ApplyRenderCacheChangesScheduler(
+                        BoundingBox *box) {
+    mTarget = box;
+}
+
+void ApplyRenderCacheChangesScheduler::update() {
+    mTarget->applyRenderCacheChanges();
+}

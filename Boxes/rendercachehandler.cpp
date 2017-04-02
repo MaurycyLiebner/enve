@@ -80,15 +80,24 @@ bool RenderCacheRange::getRenderContainterIdAtRelFrame(const int &relFrame,
     int minId = 0;
     int maxId = mRenderContainers.count() - 1;
 
-    while(minId < maxId) {
+    while(minId <= maxId) {
         int guess = (minId + maxId)/2;
-        if(guess == maxId || guess == minId) return false;
         BoundingBoxRenderContainer *cont = mRenderContainers.at(guess);
         int contFrame = cont->getFrame();
         if(contFrame > relFrame) {
-            maxId = guess;
+            if(maxId == guess) {
+                *id = minId;
+                return mRenderContainers.at(minId)->getFrame() == relFrame;
+            } else {
+                maxId = guess;
+            }
         } else if(contFrame < relFrame) {
-            minId = guess;
+            if(minId == guess) {
+                *id = maxId;
+                return mRenderContainers.at(maxId)->getFrame() == relFrame;
+            } else {
+                minId = guess;
+            }
         } else {
             *id = guess;
             return true;
@@ -100,22 +109,25 @@ bool RenderCacheRange::getRenderContainterIdAtRelFrame(const int &relFrame,
 int RenderCacheRange::getRenderContainterInsertIdAtRelFrame(
         const int &relFrame) {
     int minId = 0;
-    int maxId = mRenderContainers.count() - 1;
+    int maxId = mRenderContainers.count();
 
     while(minId < maxId) {
         int guess = (minId + maxId)/2;
-        if(guess == maxId || guess == minId) return maxId;
         BoundingBoxRenderContainer *cont = mRenderContainers.at(guess);
         int contFrame = cont->getFrame();
         if(contFrame > relFrame) {
+            if(guess == maxId) {
+                return minId;
+            }
             maxId = guess;
         } else if(contFrame < relFrame) {
+            if(guess == minId) {
+                return maxId;
+            }
             minId = guess;
-        } else {
-            return guess;
         }
     }
-    return false;
+    return 0;
 }
 
 BoundingBoxRenderContainer *RenderCacheRange::getRenderContainerAtRelFrame(
@@ -133,7 +145,7 @@ BoundingBoxRenderContainer *RenderCacheRange::getRenderContainerAtRelFrame(
         return mRenderContainers.first();
     }
 }
-
+#include <QDebug>
 BoundingBoxRenderContainer *
 RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
     BoundingBoxRenderContainer *cont = new BoundingBoxRenderContainer();
@@ -142,6 +154,7 @@ RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
     if(mInternalDifferences) {
         int contId = getRenderContainterInsertIdAtRelFrame(frame);
         mRenderContainers.insert(contId, cont);
+        qDebug() << "frame: " << frame << " at: " << contId;
     } else {
         mRenderContainers.append(cont);
     }
@@ -203,22 +216,31 @@ void RenderCacheRange::drawCacheOnTimeline(QPainter *p,
                                            const qreal &drawY,
                                            const int &startFrame,
                                            const int &endFrame) {
+    int lastDrawnRelToStartFrame = 0;
+    int lastDrawFrameRightPos = 0;
     if(mInternalDifferences) {
         foreach(BoundingBoxRenderContainer *cont, mRenderContainers) {
             int dFrame = cont->getFrame() - startFrame;
             int xT = dFrame*pixelsPerFrame;
-            p->fillRect(xT, drawY, pixelsPerFrame, 20, Qt::green);
+            int widthT = pixelsPerFrame;
+            if(lastDrawnRelToStartFrame == dFrame -  1) {
+                widthT += xT - lastDrawFrameRightPos;
+                xT = lastDrawFrameRightPos;
+            }
+            p->drawRect(xT, drawY, widthT, 20);
+            lastDrawnRelToStartFrame = dFrame;
+            lastDrawFrameRightPos = xT + widthT;
             if(cont->getFrame() > endFrame) return;
         }
     } else {
         if(mRenderContainers.isEmpty()) return;
-        int minDrawFrame = qMax(startFrame - 1, mMinRelFrame);
-        int maxFrawFrame = qMin(endFrame + 2, mMaxRelFrame);
+        int minDrawFrame = qMax(startFrame, mMinRelFrame);
+        int maxFrawFrame = qMin(endFrame + 1, mMaxRelFrame);
         int dFrame = minDrawFrame - startFrame;
         int xT = dFrame*pixelsPerFrame;
-        p->fillRect(xT, drawY,
+        p->drawRect(xT, drawY,
                     pixelsPerFrame*(maxFrawFrame - minDrawFrame),
-                    20, Qt::green);
+                    20);
     }
 }
 
@@ -486,6 +508,8 @@ void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
                            const qreal &drawY,
                            const int &startFrame,
                            const int &endFrame) {
+    p->setBrush(QColor(0, 255, 0, 75));
+    p->setPen(Qt::NoPen);
     RenderCacheRange *first = getRenderCacheRangeContainingRelFrame(startFrame);
     first->drawCacheOnTimeline(p,
                                pixelsPerFrame,

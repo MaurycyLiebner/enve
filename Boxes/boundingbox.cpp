@@ -58,6 +58,7 @@ void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
         maxRelFrame = prp_absFrameToRelFrame(maxFrame);
     }
     mRenderCacheHandler.addRangeNeedingUpdate(minRelFrame, maxRelFrame);
+    scheduleRenderCacheChange();
 }
 
 void BoundingBox::ca_childAnimatorIsRecordingChanged() {
@@ -81,6 +82,7 @@ void BoundingBox::ca_addDescendantsKey(Key *key) {
             mRenderCacheHandler.addChangedKey(collection);
         }
         collection->addAnimatorKey(key);
+        scheduleRenderCacheChange();
     }
 }
 
@@ -97,6 +99,7 @@ void BoundingBox::ca_removeDescendantsKey(Key *key) {
         } else {
             mRenderCacheHandler.addChangedKey(collection);
         }
+        scheduleRenderCacheChange();
     }
 }
 
@@ -950,13 +953,13 @@ void BoundingBox::drawKeys(QPainter *p,
                            qreal pixelsPerFrame,
                            qreal drawY,
                            int startFrame, int endFrame) {
-    prp_drawKeys(p,
-                 pixelsPerFrame, drawY,
-                 startFrame, endFrame);
     mRenderCacheHandler.drawCacheOnTimeline(p, pixelsPerFrame,
                                             drawY,
                                             prp_absFrameToRelFrame(startFrame),
                                             prp_absFrameToRelFrame(endFrame));
+    prp_drawKeys(p,
+                 pixelsPerFrame, drawY,
+                 startFrame, endFrame);
 }
 
 void BoundingBox::setName(QString name)
@@ -1172,10 +1175,22 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
     }
     return false;
 }
+#include "updatescheduler.h"
+void BoundingBox::scheduleRenderCacheChange() {
+    if(mRenderCacheChangeNeeded) return;
+    mRenderCacheChangeNeeded = true;
+    addUpdateScheduler(new ApplyRenderCacheChangesScheduler(this));
+}
+
+void BoundingBox::applyRenderCacheChanges() {
+    if(mRenderCacheChangeNeeded) {
+        mRenderCacheChangeNeeded = false;
+        mRenderCacheHandler.applyChanges();
+    }
+}
 
 void BoundingBox::beforeUpdate() {
     qDebug() << "before update " + prp_mName;
-    mRenderCacheHandler.applyChanges();
     setUpdateVars();
 //    if(!mUpdateReplaceCache) {
 //        BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
