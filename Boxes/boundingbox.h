@@ -483,6 +483,7 @@ protected:
     QMatrix mUpdateTransform;
     bool mUpdateDrawOnParentBox = true;
     bool mUpdateReplaceCache;
+    qreal mUpdateOpacity;
 
     bool mRedoUpdate = false;
     bool mAwaitingUpdate = false;

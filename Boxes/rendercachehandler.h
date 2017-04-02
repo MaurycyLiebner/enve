@@ -75,6 +75,12 @@ public:
     Key *getMinKey();
 
     Key *getMaxKey();
+
+    void drawCacheOnTimeline(QPainter *p,
+                             const qreal &pixelsPerFrame,
+                             const qreal &drawY,
+                             const int &startFrame,
+                             const int &endFrame);
 private:
     QList<BoundingBoxRenderContainer*> mRenderContainers;
     bool mInternalDifferences;
@@ -122,6 +128,10 @@ public:
 
     void drawCurrentRenderContainer(QPainter *p);
 
+    void drawCacheOnTimeline(QPainter *p,
+                             const qreal &pixelsPerFrame,
+                             const qreal &drawY,
+                             const int &startFrame, const int &endFrame);
 private:
     void setCurrentRenderContainerVar(BoundingBoxRenderContainer *cont);
 

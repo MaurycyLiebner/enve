@@ -198,6 +198,30 @@ Key *RenderCacheRange::getMaxKey() {
     return mMaxKey;
 }
 
+void RenderCacheRange::drawCacheOnTimeline(QPainter *p,
+                                           const qreal &pixelsPerFrame,
+                                           const qreal &drawY,
+                                           const int &startFrame,
+                                           const int &endFrame) {
+    if(mInternalDifferences) {
+        foreach(BoundingBoxRenderContainer *cont, mRenderContainers) {
+            int dFrame = cont->getFrame() - startFrame;
+            int xT = dFrame*pixelsPerFrame;
+            p->fillRect(xT, drawY, pixelsPerFrame, 20, Qt::green);
+            if(cont->getFrame() > endFrame) return;
+        }
+    } else {
+        if(mRenderContainers.isEmpty()) return;
+        int minDrawFrame = qMax(startFrame - 1, mMinRelFrame);
+        int maxFrawFrame = qMin(endFrame + 2, mMaxRelFrame);
+        int dFrame = minDrawFrame - startFrame;
+        int xT = dFrame*pixelsPerFrame;
+        p->fillRect(xT, drawY,
+                    pixelsPerFrame*(maxFrawFrame - minDrawFrame),
+                    20, Qt::green);
+    }
+}
+
 RenderCacheHandler::RenderCacheHandler() {
     mRenderCacheRange << new RenderCacheRange(NULL, NULL);
 }
@@ -455,4 +479,28 @@ void RenderCacheHandler::removeRangeNeedingUpdate(RenderCacheRange *range) {
 void RenderCacheHandler::addRangeNeedingUpdate(RenderCacheRange *range) {
     if(mRangesNeedingUpdate.contains(range)) return;
     mRangesNeedingUpdate << range;
+}
+
+void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
+                           const qreal &pixelsPerFrame,
+                           const qreal &drawY,
+                           const int &startFrame,
+                           const int &endFrame) {
+    RenderCacheRange *first = getRenderCacheRangeContainingRelFrame(startFrame);
+    first->drawCacheOnTimeline(p,
+                               pixelsPerFrame,
+                               drawY,
+                               startFrame,
+                               endFrame);
+    int currId = mRenderCacheRange.indexOf(first) + 1;
+    while(currId < mRenderCacheRange.count()) {
+        RenderCacheRange *nextRange = mRenderCacheRange.at(currId);
+        if(nextRange->getMinRelFrame() > endFrame) return;
+        nextRange->drawCacheOnTimeline(p,
+                                       pixelsPerFrame,
+                                       drawY,
+                                       startFrame,
+                                       endFrame);
+        currId++;
+    }
 }

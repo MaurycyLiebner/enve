@@ -462,7 +462,7 @@ void BoundingBox::drawUpdatePixmap(QPainter *p) {
     if(mUpdateDrawOnParentBox) {
         p->save();
         p->setCompositionMode(mCompositionMode);
-        p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
+        p->setOpacity(mUpdateOpacity);
         mUpdateRenderContainer->draw(p);
         p->restore();
     }
@@ -470,7 +470,7 @@ void BoundingBox::drawUpdatePixmap(QPainter *p) {
 
 void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
     p->save();
-    p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
+    p->setOpacity(mUpdateOpacity);
     mUpdateRenderContainer->drawWithoutTransform(p);
     p->restore();
 }
@@ -951,8 +951,12 @@ void BoundingBox::drawKeys(QPainter *p,
                            qreal drawY,
                            int startFrame, int endFrame) {
     prp_drawKeys(p,
-                                  pixelsPerFrame, drawY,
-                                  startFrame, endFrame);
+                 pixelsPerFrame, drawY,
+                 startFrame, endFrame);
+    mRenderCacheHandler.drawCacheOnTimeline(p, pixelsPerFrame,
+                                            drawY,
+                                            prp_absFrameToRelFrame(startFrame),
+                                            prp_absFrameToRelFrame(endFrame));
 }
 
 void BoundingBox::setName(QString name)
@@ -1224,6 +1228,7 @@ void BoundingBox::setUpdateVars() {
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
     mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL ||
                           mReplaceCache;
+    mUpdateOpacity = mTransformAnimator.getOpacity()*0.01;
     mReplaceCache = false;
 }
 
