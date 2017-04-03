@@ -130,6 +130,12 @@ int RenderCacheRange::getRenderContainterInsertIdAtRelFrame(
     return 0;
 }
 
+void RenderCacheRange::insertRenderContainer(BoundingBoxRenderContainer *cont) {
+    int contId = getRenderContainterInsertIdAtRelFrame(cont->getFrame());
+    mRenderContainers.insert(contId, cont);
+    cont->incNumberPointers();
+}
+
 BoundingBoxRenderContainer *RenderCacheRange::getRenderContainerAtRelFrame(
         const int &frame) {
     if(mInternalDifferences) {
@@ -279,6 +285,10 @@ void RenderCacheHandler::applyChanges() {
     }
     mRangesNeedingUpdate.clear();
 
+    if(mCurrentRenderContainer == NULL) return;
+    getRenderCacheRangeContainingRelFrame(
+        mCurrentRenderContainer->getFrame())->
+            insertRenderContainer(mCurrentRenderContainer);
     //updateCurrentRenderContainerFromFrame();
 }
 

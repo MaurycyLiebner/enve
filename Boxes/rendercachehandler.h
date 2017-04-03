@@ -83,6 +83,7 @@ public:
                              const int &endFrame,
                              int *lastDrawnRelToStartFrame,
                              int *lastDrawFrameRightPosP);
+    void insertRenderContainer(BoundingBoxRenderContainer *cont);
 private:
     QList<BoundingBoxRenderContainer*> mRenderContainers;
     bool mInternalDifferences;
