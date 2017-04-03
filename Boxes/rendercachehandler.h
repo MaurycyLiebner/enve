@@ -80,7 +80,9 @@ public:
                              const qreal &pixelsPerFrame,
                              const qreal &drawY,
                              const int &startFrame,
-                             const int &endFrame);
+                             const int &endFrame,
+                             int *lastDrawnRelToStartFrame,
+                             int *lastDrawFrameRightPosP);
 private:
     QList<BoundingBoxRenderContainer*> mRenderContainers;
     bool mInternalDifferences;

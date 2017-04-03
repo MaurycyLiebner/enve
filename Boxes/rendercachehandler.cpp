@@ -215,9 +215,11 @@ void RenderCacheRange::drawCacheOnTimeline(QPainter *p,
                                            const qreal &pixelsPerFrame,
                                            const qreal &drawY,
                                            const int &startFrame,
-                                           const int &endFrame) {
-    int lastDrawnRelToStartFrame = 0;
-    int lastDrawFrameRightPos = 0;
+                                           const int &endFrame,
+                                           int *lastDrawnRelToStartFrameP,
+                                           int *lastDrawFrameRightPosP) {
+    int lastDrawnRelToStartFrame = *lastDrawnRelToStartFrameP;
+    int lastDrawFrameRightPos = *lastDrawFrameRightPosP;
     if(mInternalDifferences) {
         foreach(BoundingBoxRenderContainer *cont, mRenderContainers) {
             int dFrame = cont->getFrame() - startFrame;
@@ -238,10 +240,19 @@ void RenderCacheRange::drawCacheOnTimeline(QPainter *p,
         int maxFrawFrame = qMin(endFrame + 1, mMaxRelFrame);
         int dFrame = minDrawFrame - startFrame;
         int xT = dFrame*pixelsPerFrame;
+        int widthT = pixelsPerFrame*(maxFrawFrame - minDrawFrame);
+        if(lastDrawnRelToStartFrame == dFrame -  1) {
+            widthT += xT - lastDrawFrameRightPos;
+            xT = lastDrawFrameRightPos;
+        }
         p->drawRect(xT, drawY,
-                    pixelsPerFrame*(maxFrawFrame - minDrawFrame),
+                    widthT,
                     20);
+        lastDrawnRelToStartFrame = dFrame;
+        lastDrawFrameRightPos = xT + widthT;
     }
+    *lastDrawnRelToStartFrameP = lastDrawnRelToStartFrame;
+    *lastDrawFrameRightPosP = lastDrawFrameRightPos;
 }
 
 RenderCacheHandler::RenderCacheHandler() {
@@ -510,12 +521,16 @@ void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
                            const int &endFrame) {
     p->setBrush(QColor(0, 255, 0, 75));
     p->setPen(Qt::NoPen);
+    int lastDrawnFrame = 0;
+    int lastDrawX = 0;
     RenderCacheRange *first = getRenderCacheRangeContainingRelFrame(startFrame);
     first->drawCacheOnTimeline(p,
                                pixelsPerFrame,
                                drawY,
                                startFrame,
-                               endFrame);
+                               endFrame,
+                               &lastDrawnFrame,
+                               &lastDrawX);
     int currId = mRenderCacheRange.indexOf(first) + 1;
     while(currId < mRenderCacheRange.count()) {
         RenderCacheRange *nextRange = mRenderCacheRange.at(currId);
@@ -524,7 +539,9 @@ void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
                                        pixelsPerFrame,
                                        drawY,
                                        startFrame,
-                                       endFrame);
+                                       endFrame,
+                                       &lastDrawnFrame,
+                                       &lastDrawX);
         currId++;
     }
 }
