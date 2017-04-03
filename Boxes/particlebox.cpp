@@ -437,7 +437,7 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
 
 void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
-    mParentBox->replaceCurrentFrameCache();
+    mParentBox->clearAllCache();
     mParentBox->scheduleUpdate();
 }
 

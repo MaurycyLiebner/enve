@@ -349,6 +349,7 @@ void BoundingBox::updateAllBoxes() {
 
 void BoundingBox::clearAllCache() {
     mRenderCacheHandler.clearAllCache();
+    replaceCurrentFrameCache();
 }
 
 void BoundingBox::replaceCurrentFrameCache() {
@@ -840,6 +841,7 @@ void BoundingBox::updateCombinedTransform() {
                                mParent->getCombinedTransform();
 
     updateAfterCombinedTransformationChanged();
+    replaceCurrentFrameCache();
     scheduleUpdate();
 }
 

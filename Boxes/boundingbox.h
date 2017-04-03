@@ -439,7 +439,7 @@ public:
     void setSqlId(int id) {
         mSqlId = id;
     }
-    void clearAllCache();
+    virtual void clearAllCache();
 
     void ca_addDescendantsKey(Key *key);
     void ca_removeDescendantsKey(Key *key);
