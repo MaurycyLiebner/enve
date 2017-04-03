@@ -46,7 +46,7 @@ void Animator::prp_setAbsFrame(int frame) {
     anim_mCurrentAbsFrame = frame;
     anim_updateRelFrame();
 
-    anim_callFrameChangeUpdater();
+    //anim_callFrameChangeUpdater();
 }
 
 void Animator::anim_updateRelFrame() {

@@ -319,6 +319,7 @@ void RenderCacheHandler::clearAllCache() {
     foreach(RenderCacheRange *range, mRenderCacheRange) {
         range->clearCache();
     }
+    setCurrentRenderContainerVar(NULL);
 }
 
 void RenderCacheHandler::addRangeNeedingUpdate(const int &min,
