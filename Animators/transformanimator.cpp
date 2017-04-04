@@ -318,7 +318,7 @@ qreal TransformAnimator::getOpacity()
     return mOpacityAnimator.qra_getCurrentValue();
 }
 
-QMatrix TransformAnimator::qra_getCurrentValue() {
+QMatrix TransformAnimator::getCurrentTransformationMatrix() {
     QMatrix matrix;// = mBaseTransformation;
     qreal pivotX = mPivotAnimator.getXValue();
     qreal pivotY = mPivotAnimator.getYValue();

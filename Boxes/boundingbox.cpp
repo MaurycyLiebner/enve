@@ -825,13 +825,13 @@ QPointF BoundingBox::getAbsolutePos() {
 }
 
 void BoundingBox::updateRelativeTransformTmp() {
-    mRelativeTransformMatrix = mTransformAnimator.qra_getCurrentValue();
+    mRelativeTransformMatrix = mTransformAnimator.getCurrentTransformationMatrix();
     updateCombinedTransformTmp();
     //updateCombinedTransform(replaceCache);
 }
 
 void BoundingBox::updateRelativeTransformAfterFrameChange() {
-    mRelativeTransformMatrix = mTransformAnimator.qra_getCurrentValue();
+    mRelativeTransformMatrix = mTransformAnimator.getCurrentTransformationMatrix();
     updateCombinedTransform();
 }
 
@@ -861,12 +861,12 @@ TransformAnimator *BoundingBox::getTransformAnimator() {
 }
 
 QMatrix BoundingBox::getCombinedRenderTransform() {
-    return mTransformAnimator.qra_getCurrentValue()*
+    return mTransformAnimator.getCurrentTransformationMatrix()*
             mParent->getCombinedRenderTransform();
 }
 
 QMatrix BoundingBox::getCombinedFinalRenderTransform() {
-    return mTransformAnimator.qra_getCurrentValue()*
+    return mTransformAnimator.getCurrentTransformationMatrix()*
             mParent->getCombinedFinalRenderTransform();
 }
 

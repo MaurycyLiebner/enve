@@ -13,7 +13,7 @@ public:
     void resetRotation(bool finish = false);
     void reset(bool finish = false);
 
-    QMatrix qra_getCurrentValue();
+    QMatrix getCurrentTransformationMatrix();
     void rotateRelativeToSavedValue(qreal rotRel);
     void translate(qreal dX, qreal dY);
     void scale(qreal sx, qreal sy);

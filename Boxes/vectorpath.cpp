@@ -63,7 +63,7 @@ PathAnimator *VectorPath::getPathAnimator() {
 
 void VectorPath::applyCurrentTransformation() {
     mPathAnimator.
-            applyTransformToPoints(mTransformAnimator.qra_getCurrentValue());
+            applyTransformToPoints(mTransformAnimator.getCurrentTransformationMatrix());
 
     mTransformAnimator.reset(true);
     centerPivotPosition(true);

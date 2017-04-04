@@ -194,6 +194,7 @@ void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater) {
 }
 
 void ComplexAnimator::prp_setAbsFrame(int frame) {
+    if(!prp_isDescendantRecording()) return;
     Animator::prp_setAbsFrame(frame);
 
     foreach(Property *property, ca_mChildAnimators) {
@@ -220,14 +221,14 @@ void ComplexAnimator::prp_cancelTransform() {
 }
 
 void ComplexAnimator::ca_setRecordingValue(bool rec) {
+    if(rec == anim_mIsRecording) return;
     anim_mIsRecording = rec;
     if(prp_mParentAnimator != NULL) {
         prp_mParentAnimator->ca_childAnimatorIsRecordingChanged();
     }
 }
 
-bool ComplexAnimator::prp_isDescendantRecording()
-{
+bool ComplexAnimator::prp_isDescendantRecording() {
     return ca_mChildAnimatorRecording;
 }
 
@@ -236,8 +237,7 @@ QString ComplexAnimator::prp_getValueText()
     return "";
 }
 
-void ComplexAnimator::prp_setRecording(bool rec)
-{
+void ComplexAnimator::prp_setRecording(bool rec) {
     foreach(Property *property, ca_mChildAnimators) {
         property->prp_setRecording(rec);
     }
