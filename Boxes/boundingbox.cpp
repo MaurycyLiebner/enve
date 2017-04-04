@@ -344,20 +344,23 @@ void BoundingBox::duplicateTransformAnimatorFrom(
 }
 
 void BoundingBox::updateAllBoxes() {
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void BoundingBox::clearAllCache() {
-    mRenderCacheHandler.clearAllCache();
+    if(!mNoCache) {
+        mRenderCacheHandler.clearAllCache();
+    }
     replaceCurrentFrameCache();
 }
 
 void BoundingBox::replaceCurrentFrameCache() {
     mReplaceCache = true;
+    emit replaceChacheSet();
 
     if(mParent == NULL) return;
     mParent->BoundingBox::replaceCurrentFrameCache();
-    //scheduleUpdate();
+    //scheduleSoftUpdate();
 }
 
 QImage BoundingBox::getAllUglyPixmapProvidedTransform(
@@ -500,7 +503,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
 void BoundingBox::setCompositionMode(
         QPainter::CompositionMode compositionMode) {
     mCompositionMode = compositionMode;
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 QPainter::CompositionMode BoundingBox::getCompositionMode() {
@@ -519,7 +522,7 @@ void BoundingBox::updateEffectsMargin() {
 }
 
 void BoundingBox::scheduleEffectsMarginUpdate() {
-    scheduleUpdate();
+    scheduleSoftUpdate();
     mEffectsMarginUpdateNeeded = true;
     if(mParent == NULL) return;
     mParent->scheduleEffectsMarginUpdate();
@@ -821,17 +824,20 @@ int BoundingBox::getZIndex() {
 }
 
 QPointF BoundingBox::getAbsolutePos() {
-    return QPointF(mCombinedTransformMatrix.dx(), mCombinedTransformMatrix.dy());
+    return QPointF(mCombinedTransformMatrix.dx(),
+                   mCombinedTransformMatrix.dy());
 }
 
 void BoundingBox::updateRelativeTransformTmp() {
-    mRelativeTransformMatrix = mTransformAnimator.getCurrentTransformationMatrix();
+    mRelativeTransformMatrix =
+            mTransformAnimator.getCurrentTransformationMatrix();
     updateCombinedTransformTmp();
     //updateCombinedTransform(replaceCache);
 }
 
 void BoundingBox::updateRelativeTransformAfterFrameChange() {
-    mRelativeTransformMatrix = mTransformAnimator.getCurrentTransformationMatrix();
+    mRelativeTransformMatrix =
+            mTransformAnimator.getCurrentTransformationMatrix();
     updateCombinedTransform();
 }
 
@@ -839,10 +845,12 @@ void BoundingBox::updateCombinedTransform() {
     if(mParent == NULL) return;
     mCombinedTransformMatrix = mRelativeTransformMatrix*
                                mParent->getCombinedTransform();
+    mRenderCacheHandler.updateCurrentRenderContainerTransform(
+                                mCombinedTransformMatrix);
 
     updateAfterCombinedTransformationChanged();
     replaceCurrentFrameCache();
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void BoundingBox::updateCombinedTransformTmp() {
@@ -893,7 +901,7 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     mEffectsAnimators.ca_addChildAnimator(effect);
 
     scheduleEffectsMarginUpdate();
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
@@ -904,7 +912,7 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
     effect->decNumberPointers();
 
     scheduleEffectsMarginUpdate();
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void BoundingBox::getKeysInRect(const QRectF &selectionRect,
@@ -994,7 +1002,7 @@ void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
     }
     mVisible = visible;
 
-    scheduleUpdate();
+    scheduleSoftUpdate();
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
@@ -1269,12 +1277,19 @@ bool BoundingBox::shouldUpdateAndDraw() {
             (isInVisibleDurationRect() && isUsedAsTarget());
 }
 
+void BoundingBox::scheduleSoftUpdate() {
+    if(mAwaitingUpdate) return;
+    scheduleUpdate();
+}
+
 void BoundingBox::scheduleUpdate() {
-    //if(mAwaitingUpdate) return;
     if(shouldUpdateAndDraw()) {
-        qDebug() << "schedule update " + prp_mName;
         mAwaitingUpdate = true;
         mParent->addChildAwaitingUpdate(this);
         emit scheduledUpdate();
     }
+}
+
+void BoundingBox::scheduleHardUpdate() {
+    scheduleUpdate();
 }

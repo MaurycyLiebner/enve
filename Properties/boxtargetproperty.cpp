@@ -15,7 +15,9 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
     if(mTarget != NULL) {
         if(mParentBox != NULL) {
             QObject::disconnect(mTarget, SIGNAL(scheduledUpdate()),
-                                mParentBox, SLOT(scheduleUpdate()));
+                                mParentBox, SLOT(scheduleHardUpdate()));
+            QObject::disconnect(mTarget, SIGNAL(replaceChacheSet()),
+                                mParentBox, SLOT(replaceCurrentFrameCache()));
         }
         mTarget->decUsedAsTarget();
     }
@@ -23,8 +25,9 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
     if(mTarget != NULL) {
         if(mParentBox != NULL) {
             QObject::connect(mTarget, SIGNAL(scheduledUpdate()),
-                             mParentBox, SLOT(scheduleUpdate()));
-
+                             mParentBox, SLOT(scheduleHardUpdate()));
+            QObject::connect(mTarget, SIGNAL(replaceChacheSet()),
+                             mParentBox, SLOT(replaceCurrentFrameCache()));
         }
         mTarget->incUsedAsTarget();
     }

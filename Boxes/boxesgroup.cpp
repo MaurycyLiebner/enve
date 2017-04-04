@@ -25,7 +25,7 @@ void BoxesGroup::updateAllBoxes() {
     foreach(BoundingBox *child, mChildBoxes) {
         child->updateAllBoxes();
     }
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void BoxesGroup::clearAllCache() {
@@ -280,7 +280,7 @@ void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
     mChildrenAwaitingUpdate << child;
 
     if(mParent == NULL) return;
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void BoxesGroup::beforeUpdate() {
@@ -381,7 +381,7 @@ bool BoxesGroup::shouldPaintOnImage() {
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
     if(!bT) {
-        scheduleUpdate();
+        scheduleSoftUpdate();
     }
     if(mParent == NULL) return;
     mParent->setDescendantCurrentGroup(bT);
@@ -623,7 +623,7 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
         addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }
 
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void BoxesGroup::moveChildBelow(BoundingBox *boxToMove,

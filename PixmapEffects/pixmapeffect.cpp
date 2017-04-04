@@ -64,8 +64,8 @@ void BlurEffect::apply(BoundingBox *target,
                        qreal scale) {
     Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius.qra_getCurrentValue()*scale;
-    //fmt_filters::blur(img, radius, radius*0.3333);
-    //return;
+    fmt_filters::blur(img, radius, radius*0.3333);
+    return;
     //fmt_filters::fast_blur(img, radius*0.5);
     fmt_filters::fast_blur(img, radius*0.25);
     fmt_filters::fast_blur(img, radius*0.25);

@@ -53,7 +53,7 @@ public:
     void setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
         mStrokeSettings.setOutlineCompositionMode(compositionMode);
         clearAllCache();
-        scheduleUpdate();
+        scheduleSoftUpdate();
     }
 
     void startSelectedStrokeWidthTransform() {
@@ -102,7 +102,7 @@ public:
     void applyPaintSetting(
             const PaintSetting &setting) {
         setting.apply(this);
-        scheduleUpdate();
+        scheduleSoftUpdate();
     }
 
     void setFillColorMode(const ColorMode &colorMode) {

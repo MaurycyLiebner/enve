@@ -238,7 +238,9 @@ public:
     void applyPaintSetting(const PaintSetting &setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
+    void setUpdateVars();
 private:
+    bool mParticlesFrameChanged = false;
     MovablePoint *mTopLeftPoint;
     MovablePoint *mBottomRightPoint;
     QList<ParticleEmitter*> mEmitters;

@@ -2,8 +2,7 @@
 #include "mainwindow.h"
 
 
-double fRand(double fMin, double fMax)
-{
+double fRand(double fMin, double fMax) {
     double f = (double)rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
@@ -35,7 +34,15 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
 
 void ParticleBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    scheduleUpdate();
+    mParticlesFrameChanged = true;
+    scheduleSoftUpdate();
+}
+
+void ParticleBox::setUpdateVars() {
+    BoundingBox::setUpdateVars();
+    mUpdateReplaceCache = mUpdateReplaceCache ||
+                          mParticlesFrameChanged;
+    mParticlesFrameChanged = false;
 }
 
 void ParticleBox::updateRelBoundingRect() {
@@ -438,12 +445,12 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
 void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
     mParentBox->clearAllCache();
-    mParentBox->scheduleUpdate();
+    mParentBox->scheduleSoftUpdate();
 }
 
 void ParticleEmitter::scheduleUpdateParticlesForFrame() {
     mUpdateParticlesForFrameScheduled = true;
-    mParentBox->scheduleUpdate();
+    mParentBox->scheduleSoftUpdate();
 }
 
 void ParticleEmitter::updateParticlesForFrameIfNeeded() {

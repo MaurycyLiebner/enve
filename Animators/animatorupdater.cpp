@@ -67,11 +67,11 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 
 void DisplayedFillStrokeSettingsUpdater::update() {
     mTarget->replaceCurrentFrameCache();
-    mTarget->scheduleUpdate();
+    mTarget->scheduleSoftUpdate();
 }
 
 void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleSoftUpdate();
 }
 
 PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
@@ -113,11 +113,11 @@ void GradientPointsUpdater::update() {
     } else {
         mTarget->updateStrokeDrawGradient();
     }
-    mTarget->scheduleUpdate();
+    mTarget->scheduleSoftUpdate();
 }
 
 void GradientPointsUpdater::frameChangeUpdate() {
-    mTarget->scheduleUpdate();
+    mTarget->scheduleSoftUpdate();
 }
 
 #include "Sound/singlesound.h"

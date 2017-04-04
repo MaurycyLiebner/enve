@@ -91,7 +91,7 @@ public:
     BoundingBox(BoundingBoxType type);
     virtual ~BoundingBox();
 
-    QMatrix getUpdateTransform() { return mUpdateTransform; }
+    const QMatrix &getUpdateTransform() { return mUpdateTransform; }
 
     virtual BoundingBox *createLink(BoxesGroup *parent);
     virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
@@ -390,7 +390,6 @@ public:
 
     void applyEffects(QImage *im,
                       qreal scale = 1.);
-    virtual void replaceCurrentFrameCache();
     virtual QMatrix getCombinedTransform() const;
     virtual void drawUpdatePixmap(QPainter *p);
 
@@ -450,6 +449,8 @@ public:
     void applyRenderCacheChanges();
     void scheduleRenderCacheChange();
 protected:
+    virtual void scheduleUpdate();
+
     bool mRenderCacheChangeNeeded = false;
     bool mReplaceCache = false;
     RenderCacheHandler mRenderCacheHandler;
@@ -519,10 +520,13 @@ protected:
 
     QImage mRenderPixmap;
 signals:
+    void replaceChacheSet();
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
 public slots:
-    virtual void scheduleUpdate();
+    void replaceCurrentFrameCache();
+    void scheduleSoftUpdate();
+    void scheduleHardUpdate();
 };
 
 

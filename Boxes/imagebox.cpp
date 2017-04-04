@@ -68,7 +68,7 @@ void ImageBox::reloadPixmap()
     }
 
     if(!mPivotChanged) centerPivotPosition();
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void ImageBox::setFilePath(QString path)

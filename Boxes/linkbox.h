@@ -35,7 +35,7 @@ public:
 
     void setLinkTarget(BoundingBox *linkTarget) {
         mLinkTarget = linkTarget;
-        scheduleUpdate();
+        scheduleSoftUpdate();
         if(linkTarget == NULL) {
             setName("Link Empty");
             return;

@@ -264,7 +264,7 @@ protected:
     void updateAfterCombinedTransformationChanged() {
 //        foreach(BoundingBox *child, mChildBoxes) {
 //            child->updateCombinedTransformTmp();
-//            child->scheduleUpdate();
+//            child->scheduleSoftUpdate();
 //        }
     }
 
@@ -314,6 +314,7 @@ public:
     }
     void createSoundForPath(const QString &path);
 private:
+    void scheduleUpdate() {}
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
 
@@ -412,8 +413,6 @@ private:
     void setLastMousePressPosAbs(const QPoint &abs);
     void setCurrentMouseEventPosAbs(const QPoint &abs);
     void setCurrentMousePressPosAbs(const QPoint &abs);
-public slots:
-    void scheduleUpdate() {}
 };
 
 #endif // CANVAS_H

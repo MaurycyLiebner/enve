@@ -135,7 +135,7 @@ void PathBox::prp_makeDuplicate(Property *targetBox) {
 }
 
 void PathBox::schedulePathUpdate() {
-    scheduleUpdate();
+    scheduleSoftUpdate();
     if(mPathUpdateNeeded) {
         return;
     }
@@ -146,7 +146,7 @@ void PathBox::schedulePathUpdate() {
 }
 
 void PathBox::scheduleOutlinePathUpdate() {
-    scheduleUpdate();
+    scheduleSoftUpdate();
     if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
     }

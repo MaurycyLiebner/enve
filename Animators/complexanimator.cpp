@@ -194,7 +194,7 @@ void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater) {
 }
 
 void ComplexAnimator::prp_setAbsFrame(int frame) {
-    if(!prp_isDescendantRecording()) return;
+    //if(!prp_isDescendantRecording()) return;
     Animator::prp_setAbsFrame(frame);
 
     foreach(Property *property, ca_mChildAnimators) {

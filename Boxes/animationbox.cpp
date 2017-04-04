@@ -82,7 +82,7 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
         schedulePixmapReload();
     } else {
         mPixmapReloadScheduled = false;
-        scheduleUpdate();
+        scheduleSoftUpdate();
     }
 }
 
@@ -133,7 +133,7 @@ void AnimationBox::setUpdateVars() {
 void AnimationBox::schedulePixmapReload() {
     if(mPixmapReloadScheduled) return;
     mPixmapReloadScheduled = true;
-    scheduleUpdate();
+    scheduleSoftUpdate();
 }
 
 void AnimationBox::preUpdatePixmapsUpdates() {
