@@ -1,6 +1,6 @@
 #include "particlebox.h"
 #include "mainwindow.h"
-
+#include "durationrectangle.h"
 
 double fRand(double fMin, double fMax) {
     double f = (double)rand() / RAND_MAX;
@@ -22,6 +22,13 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
     mBottomRightPoint->prp_setUpdater(
                 new DisplayedFillStrokeSettingsUpdater(this));
     mBottomRightPoint->prp_setName("bottom right");
+
+    setDurationRectangle(new DurationRectangle(this));
+    mDurationRectangle->setAnimationFrameRangeVisible();
+    mDurationRectangle->setAnimationFrameDuration(200);
+    mDurationRectangle->setBindToAnimationFrameRange();
+    mRenderCacheHandler.setDurationRectangle(mDurationRectangle);
+    mRenderCacheHandler.setupRenderRangeforAnimationRange();
 
     //addEmitter(new ParticleEmitter(this));
 }

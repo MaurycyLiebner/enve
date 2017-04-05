@@ -317,6 +317,7 @@ void RenderCacheHandler::setupRenderRangeforAnimationRange() {
     if(!isThereBarrierAtRelFrame(durRectMax)) {
         divideRenderCacheRangeAtRelFrame(durRectMax, NULL);
     }
+    applyChanges();
 
     QList<Key*> newRangeInternalKeys;
     int idAtMin = mRenderCacheRange.indexOf(
@@ -342,10 +343,12 @@ void RenderCacheHandler::setupRenderRangeforAnimationRange() {
         newRange->addInternalKey(key);
     }
     mRenderCacheRange.insert(idAtMin, newRange);
+    addRangeNeedingUpdate(newRange);
 }
 
 void RenderCacheHandler::clearRenderRangeforAnimationRange() {
     if(mAnimationRangeSetup) {
+        applyChanges();
         mAnimationRangeSetup = false;
         foreach(RenderCacheRange *range, mRenderCacheRange) {
             if(range->isBlocked()) {
@@ -647,6 +650,7 @@ void RenderCacheHandler::removeRangeNeedingUpdate(RenderCacheRange *range) {
 
 void RenderCacheHandler::addRangeNeedingUpdate(RenderCacheRange *range) {
     if(mRangesNeedingUpdate.contains(range)) return;
+    qDebug() << range->getMinRelFrame() << range->getMaxRelFrame();
     mRangesNeedingUpdate << range;
 }
 
