@@ -10,19 +10,11 @@ class AnimationBox : public BoundingBox
 public:
     AnimationBox(BoxesGroup *parent);
     void updateAfterFrameChanged(int currentFrame);
-    void drawKeys(QPainter *p,
-                  qreal pixelsPerFrame, qreal drawY,
-                  int startFrame, int endFrame);
-
 
     void prp_makeDuplicate(Property *targetBox);
 
 //    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
-    DurationRectangleMovable *getRectangleMovableAtPos(
-                                    qreal relX,
-                                    int minViewedFrame,
-            qreal pixelsPerFrame);
     void drawSelected(QPainter *p, const CanvasMode &);
     bool relPointInsidePath(QPointF point);
     void draw(QPainter *p);

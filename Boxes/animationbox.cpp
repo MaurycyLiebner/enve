@@ -37,15 +37,6 @@ void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
     timeScaleAnimator->prp_makeDuplicate(&mTimeScaleAnimator);
 }
 
-DurationRectangleMovable *AnimationBox::getRectangleMovableAtPos(
-                            qreal relX,
-                            int minViewedFrame,
-                            qreal pixelsPerFrame) {
-    return mDurationRectangle->getMovableAt(relX,
-                                           pixelsPerFrame,
-                                           minViewedFrame);
-}
-
 //BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
 //    return new AnimationBox(parent);
 //}
@@ -86,21 +77,6 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
         mPixmapReloadScheduled = false;
         scheduleSoftUpdate();
     }
-}
-
-void AnimationBox::drawKeys(QPainter *p,
-                            qreal pixelsPerFrame, qreal drawY,
-                            int startFrame, int endFrame) {
-//    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
-//    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
-//    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
-//    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
-//                frameWidth*pixelsPerFrame - pixelsPerFrame,
-//                BOX_HEIGHT, QColor(0, 0, 255, 125));
-    mDurationRectangle->draw(p, pixelsPerFrame,
-                            drawY, startFrame);
-    BoundingBox::drawKeys(p, pixelsPerFrame, drawY,
-                          startFrame, endFrame);
 }
 
 void AnimationBox::afterSuccessfulUpdate() {

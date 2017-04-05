@@ -24,9 +24,11 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
     mBottomRightPoint->prp_setName("bottom right");
 
     setDurationRectangle(new DurationRectangle(this));
-    mDurationRectangle->setAnimationFrameRangeVisible();
-    mDurationRectangle->setAnimationFrameDuration(200);
+    mDurationRectangle->setMaxFrame(200);
+    mDurationRectangle->setMinFrame(-10);
+    mDurationRectangle->setAnimationFrameDuration(100000);
     mDurationRectangle->setBindToAnimationFrameRange();
+    mDurationRectangle->setFramesDuration(200);
     mRenderCacheHandler.setDurationRectangle(mDurationRectangle);
     mRenderCacheHandler.setupRenderRangeforAnimationRange();
 
@@ -87,6 +89,15 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     ParticleEmitter *emitter = new ParticleEmitter(this);
     emitter->getPosPoint()->setAbsolutePos(absPos, false);
     addEmitter(emitter);
+}
+
+void ParticleBox::updateAfterDurationRectangleChanged() {
+    updateAfterFrameChanged(mCurrentAbsFrame);
+    int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
+    int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
+    foreach(ParticleEmitter *emitter, mEmitters) {
+        emitter->setFrameRange(minFrame, maxFrame);
+    }
 }
 
 void ParticleBox::draw(QPainter *p)
@@ -455,7 +466,7 @@ void ParticleEmitter::scheduleUpdateParticlesForFrame() {
 void ParticleEmitter::updateParticlesForFrameIfNeeded() {
     if(mUpdateParticlesForFrameScheduled) {
         mUpdateParticlesForFrameScheduled = false;
-        updateParticlesForFrame(anim_mCurrentAbsFrame);
+        updateParticlesForFrame(anim_mCurrentRelFrame);
     }
 }
 
@@ -521,8 +532,7 @@ void ParticleEmitter::prp_makeDuplicate(Property *target) {
                 &mParticlesDecayFrames,
                 &mParticlesSizeDecay,
                 &mParticlesOpacityDecay);
-    peTarget->setMinFrame(mMinFrame);
-    peTarget->setMaxFrame(mMaxFrame);
+    peTarget->setFrameRange(mMinFrame, mMaxFrame);
 }
 
 ColorAnimator *ParticleEmitter::getColorAnimator() {

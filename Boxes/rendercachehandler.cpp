@@ -304,13 +304,20 @@ void RenderCacheHandler::setNoCache(const bool &noCache) {
 
 void RenderCacheHandler::setupRenderRangeforAnimationRange() {
     if(mDurationRect == NULL) return;
-    if(!mDurationRect->hasAnimationFrameRange()) return;
     if(mAnimationRangeSetup) {
         clearRenderRangeforAnimationRange();
     }
     mAnimationRangeSetup = true;
-    int durRectMin = mDurationRect->getMinAnimationFrameAsRelFrame();
-    int durRectMax = mDurationRect->getMaxAnimationFrameAsRelFrame();
+    int durRectMin;
+    int durRectMax;
+    if(mDurationRect->hasAnimationFrameRange()) {
+        durRectMin = mDurationRect->getMinAnimationFrameAsRelFrame();
+        durRectMax = mDurationRect->getMaxAnimationFrameAsRelFrame();
+    } else {
+        durRectMin = mDurationRect->getMinFrameAsRelFrame();
+        durRectMax = mDurationRect->getMaxFrameAsRelFrame();
+    }
+
     if(!isThereBarrierAtRelFrame(durRectMin)) {
         divideRenderCacheRangeAtRelFrame(durRectMin, NULL);
     }

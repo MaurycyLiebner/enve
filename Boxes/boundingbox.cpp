@@ -959,10 +959,25 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
             this, SLOT(updateAfterDurationRectangleChanged()));
 }
 
+DurationRectangleMovable *BoundingBox::getRectangleMovableAtPos(
+                            qreal relX,
+                            int minViewedFrame,
+                            qreal pixelsPerFrame) {
+    if(mDurationRectangle == NULL) return NULL;
+    return mDurationRectangle->getMovableAt(relX,
+                                           pixelsPerFrame,
+                                           minViewedFrame);
+}
+
 void BoundingBox::drawKeys(QPainter *p,
                            qreal pixelsPerFrame,
                            qreal drawY,
                            int startFrame, int endFrame) {
+    if(mDurationRectangle != NULL) {
+        mDurationRectangle->draw(p, pixelsPerFrame,
+                                drawY, startFrame);
+    }
+
     mRenderCacheHandler.drawCacheOnTimeline(p, pixelsPerFrame,
                                             drawY,
                                             prp_absFrameToRelFrame(startFrame),
@@ -1230,7 +1245,7 @@ void BoundingBox::setNoCache(const bool &bT) {
 
 void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
-
+    mReplaceCache = false;
     if(mNoCache) {
         mRenderCacheHandler.duplicateCurrentRenderContainerFrom(
                                             mUpdateRenderContainer);
@@ -1256,7 +1271,6 @@ void BoundingBox::setUpdateVars() {
     mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL ||
                           mReplaceCache;
     mUpdateOpacity = mTransformAnimator.getOpacity()*0.01;
-    mReplaceCache = false;
 }
 
 bool BoundingBox::isUsedAsTarget() {

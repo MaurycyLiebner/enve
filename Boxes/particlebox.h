@@ -157,6 +157,14 @@ public:
         scheduleGenerateParticles();
     }
 
+    void setFrameRange(const int &minFrame,
+                       const int &maxFrame) {
+        if(minFrame == mMinFrame && mMaxFrame == maxFrame) return;
+        mMinFrame = minFrame;
+        mMaxFrame = maxFrame;
+        scheduleGenerateParticles();
+    }
+
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint() {
         return mPos;
@@ -201,8 +209,8 @@ private:
     QrealAnimator mParticlesOpacityDecay;
 };
 
-class ParticleBox : public BoundingBox
-{
+class ParticleBox : public BoundingBox {
+    Q_OBJECT
 public:
     ParticleBox(BoxesGroup *parent);
     void getAccelerationAt(const QPointF &pos,
@@ -238,6 +246,8 @@ public:
     void applyPaintSetting(const PaintSetting &setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
+public slots:
+    void updateAfterDurationRectangleChanged();
 private:
     MovablePoint *mTopLeftPoint;
     MovablePoint *mBottomRightPoint;

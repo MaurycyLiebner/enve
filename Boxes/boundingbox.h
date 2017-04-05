@@ -404,14 +404,9 @@ public:
     QRectF getUpdateRenderRect();
     QMatrix getUpdatePaintTransform();
     bool isParticleBox();
-    virtual DurationRectangleMovable *getRectangleMovableAtPos(qreal relX,
+    DurationRectangleMovable *getRectangleMovableAtPos(qreal relX,
                                                        int minViewedFrame,
-                                                       qreal pixelsPerFrame) {
-        Q_UNUSED(relX);
-        Q_UNUSED(minViewedFrame);
-        Q_UNUSED(pixelsPerFrame);
-        return NULL;
-    }
+                                                       qreal pixelsPerFrame);
     void getKeysInRect(const QRectF &selectionRect,
                        const qreal &pixelsPerFrame,
                        QList<Key *> *keysList);
@@ -524,6 +519,7 @@ signals:
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
 public slots:
+    virtual void updateAfterDurationRectangleChanged() {}
     void replaceCurrentFrameCache();
     void scheduleSoftUpdate();
     void scheduleHardUpdate();
