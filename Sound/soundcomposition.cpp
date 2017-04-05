@@ -23,12 +23,12 @@ void SoundComposition::stop() {
     mBuffer.clear();
 }
 
-void SoundComposition::generateData(const int &startFrame,
-                                    const int &endFrame,
+void SoundComposition::generateData(const int &startAbsFrame,
+                                    const int &endAbsFrame,
                                     const qreal &fps) {
     if(mSounds.isEmpty()) return;
 
-    int nSamples = (endFrame - startFrame)*SAMPLERATE/fps;
+    int nSamples = (endAbsFrame - startAbsFrame)*SAMPLERATE/fps;
     //float *data1 = NULL;
     float *data = new float[nSamples];
     for(int i = 0; i < nSamples; i++) {
@@ -46,22 +46,25 @@ void SoundComposition::generateData(const int &startFrame,
 //    free(data1);
 
     foreach(SingleSound *sound, mSounds) {
-        sound->updateFinalDataIfNeeded(fps, startFrame, endFrame);
-        const int &soundStartFrame = sound->getStartFrame();
+        sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);
+        const int &soundStartFrame = sound->getStartAbsFrame();
         const int &soundSampleCount = sound->getSampleCount();
         int firstSampleFromSound;
         int sampleCountNeeded;
         int firstTargetSample;
-        int samplesInSoundFrameRange = (endFrame - soundStartFrame)*SAMPLERATE/fps;
+        int samplesInSoundFrameRange =
+                        (endAbsFrame - soundStartFrame)*SAMPLERATE/fps;
 
-        if(soundStartFrame >= startFrame) {
-            firstTargetSample = (soundStartFrame - startFrame)*SAMPLERATE/fps;
+        if(soundStartFrame >= startAbsFrame) {
+            firstTargetSample =
+                        (soundStartFrame - startAbsFrame)*SAMPLERATE/fps;
             firstSampleFromSound = 0;
             sampleCountNeeded = qMin(soundSampleCount,
                                      samplesInSoundFrameRange);
         } else {
             firstTargetSample = 0;
-            firstSampleFromSound = (startFrame - soundStartFrame)*SAMPLERATE/fps;
+            firstSampleFromSound =
+                        (startAbsFrame - soundStartFrame)*SAMPLERATE/fps;
             sampleCountNeeded = qMin(soundSampleCount - firstSampleFromSound,
                                      samplesInSoundFrameRange);
         }

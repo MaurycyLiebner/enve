@@ -94,7 +94,7 @@ AnimationBoxFrameUpdater::AnimationBoxFrameUpdater(AnimationBox *target) {
 
 void AnimationBoxFrameUpdater::update() {
     mTarget->replaceCurrentFrameCache();
-    mTarget->updateDurationRectanglePossibleRange();
+    mTarget->updateDurationRectangleAnimationRange();
 }
 
 #include "Boxes/particlebox.h"

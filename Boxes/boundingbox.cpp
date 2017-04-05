@@ -984,8 +984,8 @@ QString BoundingBox::getName()
 
 bool BoundingBox::isInVisibleDurationRect() {
     if(mDurationRectangle == NULL) return true;
-    return mCurrentAbsFrame < mDurationRectangle->getMaxFrame() &&
-           mCurrentAbsFrame >= mDurationRectangle->getMinFrame();
+    return mCurrentRelFrame < mDurationRectangle->getMaxFrameAsRelFrame() &&
+           mCurrentRelFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
 bool BoundingBox::isVisibleAndInVisibleDurationRect() {

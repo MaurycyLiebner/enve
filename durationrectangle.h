@@ -44,10 +44,12 @@ protected:
     int mFramePos = 0;
 };
 
+class Property;
+
 class DurationRectangle : public DurationRectangleMovable {
     Q_OBJECT
 public:
-    DurationRectangle();
+    DurationRectangle(Property *childProp);
 
     int getFrameShift();
 
@@ -60,8 +62,13 @@ public:
     int getFrameDuration() const;
 
     int getMinFrame() const;
-
     int getMaxFrame() const;
+
+    int getMinFrameAsRelFrame() const;
+    int getMaxFrameAsRelFrame() const;
+
+    int getMinFrameAsAbsFrame() const;
+    int getMaxFrameAsAbsFrame() const;
 
     void draw(QPainter *p,
               const qreal &pixelsPerFrame,
@@ -75,34 +82,42 @@ public:
 
     void changeFramePosBy(const int &change);
 
-    void setPossibleFrameRangeVisible();
+    void setAnimationFrameRangeVisible();
 
-    int getMinPossibleFrame();
+    int getMinAnimationFrame() const;
+    int getMaxAnimationFrame() const;
 
-    int getMaxPossibleFrame();
+    int getMaxAnimationFrameAsRelFrame() const;
+    int getMinAnimationFrameAsRelFrame() const { return 0; }
 
-    void setMinPossibleFrame(const int &minPossibleFrame);
+    int getMaxAnimationFrameAsAbsFrame() const;
+    int getMinAnimationFrameAsAbsFrame() const;
 
-    void setMaxPossibleFrame(const int &maxPossibleFrame);
+    void setAnimationFrameDuration(const int &frameDuration);
 
-    void setPossibleFrameDuration(const int &frameDuration);
-
-    int getPossibleFrameDuration();
+    int getAnimationFrameDuration();
 
     Qt::CursorShape getHoverCursorShape() {
         return Qt::OpenHandCursor;
     }
 
-    void bindToPossibleFrameRange();
-    void setBindToPossibleFrameRange();
+    void bindToAnimationFrameRange();
+    void setBindToAnimationFrameRange();
+
+    bool hasAnimationFrameRange() { return mShowAnimationFrameRange; }
 signals:
     void changed();
 protected:
-    bool mBoundToPossible = false;
+    Property *mChildProperty;
+    void setMinAnimationFrame(const int &minAnimationFrame);
+
+    void setMaxAnimationFrame(const int &maxAnimationFrame);
+
+    bool mBoundToAnimation = false;
     bool mSetMaxFrameAtLeastOnce = false;
-    bool mShowPossibleFrameRange = false;
-    int mMinPossibleFrame = 0;
-    int mMaxPossibleFrame = 100;
+    bool mShowAnimationFrameRange = false;
+    int mMinAnimationFrame = 0;
+    int mMaxAnimationFrame = 100;
     DurationRectangleMovable mMinFrame;
     DurationRectangleMovable mMaxFrame;
 };

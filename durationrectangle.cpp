@@ -1,4 +1,5 @@
 #include "durationrectangle.h"
+#include "Properties/property.h"
 
 DurationRectangleMovable::DurationRectangleMovable() : QObject() {
 
@@ -50,7 +51,10 @@ void DurationRectangleMovable::setMinPos(const int &minPos) {
     mMinPos = minPos + 1;
 }
 
-DurationRectangle::DurationRectangle() : DurationRectangleMovable() {
+DurationRectangle::DurationRectangle(Property *childProp) :
+    DurationRectangleMovable() {
+    mChildProperty = childProp;
+
     setMinPos(-1000000);
     setMaxPos(1000000);
     mMinFrame.setMinPos(-1000000);
@@ -92,6 +96,24 @@ int DurationRectangle::getMaxFrame() const {
     return mMaxFrame.getFramePos();
 }
 
+int DurationRectangle::getMinFrameAsRelFrame() const {
+    return getMinFrame() - mFramePos;
+}
+
+int DurationRectangle::getMaxFrameAsRelFrame() const {
+    return getMaxFrame() - mFramePos;
+}
+
+int DurationRectangle::getMinFrameAsAbsFrame() const {
+    return mChildProperty->prp_relFrameToAbsFrame(
+                getMinFrameAsRelFrame());
+}
+
+int DurationRectangle::getMaxFrameAsAbsFrame() const {
+    return mChildProperty->prp_relFrameToAbsFrame(
+                getMaxFrameAsRelFrame());
+}
+
 void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
                              const qreal &drawY, const int &startFrame) {
     p->save();
@@ -99,10 +121,10 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
     int xT;
     int widthT;
     QRect drawRect;
-    if(mShowPossibleFrameRange) {
-        startDFrame = getMinPossibleFrame() - startFrame;
+    if(mShowAnimationFrameRange) {
+        startDFrame = getMinAnimationFrame() - startFrame;
         xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
-        widthT = getPossibleFrameDuration()*pixelsPerFrame - pixelsPerFrame;
+        widthT = getAnimationFrameDuration()*pixelsPerFrame - pixelsPerFrame;
         QRect drawRect = QRect(xT, drawY,
                                widthT,
                                BOX_HEIGHT);
@@ -159,8 +181,8 @@ DurationRectangleMovable *DurationRectangle::getMovableAt(
 }
 
 void DurationRectangle::changeFramePosBy(const int &change) {
-    mMaxPossibleFrame += change;
-    mMinPossibleFrame += change;
+    mMaxAnimationFrame += change;
+    mMinAnimationFrame += change;
     mMinFrame.changeFramePosByWithoutSignal(change);
     mMaxFrame.setMinPos(getMinFrame());
     mMaxFrame.changeFramePosByWithoutSignal(change);
@@ -168,64 +190,78 @@ void DurationRectangle::changeFramePosBy(const int &change) {
     DurationRectangleMovable::changeFramePosBy(change);
 }
 
-void DurationRectangle::setPossibleFrameRangeVisible() {
-    mShowPossibleFrameRange = true;
+void DurationRectangle::setAnimationFrameRangeVisible() {
+    mShowAnimationFrameRange = true;
 }
 
-int DurationRectangle::getMinPossibleFrame() {
-    return mMinPossibleFrame;
+int DurationRectangle::getMinAnimationFrame() const {
+    return mMinAnimationFrame;
 }
 
-int DurationRectangle::getMaxPossibleFrame() {
-    return mMaxPossibleFrame;
+int DurationRectangle::getMaxAnimationFrame() const {
+    return mMaxAnimationFrame;
 }
 
-void DurationRectangle::setMinPossibleFrame(const int &minPossibleFrame) {
-    mMinPossibleFrame = minPossibleFrame;
-    if(mBoundToPossible) {
-        bindToPossibleFrameRange();
+int DurationRectangle::getMaxAnimationFrameAsRelFrame() const {
+    return mMaxAnimationFrame - mFramePos;
+}
+
+int DurationRectangle::getMaxAnimationFrameAsAbsFrame() const {
+    return mChildProperty->prp_relFrameToAbsFrame(
+                getMaxAnimationFrameAsRelFrame());
+}
+
+int DurationRectangle::getMinAnimationFrameAsAbsFrame() const {
+    return mChildProperty->prp_relFrameToAbsFrame(
+                getMinAnimationFrameAsRelFrame());
+}
+
+void DurationRectangle::setMinAnimationFrame(const int &minAnimationFrame) {
+    mMinAnimationFrame = minAnimationFrame;
+    if(mBoundToAnimation) {
+        bindToAnimationFrameRange();
     }
 }
 
-void DurationRectangle::setMaxPossibleFrame(const int &maxPossibleFrame) {
+void DurationRectangle::setMaxAnimationFrame(const int &maxAnimationFrame) {
     bool moveMaxPosFrame = getMinFrame() == mFramePos &&
-                           getMaxFrame() == mFramePos + getPossibleFrameDuration();
-    mMaxPossibleFrame = maxPossibleFrame;
+                           getMaxFrame() == mFramePos + getAnimationFrameDuration();
+    mMaxAnimationFrame = maxAnimationFrame;
     if(mSetMaxFrameAtLeastOnce) {
         if(moveMaxPosFrame) {
-            setMaxFrame(mMaxPossibleFrame);
+            setMaxFrame(mMaxAnimationFrame);
         }
     } else {
         mSetMaxFrameAtLeastOnce = true;
-        setMaxFrame(maxPossibleFrame);
-        mMinFrame.setMaxPos(maxPossibleFrame);
+        setMaxFrame(maxAnimationFrame);
+        mMinFrame.setMaxPos(maxAnimationFrame);
     }
-    if(mBoundToPossible) {
-        bindToPossibleFrameRange();
+    if(mBoundToAnimation) {
+        bindToAnimationFrameRange();
     }
 }
 
-void DurationRectangle::setPossibleFrameDuration(const int &frameDuration) {
-    setMaxPossibleFrame(mMinPossibleFrame + frameDuration);
+void DurationRectangle::setAnimationFrameDuration(const int &frameDuration) {
+    setMaxAnimationFrame(mMinAnimationFrame + frameDuration);
 }
 
-int DurationRectangle::getPossibleFrameDuration() {
-    return mMaxPossibleFrame - mMinPossibleFrame;
+int DurationRectangle::getAnimationFrameDuration() {
+    return mMaxAnimationFrame - mMinAnimationFrame;
 }
 
-void DurationRectangle::bindToPossibleFrameRange() {
-    if(getMinFrame() < getMinPossibleFrame() ||
-       getMinFrame() >= getMaxPossibleFrame()) {
-        setMinFrame(getMinPossibleFrame());
+void DurationRectangle::bindToAnimationFrameRange() {
+    if(getMinFrame() < getMinAnimationFrame() ||
+       getMinFrame() >= getMaxAnimationFrame()) {
+        setMinFrame(getMinAnimationFrame());
     }
-    mMinFrame.setMinPos(getMinPossibleFrame());
-    if(getMaxFrame() > getMaxPossibleFrame() ||
-       getMaxFrame() <= getMinPossibleFrame()) {
-        setMaxFrame(getMaxPossibleFrame());
+    mMinFrame.setMinPos(getMinAnimationFrame());
+    if(getMaxFrame() > getMaxAnimationFrame() ||
+       getMaxFrame() <= getMinAnimationFrame()) {
+        setMaxFrame(getMaxAnimationFrame());
     }
-    mMaxFrame.setMaxPos(getMaxPossibleFrame());
+    mMaxFrame.setMaxPos(getMaxAnimationFrame());
 }
 
-void DurationRectangle::setBindToPossibleFrameRange() {
-    mBoundToPossible = true;
+void DurationRectangle::setBindToAnimationFrameRange() {
+    mBoundToAnimation = true;
 }

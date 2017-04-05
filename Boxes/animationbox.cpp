@@ -13,8 +13,9 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mTimeScaleAnimator.prp_blockUpdater();
     ca_addChildAnimator(&mTimeScaleAnimator);
 
-    setDurationRectangle(new DurationRectangle());
-    mDurationRectangle->setPossibleFrameRangeVisible();
+    setDurationRectangle(new DurationRectangle(this));
+    mDurationRectangle->setAnimationFrameRangeVisible();
+    mRenderCacheHandler.setDurationRectangle(mDurationRectangle);
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
 //    mFrameAnimator.setCurrentIntValue(0);
@@ -49,10 +50,10 @@ DurationRectangleMovable *AnimationBox::getRectangleMovableAtPos(
 //    return new AnimationBox(parent);
 //}
 
-void AnimationBox::updateDurationRectanglePossibleRange() {
+void AnimationBox::updateDurationRectangleAnimationRange() {
     qreal timeScale = mTimeScaleAnimator.qra_getCurrentValue();
 
-    mDurationRectangle->setPossibleFrameDuration(
+    mDurationRectangle->setAnimationFrameDuration(
                 qCeil(qAbs(timeScale*mFramesCount)));
 }
 
@@ -61,12 +62,13 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     qreal timeScale = mTimeScaleAnimator.qra_getCurrentValue();
 
     int pixId;
+    const int &absMinAnimation =
+                    mDurationRectangle->getMinAnimationFrameAsAbsFrame();
     if(timeScale > 0.) {
-        pixId = (mCurrentAbsFrame -
-                mDurationRectangle->getMinPossibleFrame())/timeScale;
+        pixId = (mCurrentAbsFrame - absMinAnimation)/timeScale;
     } else {
-        pixId = mFramesCount - 1 + (mCurrentAbsFrame -
-                mDurationRectangle->getMinPossibleFrame())/timeScale;
+        pixId = mFramesCount - 1 +
+                (mCurrentAbsFrame - absMinAnimation)/timeScale;
     }
 
     if(pixId < 0) {
@@ -90,7 +92,7 @@ void AnimationBox::drawKeys(QPainter *p,
                             qreal pixelsPerFrame, qreal drawY,
                             int startFrame, int endFrame) {
 //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
-//    int startDFrame = mDurationRectangle.getMinPossibleFrame() - startFrame;
+//    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
 //    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
 //    p->fillRect(startDFrame*pixelsPerFrame + pixelsPerFrame*0.5, drawY,
 //                frameWidth*pixelsPerFrame - pixelsPerFrame,

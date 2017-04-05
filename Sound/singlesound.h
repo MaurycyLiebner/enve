@@ -19,10 +19,10 @@ public:
     void setFilePath(const QString &path);
     void reloadDataFromFile();
 
-    int getStartFrame() const;
+    int getStartAbsFrame() const;
     int getSampleCount() const;
     const float *getFinalData() const;
-    void prepareFinalData(const qreal &fps, const int &minFrame, const int &maxFrame);
+    void prepareFinalData(const qreal &fps, const int &minAbsFrame, const int &maxAbsFrame);
     void prp_drawKeys(QPainter *p,
                   qreal pixelsPerFrame,
                   qreal drawY,
@@ -32,8 +32,8 @@ public:
                                                        qreal pixelsPerFrame);
     SWT_Type SWT_getType() { return SWT_SingleSound; }
     void updateFinalDataIfNeeded(const qreal &fps,
-                                 const int &minFrame,
-                                 const int &maxFrame);
+                                 const int &minAbsFrame,
+                                 const int &maxAbsFrame);
     int prp_getFrameShift() const;
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,

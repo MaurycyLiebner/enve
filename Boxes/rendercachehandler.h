@@ -15,10 +15,10 @@ enum RenderCacheRangeChangeType {
 
 struct RenderCacheRangeChange {
     RenderCacheRangeChange(const RenderCacheRangeChangeType &typeT,
-                         const int &relFrameT);
+                           const int &relFrameT);
 
     RenderCacheRangeChange(const RenderCacheRangeChangeType &typeT,
-                         Key *keyToAdd);
+                           Key *keyToAdd);
 
     RenderCacheRangeChangeType type;
     int relFrame;
@@ -28,18 +28,11 @@ struct RenderCacheRangeChange {
 class RenderCacheRange {
 public:
     RenderCacheRange(Key *minKey,
-                   Key *maxKey);
+                     Key *maxKey,
+                     const int &minFrame,
+                     const int &maxFrame);
 
-    RenderCacheRange(Key *minKey,
-                   Key *maxKey,
-                   const int &minFrame,
-                   const int &maxFrame);
-
-    ~RenderCacheRange();
-
-    void updateMinRelFrameFromKey();
-
-    void updateMaxRelFrameFromKey();
+    virtual ~RenderCacheRange();
 
     void setInternalDifferencesPresent(const bool &bT);
 
@@ -63,7 +56,7 @@ public:
 
     const int &getMinRelFrame();
 
-    void updateAfterKeysChanged();
+    virtual void updateAfterKeysChanged();
 
     void setMinKeyTMP(Key *minKey);
 
@@ -85,7 +78,9 @@ public:
                              int *lastDrawnRelToStartFrame,
                              int *lastDrawFrameRightPosP);
     void insertRenderContainer(BoundingBoxRenderContainer *cont);
-private:
+
+    virtual bool isBlocked() { return false; }
+protected:
     QList<BoundingBoxRenderContainer*> mRenderContainers;
     bool mInternalDifferences;
 
@@ -94,6 +89,44 @@ private:
 
     Key *mMinKey = NULL;
     Key *mMaxKey = NULL;
+};
+
+class RenderCacheHandler;
+
+class AnimationRenderCacheRange : public RenderCacheRange {
+public:
+    AnimationRenderCacheRange(DurationRectangle *durationRect);
+
+    bool isBlocked() { return true; }
+
+    void updateAfterKeysChanged() {}
+
+    void addInternalKey(Key *key);
+    void removeInternalKey(Key *key);
+
+    void updateMaxKey() {
+        mMaxKey = getLastInternalKey();
+    }
+
+    void updateMinKey() {
+        mMinKey = getFirstInternalKey();
+    }
+
+    void addAllInternalKeysToHandler(RenderCacheHandler *handler);
+private:
+    Key *getLastInternalKey() {
+        if(mInternalKeys.isEmpty()) return NULL;
+        return mInternalKeys.last();
+    }
+
+    Key *getFirstInternalKey() {
+        if(mInternalKeys.isEmpty()) return NULL;
+        return mInternalKeys.first();
+    }
+    int getKeyInsertIdForFrame(const int &frame);
+
+    QList<Key*> mInternalKeys;
+    DurationRectangle *mDurationRect = NULL;
 };
 
 class RenderCacheHandler {
@@ -137,18 +170,28 @@ public:
                              const qreal &drawY,
                              const int &startFrame, const int &endFrame);
     void setNoCache(const bool &noCache);
+
+    bool isRelFrameInDurationRectAnimationRange(const int &frame);
+    void setupRenderRangeforAnimationRange();
+
+    void divideRenderCacheRangeAtRelFrame(const int &divideRelFrame,
+                                          Key *newKey);
+    bool isThereBarrierAtRelFrame(const int &frame);
+    void setDurationRectangle(DurationRectangle *durRect);
 private:
+    void clearRenderRangeforAnimationRange();
+
+    bool mAnimationRangeSetup = false;
     bool mNoCache = false;
     DurationRectangle *mDurationRect = NULL;
 
     void setCurrentRenderContainerVar(BoundingBoxRenderContainer *cont);
 
     BoundingBoxRenderContainer *mCurrentRenderContainer = NULL;
-    void divideRenderCacheRangeAtRelFrame(const int &divideRelFrame,
-                                        Key *newKey);
 
     void divideRenderCacheRange(RenderCacheRange *oldRange,
-                              Key *newKey);
+                                const int &relFrame,
+                                Key *newKey);
 
     void mergeRenderCacheRanges(RenderCacheRange *prevRange,
                               RenderCacheRange *nextRange);
@@ -158,7 +201,7 @@ private:
                             RenderCacheRange **nextRange,
                             const int &relFrame);
 
-    void removeRangesBarrierAtRelFrame(const int &relFrame);
+    void removeRangesBarrierAtRelFrame(const int &relFrame, Key *key);
 
     void updateAfterBarrierValueChanged(const int &barrierRelFrame);
 

@@ -32,7 +32,7 @@ public:
     void schedulePixmapReload();
     void setUpdateVars();
     void afterSuccessfulUpdate();
-    void updateDurationRectanglePossibleRange();
+    void updateDurationRectangleAnimationRange();
     virtual void reloadFile() = 0;
 public slots:
     void updateAfterDurationRectangleChanged();

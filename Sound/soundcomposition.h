@@ -32,8 +32,8 @@ public:
     qint64 writeData(const char *data, qint64 len);
     qint64 bytesAvailable() const;
 
-    void generateData(const int &startFrame,
-                      const int &endFrame,
+    void generateData(const int &startAbsFrame,
+                      const int &endAbsFrame,
                       const qreal &fps);
 
     void addSound(SingleSound *sound);
