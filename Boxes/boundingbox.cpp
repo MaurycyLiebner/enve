@@ -1224,8 +1224,7 @@ void BoundingBox::processUpdate() {
 void BoundingBox::setNoCache(const bool &bT) {
     mNoCache = bT;
     clearAllCache();
-    mRenderCacheHandler.createNewRenderContainerAtRelFrame(mCurrentRelFrame);
-    mRenderCacheHandler.updateCurrentRenderContainerFromFrame(mCurrentRelFrame);
+    mRenderCacheHandler.setNoCache(bT);
     replaceCurrentFrameCache();
 }
 

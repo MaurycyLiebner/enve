@@ -191,6 +191,7 @@ void VideoBox::reloadFile() {
     updateFrameCount(mSrcFilePath.toLatin1().data());
     updateDurationRectanglePossibleRange();
     reloadSound();
+    clearAllCache();
     schedulePixmapReload();
 }
 

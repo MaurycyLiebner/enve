@@ -4,6 +4,7 @@ class Key;
 #include <QtCore>
 class QPainter;
 class BoundingBoxRenderContainer;
+class DurationRectangle;
 
 enum RenderCacheRangeChangeType {
 //    MOVE_KEY,
@@ -135,8 +136,10 @@ public:
                              const qreal &pixelsPerFrame,
                              const qreal &drawY,
                              const int &startFrame, const int &endFrame);
+    void setNoCache(const bool &noCache);
 private:
     bool mNoCache = false;
+    DurationRectangle *mDurationRect = NULL;
 
     void setCurrentRenderContainerVar(BoundingBoxRenderContainer *cont);
 

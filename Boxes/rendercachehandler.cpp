@@ -2,6 +2,7 @@
 #include "boundingboxrendercontainer.h"
 #include "key.h"
 #include "Animators/complexanimator.h"
+#include "durationrectangle.h"
 
 RenderCacheRangeChange::RenderCacheRangeChange(
         const RenderCacheRangeChangeType &typeT,
@@ -305,6 +306,10 @@ void RenderCacheHandler::addRenderCacheRangeChange(
 
 BoundingBoxRenderContainer *RenderCacheHandler::getRenderContainerAtRelFrame(
                                 const int &frame) {
+    if(mNoCache) {
+        if(mCurrentRenderContainer->getFrame() != frame) return NULL;
+        return mCurrentRenderContainer;
+    }
     return getRenderCacheRangeContainingRelFrame(frame)->
             getRenderContainerAtRelFrame(frame);
 }
@@ -313,6 +318,14 @@ BoundingBoxRenderContainer *RenderCacheHandler::createNewRenderContainerAtRelFra
                                 const int &frame) {
     return getRenderCacheRangeContainingRelFrame(frame)->
             createNewRenderContainerAtRelFrame(frame);
+}
+
+void RenderCacheHandler::setNoCache(const bool &noCache) {
+    mNoCache = noCache;
+    clearAllCache();
+    if(noCache) {
+        setCurrentRenderContainerVar(new BoundingBoxRenderContainer());
+    }
 }
 
 void RenderCacheHandler::clearAllCache() {
@@ -351,6 +364,7 @@ void RenderCacheHandler::addChangedKey(Key *key) {
 
 void RenderCacheHandler::updateCurrentRenderContainerFromFrame(
                                 const int &relFrame) {
+    if(mNoCache) return;
     BoundingBoxRenderContainer *contAtFrame =
             getRenderContainerAtRelFrame(relFrame);
     if(contAtFrame == NULL) {
@@ -363,6 +377,7 @@ void RenderCacheHandler::updateCurrentRenderContainerFromFrame(
 
 bool RenderCacheHandler::updateCurrentRenderContainerFromFrameIfNotNull(
                                 const int &relFrame) {
+    if(mNoCache) return false;
     BoundingBoxRenderContainer *cont =
             getRenderContainerAtRelFrame(relFrame);
     if(cont != NULL) {

@@ -34,15 +34,7 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
 
 void ParticleBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    mParticlesFrameChanged = true;
     scheduleSoftUpdate();
-}
-
-void ParticleBox::setUpdateVars() {
-    BoundingBox::setUpdateVars();
-    mUpdateReplaceCache = mUpdateReplaceCache ||
-                          mParticlesFrameChanged;
-    mParticlesFrameChanged = false;
 }
 
 void ParticleBox::updateRelBoundingRect() {
