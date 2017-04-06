@@ -78,6 +78,7 @@ public:
         mParentRange = range;
     }
 
+    void thisAccessed();
 private:
     RenderCacheRange *mParentRange = NULL;
 };

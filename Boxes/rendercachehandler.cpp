@@ -484,6 +484,7 @@ void RenderCacheHandler::setCurrentRenderContainerVar(
     mCurrentRenderContainer = cont;
     if(mCurrentRenderContainer != NULL) {
         mCurrentRenderContainer->incNumberPointers();
+        mCurrentRenderContainer->thisAccessed();
     }
 }
 

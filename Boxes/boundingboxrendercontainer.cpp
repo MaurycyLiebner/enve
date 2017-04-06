@@ -121,6 +121,10 @@ void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
     mFrame = frame;
     mResolutionPercent = res;
     mRenderTime = time;
+    thisAccessed();
+}
+
+void CacheBoundingBoxRenderContainer::thisAccessed() {
     MemoryHandler::getInstance()->containerUpdated(this);
 }
 
