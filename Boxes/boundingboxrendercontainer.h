@@ -6,7 +6,8 @@ class BoundingBox;
 
 class BoundingBoxRenderContainer : public SmartPointerTarget {
 public:
-    BoundingBoxRenderContainer();
+    BoundingBoxRenderContainer() {}
+    virtual ~BoundingBoxRenderContainer() {}
 
     void draw(QPainter *p);
 
@@ -31,6 +32,8 @@ public:
 
     const int &getFrame() const;
 
+    const qint64 &getRenderTime() const;
+
     void setFrame(const int &frame);
 
     void updateVariables(const QMatrix &combinedTransform,
@@ -38,21 +41,45 @@ public:
                          const qreal &resolutionPer,
                          BoundingBox *target);
 
-    void duplicateFrom(BoundingBoxRenderContainer *src);
-
-    void setVariables(const QMatrix &transform,
-                      const QMatrix &paintTransform,
-                      const QRectF &rect,
-                      const QImage &img,
-                      const int &frame, const qreal &res);
     void drawWithoutTransform(QPainter *p);
-private:
+
+    int getByteCount() {
+        return mImage.byteCount();
+    }
+
+protected:
+    qint64 mRenderTime = 0;
     int mFrame = 0;
     qreal mResolutionPercent;
     QMatrix mTransform;
     QMatrix mPaintTransform;
     QRectF mBoundingRect;
     QImage mImage;
+};
+
+class RenderCacheRange;
+
+class CacheBoundingBoxRenderContainer : public BoundingBoxRenderContainer {
+public:
+    CacheBoundingBoxRenderContainer();
+    virtual ~CacheBoundingBoxRenderContainer();
+
+    void duplicateFrom(BoundingBoxRenderContainer *src);
+
+    void setVariables(const QMatrix &transform,
+                      const QMatrix &paintTransform,
+                      const QRectF &rect,
+                      const QImage &img,
+                      const int &frame,
+                      const qreal &res, const qint64 &time);
+    void freeThis();
+
+    void setParentRagne(RenderCacheRange *range) {
+        mParentRange = range;
+    }
+
+private:
+    RenderCacheRange *mParentRange = NULL;
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H

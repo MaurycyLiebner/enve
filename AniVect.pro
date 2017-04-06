@@ -120,7 +120,9 @@ SOURCES += main.cpp\
     BoxesList/boolpropertywidget.cpp \
     Boxes/imagesequencebox.cpp \
     key.cpp \
-    Boxes/rendercachehandler.cpp
+    Boxes/rendercachehandler.cpp \
+    memorychecker.cpp \
+    memoryhandler.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -225,7 +227,9 @@ HEADERS  += mainwindow.h \
     BoxesList/boolpropertywidget.h \
     Boxes/imagesequencebox.h \
     key.h \
-    Boxes/rendercachehandler.h
+    Boxes/rendercachehandler.h \
+    memorychecker.h \
+    memoryhandler.h
 
 RESOURCES += \
     resources.qrc

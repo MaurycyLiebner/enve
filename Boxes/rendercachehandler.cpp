@@ -56,7 +56,7 @@ bool RenderCacheRange::getRenderContainterIdAtRelFrame(const int &relFrame,
 
     while(minId <= maxId) {
         int guess = (minId + maxId)/2;
-        BoundingBoxRenderContainer *cont = mRenderContainers.at(guess);
+        CacheBoundingBoxRenderContainer *cont = mRenderContainers.at(guess);
         int contFrame = cont->getFrame();
         if(contFrame > relFrame) {
             if(maxId == guess) {
@@ -87,7 +87,7 @@ int RenderCacheRange::getRenderContainterInsertIdAtRelFrame(
 
     while(minId < maxId) {
         int guess = (minId + maxId)/2;
-        BoundingBoxRenderContainer *cont = mRenderContainers.at(guess);
+        CacheBoundingBoxRenderContainer *cont = mRenderContainers.at(guess);
         int contFrame = cont->getFrame();
         if(contFrame > relFrame) {
             if(guess == maxId) {
@@ -104,13 +104,22 @@ int RenderCacheRange::getRenderContainterInsertIdAtRelFrame(
     return 0;
 }
 
-void RenderCacheRange::insertRenderContainer(BoundingBoxRenderContainer *cont) {
+void RenderCacheRange::insertRenderContainer(
+                    CacheBoundingBoxRenderContainer *cont) {
     int contId = getRenderContainterInsertIdAtRelFrame(cont->getFrame());
+    cont->setParentRagne(this);
     mRenderContainers.insert(contId, cont);
     cont->incNumberPointers();
 }
 
-BoundingBoxRenderContainer *RenderCacheRange::getRenderContainerAtRelFrame(
+void RenderCacheRange::removeRenderContainer(
+        CacheBoundingBoxRenderContainer *cont) {
+    mRenderContainers.removeOne(cont);
+    cont->decNumberPointers();
+}
+
+CacheBoundingBoxRenderContainer *
+RenderCacheRange::getRenderContainerAtRelFrame(
         const int &frame) {
     if(mInternalDifferences) {
         int id;
@@ -126,9 +135,11 @@ BoundingBoxRenderContainer *RenderCacheRange::getRenderContainerAtRelFrame(
     }
 }
 #include <QDebug>
-BoundingBoxRenderContainer *
+CacheBoundingBoxRenderContainer *
 RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
-    BoundingBoxRenderContainer *cont = new BoundingBoxRenderContainer();
+    CacheBoundingBoxRenderContainer *cont =
+            new CacheBoundingBoxRenderContainer();
+    cont->setParentRagne(this);
     cont->setFrame(frame);
     cont->incNumberPointers();
     if(mInternalDifferences) {
@@ -142,7 +153,7 @@ RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
 }
 
 void RenderCacheRange::clearCache() {
-    foreach(BoundingBoxRenderContainer *cont, mRenderContainers) {
+    foreach(CacheBoundingBoxRenderContainer *cont, mRenderContainers) {
         cont->decNumberPointers();
     }
 
@@ -201,7 +212,7 @@ void RenderCacheRange::drawCacheOnTimeline(QPainter *p,
     int lastDrawnRelToStartFrame = *lastDrawnRelToStartFrameP;
     int lastDrawFrameRightPos = *lastDrawFrameRightPosP;
     if(mInternalDifferences) {
-        foreach(BoundingBoxRenderContainer *cont, mRenderContainers) {
+        foreach(CacheBoundingBoxRenderContainer *cont, mRenderContainers) {
             int dFrame = cont->getFrame() - startFrame;
             int xT = dFrame*pixelsPerFrame;
             int widthT = pixelsPerFrame;
@@ -278,7 +289,8 @@ void RenderCacheHandler::addRenderCacheRangeChange(
     }
 }
 
-BoundingBoxRenderContainer *RenderCacheHandler::getRenderContainerAtRelFrame(
+CacheBoundingBoxRenderContainer *
+RenderCacheHandler::getRenderContainerAtRelFrame(
                                 const int &frame) {
     if(mNoCache) {
         if(mCurrentRenderContainer->getFrame() != frame) return NULL;
@@ -288,7 +300,8 @@ BoundingBoxRenderContainer *RenderCacheHandler::getRenderContainerAtRelFrame(
             getRenderContainerAtRelFrame(frame);
 }
 
-BoundingBoxRenderContainer *RenderCacheHandler::createNewRenderContainerAtRelFrame(
+CacheBoundingBoxRenderContainer *
+RenderCacheHandler::createNewRenderContainerAtRelFrame(
                                 const int &frame) {
     return getRenderCacheRangeContainingRelFrame(frame)->
             createNewRenderContainerAtRelFrame(frame);
@@ -298,7 +311,7 @@ void RenderCacheHandler::setNoCache(const bool &noCache) {
     mNoCache = noCache;
     clearAllCache();
     if(noCache) {
-        setCurrentRenderContainerVar(new BoundingBoxRenderContainer());
+        setCurrentRenderContainerVar(new CacheBoundingBoxRenderContainer());
     }
 }
 
@@ -424,7 +437,7 @@ void RenderCacheHandler::addChangedKey(Key *key) {
 void RenderCacheHandler::updateCurrentRenderContainerFromFrame(
                                 const int &relFrame) {
     if(mNoCache) return;
-    BoundingBoxRenderContainer *contAtFrame =
+    CacheBoundingBoxRenderContainer *contAtFrame =
             getRenderContainerAtRelFrame(relFrame);
     if(contAtFrame == NULL) {
         setCurrentRenderContainerVar(
@@ -437,7 +450,7 @@ void RenderCacheHandler::updateCurrentRenderContainerFromFrame(
 bool RenderCacheHandler::updateCurrentRenderContainerFromFrameIfNotNull(
                                 const int &relFrame) {
     if(mNoCache) return false;
-    BoundingBoxRenderContainer *cont =
+    CacheBoundingBoxRenderContainer *cont =
             getRenderContainerAtRelFrame(relFrame);
     if(cont != NULL) {
         setCurrentRenderContainerVar(cont);
@@ -447,7 +460,7 @@ bool RenderCacheHandler::updateCurrentRenderContainerFromFrameIfNotNull(
 }
 
 void RenderCacheHandler::duplicateCurrentRenderContainerFrom(
-                                BoundingBoxRenderContainer *cont) {
+                            BoundingBoxRenderContainer *cont) {
     mCurrentRenderContainer->duplicateFrom(cont);
 }
 
@@ -464,7 +477,7 @@ void RenderCacheHandler::drawCurrentRenderContainer(QPainter *p) {
 }
 
 void RenderCacheHandler::setCurrentRenderContainerVar(
-                                BoundingBoxRenderContainer *cont) {
+                            CacheBoundingBoxRenderContainer *cont) {
     if(mCurrentRenderContainer != NULL) {
         mCurrentRenderContainer->decNumberPointers();
     }

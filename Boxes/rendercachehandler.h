@@ -4,6 +4,7 @@ class Key;
 #include <QtCore>
 class QPainter;
 class BoundingBoxRenderContainer;
+class CacheBoundingBoxRenderContainer;
 class DurationRectangle;
 
 enum RenderCacheRangeChangeType {
@@ -44,10 +45,10 @@ public:
 
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
 
-    BoundingBoxRenderContainer *getRenderContainerAtRelFrame(
+    CacheBoundingBoxRenderContainer *getRenderContainerAtRelFrame(
                                 const int &frame);
 
-    BoundingBoxRenderContainer *createNewRenderContainerAtRelFrame(
+    CacheBoundingBoxRenderContainer *createNewRenderContainerAtRelFrame(
                                 const int &frame);
 
     void clearCache();
@@ -77,11 +78,13 @@ public:
                              const int &endFrame,
                              int *lastDrawnRelToStartFrame,
                              int *lastDrawFrameRightPosP);
-    void insertRenderContainer(BoundingBoxRenderContainer *cont);
+    void insertRenderContainer(CacheBoundingBoxRenderContainer *cont);
 
     virtual bool isBlocked() { return false; }
+
+    void removeRenderContainer(CacheBoundingBoxRenderContainer *cont);
 protected:
-    QList<BoundingBoxRenderContainer*> mRenderContainers;
+    QList<CacheBoundingBoxRenderContainer*> mRenderContainers;
     bool mInternalDifferences;
 
     int mMinRelFrame;
@@ -137,10 +140,10 @@ public:
 
     void addRenderCacheRangeChange(const RenderCacheRangeChange &change);
 
-    BoundingBoxRenderContainer *getRenderContainerAtRelFrame(
+    CacheBoundingBoxRenderContainer *getRenderContainerAtRelFrame(
                                     const int &frame);
 
-    BoundingBoxRenderContainer *createNewRenderContainerAtRelFrame(
+    CacheBoundingBoxRenderContainer *createNewRenderContainerAtRelFrame(
                                     const int &frame);
 
     void clearAllCache();
@@ -158,8 +161,7 @@ public:
     bool updateCurrentRenderContainerFromFrameIfNotNull(
                                                 const int &relFrame);
 
-    void duplicateCurrentRenderContainerFrom(
-            BoundingBoxRenderContainer *cont);
+    void duplicateCurrentRenderContainerFrom(BoundingBoxRenderContainer *cont);
 
     void updateCurrentRenderContainerTransform(const QMatrix &trans);
 
@@ -185,9 +187,9 @@ private:
     bool mNoCache = false;
     DurationRectangle *mDurationRect = NULL;
 
-    void setCurrentRenderContainerVar(BoundingBoxRenderContainer *cont);
+    void setCurrentRenderContainerVar(CacheBoundingBoxRenderContainer *cont);
 
-    BoundingBoxRenderContainer *mCurrentRenderContainer = NULL;
+    CacheBoundingBoxRenderContainer *mCurrentRenderContainer = NULL;
 
     void divideRenderCacheRange(RenderCacheRange *oldRange,
                                 const int &relFrame,

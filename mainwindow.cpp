@@ -23,6 +23,7 @@
 #include "Sound/soundcomposition.h"
 #include "Sound/singlesound.h"
 #include "BoxesList/boxsinglewidget.h"
+#include "memoryhandler.h"
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -56,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     mCurrentUndoRedoStack = &mUndoRedoStack;
+
+    mMemoryHandler = new MemoryHandler(this);
 
     mMainWindowInstance = this;
     //int nThreads = QThread::idealThreadCount();
@@ -104,9 +107,7 @@ MainWindow::MainWindow(QWidget *parent)
     mObjectSettingsWidget->getVisiblePartWidget()->
             setCurrentRule(SWT_Selected);
     mObjectSettingsWidget->getVisiblePartWidget()->
-            setCurrentTarget(
-                NULL,
-                SWT_CurrentGroup);
+            setCurrentTarget(NULL, SWT_CurrentGroup);
 
     connect(mObjectSettingsScrollArea->verticalScrollBar(),
             SIGNAL(valueChanged(int)),

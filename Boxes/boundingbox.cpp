@@ -168,7 +168,7 @@ void BoundingBox::applyEffects(QImage *im,
     }
 }
 
-BoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
+CacheBoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
                                                 const int &frame) {
     return mRenderCacheHandler.getRenderContainerAtRelFrame(frame);
 }

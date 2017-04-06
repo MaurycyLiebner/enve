@@ -467,7 +467,7 @@ protected:
 
     virtual void updateAfterCombinedTransformationChanged() {}
 
-    BoundingBoxRenderContainer *getRenderContainerAtFrame(
+    CacheBoundingBoxRenderContainer *getRenderContainerAtFrame(
                                     const int &frame);
 
     BoundingBoxRenderContainer *mUpdateRenderContainer =

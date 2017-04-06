@@ -1,7 +1,7 @@
 #include "boundingboxrendercontainer.h"
 #include "boundingbox.h"
-
-BoundingBoxRenderContainer::BoundingBoxRenderContainer() {}
+#include <QElapsedTimer>
+#include "memoryhandler.h"
 
 void BoundingBoxRenderContainer::draw(QPainter *p) {
     p->save();
@@ -57,6 +57,10 @@ const int &BoundingBoxRenderContainer::getFrame() const {
     return mFrame;
 }
 
+const qint64 &BoundingBoxRenderContainer::getRenderTime() const {
+    return mRenderTime;
+}
+
 void BoundingBoxRenderContainer::setFrame(const int &frame) {
     mFrame = frame;
 }
@@ -65,6 +69,9 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransfor
                                                  const qreal &effectsMargin,
                                                  const qreal &resolutionPer,
                                                  BoundingBox *target) {
+    QElapsedTimer timer;
+    timer.start();
+
     mTransform = combinedTransform;
     mTransform.scale(resolutionPer, resolutionPer);
 
@@ -77,27 +84,47 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransfor
 
     target->applyEffects(&mImage,
                          resolutionPer);
+
+    mRenderTime = timer.elapsed();
 }
 
-void BoundingBoxRenderContainer::duplicateFrom(BoundingBoxRenderContainer *src) {
+CacheBoundingBoxRenderContainer::CacheBoundingBoxRenderContainer() {
+    MemoryHandler::getInstance()->addContainer(this);
+}
+
+CacheBoundingBoxRenderContainer::~CacheBoundingBoxRenderContainer() {
+    MemoryHandler::getInstance()->removeContainer(this);
+}
+
+void CacheBoundingBoxRenderContainer::duplicateFrom(
+                                            BoundingBoxRenderContainer *src) {
     setVariables(src->getTransform(),
                  src->getPaintTransform(),
                  src->getBoundingRect(),
                  src->getImage(),
                  src->getFrame(),
-                 src->getResolutionPercent());
+                 src->getResolutionPercent(),
+                 src->getRenderTime());
 }
 
-void BoundingBoxRenderContainer::setVariables(const QMatrix &transform,
+void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
                                               const QMatrix &paintTransform,
                                               const QRectF &rect,
                                               const QImage &img,
                                               const int &frame,
-                                              const qreal &res) {
+                                              const qreal &res,
+                                              const qint64 &time) {
     mTransform = transform;
     mPaintTransform = paintTransform;
     mImage = img;
     mBoundingRect = rect;
     mFrame = frame;
     mResolutionPercent = res;
+    mRenderTime = time;
+    MemoryHandler::getInstance()->containerUpdated(this);
+}
+
+void CacheBoundingBoxRenderContainer::freeThis() {
+    if(mParentRange == NULL) return;
+    mParentRange->removeRenderContainer(this);
 }

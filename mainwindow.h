@@ -26,6 +26,7 @@ class ColorSettingsWidget;
 class BoxesListAnimationDockWidget;
 
 class CanvasWidget;
+class MemoryHandler;
 
 class ObjectSettingsWidget;
 class BoxScrollWidget;
@@ -156,6 +157,7 @@ signals:
     void updateAll();
 private:
     static MainWindow *mMainWindowInstance;
+    MemoryHandler *mMemoryHandler;
 
     QList<ClipboardContainer*> mClipboardContainers;
 //    bool mRendering = false;
