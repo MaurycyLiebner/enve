@@ -157,22 +157,29 @@ void SingleSound::prp_drawKeys(QPainter *p,
                                   startFrame, endFrame);
 }
 
+FixedLenAnimationRect *SingleSound::getDurationRect() {
+    return (FixedLenAnimationRect*)mDurationRectangle;
+}
+
 void SingleSound::setDurationRect(DurationRectangle *durRect) {
     if(mDurationRectangle != NULL) {
         delete mDurationRectangle;
     }
     if(durRect == NULL) {
         mOwnDurationRectangle = true;
-        mDurationRectangle = new DurationRectangle(this);
-        mDurationRectangle->setAnimationFrameRangeVisible();
-        mDurationRectangle->setBindToAnimationFrameRange();
-        connect(mDurationRectangle, SIGNAL(changed()),
+        FixedLenAnimationRect *durRect =
+                new FixedLenAnimationRect(this);
+        setDurationRect(durRect);
+        durRect->setBindToAnimationFrameRange();
+        connect(mDurationRectangle, SIGNAL(posChanged(int)),
                 this, SLOT(anim_updateAfterShifted()));
     } else {
         mOwnDurationRectangle = false;
         mDurationRectangle = durRect;
     }
-    connect(mDurationRectangle, SIGNAL(changed()),
+    connect(mDurationRectangle, SIGNAL(rangeChanged()),
+            this, SLOT(scheduleFinalDataUpdate()));
+    connect(mDurationRectangle, SIGNAL(posChanged(int)),
             this, SLOT(scheduleFinalDataUpdate()));
 }
 
@@ -217,7 +224,7 @@ void SingleSound::reloadDataFromFile() {
         }
     }
     if(mOwnDurationRectangle) {
-        mDurationRectangle->setAnimationFrameDuration(
+        getDurationRect()->setAnimationFrameDuration(
                     qCeil(mSrcSampleCount*24./SAMPLERATE));
     }
 
@@ -245,15 +252,15 @@ void SingleSound::prepareFinalData(const qreal &fps,
         int finalMinFrame =
                 qMax(minAbsFrame,
                        qMax(mDurationRectangle->getMinFrameAsAbsFrame(),
-                            mDurationRectangle->getMinAnimationFrameAsAbsFrame()) );
+                            getDurationRect()->getMinAnimationFrameAsAbsFrame()) );
         int finalMaxFrame =
                 qMin(maxAbsFrame,
                        qMin(mDurationRectangle->getMaxFrameAsAbsFrame(),
-                            mDurationRectangle->getMaxAnimationFrameAsAbsFrame()) );
+                            getDurationRect()->getMaxAnimationFrameAsAbsFrame()) );
         int minFrameFromSrc = finalMinFrame -
-                              mDurationRectangle->getMinAnimationFrameAsAbsFrame();
+                              getDurationRect()->getMinAnimationFrameAsAbsFrame();
         int maxFrameFromSrc = qMin(finalMaxFrame,
-                                   mDurationRectangle->getMaxAnimationFrameAsAbsFrame());
+                                   getDurationRect()->getMaxAnimationFrameAsAbsFrame());
         int minSampleFromSrc = minFrameFromSrc*SAMPLERATE/fps;
         int maxSampleFromSrc = qMin(mSrcSampleCount,
                                     qCeil(maxFrameFromSrc*SAMPLERATE/fps));

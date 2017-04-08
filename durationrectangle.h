@@ -37,6 +37,7 @@ public slots:
     void setMinPos(const int &minPos);
 signals:
     void posChanged(int);
+    void finishedTransform();
 protected:
     bool mHovered = false;
     int mMinPos = 0;
@@ -45,6 +46,7 @@ protected:
 };
 
 class Property;
+class RenderCacheHandler;
 
 class DurationRectangle : public DurationRectangleMovable {
     Q_OBJECT
@@ -55,9 +57,9 @@ public:
 
     void setFramesDuration(const int &duration);
 
-    void setMinFrame(const int &minFrame);
+    virtual void setMinFrame(const int &minFrame);
 
-    void setMaxFrame(const int &maxFrame);
+    virtual void setMaxFrame(const int &maxFrame);
 
     int getFrameDuration() const;
 
@@ -70,10 +72,10 @@ public:
     int getMinFrameAsAbsFrame() const;
     int getMaxFrameAsAbsFrame() const;
 
-    void draw(QPainter *p,
-              const qreal &pixelsPerFrame,
-              const qreal &drawY,
-              const int &startFrame);
+    virtual void draw(QPainter *p,
+                      const qreal &pixelsPerFrame,
+                      const qreal &drawY,
+                      const int &startFrame);
 
     virtual DurationRectangleMovable *getMovableAt(
                       const int &pressX,
@@ -82,13 +84,40 @@ public:
 
     void changeFramePosBy(const int &change);
 
-    void setAnimationFrameRangeVisible();
+    Qt::CursorShape getHoverCursorShape() {
+        return Qt::OpenHandCursor;
+    }
 
-    int getMinAnimationFrame() const;
-    int getMaxAnimationFrame() const;
+    virtual bool hasAnimationFrameRange() { return false; }
+
+    virtual void connectRenderCacheHandler(RenderCacheHandler *handler);
+signals:
+    void rangeChanged();
+    void finishedRangeChange();
+protected:
+    Property *mChildProperty;
+
+    DurationRectangleMovable mMinFrame;
+    DurationRectangleMovable mMaxFrame;
+};
+
+class AnimationRect : public DurationRectangle {
+    Q_OBJECT
+public:
+    AnimationRect(Property *childProp) : DurationRectangle(childProp) {}
+
+    bool hasAnimationFrameRange() { return true; }
+
+    void draw(QPainter *p,
+              const qreal &pixelsPerFrame,
+              const qreal &drawY,
+              const int &startFrame);
+
+    virtual int getMinAnimationFrame() const = 0;
+    virtual int getMaxAnimationFrame() const = 0;
 
     int getMaxAnimationFrameAsRelFrame() const;
-    int getMinAnimationFrameAsRelFrame() const { return 0; }
+    int getMinAnimationFrameAsRelFrame() const;
 
     int getMaxAnimationFrameAsAbsFrame() const;
     int getMinAnimationFrameAsAbsFrame() const;
@@ -96,30 +125,75 @@ public:
     void setAnimationFrameDuration(const int &frameDuration);
 
     int getAnimationFrameDuration();
+    void connectRenderCacheHandler(RenderCacheHandler *handler);
+signals:
+    void animationRangeChanged();
+    void finishedAnimationRangeChange();
+protected:
+    virtual void setMinAnimationFrame(const int &minAnimationFrame) = 0;
+    virtual void setMaxAnimationFrame(const int &maxAnimationFrame) = 0;
+};
 
-    Qt::CursorShape getHoverCursorShape() {
-        return Qt::OpenHandCursor;
+class VaryingLenAnimationRect : public AnimationRect {
+    Q_OBJECT
+public:
+    VaryingLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
+        connect(&mMinFrame, SIGNAL(posChanged(int)),
+                this, SIGNAL(animationRangeChanged()));
+        connect(&mMaxFrame, SIGNAL(posChanged(int)),
+                this, SIGNAL(animationRangeChanged()));
+        connect(&mMinFrame, SIGNAL(finishedTransform()),
+                this, SIGNAL(finishedAnimationRangeChange()));
+        connect(&mMaxFrame, SIGNAL(finishedTransform()),
+                this, SIGNAL(finishedAnimationRangeChange()));
     }
+
+    int getMinAnimationFrame() const {
+        return getMinFrame();
+    }
+
+    int getMaxAnimationFrame() const {
+        return getMaxFrame();
+    }
+
+    void setMinFrame(const int &minFrame) {
+        DurationRectangle::setMinFrame(minFrame);
+        emit animationRangeChanged();
+    }
+
+    void setMaxFrame(const int &maxFrame) {
+        DurationRectangle::setMaxFrame(maxFrame);
+        emit animationRangeChanged();
+    }
+protected:
+    void setMinAnimationFrame(const int &minAnimationFrame) {
+        setMinFrame(minAnimationFrame);
+    }
+
+    void setMaxAnimationFrame(const int &maxAnimationFrame) {
+        setMaxFrame(maxAnimationFrame);
+    }
+};
+
+class FixedLenAnimationRect : public AnimationRect {
+    Q_OBJECT
+public:
+    FixedLenAnimationRect(Property *childProp) : AnimationRect(childProp) {}
+
+    int getMinAnimationFrame() const;
+    int getMaxAnimationFrame() const;
 
     void bindToAnimationFrameRange();
     void setBindToAnimationFrameRange();
-
-    bool hasAnimationFrameRange() { return mShowAnimationFrameRange; }
-signals:
-    void changed();
+    void changeFramePosBy(const int &change);
 protected:
-    Property *mChildProperty;
     void setMinAnimationFrame(const int &minAnimationFrame);
-
     void setMaxAnimationFrame(const int &maxAnimationFrame);
 
     bool mBoundToAnimation = false;
     bool mSetMaxFrameAtLeastOnce = false;
-    bool mShowAnimationFrameRange = false;
     int mMinAnimationFrame = 0;
     int mMaxAnimationFrame = 100;
-    DurationRectangleMovable mMinFrame;
-    DurationRectangleMovable mMaxFrame;
 };
 
 #endif // DURATIONRECTANGLE_H

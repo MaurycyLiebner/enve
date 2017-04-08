@@ -26,8 +26,8 @@ public:
     void afterSuccessfulUpdate();
     void updateDurationRectangleAnimationRange();
     virtual void reloadFile() = 0;
+    FixedLenAnimationRect *getAnimationDurationRect();
 public slots:
-    void updateAfterDurationRectangleChanged();
 protected:
     bool mPixmapReloadScheduled = false;
     bool mUpdatePixmapReloadScheduled = false;

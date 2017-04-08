@@ -1,6 +1,7 @@
 #ifndef SINGLESOUND_H
 #define SINGLESOUND_H
 #include "Animators/complexanimator.h"
+class FixedLenAnimationRect;
 class DurationRectangle;
 
 extern int decode_audio_file(const char* path,
@@ -39,6 +40,7 @@ public:
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
                              const bool &parentMainTarget);
+    FixedLenAnimationRect *getDurationRect();
 public slots:
     void scheduleFinalDataUpdate();
 private:

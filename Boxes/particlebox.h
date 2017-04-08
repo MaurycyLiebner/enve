@@ -158,12 +158,7 @@ public:
     }
 
     void setFrameRange(const int &minFrame,
-                       const int &maxFrame) {
-        if(minFrame == mMinFrame && mMaxFrame == maxFrame) return;
-        mMinFrame = minFrame;
-        mMaxFrame = maxFrame;
-        scheduleGenerateParticles();
-    }
+                       const int &maxFrame);
 
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint() {
@@ -180,6 +175,7 @@ private:
 
     QList<ParticleState> mParticleStates;
     QList<Particle*> mParticles;
+    QList<Particle*> mNotFinishedParticles;
     ParticleBox *mParentBox = NULL;
 
     ColorAnimator mColorAnimator;
@@ -247,7 +243,7 @@ public:
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
 public slots:
-    void updateAfterDurationRectangleChanged();
+    void updateAfterDurationRectangleRangeChanged();
 private:
     MovablePoint *mTopLeftPoint;
     MovablePoint *mBottomRightPoint;

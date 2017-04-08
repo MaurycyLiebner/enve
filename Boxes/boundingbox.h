@@ -519,7 +519,8 @@ signals:
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
 public slots:
-    virtual void updateAfterDurationRectangleChanged() {}
+    void updateAfterDurationRectangleShifted();
+    virtual void updateAfterDurationRectangleRangeChanged() {}
     void replaceCurrentFrameCache();
     void scheduleSoftUpdate();
     void scheduleHardUpdate();

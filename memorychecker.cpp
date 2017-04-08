@@ -7,7 +7,9 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     if(sysinfo(&info) == 0) {
         mMemUnit = info.mem_unit;
         mTotalRam = info.totalram*mMemUnit;
-        mFreeRam = info.freeram*mMemUnit;
+        mFreeRam = info.freeram*info.mem_unit +
+                   //info.freeswap*info.mem_unit +
+                   info.bufferram*info.mem_unit;
     } else { // ??
     }
     mTimer = new QTimer(this);
@@ -19,7 +21,9 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
 void MemoryChecker::checkMemory() {
     struct sysinfo info;
     if(sysinfo(&info) == 0) {
-        mFreeRam = info.freeram*mMemUnit;
+        mFreeRam = info.freeram*info.mem_unit +
+                   //info.freeswap*info.mem_unit +
+                   info.bufferram*info.mem_unit;
         if(mFreeRam < mb500) {
             emit freeMemory(mb500 - mFreeRam);
         }

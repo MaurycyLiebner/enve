@@ -35,6 +35,9 @@ public:
 
     virtual ~RenderCacheRange();
 
+    void clearCacheAboveRelFrame(const int &max);
+    void clearCacheBelowRelFrame(const int &min);
+
     void setInternalDifferencesPresent(const bool &bT);
 
     bool areInternalDifferencesPresent() const;
@@ -95,10 +98,11 @@ protected:
 };
 
 class RenderCacheHandler;
+class AnimationRect;
 
 class AnimationRenderCacheRange : public RenderCacheRange {
 public:
-    AnimationRenderCacheRange(DurationRectangle *durationRect);
+    AnimationRenderCacheRange(AnimationRect *durationRect);
 
     bool isBlocked() { return true; }
 
@@ -129,10 +133,11 @@ private:
     int getKeyInsertIdForFrame(const int &frame);
 
     QList<Key*> mInternalKeys;
-    DurationRectangle *mDurationRect = NULL;
+    AnimationRect *mDurationRect = NULL;
 };
 
-class RenderCacheHandler {
+class RenderCacheHandler : public QObject {
+    Q_OBJECT
 public:
     RenderCacheHandler();
 
@@ -180,10 +185,17 @@ public:
                                           Key *newKey);
     bool isThereBarrierAtRelFrame(const int &frame);
     void setDurationRectangle(DurationRectangle *durRect);
+
+public slots:
+    void updateVisibilityRange();
+    void updateAnimationRenderCacheRange();
 private:
+    int mMinRelFrame = INT_MIN;
+    int mMaxRelFrame = INT_MAX;
+
     void clearRenderRangeforAnimationRange();
 
-    bool mAnimationRangeSetup = false;
+    AnimationRenderCacheRange *mAnimationRenderCacheRange = NULL;
     bool mNoCache = false;
     DurationRectangle *mDurationRect = NULL;
 

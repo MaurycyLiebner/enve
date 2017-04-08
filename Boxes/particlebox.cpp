@@ -23,13 +23,11 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
                 new DisplayedFillStrokeSettingsUpdater(this));
     mBottomRightPoint->prp_setName("bottom right");
 
-    setDurationRectangle(new DurationRectangle(this));
-    mDurationRectangle->setMaxFrame(200);
-    mDurationRectangle->setMinFrame(-10);
-    mDurationRectangle->setAnimationFrameDuration(100000);
-    mDurationRectangle->setBindToAnimationFrameRange();
-    mDurationRectangle->setFramesDuration(200);
-    mRenderCacheHandler.setDurationRectangle(mDurationRectangle);
+    VaryingLenAnimationRect *durRect = new VaryingLenAnimationRect(this);
+    setDurationRectangle(durRect);
+    durRect->setMaxFrame(200);
+    durRect->setMinFrame(-10);
+    mRenderCacheHandler.setDurationRectangle(durRect);
     mRenderCacheHandler.setupRenderRangeforAnimationRange();
 
     //addEmitter(new ParticleEmitter(this));
@@ -91,8 +89,7 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     addEmitter(emitter);
 }
 
-void ParticleBox::updateAfterDurationRectangleChanged() {
-    updateAfterFrameChanged(mCurrentAbsFrame);
+void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
     int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
     foreach(ParticleEmitter *emitter, mEmitters) {
@@ -533,6 +530,25 @@ void ParticleEmitter::prp_makeDuplicate(Property *target) {
                 &mParticlesSizeDecay,
                 &mParticlesOpacityDecay);
     peTarget->setFrameRange(mMinFrame, mMaxFrame);
+}
+
+void ParticleEmitter::setFrameRange(const int &minFrame, const int &maxFrame) {
+    if(minFrame == mMinFrame && mMaxFrame == maxFrame) return;
+    if(mMaxFrame > maxFrame) {
+        int currId = mParticles.count() - 1;
+        while(currId > 0) {
+            Particle *part = mParticles.at(currId);
+            if(part->isVisibleAtFrame(maxFrame)) break;
+            mParticles.removeOne(part);
+            currId--;
+            delete part;
+        }
+    } else {
+        scheduleGenerateParticles();
+    }
+
+    mMinFrame = minFrame;
+    mMaxFrame = maxFrame;
 }
 
 ColorAnimator *ParticleEmitter::getColorAnimator() {

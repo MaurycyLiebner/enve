@@ -950,13 +950,21 @@ int BoundingBox::prp_getFrameShift() const {
 
 void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     if(mDurationRectangle != NULL) {
-        disconnect(mDurationRectangle, SIGNAL(changed()),
-                   this, SLOT(updateAfterDurationRectangleChanged()));
+        disconnect(mDurationRectangle, SIGNAL(posChanged(int)),
+                   this, SLOT(updateAfterDurationRectangleShifted()));
+        disconnect(mDurationRectangle, SIGNAL(rangeChanged()),
+                   this, SLOT(updateAfterDurationRectangleRangeChanged()));
     }
     mDurationRectangle = durationRect;
     if(mDurationRectangle == NULL) return;
-    connect(mDurationRectangle, SIGNAL(changed()),
-            this, SLOT(updateAfterDurationRectangleChanged()));
+    connect(mDurationRectangle, SIGNAL(posChanged(int)),
+            this, SLOT(updateAfterDurationRectangleShifted()));
+    connect(mDurationRectangle, SIGNAL(rangeChanged()),
+            this, SLOT(updateAfterDurationRectangleRangeChanged()));
+}
+
+void BoundingBox::updateAfterDurationRectangleShifted() {
+    updateAfterFrameChanged(mCurrentAbsFrame);
 }
 
 DurationRectangleMovable *BoundingBox::getRectangleMovableAtPos(

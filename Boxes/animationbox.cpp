@@ -13,16 +13,11 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     mTimeScaleAnimator.prp_blockUpdater();
     ca_addChildAnimator(&mTimeScaleAnimator);
 
-    setDurationRectangle(new DurationRectangle(this));
-    mDurationRectangle->setAnimationFrameRangeVisible();
+    setDurationRectangle(new FixedLenAnimationRect(this));
     mRenderCacheHandler.setDurationRectangle(mDurationRectangle);
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
 //    mFrameAnimator.setCurrentIntValue(0);
-}
-
-void AnimationBox::updateAfterDurationRectangleChanged() {
-    updateAfterFrameChanged(mCurrentAbsFrame);
 }
 
 void AnimationBox::prp_makeDuplicate(Property *targetBox) {
@@ -41,10 +36,14 @@ void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
 //    return new AnimationBox(parent);
 //}
 
+FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
+    return ((FixedLenAnimationRect*)mDurationRectangle);
+}
+
 void AnimationBox::updateDurationRectangleAnimationRange() {
     qreal timeScale = mTimeScaleAnimator.qra_getCurrentValue();
 
-    mDurationRectangle->setAnimationFrameDuration(
+    getAnimationDurationRect()->setAnimationFrameDuration(
                 qCeil(qAbs(timeScale*mFramesCount)));
 }
 
@@ -54,7 +53,7 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
 
     int pixId;
     const int &absMinAnimation =
-                    mDurationRectangle->getMinAnimationFrameAsAbsFrame();
+                getAnimationDurationRect()->getMinAnimationFrameAsAbsFrame();
     if(timeScale > 0.) {
         pixId = (mCurrentAbsFrame - absMinAnimation)/timeScale;
     } else {

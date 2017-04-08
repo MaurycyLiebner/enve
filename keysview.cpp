@@ -568,6 +568,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
             } else if(mMovingRect) {
                 mMoveDFrame = 0;
                 mMovingRect = false;
+                mLastPressedDurationRectangleMovable->finishedTransform();
             }
         }
     }

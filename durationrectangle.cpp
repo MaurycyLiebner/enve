@@ -1,5 +1,6 @@
 #include "durationrectangle.h"
 #include "Properties/property.h"
+#include "Boxes/rendercachehandler.h"
 
 DurationRectangleMovable::DurationRectangleMovable() : QObject() {
 
@@ -65,11 +66,14 @@ DurationRectangle::DurationRectangle(Property *childProp) :
             &mMinFrame, SLOT(setMaxPos(int)));
 
     connect(&mMinFrame, SIGNAL(posChanged(int)),
-            this, SIGNAL(changed()));
+            this, SIGNAL(rangeChanged()));
     connect(&mMaxFrame, SIGNAL(posChanged(int)),
-            this, SIGNAL(changed()));
-    connect(this, SIGNAL(posChanged(int)),
-            this, SIGNAL(changed()));
+            this, SIGNAL(rangeChanged()));
+
+    connect(&mMinFrame, SIGNAL(finishedTransform()),
+            this, SIGNAL(finishedRangeChange()));
+    connect(&mMaxFrame, SIGNAL(finishedTransform()),
+            this, SIGNAL(finishedRangeChange()));
 }
 
 void DurationRectangle::setFramesDuration(const int &duration) {
@@ -121,24 +125,15 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
     int xT;
     int widthT;
     QRect drawRect;
-    if(mShowAnimationFrameRange) {
-        startDFrame = getMinAnimationFrame() - startFrame;
-        xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
-        widthT = getAnimationFrameDuration()*pixelsPerFrame - pixelsPerFrame;
-        QRect drawRect = QRect(xT, drawY,
-                               widthT,
-                               BOX_HEIGHT);
-        p->fillRect(drawRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
-    }
 
     startDFrame = getMinFrame() - startFrame;
     xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
     widthT = getFrameDuration()*pixelsPerFrame - pixelsPerFrame;
     QColor fillColor;
     if(mHovered) {
-        fillColor = QColor(50, 50, 255, 180);
+        fillColor = QColor(50, 50, 255, 120);
     } else {
-        fillColor = QColor(0, 0, 255, 180);
+        fillColor = QColor(0, 0, 255, 120);
     }
     drawRect = QRect(xT, drawY,
                      widthT, BOX_HEIGHT);
@@ -181,8 +176,6 @@ DurationRectangleMovable *DurationRectangle::getMovableAt(
 }
 
 void DurationRectangle::changeFramePosBy(const int &change) {
-    mMaxAnimationFrame += change;
-    mMinAnimationFrame += change;
     mMinFrame.changeFramePosByWithoutSignal(change);
     mMaxFrame.setMinPos(getMinFrame());
     mMaxFrame.changeFramePosByWithoutSignal(change);
@@ -190,40 +183,97 @@ void DurationRectangle::changeFramePosBy(const int &change) {
     DurationRectangleMovable::changeFramePosBy(change);
 }
 
-void DurationRectangle::setAnimationFrameRangeVisible() {
-    mShowAnimationFrameRange = true;
+void DurationRectangle::connectRenderCacheHandler(RenderCacheHandler *handler) {
+    connect(this, SIGNAL(finishedRangeChange()),
+            handler, SLOT(updateVisibilityRange()));
 }
 
-int DurationRectangle::getMinAnimationFrame() const {
-    return mMinAnimationFrame;
+int AnimationRect::getMaxAnimationFrameAsRelFrame() const {
+    return getMaxAnimationFrame() - mFramePos;
 }
 
-int DurationRectangle::getMaxAnimationFrame() const {
-    return mMaxAnimationFrame;
+int AnimationRect::getMinAnimationFrameAsRelFrame() const {
+    return getMinAnimationFrame() - mFramePos;
 }
 
-int DurationRectangle::getMaxAnimationFrameAsRelFrame() const {
-    return mMaxAnimationFrame - mFramePos;
-}
-
-int DurationRectangle::getMaxAnimationFrameAsAbsFrame() const {
+int AnimationRect::getMaxAnimationFrameAsAbsFrame() const {
     return mChildProperty->prp_relFrameToAbsFrame(
                 getMaxAnimationFrameAsRelFrame());
 }
 
-int DurationRectangle::getMinAnimationFrameAsAbsFrame() const {
+int AnimationRect::getMinAnimationFrameAsAbsFrame() const {
     return mChildProperty->prp_relFrameToAbsFrame(
                 getMinAnimationFrameAsRelFrame());
 }
 
-void DurationRectangle::setMinAnimationFrame(const int &minAnimationFrame) {
+void AnimationRect::setAnimationFrameDuration(const int &frameDuration) {
+    setMaxAnimationFrame(getMinAnimationFrame() + frameDuration);
+}
+
+int AnimationRect::getAnimationFrameDuration() {
+    return getMaxAnimationFrame() - getMinAnimationFrame();
+}
+
+void AnimationRect::draw(
+        QPainter *p, const qreal &pixelsPerFrame,
+        const qreal &drawY, const int &startFrame) {
+    p->save();
+
+    int startDFrame = getMinAnimationFrame() - startFrame;
+    int xT = startDFrame*pixelsPerFrame + pixelsPerFrame*0.5;
+    int widthT = getAnimationFrameDuration()*pixelsPerFrame - pixelsPerFrame;
+    QRect drawRect = QRect(xT, drawY,
+                           widthT,
+                           BOX_HEIGHT);
+    p->fillRect(drawRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
+
+    DurationRectangle::draw(p, pixelsPerFrame,
+                            drawY, startFrame);
+    p->restore();
+}
+
+void AnimationRect::connectRenderCacheHandler(RenderCacheHandler *handler) {
+    DurationRectangle::connectRenderCacheHandler(handler);
+    connect(this, SIGNAL(finishedAnimationRangeChange()),
+            handler, SLOT(updateAnimationRenderCacheRange()));
+}
+
+int FixedLenAnimationRect::getMinAnimationFrame() const {
+    return mMinAnimationFrame;
+}
+
+int FixedLenAnimationRect::getMaxAnimationFrame() const {
+    return mMaxAnimationFrame;
+}
+
+void FixedLenAnimationRect::bindToAnimationFrameRange() {
+    if(getMinFrame() < getMinAnimationFrame() ||
+       getMinFrame() >= getMaxAnimationFrame()) {
+        setMinFrame(getMinAnimationFrame());
+    }
+    mMinFrame.setMinPos(getMinAnimationFrame());
+    if(getMaxFrame() > getMaxAnimationFrame() ||
+       getMaxFrame() <= getMinAnimationFrame()) {
+        setMaxFrame(getMaxAnimationFrame());
+    }
+    mMaxFrame.setMaxPos(getMaxAnimationFrame());
+    emit rangeChanged();
+}
+
+void FixedLenAnimationRect::setBindToAnimationFrameRange() {
+    mBoundToAnimation = true;
+}
+
+void FixedLenAnimationRect::setMinAnimationFrame(const int &minAnimationFrame) {
     mMinAnimationFrame = minAnimationFrame;
     if(mBoundToAnimation) {
         bindToAnimationFrameRange();
     }
+    emit animationRangeChanged();
+    emit finishedAnimationRangeChange();
 }
 
-void DurationRectangle::setMaxAnimationFrame(const int &maxAnimationFrame) {
+void FixedLenAnimationRect::setMaxAnimationFrame(const int &maxAnimationFrame) {
     bool moveMaxPosFrame = getMinFrame() == mFramePos &&
                            getMaxFrame() == mFramePos + getAnimationFrameDuration();
     mMaxAnimationFrame = maxAnimationFrame;
@@ -239,29 +289,16 @@ void DurationRectangle::setMaxAnimationFrame(const int &maxAnimationFrame) {
     if(mBoundToAnimation) {
         bindToAnimationFrameRange();
     }
+    emit animationRangeChanged();
+    emit finishedAnimationRangeChange();
 }
 
-void DurationRectangle::setAnimationFrameDuration(const int &frameDuration) {
-    setMaxAnimationFrame(mMinAnimationFrame + frameDuration);
-}
-
-int DurationRectangle::getAnimationFrameDuration() {
-    return mMaxAnimationFrame - mMinAnimationFrame;
-}
-
-void DurationRectangle::bindToAnimationFrameRange() {
-    if(getMinFrame() < getMinAnimationFrame() ||
-       getMinFrame() >= getMaxAnimationFrame()) {
-        setMinFrame(getMinAnimationFrame());
-    }
-    mMinFrame.setMinPos(getMinAnimationFrame());
-    if(getMaxFrame() > getMaxAnimationFrame() ||
-       getMaxFrame() <= getMinAnimationFrame()) {
-        setMaxFrame(getMaxAnimationFrame());
-    }
-    mMaxFrame.setMaxPos(getMaxAnimationFrame());
-}
-
-void DurationRectangle::setBindToAnimationFrameRange() {
-    mBoundToAnimation = true;
+void FixedLenAnimationRect::changeFramePosBy(const int &change) {
+    mMaxAnimationFrame += change;
+    mMinAnimationFrame += change;
+    mMinFrame.changeFramePosByWithoutSignal(change);
+    mMaxFrame.setMinPos(getMinFrame());
+    mMaxFrame.changeFramePosByWithoutSignal(change);
+    mMinFrame.setMaxPos(getMaxFrame());
+    DurationRectangleMovable::changeFramePosBy(change);
 }
