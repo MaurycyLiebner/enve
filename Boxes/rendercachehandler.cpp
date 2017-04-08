@@ -368,7 +368,8 @@ void RenderCacheHandler::clearAllCache() {
 
 void RenderCacheHandler::addRangeNeedingUpdate(const int &min,
                                                const int &max) {
-    RenderCacheRange *first = getRenderCacheRangeContainingRelFrame(min);
+    RenderCacheRange *first = getRenderCacheRangeContainingRelFrame(min,
+                                                                    false);
     addRangeNeedingUpdate(first);
     int currId = mRenderCacheRange.indexOf(first) + 1;
     while(currId < mRenderCacheRange.count()) {
@@ -516,7 +517,7 @@ void RenderCacheHandler::updateAnimationRenderCacheRange() {
 void RenderCacheHandler::updateVisibilityRange() {
     if(mDurationRect == NULL) return;
     int newMinRelFrame = mDurationRect->getMinFrameAsRelFrame();
-    int newMaxRelFrame = mDurationRect->getMaxFrameAsRelFrame();
+    int newMaxRelFrame = mDurationRect->getMaxFrameAsRelFrame() - 1;
 
     if(newMaxRelFrame < mMaxRelFrame) {
         for(int i = mRenderCacheRange.count() - 1; i >= 0; i--) {
@@ -531,6 +532,11 @@ void RenderCacheHandler::updateVisibilityRange() {
             range->clearCacheBelowRelFrame(newMinRelFrame);
             if(range->getMaxRelFrame() >= newMinRelFrame) break;
         }
+    }
+
+    if(mAnimationRenderCacheRange != NULL) {
+        mAnimationRenderCacheRange->clearCacheAboveRelFrame(newMaxRelFrame);
+        mAnimationRenderCacheRange->clearCacheBelowRelFrame(newMinRelFrame);
     }
 
     mMinRelFrame = newMinRelFrame;
