@@ -215,12 +215,13 @@ private:
                             RenderCacheRange **nextRange,
                             const int &relFrame);
 
-    void removeRangesBarrierAtRelFrame(const int &relFrame, Key *key);
+    void removeRangesBarrierAtRelFrame(const int &relFrame);
 
     void updateAfterBarrierValueChanged(const int &barrierRelFrame);
 
     RenderCacheRange *getRenderCacheRangeContainingRelFrame(
-                                        const int &relFrame);
+                        const int &relFrame,
+                        const bool &considerAnimationRange = true);
 
     void removeRenderCacheRangeFromList(RenderCacheRange *range);
 

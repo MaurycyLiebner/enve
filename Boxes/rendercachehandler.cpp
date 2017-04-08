@@ -116,8 +116,6 @@ int RenderCacheRange::getRenderContainterInsertIdAtRelFrame(
                 return maxId;
             }
             minId = guess;
-        } else {
-            return guess;
         }
     }
     return 0;
@@ -125,6 +123,7 @@ int RenderCacheRange::getRenderContainterInsertIdAtRelFrame(
 
 void RenderCacheRange::insertRenderContainer(
                     CacheBoundingBoxRenderContainer *cont) {
+    if(mRenderContainers.contains(cont)) return;
     int contId = getRenderContainterInsertIdAtRelFrame(cont->getFrame());
     cont->setParentRagne(this);
     mRenderContainers.insert(contId, cont);
@@ -342,70 +341,16 @@ void RenderCacheHandler::setupRenderRangeforAnimationRange() {
     }
 
     if(mDurationRect->hasAnimationFrameRange()) {
-        int durRectMin = ((FixedLenAnimationRect*)mDurationRect)->
-                                getMinAnimationFrameAsRelFrame();
-        int durRectMax = ((FixedLenAnimationRect*)mDurationRect)->
-                                getMaxAnimationFrameAsRelFrame();
-
-
-        if(!isThereBarrierAtRelFrame(durRectMin)) {
-            divideRenderCacheRangeAtRelFrame(durRectMin, NULL);
-        }
-        if(!isThereBarrierAtRelFrame(durRectMax)) {
-            divideRenderCacheRangeAtRelFrame(durRectMax, NULL);
-        }
-        applyChanges();
-
-        QList<Key*> newRangeInternalKeys;
-        int idAtMin = mRenderCacheRange.indexOf(
-                    getRenderCacheRangeContainingRelFrame(durRectMin));
-        int idAtMax = mRenderCacheRange.indexOf(
-                    getRenderCacheRangeContainingRelFrame(durRectMax));
-        for(int i = idAtMin; i < idAtMax; i++) {
-            RenderCacheRange *iRange = mRenderCacheRange.takeAt(idAtMin);
-            Key *maxKey = iRange->getMaxKey();
-            Key *minKey = iRange->getMinKey();
-            if(maxKey != NULL) {
-                newRangeInternalKeys << maxKey;
-            }
-            if(minKey != NULL) {
-                newRangeInternalKeys << minKey;
-            }
-            delete iRange;
-        }
-
         mAnimationRenderCacheRange = new AnimationRenderCacheRange(
                                         (AnimationRect*)mDurationRect);
-        foreach(Key *key, newRangeInternalKeys) {
-            mAnimationRenderCacheRange->addInternalKey(key);
-        }
-        mRenderCacheRange.insert(idAtMin, mAnimationRenderCacheRange);
-        addRangeNeedingUpdate(mAnimationRenderCacheRange);
     }
 }
 
 void RenderCacheHandler::clearRenderRangeforAnimationRange() {
     if(mAnimationRenderCacheRange != NULL) {
         applyChanges();
-        int oldId = mRenderCacheRange.indexOf(mAnimationRenderCacheRange);
-        RenderCacheRange *prevRange = mRenderCacheRange.at(oldId - 1);
-        RenderCacheRange *nextRange = mRenderCacheRange.at(oldId + 1);
-        mRenderCacheRange.removeOne(mAnimationRenderCacheRange);
-        mRenderCacheRange.removeOne(prevRange);
-        mRenderCacheRange.removeOne(nextRange);
-
-        RenderCacheRange *newRange = new RenderCacheRange(
-                                        prevRange->getMinKey(),
-                                        nextRange->getMaxKey(),
-                                        prevRange->getMinRelFrame(),
-                                        nextRange->getMaxRelFrame());
-        mRenderCacheRange.insert(oldId - 1, newRange);
-
-        mAnimationRenderCacheRange->addAllInternalKeysToHandler(this);
 
         delete mAnimationRenderCacheRange;
-        delete prevRange;
-        delete nextRange;
 
         mAnimationRenderCacheRange = NULL;
     }
@@ -414,6 +359,9 @@ void RenderCacheHandler::clearRenderRangeforAnimationRange() {
 void RenderCacheHandler::clearAllCache() {
     foreach(RenderCacheRange *range, mRenderCacheRange) {
         range->clearCache();
+    }
+    if(mAnimationRenderCacheRange != NULL) {
+        mAnimationRenderCacheRange->clearCache();
     }
     //setCurrentRenderContainerVar(NULL);
 }
@@ -510,45 +458,25 @@ void RenderCacheHandler::divideRenderCacheRangeAtRelFrame(
 void RenderCacheHandler::divideRenderCacheRange(RenderCacheRange *oldRange,
                                                 const int &relFrame,
                                                 Key *newKey) {
-    if(oldRange->isBlocked()) {
-        int oldId = mRenderCacheRange.indexOf(oldRange);
-        ((AnimationRenderCacheRange*)oldRange)->addInternalKey(newKey);
-        RenderCacheRange *prevRange = mRenderCacheRange.at(oldId - 1);
-        prevRange->setMaxKeyTMP(oldRange->getMinKey());
-        RenderCacheRange *nextRange = mRenderCacheRange.at(oldId + 1);
-        if(nextRange->getMinKey() != NULL) {
-            if(nextRange->getMinKey()->getRelFrame() !=
-               nextRange->getMinRelFrame()) {
-                nextRange->setMinKeyTMP(oldRange->getMaxKey());
-            }
-        } else {
-            nextRange->setMinKeyTMP(oldRange->getMaxKey());
-        }
+    int oldId = mRenderCacheRange.indexOf(oldRange);
+    Key *minKey = oldRange->getMinKey();
+    Key *maxKey = oldRange->getMaxKey();
+    removeRangeNeedingUpdate(oldRange);
+    removeRenderCacheRangeFromList(oldRange);
+    RenderCacheRange *range1 = new RenderCacheRange(minKey,
+                                                    newKey,
+                                                    oldRange->getMinRelFrame(),
+                                                    relFrame);
+    mRenderCacheRange.insert(oldId, range1);
+    RenderCacheRange *range2 = new RenderCacheRange(newKey,
+                                                    maxKey,
+                                                    relFrame,
+                                                    oldRange->getMaxRelFrame());
+    mRenderCacheRange.insert(oldId + 1, range2);
+    delete oldRange;
 
-        addRangeNeedingUpdate(oldRange);
-        addRangeNeedingUpdate(nextRange);
-        addRangeNeedingUpdate(prevRange);
-    } else {
-        int oldId = mRenderCacheRange.indexOf(oldRange);
-        Key *minKey = oldRange->getMinKey();
-        Key *maxKey = oldRange->getMaxKey();
-        removeRangeNeedingUpdate(oldRange);
-        removeRenderCacheRangeFromList(oldRange);
-        RenderCacheRange *range1 = new RenderCacheRange(minKey,
-                                                        newKey,
-                                                        oldRange->getMinRelFrame(),
-                                                        relFrame);
-        mRenderCacheRange.insert(oldId, range1);
-        RenderCacheRange *range2 = new RenderCacheRange(newKey,
-                                                        maxKey,
-                                                        relFrame,
-                                                        oldRange->getMaxRelFrame());
-        mRenderCacheRange.insert(oldId + 1, range2);
-        delete oldRange;
-
-        addRangeNeedingUpdate(range1);
-        addRangeNeedingUpdate(range2);
-    }
+    addRangeNeedingUpdate(range1);
+    addRangeNeedingUpdate(range2);
 }
 
 void RenderCacheHandler::mergeRenderCacheRanges(RenderCacheRange *prevRange,
@@ -575,7 +503,14 @@ void RenderCacheHandler::setDurationRectangle(DurationRectangle *durRect) {
 }
 
 void RenderCacheHandler::updateAnimationRenderCacheRange() {
-    setupRenderRangeforAnimationRange();
+    if(mAnimationRenderCacheRange == NULL) return;
+    AnimationRect *aRect = (AnimationRect*)mDurationRect;
+    int durRectMin = aRect->getMinAnimationFrameAsRelFrame();
+    int durRectMax = aRect->getMaxAnimationFrameAsRelFrame();
+    mAnimationRenderCacheRange->clearCacheAboveRelFrame(durRectMax);
+    mAnimationRenderCacheRange->clearCacheBelowRelFrame(durRectMin);
+    mAnimationRenderCacheRange->setMinRelFrame(durRectMin);
+    mAnimationRenderCacheRange->setMaxRelFrame(durRectMax);
 }
 
 void RenderCacheHandler::updateVisibilityRange() {
@@ -610,40 +545,13 @@ void RenderCacheHandler::getRenderCacheRangesWithBarrierAtRelFrame(
     *nextRange = getRenderCacheRangeContainingRelFrame(relFrame);
 }
 
-void RenderCacheHandler::removeRangesBarrierAtRelFrame(const int &relFrame,
-                                                       Key *key) {
+void RenderCacheHandler::removeRangesBarrierAtRelFrame(const int &relFrame) {
     RenderCacheRange *prevRange;
     RenderCacheRange *nextRange;
     getRenderCacheRangesWithBarrierAtRelFrame(&prevRange,
                                               &nextRange,
                                               relFrame);
-    if(prevRange->isBlocked() || nextRange->isBlocked()) {
-        AnimationRenderCacheRange *animationRange;
-        if(prevRange->isBlocked()) {
-            animationRange = (AnimationRenderCacheRange*)prevRange;
-        } else {
-            animationRange = (AnimationRenderCacheRange*)nextRange;
-        }
-        animationRange->removeInternalKey(key);
-        int oldId = mRenderCacheRange.indexOf(animationRange);
-        RenderCacheRange *prevRange2 = mRenderCacheRange.at(oldId - 1);
-        prevRange2->setMaxKeyTMP(animationRange->getMinKey());
-        RenderCacheRange *nextRange2 = mRenderCacheRange.at(oldId + 1);
-        if(nextRange2->getMinKey() != NULL) {
-            if(nextRange2->getMinKey()->getRelFrame() !=
-               nextRange2->getMinRelFrame()) {
-                nextRange2->setMinKeyTMP(animationRange->getMaxKey());
-            }
-        } else {
-            nextRange2->setMinKeyTMP(animationRange->getMaxKey());
-        }
-
-        addRangeNeedingUpdate(animationRange);
-        addRangeNeedingUpdate(nextRange2);
-        addRangeNeedingUpdate(prevRange2);
-    } else {
-        mergeRenderCacheRanges(prevRange, nextRange);
-    }
+    mergeRenderCacheRanges(prevRange, nextRange);
 }
 
 void RenderCacheHandler::updateAfterBarrierValueChanged(
@@ -662,7 +570,15 @@ void RenderCacheHandler::updateAfterBarrierValueChanged(
 }
 
 RenderCacheRange *RenderCacheHandler::getRenderCacheRangeContainingRelFrame(
-        const int &relFrame) {
+                                        const int &relFrame,
+                                        const bool &considerAnimationRange) {
+    if(considerAnimationRange) {
+        if(mAnimationRenderCacheRange != NULL) {
+            if(mAnimationRenderCacheRange->relFrameInRange(relFrame)) {
+                return mAnimationRenderCacheRange;
+            }
+        }
+    }
     int minId = 0;
     int maxId = mRenderCacheRange.count() - 1;
 
@@ -696,7 +612,7 @@ void RenderCacheHandler::removeRenderCacheRangeFromList(
 
 void RenderCacheHandler::applyChange(const RenderCacheRangeChange &change) {
     if(change.type == REMOVE_KEY) {
-        removeRangesBarrierAtRelFrame(change.relFrame, change.key);
+        removeRangesBarrierAtRelFrame(change.relFrame);
     } else if(change.type == ADD_KEY) {
         divideRenderCacheRangeAtRelFrame(change.relFrame, change.key);
     } else if(change.type == CHANGE_KEY) {
@@ -723,7 +639,8 @@ void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
     p->setPen(Qt::NoPen);
     int lastDrawnFrame = 0;
     int lastDrawX = 0;
-    RenderCacheRange *first = getRenderCacheRangeContainingRelFrame(startFrame);
+    RenderCacheRange *first = getRenderCacheRangeContainingRelFrame(startFrame,
+                                                                    false);
     first->drawCacheOnTimeline(p,
                                pixelsPerFrame,
                                drawY,
@@ -744,6 +661,17 @@ void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
                                        &lastDrawX);
         currId++;
     }
+    if(mAnimationRenderCacheRange == NULL) return;
+    lastDrawnFrame = 0;
+    lastDrawX = 0;
+    mAnimationRenderCacheRange->drawCacheOnTimeline(
+                                   p,
+                                   pixelsPerFrame,
+                                   drawY,
+                                   startFrame,
+                                   endFrame,
+                                   &lastDrawnFrame,
+                                   &lastDrawX);
 }
 
 AnimationRenderCacheRange::AnimationRenderCacheRange(
