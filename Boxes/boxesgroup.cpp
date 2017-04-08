@@ -310,18 +310,16 @@ void BoxesGroup::afterUpdate() {
 }
 
 void BoxesGroup::draw(QPainter *p) {
-    if(shouldUpdateAndDraw()) {
-        p->save();
-        p->setTransform(QTransform(
-                            mUpdateTransform.inverted()),
-                            true);
-        foreach(BoundingBox *box, mChildBoxes) {
-            //box->draw(p);
-            box->drawUpdatePixmap(p);
-        }
-
-        p->restore();
+    p->save();
+    p->setTransform(QTransform(
+                        mUpdateTransform.inverted()),
+                        true);
+    foreach(BoundingBox *box, mChildBoxes) {
+        //box->draw(p);
+        box->drawUpdatePixmap(p);
     }
+
+    p->restore();
 }
 
 void BoxesGroup::drawPixmap(QPainter *p) {

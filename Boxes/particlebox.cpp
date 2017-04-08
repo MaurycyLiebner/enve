@@ -97,20 +97,17 @@ void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     }
 }
 
-void ParticleBox::draw(QPainter *p)
-{
-    if(shouldUpdateAndDraw()) {
-        p->save();
+void ParticleBox::draw(QPainter *p) {
+    p->save();
 
-        p->setClipRect(mRelBoundingRect);
-        foreach(ParticleEmitter *emitter, mEmitters) {
-            emitter->drawParticles(p);
-        }
-
-        //p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
-        //p->fillRect(mRelBoundingRect, Qt::white);
-        p->restore();
+    p->setClipRect(mRelBoundingRect);
+    foreach(ParticleEmitter *emitter, mEmitters) {
+        emitter->drawParticles(p);
     }
+
+    //p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
+    //p->fillRect(mRelBoundingRect, Qt::white);
+    p->restore();
 }
 
 void ParticleBox::applyPaintSetting(const PaintSetting &setting) {

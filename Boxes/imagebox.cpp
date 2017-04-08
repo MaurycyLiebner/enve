@@ -52,12 +52,9 @@ BoundingBox *ImageBox::createNewDuplicate(BoxesGroup *parent) {
     return new ImageBox(parent);
 }
 
-void ImageBox::draw(QPainter *p)
-{
-    if(shouldUpdateAndDraw()) {
-        p->setRenderHint(QPainter::SmoothPixmapTransform);
-        p->drawImage(0, 0, mImage);
-    }
+void ImageBox::draw(QPainter *p) {
+    p->setRenderHint(QPainter::SmoothPixmapTransform);
+    p->drawImage(0, 0, mImage);
 }
 
 void ImageBox::reloadPixmap()

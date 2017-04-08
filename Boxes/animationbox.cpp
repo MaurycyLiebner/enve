@@ -125,10 +125,8 @@ void AnimationBox::reloadPixmapIfNeeded() {
 }
 
 void AnimationBox::draw(QPainter *p) {
-    if(shouldUpdateAndDraw()) {
-        p->setRenderHint(QPainter::SmoothPixmapTransform);
-        p->drawImage(0, 0, mUpdateAnimationImage);
-    }
+    p->setRenderHint(QPainter::SmoothPixmapTransform);
+    p->drawImage(0, 0, mUpdateAnimationImage);
 }
 
 bool AnimationBox::relPointInsidePath(QPointF point) {

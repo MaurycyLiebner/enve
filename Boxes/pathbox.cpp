@@ -258,37 +258,34 @@ void PathBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
 }
 
-void PathBox::draw(QPainter *p)
-{
-    if(shouldUpdateAndDraw()) {
-        p->save();
+void PathBox::draw(QPainter *p) {
+    p->save();
 
-        p->setPen(Qt::NoPen);
-        if(!mUpdatePath.isEmpty()) {
-            if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
-                p->setBrush(mDrawFillGradient);
-            } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
-                p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
-            } else {
-                p->setBrush(Qt::NoBrush);
-            }
-            p->drawPath(mUpdatePath);
+    p->setPen(Qt::NoPen);
+    if(!mUpdatePath.isEmpty()) {
+        if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
+            p->setBrush(mDrawFillGradient);
+        } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
+            p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
+        } else {
+            p->setBrush(Qt::NoBrush);
         }
-        if(!mUpdateOutlinePath.isEmpty()) {
-            if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
-                p->setBrush(mDrawStrokeGradient);
-            } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
-                p->setBrush(mStrokeSettings.getCurrentColor().qcol);
-            } else{
-                p->setBrush(Qt::NoBrush);
-            }
-
-            p->setCompositionMode(mStrokeSettings.getOutlineCompositionMode());
-            p->drawPath(mUpdateOutlinePath);
-        }
-
-        p->restore();
+        p->drawPath(mUpdatePath);
     }
+    if(!mUpdateOutlinePath.isEmpty()) {
+        if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
+            p->setBrush(mDrawStrokeGradient);
+        } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
+            p->setBrush(mStrokeSettings.getCurrentColor().qcol);
+        } else{
+            p->setBrush(Qt::NoBrush);
+        }
+
+        p->setCompositionMode(mStrokeSettings.getOutlineCompositionMode());
+        p->drawPath(mUpdateOutlinePath);
+    }
+
+    p->restore();
 }
 
 bool PathBox::relPointInsidePath(QPointF relPos) {

@@ -215,19 +215,16 @@ void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
     scheduleSoftUpdate();
 }
 
-void InternalLinkCanvas::draw(QPainter *p)
-{
-    if(shouldUpdateAndDraw()) {
-        p->save();
-        if(mClipToCanvasSize) {
-            p->setClipRect(mRelBoundingRect);
-        }
-        p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
-        foreach(BoundingBox *box, mChildBoxes) {
-            //box->draw(p);
-            box->drawPixmap(p);
-        }
-
-        p->restore();
+void InternalLinkCanvas::draw(QPainter *p) {
+    p->save();
+    if(mClipToCanvasSize) {
+        p->setClipRect(mRelBoundingRect);
     }
+    p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
+    foreach(BoundingBox *box, mChildBoxes) {
+        //box->draw(p);
+        box->drawPixmap(p);
+    }
+
+    p->restore();
 }
