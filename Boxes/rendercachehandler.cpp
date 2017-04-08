@@ -158,7 +158,7 @@ RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
     CacheBoundingBoxRenderContainer *cont =
             new CacheBoundingBoxRenderContainer();
     cont->setParentRagne(this);
-    cont->setFrame(frame);
+    cont->setRelFrame(frame);
     cont->incNumberPointers();
     if(mInternalDifferences) {
         int contId = getRenderContainterInsertIdAtRelFrame(frame);

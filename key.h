@@ -85,11 +85,11 @@ public:
     Key *getPrevKey();
 
     bool differesFromNextKey() {
-        differsFromKey(getNextKey());
+        return differsFromKey(getNextKey());
     }
 
     bool differesFromPrevKey() {
-        differsFromKey(getPrevKey());
+        return differsFromKey(getPrevKey());
     }
 
     virtual bool differsFromKey(Key *key) = 0;

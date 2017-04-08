@@ -103,7 +103,7 @@ public:
     void scheduleGenerateParticles();
     void scheduleUpdateParticlesForFrame();
     void generateParticlesIfNeeded();
-    void updateParticlesForFrameIfNeeded();
+    void updateParticlesForFrameIfNeeded(const int &frame);
     bool relPointInsidePath(const QPointF &relPos) {
         foreach(const ParticleState &state, mParticleStates) {
             if(pointToLen(state.pos - relPos) < 5.) {
@@ -164,8 +164,6 @@ public:
     MovablePoint *getPosPoint() {
         return mPos;
     }
-
-    void prp_setAbsFrame(int frame);
 private:
     QRectF mParticlesBoundingRect;
     bool mGenerateParticlesScheduled = false;
@@ -242,9 +240,26 @@ public:
     void applyPaintSetting(const PaintSetting &setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
+
+    void prp_setAbsFrame(int frame) {
+        BoundingBox::prp_setAbsFrame(frame);
+        mFrameChangedUpdateScheduled = true;
+    }
+
+    void setUpdateVars() {
+        BoundingBox::setUpdateVars();
+        if(mFrameChangedUpdateScheduled) {
+            mFrameChangedUpdateScheduled = false;
+            foreach(ParticleEmitter *emitter, mEmitters) {
+                emitter->scheduleUpdateParticlesForFrame();
+            }
+        }
+    }
+
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:
+    bool mFrameChangedUpdateScheduled = false;
     MovablePoint *mTopLeftPoint;
     MovablePoint *mBottomRightPoint;
     QList<ParticleEmitter*> mEmitters;

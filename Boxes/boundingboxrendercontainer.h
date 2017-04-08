@@ -34,7 +34,7 @@ public:
 
     const qint64 &getRenderTime() const;
 
-    void setFrame(const int &frame);
+    void setRelFrame(const int &frame);
 
     void updateVariables(const QMatrix &combinedTransform,
                          const qreal &effectsMargin,

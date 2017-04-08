@@ -61,7 +61,7 @@ const qint64 &BoundingBoxRenderContainer::getRenderTime() const {
     return mRenderTime;
 }
 
-void BoundingBoxRenderContainer::setFrame(const int &frame) {
+void BoundingBoxRenderContainer::setRelFrame(const int &frame) {
     mFrame = frame;
 }
 

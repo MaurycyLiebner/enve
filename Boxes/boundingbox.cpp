@@ -367,9 +367,10 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
         const qreal &effectsMargin,
         const QMatrix &allUglyTransform,
         QRectF *allUglyBoundingRectP) {
-    QRectF allUglyBoundingRect = allUglyTransform.mapRect(mUpdateRelBoundingRect).
-            adjusted(-effectsMargin, -effectsMargin,
-                     effectsMargin, effectsMargin);
+    QRectF allUglyBoundingRect =
+            allUglyTransform.mapRect(mUpdateRelBoundingRect).
+                adjusted(-effectsMargin, -effectsMargin,
+                         effectsMargin, effectsMargin);
 
     QSizeF sizeF = allUglyBoundingRect.size();
     QImage allUglyPixmap = QImage(QSize(ceil(sizeF.width()),
@@ -408,7 +409,7 @@ void BoundingBox::updateAllUglyPixmap() {
                 mEffectsMargin,
                 parentCanvas->getResolutionPercent(),
                 this);
-    mUpdateRenderContainer->setFrame(mUpdateRelFrame);
+    mUpdateRenderContainer->setRelFrame(mUpdateRelFrame);
 }
 
 void BoundingBox::drawPreviewPixmap(QPainter *p) {

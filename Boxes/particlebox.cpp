@@ -58,7 +58,7 @@ void ParticleBox::updateRelBoundingRect() {
 void ParticleBox::preUpdatePixmapsUpdates() {
     foreach(ParticleEmitter *emitter, mEmitters) {
         emitter->generateParticlesIfNeeded();
-        emitter->updateParticlesForFrameIfNeeded();
+        emitter->updateParticlesForFrameIfNeeded(mUpdateRelFrame);
     }
 
     BoundingBox::preUpdatePixmapsUpdates();
@@ -460,10 +460,10 @@ void ParticleEmitter::scheduleUpdateParticlesForFrame() {
     mParentBox->scheduleSoftUpdate();
 }
 
-void ParticleEmitter::updateParticlesForFrameIfNeeded() {
+void ParticleEmitter::updateParticlesForFrameIfNeeded(const int &frame) {
     if(mUpdateParticlesForFrameScheduled) {
         mUpdateParticlesForFrameScheduled = false;
-        updateParticlesForFrame(anim_mCurrentRelFrame);
+        updateParticlesForFrame(frame);
     }
 }
 
@@ -722,9 +722,4 @@ void ParticleEmitter::updateParticlesForFrame(const int &frame) {
 
 QRectF ParticleEmitter::getParticlesBoundingRect() {
     return mParticlesBoundingRect;
-}
-
-void ParticleEmitter::prp_setAbsFrame(int frame) {
-    ComplexAnimator::prp_setAbsFrame(frame);
-    scheduleUpdateParticlesForFrame();
 }
