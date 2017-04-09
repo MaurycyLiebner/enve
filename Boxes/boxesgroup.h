@@ -137,18 +137,18 @@ public:
 
     void applyPaintSetting(
             const PaintSetting &setting) {
-        foreach(BoundingBox *box, mChildBoxes) {
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             box->applyPaintSetting(setting);
         }
     }
 
     void setFillColorMode(const ColorMode &colorMode) {
-        foreach(BoundingBox *box, mChildBoxes) {
+        foreach(const QSharedPointer<BoundingBox> &box,  mChildBoxes) {
             box->setFillColorMode(colorMode);
         }
     }
     void setStrokeColorMode(const ColorMode &colorMode) {
-        foreach(BoundingBox *box, mChildBoxes) {
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             box->setStrokeColorMode(colorMode);
         }
     }
@@ -170,10 +170,11 @@ protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
-    QList<BoundingBox*> mChildBoxes;
+    QList<QSharedPointer<BoundingBox> > mChildBoxes;
 
-    QList<BoundingBox*> mChildrenAwaitingUpdate;
-    QList<BoundingBox*> mUpdateChildrenAwaitingUpdate;
+    QList<QSharedPointer<BoundingBox> > mChildrenAwaitingUpdate;
+    QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
+    int getChildBoxIndex(BoundingBox *child);
 signals:
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);

@@ -1,6 +1,6 @@
 #ifndef ANIMATORUPDATER_H
 #define ANIMATORUPDATER_H
-#include "smartpointertarget.h"
+#include "selfref.h"
 
 class BoundingBox;
 
@@ -12,10 +12,10 @@ class Circle;
 
 class Rectangle;
 
-class AnimatorUpdater : public SmartPointerTarget
+class AnimatorUpdater : public StdSelfRef
 {
 public:
-    AnimatorUpdater() : SmartPointerTarget() {}
+    AnimatorUpdater() {}
     virtual ~AnimatorUpdater() {}
 
     virtual void update() {}

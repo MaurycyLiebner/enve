@@ -16,14 +16,10 @@ BoxesClipboardContainer::BoxesClipboardContainer() :
 }
 
 BoxesClipboardContainer::~BoxesClipboardContainer() {
-    foreach(BoundingBox *box, mBoxesList) {
-        box->decNumberPointers();
-    }
 }
 
 void BoxesClipboardContainer::copyBoxToContainer(BoundingBox *box) {
     mBoxesList << box->createDuplicate(NULL);
-    box->incNumberPointers();
 }
 
 void BoxesClipboardContainer::pasteTo(BoxesGroup *parent) {
@@ -38,9 +34,6 @@ KeysClipboardContainer::KeysClipboardContainer() :
 }
 
 KeysClipboardContainer::~KeysClipboardContainer() {
-    foreach(Animator *animator, mTargetAnimators) {
-        animator->decNumberPointers();
-    }
     foreach(KeyCloner *keyCloner, mKeyClonersList) {
         delete keyCloner;
     }
@@ -49,7 +42,6 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 void KeysClipboardContainer::copyKeyToContainer(Key *key) {
     mKeyClonersList << key->createNewKeyCloner();
     mTargetAnimators << key->getParentAnimator();
-    key->getParentAnimator()->incNumberPointers();
 }
 
 #include "keysview.h"
@@ -91,12 +83,10 @@ AnimatorClipboardContainer::AnimatorClipboardContainer() :
 }
 
 AnimatorClipboardContainer::~AnimatorClipboardContainer() {
-    mAnimator->decNumberPointers();
 }
 
 void AnimatorClipboardContainer::setAnimator(QrealAnimator *animator) {
     mAnimator = animator;
-    mAnimator->incNumberPointers();
 }
 
 void AnimatorClipboardContainer::paste(QrealAnimator *target) {

@@ -11,7 +11,8 @@ class VideoBox : public AnimationBox
 {
     Q_OBJECT
 public:
-    VideoBox(const QString &filePath, BoxesGroup *parent);
+    VideoBox(const QString &filePath,
+             BoxesGroup *parent);
 
     void setFilePath(QString path);
     void prp_makeDuplicate(Property *targetBox);

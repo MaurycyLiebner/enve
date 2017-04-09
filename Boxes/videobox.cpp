@@ -9,7 +9,8 @@ extern "C" {
 #include <QDebug>
 #include "Sound/singlesound.h"
 
-VideoBox::VideoBox(const QString &filePath, BoxesGroup *parent) :
+VideoBox::VideoBox(const QString &filePath,
+                   BoxesGroup *parent) :
     AnimationBox(parent) {
     setName("Video");
 

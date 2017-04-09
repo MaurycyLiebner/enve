@@ -16,9 +16,7 @@ PathAnimator::PathAnimator(BoundingBox *parentBox) :
 }
 
 PathAnimator::~PathAnimator() {
-    foreach(SinglePathAnimator *path, mSinglePaths) {
-        path->decNumberPointers();
-    }
+
 }
 
 void PathAnimator::setParentBox(BoundingBox *parent) {
@@ -48,7 +46,6 @@ QPointF PathAnimator::getRelCenterPosition() {
 void PathAnimator::addSinglePathAnimator(SinglePathAnimator *path,
                                          const bool &saveUndoRedo) {
     mSinglePaths << path;
-    path->incNumberPointers();
     ca_addChildAnimator(path);
     if(saveUndoRedo) {
         addUndoRedo(new AddSinglePathAnimatorUndoRedo(this, path));
@@ -61,7 +58,6 @@ void PathAnimator::removeSinglePathAnimator(SinglePathAnimator *path,
         if(saveUndoRedo) {
             addUndoRedo(new RemoveSinglePathAnimatorUndoRedo(this, path));
         }
-        path->decNumberPointers();
         ca_removeChildAnimator(path);
     }
 }

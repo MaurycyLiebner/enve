@@ -5,22 +5,17 @@ GradientPoints::GradientPoints() : ComplexAnimator()
     prp_setName("gradient points");
 }
 
-GradientPoints::~GradientPoints()
-{
-    startPoint->decNumberPointers();
-    endPoint->decNumberPointers();
+GradientPoints::~GradientPoints() {
 }
 
 void GradientPoints::initialize(PathBox *parentT)
 {
     parent = parentT;
     startPoint = new GradientPoint(parent);
-    startPoint->incNumberPointers();
     ca_addChildAnimator(startPoint );
     startPoint->prp_setName("point1");
     endPoint = new GradientPoint(parent);
     endPoint->prp_setName("point2");
-    endPoint->incNumberPointers();
     ca_addChildAnimator(endPoint);
     enabled = false;
 }

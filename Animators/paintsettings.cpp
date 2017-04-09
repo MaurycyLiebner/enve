@@ -207,7 +207,6 @@ void Gradient::addColorToList(Color color) {
 void Gradient::addColorToList(ColorAnimator *newColorAnimator,
                               const bool &saveUndoRedo) {
     mColors << newColorAnimator;
-    newColorAnimator->incNumberPointers();
 
     ca_addChildAnimator(newColorAnimator);
 
@@ -295,7 +294,6 @@ void Gradient::removeColor(ColorAnimator *color,
     ca_removeChildAnimator(color);
     emit resetGradientWidgetColorIdIfEquals(this, mColors.indexOf(color));
     mColors.removeOne(color);
-    color->decNumberPointers();
     updateQGradientStops();
 }
 

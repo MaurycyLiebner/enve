@@ -9,34 +9,33 @@
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 #include "durationrectangle.h"
 
-BoundingBox::BoundingBox(BoxesGroup *parent, BoundingBoxType type) :
+BoundingBox::BoundingBox(BoxesGroup *parent,
+                         const BoundingBoxType &type) :
     ComplexAnimator(), Transformable()
 {
-    mParent = parent;
+    mParent = parent->ref<BoxesGroup>();
 
-    mEffectsAnimators.blockPointer();
-    mEffectsAnimators.prp_setName("effects");
-    mEffectsAnimators.setParentBox(this);
-    mEffectsAnimators.prp_setUpdater(new PixmapEffectUpdater(this));
-    mEffectsAnimators.prp_blockUpdater();
+    mEffectsAnimators->prp_setName("effects");
+    mEffectsAnimators->setParentBox(this);
+    mEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
+    mEffectsAnimators->prp_blockUpdater();
 
-    ca_addChildAnimator(&mTransformAnimator);
-    mTransformAnimator.blockPointer();
+    ca_addChildAnimator(mTransformAnimator.data());
 
-    mTransformAnimator.prp_setUpdater(new TransUpdater(this) );
-    mTransformAnimator.prp_blockUpdater();
+    mTransformAnimator->prp_setUpdater(new TransUpdater(this) );
+    mTransformAnimator->prp_blockUpdater();
     mType = type;
 
-    mTransformAnimator.reset();
+    mTransformAnimator->reset();
     if(parent == NULL) return;
     parent->addChild(this);
     updateCombinedTransform();
 }
 
-BoundingBox::BoundingBox(BoundingBoxType type) :
+BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
     mType = type;
-    mTransformAnimator.reset();
+    mTransformAnimator->reset();
 }
 
 BoundingBox::~BoundingBox() {
@@ -122,16 +121,16 @@ BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
 
 void BoundingBox::prp_makeDuplicate(Property *property) {
     BoundingBox *targetBox = (BoundingBox*)property;
-    targetBox->duplicateTransformAnimatorFrom(&mTransformAnimator);
-    int effectsCount = mEffectsAnimators.ca_getNumberOfChildren();
+    targetBox->duplicateTransformAnimatorFrom(mTransformAnimator.data());
+    int effectsCount = mEffectsAnimators->ca_getNumberOfChildren();
     for(int i = 0; i < effectsCount; i++) {
-        targetBox->addEffect((PixmapEffect*)((PixmapEffect*)mEffectsAnimators.
+        targetBox->addEffect((PixmapEffect*)((PixmapEffect*)mEffectsAnimators->
                            ca_getChildAt(i))->prp_makeDuplicate() );
     }
 }
 
 Property *BoundingBox::prp_makeDuplicate() {
-    return createDuplicate(mParent);
+    return createDuplicate(mParent.data());
 }
 
 BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
@@ -159,9 +158,9 @@ bool BoundingBox::isAncestor(BoundingBox *box) const {
 
 void BoundingBox::applyEffects(QImage *im,
                                qreal scale) {
-    if(mEffectsAnimators.hasChildAnimators()) {
+    if(mEffectsAnimators->hasChildAnimators()) {
         fmt_filters::image img(im->bits(), im->width(), im->height());
-        mEffectsAnimators.applyEffects(this,
+        mEffectsAnimators->applyEffects(this,
                                        im,
                                        img,
                                        scale);
@@ -177,7 +176,7 @@ CacheBoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
 #include <QSqlError>
 int BoundingBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
-    int transfromAnimatorId = mTransformAnimator.prp_saveToSql(query);
+    int transfromAnimatorId = mTransformAnimator->prp_saveToSql(query);
     if(!query->exec(
                 QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
                         "pivotchanged, visible, locked, "
@@ -195,8 +194,8 @@ int BoundingBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     }
 
     int boxId = query->lastInsertId().toInt();
-    if(mEffectsAnimators.hasChildAnimators()) {
-        mEffectsAnimators.prp_saveToSql(query, boxId);
+    if(mEffectsAnimators->hasChildAnimators()) {
+        mEffectsAnimators->prp_saveToSql(query, boxId);
     }
     return boxId;
 }
@@ -218,8 +217,8 @@ void BoundingBox::prp_loadFromSql(const int &boundingBoxId) {
         bool pivotChanged = query.value(idPivotChanged).toBool();
         bool visible = query.value(idVisible).toBool();
         bool locked = query.value(idLocked).toBool();
-        mTransformAnimator.prp_loadFromSql(transformAnimatorId);
-        mEffectsAnimators.prp_loadFromSql(boundingBoxId);
+        mTransformAnimator->prp_loadFromSql(transformAnimatorId);
+        mEffectsAnimators->prp_loadFromSql(boundingBoxId);
         mPivotChanged = pivotChanged;
         mLocked = locked;
         mVisible = visible;
@@ -340,7 +339,7 @@ Canvas *BoundingBox::getParentCanvas() {
 
 void BoundingBox::duplicateTransformAnimatorFrom(
         TransformAnimator *source) {
-    source->prp_makeDuplicate(&mTransformAnimator);
+    source->prp_makeDuplicate(mTransformAnimator.data());
 }
 
 void BoundingBox::updateAllBoxes() {
@@ -416,7 +415,7 @@ void BoundingBox::drawPreviewPixmap(QPainter *p) {
     drawPixmap(p);
 //    p->save();
 
-//    p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+//    p->setOpacity(mTransformAnimator->getOpacity()*0.01);
 
 //    p->drawImage(mPreviewDrawPos, mRenderPixmap);
 //    p->restore();
@@ -448,7 +447,7 @@ void BoundingBox::renderFinal(QPainter *p) {
 
     applyEffects(&renderPixmap, true);
 
-    p->setOpacity(mTransformAnimator.getOpacity()*0.01);
+    p->setOpacity(mTransformAnimator->getOpacity()*0.01);
     p->drawImage(pixBoundingRect.topLeft(), renderPixmap);
 
     p->restore();
@@ -495,7 +494,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         p->setCompositionMode(mCompositionMode);
-        p->setOpacity(mTransformAnimator.getOpacity()*0.01 );
+        p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
         mRenderCacheHandler.drawCurrentRenderContainer(p);
         p->restore();
     }
@@ -519,7 +518,7 @@ void BoundingBox::updateEffectsMarginIfNeeded() {
 }
 
 void BoundingBox::updateEffectsMargin() {
-    mEffectsMargin = mEffectsAnimators.getEffectsMargin();
+    mEffectsMargin = mEffectsAnimators->getEffectsMargin();
 }
 
 void BoundingBox::scheduleEffectsMarginUpdate() {
@@ -530,15 +529,15 @@ void BoundingBox::scheduleEffectsMarginUpdate() {
 }
 
 void BoundingBox::resetScale() {
-    mTransformAnimator.resetScale();
+    mTransformAnimator->resetScale();
 }
 
 void BoundingBox::resetTranslation() {
-    mTransformAnimator.resetTranslation();
+    mTransformAnimator->resetTranslation();
 }
 
 void BoundingBox::resetRotation() {
-    mTransformAnimator.resetRotation();
+    mTransformAnimator->resetRotation();
 }
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
@@ -549,15 +548,15 @@ void BoundingBox::updateAfterFrameChanged(int currentFrame) {
 
 void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new SetBoxParentUndoRedo(this, mParent, parent));
+        addUndoRedo(new SetBoxParentUndoRedo(this, mParent.data(), parent));
     }
-    mParent = parent;
+    mParent = parent->ref<BoxesGroup>();
 
     updateCombinedTransform();
 }
 
 BoxesGroup *BoundingBox::getParent() {
-    return mParent;
+    return mParent.data();
 }
 
 bool BoundingBox::isGroup() {
@@ -604,11 +603,11 @@ void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
                                  bool pivotChanged) {
     if(saveUndoRedo) {
         addUndoRedo(new SetPivotRelPosUndoRedo(this,
-                        mTransformAnimator.getPivot(), relPos,
+                        mTransformAnimator->getPivot(), relPos,
                         mPivotChanged, pivotChanged));
     }
     mPivotChanged = pivotChanged;
-    mTransformAnimator.
+    mTransformAnimator->
             setPivotWithoutChangingTransformation(relPos,
                                                   saveUndoRedo);//setPivot(relPos, saveUndoRedo);//setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
     schedulePivotUpdate();
@@ -622,7 +621,7 @@ void BoundingBox::setPivotAbsPos(QPointF absPos,
 }
 
 QPointF BoundingBox::getPivotAbsPos() {
-    return mCombinedTransformMatrix.map(mTransformAnimator.getPivot());
+    return mCombinedTransformMatrix.map(mTransformAnimator->getPivot());
 }
 
 void BoundingBox::select() {
@@ -711,20 +710,20 @@ void BoundingBox::scale(qreal scaleBy) {
 }
 
 void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy) {
-    mTransformAnimator.scale(scaleXBy, scaleYBy);
+    mTransformAnimator->scale(scaleXBy, scaleYBy);
 }
 
 void BoundingBox::rotateBy(qreal rot) {
-    mTransformAnimator.rotateRelativeToSavedValue(rot);
+    mTransformAnimator->rotateRelativeToSavedValue(rot);
 }
 
 void BoundingBox::rotateRelativeToSavedPivot(qreal rot) {
-    mTransformAnimator.rotateRelativeToSavedValue(rot,
+    mTransformAnimator->rotateRelativeToSavedValue(rot,
                                                   mSavedTransformPivot);
 }
 
 void BoundingBox::scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy) {
-    mTransformAnimator.scaleRelativeToSavedValue(scaleXBy, scaleYBy,
+    mTransformAnimator->scaleRelativeToSavedValue(scaleXBy, scaleYBy,
                                                  mSavedTransformPivot);
 }
 
@@ -737,7 +736,7 @@ QPointF BoundingBox::mapRelativeToAbsolute(QPointF relPos) const {
 }
 
 void BoundingBox::moveByAbs(QPointF trans) {
-    mTransformAnimator.moveByAbs(mParent->getCombinedTransform(), trans);
+    mTransformAnimator->moveByAbs(mParent->getCombinedTransform(), trans);
 //    QPointF by = mParent->mapAbsPosToRel(trans) -
 //                 mParent->mapAbsPosToRel(QPointF(0., 0.));
 // //    QPointF by = mapAbsPosToRel(
@@ -747,7 +746,7 @@ void BoundingBox::moveByAbs(QPointF trans) {
 }
 
 void BoundingBox::moveByRel(QPointF trans) {
-    mTransformAnimator.moveRelativeToSavedValue(trans.x(), trans.y());
+    mTransformAnimator->moveRelativeToSavedValue(trans.x(), trans.y());
 }
 
 void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo) {
@@ -757,33 +756,33 @@ void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo) {
 }
 
 void BoundingBox::setRelativePos(QPointF relPos, bool saveUndoRedo) {
-    mTransformAnimator.setPosition(relPos.x(), relPos.y() );
+    mTransformAnimator->setPosition(relPos.x(), relPos.y() );
 }
 
 void BoundingBox::saveTransformPivotAbsPos(QPointF absPivot) {
     mSavedTransformPivot =
             mParent->mapAbsPosToRel(absPivot) -
-            mTransformAnimator.getPivot();
+            mTransformAnimator->getPivot();
 }
 
 void BoundingBox::startPosTransform() {
-    mTransformAnimator.startPosTransform();
+    mTransformAnimator->startPosTransform();
 }
 
 void BoundingBox::startRotTransform() {
-    mTransformAnimator.startRotTransform();
+    mTransformAnimator->startRotTransform();
 }
 
 void BoundingBox::startScaleTransform() {
-    mTransformAnimator.startScaleTransform();
+    mTransformAnimator->startScaleTransform();
 }
 
 void BoundingBox::startTransform() {
-    mTransformAnimator.prp_startTransform();
+    mTransformAnimator->prp_startTransform();
 }
 
 void BoundingBox::finishTransform() {
-    mTransformAnimator.prp_finishTransform();
+    mTransformAnimator->prp_finishTransform();
     //updateCombinedTransform();
 }
 
@@ -792,7 +791,7 @@ bool BoundingBox::absPointInsidePath(QPointF absPoint) {
 }
 
 void BoundingBox::cancelTransform() {
-    mTransformAnimator.prp_cancelTransform();
+    mTransformAnimator->prp_cancelTransform();
     //updateCombinedTransform();
 }
 
@@ -831,14 +830,14 @@ QPointF BoundingBox::getAbsolutePos() {
 
 void BoundingBox::updateRelativeTransformTmp() {
     mRelativeTransformMatrix =
-            mTransformAnimator.getCurrentTransformationMatrix();
+            mTransformAnimator->getCurrentTransformationMatrix();
     updateCombinedTransformTmp();
     //updateCombinedTransform(replaceCache);
 }
 
 void BoundingBox::updateRelativeTransformAfterFrameChange() {
     mRelativeTransformMatrix =
-            mTransformAnimator.getCurrentTransformationMatrix();
+            mTransformAnimator->getCurrentTransformationMatrix();
     updateCombinedTransform();
 }
 
@@ -866,16 +865,16 @@ void BoundingBox::updateCombinedTransformTmp() {
 }
 
 TransformAnimator *BoundingBox::getTransformAnimator() {
-    return &mTransformAnimator;
+    return mTransformAnimator.data();
 }
 
 QMatrix BoundingBox::getCombinedRenderTransform() {
-    return mTransformAnimator.getCurrentTransformationMatrix()*
+    return mTransformAnimator->getCurrentTransformationMatrix()*
             mParent->getCombinedRenderTransform();
 }
 
 QMatrix BoundingBox::getCombinedFinalRenderTransform() {
-    return mTransformAnimator.getCurrentTransformationMatrix()*
+    return mTransformAnimator->getCurrentTransformationMatrix()*
             mParent->getCombinedFinalRenderTransform();
 }
 
@@ -896,21 +895,20 @@ void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
 void BoundingBox::addEffect(PixmapEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
 
-    if(!mEffectsAnimators.hasChildAnimators()) {
-        ca_addChildAnimator(&mEffectsAnimators);
+    if(!mEffectsAnimators->hasChildAnimators()) {
+        ca_addChildAnimator(mEffectsAnimators.data());
     }
-    mEffectsAnimators.ca_addChildAnimator(effect);
+    mEffectsAnimators->ca_addChildAnimator(effect);
 
     scheduleEffectsMarginUpdate();
     scheduleSoftUpdate();
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
-    mEffectsAnimators.ca_removeChildAnimator(effect);
-    if(!mEffectsAnimators.hasChildAnimators()) {
-        ca_removeChildAnimator(&mEffectsAnimators);
+    mEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mEffectsAnimators->hasChildAnimators()) {
+        ca_removeChildAnimator(mEffectsAnimators.data());
     }
-    effect->decNumberPointers();
 
     scheduleEffectsMarginUpdate();
     scheduleSoftUpdate();
@@ -1177,7 +1175,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
         } else if(selectedAction->text() == "Apply Transformation") {
             applyCurrentTransformation();
         } else if(selectedAction->text() == "Create Link") {
-            createLink(mParent);
+            createLink(mParent.data());
         } else if(selectedAction->text() == "Group") {
             getParentCanvas()->groupSelectedBoxes();
             return true;
@@ -1279,7 +1277,7 @@ void BoundingBox::setUpdateVars() {
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
     mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL ||
                           mReplaceCache;
-    mUpdateOpacity = mTransformAnimator.getOpacity()*0.01;
+    mUpdateOpacity = mTransformAnimator->getOpacity()*0.01;
 }
 
 bool BoundingBox::isUsedAsTarget() {

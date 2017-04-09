@@ -5,6 +5,7 @@
 #include <QSqlQuery>
 #include "connectedtomainwindow.h"
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include "selfref.h"
 
 class ComplexAnimator;
 class Key;
@@ -16,7 +17,7 @@ class Property :
     public QObject,
     public ConnectedToMainWindow,
     public SingleWidgetTarget,
-    public SmartPointerTarget {
+    public SelfRef {
     Q_OBJECT
 public:
     Property();

@@ -37,8 +37,10 @@ public:
     QPointF getCurrentPointValueAtFrame(const int &frame);
     void setPrefferedValueStep(const qreal &valueStep);
 private:
-    QrealAnimator mXAnimator;
-    QrealAnimator mYAnimator;
+    QSharedPointer<QrealAnimator> mXAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mYAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 #endif // QPOINTFANIMATOR_H

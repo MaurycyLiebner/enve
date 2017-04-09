@@ -3,8 +3,8 @@
 #include "movablepoint.h"
 #include "updatescheduler.h"
 
-Circle::Circle(BoxesGroup *parent) : PathBox(parent, TYPE_CIRCLE)
-{
+Circle::Circle(BoxesGroup *parent) :
+    PathBox(parent, TYPE_CIRCLE) {
     setName("Circle");
 
     mCenter = new CircleCenterPoint(this, TYPE_PATH_POINT);
@@ -127,8 +127,8 @@ void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
             mHorizontalRadiusPoint->draw(p);
             mVerticalRadiusPoint->draw(p);
 
-            mFillGradientPoints.drawGradientPoints(p);
-            mStrokeGradientPoints.drawGradientPoints(p);
+            mFillGradientPoints->drawGradientPoints(p);
+            mStrokeGradientPoints->drawGradientPoints(p);
         }
         p->restore();
     }
@@ -139,9 +139,9 @@ MovablePoint *Circle::getPointAt(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode) {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
         }
     }
     if(pointToReturn == NULL) {

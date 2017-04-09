@@ -1,6 +1,6 @@
 #ifndef KEY_H
 #define KEY_H
-#include "smartpointertarget.h"
+#include "selfref.h"
 #include <QtCore>
 
 class ComplexAnimator;
@@ -11,7 +11,7 @@ class KeyCloner;
 class Animator;
 class KeysClipboardContainer;
 
-class Key : public SmartPointerTarget {
+class Key : public StdSelfRef {
 public:
     Key(Animator *parentAnimator);
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,

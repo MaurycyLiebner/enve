@@ -106,7 +106,8 @@ public:
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 private:
     void loadBlurEffectFromSql(const int &pixmapEffectId);
-    QrealAnimator mBlurRadius;
+    QSharedPointer<QrealAnimator> mBlurRadius =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class ShadowEffect : public PixmapEffect
@@ -132,10 +133,14 @@ public:
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 private:
 //    QrealAnimator mScale;
-    QrealAnimator mBlurRadius;
-    QrealAnimator mOpacity;
-    ColorAnimator mColor;
-    QPointFAnimator mTranslation;
+    QSharedPointer<QrealAnimator> mBlurRadius =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mOpacity =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<ColorAnimator> mColor =
+            (new ColorAnimator())->ref<ColorAnimator>();
+    QSharedPointer<QPointFAnimator> mTranslation =
+            (new QPointFAnimator())->ref<QPointFAnimator>();
 };
 
 class LinesEffect : public PixmapEffect
@@ -154,8 +159,10 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 private:
-    QrealAnimator mLinesDistance;
-    QrealAnimator mLinesWidth;
+    QSharedPointer<QrealAnimator> mLinesDistance =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mLinesWidth =
+            (new QrealAnimator())->ref<QrealAnimator>();
     bool mVertical = false;
 };
 
@@ -175,8 +182,10 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 private:
-    QrealAnimator mCirclesDistance;
-    QrealAnimator mCirclesRadius;
+    QSharedPointer<QrealAnimator> mCirclesDistance =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mCirclesRadius =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class SwirlEffect : public PixmapEffect {
@@ -193,7 +202,8 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 private:
-    QrealAnimator mDegreesAnimator;
+    QSharedPointer<QrealAnimator> mDegreesAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class OilEffect : public PixmapEffect {
@@ -210,7 +220,8 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 private:
-    QrealAnimator mRadiusAnimator;
+    QSharedPointer<QrealAnimator> mRadiusAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class ImplodeEffect : public PixmapEffect {
@@ -227,7 +238,8 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 private:
-    QrealAnimator mFactorAnimator;
+    QSharedPointer<QrealAnimator> mFactorAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class DesaturateEffect : public PixmapEffect {
@@ -244,7 +256,8 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 private:
-    QrealAnimator mInfluenceAnimator;
+    QSharedPointer<QrealAnimator> mInfluenceAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class AlphaMatteEffect : public PixmapEffect {
@@ -261,9 +274,12 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 private:
-    BoolProperty mInvertedProperty;
-    QrealAnimator mInfluenceAnimator;
-    BoxTargetProperty mBoxTarget;
+    QSharedPointer<BoolProperty> mInvertedProperty =
+            (new BoolProperty())->ref<BoolProperty>();
+    QSharedPointer<QrealAnimator> mInfluenceAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<BoxTargetProperty> mBoxTarget =
+            (new BoxTargetProperty())->ref<BoxTargetProperty>();
 };
 
 #endif // PIXMAPEFFECT_H

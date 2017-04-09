@@ -272,10 +272,8 @@ void BoxScrollWidgetVisiblePart::dropEvent(
         EffectAnimators *draggedAnimator = (EffectAnimators*)
                                  effect->prp_getParentAnimator();
         if(draggedAnimator != underMouseAnimator) {
-            effect->incNumberPointers();
             draggedAnimator->getParentBox()->removeEffect(effect);
             underMouseAnimator->getParentBox()->addEffect(effect);
-            effect->decNumberPointers();
         }
         if(below) { // add box below
             underMouseAnimator->ca_moveChildAbove( // boxesgroup list is reversed

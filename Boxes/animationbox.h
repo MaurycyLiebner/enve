@@ -37,7 +37,8 @@ protected:
     std::unordered_map<int, QImage> mAnimationFramesCache;
     QImage mUpdateAnimationImage;
 
-    QrealAnimator mTimeScaleAnimator;
+    QSharedPointer<QrealAnimator> mTimeScaleAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
     //IntAnimator mFrameAnimator;
 };
 

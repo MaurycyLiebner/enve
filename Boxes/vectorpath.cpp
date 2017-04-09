@@ -11,27 +11,25 @@
 VectorPath::VectorPath(BoxesGroup *group) :
     PathBox(group, BoundingBoxType::TYPE_VECTOR_PATH) {
     setName("Path");
-    mPathAnimator.setParentBox(this);
-    mPathAnimator.prp_setUpdater(new PathPointUpdater(this));
-    mPathAnimator.prp_blockUpdater();
-    mPathAnimator.blockPointer();
-    ca_addChildAnimator(&mPathAnimator);
+    mPathAnimator->prp_setUpdater(new PathPointUpdater(this));
+    mPathAnimator->prp_blockUpdater();
+    ca_addChildAnimator(mPathAnimator.data());
 }
 
 #include <QSqlError>
 int VectorPath::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
-    mPathAnimator.prp_saveToSql(query, boundingBoxId);
+    mPathAnimator->prp_saveToSql(query, boundingBoxId);
 
     return boundingBoxId;
 }
 
 PathPoint *VectorPath::createNewPointOnLineNear(QPointF absPos, bool adjust) {
-    return mPathAnimator.createNewPointOnLineNear(absPos, adjust);
+    return mPathAnimator->createNewPointOnLineNear(absPos, adjust);
 }
 
 void VectorPath::removeChildPathAnimator(PathAnimator *path) {
-    if(path == &mPathAnimator) {
+    if(path == mPathAnimator.data()) {
         removeFromParent();
     } else {
         BoundingBox::removeChildPathAnimator(path);
@@ -40,7 +38,7 @@ void VectorPath::removeChildPathAnimator(PathAnimator *path) {
 
 void VectorPath::prp_loadFromSql(const int &boundingBoxId) {
     PathBox::prp_loadFromSql(boundingBoxId);
-    mPathAnimator.prp_loadFromSql(boundingBoxId);
+    mPathAnimator->prp_loadFromSql(boundingBoxId);
     if(!mPivotChanged) centerPivotPosition();
 }
 
@@ -58,27 +56,27 @@ VectorPath::~VectorPath()
 }
 
 PathAnimator *VectorPath::getPathAnimator() {
-    return &mPathAnimator;
+    return mPathAnimator.data();
 }
 
 void VectorPath::applyCurrentTransformation() {
-    mPathAnimator.
-            applyTransformToPoints(mTransformAnimator.getCurrentTransformationMatrix());
+    mPathAnimator->
+            applyTransformToPoints(mTransformAnimator->getCurrentTransformationMatrix());
 
-    mTransformAnimator.reset(true);
+    mTransformAnimator->reset(true);
     centerPivotPosition(true);
 }
 
 Edge *VectorPath::getEgde(QPointF absPos) {
-    return mPathAnimator.getEgde(absPos);
+    return mPathAnimator->getEgde(absPos);
 }
 
 void VectorPath::loadPathFromQPainterPath(const QPainterPath &path) {
-    mPathAnimator.loadPathFromQPainterPath(path);
+    mPathAnimator->loadPathFromQPainterPath(path);
 }
 
 QPointF VectorPath::getRelCenterPosition() {
-    return mPathAnimator.getRelCenterPosition();
+    return mPathAnimator->getRelCenterPosition();
 }
 
 void VectorPath::updatePath()
@@ -88,8 +86,8 @@ void VectorPath::updatePath()
 
 //    mEditPath = QPainterPath();
 
-    mPathAnimator.updatePath();
-    mPath = mPathAnimator.getCurrentPath();
+    mPathAnimator->updatePath();
+    mPath = mPathAnimator->getCurrentPath();
 
     updateOutlinePath();
 }
@@ -122,13 +120,13 @@ void VectorPath::drawSelected(QPainter *p,
                               const CanvasMode &currentCanvasMode) {
     if(isVisibleAndInVisibleDurationRect()) {
         drawBoundingRect(p);
-        mPathAnimator.drawSelected(p,
+        mPathAnimator->drawSelected(p,
                                    currentCanvasMode,
                                    mCombinedTransformMatrix);
         p->save();
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mFillGradientPoints.drawGradientPoints(p);
-            mStrokeGradientPoints.drawGradientPoints(p);
+            mFillGradientPoints->drawGradientPoints(p);
+            mStrokeGradientPoints->drawGradientPoints(p);
         }
         p->restore();
     }
@@ -139,13 +137,13 @@ MovablePoint *VectorPath::getPointAt(const QPointF &absPtPos,
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
         }
     }
     if(pointToReturn == NULL) {
-        pointToReturn = mPathAnimator.qra_getPointAt(absPtPos,
+        pointToReturn = mPathAnimator->qra_getPointAt(absPtPos,
                                                  currentCanvasMode);
     }
     return pointToReturn;
@@ -153,19 +151,19 @@ MovablePoint *VectorPath::getPointAt(const QPointF &absPtPos,
 
 void VectorPath::selectAndAddContainedPointsToList(QRectF absRect,
                                                    QList<MovablePoint *> *list) {
-    mPathAnimator.selectAndAddContainedPointsToList(absRect,
+    mPathAnimator->selectAndAddContainedPointsToList(absRect,
                                                     list);
 }
 
 void VectorPath::duplicatePathAnimatorFrom(
         PathAnimator *source) {
-    source->duplicatePathsTo(&mPathAnimator);
+    source->duplicatePathsTo(mPathAnimator.data());
 }
 
 void VectorPath::prp_makeDuplicate(Property *targetBox) {
     PathBox::prp_makeDuplicate(targetBox);
     ((VectorPath*)targetBox)->
-            duplicatePathAnimatorFrom(&mPathAnimator);
+            duplicatePathAnimatorFrom(mPathAnimator.data());
 }
 
 BoundingBox *VectorPath::createNewDuplicate(BoxesGroup *parent) {

@@ -2,9 +2,9 @@
 #define BOUNDINGBOXRENDERCONTAINER_H
 class BoundingBox;
 #include <QImage>
-#include "smartpointertarget.h"
+#include "selfref.h"
 
-class BoundingBoxRenderContainer : public SmartPointerTarget {
+class BoundingBoxRenderContainer : public StdSelfRef {
 public:
     BoundingBoxRenderContainer() {}
     virtual ~BoundingBoxRenderContainer() {}

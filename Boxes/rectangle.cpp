@@ -123,8 +123,8 @@ void Rectangle::drawSelected(QPainter *p,
             mTopLeftPoint->draw(p);
             mBottomRightPoint->draw(p);
 
-            mFillGradientPoints.drawGradientPoints(p);
-            mStrokeGradientPoints.drawGradientPoints(p);
+            mFillGradientPoints->drawGradientPoints(p);
+            mStrokeGradientPoints->drawGradientPoints(p);
         }
         p->restore();
     }
@@ -136,9 +136,9 @@ MovablePoint *Rectangle::getPointAt(const QPointF &absPtPos,
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
         }
     }
     if(pointToReturn == NULL) {

@@ -86,7 +86,7 @@ class SameTransformInternalLink : public InternalLinkBox
 {
     Q_OBJECT
 public:
-    SameTransformInternalLink(BoxesGroup *parent);
+    SameTransformInternalLink(BoxesGroup *&parent);
     SameTransformInternalLink(BoundingBox *linkTarget,
                               BoxesGroup *parent);
 
@@ -107,7 +107,8 @@ class InternalLinkBoxesGroup : public BoxesGroup
 {
     Q_OBJECT
 public:
-    InternalLinkBoxesGroup(BoxesGroup *parent) : BoxesGroup(parent) {
+    InternalLinkBoxesGroup(BoxesGroup *parent) :
+        BoxesGroup(parent) {
         setType(TYPE_INTERNAL_LINK);
     }
 
@@ -118,7 +119,7 @@ public:
     }
 
     virtual void setLinkTarget(BoxesGroup *linkTarget) {
-        mLinkTarget = linkTarget;
+        mLinkTarget = linkTarget->ref<BoxesGroup>();
     }
 
     BoundingBox *createLink(BoxesGroup *parent) {
@@ -137,11 +138,11 @@ public:
         BoxesGroup::prp_makeDuplicate(targetBox);
         InternalLinkBoxesGroup *ilbgTarget =
                 (InternalLinkBoxesGroup*)targetBox;
-        ilbgTarget->setLinkTarget(mLinkTarget);
+        ilbgTarget->setLinkTarget(mLinkTarget.data());
     }
 
 protected:
-    BoxesGroup *mLinkTarget = NULL;
+    QSharedPointer<BoxesGroup> mLinkTarget;
 };
 
 class InternalLinkCanvas : public InternalLinkBoxesGroup {

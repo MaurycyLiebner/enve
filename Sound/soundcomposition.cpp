@@ -2,14 +2,10 @@
 
 SoundComposition::SoundComposition(QObject *parent)
     :   QIODevice(parent) {
-    mSoundsAnimatorContainer.incNumberPointers();
     mSoundsAnimatorContainer.prp_setName("sounds");
 }
 
 SoundComposition::~SoundComposition() {
-    foreach(SingleSound *sound, mSounds) {
-        sound->decNumberPointers();
-    }
 }
 
 void SoundComposition::start()
@@ -84,13 +80,10 @@ void SoundComposition::generateData(const int &startAbsFrame,
 
 void SoundComposition::addSound(SingleSound *sound) {
     mSounds.append(sound);
-    sound->incNumberPointers();
 }
 
 void SoundComposition::removeSound(SingleSound *sound) {
-    if(mSounds.removeOne(sound)) {
-        sound->decNumberPointers();
-    }
+    mSounds.removeOne(sound);
 }
 
 void SoundComposition::addSoundAnimator(SingleSound *sound) {
@@ -100,7 +93,6 @@ void SoundComposition::addSoundAnimator(SingleSound *sound) {
 
 void SoundComposition::removeSoundAnimator(SingleSound *sound) {
     if(mSounds.removeOne(sound)) {
-        sound->decNumberPointers();
         mSoundsAnimatorContainer.ca_removeChildAnimator(sound);
     }
 }

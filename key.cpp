@@ -125,15 +125,12 @@ void Key::addToSelection(QList<Key *> *selectedKeys) {
     if(isSelected()) return;
     setSelected(true);
     selectedKeys->append(this);
-    incNumberPointers();
 }
 
 void Key::removeFromSelection(QList<Key *> *selectedKeys) {
     if(isSelected()) {
         setSelected(false);
-        if(selectedKeys->removeOne(this) ) {
-            decNumberPointers();
-        }
+        selectedKeys->removeOne(this);
     }
 }
 

@@ -9,9 +9,6 @@ ComplexAnimator::ComplexAnimator() :
 
 ComplexAnimator::~ComplexAnimator() {
     anim_removeAllKeys();
-    foreach(Property *property, ca_mChildAnimators) {
-        property->decNumberPointers();
-    }
 }
 
 int ComplexAnimator::ca_getNumberOfChildren() {
@@ -45,7 +42,6 @@ void ComplexAnimator::ca_addChildAnimator(Property *childAnimator)
 {
     ca_mChildAnimators << childAnimator;
     childAnimator->prp_setUpdater(prp_mUpdater);
-    childAnimator->incNumberPointers();
     childAnimator->prp_setParentAnimator(this);
 
     childAnimator->prp_addAllKeysToComplexAnimator();
@@ -102,7 +98,6 @@ void ComplexAnimator::ca_removeChildAnimator(Property *removeAnimator) {
     removeAnimator->prp_removeAllKeysFromComplexAnimator();
     ca_mChildAnimators.removeOne(removeAnimator);
     removeAnimator->prp_setParentAnimator(NULL);
-    removeAnimator->decNumberPointers();
     ca_childAnimatorIsRecordingChanged();
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator);
@@ -287,7 +282,6 @@ ComplexKey::ComplexKey(ComplexAnimator *parentAnimator) :
 void ComplexKey::addAnimatorKey(Key *key) {
     mKeys << key;
     key->setParentKey(this);
-    key->incNumberPointers();
 }
 
 void ComplexKey::addOrMergeKey(Key *keyAdd) {
@@ -308,10 +302,7 @@ void ComplexKey::deleteKey() {
 }
 
 void ComplexKey::removeAnimatorKey(Key *key) {
-    if(mKeys.removeOne(key) ) {
-        //key->setParentKey(NULL);
-        key->decNumberPointers();
-    }
+    mKeys.removeOne(key);
 }
 
 bool ComplexKey::isEmpty() {

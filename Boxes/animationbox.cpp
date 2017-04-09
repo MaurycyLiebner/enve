@@ -4,14 +4,13 @@
 AnimationBox::AnimationBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_IMAGE) {
     setName("Animation");
-    mTimeScaleAnimator.prp_setName("time scale");
-    mTimeScaleAnimator.blockPointer();
-    mTimeScaleAnimator.qra_setValueRange(-100, 100);
-    mTimeScaleAnimator.qra_setCurrentValue(1.);
-    mTimeScaleAnimator.setPrefferedValueStep(0.05);
-    mTimeScaleAnimator.prp_setUpdater(new AnimationBoxFrameUpdater(this));
-    mTimeScaleAnimator.prp_blockUpdater();
-    ca_addChildAnimator(&mTimeScaleAnimator);
+    mTimeScaleAnimator->prp_setName("time scale");
+    mTimeScaleAnimator->qra_setValueRange(-100, 100);
+    mTimeScaleAnimator->qra_setCurrentValue(1.);
+    mTimeScaleAnimator->setPrefferedValueStep(0.05);
+    mTimeScaleAnimator->prp_setUpdater(new AnimationBoxFrameUpdater(this));
+    mTimeScaleAnimator->prp_blockUpdater();
+    ca_addChildAnimator(mTimeScaleAnimator.data());
 
     setDurationRectangle(new FixedLenAnimationRect(this));
     mRenderCacheHandler.setDurationRectangle(mDurationRectangle);
@@ -24,12 +23,12 @@ void AnimationBox::prp_makeDuplicate(Property *targetBox) {
     BoundingBox::prp_makeDuplicate(targetBox);
     AnimationBox *animationBoxTarget = (AnimationBox*)targetBox;
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
-                &mTimeScaleAnimator);
+                mTimeScaleAnimator.data());
 }
 
 void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
         QrealAnimator *timeScaleAnimator) {
-    timeScaleAnimator->prp_makeDuplicate(&mTimeScaleAnimator);
+    timeScaleAnimator->prp_makeDuplicate(mTimeScaleAnimator.data());
 }
 
 //BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {
@@ -41,7 +40,7 @@ FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
-    qreal timeScale = mTimeScaleAnimator.qra_getCurrentValue();
+    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue();
 
     getAnimationDurationRect()->setAnimationFrameDuration(
                 qCeil(qAbs(timeScale*mFramesCount)));
@@ -49,7 +48,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 
 void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    qreal timeScale = mTimeScaleAnimator.qra_getCurrentValue();
+    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue();
 
     int pixId;
     const int &absMinAnimation =

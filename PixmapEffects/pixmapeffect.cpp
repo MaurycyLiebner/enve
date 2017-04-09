@@ -50,12 +50,11 @@ int PixmapEffect::prp_saveToSql(QSqlQuery *query,
 }
 
 BlurEffect::BlurEffect(qreal radius) : PixmapEffect(EFFECT_BLUR) {
-    mBlurRadius.qra_setCurrentValue(radius);
+    mBlurRadius->qra_setCurrentValue(radius);
     prp_setName("blur");
-    mBlurRadius.prp_setName("radius");
-    mBlurRadius.blockPointer();
-    mBlurRadius.qra_setValueRange(0., 1000.);
-    ca_addChildAnimator(&mBlurRadius);
+    mBlurRadius->prp_setName("radius");
+    mBlurRadius->qra_setValueRange(0., 1000.);
+    ca_addChildAnimator(mBlurRadius.data());
 }
 
 void BlurEffect::apply(BoundingBox *target,
@@ -63,7 +62,7 @@ void BlurEffect::apply(BoundingBox *target,
                        const fmt_filters::image &img,
                        qreal scale) {
     Q_UNUSED(imgPtr);
-    qreal radius = mBlurRadius.qra_getCurrentValue()*scale;
+    qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
     fmt_filters::blur(img, radius, radius*0.3333);
     return;
     //fmt_filters::fast_blur(img, radius*0.5);
@@ -74,14 +73,14 @@ void BlurEffect::apply(BoundingBox *target,
 
 qreal BlurEffect::getMargin()
 {
-    return mBlurRadius.qra_getCurrentValue();
+    return mBlurRadius->qra_getCurrentValue();
 }
 
 #include <QSqlError>
 int BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int radiusId = mBlurRadius.prp_saveToSql(query);
+    int radiusId = mBlurRadius->prp_saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO blureffect (pixmapeffectid, radiusid) "
                 "VALUES (%1, %2)").
@@ -103,7 +102,7 @@ void BlurEffect::loadBlurEffectFromSql(const int &pixmapEffectId) {
             QString::number(pixmapEffectId);
     if(query.exec(queryStr)) {
         query.next();
-        mBlurRadius.prp_loadFromSql(query.value("radiusid").toInt() );
+        mBlurRadius->prp_loadFromSql(query.value("radiusid").toInt() );
     } else {
         qDebug() << "Could not load blureffect with id " << pixmapEffectId;
     }
@@ -118,38 +117,34 @@ Property *BlurEffect::prp_makeDuplicate() {
 void BlurEffect::prp_makeDuplicate(Property *target) {
     BlurEffect *blurTarget = (BlurEffect*)target;
 
-    blurTarget->duplicateBlurRadiusAnimatorFrom(&mBlurRadius);
+    blurTarget->duplicateBlurRadiusAnimatorFrom(mBlurRadius.data());
 }
 
 void BlurEffect::duplicateBlurRadiusAnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(&mBlurRadius);
+    source->prp_makeDuplicate(mBlurRadius.data());
 }
 
 ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
-    mBlurRadius.qra_setCurrentValue(radius);
+    mBlurRadius->qra_setCurrentValue(radius);
     prp_setName("shadow");
-    mBlurRadius.prp_setName("blur radius");
-    mBlurRadius.blockPointer();
-    mBlurRadius.qra_setValueRange(0., 1000.);
-    ca_addChildAnimator(&mBlurRadius);
+    mBlurRadius->prp_setName("blur radius");
+    mBlurRadius->qra_setValueRange(0., 1000.);
+    ca_addChildAnimator(mBlurRadius.data());
 
-    mTranslation.qra_setCurrentValue(QPointF(0., 0.));
-    mTranslation.prp_setName("translation");
-    mTranslation.blockPointer();
-    mTranslation.qra_setValueRange(-1000., 1000.);
-    ca_addChildAnimator(&mTranslation);
+    mTranslation->qra_setCurrentValue(QPointF(0., 0.));
+    mTranslation->prp_setName("translation");
+    mTranslation->qra_setValueRange(-1000., 1000.);
+    ca_addChildAnimator(mTranslation.data());
 
-    mColor.qra_setCurrentValue(Qt::black);
-    mColor.prp_setName("color");
-    mColor.blockPointer();
-    ca_addChildAnimator(&mColor);
+    mColor->qra_setCurrentValue(Qt::black);
+    mColor->prp_setName("color");
+    ca_addChildAnimator(mColor.data());
 
-    mOpacity.qra_setCurrentValue(100.);
-    mOpacity.prp_setName("opacity");
-    mOpacity.blockPointer();
-    mOpacity.qra_setValueRange(0., 100.);
-    ca_addChildAnimator(&mOpacity);
+    mOpacity->qra_setCurrentValue(100.);
+    mOpacity->prp_setName("opacity");
+    mOpacity->qra_setValueRange(0., 100.);
+    ca_addChildAnimator(mOpacity.data());
 //    mScale.setCurrentValue(1.);
 //    mScale.setName("scale");
 //    mScale.blockPointer();
@@ -160,10 +155,10 @@ ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
 int ShadowEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int radiusId = mBlurRadius.prp_saveToSql(query);
-    int colorId = mColor.prp_saveToSql(query);
-    int opacityId = mOpacity.prp_saveToSql(query);
-    int translationId = mTranslation.prp_saveToSql(query);
+    int radiusId = mBlurRadius->prp_saveToSql(query);
+    int colorId = mColor->prp_saveToSql(query);
+    int opacityId = mOpacity->prp_saveToSql(query);
+    int translationId = mTranslation->prp_saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO shadoweffect (pixmapeffectid, blurradiusid, "
                 "colorid, opacityid, translationid) "
@@ -185,10 +180,10 @@ void ShadowEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mBlurRadius.prp_loadFromSql(query.value("blurradiusid").toInt() );
-        mColor.prp_loadFromSql(query.value("colorid").toInt() );
-        mOpacity.prp_loadFromSql(query.value("opacityid").toInt() );
-        mTranslation.prp_loadFromSql(query.value("translationid").toInt() );
+        mBlurRadius->prp_loadFromSql(query.value("blurradiusid").toInt() );
+        mColor->prp_loadFromSql(query.value("colorid").toInt() );
+        mOpacity->prp_loadFromSql(query.value("opacityid").toInt() );
+        mTranslation->prp_loadFromSql(query.value("translationid").toInt() );
     } else {
         qDebug() << "Could not load shadowffect with id " << identifyingId;
     }
@@ -205,7 +200,7 @@ void ShadowEffect::apply(BoundingBox *target,
                                  shadowQImg.width(),
                                  shadowQImg.height());
 
-    QColor currentColor = mColor.qra_getCurrentValue().qcol;
+    QColor currentColor = mColor->qra_getCurrentValue().qcol;
 
     fmt_filters::replaceColor(shadowImg,
                               currentColor.red(),
@@ -218,7 +213,7 @@ void ShadowEffect::apply(BoundingBox *target,
 //    p0.end();
 
 
-    qreal radius = mBlurRadius.qra_getCurrentValue()*scale;
+    qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
     //fmt_filters::blur(shadowImg, radius, radius*0.3333);
     fmt_filters::fast_blur(shadowImg, radius*0.25);
     fmt_filters::fast_blur(shadowImg, radius*0.25);
@@ -226,14 +221,14 @@ void ShadowEffect::apply(BoundingBox *target,
 
     QPainter p(imgPtr);
     p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
-    p.setOpacity(mOpacity.qra_getCurrentValue()*0.01);
-    p.drawImage(mTranslation.qra_getCurrentValue()*scale, shadowQImg);
+    p.setOpacity(mOpacity->qra_getCurrentValue()*0.01);
+    p.drawImage(mTranslation->qra_getCurrentValue()*scale, shadowQImg);
     p.end();
 }
 
 qreal ShadowEffect::getMargin() {
-    return mBlurRadius.qra_getCurrentValue() +
-            pointToLen(mTranslation.qra_getCurrentValue());
+    return mBlurRadius->qra_getCurrentValue() +
+            pointToLen(mTranslation->qra_getCurrentValue());
 }
 
 Property *ShadowEffect::prp_makeDuplicate() {
@@ -245,52 +240,50 @@ Property *ShadowEffect::prp_makeDuplicate() {
 void ShadowEffect::prp_makeDuplicate(Property *target) {
     ShadowEffect *shadowTarget = (ShadowEffect*)target;
 
-    shadowTarget->duplicateTranslationAnimatorFrom(&mTranslation);
-    shadowTarget->duplicateBlurRadiusAnimatorFrom(&mBlurRadius);
-    shadowTarget->duplicateColorAnimatorFrom(&mColor);
-    shadowTarget->duplicateOpacityAnimatorFrom(&mOpacity);
+    shadowTarget->duplicateTranslationAnimatorFrom(mTranslation.data());
+    shadowTarget->duplicateBlurRadiusAnimatorFrom(mBlurRadius.data());
+    shadowTarget->duplicateColorAnimatorFrom(mColor.data());
+    shadowTarget->duplicateOpacityAnimatorFrom(mOpacity.data());
 }
 
 void ShadowEffect::duplicateTranslationAnimatorFrom(QPointFAnimator *source) {
-    source->prp_makeDuplicate(&mTranslation);
+    source->prp_makeDuplicate(mTranslation.data());
 }
 
 void ShadowEffect::duplicateBlurRadiusAnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(&mBlurRadius);
+    source->prp_makeDuplicate(mBlurRadius.data());
 }
 
 void ShadowEffect::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->prp_makeDuplicate(&mColor);
+    source->prp_makeDuplicate(mColor.data());
 }
 
 void ShadowEffect::duplicateOpacityAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(&mOpacity);
+    source->prp_makeDuplicate(mOpacity.data());
 }
 
 LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
     PixmapEffect(EFFECT_LINES) {
     prp_setName("lines");
 
-    mLinesWidth.qra_setValueRange(0., 100000.);
-    mLinesWidth.qra_setCurrentValue(linesWidth);
-    mLinesWidth.prp_setName("width");
-    mLinesWidth.blockPointer();
-    ca_addChildAnimator(&mLinesWidth);
+    mLinesWidth->qra_setValueRange(0., 100000.);
+    mLinesWidth->qra_setCurrentValue(linesWidth);
+    mLinesWidth->prp_setName("width");
+    ca_addChildAnimator(mLinesWidth.data());
 
-    mLinesDistance.qra_setValueRange(0., 100000.);
-    mLinesDistance.qra_setCurrentValue(linesDistance);
-    mLinesDistance.prp_setName("distance");
-    mLinesDistance.blockPointer();
-    ca_addChildAnimator(&mLinesDistance);
+    mLinesDistance->qra_setValueRange(0., 100000.);
+    mLinesDistance->qra_setCurrentValue(linesDistance);
+    mLinesDistance->prp_setName("distance");
+    ca_addChildAnimator(mLinesDistance.data());
 }
 
 int LinesEffect::prp_saveToSql(QSqlQuery *query,
                                const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int distId = mLinesDistance.prp_saveToSql(query);
-    int widthId = mLinesWidth.prp_saveToSql(query);
+    int distId = mLinesDistance->prp_saveToSql(query);
+    int widthId = mLinesWidth->prp_saveToSql(query);
 
     if(!query->exec(
         QString("INSERT INTO lineseffect (pixmapeffectid, distanceid, "
@@ -311,8 +304,8 @@ void LinesEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mLinesDistance.prp_loadFromSql(query.value("distanceid").toInt() );
-        mLinesWidth.prp_loadFromSql(query.value("widthid").toInt() );
+        mLinesDistance->prp_loadFromSql(query.value("distanceid").toInt() );
+        mLinesWidth->prp_loadFromSql(query.value("widthid").toInt() );
     } else {
         qDebug() << "Could not load lineseffect with id " << identifyingId;
     }
@@ -323,8 +316,8 @@ void LinesEffect::apply(BoundingBox *target,
                         const fmt_filters::image &img,
                         qreal scale)
 {
-    qreal linesWidth = mLinesWidth.qra_getCurrentValue()*scale;
-    qreal linesDistance = mLinesDistance.qra_getCurrentValue()*scale;
+    qreal linesWidth = mLinesWidth->qra_getCurrentValue()*scale;
+    qreal linesDistance = mLinesDistance->qra_getCurrentValue()*scale;
     if((linesWidth < 0.1 && linesDistance < linesWidth) ||
             (linesDistance <= linesWidth*0.5)) return;
 
@@ -369,25 +362,23 @@ CirclesEffect::CirclesEffect(qreal circlesRadius,
     PixmapEffect(EFFECT_CIRCLES) {
     prp_setName("circles");
 
-    mCirclesRadius.qra_setValueRange(0., 1000.);
-    mCirclesRadius.qra_setCurrentValue(circlesRadius);
-    mCirclesRadius.prp_setName("radius");
-    mCirclesRadius.blockPointer();
-    ca_addChildAnimator(&mCirclesRadius);
+    mCirclesRadius->qra_setValueRange(0., 1000.);
+    mCirclesRadius->qra_setCurrentValue(circlesRadius);
+    mCirclesRadius->prp_setName("radius");
+    ca_addChildAnimator(mCirclesRadius.data());
 
-    mCirclesDistance.qra_setValueRange(-1000., 1000.);
-    mCirclesDistance.qra_setCurrentValue(circlesDistance);
-    mCirclesDistance.prp_setName("distance");
-    mCirclesDistance.blockPointer();
-    ca_addChildAnimator(&mCirclesDistance);
+    mCirclesDistance->qra_setValueRange(-1000., 1000.);
+    mCirclesDistance->qra_setCurrentValue(circlesDistance);
+    mCirclesDistance->prp_setName("distance");
+    ca_addChildAnimator(mCirclesDistance.data());
 }
 
 int CirclesEffect::prp_saveToSql(QSqlQuery *query,
                                  const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int distId = mCirclesDistance.prp_saveToSql(query);
-    int radId = mCirclesRadius.prp_saveToSql(query);
+    int distId = mCirclesDistance->prp_saveToSql(query);
+    int radId = mCirclesRadius->prp_saveToSql(query);
 
     if(!query->exec(
         QString("INSERT INTO circleseffect (pixmapeffectid, distanceid, "
@@ -408,8 +399,8 @@ void CirclesEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mCirclesDistance.prp_loadFromSql(query.value("distanceid").toInt() );
-        mCirclesRadius.prp_loadFromSql(query.value("radiusid").toInt() );
+        mCirclesDistance->prp_loadFromSql(query.value("distanceid").toInt() );
+        mCirclesRadius->prp_loadFromSql(query.value("radiusid").toInt() );
     } else {
         qDebug() << "Could not load circleseffect with id " << identifyingId;
     }
@@ -421,8 +412,8 @@ void CirclesEffect::apply(BoundingBox *target,
                           const fmt_filters::image &img,
                           qreal scale)
 {
-    qreal radius = mCirclesRadius.qra_getCurrentValue()*scale;
-    qreal distance = mCirclesDistance.qra_getCurrentValue()*scale;
+    qreal radius = mCirclesRadius->qra_getCurrentValue()*scale;
+    qreal distance = mCirclesDistance->qra_getCurrentValue()*scale;
     if((radius < 0.1 && distance < radius) || (distance <= -0.6*radius)) return;
 
     QImage circlesImg = QImage(imgPtr->size(),
@@ -471,17 +462,16 @@ SwirlEffect::SwirlEffect(qreal degrees) :
     PixmapEffect(EFFECT_SWIRL) {
     prp_setName("swirl");
 
-    mDegreesAnimator.qra_setValueRange(-3600., 3600.);
-    mDegreesAnimator.qra_setCurrentValue(degrees);
-    mDegreesAnimator.prp_setName("degrees");
-    mDegreesAnimator.blockPointer();
-    ca_addChildAnimator(&mDegreesAnimator);
+    mDegreesAnimator->qra_setValueRange(-3600., 3600.);
+    mDegreesAnimator->qra_setCurrentValue(degrees);
+    mDegreesAnimator->prp_setName("degrees");
+    ca_addChildAnimator(mDegreesAnimator.data());
 }
 
 int SwirlEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int degId = mDegreesAnimator.prp_saveToSql(query);
+    int degId = mDegreesAnimator->prp_saveToSql(query);
 
     if(!query->exec(
         QString("INSERT INTO swirleffect (pixmapeffectid, "
@@ -501,7 +491,7 @@ void SwirlEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mDegreesAnimator.prp_loadFromSql(query.value("degreesid").toInt() );
+        mDegreesAnimator->prp_loadFromSql(query.value("degreesid").toInt() );
     } else {
         qDebug() << "Could not load swirleffect with id " << identifyingId;
     }
@@ -513,25 +503,24 @@ void SwirlEffect::apply(BoundingBox *target,
                         qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::swirl(img,
-                       mDegreesAnimator.qra_getCurrentValue(),
+                       mDegreesAnimator->qra_getCurrentValue(),
                        fmt_filters::rgba(0, 0, 0, 0));
 }
 
 OilEffect::OilEffect(qreal radius) : PixmapEffect(EFFECT_OIL) {
     prp_setName("oil");
 
-    mRadiusAnimator.qra_setValueRange(1., 5.);
-    mRadiusAnimator.qra_setCurrentValue(radius);
-    mRadiusAnimator.prp_setName("radius");
-    mRadiusAnimator.blockPointer();
-    ca_addChildAnimator(&mRadiusAnimator);
+    mRadiusAnimator->qra_setValueRange(1., 5.);
+    mRadiusAnimator->qra_setCurrentValue(radius);
+    mRadiusAnimator->prp_setName("radius");
+    ca_addChildAnimator(mRadiusAnimator.data());
 }
 
 int OilEffect::prp_saveToSql(QSqlQuery *query,
                              const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int radId = mRadiusAnimator.prp_saveToSql(query);
+    int radId = mRadiusAnimator->prp_saveToSql(query);
 
     if(!query->exec(
         QString("INSERT INTO oileffect (pixmapeffectid, "
@@ -551,7 +540,7 @@ void OilEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mRadiusAnimator.prp_loadFromSql(query.value("radiusid").toInt() );
+        mRadiusAnimator->prp_loadFromSql(query.value("radiusid").toInt() );
     } else {
         qDebug() << "Could not load oileffect with id " << identifyingId;
     }
@@ -563,24 +552,23 @@ void OilEffect::apply(BoundingBox *target,
                         qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::oil(img,
-                     mRadiusAnimator.qra_getCurrentValue());
+                     mRadiusAnimator->qra_getCurrentValue());
 }
 
 ImplodeEffect::ImplodeEffect(qreal radius) :
     PixmapEffect(EFFECT_IMPLODE) {
     prp_setName("implode");
 
-    mFactorAnimator.qra_setValueRange(0., 100.);
-    mFactorAnimator.qra_setCurrentValue(radius);
-    mFactorAnimator.prp_setName("factor");
-    mFactorAnimator.blockPointer();
-    ca_addChildAnimator(&mFactorAnimator);
+    mFactorAnimator->qra_setValueRange(0., 100.);
+    mFactorAnimator->qra_setCurrentValue(radius);
+    mFactorAnimator->prp_setName("factor");
+    ca_addChildAnimator(mFactorAnimator.data());
 }
 
 int ImplodeEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int facId = mFactorAnimator.prp_saveToSql(query);
+    int facId = mFactorAnimator->prp_saveToSql(query);
 
     if(!query->exec(
         QString("INSERT INTO implodeeffect (pixmapeffectid, "
@@ -600,7 +588,7 @@ void ImplodeEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mFactorAnimator.prp_loadFromSql(query.value("factorid").toInt() );
+        mFactorAnimator->prp_loadFromSql(query.value("factorid").toInt() );
     } else {
         qDebug() << "Could not load implodeeffect with id " << identifyingId;
     }
@@ -612,7 +600,7 @@ void ImplodeEffect::apply(BoundingBox *target,
                         qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::implode(img,
-                         mFactorAnimator.qra_getCurrentValue(),
+                         mFactorAnimator->qra_getCurrentValue(),
                          fmt_filters::rgba(0, 0, 0, 0));
 }
 
@@ -621,18 +609,17 @@ DesaturateEffect::DesaturateEffect(qreal radius) :
     PixmapEffect(EFFECT_DESATURATE) {
     prp_setName("desaturate");
 
-    mInfluenceAnimator.qra_setValueRange(0., 1.);
-    mInfluenceAnimator.qra_setCurrentValue(radius);
-    mInfluenceAnimator.prp_setName("factor");
-    mInfluenceAnimator.blockPointer();
-    ca_addChildAnimator(&mInfluenceAnimator);
+    mInfluenceAnimator->qra_setValueRange(0., 1.);
+    mInfluenceAnimator->qra_setCurrentValue(radius);
+    mInfluenceAnimator->prp_setName("factor");
+    ca_addChildAnimator(mInfluenceAnimator.data());
 }
 
 int DesaturateEffect::prp_saveToSql(QSqlQuery *query,
                                     const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int infId = mInfluenceAnimator.prp_saveToSql(query);
+    int infId = mInfluenceAnimator->prp_saveToSql(query);
 
     if(!query->exec(
         QString("INSERT INTO desaturateeffect (pixmapeffectid, "
@@ -652,7 +639,7 @@ void DesaturateEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mInfluenceAnimator.prp_loadFromSql(query.value("influenceid").toInt() );
+        mInfluenceAnimator->prp_loadFromSql(query.value("influenceid").toInt() );
     } else {
         qDebug() << "Could not load desaturateeffect with id " << identifyingId;
     }
@@ -664,36 +651,33 @@ void DesaturateEffect::apply(BoundingBox *target,
                         qreal scale) {
     Q_UNUSED(imgPtr);
     fmt_filters::desaturate(img,
-                            mInfluenceAnimator.qra_getCurrentValue());
+                            mInfluenceAnimator->qra_getCurrentValue());
 }
 
 AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) :
     PixmapEffect(EFFECT_ALPHA_MATTE) {
     prp_setName("alpha matte");
 
-    mInfluenceAnimator.qra_setValueRange(0., 1.);
-    mInfluenceAnimator.qra_setCurrentValue(1.);
-    mInfluenceAnimator.setPrefferedValueStep(0.05);
-    mInfluenceAnimator.prp_setName("influence");
-    mInfluenceAnimator.blockPointer();
-    ca_addChildAnimator(&mInfluenceAnimator);
+    mInfluenceAnimator->qra_setValueRange(0., 1.);
+    mInfluenceAnimator->qra_setCurrentValue(1.);
+    mInfluenceAnimator->setPrefferedValueStep(0.05);
+    mInfluenceAnimator->prp_setName("influence");
+    ca_addChildAnimator(mInfluenceAnimator.data());
 
-    mBoxTarget.prp_setName("target");
-    mBoxTarget.blockPointer();
-    mBoxTarget.setParentBox(parentBox);
-    ca_addChildAnimator(&mBoxTarget);
+    mBoxTarget->prp_setName("target");
+    mBoxTarget->setParentBox(parentBox);
+    ca_addChildAnimator(mBoxTarget.data());
 
-    mInvertedProperty.prp_setName("invert");
-    mInvertedProperty.blockPointer();
-    ca_addChildAnimator(&mInvertedProperty);
+    mInvertedProperty->prp_setName("invert");
+    ca_addChildAnimator(mInvertedProperty.data());
 }
 
 int AlphaMatteEffect::prp_saveToSql(QSqlQuery *query,
                                     const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int infId = mInfluenceAnimator.prp_saveToSql(query);
-    BoundingBox *target = mBoxTarget.getTarget();
+    int infId = mInfluenceAnimator->prp_saveToSql(query);
+    BoundingBox *target = mBoxTarget->getTarget();
     int boundingBoxId;
     if(target == NULL) {
          boundingBoxId = -1;
@@ -708,7 +692,7 @@ int AlphaMatteEffect::prp_saveToSql(QSqlQuery *query,
                 arg(pixmapEffectId).
                 arg(infId).
                 arg(boundingBoxId).
-                arg(mInvertedProperty.getValue()) ) ) {
+                arg(mInvertedProperty->getValue()) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
     return pixmapEffectId;
@@ -721,8 +705,8 @@ void AlphaMatteEffect::prp_loadFromSql(const int &identifyingId) {
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mInfluenceAnimator.prp_loadFromSql(query.value("influenceid").toInt() );
-        mInvertedProperty.setValue(query.value("inverted").toBool() );
+        mInfluenceAnimator->prp_loadFromSql(query.value("influenceid").toInt() );
+        mInvertedProperty->setValue(query.value("inverted").toBool() );
     } else {
         qDebug() << "Could not load alphamatteeffect with id " << identifyingId;
     }
@@ -732,9 +716,9 @@ void AlphaMatteEffect::apply(BoundingBox *target,
                              QImage *imgPtr,
                              const fmt_filters::image &img,
                              qreal scale) {
-    BoundingBox *boxTarget = mBoxTarget.getTarget();
+    BoundingBox *boxTarget = mBoxTarget->getTarget();
     if(boxTarget) {
-        qreal influence = mInfluenceAnimator.qra_getCurrentValue();
+        qreal influence = mInfluenceAnimator->qra_getCurrentValue();
         QRectF targetRect = target->getUpdateRenderRect();
 
         QImage imgTmp = QImage(imgPtr->size(),
@@ -753,7 +737,7 @@ void AlphaMatteEffect::apply(BoundingBox *target,
         QPainter p2(imgPtr);
 
         p2.setOpacity(influence);
-        if(mInvertedProperty.getValue()) {
+        if(mInvertedProperty->getValue()) {
             p2.setCompositionMode(QPainter::CompositionMode_DestinationIn);
         } else {
             p2.setCompositionMode(QPainter::CompositionMode_DestinationOut);

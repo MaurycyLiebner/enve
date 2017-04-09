@@ -59,7 +59,6 @@ void KeysView::deleteSelectedKeys()
     }
     foreach(Key *key, mSelectedKeys) {
         key->deleteKey();
-        key->decNumberPointers();
     }
     mSelectedKeys.clear();
 }
@@ -623,7 +622,6 @@ void KeysView::clearKeySelection()
 {
     foreach(Key *key, mSelectedKeys) {
         key->setSelected(false);
-        key->decNumberPointers();
     }
     mSelectedKeys.clear();
 }

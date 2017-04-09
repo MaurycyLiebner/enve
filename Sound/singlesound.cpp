@@ -133,7 +133,6 @@ SingleSound::SingleSound(const QString &path,
 
     prp_setName("sound");
 
-    mVolumeAnimator.incNumberPointers();
     ca_addChildAnimator(&mVolumeAnimator);
     mVolumeAnimator.qra_setValueRange(0, 200);
     mVolumeAnimator.qra_setCurrentValue(100);

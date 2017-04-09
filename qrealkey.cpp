@@ -13,9 +13,7 @@ QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     mEndValue = mValue;
 
     mStartPoint = new QrealPoint(START_POINT, this, 7.5);
-    mStartPoint->incNumberPointers();
     mEndPoint = new QrealPoint(END_POINT, this, 7.5);
-    mEndPoint->incNumberPointers();
 }
 
 QrealKey::QrealKey(const int &frame,
@@ -30,14 +28,10 @@ QrealKey::QrealKey(const int &frame,
     mEndValue = mValue;
 
     mStartPoint = new QrealPoint(START_POINT, this, 7.5);
-    mStartPoint->incNumberPointers();
     mEndPoint = new QrealPoint(END_POINT, this, 7.5);
-    mEndPoint->incNumberPointers();
 }
 
 QrealKey::~QrealKey() {
-    mStartPoint->decNumberPointers();
-    mEndPoint->decNumberPointers();
 }
 
 Key *QrealKey::makeKeyDuplicate(Animator *animator) {

@@ -2,43 +2,39 @@
 #include "updatescheduler.h"
 #include "mainwindow.h"
 
-PathBox::PathBox(BoxesGroup *parent, BoundingBoxType type) :
+PathBox::PathBox(BoxesGroup *parent,
+                 const BoundingBoxType &type) :
     BoundingBox(parent, type) {
-    mFillPaintSettings.setTargetPathBox(this);
-    mStrokeSettings.setTargetPathBox(this);
+    mFillPaintSettings->setTargetPathBox(this);
+    mStrokeSettings->setTargetPathBox(this);
 
-    ca_addChildAnimator(&mFillPaintSettings);
-    ca_addChildAnimator(&mStrokeSettings);
+    ca_addChildAnimator(mFillPaintSettings.data());
+    ca_addChildAnimator(mStrokeSettings.data());
 
-    mFillPaintSettings.blockPointer();
-    mStrokeSettings.blockPointer();
+    mFillGradientPoints->initialize(this);
+    mStrokeGradientPoints->initialize(this);
 
-    mFillGradientPoints.initialize(this);
-    mFillGradientPoints.blockPointer();
-    mStrokeGradientPoints.initialize(this);
-    mStrokeGradientPoints.blockPointer();
+    mFillGradientPoints->prp_setUpdater(new GradientPointsUpdater(true, this));
+    mFillGradientPoints->prp_blockUpdater();
+    mStrokeGradientPoints->prp_setUpdater(new GradientPointsUpdater(false, this));
+    mStrokeGradientPoints->prp_blockUpdater();
 
-    mFillGradientPoints.prp_setUpdater(new GradientPointsUpdater(true, this));
-    mFillGradientPoints.prp_blockUpdater();
-    mStrokeGradientPoints.prp_setUpdater(new GradientPointsUpdater(false, this));
-    mStrokeGradientPoints.prp_blockUpdater();
+    mFillPaintSettings->setGradientPoints(mFillGradientPoints.data());
+    mStrokeSettings->setGradientPoints(mStrokeGradientPoints.data());
 
-    mFillPaintSettings.setGradientPoints(&mFillGradientPoints);
-    mStrokeSettings.setGradientPoints(&mStrokeGradientPoints);
-
-    mStrokeSettings.setLineWidthUpdaterTarget(this);
-    mFillPaintSettings.setPaintPathTarget(this);
+    mStrokeSettings->setLineWidthUpdaterTarget(this);
+    mFillPaintSettings->setPaintPathTarget(this);
 
     schedulePathUpdate();
 }
 
 PathBox::~PathBox()
 {
-    if(mFillPaintSettings.getGradient() != NULL) {
-        mFillPaintSettings.getGradient()->removePath(this);
+    if(mFillPaintSettings->getGradient() != NULL) {
+        mFillPaintSettings->getGradient()->removePath(this);
     }
-    if(mStrokeSettings.getGradient() != NULL) {
-        mStrokeSettings.getGradient()->removePath(this);
+    if(mStrokeSettings->getGradient() != NULL) {
+        mStrokeSettings->getGradient()->removePath(this);
     }
 }
 
@@ -46,11 +42,11 @@ PathBox::~PathBox()
 int PathBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = BoundingBox::prp_saveToSql(query, parentId);
 
-    int fillPts = mFillGradientPoints.startPoint->prp_saveToSql(query);
-    int strokePts = mStrokeGradientPoints.startPoint->prp_saveToSql(query);
+    int fillPts = mFillGradientPoints->startPoint->prp_saveToSql(query);
+    int strokePts = mStrokeGradientPoints->startPoint->prp_saveToSql(query);
 
-    int fillSettingsId = mFillPaintSettings.prp_saveToSql(query);
-    int strokeSettingsId = mStrokeSettings.prp_saveToSql(query);
+    int fillSettingsId = mFillPaintSettings->prp_saveToSql(query);
+    int strokeSettingsId = mStrokeSettings->prp_saveToSql(query);
     if(!query->exec(
             QString(
             "INSERT INTO pathbox (fillgradientpointsid, "
@@ -86,11 +82,11 @@ void PathBox::prp_loadFromSql(const int &boundingBoxId) {
         int strokeSettingsId = query.value(idstrokesettingsid).toInt();
 
 
-        mFillGradientPoints.prp_loadFromSql(fillGradientPointsId);
-        mStrokeGradientPoints.prp_loadFromSql(strokeGradientPointsId);
+        mFillGradientPoints->prp_loadFromSql(fillGradientPointsId);
+        mStrokeGradientPoints->prp_loadFromSql(strokeGradientPointsId);
 
-        mFillPaintSettings.prp_loadFromSql(fillSettingsId);
-        mStrokeSettings.prp_loadFromSql(strokeSettingsId);
+        mFillPaintSettings->prp_loadFromSql(fillSettingsId);
+        mStrokeSettings->prp_loadFromSql(strokeSettingsId);
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }
@@ -116,22 +112,22 @@ void PathBox::preUpdatePixmapsUpdates() {
 
 void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
                                           GradientPoints *strokeGradientPoints) {
-    fillGradientPoints->prp_makeDuplicate(&mFillGradientPoints);
-    strokeGradientPoints->prp_makeDuplicate(&mStrokeGradientPoints);
+    fillGradientPoints->prp_makeDuplicate(mFillGradientPoints.data());
+    strokeGradientPoints->prp_makeDuplicate(mStrokeGradientPoints.data());
 }
 
 void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                          StrokeSettings *strokeSettings) {
-    fillSettings->prp_makeDuplicate(&mFillPaintSettings);
-    strokeSettings->prp_makeDuplicate(&mStrokeSettings);
+    fillSettings->prp_makeDuplicate(mFillPaintSettings.data());
+    strokeSettings->prp_makeDuplicate(mStrokeSettings.data());
 }
 
 void PathBox::prp_makeDuplicate(Property *targetBox) {
     PathBox *pathBoxTarget = ((PathBox*)targetBox);
-    pathBoxTarget->duplicatePaintSettingsFrom(&mFillPaintSettings,
-                                              &mStrokeSettings);
-    pathBoxTarget->duplicateGradientPointsFrom(&mFillGradientPoints,
-                                               &mStrokeGradientPoints);
+    pathBoxTarget->duplicatePaintSettingsFrom(mFillPaintSettings.data(),
+                                              mStrokeSettings.data());
+    pathBoxTarget->duplicateGradientPointsFrom(mFillGradientPoints.data(),
+                                               mStrokeGradientPoints.data());
 }
 
 void PathBox::schedulePathUpdate() {
@@ -163,19 +159,19 @@ void PathBox::updateOutlinePathIfNeeded() {
 }
 
 VectorPath *PathBox::objectToPath() {
-    VectorPath *newPath = new VectorPath(mParent);
+    VectorPath *newPath = new VectorPath(mParent.data());
     newPath->loadPathFromQPainterPath(mPath);
-    newPath->duplicateTransformAnimatorFrom(&mTransformAnimator);
-    newPath->duplicatePaintSettingsFrom(&mFillPaintSettings,
-                                        &mStrokeSettings);
-    newPath->duplicateGradientPointsFrom(&mFillGradientPoints,
-                                         &mStrokeGradientPoints);
+    newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
+    newPath->duplicatePaintSettingsFrom(mFillPaintSettings.data(),
+                                        mStrokeSettings.data());
+    newPath->duplicateGradientPointsFrom(mFillGradientPoints.data(),
+                                         mStrokeGradientPoints.data());
     return newPath;
 }
 
 void PathBox::updateOutlinePath() {
-    if(mStrokeSettings.nonZeroLineWidth()) {
-        mStrokeSettings.setStrokerSettings(&mPathStroker);
+    if(mStrokeSettings->nonZeroLineWidth()) {
+        mStrokeSettings->setStrokerSettings(&mPathStroker);
         if(mOutlineAffectedByScale) {
             mOutlinePath = mPathStroker.createStroke(mPath);
         } else {
@@ -194,50 +190,50 @@ void PathBox::updateOutlinePath() {
 
 void PathBox::updateWholePath() {
     mWholePath = QPainterPath();
-    if(mStrokeSettings.getPaintType() != NOPAINT) {
+    if(mStrokeSettings->getPaintType() != NOPAINT) {
         mWholePath += mOutlinePath;
     }
-    if(mFillPaintSettings.getPaintType() != NOPAINT ||
-            mStrokeSettings.getPaintType() == NOPAINT) {
+    if(mFillPaintSettings->getPaintType() != NOPAINT ||
+            mStrokeSettings->getPaintType() == NOPAINT) {
         mWholePath += mPath;
     }
     updateRelBoundingRect();
 }
 
 void PathBox::updateFillDrawGradient() {
-    if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
-        Gradient *gradient = mFillPaintSettings.getGradient();
+    if(mFillPaintSettings->getPaintType() == GRADIENTPAINT) {
+        Gradient *gradient = mFillPaintSettings->getGradient();
 
-        mFillGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
+        mFillGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                       gradient->getLastQGradientStopQColor());
-        if(!mFillGradientPoints.enabled) {
-            mFillGradientPoints.enable();
+        if(!mFillGradientPoints->enabled) {
+            mFillGradientPoints->enable();
         }
 
         mDrawFillGradient.setStops(gradient->getQGradientStops());
-        mDrawFillGradient.setStart(mFillGradientPoints.getStartPoint() );
-        mDrawFillGradient.setFinalStop(mFillGradientPoints.getEndPoint() );
+        mDrawFillGradient.setStart(mFillGradientPoints->getStartPoint() );
+        mDrawFillGradient.setFinalStop(mFillGradientPoints->getEndPoint() );
 
-    } else if(mFillGradientPoints.enabled) {
-        mFillGradientPoints.disable();
+    } else if(mFillGradientPoints->enabled) {
+        mFillGradientPoints->disable();
     }
 }
 
 void PathBox::updateStrokeDrawGradient() {
-    if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
-        Gradient *gradient = mStrokeSettings.getGradient();
+    if(mStrokeSettings->getPaintType() == GRADIENTPAINT) {
+        Gradient *gradient = mStrokeSettings->getGradient();
 
-        mStrokeGradientPoints.setColors(gradient->getFirstQGradientStopQColor(),
+        mStrokeGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
                                       gradient->getLastQGradientStopQColor() );
 
-        if(!mStrokeGradientPoints.enabled) {
-            mStrokeGradientPoints.enable();
+        if(!mStrokeGradientPoints->enabled) {
+            mStrokeGradientPoints->enable();
         }
         mDrawStrokeGradient.setStops(gradient->getQGradientStops());
-        mDrawStrokeGradient.setStart(mStrokeGradientPoints.getStartPoint() );
-        mDrawStrokeGradient.setFinalStop(mStrokeGradientPoints.getEndPoint() );
-    } else if(mStrokeGradientPoints.enabled) {
-        mStrokeGradientPoints.disable();
+        mDrawStrokeGradient.setStart(mStrokeGradientPoints->getStartPoint() );
+        mDrawStrokeGradient.setFinalStop(mStrokeGradientPoints->getEndPoint() );
+    } else if(mStrokeGradientPoints->enabled) {
+        mStrokeGradientPoints->disable();
     }
 }
 
@@ -263,25 +259,25 @@ void PathBox::draw(QPainter *p) {
 
     p->setPen(Qt::NoPen);
     if(!mUpdatePath.isEmpty()) {
-        if(mFillPaintSettings.getPaintType() == GRADIENTPAINT) {
+        if(mFillPaintSettings->getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawFillGradient);
-        } else if(mFillPaintSettings.getPaintType() == FLATPAINT) {
-            p->setBrush(mFillPaintSettings.getCurrentColor().qcol);
+        } else if(mFillPaintSettings->getPaintType() == FLATPAINT) {
+            p->setBrush(mFillPaintSettings->getCurrentColor().qcol);
         } else {
             p->setBrush(Qt::NoBrush);
         }
         p->drawPath(mUpdatePath);
     }
     if(!mUpdateOutlinePath.isEmpty()) {
-        if(mStrokeSettings.getPaintType() == GRADIENTPAINT) {
+        if(mStrokeSettings->getPaintType() == GRADIENTPAINT) {
             p->setBrush(mDrawStrokeGradient);
-        } else if(mStrokeSettings.getPaintType() == FLATPAINT) {
-            p->setBrush(mStrokeSettings.getCurrentColor().qcol);
+        } else if(mStrokeSettings->getPaintType() == FLATPAINT) {
+            p->setBrush(mStrokeSettings->getCurrentColor().qcol);
         } else{
             p->setBrush(Qt::NoBrush);
         }
 
-        p->setCompositionMode(mStrokeSettings.getOutlineCompositionMode());
+        p->setCompositionMode(mStrokeSettings->getOutlineCompositionMode());
         p->drawPath(mUpdateOutlinePath);
     }
 
@@ -302,9 +298,9 @@ void PathBox::setOutlineAffectedByScale(bool bT) {
 }
 
 PaintSettings *PathBox::getFillSettings() {
-    return &mFillPaintSettings;
+    return mFillPaintSettings.data();
 }
 
 StrokeSettings *PathBox::getStrokeSettings() {
-    return &mStrokeSettings;
+    return mStrokeSettings.data();
 }

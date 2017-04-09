@@ -87,8 +87,9 @@ class BoundingBox :
         public Transformable {
     Q_OBJECT
 public:
-    BoundingBox(BoxesGroup *parent, BoundingBoxType type);
-    BoundingBox(BoundingBoxType type);
+    BoundingBox(BoxesGroup *parent,
+                const BoundingBoxType &type);
+    BoundingBox(const BoundingBoxType &type);
     virtual ~BoundingBox();
 
     const QMatrix &getUpdateTransform() { return mUpdateTransform; }
@@ -103,7 +104,7 @@ public:
 
     virtual QPointF getRelCenterPosition() { return mRelBoundingRect.center(); }
     virtual void centerPivotPosition(bool finish = false) {
-        mTransformAnimator.setPivotWithoutChangingTransformation(
+        mTransformAnimator->setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), finish);
     }
     virtual bool isContainedIn(QRectF absRect);
@@ -353,7 +354,7 @@ public:
     BoundingBox *createDuplicate(BoxesGroup *parent);
     virtual BoundingBox *createNewDuplicate(BoxesGroup *) = 0;
     BoundingBox *createDuplicate() {
-        return createDuplicate(mParent);
+        return createDuplicate(mParent.data());
     }
 
     virtual void drawHovered(QPainter *p) {
@@ -496,17 +497,20 @@ protected:
 
     void setType(const BoundingBoxType &type) { mType = type; }
     BoundingBoxType mType;
-    BoxesGroup *mParent = NULL;
+    QSharedPointer<BoxesGroup> mParent;
 
-    EffectAnimators mEffectsAnimators;
+    QSharedPointer<EffectAnimators> mEffectsAnimators =
+                            (new EffectAnimators())->ref<EffectAnimators>();
 
-    TransformAnimator mTransformAnimator;
+    QSharedPointer<TransformAnimator> mTransformAnimator =
+                            (new TransformAnimator())->ref<TransformAnimator>();
 
     QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;
     bool mPivotChanged = false;
 
-    QPainter::CompositionMode mCompositionMode = QPainter::CompositionMode_SourceOver;
+    QPainter::CompositionMode mCompositionMode =
+            QPainter::CompositionMode_SourceOver;
 
     bool mVisible = true;
     bool mLocked = false;

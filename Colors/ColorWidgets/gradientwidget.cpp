@@ -33,7 +33,6 @@ void GradientWidget::setCurrentColorId(int id) {
 
 void GradientWidget::addGradientToList(Gradient *gradient) {
     mGradients << gradient;
-    gradient->incNumberPointers();
 }
 
 void GradientWidget::newGradient(Color color1, Color color2) {
@@ -53,9 +52,6 @@ void GradientWidget::newGradient(int fromGradientId)
 }
 
 void GradientWidget::clearAll() {
-    foreach(Gradient *gradient, mGradients) {
-        gradient->decNumberPointers();
-    }
     mGradients.clear();
 
     mCurrentGradient = NULL;
@@ -69,7 +65,6 @@ void GradientWidget::removeGradientFromList(Gradient *toRemove) {
     if(mCurrentGradient == toRemove) {
         setCurrentGradient((Gradient*) NULL);
     }
-    toRemove->decNumberPointers();
 }
 
 void GradientWidget::removeGradient(int gradientId)

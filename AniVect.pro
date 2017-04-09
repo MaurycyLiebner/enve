@@ -48,7 +48,6 @@ SOURCES += main.cpp\
     qrealpoint.cpp \
     pointhelpers.cpp \
     updatescheduler.cpp \
-    smartpointertarget.cpp \
     graphboxeslist.cpp \
     keysview.cpp \
     gradientpoints.cpp \
@@ -157,7 +156,6 @@ HEADERS  += mainwindow.h \
     qrealkey.h \
     qrealpoint.h \
     pointhelpers.h \
-    smartpointertarget.h \
     keysview.h \
     gradientpoints.h \
     fontswidget.h \
@@ -229,7 +227,8 @@ HEADERS  += mainwindow.h \
     key.h \
     Boxes/rendercachehandler.h \
     memorychecker.h \
-    memoryhandler.h
+    memoryhandler.h \
+    selfref.h
 
 RESOURCES += \
     resources.qrc

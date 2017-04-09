@@ -75,11 +75,17 @@ public:
     void moveByAbs(const QMatrix &combinedTrans,
                    const QPointF &absTrans);
 private:
-    QPointFAnimator mPivotAnimator;
-    QPointFAnimator mPosAnimator;
-    QPointFAnimator mScaleAnimator;
-    QrealAnimator mRotAnimator;
-    QrealAnimator mOpacityAnimator;
+    QSharedPointer<QPointFAnimator> mPivotAnimator =
+            (new QPointFAnimator)->ref<QPointFAnimator>();
+    QSharedPointer<QPointFAnimator> mPosAnimator =
+            (new QPointFAnimator)->ref<QPointFAnimator>();
+    QSharedPointer<QPointFAnimator> mScaleAnimator =
+            (new QPointFAnimator)->ref<QPointFAnimator>();
+
+    QSharedPointer<QrealAnimator> mRotAnimator =
+            (new QrealAnimator)->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mOpacityAnimator =
+            (new QrealAnimator)->ref<QrealAnimator>();
 };
 
 #endif // TRANSFORMANIMATOR_H

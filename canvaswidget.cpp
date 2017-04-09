@@ -98,7 +98,6 @@ void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
 }
 
 void CanvasWidget::addCanvasToList(Canvas *canvas) {
-    canvas->incNumberPointers();
     mCanvasList << canvas;
     SWT_addChildAbstractionForTargetToAll(canvas);
 }
@@ -106,7 +105,6 @@ void CanvasWidget::addCanvasToList(Canvas *canvas) {
 void CanvasWidget::removeCanvas(const int &id) {
     Canvas *canvas = mCanvasList.takeAt(id);
     SWT_removeChildAbstractionForTargetFromAll(canvas);
-    canvas->decNumberPointers();
     if(mCanvasList.isEmpty()) {
         setCurrentCanvas((Canvas*)NULL);
     } else if(id < mCanvasList.count()) {
@@ -669,9 +667,6 @@ void CanvasWidget::saveOutput(QString renderDest) {
 
 void CanvasWidget::clearAll() {
     SWT_clearAll();
-    foreach(Canvas *canvas, mCanvasList) {
-        canvas->decNumberPointers();
-    }
     mCanvasList.clear();
     setCurrentCanvas((Canvas*)NULL);
 }

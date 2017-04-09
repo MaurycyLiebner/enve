@@ -71,9 +71,7 @@ void Property::prp_setName(QString newName) {
 
 void Property::prp_setUpdater(AnimatorUpdater *updater) {
     if(prp_mUpdaterBlocked) return;
-    if(prp_mUpdater != NULL) prp_mUpdater->decNumberPointers();
     prp_mUpdater = updater;
-    if(prp_mUpdater != NULL) prp_mUpdater->incNumberPointers();
 }
 
 void Property::prp_blockUpdater() {

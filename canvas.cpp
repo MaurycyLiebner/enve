@@ -29,7 +29,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mVisibleWidth = mWidth;
     mVisibleHeight = mHeight;
     mCanvasWidget = canvasWidget;
-    incNumberPointers();
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -84,9 +83,9 @@ void Canvas::showContextMenu(QPoint globalPos) {
 
 #include "Boxes/linkbox.h"
 BoundingBox *Canvas::createLink(BoxesGroup *parent) {
-    InternalLinkCanvas *linkGroup =
-                        new InternalLinkCanvas(this, parent);
-    foreach(BoundingBox *box, mChildBoxes) {
+    InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this,
+                                                           parent);
+    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->createSameTransformationLink(linkGroup);
     }
     return linkGroup;
@@ -238,7 +237,7 @@ void Canvas::paintEvent(QPainter *p) {
         p->fillRect(viewRect, Qt::white);
 
         p->setTransform(QTransform(mCombinedTransformMatrix), true);
-        foreach(BoundingBox *box, mChildBoxes){
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmap(p);
         }
         mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
@@ -380,7 +379,7 @@ void Canvas::drawPreviewPixmap(QPainter *p) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         //p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
-        foreach(BoundingBox *box, mChildBoxes){
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPreviewPixmap(p);
         }
 
@@ -392,7 +391,7 @@ void Canvas::renderFinal(QPainter *p) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
 
-        foreach(BoundingBox *box, mChildBoxes){
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->renderFinal(p);
         }
 
@@ -407,7 +406,8 @@ void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 
 #include "Boxes/videobox.h"
 void Canvas::createVideoForPath(const QString &path) {
-    VideoBox *vidBox = new VideoBox(path, mCurrentBoxesGroup);
+    VideoBox *vidBox = new VideoBox(path,
+                                    mCurrentBoxesGroup);
 }
 
 #include "Boxes/linkbox.h"
@@ -831,7 +831,7 @@ void Canvas::moveByRel(QPointF trans) {
 
 void Canvas::updateAfterFrameChanged(int currentFrame) {
     mCurrentAbsFrame = currentFrame;
-    foreach(BoundingBox *box, mChildBoxes) {
+    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
     mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);

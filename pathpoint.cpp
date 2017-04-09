@@ -12,8 +12,6 @@ PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
     mParentPath = parentAnimator;
     mStartCtrlPt = new CtrlPoint(this, true);
     mEndCtrlPt = new CtrlPoint(this, false);
-    mStartCtrlPt->incNumberPointers();
-    mEndCtrlPt->incNumberPointers();
 
     mStartCtrlPt->setOtherCtrlPt(mEndCtrlPt);
     mEndCtrlPt->setOtherCtrlPt(mStartCtrlPt);
@@ -28,14 +26,10 @@ PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
                                    mEndCtrlPt,
                                    mStartCtrlPt);
 
-    mPathPointAnimators.incNumberPointers();
-
     anim_setTraceKeyOnCurrentFrame(true);
 }
 
 PathPoint::~PathPoint() {
-    mStartCtrlPt->decNumberPointers();
-    mEndCtrlPt->decNumberPointers();
 }
 
 void PathPoint::setParentPath(SinglePathAnimator *path) {

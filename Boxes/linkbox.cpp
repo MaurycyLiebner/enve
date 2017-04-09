@@ -9,10 +9,6 @@ ExternalLinkBox::ExternalLinkBox(BoxesGroup *parent) :
 }
 
 void ExternalLinkBox::reload() {
-    foreach(BoundingBox *box, mChildBoxes) {
-        box->decNumberPointers();
-    }
-
     QSqlDatabase db = QSqlDatabase::database();//not dbConnection
     db.setDatabaseName(mSrc);
     db.open();
@@ -120,8 +116,7 @@ bool InternalLinkBox::relPointInsidePath(QPointF point)
     return mLinkTarget->relPointInsidePath(point);
 }
 
-SameTransformInternalLink::SameTransformInternalLink(
-        BoxesGroup *parent) :
+SameTransformInternalLink::SameTransformInternalLink(BoxesGroup *&parent) :
     InternalLinkBox(parent) {
 
 }
@@ -159,13 +154,14 @@ qreal SameTransformInternalLink::getEffectsMargin() {
 }
 
 SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
-        BoxesGroup *parent) :
+                                                BoxesGroup *parent) :
     InternalLinkBoxesGroup(parent) {
 
 }
 
 SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
-        BoxesGroup *linkTarget, BoxesGroup *parent) :
+                                                BoxesGroup *linkTarget,
+                                                BoxesGroup *parent) :
     InternalLinkBoxesGroup(linkTarget, parent) {
 
 }
@@ -200,8 +196,9 @@ void InternalLinkCanvas::updateRelBoundingRect() {
         //                        child->getRelativeTransform().
         //                        map(child->getRelBoundingRectPath()));
         //        }
-        mRelBoundingRect = QRectF(QPointF(0., 0.),
-                                  ((Canvas*)mLinkTarget)->getCanvasSize());
+        mRelBoundingRect =
+                QRectF(QPointF(0., 0.),
+                       ((Canvas*)mLinkTarget.data())->getCanvasSize());
         //boundingPaths.boundingRect();
 
         BoundingBox::updateRelBoundingRect();
@@ -221,7 +218,7 @@ void InternalLinkCanvas::draw(QPainter *p) {
         p->setClipRect(mRelBoundingRect);
     }
     p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
-    foreach(BoundingBox *box, mChildBoxes) {
+    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         //box->draw(p);
         box->drawPixmap(p);
     }

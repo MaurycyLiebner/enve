@@ -52,28 +52,32 @@ public:
     }
 
     QrealAnimator *getVal1Animator() {
-        return &mVal1Animator;
+        return mVal1Animator.data();
     }
 
     QrealAnimator *getVal2Animator() {
-        return &mVal2Animator;
+        return mVal2Animator.data();
     }
 
     QrealAnimator *getVal3Animator() {
-        return &mVal3Animator;
+        return mVal3Animator.data();
     }
 
     QrealAnimator *getAlphaAnimator() {
-        return &mAlphaAnimator;
+        return mAlphaAnimator.data();
     }
 
     SWT_Type SWT_getType() { return SWT_ColorAnimator; }
 private:
     ColorMode mColorMode = RGBMODE;
-    QrealAnimator mVal1Animator;
-    QrealAnimator mVal2Animator;
-    QrealAnimator mVal3Animator;
-    QrealAnimator mAlphaAnimator;
+    QSharedPointer<QrealAnimator> mVal1Animator =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mVal2Animator =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mVal3Animator =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mAlphaAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
 signals:
     void colorModeChanged(ColorMode);
 };

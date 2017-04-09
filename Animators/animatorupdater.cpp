@@ -123,11 +123,9 @@ void GradientPointsUpdater::frameChangeUpdate() {
 #include "Sound/singlesound.h"
 SingleSoundUpdater::SingleSoundUpdater(SingleSound *sound) : AnimatorUpdater() {
     mTarget = sound;
-    mTarget->incNumberPointers();
 }
 
 SingleSoundUpdater::~SingleSoundUpdater() {
-    mTarget->decNumberPointers();
 }
 
 void SingleSoundUpdater::update() {

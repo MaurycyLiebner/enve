@@ -84,7 +84,8 @@ public:
     void updatePath();
 protected:
     void updatePathPointIds();
-    PathAnimator mPathAnimator;
+    QSharedPointer<PathAnimator> mPathAnimator =
+                        (new PathAnimator(this))->ref<PathAnimator>();
 
     void loadPointsFromSql(int boundingBoxId);
 

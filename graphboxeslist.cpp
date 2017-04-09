@@ -398,7 +398,6 @@ void KeysView::graphDeletePressed()
         QrealKey *key; foreachQK(key, mSelectedKeys)
             key->removeFromAnimator();
             key->setSelected(false);
-            key->decNumberPointers();
         }
         mSelectedKeys.clear();
 
@@ -412,7 +411,6 @@ void KeysView::graphDeletePressed()
 void KeysView::graphClearKeysSelection() {
     QrealKey *key; foreachQK(key, mSelectedKeys)
         key->setSelected(false);
-        key->decNumberPointers();
     }
 
     mSelectedKeys.clear();
@@ -423,16 +421,13 @@ void KeysView::graphAddKeyToSelection(QrealKey *key)
     if(key->isSelected()) return;
     key->setSelected(true);
     mSelectedKeys << key;
-    key->incNumberPointers();
 }
 
 void KeysView::graphRemoveKeyFromSelection(QrealKey *key)
 {
     if(key->isSelected()) {
         key->setSelected(false);
-        if(mSelectedKeys.removeOne(key) ) {
-            key->decNumberPointers();
-        }
+        mSelectedKeys.removeOne(key);
     }
 }
 

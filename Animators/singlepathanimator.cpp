@@ -11,9 +11,6 @@ SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
 }
 
 SinglePathAnimator::~SinglePathAnimator() {
-    foreach(PathPoint *point, mPoints) {
-        point->decNumberPointers();
-    }
 }
 
 Edge *SinglePathAnimator::getEgde(QPointF absPos) {
@@ -539,10 +536,8 @@ void SinglePathAnimator::changeAllPointsParentPathTo(SinglePathAnimator *path) {
     replaceSeparatePathPoint(NULL);
     QList<PathPoint*> allPoints = mPoints;
     foreach(PathPoint *point, allPoints) {
-        point->incNumberPointers();
         removeFromPointsList(point);
         path->appendToPointsList(point);
-        point->decNumberPointers();
     }
     mPoints.clear();
 }
@@ -714,7 +709,6 @@ void SinglePathAnimator::appendToPointsList(PathPoint *point,
                 new AppendToPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
     }
-    point->incNumberPointers();
 
     //schedulePathUpdate();
 
@@ -734,12 +728,10 @@ void SinglePathAnimator::removeFromPointsList(PathPoint *point,
                 new RemoveFromPointsListUndoRedo(point, this);
         addUndoRedo(undoRedo);
         if(mPoints.count() == 0) {
-            point->decNumberPointers();
             mParentPathAnimator->removeSinglePathAnimator(this);
             return;
         }
     }
-    point->decNumberPointers();
 
     //schedulePathUpdate();
     prp_callUpdater();

@@ -10,12 +10,6 @@ Animator::Animator() :
 
 Animator::~Animator() {
     emit beingDeleted();
-    foreach(Key *key, anim_mKeys) {
-        key->decNumberPointers();
-    }
-    if(prp_mUpdater != NULL) {
-        prp_mUpdater->decNumberPointers();
-    }
 }
 
 int Animator::anim_getNextKeyRelFrame(Key *key) {
@@ -175,7 +169,6 @@ void Animator::anim_appendKey(Key *newKey,
         addUndoRedo(new AddKeyToAnimatorUndoRedo(newKey, this));
     }
     anim_mKeys.append(newKey);
-    newKey->incNumberPointers();
     anim_sortKeys();
     //mergeKeysIfNeeded();
     if(prp_mParentAnimator != NULL && !newKey->hasParentKey()) {
@@ -204,7 +197,6 @@ void Animator::anim_removeKey(Key *keyToRemove,
     if(prp_mParentAnimator != NULL) {
         prp_mParentAnimator->ca_removeDescendantsKey(keyToRemove);
     }
-    keyToRemove->decNumberPointers();
     anim_sortKeys();
 
     if(anim_mIsCurrentAnimator) {

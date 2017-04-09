@@ -308,7 +308,8 @@ public:
     SoundComposition *getSoundComposition();
 
     void processUpdate() {
-        foreach(BoundingBox *child, mUpdateChildrenAwaitingUpdate) {
+        foreach(const QSharedPointer<BoundingBox> &child,
+                mUpdateChildrenAwaitingUpdate) {
             child->processUpdate();
         }
     }

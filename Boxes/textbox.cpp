@@ -2,11 +2,12 @@
 #include <QInputDialog>
 #include "mainwindow.h"
 
-TextBox::TextBox(BoxesGroup *parent) : PathBox(parent, TYPE_TEXT) {
+TextBox::TextBox(BoxesGroup *parent) :
+    PathBox(parent, TYPE_TEXT) {
     setName("text");
 
-    mFillPaintSettings.setCurrentColor(Color(0, 0, 0));
-    mStrokeSettings.setPaintType(PaintType::NOPAINT);
+    mFillPaintSettings->setCurrentColor(Color(0, 0, 0));
+    mStrokeSettings->setPaintType(PaintType::NOPAINT);
 }
 
 #include <QSqlError>
@@ -71,8 +72,8 @@ void TextBox::drawSelected(QPainter *p,
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
 
-            mFillGradientPoints.drawGradientPoints(p);
-            mStrokeGradientPoints.drawGradientPoints(p);
+            mFillGradientPoints->drawGradientPoints(p);
+            mStrokeGradientPoints->drawGradientPoints(p);
         }
 
         p->restore();
@@ -123,9 +124,9 @@ MovablePoint *TextBox::getPointAt(const QPointF &absPtPos, const CanvasMode &cur
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints.qra_getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints.qra_getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
         }
     }
 
