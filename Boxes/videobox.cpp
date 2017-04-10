@@ -22,7 +22,7 @@ void VideoBox::prp_makeDuplicate(Property *targetBox) {
     VideoBox *animationBoxTarget = (VideoBox*)targetBox;
     animationBoxTarget->setFilePath(mSrcFilePath);
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
-                &mTimeScaleAnimator);
+                mTimeScaleAnimator.data());
 }
 
 BoundingBox *VideoBox::createNewDuplicate(BoxesGroup *parent) {

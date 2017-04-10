@@ -162,7 +162,7 @@ public:
 
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint() {
-        return mPos;
+        return mPos.data();
     }
 private:
     QRectF mParticlesBoundingRect;
@@ -176,31 +176,48 @@ private:
     QList<Particle*> mNotFinishedParticles;
     ParticleBox *mParentBox = NULL;
 
-    ColorAnimator mColorAnimator;
+    QSharedPointer<ColorAnimator> mColorAnimator =
+            (new ColorAnimator())->ref<ColorAnimator>();
 
-    MovablePoint *mPos;
-    QrealAnimator mWidth;
+    QSharedPointer<MovablePoint> mPos;
+    QSharedPointer<QrealAnimator> mWidth =
+            (new QrealAnimator())->ref<QrealAnimator>();
 
-    QrealAnimator mIniVelocity;
-    QrealAnimator mIniVelocityVar;
-    QrealAnimator mIniVelocityAngle;
-    QrealAnimator mIniVelocityAngleVar;
-    QPointFAnimator mAcceleration;
+    QSharedPointer<QrealAnimator> mIniVelocity =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mIniVelocityVar =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mIniVelocityAngle =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mIniVelocityAngleVar =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QPointFAnimator> mAcceleration =
+            (new QPointFAnimator())->ref<QPointFAnimator>();
 
-    QrealAnimator mParticlesPerSecond;
-    QrealAnimator mParticlesFrameLifetime;
+    QSharedPointer<QrealAnimator> mParticlesPerSecond =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mParticlesFrameLifetime =
+            (new QrealAnimator())->ref<QrealAnimator>();
 
-    QrealAnimator mVelocityRandomVar;
-    QrealAnimator mVelocityRandomVarPeriod;
+    QSharedPointer<QrealAnimator> mVelocityRandomVar =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mVelocityRandomVarPeriod =
+            (new QrealAnimator())->ref<QrealAnimator>();
 
-    QrealAnimator mParticleSize;
-    QrealAnimator mParticleSizeVar;
+    QSharedPointer<QrealAnimator> mParticleSize =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mParticleSizeVar =
+            (new QrealAnimator())->ref<QrealAnimator>();
 
-    QrealAnimator mParticleLength;
+    QSharedPointer<QrealAnimator> mParticleLength =
+            (new QrealAnimator())->ref<QrealAnimator>();
 
-    QrealAnimator mParticlesDecayFrames;
-    QrealAnimator mParticlesSizeDecay;
-    QrealAnimator mParticlesOpacityDecay;
+    QSharedPointer<QrealAnimator> mParticlesDecayFrames =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mParticlesSizeDecay =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mParticlesOpacityDecay =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class ParticleBox : public BoundingBox {

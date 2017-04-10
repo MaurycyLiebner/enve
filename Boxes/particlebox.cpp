@@ -305,130 +305,104 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
 
     prp_setName("particle emitter");
 
-    mPos = new MovablePoint(mParentBox, TYPE_PATH_POINT);
+    mPos = (new MovablePoint(mParentBox, TYPE_PATH_POINT))->ref<MovablePoint>();
     //mPos->setName("pos");
     //mPos.setCurrentValue(QPointF(0., 0.));
 
-    mColorAnimator.prp_setName("color");
-    mColorAnimator.qra_setCurrentValue(Color(0, 0, 0));
-    ca_addChildAnimator(&mColorAnimator);
+    mColorAnimator->prp_setName("color");
+    mColorAnimator->qra_setCurrentValue(Color(0, 0, 0));
+    ca_addChildAnimator(mColorAnimator.data());
 
-    mWidth.prp_setName("width");
-    mWidth.qra_setValueRange(0., 6000.);
-    mWidth.qra_setCurrentValue(0.);
+    mWidth->prp_setName("width");
+    mWidth->qra_setValueRange(0., 6000.);
+    mWidth->qra_setCurrentValue(0.);
 
-    mIniVelocity.prp_setName("ini vel");
-    mIniVelocity.qra_setValueRange(-1000., 1000.);
-    mIniVelocity.qra_setCurrentValue(10.);
+    mIniVelocity->prp_setName("ini vel");
+    mIniVelocity->qra_setValueRange(-1000., 1000.);
+    mIniVelocity->qra_setCurrentValue(10.);
 
-    mIniVelocityVar.prp_setName("ini vel var");
-    mIniVelocityVar.qra_setValueRange(0., 1000.);
-    mIniVelocityVar.qra_setCurrentValue(5.);
+    mIniVelocityVar->prp_setName("ini vel var");
+    mIniVelocityVar->qra_setValueRange(0., 1000.);
+    mIniVelocityVar->qra_setCurrentValue(5.);
 
-    mIniVelocityAngle.prp_setName("ini vel angle");
-    mIniVelocityAngle.qra_setValueRange(-3600., 3600.);
-    mIniVelocityAngle.qra_setCurrentValue(-90.);
+    mIniVelocityAngle->prp_setName("ini vel angle");
+    mIniVelocityAngle->qra_setValueRange(-3600., 3600.);
+    mIniVelocityAngle->qra_setCurrentValue(-90.);
 
-    mIniVelocityAngleVar.prp_setName("ini vel angle var");
-    mIniVelocityAngleVar.qra_setValueRange(0., 3600.);
-    mIniVelocityAngleVar.qra_setCurrentValue(15.);
+    mIniVelocityAngleVar->prp_setName("ini vel angle var");
+    mIniVelocityAngleVar->qra_setValueRange(0., 3600.);
+    mIniVelocityAngleVar->qra_setCurrentValue(15.);
 
-    mAcceleration.prp_setName("acceleration");
-    mAcceleration.qra_setValueRange(-100., 100.);
-    mAcceleration.qra_setCurrentValue(QPointF(0., 9.8));
+    mAcceleration->prp_setName("acceleration");
+    mAcceleration->qra_setValueRange(-100., 100.);
+    mAcceleration->qra_setCurrentValue(QPointF(0., 9.8));
 
-    mParticlesPerSecond.prp_setName("particles per second");
-    mParticlesPerSecond.qra_setValueRange(0., 10000.);
-    mParticlesPerSecond.qra_setCurrentValue(120);
+    mParticlesPerSecond->prp_setName("particles per second");
+    mParticlesPerSecond->qra_setValueRange(0., 10000.);
+    mParticlesPerSecond->qra_setCurrentValue(120);
 
-    mParticlesFrameLifetime.prp_setName("particles lifetime");
-    mParticlesFrameLifetime.qra_setValueRange(1., 1000.);
-    mParticlesFrameLifetime.qra_setCurrentValue(50.);
+    mParticlesFrameLifetime->prp_setName("particles lifetime");
+    mParticlesFrameLifetime->qra_setValueRange(1., 1000.);
+    mParticlesFrameLifetime->qra_setCurrentValue(50.);
 
-    mVelocityRandomVar.prp_setName("velocity random var");
-    mVelocityRandomVar.qra_setValueRange(0., 1000.);
-    mVelocityRandomVar.qra_setCurrentValue(5.);
+    mVelocityRandomVar->prp_setName("velocity random var");
+    mVelocityRandomVar->qra_setValueRange(0., 1000.);
+    mVelocityRandomVar->qra_setCurrentValue(5.);
 
-    mVelocityRandomVarPeriod.prp_setName("velocity random var period");
-    mVelocityRandomVarPeriod.qra_setValueRange(1., 100.);
-    mVelocityRandomVarPeriod.qra_setCurrentValue(10.);
+    mVelocityRandomVarPeriod->prp_setName("velocity random var period");
+    mVelocityRandomVarPeriod->qra_setValueRange(1., 100.);
+    mVelocityRandomVarPeriod->qra_setCurrentValue(10.);
 
-    mParticleSize.prp_setName("particle size");
-    mParticleSize.qra_setValueRange(0., 100.);
-    mParticleSize.qra_setCurrentValue(5.);
+    mParticleSize->prp_setName("particle size");
+    mParticleSize->qra_setValueRange(0., 100.);
+    mParticleSize->qra_setCurrentValue(5.);
 
-    mParticleSizeVar.prp_setName("particle size var");
-    mParticleSizeVar.qra_setValueRange(0., 100.);
-    mParticleSizeVar.qra_setCurrentValue(1.);
+    mParticleSizeVar->prp_setName("particle size var");
+    mParticleSizeVar->qra_setValueRange(0., 100.);
+    mParticleSizeVar->qra_setCurrentValue(1.);
 
-    mParticleLength.prp_setName("length");
-    mParticleLength.qra_setValueRange(0., 2000.);
-    mParticleLength.qra_setCurrentValue(0.);
+    mParticleLength->prp_setName("length");
+    mParticleLength->qra_setValueRange(0., 2000.);
+    mParticleLength->qra_setCurrentValue(0.);
 
-    mParticlesDecayFrames.prp_setName("decay frames");
-    mParticlesDecayFrames.qra_setValueRange(0., 1000.);
-    mParticlesDecayFrames.qra_setCurrentValue(10.);
+    mParticlesDecayFrames->prp_setName("decay frames");
+    mParticlesDecayFrames->qra_setValueRange(0., 1000.);
+    mParticlesDecayFrames->qra_setCurrentValue(10.);
 
-    mParticlesSizeDecay.prp_setName("final scale");
-    mParticlesSizeDecay.qra_setValueRange(0., 10.);
-    mParticlesSizeDecay.qra_setCurrentValue(0.);
+    mParticlesSizeDecay->prp_setName("final scale");
+    mParticlesSizeDecay->qra_setValueRange(0., 10.);
+    mParticlesSizeDecay->qra_setCurrentValue(0.);
 
-    mParticlesOpacityDecay.prp_setName("final opacity");
-    mParticlesOpacityDecay.qra_setValueRange(0., 1.);
-    mParticlesOpacityDecay.qra_setCurrentValue(0.);
-
-    //mPos.blockPointer();
-    mWidth.blockPointer();
-
-    mIniVelocity.blockPointer();
-    mIniVelocityVar.blockPointer();
-
-    mIniVelocityAngle.blockPointer();
-    mIniVelocityAngleVar.blockPointer();
-
-    mAcceleration.blockPointer();
-
-    mParticlesPerSecond.blockPointer();
-    mParticlesFrameLifetime.blockPointer();
-
-    mVelocityRandomVar.blockPointer();
-    mVelocityRandomVarPeriod.blockPointer();
-
-    mParticleSize.blockPointer();
-    mParticleSizeVar.blockPointer();
-
-    mParticleLength.blockPointer();
-
-    mParticlesDecayFrames.blockPointer();
-    mParticlesSizeDecay.blockPointer();
-    mParticlesOpacityDecay.blockPointer();
+    mParticlesOpacityDecay->prp_setName("final opacity");
+    mParticlesOpacityDecay->qra_setValueRange(0., 1.);
+    mParticlesOpacityDecay->qra_setCurrentValue(0.);
 
     mPos->prp_setName("pos");
-    ca_addChildAnimator(mPos);
-    ca_addChildAnimator(&mWidth);
+    ca_addChildAnimator(mPos.data());
+    ca_addChildAnimator(mWidth.data());
 
-    ca_addChildAnimator(&mIniVelocity);
-    ca_addChildAnimator(&mIniVelocityVar);
+    ca_addChildAnimator(mIniVelocity.data());
+    ca_addChildAnimator(mIniVelocityVar.data());
 
-    ca_addChildAnimator(&mIniVelocityAngle);
-    ca_addChildAnimator(&mIniVelocityAngleVar);
+    ca_addChildAnimator(mIniVelocityAngle.data());
+    ca_addChildAnimator(mIniVelocityAngleVar.data());
 
-    ca_addChildAnimator(&mAcceleration);
+    ca_addChildAnimator(mAcceleration.data());
 
-    ca_addChildAnimator(&mParticlesPerSecond);
-    ca_addChildAnimator(&mParticlesFrameLifetime);
+    ca_addChildAnimator(mParticlesPerSecond.data());
+    ca_addChildAnimator(mParticlesFrameLifetime.data());
 
-    ca_addChildAnimator(&mVelocityRandomVar);
-    ca_addChildAnimator(&mVelocityRandomVarPeriod);
+    ca_addChildAnimator(mVelocityRandomVar.data());
+    ca_addChildAnimator(mVelocityRandomVarPeriod.data());
 
-    ca_addChildAnimator(&mParticleSize);
-    ca_addChildAnimator(&mParticleSizeVar);
+    ca_addChildAnimator(mParticleSize.data());
+    ca_addChildAnimator(mParticleSizeVar.data());
 
-    ca_addChildAnimator(&mParticleLength);
+    ca_addChildAnimator(mParticleLength.data());
 
-    ca_addChildAnimator(&mParticlesDecayFrames);
-    ca_addChildAnimator(&mParticlesSizeDecay);
-    ca_addChildAnimator(&mParticlesOpacityDecay);
+    ca_addChildAnimator(mParticlesDecayFrames.data());
+    ca_addChildAnimator(mParticlesSizeDecay.data());
+    ca_addChildAnimator(mParticlesOpacityDecay.data());
 
     prp_setUpdater(new ParticlesUpdater(this));
     prp_blockUpdater();
@@ -439,9 +413,9 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
 
     scheduleGenerateParticles();
     if(parentBox == NULL) {
-        mColorAnimator.prp_setUpdater(NULL);
+        mColorAnimator->prp_setUpdater(NULL);
     } else {
-        mColorAnimator.prp_setUpdater(
+        mColorAnimator->prp_setUpdater(
                     new DisplayedFillStrokeSettingsUpdater(parentBox));
     }
 }
@@ -481,51 +455,51 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *particlesDecayFrames,
                                              QrealAnimator *particlesSizeDecay,
                                              QrealAnimator *particlesOpacityDecay) {
-    pos->prp_makeDuplicate(mPos);
-    width->prp_makeDuplicate(&mWidth);
+    pos->prp_makeDuplicate(mPos.data());
+    width->prp_makeDuplicate(mWidth.data());
 
-    iniVelocity->prp_makeDuplicate(&mIniVelocity);
-    iniVelocityVar->prp_makeDuplicate(&mIniVelocityVar);
-    iniVelocityAngle->prp_makeDuplicate(&mIniVelocityAngle);
-    iniVelocityAngleVar->prp_makeDuplicate(&mIniVelocityAngleVar);
-    acceleration->prp_makeDuplicate(&mAcceleration);
+    iniVelocity->prp_makeDuplicate(mIniVelocity.data());
+    iniVelocityVar->prp_makeDuplicate(mIniVelocityVar.data());
+    iniVelocityAngle->prp_makeDuplicate(mIniVelocityAngle.data());
+    iniVelocityAngleVar->prp_makeDuplicate(mIniVelocityAngleVar.data());
+    acceleration->prp_makeDuplicate(mAcceleration.data());
 
-    particlesPerSecond->prp_makeDuplicate(&mParticlesPerSecond);
-    particlesFrameLifetime->prp_makeDuplicate(&mParticlesFrameLifetime);
+    particlesPerSecond->prp_makeDuplicate(mParticlesPerSecond.data());
+    particlesFrameLifetime->prp_makeDuplicate(mParticlesFrameLifetime.data());
 
-    velocityRandomVar->prp_makeDuplicate(&mVelocityRandomVar);
-    velocityRandomVarPeriod->prp_makeDuplicate(&mVelocityRandomVarPeriod);
+    velocityRandomVar->prp_makeDuplicate(mVelocityRandomVar.data());
+    velocityRandomVarPeriod->prp_makeDuplicate(mVelocityRandomVarPeriod.data());
 
-    particleSize->prp_makeDuplicate(&mParticleSize);
-    particleSizeVar->prp_makeDuplicate(&mParticleSizeVar);
+    particleSize->prp_makeDuplicate(mParticleSize.data());
+    particleSizeVar->prp_makeDuplicate(mParticleSizeVar.data());
 
-    particleLength->prp_makeDuplicate(&mParticleLength);
+    particleLength->prp_makeDuplicate(mParticleLength.data());
 
-    particlesDecayFrames->prp_makeDuplicate(&mParticlesDecayFrames);
-    particlesSizeDecay->prp_makeDuplicate(&mParticlesSizeDecay);
-    particlesOpacityDecay->prp_makeDuplicate(&mParticlesOpacityDecay);
+    particlesDecayFrames->prp_makeDuplicate(mParticlesDecayFrames.data());
+    particlesSizeDecay->prp_makeDuplicate(mParticlesSizeDecay.data());
+    particlesOpacityDecay->prp_makeDuplicate(mParticlesOpacityDecay.data());
 }
 
 void ParticleEmitter::prp_makeDuplicate(Property *target) {
     ParticleEmitter *peTarget = ((ParticleEmitter*)target);
     peTarget->duplicateAnimatorsFrom(
-                mPos,
-                &mWidth,
-                &mIniVelocity,
-                &mIniVelocityVar,
-                &mIniVelocityAngle,
-                &mIniVelocityAngleVar,
-                &mAcceleration,
-                &mParticlesPerSecond,
-                &mParticlesFrameLifetime,
-                &mVelocityRandomVar,
-                &mVelocityRandomVarPeriod,
-                &mParticleSize,
-                &mParticleSizeVar,
-                &mParticleLength,
-                &mParticlesDecayFrames,
-                &mParticlesSizeDecay,
-                &mParticlesOpacityDecay);
+                mPos.data(),
+                mWidth.data(),
+                mIniVelocity.data(),
+                mIniVelocityVar.data(),
+                mIniVelocityAngle.data(),
+                mIniVelocityAngleVar.data(),
+                mAcceleration.data(),
+                mParticlesPerSecond.data(),
+                mParticlesFrameLifetime.data(),
+                mVelocityRandomVar.data(),
+                mVelocityRandomVarPeriod.data(),
+                mParticleSize.data(),
+                mParticleSizeVar.data(),
+                mParticleLength.data(),
+                mParticlesDecayFrames.data(),
+                mParticlesSizeDecay.data(),
+                mParticlesOpacityDecay.data());
     peTarget->setFrameRange(mMinFrame, mMaxFrame);
 }
 
@@ -549,7 +523,7 @@ void ParticleEmitter::setFrameRange(const int &minFrame, const int &maxFrame) {
 }
 
 ColorAnimator *ParticleEmitter::getColorAnimator() {
-    return &mColorAnimator;
+    return mColorAnimator.data();
 }
 
 void ParticleEmitter::generateParticlesIfNeeded() {
@@ -570,37 +544,37 @@ void ParticleEmitter::generateParticles() {
     int totalNeededParticles = 0;
     for(int i = mMinFrame; i < mMaxFrame; i++) {
         qreal iniVelocity =
-                mIniVelocity.getCurrentValueAtAbsFrame(i);
+                mIniVelocity->getCurrentValueAtAbsFrame(i);
         qreal iniVelocityVar =
-                mIniVelocityVar.getCurrentValueAtAbsFrame(i);
+                mIniVelocityVar->getCurrentValueAtAbsFrame(i);
         qreal iniVelocityAngle =
-                mIniVelocityAngle.getCurrentValueAtAbsFrame(i);
+                mIniVelocityAngle->getCurrentValueAtAbsFrame(i);
         qreal iniVelocityAngleVar =
-                mIniVelocityAngleVar.getCurrentValueAtAbsFrame(i);
+                mIniVelocityAngleVar->getCurrentValueAtAbsFrame(i);
         qreal particlesPerFrame =
-                mParticlesPerSecond.getCurrentValueAtAbsFrame(i)/24.;
+                mParticlesPerSecond->getCurrentValueAtAbsFrame(i)/24.;
         qreal particlesFrameLifetime =
-                mParticlesFrameLifetime.getCurrentValueAtAbsFrame(i);
+                mParticlesFrameLifetime->getCurrentValueAtAbsFrame(i);
         QPointF pos =
                 mPos->getCurrentPointValueAtFrame(i);
         qreal width =
-                mWidth.getCurrentValueAtAbsFrame(i);
+                mWidth->getCurrentValueAtAbsFrame(i);
         qreal velocityVar =
-                mVelocityRandomVar.getCurrentValueAtAbsFrame(i);
+                mVelocityRandomVar->getCurrentValueAtAbsFrame(i);
         qreal velocityVarPeriod =
-                mVelocityRandomVarPeriod.getCurrentValueAtAbsFrame(i);
-        QPointF acceleration = mAcceleration.getCurrentPointValueAtFrame(i)/24.;
+                mVelocityRandomVarPeriod->getCurrentValueAtAbsFrame(i);
+        QPointF acceleration = mAcceleration->getCurrentPointValueAtFrame(i)/24.;
         qreal finalScale =
-                mParticlesSizeDecay.getCurrentValueAtAbsFrame(i);
+                mParticlesSizeDecay->getCurrentValueAtAbsFrame(i);
         qreal finalOpacity =
-                mParticlesOpacityDecay.getCurrentValueAtAbsFrame(i);
+                mParticlesOpacityDecay->getCurrentValueAtAbsFrame(i);
         qreal decayFrames =
-                mParticlesDecayFrames.getCurrentValueAtAbsFrame(i);
+                mParticlesDecayFrames->getCurrentValueAtAbsFrame(i);
         qreal particleSize =
-                mParticleSize.getCurrentValueAtAbsFrame(i);
+                mParticleSize->getCurrentValueAtAbsFrame(i);
         qreal particleSizeVar =
-                mParticleSizeVar.getCurrentValueAtAbsFrame(i);
-        qreal length = mParticleLength.getCurrentValueAtAbsFrame(i);
+                mParticleSizeVar->getCurrentValueAtAbsFrame(i);
+        qreal length = mParticleLength->getCurrentValueAtAbsFrame(i);
 
         int particlesToCreate = remainingPartFromFrame + particlesPerFrame;
         remainingPartFromFrame += particlesPerFrame - particlesToCreate;
@@ -670,13 +644,13 @@ void ParticleEmitter::generateParticles() {
 
 void ParticleEmitter::drawParticles(QPainter *p) {
     p->save();
-    if(mParticleLength.qra_getCurrentValue() > 0.1) {
-        QPen pen = QPen(mColorAnimator.qra_getCurrentValue().qcol);
+    if(mParticleLength->qra_getCurrentValue() > 0.1) {
+        QPen pen = QPen(mColorAnimator->qra_getCurrentValue().qcol);
         pen.setCapStyle(Qt::RoundCap);
         p->setPen(pen);
         p->setBrush(Qt::NoBrush);
     } else {
-        p->setBrush(mColorAnimator.qra_getCurrentValue().qcol);
+        p->setBrush(mColorAnimator->qra_getCurrentValue().qcol);
         p->setPen(Qt::NoPen);
     }
     foreach(const ParticleState &state, mParticleStates) {

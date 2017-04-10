@@ -197,7 +197,8 @@ public:
 private:
     PathBox *mTarget;
     GradientPoints *mGradientPoints = NULL;
-    ColorAnimator mColor;
+    QSharedPointer<ColorAnimator> mColor =
+            (new ColorAnimator())->ref<ColorAnimator>();
     PaintType mPaintType = FLATPAINT;
     Gradient *mGradient = NULL;
 };
@@ -246,7 +247,8 @@ public:
     QrealAnimator *getLineWidthAnimator();
 
 private:
-    QrealAnimator mLineWidth;
+    QSharedPointer<QrealAnimator> mLineWidth =
+            (new QrealAnimator())->ref<QrealAnimator>();
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
     QPainter::CompositionMode mOutlineCompositionMode =

@@ -4,8 +4,7 @@
 #include "Animators/complexanimator.h"
 #include "clipboardcontainer.h"
 
-Key::Key(Animator *parentAnimator) :
-    SmartPointerTarget() {
+Key::Key(Animator *parentAnimator) {
     mParentAnimator = parentAnimator;
     mRelFrame = 0;
 }

@@ -1,11 +1,7 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
 
-Property::Property() :
-    QObject(),
-    ConnectedToMainWindow(),
-    SingleWidgetTarget(),
-    SmartPointerTarget() {
+Property::Property() {
 
 }
 

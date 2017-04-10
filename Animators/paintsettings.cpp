@@ -393,28 +393,27 @@ PaintSettings::PaintSettings(Color colorT,
                              PaintType paintTypeT,
                              Gradient *gradientT) : ComplexAnimator() {
     prp_setName("fill");
-    mColor.blockPointer();
-    mColor.qra_setCurrentValue(colorT);
+    mColor->qra_setCurrentValue(colorT);
     mPaintType = paintTypeT;
     mGradient = gradientT;
 
-    ca_addChildAnimator(&mColor);
+    ca_addChildAnimator(mColor.data());
 }
 
 void PaintSettings::setPaintPathTarget(PathBox *path) {
-    mColor.prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(path));
-    mColor.prp_blockUpdater();
+    mColor->prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(path));
+    mColor->prp_blockUpdater();
 }
 
 void PaintSettings::prp_makeDuplicate(Property *target) {
     PaintSettings *paintSettingsTarget = (PaintSettings*)target;
-        paintSettingsTarget->duplicateColorAnimatorFrom(&mColor);
+        paintSettingsTarget->duplicateColorAnimatorFrom(mColor.data());
         paintSettingsTarget->setGradient(mGradient);
         paintSettingsTarget->setPaintType(mPaintType);
 }
 
 void PaintSettings::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->prp_makeDuplicate(&mColor);
+    source->prp_makeDuplicate(mColor.data());
 }
 
 void PaintSettings::setTargetPathBox(PathBox *target) {
@@ -430,7 +429,7 @@ void PaintSettings::prp_loadFromSql(const int &sqlId) {
         int idPaintType = query.record().indexOf("painttype");
         mPaintType = static_cast<PaintType>(query.value(idPaintType).toInt());
         int idColorId = query.record().indexOf("colorid");
-        mColor.prp_loadFromSql(query.value(idColorId).toInt() );
+        mColor->prp_loadFromSql(query.value(idColorId).toInt() );
         int idGradientId = query.record().indexOf("gradientid");
         if(!query.value(idGradientId).isNull()) {
             mGradient = getLoadedGradientBySqlId(
@@ -443,7 +442,7 @@ void PaintSettings::prp_loadFromSql(const int &sqlId) {
 
 int PaintSettings::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
-    int colorId = mColor.prp_saveToSql(query);
+    int colorId = mColor->prp_saveToSql(query);
     QString gradientId = (mGradient == NULL) ? "NULL" :
                                                QString::number(
                                                    mGradient->getSqlId());
@@ -457,7 +456,7 @@ int PaintSettings::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 }
 
 Color PaintSettings::getCurrentColor() const {
-    return mColor.qra_getCurrentValue();
+    return mColor->qra_getCurrentValue();
 }
 
 PaintType PaintSettings::getPaintType() const {
@@ -491,16 +490,16 @@ void PaintSettings::setGradient(Gradient *gradient,
 }
 
 void PaintSettings::setCurrentColor(Color color) {
-    mColor.qra_setCurrentValue(color);
+    mColor->qra_setCurrentValue(color);
 }
 
 void PaintSettings::setPaintType(PaintType paintType, bool saveUndoRedo) {
     if(paintType == mPaintType) return;
 
     if(mPaintType == FLATPAINT) {
-        ca_removeChildAnimator(&mColor);
+        ca_removeChildAnimator(mColor.data());
     } else if(paintType == FLATPAINT) {
-        ca_addChildAnimator(&mColor);
+        ca_addChildAnimator(mColor.data());
     }
     if(saveUndoRedo) {
         addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
@@ -514,7 +513,7 @@ void PaintSettings::setPaintType(PaintType paintType, bool saveUndoRedo) {
 }
 
 ColorAnimator *PaintSettings::getColorAnimator() {
-    return &mColor;
+    return mColor.data();
 }
 
 void PaintSettings::setGradientPoints(GradientPoints *gradientPoints) {
@@ -532,17 +531,16 @@ StrokeSettings::StrokeSettings(Color colorT,
                                                                     paintTypeT,
                                                                     gradientT) {
     prp_setName("stroke");
-    mLineWidth.qra_setCurrentValue(1.);
-    mLineWidth.prp_setName("thickness");
+    mLineWidth->qra_setCurrentValue(1.);
+    mLineWidth->prp_setName("thickness");
 
-    ca_addChildAnimator(&mLineWidth);
-    mLineWidth.blockPointer();
+    ca_addChildAnimator(mLineWidth.data());
 
-    mLineWidth.qra_setValueRange(0., mLineWidth.getMaxPossibleValue());
+    mLineWidth->qra_setValueRange(0., mLineWidth->getMaxPossibleValue());
 }
 
 void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
-    mLineWidth.prp_setUpdater(new StrokeWidthUpdater(path));
+    mLineWidth->prp_setUpdater(new StrokeWidthUpdater(path));
     setPaintPathTarget(path);
 }
 
@@ -560,7 +558,7 @@ void StrokeSettings::prp_loadFromSql(const int &strokeSqlId) {
         int paintSettingsId = static_cast<PaintType>(
                     query.value(idPaintSettingsId).toInt());
         PaintSettings::prp_loadFromSql(paintSettingsId);
-        mLineWidth.prp_loadFromSql(query.value(idLineWidth).toInt() );
+        mLineWidth->prp_loadFromSql(query.value(idLineWidth).toInt() );
         mCapStyle = static_cast<Qt::PenCapStyle>(query.value(idCapStyle).toInt());
         mJoinStyle = static_cast<Qt::PenJoinStyle>(query.value(idJoinStyle).toInt());
     } else {
@@ -572,7 +570,7 @@ int StrokeSettings::prp_saveToSql(QSqlQuery *query,
                                   const int &parentId) {
     Q_UNUSED(parentId);
     int paintSettingsId = PaintSettings::prp_saveToSql(query);
-    int lineWidthId = mLineWidth.prp_saveToSql(query);
+    int lineWidthId = mLineWidth->prp_saveToSql(query);
     query->exec(QString("INSERT INTO strokesettings (linewidthanimatorid, "
                        "capstyle, joinstyle, paintsettingsid) "
                        "VALUES (%1, %2, %3, %4)").
@@ -584,7 +582,7 @@ int StrokeSettings::prp_saveToSql(QSqlQuery *query,
 }
 
 void StrokeSettings::setCurrentStrokeWidth(qreal newWidth) {
-    mLineWidth.qra_setCurrentValue(newWidth);
+    mLineWidth->qra_setCurrentValue(newWidth);
 }
 
 void StrokeSettings::setCapStyle(Qt::PenCapStyle capStyle) {
@@ -596,13 +594,13 @@ void StrokeSettings::setJoinStyle(Qt::PenJoinStyle joinStyle) {
 }
 
 void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
-    stroker->setWidth(mLineWidth.qra_getCurrentValue());
+    stroker->setWidth(mLineWidth->qra_getCurrentValue());
     stroker->setCapStyle(mCapStyle);
     stroker->setJoinStyle(mJoinStyle);
 }
 
 qreal StrokeSettings::getCurrentStrokeWidth() const {
-    return mLineWidth.qra_getCurrentValue();
+    return mLineWidth->qra_getCurrentValue();
 }
 
 Qt::PenCapStyle StrokeSettings::getCapStyle() const {
@@ -614,7 +612,7 @@ Qt::PenJoinStyle StrokeSettings::getJoinStyle() const {
 }
 
 QrealAnimator *StrokeSettings::getStrokeWidthAnimator() {
-    return &mLineWidth;
+    return mLineWidth.data();
 }
 
 void StrokeSettings::setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
@@ -626,24 +624,24 @@ QPainter::CompositionMode StrokeSettings::getOutlineCompositionMode() {
 }
 
 bool StrokeSettings::nonZeroLineWidth() {
-    return !isZero(mLineWidth.qra_getCurrentValue());
+    return !isZero(mLineWidth->qra_getCurrentValue());
 }
 
 void StrokeSettings::prp_makeDuplicate(Property *target) {
     PaintSettings::prp_makeDuplicate(target);
     StrokeSettings *strokeSettingsTarget = (StrokeSettings*)target;
-    strokeSettingsTarget->duplicateLineWidthFrom(&mLineWidth);
+    strokeSettingsTarget->duplicateLineWidthFrom(mLineWidth.data());
     strokeSettingsTarget->setCapStyle(mCapStyle);
     strokeSettingsTarget->setJoinStyle(mJoinStyle);
     strokeSettingsTarget->setOutlineCompositionMode(mOutlineCompositionMode);
 }
 
 void StrokeSettings::duplicateLineWidthFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(&mLineWidth);
+    source->prp_makeDuplicate(mLineWidth.data());
 }
 
 QrealAnimator *StrokeSettings::getLineWidthAnimator() {
-    return &mLineWidth;
+    return mLineWidth.data();
 }
 
 PaintSetting::PaintSetting(const bool &targetFillSettings, const ColorSetting &colorSetting) {

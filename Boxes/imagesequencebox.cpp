@@ -27,7 +27,7 @@ void ImageSequenceBox::prp_makeDuplicate(Property *targetBox) {
     ImageSequenceBox *animationBoxTarget = (ImageSequenceBox*)targetBox;
     animationBoxTarget->setListOfFrames(mListOfFrames);
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
-                &mTimeScaleAnimator);
+                mTimeScaleAnimator.data());
 }
 
 BoundingBox *ImageSequenceBox::createNewDuplicate(BoxesGroup *parent) {
