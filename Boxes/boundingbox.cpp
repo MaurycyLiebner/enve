@@ -1252,7 +1252,6 @@ void BoundingBox::setNoCache(const bool &bT) {
 
 void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
-    mReplaceCache = false;
     if(mNoCache) {
         mRenderCacheHandler.duplicateCurrentRenderContainerFrom(
                                             mUpdateRenderContainer);
@@ -1277,6 +1276,7 @@ void BoundingBox::setUpdateVars() {
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
     mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL ||
                           mReplaceCache;
+    mReplaceCache = false;
     mUpdateOpacity = mTransformAnimator->getOpacity()*0.01;
 }
 
