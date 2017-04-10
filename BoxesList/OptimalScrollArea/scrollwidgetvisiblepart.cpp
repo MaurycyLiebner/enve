@@ -221,6 +221,7 @@ SingleWidget *ScrollWidgetVisiblePart::createNewSingleWidget() {
 }
 
 SWT_RulesCollection::SWT_RulesCollection() {
+    type = SWT_AllTypes;
     rule = SWT_NoRule;
     alwaysShowChildren = false;
     target = SWT_CurrentCanvas;

@@ -88,7 +88,7 @@ public:
     void removeRenderContainer(CacheBoundingBoxRenderContainer *cont);
 protected:
     QList<CacheBoundingBoxRenderContainer*> mRenderContainers;
-    bool mInternalDifferences;
+    bool mInternalDifferences = false;
 
     int mMinRelFrame;
     int mMaxRelFrame;

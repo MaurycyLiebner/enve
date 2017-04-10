@@ -903,7 +903,7 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
     if(alwaysShowChildren) {
         return false;
     } else {
-        if(type == SWT_All) {
+        if(type == SWT_AllTypes) {
         } else if(type == SWT_SingleSound) {
             return false;
         }

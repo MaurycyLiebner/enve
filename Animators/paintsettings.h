@@ -207,7 +207,8 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
         p->setCompositionMode(outlineCompositionMode);
     }
 
-    QPainter::CompositionMode outlineCompositionMode;
+    QPainter::CompositionMode outlineCompositionMode =
+            QPainter::CompositionMode_Source;
 };
 
 class PaintSettings : public ComplexAnimator {
