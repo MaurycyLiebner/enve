@@ -217,7 +217,7 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator,
 }
 
 Color Gradient::getCurrentColorAt(int id) {
-    return mColors.at(id)->qra_getCurrentValue();
+    return mColors.at(id)->getCurrentColor();
 }
 
 ColorAnimator *Gradient::getColorAnimatorAt(int id) {
@@ -370,7 +370,7 @@ void Gradient::updateQGradientStops() {
     qreal cPos = 0.;
     for(int i = 0; i < mColors.length(); i++) {
         mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
-                                    mColors.at(i)->qra_getCurrentValue().qcol) );
+                                    mColors.at(i)->getCurrentColor().qcol) );
         cPos += inc;
     }
     updatePaths();
@@ -456,7 +456,7 @@ int PaintSettings::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 }
 
 Color PaintSettings::getCurrentColor() const {
-    return mColor->qra_getCurrentValue();
+    return mColor->getCurrentColor();
 }
 
 PaintType PaintSettings::getPaintType() const {

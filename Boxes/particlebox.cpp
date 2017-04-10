@@ -645,12 +645,12 @@ void ParticleEmitter::generateParticles() {
 void ParticleEmitter::drawParticles(QPainter *p) {
     p->save();
     if(mParticleLength->qra_getCurrentValue() > 0.1) {
-        QPen pen = QPen(mColorAnimator->qra_getCurrentValue().qcol);
+        QPen pen = QPen(mColorAnimator->getCurrentColor().qcol);
         pen.setCapStyle(Qt::RoundCap);
         p->setPen(pen);
         p->setBrush(Qt::NoBrush);
     } else {
-        p->setBrush(mColorAnimator->qra_getCurrentValue().qcol);
+        p->setBrush(mColorAnimator->getCurrentColor().qcol);
         p->setPen(Qt::NoPen);
     }
     foreach(const ParticleState &state, mParticleStates) {

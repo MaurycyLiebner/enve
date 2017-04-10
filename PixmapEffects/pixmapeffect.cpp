@@ -200,7 +200,7 @@ void ShadowEffect::apply(BoundingBox *target,
                                  shadowQImg.width(),
                                  shadowQImg.height());
 
-    QColor currentColor = mColor->qra_getCurrentValue().qcol;
+    QColor currentColor = mColor->getCurrentColor().qcol;
 
     fmt_filters::replaceColor(shadowImg,
                               currentColor.red(),

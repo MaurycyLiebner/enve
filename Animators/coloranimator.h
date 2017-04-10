@@ -18,7 +18,7 @@ public:
     void qra_setCurrentValue(Color colorValue, bool finish = false);
     void qra_setCurrentValue(QColor qcolorValue, bool finish = false);
 
-    Color qra_getCurrentValue() const;
+    Color getCurrentColor() const;
     void setColorMode(ColorMode colorMode);
 
     void startVal1Transform();

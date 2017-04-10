@@ -39,4 +39,23 @@ private:
     std::weak_ptr<StdSelfRef> mThisWeak;
 };
 
+class SimpleSmartPointer {
+public:
+    SimpleSmartPointer() {}
+    virtual ~SimpleSmartPointer() {}
+    void incNumberPointers() {
+        mNumberPointers++;
+    }
+
+    void decNumberPointers() {
+        mNumberPointers--;
+        if(mNumberPointers <= 0) {
+            delete this;
+        }
+    }
+
+private:
+    int mNumberPointers = 0;
+};
+
 #endif // SELFREF_H

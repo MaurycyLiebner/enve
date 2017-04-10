@@ -124,6 +124,7 @@ int RenderCacheRange::getRenderContainterInsertIdAtRelFrame(
 void RenderCacheRange::insertRenderContainer(
                     CacheBoundingBoxRenderContainer *cont) {
     if(mRenderContainers.contains(cont)) return;
+    cont->incNumberPointers();
     int contId = getRenderContainterInsertIdAtRelFrame(cont->getFrame());
     cont->setParentRagne(this);
     mRenderContainers.insert(contId, cont);
@@ -132,6 +133,7 @@ void RenderCacheRange::insertRenderContainer(
 void RenderCacheRange::removeRenderContainer(
         CacheBoundingBoxRenderContainer *cont) {
     mRenderContainers.removeOne(cont);
+    cont->decNumberPointers();
 }
 
 CacheBoundingBoxRenderContainer *
@@ -157,6 +159,7 @@ RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
             new CacheBoundingBoxRenderContainer();
     cont->setParentRagne(this);
     cont->setRelFrame(frame);
+    cont->incNumberPointers();
     if(mInternalDifferences) {
         int contId = getRenderContainterInsertIdAtRelFrame(frame);
         mRenderContainers.insert(contId, cont);
@@ -431,8 +434,13 @@ void RenderCacheHandler::drawCurrentRenderContainer(QPainter *p) {
 
 void RenderCacheHandler::setCurrentRenderContainerVar(
                             CacheBoundingBoxRenderContainer *cont) {
+    if(cont == mCurrentRenderContainer) return;
+    if(mCurrentRenderContainer != NULL) {
+        mCurrentRenderContainer->decNumberPointers();
+    }
     mCurrentRenderContainer = cont;
     if(mCurrentRenderContainer != NULL) {
+        mCurrentRenderContainer->incNumberPointers();
         mCurrentRenderContainer->thisAccessed();
     }
 }

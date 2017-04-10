@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "pointhelpers.h"
+#include <QPointer>
 
 class Key;
 class QrealKey;
@@ -122,7 +123,7 @@ private:
 
     void updateHoveredPointFromPos(const QPoint &posU);
 
-    DurationRectangleMovable *mHoveredMovable = NULL;
+    QPointer<DurationRectangleMovable> mHoveredMovable;
     Key *mHoveredKey = NULL;
     AnimationDockWidget *mGraphControls = NULL;
 
@@ -136,11 +137,11 @@ private:
     bool mGraphViewed = false;
     qreal mPixelsPerFrame;
     QPointF mMiddlePressPos;
-    QList<QrealAnimator*> mAnimators;
+    QList<QPointer<QrealAnimator>> mAnimators;
 
     bool mGraphUpdateAfterKeysChangedNeeded = false;
 
-    DurationRectangleMovable *mLastPressedDurationRectangleMovable = NULL;
+    QPointer<DurationRectangleMovable> mLastPressedDurationRectangleMovable;
     Key *mLastPressedKey = NULL;
     bool mFirstMove = false;
     int mMoveDFrame = 0;

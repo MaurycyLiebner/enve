@@ -608,7 +608,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 
         if(type == SWT_ColorAnimator) {
             ColorAnimator *col_target = (ColorAnimator*)ca_target;
-            p.setBrush(col_target->qra_getCurrentValue().qcol);
+            p.setBrush(col_target->getCurrentColor().qcol);
             p.drawRect(mColorButton->x(), 3,
                        BOX_HEIGHT, BOX_HEIGHT - 6);
         }

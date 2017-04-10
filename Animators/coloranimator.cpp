@@ -100,7 +100,7 @@ void ColorAnimator::qra_setCurrentValue(QColor qcolorValue, bool finish)
     qra_setCurrentValue(color, finish);
 }
 
-Color ColorAnimator::qra_getCurrentValue() const
+Color ColorAnimator::getCurrentColor() const
 {
     Color color;
     if(mColorMode == RGBMODE) {

@@ -6,7 +6,7 @@ TextBox::TextBox(BoxesGroup *parent) :
     PathBox(parent, TYPE_TEXT) {
     setName("text");
 
-    mFillPaintSettings->setCurrentColor(Color(0, 0, 0));
+    mFillSettings->setCurrentColor(Color(0, 0, 0));
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
 }
 

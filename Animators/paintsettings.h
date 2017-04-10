@@ -156,6 +156,60 @@ private:
     ColorSetting mColorSetting;
 };
 
+struct UpdatePaintSettings {
+    UpdatePaintSettings(const QColor &paintColorT,
+                        const PaintType &paintTypeT,
+                        const QLinearGradient &gradientT) {
+        paintColor = paintColorT;
+        paintType = paintTypeT;
+        gradient = gradientT;
+    }
+
+    UpdatePaintSettings() {}
+
+    virtual void applyPainterSettings(QPainter *p) {
+        if(paintType == GRADIENTPAINT) {
+            p->setBrush(gradient);
+        } else if(paintType == FLATPAINT) {
+            p->setBrush(paintColor);
+        } else {
+            p->setBrush(Qt::NoBrush);
+        }
+    }
+
+    void updateGradient(const QGradientStops &stops,
+                        const QPointF &start,
+                        const QPointF &finalStop) {
+        gradient.setStops(stops);
+        gradient.setStart(start);
+        gradient.setFinalStop(finalStop);
+    }
+
+    QColor paintColor;
+    PaintType paintType;
+    QLinearGradient gradient;
+};
+
+struct UpdateStrokeSettings : UpdatePaintSettings {
+    UpdateStrokeSettings(
+            const QColor &paintColorT,
+            const PaintType &paintTypeT,
+            const QLinearGradient &gradientT,
+            const QPainter::CompositionMode &outlineCompositionModeT) :
+                UpdatePaintSettings(paintColorT, paintTypeT, gradientT) {
+        outlineCompositionMode = outlineCompositionModeT;
+    }
+
+    UpdateStrokeSettings() {}
+
+    void applyPainterSettings(QPainter *p) {
+        UpdatePaintSettings::applyPainterSettings(p);
+        p->setCompositionMode(outlineCompositionMode);
+    }
+
+    QPainter::CompositionMode outlineCompositionMode;
+};
+
 class PaintSettings : public ComplexAnimator {
 public:
     PaintSettings();

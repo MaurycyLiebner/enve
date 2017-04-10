@@ -66,7 +66,7 @@ public:
     }
 
     void startSelectedFillColorTransform() {
-        mFillPaintSettings->getColorAnimator()->prp_startTransform();
+        mFillSettings->getColorAnimator()->prp_startTransform();
     }
 
     StrokeSettings *getStrokeSettings();
@@ -107,10 +107,10 @@ public:
     }
 
     void setFillColorMode(const ColorMode &colorMode) {
-        mFillPaintSettings->getColorAnimator()->setColorMode(colorMode);
+        mFillSettings->getColorAnimator()->setColorMode(colorMode);
     }
     void setStrokeColorMode(const ColorMode &colorMode) {
-        mFillPaintSettings->getColorAnimator()->setColorMode(colorMode);
+        mFillSettings->getColorAnimator()->setColorMode(colorMode);
     }
     void updateStrokeDrawGradient();
     void updateFillDrawGradient();
@@ -126,7 +126,7 @@ protected:
     QLinearGradient mDrawFillGradient;
     QLinearGradient mDrawStrokeGradient;
 
-    QSharedPointer<PaintSettings> mFillPaintSettings =
+    QSharedPointer<PaintSettings> mFillSettings =
             (new PaintSettings)->ref<PaintSettings>();
     QSharedPointer<StrokeSettings> mStrokeSettings =
             (new StrokeSettings)->ref<StrokeSettings>();
@@ -137,9 +137,13 @@ protected:
 
     QPainterPath mUpdatePath;
     QPainterPath mUpdateOutlinePath;
+    bool mFillSettingsGradientUpdateNeeded = false;
+    bool mStrokeSettingsGradientUpdateNeeded = false;
+    UpdatePaintSettings mUpdateFillSettings;
+    UpdateStrokeSettings mUpdateStrokeSettings;
+
     QPainterPath mPath;
     QPainterPath mOutlinePath;
-    QPainterPathStroker mPathStroker;
     QPainterPath mWholePath;
     void updateWholePath();
 

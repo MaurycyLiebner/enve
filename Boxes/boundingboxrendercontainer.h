@@ -4,7 +4,7 @@ class BoundingBox;
 #include <QImage>
 #include "selfref.h"
 
-class BoundingBoxRenderContainer : public StdSelfRef {
+class BoundingBoxRenderContainer {
 public:
     BoundingBoxRenderContainer() {}
     virtual ~BoundingBoxRenderContainer() {}
@@ -59,7 +59,8 @@ protected:
 
 class RenderCacheRange;
 
-class CacheBoundingBoxRenderContainer : public BoundingBoxRenderContainer {
+class CacheBoundingBoxRenderContainer : public BoundingBoxRenderContainer,
+                                        public SimpleSmartPointer {
 public:
     CacheBoundingBoxRenderContainer();
     virtual ~CacheBoundingBoxRenderContainer();
