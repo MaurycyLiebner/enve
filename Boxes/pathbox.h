@@ -17,57 +17,23 @@ public:
 
     void updatePathIfNeeded();
 
-    void resetStrokeGradientPointsPos(bool finish) {
-        mStrokeGradientPoints->prp_setRecording(false);
-        mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),
-                                           mRelBoundingRect.bottomRight(),
-                                           finish);
-    }
+    void resetStrokeGradientPointsPos(bool finish);
 
-    void resetFillGradientPointsPos(bool finish) {
-        mFillGradientPoints->prp_setRecording(false);
-        mFillGradientPoints->setPositions(mRelBoundingRect.topLeft(),
-                                         mRelBoundingRect.bottomRight(),
-                                         finish);
-    }
+    void resetFillGradientPointsPos(bool finish);
 
-    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
-        mStrokeSettings->setCapStyle(capStyle);
-        clearAllCache();
-        scheduleOutlinePathUpdate();
-    }
+    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle);
 
-    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
-        mStrokeSettings->setJoinStyle(joinStyle);
-        clearAllCache();
-        scheduleOutlinePathUpdate();
-    }
+    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle);
 
-    virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
-        mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
-        if(finish) {
-            mStrokeSettings->getStrokeWidthAnimator()->prp_finishTransform();
-        }
-        //scheduleOutlinePathUpdate();
-    }
+    virtual void setStrokeWidth(qreal strokeWidth, bool finish);
 
-    void setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
-        mStrokeSettings->setOutlineCompositionMode(compositionMode);
-        clearAllCache();
-        scheduleSoftUpdate();
-    }
+    void setOutlineCompositionMode(QPainter::CompositionMode compositionMode);
 
-    void startSelectedStrokeWidthTransform() {
-        mStrokeSettings->getStrokeWidthAnimator()->prp_startTransform();
-    }
+    void startSelectedStrokeWidthTransform();
 
-    void startSelectedStrokeColorTransform() {
-        mStrokeSettings->getColorAnimator()->prp_startTransform();
-    }
+    void startSelectedStrokeColorTransform();
 
-    void startSelectedFillColorTransform() {
-        mFillSettings->getColorAnimator()->prp_startTransform();
-    }
+    void startSelectedFillColorTransform();
 
     StrokeSettings *getStrokeSettings();
     PaintSettings *getFillSettings();
@@ -85,7 +51,7 @@ public:
     void setUpdateVars();
 
     VectorPath *objectToPath();
-    const QPainterPath &getRelativePath() const { return mPath; }
+    const QPainterPath &getRelativePath() const;
     bool relPointInsidePath(QPointF relPos);
     void preUpdatePixmapsUpdates();
 
@@ -96,26 +62,17 @@ public:
 
     void prp_makeDuplicate(Property *targetBox);
 
-    virtual void drawHovered(QPainter *p) {
-        drawHoveredPath(p, mPath);
-    }
+    virtual void drawHovered(QPainter *p);
 
     void applyPaintSetting(
-            const PaintSetting &setting) {
-        setting.apply(this);
-        scheduleSoftUpdate();
-    }
+            const PaintSetting &setting);
 
-    void setFillColorMode(const ColorMode &colorMode) {
-        mFillSettings->getColorAnimator()->setColorMode(colorMode);
-    }
-    void setStrokeColorMode(const ColorMode &colorMode) {
-        mFillSettings->getColorAnimator()->setColorMode(colorMode);
-    }
+    void setFillColorMode(const ColorMode &colorMode);
+    void setStrokeColorMode(const ColorMode &colorMode);
     void updateStrokeDrawGradient();
     void updateFillDrawGradient();
 
-    virtual void updatePath() {}
+    virtual void updatePath();
 protected:
     QSharedPointer<GradientPoints> mFillGradientPoints =
             (new GradientPoints)->ref<GradientPoints>();

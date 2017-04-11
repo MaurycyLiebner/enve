@@ -60,6 +60,77 @@ private:
     ColorAnimator *mExclude = NULL;
 };
 
+class Gradient;
+class PaintSetting{
+public:
+    PaintSetting(const bool &targetFillSettings,
+                      const ColorSetting &colorSetting);
+
+    PaintSetting(const bool &targetFillSettings);
+
+    PaintSetting(const bool &targetFillSettings,
+                      Gradient *gradient);
+
+    void apply(PathBox *box) const;
+
+    void applyColorSetting(ColorAnimator *animator) const;
+
+    bool targetsFill() const { return mTargetFillSettings; }
+private:
+    bool mTargetFillSettings;
+    Gradient *mGradient;
+    PaintType mPaintType;
+    ColorSetting mColorSetting;
+};
+
+class PaintSettings : public ComplexAnimator {
+public:
+    PaintSettings();
+
+    PaintSettings(Color colorT,
+                  PaintType paintTypeT,
+                  Gradient *gradientT = NULL);
+
+    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+
+    Color getCurrentColor() const;
+
+    PaintType getPaintType() const;
+
+    Gradient *getGradient() const;
+
+    void setGradient(Gradient *gradient, bool saveUndoRedo = true);
+
+    void setCurrentColor(Color color);
+
+    void setPaintType(PaintType paintType, bool saveUndoRedo = true);
+
+    ColorAnimator *getColorAnimator();
+
+    void setGradientPoints(GradientPoints *gradientPoints);
+
+    void prp_loadFromSql(const int &sqlId);
+    void setPaintPathTarget(PathBox *path);
+
+    void prp_makeDuplicate(Property *target);
+    Property *prp_makeDuplicate() {
+        return NULL;
+    }
+
+    void duplicateColorAnimatorFrom(ColorAnimator *source);
+
+    void setTargetPathBox(PathBox *target);
+
+    void setGradientVar(Gradient *grad);
+private:
+    PathBox *mTarget;
+    GradientPoints *mGradientPoints = NULL;
+    QSharedPointer<ColorAnimator> mColor =
+            (new ColorAnimator())->ref<ColorAnimator>();
+    PaintType mPaintType = FLATPAINT;
+    Gradient *mGradient = NULL;
+};
+
 class Gradient : public ComplexAnimator {
     Q_OBJECT
 public:
@@ -122,6 +193,42 @@ public:
     ColorAnimator *getColorAnimatorAt(int id);
     void removeColor(const int &id);
     Property *prp_makeDuplicate();
+    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                             const int &maxFrame);
+    void updateQGradientStopsFinal();
+
+//    void anim_appendKey(Key *newKey, bool saveUndoRedo) {
+//        Animator::anim_appendKey(newKey, saveUndoRedo);
+//        foreach(PaintSettings *parent, mParentAnimators) {
+//            parent->ca_addDescendantsKey(newKey);
+//        }
+//    }
+
+//    void anim_removeKey(Key *newKey, bool saveUndoRedo) {
+//        Animator::anim_removeKey(newKey, saveUndoRedo);
+//        foreach(PaintSettings *parent, mParentAnimators) {
+//            parent->ca_removeDescendantsKey(newKey);
+//        }
+//    }
+
+//    void anim_updateAfterShifted() {
+//        foreach(PaintSettings *parent, mParentAnimators) {
+//            foreach(Key *key, anim_mKeys) {
+//                parent->ca_removeDescendantsKey(key);
+//                parent->ca_addDescendantsKey(key);
+//            }
+//        }
+//    }
+
+    void addParentAnimator(PaintSettings *parent) {
+        removeParentAnimator(parent);
+        mParentAnimators << parent;
+    }
+
+    void removeParentAnimator(PaintSettings *parent) {
+        mParentAnimators.removeOne(parent);
+    }
+
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:
@@ -129,31 +236,10 @@ private:
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
     QList<PathBox*> mAffectedPaths;
+    QList<PaintSettings*> mParentAnimators;
     ColorAnimator *mCurrentColor = NULL;
 
     bool mQGradientStopsUpdateNeeded = false;
-};
-
-class PaintSetting{
-public:
-    PaintSetting(const bool &targetFillSettings,
-                      const ColorSetting &colorSetting);
-
-    PaintSetting(const bool &targetFillSettings);
-
-    PaintSetting(const bool &targetFillSettings,
-                      Gradient *gradient);
-
-    void apply(PathBox *box) const;
-
-    void applyColorSetting(ColorAnimator *animator) const;
-
-    bool targetsFill() const { return mTargetFillSettings; }
-private:
-    bool mTargetFillSettings;
-    Gradient *mGradient;
-    PaintType mPaintType;
-    ColorSetting mColorSetting;
 };
 
 struct UpdatePaintSettings {
@@ -209,53 +295,6 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
 
     QPainter::CompositionMode outlineCompositionMode =
             QPainter::CompositionMode_Source;
-};
-
-class PaintSettings : public ComplexAnimator {
-public:
-    PaintSettings();
-
-    PaintSettings(Color colorT,
-                  PaintType paintTypeT,
-                  Gradient *gradientT = NULL);
-
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
-
-    Color getCurrentColor() const;
-
-    PaintType getPaintType() const;
-
-    Gradient *getGradient() const;
-
-    void setGradient(Gradient *gradient, bool saveUndoRedo = true);
-
-    void setCurrentColor(Color color);
-
-    void setPaintType(PaintType paintType, bool saveUndoRedo = true);
-
-    ColorAnimator *getColorAnimator();
-
-    void setGradientPoints(GradientPoints *gradientPoints);
-
-    void prp_loadFromSql(const int &sqlId);
-    void setPaintPathTarget(PathBox *path);
-
-    void prp_makeDuplicate(Property *target);
-    Property *prp_makeDuplicate() {
-        return NULL;
-    }
-
-    void duplicateColorAnimatorFrom(ColorAnimator *source);
-
-    void setTargetPathBox(PathBox *target);
-
-private:
-    PathBox *mTarget;
-    GradientPoints *mGradientPoints = NULL;
-    QSharedPointer<ColorAnimator> mColor =
-            (new ColorAnimator())->ref<ColorAnimator>();
-    PaintType mPaintType = FLATPAINT;
-    Gradient *mGradient = NULL;
 };
 
 class StrokeSettings : public PaintSettings

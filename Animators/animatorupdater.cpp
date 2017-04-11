@@ -44,6 +44,14 @@ GradientUpdater::GradientUpdater(Gradient *gradient) {
 }
 
 void GradientUpdater::update() {
+    mTarget->updateQGradientStopsFinal();
+}
+
+void GradientUpdater::updateFinal() {
+    mTarget->updateQGradientStopsFinal();
+}
+
+void GradientUpdater::frameChangeUpdate() {
     mTarget->updateQGradientStops();
 }
 

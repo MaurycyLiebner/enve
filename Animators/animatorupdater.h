@@ -56,7 +56,9 @@ public:
     GradientUpdater(Gradient *gradient);
 
     void update();
+    void updateFinal();
 
+    void frameChangeUpdate();
 private:
     Gradient *mTarget;
 };

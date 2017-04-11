@@ -103,10 +103,62 @@ void PathBox::updatePathIfNeeded() {
     }
 }
 
+void PathBox::resetStrokeGradientPointsPos(bool finish) {
+    mStrokeGradientPoints->prp_setRecording(false);
+    mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),
+                                        mRelBoundingRect.bottomRight(),
+                                        finish);
+}
+
+void PathBox::resetFillGradientPointsPos(bool finish) {
+    mFillGradientPoints->prp_setRecording(false);
+    mFillGradientPoints->setPositions(mRelBoundingRect.topLeft(),
+                                      mRelBoundingRect.bottomRight(),
+                                      finish);
+}
+
+void PathBox::setStrokeCapStyle(Qt::PenCapStyle capStyle) {
+    mStrokeSettings->setCapStyle(capStyle);
+    clearAllCache();
+    scheduleOutlinePathUpdate();
+}
+
+void PathBox::setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
+    mStrokeSettings->setJoinStyle(joinStyle);
+    clearAllCache();
+    scheduleOutlinePathUpdate();
+}
+
+void PathBox::setStrokeWidth(qreal strokeWidth, bool finish) {
+    mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
+    if(finish) {
+        mStrokeSettings->getStrokeWidthAnimator()->prp_finishTransform();
+    }
+    //scheduleOutlinePathUpdate();
+}
+
+void PathBox::setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
+    mStrokeSettings->setOutlineCompositionMode(compositionMode);
+    clearAllCache();
+    scheduleSoftUpdate();
+}
+
+void PathBox::startSelectedStrokeWidthTransform() {
+    mStrokeSettings->getStrokeWidthAnimator()->prp_startTransform();
+}
+
+void PathBox::startSelectedStrokeColorTransform() {
+    mStrokeSettings->getColorAnimator()->prp_startTransform();
+}
+
+void PathBox::startSelectedFillColorTransform() {
+    mFillSettings->getColorAnimator()->prp_startTransform();
+}
+
 void PathBox::preUpdatePixmapsUpdates() {
     updateEffectsMarginIfNeeded();
-//    updatePathIfNeeded();
-//    updateOutlinePathIfNeeded();
+    //    updatePathIfNeeded();
+    //    updateOutlinePathIfNeeded();
     //updateBoundingRect();
 }
 
@@ -128,6 +180,24 @@ void PathBox::prp_makeDuplicate(Property *targetBox) {
                                               mStrokeSettings.data());
     pathBoxTarget->duplicateGradientPointsFrom(mFillGradientPoints.data(),
                                                mStrokeGradientPoints.data());
+}
+
+void PathBox::drawHovered(QPainter *p) {
+    drawHoveredPath(p, mPath);
+}
+
+void PathBox::applyPaintSetting(const PaintSetting &setting) {
+    setting.apply(this);
+    replaceCurrentFrameCache();
+    scheduleSoftUpdate();
+}
+
+void PathBox::setFillColorMode(const ColorMode &colorMode) {
+    mFillSettings->getColorAnimator()->setColorMode(colorMode);
+}
+
+void PathBox::setStrokeColorMode(const ColorMode &colorMode) {
+    mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
 
 void PathBox::schedulePathUpdate() {
@@ -169,6 +239,8 @@ VectorPath *PathBox::objectToPath() {
     return newPath;
 }
 
+const QPainterPath &PathBox::getRelativePath() const { return mPath; }
+
 void PathBox::updateOutlinePath() {
     if(mStrokeSettings->nonZeroLineWidth()) {
         QPainterPathStroker stroker;
@@ -206,6 +278,8 @@ void PathBox::updateFillDrawGradient() {
         mFillGradientPoints->disable();
     }
 }
+
+void PathBox::updatePath() {}
 
 void PathBox::updateStrokeDrawGradient() {
     if(mStrokeSettings->getPaintType() == GRADIENTPAINT) {

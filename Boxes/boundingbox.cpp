@@ -849,7 +849,7 @@ void BoundingBox::updateCombinedTransform() {
                                 mCombinedTransformMatrix);
 
     updateAfterCombinedTransformationChanged();
-    replaceCurrentFrameCache();
+    //replaceCurrentFrameCache();
     scheduleSoftUpdate();
 }
 

@@ -36,8 +36,7 @@ QDoubleSlider::QDoubleSlider(QString name,
                              qreal minVal, qreal maxVal,
                              qreal prefferedStep,
                              QWidget *parent) :
-    QDoubleSlider(minVal, maxVal, prefferedStep, parent)
-{
+    QDoubleSlider(minVal, maxVal, prefferedStep, parent) {
     setName(name);
 }
 
@@ -55,20 +54,17 @@ QDoubleSlider::~QDoubleSlider() {
 //    mValidator = NULL;
 }
 
-void QDoubleSlider::setValueSliderVisibile(bool valueSliderVisible)
-{
+void QDoubleSlider::setValueSliderVisibile(bool valueSliderVisible) {
     mShowValueSlider = valueSliderVisible;
     update();
 }
 
-void QDoubleSlider::setNameVisible(bool nameVisible)
-{
+void QDoubleSlider::setNameVisible(bool nameVisible) {
     mShowName = nameVisible;
     fitWidthToContent();
 }
 
-void QDoubleSlider::setName(QString name)
-{
+void QDoubleSlider::setName(QString name) {
     mName = name;
     setNameVisible(true);
     fitWidthToContent();
@@ -80,13 +76,11 @@ void QDoubleSlider::setNumberDecimals(int decimals) {
     fitWidthToContent();
 }
 
-void QDoubleSlider::setValueNoUpdate(qreal value)
-{
+void QDoubleSlider::setValueNoUpdate(qreal value) {
     mValue = qclamp(value, mMinValue, mMaxValue);
 }
 
-void QDoubleSlider::updateLineEditFromValue()
-{
+void QDoubleSlider::updateLineEditFromValue() {
     mLineEdit->setText(QString::number(mValue, 'f', mDecimals));
 }
 
@@ -94,8 +88,7 @@ QString QDoubleSlider::getValueString() {
     return QString::number(mValue, 'f', mDecimals);
 }
 
-void QDoubleSlider::setValueRange(qreal min, qreal max)
-{
+void QDoubleSlider::setValueRange(qreal min, qreal max) {
     mValidator->setRange(min, max, 3);
     mMinValue = min;
     mMaxValue = max;
@@ -114,8 +107,7 @@ void QDoubleSlider::paint(QPainter *p) {
 void QDoubleSlider::paint(QPainter *p,
                           const QColor &allFill,
                           const QColor &sliderFill,
-                          const QColor &stroke)
-{
+                          const QColor &stroke) {
     p->save();
 
     p->setRenderHint(QPainter::Antialiasing);
@@ -156,24 +148,20 @@ void QDoubleSlider::emitEditingStarted(qreal value) {
     emit editingStarted(value);
 }
 
-void QDoubleSlider::emitValueChanged(qreal value)
-{
+void QDoubleSlider::emitValueChanged(qreal value) {
     emit valueChanged(value);
 }
 
-void QDoubleSlider::emitEditingFinished(qreal value)
-{
+void QDoubleSlider::emitEditingFinished(qreal value) {
     emit editingFinished(value);
 }
 
-void QDoubleSlider::setDisplayedValue(qreal value)
-{
+void QDoubleSlider::setDisplayedValue(qreal value) {
     setValueNoUpdate(value);
     update();
 }
 
-void QDoubleSlider::fitWidthToContent()
-{
+void QDoubleSlider::fitWidthToContent() {
     QFontMetrics fm = QFontMetrics(QFont());
     QString textMax;
     QString textMin;
@@ -198,12 +186,10 @@ void QDoubleSlider::paintEvent(QPaintEvent *) {
     p.end();
 }
 
-void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event)
-{
+void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event) {
 }
 
-void QDoubleSlider::mousePressEvent(QMouseEvent *event)
-{
+void QDoubleSlider::mousePressEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
         openContextMenu(event->globalPos());
     } else if(event->button() == Qt::LeftButton) {
@@ -226,8 +212,7 @@ qreal QDoubleSlider::minimum() {
     return mMinValue;
 }
 
-void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
-{
+void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
     if(!mMouseMoved) emitEditingStarted(mValue);
     qreal dValue = (event->x() - mPressX)*0.1*mPrefferedValueStep;
     setValueNoUpdate(mPressValue + dValue);
@@ -240,8 +225,7 @@ void QDoubleSlider::mouseMoveEvent(QMouseEvent *event)
 }
 
 #include <QApplication>
-bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
-{
+bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event) {
     if(event->type() == QEvent::Paint) {
         return false;
     } else if(event->type() == QEvent::KeyPress) {
@@ -329,15 +313,13 @@ bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event)
     return false;
 }
 
-void QDoubleSlider::finishTextEditing()
-{
+void QDoubleSlider::finishTextEditing() {
     mLineEdit->deselect();
     mLineEdit->clearFocus();
     mLineEdit->editingFinished();
 }
 
-void QDoubleSlider::lineEditingFinished()
-{
+void QDoubleSlider::lineEditingFinished() {
     mLineEdit->setCursor(Qt::ArrowCursor);
     setCursor(Qt::ArrowCursor);
     QString text = mLineEdit->text();

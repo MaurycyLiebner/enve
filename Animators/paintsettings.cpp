@@ -334,6 +334,7 @@ bool Gradient::affectsPaths() {
 
 void Gradient::updatePaths() {
     foreach (PathBox *path, mAffectedPaths) {
+        //path->replaceCurrentFrameCache();
         path->updateDrawGradients();
         path->scheduleSoftUpdate();
     }
@@ -376,6 +377,29 @@ void Gradient::updateQGradientStops() {
     updatePaths();
 }
 
+void Gradient::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                                   const int &maxFrame) {
+    foreach(PathBox *path, mAffectedPaths) {
+        path->prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
+    }
+}
+
+void Gradient::updateQGradientStopsFinal() {
+    mQGradientStops.clear();
+    qreal inc = 1./(mColors.length() - 1.);
+    qreal cPos = 0.;
+    for(int i = 0; i < mColors.length(); i++) {
+        mQGradientStops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
+                               mColors.at(i)->getCurrentColor().qcol) );
+        cPos += inc;
+    }
+    foreach(PathBox *path, mAffectedPaths) {
+        path->replaceCurrentFrameCache();
+        path->updateDrawGradients();
+        path->scheduleSoftUpdate();
+    }
+}
+
 int Gradient::getSqlId() {
     return mSqlId;
 }
@@ -395,7 +419,7 @@ PaintSettings::PaintSettings(Color colorT,
     prp_setName("fill");
     mColor->qra_setCurrentValue(colorT);
     mPaintType = paintTypeT;
-    mGradient = gradientT;
+    setGradientVar(gradientT);
 
     ca_addChildAnimator(mColor.data());
 }
@@ -420,6 +444,22 @@ void PaintSettings::setTargetPathBox(PathBox *target) {
     mTarget = target;
 }
 
+void PaintSettings::setGradientVar(Gradient *grad) {
+    if(mGradient != NULL) {
+        ca_removeChildAnimator(mGradient);
+        ca_removeChildAnimator((QrealAnimator*) mGradientPoints);
+        mGradient->removePath(mTarget);
+        mGradient->removeParentAnimator(this);
+    }
+    mGradient = grad;
+    if(mGradient != NULL) {
+        ca_addChildAnimator(mGradient);
+        ca_addChildAnimator((QrealAnimator*) mGradientPoints);
+        mGradient->addPath(mTarget);
+        mGradient->addParentAnimator(this);
+    }
+}
+
 void PaintSettings::prp_loadFromSql(const int &sqlId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM paintsettings WHERE id = %1").
@@ -432,8 +472,8 @@ void PaintSettings::prp_loadFromSql(const int &sqlId) {
         mColor->prp_loadFromSql(query.value(idColorId).toInt() );
         int idGradientId = query.record().indexOf("gradientid");
         if(!query.value(idGradientId).isNull()) {
-            mGradient = getLoadedGradientBySqlId(
-                        query.value(idGradientId).toInt());
+            setGradientVar(getLoadedGradientBySqlId(
+                        query.value(idGradientId).toInt()));
         }
     } else {
         qDebug() << "Could not load paintSettings with id " << sqlId;
@@ -470,20 +510,12 @@ Gradient *PaintSettings::getGradient() const {
 void PaintSettings::setGradient(Gradient *gradient,
                                 bool saveUndoRedo) {
     if(gradient == mGradient) return;
-    if(mGradient != NULL) {
-        ca_removeChildAnimator(mGradient);
-        ca_removeChildAnimator((QrealAnimator*) mGradientPoints);
-        mGradient->removePath(mTarget);
-    }
+
     if(saveUndoRedo) {
         addUndoRedo(new GradientChangeUndoRedo(mGradient, gradient, this));
     }
-    mGradient = gradient;
-    if(mGradient != NULL) {
-        ca_addChildAnimator(mGradient);
-        ca_addChildAnimator((QrealAnimator*) mGradientPoints);
-        mGradient->addPath(mTarget);
-    }
+    setGradientVar(gradient);
+
     if(mTarget->isSelected()) {
         mMainWindow->scheduleDisplayedFillStrokeSettingsUpdate();
     }

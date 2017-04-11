@@ -33,7 +33,7 @@ public:
     void anim_updateRelFrame();
     virtual void anim_mergeKeysIfNeeded();
     int anim_getClosestsKeyOccupiedRelFrame(const int &frame);
-    Key *anim_getKeyAtRelFrame(const int &frame);
+    virtual Key *anim_getKeyAtRelFrame(const int &frame);
     bool anim_hasPrevKey(Key *key);
     bool anim_hasNextKey(Key *key);
     virtual void anim_callFrameChangeUpdater();
@@ -109,7 +109,7 @@ protected:
     QColor anim_mAnimatorColor;
 public slots:
     void anim_deleteCurrentKey();
-    void anim_updateAfterShifted();
+    virtual void anim_updateAfterShifted();
 signals:
     void beingDeleted();
 };
