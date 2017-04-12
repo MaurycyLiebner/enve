@@ -170,9 +170,7 @@ void Animator::anim_appendKey(Key *newKey,
     anim_mKeys.append(newKey);
     anim_sortKeys();
     //mergeKeysIfNeeded();
-    if(!newKey->hasParentKey()) {
-        emit prp_addingKey(newKey);
-    }
+    emit prp_addingKey(newKey);
 
     if(anim_mIsCurrentAnimator) {
         graphScheduleUpdateAfterKeysChanged();
@@ -267,7 +265,8 @@ bool Animator::prp_hasKeys() {
     return !anim_mKeys.isEmpty();
 }
 
-void Animator::anim_setRecordingWithoutChangingKeys(bool rec, bool saveUndoRedo) {
+void Animator::anim_setRecordingWithoutChangingKeys(bool rec,
+                                                    bool saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new AnimatorRecordingSetUndoRedo(anim_mIsRecording,
                                                      rec,
@@ -374,8 +373,7 @@ void Animator::anim_drawKey(QPainter *p,
                             const qreal &pixelsPerFrame,
                             const qreal &drawY,
                             const int &startFrame) {
-    if(key->isSelected() ||
-       key->isAncestorSelected()) {
+    if(key->isSelected()) {
         p->setBrush(Qt::yellow);
     } else {
         p->setBrush(Qt::red);

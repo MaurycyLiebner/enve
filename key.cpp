@@ -82,26 +82,12 @@ void Key::removeFromAnimator() {
     mParentAnimator->anim_removeKey(this);
 }
 
-void Key::setParentKey(ComplexKey *parentKey) {
-    mParentKey = parentKey;
-}
-
-ComplexKey *Key::getParentKey() {
-    return mParentKey;
-}
-
 Key *Key::getNextKey() {
     return mParentAnimator->anim_getNextKey(this);
 }
 
 Key *Key::getPrevKey() {
     return mParentAnimator->anim_getPrevKey(this);
-}
-
-bool Key::isAncestorSelected() {
-    if(mParentKey == NULL) return isSelected();
-    if(isSelected()) return true;
-    return mParentKey->isAncestorSelected();
 }
 
 bool Key::hasPrevKey() {
@@ -116,7 +102,6 @@ bool Key::hasNextKey() {
 
 void Key::incFrameAndUpdateParentAnimator(int inc) {
     if(mParentAnimator == NULL) return;
-    if((mParentKey == NULL) ? false : mParentKey->isAncestorSelected() ) return;
     mParentAnimator->anim_moveKeyToFrame(this, mRelFrame + inc);
 }
 

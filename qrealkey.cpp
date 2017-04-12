@@ -285,7 +285,6 @@ void QrealKey::setValue(qreal value, bool saveUndoRedo) {
 
 void QrealKey::incFrameAndUpdateParentAnimator(int inc) {
     if(mParentAnimator == NULL) return;
-    if((mParentKey == NULL) ? false : mParentKey->isAncestorSelected() ) return;
     mParentAnimator->anim_moveKeyToFrame(this, mRelFrame + inc);
 }
 

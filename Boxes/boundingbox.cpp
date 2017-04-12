@@ -89,7 +89,7 @@ void BoundingBox::ca_removeDescendantsKey(Key *key) {
     if(mNoCache) {
         ComplexAnimator::ca_removeDescendantsKey(key);
     } else {
-        ComplexKey *collection = key->getParentKey();
+        ComplexKey *collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());//key->getParentKey();
         if(collection == NULL) return;
         collection->removeAnimatorKey(key);
         if(collection->isEmpty() ) {

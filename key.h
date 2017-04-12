@@ -44,10 +44,6 @@ public:
 
     virtual void deleteKey() { removeFromAnimator(); }
 
-    void setParentKey(ComplexKey *parentKey);
-
-    bool isAncestorSelected();
-
     int saveToSql(int parentAnimatorSqlId);
     void loadFromSql(int keyId);
 
@@ -57,10 +53,6 @@ public:
                                                    const qreal &scaleFactor);
     virtual void setSelected(bool bT);
     bool isSelected();
-
-    bool hasParentKey() {
-        return mParentKey != NULL;
-    }
 
     virtual bool areAllChildrenSelected() {
         return false;
@@ -79,7 +71,6 @@ public:
 
     int getRelFrame();
     void setAbsFrame(const int &frame);
-    ComplexKey *getParentKey();
 
     Key *getNextKey();
     Key *getPrevKey();
@@ -96,7 +87,6 @@ public:
 protected:
     bool mIsSelected = false;
     Animator *mParentAnimator = NULL;
-    ComplexKey *mParentKey = NULL;
 
     int mRelFrame;
     int mSavedRelFrame;

@@ -74,7 +74,7 @@ void QDoubleSlider::setName(QString name) {
 
 void QDoubleSlider::setNumberDecimals(int decimals) {
     mDecimals = decimals;
-    updateLineEditFromValue();
+    //updateLineEditFromValue();
     fitWidthToContent();
 }
 
@@ -83,8 +83,7 @@ void QDoubleSlider::setValueNoUpdate(qreal value) {
 }
 
 void QDoubleSlider::updateLineEditFromValue() {
-    QString str = QString::number(mValue, 'f', mDecimals);
-    mLineEdit->setText(str);
+    mLineEdit->setText(QString::number(mValue, 'f', mDecimals));
 }
 
 QString QDoubleSlider::getValueString() {
@@ -96,7 +95,7 @@ void QDoubleSlider::setValueRange(qreal min, qreal max) {
     mMinValue = min;
     mMaxValue = max;
     setValueNoUpdate(mValue);
-    updateLineEditFromValue();
+    //updateLineEditFromValue();
     fitWidthToContent();
 }
 
