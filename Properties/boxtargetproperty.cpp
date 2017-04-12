@@ -31,7 +31,7 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
         }
         mTarget->incUsedAsTarget();
     }
-    prp_mParentAnimator->prp_callUpdater();
+    prp_callUpdater();
 }
 
 void BoxTargetProperty::setParentBox(BoundingBox *box) {

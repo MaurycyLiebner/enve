@@ -350,9 +350,7 @@ void PathBox::draw(QPainter *p) {
     if(!mUpdateOutlinePath.isEmpty()) {
         mUpdateStrokeSettings.applyPainterSettings(p);
 
-        qDebug() << mUpdateOutlinePath;
         p->drawPath(mUpdateOutlinePath);
-        qDebug() << "nest";
     }
 
     p->restore();

@@ -92,6 +92,7 @@ public:
     Key *anim_getPrevKey(Key *key);
     int anim_getNextKeyRelFrame(Key *key);
     int anim_getPrevKeyRelFrame(Key *key);
+    void anim_setRecordingValue(bool rec);
 protected:
     virtual void anim_drawKey(QPainter *p,
                          Key *key,

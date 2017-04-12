@@ -11,19 +11,7 @@ void Property::prp_valueChanged() {
 
 void Property::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                    const int &maxFrame) {
-    if(prp_mParentAnimator == NULL) return;
-    prp_mParentAnimator->prp_updateAfterChangedAbsFrameRange(minFrame,
-                                                             maxFrame);
-}
-
-void Property::prp_setParentAnimator(ComplexAnimator *parentAnimator) {
-    prp_mParentAnimator = parentAnimator;
-}
-
-void Property::prp_setZValue(const int &oldIndex,
-                             const int &newIndex) {
-    if(prp_mParentAnimator == NULL) return;
-    prp_mParentAnimator->ca_changeChildAnimatorZ(oldIndex, newIndex);
+    emit prp_absFrameRangeChanged(minFrame, maxFrame);
 }
 
 QString Property::prp_getName() {
@@ -35,10 +23,11 @@ int Property::prp_getFrameShift() const {
 }
 
 int Property::prp_getParentFrameShift() const {
-    if(prp_mParentAnimator == NULL) {
-        return 0;
-    }
-    return prp_mParentAnimator->prp_getFrameShift();
+    return prp_mParentFrameShift;
+}
+
+void Property::prp_setParentFrameShift(const int &shift) {
+    prp_mParentFrameShift = shift;
 }
 
 int Property::prp_absFrameToRelFrame(

@@ -91,11 +91,7 @@ int BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     return pixmapEffectId;
 }
 
-void BlurEffect::prp_loadFromSql(const int &identifyingId) {
-    loadBlurEffectFromSql(identifyingId);
-}
-
-void BlurEffect::loadBlurEffectFromSql(const int &pixmapEffectId) {
+void BlurEffect::prp_loadFromSql(const int &pixmapEffectId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM blureffect WHERE pixmapeffectid = " +
@@ -311,6 +307,27 @@ void LinesEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
+Property *LinesEffect::prp_makeDuplicate() {
+    LinesEffect *linesTarget = new LinesEffect();
+    prp_makeDuplicate(linesTarget);
+    return linesTarget;
+}
+
+void LinesEffect::prp_makeDuplicate(Property *target) {
+    LinesEffect *linesTarget = (LinesEffect*)target;
+
+    linesTarget->duplicateDistanceAnimatorFrom(mLinesDistance.data());
+    linesTarget->duplicateWidthAnimatorFrom(mLinesWidth.data());
+}
+
+void LinesEffect::duplicateDistanceAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mLinesDistance.data());
+}
+
+void LinesEffect::duplicateWidthAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mLinesWidth.data());
+}
+
 void LinesEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
@@ -406,6 +423,27 @@ void CirclesEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
+Property *CirclesEffect::prp_makeDuplicate() {
+    CirclesEffect *linesTarget = new CirclesEffect();
+    prp_makeDuplicate(linesTarget);
+    return linesTarget;
+}
+
+void CirclesEffect::prp_makeDuplicate(Property *target) {
+    CirclesEffect *circlesTarget = (CirclesEffect*)target;
+
+    circlesTarget->duplicateDistanceAnimatorFrom(mCirclesDistance.data());
+    circlesTarget->duplicateRadiusAnimatorFrom(mCirclesRadius.data());
+}
+
+void CirclesEffect::duplicateDistanceAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mCirclesDistance.data());
+}
+
+void CirclesEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mCirclesRadius.data());
+}
+
 #include "Boxes/boundingbox.h"
 void CirclesEffect::apply(BoundingBox *target,
                           QImage *imgPtr,
@@ -497,6 +535,22 @@ void SwirlEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
+Property *SwirlEffect::prp_makeDuplicate() {
+    SwirlEffect *linesTarget = new SwirlEffect();
+    prp_makeDuplicate(linesTarget);
+    return linesTarget;
+}
+
+void SwirlEffect::prp_makeDuplicate(Property *target) {
+    SwirlEffect *swirlTarget = (SwirlEffect*)target;
+
+    swirlTarget->duplicateDegreesAnimatorFrom(mDegreesAnimator.data());
+}
+
+void SwirlEffect::duplicateDegreesAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mDegreesAnimator.data());
+}
+
 void SwirlEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
@@ -546,6 +600,22 @@ void OilEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
+Property *OilEffect::prp_makeDuplicate() {
+    OilEffect *oilTarget = new OilEffect();
+    prp_makeDuplicate(oilTarget);
+    return oilTarget;
+}
+
+void OilEffect::prp_makeDuplicate(Property *target) {
+    OilEffect *oilTarget = (OilEffect*)target;
+
+    oilTarget->duplicateRadiusAnimatorFrom(mRadiusAnimator.data());
+}
+
+void OilEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mRadiusAnimator.data());
+}
+
 void OilEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
@@ -592,6 +662,22 @@ void ImplodeEffect::prp_loadFromSql(const int &identifyingId) {
     } else {
         qDebug() << "Could not load implodeeffect with id " << identifyingId;
     }
+}
+
+Property *ImplodeEffect::prp_makeDuplicate() {
+    ImplodeEffect *implodeTarget = new ImplodeEffect();
+    prp_makeDuplicate(implodeTarget);
+    return implodeTarget;
+}
+
+void ImplodeEffect::prp_makeDuplicate(Property *target) {
+    ImplodeEffect *implodeTarget = (ImplodeEffect*)target;
+
+    implodeTarget->duplicateFactorAnimatorFrom(mFactorAnimator.data());
+}
+
+void ImplodeEffect::duplicateFactorAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mFactorAnimator.data());
 }
 
 void ImplodeEffect::apply(BoundingBox *target,
@@ -643,6 +729,22 @@ void DesaturateEffect::prp_loadFromSql(const int &identifyingId) {
     } else {
         qDebug() << "Could not load desaturateeffect with id " << identifyingId;
     }
+}
+
+Property *DesaturateEffect::prp_makeDuplicate() {
+    DesaturateEffect *desaturateTarget = new DesaturateEffect();
+    prp_makeDuplicate(desaturateTarget);
+    return desaturateTarget;
+}
+
+void DesaturateEffect::prp_makeDuplicate(Property *target) {
+    DesaturateEffect *desaturateTarget = (DesaturateEffect*)target;
+
+    desaturateTarget->duplicateInfluenceAnimatorFrom(mInfluenceAnimator.data());
+}
+
+void DesaturateEffect::duplicateInfluenceAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mInfluenceAnimator.data());
 }
 
 void DesaturateEffect::apply(BoundingBox *target,
@@ -710,6 +812,28 @@ void AlphaMatteEffect::prp_loadFromSql(const int &identifyingId) {
     } else {
         qDebug() << "Could not load alphamatteeffect with id " << identifyingId;
     }
+}
+
+Property *AlphaMatteEffect::prp_makeDuplicate() {
+    AlphaMatteEffect *alphaMatteTarget = new AlphaMatteEffect(
+                mParentEffects->getParentBox()); // !!!
+    prp_makeDuplicate(alphaMatteTarget);
+    return alphaMatteTarget;
+}
+
+void AlphaMatteEffect::prp_makeDuplicate(Property *target) {
+    AlphaMatteEffect *alphaMatteTarget = (AlphaMatteEffect*)target;
+
+    alphaMatteTarget->duplicateInfluenceAnimatorFrom(mInfluenceAnimator.data());
+    alphaMatteTarget->setInverted(mInvertedProperty->getValue());
+}
+
+void AlphaMatteEffect::duplicateInfluenceAnimatorFrom(QrealAnimator *source) {
+    source->prp_makeDuplicate(mInfluenceAnimator.data());
+}
+
+void AlphaMatteEffect::setInverted(const bool &inv) {
+    mInvertedProperty->setValue(inv);
 }
 
 void AlphaMatteEffect::apply(BoundingBox *target,

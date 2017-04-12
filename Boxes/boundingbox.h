@@ -436,12 +436,6 @@ public:
     }
     virtual void clearAllCache();
 
-    void ca_addDescendantsKey(Key *key);
-    void ca_removeDescendantsKey(Key *key);
-
-    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                             const int &maxFrame);
-
     void applyRenderCacheChanges();
     void scheduleRenderCacheChange();
 protected:
@@ -528,6 +522,11 @@ public slots:
     void replaceCurrentFrameCache();
     void scheduleSoftUpdate();
     void scheduleHardUpdate();
+
+    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                             const int &maxFrame);
+    void ca_addDescendantsKey(Key *key);
+    void ca_removeDescendantsKey(Key *key);
 };
 
 

@@ -899,6 +899,7 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
         ca_addChildAnimator(mEffectsAnimators.data());
     }
     mEffectsAnimators->ca_addChildAnimator(effect);
+    effect->setParentEffectAnimators(mEffectsAnimators.data());
 
     scheduleEffectsMarginUpdate();
     scheduleSoftUpdate();

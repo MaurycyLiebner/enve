@@ -63,17 +63,17 @@ public slots:
 protected:
     int mDecimals = 3;
 
-    QString mName;
+    QString mName = "";
     bool mShowName = false;
 
-    QLineEdit *mLineEdit;
-    qreal mValue;
+    QLineEdit *mLineEdit = NULL;
+    qreal mValue = 0.;
     bool mTextEdit = false;
     int mMovesCount = 0;
     bool mMouseMoved = false;
     QDoubleValidator *mValidator;
-    qreal mMinValue;
-    qreal mMaxValue;
+    qreal mMinValue = 0.;
+    qreal mMaxValue = 0.;
     qreal mPrefferedValueStep = 1.;
     void finishTextEditing();
 

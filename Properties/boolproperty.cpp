@@ -21,5 +21,5 @@ Property *BoolProperty::prp_makeDuplicate() {
 
 void BoolProperty::setValue(const bool &value) {
     mValue = value;
-    prp_mParentAnimator->prp_callUpdater();
+    prp_callUpdater();
 }

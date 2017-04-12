@@ -377,13 +377,6 @@ void Gradient::updateQGradientStops() {
     updatePaths();
 }
 
-void Gradient::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                                   const int &maxFrame) {
-    foreach(PathBox *path, mAffectedPaths) {
-        path->prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
-    }
-}
-
 void Gradient::updateQGradientStopsFinal() {
     mQGradientStops.clear();
     qreal inc = 1./(mColors.length() - 1.);
@@ -449,14 +442,12 @@ void PaintSettings::setGradientVar(Gradient *grad) {
         ca_removeChildAnimator(mGradient);
         ca_removeChildAnimator((QrealAnimator*) mGradientPoints);
         mGradient->removePath(mTarget);
-        mGradient->removeParentAnimator(this);
     }
     mGradient = grad;
     if(mGradient != NULL) {
         ca_addChildAnimator(mGradient);
         ca_addChildAnimator((QrealAnimator*) mGradientPoints);
         mGradient->addPath(mTarget);
-        mGradient->addParentAnimator(this);
     }
 }
 

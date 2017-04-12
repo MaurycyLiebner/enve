@@ -4,7 +4,8 @@
 #include "pointhelpers.h"
 #include "mainwindow.h"
 
-QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal, qreal prefferedStep,
+QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
+                             qreal prefferedStep,
                              QWidget *parent) :
     QWidget(parent)
 {
@@ -40,7 +41,8 @@ QDoubleSlider::QDoubleSlider(QString name,
     setName(name);
 }
 
-QDoubleSlider::QDoubleSlider(QWidget *parent) : QDoubleSlider(0., 100., 1., parent)
+QDoubleSlider::QDoubleSlider(QWidget *parent) :
+    QDoubleSlider(0., 100., 1., parent)
 {
 
 }
@@ -81,7 +83,8 @@ void QDoubleSlider::setValueNoUpdate(qreal value) {
 }
 
 void QDoubleSlider::updateLineEditFromValue() {
-    mLineEdit->setText(QString::number(mValue, 'f', mDecimals));
+    QString str = QString::number(mValue, 'f', mDecimals);
+    mLineEdit->setText(str);
 }
 
 QString QDoubleSlider::getValueString() {

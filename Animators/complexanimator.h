@@ -7,12 +7,10 @@ class ComplexAnimatorItemWidgetContainer;
 
 class ComplexAnimator : public Animator
 {
+    Q_OBJECT
 public:
     ComplexAnimator();
     ~ComplexAnimator();
-
-    virtual void ca_addDescendantsKey(Key *key);
-    virtual void ca_removeDescendantsKey(Key *key);
 
     void ca_addChildAnimator(Property *childAnimator);
     void ca_removeChildAnimator(Property *removeAnimator);
@@ -32,9 +30,6 @@ public:
     void prp_cancelTransform();
 
     void prp_setRecording(bool rec);
-
-    virtual void ca_childAnimatorIsRecordingChanged();
-    void ca_setRecordingValue(bool rec);
 
     bool prp_isDescendantRecording();
     QString prp_getValueText();
@@ -75,10 +70,11 @@ public:
         Q_UNUSED(qrealAnimatorId);
     }
 
-    void prp_makeDuplicate(Property *) {}
-    Property *prp_makeDuplicate() {}
-    int prp_saveToSql(QSqlQuery *, const int &) {}
-    void prp_loadFromSql(const int &) {}
+    void prp_setParentFrameShift(const int &shift);
+public slots:
+    virtual void ca_addDescendantsKey(Key *key);
+    virtual void ca_removeDescendantsKey(Key *key);
+    virtual void ca_childAnimatorIsRecordingChanged();
 protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(int frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(int frame);

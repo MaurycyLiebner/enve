@@ -42,7 +42,15 @@ void ComplexAnimator::ca_addChildAnimator(Property *childAnimator)
 {
     ca_mChildAnimators << childAnimator;
     childAnimator->prp_setUpdater(prp_mUpdater);
-    childAnimator->prp_setParentAnimator(this);
+    childAnimator->prp_setParentFrameShift(prp_getFrameShift());
+    connect(childAnimator, SIGNAL(prp_isRecordingChanged()),
+            this, SLOT(ca_childAnimatorIsRecordingChanged()));
+    connect(childAnimator, SIGNAL(prp_absFrameRangeChanged(int, int)),
+            this, SLOT(prp_updateAfterChangedAbsFrameRange(int, int)));
+    connect(childAnimator, SIGNAL(prp_addingKey(Key*)),
+            this, SLOT(ca_addDescendantsKey(Key*)));
+    connect(childAnimator, SIGNAL(prp_removingKey(Key*)),
+            this, SLOT(ca_removeDescendantsKey(Key*)));
 
     childAnimator->prp_addAllKeysToComplexAnimator();
     ca_childAnimatorIsRecordingChanged();
@@ -97,7 +105,7 @@ void ComplexAnimator::ca_removeChildAnimator(Property *removeAnimator) {
     removeAnimator->prp_setUpdater(NULL);
     removeAnimator->prp_removeAllKeysFromComplexAnimator();
     ca_mChildAnimators.removeOne(removeAnimator);
-    removeAnimator->prp_setParentAnimator(NULL);
+    disconnect(removeAnimator, 0, this, 0);
     ca_childAnimatorIsRecordingChanged();
 
     SWT_removeChildAbstractionForTargetFromAll(removeAnimator);
@@ -172,8 +180,16 @@ void ComplexAnimator::anim_drawKey(
     }
 }
 
+void ComplexAnimator::prp_setParentFrameShift(const int &shift) {
+    prp_mParentFrameShift = shift;
+    int thisShift = prp_getFrameShift();
+    foreach(Property *property, ca_mChildAnimators) {
+        property->prp_setParentFrameShift(thisShift);
+    }
+}
+
 void ComplexAnimator::ca_changeChildAnimatorZ(const int &oldIndex,
-                                           const int &newIndex) {
+                                              const int &newIndex) {
     ca_mChildAnimators.move(oldIndex, newIndex);
 
     prp_callUpdater();
@@ -215,14 +231,6 @@ void ComplexAnimator::prp_cancelTransform() {
     }
 }
 
-void ComplexAnimator::ca_setRecordingValue(bool rec) {
-    if(rec == anim_mIsRecording) return;
-    anim_mIsRecording = rec;
-    if(prp_mParentAnimator != NULL) {
-        prp_mParentAnimator->ca_childAnimatorIsRecordingChanged();
-    }
-}
-
 bool ComplexAnimator::prp_isDescendantRecording() {
     return ca_mChildAnimatorRecording;
 }
@@ -236,7 +244,7 @@ void ComplexAnimator::prp_setRecording(bool rec) {
     foreach(Property *property, ca_mChildAnimators) {
         property->prp_setRecording(rec);
     }
-    ca_setRecordingValue(rec);
+    anim_setRecordingValue(rec);
 }
 
 void ComplexAnimator::ca_childAnimatorIsRecordingChanged()
@@ -253,7 +261,7 @@ void ComplexAnimator::ca_childAnimatorIsRecordingChanged()
             rec = false;
         }
     }
-    ca_setRecordingValue(rec);
+    anim_setRecordingValue(rec);
 }
 
 void ComplexAnimator::ca_addDescendantsKey(Key *key) {

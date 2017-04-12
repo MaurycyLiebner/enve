@@ -148,10 +148,9 @@ void Animator::anim_callFrameChangeUpdater() {
 }
 
 void Animator::anim_updateAfterShifted() {
-    if(prp_mParentAnimator == NULL) return;
     foreach(Key *key, anim_mKeys) {
-        prp_mParentAnimator->ca_removeDescendantsKey(key);
-        prp_mParentAnimator->ca_addDescendantsKey(key);
+        emit prp_removingKey(key);
+        emit prp_addingKey(key);
     }
 }
 
@@ -171,8 +170,8 @@ void Animator::anim_appendKey(Key *newKey,
     anim_mKeys.append(newKey);
     anim_sortKeys();
     //mergeKeysIfNeeded();
-    if(prp_mParentAnimator != NULL && !newKey->hasParentKey()) {
-        prp_mParentAnimator->ca_addDescendantsKey(newKey);
+    if(!newKey->hasParentKey()) {
+        emit prp_addingKey(newKey);
     }
 
     if(anim_mIsCurrentAnimator) {
@@ -194,9 +193,7 @@ void Animator::anim_removeKey(Key *keyToRemove,
                                 keyToRemove, this));
     }
 
-    if(prp_mParentAnimator != NULL) {
-        prp_mParentAnimator->ca_removeDescendantsKey(keyToRemove);
-    }
+    emit prp_removingKey(keyToRemove);
     anim_sortKeys();
 
     if(anim_mIsCurrentAnimator) {
@@ -209,13 +206,9 @@ void Animator::anim_removeKey(Key *keyToRemove,
 void Animator::anim_moveKeyToFrame(Key *key,
                                    int newFrame) {
     anim_updateAfterChangedKey(key);
-    if(prp_mParentAnimator != NULL) {
-        prp_mParentAnimator->ca_removeDescendantsKey(key);
-    }
+    emit prp_removingKey(key);
     key->setRelFrame(newFrame);
-    if(prp_mParentAnimator != NULL) {
-        prp_mParentAnimator->ca_addDescendantsKey(key);
-    }
+    emit prp_addingKey(key);
     anim_sortKeys();
     anim_updateKeyOnCurrrentFrame();
     anim_updateAfterChangedKey(key);
@@ -259,16 +252,14 @@ Key *Animator::prp_getKeyAtPos(qreal relX,
 }
 
 void Animator::prp_addAllKeysToComplexAnimator() {
-    if(prp_mParentAnimator == NULL) return;
     foreach(Key *key, anim_mKeys) {
-        prp_mParentAnimator->ca_addDescendantsKey(key);
+        emit prp_addingKey(key);
     }
 }
 
 void Animator::prp_removeAllKeysFromComplexAnimator() {
-    if(prp_mParentAnimator == NULL) return;
     foreach(Key *key, anim_mKeys) {
-        prp_mParentAnimator->ca_removeDescendantsKey(key);
+        emit prp_removingKey(key);
     }
 }
 
@@ -282,11 +273,15 @@ void Animator::anim_setRecordingWithoutChangingKeys(bool rec, bool saveUndoRedo)
                                                      rec,
                                                      this));
     }
-    anim_mIsRecording = rec;
+
+    anim_setRecordingValue(rec);
     anim_setTraceKeyOnCurrentFrame(rec); // !!!
-    if(prp_mParentAnimator != NULL) {
-        prp_mParentAnimator->ca_childAnimatorIsRecordingChanged();
-    }
+}
+
+void Animator::anim_setRecordingValue(bool rec) {
+    if(rec == anim_mIsRecording) return;
+    anim_mIsRecording = rec;
+    emit prp_isRecordingChanged();
 }
 
 bool Animator::prp_isRecording() {

@@ -193,42 +193,8 @@ public:
     ColorAnimator *getColorAnimatorAt(int id);
     void removeColor(const int &id);
     Property *prp_makeDuplicate();
-    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                             const int &maxFrame);
+
     void updateQGradientStopsFinal();
-
-//    void anim_appendKey(Key *newKey, bool saveUndoRedo) {
-//        Animator::anim_appendKey(newKey, saveUndoRedo);
-//        foreach(PaintSettings *parent, mParentAnimators) {
-//            parent->ca_addDescendantsKey(newKey);
-//        }
-//    }
-
-//    void anim_removeKey(Key *newKey, bool saveUndoRedo) {
-//        Animator::anim_removeKey(newKey, saveUndoRedo);
-//        foreach(PaintSettings *parent, mParentAnimators) {
-//            parent->ca_removeDescendantsKey(newKey);
-//        }
-//    }
-
-//    void anim_updateAfterShifted() {
-//        foreach(PaintSettings *parent, mParentAnimators) {
-//            foreach(Key *key, anim_mKeys) {
-//                parent->ca_removeDescendantsKey(key);
-//                parent->ca_addDescendantsKey(key);
-//            }
-//        }
-//    }
-
-    void addParentAnimator(PaintSettings *parent) {
-        removeParentAnimator(parent);
-        mParentAnimators << parent;
-    }
-
-    void removeParentAnimator(PaintSettings *parent) {
-        mParentAnimators.removeOne(parent);
-    }
-
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:
@@ -236,7 +202,6 @@ private:
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
     QList<PathBox*> mAffectedPaths;
-    QList<PaintSettings*> mParentAnimators;
     ColorAnimator *mCurrentColor = NULL;
 
     bool mQGradientStopsUpdateNeeded = false;

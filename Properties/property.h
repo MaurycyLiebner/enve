@@ -28,9 +28,6 @@ public:
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 
-    virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
-                                                     const int &maxFrame);
-
     virtual void prp_updateAfterChangedRelFrameRange(const int &minFrame,
                                                      const int &maxFrame) {
         int minFrameT;
@@ -104,14 +101,7 @@ public:
 
     virtual void prp_openContextMenu(QPoint pos) { Q_UNUSED(pos); }
 
-    virtual int prp_saveToSql(QSqlQuery*, const int &parentId = 0) = 0;
-    virtual void prp_loadFromSql(const int &identifyingId) = 0;
-
     virtual bool prp_hasKeys() { return false; }
-
-    ComplexAnimator *prp_getParentAnimator() const { return prp_mParentAnimator; }
-    void prp_setParentAnimator(ComplexAnimator *parentAnimator);
-    void prp_setZValue(const int &oldIndex, const int &newIndex);
 
     virtual bool prp_isAnimator() { return false; }
     virtual void prp_startDragging() {}
@@ -129,16 +119,24 @@ public:
     void prp_blockUpdater();
     void prp_callFinishUpdater();
 
-    virtual void prp_makeDuplicate(Property *) = 0;
-    virtual Property *prp_makeDuplicate() = 0;
+    virtual void prp_setParentFrameShift(const int &shift);
 public slots:
     virtual void prp_setRecording(bool rec) { Q_UNUSED(rec); }
+
+    virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                                     const int &maxFrame);
+signals:
+    void prp_isRecordingChanged();
+    void prp_absFrameRangeChanged(const int &minFrame,
+                                  const int &maxFrame);
+    void prp_removingKey(Key *);
+    void prp_addingKey(Key *);
 protected:
+    int prp_mParentFrameShift = 0;
     AnimatorUpdater *prp_mUpdater = NULL;
     bool prp_mUpdaterBlocked = false;
 
     QString prp_mName = "";
-    ComplexAnimator *prp_mParentAnimator = NULL;
 };
 
 #endif // PROPERTY_H
