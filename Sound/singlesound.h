@@ -51,6 +51,7 @@ private:
     float *mSrcData = NULL;
     float *mFinalData = NULL;
     int mFinalSampleCount = 0;
+    int mFinalAbsStartFrame = 0;
     int mSrcSampleCount = 0;
     QrealAnimator mVolumeAnimator;
     QString mPath;

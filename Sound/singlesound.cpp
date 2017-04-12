@@ -229,7 +229,7 @@ void SingleSound::reloadDataFromFile() {
 }
 
 int SingleSound::getStartAbsFrame() const {
-    return prp_relFrameToAbsFrame(mDurationRectangle->getMinFrameAsRelFrame());
+    return mFinalAbsStartFrame;
 }
 
 int SingleSound::getSampleCount() const {
@@ -246,26 +246,26 @@ void SingleSound::prepareFinalData(const qreal &fps,
         mFinalData = NULL;
         mFinalSampleCount = 0;
     } else {
-        int finalMinFrame =
+        mFinalAbsStartFrame =
             qMax(minAbsFrame,
                    qMax(mDurationRectangle->getMinFrameAsAbsFrame(),
                         mDurationRectangle->getMinAnimationFrameAsAbsFrame()) );
-        int finalMaxFrame =
+        int finalMaxAbsFrame =
             qMin(maxAbsFrame,
                    qMin(mDurationRectangle->getMaxFrameAsAbsFrame(),
                         mDurationRectangle->getMaxAnimationFrameAsAbsFrame()) );
-        int minFrameFromSrc =
-                    finalMinFrame -
-                    mDurationRectangle->getMinAnimationFrameAsAbsFrame();
-        int maxFrameFromSrc =
-                qMin(finalMaxFrame,
-                     mDurationRectangle->getMaxAnimationFrameAsAbsFrame());
-        int minSampleFromSrc = minFrameFromSrc*SAMPLERATE/fps;
+        qDebug() << "sound abs frame range:" << mFinalAbsStartFrame << finalMaxAbsFrame;
+        int finalMinRelFrame = prp_absFrameToRelFrame(mFinalAbsStartFrame);
+        int finalMaxRelFrame = prp_absFrameToRelFrame(finalMaxAbsFrame);
+        qDebug() << "sound rel frame range:" << finalMinRelFrame << finalMaxRelFrame;
+
+        int minSampleFromSrc = finalMinRelFrame*SAMPLERATE/fps;
         int maxSampleFromSrc = qMin(mSrcSampleCount,
-                                    qCeil(maxFrameFromSrc*SAMPLERATE/fps));
+                                    qCeil(finalMaxRelFrame*SAMPLERATE/fps));
 
 
         mFinalSampleCount = maxSampleFromSrc - minSampleFromSrc;
+        qDebug() << minSampleFromSrc << maxSampleFromSrc << mFinalSampleCount;
         mFinalData = (float*)malloc(mFinalSampleCount*sizeof(float));
         if(mVolumeAnimator.prp_hasKeys()) {
             int j = 0;

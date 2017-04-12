@@ -1223,7 +1223,7 @@ void BoundingBox::applyRenderCacheChanges() {
 }
 
 void BoundingBox::beforeUpdate() {
-    qDebug() << "before update " + prp_mName;
+    //qDebug() << "before update " + prp_mName;
     setUpdateVars();
 //    if(!mUpdateReplaceCache) {
 //        BoundingBoxRenderContainer *cont = getRenderContainerAtFrame(
@@ -1238,7 +1238,7 @@ void BoundingBox::beforeUpdate() {
 }
 
 void BoundingBox::processUpdate() {
-    qDebug() << "process update " + prp_mName;
+    //qDebug() << "process update " + prp_mName;
     if(mUpdateReplaceCache) {
         updatePixmaps();
     }

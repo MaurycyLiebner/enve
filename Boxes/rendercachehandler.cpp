@@ -164,7 +164,7 @@ RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
     if(mInternalDifferences) {
         int contId = getRenderContainterInsertIdAtRelFrame(frame);
         mRenderContainers.insert(contId, cont);
-        qDebug() << "frame: " << frame << " at: " << contId;
+        //qDebug() << "frame: " << frame << " at: " << contId;
     } else {
         mRenderContainers.append(cont);
     }
@@ -635,7 +635,7 @@ void RenderCacheHandler::removeRangeNeedingUpdate(RenderCacheRange *range) {
 
 void RenderCacheHandler::addRangeNeedingUpdate(RenderCacheRange *range) {
     if(mRangesNeedingUpdate.contains(range)) return;
-    qDebug() << range->getMinRelFrame() << range->getMaxRelFrame();
+    //qDebug() << range->getMinRelFrame() << range->getMaxRelFrame();
     mRangesNeedingUpdate << range;
 }
 
