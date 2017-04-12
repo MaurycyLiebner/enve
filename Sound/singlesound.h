@@ -13,9 +13,10 @@ class SingleSound : public ComplexAnimator
 {
     Q_OBJECT
 public:
-    SingleSound(const QString &path, DurationRectangle *durRect = NULL);
+    SingleSound(const QString &path,
+                FixedLenAnimationRect *durRect = NULL);
 
-    void setDurationRect(DurationRectangle *durRect);
+    void setDurationRect(FixedLenAnimationRect *durRect);
 
     void setFilePath(const QString &path);
     void reloadDataFromFile();
@@ -46,7 +47,7 @@ public slots:
 private:
     bool mFinalDataUpdateNeeded = false;
     bool mOwnDurationRectangle;
-    DurationRectangle *mDurationRectangle = NULL;
+    FixedLenAnimationRect *mDurationRectangle = NULL;
     float *mSrcData = NULL;
     float *mFinalData = NULL;
     int mFinalSampleCount = 0;

@@ -300,5 +300,8 @@ void FixedLenAnimationRect::changeFramePosBy(const int &change) {
     mMaxFrame.setMinPos(getMinFrame());
     mMaxFrame.changeFramePosByWithoutSignal(change);
     mMinFrame.setMaxPos(getMaxFrame());
+    if(mBoundToAnimation) {
+        bindToAnimationFrameRange();
+    }
     DurationRectangleMovable::changeFramePosBy(change);
 }

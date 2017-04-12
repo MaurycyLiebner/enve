@@ -528,6 +528,9 @@ void PaintSettings::setPaintType(PaintType paintType, bool saveUndoRedo) {
         addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
                                                 this));
     }
+    if(paintType != GRADIENTPAINT) {
+        setGradientVar(NULL);
+    }
     mPaintType = paintType;
     mTarget->updateDrawGradients();
     if(mTarget->isSelected()) {

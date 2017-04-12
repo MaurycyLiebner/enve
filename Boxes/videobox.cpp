@@ -226,7 +226,8 @@ bool hasSound(const char* path) {
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
         if(mSound == NULL) {
-            mSound = new SingleSound(mSrcFilePath, mDurationRectangle);
+            mSound = new SingleSound(mSrcFilePath,
+                                     (FixedLenAnimationRect*)mDurationRectangle);
             ca_addChildAnimator(mSound);
             getParentCanvas()->getSoundComposition()->addSound(mSound);
         } else {

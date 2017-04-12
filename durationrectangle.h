@@ -178,7 +178,16 @@ protected:
 class FixedLenAnimationRect : public AnimationRect {
     Q_OBJECT
 public:
-    FixedLenAnimationRect(Property *childProp) : AnimationRect(childProp) {}
+    FixedLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
+        connect(&mMinFrame, SIGNAL(posChanged(int)),
+                this, SIGNAL(rangeChanged()));
+        connect(&mMaxFrame, SIGNAL(posChanged(int)),
+                this, SIGNAL(rangeChanged()));
+        connect(&mMinFrame, SIGNAL(finishedTransform()),
+                this, SIGNAL(finishedRangeChange()));
+        connect(&mMaxFrame, SIGNAL(finishedTransform()),
+                this, SIGNAL(finishedRangeChange()));
+    }
 
     int getMinAnimationFrame() const;
     int getMaxAnimationFrame() const;
