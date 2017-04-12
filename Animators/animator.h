@@ -63,8 +63,8 @@ public:
     Key *prp_getKeyAtPos(qreal relX,
                          int minViewedFrame,
                          qreal pixelsPerFrame);
-    void prp_removeAllKeysFromComplexAnimator();
-    void prp_addAllKeysToComplexAnimator();
+    void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
+    void prp_addAllKeysToComplexAnimator(ComplexAnimator *target);
     bool prp_hasKeys();
 
     void anim_setRecordingWithoutChangingKeys(bool rec,

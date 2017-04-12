@@ -249,15 +249,15 @@ Key *Animator::prp_getKeyAtPos(qreal relX,
     return NULL;
 }
 
-void Animator::prp_addAllKeysToComplexAnimator() {
+void Animator::prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
     foreach(Key *key, anim_mKeys) {
-        emit prp_addingKey(key);
+        target->ca_addDescendantsKey(key);
     }
 }
 
-void Animator::prp_removeAllKeysFromComplexAnimator() {
+void Animator::prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
     foreach(Key *key, anim_mKeys) {
-        emit prp_removingKey(key);
+        target->ca_removeDescendantsKey(key);
     }
 }
 

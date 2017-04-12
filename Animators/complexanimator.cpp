@@ -52,7 +52,7 @@ void ComplexAnimator::ca_addChildAnimator(Property *childAnimator)
     connect(childAnimator, SIGNAL(prp_removingKey(Key*)),
             this, SLOT(ca_removeDescendantsKey(Key*)));
 
-    childAnimator->prp_addAllKeysToComplexAnimator();
+    childAnimator->prp_addAllKeysToComplexAnimator(this);
     ca_childAnimatorIsRecordingChanged();
     childAnimator->prp_setAbsFrame(anim_mCurrentAbsFrame);
     //updateKeysPath();
@@ -103,7 +103,7 @@ void ComplexAnimator::ca_moveChildInList(
 
 void ComplexAnimator::ca_removeChildAnimator(Property *removeAnimator) {
     removeAnimator->prp_setUpdater(NULL);
-    removeAnimator->prp_removeAllKeysFromComplexAnimator();
+    removeAnimator->prp_removeAllKeysFromComplexAnimator(this);
     ca_mChildAnimators.removeOne(removeAnimator);
     disconnect(removeAnimator, 0, this, 0);
     ca_childAnimatorIsRecordingChanged();

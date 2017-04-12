@@ -133,6 +133,7 @@ void RenderCacheRange::insertRenderContainer(
 void RenderCacheRange::removeRenderContainer(
         CacheBoundingBoxRenderContainer *cont) {
     mRenderContainers.removeOne(cont);
+    cont->setParentRagne(NULL);
     cont->decNumberPointers();
 }
 
@@ -171,6 +172,11 @@ RenderCacheRange::createNewRenderContainerAtRelFrame(const int &frame) {
 }
 
 void RenderCacheRange::clearCache() {
+    foreach(CacheBoundingBoxRenderContainer *cont, mRenderContainers) {
+        cont->setParentRagne(NULL);
+        cont->decNumberPointers();
+    }
+
     mRenderContainers.clear();
 }
 

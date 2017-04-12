@@ -107,9 +107,13 @@ public:
     virtual void prp_startDragging() {}
 
     virtual bool prp_isRecording() { return false; }
-    virtual void prp_removeAllKeysFromComplexAnimator() {}
+    virtual void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
+        Q_UNUSED(target);
+    }
     virtual void prp_setTransformed(bool bT) { Q_UNUSED(bT); }
-    virtual void prp_addAllKeysToComplexAnimator() {}
+    virtual void prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
+        Q_UNUSED(target);
+    }
 
     QString prp_getName();
     void prp_setName(QString newName);
