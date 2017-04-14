@@ -61,18 +61,22 @@ void BlurEffect::apply(BoundingBox *target,
                        QImage *imgPtr,
                        const fmt_filters::image &img,
                        qreal scale) {
-    Q_UNUSED(imgPtr);
+    //Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
-    fmt_filters::blur(img, radius, radius*0.3333);
-    return;
+    //fmt_filters::blur(img, radius, radius*0.3333);
+    //return;
     //fmt_filters::fast_blur(img, radius*0.5);
-    fmt_filters::fast_blur(img, radius*0.25);
-    fmt_filters::fast_blur(img, radius*0.25);
+    if(mBlurRadius->prp_hasKeys()) {
+        fmt_filters::anim_fast_blur(img, radius*0.25);
+        fmt_filters::anim_fast_blur(img, radius*0.25);
+    } else {
+        fmt_filters::fast_blur(img, radius*0.25);
+        fmt_filters::fast_blur(img, radius*0.25);
+    }
     //fmt_filters::blur(img, radius, radius*0.3333);
 }
 
-qreal BlurEffect::getMargin()
-{
+qreal BlurEffect::getMargin() {
     return mBlurRadius->qra_getCurrentValue();
 }
 
@@ -211,8 +215,13 @@ void ShadowEffect::apply(BoundingBox *target,
 
     qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
     //fmt_filters::blur(shadowImg, radius, radius*0.3333);
-    fmt_filters::fast_blur(shadowImg, radius*0.25);
-    fmt_filters::fast_blur(shadowImg, radius*0.25);
+    if(mBlurRadius->prp_hasKeys()) {
+        fmt_filters::anim_fast_blur(shadowImg, radius*0.25);
+        fmt_filters::anim_fast_blur(shadowImg, radius*0.25);
+    } else {
+        fmt_filters::fast_blur(shadowImg, radius*0.25);
+        fmt_filters::fast_blur(shadowImg, radius*0.25);
+    }
     //fmt_filters::fast_blur(shadowImg, radius*0.5);
 
     QPainter p(imgPtr);

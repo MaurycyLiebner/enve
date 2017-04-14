@@ -954,6 +954,401 @@ void despeckle(const image &im)
     delete [] n;
 }
 
+class BlurPoint {
+public:
+    BlurPoint() {}
+
+    void setPrevPoint(BlurPoint *pt) {
+        prevPoint = pt;
+    }
+
+    virtual void setInf(const double &) {
+
+    }
+
+    void setNextPoint(BlurPoint *pt) {
+        nextPoint = pt;
+    }
+
+    virtual void shiftValues(
+             const double &r,
+             const double &g,
+             const double &b,
+             const double &a) {
+        if(prevPoint != NULL) {
+            prevPoint->shiftValues(rV, gV, bV, aV);
+        }
+        rV = r;
+        gV = g;
+        bV = b;
+        aV = a;
+    }
+
+    virtual void substractValuesFromProvided(double *r, double *g,
+                                             double *b, double *a) {
+        *r -= rV;
+        *g -= gV;
+        *b -= bV;
+        *a -= aV;
+    }
+
+    virtual void addValuesToProvided(double *r, double *g,
+                                     double *b, double *a) {
+        *r += rV;
+        *g += gV;
+        *b += bV;
+        *a += aV;
+    }
+
+    BlurPoint *getNextPoint() const {
+        return nextPoint;
+    }
+
+    BlurPoint *getPrevPoint() const {
+        return prevPoint;
+    }
+
+    double rV;
+    double gV;
+    double bV;
+    double aV;
+    BlurPoint *prevPoint = NULL;
+    BlurPoint *nextPoint = NULL;
+};
+
+class BlurInfPoint : public BlurPoint {
+public:
+    BlurInfPoint() : BlurPoint() {
+
+    }
+
+    void substractValuesFromProvided(double *r, double *g,
+                                     double *b, double *a) {
+        *r -= rVinf;
+        *g -= gVinf;
+        *b -= bVinf;
+        *a -= aVinf;
+    }
+
+    void addValuesToProvided(double *r, double *g,
+                             double *b, double *a) {
+        *r += rVinf;
+        *g += gVinf;
+        *b += bVinf;
+        *a += aVinf;
+    }
+
+    void shiftValues(const double &r,
+                     const double &g,
+                     const double &b,
+                     const double &a) {
+        BlurPoint::shiftValues(r, g, b, a);
+        rVinf = rV*influence;
+        gVinf = gV*influence;
+        bVinf = bV*influence;
+        aVinf = aV*influence;
+    }
+
+    virtual void setInf(const double &inf) {
+        influence = inf;
+    }
+
+    double rVinf;
+    double gVinf;
+    double bVinf;
+    double aVinf;
+    double influence;
+};
+
+struct RadiusRangeBlurPoints {
+    RadiusRangeBlurPoints(const double &radius) {
+        fRadius = radius;
+        iRadius = ceil(fRadius + 0.001);
+        nPoints = iRadius + iRadius + 1;
+        fracInf = 1 - iRadius + fRadius;
+        firstBlurPoint = new BlurInfPoint();
+        firstBlurPoint->setInf(fracInf);
+        BlurPoint *prevPoint = firstBlurPoint;
+        for(int i = 1; i < nPoints - 1; i++) {
+            BlurPoint *pt = new BlurPoint();
+            pt->setPrevPoint(prevPoint);
+            prevPoint->setNextPoint(pt);
+            prevPoint = pt;
+        }
+        lastBlurPoint = new BlurInfPoint();
+        lastBlurPoint->setInf(fracInf);
+        lastBlurPoint->setPrevPoint(prevPoint);
+        prevPoint->setNextPoint(lastBlurPoint);
+    }
+
+    void shiftValues(
+            const double &rN, const double &gN,
+            const double &bN, const double &aN) {
+        lastBlurPoint->substractValuesFromProvided(&rSum, &gSum, &bSum, &aSum);
+        firstBlurPoint->substractValuesFromProvided(&rSum, &gSum, &bSum, &aSum);
+        firstBlurPoint->getNextPoint()->
+                substractValuesFromProvided(&rSum, &gSum, &bSum, &aSum);
+        lastBlurPoint->shiftValues(rN, gN, bN, aN);
+        lastBlurPoint->addValuesToProvided(&rSum, &gSum, &bSum, &aSum);
+        lastBlurPoint->getPrevPoint()->addValuesToProvided(&rSum, &gSum, &bSum, &aSum);
+        firstBlurPoint->addValuesToProvided(&rSum, &gSum, &bSum, &aSum);
+    }
+
+    void getCurrentValueSums(
+            double *rS, double *gS, double *bS, double *aS) {
+        *rS = rSum;
+        *gS = gSum;
+        *bS = bSum;
+        *aS = aSum;
+    }
+
+    void startIni() {
+        rSum = 0.;
+        gSum = 0.;
+        bSum = 0.;
+        aSum = 0.;
+    }
+
+    void addIniValues(const double &rN, const double &gN,
+                      const double &bN, const double &aN) {
+        lastBlurPoint->shiftValues(rN, gN, bN, aN);
+    }
+
+    void finishIni() {
+        BlurPoint *currPt = firstBlurPoint;
+        while(currPt != NULL) {
+            currPt->addValuesToProvided(&rSum, &gSum, &bSum, &aSum);
+            currPt = currPt->getNextPoint();
+        }
+    }
+
+    double rSum;
+    double gSum;
+    double bSum;
+    double aSum;
+    int nPoints;
+    int iRadius;
+    double fRadius;
+    double fracInf;
+    BlurInfPoint *firstBlurPoint;
+    BlurInfPoint *lastBlurPoint;
+};
+
+void anim_fast_blur(const image &im, double radiusF) {
+    if(radiusF < 0.) return;
+    unsigned char *pix = im.data;
+    int w = im.w;
+    int h = im.h;
+
+    RadiusRangeBlurPoints radiusRange = RadiusRangeBlurPoints(radiusF);
+
+    double divF = radiusF + radiusF + 1.;
+    int maxRadius = ceil(radiusF + 0.001);
+
+    int wm=w-1;
+    int hm=h-1;
+    int wh=w*h;
+    double *r=new double[wh];
+    double *g=new double[wh];
+    double *b=new double[wh];
+    double *a=new double[wh];
+    double rsum,gsum,bsum,asum;
+    int x,y,i,p,p1,yp,yi,yw;
+    int *vMIN = new int[max(w,h)];
+    int *vMAX = new int[max(w,h)];
+
+
+    yw=yi=0;
+
+    for (y=0;y<h;y++){
+        rsum=gsum=bsum=asum=0.;
+
+        radiusRange.startIni();
+        for(i=-maxRadius;i<=maxRadius;i++){
+            p = (yi + min(wm, max(i,0))) * 4;
+            radiusRange.addIniValues(
+                        pix[p], pix[p + 1],
+                        pix[p + 2], pix[p + 3]);
+        }
+        radiusRange.finishIni();
+        radiusRange.getCurrentValueSums(&rsum, &gsum, &bsum, &asum);
+        for (x = 0; x < w; x++){
+
+            r[yi] = rsum/divF;
+            g[yi] = gsum/divF;
+            b[yi] = bsum/divF;
+            a[yi] = asum/divF;
+
+            if(y == 0) {
+                vMIN[x]=min(x+maxRadius+1,wm);
+                vMAX[x]=max(x-maxRadius,0);
+            }
+            p1 = (yw + vMIN[x])*4;
+
+            radiusRange.shiftValues(pix[p1], pix[p1 + 1], pix[p1 + 2], pix[p1 + 3]);
+            radiusRange.getCurrentValueSums(&rsum, &gsum, &bsum, &asum);
+
+            yi++;
+        }
+        yw+=w;
+    }
+
+    for (x=0;x<w;x++){
+        rsum=gsum=bsum=asum=0.;
+        yp=-maxRadius*w;
+        radiusRange.startIni();
+
+        for(i=-maxRadius;i<=maxRadius;i++){
+            yi=max(0,yp)+x;
+            radiusRange.addIniValues(
+                        r[yi], g[yi],
+                        b[yi], a[yi]);
+            yp+=w;
+        }
+        radiusRange.finishIni();
+        radiusRange.getCurrentValueSums(&rsum, &gsum, &bsum, &asum);
+
+        yi=x;
+        for (y=0;y<h;y++){
+            pix[yi*4]		= rsum/divF;
+            pix[yi*4 + 1]	= gsum/divF;
+            pix[yi*4 + 2]	= bsum/divF;
+            pix[yi*4 + 3]	= asum/divF;
+            if(x==0) {
+                vMIN[y]=min(y+maxRadius+1,hm)*w;
+                vMAX[y]=max(y-maxRadius,0)*w;
+            }
+            p1=x+vMIN[y];
+
+            radiusRange.shiftValues(r[p1], g[p1], b[p1], a[p1]);
+            radiusRange.getCurrentValueSums(&rsum, &gsum, &bsum, &asum);
+
+            yi+=w;
+        }
+    }
+
+    delete[] r;
+    delete[] g;
+    delete[] b;
+    delete[] a;
+
+    delete[] vMIN;
+    delete[] vMAX;
+}
+
+//void fast_blur(const image &im, double radiusF)
+//{
+//    unsigned char *pix = im.data;
+//    int w = im.w;
+//    int h = im.h;
+
+//    int maxRadius = ceil(radiusF);
+//    double fraqInf = maxRadius - radiusF;
+
+//    if (maxRadius<1) return;
+//    int wm=w-1;
+//    int hm=h-1;
+//    int wh=w*h;
+//    int div=maxRadius+maxRadius+1;
+//    unsigned char *r=new unsigned char[wh];
+//    unsigned char *g=new unsigned char[wh];
+//    unsigned char *b=new unsigned char[wh];
+//    unsigned char *a=new unsigned char[wh];
+//    int rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
+//    int *vMIN = new int[max(w,h)];
+//    int *vMAX = new int[max(w,h)];
+
+//    double divF = radiusF + radiusF + 1.;
+//    int minFi = 256*div - ceil(256*divF);
+//    double *dv=new double[256*div];
+//    for(i=0; i< minFi; i++) {
+//        dv[i] = 0.;
+//    }
+//    for (i=minFi;i<256*div;i++) {
+//        dv[i]= ((i - minFi)/divF);
+//        printf("%4.2f ", dv[i]);
+//    }
+
+//    yw=yi=0;
+
+//    for (y=0;y<h;y++){
+//        rsum=gsum=bsum=asum=0;
+
+//        for(i=-maxRadius;i<=maxRadius;i++){
+//            p = (yi + min(wm, max(i,0))) * 4;
+//            rsum += pix[p];
+//            gsum += pix[p+1];
+//            bsum += pix[p+2];
+//            asum += pix[p+3];
+//        }
+//        for (x=0;x<w;x++){
+
+//            r[yi]=dv[rsum];
+//            g[yi]=dv[gsum];
+//            b[yi]=dv[bsum];
+//            a[yi]=dv[asum];
+
+//            if(y==0){
+//                vMIN[x]=min(x+maxRadius+1,wm);
+//                vMAX[x]=max(x-maxRadius,0);
+//            }
+//            p1 = (yw+vMIN[x])*4;
+//            p2 = (yw+vMAX[x])*4;
+
+//            rsum += pix[p1]		- pix[p2];
+//            gsum += pix[p1+1]	- pix[p2+1];
+//            bsum += pix[p1+2]	- pix[p2+2];
+//            asum += pix[p1+3]	- pix[p2+3];
+
+//            yi++;
+//        }
+//        yw+=w;
+//    }
+
+//    for (x=0;x<w;x++){
+//        rsum=gsum=bsum=asum=0;
+//        yp=-maxRadius*w;
+//        for(i=-maxRadius;i<=maxRadius;i++){
+//            yi=max(0,yp)+x;
+//            rsum+=r[yi];
+//            gsum+=g[yi];
+//            bsum+=b[yi];
+//            asum+=a[yi];
+//            yp+=w;
+//        }
+//        yi=x;
+//        for (y=0;y<h;y++){
+//            pix[yi*4]		= dv[rsum];
+//            pix[yi*4 + 1]	= dv[gsum];
+//            pix[yi*4 + 2]	= dv[bsum];
+//            pix[yi*4 + 3]	= dv[asum];
+//            if(x==0){
+//                vMIN[y]=min(y+maxRadius+1,hm)*w;
+//                vMAX[y]=max(y-maxRadius,0)*w;
+//            }
+//            p1=x+vMIN[y];
+//            p2=x+vMAX[y];
+
+//            rsum+=r[p1]-r[p2];
+//            gsum+=g[p1]-g[p2];
+//            bsum+=b[p1]-b[p2];
+//            asum+=a[p1]-a[p2];
+
+//            yi+=w;
+//        }
+//    }
+
+//    delete r;
+//    delete g;
+//    delete b;
+//    delete a;
+
+//    delete vMIN;
+//    delete vMAX;
+//    delete dv;
+//}
+
+
 void fast_blur(const image &im, int radius)
 {
     unsigned char *pix = im.data;
@@ -1044,116 +1439,15 @@ void fast_blur(const image &im, int radius)
         }
     }
 
-    delete r;
-    delete g;
-    delete b;
-    delete a;
+    delete[] r;
+    delete[] g;
+    delete[] b;
+    delete[] a;
 
-    delete vMIN;
-    delete vMAX;
-    delete dv;
+    delete[] vMIN;
+    delete[] vMAX;
+    delete[] dv;
 }
-
-
-//void fast_blur(const image &im, int radius)
-//{
-//    unsigned char *pix = im.data;
-//    int w = im.w;
-//    int h = im.h;
-
-//    if (radius<1) return;
-//    int wm=w-1;
-//    int hm=h-1;
-//    int wh=w*h;
-//    int div=radius+radius+1;
-//    unsigned char *r=new unsigned char[wh];
-//    unsigned char *g=new unsigned char[wh];
-//    unsigned char *b=new unsigned char[wh];
-//    unsigned char *a=new unsigned char[wh];
-//    int rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
-//    int *vMIN = new int[max(w,h)];
-//    int *vMAX = new int[max(w,h)];
-
-//    unsigned char *dv=new unsigned char[256*div];
-//    for (i=0;i<256*div;i++) dv[i]=(i/div);
-
-//    yw=yi=0;
-
-//    for (y=0;y<h;y++){
-//        rsum=gsum=bsum=asum=0;
-//        for(i=-radius;i<=radius;i++){
-//            p = (yi + min(wm, max(i,0))) * 4;
-//            rsum += pix[p];
-//            gsum += pix[p+1];
-//            bsum += pix[p+2];
-//            asum += pix[p+3];
-//        }
-//        for (x=0;x<w;x++){
-
-//            r[yi]=dv[rsum];
-//            g[yi]=dv[gsum];
-//            b[yi]=dv[bsum];
-//            a[yi]=dv[asum];
-
-//            if(y==0){
-//                vMIN[x]=min(x+radius+1,wm);
-//                vMAX[x]=max(x-radius,0);
-//            }
-//            p1 = (yw+vMIN[x])*4;
-//            p2 = (yw+vMAX[x])*4;
-
-//            rsum += pix[p1]		- pix[p2];
-//            gsum += pix[p1+1]	- pix[p2+1];
-//            bsum += pix[p1+2]	- pix[p2+2];
-//            asum += pix[p1+3]	- pix[p2+3];
-
-//            yi++;
-//        }
-//        yw+=w;
-//    }
-
-//    for (x=0;x<w;x++){
-//        rsum=gsum=bsum=asum=0;
-//        yp=-radius*w;
-//        for(i=-radius;i<=radius;i++){
-//            yi=max(0,yp)+x;
-//            rsum+=r[yi];
-//            gsum+=g[yi];
-//            bsum+=b[yi];
-//            asum+=a[yi];
-//            yp+=w;
-//        }
-//        yi=x;
-//        for (y=0;y<h;y++){
-//            pix[yi*4]		= dv[rsum];
-//            pix[yi*4 + 1]	= dv[gsum];
-//            pix[yi*4 + 2]	= dv[bsum];
-//            pix[yi*4 + 3]	= dv[asum];
-//            if(x==0){
-//                vMIN[y]=min(y+radius+1,hm)*w;
-//                vMAX[y]=max(y-radius,0)*w;
-//            }
-//            p1=x+vMIN[y];
-//            p2=x+vMAX[y];
-
-//            rsum+=r[p1]-r[p2];
-//            gsum+=g[p1]-g[p2];
-//            bsum+=b[p1]-b[p2];
-//            asum+=a[p1]-a[p2];
-
-//            yi+=w;
-//        }
-//    }
-
-//    delete r;
-//    delete g;
-//    delete b;
-//    delete a;
-
-//    delete vMIN;
-//    delete vMAX;
-//    delete dv;
-//}
 
 void blur(const image &im, double radius, double sigma)
 {

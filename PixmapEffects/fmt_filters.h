@@ -226,7 +226,9 @@ namespace fmt_filters
         void equalize(const image &im);
 
         // radius = [0.01; 90.0], sigma = [0.01; 50.0]
+        void anim_fast_blur(const image &im, double radiusF);
         void fast_blur(const image &im, int radius);
+
         void blur(const image &im, double radius, double sigma);
 
         void despeckle(const image &im);

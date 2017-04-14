@@ -197,8 +197,7 @@ void QrealKey::constrainStartCtrlMinFrame(int minFrame) {
 //    return NULL;
 //}
 
-void QrealKey::setCtrlsMode(CtrlsMode mode)
-{
+void QrealKey::setCtrlsMode(CtrlsMode mode) {
     mCtrlsMode = mode;
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
         QPointF newStartPos;
@@ -228,8 +227,7 @@ void QrealKey::setCtrlsMode(CtrlsMode mode)
     }
 }
 
-void QrealKey::updateCtrlFromCtrl(QrealPointType type)
-{
+void QrealKey::updateCtrlFromCtrl(QrealPointType type) {
     if(mCtrlsMode == CTRLS_CORNER) return;
     QPointF fromPt;
     QPointF toPt;
