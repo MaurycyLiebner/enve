@@ -50,10 +50,15 @@ int PixmapEffect::prp_saveToSql(QSqlQuery *query,
 }
 
 BlurEffect::BlurEffect(qreal radius) : PixmapEffect(EFFECT_BLUR) {
-    mBlurRadius->qra_setCurrentValue(radius);
     prp_setName("blur");
+    mBlurRadius->qra_setCurrentValue(radius);
     mBlurRadius->prp_setName("radius");
     mBlurRadius->qra_setValueRange(0., 1000.);
+
+    mHighQuality->setValue(false);
+    mHighQuality->prp_setName("high quality");
+
+    ca_addChildAnimator(mHighQuality.data());
     ca_addChildAnimator(mBlurRadius.data());
 }
 
@@ -66,12 +71,20 @@ void BlurEffect::apply(BoundingBox *target,
     //fmt_filters::blur(img, radius, radius*0.3333);
     //return;
     //fmt_filters::fast_blur(img, radius*0.5);
-    if(mBlurRadius->prp_hasKeys()) {
-        fmt_filters::anim_fast_blur(img, radius*0.25);
-        fmt_filters::anim_fast_blur(img, radius*0.25);
+    if(mHighQuality->getValue()) {
+        if(mBlurRadius->prp_hasKeys()) {
+            fmt_filters::anim_fast_blur(img, radius*0.5);
+            fmt_filters::anim_fast_blur(img, radius*0.5);
+        } else {
+            fmt_filters::fast_blur(img, radius*0.5);
+            fmt_filters::fast_blur(img, radius*0.5);
+        }
     } else {
-        fmt_filters::fast_blur(img, radius*0.25);
-        fmt_filters::fast_blur(img, radius*0.25);
+        if(mBlurRadius->prp_hasKeys()) {
+            fmt_filters::anim_fast_blur(img, radius*0.8);
+        } else {
+            fmt_filters::fast_blur(img, radius*0.8);
+        }
     }
     //fmt_filters::blur(img, radius, radius*0.3333);
 }
@@ -216,11 +229,11 @@ void ShadowEffect::apply(BoundingBox *target,
     qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
     //fmt_filters::blur(shadowImg, radius, radius*0.3333);
     if(mBlurRadius->prp_hasKeys()) {
-        fmt_filters::anim_fast_blur(shadowImg, radius*0.25);
-        fmt_filters::anim_fast_blur(shadowImg, radius*0.25);
+        fmt_filters::anim_fast_blur(shadowImg, radius*0.5);
+        //fmt_filters::anim_fast_blur(shadowImg, radius*0.25);
     } else {
-        fmt_filters::fast_blur(shadowImg, radius*0.25);
-        fmt_filters::fast_blur(shadowImg, radius*0.25);
+        fmt_filters::fast_blur(shadowImg, radius*0.5);
+        //fmt_filters::fast_blur(shadowImg, radius*0.25);
     }
     //fmt_filters::fast_blur(shadowImg, radius*0.5);
 

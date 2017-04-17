@@ -120,6 +120,8 @@ public:
     void prp_makeDuplicate(Property *target);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 private:
+    QSharedPointer<BoolProperty> mHighQuality =
+            (new BoolProperty())->ref<BoolProperty>();
     QSharedPointer<QrealAnimator> mBlurRadius =
             (new QrealAnimator())->ref<QrealAnimator>();
 };
