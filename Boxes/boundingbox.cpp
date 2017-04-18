@@ -1082,7 +1082,7 @@ void BoundingBox::setLocked(bool bt) {
 
 bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool &parentSatisfies,
-                                      const bool &) {
+                                      const bool &parentMainTarget) {
     const SWT_Rule &rule = rules.rule;
     const SWT_Type &type = rules.type;
     bool satisfies;
@@ -1092,19 +1092,26 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
         if(rule == SWT_NoRule) {
             satisfies = parentSatisfies;
         } else if(rule == SWT_Selected) {
-            satisfies = isSelected() || parentSatisfies;
+            satisfies = isSelected() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_Animated) {
-            satisfies = isAnimated() || parentSatisfies;
+            satisfies = isAnimated() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_NotAnimated) {
-            satisfies = !isAnimated() || parentSatisfies;
+            satisfies = !isAnimated() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_Visible) {
-            satisfies = isVisible() || parentSatisfies;
+            satisfies = isVisible() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_Invisible) {
-            satisfies = !isVisible() || parentSatisfies;
+            satisfies = !isVisible() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_Locked) {
-            satisfies = isLocked() || parentSatisfies;
+            satisfies = isLocked() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_Unlocked) {
-            satisfies = !isLocked() || parentSatisfies;
+            satisfies = !isLocked() ||
+                    (parentSatisfies && !parentMainTarget);
         }
     } else {
         if(rule == SWT_NoRule) {
@@ -1118,9 +1125,11 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
         } else if(rule == SWT_Visible) {
             satisfies = isVisible() && parentSatisfies;
         } else if(rule == SWT_Invisible) {
-            satisfies = !isVisible() || parentSatisfies;
+            satisfies = !isVisible() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_Locked) {
-            satisfies = isLocked() || parentSatisfies;
+            satisfies = isLocked() ||
+                    (parentSatisfies && !parentMainTarget);
         } else if(rule == SWT_Unlocked) {
             satisfies = !isLocked() && parentSatisfies;
         }

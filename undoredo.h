@@ -149,10 +149,10 @@ class MoveMovablePointUndoRedo : public UndoRedo
 {
 public:
     MoveMovablePointUndoRedo(MovablePoint *movedPoint,
-                         QPointF relPosBefore,
-                         QPointF relPosAfter) :
+                         const QPointF &relPosBefore,
+                         const QPointF &relPosAfter) :
         UndoRedo("MoveMovablePointUndoRedo") {
-        mMovedPoint = movedPoint;
+        mMovedPoint = movedPoint->ref<MovablePoint>();
         mRelPosAfter = relPosAfter;
         mRelPosBefore = relPosBefore;
     }
@@ -169,7 +169,7 @@ public:
     }
 
 private:
-    MovablePoint *mMovedPoint;
+    QSharedPointer<MovablePoint> mMovedPoint;
     QPointF mRelPosBefore;
     QPointF mRelPosAfter;
 };
@@ -180,24 +180,24 @@ public:
     AppendToPointsListUndoRedo(PathPoint *pointToAdd,
                                SinglePathAnimator *path) :
         UndoRedo("AppendToPointsListUndoRedo") {
-        mPoint = pointToAdd;
-        mPath = path;
+        mPoint = pointToAdd->ref<PathPoint>();
+        mPath = path->ref<SinglePathAnimator>();
     }
 
     ~AppendToPointsListUndoRedo() {
     }
 
     void redo() {
-        mPath->appendToPointsList(mPoint, false);
+        mPath->appendToPointsList(mPoint.data(), false);
     }
 
     void undo() {
-        mPath->removeFromPointsList(mPoint, false);
+        mPath->removeFromPointsList(mPoint.data(), false);
     }
 
 private:
-    PathPoint *mPoint;
-    SinglePathAnimator *mPath;
+    QSharedPointer<PathPoint> mPoint;
+    QSharedPointer<SinglePathAnimator> mPath;
 };
 
 class RemoveFromPointsListUndoRedo : public AppendToPointsListUndoRedo
@@ -224,26 +224,30 @@ public:
                          PathPoint *oldNext,
                          PathPoint *newNext) :
         UndoRedo("SetNextPointUndoRedo") {
-        mNewNext = newNext;
-        mOldNext = oldNext;
-        mPoint = point;
+        if(newNext != NULL) {
+            mNewNext = newNext->ref<PathPoint>();
+        }
+        if(oldNext != NULL) {
+            mOldNext = oldNext->ref<PathPoint>();
+        }
+        mPoint = point->ref<PathPoint>();
     }
 
     ~SetNextPointUndoRedo() {
     }
 
     void redo(){
-        mPoint->setNextPoint(mNewNext, false);
+        mPoint->setNextPoint(mNewNext.data(), false);
     }
 
     void undo() {
-        mPoint->setNextPoint(mOldNext, false);
+        mPoint->setNextPoint(mOldNext.data(), false);
     }
 
 private:
-    PathPoint *mNewNext;
-    PathPoint *mOldNext;
-    PathPoint *mPoint;
+    QSharedPointer<PathPoint> mNewNext;
+    QSharedPointer<PathPoint> mOldNext;
+    QSharedPointer<PathPoint> mPoint;
 };
 
 class SetPreviousPointUndoRedo : public UndoRedo
@@ -253,26 +257,30 @@ public:
                              PathPoint *oldPrevious,
                              PathPoint *newPrevious) :
         UndoRedo("SetPreviousPointUndoRedo") {
-        mNewPrev = newPrevious;
-        mOldPrev = oldPrevious;
-        mPoint = point;
+        if(newPrevious != NULL) {
+            mNewPrev = newPrevious->ref<PathPoint>();
+        }
+        if(oldPrevious != NULL) {
+            mOldPrev = oldPrevious->ref<PathPoint>();
+        }
+        mPoint = point->ref<PathPoint>();
     }
 
     ~SetPreviousPointUndoRedo() {
     }
 
     void redo(){
-        mPoint->setPreviousPoint(mNewPrev, false);
+        mPoint->setPreviousPoint(mNewPrev.data(), false);
     }
 
     void undo() {
-        mPoint->setPreviousPoint(mOldPrev, false);
+        mPoint->setPreviousPoint(mOldPrev.data(), false);
     }
 
 private:
-    PathPoint *mNewPrev;
-    PathPoint *mOldPrev;
-    PathPoint *mPoint;
+    QSharedPointer<PathPoint> mNewPrev;
+    QSharedPointer<PathPoint> mOldPrev;
+    QSharedPointer<PathPoint> mPoint;
 };
 
 //class AddPointToSeparatePathsUndoRedo : public UndoRedo
@@ -324,10 +332,10 @@ class SetPathPointModeUndoRedo : public UndoRedo
 {
 public:
     SetPathPointModeUndoRedo(PathPoint *point,
-                             CtrlsMode modeBefore,
-                             CtrlsMode modeAfter) :
+                             const CtrlsMode &modeBefore,
+                             const CtrlsMode &modeAfter) :
         UndoRedo("SetPathPointModeUndoRedo") {
-        mPoint = point;
+        mPoint = point->ref<PathPoint>();
         mBefore = modeBefore;
         mAfter = modeAfter;
     }
@@ -344,7 +352,7 @@ public:
     }
 
 private:
-    PathPoint *mPoint;
+    QSharedPointer<PathPoint> mPoint;
     CtrlsMode mBefore;
     CtrlsMode mAfter;
 };
@@ -352,8 +360,9 @@ private:
 class SetCtrlPtEnabledUndoRedo : public UndoRedo
 {
 public:
-    SetCtrlPtEnabledUndoRedo(bool enabled, bool isStartPt,
-                             PathPoint* parentPoint) :
+    SetCtrlPtEnabledUndoRedo(const bool &enabled,
+                             const bool &isStartPt,
+                             PathPoint *parentPoint) :
         UndoRedo("SetCtrlPtEnabledUndoRedo") {
         mParentPoint = parentPoint;
         mEnabled = enabled;
@@ -381,29 +390,31 @@ class MoveChildInListUndoRedo : public UndoRedo
 {
 public:
     MoveChildInListUndoRedo(BoundingBox *child,
-                            int fromIndex,
-                            int toIndex,
+                            const int &fromIndex,
+                            const int &toIndex,
                             BoxesGroup *parentBox) :
         UndoRedo("MoveChildInListUndoRedo") {
-        mParentBox = parentBox;
+        mParentBox = parentBox->ref<BoxesGroup>();
         mFromIndex = fromIndex;
         mToIndex = toIndex;
-        mChild = child;
+        mChild = child->ref<BoundingBox>();
     }
 
     ~MoveChildInListUndoRedo() {
     }
 
     void redo() {
-        mParentBox->moveChildInList(mChild, mFromIndex, mToIndex, false);
+        mParentBox->moveChildInList(mChild.data(),
+                                    mFromIndex, mToIndex, false);
     }
 
     void undo() {
-        mParentBox->moveChildInList(mChild, mToIndex, mFromIndex, false);
+        mParentBox->moveChildInList(mChild.data(),
+                                    mToIndex, mFromIndex, false);
     }
 private:
-    BoxesGroup *mParentBox;
-    BoundingBox *mChild;
+    QSharedPointer<BoxesGroup> mParentBox;
+    QSharedPointer<BoundingBox> mChild;
     int mFromIndex;
     int mToIndex;
 };
@@ -412,29 +423,31 @@ class MoveChildAnimatorInListUndoRedo : public UndoRedo
 {
 public:
     MoveChildAnimatorInListUndoRedo(Property *child,
-                            int fromIndex,
-                            int toIndex,
+                            const int &fromIndex,
+                            const int &toIndex,
                             ComplexAnimator *parentAnimator) :
         UndoRedo("MoveChildInListUndoRedo") {
-        mParentAnimator = parentAnimator;
+        mParentAnimator = parentAnimator->ref<ComplexAnimator>();
         mFromIndex = fromIndex;
         mToIndex = toIndex;
-        mChild = child;
+        mChild = child->ref<Property>();
     }
 
     ~MoveChildAnimatorInListUndoRedo() {
     }
 
     void redo() {
-        mParentAnimator->ca_moveChildInList(mChild, mFromIndex, mToIndex, false);
+        mParentAnimator->ca_moveChildInList(mChild.data(),
+                                            mFromIndex, mToIndex, false);
     }
 
     void undo() {
-        mParentAnimator->ca_moveChildInList(mChild, mToIndex, mFromIndex, false);
+        mParentAnimator->ca_moveChildInList(mChild.data(),
+                                            mToIndex, mFromIndex, false);
     }
 private:
-    ComplexAnimator *mParentAnimator;
-    Property *mChild;
+    QSharedPointer<ComplexAnimator> mParentAnimator;
+    QSharedPointer<Property> mChild;
     int mFromIndex;
     int mToIndex;
 };
@@ -442,11 +455,11 @@ private:
 class SetBoundingBoxZListIndexUnoRedo : public UndoRedo
 {
 public:
-    SetBoundingBoxZListIndexUnoRedo(int indexBefore,
-                                    int indexAfter,
+    SetBoundingBoxZListIndexUnoRedo(const int &indexBefore,
+                                    const int &indexAfter,
                                     BoundingBox *box) :
         UndoRedo("SetBoundingBoxZListIndexUnoRedo") {
-        mBox = box;
+        mBox = box->ref<BoundingBox>();
         mIndexAfter = indexAfter;
         mIndexBefore = indexBefore;
     }
@@ -465,26 +478,26 @@ public:
 private:
     int mIndexBefore;
     int mIndexAfter;
-    BoundingBox *mBox;
+    QSharedPointer<BoundingBox> mBox;
 };
 
 class AddChildToListUndoRedo : public UndoRedo
 {
 public:
     AddChildToListUndoRedo(BoxesGroup *parent,
-                           int index,
+                           const int &index,
                            BoundingBox *child) :
         UndoRedo("AddChildToListUndoRedo") {
-        mParent = parent;
+        mParent = parent->ref<BoxesGroup>();
         mAddAtId = index;
-        mChild = child;
+        mChild = child->ref<BoundingBox>();
     }
 
     ~AddChildToListUndoRedo() {
     }
 
     void redo() {
-        mParent->addChildToListAt(mAddAtId, mChild, false);
+        mParent->addChildToListAt(mAddAtId, mChild.data(), false);
     }
 
     void undo() {
@@ -492,9 +505,9 @@ public:
     }
 
 private:
-    BoxesGroup *mParent;
+    QSharedPointer<BoxesGroup> mParent;
     int mAddAtId;
-    BoundingBox *mChild;
+    QSharedPointer<BoundingBox> mChild;
 };
 
 class RemoveChildFromListUndoRedo : public AddChildToListUndoRedo
@@ -525,36 +538,38 @@ public:
                          BoxesGroup *newParent) :
         UndoRedo("SetBoxParentUndoRedo")
     {
-        mChildBox = childBox;
-        mOldParent = oldParent;
-        mNewParent = newParent;
+        mChildBox = childBox->ref<BoundingBox>();
+        mOldParent = oldParent->ref<BoxesGroup>();
+        mNewParent = newParent->ref<BoxesGroup>();
     }
 
     ~SetBoxParentUndoRedo() {
     }
 
     void redo() {
-        mChildBox->setParent(mNewParent, false);
+        mChildBox->setParent(mNewParent.data(), false);
     }
 
     void undo() {
-        mChildBox->setParent(mOldParent, false);
+        mChildBox->setParent(mOldParent.data(), false);
     }
 
 private:
-    BoundingBox *mChildBox;
-    BoxesGroup *mOldParent;
-    BoxesGroup *mNewParent;
+    QSharedPointer<BoundingBox> mChildBox;
+    QSharedPointer<BoxesGroup> mOldParent;
+    QSharedPointer<BoxesGroup> mNewParent;
 };
 
 class SetPivotRelPosUndoRedo : public UndoRedo
 {
 public:
     SetPivotRelPosUndoRedo(BoundingBox *target,
-                           QPointF prevRelPos, QPointF newRelPos,
-                           bool prevPivotChanged, bool newPivotChanged) :
+                           const QPointF &prevRelPos,
+                           const QPointF &newRelPos,
+                           const bool &prevPivotChanged,
+                           const bool &newPivotChanged) :
         UndoRedo("SetPivotRelPosUndoRedo") {
-        mTarget = target;
+        mTarget = target->ref<BoundingBox>();
         mPrevRelPos = prevRelPos;
         mNewRelPos = newRelPos;
         mPrevPivotChanged = prevPivotChanged;
@@ -573,7 +588,7 @@ public:
     }
 
 private:
-    BoundingBox *mTarget;
+    QSharedPointer<BoundingBox> mTarget;
     QPointF mPrevRelPos;
     QPointF mNewRelPos;
     bool mPrevPivotChanged;
@@ -584,9 +599,10 @@ class  SetBoxVisibleUndoRedo : public UndoRedo
 {
 public:
      SetBoxVisibleUndoRedo(BoundingBox *target,
-                           bool visibleBefore, bool visibleAfter) :
+                           const bool &visibleBefore,
+                           const bool &visibleAfter) :
          UndoRedo("SetBoxVisibleUndoRedo") {
-         mTarget = target;
+         mTarget = target->ref<BoundingBox>();
          mVisibleAfter = visibleAfter;
          mVisibleBefore = visibleBefore;
      }
@@ -605,18 +621,19 @@ public:
 private:
      bool mVisibleBefore;
      bool mVisibleAfter;
-     BoundingBox *mTarget;
+     QSharedPointer<BoundingBox> mTarget;
 };
 
 class ChangeQrealAnimatorValue : public UndoRedo
 {
 public:
-    ChangeQrealAnimatorValue(qreal oldValue, qreal newValue,
+    ChangeQrealAnimatorValue(const qreal &oldValue,
+                             const qreal &newValue,
                              QrealAnimator *animator) :
         UndoRedo("ChangeQrealAnimatorValue") {
         mOldValue = oldValue;
         mNewValue = newValue;
-        mAnimator = animator;
+        mAnimator = animator->ref<QrealAnimator>();
     }
 
     ~ChangeQrealAnimatorValue() {
@@ -633,17 +650,19 @@ public:
 private:
     qreal mOldValue;
     qreal mNewValue;
-    QrealAnimator *mAnimator;
+    QSharedPointer<QrealAnimator> mAnimator;
 };
 
 class ChangeQrealKeyValueUndoRedo : public UndoRedo
 {
 public:
-    ChangeQrealKeyValueUndoRedo(qreal oldValue, qreal newValue, QrealKey *key) :
+    ChangeQrealKeyValueUndoRedo(const qreal &oldValue,
+                                const qreal &newValue,
+                                QrealKey *key) :
         UndoRedo("ChangeQrealKeyValueUndoRedo") {
         mOldValue = oldValue;
         mNewValue = newValue;
-        mTargetKey = key;
+        mTargetKey = key->ref<QrealKey>();
     }
 
     ~ChangeQrealKeyValueUndoRedo() {
@@ -651,57 +670,61 @@ public:
 
     void redo() {
         ((QrealAnimator*)mTargetKey->getParentAnimator())->
-                qra_saveValueToKey(mTargetKey, mNewValue, false);
+                qra_saveValueToKey(mTargetKey.get(), mNewValue, false);
     }
 
     void undo() {
         ((QrealAnimator*)mTargetKey->getParentAnimator())->
-                qra_saveValueToKey(mTargetKey, mOldValue, false);
+                qra_saveValueToKey(mTargetKey.get(), mOldValue, false);
     }
 
 private:
     qreal mOldValue;
     qreal mNewValue;
-    QrealKey *mTargetKey;
+    std::shared_ptr<QrealKey> mTargetKey;
 };
 
 class ChangeKeyFrameUndoRedo : public UndoRedo
 {
 public:
-    ChangeKeyFrameUndoRedo(int oldFrame, int newFrame, Key *key) :
+    ChangeKeyFrameUndoRedo(const int &oldFrame,
+                           const int &newFrame,
+                           Key *key) :
         UndoRedo("ChangeKeyFrameUndoRedo") {
         mOldFrame = oldFrame;
         mNewFrame = newFrame;
-        mTargetKey = key;
+        mTargetKey = key->ref<Key>();
     }
 
     ~ChangeKeyFrameUndoRedo() {
     }
 
     void redo() {
-        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey, mNewFrame);
+        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey.get(),
+                                                             mNewFrame);
     }
 
     void undo() {
-        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey, mOldFrame);
+        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey.get(),
+                                                             mOldFrame);
     }
 
 private:
     int mOldFrame;
     int mNewFrame;
-    Key *mTargetKey;
+    std::shared_ptr<Key> mTargetKey;
 };
 
 class AnimatorRecordingSetUndoRedo : public UndoRedo
 {
 public:
-    AnimatorRecordingSetUndoRedo(bool recordingOld,
-                                 bool recordingNew,
+    AnimatorRecordingSetUndoRedo(const bool &recordingOld,
+                                 const bool &recordingNew,
                                  Animator *animator) :
     UndoRedo("QrealAnimatorRecordingSetUndoRedo") {
         mRecordingOld = recordingOld;
         mRecordingNew = recordingNew;
-        mAnimator = animator;
+        mAnimator = animator->ref<Animator>();
     }
 
     ~AnimatorRecordingSetUndoRedo() {
@@ -718,7 +741,7 @@ public:
 private:
     bool mRecordingOld;
     bool mRecordingNew;
-    Animator *mAnimator;
+    QSharedPointer<Animator> mAnimator;
 };
 
 class AddKeyToAnimatorUndoRedo : public UndoRedo
@@ -726,24 +749,24 @@ class AddKeyToAnimatorUndoRedo : public UndoRedo
 public:
     AddKeyToAnimatorUndoRedo(Key *key, Animator *animator) :
         UndoRedo("AddQrealKeyToAnimatorUndoRedo") {
-        mKey = key;
-        mAnimator = animator;
+        mKey = key->ref<Key>();
+        mAnimator = animator->ref<Animator>();
     }
 
     ~AddKeyToAnimatorUndoRedo() {
     }
 
     void redo() {
-        mAnimator->anim_appendKey(mKey, false);
+        mAnimator->anim_appendKey(mKey.get(), false);
     }
 
     void undo() {
-        mAnimator->anim_removeKey(mKey, false);
+        mAnimator->anim_removeKey(mKey.get(), false);
     }
 
 private:
-    Key *mKey;
-    Animator *mAnimator;
+    std::shared_ptr<Key> mKey;
+    QSharedPointer<Animator> mAnimator;
 };
 
 class RemoveKeyFromAnimatorUndoRedo :
@@ -774,7 +797,7 @@ public:
         UndoRedo("PaintTypeChangeUndoRedo") {
         mOldType = oldType;
         mNewType = newType;
-        mTarget = target;
+        mTarget = target->ref<PaintSettings>();
     }
 
     ~PaintTypeChangeUndoRedo() {
@@ -791,7 +814,7 @@ public:
 private:
     PaintType mOldType;
     PaintType mNewType;
-    PaintSettings *mTarget;
+    QSharedPointer<PaintSettings> mTarget;
 };
 
 class GradientChangeUndoRedo : public UndoRedo {
@@ -800,26 +823,26 @@ public:
                            Gradient *newGradient,
                            PaintSettings *target) :
         UndoRedo("GradientChangeUndoRedo") {
-        mTarget = target;
-        mOldGradient = oldGradient;
-        mNewGradient = newGradient;
+        mTarget = target->ref<PaintSettings>();
+        mOldGradient = oldGradient->ref<Gradient>();
+        mNewGradient = newGradient->ref<Gradient>();
     }
 
     ~GradientChangeUndoRedo() {
     }
 
     void redo() {
-        mTarget->setGradient(mNewGradient, false);
+        mTarget->setGradient(mNewGradient.data(), false);
     }
 
     void undo() {
-        mTarget->setGradient(mOldGradient, false);
+        mTarget->setGradient(mOldGradient.data(), false);
     }
 
 private:
-    Gradient *mOldGradient;
-    Gradient *mNewGradient;
-    PaintSettings *mTarget;
+    QSharedPointer<Gradient> mOldGradient;
+    QSharedPointer<Gradient> mNewGradient;
+    QSharedPointer<PaintSettings> mTarget;
 };
 
 
@@ -828,24 +851,24 @@ public:
     GradientColorAddedToListUndoRedo(Gradient *target,
                                      ColorAnimator *color) :
         UndoRedo("GradientColorAddedToListUndoRedo") {
-        mGradient = target;
-        mColor = color;
+        mGradient = target->ref<Gradient>();
+        mColor = color->ref<ColorAnimator>();
     }
 
     ~GradientColorAddedToListUndoRedo() {
     }
 
     void undo() {
-        mGradient->removeColor(mColor, false);
+        mGradient->removeColor(mColor.data(), false);
     }
 
     void redo() {
-        mGradient->addColorToList(mColor, false);
+        mGradient->addColorToList(mColor.data(), false);
     }
 
 private:
-    ColorAnimator *mColor;
-    Gradient *mGradient;
+    QSharedPointer<ColorAnimator> mColor;
+    QSharedPointer<Gradient> mGradient;
 };
 
 class GradientColorRemovedFromListUndoRedo :
@@ -869,10 +892,10 @@ public:
 class GradientSwapColorsUndoRedo : public UndoRedo {
 public:
     GradientSwapColorsUndoRedo(Gradient *target,
-                               const int id1,
-                               const int id2) :
+                               const int &id1,
+                               const int &id2) :
         UndoRedo("GradientSwapColorsUndoRedo") {
-        mGradient = target;
+        mGradient = target->ref<Gradient>();
         mId1 = id1;
         mId2 = id2;
     }
@@ -891,7 +914,7 @@ public:
 private:
     int mId1;
     int mId2;
-    Gradient *mGradient;
+    QSharedPointer<Gradient> mGradient;
 };
 
 class AddSinglePathAnimatorUndoRedo : public UndoRedo {
@@ -899,8 +922,8 @@ public:
     AddSinglePathAnimatorUndoRedo(PathAnimator *target,
                                   SinglePathAnimator *path) :
         UndoRedo("AddSinglePathAnimatorUndoRedo") {
-        mTarget = target;
-        mPath = path;
+        mTarget = target->ref<PathAnimator>();
+        mPath = path->ref<SinglePathAnimator>();
     }
 
     ~AddSinglePathAnimatorUndoRedo() {
@@ -908,15 +931,15 @@ public:
     }
 
     void undo() {
-        mTarget->removeSinglePathAnimator(mPath, false);
+        mTarget->removeSinglePathAnimator(mPath.data(), false);
     }
 
     void redo() {
-        mTarget->addSinglePathAnimator(mPath, false);
+        mTarget->addSinglePathAnimator(mPath.data(), false);
     }
 private:
-    PathAnimator *mTarget;
-    SinglePathAnimator *mPath;
+    QSharedPointer<PathAnimator> mTarget;
+    QSharedPointer<SinglePathAnimator> mPath;
 };
 
 class RemoveSinglePathAnimatorUndoRedo :
@@ -943,30 +966,31 @@ public:
                                PathPoint *oldPoint,
                                PathPoint *newPoint) :
         UndoRedo("ChangeSinglePathFirstPoint") {
-        mTarget = target;
-        mOldPoint = oldPoint;
-        mNewPoint = newPoint;
+        mTarget = target->ref<SinglePathAnimator>();
+        if(oldPoint != NULL) {
+            mOldPoint = oldPoint->ref<PathPoint>();
+        }
+        if(newPoint != NULL) {
+            mNewPoint = newPoint->ref<PathPoint>();
+        }
     }
 
     ~ChangeSinglePathFirstPoint() {
-        if(mNewPoint != NULL) {
-        }
-        if(mOldPoint != NULL) {
-        }
+
     }
 
     void undo() {
-        mTarget->replaceSeparatePathPoint(mOldPoint, false);
+        mTarget->replaceSeparatePathPoint(mOldPoint.data(), false);
     }
 
     void redo() {
-        mTarget->replaceSeparatePathPoint(mNewPoint, false);
+        mTarget->replaceSeparatePathPoint(mNewPoint.data(), false);
     }
 
 private:
-    SinglePathAnimator *mTarget;
-    PathPoint *mOldPoint;
-    PathPoint *mNewPoint;
+    QSharedPointer<SinglePathAnimator> mTarget;
+    QSharedPointer<PathPoint> mOldPoint;
+    QSharedPointer<PathPoint> mNewPoint;
 };
 
 class ReversePointsDirectionUndoRedo :
@@ -974,7 +998,7 @@ class ReversePointsDirectionUndoRedo :
 public:
     ReversePointsDirectionUndoRedo(PathPoint *target) :
         UndoRedo("ReversePointsDirectionUndoRedo") {
-        mTarget = target;
+        mTarget = target->ref<PathPoint>();
     }
 
     ~ReversePointsDirectionUndoRedo() {
@@ -988,7 +1012,7 @@ public:
         mTarget->reversePointsDirection();
     }
 private:
-    PathPoint *mTarget;
+    QSharedPointer<PathPoint> mTarget;
 };
 
 #endif // UNDOREDO_H

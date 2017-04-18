@@ -207,7 +207,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mFrameRangeScrollbar->raise();
 
     addNewBoxesListKeysViewWidget(0);
-    addNewBoxesListKeysViewWidget(1);
+    //addNewBoxesListKeysViewWidget(1);
     //addNewBoxesListKeysViewWidget(0);
 }
 

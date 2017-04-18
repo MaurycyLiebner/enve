@@ -531,19 +531,19 @@ void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
 }
 
 void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
-    const QSharedPointer<BoundingBox> &box = mChildBoxes.at(id);
+    BoundingBox *box = mChildBoxes.at(id).data();
     box->clearAllCache();
     if(box->isSelected()) {
         box->removeFromSelection();
     }
     if(saveUndoRedo) {
         addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
-                                                   box.data()) );
+                                                   box) );
     }
     mChildBoxes.removeAt(id);
     updateRelBoundingRect();
     if(box->isGroup()) {
-        BoxesGroup *group = (BoxesGroup*) box.data();
+        BoxesGroup *group = (BoxesGroup*) box;
         if(group->isCurrentGroup()) {
             mMainWindow->getCanvasWidget()->getCurrentCanvas()->
                     setCurrentBoxesGroup(group->getParent());
@@ -553,7 +553,7 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
 
     scheduleEffectsMarginUpdate();
 
-    SWT_removeChildAbstractionForTargetFromAll(box.data());
+    SWT_removeChildAbstractionForTargetFromAll(box);
 }
 
 int BoxesGroup::getChildBoxIndex(BoundingBox *child) {

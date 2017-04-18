@@ -331,7 +331,7 @@ public:
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &);
+                             const bool &parentMainTarget);
 
     bool SWT_visibleOnlyIfParentDescendant() {
         return false;
