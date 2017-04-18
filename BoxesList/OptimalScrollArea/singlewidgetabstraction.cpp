@@ -19,6 +19,14 @@ SingleWidgetAbstraction::~SingleWidgetAbstraction() {
 //    }
 }
 
+void SingleWidgetAbstraction::deleteWithDescendantAbstraction() {
+    foreach(SingleWidgetAbstraction *abs, mChildren) {
+        abs->deleteWithDescendantAbstraction();
+    }
+
+    delete this;
+}
+
 bool SingleWidgetAbstraction::getAbstractions(
         const int &minY, const int &maxY,
         int *currY, int currX,

@@ -80,6 +80,7 @@ public:
 
     void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
                                          const int &id);
+    void deleteWithDescendantAbstraction();
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
 

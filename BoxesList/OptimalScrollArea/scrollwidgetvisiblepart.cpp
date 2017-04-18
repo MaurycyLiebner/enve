@@ -17,6 +17,9 @@ ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(
 
 ScrollWidgetVisiblePart::~ScrollWidgetVisiblePart() {
     removeInstance(this);
+    if(mMainAbstraction != NULL) {
+        mMainAbstraction->deleteWithDescendantAbstraction();
+    }
 }
 
 void ScrollWidgetVisiblePart::setVisibleTop(
