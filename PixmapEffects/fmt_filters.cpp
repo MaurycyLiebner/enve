@@ -955,14 +955,14 @@ void despeckle(const image &im)
 }
 
 void anim_fast_blur(const image &im, double fRadius) {
-    if(fRadius < 0.) return;
+    if(fRadius < 0.01) return;
     unsigned char *pix = im.data;
     int w = im.w;
     int h = im.h;
 
     double divF = fRadius + fRadius + 1.;
     double divFInv = 1./divF;
-    int iRadius = ceil(fRadius + 0.001);
+    int iRadius = ceil(fRadius);
     int nPoints = iRadius + iRadius + 1;
     double fracInf = 1. - iRadius + fRadius;
     double fracInfInv = 1. - fracInf;
@@ -988,9 +988,17 @@ void anim_fast_blur(const image &im, double fRadius) {
     yw=yi=0;
 
     for (y=0;y<h;y++){
-        rsum=gsum=bsum=asum=0.;
+        p = yi * 4;
+        rLine[0] = pix[p];
+        rsum = pix[p]*fracInf;
+        gLine[0] = pix[p + 1];
+        gsum = pix[p + 1]*fracInf;
+        bLine[0] = pix[p + 2];
+        bsum = pix[p + 2]*fracInf;
+        aLine[0] = pix[p + 3];
+        asum = pix[p + 3]*fracInf;
 
-        for(i=-iRadius;i<=iRadius;i++){
+        for(i = 1 - iRadius; i < iRadius ; i++){
             p = (yi + min(wm, max(i,0))) * 4;
             rLine[i + iRadius] = pix[p];
             rsum += pix[p];
@@ -1001,6 +1009,16 @@ void anim_fast_blur(const image &im, double fRadius) {
             aLine[i + iRadius] = pix[p + 3];
             asum += pix[p + 3];
         }
+
+        p = (yi + min(wm, iRadius)) * 4;
+        rLine[iRadius + iRadius] = pix[p];
+        rsum += pix[p]*fracInf;
+        gLine[iRadius + iRadius] = pix[p + 1];
+        gsum += pix[p + 1]*fracInf;
+        bLine[iRadius + iRadius] = pix[p + 2];
+        bsum += pix[p + 2]*fracInf;
+        aLine[iRadius + iRadius] = pix[p + 3];
+        asum += pix[p + 3]*fracInf;
 
         for (x = 0; x < w; x++){
 
@@ -1053,10 +1071,20 @@ void anim_fast_blur(const image &im, double fRadius) {
     }
 
     for (x=0;x<w;x++){
-        rsum=gsum=bsum=asum=0.;
         yp=-iRadius*w;
 
-        for(i=-iRadius;i<=iRadius;i++){
+        yi=max(0,yp)+x;
+        rLine[0] = r[yi];
+        rsum = r[yi]*fracInf;
+        gLine[0] = g[yi];
+        gsum = g[yi]*fracInf;
+        bLine[0] = b[yi];
+        bsum = b[yi]*fracInf;
+        aLine[0] = a[yi];
+        asum = a[yi]*fracInf;
+        yp+=w;
+
+        for(i = 1 - iRadius; i < iRadius ; i++){
             yi=max(0,yp)+x;
             rLine[i + iRadius] = r[yi];
             rsum += r[yi];
@@ -1069,12 +1097,31 @@ void anim_fast_blur(const image &im, double fRadius) {
             yp+=w;
         }
 
+        yi=max(0,yp)+x;
+        rLine[iRadius + iRadius] = r[yi];
+        rsum += r[yi]*fracInf;
+        gLine[iRadius + iRadius] = g[yi];
+        gsum += g[yi]*fracInf;
+        bLine[iRadius + iRadius] = b[yi];
+        bsum += b[yi]*fracInf;
+        aLine[iRadius + iRadius] = a[yi];
+        asum += a[yi]*fracInf;
+        yp+=w;
+
+
         yi=x;
         for (y=0;y<h;y++){
-            pix[yi*4]		= (unsigned char)(rsum*divFInv);
-            pix[yi*4 + 1]	= (unsigned char)(gsum*divFInv);
-            pix[yi*4 + 2]	= (unsigned char)(bsum*divFInv);
-            pix[yi*4 + 3]	= (unsigned char)(asum*divFInv);
+            unsigned char aVal = min(255, max(0, (int)(asum*divFInv)));
+            pix[yi*4]		= min(aVal,
+                                  (unsigned char)min(255,
+                                      max(0, (int)(rsum*divFInv))));
+            pix[yi*4 + 1]	= min(aVal,
+                                  (unsigned char)min(255,
+                                      max(0, (int)(gsum*divFInv))));
+            pix[yi*4 + 2]	= min(aVal,
+                                  (unsigned char)min(255,
+                                      max(0, (int)(bsum*divFInv))));
+            pix[yi*4 + 3]	= aVal;
             if(x==0) {
                 vMIN[y]=min(y+iRadius+1,hm)*w;
                 vMAX[y]=max(y-iRadius,0)*w;
