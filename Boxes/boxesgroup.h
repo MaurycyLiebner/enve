@@ -165,6 +165,7 @@ public:
     void afterUpdate();
     void updateAfterCombinedTransformationChanged();
     void updateCombinedTransformTmp();
+    void updateAfterCombinedTransformationChangedAfterFrameChagne();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

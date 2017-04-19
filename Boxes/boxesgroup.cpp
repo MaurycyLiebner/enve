@@ -302,7 +302,8 @@ void BoxesGroup::processUpdate() {
 }
 
 void BoxesGroup::afterUpdate() {
-    foreach(const QSharedPointer<BoundingBox> &child, mUpdateChildrenAwaitingUpdate) {
+    foreach(const QSharedPointer<BoundingBox> &child,
+            mUpdateChildrenAwaitingUpdate) {
         child->afterUpdate();
     }
     mUpdateChildrenAwaitingUpdate.clear();
@@ -503,14 +504,14 @@ void BoxesGroup::addChild(BoundingBox *child) {
 void BoxesGroup::addChildToListAt(int index,
                                   BoundingBox *child,
                                   bool saveUndoRedo) {
-    child->setParent(this);
+    if(saveUndoRedo) {
+        child->setParent(this);
+        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
+    }
     child->setNoCache(mType != TYPE_CANVAS);
     mChildBoxes.insert(index, child->ref<BoundingBox>());
     updateRelBoundingRect();
     updateChildrenId(index, saveUndoRedo);
-    if(saveUndoRedo) {
-        addUndoRedo(new AddChildToListUndoRedo(this, index, child));
-    }
 
     scheduleEffectsMarginUpdate();
     if(!mPivotChanged) scheduleCenterPivot();
@@ -654,6 +655,12 @@ void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
 void BoxesGroup::updateAfterCombinedTransformationChanged() {
     foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateCombinedTransform();
+    }
+}
+
+void BoxesGroup::updateAfterCombinedTransformationChangedAfterFrameChagne() {
+    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        child->updateCombinedTransformAfterFrameChange();
     }
 }
 

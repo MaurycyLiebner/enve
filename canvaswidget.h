@@ -83,6 +83,7 @@ public:
     void createSoundForPath(const QString &path);
     void loadCanvasesFromSql();
     void saveCanvasesFromSql(QSqlQuery *query);
+    void updateHoveredElements();
 protected:
     QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;

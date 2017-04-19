@@ -132,6 +132,8 @@ public:
     QPointF getAbsolutePos();
 
     virtual void updateCombinedTransform();
+    void updateCombinedTransformAfterFrameChange();
+
     void moveByRel(QPointF trans);
 
     void startTransform();
@@ -364,7 +366,8 @@ public:
     void drawHoveredPath(QPainter *p, const QPainterPath &path) {
         p->save();
         p->setTransform(QTransform(mCombinedTransformMatrix), true);
-        QPen pen = QPen(Qt::red, 1.);
+        QPen pen = QPen(Qt::white, 1.);
+        p->setCompositionMode(QPainter::CompositionMode_Difference);
         pen.setCosmetic(true);
         p->setPen(pen);
         p->setBrush(Qt::NoBrush);
@@ -461,6 +464,7 @@ protected:
     bool mAwaitUpdateScheduled = false;
 
     virtual void updateAfterCombinedTransformationChanged() {}
+    virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
 
     CacheBoundingBoxRenderContainer *getRenderContainerAtFrame(
                                     const int &frame);

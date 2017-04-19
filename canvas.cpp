@@ -15,7 +15,9 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWidget *canvasWidget,
                int canvasWidth, int canvasHeight,
                const int &frameCount) :
-    BoxesGroup(fillStrokeSettings) {    
+    BoxesGroup(fillStrokeSettings) {
+    mBackgroundColor->qra_setCurrentValue(Color(75, 75, 75));
+    ca_addChildAnimator(mBackgroundColor.data());
     mSoundComposition = new SoundComposition(this);
     ca_addChildAnimator(mSoundComposition->getSoundsAnimatorContainer());
 
@@ -204,6 +206,32 @@ void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
     }
 }
 
+void Canvas::updateHoveredBox() {
+    mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
+}
+
+void Canvas::updateHoveredPoint() {
+    mHoveredPoint = getPointAt(mCurrentMouseEventPosRel,
+                               mCurrentMode);
+}
+
+void Canvas::updateHoveredEdge() {
+    mHoveredEdge = getEdgeAt(mCurrentMouseEventPosRel);
+    if(mHoveredEdge != NULL) {
+        mHoveredEdge->generatePainterPath();
+    }
+}
+
+void Canvas::updateHoveredElements() {
+    updateHoveredPoint();
+    if(mCurrentMode == MOVE_POINT) {
+        updateHoveredEdge();
+    } else {
+        clearHoveredEdge();
+    }
+    updateHoveredBox();
+}
+
 void Canvas::paintEvent(QPainter *p) {
     p->setRenderHint(QPainter::Antialiasing);
     p->setRenderHint(QPainter::SmoothPixmapTransform);
@@ -234,7 +262,7 @@ void Canvas::paintEvent(QPainter *p) {
                     mCanvasWidget->width() + 1,
                     mCanvasWidget->height() + 1,
                     QColor(75, 75, 75));
-        p->fillRect(viewRect, Qt::white);
+        p->fillRect(viewRect, mBackgroundColor->getCurrentColor().qcol);
 
         p->setTransform(QTransform(mCombinedTransformMatrix), true);
         foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
@@ -360,7 +388,7 @@ void Canvas::updateRenderRect() {
 void Canvas::renderCurrentFrameToPreview() {
     QImage *image = new QImage(mRenderRect.size().toSize(),
                                QImage::Format_ARGB32_Premultiplied);
-    image->fill(Qt::transparent);
+    image->fill(mBackgroundColor->getCurrentColor().qcol);
     renderCurrentFrameToQImage(image);
     mPreviewFrames << image;
     mCurrentPreviewImg = image;
@@ -834,7 +862,8 @@ void Canvas::updateAfterFrameChanged(int currentFrame) {
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
-    mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
+    prp_setAbsFrame(currentFrame);
+    //mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
 }
 
 void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,

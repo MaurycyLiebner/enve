@@ -704,6 +704,7 @@ void MainWindow::callUpdateSchedulers()
 
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mUpdateSchedulers.clear();
+    mCanvasWidget->updateHoveredElements();
     mCanvasWidget->updatePivotIfNeeded();
     mCanvasWidget->repaint();
     mObjectSettingsWidget->repaint();

@@ -376,7 +376,7 @@ void RenderCacheHandler::addRangeNeedingUpdate(const int &min,
     int currId = mRenderCacheRange.indexOf(first) + 1;
     while(currId < mRenderCacheRange.count()) {
         RenderCacheRange *nextRange = mRenderCacheRange.at(currId);
-        if(nextRange->getMinRelFrame() > max) return;
+        if(nextRange->getMinRelFrame() >= max) return;
         addRangeNeedingUpdate(nextRange);
         currId++;
     }

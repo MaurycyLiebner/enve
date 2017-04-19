@@ -75,11 +75,12 @@ public:
     //void loadPathFromQPainterPath(const QPainterPath &path);
     void changeAllPointsParentPathTo(SinglePathAnimator *path);
     void updatePathPointIds();
+    int getChildPointIndex(PathPoint *child);
 private:
     PathAnimator *mParentPathAnimator = NULL;
     QPainterPath mPath;
     PathPoint *mFirstPoint = NULL;
-    QList<PathPoint*> mPoints;
+    QList<QSharedPointer<PathPoint> > mPoints;
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
                                               qreal *pressedT,
                                               PathPoint **prevPoint,

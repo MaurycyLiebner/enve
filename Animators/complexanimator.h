@@ -71,6 +71,7 @@ public:
     }
 
     void prp_setParentFrameShift(const int &shift);
+    int getChildPropertyIndex(Property *child);
 public slots:
     virtual void ca_addDescendantsKey(Key *key);
     virtual void ca_removeDescendantsKey(Key *key);
@@ -79,7 +80,7 @@ protected:
     ComplexKey *ca_getKeyCollectionAtAbsFrame(int frame);
     ComplexKey *ca_getKeyCollectionAtRelFrame(int frame);
     bool ca_mChildAnimatorRecording = false;
-    QList<Property*> ca_mChildAnimators;
+    QList<QSharedPointer<Property> > ca_mChildAnimators;
 };
 
 class ComplexKey : public Key

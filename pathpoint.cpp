@@ -22,7 +22,7 @@ PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
     //PathPointUpdater *updater = new PathPointUpdater(vectorPath);
     //setPosAnimatorUpdater(updater);
 
-    mPathPointAnimators.setAllVars(this,
+    mPathPointAnimators->setAllVars(this,
                                    mEndCtrlPt,
                                    mStartCtrlPt);
 
@@ -487,7 +487,7 @@ void PathPoint::updateAfterFrameChanged(int frame)
 }
 
 void PathPoint::setPointId(int idT) {
-    mPathPointAnimators.prp_setName("point " + QString::number(idT) );
+    mPathPointAnimators->prp_setName("point " + QString::number(idT) );
     mPointId = idT;
 }
 
@@ -529,7 +529,7 @@ CtrlsMode PathPoint::getCurrentCtrlsMode()
 }
 
 PathPointAnimators *PathPoint::getPathPointAnimatorsPtr() {
-    return &mPathPointAnimators;
+    return mPathPointAnimators.data();
 }
 
 bool PathPoint::isEndCtrlPtEnabled()

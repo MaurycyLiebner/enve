@@ -163,10 +163,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 }
 
 void Canvas::clearHoveredEdge() {
-    if(mHoveredEdge != NULL) {
-        delete mHoveredEdge;
-        mHoveredEdge = NULL;
-    }
+    if(mHoveredEdge == NULL) return;
+    delete mHoveredEdge;
+    mHoveredEdge = NULL;
 }
 
 #include "Boxes/particlebox.h"
@@ -680,8 +679,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
        !(event->buttons() & Qt::LeftButton) &&
        !mIsMouseGrabbing) {
         MovablePoint *lastHoveredPoint = mHoveredPoint;
-        mHoveredPoint = getPointAt(mCurrentMouseEventPosRel,
-                                   mCurrentMode);
+        updateHoveredPoint();
 
         if(mRotPivot->isVisible() && mHoveredPoint == NULL) {
             if(mRotPivot->isPointAtAbsPos(mCurrentMouseEventPosRel) ) {
@@ -690,18 +688,12 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         }
 
         BoundingBox *lastHoveredBox = mHoveredBox;
-        mHoveredBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
+        updateHoveredBox();
 
         Edge *lastEdge = mHoveredEdge;
-        if(mHoveredEdge != NULL) {
-            delete mHoveredEdge;
-            mHoveredEdge = NULL;
-        }
+        clearHoveredEdge();
         if(mCurrentMode == MOVE_POINT) {
-            mHoveredEdge = getEdgeAt(mCurrentMouseEventPosRel);
-            if(mHoveredEdge != NULL) {
-                mHoveredEdge->generatePainterPath();
-            }
+            updateHoveredEdge();
         }
 
         if(mHoveredPoint != lastHoveredPoint ||

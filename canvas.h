@@ -314,7 +314,15 @@ public:
         }
     }
     void createSoundForPath(const QString &path);
+
+    void updateHoveredBox();
+    void updateHoveredPoint();
+    void updateHoveredEdge();
+    void updateHoveredElements();
 private:
+    QSharedPointer<ColorAnimator> mBackgroundColor =
+            (new ColorAnimator())->ref<ColorAnimator>();
+
     void scheduleUpdate() {}
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);

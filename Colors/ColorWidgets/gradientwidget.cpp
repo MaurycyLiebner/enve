@@ -16,11 +16,8 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
 //    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
 }
 
-GradientWidget::~GradientWidget()
-{
-    foreach(Gradient *gradient, mGradients) {
-        delete gradient;
-    }
+GradientWidget::~GradientWidget() {
+    mGradients.clear();
 }
 
 void GradientWidget::setCurrentColorId(int id) {
@@ -32,7 +29,7 @@ void GradientWidget::setCurrentColorId(int id) {
 }
 
 void GradientWidget::addGradientToList(Gradient *gradient) {
-    mGradients << gradient;
+    mGradients << gradient->ref<Gradient>();
 }
 
 void GradientWidget::newGradient(Color color1, Color color2) {
@@ -44,10 +41,10 @@ void GradientWidget::newGradient(Color color1, Color color2) {
 
 void GradientWidget::newGradient(int fromGradientId)
 {
-    Gradient *fromGradient = mGradients.at(fromGradientId);
+    Gradient *fromGradient = mGradients.at(fromGradientId).data();
     Gradient *newGradient = (Gradient*)fromGradient->prp_makeDuplicate();
     addGradientToList(newGradient);
-    setCurrentGradient(mGradients.last());
+    setCurrentGradient(mGradients.last().data());
     repaint();
 }
 
@@ -60,8 +57,18 @@ void GradientWidget::clearAll() {
     repaint();
 }
 
+int GradientWidget::getGradientIndex(Gradient *child) {
+    int index = -1;
+    for(int i = 0; i < mGradients.count(); i++) {
+        if(mGradients.at(i) == child) {
+            index = i;
+        }
+    }
+    return index;
+}
+
 void GradientWidget::removeGradientFromList(Gradient *toRemove) {
-    mGradients.removeOne(toRemove);
+    mGradients.removeAt(getGradientIndex(toRemove));
     if(mCurrentGradient == toRemove) {
         setCurrentGradient((Gradient*) NULL);
     }
@@ -69,7 +76,7 @@ void GradientWidget::removeGradientFromList(Gradient *toRemove) {
 
 void GradientWidget::removeGradient(int gradientId)
 {
-    Gradient *toRemove = mGradients.at(gradientId);
+    Gradient *toRemove = mGradients.at(gradientId).data();
     if(toRemove->affectsPaths()) {
         return;
     }
@@ -80,13 +87,13 @@ void GradientWidget::removeGradient(int gradientId)
 }
 
 void GradientWidget::saveGradientsToQuery(QSqlQuery *query) {
-    foreach(Gradient *gradient, mGradients) {
+    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
         gradient->prp_saveToSql(query);
     }
 }
 
 void GradientWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
-    foreach(Gradient *gradient, mGradients) {
+    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
         gradient->saveToSqlIfPathSelected(query);
     }
 }
@@ -165,7 +172,7 @@ void GradientWidget::resetColorIdIfEquals(Gradient *gradient, const int &id) {
 void GradientWidget::setCurrentGradient(int listId)
 {
     if(listId >= mGradients.length()) return;
-    setCurrentGradient(mGradients.at(listId));
+    setCurrentGradient(mGradients.at(listId).data());
 }
 
 void GradientWidget::mousePressEvent(QMouseEvent *event)
@@ -315,24 +322,26 @@ void GradientWidget::drawBorder(GLfloat xt, GLfloat yt, GLfloat wt, GLfloat ht) 
 }
 
 void GradientWidget::drawGradient(int id, GLfloat height, GLfloat cY, bool border) {
-    Gradient *gradient = mGradients.at(id);
+    Gradient *gradient = mGradients.at(id).data();
 
-    int len = gradient->getColorCount();
-    Color nextColor = gradient->getCurrentColorAt(0);
-    GLfloat cX = 0.f;
-    GLfloat segWidth = width()/(GLfloat)(len - 1);
+    if(!gradient->isEmpty()) {
+        int len = gradient->getColorCount();
+        Color nextColor = gradient->getCurrentColorAt(0);
+        GLfloat cX = 0.f;
+        GLfloat segWidth = width()/(GLfloat)(len - 1);
 
-    for(int i = 0; i < len - 1; i++) {
-        Color color = nextColor;
-        nextColor = gradient->getCurrentColorAt(i + 1);
+        for(int i = 0; i < len - 1; i++) {
+            Color color = nextColor;
+            nextColor = gradient->getCurrentColorAt(i + 1);
 
-        drawRect(cX, cY, segWidth, height,
-                 color.gl_r, color.gl_g, color.gl_b, color.gl_a,
-                 nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
-                 nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
-                 color.gl_r, color.gl_g, color.gl_b, color.gl_a,
-                 false, false, false, false);
-        cX += segWidth;
+            drawRect(cX, cY, segWidth, height,
+                     color.gl_r, color.gl_g, color.gl_b, color.gl_a,
+                     nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
+                     nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
+                     color.gl_r, color.gl_g, color.gl_b, color.gl_a,
+                     false, false, false, false);
+            cX += segWidth;
+        }
     }
     if(gradient == mCurrentGradient && border) {
         drawBorder(0.f, cY, width(), height);
@@ -383,7 +392,7 @@ void GradientWidget::paintGL()
         nextColor = mCurrentGradient->getCurrentColorAt(i + 1);
         cX += segWidth;
     }
-    drawGradient(mGradients.indexOf(mCurrentGradient),
+    drawGradient(getGradientIndex(mCurrentGradient),
                  quorterHeight, halfHeight + quorterHeight, false);
 }
 

@@ -36,6 +36,7 @@ public:
     void addGradientToList(Gradient *gradient);
     void removeGradientFromList(Gradient *toRemove);
     void startSelectedColorTransform();
+    int getGradientIndex(Gradient *child);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);
@@ -45,7 +46,7 @@ public slots:
     void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
 private:
     MainWindow *mMainWindow;
-    QList<Gradient*> mGradients;
+    QList<QSharedPointer<Gradient> > mGradients;
     Gradient *mCurrentGradient = NULL;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;

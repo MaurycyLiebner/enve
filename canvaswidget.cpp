@@ -712,6 +712,11 @@ int CanvasWidget::getFrameCount() {
     return mCurrentCanvas->getFrameCount();
 }
 
+void CanvasWidget::updateHoveredElements() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->updateHoveredElements();
+}
+
 const int BufferSize = 32768;
 
 void CanvasWidget::initializeAudio()

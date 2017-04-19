@@ -214,7 +214,8 @@ public:
 private:
 
     int mPointId;
-    PathPointAnimators mPathPointAnimators;
+    QSharedPointer<PathPointAnimators> mPathPointAnimators =
+            (new PathPointAnimators())->ref<PathPointAnimators>();
 
     SinglePathAnimator *mParentPath;
     CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_CORNER;

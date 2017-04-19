@@ -13,7 +13,9 @@ class UndoRedo
 {
 public:
     UndoRedo(QString name);
-    virtual ~UndoRedo() {}
+    virtual ~UndoRedo() {
+        qDebug() << "DELETE " << mName;
+    }
     virtual void undo() {}
     virtual void redo() {}
     void printName() { qDebug() << mName; }
@@ -824,8 +826,12 @@ public:
                            PaintSettings *target) :
         UndoRedo("GradientChangeUndoRedo") {
         mTarget = target->ref<PaintSettings>();
-        mOldGradient = oldGradient->ref<Gradient>();
-        mNewGradient = newGradient->ref<Gradient>();
+        if(oldGradient != NULL) {
+            mOldGradient = oldGradient->ref<Gradient>();
+        }
+        if(newGradient != NULL) {
+            mNewGradient = newGradient->ref<Gradient>();
+        }
     }
 
     ~GradientChangeUndoRedo() {
@@ -948,6 +954,7 @@ public:
     RemoveSinglePathAnimatorUndoRedo(PathAnimator *target,
                                      SinglePathAnimator *path) :
         AddSinglePathAnimatorUndoRedo(target, path) {
+
     }
 
     void undo() {

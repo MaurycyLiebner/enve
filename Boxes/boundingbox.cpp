@@ -838,7 +838,18 @@ void BoundingBox::updateRelativeTransformTmp() {
 void BoundingBox::updateRelativeTransformAfterFrameChange() {
     mRelativeTransformMatrix =
             mTransformAnimator->getCurrentTransformationMatrix();
-    updateCombinedTransform();
+    updateCombinedTransformAfterFrameChange();
+}
+
+void BoundingBox::updateCombinedTransformAfterFrameChange() {
+    if(mParent == NULL) return;
+    mCombinedTransformMatrix = mRelativeTransformMatrix*
+                               mParent->getCombinedTransform();
+    mRenderCacheHandler.updateCurrentRenderContainerTransform(
+                                mCombinedTransformMatrix);
+
+    updateAfterCombinedTransformationChangedAfterFrameChagne();
+    scheduleSoftUpdate();
 }
 
 void BoundingBox::updateCombinedTransform() {
@@ -849,7 +860,7 @@ void BoundingBox::updateCombinedTransform() {
                                 mCombinedTransformMatrix);
 
     updateAfterCombinedTransformationChanged();
-    //replaceCurrentFrameCache();
+    replaceCurrentFrameCache();
     scheduleSoftUpdate();
 }
 

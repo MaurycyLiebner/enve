@@ -128,13 +128,14 @@ private:
     QSharedPointer<ColorAnimator> mColor =
             (new ColorAnimator())->ref<ColorAnimator>();
     PaintType mPaintType = FLATPAINT;
-    Gradient *mGradient = NULL;
+    QSharedPointer<Gradient> mGradient;
 };
 
 class Gradient : public ComplexAnimator {
     Q_OBJECT
 public:
     Gradient();
+    ~Gradient();
 
     Gradient(Color color1, Color color2);
 
@@ -175,7 +176,8 @@ public:
     int getSqlId();
     void setSqlId(int id);
 
-    void addColorToList(Color color);
+    void addColorToList(const Color &color,
+                        const bool &saveUndoRedo = true);
 
     Color getCurrentColorAt(int id);
 
@@ -195,6 +197,7 @@ public:
     Property *prp_makeDuplicate();
 
     void updateQGradientStopsFinal();
+    bool isEmpty() const;
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:

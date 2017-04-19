@@ -76,7 +76,7 @@ public:
 
     virtual void prp_startTransform();
 
-    virtual void prp_finishTransform();
+    void prp_finishTransform();
 
     void qra_multCurrentValue(qreal mult);
 

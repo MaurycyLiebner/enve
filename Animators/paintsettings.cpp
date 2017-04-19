@@ -138,14 +138,18 @@ Gradient::Gradient() : ComplexAnimator() {
     updateQGradientStops();
 }
 
+Gradient::~Gradient() {
+    qDebug() << "asdsd";
+}
+
 Gradient::Gradient(Color color1, Color color2) :
     ComplexAnimator()
 {
     prp_setUpdater(new GradientUpdater(this));
     prp_blockUpdater();
     prp_setName("gradient");
-    addColorToList(color1);
-    addColorToList(color2);
+    addColorToList(color1, false);
+    addColorToList(color2, false);
     updateQGradientStops();
 }
 
@@ -194,14 +198,19 @@ Gradient::Gradient(int sqlIdT) :
     updateQGradientStops();
 }
 
+bool Gradient::isEmpty() const {
+    return mColors.isEmpty();
+}
+
 void Gradient::prp_startTransform() {
     //savedColors = colors;
 }
 
-void Gradient::addColorToList(Color color) {
+void Gradient::addColorToList(const Color &color,
+                              const bool &saveUndoRedo) {
     ColorAnimator *newColorAnimator = new ColorAnimator();
     newColorAnimator->qra_setCurrentValue(color);
-    addColorToList(newColorAnimator);
+    addColorToList(newColorAnimator, saveUndoRedo);
 }
 
 void Gradient::addColorToList(ColorAnimator *newColorAnimator,
@@ -425,7 +434,7 @@ void PaintSettings::setPaintPathTarget(PathBox *path) {
 void PaintSettings::prp_makeDuplicate(Property *target) {
     PaintSettings *paintSettingsTarget = (PaintSettings*)target;
         paintSettingsTarget->duplicateColorAnimatorFrom(mColor.data());
-        paintSettingsTarget->setGradient(mGradient);
+        paintSettingsTarget->setGradient(mGradient.data());
         paintSettingsTarget->setPaintType(mPaintType);
 }
 
@@ -438,14 +447,18 @@ void PaintSettings::setTargetPathBox(PathBox *target) {
 }
 
 void PaintSettings::setGradientVar(Gradient *grad) {
-    if(mGradient != NULL) {
-        ca_removeChildAnimator(mGradient);
+    if(!mGradient.isNull()) {
+        ca_removeChildAnimator(mGradient.data());
         ca_removeChildAnimator((QrealAnimator*) mGradientPoints);
         mGradient->removePath(mTarget);
     }
-    mGradient = grad;
-    if(mGradient != NULL) {
-        ca_addChildAnimator(mGradient);
+    if(grad == NULL) {
+        mGradient.reset();
+    } else {
+        mGradient = grad->ref<Gradient>();
+    }
+    if(!mGradient.isNull()) {
+        ca_addChildAnimator(mGradient.data());
         ca_addChildAnimator((QrealAnimator*) mGradientPoints);
         mGradient->addPath(mTarget);
     }
@@ -474,7 +487,7 @@ void PaintSettings::prp_loadFromSql(const int &sqlId) {
 int PaintSettings::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     int colorId = mColor->prp_saveToSql(query);
-    QString gradientId = (mGradient == NULL) ? "NULL" :
+    QString gradientId = (mGradient.isNull()) ? "NULL" :
                                                QString::number(
                                                    mGradient->getSqlId());
     query->exec(QString("INSERT INTO paintsettings "
@@ -495,15 +508,15 @@ PaintType PaintSettings::getPaintType() const {
 }
 
 Gradient *PaintSettings::getGradient() const {
-    return mGradient;
+    return mGradient.data();
 }
 
 void PaintSettings::setGradient(Gradient *gradient,
                                 bool saveUndoRedo) {
-    if(gradient == mGradient) return;
+    if(gradient == mGradient.data()) return;
 
     if(saveUndoRedo) {
-        addUndoRedo(new GradientChangeUndoRedo(mGradient, gradient, this));
+        addUndoRedo(new GradientChangeUndoRedo(mGradient.data(), gradient, this));
     }
     setGradientVar(gradient);
 
@@ -527,10 +540,11 @@ void PaintSettings::setPaintType(PaintType paintType, bool saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new PaintTypeChangeUndoRedo(mPaintType, paintType,
                                                 this));
+        if(mPaintType == GRADIENTPAINT) {
+            setGradient(NULL);
+        }
     }
-    if(paintType != GRADIENTPAINT) {
-        setGradientVar(NULL);
-    }
+
     mPaintType = paintType;
     mTarget->updateDrawGradients();
     if(mTarget->isSelected()) {
