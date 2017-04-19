@@ -366,11 +366,15 @@ public:
     void drawHoveredPath(QPainter *p, const QPainterPath &path) {
         p->save();
         p->setTransform(QTransform(mCombinedTransformMatrix), true);
-        QPen pen = QPen(Qt::white, 1.);
-        p->setCompositionMode(QPainter::CompositionMode_Difference);
+        QPen pen = QPen(Qt::black, 2.);
         pen.setCosmetic(true);
         p->setPen(pen);
         p->setBrush(Qt::NoBrush);
+        p->drawPath(path);
+
+        pen = QPen(Qt::red, 1.);
+        pen.setCosmetic(true);
+        p->setPen(pen);
         p->drawPath(path);
         p->restore();
     }

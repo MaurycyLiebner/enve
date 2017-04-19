@@ -414,10 +414,12 @@ void BoxesGroup::ungroup() {
 }
 
 PaintSettings *BoxesGroup::getFillSettings() {
+    if(mChildBoxes.isEmpty()) return NULL;
     return mChildBoxes.first()->getFillSettings();
 }
 
 StrokeSettings *BoxesGroup::getStrokeSettings() {
+    if(mChildBoxes.isEmpty()) return NULL;
     return mChildBoxes.first()->getStrokeSettings();
 }
 
