@@ -119,14 +119,18 @@ void VectorPath::showContextMenu(QPoint globalPos) {
 void VectorPath::drawSelected(QPainter *p,
                               const CanvasMode &currentCanvasMode) {
     if(isVisibleAndInVisibleDurationRect()) {
+        p->save();
+
         drawBoundingRect(p);
         mPathAnimator->drawSelected(p,
                                    currentCanvasMode,
                                    mCombinedTransformMatrix);
-        p->save();
+
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             mFillGradientPoints->drawGradientPoints(p);
             mStrokeGradientPoints->drawGradientPoints(p);
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->draw(p);
         }
         p->restore();
     }
@@ -140,6 +144,11 @@ MovablePoint *VectorPath::getPointAt(const QPointF &absPtPos,
         pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
         if(pointToReturn == NULL) {
             pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
+        }
+    } else if(currentCanvasMode == MOVE_PATH) {
+        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
+        if(pivotMovable->isPointAtAbsPos(absPtPos)) {
+            return pivotMovable;
         }
     }
     if(pointToReturn == NULL) {

@@ -505,7 +505,7 @@ protected:
                             (new EffectAnimators())->ref<EffectAnimators>();
 
     QSharedPointer<TransformAnimator> mTransformAnimator =
-                            (new TransformAnimator())->ref<TransformAnimator>();
+                        (new TransformAnimator(this))->ref<TransformAnimator>();
 
     QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;

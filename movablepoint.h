@@ -98,6 +98,7 @@ public:
         p->drawEllipse(getAbsolutePos(),
                        mRadius, mRadius);
     }
+    QPointF mapAbsoluteToRelative(QPointF absPos) const;
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

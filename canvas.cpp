@@ -271,7 +271,9 @@ void Canvas::paintEvent(QPainter *p) {
         mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
         drawSelected(p, mCurrentMode);
 
-        p->setPen(QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine));
+        QPen pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
+        pen.setCosmetic(true);
+        p->setPen(pen);
         if(mSelecting) {
             p->drawRect(mSelectionRect);
         }

@@ -147,7 +147,8 @@ void QPointFAnimator::qra_multCurrentValue(qreal sx, qreal sy)
 
 QPointF QPointFAnimator::qra_getSavedValue()
 {
-    return QPointF(mXAnimator->qra_getSavedValue(), mYAnimator->qra_getSavedValue() );
+    return QPointF(mXAnimator->qra_getSavedValue(),
+                   mYAnimator->qra_getSavedValue() );
 }
 
 qreal QPointFAnimator::getSavedXValue()

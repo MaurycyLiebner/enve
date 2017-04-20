@@ -1,9 +1,12 @@
 #include "Animators/transformanimator.h"
 #include "undoredo.h"
 #include <QDebug>
+#include "boxpathpoint.h"
 
-TransformAnimator::TransformAnimator() : ComplexAnimator()
+TransformAnimator::TransformAnimator(BoundingBox *parent) : ComplexAnimator()
 {
+    mPivotAnimator = (new BoxPathPoint(parent))->ref<MovablePoint>();
+
     prp_setName("transformation");
     mScaleAnimator->prp_setName("scale");
     mScaleAnimator->qra_setCurrentValue(QPointF(1., 1.));
@@ -26,6 +29,10 @@ TransformAnimator::TransformAnimator() : ComplexAnimator()
     ca_addChildAnimator(mScaleAnimator.data());
     ca_addChildAnimator(mPivotAnimator.data());
     ca_addChildAnimator(mOpacityAnimator.data());
+}
+
+MovablePoint *TransformAnimator::getPivotMovablePoint() {
+    return mPivotAnimator.data();
 }
 
 #include <QSqlError>

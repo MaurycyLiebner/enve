@@ -278,7 +278,7 @@ protected:
     bool isMovingPath();
     bool handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event);
     void handleRightButtonMousePress(QMouseEvent *event);
-    void handleLeftButtonMousePress(QMouseEvent *event);
+    void handleLeftButtonMousePress();
 signals:
 private slots:
     void nextPreviewFrame();
@@ -410,6 +410,7 @@ private:
     void handleMovePathMouseMove();
     void handleAddPointMouseMove();
     void handleMovePathMousePressEvent();
+    void handleMovePointMousePressEvent();
     void handleAddPointMouseRelease();
 
     QList<QImage*> mPreviewFrames;

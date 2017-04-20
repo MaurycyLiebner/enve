@@ -2,11 +2,12 @@
 #define TRANSFORMANIMATOR_H
 #include "Animators/complexanimator.h"
 #include "Animators/qpointfanimator.h"
+#include "movablepoint.h"
 
 class TransformAnimator : public ComplexAnimator
 {
 public:
-    TransformAnimator();
+    TransformAnimator(BoundingBox *parent);
 
     void resetScale(bool finish = false);
     void resetTranslation(bool finish = false);
@@ -74,9 +75,9 @@ public:
                    QPointF absPos);
     void moveByAbs(const QMatrix &combinedTrans,
                    const QPointF &absTrans);
+    MovablePoint *getPivotMovablePoint();
 private:
-    QSharedPointer<QPointFAnimator> mPivotAnimator =
-            (new QPointFAnimator)->ref<QPointFAnimator>();
+    QSharedPointer<MovablePoint> mPivotAnimator;
     QSharedPointer<QPointFAnimator> mPosAnimator =
             (new QPointFAnimator)->ref<QPointFAnimator>();
     QSharedPointer<QPointFAnimator> mScaleAnimator =

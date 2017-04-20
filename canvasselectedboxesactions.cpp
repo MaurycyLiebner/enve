@@ -426,7 +426,8 @@ void Canvas::deselectAllBoxes() {
 MovablePoint *Canvas::getPointAt(const QPointF &absPos,
                                  const CanvasMode &currentMode) {
     if(currentMode == MOVE_POINT ||
-       currentMode == ADD_POINT) {
+       currentMode == ADD_POINT ||
+       currentMode == MOVE_PATH) {
         MovablePoint *pointAtPos = NULL;
         foreach(BoundingBox *box, mSelectedBoxes) {
             pointAtPos = box->getPointAt(absPos, currentMode);

@@ -168,8 +168,42 @@ void Canvas::clearHoveredEdge() {
     mHoveredEdge = NULL;
 }
 
+void Canvas::handleMovePointMousePressEvent() {
+    if (mLastPressedPoint == NULL) {
+        if(isCtrlPressed() ) {
+            clearPointsSelection();
+            mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel,
+                                                     isShiftPressed());
+
+        } else {
+            mCurrentEdge = getEdgeAt(mLastPressPosRel);
+            if(mCurrentEdge == NULL) {
+                mSelecting = true;
+                startSelectionAtPoint(mLastMouseEventPosRel);
+            } else {
+                clearPointsSelection();
+                clearCurrentEndPoint();
+                clearLastPressedPoint();
+            }
+        }
+        clearHoveredEdge();
+    } else {
+        if(mLastPressedPoint->isSelected()) {
+            return;
+        }
+        if(!isShiftPressed() &&
+                !(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible()) ) {
+            clearPointsSelection();
+        }
+        if(mLastPressedPoint->isCtrlPoint() &&
+           !BoxesGroup::getCtrlsAlwaysVisible() ) {
+            addPointToSelection(mLastPressedPoint);
+        }
+    }
+}
+
 #include "Boxes/particlebox.h"
-void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
+void Canvas::handleLeftButtonMousePress() {
     if(mIsMouseGrabbing) {
         //handleMouseRelease(event->pos());
         //releaseMouseAndDontTrack();
@@ -183,15 +217,18 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
     mFirstMouseMove = true;
 
     mLastPressPosRel = mLastMouseEventPosRel;
+    mLastPressedPoint = getPointAt(mLastMouseEventPosRel, mCurrentMode);
 
     if(mRotPivot->handleMousePress(mLastMouseEventPosRel)) {
     } else if(isMovingPath()) {
-        handleMovePathMousePressEvent();
+        if(mHoveredPoint == NULL) {
+            handleMovePathMousePressEvent();
+        } else {
+            handleMovePointMousePressEvent();
+        }
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
         mLastPressedBox = getPathAtFromAllAncestors(mLastPressPosRel);
     } else {
-        mLastPressedPoint = getPointAt(mLastMouseEventPosRel, mCurrentMode);
-
         if(mCurrentMode == CanvasMode::ADD_POINT) {
             if(mCurrentEndPoint != NULL) {
                 if(mCurrentEndPoint->isHidden()) {
@@ -239,37 +276,7 @@ void Canvas::handleLeftButtonMousePress(QMouseEvent *event) {
             } // pats is not null
         } // point adding mode
         else if (mCurrentMode == CanvasMode::MOVE_POINT) {
-            if (mLastPressedPoint == NULL) {
-                if(isCtrlPressed() ) {
-                    clearPointsSelection();
-                    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel,
-                                                             isShiftPressed());
-
-                } else {
-                    mCurrentEdge = getEdgeAt(mLastPressPosRel);
-                    if(mCurrentEdge == NULL) {
-                        mSelecting = true;
-                        startSelectionAtPoint(mLastMouseEventPosRel);
-                    } else {
-                        clearPointsSelection();
-                        clearCurrentEndPoint();
-                        clearLastPressedPoint();
-                    }
-                }
-                clearHoveredEdge();
-            } else {
-                if(mLastPressedPoint->isSelected()) {
-                    return;
-                }
-                if(!isShiftPressed() &&
-                        !(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible()) ) {
-                    clearPointsSelection();
-                }
-                if(mLastPressedPoint->isCtrlPoint() &&
-                   !BoxesGroup::getCtrlsAlwaysVisible() ) {
-                    addPointToSelection(mLastPressedPoint);
-                }
-            }
+            handleMovePointMousePressEvent();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
 
             Circle *newPath = new Circle(mCurrentBoxesGroup);
@@ -354,7 +361,7 @@ void Canvas::mousePressEvent(QMouseEvent *event)
             handleRightButtonMousePress(event);
         }
     } else {
-        handleLeftButtonMousePress(event);
+        handleLeftButtonMousePress();
     }
 
     callUpdateSchedulers();
@@ -503,7 +510,11 @@ void Canvas::handleMouseRelease() {
                 mCanvasWidget->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
             }
         } else if(isMovingPath()) {
-            handleMovePathMouseRelease();
+            if(mLastPressedPoint == NULL) {
+                handleMovePathMouseRelease();
+            } else {
+                handleMovePathMouseRelease();
+            }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseRelease();
         } else if(mCurrentMode == PICK_PATH_SETTINGS) {
@@ -665,7 +676,11 @@ void Canvas::updateTransformation() {
     } else if(mCurrentMode == CanvasMode::MOVE_POINT) {
         handleMovePointMouseMove();
     } else if(isMovingPath()) {
-        handleMovePathMouseMove();
+        if(mLastPressedPoint == NULL) {
+            handleMovePathMouseMove();
+        } else {
+            handleMovePointMouseMove();
+        }
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
         handleAddPointMouseMove();
     }
@@ -718,7 +733,11 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
                   mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseMove();
         } else if(isMovingPath()) {
-            handleMovePathMouseMove();
+            if(mLastPressedPoint == NULL) {
+                handleMovePathMouseMove();
+            } else {
+                handleMovePointMouseMove();
+            }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseMove();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
