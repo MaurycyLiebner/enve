@@ -7,6 +7,9 @@ class BoxPathPoint : public MovablePoint
 {
 public:
     BoxPathPoint(BoundingBox *box);
+
+    void startTransform();
+    void moveByAbs(QPointF absTranslatione);
 private:
     QPointF mSavedAbsPos;
 };

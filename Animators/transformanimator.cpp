@@ -220,8 +220,7 @@ void TransformAnimator::setPivotWithoutChangingTransformation(qreal x, qreal y)
 
 void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, bool finish)
 {
-    if(!mPivotAnimator->prp_isRecording() && !mPosAnimator->prp_isRecording() &&
-       !mRotAnimator->prp_isRecording() && !mScaleAnimator->prp_isRecording()) {
+    if(!mPosAnimator->prp_isDescendantRecording()) {
         QMatrix currentMatrix;
         qreal pivotX = mPivotAnimator->getXValue();
         qreal pivotY = mPivotAnimator->getYValue();
@@ -244,11 +243,39 @@ void TransformAnimator::setPivotWithoutChangingTransformation(QPointF point, boo
                            mScaleAnimator->getYValue() );
 
         futureMatrix.translate(-point.x(),
-                                -point.y());
+                               -point.y());
 
 
         mPosAnimator->qra_incAllValues(currentMatrix.dx() - futureMatrix.dx(),
-                                  currentMatrix.dy() - futureMatrix.dy());
+                                       currentMatrix.dy() - futureMatrix.dy());
+    } else {
+        QMatrix currentMatrix;
+        qreal pivotX = mPivotAnimator->getXValue();
+        qreal pivotY = mPivotAnimator->getYValue();
+        currentMatrix.translate(pivotX + mPosAnimator->getXValue(),
+                         pivotY + mPosAnimator->getYValue());
+
+        currentMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+        currentMatrix.scale(mScaleAnimator->getXValue(),
+                            mScaleAnimator->getYValue() );
+
+        currentMatrix.translate(-pivotX,
+                                -pivotY);
+
+        QMatrix futureMatrix;
+        futureMatrix.translate(point.x() + mPosAnimator->getXValue(),
+                               point.y() + mPosAnimator->getYValue());
+
+        futureMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+        futureMatrix.scale(mScaleAnimator->getXValue(),
+                           mScaleAnimator->getYValue() );
+
+        futureMatrix.translate(-point.x(),
+                               -point.y());
+
+
+        point += QPointF(currentMatrix.dx() - futureMatrix.dx(),
+                         currentMatrix.dy() - futureMatrix.dy());
     }
 //    if(!mPivotAnimator->isRecording()) {
 //        mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
