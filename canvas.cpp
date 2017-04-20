@@ -552,7 +552,8 @@ void Canvas::updatePivot() {
                                       false);
         }
     } else if(mCurrentMode == MOVE_PATH) {
-        if(isSelectionEmpty() ) {
+        if(isSelectionEmpty() ||
+           mLocalPivot) {
             mRotPivot->hide();
         } else {
             mRotPivot->show();

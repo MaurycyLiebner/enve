@@ -213,10 +213,10 @@ Edge *Canvas::getEdgeAt(QPointF absPos) {
     return NULL;
 }
 
-void Canvas::rotateSelectedBy(qreal rotBy, QPointF absOrigin,
-                                  bool startTrans)
-{
-    if(mSelectedBoxes.count() == 1) {
+void Canvas::rotateSelectedBy(const qreal &rotBy,
+                              const QPointF &absOrigin,
+                              const bool &startTrans) {
+    if(mSelectedBoxes.count() == 1 || mLocalPivot) {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
                 box->startRotTransform();
@@ -253,7 +253,7 @@ void Canvas::scaleSelectedBy(qreal scaleBy,
 void Canvas::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
                                  QPointF absOrigin,
                                  bool startTrans) {
-    if(mSelectedBoxes.count() == 1) {
+    if(mSelectedBoxes.count() == 1 || mLocalPivot) {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
                 box->startScaleTransform();

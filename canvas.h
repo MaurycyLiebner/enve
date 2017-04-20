@@ -131,7 +131,9 @@ public:
     void applyDesaturateEffectToSelected();
     void applyAlphaMatteToSelected();
 
-    void rotateSelectedBy(qreal rotBy, QPointF absOrigin, bool startTrans);
+    void rotateSelectedBy(const qreal &rotBy,
+                          const QPointF &absOrigin,
+                          const bool &startTrans);
 
     QPointF getSelectedBoxesAbsPivotPos();
     bool isSelectionEmpty();
@@ -319,6 +321,16 @@ public:
     void updateHoveredPoint();
     void updateHoveredEdge();
     void updateHoveredElements();
+
+    void setLocalPivot(const bool &localPivot) {
+        mLocalPivot = localPivot;
+        updatePivot();
+    }
+
+    const bool &getPivotLocal() {
+        return mLocalPivot;
+    }
+
 private:
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();
@@ -338,6 +350,7 @@ private:
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;
 
+    bool mLocalPivot = false;
     bool mIsCurrentCanvas = true;
     int mFrameCount = 0;
 

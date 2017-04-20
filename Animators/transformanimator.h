@@ -27,8 +27,9 @@ public:
     qreal getYScale();
     qreal getXScale();
 
-    void setPivotWithoutChangingTransformation(qreal x, qreal y);
-    void setPivotWithoutChangingTransformation(QPointF point, bool finish = false);
+    void setPivotWithoutChangingTransformation(const qreal &x, const qreal &y);
+    void setPivotWithoutChangingTransformation(QPointF point,
+                                               const bool &finish = false);
     QPointF getPivot();
 
     qreal dx();

@@ -84,6 +84,10 @@ public:
     void loadCanvasesFromSql();
     void saveCanvasesFromSql(QSqlQuery *query);
     void updateHoveredElements();
+
+    void switchLocalPivot();
+    bool getLocalPivot();
+    void setLocalPivot(const bool &bT);
 protected:
     QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;

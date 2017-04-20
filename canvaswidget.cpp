@@ -717,10 +717,23 @@ void CanvasWidget::updateHoveredElements() {
     mCurrentCanvas->updateHoveredElements();
 }
 
+void CanvasWidget::switchLocalPivot() {
+    setLocalPivot(!mCurrentCanvas->getPivotLocal());
+}
+
+bool CanvasWidget::getLocalPivot() {
+    if(hasNoCanvas()) return false;
+    return mCurrentCanvas->getPivotLocal();
+}
+
+void CanvasWidget::setLocalPivot(const bool &bT) {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->setLocalPivot(bT);
+}
+
 const int BufferSize = 32768;
 
-void CanvasWidget::initializeAudio()
-{
+void CanvasWidget::initializeAudio() {
     mAudioBuffer = QByteArray(BufferSize, 0);
     connect(mPreviewFPSTimer, SIGNAL(timeout()),
             this, SLOT(pushTimerExpired()));

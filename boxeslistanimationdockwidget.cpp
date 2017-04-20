@@ -166,6 +166,14 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mCtrlsAlwaysVisible, SIGNAL(toggled(bool)),
             this, SLOT(setCtrlsAlwaysVisible(bool)) );
 
+    mLocalPivot = new ActionButton(
+                ":/icons/globalPivot.png",
+                "", this);
+
+    mLocalPivot->setCheckable(":/icons/localPivot.png");
+    connect(mLocalPivot, SIGNAL(toggled(bool)),
+            this, SLOT(setLocalPivot(bool)) );
+
     mControlButtonsLayout = new QHBoxLayout();
     mControlButtonsLayout->setSpacing(0);
     mControlButtonsLayout->setMargin(0);
@@ -186,6 +194,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mCtrlsAlwaysVisible);
     mCtrlsAlwaysVisible->setFocusPolicy(Qt::NoFocus);
+    mControlButtonsLayout->addWidget(mLocalPivot);
+    mLocalPivot->setFocusPolicy(Qt::NoFocus);
 
     mMainLayout->addLayout(mControlButtonsLayout,
                            Qt::AlignTop);
@@ -325,6 +335,11 @@ void BoxesListAnimationDockWidget::setGraphEnabled(bool graphEnabled)
 void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
         bool ctrlsAlwaysVisible) {
     BoxesGroup::setCtrlsAlwaysVisible(ctrlsAlwaysVisible);
+    mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {
+    mMainWindow->getCanvasWidget()->setLocalPivot(bT);
     mMainWindow->callUpdateSchedulers();
 }
 
