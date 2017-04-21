@@ -613,6 +613,14 @@ void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
     schedulePivotUpdate();
 }
 
+void BoundingBox::startPivotTransform() {
+    mTransformAnimator->pivotTransformStarted();
+}
+
+void BoundingBox::finishPivotTransform() {
+    mTransformAnimator->pivotTransformFinished();
+}
+
 void BoundingBox::setPivotAbsPos(QPointF absPos,
                                  bool saveUndoRedo, bool pivotChanged) {
     QPointF newPos = mapAbsPosToRel(absPos);

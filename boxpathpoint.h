@@ -9,6 +9,7 @@ public:
     BoxPathPoint(BoundingBox *box);
 
     void startTransform();
+    void finishTransform();
     void moveByAbs(QPointF absTranslatione);
 private:
     QPointF mSavedAbsPos;

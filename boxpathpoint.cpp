@@ -9,6 +9,12 @@ BoxPathPoint::BoxPathPoint(BoundingBox *box) :
 void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();
     mSavedAbsPos = mapRelativeToAbsolute(mSavedRelPos);
+    mParent->startPivotTransform();
+}
+
+void BoxPathPoint::finishTransform() {
+    MovablePoint::finishTransform();
+    mParent->finishPivotTransform();
 }
 
 void BoxPathPoint::moveByAbs(QPointF absTranslatione) {

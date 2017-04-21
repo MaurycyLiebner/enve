@@ -213,9 +213,16 @@ qreal TransformAnimator::getXScale()
     return mScaleAnimator->getXValue();
 }
 
-void TransformAnimator::setPivotWithoutChangingTransformation(
-                                      const qreal &x, const qreal &y) {
-    setPivotWithoutChangingTransformation(QPointF(x, y) );
+void TransformAnimator::pivotTransformStarted() {
+    if(!mPosAnimator->prp_isDescendantRecording()) {
+        mPosAnimator->prp_startTransform();
+    }
+}
+
+void TransformAnimator::pivotTransformFinished() {
+    if(!mPosAnimator->prp_isDescendantRecording()) {
+        mPosAnimator->prp_finishTransform();
+    }
 }
 
 void TransformAnimator::setPivotWithoutChangingTransformation(

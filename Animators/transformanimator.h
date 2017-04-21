@@ -27,7 +27,6 @@ public:
     qreal getYScale();
     qreal getXScale();
 
-    void setPivotWithoutChangingTransformation(const qreal &x, const qreal &y);
     void setPivotWithoutChangingTransformation(QPointF point,
                                                const bool &finish = false);
     QPointF getPivot();
@@ -77,6 +76,8 @@ public:
     void moveByAbs(const QMatrix &combinedTrans,
                    const QPointF &absTrans);
     MovablePoint *getPivotMovablePoint();
+    void pivotTransformStarted();
+    void pivotTransformFinished();
 private:
     QSharedPointer<MovablePoint> mPivotAnimator;
     QSharedPointer<QPointFAnimator> mPosAnimator =

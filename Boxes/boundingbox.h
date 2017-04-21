@@ -445,6 +445,8 @@ public:
 
     void applyRenderCacheChanges();
     void scheduleRenderCacheChange();
+    void startPivotTransform();
+    void finishPivotTransform();
 protected:
     virtual void scheduleUpdate();
 

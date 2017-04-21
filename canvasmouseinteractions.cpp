@@ -513,7 +513,8 @@ void Canvas::handleMouseRelease() {
             if(mLastPressedPoint == NULL) {
                 handleMovePathMouseRelease();
             } else {
-                handleMovePathMouseRelease();
+                handleMovePointMouseRelease();
+                clearPointsSelection();
             }
         } else if(mCurrentMode == CanvasMode::ADD_POINT) {
             handleAddPointMouseRelease();
