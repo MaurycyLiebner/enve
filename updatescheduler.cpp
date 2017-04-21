@@ -24,7 +24,8 @@ PathUpdateScheduler::PathUpdateScheduler(PathBox *path) {
 }
 
 void PathUpdateScheduler::update() {
-    mPath->updatePath();
+    mPath->updatePathIfNeeded();
+    mPath->updateOutlinePathIfNeeded();
 }
 
 ApplyRenderCacheChangesScheduler::ApplyRenderCacheChangesScheduler(

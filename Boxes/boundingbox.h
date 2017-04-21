@@ -280,7 +280,7 @@ public:
     void updateRelativeTransformTmp();
 
     virtual void updateAllUglyPixmap();
-    QPointF mapAbsPosToRel(QPointF absPos);
+    virtual QPointF mapAbsPosToRel(QPointF absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
     void setAwaitUpdateScheduled(bool bT);

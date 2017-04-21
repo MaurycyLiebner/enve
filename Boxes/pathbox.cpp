@@ -95,11 +95,10 @@ void PathBox::prp_loadFromSql(const int &boundingBoxId) {
 void PathBox::updatePathIfNeeded() {
     if(mPathUpdateNeeded) {
         updatePath();
-        mUpdatePath = mPath;
-        mUpdateOutlinePath = mOutlinePath;
         if(!prp_hasKeys() &&
            !mPivotChanged ) centerPivotPosition();
         mPathUpdateNeeded = false;
+        mOutlinePathUpdateNeeded = false;
     }
 }
 
@@ -216,6 +215,7 @@ void PathBox::scheduleOutlinePathUpdate() {
     if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
         return;
     }
+    addUpdateScheduler(new PathUpdateScheduler(this));
 
     mOutlinePathUpdateNeeded = true;
 }
@@ -223,7 +223,6 @@ void PathBox::scheduleOutlinePathUpdate() {
 void PathBox::updateOutlinePathIfNeeded() {
     if(mOutlinePathUpdateNeeded) {
         updateOutlinePath();
-        mUpdateOutlinePath = mOutlinePath;
         mOutlinePathUpdateNeeded = false;
     }
 }
@@ -335,6 +334,8 @@ void PathBox::setUpdateVars() {
     }
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
+    mUpdatePath = mPath;
+    mUpdateOutlinePath = mOutlinePath;
     BoundingBox::setUpdateVars();
 }
 

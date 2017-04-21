@@ -259,6 +259,9 @@ public:
 
     QMatrix getCombinedTransform() const { return QMatrix(); }
     QMatrix getRelativeTransform() const { return QMatrix(); }
+    QPointF mapAbsPosToRel(QPointF absPos) {
+        return absPos;
+    }
 
     void setIsCurrentCanvas(const bool &bT);
 
