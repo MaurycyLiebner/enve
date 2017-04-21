@@ -86,7 +86,7 @@ public:
     virtual void applyTransform(QMatrix transform);
     void moveToRel(QPointF relPos);
     void scaleRelativeToSavedPivot(qreal sx, qreal sy);
-    void rotateRelativeToSavedPivot(qreal rot);
+    virtual void rotateRelativeToSavedPivot(const qreal &rot);
     void removeAnimations();
 
     void makeDuplicate(MovablePoint *targetPoint);

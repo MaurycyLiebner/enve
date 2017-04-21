@@ -55,7 +55,6 @@ void PathPivot::finishTransform()
         return;
     }
     mTransformStarted = false;
-    mCanvas->setPivotPositionForSelected();
 }
 
 void PathPivot::setRelativePos(QPointF relPos, bool saveUndoRedo)

@@ -181,22 +181,19 @@ void Canvas::setSelectedStrokeWidth(qreal strokeWidth, bool finish) {
     }
 }
 
-void Canvas::startSelectedStrokeWidthTransform()
-{
+void Canvas::startSelectedStrokeWidthTransform() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->startSelectedStrokeWidthTransform();
     }
 }
 
-void Canvas::startSelectedStrokeColorTransform()
-{
+void Canvas::startSelectedStrokeColorTransform() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->startSelectedStrokeColorTransform();
     }
 }
 
-void Canvas::startSelectedFillColorTransform()
-{
+void Canvas::startSelectedFillColorTransform() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->startSelectedFillColorTransform();
     }
@@ -216,7 +213,7 @@ Edge *Canvas::getEdgeAt(QPointF absPos) {
 void Canvas::rotateSelectedBy(const qreal &rotBy,
                               const QPointF &absOrigin,
                               const bool &startTrans) {
-    if(mSelectedBoxes.count() == 1 || mLocalPivot) {
+    if(mLocalPivot || !mGlobalPivotVisible) {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
                 box->startRotTransform();
@@ -253,7 +250,7 @@ void Canvas::scaleSelectedBy(qreal scaleBy,
 void Canvas::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
                                  QPointF absOrigin,
                                  bool startTrans) {
-    if(mSelectedBoxes.count() == 1 || mLocalPivot) {
+    if(mLocalPivot || !mGlobalPivotVisible) {
         if(startTrans) {
             foreach(BoundingBox *box, mSelectedBoxes) {
                 box->startScaleTransform();
@@ -282,8 +279,7 @@ void Canvas::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
     }
 }
 
-QPointF Canvas::getSelectedBoxesAbsPivotPos()
-{
+QPointF Canvas::getSelectedBoxesAbsPivotPos() {
     if(mSelectedBoxes.isEmpty()) return QPointF(0., 0.);
     QPointF posSum = QPointF(0., 0.);
     int count = mSelectedBoxes.length();
@@ -293,20 +289,11 @@ QPointF Canvas::getSelectedBoxesAbsPivotPos()
     return posSum/count;
 }
 
-bool Canvas::isSelectionEmpty()
-{
+bool Canvas::isSelectionEmpty() {
     return mSelectedBoxes.isEmpty();
 }
 
-void Canvas::setSelectedPivotAbsPos(QPointF absPos)
-{
-    if(mSelectedBoxes.count() == 1) {
-        mSelectedBoxes.first()->setPivotAbsPos(absPos);
-    }
-}
-
-void Canvas::ungroupSelected()
-{
+void Canvas::ungroupSelected() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->isGroup()) {
             ((BoxesGroup*) box)->ungroup();
@@ -320,8 +307,7 @@ void Canvas::centerPivotForSelected() {
     }
 }
 
-void Canvas::removeSelectedBoxesAndClearList()
-{
+void Canvas::removeSelectedBoxesAndClearList() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         //box->deselect();
         box->removeFromParent();

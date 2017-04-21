@@ -285,17 +285,7 @@ void TransformAnimator::setPivotWithoutChangingTransformation(
         mPosAnimator->qra_incAllValues(currentMatrix.dx() - futureMatrix.dx(),
                                        currentMatrix.dy() - futureMatrix.dy());
     }
-//    if(!mPivotAnimator->isRecording()) {
-//        mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
-//                                  currentMatrix.dy() - futureMatrix.dy());
-//    } else {
-//    mPosAnimator->incCurrentValue(currentMatrix.dx() - futureMatrix.dx(),
-//                                 currentMatrix.dy() - futureMatrix.dy());
-//    }
-
     mPivotAnimator->qra_setCurrentValue(point, finish);
-
-    //callUpdater();
 }
 
 void TransformAnimator::setPivot(QPointF point, bool finish) {

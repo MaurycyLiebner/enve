@@ -17,6 +17,7 @@ public:
 
     bool isHidden();
     void setIsStartCtrlPt(const bool &bT);
+    void cancelTransform();
 private:
     bool mIsStartCtrlPt;
     PathPoint *mParentPoint;

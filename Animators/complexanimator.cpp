@@ -246,8 +246,7 @@ bool ComplexAnimator::prp_isDescendantRecording() {
     return ca_mChildAnimatorRecording;
 }
 
-QString ComplexAnimator::prp_getValueText()
-{
+QString ComplexAnimator::prp_getValueText() {
     return "";
 }
 

@@ -11,6 +11,7 @@ public:
     void startTransform();
     void finishTransform();
     void moveByAbs(QPointF absTranslatione);
+    void draw(QPainter *p);
 private:
     QPointF mSavedAbsPos;
 };

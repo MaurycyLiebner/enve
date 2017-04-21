@@ -192,7 +192,8 @@ void Canvas::handleMovePointMousePressEvent() {
             return;
         }
         if(!isShiftPressed() &&
-                !(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible()) ) {
+           !(mLastPressedPoint->isCtrlPoint() &&
+           !BoxesGroup::getCtrlsAlwaysVisible())) {
             clearPointsSelection();
         }
         if(mLastPressedPoint->isCtrlPoint() &&
@@ -629,10 +630,6 @@ void Canvas::handleMovePointMouseMove() {
         moveSelectedPointsByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel),
                                 mFirstMouseMove);
     }
-}
-
-void Canvas::setPivotPositionForSelected() {
-    setSelectedPivotAbsPos(mRotPivot->getAbsolutePos());
 }
 
 void Canvas::handleMovePathMouseMove() {

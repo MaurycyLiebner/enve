@@ -62,7 +62,6 @@ public:
 
     void schedulePivotUpdate();
     void updatePivotIfNeeded();
-    void setPivotPositionForSelected();
 
     void awaitUpdate() {}
 
@@ -137,7 +136,6 @@ public:
 
     QPointF getSelectedBoxesAbsPivotPos();
     bool isSelectionEmpty();
-    void setSelectedPivotAbsPos(QPointF absPos);
 
     void ungroupSelected();
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
@@ -184,8 +182,13 @@ public:
     void applyCurrentTransformationToSelected();
     QPointF getSelectedPointsAbsPivotPos();
     bool isPointsSelectionEmpty();
-    void scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin, bool startTrans);
-    void rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin, bool startTrans);
+    void scaleSelectedPointsBy(const qreal &scaleXBy,
+                               const qreal &scaleYBy,
+                               const QPointF &absOrigin,
+                               const bool &startTrans);
+    void rotateSelectedPointsBy(const qreal &rotBy,
+                                const QPointF &absOrigin,
+                                const bool &startTrans);
     int getPointsSelectionCount();
 
 
@@ -354,7 +357,7 @@ private:
     bool mIsCurrentCanvas = true;
     int mFrameCount = 0;
 
-    bool mPivotVisibleDuringPointEdit = true;
+    bool mGlobalPivotVisible = true;
     bool mEffectsPaintEnabled;
     qreal mResolutionPercent;
 

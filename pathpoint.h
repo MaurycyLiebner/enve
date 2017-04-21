@@ -211,6 +211,9 @@ public:
     void reversePointsDirectionStartingFromThis(
             const bool &saveUndoRedo = true);
     void reversePointsDirectionReverse();
+
+    void saveTransformPivotAbsPos(QPointF absPivot);
+    void rotateRelativeToSavedPivot(const qreal &rot);
 private:
 
     int mPointId;

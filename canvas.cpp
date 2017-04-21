@@ -539,21 +539,23 @@ void Canvas::startSelectionAtPoint(QPointF pos) {
 void Canvas::updatePivot() {
     if(mCurrentMode == MOVE_POINT) {
         if(isPointsSelectionEmpty() ||
-           !mPivotVisibleDuringPointEdit) {
+           !mGlobalPivotVisible) {
             mRotPivot->hide();
         } else {
             mRotPivot->show();
         }
         if(getPointsSelectionCount() == 1) {
-                    mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos() + QPointF(0., 20.),
-                                              false);
+            mRotPivot->setAbsolutePos(
+                        getSelectedPointsAbsPivotPos() + QPointF(0., 20.),
+                        false);
         } else {
             mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos(),
                                       false);
         }
     } else if(mCurrentMode == MOVE_PATH) {
         if(isSelectionEmpty() ||
-           mLocalPivot) {
+           mLocalPivot ||
+           !mGlobalPivotVisible) {
             mRotPivot->hide();
         } else {
             mRotPivot->show();
@@ -688,8 +690,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
     return true;
 }
 #include "clipboardcontainer.h"
-void Canvas::keyPressEvent(QKeyEvent *event)
-{
+void Canvas::keyPressEvent(QKeyEvent *event) {
     if(mPreviewing) return;
 
     bool isGrabbingMouse = mCanvasWidget->mouseGrabber() == mCanvasWidget;
@@ -790,7 +791,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
                mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
            }
         } else if(event->key() == Qt::Key_P) {
-            mPivotVisibleDuringPointEdit = !mPivotVisibleDuringPointEdit;
+            mGlobalPivotVisible = !mGlobalPivotVisible;
         }
         schedulePivotUpdate();
     }
@@ -798,8 +799,7 @@ void Canvas::keyPressEvent(QKeyEvent *event)
     callUpdateSchedulers();
 }
 
-void Canvas::setCurrentEndPoint(PathPoint *point)
-{
+void Canvas::setCurrentEndPoint(PathPoint *point) {
     if(mCurrentEndPoint != NULL) {
         mCurrentEndPoint->deselect();
     }

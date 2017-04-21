@@ -40,18 +40,22 @@ void CtrlPoint::moveByRel(QPointF relTranslation)
     mParentPoint->ctrlPointPosChanged(mIsStartCtrlPt);
 }
 
-void CtrlPoint::startTransform()
-{
+void CtrlPoint::startTransform() {
     MovablePoint::startTransform();
     mParentPoint->MovablePoint::startTransform();
     mOtherCtrlPt->MovablePoint::startTransform();
 }
 
-void CtrlPoint::finishTransform()
-{
+void CtrlPoint::finishTransform() {
     mParentPoint->MovablePoint::finishTransform();
     MovablePoint::finishTransform();
     mOtherCtrlPt->MovablePoint::finishTransform();
+}
+
+void CtrlPoint::cancelTransform() {
+    mParentPoint->MovablePoint::cancelTransform();
+    MovablePoint::finishTransform();
+    mOtherCtrlPt->MovablePoint::cancelTransform();
 }
 
 void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {

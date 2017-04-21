@@ -241,7 +241,10 @@ void Canvas::clearPointsSelection()
     foreach(MovablePoint *point, mSelectedPoints) {
         point->deselect();
     }
-    mSelectedPoints.clear(); schedulePivotUpdate();
+    mSelectedPoints.clear();
+    if(mCurrentMode == MOVE_POINT) {
+        schedulePivotUpdate();
+    }
 //    if(mLastPressedPoint != NULL) {
 //        mLastPressedPoint->deselect();
 //        mLastPressedPoint = NULL;
@@ -278,36 +281,65 @@ int Canvas::getPointsSelectionCount() {
     return mSelectedPoints.length();
 }
 
-void Canvas::rotateSelectedPointsBy(qreal rotBy, QPointF absOrigin,
-                                        bool startTrans)
-{
+void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
+                                    const QPointF &absOrigin,
+                                    const bool &startTrans) {
     if(mSelectedPoints.isEmpty()) return;
-    if(startTrans) {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-            point->saveTransformPivotAbsPos(absOrigin);
-            point->rotateRelativeToSavedPivot(rotBy);
+    if(mLocalPivot || !mGlobalPivotVisible) {
+        if(startTrans) {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->startTransform();
+                point->saveTransformPivotAbsPos(point->getAbsolutePos());
+                point->rotateRelativeToSavedPivot(rotBy);
+            }
+        } else {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->rotateRelativeToSavedPivot(rotBy);
+            }
         }
     } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->rotateRelativeToSavedPivot(rotBy);
+        if(startTrans) {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->startTransform();
+                point->saveTransformPivotAbsPos(absOrigin);
+                point->rotateRelativeToSavedPivot(rotBy);
+            }
+        } else {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->rotateRelativeToSavedPivot(rotBy);
+            }
         }
     }
 }
 
-void Canvas::scaleSelectedPointsBy(qreal scaleXBy, qreal scaleYBy,
-                                       QPointF absOrigin,
-                                       bool startTrans) {
+void Canvas::scaleSelectedPointsBy(const qreal &scaleXBy,
+                                   const qreal &scaleYBy,
+                                   const QPointF &absOrigin,
+                                   const bool &startTrans) {
     if(mSelectedPoints.isEmpty()) return;
-    if(startTrans) {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-            point->saveTransformPivotAbsPos(absOrigin);
-            point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+    if(mLocalPivot || !mGlobalPivotVisible) {
+        if(startTrans) {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->startTransform();
+                point->saveTransformPivotAbsPos(point->getAbsolutePos());
+                point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy );
+            }
+        } else {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+            }
         }
     } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
-            point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+        if(startTrans) {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->startTransform();
+                point->saveTransformPivotAbsPos(absOrigin);
+                point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+            }
+        } else {
+            foreach(MovablePoint *point, mSelectedPoints) {
+                point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
+            }
         }
     }
 }

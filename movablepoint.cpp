@@ -122,7 +122,7 @@ bool MovablePoint::isContainedInRect(QRectF absRect)
     return absRect.contains(getAbsolutePos());
 }
 
-void MovablePoint::rotateRelativeToSavedPivot(qreal rot) {
+void MovablePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     QMatrix mat;
     mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
     mat.rotate(rot);

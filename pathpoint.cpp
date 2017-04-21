@@ -80,6 +80,26 @@ void PathPoint::startTransform()
     }
 }
 
+void PathPoint::saveTransformPivotAbsPos(QPointF absPivot) {
+    MovablePoint::saveTransformPivotAbsPos(absPivot);
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->saveTransformPivotAbsPos(absPivot);
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->saveTransformPivotAbsPos(absPivot);
+    }
+}
+
+void PathPoint::rotateRelativeToSavedPivot(const qreal &rot) {
+    MovablePoint::rotateRelativeToSavedPivot(rot);
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->rotateRelativeToSavedPivot(rot);
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->rotateRelativeToSavedPivot(rot);
+    }
+}
+
 void PathPoint::cancelTransform()
 {
     MovablePoint::cancelTransform();
