@@ -38,8 +38,7 @@ ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(int frame) {
     return (ComplexKey *) anim_getKeyAtRelFrame(frame);
 }
 
-void ComplexAnimator::ca_addChildAnimator(Property *childAnimator)
-{
+void ComplexAnimator::ca_addChildAnimator(Property *childAnimator) {
     ca_mChildAnimators << childAnimator->ref<Property>();
     childAnimator->prp_setUpdater(prp_mUpdater);
     childAnimator->prp_setParentFrameShift(prp_getFrameShift());

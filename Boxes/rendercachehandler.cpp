@@ -455,7 +455,7 @@ void RenderCacheHandler::divideRenderCacheRangeAtRelFrame(
                                 const int &divideRelFrame,
                                 Key *newKey) {
     RenderCacheRange *oldRange =
-            getRenderCacheRangeContainingRelFrame(divideRelFrame);
+            getRenderCacheRangeContainingRelFrame(divideRelFrame, false);
     divideRenderCacheRange(oldRange, divideRelFrame, newKey);
 }
 
@@ -550,8 +550,8 @@ void RenderCacheHandler::getRenderCacheRangesWithBarrierAtRelFrame(
         RenderCacheRange **prevRange,
         RenderCacheRange **nextRange,
         const int &relFrame) {
-    *prevRange = getRenderCacheRangeContainingRelFrame(relFrame - 1);
-    *nextRange = getRenderCacheRangeContainingRelFrame(relFrame);
+    *prevRange = getRenderCacheRangeContainingRelFrame(relFrame - 1, false);
+    *nextRange = getRenderCacheRangeContainingRelFrame(relFrame, false);
 }
 
 void RenderCacheHandler::removeRangesBarrierAtRelFrame(const int &relFrame) {

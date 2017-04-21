@@ -54,10 +54,10 @@ void AnimationBox::updateAfterFrameChanged(int currentFrame) {
     const int &absMinAnimation =
                 getAnimationDurationRect()->getMinAnimationFrameAsAbsFrame();
     if(timeScale > 0.) {
-        pixId = (mCurrentAbsFrame - absMinAnimation)/timeScale;
+        pixId = (anim_mCurrentAbsFrame - absMinAnimation)/timeScale;
     } else {
         pixId = mFramesCount - 1 +
-                (mCurrentAbsFrame - absMinAnimation)/timeScale;
+                (anim_mCurrentAbsFrame - absMinAnimation)/timeScale;
     }
 
     if(pixId < 0) {

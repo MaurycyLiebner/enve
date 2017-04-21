@@ -401,7 +401,7 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest) {
                                QImage::Format_ARGB32_Premultiplied);
     image->fill(Qt::transparent);
     renderFinalCurrentFrameToQImage(image);
-    image->save(renderDest + QString::number(mCurrentAbsFrame) + ".png");
+    image->save(renderDest + QString::number(anim_mCurrentAbsFrame) + ".png");
     delete image;
 }
 
@@ -861,7 +861,7 @@ void Canvas::moveByRel(QPointF trans) {
 }
 
 void Canvas::updateAfterFrameChanged(int currentFrame) {
-    mCurrentAbsFrame = currentFrame;
+    anim_mCurrentAbsFrame = currentFrame;
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
@@ -973,7 +973,7 @@ void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
 }
 
 int Canvas::getCurrentFrame() {
-    return mCurrentAbsFrame;
+    return anim_mCurrentAbsFrame;
 }
 
 int Canvas::getFrameCount() {

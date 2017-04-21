@@ -541,8 +541,6 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::updateAfterFrameChanged(int currentFrame) {
-    mCurrentAbsFrame = currentFrame;
-    mCurrentRelFrame = mCurrentAbsFrame - prp_getFrameShift();
     prp_setAbsFrame(currentFrame);
 }
 
@@ -983,7 +981,8 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
 }
 
 void BoundingBox::updateAfterDurationRectangleShifted() {
-    updateAfterFrameChanged(mCurrentAbsFrame);
+    prp_setParentFrameShift(prp_mParentFrameShift);
+    updateAfterFrameChanged(anim_mCurrentAbsFrame);
 }
 
 DurationRectangleMovable *BoundingBox::getRectangleMovableAtPos(
@@ -1026,8 +1025,8 @@ QString BoundingBox::getName()
 
 bool BoundingBox::isInVisibleDurationRect() {
     if(mDurationRectangle == NULL) return true;
-    return mCurrentRelFrame < mDurationRectangle->getMaxFrameAsRelFrame() &&
-           mCurrentRelFrame >= mDurationRectangle->getMinFrameAsRelFrame();
+    return anim_mCurrentRelFrame < mDurationRectangle->getMaxFrameAsRelFrame() &&
+           anim_mCurrentRelFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
 bool BoundingBox::isVisibleAndInVisibleDurationRect() {
@@ -1300,7 +1299,7 @@ void BoundingBox::setUpdateVars() {
     updateRelBoundingRect();
 
     mUpdateTransform = mCombinedTransformMatrix;
-    mUpdateRelFrame = mCurrentRelFrame;
+    mUpdateRelFrame = anim_mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
     mUpdateReplaceCache = getRenderContainerAtFrame(mUpdateRelFrame) == NULL ||

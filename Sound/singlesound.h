@@ -44,6 +44,8 @@ public:
     FixedLenAnimationRect *getDurationRect();
 public slots:
     void scheduleFinalDataUpdate();
+private slots:
+    void updateAfterDurationRectangleShifted();
 private:
     bool mFinalDataUpdateNeeded = false;
     bool mOwnDurationRectangle;

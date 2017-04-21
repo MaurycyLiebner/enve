@@ -177,7 +177,13 @@ void SingleSound::setDurationRect(FixedLenAnimationRect *durRect) {
     connect(mDurationRectangle, SIGNAL(rangeChanged()),
             this, SLOT(scheduleFinalDataUpdate()));
     connect(mDurationRectangle, SIGNAL(posChanged(int)),
-            this, SLOT(scheduleFinalDataUpdate()));
+            this, SLOT(updateAfterDurationRectangleShifted()));
+}
+
+void SingleSound::updateAfterDurationRectangleShifted() {
+    prp_setParentFrameShift(prp_mParentFrameShift);
+    prp_setAbsFrame(anim_mCurrentAbsFrame);
+    scheduleFinalDataUpdate();
 }
 
 DurationRectangleMovable *SingleSound::anim_getRectangleMovableAtPos(
