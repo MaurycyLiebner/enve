@@ -34,6 +34,7 @@ void Canvas::disconnectPoints() {
         }
         foreach(PathPoint *point, selectedPathPoints) {
             PathPoint *secondPoint = point->getNextPoint();
+            if(secondPoint == NULL) secondPoint = point->getPreviousPoint();
             if(point->getParentPath() ==
                     secondPoint->getParentPath()) {
                 point->getParentPath()->
