@@ -104,7 +104,6 @@ protected:
     MovablePointType mType;
     bool mHidden = false;
     qreal mRadius;
-    QPointFAnimator mRelPos;
     QPointF mSavedRelPos;
     BoundingBox *mParent = NULL;
     void drawOnAbsPos(QPainter *p, const QPointF &absPos);

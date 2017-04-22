@@ -270,14 +270,17 @@ void CircleRadiusPoint::moveByRel(QPointF relTranslation)
 
 void CircleRadiusPoint::moveByAbs(QPointF absTranslatione) {
     if(mCenterPoint->isSelected() ) return;
-    if(mXBlocked) {
-        absTranslatione.setX(0.);
-    } else {
-        absTranslatione.setY(0.);
-    }
     MovablePoint::moveByAbs(absTranslatione);
     //setCurrentValue(mSavedRelPos);
     //setAbsPosRadius(getAbsolutePos() + absTranslatione);
+}
+
+void CircleRadiusPoint::setRelativePos(QPointF relPos, bool saveUndoRedo) {
+    if(mXBlocked) {
+        mYAnimator->qra_setCurrentValue(relPos.y(), saveUndoRedo);
+    } else {
+        mXAnimator->qra_setCurrentValue(relPos.x(), saveUndoRedo);
+    }
 }
 
 void CircleRadiusPoint::startTransform()

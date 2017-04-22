@@ -44,8 +44,9 @@ void QPointFAnimator::prp_loadFromSql(const int &posAnimatorId) {
     }
 }
 
-QPointF QPointFAnimator::qra_getCurrentValue() const {
-    return QPointF(mXAnimator->qra_getCurrentValue(), mYAnimator->qra_getCurrentValue());
+QPointF QPointFAnimator::getCurrentPointValue() const {
+    return QPointF(mXAnimator->qra_getCurrentValue(),
+                   mYAnimator->qra_getCurrentValue());
 }
 
 QPointF QPointFAnimator::getCurrentPointValueAtFrame(const int &frame) {
@@ -73,24 +74,24 @@ qreal QPointFAnimator::getYValue()
     return mYAnimator->qra_getCurrentValue();
 }
 
-void QPointFAnimator::qra_setCurrentValue(QPointF val, bool finish)
+void QPointFAnimator::setCurrentPointValue(QPointF val, bool finish)
 {
     mXAnimator->qra_setCurrentValue(val.x(), finish);
     mYAnimator->qra_setCurrentValue(val.y(), finish);
 }
 
-void QPointFAnimator::qra_setValueRange(qreal minVal, qreal maxVal) {
+void QPointFAnimator::setValuesRange(qreal minVal, qreal maxVal) {
     mXAnimator->qra_setValueRange(minVal, maxVal);
     mYAnimator->qra_setValueRange(minVal, maxVal);
 }
 
-void QPointFAnimator::qra_incCurrentValue(qreal x, qreal y)
+void QPointFAnimator::incCurrentValues(qreal x, qreal y)
 {
     mXAnimator->qra_incCurrentValue(x);
     mYAnimator->qra_incCurrentValue(y);
 }
 
-void QPointFAnimator::qra_incAllValues(qreal x, qreal y) {
+void QPointFAnimator::incAllValues(qreal x, qreal y) {
     mXAnimator->qra_incAllValues(x);
     mYAnimator->qra_incAllValues(y);
 }
@@ -139,13 +140,13 @@ void QPointFAnimator::multSavedValueToCurrentValue(qreal sx, qreal sy)
     mYAnimator->multSavedValueToCurrentValue(sy);
 }
 
-void QPointFAnimator::qra_multCurrentValue(qreal sx, qreal sy)
+void QPointFAnimator::multCurrentValues(qreal sx, qreal sy)
 {
     mXAnimator->qra_multCurrentValue(sx);
     mYAnimator->qra_multCurrentValue(sy);
 }
 
-QPointF QPointFAnimator::qra_getSavedValue()
+QPointF QPointFAnimator::getSavedPointValue()
 {
     return QPointF(mXAnimator->qra_getSavedValue(),
                    mYAnimator->qra_getSavedValue() );

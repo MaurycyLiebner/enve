@@ -36,6 +36,7 @@ public:
 
     void startTransform();
     void finishTransform();
+    void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
 private:
     MovablePoint *mCenterPoint = NULL;
     bool mXBlocked = false;

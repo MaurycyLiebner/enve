@@ -9,15 +9,15 @@ TransformAnimator::TransformAnimator(BoundingBox *parent) : ComplexAnimator()
 
     prp_setName("transformation");
     mScaleAnimator->prp_setName("scale");
-    mScaleAnimator->qra_setCurrentValue(QPointF(1., 1.));
+    mScaleAnimator->setCurrentPointValue(QPointF(1., 1.));
     mScaleAnimator->setPrefferedValueStep(0.05);
 
     mRotAnimator->prp_setName("rot");
     mRotAnimator->qra_setCurrentValue(0.);
     mPosAnimator->prp_setName("trans");
-    mPosAnimator->qra_setCurrentValue(QPointF(0., 0.) );
+    mPosAnimator->setCurrentPointValue(QPointF(0., 0.) );
     mPivotAnimator->prp_setName("pivot");
-    mPivotAnimator->qra_setCurrentValue(QPointF(0., 0.) );
+    mPivotAnimator->setCurrentPointValue(QPointF(0., 0.) );
     mOpacityAnimator->prp_setName("opacity");
     mOpacityAnimator->qra_setValueRange(0., 100.);
     mOpacityAnimator->setPrefferedValueStep(5.);
@@ -85,9 +85,9 @@ void TransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
 
 void TransformAnimator::copyTransformationTo(
                                         TransformAnimator *targetAnimator) {
-    QPointF currScale = mScaleAnimator->qra_getCurrentValue();
-    QPointF currTrans = mPosAnimator->qra_getCurrentValue();
-    QPointF currPivot = mPivotAnimator->qra_getCurrentValue();
+    QPointF currScale = mScaleAnimator->getCurrentPointValue();
+    QPointF currTrans = mPosAnimator->getCurrentPointValue();
+    QPointF currPivot = mPivotAnimator->getCurrentPointValue();
     qreal currRot = mRotAnimator->qra_getCurrentValue();
     qreal currOpacity = mOpacityAnimator->qra_getCurrentValue();
 
@@ -100,12 +100,12 @@ void TransformAnimator::copyTransformationTo(
 
 void TransformAnimator::resetScale(bool finish)
 {
-    mScaleAnimator->qra_setCurrentValue(QPointF(1., 1.), finish);
+    mScaleAnimator->setCurrentPointValue(QPointF(1., 1.), finish);
 }
 
 void TransformAnimator::resetTranslation(bool finish)
 {
-    mPosAnimator->qra_setCurrentValue(QPointF(0., 0.), finish);
+    mPosAnimator->setCurrentPointValue(QPointF(0., 0.), finish);
 }
 
 void TransformAnimator::resetRotation(bool finish)
@@ -134,7 +134,7 @@ void TransformAnimator::rotateRelativeToSavedValue(qreal rotRel,
     matrix.translate(-pivot.x() + mPosAnimator->getSavedXValue(),
                      -pivot.y() + mPosAnimator->getSavedYValue() );
     rotateRelativeToSavedValue(rotRel);
-    mPosAnimator->qra_setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
+    mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
 void TransformAnimator::moveRelativeToSavedValue(qreal dX, qreal dY) {
@@ -142,7 +142,7 @@ void TransformAnimator::moveRelativeToSavedValue(qreal dX, qreal dY) {
 }
 
 void TransformAnimator::translate(qreal dX, qreal dY) {
-    mPosAnimator->qra_incCurrentValue(dX, dY);
+    mPosAnimator->incCurrentValues(dX, dY);
 }
 
 void TransformAnimator::scale(qreal sx, qreal sy)
@@ -164,7 +164,7 @@ void TransformAnimator::scaleRelativeToSavedValue(qreal sx, qreal sy,
                      -pivot.y() + mPosAnimator->getSavedYValue() );
 
     scale(sx, sy);
-    mPosAnimator->qra_setCurrentValue(QPointF(matrix.dx(), matrix.dy()) );
+    mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
 void TransformAnimator::startOpacityTransform() {
@@ -177,12 +177,12 @@ void TransformAnimator::setOpacity(qreal newOpacity) {
 
 void TransformAnimator::setScale(qreal sx, qreal sy)
 {
-    mScaleAnimator->qra_setCurrentValue(QPointF(sx, sy) );
+    mScaleAnimator->setCurrentPointValue(QPointF(sx, sy) );
 }
 
 void TransformAnimator::setPosition(qreal x, qreal y)
 {
-    mPosAnimator->qra_setCurrentValue(QPointF(x, y) );
+    mPosAnimator->setCurrentPointValue(QPointF(x, y) );
 }
 
 void TransformAnimator::setRotation(qreal rot)
@@ -282,20 +282,20 @@ void TransformAnimator::setPivotWithoutChangingTransformation(
                                -point.y());
 
 
-        mPosAnimator->qra_incAllValues(currentMatrix.dx() - futureMatrix.dx(),
+        mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
                                        currentMatrix.dy() - futureMatrix.dy());
     }
-    mPivotAnimator->qra_setCurrentValue(point, finish);
+    mPivotAnimator->setCurrentPointValue(point, finish);
 }
 
 void TransformAnimator::setPivot(QPointF point, bool finish) {
-    mPivotAnimator->qra_setCurrentValue(point, finish);
+    mPivotAnimator->setCurrentPointValue(point, finish);
 
     //callUpdater();
 }
 
 QPointF TransformAnimator::getPivot() {
-    return mPivotAnimator->qra_getCurrentValue();
+    return mPivotAnimator->getCurrentPointValue();
 }
 
 qreal TransformAnimator::dx() {
@@ -319,7 +319,7 @@ qreal TransformAnimator::yScale() {
 }
 
 QPointF TransformAnimator::pos() {
-    return mPosAnimator->qra_getCurrentValue();
+    return mPosAnimator->getCurrentPointValue();
 }
 
 qreal TransformAnimator::getPivotX()
@@ -399,7 +399,7 @@ void TransformAnimator::duplicateOpacityAnimatorFrom(
 void TransformAnimator::moveByAbs(const QMatrix &combinedTrans,
                                   const QPointF &absTrans) {
     moveToAbs(combinedTrans,
-              combinedTrans.map(mPosAnimator->qra_getSavedValue()) +
+              combinedTrans.map(mPosAnimator->getSavedPointValue()) +
               absTrans);
 }
 
@@ -417,5 +417,5 @@ void TransformAnimator::setAbsolutePos(const QMatrix &combinedTrans,
 
 void TransformAnimator::setRelativePos(QPointF relPos,
                                        bool saveUndoRedo) {
-    mPosAnimator->qra_setCurrentValue(relPos, saveUndoRedo);
+    mPosAnimator->setCurrentPointValue(relPos, saveUndoRedo);
 }

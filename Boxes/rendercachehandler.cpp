@@ -380,6 +380,11 @@ void RenderCacheHandler::addRangeNeedingUpdate(const int &min,
         addRangeNeedingUpdate(nextRange);
         currId++;
     }
+    if(mAnimationRenderCacheRange != NULL) {
+        if(mAnimationRenderCacheRange->getMinRelFrame() > max ||
+           mAnimationRenderCacheRange->getMaxRelFrame() < min) return;
+        addRangeNeedingUpdate(mAnimationRenderCacheRange);
+    }
 }
 
 void RenderCacheHandler::addAddedKey(Key *key) {

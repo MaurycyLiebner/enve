@@ -334,8 +334,8 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mIniVelocityAngleVar->qra_setCurrentValue(15.);
 
     mAcceleration->prp_setName("acceleration");
-    mAcceleration->qra_setValueRange(-100., 100.);
-    mAcceleration->qra_setCurrentValue(QPointF(0., 9.8));
+    mAcceleration->setValuesRange(-100., 100.);
+    mAcceleration->setCurrentPointValue(QPointF(0., 9.8));
 
     mParticlesPerSecond->prp_setName("particles per second");
     mParticlesPerSecond->qra_setValueRange(0., 10000.);

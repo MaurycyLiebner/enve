@@ -21,7 +21,7 @@ void MovablePoint::startTransform()
 }
 
 void MovablePoint::applyTransform(QMatrix transform){
-    qra_setCurrentValue(transform.map(qra_getCurrentValue()), true);
+    setCurrentPointValue(transform.map(getCurrentPointValue()), true);
 }
 
 void MovablePoint::removeAnimations() {
@@ -31,11 +31,11 @@ void MovablePoint::removeAnimations() {
 }
 
 void MovablePoint::makeDuplicate(MovablePoint *targetPoint) {
-    targetPoint->duplicatePosAnimatorFrom(&mRelPos);
+    targetPoint->duplicatePosAnimatorFrom(this);
 }
 
 void MovablePoint::duplicatePosAnimatorFrom(QPointFAnimator *source) {
-    source->prp_makeDuplicate(&mRelPos);
+    source->prp_makeDuplicate(this);
 }
 
 void MovablePoint::finishTransform()
@@ -54,12 +54,12 @@ void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo) {
 
 void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
 {
-    qra_setCurrentValue(relPos, saveUndoRedo);
+    setCurrentPointValue(relPos, saveUndoRedo);
 }
 
 QPointF MovablePoint::getRelativePos() const
 {
-    return qra_getCurrentValue();
+    return getCurrentPointValue();
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) const {
@@ -152,7 +152,7 @@ void MovablePoint::moveByRel(QPointF relTranslation) {
 }
 
 void MovablePoint::moveByAbs(QPointF absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(qra_getSavedValue()) +
+    moveToAbs(mapRelativeToAbsolute(getSavedPointValue()) +
               absTranslatione);
 }
 

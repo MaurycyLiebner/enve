@@ -7,19 +7,19 @@ class QPointFAnimator : public ComplexAnimator
 {
 public:
     QPointFAnimator();
-    QPointF qra_getCurrentValue() const;
+    QPointF getCurrentPointValue() const;
     QPointF getPointValueAtFrame(const int &frame);
     qreal getXValue();
     qreal getYValue();
-    void qra_setCurrentValue(QPointF val, bool finish = false);
-    void qra_incCurrentValue(qreal x, qreal y);
-    void qra_multCurrentValue(qreal sx, qreal sy);
+    void setCurrentPointValue(QPointF val, bool finish = false);
+    void incCurrentValues(qreal x, qreal y);
+    void multCurrentValues(qreal sx, qreal sy);
 
-    QPointF qra_getSavedValue();
+    QPointF getSavedPointValue();
     qreal getSavedXValue();
     qreal getSavedYValue();
 
-    void qra_incAllValues(qreal x, qreal y);
+    void incAllValues(qreal x, qreal y);
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();
@@ -33,10 +33,10 @@ public:
 
     void duplicateYAnimatorFrom(QrealAnimator *source);
     void duplicateXAnimatorFrom(QrealAnimator *source);
-    void qra_setValueRange(qreal minVal, qreal maxVal);
+    void setValuesRange(qreal minVal, qreal maxVal);
     QPointF getCurrentPointValueAtFrame(const int &frame);
     void setPrefferedValueStep(const qreal &valueStep);
-private:
+protected:
     QSharedPointer<QrealAnimator> mXAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();
     QSharedPointer<QrealAnimator> mYAnimator =

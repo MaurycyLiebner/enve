@@ -145,9 +145,9 @@ ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
     mBlurRadius->qra_setValueRange(0., 1000.);
     ca_addChildAnimator(mBlurRadius.data());
 
-    mTranslation->qra_setCurrentValue(QPointF(0., 0.));
+    mTranslation->setCurrentPointValue(QPointF(0., 0.));
     mTranslation->prp_setName("translation");
-    mTranslation->qra_setValueRange(-1000., 1000.);
+    mTranslation->setValuesRange(-1000., 1000.);
     ca_addChildAnimator(mTranslation.data());
 
     mColor->qra_setCurrentValue(Qt::black);
@@ -240,13 +240,13 @@ void ShadowEffect::apply(BoundingBox *target,
     QPainter p(imgPtr);
     p.setCompositionMode(QPainter::CompositionMode_DestinationOver);
     p.setOpacity(mOpacity->qra_getCurrentValue()*0.01);
-    p.drawImage(mTranslation->qra_getCurrentValue()*scale, shadowQImg);
+    p.drawImage(mTranslation->getCurrentPointValue()*scale, shadowQImg);
     p.end();
 }
 
 qreal ShadowEffect::getMargin() {
     return mBlurRadius->qra_getCurrentValue() +
-            pointToLen(mTranslation->qra_getCurrentValue());
+            pointToLen(mTranslation->getCurrentPointValue());
 }
 
 Property *ShadowEffect::prp_makeDuplicate() {
