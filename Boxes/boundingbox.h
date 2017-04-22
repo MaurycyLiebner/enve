@@ -261,6 +261,7 @@ public:
     void enablePivotAutoAdjust();
 
     virtual VectorPath *objectToPath() { return NULL; }
+    virtual VectorPath *strokeToPath() { return NULL; }
     virtual void prp_loadFromSql(const int &boundingBoxId);
 
     virtual void updatePixmaps();

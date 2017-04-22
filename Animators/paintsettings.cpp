@@ -433,9 +433,9 @@ void PaintSettings::setPaintPathTarget(PathBox *path) {
 
 void PaintSettings::prp_makeDuplicate(Property *target) {
     PaintSettings *paintSettingsTarget = (PaintSettings*)target;
-        paintSettingsTarget->duplicateColorAnimatorFrom(mColor.data());
-        paintSettingsTarget->setGradient(mGradient.data());
-        paintSettingsTarget->setPaintType(mPaintType);
+    paintSettingsTarget->duplicateColorAnimatorFrom(mColor.data());
+    paintSettingsTarget->setGradient(mGradient.data());
+    paintSettingsTarget->setPaintType(mPaintType);
 }
 
 void PaintSettings::duplicateColorAnimatorFrom(ColorAnimator *source) {

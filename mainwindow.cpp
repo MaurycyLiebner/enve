@@ -216,7 +216,8 @@ void MainWindow::setupMenuBar() {
 
     mPathMenu->addAction("Object to Path", mCanvasWidget,
                          SLOT(objectsToPathAction()));
-    mPathMenu->addAction("Stroke to Path");
+    mPathMenu->addAction("Stroke to Path", mCanvasWidget,
+                         SLOT(strokeToPathAction()));
     mPathMenu->addSeparator();
     mPathMenu->addAction("Union", mCanvasWidget,
                          SLOT(pathsUnionAction()));

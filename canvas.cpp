@@ -118,7 +118,7 @@ QRectF Canvas::getPixBoundingRect()
 }
 
 void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin) {
-    QPointF transPoint = -mapAbsPosToRel(absOrigin);
+    QPointF transPoint = -BoundingBox::mapAbsPosToRel(absOrigin);
 
     mCombinedTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mCombinedTransformMatrix.scale(scaleXBy, scaleYBy);

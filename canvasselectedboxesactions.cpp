@@ -7,6 +7,12 @@ void Canvas::convertSelectedBoxesToPath() {
     }
 }
 
+void Canvas::convertSelectedPathStrokesToPath() {
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        box->strokeToPath();
+    }
+}
+
 void Canvas::setSelectedFontFamilyAndStyle(QString family, QString style)
 {
     foreach(BoundingBox *box, mSelectedBoxes) {

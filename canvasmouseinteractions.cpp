@@ -795,8 +795,6 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *event) {
                 setCurrentBoxesGroup((BoxesGroup*) boxAt);
             } else if(boxAt->isText()) {
                 ((TextBox*) boxAt)->openTextEditor();
-            } else if(boxAt->isCircle() ) {
-                ((Circle*) boxAt)->objectToPath();
             } else if(mCurrentMode == MOVE_PATH) {
                 mCanvasWidget->setCanvasMode(MOVE_PATH);
             }

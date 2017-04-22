@@ -119,6 +119,7 @@ public:
     void resetSelectedTranslation();
     void resetSelectedRotation();
     void convertSelectedBoxesToPath();
+    void convertSelectedPathStrokesToPath();
 
     void applyBlurToSelected();
     void applyBrushEffectToSelected();

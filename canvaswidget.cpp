@@ -293,6 +293,12 @@ void CanvasWidget::objectsToPathAction() {
     callUpdateSchedulers();
 }
 
+void CanvasWidget::strokeToPathAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->convertSelectedPathStrokesToPath();
+    callUpdateSchedulers();
+}
+
 void CanvasWidget::pathsUnionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsUnion();

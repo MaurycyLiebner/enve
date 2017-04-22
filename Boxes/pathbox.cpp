@@ -163,14 +163,26 @@ void PathBox::preUpdatePixmapsUpdates() {
 
 void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
                                           GradientPoints *strokeGradientPoints) {
-    fillGradientPoints->prp_makeDuplicate(mFillGradientPoints.data());
-    strokeGradientPoints->prp_makeDuplicate(mStrokeGradientPoints.data());
+    if(fillGradientPoints != NULL) {
+        fillGradientPoints->prp_makeDuplicate(mFillGradientPoints.data());
+    }
+    if(strokeGradientPoints != NULL) {
+        strokeGradientPoints->prp_makeDuplicate(mStrokeGradientPoints.data());
+    }
 }
 
 void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                          StrokeSettings *strokeSettings) {
-    fillSettings->prp_makeDuplicate(mFillSettings.data());
-    strokeSettings->prp_makeDuplicate(mStrokeSettings.data());
+    if(fillSettings == NULL) {
+        mFillSettings->setPaintType(NOPAINT);
+    } else {
+        fillSettings->prp_makeDuplicate(mFillSettings.data());
+    }
+    if(strokeSettings == NULL) {
+        mStrokeSettings->setPaintType(NOPAINT);
+    } else {
+        strokeSettings->prp_makeDuplicate(mStrokeSettings.data());
+    }
 }
 
 void PathBox::prp_makeDuplicate(Property *targetBox) {
@@ -235,6 +247,18 @@ VectorPath *PathBox::objectToPath() {
                                         mStrokeSettings.data());
     newPath->duplicateGradientPointsFrom(mFillGradientPoints.data(),
                                          mStrokeGradientPoints.data());
+    return newPath;
+}
+
+VectorPath *PathBox::strokeToPath() {
+    if(mOutlinePath.isEmpty()) return NULL;
+    VectorPath *newPath = new VectorPath(mParent.data());
+    newPath->loadPathFromQPainterPath(mOutlinePath);
+    newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
+    newPath->duplicatePaintSettingsFrom(mStrokeSettings.data(),
+                                        NULL);
+    newPath->duplicateGradientPointsFrom(mStrokeGradientPoints.data(),
+                                         NULL);
     return newPath;
 }
 

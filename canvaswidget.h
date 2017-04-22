@@ -152,6 +152,7 @@ public slots:
     void lowerToBottomAction();
 
     void objectsToPathAction();
+    void strokeToPathAction();
 
     void setFontFamilyAndStyle(QString family, QString style);
     void setFontSize(qreal size);
