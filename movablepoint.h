@@ -16,7 +16,8 @@ enum MovablePointType {
     TYPE_PATH_POINT,
     TYPE_CTRL_POINT,
     TYPE_PIVOT_POINT,
-    TYPE_GRADIENT_POINT
+    TYPE_GRADIENT_POINT,
+    TYPE_BONE_POINT
 };
 
 class MovablePoint :

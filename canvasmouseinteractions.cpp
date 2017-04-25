@@ -563,7 +563,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event)
 
     if(mCurrentEdge != NULL) {
         if(!mFirstMouseMove) {
-            mCurrentEdge->finishTransform();
+            mCurrentEdge->finishPassThroughTransform();
         }
         mHoveredEdge = mCurrentEdge;
         mHoveredEdge->generatePainterPath();
@@ -604,26 +604,29 @@ void Canvas::handleMovePointMouseMove() {
                                       mCurrentMode);
     } else if(mCurrentEdge != NULL) {
         if(mFirstMouseMove) {
-            mCurrentEdge->startTransform();
+            mCurrentEdge->startPassThroughTransform();
         }
         mCurrentEdge->makePassThrough(mCurrentMouseEventPosRel);
     } else {
         if(mLastPressedPoint != NULL) {
             addPointToSelection(mLastPressedPoint);
 
-            if(mLastPressedPoint->isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible() ) {
+            if(mLastPressedPoint->isCtrlPoint() &&
+               !BoxesGroup::getCtrlsAlwaysVisible() ) {
                 if(mFirstMouseMove) {
                     startSelectedPointsTransform();
                 }
-                mLastPressedPoint->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel) );
+                mLastPressedPoint->moveByAbs(
+                        getMoveByValueForEventPos(mCurrentMouseEventPosRel));
                 return;//
             }/* else {
                 mCurrentBoxesGroup->moveSelectedPointsBy(getMoveByValueForEventPos(eventPos),
                                                          mFirstMouseMove);
             }*/
         }
-        moveSelectedPointsByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel),
-                                mFirstMouseMove);
+        moveSelectedPointsByAbs(
+                    getMoveByValueForEventPos(mCurrentMouseEventPosRel),
+                    mFirstMouseMove);
     }
 }
 

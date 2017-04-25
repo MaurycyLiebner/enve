@@ -129,7 +129,8 @@ SOURCES += main.cpp\
     Boxes/rendercachehandler.cpp \
     memorychecker.cpp \
     memoryhandler.cpp \
-    boxpathpoint.cpp
+    boxpathpoint.cpp \
+    Bones/bonepoint.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -237,7 +238,8 @@ HEADERS  += mainwindow.h \
     memorychecker.h \
     memoryhandler.h \
     selfref.h \
-    boxpathpoint.h
+    boxpathpoint.h \
+    Bones/bonepoint.h
 
 RESOURCES += \
     resources.qrc

@@ -8,36 +8,55 @@ class Edge {
 public:
     Edge(PathPoint *pt1, PathPoint *pt2, qreal pressedT);
 
-    static void getNewRelPosForKnotInsertionAtT(QPointF P0,
+    static void getNewRelPosForKnotInsertionAtT(const QPointF &P0,
                                                 QPointF *P1_ptr,
                                                 QPointF *P2_ptr,
                                                 QPointF P3,
                                                 QPointF *new_p_ptr,
                                                 QPointF *new_p_start_ptr,
                                                 QPointF *new_p_end_ptr,
-                                                qreal t);
+                                                const qreal &t);
 
-    static QPointF getRelPosBetweenPointsAtT(qreal t,
-                                             QPointF p0Pos,
-                                             QPointF p1EndPos,
-                                             QPointF p2StartPos,
-                                             QPointF p3Pos);
+    static qreal getRelPosBetweenPointsAtT(const qreal &t,
+                                           const QPointF &p0Pos,
+                                           const QPointF &p1EndPos,
+                                           const QPointF &p2StartPos,
+                                           const QPointF &p3Pos);
 
-    static QPointF getRelPosBetweenPointsAtT(qreal t,
+    static qreal getLength(const QPointF &p0Pos,
+                           const QPointF &p1EndPos,
+                           const QPointF &p2StartPos,
+                           const QPointF &p3Pos,
+                           int divisions);
+
+    static qreal getLength(const QPointF &p0Pos,
+                           const QPointF &p1EndPos,
+                           const QPointF &p2StartPos,
+                           const QPointF &p3Pos);
+
+    static QPointF getRelPosBetweenPointsAtT(const qreal &t,
                                              PathPoint *point1,
                                              PathPoint *point2);
 
-    void makePassThrough(QPointF absPos);
+    void makePassThrough(const QPointF &absPos);
 
-    void finishTransform();
+    void finishPassThroughTransform();
 
-    void startTransform();
+    void startPassThroughTransform();
 
-    void setEditPath(bool bT);
+    void setEditPath(const bool &bT);
 
     void generatePainterPath();
 
     void drawHover(QPainter *p);
+
+    PathPoint *getPrevPoint() const {
+        return mPoint1;
+    }
+
+    PathPoint *getNextPoint() const {
+        return mPoint2;
+    }
 private:
     QPainterPath mPath;
 

@@ -18,7 +18,7 @@ Edge *SinglePathAnimator::getEgde(QPointF absPos) {
     PathPoint *prevPoint = NULL;
     PathPoint *nextPoint = NULL;
     if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
-                                         &prevPoint, &nextPoint)) {
+                                            &prevPoint, &nextPoint)) {
         if(pressedT > 0.0001 && pressedT < 0.9999) {
             return new Edge(prevPoint, nextPoint, pressedT);
         } else {
