@@ -51,8 +51,8 @@ public:
     void setParentBonePointVar(BonePoint *parentBonePt);
     void setParentBonePoint(BonePoint *parentBonePt);
 protected:
-
-
+    QSharedPointer<QrealAnimator> mRotAnimator;
+    QSharedPointer<QPointFAnimator> mScaleAnimator;
     bool mBoneBeetweenThisAndPrev = false;
     QList<QSharedPointer<BonePoint> > mChildBonePoints;
     QSharedPointer<BonePoint> mParentBonePoint;

@@ -19,8 +19,10 @@ Edge *SinglePathAnimator::getEgde(QPointF absPos) {
     PathPoint *nextPoint = NULL;
     if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
                                             &prevPoint, &nextPoint)) {
-        if(pressedT > 0.0001 && pressedT < 0.9999) {
-            return new Edge(prevPoint, nextPoint, pressedT);
+        if(pressedT > 0.0001 && pressedT < 0.9999 && prevPoint && nextPoint) {
+            Edge *edge = prevPoint->getNextEdge();
+            edge->setPressedT(pressedT);
+            return edge;
         } else {
             return NULL;
         }
@@ -200,7 +202,8 @@ QPointF getPointClosestOnPathTo(const QPainterPath &path,
     }
 }
 
-bool SinglePathAnimator::getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
+bool SinglePathAnimator::getTAndPointsForMouseEdgeInteraction(
+                                                      const QPointF &absPos,
                                                       qreal *pressedT,
                                                       PathPoint **prevPoint,
                                                       PathPoint **nextPoint) {
@@ -551,8 +554,9 @@ void SinglePathAnimator::deletePointAndApproximate(PathPoint *pointToRemove) {
 
     pointToRemove->removeFromVectorPath();
 
-    Edge newEdge = Edge(prevPoint, nextPoint, 0.5);
-    newEdge.makePassThrough(absPos);
+    Edge *newEdge = prevPoint->getNextEdge();
+    newEdge->setPressedT(0.5);
+    newEdge->makePassThrough(absPos);
 }
 
 MovablePoint *SinglePathAnimator::qra_getPointAt(const QPointF &absPtPos,

@@ -119,10 +119,10 @@ void PathWeightMap::addPoint(const QPointF &c1,
     QPointF sc3;
     QPointF sc4 = c2;
     QPointF sp3 = p;
-    Edge::getNewRelPosForKnotInsertionAtT(
-                sp1, &sc1, &sc4, sp3,
-                &sp2, &sc2, &sc3,
-                tVal);
+//    Edge::getNewRelPosForKnotInsertionAtT(
+//                sp1, &sc1, &sc4, sp3,
+//                &sp2, &sc2, &sc3,
+//                tVal);
 }
 
 QPainterPath PathWeightMap::finishPath() {

@@ -164,7 +164,6 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
 void Canvas::clearHoveredEdge() {
     if(mHoveredEdge == NULL) return;
-    delete mHoveredEdge;
     mHoveredEdge = NULL;
 }
 

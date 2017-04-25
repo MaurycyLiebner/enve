@@ -3,12 +3,9 @@
 #include "ctrlpoint.h"
 #include "Boxes/boundingbox.h"
 
-Edge::Edge(PathPoint *pt1, PathPoint *pt2, qreal pressedT) {
-    mPoint1 = pt1;
-    mPoint1EndPt = pt1->getEndCtrlPt();
-    mPoint2 = pt2;
-    mPoint2StartPt = pt2->getStartCtrlPt();
-    mPressedT = pressedT;
+Edge::Edge(PathPoint *pt1, PathPoint *pt2) {
+    setPoint1(pt1);
+    setPoint2(pt2);
 }
 
 void Edge::getNewRelPosForKnotInsertionAtT(const QPointF &P0,
@@ -47,11 +44,11 @@ qreal Edge::getLength(const QPointF &p0Pos,
     qreal t = 0.;
     QPointF lastPoint = p0Pos;
     while(true) {
-        QPointF currentPoint = getRelPosBetweenPointsAtT(t + tInc,
-                                                         p0Pos,
-                                                         p1EndPos,
-                                                         p2StartPos,
-                                                         p3Pos);
+        QPointF currentPoint = getPosBetweenPointsAtT(t + tInc,
+                                                      p0Pos,
+                                                      p1EndPos,
+                                                      p2StartPos,
+                                                      p3Pos);
         qreal lenInc = pointToLen(currentPoint - lastPoint);
         if(lenInc > 5) {
             tInc = tInc * 4 / lenInc;
@@ -84,11 +81,11 @@ qreal Edge::getLength(const QPointF &p0Pos,
     QPointF lastPoint = p0Pos;
     for(int i = 1; i < divisions; i++) {
         qreal t = i/(qreal)divisions;
-        QPointF currentPoint = getRelPosBetweenPointsAtT(t,
-                                                         p0Pos,
-                                                         p1EndPos,
-                                                         p2StartPos,
-                                                         p3Pos);
+        QPointF currentPoint = getPosBetweenPointsAtT(t,
+                                                      p0Pos,
+                                                      p1EndPos,
+                                                      p2StartPos,
+                                                      p3Pos);
         length += pointToLen(currentPoint - lastPoint);
         lastPoint = currentPoint;
     }
@@ -97,11 +94,11 @@ qreal Edge::getLength(const QPointF &p0Pos,
     return length;
 }
 
-QPointF Edge::getRelPosBetweenPointsAtT(const qreal &t,
-                                        const QPointF &p0Pos,
-                                        const QPointF &p1EndPos,
-                                        const QPointF &p2StartPos,
-                                        const QPointF &p3Pos) {
+QPointF Edge::getPosBetweenPointsAtT(const qreal &t,
+                                     const QPointF &p0Pos,
+                                     const QPointF &p1EndPos,
+                                     const QPointF &p2StartPos,
+                                     const QPointF &p3Pos) {
     qreal x0 = p0Pos.x();
     qreal y0 = p0Pos.y();
     qreal x1 = p1EndPos.x();
@@ -128,7 +125,31 @@ QPointF Edge::getRelPosBetweenPointsAtT(const qreal &t,
     QPointF p2Pos = point2StartPt->getRelativePos();
     QPointF p3Pos = point2->getRelativePos();
 
-    return getRelPosBetweenPointsAtT(t, p0Pos, p1Pos, p2Pos, p3Pos);
+    return getPosBetweenPointsAtT(t, p0Pos, p1Pos, p2Pos, p3Pos);
+}
+
+QPointF Edge::getAbsPosBetweenPointsAtT(const qreal &t,
+                                        PathPoint *point1,
+                                        PathPoint *point2) {
+    if(point1 == NULL) return point2->getAbsolutePos();
+    if(point2 == NULL) return point1->getAbsolutePos();
+
+    CtrlPoint *point1EndPt = point1->getEndCtrlPt();
+    CtrlPoint *point2StartPt = point2->getStartCtrlPt();
+    QPointF p0Pos = point1->getAbsolutePos();
+    QPointF p1Pos = point1EndPt->getAbsolutePos();
+    QPointF p2Pos = point2StartPt->getAbsolutePos();
+    QPointF p3Pos = point2->getAbsolutePos();
+
+    return getPosBetweenPointsAtT(t, p0Pos, p1Pos, p2Pos, p3Pos);
+}
+
+QPointF Edge::getRelPosAtT(const qreal &t) {
+    return getRelPosBetweenPointsAtT(t, mPoint1, mPoint2);
+}
+
+QPointF Edge::getAbsPosAtT(const qreal &t) {
+    return getAbsPosBetweenPointsAtT(t, mPoint1, mPoint2);
 }
 
 void Edge::makePassThrough(const QPointF &absPos) {
@@ -223,4 +244,45 @@ void Edge::drawHover(QPainter *p) {
     p->setPen(pen);
     p->drawPath(mPath);
     p->restore();
+}
+
+PathPoint *Edge::getPoint1() const {
+    return mPoint1;
+}
+
+PathPoint *Edge::getPoint2() const {
+    return mPoint2;
+}
+
+void Edge::setPoint1(PathPoint *point1) {
+    mPoint1 = point1;
+    mPoint1EndPt = mPoint1->getEndCtrlPt();
+}
+
+void Edge::setPoint2(PathPoint *point2) {
+    mPoint2 = point2;
+    mPoint2StartPt = mPoint2->getStartCtrlPt();
+}
+
+void Edge::setPressedT(const qreal &t) {
+    mPressedT = t;
+}
+
+void Edge::getNearestAbsPosAndT(const QPointF &absPos,
+                                QPointF *nearestPoint,
+                                qreal *t) {
+    qreal error;
+    *t = getTforBezierPoint(mPoint1->getAbsolutePos(),
+                            mPoint1->getEndCtrlPtAbsPos(),
+                            mPoint2->getStartCtrlPtAbsPos(),
+                            mPoint2->getAbsolutePos(),
+                            absPos,
+                            &error);
+    *nearestPoint = getAbsPosAtT(*t);
+}
+
+QPointF Edge::getSlopeVector(const qreal &t) {
+    QPointF posAtT = getRelPosAtT(t);
+    QPointF posAtTPlus = getRelPosAtT(t + 0.01);
+    return scalePointToNewLen(posAtTPlus - posAtT, 1.);
 }

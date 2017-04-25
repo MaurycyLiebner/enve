@@ -4,6 +4,7 @@
 #include "ctrlpoint.h"
 #include <QPainter>
 #include <QDebug>
+#include "edge.h"
 
 PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
     MovablePoint(parentAnimator->getParentPathAnimator()->getParentBox(),
@@ -439,8 +440,7 @@ PathPoint *PathPoint::getConnectedSeparatePathPoint() {
     return mPreviousPoint->getConnectedSeparatePathPoint();
 }
 
-void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
-{
+void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo) {
     if(saveUndoRedo) {
         SetNextPointUndoRedo *undoRedo = new SetNextPointUndoRedo(this,
                                                                   mNextPoint,
@@ -448,6 +448,17 @@ void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo)
         addUndoRedo(undoRedo);
     }
     mNextPoint = nextPoint;
+    if(mNextPoint == NULL) {
+        if(mNextEdge.get() != NULL) {
+            mNextEdge.reset();
+        }
+    } else {
+        if(mNextEdge.get() == NULL) {
+            mNextEdge = (new Edge(this, mNextPoint))->ref<Edge>();
+        } else {
+            mNextEdge->setPoint2(mNextPoint);
+        }
+    }
     updateEndCtrlPtVisibility();
     prp_callUpdater();
     //mParentPath->schedulePathUpdate();

@@ -13,6 +13,7 @@ class CtrlPoint;
 enum CanvasMode : short;
 
 class PathPoint;
+class Edge;
 
 struct PathPointValues {
     PathPointValues(QPointF startPosT,
@@ -214,7 +215,13 @@ public:
 
     void saveTransformPivotAbsPos(QPointF absPivot);
     void rotateRelativeToSavedPivot(const qreal &rot);
+
+    Edge *getNextEdge() {
+        return mNextEdge.get();
+    }
+
 private:
+    std::shared_ptr<Edge> mNextEdge;
 
     int mPointId;
     QSharedPointer<PathPointAnimators> mPathPointAnimators =

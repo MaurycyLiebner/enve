@@ -261,3 +261,7 @@ QRectF qRectF4Points(QPointF p1, QPointF c1, QPointF c2, QPointF p2) {
                   QPointF(qMax4(p1.x(), c1.x(), c2.x(), p2.x()),
                           qMax4(p1.y(), c1.y(), c2.y(), p2.y())));
 }
+#include <QMatrix>
+QPointF rotatePoint90Degrees(const QPointF &pt) {
+    return QPointF(-pt.y(), pt.x()); // y is downwards
+}
