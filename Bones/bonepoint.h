@@ -42,12 +42,22 @@ private:
     int mNumberOfControlPoints;
 };
 #include "Properties/boolproperty.h"
-class Bone {
+#include "Animators/transformanimator.h"
+class Bone : public ComplexAnimator {
 public:
     Bone(BonePoint *rootPoint,
          BonePoint *tipPoint) {
         mRootPoint = rootPoint->ref<BonePoint>();
         mTipPoint = tipPoint->ref<BonePoint>();
+        prp_setName("bone");
+
+        mFixedLength->prp_setName("fixed length");
+        ca_addChildAnimator(mFixedLength.data());
+        ca_addChildAnimator(mTransformAnimator.data());
+        mRootPoint->prp_setName("root");
+        mTipPoint->prp_setName("tip");
+        ca_addChildAnimator(mRootPoint.data());
+        ca_addChildAnimator(mTipPoint.data());
     }
 
     QPointF getCurrentRootAbsPos() {
@@ -79,17 +89,18 @@ public:
         }
     }
 
+
 private:
+    QSharedPointer<Bone> mParentBone;
+    QMatrix mRelTransform;
+    QMatrix mCombinedTransform;
+
     QSharedPointer<BoolProperty> mFixedLength =
             (new BoolProperty())->ref<BoolProperty>();
-    QSharedPointer<QPointFAnimator> mTranslationAnimator =
-            (new QPointFAnimator())->ref<QPointFAnimator>();
-    QSharedPointer<QrealAnimator> mScaleAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<BonePoint> mRootPoint =
-            (new BonePoint())->ref<BonePoint>();
-    QSharedPointer<BonePoint> mTipPoint =
-            (new BonePoint())->ref<BonePoint>();
+    QSharedPointer<BasicTransformAnimator> mTransformAnimator =
+            (new BasicTransformAnimator())->ref<BasicTransformAnimator>();
+    QSharedPointer<BonePoint> mRootPoint;
+    QSharedPointer<BonePoint> mTipPoint;
 };
 
 class BonePoint : public MovablePoint {

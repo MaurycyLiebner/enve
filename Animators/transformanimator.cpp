@@ -3,6 +3,23 @@
 #include <QDebug>
 #include "boxpathpoint.h"
 
+BasicTransformAnimator::BasicTransformAnimator() :
+    ComplexAnimator() {
+    prp_setName("transformation");
+    mScaleAnimator->prp_setName("scale");
+    mScaleAnimator->setCurrentPointValue(QPointF(1., 1.));
+    mScaleAnimator->setPrefferedValueStep(0.05);
+
+    mRotAnimator->prp_setName("rot");
+    mRotAnimator->qra_setCurrentValue(0.);
+    mPosAnimator->prp_setName("trans");
+    mPosAnimator->setCurrentPointValue(QPointF(0., 0.) );
+
+    ca_addChildAnimator(mPosAnimator.data());
+    ca_addChildAnimator(mRotAnimator.data());
+    ca_addChildAnimator(mScaleAnimator.data());
+}
+
 void BasicTransformAnimator::resetScale(const bool &finish) {
     mScaleAnimator->setCurrentPointValue(QPointF(1., 1.), finish);
 }
@@ -186,16 +203,6 @@ void BasicTransformAnimator::makeDuplicate(BasicTransformAnimator *target) {
 TransformAnimator::TransformAnimator(BoundingBox *parent) :
     BasicTransformAnimator() {
     mPivotAnimator = (new BoxPathPoint(parent))->ref<MovablePoint>();
-
-    prp_setName("transformation");
-    mScaleAnimator->prp_setName("scale");
-    mScaleAnimator->setCurrentPointValue(QPointF(1., 1.));
-    mScaleAnimator->setPrefferedValueStep(0.05);
-
-    mRotAnimator->prp_setName("rot");
-    mRotAnimator->qra_setCurrentValue(0.);
-    mPosAnimator->prp_setName("trans");
-    mPosAnimator->setCurrentPointValue(QPointF(0., 0.) );
     mPivotAnimator->prp_setName("pivot");
     mPivotAnimator->setCurrentPointValue(QPointF(0., 0.) );
     mOpacityAnimator->prp_setName("opacity");
@@ -204,9 +211,6 @@ TransformAnimator::TransformAnimator(BoundingBox *parent) :
     mOpacityAnimator->qra_setCurrentValue(100.);
     mOpacityAnimator->freezeMinMaxValues();
 
-    ca_addChildAnimator(mPosAnimator.data());
-    ca_addChildAnimator(mRotAnimator.data());
-    ca_addChildAnimator(mScaleAnimator.data());
     ca_addChildAnimator(mPivotAnimator.data());
     ca_addChildAnimator(mOpacityAnimator.data());
 }

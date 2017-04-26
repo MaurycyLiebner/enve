@@ -7,6 +7,7 @@
 class BasicTransformAnimator : public ComplexAnimator
 {
 public:
+    BasicTransformAnimator();
     void resetScale(const bool &finish = false);
     void resetTranslation(const bool &finish = false);
     void resetRotation(const bool &finish = false);
