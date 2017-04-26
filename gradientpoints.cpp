@@ -56,7 +56,7 @@ void GradientPoints::duplicatePointsFrom(GradientPoint *startPointT,
     endPointT->makeDuplicate(endPoint);
 }
 
-void GradientPoints::prp_makeDuplicate(Property *target) {
+void GradientPoints::makeDuplicate(Property *target) {
     GradientPoints *gradientPointsTarget = (GradientPoints*)target;
     gradientPointsTarget->duplicatePointsFrom(startPoint,
                                               endPoint);

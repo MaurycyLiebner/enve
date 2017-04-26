@@ -262,6 +262,18 @@ QRectF qRectF4Points(QPointF p1, QPointF c1, QPointF c2, QPointF p2) {
                           qMax4(p1.y(), c1.y(), c2.y(), p2.y())));
 }
 #include <QMatrix>
-QPointF rotatePoint90Degrees(const QPointF &pt) {
+QPointF rotateVector90Degrees(const QPointF &pt) {
     return QPointF(-pt.y(), pt.x()); // y is downwards
+}
+#include <QtMath>
+qreal degreesBetweenVectors(const QPointF &pt1,
+                            const QPointF &pt2) {
+    return radiansBetweenVectors(pt1, pt2)*180./M_PI;
+}
+
+qreal radiansBetweenVectors(const QPointF &pt1,
+                            const QPointF &pt2) {
+    qreal dot = pt1.x()*pt2.x() + pt1.y()*pt2.y();
+    qreal det = pt1.x()*pt2.y() - pt1.y()*pt2.x();
+    return atan2(det, dot);
 }

@@ -101,27 +101,27 @@ void QPointFAnimator::incSavedValueToCurrentValue(qreal incXBy, qreal incYBy) {
     mYAnimator->incSavedValueToCurrentValue(incYBy);
 }
 
-void QPointFAnimator::prp_makeDuplicate(Property *target) {
+void QPointFAnimator::makeDuplicate(Property *target) {
     QPointFAnimator *pointTarget = (QPointFAnimator*)target;
 
     pointTarget->duplicateXAnimatorFrom(mXAnimator.data());
     pointTarget->duplicateYAnimatorFrom(mYAnimator.data());
 }
 
-Property *QPointFAnimator::prp_makeDuplicate() {
+Property *QPointFAnimator::makeDuplicate() {
     QPointFAnimator *posAnim = new QPointFAnimator();
-    prp_makeDuplicate(posAnim);
+    makeDuplicate(posAnim);
     return posAnim;
 }
 
 void QPointFAnimator::duplicateXAnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mXAnimator.data());
+    source->makeDuplicate(mXAnimator.data());
 }
 
 void QPointFAnimator::duplicateYAnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mYAnimator.data());
+    source->makeDuplicate(mYAnimator.data());
 }
 
 QrealAnimator *QPointFAnimator::getXAnimator()

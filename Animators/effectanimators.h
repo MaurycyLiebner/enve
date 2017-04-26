@@ -27,8 +27,8 @@ public:
 
     bool hasEffects();
 
-    void prp_makeDuplicate(Property *target);
-    Property *prp_makeDuplicate() {
+    void makeDuplicate(Property *target);
+    Property *makeDuplicate() {
         return NULL;
     }
 private:

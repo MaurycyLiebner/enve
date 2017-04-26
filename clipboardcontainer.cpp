@@ -94,7 +94,7 @@ void AnimatorClipboardContainer::paste(QrealAnimator *target) {
     if(nameT == mAnimator->prp_getName() ||
        !(target->anim_isComplexAnimator() ||
          mAnimator->anim_isComplexAnimator())) {
-        mAnimator->prp_makeDuplicate(target);
+        mAnimator->makeDuplicate(target);
         target->prp_setName(nameT);
     }
 }

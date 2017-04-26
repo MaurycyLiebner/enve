@@ -72,6 +72,12 @@ extern qreal qMax4(qreal v1, qreal v2,
 extern QRectF qRectF4Points(QPointF p1, QPointF c1,
                             QPointF c2, QPointF p2);
 
-extern QPointF rotatePoint90Degrees(const QPointF &pt);
+extern QPointF rotateVector90Degrees(const QPointF &pt);
+
+extern qreal degreesBetweenVectors(const QPointF &pt1,
+                                   const QPointF &pt2);
+
+extern qreal radiansBetweenVectors(const QPointF &pt1,
+                                   const QPointF &pt2);
 
 #endif // POINTHELPERS_H

@@ -164,10 +164,10 @@ void PathBox::preUpdatePixmapsUpdates() {
 void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
                                           GradientPoints *strokeGradientPoints) {
     if(fillGradientPoints != NULL) {
-        fillGradientPoints->prp_makeDuplicate(mFillGradientPoints.data());
+        fillGradientPoints->makeDuplicate(mFillGradientPoints.data());
     }
     if(strokeGradientPoints != NULL) {
-        strokeGradientPoints->prp_makeDuplicate(mStrokeGradientPoints.data());
+        strokeGradientPoints->makeDuplicate(mStrokeGradientPoints.data());
     }
 }
 
@@ -176,16 +176,16 @@ void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
     if(fillSettings == NULL) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
-        fillSettings->prp_makeDuplicate(mFillSettings.data());
+        fillSettings->makeDuplicate(mFillSettings.data());
     }
     if(strokeSettings == NULL) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {
-        strokeSettings->prp_makeDuplicate(mStrokeSettings.data());
+        strokeSettings->makeDuplicate(mStrokeSettings.data());
     }
 }
 
-void PathBox::prp_makeDuplicate(Property *targetBox) {
+void PathBox::makeDuplicate(Property *targetBox) {
     PathBox *pathBoxTarget = ((PathBox*)targetBox);
     pathBoxTarget->duplicatePaintSettingsFrom(mFillSettings.data(),
                                               mStrokeSettings.data());

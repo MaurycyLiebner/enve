@@ -34,10 +34,10 @@ public:
     void setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo = true);
     void prp_loadFromSql(const int &identifyingId);
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
-    Property *prp_makeDuplicate() {
+    Property *makeDuplicate() {
         return NULL;
     }
-    void prp_makeDuplicate(Property *target);
+    void makeDuplicate(Property *target);
     void duplicatePointsFrom(GradientPoint *startPointT,
                              GradientPoint *endPointT);
 };

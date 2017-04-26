@@ -121,13 +121,13 @@ void BlurEffect::prp_loadFromSql(const int &pixmapEffectId) {
     }
 }
 
-Property *BlurEffect::prp_makeDuplicate() {
+Property *BlurEffect::makeDuplicate() {
     BlurEffect *newBlur = new BlurEffect();
-    prp_makeDuplicate(newBlur);
+    makeDuplicate(newBlur);
     return newBlur;
 }
 
-void BlurEffect::prp_makeDuplicate(Property *target) {
+void BlurEffect::makeDuplicate(Property *target) {
     BlurEffect *blurTarget = (BlurEffect*)target;
 
     blurTarget->duplicateBlurRadiusAnimatorFrom(mBlurRadius.data());
@@ -135,7 +135,7 @@ void BlurEffect::prp_makeDuplicate(Property *target) {
 
 void BlurEffect::duplicateBlurRadiusAnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mBlurRadius.data());
+    source->makeDuplicate(mBlurRadius.data());
 }
 
 ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
@@ -249,13 +249,13 @@ qreal ShadowEffect::getMargin() {
             pointToLen(mTranslation->getCurrentPointValue());
 }
 
-Property *ShadowEffect::prp_makeDuplicate() {
+Property *ShadowEffect::makeDuplicate() {
     ShadowEffect *newShadow = new ShadowEffect();
-    prp_makeDuplicate(newShadow);
+    makeDuplicate(newShadow);
     return newShadow;
 }
 
-void ShadowEffect::prp_makeDuplicate(Property *target) {
+void ShadowEffect::makeDuplicate(Property *target) {
     ShadowEffect *shadowTarget = (ShadowEffect*)target;
 
     shadowTarget->duplicateTranslationAnimatorFrom(mTranslation.data());
@@ -265,20 +265,20 @@ void ShadowEffect::prp_makeDuplicate(Property *target) {
 }
 
 void ShadowEffect::duplicateTranslationAnimatorFrom(QPointFAnimator *source) {
-    source->prp_makeDuplicate(mTranslation.data());
+    source->makeDuplicate(mTranslation.data());
 }
 
 void ShadowEffect::duplicateBlurRadiusAnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mBlurRadius.data());
+    source->makeDuplicate(mBlurRadius.data());
 }
 
 void ShadowEffect::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->prp_makeDuplicate(mColor.data());
+    source->makeDuplicate(mColor.data());
 }
 
 void ShadowEffect::duplicateOpacityAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mOpacity.data());
+    source->makeDuplicate(mOpacity.data());
 }
 
 LinesEffect::LinesEffect(qreal linesWidth, qreal linesDistance) :
@@ -329,13 +329,13 @@ void LinesEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-Property *LinesEffect::prp_makeDuplicate() {
+Property *LinesEffect::makeDuplicate() {
     LinesEffect *linesTarget = new LinesEffect();
-    prp_makeDuplicate(linesTarget);
+    makeDuplicate(linesTarget);
     return linesTarget;
 }
 
-void LinesEffect::prp_makeDuplicate(Property *target) {
+void LinesEffect::makeDuplicate(Property *target) {
     LinesEffect *linesTarget = (LinesEffect*)target;
 
     linesTarget->duplicateDistanceAnimatorFrom(mLinesDistance.data());
@@ -343,11 +343,11 @@ void LinesEffect::prp_makeDuplicate(Property *target) {
 }
 
 void LinesEffect::duplicateDistanceAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mLinesDistance.data());
+    source->makeDuplicate(mLinesDistance.data());
 }
 
 void LinesEffect::duplicateWidthAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mLinesWidth.data());
+    source->makeDuplicate(mLinesWidth.data());
 }
 
 void LinesEffect::apply(BoundingBox *target,
@@ -445,13 +445,13 @@ void CirclesEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-Property *CirclesEffect::prp_makeDuplicate() {
+Property *CirclesEffect::makeDuplicate() {
     CirclesEffect *linesTarget = new CirclesEffect();
-    prp_makeDuplicate(linesTarget);
+    makeDuplicate(linesTarget);
     return linesTarget;
 }
 
-void CirclesEffect::prp_makeDuplicate(Property *target) {
+void CirclesEffect::makeDuplicate(Property *target) {
     CirclesEffect *circlesTarget = (CirclesEffect*)target;
 
     circlesTarget->duplicateDistanceAnimatorFrom(mCirclesDistance.data());
@@ -459,11 +459,11 @@ void CirclesEffect::prp_makeDuplicate(Property *target) {
 }
 
 void CirclesEffect::duplicateDistanceAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mCirclesDistance.data());
+    source->makeDuplicate(mCirclesDistance.data());
 }
 
 void CirclesEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mCirclesRadius.data());
+    source->makeDuplicate(mCirclesRadius.data());
 }
 
 #include "Boxes/boundingbox.h"
@@ -557,20 +557,20 @@ void SwirlEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-Property *SwirlEffect::prp_makeDuplicate() {
+Property *SwirlEffect::makeDuplicate() {
     SwirlEffect *linesTarget = new SwirlEffect();
-    prp_makeDuplicate(linesTarget);
+    makeDuplicate(linesTarget);
     return linesTarget;
 }
 
-void SwirlEffect::prp_makeDuplicate(Property *target) {
+void SwirlEffect::makeDuplicate(Property *target) {
     SwirlEffect *swirlTarget = (SwirlEffect*)target;
 
     swirlTarget->duplicateDegreesAnimatorFrom(mDegreesAnimator.data());
 }
 
 void SwirlEffect::duplicateDegreesAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mDegreesAnimator.data());
+    source->makeDuplicate(mDegreesAnimator.data());
 }
 
 void SwirlEffect::apply(BoundingBox *target,
@@ -622,20 +622,20 @@ void OilEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-Property *OilEffect::prp_makeDuplicate() {
+Property *OilEffect::makeDuplicate() {
     OilEffect *oilTarget = new OilEffect();
-    prp_makeDuplicate(oilTarget);
+    makeDuplicate(oilTarget);
     return oilTarget;
 }
 
-void OilEffect::prp_makeDuplicate(Property *target) {
+void OilEffect::makeDuplicate(Property *target) {
     OilEffect *oilTarget = (OilEffect*)target;
 
     oilTarget->duplicateRadiusAnimatorFrom(mRadiusAnimator.data());
 }
 
 void OilEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mRadiusAnimator.data());
+    source->makeDuplicate(mRadiusAnimator.data());
 }
 
 void OilEffect::apply(BoundingBox *target,
@@ -686,20 +686,20 @@ void ImplodeEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-Property *ImplodeEffect::prp_makeDuplicate() {
+Property *ImplodeEffect::makeDuplicate() {
     ImplodeEffect *implodeTarget = new ImplodeEffect();
-    prp_makeDuplicate(implodeTarget);
+    makeDuplicate(implodeTarget);
     return implodeTarget;
 }
 
-void ImplodeEffect::prp_makeDuplicate(Property *target) {
+void ImplodeEffect::makeDuplicate(Property *target) {
     ImplodeEffect *implodeTarget = (ImplodeEffect*)target;
 
     implodeTarget->duplicateFactorAnimatorFrom(mFactorAnimator.data());
 }
 
 void ImplodeEffect::duplicateFactorAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mFactorAnimator.data());
+    source->makeDuplicate(mFactorAnimator.data());
 }
 
 void ImplodeEffect::apply(BoundingBox *target,
@@ -753,20 +753,20 @@ void DesaturateEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-Property *DesaturateEffect::prp_makeDuplicate() {
+Property *DesaturateEffect::makeDuplicate() {
     DesaturateEffect *desaturateTarget = new DesaturateEffect();
-    prp_makeDuplicate(desaturateTarget);
+    makeDuplicate(desaturateTarget);
     return desaturateTarget;
 }
 
-void DesaturateEffect::prp_makeDuplicate(Property *target) {
+void DesaturateEffect::makeDuplicate(Property *target) {
     DesaturateEffect *desaturateTarget = (DesaturateEffect*)target;
 
     desaturateTarget->duplicateInfluenceAnimatorFrom(mInfluenceAnimator.data());
 }
 
 void DesaturateEffect::duplicateInfluenceAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mInfluenceAnimator.data());
+    source->makeDuplicate(mInfluenceAnimator.data());
 }
 
 void DesaturateEffect::apply(BoundingBox *target,
@@ -836,14 +836,14 @@ void AlphaMatteEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-Property *AlphaMatteEffect::prp_makeDuplicate() {
+Property *AlphaMatteEffect::makeDuplicate() {
     AlphaMatteEffect *alphaMatteTarget = new AlphaMatteEffect(
                 mParentEffects->getParentBox()); // !!!
-    prp_makeDuplicate(alphaMatteTarget);
+    makeDuplicate(alphaMatteTarget);
     return alphaMatteTarget;
 }
 
-void AlphaMatteEffect::prp_makeDuplicate(Property *target) {
+void AlphaMatteEffect::makeDuplicate(Property *target) {
     AlphaMatteEffect *alphaMatteTarget = (AlphaMatteEffect*)target;
 
     alphaMatteTarget->duplicateInfluenceAnimatorFrom(mInfluenceAnimator.data());
@@ -851,7 +851,7 @@ void AlphaMatteEffect::prp_makeDuplicate(Property *target) {
 }
 
 void AlphaMatteEffect::duplicateInfluenceAnimatorFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mInfluenceAnimator.data());
+    source->makeDuplicate(mInfluenceAnimator.data());
 }
 
 void AlphaMatteEffect::setInverted(const bool &inv) {

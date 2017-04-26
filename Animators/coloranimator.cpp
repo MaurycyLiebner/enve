@@ -282,7 +282,7 @@ void ColorAnimator::prp_openContextMenu(QPoint pos) {
     }
 }
 
-void ColorAnimator::prp_makeDuplicate(Property *target) {
+void ColorAnimator::makeDuplicate(Property *target) {
     ColorAnimator *colorTarget = (ColorAnimator*)target;
 
     colorTarget->duplicateVal1AnimatorFrom(mVal1Animator.data());
@@ -291,28 +291,28 @@ void ColorAnimator::prp_makeDuplicate(Property *target) {
     colorTarget->duplicateAlphaAnimatorFrom(mAlphaAnimator.data());
 }
 
-Property *ColorAnimator::prp_makeDuplicate() {
+Property *ColorAnimator::makeDuplicate() {
     ColorAnimator *colorAnimator = new ColorAnimator();
-    prp_makeDuplicate(colorAnimator);
+    makeDuplicate(colorAnimator);
     return colorAnimator;
 }
 
 void ColorAnimator::duplicateVal1AnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mVal1Animator.data());
+    source->makeDuplicate(mVal1Animator.data());
 }
 
 void ColorAnimator::duplicateVal2AnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mVal2Animator.data());
+    source->makeDuplicate(mVal2Animator.data());
 }
 
 void ColorAnimator::duplicateVal3AnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mVal3Animator.data());
+    source->makeDuplicate(mVal3Animator.data());
 }
 
 void ColorAnimator::duplicateAlphaAnimatorFrom(
         QrealAnimator *source) {
-    source->prp_makeDuplicate(mAlphaAnimator.data());
+    source->makeDuplicate(mAlphaAnimator.data());
 }

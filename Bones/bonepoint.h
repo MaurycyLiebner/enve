@@ -41,6 +41,56 @@ private:
     qreal *mControlPointsWeight = NULL;
     int mNumberOfControlPoints;
 };
+#include "Properties/boolproperty.h"
+class Bone {
+public:
+    Bone(BonePoint *rootPoint,
+         BonePoint *tipPoint) {
+        mRootPoint = rootPoint->ref<BonePoint>();
+        mTipPoint = tipPoint->ref<BonePoint>();
+    }
+
+    QPointF getCurrentRootAbsPos() {
+        return mRootPoint->getAbsolutePos();
+    }
+
+    QPointF getCurrentTipAbsPos() {
+        return mTipPoint->getAbsolutePos();
+    }
+
+    qreal getCurrentRotation() {
+        degreesBetweenVectors(
+                    mTipPoint->getAbsolutePos() - mRootPoint->getAbsolutePos(),
+                    QPointF(1., 0.));
+    }
+
+    void moveTipPointToAbsPos(const QPointF &absPos) {
+        if(mFixedLength->getValue()) {
+            QPointF tipVect = absPos - mRootPoint->getCurrentPointValue();
+            qreal currLen = pointToLen(mTipPoint->getCurrentPointValue() -
+                                       mRootPoint->getCurrentPointValue());
+            tipVect = scalePointToNewLen(tipVect, currLen);
+            mTipPoint->moveToAbs(mRootPoint->getCurrentPointValue() + tipVect);
+        } else {
+            mTranslationAnimator->setCurrentPointValue(
+                        mTranslationAnimator->getCurrentPointValue()
+                        absPos - mTipPoint->getAbsolutePos());
+            mTipPoint->moveToAbs(absPos);
+        }
+    }
+
+private:
+    QSharedPointer<BoolProperty> mFixedLength =
+            (new BoolProperty())->ref<BoolProperty>();
+    QSharedPointer<QPointFAnimator> mTranslationAnimator =
+            (new QPointFAnimator())->ref<QPointFAnimator>();
+    QSharedPointer<QrealAnimator> mScaleAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<BonePoint> mRootPoint =
+            (new BonePoint())->ref<BonePoint>();
+    QSharedPointer<BonePoint> mTipPoint =
+            (new BonePoint())->ref<BonePoint>();
+};
 
 class BonePoint : public MovablePoint {
 public:

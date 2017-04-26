@@ -34,13 +34,13 @@ public:
     void prp_loadFromSql(const int &boundingBoxId);
     int prp_saveToSql(QSqlQuery *query,
                       const int &boundingBoxId);
-    void prp_makeDuplicate(Property *property) {
+    void makeDuplicate(Property *property) {
         duplicatePathsTo((PathAnimator*)property);
     }
 
-    Property *prp_makeDuplicate() {
+    Property *makeDuplicate() {
         PathAnimator *newAnimator = new PathAnimator();
-        prp_makeDuplicate(newAnimator);
+        makeDuplicate(newAnimator);
         return newAnimator;
     }
 

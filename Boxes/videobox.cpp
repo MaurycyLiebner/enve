@@ -17,8 +17,8 @@ VideoBox::VideoBox(const QString &filePath,
     setFilePath(filePath);
 }
 
-void VideoBox::prp_makeDuplicate(Property *targetBox) {
-    AnimationBox::prp_makeDuplicate(targetBox);
+void VideoBox::makeDuplicate(Property *targetBox) {
+    AnimationBox::makeDuplicate(targetBox);
     VideoBox *animationBoxTarget = (VideoBox*)targetBox;
     animationBoxTarget->setFilePath(mSrcFilePath);
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(

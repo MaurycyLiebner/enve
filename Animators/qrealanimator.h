@@ -131,8 +131,8 @@ public:
     int getNumberDecimals() { return mDecimals; }
     void setNumberDecimals(int decimals) { mDecimals = decimals; }
 
-    void prp_makeDuplicate(Property *target);
-    Property *prp_makeDuplicate();
+    void makeDuplicate(Property *target);
+    Property *makeDuplicate();
 
     SWT_Type SWT_getType() { return SWT_QrealAnimator; }
     qreal getCurrentValueAtAbsFrame(const int &frame) const;

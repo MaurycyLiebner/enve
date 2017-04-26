@@ -34,8 +34,8 @@ public:
         scheduleSoftUpdate();
     }
 
-    void prp_makeDuplicate(Property *targetBox) {
-        PathBox::prp_makeDuplicate(targetBox);
+    void makeDuplicate(Property *targetBox) {
+        PathBox::makeDuplicate(targetBox);
         TextBox *textTarget = (TextBox*)targetBox;
         textTarget->setText(mText);
         textTarget->setFont(mFont);

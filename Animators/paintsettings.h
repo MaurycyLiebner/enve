@@ -112,8 +112,8 @@ public:
     void prp_loadFromSql(const int &sqlId);
     void setPaintPathTarget(PathBox *path);
 
-    void prp_makeDuplicate(Property *target);
-    Property *prp_makeDuplicate() {
+    void makeDuplicate(Property *target);
+    Property *makeDuplicate() {
         return NULL;
     }
 
@@ -194,7 +194,7 @@ public:
                         const bool &saveUndoRedo = true);
     ColorAnimator *getColorAnimatorAt(int id);
     void removeColor(const int &id);
-    Property *prp_makeDuplicate();
+    Property *makeDuplicate();
 
     void updateQGradientStopsFinal();
     bool isEmpty() const;
@@ -302,7 +302,7 @@ public:
     void prp_loadFromSql(const int &strokeSqlId);
     bool nonZeroLineWidth();
 
-    void prp_makeDuplicate(Property *target);
+    void makeDuplicate(Property *target);
 
     void duplicateLineWidthFrom(QrealAnimator *source);
 

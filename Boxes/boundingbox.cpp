@@ -115,27 +115,27 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 #include "linkbox.h"
 BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
     InternalLinkBox *linkBox = new InternalLinkBox(this, parent);
-    BoundingBox::prp_makeDuplicate(linkBox);
+    BoundingBox::makeDuplicate(linkBox);
     return linkBox;
 }
 
-void BoundingBox::prp_makeDuplicate(Property *property) {
+void BoundingBox::makeDuplicate(Property *property) {
     BoundingBox *targetBox = (BoundingBox*)property;
     targetBox->duplicateTransformAnimatorFrom(mTransformAnimator.data());
     int effectsCount = mEffectsAnimators->ca_getNumberOfChildren();
     for(int i = 0; i < effectsCount; i++) {
         targetBox->addEffect((PixmapEffect*)((PixmapEffect*)mEffectsAnimators->
-                           ca_getChildAt(i))->prp_makeDuplicate() );
+                           ca_getChildAt(i))->makeDuplicate() );
     }
 }
 
-Property *BoundingBox::prp_makeDuplicate() {
+Property *BoundingBox::makeDuplicate() {
     return createDuplicate(mParent.data());
 }
 
 BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
     BoundingBox *target = createNewDuplicate(parent);
-    prp_makeDuplicate(target);
+    makeDuplicate(target);
     return target;
 }
 
@@ -339,7 +339,7 @@ Canvas *BoundingBox::getParentCanvas() {
 
 void BoundingBox::duplicateTransformAnimatorFrom(
         TransformAnimator *source) {
-    source->prp_makeDuplicate(mTransformAnimator.data());
+    source->makeDuplicate(mTransformAnimator.data());
 }
 
 void BoundingBox::updateAllBoxes() {

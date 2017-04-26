@@ -76,7 +76,7 @@ public:
     void duplicatePathPointsTo(VectorPath *target);
 //    void disconnectPoints(PathPoint *point1, PathPoint *point2);
 //    void connectPoints(PathPoint *point1, PathPoint *point2);
-    void prp_makeDuplicate(Property *targetBox);
+    void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     PathAnimator *getPathAnimator();
     void duplicatePathAnimatorFrom(PathAnimator *source);

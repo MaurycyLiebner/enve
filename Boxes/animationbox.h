@@ -11,7 +11,7 @@ public:
     AnimationBox(BoxesGroup *parent);
     void updateAfterFrameChanged(int currentFrame);
 
-    void prp_makeDuplicate(Property *targetBox);
+    void makeDuplicate(Property *targetBox);
 
 //    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);

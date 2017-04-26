@@ -58,7 +58,7 @@ void Rectangle::duplicateRectanglePointsFrom(
         QrealAnimator *radiusAnimator) {
     topLeftPoint->makeDuplicate(mTopLeftPoint);
     bottomRightPoint->makeDuplicate(mBottomRightPoint);
-    radiusAnimator->prp_makeDuplicate(&mRadiusAnimator);
+    radiusAnimator->makeDuplicate(&mRadiusAnimator);
 }
 
 BoundingBox *Rectangle::createNewDuplicate(BoxesGroup *parent) {

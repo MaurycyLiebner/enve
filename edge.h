@@ -88,27 +88,50 @@ private:
     qreal mPressedT;
 };
 
-struct BoneInfluencePoint {
+class BoneInfluencePoint {
+public:
     BoneInfluencePoint() {}
     BoneInfluencePoint(const qreal &tT) {
-        weight = 0.;
-        t = tT;
+        mWeight = 0.;
+        mT = tT;
     }
 
     BoneInfluencePoint(const qreal &tT,
                        const qreal &weightT) {
-        weight = weightT;
-        t = tT;
+        mWeight = weightT;
+        mT = tT;
     }
 
-    qreal t;
-    qreal weight;
-    QPointF absPos;
+    const qreal &getT() {
+        return mT;
+    }
+
+    const qreal &getWeight() {
+        return mWeight;
+    }
+
+    const QPointF &getAbsPos() {
+        return mAbsPos;
+    }
+
+
+private:
+    qreal mAssignedRotation;
+    QPointF mAssignedScale;
+    QPointF mAssignedTranslation;
+
+    qreal mCurrentRotation;
+    QPointF mCurrentScale;
+    QPointF mCurrentTranslation;
+
+    qreal mT;
+    qreal mWeight;
+    QPointF mAbsPos;
 };
 
-class BoneEdgeInfluencePoints {
+class EdgeInfluencePoints {
 public:
-    BoneEdgeInfluencePoints(BonePoint *bonePoint) {
+    EdgeInfluencePoints(BonePoint *bonePoint) {
         mBonePoint = bonePoint;
     }
 
@@ -156,9 +179,10 @@ public:
 
 private:
     Edge *mParentEdge;
-    qreal mPoint1Weight;
-    qreal mPoint2Weight;
+    BoneInfluencePoint mPoint1InfluencePoint;
+    BoneInfluencePoint mPoint2InfluencePoint;
     QList<BoneInfluencePoint> mBoneInfluencePoints;
+
     BonePoint *mBonePoint;
 };
 #endif // EDGE_H

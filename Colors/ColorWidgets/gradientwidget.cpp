@@ -42,7 +42,7 @@ void GradientWidget::newGradient(Color color1, Color color2) {
 void GradientWidget::newGradient(int fromGradientId)
 {
     Gradient *fromGradient = mGradients.at(fromGradientId).data();
-    Gradient *newGradient = (Gradient*)fromGradient->prp_makeDuplicate();
+    Gradient *newGradient = (Gradient*)fromGradient->makeDuplicate();
     addGradientToList(newGradient);
     setCurrentGradient(mGradients.last().data());
     repaint();

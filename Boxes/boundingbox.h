@@ -352,8 +352,8 @@ public:
     void removeFromParent();
     void removeFromSelection();
     void moveByAbs(QPointF trans);
-    virtual void prp_makeDuplicate(Property *property);
-    Property *prp_makeDuplicate();
+    virtual void makeDuplicate(Property *property);
+    Property *makeDuplicate();
     BoundingBox *createDuplicate(BoxesGroup *parent);
     virtual BoundingBox *createNewDuplicate(BoxesGroup *) = 0;
     BoundingBox *createDuplicate() {

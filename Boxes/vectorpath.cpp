@@ -169,8 +169,8 @@ void VectorPath::duplicatePathAnimatorFrom(
     source->duplicatePathsTo(mPathAnimator.data());
 }
 
-void VectorPath::prp_makeDuplicate(Property *targetBox) {
-    PathBox::prp_makeDuplicate(targetBox);
+void VectorPath::makeDuplicate(Property *targetBox) {
+    PathBox::makeDuplicate(targetBox);
     ((VectorPath*)targetBox)->
             duplicatePathAnimatorFrom(mPathAnimator.data());
 }

@@ -229,8 +229,8 @@ void BoxesGroup::startSelectedFillColorTransform()
     }
 }
 
-void BoxesGroup::prp_makeDuplicate(Property *targetBox) {
-    BoundingBox::prp_makeDuplicate(targetBox);
+void BoxesGroup::makeDuplicate(Property *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
     foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->createDuplicate((BoxesGroup*)targetBox);
     }

@@ -62,7 +62,7 @@ public:
     void duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                     StrokeSettings *strokeSettings);
 
-    void prp_makeDuplicate(Property *targetBox);
+    void makeDuplicate(Property *targetBox);
 
     virtual void drawHovered(QPainter *p);
 

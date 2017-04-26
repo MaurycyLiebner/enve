@@ -14,8 +14,8 @@ public:
     SWT_Type SWT_getType() { return SWT_BoxTarget; }
     void setParentBox(BoundingBox *box);
 
-    void prp_makeDuplicate(Property *property);
-    Property *prp_makeDuplicate();
+    void makeDuplicate(Property *property);
+    Property *makeDuplicate();
     int prp_saveToSql(QSqlQuery *query,
                       const int &parentId) {}
     void prp_loadFromSql(const int &identifyingId) {}

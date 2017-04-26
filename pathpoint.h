@@ -87,11 +87,11 @@ public:
 
     }
 
-    void prp_makeDuplicate(Property *) {
+    void makeDuplicate(Property *) {
 
     }
 
-    Property *prp_makeDuplicate() {
+    Property *makeDuplicate() {
 
     }
 private:

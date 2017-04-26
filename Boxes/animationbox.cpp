@@ -19,8 +19,8 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
 //    mFrameAnimator.setCurrentIntValue(0);
 }
 
-void AnimationBox::prp_makeDuplicate(Property *targetBox) {
-    BoundingBox::prp_makeDuplicate(targetBox);
+void AnimationBox::makeDuplicate(Property *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
     AnimationBox *animationBoxTarget = (AnimationBox*)targetBox;
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
                 mTimeScaleAnimator.data());
@@ -28,7 +28,7 @@ void AnimationBox::prp_makeDuplicate(Property *targetBox) {
 
 void AnimationBox::duplicateAnimationBoxAnimatorsFrom(
         QrealAnimator *timeScaleAnimator) {
-    timeScaleAnimator->prp_makeDuplicate(mTimeScaleAnimator.data());
+    timeScaleAnimator->makeDuplicate(mTimeScaleAnimator.data());
 }
 
 //BoundingBox *AnimationBox::createNewDuplicate(BoxesGroup *parent) {

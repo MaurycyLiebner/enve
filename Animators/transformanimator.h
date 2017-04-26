@@ -4,32 +4,41 @@
 #include "Animators/qpointfanimator.h"
 #include "movablepoint.h"
 
-class TransformAnimator : public ComplexAnimator
+class BasicTransformAnimator : public ComplexAnimator
 {
 public:
-    TransformAnimator(BoundingBox *parent);
+    void resetScale(const bool &finish = false);
+    void resetTranslation(const bool &finish = false);
+    void resetRotation(const bool &finish = false);
+    virtual void reset(const bool &finish = false);
 
-    void resetScale(bool finish = false);
-    void resetTranslation(bool finish = false);
-    void resetRotation(bool finish = false);
-    void reset(bool finish = false);
+    void setScale(const qreal &sx, const qreal &sy);
+    void setPosition(const qreal &x, const qreal &y);
+    void setRotation(const qreal &rot);
 
-    QMatrix getCurrentTransformationMatrix();
-    void rotateRelativeToSavedValue(qreal rotRel);
-    void translate(qreal dX, qreal dY);
-    void scale(qreal sx, qreal sy);
-    void scaleRelativeToSavedValue(qreal sx, qreal sy, QPointF pivot);
-
-    void setScale(qreal sx, qreal sy);
-    void setPosition(qreal x, qreal y);
-    void setRotation(qreal rot);
+    void startRotTransform();
+    void startPosTransform();
+    void startScaleTransform();
 
     qreal getYScale();
     qreal getXScale();
 
-    void setPivotWithoutChangingTransformation(QPointF point,
-                                               const bool &finish = false);
-    QPointF getPivot();
+    void setRelativePos(const QPointF &relPos,
+                        const bool &saveUndoRedo = false);
+    void setAbsolutePos(const QMatrix &combinedTrans,
+                        const QPointF &pos,
+                        const bool &saveUndoRedo);
+    void moveToAbs(const QMatrix &combinedTrans,
+                   const QPointF &absPos);
+    void moveByAbs(const QMatrix &combinedTrans,
+                   const QPointF &absTrans);
+
+    void rotateRelativeToSavedValue(const qreal &rotRel);
+    void translate(const qreal &dX, const qreal &dY);
+    void scale(const qreal &sx, const qreal &sy);
+    void moveRelativeToSavedValue(const qreal &dX,
+                                  const qreal &dY);
+    virtual QMatrix getCurrentTransformationMatrix();
 
     qreal dx();
     qreal dy();
@@ -38,55 +47,65 @@ public:
     qreal yScale();
     QPointF pos();
 
+    void duplicatePosAnimatorFrom(QPointFAnimator *source);
+    void duplicateScaleAnimatorFrom(QPointFAnimator *source);
+    void duplicateRotAnimatorFrom(QrealAnimator *source);
+
+    void scaleRelativeToSavedValue(const qreal &sx,
+                                   const qreal &sy,
+                                   const QPointF &pivot);
+    void rotateRelativeToSavedValue(const qreal &rotRel,
+                                    const QPointF &pivot);
+protected:
+    QSharedPointer<QPointFAnimator> mPosAnimator =
+            (new QPointFAnimator)->ref<QPointFAnimator>();
+    QSharedPointer<QPointFAnimator> mScaleAnimator =
+            (new QPointFAnimator)->ref<QPointFAnimator>();
+    QSharedPointer<QrealAnimator> mRotAnimator =
+            (new QrealAnimator)->ref<QrealAnimator>();
+};
+
+class TransformAnimator : public BasicTransformAnimator
+{
+public:
+    TransformAnimator(BoundingBox *parent);
+
+    void resetPivot(const bool &finish = false);
+    void reset(const bool &finish = false);
+
+    QMatrix getCurrentTransformationMatrix();
+
+    void setPivotWithoutChangingTransformation(QPointF point,
+                                               const bool &finish = false);
+    QPointF getPivot();
+
     qreal getPivotX();
     qreal getPivotY();
 
     qreal getOpacity();
 
-    void rotateRelativeToSavedValue(qreal rotRel, QPointF pivot);
-    void startRotTransform();
-    void startPosTransform();
-    void startScaleTransform();
     void startOpacityTransform();
-    void setOpacity(qreal newOpacity);
-    void moveRelativeToSavedValue(qreal dX, qreal dY);
-    void copyTransformationTo(TransformAnimator *targetAnimator);
-    void setPivot(QPointF point, bool finish = false);
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+    void setOpacity(const qreal &newOpacity);
+
+    void setPivot(const QPointF &point,
+                  const bool &finish = false);
+    int prp_saveToSql(QSqlQuery *query,
+                      const int &parentId = 0);
     void prp_loadFromSql(const int &transformAnimatorId);
 
-    void prp_makeDuplicate(Property *target);
-    Property *prp_makeDuplicate() {
+    void makeDuplicate(TransformAnimator *target);
+    Property *makeDuplicate() {
         return NULL;
     }
 
     void duplicatePivotAnimatorFrom(QPointFAnimator *source);
-    void duplicatePosAnimatorFrom(QPointFAnimator *source);
-    void duplicateScaleAnimatorFrom(QPointFAnimator *source);
-    void duplicateRotAnimatorFrom(QrealAnimator *source);
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 
-    void setRelativePos(QPointF relPos,
-                        bool saveUndoRedo = false);
-    void setAbsolutePos(const QMatrix &combinedTrans,
-                        QPointF pos,
-                        bool saveUndoRedo);
-    void moveToAbs(const QMatrix &combinedTrans,
-                   QPointF absPos);
-    void moveByAbs(const QMatrix &combinedTrans,
-                   const QPointF &absTrans);
     MovablePoint *getPivotMovablePoint();
     void pivotTransformStarted();
     void pivotTransformFinished();
 private:
     QSharedPointer<MovablePoint> mPivotAnimator;
-    QSharedPointer<QPointFAnimator> mPosAnimator =
-            (new QPointFAnimator)->ref<QPointFAnimator>();
-    QSharedPointer<QPointFAnimator> mScaleAnimator =
-            (new QPointFAnimator)->ref<QPointFAnimator>();
-
-    QSharedPointer<QrealAnimator> mRotAnimator =
-            (new QrealAnimator)->ref<QrealAnimator>();
     QSharedPointer<QrealAnimator> mOpacityAnimator =
             (new QrealAnimator)->ref<QrealAnimator>();
 };

@@ -15,7 +15,7 @@ public:
              BoxesGroup *parent);
 
     void setFilePath(QString path);
-    void prp_makeDuplicate(Property *targetBox);
+    void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void reloadSound();
     void reloadFile();

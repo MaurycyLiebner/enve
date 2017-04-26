@@ -153,12 +153,12 @@ Gradient::Gradient(Color color1, Color color2) :
     updateQGradientStops();
 }
 
-Property *Gradient::prp_makeDuplicate() {
+Property *Gradient::makeDuplicate() {
     Gradient *newGradient = new Gradient();
 
     foreach(ColorAnimator *color, mColors) {
         newGradient->addColorToList(
-                    (ColorAnimator*)color->prp_makeDuplicate(), false);
+                    (ColorAnimator*)color->makeDuplicate(), false);
     }
 
     newGradient->updateQGradientStops();
@@ -431,7 +431,7 @@ void PaintSettings::setPaintPathTarget(PathBox *path) {
     mColor->prp_blockUpdater();
 }
 
-void PaintSettings::prp_makeDuplicate(Property *target) {
+void PaintSettings::makeDuplicate(Property *target) {
     PaintSettings *paintSettingsTarget = (PaintSettings*)target;
     paintSettingsTarget->duplicateColorAnimatorFrom(mColor.data());
     paintSettingsTarget->setGradient(mGradient.data());
@@ -439,7 +439,7 @@ void PaintSettings::prp_makeDuplicate(Property *target) {
 }
 
 void PaintSettings::duplicateColorAnimatorFrom(ColorAnimator *source) {
-    source->prp_makeDuplicate(mColor.data());
+    source->makeDuplicate(mColor.data());
 }
 
 void PaintSettings::setTargetPathBox(PathBox *target) {
@@ -667,8 +667,8 @@ bool StrokeSettings::nonZeroLineWidth() {
     return !isZero(mLineWidth->qra_getCurrentValue());
 }
 
-void StrokeSettings::prp_makeDuplicate(Property *target) {
-    PaintSettings::prp_makeDuplicate(target);
+void StrokeSettings::makeDuplicate(Property *target) {
+    PaintSettings::makeDuplicate(target);
     StrokeSettings *strokeSettingsTarget = (StrokeSettings*)target;
     strokeSettingsTarget->duplicateLineWidthFrom(mLineWidth.data());
     strokeSettingsTarget->setCapStyle(mCapStyle);
@@ -677,7 +677,7 @@ void StrokeSettings::prp_makeDuplicate(Property *target) {
 }
 
 void StrokeSettings::duplicateLineWidthFrom(QrealAnimator *source) {
-    source->prp_makeDuplicate(mLineWidth.data());
+    source->makeDuplicate(mLineWidth.data());
 }
 
 QrealAnimator *StrokeSettings::getLineWidthAnimator() {

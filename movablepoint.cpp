@@ -35,7 +35,7 @@ void MovablePoint::makeDuplicate(MovablePoint *targetPoint) {
 }
 
 void MovablePoint::duplicatePosAnimatorFrom(QPointFAnimator *source) {
-    source->prp_makeDuplicate(this);
+    source->makeDuplicate(this);
 }
 
 void MovablePoint::finishTransform()

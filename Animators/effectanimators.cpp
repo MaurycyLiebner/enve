@@ -95,10 +95,10 @@ bool EffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }
 
-void EffectAnimators::prp_makeDuplicate(Property *target) {
+void EffectAnimators::makeDuplicate(Property *target) {
     EffectAnimators *eaTarget = ((EffectAnimators*)target);
     foreach(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         eaTarget->addEffect((PixmapEffect*)
-                    ((PixmapEffect*)effect.data())->prp_makeDuplicate());
+                    ((PixmapEffect*)effect.data())->makeDuplicate());
     }
 }

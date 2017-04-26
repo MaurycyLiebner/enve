@@ -594,7 +594,7 @@ void QrealAnimator::prp_cancelTransform() {
     }
 }
 
-void QrealAnimator::prp_makeDuplicate(Property *target) {
+void QrealAnimator::makeDuplicate(Property *target) {
     QrealAnimator *qa_target = (QrealAnimator*)target;
     qa_target->prp_setName(prp_mName);
     qa_target->prp_setRecording(false);
@@ -608,9 +608,9 @@ void QrealAnimator::prp_makeDuplicate(Property *target) {
     }
 }
 
-Property *QrealAnimator::prp_makeDuplicate() {
+Property *QrealAnimator::makeDuplicate() {
     QrealAnimator *target = new QrealAnimator();
-    prp_makeDuplicate(target);
+    makeDuplicate(target);
     return target;
 }
 

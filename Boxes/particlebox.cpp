@@ -455,32 +455,32 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *particlesDecayFrames,
                                              QrealAnimator *particlesSizeDecay,
                                              QrealAnimator *particlesOpacityDecay) {
-    pos->prp_makeDuplicate(mPos.data());
-    width->prp_makeDuplicate(mWidth.data());
+    pos->makeDuplicate(mPos.data());
+    width->makeDuplicate(mWidth.data());
 
-    iniVelocity->prp_makeDuplicate(mIniVelocity.data());
-    iniVelocityVar->prp_makeDuplicate(mIniVelocityVar.data());
-    iniVelocityAngle->prp_makeDuplicate(mIniVelocityAngle.data());
-    iniVelocityAngleVar->prp_makeDuplicate(mIniVelocityAngleVar.data());
-    acceleration->prp_makeDuplicate(mAcceleration.data());
+    iniVelocity->makeDuplicate(mIniVelocity.data());
+    iniVelocityVar->makeDuplicate(mIniVelocityVar.data());
+    iniVelocityAngle->makeDuplicate(mIniVelocityAngle.data());
+    iniVelocityAngleVar->makeDuplicate(mIniVelocityAngleVar.data());
+    acceleration->makeDuplicate(mAcceleration.data());
 
-    particlesPerSecond->prp_makeDuplicate(mParticlesPerSecond.data());
-    particlesFrameLifetime->prp_makeDuplicate(mParticlesFrameLifetime.data());
+    particlesPerSecond->makeDuplicate(mParticlesPerSecond.data());
+    particlesFrameLifetime->makeDuplicate(mParticlesFrameLifetime.data());
 
-    velocityRandomVar->prp_makeDuplicate(mVelocityRandomVar.data());
-    velocityRandomVarPeriod->prp_makeDuplicate(mVelocityRandomVarPeriod.data());
+    velocityRandomVar->makeDuplicate(mVelocityRandomVar.data());
+    velocityRandomVarPeriod->makeDuplicate(mVelocityRandomVarPeriod.data());
 
-    particleSize->prp_makeDuplicate(mParticleSize.data());
-    particleSizeVar->prp_makeDuplicate(mParticleSizeVar.data());
+    particleSize->makeDuplicate(mParticleSize.data());
+    particleSizeVar->makeDuplicate(mParticleSizeVar.data());
 
-    particleLength->prp_makeDuplicate(mParticleLength.data());
+    particleLength->makeDuplicate(mParticleLength.data());
 
-    particlesDecayFrames->prp_makeDuplicate(mParticlesDecayFrames.data());
-    particlesSizeDecay->prp_makeDuplicate(mParticlesSizeDecay.data());
-    particlesOpacityDecay->prp_makeDuplicate(mParticlesOpacityDecay.data());
+    particlesDecayFrames->makeDuplicate(mParticlesDecayFrames.data());
+    particlesSizeDecay->makeDuplicate(mParticlesSizeDecay.data());
+    particlesOpacityDecay->makeDuplicate(mParticlesOpacityDecay.data());
 }
 
-void ParticleEmitter::prp_makeDuplicate(Property *target) {
+void ParticleEmitter::makeDuplicate(Property *target) {
     ParticleEmitter *peTarget = ((ParticleEmitter*)target);
     peTarget->duplicateAnimatorsFrom(
                 mPos.data(),

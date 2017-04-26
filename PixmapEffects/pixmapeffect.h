@@ -79,8 +79,8 @@ public:
     SWT_Type SWT_getType() { return SWT_PixmapEffect; }
 
     virtual void prp_loadFromSql(const int &identifyingId) = 0;
-    virtual Property *prp_makeDuplicate() = 0;
-    virtual void prp_makeDuplicate(Property *target) = 0;
+    virtual Property *makeDuplicate() = 0;
+    virtual void makeDuplicate(Property *target) = 0;
 
     EffectAnimators *getParentEffectAnimators() {
         return mParentEffects;
@@ -116,8 +116,8 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &pixmapEffectId);
 
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<BoolProperty> mHighQuality =
@@ -141,8 +141,8 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
 
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateTranslationAnimatorFrom(QPointFAnimator *source);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
     void duplicateColorAnimatorFrom(ColorAnimator *source);
@@ -174,8 +174,8 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateDistanceAnimatorFrom(QrealAnimator *source);
     void duplicateWidthAnimatorFrom(QrealAnimator *source);
 private:
@@ -201,8 +201,8 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateDistanceAnimatorFrom(QrealAnimator *source);
     void duplicateRadiusAnimatorFrom(QrealAnimator *source);
 private:
@@ -225,8 +225,8 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateDegreesAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<QrealAnimator> mDegreesAnimator =
@@ -246,8 +246,8 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateRadiusAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<QrealAnimator> mRadiusAnimator =
@@ -267,8 +267,8 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateFactorAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<QrealAnimator> mFactorAnimator =
@@ -288,8 +288,8 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
 private:
     QSharedPointer<QrealAnimator> mInfluenceAnimator =
@@ -309,8 +309,8 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
-    Property *prp_makeDuplicate();
-    void prp_makeDuplicate(Property *target);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
     void setInverted(const bool &inv);
 private:

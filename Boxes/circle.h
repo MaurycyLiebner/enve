@@ -65,8 +65,8 @@ public:
         return new Circle(parent);
     }
 
-    void prp_makeDuplicate(Property *targetBox) {
-        PathBox::prp_makeDuplicate(targetBox);
+    void makeDuplicate(Property *targetBox) {
+        PathBox::makeDuplicate(targetBox);
         Circle *circleTarget = (Circle*)targetBox;
         circleTarget->duplicateCirclePointsFrom(
                     mCenter,

@@ -9,13 +9,13 @@ bool BoolProperty::getValue() {
     return mValue;
 }
 
-void BoolProperty::prp_makeDuplicate(Property *property) {
+void BoolProperty::makeDuplicate(Property *property) {
     ((BoolProperty*)property)->setValue(mValue);
 }
 
-Property *BoolProperty::prp_makeDuplicate() {
+Property *BoolProperty::makeDuplicate() {
     BoolProperty *newProp = new BoolProperty();
-    prp_makeDuplicate(newProp);
+    makeDuplicate(newProp);
     return newProp;
 }
 
