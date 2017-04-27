@@ -503,7 +503,7 @@ protected:
     QSharedPointer<BoxesGroup> mParent;
 
     QSharedPointer<EffectAnimators> mEffectsAnimators =
-                            (new EffectAnimators())->ref<EffectAnimators>();
+            (new EffectAnimators())->ref<EffectAnimators>();
 
     QSharedPointer<TransformAnimator> mTransformAnimator =
                         (new TransformAnimator(this))->ref<TransformAnimator>();

@@ -17,15 +17,8 @@ KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
     mScrollTimer = new QTimer(this);
 }
 
-void KeysView::setAnimationDockWidget(
-        AnimationDockWidget *graphControls)
-{
-    mGraphControls = graphControls;
-}
-
 void KeysView::setGraphViewed(bool bT) {
     mGraphViewed = bT;
-    mGraphControls->setVisible(bT);
 }
 
 void KeysView::middlePress(QPointF pressPos)

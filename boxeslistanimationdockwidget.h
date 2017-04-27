@@ -76,7 +76,6 @@ private slots:
     void playPreview();
     void stopPreview();
 
-    void setGraphEnabled(bool recording);
     void setLocalPivot(const bool &bT);
 private:
     QMenuBar *mAddBoxesListKeysViewWidgetsBar = new QMenuBar(this);
@@ -96,7 +95,6 @@ private:
 
     ActionButton *mPlayButton;
 
-    QPushButton *mGraphEnabledButton;
     ActionButton *mAllPointsRecordButton;
     ActionButton *mCtrlsAlwaysVisible;
     ActionButton *mLocalPivot;

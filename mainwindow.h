@@ -128,7 +128,6 @@ public:
     void clearLoadedGradientsList();
 public slots:
     void setCurrentFrame(int frame);
-    void setGraphEnabled(bool graphEnabled);
     void setAllPointsRecord(bool allPointsRecord);
     //void playPreview();
    // void stopPreview();
@@ -171,7 +170,6 @@ private:
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
-    KeysView *mKeysView;
 
     QToolBar *mToolBar;
 

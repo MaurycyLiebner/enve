@@ -11,7 +11,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                             QWidget *parent) :
     QWidget(parent) {
     mMainWindow = MainWindow::getInstance();
-    mAnimationDockWidget = animationDock;
+    mBoxesListAnimationDockWidget = animationDock;
 
     mMainLayout = new QHBoxLayout(this);
     mMainLayout->setSpacing(0);
@@ -63,6 +63,15 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                                      QSizePolicy::Fixed);
 
     mMenuLayout->addWidget(mBoxesListMenuBar);
+
+    mGraphEnabledButton = new ActionButton(
+                ":/icons/graphDisabled.png",
+                "", this);
+    mGraphEnabledButton->setCheckable(":/icons/graphEnabled.png");
+    connect(mGraphEnabledButton, SIGNAL(toggled(bool)),
+            this, SLOT(setGraphEnabled(bool)) );
+    mMenuLayout->addWidget(mGraphEnabledButton);
+
     mMenuLayout->addWidget(mSearchLine);
 
     mBoxesListLayout = new QVBoxLayout();
@@ -79,6 +88,9 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mKeysView = new KeysView(mBoxesListWidget->getVisiblePartWidget(),
                              this);
     mKeysViewLayout->addWidget(mKeysView);
+    mAnimationDockWidget = new AnimationDockWidget(this, mKeysView);
+    mKeysViewLayout->addWidget(mAnimationDockWidget);
+    mAnimationDockWidget->hide();
     mMainLayout->addLayout(mKeysViewLayout);
 
     QHBoxLayout *keysViewScrollbarLayout = new QHBoxLayout();
@@ -103,7 +115,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     connect(mKeysView, SIGNAL(wheelEventSignal(QWheelEvent*)),
             mBoxesListScrollArea, SLOT(callWheelEvent(QWheelEvent*)));
 
-    connect(mAnimationDockWidget, SIGNAL(visibleRangeChanged(int,int)),
+    connect(mBoxesListAnimationDockWidget, SIGNAL(visibleRangeChanged(int,int)),
             mKeysView, SLOT(setViewedRange(int,int)) );
     mBoxesListScrollArea->setFixedWidth(400);
 
@@ -123,6 +135,11 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 BoxesListKeysViewWidget::~BoxesListKeysViewWidget() {
     delete mMainWindow->getCanvasWidget()->SWT_getAbstractionForWidget(
                 mBoxesListWidget->getVisiblePartWidget());
+}
+
+void BoxesListKeysViewWidget::setGraphEnabled(const bool &bT) {
+    mKeysView->setGraphViewed(bT);
+    mAnimationDockWidget->setVisible(bT);
 }
 
 void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
@@ -145,7 +162,7 @@ void BoxesListKeysViewWidget::moveSlider(int val) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
     }
-    emit mAnimationDockWidget->visibleRangeChanged(
+    emit mBoxesListAnimationDockWidget->visibleRangeChanged(
                         val,
                         val + mBoxesListScrollArea->height());
 }
@@ -171,11 +188,11 @@ void BoxesListKeysViewWidget::setBoxesListWidth(const int &width) {
 }
 
 void BoxesListKeysViewWidget::addNewBelowThis() {
-    mAnimationDockWidget->addNewBoxesListKeysViewWidgetBelow(this);
+    mBoxesListAnimationDockWidget->addNewBoxesListKeysViewWidgetBelow(this);
 }
 
 void BoxesListKeysViewWidget::removeThis() {
-    mAnimationDockWidget->removeBoxesListKeysViewWidget(this);
+    mBoxesListAnimationDockWidget->removeBoxesListKeysViewWidget(this);
 }
 
 void BoxesListKeysViewWidget::setRuleNone() {

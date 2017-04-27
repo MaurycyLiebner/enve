@@ -801,11 +801,6 @@ void MainWindow::setCurrentFrame(int frame) {
     callUpdateSchedulers();
 }
 
-void MainWindow::setGraphEnabled(bool graphEnabled)
-{
-    //mKeysView->setGraphViewed(graphEnabled);
-}
-
 void MainWindow::setAllPointsRecord(bool allPointsRecord)
 {
     mAllPointsRecording = allPointsRecord;
@@ -823,8 +818,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
     }
-    if (e->type() == QEvent::KeyPress)
-    {
+    if (e->type() == QEvent::KeyPress) {
         QKeyEvent *key_event = (QKeyEvent*)e;
         if(key_event->key() == Qt::Key_Control) {
             mCtrlPressed = true;

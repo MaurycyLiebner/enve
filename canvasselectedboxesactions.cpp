@@ -432,8 +432,7 @@ MovablePoint *Canvas::getPointAt(const QPointF &absPos,
     return NULL;
 }
 
-void Canvas::finishSelectedBoxesTransform()
-{
+void Canvas::finishSelectedBoxesTransform() {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->finishTransform();
     }

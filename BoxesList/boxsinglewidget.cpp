@@ -152,7 +152,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
-    } else if(type == SWT_BoxesGroup) {
+    } else if(type == SWT_BoxesGroup ||
+              type == SWT_Canvas) {
         //BoxesGroup *bg_target = (BoxesGroup*)target;
 
         //setName(bg_target->getName());
@@ -298,7 +299,8 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         QMenu menu(this);
 
         if(type == SWT_BoundingBox ||
-           type == SWT_BoxesGroup) {
+           type == SWT_BoxesGroup ||
+           type == SWT_Canvas) {
             menu.addAction("Rename");
         } else if(type == SWT_QrealAnimator ||
                   type == SWT_ColorAnimator ||
@@ -392,7 +394,8 @@ void BoxSingleWidget::rename() {
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup) {
+       type == SWT_BoxesGroup ||
+       type == SWT_Canvas) {
         BoundingBox *bb_target = (BoundingBox*)target;
         bool ok;
         QString text = QInputDialog::getText(this, tr("New name dialog"),
@@ -414,7 +417,8 @@ void BoxSingleWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup) {
+       type == SWT_BoxesGroup ||
+       type == SWT_Canvas) {
         BoundingBox *bb_target = (BoundingBox*)target;
         bb_target->drawKeys(p, pixelsPerFrame,
                             containerTop,
@@ -438,7 +442,8 @@ Key *BoxSingleWidget::getKeyAtPos(const int &pressX,
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup) {
+       type == SWT_BoxesGroup ||
+       type == SWT_Canvas) {
         BoundingBox *bb_target = (BoundingBox*)target;
         return bb_target->getKeyAtPos(
                     pressX,
@@ -465,7 +470,8 @@ DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup) {
+       type == SWT_BoxesGroup ||
+       type == SWT_Canvas) {
         BoundingBox *bb_target = (BoundingBox*)target;
         return bb_target->getRectangleMovableAtPos(
                     pressX,
@@ -488,7 +494,8 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
     if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup) {
+       type == SWT_BoxesGroup ||
+       type == SWT_Canvas) {
         BoundingBox *bb_target = (BoundingBox*)target;
         bb_target->getKeysInRect(
                     selectionRect,
@@ -516,7 +523,8 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     int nameX = mFillWidget->x();
     QString name;
     if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup) {
+       type == SWT_BoxesGroup ||
+       type == SWT_Canvas) {
         BoundingBox *bb_target = (BoundingBox*)target;
 
         nameX += 5;

@@ -125,7 +125,6 @@ private:
 
     QPointer<DurationRectangleMovable> mHoveredMovable;
     Key *mHoveredKey = NULL;
-    AnimationDockWidget *mGraphControls = NULL;
 
     bool mIsMouseGrabbing = false;
     int mViewedTop = 0;

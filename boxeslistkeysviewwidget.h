@@ -10,6 +10,7 @@ class AnimationWidgetScrollBar;
 class BoxesListAnimationDockWidget;
 class ChangeWidthWidget;
 #include <QMenuBar>
+#include "actionbutton.h"
 
 class BoxesListKeysViewWidget : public QWidget
 {
@@ -46,6 +47,7 @@ public slots:
 
     void setTypeSound();
     void setTypeAll();
+    void setGraphEnabled(const bool &bT);
 protected slots:
     void setBoxesListWidth(const int &width);
 
@@ -63,8 +65,10 @@ private:
     BoxScrollWidget *mBoxesListWidget;
     KeysView *mKeysView;
     MainWindow *mMainWindow;
+    ActionButton *mGraphEnabledButton;
+    AnimationDockWidget *mAnimationDockWidget;
 
-    BoxesListAnimationDockWidget *mAnimationDockWidget;
+    BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
 };
 
 #endif // BOXESLISTKEYSVIEWWIDGET_H

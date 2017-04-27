@@ -270,6 +270,11 @@ public:
     void scheduleEffectsMarginUpdate() {}
 
     void addChildAwaitingUpdate(BoundingBox *child);
+
+    SWT_Type SWT_getType() {
+        return SWT_Canvas;
+    }
+
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        foreach(BoundingBox *child, mChildBoxes) {

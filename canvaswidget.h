@@ -58,7 +58,7 @@ public:
     void schedulePivotUpdate();
 
     SWT_Type SWT_getType() {
-        return SWT_Canvas;
+        return SWT_CanvasWidget;
     }
 
     BoxesGroup *getCurrentGroup();

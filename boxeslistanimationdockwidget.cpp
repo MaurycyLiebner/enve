@@ -140,17 +140,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mPlayButton, SIGNAL(toggled(bool)),
             this, SLOT(playStopPreview(bool)) );
 
-    mGraphEnabledButton = new QPushButton(
-                QIcon(":/icons/graphDisabled.png"), "", this);
-    mGraphEnabledButton->setSizePolicy(QSizePolicy::Maximum,
-                               QSizePolicy::Maximum);
-    mGraphEnabledButton->setCheckable(true);
-    mGraphEnabledButton->setChecked(false);
-    connect(mGraphEnabledButton, SIGNAL(toggled(bool)),
-            this, SLOT(setGraphEnabled(bool)) );
-    connect(mGraphEnabledButton, SIGNAL(toggled(bool)),
-            parent, SLOT(setGraphEnabled(bool)) );
-
     mAllPointsRecordButton = new ActionButton(
                 ":/icons/recordSinglePoint.png",
                 "start preview", this);
@@ -188,8 +177,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mControlButtonsLayout->addWidget(mPlayButton);
     mPlayButton->setFocusPolicy(Qt::NoFocus);
 
-    mControlButtonsLayout->addWidget(mGraphEnabledButton);
-    mGraphEnabledButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mAllPointsRecordButton);
     mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mCtrlsAlwaysVisible);
@@ -321,15 +308,6 @@ void BoxesListAnimationDockWidget::stopPreview() {
 
 void BoxesListAnimationDockWidget::playPreview() {
     mMainWindow->getCanvasWidget()->playPreview();
-}
-
-void BoxesListAnimationDockWidget::setGraphEnabled(bool graphEnabled)
-{
-    if(graphEnabled) {
-        mGraphEnabledButton->setIcon(QIcon(":/icons/graphEnabled.png") );
-    } else {
-        mGraphEnabledButton->setIcon(QIcon(":/icons/graphDisabled.png") );
-    }
 }
 
 void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
