@@ -41,14 +41,11 @@ void BoxesGroup::clearAllCache() {
 }
 
 void BoxesGroup::updateCombinedTransformTmp() {
-    mCombinedTransformMatrix = mRelativeTransformMatrix*
-                               mParent->getCombinedTransform();
     foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateCombinedTransformTmp();
     }
     if(!mIsDescendantCurrentGroup) {
-        mRenderCacheHandler.updateCurrentRenderContainerTransform(
-                                    mCombinedTransformMatrix);
+        updateCurrentRenderContainerTransform();
     }
 }
 
@@ -135,7 +132,7 @@ int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 
 bool BoxesGroup::relPointInsidePath(QPointF relPos) {
     if(mRelBoundingRect.contains(relPos)) {
-        QPointF absPos = mapRelativeToAbsolute(relPos);
+        QPointF absPos = mapRelPosToAbs(relPos);
         foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             if(box->absPointInsidePath(absPos)) {
                 return true;
@@ -151,8 +148,7 @@ void BoxesGroup::updateAfterFrameChanged(int currentFrame) {
     bool notNull = mRenderCacheHandler.
             updateCurrentRenderContainerFromFrameIfNotNull(currentFrame);
     if(notNull) {
-        mRenderCacheHandler.updateCurrentRenderContainerTransform(
-                                        mCombinedTransformMatrix);
+        updateCurrentRenderContainerTransform();
         if(getParentCanvas()->isPreviewing()) return;
     }
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
@@ -348,7 +344,8 @@ void BoxesGroup::drawBoundingRect(QPainter *p) {
     p->setPen(pen);
     p->setBrush(Qt::NoBrush);
 
-    p->setTransform(QTransform(mCombinedTransformMatrix), true);
+    p->setTransform(QTransform(mTransformAnimator->getCombinedTransform()),
+                    true);
     p->drawPath(mRelBoundingRectPath);
 
     p->restore();

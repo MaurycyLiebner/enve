@@ -124,7 +124,7 @@ void VectorPath::drawSelected(QPainter *p,
         drawBoundingRect(p);
         mPathAnimator->drawSelected(p,
                                    currentCanvasMode,
-                                   mCombinedTransformMatrix);
+                                   getCombinedTransform());
 
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
             mFillGradientPoints->drawGradientPoints(p);

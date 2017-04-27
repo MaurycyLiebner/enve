@@ -41,6 +41,24 @@ private:
     qreal *mControlPointsWeight = NULL;
     int mNumberOfControlPoints;
 };
+
+class BonePoint : public MovablePoint {
+public:
+    BonePoint(BoundingBox *bonesBox);
+    BonePoint(BoundingBox *bonesBox, BonePoint *parentBonePt);
+
+    void addChildBonePoint(BonePoint *childBonePt);
+    void setParentBonePointVar(BonePoint *parentBonePt);
+    void setParentBonePoint(BonePoint *parentBonePt);
+protected:
+    QSharedPointer<QrealAnimator> mRotAnimator;
+    QSharedPointer<QPointFAnimator> mScaleAnimator;
+    bool mBoneBeetweenThisAndPrev = false;
+    QList<QSharedPointer<BonePoint> > mChildBonePoints;
+    QSharedPointer<BonePoint> mParentBonePoint;
+};
+
+
 #include "Properties/boolproperty.h"
 #include "Animators/transformanimator.h"
 class Bone : public ComplexAnimator {
@@ -69,26 +87,37 @@ public:
     }
 
     qreal getCurrentRotation() {
-        degreesBetweenVectors(
+        return degreesBetweenVectors(
                     mTipPoint->getAbsolutePos() - mRootPoint->getAbsolutePos(),
                     QPointF(1., 0.));
     }
 
-    void moveTipPointToAbsPos(const QPointF &absPos) {
+    void moveTipPointToRelPos(const QPointF &relPos) {
         if(mFixedLength->getValue()) {
-            QPointF tipVect = absPos - mRootPoint->getCurrentPointValue();
-            qreal currLen = pointToLen(mTipPoint->getCurrentPointValue() -
-                                       mRootPoint->getCurrentPointValue());
+            QPointF tipVect = relPos - mRootPoint->getRelativePos();
+            qreal currLen = pointToLen(mTipPoint->getRelativePos() -
+                                       mRootPoint->getRelativePos());
             tipVect = scalePointToNewLen(tipVect, currLen);
-            mTipPoint->moveToAbs(mRootPoint->getCurrentPointValue() + tipVect);
+            mTipPoint->moveToRel(mRootPoint->getCurrentPointValue() + tipVect);
         } else {
-            mTranslationAnimator->setCurrentPointValue(
-                        mTranslationAnimator->getCurrentPointValue()
-                        absPos - mTipPoint->getAbsolutePos());
-            mTipPoint->moveToAbs(absPos);
+            mTipPoint->moveToRel(relPos);
         }
     }
 
+    BasicTransformAnimator *getTransformAnimator() {
+        return mTransformAnimator.data();
+    }
+
+    void setParentBone(Bone *parentBone) {
+        if(parentBone == NULL) {
+            mParentBone.reset();
+            mTransformAnimator->setParentTransformAnimator(NULL);
+        } else {
+            mParentBone = parentBone->ref<Bone>();
+            mTransformAnimator->setParentTransformAnimator(
+                        parentBone->getTransformAnimator());
+        }
+    }
 
 private:
     QSharedPointer<Bone> mParentBone;
@@ -102,21 +131,4 @@ private:
     QSharedPointer<BonePoint> mRootPoint;
     QSharedPointer<BonePoint> mTipPoint;
 };
-
-class BonePoint : public MovablePoint {
-public:
-    BonePoint(BoundingBox *bonesBox);
-    BonePoint(BoundingBox *bonesBox, BonePoint *parentBonePt);
-
-    void addChildBonePoint(BonePoint *childBonePt);
-    void setParentBonePointVar(BonePoint *parentBonePt);
-    void setParentBonePoint(BonePoint *parentBonePt);
-protected:
-    QSharedPointer<QrealAnimator> mRotAnimator;
-    QSharedPointer<QPointFAnimator> mScaleAnimator;
-    bool mBoneBeetweenThisAndPrev = false;
-    QList<QSharedPointer<BonePoint> > mChildBonePoints;
-    QSharedPointer<BonePoint> mParentBonePoint;
-};
-
 #endif // BONEPOINT_H

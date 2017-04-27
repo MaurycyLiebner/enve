@@ -128,9 +128,9 @@ SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
 
 void SameTransformInternalLink::updateCombinedTransform() {
     if(mLinkTarget == NULL) return;
-    mCombinedTransformMatrix =
-            mLinkTarget->getRelativeTransform()*
-            mParent->getCombinedTransform();
+//    mCombinedTransformMatrix =
+//            mLinkTarget->getRelativeTransform()*
+//            mParent->getCombinedTransform();
 
 
     updateAfterCombinedTransformationChanged();
@@ -167,8 +167,8 @@ SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
 }
 
 void SameTransformInternalLinkBoxesGroup::updateCombinedTransform() {
-    mCombinedTransformMatrix = mLinkTarget->getRelativeTransform()*
-            mParent->getCombinedTransform();
+//    mCombinedTransformMatrix = mLinkTarget->getRelativeTransform()*
+//            mParent->getCombinedTransform();
 
 
     updateAfterCombinedTransformationChanged();
@@ -217,7 +217,7 @@ void InternalLinkCanvas::draw(QPainter *p) {
     if(mClipToCanvasSize) {
         p->setClipRect(mRelBoundingRect);
     }
-    p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
+    p->setTransform(QTransform(getCombinedTransform().inverted()), true);
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         //box->draw(p);
         box->drawPixmap(p);

@@ -59,6 +59,12 @@ void Property::prp_setUpdater(AnimatorUpdater *updater) {
     prp_mUpdater = updater;
 }
 
+void Property::prp_setBlockedUpdater(AnimatorUpdater *updater) {
+    prp_mUpdaterBlocked = false;
+    prp_setUpdater(updater);
+    prp_blockUpdater();
+}
+
 void Property::prp_blockUpdater() {
     prp_mUpdaterBlocked = true;
 }

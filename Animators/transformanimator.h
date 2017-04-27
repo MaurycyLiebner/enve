@@ -4,8 +4,8 @@
 #include "Animators/qpointfanimator.h"
 #include "movablepoint.h"
 
-class BasicTransformAnimator : public ComplexAnimator
-{
+class BasicTransformAnimator : public ComplexAnimator {
+    Q_OBJECT
 public:
     BasicTransformAnimator();
     void resetScale(const bool &finish = false);
@@ -57,13 +57,35 @@ public:
                                    const QPointF &pivot);
     void rotateRelativeToSavedValue(const qreal &rotRel,
                                     const QPointF &pivot);
+
+    QPointF mapRelPosToAbs(const QPointF &relPos) const;
+    QPointF mapAbsPosToRel(const QPointF &absPos) const;
+
+    void updateRelativeTransform();
+    const QMatrix &getCombinedTransform() const;
+    const QMatrix &getRelativeTransform() const;
+
+    void setParentTransformAnimator(BasicTransformAnimator *parent);
+    void makeDuplicate(BasicTransformAnimator *target);
 protected:
+    QMatrix mRelTransform;
+    QMatrix mCombinedTransform;
+
+    QSharedPointer<BasicTransformAnimator> mParentTransformAnimator;
+
     QSharedPointer<QPointFAnimator> mPosAnimator =
             (new QPointFAnimator)->ref<QPointFAnimator>();
     QSharedPointer<QPointFAnimator> mScaleAnimator =
             (new QPointFAnimator)->ref<QPointFAnimator>();
     QSharedPointer<QrealAnimator> mRotAnimator =
             (new QrealAnimator)->ref<QrealAnimator>();
+
+    std::shared_ptr<TransformUpdater> mTransformUpdater =
+            (new TransformUpdater(this))->ref<TransformUpdater>();
+public slots:
+    void updateCombinedTransform();
+signals:
+    void combinedTransformChanged();
 };
 
 class TransformAnimator : public BasicTransformAnimator
@@ -105,6 +127,7 @@ public:
     MovablePoint *getPivotMovablePoint();
     void pivotTransformStarted();
     void pivotTransformFinished();
+    QPointF getPivotAbs();
 private:
     QSharedPointer<MovablePoint> mPivotAnimator;
     QSharedPointer<QrealAnimator> mOpacityAnimator =

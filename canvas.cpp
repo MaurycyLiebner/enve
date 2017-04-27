@@ -97,13 +97,11 @@ void Canvas::setEffectsPaintEnabled(const bool &bT) {
     mEffectsPaintEnabled = bT;
 }
 
-bool Canvas::effectsPaintEnabled()
-{
+bool Canvas::effectsPaintEnabled() {
     return mEffectsPaintEnabled;
 }
 
-qreal Canvas::getResolutionPercent()
-{
+qreal Canvas::getResolutionPercent() {
     return Canvas::mResolutionPercent;
 }
 
@@ -111,25 +109,20 @@ void Canvas::setResolutionPercent(const qreal &percent) {
     mResolutionPercent = percent;
 }
 
-QRectF Canvas::getPixBoundingRect()
-{
-    QPointF absPos = getAbsolutePos();
-    return QRectF(absPos, absPos + QPointF(mVisibleWidth, mVisibleHeight));
+QRectF Canvas::getPixBoundingRect() {
+    QPointF absPos = QPointF(mCanvasTransformMatrix.dx(),
+                             mCanvasTransformMatrix.dy());
+    return QRectF(absPos, QSizeF(mVisibleWidth, mVisibleHeight));
 }
 
-void Canvas::scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin) {
-    QPointF transPoint = -BoundingBox::mapAbsPosToRel(absOrigin);
+void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
+    QPointF transPoint = -mCanvasTransformMatrix.inverted().map(absOrigin);
 
-    mCombinedTransformMatrix.translate(-transPoint.x(), -transPoint.y());
-    mCombinedTransformMatrix.scale(scaleXBy, scaleYBy);
-    mCombinedTransformMatrix.translate(transPoint.x(), transPoint.y());
+    mCanvasTransformMatrix.translate(-transPoint.x(), -transPoint.y());
+    mCanvasTransformMatrix.scale(scaleBy, scaleBy);
+    mCanvasTransformMatrix.translate(transPoint.x(), transPoint.y());
 
-    mLastPressPosAbs = mCombinedTransformMatrix.map(mLastPressPosRel);
-}
-
-void Canvas::scale(qreal scaleBy, QPointF absOrigin)
-{
-    scale(scaleBy, scaleBy, absOrigin);
+    mLastPressPosAbs = mCanvasTransformMatrix.map(mLastPressPosRel);
 }
 
 bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
@@ -236,9 +229,7 @@ void Canvas::paintEvent(QPainter *p) {
     p->setRenderHint(QPainter::Antialiasing);
     p->setRenderHint(QPainter::SmoothPixmapTransform);
 
-    QPointF absPos = getAbsolutePos();
-    QRectF viewRect = QRectF(absPos,
-                             absPos + QPointF(mVisibleWidth, mVisibleHeight));
+    QRectF viewRect = getPixBoundingRect();
 
     if(mPreviewing) {
         QPainterPath path;
@@ -264,7 +255,7 @@ void Canvas::paintEvent(QPainter *p) {
                     QColor(75, 75, 75));
         p->fillRect(viewRect, mBackgroundColor->getCurrentColor().qcol);
 
-        p->setTransform(QTransform(mCombinedTransformMatrix), true);
+        p->setTransform(QTransform(mCanvasTransformMatrix), true);
         foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmap(p);
         }
@@ -373,11 +364,11 @@ QRectF Canvas::getRenderRect() {
 }
 
 void Canvas::updateRenderRect() {
-    mCanvasRect = QRectF(qMax(mCombinedTransformMatrix.dx(),
-                              mCombinedTransformMatrix.dx()*
+    mCanvasRect = QRectF(qMax(mCanvasTransformMatrix.dx(),
+                              mCanvasTransformMatrix.dx()*
                               mResolutionPercent),
-                         qMax(mCombinedTransformMatrix.dy(),
-                              mCombinedTransformMatrix.dy()*
+                         qMax(mCanvasTransformMatrix.dy(),
+                              mCanvasTransformMatrix.dy()*
                               mResolutionPercent),
                          mVisibleWidth*mResolutionPercent,
                          mVisibleHeight*mResolutionPercent);
@@ -408,7 +399,6 @@ void Canvas::renderCurrentFrameToOutput(QString renderDest) {
 void Canvas::drawPreviewPixmap(QPainter *p) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
-        //p->setTransform(QTransform(mCombinedTransformMatrix.inverted()), true);
         foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPreviewPixmap(p);
         }
@@ -458,7 +448,7 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame)
     p.translate(-mRenderRect.topLeft()*mResolutionPercent);
     //p.translate(-mCanvasRect.topLeft());
     p.scale(mResolutionPercent, mResolutionPercent);
-    p.setTransform(QTransform(mCombinedTransformMatrix), true);
+    p.setTransform(QTransform(mCanvasTransformMatrix), true);
 
     Canvas::drawPreviewPixmap(&p);
 
@@ -479,8 +469,8 @@ void Canvas::renderFinalCurrentFrameToQImage(QImage *frame)
 QMatrix Canvas::getCombinedRenderTransform()
 {
     QMatrix matrix;
-    matrix.scale(mCombinedTransformMatrix.m11(),
-                 mCombinedTransformMatrix.m22() );
+    matrix.scale(mCanvasTransformMatrix.m11(),
+                 mCanvasTransformMatrix.m22() );
     return matrix;
 }
 
@@ -564,12 +554,6 @@ void Canvas::updatePivot() {
         }
     }
 }
-
-//void Canvas::updateAfterCombinedTransformationChanged()
-//{
-//    BoundingBox::updateAfterCombinedTransformationChanged();
-//    mRotPivot->updateRotationMappedPath();
-//}
 
 void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
@@ -826,7 +810,7 @@ void Canvas::selectOnlyLastPressedPoint() {
 }
 
 void Canvas::resetTransormation() {
-    mCombinedTransformMatrix.reset();
+    mCanvasTransformMatrix.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
@@ -835,14 +819,14 @@ void Canvas::resetTransormation() {
 }
 
 void Canvas::fitCanvasToSize() {
-    mCombinedTransformMatrix.reset();
+    mCanvasTransformMatrix.reset();
     mVisibleHeight = mHeight + 20;
     mVisibleWidth = mWidth + 20;
     qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
     qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
-    scale(qMin(heightScale, widthScale), QPointF(0., 0.));
-    mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
-    mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
+    zoomCanvas(qMin(heightScale, widthScale), QPointF(0., 0.));
+    mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
+    mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
     moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
                     (mCanvasWidget->height() - mVisibleHeight)*0.5) );
 
@@ -854,9 +838,9 @@ void Canvas::moveByRel(QPointF trans) {
 
     mLastPressPosRel = mapAbsPosToRel(mLastPressPosRel);
 
-    mCombinedTransformMatrix.translate(trans.x(), trans.y());
+    mCanvasTransformMatrix.translate(trans.x(), trans.y());
 
-    mLastPressPosRel = mCombinedTransformMatrix.map(mLastPressPosRel);
+    mLastPressPosRel = mCanvasTransformMatrix.map(mLastPressPosRel);
     schedulePivotUpdate();
 }
 

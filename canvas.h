@@ -70,8 +70,7 @@ public:
     void resetTransormation();
     void fitCanvasToSize();
     bool processFilteredKeyEvent(QKeyEvent *event);
-    void scale(qreal scaleXBy, qreal scaleYBy, QPointF absOrigin);
-    void scale(qreal scaleBy, QPointF absOrigin);
+    void zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin);
     void moveByRel(QPointF trans);
 
     void updateAfterFrameChanged(int currentFrame);
@@ -95,8 +94,10 @@ public:
     //
     void finishSelectedPointsTransform();
     void finishSelectedBoxesTransform();
-    void moveSelectedPointsByAbs(QPointF by, bool startTransform);
-    void moveSelectedBoxesByAbs(QPointF by, bool startTransform);
+    void moveSelectedPointsByAbs(const QPointF &by,
+                                 const bool &startTransform);
+    void moveSelectedBoxesByAbs(const QPointF &by,
+                                const bool &startTransform);
     BoxesGroup *groupSelectedBoxes();
 
     //void selectAllBoxes();
@@ -348,6 +349,7 @@ private:
 
     void sortSelectedBoxesByZAscending();
 
+    QMatrix mCanvasTransformMatrix;
     SoundComposition *mSoundComposition;
 
     MovablePoint *mHoveredPoint = NULL;

@@ -9,11 +9,15 @@ BasicTransformAnimator::BasicTransformAnimator() :
     mScaleAnimator->prp_setName("scale");
     mScaleAnimator->setCurrentPointValue(QPointF(1., 1.));
     mScaleAnimator->setPrefferedValueStep(0.05);
+    mScaleAnimator->prp_setBlockedUpdater(mTransformUpdater.get());
 
     mRotAnimator->prp_setName("rot");
     mRotAnimator->qra_setCurrentValue(0.);
+    mRotAnimator->prp_setBlockedUpdater(mTransformUpdater.get());
+
     mPosAnimator->prp_setName("trans");
     mPosAnimator->setCurrentPointValue(QPointF(0., 0.) );
+    mPosAnimator->prp_setBlockedUpdater(mTransformUpdater.get());
 
     ca_addChildAnimator(mPosAnimator.data());
     ca_addChildAnimator(mRotAnimator.data());
@@ -177,6 +181,53 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
     mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
+QPointF BasicTransformAnimator::mapRelPosToAbs(const QPointF &relPos) const {
+    return mCombinedTransform.map(relPos);
+}
+
+QPointF BasicTransformAnimator::mapAbsPosToRel(const QPointF &absPos) const {
+    return mCombinedTransform.inverted().map(absPos);
+}
+
+void BasicTransformAnimator::updateRelativeTransform() {
+    mRelTransform = getCurrentTransformationMatrix();
+    updateCombinedTransform();
+}
+
+void BasicTransformAnimator::updateCombinedTransform() {
+    if(mParentTransformAnimator.isNull()) {
+        mCombinedTransform = mRelTransform;
+    } else {
+        mCombinedTransform = mRelTransform *
+                             mParentTransformAnimator->getCombinedTransform();
+    }
+    emit combinedTransformChanged();
+}
+
+const QMatrix &BasicTransformAnimator::getCombinedTransform() const {
+    return mCombinedTransform;
+}
+
+const QMatrix &BasicTransformAnimator::getRelativeTransform() const {
+    return mRelTransform;
+}
+
+void BasicTransformAnimator::setParentTransformAnimator(
+                                BasicTransformAnimator *parent) {
+    if(!mParentTransformAnimator.isNull()) {
+        disconnect(parent, SIGNAL(combinedTransformChanged()),
+                   this, SLOT(updateCombinedTransform()));
+    }
+    if(parent == NULL) {
+        mParentTransformAnimator.reset();
+    } else {
+        mParentTransformAnimator = parent->ref<BasicTransformAnimator>();
+        connect(parent, SIGNAL(combinedTransformChanged()),
+                this, SLOT(updateCombinedTransform()));
+    }
+    updateCombinedTransform();
+}
+
 void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
                                                       const qreal &sy,
                                                       const QPointF &pivot) {
@@ -205,14 +256,18 @@ TransformAnimator::TransformAnimator(BoundingBox *parent) :
     mPivotAnimator = (new BoxPathPoint(parent))->ref<MovablePoint>();
     mPivotAnimator->prp_setName("pivot");
     mPivotAnimator->setCurrentPointValue(QPointF(0., 0.) );
+    mPivotAnimator->prp_setBlockedUpdater(mTransformUpdater.get());
     mOpacityAnimator->prp_setName("opacity");
     mOpacityAnimator->qra_setValueRange(0., 100.);
     mOpacityAnimator->setPrefferedValueStep(5.);
     mOpacityAnimator->qra_setCurrentValue(100.);
     mOpacityAnimator->freezeMinMaxValues();
+    mOpacityAnimator->prp_setBlockedUpdater(mTransformUpdater.get());
 
     ca_addChildAnimator(mPivotAnimator.data());
     ca_addChildAnimator(mOpacityAnimator.data());
+
+    prp_setBlockedUpdater(new TransUpdater(parent) );
 }
 
 MovablePoint *TransformAnimator::getPivotMovablePoint() {
@@ -369,6 +424,10 @@ void TransformAnimator::setPivot(const QPointF &point,
 
 QPointF TransformAnimator::getPivot() {
     return mPivotAnimator->getCurrentPointValue();
+}
+
+QPointF TransformAnimator::getPivotAbs() {
+    return mPivotAnimator->getAbsolutePos();
 }
 
 qreal TransformAnimator::getPivotX() {

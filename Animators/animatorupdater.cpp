@@ -5,25 +5,40 @@
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
 
-TransUpdater::TransUpdater(BoundingBox *boundingBox) : AnimatorUpdater()
-{
+TransUpdater::TransUpdater(BoundingBox *boundingBox) :
+    AnimatorUpdater() {
     mTarget = boundingBox;
 }
 
 void TransUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
     mTarget->updateRelativeTransformTmp();
-    mTarget->schedulePivotUpdate();
 }
 
 void TransUpdater::updateFinal() {
-    mTarget->replaceCurrentFrameCache();
     mTarget->updateCombinedTransform();
 }
 
 void TransUpdater::frameChangeUpdate() {
     mTarget->updateRelativeTransformAfterFrameChange();
-    mTarget->schedulePivotUpdate();
+}
+
+TransformUpdater::TransformUpdater(BasicTransformAnimator *transformAnimator) {
+    mTarget = transformAnimator;
+}
+
+void TransformUpdater::update() {
+    mTarget->updateRelativeTransform();
+    mTarget->prp_callUpdater();
+}
+
+void TransformUpdater::updateFinal() {
+    mTarget->updateRelativeTransform();
+    mTarget->prp_callFinishUpdater();
+}
+
+void TransformUpdater::frameChangeUpdate() {
+    mTarget->updateRelativeTransform();
+    mTarget->anim_callFrameChangeUpdater();
 }
 
 PathPointUpdater::PathPointUpdater(PathBox *vectorPath) {

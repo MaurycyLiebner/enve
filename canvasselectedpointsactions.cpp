@@ -176,7 +176,8 @@ void Canvas::cancelSelectedPointsTransform() {
     }
 }
 
-void Canvas::moveSelectedPointsByAbs(QPointF by, bool startTransform) {
+void Canvas::moveSelectedPointsByAbs(const QPointF &by,
+                                     const bool &startTransform) {
     if(startTransform) {
         startSelectedPointsTransform();
         foreach(MovablePoint *point, mSelectedPoints) {

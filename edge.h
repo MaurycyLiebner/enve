@@ -102,18 +102,21 @@ public:
         mT = tT;
     }
 
-    const qreal &getT() {
+    const qreal &getT() const {
         return mT;
     }
 
-    const qreal &getWeight() {
+    const qreal &getWeight() const {
         return mWeight;
     }
 
-    const QPointF &getAbsPos() {
+    const QPointF &getAbsPos() const {
         return mAbsPos;
     }
 
+    void setAbsPos(const QPointF &absPos) {
+        mAbsPos = absPos;
+    }
 
 private:
     qreal mAssignedRotation;
@@ -155,8 +158,8 @@ public:
         int bestId = -1;
         for(int i = 0; i < mBoneInfluencePoints.count(); i++) {
             const BoneInfluencePoint &boneInfPt = mBoneInfluencePoints.at(i);
-            qreal thisDist =
-                    pointToLen(absPos - mParentEdge->getAbsPosAtT(boneInfPt.t));
+            qreal thisDist = pointToLen(
+                        absPos - mParentEdge->getAbsPosAtT(boneInfPt.getT()));
             if(leastDist > thisDist) {
                 leastDist = thisDist;
                 bestId = i;
@@ -172,8 +175,8 @@ public:
 
     void updatePointsAbsPosition() {
         for(int i = 0; i < mBoneInfluencePoints.count(); i++) {
-            mBoneInfluencePoints[i].absPos =
-                    mParentEdge->getAbsPosAtT(mBoneInfluencePoints[i].t);
+            mBoneInfluencePoints[i].setAbsPos(
+                    mParentEdge->getAbsPosAtT(mBoneInfluencePoints[i].getT()));
         }
     }
 

@@ -29,7 +29,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         cancelCurrentTransform();
         clearAndDisableInput();
     } else {
-        QPointF eventPos = mCombinedTransformMatrix.inverted().map(event->pos());
+        QPointF eventPos = mCanvasTransformMatrix.inverted().map(event->pos());
         BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(eventPos);
         if(pressedBox == NULL) {
             clearBoxesSelection();
@@ -330,25 +330,25 @@ void Canvas::handleLeftButtonMousePress() {
 
 void Canvas::setLastMouseEventPosAbs(const QPoint &abs) {
     mLastMouseEventPosAbs = abs;
-    mLastMouseEventPosRel = mCombinedTransformMatrix.inverted().map(
+    mLastMouseEventPosRel = mCanvasTransformMatrix.inverted().map(
                                                     mLastMouseEventPosAbs);
 }
 
 void Canvas::setLastMousePressPosAbs(const QPoint &abs) {
     mLastPressPosAbs = abs;
-    mLastPressPosRel = mCombinedTransformMatrix.inverted().map(
+    mLastPressPosRel = mCanvasTransformMatrix.inverted().map(
                                 mLastMouseEventPosAbs);
 }
 
 void Canvas::setCurrentMouseEventPosAbs(const QPoint &abs) {
     mCurrentMouseEventPosAbs = abs;
-    mCurrentMouseEventPosRel = mCombinedTransformMatrix.inverted().map(
+    mCurrentMouseEventPosRel = mCanvasTransformMatrix.inverted().map(
                                                     mCurrentMouseEventPosAbs);
 }
 
 void Canvas::setCurrentMousePressPosAbs(const QPoint &abs) {
     mCurrentPressPosAbs = abs;
-    mCurrentPressPosRel = mCombinedTransformMatrix.inverted().map(
+    mCurrentPressPosRel = mCanvasTransformMatrix.inverted().map(
                                 mCurrentMouseEventPosAbs);
 }
 
@@ -766,12 +766,12 @@ void Canvas::wheelEvent(QWheelEvent *event)
 {
     if(mPreviewing) return;
     if(event->delta() > 0) {
-        scale(1.1, event->posF());
+        zoomCanvas(1.1, event->posF());
     } else {
-        scale(0.9, event->posF());
+        zoomCanvas(0.9, event->posF());
     }
-    mVisibleHeight = mCombinedTransformMatrix.m22()*mHeight;
-    mVisibleWidth = mCombinedTransformMatrix.m11()*mWidth;
+    mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
+    mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
     
     if(mHoveredEdge != NULL) {
         mHoveredEdge->generatePainterPath();

@@ -63,7 +63,7 @@ QPointF MovablePoint::getRelativePos() const
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) const {
-    return mParent->mapRelativeToAbsolute(relPos);
+    return mParent->mapRelPosToAbs(relPos);
 }
 
 QPointF MovablePoint::mapAbsoluteToRelative(QPointF absPos) const {

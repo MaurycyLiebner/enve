@@ -445,8 +445,8 @@ void Canvas::cancelSelectedBoxesTransform() {
     }
 }
 
-void Canvas::moveSelectedBoxesByAbs(QPointF by, bool startTransform)
-{
+void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
+                                    const bool &startTransform) {
     if(startTransform) {
         foreach(BoundingBox *box, mSelectedBoxes) {
             box->startPosTransform();

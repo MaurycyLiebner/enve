@@ -12,6 +12,8 @@ class Circle;
 
 class Rectangle;
 
+class BasicTransformAnimator;
+
 class AnimatorUpdater : public StdSelfRef
 {
 public:
@@ -36,6 +38,17 @@ public:
     void frameChangeUpdate();
 private:
     BoundingBox *mTarget;
+};
+
+class TransformUpdater : public AnimatorUpdater {
+public:
+    TransformUpdater(BasicTransformAnimator *transformAnimator);
+    void update();
+    void updateFinal();
+
+    void frameChangeUpdate();
+private:
+    BasicTransformAnimator *mTarget;
 };
 
 class PathPointUpdater : public AnimatorUpdater

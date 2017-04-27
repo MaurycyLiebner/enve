@@ -11,8 +11,7 @@
 
 BoundingBox::BoundingBox(BoxesGroup *parent,
                          const BoundingBoxType &type) :
-    ComplexAnimator(), Transformable()
-{
+    ComplexAnimator(), Transformable() {
     mParent = parent->ref<BoxesGroup>();
 
     mEffectsAnimators->prp_setName("effects");
@@ -22,8 +21,6 @@ BoundingBox::BoundingBox(BoxesGroup *parent,
 
     ca_addChildAnimator(mTransformAnimator.data());
 
-    mTransformAnimator->prp_setUpdater(new TransUpdater(this) );
-    mTransformAnimator->prp_blockUpdater();
     mType = type;
 
     mTransformAnimator->reset();
@@ -549,6 +546,8 @@ void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
         addUndoRedo(new SetBoxParentUndoRedo(this, mParent.data(), parent));
     }
     mParent = parent->ref<BoxesGroup>();
+    mTransformAnimator->setParentTransformAnimator(
+                        mParent->getTransformAnimator());
 
     updateCombinedTransform();
 }
@@ -627,7 +626,7 @@ void BoundingBox::setPivotAbsPos(QPointF absPos,
 }
 
 QPointF BoundingBox::getPivotAbsPos() {
-    return mCombinedTransformMatrix.map(mTransformAnimator->getPivot());
+    return mTransformAnimator->getPivotAbs();
 }
 
 void BoundingBox::select() {
@@ -657,7 +656,7 @@ void BoundingBox::deselect() {
 }
 
 bool BoundingBox::isContainedIn(QRectF absRect) {
-    return absRect.contains(mCombinedTransformMatrix.mapRect(mRelBoundingRect));
+    return absRect.contains(getCombinedTransform().mapRect(mRelBoundingRect));
 }
 
 BoundingBox *BoundingBox::getPathAtFromAllAncestors(QPointF absPos) {
@@ -669,7 +668,7 @@ BoundingBox *BoundingBox::getPathAtFromAllAncestors(QPointF absPos) {
 }
 
 QPointF BoundingBox::mapAbsPosToRel(QPointF absPos) {
-    return mCombinedTransformMatrix.inverted().map(absPos);
+    return mTransformAnimator->mapAbsPosToRel(absPos);
 }
 
 PaintSettings *BoundingBox::getFillSettings() {
@@ -686,7 +685,7 @@ void BoundingBox::drawAsBoundingRect(QPainter *p, QPainterPath path) {
     pen.setCosmetic(true);
     p->setPen(pen);
     p->setBrush(Qt::NoBrush);
-    p->setTransform(QTransform(mCombinedTransformMatrix), true);
+    p->setTransform(QTransform(getCombinedTransform()), true);
     p->drawPath(path);
     p->restore();
 }
@@ -700,11 +699,11 @@ const QPainterPath &BoundingBox::getRelBoundingRectPath() {
 }
 
 QMatrix BoundingBox::getCombinedTransform() const {
-    return mCombinedTransformMatrix;
+    return mTransformAnimator->getCombinedTransform();
 }
 
 QMatrix BoundingBox::getRelativeTransform() const {
-    return mRelativeTransformMatrix;
+    return mTransformAnimator->getRelativeTransform();
 }
 
 void BoundingBox::applyTransformation(TransformAnimator *transAnimator) {
@@ -737,8 +736,8 @@ void BoundingBox::scaleRelativeToSavedPivot(qreal scaleBy) {
     scaleRelativeToSavedPivot(scaleBy, scaleBy);
 }
 
-QPointF BoundingBox::mapRelativeToAbsolute(QPointF relPos) const {
-    return getCombinedTransform().map(relPos);
+QPointF BoundingBox::mapRelPosToAbs(QPointF relPos) const {
+    return mTransformAnimator->mapRelPosToAbs(relPos);
 }
 
 void BoundingBox::moveByAbs(QPointF trans) {
@@ -830,40 +829,39 @@ int BoundingBox::getZIndex() {
 }
 
 QPointF BoundingBox::getAbsolutePos() {
-    return QPointF(mCombinedTransformMatrix.dx(),
-                   mCombinedTransformMatrix.dy());
+    return QPointF(mTransformAnimator->getCombinedTransform().dx(),
+                   mTransformAnimator->getCombinedTransform().dy());
 }
 
 void BoundingBox::updateRelativeTransformTmp() {
-    mRelativeTransformMatrix =
-            mTransformAnimator->getCurrentTransformationMatrix();
+    replaceCurrentFrameCache();
     updateCombinedTransformTmp();
+    schedulePivotUpdate();
     //updateCombinedTransform(replaceCache);
 }
 
 void BoundingBox::updateRelativeTransformAfterFrameChange() {
-    mRelativeTransformMatrix =
-            mTransformAnimator->getCurrentTransformationMatrix();
     updateCombinedTransformAfterFrameChange();
+    schedulePivotUpdate();
 }
 
 void BoundingBox::updateCombinedTransformAfterFrameChange() {
     if(mParent == NULL) return;
-    mCombinedTransformMatrix = mRelativeTransformMatrix*
-                               mParent->getCombinedTransform();
-    mRenderCacheHandler.updateCurrentRenderContainerTransform(
-                                mCombinedTransformMatrix);
+    updateCurrentRenderContainerTransform();
+
 
     updateAfterCombinedTransformationChangedAfterFrameChagne();
     scheduleSoftUpdate();
 }
 
+void BoundingBox::updateCurrentRenderContainerTransform() {
+    mRenderCacheHandler.updateCurrentRenderContainerTransform(
+                                mTransformAnimator->getCombinedTransform());
+}
+
 void BoundingBox::updateCombinedTransform() {
     if(mParent == NULL) return;
-    mCombinedTransformMatrix = mRelativeTransformMatrix*
-                               mParent->getCombinedTransform();
-    mRenderCacheHandler.updateCurrentRenderContainerTransform(
-                                mCombinedTransformMatrix);
+    updateCurrentRenderContainerTransform();
 
     updateAfterCombinedTransformationChanged();
     replaceCurrentFrameCache();
@@ -872,10 +870,7 @@ void BoundingBox::updateCombinedTransform() {
 
 void BoundingBox::updateCombinedTransformTmp() {
     if(mAwaitingUpdate) {
-        mCombinedTransformMatrix = mRelativeTransformMatrix*
-                                   mParent->getCombinedTransform();
-        mRenderCacheHandler.updateCurrentRenderContainerTransform(
-                                    mCombinedTransformMatrix);
+        updateCurrentRenderContainerTransform();
     } else {
         updateCombinedTransform();
     }
@@ -1291,14 +1286,13 @@ void BoundingBox::afterUpdate() {
                                             mUpdateRenderContainer);
         }
     }
-    mRenderCacheHandler.updateCurrentRenderContainerTransform(
-                                            mCombinedTransformMatrix);
+    updateCurrentRenderContainerTransform();
 }
 
 void BoundingBox::setUpdateVars() {
     updateRelBoundingRect();
 
-    mUpdateTransform = mCombinedTransformMatrix;
+    mUpdateTransform = mTransformAnimator->getCombinedTransform();
     mUpdateRelFrame = anim_mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();

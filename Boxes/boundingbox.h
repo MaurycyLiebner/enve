@@ -300,7 +300,7 @@ public:
     virtual void updateRelBoundingRect();
     virtual const QPainterPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
-    QPointF mapRelativeToAbsolute(QPointF relPos) const;
+    QPointF mapRelPosToAbs(QPointF relPos) const;
 
     QRectF getRelBoundingRect() const {
         return mRelBoundingRect;
@@ -366,7 +366,8 @@ public:
 
     void drawHoveredPath(QPainter *p, const QPainterPath &path) {
         p->save();
-        p->setTransform(QTransform(mCombinedTransformMatrix), true);
+        p->setTransform(QTransform(mTransformAnimator->getCombinedTransform()),
+                        true);
         QPen pen = QPen(Qt::black, 2.);
         pen.setCosmetic(true);
         p->setPen(pen);
@@ -449,6 +450,7 @@ public:
     void startPivotTransform();
     void finishPivotTransform();
 protected:
+    void updateCurrentRenderContainerTransform();
     virtual void scheduleUpdate();
 
     bool mRenderCacheChangeNeeded = false;
@@ -479,8 +481,6 @@ protected:
     BoundingBoxRenderContainer *mUpdateRenderContainer =
             new BoundingBoxRenderContainer();
 
-    QMatrix mRelativeTransformMatrix;
-
     bool mNoCache = false;
     int mUpdateRelFrame = 0;
     QRectF mUpdateRelBoundingRect;
@@ -508,7 +508,6 @@ protected:
     QSharedPointer<TransformAnimator> mTransformAnimator =
                         (new TransformAnimator(this))->ref<TransformAnimator>();
 
-    QMatrix mCombinedTransformMatrix;
     int mZListIndex = 0;
     bool mPivotChanged = false;
 

@@ -124,6 +124,7 @@ public:
     void prp_callFinishUpdater();
 
     virtual void prp_setParentFrameShift(const int &shift);
+    void prp_setBlockedUpdater(AnimatorUpdater *updater);
 public slots:
     virtual void prp_setRecording(bool rec) { Q_UNUSED(rec); }
 
