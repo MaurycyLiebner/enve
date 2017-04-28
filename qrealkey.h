@@ -48,9 +48,9 @@ public:
 
     bool isInsideRect(QRectF valueFrameRect);
 
-    void drawGraphKey(QPainter *p,
-              qreal minFrameT, qreal minValueT,
-              qreal pixelsPerFrame, qreal pixelsPerValue);
+    void drawGraphKey(QPainter *p, const QColor &paintColor,
+                      qreal minFrameT, qreal minValueT,
+                      qreal pixelsPerFrame, qreal pixelsPerValue);
     void changeFrameAndValueBy(QPointF frameValueChange);
     void saveCurrentFrameAndValue();
     virtual void setCtrlsMode(CtrlsMode mode);
@@ -68,7 +68,8 @@ public:
     qreal getPrevKeyValue();
     qreal getNextKeyValue();
 
-    void incFrameAndUpdateParentAnimator(int inc);
+    void incFrameAndUpdateParentAnimator(const int &inc);
+    void setFrameAndUpdateParentAnimator(const int &relFrame);
 
     void incValue(qreal incBy);
 

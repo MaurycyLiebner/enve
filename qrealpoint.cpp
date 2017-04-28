@@ -15,7 +15,8 @@ qreal QrealPoint::getFrame() {
 
 void QrealPoint::setFrame(qreal frame)
 {
-    if(mType == KEY_POINT) return mParentKey->setRelFrame(qRound(frame));
+    if(mType == KEY_POINT) return mParentKey->setFrameAndUpdateParentAnimator(
+                                                                qRound(frame));
     if(mType == START_POINT) return mParentKey->setStartFrame(frame);
     if(mType == END_POINT) return mParentKey->setEndFrame(frame);
 }
@@ -54,17 +55,20 @@ void QrealPoint::moveTo(qreal frameT, qreal valueT) {
     mParentKey->updateCtrlFromCtrl(mType);
 }
 
-void QrealPoint::draw(QPainter *p,
-                      qreal minFrameT, qreal minValueT,
-                      qreal pixelsPerFrame, qreal pixelsPerValue) {
-    if(mIsSelected) {
-        p->setBrush(Qt::red);
+void QrealPoint::draw(QPainter *p, const QColor &paintColor,
+                      const qreal &minFrameT, const qreal &minValueT,
+                      const qreal &pixelsPerFrame, const qreal &pixelsPerValue) {
+    QPointF center = QPointF((getFrame() - minFrameT + 0.5)*pixelsPerFrame,
+                             (minValueT - getValue())*pixelsPerValue);
+    p->setBrush(Qt::black);
+    p->drawEllipse(center, mRadius, mRadius);
+
+    p->setBrush(paintColor);
+    if(isSelected()) {
+        p->drawEllipse(center, mRadius - 1., mRadius - 1.);
     } else {
-        p->setBrush(Qt::black);
+        p->drawEllipse(center, mRadius*0.5 - 1., mRadius*0.5 - 1.);
     }
-    p->drawEllipse(QPointF((getFrame() - minFrameT + 0.5)*pixelsPerFrame,
-                           (minValueT - getValue())*pixelsPerValue),
-                           mRadius, mRadius);
 }
 
 void QrealPoint::setSelected(bool bT) {

@@ -12,9 +12,9 @@ QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     mStartValue = mValue;
     mEndValue = mValue;
 
-    mGraphPoint = new QrealPoint(KEY_POINT, this, 7.5);
-    mStartPoint = new QrealPoint(START_POINT, this, 7.5);
-    mEndPoint = new QrealPoint(END_POINT, this, 7.5);
+    mGraphPoint = new QrealPoint(KEY_POINT, this, 6.);
+    mStartPoint = new QrealPoint(START_POINT, this, 4.);
+    mEndPoint = new QrealPoint(END_POINT, this, 4.);
 }
 
 QrealKey::QrealKey(const int &frame,
@@ -28,12 +28,13 @@ QrealKey::QrealKey(const int &frame,
     mStartValue = mValue;
     mEndValue = mValue;
 
-    mGraphPoint = new QrealPoint(KEY_POINT, this, 7.5);
-    mStartPoint = new QrealPoint(START_POINT, this, 7.5);
-    mEndPoint = new QrealPoint(END_POINT, this, 7.5);
+    mGraphPoint = new QrealPoint(KEY_POINT, this, 6.);
+    mStartPoint = new QrealPoint(START_POINT, this, 4.);
+    mEndPoint = new QrealPoint(END_POINT, this, 4.);
 }
 
 QrealKey::~QrealKey() {
+
 }
 
 Key *QrealKey::makeKeyDuplicate(Animator *animator) {
@@ -286,9 +287,13 @@ void QrealKey::setValue(qreal value, bool saveUndoRedo) {
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void QrealKey::incFrameAndUpdateParentAnimator(int inc) {
+void QrealKey::incFrameAndUpdateParentAnimator(const int &inc) {
+    setFrameAndUpdateParentAnimator(mRelFrame + inc);
+}
+
+void QrealKey::setFrameAndUpdateParentAnimator(const int &relFrame) {
     if(mParentAnimator == NULL) return;
-    mParentAnimator->anim_moveKeyToFrame(this, mRelFrame + inc);
+    mParentAnimator->anim_moveKeyToFrame(this, relFrame);
 }
 
 void QrealKey::setStartValue(qreal value) {
@@ -345,7 +350,7 @@ bool QrealKey::isInsideRect(QRectF valueFrameRect)
     return valueFrameRect.contains(keyPoint);
 }
 
-void QrealKey::drawGraphKey(QPainter *p,
+void QrealKey::drawGraphKey(QPainter *p, const QColor &paintColor,
                     qreal minFrameT, qreal minValueT,
                     qreal pixelsPerFrame, qreal pixelsPerValue) {
     if(isSelected()) {
@@ -365,13 +370,19 @@ void QrealKey::drawGraphKey(QPainter *p,
         }
         p->restore();
     }
-    mGraphPoint->draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);
+    mGraphPoint->draw(p, paintColor,
+                      minFrameT, minValueT,
+                      pixelsPerFrame, pixelsPerValue);
     if(isSelected() ) {
         if(mStartEnabled) {
-            mStartPoint->draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);
+            mStartPoint->draw(p, paintColor,
+                              minFrameT, minValueT,
+                              pixelsPerFrame, pixelsPerValue);
         }
         if(mEndEnabled) {
-            mEndPoint->draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);
+            mEndPoint->draw(p, paintColor,
+                            minFrameT, minValueT,
+                            pixelsPerFrame, pixelsPerValue);
         }
     }
 }

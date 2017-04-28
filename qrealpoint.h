@@ -15,6 +15,7 @@ class QrealPoint : public StdSelfRef
 {
 public:
     QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius = 10.);
+    ~QrealPoint() {}
 
     qreal getFrame();
 
@@ -31,9 +32,9 @@ public:
 
     void moveTo(qreal frameT, qreal valueT);
 
-    void draw(QPainter *p,
-              qreal minFrameT, qreal minValueT,
-              qreal pixelsPerFrame, qreal pixelsPerValue);
+    void draw(QPainter *p, const QColor &paintColor,
+              const qreal &minFrameT, const qreal &minValueT,
+              const qreal &pixelsPerFrame, const qreal &pixelsPerValue);
 
     void setSelected(bool bT);
 

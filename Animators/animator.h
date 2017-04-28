@@ -94,13 +94,15 @@ public:
     int anim_getPrevKeyRelFrame(Key *key);
     void anim_setRecordingValue(bool rec);
 protected:
+    int anim_getKeyIndex(Key *key);
+
     virtual void anim_drawKey(QPainter *p,
                          Key *key,
                          const qreal &pixelsPerFrame,
                          const qreal &drawY,
                          const int &startFrame);
     bool anim_mTraceKeyOnCurrentFrame = false;
-    QList<Key*> anim_mKeys;
+    QList<std::shared_ptr<Key> > anim_mKeys;
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
     bool anim_mIsComplexAnimator = false;

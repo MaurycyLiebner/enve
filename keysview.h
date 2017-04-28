@@ -160,19 +160,19 @@ private:
     // graph
 
     qreal mMargin = 20.;
-    qreal mPixelsPerValUnit;
-    qreal mMinShownVal;
+    qreal mPixelsPerValUnit = 0.;
+    qreal mMinShownVal = 0.;
     QrealPoint *mCurrentPoint = NULL;
-    qreal mMinVal;
-    qreal mMaxVal;
+    qreal mMinVal = 0.;
+    qreal mMaxVal = 0.;
     qreal mValueScale = 1.;
-    qreal mMinMoveFrame;
-    qreal mMaxMoveFrame;
-    QPointF mPressFrameAndValue;
-    qreal mSavedMinViewedFrame;
-    qreal mSavedMaxViewedFrame;
-    qreal mSavedMinShownValue;
-    qreal mValueInc;
+    qreal mMinMoveFrame = 0.;
+    qreal mMaxMoveFrame = 0.;
+    QPointF mPressFrameAndValue = QPointF(0., 0.);
+    qreal mSavedMinViewedFrame = 0.;
+    qreal mSavedMaxViewedFrame = 0.;
+    qreal mSavedMinShownValue = 0.;
+    qreal mValueInc = 0.;
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
     void clearHoveredPoint();

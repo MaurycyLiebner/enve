@@ -156,7 +156,7 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
         return;
     }
 
-    foreach(Key *key, anim_mKeys) {
+    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
         int frame = key->getAbsFrame();
 
         qreal rF = mVal1Animator->qra_getValueAtAbsFrame(frame);

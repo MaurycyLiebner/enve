@@ -6,22 +6,19 @@
 #include "updatescheduler.h"
 #include "qrealpoint.h"
 
-void KeysView::graphSetSmoothCtrl()
-{
+void KeysView::graphSetSmoothCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
     graphRepaint();
 }
 
-void KeysView::graphSetSymmetricCtrl()
-{
+void KeysView::graphSetSymmetricCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
     graphRepaint();
 }
 
-void KeysView::graphSetCornerCtrl()
-{
+void KeysView::graphSetCornerCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_CORNER);
     graphRepaint();
@@ -227,10 +224,11 @@ void KeysView::graphMousePress(QPointF pressPos) {
             }
         }
     } else {
-//        mCurrentPoint->getParentKey()->getParentAnimator()->getMinAndMaxMoveFrame(
-//                    mCurrentPoint->getParentKey(), mCurrentPoint,
-//                    &mMinMoveFrame, &mMaxMoveFrame);
-//        mCurrentPoint->setSelected(true);
+        ((QrealAnimator*)mCurrentPoint->getParentKey()->getParentAnimator())->
+                getMinAndMaxMoveFrame(
+                    mCurrentPoint->getParentKey(), mCurrentPoint,
+                    &mMinMoveFrame, &mMaxMoveFrame);
+        mCurrentPoint->setSelected(true);
     }
 }
 
@@ -445,9 +443,12 @@ void KeysView::graphMouseMove(QPointF mousePos) {
                 animator->anim_sortKeys();
             }
         } else {
-//            qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
-//            mCurrentPoint->moveTo(clampedFrame, mCurrentPoint->getParentKey()->
-//                                  getParentAnimator()->qra_clampValue(value));
+            qreal clampedFrame = clamp(frame, mMinMoveFrame, mMaxMoveFrame);
+            QrealAnimator *parentAnimator =
+                    (QrealAnimator*)mCurrentPoint->getParentKey()->
+                                        getParentAnimator();
+            mCurrentPoint->moveTo(clampedFrame,
+                                  parentAnimator->qra_clampValue(value));
         }
         foreach(QrealAnimator *animator, mAnimators) {
             animator->qra_updateKeysPath();
