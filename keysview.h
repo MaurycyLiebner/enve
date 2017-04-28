@@ -5,6 +5,10 @@
 #include "pointhelpers.h"
 #include <QPointer>
 
+const QList<QColor> ANIMATORCOLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
+                                    QColor(255, 255, 0), QColor(255, 0, 255),
+                                    QColor(0, 255, 0)};
+
 class Key;
 class QrealKey;
 
@@ -29,7 +33,6 @@ public:
     explicit KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                       QWidget *parent = 0);
 
-    void setAnimationDockWidget(AnimationDockWidget *graphControls);
     void setGraphViewed(bool bT);
 
     int getMinViewedFrame();
@@ -71,8 +74,6 @@ public:
     void graphRemoveKeyFromSelection(QrealKey *key);
     void graphMouseMove(QPointF mousePos);
     void graphRepaint();
-    void graphUpdateDrawPathIfNeeded();
-    void graphSetDrawPathUpdateNeeded();
     void graphResetValueScaleAndMinShown();
     void scheduleGraphUpdateAfterKeysChanged();
     void graphUpdateAfterKeysChangedIfNeeded();

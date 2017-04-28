@@ -47,12 +47,6 @@ public:
     virtual void prp_setAbsFrame(int frame);
     virtual void qra_updateKeysPath();
 
-
-    void qra_updateDrawPathIfNeeded(
-                        qreal height, qreal margin,
-                        qreal startFrame, qreal minShownVal,
-                        qreal pixelsPerFrame, qreal pixelsPerValUnit);
-
     void qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP);
     void qra_getMinAndMaxValuesBetweenFrames(int startFrame, int endFrame,
                                              qreal *minValP, qreal *maxValP);
@@ -89,15 +83,13 @@ public:
     virtual QString prp_getValueText();
     void getMinAndMaxMoveFrame(QrealKey *key, QrealPoint *currentPoint,
                                qreal *minMoveFrame, qreal *maxMoveFrame);
-    void drawKeysPath(QPainter *p,
+    void drawKeysPath(QPainter *p, const QColor &paintColor,
                       qreal height, qreal margin,
                       qreal startFrame, qreal minShownVal,
                       qreal pixelsPerFrame, qreal pixelsPerValUnit);
-    void setDrawPathUpdateNeeded();
     void addKeysInRectToList(QRectF frameValueRect,
                              QList<QrealKey*> *keys);
 
-    void setIsCurrentAnimator(bool bT);
     qreal getMinPossibleValue();
     qreal getMaxPossibleValue();
 
@@ -119,14 +111,31 @@ public:
     void qra_saveValueToKey(int frame, qreal value);
     void removeThisFromGraphAnimator();
 
-    void setAnimatorColor(QColor color);
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
     void prp_loadFromSql(const int &qrealAnimatorId);
     void anim_loadKeysFromSql(int qrealAnimatorId);
     virtual void incSavedValueToCurrentValue(qreal incBy);
     virtual void multSavedValueToCurrentValue(qreal multBy);
 
-    const QColor &getAnimatorColor() const { return anim_mAnimatorColor; }
+    QColor getAnimatorColor(void *ptr) const {
+        for(const std::map<void*, QColor>::value_type& x : mAnimatorColors) {
+            if(x.first == ptr) {
+                return x.second;
+            }
+        }
+        return QColor();
+    }
+
+    void setAnimatorColor(void *ptr, const QColor &color) {
+        mAnimatorColors[ptr] = color;
+    }
+    void removeAnimatorColor(void *ptr) {
+        mAnimatorColors.erase(ptr);
+    }
+
+    bool isCurrentAnimator(void *ptr) const {
+        return mAnimatorColors.find(ptr) != mAnimatorColors.end();
+    }
 
     int getNumberDecimals() { return mDecimals; }
     void setNumberDecimals(int decimals) { mDecimals = decimals; }
@@ -140,12 +149,10 @@ public:
     void prp_setTransformed(bool bT) { mTransformed = bT; }
     void anim_removeAllKeys();
     QrealKey *getQrealKeyAtId(const int &id) const;
-
-
 protected:
-    bool mMinMaxValuesFrozen = false;
+    std::map<void*, QColor> mAnimatorColors;
 
-    bool mDrawPathUpdateNeeded = false;
+    bool mMinMaxValuesFrozen = false;
 
     qreal mMaxPossibleVal = DBL_MAX;
     qreal mMinPossibleVal = -DBL_MAX;

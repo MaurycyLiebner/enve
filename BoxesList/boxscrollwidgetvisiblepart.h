@@ -9,6 +9,7 @@ class BoxSingleWidget;
 class QrealKey;
 class DurationRectangleMovable;
 class Key;
+class KeysView;
 
 class BoxScrollWidgetVisiblePart : public ScrollWidgetVisiblePart
 {
@@ -42,6 +43,14 @@ public:
                                         const int &pressY,
                                         const qreal &pixelsPerFrame,
                                         const int &minViewedFrame);
+    KeysView *getKeysView() {
+        return mKeysView;
+    }
+
+    void setKeysView(KeysView *keysView) {
+        mKeysView = keysView;
+    }
+
 protected:
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *);
@@ -51,6 +60,8 @@ protected:
 
     int mLastDragMoveY;
     SWT_Types mLastDragMoveTargetTypes;
+
+    KeysView *mKeysView = NULL;
 
     bool mDragging = false;
     int mCurrentDragPosId = 0;

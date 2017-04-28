@@ -12,6 +12,7 @@ QrealKey::QrealKey(QrealAnimator *parentAnimator) :
     mStartValue = mValue;
     mEndValue = mValue;
 
+    mGraphPoint = new QrealPoint(KEY_POINT, this, 7.5);
     mStartPoint = new QrealPoint(START_POINT, this, 7.5);
     mEndPoint = new QrealPoint(END_POINT, this, 7.5);
 }
@@ -27,6 +28,7 @@ QrealKey::QrealKey(const int &frame,
     mStartValue = mValue;
     mEndValue = mValue;
 
+    mGraphPoint = new QrealPoint(KEY_POINT, this, 7.5);
     mStartPoint = new QrealPoint(START_POINT, this, 7.5);
     mEndPoint = new QrealPoint(END_POINT, this, 7.5);
 }
@@ -138,6 +140,10 @@ QrealPoint *QrealKey::getEndPoint() {
     return mEndPoint;
 }
 
+QrealPoint *QrealKey::getGraphPoint() {
+    return mGraphPoint;
+}
+
 bool QrealKey::isEndPointEnabled() {
     return mEndEnabled;
 }
@@ -176,26 +182,25 @@ void QrealKey::constrainStartCtrlMinFrame(int minFrame) {
 //    return true;
 //}
 
-//QrealPoint *QrealKey::mousePress(qreal frameT, qreal valueT,
-//                          qreal pixelsPerFrame, qreal pixelsPerValue)
-//{
-//    if(isSelected() ) {
-//        if( (mStartEnabled) ?
-//            mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
-//            false ) {
-//            return mStartPoint;
-//        }
-//        if((mEndEnabled) ?
-//            mEndPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
-//            false ) {
-//            return mEndPoint;
-//        }
-//    }
-//    if(isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue)) {
-//        return this;
-//    }
-//    return NULL;
-//}
+QrealPoint *QrealKey::mousePress(qreal frameT, qreal valueT,
+                          qreal pixelsPerFrame, qreal pixelsPerValue) {
+    if(isSelected() ) {
+        if( (mStartEnabled) ?
+            mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
+            false ) {
+            return mStartPoint;
+        }
+        if((mEndEnabled) ?
+            mEndPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
+            false ) {
+            return mEndPoint;
+        }
+    }
+    if(mGraphPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue)) {
+        return mGraphPoint;
+    }
+    return NULL;
+}
 
 void QrealKey::setCtrlsMode(CtrlsMode mode) {
     mCtrlsMode = mode;
@@ -342,8 +347,7 @@ bool QrealKey::isInsideRect(QRectF valueFrameRect)
 
 void QrealKey::drawGraphKey(QPainter *p,
                     qreal minFrameT, qreal minValueT,
-                    qreal pixelsPerFrame, qreal pixelsPerValue)
-{
+                    qreal pixelsPerFrame, qreal pixelsPerValue) {
     if(isSelected()) {
         p->save();
         p->setPen(QPen(Qt::black, 2., Qt::DotLine));
@@ -361,7 +365,7 @@ void QrealKey::drawGraphKey(QPainter *p,
         }
         p->restore();
     }
-//    QrealPoint::draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);
+    mGraphPoint->draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);
     if(isSelected() ) {
         if(mStartEnabled) {
             mStartPoint->draw(p, minFrameT, minValueT, pixelsPerFrame, pixelsPerValue);

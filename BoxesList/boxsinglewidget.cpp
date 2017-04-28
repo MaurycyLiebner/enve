@@ -377,6 +377,18 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
         bb_target->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);
         MainWindow::getInstance()->callUpdateSchedulers();
+    } else if(type == SWT_QrealAnimator) {
+        QrealAnimator *qa_target = (QrealAnimator*)target;
+        KeysView *keysView =
+                ((BoxScrollWidgetVisiblePart*)mParent)->getKeysView();
+        if(keysView != NULL) {
+            if(qa_target->isCurrentAnimator(mParent)) {
+                keysView->graphRemoveViewedAnimator(qa_target);
+            } else {
+                keysView->graphAddViewedAnimator(qa_target);
+            }
+            MainWindow::getInstance()->callUpdateSchedulers();
+        }
     }
 }
 
@@ -513,7 +525,7 @@ void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
     }
 }
 
-
+#include "keysview.h"
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(mTarget == NULL) return;
     QPainter p(this);
@@ -569,6 +581,11 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     } /*else if(type == SWT_BoxesGroup) {
     } */else if(type == SWT_QrealAnimator) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
+        if(qa_target->isCurrentAnimator(mParent)) {
+            p.fillRect(nameX + BOX_HEIGHT/4, BOX_HEIGHT/4,
+                       BOX_HEIGHT/2, BOX_HEIGHT/2,
+                       qa_target->getAnimatorColor(mParent));
+        }
         name = qa_target->prp_getName();
         nameX += 20;
         if(qa_target->prp_isRecording()) {

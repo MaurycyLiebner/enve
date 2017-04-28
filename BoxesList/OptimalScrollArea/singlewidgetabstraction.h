@@ -81,9 +81,9 @@ public:
     void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
                                          const int &id);
     void deleteWithDescendantAbstraction();
+
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
-
     bool mIsMainTarget = false;
     bool mContentVisible = false;
     SingleWidgetTarget *mTarget;

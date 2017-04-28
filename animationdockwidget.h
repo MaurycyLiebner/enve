@@ -3,6 +3,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include "actionbutton.h"
 
 class MainWindow;
 class KeysView;
@@ -21,13 +22,9 @@ public slots:
 
 private:
     QHBoxLayout *mButtonsLayout;
-    QPushButton *mSmoothButton;
-    QPushButton *mSymmetricButton;
-    QPushButton *mCornerButton;
-    QPushButton *mTwoSideCtrlButton;
-    QPushButton *mRightSideCtrlButton;
-    QPushButton *mLeftSideCtrlButton;
-    QPushButton *mNoSideCtrlButton;
+    ActionButton *mSmoothButton;
+    ActionButton *mSymmetricButton;
+    ActionButton *mCornerButton;
 };
 
 #endif // ANIMATIONDOCKWIDGET_H

@@ -7,10 +7,10 @@
 
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :
-    QWidget(parent)
-{
+    QWidget(parent) {
     mMainWindow = MainWindow::getInstance();
     mBoxesListVisible = boxesListVisible;
+    mBoxesListVisible->setKeysView(this);
 
     setFocusPolicy(Qt::StrongFocus);
     setMouseTracking(true);
@@ -576,7 +576,6 @@ void KeysView::setFramesRange(int startFrame, int endFrame)
     updatePixelsPerFrame();
     if(mGraphViewed) {
         graphUpdateDimensions();
-        graphUpdateDrawPathIfNeeded();
     }
     repaint();
 }

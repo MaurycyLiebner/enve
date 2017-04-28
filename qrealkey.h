@@ -19,8 +19,8 @@ public:
     QrealKey(const int &frame,
              const qreal &val,
              QrealAnimator *parentAnimator);
-//    QrealPoint *mousePress(qreal frameT, qreal valueT,
-//                    qreal pixelsPerFrame, qreal pixelsPerValue);
+    QrealPoint *mousePress(qreal frameT, qreal valueT,
+                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~QrealKey();
 
 
@@ -60,6 +60,7 @@ public:
 
     QrealPoint *getStartPoint();
     QrealPoint *getEndPoint();
+    QrealPoint *getGraphPoint();
 
     bool isEndPointEnabled();
     bool isStartPointEnabled();
@@ -83,9 +84,11 @@ public:
     bool differsFromKey(Key *key);
 
     KeyCloner *createNewKeyCloner();
+
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 
+    QrealPoint *mGraphPoint;
     QrealPoint *mStartPoint;
     QrealPoint *mEndPoint;
 

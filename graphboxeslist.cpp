@@ -6,10 +6,6 @@
 #include "updatescheduler.h"
 #include "qrealpoint.h"
 
-QList<QColor> animatorColors = {QColor(255, 0, 0) , QColor(0, 255, 255),
-                                QColor(255, 255, 0), QColor(255, 0, 255),
-                                QColor(0, 255, 0)};
-
 void KeysView::graphSetSmoothCtrl()
 {
     graphSetTwoSideCtrlForSelected();
@@ -31,10 +27,7 @@ void KeysView::graphSetCornerCtrl()
     graphRepaint();
 }
 
-void KeysView::graphPaint(QPainter *p)
-{
-    p->setRenderHint(QPainter::Antialiasing);
-
+void KeysView::graphPaint(QPainter *p) {
     p->setBrush(Qt::NoBrush);
 
     /*qreal maxX = width();
@@ -73,7 +66,7 @@ void KeysView::graphPaint(QPainter *p)
     //            Qt::AlignCenter, QString::number(mCurrentFrame));
     p->drawLine(xL, 20, xL, height());*/
 
-    p->setPen(QPen(QColor(0, 0, 0, 125), 2.));
+    p->setPen(QPen(QColor(255, 255, 255), 1.));
     qreal incY = mValueInc*mPixelsPerValUnit;
     qreal yL = height() +
             fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit - mMargin + incY;
@@ -85,12 +78,15 @@ void KeysView::graphPaint(QPainter *p)
         yL -= incY;
         currValue += mValueInc;
     }
+    p->setRenderHint(QPainter::Antialiasing);
 
-    foreach(QrealAnimator *animator, mAnimators) {
-        animator->drawKeysPath(p,
-                            height(), mMargin,
-                            mMinViewedFrame, mMinShownVal,
-                            mPixelsPerFrame, mPixelsPerValUnit);
+    for(int i = 0; i < mAnimators.count(); i++) {
+        const QColor &col = ANIMATORCOLORS.at(i % ANIMATORCOLORS.length());
+        QrealAnimator *animator = mAnimators.at(i);
+        animator->drawKeysPath(p, col,
+                               height(), mMargin,
+                               mMinViewedFrame, mMinShownVal,
+                               mPixelsPerFrame, mPixelsPerValUnit);
     }
 /*
 
@@ -162,27 +158,15 @@ void KeysView::graphUpdateDimensions() {
 
     graphIncMinShownVal(0.);
     updatePixelsPerFrame();
-
-    foreach(QrealAnimator *animator, mAnimators) {
-        animator->setDrawPathUpdateNeeded();
-    }
 }
 
 void KeysView::graphResizeEvent(QResizeEvent *)
 {
     graphUpdateDimensions();
-    graphUpdateDrawPathIfNeeded();
 }
 
 void KeysView::graphIncMinShownVal(qreal inc) {
     graphSetMinShownVal(inc*(mMaxVal - mMinVal) + mMinShownVal);
-    graphSetDrawPathUpdateNeeded();
-}
-
-void KeysView::graphSetDrawPathUpdateNeeded() {
-    foreach(QrealAnimator *animator, mAnimators) {
-        animator->setDrawPathUpdateNeeded();
-    }
 }
 
 void KeysView::graphSetMinShownVal(qreal newMinShownVal) {
@@ -376,17 +360,16 @@ void KeysView::graphSetNoSideCtrlForSelected() {
     graphRepaint();
 }
 
-void KeysView::graphClearAnimatorSelection()
-{
+void KeysView::graphClearAnimatorSelection() {
     graphClearKeysSelection();
 
-    foreach(QrealAnimator *animator, mAnimators) {
-        animator->setIsCurrentAnimator(false);
-    }
+//    foreach(QrealAnimator *animator, mAnimators) {
+//        animator->setIsCurrentAnimator(false);
+//    }
+    mAnimators.clear();
 }
 
-void KeysView::graphDeletePressed()
-{
+void KeysView::graphDeletePressed() {
     if(mCurrentPoint != NULL) {
             QrealKey *key = mCurrentPoint->getParentKey();
             if(mCurrentPoint->isEndPoint()) {
@@ -431,8 +414,7 @@ void KeysView::graphRemoveKeyFromSelection(QrealKey *key)
     }
 }
 
-void KeysView::graphMouseMove(QPointF mousePos)
-{
+void KeysView::graphMouseMove(QPointF mousePos) {
     if(mSelecting) {
         mSelectionRect.setBottomRight(mousePos);
     } else if(mCurrentPoint != NULL) {
@@ -472,12 +454,10 @@ void KeysView::graphMouseMove(QPointF mousePos)
         }
     }
     mFirstMove = false;
-    graphUpdateDrawPathIfNeeded();
 }
 
 void KeysView::graphMousePressEvent(QPoint eventPos,
-                                     Qt::MouseButton eventButton)
-{
+                                     Qt::MouseButton eventButton) {
     if(eventButton == Qt::RightButton) {
         qreal value;
         qreal frame;
@@ -500,7 +480,6 @@ void KeysView::graphMousePressEvent(QPoint eventPos,
     } else {
         graphMousePress(eventPos);
     }
-    graphUpdateDrawPathIfNeeded();
 }
 
 void KeysView::graphMouseMoveEvent(QPoint eventPos,
@@ -512,21 +491,17 @@ void KeysView::graphMouseMoveEvent(QPoint eventPos,
     } else {
         graphMouseMove(eventPos);
     }
-    graphUpdateDrawPathIfNeeded();
 }
 
-void KeysView::graphMouseReleaseEvent(Qt::MouseButton eventButton)
-{
+void KeysView::graphMouseReleaseEvent(Qt::MouseButton eventButton) {
     if(eventButton == Qt::MiddleButton) {
         graphMiddleRelease();
     } else {
         graphMouseRelease();
     }
-    graphUpdateDrawPathIfNeeded();
 }
 
-void KeysView::graphWheelEvent(QWheelEvent *event)
-{
+void KeysView::graphWheelEvent(QWheelEvent *event) {
     if(mMainWindow->isCtrlPressed()) {
         if(event->delta() > 0) {
             graphIncScale(0.1);
@@ -540,7 +515,6 @@ void KeysView::graphWheelEvent(QWheelEvent *event)
             graphIncMinShownVal(-0.1);
         }
     }
-    graphUpdateDrawPathIfNeeded();
 
     repaint();
 }
@@ -564,51 +538,40 @@ void KeysView::graphResetValueScaleAndMinShown() {
     graphSetMinShownVal(minVal);
     graphSetScale(1.);
 }
-
+#include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 void KeysView::updateAnimatorsColors() {
     int i = 0;
     foreach(QrealAnimator *animator, mAnimators) {
-        animator->setAnimatorColor(
-                    animatorColors.at(i % animatorColors.length()));
+        animator->setAnimatorColor(mBoxesListVisible,
+                                   ANIMATORCOLORS.at(
+                                       i %
+                                       ANIMATORCOLORS.length()));
         i++;
     }
 }
 
-void KeysView::graphAddViewedAnimator(QrealAnimator *animator)
-{
+void KeysView::graphAddViewedAnimator(QrealAnimator *animator) {
     mAnimators << animator;
     updateAnimatorsColors();
     graphUpdateDimensions();
-    animator->setIsCurrentAnimator(true);
-    animator->setDrawPathUpdateNeeded();
+    animator->qra_updateKeysPath();
     graphResetValueScaleAndMinShown();
 
     graphRepaint();
 }
 
-void KeysView::graphRemoveViewedAnimator(QrealAnimator *animator)
-{
+void KeysView::graphRemoveViewedAnimator(QrealAnimator *animator) {
     mAnimators.removeOne(animator);
+    animator->removeAnimatorColor(mBoxesListVisible);
     updateAnimatorsColors();
     graphUpdateDimensions();
-    animator->setIsCurrentAnimator(false);
     graphResetValueScaleAndMinShown();
 
     graphRepaint();
 }
 
-void KeysView::graphRepaint()
-{
-    graphUpdateDrawPathIfNeeded();
+void KeysView::graphRepaint() {
     //repaint();
-}
-
-void KeysView::graphUpdateDrawPathIfNeeded() {
-    foreach(QrealAnimator *animator, mAnimators) {
-        animator->qra_updateDrawPathIfNeeded(height(), mMargin,
-                                          mMinViewedFrame, mMinShownVal,
-                                          mPixelsPerFrame, mPixelsPerValUnit);
-    }
 }
 
 void KeysView::graphUpdateAfterKeysChangedAndRepaint() {
@@ -637,7 +600,6 @@ void KeysView::graphUpdateAfterKeysChanged()
     }
     graphResetValueScaleAndMinShown();
     graphUpdateDimensions();
-    graphUpdateDrawPathIfNeeded();
 }
 
 void KeysView::graphMergeKeysIfNeeded() {

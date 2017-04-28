@@ -33,7 +33,10 @@ void QrealPoint::setValue(qreal value, bool finish)
     if(mType == END_POINT) return mParentKey->setEndValue(value);
 }
 
-bool QrealPoint::isSelected() { return mIsSelected; }
+bool QrealPoint::isSelected() {
+    if(mType == KEY_POINT) return mParentKey->isSelected();
+    return mIsSelected;
+}
 
 bool QrealPoint::isNear(qreal frameT, qreal valueT,
                         qreal pixelsPerFrame, qreal pixelsPerValue) {
@@ -44,8 +47,7 @@ bool QrealPoint::isNear(qreal frameT, qreal valueT,
     return true;
 }
 
-void QrealPoint::moveTo(qreal frameT, qreal valueT)
-{
+void QrealPoint::moveTo(qreal frameT, qreal valueT) {
     setFrame(frameT);
     setValue(valueT);
     if(isKeyPoint() ) return;
@@ -66,7 +68,11 @@ void QrealPoint::draw(QPainter *p,
 }
 
 void QrealPoint::setSelected(bool bT) {
-    mIsSelected = bT;
+    if(mType == KEY_POINT) {
+        mParentKey->setSelected(bT);
+    } else {
+        mIsSelected = bT;
+    }
 }
 
 bool QrealPoint::isKeyPoint() { return mType == KEY_POINT; }
@@ -75,8 +81,7 @@ bool QrealPoint::isStartPoint() { return mType == START_POINT; }
 
 bool QrealPoint::isEndPoint() { return mType == END_POINT; }
 
-bool QrealPoint::isEnabled()
-{
+bool QrealPoint::isEnabled() {
     if(isKeyPoint() ) return true;
     if(isStartPoint() ) return mParentKey->isStartPointEnabled();
     if(isEndPoint() ) return mParentKey->isEndPointEnabled();

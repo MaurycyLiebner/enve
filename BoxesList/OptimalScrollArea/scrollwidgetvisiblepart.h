@@ -92,6 +92,7 @@ public:
     void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
                                                 const SWT_Target &target);
     void setCurrentType(const SWT_Type &type);
+
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;
 
