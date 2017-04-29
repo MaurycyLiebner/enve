@@ -9,19 +9,19 @@
 void KeysView::graphSetSmoothCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SMOOTH);
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphSetSymmetricCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_SYMMETRIC);
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphSetCornerCtrl() {
     graphSetTwoSideCtrlForSelected();
     graphSetCtrlsModeForSelected(CTRLS_CORNER);
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphPaint(QPainter *p) {
@@ -68,13 +68,20 @@ void KeysView::graphPaint(QPainter *p) {
     qreal yL = height() +
             fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit - mMargin + incY;
     qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
+    int nLines = qCeil(yL / incY);
+    QLine *lines = new QLine[nLines];
+    int currLine = 0;
     while(yL > 0) {
         p->drawText(QRectF(0, yL - incY, 40, 2*incY),
                     Qt::AlignCenter, QString::number(currValue));
-        p->drawLine(40, yL, width(), yL);
+        lines[currLine] = QLine(40, yL, width(), yL);
+        currLine++;
         yL -= incY;
         currValue += mValueInc;
     }
+    p->setPen(QPen(QColor(200, 200, 200), 1.));
+    p->drawLines(lines, nLines);
+    delete[] lines;
     p->setRenderHint(QPainter::Antialiasing);
 
     for(int i = 0; i < mAnimators.count(); i++) {
@@ -97,12 +104,12 @@ void KeysView::graphPaint(QPainter *p) {
 */
 }
 
-void KeysView::graphIncScale(qreal inc) {
+void KeysView::graphIncScale(const qreal &inc) {
     qreal newScale = mValueScale + inc;
     graphSetScale(clamp(newScale, 0.1, 10.));
 }
 
-void KeysView::graphSetScale(qreal scale) {
+void KeysView::graphSetScale(const qreal &scale) {
     mValueScale = scale;
     graphUpdateDimensions();
 }
@@ -162,25 +169,25 @@ void KeysView::graphResizeEvent(QResizeEvent *)
     graphUpdateDimensions();
 }
 
-void KeysView::graphIncMinShownVal(qreal inc) {
+void KeysView::graphIncMinShownVal(const qreal &inc) {
     graphSetMinShownVal(inc*(mMaxVal - mMinVal) + mMinShownVal);
 }
 
-void KeysView::graphSetMinShownVal(qreal newMinShownVal) {
+void KeysView::graphSetMinShownVal(const qreal &newMinShownVal) {
     qreal halfHeightVal = (height() - 2*mMargin)*0.5/mPixelsPerValUnit;
     mMinShownVal = clamp(newMinShownVal,
                          mMinVal - halfHeightVal,
                          mMaxVal - halfHeightVal);
 }
 
-void KeysView::graphGetValueAndFrameFromPos(QPointF pos,
+void KeysView::graphGetValueAndFrameFromPos(const QPointF &pos,
                                             qreal *value, qreal *frame) {
     *value = (height() - pos.y() - mMargin)/mPixelsPerValUnit
             + mMinShownVal;
     *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame - 0.5;
 }
 
-void KeysView::graphMousePress(QPointF pressPos) {
+void KeysView::graphMousePress(const QPointF &pressPos) {
     mFirstMove = true;
     qreal value;
     qreal frame;
@@ -188,7 +195,8 @@ void KeysView::graphMousePress(QPointF pressPos) {
 
     foreach(QrealAnimator *animator, mAnimators) {
         mCurrentPoint = animator->qra_getPointAt(value, frame,
-                                              mPixelsPerFrame, mPixelsPerValUnit);
+                                                 mPixelsPerFrame,
+                                                 mPixelsPerValUnit);
         if(mCurrentPoint != NULL) break;
     }
     QrealKey *parentKey = (mCurrentPoint == NULL) ?
@@ -280,16 +288,14 @@ void KeysView::graphMouseRelease()
     }
 }
 
-void KeysView::graphMiddlePress(QPointF pressPos)
-{
+void KeysView::graphMiddlePress(const QPointF &pressPos) {
     mSavedMinViewedFrame = mMinViewedFrame;
     mSavedMaxViewedFrame = mMaxViewedFrame;
     mSavedMinShownValue = mMinShownVal;
     mMiddlePressPos = pressPos;
 }
 
-void KeysView::graphMiddleMove(QPointF movePos)
-{
+void KeysView::graphMiddleMove(const QPointF &movePos) {
     QPointF diffFrameValue = (movePos - mMiddlePressPos);
     diffFrameValue.setX(diffFrameValue.x()/mPixelsPerFrame);
     diffFrameValue.setY(diffFrameValue.y()/mPixelsPerValUnit);
@@ -299,8 +305,7 @@ void KeysView::graphMiddleMove(QPointF movePos)
     graphSetMinShownVal(mSavedMinShownValue + diffFrameValue.y());
 }
 
-void KeysView::graphMiddleRelease()
-{
+void KeysView::graphMiddleRelease() {
 
 }
 
@@ -310,7 +315,7 @@ void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
     }
 }
 
-void KeysView::graphSetCtrlsModeForSelected(CtrlsMode mode) {
+void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
     if(mSelectedKeys.isEmpty()) return;
     QrealKey *key; foreachQK(key, mSelectedKeys)
         key->setCtrlsMode(mode);
@@ -325,7 +330,7 @@ void KeysView::graphSetTwoSideCtrlForSelected() {
         key->setStartEnabled(true);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphSetRightSideCtrlForSelected() {
@@ -335,7 +340,7 @@ void KeysView::graphSetRightSideCtrlForSelected() {
         key->setStartEnabled(false);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphSetLeftSideCtrlForSelected() {
@@ -345,7 +350,7 @@ void KeysView::graphSetLeftSideCtrlForSelected() {
         key->setStartEnabled(true);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphSetNoSideCtrlForSelected() {
@@ -355,7 +360,7 @@ void KeysView::graphSetNoSideCtrlForSelected() {
         key->setStartEnabled(false);
     }
     graphConstrainAnimatorCtrlsFrameValues();
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphClearAnimatorSelection() {
@@ -412,7 +417,7 @@ void KeysView::graphRemoveKeyFromSelection(QrealKey *key)
     }
 }
 
-void KeysView::graphMouseMove(QPointF mousePos) {
+void KeysView::graphMouseMove(const QPointF &mousePos) {
     if(mSelecting) {
         mSelectionRect.setBottomRight(mousePos);
     } else if(mCurrentPoint != NULL) {
@@ -457,8 +462,8 @@ void KeysView::graphMouseMove(QPointF mousePos) {
     mFirstMove = false;
 }
 
-void KeysView::graphMousePressEvent(QPoint eventPos,
-                                     Qt::MouseButton eventButton) {
+void KeysView::graphMousePressEvent(const QPoint &eventPos,
+                                    const Qt::MouseButton &eventButton) {
     if(eventButton == Qt::RightButton) {
         qreal value;
         qreal frame;
@@ -483,8 +488,8 @@ void KeysView::graphMousePressEvent(QPoint eventPos,
     }
 }
 
-void KeysView::graphMouseMoveEvent(QPoint eventPos,
-                                    Qt::MouseButtons eventButtons) {
+void KeysView::graphMouseMoveEvent(const QPoint &eventPos,
+                                   const Qt::MouseButtons &eventButtons) {
     if(eventButtons == Qt::MiddleButton) {
         graphMiddleMove(eventPos);
         emit changedViewedFrames(mMinViewedFrame,
@@ -494,7 +499,7 @@ void KeysView::graphMouseMoveEvent(QPoint eventPos,
     }
 }
 
-void KeysView::graphMouseReleaseEvent(Qt::MouseButton eventButton) {
+void KeysView::graphMouseReleaseEvent(const Qt::MouseButton &eventButton) {
     if(eventButton == Qt::MiddleButton) {
         graphMiddleRelease();
     } else {
@@ -525,7 +530,7 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event)
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete) {
         graphDeletePressed();
-        graphRepaint();
+        mMainWindow->callUpdateSchedulers();
     } else {
         return false;
     }
@@ -558,7 +563,7 @@ void KeysView::graphAddViewedAnimator(QrealAnimator *animator) {
     animator->qra_updateKeysPath();
     graphResetValueScaleAndMinShown();
 
-    graphRepaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphRemoveViewedAnimator(QrealAnimator *animator) {
@@ -568,11 +573,7 @@ void KeysView::graphRemoveViewedAnimator(QrealAnimator *animator) {
     graphUpdateDimensions();
     graphResetValueScaleAndMinShown();
 
-    graphRepaint();
-}
-
-void KeysView::graphRepaint() {
-    //repaint();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphUpdateAfterKeysChangedAndRepaint() {

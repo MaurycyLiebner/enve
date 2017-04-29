@@ -16,20 +16,19 @@ public:
     void ca_removeChildAnimator(Property *removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
     void ca_moveChildInList(Property *child,
-                         int from, int to,
-                         bool saveUndoRedo = true);
+                            const int &from,
+                            const int &to,
+                            const bool &saveUndoRedo = true);
     void ca_moveChildBelow(Property *move, Property *below);
     void ca_moveChildAbove(Property *move, Property *above);
 
     void prp_startTransform();
     void prp_setUpdater(AnimatorUpdater *updater);
-    void prp_setAbsFrame(int frame);
+    void prp_setAbsFrame(const int &frame);
 
     void prp_retrieveSavedValue();
     void prp_finishTransform();
     void prp_cancelTransform();
-
-    void prp_setRecording(bool rec);
 
     bool prp_isDescendantRecording();
     QString prp_getValueText();
@@ -37,10 +36,10 @@ public:
 
     bool hasChildAnimators();
 
-    void prp_setTransformed(bool bT);
+    void prp_setTransformed(const bool &bT);
 
     void ca_changeChildAnimatorZ(const int &oldIndex,
-                              const int &newIndex);
+                                 const int &newIndex);
     int ca_getNumberOfChildren();
     Property *ca_getChildAt(const int &i);
 
@@ -62,23 +61,27 @@ public:
     }
 
     SWT_Type SWT_getType() { return SWT_ComplexAnimator; }
-    void anim_drawKey(QPainter *p, Key *key,
-                 const qreal &pixelsPerFrame,
-                 const qreal &drawY, const int &startFrame);
+    void anim_drawKey(QPainter *p,
+                      Key *key,
+                      const qreal &pixelsPerFrame,
+                      const qreal &drawY,
+                      const int &startFrame);
 
-    void anim_loadKeysFromSql(int qrealAnimatorId) {
+    void anim_loadKeysFromSql(const int &qrealAnimatorId) {
         Q_UNUSED(qrealAnimatorId);
     }
 
     void prp_setParentFrameShift(const int &shift);
     int getChildPropertyIndex(Property *child);
 public slots:
+    void prp_setRecording(const bool &rec);
+
     virtual void ca_addDescendantsKey(Key *key);
     virtual void ca_removeDescendantsKey(Key *key);
     virtual void ca_childAnimatorIsRecordingChanged();
 protected:
-    ComplexKey *ca_getKeyCollectionAtAbsFrame(int frame);
-    ComplexKey *ca_getKeyCollectionAtRelFrame(int frame);
+    ComplexKey *ca_getKeyCollectionAtAbsFrame(const int &frame);
+    ComplexKey *ca_getKeyCollectionAtRelFrame(const int &frame);
     bool ca_mChildAnimatorRecording = false;
     QList<QSharedPointer<Property> > ca_mChildAnimators;
 };
@@ -98,7 +101,7 @@ public:
 
     bool isEmpty();
 
-    void setRelFrame(int frame);
+    void setRelFrame(const int &frame);
 
     void mergeWith(Key *key);
 

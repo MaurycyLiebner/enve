@@ -19,44 +19,50 @@ public:
     QrealKey(const int &frame,
              const qreal &val,
              QrealAnimator *parentAnimator);
-    QrealPoint *mousePress(qreal frameT, qreal valueT,
-                    qreal pixelsPerFrame, qreal pixelsPerValue);
+    QrealPoint *mousePress(const qreal &frameT,
+                           const qreal &valueT,
+                           const qreal &pixelsPerFrame,
+                           const qreal &pixelsPerValue);
     virtual ~QrealKey();
 
 
     Key *makeKeyDuplicate(Animator *animator);
     QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
-    void updateCtrlFromCtrl(QrealPointType type);
+    void updateCtrlFromCtrl(const QrealPointType &type);
 
     virtual qreal getValue();
-    virtual void setValue(qreal value, bool saveUndoRedo = true);
-    virtual void setStartValue(qreal value);
-    virtual void setEndValue(qreal value);
+    virtual void setValue(qreal value,
+                          const bool &saveUndoRedo = true);
+    void setStartValueVar(const qreal &value);
+    void setEndValueVar(const qreal &value);
 
-    virtual void setStartFrame(qreal startFrame);
-    virtual void setEndFrame(qreal endFrame);
+    void setStartFrameVar(const qreal &startFrame);
+    void setEndFrameVar(const qreal &endFrame);
 
     qreal getStartValue();
     qreal getEndValue();
     qreal getStartValueFrame();
     qreal getEndValueFrame();
 
-    virtual void setStartEnabled(bool bT);
+    virtual void setStartEnabled(const bool &bT);
 
-    virtual void setEndEnabled(bool bT);
+    virtual void setEndEnabled(const bool &bT);
 
-    bool isInsideRect(QRectF valueFrameRect);
+    bool isInsideRect(const QRectF &valueFrameRect);
 
-    void drawGraphKey(QPainter *p, const QColor &paintColor,
-                      qreal minFrameT, qreal minValueT,
-                      qreal pixelsPerFrame, qreal pixelsPerValue);
-    void changeFrameAndValueBy(QPointF frameValueChange);
+    void drawGraphKey(QPainter *p,
+                      const QColor &paintColor,
+                      const qreal &minFrameT,
+                      const qreal &minValueT,
+                      const qreal &pixelsPerFrame,
+                      const qreal &pixelsPerValue);
+    void changeFrameAndValueBy(const QPointF &frameValueChange);
     void saveCurrentFrameAndValue();
-    virtual void setCtrlsMode(CtrlsMode mode);
+    virtual void setCtrlsMode(const CtrlsMode &mode);
 
-    void constrainStartCtrlMinFrame(int minFrame);
-    void constrainEndCtrlMaxFrame(int maxFrame);
+    void constrainStartCtrlMinFrame(const int &minFrame);
+    void constrainEndCtrlMaxFrame(const int &maxFrame);
 
     QrealPoint *getStartPoint();
     QrealPoint *getEndPoint();
@@ -74,18 +80,22 @@ public:
     void incValue(qreal incBy);
 
     CtrlsMode getCtrlsMode();
-    int saveToSql(int parentAnimatorSqlId);
-    void loadFromSql(int keyId);
+    int saveToSql(const int &parentAnimatorSqlId);
+    void loadFromSql(const int &keyId);
 
     virtual void copyToContainer(KeysClipboardContainer *container);
 
     QrealAnimator *getParentQrealAnimator();
-    void setRelFrame(int frame);
+    void setRelFrame(const int &frame);
 
     bool differsFromKey(Key *key);
 
     KeyCloner *createNewKeyCloner();
 
+    void setEndFrame(const qreal &endFrame);
+    void setStartFrame(const qreal &startFrame);
+    void setStartValue(const qreal &value);
+    void setEndValue(const qreal &value);
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 

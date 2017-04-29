@@ -21,22 +21,20 @@ void KeysView::setGraphViewed(bool bT) {
     mGraphViewed = bT;
 }
 
-void KeysView::middlePress(QPointF pressPos)
-{
+void KeysView::middlePress(const QPointF &pressPos) {
     mSavedMinViewedFrame = mMinViewedFrame;
     mSavedMaxViewedFrame = mMaxViewedFrame;
     mMiddlePressPos = pressPos;
 }
 
-void KeysView::setViewedRange(int top, int bottom)
-{
+void KeysView::setViewedRange(const int &top,
+                              const int &bottom) {
     mViewedTop = top;
     mViewedBottom = bottom;
     update();
 }
 
-void KeysView::middleMove(QPointF movePos)
-{
+void KeysView::middleMove(const QPointF &movePos) {
     qreal diffFrame = (movePos.x() - mMiddlePressPos.x() ) / mPixelsPerFrame;
     int roundX = qRound(diffFrame );
     setFramesRange(mSavedMinViewedFrame - roundX,
@@ -569,8 +567,8 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
     mMainWindow->callUpdateSchedulers();
 }
 
-void KeysView::setFramesRange(int startFrame, int endFrame)
-{
+void KeysView::setFramesRange(const int &startFrame,
+                              const int &endFrame) {
     mMinViewedFrame = startFrame;
     mMaxViewedFrame = endFrame;
     updatePixelsPerFrame();

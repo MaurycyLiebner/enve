@@ -30,11 +30,11 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
-ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(int frame) {
+ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(const int &frame) {
     return (ComplexKey *) anim_getKeyAtAbsFrame(frame);
 }
 
-ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(int frame) {
+ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
     return (ComplexKey *) anim_getKeyAtRelFrame(frame);
 }
 
@@ -90,15 +90,13 @@ void ComplexAnimator::ca_moveChildBelow(Property *move,
     if(indexFrom < indexTo) {
         indexTo--;
     }
-    ca_moveChildInList(move,
-                    indexFrom,
-                    indexTo);
+    ca_moveChildInList(move, indexFrom, indexTo);
 }
 
 void ComplexAnimator::ca_moveChildInList(
                                  Property *child,
-                                 int from, int to,
-                                 bool saveUndoRedo) {
+                                 const int &from, const int &to,
+                                 const bool &saveUndoRedo) {
     ca_mChildAnimators.move(from, to);
     SWT_moveChildAbstractionForTargetToInAll(child,
                                              to);
@@ -150,7 +148,7 @@ void ComplexAnimator::prp_startTransform()
     }
 }
 
-void ComplexAnimator::prp_setTransformed(bool bT) {
+void ComplexAnimator::prp_setTransformed(const bool &bT) {
     foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setTransformed(bT);
     }
@@ -214,7 +212,7 @@ void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater) {
     }
 }
 
-void ComplexAnimator::prp_setAbsFrame(int frame) {
+void ComplexAnimator::prp_setAbsFrame(const int &frame) {
     //if(!prp_isDescendantRecording()) return;
     Animator::prp_setAbsFrame(frame);
 
@@ -249,7 +247,7 @@ QString ComplexAnimator::prp_getValueText() {
     return "";
 }
 
-void ComplexAnimator::prp_setRecording(bool rec) {
+void ComplexAnimator::prp_setRecording(const bool &rec) {
     foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setRecording(rec);
     }
@@ -354,7 +352,7 @@ void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
 //    return target;
 //}
 
-void ComplexKey::setRelFrame(int frame) {
+void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);
 
     foreach(Key *key, mKeys) {

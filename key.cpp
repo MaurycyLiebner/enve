@@ -163,7 +163,7 @@ int Key::getRelFrame() {
     return mRelFrame;
 }
 
-void Key::setRelFrame(int frame) {
+void Key::setRelFrame(const int &frame) {
     if(frame == mRelFrame) return;
     mRelFrame = frame;
     if(mParentAnimator == NULL) return;

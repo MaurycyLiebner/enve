@@ -64,12 +64,12 @@ class Gradient;
 class PaintSetting{
 public:
     PaintSetting(const bool &targetFillSettings,
-                      const ColorSetting &colorSetting);
+                 const ColorSetting &colorSetting);
 
     PaintSetting(const bool &targetFillSettings);
 
     PaintSetting(const bool &targetFillSettings,
-                      Gradient *gradient);
+                 Gradient *gradient);
 
     void apply(PathBox *box) const;
 
@@ -87,11 +87,12 @@ class PaintSettings : public ComplexAnimator {
 public:
     PaintSettings();
 
-    PaintSettings(Color colorT,
-                  PaintType paintTypeT,
+    PaintSettings(const Color &colorT,
+                  const PaintType &paintTypeT,
                   Gradient *gradientT = NULL);
 
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+    int prp_saveToSql(QSqlQuery *query,
+                      const int &parentId = 0);
 
     Color getCurrentColor() const;
 
@@ -99,11 +100,13 @@ public:
 
     Gradient *getGradient() const;
 
-    void setGradient(Gradient *gradient, bool saveUndoRedo = true);
+    void setGradient(Gradient *gradient,
+                     const bool &saveUndoRedo = true);
 
-    void setCurrentColor(Color color);
+    void setCurrentColor(const Color &color);
 
-    void setPaintType(PaintType paintType, bool saveUndoRedo = true);
+    void setPaintType(const PaintType &paintType,
+                      const bool &saveUndoRedo = true);
 
     ColorAnimator *getColorAnimator();
 
@@ -137,23 +140,25 @@ public:
     Gradient();
     ~Gradient();
 
-    Gradient(Color color1, Color color2);
+    Gradient(const Color &color1,
+             const Color &color2);
 
-    Gradient(int sqlIdT);
+    Gradient(const int &sqlIdT);
 
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
 
     void saveToSqlIfPathSelected(QSqlQuery *query);
 
-    void swapColors(int id1, int id2,
+    void swapColors(const int &id1, const int &id2,
                     const bool &saveUndoRedo = true);
 
     void removeColor(ColorAnimator *color,
                      const bool &saveUndoRedo = true);
 
-    void addColor(Color color);
+    void addColor(const Color &color);
 
-    void replaceColor(int id, Color color);
+    void replaceColor(const int &id,
+                      const Color &color);
 
     void setColors(QList<Color> newColors);
 
@@ -174,7 +179,7 @@ public:
     void updateQGradientStops();
 
     int getSqlId();
-    void setSqlId(int id);
+    void setSqlId(const int &id);
 
     void addColorToList(const Color &color,
                         const bool &saveUndoRedo = true);
@@ -192,7 +197,7 @@ public:
     void startColorIdTransform(int id);
     void addColorToList(ColorAnimator *newColorAnimator,
                         const bool &saveUndoRedo = true);
-    ColorAnimator *getColorAnimatorAt(int id);
+    ColorAnimator *getColorAnimatorAt(const int &id);
     void removeColor(const int &id);
     Property *makeDuplicate();
 
@@ -270,21 +275,23 @@ class StrokeSettings : public PaintSettings
 public:
     StrokeSettings();
 
-    StrokeSettings(Color colorT,
-                   PaintType paintTypeT,
+    StrokeSettings(const Color &colorT,
+                   const PaintType &paintTypeT,
                    Gradient *gradientT = NULL);
+//    StrokeSettings(const int &strokeSqlId,
+//                   const int &paintSqlId,
+//                   GradientWidget *gradientWidget);
 
     int prp_saveToSql(QSqlQuery *query,
                       const int &parentId = 0);
 
-    void setCurrentStrokeWidth(qreal newWidth);
+    void setCurrentStrokeWidth(const qreal &newWidth);
 
-    void setCapStyle(Qt::PenCapStyle capStyle);
+    void setCapStyle(const Qt::PenCapStyle &capStyle);
 
-    void setJoinStyle(Qt::PenJoinStyle joinStyle);
+    void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
 
     void setStrokerSettings(QPainterPathStroker *stroker);
-    StrokeSettings(int strokeSqlId, int paintSqlId, GradientWidget *gradientWidget);
 
     qreal getCurrentStrokeWidth() const;
 
@@ -294,7 +301,7 @@ public:
 
     QrealAnimator *getStrokeWidthAnimator();
 
-    void setOutlineCompositionMode(QPainter::CompositionMode compositionMode);
+    void setOutlineCompositionMode(const QPainter::CompositionMode &compositionMode);
 
     QPainter::CompositionMode getOutlineCompositionMode();
 

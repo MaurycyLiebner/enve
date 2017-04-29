@@ -142,8 +142,10 @@ SingleSound::SingleSound(const QString &path,
 }
 
 void SingleSound::prp_drawKeys(QPainter *p,
-                            qreal pixelsPerFrame, qreal drawY,
-                            int startFrame, int endFrame) {
+                               const qreal &pixelsPerFrame,
+                               const qreal &drawY,
+                               const int &startFrame,
+                               const int &endFrame) {
 //    qreal timeScale = mTimeScaleAnimator.getCurrentValue();
 //    int startDFrame = mDurationRectangle.getMinAnimationFrame() - startFrame;
 //    int frameWidth = ceil(mListOfFrames.count()/qAbs(timeScale));
@@ -187,9 +189,9 @@ void SingleSound::updateAfterDurationRectangleShifted() {
 }
 
 DurationRectangleMovable *SingleSound::anim_getRectangleMovableAtPos(
-                            qreal relX,
-                            int minViewedFrame,
-                            qreal pixelsPerFrame) {
+                            const qreal &relX,
+                            const int &minViewedFrame,
+                            const qreal &pixelsPerFrame) {
     return mDurationRectangle->getMovableAt(relX,
                                            pixelsPerFrame,
                                             minViewedFrame);

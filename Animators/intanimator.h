@@ -8,7 +8,8 @@ public:
     IntAnimator();
 
     int getCurrentIntValue() const;
-    void setCurrentIntValue(int value, bool finish = false);
+    void setCurrentIntValue(const int &value,
+                            const bool &finish = false);
 };
 
 #endif // INTANIMATOR_H

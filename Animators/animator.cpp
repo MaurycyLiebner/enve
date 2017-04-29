@@ -36,7 +36,7 @@ void Animator::anim_updateAfterChangedKey(Key *key) {
                                         anim_getNextKeyRelFrame(key));
 }
 
-void Animator::prp_setAbsFrame(int frame) {
+void Animator::prp_setAbsFrame(const int &frame) {
     anim_mCurrentAbsFrame = frame;
     anim_updateRelFrame();
 
@@ -173,7 +173,7 @@ void Animator::anim_sortKeys() {
 }
 
 void Animator::anim_appendKey(Key *newKey,
-                              bool saveUndoRedo) {
+                              const bool &saveUndoRedo) {
     if(saveUndoRedo && !anim_isComplexAnimator()) {
         addUndoRedo(new AddKeyToAnimatorUndoRedo(newKey, this));
     }
@@ -192,7 +192,7 @@ void Animator::anim_appendKey(Key *newKey,
 }
 
 void Animator::anim_removeKey(Key *keyToRemove,
-                              bool saveUndoRedo) {
+                              const bool &saveUndoRedo) {
     anim_updateAfterChangedKey(keyToRemove);
 
     if(saveUndoRedo && !anim_isComplexAnimator()) {
@@ -212,7 +212,7 @@ void Animator::anim_removeKey(Key *keyToRemove,
 }
 
 void Animator::anim_moveKeyToFrame(Key *key,
-                                   int newFrame) {
+                                   const int &newFrame) {
     anim_updateAfterChangedKey(key);
     emit prp_removingKey(key);
     key->setRelFrame(newFrame);
@@ -233,9 +233,9 @@ void Animator::anim_updateKeyOnCurrrentFrame() {
     }
 }
 
-Key *Animator::prp_getKeyAtPos(qreal relX,
-                               int minViewedFrame,
-                               qreal pixelsPerFrame) {
+Key *Animator::prp_getKeyAtPos(const qreal &relX,
+                               const int &minViewedFrame,
+                               const qreal &pixelsPerFrame) {
     qreal relFrame = relX/pixelsPerFrame - prp_getFrameShift();
     qreal pressFrame = relFrame + minViewedFrame;
     if(pixelsPerFrame > KEY_RECT_SIZE) {
@@ -275,8 +275,8 @@ bool Animator::prp_hasKeys() {
     return !anim_mKeys.isEmpty();
 }
 
-void Animator::anim_setRecordingWithoutChangingKeys(bool rec,
-                                                    bool saveUndoRedo) {
+void Animator::anim_setRecordingWithoutChangingKeys(const bool &rec,
+                                                    const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new AnimatorRecordingSetUndoRedo(anim_mIsRecording,
                                                      rec,
@@ -287,7 +287,7 @@ void Animator::anim_setRecordingWithoutChangingKeys(bool rec,
     anim_setTraceKeyOnCurrentFrame(rec); // !!!
 }
 
-void Animator::anim_setRecordingValue(bool rec) {
+void Animator::anim_setRecordingValue(const bool &rec) {
     if(rec == anim_mIsRecording) return;
     anim_mIsRecording = rec;
     emit prp_isRecordingChanged();
@@ -309,8 +309,8 @@ bool Animator::prp_isKeyOnCurrentFrame() {
     return anim_mKeyOnCurrentFrame;
 }
 
-void Animator::prp_getKeysInRect(QRectF selectionRect,
-                                 qreal pixelsPerFrame,
+void Animator::prp_getKeysInRect(const QRectF &selectionRect,
+                                 const qreal &pixelsPerFrame,
                                  QList<Key *> *keysList) {
     //selectionRect.translate(-getFrameShift(), 0.);
     int selLeftFrame = selectionRect.left();
@@ -332,8 +332,8 @@ void Animator::prp_getKeysInRect(QRectF selectionRect,
 }
 
 bool Animator::anim_getNextAndPreviousKeyIdForRelFrame(
-                                int *prevIdP, int *nextIdP,
-                                int frame) const {
+                        int *prevIdP, int *nextIdP,
+                        const int &frame) const {
     if(anim_mKeys.isEmpty()) return false;
     int minId = 0;
     int maxId = anim_mKeys.count() - 1;
@@ -410,9 +410,11 @@ void Animator::anim_drawKey(QPainter *p,
     }
 }
 
-void Animator::prp_drawKeys(QPainter *p, qreal pixelsPerFrame,
-                             qreal drawY,
-                             int startFrame, int endFrame) {
+void Animator::prp_drawKeys(QPainter *p,
+                            const qreal &pixelsPerFrame,
+                            const qreal &drawY,
+                            const int &startFrame,
+                            const int &endFrame) {
     p->save();
     //p->translate(getFrameShift()*pixelsPerFrame, 0.);
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {

@@ -24,14 +24,18 @@ public:
     int getStartAbsFrame() const;
     int getSampleCount() const;
     const float *getFinalData() const;
-    void prepareFinalData(const qreal &fps, const int &minAbsFrame, const int &maxAbsFrame);
+    void prepareFinalData(const qreal &fps,
+                          const int &minAbsFrame,
+                          const int &maxAbsFrame);
     void prp_drawKeys(QPainter *p,
-                  qreal pixelsPerFrame,
-                  qreal drawY,
-                  int startFrame, int endFrame);
-    DurationRectangleMovable *anim_getRectangleMovableAtPos(qreal relX,
-                                                       int minViewedFrame,
-                                                       qreal pixelsPerFrame);
+                      const qreal &pixelsPerFrame,
+                      const qreal &drawY,
+                      const int &startFrame,
+                      const int &endFrame);
+    DurationRectangleMovable *anim_getRectangleMovableAtPos(
+                                            const qreal &relX,
+                                            const int &minViewedFrame,
+                                            const qreal &pixelsPerFrame);
     SWT_Type SWT_getType() { return SWT_SingleSound; }
     void updateFinalDataIfNeeded(const qreal &fps,
                                  const int &minAbsFrame,

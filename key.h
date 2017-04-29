@@ -26,7 +26,7 @@ public:
     virtual void finishFrameTransform();
 
     int getAbsFrame();
-    virtual void setRelFrame(int frame);
+    virtual void setRelFrame(const int &frame);
 
     void changeFrameAndValueBy(QPointF frameValueChange);
 

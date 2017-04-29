@@ -53,24 +53,27 @@ public:
     int prp_parentRelFrameToAbsFrame(const int &relFrame) const;
 
     virtual void prp_drawKeys(QPainter *p,
-                              qreal pixelsPerFrame, qreal drawY,
-                              int startFrame, int endFrame) {
+                              const qreal &pixelsPerFrame,
+                              const qreal &drawY,
+                              const int &startFrame,
+                              const int &endFrame) {
         Q_UNUSED(p);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(drawY);
         Q_UNUSED(startFrame);
         Q_UNUSED(endFrame);
     }
-    virtual void prp_getKeysInRect(QRectF selectionRect,
-                                   qreal pixelsPerFrame,
+    virtual void prp_getKeysInRect(const QRectF &selectionRect,
+                                   const qreal &pixelsPerFrame,
                                    QList<Key *> *keysList) {
         Q_UNUSED(selectionRect);
         Q_UNUSED(pixelsPerFrame);
         Q_UNUSED(keysList);
     }
 
-    virtual Key *prp_getKeyAtPos(qreal relX, int minViewedFrame,
-                                 qreal pixelsPerFrame) {
+    virtual Key *prp_getKeyAtPos(const qreal &relX,
+                                 const int &minViewedFrame,
+                                 const qreal &pixelsPerFrame) {
         Q_UNUSED(relX);
         Q_UNUSED(minViewedFrame);
         Q_UNUSED(pixelsPerFrame);
@@ -85,7 +88,7 @@ public:
 
     virtual void prp_retrieveSavedValue() {}
 
-    virtual void prp_setAbsFrame(int frame) { Q_UNUSED(frame); }
+    virtual void prp_setAbsFrame(const int &frame) { Q_UNUSED(frame); }
 
     virtual void prp_switchRecording() {}
 
@@ -99,7 +102,7 @@ public:
 
     virtual void prp_clearFromGraphView() {}
 
-    virtual void prp_openContextMenu(QPoint pos) { Q_UNUSED(pos); }
+    virtual void prp_openContextMenu(const QPoint &pos) { Q_UNUSED(pos); }
 
     virtual bool prp_hasKeys() { return false; }
 
@@ -110,13 +113,13 @@ public:
     virtual void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
         Q_UNUSED(target);
     }
-    virtual void prp_setTransformed(bool bT) { Q_UNUSED(bT); }
+    virtual void prp_setTransformed(const bool &bT) { Q_UNUSED(bT); }
     virtual void prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
         Q_UNUSED(target);
     }
 
-    QString prp_getName();
-    void prp_setName(QString newName);
+    const QString &prp_getName();
+    void prp_setName(const QString &newName);
 
     virtual void prp_setUpdater(AnimatorUpdater *updater);
     virtual void prp_callUpdater();
@@ -126,7 +129,7 @@ public:
     virtual void prp_setParentFrameShift(const int &shift);
     void prp_setBlockedUpdater(AnimatorUpdater *updater);
 public slots:
-    virtual void prp_setRecording(bool rec) { Q_UNUSED(rec); }
+    virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 
     virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                      const int &maxFrame);

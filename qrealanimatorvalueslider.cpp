@@ -141,7 +141,7 @@ void QrealAnimatorValueSlider::openContextMenu(
     } else {
         menu.addAction("Add Keyframe",
                        mAnimator,
-                       SLOT(saveCurrentValueAsKey()));
+                       SLOT(anim_saveCurrentValueAsKey()));
     }
 
     menu.addSeparator();

@@ -47,11 +47,11 @@ QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     target->setRelFrame(mRelFrame);
     target->setCtrlsMode(mCtrlsMode);
     target->setStartEnabled(mStartEnabled);
-    target->setStartFrame(mStartFrame);
-    target->setStartValue(mStartValue);
+    target->setStartFrameVar(mStartFrame);
+    target->setStartValueVar(mStartValue);
     target->setEndEnabled(mEndEnabled);
-    target->setEndFrame(mEndFrame);
-    target->setEndValue(mEndValue);
+    target->setEndFrameVar(mEndFrame);
+    target->setEndValueVar(mEndValue);
     //targetParent->appendKey(target);
     return target;
 }
@@ -59,7 +59,7 @@ QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
-int QrealKey::saveToSql(int parentAnimatorSqlId) {
+int QrealKey::saveToSql(const int &parentAnimatorSqlId) {
     QSqlQuery query;
     if(!query.exec(
         QString("INSERT INTO qrealkey (value, frame, endenabled, "
@@ -83,7 +83,7 @@ int QrealKey::saveToSql(int parentAnimatorSqlId) {
 }
 
 #include <QSqlRecord>
-void QrealKey::loadFromSql(int keyId) {
+void QrealKey::loadFromSql(const int &keyId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qrealkey WHERE id = " +
@@ -118,7 +118,7 @@ void QrealKey::copyToContainer(KeysClipboardContainer *container) {
     container->copyKeyToContainer(this);
 }
 
-void QrealKey::constrainEndCtrlMaxFrame(int maxFrame) {
+void QrealKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
     if(mEndFrame < maxFrame || !mEndEnabled) return;
     qreal newFrame = clamp(mEndFrame, mRelFrame, maxFrame);
     qreal change = (newFrame - mRelFrame)/(mEndFrame - mRelFrame);
@@ -167,7 +167,7 @@ qreal QrealKey::getNextKeyValue() {
     return getParentQrealAnimator()->qra_getNextKeyValue(this);
 }
 
-void QrealKey::constrainStartCtrlMinFrame(int minFrame) {
+void QrealKey::constrainStartCtrlMinFrame(const int &minFrame) {
     if(mStartFrame > minFrame || !mStartEnabled) return;
     qreal newFrame = clamp(mStartFrame, minFrame, mRelFrame);
     qreal change = (mRelFrame - newFrame)/(mRelFrame - mStartFrame);
@@ -183,8 +183,10 @@ void QrealKey::constrainStartCtrlMinFrame(int minFrame) {
 //    return true;
 //}
 
-QrealPoint *QrealKey::mousePress(qreal frameT, qreal valueT,
-                          qreal pixelsPerFrame, qreal pixelsPerValue) {
+QrealPoint *QrealKey::mousePress(const qreal &frameT,
+                                 const qreal &valueT,
+                                 const qreal &pixelsPerFrame,
+                                 const qreal &pixelsPerValue) {
     if(isSelected() ) {
         if( (mStartEnabled) ?
             mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
@@ -203,7 +205,7 @@ QrealPoint *QrealKey::mousePress(qreal frameT, qreal valueT,
     return NULL;
 }
 
-void QrealKey::setCtrlsMode(CtrlsMode mode) {
+void QrealKey::setCtrlsMode(const CtrlsMode &mode) {
     mCtrlsMode = mode;
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
         QPointF newStartPos;
@@ -233,7 +235,7 @@ void QrealKey::setCtrlsMode(CtrlsMode mode) {
     }
 }
 
-void QrealKey::updateCtrlFromCtrl(QrealPointType type) {
+void QrealKey::updateCtrlFromCtrl(const QrealPointType &type) {
     if(mCtrlsMode == CTRLS_CORNER) return;
     QPointF fromPt;
     QPointF toPt;
@@ -263,20 +265,22 @@ void QrealKey::updateCtrlFromCtrl(QrealPointType type) {
     }
     targetPt->setValue(newFrameValue.y() );
     targetPt->setFrame(newFrameValue.x() );
+
+    mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
 qreal QrealKey::getValue() { return mValue; }
 
 #include "undoredo.h"
-void QrealKey::setValue(qreal value, bool saveUndoRedo) {
+void QrealKey::setValue(qreal value, const bool &saveUndoRedo) {
     if(mParentAnimator != NULL) {
         value = clamp(value,
                       getParentQrealAnimator()->getMinPossibleValue(),
                       getParentQrealAnimator()->getMaxPossibleValue());
     }
     qreal dVal = value - mValue;
-    setEndValue(mEndValue + dVal);
-    setStartValue(mStartValue + dVal);
+    setEndValueVar(mEndValue + dVal);
+    setStartValueVar(mStartValue + dVal);
     if(saveUndoRedo) {
         if(mParentAnimator != NULL) {
             mParentAnimator->addUndoRedo(
@@ -296,24 +300,40 @@ void QrealKey::setFrameAndUpdateParentAnimator(const int &relFrame) {
     mParentAnimator->anim_moveKeyToFrame(this, relFrame);
 }
 
-void QrealKey::setStartValue(qreal value) {
+void QrealKey::setStartValueVar(const qreal &value) {
     mStartValue = value;
 }
 
-void QrealKey::setEndValue(qreal value)
-{
+void QrealKey::setEndValueVar(const qreal &value) {
     mEndValue = value;
 }
 
-
-void QrealKey::setStartFrame(qreal startFrame)
-{
+void QrealKey::setStartFrameVar(const qreal &startFrame) {
     mStartFrame = startFrame;
 }
 
-void QrealKey::setEndFrame(qreal endFrame)
-{
+void QrealKey::setEndFrameVar(const qreal &endFrame) {
     mEndFrame = endFrame;
+}
+
+void QrealKey::setEndFrame(const qreal &endFrame) {
+    setEndFrameVar(endFrame);
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
+void QrealKey::setStartFrame(const qreal &startFrame) {
+    setStartFrameVar(startFrame);
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
+void QrealKey::setStartValue(const qreal &value) {
+    setStartValueVar(value);
+    mParentAnimator->anim_updateAfterChangedKey(this);
+}
+
+void QrealKey::setEndValue(const qreal &value) {
+    setEndValueVar(value);
+    mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
 qreal QrealKey::getStartValue() {
@@ -336,23 +356,25 @@ qreal QrealKey::getEndValueFrame() {
     return mRelFrame;
 }
 
-void QrealKey::setStartEnabled(bool bT) {
+void QrealKey::setStartEnabled(const bool &bT) {
     mStartEnabled = bT;
 }
 
-void QrealKey::setEndEnabled(bool bT) {
+void QrealKey::setEndEnabled(const bool &bT) {
     mEndEnabled = bT;
 }
 
-bool QrealKey::isInsideRect(QRectF valueFrameRect)
-{
+bool QrealKey::isInsideRect(const QRectF &valueFrameRect) {
     QPointF keyPoint = QPointF(getAbsFrame(), getValue());
     return valueFrameRect.contains(keyPoint);
 }
 
-void QrealKey::drawGraphKey(QPainter *p, const QColor &paintColor,
-                    qreal minFrameT, qreal minValueT,
-                    qreal pixelsPerFrame, qreal pixelsPerValue) {
+void QrealKey::drawGraphKey(QPainter *p,
+                            const QColor &paintColor,
+                            const qreal &minFrameT,
+                            const qreal &minValueT,
+                            const qreal &pixelsPerFrame,
+                            const qreal &pixelsPerValue) {
     if(isSelected()) {
         p->save();
         p->setPen(QPen(Qt::black, 2., Qt::DotLine));
@@ -392,11 +414,11 @@ void QrealKey::saveCurrentFrameAndValue() {
     mSavedValue = getValue();
 }
 
-void QrealKey::setRelFrame(int frame) {
+void QrealKey::setRelFrame(const int &frame) {
     if(frame == mRelFrame) return;
     int dFrame = frame - mRelFrame;
-    setEndFrame(mEndFrame + dFrame);
-    setStartFrame(mStartFrame + dFrame);
+    setEndFrameVar(mEndFrame + dFrame);
+    setStartFrameVar(mStartFrame + dFrame);
     mRelFrame = frame;
     if(mParentAnimator == NULL) return;
     mParentAnimator->anim_updateKeyOnCurrrentFrame();
@@ -417,7 +439,7 @@ bool QrealKey::differsFromKey(Key *key) {
     return true;
 }
 
-void QrealKey::changeFrameAndValueBy(QPointF frameValueChange) {
+void QrealKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
     setValue(frameValueChange.y() + mSavedValue);
     int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
     if(mParentAnimator != NULL) {

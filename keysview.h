@@ -6,8 +6,8 @@
 #include <QPointer>
 
 const QList<QColor> ANIMATORCOLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
-                                    QColor(255, 255, 0), QColor(255, 0, 255),
-                                    QColor(0, 255, 0)};
+                                      QColor(255, 255, 0), QColor(255, 0, 255),
+                                      QColor(0, 255, 0)};
 
 class Key;
 class QrealKey;
@@ -50,37 +50,39 @@ public:
 
     void graphPaint(QPainter *p);
     void graphWheelEvent(QWheelEvent *event);
-    void graphMousePressEvent(QPoint eventPos, Qt::MouseButton eventButton);
-    void graphMouseMoveEvent(QPoint eventPos, Qt::MouseButtons eventButtons);
-    void graphMouseReleaseEvent(Qt::MouseButton eventButton);
+    void graphMousePressEvent(const QPoint &eventPos,
+                              const Qt::MouseButton &eventButton);
+    void graphMouseMoveEvent(const QPoint &eventPos,
+                             const Qt::MouseButtons &eventButtons);
+    void graphMouseReleaseEvent(const Qt::MouseButton &eventButton);
     bool graphProcessFilteredKeyEvent(QKeyEvent *event);
     void graphResizeEvent(QResizeEvent *);
     void graphAddViewedAnimator(QrealAnimator *animator);
-    void graphIncScale(qreal inc);
-    void graphSetScale(qreal scale);
+    void graphIncScale(const qreal &inc);
+    void graphSetScale(const qreal &scale);
     void graphUpdateDimensions();
-    void graphIncMinShownVal(qreal inc);
-    void graphSetMinShownVal(qreal newMinShownVal);
-    void graphGetValueAndFrameFromPos(QPointF pos, qreal *value, qreal *frame);
-    void graphMiddleMove(QPointF movePos);
-    void graphMiddlePress(QPointF pressPos);
+    void graphIncMinShownVal(const qreal &inc);
+    void graphSetMinShownVal(const qreal &newMinShownVal);
+    void graphGetValueAndFrameFromPos(const QPointF &pos,
+                                      qreal *value, qreal *frame);
+    void graphMiddleMove(const QPointF &movePos);
+    void graphMiddlePress(const QPointF &pressPos);
     void graphMouseRelease();
-    void graphMousePress(QPointF pressPos);
+    void graphMousePress(const QPointF &pressPos);
     void graphMiddleRelease();
-    void graphSetCtrlsModeForSelected(CtrlsMode mode);
+    void graphSetCtrlsModeForSelected(const CtrlsMode &mode);
     void graphDeletePressed();
     void graphClearKeysSelection();
     void graphAddKeyToSelection(QrealKey *key);
     void graphRemoveKeyFromSelection(QrealKey *key);
-    void graphMouseMove(QPointF mousePos);
-    void graphRepaint();
+    void graphMouseMove(const QPointF &mousePos);
     void graphResetValueScaleAndMinShown();
     void scheduleGraphUpdateAfterKeysChanged();
     void graphUpdateAfterKeysChangedIfNeeded();
     bool processFilteredKeyEvent(QKeyEvent *event);
     void deleteSelectedKeys();
-    void middleMove(QPointF movePos);
-    void middlePress(QPointF pressPos);
+    void middleMove(const QPointF &movePos);
+    void middlePress(const QPointF &pressPos);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *e);
     void graphRemoveViewedAnimator(QrealAnimator *animator);
@@ -103,7 +105,8 @@ public slots:
     void graphUpdateAfterKeysChanged();
     void graphMergeKeysIfNeeded();
 
-    void setFramesRange(int startFrame, int endFrame);
+    void setFramesRange(const int &startFrame,
+                        const int &endFrame);
 
     void graphSetSmoothCtrl();
     void graphSetSymmetricCtrl();
@@ -115,7 +118,8 @@ public slots:
 
     void graphClearAnimatorSelection();
 
-    void setViewedRange(int top, int bottom);
+    void setViewedRange(const int &top,
+                        const int &bottom);
 private slots:
     void scrollRight();
     void scrollLeft();

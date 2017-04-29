@@ -19,7 +19,7 @@ public:
 
     void anim_updateAfterChangedKey(Key *key);
 
-    virtual void prp_setAbsFrame(int frame);
+    virtual void prp_setAbsFrame(const int &frame);
 
     virtual void prp_switchRecording();
 
@@ -40,59 +40,62 @@ public:
     virtual void anim_sortKeys();
 
     virtual void anim_appendKey(Key *newKey,
-                                bool saveUndoRedo = true);
+                                const bool &saveUndoRedo = true);
     virtual void anim_removeKey(Key *keyToRemove,
-                                bool saveUndoRedo = true);
-    virtual void anim_moveKeyToFrame(Key *key, int newFrame);
+                                const bool &saveUndoRedo = true);
+    virtual void anim_moveKeyToFrame(Key *key, const int &newFrame);
 
     virtual void anim_keyValueChanged(Key *key);
 
     void anim_updateKeyOnCurrrentFrame();
-    void anim_setTraceKeyOnCurrentFrame(bool bT) {
+    void anim_setTraceKeyOnCurrentFrame(const bool &bT) {
         anim_mTraceKeyOnCurrentFrame = bT;
     }
-    virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(qreal relX,
-                                                       int minViewedFrame,
-                                                       qreal pixelsPerFrame) {
+    virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
+                                           const qreal &relX,
+                                           const int &minViewedFrame,
+                                           const qreal &pixelsPerFrame) {
         Q_UNUSED(relX);
         Q_UNUSED(minViewedFrame);
         Q_UNUSED(pixelsPerFrame);
         return NULL;
     }
 
-    Key *prp_getKeyAtPos(qreal relX,
-                         int minViewedFrame,
-                         qreal pixelsPerFrame);
+    Key *prp_getKeyAtPos(const qreal &relX,
+                         const int &minViewedFrame,
+                         const qreal &pixelsPerFrame);
     void prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target);
     void prp_addAllKeysToComplexAnimator(ComplexAnimator *target);
     bool prp_hasKeys();
 
-    void anim_setRecordingWithoutChangingKeys(bool rec,
-                                              bool saveUndoRedo = true);
+    void anim_setRecordingWithoutChangingKeys(const bool &rec,
+                                              const bool &saveUndoRedo = true);
     bool prp_isRecording();
     virtual void anim_removeAllKeys();
     bool prp_isKeyOnCurrentFrame();
-    virtual void prp_getKeysInRect(QRectF selectionRect,
-                                   qreal pixelsPerFrame,
+    virtual void prp_getKeysInRect(const QRectF &selectionRect,
+                                   const qreal &pixelsPerFrame,
                                    QList<Key *> *keysList);
     bool anim_getNextAndPreviousKeyIdForRelFrame(
                                  int *prevIdP,
                                  int *nextIdP,
-                                 int frame) const;
+                                 const int &frame) const;
     virtual void prp_drawKeys(QPainter *p,
-                              qreal pixelsPerFrame, qreal drawY,
-                              int startFrame, int endFrame);
+                              const qreal &pixelsPerFrame,
+                              const qreal &drawY,
+                              const int &startFrame,
+                              const int &endFrame);
     Key *anim_getKeyAtAbsFrame(const int &frame);
 
     virtual void anim_saveCurrentValueAsKey() {}
 
-    virtual void anim_loadKeysFromSql(int qrealAnimatorId) = 0;
+    virtual void anim_loadKeysFromSql(const int &qrealAnimatorId) = 0;
 
     Key *anim_getNextKey(Key *key);
     Key *anim_getPrevKey(Key *key);
     int anim_getNextKeyRelFrame(Key *key);
     int anim_getPrevKeyRelFrame(Key *key);
-    void anim_setRecordingValue(bool rec);
+    void anim_setRecordingValue(const bool &rec);
 protected:
     int anim_getKeyIndex(Key *key);
 

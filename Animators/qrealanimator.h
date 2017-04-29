@@ -33,61 +33,73 @@ public:
     void qra_addSlider(QrealAnimatorValueSlider *valueSlider);
     void qra_removeSlider(QrealAnimatorValueSlider *valueSlider);
 
-    void qra_setValueRange(qreal minVal, qreal maxVal);
+    void qra_setValueRange(const qreal &minVal,
+                           const qreal &maxVal);
 
-    qreal qra_getValueAtAbsFrame(int frame) const;
+    qreal qra_getValueAtAbsFrame(const int &frame) const;
     qreal qra_getCurrentValue() const;
-    void qra_setCurrentValue(qreal newValue, bool finish = false);
+    void qra_setCurrentValue(qreal newValue,
+                             const bool &finish = false);
     void qra_updateValueFromCurrentFrame();
     void qra_saveCurrentValueToKey(QrealKey *key);
     void qra_saveValueToKey(QrealKey *key,
-                        qreal value,
-                        bool saveUndoRedo = true);
+                            const qreal &value,
+                            const bool &saveUndoRedo = true);
 
-    virtual void prp_setAbsFrame(int frame);
+    virtual void prp_setAbsFrame(const int &frame);
     virtual void qra_updateKeysPath();
 
     void qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP);
-    void qra_getMinAndMaxValuesBetweenFrames(int startFrame, int endFrame,
-                                             qreal *minValP, qreal *maxValP);
+    void qra_getMinAndMaxValuesBetweenFrames(const int &startFrame,
+                                             const int &endFrame,
+                                             qreal *minValP,
+                                             qreal *maxValP);
 
-    QrealPoint *qra_getPointAt(qreal value, qreal frame,
-                               qreal pixelsPerFrame,
-                               qreal pixelsPerValUnit);
-    qreal qra_getValueAtRelFrame(int frame,
-                          QrealKey *prevKey,
-                          QrealKey *nextKey) const;
+    QrealPoint *qra_getPointAt(const qreal &value,
+                               const qreal &frame,
+                               const qreal &pixelsPerFrame,
+                               const qreal &pixelsPerValUnit);
+    qreal qra_getValueAtRelFrame(const int &frame,
+                                 QrealKey *prevKey,
+                                 QrealKey *nextKey) const;
 
     void qra_constrainCtrlsFrameValues();
 
-    virtual qreal qra_clampValue(qreal value);
+    qreal qra_clampValue(const qreal &value);
 
     qreal qra_getPrevKeyValue(QrealKey *key);
     qreal qra_getNextKeyValue(QrealKey *key);
 
     virtual void prp_retrieveSavedValue();
-    void qra_incCurrentValue(qreal incBy);
+    void qra_incCurrentValue(const qreal &incBy);
 
     virtual void prp_startTransform();
 
     void prp_finishTransform();
 
-    void qra_multCurrentValue(qreal mult);
+    void qra_multCurrentValue(const qreal &mult);
 
     qreal qra_getSavedValue();
 
     virtual void prp_cancelTransform();  
 
-    void qra_incAllValues(qreal valInc);
+    void qra_incAllValues(const qreal &valInc);
 
     virtual QString prp_getValueText();
-    void getMinAndMaxMoveFrame(QrealKey *key, QrealPoint *currentPoint,
-                               qreal *minMoveFrame, qreal *maxMoveFrame);
-    void drawKeysPath(QPainter *p, const QColor &paintColor,
-                      qreal height, qreal margin,
-                      qreal startFrame, qreal minShownVal,
-                      qreal pixelsPerFrame, qreal pixelsPerValUnit);
-    void addKeysInRectToList(QRectF frameValueRect,
+    void getMinAndMaxMoveFrame(QrealKey *key,
+                               QrealPoint *currentPoint,
+                               qreal *minMoveFrame,
+                               qreal *maxMoveFrame);
+    void drawKeysPath(QPainter *p,
+                      const QColor &paintColor,
+                      const qreal &height,
+                      const qreal &margin,
+                      const qreal &startFrame,
+                      const qreal &minShownVal,
+                      const qreal &pixelsPerFrame,
+                      const qreal &pixelsPerValUnit);
+
+    void addKeysInRectToList(const QRectF &frameValueRect,
                              QList<QrealKey*> *keys);
 
     qreal getMinPossibleValue();
@@ -95,27 +107,27 @@ public:
 
     void anim_mergeKeysIfNeeded();
     void anim_appendKey(Key *newKey,
-                       bool saveUndoRedo = true);
+                        const bool &saveUndoRedo = true);
     void anim_removeKey(Key *keyToRemove,
-                        bool saveUndoRedo = true);
-    void anim_moveKeyToFrame(Key *key, int newFrame);
+                        const bool &saveUndoRedo = true);
+    void anim_moveKeyToFrame(Key *key, const int &newFrame);
 
     qreal getPrefferedValueStep();
     virtual void setPrefferedValueStep(const qreal &valueStep);
     virtual void prp_clearFromGraphView();
 
     void freezeMinMaxValues();
-    void saveValueAtAbsFrameAsKey(int frame);
+    void saveValueAtAbsFrameAsKey(const int &frame);
 
-    virtual void prp_openContextMenu(QPoint pos);
-    void qra_saveValueToKey(int frame, qreal value);
+    virtual void prp_openContextMenu(const QPoint &pos);
+    void qra_saveValueToKey(const int &frame, const qreal &value);
     void removeThisFromGraphAnimator();
 
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
     void prp_loadFromSql(const int &qrealAnimatorId);
-    void anim_loadKeysFromSql(int qrealAnimatorId);
-    virtual void incSavedValueToCurrentValue(qreal incBy);
-    virtual void multSavedValueToCurrentValue(qreal multBy);
+    void anim_loadKeysFromSql(const int &qrealAnimatorId);
+    void incSavedValueToCurrentValue(const qreal &incBy);
+    void multSavedValueToCurrentValue(const qreal &multBy);
 
     QColor getAnimatorColor(void *ptr) const {
         for(const std::map<void*, QColor>::value_type& x : mAnimatorColors) {
@@ -137,18 +149,29 @@ public:
         return mAnimatorColors.find(ptr) != mAnimatorColors.end();
     }
 
-    int getNumberDecimals() { return mDecimals; }
-    void setNumberDecimals(int decimals) { mDecimals = decimals; }
+    const int &getNumberDecimals() { return mDecimals; }
+    void setNumberDecimals(const int &decimals) { mDecimals = decimals; }
 
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 
     SWT_Type SWT_getType() { return SWT_QrealAnimator; }
     qreal getCurrentValueAtAbsFrame(const int &frame) const;
-    qreal qra_getValueAtRelFrame(int frame) const;
-    void prp_setTransformed(bool bT) { mTransformed = bT; }
+    qreal qra_getValueAtRelFrame(const int &frame) const;
+    void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void anim_removeAllKeys();
     QrealKey *getQrealKeyAtId(const int &id) const;
+
+    void prp_updateAfterChangedRelFrameRange(const int &minFrame,
+                                             const int &maxFrame) {
+        if(anim_mCurrentRelFrame >= minFrame) {
+            if(anim_mCurrentRelFrame <= maxFrame) {
+                qra_updateValueFromCurrentFrame();
+            }
+        }
+        Property::prp_updateAfterChangedRelFrameRange(minFrame, maxFrame);
+    }
+
 protected:
     std::map<void*, QColor> mAnimatorColors;
 
@@ -171,7 +194,7 @@ protected:
 signals:
     void valueChangedSignal(qreal);
 public slots:
-    void prp_setRecording(bool rec);
+    void prp_setRecording(const bool &rec);
 
     void anim_saveCurrentValueAsKey();
 };
