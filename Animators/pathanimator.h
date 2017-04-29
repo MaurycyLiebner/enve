@@ -5,7 +5,7 @@
 
 enum CanvasMode : short;
 
-class Edge;
+class VectorPathEdge;
 class MovablePoint;
 
 class PathPoint;
@@ -22,7 +22,7 @@ public:
 
     ~PathAnimator();
 
-    Edge *getEgde(QPointF absPos);
+    VectorPathEdge *getEgde(QPointF absPos);
     QPointF getRelCenterPosition();
     void updatePath();
     MovablePoint *qra_getPointAt(const QPointF &absPtPos,

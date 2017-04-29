@@ -454,7 +454,7 @@ void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo) {
         }
     } else {
         if(mNextEdge.get() == NULL) {
-            mNextEdge = (new Edge(this, mNextPoint))->ref<Edge>();
+            mNextEdge = (new VectorPathEdge(this, mNextPoint))->ref<VectorPathEdge>();
         } else {
             mNextEdge->setPoint2(mNextPoint);
         }

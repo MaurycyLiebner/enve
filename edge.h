@@ -7,9 +7,9 @@ class BonePoint;
 class PathPoint;
 class CtrlPoint;
 
-class Edge : public StdSelfRef {
+class VectorPathEdge : public StdSelfRef {
 public:
-    Edge(PathPoint *pt1, PathPoint *pt2);
+    VectorPathEdge(PathPoint *pt1, PathPoint *pt2);
 
     static void getNewRelPosForKnotInsertionAtT(const QPointF &P0,
                                                 QPointF *P1_ptr,
@@ -181,7 +181,7 @@ public:
     }
 
 private:
-    Edge *mParentEdge;
+    VectorPathEdge *mParentEdge;
     BoneInfluencePoint mPoint1InfluencePoint;
     BoneInfluencePoint mPoint2InfluencePoint;
     QList<BoneInfluencePoint> mBoneInfluencePoints;

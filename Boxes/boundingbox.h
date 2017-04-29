@@ -53,7 +53,7 @@ class BoxesListWidget;
 
 class CtrlPoint;
 
-class Edge;
+class VectorPathEdge;
 
 class VectorPath;
 
@@ -236,7 +236,7 @@ public:
     virtual void startSelectedStrokeColorTransform() {}
     virtual void startSelectedFillColorTransform() {}
 
-    virtual Edge *getEgde(QPointF absPos) {
+    virtual VectorPathEdge *getEgde(QPointF absPos) {
         Q_UNUSED(absPos);
         return NULL;
     }

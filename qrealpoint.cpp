@@ -39,8 +39,10 @@ bool QrealPoint::isSelected() {
     return mIsSelected;
 }
 
-bool QrealPoint::isNear(qreal frameT, qreal valueT,
-                        qreal pixelsPerFrame, qreal pixelsPerValue) {
+bool QrealPoint::isNear(const qreal &frameT,
+                        const qreal &valueT,
+                        const qreal &pixelsPerFrame,
+                        const qreal &pixelsPerValue) {
     qreal value = getValue();
     qreal frame = getFrame();
     if(qAbs(frameT - frame)*pixelsPerFrame > mRadius) return false;

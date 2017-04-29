@@ -654,7 +654,7 @@ IntersectionPathPoint *PointsBezierCubic::addIntersectionPointAt(
     QPointF sc3;
     QPointF sc4 = mC2;
     QPointF sp3 = mP2;
-    Edge::getNewRelPosForKnotInsertionAtT(
+    VectorPathEdge::getNewRelPosForKnotInsertionAtT(
                 sp1, &sc1, &sc4, sp3,
                 &sp2, &sc2, &sc3,
                 tVal);

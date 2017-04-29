@@ -700,7 +700,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         BoundingBox *lastHoveredBox = mHoveredBox;
         updateHoveredBox();
 
-        Edge *lastEdge = mHoveredEdge;
+        VectorPathEdge *lastEdge = mHoveredEdge;
         clearHoveredEdge();
         if(mCurrentMode == MOVE_POINT) {
             updateHoveredEdge();

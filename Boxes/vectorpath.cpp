@@ -67,7 +67,7 @@ void VectorPath::applyCurrentTransformation() {
     centerPivotPosition(true);
 }
 
-Edge *VectorPath::getEgde(QPointF absPos) {
+VectorPathEdge *VectorPath::getEgde(QPointF absPos) {
     return mPathAnimator->getEgde(absPos);
 }
 

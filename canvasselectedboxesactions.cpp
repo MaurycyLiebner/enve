@@ -205,10 +205,10 @@ void Canvas::startSelectedFillColorTransform() {
     }
 }
 
-Edge *Canvas::getEdgeAt(QPointF absPos) {
+VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->isSelected() ) {
-            Edge *pathEdge = box->getEgde(absPos);
+            VectorPathEdge *pathEdge = box->getEgde(absPos);
             if(pathEdge == NULL) continue;
             return pathEdge;
         }

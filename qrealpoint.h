@@ -27,8 +27,10 @@ public:
 
     bool isSelected();
 
-    bool isNear(qreal frameT, qreal valueT,
-                qreal pixelsPerFrame, qreal pixelsPerValue);
+    bool isNear(const qreal &frameT,
+                const qreal &valueT,
+                const qreal &pixelsPerFrame,
+                const qreal &pixelsPerValue);
 
     void moveTo(qreal frameT, qreal valueT);
 

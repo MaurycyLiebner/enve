@@ -317,7 +317,8 @@ void QrealAnimator::anim_mergeKeysIfNeeded() {
 void QrealAnimator::anim_appendKey(Key *newKey,
                                    const bool &saveUndoRedo) {
     Animator::anim_appendKey(newKey, saveUndoRedo);
-    qra_updateKeysPath();
+    //qra_updateKeysPath();
+    qra_constrainCtrlsFrameValues();
     qra_updateValueFromCurrentFrame();
 }
 

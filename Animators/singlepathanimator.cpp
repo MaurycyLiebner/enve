@@ -13,14 +13,14 @@ SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
 SinglePathAnimator::~SinglePathAnimator() {
 }
 
-Edge *SinglePathAnimator::getEgde(QPointF absPos) {
+VectorPathEdge *SinglePathAnimator::getEgde(QPointF absPos) {
     qreal pressedT;
     PathPoint *prevPoint = NULL;
     PathPoint *nextPoint = NULL;
     if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
                                             &prevPoint, &nextPoint)) {
         if(pressedT > 0.0001 && pressedT < 0.9999 && prevPoint && nextPoint) {
-            Edge *edge = prevPoint->getNextEdge();
+            VectorPathEdge *edge = prevPoint->getNextEdge();
             edge->setPressedT(pressedT);
             return edge;
         } else {
@@ -252,7 +252,7 @@ PathPoint *SinglePathAnimator::createNewPointOnLineNear(QPointF absPos,
             QPointF newPointPos;
             QPointF newPointStart;
             QPointF newPointEnd;
-            Edge::getNewRelPosForKnotInsertionAtT(prevPoint->getRelativePos(),
+            VectorPathEdge::getNewRelPosForKnotInsertionAtT(prevPoint->getRelativePos(),
                                                   &prevPointEnd,
                                                   &nextPointStart,
                                                   nextPoint->getRelativePos(),
@@ -554,7 +554,7 @@ void SinglePathAnimator::deletePointAndApproximate(PathPoint *pointToRemove) {
 
     pointToRemove->removeFromVectorPath();
 
-    Edge *newEdge = prevPoint->getNextEdge();
+    VectorPathEdge *newEdge = prevPoint->getNextEdge();
     newEdge->setPressedT(0.5);
     newEdge->makePassThrough(absPos);
 }

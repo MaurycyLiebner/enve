@@ -184,7 +184,6 @@ protected:
     qreal mCurrentValue = 0.;
     qreal mSavedCurrentValue;
     QPainterPath mKeysPath;
-    QPainterPath mKeysDrawPath;
 
     qreal mPrefferedValueStep = 1.;
 

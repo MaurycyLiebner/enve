@@ -14,7 +14,7 @@ class PathPivot;
 
 enum CanvasMode : short;
 
-class Edge;
+class VectorPathEdge;
 
 class VectorShapesMenu;
 
@@ -69,7 +69,7 @@ public:
 
     void applyTransformToPoints(QMatrix transform);
     void applyCurrentTransformation();
-    Edge *getEgde(QPointF absPos);
+    VectorPathEdge *getEgde(QPointF absPos);
 
     void loadPathFromQPainterPath(const QPainterPath &path);
 

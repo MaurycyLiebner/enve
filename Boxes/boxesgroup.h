@@ -11,7 +11,7 @@
 
 class MainWindow;
 
-class Edge;
+class VectorPathEdge;
 
 class BoxesGroup : public BoundingBox
 {

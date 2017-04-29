@@ -289,11 +289,11 @@ void KeysView::paintEvent(QPaintEvent *) {
     }
     int minFrame = mMinViewedFrame;//mMainWindow->getMinFrame();
     int maxFrame = mMaxViewedFrame;
-    if(mGraphViewed) {
-        while(xT + minFrame*mPixelsPerFrame < 38.) {
-            minFrame++;
-        }
-    }
+//    if(mGraphViewed) {
+//        while(xT + minFrame*mPixelsPerFrame < 38.) {
+//            minFrame++;
+//        }
+//    }
     minFrame += ceil((-xT)/mPixelsPerFrame);
     minFrame = minFrame - minFrame%iInc;
     maxFrame += floor((width() - 40. - xT)/mPixelsPerFrame) - maxFrame%iInc;
@@ -315,7 +315,9 @@ void KeysView::paintEvent(QPaintEvent *) {
     p.setPen(QPen(Qt::black, 1.));
 
     if(mGraphViewed) {
+        p.save();
         graphPaint(&p);
+        p.restore();
     } else {
         p.save();
         p.setRenderHint(QPainter::Antialiasing);

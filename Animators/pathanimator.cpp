@@ -23,9 +23,9 @@ void PathAnimator::setParentBox(BoundingBox *parent) {
     mParentBox = parent;
 }
 
-Edge *PathAnimator::getEgde(QPointF absPos) {
+VectorPathEdge *PathAnimator::getEgde(QPointF absPos) {
     foreach(SinglePathAnimator *path, mSinglePaths) {
-        Edge *edge = path->getEgde(absPos);
+        VectorPathEdge *edge = path->getEgde(absPos);
         if(edge == NULL) continue;
         return edge;
     }

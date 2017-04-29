@@ -195,7 +195,7 @@ public:
 
 
     void clearPointsSelectionOrDeselect();
-    Edge *getEdgeAt(QPointF absPos);
+    VectorPathEdge *getEdgeAt(QPointF absPos);
 
     void createLinkBoxForSelected();
     void startSelectedPointsTransform();
@@ -359,7 +359,7 @@ private:
 
     MovablePoint *mHoveredPoint = NULL;
     BoundingBox *mHoveredBox = NULL;
-    Edge *mHoveredEdge = NULL;
+    VectorPathEdge *mHoveredEdge = NULL;
 
     QList<MovablePoint*> mSelectedPoints;
     QList<BoundingBox*> mSelectedBoxes;
@@ -390,7 +390,7 @@ private:
     bool mXOnlyTransform = false;
     bool mYOnlyTransform = false;
 
-    Edge *mCurrentEdge = NULL;
+    VectorPathEdge *mCurrentEdge = NULL;
 
     bool mPreviewing = false;
     QImage *mCurrentPreviewImg = NULL;

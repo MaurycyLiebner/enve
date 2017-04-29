@@ -115,12 +115,14 @@ void KeysView::graphSetScale(const qreal &scale) {
 }
 
 void KeysView::graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal) {
+    qreal minValT;
+    qreal maxValT;
     if(mAnimators.isEmpty()) {
-        *minVal = 0.;
-        *maxVal = 0.;
+        minValT = 0.;
+        maxValT = 0.;
     } else {
-        qreal minValT = 1000000;
-        qreal maxValT = -1000000;
+        minValT = 1000000;
+        maxValT = -1000000;
 
         foreach(QrealAnimator *animator, mAnimators) {
             qreal animMinVal;
@@ -133,30 +135,33 @@ void KeysView::graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal) {
                 minValT = animMinVal;
             }
         }
-
-        *minVal = minValT;
-        *maxVal = maxValT;
     }
+    if(qAbs(minValT - maxValT) < 0.1 ) {
+        minValT -= 0.05;
+        maxValT += 0.05;
+    }
+    qreal valRange = maxValT - minValT;
+    maxValT += valRange*0.05;
+    minValT -= valRange*0.05;
+
+    *minVal = minValT;
+    *maxVal = maxValT;
 }
 
+const QList<qreal> validIncs = {7.5, 5., 2.5, 1.};
 void KeysView::graphUpdateDimensions() {
     graphGetAnimatorsMinMaxValue(&mMinVal, &mMaxVal);
 
-    if(qAbs(mMinVal - mMaxVal) < 0.1 ) {
-        mMinVal -= 0.05;
-        mMaxVal += 0.05;
-    }
-    mPixelsPerValUnit = mValueScale*(height() - 2*mMargin)/
-                                (mMaxVal - mMinVal);
-    mValueInc = 10000.;
-    qreal incIncValue = 1000.;
-    int nIncs = 0;
+    mPixelsPerValUnit = mValueScale*height()/(mMaxVal - mMinVal);
+    qreal incMulti = 10000.;
+    int currIncId = 0;
+    mValueInc = validIncs.first()*incMulti;
     while(mValueInc*mPixelsPerValUnit > 50. ) {
-        mValueInc -= incIncValue;
-        nIncs++;
-        if(nIncs == 9) {
-            nIncs = 0;
-            incIncValue *= 0.1;
+        mValueInc = validIncs.at(currIncId)*incMulti;
+        currIncId++;
+        if(currIncId >= validIncs.count()) {
+            currIncId = 0;
+            incMulti *= 0.1;
         }
     }
 
@@ -281,7 +286,10 @@ void KeysView::graphMouseRelease()
         }
         mCurrentPoint = NULL;
 
-        graphConstrainAnimatorCtrlsFrameValues();
+        foreach(QrealAnimator *animator, mAnimators) {
+            animator->qra_constrainCtrlsFrameValues();
+        }
+        //graphConstrainAnimatorCtrlsFrameValues();
 
         // needed ?
         graphUpdateDimensions();
@@ -509,11 +517,20 @@ void KeysView::graphMouseReleaseEvent(const Qt::MouseButton &eventButton) {
 
 void KeysView::graphWheelEvent(QWheelEvent *event) {
     if(mMainWindow->isCtrlPressed()) {
+        qreal valUnderMouse;
+        qreal frame;
+        graphGetValueAndFrameFromPos(event->posF(),
+                                     &valUnderMouse,
+                                     &frame);
+        qreal graphScaleInc;
         if(event->delta() > 0) {
-            graphIncScale(0.1);
+            graphScaleInc = 0.1;
         } else {
-            graphIncScale(-0.1);
+            graphScaleInc = -0.1;
         }
+        graphSetMinShownVal(mMinShownVal +
+                            (valUnderMouse - mMinShownVal)*graphScaleInc);
+        graphIncScale(graphScaleInc);
     } else {
         if(event->delta() > 0) {
             graphIncMinShownVal(0.1);
