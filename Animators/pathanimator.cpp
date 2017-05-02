@@ -23,9 +23,10 @@ void PathAnimator::setParentBox(BoundingBox *parent) {
     mParentBox = parent;
 }
 
-VectorPathEdge *PathAnimator::getEgde(QPointF absPos) {
+VectorPathEdge *PathAnimator::getEgde(const QPointF &absPos,
+                                      const qreal &canvasScaleInv) {
     foreach(SinglePathAnimator *path, mSinglePaths) {
-        VectorPathEdge *edge = path->getEgde(absPos);
+        VectorPathEdge *edge = path->getEgde(absPos, canvasScaleInv);
         if(edge == NULL) continue;
         return edge;
     }
@@ -135,9 +136,12 @@ void PathAnimator::updatePath()
 }
 
 PathPoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
-                                                  const bool &adjust) {
+                                                  const bool &adjust,
+                                                  const qreal &canvasScaleInv) {
     foreach(SinglePathAnimator *singlePath, mSinglePaths) {
-        PathPoint *pt = singlePath->createNewPointOnLineNear(absPos, adjust);
+        PathPoint *pt = singlePath->createNewPointOnLineNear(absPos,
+                                                             adjust,
+                                                             canvasScaleInv);
         if(pt == NULL) continue;
         return pt;
     }
@@ -168,11 +172,14 @@ void PathAnimator::applyTransformToPoints(const QMatrix &transform) {
     }
 }
 
-MovablePoint *PathAnimator::qra_getPointAt(const QPointF &absPtPos,
-                                       const CanvasMode &currentCanvasMode)
-{
+MovablePoint *PathAnimator::qra_getPointAt(
+                                    const QPointF &absPtPos,
+                                    const CanvasMode &currentCanvasMode,
+                                    const qreal &canvasScaleInv) {
     foreach(SinglePathAnimator *sepAnim, mSinglePaths) {
-        MovablePoint *pt = sepAnim->qra_getPointAt(absPtPos, currentCanvasMode);
+        MovablePoint *pt = sepAnim->qra_getPointAt(absPtPos,
+                                                   currentCanvasMode,
+                                                   canvasScaleInv);
         if(pt == NULL) continue;
         return pt;
     }

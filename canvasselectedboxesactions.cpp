@@ -105,10 +105,12 @@ void Canvas::resetSelectedRotation() {
     }
 }
 
-PathPoint *Canvas::createNewPointOnLineNearSelected(QPointF absPos,
-                                                        bool adjust) {
+PathPoint *Canvas::createNewPointOnLineNearSelected(const QPointF &absPos,
+                                                    const bool &adjust,
+                                                    const qreal &canvasScaleInv) {
     foreach(BoundingBox *box, mSelectedBoxes) {
-        PathPoint *point = box->createNewPointOnLineNear(absPos, adjust);
+        PathPoint *point = box->createNewPointOnLineNear(absPos, adjust,
+                                                         canvasScaleInv);
         if(point != NULL) {
             return point;
         }
@@ -208,7 +210,8 @@ void Canvas::startSelectedFillColorTransform() {
 VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->isSelected() ) {
-            VectorPathEdge *pathEdge = box->getEgde(absPos);
+            VectorPathEdge *pathEdge = box->getEgde(absPos,
+                                                    1./mCanvasTransformMatrix.m11());
             if(pathEdge == NULL) continue;
             return pathEdge;
         }
@@ -414,15 +417,21 @@ void Canvas::deselectAllBoxes() {
         removeBoxFromSelection(box);
     }
 }
-
-MovablePoint *Canvas::getPointAt(const QPointF &absPos,
-                                 const CanvasMode &currentMode) {
+#include "pathpivot.h"
+MovablePoint *Canvas::getPointAtAbsPos(const QPointF &absPos,
+                                 const CanvasMode &currentMode,
+                                 const qreal &canvasScaleInv) {
     if(currentMode == MOVE_POINT ||
        currentMode == ADD_POINT ||
        currentMode == MOVE_PATH) {
+        if(mRotPivot->isPointAtAbsPos(absPos, canvasScaleInv)) {
+            return mRotPivot;
+        }
         MovablePoint *pointAtPos = NULL;
         foreach(BoundingBox *box, mSelectedBoxes) {
-            pointAtPos = box->getPointAt(absPos, currentMode);
+            pointAtPos = box->getPointAtAbsPos(absPos,
+                                               currentMode,
+                                               canvasScaleInv);
             if(pointAtPos != NULL) {
                 break;
             }

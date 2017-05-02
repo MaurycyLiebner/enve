@@ -20,8 +20,9 @@ public:
     int prp_saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
     void updatePath();
-    MovablePoint *getPointAt(const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                             const CanvasMode &currentCanvasMode,
+                             const qreal &canvasScaleInv);
 //    QRectF getTextRect();
     void setPathText(bool pathText);
 

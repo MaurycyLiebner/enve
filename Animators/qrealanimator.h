@@ -91,13 +91,7 @@ public:
                                qreal *minMoveFrame,
                                qreal *maxMoveFrame);
     void drawKeysPath(QPainter *p,
-                      const QColor &paintColor,
-                      const qreal &height,
-                      const qreal &margin,
-                      const qreal &startFrame,
-                      const qreal &minShownVal,
-                      const qreal &pixelsPerFrame,
-                      const qreal &pixelsPerValUnit);
+                      const QColor &paintColor);
 
     void addKeysInRectToList(const QRectF &frameValueRect,
                              QList<QrealKey*> *keys);

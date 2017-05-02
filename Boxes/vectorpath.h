@@ -31,9 +31,12 @@ public:
     PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
     PathPoint *addPointRelPos(QPointF relPtPos, PathPoint *toPoint = NULL);
 
-    MovablePoint *getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                             const CanvasMode &currentCanvasMode,
+                             const qreal &canvasScaleInv);
 
-    void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint*> *list);
+    void selectAndAddContainedPointsToList(const QRectF &absRect,
+                                           QList<MovablePoint*> *list);
 
     PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
 
@@ -49,7 +52,9 @@ public:
                               PathPoint *toPoint = NULL);
     int prp_saveToSql(QSqlQuery *query, const int &parentId);
 
-    PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
+    PathPoint *createNewPointOnLineNear(const QPointF &absPos,
+                                        const bool &adjust,
+                                        const qreal &canvasScaleInv);
     qreal percentAtPoint(QPointF absPos, qreal distTolerance,
                          qreal maxPercent, qreal minPercent,
                          bool *found = NULL, QPointF *posInPath = NULL);
@@ -69,7 +74,8 @@ public:
 
     void applyTransformToPoints(QMatrix transform);
     void applyCurrentTransformation();
-    VectorPathEdge *getEgde(QPointF absPos);
+    VectorPathEdge *getEgde(const QPointF &absPos,
+                            const qreal &canvasScaleInv);
 
     void loadPathFromQPainterPath(const QPainterPath &path);
 

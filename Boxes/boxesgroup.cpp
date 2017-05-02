@@ -142,7 +142,7 @@ bool BoxesGroup::relPointInsidePath(QPointF relPos) {
     return false;
 }
 
-void BoxesGroup::updateAfterFrameChanged(int currentFrame) {
+void BoxesGroup::updateAfterFrameChanged(const int &currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
 
     bool notNull = mRenderCacheHandler.
@@ -384,7 +384,7 @@ void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mParent->setDescendantCurrentGroup(bT);
 }
 
-BoundingBox *BoxesGroup::getPathAtFromAllAncestors(QPointF absPos) {
+BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
     BoundingBox *boxAtPos = NULL;
     //foreachBoxInListInverted(mChildren) {
     for(int i = mChildBoxes.count() - 1; i >= 0; i--) {

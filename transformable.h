@@ -26,7 +26,7 @@ public:
         scale(scaleBy, scaleBy);
     }
 
-    virtual void rotateBy(qreal rot) {
+    virtual void rotateBy(const qreal &rot) {
         Q_UNUSED(rot);
     }
 

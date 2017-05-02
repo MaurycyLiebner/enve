@@ -79,5 +79,9 @@ extern qreal degreesBetweenVectors(const QPointF &pt1,
 
 extern qreal radiansBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
+#include <QPainter>
+extern void drawCosmeticEllipse(QPainter *p,
+                                const QPointF &absPos,
+                                qreal rX, qreal rY);
 
 #endif // POINTHELPERS_H

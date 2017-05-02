@@ -46,14 +46,15 @@ void MovablePoint::finishTransform()
     }
 }
 
-void MovablePoint::setAbsolutePos(QPointF pos, bool saveUndoRedo) {
+void MovablePoint::setAbsolutePos(const QPointF &pos,
+                                  const bool &saveUndoRedo) {
     QMatrix combinedM = mParent->getCombinedTransform();
     QPointF newPos = combinedM.inverted().map(pos);
     setRelativePos(newPos, saveUndoRedo);
 }
 
-void MovablePoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
-{
+void MovablePoint::setRelativePos(const QPointF &relPos,
+                                  const bool &saveUndoRedo) {
     setCurrentPointValue(relPos, saveUndoRedo);
 }
 
@@ -81,13 +82,18 @@ void MovablePoint::drawOnAbsPos(QPainter *p,
     } else {
         p->setBrush(QColor(255, 175, 175));
     }
-    p->drawEllipse(absPos,
-                   mRadius, mRadius);
+
+    drawCosmeticEllipse(p, absPos,
+                        mRadius, mRadius);
     if(prp_isKeyOnCurrentFrame()) {
         p->save();
+
         p->setBrush(Qt::red);
-        p->setPen(QPen(Qt::black, 1.) );
-        p->drawEllipse(absPos, 4, 4);
+//        QPen pen = QPen(Qt::black, 1.);
+//        pen.setCosmetic(true);
+        //p->setPen(pen);
+        drawCosmeticEllipse(p, absPos,
+                            4., 4.);
         p->restore();
     }
 }
@@ -105,13 +111,14 @@ BoundingBox *MovablePoint::getParent()
     return mParent;
 }
 
-bool MovablePoint::isPointAtAbsPos(QPointF absPoint)
-{
+bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
+                                   const qreal &canvasScaleInv) {
     if(isHidden()) {
         return false;
     }
     QPointF dist = getAbsolutePos() - absPoint;
-    return (dist.x()*dist.x() + dist.y()*dist.y() < mRadius*mRadius);
+    return (dist.x()*dist.x() + dist.y()*dist.y() <
+            mRadius*mRadius*canvasScaleInv*canvasScaleInv);
 }
 
 bool MovablePoint::isContainedInRect(QRectF absRect)
@@ -189,12 +196,12 @@ qreal MovablePoint::getRadius()
     return mRadius;
 }
 
-void MovablePoint::updateAfterFrameChanged(int frame)
+void MovablePoint::updateAfterFrameChanged(const int &frame)
 {
     prp_setAbsFrame(frame);
 }
 
-void MovablePoint::rotateBy(qreal rot)
+void MovablePoint::rotateBy(const qreal &rot)
 {
     QMatrix rotMatrix;
     rotMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());

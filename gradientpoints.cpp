@@ -82,21 +82,23 @@ void GradientPoints::disable()
 
 void GradientPoints::drawGradientPoints(QPainter *p) {
     if(enabled) {
-        p->setPen(QPen(Qt::black, 1.5));
         p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
-        p->setPen(QPen(Qt::white, 0.75));
+        QPen pen = p->pen();
+        pen.setColor(Qt::white);
+        pen.setWidthF(0.75);
+        p->setPen(pen);
         p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
         startPoint->draw(p);
         endPoint->draw(p);
     }
 }
 
-MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos)
-{
+MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos,
+                                             const qreal &canvasScaleInv) {
     if(enabled) {
-        if(startPoint->isPointAtAbsPos(absPos) ) {
+        if(startPoint->isPointAtAbsPos(absPos, canvasScaleInv) ) {
             return startPoint;
-        } else if (endPoint->isPointAtAbsPos(absPos) ){
+        } else if (endPoint->isPointAtAbsPos(absPos, canvasScaleInv) ){
             return endPoint;
         }
     }

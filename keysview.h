@@ -163,7 +163,6 @@ private:
 
     // graph
 
-    qreal mMargin = 20.;
     qreal mPixelsPerValUnit = 0.;
     qreal mMinShownVal = 0.;
     QrealPoint *mCurrentPoint = NULL;

@@ -22,19 +22,23 @@ public:
 
     ~SinglePathAnimator();
 
-    VectorPathEdge *getEgde(QPointF absPos);
+    VectorPathEdge *getEgde(const QPointF &absPos,
+                            const qreal &canvasScaleInv);
     QPointF getRelCenterPosition();
     void updatePath();
     MovablePoint *qra_getPointAt(const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode);
+                                 const CanvasMode &currentCanvasMode,
+                                 const qreal &canvasScaleInv);
     QPainterPath getCurrentPath() {
         return mPath;
     }
 
     //void loadPointsFromSql(int boundingBoxId);
     void savePointsToSql(QSqlQuery *query, const int &boundingBoxId);
-    PathPoint *createNewPointOnLineNear(QPointF absPos, bool adjust);
-    void updateAfterFrameChanged(int currentFrame);
+    PathPoint *createNewPointOnLineNear(const QPointF &absPos,
+                                        const bool &adjust,
+                                        const qreal &canvasScaleInv);
+    void updateAfterFrameChanged(const int &currentFrame);
     qreal findPercentForPoint(const QPointF &point,
                               PathPoint **prevPoint,
                               qreal *error);
@@ -84,7 +88,8 @@ private:
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
                                               qreal *pressedT,
                                               PathPoint **prevPoint,
-                                              PathPoint **nextPoint);
+                                              PathPoint **nextPoint,
+                                              const qreal &canvasScaleInv);
 signals:
     void lastPointRemoved();
 };

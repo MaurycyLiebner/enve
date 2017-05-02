@@ -39,7 +39,7 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
     *acc = QPointF(0., 9.8)/24.;
 }
 
-void ParticleBox::updateAfterFrameChanged(int currentFrame) {
+void ParticleBox::updateAfterFrameChanged(const int &currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
     scheduleSoftUpdate();
 }
@@ -143,18 +143,19 @@ void ParticleBox::drawSelected(QPainter *p,
 }
 
 
-MovablePoint *ParticleBox::getPointAt(const QPointF &absPtPos,
-                                      const CanvasMode &currentCanvasMode) {
+MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
+                                      const CanvasMode &currentCanvasMode,
+                                      const qreal &canvasScaleInv) {
     MovablePoint *pointToReturn = NULL;
-    if(mTopLeftPoint->isPointAtAbsPos(absPtPos)) {
+    if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
         return mTopLeftPoint;
     }
-    if(mBottomRightPoint->isPointAtAbsPos(absPtPos) ) {
+    if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
         return mBottomRightPoint;
     }
     foreach(ParticleEmitter *emitter, mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
-        if(pt->isPointAtAbsPos(absPtPos)) {
+        if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return pt;
         }
     }
@@ -162,7 +163,7 @@ MovablePoint *ParticleBox::getPointAt(const QPointF &absPtPos,
     return pointToReturn;
 }
 
-void ParticleBox::selectAndAddContainedPointsToList(QRectF absRect,
+void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
                                                   QList<MovablePoint *> *list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {

@@ -148,7 +148,9 @@ public:
     void removeFromVectorPath();
     void removeApproximate();
 
-    MovablePoint *getPointAtAbsPos(QPointF absPos, const CanvasMode &canvasMode);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                                   const CanvasMode &canvasMode,
+                                   const qreal &canvasScaleInv);
     void rectPointsSelection(QRectF absRect, QList<MovablePoint *> *list);
     void updateStartCtrlPtVisibility();
     void updateEndCtrlPtVisibility();
@@ -179,7 +181,7 @@ public:
 
     void setPosAnimatorUpdater(AnimatorUpdater *updater);
 
-    void updateAfterFrameChanged(int frame);
+    void updateAfterFrameChanged(const int &frame);
 
     PathPointAnimators *getPathPointAnimatorsPtr();
     void setPointId(int idT);
@@ -204,9 +206,11 @@ public:
 
     virtual void drawHovered(QPainter *p) {
         p->setBrush(Qt::NoBrush);
-        p->setPen(QPen(Qt::red, 2.));
-        p->drawEllipse(getAbsolutePos(),
-                       mRadius - 2, mRadius - 2);
+        QPen pen = QPen(Qt::red, 2.);
+        pen.setCosmetic(true);
+        p->setPen(pen);
+        drawCosmeticEllipse(p, getAbsolutePos(),
+                            mRadius - 2., mRadius - 2.);
     }
     void setParentPath(SinglePathAnimator *path);
     void reversePointsDirectionStartingFromThis(

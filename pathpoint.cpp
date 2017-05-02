@@ -237,13 +237,16 @@ void PathPoint::rectPointsSelection(QRectF absRect, QList<MovablePoint*> *list) 
     }
 }
 
-MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos,
-                                          const CanvasMode &canvasMode)
+MovablePoint *PathPoint::getPointAtAbsPos(const QPointF &absPos,
+                                          const CanvasMode &canvasMode,
+                                          const qreal &canvasScaleInv)
 {
     if(canvasMode == CanvasMode::MOVE_POINT) {
-        if(mStartCtrlPt->isPointAtAbsPos(absPos)) {
+        if(mStartCtrlPt->isPointAtAbsPos(absPos,
+                                         canvasScaleInv)) {
             return mStartCtrlPt;
-        } else if (mEndCtrlPt->isPointAtAbsPos(absPos)) {
+        } else if (mEndCtrlPt->isPointAtAbsPos(absPos,
+                                               canvasScaleInv)) {
             return mEndCtrlPt;
         }
     } else {
@@ -251,7 +254,8 @@ MovablePoint *PathPoint::getPointAtAbsPos(QPointF absPos,
             return NULL;
         }
     }
-    if (isPointAtAbsPos(absPos)) {
+    if (isPointAtAbsPos(absPos,
+                        canvasScaleInv)) {
         return this;
     }
     return NULL;
@@ -381,14 +385,15 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
         p->setBrush(QColor(170, 240, 255));
     }
     QPointF absPos = getAbsolutePos();
-    p->drawEllipse(absPos,
-                   mRadius - 2, mRadius - 2);
+
+    drawCosmeticEllipse(p, absPos,
+                        mRadius - 2., mRadius - 2.);
 
     if(prp_isKeyOnCurrentFrame() ) {
         p->save();
         p->setBrush(Qt::red);
         p->setPen(QPen(Qt::black, 1.) );
-        p->drawEllipse(absPos, 4, 4);
+        drawCosmeticEllipse(p, absPos, 4., 4.);
         p->restore();
     }
     if((mode == CanvasMode::MOVE_POINT &&
@@ -396,15 +401,23 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
        (mode == CanvasMode::ADD_POINT && mSelected) ) {
         QPen pen = p->pen();
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            p->setPen(QPen(Qt::black, 1.5));
+            QPen tPen = QPen(Qt::black, 1.5);
+            tPen.setCosmetic(true);
+            p->setPen(tPen);
             p->drawLine(absPos, mEndCtrlPt->getAbsolutePos());
-            p->setPen(QPen(Qt::white, 0.75));
+            tPen.setColor(Qt::white);
+            tPen.setWidthF(0.75);
+            p->setPen(tPen);
             p->drawLine(absPos, mEndCtrlPt->getAbsolutePos());
         }
         if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            p->setPen(QPen(Qt::black, 1.5));
+            QPen tPen = QPen(Qt::black, 1.5);
+            tPen.setCosmetic(true);
+            p->setPen(tPen);
             p->drawLine(absPos, mStartCtrlPt->getAbsolutePos());
-            p->setPen(QPen(Qt::white, 0.75));
+            tPen.setColor(Qt::white);
+            tPen.setWidthF(0.75);
+            p->setPen(tPen);
             p->drawLine(absPos, mStartCtrlPt->getAbsolutePos());
         }
         p->setPen(pen);
@@ -416,7 +429,8 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
         QPen pen = p->pen();
         p->setPen(Qt::NoPen);
         p->setBrush(Qt::white);
-        p->drawEllipse(absPos, 6., 6.);
+        drawCosmeticEllipse(p, absPos,
+                            6., 6.);
         p->setPen(pen);
         p->drawText(QRectF(absPos - QPointF(mRadius, mRadius),
                            absPos + QPointF(mRadius, mRadius)),
@@ -510,7 +524,7 @@ void PathPoint::setStartCtrlPtEnabled(bool enabled,
     //mParentPath->schedulePathUpdate();
 }
 
-void PathPoint::updateAfterFrameChanged(int frame)
+void PathPoint::updateAfterFrameChanged(const int &frame)
 {
     MovablePoint::updateAfterFrameChanged(frame);
     mEndCtrlPt->updateAfterFrameChanged(frame);

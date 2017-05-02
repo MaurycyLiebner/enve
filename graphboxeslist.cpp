@@ -62,11 +62,10 @@ void KeysView::graphPaint(QPainter *p) {
     //p->drawText(QRectF(xL - 20, 0, 40, 20),
     //            Qt::AlignCenter, QString::number(mCurrentFrame));
     p->drawLine(xL, 20, xL, height());*/
-
-    p->setPen(QPen(QColor(255, 255, 255), 1.));
+    QPen pen = QPen(QColor(255, 255, 255), 1.);
+    p->setPen(pen);
     qreal incY = mValueInc*mPixelsPerValUnit;
-    qreal yL = height() +
-            fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit - mMargin + incY;
+    qreal yL = height() + fmod(mMinShownVal, mValueInc)*mPixelsPerValUnit + incY;
     qreal currValue = mMinShownVal - fmod(mMinShownVal, mValueInc) - mValueInc;
     int nLines = qCeil(yL / incY);
     QLine *lines = new QLine[nLines];
@@ -79,18 +78,33 @@ void KeysView::graphPaint(QPainter *p) {
         yL -= incY;
         currValue += mValueInc;
     }
-    p->setPen(QPen(QColor(200, 200, 200), 1.));
+    pen.setColor(QColor(200, 200, 200));
+    p->setPen(pen);
     p->drawLines(lines, nLines);
     delete[] lines;
     p->setRenderHint(QPainter::Antialiasing);
 
+    QMatrix transform;
+    transform.translate(-mPixelsPerFrame*(mMinViewedFrame - 0.5),
+                        height() + mPixelsPerValUnit*mMinShownVal);
+    transform.scale(mPixelsPerFrame, -mPixelsPerValUnit);
+    p->setTransform(QTransform(transform), true);
+
     for(int i = 0; i < mAnimators.count(); i++) {
         const QColor &col = ANIMATORCOLORS.at(i % ANIMATORCOLORS.length());
         QrealAnimator *animator = mAnimators.at(i);
-        animator->drawKeysPath(p, col,
-                               height(), mMargin,
-                               mMinViewedFrame, mMinShownVal,
-                               mPixelsPerFrame, mPixelsPerValUnit);
+        animator->drawKeysPath(p, col);
+    }
+    p->setRenderHint(QPainter::Antialiasing, false);
+
+    if(mSelecting) {
+        pen.setColor(Qt::blue);
+        pen.setWidthF(2.);
+        pen.setStyle(Qt::DotLine);
+        pen.setCosmetic(true);
+        p->setPen(pen);
+        p->setBrush(Qt::NoBrush);
+        p->drawRect(mSelectionRect);
     }
 /*
 
@@ -179,17 +193,15 @@ void KeysView::graphIncMinShownVal(const qreal &inc) {
 }
 
 void KeysView::graphSetMinShownVal(const qreal &newMinShownVal) {
-    qreal halfHeightVal = (height() - 2*mMargin)*0.5/mPixelsPerValUnit;
     mMinShownVal = clamp(newMinShownVal,
-                         mMinVal - halfHeightVal,
-                         mMaxVal - halfHeightVal);
+                         mMinVal,
+                         mMaxVal);
 }
 
 void KeysView::graphGetValueAndFrameFromPos(const QPointF &pos,
                                             qreal *value, qreal *frame) {
-    *value = (height() - pos.y() - mMargin)/mPixelsPerValUnit
-            + mMinShownVal;
-    *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame - 0.5;
+    *value = (height() - pos.y())/mPixelsPerValUnit + mMinShownVal;
+    *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame;
 }
 
 void KeysView::graphMousePress(const QPointF &pressPos) {
@@ -219,8 +231,11 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
 //            mCurrentPoint->setSelected(true);
         } else {
             mSelecting = true;
-            mSelectionRect.setTopLeft(pressPos);
-            mSelectionRect.setBottomRight(pressPos);
+            qreal value;
+            qreal frame;
+            graphGetValueAndFrameFromPos(pressPos, &value, &frame);
+            mSelectionRect.setBottomRight(QPointF(frame, value));
+            mSelectionRect.setTopLeft(QPointF(frame, value));
         }
     } else if(mCurrentPoint->isKeyPoint()) {
         mPressFrameAndValue = QPointF(frame, value);
@@ -251,21 +266,10 @@ void KeysView::graphMouseRelease()
         if(!mMainWindow->isShiftPressed()) {
             graphClearKeysSelection();
         }
-        qreal topValue;
-        qreal leftFrame;
-        graphGetValueAndFrameFromPos(mSelectionRect.topLeft(),
-                                &topValue, &leftFrame);
-        qreal bottomValue;
-        qreal rightFrame;
-        graphGetValueAndFrameFromPos(mSelectionRect.bottomRight(),
-                                &bottomValue, &rightFrame);
-        QRectF frameValueRect;
-        frameValueRect.setTopLeft(QPointF(leftFrame, topValue) );
-        frameValueRect.setBottomRight(QPointF(rightFrame, bottomValue) );
 
         QList<QrealKey*> keysList;
         foreach(QrealAnimator *animator, mAnimators) {
-            animator->addKeysInRectToList(frameValueRect, &keysList);
+            animator->addKeysInRectToList(mSelectionRect, &keysList);
         }
         foreach(QrealKey *key, keysList) {
             graphAddKeyToSelection(key);
@@ -427,7 +431,10 @@ void KeysView::graphRemoveKeyFromSelection(QrealKey *key)
 
 void KeysView::graphMouseMove(const QPointF &mousePos) {
     if(mSelecting) {
-        mSelectionRect.setBottomRight(mousePos);
+        qreal value;
+        qreal frame;
+        graphGetValueAndFrameFromPos(mousePos, &value, &frame);
+        mSelectionRect.setBottomRight(QPointF(frame, value));
     } else if(mCurrentPoint != NULL) {
         if(!mCurrentPoint->isEnabled()) {
             QrealKey *parentKey = mCurrentPoint->getParentKey();

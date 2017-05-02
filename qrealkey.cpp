@@ -370,41 +370,30 @@ bool QrealKey::isInsideRect(const QRectF &valueFrameRect) {
 }
 
 void QrealKey::drawGraphKey(QPainter *p,
-                            const QColor &paintColor,
-                            const qreal &minFrameT,
-                            const qreal &minValueT,
-                            const qreal &pixelsPerFrame,
-                            const qreal &pixelsPerValue) {
+                            const QColor &paintColor) {
     if(isSelected()) {
         p->save();
-        p->setPen(QPen(Qt::black, 2., Qt::DotLine));
-        QPointF thisPos = QPointF((mRelFrame - minFrameT + 0.5)*pixelsPerFrame,
-                                  (minValueT - mValue)*pixelsPerValue);
+        QPen pen = QPen(Qt::black, 2., Qt::DotLine);
+        pen.setCosmetic(true);
+        p->setPen(pen);
+        QPointF thisPos = QPointF(mRelFrame, mValue);
         if(mStartEnabled) {
             p->drawLine(thisPos,
-                        QPointF((mStartFrame - minFrameT + 0.5)*pixelsPerFrame,
-                                (minValueT - mStartValue)*pixelsPerValue));
+                        QPointF(mStartFrame, mStartValue));
         }
         if(mEndEnabled) {
             p->drawLine(thisPos,
-                        QPointF((mEndFrame - minFrameT + 0.5)*pixelsPerFrame,
-                                (minValueT - mEndValue)*pixelsPerValue));
+                        QPointF(mEndFrame, mEndValue));
         }
         p->restore();
     }
-    mGraphPoint->draw(p, paintColor,
-                      minFrameT, minValueT,
-                      pixelsPerFrame, pixelsPerValue);
+    mGraphPoint->draw(p, paintColor);
     if(isSelected() ) {
         if(mStartEnabled) {
-            mStartPoint->draw(p, paintColor,
-                              minFrameT, minValueT,
-                              pixelsPerFrame, pixelsPerValue);
+            mStartPoint->draw(p, paintColor);
         }
         if(mEndEnabled) {
-            mEndPoint->draw(p, paintColor,
-                            minFrameT, minValueT,
-                            pixelsPerFrame, pixelsPerValue);
+            mEndPoint->draw(p, paintColor);
         }
     }
 }

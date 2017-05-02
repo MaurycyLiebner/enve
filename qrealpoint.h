@@ -34,9 +34,7 @@ public:
 
     void moveTo(qreal frameT, qreal valueT);
 
-    void draw(QPainter *p, const QColor &paintColor,
-              const qreal &minFrameT, const qreal &minValueT,
-              const qreal &pixelsPerFrame, const qreal &pixelsPerValue);
+    void draw(QPainter *p, const QColor &paintColor);
 
     void setSelected(bool bT);
 

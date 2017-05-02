@@ -36,7 +36,7 @@ public:
 
     void startTransform();
     void finishTransform();
-    void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
+    void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo = true);
 private:
     MovablePoint *mCenterPoint = NULL;
     bool mXBlocked = false;
@@ -53,8 +53,10 @@ public:
 
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
     void updatePath();
-    MovablePoint *getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode);
-    void selectAndAddContainedPointsToList(QRectF absRect, QList<MovablePoint *> *list);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                             const CanvasMode &currentCanvasMode,
+                             const qreal &canvasScaleInv);
+    void selectAndAddContainedPointsToList(const QRectF &absRect, QList<MovablePoint *> *list);
     void moveRadiusesByAbs(QPointF absTrans);
     void startPointsTransform();
 

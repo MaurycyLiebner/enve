@@ -39,9 +39,10 @@ public:
 
     virtual void draw(QPainter *p);
 
-    bool isPointAtAbsPos(QPointF absPoint);
-    void setAbsolutePos(QPointF pos,
-                        bool saveUndoRedo = true);
+    bool isPointAtAbsPos(const QPointF &absPoint,
+                         const qreal &canvasScaleInv);
+    void setAbsolutePos(const QPointF &pos,
+                        const bool &saveUndoRedo = true);
 
     BoundingBox *getParent();
 
@@ -67,8 +68,8 @@ public:
     bool isPivotPoint();
     bool isCtrlPoint();
 
-    virtual void setRelativePos(QPointF relPos, bool saveUndoRedo = true);
-    void rotateBy(qreal rot);
+    virtual void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo = true);
+    void rotateBy(const qreal &rot);
     void scale(qreal scaleXBy, qreal scaleYBy);
     void saveTransformPivotAbsPos(QPointF absPivot);
     void scale(qreal scaleBy);
@@ -80,7 +81,7 @@ public:
 
     virtual void setPosAnimatorUpdater(AnimatorUpdater *updater);
 
-    virtual void updateAfterFrameChanged(int frame);
+    virtual void updateAfterFrameChanged(const int &frame);
 
     qreal getRadius();
     QPointF mapRelativeToAbsolute(QPointF relPos) const;
@@ -95,9 +96,11 @@ public:
 
     virtual void drawHovered(QPainter *p) {
         p->setBrush(Qt::NoBrush);
-        p->setPen(QPen(Qt::red, 2.));
-        p->drawEllipse(getAbsolutePos(),
-                       mRadius, mRadius);
+        QPen pen = QPen(Qt::red, 2.);
+        pen.setCosmetic(true);
+        p->setPen(pen);
+        drawCosmeticEllipse(p, getAbsolutePos(),
+                            mRadius, mRadius);
     }
     QPointF mapAbsoluteToRelative(QPointF absPos) const;
 protected:
@@ -107,7 +110,7 @@ protected:
     qreal mRadius;
     QPointF mSavedRelPos;
     BoundingBox *mParent = NULL;
-    void drawOnAbsPos(QPainter *p, const QPointF &absPos);
+    virtual void drawOnAbsPos(QPainter *p, const QPointF &absPos);
 };
 
 #endif // MOVABLEPOINT_H

@@ -22,11 +22,13 @@ public:
 
     ~PathAnimator();
 
-    VectorPathEdge *getEgde(QPointF absPos);
+    VectorPathEdge *getEgde(const QPointF &absPos,
+                            const qreal &canvasScaleInv);
     QPointF getRelCenterPosition();
     void updatePath();
     MovablePoint *qra_getPointAt(const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode);
+                                 const CanvasMode &currentCanvasMode,
+                                 const qreal &canvasScaleInv);
     QPainterPath getCurrentPath() {
         return mPath;
     }
@@ -46,7 +48,8 @@ public:
 
 
     PathPoint *createNewPointOnLineNear(const QPointF &absPos,
-                                        const bool &adjust);
+                                        const bool &adjust,
+                                        const qreal &canvasScaleInv);
     void updateAfterFrameChanged(const int &currentFrame);
     qreal findPercentForPoint(const QPointF &point,
                               PathPoint **prevPoint,

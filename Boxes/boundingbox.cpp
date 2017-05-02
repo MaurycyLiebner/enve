@@ -537,11 +537,12 @@ void BoundingBox::resetRotation() {
     mTransformAnimator->resetRotation();
 }
 
-void BoundingBox::updateAfterFrameChanged(int currentFrame) {
+void BoundingBox::updateAfterFrameChanged(const int &currentFrame) {
     prp_setAbsFrame(currentFrame);
 }
 
-void BoundingBox::setParent(BoxesGroup *parent, bool saveUndoRedo) {
+void BoundingBox::setParent(BoxesGroup *parent,
+                            const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new SetBoxParentUndoRedo(this, mParent.data(), parent));
     }
@@ -596,8 +597,9 @@ void BoundingBox::enablePivotAutoAdjust() {
     mPivotChanged = false;
 }
 
-void BoundingBox::setPivotRelPos(QPointF relPos, bool saveUndoRedo,
-                                 bool pivotChanged) {
+void BoundingBox::setPivotRelPos(const QPointF &relPos,
+                                 const bool &saveUndoRedo,
+                                 const bool &pivotChanged) {
     if(saveUndoRedo) {
         addUndoRedo(new SetPivotRelPosUndoRedo(this,
                         mTransformAnimator->getPivot(), relPos,
@@ -618,8 +620,9 @@ void BoundingBox::finishPivotTransform() {
     mTransformAnimator->pivotTransformFinished();
 }
 
-void BoundingBox::setPivotAbsPos(QPointF absPos,
-                                 bool saveUndoRedo, bool pivotChanged) {
+void BoundingBox::setPivotAbsPos(const QPointF &absPos,
+                                 const bool &saveUndoRedo,
+                                 const bool &pivotChanged) {
     QPointF newPos = mapAbsPosToRel(absPos);
     setPivotRelPos(newPos, saveUndoRedo, pivotChanged);
     updateCombinedTransform();
@@ -659,7 +662,7 @@ bool BoundingBox::isContainedIn(QRectF absRect) {
     return absRect.contains(getCombinedTransform().mapRect(mRelBoundingRect));
 }
 
-BoundingBox *BoundingBox::getPathAtFromAllAncestors(QPointF absPos) {
+BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
     if(absPointInsidePath(absPos)) {
         return this;
     } else {
@@ -714,15 +717,16 @@ void BoundingBox::scale(qreal scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
-void BoundingBox::scale(qreal scaleXBy, qreal scaleYBy) {
+void BoundingBox::scale(const qreal &scaleXBy,
+                        const qreal &scaleYBy) {
     mTransformAnimator->scale(scaleXBy, scaleYBy);
 }
 
-void BoundingBox::rotateBy(qreal rot) {
+void BoundingBox::rotateBy(const qreal &rot) {
     mTransformAnimator->rotateRelativeToSavedValue(rot);
 }
 
-void BoundingBox::rotateRelativeToSavedPivot(qreal rot) {
+void BoundingBox::rotateRelativeToSavedPivot(const qreal &rot) {
     mTransformAnimator->rotateRelativeToSavedValue(rot,
                                                   mSavedTransformPivot);
 }
@@ -732,7 +736,7 @@ void BoundingBox::scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy) {
                                                  mSavedTransformPivot);
 }
 
-void BoundingBox::scaleRelativeToSavedPivot(qreal scaleBy) {
+void BoundingBox::scaleRelativeToSavedPivot(const qreal &scaleBy) {
     scaleRelativeToSavedPivot(scaleBy, scaleBy);
 }
 
@@ -760,11 +764,12 @@ void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo) {
     setRelativePos(newPos, saveUndoRedo );
 }
 
-void BoundingBox::setRelativePos(QPointF relPos, bool saveUndoRedo) {
-    mTransformAnimator->setPosition(relPos.x(), relPos.y() );
+void BoundingBox::setRelativePos(const QPointF &relPos,
+                                 const bool &saveUndoRedo) {
+    mTransformAnimator->setPosition(relPos.x(), relPos.y());
 }
 
-void BoundingBox::saveTransformPivotAbsPos(QPointF absPivot) {
+void BoundingBox::saveTransformPivotAbsPos(const QPointF &absPivot) {
     mSavedTransformPivot =
             mParent->mapAbsPosToRel(absPivot) -
             mTransformAnimator->getPivot();
@@ -816,12 +821,12 @@ void BoundingBox::bringToEnd() {
     mParent->bringChildToFrontList(this);
 }
 
-void BoundingBox::setZListIndex(int z, bool saveUndoRedo) {
+void BoundingBox::setZListIndex(const int &z,
+                                const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new SetBoundingBoxZListIndexUnoRedo(mZListIndex, z, this));
     }
     mZListIndex = z;
-
 }
 
 int BoundingBox::getZIndex() {
@@ -1008,13 +1013,11 @@ void BoundingBox::drawKeys(QPainter *p,
                  startFrame, endFrame);
 }
 
-void BoundingBox::setName(QString name)
-{
+void BoundingBox::setName(const QString &name) {
     prp_mName = name;
 }
 
-QString BoundingBox::getName()
-{
+QString BoundingBox::getName() {
     return prp_mName;
 }
 
@@ -1028,7 +1031,8 @@ bool BoundingBox::isVisibleAndInVisibleDurationRect() {
     return isInVisibleDurationRect() && mVisible;
 }
 
-void BoundingBox::setVisibile(bool visible, bool saveUndoRedo) {
+void BoundingBox::setVisibile(const bool &visible,
+                              const bool &saveUndoRedo) {
     if(mVisible == visible) return;
     if(mSelected) {
         removeFromSelection();
@@ -1083,7 +1087,7 @@ void BoundingBox::unlock() {
     setLocked(false);
 }
 
-void BoundingBox::setLocked(bool bt) {
+void BoundingBox::setLocked(const bool &bt) {
     if(bt == mLocked) return;
     if(mSelected) {
         getParentCanvas()->removeBoxFromSelection(this);

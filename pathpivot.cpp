@@ -2,8 +2,7 @@
 #include "canvas.h"
 
 PathPivot::PathPivot(Canvas *parent) :
-    MovablePoint(parent, MovablePointType::TYPE_PIVOT_POINT, 7.)
-{
+    MovablePoint(parent, MovablePointType::TYPE_PIVOT_POINT, 7.) {
     mCanvas = parent;
 //    mRotationPath.addEllipse(QPointF(0., 0.), 50., 50.);
 //    QPainterPath removeEllipse;
@@ -16,13 +15,9 @@ void PathPivot::startTransform() {
     MovablePoint::startTransform();
 }
 
-void PathPivot::draw(QPainter *p)
-{
-    if(mHidden) {
-        return;
-    }
+void PathPivot::drawOnAbsPos(QPainter *p,
+                             const QPointF &absPos) {
     p->save();
-    QPointF absPos = getAbsolutePos();
 //    p->save();
 //    p->setBrush(Qt::red);
 //    p->drawPath(mMappedRotationPath);
@@ -33,11 +28,12 @@ void PathPivot::draw(QPainter *p)
     } else {
         p->setBrush(QColor(125, 255, 125));
     }
-    p->setPen(QPen(Qt::black, 1.5));
-    p->drawEllipse(absPos,
-                   mRadius, mRadius);
+    //p->setPen(QPen(Qt::black, 1.5));
+    drawCosmeticEllipse(p, absPos,
+                        mRadius, mRadius);
 
     p->translate(absPos);
+    p->scale(1./p->transform().m11(), 1./p->transform().m22());
     qreal halfRadius = mRadius*0.5;
     p->drawLine(QPointF(-halfRadius, 0), QPointF(halfRadius, 0));
     p->drawLine(QPointF(0, -halfRadius), QPointF(0, halfRadius));
@@ -57,7 +53,7 @@ void PathPivot::finishTransform()
     mTransformStarted = false;
 }
 
-void PathPivot::setRelativePos(QPointF relPos, bool saveUndoRedo)
+void PathPivot::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo)
 {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
 //    updateRotationMappedPath();
@@ -85,10 +81,11 @@ void PathPivot::startScaling()
     mScaling = true;
 }
 
-bool PathPivot::handleMousePress(QPointF absPressPos)
+bool PathPivot::handleMousePress(const QPointF &absPressPos,
+                                 const qreal &canvasInvScale)
 {
     if(mHidden) return false;
-    if(isPointAtAbsPos(absPressPos)) {
+    if(isPointAtAbsPos(absPressPos, canvasInvScale)) {
         select();
         return true;
     }/* else {
@@ -131,11 +128,14 @@ qreal distSign(QPointF distPt) {
     }
 }
 
-bool PathPivot::handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
-                                bool xOnly, bool yOnly,
-                                bool inputTransformationEnabled,
-                                qreal inputTransformationValue,
-                                bool startTransform, const CanvasMode &mode) {
+bool PathPivot::handleMouseMove(const QPointF &moveDestAbs,
+                                const QPointF &pressPos,
+                                const bool &xOnly,
+                                const bool &yOnly,
+                                const bool &inputTransformationEnabled,
+                                const qreal &inputTransformationValue,
+                                const bool &startTransform,
+                                const CanvasMode &mode) {
     if(mRotating) {
         QPointF absPos = getAbsolutePos();
         qreal rot;

@@ -57,19 +57,23 @@ void QrealPoint::moveTo(qreal frameT, qreal valueT) {
     mParentKey->updateCtrlFromCtrl(mType);
 }
 
-void QrealPoint::draw(QPainter *p, const QColor &paintColor,
-                      const qreal &minFrameT, const qreal &minValueT,
-                      const qreal &pixelsPerFrame, const qreal &pixelsPerValue) {
-    QPointF center = QPointF((getFrame() - minFrameT + 0.5)*pixelsPerFrame,
-                             (minValueT - getValue())*pixelsPerValue);
+void QrealPoint::draw(QPainter *p, const QColor &paintColor) {
+    QPointF center = QPointF(getFrame(), getValue());
+
     p->setBrush(Qt::black);
-    p->drawEllipse(center, mRadius, mRadius);
+    drawCosmeticEllipse(p, center,
+                        mRadius,
+                        mRadius);
 
     p->setBrush(paintColor);
     if(isSelected()) {
-        p->drawEllipse(center, mRadius - 1., mRadius - 1.);
+        drawCosmeticEllipse(p, center,
+                            mRadius - 1.,
+                            mRadius - 1.);
     } else {
-        p->drawEllipse(center, mRadius*0.5 - 1., mRadius*0.5 - 1.);
+        drawCosmeticEllipse(p, center,
+                            mRadius*0.5 - 1.,
+                            mRadius*0.5 - 1.);
     }
 }
 

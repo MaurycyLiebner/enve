@@ -349,23 +349,23 @@ void QrealAnimator::qra_updateKeysPath() {
             keyValue = qaKey->getValue();
         }
         if(lastKey == NULL) {
-            mKeysPath.moveTo(-5000, -keyValue);
-            mKeysPath.lineTo(keyFrame, -keyValue);
+            mKeysPath.moveTo(-5000, keyValue);
+            mKeysPath.lineTo(keyFrame, keyValue);
         } else {
             mKeysPath.cubicTo(
                         QPointF(lastKey->getEndValueFrame(),
-                                -lastKey->getEndValue()),
+                                lastKey->getEndValue()),
                         QPointF(qaKey->getStartValueFrame(),
-                                -qaKey->getStartValue()),
-                        QPointF(keyFrame, -keyValue));
+                                qaKey->getStartValue()),
+                        QPointF(keyFrame, keyValue));
         }
         lastKey = qaKey;
     }
     if(lastKey == NULL) {
-        mKeysPath.moveTo(-5000, -mCurrentValue);
-        mKeysPath.lineTo(5000, -mCurrentValue);
+        mKeysPath.moveTo(-5000, mCurrentValue);
+        mKeysPath.lineTo(5000, mCurrentValue);
     } else {
-        mKeysPath.lineTo(5000, -lastKey->getValue());
+        mKeysPath.lineTo(5000, lastKey->getValue());
     }
 }
 
@@ -438,19 +438,7 @@ void QrealAnimator::qra_getMinAndMaxValuesBetweenFrames(
 }
 
 void QrealAnimator::drawKeysPath(QPainter *p,
-                                 const QColor &paintColor,
-                                 const qreal &height,
-                                 const qreal &margin,
-                                 const qreal &startFrame,
-                                 const qreal &minShownVal,
-                                 const qreal &pixelsPerFrame,
-                                 const qreal &pixelsPerValUnit) {
-    p->save();
-    QMatrix transform;
-    transform.translate(-pixelsPerFrame*(startFrame - 0.5),
-                height + pixelsPerValUnit*minShownVal - margin);
-    transform.scale(pixelsPerFrame, pixelsPerValUnit);
-    p->setTransform(QTransform(transform), true);
+                                 const QColor &paintColor) {
     QPen pen = QPen(Qt::black, 4.);
     pen.setCosmetic(true);
     p->setPen(pen);
@@ -459,18 +447,12 @@ void QrealAnimator::drawKeysPath(QPainter *p,
     pen.setWidthF(2.);
     p->setPen(pen);
     p->drawPath(mKeysPath);
-    p->restore();
 
-    p->save();
-    p->translate(0., height - margin);
     p->setBrush(Qt::black);
     p->setPen(Qt::NoPen);
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QrealKey*)key.get())->drawGraphKey(p, paintColor,
-                                             startFrame, minShownVal,
-                                             pixelsPerFrame, pixelsPerValUnit);
+        ((QrealKey*)key.get())->drawGraphKey(p, paintColor);
     }
-    p->restore();
 }
 
 void QrealAnimator::getMinAndMaxMoveFrame(

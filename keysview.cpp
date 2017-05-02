@@ -326,15 +326,14 @@ void KeysView::paintEvent(QPaintEvent *) {
                                     mMinViewedFrame,
                                     mMaxViewedFrame);
         p.restore();
-    }
-
-    if(mSelecting) {
-        p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
-        p.setBrush(Qt::NoBrush);
-        p.drawRect(QRectF((mSelectionRect.x() - mMinViewedFrame)*mPixelsPerFrame,
-                          mSelectionRect.y() - mViewedTop,
-                          mSelectionRect.width()*mPixelsPerFrame,
-                          mSelectionRect.height()));
+        if(mSelecting) {
+            p.setPen(QPen(Qt::blue, 2., Qt::DotLine));
+            p.setBrush(Qt::NoBrush);
+            p.drawRect(QRectF((mSelectionRect.x() - mMinViewedFrame)*mPixelsPerFrame,
+                              mSelectionRect.y() - mViewedTop,
+                              mSelectionRect.width()*mPixelsPerFrame,
+                              mSelectionRect.height()));
+        }
     }
 
     p.resetTransform();

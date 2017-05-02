@@ -13,12 +13,14 @@ SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
 SinglePathAnimator::~SinglePathAnimator() {
 }
 
-VectorPathEdge *SinglePathAnimator::getEgde(QPointF absPos) {
+VectorPathEdge *SinglePathAnimator::getEgde(const QPointF &absPos,
+                                            const qreal &canvasScaleInv) {
     qreal pressedT;
     PathPoint *prevPoint = NULL;
     PathPoint *nextPoint = NULL;
     if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
-                                            &prevPoint, &nextPoint)) {
+                                            &prevPoint, &nextPoint,
+                                            canvasScaleInv)) {
         if(pressedT > 0.0001 && pressedT < 0.9999 && prevPoint && nextPoint) {
             VectorPathEdge *edge = prevPoint->getNextEdge();
             edge->setPressedT(pressedT);
@@ -203,18 +205,19 @@ QPointF getPointClosestOnPathTo(const QPainterPath &path,
 }
 
 bool SinglePathAnimator::getTAndPointsForMouseEdgeInteraction(
-                                                      const QPointF &absPos,
-                                                      qreal *pressedT,
-                                                      PathPoint **prevPoint,
-                                                      PathPoint **nextPoint) {
+                                          const QPointF &absPos,
+                                          qreal *pressedT,
+                                          PathPoint **prevPoint,
+                                          PathPoint **nextPoint,
+                                          const qreal &canvasScaleInv) {
     const QMatrix &combinedTransform =
             mParentPathAnimator->getParentBox()->getCombinedTransform();
     qreal xScaling = combinedTransform.map(
                         QLineF(0., 0., 1., 0.)).length();
     qreal yScaling = combinedTransform.map(
                         QLineF(0., 0., 0., 1.)).length();
-    qreal maxDistX = 4./xScaling;
-    qreal maxDistY = 4./yScaling;
+    qreal maxDistX = 4./xScaling*canvasScaleInv;
+    qreal maxDistY = 4./yScaling*canvasScaleInv;
     QPointF relPos = combinedTransform.inverted().map(absPos);
     QRectF distRect = QRectF(relPos - QPointF(maxDistX, maxDistY),
                              QSizeF(maxDistX*2, maxDistY*2));
@@ -224,8 +227,8 @@ bool SinglePathAnimator::getTAndPointsForMouseEdgeInteraction(
     }
 
     relPos = getPointClosestOnPathTo(mPath, relPos,
-                                     1./xScaling,
-                                     1./yScaling);
+                                     1./xScaling*canvasScaleInv,
+                                     1./yScaling*canvasScaleInv);
 
 
     qreal error;
@@ -239,13 +242,16 @@ bool SinglePathAnimator::getTAndPointsForMouseEdgeInteraction(
 }
 
 
-PathPoint *SinglePathAnimator::createNewPointOnLineNear(QPointF absPos,
-                                                bool adjust) {
+PathPoint *SinglePathAnimator::createNewPointOnLineNear(
+                                    const QPointF &absPos,
+                                    const bool &adjust,
+                                    const qreal &canvasScaleInv) {
     qreal pressedT;
     PathPoint *prevPoint = NULL;
     PathPoint *nextPoint = NULL;
     if(getTAndPointsForMouseEdgeInteraction(absPos, &pressedT,
-                                            &prevPoint, &nextPoint)) {
+                                            &prevPoint, &nextPoint,
+                                            canvasScaleInv)) {
         if(pressedT > 0.0001 && pressedT < 0.9999) {
             QPointF prevPointEnd = prevPoint->getEndCtrlPtValue();
             QPointF nextPointStart = nextPoint->getStartCtrlPtValue();
@@ -304,7 +310,7 @@ PathPoint *SinglePathAnimator::createNewPointOnLineNear(QPointF absPos,
     return NULL;
 }
 
-void SinglePathAnimator::updateAfterFrameChanged(int currentFrame) {
+void SinglePathAnimator::updateAfterFrameChanged(const int &currentFrame) {
     foreach(const QSharedPointer<PathPoint> &point, mPoints) {
         point->updateAfterFrameChanged(currentFrame);
     }
@@ -559,12 +565,16 @@ void SinglePathAnimator::deletePointAndApproximate(PathPoint *pointToRemove) {
     newEdge->makePassThrough(absPos);
 }
 
-MovablePoint *SinglePathAnimator::qra_getPointAt(const QPointF &absPtPos,
-                                     const CanvasMode &currentCanvasMode)
+MovablePoint *SinglePathAnimator::qra_getPointAt(
+                        const QPointF &absPtPos,
+                        const CanvasMode &currentCanvasMode,
+                        const qreal &canvasScaleInv)
 {
     foreach(const QSharedPointer<PathPoint> &point, mPoints) {
         MovablePoint *pointToReturn =
-                point->getPointAtAbsPos(absPtPos, currentCanvasMode);
+                point->getPointAtAbsPos(absPtPos,
+                                        currentCanvasMode,
+                                        canvasScaleInv);
         if(pointToReturn == NULL) continue;
         return pointToReturn;
     }
@@ -586,14 +596,11 @@ void SinglePathAnimator::drawSelected(QPainter *p,
         p->drawPath(mPath);
         p->restore();
 
-        p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
-
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             const QSharedPointer<PathPoint> &point = mPoints.at(i);
             point->draw(p, currentCanvasMode);
         }
     } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
-        p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             const QSharedPointer<PathPoint> &point = mPoints.at(i);
             if(point->isEndPoint() || point->isSelected()) {

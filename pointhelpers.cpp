@@ -277,3 +277,12 @@ qreal radiansBetweenVectors(const QPointF &pt1,
     qreal det = pt1.x()*pt2.y() - pt1.y()*pt2.x();
     return atan2(det, dot);
 }
+
+void drawCosmeticEllipse(QPainter *p,
+                         const QPointF &absPos,
+                         qreal rX, qreal rY) {
+    const QTransform &transform = p->transform();
+    p->drawEllipse(absPos,
+                   rX/transform.m11(),
+                   rY/transform.m22());
+}

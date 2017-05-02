@@ -227,7 +227,7 @@ public:
     void getAccelerationAt(const QPointF &pos,
                            const int &frame,
                            QPointF *acc);
-    void updateAfterFrameChanged(int currentFrame);
+    void updateAfterFrameChanged(const int &currentFrame);
     void draw(QPainter *p);
     void updateRelBoundingRect();
     void preUpdatePixmapsUpdates();
@@ -250,9 +250,10 @@ public:
 
     void startAllPointsTransform();
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
-    MovablePoint *getPointAt(const QPointF &absPtPos,
-                             const CanvasMode &currentCanvasMode);
-    void selectAndAddContainedPointsToList(QRectF absRect,
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                             const CanvasMode &currentCanvasMode,
+                             const qreal &canvasScaleInv);
+    void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
     void applyPaintSetting(const PaintSetting &setting);
     MovablePoint *getBottomRightPoint();

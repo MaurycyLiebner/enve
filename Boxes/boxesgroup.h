@@ -39,7 +39,7 @@ public:
 
     void setIsCurrentGroup(bool bT);
 
-    BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
+    BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
     void setFillSettings(PaintSettings fillSettings,
                          bool saveUndoRedo = true);
@@ -85,7 +85,7 @@ public:
 
     void removeChildFromList(int id, bool saveUndoRedo = true);
 
-    void updateAfterFrameChanged(int currentFrame);
+    void updateAfterFrameChanged(const int &currentFrame);
 
 
     void setFillGradient(Gradient* gradient, bool finish);

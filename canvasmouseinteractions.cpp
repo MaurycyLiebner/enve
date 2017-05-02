@@ -171,8 +171,10 @@ void Canvas::handleMovePointMousePressEvent() {
     if (mLastPressedPoint == NULL) {
         if(isCtrlPressed() ) {
             clearPointsSelection();
-            mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel,
-                                                     isShiftPressed());
+            mLastPressedPoint = createNewPointOnLineNearSelected(
+                                        mLastPressPosRel,
+                                        isShiftPressed(),
+                                        1./mCanvasTransformMatrix.m11());
 
         } else {
             mCurrentEdge = getEdgeAt(mLastPressPosRel);
@@ -217,9 +219,12 @@ void Canvas::handleLeftButtonMousePress() {
     mFirstMouseMove = true;
 
     mLastPressPosRel = mLastMouseEventPosRel;
-    mLastPressedPoint = getPointAt(mLastMouseEventPosRel, mCurrentMode);
+    mLastPressedPoint = getPointAtAbsPos(mLastMouseEventPosRel,
+                                   mCurrentMode,
+                                   1./mCanvasTransformMatrix.m11());
 
-    if(mRotPivot->handleMousePress(mLastMouseEventPosRel)) {
+    if(mRotPivot->handleMousePress(mLastMouseEventPosRel,
+                                   1./mCanvasTransformMatrix.m11())) {
     } else if(isMovingPath()) {
         if(mHoveredPoint == NULL) {
             handleMovePathMousePressEvent();
@@ -692,7 +697,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         updateHoveredPoint();
 
         if(mRotPivot->isVisible() && mHoveredPoint == NULL) {
-            if(mRotPivot->isPointAtAbsPos(mCurrentMouseEventPosRel) ) {
+            if(mRotPivot->isPointAtAbsPos(mCurrentMouseEventPosRel,
+                                          1./mCanvasTransformMatrix.m11()) ) {
                 mHoveredPoint = mRotPivot;
             }
         }
@@ -783,7 +789,9 @@ void Canvas::wheelEvent(QWheelEvent *event)
 void Canvas::mouseDoubleClickEvent(QMouseEvent *event) {
     mDoubleClick = true;
 
-    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel, true);
+    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel,
+                                                         true,
+                                                         1./mCanvasTransformMatrix.m11());
 
     if(mLastPressedPoint == NULL) {
         BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);

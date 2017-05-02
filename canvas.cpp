@@ -194,6 +194,9 @@ void Canvas::createSoundForPath(const QString &path) {
 }
 
 void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
+    QPen pen = QPen(Qt::black, 1.);
+    pen.setCosmetic(true);
+    p->setPen(pen);
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->drawSelected(p, currentCanvasMode);
     }
@@ -204,8 +207,9 @@ void Canvas::updateHoveredBox() {
 }
 
 void Canvas::updateHoveredPoint() {
-    mHoveredPoint = getPointAt(mCurrentMouseEventPosRel,
-                               mCurrentMode);
+    mHoveredPoint = getPointAtAbsPos(mCurrentMouseEventPosRel,
+                               mCurrentMode,
+                               1./mCanvasTransformMatrix.m11());
 }
 
 void Canvas::updateHoveredEdge() {
@@ -259,19 +263,22 @@ void Canvas::paintEvent(QPainter *p) {
         foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmap(p);
         }
+        QPen pen = QPen(Qt::black, 1.5);
+        pen.setCosmetic(true);
+        p->setPen(pen);
         mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
         drawSelected(p, mCurrentMode);
 
-        QPen pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
+        if(mCurrentMode == CanvasMode::MOVE_PATH ||
+           mCurrentMode == CanvasMode::MOVE_POINT) {
+            mRotPivot->draw(p);
+        }
+        pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
         pen.setCosmetic(true);
         p->setPen(pen);
         if(mSelecting) {
             p->drawRect(mSelectionRect);
-        }
-        if(mCurrentMode == CanvasMode::MOVE_PATH ||
-           mCurrentMode == CanvasMode::MOVE_POINT) {
-            mRotPivot->draw(p);
-        }      
+        } 
 
         if(mHoveredPoint != NULL) {
             mHoveredPoint->drawHovered(p);
@@ -844,7 +851,7 @@ void Canvas::moveByRel(QPointF trans) {
     schedulePivotUpdate();
 }
 
-void Canvas::updateAfterFrameChanged(int currentFrame) {
+void Canvas::updateAfterFrameChanged(const int &currentFrame) {
     anim_mCurrentAbsFrame = currentFrame;
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);

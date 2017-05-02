@@ -127,7 +127,7 @@ public:
 
     void applyTransformation(TransformAnimator *transAnimator);
 
-    void rotateBy(qreal rot, QPointF absOrigin);
+    void rotateBy(const qreal &rot, QPointF absOrigin);
 
     QPointF getAbsolutePos();
 
@@ -142,75 +142,86 @@ public:
 
     virtual bool relPointInsidePath(QPointF) { return false; }
     bool absPointInsidePath(QPointF absPos);
-    virtual MovablePoint *getPointAt(const QPointF &,
-                                     const CanvasMode &) { return NULL; }
+    virtual MovablePoint *getPointAtAbsPos(const QPointF &,
+                                     const CanvasMode &,
+                                     const qreal &) { return NULL; }
 
     void moveUp();
     void moveDown();
     void bringToFront();
     void bringToEnd();
 
-    void setZListIndex(int z, bool saveUndoRedo = true);
+    void setZListIndex(const int &z,
+                       const bool &saveUndoRedo = true);
 
-    virtual void selectAndAddContainedPointsToList
-                            (QRectF,QList<MovablePoint*> *) {}
+    virtual void selectAndAddContainedPointsToList(const QRectF &,
+                                                   QList<MovablePoint*> *) {}
 
     QPointF getPivotAbsPos();
     virtual void select();
     void deselect();
     int getZIndex();
     virtual void drawBoundingRect(QPainter *p);
-    void setParent(BoxesGroup *parent, bool saveUndoRedo = true);
+    void setParent(BoxesGroup *parent,
+                   const bool &saveUndoRedo = true);
     BoxesGroup *getParent();
 
     bool isGroup();
-    virtual BoundingBox *getPathAtFromAllAncestors(QPointF absPos);
+    virtual BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
     virtual PaintSettings *getFillSettings();
     virtual StrokeSettings *getStrokeSettings();
 
-    void setPivotAbsPos(QPointF absPos,
-                        bool saveUndoRedo = true,
-                        bool pivotChanged = true);
+    void setPivotAbsPos(const QPointF &absPos,
+                        const bool &saveUndoRedo = true,
+                        const bool &pivotChanged = true);
 
-    void setPivotRelPos(QPointF relPos,
-                        bool saveUndoRedo = true,
-                        bool pivotChanged = true);
+    void setPivotRelPos(const QPointF &relPos,
+                        const bool &saveUndoRedo = true,
+                        const bool &pivotChanged = true);
 
     void cancelTransform();
-    void scale(qreal scaleXBy, qreal scaleYBy);
+    void scale(const qreal &scaleXBy,
+               const qreal &scaleYBy);
 
     virtual int prp_saveToSql(QSqlQuery *query, const int &parentId);
 
-    virtual PathPoint *createNewPointOnLineNear(QPointF, bool) { return NULL; }
+    virtual PathPoint *createNewPointOnLineNear(const QPointF &absPos,
+                                                const bool &adjust,
+                                                const qreal &canvasScaleInv) {
+        Q_UNUSED(absPos);
+        Q_UNUSED(adjust);
+        Q_UNUSED(canvasScaleInv);
+        return NULL;
+    }
     bool isVectorPath();
-    void saveTransformPivotAbsPos(QPointF absPivot);
+    void saveTransformPivotAbsPos(const QPointF &absPivot);
 
-    void setName(QString name);
+    void setName(const QString &name);
     QString getName();
 
     void hide();
     void show();
     bool isVisible();
-    void setVisibile(bool visible, bool saveUndoRedo = true);
+    void setVisibile(const bool &visible,
+                     const bool &saveUndoRedo = true);
     void switchVisible();
 
-    void setChildrenListItemsVisible(bool bt);
     void lock();
     void unlock();
-    void setLocked(bool bt);
+    void setLocked(const bool &bt);
     bool isLocked();
     bool isVisibleAndUnlocked();
-    void rotateBy(qreal rot);
+    void rotateBy(const qreal &rot);
     void scale(qreal scaleBy);
 
-    void rotateRelativeToSavedPivot(qreal rot);
-    void scaleRelativeToSavedPivot(qreal scaleBy);
+    void rotateRelativeToSavedPivot(const qreal &rot);
+    void scaleRelativeToSavedPivot(const qreal &scaleBy);
 
     virtual void startPosTransform();
     virtual void startRotTransform();
     virtual void startScaleTransform();
-    virtual void updateAfterFrameChanged(int currentFrame);
+    virtual void updateAfterFrameChanged(const int &currentFrame);
     virtual QMatrix getCombinedRenderTransform();
 
     virtual void startAllPointsTransform() {}
@@ -236,12 +247,14 @@ public:
     virtual void startSelectedStrokeColorTransform() {}
     virtual void startSelectedFillColorTransform() {}
 
-    virtual VectorPathEdge *getEgde(QPointF absPos) {
+    virtual VectorPathEdge *getEgde(const QPointF &absPos,
+                                    const qreal &canvasScaleInv) {
         Q_UNUSED(absPos);
+        Q_UNUSED(canvasScaleInv);
         return NULL;
     }
     void setAbsolutePos(QPointF pos, bool saveUndoRedo);
-    void setRelativePos(QPointF relPos, bool saveUndoRedo);
+    void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo);
 
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
 

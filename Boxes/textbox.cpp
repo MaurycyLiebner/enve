@@ -120,13 +120,17 @@ void TextBox::setSelectedFontFamilyAndStyle(QString fontFamily,
     schedulePathUpdate();
 }
 
-MovablePoint *TextBox::getPointAt(const QPointF &absPtPos, const CanvasMode &currentCanvasMode)
+MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
+                                  const CanvasMode &currentCanvasMode,
+                                  const qreal &canvasScaleInv)
 {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
+                                                              canvasScaleInv);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
+                                                                canvasScaleInv);
         }
     }
 

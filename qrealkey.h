@@ -51,12 +51,7 @@ public:
 
     bool isInsideRect(const QRectF &valueFrameRect);
 
-    void drawGraphKey(QPainter *p,
-                      const QColor &paintColor,
-                      const qreal &minFrameT,
-                      const qreal &minValueT,
-                      const qreal &pixelsPerFrame,
-                      const qreal &pixelsPerValue);
+    void drawGraphKey(QPainter *p, const QColor &paintColor);
     void changeFrameAndValueBy(const QPointF &frameValueChange);
     void saveCurrentFrameAndValue();
     virtual void setCtrlsMode(const CtrlsMode &mode);

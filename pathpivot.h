@@ -11,24 +11,30 @@ class PathPivot : public MovablePoint
 public:
     PathPivot(Canvas *parent);
 
-    void draw(QPainter *p);
-    void setRelativePos(QPointF relPos, bool saveUndoRedo);
+    void setRelativePos(const QPointF &relPos,
+                        const bool &saveUndoRedo = true);
 
     bool isRotating();
     bool isScaling();
-    bool handleMousePress(QPointF absPressPos);
+    bool handleMousePress(const QPointF &absPressPos,
+                          const qreal &canvasInvScale);
     bool handleMouseRelease();
-    bool handleMouseMove(QPointF moveDestAbs, QPointF pressPos,
-                         bool xOnly, bool yOnly,
-                         bool inputTransformationEnabled,
-                         qreal inputTransformationValue,
-                         bool startTransform, const CanvasMode &mode);
+    bool handleMouseMove(const QPointF &moveDestAbs,
+                         const QPointF &pressPos,
+                         const bool &xOnly,
+                         const bool &yOnly,
+                         const bool &inputTransformationEnabled,
+                         const qreal &inputTransformationValue,
+                         const bool &startTransform,
+                         const CanvasMode &mode);
 //    void updateRotationMappedPath();
     void finishTransform();
     void startRotating();
     void startScaling();
     void startTransform();
-private:
+protected:
+    void drawOnAbsPos(QPainter *p, const QPointF &absPos);
+
     qreal mLastDRot = 0.;
     int mRotHalfCycles = 0;
     Canvas *mCanvas;

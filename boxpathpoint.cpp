@@ -8,7 +8,7 @@ BoxPathPoint::BoxPathPoint(BoundingBox *box) :
 
 void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();
-    mSavedAbsPos = mapRelativeToAbsolute(mSavedRelPos);
+    mSavedAbsPos = getAbsolutePos();
     mParent->startPivotTransform();
 }
 
@@ -39,11 +39,11 @@ void BoxPathPoint::draw(QPainter *p) {
     } else {
         p->setBrush(QColor(255, 255, 125));
     }
-    p->setPen(QPen(Qt::black, 1.5));
-    p->drawEllipse(absPos,
-                   mRadius, mRadius);
+    drawCosmeticEllipse(p, absPos,
+                        mRadius, mRadius);
 
     p->translate(absPos);
+    p->scale(1./p->transform().m11(), 1./p->transform().m22());
     qreal halfRadius = mRadius*0.5;
     p->drawLine(QPointF(-halfRadius, 0), QPointF(halfRadius, 0));
     p->drawLine(QPointF(0, -halfRadius), QPointF(0, halfRadius));

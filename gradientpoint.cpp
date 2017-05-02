@@ -7,7 +7,7 @@ GradientPoint::GradientPoint(PathBox *parent) :
     anim_setTraceKeyOnCurrentFrame(true);
 }
 
-void GradientPoint::setRelativePos(QPointF relPos, bool saveUndoRedo)
+void GradientPoint::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo)
 {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
     ((VectorPath*)mParent)->updateDrawGradients();
@@ -25,25 +25,33 @@ void GradientPoint::setColor(QColor fillColor)
     
 }
 
-void GradientPoint::draw(QPainter *p)
-{
+void GradientPoint::draw(QPainter *p) {
     if(mHidden) {
         return;
     }
+    p->save();
     p->setBrush(mFillColor);
-    p->setPen(Qt::black);
     QPointF absPos = getAbsolutePos();
-    QRectF rect = QRectF(absPos - QPointF(mRadius, mRadius),
-                         QSize(2*mRadius, 2*mRadius));
-    p->setPen(QPen(Qt::black, 1.5));
-    p->drawEllipse(rect);
+
+    QPen pen = p->pen();
+    pen.setColor(Qt::black);
+    pen.setWidthF(1.5);
+    p->setPen(pen);
+    drawCosmeticEllipse(p, absPos,
+                        mRadius, mRadius);
     p->setBrush(Qt::NoBrush);
-    p->setPen(QPen(Qt::white, 0.75));
-    p->drawEllipse(rect);
+    pen.setColor(Qt::white);
+    pen.setWidthF(0.75);
+    p->setPen(pen);
+    drawCosmeticEllipse(p, absPos,
+                        mRadius, mRadius);
 
     if(prp_isKeyOnCurrentFrame() ) {
         p->setBrush(Qt::red);
-        p->setPen(QPen(Qt::black, 1.) );
+        pen.setColor(Qt::black);
+        pen.setWidthF(1.);
+        p->setPen(pen);
         p->drawEllipse(absPos, 4, 4);
     }
+    p->restore();
 }

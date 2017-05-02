@@ -135,30 +135,33 @@ void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
 }
 
 
-MovablePoint *Circle::getPointAt(const QPointF &absPtPos,
-                                 const CanvasMode &currentCanvasMode) {
+MovablePoint *Circle::getPointAtAbsPos(const QPointF &absPtPos,
+                                 const CanvasMode &currentCanvasMode,
+                                 const qreal &canvasScaleInv) {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
+                                                              canvasScaleInv);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
+                                                                canvasScaleInv);
         }
     }
     if(pointToReturn == NULL) {
-        if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos) ) {
+        if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mHorizontalRadiusPoint;
         }
-        if(mVerticalRadiusPoint->isPointAtAbsPos(absPtPos) ) {
+        if(mVerticalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mVerticalRadiusPoint;
         }
-        if(mCenter->isPointAtAbsPos(absPtPos)) {
+        if(mCenter->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return mCenter;
         }
     }
     return pointToReturn;
 }
 
-void Circle::selectAndAddContainedPointsToList(QRectF absRect,
+void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
                                                    QList<MovablePoint *> *list)
 {
     if(!mCenter->isSelected()) {
@@ -275,7 +278,7 @@ void CircleRadiusPoint::moveByAbs(QPointF absTranslatione) {
     //setAbsPosRadius(getAbsolutePos() + absTranslatione);
 }
 
-void CircleRadiusPoint::setRelativePos(QPointF relPos, bool saveUndoRedo) {
+void CircleRadiusPoint::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo) {
     if(mXBlocked) {
         mYAnimator->qra_setCurrentValue(relPos.y(), saveUndoRedo);
     } else {

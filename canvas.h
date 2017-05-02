@@ -73,7 +73,7 @@ public:
     void zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin);
     void moveByRel(QPointF trans);
 
-    void updateAfterFrameChanged(int currentFrame);
+    void updateAfterFrameChanged(const int &currentFrame);
 
     void renderCurrentFrameToQImage(QImage *frame);
     void renderFinalCurrentFrameToQImage(QImage *frame);
@@ -143,7 +143,9 @@ public:
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
-    PathPoint *createNewPointOnLineNearSelected(QPointF absPos, bool adjust);
+    PathPoint *createNewPointOnLineNearSelected(const QPointF &absPos,
+                                                const bool &adjust,
+                                                const qreal &canvasScaleInv);
 
     void setSelectedFillGradient(Gradient* gradient, bool finish);
     void setSelectedStrokeGradient(Gradient* gradient, bool finish);
@@ -308,8 +310,9 @@ public:
     BoundingBox *createLink(BoxesGroup *parent);
     void createImageBox(const QString &path);
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
-    MovablePoint *getPointAt(const QPointF &absPos,
-                             const CanvasMode &currentMode);
+    MovablePoint *getPointAtAbsPos(const QPointF &absPos,
+                             const CanvasMode &currentMode,
+                             const qreal &canvasScaleInv);
     void duplicateSelectedBoxes();
     void clearLastPressedPoint();
     void clearCurrentEndPoint();

@@ -46,7 +46,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
                 qCeil(qAbs(timeScale*mFramesCount)));
 }
 
-void AnimationBox::updateAfterFrameChanged(int currentFrame) {
+void AnimationBox::updateAfterFrameChanged(const int &currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
     qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue();
 

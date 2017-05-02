@@ -113,8 +113,7 @@ MovablePoint *Rectangle::getBottomRightPoint() {
 }
 
 void Rectangle::drawSelected(QPainter *p,
-                             const CanvasMode &currentCanvasMode)
-{
+                             const CanvasMode &currentCanvasMode) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         drawBoundingRect(p);
@@ -131,30 +130,31 @@ void Rectangle::drawSelected(QPainter *p,
 }
 
 
-MovablePoint *Rectangle::getPointAt(const QPointF &absPtPos,
-                                    const CanvasMode &currentCanvasMode)
-{
+MovablePoint *Rectangle::getPointAtAbsPos(const QPointF &absPtPos,
+                                    const CanvasMode &currentCanvasMode,
+                                    const qreal &canvasScaleInv) {
     MovablePoint *pointToReturn = NULL;
     if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos);
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
+                                                              canvasScaleInv);
         if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos);
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
+                                                                canvasScaleInv);
         }
     }
     if(pointToReturn == NULL) {
-        if(mTopLeftPoint->isPointAtAbsPos(absPtPos)) {
+        if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return mTopLeftPoint;
         }
-        if(mBottomRightPoint->isPointAtAbsPos(absPtPos) ) {
+        if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mBottomRightPoint;
         }
     }
     return pointToReturn;
 }
 
-void Rectangle::selectAndAddContainedPointsToList(QRectF absRect,
-                                                  QList<MovablePoint *> *list)
-{
+void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
+                                                  QList<MovablePoint *> *list) {
     if(!mTopLeftPoint->isSelected()) {
         if(mTopLeftPoint->isContainedInRect(absRect)) {
             mTopLeftPoint->select();
@@ -169,8 +169,7 @@ void Rectangle::selectAndAddContainedPointsToList(QRectF absRect,
     }
 }
 
-void Rectangle::updatePath()
-{
+void Rectangle::updatePath() {
     mPath = QPainterPath();
     QPointF topPos = mTopLeftPoint->getRelativePos();
     QPointF botPos = mBottomRightPoint->getRelativePos();
