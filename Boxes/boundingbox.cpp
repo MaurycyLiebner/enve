@@ -450,6 +450,18 @@ void BoundingBox::renderFinal(QPainter *p) {
     p->restore();
 }
 
+void BoundingBox::drawSelected(QPainter *p,
+                               const CanvasMode &currentCanvasMode) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        p->save();
+        drawBoundingRect(p);
+        if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->draw(p);
+        }
+        p->restore();
+    }
+}
+
 bool BoundingBox::shouldRedoUpdate() {
     return mRedoUpdate;
 }
@@ -670,7 +682,7 @@ BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
     }
 }
 
-QPointF BoundingBox::mapAbsPosToRel(QPointF absPos) {
+QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
     return mTransformAnimator->mapAbsPosToRel(absPos);
 }
 
@@ -796,8 +808,20 @@ void BoundingBox::finishTransform() {
     //updateCombinedTransform();
 }
 
-bool BoundingBox::absPointInsidePath(QPointF absPoint) {
+bool BoundingBox::absPointInsidePath(const QPointF &absPoint) {
     return relPointInsidePath(mapAbsPosToRel(absPoint));
+}
+
+MovablePoint *BoundingBox::getPointAtAbsPos(const QPointF &absPtPos,
+                                            const CanvasMode &currentCanvasMode,
+                                            const qreal &canvasScaleInv) {
+    if(currentCanvasMode == MOVE_PATH) {
+        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
+        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+            return pivotMovable;
+        }
+    }
+    return NULL;
 }
 
 void BoundingBox::cancelTransform() {

@@ -263,7 +263,7 @@ public:
 
     QMatrix getCombinedTransform() const { return QMatrix(); }
     QMatrix getRelativeTransform() const { return QMatrix(); }
-    QPointF mapAbsPosToRel(QPointF absPos) {
+    QPointF mapAbsPosToRel(const QPointF &absPos) {
         return absPos;
     }
 

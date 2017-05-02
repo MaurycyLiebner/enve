@@ -469,7 +469,7 @@ void BoxesGroup::deselectAllBoxesFromBoxesGroup() {
     }
 }
 
-BoundingBox *BoxesGroup::getBoxAt(QPointF absPos) {
+BoundingBox *BoxesGroup::getBoxAt(const QPointF &absPos) {
     BoundingBox *boxAtPos = NULL;
 
     for(int i = mChildBoxes.count() - 1; i >= 0; i--) {

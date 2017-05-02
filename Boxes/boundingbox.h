@@ -116,13 +116,7 @@ public:
     virtual void draw(QPainter *) {}
 
     virtual void drawSelected(QPainter *p,
-                              const CanvasMode &) {
-        if(isVisibleAndInVisibleDurationRect()) {
-            p->save();
-            drawBoundingRect(p);
-            p->restore();
-        }
-    }
+                              const CanvasMode &currentCanvasMode);
 
 
     void applyTransformation(TransformAnimator *transAnimator);
@@ -140,11 +134,11 @@ public:
     void finishTransform();
 
 
-    virtual bool relPointInsidePath(QPointF) { return false; }
-    bool absPointInsidePath(QPointF absPos);
-    virtual MovablePoint *getPointAtAbsPos(const QPointF &,
-                                     const CanvasMode &,
-                                     const qreal &) { return NULL; }
+    virtual bool relPointInsidePath(const QPointF &) { return false; }
+    bool absPointInsidePath(const QPointF &absPos);
+    virtual MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                                     const CanvasMode &currentCanvasMode,
+                                     const qreal &canvasScaleInv);
 
     void moveUp();
     void moveDown();
@@ -294,7 +288,7 @@ public:
     void updateRelativeTransformTmp();
 
     virtual void updateAllUglyPixmap();
-    virtual QPointF mapAbsPosToRel(QPointF absPos);
+    virtual QPointF mapAbsPosToRel(const QPointF &absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
     void setAwaitUpdateScheduled(bool bT);

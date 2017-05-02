@@ -75,6 +75,9 @@ public:
     void updateFillDrawGradient();
 
     virtual void updatePath();
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                                   const CanvasMode &currentCanvasMode,
+                                   const qreal &canvasScaleInv);
 protected:
     QSharedPointer<GradientPoints> mFillGradientPoints =
             (new GradientPoints)->ref<GradientPoints>();

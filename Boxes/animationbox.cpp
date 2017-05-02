@@ -131,12 +131,3 @@ void AnimationBox::draw(QPainter *p) {
 bool AnimationBox::relPointInsidePath(const QPointF &point) {
     return mRelBoundingRect.contains(point.toPoint());
 }
-
-void AnimationBox::drawSelected(QPainter *p,
-                            const CanvasMode &) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        drawBoundingRect(p);
-        p->restore();
-    }
-}

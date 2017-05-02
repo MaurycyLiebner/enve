@@ -143,20 +143,9 @@ void VectorPath::drawSelected(QPainter *p,
 MovablePoint *VectorPath::getPointAtAbsPos(const QPointF &absPtPos,
                                      const CanvasMode &currentCanvasMode,
                                      const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = NULL;
-    if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
-                                                              canvasScaleInv);
-        if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
-                                                                canvasScaleInv);
-        }
-    } else if(currentCanvasMode == MOVE_PATH) {
-        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
-        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-            return pivotMovable;
-        }
-    }
+    MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
+                                                            currentCanvasMode,
+                                                            canvasScaleInv);
     if(pointToReturn == NULL) {
         pointToReturn = mPathAnimator->qra_getPointAt(absPtPos,
                                                       currentCanvasMode,

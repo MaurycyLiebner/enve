@@ -74,6 +74,8 @@ void TextBox::drawSelected(QPainter *p,
 
             mFillGradientPoints->drawGradientPoints(p);
             mStrokeGradientPoints->drawGradientPoints(p);
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->draw(p);
         }
 
         p->restore();
@@ -122,19 +124,10 @@ void TextBox::setSelectedFontFamilyAndStyle(QString fontFamily,
 
 MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
                                   const CanvasMode &currentCanvasMode,
-                                  const qreal &canvasScaleInv)
-{
-    MovablePoint *pointToReturn = NULL;
-    if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
-                                                              canvasScaleInv);
-        if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
-                                                                canvasScaleInv);
-        }
-    }
-
-    return pointToReturn;
+                                  const qreal &canvasScaleInv) {
+    return PathBox::getPointAtAbsPos(absPtPos,
+                                     currentCanvasMode,
+                                     canvasScaleInv);
 }
 
 qreal textForQPainterPath(Qt::Alignment alignment,

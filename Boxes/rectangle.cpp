@@ -124,6 +124,8 @@ void Rectangle::drawSelected(QPainter *p,
 
             mFillGradientPoints->drawGradientPoints(p);
             mStrokeGradientPoints->drawGradientPoints(p);
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->draw(p);
         }
         p->restore();
     }
@@ -133,15 +135,9 @@ void Rectangle::drawSelected(QPainter *p,
 MovablePoint *Rectangle::getPointAtAbsPos(const QPointF &absPtPos,
                                     const CanvasMode &currentCanvasMode,
                                     const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = NULL;
-    if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
-                                                              canvasScaleInv);
-        if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
-                                                                canvasScaleInv);
-        }
-    }
+    MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
+                                                            currentCanvasMode,
+                                                            canvasScaleInv);
     if(pointToReturn == NULL) {
         if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return mTopLeftPoint;

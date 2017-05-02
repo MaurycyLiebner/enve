@@ -129,6 +129,8 @@ void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
 
             mFillGradientPoints->drawGradientPoints(p);
             mStrokeGradientPoints->drawGradientPoints(p);
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->draw(p);
         }
         p->restore();
     }
@@ -138,15 +140,9 @@ void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
 MovablePoint *Circle::getPointAtAbsPos(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = NULL;
-    if(currentCanvasMode == MOVE_POINT) {
-        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
-                                                              canvasScaleInv);
-        if(pointToReturn == NULL) {
-            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
-                                                                canvasScaleInv);
-        }
-    }
+    MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
+                                                            currentCanvasMode,
+                                                            canvasScaleInv);
     if(pointToReturn == NULL) {
         if(mHorizontalRadiusPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
             return mHorizontalRadiusPoint;

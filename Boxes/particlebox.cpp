@@ -137,6 +137,8 @@ void ParticleBox::drawSelected(QPainter *p,
                 MovablePoint *pt = emitter->getPosPoint();
                 pt->draw(p);
             }
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->draw(p);
         }
         p->restore();
     }
@@ -146,21 +148,27 @@ void ParticleBox::drawSelected(QPainter *p,
 MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
                                       const CanvasMode &currentCanvasMode,
                                       const qreal &canvasScaleInv) {
-    MovablePoint *pointToReturn = NULL;
-    if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
-        return mTopLeftPoint;
+    if(currentCanvasMode == MOVE_POINT) {
+        if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+            return mTopLeftPoint;
+        }
+        if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
+            return mBottomRightPoint;
+        }
+    } else if(currentCanvasMode == MOVE_PATH) {
+        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
+        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+            return pivotMovable;
+        }
     }
-    if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
-        return mBottomRightPoint;
-    }
+
     foreach(ParticleEmitter *emitter, mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
         if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return pt;
         }
     }
-
-    return pointToReturn;
+    return NULL;
 }
 
 void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,

@@ -11,8 +11,6 @@ public:
     void draw(QPainter *p);
     void reloadPixmap();
     void setFilePath(QString path);
-    void drawSelected(QPainter *p,
-                      const CanvasMode &);
     void updateRelBoundingRect();
     bool relPointInsidePath(const QPointF &point);
 

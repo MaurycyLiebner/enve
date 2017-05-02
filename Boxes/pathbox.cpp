@@ -102,6 +102,26 @@ void PathBox::updatePathIfNeeded() {
     }
 }
 
+MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
+                                     const CanvasMode &currentCanvasMode,
+                                     const qreal &canvasScaleInv) {
+    MovablePoint *pointToReturn = NULL;
+    if(currentCanvasMode == MOVE_POINT) {
+        pointToReturn = mStrokeGradientPoints->qra_getPointAt(absPtPos,
+                                                              canvasScaleInv);
+        if(pointToReturn == NULL) {
+            pointToReturn = mFillGradientPoints->qra_getPointAt(absPtPos,
+                                                                canvasScaleInv);
+        }
+    } else if(currentCanvasMode == MOVE_PATH) {
+        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
+        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+            return pivotMovable;
+        }
+    }
+    return pointToReturn;
+}
+
 void PathBox::resetStrokeGradientPointsPos(bool finish) {
     mStrokeGradientPoints->prp_setRecording(false);
     mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),

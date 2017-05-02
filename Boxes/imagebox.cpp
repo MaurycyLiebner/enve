@@ -16,26 +16,6 @@ void ImageBox::updateRelBoundingRect() {
     BoundingBox::updateRelBoundingRect();
 }
 
-void ImageBox::drawSelected(QPainter *p,
-                            const CanvasMode &)
-{
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-
-//        QPainterPath mapped;
-//        mapped.addRect(mPixmap.rect());
-//        mapped = mCombinedTransformMatrix.map(mapped);
-//        QPen pen = p->pen();
-//        p->setPen(QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine));
-//        p->setBrush(Qt::NoBrush);
-//        p->drawPath(mapped);
-//        p->setPen(pen);
-
-        drawBoundingRect(p);
-        p->restore();
-    }
-}
-
 bool ImageBox::relPointInsidePath(const QPointF &point)
 {
     return mImage.rect().contains(point.toPoint()

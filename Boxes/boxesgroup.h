@@ -30,7 +30,7 @@ public:
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
 
-    BoundingBox *getBoxAt(QPointF absPos);
+    BoundingBox *getBoxAt(const QPointF &absPos);
     //MovablePoint *getPointAt(const QPointF &absPos, const CanvasMode &currentMode);
 
     void addContainedBoxesToSelection(QRectF rect);
