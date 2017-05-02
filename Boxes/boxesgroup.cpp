@@ -130,7 +130,7 @@ int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
-bool BoxesGroup::relPointInsidePath(QPointF relPos) {
+bool BoxesGroup::relPointInsidePath(const QPointF &relPos) {
     if(mRelBoundingRect.contains(relPos)) {
         QPointF absPos = mapRelPosToAbs(relPos);
         foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {

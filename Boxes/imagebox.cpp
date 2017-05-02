@@ -36,7 +36,7 @@ void ImageBox::drawSelected(QPainter *p,
     }
 }
 
-bool ImageBox::relPointInsidePath(QPointF point)
+bool ImageBox::relPointInsidePath(const QPointF &point)
 {
     return mImage.rect().contains(point.toPoint()
                                    );

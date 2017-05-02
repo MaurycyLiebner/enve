@@ -231,7 +231,7 @@ public:
     void draw(QPainter *p);
     void updateRelBoundingRect();
     void preUpdatePixmapsUpdates();
-    bool relPointInsidePath(QPointF relPos);
+    bool relPointInsidePath(const QPointF &relPos);
 
     void addEmitter(ParticleEmitter *emitter);
 
@@ -249,7 +249,8 @@ public:
     }
 
     void startAllPointsTransform();
-    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
+    void drawSelected(QPainter *p,
+                      const CanvasMode &currentCanvasMode);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
@@ -259,7 +260,7 @@ public:
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
 
-    void prp_setAbsFrame(int frame) {
+    void prp_setAbsFrame(const int &frame) {
         BoundingBox::prp_setAbsFrame(frame);
         mFrameChangedUpdateScheduled = true;
     }

@@ -54,7 +54,7 @@ public:
     VectorPath *strokeToPath();
 
     const QPainterPath &getRelativePath() const;
-    bool relPointInsidePath(QPointF relPos);
+    bool relPointInsidePath(const QPointF &relPos);
     void preUpdatePixmapsUpdates();
 
     void duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,

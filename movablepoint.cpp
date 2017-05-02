@@ -89,11 +89,11 @@ void MovablePoint::drawOnAbsPos(QPainter *p,
         p->save();
 
         p->setBrush(Qt::red);
-//        QPen pen = QPen(Qt::black, 1.);
-//        pen.setCosmetic(true);
-        //p->setPen(pen);
+        QPen pen = QPen(Qt::black, 1.);
+        pen.setCosmetic(true);
+        p->setPen(pen);
         drawCosmeticEllipse(p, absPos,
-                            4., 4.);
+                            mRadius*0.5, mRadius*0.5);
         p->restore();
     }
 }

@@ -64,7 +64,7 @@ void ParticleBox::preUpdatePixmapsUpdates() {
     BoundingBox::preUpdatePixmapsUpdates();
 }
 
-bool ParticleBox::relPointInsidePath(QPointF relPos) {
+bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
     if(mRelBoundingRectPath.contains(relPos) ) {
         /*if(mEmitters.isEmpty()) */return true;
         foreach(ParticleEmitter *emitter, mEmitters) {

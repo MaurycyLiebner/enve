@@ -111,7 +111,7 @@ void InternalLinkBox::drawSelected(QPainter *p,
     }
 }
 
-bool InternalLinkBox::relPointInsidePath(QPointF point)
+bool InternalLinkBox::relPointInsidePath(const QPointF &point)
 {
     return mLinkTarget->relPointInsidePath(point);
 }

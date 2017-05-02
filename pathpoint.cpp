@@ -379,6 +379,7 @@ CtrlPoint *PathPoint::getEndCtrlPt()
 }
 
 void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
+    p->save();
     if(mSelected) {
         p->setBrush(QColor(0, 200, 255));
     } else {
@@ -392,7 +393,9 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
     if(prp_isKeyOnCurrentFrame() ) {
         p->save();
         p->setBrush(Qt::red);
-        p->setPen(QPen(Qt::black, 1.) );
+        QPen pen = p->pen();
+        pen.setWidthF(1.);
+        p->setPen(pen);
         drawCosmeticEllipse(p, absPos, 4., 4.);
         p->restore();
     }
@@ -437,6 +440,7 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
                     Qt::AlignCenter,
                     QString::number(mPointId));
     }
+    p->restore();
 }
 
 PathPoint* PathPoint::getNextPoint()

@@ -39,7 +39,7 @@ void Animator::anim_updateAfterChangedKey(Key *key) {
 void Animator::prp_setAbsFrame(const int &frame) {
     anim_mCurrentAbsFrame = frame;
     anim_updateRelFrame();
-
+    anim_updateKeyOnCurrrentFrame();
     //anim_callFrameChangeUpdater();
 }
 

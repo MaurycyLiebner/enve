@@ -128,7 +128,7 @@ void AnimationBox::draw(QPainter *p) {
     p->drawImage(0, 0, mUpdateAnimationImage);
 }
 
-bool AnimationBox::relPointInsidePath(QPointF point) {
+bool AnimationBox::relPointInsidePath(const QPointF &point) {
     return mRelBoundingRect.contains(point.toPoint());
 }
 

@@ -51,7 +51,7 @@ void GradientPoint::draw(QPainter *p) {
         pen.setColor(Qt::black);
         pen.setWidthF(1.);
         p->setPen(pen);
-        p->drawEllipse(absPos, 4, 4);
+        drawCosmeticEllipse(p, absPos, 3, 3);
     }
     p->restore();
 }

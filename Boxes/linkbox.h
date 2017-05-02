@@ -56,7 +56,7 @@ public:
 
     void drawSelected(QPainter *p, const CanvasMode &);
     void updateRelBoundingRect();
-    bool relPointInsidePath(QPointF point);
+    bool relPointInsidePath(const QPointF &point);
     QPointF getRelCenterPosition();
     qreal getEffectsMargin();
 

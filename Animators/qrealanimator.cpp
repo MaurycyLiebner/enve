@@ -257,11 +257,7 @@ void QrealAnimator::qra_saveValueToKey(QrealKey *key,
 }
 
 void QrealAnimator::prp_setAbsFrame(const int &frame) {
-    anim_mCurrentAbsFrame = frame;
-    anim_updateRelFrame();
-    //updateValueFromCurrentFrame();
-
-    anim_updateKeyOnCurrrentFrame();
+    Animator::prp_setAbsFrame(frame);
     qreal newValue = qra_getValueAtAbsFrame(anim_mCurrentAbsFrame);
     if(newValue == mCurrentValue) return;
     mCurrentValue = newValue;

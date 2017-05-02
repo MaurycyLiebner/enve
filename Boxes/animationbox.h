@@ -16,7 +16,7 @@ public:
 //    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
     void drawSelected(QPainter *p, const CanvasMode &);
-    bool relPointInsidePath(QPointF point);
+    bool relPointInsidePath(const QPointF &point);
     void draw(QPainter *p);
     virtual void loadUpdatePixmap() = 0;
     void reloadPixmapIfNeeded();

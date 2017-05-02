@@ -381,7 +381,7 @@ void PathBox::draw(QPainter *p) {
     p->restore();
 }
 
-bool PathBox::relPointInsidePath(QPointF relPos) {
+bool PathBox::relPointInsidePath(const QPointF &relPos) {
     if(mRelBoundingRectPath.contains(relPos) ) {
         return mWholePath.contains(relPos);
     } else {

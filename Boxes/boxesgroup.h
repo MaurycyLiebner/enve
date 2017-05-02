@@ -117,7 +117,7 @@ public:
     void updateRelBoundingRect();
     void applyCurrentTransformation();
 
-    bool relPointInsidePath(QPointF relPos);
+    bool relPointInsidePath(const QPointF &relPos);
 //    QPointF getRelCenterPosition();
     void updateEffectsMargin();
 

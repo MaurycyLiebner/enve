@@ -14,7 +14,7 @@ public:
     void drawSelected(QPainter *p,
                       const CanvasMode &);
     void updateRelBoundingRect();
-    bool relPointInsidePath(QPointF point);
+    bool relPointInsidePath(const QPointF &point);
 
     void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);

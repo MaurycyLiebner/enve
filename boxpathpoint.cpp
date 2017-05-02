@@ -3,7 +3,7 @@
 
 BoxPathPoint::BoxPathPoint(BoundingBox *box) :
     MovablePoint(box, TYPE_PATH_POINT, 7.) {
-
+    anim_setTraceKeyOnCurrentFrame(true);
 }
 
 void BoxPathPoint::startTransform() {
@@ -41,6 +41,18 @@ void BoxPathPoint::draw(QPainter *p) {
     }
     drawCosmeticEllipse(p, absPos,
                         mRadius, mRadius);
+
+    if(prp_isKeyOnCurrentFrame()) {
+        p->save();
+
+        p->setBrush(Qt::red);
+        QPen pen = QPen(Qt::black, 1.);
+        pen.setCosmetic(true);
+        p->setPen(pen);
+        drawCosmeticEllipse(p, absPos,
+                            mRadius*0.5, mRadius*0.5);
+        p->restore();
+    }
 
     p->translate(absPos);
     p->scale(1./p->transform().m11(), 1./p->transform().m22());
