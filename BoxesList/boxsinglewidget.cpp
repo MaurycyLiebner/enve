@@ -292,6 +292,7 @@ void BoxSingleWidget::loadStaticPixmaps() {
 #include <QMenu>
 #include "mainwindow.h"
 #include "clipboardcontainer.h"
+#include "durationrectangle.h"
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     SingleWidgetTarget *target = mTarget->getTarget();
     const SWT_Type &type = target->SWT_getType();
@@ -302,6 +303,10 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
            type == SWT_BoxesGroup ||
            type == SWT_Canvas) {
             menu.addAction("Rename");
+            QAction *durRectAct = menu.addAction("Visibility Range");
+            durRectAct->setCheckable(true);
+            durRectAct->setChecked(
+                        ((BoundingBox*)target)->hasDurationRectangle());
         } else if(type == SWT_QrealAnimator ||
                   type == SWT_ColorAnimator ||
                   type == SWT_ComplexAnimator ||
@@ -320,6 +325,13 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         {
             if(selected_action->text() == "Rename") {
                 rename();
+            } else if(selected_action->text() == "Visibility Range") {
+                BoundingBox *boxTarget = (BoundingBox*)target;
+                if(boxTarget->hasDurationRectangle()) {
+                    boxTarget->setDurationRectangle(NULL);
+                } else {
+                    boxTarget->createDurationRectangle();
+                }
             } else if(selected_action->text() == "Copy") {
                 AnimatorClipboardContainer *container =
                         new AnimatorClipboardContainer();

@@ -53,7 +53,9 @@ class DurationRectangle : public DurationRectangleMovable {
 public:
     DurationRectangle(Property *childProp);
 
-    int getFrameShift();
+    int getFrameShift() {
+        return getFramePos();
+    }
 
     void setFramesDuration(const int &duration);
 

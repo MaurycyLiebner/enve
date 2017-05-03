@@ -118,16 +118,6 @@ void KeysView::graphPaint(QPainter *p) {
 */
 }
 
-void KeysView::graphIncScale(const qreal &inc) {
-    qreal newScale = mValueScale + inc;
-    graphSetScale(clamp(newScale, 0.1, 10.));
-}
-
-void KeysView::graphSetScale(const qreal &scale) {
-    mValueScale = scale;
-    graphUpdateDimensions();
-}
-
 void KeysView::graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal) {
     qreal minValT;
     qreal maxValT;
@@ -164,9 +154,7 @@ void KeysView::graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal) {
 
 const QList<qreal> validIncs = {7.5, 5., 2.5, 1.};
 void KeysView::graphUpdateDimensions() {
-    graphGetAnimatorsMinMaxValue(&mMinVal, &mMaxVal);
 
-    mPixelsPerValUnit = mValueScale*height()/(mMaxVal - mMinVal);
     qreal incMulti = 10000.;
     int currIncId = 0;
     mValueInc = validIncs.first()*incMulti;
@@ -189,13 +177,11 @@ void KeysView::graphResizeEvent(QResizeEvent *)
 }
 
 void KeysView::graphIncMinShownVal(const qreal &inc) {
-    graphSetMinShownVal(inc*(mMaxVal - mMinVal) + mMinShownVal);
+    graphSetMinShownVal(10.*inc/mPixelsPerValUnit + mMinShownVal);
 }
 
 void KeysView::graphSetMinShownVal(const qreal &newMinShownVal) {
-    mMinShownVal = clamp(newMinShownVal,
-                         mMinVal,
-                         mMaxVal);
+    mMinShownVal = newMinShownVal;
 }
 
 void KeysView::graphGetValueAndFrameFromPos(const QPointF &pos,
@@ -537,12 +523,13 @@ void KeysView::graphWheelEvent(QWheelEvent *event) {
         }
         graphSetMinShownVal(mMinShownVal +
                             (valUnderMouse - mMinShownVal)*graphScaleInc);
-        graphIncScale(graphScaleInc);
+        mPixelsPerValUnit += graphScaleInc*mPixelsPerValUnit;
+        graphUpdateDimensions();
     } else {
         if(event->delta() > 0) {
-            graphIncMinShownVal(0.1);
+            graphIncMinShownVal(1.);
         } else {
-            graphIncMinShownVal(-0.1);
+            graphIncMinShownVal(-1.);
         }
     }
 
@@ -566,8 +553,10 @@ void KeysView::graphResetValueScaleAndMinShown() {
     qreal maxVal;
     graphGetAnimatorsMinMaxValue(&minVal, &maxVal);
     graphSetMinShownVal(minVal);
-    graphSetScale(1.);
+    mPixelsPerValUnit = height()/(maxVal - minVal);
+    graphUpdateDimensions();
 }
+
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 void KeysView::updateAnimatorsColors() {
     int i = 0;

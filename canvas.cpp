@@ -21,7 +21,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mSoundComposition = new SoundComposition(this);
     ca_addChildAnimator(mSoundComposition->getSoundsAnimatorContainer());
 
-    mFrameCount = frameCount;
+    mMaxFrame = frameCount;
 
     mEffectsPaintEnabled = true;
     mResolutionFraction = 1.;
@@ -136,7 +136,7 @@ bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
         if(isShiftPressed()) {
             ungroupSelected();
         } else {
-            BoxesGroup *newGroup = groupSelectedBoxes();
+            /*BoxesGroup *newGroup = */groupSelectedBoxes();
 //            if(newGroup != NULL) {
 //                setCurrentBoxesGroup(newGroup);
 //            }
@@ -181,7 +181,7 @@ int Canvas::prp_saveToSql(QSqlQuery *query, const int &parentId) {
                 arg(boundingBoxId).
                 arg(mWidth).
                 arg(mHeight).
-                arg(mFrameCount));
+                arg(mMaxFrame));
     return boundingBoxId;
 }
 
@@ -971,7 +971,7 @@ int Canvas::getCurrentFrame() {
 }
 
 int Canvas::getFrameCount() {
-    return mFrameCount;
+    return mMaxFrame + 1;
 }
 
 SoundComposition *Canvas::getSoundComposition() {

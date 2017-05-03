@@ -371,7 +371,7 @@ private:
 
     bool mLocalPivot = false;
     bool mIsCurrentCanvas = true;
-    int mFrameCount = 0;
+    int mMaxFrame = 0;
 
     bool mGlobalPivotVisible = true;
     bool mEffectsPaintEnabled;

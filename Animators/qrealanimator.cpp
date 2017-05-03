@@ -435,6 +435,8 @@ void QrealAnimator::qra_getMinAndMaxValuesBetweenFrames(
 
 void QrealAnimator::drawKeysPath(QPainter *p,
                                  const QColor &paintColor) {
+    p->save();
+
     QPen pen = QPen(Qt::black, 4.);
     pen.setCosmetic(true);
     p->setPen(pen);
@@ -444,11 +446,12 @@ void QrealAnimator::drawKeysPath(QPainter *p,
     p->setPen(pen);
     p->drawPath(mKeysPath);
 
-    p->setBrush(Qt::black);
     p->setPen(Qt::NoPen);
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
         ((QrealKey*)key.get())->drawGraphKey(p, paintColor);
     }
+
+    p->restore();
 }
 
 void QrealAnimator::getMinAndMaxMoveFrame(

@@ -455,6 +455,8 @@ public:
     void scheduleRenderCacheChange();
     void startPivotTransform();
     void finishPivotTransform();
+    bool hasDurationRectangle();
+    void createDurationRectangle();
 protected:
     void updateCurrentRenderContainerTransform();
     virtual void scheduleUpdate();

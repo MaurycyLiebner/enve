@@ -307,7 +307,8 @@ void SingleSound::prepareFinalData(const qreal &fps,
 
 int SingleSound::prp_getFrameShift() const {
     if(mOwnDurationRectangle) {
-        return mDurationRectangle->getFramePos() + Animator::prp_getFrameShift();
+        return mDurationRectangle->getFrameShift() +
+                Animator::prp_getFrameShift();
     }
     return Animator::prp_getFrameShift();
 }

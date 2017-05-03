@@ -168,7 +168,6 @@ private:
     QrealPoint *mCurrentPoint = NULL;
     qreal mMinVal = 0.;
     qreal mMaxVal = 0.;
-    qreal mValueScale = 1.;
     qreal mMinMoveFrame = 0.;
     qreal mMaxMoveFrame = 0.;
     QPointF mPressFrameAndValue = QPointF(0., 0.);

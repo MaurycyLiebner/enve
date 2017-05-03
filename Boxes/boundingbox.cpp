@@ -975,18 +975,38 @@ int BoundingBox::prp_getFrameShift() const {
     if(mDurationRectangle == NULL) {
         return prp_getParentFrameShift();
     } else {
-        return mDurationRectangle->getFramePos() + prp_getParentFrameShift();
+        return mDurationRectangle->getFrameShift() +
+                prp_getParentFrameShift();
     }
 }
 
+bool BoundingBox::hasDurationRectangle() {
+    return mDurationRectangle != NULL;
+}
+
+void BoundingBox::createDurationRectangle() {
+    DurationRectangle *durRect = new DurationRectangle(this);
+    durRect->setMinFrame(0);
+    durRect->setFramesDuration(getParentCanvas()->getFrameCount());
+    setDurationRectangle(durRect);
+}
+
 void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
+    if(durationRect == mDurationRectangle) return;
     if(mDurationRectangle != NULL) {
         disconnect(mDurationRectangle, SIGNAL(posChanged(int)),
                    this, SLOT(updateAfterDurationRectangleShifted()));
         disconnect(mDurationRectangle, SIGNAL(rangeChanged()),
                    this, SLOT(updateAfterDurationRectangleRangeChanged()));
     }
+    if(durationRect == NULL) {
+        int shift = mDurationRectangle->getFrameShift();
+        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+            key->setRelFrame(key->getRelFrame() + shift);
+        }
+    }
     mDurationRectangle = durationRect;
+    updateAfterDurationRectangleShifted();
     if(mDurationRectangle == NULL) return;
     connect(mDurationRectangle, SIGNAL(posChanged(int)),
             this, SLOT(updateAfterDurationRectangleShifted()));
