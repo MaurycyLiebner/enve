@@ -76,7 +76,6 @@ public:
     void updateAfterFrameChanged(const int &currentFrame);
 
     void renderCurrentFrameToQImage(QImage *frame);
-    void renderFinalCurrentFrameToQImage(QImage *frame);
 
     QSize getCanvasSize();
 
@@ -174,12 +173,14 @@ public:
     void setEffectsPaintEnabled(const bool &bT);
     bool effectsPaintEnabled();
 
-    qreal getResolutionPercent();
-    void setResolutionPercent(const qreal &percent);
+    qreal getResolutionFraction();
+    void setResolutionFraction(const qreal &percent);
 
-    void updateRenderRect();
+    void updateRenderRectForPreview();
+    void updateRenderRectForOutput();
+
     QMatrix getCombinedFinalRenderTransform();
-    void renderCurrentFrameToOutput(QString renderDest);
+    void renderCurrentFrameToOutput(const QString &renderDest);
     void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
     void showContextMenu(QPoint globalPos);
 
@@ -347,6 +348,7 @@ public:
         return mLocalPivot;
     }
 
+    void clearCurrentPreviewImage();
 private:
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();
@@ -373,7 +375,7 @@ private:
 
     bool mGlobalPivotVisible = true;
     bool mEffectsPaintEnabled;
-    qreal mResolutionPercent;
+    qreal mResolutionFraction;
 
     CanvasWidget *mCanvasWidget;
 

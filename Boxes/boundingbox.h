@@ -110,7 +110,6 @@ public:
     virtual bool isContainedIn(QRectF absRect);
 
     virtual void drawPixmap(QPainter *p);
-    virtual void drawPreviewPixmap(QPainter *p);
     virtual void renderFinal(QPainter *p);
 
     virtual void draw(QPainter *) {}

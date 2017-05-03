@@ -53,7 +53,7 @@ public:
     void pickPathForSettings();
     void updateDisplayedFillStrokeSettings();
 
-    void setResolutionPercent(const qreal &percent);
+    void setResolutionFraction(const qreal &percent);
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
 
@@ -93,6 +93,7 @@ protected:
     QThread *mPaintControlerThread;
     PaintControler *mPaintControler;
 
+    qreal mSavedResolutionFraction = 100.;
     int mSavedCurrentFrame = 0;
     bool mRendering = false;
     bool mNoBoxesAwaitUpdate = true;
@@ -187,7 +188,8 @@ private slots:
     void sendNextBoxForUpdate();
     void nextSaveOutputFrame();
     void nextPlayPreviewFrame();
-    void saveOutput(QString renderDest);
+    void saveOutput(const QString &renderDest,
+                    const qreal &resolutionFraction);
 
     void pushTimerExpired();
 };

@@ -492,9 +492,9 @@ void CanvasWidget::setEffectsPaintEnabled(const bool &bT) {
     callUpdateSchedulers();
 }
 
-void CanvasWidget::setResolutionPercent(const qreal &percent) {
+void CanvasWidget::setResolutionFraction(const qreal &percent) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->setResolutionPercent(percent);
+    mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->clearAllCache();
     mCurrentCanvas->updateAllBoxes();
     callUpdateSchedulers();
@@ -516,15 +516,18 @@ BoxesGroup *CanvasWidget::getCurrentGroup() {
 }
 
 void CanvasWidget::renderOutput() {
-    RenderOutputWidget *dialog = new RenderOutputWidget(this);
-    connect(dialog, SIGNAL(render(QString)),
-            this, SLOT(saveOutput(QString)));
+    QSize size = mCurrentCanvas->getCanvasSize();
+    RenderOutputWidget *dialog = new RenderOutputWidget(size.width(),
+                                                        size.height(),
+                                                        this);
+    connect(dialog, SIGNAL(render(QString, qreal)),
+            this, SLOT(saveOutput(QString, qreal)));
     dialog->exec();
 }
 
 void CanvasWidget::playPreview() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->updateRenderRect();
+    mCurrentCanvas->updateRenderRectForPreview();
     mBoxesUpdateFinishedFunction = &CanvasWidget::nextPlayPreviewFrame;
     mSavedCurrentFrame = getCurrentFrame();
 
@@ -615,6 +618,12 @@ void CanvasWidget::nextSaveOutputFrame() {
     if(mCurrentRenderFrame >= getFrameCount()) {
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
+        mCurrentCanvas->setPreviewing(false);
+        mCurrentCanvas->clearCurrentPreviewImage();
+        if(qAbs(mSavedResolutionFraction -
+                mCurrentCanvas->getResolutionFraction()) > 0.1) {
+            mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
+        }
     } else {
         mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
@@ -659,13 +668,21 @@ void CanvasWidget::saveCanvasesFromSql(QSqlQuery *query) {
     }
 }
 
-void CanvasWidget::saveOutput(QString renderDest) {
+void CanvasWidget::saveOutput(const QString &renderDest,
+                              const qreal &resolutionFraction) {
     mOutputString = renderDest;
     mBoxesUpdateFinishedFunction = &CanvasWidget::nextSaveOutputFrame;
     mSavedCurrentFrame = getCurrentFrame();
+    mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
+    if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.001) {
+        mCurrentCanvas->setResolutionFraction(resolutionFraction);
+    }
+    mCurrentCanvas->updateRenderRectForOutput();
 
-    mCurrentRenderFrame = 0;
-    emit changeCurrentFrame(0);
+    mCurrentRenderFrame = mSavedCurrentFrame;
+    mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
+    mCurrentCanvas->setPreviewing(true);
+    mCurrentCanvas->updateAllBoxes();
     if(mNoBoxesAwaitUpdate) {
         nextSaveOutputFrame();
     }

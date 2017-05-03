@@ -390,7 +390,7 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
 //    if(parentCanvas->effectsPaintEnabled()) {
 //        allUglyPixmap = applyEffects(allUglyPixmap,
 //                                     false,
-//                                     parentCanvas->getResolutionPercent());
+//                                     parentCanvas->getResolutionFraction());
 //    }
 
     *allUglyBoundingRectP = allUglyBoundingRect;
@@ -403,19 +403,9 @@ void BoundingBox::updateAllUglyPixmap() {
     mUpdateRenderContainer->updateVariables(
                 mUpdateTransform,
                 mEffectsMargin,
-                parentCanvas->getResolutionPercent(),
+                parentCanvas->getResolutionFraction(),
                 this);
     mUpdateRenderContainer->setRelFrame(mUpdateRelFrame);
-}
-
-void BoundingBox::drawPreviewPixmap(QPainter *p) {
-    drawPixmap(p);
-//    p->save();
-
-//    p->setOpacity(mTransformAnimator->getOpacity()*0.01);
-
-//    p->drawImage(mPreviewDrawPos, mRenderPixmap);
-//    p->restore();
 }
 
 void BoundingBox::renderFinal(QPainter *p) {

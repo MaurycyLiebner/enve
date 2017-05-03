@@ -114,7 +114,7 @@ public:
 //    void nextSaveOutputFrame();
 //    void nextPlayPreviewFrame();
 
-    void setResolutionPercent(qreal percent);
+    void setResolutionFraction(qreal percent);
 
     void setCurrentFrameForAllWidgets(int frame);
     void updateSettingsForCurrentCanvas();
@@ -131,7 +131,7 @@ public slots:
     void setAllPointsRecord(bool allPointsRecord);
     //void playPreview();
    // void stopPreview();
-    void setResolutionPercentId(int id);
+    void setResolutionFractionValue(const qreal &value);
     void createNewCanvas();
 
     void callUpdateSchedulers();

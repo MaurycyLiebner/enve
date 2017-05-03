@@ -128,10 +128,14 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mResolutionComboBox->addItem("75 %");
     mResolutionComboBox->addItem("50 %");
     mResolutionComboBox->addItem("25 %");
+    mResolutionComboBox->setEditable(true);
+    mResolutionComboBox->lineEdit()->setInputMask("D00 %");
+    mResolutionComboBox->setCurrentText("100 %");
+    mResolutionComboBox->setInsertPolicy(QComboBox::NoInsert);
     mResolutionComboBox->setSizePolicy(QSizePolicy::Maximum,
                                        QSizePolicy::Maximum);
-    connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
-            mMainWindow, SLOT(setResolutionPercentId(int)));
+    connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(setResolutionFractionText(QString)));
 
     mPlayButton = new ActionButton(
                 ":/icons/play.png",
@@ -172,7 +176,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 //    mControlButtonsLayout->addWidget(mGoToNextKeyButton);
 //    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
     mControlButtonsLayout->addWidget(mResolutionComboBox);
-    mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
+    //mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
 
     mControlButtonsLayout->addWidget(mPlayButton);
     mPlayButton->setFocusPolicy(Qt::NoFocus);
@@ -206,6 +210,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     addNewBoxesListKeysViewWidget(0);
     //addNewBoxesListKeysViewWidget(1);
     //addNewBoxesListKeysViewWidget(0);
+}
+
+void BoxesListAnimationDockWidget::setResolutionFractionText(QString text) {
+    text = text.remove(" %");
+    mMainWindow->setResolutionFractionValue(text.toDouble()/100.);
 }
 
 void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
@@ -329,12 +338,12 @@ void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                                         Canvas *canvas) {
-    disconnect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
-               mMainWindow, SLOT(setResolutionPercentId(int)));
-    mResolutionComboBox->setCurrentIndex(
-                        qRound((1. - canvas->getResolutionPercent())*4.));
-    connect(mResolutionComboBox, SIGNAL(currentIndexChanged(int)),
-            mMainWindow, SLOT(setResolutionPercentId(int)));
+    disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
+               this, SLOT(setResolutionFractionText(QString)));
+    mResolutionComboBox->setCurrentText(
+                QString::number(canvas->getResolutionFraction()*100.) + " %");
+    connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(setResolutionFractionText(QString)));
 }
 
 void BoxesListAnimationDockWidget::setMinMaxFrame(

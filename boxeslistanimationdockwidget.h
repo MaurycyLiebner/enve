@@ -69,6 +69,7 @@ public slots:
 signals:
     void visibleRangeChanged(int, int);
 private slots:
+    void setResolutionFractionText(QString text);
 
     void setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible);
 

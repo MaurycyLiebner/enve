@@ -653,13 +653,11 @@ void MainWindow::previewFinished() {
 //    }
 //}
 
-void MainWindow::setResolutionPercentId(int id)
-{
-    mCanvasWidget->setResolutionPercent(1. - id*0.25);
+void MainWindow::setResolutionFractionValue(const qreal &value) {
+    mCanvasWidget->setResolutionFraction(value);
 }
 
-UndoRedoStack *MainWindow::getUndoRedoStack()
-{
+UndoRedoStack *MainWindow::getUndoRedoStack() {
     return mCurrentUndoRedoStack;
 }
 

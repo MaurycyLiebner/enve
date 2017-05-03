@@ -49,8 +49,8 @@ const QRectF &BoundingBoxRenderContainer::getBoundingRect() const {
     return mBoundingRect;
 }
 
-const qreal &BoundingBoxRenderContainer::getResolutionPercent() const {
-    return mResolutionPercent;
+const qreal &BoundingBoxRenderContainer::getResolutionFraction() const {
+    return mResolutionFraction;
 }
 
 const int &BoundingBoxRenderContainer::getFrame() const {
@@ -75,7 +75,7 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransfor
     mTransform = combinedTransform;
     mTransform.scale(resolutionPer, resolutionPer);
 
-    mResolutionPercent = resolutionPer;
+    mResolutionFraction = resolutionPer;
     mImage = target->getAllUglyPixmapProvidedTransform(
                 resolutionPer*effectsMargin,
                 mTransform,
@@ -103,7 +103,7 @@ void CacheBoundingBoxRenderContainer::duplicateFrom(
                  src->getBoundingRect(),
                  src->getImage(),
                  src->getFrame(),
-                 src->getResolutionPercent(),
+                 src->getResolutionFraction(),
                  src->getRenderTime());
 }
 
@@ -119,7 +119,7 @@ void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
     mImage = img;
     mBoundingRect = rect;
     mFrame = frame;
-    mResolutionPercent = res;
+    mResolutionFraction = res;
     mRenderTime = time;
     thisAccessed();
 }

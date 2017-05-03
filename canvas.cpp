@@ -24,7 +24,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mFrameCount = frameCount;
 
     mEffectsPaintEnabled = true;
-    mResolutionPercent = 1.;
+    mResolutionFraction = 1.;
 
     mWidth = canvasWidth;
     mHeight = canvasHeight;
@@ -101,12 +101,12 @@ bool Canvas::effectsPaintEnabled() {
     return mEffectsPaintEnabled;
 }
 
-qreal Canvas::getResolutionPercent() {
-    return Canvas::mResolutionPercent;
+qreal Canvas::getResolutionFraction() {
+    return mResolutionFraction;
 }
 
-void Canvas::setResolutionPercent(const qreal &percent) {
-    mResolutionPercent = percent;
+void Canvas::setResolutionFraction(const qreal &percent) {
+    mResolutionFraction = percent;
 }
 
 QRectF Canvas::getPixBoundingRect() {
@@ -245,7 +245,7 @@ void Canvas::paintEvent(QPainter *p) {
         p->drawPath(path.subtracted(viewRectPath));
 
         p->save();
-        qreal reversedRes = 1./mResolutionPercent;
+        qreal reversedRes = 1./mResolutionFraction;
         p->translate(getRenderRect().topLeft());
         p->scale(reversedRes, reversedRes);
         if(mCurrentPreviewImg != NULL) {
@@ -365,24 +365,35 @@ void Canvas::nextPreviewFrame() {
 QRectF Canvas::getRenderRect() {
     return mRenderRect;
     QRectF rectT = mRenderRect;
-    rectT.setSize(mRenderRect.size()*mResolutionPercent);
-    rectT.moveTo(rectT.topLeft()*mResolutionPercent);
+    rectT.setSize(mRenderRect.size()*mResolutionFraction);
+    rectT.moveTo(rectT.topLeft()*mResolutionFraction);
     return rectT;
 }
 
-void Canvas::updateRenderRect() {
+void Canvas::updateRenderRectForPreview() {
     mCanvasRect = QRectF(qMax(mCanvasTransformMatrix.dx(),
                               mCanvasTransformMatrix.dx()*
-                              mResolutionPercent),
+                              mResolutionFraction),
                          qMax(mCanvasTransformMatrix.dy(),
                               mCanvasTransformMatrix.dy()*
-                              mResolutionPercent),
-                         mVisibleWidth*mResolutionPercent,
-                         mVisibleHeight*mResolutionPercent);
+                              mResolutionFraction),
+                         mVisibleWidth*mResolutionFraction,
+                         mVisibleHeight*mResolutionFraction);
     QRectF canvasWidgetRect = QRectF(0., 0.,
                                      (qreal)mCanvasWidget->width(),
                                      (qreal)mCanvasWidget->height());
     mRenderRect = canvasWidgetRect.intersected(mCanvasRect);
+}
+
+void Canvas::updateRenderRectForOutput() {
+    mRenderRect = QRectF(qMax(mCanvasTransformMatrix.dx(),
+                              mCanvasTransformMatrix.dx()*
+                              mResolutionFraction),
+                         qMax(mCanvasTransformMatrix.dy(),
+                              mCanvasTransformMatrix.dy()*
+                              mResolutionFraction),
+                         mWidth*mResolutionFraction,
+                         mHeight*mResolutionFraction);
 }
 
 void Canvas::renderCurrentFrameToPreview() {
@@ -394,20 +405,28 @@ void Canvas::renderCurrentFrameToPreview() {
     mCurrentPreviewImg = image;
 }
 
-void Canvas::renderCurrentFrameToOutput(QString renderDest) {
-    QImage *image = new QImage(mWidth, mHeight,
+void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
+    QImage *image = new QImage(mRenderRect.size().toSize(),
                                QImage::Format_ARGB32_Premultiplied);
-    image->fill(Qt::transparent);
-    renderFinalCurrentFrameToQImage(image);
+    image->fill(mBackgroundColor->getCurrentColor().qcol);
+    renderCurrentFrameToQImage(image);
     image->save(renderDest + QString::number(anim_mCurrentAbsFrame) + ".png");
-    delete image;
+    clearCurrentPreviewImage();
+    mCurrentPreviewImg = image;
+}
+
+void Canvas::clearCurrentPreviewImage() {
+    if(mCurrentPreviewImg != NULL) {
+        delete mCurrentPreviewImg;
+        mCurrentPreviewImg = NULL;
+    }
 }
 
 void Canvas::drawPreviewPixmap(QPainter *p) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
-            box->drawPreviewPixmap(p);
+            box->drawPixmap(p);
         }
 
         p->restore();
@@ -443,32 +462,16 @@ void Canvas::createLinkToFileWithPath(const QString &path) {
     extLinkBox->setSrc(path);
 }
 
-void Canvas::renderCurrentFrameToQImage(QImage *frame)
-{
+void Canvas::renderCurrentFrameToQImage(QImage *frame) {
     QPainter p(frame);
     p.setRenderHint(QPainter::Antialiasing);
     p.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    //p.scale(mResolutionPercent, mResolutionPercent);
-    //p.translate(getAbsolutePos() - mRenderRect.topLeft());
-
-    p.translate(-mRenderRect.topLeft()*mResolutionPercent);
-    //p.translate(-mCanvasRect.topLeft());
-    p.scale(mResolutionPercent, mResolutionPercent);
+    p.translate(-mRenderRect.topLeft()*mResolutionFraction);
+    p.scale(mResolutionFraction, mResolutionFraction);
     p.setTransform(QTransform(mCanvasTransformMatrix), true);
 
-    Canvas::drawPreviewPixmap(&p);
-
-    p.end();
-}
-
-void Canvas::renderFinalCurrentFrameToQImage(QImage *frame)
-{
-    QPainter p(frame);
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setRenderHint(QPainter::SmoothPixmapTransform);
-
-    Canvas::renderFinal(&p);
+    drawPreviewPixmap(&p);
 
     p.end();
 }

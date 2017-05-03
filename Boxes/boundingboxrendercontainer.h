@@ -28,7 +28,7 @@ public:
 
     const QRectF &getBoundingRect() const;
 
-    const qreal &getResolutionPercent() const;
+    const qreal &getResolutionFraction() const;
 
     const int &getFrame() const;
 
@@ -50,7 +50,7 @@ public:
 protected:
     qint64 mRenderTime = 0;
     int mFrame = 0;
-    qreal mResolutionPercent;
+    qreal mResolutionFraction;
     QMatrix mTransform;
     QMatrix mPaintTransform;
     QRectF mBoundingRect;
