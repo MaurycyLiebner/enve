@@ -291,13 +291,16 @@ void QrealKey::setValue(qreal value, const bool &saveUndoRedo) {
     mParentAnimator->anim_updateAfterChangedKey(this);
 }
 
-void QrealKey::incFrameAndUpdateParentAnimator(const int &inc) {
-    setFrameAndUpdateParentAnimator(mRelFrame + inc);
+void QrealKey::finishValueTransform() {
+    if(mParentAnimator != NULL) {
+        mParentAnimator->addUndoRedo(
+                    new ChangeQrealKeyValueUndoRedo(mSavedValue,
+                                                    mValue, this) );
+    }
 }
 
-void QrealKey::setFrameAndUpdateParentAnimator(const int &relFrame) {
-    if(mParentAnimator == NULL) return;
-    mParentAnimator->anim_moveKeyToFrame(this, relFrame);
+void QrealKey::startValueTransform() {
+    mSavedValue = mValue;
 }
 
 void QrealKey::setStartValueVar(const qreal &value) {
@@ -432,7 +435,7 @@ void QrealKey::changeFrameAndValueBy(const QPointF &frameValueChange) {
     setValue(frameValueChange.y() + mSavedValue);
     int newFrame = qRound(frameValueChange.x() + mSavedRelFrame);
     if(mParentAnimator != NULL) {
-        mParentAnimator->anim_moveKeyToFrame(this, newFrame);
+        mParentAnimator->anim_moveKeyToRelFrame(this, newFrame, false);
     } else {
         setRelFrame(newFrame);
     }

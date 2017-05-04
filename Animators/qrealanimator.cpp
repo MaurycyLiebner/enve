@@ -325,8 +325,10 @@ void QrealAnimator::anim_removeKey(Key *keyToRemove,
     qra_updateValueFromCurrentFrame();
 }
 
-void QrealAnimator::anim_moveKeyToFrame(Key *key, const int &newFrame) {
-    Animator::anim_moveKeyToFrame(key, newFrame);
+void QrealAnimator::anim_moveKeyToRelFrame(Key *key,
+                                           const int &newFrame,
+                                           const bool &finish) {
+    Animator::anim_moveKeyToRelFrame(key, newFrame, finish);
 
     qra_updateKeysPath();
     qra_updateValueFromCurrentFrame();

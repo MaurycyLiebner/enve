@@ -1,7 +1,9 @@
 #include "qrealpoint.h"
 #include "qrealkey.h"
 
-QrealPoint::QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius) {
+QrealPoint::QrealPoint(QrealPointType type,
+                       QrealKey *parentKey,
+                       const qreal &radius) {
     mRadius = radius;
     mType = type;
     mParentKey = parentKey;
@@ -13,12 +15,21 @@ qreal QrealPoint::getFrame() {
     if(mType == END_POINT) return mParentKey->getEndValueFrame();
 }
 
-void QrealPoint::setFrame(qreal frame)
-{
-    if(mType == KEY_POINT) return mParentKey->setFrameAndUpdateParentAnimator(
-                                                                qRound(frame));
+void QrealPoint::setFrame(const qreal &frame) {
+    if(mType == KEY_POINT) {
+        return mParentKey->setFrameAndUpdateParentAnimator(qRound(frame),
+                                                           false);
+    }
     if(mType == START_POINT) return mParentKey->setStartFrame(frame);
     if(mType == END_POINT) return mParentKey->setEndFrame(frame);
+}
+
+void QrealPoint::startFrameTransform() {
+    if(mType == KEY_POINT) return mParentKey->startFrameTransform();
+}
+
+void QrealPoint::finishFrameTransform() {
+    if(mType == KEY_POINT) return mParentKey->finishFrameTransform();
 }
 
 qreal QrealPoint::getValue() {
@@ -27,9 +38,8 @@ qreal QrealPoint::getValue() {
     if(mType == END_POINT) return mParentKey->getEndValue();
 }
 
-void QrealPoint::setValue(qreal value, bool finish)
-{
-    if(mType == KEY_POINT) return mParentKey->setValue(value, finish);
+void QrealPoint::setValue(const qreal &value) {
+    if(mType == KEY_POINT) return mParentKey->setValue(value, false);
     if(mType == START_POINT) return mParentKey->setStartValue(value);
     if(mType == END_POINT) return mParentKey->setEndValue(value);
 }
@@ -50,7 +60,7 @@ bool QrealPoint::isNear(const qreal &frameT,
     return true;
 }
 
-void QrealPoint::moveTo(qreal frameT, qreal valueT) {
+void QrealPoint::moveTo(const qreal &frameT, const qreal &valueT) {
     setFrame(frameT);
     setValue(valueT);
     if(isKeyPoint() ) return;
@@ -77,7 +87,7 @@ void QrealPoint::draw(QPainter *p, const QColor &paintColor) {
     }
 }
 
-void QrealPoint::setSelected(bool bT) {
+void QrealPoint::setSelected(const bool &bT) {
     if(mType == KEY_POINT) {
         mParentKey->setSelected(bT);
     } else {

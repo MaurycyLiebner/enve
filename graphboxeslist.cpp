@@ -269,6 +269,11 @@ void KeysView::graphMouseRelease()
                     graphClearKeysSelection();
                     graphAddKeyToSelection(mCurrentPoint->getParentKey());
                 }
+            } else {
+                QrealKey *key; foreachQK(key, mSelectedKeys)
+                    key->finishFrameTransform();
+                    key->finishValueTransform();
+                }
             }
             graphMergeKeysIfNeeded();
         } else {

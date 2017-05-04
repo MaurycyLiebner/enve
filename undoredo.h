@@ -702,13 +702,15 @@ public:
     }
 
     void redo() {
-        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey.get(),
-                                                             mNewFrame);
+        mTargetKey->getParentAnimator()->anim_moveKeyToRelFrame(mTargetKey.get(),
+                                                                mNewFrame,
+                                                                false);
     }
 
     void undo() {
-        mTargetKey->getParentAnimator()->anim_moveKeyToFrame(mTargetKey.get(),
-                                                             mOldFrame);
+        mTargetKey->getParentAnimator()->anim_moveKeyToRelFrame(mTargetKey.get(),
+                                                                mOldFrame,
+                                                                false);
     }
 
 private:

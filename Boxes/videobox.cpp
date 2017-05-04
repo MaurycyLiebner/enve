@@ -146,7 +146,7 @@ int VideoBox::getImageAtFrame(const char* path,
 //                   QImage::Format_RGBA8888);
 //    }
     mUpdateAnimationImage = QImage(videoCodec->width, videoCodec->height,
-                        QImage::Format_RGBA8888);
+                                    QImage::Format_RGBA8888);
 
     /* 2. Convert and write into image buffer  */
     uint8_t *dst[] = {mUpdateAnimationImage.bits()};

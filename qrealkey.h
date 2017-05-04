@@ -69,9 +69,6 @@ public:
     qreal getPrevKeyValue();
     qreal getNextKeyValue();
 
-    void incFrameAndUpdateParentAnimator(const int &inc);
-    void setFrameAndUpdateParentAnimator(const int &relFrame);
-
     void incValue(qreal incBy);
 
     CtrlsMode getCtrlsMode();
@@ -91,6 +88,9 @@ public:
     void setStartFrame(const qreal &startFrame);
     void setStartValue(const qreal &value);
     void setEndValue(const qreal &value);
+
+    void startValueTransform();
+    void finishValueTransform();
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 

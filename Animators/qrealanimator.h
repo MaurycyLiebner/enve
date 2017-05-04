@@ -104,7 +104,9 @@ public:
                         const bool &saveUndoRedo = true);
     void anim_removeKey(Key *keyToRemove,
                         const bool &saveUndoRedo = true);
-    void anim_moveKeyToFrame(Key *key, const int &newFrame);
+    void anim_moveKeyToRelFrame(Key *key,
+                                const int &newFrame,
+                                const bool &finish);
 
     qreal getPrefferedValueStep();
     virtual void setPrefferedValueStep(const qreal &valueStep);

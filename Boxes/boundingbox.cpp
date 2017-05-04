@@ -1002,7 +1002,7 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     if(durationRect == NULL) {
         int shift = mDurationRectangle->getFrameShift();
         foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-            key->setRelFrame(key->getRelFrame() + shift);
+            anim_moveKeyToRelFrame(key.get(), key->getRelFrame() + shift);
         }
     }
     mDurationRectangle = durationRect;

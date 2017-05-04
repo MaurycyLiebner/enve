@@ -211,8 +211,9 @@ void Animator::anim_removeKey(Key *keyToRemove,
     anim_updateKeyOnCurrrentFrame();
 }
 
-void Animator::anim_moveKeyToFrame(Key *key,
-                                   const int &newFrame) {
+void Animator::anim_moveKeyToRelFrame(Key *key,
+                                      const int &newFrame,
+                                      const bool &finish) {
     anim_updateAfterChangedKey(key);
     emit prp_removingKey(key);
     key->setRelFrame(newFrame);

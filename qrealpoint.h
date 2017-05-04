@@ -14,16 +14,18 @@ enum QrealPointType : short {
 class QrealPoint : public StdSelfRef
 {
 public:
-    QrealPoint(QrealPointType type, QrealKey *parentKey, qreal radius = 10.);
+    QrealPoint(QrealPointType type,
+               QrealKey *parentKey,
+               const qreal &radius = 10.);
     ~QrealPoint() {}
 
     qreal getFrame();
 
-    void setFrame(qreal frame);
+    void setFrame(const qreal &frame);
 
     virtual qreal getValue();
 
-    virtual void setValue(qreal value, bool finish = false);
+    virtual void setValue(const qreal &value);
 
     bool isSelected();
 
@@ -32,11 +34,11 @@ public:
                 const qreal &pixelsPerFrame,
                 const qreal &pixelsPerValue);
 
-    void moveTo(qreal frameT, qreal valueT);
+    void moveTo(const qreal &frameT, const qreal &valueT);
 
     void draw(QPainter *p, const QColor &paintColor);
 
-    void setSelected(bool bT);
+    void setSelected(const bool &bT);
 
     bool isKeyPoint();
     bool isStartPoint();
@@ -45,6 +47,8 @@ public:
     bool isEnabled();
 
     QrealKey *getParentKey();
+    void startFrameTransform();
+    void finishFrameTransform();
 private:
     bool mIsSelected = false;
     QrealPointType mType;

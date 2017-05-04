@@ -28,11 +28,12 @@ public:
     int getAbsFrame();
     virtual void setRelFrame(const int &frame);
 
-    void changeFrameAndValueBy(QPointF frameValueChange);
-
     bool hasPrevKey();
     bool hasNextKey();
-    void incFrameAndUpdateParentAnimator(int inc);
+    void incFrameAndUpdateParentAnimator(const int &inc,
+                                         const bool &finish = true);
+    void setFrameAndUpdateParentAnimator(const int &relFrame,
+                                         const bool &finish = true);
 
     Animator *getParentAnimator();
 
@@ -51,7 +52,7 @@ public:
     virtual void cancelFrameTransform();
     virtual void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
                                                    const qreal &scaleFactor);
-    virtual void setSelected(bool bT);
+    void setSelected(const bool &bT);
     bool isSelected();
 
     virtual bool areAllChildrenSelected() {

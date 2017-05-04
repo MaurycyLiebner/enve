@@ -100,9 +100,15 @@ bool Key::hasNextKey() {
     return mParentAnimator->anim_hasNextKey(this);
 }
 
-void Key::incFrameAndUpdateParentAnimator(int inc) {
+void Key::incFrameAndUpdateParentAnimator(const int &inc,
+                                          const bool &finish) {
+    setFrameAndUpdateParentAnimator(mRelFrame + inc, finish);
+}
+
+void Key::setFrameAndUpdateParentAnimator(const int &relFrame,
+                                          const bool &finish) {
     if(mParentAnimator == NULL) return;
-    mParentAnimator->anim_moveKeyToFrame(this, mRelFrame + inc);
+    mParentAnimator->anim_moveKeyToRelFrame(this, relFrame, finish);
 }
 
 void Key::addToSelection(QList<Key *> *selectedKeys) {
@@ -127,7 +133,9 @@ void Key::startFrameTransform() {
 }
 
 void Key::cancelFrameTransform() {
-    mParentAnimator->anim_moveKeyToFrame(this, mSavedRelFrame);
+    mParentAnimator->anim_moveKeyToRelFrame(this,
+                                            mSavedRelFrame,
+                                            false);
 }
 
 void Key::scaleFrameAndUpdateParentAnimator(
@@ -143,12 +151,11 @@ void Key::scaleFrameAndUpdateParentAnimator(
     incFrameAndUpdateParentAnimator(newFrame - mRelFrame);
 }
 
-void Key::setSelected(bool bT) {
+void Key::setSelected(const bool &bT) {
     mIsSelected = bT;
 }
 #include "undoredo.h"
-void Key::finishFrameTransform()
-{
+void Key::finishFrameTransform() {
     if(mParentAnimator == NULL) return;
     mParentAnimator->addUndoRedo(
                 new ChangeKeyFrameUndoRedo(mSavedRelFrame,
