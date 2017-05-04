@@ -171,8 +171,7 @@ void KeysView::graphUpdateDimensions() {
     updatePixelsPerFrame();
 }
 
-void KeysView::graphResizeEvent(QResizeEvent *)
-{
+void KeysView::graphResizeEvent(QResizeEvent *) {
     graphUpdateDimensions();
 }
 
@@ -551,6 +550,11 @@ bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event)
         return false;
     }
     return true;
+}
+
+void KeysView::graphResetValueScaleAndMinShownAction() {
+    graphResetValueScaleAndMinShown();
+    mMainWindow->callUpdateSchedulers();
 }
 
 void KeysView::graphResetValueScaleAndMinShown() {

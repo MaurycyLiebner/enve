@@ -545,6 +545,11 @@ void QrealAnimator::qra_incCurrentValue(const qreal &incBy) {
 
 void QrealAnimator::prp_startTransform() {
     if(mTransformed) return;
+    if(anim_mIsRecording) {
+        if(!anim_mKeyOnCurrentFrame) {
+            anim_saveCurrentValueAsKey();
+        }
+    }
     mSavedCurrentValue = mCurrentValue;
     mTransformed = true;
 }

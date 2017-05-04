@@ -56,8 +56,8 @@ struct ParticleState {
 class Particle {
 public:
     Particle(ParticleBox *parentBox);
-    void initializeParticle(int firstFrame,
-                            int nFrames,
+    void initializeParticle(const int &firstFrame,
+                            const int &nFrames,
                             const QPointF &iniPos,
                             const QPointF &iniVel,
                             const qreal &partSize);

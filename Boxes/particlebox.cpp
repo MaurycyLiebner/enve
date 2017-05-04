@@ -202,7 +202,8 @@ Particle::Particle(ParticleBox *parentBox) {
     mParentBox = parentBox;
 }
 
-void Particle::initializeParticle(int firstFrame, int nFrames,
+void Particle::initializeParticle(const int &firstFrame,
+                                  const int &nFrames,
                                   const QPointF &iniPos,
                                   const QPointF &iniVel,
                                   const qreal &partSize) {

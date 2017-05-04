@@ -8,7 +8,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
-    setStyleSheet("AnimationDockWidget { background-color: rgb(75, 75, 75) }"
+    setStyleSheet("AnimationDockWidget { background-color: rgb(55, 55, 55) }"
                   "QPushButton {"
                                  "qproperty-iconSize: 20px;"
                                  "border: 1px solid black;"
@@ -42,6 +42,14 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
 //                                 QSizePolicy::Maximum);
     connect(mCornerButton, SIGNAL(pressed()),
             keysView, SLOT(graphSetCornerCtrl()) );
+
+    mFitToHeightButton = new ActionButton(
+                ":/icons/zoom.png",
+                "", this);
+//    mCornerButton->setSizePolicy(QSizePolicy::Maximum,
+//                                 QSizePolicy::Maximum);
+    connect(mFitToHeightButton, SIGNAL(pressed()),
+            keysView, SLOT(graphResetValueScaleAndMinShownAction()) );
 
 //    mTwoSideCtrlButton = new ActionButton(
 //                ":/icons/two_side_ctrl_white.png",
@@ -78,6 +86,7 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
     mButtonsLayout->addWidget(mSymmetricButton);
     mButtonsLayout->addWidget(mSmoothButton);
     mButtonsLayout->addWidget(mCornerButton);
+    mButtonsLayout->addWidget(mFitToHeightButton);
 //    mButtonsLayout->addWidget(mTwoSideCtrlButton);
 //    mButtonsLayout->addWidget(mLeftSideCtrlButton);
 //    mButtonsLayout->addWidget(mRightSideCtrlButton);

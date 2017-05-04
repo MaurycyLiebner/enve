@@ -181,7 +181,7 @@ static void audio_encode_example(const char *filename) {
     int i, j, k, ret, got_output;
     int buffer_size;
     FILE *f;
-    uint16_t *samples;
+    float *samples;
     float t, tincr;
     printf("Encode audio file %s\n", filename);
     /* find the MP2 encoder */
@@ -197,8 +197,8 @@ static void audio_encode_example(const char *filename) {
     }
     /* put sample parameters */
     c->bit_rate = 64000;
-    /* check that the encoder supports s16 pcm input */
-    c->sample_fmt = AV_SAMPLE_FMT_S16;
+    /* check that the encoder supports flt pcm input */
+    c->sample_fmt = AV_SAMPLE_FMT_FLT;
     if (!check_sample_fmt(codec, c->sample_fmt)) {
         fprintf(stderr, "Encoder does not support sample format %s",
                 av_get_sample_fmt_name(c->sample_fmt));
@@ -235,7 +235,7 @@ static void audio_encode_example(const char *filename) {
         fprintf(stderr, "Could not get sample buffer size\n");
         exit(1);
     }
-    samples = (uint16_t*)av_malloc(buffer_size);
+    samples = (float*)av_malloc(buffer_size);
     if (!samples) {
         fprintf(stderr, "Could not allocate %d bytes for samples buffer\n",
                 buffer_size);

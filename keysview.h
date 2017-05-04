@@ -100,6 +100,7 @@ signals:
     void changedViewedFrames(int, int);
     void wheelEventSignal(QWheelEvent*);
 public slots:
+    void graphResetValueScaleAndMinShownAction();
     void graphUpdateAfterKeysChangedAndRepaint();
 
     void graphUpdateAfterKeysChanged();

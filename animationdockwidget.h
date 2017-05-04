@@ -25,6 +25,7 @@ private:
     ActionButton *mSmoothButton;
     ActionButton *mSymmetricButton;
     ActionButton *mCornerButton;
+    ActionButton *mFitToHeightButton;
 };
 
 #endif // ANIMATIONDOCKWIDGET_H

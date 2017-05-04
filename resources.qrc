@@ -90,6 +90,7 @@
         <file alias="draw_particle_emitter.png">pixmaps/icons/draw_particle_emitter.png</file>
         <file alias="localPivot.png">pixmaps/icons/localPivot.png</file>
         <file alias="globalPivot.png">pixmaps/icons/globalPivot.png</file>
+        <file alias="zoom.png">pixmaps/icons/zoom.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>
