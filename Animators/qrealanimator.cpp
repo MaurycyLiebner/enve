@@ -129,12 +129,14 @@ void QrealAnimator::setPrefferedValueStep(const qreal &valueStep) {
 }
 
 void QrealAnimator::prp_setRecording(const bool &rec) {
-    anim_setRecordingWithoutChangingKeys(rec);
-    if(anim_mIsRecording) {
+
+    if(rec) {
+        anim_setRecordingWithoutChangingKeys(rec);
         anim_saveCurrentValueAsKey();
     } else {
         anim_removeAllKeys();
         qra_updateKeysPath();
+        anim_setRecordingWithoutChangingKeys(rec);
     }
 }
 
@@ -215,12 +217,15 @@ void QrealAnimator::qra_setCurrentValue(qreal newValue,
     }
     if(newValue == mCurrentValue) return;
     mCurrentValue = newValue;
+    if(prp_isKeyOnCurrentFrame()) {
+        qra_saveCurrentValueToKey((QrealKey*)anim_mKeyOnCurrentFrame);
+    }
 
     emit valueChangedSignal(mCurrentValue);
 
     prp_callUpdater();
 
-    qra_updateKeysPath();
+    //qra_updateKeysPath();
 }
 
 void QrealAnimator::qra_updateValueFromCurrentFrame() {
@@ -283,14 +288,14 @@ void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
 
 void QrealAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) prp_setRecording(true);
-    QrealKey *keyAtFrame = (QrealKey*)anim_getKeyAtAbsFrame(
-                                            anim_mCurrentAbsFrame);
-    if(keyAtFrame == NULL) {
-        keyAtFrame = new QrealKey(anim_mCurrentRelFrame, mCurrentValue, this);
-        anim_appendKey(keyAtFrame);
+
+    if(anim_mKeyOnCurrentFrame == NULL) {
+        anim_mKeyOnCurrentFrame = new QrealKey(anim_mCurrentRelFrame,
+                                               mCurrentValue, this);
+        anim_appendKey(anim_mKeyOnCurrentFrame);
         qra_updateKeysPath();
     } else {
-        qra_saveCurrentValueToKey(keyAtFrame);
+        qra_saveCurrentValueToKey((QrealKey*)anim_mKeyOnCurrentFrame);
     }
 }
 
@@ -303,6 +308,7 @@ void QrealAnimator::anim_removeAllKeys() {
         anim_removeKey(key.get());
     }
     qra_setCurrentValue(currentValue);
+    anim_mKeyOnCurrentFrame = NULL;
 }
 
 void QrealAnimator::anim_mergeKeysIfNeeded() {
@@ -546,7 +552,7 @@ void QrealAnimator::qra_incCurrentValue(const qreal &incBy) {
 void QrealAnimator::prp_startTransform() {
     if(mTransformed) return;
     if(anim_mIsRecording) {
-        if(!anim_mKeyOnCurrentFrame) {
+        if(!prp_isKeyOnCurrentFrame()) {
             anim_saveCurrentValueAsKey();
         }
     }

@@ -101,9 +101,8 @@ Key *Animator::anim_getPrevKey(Key *key) {
 }
 
 void Animator::anim_deleteCurrentKey() {
-    Key *keyAtFrame = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
-    if(keyAtFrame == NULL) return;
-    keyAtFrame->deleteKey();
+    if(anim_mKeyOnCurrentFrame == NULL) return;
+    anim_mKeyOnCurrentFrame->deleteKey();
 }
 
 int Animator::anim_getClosestsKeyOccupiedRelFrame(const int &frame) {
@@ -229,8 +228,7 @@ void Animator::anim_keyValueChanged(Key *key) {
 
 void Animator::anim_updateKeyOnCurrrentFrame() {
     if(anim_mTraceKeyOnCurrentFrame) {
-        anim_mKeyOnCurrentFrame = anim_getKeyAtAbsFrame(
-                    anim_mCurrentAbsFrame) != NULL;
+        anim_mKeyOnCurrentFrame = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
     }
 }
 
@@ -307,7 +305,7 @@ void Animator::anim_removeAllKeys() {
 }
 
 bool Animator::prp_isKeyOnCurrentFrame() {
-    return anim_mKeyOnCurrentFrame;
+    return anim_mKeyOnCurrentFrame != NULL;
 }
 
 void Animator::prp_getKeysInRect(const QRectF &selectionRect,

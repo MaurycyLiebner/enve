@@ -19,6 +19,9 @@ KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
 
 void KeysView::setGraphViewed(bool bT) {
     mGraphViewed = bT;
+    if(bT) {
+        graphResetValueScaleAndMinShown();
+    }
 }
 
 void KeysView::middlePress(const QPointF &pressPos) {

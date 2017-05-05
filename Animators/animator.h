@@ -113,7 +113,7 @@ protected:
     bool anim_mIsComplexAnimator = false;
     bool anim_mIsCurrentAnimator = false;
     bool anim_mIsRecording = false;
-    bool anim_mKeyOnCurrentFrame = false;
+    Key *anim_mKeyOnCurrentFrame = NULL;
     QColor anim_mAnimatorColor;
 public slots:
     void anim_deleteCurrentKey();

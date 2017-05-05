@@ -435,10 +435,15 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
         drawCosmeticEllipse(p, absPos,
                             6., 6.);
         p->setPen(pen);
+        p->save();
+        QTransform trans = p->transform();
+        p->resetTransform();
+        absPos = trans.map(absPos);
         p->drawText(QRectF(absPos - QPointF(mRadius, mRadius),
                            absPos + QPointF(mRadius, mRadius)),
                     Qt::AlignCenter,
                     QString::number(mPointId));
+        p->restore();
     }
     p->restore();
 }
