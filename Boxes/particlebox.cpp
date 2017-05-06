@@ -327,6 +327,10 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     mWidth->qra_setValueRange(0., 6000.);
     mWidth->qra_setCurrentValue(0.);
 
+    mSrcVelInfl->prp_setName("src vel infl");
+    mSrcVelInfl->qra_setValueRange(-1., 1.);
+    mSrcVelInfl->qra_setCurrentValue(0.);
+
     mIniVelocity->prp_setName("ini vel");
     mIniVelocity->qra_setValueRange(-1000., 1000.);
     mIniVelocity->qra_setCurrentValue(10.);
@@ -391,6 +395,8 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     ca_addChildAnimator(mPos.data());
     ca_addChildAnimator(mWidth.data());
 
+    ca_addChildAnimator(mSrcVelInfl.data());
+
     ca_addChildAnimator(mIniVelocity.data());
     ca_addChildAnimator(mIniVelocityVar.data());
 
@@ -450,6 +456,7 @@ void ParticleEmitter::updateParticlesForFrameIfNeeded(const int &frame) {
 
 void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *width,
+                                             QrealAnimator *srcVelInfl,
                                              QrealAnimator *iniVelocity,
                                              QrealAnimator *iniVelocityVar,
                                              QrealAnimator *iniVelocityAngle,
@@ -467,6 +474,8 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *particlesOpacityDecay) {
     pos->makeDuplicate(mPos.data());
     width->makeDuplicate(mWidth.data());
+
+    srcVelInfl->makeDuplicate(mSrcVelInfl.data());
 
     iniVelocity->makeDuplicate(mIniVelocity.data());
     iniVelocityVar->makeDuplicate(mIniVelocityVar.data());
@@ -495,6 +504,7 @@ void ParticleEmitter::makeDuplicate(Property *target) {
     peTarget->duplicateAnimatorsFrom(
                 mPos.data(),
                 mWidth.data(),
+                mSrcVelInfl.data(),
                 mIniVelocity.data(),
                 mIniVelocityVar.data(),
                 mIniVelocityAngle.data(),
@@ -552,7 +562,10 @@ void ParticleEmitter::generateParticles() {
     bool reuseParticle = nReuseParticles > 0;
 
     int totalNeededParticles = 0;
+    QPointF lastPos = mPos->getCurrentPointValueAtFrame(mMinFrame);
     for(int i = mMinFrame; i < mMaxFrame; i++) {
+        qreal srcVelInfl =
+                mSrcVelInfl->getCurrentValueAtAbsFrame(i);
         qreal iniVelocity =
                 mIniVelocity->getCurrentValueAtAbsFrame(i);
         qreal iniVelocityVar =
@@ -586,6 +599,8 @@ void ParticleEmitter::generateParticles() {
                 mParticleSizeVar->getCurrentValueAtAbsFrame(i);
         qreal length = mParticleLength->getCurrentValueAtAbsFrame(i);
 
+        QPointF srcVel = (pos - lastPos)*srcVelInfl;
+
         int particlesToCreate = remainingPartFromFrame + particlesPerFrame;
         remainingPartFromFrame += particlesPerFrame - particlesToCreate;
         if(remainingPartFromFrame < 0.) remainingPartFromFrame = 0.;
@@ -608,13 +623,12 @@ void ParticleEmitter::generateParticles() {
             qreal velDeg = fRand(iniVelocityAngle - iniVelocityAngleVar,
                                  iniVelocityAngle + iniVelocityAngleVar);
             rotVelM.rotate(velDeg);
-            QPointF partVel = rotVelM.map(QPointF(partVelAmp, 0.));
+            QPointF partVel = rotVelM.map(QPointF(partVelAmp, 0.)) + srcVel;
 
             qreal partSize = fRand(particleSize - particleSizeVar,
                                    particleSize + particleSizeVar);
 
-            qreal xTrans = fRand(-width,
-                                 width);
+            qreal xTrans = fRand(-width, width);
 
             newParticle->initializeParticle(i, particlesFrameLifetime,
                                             QPointF(pos.x() + xTrans,
@@ -643,6 +657,7 @@ void ParticleEmitter::generateParticles() {
             }
         }
         totalNeededParticles += particlesToCreate;
+        lastPos = pos;
     }
     int nToRemove = mParticles.count() - totalNeededParticles;
     for(int i = 0; i < nToRemove; i++) {

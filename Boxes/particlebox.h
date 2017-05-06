@@ -120,9 +120,9 @@ public:
         //return emitterDupli;
     }
 
-    void duplicateAnimatorsFrom(
-            QPointFAnimator *pos,
+    void duplicateAnimatorsFrom(QPointFAnimator *pos,
             QrealAnimator *width,
+            QrealAnimator *srcVelInfl,
 
             QrealAnimator *iniVelocity,
             QrealAnimator *iniVelocityVar,
@@ -181,6 +181,9 @@ private:
 
     QSharedPointer<MovablePoint> mPos;
     QSharedPointer<QrealAnimator> mWidth =
+            (new QrealAnimator())->ref<QrealAnimator>();
+
+    QSharedPointer<QrealAnimator> mSrcVelInfl =
             (new QrealAnimator())->ref<QrealAnimator>();
 
     QSharedPointer<QrealAnimator> mIniVelocity =
