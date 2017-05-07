@@ -356,7 +356,7 @@ void BoundingBox::replaceCurrentFrameCache() {
 
     if(mParent == NULL) return;
     mParent->BoundingBox::replaceCurrentFrameCache();
-    //scheduleSoftUpdate();
+    scheduleSoftUpdate();
 }
 
 QImage BoundingBox::getAllUglyPixmapProvidedTransform(
@@ -856,9 +856,9 @@ QPointF BoundingBox::getAbsolutePos() {
 }
 
 void BoundingBox::updateRelativeTransformTmp() {
-    replaceCurrentFrameCache();
     updateCombinedTransformTmp();
     schedulePivotUpdate();
+    replaceCurrentFrameCache();
     //updateCombinedTransform(replaceCache);
 }
 
@@ -887,7 +887,6 @@ void BoundingBox::updateCombinedTransform() {
 
     updateAfterCombinedTransformationChanged();
     replaceCurrentFrameCache();
-    scheduleSoftUpdate();
 }
 
 void BoundingBox::updateCombinedTransformTmp() {

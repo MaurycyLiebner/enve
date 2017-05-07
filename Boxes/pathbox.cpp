@@ -220,7 +220,6 @@ void PathBox::drawHovered(QPainter *p) {
 void PathBox::applyPaintSetting(const PaintSetting &setting) {
     setting.apply(this);
     replaceCurrentFrameCache();
-    scheduleSoftUpdate();
 }
 
 void PathBox::setFillColorMode(const ColorMode &colorMode) {

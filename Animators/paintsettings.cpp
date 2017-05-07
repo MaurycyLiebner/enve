@@ -396,9 +396,8 @@ void Gradient::updateQGradientStopsFinal() {
         cPos += inc;
     }
     foreach(PathBox *path, mAffectedPaths) {
-        path->replaceCurrentFrameCache();
         path->updateDrawGradients();
-        path->scheduleSoftUpdate();
+        path->replaceCurrentFrameCache();
     }
 }
 

@@ -90,7 +90,6 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 
 void DisplayedFillStrokeSettingsUpdater::update() {
     mTarget->replaceCurrentFrameCache();
-    mTarget->scheduleSoftUpdate();
 }
 
 void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
