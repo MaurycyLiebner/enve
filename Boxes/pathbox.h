@@ -78,6 +78,8 @@ public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
+
+    bool SWT_isPathBox() { return true; }
 protected:
     QSharedPointer<GradientPoints> mFillGradientPoints =
             (new GradientPoints)->ref<GradientPoints>();

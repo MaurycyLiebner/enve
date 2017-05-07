@@ -12,17 +12,17 @@ public:
     virtual void startTransform() {}
     virtual void finishTransform() {}
 
-    virtual void moveByRel(QPointF relTranslatione) {
+    virtual void moveByRel(const QPointF &relTranslatione) {
         Q_UNUSED(relTranslatione);
     }
     virtual void moveByAbs(QPointF absTranslatione) {
         Q_UNUSED(absTranslatione);
     }
 
-    virtual void scale(qreal scaleXBy, qreal scaleYBy) {
+    virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy) {
         Q_UNUSED(scaleXBy); Q_UNUSED(scaleYBy);
     }
-    virtual void scale(qreal scaleBy) {
+    virtual void scale(const qreal &scaleBy) {
         scale(scaleBy, scaleBy);
     }
 

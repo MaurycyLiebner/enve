@@ -46,8 +46,8 @@ public:
     Key *getKeyAtPos(const int &pressX,
                      const qreal &pixelsPerFrame,
                      const int &minViewedFrame);
-    void getKeysInRect(QRectF selectionRect,
-                       qreal pixelsPerFrame,
+    void getKeysInRect(const QRectF &selectionRect,
+                       const qreal &pixelsPerFrame,
                        QList<Key *> *listKeys);
     DurationRectangleMovable *getRectangleMovableAtPos(
                                 const int &pressX,

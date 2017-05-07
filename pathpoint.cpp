@@ -123,7 +123,7 @@ void PathPoint::finishTransform()
     }
 }
 
-void PathPoint::moveByRel(QPointF relTranslation)
+void PathPoint::moveByRel(const QPointF &relTranslation)
 {
     MovablePoint::moveByRel(relTranslation);
     if(!mStartCtrlPt->isSelected()) {

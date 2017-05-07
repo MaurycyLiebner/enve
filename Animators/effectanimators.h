@@ -31,6 +31,8 @@ public:
     Property *makeDuplicate() {
         return NULL;
     }
+
+    bool SWT_isEffectAnimators() { return true; }
 private:
     BoundingBox *mParentBox;
 };

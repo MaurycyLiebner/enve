@@ -251,7 +251,7 @@ void BasicTransformAnimator::makeDuplicate(BasicTransformAnimator *target) {
     target->duplicateRotAnimatorFrom(mRotAnimator.data());
 }
 
-TransformAnimator::TransformAnimator(BoundingBox *parent) :
+BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     BasicTransformAnimator() {
     mPivotAnimator = (new BoxPathPoint(parent))->ref<MovablePoint>();
     mPivotAnimator->prp_setName("pivot");
@@ -270,12 +270,12 @@ TransformAnimator::TransformAnimator(BoundingBox *parent) :
     prp_setBlockedUpdater(new TransUpdater(parent) );
 }
 
-MovablePoint *TransformAnimator::getPivotMovablePoint() {
+MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
     return mPivotAnimator.data();
 }
 
 #include <QSqlError>
-int TransformAnimator::prp_saveToSql(QSqlQuery *query,
+int BoxTransformAnimator::prp_saveToSql(QSqlQuery *query,
                                      const int &parentId) {
     Q_UNUSED(parentId);
     int posAnimatorId = mPosAnimator->prp_saveToSql(query);
@@ -298,7 +298,7 @@ int TransformAnimator::prp_saveToSql(QSqlQuery *query,
     return query->lastInsertId().toInt();
 }
 
-void TransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
+void BoxTransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM transformanimator WHERE id = " +
@@ -323,36 +323,36 @@ void TransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
     }
 }
 
-void TransformAnimator::resetPivot(const bool &finish) {
+void BoxTransformAnimator::resetPivot(const bool &finish) {
     mPivotAnimator->setCurrentPointValue(QPointF(0., 0.), finish);
 }
 
-void TransformAnimator::reset(const bool &finish) {
+void BoxTransformAnimator::reset(const bool &finish) {
     BasicTransformAnimator::reset(finish);
     resetPivot(finish);
 }
 
-void TransformAnimator::startOpacityTransform() {
+void BoxTransformAnimator::startOpacityTransform() {
     mOpacityAnimator->prp_startTransform();
 }
 
-void TransformAnimator::setOpacity(const qreal &newOpacity) {
+void BoxTransformAnimator::setOpacity(const qreal &newOpacity) {
     mOpacityAnimator->qra_setCurrentValue(newOpacity);
 }
 
-void TransformAnimator::pivotTransformStarted() {
+void BoxTransformAnimator::pivotTransformStarted() {
     if(!mPosAnimator->prp_isDescendantRecording()) {
         mPosAnimator->prp_startTransform();
     }
 }
 
-void TransformAnimator::pivotTransformFinished() {
+void BoxTransformAnimator::pivotTransformFinished() {
     if(!mPosAnimator->prp_isDescendantRecording()) {
         mPosAnimator->prp_finishTransform();
     }
 }
 
-void TransformAnimator::setPivotWithoutChangingTransformation(
+void BoxTransformAnimator::setPivotWithoutChangingTransformation(
                                 QPointF point, const bool &finish) {
     if(mPosAnimator->prp_isDescendantRecording()) {
         QMatrix currentMatrix;
@@ -415,34 +415,34 @@ void TransformAnimator::setPivotWithoutChangingTransformation(
     mPivotAnimator->setCurrentPointValue(point, finish);
 }
 
-void TransformAnimator::setPivot(const QPointF &point,
+void BoxTransformAnimator::setPivot(const QPointF &point,
                                  const bool &finish) {
     mPivotAnimator->setCurrentPointValue(point, finish);
 
     //callUpdater();
 }
 
-QPointF TransformAnimator::getPivot() {
+QPointF BoxTransformAnimator::getPivot() {
     return mPivotAnimator->getCurrentPointValue();
 }
 
-QPointF TransformAnimator::getPivotAbs() {
+QPointF BoxTransformAnimator::getPivotAbs() {
     return mPivotAnimator->getAbsolutePos();
 }
 
-qreal TransformAnimator::getPivotX() {
+qreal BoxTransformAnimator::getPivotX() {
     return mPivotAnimator->getXValue();
 }
 
-qreal TransformAnimator::getPivotY() {
+qreal BoxTransformAnimator::getPivotY() {
     return mPivotAnimator->getYValue();
 }
 
-qreal TransformAnimator::getOpacity() {
+qreal BoxTransformAnimator::getOpacity() {
     return mOpacityAnimator->qra_getCurrentValue();
 }
 
-QMatrix TransformAnimator::getCurrentTransformationMatrix() {
+QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
     QMatrix matrix;
     qreal pivotX = mPivotAnimator->getXValue();
     qreal pivotY = mPivotAnimator->getYValue();
@@ -459,18 +459,18 @@ QMatrix TransformAnimator::getCurrentTransformationMatrix() {
     return matrix;
 }
 
-void TransformAnimator::makeDuplicate(TransformAnimator *target) {
+void BoxTransformAnimator::makeDuplicate(BoxTransformAnimator *target) {
     BasicTransformAnimator::makeDuplicate(target);
     target->duplicatePivotAnimatorFrom(mPivotAnimator.data());
     target->duplicateOpacityAnimatorFrom(mOpacityAnimator.data());
 }
 
-void TransformAnimator::duplicatePivotAnimatorFrom(
+void BoxTransformAnimator::duplicatePivotAnimatorFrom(
         QPointFAnimator *source) {
     source->makeDuplicate(mPivotAnimator.data());
 }
 
-void TransformAnimator::duplicateOpacityAnimatorFrom(
+void BoxTransformAnimator::duplicateOpacityAnimatorFrom(
         QrealAnimator *source) {
     source->makeDuplicate(mOpacityAnimator.data());
 }

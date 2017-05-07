@@ -91,28 +91,27 @@ void Circle::duplicateCirclePointsFrom(
     verticalRadiusPoint->makeDuplicate(mVerticalRadiusPoint);
 }
 
-void Circle::moveRadiusesByAbs(QPointF absTrans) {
+void Circle::startAllPointsTransform() {
+    mVerticalRadiusPoint->startTransform();
+    mHorizontalRadiusPoint->startTransform();
+}
+
+void Circle::moveRadiusesByAbs(const QPointF &absTrans) {
     mVerticalRadiusPoint->moveByAbs(absTrans);
     mHorizontalRadiusPoint->moveByAbs(absTrans);
 }
 
-void Circle::startPointsTransform() {
-    mVerticalRadiusPoint->startTransform();
-    mHorizontalRadiusPoint->startTransform();
-    startTransform();
-}
-
-void Circle::setVerticalRadius(qreal verticalRadius)
+void Circle::setVerticalRadius(const qreal &verticalRadius)
 {
     mVerticalRadiusPoint->setRelativePos(QPointF(0., verticalRadius) );
 }
 
-void Circle::setHorizontalRadius(qreal horizontalRadius)
+void Circle::setHorizontalRadius(const qreal &horizontalRadius)
 {
     mHorizontalRadiusPoint->setRelativePos(QPointF(horizontalRadius, 0.) );
 }
 
-void Circle::setRadius(qreal radius) {
+void Circle::setRadius(const qreal &radius) {
     setHorizontalRadius(radius);
     setVerticalRadius(radius);
 }
@@ -212,7 +211,7 @@ void CircleCenterPoint::setVerticalAndHorizontalPoints(
     mHorizontalPoint = horizontalPoint;
 }
 
-void CircleCenterPoint::moveByRel(QPointF absTranslatione)
+void CircleCenterPoint::moveByRel(const QPointF &absTranslatione)
 {
     mParent->moveByRel(absTranslatione);
 }
@@ -244,15 +243,15 @@ CircleRadiusPoint::~CircleRadiusPoint()
 
 }
 
-void CircleRadiusPoint::moveByRel(QPointF relTranslation)
-{
+void CircleRadiusPoint::moveByRel(const QPointF &relTranslation) {
     if(mCenterPoint->isSelected() ) return;
+    QPointF relTranslationT = relTranslation;
     if(mXBlocked) {
-        relTranslation.setX(0.);
+        relTranslationT.setX(0.);
     } else {
-        relTranslation.setY(0.);
+        relTranslationT.setY(0.);
     }
-    MovablePoint::moveByRel(relTranslation);
+    MovablePoint::moveByRel(relTranslationT);
 }
 
 //void CircleRadiusPoint::setAbsPosRadius(QPointF pos)

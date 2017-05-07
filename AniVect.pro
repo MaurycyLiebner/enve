@@ -64,7 +64,6 @@ SOURCES += main.cpp\
     qrealanimatorvalueslider.cpp \
     renderoutputwidget.cpp \
     canvaswidget.cpp \
-    Animators/animatorscollection.cpp \
     Animators/transformanimator.cpp \
     Animators/animator.cpp \
     Animators/boolanimator.cpp \
@@ -182,7 +181,6 @@ HEADERS  += mainwindow.h \
     Animators/animator.h \
     Animators/qrealanimator.h \
     Animators/qpointfanimator.h \
-    Animators/animatorscollection.h \
     Animators/boolanimator.h \
     Animators/animatorupdater.h \
     Animators/intanimator.h \

@@ -10,6 +10,8 @@ public:
     int getCurrentIntValue() const;
     void setCurrentIntValue(const int &value,
                             const bool &finish = false);
+
+    bool SWT_isIntAnimator() { return true; }
 };
 
 #endif // INTANIMATOR_H

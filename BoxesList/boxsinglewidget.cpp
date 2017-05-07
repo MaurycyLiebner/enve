@@ -115,9 +115,8 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 
 void BoxSingleWidget::setCompositionMode(const int &id) {
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
 
-    if(type == SWT_BoundingBox) {
+    if(target->SWT_isBoundingBox()) {
         ((BoundingBox*)target)->setCompositionMode(
                     static_cast<QPainter::CompositionMode>(id));
     }
@@ -127,33 +126,8 @@ void BoxSingleWidget::setCompositionMode(const int &id) {
 void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
     SingleWidget::setTargetAbstraction(abs);
     SingleWidgetTarget *target = abs->getTarget();
-    const SWT_Type &type = target->SWT_getType();
 
-    if(type == SWT_BoundingBox) {
-        //BoundingBox *bb_target = (BoundingBox*)target;
-
-        mRecordButton->hide();
-
-        mContentButton->show();
-
-        mVisibleButton->show();
-
-        mLockedButton->show();
-
-        mColorButton->hide();
-
-        mCompositionModeVisible = true;
-        mCompositionModeCombo->setCurrentIndex(
-                    ((BoundingBox*)target)->getCompositionMode());
-        updateCompositionBoxVisible();
-
-        mBoxTargetWidget->hide();
-        mCheckBox->hide();
-
-        mValueSlider->setAnimator(NULL);
-        mValueSlider->hide();
-    } else if(type == SWT_BoxesGroup ||
-              type == SWT_Canvas) {
+    if(target->SWT_isBoxesGroup()) {
         //BoxesGroup *bg_target = (BoxesGroup*)target;
 
         //setName(bg_target->getName());
@@ -178,7 +152,30 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
-    } else if(type == SWT_QrealAnimator) {
+    } else if(target->SWT_isBoundingBox()) {
+        //BoundingBox *bb_target = (BoundingBox*)target;
+
+        mRecordButton->hide();
+
+        mContentButton->show();
+
+        mVisibleButton->show();
+
+        mLockedButton->show();
+
+        mColorButton->hide();
+
+        mCompositionModeVisible = true;
+        mCompositionModeCombo->setCurrentIndex(
+                    ((BoundingBox*)target)->getCompositionMode());
+        updateCompositionBoxVisible();
+
+        mBoxTargetWidget->hide();
+        mCheckBox->hide();
+
+        mValueSlider->setAnimator(NULL);
+        mValueSlider->hide();
+    } else if(target->SWT_isQrealAnimator()) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
 
         mRecordButton->show();
@@ -199,10 +196,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mValueSlider->setAnimator(qa_target);
         mValueSlider->show();
-    } else if(type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect ||
-              type == SWT_SingleSound) {
+    } else if(target->SWT_isComplexAnimator()) {
         //ComplexAnimator *ca_target = (ComplexAnimator*)target;
 
         mRecordButton->show();
@@ -213,7 +207,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mLockedButton->hide();
 
-        if(type == SWT_ColorAnimator) {
+        if(target->SWT_isColorAnimator()) {
             mColorButton->show();
         } else {
             mColorButton->hide();
@@ -227,7 +221,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
-    } else if(type == SWT_BoxTarget) {
+    } else if(target->SWT_isBoxTargetProperty()) {
         mRecordButton->hide();
 
         mContentButton->hide();
@@ -246,7 +240,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCheckBox->hide();
 
         mValueSlider->hide();
-    } else if(type == SWT_BoolProperty) {
+    } else if(target->SWT_isBoolAnimator()) {
         mRecordButton->hide();
 
         mContentButton->hide();
@@ -295,22 +289,16 @@ void BoxSingleWidget::loadStaticPixmaps() {
 #include "durationrectangle.h"
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
     if(event->button() == Qt::RightButton) {
         QMenu menu(this);
 
-        if(type == SWT_BoundingBox ||
-           type == SWT_BoxesGroup ||
-           type == SWT_Canvas) {
+        if(target->SWT_isBoundingBox()) {
             menu.addAction("Rename");
             QAction *durRectAct = menu.addAction("Visibility Range");
             durRectAct->setCheckable(true);
             durRectAct->setChecked(
                         ((BoundingBox*)target)->hasDurationRectangle());
-        } else if(type == SWT_QrealAnimator ||
-                  type == SWT_ColorAnimator ||
-                  type == SWT_ComplexAnimator ||
-                  type == SWT_SingleSound) {
+        } else if(target->SWT_isAnimator()) {
             AnimatorClipboardContainer *clipboard =
                     (AnimatorClipboardContainer*)
                     MainWindow::getInstance()->getClipboardContainer(
@@ -382,14 +370,12 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(pointToLen(event->pos() - mDragStartPos) > 10.) return;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
-    if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup) {
+    if(target->SWT_isBoundingBox()) {
         BoundingBox *bb_target = (BoundingBox*)target;
         bb_target->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);
         MainWindow::getInstance()->callUpdateSchedulers();
-    } else if(type == SWT_QrealAnimator) {
+    } else if(target->SWT_isQrealAnimator()) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         KeysView *keysView =
                 ((BoxScrollWidgetVisiblePart*)mParent)->getKeysView();
@@ -416,10 +402,7 @@ void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e)
 
 void BoxSingleWidget::rename() {
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
-    if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup ||
-       type == SWT_Canvas) {
+    if(target->SWT_isBoundingBox()) {
         BoundingBox *bb_target = (BoundingBox*)target;
         bool ok;
         QString text = QInputDialog::getText(this, tr("New name dialog"),
@@ -439,21 +422,9 @@ void BoxSingleWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
                              int minViewedFrame, int maxViewedFrame) {
     if(isHidden()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
-    if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup ||
-       type == SWT_Canvas) {
-        BoundingBox *bb_target = (BoundingBox*)target;
-        bb_target->drawKeys(p, pixelsPerFrame,
-                            containerTop,
-                            minViewedFrame, maxViewedFrame);
-    } else if(type == SWT_QrealAnimator ||
-              type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect ||
-              type == SWT_SingleSound) {
-        QrealAnimator *qa_target = (QrealAnimator*)target;
-        qa_target->prp_drawKeys(p, pixelsPerFrame,
+    if(target->SWT_isAnimator()) {
+        Animator *anim_target = (Animator*)target;
+        anim_target->prp_drawKeys(p, pixelsPerFrame,
                             containerTop,
                             minViewedFrame, maxViewedFrame);
     }
@@ -464,22 +435,9 @@ Key *BoxSingleWidget::getKeyAtPos(const int &pressX,
                                   const int &minViewedFrame) {
     if(isHidden()) return NULL;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
-    if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup ||
-       type == SWT_Canvas) {
-        BoundingBox *bb_target = (BoundingBox*)target;
-        return bb_target->getKeyAtPos(
-                    pressX,
-                    minViewedFrame,
-                    pixelsPerFrame);
-    } else if(type == SWT_QrealAnimator ||
-              type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect ||
-              type == SWT_SingleSound) {
-        Animator *qa_target = (Animator*)target;
-        return qa_target->prp_getKeyAtPos(pressX,
+    if(target->SWT_isAnimator()) {
+        Animator *anim_target = (Animator*)target;
+        return anim_target->prp_getKeyAtPos(pressX,
                                minViewedFrame,
                                pixelsPerFrame);
     }
@@ -492,46 +450,25 @@ DurationRectangleMovable *BoxSingleWidget::getRectangleMovableAtPos(
                             const int &minViewedFrame) {
     if(isHidden()) return NULL;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
-    if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup ||
-       type == SWT_Canvas) {
-        BoundingBox *bb_target = (BoundingBox*)target;
-        return bb_target->getRectangleMovableAtPos(
-                    pressX,
-                    minViewedFrame,
-                    pixelsPerFrame);
-    } else if(type == SWT_SingleSound) {
-        QrealAnimator *bb_target = (QrealAnimator*)target;
-        return bb_target->anim_getRectangleMovableAtPos(
-                    pressX,
-                    minViewedFrame,
-                    pixelsPerFrame);
+    if(target->SWT_isAnimator()) {
+        Animator *anim_target = (Animator*)target;
+        return anim_target->anim_getRectangleMovableAtPos(
+                                    pressX,
+                                    minViewedFrame,
+                                    pixelsPerFrame);
     }
     return NULL;
 }
 
-void BoxSingleWidget::getKeysInRect(QRectF selectionRect,
-                                    qreal pixelsPerFrame,
+void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
+                                    const qreal &pixelsPerFrame,
                                     QList<Key *> *listKeys) {
     if(isHidden()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
-    if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup ||
-       type == SWT_Canvas) {
-        BoundingBox *bb_target = (BoundingBox*)target;
-        bb_target->getKeysInRect(
-                    selectionRect,
-                    pixelsPerFrame,
-                    listKeys);
-    } else if(type == SWT_QrealAnimator ||
-              type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect ||
-              type == SWT_SingleSound) {
-        QrealAnimator *qa_target = (QrealAnimator*)target;
-        qa_target->prp_getKeysInRect(selectionRect,
+    if(target->SWT_isAnimator()) {
+        Animator *anim_target = (Animator*)target;
+
+        anim_target->prp_getKeysInRect(selectionRect,
                                  pixelsPerFrame,
                                  listKeys);
     }
@@ -542,13 +479,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(mTarget == NULL) return;
     QPainter p(this);
     SingleWidgetTarget *target = mTarget->getTarget();
-    const SWT_Type &type = target->SWT_getType();
 
     int nameX = mFillWidget->x();
     QString name;
-    if(type == SWT_BoundingBox ||
-       type == SWT_BoxesGroup ||
-       type == SWT_Canvas) {
+    if(target->SWT_isBoundingBox()) {
         BoundingBox *bb_target = (BoundingBox*)target;
 
         nameX += 5;
@@ -591,7 +525,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
 //        font.setBold(true);
 //        p.setFont(font);
     } /*else if(type == SWT_BoxesGroup) {
-    } */else if(type == SWT_QrealAnimator) {
+    } */else if(target->SWT_isQrealAnimator()) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         if(qa_target->isCurrentAnimator(mParent)) {
             p.fillRect(nameX + BOX_HEIGHT/4, BOX_HEIGHT/4,
@@ -609,10 +543,7 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
 
         p.setPen(Qt::white);
-    } else if(type == SWT_ComplexAnimator ||
-              type == SWT_ColorAnimator ||
-              type == SWT_PixmapEffect ||
-              type == SWT_SingleSound) {
+    } else if(target->SWT_isComplexAnimator()) {
         ComplexAnimator *ca_target = (ComplexAnimator*)target;
         name = ca_target->prp_getName();
 
@@ -643,16 +574,16 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         }
         p.setPen(Qt::white);
 
-        if(type == SWT_ColorAnimator) {
+        if(target->SWT_isColorAnimator()) {
             ColorAnimator *col_target = (ColorAnimator*)ca_target;
             p.setBrush(col_target->getCurrentColor().qcol);
             p.drawRect(mColorButton->x(), 3,
                        BOX_HEIGHT, BOX_HEIGHT - 6);
         }
-    } else if(type == SWT_BoxTarget) {
+    } else if(target->SWT_isBoxTargetProperty()) {
         nameX += 40;
         name = ((BoxTargetProperty*)target)->prp_getName();
-    } else if(type == SWT_BoolProperty) {
+    } else if(target->SWT_isBoolProperty()) {
         nameX += 40;
         name = ((BoolProperty*)target)->prp_getName();
     }

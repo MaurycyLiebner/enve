@@ -125,6 +125,8 @@ public:
     void setTargetPathBox(PathBox *target);
 
     void setGradientVar(Gradient *grad);
+
+    bool SWT_isPaintSettings() { return true; }
 private:
     PathBox *mTarget;
     GradientPoints *mGradientPoints = NULL;
@@ -203,6 +205,8 @@ public:
 
     void updateQGradientStopsFinal();
     bool isEmpty() const;
+
+    bool SWT_isGradient() { return true; }
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:
@@ -315,6 +319,7 @@ public:
 
     QrealAnimator *getLineWidthAnimator();
 
+    bool SWT_isStrokeSettings() { return true; }
 private:
     QSharedPointer<QrealAnimator> mLineWidth =
             (new QrealAnimator())->ref<QrealAnimator>();

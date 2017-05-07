@@ -77,6 +77,8 @@ public:
                                const bool &saveUndoRedo = true);
     void removeSinglePathAnimator(SinglePathAnimator *path,
                                   const bool &saveUndoRedo = true);
+
+    bool SWT_isPathAnimator() { return true; }
 private:
     BoundingBox *mParentBox = NULL;
     QPainterPath mPath;

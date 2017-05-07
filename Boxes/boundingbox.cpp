@@ -154,7 +154,7 @@ bool BoundingBox::isAncestor(BoundingBox *box) const {
 }
 
 void BoundingBox::applyEffects(QImage *im,
-                               qreal scale) {
+                               const qreal &scale) {
     if(mEffectsAnimators->hasChildAnimators()) {
         fmt_filters::image img(im->bits(), im->width(), im->height());
         mEffectsAnimators->applyEffects(this,
@@ -335,7 +335,7 @@ Canvas *BoundingBox::getParentCanvas() {
 }
 
 void BoundingBox::duplicateTransformAnimatorFrom(
-        TransformAnimator *source) {
+        BoxTransformAnimator *source) {
     source->makeDuplicate(mTransformAnimator.data());
 }
 
@@ -500,7 +500,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
 }
 
 void BoundingBox::setCompositionMode(
-        QPainter::CompositionMode compositionMode) {
+        const QPainter::CompositionMode &compositionMode) {
     mCompositionMode = compositionMode;
     scheduleSoftUpdate();
 }
@@ -660,7 +660,7 @@ void BoundingBox::deselect() {
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
 }
 
-bool BoundingBox::isContainedIn(QRectF absRect) {
+bool BoundingBox::isContainedIn(const QRectF &absRect) {
     return absRect.contains(getCombinedTransform().mapRect(mRelBoundingRect));
 }
 
@@ -684,7 +684,8 @@ StrokeSettings *BoundingBox::getStrokeSettings() {
     return NULL;
 }
 
-void BoundingBox::drawAsBoundingRect(QPainter *p, QPainterPath path) {
+void BoundingBox::drawAsBoundingRect(QPainter *p,
+                                     const QPainterPath &path) {
     p->save();
     QPen pen = QPen(QColor(0, 0, 0, 125), 1., Qt::DashLine);
     pen.setCosmetic(true);
@@ -711,11 +712,11 @@ QMatrix BoundingBox::getRelativeTransform() const {
     return mTransformAnimator->getRelativeTransform();
 }
 
-void BoundingBox::applyTransformation(TransformAnimator *transAnimator) {
+void BoundingBox::applyTransformation(BoxTransformAnimator *transAnimator) {
     Q_UNUSED(transAnimator);
 }
 
-void BoundingBox::scale(qreal scaleBy) {
+void BoundingBox::scale(const qreal &scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
@@ -733,7 +734,8 @@ void BoundingBox::rotateRelativeToSavedPivot(const qreal &rot) {
                                                   mSavedTransformPivot);
 }
 
-void BoundingBox::scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy) {
+void BoundingBox::scaleRelativeToSavedPivot(const qreal &scaleXBy,
+                                            const qreal &scaleYBy) {
     mTransformAnimator->scaleRelativeToSavedValue(scaleXBy, scaleYBy,
                                                  mSavedTransformPivot);
 }
@@ -742,11 +744,11 @@ void BoundingBox::scaleRelativeToSavedPivot(const qreal &scaleBy) {
     scaleRelativeToSavedPivot(scaleBy, scaleBy);
 }
 
-QPointF BoundingBox::mapRelPosToAbs(QPointF relPos) const {
+QPointF BoundingBox::mapRelPosToAbs(const QPointF &relPos) const {
     return mTransformAnimator->mapRelPosToAbs(relPos);
 }
 
-void BoundingBox::moveByAbs(QPointF trans) {
+void BoundingBox::moveByAbs(const QPointF &trans) {
     mTransformAnimator->moveByAbs(mParent->getCombinedTransform(), trans);
 //    QPointF by = mParent->mapAbsPosToRel(trans) -
 //                 mParent->mapAbsPosToRel(QPointF(0., 0.));
@@ -756,11 +758,12 @@ void BoundingBox::moveByAbs(QPointF trans) {
 //    moveByRel(by);
 }
 
-void BoundingBox::moveByRel(QPointF trans) {
+void BoundingBox::moveByRel(const QPointF &trans) {
     mTransformAnimator->moveRelativeToSavedValue(trans.x(), trans.y());
 }
 
-void BoundingBox::setAbsolutePos(QPointF pos, bool saveUndoRedo) {
+void BoundingBox::setAbsolutePos(const QPointF &pos,
+                                 const bool &saveUndoRedo) {
     QMatrix combinedM = mParent->getCombinedTransform();
     QPointF newPos = combinedM.inverted().map(pos);
     setRelativePos(newPos, saveUndoRedo );
@@ -895,7 +898,7 @@ void BoundingBox::updateCombinedTransformTmp() {
     }
 }
 
-TransformAnimator *BoundingBox::getTransformAnimator() {
+BoxTransformAnimator *BoundingBox::getTransformAnimator() {
     return mTransformAnimator.data();
 }
 
@@ -944,23 +947,6 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
 
     scheduleEffectsMarginUpdate();
     scheduleSoftUpdate();
-}
-
-void BoundingBox::getKeysInRect(const QRectF &selectionRect,
-                                const qreal &pixelsPerFrame,
-                                QList<Key*> *keysList) {
-    prp_getKeysInRect(selectionRect,
-                                       pixelsPerFrame,
-                                       keysList);
-}
-
-Key *BoundingBox::getKeyAtPos(const qreal &relX,
-                              const int &minViewedFrame,
-                              const qreal &pixelsPerFrame) {
-    return prp_getKeyAtPos(
-                                     relX,
-                                     minViewedFrame,
-                                     pixelsPerFrame);
 }
 
 int BoundingBox::prp_getParentFrameShift() const {
@@ -1019,20 +1005,21 @@ void BoundingBox::updateAfterDurationRectangleShifted() {
     updateAfterFrameChanged(anim_mCurrentAbsFrame);
 }
 
-DurationRectangleMovable *BoundingBox::getRectangleMovableAtPos(
-                            qreal relX,
-                            int minViewedFrame,
-                            qreal pixelsPerFrame) {
+DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
+                            const qreal &relX,
+                            const int &minViewedFrame,
+                            const qreal &pixelsPerFrame) {
     if(mDurationRectangle == NULL) return NULL;
     return mDurationRectangle->getMovableAt(relX,
                                            pixelsPerFrame,
                                            minViewedFrame);
 }
 
-void BoundingBox::drawKeys(QPainter *p,
-                           qreal pixelsPerFrame,
-                           qreal drawY,
-                           int startFrame, int endFrame) {
+void BoundingBox::prp_drawKeys(QPainter *p,
+                               const qreal &pixelsPerFrame,
+                               const qreal &drawY,
+                               const int &startFrame,
+                               const int &endFrame) {
     if(mDurationRectangle != NULL) {
         mDurationRectangle->draw(p, pixelsPerFrame,
                                 drawY, startFrame);
@@ -1042,9 +1029,9 @@ void BoundingBox::drawKeys(QPainter *p,
                                             drawY,
                                             prp_absFrameToRelFrame(startFrame),
                                             prp_absFrameToRelFrame(endFrame));
-    prp_drawKeys(p,
-                 pixelsPerFrame, drawY,
-                 startFrame, endFrame);
+    Animator::prp_drawKeys(p,
+                            pixelsPerFrame, drawY,
+                            startFrame, endFrame);
 }
 
 void BoundingBox::setName(const QString &name) {
@@ -1135,10 +1122,9 @@ bool BoundingBox::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                       const bool &parentSatisfies,
                                       const bool &parentMainTarget) {
     const SWT_Rule &rule = rules.rule;
-    const SWT_Type &type = rules.type;
     bool satisfies;
     bool alwaysShowChildren = rules.alwaysShowChildren;
-    if(type == SWT_SingleSound) return false;
+    if(rules.type == &SingleWidgetTarget::SWT_isSingleSound) return false;
     if(alwaysShowChildren) {
         if(rule == SWT_NoRule) {
             satisfies = parentSatisfies;

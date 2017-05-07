@@ -81,8 +81,7 @@ void ScrollWidgetVisiblePart::setCurrentTarget(
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setCurrentType(
-                        const SWT_Type &type) {
+void ScrollWidgetVisiblePart::setCurrentType(SWT_Checker type) {
     mCurrentRulesCollection.type = type;
     updateParentHeight();
     updateVisibleWidgetsContent();
@@ -224,7 +223,7 @@ SingleWidget *ScrollWidgetVisiblePart::createNewSingleWidget() {
 }
 
 SWT_RulesCollection::SWT_RulesCollection() {
-    type = SWT_AllTypes;
+    type = NULL;
     rule = SWT_NoRule;
     alwaysShowChildren = false;
     target = SWT_CurrentCanvas;

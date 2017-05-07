@@ -21,6 +21,8 @@ public:
     QString getCurrentTextValue();
 
     QString getStringKeyWithLowerFrame(int frame);
+
+    bool SWT_isQStringAnimator() { return true; }
 private:
     QList<QStringKey*> mTextValues;
 };

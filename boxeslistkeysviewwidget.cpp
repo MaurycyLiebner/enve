@@ -269,13 +269,13 @@ void BoxesListKeysViewWidget::setTargetCurrentGroup() {
 
 void BoxesListKeysViewWidget::setTypeSound() {
     mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentType(SWT_SingleSound);
+            setCurrentType(&SingleWidgetTarget::SWT_isSingleSound);
     mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListKeysViewWidget::setTypeAll() {
     mBoxesListWidget->getVisiblePartWidget()->
-            setCurrentType(SWT_AllTypes);
+            setCurrentType(NULL);
     mMainWindow->callUpdateSchedulers();
 }
 

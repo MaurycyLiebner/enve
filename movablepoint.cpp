@@ -153,7 +153,7 @@ void MovablePoint::moveToRel(QPointF relPos) {
     moveByRel(relPos - mSavedRelPos);
 }
 
-void MovablePoint::moveByRel(QPointF relTranslation) {
+void MovablePoint::moveByRel(const QPointF &relTranslation) {
     incSavedValueToCurrentValue(relTranslation.x(),
                                         relTranslation.y());
 }
@@ -167,7 +167,7 @@ void MovablePoint::moveToAbs(QPointF absPos) {
     setAbsolutePos(absPos, false);
 }
 
-void MovablePoint::scale(qreal scaleBy) {
+void MovablePoint::scale(const qreal &scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
@@ -196,13 +196,11 @@ qreal MovablePoint::getRadius()
     return mRadius;
 }
 
-void MovablePoint::updateAfterFrameChanged(const int &frame)
-{
+void MovablePoint::updateAfterFrameChanged(const int &frame) {
     prp_setAbsFrame(frame);
 }
 
-void MovablePoint::rotateBy(const qreal &rot)
-{
+void MovablePoint::rotateBy(const qreal &rot) {
     QMatrix rotMatrix;
     rotMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
     rotMatrix.rotate(rot);
@@ -210,8 +208,8 @@ void MovablePoint::rotateBy(const qreal &rot)
     setRelativePos(mSavedRelPos*rotMatrix, false);
 }
 
-void MovablePoint::scale(qreal scaleXBy, qreal scaleYBy)
-{
+void MovablePoint::scale(const qreal &scaleXBy,
+                         const qreal &scaleYBy) {
     QMatrix scaleMatrix;
     scaleMatrix.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
     scaleMatrix.scale(scaleXBy, scaleYBy);
@@ -224,44 +222,36 @@ void MovablePoint::scale(qreal scaleXBy, qreal scaleYBy)
 //    mSavedTransformPivot = -mParent->mapAbsPosToRel(absPivot);
 //}
 
-void MovablePoint::select()
-{
+void MovablePoint::select() {
     mSelected = true;
 }
 
-void MovablePoint::deselect()
-{
+void MovablePoint::deselect() {
     mSelected = false;
 }
 
-void MovablePoint::removeFromVectorPath()
-{
+void MovablePoint::removeFromVectorPath() {
 
 }
 
-void MovablePoint::hide()
-{
+void MovablePoint::hide() {
     mHidden = true;
     deselect();
 }
 
-void MovablePoint::show()
-{
+void MovablePoint::show() {
     mHidden = false;
 }
 
-bool MovablePoint::isHidden()
-{
+bool MovablePoint::isHidden() {
     return mHidden;
 }
 
-bool MovablePoint::isVisible()
-{
+bool MovablePoint::isVisible() {
     return !isHidden();
 }
 
-void MovablePoint::setVisible(bool bT)
-{
+void MovablePoint::setVisible(bool bT) {
     if(bT) {
         show();
     } else {
@@ -269,17 +259,14 @@ void MovablePoint::setVisible(bool bT)
     }
 }
 
-bool MovablePoint::isPathPoint()
-{
+bool MovablePoint::isPathPoint() {
     return mType == MovablePointType::TYPE_PATH_POINT;
 }
 
-bool MovablePoint::isPivotPoint()
-{
+bool MovablePoint::isPivotPoint() {
     return mType == MovablePointType::TYPE_PIVOT_POINT;
 }
 
-bool MovablePoint::isCtrlPoint()
-{
+bool MovablePoint::isCtrlPoint() {
     return mType == MovablePointType::TYPE_CTRL_POINT;
 }

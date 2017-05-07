@@ -123,7 +123,6 @@ public:
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
-    SWT_Type SWT_getType() { return SWT_BoxesGroup; }
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
@@ -166,6 +165,8 @@ public:
     void updateAfterCombinedTransformationChanged();
     void updateCombinedTransformTmp();
     void updateAfterCombinedTransformationChangedAfterFrameChagne();
+
+    bool SWT_isBoxesGroup() { return true; }
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

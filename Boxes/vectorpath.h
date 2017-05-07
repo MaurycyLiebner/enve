@@ -88,6 +88,8 @@ public:
     void duplicatePathAnimatorFrom(PathAnimator *source);
     void removeChildPathAnimator(PathAnimator *path);
     void updatePath();
+
+    bool SWT_isVectorPath() { return true; }
 protected:
     void updatePathPointIds();
     QSharedPointer<PathAnimator> mPathAnimator =

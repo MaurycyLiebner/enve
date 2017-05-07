@@ -12,7 +12,7 @@ public:
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
                                         MovablePoint *horizontalPoint);
 
-    void moveByRel(QPointF absTranslatione);
+    void moveByRel(const QPointF &absTranslatione);
 
     void startTransform();
 
@@ -30,7 +30,7 @@ public:
                       bool blockX, MovablePoint *centerPoint);
     ~CircleRadiusPoint();
 
-    void moveByRel(QPointF relTranslation);
+    void moveByRel(const QPointF &relTranslation);
 //    void setAbsPosRadius(QPointF pos);
     void moveByAbs(QPointF absTranslatione);
 
@@ -47,18 +47,19 @@ class Circle : public PathBox
 public:
     Circle(BoxesGroup *parent);
 
-    void setVerticalRadius(qreal verticalRadius);
-    void setHorizontalRadius(qreal horizontalRadius);
-    void setRadius(qreal radius);
+    void setVerticalRadius(const qreal &verticalRadius);
+    void setHorizontalRadius(const qreal &horizontalRadius);
+    void setRadius(const qreal &radius);
 
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
     void updatePath();
-    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+    MovablePoint *getPointAtAbsPos(
+                             const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
-    void selectAndAddContainedPointsToList(const QRectF &absRect, QList<MovablePoint *> *list);
-    void moveRadiusesByAbs(QPointF absTrans);
-    void startPointsTransform();
+    void selectAndAddContainedPointsToList(const QRectF &absRect,
+                                           QList<MovablePoint *> *list);
+    void moveRadiusesByAbs(const QPointF &absTrans);
 
     int prp_saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
@@ -79,6 +80,10 @@ public:
                         CircleCenterPoint *center,
                         CircleRadiusPoint *horizontalRadiusPoint,
                         CircleRadiusPoint *verticalRadiusPoint);
+
+    bool SWT_isCircle() { return true; }
+
+    void startAllPointsTransform();
 private:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;

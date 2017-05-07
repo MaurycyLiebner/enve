@@ -43,6 +43,7 @@ public:
         textTarget->setTextAlignment(mAlignment);
     }
 
+    bool SWT_isTextBox() { return true; }
 private:
     QString mText;
     QFont mFont;

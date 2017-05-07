@@ -33,6 +33,7 @@ struct ParticleState {
     }
 
     void draw(QPainter *p) const {
+        if(size < 0.) return;
         p->setOpacity(opacity);
 
         if(isLine) {
@@ -41,8 +42,7 @@ struct ParticleState {
             p->setPen(pen);
             p->drawPath(linePath);
         } else {
-            p->drawEllipse(pos,
-                           size, size);
+            p->drawEllipse(pos, size, size);
         }
     }
 
@@ -115,9 +115,9 @@ public:
     }
 
     Property *makeDuplicate() {
-        //ParticleEmitter *emitterDupli = new ParticleEmitter();
-        //makeDuplicate(emitterDupli);
-        //return emitterDupli;
+        ParticleEmitter *emitterDupli = new ParticleEmitter(mParentBox);
+        makeDuplicate(emitterDupli);
+        return emitterDupli;
     }
 
     void duplicateAnimatorsFrom(QPointFAnimator *pos,
@@ -278,6 +278,7 @@ public:
         }
     }
 
+    bool SWT_isParticleBox() { return true; }
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

@@ -842,13 +842,13 @@ void Canvas::fitCanvasToSize() {
 
 }
 
-void Canvas::moveByRel(QPointF trans) {
-    trans = mapAbsPosToRel(trans) -
-            mapAbsPosToRel(QPointF(0, 0));
+void Canvas::moveByRel(const QPointF &trans) {
+    QPointF transRel = mapAbsPosToRel(trans) -
+                       mapAbsPosToRel(QPointF(0, 0));
 
     mLastPressPosRel = mapAbsPosToRel(mLastPressPosRel);
 
-    mCanvasTransformMatrix.translate(trans.x(), trans.y());
+    mCanvasTransformMatrix.translate(transRel.x(), transRel.y());
 
     mLastPressPosRel = mCanvasTransformMatrix.map(mLastPressPosRel);
     schedulePivotUpdate();
@@ -924,13 +924,12 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                  const bool &) {
     Q_UNUSED(parentSatisfies);
     const SWT_Rule &rule = rules.rule;
-    const SWT_Type &type = rules.type;
     const bool &alwaysShowChildren = rules.alwaysShowChildren;
     if(alwaysShowChildren) {
         return false;
     } else {
-        if(type == SWT_AllTypes) {
-        } else if(type == SWT_SingleSound) {
+        if(rules.type == NULL) {
+        } else if(rules.type == &SingleWidgetTarget::SWT_isSingleSound) {
             return false;
         }
         if(rule == SWT_NoRule) {

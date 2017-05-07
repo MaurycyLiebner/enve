@@ -26,6 +26,8 @@ public:
     void updateDurationRectangleAnimationRange();
     virtual void reloadFile() = 0;
     FixedLenAnimationRect *getAnimationDurationRect();
+
+    bool SWT_isAnimationBox() { return true; }
 public slots:
 protected:
     bool mPixmapReloadScheduled = false;

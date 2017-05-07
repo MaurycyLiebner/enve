@@ -36,7 +36,6 @@ public:
                                             const qreal &relX,
                                             const int &minViewedFrame,
                                             const qreal &pixelsPerFrame);
-    SWT_Type SWT_getType() { return SWT_SingleSound; }
     void updateFinalDataIfNeeded(const qreal &fps,
                                  const int &minAbsFrame,
                                  const int &maxAbsFrame);

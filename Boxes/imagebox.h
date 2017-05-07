@@ -16,6 +16,8 @@ public:
 
     void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
+
+    bool SWT_isImageBox() { return true; }
 private:
     QImage mImage;
     QString mImageFilePath;

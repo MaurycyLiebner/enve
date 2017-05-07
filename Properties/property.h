@@ -128,6 +128,8 @@ public:
 
     virtual void prp_setParentFrameShift(const int &shift);
     void prp_setBlockedUpdater(AnimatorUpdater *updater);
+
+    bool SWT_isProperty() { return true; }
 public slots:
     virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 

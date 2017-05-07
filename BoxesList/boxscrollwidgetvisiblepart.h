@@ -33,10 +33,10 @@ public:
                        QList<Key *> *listKeys);
 
     BoxSingleWidget *getClosestsSingleWidgetWithTargetType(
-            const SWT_Types &type, const int &yPos, bool *isBelow);
+            const SWT_TargetTypes &type, const int &yPos, bool *isBelow);
     void updateDraggingHighlight();
     BoxSingleWidget *getClosestsSingleWidgetWithTargetTypeLookBelow(
-            const SWT_Types &type, const int &yPos, bool *isBelow);
+            const SWT_TargetTypes &type, const int &yPos, bool *isBelow);
     void stopScrolling();
     DurationRectangleMovable *getRectangleMovableAtPos(
                                         const int &pressX,
@@ -59,7 +59,7 @@ protected:
     QTimer *mScrollTimer = NULL;
 
     int mLastDragMoveY;
-    SWT_Types mLastDragMoveTargetTypes;
+    SWT_TargetTypes mLastDragMoveTargetTypes;
 
     KeysView *mKeysView = NULL;
 

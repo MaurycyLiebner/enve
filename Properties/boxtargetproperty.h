@@ -11,7 +11,6 @@ public:
 
     BoundingBox *getTarget();
     void setTarget(BoundingBox *box);
-    SWT_Type SWT_getType() { return SWT_BoxTarget; }
     void setParentBox(BoundingBox *box);
 
     void makeDuplicate(Property *property);
@@ -19,6 +18,8 @@ public:
     int prp_saveToSql(QSqlQuery *query,
                       const int &parentId) {}
     void prp_loadFromSql(const int &identifyingId) {}
+
+    bool SWT_isBoxTargetProperty() { return true; }
 private:
     BoundingBox *mTarget = NULL;
     BoundingBox *mParentBox = NULL;

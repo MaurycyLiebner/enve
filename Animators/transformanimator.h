@@ -67,6 +67,8 @@ public:
 
     void setParentTransformAnimator(BasicTransformAnimator *parent);
     void makeDuplicate(BasicTransformAnimator *target);
+
+    bool SWT_isBasicTransformAnimator() { return true; }
 protected:
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;
@@ -88,10 +90,10 @@ signals:
     void combinedTransformChanged();
 };
 
-class TransformAnimator : public BasicTransformAnimator
+class BoxTransformAnimator : public BasicTransformAnimator
 {
 public:
-    TransformAnimator(BoundingBox *parent);
+    BoxTransformAnimator(BoundingBox *parent);
 
     void resetPivot(const bool &finish = false);
     void reset(const bool &finish = false);
@@ -116,7 +118,7 @@ public:
                       const int &parentId = 0);
     void prp_loadFromSql(const int &transformAnimatorId);
 
-    void makeDuplicate(TransformAnimator *target);
+    void makeDuplicate(BoxTransformAnimator *target);
     Property *makeDuplicate() {
         return NULL;
     }
@@ -128,6 +130,8 @@ public:
     void pivotTransformStarted();
     void pivotTransformFinished();
     QPointF getPivotAbs();
+
+    bool SWT_isBoxTransformAnimator() { return true; }
 private:
     QSharedPointer<MovablePoint> mPivotAnimator;
     QSharedPointer<QrealAnimator> mOpacityAnimator =

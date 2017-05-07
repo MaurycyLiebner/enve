@@ -107,21 +107,9 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
 
     foreach(SingleWidgetAbstraction *abs, abstractions) {
         SingleWidgetTarget *target = abs->getTarget();
-        const SWT_Type &type = target->SWT_getType();
-        if(type == SWT_BoundingBox ||
-           type == SWT_BoxesGroup) {
-            BoundingBox *bb_target = (BoundingBox*)target;
-            bb_target->getKeysInRect(
-                        selectionRect,
-                        pixelsPerFrame,
-                        listKeys);
-        } else if(type == SWT_QrealAnimator ||
-                  type == SWT_ComplexAnimator ||
-                  type == SWT_ColorAnimator ||
-                  type == SWT_PixmapEffect ||
-                  type == SWT_SingleSound) {
-            QrealAnimator *qa_target = (QrealAnimator*)target;
-            qa_target->prp_getKeysInRect(selectionRect,
+        if(target->SWT_isAnimator()) {
+            Animator *anim_target = (Animator*)target;
+            anim_target->prp_getKeysInRect(selectionRect,
                                      pixelsPerFrame,
                                      listKeys);
         }
@@ -140,7 +128,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
 
 BoxSingleWidget *BoxScrollWidgetVisiblePart::
             getClosestsSingleWidgetWithTargetTypeLookBelow(
-                const SWT_Types &type,
+                const SWT_TargetTypes &type,
                 const int &yPos,
                 bool *isBelow) {
     int idAtYPos = yPos / 20;
@@ -157,8 +145,8 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                     mSingleWidgets.at(
                         idAtYPos);
         }
-        while(!type.testFlag(singleWidgetUnderMouse->getTargetAbstraction()->
-              getTarget()->SWT_getType()) ) {
+        while(!type.isTargeted(singleWidgetUnderMouse->getTargetAbstraction()->
+                                getTarget()) ) {
             idAtYPos++;
             if(idAtYPos >= mSingleWidgets.count()) return NULL;
             singleWidgetUnderMouse = (BoxSingleWidget*)
@@ -173,7 +161,7 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
 
 BoxSingleWidget *BoxScrollWidgetVisiblePart::
             getClosestsSingleWidgetWithTargetType(
-                const SWT_Types &type,
+                const SWT_TargetTypes &types,
                 const int &yPos,
                 bool *isBelow) {
     int idAtYPos = yPos / 20;
@@ -187,18 +175,18 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
             idAtYPos--;
             if(idAtYPos < 0) {
                 return getClosestsSingleWidgetWithTargetTypeLookBelow(
-                            type, yPos, isBelow);
+                            types, yPos, isBelow);
             }
             singleWidgetUnderMouse = (BoxSingleWidget*)
                     mSingleWidgets.at(
                         idAtYPos);
         }
-        while(!type.testFlag(singleWidgetUnderMouse->getTargetAbstraction()->
-              getTarget()->SWT_getType())) {
+        while(!types.isTargeted(singleWidgetUnderMouse->getTargetAbstraction()->
+                                getTarget())) {
             idAtYPos--;
             if(idAtYPos < 0) {
                 return getClosestsSingleWidgetWithTargetTypeLookBelow(
-                            type, yPos, isBelow);
+                            types, yPos, isBelow);
             }
             singleWidgetUnderMouse = (BoxSingleWidget*)
                     mSingleWidgets.at(
@@ -224,10 +212,15 @@ void BoxScrollWidgetVisiblePart::dropEvent(
     if(event->mimeData()->hasFormat("boundingbox")) {
         int yPos = event->pos().y();
         bool below;
+
+        SWT_TargetTypes type;
+        type.targetsFunctionList =
+                QList<SWT_Checker>({&SingleWidgetTarget::SWT_isBoundingBox});
         BoxSingleWidget *singleWidgetUnderMouse =
-                getClosestsSingleWidgetWithTargetType(SWT_BoundingBox | SWT_BoxesGroup,
-                                                      yPos,
-                                                      &below);
+                getClosestsSingleWidgetWithTargetType(
+                    type,
+                    yPos,
+                    &below);
         if(singleWidgetUnderMouse == NULL) return;
 
         BoundingBox *box = ((BoundingBoxMimeData*)event->mimeData())->
@@ -255,10 +248,15 @@ void BoxScrollWidgetVisiblePart::dropEvent(
     } else if(event->mimeData()->hasFormat("pixmapeffect")) {
         int yPos = event->pos().y();
         bool below;
+
+        SWT_TargetTypes type;
+        type.targetsFunctionList =
+                QList<SWT_Checker>({&SingleWidgetTarget::SWT_isPixmapEffect});
         BoxSingleWidget *singleWidgetUnderMouse =
-                getClosestsSingleWidgetWithTargetType(SWT_PixmapEffect,
-                                                      yPos,
-                                                      &below);
+                getClosestsSingleWidgetWithTargetType(
+                    type,
+                    yPos,
+                    &below);
         if(singleWidgetUnderMouse == NULL) return;
 
         PixmapEffect *effect = ((PixmapEffectMimeData*)event->mimeData())->
@@ -338,9 +336,14 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(
     }
     mLastDragMoveY = yPos;
     if(event->mimeData()->hasFormat("boundingbox")) {
-        mLastDragMoveTargetTypes = SWT_BoundingBox | SWT_BoxesGroup;
+        mLastDragMoveTargetTypes.targetsFunctionList =
+                QList<SWT_Checker>(
+                        {&SingleWidgetTarget::SWT_isBoundingBox,
+                         &SingleWidgetTarget::SWT_isBoxesGroup});
     } else if(event->mimeData()->hasFormat("pixmapeffect")) {
-        mLastDragMoveTargetTypes = SWT_PixmapEffect;
+        mLastDragMoveTargetTypes.targetsFunctionList =
+                QList<SWT_Checker>(
+                        {&SingleWidgetTarget::SWT_isPixmapEffect});
     }
 
     updateDraggingHighlight();

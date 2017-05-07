@@ -76,8 +76,6 @@ public:
         return new PixmapEffectMimeData(this);
     }
 
-    SWT_Type SWT_getType() { return SWT_PixmapEffect; }
-
     virtual void prp_loadFromSql(const int &identifyingId) = 0;
     virtual Property *makeDuplicate() = 0;
     virtual void makeDuplicate(Property *target) = 0;
@@ -90,6 +88,7 @@ public:
         mParentEffects = parentEffects;
     }
 
+    bool SWT_isPixmapEffect() { return true; }
 public slots:
     void interrupt() {
         mInterrupted = true;

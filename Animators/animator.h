@@ -98,6 +98,8 @@ public:
     int anim_getNextKeyRelFrame(Key *key);
     int anim_getPrevKeyRelFrame(Key *key);
     void anim_setRecordingValue(const bool &rec);
+
+    bool SWT_isAnimator() { return true; }
 protected:
     int anim_getKeyIndex(Key *key);
 

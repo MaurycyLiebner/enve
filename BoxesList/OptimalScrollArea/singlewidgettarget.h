@@ -8,24 +8,6 @@
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
 
-enum SWT_Type : short {
-    SWT_BoundingBox = 1,
-    SWT_BoxesGroup = 2,
-    SWT_PixmapEffect = 4,
-    SWT_QrealAnimator = 8,
-    SWT_ComplexAnimator = 16,
-    SWT_ColorAnimator = 32,
-    SWT_Canvas = 64,
-    SWT_BoxTarget = 128,
-    SWT_BoolProperty = 256,
-    SWT_SingleSound = 512,
-    SWT_CanvasWidget = 1024,
-    SWT_AllTypes = 2048
-};
-
-Q_DECLARE_FLAGS(SWT_Types, SWT_Type)
-Q_DECLARE_OPERATORS_FOR_FLAGS(SWT_Types)
-
 enum SWT_Rule : short {
     SWT_NoRule,
     SWT_Selected,
@@ -54,7 +36,44 @@ public:
             SingleWidgetAbstraction *,
             ScrollWidgetVisiblePart *) {}
 
-    virtual SWT_Type SWT_getType() = 0;
+    // Animators
+    virtual bool SWT_isAnimator() { return false; }
+    virtual bool SWT_isBoolAnimator() { return false; }
+    virtual bool SWT_isColorAnimator() { return false; }
+    virtual bool SWT_isComplexAnimator() { return false; }
+    virtual bool SWT_isEffectAnimators() { return false; }
+    virtual bool SWT_isPixmapEffect() { return false; }
+    virtual bool SWT_isIntAnimator() { return false; }
+    virtual bool SWT_isGradient() { return false; }
+    virtual bool SWT_isPaintSettings() { return false; }
+    virtual bool SWT_isStrokeSettings() { return false; }
+    virtual bool SWT_isPathAnimator() { return false; }
+    virtual bool SWT_isQPointFAnimator() { return false; }
+    virtual bool SWT_isQrealAnimator() { return false; }
+    virtual bool SWT_isQStringAnimator() { return false; }
+    virtual bool SWT_isSinglePathAnimator() { return false; }
+    virtual bool SWT_isBasicTransformAnimator() { return false; }
+    virtual bool SWT_isBoxTransformAnimator() { return false; }
+    // Boxes
+    virtual bool SWT_isAnimationBox() { return false; }
+    virtual bool SWT_isBoundingBox() { return false; }
+    virtual bool SWT_isBoxesGroup() { return false; }
+    virtual bool SWT_isCircle() { return false; }
+    virtual bool SWT_isImageBox() { return false; }
+    virtual bool SWT_isImageSequenceBox() { return false; }
+    virtual bool SWT_isLinkBox() { return false; }
+    virtual bool SWT_isParticleBox() { return false; }
+    virtual bool SWT_isPathBox() { return false; }
+    virtual bool SWT_isRectangle() { return false; }
+    virtual bool SWT_isTextBox() { return false; }
+    virtual bool SWT_isVectorPath() { return false; }
+    virtual bool SWT_isVideoBox() { return false; }
+    // Properties
+    virtual bool SWT_isBoolProperty() { return false; }
+    virtual bool SWT_isBoxTargetProperty() { return false; }
+    virtual bool SWT_isProperty() { return false; }
+    // Sound
+    virtual bool SWT_isSingleSound() { return false; }
 
     virtual SingleWidgetAbstraction* SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
@@ -105,6 +124,22 @@ protected:
             SingleWidgetTarget *target);
     void SWT_removeChildAbstractionForTargetFromAll(
             SingleWidgetTarget *target);
+};
+
+typedef bool (SingleWidgetTarget::*SWT_Checker)();
+
+struct SWT_TargetTypes {
+    bool isTargeted(SingleWidgetTarget *target) const {
+        foreach(SWT_Checker func, targetsFunctionList) {
+            if((target->*func)()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    QList<SWT_Checker> targetsFunctionList;
 };
 
 #endif // SINGLEWIDGETTARGET_H

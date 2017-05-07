@@ -16,14 +16,14 @@ enum SWT_Target : short {
     SWT_All
 };
 
-enum SWT_Type : short;
+typedef bool (SingleWidgetTarget::*SWT_Checker)();
 
 struct SWT_RulesCollection {
     SWT_RulesCollection();
     SWT_RulesCollection(const SWT_Rule &ruleT,
                         const bool &alwaysShowChildrenT,
                         const SWT_Target &targetT,
-                        const SWT_Type &typeT,
+                        SWT_Checker typeT,
                         const QString &searchStringT) {
         rule = ruleT;
         alwaysShowChildren = alwaysShowChildrenT;
@@ -35,7 +35,7 @@ struct SWT_RulesCollection {
     SWT_Rule rule;
     bool alwaysShowChildren;
     SWT_Target target;
-    SWT_Type type;
+    SWT_Checker type;
     QString searchString;
 };
 
@@ -91,7 +91,7 @@ public:
     void scheduleContentUpdateIfSearchNotEmpty();
     void scheduleContentUpdateIfIsCurrentTarget(SingleWidgetTarget *targetP,
                                                 const SWT_Target &target);
-    void setCurrentType(const SWT_Type &type);
+    void setCurrentType(SWT_Checker type);
 
 protected:
     static QList<ScrollWidgetVisiblePart*> mAllInstances;

@@ -57,10 +57,6 @@ public:
     void updatePivotIfNeeded();
     void schedulePivotUpdate();
 
-    SWT_Type SWT_getType() {
-        return SWT_CanvasWidget;
-    }
-
     BoxesGroup *getCurrentGroup();
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);

@@ -8,7 +8,9 @@ public:
     BoolAnimator();
 
     bool getCurrentBoolValue();
-    void setCurrentBoolValue(bool bT, bool finish = false);
+    void setCurrentBoolValue(const bool &bT,
+                             const bool &finish = false);
+    bool SWT_isBoolAnimator() { return true; }
 };
 
 #endif // BOOLANIMATOR_H

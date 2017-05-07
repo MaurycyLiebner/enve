@@ -47,7 +47,7 @@ public:
     BoundingBox *getParent();
 
     bool isContainedInRect(QRectF absRect);
-    virtual void moveByRel(QPointF relTranslation);
+    virtual void moveByRel(const QPointF &relTranslation);
     virtual void moveToAbs(QPointF absPos);
     virtual void moveByAbs(QPointF absTranslatione);
 
@@ -70,9 +70,9 @@ public:
 
     virtual void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo = true);
     void rotateBy(const qreal &rot);
-    void scale(qreal scaleXBy, qreal scaleYBy);
+    void scale(const qreal &scaleXBy, const qreal &scaleYBy);
     void saveTransformPivotAbsPos(QPointF absPivot);
-    void scale(qreal scaleBy);
+    void scale(const qreal &scaleBy);
     void cancelTransform();
 
     void setRadius(qreal radius);

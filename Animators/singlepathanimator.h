@@ -80,6 +80,8 @@ public:
     void changeAllPointsParentPathTo(SinglePathAnimator *path);
     void updatePathPointIds();
     int getChildPointIndex(PathPoint *child);
+
+    bool SWT_isSinglePathAnimator() { return true; }
 private:
     PathAnimator *mParentPathAnimator = NULL;
     QPainterPath mPath;

@@ -71,7 +71,7 @@ public:
     void fitCanvasToSize();
     bool processFilteredKeyEvent(QKeyEvent *event);
     void zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin);
-    void moveByRel(QPointF trans);
+    void moveByRel(const QPointF &trans);
 
     void updateAfterFrameChanged(const int &currentFrame);
 
@@ -273,10 +273,6 @@ public:
     void scheduleEffectsMarginUpdate() {}
 
     void addChildAwaitingUpdate(BoundingBox *child);
-
-    SWT_Type SWT_getType() {
-        return SWT_Canvas;
-    }
 
 protected:
     void updateAfterCombinedTransformationChanged() {

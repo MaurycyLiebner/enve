@@ -9,7 +9,7 @@ public:
     void moveToAbsWithoutUpdatingTheOther(QPointF absPos);
     void moveToAbs(QPointF absPos);
     //void moveByWithoutUpdatingTheOther(QPointF absTranslation);
-    void moveByRel(QPointF relTranslation);
+    void moveByRel(const QPointF &relTranslation);
     void startTransform();
     void finishTransform();
     void setOtherCtrlPt(CtrlPoint *ctrlPt);

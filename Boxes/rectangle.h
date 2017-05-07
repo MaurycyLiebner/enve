@@ -47,6 +47,8 @@ public:
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
+
+    bool SWT_isRectangle() { return true; }
 private:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;

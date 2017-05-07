@@ -6,7 +6,6 @@
 #include <QSqlQuery>
 #include "Animators/transformanimator.h"
 
-#include "Animators/animatorscollection.h"
 #include "PixmapEffects/pixmapeffect.h"
 
 #include "Animators/effectanimators.h"
@@ -107,7 +106,7 @@ public:
         mTransformAnimator->setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), finish);
     }
-    virtual bool isContainedIn(QRectF absRect);
+    virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmap(QPainter *p);
     virtual void renderFinal(QPainter *p);
@@ -118,7 +117,7 @@ public:
                               const CanvasMode &currentCanvasMode);
 
 
-    void applyTransformation(TransformAnimator *transAnimator);
+    void applyTransformation(BoxTransformAnimator *transAnimator);
 
     void rotateBy(const qreal &rot, QPointF absOrigin);
 
@@ -127,7 +126,7 @@ public:
     virtual void updateCombinedTransform();
     void updateCombinedTransformAfterFrameChange();
 
-    void moveByRel(QPointF trans);
+    void moveByRel(const QPointF &trans);
 
     void startTransform();
     void finishTransform();
@@ -206,7 +205,7 @@ public:
     bool isLocked();
     bool isVisibleAndUnlocked();
     void rotateBy(const qreal &rot);
-    void scale(qreal scaleBy);
+    void scale(const qreal &scaleBy);
 
     void rotateRelativeToSavedPivot(const qreal &rot);
     void scaleRelativeToSavedPivot(const qreal &scaleBy);
@@ -246,14 +245,16 @@ public:
         Q_UNUSED(canvasScaleInv);
         return NULL;
     }
-    void setAbsolutePos(QPointF pos, bool saveUndoRedo);
-    void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo);
+    void setAbsolutePos(const QPointF &pos,
+                        const bool &saveUndoRedo);
+    void setRelativePos(const QPointF &relPos,
+                        const bool &saveUndoRedo);
 
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
 
-    virtual void drawKeys(QPainter *p, qreal pixelsPerFrame,
-                          qreal drawY, int startFrame, int endFrame);
-    void scaleRelativeToSavedPivot(qreal scaleXBy, qreal scaleYBy);
+
+    void scaleRelativeToSavedPivot(const qreal &scaleXBy,
+                                   const qreal &scaleYBy);
     void resetScale();
     void resetTranslation();
     void resetRotation();
@@ -262,7 +263,7 @@ public:
     bool isText();
     bool isInternalLink();
     bool isExternalLink();
-    TransformAnimator *getTransformAnimator();
+    BoxTransformAnimator *getTransformAnimator();
     void disablePivotAutoAdjust();
     void enablePivotAutoAdjust();
 
@@ -276,7 +277,8 @@ public:
     void saveOldPixmap();
 
     void saveUglyPaintTransform();
-    void drawAsBoundingRect(QPainter *p, QPainterPath path);
+    void drawAsBoundingRect(QPainter *p,
+                            const QPainterPath &path);
     virtual void setUpdateVars();
     void redoUpdate();
     bool shouldRedoUpdate();
@@ -292,7 +294,7 @@ public:
     void removeEffect(PixmapEffect *effect);
     void setAwaitUpdateScheduled(bool bT);
 
-    void setCompositionMode(QPainter::CompositionMode compositionMode);
+    void setCompositionMode(const QPainter::CompositionMode &compositionMode);
 
     virtual void updateEffectsMargin();
 
@@ -306,7 +308,7 @@ public:
     virtual void updateRelBoundingRect();
     virtual const QPainterPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
-    QPointF mapRelPosToAbs(QPointF relPos) const;
+    QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
     QRectF getRelBoundingRect() const {
         return mRelBoundingRect;
@@ -329,11 +331,11 @@ public:
     virtual Canvas *getParentCanvas();
 
 
-    void duplicateTransformAnimatorFrom(TransformAnimator *source);
+    void duplicateTransformAnimatorFrom(BoxTransformAnimator *source);
     virtual void preUpdatePixmapsUpdates();
     void scheduleCenterPivot();
 
-    SWT_Type SWT_getType() { return SWT_BoundingBox; }
+    bool SWT_isBoundingBox() { return true; }
 
     SingleWidgetAbstraction *SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget);
@@ -357,7 +359,7 @@ public:
     bool isAncestor(BoundingBox *box) const;
     void removeFromParent();
     void removeFromSelection();
-    void moveByAbs(QPointF trans);
+    void moveByAbs(const QPointF &trans);
     virtual void makeDuplicate(Property *property);
     Property *makeDuplicate();
     BoundingBox *createDuplicate(BoxesGroup *parent);
@@ -405,7 +407,7 @@ public:
     }
 
     void applyEffects(QImage *im,
-                      qreal scale = 1.);
+                      const qreal &scale = 1.);
     virtual QMatrix getCombinedTransform() const;
     virtual void drawUpdatePixmap(QPainter *p);
 
@@ -420,15 +422,10 @@ public:
     QRectF getUpdateRenderRect();
     QMatrix getUpdatePaintTransform();
     bool isParticleBox();
-    DurationRectangleMovable *getRectangleMovableAtPos(qreal relX,
-                                                       int minViewedFrame,
-                                                       qreal pixelsPerFrame);
-    void getKeysInRect(const QRectF &selectionRect,
-                       const qreal &pixelsPerFrame,
-                       QList<Key *> *keysList);
-    Key *getKeyAtPos(const qreal &relX,
-                     const int &minViewedFrame,
-                     const qreal &pixelsPerFrame);
+    DurationRectangleMovable *anim_getRectangleMovableAtPos(const qreal &relX,
+                                                       const int &minViewedFrame,
+                                                       const qreal &pixelsPerFrame);
+
     int prp_getFrameShift() const;
     int prp_getParentFrameShift() const;
 
@@ -457,6 +454,11 @@ public:
     void finishPivotTransform();
     bool hasDurationRectangle();
     void createDurationRectangle();
+    void prp_drawKeys(QPainter *p,
+                      const qreal &pixelsPerFrame,
+                      const qreal &drawY,
+                      const int &startFrame,
+                      const int &endFrame);
 protected:
     void updateCurrentRenderContainerTransform();
     virtual void scheduleUpdate();
@@ -513,8 +515,8 @@ protected:
     QSharedPointer<EffectAnimators> mEffectsAnimators =
             (new EffectAnimators())->ref<EffectAnimators>();
 
-    QSharedPointer<TransformAnimator> mTransformAnimator =
-                        (new TransformAnimator(this))->ref<TransformAnimator>();
+    QSharedPointer<BoxTransformAnimator> mTransformAnimator =
+                        (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
 
     int mZListIndex = 0;
     bool mPivotChanged = false;

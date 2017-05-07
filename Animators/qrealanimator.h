@@ -151,7 +151,6 @@ public:
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 
-    SWT_Type SWT_getType() { return SWT_QrealAnimator; }
     qreal getCurrentValueAtAbsFrame(const int &frame) const;
     qreal qra_getValueAtRelFrame(const int &frame) const;
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
@@ -168,6 +167,7 @@ public:
         Property::prp_updateAfterChangedRelFrameRange(minFrame, maxFrame);
     }
 
+    bool SWT_isQrealAnimator() { return true; }
 protected:
     std::map<void*, QColor> mAnimatorColors;
 

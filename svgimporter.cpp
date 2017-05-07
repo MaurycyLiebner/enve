@@ -822,7 +822,7 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
 }
 
 void BoundingBoxSvgAttributes::applySingleTransformations(BoundingBox *box) {
-    TransformAnimator *animator = box->getTransformAnimator();
+    BoxTransformAnimator *animator = box->getTransformAnimator();
     animator->translate(mDx, mDy);
     animator->setScale(mScaleX, mScaleY);
     animator->setRotation(mRot);

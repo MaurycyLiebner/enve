@@ -60,7 +60,8 @@ public:
         }
     }
 
-    SWT_Type SWT_getType() { return SWT_ComplexAnimator; }
+    bool SWT_isComplexAnimator() { return true; }
+
     void anim_drawKey(QPainter *p,
                       Key *key,
                       const qreal &pixelsPerFrame,

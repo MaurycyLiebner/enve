@@ -20,6 +20,8 @@ public:
     void reloadSound();
     void reloadFile();
     void loadUpdatePixmap();
+
+    bool SWT_isVideoBox() { return true; }
 protected:
     void updateFrameCount(const char *path);
 private:
