@@ -24,8 +24,9 @@ class MovablePoint :
     public QPointFAnimator,
     public Transformable {
 public:
-    MovablePoint(BoundingBox *parent, MovablePointType type,
-                 qreal radius = 7.5);
+    MovablePoint(BoundingBox *parent,
+                 const MovablePointType &type,
+                 const qreal &radius = 7.5);
 
     virtual ~MovablePoint() {}
 
@@ -46,10 +47,10 @@ public:
 
     BoundingBox *getParent();
 
-    bool isContainedInRect(QRectF absRect);
+    bool isContainedInRect(const QRectF &absRect);
     virtual void moveByRel(const QPointF &relTranslation);
     virtual void moveToAbs(QPointF absPos);
-    virtual void moveByAbs(QPointF absTranslatione);
+    virtual void moveByAbs(const QPointF &absTranslatione);
 
     virtual void removeApproximate() {}
 
@@ -68,10 +69,11 @@ public:
     bool isPivotPoint();
     bool isCtrlPoint();
 
-    virtual void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo = true);
+    virtual void setRelativePos(const QPointF &relPos,
+                                const bool &saveUndoRedo = true);
     void rotateBy(const qreal &rot);
     void scale(const qreal &scaleXBy, const qreal &scaleYBy);
-    void saveTransformPivotAbsPos(QPointF absPivot);
+    void saveTransformPivotAbsPos(const QPointF &absPivot);
     void scale(const qreal &scaleBy);
     void cancelTransform();
 
@@ -84,10 +86,10 @@ public:
     virtual void updateAfterFrameChanged(const int &frame);
 
     qreal getRadius();
-    QPointF mapRelativeToAbsolute(QPointF relPos) const;
-    virtual void applyTransform(QMatrix transform);
-    void moveToRel(QPointF relPos);
-    void scaleRelativeToSavedPivot(qreal sx, qreal sy);
+    virtual void applyTransform(const QMatrix &transform);
+    void moveToRel(const QPointF &relPos);
+    void scaleRelativeToSavedPivot(const qreal &sx,
+                                   const qreal &sy);
     virtual void rotateRelativeToSavedPivot(const qreal &rot);
     void removeAnimations();
 
@@ -102,7 +104,9 @@ public:
         drawCosmeticEllipse(p, getAbsolutePos(),
                             mRadius, mRadius);
     }
-    QPointF mapAbsoluteToRelative(QPointF absPos) const;
+
+    QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
+    QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

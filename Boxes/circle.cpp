@@ -39,8 +39,7 @@ Circle::Circle(BoxesGroup *parent) :
 
 
 #include <QSqlError>
-int Circle::prp_saveToSql(QSqlQuery *query, const int &parentId)
-{
+int Circle::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
 
     int horizontalRadiusPointId = mHorizontalRadiusPoint->prp_saveToSql(query);
@@ -116,7 +115,8 @@ void Circle::setRadius(const qreal &radius) {
     setVerticalRadius(radius);
 }
 
-void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
+void Circle::drawSelected(QPainter *p,
+                          const CanvasMode &currentCanvasMode) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
         drawBoundingRect(p);
@@ -136,9 +136,10 @@ void Circle::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
 }
 
 
-MovablePoint *Circle::getPointAtAbsPos(const QPointF &absPtPos,
-                                 const CanvasMode &currentCanvasMode,
-                                 const qreal &canvasScaleInv) {
+MovablePoint *Circle::getPointAtAbsPos(
+                                const QPointF &absPtPos,
+                                const CanvasMode &currentCanvasMode,
+                                const qreal &canvasScaleInv) {
     MovablePoint *pointToReturn = PathBox::getPointAtAbsPos(absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
@@ -157,8 +158,7 @@ MovablePoint *Circle::getPointAtAbsPos(const QPointF &absPtPos,
 }
 
 void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
-                                                   QList<MovablePoint *> *list)
-{
+                                               QList<MovablePoint *> *list) {
     if(!mCenter->isSelected()) {
         if(mCenter->isContainedInRect(absRect)) {
             mCenter->select();
@@ -179,8 +179,7 @@ void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
     }
 }
 
-void Circle::updatePath()
-{
+void Circle::updatePath() {
     mPath = QPainterPath();
     QPointF centerPos = mCenter->getRelativePos();
     mPath.addEllipse(centerPos,
@@ -192,54 +191,48 @@ void Circle::updatePath()
 
 CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,
                                      MovablePointType type) :
-    MovablePoint(parent, type)
-{
+    MovablePoint(parent, type) {
 
 }
 
 
-CircleCenterPoint::~CircleCenterPoint()
-{
+CircleCenterPoint::~CircleCenterPoint() {
 
 }
 
 void CircleCenterPoint::setVerticalAndHorizontalPoints(
                                                 MovablePoint *verticalPoint,
-                                                MovablePoint *horizontalPoint)
-{
+                                                MovablePoint *horizontalPoint) {
     mVerticalPoint = verticalPoint;
     mHorizontalPoint = horizontalPoint;
 }
 
-void CircleCenterPoint::moveByRel(const QPointF &absTranslatione)
-{
+void CircleCenterPoint::moveByRel(const QPointF &absTranslatione) {
     mParent->moveByRel(absTranslatione);
 }
 
-void CircleCenterPoint::moveByAbs(QPointF absTranslatione) {
+void CircleCenterPoint::moveByAbs(const QPointF &absTranslatione) {
     mParent->moveByAbs(absTranslatione);
 }
 
-void CircleCenterPoint::startTransform()
-{
+void CircleCenterPoint::startTransform() {
     mParent->startTransform();
 }
 
-void CircleCenterPoint::finishTransform()
-{
+void CircleCenterPoint::finishTransform() {
     mParent->finishTransform();
 }
 
-CircleRadiusPoint::CircleRadiusPoint(BoundingBox *parent, MovablePointType type,
-                                     bool blockX, MovablePoint *centerPoint) :
-    MovablePoint(parent, type)
-{
+CircleRadiusPoint::CircleRadiusPoint(BoundingBox *parent,
+                                     const MovablePointType &type,
+                                     const bool &blockX,
+                                     MovablePoint *centerPoint) :
+    MovablePoint(parent, type) {
     mCenterPoint = centerPoint;
     mXBlocked = blockX;
 }
 
-CircleRadiusPoint::~CircleRadiusPoint()
-{
+CircleRadiusPoint::~CircleRadiusPoint() {
 
 }
 
@@ -266,14 +259,15 @@ void CircleRadiusPoint::moveByRel(const QPointF &relTranslation) {
 //    setRelativePos(newPos, false );
 //}
 
-void CircleRadiusPoint::moveByAbs(QPointF absTranslatione) {
+void CircleRadiusPoint::moveByAbs(const QPointF &absTranslatione) {
     if(mCenterPoint->isSelected() ) return;
     MovablePoint::moveByAbs(absTranslatione);
     //setCurrentValue(mSavedRelPos);
     //setAbsPosRadius(getAbsolutePos() + absTranslatione);
 }
 
-void CircleRadiusPoint::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo) {
+void CircleRadiusPoint::setRelativePos(const QPointF &relPos,
+                                       const bool &saveUndoRedo) {
     if(mXBlocked) {
         mYAnimator->qra_setCurrentValue(relPos.y(), saveUndoRedo);
     } else {
@@ -281,14 +275,12 @@ void CircleRadiusPoint::setRelativePos(const QPointF &relPos, const bool &saveUn
     }
 }
 
-void CircleRadiusPoint::startTransform()
-{
+void CircleRadiusPoint::startTransform() {
     if(mCenterPoint->isSelected() ) return;
     MovablePoint::startTransform();
 }
 
-void CircleRadiusPoint::finishTransform()
-{
+void CircleRadiusPoint::finishTransform() {
     if(mCenterPoint->isSelected() ) return;
     MovablePoint::finishTransform();
 }

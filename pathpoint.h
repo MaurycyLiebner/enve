@@ -109,7 +109,7 @@ public:
 
     ~PathPoint();
 
-    void applyTransform(QMatrix transform);
+    void applyTransform(const QMatrix &transform);
 
     void startTransform();
     void finishTransform();
@@ -192,7 +192,7 @@ public:
     PathPointValues getPointValues() const;
 
     bool isNeighbourSelected();
-    void moveByAbs(QPointF absTranslatione);
+    void moveByAbs(const QPointF &absTranslatione);
     void prp_loadFromSql(const int &movablePointId);
 
     void setPointValues(const PathPointValues &values);

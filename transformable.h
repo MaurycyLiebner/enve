@@ -15,7 +15,7 @@ public:
     virtual void moveByRel(const QPointF &relTranslatione) {
         Q_UNUSED(relTranslatione);
     }
-    virtual void moveByAbs(QPointF absTranslatione) {
+    virtual void moveByAbs(const QPointF &absTranslatione) {
         Q_UNUSED(absTranslatione);
     }
 

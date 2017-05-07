@@ -37,7 +37,7 @@ void PathPoint::setParentPath(SinglePathAnimator *path) {
     mParentPath = path;
 }
 
-void PathPoint::applyTransform(QMatrix transform)
+void PathPoint::applyTransform(const QMatrix &transform)
 {
     mStartCtrlPt->applyTransform(transform);
     mEndCtrlPt->applyTransform(transform);
@@ -134,7 +134,7 @@ void PathPoint::moveByRel(const QPointF &relTranslation)
     }
 }
 
-void PathPoint::moveByAbs(QPointF absTranslatione) {
+void PathPoint::moveByAbs(const QPointF &absTranslatione) {
     MovablePoint::moveByAbs(absTranslatione);
     if(!mStartCtrlPt->isSelected()) {
         mStartCtrlPt->MovablePoint::moveByAbs(absTranslatione);

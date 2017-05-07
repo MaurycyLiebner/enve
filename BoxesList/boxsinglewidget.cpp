@@ -175,6 +175,26 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mValueSlider->setAnimator(NULL);
         mValueSlider->hide();
+    } else if(target->SWT_isBoolProperty()) {
+        mRecordButton->hide();
+
+        mContentButton->hide();
+
+        mVisibleButton->hide();
+
+        mLockedButton->hide();
+
+        mColorButton->hide();
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
+
+        mCheckBox->show();
+        mCheckBox->setTarget((BoolProperty*)target);
+
+        mValueSlider->hide();
     } else if(target->SWT_isQrealAnimator()) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
 
@@ -238,26 +258,6 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mBoxTargetWidget->show();
         mBoxTargetWidget->setTargetProperty((BoxTargetProperty*)target);
         mCheckBox->hide();
-
-        mValueSlider->hide();
-    } else if(target->SWT_isBoolAnimator()) {
-        mRecordButton->hide();
-
-        mContentButton->hide();
-
-        mVisibleButton->hide();
-
-        mLockedButton->hide();
-
-        mColorButton->hide();
-
-        mCompositionModeCombo->hide();
-        mCompositionModeVisible = false;
-
-        mBoxTargetWidget->hide();
-
-        mCheckBox->show();
-        mCheckBox->setTarget((BoolProperty*)target);
 
         mValueSlider->hide();
     }

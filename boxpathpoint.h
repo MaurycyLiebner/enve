@@ -10,7 +10,7 @@ public:
 
     void startTransform();
     void finishTransform();
-    void moveByAbs(QPointF absTranslatione);
+    void moveByAbs(const QPointF &absTranslatione);
     void draw(QPainter *p);
 private:
     QPointF mSavedAbsPos;

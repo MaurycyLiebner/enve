@@ -4,8 +4,8 @@
 #include "undoredo.h"
 
 MovablePoint::MovablePoint(BoundingBox *parent,
-                           MovablePointType type,
-                           qreal radius) :
+                           const MovablePointType &type,
+                           const qreal &radius) :
     QPointFAnimator(),
     Transformable() {
     mType = type;
@@ -20,7 +20,7 @@ void MovablePoint::startTransform()
     mSavedRelPos = getRelativePos();
 }
 
-void MovablePoint::applyTransform(QMatrix transform){
+void MovablePoint::applyTransform(const QMatrix &transform){
     setCurrentPointValue(transform.map(getCurrentPointValue()), true);
 }
 
@@ -63,11 +63,11 @@ QPointF MovablePoint::getRelativePos() const
     return getCurrentPointValue();
 }
 
-QPointF MovablePoint::mapRelativeToAbsolute(QPointF relPos) const {
+QPointF MovablePoint::mapRelativeToAbsolute(const QPointF &relPos) const {
     return mParent->mapRelPosToAbs(relPos);
 }
 
-QPointF MovablePoint::mapAbsoluteToRelative(QPointF absPos) const {
+QPointF MovablePoint::mapAbsoluteToRelative(const QPointF &absPos) const {
     return mParent->mapAbsPosToRel(absPos);
 }
 
@@ -121,8 +121,7 @@ bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
             mRadius*mRadius*canvasScaleInv*canvasScaleInv);
 }
 
-bool MovablePoint::isContainedInRect(QRectF absRect)
-{
+bool MovablePoint::isContainedInRect(const QRectF &absRect) {
     if(isHidden() || (isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible()) ) {
         return false;
     }
@@ -137,7 +136,8 @@ void MovablePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     moveToRel(mat.map(mSavedRelPos));
 }
 
-void MovablePoint::scaleRelativeToSavedPivot(qreal sx, qreal sy) {
+void MovablePoint::scaleRelativeToSavedPivot(const qreal &sx,
+                                             const qreal &sy) {
     QMatrix mat;
     mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
     mat.scale(sx, sy);
@@ -145,11 +145,11 @@ void MovablePoint::scaleRelativeToSavedPivot(qreal sx, qreal sy) {
     moveToRel(mat.map(mSavedRelPos));
 }
 
-void MovablePoint::saveTransformPivotAbsPos(QPointF absPivot) {
+void MovablePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
     mSavedTransformPivot = mParent->mapAbsPosToRel(absPivot);
 }
 
-void MovablePoint::moveToRel(QPointF relPos) {
+void MovablePoint::moveToRel(const QPointF &relPos) {
     moveByRel(relPos - mSavedRelPos);
 }
 
@@ -158,7 +158,7 @@ void MovablePoint::moveByRel(const QPointF &relTranslation) {
                                         relTranslation.y());
 }
 
-void MovablePoint::moveByAbs(QPointF absTranslatione) {
+void MovablePoint::moveByAbs(const QPointF &absTranslatione) {
     moveToAbs(mapRelativeToAbsolute(getSavedPointValue()) +
               absTranslatione);
 }

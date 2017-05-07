@@ -17,7 +17,7 @@ public:
     void startTransform();
 
     void finishTransform();
-    void moveByAbs(QPointF absTranslatione);
+    void moveByAbs(const QPointF &absTranslatione);
 private:
     MovablePoint *mVerticalPoint = NULL;
     MovablePoint *mHorizontalPoint = NULL;
@@ -26,17 +26,20 @@ private:
 class CircleRadiusPoint : public MovablePoint
 {
 public:
-    CircleRadiusPoint(BoundingBox *parent, MovablePointType type,
-                      bool blockX, MovablePoint *centerPoint);
+    CircleRadiusPoint(BoundingBox *parent,
+                      const MovablePointType &type,
+                      const bool &blockX,
+                      MovablePoint *centerPoint);
     ~CircleRadiusPoint();
 
     void moveByRel(const QPointF &relTranslation);
 //    void setAbsPosRadius(QPointF pos);
-    void moveByAbs(QPointF absTranslatione);
+    void moveByAbs(const QPointF &absTranslatione);
 
     void startTransform();
     void finishTransform();
-    void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo = true);
+    void setRelativePos(const QPointF &relPos,
+                        const bool &saveUndoRedo = true);
 private:
     MovablePoint *mCenterPoint = NULL;
     bool mXBlocked = false;
@@ -51,7 +54,8 @@ public:
     void setHorizontalRadius(const qreal &horizontalRadius);
     void setRadius(const qreal &radius);
 
-    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
+    void drawSelected(QPainter *p,
+                      const CanvasMode &currentCanvasMode);
     void updatePath();
     MovablePoint *getPointAtAbsPos(
                              const QPointF &absPtPos,
@@ -61,7 +65,8 @@ public:
                                            QList<MovablePoint *> *list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
-    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    int prp_saveToSql(QSqlQuery *query,
+                      const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {

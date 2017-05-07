@@ -17,7 +17,7 @@ void BoxPathPoint::finishTransform() {
     mParent->finishPivotTransform();
 }
 
-void BoxPathPoint::moveByAbs(QPointF absTranslatione) {
+void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
     QPointF absPos = mSavedAbsPos + absTranslatione;
     mParent->setPivotAbsPos(absPos, false, true);
 }
