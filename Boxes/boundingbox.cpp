@@ -345,7 +345,7 @@ void BoundingBox::updateAllBoxes() {
 
 void BoundingBox::clearAllCache() {
     if(!mNoCache) {
-        mRenderCacheHandler.clearAllCache();
+        mRenderCacheHandler.clearCache();
     }
     replaceCurrentFrameCache();
 }

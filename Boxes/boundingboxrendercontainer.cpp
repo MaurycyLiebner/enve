@@ -53,8 +53,16 @@ const qreal &BoundingBoxRenderContainer::getResolutionFraction() const {
     return mResolutionFraction;
 }
 
-const int &BoundingBoxRenderContainer::getFrame() const {
-    return mFrame;
+const int &BoundingBoxRenderContainer::getMinRelFrame() const {
+    return mMinRelFrame;
+}
+
+const int &BoundingBoxRenderContainer::getMaxRelFrame() const {
+    return mMaxRelFrame;
+}
+
+bool BoundingBoxRenderContainer::relFrameInRange(const int &relFrame) {
+    return relFrame >= mMinRelFrame && relFrame <= mMaxRelFrame;
 }
 
 const qint64 &BoundingBoxRenderContainer::getRenderTime() const {
@@ -62,7 +70,22 @@ const qint64 &BoundingBoxRenderContainer::getRenderTime() const {
 }
 
 void BoundingBoxRenderContainer::setRelFrame(const int &frame) {
-    mFrame = frame;
+    mMinRelFrame = frame;
+    mMaxRelFrame = frame;
+}
+
+void BoundingBoxRenderContainer::setMaxRelFrame(const int &maxFrame) {
+    mMaxRelFrame = maxFrame;
+}
+
+void BoundingBoxRenderContainer::setMinRelFrame(const int &minFrame) {
+    mMinRelFrame = minFrame;
+}
+
+void BoundingBoxRenderContainer::setRelFrameRange(const int &minFrame,
+                                                  const int &maxFrame) {
+    mMinRelFrame = minFrame;
+    mMaxRelFrame = maxFrame;
 }
 
 void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransform,
@@ -102,7 +125,8 @@ void CacheBoundingBoxRenderContainer::duplicateFrom(
                  src->getPaintTransform(),
                  src->getBoundingRect(),
                  src->getImage(),
-                 src->getFrame(),
+                 src->getMinRelFrame(),
+                 src->getMaxRelFrame(),
                  src->getResolutionFraction(),
                  src->getRenderTime());
 }
@@ -111,14 +135,16 @@ void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
                                               const QMatrix &paintTransform,
                                               const QRectF &rect,
                                               const QImage &img,
-                                              const int &frame,
+                                              const int &minFrame,
+                                              const int &maxFrame,
                                               const qreal &res,
                                               const qint64 &time) {
     mTransform = transform;
     mPaintTransform = paintTransform;
     mImage = img;
     mBoundingRect = rect;
-    mFrame = frame;
+    mMinRelFrame = minFrame;
+    mMaxRelFrame = maxFrame;
     mResolutionFraction = res;
     mRenderTime = time;
     thisAccessed();
@@ -129,6 +155,6 @@ void CacheBoundingBoxRenderContainer::thisAccessed() {
 }
 
 void CacheBoundingBoxRenderContainer::freeThis() {
-    if(mParentRange == NULL) return;
-    mParentRange->removeRenderContainer(this);
+    if(mParentCacheHandler == NULL) return;
+    mParentCacheHandler->removeRenderContainer(this);
 }

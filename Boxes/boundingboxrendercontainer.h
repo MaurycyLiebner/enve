@@ -4,6 +4,8 @@ class BoundingBox;
 #include <QImage>
 #include "selfref.h"
 
+class RenderCacheHandler;
+
 class BoundingBoxRenderContainer {
 public:
     BoundingBoxRenderContainer() {}
@@ -30,11 +32,16 @@ public:
 
     const qreal &getResolutionFraction() const;
 
-    const int &getFrame() const;
+    const int &getMinRelFrame() const;
+
+    const int &getMaxRelFrame() const;
 
     const qint64 &getRenderTime() const;
 
     void setRelFrame(const int &frame);
+    void setMaxRelFrame(const int &maxFrame);
+    void setMinRelFrame(const int &minFrame);
+    void setRelFrameRange(const int &minFrame, const int &maxFrame);
 
     void updateVariables(const QMatrix &combinedTransform,
                          const qreal &effectsMargin,
@@ -47,17 +54,17 @@ public:
         return mImage.byteCount();
     }
 
+    bool relFrameInRange(const int &relFrame);
 protected:
     qint64 mRenderTime = 0;
-    int mFrame = 0;
+    int mMinRelFrame = 0;
+    int mMaxRelFrame = 0;
     qreal mResolutionFraction;
     QMatrix mTransform;
     QMatrix mPaintTransform;
     QRectF mBoundingRect;
     QImage mImage;
 };
-
-class RenderCacheRange;
 
 class CacheBoundingBoxRenderContainer : public BoundingBoxRenderContainer,
                                         public SimpleSmartPointer {
@@ -71,17 +78,20 @@ public:
                       const QMatrix &paintTransform,
                       const QRectF &rect,
                       const QImage &img,
-                      const int &frame,
-                      const qreal &res, const qint64 &time);
+                      const int &minFrame,
+                      const int &maxFrame,
+                      const qreal &res,
+                      const qint64 &time);
+    void setParentCacheHandler(RenderCacheHandler *handler) {
+        mParentCacheHandler = handler;
+    }
     void freeThis();
 
-    void setParentRagne(RenderCacheRange *range) {
-        mParentRange = range;
-    }
 
     void thisAccessed();
 private:
-    RenderCacheRange *mParentRange = NULL;
+    RenderCacheHandler *mParentCacheHandler = NULL;
+
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H
