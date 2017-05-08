@@ -197,7 +197,7 @@ void RenderCacheHandler::clearCacheForRelFrameRange(const int &minFrame,
     getRenderContainterIdAtRelFrame(minFrame, &minId);
     int maxId = mRenderContainers.count() - 1;
     getRenderContainterIdAtRelFrame(maxFrame, &maxId);
-    for(int i = minId; i < maxId; i++) {
+    for(int i = minId; i <= maxId; i++) {
         CacheBoundingBoxRenderContainer *cont = mRenderContainers.takeAt(minId);
         cont->setParentCacheHandler(NULL);
         cont->decNumberPointers();
@@ -439,7 +439,8 @@ RenderCacheHandler::createNewRenderContainerAtRelFrame(const int &frame) {
     CacheBoundingBoxRenderContainer *cont =
             new CacheBoundingBoxRenderContainer();
     cont->setParentCacheHandler(this);
-    cont->setRelFrame(frame);
+    cont->setRelFrameRange(getMinRelFrameForContainerAtRel(frame),
+                           getMaxRelFrameForContainerAtRel(frame));
     cont->incNumberPointers();
     int contId = getRenderContainterInsertIdAtRelFrame(frame);
     mRenderContainers.insert(contId, cont);
@@ -579,6 +580,28 @@ void RenderCacheHandler::addRangeNeedingUpdate(RenderCacheRange *range) {
     mRangesNeedingUpdate << range;
 }
 
+int RenderCacheHandler::getMaxRelFrameForContainerAtRel(
+                                const int &relFrame) {
+    RenderCacheRange *range =
+            getRenderCacheRangeContainingRelFrame(relFrame);
+    if(range->areInternalDifferencesPresent()) {
+        return relFrame + 1;
+    } else {
+        return range->getMaxRelFrame();
+    }
+}
+
+int RenderCacheHandler::getMinRelFrameForContainerAtRel(
+                                const int &relFrame) {
+    RenderCacheRange *range =
+            getRenderCacheRangeContainingRelFrame(relFrame);
+    if(range->areInternalDifferencesPresent()) {
+        return relFrame;
+    } else {
+        return range->getMinRelFrame();
+    }
+}
+
 void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
                            const qreal &pixelsPerFrame,
                            const qreal &drawY,
@@ -586,21 +609,28 @@ void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
                            const int &endFrame) {
     p->setBrush(QColor(0, 255, 0, 75));
     p->setPen(Qt::NoPen);
-    int lastDrawnFrame = 0;
+    int lastDrawnFrame = startFrame;
     int lastDrawX = 0;
     foreach(CacheBoundingBoxRenderContainer *cont, mRenderContainers) {
-        int dFrame = cont->getMinRelFrame() - startFrame;
+        int maxFrame = cont->getMaxRelFrame();
+        int minFrame = cont->getMinRelFrame();
+        if(maxFrame < startFrame) continue;
+        if(minFrame > endFrame) return;
+
+        if(maxFrame > endFrame) maxFrame = endFrame;
+        if(minFrame < startFrame) minFrame = startFrame;
+
+        int dFrame = minFrame - startFrame;
         int xT = dFrame*pixelsPerFrame;
-        int widthT = pixelsPerFrame*(cont->getMaxRelFrame() -
-                                     cont->getMinRelFrame() + 1);
-        if(lastDrawnFrame == dFrame -  1) {
+
+        int widthT = pixelsPerFrame*(maxFrame - minFrame);
+        if(lastDrawnFrame == minFrame) {
             widthT += xT - lastDrawX;
             xT = lastDrawX;
         }
         p->drawRect(xT, drawY, widthT, 20);
-        lastDrawnFrame = dFrame;
+        lastDrawnFrame = maxFrame;
         lastDrawX = xT + widthT;
-        if(cont->getMinRelFrame() > endFrame) return;
     }
 }
 

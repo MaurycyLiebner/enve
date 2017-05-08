@@ -62,7 +62,7 @@ const int &BoundingBoxRenderContainer::getMaxRelFrame() const {
 }
 
 bool BoundingBoxRenderContainer::relFrameInRange(const int &relFrame) {
-    return relFrame >= mMinRelFrame && relFrame <= mMaxRelFrame;
+    return relFrame >= mMinRelFrame && relFrame < mMaxRelFrame;
 }
 
 const qint64 &BoundingBoxRenderContainer::getRenderTime() const {
@@ -143,8 +143,8 @@ void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
     mPaintTransform = paintTransform;
     mImage = img;
     mBoundingRect = rect;
-    mMinRelFrame = minFrame;
-    mMaxRelFrame = maxFrame;
+    //mMinRelFrame = minFrame;
+    //mMaxRelFrame = maxFrame;
     mResolutionFraction = res;
     mRenderTime = time;
     thisAccessed();

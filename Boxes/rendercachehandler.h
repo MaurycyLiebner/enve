@@ -218,6 +218,9 @@ private:
 
     void addRangeNeedingUpdate(RenderCacheRange *range);
 
+    int getMaxRelFrameForContainerAtRel(const int &relFrame);
+    int getMinRelFrameForContainerAtRel(const int &relFrame);
+
     QList<RenderCacheRangeChange> mRenderCacheRangeRemovals;
     QList<RenderCacheRangeChange> mRenderCacheRangeAdds;
     QList<RenderCacheRangeChange> mRenderCacheRangeValueChanges;
