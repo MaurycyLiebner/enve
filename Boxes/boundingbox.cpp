@@ -1004,6 +1004,7 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
 void BoundingBox::updateAfterDurationRectangleShifted() {
     prp_setParentFrameShift(prp_mParentFrameShift);
     updateAfterFrameChanged(anim_mCurrentAbsFrame);
+    emit mRenderCacheHandler.clearedCacheForAbsFrameRange(INT_MIN, INT_MAX);
 }
 
 DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
@@ -1281,6 +1282,13 @@ void BoundingBox::beforeUpdate() {
 //                        mCombinedTransformMatrix);
 //        }
 //    }
+    if(!mUpdateReplaceCache) {
+        CacheBoundingBoxRenderContainer *cont =
+              getRenderContainerAtFrame(mUpdateRelFrame);
+
+        mUpdateRenderContainer->duplicateFrom(cont);
+        mUpdateRenderContainer->setRelFrame(mUpdateRelFrame);
+    }
     mAwaitingUpdate = false;
 }
 

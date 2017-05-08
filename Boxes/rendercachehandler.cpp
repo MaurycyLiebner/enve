@@ -590,8 +590,10 @@ bool RenderCacheHandler::areInternalDifferencesPresentFromAll(
     if(range->areInternalDifferencesPresent()) {
         return true;
     }
+    int absFrame = relFrameToAbsFrame(relFrame);
     foreach(RenderCacheHandler *handler, mInfluencingHandlers) {
-        if(handler->areInternalDifferencesPresentFromAll(relFrame)) {
+        if(handler->areInternalDifferencesPresentFromAll(
+                    handler->absFrameToRelFrame(absFrame))) {
             return true;
         }
     }
@@ -656,12 +658,16 @@ int RenderCacheHandler::getMinRelFrameForContainerAtRel(
     } else {
         minRelFrame = range->getMinRelFrame();
     }
+    int absFrame = relFrameToAbsFrame(relFrame);
     foreach(RenderCacheHandler *handler, mInfluencingHandlers) {
-        if(handler->areInternalDifferencesPresentFromAll(relFrame)) {
+        if(handler->areInternalDifferencesPresentFromAll(
+                    handler->absFrameToRelFrame(absFrame)) ) {
             return relFrame;
         } else {
-            int minRelFrameT = handler->getMinRelFrameForContainerAtRel(
-                                                relFrame);
+            int minRelFrameT = absFrameToRelFrame(
+                        handler->relFrameToAbsFrame(
+                        handler->getMinRelFrameForContainerAtRel(
+                            handler->absFrameToRelFrame(absFrame)) ));
             if(minRelFrame < minRelFrameT) {
                 minRelFrame = minRelFrameT;
             }

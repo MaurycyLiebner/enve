@@ -111,16 +111,8 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransfor
     mRenderTime = timer.elapsed();
 }
 
-CacheBoundingBoxRenderContainer::CacheBoundingBoxRenderContainer() {
-    MemoryHandler::getInstance()->addContainer(this);
-}
-
-CacheBoundingBoxRenderContainer::~CacheBoundingBoxRenderContainer() {
-    MemoryHandler::getInstance()->removeContainer(this);
-}
-
-void CacheBoundingBoxRenderContainer::duplicateFrom(
-                                            BoundingBoxRenderContainer *src) {
+void BoundingBoxRenderContainer::duplicateFrom(
+                                    BoundingBoxRenderContainer *src) {
     setVariables(src->getTransform(),
                  src->getPaintTransform(),
                  src->getBoundingRect(),
@@ -131,7 +123,7 @@ void CacheBoundingBoxRenderContainer::duplicateFrom(
                  src->getRenderTime());
 }
 
-void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
+void BoundingBoxRenderContainer::setVariables(const QMatrix &transform,
                                               const QMatrix &paintTransform,
                                               const QRectF &rect,
                                               const QImage &img,
@@ -147,6 +139,32 @@ void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
     //mMaxRelFrame = maxFrame;
     mResolutionFraction = res;
     mRenderTime = time;
+}
+
+CacheBoundingBoxRenderContainer::CacheBoundingBoxRenderContainer() {
+    MemoryHandler::getInstance()->addContainer(this);
+}
+
+CacheBoundingBoxRenderContainer::~CacheBoundingBoxRenderContainer() {
+    MemoryHandler::getInstance()->removeContainer(this);
+}
+
+void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
+                                              const QMatrix &paintTransform,
+                                              const QRectF &rect,
+                                              const QImage &img,
+                                              const int &minFrame,
+                                              const int &maxFrame,
+                                              const qreal &res,
+                                              const qint64 &time) {
+    BoundingBoxRenderContainer::setVariables(transform,
+                                             paintTransform,
+                                             rect,
+                                             img,
+                                             minFrame,
+                                             maxFrame,
+                                             res,
+                                             time);
     thisAccessed();
 }
 

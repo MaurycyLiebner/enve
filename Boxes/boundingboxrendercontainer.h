@@ -55,6 +55,15 @@ public:
     }
 
     bool relFrameInRange(const int &relFrame);
+    void setVariables(const QMatrix &transform,
+                      const QMatrix &paintTransform,
+                      const QRectF &rect,
+                      const QImage &img,
+                      const int &minFrame,
+                      const int &maxFrame,
+                      const qreal &res,
+                      const qint64 &time);
+    void duplicateFrom(BoundingBoxRenderContainer *src);
 protected:
     qint64 mRenderTime = 0;
     int mMinRelFrame = 0;
@@ -71,8 +80,6 @@ class CacheBoundingBoxRenderContainer : public BoundingBoxRenderContainer,
 public:
     CacheBoundingBoxRenderContainer();
     virtual ~CacheBoundingBoxRenderContainer();
-
-    void duplicateFrom(BoundingBoxRenderContainer *src);
 
     void setVariables(const QMatrix &transform,
                       const QMatrix &paintTransform,

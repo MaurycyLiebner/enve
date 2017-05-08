@@ -32,21 +32,28 @@ void Property::prp_setParentFrameShift(const int &shift) {
 
 int Property::prp_absFrameToRelFrame(
                             const int &absFrame) const {
+    if(absFrame == INT_MIN) return INT_MIN;
+    if(absFrame == INT_MAX) return INT_MAX;
     return absFrame - prp_getFrameShift();
 }
 
-int Property::prp_relFrameToAbsFrame(
-                            const int &relFrame) const {
+int Property::prp_relFrameToAbsFrame(const int &relFrame) const {
+    if(relFrame == INT_MIN) return INT_MIN;
+    if(relFrame == INT_MAX) return INT_MAX;
     return relFrame + prp_getFrameShift();
 }
 
 int Property::prp_absFrameToParentRelFrame(
                             const int &absFrame) const {
+    if(absFrame == INT_MIN) return INT_MIN;
+    if(absFrame == INT_MAX) return INT_MAX;
     return absFrame - prp_getParentFrameShift();
 }
 
 int Property::prp_parentRelFrameToAbsFrame(
                             const int &relFrame) const {
+    if(relFrame == INT_MIN) return INT_MIN;
+    if(relFrame == INT_MAX) return INT_MAX;
     return relFrame + prp_getParentFrameShift();
 }
 
