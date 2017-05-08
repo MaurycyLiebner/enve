@@ -202,6 +202,10 @@ void RenderCacheHandler::clearCacheForRelFrameRange(const int &minFrame,
         cont->setParentCacheHandler(NULL);
         cont->decNumberPointers();
     }
+    int minFrameT = minFrame;
+    int maxFrameT = maxFrame;
+    relRangeToAbsRange(&minFrameT, &maxFrameT);
+    emit clearedCacheForAbsFrameRange(minFrameT, maxFrameT);
 }
 
 void RenderCacheHandler::addRangeNeedingUpdate(const int &min,
@@ -580,26 +584,90 @@ void RenderCacheHandler::addRangeNeedingUpdate(RenderCacheRange *range) {
     mRangesNeedingUpdate << range;
 }
 
+bool RenderCacheHandler::areInternalDifferencesPresentFromAll(
+                                    const int &relFrame) {
+    RenderCacheRange *range = getRenderCacheRangeContainingRelFrame(relFrame);
+    if(range->areInternalDifferencesPresent()) {
+        return true;
+    }
+    foreach(RenderCacheHandler *handler, mInfluencingHandlers) {
+        if(handler->areInternalDifferencesPresentFromAll(relFrame)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void RenderCacheHandler::addInfluencingHandler(RenderCacheHandler *handler) {
+    mInfluencingHandlers << handler;
+}
+
+void RenderCacheHandler::removeInfluencingHandler(RenderCacheHandler *handler) {
+    mInfluencingHandlers.removeOne(handler);
+}
+#include "boundingbox.h"
+int RenderCacheHandler::relFrameToAbsFrame(const int &relFrame) {
+    return mParentBox->prp_relFrameToAbsFrame(relFrame);
+}
+
+int RenderCacheHandler::absFrameToRelFrame(const int &absFrame) {
+    return mParentBox->prp_absFrameToRelFrame(absFrame);
+}
+
+void RenderCacheHandler::clearCacheForAbsFrameRange(const int &minFrame,
+                                                    const int &maxFrame) {
+    int minFrameT = minFrame;
+    int maxFrameT = maxFrame;
+    absRangeToRelRange(&minFrameT, &maxFrameT);
+    clearCacheForRelFrameRange(minFrameT, maxFrameT);
+}
+
 int RenderCacheHandler::getMaxRelFrameForContainerAtRel(
                                 const int &relFrame) {
-    RenderCacheRange *range =
-            getRenderCacheRangeContainingRelFrame(relFrame);
+    int maxRelFrame;
+    RenderCacheRange *range = getRenderCacheRangeContainingRelFrame(relFrame);
     if(range->areInternalDifferencesPresent()) {
         return relFrame + 1;
     } else {
-        return range->getMaxRelFrame();
+        maxRelFrame = range->getMaxRelFrame();
     }
+    foreach(RenderCacheHandler *handler, mInfluencingHandlers) {
+        if(handler->areInternalDifferencesPresentFromAll(relFrame)) {
+            return relFrame + 1;
+        } else {
+            int maxRelFrameT = handler->getMaxRelFrameForContainerAtRel(
+                                                relFrame);
+            if(maxRelFrame > maxRelFrameT) {
+                maxRelFrame = maxRelFrameT;
+            }
+        }
+    }
+    if(relFrame == maxRelFrame) return relFrame + 1;
+    return maxRelFrame;
 }
 
 int RenderCacheHandler::getMinRelFrameForContainerAtRel(
                                 const int &relFrame) {
-    RenderCacheRange *range =
-            getRenderCacheRangeContainingRelFrame(relFrame);
+    int minRelFrame;
+    RenderCacheRange *range = getRenderCacheRangeContainingRelFrame(relFrame);
     if(range->areInternalDifferencesPresent()) {
         return relFrame;
     } else {
-        return range->getMinRelFrame();
+        minRelFrame = range->getMinRelFrame();
     }
+    foreach(RenderCacheHandler *handler, mInfluencingHandlers) {
+        if(handler->areInternalDifferencesPresentFromAll(relFrame)) {
+            return relFrame;
+        } else {
+            int minRelFrameT = handler->getMinRelFrameForContainerAtRel(
+                                                relFrame);
+            if(minRelFrame < minRelFrameT) {
+                minRelFrame = minRelFrameT;
+            }
+        }
+    }
+    return minRelFrame;
 }
 
 void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,

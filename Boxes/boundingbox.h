@@ -101,7 +101,9 @@ public:
     virtual void setSelectedFontFamilyAndStyle(QString,
                                        QString) {}
 
-    virtual QPointF getRelCenterPosition() { return mRelBoundingRect.center(); }
+    virtual QPointF getRelCenterPosition() {
+        return mRelBoundingRect.center();
+    }
     virtual void centerPivotPosition(bool finish = false) {
         mTransformAnimator->setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), finish);
@@ -422,9 +424,10 @@ public:
     QRectF getUpdateRenderRect();
     QMatrix getUpdatePaintTransform();
     bool isParticleBox();
-    DurationRectangleMovable *anim_getRectangleMovableAtPos(const qreal &relX,
-                                                       const int &minViewedFrame,
-                                                       const qreal &pixelsPerFrame);
+    DurationRectangleMovable *anim_getRectangleMovableAtPos(
+                                    const qreal &relX,
+                                    const int &minViewedFrame,
+                                    const qreal &pixelsPerFrame);
 
     int prp_getFrameShift() const;
     int prp_getParentFrameShift() const;
@@ -436,6 +439,8 @@ public:
     bool isUsedAsTarget();
     void incUsedAsTarget();
     void decUsedAsTarget();
+    void addInfluencingHandler(RenderCacheHandler *handler);
+    void removeInfluencingHandler(RenderCacheHandler *handler);
     bool shouldUpdateAndDraw();
     void ca_childAnimatorIsRecordingChanged();
 
@@ -459,6 +464,11 @@ public:
                       const qreal &drawY,
                       const int &startFrame,
                       const int &endFrame);
+
+    RenderCacheHandler *getRenderHandler() {
+        return &mRenderCacheHandler;
+    }
+
 protected:
     void updateCurrentRenderContainerTransform();
     virtual void scheduleUpdate();

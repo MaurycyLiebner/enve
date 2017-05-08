@@ -12,6 +12,7 @@
 BoundingBox::BoundingBox(BoxesGroup *parent,
                          const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
+    mRenderCacheHandler.setParentBox(this);
     mParent = parent->ref<BoxesGroup>();
 
     mEffectsAnimators->prp_setName("effects");
@@ -33,6 +34,7 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
     mType = type;
     mTransformAnimator->reset();
+    mRenderCacheHandler.setParentBox(this);
 }
 
 BoundingBox::~BoundingBox() {
@@ -935,7 +937,7 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     effect->setParentEffectAnimators(mEffectsAnimators.data());
 
     scheduleEffectsMarginUpdate();
-    scheduleSoftUpdate();
+    clearAllCache();
 }
 
 void BoundingBox::removeEffect(PixmapEffect *effect) {
@@ -945,7 +947,7 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
     }
 
     scheduleEffectsMarginUpdate();
-    scheduleSoftUpdate();
+    clearAllCache();
 }
 
 int BoundingBox::prp_getParentFrameShift() const {
@@ -1335,6 +1337,14 @@ void BoundingBox::incUsedAsTarget() {
 
 void BoundingBox::decUsedAsTarget() {
     mUsedAsTargetCount--;
+}
+
+void BoundingBox::addInfluencingHandler(RenderCacheHandler *handler) {
+    mRenderCacheHandler.addInfluencingHandler(handler);
+}
+
+void BoundingBox::removeInfluencingHandler(RenderCacheHandler *handler) {
+    mRenderCacheHandler.removeInfluencingHandler(handler);
 }
 
 bool BoundingBox::shouldUpdateAndDraw() {

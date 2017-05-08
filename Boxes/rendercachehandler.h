@@ -118,6 +118,7 @@ private:
     AnimationRect *mDurationRect = NULL;
 };
 
+class BoundingBox;
 class RenderCacheHandler : public QObject {
     Q_OBJECT
 public:
@@ -171,10 +172,38 @@ public:
     void removeRenderContainer(CacheBoundingBoxRenderContainer *cont);
     void clearCacheForRelFrameRange(const int &minFrame,
                                     const int &maxFrame);
+    bool areInternalDifferencesPresentFromAll(const int &relFrame);
+
+    void addInfluencingHandler(RenderCacheHandler *handler);
+    void removeInfluencingHandler(RenderCacheHandler *handler);
+    void setParentBox(BoundingBox *parentBox) {
+        mParentBox = parentBox;
+    }
+
+    void relRangeToAbsRange(int *minFrame,
+                            int *maxFrame) {
+        *minFrame = relFrameToAbsFrame(*minFrame);
+        *maxFrame = relFrameToAbsFrame(*maxFrame);
+    }
+
+    void absRangeToRelRange(int *minFrame,
+                            int *maxFrame) {
+        *minFrame = absFrameToRelFrame(*minFrame);
+        *maxFrame = absFrameToRelFrame(*maxFrame);
+    }
+
+    int relFrameToAbsFrame(const int &relFrame);
+    int absFrameToRelFrame(const int &absFrame);
+signals:
+    void clearedCacheForAbsFrameRange(int, int);
 public slots:
+    void clearCacheForAbsFrameRange(const int &minFrame,
+                                    const int &maxFrame);
     void updateVisibilityRange();
     void updateAnimationRenderCacheRange();
 private:
+    BoundingBox *mParentBox = NULL;
+    QList<RenderCacheHandler*> mInfluencingHandlers;
     QList<CacheBoundingBoxRenderContainer*> mRenderContainers;
 
     int mMinRelFrame = INT_MIN;
