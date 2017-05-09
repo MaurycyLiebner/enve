@@ -82,8 +82,7 @@ int ConnectedToMainWindow::getFrameCount() {
     return mMainWindow->getFrameCount();
 }
 
-bool ConnectedToMainWindow::isRecordingAllPoints()
-{
+bool ConnectedToMainWindow::isRecordingAllPoints() {
     return mMainWindow->isRecordingAllPoints();
 }
 

@@ -59,14 +59,6 @@ public:
                          qreal maxPercent, qreal minPercent,
                          bool *found = NULL, QPointF *posInPath = NULL);
 
-    void startAllPointsTransform() {
-        //mPathAnimator.startAllPointsTransform();
-    }
-
-    void finishAllPointsTransform() {
-        //mPathAnimator.finishAllPointsTransform();
-    }
-
     void showContextMenu(QPoint globalPos);
 
     void deletePointAndApproximate(PathPoint *pointToRemove);

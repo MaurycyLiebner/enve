@@ -72,7 +72,7 @@ void KeysView::graphPaint(QPainter *p) {
     int currLine = 0;
     while(yL > 0) {
         p->drawText(QRectF(0, yL - incY, 40, 2*incY),
-                    Qt::AlignCenter, QString::number(currValue));
+                    Qt::AlignCenter, QString::number(currValue, 'f', mValuePrec));
         lines[currLine] = QLine(40, yL, width(), yL);
         currLine++;
         yL -= incY;
@@ -157,15 +157,21 @@ void KeysView::graphUpdateDimensions() {
 
     qreal incMulti = 10000.;
     int currIncId = 0;
+    int nDiv = 0;
     mValueInc = validIncs.first()*incMulti;
-    while(mValueInc*mPixelsPerValUnit > 50. ) {
+    while(true) {
         mValueInc = validIncs.at(currIncId)*incMulti;
+        if(mValueInc*mPixelsPerValUnit < 50.) {
+            break;
+        }
         currIncId++;
         if(currIncId >= validIncs.count()) {
             currIncId = 0;
             incMulti *= 0.1;
+            nDiv++;
         }
     }
+    mValuePrec = qMax(nDiv - 3, 0);
 
     graphIncMinShownVal(0.);
     updatePixelsPerFrame();
@@ -186,7 +192,7 @@ void KeysView::graphSetMinShownVal(const qreal &newMinShownVal) {
 void KeysView::graphGetValueAndFrameFromPos(const QPointF &pos,
                                             qreal *value, qreal *frame) {
     *value = (height() - pos.y())/mPixelsPerValUnit + mMinShownVal;
-    *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame;
+    *frame = mMinViewedFrame + pos.x()/mPixelsPerFrame - 0.5;
 }
 
 void KeysView::graphMousePress(const QPointF &pressPos) {

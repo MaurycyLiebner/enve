@@ -176,6 +176,7 @@ private:
     qreal mSavedMaxViewedFrame = 0.;
     qreal mSavedMinShownValue = 0.;
     qreal mValueInc = 0.;
+    int mValuePrec = 2;
     void graphConstrainAnimatorCtrlsFrameValues();
     void graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal);
     void clearHoveredPoint();

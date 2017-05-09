@@ -427,7 +427,7 @@ void MainWindow::setupToolBar() {
                 "border-top-left-radius: 0;"
                 "border-bottom-left-radius: 0;");
     mNewCanvasButton->setFixedHeight(
-                mCurrentCanvasComboBox->sizeHint().height() + 2);
+                mCurrentCanvasComboBox->sizeHint().height());
 
     canvasComboLayout->addWidget(mNewCanvasButton);
     canvasComboLayout->addWidget(mCurrentCanvasComboBox);
@@ -799,8 +799,7 @@ void MainWindow::setCurrentFrame(int frame) {
     callUpdateSchedulers();
 }
 
-void MainWindow::setAllPointsRecord(bool allPointsRecord)
-{
+void MainWindow::setAllPointsRecord(bool allPointsRecord) {
     mAllPointsRecording = allPointsRecord;
 }
 

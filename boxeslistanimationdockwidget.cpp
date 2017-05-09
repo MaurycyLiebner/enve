@@ -64,8 +64,7 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
 
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
-    QWidget(parent)
-{
+    QWidget(parent) {
     mAddBoxesListKeysViewWidgetsBar->hide();
     mAddBoxesListKeysViewWidgetsBar->addAction(
                         "+", this,
@@ -167,37 +166,54 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mLocalPivot, SIGNAL(toggled(bool)),
             this, SLOT(setLocalPivot(bool)) );
 
-    mControlButtonsLayout = new QHBoxLayout();
-    mControlButtonsLayout->setSpacing(0);
-    mControlButtonsLayout->setMargin(0);
+    mToolBar = new QToolBar(this);
+    mToolBar->setMovable(false);
+
+
+    mToolBar->setIconSize(QSize(24, 24));
+    mToolBar->addSeparator();
 
 //    mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
 //    mGoToPreviousKeyButton->setFocusPolicy(Qt::NoFocus);
 //    mControlButtonsLayout->addWidget(mGoToNextKeyButton);
 //    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
-    mControlButtonsLayout->addWidget(mResolutionComboBox);
+    mToolBar->addWidget(mResolutionComboBox);
     //mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
 
-    mControlButtonsLayout->addWidget(mPlayButton);
+    mToolBar->addWidget(mPlayButton);
     mPlayButton->setFocusPolicy(Qt::NoFocus);
 
-    mControlButtonsLayout->addWidget(mAllPointsRecordButton);
+    mToolBar->addWidget(mAllPointsRecordButton);
     mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
-    mControlButtonsLayout->addWidget(mCtrlsAlwaysVisible);
+    mToolBar->addWidget(mCtrlsAlwaysVisible);
     mCtrlsAlwaysVisible->setFocusPolicy(Qt::NoFocus);
-    mControlButtonsLayout->addWidget(mLocalPivot);
+    mToolBar->addWidget(mLocalPivot);
     mLocalPivot->setFocusPolicy(Qt::NoFocus);
 
-    mMainLayout->addLayout(mControlButtonsLayout,
-                           Qt::AlignTop);
+    QWidget *spacerWidget = new QWidget(this);
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    spacerWidget->setStyleSheet("QWidget { background-color: rgba(0, 0, 0, 0) }");
+    mToolBar->addWidget(spacerWidget);
+
+    mToolBar->addSeparator();
+
+    mTimelineAction = mToolBar->addAction("Timeline",
+                                       this, SLOT(setTimelineMode()));
+    mTimelineAction->setCheckable(true);
+    mTimelineAction->setChecked(true);
+    mRenderAction = mToolBar->addAction("Render", this, SLOT(setRenderMode()));
+    mRenderAction->setCheckable(true);
+
+    mToolBar->addSeparator();
+
+    mMainLayout->addWidget(mToolBar);
 
     mBoxesListKeysViewStack = new VerticalWidgetsStack(this);
     mMainLayout->addWidget(mBoxesListKeysViewStack);
 
     mMainLayout->addWidget(mAddBoxesListKeysViewWidgetsBar);
 
-    mMainLayout->addWidget(mFrameRangeScrollbar,
-                           Qt::AlignBottom);
+    mMainLayout->addWidget(mFrameRangeScrollbar, Qt::AlignBottom);
 
     mFrameRangeScrollbar->emitChange();
 
@@ -328,6 +344,14 @@ void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
 void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {
     mMainWindow->getCanvasWidget()->setLocalPivot(bT);
     mMainWindow->callUpdateSchedulers();
+}
+
+void BoxesListAnimationDockWidget::setTimelineMode() {
+    mRenderAction->setChecked(false);
+}
+
+void BoxesListAnimationDockWidget::setRenderMode() {
+    mTimelineAction->setChecked(false);
 }
 
 void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {

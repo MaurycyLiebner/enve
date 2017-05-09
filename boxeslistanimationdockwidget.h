@@ -16,6 +16,7 @@
 #include <QMenuBar>
 #include <QLineEdit>
 #include <QWidgetAction>
+#include <QToolBar>
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "boxeslistkeysviewwidget.h"
 class VerticalWidgetsStack;
@@ -78,7 +79,15 @@ private slots:
     void stopPreview();
 
     void setLocalPivot(const bool &bT);
+
+    void setTimelineMode();
+    void setRenderMode();
 private:
+    QAction *mTimelineAction;
+    QAction *mRenderAction;
+
+    QToolBar *mToolBar;
+
     QMenuBar *mAddBoxesListKeysViewWidgetsBar = new QMenuBar(this);
     QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
 
@@ -88,7 +97,6 @@ private:
     QVBoxLayout *mMainLayout;
 
     QLabel *mControlButtonsWidget;
-    QHBoxLayout *mControlButtonsLayout;
 
     QComboBox *mResolutionComboBox;
 //    QPushButton *mGoToPreviousKeyButton;

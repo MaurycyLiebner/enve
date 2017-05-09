@@ -13,15 +13,13 @@ void Canvas::convertSelectedPathStrokesToPath() {
     }
 }
 
-void Canvas::setSelectedFontFamilyAndStyle(QString family, QString style)
-{
+void Canvas::setSelectedFontFamilyAndStyle(QString family, QString style) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setSelectedFontFamilyAndStyle(family, style);
     }
 }
 
-void Canvas::setSelectedFontSize(qreal size)
-{
+void Canvas::setSelectedFontSize(qreal size) {
     foreach(BoundingBox *box, mSelectedBoxes) {
         box->setSelectedFontSize(size);
     }

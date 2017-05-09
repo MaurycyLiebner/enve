@@ -223,7 +223,6 @@ public:
     VectorPathEdge *getNextEdge() {
         return mNextEdge.get();
     }
-
 private:
     std::shared_ptr<VectorPathEdge> mNextEdge;
 

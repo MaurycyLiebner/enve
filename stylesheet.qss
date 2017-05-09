@@ -87,6 +87,31 @@ QMenuBar::item {
     border-radius: 4px;
 }
 
+QToolButton {
+    padding: 1px 4px;
+    background: transparent;
+    border-radius: 4px;
+    color: black;
+    margin-top: 10;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+    padding-bottom: 9;
+    margin-bottom: 1;
+}
+
+QToolButton:hover {
+    background-color: rgba(0, 0, 0, 30);
+}
+
+QToolButton:pressed {
+    background-color: rgba(0, 0, 0, 50);
+}
+
+QToolButton:checked {
+    background-color: rgb(60, 60, 60);
+    color: white;
+}
+
 QMenuBar::item:selected { /* when selected using mouse or keyboard */
     background: #a8a8a8;
 }

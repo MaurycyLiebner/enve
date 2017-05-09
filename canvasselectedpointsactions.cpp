@@ -134,15 +134,18 @@ void Canvas::makeSelectedPointsSegmentsLines() {
 
 void Canvas::finishSelectedPointsTransform() {
     if(isRecordingAllPoints() ) {
-        QList<BoundingBox*> parentBoxes;
+        QList<SinglePathAnimator*> separatePaths;
         foreach(MovablePoint *point, mSelectedPoints) {
-            point->finishTransform();
-            BoundingBox *parentBox = point->getParent();
-            if(parentBoxes.contains(parentBox) ) continue;
-            parentBoxes << parentBox;
+            if(point->isPathPoint()) {
+                SinglePathAnimator *sPath = ((PathPoint*)point)->getParentPath();
+                if(separatePaths.contains(sPath)) continue;
+                separatePaths << sPath;
+            } else {
+                point->finishTransform();
+            }
         }
-        foreach(BoundingBox *parentBox, parentBoxes) {
-            parentBox->finishAllPointsTransform();
+        foreach(SinglePathAnimator *path, separatePaths) {
+            path->finishAllPointsTransform();
         }
     } else {
         foreach(MovablePoint *point, mSelectedPoints) {
@@ -153,15 +156,18 @@ void Canvas::finishSelectedPointsTransform() {
 
 void Canvas::startSelectedPointsTransform() {
     if(isRecordingAllPoints() ) {
-        QList<BoundingBox*> parentBoxes;
+        QList<SinglePathAnimator*> separatePaths;
         foreach(MovablePoint *point, mSelectedPoints) {
-            point->startTransform();
-            BoundingBox *parentBox = point->getParent();
-            if(parentBoxes.contains(parentBox) ) continue;
-            parentBoxes << parentBox;
+            if(point->isPathPoint()) {
+                SinglePathAnimator *sPath = ((PathPoint*)point)->getParentPath();
+                if(separatePaths.contains(sPath)) continue;
+                separatePaths << sPath;
+            } else {
+                point->startTransform();
+            }
         }
-        foreach(BoundingBox *parentBox, parentBoxes) {
-            parentBox->startAllPointsTransform();
+        foreach(SinglePathAnimator *path, separatePaths) {
+            path->startAllPointsTransform();
         }
     } else {
         foreach(MovablePoint *point, mSelectedPoints) {

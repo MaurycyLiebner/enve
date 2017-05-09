@@ -248,7 +248,11 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
 void KeysView::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
-    p.fillRect(rect(), QColor(60, 60, 60));
+    if(mGraphViewed) {
+        p.fillRect(rect(), QColor(30, 30, 30));
+    } else {
+        p.fillRect(rect(), QColor(60, 60, 60));
+    }
 
 //    QRect rect1(0, 0, 10, height());
 //    QLinearGradient gradient1(QPoint(rect1.left(), 0),
@@ -298,14 +302,12 @@ void KeysView::paintEvent(QPaintEvent *) {
 //        }
 //    }
     minFrame += ceil((-xT)/mPixelsPerFrame);
-    minFrame = minFrame - minFrame%iInc;
+    minFrame = minFrame - minFrame%iInc - 1;
     maxFrame += floor((width() - 40. - xT)/mPixelsPerFrame) - maxFrame%iInc;
     for(int i = minFrame; i <= maxFrame; i += iInc) {
         qreal xTT = xT + (i - mMinViewedFrame)*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, height()) );
     }
-
-
 
     if(mMainWindow->getCurrentFrame() <= maxFrame &&
        mMainWindow->getCurrentFrame() >= minFrame) {

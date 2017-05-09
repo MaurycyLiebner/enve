@@ -106,8 +106,7 @@ void MovablePoint::draw(QPainter *p) {
     drawOnAbsPos(p, absPos);
 }
 
-BoundingBox *MovablePoint::getParent()
-{
+BoundingBox *MovablePoint::getParent() {
     return mParent;
 }
 

@@ -793,8 +793,7 @@ void SinglePathAnimator::replaceSeparatePathPoint(PathPoint *newPoint,
     }
 }
 
-void SinglePathAnimator::startAllPointsTransform()
-{
+void SinglePathAnimator::startAllPointsTransform() {
     foreach(const QSharedPointer<PathPoint> &point, mPoints) {
         point->startTransform();
     }

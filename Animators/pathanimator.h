@@ -56,8 +56,6 @@ public:
                               qreal *error);
     void applyTransformToPoints(const QMatrix &transform);
 
-    void startAllPointsTransform();
-    void finishAllPointsTransform();
     void duplicatePathsTo(PathAnimator *target);
 
     void drawSelected(QPainter *p,

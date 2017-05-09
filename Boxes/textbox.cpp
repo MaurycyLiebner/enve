@@ -109,8 +109,9 @@ void TextBox::setFont(QFont font) {
 }
 
 void TextBox::setSelectedFontSize(qreal size) {
+    clearAllCache();
     mFont.setPointSize(size);
-    replaceCurrentFrameCache();
+    schedulePathUpdate();
 }
 
 void TextBox::setSelectedFontFamilyAndStyle(QString fontFamily,
