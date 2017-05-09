@@ -265,22 +265,25 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                 ((PixmapEffect*)singleWidgetUnderMouse->
                  getTargetAbstraction()->getTarget());
 
-        EffectAnimators *underMouseAnimator =
-                                 effectUnderMouse->getParentEffectAnimators();
-        EffectAnimators *draggedAnimator =
-                                 effect->getParentEffectAnimators();
-        if(draggedAnimator != underMouseAnimator) {
-            draggedAnimator->getParentBox()->removeEffect(effect);
-            underMouseAnimator->getParentBox()->addEffect(effect);
-        }
-        if(below) { // add box below
-            underMouseAnimator->ca_moveChildAbove( // boxesgroup list is reversed
-                        effect,
-                        effectUnderMouse);
-        } else { // add box above
-            underMouseAnimator->ca_moveChildBelow(
-                        effect,
-                        effectUnderMouse);
+        if(effect != effectUnderMouse) {
+            EffectAnimators *underMouseAnimator =
+                                     effectUnderMouse->getParentEffectAnimators();
+            EffectAnimators *draggedAnimator =
+                                     effect->getParentEffectAnimators();
+            if(draggedAnimator != underMouseAnimator) {
+                draggedAnimator->getParentBox()->removeEffect(effect);
+                underMouseAnimator->getParentBox()->addEffect(effect);
+            }
+            if(below) { // add box below
+                underMouseAnimator->ca_moveChildAbove( // boxesgroup list is reversed
+                            effect,
+                            effectUnderMouse);
+            } else { // add box above
+                underMouseAnimator->ca_moveChildBelow(
+                            effect,
+                            effectUnderMouse);
+            }
+            underMouseAnimator->getParentBox()->clearAllCache();
         }
     }
     scheduledUpdateVisibleWidgetsContent();

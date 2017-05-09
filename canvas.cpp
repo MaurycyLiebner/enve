@@ -245,9 +245,11 @@ void Canvas::paintEvent(QPainter *p) {
         p->drawPath(path.subtracted(viewRectPath));
 
         p->save();
+
+        p->setTransform(QTransform(mCanvasTransformMatrix), true);
         qreal reversedRes = 1./mResolutionFraction;
-        p->translate(getRenderRect().topLeft());
         p->scale(reversedRes, reversedRes);
+
         if(mCurrentPreviewImg != NULL) {
             p->drawImage(QPointF(0., 0.), *mCurrentPreviewImg);
         }
@@ -332,6 +334,11 @@ void Canvas::setPreviewing(bool bT) {
     mPreviewing = bT;
 }
 
+void Canvas::setOutputRendering(const bool &bT) {
+    mRendering = bT;
+    setPreviewing(bT);
+}
+
 void Canvas::playPreview()
 {
     if(mPreviewFrames.isEmpty() ) return;
@@ -362,42 +369,13 @@ void Canvas::nextPreviewFrame() {
     mCanvasWidget->repaint();
 }
 
-QRectF Canvas::getRenderRect() {
-    return mRenderRect;
-    QRectF rectT = mRenderRect;
-    rectT.setSize(mRenderRect.size()*mResolutionFraction);
-    rectT.moveTo(rectT.topLeft()*mResolutionFraction);
-    return rectT;
-}
-
-void Canvas::updateRenderRectForPreview() {
-    mCanvasRect = QRectF(qMax(mCanvasTransformMatrix.dx(),
-                              mCanvasTransformMatrix.dx()*
-                              mResolutionFraction),
-                         qMax(mCanvasTransformMatrix.dy(),
-                              mCanvasTransformMatrix.dy()*
-                              mResolutionFraction),
-                         mVisibleWidth*mResolutionFraction,
-                         mVisibleHeight*mResolutionFraction);
-    QRectF canvasWidgetRect = QRectF(0., 0.,
-                                     (qreal)mCanvasWidget->width(),
-                                     (qreal)mCanvasWidget->height());
-    mRenderRect = canvasWidgetRect.intersected(mCanvasRect);
-}
-
-void Canvas::updateRenderRectForOutput() {
-    mRenderRect = QRectF(qMax(mCanvasTransformMatrix.dx(),
-                              mCanvasTransformMatrix.dx()*
-                              mResolutionFraction),
-                         qMax(mCanvasTransformMatrix.dy(),
-                              mCanvasTransformMatrix.dy()*
-                              mResolutionFraction),
-                         mWidth*mResolutionFraction,
-                         mHeight*mResolutionFraction);
+void Canvas::updateRenderImageSize() {
+    mRenderSize = QSize(mWidth*mResolutionFraction,
+                        mHeight*mResolutionFraction);
 }
 
 void Canvas::renderCurrentFrameToPreview() {
-    QImage *image = new QImage(mRenderRect.size().toSize(),
+    QImage *image = new QImage(mRenderSize,
                                QImage::Format_ARGB32_Premultiplied);
     image->fill(mBackgroundColor->getCurrentColor().qcol);
     renderCurrentFrameToQImage(image);
@@ -406,7 +384,7 @@ void Canvas::renderCurrentFrameToPreview() {
 }
 
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
-    QImage *image = new QImage(mRenderRect.size().toSize(),
+    QImage *image = new QImage(mRenderSize,
                                QImage::Format_ARGB32_Premultiplied);
     image->fill(mBackgroundColor->getCurrentColor().qcol);
     renderCurrentFrameToQImage(image);
@@ -467,9 +445,8 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame) {
     p.setRenderHint(QPainter::Antialiasing);
     p.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    p.translate(-mRenderRect.topLeft()*mResolutionFraction);
+
     p.scale(mResolutionFraction, mResolutionFraction);
-    p.setTransform(QTransform(mCanvasTransformMatrix), true);
 
     drawPreviewPixmap(&p);
 
@@ -569,10 +546,7 @@ void Canvas::setCanvasMode(CanvasMode mode) {
     mCurrentMode = mode;
 
     mHoveredPoint = NULL;
-    if(mHoveredEdge != NULL) {
-        delete mHoveredEdge;
-        mHoveredEdge = NULL;
-    }
+    clearHoveredEdge();
     clearPointsSelection();
     clearCurrentEndPoint();
     clearLastPressedPoint();

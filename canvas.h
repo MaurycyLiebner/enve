@@ -176,8 +176,7 @@ public:
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal &percent);
 
-    void updateRenderRectForPreview();
-    void updateRenderRectForOutput();
+    void updateRenderImageSize();
 
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(const QString &renderDest);
@@ -238,9 +237,8 @@ public:
     void createVideoForPath(const QString &path);
 
     void setPreviewing(bool bT);
+    void setOutputRendering(const bool &bT);
     void createLinkToFileWithPath(const QString &path);
-
-    QRectF getRenderRect();
 
     const CanvasMode &getCurrentCanvasMode() const {
         return mCurrentMode;
@@ -375,8 +373,7 @@ private:
 
     CanvasWidget *mCanvasWidget;
 
-    QRectF mCanvasRect;
-    QRectF mRenderRect;
+    QSize mRenderSize;
 
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;
@@ -394,6 +391,7 @@ private:
     VectorPathEdge *mCurrentEdge = NULL;
 
     bool mPreviewing = false;
+    bool mRendering = false;
     QImage *mCurrentPreviewImg = NULL;
     int mCurrentPreviewFrameId;
 

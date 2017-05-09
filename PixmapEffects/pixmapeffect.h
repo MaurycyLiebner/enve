@@ -148,6 +148,8 @@ public:
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 private:
 //    QrealAnimator mScale;
+    QSharedPointer<BoolProperty> mHighQuality =
+            (new BoolProperty())->ref<BoolProperty>();
     QSharedPointer<QrealAnimator> mBlurRadius =
             (new QrealAnimator())->ref<QrealAnimator>();
     QSharedPointer<QrealAnimator> mOpacity =

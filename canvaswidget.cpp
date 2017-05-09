@@ -527,7 +527,7 @@ void CanvasWidget::renderOutput() {
 
 void CanvasWidget::playPreview() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->updateRenderRectForPreview();
+    mCurrentCanvas->updateRenderImageSize();
     mBoxesUpdateFinishedFunction = &CanvasWidget::nextPlayPreviewFrame;
     mSavedCurrentFrame = getCurrentFrame();
 
@@ -618,7 +618,7 @@ void CanvasWidget::nextSaveOutputFrame() {
     if(mCurrentRenderFrame >= getFrameCount()) {
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
-        mCurrentCanvas->setPreviewing(false);
+        mCurrentCanvas->setOutputRendering(false);
         mCurrentCanvas->clearCurrentPreviewImage();
         if(qAbs(mSavedResolutionFraction -
                 mCurrentCanvas->getResolutionFraction()) > 0.1) {
@@ -673,15 +673,16 @@ void CanvasWidget::saveOutput(const QString &renderDest,
     mOutputString = renderDest;
     mBoxesUpdateFinishedFunction = &CanvasWidget::nextSaveOutputFrame;
     mSavedCurrentFrame = getCurrentFrame();
+    mCurrentCanvas->fitCanvasToSize();
     mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
     if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.001) {
         mCurrentCanvas->setResolutionFraction(resolutionFraction);
     }
-    mCurrentCanvas->updateRenderRectForOutput();
+    mCurrentCanvas->updateRenderImageSize();
 
     mCurrentRenderFrame = mSavedCurrentFrame;
     mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
-    mCurrentCanvas->setPreviewing(true);
+    mCurrentCanvas->setOutputRendering(true);
     mCurrentCanvas->updateAllBoxes();
     if(mNoBoxesAwaitUpdate) {
         nextSaveOutputFrame();

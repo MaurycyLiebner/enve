@@ -634,12 +634,16 @@ int RenderCacheHandler::getMaxRelFrameForContainerAtRel(
     } else {
         maxRelFrame = range->getMaxRelFrame();
     }
+    int absFrame = relFrameToAbsFrame(relFrame);
     foreach(RenderCacheHandler *handler, mInfluencingHandlers) {
-        if(handler->areInternalDifferencesPresentFromAll(relFrame)) {
+        if(handler->areInternalDifferencesPresentFromAll(
+                    handler->absFrameToRelFrame(absFrame))) {
             return relFrame + 1;
         } else {
-            int maxRelFrameT = handler->getMaxRelFrameForContainerAtRel(
-                                                relFrame);
+            int maxRelFrameT = absFrameToRelFrame(
+                        handler->relFrameToAbsFrame(
+                        handler->getMaxRelFrameForContainerAtRel(
+                            handler->absFrameToRelFrame(absFrame)) ));
             if(maxRelFrame > maxRelFrameT) {
                 maxRelFrame = maxRelFrameT;
             }

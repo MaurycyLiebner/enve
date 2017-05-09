@@ -49,9 +49,14 @@ QPointF QPointFAnimator::getCurrentPointValue() const {
                    mYAnimator->qra_getCurrentValue());
 }
 
-QPointF QPointFAnimator::getCurrentPointValueAtFrame(const int &frame) {
+QPointF QPointFAnimator::getCurrentPointValueAtAbsFrame(const int &frame) {
     return QPointF(mXAnimator->getCurrentValueAtAbsFrame(frame),
                    mYAnimator->getCurrentValueAtAbsFrame(frame));
+}
+
+QPointF QPointFAnimator::getCurrentPointValueAtRelFrame(const int &frame) {
+    return QPointF(mXAnimator->getCurrentValueAtRelFrame(frame),
+                   mYAnimator->getCurrentValueAtRelFrame(frame));
 }
 
 QPointF QPointFAnimator::getPointValueAtFrame(const int &frame) {

@@ -39,7 +39,9 @@ public:
     void duplicateXAnimatorFrom(QrealAnimator *source);
     void setValuesRange(const qreal &minVal,
                         const qreal &maxVal);
-    QPointF getCurrentPointValueAtFrame(const int &frame);
+    QPointF getCurrentPointValueAtAbsFrame(const int &frame);
+    QPointF getCurrentPointValueAtRelFrame(const int &frame);
+
     void setPrefferedValueStep(const qreal &valueStep);
 
     bool SWT_isQPointFAnimator() { return true; }

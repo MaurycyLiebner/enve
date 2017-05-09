@@ -141,6 +141,11 @@ void BlurEffect::duplicateBlurRadiusAnimatorFrom(
 ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
     mBlurRadius->qra_setCurrentValue(radius);
     prp_setName("shadow");
+
+    mHighQuality->setValue(false);
+    mHighQuality->prp_setName("high quality");
+    ca_addChildAnimator(mHighQuality.data());
+
     mBlurRadius->prp_setName("blur radius");
     mBlurRadius->qra_setValueRange(0., 1000.);
     ca_addChildAnimator(mBlurRadius.data());
@@ -227,15 +232,21 @@ void ShadowEffect::apply(BoundingBox *target,
 
 
     qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
-    //fmt_filters::blur(shadowImg, radius, radius*0.3333);
-    if(mBlurRadius->prp_hasKeys()) {
-        fmt_filters::anim_fast_blur(shadowImg, radius*0.5);
-        //fmt_filters::anim_fast_blur(shadowImg, radius*0.25);
+    if(mHighQuality->getValue()) {
+        if(mBlurRadius->prp_hasKeys()) {
+            fmt_filters::anim_fast_blur(shadowImg, radius*0.5);
+            fmt_filters::anim_fast_blur(shadowImg, radius*0.5);
+        } else {
+            fmt_filters::fast_blur(shadowImg, radius*0.5);
+            fmt_filters::fast_blur(shadowImg, radius*0.5);
+        }
     } else {
-        fmt_filters::fast_blur(shadowImg, radius*0.5);
-        //fmt_filters::fast_blur(shadowImg, radius*0.25);
+        if(mBlurRadius->prp_hasKeys()) {
+            fmt_filters::anim_fast_blur(shadowImg, radius*0.8);
+        } else {
+            fmt_filters::fast_blur(shadowImg, radius*0.8);
+        }
     }
-    //fmt_filters::fast_blur(shadowImg, radius*0.5);
 
     QPainter p(imgPtr);
     p.setCompositionMode(QPainter::CompositionMode_DestinationOver);

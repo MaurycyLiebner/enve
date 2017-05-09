@@ -152,6 +152,7 @@ public:
     Property *makeDuplicate();
 
     qreal getCurrentValueAtAbsFrame(const int &frame) const;
+    qreal getCurrentValueAtRelFrame(const int &frame) const;
     qreal qra_getValueAtRelFrame(const int &frame) const;
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void anim_removeAllKeys();
