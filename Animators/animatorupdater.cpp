@@ -139,6 +139,11 @@ void GradientPointsUpdater::update() {
 }
 
 void GradientPointsUpdater::frameChangeUpdate() {
+    if(mIsFill) {
+        mTarget->updateFillDrawGradient();
+    } else {
+        mTarget->updateStrokeDrawGradient();
+    }
     mTarget->scheduleSoftUpdate();
 }
 

@@ -256,18 +256,27 @@ void ComplexAnimator::prp_setRecording(const bool &rec) {
 
 void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     bool rec = true;
-    ca_mChildAnimatorRecording = false;
+    bool childRecordingT = false;
     foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         bool isChildRec = property->prp_isRecording();
         bool isChildDescRec = property->prp_isDescendantRecording();
         if(isChildDescRec) {
-            ca_mChildAnimatorRecording = true;
+            childRecordingT = true;
         }
         if(!isChildRec) {
             rec = false;
         }
     }
-    anim_setRecordingValue(rec);
+    if(childRecordingT != ca_mChildAnimatorRecording) {
+        ca_mChildAnimatorRecording = childRecordingT;
+        if(rec != anim_mIsRecording) {
+            anim_setRecordingValue(rec);
+        } else {
+            emit prp_isRecordingChanged();
+        }
+    } else if(rec != anim_mIsRecording) {
+        anim_setRecordingValue(rec);
+    }
 }
 
 void ComplexAnimator::ca_addDescendantsKey(Key *key) {
