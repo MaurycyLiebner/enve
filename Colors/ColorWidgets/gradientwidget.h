@@ -50,10 +50,8 @@ private:
     Gradient *mCurrentGradient = NULL;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
-    void drawBorder(GLfloat xt, GLfloat yt, GLfloat wt, GLfloat ht);
     void setCurrentGradient(int listId);
     void setCurrentColorId(int id);
-    void drawGradient(int id, GLfloat height, GLfloat cY, bool border = true);
 };
 
 #endif // GRADIENTWIDGET_H

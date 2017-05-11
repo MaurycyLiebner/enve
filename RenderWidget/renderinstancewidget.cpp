@@ -2,7 +2,9 @@
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     QWidget(parent) {
-    setStyleSheet("QWidget { background: rgb(45, 45, 45); }");
+    setStyleSheet("QWidget { background: rgb(45, 45, 45);"
+                            "padding-left: 10px;"
+                          "}");
     mMainLayout = new QVBoxLayout(this);
     mMainLayout->setMargin(0);
     setLayout(mMainLayout);

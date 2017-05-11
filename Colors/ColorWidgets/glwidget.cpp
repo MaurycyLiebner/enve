@@ -1,5 +1,6 @@
 #include "glwidget.h"
 #include "Colors/helpers.h"
+#include "fillstrokesettings.h"
 
 GLfloat AA_VECT_LEN = 1.5f;
 GLfloat AA_SHARP_VECT_LEN = AA_VECT_LEN*2.f;
@@ -8,8 +9,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     setMinimumSize(20, 20);
-    QColor col = QWidget::palette().color(QWidget::backgroundRole());
-    bgColor = Color(col.red(), col.green(), col.blue());
+    bgColor = Color(60, 60, 60);
 }
 
 bool GLWidget::isVisible()
@@ -346,21 +346,93 @@ void GLWidget::drawSolidRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height
              top_aa, bottom_aa, left_aa, right_aa);
 }
 
-void GLWidget::drawSolidRectCenter(GLfloat cx, GLfloat cy, GLfloat width, GLfloat height,
-                                         GLfloat r, GLfloat g, GLfloat b,
-                                      GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
-{
+void GLWidget::drawSolidRectCenter(GLfloat cx,
+                                   GLfloat cy,
+                                   GLfloat width,
+                                   GLfloat height,
+                                   GLfloat r,
+                                   GLfloat g,
+                                   GLfloat b,
+                                   GLboolean top_aa,
+                                   GLboolean bottom_aa,
+                                   GLboolean left_aa,
+                                   GLboolean right_aa) {
     drawSolidRect(cx - width*0.5f, cy - height*0.5f, width, height, r, g, b,
                   top_aa, bottom_aa, left_aa, right_aa);
 }
 
-void GLWidget::resizeGL(int w, int h)
-{
+void GLWidget::drawGradient(Gradient *gradient,
+                            const int &x,
+                            const int &y,
+                            const int &width,
+                            const int &height) {
+    //drawMeshBg(x, y, width, height);
+    if(!gradient->isEmpty()) {
+        int len = gradient->getColorCount();
+        Color nextColor = gradient->getCurrentColorAt(0);
+        GLfloat cX = x;
+        GLfloat segWidth = width/(GLfloat)(len - 1);
+
+        for(int i = 0; i < len - 1; i++) {
+            Color color = nextColor;
+            nextColor = gradient->getCurrentColorAt(i + 1);
+
+            drawRect(cX, y, segWidth, height,
+                     color.gl_r, color.gl_g, color.gl_b, color.gl_a,
+                     nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
+                     nextColor.gl_r, nextColor.gl_g, nextColor.gl_b, nextColor.gl_a,
+                     color.gl_r, color.gl_g, color.gl_b, color.gl_a,
+                     false, false, false, false);
+            cX += segWidth;
+        }
+    }
+}
+
+void GLWidget::drawMeshBg(const int &x,
+                          const int &y,
+                          const int &width,
+                          const int &height) {
+    GLfloat val1 = 0.5f;
+    GLfloat val2 = 0.25f;
+    int xRem = width % 7;
+    int yRem = height % 7;
+    for(int i = 0; i <= width - 7; i += 7) {
+        for(int j = 0; j <= height - 7; j += 7) {
+            GLfloat val = ((i + j) % 2 == 0) ? val1 : val2;
+            drawSolidRect(i + x, j + y, 7, 7, val, val, val,
+                          false, false, false, false);
+        }
+    }
+    int lastI = width - xRem;
+    int lastX = x + lastI;
+
+    for(int j = 0; j <= height - 7; j += 7) {
+        GLfloat val = ((lastI + j) % 2 == 0) ? val1 : val2;
+        drawSolidRect(lastX, j + y, xRem, 7, val, val, val,
+                      false, false, false, false);
+    }
+
+    int lastJ = height - yRem;
+    int lastY = y + lastJ;
+    for(int i = 0; i <= width - 7; i += 7) {
+        GLfloat val = ((i + lastJ) % 2 == 0) ? val1 : val2;
+        drawSolidRect(i + x, lastY, 7, yRem, val, val, val,
+                      false, false, false, false);
+    }
+    GLfloat val = ((lastI + lastJ) % 2 == 0) ? val1 : val2;
+    drawSolidRect(lastX, lastY, xRem, yRem, val, val, val,
+                  false, false, false, false);
+}
+
+void GLWidget::drawMeshBg() {
+    drawMeshBg(0, 0, width(), height());
+}
+
+void GLWidget::resizeGL(int w, int h) {
     glOrthoAndViewportSet(w, h);
 }
 
-void GLWidget::initializeGL()
-{
+void GLWidget::initializeGL() {
     bgColor.setGLClearColor();
 
     //Set blending
@@ -521,6 +593,63 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
             glVertex2f(x44, y44);
         }
     glEnd();
+}
+
+void GLWidget::drawBorder(GLfloat xt, GLfloat yt,
+                          GLfloat wt, GLfloat ht) {
+    drawRect(xt, yt, wt, 2.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             false, false, false, false);
+    drawRect(xt, yt + ht - 2.f, wt, 2.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             false, false, false, false);
+    drawRect(xt, yt + 2.f, 2.f, ht - 4.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             false, false, false, false);
+    drawRect(xt + wt - 2.f, yt + 2.f, 2.f, ht - 4.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             0.f, 0.f, 0.f, 1.f,
+             false, false, false, false);
+
+    xt += 2.f;
+    yt += 2.f;
+    wt -= 4.f;
+    ht -= 4.f;
+    drawRect(xt, yt, wt, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             false, false, false, false);
+    drawRect(xt, yt + ht - 1.f, wt, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             false, false, false, false);
+    drawRect(xt, yt + 1.f, 1.f, ht - 2.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             false, false, false, false);
+    drawRect(xt + wt - 1.f, yt + 1.f, 1.f, ht - 2.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             1.f, 1.f, 1.f, 1.f,
+             false, false, false, false);
 }
 
 void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,

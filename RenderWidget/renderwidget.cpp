@@ -18,7 +18,8 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mButtonsLayout->addSpacing(10);
     mCurrentRenderLabel = new QLabel("Current Render", this);
     mCurrentRenderLabel->setStyleSheet("background: rgb(30, 30, 30);"
-                                       "font-weight: bold;");
+                                       "font-weight: bold;"
+                                       "padding-left: 10px;");
     mButtonsLayout->addWidget(mCurrentRenderLabel);
 
     mStartRenderButton = new QPushButton("Render", this);
