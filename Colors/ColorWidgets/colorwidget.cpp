@@ -24,11 +24,10 @@ ColorWidget::ColorWidget(QWidget *parent) : GLWidget(parent)
 
 }
 
-void ColorWidget::setColorHSV_f(GLfloat h, GLfloat s, GLfloat v)
-{
-    if(s > 0.0001) {
-        hue = h;
-    }
+void ColorWidget::setColorHSV_f(GLfloat h, GLfloat s, GLfloat v) {
+    //if(s > 0.0001) {
+    hue = h;
+    //}
     saturation = s;
     value = v;
     update();
