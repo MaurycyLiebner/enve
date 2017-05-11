@@ -75,6 +75,8 @@ QMenu::item:selected {
 }
 
 QMenuBar {
+    padding-right: 4px;
+    padding-left: 4px;
     color: black;
     background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                       stop:0 lightgray, stop:1 darkgray);
@@ -236,6 +238,37 @@ QPushButton:checked {
     color: white;
 }
 
+QPushButton#middleButton, QPushButton#rightButton, QPushButton#leftButton {
+    color: white;
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(70, 70, 70),
+        stop:0.5 rgb(50, 50, 50));
+}
+
+QPushButton#middleButton {
+    border-radius: 0px;
+    border-right: 0;
+}
+
+QPushButton#rightButton {
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+}
+
+QPushButton#leftButton {
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    border-right: 0;
+}
+
+QPushButton#middleButton:checked, QPushButton#rightButton:checked, QPushButton#leftButton:checked {
+    background: qlineargradient(x1:0, y1:0,
+                                x2:0, y2:1,
+        stop:0 rgb(85, 175, 235),
+        stop:0.5 rgb(60, 150, 200));
+    color: black;
+}
 
 QToolBar {
     border-top: 1px solid black;
@@ -272,7 +305,13 @@ QComboBox QScrollBar {
     border-right: 0px solid black;
 }
 
-QScrollBar::add-line, QScrollBar::sub-line {
+QScrollBar::sub-line {
+    border: 1px solid black;
+    background-color: rgb(50, 50, 50);
+    image: url(:/icons/up-arrow.png);
+}
+
+QScrollBar::add-line {
     border: 1px solid black;
     background-color: rgb(50, 50, 50);
     image: url(:/icons/down-arrow.png);
@@ -339,4 +378,14 @@ QScrollBar::sub-line:horizontal  {
     width: 20px;
     subcontrol-position: right;
     subcontrol-origin: margin;
+}
+
+QProgressBar {
+    border: 1px solid black;
+    color: transparent;
+}
+
+QProgressBar::chunk {
+    background-color: green;
+    width: 5px;
 }

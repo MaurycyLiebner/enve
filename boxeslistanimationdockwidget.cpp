@@ -14,9 +14,8 @@ ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     setCursor(Qt::SplitHCursor);
 }
 
-void ChangeWidthWidget::updatePos()
-{
-    move(mCurrentWidth - 5, 22);
+void ChangeWidthWidget::updatePos() {
+    move(mCurrentWidth - 5, 0);
 }
 
 void ChangeWidthWidget::paintEvent(QPaintEvent *) {
@@ -89,6 +88,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);
     mMainLayout->setMargin(0);
+
+    mTimelineLayout = new QVBoxLayout();
+    mTimelineLayout->setSpacing(0);
+    mTimelineLayout->setMargin(0);
+
     mFrameRangeScrollbar = new AnimationWidgetScrollBar(20, 200,
                                                        20, 20,
                                                        true,
@@ -97,6 +101,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
                                                             10, 20,
                                                             false,
                                                             false, this);
+    mAnimationWidgetScrollbar->setTopBorderVisible(false);
 
     connect(mAnimationWidgetScrollbar, SIGNAL(viewedFramesChanged(int,int)),
             parent, SLOT(setCurrentFrame(int)) );
@@ -169,7 +174,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
-
     mToolBar->setIconSize(QSize(24, 24));
     mToolBar->addSeparator();
 
@@ -177,18 +181,22 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 //    mGoToPreviousKeyButton->setFocusPolicy(Qt::NoFocus);
 //    mControlButtonsLayout->addWidget(mGoToNextKeyButton);
 //    mGoToNextKeyButton->setFocusPolicy(Qt::NoFocus);
+    mToolBar->addAction("Resolution:");
     mToolBar->addWidget(mResolutionComboBox);
+    mToolBar->addSeparator();
     //mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
 
     mToolBar->addWidget(mPlayButton);
     mPlayButton->setFocusPolicy(Qt::NoFocus);
 
+    mToolBar->addSeparator();
     mToolBar->addWidget(mAllPointsRecordButton);
     mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
     mToolBar->addWidget(mCtrlsAlwaysVisible);
     mCtrlsAlwaysVisible->setFocusPolicy(Qt::NoFocus);
     mToolBar->addWidget(mLocalPivot);
     mLocalPivot->setFocusPolicy(Qt::NoFocus);
+    mToolBar->addSeparator();
 
     QWidget *spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -209,19 +217,26 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mMainLayout->addWidget(mToolBar);
 
     mBoxesListKeysViewStack = new VerticalWidgetsStack(this);
-    mMainLayout->addWidget(mBoxesListKeysViewStack);
+    mTimelineLayout->addWidget(mBoxesListKeysViewStack);
 
-    mMainLayout->addWidget(mAddBoxesListKeysViewWidgetsBar);
+    mTimelineLayout->addWidget(mAddBoxesListKeysViewWidgetsBar);
 
-    mMainLayout->addWidget(mFrameRangeScrollbar, Qt::AlignBottom);
+    mTimelineLayout->addWidget(mFrameRangeScrollbar, Qt::AlignBottom);
 
     mFrameRangeScrollbar->emitChange();
 
-    mChww = new ChangeWidthWidget(this);
+    mChww = new ChangeWidthWidget(mBoxesListKeysViewStack);
 
     mChww->updatePos();
 
     mFrameRangeScrollbar->raise();
+
+    mTimelineWidget = new QWidget(this);
+    mRenderWidget = new RenderWidget(this);
+    mTimelineWidget->setLayout(mTimelineLayout);
+    mMainLayout->addWidget(mTimelineWidget);
+    mMainLayout->addWidget(mRenderWidget);
+    mRenderWidget->hide();
 
     addNewBoxesListKeysViewWidget(0);
     //addNewBoxesListKeysViewWidget(1);
@@ -292,6 +307,10 @@ void BoxesListAnimationDockWidget::clearAll() {
     }
 }
 
+RenderWidget *BoxesListAnimationDockWidget::getRenderWidget() {
+    return mRenderWidget;
+}
+
 bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
         QKeyEvent *event) {
     if(event->key() == Qt::Key_Right && mMainWindow->isCtrlPressed()) {
@@ -347,11 +366,21 @@ void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {
 }
 
 void BoxesListAnimationDockWidget::setTimelineMode() {
+    mTimelineAction->setDisabled(true);
+    mRenderAction->setDisabled(false);
+
     mRenderAction->setChecked(false);
+    mTimelineWidget->show();
+    mRenderWidget->hide();
 }
 
 void BoxesListAnimationDockWidget::setRenderMode() {
+    mTimelineAction->setDisabled(false);
+    mRenderAction->setDisabled(true);
+
     mTimelineAction->setChecked(false);
+    mRenderWidget->show();
+    mTimelineWidget->hide();
 }
 
 void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {

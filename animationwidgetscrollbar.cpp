@@ -30,6 +30,10 @@ qreal AnimationWidgetScrollBar::posToFrame(int xPos) {
             ((qreal)width() - 40.) + mMinFrame;
 }
 
+void AnimationWidgetScrollBar::setTopBorderVisible(const bool &bT) {
+    mTopBorderVisible = bT;
+}
+
 void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
@@ -42,11 +46,11 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
     if(!mRange) dFrame++;
     qreal pixPerFrame = ((qreal)width() - 40.)/dFrame;
 
-    QColor col;
+    QColor col = mHandleColor;
     if(mPressed) {
-        col = QColor(140, 140, 140);
-    } else {
-        col = QColor(100, 100, 100);
+        col.setHsv(col.hue(),
+                   col.saturation(),
+                   qMin(255, col.value() + 40));
     }
 
     p.fillRect(QRectF((mFirstViewedFrame - mMinFrame)*pixPerFrame, 0,
@@ -108,7 +112,9 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
 
     p.setPen(QPen(Qt::black, 1.));
     p.drawLine(0, height() - 1, width(), height() - 1);
-    p.drawLine(0, 0, width(), 0);
+    if(mTopBorderVisible) {
+        p.drawLine(0, 0, width(), 0);
+    }
 
     p.end();
 }

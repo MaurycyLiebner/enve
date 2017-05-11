@@ -249,13 +249,20 @@ void MainWindow::setupMenuBar() {
     mActionEffectsPaintEnabled->setShortcut(QKeySequence(Qt::Key_E));
 
     mRenderMenu = mMenuBar->addMenu("Render");
-    mRenderMenu->addAction("Render", mCanvasWidget, SLOT(renderOutput()));
+    mRenderMenu->addAction("Render",
+                           this, SLOT(addCanvasToRenderQue()));
 
     setMenuBar(mMenuBar);
 //
 
     connect(mActionEffectsPaintEnabled, SIGNAL(toggled(bool)),
             mCanvasWidget, SLOT(setEffectsPaintEnabled(bool)));
+}
+
+void MainWindow::addCanvasToRenderQue() {
+    if(mCanvasWidget->hasNoCanvas()) return;
+    mBoxesListAnimationDockWidget->getRenderWidget()->
+    createNewRenderInstanceWidgetForCanvas(mCanvasWidget->getCurrentCanvas());
 }
 
 void MainWindow::updateSettingsForCurrentCanvas() {
@@ -790,7 +797,7 @@ bool MainWindow::isRecordingAllPoints() {
 }
 
 int MainWindow::getFrameCount() {
-    return mCanvasWidget->getFrameCount();
+    return mCanvasWidget->getMaxFrame();
 }
 
 void MainWindow::setCurrentFrame(int frame) {

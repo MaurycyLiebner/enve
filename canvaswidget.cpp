@@ -86,7 +86,7 @@ void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
 
         setCanvasMode(mCurrentCanvas->getCurrentCanvasMode());
 
-        emit changeFrameRange(0, getFrameCount());
+        emit changeFrameRange(0, getMaxFrame());
         emit changeCurrentFrame(getCurrentFrame());
     }
     SWT_scheduleWidgetsContentUpdateWithTarget(
@@ -584,7 +584,7 @@ void CanvasWidget::interruptPreview() {
 
 void CanvasWidget::stopPreview() {
     if(!mRendering) {
-        mCurrentRenderFrame = getFrameCount();
+        mCurrentRenderFrame = getMaxFrame() + 1;
         mPreviewFPSTimer->stop();
         stopAudio();
         repaint();
@@ -594,7 +594,7 @@ void CanvasWidget::stopPreview() {
 
 void CanvasWidget::nextPlayPreviewFrame() {
     mCurrentCanvas->renderCurrentFrameToPreview();
-    if(mCurrentRenderFrame >= getFrameCount() || mPreviewInterrupted) {
+    if(mCurrentRenderFrame > getMaxFrame() || mPreviewInterrupted) {
         mRendering = false;
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
@@ -615,7 +615,7 @@ void CanvasWidget::nextPlayPreviewFrame() {
 
 void CanvasWidget::nextSaveOutputFrame() {
     mCurrentCanvas->renderCurrentFrameToOutput(mOutputString);
-    if(mCurrentRenderFrame >= getFrameCount()) {
+    if(mCurrentRenderFrame > getMaxFrame()) {
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
         mCurrentCanvas->setOutputRendering(false);
@@ -731,9 +731,9 @@ int CanvasWidget::getCurrentFrame() {
     return mCurrentCanvas->getCurrentFrame();
 }
 
-int CanvasWidget::getFrameCount() {
+int CanvasWidget::getMaxFrame() {
     if(hasNoCanvas()) return 0;
-    return mCurrentCanvas->getFrameCount();
+    return mCurrentCanvas->getMaxFrame();
 }
 
 void CanvasWidget::updateHoveredElements() {

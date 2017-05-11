@@ -71,7 +71,7 @@ public:
     void saveToSql(QSqlQuery *query);
     void createVideoForPath(const QString &path);
     int getCurrentFrame();
-    int getFrameCount();
+    int getMaxFrame();
     void addBoxAwaitingUpdate(BoundingBox *box);
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);

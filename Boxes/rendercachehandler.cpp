@@ -693,9 +693,9 @@ void RenderCacheHandler::drawCacheOnTimeline(QPainter *p,
         int maxFrame = cont->getMaxRelFrame();
         int minFrame = cont->getMinRelFrame();
         if(maxFrame < startFrame) continue;
-        if(minFrame > endFrame) return;
+        if(minFrame > endFrame + 1) return;
 
-        if(maxFrame > endFrame) maxFrame = endFrame;
+        if(maxFrame > endFrame) maxFrame = endFrame + 1;
         if(minFrame < startFrame) minFrame = startFrame;
 
         int dFrame = minFrame - startFrame;

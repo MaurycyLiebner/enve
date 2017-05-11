@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QLineEdit>
+#include <QPushButton>
 class AnimationWidgetScrollBar;
 #include "keysview.h"
 #include "BoxesList/boxscrollwidget.h"
@@ -58,14 +59,16 @@ private:
     QVBoxLayout *mBoxesListLayout;
     QVBoxLayout *mKeysViewLayout;
     QHBoxLayout *mMenuLayout;
+    QHBoxLayout *mMenuWidgetsLayout;
+    QWidget *mMenuWidgetsCont;
     QWidget *mTopWidget = NULL;
     QMenuBar *mBoxesListMenuBar;
+    QMenuBar *mCornerMenuBar;
     QLineEdit *mSearchLine;
     ScrollArea *mBoxesListScrollArea;
     BoxScrollWidget *mBoxesListWidget;
     KeysView *mKeysView;
     MainWindow *mMainWindow;
-    ActionButton *mGraphEnabledButton;
     AnimationDockWidget *mAnimationDockWidget;
 
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;

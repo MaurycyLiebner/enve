@@ -17,34 +17,41 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mGradientWidget = new GradientWidget(this, mMainWindow);
     mStrokeSettingsWidget = new QWidget(this);
     mColorsSettingsWidget = new ColorSettingsWidget(this);
+
+    mTargetLayout->setSpacing(0);
     mFillTargetButton = new QPushButton(
                 QIcon(":/icons/properties_fill.png"),
                 "Fill", this);
+    mFillTargetButton->setObjectName("leftButton");
     mStrokeTargetButton = new QPushButton(
                 QIcon(":/icons/properties_stroke_paint.png"),
                 "Stroke", this);
+    mStrokeTargetButton->setObjectName("rightButton");
     setLayout(mMainLayout);
     mMainLayout->setAlignment(Qt::AlignTop);
 
     mColorTypeLayout = new QHBoxLayout();
-    mColorTypeLayout->setAlignment(Qt::AlignLeft);
-    mFillNoneButton = new ActionButton(
-                ":/icons/fill_none.png",
-                "", this);
-    mFillNoneButton->setCheckable(":icons/fill_none_checked.png");
-    connect(mFillNoneButton, SIGNAL(pressed()),
+    mColorTypeLayout->setSpacing(0);
+    mFillNoneButton = new QPushButton(
+                QIcon(":/icons/fill_none.png"),
+                "None", this);
+    mFillNoneButton->setCheckable(true);
+    mFillNoneButton->setObjectName("leftButton");
+    connect(mFillNoneButton, SIGNAL(released()),
             this, SLOT(setNoneFill()));
-    mFillFlatButton = new ActionButton(
-                ":/icons/fill_flat.png",
-                "", this);
-    mFillFlatButton->setCheckable(":icons/fill_flat_checked.png");
-    connect(mFillFlatButton, SIGNAL(pressed()),
+    mFillFlatButton = new QPushButton(
+                QIcon(":/icons/fill_flat.png"),
+                "Flat", this);
+    mFillFlatButton->setCheckable(true);
+    mFillFlatButton->setObjectName("middleButton");
+    connect(mFillFlatButton, SIGNAL(released()),
             this, SLOT(setFlatFill()));
-    mFillGradientButton = new ActionButton(
-                ":/icons/fill_gradient.png",
-                "", this);
-    mFillGradientButton->setCheckable(":icons/fill_gradient_checked.png");
-    connect(mFillGradientButton, SIGNAL(pressed()),
+    mFillGradientButton = new QPushButton(
+                QIcon(":/icons/fill_gradient.png"),
+                "Gradient", this);
+    mFillGradientButton->setCheckable(true);
+    mFillGradientButton->setObjectName("rightButton");
+    connect(mFillGradientButton, SIGNAL(released()),
             this, SLOT(setGradientFill()));
 
     mColorTypeLayout->addWidget(mFillNoneButton);
@@ -64,10 +71,29 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mMainLayout->addWidget(mGradientWidget);
     mMainLayout->addWidget(mColorsSettingsWidget);
 
+    //mLineWidthSpin = new QDoubleSpinBox(this);
+    mLineWidthSpin = new QrealAnimatorValueSlider("line width", 0., 1000., 1., this);
+    mLineWidthSpin->setNameVisible(false);
+    //mLineWidthSpin->setValueSliderVisibile(false);
+    //mLineWidthSpin->setRange(0.0, 1000.0);
+    //mLineWidthSpin->setSuffix(" px");
+    //mLineWidthSpin->setSingleStep(0.1);
+    mLineWidthLayout->addWidget(mLineWidthLabel);
+    mLineWidthLayout->addWidget(mLineWidthSpin, Qt::AlignLeft);
 
-    mBevelJoinStyleButton = new QPushButton(QIcon(":/icons/join_bevel.png"), "", this);
-    mMiterJointStyleButton = new QPushButton(QIcon(":/icons/join_miter.png"), "", this);
-    mRoundJoinStyleButton = new QPushButton(QIcon(":/icons/join_round.png"), "", this);
+    mStrokeSettingsLayout->addLayout(mLineWidthLayout);
+
+    mJoinStyleLayout->setSpacing(0);
+    mBevelJoinStyleButton = new QPushButton(QIcon(":/icons/join_bevel.png"),
+                                            "", this);
+    mBevelJoinStyleButton->setObjectName("leftButton");
+    mMiterJointStyleButton = new QPushButton(QIcon(":/icons/join_miter.png"),
+                                             "", this);
+    mMiterJointStyleButton->setObjectName("middleButton");
+    mRoundJoinStyleButton = new QPushButton(QIcon(":/icons/join_round.png"),
+                                            "", this);
+    mRoundJoinStyleButton->setObjectName("rightButton");
+
     mBevelJoinStyleButton->setCheckable(true);
     mMiterJointStyleButton->setCheckable(true);
     mRoundJoinStyleButton->setCheckable(true);
@@ -77,15 +103,24 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
             this, SLOT(setMiterJoinStyle()) );
     connect(mRoundJoinStyleButton, SIGNAL(released()),
             this, SLOT(setRoundJoinStyle()) );
+
+    mJoinStyleLayout->addWidget(new QLabel("Join:", this));
     mJoinStyleLayout->addWidget(mBevelJoinStyleButton);
     mJoinStyleLayout->addWidget(mMiterJointStyleButton);
     mJoinStyleLayout->addWidget(mRoundJoinStyleButton);
 
     mStrokeSettingsLayout->addLayout(mJoinStyleLayout);
 
-    mFlatCapStyleButton = new QPushButton(QIcon(":/icons/cap_flat.png"), "", this);
-    mSquareCapStyleButton = new QPushButton(QIcon(":/icons/cap_square.png"), "", this);
-    mRoundCapStyleButton = new QPushButton(QIcon(":/icons/cap_round.png"), "", this);
+    mCapStyleLayout->setSpacing(0);
+    mFlatCapStyleButton = new QPushButton(QIcon(":/icons/cap_flat.png"),
+                                          "", this);
+    mFlatCapStyleButton->setObjectName("leftButton");
+    mSquareCapStyleButton = new QPushButton(QIcon(":/icons/cap_square.png"),
+                                            "", this);
+    mSquareCapStyleButton->setObjectName("middleButton");
+    mRoundCapStyleButton = new QPushButton(QIcon(":/icons/cap_round.png"),
+                                           "", this);
+    mRoundCapStyleButton->setObjectName("rightButton");
     mFlatCapStyleButton->setCheckable(true);
     mSquareCapStyleButton->setCheckable(true);
     mRoundCapStyleButton->setCheckable(true);
@@ -95,23 +130,13 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
             this, SLOT(setSquareCapStyle()) );
     connect(mRoundCapStyleButton, SIGNAL(released()),
             this, SLOT(setRoundCapStyle()) );
+
+    mCapStyleLayout->addWidget(new QLabel("Cap:", this));
     mCapStyleLayout->addWidget(mFlatCapStyleButton);
     mCapStyleLayout->addWidget(mSquareCapStyleButton);
     mCapStyleLayout->addWidget(mRoundCapStyleButton);
 
     mStrokeSettingsLayout->addLayout(mCapStyleLayout);
-
-    //mLineWidthSpin = new QDoubleSpinBox(this);
-    mLineWidthSpin = new QrealAnimatorValueSlider("line width", 0., 1000., 1., this);
-    mLineWidthSpin->setNameVisible(false);
-    //mLineWidthSpin->setValueSliderVisibile(false);
-    //mLineWidthSpin->setRange(0.0, 1000.0);
-    //mLineWidthSpin->setSuffix(" px");
-    //mLineWidthSpin->setSingleStep(0.1);
-    mLineWidthLayout->addWidget(mLineWidthLabel);
-    mLineWidthLayout->addWidget(mLineWidthSpin);
-
-    mStrokeSettingsLayout->addLayout(mLineWidthLayout);
 
     connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));

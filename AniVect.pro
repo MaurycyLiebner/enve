@@ -130,7 +130,10 @@ SOURCES += main.cpp\
     memoryhandler.cpp \
     boxpathpoint.cpp \
     Bones/bonepoint.cpp \
-    outputgenerator.cpp
+    outputgenerator.cpp \
+    RenderWidget/renderwidget.cpp \
+    RenderWidget/renderinstancewidget.cpp \
+    RenderWidget/renderinstancesettings.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -239,7 +242,10 @@ HEADERS  += mainwindow.h \
     selfref.h \
     boxpathpoint.h \
     Bones/bonepoint.h \
-    outputgenerator.h
+    outputgenerator.h \
+    RenderWidget/renderwidget.h \
+    RenderWidget/renderinstancewidget.h \
+    RenderWidget/renderinstancesettings.h
 
 RESOURCES += \
     resources.qrc

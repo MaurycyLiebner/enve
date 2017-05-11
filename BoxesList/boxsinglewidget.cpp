@@ -417,9 +417,10 @@ void BoxSingleWidget::rename() {
     }
 }
 
-void BoxSingleWidget::drawKeys(QPainter *p, qreal pixelsPerFrame,
-                             int containerTop,
-                             int minViewedFrame, int maxViewedFrame) {
+void BoxSingleWidget::drawKeys(QPainter *p, const qreal &pixelsPerFrame,
+                               const int &containerTop,
+                               const int &minViewedFrame,
+                               const int &maxViewedFrame) {
     if(isHidden()) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isAnimator()) {

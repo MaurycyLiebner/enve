@@ -40,9 +40,11 @@ public:
     static void loadStaticPixmaps();
 
     void rename();
-    void drawKeys(QPainter *p, qreal pixelsPerFrame,
-                  int containerTop,
-                  int minViewedFrame, int maxViewedFrame);
+    void drawKeys(QPainter *p,
+                  const qreal &pixelsPerFrame,
+                  const int &containerTop,
+                  const int &minViewedFrame,
+                  const int &maxViewedFrame);
     Key *getKeyAtPos(const int &pressX,
                      const qreal &pixelsPerFrame,
                      const int &minViewedFrame);

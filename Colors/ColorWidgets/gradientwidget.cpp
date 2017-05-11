@@ -348,8 +348,7 @@ void GradientWidget::drawGradient(int id, GLfloat height, GLfloat cY, bool borde
     }
 }
 
-void GradientWidget::paintGL()
-{
+void GradientWidget::paintGL() {
     if(mCurrentGradient == NULL) return;
     GLfloat halfHeight = height()*0.5f;
     GLfloat quorterHeight = halfHeight*0.5f;
@@ -370,8 +369,8 @@ void GradientWidget::paintGL()
         i++) {
         drawGradient(i, scrollItemHeight, (i - mCenterGradientId + 1)*scrollItemHeight);
     }
-    drawSolidRect(0.f, halfHeight - 10.f, width(), 10.f, 1.f, 1.f, 1.f, 1.f,
-                  false, false, false, false);
+//    drawSolidRect(0.f, halfHeight - 10.f, width(), 10.f, 1.f, 1.f, 1.f, 1.f,
+//                  false, false, false, false);
 
     int len = mCurrentGradient->getColorCount();
     Color nextColor = mCurrentGradient->getCurrentColorAt(0);

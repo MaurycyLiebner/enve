@@ -71,7 +71,7 @@ void KeysView::graphPaint(QPainter *p) {
     QLine *lines = new QLine[nLines];
     int currLine = 0;
     while(yL > 0) {
-        p->drawText(QRectF(0, yL - incY, 40, 2*incY),
+        p->drawText(QRectF(-5, yL - incY, 40, 2*incY),
                     Qt::AlignCenter, QString::number(currValue, 'f', mValuePrec));
         lines[currLine] = QLine(40, yL, width(), yL);
         currLine++;

@@ -343,6 +343,7 @@ public:
     }
 
     void clearCurrentPreviewImage();
+    int getMaxFrame();
 private:
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();

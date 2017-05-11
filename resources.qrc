@@ -91,6 +91,7 @@
         <file alias="localPivot.png">pixmaps/icons/localPivot.png</file>
         <file alias="globalPivot.png">pixmaps/icons/globalPivot.png</file>
         <file alias="zoom.png">pixmaps/icons/zoom.png</file>
+        <file alias="up-arrow.png">pixmaps/icons/up-arrow.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>

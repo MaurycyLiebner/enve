@@ -180,9 +180,9 @@ private:
     QPushButton *mStrokeTargetButton;
 
     QHBoxLayout *mColorTypeLayout;
-    ActionButton *mFillNoneButton = NULL;
-    ActionButton *mFillFlatButton = NULL;
-    ActionButton *mFillGradientButton = NULL;
+    QPushButton *mFillNoneButton = NULL;
+    QPushButton *mFillFlatButton = NULL;
+    QPushButton *mFillGradientButton = NULL;
 
     QWidget *mStrokeSettingsWidget;
     QVBoxLayout *mStrokeSettingsLayout = new QVBoxLayout();

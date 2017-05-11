@@ -947,6 +947,10 @@ int Canvas::getFrameCount() {
     return mMaxFrame + 1;
 }
 
+int Canvas::getMaxFrame() {
+    return mMaxFrame;
+}
+
 SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition;
 }

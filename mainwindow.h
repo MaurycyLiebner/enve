@@ -135,6 +135,7 @@ public slots:
     void createNewCanvas();
 
     void callUpdateSchedulers();
+    void addCanvasToRenderQue();
 private slots:
     //void saveOutput(QString renderDest);
     //void renderOutput();

@@ -19,6 +19,12 @@ public:
     int getMinFrame();
     int getFirstViewedFrame();
     int getLastViewedFrame();
+    void setTopBorderVisible(const bool &bT);
+
+    void setHandleColor(const QColor &col) {
+        mHandleColor = col;
+    }
+
 protected:
     qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);
@@ -33,11 +39,12 @@ public slots:
 
     void setMinMaxFrames(int minFrame, int maxFrame);
 private:
+    bool mTopBorderVisible = true;
     bool mClamp;
 
     bool mRange;
     bool mPressed = false;
-
+    QColor mHandleColor = QColor(100, 100, 100);
     qreal mLastMousePressFrame;
     int mSavedFirstFrame;
 

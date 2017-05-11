@@ -43,8 +43,9 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
 }
 
 void BoxScrollWidgetVisiblePart::drawKeys(QPainter *p,
-             const qreal &pixelsPerFrame,
-             const int &minViewedFrame, const int &maxViewedFrame) {
+                                          const qreal &pixelsPerFrame,
+                                          const int &minViewedFrame,
+                                          const int &maxViewedFrame) {
     //p->setPen(QPen(Qt::black, 1.));
     p->setPen(Qt::NoPen);
     foreach(SingleWidget *container, mSingleWidgets) {

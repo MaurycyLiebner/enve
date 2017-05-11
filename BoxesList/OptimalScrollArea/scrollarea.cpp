@@ -7,16 +7,11 @@ ScrollArea::ScrollArea(QWidget *parent) : QScrollArea(parent)
     setFocusPolicy(Qt::NoFocus);
     //verticalScrollBar()->setSingleStep(20);
 
-    setHorizontalScrollBarPolicy(
-                Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(
-                Qt::ScrollBarAlwaysOn);
-    setBackgroundRole(
-                QPalette::Window);
-    setFrameShadow(
-                QFrame::Plain);
-    setFrameShape(
-                QFrame::NoFrame);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setBackgroundRole(QPalette::Window);
+    setFrameShadow(QFrame::Plain);
+    setFrameShape(QFrame::NoFrame);
     setWidgetResizable(true);
 }
 

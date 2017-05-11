@@ -23,13 +23,14 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mBoxesListMenuBar = new QMenuBar(this);
     mBoxesListMenuBar->setFixedHeight(20);
     mBoxesListMenuBar->setStyleSheet("QMenuBar {"
-                                        "border-top: 1px solid black;"
+                                        "border-top: 0;"
                                         "border-bottom: 1px solid black;"
                                      "}"
                                      "QMenuBar::item {"
                                         "margin-top: 2px;"
                                         "padding-top: 1px;"
                                      "}");
+    mBoxesListMenuBar->addSeparator();
     QMenu *objectsMenu = mBoxesListMenuBar->addMenu("State");
     objectsMenu->addAction("All", this, SLOT(setRuleNone()));
     objectsMenu->addAction("Selected", this, SLOT(setRuleSelected()));
@@ -50,29 +51,64 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     typeMenu->addAction("All", this, SLOT(setTypeAll()));
     typeMenu->addAction("Sound", this, SLOT(setTypeSound()));
 
-    mBoxesListMenuBar->addSeparator();
-    mBoxesListMenuBar->addAction("+", this, SLOT(addNewBelowThis()));
-    mBoxesListMenuBar->addAction("-", this, SLOT(removeThis()));
+    QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
+    QAction *graphAct = viewMenu->addAction("Graph Editor");
+    graphAct->setCheckable(true);
+    connect(graphAct, SIGNAL(toggled(bool)),
+            this, SLOT(setGraphEnabled(bool)));
 
+    mCornerMenuBar = new QMenuBar(this);
+    mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
+    mCornerMenuBar->setFixedHeight(20);
+    mCornerMenuBar->setStyleSheet("QMenuBar {"
+                                     "border-top: 0;"
+                                     "border-bottom: 1px solid black;"
+                                  "}"
+                                  "QMenuBar::item {"
+                                     "margin-top: 2px;"
+                                     "padding-top: 1px;"
+                                  "}");
+    mCornerMenuBar->addSeparator();
+    mCornerMenuBar->addAction(" + ", this, SLOT(addNewBelowThis()));
+    mCornerMenuBar->addAction(" - ", this, SLOT(removeThis()));
+    mCornerMenuBar->addSeparator();
+
+    mMenuWidgetsLayout = new QHBoxLayout();
+    mMenuWidgetsLayout->setAlignment(Qt::AlignRight);
+    mMenuWidgetsLayout->setMargin(0);
+    mMenuWidgetsLayout->setSpacing(0);
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
+    mSearchLine->setFixedHeight(18);
+    mSearchLine->setStyleSheet("background-color: rgb(255, 255, 255);"
+                               "border-bottom: 0;"
+                               "border-radius: 4px;"
+                               "border: 1px solid rgb(100, 100, 100);"
+                               "margin-top: 1px;"
+                               "margin-bottom: 1px;");
     connect(mSearchLine, SIGNAL(textChanged(QString)),
             this, SLOT(setSearchText(QString)));
     mSearchLine->setSizePolicy(QSizePolicy::Maximum,
                                QSizePolicy::Fixed);
+
     mBoxesListMenuBar->setSizePolicy(QSizePolicy::Minimum,
                                      QSizePolicy::Fixed);
 
     mMenuLayout->addWidget(mBoxesListMenuBar);
 
-    mGraphEnabledButton = new ActionButton(
-                ":/icons/graphDisabled.png",
-                "", this);
-    mGraphEnabledButton->setCheckable(":/icons/graphEnabled.png");
-    connect(mGraphEnabledButton, SIGNAL(toggled(bool)),
-            this, SLOT(setGraphEnabled(bool)) );
-    mMenuLayout->addWidget(mGraphEnabledButton);
+    mMenuWidgetsLayout->addWidget(mSearchLine);
+    mMenuWidgetsCont = new QWidget(this);
+    mMenuWidgetsCont->setStyleSheet(
+                "QWidget {"
+                    "border-top: 0;"
+                    "border-bottom: 1px solid black;"
+                    "color: black;"
+                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                    "stop:0 lightgray, stop:1 darkgray);"
+                "}");
+    mMenuWidgetsCont->setLayout(mMenuWidgetsLayout);
 
-    mMenuLayout->addWidget(mSearchLine);
+    mMenuLayout->addWidget(mMenuWidgetsCont);
+    mMenuLayout->addWidget(mCornerMenuBar);
 
     mBoxesListLayout = new QVBoxLayout();
     mBoxesListLayout->setSpacing(0);
@@ -181,6 +217,7 @@ void BoxesListKeysViewWidget::connectToChangeWidthWidget(
                                     ChangeWidthWidget *changeWidthWidget) {
     connect(changeWidthWidget, SIGNAL(widthSet(int)),
             this, SLOT(setBoxesListWidth(int)));
+    setBoxesListWidth(changeWidthWidget->getCurrentWidth());
 }
 
 void BoxesListKeysViewWidget::setBoxesListWidth(const int &width) {

@@ -19,6 +19,7 @@
 #include <QToolBar>
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "boxeslistkeysviewwidget.h"
+#include "RenderWidget/renderwidget.h"
 class VerticalWidgetsStack;
 
 class ChangeWidthWidget : public QWidget
@@ -38,6 +39,10 @@ public:
     void enterEvent(QEvent *);
 
     void leaveEvent(QEvent *);
+    int getCurrentWidth() {
+        return mCurrentWidth;
+    }
+
 signals:
     void widthSet(int);
 private:
@@ -49,6 +54,7 @@ private:
 
 class AnimationDockWidget;
 class BoxScrollWidget;
+class RenderWidget;
 #include "actionbutton.h"
 
 class BoxesListAnimationDockWidget : public QWidget
@@ -62,6 +68,8 @@ public:
     void updateSettingsForCurrentCanvas(Canvas *canvas);
     void addNewBoxesListKeysViewWidgetBelow(BoxesListKeysViewWidget *widget);
     void clearAll();
+
+    RenderWidget *getRenderWidget();
 public slots:
     void setCurrentFrame(int frame);
     void setMinMaxFrame(const int &minFrame, const int &maxFrame);
@@ -94,6 +102,11 @@ private:
     VerticalWidgetsStack *mBoxesListKeysViewStack;
     ChangeWidthWidget *mChww;
     MainWindow *mMainWindow;
+
+    RenderWidget *mRenderWidget;
+    QWidget *mTimelineWidget;
+    QVBoxLayout *mTimelineLayout;
+
     QVBoxLayout *mMainLayout;
 
     QLabel *mControlButtonsWidget;
