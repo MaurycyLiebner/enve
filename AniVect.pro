@@ -135,8 +135,8 @@ SOURCES += main.cpp\
     RenderWidget/renderinstancewidget.cpp \
     RenderWidget/renderinstancesettings.cpp \
     Gradients/gradientslistwidget.cpp \
-    Gradients/currentgradientwidget.cpp \
-    Gradients/singlegradientwidget.cpp
+    Gradients/displayedgradientswidget.cpp \
+    Gradients/currentgradientwidget.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -250,8 +250,8 @@ HEADERS  += mainwindow.h \
     RenderWidget/renderinstancewidget.h \
     RenderWidget/renderinstancesettings.h \
     Gradients/gradientslistwidget.h \
-    Gradients/currentgradientwidget.h \
-    Gradients/singlegradientwidget.h
+    Gradients/displayedgradientswidget.h \
+    Gradients/currentgradientwidget.h
 
 RESOURCES += \
     resources.qrc

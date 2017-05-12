@@ -195,6 +195,10 @@ public:
                              const int &y,
                              const int &width,
                              const int &height);
+    static void drawHoverBorder(GLfloat xt,
+                                GLfloat yt,
+                                GLfloat wt,
+                                GLfloat ht);
 protected:
     Color bgColor;
 

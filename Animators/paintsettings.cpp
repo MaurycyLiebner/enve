@@ -139,7 +139,6 @@ Gradient::Gradient() : ComplexAnimator() {
 }
 
 Gradient::~Gradient() {
-    qDebug() << "asdsd";
 }
 
 Gradient::Gradient(const Color &color1, const Color &color2) :

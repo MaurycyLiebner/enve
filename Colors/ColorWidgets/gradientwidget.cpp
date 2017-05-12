@@ -6,11 +6,25 @@
 #include "mainwindow.h"
 
 GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
-    GLWidget(parent) {
-    mMainWindow = mainWindow;
-    setFixedHeight(6*20 + 10);
+    QWidget(parent) {
+    mMainLayout = new QVBoxLayout(this);
+    mMainLayout->setMargin(0);
+    mMainLayout->setSpacing(0);
+    mMainLayout->setAlignment(Qt::AlignTop);
+    mGradientsListWidget = new GradientsListWidget(this, this);
+    mCurrentGradientWidget = new CurrentGradientWidget(this, this);
+    mMainLayout->addWidget(mGradientsListWidget);
+    mMainLayout->addSpacing(10);
+    mMainLayout->addWidget(mCurrentGradientWidget);
+    setLayout(mMainLayout);
+    setFixedHeight((3 + mNumberVisibleGradients)*20 + 10);
+
+    mScrollItemHeight = 20;
+
+    mMainWindow = mainWindow;  
+
     connect(mMainWindow, SIGNAL(updateAll()),
-            this, SLOT(update()));
+            this, SLOT(updateAll()));
 //    newGradient();
 //    newGradient(Color(1.f, 1.f, 0.f), Color(0.f, 1.f, 1.f, 0.5f));
 //    newGradient(Color(1.f, 0.f, 0.f), Color(0.f, 1.f, 0.f));
@@ -18,6 +32,12 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
 
 GradientWidget::~GradientWidget() {
     mGradients.clear();
+}
+
+void GradientWidget::updateAll() {
+    mCurrentGradientWidget->update();
+    mGradientsListWidget->getDisplayedGradientsWidget()->update();
+    update();
 }
 
 void GradientWidget::setCurrentColorId(int id) {
@@ -28,15 +48,20 @@ void GradientWidget::setCurrentColorId(int id) {
     repaint();
 }
 
+void GradientWidget::updateNumberOfGradients() {
+    mGradientsListWidget->setNumberGradients(mGradients.count());
+}
+
 void GradientWidget::addGradientToList(Gradient *gradient) {
     mGradients << gradient->ref<Gradient>();
+    updateNumberOfGradients();
 }
 
 void GradientWidget::newGradient(Color color1, Color color2) {
     Gradient *newGradient = new Gradient(color1, color2);
     addGradientToList(newGradient);
     setCurrentGradient(newGradient);
-    repaint();
+    updateAll();
 }
 
 void GradientWidget::newGradient(int fromGradientId)
@@ -45,7 +70,7 @@ void GradientWidget::newGradient(int fromGradientId)
     Gradient *newGradient = (Gradient*)fromGradient->makeDuplicate();
     addGradientToList(newGradient);
     setCurrentGradient(mGradients.last().data());
-    repaint();
+    updateAll();
 }
 
 void GradientWidget::clearAll() {
@@ -54,7 +79,7 @@ void GradientWidget::clearAll() {
     mCurrentGradient = NULL;
     mCenterGradientId = 1;
     mCurrentColorId = 0;
-    repaint();
+    updateAll();
 }
 
 int GradientWidget::getGradientIndex(Gradient *child) {
@@ -70,8 +95,10 @@ int GradientWidget::getGradientIndex(Gradient *child) {
 void GradientWidget::removeGradientFromList(Gradient *toRemove) {
     mGradients.removeAt(getGradientIndex(toRemove));
     if(mCurrentGradient == toRemove) {
+        mCurrentGradient = NULL;
         setCurrentGradient((Gradient*) NULL);
     }
+    updateNumberOfGradients();
 }
 
 void GradientWidget::removeGradient(int gradientId)
@@ -82,8 +109,9 @@ void GradientWidget::removeGradient(int gradientId)
     }
     removeGradientFromList(toRemove);
 
-    mCenterGradientId = clampInt(mCenterGradientId, 1, mGradients.length() - 2);
-    repaint();
+    mCenterGradientId = clampInt(mCenterGradientId, 1,
+                                 mGradients.length() - 2);
+    updateAll();
 }
 
 void GradientWidget::saveGradientsToQuery(QSqlQuery *query) {
@@ -98,27 +126,17 @@ void GradientWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
     }
 }
 
-void GradientWidget::wheelEvent(QWheelEvent *event)
-{
-    if(event->y() > height()/2 || mGradients.length() < 4) return;
-    if(event->delta() < 0) {
-        mCenterGradientId = clampInt(mCenterGradientId + 1, 1, mGradients.length() - 2);
-    } else {
-        mCenterGradientId = clampInt(mCenterGradientId - 1, 1, mGradients.length() - 2);
-    }
-    repaint();
-}
-
-void GradientWidget::setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a)
-{
+void GradientWidget::setCurrentColor(GLfloat h,
+                                     GLfloat s,
+                                     GLfloat v,
+                                     GLfloat a) {
     Color newColor;
     newColor.setHSV(h, s, v, a);
     mCurrentGradient->replaceColor(mCurrentColorId, newColor);
-    repaint();
+    updateAll();
 }
 
-void GradientWidget::setCurrentGradient(Gradient *gradient)
-{
+void GradientWidget::setCurrentGradient(Gradient *gradient) {
     if(mCurrentGradient != NULL) {
         disconnect(mCurrentGradient,
                    SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
@@ -140,18 +158,16 @@ void GradientWidget::setCurrentGradient(Gradient *gradient)
                 SLOT(resetColorIdIfEquals(Gradient*,int)));
     }
     setCurrentColorId(0);
-    repaint();
+    updateAll();
 
     emit currentGradientChanged(mCurrentGradient);
 }
 
-Gradient *GradientWidget::getCurrentGradient()
-{
+Gradient *GradientWidget::getCurrentGradient() {
     return mCurrentGradient;
 }
 
-Color GradientWidget::getCurrentColor()
-{
+Color GradientWidget::getCurrentColor() {
     if(mCurrentGradient == NULL) return Color();
     return mCurrentGradient->getCurrentColorAt(mCurrentColorId);
 }
@@ -169,152 +185,165 @@ void GradientWidget::resetColorIdIfEquals(Gradient *gradient, const int &id) {
     }
 }
 
-void GradientWidget::setCurrentGradient(int listId)
-{
+void GradientWidget::setCurrentGradient(int listId) {
     if(listId >= mGradients.length()) return;
     setCurrentGradient(mGradients.at(listId).data());
 }
 
-void GradientWidget::mousePressEvent(QMouseEvent *event)
-{
-    if(event->y() < height()/2 - 10) {
-        int heightGrad = (height()/2 - 10)/3;
-        int gradId = event->y()/heightGrad + mCenterGradientId - 1;
-        bool gradPressed = true;
-        if(gradId >= mGradients.count() || gradId < 0) {
-            gradPressed = false;
-        }
-        if(event->button() == Qt::RightButton) {
-            QMenu menu(this);
-            menu.addAction("New Gradient");
-            if(gradPressed) {
-                menu.addAction("Duplicate Gradient");
-                menu.addAction("Delete Gradient");
-            }
-            QAction *selected_action = menu.exec(event->globalPos());
-            if(selected_action != NULL)
-            {
-                if(selected_action->text() == "Delete Gradient")
-                {
-                    removeGradient(gradId);
-                } else if(selected_action->text() == "Duplicate Gradient") {
-                    newGradient(gradId);
-                } else if(selected_action->text() == "New Gradient"){
-                    newGradient();
+void GradientWidget::colorRightPress(const int &x,
+                                     const QPoint &point) {
+    colorLeftPress(x);
+    if(mCurrentGradient != NULL) {
+        QMenu menu(this);
+        menu.addAction("Delete Color");
+        menu.addAction("Add Color");
+        QAction *selected_action = menu.exec(point);
+        if(selected_action != NULL) {
+            if(selected_action->text() == "Delete Color") {
+
+                if(mCurrentGradient->getColorCount() < 2) {
+                    mCurrentGradient->replaceColor(mCurrentColorId,
+                                                   Color(0.f, 0.f, 0.f, 1.f));
+                } else {
+                    mCurrentGradient->removeColor(mCurrentColorId);
                 }
-            } else {
-
+                startGradientTransform();
+                setCurrentColorId(0);
+                emit gradientSettingsChanged();
+                finishGradientTransform();
+                updateAll();
+            } else if(selected_action->text() == "Add Color") {
+                startGradientTransform();
+                mCurrentGradient->addColor(Color(0.f, 0.f, 0.f, 1.f));
+                emit gradientSettingsChanged();
+                finishGradientTransform();
+                updateAll();
             }
-        } else if(gradPressed) {
-            setCurrentGradient(gradId);
         }
-    } else if(event->y() > height()/2 && event->y() < 3*height()/4 && mCurrentGradient != NULL) {
-        int nCols = mCurrentGradient->getColorCount();
-        setCurrentColorId(clampInt(event->x()*nCols/width(), 0, nCols - 1) );
-        if(event->button() == Qt::RightButton)
-        {
-            QMenu menu(this);
-            menu.addAction("Delete Color");
-            menu.addAction("Add Color");
-            QAction *selected_action = menu.exec(event->globalPos());
-            if(selected_action != NULL)
-            {
-                if(selected_action->text() == "Delete Color")
-                {
+        else {
 
-                    if(mCurrentGradient->getColorCount() < 2) {
-                        mCurrentGradient->replaceColor(mCurrentColorId,
-                                                       Color(0.f, 0.f, 0.f, 1.f));
-                    } else {
-                        mCurrentGradient->removeColor(mCurrentColorId);
-                    }
-                    startGradientTransform();
-                    setCurrentColorId(0);
-                    emit gradientSettingsChanged();
-                    finishGradientTransform();
-                    repaint();
-                } else if(selected_action->text() == "Add Color") {
-                    startGradientTransform();
-                    mCurrentGradient->addColor(Color(0.f, 0.f, 0.f, 1.f));
-                    emit gradientSettingsChanged();
-                    finishGradientTransform();
-                    repaint();
-                }
-            }
-            else
-            {
-
-            }
         }
     }
 }
 
-void GradientWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    if(event->y() > height()/2 && event->y() < 3*height()/4 && mCurrentGradient != NULL) {
+void GradientWidget::colorLeftPress(const int &x) {
+    if(mCurrentGradient != NULL) {
         int nCols = mCurrentGradient->getColorCount();
-            int colorId = clampInt(event->x()*nCols/width(), 0, nCols - 1);
+        setCurrentColorId(clampInt(x*nCols/width(), 0, nCols - 1) );
+    }
+    updateAll();
+}
+
+void GradientWidget::moveColor(const int &x) {
+    if(mCurrentGradient != NULL) {
+        int nCols = mCurrentGradient->getColorCount();
+            int colorId = clampInt(x*nCols/width(), 0, nCols - 1);
             if(colorId != mCurrentColorId) {
                 startGradientTransform();
                 mCurrentGradient->swapColors(mCurrentColorId, colorId);
                 setCurrentColorId(colorId);
                 emit gradientSettingsChanged();
                 finishGradientTransform();
-                repaint();
+                updateAll();
             }
     }
 }
 
-void GradientWidget::paintGL() {
+void GradientWidget::drawCurrentGradientColors(const int &x,
+                                               const int &y,
+                                               const int &width,
+                                               const int &height) {
     if(mCurrentGradient == NULL) return;
-    int halfHeight = height()*0.5f;
-    int quorterHeight = halfHeight*0.5f;
-    int scrollItemHeight = (halfHeight - 10.)*0.334;
-
-    drawMeshBg(0, 0,
-               width(), scrollItemHeight*3);
-    drawMeshBg(0, halfHeight,
-               width(), 2*quorterHeight);
-
-    for(int i = (mCenterGradientId > 1) ? mCenterGradientId - 1 : 0;
-        i < mCenterGradientId + 2 && i < mGradients.length();
-        i++) {
-        Gradient *gradient = mGradients.at(i).data();
-        int yT = (i - mCenterGradientId + 1)*scrollItemHeight;
-        drawGradient(gradient,
-                     0, yT,
-                     width(), scrollItemHeight);
-        if(gradient == mCurrentGradient) {
-            drawBorder(0, yT,
-                       width(), scrollItemHeight);
-        }
-    }
-
 
     int len = mCurrentGradient->getColorCount();
     Color nextColor = mCurrentGradient->getCurrentColorAt(0);
-    GLfloat cX = 0.f;
-    GLfloat segWidth = width()/(GLfloat)len;
+    GLfloat cX = x;
+    GLfloat segWidth = width/(GLfloat)len;
     for(int i = 0; i < len; i++) {
         Color color = nextColor;
-        drawRect(cX, halfHeight, segWidth, quorterHeight,
+        GLWidget::drawRect(cX, y, segWidth, height,
                  color.gl_r, color.gl_g, color.gl_b, color.gl_a,
                  color.gl_r, color.gl_g, color.gl_b, color.gl_a,
                  color.gl_r, color.gl_g, color.gl_b, color.gl_a,
                  color.gl_r, color.gl_g, color.gl_b, color.gl_a,
                  false, false, false, false);
         if(i == mCurrentColorId) {
-            drawBorder(cX, halfHeight, segWidth, quorterHeight);
+            GLWidget::drawBorder(cX, y, segWidth, height);
         }
         if(i + 1 == len) break;
         nextColor = mCurrentGradient->getCurrentColorAt(i + 1);
         cX += segWidth;
     }
+}
 
+void GradientWidget::drawCurrentGradient(const int &x,
+                                         const int &y,
+                                         const int &width,
+                                         const int &height) {
+    if(mCurrentGradient == NULL) return;
+    GLWidget::drawGradient(mCurrentGradient,
+                 x, y, width, height);
+}
 
-    drawGradient(mCurrentGradient,
-                 0, halfHeight + quorterHeight,
-                 width(), quorterHeight);
+void GradientWidget::drawGradients(const int &displayedTop,
+                                   const int &topGradientId,
+                                   const int &numberVisibleGradients,
+                                   const int &scrollItemHeight) {
+    int gradListHeight = scrollItemHeight*numberVisibleGradients;
+    GLWidget::drawMeshBg(0, displayedTop,
+               width(), gradListHeight);
+
+    int yT = displayedTop;
+    for(int i = topGradientId; i < mGradients.count(); i++) {
+        Gradient *gradient = mGradients.at(i).data();
+        GLWidget::drawGradient(gradient,
+                     0, yT,
+                     width(), scrollItemHeight);
+        if(gradient == mCurrentGradient) {
+            GLWidget::drawBorder(0, yT,
+                       width(), scrollItemHeight);
+        }
+        yT += scrollItemHeight;
+    }
+}
+
+void GradientWidget::drawHoveredGradientBorder(const int &displayedTop,
+                                               const int &topGradientId,
+                                               const int &hoveredGradId,
+                                               const int &scrollItemHeight) {
+    int gradId = topGradientId + hoveredGradId;
+    if(gradId >= mGradients.count() || gradId < 0) return;
+    GLWidget::drawHoverBorder(0,
+                              displayedTop + hoveredGradId*scrollItemHeight,
+                              width(), scrollItemHeight);
+}
+
+void GradientWidget::gradientLeftPressed(const int &gradId) {
+    if(gradId >= mGradients.count() || gradId < 0) return;
+    setCurrentGradient(gradId);
+}
+
+void GradientWidget::gradientContextMenuReq(const int &gradId,
+                                            const QPoint globalPos) {
+    bool gradPressed = gradId < mGradients.count() && gradId >= 0;
+    QMenu menu(this);
+    menu.addAction("New Gradient");
+    if(gradPressed) {
+        menu.addAction("Duplicate Gradient");
+        menu.addAction("Delete Gradient");
+    }
+    QAction *selected_action = menu.exec(globalPos);
+    if(selected_action != NULL) {
+        if(selected_action->text() == "Delete Gradient") {
+            removeGradient(gradId);
+        } else if(selected_action->text() == "Duplicate Gradient") {
+            newGradient(gradId);
+        } else if(selected_action->text() == "New Gradient") {
+            newGradient();
+        }
+    } else {
+
+    }
 }
 
 void GradientWidget::startSelectedColorTransform() {

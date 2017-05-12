@@ -597,28 +597,16 @@ void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
 
 void GLWidget::drawBorder(GLfloat xt, GLfloat yt,
                           GLfloat wt, GLfloat ht) {
-    drawRect(xt, yt, wt, 2.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
+    drawSolidRect(xt, yt, wt, 2.f,
              0.f, 0.f, 0.f, 1.f,
              false, false, false, false);
-    drawRect(xt, yt + ht - 2.f, wt, 2.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
+    drawSolidRect(xt, yt + ht - 2.f, wt, 2.f,
              0.f, 0.f, 0.f, 1.f,
              false, false, false, false);
-    drawRect(xt, yt + 2.f, 2.f, ht - 4.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
+    drawSolidRect(xt, yt + 2.f, 2.f, ht - 4.f,
              0.f, 0.f, 0.f, 1.f,
              false, false, false, false);
-    drawRect(xt + wt - 2.f, yt + 2.f, 2.f, ht - 4.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
-             0.f, 0.f, 0.f, 1.f,
+    drawSolidRect(xt + wt - 2.f, yt + 2.f, 2.f, ht - 4.f,
              0.f, 0.f, 0.f, 1.f,
              false, false, false, false);
 
@@ -626,39 +614,43 @@ void GLWidget::drawBorder(GLfloat xt, GLfloat yt,
     yt += 2.f;
     wt -= 4.f;
     ht -= 4.f;
-    drawRect(xt, yt, wt, 1.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
+    drawSolidRect(xt, yt, wt, 1.f,
              1.f, 1.f, 1.f, 1.f,
              false, false, false, false);
-    drawRect(xt, yt + ht - 1.f, wt, 1.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
+    drawSolidRect(xt, yt + ht - 1.f, wt, 1.f,
              1.f, 1.f, 1.f, 1.f,
              false, false, false, false);
-    drawRect(xt, yt + 1.f, 1.f, ht - 2.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
+    drawSolidRect(xt, yt + 1.f, 1.f, ht - 2.f,
              1.f, 1.f, 1.f, 1.f,
              false, false, false, false);
-    drawRect(xt + wt - 1.f, yt + 1.f, 1.f, ht - 2.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
-             1.f, 1.f, 1.f, 1.f,
+    drawSolidRect(xt + wt - 1.f, yt + 1.f, 1.f, ht - 2.f,
              1.f, 1.f, 1.f, 1.f,
              false, false, false, false);
 }
 
+void GLWidget::drawHoverBorder(GLfloat xt, GLfloat yt,
+                               GLfloat wt, GLfloat ht) {
+    drawSolidRect(xt, yt, wt, 1.f,
+             1.f, 0.f, 0.f,
+             false, false, false, false);
+    drawSolidRect(xt, yt + ht - 1.f, wt, 1.f,
+                  1.f, 0.f, 0.f,
+                  false, false, false, false);
+    drawSolidRect(xt, yt + 1.f, 1.f, ht - 2.f,
+             1.f, 0.f, 0.f,
+             false, false, false, false);
+    drawSolidRect(xt + wt - 1.f, yt + 1.f, 1.f, ht - 2.f,
+             1.f, 0.f, 0.f,
+             false, false, false, false);
+}
+
 void GLWidget::drawRect(GLfloat x, GLfloat y, GLfloat width, GLfloat height,
-                           GLfloat r1, GLfloat g1, GLfloat b1,
-                           GLfloat r2, GLfloat g2, GLfloat b2,
-                           GLfloat r3, GLfloat g3, GLfloat b3,
-                           GLfloat r4, GLfloat g4, GLfloat b4,
-                           GLboolean top_aa, GLboolean bottom_aa, GLboolean left_aa, GLboolean right_aa)
-{
+                        GLfloat r1, GLfloat g1, GLfloat b1,
+                        GLfloat r2, GLfloat g2, GLfloat b2,
+                        GLfloat r3, GLfloat g3, GLfloat b3,
+                        GLfloat r4, GLfloat g4, GLfloat b4,
+                        GLboolean top_aa, GLboolean bottom_aa,
+                        GLboolean left_aa, GLboolean right_aa) {
     drawRect(x, y, width, height,
              r1, g1, b1, 1.f,
              r2, g2, b2, 1.f,

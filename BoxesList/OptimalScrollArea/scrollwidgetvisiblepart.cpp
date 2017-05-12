@@ -22,14 +22,12 @@ ScrollWidgetVisiblePart::~ScrollWidgetVisiblePart() {
     }
 }
 
-void ScrollWidgetVisiblePart::setVisibleTop(
-        const int &top) {
+void ScrollWidgetVisiblePart::setVisibleTop(const int &top) {
     mVisibleTop = top;
     updateVisibleWidgetsContent();
 }
 
-void ScrollWidgetVisiblePart::setVisibleHeight(
-        const int &height) {
+void ScrollWidgetVisiblePart::setVisibleHeight(const int &height) {
     mVisibleHeight = height;
     updateVisibleWidgets();
 }

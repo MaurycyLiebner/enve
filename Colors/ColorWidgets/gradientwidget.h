@@ -3,8 +3,11 @@
 #include "glwidget.h"
 #include "fillstrokesettings.h"
 #include <QComboBox>
+#include <QScrollArea>
+#include "Gradients/gradientslistwidget.h"
+#include "Gradients/currentgradientwidget.h"
 
-class GradientWidget : public GLWidget
+class GradientWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -16,17 +19,12 @@ public:
     Color getCurrentColor();
     ColorAnimator *getCurrentColorAnimator();
 
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
+    void moveColor(const int &x);
 
     void newGradient(Color color1 = Color(0.f, 0.f, 0.f, 1.f),
                      Color color2 = Color(0.f, 0.f, 0.f, 0.f));
     void newGradient(int fromGradientId);
     void removeGradient(int gradientId);
-
-    void wheelEvent(QWheelEvent *event);
-
-    void paintGL();
 
     void finishGradientTransform();
     void startGradientTransform();
@@ -37,6 +35,26 @@ public:
     void removeGradientFromList(Gradient *toRemove);
     void startSelectedColorTransform();
     int getGradientIndex(Gradient *child);
+    void updateNumberOfGradients();
+
+    void drawGradients(const int &displayedTop,
+                       const int &topGradientId,
+                       const int &numberVisibleGradients,
+                       const int &scrollItemHeight);
+
+    void gradientLeftPressed(const int &gradId);
+    void gradientContextMenuReq(const int &gradId,
+                                const QPoint globalPos);
+    void drawHoveredGradientBorder(const int &displayedTop,
+                                   const int &topGradientId,
+                                   const int &hoveredGradId,
+                                   const int &scrollItemHeight);
+    void drawCurrentGradientColors(const int &x, const int &y,
+                                   const int &width, const int &height);
+    void drawCurrentGradient(const int &x, const int &y,
+                             const int &width, const int &height);
+    void colorRightPress(const int &x, const QPoint &point);
+    void colorLeftPress(const int &x);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);
@@ -44,7 +62,18 @@ signals:
 public slots:
     void resetColorIdIfEquals(Gradient *gradient, const int &id);
     void setCurrentColor(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
+private slots:
+    void updateAll();
 private:
+    QVBoxLayout *mMainLayout;
+    GradientsListWidget *mGradientsListWidget;
+    CurrentGradientWidget *mCurrentGradientWidget;
+
+    int mNumberVisibleGradients = 6;
+    int mHalfHeight = 64;
+    int mQuorterHeight = 32;
+    int mScrollItemHeight;
+
     MainWindow *mMainWindow;
     QList<QSharedPointer<Gradient> > mGradients;
     Gradient *mCurrentGradient = NULL;
