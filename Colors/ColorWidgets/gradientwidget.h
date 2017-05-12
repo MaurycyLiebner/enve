@@ -55,6 +55,9 @@ public:
                              const int &width, const int &height);
     void colorRightPress(const int &x, const QPoint &point);
     void colorLeftPress(const int &x);
+    int getColorIdAtX(const int &x);
+    void drawHoveredColorBorder(const int &hoveredX,
+                                const int &colHeight);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);

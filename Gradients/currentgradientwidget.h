@@ -17,6 +17,8 @@ protected:
     GradientWidget *mGradientWidget;
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void leaveEvent(QEvent *);
+    int mHoveredX = 0;
 signals:
 
 public slots:

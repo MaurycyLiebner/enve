@@ -225,10 +225,14 @@ void GradientWidget::colorRightPress(const int &x,
     }
 }
 
+int GradientWidget::getColorIdAtX(const int &x) {
+    int nCols = mCurrentGradient->getColorCount();
+    return clampInt(x*nCols/width(), 0, nCols - 1);
+}
+
 void GradientWidget::colorLeftPress(const int &x) {
     if(mCurrentGradient != NULL) {
-        int nCols = mCurrentGradient->getColorCount();
-        setCurrentColorId(clampInt(x*nCols/width(), 0, nCols - 1) );
+        setCurrentColorId(getColorIdAtX(x));
     }
     updateAll();
 }
@@ -315,6 +319,16 @@ void GradientWidget::drawHoveredGradientBorder(const int &displayedTop,
     GLWidget::drawHoverBorder(0,
                               displayedTop + hoveredGradId*scrollItemHeight,
                               width(), scrollItemHeight);
+}
+
+void GradientWidget::drawHoveredColorBorder(const int &hoveredX,
+                                            const int &colHeight) {
+    if(hoveredX < 0 || hoveredX > width()) return;
+    int colId = getColorIdAtX(hoveredX);
+    int len = mCurrentGradient->getColorCount();
+    int colWidth = width()/len;
+    GLWidget::drawHoverBorder(colId*colWidth, 0,
+                              colWidth, colHeight);
 }
 
 void GradientWidget::gradientLeftPressed(const int &gradId) {
