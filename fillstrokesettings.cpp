@@ -543,8 +543,7 @@ void FillStrokeSettingsWidget::startTransform(const char *slot)
     }*/
 }
 
-void FillStrokeSettingsWidget::setGradient(Gradient *gradient)
-{
+void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {
     setCurrentGradientVal(gradient);
     if(mTargetId == 0) {
         PaintSetting paintSetting =

@@ -710,10 +710,16 @@ void PaintSetting::apply(PathBox *box) const {
         fillSettings = box->getStrokeSettings();
     }
     bool paintTypeChanged = fillSettings->getPaintType() != mPaintType;
+    bool gradientChanged = false;
 
     if(mPaintType == FLATPAINT) {
         mColorSetting.apply(fillSettings->getColorAnimator());
     } else if(mPaintType == GRADIENTPAINT) {
+        if(paintTypeChanged) {
+            gradientChanged = true;
+        } else {
+            gradientChanged = fillSettings->getGradient() == mGradient;
+        }
         fillSettings->setGradient(mGradient);
         if(paintTypeChanged) {
             if(mTargetFillSettings) {
@@ -722,13 +728,16 @@ void PaintSetting::apply(PathBox *box) const {
                 box->resetStrokeGradientPointsPos(true);
             }
         }
-
-        //box->updateDrawGradients();
+//        if(gradientChanged) {
+//            box->updateDrawGradients();
+//        }
     }
     if(paintTypeChanged) {
         if(paintTypeChanged) {
             fillSettings->setPaintType(mPaintType);
         }
+    }
+    if(gradientChanged) {
         if(mTargetFillSettings) {
             box->updateFillDrawGradient();
         } else {

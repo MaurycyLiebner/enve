@@ -158,7 +158,6 @@ void GradientWidget::setCurrentGradient(Gradient *gradient) {
                 SLOT(resetColorIdIfEquals(Gradient*,int)));
     }
     setCurrentColorId(0);
-    updateAll();
 
     emit currentGradientChanged(mCurrentGradient);
 }
@@ -321,6 +320,7 @@ void GradientWidget::drawHoveredGradientBorder(const int &displayedTop,
 void GradientWidget::gradientLeftPressed(const int &gradId) {
     if(gradId >= mGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void GradientWidget::gradientContextMenuReq(const int &gradId,
