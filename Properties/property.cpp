@@ -26,7 +26,9 @@ int Property::prp_getParentFrameShift() const {
     return prp_mParentFrameShift;
 }
 
-void Property::prp_setParentFrameShift(const int &shift) {
+void Property::prp_setParentFrameShift(const int &shift,
+                                       ComplexAnimator *parentAnimator) {
+    Q_UNUSED(parentAnimator);
     prp_mParentFrameShift = shift;
 }
 

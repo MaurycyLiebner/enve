@@ -207,6 +207,22 @@ public:
     bool isEmpty() const;
 
     bool SWT_isGradient() { return true; }
+
+    void prp_setParentFrameShift(const int &shift,
+                                 ComplexAnimator *parentAnimator = NULL) {
+        if(parentAnimator == NULL) return;
+        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+            parentAnimator->ca_updateDescendatKeyFrame(key.get());
+        }
+    }
+
+    int prp_getFrameShift() const {
+        return 0;
+    }
+
+    int prp_getParentFrameShift() const {
+        return 0;
+    }
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:

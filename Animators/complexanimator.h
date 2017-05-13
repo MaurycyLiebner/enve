@@ -72,8 +72,12 @@ public:
         Q_UNUSED(qrealAnimatorId);
     }
 
-    void prp_setParentFrameShift(const int &shift);
+    void prp_setParentFrameShift(const int &shift,
+                                 ComplexAnimator *parentAnimator = NULL);
     int getChildPropertyIndex(Property *child);
+
+    void ca_updateDescendatKeyFrame(Key *key);
+
 public slots:
     void prp_setRecording(const bool &rec);
 
@@ -128,6 +132,15 @@ public:
     }
     void removeFromSelection(QList<Key *> *selectedKeys);
     void addToSelection(QList<Key *> *selectedKeys);
+
+    bool hasKey(Key *key) {
+        foreach(Key *keyT, mKeys) {
+            if(key == keyT) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     bool differsFromKey(Key *key) {
         ComplexKey *otherKey = (ComplexKey*)key;

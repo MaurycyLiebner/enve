@@ -71,6 +71,20 @@ int ComplexAnimator::getChildPropertyIndex(Property *child) {
     return index;
 }
 
+void ComplexAnimator::ca_updateDescendatKeyFrame(Key *key) {
+    foreach(const std::shared_ptr<Key> &ckey, anim_mKeys) {
+        ComplexKey *complexKey = ((ComplexKey*)ckey.get());
+        if(complexKey->hasKey(key)) {
+            complexKey->removeAnimatorKey(key);
+            if(complexKey->isEmpty() ) {
+                anim_removeKey(complexKey);
+            }
+            ca_addDescendantsKey(key);
+            break;
+        }
+    }
+}
+
 void ComplexAnimator::ca_moveChildAbove(Property *move,
                                         Property *above) {
     int indexFrom = getChildPropertyIndex(move);
@@ -79,8 +93,8 @@ void ComplexAnimator::ca_moveChildAbove(Property *move,
         indexTo++;
     }
     ca_moveChildInList(move,
-                    indexFrom,
-                    indexTo);
+                       indexFrom,
+                       indexTo);
 }
 
 void ComplexAnimator::ca_moveChildBelow(Property *move,
@@ -188,11 +202,12 @@ void ComplexAnimator::anim_drawKey(
     }
 }
 
-void ComplexAnimator::prp_setParentFrameShift(const int &shift) {
-    prp_mParentFrameShift = shift;
+void ComplexAnimator::prp_setParentFrameShift(const int &shift,
+                                              ComplexAnimator *parentAnimator) {
+    Property::prp_setParentFrameShift(shift, parentAnimator);
     int thisShift = prp_getFrameShift();
     foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
-        property->prp_setParentFrameShift(thisShift);
+        property->prp_setParentFrameShift(thisShift, this);
     }
 }
 
@@ -364,8 +379,9 @@ void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
 void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);
 
+    int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
     foreach(Key *key, mKeys) {
-        key->setRelFrame(frame);
+        key->setAbsFrame(absFrame);
     }
 }
 

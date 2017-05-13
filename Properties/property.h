@@ -126,7 +126,8 @@ public:
     void prp_blockUpdater();
     void prp_callFinishUpdater();
 
-    virtual void prp_setParentFrameShift(const int &shift);
+    virtual void prp_setParentFrameShift(const int &shift,
+                                         ComplexAnimator *parentAnimator = NULL);
     void prp_setBlockedUpdater(AnimatorUpdater *updater);
 
     bool SWT_isProperty() { return true; }
