@@ -58,6 +58,8 @@ public:
     int getColorIdAtX(const int &x);
     void drawHoveredColorBorder(const int &hoveredX,
                                 const int &colHeight);
+
+    void updateAfterFrameChanged(const int &absFrame);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);

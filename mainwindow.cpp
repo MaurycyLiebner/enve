@@ -799,8 +799,9 @@ bool MainWindow::isRecordingAllPoints() {
 int MainWindow::getFrameCount() {
     return mCanvasWidget->getMaxFrame();
 }
-
+#include "Colors/ColorWidgets/gradientwidget.h"
 void MainWindow::setCurrentFrame(int frame) {
+    mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
     mCanvasWidget->updateAfterFrameChanged(frame);
 
     callUpdateSchedulers();

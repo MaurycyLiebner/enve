@@ -96,7 +96,7 @@ Key *Animator::anim_getNextKey(Key *key) {
 
 Key *Animator::anim_getPrevKey(Key *key) {
     int keyId = anim_getKeyIndex(key);
-    if(keyId == 0) return NULL;
+    if(keyId <= 0) return NULL;
     return anim_mKeys.at(keyId - 1).get();
 }
 

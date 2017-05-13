@@ -331,6 +331,12 @@ void GradientWidget::drawHoveredColorBorder(const int &hoveredX,
                               colWidth, colHeight);
 }
 
+void GradientWidget::updateAfterFrameChanged(const int &absFrame) {
+    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
+        gradient->prp_setAbsFrame(absFrame);
+    }
+}
+
 void GradientWidget::gradientLeftPressed(const int &gradId) {
     if(gradId >= mGradients.count() || gradId < 0) return;
     setCurrentGradient(gradId);
