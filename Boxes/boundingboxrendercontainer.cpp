@@ -101,6 +101,7 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransfor
     mResolutionFraction = resolutionPer;
     mImage = target->getAllUglyPixmapProvidedTransform(
                 resolutionPer*effectsMargin,
+                resolutionPer,
                 mTransform,
                 &mBoundingRect);
     updatePaintTransformGivenNewCombinedTransform(combinedTransform);

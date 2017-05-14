@@ -186,7 +186,7 @@ int Canvas::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 }
 
 void Canvas::createImageBox(const QString &path) {
-    mCurrentBoxesGroup->addChild(new ImageBox(mCurrentBoxesGroup, path));
+    new ImageBox(mCurrentBoxesGroup, path);
 }
 
 void Canvas::createSoundForPath(const QString &path) {
@@ -411,17 +411,6 @@ void Canvas::drawPreviewPixmap(QPainter *p) {
     }
 }
 
-void Canvas::renderFinal(QPainter *p) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
-            box->renderFinal(p);
-        }
-
-        p->restore();
-    }
-}
 #include "Boxes/imagesequencebox.h"
 void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
     ImageSequenceBox *aniBox = new ImageSequenceBox(mCurrentBoxesGroup);

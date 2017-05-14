@@ -79,6 +79,7 @@ QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
                                 const QMatrix &allUglyTransform,
                                 QRectF *allUglyBoundingRectP) {
     return mLinkTarget->getAllUglyPixmapProvidedTransform(effectsMargin,
+                                                          1.,
                                                           allUglyTransform,
                                                           allUglyBoundingRectP);
 }

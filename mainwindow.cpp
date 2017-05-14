@@ -153,7 +153,7 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
     mFileMenu->addSeparator();
     mFileMenu->addAction("Link...", this, SLOT(linkFile()));
-    mFileMenu->addAction("Import File...", this, SLOT(importFile()));
+    mFileMenu->addAction("Import File...", mCanvasWidget, SLOT(importFile()));
     mFileMenu->addAction("Import Image Sequence...", this, SLOT(importImageSequence()));
     mFileMenu->addSeparator();
     mFileMenu->addAction("Revert", this, SLOT(revert()));
@@ -982,25 +982,7 @@ void MainWindow::closeProject()
     }
 }
 
-void MainWindow::importFile()
-{
-    disableEventFilter();
-    QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Import File", "", "Files (*.av *.svg "
-                                  "*.mp4 *.mov *.avi "
-                                  "*.png *.jpg "
-                                  "*.wav *.mp3)");
-    enableEventFilter();
-    if(!importPaths.isEmpty()) {
-        foreach(const QString &path, importPaths) {
-            if(path.isEmpty()) continue;
-            importFile(path);
-        }
-    }
-}
-
-void MainWindow::linkFile()
-{
+void MainWindow::linkFile() {
     disableEventFilter();
     QStringList importPaths = QFileDialog::getOpenFileNames(this,
         "Link File", "", "AniVect Files (*.av)");
@@ -1044,34 +1026,6 @@ void MainWindow::revert()
 void MainWindow::setCurrentFrameForAllWidgets(int frame)
 {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
-}
-
-void MainWindow::importFile(QString path) {
-    if(mCanvasWidget->hasNoCanvas()) return;
-    disable();
-
-    QFile file(path);
-    if(!file.exists()) {
-        return;
-    }
-
-    QString extension = path.split(".").last();
-    if(extension == "svg") {
-        loadSVGFile(path, mCanvasWidget->getCurrentCanvas());
-    } else if(extension == "png" ||
-              extension == "jpg") {
-        mCanvasWidget->createImageForPath(path);
-    } else if(extension == "avi" ||
-              extension == "mp4" ||
-              extension == "mov") {
-        mCanvasWidget->createVideoForPath(path);
-    } else if(extension == "mp3" ||
-              extension == "wav") {
-        mCanvasWidget->createSoundForPath(path);
-    }
-    enable();
-
-    callUpdateSchedulers();
 }
 
 void MainWindow::loadAVFile(QString path) {

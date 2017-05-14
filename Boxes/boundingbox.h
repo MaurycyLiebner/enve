@@ -111,7 +111,6 @@ public:
     virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmap(QPainter *p);
-    virtual void renderFinal(QPainter *p);
 
     virtual void draw(QPainter *) {}
 
@@ -324,6 +323,7 @@ public:
 
     virtual QImage getAllUglyPixmapProvidedTransform(
                         const qreal &effectsMargin,
+                        const qreal &resolution,
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
     virtual QImage getPrettyPixmapProvidedTransform(

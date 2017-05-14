@@ -84,7 +84,6 @@ public:
     void saveToFile(QString path);
     void loadAVFile(QString path);
     void clearAll();
-    void importFile(QString path);
     void setCurrentPath(QString newPath);
     void createTablesInSaveDatabase(QSqlQuery *query);
     void updateTitle();
@@ -148,7 +147,6 @@ private slots:
     void saveFileAs();
     void saveBackup();
     void closeProject();
-    void importFile();
     void linkFile();
     void importImageSequence();
     //void importVideo();

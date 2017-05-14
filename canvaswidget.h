@@ -84,6 +84,8 @@ public:
     void switchLocalPivot();
     bool getLocalPivot();
     void setLocalPivot(const bool &bT);
+
+    void importFile(const QString &path);
 protected:
     QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;
@@ -112,6 +114,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
+    void dropEvent(QDropEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
 
@@ -180,6 +184,8 @@ public slots:
     void stopPreview();
     void playPreview();
     void renderOutput();
+
+    void importFile();
 private slots:
     void sendNextBoxForUpdate();
     void nextSaveOutputFrame();

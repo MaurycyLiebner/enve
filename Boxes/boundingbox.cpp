@@ -363,6 +363,7 @@ void BoundingBox::replaceCurrentFrameCache() {
 
 QImage BoundingBox::getAllUglyPixmapProvidedTransform(
         const qreal &effectsMargin,
+        const qreal &resolution,
         const QMatrix &allUglyTransform,
         QRectF *allUglyBoundingRectP) {
     QRectF allUglyBoundingRect =
@@ -379,10 +380,11 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
     QPainter p(&allUglyPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-allUglyBoundingRect.topLeft());
-    QPointF transF = allUglyBoundingRect.topLeft() -
-            QPointF(qRound(allUglyBoundingRect.left()),
-                    qRound(allUglyBoundingRect.top()));
+    QPointF transF = allUglyBoundingRect.topLeft()*resolution -
+            QPointF(qRound(allUglyBoundingRect.left()*resolution),
+                    qRound(allUglyBoundingRect.top()*resolution));
     allUglyBoundingRect.translate(-transF);
+
     p.translate(transF);
     p.setTransform(QTransform(allUglyTransform), true);
 
@@ -408,38 +410,6 @@ void BoundingBox::updateAllUglyPixmap() {
                 parentCanvas->getResolutionFraction(),
                 this);
     mUpdateRenderContainer->setRelFrame(mUpdateRelFrame);
-}
-
-void BoundingBox::renderFinal(QPainter *p) {
-    p->save();
-
-    QMatrix renderTransform = getCombinedFinalRenderTransform();
-
-    QRectF pixBoundingRect = renderTransform.mapRect(mRelBoundingRect).
-                            adjusted(-mEffectsMargin, -mEffectsMargin,
-                                     mEffectsMargin, mEffectsMargin);
-
-    QSizeF sizeF = pixBoundingRect.size();
-    QImage renderPixmap = QImage(QSize(ceil(sizeF.width()),
-                                         ceil(sizeF.height())),
-                                 QImage::Format_ARGB32_Premultiplied);
-    renderPixmap.fill(Qt::transparent);
-
-    QPainter pixP(&renderPixmap);
-    pixP.setRenderHint(QPainter::Antialiasing);
-    pixP.setRenderHint(QPainter::SmoothPixmapTransform);
-    pixP.translate(-pixBoundingRect.topLeft());
-    pixP.setTransform(QTransform(renderTransform), true);
-
-    draw(&pixP);
-    pixP.end();
-
-    applyEffects(&renderPixmap, true);
-
-    p->setOpacity(mTransformAnimator->getOpacity()*0.01);
-    p->drawImage(pixBoundingRect.topLeft(), renderPixmap);
-
-    p->restore();
 }
 
 void BoundingBox::drawSelected(QPainter *p,

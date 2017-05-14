@@ -232,7 +232,6 @@ public:
 
     void keyPressEvent(QKeyEvent *event);
     void drawPreviewPixmap(QPainter *p);
-    void renderFinal(QPainter *p);
     void createAnimationBoxForPaths(const QStringList &paths);
     void createVideoForPath(const QString &path);
 

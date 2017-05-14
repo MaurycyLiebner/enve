@@ -10,6 +10,7 @@
 
 CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
+    setAcceptDrops(true);
     setFocusPolicy(Qt::StrongFocus);
     setMinimumSize(500, 500);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -813,6 +814,70 @@ void CanvasWidget::pushTimerExpired() {
                break;
            }
            --chunks;
+        }
+    }
+}
+
+void CanvasWidget::dropEvent(QDropEvent *event) {
+    const QMimeData* mimeData = event->mimeData();
+
+    if(mimeData->hasUrls()) {
+        QList<QUrl> urlList = mimeData->urls();
+
+        for (int i = 0; i < urlList.size() && i < 32; i++) {
+            importFile(urlList.at(i).toLocalFile());
+        }
+    }
+}
+
+void CanvasWidget::dragEnterEvent(QDragEnterEvent *event) {
+    if(event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
+#include "svgimporter.h"
+#include <QFileDialog>
+void CanvasWidget::importFile(const QString &path) {
+    if(hasNoCanvas()) return;
+    MainWindow::getInstance()->disable();
+
+    QFile file(path);
+    if(!file.exists()) {
+        return;
+    }
+
+    QString extension = path.split(".").last();
+    if(extension == "svg") {
+        loadSVGFile(path, mCurrentCanvas);
+    } else if(extension == "png" ||
+              extension == "jpg") {
+        createImageForPath(path);
+    } else if(extension == "avi" ||
+              extension == "mp4" ||
+              extension == "mov") {
+        createVideoForPath(path);
+    } else if(extension == "mp3" ||
+              extension == "wav") {
+        createSoundForPath(path);
+    }
+    MainWindow::getInstance()->enable();
+
+    MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+void CanvasWidget::importFile() {
+    MainWindow::getInstance()->disableEventFilter();
+    QStringList importPaths = QFileDialog::getOpenFileNames(this,
+        "Import File", "", "Files (*.av *.svg "
+                                  "*.mp4 *.mov *.avi "
+                                  "*.png *.jpg "
+                                  "*.wav *.mp3)");
+    MainWindow::getInstance()->enableEventFilter();
+    if(!importPaths.isEmpty()) {
+        foreach(const QString &path, importPaths) {
+            if(path.isEmpty()) continue;
+            importFile(path);
         }
     }
 }
