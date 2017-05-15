@@ -19,15 +19,15 @@ MemoryHandler::~MemoryHandler() {
     mMemoryChekerThread->wait();
 }
 
-void MemoryHandler::addContainer(CacheBoundingBoxRenderContainer *cont) {
+void MemoryHandler::addContainer(CacheContainer *cont) {
     mContainers << cont;
 }
 
-void MemoryHandler::removeContainer(CacheBoundingBoxRenderContainer *cont) {
+void MemoryHandler::removeContainer(CacheContainer *cont) {
     mContainers.removeOne(cont);
 }
 
-void MemoryHandler::containerUpdated(CacheBoundingBoxRenderContainer *cont) {
+void MemoryHandler::containerUpdated(CacheContainer *cont) {
     removeContainer(cont);
     addContainer(cont);
 }
@@ -35,7 +35,7 @@ void MemoryHandler::containerUpdated(CacheBoundingBoxRenderContainer *cont) {
 void MemoryHandler::freeMemory(const ulong &bytes) {
     long memToFree = bytes;
     while(memToFree > 0 && !mContainers.isEmpty()) {
-        CacheBoundingBoxRenderContainer *cont = mContainers.takeFirst();
+        CacheContainer *cont = mContainers.takeFirst();
         memToFree -= cont->getByteCount();
         cont->freeThis();
     }

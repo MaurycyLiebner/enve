@@ -495,11 +495,11 @@ protected:
     virtual void updateAfterCombinedTransformationChanged() {}
     virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
 
-    CacheBoundingBoxRenderContainer *getRenderContainerAtFrame(
+    RenderContainer *getRenderContainerAtFrame(
                                     const int &frame);
 
-    BoundingBoxRenderContainer *mUpdateRenderContainer =
-            new BoundingBoxRenderContainer();
+    RenderContainer *mUpdateRenderContainer =
+            new RenderContainer();
 
     bool mNoCache = false;
     int mUpdateRelFrame = 0;

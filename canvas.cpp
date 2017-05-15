@@ -434,7 +434,6 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame) {
     p.setRenderHint(QPainter::Antialiasing);
     p.setRenderHint(QPainter::SmoothPixmapTransform);
 
-
     p.scale(mResolutionFraction, mResolutionFraction);
 
     drawPreviewPixmap(&p);

@@ -166,9 +166,10 @@ void BoundingBox::applyEffects(QImage *im,
     }
 }
 
-CacheBoundingBoxRenderContainer *BoundingBox::getRenderContainerAtFrame(
+RenderContainer *BoundingBox::getRenderContainerAtFrame(
                                                 const int &frame) {
-    return mRenderCacheHandler.getRenderContainerAtRelFrame(frame);
+    return (RenderContainer*)
+            mRenderCacheHandler.getRenderContainerAtRelFrame(frame);
 }
 
 
@@ -409,7 +410,6 @@ void BoundingBox::updateAllUglyPixmap() {
                 mEffectsMargin,
                 parentCanvas->getResolutionFraction(),
                 this);
-    mUpdateRenderContainer->setRelFrame(mUpdateRelFrame);
 }
 
 void BoundingBox::drawSelected(QPainter *p,
@@ -1253,11 +1253,10 @@ void BoundingBox::beforeUpdate() {
 //        }
 //    }
     if(!mUpdateReplaceCache) {
-        CacheBoundingBoxRenderContainer *cont =
+        RenderContainer *cont =
               getRenderContainerAtFrame(mUpdateRelFrame);
 
         mUpdateRenderContainer->duplicateFrom(cont);
-        mUpdateRenderContainer->setRelFrame(mUpdateRelFrame);
     }
     mAwaitingUpdate = false;
 }

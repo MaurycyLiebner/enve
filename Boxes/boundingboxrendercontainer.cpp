@@ -3,97 +3,62 @@
 #include <QElapsedTimer>
 #include "memoryhandler.h"
 
-void BoundingBoxRenderContainer::draw(QPainter *p) {
+void RenderContainer::draw(QPainter *p) {
     p->save();
     p->setTransform(QTransform(mPaintTransform), true);
     p->drawImage(mBoundingRect.topLeft(), mImage);
     p->restore();
 }
 
-void BoundingBoxRenderContainer::drawWithoutTransform(QPainter *p) {
+void RenderContainer::drawWithoutTransform(QPainter *p) {
     draw(p); return;
     //p->setTransform(QTransform(mPaintTransform), true);
     p->drawImage(0, 0, mImage);
 }
 
-void BoundingBoxRenderContainer::updatePaintTransformGivenNewCombinedTransform(
+void RenderContainer::updatePaintTransformGivenNewCombinedTransform(
                                     const QMatrix &combinedTransform) {
     mPaintTransform = mTransform.inverted()*combinedTransform;
 }
 
-void BoundingBoxRenderContainer::replaceImage(const QImage &img) {
+void RenderContainer::replaceImage(const QImage &img) {
     mImage = img;
 }
 
-void BoundingBoxRenderContainer::setTransform(const QMatrix &transform) {
+void RenderContainer::setTransform(const QMatrix &transform) {
     mTransform = transform;
 }
 
-void BoundingBoxRenderContainer::setBoundingRect(const QRectF &rect) {
+void RenderContainer::setBoundingRect(const QRectF &rect) {
     mBoundingRect = rect;
 }
 
-const QMatrix &BoundingBoxRenderContainer::getTransform() const {
+const QMatrix &RenderContainer::getTransform() const {
     return mTransform;
 }
 
-const QImage &BoundingBoxRenderContainer::getImage() const {
+const QImage &RenderContainer::getImage() const {
     return mImage;
 }
 
-const QMatrix &BoundingBoxRenderContainer::getPaintTransform() const {
+const QMatrix &RenderContainer::getPaintTransform() const {
     return mPaintTransform;
 }
 
-const QRectF &BoundingBoxRenderContainer::getBoundingRect() const {
+const QRectF &RenderContainer::getBoundingRect() const {
     return mBoundingRect;
 }
 
-const qreal &BoundingBoxRenderContainer::getResolutionFraction() const {
+const qreal &RenderContainer::getResolutionFraction() const {
     return mResolutionFraction;
 }
 
-const int &BoundingBoxRenderContainer::getMinRelFrame() const {
-    return mMinRelFrame;
-}
-
-const int &BoundingBoxRenderContainer::getMaxRelFrame() const {
-    return mMaxRelFrame;
-}
-
-bool BoundingBoxRenderContainer::relFrameInRange(const int &relFrame) {
-    return relFrame >= mMinRelFrame && relFrame < mMaxRelFrame;
-}
-
-const qint64 &BoundingBoxRenderContainer::getRenderTime() const {
-    return mRenderTime;
-}
-
-void BoundingBoxRenderContainer::setRelFrame(const int &frame) {
-    mMinRelFrame = frame;
-    mMaxRelFrame = frame;
-}
-
-void BoundingBoxRenderContainer::setMaxRelFrame(const int &maxFrame) {
-    mMaxRelFrame = maxFrame;
-}
-
-void BoundingBoxRenderContainer::setMinRelFrame(const int &minFrame) {
-    mMinRelFrame = minFrame;
-}
-
-void BoundingBoxRenderContainer::setRelFrameRange(const int &minFrame,
-                                                  const int &maxFrame) {
-    mMinRelFrame = minFrame;
-    mMaxRelFrame = maxFrame;
-}
-
-void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransform,
+void RenderContainer::updateVariables(const QMatrix &combinedTransform,
                                                  const qreal &effectsMargin,
                                                  const qreal &resolutionPer,
                                                  BoundingBox *target) {
-    QElapsedTimer timer;
-    timer.start();
+    //QElapsedTimer timer;
+    //timer.start();
 
     mTransform = combinedTransform;
     mTransform.scale(resolutionPer, resolutionPer);
@@ -109,71 +74,78 @@ void BoundingBoxRenderContainer::updateVariables(const QMatrix &combinedTransfor
     target->applyEffects(&mImage,
                          resolutionPer);
 
-    mRenderTime = timer.elapsed();
+    //mRenderTime = timer.elapsed();
 }
 
-void BoundingBoxRenderContainer::duplicateFrom(
-                                    BoundingBoxRenderContainer *src) {
+void RenderContainer::duplicateFrom(RenderContainer *src) {
     setVariables(src->getTransform(),
                  src->getPaintTransform(),
                  src->getBoundingRect(),
                  src->getImage(),
-                 src->getMinRelFrame(),
-                 src->getMaxRelFrame(),
-                 src->getResolutionFraction(),
-                 src->getRenderTime());
+                 src->getResolutionFraction());
 }
 
-void BoundingBoxRenderContainer::setVariables(const QMatrix &transform,
-                                              const QMatrix &paintTransform,
-                                              const QRectF &rect,
-                                              const QImage &img,
-                                              const int &minFrame,
-                                              const int &maxFrame,
-                                              const qreal &res,
-                                              const qint64 &time) {
+void RenderContainer::setVariables(const QMatrix &transform,
+                                   const QMatrix &paintTransform,
+                                   const QRectF &rect,
+                                   const QImage &img,
+                                   const qreal &res) {
     mTransform = transform;
     mPaintTransform = paintTransform;
     mImage = img;
     mBoundingRect = rect;
-    //mMinRelFrame = minFrame;
-    //mMaxRelFrame = maxFrame;
     mResolutionFraction = res;
-    mRenderTime = time;
-}
-
-CacheBoundingBoxRenderContainer::CacheBoundingBoxRenderContainer() {
-    MemoryHandler::getInstance()->addContainer(this);
-}
-
-CacheBoundingBoxRenderContainer::~CacheBoundingBoxRenderContainer() {
-    MemoryHandler::getInstance()->removeContainer(this);
-}
-
-void CacheBoundingBoxRenderContainer::setVariables(const QMatrix &transform,
-                                              const QMatrix &paintTransform,
-                                              const QRectF &rect,
-                                              const QImage &img,
-                                              const int &minFrame,
-                                              const int &maxFrame,
-                                              const qreal &res,
-                                              const qint64 &time) {
-    BoundingBoxRenderContainer::setVariables(transform,
-                                             paintTransform,
-                                             rect,
-                                             img,
-                                             minFrame,
-                                             maxFrame,
-                                             res,
-                                             time);
     thisAccessed();
 }
 
-void CacheBoundingBoxRenderContainer::thisAccessed() {
+CacheContainer::CacheContainer() {
+    MemoryHandler::getInstance()->addContainer(this);
+}
+
+CacheContainer::~CacheContainer() {
+    MemoryHandler::getInstance()->removeContainer(this);
+}
+
+void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
+    mParentCacheHandler = handler;
+}
+
+void CacheContainer::freeThis() {
+    if(mParentCacheHandler == NULL) return;
+    mParentCacheHandler->removeRenderContainer(this);
+}
+
+void CacheContainer::thisAccessed() {
     MemoryHandler::getInstance()->containerUpdated(this);
 }
 
-void CacheBoundingBoxRenderContainer::freeThis() {
-    if(mParentCacheHandler == NULL) return;
-    mParentCacheHandler->removeRenderContainer(this);
+const int &CacheContainer::getMinRelFrame() const {
+    return mMinRelFrame;
+}
+
+const int &CacheContainer::getMaxRelFrame() const {
+    return mMaxRelFrame;
+}
+
+bool CacheContainer::relFrameInRange(const int &relFrame) {
+    return relFrame >= mMinRelFrame && relFrame < mMaxRelFrame;
+}
+
+void CacheContainer::setRelFrame(const int &frame) {
+    mMinRelFrame = frame;
+    mMaxRelFrame = frame;
+}
+
+void CacheContainer::setMaxRelFrame(const int &maxFrame) {
+    mMaxRelFrame = maxFrame;
+}
+
+void CacheContainer::setMinRelFrame(const int &minFrame) {
+    mMinRelFrame = minFrame;
+}
+
+void CacheContainer::setRelFrameRange(const int &minFrame,
+                                      const int &maxFrame) {
+    mMinRelFrame = minFrame;
+    mMaxRelFrame = maxFrame;
 }
