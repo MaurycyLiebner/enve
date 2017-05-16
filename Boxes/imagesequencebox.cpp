@@ -13,8 +13,7 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
 void ImageSequenceBox::reloadFile() {
     mFramesCount = mListOfFrames.count();
     updateDurationRectangleAnimationRange();
-    schedulePixmapReload();
-    mRenderCacheHandler.setupRenderRangeforAnimationRange();
+    scheduleSoftUpdate();
 }
 
 void ImageSequenceBox::setUpdateVars() {

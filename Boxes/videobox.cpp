@@ -188,13 +188,12 @@ void VideoBox::setFilePath(QString path) {
 }
 
 void VideoBox::reloadFile() {
-    mAnimationFramesCache.clear();
+    mAnimationFramesCache.clearCache();
     updateFrameCount(mSrcFilePath.toLatin1().data());
     updateDurationRectangleAnimationRange();
     reloadSound();
     clearAllCache();
-    schedulePixmapReload();
-    mRenderCacheHandler.setupRenderRangeforAnimationRange();
+    scheduleSoftUpdate();
 }
 
 bool hasSound(const char* path) {

@@ -10,12 +10,6 @@ void RenderContainer::draw(QPainter *p) {
     p->restore();
 }
 
-void RenderContainer::drawWithoutTransform(QPainter *p) {
-    draw(p); return;
-    //p->setTransform(QTransform(mPaintTransform), true);
-    p->drawImage(0, 0, mImage);
-}
-
 void RenderContainer::updatePaintTransformGivenNewCombinedTransform(
                                     const QMatrix &combinedTransform) {
     mPaintTransform = mTransform.inverted()*combinedTransform;
@@ -133,7 +127,7 @@ bool CacheContainer::relFrameInRange(const int &relFrame) {
 
 void CacheContainer::setRelFrame(const int &frame) {
     mMinRelFrame = frame;
-    mMaxRelFrame = frame;
+    mMaxRelFrame = frame + 1;
 }
 
 void CacheContainer::setMaxRelFrame(const int &maxFrame) {
@@ -148,4 +142,8 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
                                       const int &maxFrame) {
     mMinRelFrame = minFrame;
     mMaxRelFrame = maxFrame;
+}
+
+void CacheContainer::draw(QPainter *p) {
+    p->drawImage(0, 0, mImage);
 }

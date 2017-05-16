@@ -17,7 +17,17 @@ public:
 
     void thisAccessed();
 
-    virtual int getByteCount() = 0;
+    int getByteCount() {
+        return mImage.byteCount();
+    }
+
+    QImage getImage(){
+        return mImage;
+    }
+
+    void setImage(const QImage &img) {
+        mImage = img;
+    }
 
     const int &getMinRelFrame() const;
 
@@ -28,7 +38,14 @@ public:
     void setMinRelFrame(const int &minFrame);
     void setRelFrameRange(const int &minFrame, const int &maxFrame);
     bool relFrameInRange(const int &relFrame);
-private:
+    void drawCacheOnTimeline(QPainter *p,
+                             const qreal &pixelsPerFrame,
+                             const qreal &drawY,
+                             const int &startFrame,
+                             const int &endFrame);
+    virtual void draw(QPainter *p);
+protected:
+    QImage mImage;
     CacheHandler *mParentCacheHandler = NULL;
     int mMinRelFrame = 0;
     int mMaxRelFrame = 0;
@@ -65,24 +82,17 @@ public:
                          const qreal &resolutionPer,
                          BoundingBox *target);
 
-    void drawWithoutTransform(QPainter *p);
-
     void setVariables(const QMatrix &transform,
                       const QMatrix &paintTransform,
                       const QRectF &rect,
                       const QImage &img,
                       const qreal &res);
     void duplicateFrom(RenderContainer *src);
-
-    int getByteCount() {
-        return mImage.byteCount();
-    }
 protected:
     qreal mResolutionFraction;
     QMatrix mTransform;
     QMatrix mPaintTransform;
     QRectF mBoundingRect;
-    QImage mImage;
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H

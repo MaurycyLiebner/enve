@@ -45,7 +45,7 @@ void BoxesGroup::updateCombinedTransformTmp() {
         child->updateCombinedTransformTmp();
     }
     if(!mIsDescendantCurrentGroup) {
-        updateCurrentRenderContainerTransform();
+        updateDrawRenderContainerTransform();
     }
 }
 
@@ -148,7 +148,7 @@ void BoxesGroup::updateAfterFrameChanged(const int &currentFrame) {
     bool notNull = mRenderCacheHandler.
             updateCurrentRenderContainerFromFrameIfNotNull(currentFrame);
     if(notNull) {
-        updateCurrentRenderContainerTransform();
+        updateDrawRenderContainerTransform();
         if(getParentCanvas()->isPreviewing()) return;
     }
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
@@ -507,7 +507,6 @@ void BoxesGroup::addChildToListAt(int index,
         child->setParent(this);
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
-    child->setNoCache(mType != TYPE_CANVAS);
     mChildBoxes.insert(index, child->ref<BoundingBox>());
     updateRelBoundingRect();
     updateChildrenId(index, saveUndoRedo);

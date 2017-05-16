@@ -326,9 +326,6 @@ public:
                         const qreal &resolution,
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
-    virtual QImage getPrettyPixmapProvidedTransform(
-            const QMatrix &transform,
-            QRectF *pixBoundingRectClippedToViewP);
 
     virtual Canvas *getParentCanvas();
 
@@ -439,8 +436,6 @@ public:
     bool isUsedAsTarget();
     void incUsedAsTarget();
     void decUsedAsTarget();
-    void addInfluencingHandler(RenderCacheHandler *handler);
-    void removeInfluencingHandler(RenderCacheHandler *handler);
     bool shouldUpdateAndDraw();
     void ca_childAnimatorIsRecordingChanged();
 
@@ -453,8 +448,6 @@ public:
     }
     virtual void clearAllCache();
 
-    void applyRenderCacheChanges();
-    void scheduleRenderCacheChange();
     void startPivotTransform();
     void finishPivotTransform();
     bool hasDurationRectangle();
@@ -470,7 +463,7 @@ public:
     }
 
 protected:
-    void updateCurrentRenderContainerTransform();
+    void updateDrawRenderContainerTransform();
     virtual void scheduleUpdate();
 
     bool mRenderCacheChangeNeeded = false;
@@ -495,18 +488,14 @@ protected:
     virtual void updateAfterCombinedTransformationChanged() {}
     virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
 
-    RenderContainer *getRenderContainerAtFrame(
-                                    const int &frame);
 
-    RenderContainer *mUpdateRenderContainer =
-            new RenderContainer();
+    RenderContainer *mUpdateRenderContainer = new RenderContainer();
+    RenderContainer *mDrawRenderContainer = new RenderContainer();
 
-    bool mNoCache = false;
     int mUpdateRelFrame = 0;
     QRectF mUpdateRelBoundingRect;
     QMatrix mUpdateTransform;
     bool mUpdateDrawOnParentBox = true;
-    bool mUpdateReplaceCache;
     qreal mUpdateOpacity;
 
     bool mRedoUpdate = false;
@@ -553,8 +542,6 @@ public slots:
 
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
-    void ca_addDescendantsKey(Key *key);
-    void ca_removeDescendantsKey(Key *key);
 };
 
 

@@ -84,14 +84,6 @@ QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
                                                           allUglyBoundingRectP);
 }
 
-QImage InternalLinkBox::getPrettyPixmapProvidedTransform(
-                                const QMatrix &transform,
-                                QRectF *pixBoundingRectClippedToViewP) {
-    return mLinkTarget->getPrettyPixmapProvidedTransform(
-                                        transform,
-                                        pixBoundingRectClippedToViewP);
-}
-
 bool InternalLinkBox::relPointInsidePath(const QPointF &point)
 {
     return mLinkTarget->relPointInsidePath(point);

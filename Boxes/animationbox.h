@@ -18,9 +18,7 @@ public:
     bool relPointInsidePath(const QPointF &point);
     void draw(QPainter *p);
     virtual void loadUpdatePixmap() = 0;
-    void reloadPixmapIfNeeded();
     void preUpdatePixmapsUpdates();
-    void schedulePixmapReload();
     void setUpdateVars();
     void afterSuccessfulUpdate();
     void updateDurationRectangleAnimationRange();
@@ -30,12 +28,11 @@ public:
     bool SWT_isAnimationBox() { return true; }
 public slots:
 protected:
-    bool mPixmapReloadScheduled = false;
+    CacheHandler mAnimationFramesCache;
     bool mUpdatePixmapReloadScheduled = false;
     int mUpdateAnimationFrame = 0;
     int mCurrentAnimationFrame = 0;
     int mFramesCount = 0;
-    std::unordered_map<int, QImage> mAnimationFramesCache;
     QImage mUpdateAnimationImage;
 
     QSharedPointer<QrealAnimator> mTimeScaleAnimator =

@@ -17,7 +17,6 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
             QObject::disconnect(mTarget, 0, mParentBox, 0);
             RenderCacheHandler *handler = mTarget->getRenderHandler();
             QObject::disconnect(handler, 0, mParentBox->getRenderHandler(), 0);
-            mParentBox->removeInfluencingHandler(handler);
         }
         mTarget->decUsedAsTarget();
     }
@@ -33,7 +32,6 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
                              SIGNAL(clearedCacheForAbsFrameRange(int,int)),
                              mParentBox->getRenderHandler(),
                              SLOT(clearCacheForAbsFrameRange(int,int)));
-            mParentBox->addInfluencingHandler(handler);
         }
         mTarget->incUsedAsTarget();
     }

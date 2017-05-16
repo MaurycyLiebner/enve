@@ -50,9 +50,6 @@ public:
                         const QMatrix &allUglyTransform,
                         QRectF *allUglyBoundingRectP);
 
-    QImage getPrettyPixmapProvidedTransform(
-                        const QMatrix &transform,
-                        QRectF *pixBoundingRectClippedToViewP);
 
     void updateRelBoundingRect();
     bool relPointInsidePath(const QPointF &point);

@@ -27,12 +27,3 @@ void PathUpdateScheduler::update() {
     mPath->updatePathIfNeeded();
     mPath->updateOutlinePathIfNeeded();
 }
-
-ApplyRenderCacheChangesScheduler::ApplyRenderCacheChangesScheduler(
-                        BoundingBox *box) {
-    mTarget = box;
-}
-
-void ApplyRenderCacheChangesScheduler::update() {
-    mTarget->applyRenderCacheChanges();
-}

@@ -27,8 +27,6 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
     setDurationRectangle(durRect);
     durRect->setMaxFrame(200);
     durRect->setMinFrame(-10);
-    mRenderCacheHandler.setDurationRectangle(durRect);
-    mRenderCacheHandler.setupRenderRangeforAnimationRange();
 
     //addEmitter(new ParticleEmitter(this));
 }

@@ -13,7 +13,6 @@ AnimationBox::AnimationBox(BoxesGroup *parent) :
     ca_addChildAnimator(mTimeScaleAnimator.data());
 
     setDurationRectangle(new FixedLenAnimationRect(this));
-    mRenderCacheHandler.setDurationRectangle(mDurationRectangle);
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
 //    mFrameAnimator.setCurrentIntValue(0);
@@ -67,24 +66,18 @@ void AnimationBox::updateAfterFrameChanged(const int &currentFrame) {
     }
 
     mCurrentAnimationFrame = pixId;
-    auto searchCurrentFrame = mAnimationFramesCache.find(
-                                            mCurrentAnimationFrame);
-    if(searchCurrentFrame == mAnimationFramesCache.end()) {
-        schedulePixmapReload();
-    } else {
-        mPixmapReloadScheduled = false;
-        scheduleSoftUpdate();
-    }
+
+    scheduleSoftUpdate();
 }
 
 void AnimationBox::afterSuccessfulUpdate() {
-    mPixmapReloadScheduled = false;
     if(mUpdatePixmapReloadScheduled) {
-        auto searchLastFrame = mAnimationFramesCache.find(
-                                            mUpdateAnimationFrame);
-        if(searchLastFrame == mAnimationFramesCache.end()) {
-            mAnimationFramesCache.insert({mUpdateAnimationFrame,
-                                          mUpdateAnimationImage});
+        CacheContainer *cont = mAnimationFramesCache.getRenderContainerAtRelFrame(
+                                    mUpdateAnimationFrame);
+        if(cont == NULL) {
+            cont = mAnimationFramesCache.createNewRenderContainerAtRelFrame(
+                                                        mUpdateAnimationFrame);
+            cont->setImage(mUpdateAnimationImage);
         }
     }
     mRelBoundingRect = mUpdateRelBoundingRect;
@@ -95,32 +88,21 @@ void AnimationBox::afterSuccessfulUpdate() {
 void AnimationBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
     mUpdateAnimationFrame = mCurrentAnimationFrame;
-    mUpdatePixmapReloadScheduled = mPixmapReloadScheduled;
-    mUpdateReplaceCache = mUpdateReplaceCache || mUpdatePixmapReloadScheduled;
-    if(!mUpdatePixmapReloadScheduled) {
-        auto searchCurrentFrame = mAnimationFramesCache.find(mUpdateAnimationFrame);
-        if(searchCurrentFrame != mAnimationFramesCache.end()) {
-            mUpdateAnimationImage = searchCurrentFrame->second;
-            mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
-        }
+    CacheContainer *cont =
+            mAnimationFramesCache.getRenderContainerAtRelFrame(
+                mUpdateAnimationFrame);
+    mUpdatePixmapReloadScheduled = cont == NULL;
+    if(cont != NULL) {
+        mUpdateAnimationImage = cont->getImage();
+        mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
     }
-}
-
-void AnimationBox::schedulePixmapReload() {
-    if(mPixmapReloadScheduled) return;
-    mPixmapReloadScheduled = true;
-    scheduleSoftUpdate();
 }
 
 void AnimationBox::preUpdatePixmapsUpdates() {
-    reloadPixmapIfNeeded();
-    BoundingBox::preUpdatePixmapsUpdates();
-}
-
-void AnimationBox::reloadPixmapIfNeeded() {
-    if(mPixmapReloadScheduled) {
+    if(mUpdatePixmapReloadScheduled) {
         loadUpdatePixmap();
     }
+    BoundingBox::preUpdatePixmapsUpdates();
 }
 
 void AnimationBox::draw(QPainter *p) {
