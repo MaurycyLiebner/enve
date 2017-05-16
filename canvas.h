@@ -346,6 +346,9 @@ public:
 
     void beforeCurrentFrameRender();
     void afterCurrentFrameRender();
+    void beforeUpdate();
+    void afterUpdate();
+    void updatePixmaps();
 private:
     CacheHandler mCacheHandler;
 

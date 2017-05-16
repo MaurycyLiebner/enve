@@ -374,13 +374,25 @@ void Canvas::updateRenderImageSize() {
                         mHeight*mResolutionFraction);
 }
 
-void Canvas::beforeCurrentFrameRender() {
+void Canvas::beforeUpdate() {
+    BoxesGroup::beforeUpdate();
     mRenderBackgroundColor = mBackgroundColor->getCurrentColor().qcol;
     mRenderImageSize = mImageSize;
 }
 
-void Canvas::afterCurrentFrameRender() {
+void Canvas::afterUpdate() {
+    BoxesGroup::afterUpdate();
     mCurrentPreviewImg = mRenderImage;
+    if(mRendering) {
+        //mRenderImage->save(renderDest + QString::number(mUpdateRelFrame) + ".png");
+    } else {
+        mPreviewFrames << mRenderImage;
+    }
+    callUpdateSchedulers();
+}
+
+void Canvas::updatePixmaps() {
+    renderCurrentFrameToPreview();
 }
 
 void Canvas::renderCurrentFrameToPreview() {
@@ -388,7 +400,7 @@ void Canvas::renderCurrentFrameToPreview() {
                               QImage::Format_ARGB32_Premultiplied);
     mRenderImage->fill(mRenderBackgroundColor);
     renderCurrentFrameToQImage(mRenderImage);
-    mPreviewFrames << mRenderImage;
+    //mPreviewFrames << mRenderImage;
 }
 
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
@@ -396,8 +408,7 @@ void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
                               QImage::Format_ARGB32_Premultiplied);
     mRenderImage->fill(mRenderBackgroundColor);
     renderCurrentFrameToQImage(mRenderImage);
-    mRenderImage->save(renderDest + QString::number(anim_mCurrentAbsFrame) + ".png");
-    clearCurrentPreviewImage();
+    //clearCurrentPreviewImage();
 }
 
 void Canvas::clearCurrentPreviewImage() {
