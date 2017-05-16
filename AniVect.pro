@@ -136,7 +136,8 @@ SOURCES += main.cpp\
     RenderWidget/renderinstancesettings.cpp \
     Gradients/gradientslistwidget.cpp \
     Gradients/displayedgradientswidget.cpp \
-    Gradients/currentgradientwidget.cpp
+    Gradients/currentgradientwidget.cpp \
+    filesourcescache.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -251,7 +252,8 @@ HEADERS  += mainwindow.h \
     RenderWidget/renderinstancesettings.h \
     Gradients/gradientslistwidget.h \
     Gradients/displayedgradientswidget.h \
-    Gradients/currentgradientwidget.h
+    Gradients/currentgradientwidget.h \
+    filesourcescache.h
 
 RESOURCES += \
     resources.qrc

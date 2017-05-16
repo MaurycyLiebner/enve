@@ -517,6 +517,7 @@ void BoxesGroup::addChildToListAt(int index,
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(child,
                                             ca_mChildAnimators.count());
+    child->prp_setAbsFrame(anim_mCurrentAbsFrame);
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {

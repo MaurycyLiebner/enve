@@ -343,7 +343,15 @@ public:
 
     void clearCurrentPreviewImage();
     int getMaxFrame();
+
+    void beforeCurrentFrameRender();
+    void afterCurrentFrameRender();
 private:
+    CacheHandler mCacheHandler;
+
+    QImage *mRenderImage;
+    QSize mRenderImageSize;
+    QColor mRenderBackgroundColor;
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();
 
@@ -373,7 +381,7 @@ private:
 
     CanvasWidget *mCanvasWidget;
 
-    QSize mRenderSize;
+    QSize mImageSize;
 
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;
@@ -392,7 +400,7 @@ private:
 
     bool mPreviewing = false;
     bool mRendering = false;
-    QImage *mCurrentPreviewImg = NULL;
+    QImage *mCurrentPreviewImg;
     int mCurrentPreviewFrameId;
 
     bool mIsMouseGrabbing = false;

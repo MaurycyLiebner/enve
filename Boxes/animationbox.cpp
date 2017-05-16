@@ -59,7 +59,7 @@ void AnimationBox::updateAfterFrameChanged(const int &currentFrame) {
                 (anim_mCurrentAbsFrame - absMinAnimation)/timeScale;
     }
 
-    if(pixId < 0) {
+    if(pixId <= 0) {
         pixId = 0;
     } else if(pixId > mFramesCount - 1){
         pixId = mFramesCount - 1;
