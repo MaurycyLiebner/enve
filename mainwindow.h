@@ -125,6 +125,9 @@ public:
 
     Gradient *getLoadedGradientBySqlId(const int &id);
     void clearLoadedGradientsList();
+    void previewBeingPlayed();
+    void previewBeingRendered();
+    void previewPaused();
 public slots:
     void setCurrentFrame(int frame);
     void setAllPointsRecord(bool allPointsRecord);

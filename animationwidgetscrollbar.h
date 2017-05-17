@@ -2,6 +2,7 @@
 #define ANIMATiONWIDGETSCROLLBAR_H
 
 #include <QWidget>
+class CacheHandler;
 
 class AnimationWidgetScrollBar : public QWidget
 {
@@ -25,6 +26,7 @@ public:
         mHandleColor = col;
     }
 
+    void setCacheHandler(CacheHandler *handler);
 protected:
     qreal posToFrame(int xPos);
     void paintEvent(QPaintEvent *);
@@ -39,6 +41,7 @@ public slots:
 
     void setMinMaxFrames(int minFrame, int maxFrame);
 private:
+    CacheHandler *mCacheHandler = NULL;
     bool mTopBorderVisible = true;
     bool mClamp;
 

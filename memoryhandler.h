@@ -16,9 +16,9 @@ public:
 
     static MemoryHandler *getInstance() { return mInstance; }
 signals:
-
+    void allMemoryUsed();
 public slots:
-    void freeMemory(const ulong &bytes);
+    void freeMemory(const unsigned long long &bytes);
 private:
     static MemoryHandler *mInstance;
     QThread *mMemoryChekerThread;

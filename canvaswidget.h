@@ -93,6 +93,7 @@ protected:
 
     qreal mSavedResolutionFraction = 100.;
     int mSavedCurrentFrame = 0;
+    bool mPreviewing = false;
     bool mRendering = false;
     bool mNoBoxesAwaitUpdate = true;
     bool mCancelLastBoxUpdate = false;
@@ -101,8 +102,6 @@ protected:
 
     QString mOutputString;
     int mCurrentRenderFrame;
-
-    bool mPreviewInterrupted = false;
 
     void (CanvasWidget::*mBoxesUpdateFinishedFunction)(void) = NULL;
     Canvas *mCurrentCanvas = NULL;
@@ -179,17 +178,23 @@ public slots:
     void setCurrentCanvas(const int &id);
 
     void setEffectsPaintEnabled(const bool &bT);
-    void interruptPreview();
 
-    void stopPreview();
+    void interruptPreview();
+    void outOfMemory();
+    void interruptRendering();
+
     void playPreview();
+    void stopPreview();
+    void pausePreview();
+    void resumePreview();
+    void renderPreview();
     void renderOutput();
 
     void importFile();
 private slots:
     void sendNextBoxForUpdate();
     void nextSaveOutputFrame();
-    void nextPlayPreviewFrame();
+    void nextPreviewRenderFrame();
     void saveOutput(const QString &renderDest,
                     const qreal &resolutionFraction);
 

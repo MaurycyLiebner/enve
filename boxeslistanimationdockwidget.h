@@ -65,6 +65,10 @@ public:
     bool processUnfilteredKeyEvent(QKeyEvent *event);
     bool processFilteredKeyEvent(QKeyEvent *event);
     void previewFinished();
+    void previewBeingPlayed();
+    void previewBeingRendered();
+    void previewPaused();
+
     void updateSettingsForCurrentCanvas(Canvas *canvas);
     void addNewBoxesListKeysViewWidgetBelow(BoxesListKeysViewWidget *widget);
     void clearAll();
@@ -82,14 +86,16 @@ private slots:
 
     void setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible);
 
-    void playStopPreview(const bool &play);
-    void playPreview();
-    void stopPreview();
+    void interruptPreview();
 
     void setLocalPivot(const bool &bT);
 
     void setTimelineMode();
     void setRenderMode();
+    void playPreview();
+    void renderPreview();
+    void pausePreview();
+    void resumePreview();
 private:
     QAction *mTimelineAction;
     QAction *mRenderAction;
@@ -116,6 +122,7 @@ private:
 //    QPushButton *mGoToNextKeyButton;
 
     ActionButton *mPlayButton;
+    ActionButton *mStopButton;
 
     ActionButton *mAllPointsRecordButton;
     ActionButton *mCtrlsAlwaysVisible;

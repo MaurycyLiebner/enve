@@ -82,6 +82,8 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
     mCanvasWidget = new CanvasWidget(this);
+    connect(mMemoryHandler, SIGNAL(allMemoryUsed()),
+            mCanvasWidget, SLOT(outOfMemory()));
 
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
     connect(mCanvasWidget, SIGNAL(changeCurrentFrame(int)),
@@ -648,6 +650,18 @@ void MainWindow::updateCanvasModeButtonsChecked() {
 
 void MainWindow::previewFinished() {
     mBoxesListAnimationDockWidget->previewFinished();
+}
+
+void MainWindow::previewBeingPlayed() {
+    mBoxesListAnimationDockWidget->previewBeingPlayed();
+}
+
+void MainWindow::previewBeingRendered() {
+    mBoxesListAnimationDockWidget->previewBeingRendered();
+}
+
+void MainWindow::previewPaused() {
+    mBoxesListAnimationDockWidget->previewPaused();
 }
 
 //void MainWindow::stopPreview() {

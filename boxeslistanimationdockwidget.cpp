@@ -142,11 +142,13 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
             this, SLOT(setResolutionFractionText(QString)));
 
     mPlayButton = new ActionButton(
-                ":/icons/play.png",
-                "start preview", this);
-    mPlayButton->setCheckable(":/icons/stop.png");
-    connect(mPlayButton, SIGNAL(toggled(bool)),
-            this, SLOT(playStopPreview(bool)) );
+                ":/icons/renderPreviewButton.png",
+                "render preview", this);
+    mStopButton = new ActionButton(
+                ":/icons/stopPreviewButton.png",
+                "stop preview", this);
+    connect(mStopButton, SIGNAL(pressed()),
+            this, SLOT(interruptPreview()));
 
     mAllPointsRecordButton = new ActionButton(
                 ":/icons/recordSinglePoint.png",
@@ -187,7 +189,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     //mResolutionComboBox->setFocusPolicy(Qt::NoFocus);
 
     mToolBar->addWidget(mPlayButton);
-    mPlayButton->setFocusPolicy(Qt::NoFocus);
+    mToolBar->addWidget(mStopButton);
 
     mToolBar->addSeparator();
     mToolBar->addWidget(mAllPointsRecordButton);
@@ -239,6 +241,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mRenderWidget->hide();
 
     addNewBoxesListKeysViewWidget(0);
+    previewFinished();
     //addNewBoxesListKeysViewWidget(1);
     //addNewBoxesListKeysViewWidget(0);
 }
@@ -334,24 +337,59 @@ bool BoxesListAnimationDockWidget::processFilteredKeyEvent(
 
 void BoxesListAnimationDockWidget::previewFinished() {
     //setPlaying(false);
-    mPlayButton->setChecked(false);
+    mStopButton->setDisabled(true);
+    mPlayButton->setIcon(":/icons/renderPreviewButton.png");
+    mPlayButton->setToolTip("render preview");
+    disconnect(mPlayButton, 0, this, 0);
+    connect(mPlayButton, SIGNAL(pressed()),
+            this, SLOT(renderPreview()));
 }
 
-void BoxesListAnimationDockWidget::playStopPreview(const bool &play) {
-    if(play) {
-        playPreview();
-    } else {
-        stopPreview();
-    }
+void BoxesListAnimationDockWidget::previewBeingPlayed() {
+    mStopButton->setDisabled(false);
+    mPlayButton->setIcon(":/icons/pausePreviewButton.png");
+    mPlayButton->setToolTip("pause preview");
+    disconnect(mPlayButton, 0, this, 0);
+    connect(mPlayButton, SIGNAL(pressed()),
+            this, SLOT(pausePreview()));
 }
 
-void BoxesListAnimationDockWidget::stopPreview() {
-    mMainWindow->getCanvasWidget()->interruptPreview();
+void BoxesListAnimationDockWidget::previewBeingRendered() {
+    mStopButton->setDisabled(false);
+    mPlayButton->setIcon(":/icons/playPreviewButton.png");
+    mPlayButton->setToolTip("play preview");
+    disconnect(mPlayButton, 0, this, 0);
+    connect(mPlayButton, SIGNAL(pressed()),
+            this, SLOT(playPreview()));
 }
 
+void BoxesListAnimationDockWidget::previewPaused() {
+    mStopButton->setDisabled(false);
+    mPlayButton->setIcon(":/icons/playPreviewButton.png");
+    mPlayButton->setToolTip("resume preview");
+    disconnect(mPlayButton, 0, this, 0);
+    connect(mPlayButton, SIGNAL(pressed()),
+            this, SLOT(resumePreview()));
+}
+
+void BoxesListAnimationDockWidget::resumePreview() {
+    mMainWindow->getCanvasWidget()->resumePreview();
+}
+
+void BoxesListAnimationDockWidget::pausePreview() {
+    mMainWindow->getCanvasWidget()->pausePreview();
+}
 
 void BoxesListAnimationDockWidget::playPreview() {
     mMainWindow->getCanvasWidget()->playPreview();
+}
+
+void BoxesListAnimationDockWidget::renderPreview() {
+    mMainWindow->getCanvasWidget()->renderPreview();
+}
+
+void BoxesListAnimationDockWidget::interruptPreview() {
+    mMainWindow->getCanvasWidget()->interruptPreview();
 }
 
 void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
@@ -397,6 +435,7 @@ void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                 QString::number(canvas->getResolutionFraction()*100.) + " %");
     connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
             this, SLOT(setResolutionFractionText(QString)));
+    mAnimationWidgetScrollbar->setCacheHandler(canvas->getCacheHandler());
 }
 
 void BoxesListAnimationDockWidget::setMinMaxFrame(

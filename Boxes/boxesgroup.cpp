@@ -145,12 +145,7 @@ bool BoxesGroup::relPointInsidePath(const QPointF &relPos) {
 void BoxesGroup::updateAfterFrameChanged(const int &currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
 
-    bool notNull = mRenderCacheHandler.
-            updateCurrentRenderContainerFromFrameIfNotNull(currentFrame);
-    if(notNull) {
-        updateDrawRenderContainerTransform();
-        if(getParentCanvas()->isPreviewing()) return;
-    }
+    updateDrawRenderContainerTransform();
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
@@ -507,6 +502,8 @@ void BoxesGroup::addChildToListAt(int index,
         child->setParent(this);
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
+    connect(child, SIGNAL(prp_absFrameRangeChanged(int,int)),
+            this, SLOT(prp_updateAfterChangedAbsFrameRange(int,int)));
     mChildBoxes.insert(index, child->ref<BoundingBox>());
     updateRelBoundingRect();
     updateChildrenId(index, saveUndoRedo);
@@ -536,6 +533,7 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
     if(box->isSelected()) {
         box->removeFromSelection();
     }
+    disconnect(box, 0, this, 0);
     if(saveUndoRedo) {
         addUndoRedo(new RemoveChildFromListUndoRedo(this, id,
                                                    box) );

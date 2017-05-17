@@ -39,6 +39,7 @@ public:
                              const int &startFrame,
                              const int &endFrame);
     void clearCache();
+    CacheContainer *getRenderContainerAtOrBeforeRelFrame(const int &frame);
 protected:
     void setCurrentRenderContainerVar(CacheContainer *cont);
     CacheContainer *mCurrentRenderContainer = NULL;
@@ -67,6 +68,8 @@ public:
 
     void clearCacheForRelFrameRange(const int &minFrame,
                                     const int &maxFrame);
+    void clearCacheForAbsFrameRange(const int &minFrame,
+                                    const int &maxFrame);
 
     void setParentBox(BoundingBox *parentBox) {
         mParentBox = parentBox;
@@ -89,8 +92,6 @@ public:
 signals:
     void clearedCacheForAbsFrameRange(int, int);
 public slots:
-    void clearCacheForAbsFrameRange(const int &minFrame,
-                                    const int &maxFrame);
 private:
     BoundingBox *mParentBox = NULL;
 

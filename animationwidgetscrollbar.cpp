@@ -34,6 +34,10 @@ void AnimationWidgetScrollBar::setTopBorderVisible(const bool &bT) {
     mTopBorderVisible = bT;
 }
 
+void AnimationWidgetScrollBar::setCacheHandler(CacheHandler *handler) {
+    mCacheHandler = handler;
+}
+#include "Boxes/rendercachehandler.h"
 void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
@@ -58,6 +62,11 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
 
     p.fillRect(-10, 0, 10, height(), QColor(30, 30, 30));
     p.fillRect(width() - 40, 0, 30, height(), QColor(30, 30, 30));
+
+    if(mCacheHandler != NULL) {
+        mCacheHandler->drawCacheOnTimeline(&p, pixPerFrame, 0.,
+                                           mMinFrame, mMaxFrame);
+    }
 
     p.setPen(Qt::white);
 

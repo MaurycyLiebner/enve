@@ -458,17 +458,12 @@ public:
                       const int &startFrame,
                       const int &endFrame);
 
-    RenderCacheHandler *getRenderHandler() {
-        return &mRenderCacheHandler;
-    }
-
 protected:
     void updateDrawRenderContainerTransform();
     virtual void scheduleUpdate();
 
     bool mRenderCacheChangeNeeded = false;
     bool mReplaceCache = false;
-    RenderCacheHandler mRenderCacheHandler;
 
     int mSqlId = 0;
 
@@ -489,8 +484,8 @@ protected:
     virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
 
 
-    RenderContainer *mUpdateRenderContainer = new RenderContainer();
-    RenderContainer *mDrawRenderContainer = new RenderContainer();
+    RenderContainer mUpdateRenderContainer;
+    RenderContainer mDrawRenderContainer;
 
     int mUpdateRelFrame = 0;
     QRectF mUpdateRelBoundingRect;

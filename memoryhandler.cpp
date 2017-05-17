@@ -8,8 +8,8 @@ MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
     mMemoryChecker = new MemoryChecker();
     mMemoryChecker->moveToThread(mMemoryChekerThread);
 
-    connect(mMemoryChecker, SIGNAL(freeMemory(ulong)),
-            this, SLOT(freeMemory(ulong)) );
+    connect(mMemoryChecker, SIGNAL(freeMemory(unsigned long long)),
+            this, SLOT(freeMemory(unsigned long long)) );
 
     mMemoryChekerThread->start();
 }
@@ -32,11 +32,20 @@ void MemoryHandler::containerUpdated(CacheContainer *cont) {
     addContainer(cont);
 }
 
-void MemoryHandler::freeMemory(const ulong &bytes) {
-    long memToFree = bytes;
-    while(memToFree > 0 && !mContainers.isEmpty()) {
+void MemoryHandler::freeMemory(const unsigned long long &bytes) {
+    long long memToFree = bytes;
+    int unfreeable = 0;
+    while(memToFree > 0 && mContainers.count() > unfreeable) {
         CacheContainer *cont = mContainers.takeFirst();
-        memToFree -= cont->getByteCount();
-        cont->freeThis();
+        int byteCount = cont->getByteCount();
+        if(cont->freeThis()) {
+            memToFree -= byteCount;
+        } else {
+            unfreeable++;
+            mContainers << cont;
+        }
+    }
+    if(memToFree > 0) {
+        emit allMemoryUsed();
     }
 }

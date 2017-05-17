@@ -177,8 +177,6 @@ public:
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal &percent);
 
-    void updateRenderImageSize();
-
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(const QString &renderDest);
     void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
@@ -294,6 +292,9 @@ protected:
 signals:
 private slots:
     void nextPreviewFrame();
+public slots:
+    void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
+                                             const int &maxFrame);
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -320,12 +321,6 @@ public:
 
     SoundComposition *getSoundComposition();
 
-    void processUpdate() {
-        foreach(const QSharedPointer<BoundingBox> &child,
-                mUpdateChildrenAwaitingUpdate) {
-            child->processUpdate();
-        }
-    }
     void createSoundForPath(const QString &path);
 
     void updateHoveredBox();
@@ -355,7 +350,7 @@ public:
     }
 
 private:
-    CacheHandler mCacheHandler;
+    RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 
     QImage mRenderImage;
@@ -390,8 +385,6 @@ private:
 
     CanvasWidget *mCanvasWidget;
 
-    QSize mImageSize;
-
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;
     TextBox *mCurrentTextBox = NULL;
@@ -409,7 +402,7 @@ private:
 
     bool mPreviewing = false;
     bool mRendering = false;
-    QImage mCurrentPreviewImg;
+    CacheContainer *mCurrentPreviewContainer = NULL;
     int mCurrentPreviewFrameId;
     int mMaxPreviewFrameId = 0;
 
@@ -457,7 +450,6 @@ private:
     void handleMovePointMousePressEvent();
     void handleAddPointMouseRelease();
 
-    QList<QImage> mPreviewFrames;
     void updateTransformation();
     void handleMouseRelease();
     QPointF getMoveByValueForEventPos(QPointF eventPos);

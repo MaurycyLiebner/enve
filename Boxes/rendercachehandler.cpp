@@ -127,6 +127,18 @@ CacheContainer *CacheHandler::getRenderContainerAtRelFrame(const int &frame) {
     return NULL;
 }
 
+CacheContainer *CacheHandler::getRenderContainerAtOrBeforeRelFrame(
+                                                const int &frame) {
+    CacheContainer *cont = getRenderContainerAtRelFrame(frame);
+    if(cont == NULL) {
+        int id = getRenderContainterInsertIdAtRelFrame(frame) - 1;
+        if(id >= 0 && id < mRenderContainers.length()) {
+            cont = mRenderContainers.at(id);
+        }
+    }
+    return cont;
+}
+
 void CacheHandler::drawCacheOnTimeline(QPainter *p,
                            const qreal &pixelsPerFrame,
                            const qreal &drawY,

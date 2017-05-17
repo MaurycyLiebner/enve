@@ -104,9 +104,11 @@ void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
     mParentCacheHandler = handler;
 }
 
-void CacheContainer::freeThis() {
-    if(mParentCacheHandler == NULL) return;
+bool CacheContainer::freeThis() {
+    if(mBlocked) return false;
+    if(mParentCacheHandler == NULL) return false;
     mParentCacheHandler->removeRenderContainer(this);
+    return true;
 }
 
 void CacheContainer::thisAccessed() {

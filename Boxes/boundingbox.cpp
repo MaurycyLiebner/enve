@@ -12,7 +12,6 @@
 BoundingBox::BoundingBox(BoxesGroup *parent,
                          const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
-    mRenderCacheHandler.setParentBox(this);
     mParent = parent->ref<BoxesGroup>();
 
     mEffectsAnimators->prp_setName("effects");
@@ -34,34 +33,21 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
     mType = type;
     mTransformAnimator->reset();
-    mRenderCacheHandler.setParentBox(this);
 }
 
 BoundingBox::~BoundingBox() {
-    delete mUpdateRenderContainer;
 }
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                       const int &maxFrame) {
-    int minRelFrame;
-    if(minFrame == INT_MIN) {
-        minRelFrame = INT_MIN;
-    } else {
-        minRelFrame = prp_absFrameToRelFrame(minFrame);
-    }
-    int maxRelFrame;
-    if(maxFrame == INT_MAX) {
-        maxRelFrame = INT_MAX;
-    } else {
-        maxRelFrame = prp_absFrameToRelFrame(maxFrame);
-    }
-    if(anim_mCurrentRelFrame >= minRelFrame) {
-        if(anim_mCurrentRelFrame <= maxRelFrame) {
+    if(anim_mCurrentAbsFrame >= minFrame) {
+        if(anim_mCurrentAbsFrame <= maxFrame) {
             replaceCurrentFrameCache();
         }
     }
-//    mRenderCacheHandler.addRangeNeedingUpdate(minRelFrame, maxRelFrame);
-//    scheduleRenderCacheChange();
+
+    Property::prp_updateAfterChangedAbsFrameRange(minFrame,
+                                                  maxFrame);
 }
 
 void BoundingBox::ca_childAnimatorIsRecordingChanged() {
@@ -269,7 +255,7 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
 void BoundingBox::updateAllUglyPixmap() {
     Canvas *parentCanvas = getParentCanvas();
 
-    mUpdateRenderContainer->updateVariables(
+    mUpdateRenderContainer.updateVariables(
                 mUpdateTransform,
                 mEffectsMargin,
                 parentCanvas->getResolutionFraction(),
@@ -305,7 +291,7 @@ void BoundingBox::drawUpdatePixmap(QPainter *p) {
         p->save();
         p->setCompositionMode(mCompositionMode);
         p->setOpacity(mUpdateOpacity);
-        mUpdateRenderContainer->draw(p);
+        mUpdateRenderContainer.draw(p);
         p->restore();
     }
 }
@@ -313,16 +299,16 @@ void BoundingBox::drawUpdatePixmap(QPainter *p) {
 void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
     p->save();
     p->setOpacity(mUpdateOpacity);
-    mUpdateRenderContainer->draw(p);
+    mUpdateRenderContainer.draw(p);
     p->restore();
 }
 
 QRectF BoundingBox::getUpdateRenderRect() {
-    return mUpdateRenderContainer->getBoundingRect();
+    return mUpdateRenderContainer.getBoundingRect();
 }
 
 QMatrix BoundingBox::getUpdatePaintTransform() {
-    return mUpdateRenderContainer->getPaintTransform();
+    return mUpdateRenderContainer.getPaintTransform();
 }
 
 void BoundingBox::drawPixmap(QPainter *p) {
@@ -330,7 +316,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
         p->save();
         p->setCompositionMode(mCompositionMode);
         p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
-        mDrawRenderContainer->draw(p);
+        mDrawRenderContainer.draw(p);
         p->restore();
     }
 }
@@ -713,7 +699,7 @@ void BoundingBox::updateCombinedTransformAfterFrameChange() {
 }
 
 void BoundingBox::updateDrawRenderContainerTransform() {
-    mDrawRenderContainer->updatePaintTransformGivenNewCombinedTransform(
+    mDrawRenderContainer.updatePaintTransformGivenNewCombinedTransform(
                 mTransformAnimator->getCombinedTransform());
 }
 
@@ -838,7 +824,7 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
 void BoundingBox::updateAfterDurationRectangleShifted() {
     prp_setParentFrameShift(prp_mParentFrameShift);
     updateAfterFrameChanged(anim_mCurrentAbsFrame);
-    emit mRenderCacheHandler.clearedCacheForAbsFrameRange(INT_MIN, INT_MAX);
+    prp_updateAfterChangedAbsFrameRange(INT_MIN, INT_MAX);
 }
 
 DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
@@ -1098,7 +1084,7 @@ void BoundingBox::processUpdate() {
 
 void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
-    mDrawRenderContainer->duplicateFrom(mUpdateRenderContainer);
+    mDrawRenderContainer.duplicateFrom(&mUpdateRenderContainer);
     updateDrawRenderContainerTransform();
 }
 

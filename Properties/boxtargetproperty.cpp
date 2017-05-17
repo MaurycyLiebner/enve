@@ -15,8 +15,6 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
     if(mTarget != NULL) {
         if(mParentBox != NULL) {
             QObject::disconnect(mTarget, 0, mParentBox, 0);
-            RenderCacheHandler *handler = mTarget->getRenderHandler();
-            QObject::disconnect(handler, 0, mParentBox->getRenderHandler(), 0);
         }
         mTarget->decUsedAsTarget();
     }
@@ -27,11 +25,6 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
                              mParentBox, SLOT(scheduleHardUpdate()));
             QObject::connect(mTarget, SIGNAL(replaceChacheSet()),
                              mParentBox, SLOT(replaceCurrentFrameCache()));
-            RenderCacheHandler *handler = mTarget->getRenderHandler();
-            QObject::connect(handler,
-                             SIGNAL(clearedCacheForAbsFrameRange(int,int)),
-                             mParentBox->getRenderHandler(),
-                             SLOT(clearCacheForAbsFrameRange(int,int)));
         }
         mTarget->incUsedAsTarget();
     }

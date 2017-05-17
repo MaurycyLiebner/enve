@@ -11,13 +11,13 @@ public:
 
 private:
     QTimer *mTimer;
-    unsigned long mFreeRam;
-    unsigned long mTotalRam;
-    unsigned int mMemUnit;
+    unsigned long long mFreeRam;
+    unsigned long long mTotalRam;
+    unsigned long long mMemUnit;
 private slots:
     void checkMemory();
 signals:
-    void freeMemory(unsigned long);
+    void freeMemory(unsigned long long);
 public slots:
 };
 

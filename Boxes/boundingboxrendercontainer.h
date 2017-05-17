@@ -13,7 +13,7 @@ public:
     virtual ~CacheContainer();
 
     void setParentCacheHandler(CacheHandler *handler);
-    void freeThis();
+    bool freeThis();
 
     void thisAccessed();
 
@@ -44,7 +44,13 @@ public:
                              const int &startFrame,
                              const int &endFrame);
     virtual void draw(QPainter *p);
+
+    void setBlocked(const bool &bT) {
+        mBlocked = bT;
+    }
+
 protected:
+    bool mBlocked = false;
     QImage mImage;
     CacheHandler *mParentCacheHandler = NULL;
     int mMinRelFrame = 0;

@@ -1,6 +1,6 @@
 #include "memorychecker.h"
 #include <sys/sysinfo.h>
-#define mb500 500000000
+#define mb500 500000000ULL
 
 MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     struct sysinfo info;

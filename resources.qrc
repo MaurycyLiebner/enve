@@ -73,13 +73,11 @@
         <file>pixmaps/icons/outline_source_over.png</file>
         <file>pixmaps/icons/outline_source.png</file>
         <file alias="pause.png">pixmaps/icons/pause.png</file>
-        <file alias="play.png">pixmaps/icons/play_button.png</file>
         <file alias="prev_key.png">pixmaps/icons/prev_key_button.png</file>
         <file alias="recordAllPoints.png">pixmaps/icons/recordAllPoints.png</file>
         <file alias="recording.png">pixmaps/icons/recording.png</file>
         <file alias="recordSinglePoint.png">pixmaps/icons/recordSinglePoint.png</file>
         <file>pixmaps/icons/right_side_ctrl_white.png</file>
-        <file alias="stop.png">pixmaps/icons/stop_button.png</file>
         <file>pixmaps/icons/two_side_ctrl_white.png</file>
         <file alias="fill_none_checked.png">pixmaps/icons/fill_none_checked.png</file>
         <file alias="fill_flat_checked.png">pixmaps/icons/fill_solid_checked.png</file>
@@ -92,6 +90,10 @@
         <file alias="globalPivot.png">pixmaps/icons/globalPivot.png</file>
         <file alias="zoom.png">pixmaps/icons/zoom.png</file>
         <file alias="up-arrow.png">pixmaps/icons/up-arrow.png</file>
+        <file alias="pausePreviewButton.png">pixmaps/icons/pausePreviewButton.png</file>
+        <file alias="playPreviewButton.png">pixmaps/icons/playPreviewButton.png</file>
+        <file alias="renderPreviewButton.png">pixmaps/icons/renderPreviewButton.png</file>
+        <file alias="stopPreviewButton.png">pixmaps/icons/stopPreviewButton.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>

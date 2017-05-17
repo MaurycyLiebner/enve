@@ -526,21 +526,20 @@ void CanvasWidget::renderOutput() {
     dialog->exec();
 }
 
-void CanvasWidget::playPreview() {
+void CanvasWidget::renderPreview() {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->updateRenderImageSize();
-    mBoxesUpdateFinishedFunction = &CanvasWidget::nextPlayPreviewFrame;
+    mBoxesUpdateFinishedFunction = &CanvasWidget::nextPreviewRenderFrame;
     mSavedCurrentFrame = getCurrentFrame();
 
     mRendering = true;
-    mPreviewInterrupted = false;
     mCurrentRenderFrame = mSavedCurrentFrame;
     mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
     mCurrentCanvas->setPreviewing(true);
     mCurrentCanvas->updateAllBoxes();
     if(mNoBoxesAwaitUpdate) {
-        nextPlayPreviewFrame();
+        nextPreviewRenderFrame();
     }
+    MainWindow::getInstance()->previewBeingRendered();
 }
 
 void CanvasWidget::addBoxAwaitingUpdate(BoundingBox *box) {
@@ -579,38 +578,76 @@ void CanvasWidget::sendNextBoxForUpdate() {
 }
 
 void CanvasWidget::interruptPreview() {
-    mPreviewInterrupted = true;
-    mCurrentCanvas->clearPreview();
-}
-
-void CanvasWidget::stopPreview() {
-    if(!mRendering) {
-        mCurrentRenderFrame = getMaxFrame() + 1;
-        mPreviewFPSTimer->stop();
-        stopAudio();
-        repaint();
-        MainWindow::getInstance()->previewFinished();
+    if(mRendering) {
+        interruptRendering();
+    } else if(mPreviewing) {
+        stopPreview();
     }
 }
 
-void CanvasWidget::nextPlayPreviewFrame() {
-    mCurrentCanvas->renderCurrentFrameToPreview();
-    if(mCurrentRenderFrame > getMaxFrame() || mPreviewInterrupted) {
-        mRendering = false;
-        emit changeCurrentFrame(mSavedCurrentFrame);
-        mBoxesUpdateFinishedFunction = NULL;
-            mCurrentCanvas->playPreview(mSavedCurrentFrame,
-                                        mCurrentRenderFrame);
-            mCurrentSoundComposition->generateData(mSavedCurrentFrame,
-                                                   mCurrentRenderFrame,
-                                                   24);
-            startAudio();
-            mPreviewFPSTimer->start();
+void CanvasWidget::outOfMemory() {
+    if(mRendering) {
+        playPreview();
+    }
+}
+
+void CanvasWidget::interruptRendering() {
+    mRendering = false;
+    mBoxesUpdateFinishedFunction = NULL;
+    mCurrentCanvas->clearPreview();
+    emit changeCurrentFrame(mSavedCurrentFrame);
+    MainWindow::getInstance()->previewFinished();
+}
+
+void CanvasWidget::stopPreview() {
+    mCurrentRenderFrame = getMaxFrame() + 1;
+    mPreviewing = false;
+    mCurrentCanvas->setPreviewing(true);
+    mPreviewFPSTimer->stop();
+    stopAudio();
+    repaint();
+    MainWindow::getInstance()->previewFinished();
+}
+
+void CanvasWidget::pausePreview() {
+    if(mPreviewing) {
+        mPreviewFPSTimer->stop();
+        MainWindow::getInstance()->previewPaused();
+    }
+}
+
+void CanvasWidget::resumePreview() {
+    if(mPreviewing) {
+        mPreviewFPSTimer->start();
+        MainWindow::getInstance()->previewBeingPlayed();
+    }
+}
+
+void CanvasWidget::playPreview() {
+    mRendering = false;
+    mPreviewing = true;
+    emit changeCurrentFrame(mSavedCurrentFrame);
+    mBoxesUpdateFinishedFunction = NULL;
+    mCurrentCanvas->playPreview(mSavedCurrentFrame,
+                                mCurrentRenderFrame);
+    mCurrentSoundComposition->generateData(mSavedCurrentFrame,
+                                           mCurrentRenderFrame,
+                                           24);
+    startAudio();
+    mPreviewFPSTimer->start();
+    MainWindow::getInstance()->previewBeingPlayed();
+}
+
+void CanvasWidget::nextPreviewRenderFrame() {
+    //mCurrentCanvas->renderCurrentFrameToPreview();
+    if(!mRendering) return;
+    if(mCurrentRenderFrame > getMaxFrame()) {
+        playPreview();
     } else {
         mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
         if(mNoBoxesAwaitUpdate) {
-            nextPlayPreviewFrame();
+            nextPreviewRenderFrame();
         }
     }
 }
@@ -680,7 +717,6 @@ void CanvasWidget::saveOutput(const QString &renderDest,
     if(qAbs(mSavedResolutionFraction - resolutionFraction) > 0.001) {
         mCurrentCanvas->setResolutionFraction(resolutionFraction);
     }
-    mCurrentCanvas->updateRenderImageSize();
 
     mCurrentRenderFrame = mSavedCurrentFrame;
     mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
