@@ -79,7 +79,8 @@ public:
 
     QSize getCanvasSize();
 
-    void playPreview();
+    void playPreview(const int &minPreviewFrameId,
+                     const int &maxPreviewFrameId);
 
     void renderCurrentFrameToPreview();
 
@@ -349,10 +350,15 @@ public:
     void beforeUpdate();
     void afterUpdate();
     void updatePixmaps();
+    CacheHandler *getCacheHandler() {
+        return &mCacheHandler;
+    }
+
 private:
     CacheHandler mCacheHandler;
+    bool mUpdateReplaceCache = false;
 
-    QImage *mRenderImage;
+    QImage mRenderImage;
     QSize mRenderImageSize;
     QColor mRenderBackgroundColor;
     QSharedPointer<ColorAnimator> mBackgroundColor =
@@ -403,8 +409,9 @@ private:
 
     bool mPreviewing = false;
     bool mRendering = false;
-    QImage *mCurrentPreviewImg;
+    QImage mCurrentPreviewImg;
     int mCurrentPreviewFrameId;
+    int mMaxPreviewFrameId = 0;
 
     bool mIsMouseGrabbing = false;
 
@@ -450,7 +457,7 @@ private:
     void handleMovePointMousePressEvent();
     void handleAddPointMouseRelease();
 
-    QList<QImage*> mPreviewFrames;
+    QList<QImage> mPreviewFrames;
     void updateTransformation();
     void handleMouseRelease();
     QPointF getMoveByValueForEventPos(QPointF eventPos);

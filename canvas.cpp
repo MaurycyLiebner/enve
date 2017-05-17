@@ -250,8 +250,8 @@ void Canvas::paintEvent(QPainter *p) {
         qreal reversedRes = 1./mResolutionFraction;
         p->scale(reversedRes, reversedRes);
 
-        if(mCurrentPreviewImg != NULL) {
-            p->drawImage(QPointF(0., 0.), *mCurrentPreviewImg);
+        if(!mCurrentPreviewImg.isNull()) {
+            p->drawImage(QPointF(0., 0.), mCurrentPreviewImg);
         }
         p->restore();
     } else {
@@ -339,21 +339,19 @@ void Canvas::setOutputRendering(const bool &bT) {
     setPreviewing(bT);
 }
 
-void Canvas::playPreview()
-{
-    if(mPreviewFrames.isEmpty() ) return;
-    mCurrentPreviewFrameId = 0;
-    mCurrentPreviewImg = mPreviewFrames.first();
+void Canvas::playPreview(const int &minPreviewFrameId,
+                         const int &maxPreviewFrameId) {
+    if(minPreviewFrameId >= maxPreviewFrameId) return;
+    mMaxPreviewFrameId = maxPreviewFrameId;
+    mCurrentPreviewFrameId = minPreviewFrameId;
+    mCurrentPreviewImg = mCacheHandler.getRenderContainerAtRelFrame(
+                                    mCurrentPreviewFrameId)->getImage();
     setPreviewing(true);
     mCanvasWidget->repaint();
 }
 
 void Canvas::clearPreview() {
     setPreviewing(false);
-    mCurrentPreviewImg = NULL;
-    for(int i = 0; i < mPreviewFrames.length(); i++) {
-        delete mPreviewFrames.at(i);
-    }
     mPreviewFrames.clear();
     mMainWindow->previewFinished();
     mCanvasWidget->stopPreview();
@@ -361,10 +359,11 @@ void Canvas::clearPreview() {
 
 void Canvas::nextPreviewFrame() {
     mCurrentPreviewFrameId++;
-    if(mCurrentPreviewFrameId >= mPreviewFrames.length() ) {
+    if(mCurrentPreviewFrameId > mMaxPreviewFrameId) {
         clearPreview();
     } else {
-        mCurrentPreviewImg = mPreviewFrames.at(mCurrentPreviewFrameId);
+        mCurrentPreviewImg = mCacheHandler.getRenderContainerAtRelFrame(
+                    mCurrentPreviewFrameId)->getImage();
     }
     mCanvasWidget->repaint();
 }
@@ -378,15 +377,24 @@ void Canvas::beforeUpdate() {
     BoxesGroup::beforeUpdate();
     mRenderBackgroundColor = mBackgroundColor->getCurrentColor().qcol;
     mRenderImageSize = mImageSize;
+    CacheContainer *cont =
+          mCacheHandler.getRenderContainerAtRelFrame(mUpdateRelFrame);
+    mUpdateReplaceCache = cont == NULL;
+    if(cont != NULL) {
+        mCurrentPreviewImg = cont->getImage();
+    }
 }
 
 void Canvas::afterUpdate() {
     BoxesGroup::afterUpdate();
-    mCurrentPreviewImg = mRenderImage;
-    if(mRendering) {
-        //mRenderImage->save(renderDest + QString::number(mUpdateRelFrame) + ".png");
-    } else {
-        mPreviewFrames << mRenderImage;
+    if(mUpdateReplaceCache) {
+        mCurrentPreviewImg = mRenderImage;
+        CacheContainer *cont =
+              mCacheHandler.createNewRenderContainerAtRelFrame(mUpdateRelFrame);
+        cont->setImage(mRenderImage);
+        if(mRendering) {
+            //mRenderImage.save(renderDest + QString::number(mUpdateRelFrame) + ".png");
+        }
     }
     callUpdateSchedulers();
 }
@@ -396,26 +404,23 @@ void Canvas::updatePixmaps() {
 }
 
 void Canvas::renderCurrentFrameToPreview() {
-    mRenderImage = new QImage(mRenderImageSize,
+    mRenderImage = QImage(mRenderImageSize,
                               QImage::Format_ARGB32_Premultiplied);
-    mRenderImage->fill(mRenderBackgroundColor);
-    renderCurrentFrameToQImage(mRenderImage);
+    mRenderImage.fill(mRenderBackgroundColor);
+    renderCurrentFrameToQImage(&mRenderImage);
     //mPreviewFrames << mRenderImage;
 }
 
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
-    mRenderImage = new QImage(mRenderImageSize,
+    mRenderImage = QImage(mRenderImageSize,
                               QImage::Format_ARGB32_Premultiplied);
-    mRenderImage->fill(mRenderBackgroundColor);
-    renderCurrentFrameToQImage(mRenderImage);
+    mRenderImage.fill(mRenderBackgroundColor);
+    renderCurrentFrameToQImage(&mRenderImage);
     //clearCurrentPreviewImage();
 }
 
 void Canvas::clearCurrentPreviewImage() {
-    if(mCurrentPreviewImg != NULL) {
-        delete mCurrentPreviewImg;
-        mCurrentPreviewImg = NULL;
-    }
+
 }
 
 void Canvas::drawPreviewPixmap(QPainter *p) {

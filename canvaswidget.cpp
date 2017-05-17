@@ -599,7 +599,8 @@ void CanvasWidget::nextPlayPreviewFrame() {
         mRendering = false;
         emit changeCurrentFrame(mSavedCurrentFrame);
         mBoxesUpdateFinishedFunction = NULL;
-            mCurrentCanvas->playPreview();
+            mCurrentCanvas->playPreview(mSavedCurrentFrame,
+                                        mCurrentRenderFrame);
             mCurrentSoundComposition->generateData(mSavedCurrentFrame,
                                                    mCurrentRenderFrame,
                                                    24);
