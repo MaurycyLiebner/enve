@@ -8,21 +8,8 @@ class MemoryChecker : public QObject {
     Q_OBJECT
 public:
     explicit MemoryChecker(QObject *parent = 0);
+    static MemoryChecker *getInstance() { return mInstance; }
 
-private:
-    QTimer *mTimer;
-
-    unsigned long long mUsedRam = 0ULL;
-    unsigned long long mLeaveUnused = 1500000000ULL;
-
-    unsigned long long mFreeRam;
-    unsigned long long mTotalRam;
-    unsigned long long mMemUnit;
-private slots:
-    void checkMemory();
-signals:
-    void freeMemory(unsigned long long);
-public slots:
     void decUsedMemory(const unsigned long long &used) {
         mUsedRam -= used;
     }
@@ -30,6 +17,22 @@ public slots:
     void incUsedMemory(const unsigned long long &used) {
         mUsedRam += used;
     }
+private:
+    QTimer *mTimer;
+
+    unsigned long long mMinFreeRam = 0ULL;
+    unsigned long long mUsedRam = 0ULL;
+    unsigned long long mLeaveUnused = 1500000000ULL;
+
+    unsigned long long mFreeRam;
+    unsigned long long mTotalRam;
+    unsigned long long mMemUnit;
+    static MemoryChecker *mInstance;
+private slots:
+    void checkMemory();
+signals:
+    void outOfMemory(unsigned long long);
+
 };
 
 #endif // MEMORYCHECKER_H

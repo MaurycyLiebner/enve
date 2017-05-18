@@ -77,7 +77,7 @@ void AnimationBox::afterSuccessfulUpdate() {
         if(cont == NULL) {
             cont = mAnimationFramesCache.createNewRenderContainerAtRelFrame(
                                                         mUpdateAnimationFrame);
-            cont->setImage(mUpdateAnimationImage);
+            cont->replaceImage(mUpdateAnimationImage);
         }
     }
     mRelBoundingRect = mUpdateRelBoundingRect;

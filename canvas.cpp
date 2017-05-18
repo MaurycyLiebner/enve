@@ -414,7 +414,7 @@ void Canvas::afterUpdate() {
     if(mUpdateReplaceCache) {
         CacheContainer *cont =
               mCacheHandler.createNewRenderContainerAtRelFrame(mUpdateRelFrame);
-        cont->setImage(mRenderImage);
+        cont->replaceImage(mRenderImage);
         setCurrentPreviewContainer(cont);
         if(mRendering) {
             //mRenderImage.save(renderDest + QString::number(mUpdateRelFrame) + ".png");

@@ -15,10 +15,6 @@ void RenderContainer::updatePaintTransformGivenNewCombinedTransform(
     mPaintTransform = mTransform.inverted()*combinedTransform;
 }
 
-void RenderContainer::replaceImage(const QImage &img) {
-    mImage = img;
-}
-
 void RenderContainer::setTransform(const QMatrix &transform) {
     mTransform = transform;
 }
@@ -48,9 +44,9 @@ const qreal &RenderContainer::getResolutionFraction() const {
 }
 
 void RenderContainer::updateVariables(const QMatrix &combinedTransform,
-                                                 const qreal &effectsMargin,
-                                                 const qreal &resolutionPer,
-                                                 BoundingBox *target) {
+                                      const qreal &effectsMargin,
+                                      const qreal &resolutionPer,
+                                      BoundingBox *target) {
     //QElapsedTimer timer;
     //timer.start();
 
@@ -58,11 +54,11 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
     mTransform.scale(resolutionPer, resolutionPer);
 
     mResolutionFraction = resolutionPer;
-    mImage = target->getAllUglyPixmapProvidedTransform(
+    replaceImage(target->getAllUglyPixmapProvidedTransform(
                 resolutionPer*effectsMargin,
                 resolutionPer,
                 mTransform,
-                &mDrawPos);
+                &mDrawPos));
     updatePaintTransformGivenNewCombinedTransform(combinedTransform);
 
     target->applyEffects(&mImage,
@@ -86,7 +82,7 @@ void RenderContainer::setVariables(const QMatrix &transform,
                                    const qreal &res) {
     mTransform = transform;
     mPaintTransform = paintTransform;
-    mImage = img;
+    replaceImage(img);
     mDrawPos = drawpos;
     mResolutionFraction = res;
     thisAccessed();
@@ -97,11 +93,18 @@ CacheContainer::CacheContainer() {
 }
 
 CacheContainer::~CacheContainer() {
+    MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
     MemoryHandler::getInstance()->removeContainer(this);
 }
 
 void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
     mParentCacheHandler = handler;
+}
+
+void CacheContainer::replaceImage(const QImage &img) {
+    MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
+    mImage = img;
+    MemoryChecker::getInstance()->incUsedMemory(mImage.byteCount());
 }
 
 bool CacheContainer::freeThis() {

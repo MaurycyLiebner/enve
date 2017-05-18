@@ -25,9 +25,7 @@ public:
         return mImage;
     }
 
-    void setImage(const QImage &img) {
-        mImage = img;
-    }
+    void replaceImage(const QImage &img);
 
     const int &getMinRelFrame() const;
 
@@ -72,8 +70,6 @@ public:
 
     void updatePaintTransformGivenNewCombinedTransform(
             const QMatrix &combinedTransform);
-
-    void replaceImage(const QImage &img);
 
     void setTransform(const QMatrix &transform);
 

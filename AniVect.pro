@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += multimedia core gui svg opengl sql xml
-LIBS     += -lavutil -lavformat -lavcodec -lswscale -lswresample
+LIBS     += -lavutil -lavformat -lavcodec -lswscale -lswresample -ltcmalloc
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
