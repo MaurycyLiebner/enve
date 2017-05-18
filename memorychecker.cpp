@@ -19,13 +19,16 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
 }
 
 void MemoryChecker::checkMemory() {
-    struct sysinfo info;
-    if(sysinfo(&info) == 0) {
-        mFreeRam = info.freeram*info.mem_unit +
-                   //info.freeswap*info.mem_unit +
-                   info.bufferram*info.mem_unit;
-        if(mFreeRam < mb500) {
-            emit freeMemory(mb500 - mFreeRam);
-        }
+//    struct sysinfo info;
+//    if(sysinfo(&info) == 0) {
+//        mFreeRam = info.freeram*info.mem_unit +
+//                   //info.freeswap*info.mem_unit +
+//                   info.bufferram*info.mem_unit;
+//        if(mFreeRam < mb500) {
+//            emit freeMemory(mb500 - mFreeRam);
+//        }
+//    }
+    if(mTotalRam < mLeaveUnused + mUsedRam) {
+        emit freeMemory(mUsedRam + mLeaveUnused - mTotalRam);
     }
 }

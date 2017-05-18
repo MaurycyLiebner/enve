@@ -546,8 +546,10 @@ void CanvasWidget::renderPreview() {
 
     mCurrentRenderFrame = mSavedCurrentFrame;
     setRendering(true);
-    //mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
-    //mCurrentCanvas->updateAllBoxes();
+
+    mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
+    mCurrentCanvas->updateAllBoxes();
+    callUpdateSchedulers();
     if(mNoBoxesAwaitUpdate) {
         nextPreviewRenderFrame();
     }
@@ -618,7 +620,7 @@ void CanvasWidget::interruptRendering() {
     mBoxesUpdateFinishedFunction = NULL;
     mCurrentCanvas->clearPreview();
     mCurrentCanvas->getCacheHandler()->
-        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
+        setContainersInFrameRangeBlocked(mSavedCurrentFrame,
                                          mCurrentRenderFrame,
                                          false);
     emit changeCurrentFrame(mSavedCurrentFrame);
@@ -628,7 +630,7 @@ void CanvasWidget::interruptRendering() {
 void CanvasWidget::stopPreview() {
     setPreviewing(false);
     mCurrentCanvas->getCacheHandler()->
-        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
+        setContainersInFrameRangeBlocked(mSavedCurrentFrame,
                                          mCurrentRenderFrame,
                                          false);
     mPreviewFPSTimer->stop();
