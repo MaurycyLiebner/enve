@@ -29,9 +29,11 @@ class CacheHandler : public QObject {
 public:
     void removeRenderContainer(CacheContainer *cont);
     CacheContainer *getRenderContainerAtRelFrame(const int &frame);
-    virtual void updateCurrentRenderContainerFromFrame(const int &relFrame);
-    virtual bool updateCurrentRenderContainerFromFrameIfNotNull(const int &relFrame);
     virtual CacheContainer *createNewRenderContainerAtRelFrame(const int &frame);
+    int getFirstEmptyFrameAtOrAfterFrame(const int &frame);
+    void setContainersInFrameRangeBlocked(const int &minFrame,
+                                          const int &maxFrame,
+                                          const bool &blocked);
 
     void drawCacheOnTimeline(QPainter *p,
                              const qreal &pixelsPerFrame,
@@ -40,9 +42,8 @@ public:
                              const int &endFrame);
     void clearCache();
     CacheContainer *getRenderContainerAtOrBeforeRelFrame(const int &frame);
+    int getFirstEmptyFrameAfterFrame(const int &frame);
 protected:
-    void setCurrentRenderContainerVar(CacheContainer *cont);
-    CacheContainer *mCurrentRenderContainer = NULL;
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
     bool getRenderContainterIdAtRelFrame(const int &relFrame, int *id);
     QList<CacheContainer*> mRenderContainers;
@@ -94,8 +95,6 @@ signals:
 public slots:
 private:
     BoundingBox *mParentBox = NULL;
-
-    void insertRenderContainer(RenderContainer *cont);
 };
 
 #endif // RENDERCACHEHANDLER_H

@@ -46,7 +46,13 @@ public:
     virtual void draw(QPainter *p);
 
     void setBlocked(const bool &bT) {
+        if(bT == mBlocked) return;
         mBlocked = bT;
+        if(bT) {
+            incNumberPointers();
+        } else {
+            decNumberPointers();
+        }
     }
 
 protected:
@@ -71,7 +77,7 @@ public:
 
     void setTransform(const QMatrix &transform);
 
-    void setBoundingRect(const QRectF &rect);
+    void setDrawPos(const QPoint &drawpos);
 
     const QMatrix &getTransform() const;
 
@@ -79,7 +85,7 @@ public:
 
     const QMatrix &getPaintTransform() const;
 
-    const QRectF &getBoundingRect() const;
+    const QPoint &getDrawpos() const;
 
     const qreal &getResolutionFraction() const;
 
@@ -90,7 +96,7 @@ public:
 
     void setVariables(const QMatrix &transform,
                       const QMatrix &paintTransform,
-                      const QRectF &rect,
+                      const QPoint &drawpos,
                       const QImage &img,
                       const qreal &res);
     void duplicateFrom(RenderContainer *src);
@@ -98,7 +104,7 @@ protected:
     qreal mResolutionFraction;
     QMatrix mTransform;
     QMatrix mPaintTransform;
-    QRectF mBoundingRect;
+    QPoint mDrawPos;
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H

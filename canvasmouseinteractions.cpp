@@ -359,7 +359,7 @@ void Canvas::setCurrentMousePressPosAbs(const QPoint &abs) {
 
 void Canvas::mousePressEvent(QMouseEvent *event)
 {
-    if(mPreviewing) return;
+    if(isPreviewingOrRendering()) return;
     setLastMouseEventPosAbs(event->pos());
     if(event->button() != Qt::LeftButton) {
         if(event->button() == Qt::RightButton) {
@@ -547,7 +547,7 @@ void Canvas::handleMouseRelease() {
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(mPreviewing || event->button() == Qt::MiddleButton) return;
+    if(isPreviewingOrRendering() || event->button() == Qt::MiddleButton) return;
     setCurrentMouseEventPosAbs(event->pos());
     mXOnlyTransform = false;
     mYOnlyTransform = false;
@@ -687,7 +687,7 @@ void Canvas::updateTransformation() {
 }
 
 void Canvas::mouseMoveEvent(QMouseEvent *event) {
-    if(mPreviewing) return;
+    if(isPreviewingOrRendering()) return;
     setCurrentMouseEventPosAbs(event->pos());
     if(!(event->buttons() & Qt::MiddleButton) &&
        !(event->buttons() & Qt::RightButton) &&
@@ -770,7 +770,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 
 void Canvas::wheelEvent(QWheelEvent *event)
 {
-    if(mPreviewing) return;
+    if(isPreviewingOrRendering()) return;
     if(event->delta() > 0) {
         zoomCanvas(1.1, event->posF());
     } else {

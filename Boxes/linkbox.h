@@ -47,8 +47,9 @@ public:
 
     QImage getAllUglyPixmapProvidedTransform(
                         const qreal &effectsMargin,
+                        const qreal &resolution,
                         const QMatrix &allUglyTransform,
-                        QRectF *allUglyBoundingRectP);
+                        QPoint *draWPosP);
 
 
     void updateRelBoundingRect();

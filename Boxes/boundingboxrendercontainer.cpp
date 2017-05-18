@@ -6,7 +6,7 @@
 void RenderContainer::draw(QPainter *p) {
     p->save();
     p->setTransform(QTransform(mPaintTransform), true);
-    p->drawImage(mBoundingRect.topLeft(), mImage);
+    p->drawImage(mDrawPos, mImage);
     p->restore();
 }
 
@@ -23,8 +23,8 @@ void RenderContainer::setTransform(const QMatrix &transform) {
     mTransform = transform;
 }
 
-void RenderContainer::setBoundingRect(const QRectF &rect) {
-    mBoundingRect = rect;
+void RenderContainer::setDrawPos(const QPoint &drawpos) {
+    mDrawPos = drawpos;
 }
 
 const QMatrix &RenderContainer::getTransform() const {
@@ -39,8 +39,8 @@ const QMatrix &RenderContainer::getPaintTransform() const {
     return mPaintTransform;
 }
 
-const QRectF &RenderContainer::getBoundingRect() const {
-    return mBoundingRect;
+const QPoint &RenderContainer::getDrawpos() const {
+    return mDrawPos;
 }
 
 const qreal &RenderContainer::getResolutionFraction() const {
@@ -62,7 +62,7 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
                 resolutionPer*effectsMargin,
                 resolutionPer,
                 mTransform,
-                &mBoundingRect);
+                &mDrawPos);
     updatePaintTransformGivenNewCombinedTransform(combinedTransform);
 
     target->applyEffects(&mImage,
@@ -74,20 +74,20 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
 void RenderContainer::duplicateFrom(RenderContainer *src) {
     setVariables(src->getTransform(),
                  src->getPaintTransform(),
-                 src->getBoundingRect(),
+                 src->getDrawpos(),
                  src->getImage(),
                  src->getResolutionFraction());
 }
 
 void RenderContainer::setVariables(const QMatrix &transform,
                                    const QMatrix &paintTransform,
-                                   const QRectF &rect,
+                                   const QPoint &drawpos,
                                    const QImage &img,
                                    const qreal &res) {
     mTransform = transform;
     mPaintTransform = paintTransform;
     mImage = img;
-    mBoundingRect = rect;
+    mDrawPos = drawpos;
     mResolutionFraction = res;
     thisAccessed();
 }

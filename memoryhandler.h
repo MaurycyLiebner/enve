@@ -17,6 +17,7 @@ public:
     static MemoryHandler *getInstance() { return mInstance; }
 signals:
     void allMemoryUsed();
+    void memoryFreed();
 public slots:
     void freeMemory(const unsigned long long &bytes);
 private:

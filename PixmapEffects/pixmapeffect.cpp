@@ -876,14 +876,14 @@ void AlphaMatteEffect::apply(BoundingBox *target,
     BoundingBox *boxTarget = mBoxTarget->getTarget();
     if(boxTarget) {
         qreal influence = mInfluenceAnimator->qra_getCurrentValue();
-        QRectF targetRect = target->getUpdateRenderRect();
+        QPoint targetDrawPos = target->getUpdateDrawPos();
 
         QImage imgTmp = QImage(imgPtr->size(),
                                QImage::Format_ARGB32_Premultiplied);
         imgTmp.fill(Qt::transparent);
         QPainter p(&imgTmp);
 
-        p.translate(-targetRect.topLeft());
+        p.translate(-targetDrawPos);
         p.setTransform(
                     QTransform(target->getUpdatePaintTransform().inverted()),
                     true);

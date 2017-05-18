@@ -87,6 +87,9 @@ public:
 
     void importFile(const QString &path);
 protected:
+    void setRendering(const bool &bT);
+    void setPreviewing(const bool &bT);
+
     QTimer *mPreviewFPSTimer = NULL;
     QThread *mPaintControlerThread;
     PaintControler *mPaintControler;
@@ -117,6 +120,8 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
+    void nextCurrentRenderFrame();
+
 
     // AUDIO
     void initializeAudio();

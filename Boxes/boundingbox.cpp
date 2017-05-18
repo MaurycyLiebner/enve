@@ -202,6 +202,7 @@ void BoundingBox::updateAllBoxes() {
 
 void BoundingBox::clearAllCache() {
     replaceCurrentFrameCache();
+    emit prp_absFrameRangeChanged(INT_MIN, INT_MAX);
 }
 
 void BoundingBox::replaceCurrentFrameCache() {
@@ -216,7 +217,7 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
         const qreal &effectsMargin,
         const qreal &resolution,
         const QMatrix &allUglyTransform,
-        QRectF *allUglyBoundingRectP) {
+        QPoint *drawPosP) {
     QRectF allUglyBoundingRect =
             allUglyTransform.mapRect(mUpdateRelBoundingRect).
                 adjusted(-effectsMargin, -effectsMargin,
@@ -231,9 +232,9 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
     QPainter p(&allUglyPixmap);
     p.setRenderHint(QPainter::Antialiasing);
     p.translate(-allUglyBoundingRect.topLeft());
-    QPointF transF = allUglyBoundingRect.topLeft()*resolution -
-            QPointF(qRound(allUglyBoundingRect.left()*resolution),
-                    qRound(allUglyBoundingRect.top()*resolution));
+    QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
+            QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
+                    qRound(allUglyBoundingRect.top()/**resolution*/));
     allUglyBoundingRect.translate(-transF);
 
     p.translate(transF);
@@ -248,7 +249,8 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
 //                                     parentCanvas->getResolutionFraction());
 //    }
 
-    *allUglyBoundingRectP = allUglyBoundingRect;
+    *drawPosP = QPoint(qRound(allUglyBoundingRect.left()),
+                       qRound(allUglyBoundingRect.top()));
     return allUglyPixmap;
 }
 
@@ -303,8 +305,8 @@ void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
     p->restore();
 }
 
-QRectF BoundingBox::getUpdateRenderRect() {
-    return mUpdateRenderContainer.getBoundingRect();
+QPoint BoundingBox::getUpdateDrawPos() {
+    return mUpdateRenderContainer.getDrawpos();
 }
 
 QMatrix BoundingBox::getUpdatePaintTransform() {

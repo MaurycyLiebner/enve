@@ -321,11 +321,10 @@ public:
         return mEffectsMargin;
     }
 
-    virtual QImage getAllUglyPixmapProvidedTransform(
-                        const qreal &effectsMargin,
+    virtual QImage getAllUglyPixmapProvidedTransform(const qreal &effectsMargin,
                         const qreal &resolution,
                         const QMatrix &allUglyTransform,
-                        QRectF *allUglyBoundingRectP);
+                        QPoint *drawPosP);
 
     virtual Canvas *getParentCanvas();
 
@@ -418,7 +417,7 @@ public:
     void setNoCache(const bool &bT);
     QPainter::CompositionMode getCompositionMode();
     void drawUpdatePixmapForEffect(QPainter *p);
-    QRectF getUpdateRenderRect();
+    QPoint getUpdateDrawPos();
     QMatrix getUpdatePaintTransform();
     bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(

@@ -76,12 +76,13 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
 
 QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
                                 const qreal &effectsMargin,
+                                const qreal &resolution,
                                 const QMatrix &allUglyTransform,
-                                QRectF *allUglyBoundingRectP) {
+                                QPoint *draWPosP) {
     return mLinkTarget->getAllUglyPixmapProvidedTransform(effectsMargin,
-                                                          1.,
+                                                          resolution,
                                                           allUglyTransform,
-                                                          allUglyBoundingRectP);
+                                                          draWPosP);
 }
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &point)

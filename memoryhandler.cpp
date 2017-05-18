@@ -48,4 +48,5 @@ void MemoryHandler::freeMemory(const unsigned long long &bytes) {
     if(memToFree > 0) {
         emit allMemoryUsed();
     }
+    emit memoryFreed();
 }

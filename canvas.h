@@ -234,7 +234,7 @@ public:
     void createAnimationBoxForPaths(const QStringList &paths);
     void createVideoForPath(const QString &path);
 
-    void setPreviewing(bool bT);
+    void setPreviewing(const bool &bT);
     void setOutputRendering(const bool &bT);
     void createLinkToFileWithPath(const QString &path);
 
@@ -291,8 +291,8 @@ protected:
     void handleLeftButtonMousePress();
 signals:
 private slots:
-    void nextPreviewFrame();
 public slots:
+    void nextPreviewFrame();
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
 public:
@@ -349,6 +349,11 @@ public:
         return &mCacheHandler;
     }
 
+    void setCurrentPreviewContainer(CacheContainer *cont);
+    void setRendering(const bool &bT);
+    bool isPreviewingOrRendering() const {
+        return mPreviewing || mRendering;
+    }
 private:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;

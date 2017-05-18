@@ -236,7 +236,7 @@ void Canvas::paintEvent(QPainter *p) {
 
     QRectF viewRect = getPixBoundingRect();
 
-    if(mPreviewing) {
+    if(isPreviewingOrRendering()) {
         QPainterPath path;
         path.addRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1);
         QPainterPath viewRectPath;
@@ -332,8 +332,15 @@ QSize Canvas::getCanvasSize()
     return QSize(mWidth, mHeight);
 }
 
-void Canvas::setPreviewing(bool bT) {
+void Canvas::setPreviewing(const bool &bT) {
     mPreviewing = bT;
+    if(!bT) {
+        setCurrentPreviewContainer(NULL);
+    }
+}
+
+void Canvas::setRendering(const bool &bT) {
+    mRendering = bT;
 }
 
 void Canvas::setOutputRendering(const bool &bT) {
@@ -341,35 +348,44 @@ void Canvas::setOutputRendering(const bool &bT) {
     setPreviewing(bT);
 }
 
+void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
+    if(mCurrentPreviewContainer != NULL) {
+        mCurrentPreviewContainer->decNumberPointers();
+        if(!mRendering) {
+            mCurrentPreviewContainer->setBlocked(false);
+        }
+    }
+    mCurrentPreviewContainer = cont;
+    if(mCurrentPreviewContainer != NULL) {
+        mCurrentPreviewContainer->setBlocked(true);
+        mCurrentPreviewContainer->incNumberPointers();
+    }
+}
+
 void Canvas::playPreview(const int &minPreviewFrameId,
                          const int &maxPreviewFrameId) {
     if(minPreviewFrameId >= maxPreviewFrameId) return;
     mMaxPreviewFrameId = maxPreviewFrameId;
     mCurrentPreviewFrameId = minPreviewFrameId;
-    mCurrentPreviewContainer = mCacheHandler.getRenderContainerAtRelFrame(
-                                    mCurrentPreviewFrameId);
+    setCurrentPreviewContainer(mCacheHandler.getRenderContainerAtRelFrame(
+                                    mCurrentPreviewFrameId));
     setPreviewing(true);
     mCanvasWidget->repaint();
 }
 
 void Canvas::clearPreview() {
-    setPreviewing(false);
-    mCurrentPreviewContainer = NULL;
     mMainWindow->previewFinished();
     mCanvasWidget->stopPreview();
 }
 
 void Canvas::nextPreviewFrame() {
     mCurrentPreviewFrameId++;
-    if(mCurrentPreviewContainer != NULL) {
-        mCurrentPreviewContainer->setBlocked(false);
-    }
     if(mCurrentPreviewFrameId > mMaxPreviewFrameId) {
         clearPreview();
     } else {
-        mCurrentPreviewContainer =
+        setCurrentPreviewContainer(
                 mCacheHandler.getRenderContainerAtOrBeforeRelFrame(
-                                    mCurrentPreviewFrameId);
+                                    mCurrentPreviewFrameId));
     }
     mCanvasWidget->repaint();
 }
@@ -383,10 +399,7 @@ void Canvas::beforeUpdate() {
           mCacheHandler.getRenderContainerAtRelFrame(mUpdateRelFrame);
     mUpdateReplaceCache = cont == NULL;
     if(cont != NULL) {
-        if(mPreviewing) {
-            cont->setBlocked(true);
-        }
-        mCurrentPreviewContainer = cont;
+        setCurrentPreviewContainer(cont);
     }
 }
 
@@ -402,10 +415,7 @@ void Canvas::afterUpdate() {
         CacheContainer *cont =
               mCacheHandler.createNewRenderContainerAtRelFrame(mUpdateRelFrame);
         cont->setImage(mRenderImage);
-        mCurrentPreviewContainer = cont;
-        if(mPreviewing) {
-            cont->setBlocked(true);
-        }
+        setCurrentPreviewContainer(cont);
         if(mRendering) {
             //mRenderImage.save(renderDest + QString::number(mUpdateRelFrame) + ".png");
         }
@@ -684,7 +694,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
 }
 #include "clipboardcontainer.h"
 void Canvas::keyPressEvent(QKeyEvent *event) {
-    if(mPreviewing) return;
+    if(isPreviewingOrRendering()) return;
 
     bool isGrabbingMouse = mCanvasWidget->mouseGrabber() == mCanvasWidget;
     if(isGrabbingMouse ? !handleKeyPressEventWhileMouseGrabbing(event) : true) {

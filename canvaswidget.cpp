@@ -526,16 +526,28 @@ void CanvasWidget::renderOutput() {
     dialog->exec();
 }
 
+void CanvasWidget::nextCurrentRenderFrame() {
+    int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler()->
+            getFirstEmptyFrameAfterFrame(mCurrentRenderFrame);
+    if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
+        mCurrentCanvas->getCacheHandler()->
+            setContainersInFrameRangeBlocked(mCurrentRenderFrame + 1,
+                                             newCurrentRenderFrame - 1,
+                                             true);
+    }
+    mCurrentRenderFrame = newCurrentRenderFrame;
+    emit changeCurrentFrame(mCurrentRenderFrame);
+}
+
 void CanvasWidget::renderPreview() {
     if(hasNoCanvas()) return;
     mBoxesUpdateFinishedFunction = &CanvasWidget::nextPreviewRenderFrame;
     mSavedCurrentFrame = getCurrentFrame();
 
-    mRendering = true;
     mCurrentRenderFrame = mSavedCurrentFrame;
-    mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
-    mCurrentCanvas->setPreviewing(true);
-    mCurrentCanvas->updateAllBoxes();
+    setRendering(true);
+    //mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
+    //mCurrentCanvas->updateAllBoxes();
     if(mNoBoxesAwaitUpdate) {
         nextPreviewRenderFrame();
     }
@@ -591,18 +603,34 @@ void CanvasWidget::outOfMemory() {
     }
 }
 
+void CanvasWidget::setRendering(const bool &bT) {
+    mRendering = bT;
+    mCurrentCanvas->setRendering(bT);
+}
+
+void CanvasWidget::setPreviewing(const bool &bT) {
+    mPreviewing = bT;
+    mCurrentCanvas->setPreviewing(bT);
+}
+
 void CanvasWidget::interruptRendering() {
-    mRendering = false;
+    setRendering(false);
     mBoxesUpdateFinishedFunction = NULL;
     mCurrentCanvas->clearPreview();
+    mCurrentCanvas->getCacheHandler()->
+        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
+                                         mCurrentRenderFrame,
+                                         false);
     emit changeCurrentFrame(mSavedCurrentFrame);
     MainWindow::getInstance()->previewFinished();
 }
 
 void CanvasWidget::stopPreview() {
-    mCurrentRenderFrame = getMaxFrame() + 1;
-    mPreviewing = false;
-    mCurrentCanvas->setPreviewing(true);
+    setPreviewing(false);
+    mCurrentCanvas->getCacheHandler()->
+        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
+                                         mCurrentRenderFrame,
+                                         false);
     mPreviewFPSTimer->stop();
     stopAudio();
     repaint();
@@ -624,8 +652,8 @@ void CanvasWidget::resumePreview() {
 }
 
 void CanvasWidget::playPreview() {
-    mRendering = false;
-    mPreviewing = true;
+    setRendering(false);
+    setPreviewing(true);
     emit changeCurrentFrame(mSavedCurrentFrame);
     mBoxesUpdateFinishedFunction = NULL;
     mCurrentCanvas->playPreview(mSavedCurrentFrame,
@@ -644,8 +672,7 @@ void CanvasWidget::nextPreviewRenderFrame() {
     if(mCurrentRenderFrame > getMaxFrame()) {
         playPreview();
     } else {
-        mCurrentRenderFrame++;
-        emit changeCurrentFrame(mCurrentRenderFrame);
+        nextCurrentRenderFrame();
         if(mNoBoxesAwaitUpdate) {
             nextPreviewRenderFrame();
         }
@@ -664,8 +691,7 @@ void CanvasWidget::nextSaveOutputFrame() {
             mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
         }
     } else {
-        mCurrentRenderFrame++;
-        emit changeCurrentFrame(mCurrentRenderFrame);
+        nextCurrentRenderFrame();
         if(mNoBoxesAwaitUpdate) {
             nextSaveOutputFrame();
         }

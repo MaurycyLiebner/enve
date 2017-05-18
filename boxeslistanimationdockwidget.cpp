@@ -60,7 +60,7 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
     mHover = false;
     update();
 }
-
+#include "memoryhandler.h"
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
     QWidget(parent) {
@@ -101,6 +101,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
                                                             10, 20,
                                                             false,
                                                             false, this);
+    connect(MemoryHandler::getInstance(), SIGNAL(memoryFreed()),
+            mAnimationWidgetScrollbar, SLOT(repaint()));
     mAnimationWidgetScrollbar->setTopBorderVisible(false);
 
     connect(mAnimationWidgetScrollbar, SIGNAL(viewedFramesChanged(int,int)),
