@@ -21,7 +21,7 @@ Property *BoolProperty::makeDuplicate() {
 
 void BoolProperty::setValue(const bool &value) {
     mValue = value;
-    prp_updateAfterChangedAbsFrameRange(INT_MIN, INT_MAX);
+    prp_updateInfluenceRangeAfterChanged();
     prp_callUpdater();
     prp_callFinishUpdater();
 }

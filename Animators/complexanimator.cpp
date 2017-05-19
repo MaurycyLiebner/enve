@@ -42,6 +42,8 @@ void ComplexAnimator::ca_addChildAnimator(Property *childAnimator) {
     ca_mChildAnimators << childAnimator->ref<Property>();
     childAnimator->prp_setUpdater(prp_mUpdater);
     childAnimator->prp_setParentFrameShift(prp_getFrameShift());
+    connect(childAnimator, SIGNAL(prp_updateWholeInfluenceRange()),
+            this, SLOT(prp_updateInfluenceRangeAfterChanged()));
     connect(childAnimator, SIGNAL(prp_isRecordingChanged()),
             this, SLOT(ca_childAnimatorIsRecordingChanged()));
     connect(childAnimator, SIGNAL(prp_absFrameRangeChanged(int, int)),

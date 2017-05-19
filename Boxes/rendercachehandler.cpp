@@ -187,10 +187,14 @@ RenderCacheHandler::RenderCacheHandler() {
 
 void RenderCacheHandler::clearCacheForRelFrameRange(const int &minFrame,
                                                     const int &maxFrame) {
-    int minId = 0;
-    getRenderContainterIdAtRelFrame(minFrame, &minId);
-    int maxId = mRenderContainers.count() - 1;
-    getRenderContainterIdAtRelFrame(maxFrame, &maxId);
+    int minId;
+    if(!getRenderContainterIdAtRelFrame(minFrame, &minId)) {
+        minId = getRenderContainterInsertIdAtRelFrame(minFrame);
+    }
+    int maxId;
+    if(!getRenderContainterIdAtRelFrame(maxFrame, &maxId)) {
+        maxId = getRenderContainterInsertIdAtRelFrame(maxFrame) - 1;
+    }
     for(int i = minId; i <= maxId; i++) {
         CacheContainer *cont = mRenderContainers.takeAt(minId);
         cont->setParentCacheHandler(NULL);

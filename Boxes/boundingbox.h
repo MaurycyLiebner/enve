@@ -435,7 +435,7 @@ public:
     bool isUsedAsTarget();
     void incUsedAsTarget();
     void decUsedAsTarget();
-    bool shouldUpdateAndDraw();
+    bool shouldUpdate();
     void ca_childAnimatorIsRecordingChanged();
 
     int getSqlId() {
@@ -517,10 +517,12 @@ protected:
     QPainter::CompositionMode mCompositionMode =
             QPainter::CompositionMode_SourceOver;
 
+    void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);
+
     bool mVisible = true;
     bool mLocked = false;
 
-    bool mAnimated = false;
+    bool mForceUpdate = false;
 
     QImage mRenderPixmap;
 signals:
@@ -528,7 +530,9 @@ signals:
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
 public slots:
-    void updateAfterDurationRectangleShifted();
+    void updateAfterDurationRectangleShifted(const int &dFrame = 0);
+    void updateAfterDurationMinFrameChangedBy(const int &by);
+    void updateAfterDurationMaxFrameChangedBy(const int &by);
     virtual void updateAfterDurationRectangleRangeChanged() {}
     void replaceCurrentFrameCache();
     void scheduleSoftUpdate();
@@ -536,6 +540,7 @@ public slots:
 
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
+    void prp_updateInfluenceRangeAfterChanged();
 };
 
 

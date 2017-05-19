@@ -200,9 +200,17 @@ void BoundingBox::updateAllBoxes() {
     scheduleSoftUpdate();
 }
 
+void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
+    int minAbsUpdateFrame;
+    int maxAbsUpdateFrame;
+    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
+    prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame,
+                                        maxAbsUpdateFrame);
+}
+
 void BoundingBox::clearAllCache() {
     replaceCurrentFrameCache();
-    emit prp_absFrameRangeChanged(INT_MIN, INT_MAX);
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void BoundingBox::replaceCurrentFrameCache() {
@@ -365,6 +373,15 @@ void BoundingBox::resetRotation() {
 
 void BoundingBox::updateAfterFrameChanged(const int &currentFrame) {
     prp_setAbsFrame(currentFrame);
+    if(mDurationRectangle != NULL) {
+        int minDurRelFrame = mDurationRectangle->getMinFrameAsRelFrame();
+        int maxDurRelFrame = mDurationRectangle->getMaxFrameAsRelFrame();
+        if(mUpdateDrawOnParentBox !=
+           (anim_mCurrentRelFrame >= minDurRelFrame &&
+            anim_mCurrentRelFrame <= maxDurRelFrame)) {
+            scheduleHardUpdate();
+        }
+    }
 }
 
 void BoundingBox::setParent(BoxesGroup *parent,
@@ -803,10 +820,7 @@ void BoundingBox::createDurationRectangle() {
 void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     if(durationRect == mDurationRectangle) return;
     if(mDurationRectangle != NULL) {
-        disconnect(mDurationRectangle, SIGNAL(posChanged(int)),
-                   this, SLOT(updateAfterDurationRectangleShifted()));
-        disconnect(mDurationRectangle, SIGNAL(rangeChanged()),
-                   this, SLOT(updateAfterDurationRectangleRangeChanged()));
+        disconnect(mDurationRectangle, 0, this, 0);
     }
     if(durationRect == NULL) {
         int shift = mDurationRectangle->getFrameShift();
@@ -817,16 +831,56 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted();
     if(mDurationRectangle == NULL) return;
-    connect(mDurationRectangle, SIGNAL(posChanged(int)),
-            this, SLOT(updateAfterDurationRectangleShifted()));
+    connect(mDurationRectangle, SIGNAL(posChangedBy(int)),
+            this, SLOT(updateAfterDurationRectangleShifted(int)));
     connect(mDurationRectangle, SIGNAL(rangeChanged()),
             this, SLOT(updateAfterDurationRectangleRangeChanged()));
+
+    connect(mDurationRectangle, SIGNAL(minFrameChangedBy(int)),
+            this, SLOT(updateAfterDurationMinFrameChangedBy(int)));
+    connect(mDurationRectangle, SIGNAL(maxFrameChangedBy(int)),
+            this, SLOT(updateAfterDurationMaxFrameChangedBy(int)));
 }
 
-void BoundingBox::updateAfterDurationRectangleShifted() {
+void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_setParentFrameShift(prp_mParentFrameShift);
     updateAfterFrameChanged(anim_mCurrentAbsFrame);
-    prp_updateAfterChangedAbsFrameRange(INT_MIN, INT_MAX);
+    int minAbsUpdateFrame;
+    int maxAbsUpdateFrame;
+    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
+    if(dFrame > 0) {
+        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame - dFrame,
+                                            maxAbsUpdateFrame);
+    } else {
+        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame,
+                                            maxAbsUpdateFrame - dFrame);
+    }
+}
+
+void BoundingBox::updateAfterDurationMinFrameChangedBy(const int &by) {
+    int minAbsUpdateFrame;
+    int maxAbsUpdateFrame;
+    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
+    if(by > 0) {
+        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame - by,
+                                            minAbsUpdateFrame - 1);
+    } else {
+        prp_updateAfterChangedAbsFrameRange(minAbsUpdateFrame,
+                                            minAbsUpdateFrame - by - 1);
+    }
+}
+
+void BoundingBox::updateAfterDurationMaxFrameChangedBy(const int &by) {
+    int minAbsUpdateFrame;
+    int maxAbsUpdateFrame;
+    getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);
+    if(by > 0) {
+        prp_updateAfterChangedAbsFrameRange(maxAbsUpdateFrame - by + 1,
+                                            maxAbsUpdateFrame);
+    } else {
+        prp_updateAfterChangedAbsFrameRange(maxAbsUpdateFrame + 1,
+                                            maxAbsUpdateFrame - by);
+    }
 }
 
 DurationRectangleMovable *BoundingBox::anim_getRectangleMovableAtPos(
@@ -864,7 +918,7 @@ QString BoundingBox::getName() {
 
 bool BoundingBox::isInVisibleDurationRect() {
     if(mDurationRectangle == NULL) return true;
-    return anim_mCurrentRelFrame < mDurationRectangle->getMaxFrameAsRelFrame() &&
+    return anim_mCurrentRelFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
            anim_mCurrentRelFrame >= mDurationRectangle->getMinFrameAsRelFrame();
 }
 
@@ -882,6 +936,8 @@ void BoundingBox::setVisibile(const bool &visible,
         addUndoRedo(new SetBoxVisibleUndoRedo(this, mVisible, visible));
     }
     mVisible = visible;
+
+    clearAllCache();
 
     scheduleSoftUpdate();
 
@@ -1112,9 +1168,14 @@ void BoundingBox::decUsedAsTarget() {
     mUsedAsTargetCount--;
 }
 
-bool BoundingBox::shouldUpdateAndDraw() {
-    return isVisibleAndInVisibleDurationRect() ||
-            (isInVisibleDurationRect() && isUsedAsTarget());
+bool BoundingBox::shouldUpdate() {
+    if(mForceUpdate) {
+        mForceUpdate = false;
+        return true;
+    } else {
+        return (isVisibleAndInVisibleDurationRect()) ||
+               (isInVisibleDurationRect() && isUsedAsTarget());
+    }
 }
 
 void BoundingBox::scheduleSoftUpdate() {
@@ -1123,13 +1184,24 @@ void BoundingBox::scheduleSoftUpdate() {
 }
 
 void BoundingBox::scheduleUpdate() {
-    if(shouldUpdateAndDraw()) {
+    if(shouldUpdate()) {
         mAwaitingUpdate = true;
         mParent->addChildAwaitingUpdate(this);
         emit scheduledUpdate();
     }
 }
 
+void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
+    if(mDurationRectangle == NULL) {
+        *minFrame = INT_MIN;
+        *maxFrame = INT_MAX;
+    } else {
+        *minFrame = mDurationRectangle->getMinFrameAsAbsFrame();
+        *maxFrame = mDurationRectangle->getMaxFrameAsAbsFrame();
+    }
+}
+
 void BoundingBox::scheduleHardUpdate() {
+    mForceUpdate = true;
     scheduleUpdate();
 }

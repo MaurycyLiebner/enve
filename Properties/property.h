@@ -131,12 +131,15 @@ public:
     void prp_setBlockedUpdater(AnimatorUpdater *updater);
 
     bool SWT_isProperty() { return true; }
+
 public slots:
     virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 
     virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                      const int &maxFrame);
+    virtual void prp_updateInfluenceRangeAfterChanged();
 signals:
+    void prp_updateWholeInfluenceRange();
     void prp_isRecordingChanged();
     void prp_absFrameRangeChanged(const int &minFrame,
                                   const int &maxFrame);

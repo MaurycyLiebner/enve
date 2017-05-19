@@ -36,6 +36,7 @@ public slots:
 
     void setMinPos(const int &minPos);
 signals:
+    void posChangedBy(int);
     void posChanged(int);
     void finishedTransform();
 protected:
@@ -91,9 +92,9 @@ public:
     }
 
     virtual bool hasAnimationFrameRange() { return false; }
-
-    virtual void connectRenderCacheHandler(RenderCacheHandler *handler);
 signals:
+    void minFrameChangedBy(int);
+    void maxFrameChangedBy(int);
     void rangeChanged();
     void finishedRangeChange();
 protected:
@@ -127,10 +128,7 @@ public:
     void setAnimationFrameDuration(const int &frameDuration);
 
     int getAnimationFrameDuration();
-    void connectRenderCacheHandler(RenderCacheHandler *handler);
 signals:
-    void animationRangeChanged();
-    void finishedAnimationRangeChange();
 protected:
     virtual void setMinAnimationFrame(const int &minAnimationFrame) = 0;
     virtual void setMaxAnimationFrame(const int &maxAnimationFrame) = 0;
@@ -140,14 +138,7 @@ class VaryingLenAnimationRect : public AnimationRect {
     Q_OBJECT
 public:
     VaryingLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
-        connect(&mMinFrame, SIGNAL(posChanged(int)),
-                this, SIGNAL(animationRangeChanged()));
-        connect(&mMaxFrame, SIGNAL(posChanged(int)),
-                this, SIGNAL(animationRangeChanged()));
-        connect(&mMinFrame, SIGNAL(finishedTransform()),
-                this, SIGNAL(finishedAnimationRangeChange()));
-        connect(&mMaxFrame, SIGNAL(finishedTransform()),
-                this, SIGNAL(finishedAnimationRangeChange()));
+
     }
 
     int getMinAnimationFrame() const {
@@ -156,16 +147,6 @@ public:
 
     int getMaxAnimationFrame() const {
         return getMaxFrame();
-    }
-
-    void setMinFrame(const int &minFrame) {
-        DurationRectangle::setMinFrame(minFrame);
-        emit animationRangeChanged();
-    }
-
-    void setMaxFrame(const int &maxFrame) {
-        DurationRectangle::setMaxFrame(maxFrame);
-        emit animationRangeChanged();
     }
 protected:
     void setMinAnimationFrame(const int &minAnimationFrame) {
@@ -181,14 +162,7 @@ class FixedLenAnimationRect : public AnimationRect {
     Q_OBJECT
 public:
     FixedLenAnimationRect(Property *childProp) : AnimationRect(childProp) {
-        connect(&mMinFrame, SIGNAL(posChanged(int)),
-                this, SIGNAL(rangeChanged()));
-        connect(&mMaxFrame, SIGNAL(posChanged(int)),
-                this, SIGNAL(rangeChanged()));
-        connect(&mMinFrame, SIGNAL(finishedTransform()),
-                this, SIGNAL(finishedRangeChange()));
-        connect(&mMaxFrame, SIGNAL(finishedTransform()),
-                this, SIGNAL(finishedRangeChange()));
+
     }
 
     int getMinAnimationFrame() const;

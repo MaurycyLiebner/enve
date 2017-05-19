@@ -576,7 +576,7 @@ void QrealAnimator::prp_finishTransform() {
         if(anim_mIsRecording) {
             anim_saveCurrentValueAsKey();
         } else {
-            prp_updateAfterChangedAbsFrameRange(INT_MIN, INT_MAX);
+            prp_updateInfluenceRangeAfterChanged();
         }
         mTransformed = false;
 

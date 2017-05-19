@@ -6,7 +6,7 @@ Property::Property() {
 }
 
 void Property::prp_valueChanged() {
-    prp_updateAfterChangedAbsFrameRange(INT_MIN, INT_MAX);
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void Property::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
@@ -72,6 +72,10 @@ void Property::prp_setBlockedUpdater(AnimatorUpdater *updater) {
     prp_mUpdaterBlocked = false;
     prp_setUpdater(updater);
     prp_blockUpdater();
+}
+
+void Property::prp_updateInfluenceRangeAfterChanged() {
+    emit prp_updateWholeInfluenceRange();
 }
 
 void Property::prp_blockUpdater() {
