@@ -37,10 +37,6 @@ QrealKey::~QrealKey() {
 
 }
 
-Key *QrealKey::makeKeyDuplicate(Animator *animator) {
-    return makeQrealKeyDuplicate((QrealAnimator*)animator);
-}
-
 QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     QrealKey *target = new QrealKey(targetParent);
     target->setValue(mValue);

@@ -786,7 +786,7 @@ void Canvas::wheelEvent(QWheelEvent *event)
     callUpdateSchedulers();
 }
 
-void Canvas::mouseDoubleClickEvent(QMouseEvent *event) {
+void Canvas::mouseDoubleClickEvent(QMouseEvent *) {
     mDoubleClick = true;
 
     mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel,

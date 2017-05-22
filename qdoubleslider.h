@@ -16,7 +16,7 @@ public:
     QDoubleSlider(QWidget *parent = 0);
     virtual ~QDoubleSlider();
 
-    bool eventFilter(QObject *obj, QEvent *event);
+    bool eventFilter(QObject *, QEvent *event);
 
     void setValueSliderVisibile(bool valueSliderVisible);
     void setNameVisible(bool nameVisible);

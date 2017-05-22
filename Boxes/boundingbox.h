@@ -43,7 +43,8 @@ enum BoundingBoxType {
     TYPE_CANVAS,
     TYPE_INTERNAL_LINK,
     TYPE_EXTERNAL_LINK,
-    TYPE_PARTICLES
+    TYPE_PARTICLES,
+    TYPE_DRAFT_CANVAS
 };
 
 class BoxesGroup;
@@ -247,9 +248,9 @@ public:
         return NULL;
     }
     void setAbsolutePos(const QPointF &pos,
-                        const bool &saveUndoRedo);
+                        const bool &saveUndoRedo = false);
     void setRelativePos(const QPointF &relPos,
-                        const bool &saveUndoRedo);
+                        const bool &saveUndoRedo = false);
 
     virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
 

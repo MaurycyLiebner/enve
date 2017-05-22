@@ -13,11 +13,8 @@ public:
     void setTarget(BoundingBox *box);
     void setParentBox(BoundingBox *box);
 
-    void makeDuplicate(Property *property);
-    Property *makeDuplicate();
-    int prp_saveToSql(QSqlQuery *query,
-                      const int &parentId) {}
-    void prp_loadFromSql(const int &identifyingId) {}
+    void makeDuplicate(BoxTargetProperty *property);
+    BoxTargetProperty *makeDuplicate();
 
     bool SWT_isBoxTargetProperty() { return true; }
 private:

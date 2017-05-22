@@ -12,8 +12,7 @@ class TextSvgAttributes {
 public:
     TextSvgAttributes() {}
 
-    TextSvgAttributes &operator*=(const TextSvgAttributes &overwritter)
-    {
+    TextSvgAttributes &operator*=(const TextSvgAttributes &overwritter) {
 //        if(overwritter.wasColorAssigned()) {
 //            mColor = overwritter.getColor();
 //        }

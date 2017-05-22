@@ -227,7 +227,7 @@ void QDoubleSlider::mouseMoveEvent(QMouseEvent *event) {
 }
 
 #include <QApplication>
-bool QDoubleSlider::eventFilter(QObject *obj, QEvent *event) {
+bool QDoubleSlider::eventFilter(QObject *, QEvent *event) {
     if(event->type() == QEvent::Paint) {
         return false;
     } else if(event->type() == QEvent::KeyPress) {

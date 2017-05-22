@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QtMath>
 class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidget;

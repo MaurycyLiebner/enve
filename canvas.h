@@ -227,7 +227,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *);
 
     void keyPressEvent(QKeyEvent *event);
     void drawPreviewPixmap(QPainter *p);

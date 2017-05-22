@@ -33,11 +33,11 @@ bool outsideCircle(int r, int x_t, int y_t)
 }
 
 
-bool isnan(float var)
-{
-    volatile float d = var;
-    return d != d;
-}
+//bool isnan(float var)
+//{
+//    volatile float d = var;
+//    return d != d;
+//}
 
 void glOrthoAndViewportSet(GLuint w, GLuint h)
 {

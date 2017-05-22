@@ -1,5 +1,8 @@
 #include "memorychecker.h"
 #include <sys/sysinfo.h>
+#include <gperftools/tcmalloc.h>
+#include <gperftools/malloc_extension.h>
+
 MemoryChecker *MemoryChecker::mInstance;
 
 MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
@@ -19,9 +22,31 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
             this, SLOT(checkMemory()) );
     mTimer->start(500);
 }
+#include <QDebug>
 #include <stdio.h>
 #include <stdlib.h>
 unsigned long long getFreeRam() {
+    unsigned long long unmapped = 0ULL;
+    char buffer[1000];
+    MallocExtension::instance()->GetStats(buffer, 1000);
+
+    QString allText = QString::fromUtf8(buffer);
+    QString extract = allText.split(QRegExp("\n|\r\n|\r")).at(9);
+    extract = line.split('(').first();
+    extract = extract.split('+').last();
+    extract = extract.trimmed();
+    unmapped = extract.toULongLong();
+//    QStringList allLines = allText.split(QRegExp("\n|\r\n|\r"));
+//    foreach(const QString &line, allLines) {
+//        if(line.contains("Bytes released to OS (aka unmapped)")) {
+//            QString extract = line.split('(').first();
+//            extract = extract.split('+').last();
+//            extract = extract.trimmed();
+//            unmapped = extract.toULongLong();
+//            break;
+//        }
+//    }
+
     FILE *meminfo = fopen("/proc/meminfo", "r");
     if(meminfo == NULL) return 0;
 
@@ -43,7 +68,7 @@ unsigned long long getFreeRam() {
 
         if(found >= 3) {
             fclose(meminfo);
-            return ramULL;
+            return ramULL + unmapped;
         }
     }
 

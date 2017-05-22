@@ -34,6 +34,8 @@ ParticleBox::ParticleBox(BoxesGroup *parent) :
 void ParticleBox::getAccelerationAt(const QPointF &pos,
                                     const int &frame,
                                     QPointF *acc) {
+    Q_UNUSED(pos);
+    Q_UNUSED(frame);
     *acc = QPointF(0., 9.8)/24.;
 }
 

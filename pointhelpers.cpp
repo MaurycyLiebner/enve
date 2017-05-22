@@ -1,18 +1,28 @@
 #include "pointhelpers.h"
+#include <QtMath>
+#include <complex>
+#include <QDebug>
+#include <QMatrix>
 
-qreal qRandF(qreal fMin, qreal fMax)
-{
+#define v2to1div3 1.25992104989
+#define sqrt3     1.73205080757
+#define v2to2div3 1.58740105197
+#include <QList>
+
+qreal qRandF(qreal fMin, qreal fMax) {
     qreal f = (qreal)qrand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
-QPointF symmetricToPos(QPointF toMirror, QPointF mirrorCenter) {
+QPointF symmetricToPos(QPointF toMirror,
+                       QPointF mirrorCenter) {
     QPointF posDist = toMirror - mirrorCenter;
     return mirrorCenter - posDist;
 }
 
-QPointF symmetricToPosNewLen(QPointF toMirror, QPointF mirrorCenter, qreal newLen)
-{
+QPointF symmetricToPosNewLen(QPointF toMirror,
+                             QPointF mirrorCenter,
+                             qreal newLen) {
     QPointF posDist = toMirror - mirrorCenter;
     return mirrorCenter - scalePointToNewLen(posDist, newLen);
 }
@@ -24,16 +34,20 @@ QPointF calcCubicBezierVal(QPointF p0, QPointF p1,
                    calcCubicBezierVal(p0.y(), p1.y(), p2.y(), p3.y(), t));
 }
 
-qreal calcCubicBezierVal(qreal p0, qreal p1, qreal p2, qreal p3, qreal t) {
-    return pow(1 - t, 3)*p0 +
-            3*pow(1 - t, 2)*t*p1 +
+qreal calcCubicBezierVal(qreal p0, qreal p1,
+                         qreal p2, qreal p3,
+                         qreal t) {
+    return qPow(1 - t, 3)*p0 +
+            3*qPow(1 - t, 2)*t*p1 +
             3*(1 - t)*t*t*p2 +
             t*t*t*p3;
 }
 
 // only for beziers that do not have multiple points of the same x value
 // for qrealanimators
-qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x) {
+qreal tFromX(qreal p0x, qreal p1x,
+             qreal p2x, qreal p3x,
+             qreal x) {
     qreal minT = 0.;
     qreal maxT = 1.;
     qreal xGuess;
@@ -51,7 +65,7 @@ qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x) {
 }
 
 qreal pointToLen(QPointF point) {
-    return sqrt(point.x()*point.x() + point.y()*point.y());
+    return qSqrt(point.x()*point.x() + point.y()*point.y());
 }
 
 bool isZero(qreal val) {
@@ -81,7 +95,8 @@ QString boolToSql(bool bT) {
     return (bT) ? "1" : "0";
 }
 
-void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos, QPointF centerPos,
+void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
+                          QPointF centerPos,
                           QPointF *newEndPos, QPointF *newStartPos) {
     endPos = symmetricToPos(endPos, centerPos);
     qreal len1 = pointToLen(endPos);
@@ -91,7 +106,8 @@ void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos, QPointF centerPos,
     *newEndPos = symmetricToPos(*newStartPos, centerPos);
 }
 
-void getCtrlsSmoothPos(QPointF endPos, QPointF startPos, QPointF centerPos,
+void getCtrlsSmoothPos(QPointF endPos, QPointF startPos,
+                       QPointF centerPos,
                        QPointF *newEndPos, QPointF *newStartPos) {
     QPointF symEndPos = symmetricToPos(endPos, centerPos);
     qreal len1 = pointToLen(symEndPos);
@@ -104,11 +120,11 @@ void getCtrlsSmoothPos(QPointF endPos, QPointF startPos, QPointF centerPos,
                 (symEndPos*len1 + startPos*len2)/lenSum - centerPos,
                 1.);
     qreal startCtrlPtLen =
-            abs(QPointF::dotProduct(point2Rel, newStartDirection));
+            qAbs(QPointF::dotProduct(point2Rel, newStartDirection));
     *newStartPos = newStartDirection*startCtrlPtLen +
             centerPos;
     qreal endCtrlPtLen =
-            abs(QPointF::dotProduct(point1Rel, newStartDirection));
+            qAbs(QPointF::dotProduct(point1Rel, newStartDirection));
     *newEndPos = -newStartDirection*endCtrlPtLen +
             centerPos;
 }
@@ -124,12 +140,7 @@ qreal qclamp(qreal val, qreal min, qreal max) {
     if(val < min) return min;
     return val;
 }
-#include <complex>
 
-#define v2to1div3 1.25992104989
-#define sqrt3     1.73205080757
-#define v2to2div3 1.58740105197
-#include <QList>
 void getTValuesforBezier1D(const qreal &x0n,
                               const qreal &x1n,
                               const qreal &x2n,
@@ -187,7 +198,6 @@ qreal get1DAccuracyValue(const qreal &x0,
     return qMax4(x0, x1, x2, x3) - qMin4(x0, x1, x2, x3);
 }
 
-#include <QDebug>
 qreal getTforBezierPoint(const qreal &x0,
                          const qreal &x1,
                          const qreal &x2,
@@ -254,18 +264,19 @@ qreal qMax4(qreal v1, qreal v2, qreal v3, qreal v4) {
     return qMax(v1, qMax(v2, qMax(v3, v4) ) );
 }
 
-QRectF qRectF4Points(QPointF p1, QPointF c1, QPointF c2, QPointF p2) {
+QRectF qRectF4Points(QPointF p1, QPointF c1,
+                     QPointF c2, QPointF p2) {
     return QRectF(QPointF(qMin4(p1.x(), c1.x(), c2.x(), p2.x()),
                           qMin4(p1.y(), c1.y(), c2.y(), p2.y())),
 
                   QPointF(qMax4(p1.x(), c1.x(), c2.x(), p2.x()),
                           qMax4(p1.y(), c1.y(), c2.y(), p2.y())));
 }
-#include <QMatrix>
+
 QPointF rotateVector90Degrees(const QPointF &pt) {
     return QPointF(-pt.y(), pt.x()); // y is downwards
 }
-#include <QtMath>
+
 qreal degreesBetweenVectors(const QPointF &pt1,
                             const QPointF &pt2) {
     return radiansBetweenVectors(pt1, pt2)*180./M_PI;

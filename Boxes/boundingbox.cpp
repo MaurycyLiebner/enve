@@ -607,12 +607,12 @@ void BoundingBox::setAbsolutePos(const QPointF &pos,
                                  const bool &saveUndoRedo) {
     QMatrix combinedM = mParent->getCombinedTransform();
     QPointF newPos = combinedM.inverted().map(pos);
-    setRelativePos(newPos, saveUndoRedo );
+    setRelativePos(newPos, saveUndoRedo);
 }
 
 void BoundingBox::setRelativePos(const QPointF &relPos,
                                  const bool &saveUndoRedo) {
-    mTransformAnimator->setPosition(relPos.x(), relPos.y());
+    mTransformAnimator->setPosition(relPos.x(), relPos.y(), saveUndoRedo);
 }
 
 void BoundingBox::saveTransformPivotAbsPos(const QPointF &absPivot) {

@@ -35,11 +35,11 @@ void BoxTargetProperty::setParentBox(BoundingBox *box) {
     mParentBox = box;
 }
 
-void BoxTargetProperty::makeDuplicate(Property *property) {
-    ((BoxTargetProperty*)property)->setTarget(mTarget);
+void BoxTargetProperty::makeDuplicate(BoxTargetProperty *property) {
+    property->setTarget(mTarget);
 }
 
-Property *BoxTargetProperty::makeDuplicate() {
+BoxTargetProperty *BoxTargetProperty::makeDuplicate() {
     BoxTargetProperty *prop = new BoxTargetProperty();
     makeDuplicate(prop);
     return prop;

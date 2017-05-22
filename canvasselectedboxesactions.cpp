@@ -44,9 +44,9 @@ void Canvas::applyAlphaMatteToSelected() {
 }
 
 void Canvas::applyBrushEffectToSelected() {
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    //foreach(BoundingBox *box, mSelectedBoxes) {
         //box->addEffect(new BrushEffect());
-    }
+    //}
 }
 
 void Canvas::applyLinesEffectToSelected() {

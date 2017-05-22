@@ -5,88 +5,88 @@
 #include "Animators/singlepathanimator.h"
 
 #include "Colors/helpers.h"
-bool getRotationScaleFromMatrixIfNoShear(const QMatrix &matrix,
-                                         qreal *rot,
-                                         qreal *sx, qreal *sy) {
-    qreal m11 = matrix.m11();
-    qreal m12 = matrix.m12();
-    qreal m21 = matrix.m21();
-    qreal m22 = matrix.m22();
+//bool getRotationScaleFromMatrixIfNoShear(const QMatrix &matrix,
+//                                         qreal *rot,
+//                                         qreal *sx, qreal *sy) {
+//    qreal m11 = matrix.m11();
+//    qreal m12 = matrix.m12();
+//    qreal m21 = matrix.m21();
+//    qreal m22 = matrix.m22();
 
-    bool scalesDifferentSign = (isZero(m11) || isZero(m22)) ?
-                                m12*m21 > 0. : m11*m22 < 0.;
-    bool cosSinDifferentSign = (isZero(m11) || isZero(m12)) ?
-                                (m21*m22 > 0.) != scalesDifferentSign :
-                                (m11*m12 < 0.) != scalesDifferentSign;
-    qreal sxAbs = qSqrt(m11*m11 + m21*m21);
-    qreal syAbs = qSqrt(m12*m12 + m22*m22);
-    qreal rotT = 0.;
-    qreal sxT = 1.;
-    qreal syT = 1.;
-    for(int i = 0; i < 2; i++) {
-        sxT = (i == 0) ? -sxAbs : sxAbs;
-        syT = (i == 0) ?
-                     ((scalesDifferentSign) ? syAbs : -syAbs) :
-                     ((scalesDifferentSign) ? -syAbs : syAbs);
+//    bool scalesDifferentSign = (isZero(m11) || isZero(m22)) ?
+//                                m12*m21 > 0. : m11*m22 < 0.;
+//    bool cosSinDifferentSign = (isZero(m11) || isZero(m12)) ?
+//                                (m21*m22 > 0.) != scalesDifferentSign :
+//                                (m11*m12 < 0.) != scalesDifferentSign;
+//    qreal sxAbs = qSqrt(m11*m11 + m21*m21);
+//    qreal syAbs = qSqrt(m12*m12 + m22*m22);
+//    qreal rotT = 0.;
+//    qreal sxT = 1.;
+//    qreal syT = 1.;
+//    for(int i = 0; i < 2; i++) {
+//        sxT = (i == 0) ? -sxAbs : sxAbs;
+//        syT = (i == 0) ?
+//                     ((scalesDifferentSign) ? syAbs : -syAbs) :
+//                     ((scalesDifferentSign) ? -syAbs : syAbs);
 
-        qreal rotM11T = m11/sxT;
-        qreal rotM12T = m12/syT;
-        qreal rotM21T = m21/sxT;
-        qreal rotM22T = m22/syT;
+//        qreal rotM11T = m11/sxT;
+//        qreal rotM12T = m12/syT;
+//        qreal rotM21T = m21/sxT;
+//        qreal rotM22T = m22/syT;
 
-        if(!isZero2Dec(rotM11T - rotM22T) ||
-           !isZero2Dec(rotM12T + rotM21T)) {
-            return false;
-        }
+//        if(!isZero2Dec(rotM11T - rotM22T) ||
+//           !isZero2Dec(rotM12T + rotM21T)) {
+//            return false;
+//        }
 
-        QPointF rotatedPoint = QMatrix(rotM11T, rotM12T,
-                                       rotM21T, rotM22T,
-                                       0., 0.).map(QPointF(1., 0.));
-        rotT = qAtan2(rotatedPoint.y(), rotatedPoint.x());
-        if(rotT > 2*PI) rotT -= 2*PI;
-        if(cosSinDifferentSign) {
-            if((0.5*PI <= rotT && rotT <= PI) ||
-               (1.5*PI <= rotT && rotT <= 2.*PI)) {
-                break;
-            }
-        } else {
-            if((0. <= rotT && rotT <= 0.5*PI) ||
-               (PI <= rotT && rotT <= 1.5*PI)) {
-                break;
-            }
-        }
-    }
+//        QPointF rotatedPoint = QMatrix(rotM11T, rotM12T,
+//                                       rotM21T, rotM22T,
+//                                       0., 0.).map(QPointF(1., 0.));
+//        rotT = qAtan2(rotatedPoint.y(), rotatedPoint.x());
+//        if(rotT > 2*PI) rotT -= 2*PI;
+//        if(cosSinDifferentSign) {
+//            if((0.5*PI <= rotT && rotT <= PI) ||
+//               (1.5*PI <= rotT && rotT <= 2.*PI)) {
+//                break;
+//            }
+//        } else {
+//            if((0. <= rotT && rotT <= 0.5*PI) ||
+//               (PI <= rotT && rotT <= 1.5*PI)) {
+//                break;
+//            }
+//        }
+//    }
 
-    *sx = sxT;
-    *sy = syT;
-    *rot = rotT*180./PI;
+//    *sx = sxT;
+//    *sy = syT;
+//    *rot = rotT*180./PI;
 
-    return true;
-}
+//    return true;
+//}
 
-bool getTranslationShearRotationScaleFromMatrix(const QMatrix &matrix,
-                                                qreal *tx, qreal *ty,
-                                                qreal *lx, qreal *ly,
-                                                qreal *rot,
-                                                qreal *sx, qreal *sy) {
-    if(getRotationScaleFromMatrixIfNoShear(matrix,
-                                           rot,
-                                           sx, sy) ) {
-        *lx = 0.;
-        *ly = 0.;
-        *tx = matrix.dx();
-        *ty = matrix.dy();
+//bool getTranslationShearRotationScaleFromMatrix(const QMatrix &matrix,
+//                                                qreal *tx, qreal *ty,
+//                                                qreal *lx, qreal *ly,
+//                                                qreal *rot,
+//                                                qreal *sx, qreal *sy) {
+//    if(getRotationScaleFromMatrixIfNoShear(matrix,
+//                                           rot,
+//                                           sx, sy) ) {
+//        *lx = 0.;
+//        *ly = 0.;
+//        *tx = matrix.dx();
+//        *ty = matrix.dy();
 
-        return true;
-    } else {
-        qreal m11 = matrix.m11();
-        qreal m12 = matrix.m12();
-        qreal m21 = matrix.m21();
-        qreal m22 = matrix.m22();
+//        return true;
+//    } else {
+//        qreal m11 = matrix.m11();
+//        qreal m12 = matrix.m12();
+//        qreal m21 = matrix.m21();
+//        qreal m22 = matrix.m22();
 
-        return false;
-    }
-}
+//        return false;
+//    }
+//}
 
 struct SvgAttribute {
     SvgAttribute(const QString &nameValueStr) {

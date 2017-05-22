@@ -1,11 +1,13 @@
 #include "memoryhandler.h"
 #include "Boxes/boundingboxrendercontainer.h"
 #include <gperftools/malloc_extension.h>
+#include <malloc.h>
 
 MemoryHandler *MemoryHandler::mInstance;
 
 MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
     mInstance = this;
+
     mMemoryChekerThread = new QThread(this);
     mMemoryChecker = new MemoryChecker();
     mMemoryChecker->moveToThread(mMemoryChekerThread);
@@ -51,5 +53,7 @@ void MemoryHandler::freeMemory(const unsigned long long &bytes) {
         emit allMemoryUsed();
     }
     emit memoryFreed();
-    MallocExtension::instance()->ReleaseFreeMemory();
+
+    //MallocExtension::instance()->ReleaseToSystem(bytes - memToFree);
+//    MallocExtension::instance()->ReleaseFreeMemory();
 }

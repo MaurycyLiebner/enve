@@ -20,8 +20,6 @@ public:
 
     virtual KeyCloner *createNewKeyCloner() { return NULL; }
 
-    virtual Key *makeKeyDuplicate(Animator *targetParent) {}
-
     virtual void startFrameTransform();
     virtual void finishFrameTransform();
 

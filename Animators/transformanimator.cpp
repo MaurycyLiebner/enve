@@ -46,8 +46,9 @@ void BasicTransformAnimator::setScale(const qreal &sx, const qreal &sy) {
     mScaleAnimator->setCurrentPointValue(QPointF(sx, sy) );
 }
 
-void BasicTransformAnimator::setPosition(const qreal &x, const qreal &y) {
-    mPosAnimator->setCurrentPointValue(QPointF(x, y) );
+void BasicTransformAnimator::setPosition(const qreal &x, const qreal &y,
+                                         const bool &saveUndoRedo) {
+    mPosAnimator->setCurrentPointValue(QPointF(x, y), saveUndoRedo);
 }
 
 void BasicTransformAnimator::setRotation(const qreal &rot) {

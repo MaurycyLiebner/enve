@@ -14,7 +14,8 @@ public:
     virtual void reset(const bool &finish = false);
 
     void setScale(const qreal &sx, const qreal &sy);
-    void setPosition(const qreal &x, const qreal &y);
+    void setPosition(const qreal &x, const qreal &y,
+                     const bool &saveUndoRedo);
     void setRotation(const qreal &rot);
 
     void startRotTransform();

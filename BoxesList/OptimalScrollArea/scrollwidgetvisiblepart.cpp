@@ -150,7 +150,7 @@ void ScrollWidgetVisiblePart::updateParentHeightIfNeeded() {
 }
 
 void ScrollWidgetVisiblePart::updateVisibleWidgets() {
-    int neededWidgets = ceil(mVisibleHeight/20.);
+    int neededWidgets = qCeil(mVisibleHeight/20.);
     int currentNWidgets = mSingleWidgets.count();
 
     if(neededWidgets == currentNWidgets) return;

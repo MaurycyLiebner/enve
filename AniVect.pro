@@ -137,7 +137,8 @@ SOURCES += main.cpp\
     Gradients/gradientslistwidget.cpp \
     Gradients/displayedgradientswidget.cpp \
     Gradients/currentgradientwidget.cpp \
-    filesourcescache.cpp
+    filesourcescache.cpp \
+    Boxes/draftcanvas.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -253,7 +254,8 @@ HEADERS  += mainwindow.h \
     Gradients/gradientslistwidget.h \
     Gradients/displayedgradientswidget.h \
     Gradients/currentgradientwidget.h \
-    filesourcescache.h
+    filesourcescache.h \
+    Boxes/draftcanvas.h
 
 RESOURCES += \
     resources.qrc

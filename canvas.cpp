@@ -466,7 +466,7 @@ void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 
 #include "Boxes/videobox.h"
 void Canvas::createVideoForPath(const QString &path) {
-    VideoBox *vidBox = new VideoBox(path,
+    /*VideoBox *vidBox = */new VideoBox(path,
                                     mCurrentBoxesGroup);
 }
 

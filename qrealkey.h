@@ -26,7 +26,6 @@ public:
     virtual ~QrealKey();
 
 
-    Key *makeKeyDuplicate(Animator *animator);
     QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     void updateCtrlFromCtrl(const QrealPointType &type);

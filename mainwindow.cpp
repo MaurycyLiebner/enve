@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     av_register_all();
-    QFile file("/home/ailuropoda/.Qt_pro/AniVect/stylesheet.qss");
+    QFile file("/home/ailuropoda/Dev/AniVect/stylesheet.qss");
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setStyleSheet(file.readAll());
         file.close();

@@ -78,22 +78,6 @@ public:
     bool isOfPathPoint(PathPoint *checkPoint) {
         return mParentPathPoint == checkPoint;
     }
-
-    int prp_saveToSql(QSqlQuery *, const int &parentId) {
-
-    }
-
-    void prp_loadFromSql(const int &identifyingId) {
-
-    }
-
-    void makeDuplicate(Property *) {
-
-    }
-
-    Property *makeDuplicate() {
-
-    }
 private:
     PathPoint *mParentPathPoint;
     QPointFAnimator *mEndPosAnimator;
