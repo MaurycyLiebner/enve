@@ -4,6 +4,7 @@
 #include "singlewidget.h"
 #include "scrollwidget.h"
 #include "singlewidgettarget.h"
+#include "mainwindow.h"
 
 QList<ScrollWidgetVisiblePart*> ScrollWidgetVisiblePart::mAllInstances;
 
@@ -150,7 +151,8 @@ void ScrollWidgetVisiblePart::updateParentHeightIfNeeded() {
 }
 
 void ScrollWidgetVisiblePart::updateVisibleWidgets() {
-    int neededWidgets = qCeil(mVisibleHeight/20.);
+    int neededWidgets = qCeil(mVisibleHeight/
+                              (qreal)MIN_WIDGET_HEIGHT);
     int currentNWidgets = mSingleWidgets.count();
 
     if(neededWidgets == currentNWidgets) return;
@@ -169,7 +171,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgets() {
     foreach(SingleWidget *widget, mSingleWidgets) {
         widget->move(widget->x(), yT);
         widget->setFixedWidth(width() - widget->x());
-        yT += 20;
+        yT += MIN_WIDGET_HEIGHT;
     }
 
     updateVisibleWidgetsContent();
@@ -186,11 +188,11 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 //        currY = -10;
 //    } else {
         currX = 0;
-        currY = 10;
+        currY = MIN_WIDGET_HEIGHT/2;
 //    }
     mMainAbstraction->setSingleWidgetAbstractions(
                 mVisibleTop,
-                mVisibleTop + mVisibleHeight + 10,
+                mVisibleTop + mVisibleHeight + currY,
                 &currY, currX,
                 &mSingleWidgets,
                 &idP,

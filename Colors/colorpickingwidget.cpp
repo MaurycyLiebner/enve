@@ -40,7 +40,10 @@ void ColorPickingWidget::paintEvent(QPaintEvent *)
     QPainter p(this);
     p.fillRect(cursor_x + 16, cursor_y + 16, 28, 28, Qt::black);
     p.fillRect(cursor_x + 18, cursor_y + 18, 24, 24, Qt::white);
-    p.fillRect(cursor_x + 20, cursor_y + 20, 20, 20, current_color);
+    p.fillRect(cursor_x + MIN_WIDGET_HEIGHT,
+               cursor_y + MIN_WIDGET_HEIGHT,
+               MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT,
+               current_color);
     p.end();
 }
 

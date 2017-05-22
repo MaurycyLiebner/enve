@@ -1,10 +1,11 @@
 #include "boxeslistactionbutton.h"
 #include <QPainter>
+#include "global.h"
 
 BoxesListActionButton::BoxesListActionButton(
         QWidget *parent) :
     QWidget(parent) {
-    setFixedSize(20, 20);
+    setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
 }
 
 void BoxesListActionButton::mousePressEvent(QMouseEvent *) {

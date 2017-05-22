@@ -3,6 +3,7 @@
 #include "key.h"
 #include "Animators/complexanimator.h"
 #include "durationrectangle.h"
+#include "global.h"
 
 void CacheHandler::removeRenderContainer(CacheContainer *cont) {
     mRenderContainers.removeOne(cont);
@@ -175,7 +176,7 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
             widthT += xT - lastDrawX;
             xT = lastDrawX;
         }
-        p->drawRect(xT, drawY, widthT, 20);
+        p->drawRect(xT, drawY, widthT, MIN_WIDGET_HEIGHT);
         lastDrawnFrame = maxFrame;
         lastDrawX = xT + widthT;
     }

@@ -1,6 +1,7 @@
 #include "glwidget.h"
 #include "Colors/helpers.h"
 #include "fillstrokesettings.h"
+#include "global.h"
 
 GLfloat AA_VECT_LEN = 1.5f;
 GLfloat AA_SHARP_VECT_LEN = AA_VECT_LEN*2.f;
@@ -8,7 +9,7 @@ GLfloat AA_SHARP_VECT_LEN = AA_VECT_LEN*2.f;
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    setMinimumSize(20, 20);
+    setMinimumSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
     bgColor = Color(60, 60, 60);
 }
 

@@ -1,11 +1,11 @@
 #include "renderinstancewidget.h"
+#include "global.h"
 
 RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     QWidget(parent) {
-    setStyleSheet("QWidget { background: rgb(45, 45, 45);"
-                            "padding-left: 10px;"
-                          "}");
+    setStyleSheet("QWidget { background: rgb(45, 45, 45); }");
     mMainLayout = new QVBoxLayout(this);
+    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
     mMainLayout->setMargin(0);
     setLayout(mMainLayout);
 
@@ -13,15 +13,15 @@ RenderInstanceWidget::RenderInstanceWidget(QWidget *parent) :
     mTitleLayout->setMargin(0);
 
     mNameLabel = new QLabel(this);
-    mNameLabel->setFixedHeight(BOX_HEIGHT);
+    mNameLabel->setFixedHeight(MIN_WIDGET_HEIGHT);
     mContentArrow = new QPushButton(QIcon(":/icons/list_show_children.png"),
                                     "",
                                     this);
     mContentArrow->setCheckable(true);
     mContentArrow->setStyleSheet("background: transparent;"
                                  "border: 0;");
-    mContentArrow->setIconSize(QSize(BOX_HEIGHT, BOX_HEIGHT));
-    mContentArrow->setFixedSize(BOX_HEIGHT, BOX_HEIGHT);
+    mContentArrow->setIconSize(QSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT));
+    mContentArrow->setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
     connect(mContentArrow, SIGNAL(toggled(bool)),
             this, SLOT(setContentVisible(bool)));
 

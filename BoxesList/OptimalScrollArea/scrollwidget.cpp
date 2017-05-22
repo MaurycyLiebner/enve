@@ -4,6 +4,7 @@
 #include "singlewidgetabstraction.h"
 #include "singlewidgettarget.h"
 #include "scrollarea.h"
+#include "global.h"
 
 ScrollWidget::ScrollWidget(ScrollArea *parent) :
     QWidget(parent) {
@@ -40,13 +41,14 @@ void ScrollWidget::setWidth(const int &width) {
 }
 
 void ScrollWidget::changeVisibleTop(const int &top) {
-    int newTop = top - top % 20;
+    int newTop = top - top % MIN_WIDGET_HEIGHT;
     mVisiblePartWidget->move(0, newTop);
     mVisiblePartWidget->setVisibleTop(newTop);
 }
 #include <QtMath>
 void ScrollWidget::changeVisibleHeight(const int &height) {
-    int newHeight = qCeil(height/20.)*20.;
+    int newHeight = qCeil(height/(qreal)MIN_WIDGET_HEIGHT)*
+                    MIN_WIDGET_HEIGHT;
     mVisiblePartWidget->setFixedHeight(newHeight);
     mVisiblePartWidget->setVisibleHeight(newHeight);
 }
@@ -68,6 +70,6 @@ void ScrollWidget::updateHeight() {
     setFixedHeight(mMainAbstraction->getHeight(
                        mVisiblePartWidget->getCurrentRulesCollection(),
                        false,
-                       false) + 10);
+                       false) + MIN_WIDGET_HEIGHT/2);
     if(isHidden()) show();
 }

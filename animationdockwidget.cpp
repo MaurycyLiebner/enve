@@ -1,6 +1,6 @@
 #include "animationdockwidget.h"
 #include <QStyleOption>
-#include "mainwindow.h"
+#include "global.h"
 #include "keysview.h"
 
 AnimationDockWidget::AnimationDockWidget(QWidget *parent,

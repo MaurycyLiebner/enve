@@ -297,7 +297,9 @@ void Canvas::paintEvent(QPainter *p) {
         p->resetTransform();
 
         if(mInputTransformationEnabled) {
-            QRect inputRect = QRect(40, mCanvasWidget->height() - 20, 100, 20);
+            QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
+                                    mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
+                                    5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
             p->fillRect(inputRect, QColor(225, 225, 225));
             QString text;
             if(mXOnlyTransform) {
@@ -839,8 +841,8 @@ void Canvas::resetTransormation() {
 
 void Canvas::fitCanvasToSize() {
     mCanvasTransformMatrix.reset();
-    mVisibleHeight = mHeight + 20;
-    mVisibleWidth = mWidth + 20;
+    mVisibleHeight = mHeight + MIN_WIDGET_HEIGHT;
+    mVisibleWidth = mWidth + MIN_WIDGET_HEIGHT;
     qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
     qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
     zoomCanvas(qMin(heightScale, widthScale), QPointF(0., 0.));

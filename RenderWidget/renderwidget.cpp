@@ -1,5 +1,6 @@
 #include "renderwidget.h"
 #include "canvas.h"
+#include "global.h"
 
 RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mMainLayout = new QVBoxLayout(this);
@@ -14,8 +15,8 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mMainLayout->addWidget(mRenderProgressBar);
 
     mButtonsLayout = new QHBoxLayout();
-    mButtonsLayout->setMargin(10);
-    mButtonsLayout->addSpacing(10);
+    mButtonsLayout->setMargin(MIN_WIDGET_HEIGHT/2);
+    mButtonsLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
     mCurrentRenderLabel = new QLabel("Current Render", this);
     mCurrentRenderLabel->setStyleSheet("background: rgb(30, 30, 30);"
                                        "font-weight: bold;"
@@ -33,7 +34,7 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mStopRenderButton = new QPushButton("Stop", this);
     mStopRenderButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     mButtonsLayout->addWidget(mStopRenderButton, Qt::AlignRight);
-    mButtonsLayout->addSpacing(10);
+    mButtonsLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
 
     mMainLayout->addLayout(mButtonsLayout);
 

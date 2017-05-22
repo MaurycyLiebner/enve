@@ -18,7 +18,13 @@ QPixmap *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN;
 QPixmap *BoxSingleWidget::ANIMATOR_RECORDING;
 QPixmap *BoxSingleWidget::ANIMATOR_NOT_RECORDING;
 bool BoxSingleWidget::mStaticPixmapsLoaded = false;
+
+#include "global.h"
 #include "mainwindow.h"
+#include <QInputDialog>
+#include <QMenu>
+#include "clipboardcontainer.h"
+#include "durationrectangle.h"
 
 BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     SingleWidget(parent) {
@@ -108,7 +114,7 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mCheckBox = new BoolPropertyWidget(this);
     mMainLayout->addWidget(mCheckBox);
 
-    mMainLayout->addSpacing(10);
+    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
 
     hide();
 }
@@ -282,11 +288,6 @@ void BoxSingleWidget::loadStaticPixmaps() {
     mStaticPixmapsLoaded = true;
 }
 
-#include <QInputDialog>
-#include <QMenu>
-#include "mainwindow.h"
-#include "clipboardcontainer.h"
-#include "durationrectangle.h"
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     SingleWidgetTarget *target = mTarget->getTarget();
     if(event->button() == Qt::RightButton) {
@@ -368,7 +369,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
-    if(pointToLen(event->pos() - mDragStartPos) > 10.) return;
+    if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_HEIGHT/2) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isBoundingBox()) {
         BoundingBox *bb_target = (BoundingBox*)target;
@@ -475,6 +476,16 @@ void BoxSingleWidget::getKeysInRect(const QRectF &selectionRect,
     }
 }
 
+void drawPixmapCentered(QPainter *p,
+                        const QRect &boundingRect,
+                        const QPixmap &pixmap) {
+    int widthDiff = boundingRect.width() - pixmap.width();
+    int heightDiff = boundingRect.height() - pixmap.height();
+    int x = widthDiff/2 + boundingRect.x();
+    int y = heightDiff/2 + boundingRect.y();
+    p->drawPixmap(x, y, pixmap);
+}
+
 #include "keysview.h"
 void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(mTarget == NULL) return;
@@ -486,37 +497,37 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     if(target->SWT_isBoundingBox()) {
         BoundingBox *bb_target = (BoundingBox*)target;
 
-        nameX += 5;
+        nameX += MIN_WIDGET_HEIGHT/4;
         name = bb_target->getName();
 
         p.fillRect(rect(), QColor(0, 0, 0, 50));
 
         if(mTarget->contentVisible()) {
-            p.drawPixmap(mContentButton->x(), 0,
-                         *BoxSingleWidget::HIDE_CHILDREN);
+            drawPixmapCentered(&p, mContentButton->geometry(),
+                               *BoxSingleWidget::HIDE_CHILDREN);
         } else {
-            p.drawPixmap(mContentButton->x(), 0,
-                         *BoxSingleWidget::SHOW_CHILDREN);
+            drawPixmapCentered(&p, mContentButton->geometry(),
+                               *BoxSingleWidget::SHOW_CHILDREN);
         }
 
         if(bb_target->isVisible()) {
-            p.drawPixmap(mVisibleButton->x(), 0,
-                         *BoxSingleWidget::VISIBLE_PIXMAP);
+            drawPixmapCentered(&p, mVisibleButton->geometry(),
+                               *BoxSingleWidget::VISIBLE_PIXMAP);
         } else {
-            p.drawPixmap(mVisibleButton->x(), 0,
-                         *BoxSingleWidget::INVISIBLE_PIXMAP);
+            drawPixmapCentered(&p, mVisibleButton->geometry(),
+                               *BoxSingleWidget::INVISIBLE_PIXMAP);
         }
 
         if(bb_target->isLocked()) {
-            p.drawPixmap(mLockedButton->x(), 0,
-                         *BoxSingleWidget::LOCKED_PIXMAP);
+            drawPixmapCentered(&p, mLockedButton->geometry(),
+                               *BoxSingleWidget::LOCKED_PIXMAP);
         } else {
-            p.drawPixmap(mLockedButton->x(), 0,
-                         *BoxSingleWidget::UNLOCKED_PIXMAP);
+            drawPixmapCentered(&p, mLockedButton->geometry(),
+                               *BoxSingleWidget::UNLOCKED_PIXMAP);
         }
 
         if(bb_target->isSelected()) {
-            p.fillRect(QRect(mFillWidget->pos(), mFillWidget->size()),
+            p.fillRect(mFillWidget->geometry(),
                        QColor(180, 180, 180));
             p.setPen(Qt::black);
         } else {
@@ -529,18 +540,18 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
     } */else if(target->SWT_isQrealAnimator()) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
         if(qa_target->isCurrentAnimator(mParent)) {
-            p.fillRect(nameX + BOX_HEIGHT/4, BOX_HEIGHT/4,
-                       BOX_HEIGHT/2, BOX_HEIGHT/2,
+            p.fillRect(nameX + MIN_WIDGET_HEIGHT/4, MIN_WIDGET_HEIGHT/4,
+                       MIN_WIDGET_HEIGHT/2, MIN_WIDGET_HEIGHT/2,
                        qa_target->getAnimatorColor(mParent));
         }
         name = qa_target->prp_getName();
-        nameX += 20;
+        nameX += MIN_WIDGET_HEIGHT;
         if(qa_target->prp_isRecording()) {
-            p.drawPixmap(mRecordButton->x(), 0,
-                         *BoxSingleWidget::ANIMATOR_RECORDING);
+            drawPixmapCentered(&p, mRecordButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {
-            p.drawPixmap(mRecordButton->x(), 0,
-                         *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
+            drawPixmapCentered(&p, mRecordButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
         }
 
         p.setPen(Qt::white);
@@ -549,29 +560,30 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
         name = ca_target->prp_getName();
 
         if(ca_target->prp_isRecording()) {
-            p.drawPixmap(mRecordButton->x(), 0,
-                         *BoxSingleWidget::ANIMATOR_RECORDING);
+            drawPixmapCentered(&p, mRecordButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_RECORDING);
         } else {
-            p.drawPixmap(mRecordButton->x(), 0,
-                         *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
+            drawPixmapCentered(&p, mRecordButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
             if(ca_target->prp_isDescendantRecording()) {
                 p.save();
                 p.setRenderHint(QPainter::Antialiasing);
                 p.setBrush(Qt::red);
                 p.setPen(Qt::NoPen);
-                p.drawEllipse(QPointF(10,
-                                      10),
-                               2.5, 2.5);
+                p.drawEllipse(QPointF(MIN_WIDGET_HEIGHT/2,
+                                      MIN_WIDGET_HEIGHT/2),
+                              0.125*MIN_WIDGET_HEIGHT,
+                              0.125*MIN_WIDGET_HEIGHT);
                 p.restore();
             }
         }
 
         if(mTarget->contentVisible()) {
-            p.drawPixmap(mContentButton->x(), 0,
-                         *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
+            drawPixmapCentered(&p, mContentButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_CHILDREN_VISIBLE);
         } else {
-            p.drawPixmap(mContentButton->x(), 0,
-                         *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
+            drawPixmapCentered(&p, mContentButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_CHILDREN_HIDDEN);
         }
         p.setPen(Qt::white);
 
@@ -579,19 +591,19 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             ColorAnimator *col_target = (ColorAnimator*)ca_target;
             p.setBrush(col_target->getCurrentColor().qcol);
             p.drawRect(mColorButton->x(), 3,
-                       BOX_HEIGHT, BOX_HEIGHT - 6);
+                       MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT - 6);
         }
     } else if(target->SWT_isBoxTargetProperty()) {
-        nameX += 40;
+        nameX += 2*MIN_WIDGET_HEIGHT;
         name = ((BoxTargetProperty*)target)->prp_getName();
     } else if(target->SWT_isBoolProperty()) {
-        nameX += 40;
+        nameX += 2*MIN_WIDGET_HEIGHT;
         name = ((BoolProperty*)target)->prp_getName();
     }
     p.drawText(QRect(nameX, 0,
                      width() - nameX -
-                     BOX_HEIGHT,
-                     BOX_HEIGHT),
+                     MIN_WIDGET_HEIGHT,
+                     MIN_WIDGET_HEIGHT),
                name, QTextOption(Qt::AlignVCenter));
 
     p.end();

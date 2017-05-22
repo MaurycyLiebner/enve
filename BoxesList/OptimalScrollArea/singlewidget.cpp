@@ -1,11 +1,12 @@
 #include "singlewidget.h"
 #include "singlewidgetabstraction.h"
 #include "scrollwidgetvisiblepart.h"
+#include "global.h"
 
 SingleWidget::SingleWidget(ScrollWidgetVisiblePart *parent) :
     QWidget(parent) {
     mParent = parent;
-    setFixedHeight(20);
+    setFixedHeight(MIN_WIDGET_HEIGHT);
 }
 
 void SingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {

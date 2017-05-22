@@ -1,6 +1,6 @@
 #include "colorwidget.h"
 #include "Colors/helpers.h"
-#include "mainwindow.h"
+#include "global.h"
 
 bool shouldValPointerBeLightHSV(GLfloat hue, GLfloat saturation, GLfloat value)
 {

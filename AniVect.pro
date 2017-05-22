@@ -255,7 +255,8 @@ HEADERS  += mainwindow.h \
     Gradients/displayedgradientswidget.h \
     Gradients/currentgradientwidget.h \
     filesourcescache.h \
-    Boxes/draftcanvas.h
+    Boxes/draftcanvas.h \
+    global.h
 
 RESOURCES += \
     resources.qrc

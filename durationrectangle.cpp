@@ -1,6 +1,7 @@
 #include "durationrectangle.h"
 #include "Properties/property.h"
 #include "Boxes/rendercachehandler.h"
+#include "global.h"
 
 DurationRectangleMovable::DurationRectangleMovable() : QObject() {
 
@@ -144,7 +145,7 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
         fillColor = QColor(0, 0, 255, 120);
     }
     drawRect = QRect(xT, drawY,
-                     widthT, BOX_HEIGHT);
+                     widthT, MIN_WIDGET_HEIGHT);
 
     p->fillRect(drawRect.adjusted(0, 1, 0, -1), fillColor);
 
@@ -153,14 +154,14 @@ void DurationRectangle::draw(QPainter *p, const qreal &pixelsPerFrame,
     } else {
         p->setPen(QPen(Qt::black));
     }
-    p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + BOX_HEIGHT));
+    p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + MIN_WIDGET_HEIGHT));
     xT += widthT;
     if(mMaxFrame.isHovered()) {
         p->setPen(QPen(Qt::white));
     } else {
         p->setPen(QPen(Qt::black));
     }
-    p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + BOX_HEIGHT));
+    p->drawLine(QPoint(xT, drawY), QPoint(xT, drawY + MIN_WIDGET_HEIGHT));
 //    p->setPen(Qt::black);
 //    p->setBrush(Qt::NoBrush);
     //p->drawRect(drawRect);
@@ -227,7 +228,7 @@ void AnimationRect::draw(
     int widthT = getAnimationFrameDuration()*pixelsPerFrame - pixelsPerFrame;
     QRect drawRect = QRect(xT, drawY,
                            widthT,
-                           BOX_HEIGHT);
+                           MIN_WIDGET_HEIGHT);
     p->fillRect(drawRect.adjusted(0, 1, 0, -1), QColor(125, 125, 255, 180));
 
     DurationRectangle::draw(p, pixelsPerFrame,

@@ -1,6 +1,7 @@
 #include "animationwidgetscrollbar.h"
 #include <QMouseEvent>
 #include <QPainter>
+#include "global.h"
 
 int clampInt2(int val, int min, int max) {
     if(val > max) return max;
@@ -26,8 +27,8 @@ AnimationWidgetScrollBar::AnimationWidgetScrollBar(int minSpan, int maxSpan,
 }
 
 qreal AnimationWidgetScrollBar::posToFrame(int xPos) {
-    return (xPos - 10.)*(mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
-            ((qreal)width() - 40.) + mMinFrame;
+    return (xPos - MIN_WIDGET_HEIGHT/2)*(mMaxFrame - mMinFrame + (mRange ? 0 : 1) ) /
+            ((qreal)width() - 2*MIN_WIDGET_HEIGHT) + mMinFrame;
 }
 
 void AnimationWidgetScrollBar::setTopBorderVisible(const bool &bT) {
@@ -45,10 +46,10 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
 
     p.fillRect(rect(), QColor(60, 60, 60));
 
-    p.translate(10., 0.);
+    p.translate(MIN_WIDGET_HEIGHT/2, 0.);
     int dFrame = mMaxFrame - mMinFrame;
     if(!mRange) dFrame++;
-    qreal pixPerFrame = ((qreal)width() - 40.)/dFrame;
+    qreal pixPerFrame = ((qreal)width() - 2*MIN_WIDGET_HEIGHT)/dFrame;
 
     QColor col = mHandleColor;
     if(mPressed) {
@@ -60,8 +61,12 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
     p.fillRect(QRectF((mFirstViewedFrame - mMinFrame)*pixPerFrame, 0,
                mFramesSpan*pixPerFrame, height()), col);
 
-    p.fillRect(-10, 0, 10, height(), QColor(30, 30, 30));
-    p.fillRect(width() - 40, 0, 30, height(), QColor(30, 30, 30));
+    p.fillRect(-MIN_WIDGET_HEIGHT/2, 0,
+               MIN_WIDGET_HEIGHT/2, height(),
+               QColor(30, 30, 30));
+    p.fillRect(width() - 2*MIN_WIDGET_HEIGHT, 0,
+               2*MIN_WIDGET_HEIGHT - MIN_WIDGET_HEIGHT/2, height(),
+               QColor(30, 30, 30));
 
     if(mCacheHandler != NULL) {
         mCacheHandler->drawCacheOnTimeline(&p, pixPerFrame, 0.,
@@ -98,7 +103,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
     qreal qorterHeight = height()*0.25;
     qreal threeFourthsHeight = height()*0.75;
     qreal fullHeight = height();
-    qreal maxX = width() + 20;
+    qreal maxX = width() + MIN_WIDGET_HEIGHT;
     while(xL < maxX ) {
 //        p.drawLine(QPointF(xL, 0.), QPointF(xL, qorterHeight - 2 ));
         p.drawText(QRectF(xL - inc, qorterHeight, 2*inc, halfHeight),
@@ -114,7 +119,8 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
 
     p.setPen(QPen(Qt::white, 1.));
     if(!mRange) {
-        p.drawText(QRectF(10, 0, 100, fullHeight),
+        p.drawText(QRectF(MIN_WIDGET_HEIGHT/2, 0,
+                          5*MIN_WIDGET_HEIGHT, fullHeight),
                    Qt::AlignVCenter | Qt::AlignLeft,
                    QString::number(mFirstViewedFrame));
     }

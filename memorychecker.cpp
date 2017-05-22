@@ -7,16 +7,16 @@ MemoryChecker *MemoryChecker::mInstance;
 
 MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mInstance = this;
-    struct sysinfo info;
-    if(sysinfo(&info) == 0) {
-        mMemUnit = info.mem_unit;
-        mTotalRam = info.totalram*mMemUnit;
-        mFreeRam = info.freeram*info.mem_unit +
-                   //info.freeswap*info.mem_unit +
-                   info.bufferram*info.mem_unit;
-        mMinFreeRam = mTotalRam*20/100;
-    } else { // ??
-    }
+//    struct sysinfo info;
+//    if(sysinfo(&info) == 0) {
+//        mMemUnit = info.mem_unit;
+//        mTotalRam = info.totalram*mMemUnit;
+//        mFreeRam = info.freeram*info.mem_unit +
+//                   //info.freeswap*info.mem_unit +
+//                   info.bufferram*info.mem_unit;
+//        mMinFreeRam = mTotalRam*20/100;
+//    } else { // ??
+//    }
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()),
             this, SLOT(checkMemory()) );
@@ -32,7 +32,7 @@ unsigned long long getFreeRam() {
 
     QString allText = QString::fromUtf8(buffer);
     QString extract = allText.split(QRegExp("\n|\r\n|\r")).at(9);
-    extract = line.split('(').first();
+    extract = extract.split('(').first();
     extract = extract.split('+').last();
     extract = extract.trimmed();
     unmapped = extract.toULongLong();

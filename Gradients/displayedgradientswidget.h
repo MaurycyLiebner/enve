@@ -2,6 +2,7 @@
 #define DISPLACYEDGRADIENTSWIDGET_H
 
 #include "Colors/ColorWidgets/glwidget.h"
+#include "global.h"
 class Gradient;
 class GradientWidget;
 
@@ -26,7 +27,7 @@ protected:
     int mTopGradientId = 0;
     int mHoveredGradientId = 0;
 
-    int mScrollItemHeight = 20;
+    int mScrollItemHeight = MIN_WIDGET_HEIGHT;
     int mNumberVisibleGradients = 6;
 
     GradientWidget *mGradientWidget;

@@ -134,51 +134,17 @@ private:
 
 class EdgeInfluencePoints {
 public:
-    EdgeInfluencePoints(BonePoint *bonePoint) {
-        mBonePoint = bonePoint;
-    }
+    EdgeInfluencePoints(BonePoint *bonePoint);
 
-    void addInfluencePointAtAbsPos(const QPointF &absPos) {
-        qreal tAtPos;
-        QPointF nearestPoint;
-        mParentEdge->getNearestAbsPosAndT(absPos,
-                                          &nearestPoint,
-                                          &tAtPos);
-        if(pointToLen(nearestPoint - absPos) > 10.) return;
-        removeInfluencePointNearAbsPos(absPos);
-        addInfluencePoint(tAtPos );
-    }
+    void addInfluencePointAtAbsPos(const QPointF &absPos);
 
-    void addInfluencePoint(const qreal &t) {
-        mBoneInfluencePoints << BoneInfluencePoint(t);
-    }
+    void addInfluencePoint(const qreal &t);
 
-    void removeInfluencePointNearAbsPos(const QPointF &absPos) {
-        qreal leastDist = 10000.;
-        int bestId = -1;
-        for(int i = 0; i < mBoneInfluencePoints.count(); i++) {
-            const BoneInfluencePoint &boneInfPt = mBoneInfluencePoints.at(i);
-            qreal thisDist = pointToLen(
-                        absPos - mParentEdge->getAbsPosAtT(boneInfPt.getT()));
-            if(leastDist > thisDist) {
-                leastDist = thisDist;
-                bestId = i;
-            }
-        }
-        if(bestId == -1 || leastDist > 10.) return;
-        removeInfluencePoint(bestId);
-    }
+    void removeInfluencePointNearAbsPos(const QPointF &absPos);
 
-    void removeInfluencePoint(const int &id) {
-        mBoneInfluencePoints.removeAt(id);
-    }
+    void removeInfluencePoint(const int &id);
 
-    void updatePointsAbsPosition() {
-        for(int i = 0; i < mBoneInfluencePoints.count(); i++) {
-            mBoneInfluencePoints[i].setAbsPos(
-                    mParentEdge->getAbsPosAtT(mBoneInfluencePoints[i].getT()));
-        }
-    }
+    void updatePointsAbsPosition();
 
 private:
     VectorPathEdge *mParentEdge;

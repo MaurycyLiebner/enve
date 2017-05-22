@@ -12,6 +12,7 @@
 #include "keysview.h"
 #include "fontswidget.h"
 #include "actionbutton.h"
+#include "global.h"
 
 enum ClipboardContainerType : short;
 
@@ -171,6 +172,7 @@ private:
 
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
+    QDockWidget *mLeftDock;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
 
     QToolBar *mToolBar;

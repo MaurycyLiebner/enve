@@ -71,9 +71,11 @@ void KeysView::graphPaint(QPainter *p) {
     QLine *lines = new QLine[nLines];
     int currLine = 0;
     while(yL > 0) {
-        p->drawText(QRectF(-5, yL - incY, 40, 2*incY),
-                    Qt::AlignCenter, QString::number(currValue, 'f', mValuePrec));
-        lines[currLine] = QLine(40, yL, width(), yL);
+        p->drawText(QRectF(-MIN_WIDGET_HEIGHT/4, yL - incY,
+                           2*MIN_WIDGET_HEIGHT, 2*incY),
+                    Qt::AlignCenter,
+                    QString::number(currValue, 'f', mValuePrec));
+        lines[currLine] = QLine(2*MIN_WIDGET_HEIGHT, yL, width(), yL);
         currLine++;
         yL -= incY;
         currValue += mValueInc;
@@ -182,7 +184,8 @@ void KeysView::graphResizeEvent(QResizeEvent *) {
 }
 
 void KeysView::graphIncMinShownVal(const qreal &inc) {
-    graphSetMinShownVal(10.*inc/mPixelsPerValUnit + mMinShownVal);
+    graphSetMinShownVal((MIN_WIDGET_HEIGHT/2)*inc/mPixelsPerValUnit +
+                        mMinShownVal);
 }
 
 void KeysView::graphSetMinShownVal(const qreal &newMinShownVal) {

@@ -16,8 +16,6 @@ class BoundingBox;
 class DurationRectangleMovable;
 class Key;
 
-const int BOX_HEIGHT = 20;
-
 class BoxSingleWidget : public SingleWidget
 {
     Q_OBJECT

@@ -36,9 +36,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     processKeyEvent(event);
 }
 
+int FONT_HEIGHT;
+int MIN_WIDGET_HEIGHT;
+
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-{
+    : QMainWindow(parent) {
+    FONT_HEIGHT = QApplication::fontMetrics().height();
+    MIN_WIDGET_HEIGHT = FONT_HEIGHT*4/3;
     av_register_all();
     QFile file("/home/ailuropoda/Dev/AniVect/stylesheet.qss");
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -100,8 +104,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     showMaximized();
 
-    QDockWidget *effectsMenuWidget = new QDockWidget(this);
-    effectsMenuWidget->setMinimumWidth(200);
+    mLeftDock = new QDockWidget(this);
+    mLeftDock->setFeatures(mLeftDock->features().setFlag(
+                               QDockWidget::DockWidgetClosable, false));
+    mLeftDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
 
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(mObjectSettingsScrollArea);
@@ -120,10 +126,10 @@ MainWindow::MainWindow(QWidget *parent)
             mObjectSettingsWidget, SLOT(setWidth(int)));
 
     mObjectSettingsScrollArea->verticalScrollBar()->setSingleStep(
-                BOX_HEIGHT);
+                MIN_WIDGET_HEIGHT);
 
-    effectsMenuWidget->setWidget(mObjectSettingsScrollArea);
-    addDockWidget(Qt::LeftDockWidgetArea, effectsMenuWidget);
+    mLeftDock->setWidget(mObjectSettingsScrollArea);
+    addDockWidget(Qt::LeftDockWidgetArea, mLeftDock);
 
 //    mCanvasWidget->SWT_getAbstractionForWidget(
 //                mBoxListWidget->getVisiblePartWidget());

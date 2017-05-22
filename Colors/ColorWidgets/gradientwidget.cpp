@@ -14,12 +14,12 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
     mGradientsListWidget = new GradientsListWidget(this, this);
     mCurrentGradientWidget = new CurrentGradientWidget(this, this);
     mMainLayout->addWidget(mGradientsListWidget);
-    mMainLayout->addSpacing(10);
+    mMainLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
     mMainLayout->addWidget(mCurrentGradientWidget);
     setLayout(mMainLayout);
-    setFixedHeight((3 + mNumberVisibleGradients)*20 + 10);
+    setFixedHeight((3 + mNumberVisibleGradients + 0.5)*MIN_WIDGET_HEIGHT);
 
-    mScrollItemHeight = 20;
+    mScrollItemHeight = MIN_WIDGET_HEIGHT;
 
     mMainWindow = mainWindow;  
 

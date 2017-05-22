@@ -2,6 +2,7 @@
 #include "singlewidgettarget.h"
 #include "singlewidget.h"
 #include "scrollwidgetvisiblepart.h"
+#include "global.h"
 
 SingleWidgetAbstraction::SingleWidgetAbstraction(
         SingleWidgetTarget *target,
@@ -42,8 +43,8 @@ bool SingleWidgetAbstraction::getAbstractions(
         abstractions->append(this);
     }
     if(satisfiesRule && !mIsMainTarget) {
-        currX += 20;
-        *currY += 20;
+        currX += MIN_WIDGET_HEIGHT;
+        *currY += MIN_WIDGET_HEIGHT;
     }
     foreach(SingleWidgetAbstraction *abs, mChildren) {
         if(abs->getAbstractions(
@@ -84,8 +85,8 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         }
     }
     if(satisfiesRule && !mIsMainTarget) {
-        currX += 20;
-        *currY += 20;
+        currX += MIN_WIDGET_HEIGHT;
+        *currY += MIN_WIDGET_HEIGHT;
     }
     foreach(SingleWidgetAbstraction *abs, mChildren) {
         if(abs->setSingleWidgetAbstractions(
@@ -112,7 +113,7 @@ int SingleWidgetAbstraction::getHeight(
                                                       parentSatisfiesRule,
                                                       parentMainTarget);
     if(satisfiesRule && !mIsMainTarget) {
-        height += 20;
+        height += MIN_WIDGET_HEIGHT;
     }
     foreach(SingleWidgetAbstraction *abs, mChildren) {
         height += abs->getHeight(

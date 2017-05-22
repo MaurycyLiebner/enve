@@ -2,11 +2,12 @@
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
+#include "global.h"
 
 SavedColorButton::SavedColorButton(Color color_t, QWidget *parent) : QWidget(parent)
 {
     color = color_t;
-    setFixedSize(40, 40);
+    setFixedSize(2*MIN_WIDGET_HEIGHT, 2*MIN_WIDGET_HEIGHT);
 }
 
 void SavedColorButton::mousePressEvent(QMouseEvent *e)

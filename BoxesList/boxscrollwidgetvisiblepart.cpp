@@ -8,6 +8,7 @@
 #include "Boxes/boundingbox.h"
 #include "Boxes/boxesgroup.h"
 #include "mainwindow.h"
+#include "global.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
@@ -25,18 +26,18 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
 //    p.fillRect(rect(), Qt::red);
-    int currY = BOX_HEIGHT;
+    int currY = MIN_WIDGET_HEIGHT;
     p.setPen(QPen(QColor(40, 40, 40), 1.));
     while(currY < height()) {
         p.drawLine(0, currY, width(), currY);
 
-        currY += BOX_HEIGHT;
+        currY += MIN_WIDGET_HEIGHT;
     }
 
     if(mDragging) {
         p.setPen(QPen(Qt::white, 3.));
-        p.drawLine(0, mCurrentDragPosId*BOX_HEIGHT,
-                   width(), mCurrentDragPosId*BOX_HEIGHT);
+        p.drawLine(0, mCurrentDragPosId*MIN_WIDGET_HEIGHT,
+                   width(), mCurrentDragPosId*MIN_WIDGET_HEIGHT);
     }
 
     p.end();
@@ -60,9 +61,9 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
         const int &pressX, const int &pressY,
         const qreal &pixelsPerFrame,
         const int &minViewedFrame) {
-    int remaining = pressY % BOX_HEIGHT;
-    if(remaining < (BOX_HEIGHT - KEY_RECT_SIZE)/2 ||
-       remaining > (BOX_HEIGHT + KEY_RECT_SIZE)/2) return NULL;
+    int remaining = pressY % MIN_WIDGET_HEIGHT;
+    if(remaining < (MIN_WIDGET_HEIGHT - KEY_RECT_SIZE)/2 ||
+       remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return NULL;
     foreach(SingleWidget *container, mSingleWidgets) {
         int containerTop = container->y();
         int containerBottom = containerTop + container->height();
@@ -98,8 +99,8 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
 //                         0.5, (BOX_HEIGHT/* + KEY_RECT_SIZE*/)*0.5);
     selectionRect.adjust(0.5, 0., 0.5, 0.);
     int currY = 0;
-    mMainAbstraction->getAbstractions(selectionRect.top() - 10,
-                                      selectionRect.bottom() - 10,
+    mMainAbstraction->getAbstractions(selectionRect.top() - MIN_WIDGET_HEIGHT/2,
+                                      selectionRect.bottom() - MIN_WIDGET_HEIGHT/2,
                                       &currY, 0,
                                       &abstractions,
                                       mCurrentRulesCollection,
@@ -132,8 +133,9 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                 const SWT_TargetTypes &type,
                 const int &yPos,
                 bool *isBelow) {
-    int idAtYPos = yPos / 20;
-    int targetId = (yPos + 10) / 20;
+    int idAtYPos = yPos / MIN_WIDGET_HEIGHT;
+    int targetId = (yPos + MIN_WIDGET_HEIGHT/2) /
+                    MIN_WIDGET_HEIGHT;
     if(idAtYPos < mSingleWidgets.count() &&
        idAtYPos >= 0) {
         BoxSingleWidget *singleWidgetUnderMouse = (BoxSingleWidget*)
@@ -165,8 +167,9 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                 const SWT_TargetTypes &types,
                 const int &yPos,
                 bool *isBelow) {
-    int idAtYPos = yPos / 20;
-    int targetId = (yPos + 10) / 20;
+    int idAtYPos = yPos / MIN_WIDGET_HEIGHT;
+    int targetId = (yPos + MIN_WIDGET_HEIGHT/2)/
+                    MIN_WIDGET_HEIGHT;
     if(idAtYPos < mSingleWidgets.count() &&
        idAtYPos >= 0) {
         BoxSingleWidget *singleWidgetUnderMouse = (BoxSingleWidget*)
@@ -361,7 +364,7 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
                                                   mLastDragMoveY,
                                                   &below);
     if(singleWidgetUnderMouse != NULL) {
-        int currentDragPosId = singleWidgetUnderMouse->y()/20;
+        int currentDragPosId = singleWidgetUnderMouse->y()/MIN_WIDGET_HEIGHT;
         if(below) {
             currentDragPosId++;
         }
@@ -372,11 +375,11 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
 }
 
 void BoxScrollWidgetVisiblePart::scrollUp() {
-    mParentWidget->scrollParentAreaBy(-20);
+    mParentWidget->scrollParentAreaBy(-MIN_WIDGET_HEIGHT);
     updateDraggingHighlight();
 }
 
 void BoxScrollWidgetVisiblePart::scrollDown() {
-    mParentWidget->scrollParentAreaBy(20);
+    mParentWidget->scrollParentAreaBy(MIN_WIDGET_HEIGHT);
     updateDraggingHighlight();
 }

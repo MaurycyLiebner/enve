@@ -1,12 +1,13 @@
 #include "verticalwidgetsstack.h"
 #include <QResizeEvent>
 #include <QPainter>
+#include "global.h"
 
 BoxesListKeysViewWidgetResizer::BoxesListKeysViewWidgetResizer(
                                                 QWidget *parent) :
     QWidget(parent) {
-    setFixedHeight(10);
-    setFixedWidth(4000);
+    setFixedHeight(MIN_WIDGET_HEIGHT/2);
+    setFixedWidth(2*MIN_WIDGET_HEIGHT*100);
     setCursor(Qt::SplitVCursor);
     show();
 }
@@ -27,10 +28,10 @@ void BoxesListKeysViewWidgetResizer::displace(int totDy) {
     int dY = totDy;
     int newAboveHeight = mAboveWidget->height() + dY;
     int newBelowHeight = mBelowWidget->height() - dY;
-    if(newAboveHeight < 40) {
-        dY = 40 - mAboveWidget->height();
-    } else if(newBelowHeight < 40) {
-        dY = mBelowWidget->height() - 40;
+    if(newAboveHeight < 2*MIN_WIDGET_HEIGHT) {
+        dY = 2*MIN_WIDGET_HEIGHT - mAboveWidget->height();
+    } else if(newBelowHeight < 2*MIN_WIDGET_HEIGHT) {
+        dY = mBelowWidget->height() - 2*MIN_WIDGET_HEIGHT;
     }
     qDebug() << totDy << dY;
     if(totDy != dY) {
@@ -111,7 +112,7 @@ void VerticalWidgetsStack::updateSizesAndPositions() {
         QWidget *widget = mWidgets.at(i);
         widget->move(0, accumulated);
         int newWidgetHeight = mHeightPercent.at(i)*newHeight;
-        if(newWidgetHeight < 40) newWidgetHeight = 40;
+        if(newWidgetHeight < 2*MIN_WIDGET_HEIGHT) newWidgetHeight = 2*MIN_WIDGET_HEIGHT;
         widget->setFixedHeight(newWidgetHeight);
         widget->setFixedWidth(width());
         accumulated += newWidgetHeight;
@@ -168,13 +169,13 @@ void VerticalWidgetsStack::updatePercent() {
     qreal totHeight = 0.;
     foreach(QWidget *wid, mWidgets) {
         totHeight += wid->height();
-        if(wid->height() == 0) totHeight += 40;
+        if(wid->height() == 0) totHeight += 2*MIN_WIDGET_HEIGHT;
     }
 
     mHeightPercent.clear();
     for(int i = 0; i < mWidgets.count(); i++) {
         int widHeight = mWidgets.at(i)->height();
-        if(widHeight == 0) widHeight = 40;
+        if(widHeight == 0) widHeight = 2*MIN_WIDGET_HEIGHT;
         mHeightPercent << widHeight/(qreal)totHeight;
     }
 }
@@ -182,7 +183,7 @@ void VerticalWidgetsStack::updatePercent() {
 void VerticalWidgetsStack::appendWidget(QWidget *widget) {
     mWidgets.append(widget);
     widget->setParent(this);
-    widget->setFixedHeight(50);
+    widget->setFixedHeight(3*MIN_WIDGET_HEIGHT);
     updatePercent();
     updateResizers();
     updateSizesAndPositions();
@@ -192,7 +193,7 @@ void VerticalWidgetsStack::insertWidget(const int &id,
                                         QWidget *widget) {
     mWidgets.insert(id, widget);
     widget->setParent(this);
-    widget->setFixedHeight(50);
+    widget->setFixedHeight(3*MIN_WIDGET_HEIGHT);
     updatePercent();
     updateResizers();
     updateSizesAndPositions();

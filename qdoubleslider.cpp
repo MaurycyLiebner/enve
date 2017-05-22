@@ -13,7 +13,7 @@ QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
     mMinValue = minVal;
     mMaxValue = maxVal;
     mPrefferedValueStep = prefferedStep;
-    setFixedHeight(20);
+    setFixedHeight(MIN_WIDGET_HEIGHT);
     mLineEdit = new QLineEdit(QString::number(mValue, 'f', mDecimals), this);
     mLineEdit->setAttribute(Qt::WA_TranslucentBackground);
     mLineEdit->setStyleSheet("background-color: rgba(0, 0, 0, 0);"
@@ -21,7 +21,7 @@ QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
     mLineEdit->setFocusPolicy(Qt::NoFocus);
     mLineEdit->installEventFilter(this);
     installEventFilter(this);
-    mLineEdit->setFixedHeight(20);
+    mLineEdit->setFixedHeight(MIN_WIDGET_HEIGHT);
     mValidator = new QDoubleValidator(minVal, maxVal, 3, this);
     mValidator->setNotation(QDoubleValidator::StandardNotation);
     mLineEdit->setValidator(mValidator);
@@ -123,7 +123,7 @@ void QDoubleSlider::paint(QPainter *p,
             qreal valWidth = qclamp(mValue*width()/(mMaxValue - mMinValue),
                                     0., width() - 3.);
             p->setBrush(sliderFill);
-            qreal heightRemoval = qMax(0., 10. - valWidth)*0.5;
+            qreal heightRemoval = qMax(0., MIN_WIDGET_HEIGHT/2 - valWidth)*0.5;
             p->drawRoundedRect(QRectF(1., 1.,
                                       valWidth,
                                       height() - 2.).
@@ -175,7 +175,7 @@ void QDoubleSlider::fitWidthToContent() {
         textMin = QString::number(mMinValue, 'f', mDecimals);
     }
     int textWidth = qMax(fm.width(textMax), fm.width(textMin));
-    int newWidth = qMin(60, textWidth + textWidth%2 + 10);
+    int newWidth = qMin(60, textWidth + textWidth%2 + MIN_WIDGET_HEIGHT/2);
     setFixedWidth(newWidth);
     mLineEdit->setFixedWidth(newWidth);
 }

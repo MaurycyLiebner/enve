@@ -1,6 +1,6 @@
 #include "movablepoint.h"
 #include "Boxes/vectorpath.h"
-#include "mainwindow.h"
+#include "global.h"
 #include "undoredo.h"
 
 MovablePoint::MovablePoint(BoundingBox *parent,

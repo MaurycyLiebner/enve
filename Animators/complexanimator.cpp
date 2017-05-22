@@ -189,7 +189,7 @@ void ComplexAnimator::anim_drawKey(
             QRectF(
                 QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.35,
-                        drawY + (BOX_HEIGHT -
+                        drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE*0.7)*0.5 ),
                 QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
         p->restore();
@@ -198,7 +198,7 @@ void ComplexAnimator::anim_drawKey(
             QRectF(
                 QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.35,
-                        drawY + (BOX_HEIGHT -
+                        drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE*0.7)*0.5 ),
                 QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
     }

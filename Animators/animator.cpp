@@ -394,7 +394,7 @@ void Animator::anim_drawKey(QPainter *p,
             QRectF(
                 QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                        drawY + (BOX_HEIGHT -
+                        drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE)*0.5 ),
                 QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
         p->restore();
@@ -403,7 +403,7 @@ void Animator::anim_drawKey(QPainter *p,
             QRectF(
                 QPointF((key->getAbsFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                        drawY + (BOX_HEIGHT -
+                        drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE)*0.5 ),
                 QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
     }

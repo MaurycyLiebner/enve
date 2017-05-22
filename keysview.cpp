@@ -81,7 +81,8 @@ void KeysView::wheelEvent(QWheelEvent *e) {
     } else {
         emit wheelEventSignal(e);
         if(mSelecting) {
-            QPointF posU = mapFromGlobal(QCursor::pos()) + QPointF(-10., 0.);
+            QPointF posU = mapFromGlobal(QCursor::pos()) +
+                           QPointF(-MIN_WIDGET_HEIGHT/2, 0.);
             mSelectionRect.setBottom(posU.y() + mViewedTop);
         }
         //mBoxesList->handleWheelEvent(e);
@@ -89,7 +90,7 @@ void KeysView::wheelEvent(QWheelEvent *e) {
 }
 
 void KeysView::mousePressEvent(QMouseEvent *e) {
-    QPoint posU = e->pos() + QPoint(-10, 0);
+    QPoint posU = e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
     if(mGraphViewed) {
         graphMousePressEvent(posU,
                              e->button());
@@ -273,21 +274,21 @@ void KeysView::paintEvent(QPaintEvent *) {
 
 
     if(!mGraphViewed) {    
-        int currY = BOX_HEIGHT;
+        int currY = MIN_WIDGET_HEIGHT;
         p.setPen(QPen(QColor(40, 40, 40), 1.));
         while(currY < height()) {
             p.drawLine(0, currY, width(), currY);
 
-            currY += BOX_HEIGHT;
+            currY += MIN_WIDGET_HEIGHT;
         }
     }
-    p.translate(10, 0);
+    p.translate(MIN_WIDGET_HEIGHT/2, 0);
 
     p.setPen(QPen(QColor(75, 75, 75), 1.));
     qreal xT = mPixelsPerFrame*0.5;
     int iInc = 1;
     bool mult5 = true;
-    while(iInc*mPixelsPerFrame < 10.) {
+    while(iInc*mPixelsPerFrame < MIN_WIDGET_HEIGHT/2) {
         if(mult5) {
             iInc *= 5;
         } else {
@@ -396,7 +397,7 @@ void KeysView::clearHoveredMovable() {
 }
 
 void KeysView::scrollRight() {
-    int inc = qMax(1, (int)(40./mPixelsPerFrame) );
+    int inc = qMax(1, (int)(2*MIN_WIDGET_HEIGHT/mPixelsPerFrame) );
     mMinViewedFrame += inc;
     mMaxViewedFrame += inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
@@ -408,7 +409,7 @@ void KeysView::scrollRight() {
 }
 
 void KeysView::scrollLeft() {
-    int inc = qMax(1, (int)(40./mPixelsPerFrame) );
+    int inc = qMax(1, (int)(2*MIN_WIDGET_HEIGHT/mPixelsPerFrame) );
     mMinViewedFrame -= inc;
     mMaxViewedFrame -= inc;
     emit changedViewedFrames(mMinViewedFrame, mMaxViewedFrame);
@@ -420,7 +421,7 @@ void KeysView::scrollLeft() {
 }
 
 void KeysView::mouseMoveEvent(QMouseEvent *event) {
-    QPoint posU = event->pos() + QPoint(-10, 0);
+    QPoint posU = event->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0);
 
     if(mIsMouseGrabbing ||
        (event->buttons() & Qt::LeftButton ||
@@ -435,13 +436,13 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                 emit changedViewedFrames(mMinViewedFrame,
                                          mMaxViewedFrame);
             } else {
-                if(posU.x() < -10) {
+                if(posU.x() < -MIN_WIDGET_HEIGHT/2) {
                     if(!mScrollTimer->isActive()) {
                         connect(mScrollTimer, SIGNAL(timeout()),
                                 this, SLOT(scrollLeft()));
                         mScrollTimer->start(300);
                     }
-                } else if(posU.x() > width() - 20) {
+                } else if(posU.x() > width() - MIN_WIDGET_HEIGHT) {
                     if(!mScrollTimer->isActive()) {
                         connect(mScrollTimer, SIGNAL(timeout()),
                                 this, SLOT(scrollRight()));
@@ -568,7 +569,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
             }
         }
     }
-    updateHoveredPointFromPos(e->pos() + QPoint(-10, 0));
+    updateHoveredPointFromPos(e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0));
 
     mMainWindow->callUpdateSchedulers();
 }
@@ -601,7 +602,7 @@ qreal KeysView::getPixelsPerFrame()
 
 void KeysView::updatePixelsPerFrame()
 {
-    qreal animWidth = width() - 40.;
+    qreal animWidth = width() - 2*MIN_WIDGET_HEIGHT;
     qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
     mPixelsPerFrame = animWidth/dFrame;
 }

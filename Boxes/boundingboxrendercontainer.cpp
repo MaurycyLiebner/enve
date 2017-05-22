@@ -93,7 +93,7 @@ CacheContainer::CacheContainer() {
 }
 
 CacheContainer::~CacheContainer() {
-    MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
+    //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
     MemoryHandler::getInstance()->removeContainer(this);
 }
 
@@ -102,9 +102,9 @@ void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
 }
 
 void CacheContainer::replaceImage(const QImage &img) {
-    MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
+    //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
     mImage = img;
-    MemoryChecker::getInstance()->incUsedMemory(mImage.byteCount());
+    //MemoryChecker::getInstance()->incUsedMemory(mImage.byteCount());
 }
 
 bool CacheContainer::freeThis() {

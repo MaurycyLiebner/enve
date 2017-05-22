@@ -12,7 +12,7 @@ CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     setAcceptDrops(true);
     setFocusPolicy(Qt::StrongFocus);
-    setMinimumSize(500, 500);
+    setMinimumSize(MIN_WIDGET_HEIGHT*10, MIN_WIDGET_HEIGHT*10);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     setMouseTracking(true);
 

@@ -109,7 +109,6 @@ protected:
 
     QList<SingleWidget*> mSingleWidgets;
 
-    QVBoxLayout *mLayout;
     int mVisibleTop = 0;
     int mVisibleHeight = 0;
 };

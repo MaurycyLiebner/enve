@@ -1,10 +1,11 @@
 #include "boolpropertywidget.h"
 #include "Properties/boolproperty.h"
 #include "mainwindow.h"
+#include "global.h"
 
 BoolPropertyWidget::BoolPropertyWidget(QWidget *parent) :
     QWidget(parent) {
-    setFixedSize(20, 20);
+    setFixedSize(MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
 }
 
 void BoolPropertyWidget::setTarget(BoolProperty *property) {

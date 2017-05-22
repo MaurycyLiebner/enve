@@ -9,7 +9,7 @@
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     QWidget(parent) {
-    setFixedWidth(10);
+    setFixedWidth(MIN_WIDGET_HEIGHT/2);
     setFixedHeight(4000);
     setCursor(Qt::SplitHCursor);
 }
@@ -83,7 +83,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
                    "background: rgb(90, 90, 90);"
                "}");
     mMainWindow = parent;
-    setMinimumSize(200, 200);
+    setMinimumSize(10*MIN_WIDGET_HEIGHT, 10*MIN_WIDGET_HEIGHT);
     mMainLayout = new QVBoxLayout(this);
     setLayout(mMainLayout);
     mMainLayout->setSpacing(0);
@@ -94,11 +94,11 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mTimelineLayout->setMargin(0);
 
     mFrameRangeScrollbar = new AnimationWidgetScrollBar(20, 200,
-                                                       20, 20,
+                                                       20, MIN_WIDGET_HEIGHT,
                                                        true,
                                                        true, this);
     mAnimationWidgetScrollbar = new AnimationWidgetScrollBar(1, 1,
-                                                            10, 20,
+                                                            10, MIN_WIDGET_HEIGHT,
                                                             false,
                                                             false, this);
     connect(MemoryHandler::getInstance(), SIGNAL(memoryFreed()),
@@ -258,8 +258,8 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
     if(mBoxesListKeysViewStack->isHidden()) {
         mBoxesListKeysViewStack->show();
         mAddBoxesListKeysViewWidgetsBar->hide();
-        setMinimumHeight(200);
-        setMaximumHeight(2000);
+        setMinimumHeight(10*MIN_WIDGET_HEIGHT);
+        setMaximumHeight(100*MIN_WIDGET_HEIGHT);
     }
     if(id < 0) id = 0;
     id = qMin(id, mBoxesListKeysViewWidgets.count());

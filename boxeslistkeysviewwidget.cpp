@@ -21,14 +21,10 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mMenuLayout->setSpacing(0);
     mMenuLayout->setMargin(0);
     mBoxesListMenuBar = new QMenuBar(this);
-    mBoxesListMenuBar->setFixedHeight(20);
+    mBoxesListMenuBar->setFixedHeight(MIN_WIDGET_HEIGHT);
     mBoxesListMenuBar->setStyleSheet("QMenuBar {"
                                         "border-top: 0;"
                                         "border-bottom: 1px solid black;"
-                                     "}"
-                                     "QMenuBar::item {"
-                                        "margin-top: 2px;"
-                                        "padding-top: 1px;"
                                      "}");
     mBoxesListMenuBar->addSeparator();
     QMenu *objectsMenu = mBoxesListMenuBar->addMenu("State");
@@ -59,14 +55,10 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 
     mCornerMenuBar = new QMenuBar(this);
     mCornerMenuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
-    mCornerMenuBar->setFixedHeight(20);
+    mCornerMenuBar->setFixedHeight(MIN_WIDGET_HEIGHT);
     mCornerMenuBar->setStyleSheet("QMenuBar {"
                                      "border-top: 0;"
                                      "border-bottom: 1px solid black;"
-                                  "}"
-                                  "QMenuBar::item {"
-                                     "margin-top: 2px;"
-                                     "padding-top: 1px;"
                                   "}");
     mCornerMenuBar->addSeparator();
     mCornerMenuBar->addAction(" + ", this, SLOT(addNewBelowThis()));
@@ -78,7 +70,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mMenuWidgetsLayout->setMargin(0);
     mMenuWidgetsLayout->setSpacing(0);
     mSearchLine = new QLineEdit("", mBoxesListMenuBar);
-    mSearchLine->setFixedHeight(18);
+    mSearchLine->setFixedHeight(FONT_HEIGHT);
     mSearchLine->setStyleSheet("background-color: rgb(255, 255, 255);"
                                "border-bottom: 0;"
                                "border-radius: 4px;"
@@ -153,7 +145,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 
     connect(mBoxesListAnimationDockWidget, SIGNAL(visibleRangeChanged(int,int)),
             mKeysView, SLOT(setViewedRange(int,int)) );
-    mBoxesListScrollArea->setFixedWidth(400);
+    mBoxesListScrollArea->setFixedWidth(20*MIN_WIDGET_HEIGHT);
 
     setLayout(mMainLayout);
 
@@ -184,7 +176,7 @@ void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
     }
     if(topWidget == NULL) {
         mTopWidget = new QWidget(this);
-        mTopWidget->setFixedHeight(20);
+        mTopWidget->setFixedHeight(MIN_WIDGET_HEIGHT);
         mTopWidget->setStyleSheet("background-color: rgb(50, 50, 50)");
     } else {
         mTopWidget = topWidget;
@@ -193,7 +185,7 @@ void BoxesListKeysViewWidget::setTopWidget(QWidget *topWidget) {
 }
 
 void BoxesListKeysViewWidget::moveSlider(int val) {
-    int diff = val%BOX_HEIGHT;
+    int diff = val%MIN_WIDGET_HEIGHT;
     if(diff != 0) {
         val -= diff;
         mBoxesListScrollArea->verticalScrollBar()->setSliderPosition(val);
