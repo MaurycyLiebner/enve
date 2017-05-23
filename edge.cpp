@@ -236,7 +236,7 @@ void VectorPathEdge::generatePainterPath() {
                   mPoint2->getAbsolutePos());
 }
 
-void VectorPathEdge::drawHover(QPainter *p) {
+void VectorPathEdge::drawHovered(QPainter *p) {
     p->save();
     p->setBrush(Qt::NoBrush);
     //QPen pen = QPen(Qt::red, 2.);

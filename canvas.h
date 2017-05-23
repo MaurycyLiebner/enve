@@ -270,6 +270,7 @@ public:
 
     void addChildAwaitingUpdate(BoundingBox *child);
 
+    void renderToSkiaCanvas(SkCanvas *canvas);
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        Q_FOREACH(BoundingBox *child, mChildBoxes) {
@@ -389,6 +390,7 @@ private:
     qreal mResolutionFraction;
 
     CanvasWindow *mCanvasWindow;
+    QWidget *mCanvasWidget;
 
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;

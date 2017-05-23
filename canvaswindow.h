@@ -169,7 +169,9 @@ protected:
 
     QByteArray mAudioBuffer;
     // AUDIO
+
     void qRender(QPainter *p);
+    void render(SkCanvas *canvas);
 signals:
     void updateBoxPixmaps(BoundingBox*);
     void changeCurrentFrame(int);

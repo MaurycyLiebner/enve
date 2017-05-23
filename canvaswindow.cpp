@@ -209,6 +209,11 @@ void CanvasWindow::qRender(QPainter *p) {
     mCurrentCanvas->paintEvent(p);
 }
 
+void CanvasWindow::render(SkCanvas *canvas) {
+    if(mCurrentCanvas == NULL) return;
+    mCurrentCanvas->renderToSkiaCanvas(canvas);
+}
+
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->mousePressEvent(event);

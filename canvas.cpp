@@ -32,6 +32,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mVisibleWidth = mWidth;
     mVisibleHeight = mHeight;
     mCanvasWindow = canvasWidget;
+    mCanvasWidget = mCanvasWindow->getWidgetContainer();
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -133,7 +134,7 @@ bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
 
 bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     if(processUnfilteredKeyEvent(event)) return true;
-    if(!mCanvasWindow->hasFocus()) return false;
+    if(!mCanvasWidget->hasFocus()) return false;
     if(isCtrlPressed() && event->key() == Qt::Key_G) {
         if(isShiftPressed()) {
             ungroupSelected();
@@ -231,6 +232,115 @@ void Canvas::updateHoveredElements() {
     updateHoveredBox();
 }
 
+void Canvas::renderToSkiaCanvas(SkCanvas *canvas) {
+    SkRect viewRect = QRectFToSkRect(getPixBoundingRect());
+
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    if(isPreviewingOrRendering()) {
+        paint.setColor(SK_ColorBLACK);
+        paint.setStyle(SkPaint::kFill_Style);
+        canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width() + 1,
+                                        mCanvasWidget->height() + 1),
+                         paint);
+
+        canvas->save();
+
+        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+        qreal reversedRes = 1./mResolutionFraction;
+        canvas->scale(reversedRes, reversedRes);
+
+        if(mCurrentPreviewContainer != NULL) {
+            mCurrentPreviewContainer->drawToSkiaCanvas(canvas);
+            //p->drawImage(QPointF(0., 0.), mCurrentPreviewContainer->getImage());
+        }
+        canvas->restore();
+    } else {
+        paint.setColor(SkColorSetARGBInline(255, 75, 75, 75));
+        paint.setStyle(SkPaint::kFill_Style);
+        canvas->drawRect(SkRect::MakeWH(mCanvasWindow->width() + 1,
+                                        mCanvasWidget->height() + 1),
+                         paint);
+        paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
+        canvas->drawRect(viewRect, paint);
+
+        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
+            box->drawPixmapToSkiaCanvas(canvas);
+        }
+//        QPen pen = QPen(Qt::black, 1.5);
+//        pen.setCosmetic(true);
+//        p->setPen(pen);
+        mCurrentBoxesGroup->drawSelectedToSkiaCanvas(canvas, mCurrentMode);
+        drawSelectedToSkiaCanvas(canvas, mCurrentMode);
+
+        if(mCurrentMode == CanvasMode::MOVE_PATH ||
+           mCurrentMode == CanvasMode::MOVE_POINT) {
+            mRotPivot->drawToSkiaCanvas(canvas);
+        }
+//        pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
+//        pen.setCosmetic(true);
+//        p->setPen(pen);
+        if(mSelecting) {
+            paint.setStyle(SkPaint::kStroke_Style);
+            paint.setColor(SkColorSetARGBInline(125, 0, 0, 255));
+            SkScalar intervals[2] = {10, 20};
+            paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 25));
+            SkPath selectionPath;
+            selectionPath.addRect(QRectFToSkRect(mSelectionRect));
+            canvas->drawPath(selectionPath, paint);
+        }
+
+        if(mHoveredPoint != NULL) {
+            mHoveredPoint->drawHoveredToSkiaCanvas(canvas);
+        } else if(mHoveredEdge != NULL) {
+            mHoveredEdge->drawHoveredToSkiaCanvas(canvas);
+        } else if(mHoveredBox != NULL) {
+            if(mCurrentEdge == NULL) {
+                mHoveredBox->drawHoveredToSkiaCanvas(canvas);
+            }
+        }
+
+        canvas->resetMatrix();
+
+        if(mInputTransformationEnabled) {
+            SkRect inputRect = SkRect::MakeXYWH(
+                                    2*MIN_WIDGET_HEIGHT,
+                                    mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
+                                    5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+            paint.setStyle(SkPaint::kFill_Style);
+            paint.setColor(SkColorSetARGBInline(255, 225, 225, 225));
+            canvas->drawRect(inputRect, paint);
+            QString transStr;
+            if(mXOnlyTransform) {
+                transStr = " x: " + mInputText + "|";
+            } else if(mYOnlyTransform) {
+                transStr = " y: " + mInputText + "|";
+            } else {
+                transStr = " x, y: " + mInputText + "|";
+            }
+            canvas->drawString(transStr.toStdString().c_str(),
+                               inputRect.x(),
+                               inputRect.y(),
+                               paint);
+            //p->drawText(inputRect, Qt::AlignVCenter, transStr);
+        }
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setStrokeWidth(2.);
+        paint.setColor(SK_ColorBLACK);
+        canvas->drawRect(viewRect.makeInset(1, 1),
+                         paint);
+    }
+
+    if(mCanvasWidget->hasFocus()) {
+        paint.setColor(SK_ColorRED);
+        paint.setStrokeWidth(4.);
+        canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width(),
+                                        mCanvasWidget->height()),
+                                        paint);
+    }
+}
+
 void Canvas::paintEvent(QPainter *p) {
     p->setRenderHint(QPainter::Antialiasing);
     p->setRenderHint(QPainter::SmoothPixmapTransform);
@@ -239,7 +349,9 @@ void Canvas::paintEvent(QPainter *p) {
 
     if(isPreviewingOrRendering()) {
         QPainterPath path;
-        path.addRect(0, 0, mCanvasWindow->width() + 1, mCanvasWindow->height() + 1);
+        path.addRect(0, 0,
+                     mCanvasWidget->width() + 1,
+                     mCanvasWidget->height() + 1);
         QPainterPath viewRectPath;
         viewRectPath.addRect(viewRect);
         p->setBrush(QColor(0, 0, 0));
@@ -259,8 +371,8 @@ void Canvas::paintEvent(QPainter *p) {
         p->restore();
     } else {
         p->fillRect(0, 0,
-                    mCanvasWindow->width() + 1,
-                    mCanvasWindow->height() + 1,
+                    mCanvasWidget->width() + 1,
+                    mCanvasWidget->height() + 1,
                     QColor(75, 75, 75));
         p->fillRect(viewRect, mBackgroundColor->getCurrentColor().qcol);
 
@@ -288,7 +400,7 @@ void Canvas::paintEvent(QPainter *p) {
         if(mHoveredPoint != NULL) {
             mHoveredPoint->drawHovered(p);
         } else if(mHoveredEdge != NULL) {
-            mHoveredEdge->drawHover(p);
+            mHoveredEdge->drawHovered(p);
         } else if(mHoveredBox != NULL) {
             if(mCurrentEdge == NULL) {
                 mHoveredBox->drawHovered(p);
@@ -299,7 +411,7 @@ void Canvas::paintEvent(QPainter *p) {
 
         if(mInputTransformationEnabled) {
             QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
-                                    mCanvasWindow->height() - MIN_WIDGET_HEIGHT,
+                                    mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
                                     5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
             p->fillRect(inputRect, QColor(225, 225, 225));
             QString text;
@@ -317,13 +429,13 @@ void Canvas::paintEvent(QPainter *p) {
         p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
     }
 
-    if(mCanvasWindow->hasFocus() ) {
+    if(mCanvasWidget->hasFocus() ) {
         p->setPen(QPen(Qt::red, 4.));
     } else {
         p->setPen(Qt::NoPen);
     }
     p->setBrush(Qt::NoBrush);
-    p->drawRect(mCanvasWindow->rect());
+    p->drawRect(mCanvasWidget->rect());
 }
 
 bool Canvas::isMovingPath() {
@@ -373,7 +485,7 @@ void Canvas::playPreview(const int &minPreviewFrameId,
     setCurrentPreviewContainer(mCacheHandler.getRenderContainerAtRelFrame(
                                     mCurrentPreviewFrameId));
     setPreviewing(true);
-    mCanvasWindow->repaint();
+    mCanvasWindow->requestUpdate();
 }
 
 void Canvas::clearPreview() {
@@ -390,7 +502,7 @@ void Canvas::nextPreviewFrame() {
                 mCacheHandler.getRenderContainerAtOrBeforeRelFrame(
                                     mCurrentPreviewFrameId));
     }
-    mCanvasWindow->repaint();
+    mCanvasWindow->requestUpdate();
 }
 
 void Canvas::beforeUpdate() {
@@ -836,8 +948,8 @@ void Canvas::resetTransormation() {
     mCanvasTransformMatrix.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
-    moveByRel(QPointF( (mCanvasWindow->width() - mVisibleWidth)*0.5,
-                    (mCanvasWindow->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
+                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
 
 }
 
@@ -845,13 +957,13 @@ void Canvas::fitCanvasToSize() {
     mCanvasTransformMatrix.reset();
     mVisibleHeight = mHeight + MIN_WIDGET_HEIGHT;
     mVisibleWidth = mWidth + MIN_WIDGET_HEIGHT;
-    qreal widthScale = mCanvasWindow->width()/mVisibleWidth;
-    qreal heightScale = mCanvasWindow->height()/mVisibleHeight;
+    qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
+    qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
     zoomCanvas(qMin(heightScale, widthScale), QPointF(0., 0.));
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
-    moveByRel(QPointF( (mCanvasWindow->width() - mVisibleWidth)*0.5,
-                    (mCanvasWindow->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
+                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
 
 }
 

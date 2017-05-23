@@ -57,7 +57,7 @@ public:
 
     void generatePainterPath();
 
-    void drawHover(QPainter *p);
+    void drawHovered(QPainter *p);
 
     PathPoint *getPoint1() const;
 

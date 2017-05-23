@@ -273,7 +273,8 @@ HEADERS  += mainwindow.h \
     Boxes/draftcanvas.h \
     global.h \
     glwindow.h \
-    canvaswindow.h
+    canvaswindow.h \
+    skqtconversions.h
 
 RESOURCES += \
     resources.qrc

@@ -17,6 +17,8 @@
 #include "SkSurface.h"
 #include "SkGradientShader.h"
 #include "SkPixelRef.h"
+#include "SkDashPathEffect.h"
+#include "skqtconversions.h"
 
 #include "gl/GrGLUtil.h"
 

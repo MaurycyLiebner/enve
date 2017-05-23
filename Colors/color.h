@@ -5,6 +5,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
+#include "SkColor.h"
+
 class Color
 {
 public:
@@ -47,6 +49,12 @@ public:
         qcol.setAlpha(a_t);
     }*/
 
+    SkColor getSkColor() const {
+        return SkColorSetARGBInline(qcol.alpha(),
+                                    qcol.red(),
+                                    qcol.green(),
+                                    qcol.blue());
+    }
     void updateHSVFromRGB();
     void updateQColFromHSV();
     void setHSV(GLfloat h, GLfloat s, GLfloat v, GLfloat a = 1.f);
