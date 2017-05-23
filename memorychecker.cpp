@@ -7,16 +7,16 @@ MemoryChecker *MemoryChecker::mInstance;
 
 MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mInstance = this;
-//    struct sysinfo info;
-//    if(sysinfo(&info) == 0) {
-//        mMemUnit = info.mem_unit;
-//        mTotalRam = info.totalram*mMemUnit;
+    struct sysinfo info;
+    if(sysinfo(&info) == 0) {
+        mMemUnit = info.mem_unit;
+        unsigned long long totalRam = info.totalram*mMemUnit;
 //        mFreeRam = info.freeram*info.mem_unit +
 //                   //info.freeswap*info.mem_unit +
 //                   info.bufferram*info.mem_unit;
-//        mMinFreeRam = mTotalRam*20/100;
-//    } else { // ??
-//    }
+        mMinFreeRam = totalRam*20/100;
+    } else { // ??
+    }
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()),
             this, SLOT(checkMemory()) );
