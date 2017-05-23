@@ -2,6 +2,9 @@
 #include <sys/sysinfo.h>
 #include <gperftools/tcmalloc.h>
 #include <gperftools/malloc_extension.h>
+#include <QDebug>
+#include <stdio.h>
+#include <stdlib.h>
 
 MemoryChecker *MemoryChecker::mInstance;
 
@@ -9,8 +12,8 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mInstance = this;
     struct sysinfo info;
     if(sysinfo(&info) == 0) {
-        mMemUnit = info.mem_unit;
-        unsigned long long totalRam = info.totalram*mMemUnit;
+        unsigned long long memUnit = info.mem_unit;
+        unsigned long long totalRam = info.totalram*memUnit;
 //        mFreeRam = info.freeram*info.mem_unit +
 //                   //info.freeswap*info.mem_unit +
 //                   info.bufferram*info.mem_unit;
@@ -22,9 +25,7 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
             this, SLOT(checkMemory()) );
     mTimer->start(500);
 }
-#include <QDebug>
-#include <stdio.h>
-#include <stdlib.h>
+
 unsigned long long getFreeRam() {
     unsigned long long unmapped = 0ULL;
     char buffer[1000];
