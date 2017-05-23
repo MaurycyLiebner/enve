@@ -23,7 +23,7 @@ void BoxesClipboardContainer::copyBoxToContainer(BoundingBox *box) {
 }
 
 void BoxesClipboardContainer::pasteTo(BoxesGroup *parent) {
-    foreach(BoundingBox *box, mBoxesList) {
+    Q_FOREACH(BoundingBox *box, mBoxesList) {
         box->createDuplicate(parent);
     }
 }
@@ -34,7 +34,7 @@ KeysClipboardContainer::KeysClipboardContainer() :
 }
 
 KeysClipboardContainer::~KeysClipboardContainer() {
-    foreach(KeyCloner *keyCloner, mKeyClonersList) {
+    Q_FOREACH(KeyCloner *keyCloner, mKeyClonersList) {
         delete keyCloner;
     }
 }
@@ -48,7 +48,7 @@ void KeysClipboardContainer::copyKeyToContainer(Key *key) {
 void KeysClipboardContainer::paste(const int &pasteFrame,
                                    KeysView *keysView) {
     int firstKeyFrame = 1000000;
-    foreach(KeyCloner *keyCloner, mKeyClonersList) {
+    Q_FOREACH(KeyCloner *keyCloner, mKeyClonersList) {
         if(keyCloner->getAbsFrame() < firstKeyFrame) {
             firstKeyFrame = keyCloner->getAbsFrame();
         }
@@ -56,7 +56,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     int dFrame = pasteFrame - firstKeyFrame;
 
     QList<Animator*> animators;
-    foreach(Animator *animator, mTargetAnimators) {
+    Q_FOREACH(Animator *animator, mTargetAnimators) {
         if(animators.contains(animator)) continue;
         animators << animator;
     }
@@ -72,7 +72,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
         keysView->addKeyToSelection(newKey);
     }
 
-    foreach(Animator *animator, animators) {
+    Q_FOREACH(Animator *animator, animators) {
         animator->anim_mergeKeysIfNeeded();
     }
 }

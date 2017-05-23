@@ -483,9 +483,9 @@ void GLWidget::drawAACircTris(GLfloat x1, GLfloat y1,
     glEnd();
 }
 
-void GLWidget::drawSolidCircle(GLfloat r, GLfloat cx, GLfloat cy, GLuint num_seg,
-                                  GLfloat red, GLfloat green, GLfloat blue)
-{
+void GLWidget::drawSolidCircle(GLfloat r, GLfloat cx,
+                               GLfloat cy, GLuint num_seg,
+                               GLfloat red, GLfloat green, GLfloat blue) {
     float theta = 2 * PI / float(num_seg);
     float c = cosf(theta);//precalculate the sine and cosine
     float s = sinf(theta);
@@ -494,8 +494,7 @@ void GLWidget::drawSolidCircle(GLfloat r, GLfloat cx, GLfloat cy, GLuint num_seg
     float last_inner_x = inner_x;
     float last_inner_y = inner_y;
     float inner_t;
-    for(int ii = 0; ii < num_seg; ii++)
-    {
+    for(GLuint ii = 0; ii < num_seg; ii++) {
         //apply the rotation matrix
         inner_t = inner_x;
         inner_x = c * inner_x - s * inner_y;

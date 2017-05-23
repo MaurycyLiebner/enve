@@ -34,7 +34,7 @@ void ScrollWidgetVisiblePart::setVisibleHeight(const int &height) {
 }
 
 void ScrollWidgetVisiblePart::updateWidgetsWidth() {
-    foreach(SingleWidget *widget, mSingleWidgets) {
+    Q_FOREACH(SingleWidget *widget, mSingleWidgets) {
         widget->setFixedWidth(width() - widget->x());
     }
 }
@@ -49,7 +49,7 @@ void ScrollWidgetVisiblePart::callUpdaters() {
 }
 
 void ScrollWidgetVisiblePart::callAllInstanceUpdaters() {
-    foreach(ScrollWidgetVisiblePart *instance, mAllInstances) {
+    Q_FOREACH(ScrollWidgetVisiblePart *instance, mAllInstances) {
         instance->callUpdaters();
     }
 }
@@ -168,7 +168,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgets() {
     }
 
     int yT = 0;
-    foreach(SingleWidget *widget, mSingleWidgets) {
+    Q_FOREACH(SingleWidget *widget, mSingleWidgets) {
         widget->move(widget->x(), yT);
         widget->setFixedWidth(width() - widget->x());
         yT += MIN_WIDGET_HEIGHT;

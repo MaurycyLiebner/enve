@@ -8,7 +8,7 @@ QStringAnimator::QStringAnimator() : IntAnimator()
 void QStringAnimator::setCurrentTextValue(const QString &text)
 {
     if(prp_isKeyOnCurrentFrame()) {
-        foreach(QStringKey *key, mTextValues) {
+        Q_FOREACH(QStringKey *key, mTextValues) {
             if(key->keyFrame == anim_mCurrentAbsFrame) {
                 key->string = text;
                 break;
@@ -30,7 +30,7 @@ QString QStringAnimator::getStringKeyWithLowerFrame(int frame)
 {
     QStringKey *bestKey = NULL;
     int dFrame = 10000000;
-    foreach(QStringKey *key, mTextValues) {
+    Q_FOREACH(QStringKey *key, mTextValues) {
         int newDFrame = frame - key->keyFrame;
         if(newDFrame == 0) {
             bestKey = key;

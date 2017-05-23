@@ -44,7 +44,6 @@ void SavedColorsWidget::mousePressEvent(QMouseEvent *e)
     }
 }
 
-void SavedColorsWidget::setColorFromButton(Color color_t)
-{
+void SavedColorsWidget::setColorFromButton(Color color_t) {
 
 }

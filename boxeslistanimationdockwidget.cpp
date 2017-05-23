@@ -102,7 +102,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
                                                             false,
                                                             false, this);
     connect(MemoryHandler::getInstance(), SIGNAL(memoryFreed()),
-            mAnimationWidgetScrollbar, SLOT(repaint()));
+            mAnimationWidgetScrollbar, SLOT(update()));
     mAnimationWidgetScrollbar->setTopBorderVisible(false);
 
     connect(mAnimationWidgetScrollbar, SIGNAL(viewedFramesChanged(int,int)),
@@ -307,7 +307,7 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidgetBelow(
 
 void BoxesListAnimationDockWidget::clearAll() {
     QList<BoxesListKeysViewWidget*> widgets = mBoxesListKeysViewWidgets;
-    foreach(BoxesListKeysViewWidget *widget, widgets) {
+    Q_FOREACH(BoxesListKeysViewWidget *widget, widgets) {
         removeBoxesListKeysViewWidget(widget);
     }
 }
@@ -330,7 +330,7 @@ bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
 
 bool BoxesListAnimationDockWidget::processFilteredKeyEvent(
         QKeyEvent *event) {
-    foreach(BoxesListKeysViewWidget *blk, mBoxesListKeysViewWidgets) {
+    Q_FOREACH(BoxesListKeysViewWidget *blk, mBoxesListKeysViewWidgets) {
         blk->processFilteredKeyEvent(event);
     }
     if(processUnfilteredKeyEvent(event) ) return true;
@@ -375,23 +375,23 @@ void BoxesListAnimationDockWidget::previewPaused() {
 }
 
 void BoxesListAnimationDockWidget::resumePreview() {
-    mMainWindow->getCanvasWidget()->resumePreview();
+    mMainWindow->getCanvasWindow()->resumePreview();
 }
 
 void BoxesListAnimationDockWidget::pausePreview() {
-    mMainWindow->getCanvasWidget()->pausePreview();
+    mMainWindow->getCanvasWindow()->pausePreview();
 }
 
 void BoxesListAnimationDockWidget::playPreview() {
-    mMainWindow->getCanvasWidget()->playPreview();
+    mMainWindow->getCanvasWindow()->playPreview();
 }
 
 void BoxesListAnimationDockWidget::renderPreview() {
-    mMainWindow->getCanvasWidget()->renderPreview();
+    mMainWindow->getCanvasWindow()->renderPreview();
 }
 
 void BoxesListAnimationDockWidget::interruptPreview() {
-    mMainWindow->getCanvasWidget()->interruptPreview();
+    mMainWindow->getCanvasWindow()->interruptPreview();
 }
 
 void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
@@ -401,7 +401,7 @@ void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
 }
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {
-    mMainWindow->getCanvasWidget()->setLocalPivot(bT);
+    mMainWindow->getCanvasWindow()->setLocalPivot(bT);
     mMainWindow->callUpdateSchedulers();
 }
 
@@ -426,7 +426,7 @@ void BoxesListAnimationDockWidget::setRenderMode() {
 void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
     mAnimationWidgetScrollbar->emitChange();
-    mAnimationWidgetScrollbar->repaint();
+    mAnimationWidgetScrollbar->update();
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(

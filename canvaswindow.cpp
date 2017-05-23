@@ -1,4 +1,4 @@
-#include "canvaswidget.h"
+#include "canvaswindow.h"
 #include "canvas.h"
 #include <QComboBox>
 #include "mainwindow.h"
@@ -8,13 +8,8 @@
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
 
-CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
+CanvasWindow::CanvasWindow() {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
-    setAcceptDrops(true);
-    setFocusPolicy(Qt::StrongFocus);
-    setMinimumSize(MIN_WIDGET_HEIGHT*10, MIN_WIDGET_HEIGHT*10);
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    setMouseTracking(true);
 
     mPaintControlerThread = new QThread(this);
     mPaintControler = new PaintControler();
@@ -30,20 +25,29 @@ CanvasWidget::CanvasWidget(QWidget *parent) : QWidget(parent) {
     mPreviewFPSTimer->setInterval(1000/24.);
 
     initializeAudio();
+
+    mWidgetContainer = QWidget::createWindowContainer(this);
+    mWidgetContainer->setAcceptDrops(true);
+    mWidgetContainer->setFocusPolicy(Qt::StrongFocus);
+    mWidgetContainer->setMinimumSize(MIN_WIDGET_HEIGHT*10,
+                                     MIN_WIDGET_HEIGHT*10);
+    mWidgetContainer->setSizePolicy(QSizePolicy::Minimum,
+                                    QSizePolicy::Minimum);
+    mWidgetContainer->setMouseTracking(true);
 }
 
-CanvasWidget::~CanvasWidget() {
+CanvasWindow::~CanvasWindow() {
     mPaintControlerThread->quit();
     mPaintControlerThread->wait();
 }
 
-Canvas *CanvasWidget::getCurrentCanvas() {
+Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas;
 }
 
-SingleWidgetAbstraction* CanvasWidget::SWT_getAbstractionForWidget(
+SingleWidgetAbstraction* CanvasWindow::SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
             return abs;
         }
@@ -52,16 +56,16 @@ SingleWidgetAbstraction* CanvasWidget::SWT_getAbstractionForWidget(
     return abs;
 }
 
-void CanvasWidget::SWT_addChildrenAbstractions(
+void CanvasWindow::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    foreach(Canvas *child, mCanvasList) {
+    Q_FOREACH(Canvas *child, mCanvasList) {
         abstraction->addChildAbstraction(
                     child->SWT_getAbstractionForWidget(visiblePartWidget));
     }
 }
 
-void CanvasWidget::setCurrentCanvas(const int &id) {
+void CanvasWindow::setCurrentCanvas(const int &id) {
     if(id < 0 || id >= mCanvasList.count()) {
         setCurrentCanvas((Canvas*)NULL);
     } else {
@@ -69,7 +73,7 @@ void CanvasWidget::setCurrentCanvas(const int &id) {
     }
 }
 
-void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
+void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
     if(mCurrentCanvas != NULL) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mPreviewFPSTimer, SIGNAL(timeout()),
@@ -98,12 +102,12 @@ void CanvasWidget::setCurrentCanvas(Canvas *canvas) {
     callUpdateSchedulers();
 }
 
-void CanvasWidget::addCanvasToList(Canvas *canvas) {
+void CanvasWindow::addCanvasToList(Canvas *canvas) {
     mCanvasList << canvas;
     SWT_addChildAbstractionForTargetToAll(canvas);
 }
 
-void CanvasWidget::removeCanvas(const int &id) {
+void CanvasWindow::removeCanvas(const int &id) {
     Canvas *canvas = mCanvasList.takeAt(id);
     SWT_removeChildAbstractionForTargetFromAll(canvas);
     if(mCanvasList.isEmpty()) {
@@ -115,7 +119,7 @@ void CanvasWidget::removeCanvas(const int &id) {
     }
 }
 
-void CanvasWidget::setCanvasMode(const CanvasMode &mode) {
+void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
     if(hasNoCanvas()) {
         setCursor(QCursor(Qt::ArrowCursor) );
         return;
@@ -142,102 +146,100 @@ void CanvasWidget::setCanvasMode(const CanvasMode &mode) {
     callUpdateSchedulers();
 }
 
-void CanvasWidget::callUpdateSchedulers() {
+void CanvasWindow::callUpdateSchedulers() {
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 
-void CanvasWidget::setMovePathMode() {
+void CanvasWindow::setMovePathMode() {
     setCanvasMode(MOVE_PATH);
 }
 
-void CanvasWidget::setMovePointMode() {
+void CanvasWindow::setMovePointMode() {
     setCanvasMode(MOVE_POINT);
 }
 
-void CanvasWidget::setAddPointMode() {
+void CanvasWindow::setAddPointMode() {
     setCanvasMode(ADD_POINT);
 }
 
-void CanvasWidget::setRectangleMode() {
+void CanvasWindow::setRectangleMode() {
     setCanvasMode(ADD_RECTANGLE);
 }
 
-void CanvasWidget::setCircleMode() {
+void CanvasWindow::setCircleMode() {
     setCanvasMode(ADD_CIRCLE);
 }
 
-void CanvasWidget::setTextMode() {
+void CanvasWindow::setTextMode() {
     setCanvasMode(ADD_TEXT);
 }
 
-void CanvasWidget::setParticleBoxMode() {
+void CanvasWindow::setParticleBoxMode() {
     setCanvasMode(ADD_PARTICLE_BOX);
 }
 
-void CanvasWidget::setParticleEmitterMode() {
+void CanvasWindow::setParticleEmitterMode() {
     setCanvasMode(ADD_PARTICLE_EMITTER);
 }
 
-void CanvasWidget::addCanvasToListAndSetAsCurrent(Canvas *canvas) {
+void CanvasWindow::addCanvasToListAndSetAsCurrent(Canvas *canvas) {
     addCanvasToList(canvas);
     setCurrentCanvas(canvas);
 }
 
-void CanvasWidget::renameCanvas(Canvas *canvas, const QString &newName) {
+void CanvasWindow::renameCanvas(Canvas *canvas, const QString &newName) {
     canvas->setName(newName);
 }
 
-void CanvasWidget::renameCanvas(const int &id, const QString &newName) {
+void CanvasWindow::renameCanvas(const int &id, const QString &newName) {
     renameCanvas(mCanvasList.at(id), newName);
 }
 
-bool CanvasWidget::hasNoCanvas() {
+bool CanvasWindow::hasNoCanvas() {
     return mCurrentCanvas == NULL;
 }
 
-void CanvasWidget::renameCurrentCanvas(const QString &newName) {
+void CanvasWindow::renameCurrentCanvas(const QString &newName) {
     if(mCurrentCanvas == NULL) return;
     renameCanvas(mCurrentCanvas, newName);
 }
 
-void CanvasWidget::paintEvent(QPaintEvent *) {
+void CanvasWindow::qRender(QPainter *p) {
     if(mCurrentCanvas == NULL) return;
-    QPainter p(this);
-    mCurrentCanvas->paintEvent(&p);
-    p.end();
+    mCurrentCanvas->paintEvent(p);
 }
 
-void CanvasWidget::mousePressEvent(QMouseEvent *event) {
+void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->mousePressEvent(event);
 }
 
-void CanvasWidget::mouseReleaseEvent(QMouseEvent *event) {
+void CanvasWindow::mouseReleaseEvent(QMouseEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->mouseReleaseEvent(event);
 }
 
-void CanvasWidget::mouseMoveEvent(QMouseEvent *event) {
+void CanvasWindow::mouseMoveEvent(QMouseEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->mouseMoveEvent(event);
 }
 
-void CanvasWidget::wheelEvent(QWheelEvent *event) {
+void CanvasWindow::wheelEvent(QWheelEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->wheelEvent(event);
 }
 
-void CanvasWidget::mouseDoubleClickEvent(QMouseEvent *event) {
+void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->mouseDoubleClickEvent(event);
 }
 
-void CanvasWidget::keyPressEvent(QKeyEvent *event) {
+void CanvasWindow::keyPressEvent(QKeyEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->keyPressEvent(event);
 }
 
-bool CanvasWidget::processUnfilteredKeyEvent(QKeyEvent *event) {
+bool CanvasWindow::processUnfilteredKeyEvent(QKeyEvent *event) {
     if(event->key() == Qt::Key_F1) {
         setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_F2) {
@@ -258,242 +260,242 @@ bool CanvasWidget::processUnfilteredKeyEvent(QKeyEvent *event) {
     return true;
 }
 
-bool CanvasWidget::processFilteredKeyEvent(QKeyEvent *event) {
+bool CanvasWindow::processFilteredKeyEvent(QKeyEvent *event) {
     if(processUnfilteredKeyEvent(event)) return true;
     if(hasNoCanvas()) return false;
     return mCurrentCanvas->processFilteredKeyEvent(event);
 }
 
-void CanvasWidget::raiseAction() {
+void CanvasWindow::raiseAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->raiseSelectedBoxes();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::lowerAction() {
+void CanvasWindow::lowerAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->lowerSelectedBoxes();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::raiseToTopAction() {
+void CanvasWindow::raiseToTopAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->raiseSelectedBoxesToTop();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::lowerToBottomAction() {
+void CanvasWindow::lowerToBottomAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->lowerSelectedBoxesToBottom();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::objectsToPathAction() {
+void CanvasWindow::objectsToPathAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->convertSelectedBoxesToPath();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::strokeToPathAction() {
+void CanvasWindow::strokeToPathAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->convertSelectedPathStrokesToPath();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::pathsUnionAction() {
+void CanvasWindow::pathsUnionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsUnion();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::pathsDifferenceAction() {
+void CanvasWindow::pathsDifferenceAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsDifference();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::pathsIntersectionAction() {
+void CanvasWindow::pathsIntersectionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsIntersection();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::pathsDivisionAction() {
+void CanvasWindow::pathsDivisionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsDivision();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::pathsExclusionAction() {
+void CanvasWindow::pathsExclusionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsExclusion();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::setFontFamilyAndStyle(QString family, QString style) {
+void CanvasWindow::setFontFamilyAndStyle(QString family, QString style) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontFamilyAndStyle(family, style);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::setFontSize(qreal size) {
+void CanvasWindow::setFontSize(qreal size) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontSize(size);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::connectPointsSlot() {
+void CanvasWindow::connectPointsSlot() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->connectPoints();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::disconnectPointsSlot() {
+void CanvasWindow::disconnectPointsSlot() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->disconnectPoints();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::mergePointsSlot() {
+void CanvasWindow::mergePointsSlot() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->mergePoints();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::makePointCtrlsSymmetric() {
+void CanvasWindow::makePointCtrlsSymmetric() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makePointCtrlsSymmetric();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::makePointCtrlsSmooth() {
+void CanvasWindow::makePointCtrlsSmooth() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makePointCtrlsSmooth();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::makePointCtrlsCorner() {
+void CanvasWindow::makePointCtrlsCorner() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makePointCtrlsCorner();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::makeSegmentLine() {
+void CanvasWindow::makeSegmentLine() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makeSegmentLine();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::makeSegmentCurve() {
+void CanvasWindow::makeSegmentCurve() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->makeSegmentCurve();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::startSelectedStrokeWidthTransform() {
+void CanvasWindow::startSelectedStrokeWidthTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedStrokeWidthTransform();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::startSelectedStrokeColorTransform() {
+void CanvasWindow::startSelectedStrokeColorTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedStrokeColorTransform();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::startSelectedFillColorTransform() {
+void CanvasWindow::startSelectedFillColorTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedFillColorTransform();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::strokeCapStyleChanged(const Qt::PenCapStyle &capStyle) {
+void CanvasWindow::strokeCapStyleChanged(const Qt::PenCapStyle &capStyle) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedCapStyle(capStyle);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
+void CanvasWindow::strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedJoinStyle(joinStyle);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::strokeWidthChanged(const qreal &strokeWidth,
+void CanvasWindow::strokeWidthChanged(const qreal &strokeWidth,
                                       const bool &finish) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeWidth(strokeWidth, finish);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::applyPaintSettingToSelected(
+void CanvasWindow::applyPaintSettingToSelected(
         const PaintSetting &setting) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->applyPaintSettingToSelected(setting);
 }
 
-void CanvasWidget::setSelectedFillColorMode(const ColorMode &mode) {
+void CanvasWindow::setSelectedFillColorMode(const ColorMode &mode) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFillColorMode(mode);
 }
 
-void CanvasWidget::setSelectedStrokeColorMode(const ColorMode &mode) {
+void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeColorMode(mode);
 }
 
-void CanvasWidget::updateAfterFrameChanged(const int &currentFrame) {
+void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->updateAfterFrameChanged(currentFrame);
 }
 
-void CanvasWidget::strokeFlatColorChanged(const Color &color,
+void CanvasWindow::strokeFlatColorChanged(const Color &color,
                                       const bool &finish) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeFlatColor(color, finish);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::fillFlatColorChanged(const Color &color,
+void CanvasWindow::fillFlatColorChanged(const Color &color,
                                         const bool &finish) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFillFlatColor(color, finish);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::fillGradientChanged(Gradient *gradient,
+void CanvasWindow::fillGradientChanged(Gradient *gradient,
                                        const bool &finish) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFillGradient(gradient, finish);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::strokeGradientChanged(Gradient *gradient,
+void CanvasWindow::strokeGradientChanged(Gradient *gradient,
                                        const bool &finish) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedStrokeGradient(gradient, finish);
     callUpdateSchedulers();
 }
 
-void CanvasWidget::pickPathForSettings() {
+void CanvasWindow::pickPathForSettings() {
     if(hasNoCanvas()) return;
     setCanvasMode(PICK_PATH_SETTINGS);
 }
 
-void CanvasWidget::updateDisplayedFillStrokeSettings() {
+void CanvasWindow::updateDisplayedFillStrokeSettings() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setDisplayedFillStrokeSettingsFromLastSelected();
 }
 
-void CanvasWidget::setEffectsPaintEnabled(const bool &bT) {
+void CanvasWindow::setEffectsPaintEnabled(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setEffectsPaintEnabled(bT);
     mCurrentCanvas->updateAllBoxes();
     callUpdateSchedulers();
 }
 
-void CanvasWidget::setResolutionFraction(const qreal &percent) {
+void CanvasWindow::setResolutionFraction(const qreal &percent) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setResolutionFraction(percent);
     mCurrentCanvas->clearAllCache();
@@ -501,32 +503,33 @@ void CanvasWidget::setResolutionFraction(const qreal &percent) {
     callUpdateSchedulers();
 }
 
-void CanvasWidget::updatePivotIfNeeded() {
+void CanvasWindow::updatePivotIfNeeded() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->updatePivotIfNeeded();
 }
 
-void CanvasWidget::schedulePivotUpdate() {
+void CanvasWindow::schedulePivotUpdate() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->schedulePivotUpdate();
 }
 
-BoxesGroup *CanvasWidget::getCurrentGroup() {
+BoxesGroup *CanvasWindow::getCurrentGroup() {
     if(hasNoCanvas()) return NULL;
     return mCurrentCanvas->getCurrentBoxesGroup();
 }
 
-void CanvasWidget::renderOutput() {
+void CanvasWindow::renderOutput() {
     QSize size = mCurrentCanvas->getCanvasSize();
-    RenderOutputWidget *dialog = new RenderOutputWidget(size.width(),
-                                                        size.height(),
-                                                        this);
+    RenderOutputWidget *dialog = new RenderOutputWidget(
+                                        size.width(),
+                                        size.height(),
+                                        MainWindow::getInstance());
     connect(dialog, SIGNAL(render(QString, qreal)),
             this, SLOT(saveOutput(QString, qreal)));
     dialog->exec();
 }
 
-void CanvasWidget::nextCurrentRenderFrame() {
+void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler()->
             getFirstEmptyFrameAfterFrame(mCurrentRenderFrame);
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
@@ -539,9 +542,9 @@ void CanvasWidget::nextCurrentRenderFrame() {
     emit changeCurrentFrame(mCurrentRenderFrame);
 }
 
-void CanvasWidget::renderPreview() {
+void CanvasWindow::renderPreview() {
     if(hasNoCanvas()) return;
-    mBoxesUpdateFinishedFunction = &CanvasWidget::nextPreviewRenderFrame;
+    mBoxesUpdateFinishedFunction = &CanvasWindow::nextPreviewRenderFrame;
     mSavedCurrentFrame = getCurrentFrame();
 
     mCurrentRenderFrame = mSavedCurrentFrame;
@@ -556,7 +559,7 @@ void CanvasWidget::renderPreview() {
     MainWindow::getInstance()->previewBeingRendered();
 }
 
-void CanvasWidget::addBoxAwaitingUpdate(BoundingBox *box) {
+void CanvasWindow::addBoxAwaitingUpdate(BoundingBox *box) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
         mLastUpdatedBox = box;
@@ -567,7 +570,7 @@ void CanvasWidget::addBoxAwaitingUpdate(BoundingBox *box) {
     }
 }
 
-void CanvasWidget::sendNextBoxForUpdate() {
+void CanvasWindow::sendNextBoxForUpdate() {
     if(mLastUpdatedBox != NULL) {
         mLastUpdatedBox->afterUpdate();
 //        mLastUpdatedBox->setAwaitingUpdate(false);
@@ -591,7 +594,7 @@ void CanvasWidget::sendNextBoxForUpdate() {
     }
 }
 
-void CanvasWidget::interruptPreview() {
+void CanvasWindow::interruptPreview() {
     if(mRendering) {
         interruptRendering();
     } else if(mPreviewing) {
@@ -599,23 +602,23 @@ void CanvasWidget::interruptPreview() {
     }
 }
 
-void CanvasWidget::outOfMemory() {
+void CanvasWindow::outOfMemory() {
     if(mRendering) {
         playPreview();
     }
 }
 
-void CanvasWidget::setRendering(const bool &bT) {
+void CanvasWindow::setRendering(const bool &bT) {
     mRendering = bT;
     mCurrentCanvas->setRendering(bT);
 }
 
-void CanvasWidget::setPreviewing(const bool &bT) {
+void CanvasWindow::setPreviewing(const bool &bT) {
     mPreviewing = bT;
     mCurrentCanvas->setPreviewing(bT);
 }
 
-void CanvasWidget::interruptRendering() {
+void CanvasWindow::interruptRendering() {
     setRendering(false);
     mBoxesUpdateFinishedFunction = NULL;
     mCurrentCanvas->clearPreview();
@@ -627,7 +630,7 @@ void CanvasWidget::interruptRendering() {
     MainWindow::getInstance()->previewFinished();
 }
 
-void CanvasWidget::stopPreview() {
+void CanvasWindow::stopPreview() {
     setPreviewing(false);
     mCurrentCanvas->getCacheHandler()->
         setContainersInFrameRangeBlocked(mSavedCurrentFrame,
@@ -639,21 +642,21 @@ void CanvasWidget::stopPreview() {
     MainWindow::getInstance()->previewFinished();
 }
 
-void CanvasWidget::pausePreview() {
+void CanvasWindow::pausePreview() {
     if(mPreviewing) {
         mPreviewFPSTimer->stop();
         MainWindow::getInstance()->previewPaused();
     }
 }
 
-void CanvasWidget::resumePreview() {
+void CanvasWindow::resumePreview() {
     if(mPreviewing) {
         mPreviewFPSTimer->start();
         MainWindow::getInstance()->previewBeingPlayed();
     }
 }
 
-void CanvasWidget::playPreview() {
+void CanvasWindow::playPreview() {
     setRendering(false);
     setPreviewing(true);
     emit changeCurrentFrame(mSavedCurrentFrame);
@@ -668,7 +671,7 @@ void CanvasWidget::playPreview() {
     MainWindow::getInstance()->previewBeingPlayed();
 }
 
-void CanvasWidget::nextPreviewRenderFrame() {
+void CanvasWindow::nextPreviewRenderFrame() {
     //mCurrentCanvas->renderCurrentFrameToPreview();
     if(!mRendering) return;
     if(mCurrentRenderFrame > getMaxFrame()) {
@@ -681,7 +684,7 @@ void CanvasWidget::nextPreviewRenderFrame() {
     }
 }
 
-void CanvasWidget::nextSaveOutputFrame() {
+void CanvasWindow::nextSaveOutputFrame() {
     mCurrentCanvas->renderCurrentFrameToOutput(mOutputString);
     if(mCurrentRenderFrame > getMaxFrame()) {
         emit changeCurrentFrame(mSavedCurrentFrame);
@@ -700,7 +703,7 @@ void CanvasWidget::nextSaveOutputFrame() {
     }
 }
 
-void CanvasWidget::loadCanvasesFromSql() {
+void CanvasWindow::loadCanvasesFromSql() {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM canvas";
@@ -729,16 +732,16 @@ void CanvasWidget::loadCanvasesFromSql() {
     }
 }
 
-void CanvasWidget::saveCanvasesFromSql(QSqlQuery *query) {
-    foreach(Canvas *canvas, mCanvasList) {
+void CanvasWindow::saveCanvasesFromSql(QSqlQuery *query) {
+    Q_FOREACH(Canvas *canvas, mCanvasList) {
         canvas->prp_saveToSql(query);
     }
 }
 
-void CanvasWidget::saveOutput(const QString &renderDest,
+void CanvasWindow::saveOutput(const QString &renderDest,
                               const qreal &resolutionFraction) {
     mOutputString = renderDest;
-    mBoxesUpdateFinishedFunction = &CanvasWidget::nextSaveOutputFrame;
+    mBoxesUpdateFinishedFunction = &CanvasWindow::nextSaveOutputFrame;
     mSavedCurrentFrame = getCurrentFrame();
     mCurrentCanvas->fitCanvasToSize();
     mSavedResolutionFraction = mCurrentCanvas->getResolutionFraction();
@@ -755,75 +758,75 @@ void CanvasWidget::saveOutput(const QString &renderDest,
     }
 }
 
-void CanvasWidget::clearAll() {
+void CanvasWindow::clearAll() {
     SWT_clearAll();
     mCanvasList.clear();
     setCurrentCanvas((Canvas*)NULL);
 }
 
-void CanvasWidget::createLinkToFileWithPath(const QString &path) {
+void CanvasWindow::createLinkToFileWithPath(const QString &path) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->createLinkToFileWithPath(path);
 }
 
-void CanvasWidget::createAnimationBoxForPaths(
+void CanvasWindow::createAnimationBoxForPaths(
         const QStringList &importPaths) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->createAnimationBoxForPaths(importPaths);
 }
 
-void CanvasWidget::createVideoForPath(const QString &path) {
+void CanvasWindow::createVideoForPath(const QString &path) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->createVideoForPath(path);
 }
 
-void CanvasWidget::createImageForPath(const QString &path) {
+void CanvasWindow::createImageForPath(const QString &path) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->createImageBox(path);
 }
 
-void CanvasWidget::createSoundForPath(const QString &path) {
+void CanvasWindow::createSoundForPath(const QString &path) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->createSoundForPath(path);
 }
 
-void CanvasWidget::saveToSql(QSqlQuery *query) {
+void CanvasWindow::saveToSql(QSqlQuery *query) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->prp_saveToSql(query);
 }
 
-int CanvasWidget::getCurrentFrame() {
+int CanvasWindow::getCurrentFrame() {
     if(hasNoCanvas()) return 0;
     return mCurrentCanvas->getCurrentFrame();
 }
 
-int CanvasWidget::getMaxFrame() {
+int CanvasWindow::getMaxFrame() {
     if(hasNoCanvas()) return 0;
     return mCurrentCanvas->getMaxFrame();
 }
 
-void CanvasWidget::updateHoveredElements() {
+void CanvasWindow::updateHoveredElements() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->updateHoveredElements();
 }
 
-void CanvasWidget::switchLocalPivot() {
+void CanvasWindow::switchLocalPivot() {
     setLocalPivot(!mCurrentCanvas->getPivotLocal());
 }
 
-bool CanvasWidget::getLocalPivot() {
+bool CanvasWindow::getLocalPivot() {
     if(hasNoCanvas()) return false;
     return mCurrentCanvas->getPivotLocal();
 }
 
-void CanvasWidget::setLocalPivot(const bool &bT) {
+void CanvasWindow::setLocalPivot(const bool &bT) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setLocalPivot(bT);
 }
 
 const int BufferSize = 32768;
 
-void CanvasWidget::initializeAudio() {
+void CanvasWindow::initializeAudio() {
     mAudioBuffer = QByteArray(BufferSize, 0);
     connect(mPreviewFPSTimer, SIGNAL(timeout()),
             this, SLOT(pushTimerExpired()));
@@ -845,12 +848,12 @@ void CanvasWidget::initializeAudio() {
     mAudioOutput = new QAudioOutput(mAudioDevice, mAudioFormat, this);
 }
 
-void CanvasWidget::startAudio() {
+void CanvasWindow::startAudio() {
     mCurrentSoundComposition->start();
     mAudioIOOutput = mAudioOutput->start();
 }
 
-void CanvasWidget::stopAudio() {
+void CanvasWindow::stopAudio() {
     //mAudioOutput->suspend();
     //mCurrentSoundComposition->stop();
     mAudioIOOutput = NULL;
@@ -859,13 +862,13 @@ void CanvasWidget::stopAudio() {
     mCurrentSoundComposition->stop();
 }
 
-void CanvasWidget::volumeChanged(int value) {
+void CanvasWindow::volumeChanged(int value) {
     if(mAudioOutput) {
         mAudioOutput->setVolume(qreal(value/100.));
     }
 }
 
-void CanvasWidget::pushTimerExpired() {
+void CanvasWindow::pushTimerExpired() {
     if(mAudioOutput && mAudioOutput->state() != QAudio::StoppedState) {
         int chunks = mAudioOutput->bytesFree()/mAudioOutput->periodSize();
         while(chunks) {
@@ -883,7 +886,7 @@ void CanvasWidget::pushTimerExpired() {
     }
 }
 
-void CanvasWidget::dropEvent(QDropEvent *event) {
+void CanvasWindow::dropEvent(QDropEvent *event) {
     const QMimeData* mimeData = event->mimeData();
 
     if(mimeData->hasUrls()) {
@@ -895,7 +898,7 @@ void CanvasWidget::dropEvent(QDropEvent *event) {
     }
 }
 
-void CanvasWidget::dragEnterEvent(QDragEnterEvent *event) {
+void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     if(event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
     }
@@ -903,7 +906,7 @@ void CanvasWidget::dragEnterEvent(QDragEnterEvent *event) {
 
 #include "svgimporter.h"
 #include <QFileDialog>
-void CanvasWidget::importFile(const QString &path) {
+void CanvasWindow::importFile(const QString &path) {
     if(hasNoCanvas()) return;
     MainWindow::getInstance()->disable();
 
@@ -931,16 +934,18 @@ void CanvasWidget::importFile(const QString &path) {
     MainWindow::getInstance()->callUpdateSchedulers();
 }
 
-void CanvasWidget::importFile() {
+void CanvasWindow::importFile() {
     MainWindow::getInstance()->disableEventFilter();
-    QStringList importPaths = QFileDialog::getOpenFileNames(this,
-        "Import File", "", "Files (*.av *.svg "
-                                  "*.mp4 *.mov *.avi "
-                                  "*.png *.jpg "
-                                  "*.wav *.mp3)");
+    QStringList importPaths = QFileDialog::getOpenFileNames(
+                                            MainWindow::getInstance(),
+                                            "Import File", "",
+                                            "Files (*.av *.svg "
+                                                   "*.mp4 *.mov *.avi "
+                                                   "*.png *.jpg "
+                                                   "*.wav *.mp3)");
     MainWindow::getInstance()->enableEventFilter();
     if(!importPaths.isEmpty()) {
-        foreach(const QString &path, importPaths) {
+        Q_FOREACH(const QString &path, importPaths) {
             if(path.isEmpty()) continue;
             importFile(path);
         }

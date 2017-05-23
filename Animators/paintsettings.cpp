@@ -155,7 +155,7 @@ Gradient::Gradient(const Color &color1, const Color &color2) :
 Property *Gradient::makeDuplicate() {
     Gradient *newGradient = new Gradient();
 
-    foreach(ColorAnimator *color, mColors) {
+    Q_FOREACH(ColorAnimator *color, mColors) {
         newGradient->addColorToList(
                     (ColorAnimator*)color->makeDuplicate(), false);
     }
@@ -253,7 +253,7 @@ int Gradient::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     query->exec("INSERT INTO gradient DEFAULT VALUES");
     mSqlId = query->lastInsertId().toInt();
     int posInGradient = 0;
-    foreach(ColorAnimator *color, mColors) {
+    Q_FOREACH(ColorAnimator *color, mColors) {
         int colorId = color->prp_saveToSql(query);
         query->exec(QString("INSERT INTO gradientcolor "
                             "(colorid, gradientid, positioningradient) "
@@ -267,7 +267,7 @@ int Gradient::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 }
 
 void Gradient::saveToSqlIfPathSelected(QSqlQuery *query) {
-    foreach(PathBox *path, mAffectedPaths) {
+    Q_FOREACH(PathBox *path, mAffectedPaths) {
         BoundingBox *parent = (BoundingBox *) path;
         while(parent != NULL) {
             if(parent->isSelected()) {
@@ -341,7 +341,7 @@ bool Gradient::affectsPaths() {
 }
 
 void Gradient::updatePaths() {
-    foreach (PathBox *path, mAffectedPaths) {
+    Q_FOREACH (PathBox *path, mAffectedPaths) {
         //path->replaceCurrentFrameCache();
         path->updateDrawGradients();
         path->scheduleSoftUpdate();
@@ -394,7 +394,7 @@ void Gradient::updateQGradientStopsFinal() {
                                mColors.at(i)->getCurrentColor().qcol) );
         cPos += inc;
     }
-    foreach(PathBox *path, mAffectedPaths) {
+    Q_FOREACH(PathBox *path, mAffectedPaths) {
         path->updateDrawGradients();
         path->replaceCurrentFrameCache();
     }

@@ -270,7 +270,7 @@ class SvgSeparatePath {
 public:
     SvgSeparatePath() {}
     virtual ~SvgSeparatePath() {
-        foreach(SvgPathPoint *point, mPoints) {
+        Q_FOREACH(SvgPathPoint *point, mPoints) {
             delete point;
         }
     }
@@ -314,7 +314,7 @@ public:
     }
 
     void applyTransfromation(const QMatrix &transformation) {
-        foreach(SvgPathPoint *point, mPoints) {
+        Q_FOREACH(SvgPathPoint *point, mPoints) {
             point->applyTransfromation(transformation);
         }
     }
@@ -443,7 +443,7 @@ class VectorPathSvgAttributes : public BoundingBoxSvgAttributes {
 public:
     VectorPathSvgAttributes() {}
     ~VectorPathSvgAttributes() {
-        foreach(SvgSeparatePath *path, mSvgSeparatePaths) {
+        Q_FOREACH(SvgSeparatePath *path, mSvgSeparatePaths) {
             delete path;
         }
     }

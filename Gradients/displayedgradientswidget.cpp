@@ -24,7 +24,7 @@ void DisplayedGradientsWidget::updateTopGradientId() {
     int newGradientId = mDisplayedTop/mScrollItemHeight;
     mHoveredGradientId += newGradientId - mTopGradientId;
     mTopGradientId = newGradientId;
-    repaint();
+    update();
 }
 
 void DisplayedGradientsWidget::setNumberGradients(const int &n) {
@@ -49,15 +49,15 @@ void DisplayedGradientsWidget::mousePressEvent(QMouseEvent *event) {
     } else if(event->button() == Qt::RightButton) {
         mGradientWidget->gradientContextMenuReq(gradientId, event->globalPos());
     }
-    repaint();
+    update();
 }
 
 void DisplayedGradientsWidget::mouseMoveEvent(QMouseEvent *event) {
     mHoveredGradientId = event->y()/mScrollItemHeight;
-    repaint();
+    update();
 }
 
 void DisplayedGradientsWidget::leaveEvent(QEvent *) {
     mHoveredGradientId = -1;
-    repaint();
+    update();
 }

@@ -36,7 +36,7 @@ QPointF SinglePathAnimator::getRelCenterPosition() {
     QPointF posSum = QPointF(0., 0.);
     int count = mPoints.length();
     if(count == 0) return posSum;
-    foreach(const QSharedPointer<PathPoint> &point, mPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         posSum += point->getRelativePos();
     }
     return posSum/count;
@@ -311,7 +311,7 @@ PathPoint *SinglePathAnimator::createNewPointOnLineNear(
 }
 
 void SinglePathAnimator::updateAfterFrameChanged(const int &currentFrame) {
-    foreach(const QSharedPointer<PathPoint> &point, mPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         point->updateAfterFrameChanged(currentFrame);
     }
 }
@@ -358,7 +358,7 @@ qreal SinglePathAnimator::findPercentForPoint(const QPointF &point,
 }
 
 void SinglePathAnimator::applyTransformToPoints(const QMatrix &transform) {
-    foreach(const QSharedPointer<PathPoint> &point, mPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         point->applyTransform(transform);
     }
 }
@@ -378,11 +378,7 @@ void SinglePathAnimator::disconnectPoints(PathPoint *point1,
     bool stillConnected = false;
     PathPoint *currPoint = point1;
     PathPoint *prevPoint = point1->getPreviousPoint();
-    PathPoint *firstPoint;
     while(prevPoint != NULL) {
-        if(currPoint->isSeparatePathPoint()) {
-            firstPoint = currPoint;
-        }
         currPoint = prevPoint;
         prevPoint = currPoint->getPreviousPoint();
     }
@@ -544,7 +540,7 @@ void SinglePathAnimator::connectPoints(PathPoint *point1,
 void SinglePathAnimator::changeAllPointsParentPathTo(SinglePathAnimator *path) {
     replaceSeparatePathPoint(NULL);
     QList<QSharedPointer<PathPoint> > allPoints = mPoints;
-    foreach(const QSharedPointer<PathPoint> &point, allPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, allPoints) {
         removeFromPointsList(point.data());
         path->appendToPointsList(point.data());
     }
@@ -570,7 +566,7 @@ MovablePoint *SinglePathAnimator::qra_getPointAt(
                         const CanvasMode &currentCanvasMode,
                         const qreal &canvasScaleInv)
 {
-    foreach(const QSharedPointer<PathPoint> &point, mPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         MovablePoint *pointToReturn =
                 point->getPointAtAbsPos(absPtPos,
                                         currentCanvasMode,
@@ -613,7 +609,7 @@ void SinglePathAnimator::drawSelected(QPainter *p,
 
 void SinglePathAnimator::selectAndAddContainedPointsToList(
         const QRectF &absRect, QList<MovablePoint *> *list) {
-    foreach(const QSharedPointer<PathPoint> &point, mPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         point->rectPointsSelection(absRect, list);
     }
 }
@@ -794,13 +790,13 @@ void SinglePathAnimator::replaceSeparatePathPoint(PathPoint *newPoint,
 }
 
 void SinglePathAnimator::startAllPointsTransform() {
-    foreach(const QSharedPointer<PathPoint> &point, mPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         point->startTransform();
     }
 }
 
 void SinglePathAnimator::finishAllPointsTransform() {
-    foreach(const QSharedPointer<PathPoint> &point, mPoints) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         point->finishTransform();
     }
 }

@@ -167,7 +167,7 @@ int VerticalWidgetsStack::getIdOf(QWidget *idOf) {
 
 void VerticalWidgetsStack::updatePercent() {
     qreal totHeight = 0.;
-    foreach(QWidget *wid, mWidgets) {
+    Q_FOREACH(QWidget *wid, mWidgets) {
         totHeight += wid->height();
         if(wid->height() == 0) totHeight += 2*MIN_WIDGET_HEIGHT;
     }

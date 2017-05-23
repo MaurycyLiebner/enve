@@ -15,7 +15,7 @@
 #include "paintcontroler.h"
 #include "qdoubleslider.h"
 #include "svgimporter.h"
-#include "canvaswidget.h"
+#include "canvaswindow.h"
 #include "BoxesList/boxscrollwidget.h"
 #include "clipboardcontainer.h"
 
@@ -85,22 +85,22 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
-    mCanvasWidget = new CanvasWidget(this);
+    mCanvasWindow = new CanvasWindow();
     connect(mMemoryHandler, SIGNAL(allMemoryUsed()),
-            mCanvasWidget, SLOT(outOfMemory()));
+            mCanvasWindow, SLOT(outOfMemory()));
 
     mBoxesListAnimationDockWidget = new BoxesListAnimationDockWidget(this);
-    connect(mCanvasWidget, SIGNAL(changeCurrentFrame(int)),
+    connect(mCanvasWindow, SIGNAL(changeCurrentFrame(int)),
             mBoxesListAnimationDockWidget, SLOT(setCurrentFrame(int)));
-    connect(mCanvasWidget, SIGNAL(changeFrameRange(int,int)),
+    connect(mCanvasWindow, SIGNAL(changeFrameRange(int,int)),
             mBoxesListAnimationDockWidget, SLOT(setMinMaxFrame(int,int)));
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
 
-    mFillStrokeSettings->setCanvasWidgetPtr(mCanvasWidget);
+    mFillStrokeSettings->setCanvasWindowPtr(mCanvasWindow);
 
     setupMenuBar();
 
-    setCentralWidget(mCanvasWidget);
+    setCentralWidget(mCanvasWindow->getWidgetContainer());
 
     showMaximized();
 
@@ -131,13 +131,13 @@ MainWindow::MainWindow(QWidget *parent)
     mLeftDock->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock);
 
-//    mCanvasWidget->SWT_getAbstractionForWidget(
+//    mCanvasWindow->SWT_getAbstractionForWidget(
 //                mBoxListWidget->getVisiblePartWidget());
 
-//    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWidget);
+//    Canvas *canvas = new Canvas(mFillStrokeSettings, mCanvasWindow);
 //    canvas->setName("Canvas 0");
-//    mCanvasWidget->addCanvasToListAndSetAsCurrent(canvas);
-//    mCanvas = mCanvasWidget->getCurrentCanvas();
+//    mCanvasWindow->addCanvasToListAndSetAsCurrent(canvas);
+//    mCanvas = mCanvasWindow->getCurrentCanvas();
 //    mCurrentCanvasComboBox->addItem(mCanvas->getName());
 
     connectToolBarActions();
@@ -161,7 +161,7 @@ void MainWindow::setupMenuBar() {
     mFileMenu->addAction("Open...", this, SLOT(openFile()));
     mFileMenu->addSeparator();
     mFileMenu->addAction("Link...", this, SLOT(linkFile()));
-    mFileMenu->addAction("Import File...", mCanvasWidget, SLOT(importFile()));
+    mFileMenu->addAction("Import File...", mCanvasWindow, SLOT(importFile()));
     mFileMenu->addAction("Import Image Sequence...", this, SLOT(importImageSequence()));
     mFileMenu->addSeparator();
     mFileMenu->addAction("Revert", this, SLOT(revert()));
@@ -203,13 +203,13 @@ void MainWindow::setupMenuBar() {
     mObjectMenu = mMenuBar->addMenu("Object");
 
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Raise", mCanvasWidget,
+    mObjectMenu->addAction("Raise", mCanvasWindow,
                            SLOT(raiseAction()));
-    mObjectMenu->addAction("Lower", mCanvasWidget,
+    mObjectMenu->addAction("Lower", mCanvasWindow,
                            SLOT(lowerAction()));
-    mObjectMenu->addAction("Rasie to Top", mCanvasWidget,
+    mObjectMenu->addAction("Rasie to Top", mCanvasWindow,
                            SLOT(raiseToTopAction()));
-    mObjectMenu->addAction("Lower to Bottom", mCanvasWidget,
+    mObjectMenu->addAction("Lower to Bottom", mCanvasWindow,
                            SLOT(lowerToBottomAction()));
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° Right");
@@ -222,27 +222,27 @@ void MainWindow::setupMenuBar() {
 
     mPathMenu = mMenuBar->addMenu("Path");
 
-    mPathMenu->addAction("Object to Path", mCanvasWidget,
+    mPathMenu->addAction("Object to Path", mCanvasWindow,
                          SLOT(objectsToPathAction()));
-    mPathMenu->addAction("Stroke to Path", mCanvasWidget,
+    mPathMenu->addAction("Stroke to Path", mCanvasWindow,
                          SLOT(strokeToPathAction()));
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Union", mCanvasWidget,
+    mPathMenu->addAction("Union", mCanvasWindow,
                          SLOT(pathsUnionAction()));
-    mPathMenu->addAction("Difference", mCanvasWidget,
+    mPathMenu->addAction("Difference", mCanvasWindow,
                          SLOT(pathsDifferenceAction()));
-    mPathMenu->addAction("Intersection", mCanvasWidget,
+    mPathMenu->addAction("Intersection", mCanvasWindow,
                          SLOT(pathsIntersectionAction()));
-    mPathMenu->addAction("Exclusion", mCanvasWidget,
+    mPathMenu->addAction("Exclusion", mCanvasWindow,
                          SLOT(pathsExclusionAction()));
-    mPathMenu->addAction("Division", mCanvasWidget,
+    mPathMenu->addAction("Division", mCanvasWindow,
                          SLOT(pathsDivisionAction()));
 //    mPathMenu->addAction("Cut Path", mCanvas,
 //                         SLOT(pathsCutAction()));
     mPathMenu->addSeparator();
-    mPathMenu->addAction("Combine", mCanvasWidget,
+    mPathMenu->addAction("Combine", mCanvasWindow,
                          SLOT(pathsCombineAction()));
-    mPathMenu->addAction("Break Apart", mCanvasWidget,
+    mPathMenu->addAction("Break Apart", mCanvasWindow,
                          SLOT(pathsBreakApartAction()));
 
     mEffectsMenu = mMenuBar->addMenu("Effects");
@@ -264,21 +264,21 @@ void MainWindow::setupMenuBar() {
 //
 
     connect(mActionEffectsPaintEnabled, SIGNAL(toggled(bool)),
-            mCanvasWidget, SLOT(setEffectsPaintEnabled(bool)));
+            mCanvasWindow, SLOT(setEffectsPaintEnabled(bool)));
 }
 
 void MainWindow::addCanvasToRenderQue() {
-    if(mCanvasWidget->hasNoCanvas()) return;
+    if(mCanvasWindow->hasNoCanvas()) return;
     mBoxesListAnimationDockWidget->getRenderWidget()->
-    createNewRenderInstanceWidgetForCanvas(mCanvasWidget->getCurrentCanvas());
+    createNewRenderInstanceWidgetForCanvas(mCanvasWindow->getCurrentCanvas());
 }
 
 void MainWindow::updateSettingsForCurrentCanvas() {
-    if(mCanvasWidget->hasNoCanvas()) {
+    if(mCanvasWindow->hasNoCanvas()) {
         mObjectSettingsWidget->setMainTarget(NULL);
         return;
     }
-    Canvas *canvas = mCanvasWidget->getCurrentCanvas();
+    Canvas *canvas = mCanvasWindow->getCurrentCanvas();
     mActionEffectsPaintEnabled->setChecked(canvas->effectsPaintEnabled());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(
@@ -454,47 +454,47 @@ void MainWindow::setupToolBar() {
 
 void MainWindow::connectToolBarActions() {
     connect(mMovePathMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setMovePathMode()) );
+            mCanvasWindow, SLOT(setMovePathMode()) );
     connect(mMovePointMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setMovePointMode()) );
+            mCanvasWindow, SLOT(setMovePointMode()) );
     connect(mAddPointMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setAddPointMode()) );
+            mCanvasWindow, SLOT(setAddPointMode()) );
     connect(mCircleMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setCircleMode()) );
+            mCanvasWindow, SLOT(setCircleMode()) );
     connect(mRectangleMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setRectangleMode()) );
+            mCanvasWindow, SLOT(setRectangleMode()) );
     connect(mTextMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setTextMode()) );
+            mCanvasWindow, SLOT(setTextMode()) );
     connect(mParticleBoxMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setParticleBoxMode()) );
+            mCanvasWindow, SLOT(setParticleBoxMode()) );
     connect(mParticleEmitterMode, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(setParticleEmitterMode()));
+            mCanvasWindow, SLOT(setParticleEmitterMode()));
     connect(mActionConnectPoints, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(connectPointsSlot()) );
+            mCanvasWindow, SLOT(connectPointsSlot()) );
     connect(mActionDisconnectPoints, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(disconnectPointsSlot()) );
+            mCanvasWindow, SLOT(disconnectPointsSlot()) );
     connect(mActionMergePoints, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(mergePointsSlot()) );
+            mCanvasWindow, SLOT(mergePointsSlot()) );
     connect(mActionSymmetricPointCtrls, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(makePointCtrlsSymmetric()) );
+            mCanvasWindow, SLOT(makePointCtrlsSymmetric()) );
     connect(mActionSmoothPointCtrls, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(makePointCtrlsSmooth()) );
+            mCanvasWindow, SLOT(makePointCtrlsSmooth()) );
     connect(mActionCornerPointCtrls, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(makePointCtrlsCorner()) );
+            mCanvasWindow, SLOT(makePointCtrlsCorner()) );
     connect(mActionLine, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(makeSegmentLine()) );
+            mCanvasWindow, SLOT(makeSegmentLine()) );
     connect(mActionCurve, SIGNAL(pressed()),
-            mCanvasWidget, SLOT(makeSegmentCurve()) );
+            mCanvasWindow, SLOT(makeSegmentCurve()) );
     connect(mCurrentCanvasComboBox, SIGNAL(editTextChanged(QString)),
-            mCanvasWidget, SLOT(renameCurrentCanvas(QString)));
+            mCanvasWindow, SLOT(renameCurrentCanvas(QString)));
     connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-            mCanvasWidget, SLOT(setCurrentCanvas(int)));
+            mCanvasWindow, SLOT(setCurrentCanvas(int)));
     connect(mNewCanvasButton, SIGNAL(pressed()),
             this, SLOT(createNewCanvas()));
     connect(mFontWidget, SIGNAL(fontSizeChanged(qreal)),
-            mCanvasWidget, SLOT(setFontSize(qreal)) );
+            mCanvasWindow, SLOT(setFontSize(qreal)) );
     connect(mFontWidget, SIGNAL(fontFamilyAndStyleChanged(QString, QString)),
-            mCanvasWidget, SLOT(setFontFamilyAndStyle(QString, QString)) );
+            mCanvasWindow, SLOT(setFontFamilyAndStyle(QString, QString)) );
 }
 
 MainWindow *MainWindow::getInstance()
@@ -509,7 +509,7 @@ void MainWindow::createNewCanvas() {
 
     if(dialog.exec() == QDialog::Accepted) {
         Canvas *newCanvas = new Canvas(getFillStrokeSettings(),
-                                       mCanvasWidget,
+                                       mCanvasWindow,
                                        dialog.getCanvasWidth(),
                                        dialog.getCanvasHeight(),
                                        dialog.getCanvasFrameCount());
@@ -521,15 +521,15 @@ void MainWindow::createNewCanvas() {
 }
 
 void MainWindow::addCanvas(Canvas *newCanvas) {
-    mCanvasWidget->addCanvasToListAndSetAsCurrent(newCanvas);
+    mCanvasWindow->addCanvasToListAndSetAsCurrent(newCanvas);
 
     disconnect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-            mCanvasWidget, SLOT(setCurrentCanvas(int)));
+            mCanvasWindow, SLOT(setCurrentCanvas(int)));
     mCurrentCanvasComboBox->addItem(newCanvas->getName());
     mCurrentCanvasComboBox->setCurrentIndex(
                 mCurrentCanvasComboBox->count() - 1);
     connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
-            mCanvasWidget, SLOT(setCurrentCanvas(int)));
+            mCanvasWindow, SLOT(setCurrentCanvas(int)));
 }
 
 void MainWindow::createDetachedUndoRedoStack()
@@ -547,9 +547,9 @@ void MainWindow::deleteDetachedUndoRedoStack()
 }
 
 void MainWindow::updateCanvasModeButtonsChecked() {
-    if(mCanvasWidget->hasNoCanvas()) return;
+    if(mCanvasWindow->hasNoCanvas()) return;
     const CanvasMode &currentMode =
-            mCanvasWidget->getCurrentCanvas()->getCurrentCanvasMode();
+            mCanvasWindow->getCurrentCanvas()->getCurrentCanvasMode();
     mMovePathMode->setChecked(currentMode == MOVE_PATH);
     mMovePointMode->setChecked(currentMode == MOVE_POINT);
     mAddPointMode->setChecked(currentMode == ADD_POINT);
@@ -675,13 +675,13 @@ void MainWindow::previewPaused() {
 //    if(!mRendering) {
 //        mCurrentRenderFrame = mMaxFrame;
 //        mCanvas->clearPreview();
-//        mCanvasWidget->repaint();
+//        mCanvasWindow->repaint();
 //        previewFinished();
 //    }
 //}
 
 void MainWindow::setResolutionFractionValue(const qreal &value) {
-    mCanvasWidget->setResolutionFraction(value);
+    mCanvasWindow->setResolutionFraction(value);
 }
 
 UndoRedoStack *MainWindow::getUndoRedoStack() {
@@ -714,8 +714,7 @@ bool MainWindow::isAltPressed()
     return mAltPressed;
 }
 
-void MainWindow::callUpdateSchedulers()
-{
+void MainWindow::callUpdateSchedulers() {
     if(!isEnabled()) {
         return;
     }
@@ -723,21 +722,21 @@ void MainWindow::callUpdateSchedulers()
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
-    foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
+    Q_FOREACH(UpdateScheduler *sheduler, mUpdateSchedulers) {
         sheduler->update();
         delete sheduler;
     }
 
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mUpdateSchedulers.clear();
-    mCanvasWidget->updateHoveredElements();
-    mCanvasWidget->updatePivotIfNeeded();
-    mCanvasWidget->repaint();
-    mObjectSettingsWidget->repaint();
+    mCanvasWindow->updateHoveredElements();
+    mCanvasWindow->updatePivotIfNeeded();
+    mCanvasWindow->repaint();
+    mObjectSettingsWidget->update();
     //mKeysView->repaint();
     mBoxesListAnimationDockWidget->update();
     updateDisplayedFillStrokeSettingsIfNeeded();
-    mFillStrokeSettings->repaint();
+    mFillStrokeSettings->update();
     emit updateAll();
 
     mCurrentUndoRedoStack->startNewSet();
@@ -777,7 +776,7 @@ bool MainWindow::askForSaving() {
 }
 
 void MainWindow::schedulePivotUpdate() {
-    mCanvasWidget->schedulePivotUpdate();
+    mCanvasWindow->schedulePivotUpdate();
 }
 
 BoxScrollWidget *MainWindow::getObjectSettingsList() {
@@ -799,7 +798,7 @@ void MainWindow::disable()
     mGrayOutWidget->setStyleSheet(
                 "QWidget { background-color: rgb(0, 0, 0, 125) }");
     mGrayOutWidget->show();
-    mGrayOutWidget->repaint();
+    mGrayOutWidget->update();
 }
 
 void MainWindow::enable() {
@@ -809,7 +808,7 @@ void MainWindow::enable() {
 }
 
 int MainWindow::getCurrentFrame() {
-    return mCanvasWidget->getCurrentFrame();
+    return mCanvasWindow->getCurrentFrame();
 }
 
 bool MainWindow::isRecordingAllPoints() {
@@ -817,12 +816,12 @@ bool MainWindow::isRecordingAllPoints() {
 }
 
 int MainWindow::getFrameCount() {
-    return mCanvasWidget->getMaxFrame();
+    return mCanvasWindow->getMaxFrame();
 }
 #include "Colors/ColorWidgets/gradientwidget.h"
 void MainWindow::setCurrentFrame(int frame) {
     mFillStrokeSettings->getGradientWidget()->updateAfterFrameChanged(frame);
-    mCanvasWidget->updateAfterFrameChanged(frame);
+    mCanvasWindow->updateAfterFrameChanged(frame);
 
     callUpdateSchedulers();
 }
@@ -875,7 +874,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 }
 
 void MainWindow::updateDisplayedFillStrokeSettings() {
-    mCanvasWidget->updateDisplayedFillStrokeSettings();
+    mCanvasWindow->updateDisplayedFillStrokeSettings();
 }
 
 void MainWindow::updateDisplayedFillStrokeSettingsIfNeeded() {
@@ -903,7 +902,7 @@ bool MainWindow::processKeyEvent(QKeyEvent *event) {
         saveFile();
     } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
         openFile();
-    } else if(mCanvasWidget->processFilteredKeyEvent(event) ) {
+    } else if(mCanvasWindow->processFilteredKeyEvent(event) ) {
     } else if(mBoxesListAnimationDockWidget->processFilteredKeyEvent(event) ) {
     } else {
         returnBool = false;
@@ -918,7 +917,7 @@ bool MainWindow::isEnabled() {
 }
 
 void MainWindow::clearAll() {
-    foreach(UpdateScheduler *sheduler, mUpdateSchedulers) {
+    Q_FOREACH(UpdateScheduler *sheduler, mUpdateSchedulers) {
         delete sheduler;
     }
     mUpdateSchedulers.clear();
@@ -927,7 +926,7 @@ void MainWindow::clearAll() {
     mObjectSettingsWidget->setMainTarget(NULL);
     mBoxesListAnimationDockWidget->clearAll();
     mCurrentCanvasComboBox->clear();
-    mCanvasWidget->clearAll();
+    mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
     //mBoxListWidget->clearAll();
 }
@@ -1008,9 +1007,9 @@ void MainWindow::linkFile() {
         "Link File", "", "AniVect Files (*.av)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
-        foreach(const QString &path, importPaths) {
+        Q_FOREACH(const QString &path, importPaths) {
             if(path.isEmpty()) continue;
-            mCanvasWidget->createLinkToFileWithPath(path);
+            mCanvasWindow->createLinkToFileWithPath(path);
         }
     }
 }
@@ -1021,7 +1020,7 @@ void MainWindow::importImageSequence() {
         "Import Image Sequence", "", "Images (*.png *.jpg)");
     enableEventFilter();
     if(!importPaths.isEmpty()) {
-        mCanvasWidget->createAnimationBoxForPaths(importPaths);
+        mCanvasWindow->createAnimationBoxForPaths(importPaths);
     }
     callUpdateSchedulers();
 }
@@ -1031,8 +1030,8 @@ void MainWindow::importImageSequence() {
 //    QStringList importPaths = QFileDialog::getOpenFileNames(this,
 //        "Import Video", "", "Video (*.mp4 *.mov *.avi)");
 //    enableEventFilter();
-//    foreach(const QString &path, importPaths) {
-//        mCanvasWidget->createVideoForPath(path);
+//    Q_FOREACH(const QString &path, importPaths) {
+//        mCanvasWindow->createVideoForPath(path);
 //    }
 //    callUpdateSchedulers();
 //}
@@ -1057,7 +1056,7 @@ void MainWindow::loadAVFile(QString path) {
 
     loadAllGradientsFromSql();
 
-    mCanvasWidget->loadCanvasesFromSql();
+    mCanvasWindow->loadCanvasesFromSql();
 
     clearLoadedGradientsList();
     db.close();
@@ -1069,7 +1068,7 @@ void MainWindow::loadAVFile(QString path) {
 
 
 Gradient *MainWindow::getLoadedGradientBySqlId(const int &id) {
-    foreach(Gradient *gradient, mLoadedGradientsList) {
+    Q_FOREACH(Gradient *gradient, mLoadedGradientsList) {
         if(gradient->getSqlId() == id) {
             return gradient;
         }
@@ -1360,7 +1359,7 @@ void MainWindow::saveToFile(QString path) {
     query.exec("BEGIN TRANSACTION");
 
     mFillStrokeSettings->saveGradientsToQuery(&query);
-    mCanvasWidget->saveToSql(&query);
+    mCanvasWindow->saveToSql(&query);
 
     query.exec("COMMIT TRANSACTION");
     db.close();

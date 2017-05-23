@@ -66,7 +66,9 @@ void BlurEffect::apply(BoundingBox *target,
                        QImage *imgPtr,
                        const fmt_filters::image &img,
                        qreal scale) {
-    //Q_UNUSED(imgPtr);
+    Q_UNUSED(target);
+    Q_UNUSED(scale);
+    Q_UNUSED(imgPtr);
     qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
     //fmt_filters::blur(img, radius, radius*0.3333);
     //return;
@@ -718,6 +720,8 @@ void ImplodeEffect::apply(BoundingBox *target,
                         const fmt_filters::image &img,
                         qreal scale) {
     Q_UNUSED(imgPtr);
+    Q_UNUSED(target);
+    Q_UNUSED(scale);
     fmt_filters::implode(img,
                          mFactorAnimator->qra_getCurrentValue(),
                          fmt_filters::rgba(0, 0, 0, 0));
@@ -785,6 +789,8 @@ void DesaturateEffect::apply(BoundingBox *target,
                         const fmt_filters::image &img,
                         qreal scale) {
     Q_UNUSED(imgPtr);
+    Q_UNUSED(target);
+    Q_UNUSED(scale);
     fmt_filters::desaturate(img,
                             mInfluenceAnimator->qra_getCurrentValue());
 }

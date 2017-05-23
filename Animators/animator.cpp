@@ -55,7 +55,7 @@ void Animator::prp_switchRecording() {
 void Animator::anim_mergeKeysIfNeeded() {
     Key *lastKey = NULL;
     QList<KeyPair> keyPairsToMerge;
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         Key *keyPtr = key.get();
         if(lastKey != NULL) {
             if(keyPtr->getAbsFrame() == lastKey->getAbsFrame() ) {
@@ -69,7 +69,7 @@ void Animator::anim_mergeKeysIfNeeded() {
         }
         lastKey = keyPtr;
     }
-    foreach(KeyPair keyPair, keyPairsToMerge) {
+    Q_FOREACH(KeyPair keyPair, keyPairsToMerge) {
         keyPair.merge();
     }
 }
@@ -156,7 +156,7 @@ void Animator::anim_callFrameChangeUpdater() {
 }
 
 void Animator::anim_updateAfterShifted() {
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         emit prp_removingKey(key.get());
         emit prp_addingKey(key.get());
     }
@@ -213,6 +213,7 @@ void Animator::anim_removeKey(Key *keyToRemove,
 void Animator::anim_moveKeyToRelFrame(Key *key,
                                       const int &newFrame,
                                       const bool &finish) {
+    Q_UNUSED(finish);
     anim_updateAfterChangedKey(key);
     emit prp_removingKey(key);
     key->setRelFrame(newFrame);
@@ -259,13 +260,13 @@ Key *Animator::prp_getKeyAtPos(const qreal &relX,
 }
 
 void Animator::prp_addAllKeysToComplexAnimator(ComplexAnimator *target) {
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         target->ca_addDescendantsKey(key.get());
     }
 }
 
 void Animator::prp_removeAllKeysFromComplexAnimator(ComplexAnimator *target) {
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         target->ca_removeDescendantsKey(key.get());
     }
 }
@@ -299,7 +300,7 @@ bool Animator::prp_isRecording() {
 void Animator::anim_removeAllKeys() {
     if(anim_mKeys.isEmpty()) return;
     QList<std::shared_ptr<Key>> keys = anim_mKeys;
-    foreach(const std::shared_ptr<Key> &key, keys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, keys) {
         anim_removeKey(key.get());
     }
 }
@@ -416,7 +417,7 @@ void Animator::prp_drawKeys(QPainter *p,
                             const int &endFrame) {
     p->save();
     //p->translate(getFrameShift()*pixelsPerFrame, 0.);
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         if(key->getAbsFrame() >= startFrame &&
            key->getAbsFrame() <= endFrame) {
             anim_drawKey(p, key.get(), pixelsPerFrame, drawY, startFrame);

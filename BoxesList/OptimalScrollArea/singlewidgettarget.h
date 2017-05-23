@@ -130,7 +130,7 @@ typedef bool (SingleWidgetTarget::*SWT_Checker)();
 
 struct SWT_TargetTypes {
     bool isTargeted(SingleWidgetTarget *target) const {
-        foreach(SWT_Checker func, targetsFunctionList) {
+        Q_FOREACH(SWT_Checker func, targetsFunctionList) {
             if((target->*func)()) {
                 return true;
             }

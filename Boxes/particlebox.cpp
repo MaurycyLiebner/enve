@@ -47,7 +47,7 @@ void ParticleBox::updateAfterFrameChanged(const int &currentFrame) {
 void ParticleBox::updateRelBoundingRect() {
     mRelBoundingRect = QRectF(mTopLeftPoint->getRelativePos(),
                               mBottomRightPoint->getRelativePos());
-//    foreach(ParticleEmitter *emitter, mEmitters) {
+//    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
 //        mRelBoundingRect = mRelBoundingRect.united(
 //                    emitter->getParticlesBoundingRect());
 //    }
@@ -56,7 +56,7 @@ void ParticleBox::updateRelBoundingRect() {
 }
 
 void ParticleBox::preUpdatePixmapsUpdates() {
-    foreach(ParticleEmitter *emitter, mEmitters) {
+    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
         emitter->generateParticlesIfNeeded();
         emitter->updateParticlesForFrameIfNeeded(mUpdateRelFrame);
     }
@@ -67,7 +67,7 @@ void ParticleBox::preUpdatePixmapsUpdates() {
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
     if(mRelBoundingRectPath.contains(relPos) ) {
         /*if(mEmitters.isEmpty()) */return true;
-        foreach(ParticleEmitter *emitter, mEmitters) {
+        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
             if(emitter->relPointInsidePath(relPos)) {
                 return true;
             }
@@ -92,7 +92,7 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
     int maxFrame = mDurationRectangle->getMaxFrameAsRelFrame();
-    foreach(ParticleEmitter *emitter, mEmitters) {
+    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
         emitter->setFrameRange(minFrame, maxFrame);
     }
 }
@@ -101,7 +101,7 @@ void ParticleBox::draw(QPainter *p) {
     p->save();
 
     p->setClipRect(mRelBoundingRect);
-    foreach(ParticleEmitter *emitter, mEmitters) {
+    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
         emitter->drawParticles(p);
     }
 
@@ -112,7 +112,7 @@ void ParticleBox::draw(QPainter *p) {
 
 void ParticleBox::applyPaintSetting(const PaintSetting &setting) {
     if(setting.targetsFill()) {
-        foreach(ParticleEmitter *emitter, mEmitters) {
+        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
             setting.applyColorSetting(emitter->getColorAnimator());
         }
     }
@@ -133,7 +133,7 @@ void ParticleBox::drawSelected(QPainter *p,
             p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
             mTopLeftPoint->draw(p);
             mBottomRightPoint->draw(p);
-            foreach(ParticleEmitter *emitter, mEmitters) {
+            Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
                 MovablePoint *pt = emitter->getPosPoint();
                 pt->draw(p);
             }
@@ -162,7 +162,7 @@ MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
         }
     }
 
-    foreach(ParticleEmitter *emitter, mEmitters) {
+    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
         if(pt->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
             return pt;
@@ -185,7 +185,7 @@ void ParticleBox::selectAndAddContainedPointsToList(const QRectF &absRect,
             list->append(mBottomRightPoint);
         }
     }
-    foreach(ParticleEmitter *emitter, mEmitters) {
+    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
         MovablePoint *pt = emitter->getPosPoint();
         if(pt->isContainedInRect(absRect)) {
             pt->select();
@@ -678,7 +678,7 @@ void ParticleEmitter::drawParticles(QPainter *p) {
         p->setBrush(mColorAnimator->getCurrentColor().qcol);
         p->setPen(Qt::NoPen);
     }
-    foreach(const ParticleState &state, mParticleStates) {
+    Q_FOREACH(const ParticleState &state, mParticleStates) {
         state.draw(p);
     }
     p->restore();
@@ -686,13 +686,13 @@ void ParticleEmitter::drawParticles(QPainter *p) {
 
 void ParticleEmitter::updateParticlesForFrame(const int &frame) {
     mParticleStates.clear();
-    foreach(Particle *particle, mParticles) {
+    Q_FOREACH(Particle *particle, mParticles) {
         if(particle->isVisibleAtFrame(frame)) {
             mParticleStates << particle->getParticleStateAtFrame(frame);
         }
     }
     QRectF rect;
-    foreach(const ParticleState &state, mParticleStates) {
+    Q_FOREACH(const ParticleState &state, mParticleStates) {
         const QPointF &pos = state.pos;
         if(rect.isNull()) {
             rect.setTopLeft(pos);

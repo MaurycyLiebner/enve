@@ -12,7 +12,7 @@ SingleWidgetTarget::~SingleWidgetTarget() {
 //void SingleWidgetTarget::SWT_addChildrenAbstractions(
 //        SingleWidgetAbstraction *SWT_Abstraction,
 //        ScrollWidgetVisiblePart *visiblePartWidget) {
-//    foreach(SingleWidgetTarget *child, mChildren) {
+//    Q_FOREACH(SingleWidgetTarget *child, mChildren) {
 //        SWT_Abstraction->addChildAbstraction(
 //                    child->createAbstraction(visiblePartWidget));
 //    }
@@ -36,21 +36,21 @@ void SingleWidgetTarget::SWT_removeAbstractionFromList(
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
         SingleWidgetTarget *target) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->addChildAbstractionForTarget(target);
     }
 }
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
         SingleWidgetTarget *target, const int &id) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->addChildAbstractionForTargetAt(target, id);
     }
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
         const SWT_Rule &rule) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfIsCurrentRule(rule);
     }
 }
@@ -58,34 +58,34 @@ void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithTarget(
         SingleWidgetTarget *targetP,
         const SWT_Target &target) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfIsCurrentTarget(targetP,
                                                           target);
     }
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty() {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfSearchNotEmpty();
     }
 }
 
 void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
         SingleWidgetTarget *target) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->removeChildAbstractionForTarget(target);
     }
 }
 
 void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
         SingleWidgetTarget *target, const int &id) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         abs->moveChildAbstractionForTargetTo(target, id);
     }
 }
 
 void SingleWidgetTarget::SWT_clearAll() {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         delete abs;
     }
     mSWT_allAbstractions.clear();

@@ -122,7 +122,7 @@ public:
     //QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
     bool areAllChildrenSelected() {
-        foreach(Key *key, mKeys) {
+        Q_FOREACH(Key *key, mKeys) {
             if(key->isSelected() ||
                key->areAllChildrenSelected()) continue;
             return false;
@@ -134,7 +134,7 @@ public:
     void addToSelection(QList<Key *> *selectedKeys);
 
     bool hasKey(Key *key) {
-        foreach(Key *keyT, mKeys) {
+        Q_FOREACH(Key *keyT, mKeys) {
             if(key == keyT) {
                 return true;
             }
@@ -145,7 +145,7 @@ public:
     bool differsFromKey(Key *key) {
         ComplexKey *otherKey = (ComplexKey*)key;
         if(getChildKeysCount() == otherKey->getChildKeysCount()) {
-            foreach(Key *key, mKeys) {
+            Q_FOREACH(Key *key, mKeys) {
                 if(otherKey->hasSameKey(key)) continue;
                 return true;
             }
@@ -159,7 +159,7 @@ public:
     }
 
     bool hasSameKey(Key *otherKey) {
-        foreach(Key *key, mKeys) {
+        Q_FOREACH(Key *key, mKeys) {
             if(key->getParentAnimator() == otherKey->getParentAnimator()) {
                 if(key->differsFromKey(otherKey)) return false;
                 return true;

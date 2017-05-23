@@ -3,7 +3,7 @@
 
 void Canvas::connectPoints() {
     QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
             if(((PathPoint*)point)->isEndPoint()) {
                 selectedPathPoints.append( (PathPoint*) point);
@@ -23,7 +23,7 @@ void Canvas::connectPoints() {
 
 void Canvas::disconnectPoints() {
     QList<PathPoint*> selectedPathPoints;
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             if(point->isPathPoint()) {
                 PathPoint *nextPoint = ((PathPoint*)point)->getNextPoint();
                 if(nextPoint == NULL) continue;
@@ -32,7 +32,7 @@ void Canvas::disconnectPoints() {
                 }
             }
         }
-        foreach(PathPoint *point, selectedPathPoints) {
+        Q_FOREACH(PathPoint *point, selectedPathPoints) {
             PathPoint *secondPoint = point->getNextPoint();
             if(secondPoint == NULL) secondPoint = point->getPreviousPoint();
             if(point->getParentPath() ==
@@ -45,7 +45,7 @@ void Canvas::disconnectPoints() {
 
 void Canvas::mergePoints() {
     QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
             //if(((PathPoint*)point)->isEndPoint()) {
                 selectedPathPoints.append( (PathPoint*) point);
@@ -85,7 +85,7 @@ void Canvas::mergePoints() {
 }
 
 void Canvas::setPointCtrlsMode(CtrlsMode mode) {
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
             ( (PathPoint*)point)->setCtrlsMode(mode);
         }
@@ -94,12 +94,12 @@ void Canvas::setPointCtrlsMode(CtrlsMode mode) {
 
 void Canvas::makeSelectedPointsSegmentsCurves() {
     QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
             selectedPathPoints.append( (PathPoint*) point);
         }
     }
-    foreach(PathPoint *selectedPoint,
+    Q_FOREACH(PathPoint *selectedPoint,
             selectedPathPoints) {
         PathPoint *nextPoint = selectedPoint->getNextPoint();
         PathPoint *prevPoint = selectedPoint->getPreviousPoint();
@@ -114,12 +114,12 @@ void Canvas::makeSelectedPointsSegmentsCurves() {
 
 void Canvas::makeSelectedPointsSegmentsLines() {
     QList<PathPoint*> selectedPathPoints;
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         if(point->isPathPoint()) {
             selectedPathPoints.append( (PathPoint*) point);
         }
     }
-    foreach(PathPoint *selectedPoint,
+    Q_FOREACH(PathPoint *selectedPoint,
             selectedPathPoints) {
         PathPoint *nextPoint = selectedPoint->getNextPoint();
         PathPoint *prevPoint = selectedPoint->getPreviousPoint();
@@ -135,7 +135,7 @@ void Canvas::makeSelectedPointsSegmentsLines() {
 void Canvas::finishSelectedPointsTransform() {
     if(isRecordingAllPoints() ) {
         QList<SinglePathAnimator*> separatePaths;
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             if(point->isPathPoint()) {
                 SinglePathAnimator *sPath = ((PathPoint*)point)->getParentPath();
                 if(separatePaths.contains(sPath)) continue;
@@ -144,11 +144,11 @@ void Canvas::finishSelectedPointsTransform() {
                 point->finishTransform();
             }
         }
-        foreach(SinglePathAnimator *path, separatePaths) {
+        Q_FOREACH(SinglePathAnimator *path, separatePaths) {
             path->finishAllPointsTransform();
         }
     } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             point->finishTransform();
         }
     }
@@ -157,7 +157,7 @@ void Canvas::finishSelectedPointsTransform() {
 void Canvas::startSelectedPointsTransform() {
     if(isRecordingAllPoints() ) {
         QList<SinglePathAnimator*> separatePaths;
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             if(point->isPathPoint()) {
                 SinglePathAnimator *sPath = ((PathPoint*)point)->getParentPath();
                 if(separatePaths.contains(sPath)) continue;
@@ -166,18 +166,18 @@ void Canvas::startSelectedPointsTransform() {
                 point->startTransform();
             }
         }
-        foreach(SinglePathAnimator *path, separatePaths) {
+        Q_FOREACH(SinglePathAnimator *path, separatePaths) {
             path->startAllPointsTransform();
         }
     } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             point->startTransform();
         }
     }
 }
 
 void Canvas::cancelSelectedPointsTransform() {
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         point->cancelTransform();
     }
 }
@@ -186,18 +186,18 @@ void Canvas::moveSelectedPointsByAbs(const QPointF &by,
                                      const bool &startTransform) {
     if(startTransform) {
         startSelectedPointsTransform();
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             point->moveByAbs(by);
         }
     } else {
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             point->moveByAbs(by);
         }
     }
 }
 
 void Canvas::selectAndAddContainedPointsToSelection(QRectF absRect) {
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->selectAndAddContainedPointsToList(absRect, &mSelectedPoints);
     }
 }
@@ -218,17 +218,17 @@ void Canvas::removePointFromSelection(MovablePoint *point) {
 void Canvas::updateSelectedPointsAfterCtrlsVisiblityChanged() {
     if(!BoxesGroup::mCtrlsAlwaysVisible) {
         QList<MovablePoint*> pointsToDeselect;
-        foreach(MovablePoint *point, mSelectedPoints) {
+        Q_FOREACH(MovablePoint *point, mSelectedPoints) {
             pointsToDeselect << point;
         }
-        foreach(MovablePoint *point, pointsToDeselect) {
+        Q_FOREACH(MovablePoint *point, pointsToDeselect) {
             removePointFromSelection(point);
         }
     }
 }
 
 void Canvas::removeSelectedPointsApproximateAndClearList() {
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         point->deselect();
         point->removeApproximate();
     }
@@ -237,7 +237,7 @@ void Canvas::removeSelectedPointsApproximateAndClearList() {
 
 void Canvas::removeSelectedPointsAndClearList()
 {
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         point->deselect();
         point->removeFromVectorPath();
     }
@@ -246,7 +246,7 @@ void Canvas::removeSelectedPointsAndClearList()
 
 void Canvas::clearPointsSelection()
 {
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         point->deselect();
     }
     mSelectedPoints.clear();
@@ -275,7 +275,7 @@ QPointF Canvas::getSelectedPointsAbsPivotPos() {
     if(mSelectedPoints.isEmpty()) return QPointF(0., 0.);
     QPointF posSum = QPointF(0., 0.);
     int count = mSelectedPoints.length();
-    foreach(MovablePoint *point, mSelectedPoints) {
+    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         posSum += point->getAbsolutePos();
     }
     return posSum/count;
@@ -295,25 +295,25 @@ void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
     if(mSelectedPoints.isEmpty()) return;
     if(mLocalPivot || !mGlobalPivotVisible) {
         if(startTrans) {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         }
     } else {
         if(startTrans) {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         } else {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->rotateRelativeToSavedPivot(rotBy);
             }
         }
@@ -327,25 +327,25 @@ void Canvas::scaleSelectedPointsBy(const qreal &scaleXBy,
     if(mSelectedPoints.isEmpty()) return;
     if(mLocalPivot || !mGlobalPivotVisible) {
         if(startTrans) {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(point->getAbsolutePos());
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy );
             }
         } else {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         }
     } else {
         if(startTrans) {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();
                 point->saveTransformPivotAbsPos(absOrigin);
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         } else {
-            foreach(MovablePoint *point, mSelectedPoints) {
+            Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->scaleRelativeToSavedPivot(scaleXBy, scaleYBy);
             }
         }

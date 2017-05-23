@@ -168,7 +168,7 @@ void AnimationWidgetScrollBar::wheelEvent(QWheelEvent *event)
     }
 
     emitChange();
-    repaint();
+    update();
 }
 
 bool AnimationWidgetScrollBar::setFirstViewedFrame(int firstFrame) {
@@ -197,7 +197,7 @@ void AnimationWidgetScrollBar::mousePressEvent(QMouseEvent *event)
         emitChange();
     }
     mSavedFirstFrame = mFirstViewedFrame;
-    repaint();
+    update();
 }
 
 void AnimationWidgetScrollBar::mouseMoveEvent(QMouseEvent *event)
@@ -208,21 +208,21 @@ void AnimationWidgetScrollBar::mouseMoveEvent(QMouseEvent *event)
                                      mMinFrame,
                                      mMaxFrame)) ) {
         emitChange();
-        repaint();
+        update();
     }
 }
 
 void AnimationWidgetScrollBar::mouseReleaseEvent(QMouseEvent *)
 {
     mPressed = false;
-    repaint();
+    update();
 }
 
 void AnimationWidgetScrollBar::setViewedFramesRange(int startFrame, int endFrame)
 {
     setFirstViewedFrame(startFrame);
     setFramesSpan(endFrame - startFrame);
-    repaint();
+    update();
 }
 
 void AnimationWidgetScrollBar::setMinMaxFrames(int minFrame, int maxFrame)
@@ -230,7 +230,7 @@ void AnimationWidgetScrollBar::setMinMaxFrames(int minFrame, int maxFrame)
     mMinFrame = minFrame;
     mMaxFrame = maxFrame;
     mMaxSpan = mMaxFrame - mMinFrame;
-    repaint();
+    update();
 }
 
 void AnimationWidgetScrollBar::emitChange()

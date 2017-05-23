@@ -26,7 +26,7 @@ class ColorSettingsWidget;
 
 class BoxesListAnimationDockWidget;
 
-class CanvasWidget;
+class CanvasWindow;
 class MemoryHandler;
 
 class ObjectSettingsWidget;
@@ -80,7 +80,7 @@ public:
     AnimationDockWidget *getAnimationDockWidget();
     BoxScrollWidget *getObjectSettingsList();
 
-    CanvasWidget *getCanvasWidget() { return mCanvasWidget; }
+    CanvasWindow *getCanvasWindow() { return mCanvasWindow; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
     void saveToFile(QString path);
     void loadAVFile(QString path);
@@ -217,7 +217,7 @@ private:
     QMenu *mViewMenu;
     QMenu *mRenderMenu;
 
-    CanvasWidget *mCanvasWidget;
+    CanvasWindow *mCanvasWindow;
     UndoRedoStack mUndoRedoStack;
     bool mDetachedUndoRedoStack = false;
     UndoRedoStack *mCurrentUndoRedoStack;

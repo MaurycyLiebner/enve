@@ -58,7 +58,7 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
-    foreach(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
             return abs;
         }
@@ -226,6 +226,7 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
         const qreal &resolution,
         const QMatrix &allUglyTransform,
         QPoint *drawPosP) {
+    Q_UNUSED(resolution);
     QRectF allUglyBoundingRect =
             allUglyTransform.mapRect(mUpdateRelBoundingRect).
                 adjusted(-effectsMargin, -effectsMargin,
@@ -824,7 +825,7 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     }
     if(durationRect == NULL) {
         int shift = mDurationRectangle->getFrameShift();
-        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
             anim_moveKeyToRelFrame(key.get(), key->getRelFrame() + shift);
         }
     }

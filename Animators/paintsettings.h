@@ -212,7 +212,7 @@ public:
                                  ComplexAnimator *parentAnimator = NULL) {
         Q_UNUSED(shift);
         if(parentAnimator == NULL) return;
-        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
             parentAnimator->ca_updateDescendatKeyFrame(key.get());
         }
     }

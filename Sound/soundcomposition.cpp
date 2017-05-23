@@ -41,7 +41,7 @@ void SoundComposition::generateData(const int &startAbsFrame,
 //    }
 //    free(data1);
 
-    foreach(SingleSound *sound, mSounds) {
+    Q_FOREACH(SingleSound *sound, mSounds) {
         sound->updateFinalDataIfNeeded(fps, startAbsFrame, endAbsFrame);
         const int &soundStartFrame = sound->getStartAbsFrame();
         const int &soundSampleCount = sound->getSampleCount();

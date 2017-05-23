@@ -15,7 +15,7 @@ void EffectAnimators::addEffect(PixmapEffect *effect) {
 
 int EffectAnimators::prp_saveToSql(QSqlQuery *query,
                                     const int &boundingBoxSqlId) {
-    foreach(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         ((PixmapEffect*)effect.data())->
                 prp_saveToSql(query, boundingBoxSqlId);
     }
@@ -77,14 +77,14 @@ void EffectAnimators::applyEffects(BoundingBox *target,
                                    QImage *imgPtr,
                                    const fmt_filters::image &img,
                                    const qreal &scale) {
-    foreach(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         ((PixmapEffect*)effect.data())->apply(target, imgPtr, img, scale);
     }
 }
 
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
-    foreach(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         qreal effectMargin = ((PixmapEffect*)effect.data())->getMargin();
         newMargin += effectMargin;
     }
@@ -97,7 +97,7 @@ bool EffectAnimators::hasEffects() {
 
 void EffectAnimators::makeDuplicate(Property *target) {
     EffectAnimators *eaTarget = ((EffectAnimators*)target);
-    foreach(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         eaTarget->addEffect((PixmapEffect*)
                     ((PixmapEffect*)effect.data())->makeDuplicate());
     }

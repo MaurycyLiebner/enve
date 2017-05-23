@@ -105,7 +105,7 @@ public:
     void generateParticlesIfNeeded();
     void updateParticlesForFrameIfNeeded(const int &frame);
     bool relPointInsidePath(const QPointF &relPos) {
-        foreach(const ParticleState &state, mParticleStates) {
+        Q_FOREACH(const ParticleState &state, mParticleStates) {
             if(pointToLen(state.pos - relPos) < 5.) {
                 return true;
             }
@@ -245,7 +245,7 @@ public:
     void makeDuplicate(Property *targetBox) {
         BoundingBox::makeDuplicate(targetBox);
         ParticleBox *pbTarget = (ParticleBox*)targetBox;
-        foreach(ParticleEmitter *emitter, mEmitters) {
+        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
             pbTarget->addEmitter((ParticleEmitter*)
                                  emitter->makeDuplicate());
         }
@@ -272,7 +272,7 @@ public:
         BoundingBox::setUpdateVars();
         if(mFrameChangedUpdateScheduled) {
             mFrameChangedUpdateScheduled = false;
-            foreach(ParticleEmitter *emitter, mEmitters) {
+            Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
                 emitter->scheduleUpdateParticlesForFrame();
             }
         }

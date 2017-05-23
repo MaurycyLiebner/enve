@@ -217,7 +217,7 @@ qreal getTforBezierPoint(const qreal &x0,
     getTValuesforBezier1D(y0, y1, y2, y3, y, &yValues);
     qreal bestT = 0.;
     qreal minErrorT = 1000000.;
-    foreach(const std::complex<double> &yVal, yValues) {
+    Q_FOREACH(const std::complex<double> &yVal, yValues) {
         qreal errorT = pointToLen(QPointF(calcCubicBezierVal(x0, x1, x2, x3,
                                                              yVal.real()),
                                           calcCubicBezierVal(y0, y1, y2, y3,
@@ -228,7 +228,7 @@ qreal getTforBezierPoint(const qreal &x0,
             bestT = yVal.real();
         }
     }
-    foreach(const std::complex<double> &xVal, xValues) {
+    Q_FOREACH(const std::complex<double> &xVal, xValues) {
         qreal errorT = pointToLen(QPointF(calcCubicBezierVal(x0, x1, x2, x3,
                                                              xVal.real()),
                                           calcCubicBezierVal(y0, y1, y2, y3,

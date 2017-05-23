@@ -12,7 +12,7 @@
 #include "Sound/soundcomposition.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-               CanvasWidget *canvasWidget,
+               CanvasWindow *canvasWidget,
                int canvasWidth, int canvasHeight,
                const int &frameCount) :
     BoxesGroup(fillStrokeSettings) {
@@ -31,7 +31,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mHeight = canvasHeight;
     mVisibleWidth = mWidth;
     mVisibleHeight = mHeight;
-    mCanvasWidget = canvasWidget;
+    mCanvasWindow = canvasWidget;
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -88,7 +88,7 @@ void Canvas::showContextMenu(QPoint globalPos) {
 BoundingBox *Canvas::createLink(BoxesGroup *parent) {
     InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this,
                                                            parent);
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->createSameTransformationLink(linkGroup);
     }
     return linkGroup;
@@ -127,12 +127,13 @@ void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
 }
 
 bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
+    Q_UNUSED(event);
     return false;
 }
 
 bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
     if(processUnfilteredKeyEvent(event)) return true;
-    if(!mCanvasWidget->hasFocus()) return false;
+    if(!mCanvasWindow->hasFocus()) return false;
     if(isCtrlPressed() && event->key() == Qt::Key_G) {
         if(isShiftPressed()) {
             ungroupSelected();
@@ -198,7 +199,7 @@ void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
     QPen pen = QPen(Qt::black, 1.);
     pen.setCosmetic(true);
     p->setPen(pen);
-    foreach(BoundingBox *box, mSelectedBoxes) {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->drawSelected(p, currentCanvasMode);
     }
 }
@@ -238,7 +239,7 @@ void Canvas::paintEvent(QPainter *p) {
 
     if(isPreviewingOrRendering()) {
         QPainterPath path;
-        path.addRect(0, 0, mCanvasWidget->width() + 1, mCanvasWidget->height() + 1);
+        path.addRect(0, 0, mCanvasWindow->width() + 1, mCanvasWindow->height() + 1);
         QPainterPath viewRectPath;
         viewRectPath.addRect(viewRect);
         p->setBrush(QColor(0, 0, 0));
@@ -258,13 +259,13 @@ void Canvas::paintEvent(QPainter *p) {
         p->restore();
     } else {
         p->fillRect(0, 0,
-                    mCanvasWidget->width() + 1,
-                    mCanvasWidget->height() + 1,
+                    mCanvasWindow->width() + 1,
+                    mCanvasWindow->height() + 1,
                     QColor(75, 75, 75));
         p->fillRect(viewRect, mBackgroundColor->getCurrentColor().qcol);
 
         p->setTransform(QTransform(mCanvasTransformMatrix), true);
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmap(p);
         }
         QPen pen = QPen(Qt::black, 1.5);
@@ -298,7 +299,7 @@ void Canvas::paintEvent(QPainter *p) {
 
         if(mInputTransformationEnabled) {
             QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
-                                    mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
+                                    mCanvasWindow->height() - MIN_WIDGET_HEIGHT,
                                     5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
             p->fillRect(inputRect, QColor(225, 225, 225));
             QString text;
@@ -316,13 +317,13 @@ void Canvas::paintEvent(QPainter *p) {
         p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
     }
 
-    if(mCanvasWidget->hasFocus() ) {
+    if(mCanvasWindow->hasFocus() ) {
         p->setPen(QPen(Qt::red, 4.));
     } else {
         p->setPen(Qt::NoPen);
     }
     p->setBrush(Qt::NoBrush);
-    p->drawRect(mCanvasWidget->rect());
+    p->drawRect(mCanvasWindow->rect());
 }
 
 bool Canvas::isMovingPath() {
@@ -372,12 +373,12 @@ void Canvas::playPreview(const int &minPreviewFrameId,
     setCurrentPreviewContainer(mCacheHandler.getRenderContainerAtRelFrame(
                                     mCurrentPreviewFrameId));
     setPreviewing(true);
-    mCanvasWidget->repaint();
+    mCanvasWindow->repaint();
 }
 
 void Canvas::clearPreview() {
     mMainWindow->previewFinished();
-    mCanvasWidget->stopPreview();
+    mCanvasWindow->stopPreview();
 }
 
 void Canvas::nextPreviewFrame() {
@@ -389,7 +390,7 @@ void Canvas::nextPreviewFrame() {
                 mCacheHandler.getRenderContainerAtOrBeforeRelFrame(
                                     mCurrentPreviewFrameId));
     }
-    mCanvasWidget->repaint();
+    mCanvasWindow->repaint();
 }
 
 void Canvas::beforeUpdate() {
@@ -438,8 +439,9 @@ void Canvas::renderCurrentFrameToPreview() {
 }
 
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
+    Q_UNUSED(renderDest);
     mRenderImage = QImage(mRenderImageSize,
-                              QImage::Format_ARGB32_Premultiplied);
+                          QImage::Format_ARGB32_Premultiplied);
     mRenderImage.fill(mRenderBackgroundColor);
     renderCurrentFrameToQImage(&mRenderImage);
     //clearCurrentPreviewImage();
@@ -452,7 +454,7 @@ void Canvas::clearCurrentPreviewImage() {
 void Canvas::drawPreviewPixmap(QPainter *p) {
     if(isVisibleAndInVisibleDurationRect()) {
         p->save();
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes){
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawUpdatePixmap(p);
         }
 
@@ -611,14 +613,14 @@ void Canvas::updateInputValue() {
 
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
-    //mCanvasWidget->setMouseTracking(true);
-    mCanvasWidget->grabMouse();
+    //mCanvasWindow->setMouseTracking(true);
+    mCanvasWindow->grabMouse();
 }
 
 void Canvas::releaseMouseAndDontTrack() {
     mIsMouseGrabbing = false;
-    //mCanvasWidget->setMouseTracking(false);
-    mCanvasWidget->releaseMouse();
+    //mCanvasWindow->setMouseTracking(false);
+    mCanvasWindow->releaseMouse();
 }
 
 bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
@@ -698,7 +700,7 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
 void Canvas::keyPressEvent(QKeyEvent *event) {
     if(isPreviewingOrRendering()) return;
 
-    bool isGrabbingMouse = mCanvasWidget->mouseGrabber() == mCanvasWidget;
+    bool isGrabbingMouse = mCanvasWindow->isMouseGrabber();
     if(isGrabbingMouse ? !handleKeyPressEventWhileMouseGrabbing(event) : true) {
         if(isCtrlPressed() && event->key() == Qt::Key_V) {
             if(event->isAutoRepeat()) return;
@@ -711,7 +713,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
             if(event->isAutoRepeat()) return;
             BoxesClipboardContainer *container =
                     new BoxesClipboardContainer();
-            foreach(BoundingBox *box, mSelectedBoxes) {
+            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
                 container->copyBoxToContainer(box);
             }
             mMainWindow->replaceClipboard(container);
@@ -753,7 +755,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
         } else if(event->key() == Qt::Key_R && (isMovingPath() ||
                   mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
            mTransformationFinishedBeforeMouseRelease = false;
-           QPoint cursorPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+           QPoint cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
            setLastMouseEventPosAbs(cursorPos);
            setLastMousePressPosAbs(cursorPos);
            mRotPivot->startRotating();
@@ -767,7 +769,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
            mXOnlyTransform = false;
            mYOnlyTransform = false;
 
-           QPoint cursorPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+           QPoint cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
            setLastMouseEventPosAbs(cursorPos);
            setLastMousePressPosAbs(cursorPos);
            mRotPivot->startScaling();
@@ -782,7 +784,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
             mXOnlyTransform = false;
             mYOnlyTransform = false;
 
-            QPoint cursorPos = mCanvasWidget->mapFromGlobal(QCursor::pos());
+            QPoint cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
             setLastMouseEventPosAbs(cursorPos);
             setLastMousePressPosAbs(cursorPos);
             mDoubleClick = false;
@@ -834,8 +836,8 @@ void Canvas::resetTransormation() {
     mCanvasTransformMatrix.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
-    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
-                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF( (mCanvasWindow->width() - mVisibleWidth)*0.5,
+                    (mCanvasWindow->height() - mVisibleHeight)*0.5) );
 
 }
 
@@ -843,13 +845,13 @@ void Canvas::fitCanvasToSize() {
     mCanvasTransformMatrix.reset();
     mVisibleHeight = mHeight + MIN_WIDGET_HEIGHT;
     mVisibleWidth = mWidth + MIN_WIDGET_HEIGHT;
-    qreal widthScale = mCanvasWidget->width()/mVisibleWidth;
-    qreal heightScale = mCanvasWidget->height()/mVisibleHeight;
+    qreal widthScale = mCanvasWindow->width()/mVisibleWidth;
+    qreal heightScale = mCanvasWindow->height()/mVisibleHeight;
     zoomCanvas(qMin(heightScale, widthScale), QPointF(0., 0.));
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
-    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
-                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF( (mCanvasWindow->width() - mVisibleWidth)*0.5,
+                    (mCanvasWindow->height() - mVisibleHeight)*0.5) );
 
 }
 
@@ -867,7 +869,7 @@ void Canvas::moveByRel(const QPointF &trans) {
 
 void Canvas::updateAfterFrameChanged(const int &currentFrame) {
     anim_mCurrentAbsFrame = currentFrame;
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
     prp_setAbsFrame(currentFrame);
@@ -973,7 +975,7 @@ void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
     if(mAwaitingUpdate) return;
     mAwaitingUpdate = true;
     addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));
-    //mCanvasWidget->addBoxAwaitingUpdate(this);
+    //mCanvasWindow->addBoxAwaitingUpdate(this);
 }
 
 int Canvas::getCurrentFrame() {

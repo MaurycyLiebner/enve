@@ -49,7 +49,7 @@ void BoxScrollWidgetVisiblePart::drawKeys(QPainter *p,
                                           const int &maxViewedFrame) {
     //p->setPen(QPen(Qt::black, 1.));
     p->setPen(Qt::NoPen);
-    foreach(SingleWidget *container, mSingleWidgets) {
+    Q_FOREACH(SingleWidget *container, mSingleWidgets) {
         ((BoxSingleWidget*)container)->drawKeys(
                             p, pixelsPerFrame,
                             container->y(),
@@ -64,7 +64,7 @@ Key *BoxScrollWidgetVisiblePart::getKeyAtPos(
     int remaining = pressY % MIN_WIDGET_HEIGHT;
     if(remaining < (MIN_WIDGET_HEIGHT - KEY_RECT_SIZE)/2 ||
        remaining > (MIN_WIDGET_HEIGHT + KEY_RECT_SIZE)/2) return NULL;
-    foreach(SingleWidget *container, mSingleWidgets) {
+    Q_FOREACH(SingleWidget *container, mSingleWidgets) {
         int containerTop = container->y();
         int containerBottom = containerTop + container->height();
         if(containerTop > pressY || containerBottom < pressY) continue;
@@ -80,7 +80,7 @@ DurationRectangleMovable *BoxScrollWidgetVisiblePart::getRectangleMovableAtPos(
         const int &pressY,
         const qreal &pixelsPerFrame,
         const int &minViewedFrame) {
-    foreach(SingleWidget *container, mSingleWidgets) {
+    Q_FOREACH(SingleWidget *container, mSingleWidgets) {
         int containerTop = container->y();
         int containerBottom = containerTop + container->height();
         if(containerTop > pressY || containerBottom < pressY) continue;
@@ -107,7 +107,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
                                       true,
                                       false);
 
-    foreach(SingleWidgetAbstraction *abs, abstractions) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, abstractions) {
         SingleWidgetTarget *target = abs->getTarget();
         if(target->SWT_isAnimator()) {
             Animator *anim_target = (Animator*)target;
@@ -116,7 +116,7 @@ void BoxScrollWidgetVisiblePart::getKeysInRect(QRectF selectionRect,
                                      listKeys);
         }
     }
-//    foreach(SingleWidget *container, mSingleWidgets) {
+//    Q_FOREACH(SingleWidget *container, mSingleWidgets) {
 //        int containerTop = container->y();
 //        int containerBottom = containerTop + container->height();
 //        if(containerTop > selectionRect.bottom() ||

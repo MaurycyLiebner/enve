@@ -1,7 +1,8 @@
-#ifndef CANVASWIDGET_H
-#define CANVASWIDGET_H
+#ifndef CANVASWINDOW_H
+#define CANVASWINDOW_H
 
 #include <QWidget>
+#include "glwindow.h"
 class Canvas;
 enum CanvasMode : short;
 class Color;
@@ -14,12 +15,11 @@ class SoundComposition;
 #include "boxeslistanimationdockwidget.h"
 #include <QAudioOutput>
 
-class CanvasWidget : public QWidget, public SingleWidgetTarget
-{
+class CanvasWindow : public GLWindow, public SingleWidgetTarget {
     Q_OBJECT
 public:
-    explicit CanvasWidget(QWidget *parent = 0);
-    ~CanvasWidget();
+    explicit CanvasWindow();
+    ~CanvasWindow();
 
     Canvas *getCurrentCanvas();
     const QList<Canvas*> &getCanvasList() {
@@ -86,7 +86,39 @@ public:
     void setLocalPivot(const bool &bT);
 
     void importFile(const QString &path);
+
+    QWidget *getWidgetContainer() {
+        return mWidgetContainer;
+    }
+
+    void grabMouse() {
+        //mWidgetContainer->grabMouse();
+    }
+
+    bool hasFocus() {
+        return mWidgetContainer->hasFocus();
+    }
+
+    void repaint() {
+        mWidgetContainer->update();
+    }
+
+    QRect rect() {
+        return mWidgetContainer->rect();
+    }
+
+    void releaseMouse() {
+//        QWidget *grabber = mWidgetContainer->mouseGrabber();
+//        mWidgetContainer->releaseMouse();
+//        grabber = mWidgetContainer->mouseGrabber();
+    }
+
+    bool isMouseGrabber() {
+        return mWidgetContainer->mouseGrabber() == mWidgetContainer;
+    }
+
 protected:
+    QWidget *mWidgetContainer;
     void setRendering(const bool &bT);
     void setPreviewing(const bool &bT);
 
@@ -106,11 +138,11 @@ protected:
     QString mOutputString;
     int mCurrentRenderFrame;
 
-    void (CanvasWidget::*mBoxesUpdateFinishedFunction)(void) = NULL;
+    void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
     Canvas *mCurrentCanvas = NULL;
     QList<Canvas*> mCanvasList;
 
-    void paintEvent(QPaintEvent *);
+    //void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -137,6 +169,7 @@ protected:
 
     QByteArray mAudioBuffer;
     // AUDIO
+    void qRender(QPainter *p);
 signals:
     void updateBoxPixmaps(BoundingBox*);
     void changeCurrentFrame(int);
@@ -206,4 +239,4 @@ private slots:
     void pushTimerExpired();
 };
 
-#endif // CANVASWIDGET_H
+#endif // CANVASWINDOW_H

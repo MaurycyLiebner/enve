@@ -45,7 +45,7 @@ void GradientWidget::setCurrentColorId(int id) {
     //Color col = mCurrentGradient->getCurrentColorAt(mCurrentColorId);
     emit selectedColorChanged(
                 mCurrentGradient->getColorAnimatorAt(mCurrentColorId));
-    repaint();
+    update();
 }
 
 void GradientWidget::updateNumberOfGradients() {
@@ -115,13 +115,13 @@ void GradientWidget::removeGradient(int gradientId)
 }
 
 void GradientWidget::saveGradientsToQuery(QSqlQuery *query) {
-    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
+    Q_FOREACH(const QSharedPointer<Gradient> &gradient, mGradients) {
         gradient->prp_saveToSql(query);
     }
 }
 
 void GradientWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
-    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
+    Q_FOREACH(const QSharedPointer<Gradient> &gradient, mGradients) {
         gradient->saveToSqlIfPathSelected(query);
     }
 }
@@ -332,7 +332,7 @@ void GradientWidget::drawHoveredColorBorder(const int &hoveredX,
 }
 
 void GradientWidget::updateAfterFrameChanged(const int &absFrame) {
-    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
+    Q_FOREACH(const QSharedPointer<Gradient> &gradient, mGradients) {
         gradient->prp_setAbsFrame(absFrame);
     }
 }

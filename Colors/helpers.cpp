@@ -39,8 +39,7 @@ bool outsideCircle(int r, int x_t, int y_t)
 //    return d != d;
 //}
 
-void glOrthoAndViewportSet(GLuint w, GLuint h)
-{
+void glOrthoAndViewportSet(GLuint w, GLuint h) {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();

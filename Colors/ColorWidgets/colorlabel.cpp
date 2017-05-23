@@ -10,8 +10,7 @@ ColorLabel::ColorLabel(QWidget *parent) : ColorWidget(parent)
     //setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
-void ColorLabel::mousePressEvent(QMouseEvent *e)
-{
+void ColorLabel::mousePressEvent(QMouseEvent *e) {
 
 }
 

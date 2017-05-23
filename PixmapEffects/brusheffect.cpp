@@ -123,7 +123,7 @@
 
 //    imgPtr->fill(Qt::transparent);
 
-//    foreach(BrushStroke *stroke, strokes) {
+//    Q_FOREACH(BrushStroke *stroke, strokes) {
 //        stroke->drawOnImage(imgPtr);
 //        delete stroke;
 //    }

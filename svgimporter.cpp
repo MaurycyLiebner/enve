@@ -110,7 +110,7 @@ struct SvgAttribute {
 void extractSvgAttributes(const QString &string,
                           QList<SvgAttribute> *attributesList) {
     QStringList attributesStrList = string.split(";");
-    foreach(const QString &attributeStr, attributesStrList) {
+    Q_FOREACH(const QString &attributeStr, attributesStrList) {
         attributesList->append(SvgAttribute(attributeStr));
     }
 }
@@ -220,8 +220,7 @@ static qreal toDouble(const QChar *&str)
     return val;
 }
 
-static qreal toDouble(const QString &str, bool *ok = NULL)
-{
+static qreal toDouble(const QString &str, bool *ok = NULL) {
     const QChar *c = str.constData();
     qreal res = toDouble(c);
     if (ok) {
@@ -230,15 +229,14 @@ static qreal toDouble(const QString &str, bool *ok = NULL)
     return res;
 }
 
-static qreal toDouble(const QStringRef &str, bool *ok = NULL)
-{
-    const QChar *c = str.constData();
-    qreal res = toDouble(c);
-    if (ok) {
-        *ok = (c == (str.constData() + str.length()));
-    }
-    return res;
-}
+//static qreal toDouble(const QStringRef &str, bool *ok = NULL) {
+//    const QChar *c = str.constData();
+//    qreal res = toDouble(c);
+//    if (ok) {
+//        *ok = (c == (str.constData() + str.length()));
+//    }
+//    return res;
+//}
 
 static void parseNumbersArray(const QChar *&str, QVarLengthArray<qreal, 8> &points)
 {
@@ -609,7 +607,7 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
     QList<SvgAttribute> styleAttributes;
     QString styleAttributesStr = element.attribute("style");
     extractSvgAttributes(styleAttributesStr, &styleAttributes);
-    foreach(const SvgAttribute &attribute, styleAttributes) {
+    Q_FOREACH(const SvgAttribute &attribute, styleAttributes) {
         QString name = attribute.getName();
         if(name.isEmpty()) continue;
         QString value = attribute.getValue();
@@ -1728,7 +1726,7 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
 void VectorPathSvgAttributes::apply(VectorPath *path)
 {
     PathAnimator *pathAnimator = path->getPathAnimator();
-    foreach(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
+    Q_FOREACH(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
         SinglePathAnimator *singlePath =
                 new SinglePathAnimator(pathAnimator);
@@ -1753,7 +1751,7 @@ void SvgSeparatePath::apply(SinglePathAnimator *path)
 {
     PathPoint *lastPoint = NULL;
     PathPoint *firstPoint = NULL;
-    foreach(SvgPathPoint *point, mPoints) {
+    Q_FOREACH(SvgPathPoint *point, mPoints) {
         PathPoint *newPoint = new PathPoint(path);
         if(firstPoint == NULL) firstPoint = newPoint;
         path->addPoint(newPoint, lastPoint);

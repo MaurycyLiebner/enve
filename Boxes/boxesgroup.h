@@ -4,7 +4,7 @@
 #include "Boxes/vectorpath.h"
 #include "fillstrokesettings.h"
 
-#define foreachBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
+#define Q_FOREACHBoxInListInverted(boxesList) BoundingBox *box = getAtIndexOrGiveNull((boxesList).count() - 1, (boxesList)); \
     for(int i = (boxesList).count() - 1; i >= 0; i--, box = getAtIndexOrGiveNull(i, (boxesList)) )
 
 
@@ -136,18 +136,18 @@ public:
 
     void applyPaintSetting(
             const PaintSetting &setting) {
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             box->applyPaintSetting(setting);
         }
     }
 
     void setFillColorMode(const ColorMode &colorMode) {
-        foreach(const QSharedPointer<BoundingBox> &box,  mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box,  mChildBoxes) {
             box->setFillColorMode(colorMode);
         }
     }
     void setStrokeColorMode(const ColorMode &colorMode) {
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             box->setStrokeColorMode(colorMode);
         }
     }

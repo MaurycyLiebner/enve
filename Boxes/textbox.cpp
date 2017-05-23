@@ -149,11 +149,11 @@ void TextBox::updatePath()
     QFontMetricsF fm(mFont);
     qreal yT = 0.;
     qreal maxWidth = 0.;
-    foreach(QString line, lines) {
+    Q_FOREACH(QString line, lines) {
         qreal lineWidth = fm.width(line);
         if(lineWidth > maxWidth) maxWidth = lineWidth;
     }
-    foreach(QString line, lines) {
+    Q_FOREACH(QString line, lines) {
         qreal lineWidth = fm.width(line);
         mPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth), yT,
                       mFont, line);

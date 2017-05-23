@@ -1,0 +1,126 @@
+#include "glwindow.h"
+#include "Colors/helpers.h"
+#include <QPainter>
+
+static const int kStencilBits = 8;  // Skia needs 8 stencil bits
+// If you want multisampling, uncomment the below lines and set a sample count
+static const int kMsaaSampleCount = 0; //4;
+// SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+// SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, kMsaaSampleCount);
+
+GLWindow::GLWindow(QScreen *screen)
+    : QWindow(screen), QOpenGLFunctions() {
+    setSurfaceType(OpenGLSurface);
+}
+
+void GLWindow::bindSkia() {
+    GrBackendRenderTarget backendRT = GrBackendRenderTarget(
+                                        width(), height(),
+                                        kMsaaSampleCount, kStencilBits,
+                                        kSkia8888_GrPixelConfig, m_fbInfo);
+
+    // setup SkSurface
+    // To use distance field text, use commented out SkSurfaceProps instead
+    // SkSurfaceProps props(SkSurfaceProps::kUseDeviceIndependentFonts_Flag,
+    //                      SkSurfaceProps::kLegacyFontHost_InitType);
+    SkSurfaceProps props(SkSurfaceProps::kLegacyFontHost_InitType);
+
+    mSurface = SkSurface::MakeFromBackendRenderTarget(
+                                    mGrContext,
+                                    backendRT,
+                                    kBottomLeft_GrSurfaceOrigin,
+                                    nullptr,
+                                    &props);
+
+    mCanvas = mSurface->getCanvas();
+}
+
+void GLWindow::resizeEvent(QResizeEvent *) {
+    if(!m_context) return;
+    bindSkia();
+}
+
+void GLWindow::initialize() {
+    glClearColor(1.f, 1.f, 1.f, 1.f);
+
+    //Set blending
+    glEnable( GL_BLEND );
+    glDisable( GL_DEPTH_TEST );
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+    // setup GrContext
+    mInterface = GrGLCreateNativeInterface();
+
+    // setup contexts
+    mGrContext = GrContext::Create(kOpenGL_GrBackend,
+                                   (GrBackendContext)mInterface);
+    SkASSERT(mGrContext);
+
+    // Wrap the frame buffer object attached to the screen in
+    // a Skia render target so Skia can render to it
+    GrGLint buffer;
+    GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+    m_fbInfo.fFBOID = buffer;
+    bindSkia();
+}
+
+//void glOrthoAndViewportSet(GLuint w, GLuint h) {
+//    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    glOrtho(0.0f, w, h, 0.0f, 0.0f, 1.0f);
+//    glMatrixMode(GL_MODELVIEW);
+//}
+
+
+void GLWindow::renderNow() {
+    if(!isExposed()) return;
+
+    bool needsInitialize = false;
+    if (!m_context) {
+        m_context = new QOpenGLContext(this);
+        m_context->setFormat(requestedFormat());
+        m_context->create();
+
+        needsInitialize = true;
+    }
+
+    m_context->makeCurrent(this);
+
+    if(needsInitialize) {
+        initializeOpenGLFunctions();
+        initialize();
+    }
+
+    glOrthoAndViewportSet(width(), height());
+    mCanvas->clear(SK_ColorWHITE);
+    render(mCanvas);
+    mCanvas->flush();
+
+    if(!m_device) m_device = new QOpenGLPaintDevice;
+
+    m_device->setSize(size());
+
+    QPainter painter(m_device);
+    qRender(&painter);
+
+    m_context->swapBuffers(this);
+    //m_context->doneCurrent();
+}
+
+bool GLWindow::event(QEvent *event) {
+    switch (event->type()) {
+    case QEvent::UpdateRequest:
+        renderNow();
+        return true;
+    default:
+        if(isExposed()) requestUpdate();
+        return QWindow::event(event);
+    }
+}
+
+//void GLWindow::exposeEvent(QExposeEvent *event) {
+//    Q_UNUSED(event);
+
+//    if(isExposed()) renderNow();
+//}

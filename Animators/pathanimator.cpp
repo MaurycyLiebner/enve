@@ -25,7 +25,7 @@ void PathAnimator::setParentBox(BoundingBox *parent) {
 
 VectorPathEdge *PathAnimator::getEgde(const QPointF &absPos,
                                       const qreal &canvasScaleInv) {
-    foreach(SinglePathAnimator *path, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *path, mSinglePaths) {
         VectorPathEdge *edge = path->getEgde(absPos, canvasScaleInv);
         if(edge == NULL) continue;
         return edge;
@@ -37,7 +37,7 @@ QPointF PathAnimator::getRelCenterPosition() {
 //    QPointF posSum = QPointF(0., 0.);
 //    int count = mPoints.length();
 //    if(count == 0) return posSum;
-//    foreach(PathPoint *point, mPoints) {
+//    Q_FOREACH(PathPoint *point, mPoints) {
 //        posSum += point->getRelativePos();
 //    }
 //    return posSum/count;
@@ -129,7 +129,7 @@ void PathAnimator::updatePath()
 {
     mPath = QPainterPath();
 
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->updatePath();
         mPath.addPath(singlePath->getCurrentPath());
     }
@@ -138,7 +138,7 @@ void PathAnimator::updatePath()
 PathPoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
                                                   const bool &adjust,
                                                   const qreal &canvasScaleInv) {
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         PathPoint *pt = singlePath->createNewPointOnLineNear(absPos,
                                                              adjust,
                                                              canvasScaleInv);
@@ -149,7 +149,7 @@ PathPoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
 }
 
 void PathAnimator::updateAfterFrameChanged(const int &currentFrame) {
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->updateAfterFrameChanged(currentFrame);
     }
 }
@@ -157,7 +157,7 @@ void PathAnimator::updateAfterFrameChanged(const int &currentFrame) {
 qreal PathAnimator::findPercentForPoint(const QPointF &point,
                                         PathPoint **prevPoint,
                                         qreal *error) {
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         const qreal &val =
                 singlePath->findPercentForPoint(point, prevPoint, error);
         if(*prevPoint == NULL) continue;
@@ -167,7 +167,7 @@ qreal PathAnimator::findPercentForPoint(const QPointF &point,
 }
 
 void PathAnimator::applyTransformToPoints(const QMatrix &transform) {
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->applyTransformToPoints(transform);
     }
 }
@@ -176,7 +176,7 @@ MovablePoint *PathAnimator::qra_getPointAt(
                                     const QPointF &absPtPos,
                                     const CanvasMode &currentCanvasMode,
                                     const qreal &canvasScaleInv) {
-    foreach(SinglePathAnimator *sepAnim, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *sepAnim, mSinglePaths) {
         MovablePoint *pt = sepAnim->qra_getPointAt(absPtPos,
                                                    currentCanvasMode,
                                                    canvasScaleInv);
@@ -190,14 +190,14 @@ MovablePoint *PathAnimator::qra_getPointAt(
 void PathAnimator::drawSelected(QPainter *p,
                                 const CanvasMode &currentCanvasMode,
                                 const QMatrix &combinedTransform) {
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->drawSelected(p, currentCanvasMode, combinedTransform);
     }
 }
 
 void PathAnimator::selectAndAddContainedPointsToList(
         const QRectF &absRect, QList<MovablePoint *> *list) {
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->selectAndAddContainedPointsToList(absRect,
                                                       list);
     }
@@ -205,7 +205,7 @@ void PathAnimator::selectAndAddContainedPointsToList(
 
 int PathAnimator::prp_saveToSql(QSqlQuery *query,
                                 const int &boundingBoxId) {
-    foreach(SinglePathAnimator *singlePath, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->savePointsToSql(query, boundingBoxId);
     }
     return 0;
@@ -261,7 +261,7 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
 
 void PathAnimator::duplicatePathsTo(
         PathAnimator *target) {
-    foreach(SinglePathAnimator *sepPoint, mSinglePaths) {
+    Q_FOREACH(SinglePathAnimator *sepPoint, mSinglePaths) {
         SinglePathAnimator *copy = new SinglePathAnimator(target);
         sepPoint->duplicatePathPointsTo(copy);
         target->addSinglePathAnimator(copy);

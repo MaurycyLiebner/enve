@@ -7,6 +7,21 @@
 QT       += multimedia core gui svg opengl sql xml
 LIBS     += -lavutil -lavformat -lavcodec -lswscale -lswresample -ltcmalloc
 
+INCLUDEPATH += /home/ailuropoda/.skia/include/images/
+INCLUDEPATH += /home/ailuropoda/.skia/include/core/
+INCLUDEPATH += /home/ailuropoda/.skia/include/utils/
+INCLUDEPATH += /home/ailuropoda/.skia/include/gpu/
+INCLUDEPATH += /home/ailuropoda/.skia/include/config/
+INCLUDEPATH += /home/ailuropoda/.skia/include/ports/
+INCLUDEPATH += /home/ailuropoda/.skia/include/effects/
+INCLUDEPATH += /home/ailuropoda/.skia/third_party/externals/sdl/include/
+INCLUDEPATH += /home/ailuropoda/.skia/third_party/vulkan/
+INCLUDEPATH += /home/ailuropoda/.skia/src/gpu/
+
+LIBS     += -L/home/ailuropoda/.skia/out/Debug -lskia -lpthread -lfreetype \
+            -lpng -ldl -lSDL2 -lSDL2_image -lSDL2_ttf -lfontconfig
+#CONFIG += no_keywords
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = AniVect
@@ -63,7 +78,6 @@ SOURCES += main.cpp\
     qdoubleslider.cpp \
     qrealanimatorvalueslider.cpp \
     renderoutputwidget.cpp \
-    canvaswidget.cpp \
     Animators/transformanimator.cpp \
     Animators/animator.cpp \
     Animators/boolanimator.cpp \
@@ -138,7 +152,9 @@ SOURCES += main.cpp\
     Gradients/displayedgradientswidget.cpp \
     Gradients/currentgradientwidget.cpp \
     filesourcescache.cpp \
-    Boxes/draftcanvas.cpp
+    Boxes/draftcanvas.cpp \
+    glwindow.cpp \
+    canvaswindow.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -180,7 +196,6 @@ HEADERS  += mainwindow.h \
     qdoubleslider.h \
     qrealanimatorvalueslider.h \
     renderoutputwidget.h \
-    canvaswidget.h \
     keypoint.h \
     Animators/qstringanimator.h \
     Animators/transformanimator.h \
@@ -256,7 +271,9 @@ HEADERS  += mainwindow.h \
     Gradients/currentgradientwidget.h \
     filesourcescache.h \
     Boxes/draftcanvas.h \
-    global.h
+    global.h \
+    glwindow.h \
+    canvaswindow.h
 
 RESOURCES += \
     resources.qrc

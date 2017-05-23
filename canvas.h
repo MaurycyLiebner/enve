@@ -32,14 +32,14 @@ enum CanvasMode : short {
     PICK_PATH_SETTINGS
 };
 
-#include "canvaswidget.h"
+#include "canvaswindow.h"
 
 class Canvas : public BoxesGroup
 {
     Q_OBJECT
 public:
     explicit Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
-                    CanvasWidget *canvasWidget,
+                    CanvasWindow *canvasWidget,
                     int canvasWidth = 1920,
                     int canvasHeight = 1080,
                     const int &frameCount = 200);
@@ -272,7 +272,7 @@ public:
 
 protected:
     void updateAfterCombinedTransformationChanged() {
-//        foreach(BoundingBox *child, mChildBoxes) {
+//        Q_FOREACH(BoundingBox *child, mChildBoxes) {
 //            child->updateCombinedTransformTmp();
 //            child->scheduleSoftUpdate();
 //        }
@@ -388,7 +388,7 @@ private:
     bool mEffectsPaintEnabled;
     qreal mResolutionFraction;
 
-    CanvasWidget *mCanvasWidget;
+    CanvasWindow *mCanvasWindow;
 
     Circle *mCurrentCircle = NULL;
     Rectangle *mCurrentRectangle = NULL;

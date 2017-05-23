@@ -27,7 +27,7 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
 
 
 void BoxesGroup::updateAllBoxes() {
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateAllBoxes();
     }
     scheduleSoftUpdate();
@@ -35,13 +35,13 @@ void BoxesGroup::updateAllBoxes() {
 
 void BoxesGroup::clearAllCache() {
     BoundingBox::clearAllCache();
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->clearAllCache();
     }
 }
 
 void BoxesGroup::updateCombinedTransformTmp() {
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateCombinedTransformTmp();
     }
     if(!mIsDescendantCurrentGroup) {
@@ -62,7 +62,7 @@ void BoxesGroup::prp_loadFromSql(const int &boundingBoxId) {
 BoundingBox *BoxesGroup::createLink(BoxesGroup *parent) {
     InternalLinkBoxesGroup *linkGroup =
                         new InternalLinkBoxesGroup(this, parent);
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->createSameTransformationLink(linkGroup);
     }
     return linkGroup;
@@ -71,7 +71,7 @@ BoundingBox *BoxesGroup::createLink(BoxesGroup *parent) {
 BoundingBox *BoxesGroup::createSameTransformationLink(BoxesGroup *parent) {
     SameTransformInternalLinkBoxesGroup *linkGroup =
                         new SameTransformInternalLinkBoxesGroup(this, parent);
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->createSameTransformationLink(linkGroup);
     }
     return linkGroup;
@@ -124,7 +124,7 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
 int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = BoundingBox::prp_saveToSql(query, parentId);
 
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->prp_saveToSql(query, boundingBoxId);
     }
     return boundingBoxId;
@@ -133,7 +133,7 @@ int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 bool BoxesGroup::relPointInsidePath(const QPointF &relPos) {
     if(mRelBoundingRect.contains(relPos)) {
         QPointF absPos = mapRelPosToAbs(relPos);
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             if(box->absPointInsidePath(absPos)) {
                 return true;
             }
@@ -146,83 +146,83 @@ void BoxesGroup::updateAfterFrameChanged(const int &currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
 
     updateDrawRenderContainerTransform();
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
 }
 
 void BoxesGroup::setFillGradient(Gradient *gradient, bool finish) {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setFillGradient(gradient, finish);
     }
 }
 
 void BoxesGroup::setStrokeGradient(Gradient *gradient, bool finish)
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeGradient(gradient, finish);
     }
 }
 
 void BoxesGroup::setFillFlatColor(Color color, bool finish)
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setFillFlatColor(color, finish);
     }
 }
 
 void BoxesGroup::setStrokeFlatColor(Color color, bool finish)
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeFlatColor(color, finish);
     }
 }
 
 void BoxesGroup::setStrokeCapStyle(Qt::PenCapStyle capStyle)
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
 void BoxesGroup::setStrokeJoinStyle(Qt::PenJoinStyle joinStyle)
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
 }
 
 void BoxesGroup::setStrokeWidth(qreal strokeWidth, bool finish)
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeWidth(strokeWidth, finish);
     }
 }
 
 void BoxesGroup::startSelectedStrokeWidthTransform()
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->startSelectedStrokeWidthTransform();
     }
 }
 
 void BoxesGroup::startSelectedStrokeColorTransform()
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->startSelectedStrokeColorTransform();
     }
 }
 
 void BoxesGroup::startSelectedFillColorTransform()
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->startSelectedFillColorTransform();
     }
 }
 
 void BoxesGroup::makeDuplicate(Property *targetBox) {
     BoundingBox::makeDuplicate(targetBox);
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->createDuplicate((BoxesGroup*)targetBox);
     }
 }
@@ -233,7 +233,7 @@ BoundingBox *BoxesGroup::createNewDuplicate(BoxesGroup *parent) {
 
 void BoxesGroup::updateRelBoundingRect() {
     QPainterPath boundingPaths = QPainterPath();
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         boundingPaths.addPath(
                     child->getRelativeTransform().
                     map(child->getRelBoundingRectPath()));
@@ -245,7 +245,7 @@ void BoxesGroup::updateRelBoundingRect() {
 
 void BoxesGroup::updateEffectsMargin() {
     qreal childrenMargin = 0.;
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         childrenMargin = qMax(child->getEffectsMargin(),
                               childrenMargin);
     }
@@ -257,7 +257,7 @@ void BoxesGroup::drawUpdatePixmap(QPainter *p) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawUpdatePixmap(p);
     } else {
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             box->drawUpdatePixmap(p);
         }
     }
@@ -276,7 +276,7 @@ void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
 }
 
 void BoxesGroup::beforeUpdate() {
-    foreach(const QSharedPointer<BoundingBox> &child, mChildrenAwaitingUpdate) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildrenAwaitingUpdate) {
         child->beforeUpdate();
         mUpdateChildrenAwaitingUpdate.append(child);
     }
@@ -286,14 +286,14 @@ void BoxesGroup::beforeUpdate() {
 }
 
 void BoxesGroup::processUpdate() {
-    foreach(const QSharedPointer<BoundingBox> &child, mUpdateChildrenAwaitingUpdate) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mUpdateChildrenAwaitingUpdate) {
         child->processUpdate();
     }
     BoundingBox::processUpdate();
 }
 
 void BoxesGroup::afterUpdate() {
-    foreach(const QSharedPointer<BoundingBox> &child,
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
             mUpdateChildrenAwaitingUpdate) {
         child->afterUpdate();
     }
@@ -307,7 +307,7 @@ void BoxesGroup::draw(QPainter *p) {
     p->setTransform(QTransform(
                         mUpdateTransform.inverted()),
                         true);
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         //box->draw(p);
         box->drawUpdatePixmap(p);
     }
@@ -319,7 +319,7 @@ void BoxesGroup::drawPixmap(QPainter *p) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawPixmap(p);
     } else {
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             //box->draw(p);
             box->drawPixmap(p);
         }
@@ -381,7 +381,7 @@ void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
 
 BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
     BoundingBox *boxAtPos = NULL;
-    //foreachBoxInListInverted(mChildren) {
+    //Q_FOREACHBoxInListInverted(mChildren) {
     for(int i = mChildBoxes.count() - 1; i >= 0; i--) {
         const QSharedPointer<BoundingBox> &box = mChildBoxes.at(i);
         if(box->isVisibleAndUnlocked()) {
@@ -397,7 +397,7 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
 void BoxesGroup::ungroup() {
     //clearBoxesSelection();
     BoxesGroup *parentGroup = mParent.data();
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->applyTransformation(mTransformAnimator.data());
         removeChild(box.data());
         parentGroup->addChild(box.data());
@@ -422,7 +422,7 @@ bool BoxesGroup::getCtrlsAlwaysVisible()
 
 void BoxesGroup::setCtrlsAlwaysVisible(bool bT) {
     BoxesGroup::mCtrlsAlwaysVisible = bT;
-    MainWindow::getInstance()->getCanvasWidget()->getCurrentCanvas()->updateSelectedPointsAfterCtrlsVisiblityChanged();
+    MainWindow::getInstance()->getCanvasWindow()->getCurrentCanvas()->updateSelectedPointsAfterCtrlsVisiblityChanged();
 }
 
 void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {
@@ -435,7 +435,7 @@ void BoxesGroup::applyCurrentTransformation() {
     qreal rotation = mTransformAnimator->rot();
     qreal scaleX = mTransformAnimator->xScale();
     qreal scaleY = mTransformAnimator->yScale();
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->saveTransformPivotAbsPos(absPivot);
         box->startTransform();
         box->rotateRelativeToSavedPivot(rotation);
@@ -450,14 +450,14 @@ void BoxesGroup::applyCurrentTransformation() {
 }
 
 void BoxesGroup::selectAllBoxesFromBoxesGroup() {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         if(box->isSelected()) continue;
         getParentCanvas()->addBoxToSelection(box.data());
     }
 }
 
 void BoxesGroup::deselectAllBoxesFromBoxesGroup() {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         if(box->isSelected()) {
             getParentCanvas()->removeBoxFromSelection(box.data());
         }
@@ -481,7 +481,7 @@ BoundingBox *BoxesGroup::getBoxAt(const QPointF &absPos) {
 
 void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
 {
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         if(box->isVisibleAndUnlocked()) {
             if(box->isContainedIn(rect) ) {
                 getParentCanvas()->addBoxToSelection(box.data());
@@ -543,7 +543,7 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*) box;
         if(group->isCurrentGroup()) {
-            mMainWindow->getCanvasWidget()->getCurrentCanvas()->
+            mMainWindow->getCanvasWindow()->getCurrentCanvas()->
                     setCurrentBoxesGroup(group->getParent());
         }
     }
@@ -650,13 +650,13 @@ void BoxesGroup::moveChildAbove(BoundingBox *boxToMove,
 }
 
 void BoxesGroup::updateAfterCombinedTransformationChanged() {
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateCombinedTransform();
     }
 }
 
 void BoxesGroup::updateAfterCombinedTransformationChangedAfterFrameChagne() {
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateCombinedTransformAfterFrameChange();
     }
 }
@@ -668,7 +668,7 @@ void BoxesGroup::SWT_addChildrenAbstractions(
     BoundingBox::SWT_addChildrenAbstractions(abstraction,
                                              visiblePartWidget);
 
-    foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         abstraction->addChildAbstraction(
                     child->SWT_getAbstractionForWidget(visiblePartWidget));
     }

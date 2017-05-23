@@ -31,7 +31,7 @@ void KeysView::graphPaint(QPainter *p) {
     int currAlpha = 75;
     qreal lineWidth = 1.;
     QList<int> incFrameList = { 1, 5, 10, 100 };
-    foreach(int incFrame, incFrameList) {
+    Q_FOREACH(int incFrame, incFrameList) {
         if(mPixelsPerFrame*incFrame < 15.) continue;
         bool drawText = mPixelsPerFrame*incFrame > 30.;
         p->setPen(QPen(QColor(0, 0, 0, currAlpha), lineWidth));
@@ -130,7 +130,7 @@ void KeysView::graphGetAnimatorsMinMaxValue(qreal *minVal, qreal *maxVal) {
         minValT = 1000000;
         maxValT = -1000000;
 
-        foreach(QrealAnimator *animator, mAnimators) {
+        Q_FOREACH(QrealAnimator *animator, mAnimators) {
             qreal animMinVal;
             qreal animMaxVal;
             animator->qra_getMinAndMaxValues(&animMinVal, &animMaxVal);
@@ -204,7 +204,7 @@ void KeysView::graphMousePress(const QPointF &pressPos) {
     qreal frame;
     graphGetValueAndFrameFromPos(pressPos, &value, &frame);
 
-    foreach(QrealAnimator *animator, mAnimators) {
+    Q_FOREACH(QrealAnimator *animator, mAnimators) {
         mCurrentPoint = animator->qra_getPointAt(value, frame,
                                                  mPixelsPerFrame,
                                                  mPixelsPerValUnit);
@@ -262,10 +262,10 @@ void KeysView::graphMouseRelease()
         }
 
         QList<QrealKey*> keysList;
-        foreach(QrealAnimator *animator, mAnimators) {
+        Q_FOREACH(QrealAnimator *animator, mAnimators) {
             animator->addKeysInRectToList(mSelectionRect, &keysList);
         }
-        foreach(QrealKey *key, keysList) {
+        Q_FOREACH(QrealKey *key, keysList) {
             graphAddKeyToSelection(key);
         }
 
@@ -278,7 +278,7 @@ void KeysView::graphMouseRelease()
                     graphAddKeyToSelection(mCurrentPoint->getParentKey());
                 }
             } else {
-                QrealKey *key; foreachQK(key, mSelectedKeys)
+                QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
                     key->finishFrameTransform();
                     key->finishValueTransform();
                 }
@@ -289,7 +289,7 @@ void KeysView::graphMouseRelease()
         }
         mCurrentPoint = NULL;
 
-        foreach(QrealAnimator *animator, mAnimators) {
+        Q_FOREACH(QrealAnimator *animator, mAnimators) {
             animator->qra_constrainCtrlsFrameValues();
         }
         //graphConstrainAnimatorCtrlsFrameValues();
@@ -321,14 +321,14 @@ void KeysView::graphMiddleRelease() {
 }
 
 void KeysView::graphConstrainAnimatorCtrlsFrameValues() {
-    foreach(QrealAnimator *animator, mAnimators) {
+    Q_FOREACH(QrealAnimator *animator, mAnimators) {
         animator->qra_constrainCtrlsFrameValues();
     }
 }
 
 void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
     if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; foreachQK(key, mSelectedKeys)
+    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setCtrlsMode(mode);
     }
     graphConstrainAnimatorCtrlsFrameValues();
@@ -336,7 +336,7 @@ void KeysView::graphSetCtrlsModeForSelected(const CtrlsMode &mode) {
 
 void KeysView::graphSetTwoSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; foreachQK(key, mSelectedKeys)
+    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setEndEnabled(true);
         key->setStartEnabled(true);
     }
@@ -346,7 +346,7 @@ void KeysView::graphSetTwoSideCtrlForSelected() {
 
 void KeysView::graphSetRightSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; foreachQK(key, mSelectedKeys)
+    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setEndEnabled(true);
         key->setStartEnabled(false);
     }
@@ -356,7 +356,7 @@ void KeysView::graphSetRightSideCtrlForSelected() {
 
 void KeysView::graphSetLeftSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; foreachQK(key, mSelectedKeys)
+    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setEndEnabled(false);
         key->setStartEnabled(true);
     }
@@ -366,7 +366,7 @@ void KeysView::graphSetLeftSideCtrlForSelected() {
 
 void KeysView::graphSetNoSideCtrlForSelected() {
     if(mSelectedKeys.isEmpty()) return;
-    QrealKey *key; foreachQK(key, mSelectedKeys)
+    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setEndEnabled(false);
         key->setStartEnabled(false);
     }
@@ -377,7 +377,7 @@ void KeysView::graphSetNoSideCtrlForSelected() {
 void KeysView::graphClearAnimatorSelection() {
     graphClearKeysSelection();
 
-//    foreach(QrealAnimator *animator, mAnimators) {
+//    Q_FOREACH(QrealAnimator *animator, mAnimators) {
 //        animator->setIsCurrentAnimator(false);
 //    }
     mAnimators.clear();
@@ -392,13 +392,13 @@ void KeysView::graphDeletePressed() {
                 key->setStartEnabled(false);
             }
     } else {
-        QrealKey *key; foreachQK(key, mSelectedKeys)
+        QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
             key->removeFromAnimator();
             key->setSelected(false);
         }
         mSelectedKeys.clear();
 
-        foreach(QrealAnimator *animator, mAnimators) {
+        Q_FOREACH(QrealAnimator *animator, mAnimators) {
             animator->anim_sortKeys();
             animator->qra_updateKeysPath();
         }
@@ -406,7 +406,7 @@ void KeysView::graphDeletePressed() {
 }
 
 void KeysView::graphClearKeysSelection() {
-    QrealKey *key; foreachQK(key, mSelectedKeys)
+    QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
         key->setSelected(false);
     }
 
@@ -447,18 +447,18 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
         if(mCurrentPoint->isKeyPoint()) {
             QPointF currentFrameAndValue = QPointF(frame, value);
             if(mFirstMove) {
-                QrealKey *key; foreachQK(key, mSelectedKeys)
+                QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
                     key->saveCurrentFrameAndValue();
                     key->changeFrameAndValueBy(currentFrameAndValue -
                                                mPressFrameAndValue);
                 }
             } else {
-                QrealKey *key; foreachQK(key, mSelectedKeys)
+                QrealKey *key; Q_FOREACHQK(key, mSelectedKeys)
                     key->changeFrameAndValueBy(currentFrameAndValue -
                                                mPressFrameAndValue);
                 }
             }
-            foreach(QrealAnimator *animator, mAnimators) {
+            Q_FOREACH(QrealAnimator *animator, mAnimators) {
                 animator->anim_sortKeys();
             }
         } else {
@@ -469,7 +469,7 @@ void KeysView::graphMouseMove(const QPointF &mousePos) {
             mCurrentPoint->moveTo(clampedFrame,
                                   parentAnimator->qra_clampValue(value));
         }
-        foreach(QrealAnimator *animator, mAnimators) {
+        Q_FOREACH(QrealAnimator *animator, mAnimators) {
             animator->qra_updateKeysPath();
         }
     }
@@ -483,7 +483,7 @@ void KeysView::graphMousePressEvent(const QPoint &eventPos,
         qreal frame;
         graphGetValueAndFrameFromPos(eventPos, &value, &frame);
         QrealPoint *point = NULL;
-        foreach(QrealAnimator *animator, mAnimators) {
+        Q_FOREACH(QrealAnimator *animator, mAnimators) {
             point = animator->qra_getPointAt(value, frame,
                                          mPixelsPerFrame, mPixelsPerValUnit);
             if(point != NULL) break;
@@ -546,7 +546,7 @@ void KeysView::graphWheelEvent(QWheelEvent *event) {
         }
     }
 
-    repaint();
+    update();
 }
 
 bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event)
@@ -578,7 +578,7 @@ void KeysView::graphResetValueScaleAndMinShown() {
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 void KeysView::updateAnimatorsColors() {
     int i = 0;
-    foreach(QrealAnimator *animator, mAnimators) {
+    Q_FOREACH(QrealAnimator *animator, mAnimators) {
         animator->setAnimatorColor(mBoxesListVisible,
                                    ANIMATORCOLORS.at(
                                        i %
@@ -627,7 +627,7 @@ void KeysView::graphUpdateAfterKeysChangedIfNeeded() {
 
 void KeysView::graphUpdateAfterKeysChanged()
 {
-    foreach(QrealAnimator *animator, mAnimators) {
+    Q_FOREACH(QrealAnimator *animator, mAnimators) {
         animator->anim_sortKeys();
         animator->qra_updateKeysPath();
     }
@@ -636,7 +636,7 @@ void KeysView::graphUpdateAfterKeysChanged()
 }
 
 void KeysView::graphMergeKeysIfNeeded() {
-    foreach(QrealAnimator *animator, mAnimators) {
+    Q_FOREACH(QrealAnimator *animator, mAnimators) {
         animator->anim_mergeKeysIfNeeded();
     }
 }

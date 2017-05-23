@@ -35,7 +35,7 @@ public:
     }
 
     ~UndoRedoSet() {
-        foreach(UndoRedo *undoRedo, mSet) {
+        Q_FOREACH(UndoRedo *undoRedo, mSet) {
             delete undoRedo;
         }
     }
@@ -47,7 +47,7 @@ public:
     }
 
     void redo() {
-        foreach(UndoRedo* undoRedo, mSet) {
+        Q_FOREACH(UndoRedo* undoRedo, mSet) {
             undoRedo->redo();
         }
     }
@@ -106,14 +106,14 @@ public:
     }
 
     void clearRedoStack() {
-        foreach (UndoRedo *redoStackItem, mRedoStack) {
+        Q_FOREACH (UndoRedo *redoStackItem, mRedoStack) {
             delete redoStackItem;
         }
         mRedoStack.clear();
     }
 
     void clearUndoStack() {
-        foreach (UndoRedo *undoStackItem, mUndoStack) {
+        Q_FOREACH (UndoRedo *undoStackItem, mUndoStack) {
             delete undoStackItem;
         }
         mUndoStack.clear();

@@ -165,7 +165,7 @@ qreal SameTransformInternalLinkBoxesGroup::getEffectsMargin() {
 void InternalLinkCanvas::updateRelBoundingRect() {
     if(mClipToCanvasSize) {
         //        QPainterPath boundingPaths = QPainterPath();
-        //        foreach(BoundingBox *child, mChildren) {
+        //        Q_FOREACH(BoundingBox *child, mChildren) {
         //            boundingPaths.addPath(
         //                        child->getRelativeTransform().
         //                        map(child->getRelBoundingRectPath()));
@@ -192,7 +192,7 @@ void InternalLinkCanvas::draw(QPainter *p) {
         p->setClipRect(mRelBoundingRect);
     }
     p->setTransform(QTransform(getCombinedTransform().inverted()), true);
-    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         //box->draw(p);
         box->drawPixmap(p);
     }

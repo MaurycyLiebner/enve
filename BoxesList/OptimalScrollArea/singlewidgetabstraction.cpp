@@ -15,13 +15,13 @@ SingleWidgetAbstraction::~SingleWidgetAbstraction() {
     if(mTarget != NULL) {
         mTarget->SWT_removeAbstractionFromList(this);
     }
-//    foreach(SingleWidgetAbstraction *abs, mChildren) {
+//    Q_FOREACH(SingleWidgetAbstraction *abs, mChildren) {
 //        delete abs;
 //    }
 }
 
 void SingleWidgetAbstraction::deleteWithDescendantAbstraction() {
-    foreach(SingleWidgetAbstraction *abs, mChildren) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mChildren) {
         abs->deleteWithDescendantAbstraction();
     }
 
@@ -46,7 +46,7 @@ bool SingleWidgetAbstraction::getAbstractions(
         currX += MIN_WIDGET_HEIGHT;
         *currY += MIN_WIDGET_HEIGHT;
     }
-    foreach(SingleWidgetAbstraction *abs, mChildren) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mChildren) {
         if(abs->getAbstractions(
                     minY, maxY,
                     currY, currX,
@@ -88,7 +88,7 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         currX += MIN_WIDGET_HEIGHT;
         *currY += MIN_WIDGET_HEIGHT;
     }
-    foreach(SingleWidgetAbstraction *abs, mChildren) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mChildren) {
         if(abs->setSingleWidgetAbstractions(
                     minY, maxY,
                     currY, currX,
@@ -115,7 +115,7 @@ int SingleWidgetAbstraction::getHeight(
     if(satisfiesRule && !mIsMainTarget) {
         height += MIN_WIDGET_HEIGHT;
     }
-    foreach(SingleWidgetAbstraction *abs, mChildren) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mChildren) {
         height += abs->getHeight(
                     rules,
                     (satisfiesRule && mContentVisible) || mIsMainTarget,
@@ -143,7 +143,7 @@ void SingleWidgetAbstraction::addChildAbstractionAt(
 
 SingleWidgetAbstraction *SingleWidgetAbstraction::getChildAbstractionForTarget(
         SingleWidgetTarget *target) {
-    foreach(SingleWidgetAbstraction *abs, mChildren) {
+    Q_FOREACH(SingleWidgetAbstraction *abs, mChildren) {
         if(abs->getTarget() == target) {
             return abs;
         }

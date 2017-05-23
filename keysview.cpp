@@ -51,7 +51,7 @@ void KeysView::deleteSelectedKeys()
             clearHoveredPoint();
         }
     }
-    foreach(Key *key, mSelectedKeys) {
+    Q_FOREACH(Key *key, mSelectedKeys) {
         key->deleteKey();
     }
     mSelectedKeys.clear();
@@ -62,7 +62,7 @@ void KeysView::selectKeysInSelectionRect() {
     mBoxesListVisible->getKeysInRect(mSelectionRect,
                                      mPixelsPerFrame,
                                      &listKeys);
-    foreach(Key *key, listKeys) {
+    Q_FOREACH(Key *key, listKeys) {
         addKeyToSelection(key);
     }
 }
@@ -144,7 +144,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
         } else {
             if(mMovingKeys) {
                 if(!mFirstMove) {
-                    foreach(Key *key, mSelectedKeys) {
+                    Q_FOREACH(Key *key, mSelectedKeys) {
                         key->cancelFrameTransform();
                     }
                 }
@@ -181,7 +181,7 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
             if(event->isAutoRepeat()) return false;
             KeysClipboardContainer *container =
                     new KeysClipboardContainer();
-            foreach(Key *key, mSelectedKeys) {
+            Q_FOREACH(Key *key, mSelectedKeys) {
                 key->copyToContainer(container);
             }
             mMainWindow->replaceClipboard(container);
@@ -210,7 +210,7 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                 if(!mMovingKeys) {
                     QList<Key*> selectedKeys = mSelectedKeys;
                     clearKeySelection();
-                    QrealKey *key; foreachQK(key, selectedKeys)
+                    QrealKey *key; Q_FOREACHQK(key, selectedKeys)
                         QrealKey *duplicate =
                                 key->makeQrealKeyDuplicate(
                                         key->getParentQrealAnimator());
@@ -228,13 +228,13 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
             }
         } else if(event->key() == Qt::Key_Delete) {
             deleteSelectedKeys();
-            repaint();
+            update();
         } else if(event->key() == Qt::Key_Right) {
-            foreach(Key *key, mSelectedKeys) {
+            Q_FOREACH(Key *key, mSelectedKeys) {
                 key->incFrameAndUpdateParentAnimator(1);
             }
         } else if(event->key() == Qt::Key_Left) {
-            foreach(Key *key, mSelectedKeys) {
+            Q_FOREACH(Key *key, mSelectedKeys) {
                 key->incFrameAndUpdateParentAnimator(-1);
             }
         } else {
@@ -454,14 +454,14 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
                 }
                 if(mMovingKeys) {
                     if(mFirstMove) {
-                        foreach(Key *key, mSelectedKeys) {
+                        Q_FOREACH(Key *key, mSelectedKeys) {
                             key->startFrameTransform();
                         }
                     }
                     if(mScalingKeys) {
                         qreal keysScale = (event->x() - mLastPressPos.x())/
                                            300.;
-                        foreach(Key *key, mSelectedKeys) {
+                        Q_FOREACH(Key *key, mSelectedKeys) {
                             key->scaleFrameAndUpdateParentAnimator(
                                         mMainWindow->getCurrentFrame(),
                                         keysScale);
@@ -474,7 +474,7 @@ void KeysView::mouseMoveEvent(QMouseEvent *event) {
 
                         if(dDFrame != 0) {
                             mMoveDFrame = dFrame;
-                            foreach(Key *key, mSelectedKeys) {
+                            Q_FOREACH(Key *key, mSelectedKeys) {
                                 key->incFrameAndUpdateParentAnimator(dDFrame);
                             }
                         }
@@ -546,13 +546,13 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
                     }
                 }
                 QList<Animator*> parentAnimators;
-                foreach(Key *key, mSelectedKeys) {
+                Q_FOREACH(Key *key, mSelectedKeys) {
                     key->finishFrameTransform();
                     if(parentAnimators.contains(
                                 key->getParentAnimator()) ) continue;
                     parentAnimators << key->getParentAnimator();
                 }
-                foreach(Animator *animator, parentAnimators) {
+                Q_FOREACH(Animator *animator, parentAnimators) {
                     animator->anim_mergeKeysIfNeeded();
                 }
 
@@ -582,7 +582,7 @@ void KeysView::setFramesRange(const int &startFrame,
     if(mGraphViewed) {
         graphUpdateDimensions();
     }
-    repaint();
+    update();
 }
 
 int KeysView::getMinViewedFrame()
@@ -617,7 +617,7 @@ void KeysView::removeKeyFromSelection(Key *key) {
 
 void KeysView::clearKeySelection()
 {
-    foreach(Key *key, mSelectedKeys) {
+    Q_FOREACH(Key *key, mSelectedKeys) {
         key->setSelected(false);
     }
     mSelectedKeys.clear();

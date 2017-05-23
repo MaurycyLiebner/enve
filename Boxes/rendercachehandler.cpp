@@ -122,7 +122,7 @@ void CacheHandler::setContainersInFrameRangeBlocked(const int &minFrame,
 }
 
 void CacheHandler::clearCache() {
-    foreach(CacheContainer *cont, mRenderContainers) {
+    Q_FOREACH(CacheContainer *cont, mRenderContainers) {
         cont->setParentCacheHandler(NULL);
         cont->decNumberPointers();
     }
@@ -159,7 +159,7 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     p->setPen(Qt::NoPen);
     int lastDrawnFrame = startFrame;
     int lastDrawX = 0;
-    foreach(CacheContainer *cont, mRenderContainers) {
+    Q_FOREACH(CacheContainer *cont, mRenderContainers) {
         int maxFrame = cont->getMaxRelFrame();
         int minFrame = cont->getMinRelFrame();
         if(maxFrame < startFrame) continue;

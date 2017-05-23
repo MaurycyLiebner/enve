@@ -30,7 +30,7 @@ int QrealAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 
     int thisSqlId = query->lastInsertId().toInt();
 
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         ((QrealKey*)key.get())->saveToSql(thisSqlId);
     }
 
@@ -83,7 +83,7 @@ void QrealAnimator::qra_setValueRange(const qreal &minVal, const qreal &maxVal) 
 }
 
 void QrealAnimator::qra_incAllValues(const qreal &valInc) {
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         ((QrealKey*)key.get())->incValue(valInc);
     }
     qra_incCurrentValue(valInc);
@@ -309,7 +309,7 @@ void QrealAnimator::anim_removeAllKeys() {
     qreal currentValue = mCurrentValue;
 
     QList<std::shared_ptr<Key> > keys = anim_mKeys;
-    foreach(const std::shared_ptr<Key> &key, keys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, keys) {
         anim_removeKey(key.get());
     }
     qra_setCurrentValue(currentValue);
@@ -348,7 +348,7 @@ void QrealAnimator::anim_moveKeyToRelFrame(Key *key,
 void QrealAnimator::qra_updateKeysPath() {
     mKeysPath = QPainterPath();
     QrealKey *lastKey = NULL;
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         QrealKey *qaKey = ((QrealKey*)key.get());
         int keyFrame = key->getAbsFrame();
         qreal keyValue;
@@ -395,7 +395,7 @@ void QrealAnimator::qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
         *minValP = mCurrentValue - mPrefferedValueStep;
         *maxValP = mCurrentValue + mPrefferedValueStep;
     } else {
-        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
             QrealKey *qaKey = ((QrealKey*)key.get());
             qreal keyVal = qaKey->getValue();
             qreal startVal = qaKey->getStartValue();
@@ -421,7 +421,7 @@ void QrealAnimator::qra_getMinAndMaxValuesBetweenFrames(
         *maxValP = mCurrentValue;
     } else {
         bool first = true;
-        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
             QrealKey *qaKey = ((QrealKey*)key.get());
             int keyFrame = key->getAbsFrame();
             if(keyFrame > endFrame || keyFrame < startFrame) continue;
@@ -460,7 +460,7 @@ void QrealAnimator::drawKeysPath(QPainter *p,
     p->drawPath(mKeysPath);
 
     p->setPen(Qt::NoPen);
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         ((QrealKey*)key.get())->drawGraphKey(p, paintColor);
     }
 
@@ -511,7 +511,7 @@ void QrealAnimator::getMinAndMaxMoveFrame(
 
 void QrealAnimator::qra_constrainCtrlsFrameValues() {
     QrealKey *lastKey = NULL;
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         QrealKey *qaKey = ((QrealKey*)key.get());
         if(lastKey != NULL) {
             lastKey->constrainEndCtrlMaxFrame(qaKey->getAbsFrame());
@@ -604,7 +604,7 @@ void QrealAnimator::makeDuplicate(Property *target) {
     if(anim_mIsRecording) {
         qa_target->anim_setRecordingWithoutChangingKeys(anim_mIsRecording);
     }
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         QrealKey *duplicate =
                 ((QrealKey*)key.get())->makeQrealKeyDuplicate(qa_target);
         qa_target->anim_appendKey(duplicate);
@@ -630,7 +630,7 @@ QrealPoint *QrealAnimator::qra_getPointAt(const qreal &value,
                                           const qreal &pixelsPerFrame,
                                           const qreal &pixelsPerValUnit) {
     QrealPoint *point = NULL;
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         point = ((QrealKey*)key.get())->mousePress(frame, value,
                                 pixelsPerFrame, pixelsPerValUnit);
         if(point != NULL) {
@@ -642,7 +642,7 @@ QrealPoint *QrealAnimator::qra_getPointAt(const qreal &value,
 
 void QrealAnimator::addKeysInRectToList(const QRectF &frameValueRect,
                                         QList<QrealKey*> *keys) {
-    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         QrealKey *qaKey = ((QrealKey*)key.get());
         if(qaKey->isInsideRect(frameValueRect)) {
             keys->append(qaKey);

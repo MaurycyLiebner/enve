@@ -42,11 +42,11 @@ void BoolPropertyWidget::paintEvent(QPaintEvent *) {
 
 void BoolPropertyWidget::enterEvent(QEvent *) {
     mHovered = true;
-    repaint();
+    update();
 }
 
 void BoolPropertyWidget::leaveEvent(QEvent *) {
     mHovered = false;
-    repaint();
+    update();
 }
 

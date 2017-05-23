@@ -31,10 +31,10 @@ void CurrentGradientWidget::mouseMoveEvent(QMouseEvent *event) {
         mGradientWidget->moveColor(event->x());
     }
     mHoveredX = event->x();
-    repaint();
+    update();
 }
 
 void CurrentGradientWidget::leaveEvent(QEvent *) {
     mHoveredX = -1;
-    repaint();
+    update();
 }

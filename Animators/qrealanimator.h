@@ -18,7 +18,7 @@ const int KEY_RECT_SIZE = 12;
 class ComplexAnimator;
 class QrealAnimatorValueSlider;
 
-#define foreachQK(key, keysList) foreach(Key *keyK, keysList) { key = (QrealKey*)keyK;
+#define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = (QrealKey*)keyK;
 
 #include <QDoubleSpinBox>
 

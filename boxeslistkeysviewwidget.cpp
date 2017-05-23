@@ -149,7 +149,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 
     setLayout(mMainLayout);
 
-    mMainWindow->getCanvasWidget()->SWT_getAbstractionForWidget(
+    mMainWindow->getCanvasWindow()->SWT_getAbstractionForWidget(
                 mBoxesListWidget->getVisiblePartWidget());
     mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(SWT_NoRule);
     mBoxesListWidget->getVisiblePartWidget()->
@@ -161,7 +161,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 }
 
 BoxesListKeysViewWidget::~BoxesListKeysViewWidget() {
-    delete mMainWindow->getCanvasWidget()->SWT_getAbstractionForWidget(
+    delete mMainWindow->getCanvasWindow()->SWT_getAbstractionForWidget(
                 mBoxesListWidget->getVisiblePartWidget());
 }
 
@@ -275,7 +275,7 @@ void BoxesListKeysViewWidget::setRuleLocked() {
 void BoxesListKeysViewWidget::setTargetAll() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindow->getCanvasWidget(),
+                mMainWindow->getCanvasWindow(),
                 SWT_All);
     mMainWindow->callUpdateSchedulers();
 }
@@ -283,7 +283,7 @@ void BoxesListKeysViewWidget::setTargetAll() {
 void BoxesListKeysViewWidget::setTargetCurrentCanvas() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindow->getCanvasWidget()->getCurrentCanvas(),
+                mMainWindow->getCanvasWindow()->getCurrentCanvas(),
                 SWT_CurrentCanvas);
     mMainWindow->callUpdateSchedulers();
 }
@@ -291,7 +291,7 @@ void BoxesListKeysViewWidget::setTargetCurrentCanvas() {
 void BoxesListKeysViewWidget::setTargetCurrentGroup() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindow->getCanvasWidget()->getCurrentGroup(),
+                mMainWindow->getCanvasWindow()->getCurrentGroup(),
                 SWT_CurrentGroup);
     mMainWindow->callUpdateSchedulers();
 }

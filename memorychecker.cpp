@@ -38,7 +38,7 @@ unsigned long long getFreeRam() {
     extract = extract.trimmed();
     unmapped = extract.toULongLong();
 //    QStringList allLines = allText.split(QRegExp("\n|\r\n|\r"));
-//    foreach(const QString &line, allLines) {
+//    Q_FOREACH(const QString &line, allLines) {
 //        if(line.contains("Bytes released to OS (aka unmapped)")) {
 //            QString extract = line.split('(').first();
 //            extract = extract.split('+').last();

@@ -10,7 +10,7 @@ void FileSourcesCache::addHandler(FileCacheHandler *handlerPtr) {
 }
 
 FileCacheHandler *FileSourcesCache::getHandlerForFilePath(const QString &filePath) {
-    foreach(FileCacheHandler *handler, mFileCacheHandlers) {
+    Q_FOREACH(FileCacheHandler *handler, mFileCacheHandlers) {
         if(handler->getFilePath() == filePath) {
             return handler;
         }

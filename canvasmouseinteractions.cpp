@@ -34,12 +34,12 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         if(pressedBox == NULL) {
             clearBoxesSelection();
 
-            QMenu menu(mCanvasWidget);
+            QMenu menu(mCanvasWindow->getWidgetContainer());
 
             menu.addAction("Paste");
             QMenu *linkCanvasMenu = menu.addMenu("Link Canvas");
-            const QList<Canvas*> &listOfCanvas = mCanvasWidget->getCanvasList();
-            foreach(Canvas *canvas, listOfCanvas) {
+            const QList<Canvas*> &listOfCanvas = mCanvasWindow->getCanvasList();
+            Q_FOREACH(Canvas *canvas, listOfCanvas) {
                 QAction *action = linkCanvasMenu->addAction(canvas->getName());
                 if(canvas == this) {
                     action->setEnabled(false);
@@ -94,7 +94,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                 addBoxToSelection(pressedBox);
             }
 
-            QMenu menu(mCanvasWidget);
+            QMenu menu(mCanvasWindow->getWidgetContainer());
 
             menu.addAction("Apply Transformation");
             menu.addAction("Create Link");
@@ -319,7 +319,7 @@ void Canvas::handleLeftButtonMousePress() {
 
             mLastPressedPoint = partBox->getBottomRightPoint();
         } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
-            foreach(BoundingBox *box, mSelectedBoxes) {
+            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
                 if(box->isParticleBox()) {
                     if(box->getRelBoundingRectPath().contains(
                                 box->mapAbsPosToRel(mLastMouseEventPosRel))) {
@@ -391,7 +391,7 @@ void Canvas::cancelCurrentTransform() {
     } else if(mCurrentMode == CanvasMode::ADD_POINT) {
 
     } else if(mCurrentMode == PICK_PATH_SETTINGS) {
-        mCanvasWidget->setCanvasMode(MOVE_PATH);
+        mCanvasWindow->setCanvasMode(MOVE_PATH);
     }
 
     if(mIsMouseGrabbing) {
@@ -512,7 +512,7 @@ void Canvas::handleMouseRelease() {
            mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             handleMovePointMouseRelease();
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
-                mCanvasWidget->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+                mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
             }
         } else if(isMovingPath()) {
             if(mLastPressedPoint == NULL) {
@@ -528,7 +528,7 @@ void Canvas::handleMouseRelease() {
                 mFillStrokeSettingsWidget->loadSettingsFromPath(
                             (VectorPath*) mLastPressedBox);
             }
-            mCanvasWidget->setCanvasMode(MOVE_PATH);
+            mCanvasWindow->setCanvasMode(MOVE_PATH);
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             if(mCurrentTextBox != NULL) {
                 mCurrentTextBox->openTextEditor();
@@ -545,8 +545,7 @@ void Canvas::handleMouseRelease() {
     }
 }
 
-void Canvas::mouseReleaseEvent(QMouseEvent *event)
-{
+void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     if(isPreviewingOrRendering() || event->button() == Qt::MiddleButton) return;
     setCurrentMouseEventPosAbs(event->pos());
     mXOnlyTransform = false;
@@ -806,7 +805,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *) {
             } else if(boxAt->isText()) {
                 ((TextBox*) boxAt)->openTextEditor();
             } else if(mCurrentMode == MOVE_PATH) {
-                mCanvasWidget->setCanvasMode(MOVE_PATH);
+                mCanvasWindow->setCanvasMode(MOVE_PATH);
             }
         }
     }

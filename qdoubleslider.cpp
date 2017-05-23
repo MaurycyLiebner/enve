@@ -189,6 +189,7 @@ void QDoubleSlider::paintEvent(QPaintEvent *) {
 }
 
 void QDoubleSlider::mouseDoubleClickEvent(QMouseEvent *event) {
+    Q_UNUSED(event);
 }
 
 void QDoubleSlider::mousePressEvent(QMouseEvent *event) {

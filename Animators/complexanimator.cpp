@@ -23,7 +23,7 @@ Property *ComplexAnimator::ca_getChildAt(const int &i) {
 void ComplexAnimator::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         abstraction->addChildAbstraction(
                     property->SWT_createAbstraction(visiblePartWidget));
     }
@@ -74,7 +74,7 @@ int ComplexAnimator::getChildPropertyIndex(Property *child) {
 }
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key *key) {
-    foreach(const std::shared_ptr<Key> &ckey, anim_mKeys) {
+    Q_FOREACH(const std::shared_ptr<Key> &ckey, anim_mKeys) {
         ComplexKey *complexKey = ((ComplexKey*)ckey.get());
         if(complexKey->hasKey(key)) {
             complexKey->removeAnimatorKey(key);
@@ -147,7 +147,7 @@ void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
 }
 
 void ComplexAnimator::prp_clearFromGraphView() {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_clearFromGraphView();
     }
 }
@@ -159,13 +159,13 @@ bool ComplexAnimator::hasChildAnimators()
 
 void ComplexAnimator::prp_startTransform()
 {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_startTransform();
     }
 }
 
 void ComplexAnimator::prp_setTransformed(const bool &bT) {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setTransformed(bT);
     }
 }
@@ -208,7 +208,7 @@ void ComplexAnimator::prp_setParentFrameShift(const int &shift,
                                               ComplexAnimator *parentAnimator) {
     Property::prp_setParentFrameShift(shift, parentAnimator);
     int thisShift = prp_getFrameShift();
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setParentFrameShift(thisShift, this);
     }
 }
@@ -224,7 +224,7 @@ void ComplexAnimator::prp_setUpdater(AnimatorUpdater *updater) {
     if(prp_mUpdaterBlocked) return;
     Animator::prp_setUpdater(updater);
 
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setUpdater(updater);
     }
 }
@@ -233,25 +233,25 @@ void ComplexAnimator::prp_setAbsFrame(const int &frame) {
     //if(!prp_isDescendantRecording()) return;
     Animator::prp_setAbsFrame(frame);
 
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setAbsFrame(frame);
     }
 }
 
 void ComplexAnimator::prp_retrieveSavedValue() {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_retrieveSavedValue();
     }
 }
 
 void ComplexAnimator::prp_finishTransform() {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_finishTransform();
     }
 }
 
 void ComplexAnimator::prp_cancelTransform() {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_cancelTransform();
     }
 }
@@ -265,7 +265,7 @@ QString ComplexAnimator::prp_getValueText() {
 }
 
 void ComplexAnimator::prp_setRecording(const bool &rec) {
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setRecording(rec);
     }
     anim_setRecordingValue(rec);
@@ -274,7 +274,7 @@ void ComplexAnimator::prp_setRecording(const bool &rec) {
 void ComplexAnimator::ca_childAnimatorIsRecordingChanged() {
     bool rec = true;
     bool childRecordingT = false;
-    foreach(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         bool isChildRec = property->prp_isRecording();
         bool isChildDescRec = property->prp_isDescendantRecording();
         if(isChildDescRec) {
@@ -324,7 +324,7 @@ void ComplexKey::addAnimatorKey(Key *key) {
 }
 
 void ComplexKey::addOrMergeKey(Key *keyAdd) {
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         if(key->getParentAnimator() == keyAdd->getParentAnimator() ) {
             key->mergeWith(keyAdd);
             return;
@@ -335,7 +335,7 @@ void ComplexKey::addOrMergeKey(Key *keyAdd) {
 
 void ComplexKey::deleteKey() {
     QList<Key*> keys = mKeys;
-    foreach(Key *key, keys) {
+    Q_FOREACH(Key *key, keys) {
         key->deleteKey();
     }
 }
@@ -349,7 +349,7 @@ bool ComplexKey::isEmpty() {
 }
 
 void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         if(key->isSelected()) continue;
         key->copyToContainer(container);
     }
@@ -367,7 +367,7 @@ void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
 //    target->setEndFrame(mEndFrame);
 //    target->setEndValue(mEndValue);
 //    //targetParent->appendKey(target);
-//    foreach(QrealKey *key, mKeys) {
+//    Q_FOREACH(QrealKey *key, mKeys) {
 //        if(key->isSelected()) continue;
 //        QrealKey *keyDuplicate = key->makeQrealKeyDuplicate(
 //                    key->getParentAnimator());
@@ -382,7 +382,7 @@ void ComplexKey::setRelFrame(const int &frame) {
     Key::setRelFrame(frame);
 
     int absFrame = mParentAnimator->prp_relFrameToAbsFrame(frame);
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         key->setAbsFrame(absFrame);
     }
 }
@@ -394,7 +394,7 @@ void ComplexKey::mergeWith(Key *key) {
 
 void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
     QList<Key*> keys = mKeys;
-    foreach(Key *key, keys) {
+    Q_FOREACH(Key *key, keys) {
         removeAnimatorKey(key);
         target->addOrMergeKey(key); // this might be deleted
     }
@@ -402,7 +402,7 @@ void ComplexKey::margeAllKeysToKey(ComplexKey *target) {
 
 bool ComplexKey::isDescendantSelected() {
     if(isSelected()) return true;
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         if(key->isDescendantSelected()) return true;
     }
     return false;
@@ -410,7 +410,7 @@ bool ComplexKey::isDescendantSelected() {
 
 //void ComplexKey::scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
 //                                                   const qreal &scaleFactor) {
-//    foreach(QrealKey *key, mKeys) {
+//    Q_FOREACH(QrealKey *key, mKeys) {
 //        if(key->isSelected()) continue;
 //        key->scaleFrameAndUpdateParentAnimator(relativeToFrame,
 //                                               scaleFactor);
@@ -419,34 +419,34 @@ bool ComplexKey::isDescendantSelected() {
 
 void ComplexKey::cancelFrameTransform() {
     Key::cancelFrameTransform();
-//    foreach(QrealKey *key, mKeys) {
+//    Q_FOREACH(QrealKey *key, mKeys) {
 //        if(key->isSelected()) continue;
 //        key->cancelFrameTransform();
 //    }
 }
 
 void ComplexKey::addToSelection(QList<Key *> *selectedKeys) {
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         key->addToSelection(selectedKeys);
     }
 }
 
 void ComplexKey::removeFromSelection(QList<Key *> *selectedKeys) {
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         key->removeFromSelection(selectedKeys);
     }
 }
 
 void ComplexKey::startFrameTransform() {
     Key::startFrameTransform();
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         if(key->isSelected()) continue;
         key->startFrameTransform();
     }
 }
 
 void ComplexKey::finishFrameTransform() {
-    foreach(Key *key, mKeys) {
+    Q_FOREACH(Key *key, mKeys) {
         if(key->isSelected()) continue;
         key->finishFrameTransform();
     }

@@ -119,7 +119,7 @@ FullVectorPath::FullVectorPath() {}
 
 void FullVectorPath::generateSinglePathPaths() {
     mPath = QPainterPath();
-    foreach(MinimalVectorPath *separatePath, mSeparatePaths) {
+    Q_FOREACH(MinimalVectorPath *separatePath, mSeparatePaths) {
         separatePath->generateQPainterPath();
         mPath.addPath(separatePath->getPath());
     }
@@ -215,7 +215,7 @@ void FullVectorPath::intersectWith(FullVectorPath *otherPath,
     int otherCount = otherPath->getSeparatePathsCount();
     for(int i = 0; i < otherCount; i++) {
         MinimalVectorPath *otherSPath = otherPath->getSeparatePathAt(i);
-        foreach(MinimalVectorPath *thisSPath, mSeparatePaths) {
+        Q_FOREACH(MinimalVectorPath *thisSPath, mSeparatePaths) {
             thisSPath->intersectWith(otherSPath,
                                      unionInterThis,
                                      unionInterOther);
@@ -226,14 +226,14 @@ void FullVectorPath::intersectWith(FullVectorPath *otherPath,
 void FullVectorPath::getListOfGeneratedSeparatePaths(
                         QList<MinimalVectorPath *> *separate,
                         FullVectorPath *target) {
-    foreach(MinimalVectorPath *thisSPath, mSeparatePaths) {
+    Q_FOREACH(MinimalVectorPath *thisSPath, mSeparatePaths) {
         thisSPath->addAllPaths(separate, target);
     }
 }
 
 #include "Animators/singlepathanimator.h"
 void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
-    foreach(MinimalVectorPath *separatePath, mSeparatePaths) {
+    Q_FOREACH(MinimalVectorPath *separatePath, mSeparatePaths) {
         MinimalPathPoint *firstPoint = separatePath->getFirstPoint();
         MinimalPathPoint *point = firstPoint;
         PathPoint *firstPathPoint = NULL;
@@ -281,7 +281,7 @@ void MinimalVectorPath::addPoint(MinimalPathPoint *point) {
 }
 
 MinimalVectorPath::~MinimalVectorPath() {
-    foreach(MinimalPathPoint *point, mIntersectionPoints) {
+    Q_FOREACH(MinimalPathPoint *point, mIntersectionPoints) {
         delete point;
     }
 }
@@ -376,7 +376,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
             otherCubic = nextCubic;
         }
 
-        foreach(IntersectionPathPoint *interPt, mIntersectionPoints) {
+        Q_FOREACH(IntersectionPathPoint *interPt, mIntersectionPoints) {
             interPt->fixSiblingSideCtrlPoint();
             interPt->getSibling()->fixSiblingSideCtrlPoint();
         }

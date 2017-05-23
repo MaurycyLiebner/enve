@@ -231,11 +231,11 @@ void FillStrokeSettingsWidget::updateColorAnimator() {
 void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode &mode) {
     if(mTargetId == 0) {
         if(mCurrentFillPaintType == FLATPAINT) {
-            mCanvasWidget->setSelectedFillColorMode(mode);
+            mCanvasWindow->setSelectedFillColorMode(mode);
         }
     } else {
         if(mCurrentStrokePaintType == FLATPAINT) {
-            mCanvasWidget->setSelectedStrokeColorMode(mode);
+            mCanvasWindow->setSelectedStrokeColorMode(mode);
         }
     }
 }
@@ -281,7 +281,7 @@ void FillStrokeSettingsWidget::setTransformFinishEmitter(const char *slot) {
 
 void FillStrokeSettingsWidget::setStrokeWidth(qreal width)
 {
-    mCanvasWidget->startSelectedStrokeWidthTransform();
+    mCanvasWindow->startSelectedStrokeWidthTransform();
     startTransform(SLOT(emitStrokeWidthChanged()));
     mCurrentStrokeWidth = width;
     emitStrokeWidthChangedTMP();
@@ -338,29 +338,29 @@ void FillStrokeSettingsWidget::colorTypeSet(int id)
         if(mCurrentFillPaintType == FLATPAINT) {
             PaintSetting paintSetting =
                     PaintSetting(true, ColorSetting());
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else if(mCurrentFillPaintType == GRADIENTPAINT) {
             PaintSetting paintSetting =
                     PaintSetting(true, mCurrentFillGradient);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else{
             PaintSetting paintSetting =
                     PaintSetting(true);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         }
     } else {
         if(mCurrentStrokePaintType == FLATPAINT) {
             PaintSetting paintSetting =
                     PaintSetting(false, ColorSetting());
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else if(mCurrentStrokePaintType == GRADIENTPAINT) {
             PaintSetting paintSetting =
                     PaintSetting(false, mCurrentStrokeGradient);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else{
             PaintSetting paintSetting =
                     PaintSetting(false);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         }
     }
 
@@ -373,21 +373,21 @@ void FillStrokeSettingsWidget::colorSettingReceived(
         if(mCurrentFillPaintType == FLATPAINT) {
             PaintSetting paintSetting =
                     PaintSetting(true, colorSetting);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else {
             PaintSetting paintSetting =
                     PaintSetting(true, mCurrentFillGradient);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         }
     } else {
         if(mCurrentStrokePaintType == FLATPAINT) {
             PaintSetting paintSetting =
                     PaintSetting(false, colorSetting);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else {
             PaintSetting paintSetting =
                     PaintSetting(false, mCurrentStrokeGradient);
-            mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+            mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         }
     }
 }
@@ -462,9 +462,9 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
     }
 }
 
-void FillStrokeSettingsWidget::setCanvasWidgetPtr(CanvasWidget *canvasWidget)
+void FillStrokeSettingsWidget::setCanvasWindowPtr(CanvasWindow *canvasWidget)
 {
-    mCanvasWidget = canvasWidget;
+    mCanvasWindow = canvasWidget;
 }
 
 void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
@@ -477,45 +477,45 @@ void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
         mLoadStrokeFromPath = false;
         setStrokeValuesFromStrokeSettings(path->getStrokeSettings());
 
-        mCanvasWidget->strokeCapStyleChanged(mCurrentCapStyle);
-        mCanvasWidget->strokeJoinStyleChanged(mCurrentJoinStyle);
-        mCanvasWidget->strokeWidthChanged(mCurrentStrokeWidth, true);
+        mCanvasWindow->strokeCapStyleChanged(mCurrentCapStyle);
+        mCanvasWindow->strokeJoinStyleChanged(mCurrentJoinStyle);
+        mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth, true);
     }
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChanged() {
-    mCanvasWidget->strokeWidthChanged(mCurrentStrokeWidth, true);
+    mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth, true);
 }
 
 void FillStrokeSettingsWidget::emitStrokeWidthChangedTMP() {
-    mCanvasWidget->strokeWidthChanged(mCurrentStrokeWidth, false);
+    mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth, false);
 }
 
 void FillStrokeSettingsWidget::emitCapStyleChanged() {
-    mCanvasWidget->strokeCapStyleChanged(mCurrentCapStyle);
+    mCanvasWindow->strokeCapStyleChanged(mCurrentCapStyle);
 }
 
 void FillStrokeSettingsWidget::emitJoinStyleChanged() {
-    mCanvasWidget->strokeJoinStyleChanged(mCurrentJoinStyle);
+    mCanvasWindow->strokeJoinStyleChanged(mCurrentJoinStyle);
 }
 
 void FillStrokeSettingsWidget::startLoadingFillFromPath()
 {
     mLoadFillFromPath = true;
-    mCanvasWidget->pickPathForSettings();
+    mCanvasWindow->pickPathForSettings();
 }
 
 void FillStrokeSettingsWidget::startLoadingStrokeFromPath()
 {
     mLoadStrokeFromPath = true;
-    mCanvasWidget->pickPathForSettings();
+    mCanvasWindow->pickPathForSettings();
 }
 
 void FillStrokeSettingsWidget::startLoadingSettingsFromPath()
 {
     mLoadFillFromPath = true;
     mLoadStrokeFromPath = true;
-    mCanvasWidget->pickPathForSettings();
+    mCanvasWindow->pickPathForSettings();
 }
 
 void FillStrokeSettingsWidget::finishTransform()
@@ -548,11 +548,11 @@ void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {
     if(mTargetId == 0) {
         PaintSetting paintSetting =
                 PaintSetting(true, mCurrentFillGradient);
-        mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
     } else {
         PaintSetting paintSetting =
                 PaintSetting(false, mCurrentStrokeGradient);
-        mCanvasWidget->applyPaintSettingToSelected(paintSetting);
+        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
     }
 }
 

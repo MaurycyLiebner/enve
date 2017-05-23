@@ -21,7 +21,7 @@
 class MainWindow;
 class Canvas;
 class QDoubleSlider;
-class CanvasWidget;
+class CanvasWindow;
 
 class FillStrokeSettingsWidget : public QWidget
 {
@@ -43,7 +43,7 @@ public:
     void setFillValuesFromFillSettings(PaintSettings *settings);
     void setStrokeValuesFromStrokeSettings(StrokeSettings *settings);
 
-    void setCanvasWidgetPtr(CanvasWidget *canvasWidget);
+    void setCanvasWindowPtr(CanvasWindow *canvasWidget);
     void updateColorAnimator();
 public slots:
     void emitStrokeWidthChanged();
@@ -84,7 +84,7 @@ private slots:
     void setCurrentColorMode(const ColorMode &mode);
 private:
 
-    CanvasWidget *mCanvasWidget;
+    CanvasWindow *mCanvasWindow;
 
     bool mLoadFillFromPath = false;
     bool mLoadStrokeFromPath = false;

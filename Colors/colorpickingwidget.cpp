@@ -90,6 +90,6 @@ void ColorPickingWidget::updateBox(QPoint pos_t)
     cursor_y = pos_t.y();
     QPointF globalPos = mapToGlobal(pos_t);
     current_color = colorFromPoint(globalPos.x(), globalPos.y());
-    repaint();
+    update();
 }
 
