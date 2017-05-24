@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QSqlError>
 #include "Boxes/boxesgroup.h"
+#include "fmt_filters.h"
+#include "pointhelpers.h"
 
 QDataStream & operator << (QDataStream & s, const PixmapEffect *ptr) {
     qulonglong ptrval(*reinterpret_cast<qulonglong *>(&ptr));
@@ -95,7 +97,6 @@ qreal BlurEffect::getMargin() {
     return mBlurRadius->qra_getCurrentValue();
 }
 
-#include <QSqlError>
 int BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
@@ -213,7 +214,9 @@ void ShadowEffect::apply(BoundingBox *target,
                          QImage *imgPtr,
                          const fmt_filters::image &img,
                          qreal scale) {
+    Q_UNUSED(target);
     Q_UNUSED(imgPtr);
+    Q_UNUSED(img);
 
     QImage shadowQImg = imgPtr->copy();
     fmt_filters::image shadowImg(shadowQImg.bits(),
@@ -366,8 +369,9 @@ void LinesEffect::duplicateWidthAnimatorFrom(QrealAnimator *source) {
 void LinesEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
-                        qreal scale)
-{
+                        qreal scale) {
+    Q_UNUSED(target);
+    Q_UNUSED(img);
     qreal linesWidth = mLinesWidth->qra_getCurrentValue()*scale;
     qreal linesDistance = mLinesDistance->qra_getCurrentValue()*scale;
     if((linesWidth < 0.1 && linesDistance < linesWidth) ||
@@ -483,8 +487,9 @@ void CirclesEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
 void CirclesEffect::apply(BoundingBox *target,
                           QImage *imgPtr,
                           const fmt_filters::image &img,
-                          qreal scale)
-{
+                          qreal scale) {
+    Q_UNUSED(target);
+    Q_UNUSED(img);
     qreal radius = mCirclesRadius->qra_getCurrentValue()*scale;
     qreal distance = mCirclesDistance->qra_getCurrentValue()*scale;
     if((radius < 0.1 && distance < radius) || (distance <= -0.6*radius)) return;
@@ -590,7 +595,9 @@ void SwirlEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
+    Q_UNUSED(target);
     Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
     fmt_filters::swirl(img,
                        mDegreesAnimator->qra_getCurrentValue(),
                        fmt_filters::rgba(0, 0, 0, 0));
@@ -655,7 +662,9 @@ void OilEffect::apply(BoundingBox *target,
                         QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
+    Q_UNUSED(target);
     Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
     fmt_filters::oil(img,
                      mRadiusAnimator->qra_getCurrentValue());
 }
@@ -879,6 +888,8 @@ void AlphaMatteEffect::apply(BoundingBox *target,
                              QImage *imgPtr,
                              const fmt_filters::image &img,
                              qreal scale) {
+    Q_UNUSED(img);
+    Q_UNUSED(scale);
     BoundingBox *boxTarget = mBoxTarget->getTarget();
     if(boxTarget) {
         qreal influence = mInfluenceAnimator->qra_getCurrentValue();

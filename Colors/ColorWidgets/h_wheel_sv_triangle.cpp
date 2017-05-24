@@ -210,7 +210,6 @@ void H_Wheel_SV_Triangle::wheelInteraction(int x_t, int y_t)
     update();
 }
 
-#include <QDebug>
 void H_Wheel_SV_Triangle::triangleInteraction(int x_t, int y_t)
 {
     x_t--;

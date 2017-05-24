@@ -10,6 +10,7 @@
 #include "mainwindow.h"
 #include "global.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "keysview.h"
 
 BoxScrollWidgetVisiblePart::BoxScrollWidgetVisiblePart(
         ScrollWidget *parent) :

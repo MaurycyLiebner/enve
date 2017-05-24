@@ -1,4 +1,5 @@
 #include "soundcomposition.h"
+#include "singlesound.h"
 
 SoundComposition::SoundComposition(QObject *parent)
     :   QIODevice(parent) {

@@ -2,12 +2,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include "global.h"
-
-int clampInt2(int val, int min, int max) {
-    if(val > max) return max;
-    if(val < min) return min;
-    return val;
-}
+#include "Colors/helpers.h"
 
 AnimationWidgetScrollBar::AnimationWidgetScrollBar(int minSpan, int maxSpan,
                                                  int spanInc, int height,
@@ -135,7 +130,7 @@ void AnimationWidgetScrollBar::paintEvent(QPaintEvent *)
 }
 
 void AnimationWidgetScrollBar::setFramesSpan(int newSpan) {
-    mFramesSpan = clampInt2(newSpan, mMinSpan, mMaxSpan);
+    mFramesSpan = clampInt(newSpan, mMinSpan, mMaxSpan);
     if(mClamp) setFirstViewedFrame(mFirstViewedFrame);
 }
 
@@ -174,10 +169,10 @@ void AnimationWidgetScrollBar::wheelEvent(QWheelEvent *event)
 bool AnimationWidgetScrollBar::setFirstViewedFrame(int firstFrame) {
     if(mClamp) {
         if(mRange) {
-            mFirstViewedFrame = clampInt2(firstFrame, mMinFrame, mMaxFrame -
+            mFirstViewedFrame = clampInt(firstFrame, mMinFrame, mMaxFrame -
                                           mFramesSpan);
         } else {
-            mFirstViewedFrame = clampInt2(firstFrame, mMinFrame, mMaxFrame);
+            mFirstViewedFrame = clampInt(firstFrame, mMinFrame, mMaxFrame);
         }
         return true;
     } else {
@@ -204,7 +199,7 @@ void AnimationWidgetScrollBar::mouseMoveEvent(QMouseEvent *event)
 {
     qreal newFrame = posToFrame(event->x() );
     int moveFrame = qRound(newFrame - mLastMousePressFrame);
-    if(setFirstViewedFrame(clampInt2(mSavedFirstFrame + moveFrame,
+    if(setFirstViewedFrame(clampInt(mSavedFirstFrame + moveFrame,
                                      mMinFrame,
                                      mMaxFrame)) ) {
         emitChange();

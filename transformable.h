@@ -1,8 +1,6 @@
 #ifndef TRANSFORMABLE_H
 #define TRANSFORMABLE_H
-#include "connectedtomainwindow.h"
 #include <QPointF>
-
 
 class Transformable
 {

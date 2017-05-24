@@ -1,6 +1,8 @@
 #include "Boxes/textbox.h"
 #include <QInputDialog>
 #include "mainwindow.h"
+#include "canvas.h"
+#include "gradientpoints.h"
 
 TextBox::TextBox(BoxesGroup *parent) :
     PathBox(parent, TYPE_TEXT) {

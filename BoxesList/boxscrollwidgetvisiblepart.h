@@ -6,7 +6,6 @@
 #include "OptimalScrollArea/singlewidgettarget.h"
 
 class BoxSingleWidget;
-class QrealKey;
 class DurationRectangleMovable;
 class Key;
 class KeysView;

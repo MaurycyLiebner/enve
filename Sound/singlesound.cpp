@@ -1,6 +1,7 @@
 #include "singlesound.h"
 #include "soundcomposition.h"
 #include "durationrectangle.h"
+#include "Animators/animatorupdater.h"
 
 extern "C" {
     #include <libavutil/opt.h>

@@ -1,11 +1,11 @@
 #ifndef PATHBOX_H
 #define PATHBOX_H
 #include "Boxes/boundingbox.h"
-#include "gradientpoints.h"
 #include "Animators/paintsettings.h"
+class GradientPoints;
+typedef QSharedPointer<GradientPoints> GradientPointsQSPtr;
 
-class PathBox : public BoundingBox
-{
+class PathBox : public BoundingBox {
 public:
     PathBox(BoxesGroup *parent,
             const BoundingBoxType &type);
@@ -81,10 +81,8 @@ public:
 
     bool SWT_isPathBox() { return true; }
 protected:
-    QSharedPointer<GradientPoints> mFillGradientPoints =
-            (new GradientPoints)->ref<GradientPoints>();
-    QSharedPointer<GradientPoints> mStrokeGradientPoints =
-            (new GradientPoints)->ref<GradientPoints>();
+    GradientPointsQSPtr mFillGradientPoints;
+    GradientPointsQSPtr mStrokeGradientPoints;
 
 
     QLinearGradient mDrawFillGradient;

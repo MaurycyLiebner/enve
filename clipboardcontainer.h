@@ -1,7 +1,6 @@
 #ifndef CLIPBOARDCONTAINER_H
 #define CLIPBOARDCONTAINER_H
 #include <QList>
-class QrealKey;
 class QrealAnimator;
 class BoundingBox;
 class BoxesGroup;

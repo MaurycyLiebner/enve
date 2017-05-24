@@ -1,8 +1,8 @@
 #ifndef SINGLESOUND_H
 #define SINGLESOUND_H
 #include "Animators/complexanimator.h"
+#include "Animators/qrealanimator.h"
 class FixedLenAnimationRect;
-class DurationRectangle;
 
 extern int decode_audio_file(const char* path,
                              const int sample_rate,

@@ -1,6 +1,7 @@
 #include "linkbox.h"
 #include <QFileDialog>
 #include "mainwindow.h"
+#include "canvas.h"
 
 ExternalLinkBox::ExternalLinkBox(BoxesGroup *parent) :
     BoxesGroup(parent) {

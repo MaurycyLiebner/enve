@@ -64,60 +64,19 @@ protected:
 class Bone : public ComplexAnimator {
 public:
     Bone(BonePoint *rootPoint,
-         BonePoint *tipPoint) {
-        mRootPoint = rootPoint->ref<BonePoint>();
-        mTipPoint = tipPoint->ref<BonePoint>();
-        prp_setName("bone");
+         BonePoint *tipPoint);
 
-        mFixedLength->prp_setName("fixed length");
-        ca_addChildAnimator(mFixedLength.data());
-        ca_addChildAnimator(mTransformAnimator.data());
-        mRootPoint->prp_setName("root");
-        mTipPoint->prp_setName("tip");
-        ca_addChildAnimator(mRootPoint.data());
-        ca_addChildAnimator(mTipPoint.data());
-    }
+    QPointF getCurrentRootAbsPos();
 
-    QPointF getCurrentRootAbsPos() {
-        return mRootPoint->getAbsolutePos();
-    }
+    QPointF getCurrentTipAbsPos();
 
-    QPointF getCurrentTipAbsPos() {
-        return mTipPoint->getAbsolutePos();
-    }
+    qreal getCurrentRotation();
 
-    qreal getCurrentRotation() {
-        return degreesBetweenVectors(
-                    mTipPoint->getAbsolutePos() - mRootPoint->getAbsolutePos(),
-                    QPointF(1., 0.));
-    }
+    void moveTipPointToRelPos(const QPointF &relPos);
 
-    void moveTipPointToRelPos(const QPointF &relPos) {
-        if(mFixedLength->getValue()) {
-            QPointF tipVect = relPos - mRootPoint->getRelativePos();
-            qreal currLen = pointToLen(mTipPoint->getRelativePos() -
-                                       mRootPoint->getRelativePos());
-            tipVect = scalePointToNewLen(tipVect, currLen);
-            mTipPoint->moveToRel(mRootPoint->getCurrentPointValue() + tipVect);
-        } else {
-            mTipPoint->moveToRel(relPos);
-        }
-    }
+    BasicTransformAnimator *getTransformAnimator();
 
-    BasicTransformAnimator *getTransformAnimator() {
-        return mTransformAnimator.data();
-    }
-
-    void setParentBone(Bone *parentBone) {
-        if(parentBone == NULL) {
-            mParentBone.reset();
-            mTransformAnimator->setParentTransformAnimator(NULL);
-        } else {
-            mParentBone = parentBone->ref<Bone>();
-            mTransformAnimator->setParentTransformAnimator(
-                        parentBone->getTransformAnimator());
-        }
-    }
+    void setParentBone(Bone *parentBone);
 
 private:
     QSharedPointer<Bone> mParentBone;

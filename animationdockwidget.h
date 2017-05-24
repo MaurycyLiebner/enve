@@ -3,9 +3,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include "actionbutton.h"
-
-class MainWindow;
+class ActionButton;
 class KeysView;
 
 class AnimationDockWidget : public QWidget

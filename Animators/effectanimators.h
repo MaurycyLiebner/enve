@@ -4,8 +4,8 @@
 
 namespace fmt_filters { struct image; }
 
-class EffectsSettingsWidget;
 class PixmapEffect;
+class BoundingBox;
 
 class EffectAnimators : public ComplexAnimator
 {

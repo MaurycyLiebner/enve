@@ -1,10 +1,17 @@
 #include "Boxes/pathbox.h"
 #include "updatescheduler.h"
 #include "mainwindow.h"
+#include "gradientpoint.h"
+#include "Animators/animatorupdater.h"
+#include "gradientpoints.h"
 
 PathBox::PathBox(BoxesGroup *parent,
                  const BoundingBoxType &type) :
     BoundingBox(parent, type) {
+    mStrokeGradientPoints =
+            (new GradientPoints)->ref<GradientPoints>();
+    mFillGradientPoints =
+            (new GradientPoints)->ref<GradientPoints>();
     mFillSettings->setTargetPathBox(this);
     mStrokeSettings->setTargetPathBox(this);
 

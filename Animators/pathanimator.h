@@ -7,14 +7,14 @@ enum CanvasMode : short;
 
 class VectorPathEdge;
 class MovablePoint;
-
+class SkCanvas;
 class PathPoint;
 class SinglePathAnimator;
+class BoundingBox;
+class SkMatrix;
+typedef float SkScalar;
 
-struct PathPointAnimators;
-
-class PathAnimator : public ComplexAnimator
-{
+class PathAnimator : public ComplexAnimator {
     Q_OBJECT
 public:
     PathAnimator(BoundingBox *parentBox);
@@ -29,22 +29,14 @@ public:
     MovablePoint *qra_getPointAt(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
-    QPainterPath getCurrentPath() {
-        return mPath;
-    }
+    QPainterPath getCurrentPath();
 
     void prp_loadFromSql(const int &boundingBoxId);
     int prp_saveToSql(QSqlQuery *query,
                       const int &boundingBoxId);
-    void makeDuplicate(Property *property) {
-        duplicatePathsTo((PathAnimator*)property);
-    }
+    void makeDuplicate(Property *property);
 
-    Property *makeDuplicate() {
-        PathAnimator *newAnimator = new PathAnimator();
-        makeDuplicate(newAnimator);
-        return newAnimator;
-    }
+    Property *makeDuplicate();
 
 
     PathPoint *createNewPointOnLineNear(const QPointF &absPos,
@@ -61,12 +53,15 @@ public:
     void drawSelected(QPainter *p,
                       const CanvasMode &currentCanvasMode,
                       const QMatrix &combinedTransform);
+    void drawSelected(SkCanvas *canvas,
+                      const CanvasMode &currentCanvasMode,
+                      const SkScalar &invScale,
+                      const SkMatrix &combinedTransform);
+
     void selectAndAddContainedPointsToList(
             const QRectF &absRect, QList<MovablePoint *> *list);
 
-    BoundingBox *getParentBox() {
-        return mParentBox;
-    }
+    BoundingBox *getParentBox();
 
     void loadPathFromQPainterPath(const QPainterPath &path);
 
@@ -76,7 +71,7 @@ public:
     void removeSinglePathAnimator(SinglePathAnimator *path,
                                   const bool &saveUndoRedo = true);
 
-    bool SWT_isPathAnimator() { return true; }
+    bool SWT_isPathAnimator();
 private:
     BoundingBox *mParentBox = NULL;
     QPainterPath mPath;

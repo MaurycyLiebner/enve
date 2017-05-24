@@ -5,6 +5,8 @@
 #include "keysview.h"
 #include "updatescheduler.h"
 #include "qrealpoint.h"
+#include "global.h"
+#include "qrealkey.h"
 
 void KeysView::graphSetSmoothCtrl() {
     graphSetTwoSideCtrlForSelected();

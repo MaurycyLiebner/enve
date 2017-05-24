@@ -7,6 +7,7 @@
 #include "paintcontroler.h"
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
+#include "global.h"
 
 CanvasWindow::CanvasWindow() {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);

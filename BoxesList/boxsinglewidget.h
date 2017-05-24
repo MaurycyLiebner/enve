@@ -7,14 +7,12 @@
 #include <QPushButton>
 #include <QMimeData>
 #include <QComboBox>
-#include "boxeslistactionbutton.h"
-#include "boxtargetwidget.h"
 #include "BoxesList/boolpropertywidget.h"
 class QrealAnimatorValueSlider;
-class QrealKey;
-class BoundingBox;
 class DurationRectangleMovable;
 class Key;
+class BoxTargetWidget;
+class BoxesListActionButton;
 
 class BoxSingleWidget : public SingleWidget
 {

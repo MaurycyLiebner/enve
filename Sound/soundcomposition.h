@@ -15,7 +15,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QTimer>
-#include "singlesound.h"
+class SingleSound;
 const int SAMPLERATE = 44100;
 
 class SoundComposition : public QIODevice

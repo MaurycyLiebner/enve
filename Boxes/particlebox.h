@@ -104,21 +104,9 @@ public:
     void scheduleUpdateParticlesForFrame();
     void generateParticlesIfNeeded();
     void updateParticlesForFrameIfNeeded(const int &frame);
-    bool relPointInsidePath(const QPointF &relPos) {
-        Q_FOREACH(const ParticleState &state, mParticleStates) {
-            if(pointToLen(state.pos - relPos) < 5.) {
-                return true;
-            }
-        }
+    bool relPointInsidePath(const QPointF &relPos);
 
-        return false;
-    }
-
-    Property *makeDuplicate() {
-        ParticleEmitter *emitterDupli = new ParticleEmitter(mParentBox);
-        makeDuplicate(emitterDupli);
-        return emitterDupli;
-    }
+    Property *makeDuplicate();
 
     void duplicateAnimatorsFrom(QPointFAnimator *pos,
             QrealAnimator *width,
@@ -147,23 +135,15 @@ public:
 
     void makeDuplicate(Property *target);
 
-    void setMinFrame(const int &minFrame) {
-        mMinFrame = minFrame;
-        scheduleGenerateParticles();
-    }
+    void setMinFrame(const int &minFrame);
 
-    void setMaxFrame(const int &maxFrame) {
-        mMaxFrame = maxFrame;
-        scheduleGenerateParticles();
-    }
+    void setMaxFrame(const int &maxFrame);
 
     void setFrameRange(const int &minFrame,
                        const int &maxFrame);
 
     ColorAnimator *getColorAnimator();
-    MovablePoint *getPosPoint() {
-        return mPos.data();
-    }
+    MovablePoint *getPosPoint();
 private:
     QRectF mParticlesBoundingRect;
     bool mGenerateParticlesScheduled = false;
@@ -238,18 +218,9 @@ public:
 
     void addEmitter(ParticleEmitter *emitter);
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new ParticleBox(parent);
-    }
+    BoundingBox *createNewDuplicate(BoxesGroup *parent);
 
-    void makeDuplicate(Property *targetBox) {
-        BoundingBox::makeDuplicate(targetBox);
-        ParticleBox *pbTarget = (ParticleBox*)targetBox;
-        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-            pbTarget->addEmitter((ParticleEmitter*)
-                                 emitter->makeDuplicate());
-        }
-    }
+    void makeDuplicate(Property *targetBox);
 
     void startAllPointsTransform();
     void drawSelected(QPainter *p,
@@ -263,22 +234,11 @@ public:
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
 
-    void prp_setAbsFrame(const int &frame) {
-        BoundingBox::prp_setAbsFrame(frame);
-        mFrameChangedUpdateScheduled = true;
-    }
+    void prp_setAbsFrame(const int &frame);
 
-    void setUpdateVars() {
-        BoundingBox::setUpdateVars();
-        if(mFrameChangedUpdateScheduled) {
-            mFrameChangedUpdateScheduled = false;
-            Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-                emitter->scheduleUpdateParticlesForFrame();
-            }
-        }
-    }
+    void setUpdateVars();
 
-    bool SWT_isParticleBox() { return true; }
+    bool SWT_isParticleBox();
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

@@ -1,6 +1,7 @@
 #include "pathoperations.h"
 #include "pointhelpers.h"
 #include "edge.h"
+#include "Animators/pathanimator.h"
 
 MinimalPathPoint::MinimalPathPoint() {}
 

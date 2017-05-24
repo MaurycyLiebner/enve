@@ -3,12 +3,11 @@
 #include <QKeyEvent>
 #include "pointhelpers.h"
 #include "mainwindow.h"
+#include "global.h"
 
 QDoubleSlider::QDoubleSlider(qreal minVal, qreal maxVal,
                              qreal prefferedStep,
-                             QWidget *parent) :
-    QWidget(parent)
-{
+                             QWidget *parent) : QWidget(parent) {
     mValue = minVal;
     mMinValue = minVal;
     mMaxValue = maxVal;

@@ -5,39 +5,18 @@
 #include "SkMatrix.h"
 #include "SkRect.h"
 
-QRectF SkRectToQRectF(const SkRect &rect) {
-    return QRectF(rect.x(), rect.y(),
-                  rect.width(), rect.height());
-}
-
-SkRect QRectFToSkRect(const QRectF &rect) {
-    return SkRect::MakeXYWH(rect.x(), rect.y(),
-                            rect.width(), rect.height());
-}
+extern QRectF SkRectToQRectF(const SkRect &rect);
+extern SkRect QRectFToSkRect(const QRectF &rect);
 // m11 - scaleX
 // m12 - skewY
 // m21 - skewX
 // m22 - scaleY
-QMatrix SkMatrixToQMatrix(const SkMatrix &matrix) {
-    return QMatrix(matrix.getScaleX(), matrix.getSkewY(),
-                   matrix.getSkewX(), matrix.getScaleY(),
-                   matrix.getTranslateX(), matrix.getTranslateY());
-}
+extern QMatrix SkMatrixToQMatrix(const SkMatrix &matrix);
 
-SkMatrix QMatrixToSkMatrix(const QMatrix &matrix) {
-    SkMatrix skMatrix;
-    skMatrix.setScale(matrix.m11(), matrix.m22());
-    skMatrix.setSkew(matrix.m21(), matrix.m12());
-    skMatrix.setTranslate(matrix.dx(), matrix.dy());
-    return skMatrix;
-}
+extern SkMatrix QMatrixToSkMatrix(const QMatrix &matrix);
 
-QPointF SkPointToQPointF(const SkPoint &point) {
-    return QPointF(point.x(), point.y());
-}
+extern QPointF SkPointToQPointF(const SkPoint &point);
 
-SkPoint QPointFToSkPoint(const QPointF &point) {
-    return SkPoint::Make(point.x(), point.y());
-}
+extern SkPoint QPointFToSkPoint(const QPointF &point);
 
 #endif // SKQTCONVERSIONS_H

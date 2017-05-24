@@ -5,13 +5,16 @@
 #include <QVBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QMenuBar>
+
 class AnimationWidgetScrollBar;
-#include "keysview.h"
-#include "BoxesList/boxscrollwidget.h"
+class KeysView;
 class BoxesListAnimationDockWidget;
 class ChangeWidthWidget;
-#include <QMenuBar>
-#include "actionbutton.h"
+class MainWindow;
+class ScrollArea;
+class AnimationDockWidget;
+class BoxScrollWidget;
 
 class BoxesListKeysViewWidget : public QWidget
 {

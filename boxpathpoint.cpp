@@ -1,5 +1,6 @@
 #include "boxpathpoint.h"
 #include "Boxes/boundingbox.h"
+#include "pointhelpers.h"
 
 BoxPathPoint::BoxPathPoint(BoundingBox *box) :
     MovablePoint(box, TYPE_PATH_POINT, 7.) {

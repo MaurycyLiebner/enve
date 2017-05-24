@@ -3,8 +3,11 @@
 #include "Boxes/boxesgroup.h"
 #include "canvas.h"
 #include "Animators/singlepathanimator.h"
-
+#include "Colors/ColorWidgets/colorvaluerect.h"
 #include "Colors/helpers.h"
+#include "Animators/pathanimator.h"
+#include "pathpoint.h"
+
 //bool getRotationScaleFromMatrixIfNoShear(const QMatrix &matrix,
 //                                         qreal *rot,
 //                                         qreal *sx, qreal *sy) {
@@ -603,6 +606,32 @@ bool parsePathDataFast(const QString &dataStr, VectorPathSvgAttributes *attribut
     return true;
 }
 
+BoundingBoxSvgAttributes::BoundingBoxSvgAttributes() {}
+
+BoundingBoxSvgAttributes::~BoundingBoxSvgAttributes() {}
+
+BoundingBoxSvgAttributes &BoundingBoxSvgAttributes::operator*=(const BoundingBoxSvgAttributes &overwritter)
+{
+    mRelTransform = overwritter.getRelTransform();
+
+    mFillAttributes *= overwritter.getFillAttributes();
+    mStrokeAttributes *= overwritter.getStrokeAttributes();
+    mTextAttributes *= overwritter.getTextAttributes();
+    mFillRule = overwritter.getFillRule();
+
+    return *this;
+}
+
+const Qt::FillRule &BoundingBoxSvgAttributes::getFillRule() const { return mFillRule; }
+
+const QMatrix &BoundingBoxSvgAttributes::getRelTransform() const { return mRelTransform; }
+
+const FillSvgAttributes &BoundingBoxSvgAttributes::getFillAttributes() const { return mFillAttributes; }
+
+const StrokeSvgAttributes &BoundingBoxSvgAttributes::getStrokeAttributes() const { return mStrokeAttributes; }
+
+const TextSvgAttributes &BoundingBoxSvgAttributes::getTextAttributes() const { return mTextAttributes; }
+
 void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
     QList<SvgAttribute> styleAttributes;
     QString styleAttributesStr = element.attribute("style");
@@ -817,6 +846,19 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
 
 //        mRelTransform = mRelTransform*matrix.inverted();
 //    }
+}
+
+bool BoundingBoxSvgAttributes::hasTransform() const {
+    return !(isZero(mRelTransform.dx()) &&
+             isZero(mRelTransform.dy()) &&
+             isZero(mRelTransform.m11() - 1.) &&
+             isZero(mRelTransform.m22() - 1) &&
+             isZero(mRelTransform.m12()) &&
+             isZero(mRelTransform.m21())); /*&&
+                 isZero(mDx) && isZero(mDy) &&
+                 isZero(mScaleX - 1.) && isZero(mScaleY - 1.) &&
+                 isZero(mShearX) && isZero(mShearY) &&
+                 isZero(mRot));*/
 }
 
 void BoundingBoxSvgAttributes::applySingleTransformations(BoundingBox *box) {
@@ -1673,6 +1715,41 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
     return true;
 }*/
 #include "Animators/paintsettings.h"
+FillSvgAttributes::FillSvgAttributes() {}
+
+FillSvgAttributes &FillSvgAttributes::operator*=(const FillSvgAttributes &overwritter) {
+    setColor(overwritter.getColor());
+    setPaintType(overwritter.getPaintType());
+    setGradient(overwritter.getGradient());
+    return *this;
+}
+
+void FillSvgAttributes::setColor(const Color &val) {
+    qreal opacity = val.gl_a;
+    mColor = val;
+    mColor.setGLColorA(opacity);
+    setPaintType(FLATPAINT);
+}
+
+void FillSvgAttributes::setColorOpacity(const qreal &opacity) {
+    mColor.setGLColorA(opacity);
+}
+
+void FillSvgAttributes::setPaintType(const PaintType &type) {
+    mPaintType = type;
+}
+
+void FillSvgAttributes::setGradient(Gradient *gradient) {
+    mGradient = gradient;
+    setPaintType(GRADIENTPAINT);
+}
+
+const Color &FillSvgAttributes::getColor() const { return mColor; }
+
+const PaintType &FillSvgAttributes::getPaintType() const { return mPaintType; }
+
+Gradient *FillSvgAttributes::getGradient() const { return mGradient; }
+
 void FillSvgAttributes::apply(BoundingBox *box) {
     PaintSetting *setting;
     if(mPaintType == FLATPAINT) {
@@ -1694,6 +1771,44 @@ void FillSvgAttributes::apply(BoundingBox *box) {
     delete setting;
 }
 
+StrokeSvgAttributes::StrokeSvgAttributes() {}
+
+StrokeSvgAttributes &StrokeSvgAttributes::operator*=(const StrokeSvgAttributes &overwritter) {
+    setColor(overwritter.getColor());
+    setPaintType(overwritter.getPaintType());
+    setGradient(overwritter.getGradient());
+
+    setLineWidth(overwritter.getLineWidth());
+    setCapStyle(overwritter.getCapStyle());
+    setJoinStyle(overwritter.getJoinStyle());
+    setOutlineCompositionMode(overwritter.getOutlineCompositionMode());
+    return *this;
+}
+
+const qreal &StrokeSvgAttributes::getLineWidth() const { return mLineWidth; }
+
+const Qt::PenCapStyle &StrokeSvgAttributes::getCapStyle() const { return mCapStyle; }
+
+const Qt::PenJoinStyle &StrokeSvgAttributes::getJoinStyle() const { return mJoinStyle; }
+
+const QPainter::CompositionMode &StrokeSvgAttributes::getOutlineCompositionMode() const { return mOutlineCompositionMode; }
+
+void StrokeSvgAttributes::setLineWidth(const qreal &val) {
+    mLineWidth = val;
+}
+
+void StrokeSvgAttributes::setCapStyle(const Qt::PenCapStyle &capStyle) {
+    mCapStyle = capStyle;
+}
+
+void StrokeSvgAttributes::setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
+    mJoinStyle = joinStyle;
+}
+
+void StrokeSvgAttributes::setOutlineCompositionMode(const QPainter::CompositionMode &compMode) {
+    mOutlineCompositionMode = compMode;
+}
+
 void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale)
 {
     box->setStrokeWidth(mLineWidth*scale, false);
@@ -1701,10 +1816,10 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale)
     PaintSetting *setting;
     if(mPaintType == FLATPAINT) {
         setting = new PaintSetting(false, ColorSetting(RGBMODE,
-                                                      CVR_ALL,
-                                                      mColor.gl_r,
-                                                      mColor.gl_g,
-                                                      mColor.gl_b,
+                                                       CVR_ALL,
+                                                       mColor.gl_r,
+                                                       mColor.gl_g,
+                                                       mColor.gl_b,
                                                       mColor.gl_a,
                                                       CST_CHANGE));
     } else if(mPaintType == GRADIENTPAINT) {
@@ -1747,6 +1862,14 @@ void VectorPathSvgAttributes::apply(VectorPath *path)
     BoundingBoxSvgAttributes::apply((BoundingBox*)path);
 }
 
+SvgSeparatePath::SvgSeparatePath() {}
+
+SvgSeparatePath::~SvgSeparatePath() {
+    Q_FOREACH(SvgPathPoint *point, mPoints) {
+        delete point;
+    }
+}
+
 void SvgSeparatePath::apply(SinglePathAnimator *path)
 {
     PathPoint *lastPoint = NULL;
@@ -1769,4 +1892,243 @@ void SvgSeparatePath::apply(SinglePathAnimator *path)
     if(mClosedPath) {
         lastPoint->connectToPoint(firstPoint);
     }
+}
+
+void SvgSeparatePath::closePath() {
+    if(mLastPoint->getStartPointEnabled() &&
+            pointToLen(mLastPoint->getPoint() - mFirstPoint->getPoint()) < 0.1) {
+        mFirstPoint->setStartPoint(mLastPoint->getStartPoint());
+        delete mPoints.takeLast();
+        mLastPoint = mPoints.last();
+    }
+
+    mClosedPath = true;
+}
+
+void SvgSeparatePath::moveTo(QPointF e) {
+    mFirstPoint = new SvgPathPoint(e);
+    mLastPoint = mFirstPoint;
+    addPoint(mFirstPoint);
+}
+
+void SvgSeparatePath::cubicTo(QPointF c1, QPointF c2, QPointF e) {
+    mLastPoint->setEndPoint(c1);
+    mLastPoint = new SvgPathPoint(e);
+    mLastPoint->setStartPoint(c2);
+    addPoint(mLastPoint);
+}
+
+void SvgSeparatePath::lineTo(QPointF e) {
+    mLastPoint = new SvgPathPoint(e);
+    addPoint(mLastPoint);
+}
+
+void SvgSeparatePath::quadTo(QPointF c, QPointF e) {
+    QPointF prev = mLastPoint->getPoint();
+    QPointF c1((prev.x() + 2*c.x()) / 3, (prev.y() + 2*c.y()) / 3);
+    QPointF c2((e.x() + 2*c.x()) / 3, (e.y() + 2*c.y()) / 3);
+    cubicTo(c1, c2, e);
+}
+
+void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
+    Q_FOREACH(SvgPathPoint *point, mPoints) {
+        point->applyTransfromation(transformation);
+    }
+}
+
+void SvgSeparatePath::pathArc(qreal rx, qreal ry, qreal x_axis_rotation, int large_arc_flag, int sweep_flag, qreal x, qreal y, qreal curx, qreal cury) {
+    qreal sin_th, cos_th;
+    qreal a00, a01, a10, a11;
+    qreal x0, y0, x1, y1, xc, yc;
+    qreal d, sfactor, sfactor_sq;
+    qreal th0, th1, th_arc;
+    int i, n_segs;
+    qreal dx, dy, dx1, dy1, Pr1, Pr2, Px, Py, check;
+
+    rx = qAbs(rx);
+    ry = qAbs(ry);
+
+    sin_th = qSin(x_axis_rotation * (M_PI / 180.0));
+    cos_th = qCos(x_axis_rotation * (M_PI / 180.0));
+
+    dx = (curx - x) / 2.0;
+    dy = (cury - y) / 2.0;
+    dx1 =  cos_th * dx + sin_th * dy;
+    dy1 = -sin_th * dx + cos_th * dy;
+    Pr1 = rx * rx;
+    Pr2 = ry * ry;
+    Px = dx1 * dx1;
+    Py = dy1 * dy1;
+    /* Spec : check if radii are large enough */
+    check = Px / Pr1 + Py / Pr2;
+    if (check > 1) {
+        rx = rx * qSqrt(check);
+        ry = ry * qSqrt(check);
+    }
+
+    a00 =  cos_th / rx;
+    a01 =  sin_th / rx;
+    a10 = -sin_th / ry;
+    a11 =  cos_th / ry;
+    x0 = a00 * curx + a01 * cury;
+    y0 = a10 * curx + a11 * cury;
+    x1 = a00 * x + a01 * y;
+    y1 = a10 * x + a11 * y;
+    /* (x0, y0) is current point in transformed coordinate space.
+           (x1, y1) is new point in transformed coordinate space.
+
+           The arc fits a unit-radius circle in this space.
+        */
+    d = (x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0);
+    sfactor_sq = 1.0 / d - 0.25;
+    if (sfactor_sq < 0) sfactor_sq = 0;
+    sfactor = qSqrt(sfactor_sq);
+    if (sweep_flag == large_arc_flag) sfactor = -sfactor;
+    xc = 0.5 * (x0 + x1) - sfactor * (y1 - y0);
+    yc = 0.5 * (y0 + y1) + sfactor * (x1 - x0);
+    /* (xc, yc) is center of the circle. */
+
+    th0 = qAtan2(y0 - yc, x0 - xc);
+    th1 = qAtan2(y1 - yc, x1 - xc);
+
+    th_arc = th1 - th0;
+    if (th_arc < 0 && sweep_flag)
+        th_arc += 2 * M_PI;
+    else if (th_arc > 0 && !sweep_flag)
+        th_arc -= 2 * M_PI;
+
+    n_segs = qCeil(qAbs(th_arc / (M_PI * 0.5 + 0.001)));
+
+    for (i = 0; i < n_segs; i++) {
+        pathArcSegment(xc, yc,
+                       th0 + i * th_arc / n_segs,
+                       th0 + (i + 1) * th_arc / n_segs,
+                       rx, ry, x_axis_rotation);
+    }
+}
+
+void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc, qreal th0, qreal th1, qreal rx, qreal ry, qreal xAxisRotation)
+{
+    qreal sinTh, cosTh;
+    qreal a00, a01, a10, a11;
+    qreal x1, y1, x2, y2, x3, y3;
+    qreal t;
+    qreal thHalf;
+
+    sinTh = qSin(xAxisRotation * (M_PI / 180.0));
+    cosTh = qCos(xAxisRotation * (M_PI / 180.0));
+
+    a00 =  cosTh * rx;
+    a01 = -sinTh * ry;
+    a10 =  sinTh * rx;
+    a11 =  cosTh * ry;
+
+    thHalf = 0.5 * (th1 - th0);
+    t = (8.0 / 3.0) * qSin(thHalf * 0.5) * qSin(thHalf * 0.5) / qSin(thHalf);
+    x1 = xc + qCos(th0) - t * qSin(th0);
+    y1 = yc + qSin(th0) + t * qCos(th0);
+    x3 = xc + qCos(th1);
+    y3 = yc + qSin(th1);
+    x2 = x3 + t * qSin(th1);
+    y2 = y3 - t * qCos(th1);
+
+    cubicTo(QPointF(a00 * x1 + a01 * y1, a10 * x1 + a11 * y1),
+            QPointF(a00 * x2 + a01 * y2, a10 * x2 + a11 * y2),
+            QPointF(a00 * x3 + a01 * y3, a10 * x3 + a11 * y3));
+}
+
+void SvgSeparatePath::addPoint(SvgPathPoint *point) {
+    mPoints << point;
+}
+
+TextSvgAttributes::TextSvgAttributes() {}
+
+TextSvgAttributes &TextSvgAttributes::operator*=(const TextSvgAttributes &overwritter) {
+    //        if(overwritter.wasColorAssigned()) {
+    //            mColor = overwritter.getColor();
+    //        }
+    return *this;
+}
+
+void TextSvgAttributes::setFontFamily(const QString &family) {
+    mFont.setFamily(family);
+}
+
+void TextSvgAttributes::setFontSize(const int &size) {
+    mFont.setPixelSize(size);
+}
+
+void TextSvgAttributes::setFontStyle(const QFont::Style &style) {
+    mFont.setStyle(style);
+}
+
+void TextSvgAttributes::setFontWeight(const int &weight) {
+    mFont.setWeight(weight);
+}
+
+void TextSvgAttributes::setFontAlignment(const Qt::Alignment &alignment) {
+    mAlignment = alignment;
+}
+
+SvgPathPoint::SvgPathPoint(QPointF point) {
+    mCtrlsMode = CTRLS_CORNER;
+    mPoint = point;
+}
+
+void SvgPathPoint::guessCtrlsMode() {
+    QPointF startPointRel = mStartPoint - mPoint;
+    QPointF endPointRel = mEndPoint - mPoint;
+    if(isZero1Dec(pointToLen(startPointRel) - pointToLen(endPointRel)) ) {
+        mCtrlsMode = CTRLS_SYMMETRIC;
+    } else {
+        qreal angle = QLineF(mStartPoint, mPoint).angleTo(QLineF(mPoint, mEndPoint));
+        while(angle > 90.) angle -= 180;
+        if(isZero1Dec(angle)) {
+            mCtrlsMode = CTRLS_SMOOTH;
+        }
+    }
+}
+
+void SvgPathPoint::setStartPoint(QPointF startPoint) {
+    mStartPoint = startPoint;
+    if(isZero1Dec(pointToLen(mStartPoint - mPoint))) return;
+    mStartPointSet = true;
+    if(mEndPointSet) guessCtrlsMode();
+}
+
+void SvgPathPoint::setEndPoint(QPointF endPoint) {
+    mEndPoint = endPoint;
+    if(isZero1Dec(pointToLen(mEndPoint - mPoint))) return;
+    mEndPointSet = true;
+    if(mStartPointSet) guessCtrlsMode();
+}
+
+CtrlsMode SvgPathPoint::getCtrlsMode() const {
+    return mCtrlsMode;
+}
+
+QPointF SvgPathPoint::getPoint() const {
+    return mPoint;
+}
+
+QPointF SvgPathPoint::getStartPoint() const {
+    return mStartPoint;
+}
+
+QPointF SvgPathPoint::getEndPoint() const {
+    return mEndPoint;
+}
+
+bool SvgPathPoint::getStartPointEnabled() {
+    return mStartPointSet;
+}
+
+bool SvgPathPoint::getEndPointEnabled() {
+    return mEndPointSet;
+}
+
+void SvgPathPoint::applyTransfromation(const QMatrix &transformation) {
+    mPoint = transformation.map(mPoint);
+    mEndPoint = transformation.map(mEndPoint);
+    mStartPoint = transformation.map(mStartPoint);
 }

@@ -2,8 +2,7 @@
 #define COLORVALUERECT_H
 #include "colorwidget.h"
 
-enum CVR_TYPE
-{
+enum CVR_TYPE : short {
     CVR_RED,
     CVR_GREEN,
     CVR_BLUE,

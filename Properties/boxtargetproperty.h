@@ -3,7 +3,6 @@
 #include <QtCore>
 #include "property.h"
 class BoundingBox;
-class QrealAnimator;
 
 class BoxTargetProperty : public Property {
 public:

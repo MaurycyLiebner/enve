@@ -1,8 +1,7 @@
 #ifndef GRADIENTPOINT_H
 #define GRADIENTPOINT_H
 #include "movablepoint.h"
-#include "fillstrokesettings.h"
-class VectorPath;
+class PathBox;
 
 class GradientPoint : public MovablePoint
 {

@@ -1,9 +1,9 @@
 #ifndef GRADIENTPOINTS_H
 #define GRADIENTPOINTS_H
 #include "Animators/complexanimator.h"
-#include "gradientpoint.h"
-
+class GradientPoint;
 class MovablePoint;
+class PathBox;
 
 class GradientPoints : public ComplexAnimator {
 public:
@@ -32,7 +32,9 @@ public:
     GradientPoint *endPoint;
     PathBox *parent;
 
-    void setPositions(QPointF startPos, QPointF endPos, bool saveUndoRedo = true);
+    void setPositions(QPointF startPos,
+                      QPointF endPos,
+                      bool saveUndoRedo = true);
     void prp_loadFromSql(const int &identifyingId);
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
     Property *makeDuplicate() {

@@ -3,6 +3,7 @@
 #include "pathpoint.h"
 #include "undoredo.h"
 #include "edge.h"
+#include <QSqlRecord>
 
 PathAnimator::PathAnimator() :
     ComplexAnimator() {
@@ -62,6 +63,8 @@ void PathAnimator::removeSinglePathAnimator(SinglePathAnimator *path,
         ca_removeChildAnimator(path);
     }
 }
+
+bool PathAnimator::SWT_isPathAnimator() { return true; }
 
 void PathAnimator::loadPathFromQPainterPath(const QPainterPath &path) {
     PathPoint *firstPoint = NULL;
@@ -187,11 +190,27 @@ MovablePoint *PathAnimator::qra_getPointAt(
     return NULL;
 }
 
+QPainterPath PathAnimator::getCurrentPath() {
+    return mPath;
+}
+
 void PathAnimator::drawSelected(QPainter *p,
                                 const CanvasMode &currentCanvasMode,
                                 const QMatrix &combinedTransform) {
     Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->drawSelected(p, currentCanvasMode, combinedTransform);
+    }
+}
+
+void PathAnimator::drawSelected(SkCanvas *canvas,
+                                const CanvasMode &currentCanvasMode,
+                                const SkScalar &invScale,
+                                const SkMatrix &combinedTransform) {
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
+        singlePath->drawSelected(canvas,
+                                 currentCanvasMode,
+                                 invScale,
+                                 combinedTransform);
     }
 }
 
@@ -203,12 +222,26 @@ void PathAnimator::selectAndAddContainedPointsToList(
     }
 }
 
+BoundingBox *PathAnimator::getParentBox() {
+    return mParentBox;
+}
+
 int PathAnimator::prp_saveToSql(QSqlQuery *query,
                                 const int &boundingBoxId) {
     Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->savePointsToSql(query, boundingBoxId);
     }
     return 0;
+}
+
+void PathAnimator::makeDuplicate(Property *property) {
+    duplicatePathsTo((PathAnimator*)property);
+}
+
+Property *PathAnimator::makeDuplicate() {
+    PathAnimator *newAnimator = new PathAnimator();
+    makeDuplicate(newAnimator);
+    return newAnimator;
 }
 
 void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {

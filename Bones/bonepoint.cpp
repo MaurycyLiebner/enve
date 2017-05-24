@@ -1,4 +1,5 @@
 #include "bonepoint.h"
+#include "pointhelpers.h"
 
 const int MAP_SIZE = 100;
 
@@ -127,4 +128,59 @@ void PathWeightMap::addPoint(const QPointF &c1,
 
 QPainterPath PathWeightMap::finishPath() {
     return mPath;
+}
+
+Bone::Bone(BonePoint *rootPoint, BonePoint *tipPoint) {
+    mRootPoint = rootPoint->ref<BonePoint>();
+    mTipPoint = tipPoint->ref<BonePoint>();
+    prp_setName("bone");
+
+    mFixedLength->prp_setName("fixed length");
+    ca_addChildAnimator(mFixedLength.data());
+    ca_addChildAnimator(mTransformAnimator.data());
+    mRootPoint->prp_setName("root");
+    mTipPoint->prp_setName("tip");
+    ca_addChildAnimator(mRootPoint.data());
+    ca_addChildAnimator(mTipPoint.data());
+}
+
+QPointF Bone::getCurrentRootAbsPos() {
+    return mRootPoint->getAbsolutePos();
+}
+
+QPointF Bone::getCurrentTipAbsPos() {
+    return mTipPoint->getAbsolutePos();
+}
+
+qreal Bone::getCurrentRotation() {
+    return degreesBetweenVectors(
+                mTipPoint->getAbsolutePos() - mRootPoint->getAbsolutePos(),
+                QPointF(1., 0.));
+}
+
+void Bone::moveTipPointToRelPos(const QPointF &relPos) {
+    if(mFixedLength->getValue()) {
+        QPointF tipVect = relPos - mRootPoint->getRelativePos();
+        qreal currLen = pointToLen(mTipPoint->getRelativePos() -
+                                   mRootPoint->getRelativePos());
+        tipVect = scalePointToNewLen(tipVect, currLen);
+        mTipPoint->moveToRel(mRootPoint->getCurrentPointValue() + tipVect);
+    } else {
+        mTipPoint->moveToRel(relPos);
+    }
+}
+
+BasicTransformAnimator *Bone::getTransformAnimator() {
+    return mTransformAnimator.data();
+}
+
+void Bone::setParentBone(Bone *parentBone) {
+    if(parentBone == NULL) {
+        mParentBone.reset();
+        mTransformAnimator->setParentTransformAnimator(NULL);
+    } else {
+        mParentBone = parentBone->ref<Bone>();
+        mTransformAnimator->setParentTransformAnimator(
+                    parentBone->getTransformAnimator());
+    }
 }

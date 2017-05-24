@@ -1,22 +1,17 @@
 #ifndef VECTORPATH_H
 #define VECTORPATH_H
 #include <QPainterPath>
-#include "pathpoint.h"
 #include <QLinearGradient>
-#include "Animators/pathanimator.h"
-#include "Boxes/pathbox.h"
+#include "pathbox.h"
 
+class PathPoint;
 class BoxesGroup;
-
-class MainWindow;
-
-class PathPivot;
+class PathAnimator;
+typedef QSharedPointer<PathAnimator> PathAnimatorQSPtr;
 
 enum CanvasMode : short;
 
 class VectorPathEdge;
-
-class VectorShapesMenu;
 
 class VectorPath : public PathBox
 {
@@ -26,7 +21,11 @@ public:
 
     ~VectorPath();
 
-    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
+    void drawSelected(QPainter *p,
+                      const CanvasMode &currentCanvasMode);
+    void drawSelected(SkCanvas *canvas,
+                      const CanvasMode &currentCanvasMode,
+                      const SkScalar &invScale);
 
     PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
     PathPoint *addPointRelPos(QPointF relPtPos, PathPoint *toPoint = NULL);
@@ -41,11 +40,16 @@ public:
     PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
 
     void removePoint(PathPoint *point);
-    void replaceSeparatePathPoint(PathPoint *pointBeingReplaced, PathPoint *newPoint);
-    void addPointToSeparatePaths(PathPoint *pointToAdd, bool saveUndoRedo = true);
-    void removePointFromSeparatePaths(PathPoint *pointToRemove, bool saveUndoRedo = true);
-    void appendToPointsList(PathPoint *point, bool saveUndoRedo = true);
-    void removeFromPointsList(PathPoint *point, bool saveUndoRedo = true);
+    void replaceSeparatePathPoint(PathPoint *pointBeingReplaced,
+                                  PathPoint *newPoint);
+    void addPointToSeparatePaths(PathPoint *pointToAdd,
+                                 bool saveUndoRedo = true);
+    void removePointFromSeparatePaths(PathPoint *pointToRemove,
+                                      bool saveUndoRedo = true);
+    void appendToPointsList(PathPoint *point,
+                            bool saveUndoRedo = true);
+    void removeFromPointsList(PathPoint *point,
+                              bool saveUndoRedo = true);
 
     PathPoint *addPointRelPos(QPointF relPos,
                               QPointF startRelPos, QPointF endRelPos,
@@ -84,8 +88,7 @@ public:
     bool SWT_isVectorPath() { return true; }
 protected:
     void updatePathPointIds();
-    QSharedPointer<PathAnimator> mPathAnimator =
-                        (new PathAnimator(this))->ref<PathAnimator>();
+    PathAnimatorQSPtr mPathAnimator;
 
     void loadPointsFromSql(int boundingBoxId);
 

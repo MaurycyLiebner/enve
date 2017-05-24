@@ -3,22 +3,18 @@
 
 #include "Boxes/boxesgroup.h"
 #include "Colors/color.h"
-#include "fillstrokesettings.h"
 #include <QSqlQuery>
 #include <QThread>
-#include "ctrlpoint.h"
-#include "Boxes/textbox.h"
+#include "Boxes/rendercachehandler.h"
 
-class MainWindow;
-
-class UndoRedo;
-
-class UndoRedoStack;
-
+class TextBox;
 class Circle;
 class ParticleBox;
 class Rectangle;
+class PathPivot;
 class SoundComposition;
+
+enum CtrlsMode : short;
 
 enum CanvasMode : short {
     MOVE_PATH,
@@ -33,6 +29,8 @@ enum CanvasMode : short {
 };
 
 #include "canvaswindow.h"
+
+extern bool zLessThan(BoundingBox *box1, BoundingBox *box2);
 
 class Canvas : public BoxesGroup
 {
@@ -307,6 +305,9 @@ public:
     BoundingBox *createLink(BoxesGroup *parent);
     void createImageBox(const QString &path);
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
+    void drawSelected(SkCanvas *canvas,
+                      const CanvasMode &currentCanvasMode,
+                      const SkScalar &invScale);
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                              const CanvasMode &currentMode,
                              const qreal &canvasScaleInv);

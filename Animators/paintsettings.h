@@ -1,12 +1,11 @@
 #ifndef PAINTSETTINGS_H
 #define PAINTSETTINGS_H
 
+#include "qrealanimator.h"
 #include "coloranimator.h"
-#include "Colors/ColorWidgets/colorvaluerect.h"
+#include "Colors/color.h"
 
-class GradientWidget;
-
-enum PaintType {
+enum PaintType : short {
     NOPAINT,
     FLATPAINT,
     GRADIENTPAINT
@@ -23,9 +22,11 @@ enum ColorSettingType : short {
     CST_FINISH
 };
 
+enum CVR_TYPE : short;
+
 class ColorSetting {
 public:
-    ColorSetting() {}
+    ColorSetting();
     ColorSetting(
             const ColorMode &settingModeT,
             const CVR_TYPE &changedValueT,
@@ -52,7 +53,7 @@ private:
     void startColorTransform(ColorAnimator *target) const;
     ColorSettingType mType = CST_FINISH;
     ColorMode mSettingMode = RGBMODE;
-    CVR_TYPE mChangedValue = CVR_ALL;
+    CVR_TYPE mChangedValue;
     qreal mVal1 = 1.;
     qreal mVal2 = 1.;
     qreal mVal3 = 1.;
@@ -162,8 +163,6 @@ public:
     void replaceColor(const int &id,
                       const Color &color);
 
-    void setColors(QList<Color> newColors);
-
     void prp_startTransform();
 
     bool isInPaths(PathBox *path);
@@ -247,6 +246,8 @@ struct UpdatePaintSettings {
 
     UpdatePaintSettings() {}
 
+    virtual ~UpdatePaintSettings() {}
+
     virtual void applyPainterSettings(QPainter *p) {
         if(paintType == GRADIENTPAINT) {
             p->setBrush(gradient);
@@ -322,7 +323,8 @@ public:
 
     QrealAnimator *getStrokeWidthAnimator();
 
-    void setOutlineCompositionMode(const QPainter::CompositionMode &compositionMode);
+    void setOutlineCompositionMode(
+            const QPainter::CompositionMode &compositionMode);
 
     QPainter::CompositionMode getOutlineCompositionMode();
 

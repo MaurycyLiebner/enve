@@ -1,5 +1,6 @@
 #include "pathpivot.h"
 #include "canvas.h"
+#include "pointhelpers.h"
 
 PathPivot::PathPivot(Canvas *parent) :
     MovablePoint(parent, MovablePointType::TYPE_PIVOT_POINT, 7.) {

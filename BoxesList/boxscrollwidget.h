@@ -2,8 +2,8 @@
 #define BOXSCROLLWIDGET_H
 
 #include "OptimalScrollArea/scrollwidget.h"
-#include "boxscrollwidgetvisiblepart.h"
 
+class BoxScrollWidgetVisiblePart;
 class ScrollArea;
 
 class BoxScrollWidget : public ScrollWidget

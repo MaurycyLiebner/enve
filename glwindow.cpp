@@ -94,15 +94,17 @@ void GLWindow::renderNow() {
 
     glOrthoAndViewportSet(width(), height());
     mCanvas->clear(SK_ColorWHITE);
+    mCanvas->save();
     render(mCanvas);
+    mCanvas->restore();
     mCanvas->flush();
 
-    if(!m_device) m_device = new QOpenGLPaintDevice;
+//    if(!m_device) m_device = new QOpenGLPaintDevice;
 
-    m_device->setSize(size());
+//    m_device->setSize(size());
 
-    QPainter painter(m_device);
-    qRender(&painter);
+//    QPainter painter(m_device);
+//    qRender(&painter);
 
     m_context->swapBuffers(this);
     //m_context->doneCurrent();

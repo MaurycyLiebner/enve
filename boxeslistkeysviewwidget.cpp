@@ -4,6 +4,14 @@
 #include "boxeslistanimationdockwidget.h"
 #include "BoxesList/boxsinglewidget.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "BoxesList/boxscrollwidget.h"
+#include "keysview.h"
+#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "BoxesList/boxscrollwidgetvisiblepart.h"
+#include "canvaswindow.h"
+#include "animationdockwidget.h"
+#include "global.h"
+#include "canvas.h"
 
 BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                             QWidget *topWidget,

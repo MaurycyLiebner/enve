@@ -2,6 +2,8 @@
 #include "pathpoint.h"
 #include "ctrlpoint.h"
 #include "Boxes/boundingbox.h"
+#include "global.h"
+#include "Animators/singlepathanimator.h"
 
 VectorPathEdge::VectorPathEdge(PathPoint *pt1, PathPoint *pt2) {
     setPoint1(pt1);
@@ -252,6 +254,10 @@ void VectorPathEdge::drawHovered(QPainter *p) {
     p->setPen(pen);
     p->drawPath(mPath);
     p->restore();
+}
+
+void VectorPathEdge::drawHoveredToSkiaCanvas(SkCanvas *canvas) {
+
 }
 
 PathPoint *VectorPathEdge::getPoint1() const {

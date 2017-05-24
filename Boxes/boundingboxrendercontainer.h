@@ -2,7 +2,10 @@
 #define BOUNDINGBOXRENDERCONTAINER_H
 class BoundingBox;
 #include <QImage>
+#include "SkCanvas.h"
+#include "SkImage.h"
 #include "selfref.h"
+#include "skqtconversions.h"
 
 class CacheHandler;
 
@@ -42,6 +45,7 @@ public:
                              const int &startFrame,
                              const int &endFrame);
     virtual void draw(QPainter *p);
+    virtual void drawToSkiaCanvas(SkCanvas *canvas);
 
     void setBlocked(const bool &bT) {
         if(bT == mBlocked) return;
@@ -55,6 +59,7 @@ public:
 
 protected:
     bool mBlocked = false;
+    sk_sp<SkImage> mSkImage;
     QImage mImage;
     CacheHandler *mParentCacheHandler = NULL;
     int mMinRelFrame = 0;
@@ -67,6 +72,7 @@ public:
     virtual ~RenderContainer() {}
 
     void draw(QPainter *p);
+    void drawToSkiaCanvas(SkCanvas *canvas);
 
     void updatePaintTransformGivenNewCombinedTransform(
             const QMatrix &combinedTransform);

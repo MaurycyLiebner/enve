@@ -3,16 +3,19 @@
 
 #include <QWidget>
 #include "glwindow.h"
+#include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 class Canvas;
+enum ColorMode : short;
 enum CanvasMode : short;
 class Color;
 class Gradient;
+class BoundingBox;
 class BoxesGroup;
 class PaintControler;
 class SoundComposition;
+class PaintSetting;
 
-#include "fillstrokesettings.h"
-#include "boxeslistanimationdockwidget.h"
+#include <QSqlQuery>
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow, public SingleWidgetTarget {

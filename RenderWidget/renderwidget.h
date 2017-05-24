@@ -5,9 +5,11 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QProgressBar>
-#include "renderinstancewidget.h"
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include <QLabel>
+#include <QPushButton>
+class ScrollArea;
 class Canvas;
+class RenderInstanceWidget;
 
 class RenderWidget : public QWidget
 {

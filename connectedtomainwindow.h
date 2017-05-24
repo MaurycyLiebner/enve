@@ -19,7 +19,7 @@ class Gradient;
 class ConnectedToMainWindow {
 public:
     ConnectedToMainWindow();
-    ~ConnectedToMainWindow() {}
+    virtual ~ConnectedToMainWindow() {}
 
     void startNewUndoRedoSet();
     void finishUndoRedoSet();

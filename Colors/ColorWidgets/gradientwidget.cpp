@@ -4,6 +4,7 @@
 #include <QAction>
 #include "Colors/helpers.h"
 #include "mainwindow.h"
+#include "Gradients/displayedgradientswidget.h"
 
 GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
     QWidget(parent) {

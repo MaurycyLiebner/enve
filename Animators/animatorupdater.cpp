@@ -2,8 +2,6 @@
 #include <QDebug>
 #include "Boxes/pathbox.h"
 #include "mainwindow.h"
-#include "Boxes/circle.h"
-#include "Boxes/rectangle.h"
 
 TransUpdater::TransUpdater(BoundingBox *boundingBox) :
     AnimatorUpdater() {

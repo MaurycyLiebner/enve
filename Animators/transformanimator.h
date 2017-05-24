@@ -3,6 +3,7 @@
 #include "Animators/complexanimator.h"
 #include "Animators/qpointfanimator.h"
 #include "movablepoint.h"
+class TransformUpdater;
 
 class BasicTransformAnimator : public ComplexAnimator {
     Q_OBJECT
@@ -83,8 +84,7 @@ protected:
     QSharedPointer<QrealAnimator> mRotAnimator =
             (new QrealAnimator)->ref<QrealAnimator>();
 
-    std::shared_ptr<TransformUpdater> mTransformUpdater =
-            (new TransformUpdater(this))->ref<TransformUpdater>();
+    AnimatorUpdaterStdSPtr mTransformUpdater;
 public slots:
     void updateCombinedTransform();
 signals:

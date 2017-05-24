@@ -1,5 +1,7 @@
 #include "Boxes/rectangle.h"
 #include "canvas.h"
+#include "Animators/animatorupdater.h"
+#include "gradientpoints.h"
 
 Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
 {

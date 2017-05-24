@@ -1,31 +1,26 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDockWidget>
 #include <QMainWindow>
 #include <QGraphicsView>
-#include "canvas.h"
+#include <QComboBox>
+#include <QPushButton>
+#include <QSqlQuery>
 #include "undoredo.h"
-#include "Colors/color.h"
-#include <QDockWidget>
-#include "fillstrokesettings.h"
-#include "animationdockwidget.h"
-#include "keysview.h"
-#include "fontswidget.h"
-#include "actionbutton.h"
-#include "global.h"
 
 enum ClipboardContainerType : short;
 
 class ClipboardContainer;
-
+class ActionButton;
 class BoxesList;
-
+class FontsWidget;
 class UpdateScheduler;
-
+class AnimationDockWidget;
 class ColorSettingsWidget;
-
+class FillStrokeSettingsWidget;
 class BoxesListAnimationDockWidget;
-
+class Canvas;
 class CanvasWindow;
 class MemoryHandler;
 

@@ -1,5 +1,6 @@
 #include "canvas.h"
 #include <QMouseEvent>
+#include <QMenu>
 #include "pathpivot.h"
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
@@ -7,6 +8,8 @@
 #include "Boxes/textbox.h"
 #include "edge.h"
 #include "Animators/singlepathanimator.h"
+#include "pathpoint.h"
+#include "Animators/pathanimator.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -23,7 +26,6 @@ void Canvas::handleMovePathMousePressEvent() {
     }
 }
 
-#include <QMenu>
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();

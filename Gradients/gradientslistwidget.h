@@ -2,8 +2,8 @@
 #define GRADIENTSLISTWIDGET_H
 
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
-#include "displayedgradientswidget.h"
 class GradientWidget;
+class DisplayedGradientsWidget;
 
 class GradientsListWidget : public ScrollArea
 {
@@ -12,13 +12,9 @@ public:
     explicit GradientsListWidget(GradientWidget *gradientWidget,
                                  QWidget *parent = 0);
 
-    void setNumberGradients(const int &n) {
-        mDisplayedGradients->setNumberGradients(n);
-    }
+    void setNumberGradients(const int &n);
 
-    DisplayedGradientsWidget *getDisplayedGradientsWidget() {
-        return mDisplayedGradients;
-    }
+    DisplayedGradientsWidget *getDisplayedGradientsWidget();
 
 protected:
     void scrollContentsBy(int dx, int dy);

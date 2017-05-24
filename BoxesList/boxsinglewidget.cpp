@@ -6,6 +6,9 @@
 
 #include "Boxes/boxesgroup.h"
 #include "qrealanimatorvalueslider.h"
+#include "boxscrollwidgetvisiblepart.h"
+#include "keysview.h"
+#include "pointhelpers.h"
 
 QPixmap *BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap *BoxSingleWidget::INVISIBLE_PIXMAP;
@@ -25,6 +28,8 @@ bool BoxSingleWidget::mStaticPixmapsLoaded = false;
 #include <QMenu>
 #include "clipboardcontainer.h"
 #include "durationrectangle.h"
+#include "boxtargetwidget.h"
+#include "boxeslistactionbutton.h"
 
 BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     SingleWidget(parent) {

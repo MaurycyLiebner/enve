@@ -1,10 +1,14 @@
 #include "Animators/transformanimator.h"
 #include "undoredo.h"
 #include <QDebug>
+#include <QSqlRecord>
 #include "boxpathpoint.h"
+#include "animatorupdater.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     ComplexAnimator() {
+    mTransformUpdater = (new TransformUpdater(this))->ref<TransformUpdater>();
+
     prp_setName("transformation");
     mScaleAnimator->prp_setName("scale");
     mScaleAnimator->setCurrentPointValue(QPointF(1., 1.));

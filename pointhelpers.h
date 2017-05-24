@@ -2,8 +2,10 @@
 #define POINTHELPERS_H
 #include <QPointF>
 #include <QString>
+#include <QRectF>
+#include <QPainter>
 
-enum CtrlsMode {
+enum CtrlsMode : short {
     CTRLS_SMOOTH,
     CTRLS_SYMMETRIC,
     CTRLS_CORNER
@@ -68,7 +70,7 @@ extern qreal qMin4(qreal v1, qreal v2,
                    qreal v3, qreal v4);
 extern qreal qMax4(qreal v1, qreal v2,
                    qreal v3, qreal v4);
-#include <QRectF>
+
 extern QRectF qRectF4Points(QPointF p1, QPointF c1,
                             QPointF c2, QPointF p2);
 
@@ -79,7 +81,6 @@ extern qreal degreesBetweenVectors(const QPointF &pt1,
 
 extern qreal radiansBetweenVectors(const QPointF &pt1,
                                    const QPointF &pt2);
-#include <QPainter>
 extern void drawCosmeticEllipse(QPainter *p,
                                 const QPointF &absPos,
                                 qreal rX, qreal rY);

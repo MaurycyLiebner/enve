@@ -3,6 +3,8 @@
 #include "mainwindow.h"
 #include "key.h"
 #include "BoxesList/boxsinglewidget.h"
+#include "global.h"
+#include "Animators/animatorupdater.h"
 
 Animator::Animator() :
     Property() {

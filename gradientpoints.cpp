@@ -1,4 +1,5 @@
 #include "gradientpoints.h"
+#include "gradientpoint.h"
 
 GradientPoints::GradientPoints() : ComplexAnimator()
 {

@@ -5,17 +5,10 @@
 #include <QPainterPath>
 #include <QPainter>
 #include <QMouseEvent>
-#include "qrealkey.h"
-#include "connectedtomainwindow.h"
-#include "Animators/animatorupdater.h"
 #include "float.h"
 #include "animator.h"
-
-class DurationRectangleMovable;
-
-const int KEY_RECT_SIZE = 12;
-
-class ComplexAnimator;
+class QrealKey;
+class QrealPoint;
 class QrealAnimatorValueSlider;
 
 #define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = (QrealKey*)keyK;

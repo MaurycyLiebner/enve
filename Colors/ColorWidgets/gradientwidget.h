@@ -1,6 +1,5 @@
 #ifndef GRADIENTWIDGET_H
 #define GRADIENTWIDGET_H
-#include "glwidget.h"
 #include "fillstrokesettings.h"
 #include <QComboBox>
 #include <QScrollArea>

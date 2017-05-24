@@ -1,5 +1,6 @@
 #include "canvas.h"
 #include "Animators/singlepathanimator.h"
+#include "pathpoint.h"
 
 void Canvas::connectPoints() {
     QList<PathPoint*> selectedPathPoints;

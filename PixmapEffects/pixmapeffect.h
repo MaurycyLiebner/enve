@@ -1,11 +1,14 @@
 #ifndef PIXMAPEFFECT_H
 #define PIXMAPEFFECT_H
-#include "fmt_filters.h"
 #include "Animators/coloranimator.h"
 #include "Animators/qpointfanimator.h"
 #include "Properties/boxtargetproperty.h"
 #include "Properties/boolproperty.h"
 #include <QObject>
+
+namespace fmt_filters {
+    struct image;
+}
 
 class PixmapEffect;
 

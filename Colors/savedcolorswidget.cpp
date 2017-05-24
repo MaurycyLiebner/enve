@@ -2,6 +2,7 @@
 #include "savedcolorbutton.h"
 #include <QAction>
 #include <QMenu>
+#include "color.h"
 
 SavedColorsWidget::SavedColorsWidget(QWidget *parent)
     : QWidget(parent)
@@ -44,6 +45,6 @@ void SavedColorsWidget::mousePressEvent(QMouseEvent *e)
     }
 }
 
-void SavedColorsWidget::setColorFromButton(Color color_t) {
+void SavedColorsWidget::setColorFromButton(const Color &color_t) {
 
 }

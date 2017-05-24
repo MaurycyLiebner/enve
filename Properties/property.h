@@ -9,9 +9,9 @@
 
 class ComplexAnimator;
 class Key;
-class QrealAnimator;
 class QPainter;
 class AnimatorUpdater;
+typedef std::shared_ptr<AnimatorUpdater> AnimatorUpdaterStdSPtr;
 
 class Property :
     public QObject,
@@ -147,7 +147,7 @@ signals:
     void prp_addingKey(Key *);
 protected:
     int prp_mParentFrameShift = 0;
-    AnimatorUpdater *prp_mUpdater = NULL;
+    AnimatorUpdaterStdSPtr prp_mUpdater;
     bool prp_mUpdaterBlocked = false;
 
     QString prp_mName = "";

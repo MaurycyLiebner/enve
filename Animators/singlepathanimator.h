@@ -6,13 +6,14 @@
 
 enum CanvasMode : short;
 
+class SkCanvas;
 class PathAnimator;
 class VectorPathEdge;
 class MovablePoint;
+class SkMatrix;
 
 class PathPoint;
-
-struct PathPointAnimators;
+typedef float SkScalar;
 
 class SinglePathAnimator : public ComplexAnimator
 {
@@ -66,9 +67,15 @@ public:
     PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
     PathPoint *addPointAbsPos(const QPointF &absPtPos, PathPoint *toPoint);
     void deletePointAndApproximate(PathPoint *pointToRemove);
+
     void drawSelected(QPainter *p,
                       const CanvasMode &currentCanvasMode,
                       const QMatrix &combinedTransform);
+    void drawSelected(SkCanvas *canvas,
+                      const CanvasMode &currentCanvasMode,
+                      const SkScalar &invScale,
+                      const SkMatrix &combinedTransform);
+
     void selectAndAddContainedPointsToList(
             const QRectF &absRect, QList<MovablePoint *> *list);
 

@@ -1,8 +1,9 @@
 #ifndef ANIMATIONBOX_H
 #define ANIMATIONBOX_H
-#include "imagebox.h"
 #include "Animators/intanimator.h"
 #include "durationrectangle.h"
+#include "boundingbox.h"
+#include "rendercachehandler.h"
 
 class AnimationBox : public BoundingBox
 {

@@ -2,7 +2,6 @@
 #define KEYSVIEW_H
 
 #include <QWidget>
-#include "pointhelpers.h"
 #include <QPointer>
 
 const QList<QColor> ANIMATORCOLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
@@ -11,20 +10,14 @@ const QList<QColor> ANIMATORCOLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
 
 class Key;
 class QrealKey;
-
 class QrealAnimator;
-
 class QrealPoint;
-
 class Canvas;
-
 class MainWindow;
-
 class BoxScrollWidgetVisiblePart;
-
 class AnimationDockWidget;
-
 class DurationRectangleMovable;
+enum CtrlsMode : short;
 
 class KeysView : public QWidget
 {

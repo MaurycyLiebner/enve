@@ -6,8 +6,6 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QLabel>
-#include "animationwidgetscrollbar.h"
-#include "keysview.h"
 #include <qscrollarea.h>
 #include <QScrollArea>
 #include <QApplication>
@@ -17,10 +15,15 @@
 #include <QLineEdit>
 #include <QWidgetAction>
 #include <QToolBar>
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
-#include "boxeslistkeysviewwidget.h"
-#include "RenderWidget/renderwidget.h"
+class AnimationWidgetScrollBar;
+class BoxesListKeysViewWidget;
 class VerticalWidgetsStack;
+class RenderWidget;
+class MainWindow;
+class AnimationDockWidget;
+class RenderWidget;
+class ActionButton;
+class Canvas;
 
 class ChangeWidthWidget : public QWidget
 {
@@ -51,11 +54,6 @@ private:
     bool mPressed = false;
     int mPressX;
 };
-
-class AnimationDockWidget;
-class BoxScrollWidget;
-class RenderWidget;
-#include "actionbutton.h"
 
 class BoxesListAnimationDockWidget : public QWidget
 {

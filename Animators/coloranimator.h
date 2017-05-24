@@ -1,9 +1,11 @@
 #ifndef COLORANIMATOR_H
 #define COLORANIMATOR_H
+
 #include "Animators/complexanimator.h"
 #include "Colors/color.h"
+#include "qrealanimator.h"
 
-enum ColorMode {
+enum ColorMode : short {
     RGBMODE,
     HSVMODE,
     HSLMODE

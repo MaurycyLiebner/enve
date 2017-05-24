@@ -2,10 +2,10 @@
 #define EDGE_H
 #include <QPainter>
 #include "selfref.h"
-#include "pointhelpers.h"
 class BonePoint;
 class PathPoint;
 class CtrlPoint;
+class SkCanvas;
 
 class VectorPathEdge : public StdSelfRef {
 public:
@@ -58,6 +58,7 @@ public:
     void generatePainterPath();
 
     void drawHovered(QPainter *p);
+    void drawHoveredToSkiaCanvas(SkCanvas *canvas);
 
     PathPoint *getPoint1() const;
 

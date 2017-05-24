@@ -4,6 +4,12 @@
 #include "Colors/helpers.h"
 #include "Colors/ColorWidgets/gradientwidget.h"
 #include "mainwindow.h"
+#include "Colors/ColorWidgets/colorvaluerect.h"
+#include "Animators/animatorupdater.h"
+
+ColorSetting::ColorSetting() {
+    mChangedValue = CVR_ALL;
+}
 
 ColorSetting::ColorSetting(const ColorMode &settingModeT,
                            const CVR_TYPE &changedValueT,
@@ -313,15 +319,6 @@ void Gradient::addColor(const Color &color) {
 void Gradient::replaceColor(const int &id, const Color &color) {
     mColors.at(id)->qra_setCurrentValue(color);
     updateQGradientStops();
-}
-
-void Gradient::setColors(QList<Color> newColors)
-{
-//    colors = newColors;
-//    updateQGradientStops();
-//    mGradientWidget->repaint();
-//    mMainWindow->getFillStrokeSettings()->
-//            setCurrentColor(mGradientWidget->getCurrentColor());
 }
 
 bool Gradient::isInPaths(PathBox *path) {

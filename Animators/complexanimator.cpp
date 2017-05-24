@@ -1,6 +1,7 @@
 #include "Animators/complexanimator.h"
 #include "mainwindow.h"
 #include "BoxesList/boxsinglewidget.h"
+#include "global.h"
 
 ComplexAnimator::ComplexAnimator() :
     Animator() {
@@ -30,6 +31,19 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
+bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules, const bool &parentSatisfies, const bool &parentMainTarget) {
+    if(hasChildAnimators()) {
+        return Animator::SWT_shouldBeVisible(
+                    rules,
+                    parentSatisfies,
+                    parentMainTarget);
+    } else {
+        return false;
+    }
+}
+
+bool ComplexAnimator::SWT_isComplexAnimator() { return true; }
+
 ComplexKey *ComplexAnimator::ca_getKeyCollectionAtAbsFrame(const int &frame) {
     return (ComplexKey *) anim_getKeyAtAbsFrame(frame);
 }
@@ -40,7 +54,7 @@ ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
 
 void ComplexAnimator::ca_addChildAnimator(Property *childAnimator) {
     ca_mChildAnimators << childAnimator->ref<Property>();
-    childAnimator->prp_setUpdater(prp_mUpdater);
+    childAnimator->prp_setUpdater(prp_mUpdater.get());
     childAnimator->prp_setParentFrameShift(prp_getFrameShift());
     connect(childAnimator, SIGNAL(prp_updateWholeInfluenceRange()),
             this, SLOT(prp_updateInfluenceRangeAfterChanged()));
@@ -202,6 +216,10 @@ void ComplexAnimator::anim_drawKey(
                                   KEY_RECT_SIZE*0.7)*0.5 ),
                 QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
     }
+}
+
+void ComplexAnimator::anim_loadKeysFromSql(const int &qrealAnimatorId) {
+    Q_UNUSED(qrealAnimatorId);
 }
 
 void ComplexAnimator::prp_setParentFrameShift(const int &shift,
@@ -425,10 +443,55 @@ void ComplexKey::cancelFrameTransform() {
 //    }
 }
 
+bool ComplexKey::areAllChildrenSelected() {
+    Q_FOREACH(Key *key, mKeys) {
+        if(key->isSelected() ||
+                key->areAllChildrenSelected()) continue;
+        return false;
+    }
+
+    return true;
+}
+
 void ComplexKey::addToSelection(QList<Key *> *selectedKeys) {
     Q_FOREACH(Key *key, mKeys) {
         key->addToSelection(selectedKeys);
     }
+}
+
+bool ComplexKey::hasKey(Key *key) {
+    Q_FOREACH(Key *keyT, mKeys) {
+        if(key == keyT) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ComplexKey::differsFromKey(Key *key) {
+    ComplexKey *otherKey = (ComplexKey*)key;
+    if(getChildKeysCount() == otherKey->getChildKeysCount()) {
+        Q_FOREACH(Key *key, mKeys) {
+            if(otherKey->hasSameKey(key)) continue;
+            return true;
+        }
+        return false;
+    }
+    return true;
+}
+
+int ComplexKey::getChildKeysCount() {
+    return mKeys.count();
+}
+
+bool ComplexKey::hasSameKey(Key *otherKey) {
+    Q_FOREACH(Key *key, mKeys) {
+        if(key->getParentAnimator() == otherKey->getParentAnimator()) {
+            if(key->differsFromKey(otherKey)) return false;
+            return true;
+        }
+    }
+    return false;
 }
 
 void ComplexKey::removeFromSelection(QList<Key *> *selectedKeys) {

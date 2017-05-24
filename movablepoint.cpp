@@ -2,6 +2,9 @@
 #include "Boxes/vectorpath.h"
 #include "global.h"
 #include "undoredo.h"
+#include "Boxes/boxesgroup.h"
+#include "skqtconversions.h"
+#include "pointhelpers.h"
 
 MovablePoint::MovablePoint(BoundingBox *parent,
                            const MovablePointType &type,
@@ -36,6 +39,30 @@ void MovablePoint::makeDuplicate(MovablePoint *targetPoint) {
 
 void MovablePoint::duplicatePosAnimatorFrom(QPointFAnimator *source) {
     source->makeDuplicate(this);
+}
+
+void MovablePoint::drawHovered(QPainter *p) {
+    p->setBrush(Qt::NoBrush);
+    QPen pen = QPen(Qt::red, 2.);
+    pen.setCosmetic(true);
+    p->setPen(pen);
+    drawCosmeticEllipse(p, getAbsolutePos(),
+                        mRadius, mRadius);
+}
+
+void MovablePoint::drawHovered(SkCanvas *canvas,
+                               const SkScalar &invScale) {
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setStrokeWidth(2.*invScale);
+    paint.setColor(SK_ColorRED);
+    canvas->drawCircle(QPointFToSkPoint(getAbsolutePos()),
+                       mRadius*invScale, paint);
+    //pen.setCosmetic(true);
+    //p->setPen(pen);
+//    drawCosmeticEllipse(p, getAbsolutePos(),
+//                        mRadius, mRadius);
 }
 
 void MovablePoint::finishTransform()
@@ -98,12 +125,67 @@ void MovablePoint::drawOnAbsPos(QPainter *p,
     }
 }
 
+void MovablePoint::drawOnAbsPos(SkCanvas *canvas,
+                                const SkPoint &absPos,
+                                const SkScalar &invScale,
+                                const unsigned char r,
+                                const unsigned char g,
+                                const unsigned char b) {
+    canvas->save();
+
+    SkScalar scaledRadius = mRadius*invScale;
+
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    paint.setColor(SkColorSetARGBInline(255, r, g, b));
+
+    paint.setStyle(SkPaint::kFill_Style);
+    canvas->drawCircle(absPos,
+                       scaledRadius, paint);
+
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setColor(SK_ColorBLACK);
+    paint.setStrokeWidth(invScale);
+    canvas->drawCircle(absPos,
+                       scaledRadius, paint);
+
+    if(prp_isKeyOnCurrentFrame()) {
+        paint.setColor(SK_ColorRED);
+        paint.setStyle(SkPaint::kFill_Style);
+        canvas->drawCircle(absPos,
+                           scaledRadius*0.5, paint);
+
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setColor(SK_ColorBLACK);
+        canvas->drawCircle(absPos,
+                           scaledRadius*0.5, paint);
+    }
+    canvas->restore();
+}
+
 void MovablePoint::draw(QPainter *p) {
     if(isHidden()) {
         return;
     }
-    QPointF absPos = getAbsolutePos();
-    drawOnAbsPos(p, absPos);
+    drawOnAbsPos(p, getAbsolutePos());
+}
+
+void MovablePoint::draw(SkCanvas *canvas,
+                        const SkScalar &invScale) {
+    if(isHidden()) {
+        return;
+    }
+    if(mSelected) {
+        drawOnAbsPos(canvas,
+                     QPointFToSkPoint(getAbsolutePos()),
+                     invScale,
+                     255, 0, 0);
+    } else {
+        drawOnAbsPos(canvas,
+                     QPointFToSkPoint(getAbsolutePos()),
+                     invScale,
+                     255, 175, 175);
+    }
 }
 
 BoundingBox *MovablePoint::getParent() {

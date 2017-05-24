@@ -1,6 +1,9 @@
 #include "particlebox.h"
 #include "mainwindow.h"
 #include "durationrectangle.h"
+#include "Animators/animatorupdater.h"
+#include "canvas.h"
+#include "pointhelpers.h"
 
 double fRand(double fMin, double fMax) {
     double f = (double)rand() / RAND_MAX;
@@ -83,11 +86,41 @@ void ParticleBox::addEmitter(ParticleEmitter *emitter) {
     ca_addChildAnimator(emitter);
 }
 
+BoundingBox *ParticleBox::createNewDuplicate(BoxesGroup *parent) {
+    return new ParticleBox(parent);
+}
+
+void ParticleBox::makeDuplicate(Property *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
+    ParticleBox *pbTarget = (ParticleBox*)targetBox;
+    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+        pbTarget->addEmitter((ParticleEmitter*)
+                             emitter->makeDuplicate());
+    }
+}
+
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     ParticleEmitter *emitter = new ParticleEmitter(this);
     emitter->getPosPoint()->setAbsolutePos(absPos, false);
     addEmitter(emitter);
 }
+
+void ParticleBox::prp_setAbsFrame(const int &frame) {
+    BoundingBox::prp_setAbsFrame(frame);
+    mFrameChangedUpdateScheduled = true;
+}
+
+void ParticleBox::setUpdateVars() {
+    BoundingBox::setUpdateVars();
+    if(mFrameChangedUpdateScheduled) {
+        mFrameChangedUpdateScheduled = false;
+        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+            emitter->scheduleUpdateParticlesForFrame();
+        }
+    }
+}
+
+bool ParticleBox::SWT_isParticleBox() { return true; }
 
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
@@ -454,6 +487,22 @@ void ParticleEmitter::updateParticlesForFrameIfNeeded(const int &frame) {
     }
 }
 
+bool ParticleEmitter::relPointInsidePath(const QPointF &relPos) {
+    Q_FOREACH(const ParticleState &state, mParticleStates) {
+        if(pointToLen(state.pos - relPos) < 5.) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+Property *ParticleEmitter::makeDuplicate() {
+    ParticleEmitter *emitterDupli = new ParticleEmitter(mParentBox);
+    makeDuplicate(emitterDupli);
+    return emitterDupli;
+}
+
 void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *width,
                                              QrealAnimator *srcVelInfl,
@@ -523,6 +572,16 @@ void ParticleEmitter::makeDuplicate(Property *target) {
     peTarget->setFrameRange(mMinFrame, mMaxFrame);
 }
 
+void ParticleEmitter::setMinFrame(const int &minFrame) {
+    mMinFrame = minFrame;
+    scheduleGenerateParticles();
+}
+
+void ParticleEmitter::setMaxFrame(const int &maxFrame) {
+    mMaxFrame = maxFrame;
+    scheduleGenerateParticles();
+}
+
 void ParticleEmitter::setFrameRange(const int &minFrame, const int &maxFrame) {
     if(minFrame == mMinFrame && mMaxFrame == maxFrame) return;
     if(mMaxFrame > maxFrame) {
@@ -544,6 +603,10 @@ void ParticleEmitter::setFrameRange(const int &minFrame, const int &maxFrame) {
 
 ColorAnimator *ParticleEmitter::getColorAnimator() {
     return mColorAnimator.data();
+}
+
+MovablePoint *ParticleEmitter::getPosPoint() {
+    return mPos.data();
 }
 
 void ParticleEmitter::generateParticlesIfNeeded() {

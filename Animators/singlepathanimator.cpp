@@ -3,6 +3,9 @@
 #include "pathpoint.h"
 #include "undoredo.h"
 #include "edge.h"
+#include "Boxes/boundingbox.h"
+#include "canvas.h"
+#include "SkCanvas.h"
 
 SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
     ComplexAnimator() {
@@ -605,6 +608,37 @@ void SinglePathAnimator::drawSelected(QPainter *p,
         }
     }
     p->restore();
+}
+
+void SinglePathAnimator::drawSelected(SkCanvas *canvas,
+                                      const CanvasMode &currentCanvasMode,
+                                      const SkScalar &invScale,
+                                      const SkMatrix &combinedTransform) {
+    canvas->save();
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+        canvas->save();
+//        p->setBrush(Qt::NoBrush);
+//        QPen editPen = QPen(Qt::white, 1., Qt::DashLine);
+//        editPen.setCosmetic(true);
+//        p->setPen(editPen);
+//        p->setTransform(QTransform(combinedTransform), true);
+//        p->setCompositionMode(QPainter::CompositionMode_Difference);
+//        p->drawPath(mPath);
+        canvas->restore();
+
+        for(int i = mPoints.count() - 1; i >= 0; i--) {
+            const QSharedPointer<PathPoint> &point = mPoints.at(i);
+            point->draw(canvas, currentCanvasMode, invScale);
+        }
+    } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
+        for(int i = mPoints.count() - 1; i >= 0; i--) {
+            const QSharedPointer<PathPoint> &point = mPoints.at(i);
+            if(point->isEndPoint() || point->isSelected()) {
+                point->draw(canvas, currentCanvasMode, invScale);
+            }
+        }
+    }
+    canvas->restore();
 }
 
 void SinglePathAnimator::selectAndAddContainedPointsToList(

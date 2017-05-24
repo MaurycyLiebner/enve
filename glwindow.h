@@ -18,7 +18,6 @@
 #include "SkGradientShader.h"
 #include "SkPixelRef.h"
 #include "SkDashPathEffect.h"
-#include "skqtconversions.h"
 
 #include "gl/GrGLUtil.h"
 
@@ -59,7 +58,7 @@ protected:
 
     GrGLFramebufferInfo m_fbInfo;
     QOpenGLContext *m_context = nullptr;
-    QOpenGLPaintDevice *m_device = nullptr;
+    //QOpenGLPaintDevice *m_device = nullptr;
 
     bool event(QEvent *event);
     //void exposeEvent(QExposeEvent *event);

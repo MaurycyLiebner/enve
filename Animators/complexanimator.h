@@ -1,9 +1,10 @@
 #ifndef COMPLEXANIMATOR_H
 #define COMPLEXANIMATOR_H
-#include "Animators/qrealanimator.h"
+#include "Animators/animator.h"
+#include "key.h"
 
 class ComplexKey;
-class ComplexAnimatorItemWidgetContainer;
+class KeysClipboardContainer;
 
 class ComplexAnimator : public Animator
 {
@@ -49,18 +50,9 @@ public:
 
     bool SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                              const bool &parentSatisfies,
-                             const bool &parentMainTarget) {
-        if(hasChildAnimators()) {
-            return Animator::SWT_shouldBeVisible(
-                                        rules,
-                                        parentSatisfies,
-                                        parentMainTarget);
-        } else {
-            return false;
-        }
-    }
+                             const bool &parentMainTarget);
 
-    bool SWT_isComplexAnimator() { return true; }
+    bool SWT_isComplexAnimator();
 
     void anim_drawKey(QPainter *p,
                       Key *key,
@@ -68,9 +60,7 @@ public:
                       const qreal &drawY,
                       const int &startFrame);
 
-    void anim_loadKeysFromSql(const int &qrealAnimatorId) {
-        Q_UNUSED(qrealAnimatorId);
-    }
+    void anim_loadKeysFromSql(const int &qrealAnimatorId);
 
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator *parentAnimator = NULL);
@@ -121,52 +111,17 @@ public:
     //void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame, const qreal &scaleFactor);
     //QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);
 
-    bool areAllChildrenSelected() {
-        Q_FOREACH(Key *key, mKeys) {
-            if(key->isSelected() ||
-               key->areAllChildrenSelected()) continue;
-            return false;
-        }
-
-        return true;
-    }
+    bool areAllChildrenSelected();
     void removeFromSelection(QList<Key *> *selectedKeys);
     void addToSelection(QList<Key *> *selectedKeys);
 
-    bool hasKey(Key *key) {
-        Q_FOREACH(Key *keyT, mKeys) {
-            if(key == keyT) {
-                return true;
-            }
-        }
-        return false;
-    }
+    bool hasKey(Key *key);
 
-    bool differsFromKey(Key *key) {
-        ComplexKey *otherKey = (ComplexKey*)key;
-        if(getChildKeysCount() == otherKey->getChildKeysCount()) {
-            Q_FOREACH(Key *key, mKeys) {
-                if(otherKey->hasSameKey(key)) continue;
-                return true;
-            }
-            return false;
-        }
-        return true;
-    }
+    bool differsFromKey(Key *key);
 
-    int getChildKeysCount() {
-        return mKeys.count();
-    }
+    int getChildKeysCount();
 
-    bool hasSameKey(Key *otherKey) {
-        Q_FOREACH(Key *key, mKeys) {
-            if(key->getParentAnimator() == otherKey->getParentAnimator()) {
-                if(key->differsFromKey(otherKey)) return false;
-                return true;
-            }
-        }
-        return false;
-    }
+    bool hasSameKey(Key *otherKey);
 private:
     QList<Key*> mKeys;
 };

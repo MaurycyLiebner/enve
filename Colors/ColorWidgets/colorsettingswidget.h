@@ -3,17 +3,17 @@
 
 #include <QWidget>
 #include <QHBoxLayout>
-#include "h_wheel_sv_triangle.h"
+//#include "h_wheel_sv_triangle.h"
 #include "colorvaluerect.h"
-#include "colorlabel.h"
 #include <QTabWidget>
 #include <QLabel>
-#include "colorvaluespin.h"
 #include <QPushButton>
 #include <QComboBox>
 #include "qrealanimatorvalueslider.h"
 #include "Animators/coloranimator.h"
 #include "Animators/paintsettings.h"
+
+class ColorLabel;
 
 class ColorSettingsWidget : public QWidget
 {
@@ -27,7 +27,10 @@ signals:
     void colorSettingSignal(const ColorSetting&);
     void colorModeChanged(const ColorMode&);
 public slots:
-    void setCurrentColor(GLfloat h_t, GLfloat s_t, GLfloat v_t, GLfloat a_t = 1.f);
+    void setCurrentColor(GLfloat h_t,
+                         GLfloat s_t,
+                         GLfloat v_t,
+                         GLfloat a_t = 1.f);
     void setColorAnimatorTarget(ColorAnimator *target);
     void emitColorChangedSignal();
     void emitEditingFinishedSignal();

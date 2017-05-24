@@ -7,7 +7,7 @@
 class UndoRedoStack;
 
 class VectorPath;
-
+class SkCanvas;
 class CtrlPoint;
 
 enum CanvasMode : short;
@@ -108,7 +108,11 @@ public:
     QPointF getEndCtrlPtValue() const;
     CtrlPoint *getEndCtrlPt();
 
-    void draw(QPainter *p, const CanvasMode &mode);
+    void draw(QPainter *p,
+              const CanvasMode &mode);
+    void draw(SkCanvas *canvas,
+              const CanvasMode &mode,
+              const SkScalar &invScale);
 
     PathPoint *getNextPoint();
     PathPoint *getPreviousPoint();

@@ -4,14 +4,8 @@
 
 class BoundingBox;
 
-class PathBox;
-
 class Gradient;
-
-class Circle;
-
-class Rectangle;
-
+class PathBox;
 class BasicTransformAnimator;
 
 class AnimatorUpdater : public StdSelfRef

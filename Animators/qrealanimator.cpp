@@ -5,10 +5,12 @@
 #include "mainwindow.h"
 #include "animationdockwidget.h"
 #include <QMenu>
+#include <QSqlRecord>
 #include "qrealanimatorvalueslider.h"
 #include <QWidgetAction>
 #include "BoxesList/boxsinglewidget.h"
 #include "qrealpoint.h"
+#include "qrealkey.h"
 
 QrealAnimator::QrealAnimator() : Animator() {
 

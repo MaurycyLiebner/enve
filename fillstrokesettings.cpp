@@ -5,6 +5,7 @@
 #include "canvas.h"
 #include "updatescheduler.h"
 #include "qrealanimatorvalueslider.h"
+#include "Colors/ColorWidgets/colorsettingswidget.h"
 
 #include "qdoubleslider.h"
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
@@ -431,6 +432,54 @@ void FillStrokeSettingsWidget::setCapStyle(Qt::PenCapStyle capStyle)
     mFlatCapStyleButton->setChecked(capStyle == Qt::FlatCap);
     mSquareCapStyleButton->setChecked(capStyle == Qt::SquareCap);
     mRoundCapStyleButton->setChecked(capStyle == Qt::RoundCap);
+}
+
+PaintType FillStrokeSettingsWidget::getCurrentPaintTypeVal() {
+    if(mTargetId == 0) {
+        return mCurrentFillPaintType;
+    } else {
+        return mCurrentStrokePaintType;
+    }
+}
+
+void FillStrokeSettingsWidget::setCurrentPaintTypeVal(PaintType paintType) {
+    if(mTargetId == 0) {
+        mCurrentFillPaintType = paintType;
+    } else {
+        mCurrentStrokePaintType = paintType;
+    }
+}
+
+Color FillStrokeSettingsWidget::getCurrentColorVal() {
+    if(mTargetId == 0) {
+        return mCurrentFillColor;
+    } else {
+        return mCurrentStrokeColor;
+    }
+}
+
+void FillStrokeSettingsWidget::setCurrentColorVal(Color color) {
+    if(mTargetId == 0) {
+        mCurrentFillColor = color;
+    } else {
+        mCurrentStrokeColor = color;
+    }
+}
+
+Gradient *FillStrokeSettingsWidget::getCurrentGradientVal() {
+    if(mTargetId == 0) {
+        return mCurrentFillGradient;
+    } else {
+        return mCurrentStrokeGradient;
+    }
+}
+
+void FillStrokeSettingsWidget::setCurrentGradientVal(Gradient *gradient) {
+    if(mTargetId == 0) {
+        mCurrentFillGradient = gradient;
+    } else {
+        mCurrentStrokeGradient = gradient;
+    }
 }
 
 void FillStrokeSettingsWidget::setFillValuesFromFillSettings(

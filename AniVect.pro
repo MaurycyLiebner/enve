@@ -154,7 +154,8 @@ SOURCES += main.cpp\
     filesourcescache.cpp \
     Boxes/draftcanvas.cpp \
     glwindow.cpp \
-    canvaswindow.cpp
+    canvaswindow.cpp \
+    skqtconversions.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \

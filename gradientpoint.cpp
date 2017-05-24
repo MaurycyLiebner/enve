@@ -1,5 +1,7 @@
 #include "gradientpoint.h"
 #include "Boxes/vectorpath.h"
+#include "Animators/animatorupdater.h"
+#include "pointhelpers.h"
 
 GradientPoint::GradientPoint(PathBox *parent) :
     MovablePoint(parent, TYPE_GRADIENT_POINT) {

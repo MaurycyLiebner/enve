@@ -5,9 +5,7 @@
 
 class ComplexAnimator;
 class Key;
-class QrealAnimator;
 class QPainter;
-class AnimatorUpdater;
 class DurationRectangleMovable;
 
 class Animator :

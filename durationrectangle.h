@@ -3,7 +3,6 @@
 #include <QtCore>
 #include <QPainter>
 #include <QObject>
-#include "BoxesList/boxsinglewidget.h"
 
 class DurationRectangleMovable : public QObject {
     Q_OBJECT
@@ -47,7 +46,6 @@ protected:
 };
 
 class Property;
-class RenderCacheHandler;
 
 class DurationRectangle : public DurationRectangleMovable {
     Q_OBJECT

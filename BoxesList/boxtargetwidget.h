@@ -2,7 +2,6 @@
 #define BOXTARGETWIDGET_H
 
 #include <QWidget>
-class BoundingBox;
 class BoxTargetProperty;
 
 class BoxTargetWidget : public QWidget

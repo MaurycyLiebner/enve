@@ -1,7 +1,6 @@
 #ifndef VIDEOBOX_H
 #define VIDEOBOX_H
 #include <QString>
-#include "imagebox.h"
 #include <unordered_map>
 #include "Boxes/animationbox.h"
 

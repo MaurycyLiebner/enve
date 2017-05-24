@@ -1,4 +1,4 @@
-#include "Boxes/vectorpath.h"
+#include "vectorpath.h"
 #include <QPainter>
 #include "canvas.h"
 #include <QDebug>
@@ -7,9 +7,15 @@
 #include "updatescheduler.h"
 #include "pathpivot.h"
 #include "pointhelpers.h"
+#include "Animators/animatorupdater.h"
+#include "pathpoint.h"
+#include "Animators/pathanimator.h"
+#include "gradientpoints.h"
 
 VectorPath::VectorPath(BoxesGroup *group) :
     PathBox(group, BoundingBoxType::TYPE_VECTOR_PATH) {
+    mPathAnimator =
+            (new PathAnimator(this))->ref<PathAnimator>();
     setName("Path");
     mPathAnimator->prp_setUpdater(new PathPointUpdater(this));
     mPathAnimator->prp_blockUpdater();
@@ -137,6 +143,27 @@ void VectorPath::drawSelected(QPainter *p,
             mTransformAnimator->getPivotMovablePoint()->draw(p);
         }
         p->restore();
+    }
+}
+
+void VectorPath::drawSelected(SkCanvas *canvas,
+                              const CanvasMode &currentCanvasMode,
+                              const SkScalar &invScale) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        canvas->save();
+        drawBoundingRect(canvas, invScale);
+        mPathAnimator->drawSelected(canvas,
+                                    currentCanvasMode,
+                                    invScale,
+                                    QMatrixToSkMatrix(getCombinedTransform()));
+        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+            //mFillGradientPoints->drawGradientPoints(p);
+            //mStrokeGradientPoints->drawGradientPoints(p);
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->
+                    draw(canvas, invScale);
+        }
+        canvas->restore();
     }
 }
 

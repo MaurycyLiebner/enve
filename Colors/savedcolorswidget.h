@@ -5,8 +5,6 @@
 #include <QVBoxLayout>
 #include "color.h"
 
-class WindowVariables;
-
 class SavedColorsWidget : public QWidget
 {
     Q_OBJECT
@@ -20,7 +18,7 @@ private:
 signals:
 
 public slots:
-    void setColorFromButton(Color color_t);
+    void setColorFromButton(const Color &color_t);
 };
 
 #endif // SAVEDCOLORSWIDGET_H

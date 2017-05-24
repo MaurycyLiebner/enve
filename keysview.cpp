@@ -4,6 +4,9 @@
 #include "mainwindow.h"
 #include "BoxesList/boxscrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
+#include "global.h"
+#include "pointhelpers.h"
+#include "Animators/qrealanimator.h"
 
 KeysView::KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
                    QWidget *parent) :

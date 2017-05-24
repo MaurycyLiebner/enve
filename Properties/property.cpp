@@ -1,5 +1,6 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
+#include "Animators/animatorupdater.h"
 
 Property::Property() {
 
@@ -65,7 +66,11 @@ void Property::prp_setName(const QString &newName) {
 
 void Property::prp_setUpdater(AnimatorUpdater *updater) {
     if(prp_mUpdaterBlocked) return;
-    prp_mUpdater = updater;
+    if(updater == NULL) {
+        prp_mUpdater.reset();
+    } else {
+        prp_mUpdater = updater->ref<AnimatorUpdater>();
+    }
 }
 
 void Property::prp_setBlockedUpdater(AnimatorUpdater *updater) {
@@ -83,7 +88,7 @@ void Property::prp_blockUpdater() {
 }
 
 void Property::prp_callUpdater() {
-    if(prp_mUpdater == NULL) {
+    if(prp_mUpdater.get() == NULL) {
         return;
     } else {
         prp_mUpdater->update();
@@ -91,6 +96,6 @@ void Property::prp_callUpdater() {
 }
 
 void Property::prp_callFinishUpdater() {
-    if(prp_mUpdater == NULL) return;
+    if(prp_mUpdater.get() == NULL) return;
     prp_mUpdater->updateFinal();
 }

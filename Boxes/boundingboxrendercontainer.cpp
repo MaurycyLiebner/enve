@@ -2,12 +2,20 @@
 #include "boundingbox.h"
 #include <QElapsedTimer>
 #include "memoryhandler.h"
+#include "rendercachehandler.h"
 
 void RenderContainer::draw(QPainter *p) {
     p->save();
     p->setTransform(QTransform(mPaintTransform), true);
     p->drawImage(mDrawPos, mImage);
     p->restore();
+}
+
+void RenderContainer::drawToSkiaCanvas(SkCanvas *canvas) {
+    canvas->save();
+    canvas->concat(QMatrixToSkMatrix(mPaintTransform));
+    canvas->drawImage(mSkImage, mDrawPos.x(), mDrawPos.y());
+    canvas->restore();
 }
 
 void RenderContainer::updatePaintTransformGivenNewCombinedTransform(
@@ -151,4 +159,8 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
 
 void CacheContainer::draw(QPainter *p) {
     p->drawImage(0, 0, mImage);
+}
+
+void CacheContainer::drawToSkiaCanvas(SkCanvas *canvas) {
+    canvas->drawImage(mSkImage, 0, 0);
 }

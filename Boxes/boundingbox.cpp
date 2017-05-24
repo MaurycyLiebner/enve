@@ -7,7 +7,11 @@
 #include "keysview.h"
 #include "BoxesList/boxscrollwidget.h"
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
+#include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "durationrectangle.h"
+#include "PixmapEffects/fmt_filters.h"
+#include "Animators/animatorupdater.h"
+#include "pointhelpers.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent,
                          const BoundingBoxType &type) :
@@ -285,6 +289,20 @@ void BoundingBox::drawSelected(QPainter *p,
     }
 }
 
+void BoundingBox::drawSelected(SkCanvas *canvas,
+                               const CanvasMode &currentCanvasMode,
+                               const SkScalar &invScale) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        canvas->save();
+        drawBoundingRect(canvas, invScale);
+        if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->
+                    draw(canvas, invScale);
+        }
+        canvas->restore();
+    }
+}
+
 bool BoundingBox::shouldRedoUpdate() {
     return mRedoUpdate;
 }
@@ -329,6 +347,19 @@ void BoundingBox::drawPixmap(QPainter *p) {
         p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
         mDrawRenderContainer.draw(p);
         p->restore();
+    }
+}
+
+void BoundingBox::drawPixmap(SkCanvas *canvas) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        canvas->save();
+
+        //p->setCompositionMode(mCompositionMode);
+        //p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
+        //SkPaint paint;
+        //paint.setAlpha(mTransformAnimator->getOpacity()*255/100);
+        mDrawRenderContainer.drawToSkiaCanvas(canvas);
+        canvas->restore();
     }
 }
 
@@ -540,6 +571,11 @@ void BoundingBox::drawAsBoundingRect(QPainter *p,
 
 void BoundingBox::drawBoundingRect(QPainter *p) {
     drawAsBoundingRect(p, mRelBoundingRectPath);
+}
+
+void BoundingBox::drawBoundingRect(SkCanvas *canvas,
+                                   const SkScalar &invScale) {
+
 }
 
 const QPainterPath &BoundingBox::getRelBoundingRectPath() {

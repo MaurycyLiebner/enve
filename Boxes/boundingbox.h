@@ -14,15 +14,8 @@
 #include <unordered_map>
 
 #include "boundingboxrendercontainer.h"
-#include "rendercachehandler.h"
-
-class KeysView;
-
-class UndoRedo;
 
 class Canvas;
-
-class UndoRedoStack;
 
 class MovablePoint;
 
@@ -49,17 +42,9 @@ enum BoundingBoxType {
 
 class BoxesGroup;
 
-class BoxesListWidget;
-
-class CtrlPoint;
-
 class VectorPathEdge;
 
 class VectorPath;
-
-class BoxItemWidgetContainer;
-
-class EffectsSettingsWidget;
 
 class DurationRectangle;
 
@@ -112,11 +97,15 @@ public:
     virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmap(QPainter *p);
+    virtual void drawPixmap(SkCanvas *canvas);
 
     virtual void draw(QPainter *) {}
 
     virtual void drawSelected(QPainter *p,
                               const CanvasMode &currentCanvasMode);
+    virtual void drawSelected(SkCanvas *canvas,
+                              const CanvasMode &currentCanvasMode,
+                              const SkScalar &invScale);
 
 
     void applyTransformation(BoxTransformAnimator *transAnimator);
@@ -156,6 +145,9 @@ public:
     void deselect();
     int getZIndex();
     virtual void drawBoundingRect(QPainter *p);
+    virtual void drawBoundingRect(SkCanvas *canvas,
+                                  const SkScalar &invScale);
+
     void setParent(BoxesGroup *parent,
                    const bool &saveUndoRedo = true);
     BoxesGroup *getParent();
@@ -369,6 +361,11 @@ public:
 
     virtual void drawHovered(QPainter *p) {
         drawHoveredPath(p, mRelBoundingRectPath);
+    }
+
+    virtual void drawHovered(SkCanvas *canvas) {
+        Q_UNUSED(canvas);
+        //drawHoveredPath(canvas, mRelBoundingRectPath);
     }
 
     void drawHoveredPath(QPainter *p, const QPainterPath &path) {

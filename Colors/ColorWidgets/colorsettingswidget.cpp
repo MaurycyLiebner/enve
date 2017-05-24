@@ -3,10 +3,9 @@
 #include <QResizeEvent>
 #include <QMenu>
 #include "Colors/colorpickingwidget.h"
-#include "qrealanimatorvalueslider.h"
-#include "Animators/coloranimator.h"
 #include "Colors/helpers.h"
-
+#include "colorlabel.h"
+#include "global.h"
 
 void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
                             int rect_width, int rect_height,
@@ -588,8 +587,9 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
     moveAlphaWidgetToTab(0);
 }
 
-void addColorWidgetActionToMenu(QMenu *menu_t, QString label_t, ColorWidget *widget_t)
-{
+void addColorWidgetActionToMenu(QMenu *menu_t,
+                                QString label_t,
+                                ColorWidget *widget_t) {
     QAction *action_t = menu_t->addAction(label_t);
     action_t->setCheckable(true);
     action_t->setChecked(widget_t->isVisible() );

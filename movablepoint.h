@@ -3,12 +3,14 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPainter>
+#include "SkPoint.h"
 #include "Animators/qpointfanimator.h"
 #include "transformable.h"
 
 class BoundingBox;
 class PathPoint;
 class QSqlQuery;
+class SkCanvas;
 
 class AnimatorUpdater;
 
@@ -39,6 +41,8 @@ public:
     QPointF getAbsolutePos() const;
 
     virtual void draw(QPainter *p);
+    virtual void draw(SkCanvas *canvas,
+                      const SkScalar &invScale);
 
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);
@@ -96,14 +100,9 @@ public:
     void makeDuplicate(MovablePoint *targetPoint);
     void duplicatePosAnimatorFrom(QPointFAnimator *source);
 
-    virtual void drawHovered(QPainter *p) {
-        p->setBrush(Qt::NoBrush);
-        QPen pen = QPen(Qt::red, 2.);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        drawCosmeticEllipse(p, getAbsolutePos(),
-                            mRadius, mRadius);
-    }
+    virtual void drawHovered(QPainter *p);
+    virtual void drawHovered(SkCanvas *canvas,
+                             const SkScalar &invScale);
 
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
@@ -114,7 +113,14 @@ protected:
     qreal mRadius;
     QPointF mSavedRelPos;
     BoundingBox *mParent = NULL;
-    virtual void drawOnAbsPos(QPainter *p, const QPointF &absPos);
+    virtual void drawOnAbsPos(QPainter *p,
+                              const QPointF &absPos);
+    virtual void drawOnAbsPos(SkCanvas *canvas,
+                              const SkPoint &absPos,
+                              const SkScalar &invScale,
+                              const unsigned char r,
+                              const unsigned char g,
+                              const unsigned char b);
 };
 
 #endif // MOVABLEPOINT_H

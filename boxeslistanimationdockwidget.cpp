@@ -1,11 +1,18 @@
 #include "boxeslistanimationdockwidget.h"
 #include "mainwindow.h"
 #include <QKeyEvent>
+#include "canvaswindow.h"
+#include "canvas.h"
 #include "animationdockwidget.h"
 #include <QScrollBar>
 #include "BoxesList/boxscrollwidget.h"
 #include "BoxesList/boxsinglewidget.h"
 #include "verticalwidgetsstack.h"
+#include "actionbutton.h"
+#include "RenderWidget/renderwidget.h"
+#include "boxeslistkeysviewwidget.h"
+#include "animationwidgetscrollbar.h"
+#include "global.h"
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     QWidget(parent) {

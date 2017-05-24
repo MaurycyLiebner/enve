@@ -3,8 +3,6 @@
 #include "glwidget.h"
 #include "Colors/color.h"
 
-extern float clamp(float val_t, float min_t, float max_t);
-extern float getAngleF(double x1, double y1, double x2, double y2);
 extern bool shouldValPointerBeLightHSV(GLfloat hue, GLfloat saturation, GLfloat value);
 extern bool shouldValPointerBeLightHSL(GLfloat hue, GLfloat saturation, GLfloat lightness);
 extern bool shouldValPointerBeLightRGB(GLfloat r, GLfloat g, GLfloat b);

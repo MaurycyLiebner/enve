@@ -2,7 +2,6 @@
 #define FILLSTROKESETTINGS_H
 
 #include <QWidget>
-#include "Colors/ColorWidgets/colorsettingswidget.h"
 #include <QTabWidget>
 #include <QPushButton>
 #include <QTabBar>
@@ -11,20 +10,20 @@
 #include <QDebug>
 #include <QTimer>
 #include <QPainterPathStroker>
-#include "connectedtomainwindow.h"
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QLabel>
+#include <QHBoxLayout>
 #include "Animators/coloranimator.h"
-#include "actionbutton.h"
 #include "Animators/paintsettings.h"
 
+class GradientWidget;
 class MainWindow;
-class Canvas;
-class QDoubleSlider;
 class CanvasWindow;
+class ColorSettingsWidget;
+class QrealAnimatorValueSlider;
 
-class FillStrokeSettingsWidget : public QWidget
-{
+class FillStrokeSettingsWidget : public QWidget {
     Q_OBJECT
 public:
     explicit FillStrokeSettingsWidget(MainWindow *parent = 0);
@@ -106,53 +105,17 @@ private:
 
     //
 
-    PaintType getCurrentPaintTypeVal() {
-        if(mTargetId == 0) {
-            return mCurrentFillPaintType;
-        } else {
-            return mCurrentStrokePaintType;
-        }
-    }
+    PaintType getCurrentPaintTypeVal();
 
-    void setCurrentPaintTypeVal(PaintType paintType) {
-        if(mTargetId == 0) {
-            mCurrentFillPaintType = paintType;
-        } else {
-            mCurrentStrokePaintType = paintType;
-        }
-    }
+    void setCurrentPaintTypeVal(PaintType paintType);
 
-    Color getCurrentColorVal() {
-        if(mTargetId == 0) {
-            return mCurrentFillColor;
-        } else {
-            return mCurrentStrokeColor;
-        }
-    }
+    Color getCurrentColorVal();
 
-    void setCurrentColorVal(Color color) {
-        if(mTargetId == 0) {
-            mCurrentFillColor = color;
-        } else {
-            mCurrentStrokeColor = color;
-        }
-    }
+    void setCurrentColorVal(Color color);
 
-    Gradient *getCurrentGradientVal() {
-        if(mTargetId == 0) {
-            return mCurrentFillGradient;
-        } else {
-            return mCurrentStrokeGradient;
-        }
-    }
+    Gradient *getCurrentGradientVal();
 
-    void setCurrentGradientVal(Gradient *gradient) {
-        if(mTargetId == 0) {
-            mCurrentFillGradient = gradient;
-        } else {
-            mCurrentStrokeGradient = gradient;
-        }
-    }
+    void setCurrentGradientVal(Gradient *gradient);
 
 
     ColorAnimator *mCurrentFillColorAnimator = NULL;

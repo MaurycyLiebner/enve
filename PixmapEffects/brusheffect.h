@@ -1,6 +1,6 @@
 #ifndef BRUSHEFFECT_H
 #define BRUSHEFFECT_H
-#include "pixmapeffect.h"
+//#include "pixmapeffect.h"
 
 //class BrushStroke {
 //public:

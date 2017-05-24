@@ -1,5 +1,6 @@
 #include "animationbox.h"
 #include "BoxesList/boxsinglewidget.h"
+#include "Animators/animatorupdater.h"
 
 AnimationBox::AnimationBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_IMAGE) {

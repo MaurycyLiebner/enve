@@ -7,6 +7,7 @@
 #include <QDesktopWidget>
 #include "ColorWidgets/colorsettingswidget.h"
 #include <QDebug>
+#include "global.h"
 
 ColorPickingWidget::ColorPickingWidget(ColorSettingsWidget *parent)
     : QWidget()

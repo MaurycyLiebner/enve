@@ -1,4 +1,4 @@
-#include "brusheffect.h"
+//#include "brusheffect.h"
 //bool BrushStroke::mBrushPixmapsLoaded = false;
 
 //BrushEffect::BrushEffect(qreal numberStrokes,

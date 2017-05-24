@@ -18,6 +18,12 @@
 #include "canvaswindow.h"
 #include "BoxesList/boxscrollwidget.h"
 #include "clipboardcontainer.h"
+#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "BoxesList/boxscrollwidgetvisiblepart.h"
+#include "RenderWidget/renderwidget.h"
+#include "actionbutton.h"
+#include "fontswidget.h"
+#include "global.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -38,11 +44,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 int FONT_HEIGHT;
 int MIN_WIDGET_HEIGHT;
+int KEY_RECT_SIZE;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
     FONT_HEIGHT = QApplication::fontMetrics().height();
     MIN_WIDGET_HEIGHT = FONT_HEIGHT*4/3;
+    KEY_RECT_SIZE = MIN_WIDGET_HEIGHT*3/5;
     av_register_all();
     QFile file("/home/ailuropoda/Dev/AniVect/stylesheet.qss");
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {

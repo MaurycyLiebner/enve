@@ -5,6 +5,7 @@
 #include "scrollwidget.h"
 #include "singlewidgettarget.h"
 #include "mainwindow.h"
+#include "global.h"
 
 QList<ScrollWidgetVisiblePart*> ScrollWidgetVisiblePart::mAllInstances;
 

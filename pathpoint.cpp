@@ -5,11 +5,12 @@
 #include <QPainter>
 #include <QDebug>
 #include "edge.h"
+#include "Animators/pathanimator.h"
+#include "canvas.h"
 
 PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
     MovablePoint(parentAnimator->getParentPathAnimator()->getParentBox(),
-                 MovablePointType::TYPE_PATH_POINT, 9.5)
-{
+                 MovablePointType::TYPE_PATH_POINT, 9.5) {
     mParentPath = parentAnimator;
     mStartCtrlPt = new CtrlPoint(this, true);
     mEndCtrlPt = new CtrlPoint(this, false);
@@ -446,6 +447,79 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
         p->restore();
     }
     p->restore();
+}
+
+void PathPoint::draw(SkCanvas *canvas,
+                     const CanvasMode &mode,
+                     const SkScalar &invScale) {
+    canvas->save();
+    SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
+    if(mSelected) {
+        drawOnAbsPos(canvas,
+                     absPos,
+                     invScale,
+                     0, 200, 255);
+    } else {
+        drawOnAbsPos(canvas,
+                     absPos,
+                     invScale,
+                     170, 240, 255);
+    }
+
+    if((mode == CanvasMode::MOVE_POINT &&
+        (isNeighbourSelected() ||
+         BoxesGroup::getCtrlsAlwaysVisible() ) ) ||
+            (mode == CanvasMode::ADD_POINT && mSelected)) {
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            paint.setColor(SK_ColorBLACK);
+            paint.setStrokeWidth(1.5*invScale);
+            paint.setStyle(SkPaint::kStroke_Style);
+
+            SkPoint endAbsPos =
+                    QPointFToSkPoint(mEndCtrlPt->getAbsolutePos());
+            canvas->drawLine(absPos, endAbsPos, paint);
+            paint.setColor(SK_ColorWHITE);
+            paint.setStrokeWidth(0.75*invScale);
+            canvas->drawLine(absPos, endAbsPos, paint);
+        }
+        if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            paint.setColor(SK_ColorBLACK);
+            paint.setStrokeWidth(1.5*invScale);
+            paint.setStyle(SkPaint::kStroke_Style);
+            SkPoint startAbsPos =
+                    QPointFToSkPoint(mStartCtrlPt->getAbsolutePos());
+            canvas->drawLine(absPos, startAbsPos, paint);
+
+            paint.setColor(SK_ColorWHITE);
+            paint.setStrokeWidth(0.75*invScale);
+            canvas->drawLine(absPos, startAbsPos, paint);
+        }
+        mEndCtrlPt->draw(canvas, invScale);
+        mStartCtrlPt->draw(canvas, invScale);
+    }
+
+//    if(isCtrlPressed()) {
+//        QPen pen = p->pen();
+//        p->setPen(Qt::NoPen);
+//        p->setBrush(Qt::white);
+//        drawCosmeticEllipse(p, absPos,
+//                            6., 6.);
+//        p->setPen(pen);
+//        canvas->save();
+//        SkMatrix trans = canvas->getTotalMatrix();
+//        canvas->resetMatrix();
+//        absPos = trans.mapXY(absPos.x(), absPos.y());
+//        SkString text;
+//        text.appendS32(mPointId);
+//        canvas->drawString(QRectF(absPos - QPointF(mRadius, mRadius),
+//                           absPos + QPointF(mRadius, mRadius)),
+//                    Qt::AlignCenter,
+//                    SkString::appendS32(number(mPointId));
+//        canvas->restore();
+//    }
+    canvas->restore();
 }
 
 PathPoint* PathPoint::getNextPoint()

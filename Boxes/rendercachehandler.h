@@ -1,16 +1,11 @@
 #ifndef RENDERCACHEHANDLER_H
 #define RENDERCACHEHANDLER_H
-class Key;
 #include <QtCore>
 class QPainter;
 class RenderContainer;
 class RenderContainer;
 class CacheContainer;
-class DurationRectangle;
-
 class RenderCacheHandler;
-
-class AnimationRect;
 
 class FileCacheHandler {
 public:

@@ -6,6 +6,10 @@
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
 #include "BoxesList/boxscrollwidget.h"
+#include "textbox.h"
+#include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
+#include "canvaswindow.h"
+#include "canvas.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -322,6 +326,17 @@ void BoxesGroup::drawPixmap(QPainter *p) {
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             //box->draw(p);
             box->drawPixmap(p);
+        }
+    }
+}
+
+void BoxesGroup::drawPixmap(SkCanvas *canvas) {
+    if(shouldPaintOnImage()) {
+        BoundingBox::drawPixmap(canvas);
+    } else {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+            //box->draw(p);
+            box->drawPixmap(canvas);
         }
     }
 }

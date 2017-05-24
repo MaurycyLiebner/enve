@@ -8,6 +8,7 @@ extern "C" {
 #include "mainwindow.h"
 #include <QDebug>
 #include "Sound/singlesound.h"
+#include "canvas.h"
 
 VideoBox::VideoBox(const QString &filePath,
                    BoxesGroup *parent) :
