@@ -11,8 +11,8 @@ class SkCanvas;
 class PathPoint;
 class SinglePathAnimator;
 class BoundingBox;
-class SkMatrix;
-typedef float SkScalar;
+#include "SkCanvas.h"
+#include "SkPath.h"
 
 class PathAnimator : public ComplexAnimator {
     Q_OBJECT
@@ -29,7 +29,8 @@ public:
     MovablePoint *qra_getPointAt(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
-    QPainterPath getCurrentPath();
+    const QPainterPath &getCurrentPath();
+    const SkPath &getCurrentSkPath();
 
     void prp_loadFromSql(const int &boundingBoxId);
     int prp_saveToSql(QSqlQuery *query,
@@ -75,6 +76,7 @@ public:
 private:
     BoundingBox *mParentBox = NULL;
     QPainterPath mPath;
+    SkPath mSkPath;
     QList<SinglePathAnimator*> mSinglePaths;
 signals:
     void lastSinglePathRemoved();

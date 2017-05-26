@@ -330,13 +330,13 @@ void BoxesGroup::drawPixmap(QPainter *p) {
     }
 }
 
-void BoxesGroup::drawPixmap(SkCanvas *canvas) {
+void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {
     if(shouldPaintOnImage()) {
-        BoundingBox::drawPixmap(canvas);
+        BoundingBox::drawPixmapSk(canvas);
     } else {
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             //box->draw(p);
-            box->drawPixmap(canvas);
+            box->drawPixmapSk(canvas);
         }
     }
 }

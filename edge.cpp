@@ -236,6 +236,12 @@ void VectorPathEdge::generatePainterPath() {
     mPath.cubicTo(mPoint1->getEndCtrlPtAbsPos(),
                   mPoint2->getStartCtrlPtAbsPos(),
                   mPoint2->getAbsolutePos());
+
+    mSkPath = SkPath();
+    mSkPath.moveTo(QPointFToSkPoint(mPoint1->getAbsolutePos()));
+    mSkPath.cubicTo(QPointFToSkPoint(mPoint1->getEndCtrlPtAbsPos()),
+                    QPointFToSkPoint(mPoint2->getStartCtrlPtAbsPos()),
+                    QPointFToSkPoint(mPoint2->getAbsolutePos()));
 }
 
 void VectorPathEdge::drawHovered(QPainter *p) {
@@ -256,8 +262,18 @@ void VectorPathEdge::drawHovered(QPainter *p) {
     p->restore();
 }
 
-void VectorPathEdge::drawHoveredToSkiaCanvas(SkCanvas *canvas) {
+void VectorPathEdge::drawHoveredSk(SkCanvas *canvas,
+                                             const SkScalar &invScale) {
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    paint.setColor(SK_ColorBLACK);
+    paint.setStrokeWidth(2.5*invScale);
+    paint.setStyle(SkPaint::kStroke_Style);
+    canvas->drawPath(mSkPath, paint);
 
+    paint.setColor(SK_ColorRED);
+    paint.setStrokeWidth(1.25*invScale);
+    canvas->drawPath(mSkPath, paint);
 }
 
 PathPoint *VectorPathEdge::getPoint1() const {

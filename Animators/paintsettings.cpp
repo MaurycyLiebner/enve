@@ -636,6 +636,14 @@ void StrokeSettings::setStrokerSettings(QPainterPathStroker *stroker) {
     stroker->setJoinStyle(mJoinStyle);
 }
 
+#include "AddInclude/SkStroke.h"
+#include "skqtconversions.h"
+void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
+    stroker->setWidth(mLineWidth->qra_getCurrentValue());
+    stroker->setCap(QCapToSkCap(mCapStyle));
+    stroker->setJoin(QJoinToSkJoin(mJoinStyle));
+}
+
 qreal StrokeSettings::getCurrentStrokeWidth() const {
     return mLineWidth->qra_getCurrentValue();
 }

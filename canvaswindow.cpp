@@ -9,7 +9,7 @@
 #include "Sound/soundcomposition.h"
 #include "global.h"
 
-CanvasWindow::CanvasWindow() {
+CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
 
     mPaintControlerThread = new QThread(this);
@@ -27,7 +27,7 @@ CanvasWindow::CanvasWindow() {
 
     initializeAudio();
 
-    mWidgetContainer = QWidget::createWindowContainer(this);
+    mWidgetContainer = QWidget::createWindowContainer(this, parent);
     mWidgetContainer->setAcceptDrops(true);
     mWidgetContainer->setFocusPolicy(Qt::StrongFocus);
     mWidgetContainer->setMinimumSize(MIN_WIDGET_HEIGHT*10,

@@ -12,6 +12,8 @@
 #include "PixmapEffects/fmt_filters.h"
 #include "Animators/animatorupdater.h"
 #include "pointhelpers.h"
+#include "skqtconversions.h"
+#include "global.h"
 
 BoundingBox::BoundingBox(BoxesGroup *parent,
                          const BoundingBoxType &type) :
@@ -95,6 +97,43 @@ BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
     BoundingBox *target = createNewDuplicate(parent);
     makeDuplicate(target);
     return target;
+}
+
+void BoundingBox::drawHoveredPath(QPainter *p, const QPainterPath &path) {
+    p->save();
+    p->setTransform(QTransform(mTransformAnimator->getCombinedTransform()),
+                    true);
+    QPen pen = QPen(Qt::black, 2.);
+    pen.setCosmetic(true);
+    p->setPen(pen);
+    p->setBrush(Qt::NoBrush);
+    p->drawPath(path);
+
+    pen = QPen(Qt::red, 1.);
+    pen.setCosmetic(true);
+    p->setPen(pen);
+    p->drawPath(path);
+    p->restore();
+}
+
+void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
+                                    const SkPath &path,
+                                    const SkScalar &invScale) {
+    canvas->save();
+    SkPath mappedPath = path;
+    mappedPath.transform(QMatrixToSkMatrix(
+                             mTransformAnimator->getCombinedTransform()));
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    paint.setColor(SK_ColorBLACK);
+    paint.setStrokeWidth(2.*invScale);
+    paint.setStyle(SkPaint::kStroke_Style);
+    canvas->drawPath(mappedPath, paint);
+
+    paint.setColor(SK_ColorRED);
+    paint.setStrokeWidth(invScale);
+    canvas->drawPath(mappedPath, paint);
+    canvas->restore();
 }
 
 BoundingBox *BoundingBox::createSameTransformationLink(BoxesGroup *parent) {
@@ -267,6 +306,51 @@ QImage BoundingBox::getAllUglyPixmapProvidedTransform(
     return allUglyPixmap;
 }
 
+sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
+                const qreal &effectsMargin,
+                const qreal &resolution,
+                const QMatrix &allUglyTransform) {
+    Q_UNUSED(resolution);
+    QRectF allUglyBoundingRect =
+            allUglyTransform.mapRect(mUpdateRelBoundingRect).
+                adjusted(-effectsMargin, -effectsMargin,
+                         effectsMargin, effectsMargin);
+    QSizeF sizeF = allUglyBoundingRect.size();
+
+    SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
+                                         ceil(sizeF.height()),
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType);
+
+    sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
+    SkCanvas *rasterCanvas = rasterSurface->getCanvas();
+
+    rasterCanvas->save();
+
+    rasterCanvas->translate(-allUglyBoundingRect.left(),
+                            -allUglyBoundingRect.top());
+    QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
+            QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
+                    qRound(allUglyBoundingRect.top()/**resolution*/));
+    allUglyBoundingRect.translate(-transF);
+
+    rasterCanvas->translate(transF.x(), transF.y());
+    rasterCanvas->concat(QMatrixToSkMatrix(allUglyTransform));
+
+    drawSk(rasterCanvas);
+    rasterCanvas->restore();
+
+//    if(parentCanvas->effectsPaintEnabled()) {
+//        allUglyPixmap = applyEffects(allUglyPixmap,
+//                                     false,
+//                                     parentCanvas->getResolutionFraction());
+//    }
+
+//    *drawPosP = QPoint(qRound(allUglyBoundingRect.left()),
+//                       qRound(allUglyBoundingRect.top()));
+    return rasterSurface->makeImageSnapshot();
+}
+
 void BoundingBox::updateAllUglyPixmap() {
     Canvas *parentCanvas = getParentCanvas();
 
@@ -289,15 +373,15 @@ void BoundingBox::drawSelected(QPainter *p,
     }
 }
 
-void BoundingBox::drawSelected(SkCanvas *canvas,
-                               const CanvasMode &currentCanvasMode,
-                               const SkScalar &invScale) {
+void BoundingBox::drawSelectedSk(SkCanvas *canvas,
+                                 const CanvasMode &currentCanvasMode,
+                                 const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
-        drawBoundingRect(canvas, invScale);
+        drawBoundingRectSk(canvas, invScale);
         if(currentCanvasMode == MOVE_PATH) {
             mTransformAnimator->getPivotMovablePoint()->
-                    draw(canvas, invScale);
+                    drawSk(canvas, invScale);
         }
         canvas->restore();
     }
@@ -350,7 +434,7 @@ void BoundingBox::drawPixmap(QPainter *p) {
     }
 }
 
-void BoundingBox::drawPixmap(SkCanvas *canvas) {
+void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
 
@@ -358,7 +442,7 @@ void BoundingBox::drawPixmap(SkCanvas *canvas) {
         //p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
         //SkPaint paint;
         //paint.setAlpha(mTransformAnimator->getOpacity()*255/100);
-        mDrawRenderContainer.drawToSkiaCanvas(canvas);
+        mDrawRenderContainer.drawSk(canvas);
         canvas->restore();
     }
 }
@@ -521,6 +605,9 @@ void BoundingBox::updateRelBoundingRect() {
     mRelBoundingRectPath = QPainterPath();
     mRelBoundingRectPath.addRect(mRelBoundingRect);
 
+    mSkRelBoundingRectPath = SkPath();
+    mSkRelBoundingRectPath.addRect(QRectFToSkRect(mRelBoundingRect));
+
     if(mCenterPivotScheduled) {
         mCenterPivotScheduled = false;
         centerPivotPosition();
@@ -573,9 +660,32 @@ void BoundingBox::drawBoundingRect(QPainter *p) {
     drawAsBoundingRect(p, mRelBoundingRectPath);
 }
 
-void BoundingBox::drawBoundingRect(SkCanvas *canvas,
-                                   const SkScalar &invScale) {
+void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
+                                       const SkPath &path,
+                                       const SkScalar &invScale) {
+    canvas->save();
+    SkPaint paint;
+//    QPen pen = QPen(QColor(0, 0, 0, 125), 1., Qt::DashLine);
+//    pen.setCosmetic(true);
+//    p->setPen(pen);
+//    p->setBrush(Qt::NoBrush);
+    SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
+                             MIN_WIDGET_HEIGHT*0.25f*invScale};
+    paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+    paint.setColor(SkColorSetARGBInline(125, 0, 0, 0));
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setStrokeWidth(invScale);
+    SkPath mappedPath = path;
+    mappedPath.transform(QMatrixToSkMatrix(getCombinedTransform()));
+    canvas->drawPath(mappedPath, paint);
+    canvas->restore();
+}
 
+void BoundingBox::drawBoundingRectSk(SkCanvas *canvas,
+                                     const SkScalar &invScale) {
+    drawAsBoundingRectSk(canvas,
+                         mSkRelBoundingRectPath,
+                         invScale);
 }
 
 const QPainterPath &BoundingBox::getRelBoundingRectPath() {

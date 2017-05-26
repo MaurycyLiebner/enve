@@ -59,8 +59,7 @@ VectorPath *VectorPath::createPathFromSql(int boundingBoxId,
     return path;
 }
 
-VectorPath::~VectorPath()
-{
+VectorPath::~VectorPath() {
 
 }
 
@@ -89,8 +88,7 @@ QPointF VectorPath::getRelCenterPosition() {
     return mPathAnimator->getRelCenterPosition();
 }
 
-void VectorPath::updatePath()
-{
+void VectorPath::updatePath() {
 //    mPath = QPainterPath();
 //    //mPath.setFillRule(Qt::WindingFill);
 
@@ -98,6 +96,7 @@ void VectorPath::updatePath()
 
     mPathAnimator->updatePath();
     mPath = mPathAnimator->getCurrentPath();
+    mPathSk = mPathAnimator->getCurrentSkPath();
 
     updateOutlinePath();
 }
@@ -146,22 +145,22 @@ void VectorPath::drawSelected(QPainter *p,
     }
 }
 
-void VectorPath::drawSelected(SkCanvas *canvas,
+void VectorPath::drawSelectedSk(SkCanvas *canvas,
                               const CanvasMode &currentCanvasMode,
                               const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
-        drawBoundingRect(canvas, invScale);
+        drawBoundingRectSk(canvas, invScale);
         mPathAnimator->drawSelected(canvas,
                                     currentCanvasMode,
                                     invScale,
                                     QMatrixToSkMatrix(getCombinedTransform()));
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            //mFillGradientPoints->drawGradientPoints(p);
-            //mStrokeGradientPoints->drawGradientPoints(p);
+            mFillGradientPoints->drawGradientPoints(canvas, invScale);
+            mStrokeGradientPoints->drawGradientPoints(canvas, invScale);
         } else if(currentCanvasMode == MOVE_PATH) {
             mTransformAnimator->getPivotMovablePoint()->
-                    draw(canvas, invScale);
+                    drawSk(canvas, invScale);
         }
         canvas->restore();
     }

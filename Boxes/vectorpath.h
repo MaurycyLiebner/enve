@@ -23,7 +23,7 @@ public:
 
     void drawSelected(QPainter *p,
                       const CanvasMode &currentCanvasMode);
-    void drawSelected(SkCanvas *canvas,
+    void drawSelectedSk(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale);
 

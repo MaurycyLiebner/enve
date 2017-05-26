@@ -5,7 +5,8 @@
 class BonePoint;
 class PathPoint;
 class CtrlPoint;
-class SkCanvas;
+#include "SkCanvas.h"
+#include "SkPath.h"
 
 class VectorPathEdge : public StdSelfRef {
 public:
@@ -58,7 +59,8 @@ public:
     void generatePainterPath();
 
     void drawHovered(QPainter *p);
-    void drawHoveredToSkiaCanvas(SkCanvas *canvas);
+    void drawHoveredSk(SkCanvas *canvas,
+                                 const SkScalar &invScale);
 
     PathPoint *getPoint1() const;
 
@@ -77,8 +79,7 @@ public:
     QPointF getSlopeVector(const qreal &t);
 private:
     QPainterPath mPath;
-
-
+    SkPath mSkPath;
 
     PathPoint *mPoint1;
     CtrlPoint *mPoint1EndPt;

@@ -4,6 +4,7 @@
 class GradientPoint;
 class MovablePoint;
 class PathBox;
+#include "SkCanvas.h"
 
 class GradientPoints : public ComplexAnimator {
 public:
@@ -17,6 +18,8 @@ public:
     void disable();
 
     void drawGradientPoints(QPainter *p);
+    void drawGradientPoints(SkCanvas *canvas,
+                            const SkScalar &invScale);
 
     MovablePoint *qra_getPointAt(const QPointF &absPos,
                                  const qreal &canvasScaleInv);

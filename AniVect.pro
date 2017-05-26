@@ -14,6 +14,9 @@ INCLUDEPATH += /home/ailuropoda/.skia/include/gpu/
 INCLUDEPATH += /home/ailuropoda/.skia/include/config/
 INCLUDEPATH += /home/ailuropoda/.skia/include/ports/
 INCLUDEPATH += /home/ailuropoda/.skia/include/effects/
+INCLUDEPATH += /home/ailuropoda/.skia/include/private/
+INCLUDEPATH += /home/ailuropoda/.skia/include/pathops/
+
 INCLUDEPATH += /home/ailuropoda/.skia/third_party/externals/sdl/include/
 INCLUDEPATH += /home/ailuropoda/.skia/third_party/vulkan/
 INCLUDEPATH += /home/ailuropoda/.skia/src/gpu/
@@ -155,7 +158,10 @@ SOURCES += main.cpp\
     Boxes/draftcanvas.cpp \
     glwindow.cpp \
     canvaswindow.cpp \
-    skqtconversions.cpp
+    skqtconversions.cpp \
+    AddInclude/SkStroke.cpp \
+    AddInclude/SkGeometry.cpp \
+    AddInclude/SkStrokerPriv.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -275,7 +281,13 @@ HEADERS  += mainwindow.h \
     global.h \
     glwindow.h \
     canvaswindow.h \
-    skqtconversions.h
+    skqtconversions.h \
+    AddInclude/SkStroke.h \
+    AddInclude/SkPaintDefaults.h \
+    AddInclude/SkGeometry.h \
+    AddInclude/SkPathPriv.h \
+    AddInclude/SkStrokerPriv.h \
+    AddInclude/SkNx.h
 
 RESOURCES += \
     resources.qrc

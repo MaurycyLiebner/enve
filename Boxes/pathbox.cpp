@@ -4,6 +4,7 @@
 #include "gradientpoint.h"
 #include "Animators/animatorupdater.h"
 #include "gradientpoints.h"
+#include "AddInclude/SkStroke.h"
 
 PathBox::PathBox(BoxesGroup *parent,
                  const BoundingBoxType &type) :
@@ -35,8 +36,7 @@ PathBox::PathBox(BoxesGroup *parent,
     schedulePathUpdate();
 }
 
-PathBox::~PathBox()
-{
+PathBox::~PathBox() {
     if(mFillSettings->getGradient() != NULL) {
         mFillSettings->getGradient()->removePath(this);
     }
@@ -224,6 +224,11 @@ void PathBox::drawHovered(QPainter *p) {
     drawHoveredPath(p, mPath);
 }
 
+void PathBox::drawHoveredSk(SkCanvas *canvas,
+                            const SkScalar &invScale) {
+    drawHoveredPathSk(canvas, mPathSk, invScale);
+}
+
 void PathBox::applyPaintSetting(const PaintSetting &setting) {
     setting.apply(this);
     replaceCurrentFrameCache();
@@ -289,12 +294,16 @@ VectorPath *PathBox::strokeToPath() {
 }
 
 const QPainterPath &PathBox::getRelativePath() const { return mPath; }
-
 void PathBox::updateOutlinePath() {
     if(mStrokeSettings->nonZeroLineWidth()) {
         QPainterPathStroker stroker;
         mStrokeSettings->setStrokerSettings(&stroker);
         mOutlinePath = stroker.createStroke(mPath);
+
+        SkStroke strokerSk;
+        mStrokeSettings->setStrokerSettingsSk(&strokerSk);
+        mOutlinePathSk = SkPath();
+        strokerSk.strokePath(mPathSk, &mOutlinePathSk);
     } else {
         mOutlinePath = QPainterPath();
     }
@@ -385,7 +394,9 @@ void PathBox::setUpdateVars() {
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
     mUpdatePath = mPath;
+    mUpdatePathSk = mPathSk;
     mUpdateOutlinePath = mOutlinePath;
+    mUpdateOutlinePathSk = mOutlinePathSk;
     BoundingBox::setUpdateVars();
 }
 
@@ -405,6 +416,29 @@ void PathBox::draw(QPainter *p) {
     }
 
     p->restore();
+}
+
+void PathBox::drawSk(SkCanvas *canvas) {
+    canvas->save();
+
+    if(!mUpdatePathSk.isEmpty()) {
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        mUpdateFillSettings.applyPainterSettingsSk(&paint);
+        paint.setStyle(SkPaint::kFill_Style);
+
+        canvas->drawPath(mUpdatePathSk, paint);
+    }
+    if(!mUpdateOutlinePathSk.isEmpty()) {
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        mUpdateStrokeSettings.applyPainterSettingsSk(&paint);
+        paint.setStyle(SkPaint::kFill_Style);
+
+        canvas->drawPath(mUpdateOutlinePathSk, paint);
+    }
+
+    canvas->restore();
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) {

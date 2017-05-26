@@ -12,7 +12,7 @@ QrealPoint::QrealPoint(QrealPointType type,
 qreal QrealPoint::getFrame() {
     if(mType == KEY_POINT) return mParentKey->getAbsFrame();
     if(mType == START_POINT) return mParentKey->getStartValueFrame();
-    if(mType == END_POINT) return mParentKey->getEndValueFrame();
+    /*if(mType == END_POINT)*/ return mParentKey->getEndValueFrame();
 }
 
 void QrealPoint::setFrame(const qreal &frame) {
@@ -35,7 +35,7 @@ void QrealPoint::finishFrameTransform() {
 qreal QrealPoint::getValue() {
     if(mType == KEY_POINT) return mParentKey->getValue();
     if(mType == START_POINT) return mParentKey->getStartValue();
-    if(mType == END_POINT) return mParentKey->getEndValue();
+    /*if(mType == END_POINT)*/ return mParentKey->getEndValue();
 }
 
 void QrealPoint::setValue(const qreal &value) {
@@ -104,7 +104,7 @@ bool QrealPoint::isEndPoint() { return mType == END_POINT; }
 bool QrealPoint::isEnabled() {
     if(isKeyPoint() ) return true;
     if(isStartPoint() ) return mParentKey->isStartPointEnabled();
-    if(isEndPoint() ) return mParentKey->isEndPointEnabled();
+    /*if(isEndPoint() )*/ return mParentKey->isEndPointEnabled();
 }
 
 QrealKey *QrealPoint::getParentKey()

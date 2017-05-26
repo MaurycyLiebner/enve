@@ -4,6 +4,7 @@
 #include <QMatrix>
 #include "SkMatrix.h"
 #include "SkRect.h"
+#include "SkPaint.h"
 
 extern QRectF SkRectToQRectF(const SkRect &rect);
 extern SkRect QRectFToSkRect(const QRectF &rect);
@@ -18,5 +19,9 @@ extern SkMatrix QMatrixToSkMatrix(const QMatrix &matrix);
 extern QPointF SkPointToQPointF(const SkPoint &point);
 
 extern SkPoint QPointFToSkPoint(const QPointF &point);
+
+extern SkPaint::Cap QCapToSkCap(const Qt::PenCapStyle &cap);
+
+extern SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join);
 
 #endif // SKQTCONVERSIONS_H

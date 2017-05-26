@@ -1,5 +1,7 @@
 #include "gradientpoints.h"
 #include "gradientpoint.h"
+#include "skqtconversions.h"
+#include <QSqlError>
 
 GradientPoints::GradientPoints() : ComplexAnimator()
 {
@@ -21,7 +23,6 @@ void GradientPoints::initialize(PathBox *parentT)
     enabled = false;
 }
 
-#include <QSqlError>
 void GradientPoints::prp_loadFromSql(const int &identifyingId) {
 
     QSqlQuery query;
@@ -91,6 +92,26 @@ void GradientPoints::drawGradientPoints(QPainter *p) {
         p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
         startPoint->draw(p);
         endPoint->draw(p);
+    }
+}
+
+void GradientPoints::drawGradientPoints(SkCanvas *canvas,
+                                        const SkScalar &invScale) {
+    if(enabled) {
+        SkPoint startPos = QPointFToSkPoint(startPoint->getAbsolutePos());
+        SkPoint endPos = QPointFToSkPoint(endPoint->getAbsolutePos());
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        paint.setColor(SK_ColorBLACK);
+        paint.setStrokeWidth(1.5*invScale);
+        paint.setStyle(SkPaint::kStroke_Style);
+
+        canvas->drawLine(startPos, endPos, paint);
+        paint.setColor(SK_ColorWHITE);
+        paint.setStrokeWidth(0.75*invScale);
+        canvas->drawLine(startPos, endPos, paint);
+        startPoint->drawSk(canvas, invScale);
+        endPoint->drawSk(canvas, invScale);
     }
 }
 

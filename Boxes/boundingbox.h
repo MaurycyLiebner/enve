@@ -14,6 +14,7 @@
 #include <unordered_map>
 
 #include "boundingboxrendercontainer.h"
+#include "SkPath.h"
 
 class Canvas;
 
@@ -97,15 +98,16 @@ public:
     virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmap(QPainter *p);
-    virtual void drawPixmap(SkCanvas *canvas);
+    virtual void drawPixmapSk(SkCanvas *canvas);
 
     virtual void draw(QPainter *) {}
+    virtual void drawSk(SkCanvas *) {}
 
     virtual void drawSelected(QPainter *p,
                               const CanvasMode &currentCanvasMode);
-    virtual void drawSelected(SkCanvas *canvas,
-                              const CanvasMode &currentCanvasMode,
-                              const SkScalar &invScale);
+    virtual void drawSelectedSk(SkCanvas *canvas,
+                                const CanvasMode &currentCanvasMode,
+                                const SkScalar &invScale);
 
 
     void applyTransformation(BoxTransformAnimator *transAnimator);
@@ -144,9 +146,9 @@ public:
     virtual void select();
     void deselect();
     int getZIndex();
-    virtual void drawBoundingRect(QPainter *p);
-    virtual void drawBoundingRect(SkCanvas *canvas,
-                                  const SkScalar &invScale);
+    void drawBoundingRect(QPainter *p);
+    void drawBoundingRectSk(SkCanvas *canvas,
+                            const SkScalar &invScale);
 
     void setParent(BoxesGroup *parent,
                    const bool &saveUndoRedo = true);
@@ -273,6 +275,10 @@ public:
     void saveUglyPaintTransform();
     void drawAsBoundingRect(QPainter *p,
                             const QPainterPath &path);
+    void drawAsBoundingRectSk(SkCanvas *canvas,
+                              const SkPath &path,
+                              const SkScalar &invScale);
+
     virtual void setUpdateVars();
     void redoUpdate();
     bool shouldRedoUpdate();
@@ -314,10 +320,15 @@ public:
         return mEffectsMargin;
     }
 
-    virtual QImage getAllUglyPixmapProvidedTransform(const qreal &effectsMargin,
+    virtual QImage getAllUglyPixmapProvidedTransform(
+                        const qreal &effectsMargin,
                         const qreal &resolution,
                         const QMatrix &allUglyTransform,
                         QPoint *drawPosP);
+    virtual sk_sp<SkImage> getAllUglyPixmapProvidedTransformSk(
+                        const qreal &effectsMargin,
+                        const qreal &resolution,
+                        const QMatrix &allUglyTransform);
 
     virtual Canvas *getParentCanvas();
 
@@ -363,27 +374,15 @@ public:
         drawHoveredPath(p, mRelBoundingRectPath);
     }
 
-    virtual void drawHovered(SkCanvas *canvas) {
-        Q_UNUSED(canvas);
-        //drawHoveredPath(canvas, mRelBoundingRectPath);
+    virtual void drawHoveredSk(SkCanvas *canvas,
+                               const SkScalar &invScale) {
+        drawHoveredPathSk(canvas, mSkRelBoundingRectPath, invScale);
     }
 
-    void drawHoveredPath(QPainter *p, const QPainterPath &path) {
-        p->save();
-        p->setTransform(QTransform(mTransformAnimator->getCombinedTransform()),
-                        true);
-        QPen pen = QPen(Qt::black, 2.);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        p->setBrush(Qt::NoBrush);
-        p->drawPath(path);
-
-        pen = QPen(Qt::red, 1.);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        p->drawPath(path);
-        p->restore();
-    }
+    void drawHoveredPath(QPainter *p, const QPainterPath &path);
+    void drawHoveredPathSk(SkCanvas *canvas,
+                           const SkPath &path,
+                           const SkScalar &invScale);
 
     virtual void applyPaintSetting(
             const PaintSetting &setting) {
@@ -494,6 +493,7 @@ protected:
     bool mAwaitingUpdate = false;
 
     QPainterPath mRelBoundingRectPath;
+    SkPath mSkRelBoundingRectPath;
 
     int mUsedAsTargetCount = 0;
 

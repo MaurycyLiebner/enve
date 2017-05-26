@@ -3,6 +3,7 @@
 #include "Boxes/boundingbox.h"
 #include "Animators/paintsettings.h"
 class GradientPoints;
+class SkStroke;
 typedef QSharedPointer<GradientPoints> GradientPointsQSPtr;
 
 class PathBox : public BoundingBox {
@@ -12,6 +13,7 @@ public:
     ~PathBox();
 
     void draw(QPainter *p);
+    void drawSk(SkCanvas *canvas);
 
     void schedulePathUpdate();
 
@@ -64,7 +66,8 @@ public:
 
     void makeDuplicate(Property *targetBox);
 
-    virtual void drawHovered(QPainter *p);
+    void drawHovered(QPainter *p);
+    void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 
     void applyPaintSetting(
             const PaintSetting &setting);
@@ -98,12 +101,16 @@ protected:
     bool mOutlinePathUpdateNeeded = false;
 
     QPainterPath mUpdatePath;
+    SkPath mUpdatePathSk;
     QPainterPath mUpdateOutlinePath;
+    SkPath mUpdateOutlinePathSk;
     bool mFillSettingsGradientUpdateNeeded = false;
     bool mStrokeSettingsGradientUpdateNeeded = false;
     UpdatePaintSettings mUpdateFillSettings;
     UpdateStrokeSettings mUpdateStrokeSettings;
 
+    SkPath mPathSk;
+    SkPath mOutlinePathSk;
     QPainterPath mPath;
     QPainterPath mOutlinePath;
     QPainterPath mWholePath;

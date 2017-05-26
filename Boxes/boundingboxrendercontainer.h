@@ -24,8 +24,12 @@ public:
         return mImage.byteCount();
     }
 
-    QImage getImage(){
+    QImage getImage() {
         return mImage;
+    }
+
+    sk_sp<SkImage> getImageSk() {
+        return mImageSk;
     }
 
     void replaceImage(const QImage &img);
@@ -45,7 +49,7 @@ public:
                              const int &startFrame,
                              const int &endFrame);
     virtual void draw(QPainter *p);
-    virtual void drawToSkiaCanvas(SkCanvas *canvas);
+    virtual void drawSk(SkCanvas *canvas);
 
     void setBlocked(const bool &bT) {
         if(bT == mBlocked) return;
@@ -59,7 +63,7 @@ public:
 
 protected:
     bool mBlocked = false;
-    sk_sp<SkImage> mSkImage;
+    sk_sp<SkImage> mImageSk;
     QImage mImage;
     CacheHandler *mParentCacheHandler = NULL;
     int mMinRelFrame = 0;
@@ -72,7 +76,7 @@ public:
     virtual ~RenderContainer() {}
 
     void draw(QPainter *p);
-    void drawToSkiaCanvas(SkCanvas *canvas);
+    void drawSk(SkCanvas *canvas);
 
     void updatePaintTransformGivenNewCombinedTransform(
             const QMatrix &combinedTransform);
@@ -100,6 +104,7 @@ public:
                       const QMatrix &paintTransform,
                       const QPoint &drawpos,
                       const QImage &img,
+                      const sk_sp<SkImage> &imgSk,
                       const qreal &res);
     void duplicateFrom(RenderContainer *src);
 protected:

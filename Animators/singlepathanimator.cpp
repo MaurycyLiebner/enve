@@ -121,8 +121,7 @@ PathPoint *SinglePathAnimator::addPointRelPos(const QPointF &relPos,
 //    }
 //}
 
-void SinglePathAnimator::updatePath()
-{
+void SinglePathAnimator::updatePath() {
     mPath = QPainterPath();
     //mPath.setFillRule(Qt::WindingFill);
 
@@ -140,6 +139,31 @@ void SinglePathAnimator::updatePath()
         mPath.cubicTo(lastPointValues.endRelPos,
                       pointValues.startRelPos,
                       pointValues.pointRelPos);
+
+        lastPointValues = pointValues;
+
+        if(point == mFirstPoint) break;
+    }
+}
+
+void SinglePathAnimator::updateSkPath() {
+    mSkPath = SkPath();
+    //mPath.setFillRule(Qt::WindingFill);
+
+    PathPoint *point = mFirstPoint;
+    PathPointValues lastPointValues;
+    lastPointValues = point->getPointValues();
+    mSkPath.moveTo(QPointFToSkPoint(lastPointValues.pointRelPos));
+    while(true) {
+        point = point->getNextPoint();
+        if(point == NULL) break;
+        PathPointValues pointValues;
+
+        pointValues = point->getPointValues();
+
+        mSkPath.cubicTo(QPointFToSkPoint(lastPointValues.endRelPos),
+                        QPointFToSkPoint(pointValues.startRelPos),
+                        QPointFToSkPoint(pointValues.pointRelPos));
 
         lastPointValues = pointValues;
 
@@ -624,17 +648,26 @@ void SinglePathAnimator::drawSelected(SkCanvas *canvas,
 //        p->setTransform(QTransform(combinedTransform), true);
 //        p->setCompositionMode(QPainter::CompositionMode_Difference);
 //        p->drawPath(mPath);
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(invScale);
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setColor(SK_ColorWHITE);
+        //paint.setBlendMode(SkBlendMode::kDifference);
+        SkPath mappedPath = mSkPath;
+        mappedPath.transform(combinedTransform);
+        canvas->drawPath(mappedPath, paint);
         canvas->restore();
 
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             const QSharedPointer<PathPoint> &point = mPoints.at(i);
-            point->draw(canvas, currentCanvasMode, invScale);
+            point->drawSk(canvas, currentCanvasMode, invScale);
         }
     } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             const QSharedPointer<PathPoint> &point = mPoints.at(i);
             if(point->isEndPoint() || point->isSelected()) {
-                point->draw(canvas, currentCanvasMode, invScale);
+                point->drawSk(canvas, currentCanvasMode, invScale);
             }
         }
     }

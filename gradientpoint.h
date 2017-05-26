@@ -3,11 +3,11 @@
 #include "movablepoint.h"
 class PathBox;
 
-class GradientPoint : public MovablePoint
-{
+class GradientPoint : public MovablePoint {
 public:
     GradientPoint(PathBox *parent);
-    void setRelativePos(const QPointF &relPos, const bool &saveUndoRedo);
+    void setRelativePos(const QPointF &relPos,
+                        const bool &saveUndoRedo);
     void moveByRel(const QPointF &relTranslatione);
     void setColor(QColor fillColor);
     void draw(QPainter *p);

@@ -110,7 +110,7 @@ public:
 
     void draw(QPainter *p,
               const CanvasMode &mode);
-    void draw(SkCanvas *canvas,
+    void drawSk(SkCanvas *canvas,
               const CanvasMode &mode,
               const SkScalar &invScale);
 

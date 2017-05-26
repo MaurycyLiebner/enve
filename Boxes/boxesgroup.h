@@ -153,7 +153,7 @@ public:
     }
     void clearAllCache();
     void drawPixmap(QPainter *p);
-    void drawPixmap(SkCanvas *canvas);
+    void drawPixmapSk(SkCanvas *canvas);
     void setDescendantCurrentGroup(const bool &bT);
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();

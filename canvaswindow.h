@@ -21,7 +21,7 @@ class PaintSetting;
 class CanvasWindow : public GLWindow, public SingleWidgetTarget {
     Q_OBJECT
 public:
-    explicit CanvasWindow();
+    explicit CanvasWindow(QWidget *parent);
     ~CanvasWindow();
 
     Canvas *getCurrentCanvas();
@@ -98,9 +98,9 @@ public:
         //mWidgetContainer->grabMouse();
     }
 
-    bool hasFocus() {
-        return mWidgetContainer->hasFocus();
-    }
+//    bool hasFocus() {
+//        return mWidgetContainer->hasFocus();
+//    }
 
     void repaint() {
         mWidgetContainer->update();
@@ -120,6 +120,8 @@ public:
         return mWidgetContainer->mouseGrabber() == mWidgetContainer;
     }
 
+    void dropEvent(QDropEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
 protected:
     QWidget *mWidgetContainer;
     void setRendering(const bool &bT);
@@ -151,8 +153,6 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
-    void dropEvent(QDropEvent *event);
-    void dragEnterEvent(QDragEnterEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
     void nextCurrentRenderFrame();

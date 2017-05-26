@@ -449,7 +449,7 @@ void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
     p->restore();
 }
 
-void PathPoint::draw(SkCanvas *canvas,
+void PathPoint::drawSk(SkCanvas *canvas,
                      const CanvasMode &mode,
                      const SkScalar &invScale) {
     canvas->save();
@@ -473,31 +473,31 @@ void PathPoint::draw(SkCanvas *canvas,
         SkPaint paint;
         paint.setAntiAlias(true);
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            SkPoint endAbsPos =
+                    QPointFToSkPoint(mEndCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
 
-            SkPoint endAbsPos =
-                    QPointFToSkPoint(mEndCtrlPt->getAbsolutePos());
             canvas->drawLine(absPos, endAbsPos, paint);
             paint.setColor(SK_ColorWHITE);
             paint.setStrokeWidth(0.75*invScale);
             canvas->drawLine(absPos, endAbsPos, paint);
         }
         if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
+            SkPoint startAbsPos =
+                    QPointFToSkPoint(mStartCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
-            SkPoint startAbsPos =
-                    QPointFToSkPoint(mStartCtrlPt->getAbsolutePos());
             canvas->drawLine(absPos, startAbsPos, paint);
 
             paint.setColor(SK_ColorWHITE);
             paint.setStrokeWidth(0.75*invScale);
             canvas->drawLine(absPos, startAbsPos, paint);
         }
-        mEndCtrlPt->draw(canvas, invScale);
-        mStartCtrlPt->draw(canvas, invScale);
+        mEndCtrlPt->drawSk(canvas, invScale);
+        mStartCtrlPt->drawSk(canvas, invScale);
     }
 
 //    if(isCtrlPressed()) {

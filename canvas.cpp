@@ -212,11 +212,11 @@ void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
     }
 }
 
-void Canvas::drawSelected(SkCanvas *canvas,
+void Canvas::drawSelectedSk(SkCanvas *canvas,
                           const CanvasMode &currentCanvasMode,
                           const SkScalar &invScale) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->drawSelected(canvas, currentCanvasMode, invScale);
+        box->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }
 }
 
@@ -266,7 +266,7 @@ void Canvas::renderToSkiaCanvas(SkCanvas *canvas) {
         canvas->scale(reversedRes, reversedRes);
 
         if(mCurrentPreviewContainer != NULL) {
-            mCurrentPreviewContainer->drawToSkiaCanvas(canvas);
+            mCurrentPreviewContainer->drawSk(canvas);
             //p->drawImage(QPointF(0., 0.), mCurrentPreviewContainer->getImage());
         }
         canvas->restore();
@@ -282,29 +282,30 @@ void Canvas::renderToSkiaCanvas(SkCanvas *canvas) {
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         SkScalar invScale = 1./mCanvasTransformMatrix.m11();
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
-            box->drawPixmap(canvas);
+            box->drawPixmapSk(canvas);
         }
 //        QPen pen = QPen(Qt::black, 1.5);
 //        pen.setCosmetic(true);
 //        p->setPen(pen);
-        mCurrentBoxesGroup->drawSelected(canvas,
-                                         mCurrentMode,
-                                         invScale);
-        drawSelected(canvas, mCurrentMode, invScale);
+        mCurrentBoxesGroup->drawSelectedSk(canvas,
+                                           mCurrentMode,
+                                           invScale);
+        drawSelectedSk(canvas, mCurrentMode, invScale);
 
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
-            mRotPivot->draw(canvas, invScale);
+            mRotPivot->drawSk(canvas, invScale);
         }
 //        pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
 //        pen.setCosmetic(true);
 //        p->setPen(pen);
         if(mSelecting) {
             paint.setStyle(SkPaint::kStroke_Style);
-            paint.setColor(SkColorSetARGBInline(125, 0, 0, 255));
+            paint.setColor(SkColorSetARGBInline(255, 0, 0, 255));
             paint.setStrokeWidth(2.);
-            SkScalar intervals[2] = {10, 20};
-            paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 25));
+            SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f,
+                                     MIN_WIDGET_HEIGHT*0.25f};
+            paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
             canvas->drawRect(QRectFToSkRect(mSelectionRect), paint);
             paint.setPathEffect(NULL);
             //SkPath selectionPath;
@@ -315,10 +316,10 @@ void Canvas::renderToSkiaCanvas(SkCanvas *canvas) {
         if(mHoveredPoint != NULL) {
             mHoveredPoint->drawHovered(canvas, invScale);
         } else if(mHoveredEdge != NULL) {
-            mHoveredEdge->drawHoveredToSkiaCanvas(canvas);
+            mHoveredEdge->drawHoveredSk(canvas, invScale);
         } else if(mHoveredBox != NULL) {
             if(mCurrentEdge == NULL) {
-                mHoveredBox->drawHovered(canvas);
+                mHoveredBox->drawHoveredSk(canvas, invScale);
             }
         }
 

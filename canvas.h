@@ -305,7 +305,7 @@ public:
     BoundingBox *createLink(BoxesGroup *parent);
     void createImageBox(const QString &path);
     void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
-    void drawSelected(SkCanvas *canvas,
+    void drawSelectedSk(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale);
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,

@@ -3,14 +3,13 @@
 #include <QPointF>
 #include <QRectF>
 #include <QPainter>
-#include "SkPoint.h"
 #include "Animators/qpointfanimator.h"
 #include "transformable.h"
+#include "SkCanvas.h"
 
 class BoundingBox;
 class PathPoint;
 class QSqlQuery;
-class SkCanvas;
 
 class AnimatorUpdater;
 
@@ -41,8 +40,8 @@ public:
     QPointF getAbsolutePos() const;
 
     virtual void draw(QPainter *p);
-    virtual void draw(SkCanvas *canvas,
-                      const SkScalar &invScale);
+    virtual void drawSk(SkCanvas *canvas,
+                        const SkScalar &invScale);
 
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);

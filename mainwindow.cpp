@@ -93,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     mBottomDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::BottomDockWidgetArea, mBottomDock);
 
-    mCanvasWindow = new CanvasWindow();
+    mCanvasWindow = new CanvasWindow(this);
     connect(mMemoryHandler, SIGNAL(allMemoryUsed()),
             mCanvasWindow, SLOT(outOfMemory()));
 
@@ -869,6 +869,14 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
             mShiftPressed = false;
         } else if(key_event->key() == Qt::Key_Alt) {
             mAltPressed = false;
+        }
+    } else if(obj == mCanvasWindow->getWidgetContainer()) {
+        if(e->type() == QEvent::Drop) {
+            mCanvasWindow->dropEvent((QDropEvent*)e);
+        } else if(e->type() == QEvent::DragEnter) {
+            mCanvasWindow->dragEnterEvent((QDragEnterEvent*)e);
+        } else if(e->type() == QEvent::FocusIn) {
+            mCanvasWindow->getWidgetContainer();
         }
     }
     return QMainWindow::eventFilter(obj, e);

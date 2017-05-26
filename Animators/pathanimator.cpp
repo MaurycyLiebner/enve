@@ -128,13 +128,15 @@ void PathAnimator::loadPathFromQPainterPath(const QPainterPath &path) {
     }
 }
 
-void PathAnimator::updatePath()
-{
+void PathAnimator::updatePath() {
     mPath = QPainterPath();
+    mSkPath = SkPath();
 
     Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->updatePath();
         mPath.addPath(singlePath->getCurrentPath());
+        singlePath->updateSkPath();
+        mSkPath.addPath(singlePath->getCurrentSkPath());
     }
 }
 
@@ -190,8 +192,12 @@ MovablePoint *PathAnimator::qra_getPointAt(
     return NULL;
 }
 
-QPainterPath PathAnimator::getCurrentPath() {
+const QPainterPath &PathAnimator::getCurrentPath() {
     return mPath;
+}
+
+const SkPath &PathAnimator::getCurrentSkPath() {
+    return mSkPath;
 }
 
 void PathAnimator::drawSelected(QPainter *p,

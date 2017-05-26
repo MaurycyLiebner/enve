@@ -38,3 +38,23 @@ QPointF SkPointToQPointF(const SkPoint &point) {
 SkPoint QPointFToSkPoint(const QPointF &point) {
     return SkPoint::Make(point.x(), point.y());
 }
+
+SkPaint::Cap QCapToSkCap(const Qt::PenCapStyle &cap) {
+    if(cap == Qt::RoundCap) {
+        return SkPaint::kRound_Cap;
+    }
+    if(cap == Qt::SquareCap) {
+        return SkPaint::kSquare_Cap;
+    }
+    return SkPaint::kButt_Cap;
+}
+
+SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join) {
+    if(join == Qt::RoundJoin) {
+        return SkPaint::kRound_Join;
+    }
+    if(join == Qt::BevelJoin) {
+        return SkPaint::kBevel_Join;
+    }
+    return SkPaint::kMiter_Join;
+}

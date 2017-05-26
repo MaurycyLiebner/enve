@@ -13,10 +13,8 @@ class MovablePoint;
 class SkMatrix;
 
 class PathPoint;
-typedef float SkScalar;
-
-class SinglePathAnimator : public ComplexAnimator
-{
+#include "SkPath.h"
+class SinglePathAnimator : public ComplexAnimator {
     Q_OBJECT
 public:
     SinglePathAnimator(PathAnimator *parentPath);
@@ -27,11 +25,16 @@ public:
                             const qreal &canvasScaleInv);
     QPointF getRelCenterPosition();
     void updatePath();
+    void updateSkPath();
     MovablePoint *qra_getPointAt(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
-    QPainterPath getCurrentPath() {
+    const QPainterPath &getCurrentPath() {
         return mPath;
+    }
+
+    const SkPath &getCurrentSkPath() {
+        return mSkPath;
     }
 
     //void loadPointsFromSql(int boundingBoxId);
@@ -92,6 +95,7 @@ public:
 private:
     PathAnimator *mParentPathAnimator = NULL;
     QPainterPath mPath;
+    SkPath mSkPath;
     PathPoint *mFirstPoint = NULL;
     QList<QSharedPointer<PathPoint> > mPoints;
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,

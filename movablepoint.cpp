@@ -170,7 +170,7 @@ void MovablePoint::draw(QPainter *p) {
     drawOnAbsPos(p, getAbsolutePos());
 }
 
-void MovablePoint::draw(SkCanvas *canvas,
+void MovablePoint::drawSk(SkCanvas *canvas,
                         const SkScalar &invScale) {
     if(isHidden()) {
         return;

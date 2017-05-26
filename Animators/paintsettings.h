@@ -4,6 +4,9 @@
 #include "qrealanimator.h"
 #include "coloranimator.h"
 #include "Colors/color.h"
+#include "SkCanvas.h"
+#include "SkColor.h"
+class SkStroke;
 
 enum PaintType : short {
     NOPAINT,
@@ -234,7 +237,8 @@ private:
 
     bool mQGradientStopsUpdateNeeded = false;
 };
-
+#include "SkPaint.h"
+#include "SkGradientShader.h"
 struct UpdatePaintSettings {
     UpdatePaintSettings(const QColor &paintColorT,
                         const PaintType &paintTypeT,
@@ -258,17 +262,63 @@ struct UpdatePaintSettings {
         }
     }
 
+    virtual void applyPainterSettingsSk(SkPaint *paint) {
+        if(paintType == GRADIENTPAINT) {
+            //p->setBrush(gradient);
+            paint->setShader(gradientSk);
+        } else if(paintType == FLATPAINT) {
+            paint->setColor(SkColorSetARGBInline(paintColor.alpha(),
+                                                 paintColor.red(),
+                                                 paintColor.green(),
+                                                 paintColor.blue()));
+        } else {
+            paint->setColor(SkColorSetARGBInline(0, 0, 0, 0));
+        }
+    }
+
     void updateGradient(const QGradientStops &stops,
                         const QPointF &start,
                         const QPointF &finalStop) {
         gradient.setStops(stops);
         gradient.setStart(start);
         gradient.setFinalStop(finalStop);
+
+        int nStops = stops.count();
+        SkPoint gradPoints[nStops];
+        SkColor gradColors[nStops];
+        SkScalar gradPos[nStops];
+        SkScalar xInc = finalStop.x() - start.x();
+        SkScalar yInc = finalStop.y() - start.y();
+        SkScalar currX = start.x();
+        SkScalar currY = start.y();
+        SkScalar currT = 0.f;
+        SkScalar tInc = 1.f/(nStops - 1);
+
+        for(int i = 0; i < nStops; i++) {
+            const QGradientStop &stopT = stops.at(i);
+            QColor col = stopT.second;
+            gradPoints[i] = SkPoint::Make(currX, currY);
+            gradColors[i] = SkColorSetARGBInline(col.alpha(),
+                                                 col.red(),
+                                                 col.green(),
+                                                 col.blue());
+            gradPos[i] = currT;
+
+            currX += xInc;
+            currY += yInc;
+            currT += tInc;
+        }
+        gradientSk = SkGradientShader::MakeLinear(gradPoints,
+                                                  gradColors,
+                                                  gradPos,
+                                                  nStops,
+                                                  SkShader::kClamp_TileMode);
     }
 
     QColor paintColor;
     PaintType paintType;
     QLinearGradient gradient;
+    sk_sp<SkShader> gradientSk;
 };
 
 struct UpdateStrokeSettings : UpdatePaintSettings {
@@ -286,6 +336,11 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
     void applyPainterSettings(QPainter *p) {
         UpdatePaintSettings::applyPainterSettings(p);
         p->setCompositionMode(outlineCompositionMode);
+    }
+
+    void applyPainterSettingsSk(SkPaint *paint) {
+        UpdatePaintSettings::applyPainterSettingsSk(paint);
+        //canvas->setCompositionMode(outlineCompositionMode);
     }
 
     QPainter::CompositionMode outlineCompositionMode =
@@ -314,6 +369,7 @@ public:
     void setJoinStyle(const Qt::PenJoinStyle &joinStyle);
 
     void setStrokerSettings(QPainterPathStroker *stroker);
+    void setStrokerSettingsSk(SkStroke *stroker);
 
     qreal getCurrentStrokeWidth() const;
 
