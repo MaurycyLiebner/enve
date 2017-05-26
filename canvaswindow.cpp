@@ -8,10 +8,10 @@
 #include "renderoutputwidget.h"
 #include "Sound/soundcomposition.h"
 #include "global.h"
+#include "canvaswidget.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
-
     mPaintControlerThread = new QThread(this);
     mPaintControler = new PaintControler();
     mPaintControler->moveToThread(mPaintControlerThread);
@@ -27,14 +27,15 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
 
     initializeAudio();
 
-    mWidgetContainer = QWidget::createWindowContainer(this, parent);
-    mWidgetContainer->setAcceptDrops(true);
-    mWidgetContainer->setFocusPolicy(Qt::StrongFocus);
-    mWidgetContainer->setMinimumSize(MIN_WIDGET_HEIGHT*10,
-                                     MIN_WIDGET_HEIGHT*10);
-    mWidgetContainer->setSizePolicy(QSizePolicy::Minimum,
-                                    QSizePolicy::Minimum);
-    mWidgetContainer->setMouseTracking(true);
+    //mCanvasWidget = QWidget::createWindowContainer(this, parent);
+    mCanvasWidget = new CanvasWidget(this, parent);
+    mCanvasWidget->setAcceptDrops(true);
+    mCanvasWidget->setFocusPolicy(Qt::NoFocus);
+    mCanvasWidget->setMinimumSize(MIN_WIDGET_HEIGHT*10,
+                                  MIN_WIDGET_HEIGHT*10);
+    mCanvasWidget->setSizePolicy(QSizePolicy::Minimum,
+                                 QSizePolicy::Minimum);
+    mCanvasWidget->setMouseTracking(true);
 }
 
 CanvasWindow::~CanvasWindow() {
@@ -207,12 +208,17 @@ void CanvasWindow::renameCurrentCanvas(const QString &newName) {
 
 void CanvasWindow::qRender(QPainter *p) {
     if(mCurrentCanvas == NULL) return;
+    mCurrentCanvas->drawInputText(p);
+}
+
+void CanvasWindow::render(QPainter *p) {
+    if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->paintEvent(p);
 }
 
-void CanvasWindow::render(SkCanvas *canvas) {
+void CanvasWindow::renderSk(SkCanvas *canvas) {
     if(mCurrentCanvas == NULL) return;
-    mCurrentCanvas->renderToSkiaCanvas(canvas);
+    mCurrentCanvas->renderSk(canvas);
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
@@ -530,7 +536,7 @@ void CanvasWindow::renderOutput() {
                                         size.width(),
                                         size.height(),
                                         MainWindow::getInstance());
-    connect(dialog, SIGNAL(render(QString, qreal)),
+    connect(dialog, SIGNAL(renderSk(QString, qreal)),
             this, SLOT(saveOutput(QString, qreal)));
     dialog->exec();
 }
@@ -938,6 +944,34 @@ void CanvasWindow::importFile(const QString &path) {
     MainWindow::getInstance()->enable();
 
     MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+QWidget *CanvasWindow::getCanvasWidget() {
+    return mCanvasWidget;
+}
+
+void CanvasWindow::grabMouse() {
+    mMouseGrabber = true;
+    //mWidgetContainer->grabMouse();
+}
+
+void CanvasWindow::repaint() {
+    mCanvasWidget->update();
+}
+
+QRect CanvasWindow::rect() {
+    return mCanvasWidget->rect();
+}
+
+void CanvasWindow::releaseMouse() {
+    mMouseGrabber = false;
+    //        QWidget *grabber = mWidgetContainer->mouseGrabber();
+    //        mWidgetContainer->releaseMouse();
+    //        grabber = mWidgetContainer->mouseGrabber();
+}
+
+bool CanvasWindow::isMouseGrabber() {
+    return mMouseGrabber;
 }
 
 void CanvasWindow::importFile() {

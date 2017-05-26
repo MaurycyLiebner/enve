@@ -95,7 +95,7 @@ void GLWindow::renderNow() {
     glOrthoAndViewportSet(width(), height());
     mCanvas->clear(SK_ColorWHITE);
     mCanvas->save();
-    render(mCanvas);
+    renderSk(mCanvas);
     mCanvas->restore();
     mCanvas->flush();
 
@@ -107,6 +107,7 @@ void GLWindow::renderNow() {
 //    qRender(&painter);
 
     m_context->swapBuffers(this);
+
     //m_context->doneCurrent();
 }
 

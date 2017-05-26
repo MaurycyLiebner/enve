@@ -6,7 +6,7 @@
 BoxesListKeysViewWidgetResizer::BoxesListKeysViewWidgetResizer(
                                                 QWidget *parent) :
     QWidget(parent) {
-    setFixedHeight(MIN_WIDGET_HEIGHT/2);
+    setFixedHeight(10);
     setFixedWidth(2*MIN_WIDGET_HEIGHT*100);
     setCursor(Qt::SplitVCursor);
     show();

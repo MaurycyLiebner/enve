@@ -40,7 +40,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mVisibleWidth = mWidth;
     mVisibleHeight = mHeight;
     mCanvasWindow = canvasWidget;
-    mCanvasWidget = mCanvasWindow->getWidgetContainer();
+    mCanvasWidget = mCanvasWindow->getCanvasWidget();
 
     mCurrentBoxesGroup = this;
     mIsCurrentGroup = true;
@@ -247,7 +247,7 @@ void Canvas::updateHoveredElements() {
     updateHoveredBox();
 }
 
-void Canvas::renderToSkiaCanvas(SkCanvas *canvas) {
+void Canvas::renderSk(SkCanvas *canvas) {
     SkRect viewRect = QRectFToSkRect(getPixBoundingRect());
 
     SkPaint paint;
@@ -325,6 +325,11 @@ void Canvas::renderToSkiaCanvas(SkCanvas *canvas) {
 
         canvas->resetMatrix();
 
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setStrokeWidth(2.);
+        paint.setColor(SK_ColorBLACK);
+        canvas->drawRect(viewRect.makeInset(1, 1),
+                         paint);
         if(mInputTransformationEnabled) {
             SkRect inputRect = SkRect::MakeXYWH(
                                     2*MIN_WIDGET_HEIGHT,
@@ -334,27 +339,32 @@ void Canvas::renderToSkiaCanvas(SkCanvas *canvas) {
             paint.setColor(SkColorSetARGBInline(255, 225, 225, 225));
             canvas->drawRect(inputRect, paint);
             QString transStr;
-            if(mXOnlyTransform) {
+            if(mRotPivot->isRotating()) {
+                transStr = "rot: " + mInputText + "|";
+            } else if(mXOnlyTransform) {
                 transStr = " x: " + mInputText + "|";
             } else if(mYOnlyTransform) {
                 transStr = " y: " + mInputText + "|";
             } else {
                 transStr = " x, y: " + mInputText + "|";
             }
-            canvas->drawString(transStr.toStdString().c_str(),
-                               inputRect.x(),
-                               inputRect.y(),
-                               paint);
+            paint.setTextSize(FONT_HEIGHT);
+            SkRect bounds;
+            paint.measureText(transStr.toStdString().c_str(),
+                              transStr.size()*sizeof(char),
+                              &bounds);
+            paint.setColor(SK_ColorBLACK);
+            paint.setTypeface(SkTypeface::MakeDefault());
+            canvas->drawString(
+                   transStr.toStdString().c_str(),
+                   inputRect.x() + paint.getTextSize(),
+                   inputRect.y() + 0.5*(inputRect.height() + FONT_HEIGHT),
+                   paint);
             //p->drawText(inputRect, Qt::AlignVCenter, transStr);
         }
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(2.);
-        paint.setColor(SK_ColorBLACK);
-        canvas->drawRect(viewRect.makeInset(1, 1),
-                         paint);
     }
 
-    if(mCanvasWidget->hasFocus()) {
+    if(mCanvasWindow->hasFocus()) {
         paint.setColor(SK_ColorRED);
         paint.setStrokeWidth(4.);
         canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width(),
@@ -430,7 +440,9 @@ void Canvas::paintEvent(QPainter *p) {
         }
 
         p->resetTransform();
-
+        p->setPen(QPen(Qt::black, 2.));
+        p->setBrush(Qt::NoBrush);
+        p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
         if(mInputTransformationEnabled) {
             QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
                                     mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
@@ -446,18 +458,33 @@ void Canvas::paintEvent(QPainter *p) {
             }
             p->drawText(inputRect, Qt::AlignVCenter, text);
         }
-        p->setPen(QPen(Qt::black, 2.));
-        p->setBrush(Qt::NoBrush);
-        p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
     }
 
-    if(mCanvasWidget->hasFocus() ) {
+    if(mCanvasWidget->hasFocus()) {
         p->setPen(QPen(Qt::red, 4.));
     } else {
         p->setPen(Qt::NoPen);
     }
     p->setBrush(Qt::NoBrush);
     p->drawRect(mCanvasWidget->rect());
+}
+
+void Canvas::drawInputText(QPainter *p) {
+    if(mInputTransformationEnabled) {
+        QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
+                                mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
+                                5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
+        p->fillRect(inputRect, QColor(225, 225, 225));
+        QString text;
+        if(mXOnlyTransform) {
+            text = " x: " + mInputText + "|";
+        } else if(mYOnlyTransform) {
+            text = " y: " + mInputText + "|";
+        } else {
+            text = " x, y: " + mInputText + "|";
+        }
+        p->drawText(inputRect, Qt::AlignVCenter, text);
+    }
 }
 
 bool Canvas::isMovingPath() {

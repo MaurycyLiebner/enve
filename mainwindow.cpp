@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupMenuBar();
 
-    setCentralWidget(mCanvasWindow->getWidgetContainer());
+    setCentralWidget(mCanvasWindow->getCanvasWidget());
 
     showMaximized();
 
@@ -870,13 +870,13 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e)
         } else if(key_event->key() == Qt::Key_Alt) {
             mAltPressed = false;
         }
-    } else if(obj == mCanvasWindow->getWidgetContainer()) {
+    } else if(obj == mCanvasWindow->getCanvasWidget()) {
         if(e->type() == QEvent::Drop) {
             mCanvasWindow->dropEvent((QDropEvent*)e);
         } else if(e->type() == QEvent::DragEnter) {
             mCanvasWindow->dragEnterEvent((QDragEnterEvent*)e);
         } else if(e->type() == QEvent::FocusIn) {
-            mCanvasWindow->getWidgetContainer();
+            mCanvasWindow->getCanvasWidget();
         }
     }
     return QMainWindow::eventFilter(obj, e);

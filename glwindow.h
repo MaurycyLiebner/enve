@@ -44,7 +44,7 @@ protected:
         Q_UNUSED(p);
     }
 
-    virtual void render(SkCanvas *canvas) {
+    virtual void renderSk(SkCanvas *canvas) {
         Q_UNUSED(canvas);
     }
 

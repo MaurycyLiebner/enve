@@ -6,6 +6,7 @@
 #include <QSqlQuery>
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
+#include "SkTypeface.h"
 
 class TextBox;
 class Circle;
@@ -268,7 +269,7 @@ public:
 
     void addChildAwaitingUpdate(BoundingBox *child);
 
-    void renderToSkiaCanvas(SkCanvas *canvas);
+    void renderSk(SkCanvas *canvas);
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        Q_FOREACH(BoundingBox *child, mChildBoxes) {
@@ -356,6 +357,7 @@ public:
     bool isPreviewingOrRendering() const {
         return mPreviewing || mRendering;
     }
+    void drawInputText(QPainter *p);
 private:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;

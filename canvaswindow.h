@@ -14,6 +14,7 @@ class BoxesGroup;
 class PaintControler;
 class SoundComposition;
 class PaintSetting;
+class CanvasWidget;
 
 #include <QSqlQuery>
 #include <QAudioOutput>
@@ -90,40 +91,42 @@ public:
 
     void importFile(const QString &path);
 
-    QWidget *getWidgetContainer() {
-        return mWidgetContainer;
+    QWidget *getCanvasWidget();
+
+    void grabMouse();
+
+    bool hasFocus() {
+        return mHasFocus;
     }
 
-    void grabMouse() {
-        //mWidgetContainer->grabMouse();
+    void setFocus() {
+        mHasFocus = true;
     }
 
-//    bool hasFocus() {
-//        return mWidgetContainer->hasFocus();
-//    }
-
-    void repaint() {
-        mWidgetContainer->update();
+    void clearFocus() {
+        mHasFocus = false;
     }
 
-    QRect rect() {
-        return mWidgetContainer->rect();
-    }
+    void repaint();
 
-    void releaseMouse() {
-//        QWidget *grabber = mWidgetContainer->mouseGrabber();
-//        mWidgetContainer->releaseMouse();
-//        grabber = mWidgetContainer->mouseGrabber();
-    }
+    QRect rect();
 
-    bool isMouseGrabber() {
-        return mWidgetContainer->mouseGrabber() == mWidgetContainer;
-    }
+    void releaseMouse();
+
+    bool isMouseGrabber();
 
     void dropEvent(QDropEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 protected:
-    QWidget *mWidgetContainer;
+    bool mMouseGrabber = false;
+    bool mHasFocus = false;
+    QWidget *mCanvasWidget;
     void setRendering(const bool &bT);
     void setPreviewing(const bool &bT);
 
@@ -148,13 +151,7 @@ protected:
     QList<Canvas*> mCanvasList;
 
     //void paintEvent(QPaintEvent *);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *event);
 
-    void keyPressEvent(QKeyEvent *event);
     void nextCurrentRenderFrame();
 
 
@@ -174,7 +171,8 @@ protected:
     // AUDIO
 
     void qRender(QPainter *p);
-    void render(SkCanvas *canvas);
+    void render(QPainter *p);
+    void renderSk(SkCanvas *canvas);
 signals:
     void updateBoxPixmaps(BoundingBox*);
     void changeCurrentFrame(int);

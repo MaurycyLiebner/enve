@@ -4,8 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += multimedia core gui svg opengl sql xml
-LIBS     += -lavutil -lavformat -lavcodec -lswscale -lswresample -ltcmalloc
+QT += multimedia core gui svg opengl sql xml widgets-private # gui-private core-private
+LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -ltcmalloc
 
 INCLUDEPATH += /home/ailuropoda/.skia/include/images/
 INCLUDEPATH += /home/ailuropoda/.skia/include/core/
@@ -161,7 +161,8 @@ SOURCES += main.cpp\
     skqtconversions.cpp \
     AddInclude/SkStroke.cpp \
     AddInclude/SkGeometry.cpp \
-    AddInclude/SkStrokerPriv.cpp
+    AddInclude/SkStrokerPriv.cpp \
+    canvaswidget.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -287,7 +288,8 @@ HEADERS  += mainwindow.h \
     AddInclude/SkGeometry.h \
     AddInclude/SkPathPriv.h \
     AddInclude/SkStrokerPriv.h \
-    AddInclude/SkNx.h
+    AddInclude/SkNx.h \
+    canvaswidget.h
 
 RESOURCES += \
     resources.qrc

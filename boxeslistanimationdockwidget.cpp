@@ -16,7 +16,7 @@
 
 ChangeWidthWidget::ChangeWidthWidget(QWidget *parent) :
     QWidget(parent) {
-    setFixedWidth(MIN_WIDGET_HEIGHT/2);
+    setFixedWidth(10);
     setFixedHeight(4000);
     setCursor(Qt::SplitHCursor);
 }

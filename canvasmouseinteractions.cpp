@@ -36,7 +36,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         if(pressedBox == NULL) {
             clearBoxesSelection();
 
-            QMenu menu(mCanvasWindow->getWidgetContainer());
+            QMenu menu(mCanvasWindow->getCanvasWidget());
 
             menu.addAction("Paste");
             QMenu *linkCanvasMenu = menu.addMenu("Link Canvas");
@@ -96,7 +96,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                 addBoxToSelection(pressedBox);
             }
 
-            QMenu menu(mCanvasWindow->getWidgetContainer());
+            QMenu menu(mCanvasWindow->getCanvasWidget());
 
             menu.addAction("Apply Transformation");
             menu.addAction("Create Link");
