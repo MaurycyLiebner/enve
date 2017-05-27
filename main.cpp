@@ -2,17 +2,40 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 
+void setDefaultFormat()
+{
+    QSurfaceFormat format;
+#ifdef Q_OS_OSX
+    format.setVersion(3, 2);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+#else
+    // XXX This can be removed once we move to Qt5.7
+    format.setVersion(3, 0);
+    format.setProfile(QSurfaceFormat::CompatibilityProfile);
+    format.setOptions(QSurfaceFormat::DeprecatedFunctions);
+#endif
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+    format.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    format.setSwapInterval(0); // Disable vertical refresh syncing
+    QSurfaceFormat::setDefaultFormat(format);
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QSurfaceFormat  format;
+    setDefaultFormat();
+//    QSurfaceFormat  format;
 
-    format.setSamples(4);
-    format.setStencilBufferSize(8);
-    //format.setVersion(3,2);
-    //format.setProfile(QSurfaceFormat::CoreProfile);
-    QSurfaceFormat::setDefaultFormat(format);
+//    //format.setVersion(3,2);
+//    format.setSamples(0);
+//    format.setStencilBufferSize(8);
+//    //format.setRenderableType(QSurfaceFormat::OpenGLES);
+//    //format.setSwapBehavior(QSurfaceFormat::SingleBuffer);
+
+//    //format.setProfile(QSurfaceFormat::CompatibilityProfile);
+//    QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
 

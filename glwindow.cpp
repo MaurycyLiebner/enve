@@ -12,12 +12,13 @@ GLWindow::GLWindow(QScreen *screen)
     : QWindow(screen), QOpenGLFunctions() {
     setSurfaceType(OpenGLSurface);
 }
-
+#include <QDebug>
 void GLWindow::bindSkia() {
     GrBackendRenderTarget backendRT = GrBackendRenderTarget(
                                         width(), height(),
                                         kMsaaSampleCount, kStencilBits,
-                                        kSkia8888_GrPixelConfig, m_fbInfo);
+                                        kRGBA_half_GrPixelConfig
+                                        /*kSkia8888_GrPixelConfig*/, m_fbInfo);
 
     // setup SkSurface
     // To use distance field text, use commented out SkSurfaceProps instead
@@ -25,13 +26,14 @@ void GLWindow::bindSkia() {
     //                      SkSurfaceProps::kLegacyFontHost_InitType);
     SkSurfaceProps props(SkSurfaceProps::kLegacyFontHost_InitType);
 
+    //sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGBLinear();
     mSurface = SkSurface::MakeFromBackendRenderTarget(
                                     mGrContext,
                                     backendRT,
                                     kBottomLeft_GrSurfaceOrigin,
                                     nullptr,
+                                    //colorSpace,
                                     &props);
-
     mCanvas = mSurface->getCanvas();
 }
 
@@ -62,6 +64,14 @@ void GLWindow::initialize() {
     GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
     m_fbInfo.fFBOID = buffer;
     bindSkia();
+
+//    qDebug() << "OpenGL Info";
+//    qDebug() << "  Vendor: " << reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+//    qDebug() << "  Renderer: " << QString((const char*)glGetString(GL_RENDERER));;
+//    qDebug() << "  Version: " << reinterpret_cast<const char *>(glGetString(GL_VERSION));
+//    qDebug() << "  Shading language: " << reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
+//    qDebug() << "  Requested format: " << QSurfaceFormat::defaultFormat();
+//    qDebug() << "  Current format:   " << m_context->format();
 }
 
 //void glOrthoAndViewportSet(GLuint w, GLuint h) {
@@ -72,7 +82,7 @@ void GLWindow::initialize() {
 //    glMatrixMode(GL_MODELVIEW);
 //}
 
-
+#include "Colors/ColorWidgets/colorwidget.h"
 void GLWindow::renderNow() {
     if(!isExposed()) return;
 
@@ -92,12 +102,16 @@ void GLWindow::renderNow() {
         initialize();
     }
 
+
     glOrthoAndViewportSet(width(), height());
+
     mCanvas->clear(SK_ColorWHITE);
     mCanvas->save();
     renderSk(mCanvas);
+
     mCanvas->restore();
     mCanvas->flush();
+
 
 //    if(!m_device) m_device = new QOpenGLPaintDevice;
 

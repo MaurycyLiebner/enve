@@ -79,6 +79,8 @@ CanvasWidget::CanvasWidget(CanvasWindow *window,
                            const Qt::WindowFlags &flags) :
     QWindowContainer(window, parent, flags) {
     mCanvasWindow = window;
+    setAttribute(Qt::WA_NoSystemBackground, true);
+    setAttribute(Qt::WA_DontCreateNativeAncestors, true);
 }
 
 void CanvasWidget::paintEvent(QPaintEvent *event) {

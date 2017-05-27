@@ -317,14 +317,15 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
                          effectsMargin, effectsMargin);
     QSizeF sizeF = allUglyBoundingRect.size();
 
+    sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGBLinear();
     SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
                                          ceil(sizeF.height()),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType);
-
+                                         kRGBA_F16_SkColorType,
+                                         //kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         colorSpace);
     sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
     SkCanvas *rasterCanvas = rasterSurface->getCanvas();
-
     rasterCanvas->save();
 
     rasterCanvas->translate(-allUglyBoundingRect.left(),
