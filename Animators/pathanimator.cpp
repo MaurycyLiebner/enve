@@ -3,6 +3,7 @@
 #include "pathpoint.h"
 #include "undoredo.h"
 #include "edge.h"
+#include "skiaincludes.h"
 #include <QSqlRecord>
 
 PathAnimator::PathAnimator() :

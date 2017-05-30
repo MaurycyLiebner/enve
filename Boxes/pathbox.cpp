@@ -4,7 +4,7 @@
 #include "gradientpoint.h"
 #include "Animators/animatorupdater.h"
 #include "gradientpoints.h"
-#include "AddInclude/SkStroke.h"
+#include "skiaincludes.h"
 
 PathBox::PathBox(BoxesGroup *parent,
                  const BoundingBoxType &type) :

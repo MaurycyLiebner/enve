@@ -37,6 +37,13 @@ void ImageSequenceBox::loadUpdatePixmap() {
     if(mUpdateFramePath.isEmpty()) {
     } else {
         mUpdateAnimationImage.load(mUpdateFramePath);
+        {
+            sk_sp<SkData> data = SkData::MakeFromFileName(
+                        mUpdateFramePath.toLocal8Bit().data());
+            mUpdateAnimationImageSk = SkImage::MakeFromEncoded(data);
+        }
+
+
         mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
     } 
 }

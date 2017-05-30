@@ -79,6 +79,7 @@ void AnimationBox::afterSuccessfulUpdate() {
             cont = mAnimationFramesCache.createNewRenderContainerAtRelFrame(
                                                         mUpdateAnimationFrame);
             cont->replaceImage(mUpdateAnimationImage);
+            cont->replaceImageSk(mUpdateAnimationImageSk);
         }
     }
     mRelBoundingRect = mUpdateRelBoundingRect;
@@ -95,6 +96,7 @@ void AnimationBox::setUpdateVars() {
     mUpdatePixmapReloadScheduled = cont == NULL;
     if(cont != NULL) {
         mUpdateAnimationImage = cont->getImage();
+        mUpdateAnimationImageSk = cont->getImageSk();
         mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
     }
 }
@@ -109,6 +111,12 @@ void AnimationBox::preUpdatePixmapsUpdates() {
 void AnimationBox::draw(QPainter *p) {
     p->setRenderHint(QPainter::SmoothPixmapTransform);
     p->drawImage(0, 0, mUpdateAnimationImage);
+}
+
+void AnimationBox::drawSk(SkCanvas *canvas) {
+    SkPaint paint;
+    //paint.setFilterQuality(kHigh_SkFilterQuality);
+    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
 }
 
 bool AnimationBox::relPointInsidePath(const QPointF &point) {

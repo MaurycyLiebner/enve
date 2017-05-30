@@ -5,8 +5,7 @@
 class BonePoint;
 class PathPoint;
 class CtrlPoint;
-#include "SkCanvas.h"
-#include "SkPath.h"
+#include "skiaincludes.h"
 
 class VectorPathEdge : public StdSelfRef {
 public:

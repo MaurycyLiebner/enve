@@ -8,10 +8,11 @@
 #ifndef SkStroke_DEFINED
 #define SkStroke_DEFINED
 
+#include "skiadefines.h"
 #include "SkPath.h"
 #include "SkPoint.h"
 #include "SkPaint.h"
-//#include "SkStrokerPriv.h"
+#include "SkStrokerPriv.h"
 
 #ifdef SK_DEBUG
 extern bool gDebugStrokerErrorSet;

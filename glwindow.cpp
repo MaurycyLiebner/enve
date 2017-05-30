@@ -60,9 +60,9 @@ void GLWindow::initialize() {
 
     // Wrap the frame buffer object attached to the screen in
     // a Skia render target so Skia can render to it
-    GrGLint buffer;
-    GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
-    m_fbInfo.fFBOID = buffer;
+    //GrGLint buffer;
+    //GR_GL_GetIntegerv(mInterface, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+    m_fbInfo.fFBOID = m_context->defaultFramebufferObject();//buffer;
     bindSkia();
 
 //    qDebug() << "OpenGL Info";
@@ -89,7 +89,7 @@ void GLWindow::renderNow() {
     bool needsInitialize = false;
     if (!m_context) {
         m_context = new QOpenGLContext(this);
-        m_context->setFormat(requestedFormat());
+        m_context->setFormat(QSurfaceFormat::defaultFormat());
         m_context->create();
 
         needsInitialize = true;
@@ -108,6 +108,24 @@ void GLWindow::renderNow() {
     mCanvas->clear(SK_ColorWHITE);
     mCanvas->save();
     renderSk(mCanvas);
+//    SkPaint paint;
+//    SkPoint gradPoints[2];
+//    gradPoints[0] = SkPoint::Make(0.f, 0.f);
+//    gradPoints[1] = SkPoint::Make(width(), 0.f);
+//    SkColor gradColors[2];
+//    gradColors[0] = SkColorSetARGBInline(255, 0, 0, 0);
+//    gradColors[1] = SkColorSetARGBInline(0, 125, 125, 125);
+//    SkScalar gradPos[2];
+//    gradPos[0] = 0.f;
+//    gradPos[1] = 1.f;
+
+//    paint.setShader(SkGradientShader::MakeLinear(gradPoints,
+//                                                 gradColors,
+//                                                 gradPos, 2,
+//                                                 SkShader::kClamp_TileMode));
+//    paint.setAntiAlias(true);
+
+//    mCanvas->drawRect(SkRect::MakeWH(width(), height()), paint);
 
     mCanvas->restore();
     mCanvas->flush();

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += multimedia core gui svg opengl sql xml widgets-private # gui-private core-private
+QT += multimedia core gui svg opengl sql xml #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -ltcmalloc
 
 INCLUDEPATH += /home/ailuropoda/.skia/include/images/
@@ -21,22 +21,26 @@ INCLUDEPATH += /home/ailuropoda/.skia/third_party/externals/sdl/include/
 INCLUDEPATH += /home/ailuropoda/.skia/third_party/vulkan/
 INCLUDEPATH += /home/ailuropoda/.skia/src/gpu/
 
-LIBS     += -L/home/ailuropoda/.skia/out/Debug -lskia -lpthread -lfreetype \
-            -lpng -ldl -lSDL2 -lSDL2_image -lSDL2_ttf -lfontconfig
-#CONFIG += no_keywords
+CONFIG(debug, debug|release) {
+    LIBS += -L/home/ailuropoda/.skia/out/Debug
+} else {
+    LIBS += -L/home/ailuropoda/.skia/out/Release
+    QMAKE_CFLAGS -= -O2
+    QMAKE_CFLAGS -= -O1
+    QMAKE_CXXFLAGS -= -O2
+    QMAKE_CXXFLAGS -= -O1
+    QMAKE_CFLAGS = -m64 -O3
+    QMAKE_LFLAGS = -m64 -O3
+    QMAKE_CXXFLAGS = -m64 -O3
+}
+
+LIBS += -lskia -lpthread -lfreetype -lpng -ldl -lSDL2 -lSDL2_image \
+        -lSDL2_ttf -lfontconfig
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = AniVect
 TEMPLATE = app
-
-#QMAKE_CFLAGS -= -O2
-#QMAKE_CFLAGS -= -O1
-#QMAKE_CXXFLAGS -= -O2
-#QMAKE_CXXFLAGS -= -O1
-#QMAKE_CFLAGS = -m64 -O3
-#QMAKE_LFLAGS = -m64 -O3
-#QMAKE_CXXFLAGS = -m64 -O3
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -286,10 +290,12 @@ HEADERS  += mainwindow.h \
     AddInclude/SkStroke.h \
     AddInclude/SkPaintDefaults.h \
     AddInclude/SkGeometry.h \
-    AddInclude/SkPathPriv.h \
     AddInclude/SkStrokerPriv.h \
     AddInclude/SkNx.h \
-    canvaswidget.h
+    canvaswidget.h \
+    skiaincludes.h \
+    AddInclude/SkPathPriv.h \
+    skiadefines.h
 
 RESOURCES += \
     resources.qrc

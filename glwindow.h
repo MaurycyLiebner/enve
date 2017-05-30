@@ -4,29 +4,7 @@
 #include <QWindow>
 #include <QOpenGLFunctions>
 
-#undef foreach
-
-// for Release build
-//#define GR_GL_CHECK_ERROR false
-//#define GR_GL_LOG_CALLS false
-#include "GrBackendSurface.h"
-#include "GrContext.h"
-#include "SDL.h"
-#include "SkCanvas.h"
-#include "SkRandom.h"
-#include "SkSurface.h"
-#include "SkGradientShader.h"
-#include "SkPixelRef.h"
-#include "SkDashPathEffect.h"
-
-#include "gl/GrGLUtil.h"
-
-#include "gl/GrGLTypes.h"
-#include "gl/GrGLFunctions.h"
-#include "gl/GrGLInterface.h"
-
-#include <GL/gl.h>
-#define foreach Q_FOREACH
+#include "skiaincludes.h"
 
 #include <QResizeEvent>
 #include <QOpenGLPaintDevice>

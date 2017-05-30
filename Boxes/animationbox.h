@@ -18,6 +18,7 @@ public:
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
     bool relPointInsidePath(const QPointF &point);
     void draw(QPainter *p);
+    void drawSk(SkCanvas *canvas);
     virtual void loadUpdatePixmap() = 0;
     void preUpdatePixmapsUpdates();
     void setUpdateVars();
@@ -35,6 +36,7 @@ protected:
     int mCurrentAnimationFrame = 0;
     int mFramesCount = 0;
     QImage mUpdateAnimationImage;
+    sk_sp<SkImage> mUpdateAnimationImageSk;
 
     QSharedPointer<QrealAnimator> mTimeScaleAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();

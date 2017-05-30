@@ -27,8 +27,8 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
 
     initializeAudio();
 
-    //mCanvasWidget = QWidget::createWindowContainer(this, parent);
-    mCanvasWidget = new CanvasWidget(this, parent);
+    mCanvasWidget = QWidget::createWindowContainer(this, parent);
+    //mCanvasWidget = new CanvasWidget(this, parent);
     mCanvasWidget->setAcceptDrops(true);
     mCanvasWidget->setFocusPolicy(Qt::NoFocus);
     mCanvasWidget->setMinimumSize(MIN_WIDGET_HEIGHT*10,

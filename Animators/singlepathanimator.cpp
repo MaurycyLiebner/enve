@@ -5,7 +5,7 @@
 #include "edge.h"
 #include "Boxes/boundingbox.h"
 #include "canvas.h"
-#include "SkCanvas.h"
+#include "skiaincludes.h"
 
 SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
     ComplexAnimator() {

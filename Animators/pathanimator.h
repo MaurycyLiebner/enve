@@ -2,17 +2,15 @@
 #define PATHANIMATOR_H
 #include <QPainterPath>
 #include "complexanimator.h"
+#include "skiaincludes.h"
 
 enum CanvasMode : short;
 
 class VectorPathEdge;
 class MovablePoint;
-class SkCanvas;
 class PathPoint;
 class SinglePathAnimator;
 class BoundingBox;
-#include "SkCanvas.h"
-#include "SkPath.h"
 
 class PathAnimator : public ComplexAnimator {
     Q_OBJECT

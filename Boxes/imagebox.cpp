@@ -1,8 +1,7 @@
 #include "Boxes/imagebox.h"
 
 ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
-    BoundingBox(parent, TYPE_IMAGE)
-{
+    BoundingBox(parent, TYPE_IMAGE) {
     mImageFilePath = filePath;
 
     setName("Image");
@@ -37,11 +36,21 @@ void ImageBox::draw(QPainter *p) {
     p->drawImage(0, 0, mImage);
 }
 
+void ImageBox::drawSk(SkCanvas *canvas) {
+    SkPaint paint;
+    //paint.setFilterQuality(kHigh_SkFilterQuality);
+    canvas->drawImage(mImageSk, 0, 0, &paint);
+}
+
 void ImageBox::reloadPixmap()
 {
     if(mImageFilePath.isEmpty()) {
     } else {
         mImage.load(mImageFilePath);
+
+        sk_sp<SkData> data = SkData::MakeFromFileName(
+                    mImageFilePath.toLocal8Bit().data());
+        mImageSk = SkImage::MakeFromEncoded(data);
     }
 
     if(!mPivotChanged) centerPivotPosition();

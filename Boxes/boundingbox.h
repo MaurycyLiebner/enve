@@ -14,7 +14,7 @@
 #include <unordered_map>
 
 #include "boundingboxrendercontainer.h"
-#include "SkPath.h"
+#include "skiaincludes.h"
 
 class Canvas;
 

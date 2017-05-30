@@ -2,10 +2,9 @@
 #define BOUNDINGBOXRENDERCONTAINER_H
 class BoundingBox;
 #include <QImage>
-#include "SkCanvas.h"
-#include "SkImage.h"
 #include "selfref.h"
 #include "skqtconversions.h"
+#include "skiaincludes.h"
 
 class CacheHandler;
 
@@ -33,6 +32,7 @@ public:
     }
 
     void replaceImage(const QImage &img);
+    void replaceImageSk(const sk_sp<SkImage> &img);
 
     const int &getMinRelFrame() const;
 

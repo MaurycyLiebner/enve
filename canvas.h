@@ -6,7 +6,7 @@
 #include <QSqlQuery>
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
-#include "SkTypeface.h"
+#include "skiaincludes.h"
 
 class TextBox;
 class Circle;

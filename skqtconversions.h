@@ -2,9 +2,7 @@
 #define SKQTCONVERSIONS_H
 #include <QRectF>
 #include <QMatrix>
-#include "SkMatrix.h"
-#include "SkRect.h"
-#include "SkPaint.h"
+#include "skiaincludes.h"
 
 extern QRectF SkRectToQRectF(const SkRect &rect);
 extern SkRect QRectFToSkRect(const QRectF &rect);

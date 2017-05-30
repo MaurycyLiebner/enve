@@ -4,7 +4,7 @@
 class GradientPoint;
 class MovablePoint;
 class PathBox;
-#include "SkCanvas.h"
+#include "skiaincludes.h"
 
 class GradientPoints : public ComplexAnimator {
 public:

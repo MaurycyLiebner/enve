@@ -165,14 +165,24 @@ void GLWidget::drawSolidAATris(GLfloat x1, GLfloat y1,
                e12_aa, e13_aa, e23_aa);
 }
 
-void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
-                                     GLfloat r1, GLfloat g1, GLfloat b1,
-                                     GLfloat x2, GLfloat y2,
-                                     GLfloat r2, GLfloat g2, GLfloat b2,
-                                     GLfloat x3, GLfloat y3,
-                                     GLfloat r3, GLfloat g3, GLfloat b3,
-                                     GLboolean e12_aa, GLboolean e13_aa, GLboolean e23_aa)
-{
+void GLWidget::drawAATris(const GLfloat &x1,
+                          const GLfloat &y1,
+                          const GLfloat &r1,
+                          const GLfloat &g1,
+                          const GLfloat &b1,
+                          const GLfloat &x2,
+                          const GLfloat &y2,
+                          const GLfloat &r2,
+                          const GLfloat &g2,
+                          const GLfloat &b2,
+                          const GLfloat &x3,
+                          const GLfloat &y3,
+                          const GLfloat &r3,
+                          const GLfloat &g3,
+                          const GLfloat &b3,
+                          const GLboolean &e12_aa,
+                          const GLboolean &e13_aa,
+                          const GLboolean &e23_aa) {
     GLfloat center_x = (x1 + x2 + x3)/3;
     GLfloat center_y = (y1 + y2 + y3)/3;
 
@@ -195,21 +205,27 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
     GLboolean sharp_1 = e12_aa && e13_aa;
     GLboolean sharp_2 = e12_aa && e23_aa;
     GLboolean sharp_3 = e13_aa && e23_aa;
-    if(sharp_1)
-    {
-        getAATrisVert(center_x, center_y, x1, y1, &x11_sharp, &y11_sharp, AA_SHARP_VECT_LEN);
+    if(sharp_1) {
+        getAATrisVert(center_x, center_y,
+                      x1, y1,
+                      &x11_sharp, &y11_sharp,
+                      AA_SHARP_VECT_LEN);
         x11 = x11_sharp;
         y11 = y11_sharp;
     }
-    if(sharp_2)
-    {
-        getAATrisVert(center_x, center_y, x2, y2, &x22_sharp, &y22_sharp, AA_SHARP_VECT_LEN);
+    if(sharp_2) {
+        getAATrisVert(center_x, center_y,
+                      x2, y2,
+                      &x22_sharp, &y22_sharp,
+                      AA_SHARP_VECT_LEN);
         x22 = x22_sharp;
         y22 = y22_sharp;
     }
-    if(sharp_3)
-    {
-        getAATrisVert(center_x, center_y, x3, y3, &x33_sharp, &y33_sharp, AA_SHARP_VECT_LEN);
+    if(sharp_3) {
+        getAATrisVert(center_x, center_y,
+                      x3, y3,
+                      &x33_sharp, &y33_sharp,
+                      AA_SHARP_VECT_LEN);
         x33 = x33_sharp;
         y33 = y33_sharp;
     }
@@ -221,16 +237,16 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
         glColor3f(r3, g3, b3);
         glVertex2f(x3, y3);
 
-        if(e12_aa)
-        {
+        if(e12_aa) {
             GLfloat dx12;
             GLfloat dy12;
-            if(!sharp_1 || !sharp_2)
-            {
-                getAAVect(center_x, center_y, (x1 + x2)*0.5, (y1 + y2)*0.5, &dx12, &dy12, AA_VECT_LEN);
+            if(!sharp_1 || !sharp_2) {
+                getAAVect(center_x, center_y,
+                          (x1 + x2)*0.5, (y1 + y2)*0.5,
+                          &dx12, &dy12,
+                          AA_VECT_LEN);
             }
-            if(!sharp_1)
-            {
+            if(!sharp_1) {
                 x11 = x1 + dx12;
                 y11 = y1 + dy12;
             }
@@ -241,8 +257,7 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
             glColor3f(r2, g2, b2);
             glVertex2f(x2, y2);
 
-            if(!sharp_2)
-            {
+            if(!sharp_2) {
                 x22 = x2 + dx12;
                 y22 = y2 + dy12;
             }
@@ -254,16 +269,16 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
             glVertex2f(x22, y22);
         }
 
-        if(e13_aa)
-        {
+        if(e13_aa) {
             GLfloat dx13;
             GLfloat dy13;
-            if(!sharp_1 || !sharp_3)
-            {
-                getAAVect(center_x, center_y, (x1 + x3)*0.5, (y1 + y3)*0.5, &dx13, &dy13, AA_VECT_LEN);
+            if(!sharp_1 || !sharp_3) {
+                getAAVect(center_x, center_y,
+                          (x1 + x3)*0.5, (y1 + y3)*0.5,
+                          &dx13, &dy13,
+                          AA_VECT_LEN);
             }
-            if(!sharp_1)
-            {
+            if(!sharp_1) {
                 x11 = x1 + dx13;
                 y11 = y1 + dy13;
             }
@@ -274,8 +289,7 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
             glColor3f(r3, g3, b3);
             glVertex2f(x3, y3);
 
-            if(!sharp_3)
-            {
+            if(!sharp_3) {
                 x33 = x3 + dx13;
                 y33 = y3 + dy13;
             }
@@ -287,17 +301,18 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
             glVertex2f(x33, y33);
         }
 
-        if(e23_aa)
-        {
+        if(e23_aa) {
             GLfloat dx23;
             GLfloat dy23;
-            if(!sharp_2 || !sharp_3)
-            {
-                getAAVect(center_x, center_y, (x2 + x3)*0.5, (y2 + y3)*0.5, &dx23, &dy23, AA_VECT_LEN);
+            if(!sharp_2 || !sharp_3) {
+                getAAVect(center_x, center_y,
+                          (x2 + x3)*0.5,
+                          (y2 + y3)*0.5,
+                          &dx23, &dy23,
+                          AA_VECT_LEN);
             }
 
-            if(!sharp_3)
-            {
+            if(!sharp_3) {
                 x33 = x3 + dx23;
                 y33 = y3 + dy23;
             }
@@ -308,8 +323,7 @@ void GLWidget::drawAATris(GLfloat x1, GLfloat y1,
             glColor3f(r2, g2, b2);
             glVertex2f(x2, y2);
 
-            if(!sharp_2)
-            {
+            if(!sharp_2) {
                 x22 = x2 + dx23;
                 y22 = y2 + dy23;
             }

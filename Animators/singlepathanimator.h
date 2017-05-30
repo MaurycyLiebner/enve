@@ -6,14 +6,12 @@
 
 enum CanvasMode : short;
 
-class SkCanvas;
 class PathAnimator;
 class VectorPathEdge;
 class MovablePoint;
-class SkMatrix;
-
 class PathPoint;
-#include "SkPath.h"
+#include "skiaincludes.h"
+
 class SinglePathAnimator : public ComplexAnimator {
     Q_OBJECT
 public:

@@ -14,7 +14,9 @@ void RenderContainer::draw(QPainter *p) {
 void RenderContainer::drawSk(SkCanvas *canvas) {
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
-    canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y());
+    SkPaint paint;
+    //paint.setFilterQuality(kHigh_SkFilterQuality);
+    canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), &paint);
     canvas->restore();
 }
 
@@ -123,6 +125,10 @@ void CacheContainer::replaceImage(const QImage &img) {
     //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
     mImage = img;
     //MemoryChecker::getInstance()->incUsedMemory(mImage.byteCount());
+}
+
+void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
+    mImageSk = img;
 }
 
 bool CacheContainer::freeThis() {
