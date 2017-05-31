@@ -8,6 +8,7 @@ class PixmapEffect;
 class BoundingBox;
 class SkImage;
 class SkCanvas;
+class SkBitmap;
 
 class EffectAnimators : public ComplexAnimator
 {

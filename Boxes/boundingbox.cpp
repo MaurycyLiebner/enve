@@ -332,8 +332,12 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
                                          kBGRA_8888_SkColorType,
                                          kPremul_SkAlphaType,
                                          nullptr);
-    sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas *rasterCanvas = rasterSurface->getCanvas();
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+
+    //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
+    SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
+    rasterCanvas->clear(SK_ColorTRANSPARENT);
 
     rasterCanvas->translate(-allUglyBoundingRect.left(),
                             -allUglyBoundingRect.top());
@@ -355,7 +359,7 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
 
 //    *drawPosP = QPoint(qRound(allUglyBoundingRect.left()),
 //                       qRound(allUglyBoundingRect.top()));
-    return rasterSurface->makeImageSnapshot();
+    return SkImage::MakeFromBitmap(bitmap);
 }
 
 void BoundingBox::updateAllUglyPixmap() {
