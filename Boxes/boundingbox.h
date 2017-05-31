@@ -406,6 +406,7 @@ public:
 
     virtual QMatrix getCombinedTransform() const;
     virtual void drawUpdatePixmap(QPainter *p);
+    virtual void drawUpdatePixmapSk(SkCanvas *canvas);
 
     virtual void processUpdate();
     virtual void afterUpdate();

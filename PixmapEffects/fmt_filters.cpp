@@ -954,7 +954,8 @@ void despeckle(const image &im)
     delete [] n;
 }
 
-void anim_fast_blur(const image &im, double fRadius) {
+void anim_fast_blur(const image &im,
+                    const double &fRadius) {
     if(fRadius < 0.01) return;
     unsigned char *pix = im.data;
     int w = im.w;
@@ -1172,6 +1173,205 @@ void anim_fast_blur(const image &im, double fRadius) {
     delete[] r;
     delete[] g;
     delete[] b;
+    delete[] a;
+
+    delete[] vMIN;
+    delete[] vMAX;
+}
+
+void anim_fast_shadow(const image &im,
+                      const double &fRed,
+                      const double &fGreen,
+                      const double &fBlue,
+                      const double &fDx,
+                      const double &fDy,
+                      const double &fRadius) {
+    if(fRadius < 0.01) return;
+    unsigned char *pix = im.data;
+    int w = im.w;
+    int h = im.h;
+
+    int iDx = floor(fDx);
+    int iDy = floor(fDy);
+
+    double divF = fRadius + fRadius + 1.;
+    double divFInv = 1./divF;
+    int iRadius = ceil(fRadius);
+    int nPoints = iRadius + iRadius + 1;
+    double fracInf = 1. - iRadius + fRadius;
+    double fracInfInv = 1. - fracInf;
+
+    double *aLine = new double[nPoints];
+
+    int wh=w*h;
+    double *a = new double[wh];
+    double asum;
+    int x,y,i,p,p1,yp,yi,yw;
+    int *vMIN = new int[max(w,h)];
+    int *vMAX = new int[max(w,h)];
+    int wm=w-1;
+    int hm=h-1;
+
+    yw = yi = 0;
+
+    int yMin = max(iDy, 0);
+    int yMax = min(h + iDy, h);
+    int xMin = max(iDx, 0);
+    int xMax = min(w + iDx, w);
+
+    for(y = 0; y < yMin; y++) {
+        for(x = 0; x < w; x++) {
+            yi++;
+        }
+        yw += w;
+    }
+
+    for(y = yMin; y < yMax; y++) {
+        p = yi * 4;
+        aLine[0] = pix[p + 3];
+        asum = pix[p + 3]*fracInf;
+
+        for(i = 1 - iRadius; i < iRadius ; i++){
+            p = (yi + min(wm, max(i,0))) * 4;
+            aLine[i + iRadius] = pix[p + 3];
+            asum += pix[p + 3];
+        }
+
+        p = (yi + min(wm, iRadius)) * 4;
+        aLine[iRadius + iRadius] = pix[p + 3];
+        asum += pix[p + 3]*fracInf;
+
+        for(x = 0; x < xMin; x++) {
+            yi++;
+        }
+        for(x = xMin; x < xMax; x++) {
+            a[yi] = asum*divFInv;
+
+            if(y == yMin) {
+                vMIN[x] = min(x + iRadius + 1, wm);
+                vMAX[x] = max(x - iRadius, 0);
+            }
+            p1 = (yw + vMIN[x])*4;
+
+            asum -= aLine[0]*fracInf;
+
+            asum -= aLine[1]*fracInfInv;
+
+            for(i = 0; i < nPoints - 1; i++) {
+                aLine[i] = aLine[i + 1];
+            }
+
+            asum += aLine[nPoints - 1]*fracInfInv;
+
+            aLine[nPoints - 1] = pix[p1 + 3];
+
+            asum += pix[p1 + 3]*fracInf;
+
+            yi++;
+        }
+        for(x = xMax; x < w; x++) {
+            yi++;
+        }
+        yw += w;
+    }
+
+    for(x = xMin; x < xMax; x++) {
+        yp=-iRadius*w;
+
+        yi=max(0,yp)+x;
+        aLine[0] = a[yi];
+        asum = a[yi]*fracInf;
+        yp+=w;
+
+        for(i = 1 - iRadius; i < iRadius ; i++){
+            yi=max(0,yp)+x;
+            aLine[i + iRadius] = a[yi];
+            asum += a[yi];
+            yp+=w;
+        }
+
+        yi=max(0,yp)+x;
+        aLine[iRadius + iRadius] = a[yi];
+        asum += a[yi]*fracInf;
+        yp+=w;
+
+
+        yi=x;
+        for(y = 0; y < yMin; y++) {
+            yi += w;
+        }
+        for (y=yMin;y<yMax;y++){
+//            unsigned char aVal = min(255, max(0, (int)(asum*divFInv)));
+//            pix[yi*4]		= min(aVal,
+//                                  (unsigned char)min(255,
+//                                      max(0, (int)(rsum*divFInv))));
+//            pix[yi*4 + 1]	= min(aVal,
+//                                  (unsigned char)min(255,
+//                                      max(0, (int)(gsum*divFInv))));
+//            pix[yi*4 + 2]	= min(aVal,
+//                                  (unsigned char)min(255,
+//                                      max(0, (int)(bsum*divFInv))));
+//            pix[yi*4 + 3]	= aVal;
+            int pixA = pix[yi*4 + 3];
+            int shadowA = min(255,
+                              max(0,
+                                  (int)(asum*divFInv)) );
+            double pixAFrac = pixA/255.;
+            double shadowAFrac = shadowA/255.;
+            double aMult = shadowAFrac*pixAFrac;
+            int iAVal = (shadowAFrac + pixAFrac - aMult)*255;
+            unsigned char aVal = min(255,
+                                     max(0,
+                                         iAVal) );
+            unsigned char pixR = pix[yi*4];
+            int iRVal = pixR*aMult +
+                        pixR*(1. - shadowAFrac) +
+                        fRed*255*(1. - pixAFrac);
+            pix[yi*4]		= min(aVal,
+                                  (unsigned char)min(255,
+                                      max(0, iRVal)));
+            unsigned char pixG = pix[yi*4];
+            int iGVal = pixG*aMult +
+                        pixG*(1. - shadowAFrac) +
+                        fGreen*255*(1. - pixAFrac);
+            pix[yi*4 + 1]	= min(aVal,
+                                  (unsigned char)min(255,
+                                      max(0, iGVal)));
+            unsigned char pixB = pix[yi*4];
+            int iBVal = pixB*aMult +
+                        pixB*(1. - shadowAFrac) +
+                        fBlue*255*(1. - pixAFrac);
+            pix[yi*4 + 2]	= min(aVal,
+                                  (unsigned char)min(255,
+                                      max(0, iBVal)));
+            pix[yi*4 + 3]	= aVal;
+
+            if(x==0) {
+                vMIN[y]=min(y+iRadius+1,hm)*w;
+                vMAX[y]=max(y-iRadius,0)*w;
+            }
+            p1=x+vMIN[y];
+
+            asum -= aLine[0]*fracInf;
+
+            asum -= aLine[1]*fracInfInv;
+
+            for(i = 0; i < nPoints - 1; i++) {
+                aLine[i] = aLine[i + 1];
+            }
+
+            asum += aLine[nPoints - 1]*fracInfInv;
+
+            aLine[nPoints - 1] = a[p1];
+
+            asum += a[p1]*fracInf;
+
+            yi+=w;
+        }
+    }
+
+    delete[] aLine;
+
     delete[] a;
 
     delete[] vMIN;

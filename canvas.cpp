@@ -267,7 +267,6 @@ void Canvas::renderSk(SkCanvas *canvas) {
 
         if(mCurrentPreviewContainer != NULL) {
             mCurrentPreviewContainer->drawSk(canvas);
-            //p->drawImage(QPointF(0., 0.), mCurrentPreviewContainer->getImage());
         }
         canvas->restore();
     } else {
@@ -556,7 +555,7 @@ void Canvas::nextPreviewFrame() {
 
 void Canvas::beforeUpdate() {
     BoxesGroup::beforeUpdate();
-    mRenderBackgroundColor = mBackgroundColor->getCurrentColor().qcol;
+    mRenderBackgroundColor = mBackgroundColor->getCurrentColor();
     mRenderImageSize = QSize(mWidth*mResolutionFraction,
                              mHeight*mResolutionFraction);
     CacheContainer *cont =
@@ -579,6 +578,7 @@ void Canvas::afterUpdate() {
         CacheContainer *cont =
               mCacheHandler.createNewRenderContainerAtRelFrame(mUpdateRelFrame);
         cont->replaceImage(mRenderImage);
+        cont->replaceImageSk(mRenderImageSk);
         setCurrentPreviewContainer(cont);
         if(mRendering) {
             //mRenderImage.save(renderDest + QString::number(mUpdateRelFrame) + ".png");
@@ -594,17 +594,28 @@ void Canvas::updatePixmaps() {
 void Canvas::renderCurrentFrameToPreview() {
     mRenderImage = QImage(mRenderImageSize,
                           QImage::Format_ARGB32_Premultiplied);
-    mRenderImage.fill(mRenderBackgroundColor);
+    mRenderImage.fill(mRenderBackgroundColor.qcol);
     renderCurrentFrameToQImage(&mRenderImage);
-    //mPreviewFrames << mRenderImage;
+
+    SkImageInfo info = SkImageInfo::Make(mRenderImageSize.width(),
+                                         mRenderImageSize.height(),
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         nullptr);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+    SkCanvas *rasterCanvas = new SkCanvas(bitmap);
+    rasterCanvas->clear(mRenderBackgroundColor.getSkColor());
+
+    renderCurrentFrameToSkCanvasSk(rasterCanvas);
+    rasterCanvas->flush();
+
+    mRenderImageSk = SkImage::MakeFromBitmap(bitmap);
 }
 
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
     Q_UNUSED(renderDest);
-    mRenderImage = QImage(mRenderImageSize,
-                          QImage::Format_ARGB32_Premultiplied);
-    mRenderImage.fill(mRenderBackgroundColor);
-    renderCurrentFrameToQImage(&mRenderImage);
+    renderCurrentFrameToPreview();
     //clearCurrentPreviewImage();
 }
 
@@ -620,6 +631,14 @@ void Canvas::drawPreviewPixmap(QPainter *p) {
         }
 
         p->restore();
+    }
+}
+
+void Canvas::drawPreviewPixmapSk(SkCanvas *canvas) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
+            box->drawUpdatePixmapSk(canvas);
+        }
     }
 }
 
@@ -651,6 +670,14 @@ void Canvas::renderCurrentFrameToQImage(QImage *frame) {
     drawPreviewPixmap(&p);
 
     p.end();
+}
+
+void Canvas::renderCurrentFrameToSkCanvasSk(SkCanvas *canvas) {
+    canvas->scale(mResolutionFraction, mResolutionFraction);
+
+    drawPreviewPixmapSk(canvas);
+
+    canvas->flush();
 }
 
 QMatrix Canvas::getCombinedRenderTransform()

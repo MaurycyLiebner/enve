@@ -220,6 +220,43 @@ void ShadowEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
+void ShadowEffect::applyShadow(const fmt_filters::image &img,
+                               const qreal &scale) {
+    qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
+    Color currentColor = mColor->getCurrentColor();
+    QPointF trans = mTranslation->getCurrentPointValue();
+    fmt_filters::anim_fast_shadow(img,
+                                  currentColor.gl_r,
+                                  currentColor.gl_g,
+                                  currentColor.gl_b,
+//                                  currentColor.gl_a,
+                                  trans.x(),
+                                  trans.y(),
+                                  radius*0.5);
+    fmt_filters::anim_fast_shadow(img,
+                                  currentColor.gl_r,
+                                  currentColor.gl_g,
+                                  currentColor.gl_b,
+//                                  currentColor.gl_a,
+                                  trans.x(),
+                                  trans.y(),
+                                  radius*0.5);//    if(mHighQuality->getValue()) {
+//        if(mBlurRadius->prp_hasKeys()) {
+//            fmt_filters::anim_fast_blur(img, radius*0.5);
+//            fmt_filters::anim_fast_blur(img, radius*0.5);
+//        } else {
+//            fmt_filters::fast_blur(img, radius*0.5);
+//            fmt_filters::fast_blur(img, radius*0.5);
+//        }
+//    } else {
+//        if(mBlurRadius->prp_hasKeys()) {
+//            fmt_filters::anim_fast_blur(img, radius*0.8);
+//        } else {
+//            fmt_filters::fast_blur(img, radius*0.8);
+//        }
+//    }
+}
+
 void ShadowEffect::apply(BoundingBox *target,
                          QImage *imgPtr,
                          const fmt_filters::image &img,
@@ -268,6 +305,15 @@ void ShadowEffect::apply(BoundingBox *target,
     p.setOpacity(mOpacity->qra_getCurrentValue()*0.01);
     p.drawImage(mTranslation->getCurrentPointValue()*scale, shadowQImg);
     p.end();
+}
+
+void ShadowEffect::applySk(BoundingBox *target,
+                         SkImage *imgPtr,
+                         const fmt_filters::image &img,
+                         qreal scale) {
+    Q_UNUSED(target);
+    Q_UNUSED(imgPtr);
+    applyShadow(img, scale);
 }
 
 qreal ShadowEffect::getMargin() {

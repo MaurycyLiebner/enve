@@ -267,6 +267,16 @@ void BoxesGroup::drawUpdatePixmap(QPainter *p) {
     }
 }
 
+void BoxesGroup::drawUpdatePixmapSk(SkCanvas *canvas) {
+    if(shouldPaintOnImage()) {
+        BoundingBox::drawUpdatePixmapSk(canvas);
+    } else {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+            box->drawUpdatePixmapSk(canvas);
+        }
+    }
+}
+
 void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
     for(int i = 0; i < mChildrenAwaitingUpdate.count(); i++) {
         if(mChildrenAwaitingUpdate.at(i) == child) {

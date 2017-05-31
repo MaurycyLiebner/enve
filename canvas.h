@@ -14,6 +14,7 @@ class ParticleBox;
 class Rectangle;
 class PathPivot;
 class SoundComposition;
+class SkCanvas;
 
 enum CtrlsMode : short;
 
@@ -75,6 +76,7 @@ public:
     void updateAfterFrameChanged(const int &currentFrame);
 
     void renderCurrentFrameToQImage(QImage *frame);
+    void renderCurrentFrameToSkCanvasSk(SkCanvas *canvas);
 
     QSize getCanvasSize();
 
@@ -230,6 +232,8 @@ public:
 
     void keyPressEvent(QKeyEvent *event);
     void drawPreviewPixmap(QPainter *p);
+    void drawPreviewPixmapSk(SkCanvas *canvas);
+
     void createAnimationBoxForPaths(const QStringList &paths);
     void createVideoForPath(const QString &path);
 
@@ -363,8 +367,9 @@ private:
     bool mUpdateReplaceCache = false;
 
     QImage mRenderImage;
+    sk_sp<SkImage> mRenderImageSk;
     QSize mRenderImageSize;
-    QColor mRenderBackgroundColor;
+    Color mRenderBackgroundColor;
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();
 

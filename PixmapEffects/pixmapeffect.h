@@ -144,6 +144,10 @@ public:
                QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
+    void applySk(BoundingBox *target,
+                 SkImage *imgPtr,
+                 const fmt_filters::image &img,
+                 qreal scale);
 
     qreal getMargin();
 
@@ -156,6 +160,7 @@ public:
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
+    void applyShadow(const fmt_filters::image &img, const qreal &scale);
 private:
 //    QrealAnimator mScale;
     QSharedPointer<BoolProperty> mHighQuality =

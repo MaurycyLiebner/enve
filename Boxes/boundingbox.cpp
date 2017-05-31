@@ -420,6 +420,17 @@ void BoundingBox::drawUpdatePixmap(QPainter *p) {
     }
 }
 
+void BoundingBox::drawUpdatePixmapSk(SkCanvas *canvas) {
+    if(mUpdateDrawOnParentBox) {
+        canvas->save();
+        SkPaint paint;
+        paint.setAlpha(mUpdateOpacity*255);
+        //p->setCompositionMode(mCompositionMode);
+        mUpdateRenderContainer.drawSk(canvas);
+        canvas->restore();
+    }
+}
+
 void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
     p->save();
     p->setOpacity(mUpdateOpacity);

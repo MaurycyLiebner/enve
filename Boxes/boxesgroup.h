@@ -158,6 +158,7 @@ public:
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
     void drawUpdatePixmap(QPainter *p);
+    void drawUpdatePixmapSk(SkCanvas *canvas);
 
     virtual void addChildAwaitingUpdate(BoundingBox *child);
     void beforeUpdate();
