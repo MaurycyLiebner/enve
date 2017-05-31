@@ -45,8 +45,7 @@ enum PixmapEffectType {
 
 class EffectAnimators;
 
-class PixmapEffect : public ComplexAnimator
-{
+class PixmapEffect : public ComplexAnimator {
     Q_OBJECT
 public:
     PixmapEffect(const PixmapEffectType &type);
@@ -54,6 +53,10 @@ public:
                        QImage *,
                        const fmt_filters::image &,
                        qreal) {}
+    virtual void applySk(BoundingBox *,
+                         SkImage *,
+                         const fmt_filters::image &,
+                         qreal) {}
 
     virtual qreal getMargin() { return 0.; }
 
@@ -111,7 +114,10 @@ public:
                QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
-
+    void applySk(BoundingBox *target,
+                 SkImage *imgPtr,
+                 const fmt_filters::image &img,
+                 qreal scale);
     qreal getMargin();
 
 
@@ -121,6 +127,7 @@ public:
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
+    void applyBlur(const fmt_filters::image &img, const qreal &scale);
 private:
     QSharedPointer<BoolProperty> mHighQuality =
             (new BoolProperty())->ref<BoolProperty>();

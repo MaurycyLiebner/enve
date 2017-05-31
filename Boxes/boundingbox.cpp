@@ -157,13 +157,20 @@ void BoundingBox::applyEffects(QImage *im,
                                const qreal &scale) {
     if(mEffectsAnimators->hasChildAnimators()) {
         fmt_filters::image img(im->bits(), im->width(), im->height());
-        mEffectsAnimators->applyEffects(this,
-                                       im,
-                                       img,
-                                       scale);
+        mEffectsAnimators->applyEffects(this, im, img, scale);
     }
 }
 
+void BoundingBox::applyEffectsSk(SkImage *im,
+                                 const qreal &scale) {
+    if(mEffectsAnimators->hasChildAnimators()) {
+        SkPixmap pixmap;
+        im->peekPixels(&pixmap);
+        fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
+                               im->width(), im->height());
+        mEffectsAnimators->applyEffectsSk(this, im, img, scale);
+    }
+}
 
 #include <QSqlError>
 int BoundingBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
@@ -316,30 +323,29 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
                 adjusted(-effectsMargin, -effectsMargin,
                          effectsMargin, effectsMargin);
     QSizeF sizeF = allUglyBoundingRect.size();
-
-    sk_sp<SkColorSpace> colorSpace = SkColorSpace::MakeSRGBLinear();
-    SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
-                                         ceil(sizeF.height()),
-                                         kRGBA_F16_SkColorType,
-                                         //kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         colorSpace);
-    sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas *rasterCanvas = rasterSurface->getCanvas();
-    rasterCanvas->save();
-
-    rasterCanvas->translate(-allUglyBoundingRect.left(),
-                            -allUglyBoundingRect.top());
     QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
             QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
                     qRound(allUglyBoundingRect.top()/**resolution*/));
+
+    SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
+                                         ceil(sizeF.height()),
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         nullptr);
+    sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
+    SkCanvas *rasterCanvas = rasterSurface->getCanvas();
+
+    rasterCanvas->translate(-allUglyBoundingRect.left(),
+                            -allUglyBoundingRect.top());
+
     allUglyBoundingRect.translate(-transF);
 
     rasterCanvas->translate(transF.x(), transF.y());
     rasterCanvas->concat(QMatrixToSkMatrix(allUglyTransform));
 
     drawSk(rasterCanvas);
-    rasterCanvas->restore();
+
+    rasterCanvas->flush();
 
 //    if(parentCanvas->effectsPaintEnabled()) {
 //        allUglyPixmap = applyEffects(allUglyPixmap,

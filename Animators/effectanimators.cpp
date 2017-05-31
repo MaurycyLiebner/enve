@@ -82,6 +82,16 @@ void EffectAnimators::applyEffects(BoundingBox *target,
     }
 }
 
+void EffectAnimators::applyEffectsSk(BoundingBox *target,
+                                     SkImage *imgPtr,
+                                     const fmt_filters::image &img,
+                                     const qreal &scale) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        ((PixmapEffect*)effect.data())->applySk(target, imgPtr,
+                                                img, scale);
+    }
+}
+
 qreal EffectAnimators::getEffectsMargin() const {
     qreal newMargin = 2.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {

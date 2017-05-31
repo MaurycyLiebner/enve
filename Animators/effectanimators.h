@@ -6,6 +6,8 @@ namespace fmt_filters { struct image; }
 
 class PixmapEffect;
 class BoundingBox;
+class SkImage;
+class SkCanvas;
 
 class EffectAnimators : public ComplexAnimator
 {
@@ -13,9 +15,15 @@ public:
     EffectAnimators();
 
     void addEffect(PixmapEffect *effect);
-    void applyEffects(BoundingBox *target, QImage *imgPtr,
+    void applyEffects(BoundingBox *target,
+                      QImage *imgPtr,
                       const fmt_filters::image &img,
                       const qreal &scale);
+    void applyEffectsSk(BoundingBox *target,
+                        SkImage *imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
     qreal getEffectsMargin() const;
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);

@@ -401,8 +401,9 @@ public:
         Q_UNUSED(path);
     }
 
-    void applyEffects(QImage *im,
-                      const qreal &scale = 1.);
+    void applyEffects(QImage *im, const qreal &scale = 1.);
+    void applyEffectsSk(SkImage *im, const qreal &scale = 1.);
+
     virtual QMatrix getCombinedTransform() const;
     virtual void drawUpdatePixmap(QPainter *p);
 

@@ -65,14 +65,13 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
 
     mResolutionFraction = resolutionPer;
     replaceImage(target->getAllUglyPixmapProvidedTransform(
-                resolutionPer*effectsMargin,
-                resolutionPer,
-                mTransform,
-                &mDrawPos));
+                 resolutionPer*effectsMargin,
+                 resolutionPer,
+                 mTransform,
+                 &mDrawPos));
     updatePaintTransformGivenNewCombinedTransform(combinedTransform);
 
-    target->applyEffects(&mImage,
-                         resolutionPer);
+    target->applyEffects(&mImage, resolutionPer);
 
     // SKIA
 
@@ -80,6 +79,8 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
                             resolutionPer*effectsMargin,
                             resolutionPer,
                             mTransform);
+
+    target->applyEffectsSk(mImageSk.get(), resolutionPer);
 
     //mRenderTime = timer.elapsed();
 }

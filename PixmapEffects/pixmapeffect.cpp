@@ -64,17 +64,10 @@ BlurEffect::BlurEffect(qreal radius) : PixmapEffect(EFFECT_BLUR) {
     ca_addChildAnimator(mBlurRadius.data());
 }
 
-void BlurEffect::apply(BoundingBox *target,
-                       QImage *imgPtr,
-                       const fmt_filters::image &img,
-                       qreal scale) {
-    Q_UNUSED(target);
-    Q_UNUSED(scale);
-    Q_UNUSED(imgPtr);
+void BlurEffect::applyBlur(const fmt_filters::image &img,
+                           const qreal &scale) {
     qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
-    //fmt_filters::blur(img, radius, radius*0.3333);
-    //return;
-    //fmt_filters::fast_blur(img, radius*0.5);
+
     if(mHighQuality->getValue()) {
         if(mBlurRadius->prp_hasKeys()) {
             fmt_filters::anim_fast_blur(img, radius*0.5);
@@ -90,7 +83,24 @@ void BlurEffect::apply(BoundingBox *target,
             fmt_filters::fast_blur(img, radius*0.8);
         }
     }
-    //fmt_filters::blur(img, radius, radius*0.3333);
+}
+
+void BlurEffect::apply(BoundingBox *target,
+                       QImage *imgPtr,
+                       const fmt_filters::image &img,
+                       qreal scale) {
+    Q_UNUSED(target);
+    Q_UNUSED(imgPtr);
+    applyBlur(img, scale);
+}
+
+void BlurEffect::applySk(BoundingBox *target,
+                         SkImage *imgPtr,
+                         const fmt_filters::image &img,
+                         qreal scale) {
+    Q_UNUSED(target);
+    Q_UNUSED(imgPtr);
+    applyBlur(img, scale);
 }
 
 qreal BlurEffect::getMargin() {
