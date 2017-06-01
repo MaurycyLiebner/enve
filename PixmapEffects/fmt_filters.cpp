@@ -1302,40 +1302,37 @@ void anim_fast_shadow(const image &im,
         }
         for (y=yMin;y<yMax;y++){
             int pixA = pix[yi*4 + 3];
-            if(pixA != 255) {
-                int shadowA = min(255,
-                                  max(0,
-                                      (int)(asum*divFInv)) );
+            //if(pixA != 255) {
                 double pixAFrac = pixA/255.;
-                double shadowAFrac = shadowA/255.;
+                double shadowAFrac = asum*divFInv/255.;
                 double aMult = shadowAFrac*pixAFrac;
-                int iAVal = (shadowAFrac + pixAFrac - aMult)*255;
+                double fAVal = (shadowAFrac + pixAFrac - aMult)*255.;
                 unsigned char aVal = min(255,
                                          max(0,
-                                             iAVal) );
+                                             (int)round(fAVal)) );
                 unsigned char pixR = pix[yi*4];
-                int iRVal = (pixR*aMult +
+                int iRVal = round((pixR*aMult +
                             pixR*(1. - shadowAFrac) +
-                            fRed*255*(1. - pixAFrac))*aVal/255;
+                            fRed*255*(1. - pixAFrac))*fAVal/255.);
                 pix[yi*4]		= min(aVal,
                                       (unsigned char)min(255,
                                           max(0, iRVal)));
                 unsigned char pixG = pix[yi*4 + 1];
-                int iGVal = (pixG*aMult +
+                int iGVal = round((pixG*aMult +
                             pixG*(1. - shadowAFrac) +
-                            fGreen*255*(1. - pixAFrac))*aVal/255;
+                            fGreen*255*(1. - pixAFrac))*fAVal/255.);
                 pix[yi*4 + 1]	= min(aVal,
                                       (unsigned char)min(255,
                                           max(0, iGVal)));
                 unsigned char pixB = pix[yi*4 + 2];
-                int iBVal = (pixB*aMult +
+                int iBVal = round((pixB*aMult +
                             pixB*(1. - shadowAFrac) +
-                            fBlue*255*(1. - pixAFrac))*aVal/255;
+                            fBlue*255*(1. - pixAFrac))*fAVal/255.);
                 pix[yi*4 + 2]	= min(aVal,
                                       (unsigned char)min(255,
                                           max(0, iBVal)));
                 pix[yi*4 + 3]	= aVal;
-            }
+            //}
 
             if(x==0) {
                 vMIN[y]=min(y+iRadius+1,hm)*w;

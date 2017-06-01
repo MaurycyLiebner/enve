@@ -233,6 +233,7 @@ void ShadowEffect::applyShadow(const fmt_filters::image &img,
                                   trans.x(),
                                   trans.y(),
                                   radius*0.5);
+    return;
     fmt_filters::anim_fast_shadow(img,
                                   currentColor.gl_r,
                                   currentColor.gl_g,

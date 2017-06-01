@@ -845,8 +845,7 @@ void MainWindow::newFile()
     }
 }
 
-bool MainWindow::eventFilter(QObject *obj, QEvent *e)
-{
+bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
     }
