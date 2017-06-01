@@ -611,6 +611,8 @@ void Canvas::renderCurrentFrameToPreview() {
     rasterCanvas->flush();
 
     mRenderImageSk = SkImage::MakeFromBitmap(bitmap);
+    bitmap.reset();
+    delete rasterCanvas;
 }
 
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {

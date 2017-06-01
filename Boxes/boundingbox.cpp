@@ -359,7 +359,10 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
 
 //    *drawPosP = QPoint(qRound(allUglyBoundingRect.left()),
 //                       qRound(allUglyBoundingRect.top()));
-    return SkImage::MakeFromBitmap(bitmap);
+    sk_sp<SkImage> image = SkImage::MakeFromBitmap(bitmap);
+    bitmap.reset();
+    delete rasterCanvas;
+    return image;
 }
 
 void BoundingBox::updateAllUglyPixmap() {

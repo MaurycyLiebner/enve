@@ -32,21 +32,24 @@ unsigned long long getFreeRam() {
     MallocExtension::instance()->GetStats(buffer, 1000);
 
     QString allText = QString::fromUtf8(buffer);
-    QString extract = allText.split(QRegExp("\n|\r\n|\r")).at(9);
-    extract = extract.split('(').first();
-    extract = extract.split('+').last();
-    extract = extract.trimmed();
-    unmapped = extract.toULongLong();
-//    QStringList allLines = allText.split(QRegExp("\n|\r\n|\r"));
-//    Q_FOREACH(const QString &line, allLines) {
-//        if(line.contains("Bytes released to OS (aka unmapped)")) {
-//            QString extract = line.split('(').first();
-//            extract = extract.split('+').last();
-//            extract = extract.trimmed();
-//            unmapped = extract.toULongLong();
-//            break;
-//        }
-//    }
+    QStringList lines = allText.split(QRegExp("\n|\r\n|\r"));
+    if(lines.count() > 9) {
+        QString extract = lines.at(9);
+        extract = extract.split('(').first();
+        extract = extract.split('+').last();
+        extract = extract.trimmed();
+        unmapped = extract.toULongLong();
+    } else {
+        Q_FOREACH(const QString &line, lines) {
+            if(line.contains("Bytes released to OS (aka unmapped)")) {
+                QString extract = line.split('(').first();
+                extract = extract.split('+').last();
+                extract = extract.trimmed();
+                unmapped = extract.toULongLong();
+                break;
+            }
+        }
+    }
 
     FILE *meminfo = fopen("/proc/meminfo", "r");
     if(meminfo == NULL) return 0;
@@ -76,7 +79,7 @@ unsigned long long getFreeRam() {
     // If we got here, then we couldn't find the proper line in the meminfo file:
     // do something appropriate like return an error code, throw an exception, etc.
     fclose(meminfo);
-    return 0;
+    return ramULL + unmapped;
 }
 
 void MemoryChecker::checkMemory() {

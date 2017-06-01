@@ -154,6 +154,8 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidget()->setMouseTracking(true);
 
     createNewCanvas();
+
+    mEventFilterDisabled = false;
 }
 
 MainWindow::~MainWindow() {

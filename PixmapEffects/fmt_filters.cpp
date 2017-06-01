@@ -1206,7 +1206,7 @@ void anim_fast_shadow(const image &im,
     int wh=w*h;
     double *a = new double[wh];
     double asum;
-    int x,y,i,p,p1,yp,yi,yw;
+    int x,y,i,p,p1,yp,yi,yw,dp;
     int *vMIN = new int[max(w,h)];
     int *vMAX = new int[max(w,h)];
     int wm=w-1;
@@ -1218,6 +1218,7 @@ void anim_fast_shadow(const image &im,
     int yMax = min(h + iDy, h);
     int xMin = max(iDx, 0);
     int xMax = min(w + iDx, w);
+    dp = -iDx - iDy*w;
 
     for(y = 0; y < yMin; y++) {
         for(x = 0; x < w; x++) {
@@ -1227,17 +1228,17 @@ void anim_fast_shadow(const image &im,
     }
 
     for(y = yMin; y < yMax; y++) {
-        p = yi * 4;
+        p = (yi + dp) * 4;
         aLine[0] = pix[p + 3];
         asum = pix[p + 3]*fracInf;
 
         for(i = 1 - iRadius; i < iRadius ; i++){
-            p = (yi + min(wm, max(i,0))) * 4;
+            p = (yi + min(wm, max(i,0)) + dp) * 4;
             aLine[i + iRadius] = pix[p + 3];
             asum += pix[p + 3];
         }
 
-        p = (yi + min(wm, iRadius)) * 4;
+        p = (yi + min(wm, iRadius) + dp) * 4;
         aLine[iRadius + iRadius] = pix[p + 3];
         asum += pix[p + 3]*fracInf;
 
@@ -1251,7 +1252,7 @@ void anim_fast_shadow(const image &im,
                 vMIN[x] = min(x + iRadius + 1, wm);
                 vMAX[x] = max(x - iRadius, 0);
             }
-            p1 = (yw + vMIN[x])*4;
+            p1 = (yw + vMIN[x] + dp)*4;
 
             asum -= aLine[0]*fracInf;
 
@@ -1283,26 +1284,26 @@ void anim_fast_shadow(const image &im,
         asum = a[yi]*fracInf;
         yp+=w;
 
-        for(i = 1 - iRadius; i < iRadius ; i++){
-            yi=max(0,yp)+x;
+        for(i = 1 - iRadius; i < iRadius; i++){
+            yi = max(0, yp)+x;
             aLine[i + iRadius] = a[yi];
             asum += a[yi];
             yp+=w;
         }
 
-        yi=max(0,yp)+x;
+        yi = max(0, yp)+x;
         aLine[iRadius + iRadius] = a[yi];
-        asum += a[yi]*fracInf;
-        yp+=w;
+        asum += a[yi] * fracInf;
+        yp += w;
 
 
-        yi=x;
+        yi = x;
         for(y = 0; y < yMin; y++) {
             yi += w;
         }
-        for (y=yMin;y<yMax;y++){
+        for(y = yMin; y < yMax; y++) {
             int pixA = pix[yi*4 + 3];
-            //if(pixA != 255) {
+            if(pixA != 255) {
                 double pixAFrac = pixA/255.;
                 double shadowAFrac = asum*divFInv/255.;
                 double aMult = shadowAFrac*pixAFrac;
@@ -1314,29 +1315,29 @@ void anim_fast_shadow(const image &im,
                 int iRVal = round((pixR*aMult +
                             pixR*(1. - shadowAFrac) +
                             fRed*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4]		= min(aVal,
+                pix[yi*4] = min(aVal,
                                       (unsigned char)min(255,
                                           max(0, iRVal)));
                 unsigned char pixG = pix[yi*4 + 1];
                 int iGVal = round((pixG*aMult +
                             pixG*(1. - shadowAFrac) +
                             fGreen*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4 + 1]	= min(aVal,
+                pix[yi*4 + 1] = min(aVal,
                                       (unsigned char)min(255,
                                           max(0, iGVal)));
                 unsigned char pixB = pix[yi*4 + 2];
                 int iBVal = round((pixB*aMult +
                             pixB*(1. - shadowAFrac) +
                             fBlue*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4 + 2]	= min(aVal,
+                pix[yi*4 + 2] = min(aVal,
                                       (unsigned char)min(255,
                                           max(0, iBVal)));
-                pix[yi*4 + 3]	= aVal;
-            //}
+                pix[yi*4 + 3] = aVal;
+            }
 
-            if(x==0) {
-                vMIN[y]=min(y+iRadius+1,hm)*w;
-                vMAX[y]=max(y-iRadius,0)*w;
+            if(x == xMin) {
+                vMIN[y] = min(y + iRadius + 1, hm) * w;
+                vMAX[y] = max(y - iRadius, 0) * w;
             }
             p1=x+vMIN[y];
 

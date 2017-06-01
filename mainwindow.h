@@ -222,7 +222,7 @@ private:
     FillStrokeSettingsWidget *mFillStrokeSettings;
 
     bool mChangedSinceSaving = false;
-    bool mEventFilterDisabled = false;
+    bool mEventFilterDisabled = true;
     bool isEnabled();
     QWidget *mGrayOutWidget = NULL;
 
