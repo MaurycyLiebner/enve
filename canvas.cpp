@@ -259,17 +259,31 @@ void Canvas::renderSk(SkCanvas *canvas) {
                                         mCanvasWidget->height() + 1),
                          paint);
 
-        canvas->save();
+        if(mCurrentPreviewContainer != NULL) {
+            canvas->save();
+
+            canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+            qreal reversedRes = 1./mResolutionFraction;
+            canvas->scale(reversedRes, reversedRes);
+            mCurrentPreviewContainer->drawSk(canvas);
+
+            canvas->restore();
+        }
+    } else {
+        SkScalar invScale = 1./mCanvasTransformMatrix.m11();
+#ifdef CPU_ONLY_RENDER
+        canvas->clear(SK_ColorBLACK);
 
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
-        qreal reversedRes = 1./mResolutionFraction;
-        canvas->scale(reversedRes, reversedRes);
 
         if(mCurrentPreviewContainer != NULL) {
+            canvas->save();
+            qreal reversedRes = 1./mResolutionFraction;
+            canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas);
+            canvas->restore();
         }
-        canvas->restore();
-    } else {
+#else
         paint.setColor(SkColorSetARGBInline(255, 75, 75, 75));
         paint.setStyle(SkPaint::kFill_Style);
         canvas->drawRect(SkRect::MakeWH(mCanvasWindow->width() + 1,
@@ -279,10 +293,10 @@ void Canvas::renderSk(SkCanvas *canvas) {
         canvas->drawRect(viewRect, paint);
 
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
-        SkScalar invScale = 1./mCanvasTransformMatrix.m11();
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmapSk(canvas);
         }
+#endif
 //        QPen pen = QPen(Qt::black, 1.5);
 //        pen.setCosmetic(true);
 //        p->setPen(pen);

@@ -1,6 +1,8 @@
 #ifndef SKIADEFINES_H
 #define SKIADEFINES_H
 
+#define CPU_ONLY_RENDER
+
 #ifdef QT_DEBUG
     #define GR_GL_CHECK_ERROR true
     #define GR_GL_LOG_CALLS true

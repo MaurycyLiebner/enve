@@ -536,7 +536,7 @@ void CanvasWindow::renderOutput() {
                                         size.width(),
                                         size.height(),
                                         MainWindow::getInstance());
-    connect(dialog, SIGNAL(renderSk(QString, qreal)),
+    connect(dialog, SIGNAL(renderOutput(QString, qreal)),
             this, SLOT(saveOutput(QString, qreal)));
     dialog->exec();
 }
@@ -635,7 +635,7 @@ void CanvasWindow::interruptRendering() {
     mBoxesUpdateFinishedFunction = NULL;
     mCurrentCanvas->clearPreview();
     mCurrentCanvas->getCacheHandler()->
-        setContainersInFrameRangeBlocked(mSavedCurrentFrame,
+        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
                                          mCurrentRenderFrame,
                                          false);
     emit changeCurrentFrame(mSavedCurrentFrame);
@@ -645,9 +645,10 @@ void CanvasWindow::interruptRendering() {
 void CanvasWindow::stopPreview() {
     setPreviewing(false);
     mCurrentCanvas->getCacheHandler()->
-        setContainersInFrameRangeBlocked(mSavedCurrentFrame,
+        setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
                                          mCurrentRenderFrame,
                                          false);
+    emit changeCurrentFrame(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
     stopAudio();
     repaint();
@@ -670,8 +671,8 @@ void CanvasWindow::resumePreview() {
 
 void CanvasWindow::playPreview() {
     setRendering(false);
-    setPreviewing(true);
-    emit changeCurrentFrame(mSavedCurrentFrame);
+    //setPreviewing(true);
+    //emit changeCurrentFrame(mSavedCurrentFrame);
     mBoxesUpdateFinishedFunction = NULL;
     mCurrentCanvas->playPreview(mSavedCurrentFrame,
                                 mCurrentRenderFrame);

@@ -430,6 +430,7 @@ void BoundingBox::drawUpdatePixmapSk(SkCanvas *canvas) {
         canvas->save();
         SkPaint paint;
         paint.setAlpha(mUpdateOpacity*255);
+        paint.setBlendMode(mBlendModeSk);
         //p->setCompositionMode(mCompositionMode);
         mUpdateRenderContainer.drawSk(canvas, &paint);
         canvas->restore();

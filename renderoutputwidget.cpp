@@ -88,8 +88,8 @@ void RenderOutputWidget::disconnectSignals() {
 }
 
 void RenderOutputWidget::emitRender() {
-    emit render(mPathLabel->text() + "/",
-                getCurrentResolution());
+    emit renderOutput(mPathLabel->text() + "/",
+                      getCurrentResolution());
     delete this;
 }
 

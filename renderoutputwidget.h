@@ -43,7 +43,7 @@ private:
     void connectSignals();
     void disconnectSignals();
 signals:
-    void render(QString, qreal);
+    void renderOutput(QString, qreal);
 public slots:
     void emitRender();
     void chooseDir();
