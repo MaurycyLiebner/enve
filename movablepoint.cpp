@@ -65,8 +65,7 @@ void MovablePoint::drawHovered(SkCanvas *canvas,
 //                        mRadius, mRadius);
 }
 
-void MovablePoint::finishTransform()
-{
+void MovablePoint::finishTransform() {
     if(mTransformStarted) {
         mTransformStarted = false;
         prp_finishTransform();
@@ -125,12 +124,13 @@ void MovablePoint::drawOnAbsPos(QPainter *p,
     }
 }
 
-void MovablePoint::drawOnAbsPos(SkCanvas *canvas,
-                                const SkPoint &absPos,
-                                const SkScalar &invScale,
-                                const unsigned char r,
-                                const unsigned char g,
-                                const unsigned char b) {
+void MovablePoint::drawOnAbsPosSk(
+                SkCanvas *canvas,
+                const SkPoint &absPos,
+                const SkScalar &invScale,
+                const unsigned char r,
+                const unsigned char g,
+                const unsigned char b) {
     canvas->save();
 
     SkScalar scaledRadius = mRadius*invScale;
@@ -171,17 +171,17 @@ void MovablePoint::draw(QPainter *p) {
 }
 
 void MovablePoint::drawSk(SkCanvas *canvas,
-                        const SkScalar &invScale) {
+                          const SkScalar &invScale) {
     if(isHidden()) {
         return;
     }
     if(mSelected) {
-        drawOnAbsPos(canvas,
+        drawOnAbsPosSk(canvas,
                      QPointFToSkPoint(getAbsolutePos()),
                      invScale,
                      255, 0, 0);
     } else {
-        drawOnAbsPos(canvas,
+        drawOnAbsPosSk(canvas,
                      QPointFToSkPoint(getAbsolutePos()),
                      invScale,
                      255, 175, 175);

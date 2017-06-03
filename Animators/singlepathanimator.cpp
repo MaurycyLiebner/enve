@@ -486,7 +486,6 @@ void SinglePathAnimator::connectPoints(PathPoint *point1,
         point1->connectToPoint(point2);
         point2ParentPath->updatePathPointIds();
     }
-
 //    if(point1->isSeparatePathPoint() &&
 //       point2->isSeparatePathPoint()) {
 //        point1->reversePointsDirection();
@@ -637,28 +636,23 @@ void SinglePathAnimator::drawSelected(QPainter *p,
 void SinglePathAnimator::drawSelected(SkCanvas *canvas,
                                       const CanvasMode &currentCanvasMode,
                                       const SkScalar &invScale,
-                                      const SkMatrix &combinedTransform) {
-    canvas->save();
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        canvas->save();
-//        p->setBrush(Qt::NoBrush);
-//        QPen editPen = QPen(Qt::white, 1., Qt::DashLine);
-//        editPen.setCosmetic(true);
-//        p->setPen(editPen);
-//        p->setTransform(QTransform(combinedTransform), true);
-//        p->setCompositionMode(QPainter::CompositionMode_Difference);
-//        p->drawPath(mPath);
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(invScale);
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setColor(SK_ColorWHITE);
-        //paint.setBlendMode(SkBlendMode::kDifference);
-        SkPath mappedPath = mSkPath;
-        mappedPath.transform(combinedTransform);
-        canvas->drawPath(mappedPath, paint);
-        canvas->restore();
+                                      const SkMatrix &combinedTransform) {    
+    //canvas->save();
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    paint.setStrokeWidth(1.5*invScale);
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setColor(SK_ColorBLACK);
+    //paint.setBlendMode(SkBlendMode::kDifference);
+    SkPath mappedPath = mSkPath;
+    mappedPath.transform(combinedTransform);
+    canvas->drawPath(mappedPath, paint);
+    paint.setStrokeWidth(0.75*invScale);
+    paint.setColor(SK_ColorWHITE);
+    canvas->drawPath(mappedPath, paint);
+    //canvas->restore();
 
+    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             const QSharedPointer<PathPoint> &point = mPoints.at(i);
             point->drawSk(canvas, currentCanvasMode, invScale);
@@ -671,7 +665,6 @@ void SinglePathAnimator::drawSelected(SkCanvas *canvas,
             }
         }
     }
-    canvas->restore();
 }
 
 void SinglePathAnimator::selectAndAddContainedPointsToList(
@@ -752,8 +745,7 @@ PathPoint *SinglePathAnimator::addPoint(PathPoint *pointToAdd,
 }
 
 PathPoint* SinglePathAnimator::addPointAbsPos(const QPointF &absPtPos,
-                                        PathPoint *toPoint)
-{
+                                        PathPoint *toPoint) {
     PathPoint *newPoint = new PathPoint(this);
     newPoint->setAbsolutePos(absPtPos, false);
     newPoint->moveStartCtrlPtToAbsPos(absPtPos);
@@ -763,8 +755,7 @@ PathPoint* SinglePathAnimator::addPointAbsPos(const QPointF &absPtPos,
 }
 
 PathPoint *SinglePathAnimator::addPointRelPos(const QPointF &relPtPos,
-                                        PathPoint *toPoint)
-{
+                                        PathPoint *toPoint) {
     PathPoint *newPoint = new PathPoint(this);
     newPoint->setRelativePos(relPtPos, false);
     newPoint->moveStartCtrlPtToRelPos(relPtPos);
@@ -787,9 +778,10 @@ void SinglePathAnimator::appendToPointsList(PathPoint *point,
 
     //schedulePathUpdate();
 
-    updatePathPointIds();
-
+    prp_updateInfluenceRangeAfterChanged();
     prp_callUpdater();
+
+    updatePathPointIds();
 }
 
 int SinglePathAnimator::getChildPointIndex(PathPoint *child) {
@@ -816,6 +808,7 @@ void SinglePathAnimator::removeFromPointsList(PathPoint *point,
     mPoints.removeAt(getChildPointIndex(point));
 
     //schedulePathUpdate();
+    prp_updateInfluenceRangeAfterChanged();
     prp_callUpdater();
 
     updatePathPointIds();

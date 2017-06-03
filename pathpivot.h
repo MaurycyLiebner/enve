@@ -32,6 +32,7 @@ public:
     void startRotating();
     void startScaling();
     void startTransform();
+    void drawSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
     void drawOnAbsPos(QPainter *p, const QPointF &absPos);
 

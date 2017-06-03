@@ -393,7 +393,6 @@ private:
     bool mIsCurrentCanvas = true;
     int mMaxFrame = 0;
 
-    bool mGlobalPivotVisible = true;
     bool mEffectsPaintEnabled;
     qreal mResolutionFraction;
 
@@ -464,6 +463,7 @@ private:
     void handleMovePathMousePressEvent();
     void handleMovePointMousePressEvent();
     void handleAddPointMouseRelease();
+    void handleAddPointMousePress();
 
     void updateTransformation();
     void handleMouseRelease();

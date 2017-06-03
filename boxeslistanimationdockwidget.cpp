@@ -71,6 +71,7 @@ void ChangeWidthWidget::leaveEvent(QEvent *) {
 BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
     QWidget(parent) {
+    setFocusPolicy(Qt::NoFocus);
     mAddBoxesListKeysViewWidgetsBar->hide();
     mAddBoxesListKeysViewWidgetsBar->addAction(
                         "+", this,
@@ -329,6 +330,8 @@ bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
         setCurrentFrame(mMainWindow->getCurrentFrame() + 1);
     } else if(event->key() == Qt::Key_Left && mMainWindow->isCtrlPressed()) {
         setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
+    } else if(event->key() == Qt::Key_P) {
+        mLocalPivot->toggle();
     } else {
         return false;
     }

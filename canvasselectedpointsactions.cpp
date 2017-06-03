@@ -294,7 +294,7 @@ void Canvas::rotateSelectedPointsBy(const qreal &rotBy,
                                     const QPointF &absOrigin,
                                     const bool &startTrans) {
     if(mSelectedPoints.isEmpty()) return;
-    if(mLocalPivot || !mGlobalPivotVisible) {
+    if(mLocalPivot) {
         if(startTrans) {
             Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();
@@ -326,7 +326,7 @@ void Canvas::scaleSelectedPointsBy(const qreal &scaleXBy,
                                    const QPointF &absOrigin,
                                    const bool &startTrans) {
     if(mSelectedPoints.isEmpty()) return;
-    if(mLocalPivot || !mGlobalPivotVisible) {
+    if(mLocalPivot) {
         if(startTrans) {
             Q_FOREACH(MovablePoint *point, mSelectedPoints) {
                 point->startTransform();

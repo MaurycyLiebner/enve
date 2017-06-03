@@ -50,6 +50,9 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
     mCurrentMode = MOVE_PATH;
 
+    prp_setAbsFrame(0);
+    addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));
+    scheduleHardUpdate();
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
 }
@@ -308,6 +311,17 @@ void Canvas::renderSk(SkCanvas *canvas) {
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
             mRotPivot->drawSk(canvas, invScale);
+            if(mRotPivot->isScaling() || mRotPivot->isRotating()) {
+                paint.setStyle(SkPaint::kStroke_Style);
+                paint.setColor(SK_ColorBLACK);
+                SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
+                                         MIN_WIDGET_HEIGHT*0.25f*invScale};
+                paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+                canvas->drawLine(QPointFToSkPoint(mRotPivot->getAbsolutePos()),
+                                 QPointFToSkPoint(mLastMouseEventPosRel),
+                                 paint);
+                paint.setPathEffect(NULL);
+            }
         }
 //        pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
 //        pen.setCosmetic(true);
@@ -315,9 +329,9 @@ void Canvas::renderSk(SkCanvas *canvas) {
         if(mSelecting) {
             paint.setStyle(SkPaint::kStroke_Style);
             paint.setColor(SkColorSetARGBInline(255, 0, 0, 255));
-            paint.setStrokeWidth(2.);
-            SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f,
-                                     MIN_WIDGET_HEIGHT*0.25f};
+            paint.setStrokeWidth(2.*invScale);
+            SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
+                                     MIN_WIDGET_HEIGHT*0.25f*invScale};
             paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
             canvas->drawRect(QRectFToSkRect(mSelectionRect), paint);
             paint.setPathEffect(NULL);
@@ -511,9 +525,6 @@ QSize Canvas::getCanvasSize()
 
 void Canvas::setPreviewing(const bool &bT) {
     mPreviewing = bT;
-    if(!bT) {
-        setCurrentPreviewContainer(NULL);
-    }
 }
 
 void Canvas::setRendering(const bool &bT) {
@@ -758,8 +769,7 @@ void Canvas::startSelectionAtPoint(QPointF pos) {
 
 void Canvas::updatePivot() {
     if(mCurrentMode == MOVE_POINT) {
-        if(isPointsSelectionEmpty() ||
-           !mGlobalPivotVisible) {
+        if(isPointsSelectionEmpty() || mLocalPivot) {
             mRotPivot->hide();
         } else {
             mRotPivot->show();
@@ -774,14 +784,14 @@ void Canvas::updatePivot() {
         }
     } else if(mCurrentMode == MOVE_PATH) {
         if(isSelectionEmpty() ||
-           mLocalPivot ||
-           !mGlobalPivotVisible) {
+           mLocalPivot) {
             mRotPivot->hide();
         } else {
             mRotPivot->show();
-            mRotPivot->setAbsolutePos(getSelectedBoxesAbsPivotPos(),
-                                      false);
+
         }
+        mRotPivot->setAbsolutePos(getSelectedBoxesAbsPivotPos(),
+                                  false);
     }
 }
 
@@ -1001,8 +1011,6 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
            } else {
                mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
            }
-        } else if(event->key() == Qt::Key_P) {
-            mGlobalPivotVisible = !mGlobalPivotVisible;
         }
         schedulePivotUpdate();
     }

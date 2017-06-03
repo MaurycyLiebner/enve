@@ -220,7 +220,7 @@ VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
 void Canvas::rotateSelectedBy(const qreal &rotBy,
                               const QPointF &absOrigin,
                               const bool &startTrans) {
-    if(mLocalPivot || !mGlobalPivotVisible) {
+    if(mLocalPivot) {
         if(startTrans) {
             Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
                 box->startRotTransform();
@@ -257,7 +257,7 @@ void Canvas::scaleSelectedBy(qreal scaleBy,
 void Canvas::scaleSelectedBy(qreal scaleXBy, qreal scaleYBy,
                                  QPointF absOrigin,
                                  bool startTrans) {
-    if(mLocalPivot || !mGlobalPivotVisible) {
+    if(mLocalPivot) {
         if(startTrans) {
             Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
                 box->startScaleTransform();

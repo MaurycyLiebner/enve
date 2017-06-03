@@ -41,6 +41,30 @@ void PathPivot::drawOnAbsPos(QPainter *p,
     p->restore();
 }
 
+void PathPivot::drawSk(SkCanvas *canvas,
+                       const SkScalar &invScale) {
+    SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
+    if(!isHidden()) {
+        if(mSelected) {
+            drawOnAbsPosSk(canvas, absPos, invScale,
+                           0, 255, 0);
+        } else {
+            drawOnAbsPosSk(canvas, absPos, invScale,
+                           125, 255, 125);
+        }
+    }
+
+    canvas->save();
+    canvas->translate(absPos.x(), absPos.y());
+    SkPaint paint;
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setColor(SK_ColorBLACK);
+    SkScalar scaledHalfRadius = mRadius*invScale*0.5;
+    canvas->drawLine(-scaledHalfRadius, 0., scaledHalfRadius, 0., paint);
+    canvas->drawLine(0, -scaledHalfRadius, 0., scaledHalfRadius, paint);
+    canvas->restore();
+}
+
 //void PathPivot::updateRotationMappedPath() {
 //    mMappedRotationPath = mRotationPath.translated(getAbsolutePos());
 //    

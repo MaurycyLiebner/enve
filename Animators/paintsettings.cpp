@@ -722,24 +722,24 @@ PaintSetting::PaintSetting(const bool &targetFillSettings, Gradient *gradient) {
 }
 
 void PaintSetting::apply(PathBox *box) const {
-    PaintSettings *fillSettings;
+    PaintSettings *paintSettings;
     if(mTargetFillSettings) {
-        fillSettings = box->getFillSettings();
+        paintSettings = box->getFillSettings();
     } else {
-        fillSettings = box->getStrokeSettings();
+        paintSettings = box->getStrokeSettings();
     }
-    bool paintTypeChanged = fillSettings->getPaintType() != mPaintType;
+    bool paintTypeChanged = paintSettings->getPaintType() != mPaintType;
     bool gradientChanged = false;
 
     if(mPaintType == FLATPAINT) {
-        mColorSetting.apply(fillSettings->getColorAnimator());
+        mColorSetting.apply(paintSettings->getColorAnimator());
     } else if(mPaintType == GRADIENTPAINT) {
         if(paintTypeChanged) {
             gradientChanged = true;
         } else {
-            gradientChanged = fillSettings->getGradient() == mGradient;
+            gradientChanged = paintSettings->getGradient() == mGradient;
         }
-        fillSettings->setGradient(mGradient);
+        paintSettings->setGradient(mGradient);
         if(paintTypeChanged) {
             if(mTargetFillSettings) {
                 box->resetFillGradientPointsPos(true);
@@ -752,9 +752,8 @@ void PaintSetting::apply(PathBox *box) const {
 //        }
     }
     if(paintTypeChanged) {
-        if(paintTypeChanged) {
-            fillSettings->setPaintType(mPaintType);
-        }
+        paintSettings->setPaintType(mPaintType);
+        box->clearAllCache();
     }
     if(gradientChanged) {
         if(mTargetFillSettings) {

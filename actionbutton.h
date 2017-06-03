@@ -13,6 +13,8 @@ public:
     void setIcon(const QString &notCheckedPix);
     void setCheckable(const QString &checkedPix);
     void setChecked(bool checked);
+    void toggle();
+    bool checked() { return mChecked; }
 protected:
     void mousePressEvent(QMouseEvent *);
     void enterEvent(QEvent *);

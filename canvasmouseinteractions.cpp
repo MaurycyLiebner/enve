@@ -237,50 +237,7 @@ void Canvas::handleLeftButtonMousePress() {
         mLastPressedBox = getPathAtFromAllAncestors(mLastPressPosRel);
     } else {
         if(mCurrentMode == CanvasMode::ADD_POINT) {
-            if(mCurrentEndPoint != NULL) {
-                if(mCurrentEndPoint->isHidden()) {
-                    setCurrentEndPoint(NULL);
-                }
-            }
-            PathPoint *pathPointUnderMouse = (PathPoint*) mLastPressedPoint;
-            if( (pathPointUnderMouse == NULL) ? false :
-                    !pathPointUnderMouse->isEndPoint() ) {
-                pathPointUnderMouse = NULL;
-            }
-            if(pathPointUnderMouse == mCurrentEndPoint && pathPointUnderMouse != NULL) {
-                return;
-            }
-            if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
-
-                VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
-                clearBoxesSelection();
-                addBoxToSelection(newPath);
-                PathAnimator *newPathAnimator = newPath->getPathAnimator();
-                SinglePathAnimator *newSinglePath = new SinglePathAnimator(
-                                                            newPathAnimator);
-                newPathAnimator->addSinglePathAnimator(newSinglePath);
-                setCurrentEndPoint(newSinglePath->
-                                    addPointAbsPos(mLastMouseEventPosRel,
-                                                    mCurrentEndPoint) );
-
-            } else {
-                if(pathPointUnderMouse == NULL) {
-                    setCurrentEndPoint(mCurrentEndPoint->addPointAbsPos(mLastMouseEventPosRel) );
-                } else if(mCurrentEndPoint == NULL) {
-                    setCurrentEndPoint(pathPointUnderMouse);
-                } else {
-                    if(mCurrentEndPoint->getParentPath() ==
-                       pathPointUnderMouse->getParentPath()) {
-                        mCurrentEndPoint->getParentPath()->
-                                connectPoints(mCurrentEndPoint, pathPointUnderMouse);
-                    }
-                    else {
-                        connectPointsFromDifferentPaths(mCurrentEndPoint,
-                                                        pathPointUnderMouse);
-                    }
-                    setCurrentEndPoint(pathPointUnderMouse);
-                }
-            } // pats is not null
+            handleAddPointMousePress();
         } // point adding mode
         else if (mCurrentMode == CanvasMode::MOVE_POINT) {
             handleMovePointMousePressEvent();
@@ -497,8 +454,60 @@ void Canvas::handleMovePathMouseRelease() {
     }
 }
 
+void Canvas::handleAddPointMousePress() {
+    if(mCurrentEndPoint != NULL) {
+        if(mCurrentEndPoint->isHidden()) {
+            setCurrentEndPoint(NULL);
+        }
+    }
+    PathPoint *pathPointUnderMouse = (PathPoint*) mLastPressedPoint;
+    if( (pathPointUnderMouse == NULL) ? false :
+            !pathPointUnderMouse->isEndPoint() ) {
+        pathPointUnderMouse = NULL;
+    }
+    if(pathPointUnderMouse == mCurrentEndPoint && pathPointUnderMouse != NULL) {
+        return;
+    }
+    if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
+
+        VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
+        clearBoxesSelection();
+        addBoxToSelection(newPath);
+        PathAnimator *newPathAnimator = newPath->getPathAnimator();
+        SinglePathAnimator *newSinglePath = new SinglePathAnimator(
+                                                    newPathAnimator);
+        newPathAnimator->addSinglePathAnimator(newSinglePath);
+        setCurrentEndPoint(newSinglePath->
+                            addPointAbsPos(mLastMouseEventPosRel,
+                                            mCurrentEndPoint) );
+
+    } else {
+        if(pathPointUnderMouse == NULL) {
+            PathPoint *newPoint =
+                    mCurrentEndPoint->addPointAbsPos(mLastMouseEventPosRel);
+            newPoint->startTransform();
+            setCurrentEndPoint(newPoint);
+        } else if(mCurrentEndPoint == NULL) {
+            setCurrentEndPoint(pathPointUnderMouse);
+        } else {
+            pathPointUnderMouse->startTransform();
+            if(mCurrentEndPoint->getParentPath() ==
+               pathPointUnderMouse->getParentPath()) {
+                mCurrentEndPoint->getParentPath()->
+                        connectPoints(mCurrentEndPoint, pathPointUnderMouse);
+            }
+            else {
+                connectPointsFromDifferentPaths(mCurrentEndPoint,
+                                                pathPointUnderMouse);
+            }
+            setCurrentEndPoint(pathPointUnderMouse);
+        }
+    } // pats is not null
+}
+
 void Canvas::handleAddPointMouseRelease() {
     if(mCurrentEndPoint != NULL) {
+        mCurrentEndPoint->finishTransform();
         if(!mCurrentEndPoint->isEndPoint()) {
             setCurrentEndPoint(NULL);
         }

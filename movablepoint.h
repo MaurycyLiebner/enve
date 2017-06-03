@@ -114,12 +114,13 @@ protected:
     BoundingBox *mParent = NULL;
     virtual void drawOnAbsPos(QPainter *p,
                               const QPointF &absPos);
-    virtual void drawOnAbsPos(SkCanvas *canvas,
-                              const SkPoint &absPos,
-                              const SkScalar &invScale,
-                              const unsigned char r,
-                              const unsigned char g,
-                              const unsigned char b);
+    virtual void drawOnAbsPosSk(
+                SkCanvas *canvas,
+                const SkPoint &absPos,
+                const SkScalar &invScale,
+                const unsigned char r,
+                const unsigned char g,
+                const unsigned char b);
 };
 
 #endif // MOVABLEPOINT_H

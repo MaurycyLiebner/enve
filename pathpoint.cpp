@@ -71,8 +71,7 @@ void PathPoint::prp_loadFromSql(const int &movablePointId) {
     }
 }
 
-void PathPoint::startTransform()
-{
+void PathPoint::startTransform() {
     MovablePoint::startTransform();
     if(!mStartCtrlPt->isSelected()) {
         mStartCtrlPt->MovablePoint::startTransform();
@@ -113,8 +112,7 @@ void PathPoint::cancelTransform()
     }
 }
 
-void PathPoint::finishTransform()
-{
+void PathPoint::finishTransform() {
     MovablePoint::finishTransform();
     if(!mStartCtrlPt->isSelected()) {
         mStartCtrlPt->MovablePoint::finishTransform();
@@ -207,13 +205,11 @@ void PathPoint::disconnectFromPoint(PathPoint *point)
     }
 }
 
-void PathPoint::removeFromVectorPath()
-{
+void PathPoint::removeFromVectorPath() {
     mParentPath->removePoint(this);
 }
 
-void PathPoint::removeApproximate()
-{
+void PathPoint::removeApproximate() {
     mParentPath->deletePointAndApproximate(this);
 }
 
@@ -455,12 +451,12 @@ void PathPoint::drawSk(SkCanvas *canvas,
     canvas->save();
     SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
     if(mSelected) {
-        drawOnAbsPos(canvas,
+        drawOnAbsPosSk(canvas,
                      absPos,
                      invScale,
                      0, 200, 255);
     } else {
-        drawOnAbsPos(canvas,
+        drawOnAbsPosSk(canvas,
                      absPos,
                      invScale,
                      170, 240, 255);
