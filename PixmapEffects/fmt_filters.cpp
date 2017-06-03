@@ -1186,7 +1186,6 @@ void anim_fast_shadow(const image &im,
                       const double &fDx,
                       const double &fDy,
                       const double &fRadius) {
-    if(fRadius < 0.01) return;
     unsigned char *pix = im.data;
     int w = im.w;
     int h = im.h;
@@ -1220,14 +1219,11 @@ void anim_fast_shadow(const image &im,
     int xMax = min(w + iDx, w);
     dp = -iDx - iDy*w;
 
-    for(y = 0; y < yMin; y++) {
-        for(x = 0; x < w; x++) {
-            yi++;
-        }
-        yw += w;
-    }
+    yi += yMin*w;
+    yw += yMin*w;
 
     for(y = yMin; y < yMax; y++) {
+        yi += xMin;
         p = (yi + dp) * 4;
         aLine[0] = pix[p + 3];
         asum = pix[p + 3]*fracInf;
@@ -1242,9 +1238,6 @@ void anim_fast_shadow(const image &im,
         aLine[iRadius + iRadius] = pix[p + 3];
         asum += pix[p + 3]*fracInf;
 
-        for(x = 0; x < xMin; x++) {
-            yi++;
-        }
         for(x = xMin; x < xMax; x++) {
             a[yi] = asum*divFInv;
 
@@ -1270,9 +1263,7 @@ void anim_fast_shadow(const image &im,
 
             yi++;
         }
-        for(x = xMax; x < w; x++) {
-            yi++;
-        }
+        yi += w - xMax;
         yw += w;
     }
 
@@ -1282,7 +1273,7 @@ void anim_fast_shadow(const image &im,
         yi=max(0,yp)+x;
         aLine[0] = a[yi];
         asum = a[yi]*fracInf;
-        yp+=w;
+        yp += w;
 
         for(i = 1 - iRadius; i < iRadius; i++){
             yi = max(0, yp)+x;
@@ -1298,9 +1289,7 @@ void anim_fast_shadow(const image &im,
 
 
         yi = x;
-        for(y = 0; y < yMin; y++) {
-            yi += w;
-        }
+        yi += yMin*w;
         for(y = yMin; y < yMax; y++) {
             int pixA = pix[yi*4 + 3];
             if(pixA != 255) {
@@ -1339,7 +1328,7 @@ void anim_fast_shadow(const image &im,
                 vMIN[y] = min(y + iRadius + 1, hm) * w;
                 vMAX[y] = max(y - iRadius, 0) * w;
             }
-            p1=x+vMIN[y];
+            p1 = x + vMIN[y];
 
             asum -= aLine[0]*fracInf;
 
@@ -1355,7 +1344,7 @@ void anim_fast_shadow(const image &im,
 
             asum += a[p1]*fracInf;
 
-            yi+=w;
+            yi += w;
         }
     }
 

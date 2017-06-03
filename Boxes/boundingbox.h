@@ -295,6 +295,7 @@ public:
     void setAwaitUpdateScheduled(bool bT);
 
     void setCompositionMode(const QPainter::CompositionMode &compositionMode);
+    void setBlendModeSk(const SkBlendMode &blendMode);
 
     virtual void updateEffectsMargin();
 
@@ -402,7 +403,7 @@ public:
     }
 
     void applyEffects(QImage *im, const qreal &scale = 1.);
-    void applyEffectsSk(SkImage *im, const qreal &scale = 1.);
+    void applyEffectsSk(const SkBitmap &im, const qreal &scale = 1.);
 
     virtual QMatrix getCombinedTransform() const;
     virtual void drawUpdatePixmap(QPainter *p);
@@ -516,6 +517,7 @@ protected:
 
     QPainter::CompositionMode mCompositionMode =
             QPainter::CompositionMode_SourceOver;
+    SkBlendMode mBlendModeSk = SkBlendMode::kSrcOver;
 
     void getVisibleAbsFrameRange(int *minFrame, int *maxFrame);
 

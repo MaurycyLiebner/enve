@@ -11,12 +11,10 @@ void RenderContainer::draw(QPainter *p) {
     p->restore();
 }
 
-void RenderContainer::drawSk(SkCanvas *canvas) {
+void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
-    SkPaint paint;
-    //paint.setFilterQuality(kHigh_SkFilterQuality);
-    canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), &paint);
+    canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
     canvas->restore();
 }
 
@@ -79,8 +77,6 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
                             resolutionPer*effectsMargin,
                             resolutionPer,
                             mTransform);
-
-    target->applyEffectsSk(mImageSk.get(), resolutionPer);
 
     //mRenderTime = timer.elapsed();
 }

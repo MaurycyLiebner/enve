@@ -54,7 +54,7 @@ public:
                        const fmt_filters::image &,
                        qreal) {}
     virtual void applySk(BoundingBox *,
-                         SkImage *,
+                         const SkBitmap &,
                          const fmt_filters::image &,
                          qreal) {}
 
@@ -115,7 +115,7 @@ public:
                const fmt_filters::image &img,
                qreal scale);
     void applySk(BoundingBox *target,
-                 SkImage *imgPtr,
+                 const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
     qreal getMargin();
@@ -145,7 +145,7 @@ public:
                const fmt_filters::image &img,
                qreal scale);
     void applySk(BoundingBox *target,
-                 SkImage *imgPtr,
+                 const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
 
@@ -160,7 +160,9 @@ public:
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
-    void applyShadow(const fmt_filters::image &img, const qreal &scale);
+    void applyShadow(const SkBitmap &imgPtr,
+                     const fmt_filters::image &img,
+                     const qreal &scale);
 private:
 //    QrealAnimator mScale;
     QSharedPointer<BoolProperty> mHighQuality =

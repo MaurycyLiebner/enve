@@ -161,13 +161,13 @@ void BoundingBox::applyEffects(QImage *im,
     }
 }
 
-void BoundingBox::applyEffectsSk(SkImage *im,
+void BoundingBox::applyEffectsSk(const SkBitmap &im,
                                  const qreal &scale) {
     if(mEffectsAnimators->hasChildAnimators()) {
         SkPixmap pixmap;
-        im->peekPixels(&pixmap);
+        im.peekPixels(&pixmap);
         fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
-                               im->width(), im->height());
+                               im.width(), im.height());
         mEffectsAnimators->applyEffectsSk(this, im, img, scale);
     }
 }
@@ -350,7 +350,7 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
     drawSk(rasterCanvas);
 
     rasterCanvas->flush();
-
+    delete rasterCanvas;
 //    if(parentCanvas->effectsPaintEnabled()) {
 //        allUglyPixmap = applyEffects(allUglyPixmap,
 //                                     false,
@@ -359,9 +359,11 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
 
 //    *drawPosP = QPoint(qRound(allUglyBoundingRect.left()),
 //                       qRound(allUglyBoundingRect.top()));
+
+    applyEffectsSk(bitmap, resolution);
+
     sk_sp<SkImage> image = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
-    delete rasterCanvas;
     return image;
 }
 
@@ -429,7 +431,7 @@ void BoundingBox::drawUpdatePixmapSk(SkCanvas *canvas) {
         SkPaint paint;
         paint.setAlpha(mUpdateOpacity*255);
         //p->setCompositionMode(mCompositionMode);
-        mUpdateRenderContainer.drawSk(canvas);
+        mUpdateRenderContainer.drawSk(canvas, &paint);
         canvas->restore();
     }
 }
@@ -467,7 +469,13 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
         //p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
         //SkPaint paint;
         //paint.setAlpha(mTransformAnimator->getOpacity()*255/100);
-        mDrawRenderContainer.drawSk(canvas);
+        SkPaint paint;
+        paint.setAlpha(qMin(255,
+                            qMax(0,
+                                 (int)(mTransformAnimator->getOpacity()*255))));
+        paint.setBlendMode(mBlendModeSk);
+        //paint.setFilterQuality(kHigh_SkFilterQuality);
+        mDrawRenderContainer.drawSk(canvas, &paint);
         canvas->restore();
     }
 }
@@ -475,6 +483,11 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
 void BoundingBox::setCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mCompositionMode = compositionMode;
+    scheduleSoftUpdate();
+}
+
+void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
+    mBlendModeSk = blendMode;
     scheduleSoftUpdate();
 }
 

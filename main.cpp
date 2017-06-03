@@ -11,7 +11,7 @@ void setDefaultFormat()
 #else
     // XXX This can be removed once we move to Qt5.7
     format.setVersion(3, 0);
-    format.setProfile(QSurfaceFormat::CompatibilityProfile);
+    format.setProfile(QSurfaceFormat::CoreProfile);
     format.setOptions(QSurfaceFormat::DeprecatedFunctions);
 #endif
     format.setDepthBufferSize(24);

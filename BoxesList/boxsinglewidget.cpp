@@ -74,40 +74,69 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
 
     mCompositionModeCombo = new QComboBox(this);
     mMainLayout->addWidget(mCompositionModeCombo);
+//    mCompositionModeCombo->addItems(QStringList() <<
+//                                    "Source Over" <<
+//                                    "Destination Over" <<
+//                                    "Clear" <<
+//                                    "Source" <<
+//                                    "Destination" <<
+//                                    "Source in" <<
+//                                    "Destination in" <<
+//                                    "Source Out" <<
+//                                    "Destination Out" <<
+//                                    "Source Atop" <<
+//                                    "Destination Atop" <<
+//                                    "Xor" <<
+//                                    "Plus" <<
+//                                    "Multiply" <<
+//                                    "Screen" <<
+//                                    "Overlay" <<
+//                                    "Darken" <<
+//                                    "Lighten" <<
+//                                    "Color Burn" <<
+//                                    "Hard Light" <<
+//                                    "Soft Light" <<
+//                                    "Difference" <<
+//                                    "Exclusion" <<
+//                                    "Source or Destination" <<
+//                                    "Source and Destination" <<
+//                                    "Source Xor Destination" <<
+//                                    "Not Source And Not Destination" <<
+//                                    "Not Source or Not Destination" <<
+//                                    "Not Source Xor Destination" <<
+//                                    "Not Source" <<
+//                                    "Not Source And Destination" <<
+//                                    "Source And Not Destination" <<
+//                                    "Not Source or Destination");
     mCompositionModeCombo->addItems(QStringList() <<
-                                    "Source Over" <<
-                                    "Destination Over" <<
-                                    "Clear" <<
-                                    "Source" <<
-                                    "Destination" <<
-                                    "Source in" <<
-                                    "Destination in" <<
-                                    "Source Out" <<
-                                    "Destination Out" <<
-                                    "Source Atop" <<
-                                    "Destination Atop" <<
+                                    "SrcOver" <<
+                                    "DstOver" <<
+                                    "SrcIn" <<
+                                    "DstIn" <<
+                                    "SrcOut" <<
+                                    "DstOut" <<
+                                    "SrcATop" <<
+                                    "DstATop" <<
                                     "Xor" <<
                                     "Plus" <<
-                                    "Multiply" <<
+                                    "Modulate" <<
                                     "Screen" <<
                                     "Overlay" <<
                                     "Darken" <<
                                     "Lighten" <<
-                                    "Color Burn" <<
-                                    "Hard Light" <<
-                                    "Soft Light" <<
+                                    "ColorDodge" <<
+                                    "ColorBurn" <<
+                                    "HardLight" <<
+                                    "SoftLight" <<
                                     "Difference" <<
                                     "Exclusion" <<
-                                    "Source or Destination" <<
-                                    "Source and Destination" <<
-                                    "Source Xor Destination" <<
-                                    "Not Source And Not Destination" <<
-                                    "Not Source or Not Destination" <<
-                                    "Not Source Xor Destination" <<
-                                    "Not Source" <<
-                                    "Not Source And Destination" <<
-                                    "Source And Not Destination" <<
-                                    "Not Source or Destination");
+                                    "Multiply" <<
+                                    "Hue" <<
+                                    "Saturation" <<
+                                    "Color" <<
+                                    "Luminosity");
+    mCompositionModeCombo->insertSeparator(10);
+    mCompositionModeCombo->insertSeparator(22);
     connect(mCompositionModeCombo, SIGNAL(activated(int)),
             this, SLOT(setCompositionMode(int)));
     mCompositionModeCombo->setSizePolicy(QSizePolicy::Maximum,
@@ -124,12 +153,47 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     hide();
 }
 
+SkBlendMode idToBlendModeSk(const int &id) {
+    switch(id) {
+        case 0: return SkBlendMode::kSrcOver;
+        case 1: return SkBlendMode::kDstOver;
+        case 2: return SkBlendMode::kSrcIn;
+        case 3: return SkBlendMode::kDstIn;
+        case 4: return SkBlendMode::kSrcOut;
+        case 5: return SkBlendMode::kDstOut;
+        case 6: return SkBlendMode::kSrcATop;
+        case 7: return SkBlendMode::kDstATop;
+        case 8: return SkBlendMode::kXor;
+        case 9: return SkBlendMode::kPlus;
+        case 10: return SkBlendMode::kModulate;
+        case 11: return SkBlendMode::kScreen;
+        case 12: return SkBlendMode::kOverlay;
+        case 13: return SkBlendMode::kDarken;
+        case 14: return SkBlendMode::kLighten;
+        case 15: return SkBlendMode::kColorDodge;
+        case 16: return SkBlendMode::kColorBurn;
+        case 17: return SkBlendMode::kHardLight;
+        case 18: return SkBlendMode::kSoftLight;
+        case 19: return SkBlendMode::kDifference;
+        case 20: return SkBlendMode::kExclusion;
+        case 21: return SkBlendMode::kMultiply;
+        case 22: return SkBlendMode::kHue;
+        case 23: return SkBlendMode::kSaturation;
+        case 24: return SkBlendMode::kColor;
+        case 25: return SkBlendMode::kLuminosity;
+        default: return SkBlendMode::kSrcOver;
+    }
+    return SkBlendMode::kSrcOver;
+}
+
 void BoxSingleWidget::setCompositionMode(const int &id) {
     SingleWidgetTarget *target = mTarget->getTarget();
 
     if(target->SWT_isBoundingBox()) {
         ((BoundingBox*)target)->setCompositionMode(
                     static_cast<QPainter::CompositionMode>(id));
+        ((BoundingBox*)target)->setBlendModeSk(
+                    idToBlendModeSk(id));
     }
     MainWindow::getInstance()->callUpdateSchedulers();
 }

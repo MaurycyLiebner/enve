@@ -83,7 +83,7 @@ void EffectAnimators::applyEffects(BoundingBox *target,
 }
 
 void EffectAnimators::applyEffectsSk(BoundingBox *target,
-                                     SkImage *imgPtr,
+                                     const SkBitmap &imgPtr,
                                      const fmt_filters::image &img,
                                      const qreal &scale) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {

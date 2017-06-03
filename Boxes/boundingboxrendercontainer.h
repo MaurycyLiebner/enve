@@ -76,7 +76,7 @@ public:
     virtual ~RenderContainer() {}
 
     void draw(QPainter *p);
-    void drawSk(SkCanvas *canvas);
+    void drawSk(SkCanvas *canvas, SkPaint *paint);
 
     void updatePaintTransformGivenNewCombinedTransform(
             const QMatrix &combinedTransform);

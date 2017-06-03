@@ -95,7 +95,7 @@ void BlurEffect::apply(BoundingBox *target,
 }
 
 void BlurEffect::applySk(BoundingBox *target,
-                         SkImage *imgPtr,
+                         const SkBitmap &imgPtr,
                          const fmt_filters::image &img,
                          qreal scale) {
     Q_UNUSED(target);
@@ -220,44 +220,6 @@ void ShadowEffect::prp_loadFromSql(const int &identifyingId) {
     }
 }
 
-void ShadowEffect::applyShadow(const fmt_filters::image &img,
-                               const qreal &scale) {
-    qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
-    Color currentColor = mColor->getCurrentColor();
-    QPointF trans = mTranslation->getCurrentPointValue();
-    fmt_filters::anim_fast_shadow(img,
-                                  currentColor.gl_r,
-                                  currentColor.gl_g,
-                                  currentColor.gl_b,
-//                                  currentColor.gl_a,
-                                  trans.x(),
-                                  trans.y(),
-                                  radius*0.5);
-    return;
-    fmt_filters::anim_fast_shadow(img,
-                                  currentColor.gl_r,
-                                  currentColor.gl_g,
-                                  currentColor.gl_b,
-//                                  currentColor.gl_a,
-                                  trans.x(),
-                                  trans.y(),
-                                  radius*0.5);//    if(mHighQuality->getValue()) {
-//        if(mBlurRadius->prp_hasKeys()) {
-//            fmt_filters::anim_fast_blur(img, radius*0.5);
-//            fmt_filters::anim_fast_blur(img, radius*0.5);
-//        } else {
-//            fmt_filters::fast_blur(img, radius*0.5);
-//            fmt_filters::fast_blur(img, radius*0.5);
-//        }
-//    } else {
-//        if(mBlurRadius->prp_hasKeys()) {
-//            fmt_filters::anim_fast_blur(img, radius*0.8);
-//        } else {
-//            fmt_filters::fast_blur(img, radius*0.8);
-//        }
-//    }
-}
-
 void ShadowEffect::apply(BoundingBox *target,
                          QImage *imgPtr,
                          const fmt_filters::image &img,
@@ -308,13 +270,93 @@ void ShadowEffect::apply(BoundingBox *target,
     p.end();
 }
 
+void ShadowEffect::applyShadow(const SkBitmap &imgPtr,
+                               const fmt_filters::image &img,
+                               const qreal &scale) {
+    qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
+    Color currentColor = mColor->getCurrentColor();
+    QPointF trans = mTranslation->getCurrentPointValue()*scale;
+    qreal opacity = mOpacity->qra_getCurrentValue()*255;
+
+    SkBitmap shadowBitmap;
+    shadowBitmap.allocPixels(imgPtr.info());
+
+    SkPaint paint;
+    paint.setBlendMode(SkBlendMode::kDstIn);
+    SkCanvas *shadowCanvas = new SkCanvas(shadowBitmap);
+    shadowCanvas->clear(currentColor.getSkColor());
+    shadowCanvas->drawBitmap(imgPtr, 0, 0, &paint);
+    shadowCanvas->flush();
+    delete shadowCanvas;
+
+    SkPixmap shadowPixmap;
+    shadowBitmap.peekPixels(&shadowPixmap);
+    fmt_filters::image shadowImg((uint8_t*)shadowPixmap.writable_addr(),
+                           shadowBitmap.width(), shadowBitmap.height());
+
+    if(mHighQuality->getValue()) {
+        if(mBlurRadius->prp_hasKeys()) {
+            fmt_filters::anim_fast_blur(shadowImg, radius*0.5);
+            fmt_filters::anim_fast_blur(shadowImg, radius*0.5);
+        } else {
+            fmt_filters::fast_blur(shadowImg, radius*0.5);
+            fmt_filters::fast_blur(shadowImg, radius*0.5);
+        }
+    } else {
+        if(mBlurRadius->prp_hasKeys()) {
+            fmt_filters::anim_fast_blur(shadowImg, radius*0.8);
+        } else {
+            fmt_filters::fast_blur(shadowImg, radius*0.8);
+        }
+    }
+
+    SkCanvas *dstCanvas = new SkCanvas(imgPtr);
+    paint.setAlpha(qMin(255, qMax(0, (int)opacity)));
+    paint.setBlendMode(SkBlendMode::kDstOver);
+    dstCanvas->drawBitmap(shadowBitmap, trans.x(), trans.y(), &paint);
+    dstCanvas->flush();
+    delete dstCanvas;
+    return;
+    fmt_filters::anim_fast_shadow(img,
+                                  currentColor.gl_r,
+                                  currentColor.gl_g,
+                                  currentColor.gl_b,
+//                                  currentColor.gl_a,
+                                  trans.x(),
+                                  trans.y(),
+                                  radius*0.5);
+    return;
+    fmt_filters::anim_fast_shadow(img,
+                                  currentColor.gl_r,
+                                  currentColor.gl_g,
+                                  currentColor.gl_b,
+//                                  currentColor.gl_a,
+                                  trans.x(),
+                                  trans.y(),
+                                  radius*0.5);//    if(mHighQuality->getValue()) {
+//        if(mBlurRadius->prp_hasKeys()) {
+//            fmt_filters::anim_fast_blur(img, radius*0.5);
+//            fmt_filters::anim_fast_blur(img, radius*0.5);
+//        } else {
+//            fmt_filters::fast_blur(img, radius*0.5);
+//            fmt_filters::fast_blur(img, radius*0.5);
+//        }
+//    } else {
+//        if(mBlurRadius->prp_hasKeys()) {
+//            fmt_filters::anim_fast_blur(img, radius*0.8);
+//        } else {
+//            fmt_filters::fast_blur(img, radius*0.8);
+//        }
+//    }
+}
+
 void ShadowEffect::applySk(BoundingBox *target,
-                         SkImage *imgPtr,
-                         const fmt_filters::image &img,
-                         qreal scale) {
+                           const SkBitmap &imgPtr,
+                           const fmt_filters::image &img,
+                           qreal scale) {
     Q_UNUSED(target);
     Q_UNUSED(imgPtr);
-    applyShadow(img, scale);
+    applyShadow(imgPtr, img, scale);
 }
 
 qreal ShadowEffect::getMargin() {
