@@ -71,8 +71,7 @@ void QrealAnimatorValueSlider::setValueExternal(const qreal &value) {
     setDisplayedValue(value);
 }
 
-void QrealAnimatorValueSlider::emitEditingFinished(qreal value)
-{
+void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
     if(mAnimator != NULL) {
         mAnimator->prp_finishTransform();
         mBlockAnimatorSignals = false;

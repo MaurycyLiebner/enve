@@ -369,7 +369,7 @@ private:
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();
 
-    void scheduleUpdate() {}
+    void scheduleUpdate();
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
 

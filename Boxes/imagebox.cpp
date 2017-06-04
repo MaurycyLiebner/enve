@@ -53,12 +53,11 @@ void ImageBox::reloadPixmap()
         mImageSk = SkImage::MakeFromEncoded(data);
     }
 
-    if(!mPivotChanged) centerPivotPosition();
+    if(!mPivotChanged) scheduleCenterPivot();
     scheduleSoftUpdate();
 }
 
-void ImageBox::setFilePath(QString path)
-{
+void ImageBox::setFilePath(QString path) {
     mImageFilePath = path;
     reloadPixmap();
 }

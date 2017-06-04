@@ -103,7 +103,9 @@ void PathBox::updatePathIfNeeded() {
     if(mPathUpdateNeeded) {
         updatePath();
         if(!prp_hasKeys() &&
-           !mPivotChanged ) centerPivotPosition();
+           !mPivotChanged ) {
+            centerPivotPosition();
+        }
         mPathUpdateNeeded = false;
         mOutlinePathUpdateNeeded = false;
     }

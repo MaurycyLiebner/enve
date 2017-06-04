@@ -727,6 +727,7 @@ void ParticleEmitter::generateParticles() {
 void ParticleEmitter::drawParticlesSk(SkCanvas *canvas) {
     canvas->save();
     SkPaint paint;
+    paint.setAntiAlias(true);
     paint.setColor(mColorAnimator->getCurrentColor().getSkColor());
     paint.setStrokeCap(SkPaint::kRound_Cap);
     paint.setStyle(SkPaint::kStroke_Style);

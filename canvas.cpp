@@ -54,7 +54,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mCurrentMode = MOVE_PATH;
 
     prp_setAbsFrame(0);
-    addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));
     scheduleHardUpdate();
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
@@ -412,12 +411,17 @@ void Canvas::drawInputText(QPainter *p) {
     }
 }
 
+void Canvas::scheduleUpdate() {
+    if(shouldUpdate()) {
+        addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));
+    }
+}
+
 bool Canvas::isMovingPath() {
     return mCurrentMode == CanvasMode::MOVE_PATH;
 }
 
-QSize Canvas::getCanvasSize()
-{
+QSize Canvas::getCanvasSize() {
     return QSize(mWidth, mHeight);
 }
 
@@ -493,6 +497,7 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                  const int &maxFrame) {
     mCacheHandler.clearCacheForAbsFrameRange(minFrame, maxFrame);
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
+
 }
 
 void Canvas::afterUpdate() {
@@ -1049,7 +1054,7 @@ void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
     BoxesGroup::addChildAwaitingUpdate(child);
     if(mAwaitingUpdate) return;
     mAwaitingUpdate = true;
-    addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));
+    scheduleUpdate();
     //mCanvasWindow->addBoxAwaitingUpdate(this);
 }
 

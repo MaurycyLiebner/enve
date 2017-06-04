@@ -103,9 +103,10 @@ void Canvas::resetSelectedRotation() {
     }
 }
 
-PathPoint *Canvas::createNewPointOnLineNearSelected(const QPointF &absPos,
-                                                    const bool &adjust,
-                                                    const qreal &canvasScaleInv) {
+PathPoint *Canvas::createNewPointOnLineNearSelected(
+                        const QPointF &absPos,
+                        const bool &adjust,
+                        const qreal &canvasScaleInv) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         PathPoint *point = box->createNewPointOnLineNear(absPos, adjust,
                                                          canvasScaleInv);

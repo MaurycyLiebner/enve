@@ -423,15 +423,15 @@ void BoundingBox::scheduleEffectsMarginUpdate() {
 }
 
 void BoundingBox::resetScale() {
-    mTransformAnimator->resetScale();
+    mTransformAnimator->resetScale(true);
 }
 
 void BoundingBox::resetTranslation() {
-    mTransformAnimator->resetTranslation();
+    mTransformAnimator->resetTranslation(true);
 }
 
 void BoundingBox::resetRotation() {
-    mTransformAnimator->resetRotation();
+    mTransformAnimator->resetRotation(true);
 }
 
 void BoundingBox::updateAfterFrameChanged(const int &currentFrame) {
@@ -555,7 +555,7 @@ void BoundingBox::updateRelBoundingRect() {
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(QRectFToSkRect(mRelBoundingRect));
 
-    if(mCenterPivotScheduled) {
+    if(!mPivotChanged || mCenterPivotScheduled) {
         mCenterPivotScheduled = false;
         centerPivotPosition();
     }

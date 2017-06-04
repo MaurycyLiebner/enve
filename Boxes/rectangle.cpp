@@ -91,7 +91,7 @@ void Rectangle::prp_loadFromSql(const int &boundingBoxId) {
         qDebug() << "Could not load rectangle with id " << boundingBoxId;
     }
 
-    if(!mPivotChanged) centerPivotPosition();
+    if(!mPivotChanged) scheduleCenterPivot();
 }
 
 void Rectangle::startAllPointsTransform() {
