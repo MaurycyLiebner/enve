@@ -78,7 +78,6 @@ void AnimationBox::afterSuccessfulUpdate() {
         if(cont == NULL) {
             cont = mAnimationFramesCache.createNewRenderContainerAtRelFrame(
                                                         mUpdateAnimationFrame);
-            cont->replaceImage(mUpdateAnimationImage);
             cont->replaceImageSk(mUpdateAnimationImageSk);
         }
     }
@@ -95,7 +94,6 @@ void AnimationBox::setUpdateVars() {
                 mUpdateAnimationFrame);
     mUpdatePixmapReloadScheduled = cont == NULL;
     if(cont != NULL) {
-        mUpdateAnimationImage = cont->getImage();
         mUpdateAnimationImageSk = cont->getImageSk();
         mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
     }

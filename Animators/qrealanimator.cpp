@@ -131,7 +131,6 @@ void QrealAnimator::setPrefferedValueStep(const qreal &valueStep) {
 }
 
 void QrealAnimator::prp_setRecording(const bool &rec) {
-
     if(rec) {
         anim_setRecordingWithoutChangingKeys(rec);
         anim_saveCurrentValueAsKey();
@@ -380,7 +379,8 @@ void QrealAnimator::qra_updateKeysPath() {
     }
 }
 
-void QrealAnimator::qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
+void QrealAnimator::qra_getMinAndMaxValues(qreal *minValP,
+                                           qreal *maxValP) {
     if(mMinMaxValuesFrozen) {
         *minValP = mMinPossibleVal;
         *maxValP = mMaxPossibleVal;
@@ -414,8 +414,8 @@ void QrealAnimator::qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP) {
 }
 
 void QrealAnimator::qra_getMinAndMaxValuesBetweenFrames(
-        const int &startFrame, const int &endFrame,
-        qreal *minValP, qreal *maxValP) {
+                    const int &startFrame, const int &endFrame,
+                    qreal *minValP, qreal *maxValP) {
     qreal minVal = 100000.;
     qreal maxVal = -100000.;
     if(anim_mKeys.isEmpty()) {

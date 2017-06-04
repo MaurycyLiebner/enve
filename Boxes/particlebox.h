@@ -6,48 +6,29 @@ class ParticleBox;
 
 struct ParticleState {
     ParticleState() {}
-    ParticleState(const QPointF &posT,
-                  const qreal &scaleT,
-                  const qreal &sizeT,
-                  const qreal &opacityT) {
-        pos = posT;
-        size = scaleT*sizeT*0.5;
-        opacity = opacityT;
-        isLine = false;
-    }
+
     ParticleState(const QPointF &posT,
               const qreal &scaleT,
               const qreal &sizeT,
               const qreal &opacityT,
-              const QPainterPath &path) {
-//        QPainterPathStroker stroker;
-//        stroker.setWidth(radius);
-//        stroker.setCapStyle(Qt::RoundCap);
-//        linePath = stroker.createStroke(path);
+              const SkPath &path) {
         pos = posT;
         size = scaleT*sizeT;
         opacity = opacityT;
-        isLine = true;
 
         linePath = path;
     }
 
-    void draw(QPainter *p) const {
+    void drawSk(SkCanvas *canvas,
+                const SkPaint paint) const {
         if(size < 0.) return;
-        p->setOpacity(opacity);
-
-        if(isLine) {
-            QPen pen = p->pen();
-            pen.setWidthF(size);
-            p->setPen(pen);
-            p->drawPath(linePath);
-        } else {
-            p->drawEllipse(pos, size, size);
-        }
+        SkPaint paintT = paint;
+        paintT.setAlpha(opacity*255);
+        paintT.setStrokeWidth(size);
+        canvas->drawPath(linePath, paintT);
     }
 
-    bool isLine;
-    QPainterPath linePath;
+    SkPath linePath;
     QPointF pos;
     qreal size;
     qreal opacity;
@@ -97,7 +78,7 @@ public:
 
     void generateParticles();
 
-    void drawParticles(QPainter *p);
+    void drawParticlesSk(SkCanvas *canvas);
     void updateParticlesForFrame(const int &frame);
     QRectF getParticlesBoundingRect();
     void scheduleGenerateParticles();
@@ -211,20 +192,22 @@ public:
                            const int &frame,
                            QPointF *acc);
     void updateAfterFrameChanged(const int &currentFrame);
-    void draw(QPainter *p);
     void updateRelBoundingRect();
     void preUpdatePixmapsUpdates();
     bool relPointInsidePath(const QPointF &relPos);
 
     void addEmitter(ParticleEmitter *emitter);
+    void drawSk(SkCanvas *canvas);
+    void drawSelectedSk(SkCanvas *canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
 
     void makeDuplicate(Property *targetBox);
 
     void startAllPointsTransform();
-    void drawSelected(QPainter *p,
-                      const CanvasMode &currentCanvasMode);
+
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);

@@ -130,17 +130,17 @@ void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     }
 }
 
-void ParticleBox::draw(QPainter *p) {
-    p->save();
+void ParticleBox::drawSk(SkCanvas *canvas) {
+    canvas->save();
 
-    p->setClipRect(mRelBoundingRect);
+    canvas->clipRect(QRectFToSkRect(mRelBoundingRect));
     Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-        emitter->drawParticles(p);
+        emitter->drawParticlesSk(canvas);
     }
 
     //p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
     //p->fillRect(mRelBoundingRect, Qt::white);
-    p->restore();
+    canvas->restore();
 }
 
 void ParticleBox::applyPaintSetting(const PaintSetting &setting) {
@@ -157,26 +157,26 @@ void ParticleBox::startAllPointsTransform() {
     startTransform();
 }
 
-void ParticleBox::drawSelected(QPainter *p,
-                             const CanvasMode &currentCanvasMode) {
+void ParticleBox::drawSelectedSk(SkCanvas *canvas,
+                                 const CanvasMode &currentCanvasMode,
+                                 const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        drawBoundingRect(p);
+        canvas->save();
+        drawBoundingRectSk(canvas, invScale);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
-            mTopLeftPoint->draw(p);
-            mBottomRightPoint->draw(p);
+            mTopLeftPoint->drawSk(canvas, invScale);
+            mBottomRightPoint->drawSk(canvas, invScale);
             Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
                 MovablePoint *pt = emitter->getPosPoint();
-                pt->draw(p);
+                pt->drawSk(canvas, invScale);
             }
         } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->draw(p);
+            mTransformAnimator->getPivotMovablePoint()->
+                    drawSk(canvas, invScale);
         }
-        p->restore();
+        canvas->restore();
     }
 }
-
 
 MovablePoint *ParticleBox::getPointAtAbsPos(const QPointF &absPtPos,
                                       const CanvasMode &currentCanvasMode,
@@ -287,39 +287,33 @@ void Particle::generatePathNextFrame(const int &frame,
         mLastOpacity += (finalOpacity - 1.)/decayFrames;
     }
 
-    if(length > 0.1) {
-        QPainterPath linePath;
-        qreal currLen = 0.;
-        int currId = arrayId - 1;
-        linePath.moveTo(mLastPos);
-        QPointF lastPos = mLastPos;
-        while(currId > -1) {
-            QPointF currPos = mParticleStates[currId].pos;
-            qreal lenInc = pointToLen(lastPos - currPos);
-            qreal newLen = currLen + lenInc;
-            if(newLen > length) {
-                linePath.lineTo(lastPos + (currPos - lastPos)*
-                                (length - currLen)/lenInc);
-                break;
-            } else {
-                linePath.lineTo(currPos);
-            }
-            currLen = newLen;
-            lastPos = currPos;
-            currId--;
+    SkPath linePath;
+    SkScalar currLen = 0.;
+    int currId = arrayId - 1;
+    QPointF lastPos = mLastPos;
+    linePath.moveTo(QPointFToSkPoint(lastPos));
+    while(currId > -1) {
+        QPointF currPos = mParticleStates[currId].pos;
+        qreal lenInc = pointToLen(lastPos - currPos);
+        qreal newLen = currLen + lenInc;
+        if(newLen > length) {
+            linePath.lineTo(QPointFToSkPoint(
+                                lastPos + (currPos - lastPos)*
+                                (length - currLen)/lenInc));
+            break;
+        } else {
+            linePath.lineTo(QPointFToSkPoint(currPos));
         }
-
-        mParticleStates[arrayId] = ParticleState(mLastPos,
-                                                 mLastScale,
-                                                 mSize,
-                                                 mLastOpacity,
-                                                 linePath);
-    } else {
-        mParticleStates[arrayId] = ParticleState(mLastPos,
-                                                 mLastScale,
-                                                 mSize,
-                                                 mLastOpacity);
+        currLen = newLen;
+        lastPos = currPos;
+        currId--;
     }
+
+    mParticleStates[arrayId] = ParticleState(mLastPos,
+                                             mLastScale,
+                                             mSize,
+                                             mLastOpacity,
+                                             linePath);
 
     qreal perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
                             velocityVarPeriod;
@@ -730,21 +724,16 @@ void ParticleEmitter::generateParticles() {
     mUpdateParticlesForFrameScheduled = true;
 }
 
-void ParticleEmitter::drawParticles(QPainter *p) {
-    p->save();
-    if(mParticleLength->qra_getCurrentValue() > 0.1) {
-        QPen pen = QPen(mColorAnimator->getCurrentColor().qcol);
-        pen.setCapStyle(Qt::RoundCap);
-        p->setPen(pen);
-        p->setBrush(Qt::NoBrush);
-    } else {
-        p->setBrush(mColorAnimator->getCurrentColor().qcol);
-        p->setPen(Qt::NoPen);
-    }
+void ParticleEmitter::drawParticlesSk(SkCanvas *canvas) {
+    canvas->save();
+    SkPaint paint;
+    paint.setColor(mColorAnimator->getCurrentColor().getSkColor());
+    paint.setStrokeCap(SkPaint::kRound_Cap);
+    paint.setStyle(SkPaint::kStroke_Style);
     Q_FOREACH(const ParticleState &state, mParticleStates) {
-        state.draw(p);
+        state.drawSk(canvas, paint);
     }
-    p->restore();
+    canvas->restore();
 }
 
 void ParticleEmitter::updateParticlesForFrame(const int &frame) {

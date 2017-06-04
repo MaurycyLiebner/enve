@@ -180,7 +180,6 @@ public:
 
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(const QString &renderDest);
-    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
     void showContextMenu(QPoint globalPos);
 
     void applyCurrentTransformationToSelected();
@@ -223,7 +222,6 @@ public:
 
     void selectAndAddContainedPointsToSelection(QRectF absRect);
 //
-    void paintEvent(QPainter *p);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -231,7 +229,6 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *);
 
     void keyPressEvent(QKeyEvent *event);
-    void drawPreviewPixmap(QPainter *p);
     void drawPreviewPixmapSk(SkCanvas *canvas);
 
     void createAnimationBoxForPaths(const QStringList &paths);
@@ -309,7 +306,6 @@ public:
 
     BoundingBox *createLink(BoxesGroup *parent);
     void createImageBox(const QString &path);
-    void drawSelected(QPainter *p, const CanvasMode &currentCanvasMode);
     void drawSelectedSk(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale);

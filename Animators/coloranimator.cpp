@@ -2,8 +2,7 @@
 #include "Colors/helpers.h"
 #include <QDebug>
 
-ColorAnimator::ColorAnimator() : ComplexAnimator()
-{
+ColorAnimator::ColorAnimator() : ComplexAnimator() {
     prp_setName("color");
     mAlphaAnimator->prp_setName("alpha");
     setColorMode(RGBMODE);
@@ -34,7 +33,8 @@ void ColorAnimator::prp_loadFromSql(const int &sqlId) {
     if(query.exec(queryStr) ) {
         query.next();
         int idModeAnimator = query.record().indexOf("colormode");
-        ColorMode colorMode = static_cast<ColorMode>(query.value(idModeAnimator).toInt());
+        ColorMode colorMode = static_cast<ColorMode>(
+                    query.value(idModeAnimator).toInt());
         setColorMode(colorMode);
         int idVal1AnimatorId = query.record().indexOf("val1animatorid");
         mVal1Animator->prp_loadFromSql(query.value(idVal1AnimatorId).toInt());
@@ -50,8 +50,8 @@ void ColorAnimator::prp_loadFromSql(const int &sqlId) {
 }
 
 #include <QSqlError>
-int ColorAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId)
-{
+int ColorAnimator::prp_saveToSql(QSqlQuery *query,
+                                 const int &parentId) {
     Q_UNUSED(parentId);
     int val1AnimatorId = mVal1Animator->prp_saveToSql(query);
     int val2AnimatorId = mVal2Animator->prp_saveToSql(query);
@@ -100,8 +100,7 @@ void ColorAnimator::qra_setCurrentValue(QColor qcolorValue, bool finish)
     qra_setCurrentValue(color, finish);
 }
 
-Color ColorAnimator::getCurrentColor() const
-{
+Color ColorAnimator::getCurrentColor() const {
     Color color;
     if(mColorMode == RGBMODE) {
         color.setRGB(mVal1Animator->qra_getCurrentValue(),
@@ -122,8 +121,7 @@ Color ColorAnimator::getCurrentColor() const
     return color;
 }
 
-void ColorAnimator::setColorMode(ColorMode colorMode)
-{
+void ColorAnimator::setColorMode(ColorMode colorMode) {
     if(colorMode == RGBMODE) {
         mVal1Animator->prp_setName("red");
         mVal2Animator->prp_setName("green");
@@ -191,23 +189,19 @@ void ColorAnimator::setColorMode(ColorMode colorMode)
     emit colorModeChanged(mColorMode);
 }
 
-void ColorAnimator::startVal1Transform()
-{
+void ColorAnimator::startVal1Transform() {
     mVal1Animator->prp_startTransform();
 }
 
-void ColorAnimator::startVal2Transform()
-{
+void ColorAnimator::startVal2Transform() {
     mVal2Animator->prp_startTransform();
 }
 
-void ColorAnimator::startVal3Transform()
-{
+void ColorAnimator::startVal3Transform() {
     mVal3Animator->prp_startTransform();
 }
 
-void ColorAnimator::startAlphaTransform()
-{
+void ColorAnimator::startAlphaTransform() {
     mAlphaAnimator->prp_startTransform();
 }
 

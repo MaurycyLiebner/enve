@@ -45,11 +45,6 @@ public:
                 this, SLOT(scheduleAwaitUpdateSLOT()));
     }
 
-    QImage getAllUglyPixmapProvidedTransform(
-                        const qreal &effectsMargin,
-                        const qreal &resolution,
-                        const QMatrix &allUglyTransform,
-                        QPoint *draWPosP);
 
 
     void updateRelBoundingRect();
@@ -164,8 +159,6 @@ public:
 
     void updateRelBoundingRect();
     void setClippedToCanvasSize(const bool &clipped);
-
-    void draw(QPainter *p);
 
     void makeDuplicate(Property *targetBox) {
         InternalLinkBoxesGroup::makeDuplicate(targetBox);

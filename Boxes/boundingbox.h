@@ -97,14 +97,10 @@ public:
     }
     virtual bool isContainedIn(const QRectF &absRect);
 
-    virtual void drawPixmap(QPainter *p);
     virtual void drawPixmapSk(SkCanvas *canvas);
 
-    virtual void draw(QPainter *) {}
     virtual void drawSk(SkCanvas *) {}
 
-    virtual void drawSelected(QPainter *p,
-                              const CanvasMode &currentCanvasMode);
     virtual void drawSelectedSk(SkCanvas *canvas,
                                 const CanvasMode &currentCanvasMode,
                                 const SkScalar &invScale);
@@ -146,7 +142,6 @@ public:
     virtual void select();
     void deselect();
     int getZIndex();
-    void drawBoundingRect(QPainter *p);
     void drawBoundingRectSk(SkCanvas *canvas,
                             const SkScalar &invScale);
 
@@ -273,8 +268,6 @@ public:
     void saveOldPixmap();
 
     void saveUglyPaintTransform();
-    void drawAsBoundingRect(QPainter *p,
-                            const QPainterPath &path);
     void drawAsBoundingRectSk(SkCanvas *canvas,
                               const SkPath &path,
                               const SkScalar &invScale);
@@ -321,15 +314,11 @@ public:
         return mEffectsMargin;
     }
 
-    virtual QImage getAllUglyPixmapProvidedTransform(
-                        const qreal &effectsMargin,
-                        const qreal &resolution,
-                        const QMatrix &allUglyTransform,
-                        QPoint *drawPosP);
     virtual sk_sp<SkImage> getAllUglyPixmapProvidedTransformSk(
                         const qreal &effectsMargin,
                         const qreal &resolution,
-                        const QMatrix &allUglyTransform);
+                        const QMatrix &allUglyTransform,
+                        SkPoint *drawPosP);
 
     virtual Canvas *getParentCanvas();
 
@@ -371,16 +360,11 @@ public:
         return createDuplicate(mParent.data());
     }
 
-    virtual void drawHovered(QPainter *p) {
-        drawHoveredPath(p, mRelBoundingRectPath);
-    }
-
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const SkScalar &invScale) {
         drawHoveredPathSk(canvas, mSkRelBoundingRectPath, invScale);
     }
 
-    void drawHoveredPath(QPainter *p, const QPainterPath &path);
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
                            const SkScalar &invScale);
@@ -406,7 +390,6 @@ public:
     void applyEffectsSk(const SkBitmap &im, const qreal &scale = 1.);
 
     virtual QMatrix getCombinedTransform() const;
-    virtual void drawUpdatePixmap(QPainter *p);
     virtual void drawUpdatePixmapSk(SkCanvas *canvas);
 
     virtual void processUpdate();
@@ -416,8 +399,7 @@ public:
     void updateRelativeTransformAfterFrameChange();
     void setNoCache(const bool &bT);
     QPainter::CompositionMode getCompositionMode();
-    void drawUpdatePixmapForEffect(QPainter *p);
-    QPoint getUpdateDrawPos();
+    void drawUpdatePixmapForEffectSk(SkCanvas *canvas);
     QMatrix getUpdatePaintTransform();
     bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(

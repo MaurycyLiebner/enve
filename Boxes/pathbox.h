@@ -12,7 +12,6 @@ public:
             const BoundingBoxType &type);
     ~PathBox();
 
-    void draw(QPainter *p);
     void drawSk(SkCanvas *canvas);
 
     void schedulePathUpdate();
@@ -66,7 +65,6 @@ public:
 
     void makeDuplicate(Property *targetBox);
 
-    void drawHovered(QPainter *p);
     void drawHoveredSk(SkCanvas *canvas, const SkScalar &invScale);
 
     void applyPaintSetting(

@@ -211,11 +211,6 @@ void CanvasWindow::qRender(QPainter *p) {
     mCurrentCanvas->drawInputText(p);
 }
 
-void CanvasWindow::render(QPainter *p) {
-    if(mCurrentCanvas == NULL) return;
-    mCurrentCanvas->paintEvent(p);
-}
-
 void CanvasWindow::renderSk(SkCanvas *canvas) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->renderSk(canvas);

@@ -17,12 +17,11 @@ class VectorPath : public PathBox
 {
 public:
     VectorPath(BoxesGroup *group);
-    static VectorPath *createPathFromSql(int boundingBoxId, BoxesGroup *parent);
+    static VectorPath *createPathFromSql(int boundingBoxId,
+                                         BoxesGroup *parent);
 
     ~VectorPath();
 
-    void drawSelected(QPainter *p,
-                      const CanvasMode &currentCanvasMode);
     void drawSelectedSk(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale);

@@ -25,8 +25,6 @@ public:
     BoundingBox *createLink(BoxesGroup *parent);
     BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 
-    void draw(QPainter *p);
-//    void render(QPainter *p);
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
 
@@ -34,8 +32,6 @@ public:
     //MovablePoint *getPointAt(const QPointF &absPos, const CanvasMode &currentMode);
 
     void addContainedBoxesToSelection(QRectF rect);
-
-    void drawBoundingRect(QPainter *p);
 
     void setIsCurrentGroup(bool bT);
 
@@ -52,18 +48,6 @@ public:
 
     int prp_saveToSql(QSqlQuery *query, const int &parentId);
     BoxesGroup *loadChildrenFromSql(int thisBoundingBoxId, bool loadInBox);
-
-    //
-
-    void drawListItem(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
-    void drawChildrenListItems(QPainter *p, qreal drawX, qreal drawY, qreal maxY);
-    qreal getListItemHeight();
-    void handleListItemMousePress(qreal boxesListX,
-                                  qreal relX, qreal relY,
-                                  QMouseEvent *event);
-    void handleChildListItemMousePress(qreal boxesListX,
-                                       qreal relX, qreal relY,
-                                       qreal y0, QMouseEvent *event);
 
     bool isCurrentGroup();
     void addChild(BoundingBox *child);
@@ -96,15 +80,6 @@ public:
     void setStrokeCapStyle(Qt::PenCapStyle capStyle);
     void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle);
     void setStrokeWidth(qreal strokeWidth, bool finish);
-
-    void drawChildrenKeysView(QPainter *p,
-                              qreal drawY, qreal maxY,
-                              qreal pixelsPerFrame,
-                              int startFrame, int endFrame);
-    void drawKeysView(QPainter *p,
-                      qreal drawY, qreal maxY,
-                      qreal pixelsPerFrame,
-                      int startFrame, int endFrame);
 
     PaintSettings *getFillSettings();
     StrokeSettings *getStrokeSettings();
@@ -152,12 +127,10 @@ public:
         }
     }
     void clearAllCache();
-    void drawPixmap(QPainter *p);
     void drawPixmapSk(SkCanvas *canvas);
     void setDescendantCurrentGroup(const bool &bT);
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
-    void drawUpdatePixmap(QPainter *p);
     void drawUpdatePixmapSk(SkCanvas *canvas);
 
     virtual void addChildAwaitingUpdate(BoundingBox *child);

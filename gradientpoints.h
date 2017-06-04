@@ -17,9 +17,8 @@ public:
 
     void disable();
 
-    void drawGradientPoints(QPainter *p);
-    void drawGradientPoints(SkCanvas *canvas,
-                            const SkScalar &invScale);
+    void drawGradientPointsSk(SkCanvas *canvas,
+                              const SkScalar &invScale);
 
     MovablePoint *qra_getPointAt(const QPointF &absPos,
                                  const qreal &canvasScaleInv);

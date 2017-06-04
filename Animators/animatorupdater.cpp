@@ -94,6 +94,10 @@ void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
     mTarget->scheduleSoftUpdate();
 }
 
+void DisplayedFillStrokeSettingsUpdater::updateFinal() {
+    mTarget->clearAllCache();
+}
+
 PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
     mTarget = target;
 }

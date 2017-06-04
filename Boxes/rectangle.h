@@ -20,8 +20,11 @@ public:
 
     void moveSizePointByAbs(QPointF absTrans);
     void startAllPointsTransform();
-    void drawSelected(QPainter *p,
-                      const CanvasMode &currentCanvasMode);
+
+    void drawSelectedSk(SkCanvas *canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
+
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);

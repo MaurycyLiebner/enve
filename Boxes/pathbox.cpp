@@ -220,10 +220,6 @@ void PathBox::makeDuplicate(Property *targetBox) {
                                                mStrokeGradientPoints.data());
 }
 
-void PathBox::drawHovered(QPainter *p) {
-    drawHoveredPath(p, mPath);
-}
-
 void PathBox::drawHoveredSk(SkCanvas *canvas,
                             const SkScalar &invScale) {
     drawHoveredPathSk(canvas, mPathSk, invScale);
@@ -398,24 +394,6 @@ void PathBox::setUpdateVars() {
     mUpdateOutlinePath = mOutlinePath;
     mUpdateOutlinePathSk = mOutlinePathSk;
     BoundingBox::setUpdateVars();
-}
-
-void PathBox::draw(QPainter *p) {
-    p->save();
-
-    p->setPen(Qt::NoPen);
-    if(!mUpdatePath.isEmpty()) {
-        mUpdateFillSettings.applyPainterSettings(p);
-
-        p->drawPath(mUpdatePath);
-    }
-    if(!mUpdateOutlinePath.isEmpty()) {
-        mUpdateStrokeSettings.applyPainterSettings(p);
-
-        p->drawPath(mUpdateOutlinePath);
-    }
-
-    p->restore();
 }
 
 void PathBox::drawSk(SkCanvas *canvas) {

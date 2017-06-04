@@ -54,8 +54,6 @@ public:
     void setHorizontalRadius(const qreal &horizontalRadius);
     void setRadius(const qreal &radius);
 
-    void drawSelected(QPainter *p,
-                      const CanvasMode &currentCanvasMode);
     void updatePath();
     MovablePoint *getPointAtAbsPos(
                              const QPointF &absPtPos,
@@ -72,6 +70,10 @@ public:
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
         return new Circle(parent);
     }
+
+    void drawSelectedSk(SkCanvas *canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
 
     void makeDuplicate(Property *targetBox) {
         PathBox::makeDuplicate(targetBox);

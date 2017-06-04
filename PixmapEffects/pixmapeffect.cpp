@@ -990,34 +990,34 @@ void AlphaMatteEffect::apply(BoundingBox *target,
     Q_UNUSED(img);
     Q_UNUSED(scale);
     BoundingBox *boxTarget = mBoxTarget->getTarget();
-    if(boxTarget) {
-        qreal influence = mInfluenceAnimator->qra_getCurrentValue();
-        QPoint targetDrawPos = target->getUpdateDrawPos();
+//    if(boxTarget) {
+//        qreal influence = mInfluenceAnimator->qra_getCurrentValue();
+//        QPoint targetDrawPos = target->getUpdateDrawPos();
 
-        QImage imgTmp = QImage(imgPtr->size(),
-                               QImage::Format_ARGB32_Premultiplied);
-        imgTmp.fill(Qt::transparent);
-        QPainter p(&imgTmp);
+//        QImage imgTmp = QImage(imgPtr->size(),
+//                               QImage::Format_ARGB32_Premultiplied);
+//        imgTmp.fill(Qt::transparent);
+//        QPainter p(&imgTmp);
 
-        p.translate(-targetDrawPos);
-        p.setTransform(
-                    QTransform(target->getUpdatePaintTransform().inverted()),
-                    true);
+//        p.translate(-targetDrawPos);
+//        p.setTransform(
+//                    QTransform(target->getUpdatePaintTransform().inverted()),
+//                    true);
 
-        boxTarget->drawUpdatePixmapForEffect(&p);
-        p.end();
+//        boxTarget->drawUpdatePixmapForEffect(&p);
+//        p.end();
 
-        QPainter p2(imgPtr);
+//        QPainter p2(imgPtr);
 
-        p2.setOpacity(influence);
-        if(mInvertedProperty->getValue()) {
-            p2.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-        } else {
-            p2.setCompositionMode(QPainter::CompositionMode_DestinationOut);
-        }
+//        p2.setOpacity(influence);
+//        if(mInvertedProperty->getValue()) {
+//            p2.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+//        } else {
+//            p2.setCompositionMode(QPainter::CompositionMode_DestinationOut);
+//        }
 
-        p2.drawImage(0, 0, imgTmp);
+//        p2.drawImage(0, 0, imgTmp);
 
-        p2.end();
-    }
+//        p2.end();
+//    }
 }

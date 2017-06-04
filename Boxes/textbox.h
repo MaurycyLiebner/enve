@@ -13,8 +13,6 @@ public:
     void setSelectedFontSize(qreal size);
     void setSelectedFontFamilyAndStyle(QString fontFamily,
                                QString fontStyle);
-    void drawSelected(QPainter *p,
-                      const CanvasMode &currentCanvasMode);
 
     void openTextEditor();
     int prp_saveToSql(QSqlQuery *query, const int &parentId);

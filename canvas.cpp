@@ -18,6 +18,7 @@
 #include "pointhelpers.h"
 #include "pathpoint.h"
 #include "Boxes/linkbox.h"
+#include "Animators/animatorupdater.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWindow *canvasWidget,
@@ -27,6 +28,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mCacheHandler.setParentBox(this);
     mBackgroundColor->qra_setCurrentValue(Color(75, 75, 75));
     ca_addChildAnimator(mBackgroundColor.data());
+    mBackgroundColor->prp_setUpdater(
+                new DisplayedFillStrokeSettingsUpdater(this));
     mSoundComposition = new SoundComposition(this);
     ca_addChildAnimator(mSoundComposition->getSoundsAnimatorContainer());
 
@@ -204,15 +207,6 @@ void Canvas::createImageBox(const QString &path) {
 
 void Canvas::createSoundForPath(const QString &path) {
     getSoundComposition()->addSoundAnimator(new SingleSound(path));
-}
-
-void Canvas::drawSelected(QPainter *p, const CanvasMode &currentCanvasMode) {
-    QPen pen = QPen(Qt::black, 1.);
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->drawSelected(p, currentCanvasMode);
-    }
 }
 
 void Canvas::drawSelectedSk(SkCanvas *canvas,
@@ -400,102 +394,6 @@ void Canvas::renderSk(SkCanvas *canvas) {
     }
 }
 
-void Canvas::paintEvent(QPainter *p) {
-    p->setRenderHint(QPainter::Antialiasing);
-    p->setRenderHint(QPainter::SmoothPixmapTransform);
-
-    QRectF viewRect = getPixBoundingRect();
-
-    if(isPreviewingOrRendering()) {
-        QPainterPath path;
-        path.addRect(0, 0,
-                     mCanvasWidget->width() + 1,
-                     mCanvasWidget->height() + 1);
-        QPainterPath viewRectPath;
-        viewRectPath.addRect(viewRect);
-        p->setBrush(QColor(0, 0, 0));
-        p->setPen(Qt::NoPen);
-        p->drawPath(path.subtracted(viewRectPath));
-
-        p->save();
-
-        p->setTransform(QTransform(mCanvasTransformMatrix), true);
-        qreal reversedRes = 1./mResolutionFraction;
-        p->scale(reversedRes, reversedRes);
-
-        if(mCurrentPreviewContainer != NULL) {
-            mCurrentPreviewContainer->draw(p);
-            //p->drawImage(QPointF(0., 0.), mCurrentPreviewContainer->getImage());
-        }
-        p->restore();
-    } else {
-        p->fillRect(0, 0,
-                    mCanvasWidget->width() + 1,
-                    mCanvasWidget->height() + 1,
-                    QColor(75, 75, 75));
-        p->fillRect(viewRect, mBackgroundColor->getCurrentColor().qcol);
-
-        p->setTransform(QTransform(mCanvasTransformMatrix), true);
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
-            box->drawPixmap(p);
-        }
-        QPen pen = QPen(Qt::black, 1.5);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        mCurrentBoxesGroup->drawSelected(p, mCurrentMode);
-        drawSelected(p, mCurrentMode);
-
-        if(mCurrentMode == CanvasMode::MOVE_PATH ||
-           mCurrentMode == CanvasMode::MOVE_POINT) {
-            mRotPivot->draw(p);
-        }
-        pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        if(mSelecting) {
-            p->drawRect(mSelectionRect);
-        } 
-
-        if(mHoveredPoint != NULL) {
-            mHoveredPoint->drawHovered(p);
-        } else if(mHoveredEdge != NULL) {
-            mHoveredEdge->drawHovered(p);
-        } else if(mHoveredBox != NULL) {
-            if(mCurrentEdge == NULL) {
-                mHoveredBox->drawHovered(p);
-            }
-        }
-
-        p->resetTransform();
-        p->setPen(QPen(Qt::black, 2.));
-        p->setBrush(Qt::NoBrush);
-        p->drawRect(viewRect.adjusted(-1., -1., 1., 1.));
-        if(mInputTransformationEnabled) {
-            QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
-                                    mCanvasWidget->height() - MIN_WIDGET_HEIGHT,
-                                    5*MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT);
-            p->fillRect(inputRect, QColor(225, 225, 225));
-            QString text;
-            if(mXOnlyTransform) {
-                text = " x: " + mInputText + "|";
-            } else if(mYOnlyTransform) {
-                text = " y: " + mInputText + "|";
-            } else {
-                text = " x, y: " + mInputText + "|";
-            }
-            p->drawText(inputRect, Qt::AlignVCenter, text);
-        }
-    }
-
-    if(mCanvasWidget->hasFocus()) {
-        p->setPen(QPen(Qt::red, 4.));
-    } else {
-        p->setPen(Qt::NoPen);
-    }
-    p->setBrush(Qt::NoBrush);
-    p->drawRect(mCanvasWidget->rect());
-}
-
 void Canvas::drawInputText(QPainter *p) {
     if(mInputTransformationEnabled) {
         QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,
@@ -602,7 +500,6 @@ void Canvas::afterUpdate() {
     if(mUpdateReplaceCache) {
         CacheContainer *cont =
               mCacheHandler.createNewRenderContainerAtRelFrame(mUpdateRelFrame);
-        cont->replaceImage(mRenderImage);
         cont->replaceImageSk(mRenderImageSk);
         setCurrentPreviewContainer(cont);
         if(mRendering) {
@@ -617,11 +514,6 @@ void Canvas::updatePixmaps() {
 }
 
 void Canvas::renderCurrentFrameToPreview() {
-    mRenderImage = QImage(mRenderImageSize,
-                          QImage::Format_ARGB32_Premultiplied);
-    mRenderImage.fill(mRenderBackgroundColor.qcol);
-    renderCurrentFrameToQImage(&mRenderImage);
-
     SkImageInfo info = SkImageInfo::Make(mRenderImageSize.width(),
                                          mRenderImageSize.height(),
                                          kBGRA_8888_SkColorType,
@@ -650,17 +542,6 @@ void Canvas::clearCurrentPreviewImage() {
 
 }
 
-void Canvas::drawPreviewPixmap(QPainter *p) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
-            box->drawUpdatePixmap(p);
-        }
-
-        p->restore();
-    }
-}
-
 void Canvas::drawPreviewPixmapSk(SkCanvas *canvas) {
     if(isVisibleAndInVisibleDurationRect()) {
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
@@ -687,18 +568,6 @@ void Canvas::createLinkToFileWithPath(const QString &path) {
     extLinkBox->setSrc(path);
 }
 
-void Canvas::renderCurrentFrameToQImage(QImage *frame) {
-    QPainter p(frame);
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setRenderHint(QPainter::SmoothPixmapTransform);
-
-    p.scale(mResolutionFraction, mResolutionFraction);
-
-    drawPreviewPixmap(&p);
-
-    p.end();
-}
-
 void Canvas::renderCurrentFrameToSkCanvasSk(SkCanvas *canvas) {
     canvas->scale(mResolutionFraction, mResolutionFraction);
 
@@ -707,45 +576,38 @@ void Canvas::renderCurrentFrameToSkCanvasSk(SkCanvas *canvas) {
     canvas->flush();
 }
 
-QMatrix Canvas::getCombinedRenderTransform()
-{
+QMatrix Canvas::getCombinedRenderTransform() {
     QMatrix matrix;
     matrix.scale(mCanvasTransformMatrix.m11(),
                  mCanvasTransformMatrix.m22() );
     return matrix;
 }
 
-QMatrix Canvas::getCombinedFinalRenderTransform()
-{
+QMatrix Canvas::getCombinedFinalRenderTransform() {
     return QMatrix();
 }
 
-void Canvas::schedulePivotUpdate()
-{
+void Canvas::schedulePivotUpdate() {
     if(mRotPivot->isRotating() || mRotPivot->isScaling()) return;
     mPivotUpdateNeeded = true;
 }
 
-void Canvas::updatePivotIfNeeded()
-{
+void Canvas::updatePivotIfNeeded() {
     if(mPivotUpdateNeeded) {
         mPivotUpdateNeeded = false;
         updatePivot();
     }
 }
 
-void Canvas::makePointCtrlsSymmetric()
-{
+void Canvas::makePointCtrlsSymmetric() {
     setPointCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
 }
 
-void Canvas::makePointCtrlsSmooth()
-{
+void Canvas::makePointCtrlsSmooth() {
     setPointCtrlsMode(CtrlsMode::CTRLS_SMOOTH);
 }
 
-void Canvas::makePointCtrlsCorner()
-{
+void Canvas::makePointCtrlsCorner() {
     setPointCtrlsMode(CtrlsMode::CTRLS_CORNER);
 }
 
@@ -764,7 +626,6 @@ void Canvas::moveSecondSelectionPoint(QPointF pos) {
 void Canvas::startSelectionAtPoint(QPointF pos) {
     mSelectionRect.setTopLeft(pos);
     mSelectionRect.setBottomRight(pos);
-
 }
 
 void Canvas::updatePivot() {
@@ -1005,7 +866,9 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
             mFirstMouseMove = true;
 
             grabMouseAndTrack();
-         } else if(event->key() == Qt::Key_A && isCtrlPressed(event) && !isGrabbingMouse) {
+         } else if(event->key() == Qt::Key_A &&
+                   isCtrlPressed(event) &&
+                   !isGrabbingMouse) {
            if(isShiftPressed()) {
                mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();
            } else {

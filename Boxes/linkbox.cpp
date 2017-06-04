@@ -75,16 +75,16 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
     setLinkTarget(linkTarget);
 }
 
-QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
-                                const qreal &effectsMargin,
-                                const qreal &resolution,
-                                const QMatrix &allUglyTransform,
-                                QPoint *draWPosP) {
-    return mLinkTarget->getAllUglyPixmapProvidedTransform(effectsMargin,
-                                                          resolution,
-                                                          allUglyTransform,
-                                                          draWPosP);
-}
+//QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
+//                                const qreal &effectsMargin,
+//                                const qreal &resolution,
+//                                const QMatrix &allUglyTransform,
+//                                QPoint *draWPosP) {
+//    return mLinkTarget->getAllUglyPixmapProvidedTransform(effectsMargin,
+//                                                          resolution,
+//                                                          allUglyTransform,
+//                                                          draWPosP);
+//}
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &point)
 {
@@ -187,16 +187,15 @@ void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
     scheduleSoftUpdate();
 }
 
-void InternalLinkCanvas::draw(QPainter *p) {
-    p->save();
-    if(mClipToCanvasSize) {
-        p->setClipRect(mRelBoundingRect);
-    }
-    p->setTransform(QTransform(getCombinedTransform().inverted()), true);
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        //box->draw(p);
-        box->drawPixmap(p);
-    }
+//void InternalLinkCanvas::draw(QPainter *p) {
+//    p->save();
+//    if(mClipToCanvasSize) {
+//        p->setClipRect(mRelBoundingRect);
+//    }
+//    p->setTransform(QTransform(getCombinedTransform().inverted()), true);
+//    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+//        box->drawPixmap(p);
+//    }
 
-    p->restore();
-}
+//    p->restore();
+//}

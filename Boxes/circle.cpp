@@ -117,26 +117,26 @@ void Circle::setRadius(const qreal &radius) {
     setVerticalRadius(radius);
 }
 
-void Circle::drawSelected(QPainter *p,
-                          const CanvasMode &currentCanvasMode) {
+void Circle::drawSelectedSk(SkCanvas *canvas,
+                            const CanvasMode &currentCanvasMode,
+                            const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        drawBoundingRect(p);
+        canvas->save();
+        drawBoundingRectSk(canvas, invScale);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
-            mCenter->draw(p);
-            mHorizontalRadiusPoint->draw(p);
-            mVerticalRadiusPoint->draw(p);
+            mCenter->drawSk(canvas, invScale);
+            mHorizontalRadiusPoint->drawSk(canvas, invScale);
+            mVerticalRadiusPoint->drawSk(canvas, invScale);
 
-            mFillGradientPoints->drawGradientPoints(p);
-            mStrokeGradientPoints->drawGradientPoints(p);
+            mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
+            mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
         } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->draw(p);
+            mTransformAnimator->getPivotMovablePoint()->
+                    drawSk(canvas, invScale);
         }
-        p->restore();
+        canvas->restore();
     }
 }
-
 
 MovablePoint *Circle::getPointAtAbsPos(
                                 const QPointF &absPtPos,

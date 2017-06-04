@@ -171,7 +171,6 @@ protected:
     // AUDIO
 
     void qRender(QPainter *p);
-    void render(QPainter *p);
     void renderSk(SkCanvas *canvas);
 signals:
     void updateBoxPixmaps(BoundingBox*);

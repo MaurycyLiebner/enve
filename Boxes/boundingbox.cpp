@@ -99,22 +99,6 @@ BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
     return target;
 }
 
-void BoundingBox::drawHoveredPath(QPainter *p, const QPainterPath &path) {
-    p->save();
-    p->setTransform(QTransform(mTransformAnimator->getCombinedTransform()),
-                    true);
-    QPen pen = QPen(Qt::black, 2.);
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    p->setBrush(Qt::NoBrush);
-    p->drawPath(path);
-
-    pen = QPen(Qt::red, 1.);
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    p->drawPath(path);
-    p->restore();
-}
 
 void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
                                     const SkPath &path,
@@ -271,52 +255,11 @@ void BoundingBox::replaceCurrentFrameCache() {
     scheduleSoftUpdate();
 }
 
-QImage BoundingBox::getAllUglyPixmapProvidedTransform(
-        const qreal &effectsMargin,
-        const qreal &resolution,
-        const QMatrix &allUglyTransform,
-        QPoint *drawPosP) {
-    Q_UNUSED(resolution);
-    QRectF allUglyBoundingRect =
-            allUglyTransform.mapRect(mUpdateRelBoundingRect).
-                adjusted(-effectsMargin, -effectsMargin,
-                         effectsMargin, effectsMargin);
-
-    QSizeF sizeF = allUglyBoundingRect.size();
-    QImage allUglyPixmap = QImage(QSize(ceil(sizeF.width()),
-                                   ceil(sizeF.height())),
-                                  QImage::Format_ARGB32_Premultiplied);
-    allUglyPixmap.fill(Qt::transparent);
-
-    QPainter p(&allUglyPixmap);
-    p.setRenderHint(QPainter::Antialiasing);
-    p.translate(-allUglyBoundingRect.topLeft());
-    QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
-                    qRound(allUglyBoundingRect.top()/**resolution*/));
-    allUglyBoundingRect.translate(-transF);
-
-    p.translate(transF);
-    p.setTransform(QTransform(allUglyTransform), true);
-
-    draw(&p);
-    p.end();
-
-//    if(parentCanvas->effectsPaintEnabled()) {
-//        allUglyPixmap = applyEffects(allUglyPixmap,
-//                                     false,
-//                                     parentCanvas->getResolutionFraction());
-//    }
-
-    *drawPosP = QPoint(qRound(allUglyBoundingRect.left()),
-                       qRound(allUglyBoundingRect.top()));
-    return allUglyPixmap;
-}
-
 sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
                 const qreal &effectsMargin,
                 const qreal &resolution,
-                const QMatrix &allUglyTransform) {
+                const QMatrix &allUglyTransform,
+                SkPoint *drawPosP) {
     Q_UNUSED(resolution);
     QRectF allUglyBoundingRect =
             allUglyTransform.mapRect(mUpdateRelBoundingRect).
@@ -357,8 +300,8 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
 //                                     parentCanvas->getResolutionFraction());
 //    }
 
-//    *drawPosP = QPoint(qRound(allUglyBoundingRect.left()),
-//                       qRound(allUglyBoundingRect.top()));
+    *drawPosP = SkPoint::Make(qRound(allUglyBoundingRect.left()),
+                              qRound(allUglyBoundingRect.top()));
 
     applyEffectsSk(bitmap, resolution);
 
@@ -375,18 +318,6 @@ void BoundingBox::updateAllUglyPixmap() {
                 mEffectsMargin,
                 parentCanvas->getResolutionFraction(),
                 this);
-}
-
-void BoundingBox::drawSelected(QPainter *p,
-                               const CanvasMode &currentCanvasMode) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        drawBoundingRect(p);
-        if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->draw(p);
-        }
-        p->restore();
-    }
 }
 
 void BoundingBox::drawSelectedSk(SkCanvas *canvas,
@@ -415,16 +346,6 @@ void BoundingBox::redoUpdate() {
     mRedoUpdate = true;
 }
 
-void BoundingBox::drawUpdatePixmap(QPainter *p) {
-    if(mUpdateDrawOnParentBox) {
-        p->save();
-        p->setCompositionMode(mCompositionMode);
-        p->setOpacity(mUpdateOpacity);
-        mUpdateRenderContainer.draw(p);
-        p->restore();
-    }
-}
-
 void BoundingBox::drawUpdatePixmapSk(SkCanvas *canvas) {
     if(mUpdateDrawOnParentBox) {
         canvas->save();
@@ -437,29 +358,16 @@ void BoundingBox::drawUpdatePixmapSk(SkCanvas *canvas) {
     }
 }
 
-void BoundingBox::drawUpdatePixmapForEffect(QPainter *p) {
-    p->save();
-    p->setOpacity(mUpdateOpacity);
-    mUpdateRenderContainer.draw(p);
-    p->restore();
-}
-
-QPoint BoundingBox::getUpdateDrawPos() {
-    return mUpdateRenderContainer.getDrawpos();
+void BoundingBox::drawUpdatePixmapForEffectSk(SkCanvas *canvas) {
+    canvas->save();
+    SkPaint paint;
+    paint.setAlpha(mUpdateOpacity*255);
+    mUpdateRenderContainer.drawSk(canvas, &paint);
+    canvas->restore();
 }
 
 QMatrix BoundingBox::getUpdatePaintTransform() {
     return mUpdateRenderContainer.getPaintTransform();
-}
-
-void BoundingBox::drawPixmap(QPainter *p) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        p->setCompositionMode(mCompositionMode);
-        p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
-        mDrawRenderContainer.draw(p);
-        p->restore();
-    }
 }
 
 void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
@@ -681,22 +589,6 @@ PaintSettings *BoundingBox::getFillSettings() {
 
 StrokeSettings *BoundingBox::getStrokeSettings() {
     return NULL;
-}
-
-void BoundingBox::drawAsBoundingRect(QPainter *p,
-                                     const QPainterPath &path) {
-    p->save();
-    QPen pen = QPen(QColor(0, 0, 0, 125), 1., Qt::DashLine);
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    p->setBrush(Qt::NoBrush);
-    p->setTransform(QTransform(getCombinedTransform()), true);
-    p->drawPath(path);
-    p->restore();
-}
-
-void BoundingBox::drawBoundingRect(QPainter *p) {
-    drawAsBoundingRect(p, mRelBoundingRectPath);
 }
 
 void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,

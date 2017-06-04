@@ -125,26 +125,6 @@ void VectorPath::showContextMenu(QPoint globalPos) {
     }
 }
 
-void VectorPath::drawSelected(QPainter *p,
-                              const CanvasMode &currentCanvasMode) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-
-        drawBoundingRect(p);
-        mPathAnimator->drawSelected(p,
-                                   currentCanvasMode,
-                                   getCombinedTransform());
-
-        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mFillGradientPoints->drawGradientPoints(p);
-            mStrokeGradientPoints->drawGradientPoints(p);
-        } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->draw(p);
-        }
-        p->restore();
-    }
-}
-
 void VectorPath::drawSelectedSk(SkCanvas *canvas,
                               const CanvasMode &currentCanvasMode,
                               const SkScalar &invScale) {
@@ -156,8 +136,8 @@ void VectorPath::drawSelectedSk(SkCanvas *canvas,
                                     invScale,
                                     QMatrixToSkMatrix(getCombinedTransform()));
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            mFillGradientPoints->drawGradientPoints(canvas, invScale);
-            mStrokeGradientPoints->drawGradientPoints(canvas, invScale);
+            mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
+            mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
         } else if(currentCanvasMode == MOVE_PATH) {
             mTransformAnimator->getPivotMovablePoint()->
                     drawSk(canvas, invScale);

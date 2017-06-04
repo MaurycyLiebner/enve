@@ -65,25 +65,6 @@ void TextBox::prp_loadFromSql(const int &boundingBoxId) {
 //    return rect.translated(QPointF(0., -fm.height()));
 //}
 
-void TextBox::drawSelected(QPainter *p,
-                           const CanvasMode &currentCanvasMode)
-{
-    if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        drawBoundingRect(p);
-        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
-
-            mFillGradientPoints->drawGradientPoints(p);
-            mStrokeGradientPoints->drawGradientPoints(p);
-        } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->draw(p);
-        }
-
-        p->restore();
-    }
-}
-
 #include <QApplication>
 #include <QDesktopWidget>
 

@@ -114,22 +114,23 @@ MovablePoint *Rectangle::getBottomRightPoint() {
     return mBottomRightPoint;
 }
 
-void Rectangle::drawSelected(QPainter *p,
-                             const CanvasMode &currentCanvasMode) {
+void Rectangle::drawSelectedSk(SkCanvas *canvas,
+                               const CanvasMode &currentCanvasMode,
+                               const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
-        p->save();
-        drawBoundingRect(p);
+        canvas->save();
+        drawBoundingRectSk(canvas, invScale);
         if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-            p->setPen(QPen(QColor(0, 0, 0, 255), 1.5));
-            mTopLeftPoint->draw(p);
-            mBottomRightPoint->draw(p);
+            mTopLeftPoint->drawSk(canvas, invScale);
+            mBottomRightPoint->drawSk(canvas, invScale);
 
-            mFillGradientPoints->drawGradientPoints(p);
-            mStrokeGradientPoints->drawGradientPoints(p);
+            mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
+            mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
         } else if(currentCanvasMode == MOVE_PATH) {
-            mTransformAnimator->getPivotMovablePoint()->draw(p);
+            mTransformAnimator->getPivotMovablePoint()->
+                    drawSk(canvas, invScale);
         }
-        p->restore();
+        canvas->restore();
     }
 }
 

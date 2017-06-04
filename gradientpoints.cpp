@@ -82,21 +82,8 @@ void GradientPoints::disable()
     enabled = false;
 }
 
-void GradientPoints::drawGradientPoints(QPainter *p) {
-    if(enabled) {
-        p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
-        QPen pen = p->pen();
-        pen.setColor(Qt::white);
-        pen.setWidthF(0.75);
-        p->setPen(pen);
-        p->drawLine(startPoint->getAbsolutePos(), endPoint->getAbsolutePos());
-        startPoint->draw(p);
-        endPoint->draw(p);
-    }
-}
-
-void GradientPoints::drawGradientPoints(SkCanvas *canvas,
-                                        const SkScalar &invScale) {
+void GradientPoints::drawGradientPointsSk(SkCanvas *canvas,
+                                          const SkScalar &invScale) {
     if(enabled) {
         SkPoint startPos = QPointFToSkPoint(startPoint->getAbsolutePos());
         SkPoint endPos = QPointFToSkPoint(endPoint->getAbsolutePos());

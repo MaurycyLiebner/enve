@@ -257,16 +257,6 @@ void BoxesGroup::updateEffectsMargin() {
     mEffectsMargin += childrenMargin;
 }
 
-void BoxesGroup::drawUpdatePixmap(QPainter *p) {
-    if(shouldPaintOnImage()) {
-        BoundingBox::drawUpdatePixmap(p);
-    } else {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-            box->drawUpdatePixmap(p);
-        }
-    }
-}
-
 void BoxesGroup::drawUpdatePixmapSk(SkCanvas *canvas) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawUpdatePixmapSk(canvas);
@@ -316,30 +306,6 @@ void BoxesGroup::afterUpdate() {
 
 }
 
-void BoxesGroup::draw(QPainter *p) {
-    p->save();
-    p->setTransform(QTransform(
-                        mUpdateTransform.inverted()),
-                        true);
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        //box->draw(p);
-        box->drawUpdatePixmap(p);
-    }
-
-    p->restore();
-}
-
-void BoxesGroup::drawPixmap(QPainter *p) {
-    if(shouldPaintOnImage()) {
-        BoundingBox::drawPixmap(p);
-    } else {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-            //box->draw(p);
-            box->drawPixmap(p);
-        }
-    }
-}
-
 void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawPixmapSk(canvas);
@@ -349,26 +315,6 @@ void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {
             box->drawPixmapSk(canvas);
         }
     }
-}
-
-void BoxesGroup::drawBoundingRect(QPainter *p) {
-    p->save();
-
-    QPen pen;
-    if(mIsCurrentGroup) {
-        pen = QPen(QColor(255, 0, 0, 125), 1.f, Qt::DashLine);
-    } else {
-        pen = QPen(QColor(0, 0, 0, 125), 1.f, Qt::DashLine);
-    }
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    p->setBrush(Qt::NoBrush);
-
-    p->setTransform(QTransform(mTransformAnimator->getCombinedTransform()),
-                    true);
-    p->drawPath(mRelBoundingRectPath);
-
-    p->restore();
 }
 
 void BoxesGroup::setIsCurrentGroup(bool bT) {
@@ -648,6 +594,8 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
     }
 
     scheduleSoftUpdate();
+
+    clearAllCache();
 }
 
 void BoxesGroup::moveChildBelow(BoundingBox *boxToMove,

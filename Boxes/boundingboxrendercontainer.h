@@ -20,18 +20,19 @@ public:
     void thisAccessed();
 
     int getByteCount() {
-        return mImage.byteCount();
-    }
-
-    QImage getImage() {
-        return mImage;
+        if(mImageSk.get() == NULL) return 0;
+        SkPixmap pixmap;
+        if(mImageSk->peekPixels(&pixmap)) {
+            return pixmap.width()*pixmap.height()*
+                    pixmap.info().bytesPerPixel();
+        }
+        return 0;
     }
 
     sk_sp<SkImage> getImageSk() {
         return mImageSk;
     }
 
-    void replaceImage(const QImage &img);
     void replaceImageSk(const sk_sp<SkImage> &img);
 
     const int &getMinRelFrame() const;
@@ -48,7 +49,7 @@ public:
                              const qreal &drawY,
                              const int &startFrame,
                              const int &endFrame);
-    virtual void draw(QPainter *p);
+
     virtual void drawSk(SkCanvas *canvas);
 
     void setBlocked(const bool &bT) {
@@ -64,7 +65,6 @@ public:
 protected:
     bool mBlocked = false;
     sk_sp<SkImage> mImageSk;
-    QImage mImage;
     CacheHandler *mParentCacheHandler = NULL;
     int mMinRelFrame = 0;
     int mMaxRelFrame = 0;
@@ -75,7 +75,6 @@ public:
     RenderContainer() {}
     virtual ~RenderContainer() {}
 
-    void draw(QPainter *p);
     void drawSk(SkCanvas *canvas, SkPaint *paint);
 
     void updatePaintTransformGivenNewCombinedTransform(
@@ -83,15 +82,11 @@ public:
 
     void setTransform(const QMatrix &transform);
 
-    void setDrawPos(const QPoint &drawpos);
-
     const QMatrix &getTransform() const;
-
-    const QImage &getImage() const;
 
     const QMatrix &getPaintTransform() const;
 
-    const QPoint &getDrawpos() const;
+    const SkPoint &getDrawpos() const;
 
     const qreal &getResolutionFraction() const;
 
@@ -102,8 +97,7 @@ public:
 
     void setVariables(const QMatrix &transform,
                       const QMatrix &paintTransform,
-                      const QPoint &drawpos,
-                      const QImage &img,
+                      const SkPoint &drawpos,
                       const sk_sp<SkImage> &imgSk,
                       const qreal &res);
     void duplicateFrom(RenderContainer *src);
@@ -111,7 +105,7 @@ protected:
     qreal mResolutionFraction;
     QMatrix mTransform;
     QMatrix mPaintTransform;
-    QPoint mDrawPos;
+    SkPoint mDrawPos;
 };
 
 #endif // BOUNDINGBOXRENDERCONTAINER_H

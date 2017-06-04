@@ -4,13 +4,6 @@
 #include "memoryhandler.h"
 #include "rendercachehandler.h"
 
-void RenderContainer::draw(QPainter *p) {
-    p->save();
-    p->setTransform(QTransform(mPaintTransform), true);
-    p->drawImage(mDrawPos, mImage);
-    p->restore();
-}
-
 void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
@@ -27,23 +20,15 @@ void RenderContainer::setTransform(const QMatrix &transform) {
     mTransform = transform;
 }
 
-void RenderContainer::setDrawPos(const QPoint &drawpos) {
-    mDrawPos = drawpos;
-}
-
 const QMatrix &RenderContainer::getTransform() const {
     return mTransform;
-}
-
-const QImage &RenderContainer::getImage() const {
-    return mImage;
 }
 
 const QMatrix &RenderContainer::getPaintTransform() const {
     return mPaintTransform;
 }
 
-const QPoint &RenderContainer::getDrawpos() const {
+const SkPoint &RenderContainer::getDrawpos() const {
     return mDrawPos;
 }
 
@@ -62,21 +47,15 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
     mTransform.scale(resolutionPer, resolutionPer);
 
     mResolutionFraction = resolutionPer;
-    replaceImage(target->getAllUglyPixmapProvidedTransform(
-                 resolutionPer*effectsMargin,
-                 resolutionPer,
-                 mTransform,
-                 &mDrawPos));
-    updatePaintTransformGivenNewCombinedTransform(combinedTransform);
-
-    target->applyEffects(&mImage, resolutionPer);
 
     // SKIA
 
     mImageSk = target->getAllUglyPixmapProvidedTransformSk(
                             resolutionPer*effectsMargin,
                             resolutionPer,
-                            mTransform);
+                            mTransform,
+                            &mDrawPos);
+    updatePaintTransformGivenNewCombinedTransform(combinedTransform);
 
     //mRenderTime = timer.elapsed();
 }
@@ -85,20 +64,17 @@ void RenderContainer::duplicateFrom(RenderContainer *src) {
     setVariables(src->getTransform(),
                  src->getPaintTransform(),
                  src->getDrawpos(),
-                 src->getImage(),
                  src->getImageSk(),
                  src->getResolutionFraction());
 }
 
 void RenderContainer::setVariables(const QMatrix &transform,
                                    const QMatrix &paintTransform,
-                                   const QPoint &drawpos,
-                                   const QImage &img,
+                                   const SkPoint &drawpos,
                                    const sk_sp<SkImage> &imgSk,
                                    const qreal &res) {
     mTransform = transform;
     mPaintTransform = paintTransform;
-    replaceImage(img);
     mImageSk = imgSk;
     mDrawPos = drawpos;
     mResolutionFraction = res;
@@ -118,11 +94,6 @@ void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
     mParentCacheHandler = handler;
 }
 
-void CacheContainer::replaceImage(const QImage &img) {
-    //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
-    mImage = img;
-    //MemoryChecker::getInstance()->incUsedMemory(mImage.byteCount());
-}
 
 void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
     mImageSk = img;
@@ -168,10 +139,6 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
                                       const int &maxFrame) {
     mMinRelFrame = minFrame;
     mMaxRelFrame = maxFrame;
-}
-
-void CacheContainer::draw(QPainter *p) {
-    p->drawImage(0, 0, mImage);
 }
 
 void CacheContainer::drawSk(SkCanvas *canvas) {
