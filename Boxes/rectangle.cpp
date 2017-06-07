@@ -106,7 +106,7 @@ void Rectangle::finishAllPointsTransform() {
     finishTransform();
 }
 
-void Rectangle::moveSizePointByAbs(QPointF absTrans) {
+void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {
     mBottomRightPoint->moveByAbs(absTrans);
 }
 
@@ -176,7 +176,7 @@ void Rectangle::updatePath() {
     mPath.addRoundedRect(QRectF(topPos, botPos),
                          radius, radius);
 
-    updateOutlinePath();
+    updateOutlinePathSk();
 }
 
 RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :

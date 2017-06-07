@@ -16,31 +16,6 @@ void PathPivot::startTransform() {
     MovablePoint::startTransform();
 }
 
-void PathPivot::drawOnAbsPos(QPainter *p,
-                             const QPointF &absPos) {
-    p->save();
-//    p->save();
-//    p->setBrush(Qt::red);
-//    p->drawPath(mMappedRotationPath);
-//    p->restore();
-
-    if(mSelected) {
-        p->setBrush(QColor(0, 255, 0));
-    } else {
-        p->setBrush(QColor(125, 255, 125));
-    }
-    //p->setPen(QPen(Qt::black, 1.5));
-    drawCosmeticEllipse(p, absPos,
-                        mRadius, mRadius);
-
-    p->translate(absPos);
-    p->scale(1./p->transform().m11(), 1./p->transform().m22());
-    qreal halfRadius = mRadius*0.5;
-    p->drawLine(QPointF(-halfRadius, 0), QPointF(halfRadius, 0));
-    p->drawLine(QPointF(0, -halfRadius), QPointF(0, halfRadius));
-    p->restore();
-}
-
 void PathPivot::drawSk(SkCanvas *canvas,
                        const SkScalar &invScale) {
     SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
@@ -59,7 +34,7 @@ void PathPivot::drawSk(SkCanvas *canvas,
     SkPaint paint;
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    SkScalar scaledHalfRadius = mRadius*invScale*0.5;
+    qreal scaledHalfRadius = mRadius*invScale*0.5;
     canvas->drawLine(-scaledHalfRadius, 0., scaledHalfRadius, 0., paint);
     canvas->drawLine(0, -scaledHalfRadius, 0., scaledHalfRadius, paint);
     canvas->restore();
@@ -78,8 +53,8 @@ void PathPivot::finishTransform()
     mTransformStarted = false;
 }
 
-void PathPivot::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo)
-{
+void PathPivot::setRelativePos(const QPointF &relPos,
+                               const bool &saveUndoRedo) {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
 //    updateRotationMappedPath();
     
@@ -215,9 +190,11 @@ bool PathPivot::handleMouseMove(const QPointF &moveDestAbs,
                 scaleY = scaleBy;
             } else {
                 scaleX = 1. +
-                        distSign(distMoved - QPointF(0., distMoved.y()) )*0.003;
+                        distSign(distMoved -
+                                 QPointF(0., distMoved.y()) )*0.003;
                 scaleY = 1. +
-                        distSign(distMoved - QPointF(distMoved.x(), 0.) )*0.003;
+                        distSign(distMoved -
+                                 QPointF(distMoved.x(), 0.) )*0.003;
             }
         }
 

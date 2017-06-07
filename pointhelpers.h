@@ -4,6 +4,7 @@
 #include <QString>
 #include <QRectF>
 #include <QPainter>
+#include "skiaincludes.h"
 
 enum CtrlsMode : short {
     CTRLS_SMOOTH,
@@ -13,10 +14,14 @@ enum CtrlsMode : short {
 
 extern qreal qRandF(qreal fMin, qreal fMax);
 
-extern QPointF symmetricToPos(QPointF toMirror, QPointF mirrorCenter);
-extern QPointF symmetricToPosNewLen(QPointF toMirror, QPointF mirrorCenter,
+extern QPointF symmetricToPos(QPointF toMirror,
+                              QPointF mirrorCenter);
+extern QPointF symmetricToPosNewLen(QPointF toMirror,
+                                    QPointF mirrorCenter,
                                     qreal newLen);
 extern qreal pointToLen(QPointF point);
+extern SkScalar pointToLen(SkPoint point);
+
 extern bool isPointZero(QPointF pos);
 extern QPointF scalePointToNewLen(QPointF point, qreal newLen);
 
@@ -36,7 +41,9 @@ extern qreal calcCubicBezierVal(qreal p0, qreal p1,
 extern QPointF calcCubicBezierVal(QPointF p0, QPointF p1,
                                   QPointF p2, QPointF p3, qreal t);
 
-extern qreal tFromX(qreal p0x, qreal p1x, qreal p2x, qreal p3x, qreal x);
+extern qreal tFromX(qreal p0x, qreal p1x,
+                       qreal p2x, qreal p3x,
+                       qreal x);
 
 extern bool isZero(qreal val);
 

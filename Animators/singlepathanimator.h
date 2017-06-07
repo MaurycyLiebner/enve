@@ -69,12 +69,9 @@ public:
     PathPoint *addPointAbsPos(const QPointF &absPtPos, PathPoint *toPoint);
     void deletePointAndApproximate(PathPoint *pointToRemove);
 
-    void drawSelected(QPainter *p,
-                      const CanvasMode &currentCanvasMode,
-                      const QMatrix &combinedTransform);
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
-                      const SkScalar &invScale,
+                      const qreal &invScale,
                       const SkMatrix &combinedTransform);
 
     void selectAndAddContainedPointsToList(

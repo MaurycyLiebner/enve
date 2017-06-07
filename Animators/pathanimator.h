@@ -49,9 +49,6 @@ public:
 
     void duplicatePathsTo(PathAnimator *target);
 
-    void drawSelected(QPainter *p,
-                      const CanvasMode &currentCanvasMode,
-                      const QMatrix &combinedTransform);
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
                       const SkScalar &invScale,
@@ -63,6 +60,7 @@ public:
     BoundingBox *getParentBox();
 
     void loadPathFromQPainterPath(const QPainterPath &path);
+    void loadPathFromSkPath(const SkPath &path);
 
     void setParentBox(BoundingBox *parent);
     void addSinglePathAnimator(SinglePathAnimator *path,

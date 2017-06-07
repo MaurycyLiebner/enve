@@ -124,8 +124,7 @@ qreal textForQPainterPath(Qt::Alignment alignment,
     }
 }
 
-void TextBox::updatePath()
-{
+void TextBox::updatePath() {
     mPath = QPainterPath();
 
     QStringList lines = mText.split(QRegExp("\n|\r\n|\r"));
@@ -146,5 +145,5 @@ void TextBox::updatePath()
     QRectF boundingRect = mPath.boundingRect();
     mPath.translate(-boundingRect.center());
 
-    updateOutlinePath();
+    updateOutlinePathSk();
 }

@@ -846,11 +846,6 @@ UpdateStrokeSettings::UpdateStrokeSettings(const QColor &paintColorT, const Pain
 
 UpdateStrokeSettings::UpdateStrokeSettings() {}
 
-void UpdateStrokeSettings::applyPainterSettings(QPainter *p) {
-    UpdatePaintSettings::applyPainterSettings(p);
-    p->setCompositionMode(outlineCompositionMode);
-}
-
 void UpdateStrokeSettings::applyPainterSettingsSk(SkPaint *paint) {
     UpdatePaintSettings::applyPainterSettingsSk(paint);
     //canvas->setCompositionMode(outlineCompositionMode);

@@ -68,6 +68,10 @@ qreal pointToLen(QPointF point) {
     return qSqrt(point.x()*point.x() + point.y()*point.y());
 }
 
+SkScalar pointToLen(SkPoint point) {
+    return SkScalarSqrt(point.x()*point.x() + point.y()*point.y());
+}
+
 bool isZero(qreal val) {
     return qAbs(val) < 0.0001;
 }

@@ -102,7 +102,7 @@ BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
 
 void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
                                     const SkPath &path,
-                                    const SkScalar &invScale) {
+                                    const qreal &invScale) {
     canvas->save();
     SkPath mappedPath = path;
     mappedPath.transform(QMatrixToSkMatrix(
@@ -322,7 +322,7 @@ void BoundingBox::updateAllUglyPixmap() {
 
 void BoundingBox::drawSelectedSk(SkCanvas *canvas,
                                  const CanvasMode &currentCanvasMode,
-                                 const SkScalar &invScale) {
+                                 const qreal &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
         drawBoundingRectSk(canvas, invScale);
@@ -549,11 +549,8 @@ void BoundingBox::scheduleCenterPivot() {
 }
 
 void BoundingBox::updateRelBoundingRect() {
-    mRelBoundingRectPath = QPainterPath();
-    mRelBoundingRectPath.addRect(mRelBoundingRect);
-
     mSkRelBoundingRectPath = SkPath();
-    mSkRelBoundingRectPath.addRect(QRectFToSkRect(mRelBoundingRect));
+    mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
     if(!mPivotChanged || mCenterPivotScheduled) {
         mCenterPivotScheduled = false;
@@ -613,14 +610,14 @@ void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
 }
 
 void BoundingBox::drawBoundingRectSk(SkCanvas *canvas,
-                                     const SkScalar &invScale) {
+                                     const qreal &invScale) {
     drawAsBoundingRectSk(canvas,
                          mSkRelBoundingRectPath,
                          invScale);
 }
 
-const QPainterPath &BoundingBox::getRelBoundingRectPath() {
-    return mRelBoundingRectPath;
+const SkPath &BoundingBox::getRelBoundingRectPath() {
+    return mSkRelBoundingRectPath;
 }
 
 QMatrix BoundingBox::getCombinedTransform() const {

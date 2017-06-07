@@ -59,7 +59,7 @@ public:
 
     void drawHovered(QPainter *p);
     void drawHoveredSk(SkCanvas *canvas,
-                                 const SkScalar &invScale);
+                                 const qreal &invScale);
 
     PathPoint *getPoint1() const;
 

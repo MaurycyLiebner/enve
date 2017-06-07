@@ -263,14 +263,14 @@ void PathBox::scheduleOutlinePathUpdate() {
 
 void PathBox::updateOutlinePathIfNeeded() {
     if(mOutlinePathUpdateNeeded) {
-        updateOutlinePath();
+        updateOutlinePathSk();
         mOutlinePathUpdateNeeded = false;
     }
 }
 
 VectorPath *PathBox::objectToPath() {
     VectorPath *newPath = new VectorPath(mParent.data());
-    newPath->loadPathFromQPainterPath(mPath);
+    newPath->loadPathFromSkPath(mPathSk);
     newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
     newPath->duplicatePaintSettingsFrom(mFillSettings.data(),
                                         mStrokeSettings.data());
@@ -282,7 +282,7 @@ VectorPath *PathBox::objectToPath() {
 VectorPath *PathBox::strokeToPath() {
     if(mOutlinePath.isEmpty()) return NULL;
     VectorPath *newPath = new VectorPath(mParent.data());
-    newPath->loadPathFromQPainterPath(mOutlinePath);
+    newPath->loadPathFromSkPath(mOutlinePathSk);
     newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
     newPath->duplicatePaintSettingsFrom(mStrokeSettings.data(),
                                         NULL);
@@ -292,30 +292,27 @@ VectorPath *PathBox::strokeToPath() {
 }
 
 const QPainterPath &PathBox::getRelativePath() const { return mPath; }
-void PathBox::updateOutlinePath() {
-    if(mStrokeSettings->nonZeroLineWidth()) {
-        QPainterPathStroker stroker;
-        mStrokeSettings->setStrokerSettings(&stroker);
-        mOutlinePath = stroker.createStroke(mPath);
 
+void PathBox::updateOutlinePathSk() {
+    if(mStrokeSettings->nonZeroLineWidth()) {
         SkStroke strokerSk;
         mStrokeSettings->setStrokerSettingsSk(&strokerSk);
         mOutlinePathSk = SkPath();
         strokerSk.strokePath(mPathSk, &mOutlinePathSk);
     } else {
-        mOutlinePath = QPainterPath();
+        mOutlinePathSk = SkPath();
     }
-    updateWholePath();
+    updateWholePathSk();
 }
 
-void PathBox::updateWholePath() {
-    mWholePath = QPainterPath();
+void PathBox::updateWholePathSk() {
+    mWholePathSk = SkPath();
     if(mStrokeSettings->getPaintType() != NOPAINT) {
-        mWholePath += mOutlinePath;
+        mWholePathSk.addPath(mOutlinePathSk);
     }
     if(mFillSettings->getPaintType() != NOPAINT ||
             mStrokeSettings->getPaintType() == NOPAINT) {
-        mWholePath += mPath;
+        mWholePathSk.addPath(mPathSk);
     }
     updateRelBoundingRect();
 }
@@ -334,8 +331,6 @@ void PathBox::updateFillDrawGradient() {
         mFillGradientPoints->disable();
     }
 }
-
-void PathBox::updatePath() {}
 
 void PathBox::updateStrokeDrawGradient() {
     if(mStrokeSettings->getPaintType() == GRADIENTPAINT) {
@@ -359,7 +354,8 @@ void PathBox::updateDrawGradients() {
 }
 
 void PathBox::updateRelBoundingRect() {
-    mRelBoundingRect = mWholePath.boundingRect();
+    mRelBoundingRectSk = mWholePathSk.computeTightBounds();//mWholePath.boundingRect();
+    mRelBoundingRect = SkRectToQRectF(mRelBoundingRectSk);
 
     BoundingBox::updateRelBoundingRect();
 }
@@ -422,8 +418,8 @@ void PathBox::drawSk(SkCanvas *canvas) {
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) {
-    if(mRelBoundingRectPath.contains(relPos) ) {
-        return mWholePath.contains(relPos);
+    if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
+        return mWholePathSk.contains(relPos.x(), relPos.y());
     } else {
         return false;
     }

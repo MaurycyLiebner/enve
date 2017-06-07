@@ -207,6 +207,7 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
     mPoint1EndPt->moveToAbs(QPointF(x1, y1) );
     mPoint2StartPt->moveToAbs(QPointF(x2, y2) );
 }
+
 #include "mainwindow.h"
 void VectorPathEdge::finishPassThroughTransform() {
     if(MainWindow::getInstance()->isRecordingAllPoints()) {
@@ -263,7 +264,7 @@ void VectorPathEdge::drawHovered(QPainter *p) {
 }
 
 void VectorPathEdge::drawHoveredSk(SkCanvas *canvas,
-                                             const SkScalar &invScale) {
+                                   const qreal &invScale) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setColor(SK_ColorBLACK);

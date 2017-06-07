@@ -1,6 +1,7 @@
 #ifndef TRANSFORMABLE_H
 #define TRANSFORMABLE_H
 #include <QPointF>
+#include "skiaincludes.h"
 
 class Transformable
 {
@@ -17,7 +18,8 @@ public:
         Q_UNUSED(absTranslatione);
     }
 
-    virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy) {
+    virtual void scale(const qreal &scaleXBy,
+                       const qreal &scaleYBy) {
         Q_UNUSED(scaleXBy); Q_UNUSED(scaleYBy);
     }
     virtual void scale(const qreal &scaleBy) {

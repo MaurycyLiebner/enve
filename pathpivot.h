@@ -34,8 +34,6 @@ public:
     void startTransform();
     void drawSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
-    void drawOnAbsPos(QPainter *p, const QPointF &absPos);
-
     qreal mLastDRot = 0.;
     int mRotHalfCycles = 0;
     Canvas *mCanvas;

@@ -129,13 +129,11 @@ void QPointFAnimator::duplicateYAnimatorFrom(
     source->makeDuplicate(mYAnimator.data());
 }
 
-QrealAnimator *QPointFAnimator::getXAnimator()
-{
+QrealAnimator *QPointFAnimator::getXAnimator() {
     return mXAnimator.data();
 }
 
-QrealAnimator *QPointFAnimator::getYAnimator()
-{
+QrealAnimator *QPointFAnimator::getYAnimator() {
     return mYAnimator.data();
 }
 
@@ -145,24 +143,20 @@ void QPointFAnimator::multSavedValueToCurrentValue(const qreal &sx,
     mYAnimator->multSavedValueToCurrentValue(sy);
 }
 
-void QPointFAnimator::multCurrentValues(qreal sx, qreal sy)
-{
+void QPointFAnimator::multCurrentValues(qreal sx, qreal sy) {
     mXAnimator->qra_multCurrentValue(sx);
     mYAnimator->qra_multCurrentValue(sy);
 }
 
-QPointF QPointFAnimator::getSavedPointValue()
-{
+QPointF QPointFAnimator::getSavedPointValue() {
     return QPointF(mXAnimator->qra_getSavedValue(),
                    mYAnimator->qra_getSavedValue() );
 }
 
-qreal QPointFAnimator::getSavedXValue()
-{
+qreal QPointFAnimator::getSavedXValue() {
     return mXAnimator->qra_getSavedValue();
 }
 
-qreal QPointFAnimator::getSavedYValue()
-{
+qreal QPointFAnimator::getSavedYValue() {
     return mYAnimator->qra_getSavedValue();
 }

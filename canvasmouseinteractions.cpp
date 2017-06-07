@@ -31,7 +31,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
         cancelCurrentTransform();
         clearAndDisableInput();
     } else {
-        QPointF eventPos = mCanvasTransformMatrix.inverted().map(event->pos());
+        QPointF eventPos = mapCanvasAbsToRel(event->pos());
         BoundingBox *pressedBox = mCurrentBoxesGroup->getBoxAt(eventPos);
         if(pressedBox == NULL) {
             clearBoxesSelection();
@@ -280,8 +280,9 @@ void Canvas::handleLeftButtonMousePress() {
         } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
             Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
                 if(box->isParticleBox()) {
-                    if(box->getRelBoundingRectPath().contains(
-                                box->mapAbsPosToRel(mLastMouseEventPosRel))) {
+                    QPointF relPos = box->mapAbsPosToRel(mLastMouseEventPosRel);
+                    if(box->getRelBoundingRectPath().contains(relPos.x(),
+                                                              relPos.y())) {
                         ((ParticleBox*)box)->addEmitterAtAbsPos(
                                     mLastMouseEventPosRel);
                         break;
@@ -292,28 +293,28 @@ void Canvas::handleLeftButtonMousePress() {
     } // current mode allows interaction with points
 }
 
-void Canvas::setLastMouseEventPosAbs(const QPoint &abs) {
+QPointF Canvas::mapCanvasAbsToRel(const QPointF &pos) {
+    return mCanvasTransformMatrix.inverted().map(pos);
+}
+
+void Canvas::setLastMouseEventPosAbs(const QPointF &abs) {
     mLastMouseEventPosAbs = abs;
-    mLastMouseEventPosRel = mCanvasTransformMatrix.inverted().map(
-                                                    mLastMouseEventPosAbs);
+    mLastMouseEventPosRel = mapCanvasAbsToRel(mLastMouseEventPosAbs);
 }
 
-void Canvas::setLastMousePressPosAbs(const QPoint &abs) {
+void Canvas::setLastMousePressPosAbs(const QPointF &abs) {
     mLastPressPosAbs = abs;
-    mLastPressPosRel = mCanvasTransformMatrix.inverted().map(
-                                mLastMouseEventPosAbs);
+    mLastPressPosRel = mapCanvasAbsToRel(mLastMouseEventPosAbs);
 }
 
-void Canvas::setCurrentMouseEventPosAbs(const QPoint &abs) {
+void Canvas::setCurrentMouseEventPosAbs(const QPointF &abs) {
     mCurrentMouseEventPosAbs = abs;
-    mCurrentMouseEventPosRel = mCanvasTransformMatrix.inverted().map(
-                                                    mCurrentMouseEventPosAbs);
+    mCurrentMouseEventPosRel = mapCanvasAbsToRel(mCurrentMouseEventPosAbs);
 }
 
-void Canvas::setCurrentMousePressPosAbs(const QPoint &abs) {
+void Canvas::setCurrentMousePressPosAbs(const QPointF &abs) {
     mCurrentPressPosAbs = abs;
-    mCurrentPressPosRel = mCanvasTransformMatrix.inverted().map(
-                                mCurrentMouseEventPosAbs);
+    mCurrentPressPosRel = mapCanvasAbsToRel(mCurrentMouseEventPosAbs);
 }
 
 void Canvas::mousePressEvent(QMouseEvent *event)
@@ -707,8 +708,9 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         updateHoveredPoint();
 
         if(mRotPivot->isVisible() && mHoveredPoint == NULL) {
-            if(mRotPivot->isPointAtAbsPos(mCurrentMouseEventPosRel,
-                                          1./mCanvasTransformMatrix.m11()) ) {
+            if(mRotPivot->isPointAtAbsPos(
+                        mCurrentMouseEventPosRel,
+                        1./mCanvasTransformMatrix.m11()) ) {
                 mHoveredPoint = mRotPivot;
             }
         }
@@ -799,9 +801,10 @@ void Canvas::wheelEvent(QWheelEvent *event)
 void Canvas::mouseDoubleClickEvent(QMouseEvent *) {
     mDoubleClick = true;
 
-    mLastPressedPoint = createNewPointOnLineNearSelected(mLastPressPosRel,
-                                                         true,
-                                                         1./mCanvasTransformMatrix.m11());
+    mLastPressedPoint = createNewPointOnLineNearSelected(
+                                    mLastPressPosRel,
+                                    true,
+                                    1./mCanvasTransformMatrix.m11());
 
     if(mLastPressedPoint == NULL) {
         BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);

@@ -16,9 +16,9 @@ class PathPoint;
 class VectorPathEdge;
 
 struct PathPointValues {
-    PathPointValues(QPointF startPosT,
-                    QPointF pointPosT,
-                    QPointF endPosT) {
+    PathPointValues(const QPointF &startPosT,
+                    const QPointF &pointPosT,
+                    const QPointF &endPosT) {
         startRelPos = startPosT;
         pointRelPos = pointPosT;
         endRelPos = endPosT;
@@ -31,22 +31,20 @@ struct PathPointValues {
     QPointF pointRelPos;
     QPointF endRelPos;
 
-    PathPointValues &operator/=(const qreal &val)
-    {
-        startRelPos /= val;
-        pointRelPos /= val;
-        endRelPos /= val;
+    PathPointValues &operator/=(const qreal &val) {
+        qreal inv = 1.f/val;
+        startRelPos *= inv;
+        pointRelPos *= inv;
+        endRelPos *= inv;
         return *this;
     }
-    PathPointValues &operator*=(const qreal &val)
-    {
+    PathPointValues &operator*=(const qreal &val) {
         startRelPos *= val;
         pointRelPos *= val;
         endRelPos *= val;
         return *this;
     }
-    PathPointValues &operator+=(const PathPointValues &ppv)
-    {
+    PathPointValues &operator+=(const PathPointValues &ppv) {
         startRelPos += ppv.startRelPos;
         pointRelPos += ppv.pointRelPos;
         endRelPos += ppv.endRelPos;
@@ -108,11 +106,9 @@ public:
     QPointF getEndCtrlPtValue() const;
     CtrlPoint *getEndCtrlPt();
 
-    void draw(QPainter *p,
-              const CanvasMode &mode);
     void drawSk(SkCanvas *canvas,
               const CanvasMode &mode,
-              const SkScalar &invScale);
+              const qreal &invScale);
 
     PathPoint *getNextPoint();
     PathPoint *getPreviousPoint();
@@ -139,7 +135,8 @@ public:
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                                    const CanvasMode &canvasMode,
                                    const qreal &canvasScaleInv);
-    void rectPointsSelection(QRectF absRect, QList<MovablePoint *> *list);
+    void rectPointsSelection(QRectF absRect,
+                             QList<MovablePoint *> *list);
     void updateStartCtrlPtVisibility();
     void updateEndCtrlPtVisibility();
 
@@ -148,7 +145,8 @@ public:
 
     void setCtrlsMode(CtrlsMode mode, bool saveUndoRedo = true);
     QPointF symmetricToAbsPos(QPointF absPosToMirror);
-    QPointF symmetricToAbsPosNewLen(QPointF absPosToMirror, qreal newLen);
+    QPointF symmetricToAbsPosNewLen(QPointF absPosToMirror,
+                                    qreal newLen);
     void ctrlPointPosChanged(bool startPtChanged);
     void moveEndCtrlPtToAbsPos(QPointF endCtrlPt);
     void moveStartCtrlPtToAbsPos(QPointF startCtrlPt);
@@ -192,20 +190,12 @@ public:
     void reversePointsDirection();
     PathPoint *getConnectedSeparatePathPoint();
 
-    virtual void drawHovered(QPainter *p) {
-        p->setBrush(Qt::NoBrush);
-        QPen pen = QPen(Qt::red, 2.);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        drawCosmeticEllipse(p, getAbsolutePos(),
-                            mRadius - 2., mRadius - 2.);
-    }
     void setParentPath(SinglePathAnimator *path);
     void reversePointsDirectionStartingFromThis(
             const bool &saveUndoRedo = true);
     void reversePointsDirectionReverse();
 
-    void saveTransformPivotAbsPos(QPointF absPivot);
+    void saveTransformPivotAbsPos(const QPointF &absPivot);
     void rotateRelativeToSavedPivot(const qreal &rot);
 
     VectorPathEdge *getNextEdge() {

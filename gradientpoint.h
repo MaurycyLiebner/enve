@@ -10,7 +10,8 @@ public:
                         const bool &saveUndoRedo);
     void moveByRel(const QPointF &relTranslatione);
     void setColor(QColor fillColor);
-    void draw(QPainter *p);
+    void drawSk(SkCanvas *canvas,
+                const SkScalar &invScale);
 private:
     QColor mFillColor = QColor(255, 0, 0, 155);
 };

@@ -38,8 +38,7 @@ void PathPoint::setParentPath(SinglePathAnimator *path) {
     mParentPath = path;
 }
 
-void PathPoint::applyTransform(const QMatrix &transform)
-{
+void PathPoint::applyTransform(const QMatrix &transform) {
     mStartCtrlPt->applyTransform(transform);
     mEndCtrlPt->applyTransform(transform);
     MovablePoint::applyTransform(transform);
@@ -81,7 +80,7 @@ void PathPoint::startTransform() {
     }
 }
 
-void PathPoint::saveTransformPivotAbsPos(QPointF absPivot) {
+void PathPoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
     MovablePoint::saveTransformPivotAbsPos(absPivot);
     if(!mStartCtrlPt->isSelected()) {
         mStartCtrlPt->saveTransformPivotAbsPos(absPivot);
@@ -122,8 +121,7 @@ void PathPoint::finishTransform() {
     }
 }
 
-void PathPoint::moveByRel(const QPointF &relTranslation)
-{
+void PathPoint::moveByRel(const QPointF &relTranslation) {
     MovablePoint::moveByRel(relTranslation);
     if(!mStartCtrlPt->isSelected()) {
         mStartCtrlPt->MovablePoint::moveByRel(relTranslation);
@@ -213,7 +211,8 @@ void PathPoint::removeApproximate() {
     mParentPath->deletePointAndApproximate(this);
 }
 
-void PathPoint::rectPointsSelection(QRectF absRect, QList<MovablePoint*> *list) {
+void PathPoint::rectPointsSelection(QRectF absRect,
+                                    QList<MovablePoint*> *list) {
     if(!isSelected()) {
         if(isContainedInRect(absRect)) {
             select();
@@ -292,23 +291,20 @@ QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {
     return symmetricToPos(absPosToMirror, getAbsolutePos());
 }
 
-QPointF PathPoint::symmetricToAbsPosNewLen(QPointF absPosToMirror, qreal newLen)
-{
+QPointF PathPoint::symmetricToAbsPosNewLen(QPointF absPosToMirror,
+                                           qreal newLen) {
     return symmetricToPosNewLen(absPosToMirror, getAbsolutePos(), newLen);
 }
 
-void PathPoint::moveStartCtrlPtToAbsPos(QPointF startCtrlPt)
-{
+void PathPoint::moveStartCtrlPtToAbsPos(QPointF startCtrlPt) {
     mStartCtrlPt->moveToAbs(startCtrlPt);
 }
 
-void PathPoint::moveEndCtrlPtToRelPos(QPointF endCtrlPt)
-{
+void PathPoint::moveEndCtrlPtToRelPos(QPointF endCtrlPt) {
     mEndCtrlPt->setRelativePos(endCtrlPt);
 }
 
-void PathPoint::moveStartCtrlPtToRelPos(QPointF startCtrlPt)
-{
+void PathPoint::moveStartCtrlPtToRelPos(QPointF startCtrlPt) {
     mStartCtrlPt->setRelativePos(startCtrlPt);
 }
 
@@ -340,7 +336,8 @@ void PathPoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
                                     CtrlPoint *pointToUpdate) {
     QPointF changedPointPos = pointChanged->getAbsolutePos();
     if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
-        pointToUpdate->moveToAbsWithoutUpdatingTheOther(symmetricToAbsPos(changedPointPos));
+        pointToUpdate->moveToAbsWithoutUpdatingTheOther(
+                    symmetricToAbsPos(changedPointPos));
     } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
         if(!isPointZero(changedPointPos) ) {
             pointToUpdate->moveToAbsWithoutUpdatingTheOther(
@@ -352,8 +349,7 @@ void PathPoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
     }
 }
 
-void PathPoint::moveEndCtrlPtToAbsPos(QPointF endCtrlPt)
-{
+void PathPoint::moveEndCtrlPtToAbsPos(QPointF endCtrlPt) {
     mEndCtrlPt->moveToAbs(endCtrlPt);
 }
 
@@ -375,79 +371,9 @@ CtrlPoint *PathPoint::getEndCtrlPt()
     return mEndCtrlPt;
 }
 
-void PathPoint::draw(QPainter *p, const CanvasMode &mode) {
-    p->save();
-    if(mSelected) {
-        p->setBrush(QColor(0, 200, 255));
-    } else {
-        p->setBrush(QColor(170, 240, 255));
-    }
-    QPointF absPos = getAbsolutePos();
-
-    drawCosmeticEllipse(p, absPos,
-                        mRadius - 2., mRadius - 2.);
-
-    if(prp_isKeyOnCurrentFrame() ) {
-        p->save();
-        p->setBrush(Qt::red);
-        QPen pen = p->pen();
-        pen.setWidthF(1.);
-        p->setPen(pen);
-        drawCosmeticEllipse(p, absPos, 4., 4.);
-        p->restore();
-    }
-    if((mode == CanvasMode::MOVE_POINT &&
-       (isNeighbourSelected() || BoxesGroup::getCtrlsAlwaysVisible() ) ) ||
-       (mode == CanvasMode::ADD_POINT && mSelected) ) {
-        QPen pen = p->pen();
-        if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            QPen tPen = QPen(Qt::black, 1.5);
-            tPen.setCosmetic(true);
-            p->setPen(tPen);
-            p->drawLine(absPos, mEndCtrlPt->getAbsolutePos());
-            tPen.setColor(Qt::white);
-            tPen.setWidthF(0.75);
-            p->setPen(tPen);
-            p->drawLine(absPos, mEndCtrlPt->getAbsolutePos());
-        }
-        if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            QPen tPen = QPen(Qt::black, 1.5);
-            tPen.setCosmetic(true);
-            p->setPen(tPen);
-            p->drawLine(absPos, mStartCtrlPt->getAbsolutePos());
-            tPen.setColor(Qt::white);
-            tPen.setWidthF(0.75);
-            p->setPen(tPen);
-            p->drawLine(absPos, mStartCtrlPt->getAbsolutePos());
-        }
-        p->setPen(pen);
-        mEndCtrlPt->draw(p);
-        mStartCtrlPt->draw(p);
-    }
-
-    if(isCtrlPressed()) {
-        QPen pen = p->pen();
-        p->setPen(Qt::NoPen);
-        p->setBrush(Qt::white);
-        drawCosmeticEllipse(p, absPos,
-                            6., 6.);
-        p->setPen(pen);
-        p->save();
-        QTransform trans = p->transform();
-        p->resetTransform();
-        absPos = trans.map(absPos);
-        p->drawText(QRectF(absPos - QPointF(mRadius, mRadius),
-                           absPos + QPointF(mRadius, mRadius)),
-                    Qt::AlignCenter,
-                    QString::number(mPointId));
-        p->restore();
-    }
-    p->restore();
-}
-
 void PathPoint::drawSk(SkCanvas *canvas,
                      const CanvasMode &mode,
-                     const SkScalar &invScale) {
+                     const qreal &invScale) {
     canvas->save();
     SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
     if(mSelected) {
@@ -469,8 +395,8 @@ void PathPoint::drawSk(SkCanvas *canvas,
         SkPaint paint;
         paint.setAntiAlias(true);
         if(mEndCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            SkPoint endAbsPos =
-                    QPointFToSkPoint(mEndCtrlPt->getAbsolutePos());
+            SkPoint endAbsPos = QPointFToSkPoint(
+                        mEndCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
@@ -481,8 +407,8 @@ void PathPoint::drawSk(SkCanvas *canvas,
             canvas->drawLine(absPos, endAbsPos, paint);
         }
         if(mStartCtrlPt->isVisible() || mode == CanvasMode::ADD_POINT) {
-            SkPoint startAbsPos =
-                    QPointFToSkPoint(mStartCtrlPt->getAbsolutePos());
+            SkPoint startAbsPos = QPointFToSkPoint(
+                        mStartCtrlPt->getAbsolutePos());
             paint.setColor(SK_ColorBLACK);
             paint.setStrokeWidth(1.5*invScale);
             paint.setStyle(SkPaint::kStroke_Style);
@@ -823,8 +749,7 @@ void PathPoint::setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo) {
     }
 }
 
-PathPoint *PathPoint::addPointAbsPos(QPointF absPos)
-{
+PathPoint *PathPoint::addPointAbsPos(QPointF absPos) {
     return mParentPath->addPointAbsPos(absPos, this);
 }
 
@@ -851,11 +776,11 @@ PathPointValues operator+(const PathPointValues &ppv1, const PathPointValues &pp
                            ppv1.endRelPos + ppv2.endRelPos);
 }
 
-PathPointValues operator/(const PathPointValues &ppv, const qreal &val)
-{
-    return PathPointValues(ppv.startRelPos / val,
-                           ppv.pointRelPos / val,
-                           ppv.endRelPos / val);
+PathPointValues operator/(const PathPointValues &ppv, const qreal &val) {
+    qreal invVal = 1.f/val;
+    return PathPointValues(ppv.startRelPos * invVal,
+                           ppv.pointRelPos * invVal,
+                           ppv.endRelPos * invVal);
 }
 
 PathPointValues operator*(const qreal &val, const PathPointValues &ppv)

@@ -180,7 +180,7 @@ public:
 
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(const QString &renderDest);
-    void showContextMenu(QPoint globalPos);
+    void showContextMenu(QPointF globalPos);
 
     void applyCurrentTransformationToSelected();
     QPointF getSelectedPointsAbsPivotPos();
@@ -258,8 +258,18 @@ public:
 
     void updateCombinedTransform() {}
 
-    QMatrix getCombinedTransform() const { return QMatrix(); }
-    QMatrix getRelativeTransform() const { return QMatrix(); }
+    QMatrix getCombinedTransform() const {
+        QMatrix matrix;
+        matrix.reset();
+        return matrix;
+    }
+
+    QMatrix getRelativeTransform() const {
+        QMatrix matrix;
+        matrix.reset();
+        return matrix;
+    }
+
     QPointF mapAbsPosToRel(const QPointF &absPos) {
         return absPos;
     }
@@ -308,7 +318,7 @@ public:
     void createImageBox(const QString &path);
     void drawSelectedSk(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
-                      const SkScalar &invScale);
+                      const qreal &invScale);
     MovablePoint *getPointAtAbsPos(const QPointF &absPos,
                              const CanvasMode &currentMode,
                              const qreal &canvasScaleInv);
@@ -358,11 +368,11 @@ public:
         return mPreviewing || mRendering;
     }
     void drawInputText(QPainter *p);
+    QPointF mapCanvasAbsToRel(const QPointF &pos);
 private:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 
-    QImage mRenderImage;
     sk_sp<SkImage> mRenderImageSk;
     QSize mRenderImageSize;
     Color mRenderBackgroundColor;
@@ -466,10 +476,10 @@ private:
     QPointF getMoveByValueForEventPos(QPointF eventPos);
     void cancelCurrentTransform();
     void releaseMouseAndDontTrack();
-    void setLastMouseEventPosAbs(const QPoint &abs);
-    void setLastMousePressPosAbs(const QPoint &abs);
-    void setCurrentMouseEventPosAbs(const QPoint &abs);
-    void setCurrentMousePressPosAbs(const QPoint &abs);
+    void setLastMouseEventPosAbs(const QPointF &abs);
+    void setLastMousePressPosAbs(const QPointF &abs);
+    void setCurrentMouseEventPosAbs(const QPointF &abs);
+    void setCurrentMousePressPosAbs(const QPointF &abs);
 };
 
 #endif // CANVAS_H

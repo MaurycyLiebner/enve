@@ -1905,25 +1905,27 @@ void SvgSeparatePath::closePath() {
     mClosedPath = true;
 }
 
-void SvgSeparatePath::moveTo(QPointF e) {
+void SvgSeparatePath::moveTo(const QPointF &e) {
     mFirstPoint = new SvgPathPoint(e);
     mLastPoint = mFirstPoint;
     addPoint(mFirstPoint);
 }
 
-void SvgSeparatePath::cubicTo(QPointF c1, QPointF c2, QPointF e) {
+void SvgSeparatePath::cubicTo(const QPointF &c1,
+                              const QPointF &c2,
+                              const QPointF &e) {
     mLastPoint->setEndPoint(c1);
     mLastPoint = new SvgPathPoint(e);
     mLastPoint->setStartPoint(c2);
     addPoint(mLastPoint);
 }
 
-void SvgSeparatePath::lineTo(QPointF e) {
+void SvgSeparatePath::lineTo(const QPointF &e) {
     mLastPoint = new SvgPathPoint(e);
     addPoint(mLastPoint);
 }
 
-void SvgSeparatePath::quadTo(QPointF c, QPointF e) {
+void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
     QPointF prev = mLastPoint->getPoint();
     QPointF c1((prev.x() + 2*c.x()) / 3, (prev.y() + 2*c.y()) / 3);
     QPointF c2((e.x() + 2*c.x()) / 3, (e.y() + 2*c.y()) / 3);
@@ -2081,7 +2083,8 @@ void SvgPathPoint::guessCtrlsMode() {
     if(isZero1Dec(pointToLen(startPointRel) - pointToLen(endPointRel)) ) {
         mCtrlsMode = CTRLS_SYMMETRIC;
     } else {
-        qreal angle = QLineF(mStartPoint, mPoint).angleTo(QLineF(mPoint, mEndPoint));
+        qreal angle = QLineF(mStartPoint, mPoint).
+                angleTo(QLineF(mPoint, mEndPoint));
         while(angle > 90.) angle -= 180;
         if(isZero1Dec(angle)) {
             mCtrlsMode = CTRLS_SMOOTH;
@@ -2089,14 +2092,14 @@ void SvgPathPoint::guessCtrlsMode() {
     }
 }
 
-void SvgPathPoint::setStartPoint(QPointF startPoint) {
+void SvgPathPoint::setStartPoint(const QPointF &startPoint) {
     mStartPoint = startPoint;
     if(isZero1Dec(pointToLen(mStartPoint - mPoint))) return;
     mStartPointSet = true;
     if(mEndPointSet) guessCtrlsMode();
 }
 
-void SvgPathPoint::setEndPoint(QPointF endPoint) {
+void SvgPathPoint::setEndPoint(const QPointF &endPoint) {
     mEndPoint = endPoint;
     if(isZero1Dec(pointToLen(mEndPoint - mPoint))) return;
     mEndPointSet = true;

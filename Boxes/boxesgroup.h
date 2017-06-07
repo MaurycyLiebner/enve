@@ -31,7 +31,7 @@ public:
     BoundingBox *getBoxAt(const QPointF &absPos);
     //MovablePoint *getPointAt(const QPointF &absPos, const CanvasMode &currentMode);
 
-    void addContainedBoxesToSelection(QRectF rect);
+    void addContainedBoxesToSelection(const QRectF &rect);
 
     void setIsCurrentGroup(bool bT);
 

@@ -68,14 +68,14 @@ void ParticleBox::preUpdatePixmapsUpdates() {
 }
 
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
-    if(mRelBoundingRectPath.contains(relPos) ) {
+    if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
         /*if(mEmitters.isEmpty()) */return true;
-        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-            if(emitter->relPointInsidePath(relPos)) {
-                return true;
-            }
-        }
-        return false;
+//        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
+//            if(emitter->relPointInsidePath(relPos)) {
+//                return true;
+//            }
+//        }
+//        return false;
     } else {
         return false;
     }
@@ -237,12 +237,12 @@ Particle::Particle(ParticleBox *parentBox) {
 
 void Particle::initializeParticle(const int &firstFrame,
                                   const int &nFrames,
-                                  const QPointF &iniPos,
-                                  const QPointF &iniVel,
-                                  const qreal &partSize) {
+                                  const SkPoint &iniPos,
+                                  const SkPoint &iniVel,
+                                  const SkScalar &partSize) {
     mSize = partSize;
-    mPrevVelocityVar = QPointF(0., 0.);
-    mNextVelocityVar = QPointF(0., 0.);
+    mPrevVelocityVar = SkPoint::Make(0., 0.);
+    mNextVelocityVar = SkPoint::Make(0., 0.);
     mPrevVelocityDuration = 10000000.;
     mLastScale = 1.;
     mLastOpacity = 1.;
@@ -259,24 +259,24 @@ void Particle::initializeParticle(const int &firstFrame,
 }
 
 void Particle::generatePathNextFrame(const int &frame,
-                                     const qreal &velocityVar,
-                                     const qreal &velocityVarPeriod,
-                                     const QPointF &acc,
-                                     const qreal &finalScale,
-                                     const qreal &finalOpacity,
-                                     const qreal &decayFrames,
-                                     const qreal &length) {
+                                     const SkScalar &velocityVar,
+                                     const SkScalar &velocityVarPeriod,
+                                     const SkPoint &acc,
+                                     const SkScalar &finalScale,
+                                     const SkScalar &finalOpacity,
+                                     const SkScalar &decayFrames,
+                                     const SkScalar &length) {
     if(mPrevVelocityDuration > velocityVarPeriod) {
         mPrevVelocityVar = mNextVelocityVar;
-        mNextVelocityVar = QPointF(fRand(-velocityVar, velocityVar),
-                                   fRand(-velocityVar, velocityVar));
+        mNextVelocityVar = SkPoint::Make(fRand(-velocityVar, velocityVar),
+                                         fRand(-velocityVar, velocityVar));
         mPrevVelocityDuration = 0.;
     }
 
     int arrayId = frame - mFirstFrame;
 
     if(arrayId == 0) {
-        qreal iniTime = fRand(0., 1.);
+        SkScalar iniTime = fRand(0., 1.);
         mLastPos += mLastVel*iniTime;
         mLastVel += acc*iniTime;
     }
@@ -290,19 +290,18 @@ void Particle::generatePathNextFrame(const int &frame,
     SkPath linePath;
     SkScalar currLen = 0.;
     int currId = arrayId - 1;
-    QPointF lastPos = mLastPos;
-    linePath.moveTo(QPointFToSkPoint(lastPos));
+    SkPoint lastPos = mLastPos;
+    linePath.moveTo(lastPos);
     while(currId > -1) {
-        QPointF currPos = mParticleStates[currId].pos;
-        qreal lenInc = pointToLen(lastPos - currPos);
-        qreal newLen = currLen + lenInc;
+        SkPoint currPos = mParticleStates[currId].pos;
+        SkScalar lenInc = pointToLen(lastPos - currPos);
+        SkScalar newLen = currLen + lenInc;
         if(newLen > length) {
-            linePath.lineTo(QPointFToSkPoint(
-                                lastPos + (currPos - lastPos)*
-                                (length - currLen)/lenInc));
+            linePath.lineTo(lastPos + (currPos - lastPos)*
+                            (length - currLen)*(1./lenInc));
             break;
         } else {
-            linePath.lineTo(QPointFToSkPoint(currPos));
+            linePath.lineTo(currPos);
         }
         currLen = newLen;
         lastPos = currPos;
@@ -315,11 +314,10 @@ void Particle::generatePathNextFrame(const int &frame,
                                              mLastOpacity,
                                              linePath);
 
-    qreal perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
+    SkScalar perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
                             velocityVarPeriod;
-    mLastPos += mLastVel +
-            perPrevVelVar*mPrevVelocityVar +
-            (1. - perPrevVelVar)*mNextVelocityVar;
+    mLastPos += mLastVel + mPrevVelocityVar*perPrevVelVar +
+                    mNextVelocityVar*(1.f - perPrevVelVar);
     mLastVel += acc;
 
     mPrevVelocityDuration += 1.;
@@ -481,7 +479,7 @@ void ParticleEmitter::updateParticlesForFrameIfNeeded(const int &frame) {
     }
 }
 
-bool ParticleEmitter::relPointInsidePath(const QPointF &relPos) {
+bool ParticleEmitter::relPointInsidePath(const SkPoint &relPos) {
     Q_FOREACH(const ParticleState &state, mParticleStates) {
         if(pointToLen(state.pos - relPos) < 5.) {
             return true;
@@ -643,7 +641,8 @@ void ParticleEmitter::generateParticles() {
                 mVelocityRandomVar->getCurrentValueAtRelFrame(i);
         qreal velocityVarPeriod =
                 mVelocityRandomVarPeriod->getCurrentValueAtRelFrame(i);
-        QPointF acceleration = mAcceleration->getCurrentPointValueAtRelFrame(i)/24.;
+        QPointF acceleration =
+                mAcceleration->getCurrentPointValueAtRelFrame(i)/24.;
         qreal finalScale =
                 mParticlesSizeDecay->getCurrentValueAtRelFrame(i);
         qreal finalOpacity =
@@ -688,9 +687,11 @@ void ParticleEmitter::generateParticles() {
             qreal xTrans = fRand(-width, width);
 
             newParticle->initializeParticle(i, particlesFrameLifetime,
-                                            QPointF(pos.x() + xTrans,
-                                                    pos.y()),
-                                            partVel, partSize);
+                                            SkPoint::Make(
+                                                pos.x() + xTrans,
+                                                pos.y()),
+                                            QPointFToSkPoint(partVel),
+                                            partSize);
             notFinishedParticles << newParticle;
         }
         int nNotFinished = notFinishedParticles.count();
@@ -702,7 +703,7 @@ void ParticleEmitter::generateParticles() {
                 particle->generatePathNextFrame(i,
                                                 velocityVar,
                                                 velocityVarPeriod,
-                                                acceleration,
+                                                QPointFToSkPoint(acceleration),
                                                 finalScale,
                                                 finalOpacity,
                                                 decayFrames,
@@ -744,31 +745,4 @@ void ParticleEmitter::updateParticlesForFrame(const int &frame) {
             mParticleStates << particle->getParticleStateAtFrame(frame);
         }
     }
-    QRectF rect;
-    Q_FOREACH(const ParticleState &state, mParticleStates) {
-        const QPointF &pos = state.pos;
-        if(rect.isNull()) {
-            rect.setTopLeft(pos);
-            rect.setTopRight(pos);
-        } else {
-            if(rect.left() > pos.x()) {
-                rect.setLeft(pos.x());
-            } else if(rect.right() < pos.x()) {
-                rect.setRight(pos.x());
-            }
-            if(rect.top() > pos.y()) {
-                rect.setTop(pos.y());
-            } else if(rect.bottom() < pos.y()) {
-                rect.setBottom(pos.y());
-            }
-        }
-    }
-    if(!rect.isNull()) {
-        rect.adjust(-5., -5, 5, 5);
-    }
-    mParticlesBoundingRect = rect;
-}
-
-QRectF ParticleEmitter::getParticlesBoundingRect() {
-    return mParticlesBoundingRect;
 }

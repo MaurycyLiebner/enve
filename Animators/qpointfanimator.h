@@ -2,6 +2,7 @@
 #define QPOINTFANIMATOR_H
 #include "Animators/complexanimator.h"
 #include "Animators/qrealanimator.h"
+#include "skiaincludes.h"
 
 class QPointFAnimator : public ComplexAnimator
 {

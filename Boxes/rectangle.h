@@ -18,7 +18,7 @@ public:
     Rectangle(BoxesGroup *parent);
     ~Rectangle();
 
-    void moveSizePointByAbs(QPointF absTrans);
+    void moveSizePointByAbs(const QPointF &absTrans);
     void startAllPointsTransform();
 
     void drawSelectedSk(SkCanvas *canvas,

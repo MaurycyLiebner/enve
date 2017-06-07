@@ -10,7 +10,8 @@ ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
 }
 
 void ImageBox::updateRelBoundingRect() {
-    mRelBoundingRect = mImage.rect();
+    mRelBoundingRect = QRectF(0., 0.,
+                              mImageSk->width(), mImageSk->height());
 
     BoundingBox::updateRelBoundingRect();
 }

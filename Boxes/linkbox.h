@@ -86,7 +86,7 @@ public:
 
     QMatrix getRelativeTransform() const;
 
-    virtual const QPainterPath &getRelBoundingRectPath();
+    virtual const SkPath &getRelBoundingRectPath();
 
     qreal getEffectsMargin();
 
@@ -185,7 +185,7 @@ public:
 
     QMatrix getRelativeTransform() const;
 
-    virtual const QPainterPath &getRelBoundingRectPath();
+    virtual const SkPath &getRelBoundingRectPath();
 
     qreal getEffectsMargin();
 

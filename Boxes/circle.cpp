@@ -102,8 +102,7 @@ void Circle::moveRadiusesByAbs(const QPointF &absTrans) {
     mHorizontalRadiusPoint->moveByAbs(absTrans);
 }
 
-void Circle::setVerticalRadius(const qreal &verticalRadius)
-{
+void Circle::setVerticalRadius(const qreal &verticalRadius) {
     mVerticalRadiusPoint->setRelativePos(QPointF(0., verticalRadius) );
 }
 
@@ -119,7 +118,7 @@ void Circle::setRadius(const qreal &radius) {
 
 void Circle::drawSelectedSk(SkCanvas *canvas,
                             const CanvasMode &currentCanvasMode,
-                            const SkScalar &invScale) {
+                            const qreal &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
         drawBoundingRectSk(canvas, invScale);
@@ -182,13 +181,10 @@ void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
 }
 
 void Circle::updatePath() {
-    mPath = QPainterPath();
-    QPointF centerPos = mCenter->getRelativePos();
-    mPath.addEllipse(centerPos,
-                     (centerPos - mHorizontalRadiusPoint->getRelativePos()).x(),
-                     (centerPos - mVerticalRadiusPoint->getRelativePos()).y() );
+    mPathSk = SkPath();
+    mPathSk.addOval(QRectFToSkRect(mRelBoundingRect));
 
-    updateOutlinePath();
+    updateOutlinePathSk();
 }
 
 CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,

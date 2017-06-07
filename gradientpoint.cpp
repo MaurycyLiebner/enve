@@ -9,51 +9,60 @@ GradientPoint::GradientPoint(PathBox *parent) :
     anim_setTraceKeyOnCurrentFrame(true);
 }
 
-void GradientPoint::setRelativePos(const QPointF &relPos, const bool &saveUndoRedo)
-{
+void GradientPoint::setRelativePos(const QPointF &relPos,
+                                   const bool &saveUndoRedo) {
     MovablePoint::setRelativePos(relPos, saveUndoRedo);
     ((VectorPath*)mParent)->updateDrawGradients();
 }
 
-void GradientPoint::moveByRel(const QPointF &relTranslatione)
-{
+void GradientPoint::moveByRel(const QPointF &relTranslatione) {
     MovablePoint::moveByRel(relTranslatione);
     ((VectorPath*)mParent)->updateDrawGradients();
 }
 
-void GradientPoint::setColor(QColor fillColor)
-{
+void GradientPoint::setColor(QColor fillColor) {
     mFillColor = fillColor;
     
 }
 
-void GradientPoint::draw(QPainter *p) {
+void GradientPoint::drawSk(SkCanvas *canvas,
+                           const SkScalar &invScale) {
     if(mHidden) {
         return;
     }
-    p->save();
-    p->setBrush(mFillColor);
-    QPointF absPos = getAbsolutePos();
 
-    QPen pen = p->pen();
-    pen.setColor(Qt::black);
-    pen.setWidthF(1.5);
-    p->setPen(pen);
-    drawCosmeticEllipse(p, absPos,
-                        mRadius, mRadius);
-    p->setBrush(Qt::NoBrush);
-    pen.setColor(Qt::white);
-    pen.setWidthF(0.75);
-    p->setPen(pen);
-    drawCosmeticEllipse(p, absPos,
-                        mRadius, mRadius);
+    SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
+    canvas->save();
 
-    if(prp_isKeyOnCurrentFrame() ) {
-        p->setBrush(Qt::red);
-        pen.setColor(Qt::black);
-        pen.setWidthF(1.);
-        p->setPen(pen);
-        drawCosmeticEllipse(p, absPos, 3, 3);
+    SkScalar scaledRadius = mRadius*invScale;
+
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    paint.setColor(SkColorSetARGBInline(mFillColor.alpha(),
+                                        mFillColor.red(),
+                                        mFillColor.green(),
+                                        mFillColor.blue()));
+
+    paint.setStyle(SkPaint::kFill_Style);
+    canvas->drawCircle(absPos,
+                       scaledRadius, paint);
+
+    paint.setStyle(SkPaint::kStroke_Style);
+    paint.setColor(SK_ColorBLACK);
+    paint.setStrokeWidth(invScale);
+    canvas->drawCircle(absPos,
+                       scaledRadius, paint);
+
+    if(prp_isKeyOnCurrentFrame()) {
+        paint.setColor(SK_ColorRED);
+        paint.setStyle(SkPaint::kFill_Style);
+        canvas->drawCircle(absPos,
+                           scaledRadius*0.5, paint);
+
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setColor(SK_ColorBLACK);
+        canvas->drawCircle(absPos,
+                           scaledRadius*0.5, paint);
     }
-    p->restore();
+    canvas->restore();
 }

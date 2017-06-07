@@ -118,8 +118,8 @@ QMatrix SameTransformInternalLink::getRelativeTransform() const {
     return mLinkTarget->getRelativeTransform();
 }
 
-const QPainterPath &SameTransformInternalLink::getRelBoundingRectPath() {
-    if(mLinkTarget == NULL) return QPainterPath();
+const SkPath &SameTransformInternalLink::getRelBoundingRectPath() {
+    if(mLinkTarget == NULL) return SkPath();
     return mLinkTarget->getRelBoundingRectPath();
 }
 
@@ -155,7 +155,7 @@ QMatrix SameTransformInternalLinkBoxesGroup::getRelativeTransform() const {
     return mLinkTarget->getRelativeTransform();
 }
 
-const QPainterPath &SameTransformInternalLinkBoxesGroup::getRelBoundingRectPath() {
+const SkPath &SameTransformInternalLinkBoxesGroup::getRelBoundingRectPath() {
     return mLinkTarget->getRelBoundingRectPath();
 }
 
@@ -171,9 +171,9 @@ void InternalLinkCanvas::updateRelBoundingRect() {
         //                        child->getRelativeTransform().
         //                        map(child->getRelBoundingRectPath()));
         //        }
-        mRelBoundingRect =
-                QRectF(QPointF(0., 0.),
-                       ((Canvas*)mLinkTarget.data())->getCanvasSize());
+        QSize size = ((Canvas*)mLinkTarget.data())->getCanvasSize();
+        mRelBoundingRect = QRectF(0., 0.,
+                                  size.width(), size.height());
         //boundingPaths.boundingRect();
 
         BoundingBox::updateRelBoundingRect();

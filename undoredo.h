@@ -4,6 +4,7 @@
 #include <QList>
 #include <QDebug>
 #include <memory>
+#include "skiaincludes.h"
 
 class MainWindow;
 class MovablePoint;
@@ -494,8 +495,8 @@ private:
 
 class ChangeQrealAnimatorValue : public UndoRedo {
 public:
-    ChangeQrealAnimatorValue(const qreal &oldValue,
-                             const qreal &newValue,
+    ChangeQrealAnimatorValue(const SkScalar &oldValue,
+                             const SkScalar &newValue,
                              QrealAnimator *animator);
 
     ~ChangeQrealAnimatorValue();
@@ -505,15 +506,15 @@ public:
     void undo();
 
 private:
-    qreal mOldValue;
-    qreal mNewValue;
+    SkScalar mOldValue;
+    SkScalar mNewValue;
     QrealAnimatorQSPtr mAnimator;
 };
 
 class ChangeQrealKeyValueUndoRedo : public UndoRedo {
 public:
-    ChangeQrealKeyValueUndoRedo(const qreal &oldValue,
-                                const qreal &newValue,
+    ChangeQrealKeyValueUndoRedo(const SkScalar &oldValue,
+                                const SkScalar &newValue,
                                 QrealKey *key);
 
     ~ChangeQrealKeyValueUndoRedo();
@@ -523,8 +524,8 @@ public:
     void undo();
 
 private:
-    qreal mOldValue;
-    qreal mNewValue;
+    SkScalar mOldValue;
+    SkScalar mNewValue;
     QrealKeyStdPtr mTargetKey;
 };
 

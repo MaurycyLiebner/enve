@@ -603,39 +603,9 @@ MovablePoint *SinglePathAnimator::qra_getPointAt(
     return NULL;
 }
 
-void SinglePathAnimator::drawSelected(QPainter *p,
-                                const CanvasMode &currentCanvasMode,
-                                const QMatrix &combinedTransform) {
-    p->save();
-    if(currentCanvasMode == CanvasMode::MOVE_POINT) {
-        p->save();
-        p->setBrush(Qt::NoBrush);
-        QPen editPen = QPen(Qt::white, 1., Qt::DashLine);
-        editPen.setCosmetic(true);
-        p->setPen(editPen);
-        p->setTransform(QTransform(combinedTransform), true);
-        p->setCompositionMode(QPainter::CompositionMode_Difference);
-        p->drawPath(mPath);
-        p->restore();
-
-        for(int i = mPoints.count() - 1; i >= 0; i--) {
-            const QSharedPointer<PathPoint> &point = mPoints.at(i);
-            point->draw(p, currentCanvasMode);
-        }
-    } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
-        for(int i = mPoints.count() - 1; i >= 0; i--) {
-            const QSharedPointer<PathPoint> &point = mPoints.at(i);
-            if(point->isEndPoint() || point->isSelected()) {
-                point->draw(p, currentCanvasMode);
-            }
-        }
-    }
-    p->restore();
-}
-
 void SinglePathAnimator::drawSelected(SkCanvas *canvas,
                                       const CanvasMode &currentCanvasMode,
-                                      const SkScalar &invScale,
+                                      const qreal &invScale,
                                       const SkMatrix &combinedTransform) {    
     //canvas->save();
     SkPaint paint;
@@ -745,7 +715,7 @@ PathPoint *SinglePathAnimator::addPoint(PathPoint *pointToAdd,
 }
 
 PathPoint* SinglePathAnimator::addPointAbsPos(const QPointF &absPtPos,
-                                        PathPoint *toPoint) {
+                                              PathPoint *toPoint) {
     PathPoint *newPoint = new PathPoint(this);
     newPoint->setAbsolutePos(absPtPos, false);
     newPoint->moveStartCtrlPtToAbsPos(absPtPos);
@@ -755,7 +725,7 @@ PathPoint* SinglePathAnimator::addPointAbsPos(const QPointF &absPtPos,
 }
 
 PathPoint *SinglePathAnimator::addPointRelPos(const QPointF &relPtPos,
-                                        PathPoint *toPoint) {
+                                              PathPoint *toPoint) {
     PathPoint *newPoint = new PathPoint(this);
     newPoint->setRelativePos(relPtPos, false);
     newPoint->moveStartCtrlPtToRelPos(relPtPos);
@@ -765,7 +735,7 @@ PathPoint *SinglePathAnimator::addPointRelPos(const QPointF &relPtPos,
 }
 
 void SinglePathAnimator::appendToPointsList(PathPoint *point,
-                                      const bool &saveUndoRedo) {
+                                            const bool &saveUndoRedo) {
     mPoints.append(point->ref<PathPoint>());
     point->setParentPath(this);
     ca_addChildAnimator(point->getPathPointAnimatorsPtr());

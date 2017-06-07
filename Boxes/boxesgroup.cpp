@@ -236,13 +236,13 @@ BoundingBox *BoxesGroup::createNewDuplicate(BoxesGroup *parent) {
 }
 
 void BoxesGroup::updateRelBoundingRect() {
-    QPainterPath boundingPaths = QPainterPath();
+    SkPath boundingPaths = SkPath();
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-        boundingPaths.addPath(
-                    child->getRelativeTransform().
-                    map(child->getRelBoundingRectPath()));
+        SkPath childPath = child->getRelBoundingRectPath();
+        childPath.transform(QMatrixToSkMatrix(child->getRelativeTransform()));
+        boundingPaths.addPath(childPath);
     }
-    mRelBoundingRect = boundingPaths.boundingRect();
+    mRelBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
 
     BoundingBox::updateRelBoundingRect();
 }
@@ -450,8 +450,7 @@ BoundingBox *BoxesGroup::getBoxAt(const QPointF &absPos) {
     return boxAtPos;
 }
 
-void BoxesGroup::addContainedBoxesToSelection(QRectF rect)
-{
+void BoxesGroup::addContainedBoxesToSelection(const QRectF &rect) {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         if(box->isVisibleAndUnlocked()) {
             if(box->isContainedIn(rect) ) {

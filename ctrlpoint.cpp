@@ -5,8 +5,7 @@
 
 CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
     MovablePoint(parentPoint->getParent(),
-                 MovablePointType::TYPE_CTRL_POINT, 5.)
-{
+                 MovablePointType::TYPE_CTRL_POINT, 5.) {
     mIsStartCtrlPt = isStartCtrlPt;
     mParentPoint = parentPoint;
     mParent = mParentPoint->getParent();

@@ -7,11 +7,11 @@ class ParticleBox;
 struct ParticleState {
     ParticleState() {}
 
-    ParticleState(const QPointF &posT,
-              const qreal &scaleT,
-              const qreal &sizeT,
-              const qreal &opacityT,
-              const SkPath &path) {
+    ParticleState(const SkPoint &posT,
+                  const SkScalar &scaleT,
+                  const SkScalar &sizeT,
+                  const SkScalar &opacityT,
+                  const SkPath &path) {
         pos = posT;
         size = scaleT*sizeT;
         opacity = opacityT;
@@ -29,9 +29,9 @@ struct ParticleState {
     }
 
     SkPath linePath;
-    QPointF pos;
-    qreal size;
-    qreal opacity;
+    SkPoint pos;
+    SkScalar size;
+    SkScalar opacity;
 };
 
 class Particle {
@@ -39,35 +39,35 @@ public:
     Particle(ParticleBox *parentBox);
     void initializeParticle(const int &firstFrame,
                             const int &nFrames,
-                            const QPointF &iniPos,
-                            const QPointF &iniVel,
-                            const qreal &partSize);
+                            const SkPoint &iniPos,
+                            const SkPoint &iniVel,
+                            const SkScalar &partSize);
     void generatePathNextFrame(const int &frame,
-                               const qreal &velocityVar,
-                               const qreal &velocityVarPeriod,
-                               const QPointF &acc,
-                               const qreal &finalScale,
-                               const qreal &finalOpacity,
-                               const qreal &decayFrames,
-                               const qreal &length);
+                               const SkScalar &velocityVar,
+                               const SkScalar &velocityVarPeriod,
+                               const SkPoint &acc,
+                               const SkScalar &finalScale,
+                               const SkScalar &finalOpacity,
+                               const SkScalar &decayFrames,
+                               const SkScalar &length);
 
     bool isVisibleAtFrame(const int &frame);
     ParticleState getParticleStateAtFrame(const int &frame);
 private:
-    qreal mSize;
-    QPointF mPrevVelocityVar;
-    QPointF mNextVelocityVar;
-    qreal mPrevVelocityDuration;
+    SkScalar mSize;
+    SkPoint mPrevVelocityVar;
+    SkPoint mNextVelocityVar;
+    SkScalar mPrevVelocityDuration;
 
     ParticleBox *mParentBox;
     int mFirstFrame;
     int mNumberFrames;
     ParticleState *mParticleStates = NULL;
 
-    qreal mLastScale;
-    qreal mLastOpacity;
-    QPointF mLastPos;
-    QPointF mLastVel;
+    SkScalar mLastScale;
+    SkScalar mLastOpacity;
+    SkPoint mLastPos;
+    SkPoint mLastVel;
 };
 
 class ParticleEmitter : public ComplexAnimator {
@@ -80,12 +80,11 @@ public:
 
     void drawParticlesSk(SkCanvas *canvas);
     void updateParticlesForFrame(const int &frame);
-    QRectF getParticlesBoundingRect();
     void scheduleGenerateParticles();
     void scheduleUpdateParticlesForFrame();
     void generateParticlesIfNeeded();
     void updateParticlesForFrameIfNeeded(const int &frame);
-    bool relPointInsidePath(const QPointF &relPos);
+    bool relPointInsidePath(const SkPoint &relPos);
 
     Property *makeDuplicate();
 
@@ -126,7 +125,6 @@ public:
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint();
 private:
-    QRectF mParticlesBoundingRect;
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;
     int mMinFrame = -10;

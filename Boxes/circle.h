@@ -55,6 +55,7 @@ public:
     void setRadius(const qreal &radius);
 
     void updatePath();
+
     MovablePoint *getPointAtAbsPos(
                              const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
@@ -73,7 +74,7 @@ public:
 
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
-                        const SkScalar &invScale);
+                        const qreal &invScale);
 
     void makeDuplicate(Property *targetBox) {
         PathBox::makeDuplicate(targetBox);

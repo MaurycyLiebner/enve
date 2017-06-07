@@ -238,13 +238,12 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
                                                       const QPointF &pivot) {
     QMatrix matrix;
 
-    matrix.translate(pivot.x(),
-                     pivot.y());
+    matrix.translate(pivot.x(), pivot.y());
     matrix.rotate(mRotAnimator->qra_getCurrentValue());
     matrix.scale(sx, sy);
     matrix.rotate(-mRotAnimator->qra_getCurrentValue());
     matrix.translate(-pivot.x() + mPosAnimator->getSavedXValue(),
-                     -pivot.y() + mPosAnimator->getSavedYValue() );
+                     -pivot.y() + mPosAnimator->getSavedYValue());
 
     scale(sx, sy);
     mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()) );

@@ -41,6 +41,7 @@ public:
     void updateDrawGradients();
 
     void updateOutlinePath();
+    void updateOutlinePathSk();
     void scheduleOutlinePathUpdate();
     void updateOutlinePathIfNeeded();
 
@@ -75,7 +76,7 @@ public:
     void updateStrokeDrawGradient();
     void updateFillDrawGradient();
 
-    virtual void updatePath();
+    virtual void updatePath() {}
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
@@ -109,10 +110,11 @@ protected:
 
     SkPath mPathSk;
     SkPath mOutlinePathSk;
+    SkPath mWholePathSk;
     QPainterPath mPath;
     QPainterPath mOutlinePath;
     QPainterPath mWholePath;
-    void updateWholePath();
+    void updateWholePathSk();
 
     bool mOutlineAffectedByScale = true;
 };

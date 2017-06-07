@@ -83,8 +83,8 @@ UndoRedo::UndoRedo(QString name) {
     mFrame = MainWindow::getInstance()->getCurrentFrame();
 }
 
-ChangeQrealKeyValueUndoRedo::ChangeQrealKeyValueUndoRedo(const qreal &oldValue,
-                                                         const qreal &newValue,
+ChangeQrealKeyValueUndoRedo::ChangeQrealKeyValueUndoRedo(const SkScalar &oldValue,
+                                                         const SkScalar &newValue,
                                                          QrealKey *key) :
     UndoRedo("ChangeQrealKeyValueUndoRedo") {
     mOldValue = oldValue;
@@ -395,8 +395,8 @@ void SetBoxVisibleUndoRedo::undo() {
     mTarget->setVisibile(mVisibleBefore, false);
 }
 
-ChangeQrealAnimatorValue::ChangeQrealAnimatorValue(const qreal &oldValue,
-                                                   const qreal &newValue,
+ChangeQrealAnimatorValue::ChangeQrealAnimatorValue(const SkScalar &oldValue,
+                                                   const SkScalar &newValue,
                                                    QrealAnimator *animator) :
     UndoRedo("ChangeQrealAnimatorValue") {
     mOldValue = oldValue;

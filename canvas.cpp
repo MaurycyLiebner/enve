@@ -63,7 +63,7 @@ Canvas::~Canvas() {
     delete mRotPivot;
 }
 
-void Canvas::showContextMenu(QPoint globalPos) {
+void Canvas::showContextMenu(QPointF globalPos) {
 //    QMenu menu(mMainWindow);
 
 //    QAction *outlineScaled = new QAction("Scale outline");
@@ -124,13 +124,14 @@ void Canvas::setResolutionFraction(const qreal &percent) {
 }
 
 QRectF Canvas::getPixBoundingRect() {
-    QPointF absPos = QPointF(mCanvasTransformMatrix.dx(),
-                             mCanvasTransformMatrix.dy());
-    return QRectF(absPos, QSizeF(mVisibleWidth, mVisibleHeight));
+    return QRectF(mCanvasTransformMatrix.dx(),
+                  mCanvasTransformMatrix.dy(),
+                  mVisibleWidth,
+                  mVisibleHeight);
 }
 
 void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
-    QPointF transPoint = -mCanvasTransformMatrix.inverted().map(absOrigin);
+    QPointF transPoint = -mapCanvasAbsToRel(absOrigin);
 
     mCanvasTransformMatrix.translate(-transPoint.x(), -transPoint.y());
     mCanvasTransformMatrix.scale(scaleBy, scaleBy);
@@ -210,7 +211,7 @@ void Canvas::createSoundForPath(const QString &path) {
 
 void Canvas::drawSelectedSk(SkCanvas *canvas,
                           const CanvasMode &currentCanvasMode,
-                          const SkScalar &invScale) {
+                          const qreal &invScale) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }
@@ -259,7 +260,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->save();
 
             canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
-            qreal reversedRes = 1./mResolutionFraction;
+            SkScalar reversedRes = 1./mResolutionFraction;
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas);
 
@@ -274,7 +275,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
 
         if(mCurrentPreviewContainer != NULL) {
             canvas->save();
-            qreal reversedRes = 1./mResolutionFraction;
+            SkScalar reversedRes = 1./mResolutionFraction;
             canvas->scale(reversedRes, reversedRes);
             mCurrentPreviewContainer->drawSk(canvas);
             canvas->restore();
@@ -288,7 +289,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
         canvas->drawRect(viewRect, paint);
 
-        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+        canvas->concat(QMatrixToQMatrix(mCanvasTransformMatrix));
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmapSk(canvas);
         }
@@ -375,6 +376,8 @@ void Canvas::renderSk(SkCanvas *canvas) {
                               &bounds);
             paint.setColor(SK_ColorBLACK);
             paint.setTypeface(SkTypeface::MakeDefault());
+            paint.setStyle(SkPaint::kStroke_Style);
+
             canvas->drawString(
                    transStr.toStdString().c_str(),
                    inputRect.x() + paint.getTextSize(),
@@ -642,7 +645,8 @@ void Canvas::updatePivot() {
         }
         if(getPointsSelectionCount() == 1) {
             mRotPivot->setAbsolutePos(
-                        getSelectedPointsAbsPivotPos() + QPointF(0., 20.),
+                        getSelectedPointsAbsPivotPos() +
+                            QPointF(0., 20.),
                         false);
         } else {
             mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos(),
@@ -835,7 +839,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
         } else if(event->key() == Qt::Key_R && (isMovingPath() ||
                   mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
            mTransformationFinishedBeforeMouseRelease = false;
-           QPoint cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+           QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
            setLastMouseEventPosAbs(cursorPos);
            setLastMousePressPosAbs(cursorPos);
            mRotPivot->startRotating();
@@ -849,7 +853,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
            mXOnlyTransform = false;
            mYOnlyTransform = false;
 
-           QPoint cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+           QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
            setLastMouseEventPosAbs(cursorPos);
            setLastMousePressPosAbs(cursorPos);
            mRotPivot->startScaling();
@@ -864,7 +868,7 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
             mXOnlyTransform = false;
             mYOnlyTransform = false;
 
-            QPoint cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+            QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
             setLastMouseEventPosAbs(cursorPos);
             setLastMousePressPosAbs(cursorPos);
             mDoubleClick = false;
@@ -916,8 +920,8 @@ void Canvas::resetTransormation() {
     mCanvasTransformMatrix.reset();
     mVisibleHeight = mHeight;
     mVisibleWidth = mWidth;
-    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
-                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF((mCanvasWidget->width() - mVisibleWidth)*0.5,
+                      (mCanvasWidget->height() - mVisibleHeight)*0.5) );
 
 }
 
@@ -930,14 +934,14 @@ void Canvas::fitCanvasToSize() {
     zoomCanvas(qMin(heightScale, widthScale), QPointF(0., 0.));
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
-    moveByRel(QPointF( (mCanvasWidget->width() - mVisibleWidth)*0.5,
-                    (mCanvasWidget->height() - mVisibleHeight)*0.5) );
+    moveByRel(QPointF((mCanvasWidget->width() - mVisibleWidth)*0.5,
+                      (mCanvasWidget->height() - mVisibleHeight)*0.5) );
 
 }
 
 void Canvas::moveByRel(const QPointF &trans) {
     QPointF transRel = mapAbsPosToRel(trans) -
-                       mapAbsPosToRel(QPointF(0, 0));
+                       mapAbsPosToRel(QPointF(0., 0.));
 
     mLastPressPosRel = mapAbsPosToRel(mLastPressPosRel);
 

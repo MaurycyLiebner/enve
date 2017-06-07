@@ -129,9 +129,9 @@ public:
 
     void guessCtrlsMode();
 
-    void setStartPoint(QPointF startPoint);
+    void setStartPoint(const QPointF &startPoint);
 
-    void setEndPoint(QPointF endPoint);
+    void setEndPoint(const QPointF &endPoint);
 
     CtrlsMode getCtrlsMode() const;
 
@@ -166,13 +166,13 @@ public:
 
     void closePath();
 
-    void moveTo(QPointF e);
+    void moveTo(const QPointF &e);
 
-    void cubicTo(QPointF c1, QPointF c2, QPointF e);
+    void cubicTo(const QPointF &c1, const QPointF &c2, const QPointF &e);
 
-    void lineTo(QPointF e);
+    void lineTo(const QPointF &e);
 
-    void quadTo(QPointF c, QPointF e);
+    void quadTo(const QPointF &c, const QPointF &e);
 
     void applyTransfromation(const QMatrix &transformation);
 

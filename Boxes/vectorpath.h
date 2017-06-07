@@ -24,7 +24,7 @@ public:
 
     void drawSelectedSk(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
-                      const SkScalar &invScale);
+                      const qreal &invScale);
 
     PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
     PathPoint *addPointRelPos(QPointF relPtPos, PathPoint *toPoint = NULL);
@@ -73,6 +73,7 @@ public:
                             const qreal &canvasScaleInv);
 
     void loadPathFromQPainterPath(const QPainterPath &path);
+    void loadPathFromSkPath(const SkPath &path);
 
     void duplicatePathPointsTo(VectorPath *target);
 //    void disconnectPoints(PathPoint *point1, PathPoint *point2);

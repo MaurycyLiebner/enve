@@ -245,8 +245,6 @@ struct UpdatePaintSettings {
 
     virtual ~UpdatePaintSettings();
 
-    virtual void applyPainterSettings(QPainter *p);
-
     virtual void applyPainterSettingsSk(SkPaint *paint);
 
     void updateGradient(const QGradientStops &stops,
@@ -267,8 +265,6 @@ struct UpdateStrokeSettings : UpdatePaintSettings {
             const QPainter::CompositionMode &outlineCompositionModeT);
 
     UpdateStrokeSettings();
-
-    void applyPainterSettings(QPainter *p);
 
     void applyPainterSettingsSk(SkPaint *paint);
 

@@ -85,12 +85,12 @@ public:
 
     virtual void setFont(QFont) {}
     virtual void setSelectedFontSize(qreal) {}
-    virtual void setSelectedFontFamilyAndStyle(QString,
-                                       QString) {}
+    virtual void setSelectedFontFamilyAndStyle(QString, QString) {}
 
     virtual QPointF getRelCenterPosition() {
         return mRelBoundingRect.center();
     }
+
     virtual void centerPivotPosition(bool finish = false) {
         mTransformAnimator->setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), finish);
@@ -103,7 +103,7 @@ public:
 
     virtual void drawSelectedSk(SkCanvas *canvas,
                                 const CanvasMode &currentCanvasMode,
-                                const SkScalar &invScale);
+                                const qreal &invScale);
 
 
     void applyTransformation(BoxTransformAnimator *transAnimator);
@@ -143,7 +143,7 @@ public:
     void deselect();
     int getZIndex();
     void drawBoundingRectSk(SkCanvas *canvas,
-                            const SkScalar &invScale);
+                            const qreal &invScale);
 
     void setParent(BoxesGroup *parent,
                    const bool &saveUndoRedo = true);
@@ -300,7 +300,7 @@ public:
 
     bool isAnimated() { return prp_isDescendantRecording(); }
     virtual void updateRelBoundingRect();
-    virtual const QPainterPath &getRelBoundingRectPath();
+    virtual const SkPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
     QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
@@ -361,13 +361,13 @@ public:
     }
 
     virtual void drawHoveredSk(SkCanvas *canvas,
-                               const SkScalar &invScale) {
+                               const qreal &invScale) {
         drawHoveredPathSk(canvas, mSkRelBoundingRectPath, invScale);
     }
 
     void drawHoveredPathSk(SkCanvas *canvas,
                            const SkPath &path,
-                           const SkScalar &invScale);
+                           const qreal &invScale);
 
     virtual void applyPaintSetting(
             const PaintSetting &setting) {
@@ -455,6 +455,7 @@ protected:
     bool mCenterPivotScheduled = false;
     QPointF mPreviewDrawPos;
     QRectF mRelBoundingRect;
+    SkRect mRelBoundingRectSk;
 
     bool mEffectsMarginUpdateNeeded = false;
     qreal mEffectsMargin = 2.;
@@ -477,7 +478,6 @@ protected:
     bool mRedoUpdate = false;
     bool mAwaitingUpdate = false;
 
-    QPainterPath mRelBoundingRectPath;
     SkPath mSkRelBoundingRectPath;
 
     int mUsedAsTargetCount = 0;

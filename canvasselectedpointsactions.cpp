@@ -275,11 +275,11 @@ void Canvas::clearCurrentEndPoint() {
 QPointF Canvas::getSelectedPointsAbsPivotPos() {
     if(mSelectedPoints.isEmpty()) return QPointF(0., 0.);
     QPointF posSum = QPointF(0., 0.);
-    int count = mSelectedPoints.length();
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         posSum += point->getAbsolutePos();
     }
-    return posSum/count;
+    qreal invCount = 1./mSelectedPoints.length();
+    return posSum*invCount;
 }
 
 bool Canvas::isPointsSelectionEmpty() {

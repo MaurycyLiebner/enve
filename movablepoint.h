@@ -41,7 +41,7 @@ public:
 
     virtual void draw(QPainter *p);
     virtual void drawSk(SkCanvas *canvas,
-                        const SkScalar &invScale);
+                        const qreal &invScale);
 
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);
@@ -99,9 +99,8 @@ public:
     void makeDuplicate(MovablePoint *targetPoint);
     void duplicatePosAnimatorFrom(QPointFAnimator *source);
 
-    virtual void drawHovered(QPainter *p);
     virtual void drawHovered(SkCanvas *canvas,
-                             const SkScalar &invScale);
+                             const qreal &invScale);
 
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
@@ -114,8 +113,7 @@ protected:
     BoundingBox *mParent = NULL;
     virtual void drawOnAbsPos(QPainter *p,
                               const QPointF &absPos);
-    virtual void drawOnAbsPosSk(
-                SkCanvas *canvas,
+    virtual void drawOnAbsPosSk(SkCanvas *canvas,
                 const SkPoint &absPos,
                 const SkScalar &invScale,
                 const unsigned char r,

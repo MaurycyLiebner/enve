@@ -129,6 +129,98 @@ void PathAnimator::loadPathFromQPainterPath(const QPainterPath &path) {
     }
 }
 
+void PathAnimator::loadPathFromSkPath(const SkPath &path) {
+    PathPoint *firstPoint = NULL;
+    PathPoint *lastPoint = NULL;
+
+    SinglePathAnimator *singlePathAnimator = NULL;
+
+    SkPath::RawIter iter;
+
+    SkPoint pts[4];
+    int verbId = 0;
+    for (;;) {
+        switch(iter.next(pts)) {
+            case SkPath::kMove_Verb: {
+                SkPoint pt = pts[0];
+                if(singlePathAnimator != NULL) {
+                    addSinglePathAnimator(singlePathAnimator);
+                }
+                singlePathAnimator = new SinglePathAnimator(this);
+                lastPoint = singlePathAnimator->addPointRelPos(
+                                        QPointF(pt.x(), pt.y()), NULL);
+                firstPoint = lastPoint;
+            }
+                break;
+            case SkPath::kLine_Verb: {
+                SkPoint pt = pts[1];
+                bool sameAsFirstPoint = QPointF(pt.x(), pt.y()) ==
+                                            firstPoint->getRelativePos();
+                bool connectOnly = false;
+                if(sameAsFirstPoint) {
+                    if(path.countVerbs() > verbId + 1) {
+                        connectOnly = iter.peek() == SkPath::kMove_Verb;
+                    } else {
+                        connectOnly = true;
+                    }
+                }
+                if(connectOnly) {
+                    lastPoint->connectToPoint(firstPoint);
+                    lastPoint = firstPoint;
+                } else {
+                    lastPoint = singlePathAnimator->
+                            addPointRelPos(QPointF(pt.x(), pt.y()),
+                                               lastPoint);
+                }
+            }
+                break;
+            case SkPath::kCubic_Verb: {
+                SkPoint endPt = pts[1];
+                SkPoint startPt = pts[2];
+                SkPoint targetPt = pts[3];
+                lastPoint->setEndCtrlPtEnabled(true);
+                lastPoint->moveEndCtrlPtToRelPos(QPointF(endPt.x(), endPt.y()));
+
+                bool sameAsFirstPoint = QPointF(targetPt.x(), targetPt.y()) ==
+                                            firstPoint->getRelativePos();
+                bool connectOnly = false;
+                if(sameAsFirstPoint) {
+                    if(path.countVerbs() > verbId + 1) {
+                        connectOnly = iter.peek() == SkPath::kMove_Verb;
+                    } else {
+                        connectOnly = true;
+                    }
+                }
+                if(connectOnly) {
+                    lastPoint->connectToPoint(firstPoint);
+                    lastPoint = firstPoint;
+                } else {
+                    lastPoint = singlePathAnimator->
+                            addPointRelPos(QPointF(targetPt.x(), targetPt.y()),
+                                               lastPoint);
+                }
+                lastPoint->setStartCtrlPtEnabled(true);
+                lastPoint->moveStartCtrlPtToRelPos(QPointF(startPt.x(),
+                                                           startPt.y()));
+            }
+                break;
+            case SkPath::kClose_Verb:
+                lastPoint->connectToPoint(firstPoint);
+                lastPoint = firstPoint;
+                break;
+            case SkPath::kQuad_Verb:
+            case SkPath::kConic_Verb:
+            case SkPath::kDone_Verb:
+                break;
+            verbId++;
+        }
+    }
+
+    if(singlePathAnimator != NULL) {
+        addSinglePathAnimator(singlePathAnimator);
+    }
+}
+
 void PathAnimator::updatePath() {
     mPath = QPainterPath();
     mSkPath = SkPath();
@@ -199,14 +291,6 @@ const QPainterPath &PathAnimator::getCurrentPath() {
 
 const SkPath &PathAnimator::getCurrentSkPath() {
     return mSkPath;
-}
-
-void PathAnimator::drawSelected(QPainter *p,
-                                const CanvasMode &currentCanvasMode,
-                                const QMatrix &combinedTransform) {
-    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
-        singlePath->drawSelected(p, currentCanvasMode, combinedTransform);
-    }
 }
 
 void PathAnimator::drawSelected(SkCanvas *canvas,

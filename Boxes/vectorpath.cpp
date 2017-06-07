@@ -84,6 +84,10 @@ void VectorPath::loadPathFromQPainterPath(const QPainterPath &path) {
     mPathAnimator->loadPathFromQPainterPath(path);
 }
 
+void VectorPath::loadPathFromSkPath(const SkPath &path) {
+    mPathAnimator->loadPathFromSkPath(path);
+}
+
 QPointF VectorPath::getRelCenterPosition() {
     return mPathAnimator->getRelCenterPosition();
 }
@@ -98,7 +102,7 @@ void VectorPath::updatePath() {
     mPath = mPathAnimator->getCurrentPath();
     mPathSk = mPathAnimator->getCurrentSkPath();
 
-    updateOutlinePath();
+    updateOutlinePathSk();
 }
 
 #include <QMenu>
@@ -127,7 +131,7 @@ void VectorPath::showContextMenu(QPoint globalPos) {
 
 void VectorPath::drawSelectedSk(SkCanvas *canvas,
                               const CanvasMode &currentCanvasMode,
-                              const SkScalar &invScale) {
+                              const qreal &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
         drawBoundingRectSk(canvas, invScale);
