@@ -485,6 +485,8 @@ void BoxesGroup::addChildToListAt(int index,
     SWT_addChildAbstractionForTargetToAllAt(child,
                                             ca_mChildAnimators.count());
     child->prp_setAbsFrame(anim_mCurrentAbsFrame);
+
+    child->prp_updateInfluenceRangeAfterChanged();
 }
 
 void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
@@ -509,6 +511,7 @@ void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
                                                    box) );
     }
     mChildBoxes.removeAt(id);
+
     updateRelBoundingRect();
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*) box;

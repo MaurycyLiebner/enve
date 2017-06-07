@@ -3,7 +3,7 @@
 #include "pathpoint.h"
 #include "undoredo.h"
 #include "edge.h"
-#include "skiaincludes.h"
+#include "skqtconversions.h"
 #include <QSqlRecord>
 
 PathAnimator::PathAnimator() :
@@ -135,7 +135,7 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
 
     SinglePathAnimator *singlePathAnimator = NULL;
 
-    SkPath::RawIter iter;
+    SkPath::RawIter iter = SkPath::RawIter(path);
 
     SkPoint pts[4];
     int verbId = 0;
@@ -148,13 +148,13 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 }
                 singlePathAnimator = new SinglePathAnimator(this);
                 lastPoint = singlePathAnimator->addPointRelPos(
-                                        QPointF(pt.x(), pt.y()), NULL);
+                                        SkPointToQPointF(pt), NULL);
                 firstPoint = lastPoint;
             }
                 break;
             case SkPath::kLine_Verb: {
                 SkPoint pt = pts[1];
-                bool sameAsFirstPoint = QPointF(pt.x(), pt.y()) ==
+                bool sameAsFirstPoint = SkPointToQPointF(pt) ==
                                             firstPoint->getRelativePos();
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
@@ -169,8 +169,7 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                     lastPoint = firstPoint;
                 } else {
                     lastPoint = singlePathAnimator->
-                            addPointRelPos(QPointF(pt.x(), pt.y()),
-                                               lastPoint);
+                            addPointRelPos(SkPointToQPointF(pt), lastPoint);
                 }
             }
                 break;
@@ -179,9 +178,9 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 SkPoint startPt = pts[2];
                 SkPoint targetPt = pts[3];
                 lastPoint->setEndCtrlPtEnabled(true);
-                lastPoint->moveEndCtrlPtToRelPos(QPointF(endPt.x(), endPt.y()));
+                lastPoint->moveEndCtrlPtToRelPos(SkPointToQPointF(endPt));
 
-                bool sameAsFirstPoint = QPointF(targetPt.x(), targetPt.y()) ==
+                bool sameAsFirstPoint = SkPointToQPointF(targetPt) ==
                                             firstPoint->getRelativePos();
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
@@ -196,12 +195,11 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                     lastPoint = firstPoint;
                 } else {
                     lastPoint = singlePathAnimator->
-                            addPointRelPos(QPointF(targetPt.x(), targetPt.y()),
+                            addPointRelPos(SkPointToQPointF(targetPt),
                                                lastPoint);
                 }
                 lastPoint->setStartCtrlPtEnabled(true);
-                lastPoint->moveStartCtrlPtToRelPos(QPointF(startPt.x(),
-                                                           startPt.y()));
+                lastPoint->moveStartCtrlPtToRelPos(SkPointToQPointF(startPt));
             }
                 break;
             case SkPath::kClose_Verb:
@@ -211,11 +209,12 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
             case SkPath::kQuad_Verb:
             case SkPath::kConic_Verb:
             case SkPath::kDone_Verb:
+                goto DONE;
                 break;
-            verbId++;
         }
+        verbId++;
     }
-
+DONE:
     if(singlePathAnimator != NULL) {
         addSinglePathAnimator(singlePathAnimator);
     }

@@ -126,72 +126,103 @@ void FullVectorPath::generateSinglePathPaths() {
     }
 }
 
-void FullVectorPath::generateFromPath(const QPainterPath &path) {
+void FullVectorPath::generateFromPath(const SkPath &path) {
     MinimalPathPoint *firstPoint = NULL;
     MinimalPathPoint *lastPoint = NULL;
-    bool firstOther = true;
-    QPointF startCtrlPoint;
     MinimalVectorPath *currentTarget = NULL;
 
-    for(int i = 0; i < path.elementCount(); i++) {
-        const QPainterPath::Element &elem = path.elementAt(i);
+    SkPath::RawIter iter = SkPath::RawIter(path);;
 
-        if (elem.isMoveTo()) { // move
-            if(lastPoint != firstPoint) {
-                firstPoint->setPrevPoint(lastPoint);
-                firstPoint->setStartCtrlPos(firstPoint->getPos());
-                lastPoint->setNextPoint(firstPoint);
-                lastPoint->setEndCtrlPos(lastPoint->getPos());
-            }
-            currentTarget = new MinimalVectorPath(this);
-            mSeparatePaths.append(currentTarget);
-            lastPoint = new MinimalPathPoint(QPointF(),
-                                             QPointF(elem.x, elem.y),
-                                             QPointF());
-            currentTarget->addPoint(lastPoint);
-            firstPoint = lastPoint;
-        } else if (elem.isLineTo()) { // line
-            if((QPointF(elem.x, elem.y) == firstPoint->getPos()) ?
-                    ((path.elementCount() > i + 1) ?
-                                path.elementAt(i + 1).isMoveTo() :
-                                true) :
-                    false) {
-                firstPoint->setPrevPoint(lastPoint);
-                lastPoint->setNextPoint(firstPoint);
-                lastPoint = firstPoint;
-            } else {
+    SkPoint pts[4];
+    int verbId = 0;
+    for (;;) {
+        switch(iter.next(pts)) {
+            case SkPath::kMove_Verb: {
+                SkPoint pt = pts[0];
+
+                if(lastPoint != firstPoint) {
+                    firstPoint->setPrevPoint(lastPoint);
+                    firstPoint->setStartCtrlPos(firstPoint->getPos());
+                    lastPoint->setNextPoint(firstPoint);
+                    lastPoint->setEndCtrlPos(lastPoint->getPos());
+                }
+                currentTarget = new MinimalVectorPath(this);
+                mSeparatePaths.append(currentTarget);
                 lastPoint = new MinimalPathPoint(QPointF(),
-                                                 QPointF(elem.x, elem.y),
+                                                 QPointF(pt.x(), pt.y()),
                                                  QPointF());
                 currentTarget->addPoint(lastPoint);
+                firstPoint = lastPoint;
             }
-        } else if (elem.isCurveTo()) { // curve
-            lastPoint->setEndCtrlPos(QPointF(elem.x, elem.y));
-            firstOther = true;
-        } else { // other
-            if(firstOther) {
-                startCtrlPoint = QPointF(elem.x, elem.y);
-            } else {
-                if((QPointF(elem.x, elem.y) == firstPoint->getPos()) ?
-                        ((path.elementCount() > i + 1) ?
-                                    path.elementAt(i + 1).isMoveTo() :
-                                    true) :
-                        false) {
+                break;
+            case SkPath::kLine_Verb: {
+                SkPoint pt = pts[1];
+
+                bool sameAsFirstPoint = SkPointToQPointF(pt) ==
+                                            firstPoint->getPos();
+                bool connectOnly = false;
+                if(sameAsFirstPoint) {
+                    if(path.countVerbs() > verbId + 1) {
+                        connectOnly = iter.peek() == SkPath::kMove_Verb;
+                    } else {
+                        connectOnly = true;
+                    }
+                }
+                if(connectOnly) {
                     firstPoint->setPrevPoint(lastPoint);
                     lastPoint->setNextPoint(firstPoint);
                     lastPoint = firstPoint;
                 } else {
                     lastPoint = new MinimalPathPoint(QPointF(),
-                                                     QPointF(elem.x, elem.y),
+                                                     SkPointToQPointF(pt),
                                                      QPointF());
                     currentTarget->addPoint(lastPoint);
                 }
-                //lastPoint->setStartCtrlPtEnabled(true);
-                lastPoint->setStartCtrlPos(startCtrlPoint);
             }
-            firstOther = !firstOther;
+                break;
+            case SkPath::kCubic_Verb: {
+                SkPoint endPt = pts[1];
+                SkPoint startPt = pts[2];
+                SkPoint targetPt = pts[3];
+
+                lastPoint->setEndCtrlPos(SkPointToQPointF(endPt));
+
+                bool sameAsFirstPoint = SkPointToQPointF(targetPt) ==
+                                            firstPoint->getPos();
+                bool connectOnly = false;
+                if(sameAsFirstPoint) {
+                    if(path.countVerbs() > verbId + 1) {
+                        connectOnly = iter.peek() == SkPath::kMove_Verb;
+                    } else {
+                        connectOnly = true;
+                    }
+                }
+                if(connectOnly) {
+                    firstPoint->setPrevPoint(lastPoint);
+                    lastPoint->setNextPoint(firstPoint);
+                    lastPoint = firstPoint;
+                } else {
+                    lastPoint = new MinimalPathPoint(QPointF(),
+                                                     QPointF(targetPt.x(),
+                                                             targetPt.y()),
+                                                     QPointF());
+                    currentTarget->addPoint(lastPoint);
+                }
+                lastPoint->setStartCtrlPos(SkPointToQPointF(startPt));
+            }
+                break;
+            case SkPath::kClose_Verb:
+
+                break;
+            case SkPath::kQuad_Verb:
+            case SkPath::kConic_Verb:
+            case SkPath::kDone_Verb:
+                goto DONE;
+                break;
         }
+        verbId++;
     }
+DONE:
     if(lastPoint != firstPoint) {
         firstPoint->setPrevPoint(lastPoint);
         firstPoint->setStartCtrlPos(firstPoint->getPos());
@@ -201,6 +232,82 @@ void FullVectorPath::generateFromPath(const QPainterPath &path) {
 
     generateSinglePathPaths();
 }
+
+//void FullVectorPath::generateFromPath(const QPainterPath &path) {
+//    MinimalPathPoint *firstPoint = NULL;
+//    MinimalPathPoint *lastPoint = NULL;
+//    bool firstOther = true;
+//    QPointF startCtrlPoint;
+//    MinimalVectorPath *currentTarget = NULL;
+
+//    for(int i = 0; i < path.elementCount(); i++) {
+//        const QPainterPath::Element &elem = path.elementAt(i);
+
+//        if (elem.isMoveTo()) { // move
+//            if(lastPoint != firstPoint) {
+//                firstPoint->setPrevPoint(lastPoint);
+//                firstPoint->setStartCtrlPos(firstPoint->getPos());
+//                lastPoint->setNextPoint(firstPoint);
+//                lastPoint->setEndCtrlPos(lastPoint->getPos());
+//            }
+//            currentTarget = new MinimalVectorPath(this);
+//            mSeparatePaths.append(currentTarget);
+//            lastPoint = new MinimalPathPoint(QPointF(),
+//                                             QPointF(elem.x, elem.y),
+//                                             QPointF());
+//            currentTarget->addPoint(lastPoint);
+//            firstPoint = lastPoint;
+//        } else if (elem.isLineTo()) { // line
+//            if((QPointF(elem.x, elem.y) == firstPoint->getPos()) ?
+//                    ((path.elementCount() > i + 1) ?
+//                                path.elementAt(i + 1).isMoveTo() :
+//                                true) :
+//                    false) {
+//                firstPoint->setPrevPoint(lastPoint);
+//                lastPoint->setNextPoint(firstPoint);
+//                lastPoint = firstPoint;
+//            } else {
+//                lastPoint = new MinimalPathPoint(QPointF(),
+//                                                 QPointF(elem.x, elem.y),
+//                                                 QPointF());
+//                currentTarget->addPoint(lastPoint);
+//            }
+//        } else if (elem.isCurveTo()) { // curve
+//            lastPoint->setEndCtrlPos(QPointF(elem.x, elem.y));
+//            firstOther = true;
+//        } else { // other
+//            if(firstOther) {
+//                startCtrlPoint = QPointF(elem.x, elem.y);
+//            } else {
+//                if((QPointF(elem.x, elem.y) == firstPoint->getPos()) ?
+//                        ((path.elementCount() > i + 1) ?
+//                                    path.elementAt(i + 1).isMoveTo() :
+//                                    true) :
+//                        false) {
+//                    firstPoint->setPrevPoint(lastPoint);
+//                    lastPoint->setNextPoint(firstPoint);
+//                    lastPoint = firstPoint;
+//                } else {
+//                    lastPoint = new MinimalPathPoint(QPointF(),
+//                                                     QPointF(elem.x, elem.y),
+//                                                     QPointF());
+//                    currentTarget->addPoint(lastPoint);
+//                }
+//                //lastPoint->setStartCtrlPtEnabled(true);
+//                lastPoint->setStartCtrlPos(startCtrlPoint);
+//            }
+//            firstOther = !firstOther;
+//        }
+//    }
+//    if(lastPoint != firstPoint) {
+//        firstPoint->setPrevPoint(lastPoint);
+//        firstPoint->setStartCtrlPos(firstPoint->getPos());
+//        lastPoint->setNextPoint(firstPoint);
+//        lastPoint->setEndCtrlPos(lastPoint->getPos());
+//    }
+
+//    generateSinglePathPaths();
+//}
 
 int FullVectorPath::getSeparatePathsCount() {
     return mSeparatePaths.count();

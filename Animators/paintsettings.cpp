@@ -778,16 +778,6 @@ UpdatePaintSettings::UpdatePaintSettings() {}
 
 UpdatePaintSettings::~UpdatePaintSettings() {}
 
-void UpdatePaintSettings::applyPainterSettings(QPainter *p) {
-    if(paintType == GRADIENTPAINT) {
-        p->setBrush(gradient);
-    } else if(paintType == FLATPAINT) {
-        p->setBrush(paintColor);
-    } else {
-        p->setBrush(Qt::NoBrush);
-    }
-}
-
 void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
     if(paintType == GRADIENTPAINT) {
         //p->setBrush(gradient);

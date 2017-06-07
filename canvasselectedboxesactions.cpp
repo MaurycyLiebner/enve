@@ -517,8 +517,8 @@ VectorPath *Canvas::getPathResultingFromOperation(
            box->isCircle() ||
            box->isRect() ||
            box->isText()) {
-            const QPainterPath &boxPath = box->getRelativeTransform().map(
-                                        ((PathBox*)box)->getRelativePath());
+            SkPath boxPath = ((PathBox*)box)->getRelativePath();
+            boxPath.transform(QMatrixToSkMatrix(box->getRelativeTransform()));
             addToPath = targetPath;
             addToPath->generateSinglePathPaths();
             addedPath = new FullVectorPath();

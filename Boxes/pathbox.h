@@ -55,7 +55,7 @@ public:
     VectorPath *objectToPath();
     VectorPath *strokeToPath();
 
-    const QPainterPath &getRelativePath() const;
+    const SkPath &getRelativePath() const;
     bool relPointInsidePath(const QPointF &relPos);
     void preUpdatePixmapsUpdates();
 

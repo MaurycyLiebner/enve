@@ -291,7 +291,7 @@ VectorPath *PathBox::strokeToPath() {
     return newPath;
 }
 
-const QPainterPath &PathBox::getRelativePath() const { return mPath; }
+const SkPath &PathBox::getRelativePath() const { return mPathSk; }
 
 void PathBox::updateOutlinePathSk() {
     if(mStrokeSettings->nonZeroLineWidth()) {

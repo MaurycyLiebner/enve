@@ -66,7 +66,8 @@ public:
 
     void generateSinglePathPaths();
 
-    void generateFromPath(const QPainterPath &path);
+    //void generateFromPath(const QPainterPath &path);
+    void generateFromPath(const SkPath &path);
 
     int getSeparatePathsCount();
 
