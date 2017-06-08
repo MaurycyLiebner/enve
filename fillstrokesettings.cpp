@@ -141,6 +141,10 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
 
     connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
+    connect(mLineWidthSpin, SIGNAL(editingStarted(qreal)),
+            mCanvasWindow, SLOT(startSelectedStrokeWidthTransform()));
+    connect(mLineWidthSpin, SIGNAL(editingFinished(qreal)),
+            this, SLOT(emitStrokeWidthChanged()));
 
     mStrokeSettingsWidget->setLayout(mStrokeSettingsLayout);
 
@@ -280,10 +284,8 @@ void FillStrokeSettingsWidget::setTransformFinishEmitter(const char *slot) {
             this, slot );
 }
 
-void FillStrokeSettingsWidget::setStrokeWidth(qreal width)
-{
-    mCanvasWindow->startSelectedStrokeWidthTransform();
-    startTransform(SLOT(emitStrokeWidthChanged()));
+void FillStrokeSettingsWidget::setStrokeWidth(qreal width) {
+    //startTransform(SLOT(emitStrokeWidthChanged()));
     mCurrentStrokeWidth = width;
     emitStrokeWidthChangedTMP();
 }

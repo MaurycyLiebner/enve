@@ -397,7 +397,7 @@ void BoundingBox::setCompositionMode(
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
     mBlendModeSk = blendMode;
-    scheduleSoftUpdate();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 QPainter::CompositionMode BoundingBox::getCompositionMode() {

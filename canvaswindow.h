@@ -44,7 +44,6 @@ public:
     bool processUnfilteredKeyEvent(QKeyEvent *event);
     bool processFilteredKeyEvent(QKeyEvent *event);
 
-    void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
 
@@ -233,6 +232,8 @@ public slots:
     void renderFromSettings(RenderInstanceSettings *settings);
 
     void importFile();
+
+    void startSelectedStrokeWidthTransform();
 private slots:
     void sendNextBoxForUpdate();
     void nextSaveOutputFrame();
