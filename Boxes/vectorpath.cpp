@@ -23,8 +23,8 @@ VectorPath::VectorPath(BoxesGroup *group) :
 }
 
 #include <QSqlError>
-int VectorPath::prp_saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
+int VectorPath::saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
     mPathAnimator->prp_saveToSql(query, boundingBoxId);
 
     return boundingBoxId;

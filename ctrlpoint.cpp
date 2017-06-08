@@ -61,8 +61,7 @@ void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {
     mOtherCtrlPt = ctrlPt;
 }
 
-void CtrlPoint::removeFromVectorPath()
-{
+void CtrlPoint::removeFromVectorPath() {
     mParentPoint->setCtrlPtEnabled(false, mIsStartCtrlPt);
 }
 

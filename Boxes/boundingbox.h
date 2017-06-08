@@ -167,7 +167,7 @@ public:
     void scale(const qreal &scaleXBy,
                const qreal &scaleYBy);
 
-    virtual int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    virtual int saveToSql(QSqlQuery *query, const int &parentId);
 
     virtual PathPoint *createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
@@ -287,8 +287,11 @@ public:
     void removeEffect(PixmapEffect *effect);
     void setAwaitUpdateScheduled(bool bT);
 
-    void setCompositionMode(const QPainter::CompositionMode &compositionMode);
     void setBlendModeSk(const SkBlendMode &blendMode);
+    const SkBlendMode &getBlendMode() {
+        return mBlendModeSk;
+    }
+
 
     virtual void updateEffectsMargin();
 

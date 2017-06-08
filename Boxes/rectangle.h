@@ -32,7 +32,7 @@ public:
                                            QList<MovablePoint *> *list);
     void updatePath();
     void prp_loadFromSql(const int &boundingBoxId);
-    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    int saveToSql(QSqlQuery *query, const int &parentId);
 
     void makeDuplicate(Property *targetBox) {
         PathBox::makeDuplicate(targetBox);

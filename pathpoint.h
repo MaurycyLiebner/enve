@@ -162,6 +162,9 @@ public:
     void setEndCtrlPtEnabled(bool enabled, bool saveUndoRedo = true);
     void setStartCtrlPtEnabled(bool enabled, bool saveUndoRedo = true);
 
+    void resetEndCtrlPt();
+    void resetStartCtrlPt();
+
     bool isEndCtrlPtEnabled();
     bool isStartCtrlPtEnabled();
 

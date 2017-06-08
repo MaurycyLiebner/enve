@@ -53,7 +53,7 @@ public:
     PathPoint *addPointRelPos(QPointF relPos,
                               QPointF startRelPos, QPointF endRelPos,
                               PathPoint *toPoint = NULL);
-    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    int saveToSql(QSqlQuery *query, const int &parentId);
 
     PathPoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,

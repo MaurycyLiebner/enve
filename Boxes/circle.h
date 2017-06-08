@@ -64,7 +64,7 @@ public:
                                            QList<MovablePoint *> *list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
-    int prp_saveToSql(QSqlQuery *query,
+    int saveToSql(QSqlQuery *query,
                       const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
 

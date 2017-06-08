@@ -65,7 +65,7 @@ public:
 
     void awaitUpdate() {}
 
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+    int saveToSql(QSqlQuery *query, const int &parentId = 0);
 
     void resetTransormation();
     void fitCanvasToSize();

@@ -186,16 +186,52 @@ SkBlendMode idToBlendModeSk(const int &id) {
     return SkBlendMode::kSrcOver;
 }
 
+int blendModeToIntSk(const SkBlendMode &mode) {
+    switch(mode) {
+        case SkBlendMode::kSrcOver: return 0;
+        case SkBlendMode::kDstOver: return 1;
+        case SkBlendMode::kSrcIn: return 2;
+        case SkBlendMode::kDstIn: return 3;
+        case SkBlendMode::kSrcOut: return 4;
+        case SkBlendMode::kDstOut: return 5;
+        case SkBlendMode::kSrcATop: return 6;
+        case SkBlendMode::kDstATop: return 7;
+        case SkBlendMode::kXor: return 8;
+        case SkBlendMode::kPlus: return 9;
+        case SkBlendMode::kModulate: return 10;
+        case SkBlendMode::kScreen: return 11;
+        case SkBlendMode::kOverlay: return 12;
+        case SkBlendMode::kDarken: return 13;
+        case SkBlendMode::kLighten: return 14;
+        case SkBlendMode::kColorDodge: return 15;
+        case SkBlendMode::kColorBurn: return 16;
+        case SkBlendMode::kHardLight: return 17;
+        case SkBlendMode::kSoftLight: return 18;
+        case SkBlendMode::kDifference: return 19;
+        case SkBlendMode::kExclusion: return 20;
+        case SkBlendMode::kMultiply: return 21;
+        case SkBlendMode::kHue: return 22;
+        case SkBlendMode::kSaturation: return 23;
+        case SkBlendMode::kColor: return 24;
+        case SkBlendMode::kLuminosity: return 25;
+        default: return 0;
+    }
+    return 0;
+}
+
 void BoxSingleWidget::setCompositionMode(const int &id) {
     SingleWidgetTarget *target = mTarget->getTarget();
 
     if(target->SWT_isBoundingBox()) {
-        ((BoundingBox*)target)->setCompositionMode(
-                    static_cast<QPainter::CompositionMode>(id));
         ((BoundingBox*)target)->setBlendModeSk(
                     idToBlendModeSk(id));
     }
     MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+void BoxSingleWidget::setBlendMode(const SkBlendMode &mode) {
+    int id = blendModeToIntSk(mode);
+    mCompositionModeCombo->setCurrentIndex(id);
 }
 
 void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
@@ -242,7 +278,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mCompositionModeVisible = true;
         mCompositionModeCombo->setCurrentIndex(
-                    ((BoundingBox*)target)->getCompositionMode());
+            blendModeToIntSk(((BoundingBox*)target)->getBlendMode()) );
         updateCompositionBoxVisible();
 
         mBoxTargetWidget->hide();

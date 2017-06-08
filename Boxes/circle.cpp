@@ -41,8 +41,8 @@ Circle::Circle(BoxesGroup *parent) :
 
 
 #include <QSqlError>
-int Circle::prp_saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
+int Circle::saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
 
     int horizontalRadiusPointId = mHorizontalRadiusPoint->prp_saveToSql(query);
     int verticalRadiusPointId = mVerticalRadiusPoint->prp_saveToSql(query);

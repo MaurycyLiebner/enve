@@ -46,7 +46,7 @@ public:
 
     void ungroup();
 
-    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    int saveToSql(QSqlQuery *query, const int &parentId);
     BoxesGroup *loadChildrenFromSql(int thisBoundingBoxId, bool loadInBox);
 
     bool isCurrentGroup();

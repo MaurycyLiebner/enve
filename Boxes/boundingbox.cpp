@@ -157,20 +157,21 @@ void BoundingBox::applyEffectsSk(const SkBitmap &im,
 }
 
 #include <QSqlError>
-int BoundingBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     int transfromAnimatorId = mTransformAnimator->prp_saveToSql(query);
     if(!query->exec(
                 QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
-                        "pivotchanged, visible, locked, "
-                "parentboundingboxid) "
-                "VALUES ('%1', %2, %3, %4, %5, %6, %7)").
+                        "pivotchanged, visible, locked, blendmode, "
+                        "parentboundingboxid) "
+                "VALUES ('%1', %2, %3, %4, %5, %6, %7, %8)").
                 arg(prp_mName).
                 arg(mType).
                 arg(transfromAnimatorId).
                 arg(boolToSql(mPivotChanged)).
                 arg(boolToSql(mVisible) ).
                 arg(boolToSql(mLocked) ).
+                arg(static_cast<int>(mBlendModeSk)).
                 arg(parentId)
                 ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
@@ -195,11 +196,14 @@ void BoundingBox::prp_loadFromSql(const int &boundingBoxId) {
         int idPivotChanged = query.record().indexOf("pivotchanged");
         int idVisible = query.record().indexOf("visible");
         int idLocked = query.record().indexOf("locked");
+        int idBlendMode = query.record().indexOf("blendmode");
 
         int transformAnimatorId = query.value(idTransformAnimatorId).toInt();
         bool pivotChanged = query.value(idPivotChanged).toBool();
         bool visible = query.value(idVisible).toBool();
         bool locked = query.value(idLocked).toBool();
+        mBlendModeSk = static_cast<SkBlendMode>(
+                    query.value(idBlendMode).toInt());
         mTransformAnimator->prp_loadFromSql(transformAnimatorId);
         mEffectsAnimators->prp_loadFromSql(boundingBoxId);
         mPivotChanged = pivotChanged;
@@ -387,12 +391,6 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
         mDrawRenderContainer.drawSk(canvas, &paint);
         canvas->restore();
     }
-}
-
-void BoundingBox::setCompositionMode(
-        const QPainter::CompositionMode &compositionMode) {
-    mCompositionMode = compositionMode;
-    scheduleSoftUpdate();
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {

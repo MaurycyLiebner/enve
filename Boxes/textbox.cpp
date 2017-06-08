@@ -13,8 +13,8 @@ TextBox::TextBox(BoxesGroup *parent) :
 }
 
 #include <QSqlError>
-int TextBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
+int TextBox::saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
 
     if(!query->exec(QString("INSERT INTO textbox (boundingboxid, "
                            "text, fontfamily, fontstyle, fontsize) "

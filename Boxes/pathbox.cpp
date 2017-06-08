@@ -46,8 +46,8 @@ PathBox::~PathBox() {
 }
 
 #include <QSqlError>
-int PathBox::prp_saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = BoundingBox::prp_saveToSql(query, parentId);
+int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
 
     int fillPts = mFillGradientPoints->startPoint->prp_saveToSql(query);
     int strokePts = mStrokeGradientPoints->startPoint->prp_saveToSql(query);

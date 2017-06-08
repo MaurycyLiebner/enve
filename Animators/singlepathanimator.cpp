@@ -578,6 +578,9 @@ void SinglePathAnimator::deletePointAndApproximate(PathPoint *pointToRemove) {
     PathPoint *prevPoint = pointToRemove->getPreviousPoint();
     if(nextPoint == NULL || prevPoint == NULL) return;
 
+    nextPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+    prevPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+
     QPointF absPos = pointToRemove->getAbsolutePos();
 
     pointToRemove->removeFromVectorPath();

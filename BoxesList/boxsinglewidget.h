@@ -8,6 +8,7 @@
 #include <QMimeData>
 #include <QComboBox>
 #include "BoxesList/boolpropertywidget.h"
+#include "skiaincludes.h"
 class QrealAnimatorValueSlider;
 class DurationRectangleMovable;
 class Key;
@@ -48,9 +49,10 @@ public:
                        const qreal &pixelsPerFrame,
                        QList<Key *> *listKeys);
     DurationRectangleMovable *getRectangleMovableAtPos(
-                                const int &pressX,
-                                const qreal &pixelsPerFrame,
-                                const int &minViewedFrame);
+                        const int &pressX,
+                        const qreal &pixelsPerFrame,
+                        const int &minViewedFrame);
+    void setBlendMode(const SkBlendMode &mode);
 protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *event);

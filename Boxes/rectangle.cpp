@@ -33,8 +33,8 @@ Rectangle::~Rectangle()
 }
 
 #include <QSqlError>
-int Rectangle::prp_saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::prp_saveToSql(query, parentId);
+int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = PathBox::saveToSql(query, parentId);
 
     int bottomRightPointId = mTopLeftPoint->prp_saveToSql(query);
     int topLeftPointId = mTopLeftPoint->prp_saveToSql(query);

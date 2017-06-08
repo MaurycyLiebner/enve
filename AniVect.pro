@@ -168,7 +168,8 @@ SOURCES += main.cpp\
     AddInclude/SkStrokerPriv.cpp \
     canvaswidget.cpp \
     RenderWidget/closablecontainer.cpp \
-    RenderWidget/renderdestinationdialog.cpp
+    RenderWidget/renderdestinationdialog.cpp \
+    sqltablecreation.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \

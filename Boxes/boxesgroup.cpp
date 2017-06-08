@@ -125,11 +125,11 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
     return this;
 }
 
-int BoxesGroup::prp_saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = BoundingBox::prp_saveToSql(query, parentId);
+int BoxesGroup::saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
 
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->prp_saveToSql(query, boundingBoxId);
+        box->saveToSql(query, boundingBoxId);
     }
     return boundingBoxId;
 }

@@ -755,7 +755,7 @@ void CanvasWindow::loadCanvasesFromSql() {
 
 void CanvasWindow::saveCanvasesFromSql(QSqlQuery *query) {
     Q_FOREACH(Canvas *canvas, mCanvasList) {
-        canvas->prp_saveToSql(query);
+        canvas->saveToSql(query);
     }
 }
 
@@ -814,7 +814,7 @@ void CanvasWindow::createSoundForPath(const QString &path) {
 
 void CanvasWindow::saveToSql(QSqlQuery *query) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->prp_saveToSql(query);
+    mCurrentCanvas->saveToSql(query);
 }
 
 int CanvasWindow::getCurrentFrame() {

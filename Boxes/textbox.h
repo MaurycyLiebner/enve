@@ -15,7 +15,7 @@ public:
                                QString fontStyle);
 
     void openTextEditor();
-    int prp_saveToSql(QSqlQuery *query, const int &parentId);
+    int saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
     void updatePath();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

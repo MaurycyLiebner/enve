@@ -236,12 +236,29 @@ void Canvas::removeSelectedPointsApproximateAndClearList() {
     mSelectedPoints.clear(); schedulePivotUpdate();
 }
 
-void Canvas::removeSelectedPointsAndClearList()
-{
+void Canvas::removeSelectedPointsAndClearList() {
+    if(mIsMouseGrabbing) {
+        if(!BoxesGroup::mCtrlsAlwaysVisible ||
+            mSelectedPoints.count() == 1) {
+            if(mLastPressedPoint != NULL) {
+                if(mLastPressedPoint->isCtrlPoint()) {
+                    mLastPressedPoint->finishTransform();
+                    mLastPressedPoint->deselect();
+                    mLastPressedPoint->removeFromVectorPath();
+                    mSelectedPoints.removeOne(mLastPressedPoint);
+                    Q_FOREACH(MovablePoint *point, mSelectedPoints) {
+                        point->deselect();
+                    }
+                    goto DONE;
+                }
+            }
+        }
+    }
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
         point->deselect();
         point->removeFromVectorPath();
     }
+DONE:
     mSelectedPoints.clear(); schedulePivotUpdate();
 }
 

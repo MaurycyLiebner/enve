@@ -500,33 +500,45 @@ void PathPoint::updateEndCtrlPtVisibility() {
 }
 
 void PathPoint::setEndCtrlPtEnabled(bool enabled,
-                                    bool saveUndoRedo)
-{
+                                    bool saveUndoRedo) {
     if(enabled == mEndCtrlPtEnabled) return;
     if(mEndCtrlPtEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER, saveUndoRedo);
         mEndCtrlPt->removeAnimations();
+    } else {
+        resetEndCtrlPt();
     }
-    //mEndCtrlPt->setRelativePos(getRelativePos());
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
     prp_callUpdater();
     //mParentPath->schedulePathUpdate();
+
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void PathPoint::setStartCtrlPtEnabled(bool enabled,
-                                      bool saveUndoRedo)
-{
+                                      bool saveUndoRedo) {
     if(enabled == mStartCtrlPtEnabled) return;
     if(mStartCtrlPtEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER, saveUndoRedo);
         mStartCtrlPt->removeAnimations();
+    } else {
+        resetStartCtrlPt();
     }
-    //mStartCtrlPt->setRelativePos(getRelativePos());
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
     prp_callUpdater();
     //mParentPath->schedulePathUpdate();
+
+    prp_updateInfluenceRangeAfterChanged();
+}
+
+void PathPoint::resetEndCtrlPt() {
+    mEndCtrlPt->setRelativePos(getRelativePos());
+}
+
+void PathPoint::resetStartCtrlPt() {
+    mStartCtrlPt->setRelativePos(getRelativePos());
 }
 
 void PathPoint::updateAfterFrameChanged(const int &frame)
