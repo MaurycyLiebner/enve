@@ -49,7 +49,6 @@ void ScrollWidget::changeVisibleTop(const int &top) {
 void ScrollWidget::changeVisibleHeight(const int &height) {
     int newHeight = qCeil(height/(qreal)MIN_WIDGET_HEIGHT)*
                     MIN_WIDGET_HEIGHT;
-    mVisiblePartWidget->setFixedHeight(newHeight);
     mVisiblePartWidget->setVisibleHeight(newHeight);
 }
 

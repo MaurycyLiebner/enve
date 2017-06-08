@@ -30,6 +30,7 @@ void ScrollWidgetVisiblePart::setVisibleTop(const int &top) {
 }
 
 void ScrollWidgetVisiblePart::setVisibleHeight(const int &height) {
+    setFixedHeight(height);
     mVisibleHeight = height;
     updateVisibleWidgets();
 }
@@ -209,6 +210,7 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 void ScrollWidgetVisiblePart::setMainAbstraction(
         SingleWidgetAbstraction *abs) {
     mMainAbstraction = abs;
+    scheduledUpdateVisibleWidgetsContent();
 //    if(abs == NULL) return;
 //    abs->setContentVisible(true);
 //    updateVisibleWidgetsContent();
