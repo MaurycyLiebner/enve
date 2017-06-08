@@ -10,6 +10,7 @@
 class ScrollArea;
 class Canvas;
 class RenderInstanceWidget;
+class RenderInstanceSettings;
 
 class RenderWidget : public QWidget
 {
@@ -32,8 +33,9 @@ private:
     ScrollArea *mScrollArea;
     QList<RenderInstanceWidget*> mRenderInstanceWidgets;
 signals:
-
+    void renderFromSettings(RenderInstanceSettings *);
 public slots:
+    void render();
 };
 
 #endif // RENDERWIDGET_H

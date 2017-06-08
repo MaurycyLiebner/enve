@@ -1,9 +1,9 @@
 #ifndef RENDERINSTANCESETTINGS_H
 #define RENDERINSTANCESETTINGS_H
 #include <QString>
+class Canvas;
 
-class RenderInstanceSettings
-{
+class RenderInstanceSettings {
 public:
     RenderInstanceSettings();
 
@@ -15,8 +15,27 @@ public:
         mName = name;
     }
 
+    void setOutputDestination(const QString &outputDestination) {
+        mOutputDestination = outputDestination;
+    }
+
+    const QString &getOutputDestination() {
+        return mOutputDestination;
+    }
+
+    void setTargetCanvas(Canvas *canvas) {
+        mTargetCanvas = canvas;
+    }
+
+    Canvas *getTargetCanvas() {
+        return mTargetCanvas;
+    }
+
 private:
+    Canvas *mTargetCanvas;
     QString mName;
+
+    QString mOutputDestination;
 };
 
 #endif // RENDERINSTANCESETTINGS_H

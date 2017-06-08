@@ -15,6 +15,7 @@ class PaintControler;
 class SoundComposition;
 class PaintSetting;
 class CanvasWidget;
+class RenderInstanceSettings;
 
 #include <QSqlQuery>
 #include <QAudioOutput>
@@ -229,6 +230,7 @@ public slots:
     void resumePreview();
     void renderPreview();
     void renderOutput();
+    void renderFromSettings(RenderInstanceSettings *settings);
 
     void importFile();
 private slots:

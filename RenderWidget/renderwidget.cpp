@@ -28,6 +28,8 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
     mStartRenderButton = new QPushButton("Render", this);
     mButtonsLayout->addWidget(mStartRenderButton, Qt::AlignRight);
     mStartRenderButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    connect(mStartRenderButton, SIGNAL(pressed()),
+            this, SLOT(render()));
 
     mPauseRenderButton = new QPushButton("Pause", this);
     mButtonsLayout->addWidget(mPauseRenderButton, Qt::AlignRight);
@@ -58,6 +60,7 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
 
 void RenderWidget::createNewRenderInstanceWidgetForCanvas(Canvas *canvas) {
     RenderInstanceSettings *settings = new RenderInstanceSettings();
+    settings->setTargetCanvas(canvas);
     settings->setName(canvas->getName());
     RenderInstanceWidget *wid = new RenderInstanceWidget(settings, this);
     mContLayout->addWidget(wid);
@@ -67,4 +70,12 @@ void RenderWidget::createNewRenderInstanceWidgetForCanvas(Canvas *canvas) {
 void RenderWidget::removeRenderInstanceWidget(RenderInstanceWidget *wid) {
     mRenderInstanceWidgets.removeOne(wid);
     delete wid;
+}
+
+void RenderWidget::render() {
+    foreach(RenderInstanceWidget *wid, mRenderInstanceWidgets) {
+        //if
+        RenderInstanceSettings *settings = wid->getSettings();
+        emit renderFromSettings(settings);
+    }
 }

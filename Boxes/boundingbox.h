@@ -397,7 +397,6 @@ public:
     virtual void beforeUpdate();
     virtual void updateCombinedTransformTmp();
     void updateRelativeTransformAfterFrameChange();
-    void setNoCache(const bool &bT);
     QPainter::CompositionMode getCompositionMode();
     void drawUpdatePixmapForEffectSk(SkCanvas *canvas);
     QMatrix getUpdatePaintTransform();

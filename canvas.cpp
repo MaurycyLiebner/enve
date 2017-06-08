@@ -444,7 +444,10 @@ void Canvas::setOutputRendering(const bool &bT) {
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
     if(mCurrentPreviewContainer != NULL) {
         mCurrentPreviewContainer->decNumberPointers();
-        if(!mRendering) {
+        if(mNoCache) {
+            mCurrentPreviewContainer->setBlocked(false);
+            mCurrentPreviewContainer->freeThis();
+        } else if(!mRendering) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
@@ -539,10 +542,23 @@ void Canvas::renderCurrentFrameToPreview() {
     bitmap.reset();
     delete rasterCanvas;
 }
-
+#include <QFile>
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
     Q_UNUSED(renderDest);
-    renderCurrentFrameToPreview();
+    SkData *data = mCurrentPreviewContainer->getImageSk()->
+            encode(SkEncodedImageFormat::kPNG, 100);
+    QFile file;
+    file.setFileName(renderDest + "_" +
+                     QString::number(anim_mCurrentAbsFrame));
+    if(file.open(QIODevice::WriteOnly) ) {
+        QByteArray array = QByteArray((const char*)data->data(), data->size());
+        file.write(array);
+        file.flush();
+        file.close();
+    }
+    data->unref();
+
+    //renderCurrentFrameToPreview();
     //clearCurrentPreviewImage();
 }
 
@@ -953,9 +969,11 @@ void Canvas::moveByRel(const QPointF &trans) {
 
 void Canvas::updateAfterFrameChanged(const int &currentFrame) {
     anim_mCurrentAbsFrame = currentFrame;
+
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->updateAfterFrameChanged(currentFrame);
     }
+
     prp_setAbsFrame(currentFrame);
     //mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
 }

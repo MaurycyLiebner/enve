@@ -1,32 +1,32 @@
 #ifndef RENDERINSTANCEWIDGET_H
 #define RENDERINSTANCEWIDGET_H
 
-#include <QWidget>
+#include "closablecontainer.h"
 #include "renderinstancesettings.h"
 #include "BoxesList/boxsinglewidget.h"
 
-class RenderInstanceWidget : public QWidget
+class RenderInstanceWidget : public ClosableContainer
 {
     Q_OBJECT
 public:
     RenderInstanceWidget(QWidget *parent = 0);
     RenderInstanceWidget(RenderInstanceSettings *settings,
                          QWidget *parent = 0);
+    ~RenderInstanceWidget();
 
     void updateFromSettings();
+    RenderInstanceSettings *getSettings();
 private:
-    QVBoxLayout *mMainLayout;
-    QHBoxLayout *mTitleLayout;
-    QPushButton *mContentArrow;
+    QPushButton *mOutputDestinationButton;
     QLabel *mNameLabel;
-
-    QWidget *mContentWidget;
-
+    QVBoxLayout *mContentLayout = new QVBoxLayout();
     RenderInstanceSettings *mSettings;
 signals:
 
-public slots:
-    void setContentVisible(const bool &bT);
+private slots:
+    void openOutputSettingsDialog();
+    void openOutputDestinationDialog();
+    void openRenderSettingsDialog();
 };
 
 #endif // RENDERINSTANCEWIDGET_H

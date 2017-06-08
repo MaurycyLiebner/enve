@@ -364,6 +364,10 @@ public:
 
     void setCurrentPreviewContainer(CacheContainer *cont);
     void setRendering(const bool &bT);
+    void setNoCache(const bool &bT) {
+        mNoCache = bT;
+    }
+
     bool isPreviewingOrRendering() const {
         return mPreviewing || mRendering;
     }
@@ -420,6 +424,7 @@ private:
 
     VectorPathEdge *mCurrentEdge = NULL;
 
+    bool mNoCache = false;
     bool mPreviewing = false;
     bool mRendering = false;
     CacheContainer *mCurrentPreviewContainer = NULL;

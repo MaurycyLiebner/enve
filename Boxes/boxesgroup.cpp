@@ -242,7 +242,8 @@ void BoxesGroup::updateRelBoundingRect() {
         childPath.transform(QMatrixToSkMatrix(child->getRelativeTransform()));
         boundingPaths.addPath(childPath);
     }
-    mRelBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
+    mRelBoundingRectSk = boundingPaths.computeTightBounds();
+    mRelBoundingRect = SkRectToQRectF(mRelBoundingRectSk);
 
     BoundingBox::updateRelBoundingRect();
 }

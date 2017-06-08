@@ -166,7 +166,9 @@ SOURCES += main.cpp\
     AddInclude/SkStroke.cpp \
     AddInclude/SkGeometry.cpp \
     AddInclude/SkStrokerPriv.cpp \
-    canvaswidget.cpp
+    canvaswidget.cpp \
+    RenderWidget/closablecontainer.cpp \
+    RenderWidget/renderdestinationdialog.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -295,7 +297,9 @@ HEADERS  += mainwindow.h \
     canvaswidget.h \
     skiaincludes.h \
     AddInclude/SkPathPriv.h \
-    skiadefines.h
+    skiadefines.h \
+    RenderWidget/closablecontainer.h \
+    RenderWidget/renderdestinationdialog.h
 
 RESOURCES += \
     resources.qrc

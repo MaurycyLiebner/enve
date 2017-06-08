@@ -9,6 +9,7 @@
 #include "Sound/soundcomposition.h"
 #include "global.h"
 #include "canvaswidget.h"
+#include "RenderWidget/renderinstancesettings.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -73,6 +74,7 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
     } else {
         setCurrentCanvas(mCanvasList.at(id));
     }
+    callUpdateSchedulers();
 }
 
 void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
@@ -536,6 +538,14 @@ void CanvasWindow::renderOutput() {
     dialog->exec();
 }
 
+void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
+    Canvas *canvas = settings->getTargetCanvas();
+    const QString &destination = settings->getOutputDestination();
+    setCurrentCanvas(canvas);
+    emit changeCurrentFrame(0);
+    saveOutput(destination, 1.);
+}
+
 void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler()->
             getFirstEmptyFrameAfterFrame(mCurrentRenderFrame);
@@ -545,6 +555,7 @@ void CanvasWindow::nextCurrentRenderFrame() {
                                              newCurrentRenderFrame - 1,
                                              true);
     }
+
     mCurrentRenderFrame = newCurrentRenderFrame;
     emit changeCurrentFrame(mCurrentRenderFrame);
 }
@@ -703,8 +714,10 @@ void CanvasWindow::nextSaveOutputFrame() {
                 mCurrentCanvas->getResolutionFraction()) > 0.1) {
             mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
         }
+        mCurrentCanvas->setNoCache(false);
     } else {
-        nextCurrentRenderFrame();
+        mCurrentRenderFrame++;
+        emit changeCurrentFrame(mCurrentRenderFrame);
         if(mNoBoxesAwaitUpdate) {
             nextSaveOutputFrame();
         }
@@ -761,13 +774,14 @@ void CanvasWindow::saveOutput(const QString &renderDest,
     mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
     mCurrentCanvas->setOutputRendering(true);
     mCurrentCanvas->updateAllBoxes();
+    mCurrentCanvas->setNoCache(true);
     if(mNoBoxesAwaitUpdate) {
         nextSaveOutputFrame();
     }
 }
 
 void CanvasWindow::clearAll() {
-    SWT_clearAll();
+    //SWT_clearAll();
     mCanvasList.clear();
     setCurrentCanvas((Canvas*)NULL);
 }

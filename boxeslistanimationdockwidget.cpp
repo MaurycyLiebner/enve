@@ -245,6 +245,10 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
 
     mTimelineWidget = new QWidget(this);
     mRenderWidget = new RenderWidget(this);
+    connect(mRenderWidget,
+            SIGNAL(renderFromSettings(RenderInstanceSettings*)),
+            mMainWindow->getCanvasWindow(),
+            SLOT(renderFromSettings(RenderInstanceSettings*)));
     mTimelineWidget->setLayout(mTimelineLayout);
     mMainLayout->addWidget(mTimelineWidget);
     mMainLayout->addWidget(mRenderWidget);
@@ -297,11 +301,12 @@ void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
             mBoxesListKeysViewWidgets.at(1)->setTopWidget(
                                             mAnimationWidgetScrollbar);
         } else {
-            mMainLayout->insertWidget(1, mAnimationWidgetScrollbar);
-            mAddBoxesListKeysViewWidgetsBar->show();
-            mBoxesListKeysViewStack->hide();
-            setMinimumHeight(80);
-            setMaximumHeight(80);
+            return;
+//            mMainLayout->insertWidget(1, mAnimationWidgetScrollbar);
+//            mAddBoxesListKeysViewWidgetsBar->show();
+//            mBoxesListKeysViewStack->hide();
+//            setMinimumHeight(80);
+//            setMaximumHeight(80);
         }
     }
     mBoxesListKeysViewWidgets.removeOne(widget);
