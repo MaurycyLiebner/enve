@@ -74,8 +74,7 @@ void MovablePoint::setRelativePos(const QPointF &relPos,
     setCurrentPointValue(relPos, saveUndoRedo);
 }
 
-QPointF MovablePoint::getRelativePos() const
-{
+QPointF MovablePoint::getRelativePos() const {
     return getCurrentPointValue();
 }
 
@@ -328,7 +327,7 @@ bool MovablePoint::isVisible() {
     return !isHidden();
 }
 
-void MovablePoint::setVisible(bool bT) {
+void MovablePoint::setVisible(const bool &bT) {
     if(bT) {
         show();
     } else {

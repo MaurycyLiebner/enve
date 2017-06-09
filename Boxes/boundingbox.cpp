@@ -504,11 +504,6 @@ void BoundingBox::enablePivotAutoAdjust() {
 void BoundingBox::setPivotRelPos(const QPointF &relPos,
                                  const bool &saveUndoRedo,
                                  const bool &pivotChanged) {
-    if(saveUndoRedo) {
-        addUndoRedo(new SetPivotRelPosUndoRedo(this,
-                        mTransformAnimator->getPivot(), relPos,
-                        mPivotChanged, pivotChanged));
-    }
     mPivotChanged = pivotChanged;
     mTransformAnimator->
             setPivotWithoutChangingTransformation(relPos,
@@ -898,7 +893,8 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     if(durationRect == NULL) {
         int shift = mDurationRectangle->getFrameShift();
         Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
-            anim_moveKeyToRelFrame(key.get(), key->getRelFrame() + shift);
+            anim_moveKeyToRelFrame(key.get(),
+                                   key->getRelFrame() + shift);
         }
     }
     mDurationRectangle = durationRect;

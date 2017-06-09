@@ -9,6 +9,7 @@ int IntAnimator::getCurrentIntValue() const {
 }
 
 void IntAnimator::setCurrentIntValue(const int &value,
+                                     const bool &saveUndoRedo,
                                      const bool &finish) {
-    qra_setCurrentValue(value, finish);
+    qra_setCurrentValue(value, saveUndoRedo, finish);
 }

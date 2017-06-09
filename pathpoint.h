@@ -115,10 +115,14 @@ public:
 
     bool isEndPoint();
 
-    void setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo = true);
-    void setPointAsNext(PathPoint *pointToSet, bool saveUndoRedo = true);
-    void setNextPoint(PathPoint *mNextPoint, bool saveUndoRedo = true);
-    void setPreviousPoint(PathPoint *mPreviousPoint, bool saveUndoRedo = true);
+    void setPointAsPrevious(PathPoint *pointToSet,
+                            const bool &saveUndoRedo = true);
+    void setPointAsNext(PathPoint *pointToSet,
+                        const bool &saveUndoRedo = true);
+    void setNextPoint(PathPoint *mNextPoint,
+                      const bool &saveUndoRedo = true);
+    void setPreviousPoint(PathPoint *mPreviousPoint,
+                          const bool &saveUndoRedo = true);
 
     bool hasNextPoint();
     bool hasPreviousPoint();
@@ -140,10 +144,11 @@ public:
     void updateStartCtrlPtVisibility();
     void updateEndCtrlPtVisibility();
 
-    void setSeparatePathPoint(bool separatePathPoint);
+    void setSeparatePathPoint(const bool &separatePathPoint);
     bool isSeparatePathPoint();
 
-    void setCtrlsMode(CtrlsMode mode, bool saveUndoRedo = true);
+    void setCtrlsMode(const CtrlsMode &mode,
+                      const bool &saveUndoRedo = true);
     QPointF symmetricToAbsPos(QPointF absPosToMirror);
     QPointF symmetricToAbsPosNewLen(QPointF absPosToMirror,
                                     qreal newLen);
@@ -152,15 +157,19 @@ public:
     void moveStartCtrlPtToAbsPos(QPointF startCtrlPt);
     void moveEndCtrlPtToRelPos(QPointF endCtrlPt);
     void moveStartCtrlPtToRelPos(QPointF startCtrlPt);
-    void setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo = true);
+    void setCtrlPtEnabled(const bool &enabled,
+                          const bool &isStartPt,
+                          const bool &saveUndoRedo = true);
     SinglePathAnimator *getParentPath();
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxId);
 
     void cancelTransform();
 
-    void setEndCtrlPtEnabled(bool enabled, bool saveUndoRedo = true);
-    void setStartCtrlPtEnabled(bool enabled, bool saveUndoRedo = true);
+    void setEndCtrlPtEnabled(const bool &enabled,
+                             const bool &saveUndoRedo = true);
+    void setStartCtrlPtEnabled(const bool &enabled,
+                               const bool &saveUndoRedo = true);
 
     void resetEndCtrlPt();
     void resetStartCtrlPt();

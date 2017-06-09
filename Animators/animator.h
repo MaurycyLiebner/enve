@@ -43,6 +43,7 @@ public:
                                 const bool &saveUndoRedo = true);
     virtual void anim_moveKeyToRelFrame(Key *key,
                                         const int &newFrame,
+                                        const bool &saveUndoRedo = true,
                                         const bool &finish = true);
 
     virtual void anim_keyValueChanged(Key *key);

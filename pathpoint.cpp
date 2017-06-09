@@ -92,16 +92,15 @@ void PathPoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
 
 void PathPoint::rotateRelativeToSavedPivot(const qreal &rot) {
     MovablePoint::rotateRelativeToSavedPivot(rot);
-    if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->rotateRelativeToSavedPivot(rot);
-    }
-    if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->rotateRelativeToSavedPivot(rot);
-    }
+//    if(!mStartCtrlPt->isSelected()) {
+//        mStartCtrlPt->rotateRelativeToSavedPivot(rot);
+//    }
+//    if(!mEndCtrlPt->isSelected()) {
+//        mEndCtrlPt->rotateRelativeToSavedPivot(rot);
+//    }
 }
 
-void PathPoint::cancelTransform()
-{
+void PathPoint::cancelTransform() {
     MovablePoint::cancelTransform();
     if(!mStartCtrlPt->isSelected()) {
         mStartCtrlPt->MovablePoint::cancelTransform();
@@ -123,22 +122,22 @@ void PathPoint::finishTransform() {
 
 void PathPoint::moveByRel(const QPointF &relTranslation) {
     MovablePoint::moveByRel(relTranslation);
-    if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->MovablePoint::moveByRel(relTranslation);
-    }
-    if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->MovablePoint::moveByRel(relTranslation);
-    }
+//    if(!mStartCtrlPt->isSelected()) {
+//        mStartCtrlPt->MovablePoint::moveByRel(relTranslation);
+//    }
+//    if(!mEndCtrlPt->isSelected()) {
+//        mEndCtrlPt->MovablePoint::moveByRel(relTranslation);
+//    }
 }
 
 void PathPoint::moveByAbs(const QPointF &absTranslatione) {
     MovablePoint::moveByAbs(absTranslatione);
-    if(!mStartCtrlPt->isSelected()) {
-        mStartCtrlPt->MovablePoint::moveByAbs(absTranslatione);
-    }
-    if(!mEndCtrlPt->isSelected()) {
-        mEndCtrlPt->MovablePoint::moveByAbs(absTranslatione);
-    }
+//    if(!mStartCtrlPt->isSelected()) {
+//        mStartCtrlPt->MovablePoint::moveByAbs(absTranslatione);
+//    }
+//    if(!mEndCtrlPt->isSelected()) {
+//        mEndCtrlPt->MovablePoint::moveByAbs(absTranslatione);
+//    }
 }
 
 void PathPoint::reversePointsDirectionStartingFromThis(
@@ -175,8 +174,7 @@ void PathPoint::reversePointsDirectionReverse() {
     prevT->reversePointsDirectionReverse();
 }
 
-void PathPoint::connectToPoint(PathPoint *point)
-{
+void PathPoint::connectToPoint(PathPoint *point) {
     if(point == NULL) {
         return;
     }
@@ -459,7 +457,8 @@ PathPoint *PathPoint::getConnectedSeparatePathPoint() {
     return mPreviousPoint->getConnectedSeparatePathPoint();
 }
 
-void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo) {
+void PathPoint::setNextPoint(PathPoint *nextPoint,
+                             const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         SetNextPointUndoRedo *undoRedo = new SetNextPointUndoRedo(this,
                                                                   mNextPoint,
@@ -473,12 +472,14 @@ void PathPoint::setNextPoint(PathPoint *nextPoint, bool saveUndoRedo) {
         }
     } else {
         if(mNextEdge.get() == NULL) {
-            mNextEdge = (new VectorPathEdge(this, mNextPoint))->ref<VectorPathEdge>();
+            mNextEdge = (new VectorPathEdge(this, mNextPoint))->
+                                ref<VectorPathEdge>();
         } else {
             mNextEdge->setPoint2(mNextPoint);
         }
     }
     updateEndCtrlPtVisibility();
+    prp_updateInfluenceRangeAfterChanged();
     prp_callUpdater();
     //mParentPath->schedulePathUpdate();
 }
@@ -499,14 +500,14 @@ void PathPoint::updateEndCtrlPtVisibility() {
     }
 }
 
-void PathPoint::setEndCtrlPtEnabled(bool enabled,
-                                    bool saveUndoRedo) {
+void PathPoint::setEndCtrlPtEnabled(const bool &enabled,
+                                    const bool &saveUndoRedo) {
     if(enabled == mEndCtrlPtEnabled) return;
     if(mEndCtrlPtEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER, saveUndoRedo);
         mEndCtrlPt->removeAnimations();
     } else {
-        resetEndCtrlPt();
+        //resetEndCtrlPt();
     }
     mEndCtrlPtEnabled = enabled;
     updateEndCtrlPtVisibility();
@@ -516,14 +517,14 @@ void PathPoint::setEndCtrlPtEnabled(bool enabled,
     prp_updateInfluenceRangeAfterChanged();
 }
 
-void PathPoint::setStartCtrlPtEnabled(bool enabled,
-                                      bool saveUndoRedo) {
+void PathPoint::setStartCtrlPtEnabled(const bool &enabled,
+                                      const bool &saveUndoRedo) {
     if(enabled == mStartCtrlPtEnabled) return;
     if(mStartCtrlPtEnabled) {
         setCtrlsMode(CtrlsMode::CTRLS_CORNER, saveUndoRedo);
         mStartCtrlPt->removeAnimations();
     } else {
-        resetStartCtrlPt();
+        //resetStartCtrlPt();
     }
     mStartCtrlPtEnabled = enabled;
     updateStartCtrlPtVisibility();
@@ -610,17 +611,19 @@ void PathPoint::setPosAnimatorUpdater(AnimatorUpdater *updater) {
     mStartCtrlPt->setPosAnimatorUpdater(updater);
 }
 
-void PathPoint::setCtrlPtEnabled(bool enabled, bool isStartPt, bool saveUndoRedo) {
+void PathPoint::setCtrlPtEnabled(const bool &enabled,
+                                 const bool &isStartPt,
+                                 const bool &saveUndoRedo) {
     if(isStartPt) {
         if(mStartCtrlPtEnabled == enabled) {
             return;
         }
-        setStartCtrlPtEnabled(enabled);
+        setStartCtrlPtEnabled(enabled, saveUndoRedo);
     } else {
         if(mEndCtrlPtEnabled == enabled) {
             return;
         }
-        setEndCtrlPtEnabled(enabled);
+        setEndCtrlPtEnabled(enabled, saveUndoRedo);
     }
     if(saveUndoRedo) {
         addUndoRedo(new SetCtrlPtEnabledUndoRedo(enabled, isStartPt, this));
@@ -639,18 +642,16 @@ SinglePathAnimator *PathPoint::getParentPath() {
     return mParentPath;
 }
 
-void PathPoint::setSeparatePathPoint(bool separatePathPoint)
-{
+void PathPoint::setSeparatePathPoint(const bool &separatePathPoint) {
     mSeparatePathPoint = separatePathPoint;
 }
 
-bool PathPoint::isSeparatePathPoint()
-{
+bool PathPoint::isSeparatePathPoint() {
     return mSeparatePathPoint;
 }
 
-void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
-{
+void PathPoint::setCtrlsMode(const CtrlsMode &mode,
+                             const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new SetPathPointModeUndoRedo(this, mCtrlsMode, mode));
     }
@@ -719,17 +720,19 @@ void PathPoint::setCtrlsMode(CtrlsMode mode, bool saveUndoRedo)
     prp_callUpdater();
 }
 
-void PathPoint::setPreviousPoint(PathPoint *previousPoint, bool saveUndoRedo)
-{
+void PathPoint::setPreviousPoint(PathPoint *previousPoint,
+                                 const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        SetPreviousPointUndoRedo *undoRedo = new SetPreviousPointUndoRedo(this,
-                                                                      mPreviousPoint,
-                                                                      previousPoint);
+        SetPreviousPointUndoRedo *undoRedo =
+                new SetPreviousPointUndoRedo(this,
+                                             mPreviousPoint,
+                                             previousPoint);
         addUndoRedo(undoRedo);
     }
     mPreviousPoint = previousPoint;
     updateStartCtrlPtVisibility();
     //mParentPath->schedulePathUpdate();
+    prp_updateInfluenceRangeAfterChanged();
     prp_callUpdater();
 }
 
@@ -741,7 +744,8 @@ bool PathPoint::hasPreviousPoint() {
     return mPreviousPoint != NULL;
 }
 
-void PathPoint::setPointAsNext(PathPoint *pointToSet, bool saveUndoRedo) {
+void PathPoint::setPointAsNext(PathPoint *pointToSet,
+                               const bool &saveUndoRedo) {
     if(hasNextPoint()) {
         mNextPoint->setPreviousPoint(NULL, saveUndoRedo);
     }
@@ -751,7 +755,8 @@ void PathPoint::setPointAsNext(PathPoint *pointToSet, bool saveUndoRedo) {
     }
 }
 
-void PathPoint::setPointAsPrevious(PathPoint *pointToSet, bool saveUndoRedo) {
+void PathPoint::setPointAsPrevious(PathPoint *pointToSet,
+                                   const bool &saveUndoRedo) {
     if(hasPreviousPoint()) {
         mPreviousPoint->setNextPoint(NULL, saveUndoRedo);
     }
@@ -774,34 +779,35 @@ bool PathPoint::isEndPoint() {
     return mNextPoint == NULL || mPreviousPoint == NULL;
 }
 
-PathPointValues operator-(const PathPointValues &ppv1, const PathPointValues &ppv2)
-{
+PathPointValues operator-(const PathPointValues &ppv1,
+                          const PathPointValues &ppv2) {
     return PathPointValues(ppv1.startRelPos - ppv2.startRelPos,
                            ppv1.pointRelPos - ppv2.pointRelPos,
                            ppv1.endRelPos - ppv2.endRelPos);
 }
 
-PathPointValues operator+(const PathPointValues &ppv1, const PathPointValues &ppv2)
-{
+PathPointValues operator+(const PathPointValues &ppv1,
+                          const PathPointValues &ppv2) {
     return PathPointValues(ppv1.startRelPos + ppv2.startRelPos,
                            ppv1.pointRelPos + ppv2.pointRelPos,
                            ppv1.endRelPos + ppv2.endRelPos);
 }
 
-PathPointValues operator/(const PathPointValues &ppv, const qreal &val) {
+PathPointValues operator/(const PathPointValues &ppv,
+                          const qreal &val) {
     qreal invVal = 1.f/val;
     return PathPointValues(ppv.startRelPos * invVal,
                            ppv.pointRelPos * invVal,
                            ppv.endRelPos * invVal);
 }
 
-PathPointValues operator*(const qreal &val, const PathPointValues &ppv)
-{
+PathPointValues operator*(const qreal &val,
+                          const PathPointValues &ppv) {
     return ppv*val;
 }
 
-PathPointValues operator*(const PathPointValues &ppv, const qreal &val)
-{
+PathPointValues operator*(const PathPointValues &ppv,
+                          const qreal &val) {
     return PathPointValues(ppv.startRelPos * val,
                            ppv.pointRelPos * val,
                            ppv.endRelPos * val);
@@ -811,7 +817,9 @@ PathPointAnimators::PathPointAnimators() : ComplexAnimator() {
     prp_setName("point");
 }
 
-void PathPointAnimators::setAllVars(PathPoint *parentPathPointT, QPointFAnimator *endPosAnimatorT, QPointFAnimator *startPosAnimatorT) {
+void PathPointAnimators::setAllVars(PathPoint *parentPathPointT,
+                                    QPointFAnimator *endPosAnimatorT,
+                                    QPointFAnimator *startPosAnimatorT) {
     mParentPathPoint = parentPathPointT;
     mParentPathPoint->prp_setName("point pos");
     mEndPosAnimator = endPosAnimatorT;

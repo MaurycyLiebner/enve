@@ -12,17 +12,31 @@ CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
     anim_setTraceKeyOnCurrentFrame(true);
 }
 
+QPointF CtrlPoint::getRelativePos() const {
+    return mParentPoint->getRelativePos() + getCurrentPointValue();
+}
+
+void CtrlPoint::setRelativePos(const QPointF &relPos,
+                               const bool &saveUndoRedo) {
+    setCurrentPointValue(relPos - mParentPoint->getRelativePos(),
+                         saveUndoRedo);
+}
+
 void CtrlPoint::setIsStartCtrlPt(const bool &bT) {
     mIsStartCtrlPt = bT;
 }
 
-void CtrlPoint::moveToAbsWithoutUpdatingTheOther(QPointF absPos)
-{
+void CtrlPoint::moveToAbsWithoutUpdatingTheOther(const QPointF &absPos) {
     MovablePoint::moveToAbs(absPos);
 }
 
-void CtrlPoint::moveToAbs(QPointF absPos)
-{
+void CtrlPoint::moveByAbs(const QPointF &absTranslatione) {
+    moveToAbs(mapRelativeToAbsolute(getSavedPointValue() +
+                                    mParentPoint->getSavedPointValue()) +
+              absTranslatione);
+}
+
+void CtrlPoint::moveToAbs(QPointF absPos) {
     MovablePoint::moveToAbs(absPos);
     if(mOtherCtrlPt->isSelected()) {
         return;
@@ -30,8 +44,7 @@ void CtrlPoint::moveToAbs(QPointF absPos)
     mParentPoint->ctrlPointPosChanged(mIsStartCtrlPt);
 }
 
-void CtrlPoint::moveByRel(const QPointF &relTranslation)
-{
+void CtrlPoint::moveByRel(const QPointF &relTranslation) {
     MovablePoint::moveByRel(relTranslation);
     if(mOtherCtrlPt->isSelected()) {
         return;
@@ -65,8 +78,8 @@ void CtrlPoint::removeFromVectorPath() {
     mParentPoint->setCtrlPtEnabled(false, mIsStartCtrlPt);
 }
 
-bool CtrlPoint::isHidden()
-{
+bool CtrlPoint::isHidden() {
     return MovablePoint::isHidden() ||
-           (!mParentPoint->isNeighbourSelected() && !BoxesGroup::getCtrlsAlwaysVisible() );
+           (!mParentPoint->isNeighbourSelected() &&
+            !BoxesGroup::getCtrlsAlwaysVisible() );
 }

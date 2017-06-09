@@ -70,34 +70,48 @@ int ColorAnimator::prp_saveToSql(QSqlQuery *query,
     return query->lastInsertId().toInt();
 }
 
-void ColorAnimator::qra_setCurrentValue(Color colorValue, bool finish)
-{
+void ColorAnimator::qra_setCurrentValue(const Color &colorValue,
+                                        const bool &saveUndoRedo,
+                                        const bool &finish) {
     if(mColorMode == RGBMODE) {
-        mVal1Animator->qra_setCurrentValue(colorValue.gl_r, finish);
-        mVal2Animator->qra_setCurrentValue(colorValue.gl_g, finish);
-        mVal3Animator->qra_setCurrentValue(colorValue.gl_b, finish);
+        mVal1Animator->qra_setCurrentValue(colorValue.gl_r,
+                                           saveUndoRedo,
+                                           finish);
+        mVal2Animator->qra_setCurrentValue(colorValue.gl_g,
+                                           saveUndoRedo,
+                                           finish);
+        mVal3Animator->qra_setCurrentValue(colorValue.gl_b,
+                                           saveUndoRedo,
+                                           finish);
     } else if(mColorMode == HSVMODE) {
-        mVal1Animator->qra_setCurrentValue(colorValue.gl_h, finish);
-        mVal2Animator->qra_setCurrentValue(colorValue.gl_s, finish);
-        mVal3Animator->qra_setCurrentValue(colorValue.gl_v, finish);
+        mVal1Animator->qra_setCurrentValue(colorValue.gl_h,
+                                           saveUndoRedo,
+                                           finish);
+        mVal2Animator->qra_setCurrentValue(colorValue.gl_s,
+                                           saveUndoRedo,
+                                           finish);
+        mVal3Animator->qra_setCurrentValue(colorValue.gl_v,
+                                           saveUndoRedo,
+                                           finish);
     } else { // HSLMODE
         float h = colorValue.gl_h;
         float s = colorValue.gl_s;
         float l = colorValue.gl_v;
         hsv_to_hsl(&h, &s, &l);
 
-        mVal1Animator->qra_setCurrentValue(h, finish);
-        mVal2Animator->qra_setCurrentValue(s, finish);
-        mVal3Animator->qra_setCurrentValue(l, finish);
+        mVal1Animator->qra_setCurrentValue(h, saveUndoRedo, finish);
+        mVal2Animator->qra_setCurrentValue(s, saveUndoRedo, finish);
+        mVal3Animator->qra_setCurrentValue(l, saveUndoRedo, finish);
     }
-    mAlphaAnimator->qra_setCurrentValue(colorValue.gl_a, finish);
+    mAlphaAnimator->qra_setCurrentValue(colorValue.gl_a, saveUndoRedo, finish);
 }
 
-void ColorAnimator::qra_setCurrentValue(QColor qcolorValue, bool finish)
-{
+void ColorAnimator::qra_setCurrentValue(QColor qcolorValue,
+                                        const bool &saveUndoRedo,
+                                        const bool &finish) {
     Color color;
     color.setQColor(qcolorValue);
-    qra_setCurrentValue(color, finish);
+    qra_setCurrentValue(color, saveUndoRedo, finish);
 }
 
 Color ColorAnimator::getCurrentColor() const {

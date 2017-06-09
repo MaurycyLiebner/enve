@@ -32,7 +32,8 @@ public:
 
     virtual qreal getValue();
     virtual void setValue(qreal value,
-                          const bool &saveUndoRedo = true);
+                          const bool &saveUndoRedo = true,
+                          const bool &finish = true);
     void setStartValueVar(const qreal &value);
     void setEndValueVar(const qreal &value);
 

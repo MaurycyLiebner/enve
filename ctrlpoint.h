@@ -2,11 +2,16 @@
 #define CTRLPOINT_H
 #include "movablepoint.h"
 
-class CtrlPoint : public MovablePoint
-{
+class CtrlPoint : public MovablePoint {
 public:
     CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt);
-    void moveToAbsWithoutUpdatingTheOther(QPointF absPos);
+
+    QPointF getRelativePos() const;
+
+    void moveByAbs(const QPointF &absTranslatione);
+    void setRelativePos(const QPointF &relPos,
+                        const bool &saveUndoRedo = true);
+    void moveToAbsWithoutUpdatingTheOther(const QPointF &absPos);
     void moveToAbs(QPointF absPos);
     //void moveByWithoutUpdatingTheOther(QPointF absTranslation);
     void moveByRel(const QPointF &relTranslation);

@@ -242,7 +242,7 @@ void Canvas::removeSelectedPointsAndClearList() {
             mSelectedPoints.count() == 1) {
             if(mLastPressedPoint != NULL) {
                 if(mLastPressedPoint->isCtrlPoint()) {
-                    mLastPressedPoint->finishTransform();
+                    mLastPressedPoint->cancelTransform();
                     mLastPressedPoint->deselect();
                     mLastPressedPoint->removeFromVectorPath();
                     mSelectedPoints.removeOne(mLastPressedPoint);

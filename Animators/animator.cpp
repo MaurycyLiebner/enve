@@ -214,6 +214,7 @@ void Animator::anim_removeKey(Key *keyToRemove,
 
 void Animator::anim_moveKeyToRelFrame(Key *key,
                                       const int &newFrame,
+                                      const bool &saveUndoRedo,
                                       const bool &finish) {
     Q_UNUSED(finish);
     anim_updateAfterChangedKey(key);

@@ -32,12 +32,15 @@ public:
     qreal qra_getValueAtAbsFrame(const int &frame) const;
     qreal qra_getCurrentValue() const;
     void qra_setCurrentValue(qreal newValue,
+                             const bool &saveUndoRedo = false,
                              const bool &finish = false);
     void qra_updateValueFromCurrentFrame();
-    void qra_saveCurrentValueToKey(QrealKey *key);
+    void qra_saveCurrentValueToKey(QrealKey *key,
+                                   const bool &finish = true);
     void qra_saveValueToKey(QrealKey *key,
                             const qreal &value,
-                            const bool &saveUndoRedo = true);
+                            const bool &saveUndoRedo = true,
+                            const bool &finish = true);
 
     virtual void prp_setAbsFrame(const int &frame);
     virtual void qra_updateKeysPath();
@@ -99,6 +102,7 @@ public:
                         const bool &saveUndoRedo = true);
     void anim_moveKeyToRelFrame(Key *key,
                                 const int &newFrame,
+                                const bool &saveUndoRedo,
                                 const bool &finish);
 
     qreal getPrefferedValueStep();

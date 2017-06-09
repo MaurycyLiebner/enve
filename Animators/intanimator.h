@@ -8,7 +8,7 @@ public:
     IntAnimator();
 
     int getCurrentIntValue() const;
-    void setCurrentIntValue(const int &value,
+    void setCurrentIntValue(const int &value, const bool &saveUndoRedo,
                             const bool &finish = false);
 
     bool SWT_isIntAnimator() { return true; }

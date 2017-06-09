@@ -503,7 +503,6 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                  const int &maxFrame) {
     mCacheHandler.clearCacheForAbsFrameRange(minFrame, maxFrame);
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
-
 }
 
 void Canvas::afterUpdate() {

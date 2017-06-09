@@ -179,25 +179,6 @@ private:
     QList<UndoRedo*> mRedoStack;
 };
 
-class MoveMovablePointUndoRedo : public UndoRedo
-{
-public:
-    MoveMovablePointUndoRedo(MovablePoint *movedPoint,
-                         const QPointF &relPosBefore,
-                         const QPointF &relPosAfter);
-
-    ~MoveMovablePointUndoRedo();
-
-    void redo();
-
-    void undo();
-
-private:
-    MovablePointQSPtr mMovedPoint;
-    QPointF mRelPosBefore;
-    QPointF mRelPosAfter;
-};
-
 class AppendToPointsListUndoRedo : public UndoRedo {
 public:
     AppendToPointsListUndoRedo(PathPoint *pointToAdd,
@@ -451,28 +432,6 @@ private:
     BoundingBoxQSPtr mChildBox;
     BoxesGroupQSPtr mOldParent;
     BoxesGroupQSPtr mNewParent;
-};
-
-class SetPivotRelPosUndoRedo : public UndoRedo {
-public:
-    SetPivotRelPosUndoRedo(BoundingBox *target,
-                           const QPointF &prevRelPos,
-                           const QPointF &newRelPos,
-                           const bool &prevPivotChanged,
-                           const bool &newPivotChanged);
-
-    ~SetPivotRelPosUndoRedo();
-
-    void redo();
-
-    void undo();
-
-private:
-    BoundingBoxQSPtr mTarget;
-    QPointF mPrevRelPos;
-    QPointF mNewRelPos;
-    bool mPrevPivotChanged;
-    bool mNewPivotChanged;
 };
 
 class  SetBoxVisibleUndoRedo : public UndoRedo {

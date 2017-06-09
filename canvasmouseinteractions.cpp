@@ -466,7 +466,8 @@ void Canvas::handleAddPointMousePress() {
             !pathPointUnderMouse->isEndPoint() ) {
         pathPointUnderMouse = NULL;
     }
-    if(pathPointUnderMouse == mCurrentEndPoint && pathPointUnderMouse != NULL) {
+    if(pathPointUnderMouse == mCurrentEndPoint &&
+            pathPointUnderMouse != NULL) {
         return;
     }
     if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
@@ -481,21 +482,21 @@ void Canvas::handleAddPointMousePress() {
         setCurrentEndPoint(newSinglePath->
                             addPointAbsPos(mLastMouseEventPosRel,
                                             mCurrentEndPoint) );
-
     } else {
         if(pathPointUnderMouse == NULL) {
             PathPoint *newPoint =
                     mCurrentEndPoint->addPointAbsPos(mLastMouseEventPosRel);
-            newPoint->startTransform();
+            //newPoint->startTransform();
             setCurrentEndPoint(newPoint);
         } else if(mCurrentEndPoint == NULL) {
             setCurrentEndPoint(pathPointUnderMouse);
         } else {
-            pathPointUnderMouse->startTransform();
+            //pathPointUnderMouse->startTransform();
             if(mCurrentEndPoint->getParentPath() ==
                pathPointUnderMouse->getParentPath()) {
                 mCurrentEndPoint->getParentPath()->
-                        connectPoints(mCurrentEndPoint, pathPointUnderMouse);
+                        connectPoints(mCurrentEndPoint,
+                                      pathPointUnderMouse);
             }
             else {
                 connectPointsFromDifferentPaths(mCurrentEndPoint,
@@ -508,7 +509,7 @@ void Canvas::handleAddPointMousePress() {
 
 void Canvas::handleAddPointMouseRelease() {
     if(mCurrentEndPoint != NULL) {
-        mCurrentEndPoint->finishTransform();
+        mCurrentEndPoint->prp_updateInfluenceRangeAfterChanged();
         if(!mCurrentEndPoint->isEndPoint()) {
             setCurrentEndPoint(NULL);
         }
@@ -610,7 +611,7 @@ void Canvas::handleMovePointMouseMove() {
         }
         mRotPivot->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel));
     } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
-           mRotPivot->handleMouseMove(mCurrentMouseEventPosAbs,
+           mRotPivot->handleMouseMove(mCurrentMouseEventPosRel,
                                       mLastPressPosAbs,
                                       mXOnlyTransform, mYOnlyTransform,
                                       mInputTransformationEnabled,
@@ -658,7 +659,8 @@ void Canvas::handleMovePathMouseMove() {
                                    mXOnlyTransform, mYOnlyTransform,
                                    mInputTransformationEnabled,
                                    mInputTransformationValue,
-                                   mFirstMouseMove, mCurrentMode);
+                                   mFirstMouseMove,
+                                   mCurrentMode);
     } else {
         if(mLastPressedBox != NULL) {
             addBoxToSelection(mLastPressedBox);

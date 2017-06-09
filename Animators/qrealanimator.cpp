@@ -209,26 +209,28 @@ qreal QrealAnimator::qra_getCurrentValue() const {
 }
 
 void QrealAnimator::qra_setCurrentValue(qreal newValue,
+                                        const bool &saveUndoRedo,
                                         const bool &finish) {
     newValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
 
-    if(finish) {
+    if(saveUndoRedo) {
         prp_startTransform();
         mCurrentValue = newValue;
         prp_finishTransform();
-
         emit valueChangedSignal(mCurrentValue);
-        prp_callUpdater();
         return;
     }
+
     if(newValue == mCurrentValue) return;
     mCurrentValue = newValue;
     if(prp_isKeyOnCurrentFrame()) {
-        qra_saveCurrentValueToKey((QrealKey*)anim_mKeyOnCurrentFrame);
+        qra_saveCurrentValueToKey((QrealKey*)anim_mKeyOnCurrentFrame,
+                                  finish);
+    } else if(finish) {
+        prp_updateInfluenceRangeAfterChanged();
     }
 
     emit valueChangedSignal(mCurrentValue);
-
     prp_callUpdater();
 
     //qra_updateKeysPath();
@@ -238,8 +240,9 @@ void QrealAnimator::qra_updateValueFromCurrentFrame() {
     qra_setCurrentValue(qra_getValueAtAbsFrame(anim_mCurrentAbsFrame));
 }
 
-void QrealAnimator::qra_saveCurrentValueToKey(QrealKey *key) {
-    qra_saveValueToKey(key, mCurrentValue);
+void QrealAnimator::qra_saveCurrentValueToKey(QrealKey *key,
+                                              const bool &finish) {
+    qra_saveValueToKey(key, mCurrentValue, finish);
 }
 
 void QrealAnimator::qra_saveValueToKey(const int &frame,
@@ -258,8 +261,9 @@ void QrealAnimator::qra_saveValueToKey(const int &frame,
 
 void QrealAnimator::qra_saveValueToKey(QrealKey *key,
                                        const qreal &value,
-                                       const bool &saveUndoRedo) {
-    key->setValue(value, saveUndoRedo);
+                                       const bool &saveUndoRedo,
+                                       const bool &finish) {
+    key->setValue(value, saveUndoRedo, finish);
 
     if(anim_mIsCurrentAnimator) {
         graphScheduleUpdateAfterKeysChanged();
@@ -339,8 +343,9 @@ void QrealAnimator::anim_removeKey(Key *keyToRemove,
 
 void QrealAnimator::anim_moveKeyToRelFrame(Key *key,
                                            const int &newFrame,
+                                           const bool &saveUndoRedo,
                                            const bool &finish) {
-    Animator::anim_moveKeyToRelFrame(key, newFrame, finish);
+    Animator::anim_moveKeyToRelFrame(key, newFrame, saveUndoRedo, finish);
 
     qra_updateKeysPath();
     qra_updateValueFromCurrentFrame();

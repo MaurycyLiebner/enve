@@ -268,7 +268,9 @@ void QrealKey::updateCtrlFromCtrl(const QrealPointType &type) {
 qreal QrealKey::getValue() { return mValue; }
 
 #include "undoredo.h"
-void QrealKey::setValue(qreal value, const bool &saveUndoRedo) {
+void QrealKey::setValue(qreal value,
+                        const bool &saveUndoRedo,
+                        const bool &finish) {
     if(mParentAnimator != NULL) {
         value = clamp(value,
                       getParentQrealAnimator()->getMinPossibleValue(),
@@ -280,11 +282,13 @@ void QrealKey::setValue(qreal value, const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         if(mParentAnimator != NULL) {
             mParentAnimator->addUndoRedo(
-                        new ChangeQrealKeyValueUndoRedo(mValue, value, this) );
+                    new ChangeQrealKeyValueUndoRedo(mValue, value, this) );
         }
     }
     mValue = value;
-    mParentAnimator->anim_updateAfterChangedKey(this);
+    if(finish) {
+        mParentAnimator->anim_updateAfterChangedKey(this);
+    }
 }
 
 void QrealKey::finishValueTransform() {
@@ -292,6 +296,7 @@ void QrealKey::finishValueTransform() {
         mParentAnimator->addUndoRedo(
                     new ChangeQrealKeyValueUndoRedo(mSavedValue,
                                                     mValue, this) );
+        mParentAnimator->anim_updateAfterChangedKey(this);
     }
 }
 

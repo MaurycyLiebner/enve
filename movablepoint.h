@@ -35,7 +35,7 @@ public:
     virtual void finishTransform();
 
 
-    QPointF getRelativePos() const;
+    virtual QPointF getRelativePos() const;
 
     QPointF getAbsolutePos() const;
 
@@ -66,7 +66,7 @@ public:
     void show();
     virtual bool isHidden();
     bool isVisible();
-    void setVisible(bool bT);
+    void setVisible(const bool &bT);
 
     bool isPathPoint();
     bool isPivotPoint();

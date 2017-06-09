@@ -97,32 +97,12 @@ ChangeQrealKeyValueUndoRedo::~ChangeQrealKeyValueUndoRedo() {
 
 void ChangeQrealKeyValueUndoRedo::redo() {
     ((QrealAnimator*)mTargetKey->getParentAnimator())->
-            qra_saveValueToKey(mTargetKey.get(), mNewValue, false);
+            qra_saveValueToKey(mTargetKey.get(), mNewValue, false, true);
 }
 
 void ChangeQrealKeyValueUndoRedo::undo() {
     ((QrealAnimator*)mTargetKey->getParentAnimator())->
-            qra_saveValueToKey(mTargetKey.get(), mOldValue, false);
-}
-
-MoveMovablePointUndoRedo::MoveMovablePointUndoRedo(MovablePoint *movedPoint,
-                                                   const QPointF &relPosBefore,
-                                                   const QPointF &relPosAfter) :
-    UndoRedo("MoveMovablePointUndoRedo") {
-    mMovedPoint = movedPoint->ref<MovablePoint>();
-    mRelPosAfter = relPosAfter;
-    mRelPosBefore = relPosBefore;
-}
-
-MoveMovablePointUndoRedo::~MoveMovablePointUndoRedo() {
-}
-
-void MoveMovablePointUndoRedo::redo() {
-    mMovedPoint->setRelativePos(mRelPosAfter, false);
-}
-
-void MoveMovablePointUndoRedo::undo() {
-    mMovedPoint->setRelativePos(mRelPosBefore, false);
+            qra_saveValueToKey(mTargetKey.get(), mOldValue, false, true);
 }
 
 AppendToPointsListUndoRedo::AppendToPointsListUndoRedo(
@@ -355,26 +335,6 @@ void SetBoxParentUndoRedo::undo() {
     mChildBox->setParent(mOldParent.data(), false);
 }
 
-SetPivotRelPosUndoRedo::SetPivotRelPosUndoRedo(BoundingBox *target, const QPointF &prevRelPos, const QPointF &newRelPos, const bool &prevPivotChanged, const bool &newPivotChanged) :
-    UndoRedo("SetPivotRelPosUndoRedo") {
-    mTarget = target->ref<BoundingBox>();
-    mPrevRelPos = prevRelPos;
-    mNewRelPos = newRelPos;
-    mPrevPivotChanged = prevPivotChanged;
-    mNewPivotChanged = newPivotChanged;
-}
-
-SetPivotRelPosUndoRedo::~SetPivotRelPosUndoRedo() {
-}
-
-void SetPivotRelPosUndoRedo::redo() {
-    mTarget->setPivotRelPos(mNewRelPos, false, mNewPivotChanged);
-}
-
-void SetPivotRelPosUndoRedo::undo() {
-    mTarget->setPivotRelPos(mPrevRelPos, false, mPrevPivotChanged);
-}
-
 SetBoxVisibleUndoRedo::SetBoxVisibleUndoRedo(BoundingBox *target,
                                              const bool &visibleBefore,
                                              const bool &visibleAfter) :
@@ -408,11 +368,11 @@ ChangeQrealAnimatorValue::~ChangeQrealAnimatorValue() {
 }
 
 void ChangeQrealAnimatorValue::redo() {
-    mAnimator->qra_setCurrentValue(mNewValue);
+    mAnimator->qra_setCurrentValue(mNewValue, false, true);
 }
 
 void ChangeQrealAnimatorValue::undo() {
-    mAnimator->qra_setCurrentValue(mOldValue);
+    mAnimator->qra_setCurrentValue(mOldValue, false, true);
 }
 
 ChangeKeyFrameUndoRedo::ChangeKeyFrameUndoRedo(const int &oldFrame,
@@ -430,13 +390,15 @@ ChangeKeyFrameUndoRedo::~ChangeKeyFrameUndoRedo() {
 void ChangeKeyFrameUndoRedo::redo() {
     mTargetKey->getParentAnimator()->anim_moveKeyToRelFrame(mTargetKey.get(),
                                                             mNewFrame,
-                                                            false);
+                                                            false,
+                                                            true);
 }
 
 void ChangeKeyFrameUndoRedo::undo() {
     mTargetKey->getParentAnimator()->anim_moveKeyToRelFrame(mTargetKey.get(),
                                                             mOldFrame,
-                                                            false);
+                                                            false,
+                                                            true);
 }
 
 AnimatorRecordingSetUndoRedo::AnimatorRecordingSetUndoRedo(

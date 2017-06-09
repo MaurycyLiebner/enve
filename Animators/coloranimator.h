@@ -17,8 +17,12 @@ class ColorAnimator : public ComplexAnimator
 public:
     ColorAnimator();
 
-    void qra_setCurrentValue(Color colorValue, bool finish = false);
-    void qra_setCurrentValue(QColor qcolorValue, bool finish = false);
+    void qra_setCurrentValue(const Color &colorValue,
+                             const bool &saveUndoRedo = false,
+                             const bool &finish = false);
+    void qra_setCurrentValue(QColor qcolorValue,
+                             const bool &saveUndoRedo = false,
+                             const bool &finish = false);
 
     Color getCurrentColor() const;
     void setColorMode(ColorMode colorMode);
