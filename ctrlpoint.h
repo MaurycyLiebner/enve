@@ -23,6 +23,8 @@ public:
     bool isHidden();
     void setIsStartCtrlPt(const bool &bT);
     void cancelTransform();
+
+    void rotate(const qreal &rotate);
 private:
     bool mIsStartCtrlPt;
     PathPoint *mParentPoint;

@@ -387,16 +387,6 @@ StrokeSettings *BoxesGroup::getStrokeSettings() {
     return mChildBoxes.first()->getStrokeSettings();
 }
 
-bool BoxesGroup::getCtrlsAlwaysVisible()
-{
-    return BoxesGroup::mCtrlsAlwaysVisible;
-}
-
-void BoxesGroup::setCtrlsAlwaysVisible(bool bT) {
-    BoxesGroup::mCtrlsAlwaysVisible = bT;
-    MainWindow::getInstance()->getCanvasWindow()->getCurrentCanvas()->updateSelectedPointsAfterCtrlsVisiblityChanged();
-}
-
 void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {
     mFillStrokeSettingsWidget->setCurrentSettings(box->getFillSettings(),
                                                   box->getStrokeSettings());

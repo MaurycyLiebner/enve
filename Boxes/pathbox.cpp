@@ -5,10 +5,14 @@
 #include "Animators/animatorupdater.h"
 #include "gradientpoints.h"
 #include "skiaincludes.h"
+#include "PathEffects/patheffect.h"
+#include "PathEffects/patheffectanimators.h"
 
 PathBox::PathBox(BoxesGroup *parent,
                  const BoundingBoxType &type) :
     BoundingBox(parent, type) {
+    mPathEffectsAnimators =
+            (new PathEffectAnimators())->ref<PathEffectAnimators>();
     mStrokeGradientPoints =
             (new GradientPoints)->ref<GradientPoints>();
     mFillGradientPoints =
@@ -129,6 +133,19 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
         }
     }
     return pointToReturn;
+}
+
+void PathBox::addPathEffect(PathEffect *effect) {
+    //effect->setUpdater(new PixmapEffectUpdater(this));
+
+    if(!mEffectsAnimators->hasChildAnimators()) {
+        ca_addChildAnimator(mEffectsAnimators.data());
+    }
+    mEffectsAnimators->ca_addChildAnimator(effect);
+    //effect->setParentEffectAnimators(mEffectsAnimators.data());
+
+    //scheduleEffectsMarginUpdate();
+    clearAllCache();
 }
 
 void PathBox::resetStrokeGradientPointsPos(bool finish) {
@@ -280,7 +297,7 @@ VectorPath *PathBox::objectToPath() {
 }
 
 VectorPath *PathBox::strokeToPath() {
-    if(mOutlinePath.isEmpty()) return NULL;
+    if(mOutlinePathSk.isEmpty()) return NULL;
     VectorPath *newPath = new VectorPath(mParent.data());
     newPath->loadPathFromSkPath(mOutlinePathSk);
     newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
@@ -387,9 +404,7 @@ void PathBox::setUpdateVars() {
     }
     updatePathIfNeeded();
     updateOutlinePathIfNeeded();
-    mUpdatePath = mPath;
     mUpdatePathSk = mPathSk;
-    mUpdateOutlinePath = mOutlinePath;
     mUpdateOutlinePathSk = mOutlinePathSk;
     BoundingBox::setUpdateVars();
 }
@@ -419,7 +434,10 @@ void PathBox::drawSk(SkCanvas *canvas) {
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) {
     if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
-        return mWholePathSk.contains(relPos.x(), relPos.y());
+        if(mPathSk.contains(relPos.x(), relPos.y())) {
+            return true;
+        }
+        return mOutlinePathSk.contains(relPos.x(), relPos.y());
     } else {
         return false;
     }

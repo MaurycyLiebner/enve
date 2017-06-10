@@ -167,7 +167,10 @@ void SinglePathAnimator::updateSkPath() {
 
         lastPointValues = pointValues;
 
-        if(point == mFirstPoint) break;
+        if(point == mFirstPoint) {
+            mSkPath.close();
+            break;
+        }
     }
 }
 

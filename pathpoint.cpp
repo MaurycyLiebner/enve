@@ -92,12 +92,12 @@ void PathPoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
 
 void PathPoint::rotateRelativeToSavedPivot(const qreal &rot) {
     MovablePoint::rotateRelativeToSavedPivot(rot);
-//    if(!mStartCtrlPt->isSelected()) {
-//        mStartCtrlPt->rotateRelativeToSavedPivot(rot);
-//    }
-//    if(!mEndCtrlPt->isSelected()) {
-//        mEndCtrlPt->rotateRelativeToSavedPivot(rot);
-//    }
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->rotate(rot);
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->rotate(rot);
+    }
 }
 
 void PathPoint::cancelTransform() {
@@ -387,8 +387,7 @@ void PathPoint::drawSk(SkCanvas *canvas,
     }
 
     if((mode == CanvasMode::MOVE_POINT &&
-        (isNeighbourSelected() ||
-         BoxesGroup::getCtrlsAlwaysVisible() ) ) ||
+        (isNeighbourSelected() ) ) ||
             (mode == CanvasMode::ADD_POINT && mSelected)) {
         SkPaint paint;
         paint.setAntiAlias(true);

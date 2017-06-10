@@ -88,10 +88,6 @@ void VectorPath::loadPathFromSkPath(const SkPath &path) {
     mPathAnimator->loadPathFromSkPath(path);
 }
 
-QPointF VectorPath::getRelCenterPosition() {
-    return mPathAnimator->getRelCenterPosition();
-}
-
 void VectorPath::updatePath() {
 //    mPath = QPainterPath();
 //    //mPath.setFillRule(Qt::WindingFill);
@@ -99,7 +95,6 @@ void VectorPath::updatePath() {
 //    mEditPath = QPainterPath();
 
     mPathAnimator->updatePath();
-    mPath = mPathAnimator->getCurrentPath();
     mPathSk = mPathAnimator->getCurrentSkPath();
 
     updateOutlinePathSk();

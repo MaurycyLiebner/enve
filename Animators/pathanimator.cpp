@@ -35,17 +35,6 @@ VectorPathEdge *PathAnimator::getEgde(const QPointF &absPos,
     return NULL;
 }
 
-QPointF PathAnimator::getRelCenterPosition() {
-//    QPointF posSum = QPointF(0., 0.);
-//    int count = mPoints.length();
-//    if(count == 0) return posSum;
-//    Q_FOREACH(PathPoint *point, mPoints) {
-//        posSum += point->getRelativePos();
-//    }
-//    return posSum/count;
-    return mPath.controlPointRect().center();
-}
-
 void PathAnimator::addSinglePathAnimator(SinglePathAnimator *path,
                                          const bool &saveUndoRedo) {
     mSinglePaths << path;
@@ -221,12 +210,10 @@ DONE:
 }
 
 void PathAnimator::updatePath() {
-    mPath = QPainterPath();
     mSkPath = SkPath();
 
     Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->updatePath();
-        mPath.addPath(singlePath->getCurrentPath());
         singlePath->updateSkPath();
         mSkPath.addPath(singlePath->getCurrentSkPath());
     }

@@ -83,10 +83,6 @@ public:
 
     PaintSettings *getFillSettings();
     StrokeSettings *getStrokeSettings();
-
-    static bool getCtrlsAlwaysVisible();
-    static void setCtrlsAlwaysVisible(bool bT);
-
     void updateAllBoxes();
 
     void updateRelBoundingRect();

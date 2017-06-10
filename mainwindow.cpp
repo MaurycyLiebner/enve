@@ -966,6 +966,7 @@ void MainWindow::openFile() {
             "Open File", "", "AniVect Files (*.av)");
         enableEventFilter();
         if(!openPath.isEmpty()) {
+            clearAll();
             setCurrentPath(openPath);
             loadAVFile(mCurrentFilePath);
         }
@@ -1053,8 +1054,8 @@ void MainWindow::importImageSequence() {
 //    callUpdateSchedulers();
 //}
 
-void MainWindow::revert()
-{
+void MainWindow::revert() {
+    clearAll();
     loadAVFile(mCurrentFilePath);
     setFileChangedSinceSaving(false);
 }
@@ -1065,8 +1066,6 @@ void MainWindow::setCurrentFrameForAllWidgets(int frame)
 }
 
 void MainWindow::loadAVFile(QString path) {
-    clearAll();
-
     QSqlDatabase db = QSqlDatabase::database();//not dbConnection
     db.setDatabaseName(path);
     db.open();

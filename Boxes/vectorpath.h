@@ -95,7 +95,6 @@ protected:
     qreal findPercentForPoint(QPointF point,
                               PathPoint **prevPoint,
                               qreal *error);
-    QPointF getRelCenterPosition();
 
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
                                               qreal *pressedT,

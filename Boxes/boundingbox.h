@@ -494,7 +494,7 @@ protected:
             (new EffectAnimators())->ref<EffectAnimators>();
 
     QSharedPointer<BoxTransformAnimator> mTransformAnimator =
-                        (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
+                (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
 
     int mZListIndex = 0;
     bool mPivotChanged = false;

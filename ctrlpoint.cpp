@@ -30,6 +30,13 @@ void CtrlPoint::moveToAbsWithoutUpdatingTheOther(const QPointF &absPos) {
     MovablePoint::moveToAbs(absPos);
 }
 
+void CtrlPoint::rotate(const qreal &rotate) {
+    QPointF savedValue = getSavedPointValue();
+    QMatrix mat;
+    mat.rotate(rotate);
+    setCurrentPointValue(mat.map(savedValue));
+}
+
 void CtrlPoint::moveByAbs(const QPointF &absTranslatione) {
     moveToAbs(mapRelativeToAbsolute(getSavedPointValue() +
                                     mParentPoint->getSavedPointValue()) +
@@ -54,20 +61,26 @@ void CtrlPoint::moveByRel(const QPointF &relTranslation) {
 
 void CtrlPoint::startTransform() {
     MovablePoint::startTransform();
-    mParentPoint->MovablePoint::startTransform();
-    mOtherCtrlPt->MovablePoint::startTransform();
+    //mParentPoint->MovablePoint::startTransform();
+    if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
+        mOtherCtrlPt->MovablePoint::startTransform();
+    }
 }
 
 void CtrlPoint::finishTransform() {
-    mParentPoint->MovablePoint::finishTransform();
+    //mParentPoint->MovablePoint::finishTransform();
     MovablePoint::finishTransform();
-    mOtherCtrlPt->MovablePoint::finishTransform();
+    if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
+        mOtherCtrlPt->MovablePoint::finishTransform();
+    }
 }
 
 void CtrlPoint::cancelTransform() {
-    mParentPoint->MovablePoint::cancelTransform();
-    MovablePoint::finishTransform();
-    mOtherCtrlPt->MovablePoint::cancelTransform();
+    //mParentPoint->MovablePoint::cancelTransform();
+    MovablePoint::cancelTransform();
+    if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
+        mOtherCtrlPt->MovablePoint::cancelTransform();
+    }
 }
 
 void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {
@@ -80,6 +93,5 @@ void CtrlPoint::removeFromVectorPath() {
 
 bool CtrlPoint::isHidden() {
     return MovablePoint::isHidden() ||
-           (!mParentPoint->isNeighbourSelected() &&
-            !BoxesGroup::getCtrlsAlwaysVisible() );
+           (!mParentPoint->isNeighbourSelected() );
 }

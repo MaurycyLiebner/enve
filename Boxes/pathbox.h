@@ -4,6 +4,9 @@
 #include "Animators/paintsettings.h"
 class GradientPoints;
 class SkStroke;
+class PathEffectAnimators;
+typedef QSharedPointer<PathEffectAnimators> PathEffectAnimatorsQSPtr;
+class PathEffect;
 typedef QSharedPointer<GradientPoints> GradientPointsQSPtr;
 
 class PathBox : public BoundingBox {
@@ -82,10 +85,12 @@ public:
                                    const qreal &canvasScaleInv);
 
     bool SWT_isPathBox() { return true; }
+
+    void addPathEffect(PathEffect *effect);
 protected:
+    PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     GradientPointsQSPtr mFillGradientPoints;
     GradientPointsQSPtr mStrokeGradientPoints;
-
 
     QLinearGradient mDrawFillGradient;
     QLinearGradient mDrawStrokeGradient;
@@ -99,9 +104,7 @@ protected:
     bool mPathUpdateNeeded = false;
     bool mOutlinePathUpdateNeeded = false;
 
-    QPainterPath mUpdatePath;
     SkPath mUpdatePathSk;
-    QPainterPath mUpdateOutlinePath;
     SkPath mUpdateOutlinePathSk;
     bool mFillSettingsGradientUpdateNeeded = false;
     bool mStrokeSettingsGradientUpdateNeeded = false;
@@ -112,8 +115,6 @@ protected:
     SkPath mOutlinePathSk;
     SkPath mWholePathSk;
     QPainterPath mPath;
-    QPainterPath mOutlinePath;
-    QPainterPath mWholePath;
     void updateWholePathSk();
 
     bool mOutlineAffectedByScale = true;

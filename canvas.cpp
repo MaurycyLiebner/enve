@@ -289,7 +289,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
         canvas->drawRect(viewRect, paint);
 
-        canvas->concat(QMatrixToQMatrix(mCanvasTransformMatrix));
+        canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmapSk(canvas);
         }
@@ -853,29 +853,37 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
             resetSelectedRotation();
         } else if(event->key() == Qt::Key_R && (isMovingPath() ||
                   mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
-           mTransformationFinishedBeforeMouseRelease = false;
-           QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
-           setLastMouseEventPosAbs(cursorPos);
-           setLastMousePressPosAbs(cursorPos);
-           mRotPivot->startRotating();
-           mDoubleClick = false;
-           mFirstMouseMove = true;
+            if(mSelectedBoxes.isEmpty()) return;
+            if(mCurrentMode == MOVE_POINT) {
+                if(mSelectedPoints.isEmpty()) return;
+            }
+            mTransformationFinishedBeforeMouseRelease = false;
+            QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+            setLastMouseEventPosAbs(cursorPos);
+            setLastMousePressPosAbs(cursorPos);
+            mRotPivot->startRotating();
+            mDoubleClick = false;
+            mFirstMouseMove = true;
 
-           grabMouseAndTrack();
+            grabMouseAndTrack();
         } else if(event->key() == Qt::Key_S && (isMovingPath() ||
                   mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
-           mTransformationFinishedBeforeMouseRelease = false;
-           mXOnlyTransform = false;
-           mYOnlyTransform = false;
+            if(mSelectedBoxes.isEmpty()) return;
+            if(mCurrentMode == MOVE_POINT) {
+                if(mSelectedPoints.isEmpty()) return;
+            }
+            mTransformationFinishedBeforeMouseRelease = false;
+            mXOnlyTransform = false;
+            mYOnlyTransform = false;
 
-           QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
-           setLastMouseEventPosAbs(cursorPos);
-           setLastMousePressPosAbs(cursorPos);
-           mRotPivot->startScaling();
-           mDoubleClick = false;
-           mFirstMouseMove = true;
+            QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+            setLastMouseEventPosAbs(cursorPos);
+            setLastMousePressPosAbs(cursorPos);
+            mRotPivot->startScaling();
+            mDoubleClick = false;
+            mFirstMouseMove = true;
 
-           grabMouseAndTrack();
+            grabMouseAndTrack();
         } else if(event->key() == Qt::Key_G && (isMovingPath() ||
                                                 mCurrentMode == MOVE_POINT) &&
                   !isGrabbingMouse) {

@@ -22,7 +22,6 @@ public:
 
     VectorPathEdge *getEgde(const QPointF &absPos,
                             const qreal &canvasScaleInv);
-    QPointF getRelCenterPosition();
     void updatePath();
     MovablePoint *qra_getPointAt(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,

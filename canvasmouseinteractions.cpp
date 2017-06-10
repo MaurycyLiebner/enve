@@ -195,12 +195,10 @@ void Canvas::handleMovePointMousePressEvent() {
             return;
         }
         if(!isShiftPressed() &&
-           !(mLastPressedPoint->isCtrlPoint() &&
-           !BoxesGroup::getCtrlsAlwaysVisible())) {
+           !(mLastPressedPoint->isCtrlPoint())) {
             clearPointsSelection();
         }
-        if(mLastPressedPoint->isCtrlPoint() &&
-           !BoxesGroup::getCtrlsAlwaysVisible() ) {
+        if(mLastPressedPoint->isCtrlPoint() ) {
             addPointToSelection(mLastPressedPoint);
         }
     }
@@ -417,8 +415,7 @@ void Canvas::handleMovePointMouseRelease() {
     } else {
         finishSelectedPointsTransform();
         if(mLastPressedPoint != NULL) {
-            if(mLastPressedPoint->isCtrlPoint() &&
-               !BoxesGroup::getCtrlsAlwaysVisible() ) {
+            if(mLastPressedPoint->isCtrlPoint() ) {
                 removePointFromSelection(mLastPressedPoint);
             }
         }
@@ -612,7 +609,7 @@ void Canvas::handleMovePointMouseMove() {
         mRotPivot->moveByAbs(getMoveByValueForEventPos(mCurrentMouseEventPosRel));
     } else if(mRotPivot->isRotating() || mRotPivot->isScaling() ) {
            mRotPivot->handleMouseMove(mCurrentMouseEventPosRel,
-                                      mLastPressPosAbs,
+                                      mLastPressPosRel,
                                       mXOnlyTransform, mYOnlyTransform,
                                       mInputTransformationEnabled,
                                       mInputTransformationValue,
@@ -627,8 +624,7 @@ void Canvas::handleMovePointMouseMove() {
         if(mLastPressedPoint != NULL) {
             addPointToSelection(mLastPressedPoint);
 
-            if(mLastPressedPoint->isCtrlPoint() &&
-               !BoxesGroup::getCtrlsAlwaysVisible() ) {
+            if(mLastPressedPoint->isCtrlPoint() ) {
                 if(mFirstMouseMove) {
                     startSelectedPointsTransform();
                 }

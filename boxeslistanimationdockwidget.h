@@ -82,8 +82,6 @@ signals:
 private slots:
     void setResolutionFractionText(QString text);
 
-    void setCtrlsAlwaysVisible(bool ctrlsAlwaysVisible);
-
     void interruptPreview();
 
     void setLocalPivot(const bool &bT);
@@ -123,7 +121,7 @@ private:
     ActionButton *mStopButton;
 
     ActionButton *mAllPointsRecordButton;
-    ActionButton *mCtrlsAlwaysVisible;
+//    ActionButton *mCtrlsAlwaysVisible;
     ActionButton *mLocalPivot;
 
     AnimationDockWidget *mAnimationDockWidget;

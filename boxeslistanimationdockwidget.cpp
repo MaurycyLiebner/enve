@@ -167,14 +167,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mAllPointsRecordButton, SIGNAL(toggled(bool)),
             parent, SLOT(setAllPointsRecord(bool)) );
 
-    mCtrlsAlwaysVisible = new ActionButton(
-                ":/icons/ctrlsNotAlwaysVisible.png",
-                "", this);
-
-    mCtrlsAlwaysVisible->setCheckable(":/icons/ctrlsAlwaysVisible.png");
-    connect(mCtrlsAlwaysVisible, SIGNAL(toggled(bool)),
-            this, SLOT(setCtrlsAlwaysVisible(bool)) );
-
     mLocalPivot = new ActionButton(
                 ":/icons/globalPivot.png",
                 "", this);
@@ -204,24 +196,26 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar->addSeparator();
     mToolBar->addWidget(mAllPointsRecordButton);
     mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
-    mToolBar->addWidget(mCtrlsAlwaysVisible);
-    mCtrlsAlwaysVisible->setFocusPolicy(Qt::NoFocus);
     mToolBar->addWidget(mLocalPivot);
     mLocalPivot->setFocusPolicy(Qt::NoFocus);
     mToolBar->addSeparator();
 
     QWidget *spacerWidget = new QWidget(this);
-    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-    spacerWidget->setStyleSheet("QWidget { background-color: rgba(0, 0, 0, 0) }");
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding,
+                                QSizePolicy::Minimum);
+    spacerWidget->setStyleSheet("QWidget {"
+                                    "background-color: rgba(0, 0, 0, 0)"
+                                "}");
     mToolBar->addWidget(spacerWidget);
 
     mToolBar->addSeparator();
 
     mTimelineAction = mToolBar->addAction("Timeline",
-                                       this, SLOT(setTimelineMode()));
+                                          this, SLOT(setTimelineMode()));
     mTimelineAction->setCheckable(true);
     mTimelineAction->setChecked(true);
-    mRenderAction = mToolBar->addAction("Render", this, SLOT(setRenderMode()));
+    mRenderAction = mToolBar->addAction("Render",
+                                        this, SLOT(setRenderMode()));
     mRenderAction->setCheckable(true);
 
     mToolBar->addSeparator();
@@ -407,12 +401,6 @@ void BoxesListAnimationDockWidget::renderPreview() {
 
 void BoxesListAnimationDockWidget::interruptPreview() {
     mMainWindow->getCanvasWindow()->interruptPreview();
-}
-
-void BoxesListAnimationDockWidget::setCtrlsAlwaysVisible(
-        bool ctrlsAlwaysVisible) {
-    BoxesGroup::setCtrlsAlwaysVisible(ctrlsAlwaysVisible);
-    mMainWindow->callUpdateSchedulers();
 }
 
 void BoxesListAnimationDockWidget::setLocalPivot(const bool &bT) {

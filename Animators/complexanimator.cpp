@@ -166,8 +166,7 @@ void ComplexAnimator::prp_clearFromGraphView() {
     }
 }
 
-bool ComplexAnimator::hasChildAnimators()
-{
+bool ComplexAnimator::hasChildAnimators() {
     return !ca_mChildAnimators.isEmpty();
 }
 

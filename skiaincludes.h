@@ -16,6 +16,7 @@
 #include "SkDashPathEffect.h"
 #include "SkTypeface.h"
 #include "SkImageFilter.h"
+#include "SkDiscretePathEffect.h"
 
 #include "gl/GrGLUtil.h"
 

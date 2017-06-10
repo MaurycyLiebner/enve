@@ -169,7 +169,9 @@ SOURCES += main.cpp\
     canvaswidget.cpp \
     RenderWidget/closablecontainer.cpp \
     RenderWidget/renderdestinationdialog.cpp \
-    sqltablecreation.cpp
+    sqltablecreation.cpp \
+    PathEffects/patheffect.cpp \
+    PathEffects/patheffectanimators.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -300,7 +302,9 @@ HEADERS  += mainwindow.h \
     AddInclude/SkPathPriv.h \
     skiadefines.h \
     RenderWidget/closablecontainer.h \
-    RenderWidget/renderdestinationdialog.h
+    RenderWidget/renderdestinationdialog.h \
+    PathEffects/patheffect.h \
+    PathEffects/patheffectanimators.h
 
 RESOURCES += \
     resources.qrc

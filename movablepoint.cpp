@@ -192,7 +192,7 @@ bool MovablePoint::isPointAtAbsPos(const QPointF &absPoint,
 
 bool MovablePoint::isContainedInRect(const QRectF &absRect) {
     if(isHidden() ||
-            (isCtrlPoint() && !BoxesGroup::getCtrlsAlwaysVisible()) ) {
+            (isCtrlPoint()) ) {
         return false;
     }
     return absRect.contains(getAbsolutePos());
@@ -217,6 +217,29 @@ void MovablePoint::scaleRelativeToSavedPivot(const qreal &sx,
 
 void MovablePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
     mSavedTransformPivot = mParent->mapAbsPosToRel(absPivot);
+}
+
+void MovablePoint::rotateBy(const qreal &rot) {
+    QMatrix rotMatrix;
+    rotMatrix.translate(-mSavedTransformPivot.x(),
+                        -mSavedTransformPivot.y());
+    rotMatrix.rotate(rot);
+    rotMatrix.translate(mSavedTransformPivot.x(),
+                        mSavedTransformPivot.y());
+    setRelativePos(rotMatrix.map(mSavedRelPos),
+                   false);
+}
+
+void MovablePoint::scale(const qreal &scaleXBy,
+                         const qreal &scaleYBy) {
+    QMatrix scaleMatrix;
+    scaleMatrix.translate(-mSavedTransformPivot.x(),
+                          -mSavedTransformPivot.y());
+    scaleMatrix.scale(scaleXBy, scaleYBy);
+    scaleMatrix.translate(mSavedTransformPivot.x(),
+                          mSavedTransformPivot.y());
+    setRelativePos(scaleMatrix.map(mSavedRelPos),
+                   false);
 }
 
 void MovablePoint::moveToRel(const QPointF &relPos) {
@@ -268,29 +291,6 @@ qreal MovablePoint::getRadius()
 
 void MovablePoint::updateAfterFrameChanged(const int &frame) {
     prp_setAbsFrame(frame);
-}
-
-void MovablePoint::rotateBy(const qreal &rot) {
-    QMatrix rotMatrix;
-    rotMatrix.translate(-mSavedTransformPivot.x(),
-                        -mSavedTransformPivot.y());
-    rotMatrix.rotate(rot);
-    rotMatrix.translate(mSavedTransformPivot.x(),
-                        mSavedTransformPivot.y());
-    setRelativePos(rotMatrix.map(mSavedRelPos),
-                   false);
-}
-
-void MovablePoint::scale(const qreal &scaleXBy,
-                         const qreal &scaleYBy) {
-    QMatrix scaleMatrix;
-    scaleMatrix.translate(-mSavedTransformPivot.x(),
-                          -mSavedTransformPivot.y());
-    scaleMatrix.scale(scaleXBy, scaleYBy);
-    scaleMatrix.translate(mSavedTransformPivot.x(),
-                          mSavedTransformPivot.y());
-    setRelativePos(scaleMatrix.map(mSavedRelPos),
-                   false);
 }
 
 //void MovablePoint::saveTransformPivot(QPointF absPivot)

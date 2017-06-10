@@ -950,6 +950,8 @@ void CanvasWindow::importFile(const QString &path) {
     } else if(extension == "mp3" ||
               extension == "wav") {
         createSoundForPath(path);
+    } else if(extension == "av") {
+        MainWindow::getInstance()->loadAVFile(path);
     }
     MainWindow::getInstance()->enable();
 
@@ -966,7 +968,8 @@ void CanvasWindow::grabMouse() {
 }
 
 void CanvasWindow::repaint() {
-    mCanvasWidget->update();
+    //mCanvasWidget->update();
+    requestUpdate();
 }
 
 QRect CanvasWindow::rect() {
