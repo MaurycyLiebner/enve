@@ -39,7 +39,7 @@ void CtrlPoint::rotate(const qreal &rotate) {
 
 void CtrlPoint::moveByAbs(const QPointF &absTranslatione) {
     moveToAbs(mapRelativeToAbsolute(getSavedPointValue() +
-                                    mParentPoint->getSavedPointValue()) +
+                                    mParentPoint->getCurrentPointValue()) +
               absTranslatione);
 }
 

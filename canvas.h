@@ -479,7 +479,7 @@ private:
 
     void updateTransformation();
     void handleMouseRelease();
-    QPointF getMoveByValueForEventPos(QPointF eventPos);
+    QPointF getMoveByValueForEventPos(const QPointF &eventPos);
     void cancelCurrentTransform();
     void releaseMouseAndDontTrack();
     void setLastMouseEventPosAbs(const QPointF &abs);

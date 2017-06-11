@@ -584,7 +584,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     callUpdateSchedulers();
 }
 
-QPointF Canvas::getMoveByValueForEventPos(QPointF eventPos) {
+QPointF Canvas::getMoveByValueForEventPos(const QPointF &eventPos) {
     QPointF moveByPoint = eventPos - mLastPressPosRel;
     if(mInputTransformationEnabled) {
         moveByPoint = QPointF(mInputTransformationValue,
@@ -623,7 +623,7 @@ void Canvas::handleMovePointMouseMove() {
 
             if(mLastPressedPoint->isCtrlPoint() ) {
                 if(mFirstMouseMove) {
-                    startSelectedPointsTransform();
+                    mLastPressedPoint->startTransform();
                 }
                 mLastPressedPoint->moveByAbs(
                         getMoveByValueForEventPos(mCurrentMouseEventPosRel));
