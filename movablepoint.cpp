@@ -159,7 +159,7 @@ void MovablePoint::draw(QPainter *p) {
 }
 
 void MovablePoint::drawSk(SkCanvas *canvas,
-                          const qreal &invScale) {
+                          const SkScalar &invScale) {
     if(isHidden()) {
         return;
     }

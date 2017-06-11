@@ -23,8 +23,8 @@ public:
     ~VectorPath();
 
     void drawSelectedSk(SkCanvas *canvas,
-                      const CanvasMode &currentCanvasMode,
-                      const qreal &invScale);
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
 
     PathPoint *addPointAbsPos(QPointF absPtPos, PathPoint *toPoint = NULL);
     PathPoint *addPointRelPos(QPointF relPtPos, PathPoint *toPoint = NULL);

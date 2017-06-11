@@ -107,7 +107,8 @@ qreal BlurEffect::getMargin() {
     return mBlurRadius->qra_getCurrentValue();
 }
 
-int BlurEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int BlurEffect::prp_saveToSql(QSqlQuery *query,
+                              const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int radiusId = mBlurRadius->prp_saveToSql(query);

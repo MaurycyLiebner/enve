@@ -84,7 +84,8 @@ void BoundingBox::makeDuplicate(Property *property) {
     targetBox->duplicateTransformAnimatorFrom(mTransformAnimator.data());
     int effectsCount = mEffectsAnimators->ca_getNumberOfChildren();
     for(int i = 0; i < effectsCount; i++) {
-        targetBox->addEffect((PixmapEffect*)((PixmapEffect*)mEffectsAnimators->
+        targetBox->addEffect(
+                    (PixmapEffect*)((PixmapEffect*)mEffectsAnimators->
                            ca_getChildAt(i))->makeDuplicate() );
     }
 }
@@ -336,7 +337,7 @@ void BoundingBox::updateAllUglyPixmap() {
 
 void BoundingBox::drawSelectedSk(SkCanvas *canvas,
                                  const CanvasMode &currentCanvasMode,
-                                 const qreal &invScale) {
+                                 const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
         drawBoundingRectSk(canvas, invScale);

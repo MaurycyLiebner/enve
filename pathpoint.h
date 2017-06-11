@@ -108,7 +108,7 @@ public:
 
     void drawSk(SkCanvas *canvas,
               const CanvasMode &mode,
-              const qreal &invScale);
+              const SkScalar &invScale);
 
     PathPoint *getNextPoint();
     PathPoint *getPreviousPoint();

@@ -210,8 +210,8 @@ void Canvas::createSoundForPath(const QString &path) {
 }
 
 void Canvas::drawSelectedSk(SkCanvas *canvas,
-                          const CanvasMode &currentCanvasMode,
-                          const qreal &invScale) {
+                            const CanvasMode &currentCanvasMode,
+                            const SkScalar &invScale) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->drawSelectedSk(canvas, currentCanvasMode, invScale);
     }

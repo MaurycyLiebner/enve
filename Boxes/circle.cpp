@@ -118,7 +118,7 @@ void Circle::setRadius(const qreal &radius) {
 
 void Circle::drawSelectedSk(SkCanvas *canvas,
                             const CanvasMode &currentCanvasMode,
-                            const qreal &invScale) {
+                            const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
         drawBoundingRectSk(canvas, invScale);
@@ -182,7 +182,10 @@ void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
 
 void Circle::updatePath() {
     mPathSk = SkPath();
-    mPathSk.addOval(QRectFToSkRect(mRelBoundingRect));
+    SkScalar xRadius = mHorizontalRadiusPoint->getXValue();
+    SkScalar yRadius = mVerticalRadiusPoint->getYValue();
+    mPathSk.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
+                                     2*xRadius, 2*yRadius));
 
     updateOutlinePathSk();
 }

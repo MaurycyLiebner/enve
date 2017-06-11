@@ -241,7 +241,17 @@ void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
 }
 
 void PathBox::makeDuplicate(Property *targetBox) {
+    BoundingBox::makeDuplicate(targetBox);
+
     PathBox *pathBoxTarget = ((PathBox*)targetBox);
+
+    int effectsCount = mPathEffectsAnimators->ca_getNumberOfChildren();
+    for(int i = 0; i < effectsCount; i++) {
+        pathBoxTarget->addPathEffect(
+                (PathEffect*)((PathEffect*)mPathEffectsAnimators->
+                    ca_getChildAt(i))->makeDuplicate() );
+    }
+
     pathBoxTarget->duplicatePaintSettingsFrom(mFillSettings.data(),
                                               mStrokeSettings.data());
     pathBoxTarget->duplicateGradientPointsFrom(mFillGradientPoints.data(),

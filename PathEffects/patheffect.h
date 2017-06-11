@@ -12,16 +12,15 @@ enum PathEffectType : short {
 class PathEffect : public ComplexAnimator {
     Q_OBJECT
 public:
-    PathEffect(const PathEffectType &type) {
-        mPathEffectType = type;
-    }
+    PathEffect(const PathEffectType &type);
 
     virtual void updatePathEffect() = 0;
-    sk_sp<SkPathEffect> getPathEffect() {
-        return mSkPathEffect;
-    }
+    sk_sp<SkPathEffect> getPathEffect();
 
-    virtual qreal getMargin() { return 0.; }
+    virtual qreal getMargin();
+
+    virtual Property *makeDuplicate() = 0;
+    virtual void makeDuplicate(Property *target) = 0;
 protected:
     PathEffectType mPathEffectType;
     sk_sp<SkPathEffect> mSkPathEffect;
@@ -30,29 +29,19 @@ protected:
 class DiscretePathEffect : public PathEffect {
     Q_OBJECT
 public:
-    DiscretePathEffect() : PathEffect(DISCRETE_PATH_EFFECT) {
-        prp_setName("discrete effect");
-        mSegLength->prp_setName("segment length");
-        mMaxDev->prp_setName("max deviation");
+    DiscretePathEffect();
 
-        connect(mSegLength.data(), SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(updatePathEffect()));
-        connect(mMaxDev.data(), SIGNAL(valueChangedSignal(qreal)),
-                this, SLOT(updatePathEffect()));
+    qreal getMargin();
 
-        ca_addChildAnimator(mSegLength.data());
-        ca_addChildAnimator(mMaxDev.data());
-    }
+    Property *makeDuplicate();
 
-    qreal getMargin() {
-        return mMaxDev->qra_getCurrentValue();
-    }
+    void makeDuplicate(Property *target);
+
+    void duplicateAnimatorsFrom(QrealAnimator *segLen,
+                                QrealAnimator *maxDev);
+
 protected slots:
-    void updatePathEffect() {
-        mSkPathEffect = SkDiscretePathEffect::Make(
-                    mSegLength->qra_getCurrentValue(),
-                    mMaxDev->qra_getCurrentValue());
-    }
+    void updatePathEffect();
 private:
     QSharedPointer<QrealAnimator> mSegLength =
             (new QrealAnimator())->ref<QrealAnimator>();

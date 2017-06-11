@@ -11,7 +11,6 @@ public:
     void startTransform();
     void finishTransform();
     void moveByAbs(const QPointF &absTranslatione);
-    void draw(QPainter *p);
     void drawSk(SkCanvas *canvas, const SkScalar &invScale);
 private:
     QPointF mSavedAbsPos;

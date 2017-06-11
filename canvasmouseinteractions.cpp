@@ -248,7 +248,7 @@ void Canvas::handleLeftButtonMousePress() {
 
             Circle *newPath = new Circle(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
-            newPath->startAllPointsTransform();
+            //newPath->startAllPointsTransform();
             clearBoxesSelection();
             addBoxToSelection(newPath);
 
@@ -257,7 +257,7 @@ void Canvas::handleLeftButtonMousePress() {
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
             Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
-            newPath->startAllPointsTransform();
+            //newPath->startAllPointsTransform();
             clearBoxesSelection();
             addBoxToSelection(newPath);
 
@@ -547,14 +547,6 @@ void Canvas::handleMouseRelease() {
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             if(mCurrentTextBox != NULL) {
                 mCurrentTextBox->openTextEditor();
-            }
-        } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
-            if(mCurrentCircle != NULL) {
-                mCurrentCircle->finishAllPointsTransform();
-            }
-        } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-            if(mCurrentRectangle != NULL) {
-                mCurrentRectangle->finishAllPointsTransform();
             }
         }
     }

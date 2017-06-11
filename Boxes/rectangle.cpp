@@ -67,7 +67,6 @@ BoundingBox *Rectangle::createNewDuplicate(BoxesGroup *parent) {
     return new Rectangle(parent);
 }
 
-
 void Rectangle::prp_loadFromSql(const int &boundingBoxId) {
     PathBox::prp_loadFromSql(boundingBoxId);
 
@@ -169,12 +168,20 @@ void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
 }
 
 void Rectangle::updatePath() {
-    mPath = QPainterPath();
-    QPointF topPos = mTopLeftPoint->getRelativePos();
-    QPointF botPos = mBottomRightPoint->getRelativePos();
-    qreal radius = mRadiusAnimator.qra_getCurrentValue();
-    mPath.addRoundedRect(QRectF(topPos, botPos),
-                         radius, radius);
+    mPathSk = SkPath();
+    SkPoint topLeft =
+            QPointFToSkPoint(mTopLeftPoint->getCurrentPointValue());
+    SkPoint bottomRight =
+            QPointFToSkPoint(mBottomRightPoint->getCurrentPointValue());
+    mPathSk.addRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
+                                     bottomRight.x(), bottomRight.y()));
+
+//    mPath = QPainterPath();
+//    QPointF topPos = mTopLeftPoint->getRelativePos();
+//    QPointF botPos = mBottomRightPoint->getRelativePos();
+//    qreal radius = mRadiusAnimator.qra_getCurrentValue();
+//    mPath.addRoundedRect(QRectF(topPos, botPos),
+//                         radius, radius);
 
     updateOutlinePathSk();
 }

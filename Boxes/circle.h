@@ -74,7 +74,7 @@ public:
 
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
-                        const qreal &invScale);
+                        const SkScalar &invScale);
 
     void makeDuplicate(Property *targetBox) {
         PathBox::makeDuplicate(targetBox);

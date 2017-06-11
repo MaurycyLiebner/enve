@@ -371,7 +371,7 @@ CtrlPoint *PathPoint::getEndCtrlPt()
 
 void PathPoint::drawSk(SkCanvas *canvas,
                      const CanvasMode &mode,
-                     const qreal &invScale) {
+                     const SkScalar &invScale) {
     canvas->save();
     SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
     if(mSelected) {

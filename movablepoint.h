@@ -41,7 +41,7 @@ public:
 
     virtual void draw(QPainter *p);
     virtual void drawSk(SkCanvas *canvas,
-                        const qreal &invScale);
+                        const SkScalar &invScale);
 
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);

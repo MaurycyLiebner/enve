@@ -126,7 +126,7 @@ void VectorPath::showContextMenu(QPoint globalPos) {
 
 void VectorPath::drawSelectedSk(SkCanvas *canvas,
                               const CanvasMode &currentCanvasMode,
-                              const qreal &invScale) {
+                              const SkScalar &invScale) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
         drawBoundingRectSk(canvas, invScale);
