@@ -38,6 +38,10 @@ PathBox::PathBox(BoxesGroup *parent,
     mFillSettings->setPaintPathTarget(this);
 
     schedulePathUpdate();
+
+    mPathEffectsAnimators->prp_setName("path effects");
+    mPathEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
+    mPathEffectsAnimators->prp_blockUpdater();
 }
 
 PathBox::~PathBox() {
@@ -47,6 +51,11 @@ PathBox::~PathBox() {
     if(mStrokeSettings->getGradient() != NULL) {
         mStrokeSettings->getGradient()->removePath(this);
     }
+}
+
+void PathBox::updateEffectsMargin() {
+    mEffectsMargin = mEffectsAnimators->getEffectsMargin() +
+                        mPathEffectsAnimators->getEffectsMargin();
 }
 
 #include <QSqlError>
@@ -138,10 +147,10 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
 void PathBox::addPathEffect(PathEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
 
-    if(!mEffectsAnimators->hasChildAnimators()) {
-        ca_addChildAnimator(mEffectsAnimators.data());
+    if(!mPathEffectsAnimators->hasChildAnimators()) {
+        ca_addChildAnimator(mPathEffectsAnimators.data());
     }
-    mEffectsAnimators->ca_addChildAnimator(effect);
+    mPathEffectsAnimators->ca_addChildAnimator(effect);
     //effect->setParentEffectAnimators(mEffectsAnimators.data());
 
     //scheduleEffectsMarginUpdate();
@@ -412,17 +421,16 @@ void PathBox::setUpdateVars() {
 void PathBox::drawSk(SkCanvas *canvas) {
     canvas->save();
 
+    SkPaint paint;
+    paint.setAntiAlias(true);
+    mPathEffectsAnimators->applyEffectsSk(&paint);
     if(!mUpdatePathSk.isEmpty()) {
-        SkPaint paint;
-        paint.setAntiAlias(true);
         mUpdateFillSettings.applyPainterSettingsSk(&paint);
         paint.setStyle(SkPaint::kFill_Style);
 
         canvas->drawPath(mUpdatePathSk, paint);
     }
     if(!mUpdateOutlinePathSk.isEmpty()) {
-        SkPaint paint;
-        paint.setAntiAlias(true);
         mUpdateStrokeSettings.applyPainterSettingsSk(&paint);
         paint.setStyle(SkPaint::kFill_Style);
 

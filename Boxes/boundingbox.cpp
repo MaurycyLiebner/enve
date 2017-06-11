@@ -145,8 +145,18 @@ void BoundingBox::applyEffects(QImage *im,
     }
 }
 
+//#include <CImg.h>
+//using namespace cimg_library;
 void BoundingBox::applyEffectsSk(const SkBitmap &im,
                                  const qreal &scale) {
+//    SkPixmap pixmap1;
+//    im.peekPixels(&pixmap1);
+//    CImg<unsigned char> cimg =
+//           CImg<unsigned char>(
+//                (unsigned char*)pixmap1.writable_addr(),
+//                pixmap1.width(), pixmap1.height(),
+//                1, 4, true);
+//    cimg.blur(10.);
     if(mEffectsAnimators->hasChildAnimators()) {
         SkPixmap pixmap;
         im.peekPixels(&pixmap);

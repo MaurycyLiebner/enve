@@ -13,7 +13,7 @@ public:
 
     void applyEffectsSk(SkPaint *paint);
 
-    //qreal getEffectsMargin() const;
+    qreal getEffectsMargin() const;
 
 //    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
 //    void prp_loadFromSql(const int &boundingBoxSqlId);

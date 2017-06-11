@@ -21,7 +21,7 @@ class Canvas;
 class MovablePoint;
 
 class PathPoint;
-
+class PathEffect;
 class PathAnimator;
 class DurationRectangleMovable;
 
@@ -440,7 +440,7 @@ public:
                       const qreal &drawY,
                       const int &startFrame,
                       const int &endFrame);
-
+    virtual void addPathEffect(PathEffect *) {}
 protected:
     void updateDrawRenderContainerTransform();
     virtual void scheduleUpdate();
@@ -509,8 +509,6 @@ protected:
     bool mLocked = false;
 
     bool mForceUpdate = false;
-
-    QImage mRenderPixmap;
 signals:
     void replaceChacheSet();
     void scheduledUpdate();

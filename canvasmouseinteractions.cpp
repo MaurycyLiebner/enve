@@ -120,6 +120,9 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             effectsMenu->addAction("Desaturate");
             effectsMenu->addAction("Alpha Matte");
 
+            QMenu *pathEffectsMenu = menu.addMenu("Path Effects");
+            pathEffectsMenu->addAction("Discrete Effect");
+
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
                 if(selectedAction->text() == "Duplicate") {
@@ -156,6 +159,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     applyDesaturateEffectToSelected();
                 } else if(selectedAction->text() == "Alpha Matte") {
                     applyAlphaMatteToSelected();
+                } else if(selectedAction->text() == "Discrete Effect") {
+                    applyDiscretePathEffectToSelected();
                 }
             } else {
 

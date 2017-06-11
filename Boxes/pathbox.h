@@ -87,6 +87,7 @@ public:
     bool SWT_isPathBox() { return true; }
 
     void addPathEffect(PathEffect *effect);
+    void updateEffectsMargin();
 protected:
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     GradientPointsQSPtr mFillGradientPoints;

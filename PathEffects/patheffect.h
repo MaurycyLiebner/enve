@@ -21,6 +21,7 @@ public:
         return mSkPathEffect;
     }
 
+    virtual qreal getMargin() { return 0.; }
 protected:
     PathEffectType mPathEffectType;
     sk_sp<SkPathEffect> mSkPathEffect;
@@ -30,6 +31,7 @@ class DiscretePathEffect : public PathEffect {
     Q_OBJECT
 public:
     DiscretePathEffect() : PathEffect(DISCRETE_PATH_EFFECT) {
+        prp_setName("discrete effect");
         mSegLength->prp_setName("segment length");
         mMaxDev->prp_setName("max deviation");
 
@@ -40,6 +42,10 @@ public:
 
         ca_addChildAnimator(mSegLength.data());
         ca_addChildAnimator(mMaxDev.data());
+    }
+
+    qreal getMargin() {
+        return mMaxDev->qra_getCurrentValue();
     }
 protected slots:
     void updatePathEffect() {

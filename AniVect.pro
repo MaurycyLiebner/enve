@@ -35,7 +35,7 @@ CONFIG(debug, debug|release) {
 }
 
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -lSDL2 -lSDL2_image \
-        -lSDL2_ttf -lfontconfig
+        -lSDL2_ttf -lfontconfig# -lX11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

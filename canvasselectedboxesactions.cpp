@@ -84,6 +84,12 @@ void Canvas::applyDesaturateEffectToSelected() {
         box->addEffect(new DesaturateEffect());
     }
 }
+#include "PathEffects/patheffect.h"
+void Canvas::applyDiscretePathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addPathEffect(new DiscretePathEffect());
+    }
+}
 
 void Canvas::resetSelectedTranslation() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
