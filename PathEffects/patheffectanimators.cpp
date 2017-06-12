@@ -64,12 +64,12 @@ PathEffectAnimators::PathEffectAnimators() :
 //    }
 //}
 
-void PathEffectAnimators::applyEffectsSk(SkPaint *paint) {
-    updatePathEffectsSum();
-    if(hasEffects()) {
-        paint->setPathEffect(mPathEffectsSum);
-    }
-}
+//void PathEffectAnimators::applyEffectsSk(SkPaint *paint) {
+//    updatePathEffectsSum();
+//    if(hasEffects()) {
+//        paint->setPathEffect(mPathEffectsSum);
+//    }
+//}
 
 qreal PathEffectAnimators::getEffectsMargin() const {
     qreal newMargin = 0.;
@@ -86,22 +86,13 @@ bool PathEffectAnimators::hasEffects() {
 
 bool PathEffectAnimators::SWT_isEffectAnimators() { return true; }
 
-void PathEffectAnimators::updatePathEffectsSum() {
-    if(hasChildAnimators()) {
-        mPathEffectsSum =
-                ((PathEffect*)ca_mChildAnimators.first().data())->
-                getPathEffect();
-        for(int i = 1; i < ca_mChildAnimators.count(); i++) {
-            const QSharedPointer<Property> &effect =
-                    ca_mChildAnimators.at(i);
-            mPathEffectsSum =
-                    SkPathEffect::MakeCompose(
-                        ((PathEffect*)effect.data())->getPathEffect(),
-                        mPathEffectsSum);
-        }
-    } else {
-        mPathEffectsSum.reset();
+void PathEffectAnimators::filterPath(SkPath *srcDstPath) {
+    SkPath dstPath = *srcDstPath;
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        SkPath srcPath = dstPath;
+        ((PathEffect*)effect.data())->filterPath(srcPath, &dstPath);
     }
+    *srcDstPath = dstPath;
 }
 
 //void PathEffectAnimators::makeDuplicate(Property *target) {

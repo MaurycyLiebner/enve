@@ -96,8 +96,6 @@ void VectorPath::updatePath() {
 
     mPathAnimator->updatePath();
     mPathSk = mPathAnimator->getCurrentSkPath();
-
-    updateOutlinePathSk();
 }
 
 #include <QMenu>

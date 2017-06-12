@@ -187,7 +187,6 @@ void Circle::updatePath() {
     mPathSk.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
                                      2*xRadius, 2*yRadius));
 
-    updateOutlinePathSk();
 }
 
 CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,

@@ -183,7 +183,6 @@ void Rectangle::updatePath() {
 //    mPath.addRoundedRect(QRectF(topPos, botPos),
 //                         radius, radius);
 
-    updateOutlinePathSk();
 }
 
 RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :

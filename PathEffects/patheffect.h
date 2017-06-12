@@ -14,22 +14,19 @@ class PathEffect : public ComplexAnimator {
 public:
     PathEffect(const PathEffectType &type);
 
-    virtual void updatePathEffect() = 0;
-    sk_sp<SkPathEffect> getPathEffect();
-
     virtual qreal getMargin();
 
     virtual Property *makeDuplicate() = 0;
     virtual void makeDuplicate(Property *target) = 0;
+    virtual void filterPath(const SkPath &, SkPath *) = 0;
 protected:
     PathEffectType mPathEffectType;
-    sk_sp<SkPathEffect> mSkPathEffect;
 };
 
-class DiscretePathEffect : public PathEffect {
+class DisplacePathEffect : public PathEffect {
     Q_OBJECT
 public:
-    DiscretePathEffect();
+    DisplacePathEffect();
 
     qreal getMargin();
 
@@ -40,13 +37,15 @@ public:
     void duplicateAnimatorsFrom(QrealAnimator *segLen,
                                 QrealAnimator *maxDev);
 
-protected slots:
-    void updatePathEffect();
+    void filterPath(const SkPath &src, SkPath *dst);
 private:
     QSharedPointer<QrealAnimator> mSegLength =
             (new QrealAnimator())->ref<QrealAnimator>();
     QSharedPointer<QrealAnimator> mMaxDev =
             (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QrealAnimator> mSmoothness =
+            (new QrealAnimator())->ref<QrealAnimator>();
+    uint32_t mSeedAssist = 0;
 };
 
 #endif // PATHEFFECT_H

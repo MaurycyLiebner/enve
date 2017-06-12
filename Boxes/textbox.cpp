@@ -144,6 +144,4 @@ void TextBox::updatePath() {
 
     QRectF boundingRect = mPath.boundingRect();
     mPath.translate(-boundingRect.center());
-
-    updateOutlinePathSk();
 }

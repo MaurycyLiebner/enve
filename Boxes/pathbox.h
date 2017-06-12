@@ -31,7 +31,8 @@ public:
 
     virtual void setStrokeWidth(qreal strokeWidth, bool finish);
 
-    void setOutlineCompositionMode(QPainter::CompositionMode compositionMode);
+    void setOutlineCompositionMode(
+            const QPainter::CompositionMode &compositionMode);
 
     void startSelectedStrokeWidthTransform();
 

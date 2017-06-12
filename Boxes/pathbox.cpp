@@ -13,6 +13,8 @@ PathBox::PathBox(BoxesGroup *parent,
     BoundingBox(parent, type) {
     mPathEffectsAnimators =
             (new PathEffectAnimators())->ref<PathEffectAnimators>();
+    mPathEffectsAnimators->prp_setBlockedUpdater(
+                new PathPointUpdater(this));
     mStrokeGradientPoints =
             (new GradientPoints)->ref<GradientPoints>();
     mFillGradientPoints =
@@ -26,10 +28,10 @@ PathBox::PathBox(BoxesGroup *parent,
     mFillGradientPoints->initialize(this);
     mStrokeGradientPoints->initialize(this);
 
-    mFillGradientPoints->prp_setUpdater(new GradientPointsUpdater(true, this));
-    mFillGradientPoints->prp_blockUpdater();
-    mStrokeGradientPoints->prp_setUpdater(new GradientPointsUpdater(false, this));
-    mStrokeGradientPoints->prp_blockUpdater();
+    mFillGradientPoints->prp_setBlockedUpdater(
+                new GradientPointsUpdater(true, this));
+    mStrokeGradientPoints->prp_setBlockedUpdater(
+                new GradientPointsUpdater(false, this));
 
     mFillSettings->setGradientPoints(mFillGradientPoints.data());
     mStrokeSettings->setGradientPoints(mStrokeGradientPoints.data());
@@ -91,15 +93,23 @@ void PathBox::prp_loadFromSql(const int &boundingBoxId) {
             QString::number(boundingBoxId);
     if(query.exec(queryStr) ) {
         query.next();
-        int idfillgradientpointsid = query.record().indexOf("fillgradientpointsid");
-        int idstrokegradientpointsid = query.record().indexOf("strokegradientpointsid");
-        int idfillsettingsid = query.record().indexOf("fillsettingsid");
-        int idstrokesettingsid = query.record().indexOf("strokesettingsid");
+        int idfillgradientpointsid =
+                query.record().indexOf("fillgradientpointsid");
+        int idstrokegradientpointsid =
+                query.record().indexOf("strokegradientpointsid");
+        int idfillsettingsid =
+                query.record().indexOf("fillsettingsid");
+        int idstrokesettingsid =
+                query.record().indexOf("strokesettingsid");
 
-        int fillGradientPointsId = query.value(idfillgradientpointsid).toInt();
-        int strokeGradientPointsId = query.value(idstrokegradientpointsid).toInt();
-        int fillSettingsId = query.value(idfillsettingsid).toInt();
-        int strokeSettingsId = query.value(idstrokesettingsid).toInt();
+        int fillGradientPointsId =
+                query.value(idfillgradientpointsid).toInt();
+        int strokeGradientPointsId =
+                query.value(idstrokegradientpointsid).toInt();
+        int fillSettingsId =
+                query.value(idfillsettingsid).toInt();
+        int strokeSettingsId =
+                query.value(idstrokesettingsid).toInt();
 
 
         mFillGradientPoints->prp_loadFromSql(fillGradientPointsId);
@@ -115,6 +125,8 @@ void PathBox::prp_loadFromSql(const int &boundingBoxId) {
 void PathBox::updatePathIfNeeded() {
     if(mPathUpdateNeeded) {
         updatePath();
+        mPathEffectsAnimators->filterPath(&mPathSk);
+        updateOutlinePathSk();
         if(!prp_hasKeys() &&
            !mPivotChanged ) {
             centerPivotPosition();
@@ -191,7 +203,8 @@ void PathBox::setStrokeWidth(qreal strokeWidth, bool finish) {
     //scheduleOutlinePathUpdate();
 }
 
-void PathBox::setOutlineCompositionMode(QPainter::CompositionMode compositionMode) {
+void PathBox::setOutlineCompositionMode(
+        const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
     clearAllCache();
     scheduleSoftUpdate();
@@ -433,7 +446,7 @@ void PathBox::drawSk(SkCanvas *canvas) {
 
     SkPaint paint;
     paint.setAntiAlias(true);
-    mPathEffectsAnimators->applyEffectsSk(&paint);
+    //mPathEffectsAnimators->applyEffectsSk(&paint);
     if(!mUpdatePathSk.isEmpty()) {
         mUpdateFillSettings.applyPainterSettingsSk(&paint);
         paint.setStyle(SkPaint::kFill_Style);
