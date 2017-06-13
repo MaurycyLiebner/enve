@@ -2,11 +2,14 @@
 #define PATHEFFECT_H
 #include "Animators/complexanimator.h"
 #include "Animators/qrealanimator.h"
+#include "Animators/qpointfanimator.h"
+#include "Animators/intanimator.h"
 #include "skiaincludes.h"
 
 enum PathEffectType : short {
     DISCRETE_PATH_EFFECT,
-    DASH_PATH_EFFECT
+    DASH_PATH_EFFECT,
+    DUPLICATE_PATH_EFFECT
 };
 
 class PathEffect : public ComplexAnimator {
@@ -46,6 +49,31 @@ private:
     QSharedPointer<QrealAnimator> mSmoothness =
             (new QrealAnimator())->ref<QrealAnimator>();
     uint32_t mSeedAssist = 0;
+};
+
+class DuplicatePathEffect : public PathEffect {
+    Q_OBJECT
+public:
+    DuplicatePathEffect();
+
+    qreal getMargin();
+
+    Property *makeDuplicate();
+
+    void makeDuplicate(Property *target);
+
+    void duplicateAnimatorsFrom(IntAnimator *nDupl,
+                                QrealAnimator *maxDis);
+
+    void filterPath(const SkPath &src, SkPath *dst);
+private slots:
+    void updateDisplacements();
+private:
+    QList<QPointF> mDisplacements;
+    QSharedPointer<IntAnimator> mNumberDuplicates =
+            (new IntAnimator())->ref<IntAnimator>();
+    QSharedPointer<QrealAnimator> mMaxDisplacement =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 #endif // PATHEFFECT_H

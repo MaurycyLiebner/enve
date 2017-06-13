@@ -122,6 +122,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
             QMenu *pathEffectsMenu = menu.addMenu("Path Effects");
             pathEffectsMenu->addAction("Discrete Effect");
+            pathEffectsMenu->addAction("Duplicate Effect");
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
@@ -161,6 +162,8 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     applyAlphaMatteToSelected();
                 } else if(selectedAction->text() == "Discrete Effect") {
                     applyDiscretePathEffectToSelected();
+                } else if(selectedAction->text() == "Duplicate Effect") {
+                    applyDuplicatePathEffectToSelected();
                 }
             } else {
 

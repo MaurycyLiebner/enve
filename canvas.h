@@ -374,6 +374,7 @@ public:
     void drawInputText(QPainter *p);
     QPointF mapCanvasAbsToRel(const QPointF &pos);
     void applyDiscretePathEffectToSelected();
+    void applyDuplicatePathEffectToSelected();
 private:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;

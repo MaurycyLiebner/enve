@@ -56,14 +56,6 @@ static void Perterb(SkPoint* p,
     *p += normal;
 }
 
-static void makeTangent(SkPoint* p,
-                        const SkVector& tangent,
-                        SkScalar scale) {
-    SkVector normal = tangent;
-    normal.setLength(scale);
-    *p += normal;
-}
-
 class LCGRandom {
 public:
     LCGRandom(uint32_t seed) : fSeed(seed) {}
@@ -108,7 +100,7 @@ void getC1AndC2(const SkPoint &lastP,
     vectP.set(vectP.y(), -vectP.x());
     if(vectP.dot(lastP - currP) > 0) vectP.negate();
 
-    SkScalar nextDist = (currP - nextP).length()*0.5f;
+    SkScalar nextDist = (currP - nextP).length()*0.4f;
     if(smoothLen < nextDist) {
         vectP.setLength(smoothLen);
     } else {
@@ -288,4 +280,60 @@ void DisplacePathEffect::filterPath(const SkPath &src,
                        mSegLength->qra_getCurrentValue(),
                        mSmoothness->qra_getCurrentValue(),
                        mSeedAssist);
+}
+
+DuplicatePathEffect::DuplicatePathEffect() :
+    PathEffect(DUPLICATE_PATH_EFFECT) {
+    prp_setName("duplicate effect");
+
+    mNumberDuplicates->prp_setName("number");
+    mNumberDuplicates->qra_setValueRange(0., 10.);
+    mMaxDisplacement->prp_setName("max displacement");
+    mMaxDisplacement->qra_setValueRange(0., 1000.);
+
+    ca_addChildAnimator(mNumberDuplicates.data());
+    ca_addChildAnimator(mMaxDisplacement.data());
+
+    connect(mNumberDuplicates.data(), SIGNAL(valueChangedSignal(qreal)),
+            this, SLOT(updateDisplacements()));
+}
+
+qreal DuplicatePathEffect::getMargin() {
+    return mMaxDisplacement->qra_getCurrentValue();
+}
+
+Property *DuplicatePathEffect::makeDuplicate() {
+    DuplicatePathEffect *newEffect = new DuplicatePathEffect();
+    makeDuplicate(newEffect);
+    return newEffect;
+}
+
+void DuplicatePathEffect::makeDuplicate(Property *target) {
+    DuplicatePathEffect *effectTarget = (DuplicatePathEffect*)target;
+
+    effectTarget->duplicateAnimatorsFrom(mNumberDuplicates.data(),
+                                         mMaxDisplacement.data());
+}
+
+void DuplicatePathEffect::duplicateAnimatorsFrom(IntAnimator *nDupl,
+                                                 QrealAnimator *maxDis) {
+    nDupl->makeDuplicate(mNumberDuplicates.data());
+    maxDis->makeDuplicate(mMaxDisplacement.data());
+}
+#include "pointhelpers.h"
+void DuplicatePathEffect::filterPath(const SkPath &src,
+                                    SkPath *dst) {
+    *dst = src;
+    qreal maxDisp = mMaxDisplacement->qra_getCurrentValue();
+    for(int i = 0; i < mNumberDuplicates->getCurrentIntValue(); i++) {
+        QPointF currDisp = mDisplacements.at(i)*maxDisp;
+        dst->addPath(src, currDisp.x(), currDisp.y());
+    }
+}
+
+void DuplicatePathEffect::updateDisplacements() {
+    mDisplacements.clear();
+    for(int i = 0; i < mNumberDuplicates->getCurrentIntValue(); i++) {
+        mDisplacements << QPointF(qRandF(0., 1.), qRandF(0., 1.));
+    }
 }
