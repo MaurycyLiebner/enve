@@ -95,6 +95,38 @@ private:
     uint32_t fSeed;
 };
 
+void getC1AndC2(const SkPoint &lastP,
+                const SkPoint &currP,
+                const SkPoint &nextP,
+                SkPoint *c1, SkPoint *c2,
+                const SkScalar &smoothLen) {
+    SkPoint sLastP = lastP - currP;
+    sLastP.setLength(1.f);
+    SkPoint sNextP = nextP - currP;
+    sNextP.setLength(1.f);
+    SkPoint vectP = (sLastP + sNextP)*0.5f;
+    vectP.set(vectP.y(), -vectP.x());
+    if(vectP.dot(lastP - currP) > 0) vectP.negate();
+
+    SkScalar nextDist = (currP - nextP).length()*0.5f;
+    if(smoothLen < nextDist) {
+        vectP.setLength(smoothLen);
+    } else {
+        vectP.setLength(nextDist);
+    }
+
+    *c1 = currP + vectP;
+
+    vectP.negate();
+    SkScalar lastDist = (currP - lastP).length()*0.5f;
+    if(smoothLen < lastDist) {
+        vectP.setLength(smoothLen);
+    } else {
+        vectP.setLength(lastDist);
+    }
+    *c2 = currP + vectP;
+}
+
 bool displaceFilterPath(SkPath* dst, const SkPath& src,
                         const SkScalar &maxDev,
                         const SkScalar &segLen,
@@ -144,13 +176,18 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
             }
         } while (meas.nextContour());
     } else {
-        SkPoint c1;
-        SkPoint c2;
+        SkPoint firstP;
+        SkPoint secondP;
+        SkPoint thirdP;
         SkPoint lastP;
         SkPoint nextP;
+        SkPoint currP;
+        SkPoint lastC1;
+        SkPoint c1;
+        SkPoint c2;
 
         do {
-            SkScalar smoothLen = smoothness * segLen * 0.4f;
+            SkScalar smoothLen = smoothness * segLen * 0.5f;
             SkScalar length = meas.getLength();
 
             if(segLen * (2/* + doFill*/) > length) {
@@ -165,26 +202,77 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                     distance += delta/2;
                 }
 
-                if(meas.getPosTan(distance, &p, &v)) {
-                    Perterb(&p, v, rand.nextSScalar1() * scale);
-                    dst->moveTo(p);
-                    c1 = p;
+                if(meas.getPosTan(distance, &firstP, &v)) {
+                    Perterb(&firstP, v, rand.nextSScalar1() * scale);
+                    lastP = firstP;
                 }
+
+                if(meas.isClosed()) {
+                    distance += delta;
+                    if(meas.getPosTan(distance, &currP, &v)) {
+                        Perterb(&currP, v, rand.nextSScalar1() * scale);
+                        n--;
+                        secondP = currP;
+                    }
+                    distance += delta;
+                    if(meas.getPosTan(distance, &nextP, &v)) {
+                        Perterb(&nextP, v, rand.nextSScalar1() * scale);
+                        n--;
+                        thirdP = nextP;
+
+                        getC1AndC2(lastP, currP, nextP,
+                                   &c1, &c2, smoothLen);
+
+                        lastC1 = c1;
+
+                        lastP = currP;
+                        currP = nextP;
+                    }
+                } else {
+                    currP = lastP;
+                    lastC1 = currP;
+                }
+                dst->moveTo(lastP);
                 while(--n >= 0) {
                     distance += delta;
-                    if(meas.getPosTan(distance, &p, &v)) {
-                        Perterb(&p, v, rand.nextSScalar1() * scale);
-                        SkPoint newC1 = p;
-                        makeTangent(&newC1, v, smoothLen);
-                        c2 = p;
-                        v.negate();
-                        makeTangent(&c2, v, smoothLen);
+                    if(meas.getPosTan(distance, &nextP, &v)) {
+                        Perterb(&nextP, v, rand.nextSScalar1() * scale);
+                        getC1AndC2(lastP, currP, nextP,
+                                   &c1, &c2, smoothLen);
 
-                        dst->cubicTo(c1, c2, p);
-                        c1 = newC1;
+
+                        dst->cubicTo(lastC1, c2, currP);
+                        lastC1 = c1;
+
+                        lastP = currP;
+                        currP = nextP;
                     }
                 }
+
+                nextP = firstP;
+                getC1AndC2(lastP, currP, nextP,
+                           &c1, &c2, smoothLen);
+                dst->cubicTo(lastC1, c2, currP);
                 if(meas.isClosed()) {
+                    lastC1 = c1;
+
+                    lastP = currP;
+                    currP = nextP;
+                    nextP = secondP;
+
+                    getC1AndC2(lastP, currP, nextP,
+                               &c1, &c2, smoothLen);
+
+                    dst->cubicTo(lastC1, c2, currP);
+                    lastC1 = c1;
+
+                    lastP = currP;
+                    currP = nextP;
+                    nextP = thirdP;
+                    getC1AndC2(lastP, currP, nextP,
+                               &c1, &c2, smoothLen);
+                    dst->cubicTo(lastC1, c2, currP);
+
                     dst->close();
                 }
             }
