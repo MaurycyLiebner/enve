@@ -97,6 +97,18 @@ void Canvas::applyDuplicatePathEffectToSelected() {
     }
 }
 
+void Canvas::applyDiscreteOutlinePathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addOutlinePathEffect(new DisplacePathEffect());
+    }
+}
+
+void Canvas::applyDuplicateOutlinePathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addOutlinePathEffect(new DuplicatePathEffect());
+    }
+}
+
 void Canvas::resetSelectedTranslation() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->resetTranslation();

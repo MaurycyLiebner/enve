@@ -216,8 +216,8 @@ void QrealAnimator::qra_setCurrentValue(qreal newValue,
     if(saveUndoRedo) {
         prp_startTransform();
         mCurrentValue = newValue;
-        prp_finishTransform();
         emit valueChangedSignal(mCurrentValue);
+        prp_finishTransform();
         return;
     }
 

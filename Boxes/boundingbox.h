@@ -389,7 +389,6 @@ public:
         Q_UNUSED(path);
     }
 
-    void applyEffects(QImage *im, const qreal &scale = 1.);
     void applyEffectsSk(const SkBitmap &im, const qreal &scale = 1.);
 
     virtual QMatrix getCombinedTransform() const;
@@ -441,7 +440,29 @@ public:
                       const int &startFrame,
                       const int &endFrame);
     virtual void addPathEffect(PathEffect *) {}
+    virtual void addOutlinePathEffect(PathEffect *) {}
+
+    void setCustomFpsEnabled(const bool &bT) {
+        mCustomFpsEnabled = bT;
+    }
+
+    void enableCustomFps() {
+        setCustomFpsEnabled(true);
+    }
+
+    void disableCustomFps() {
+        setCustomFpsEnabled(false);
+    }
+
+    void setCustomFps(const qreal &customFps) {
+        mCustomFps = customFps;
+    }
+
+
 protected:
+    bool mCustomFpsEnabled = false;
+    qreal mCustomFps = 24.;
+
     void updateDrawRenderContainerTransform();
     virtual void scheduleUpdate();
 

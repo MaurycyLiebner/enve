@@ -123,6 +123,8 @@ public:
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
+    void openSettingsWindowForCurrentCanvas();
 protected:
     bool mMouseGrabber = false;
     bool mHasFocus = false;

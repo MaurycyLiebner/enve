@@ -281,6 +281,22 @@ public:
     void addChildAwaitingUpdate(BoundingBox *child);
 
     void renderSk(SkCanvas *canvas);
+
+    void setCanvasSize(const int &width, const int &height) {
+        mWidth = width;
+        mHeight = height;
+        fitCanvasToSize();
+    }
+
+    int getCanvasWidth() const {
+        return mWidth;
+    }
+
+    int getCanvasHeight() const {
+        return mHeight;
+    }
+
+    void setMaxFrame(const int &frame);
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        Q_FOREACH(BoundingBox *child, mChildBoxes) {
@@ -375,6 +391,11 @@ public:
     QPointF mapCanvasAbsToRel(const QPointF &pos);
     void applyDiscretePathEffectToSelected();
     void applyDuplicatePathEffectToSelected();
+    void applyDiscreteOutlinePathEffectToSelected();
+    void applyDuplicateOutlinePathEffectToSelected();
+
+    const qreal &getFps() const { return mFps; }
+    void setFps(const qreal &fps) { mFps = fps; }
 private:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
@@ -445,6 +466,8 @@ private:
 
     int mWidth;
     int mHeight;
+
+    qreal mFps = 24.;
 
     qreal mVisibleWidth;
     qreal mVisibleHeight;

@@ -138,14 +138,6 @@ bool BoundingBox::isAncestor(BoundingBox *box) const {
     return false;
 }
 
-void BoundingBox::applyEffects(QImage *im,
-                               const qreal &scale) {
-    if(mEffectsAnimators->hasChildAnimators()) {
-        fmt_filters::image img(im->bits(), im->width(), im->height());
-        mEffectsAnimators->applyEffects(this, im, img, scale);
-    }
-}
-
 //#include <CImg.h>
 //using namespace cimg_library;
 void BoundingBox::applyEffectsSk(const SkBitmap &im,
@@ -396,7 +388,7 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
         SkPaint paint;
         paint.setAlpha(qMin(255,
                             qMax(0,
-                                 (int)(mTransformAnimator->getOpacity()*255))));
+                                 (int)(mTransformAnimator->getOpacity()*2.55))));
         paint.setBlendMode(mBlendModeSk);
         //paint.setFilterQuality(kHigh_SkFilterQuality);
         mDrawRenderContainer.drawSk(canvas, &paint);

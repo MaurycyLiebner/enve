@@ -10,6 +10,7 @@
 #include "global.h"
 #include "canvaswidget.h"
 #include "RenderWidget/renderinstancesettings.h"
+#include "newcanvasdialog.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -24,7 +25,6 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mPaintControlerThread->start();
 
     mPreviewFPSTimer = new QTimer(this);
-    mPreviewFPSTimer->setInterval(1000/24.);
 
     initializeAudio();
 
@@ -246,6 +246,15 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 void CanvasWindow::keyPressEvent(QKeyEvent *event) {
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->keyPressEvent(event);
+}
+
+void CanvasWindow::openSettingsWindowForCurrentCanvas() {
+    if(hasNoCanvas()) return;
+    CanvasSettingsDialog dialog(mCurrentCanvas, mCanvasWidget);
+
+    if(dialog.exec() == QDialog::Accepted) {
+        dialog.applySettingsToCanvas(mCurrentCanvas);
+    }
 }
 
 bool CanvasWindow::processUnfilteredKeyEvent(QKeyEvent *event) {
@@ -684,8 +693,9 @@ void CanvasWindow::playPreview() {
                                 mCurrentRenderFrame);
     mCurrentSoundComposition->generateData(mSavedCurrentFrame,
                                            mCurrentRenderFrame,
-                                           24);
+                                           mCurrentCanvas->getFps());
     startAudio();
+    mPreviewFPSTimer->setInterval(1000/mCurrentCanvas->getFps());
     mPreviewFPSTimer->start();
     MainWindow::getInstance()->previewBeingPlayed();
 }

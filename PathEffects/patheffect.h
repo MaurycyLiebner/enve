@@ -62,18 +62,13 @@ public:
 
     void makeDuplicate(Property *target);
 
-    void duplicateAnimatorsFrom(IntAnimator *nDupl,
-                                QrealAnimator *maxDis);
+    void duplicateAnimatorsFrom(QPointFAnimator *trans);
 
     void filterPath(const SkPath &src, SkPath *dst);
-private slots:
-    void updateDisplacements();
+
 private:
-    QList<QPointF> mDisplacements;
-    QSharedPointer<IntAnimator> mNumberDuplicates =
-            (new IntAnimator())->ref<IntAnimator>();
-    QSharedPointer<QrealAnimator> mMaxDisplacement =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<QPointFAnimator> mTranslation =
+            (new QPointFAnimator())->ref<QPointFAnimator>();
 };
 
 #endif // PATHEFFECT_H

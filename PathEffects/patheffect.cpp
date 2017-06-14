@@ -286,20 +286,14 @@ DuplicatePathEffect::DuplicatePathEffect() :
     PathEffect(DUPLICATE_PATH_EFFECT) {
     prp_setName("duplicate effect");
 
-    mNumberDuplicates->prp_setName("number");
-    mNumberDuplicates->qra_setValueRange(0., 10.);
-    mMaxDisplacement->prp_setName("max displacement");
-    mMaxDisplacement->qra_setValueRange(0., 1000.);
+    mTranslation->prp_setName("translation");
 
-    ca_addChildAnimator(mNumberDuplicates.data());
-    ca_addChildAnimator(mMaxDisplacement.data());
-
-    connect(mNumberDuplicates.data(), SIGNAL(valueChangedSignal(qreal)),
-            this, SLOT(updateDisplacements()));
+    ca_addChildAnimator(mTranslation.data());
 }
 
 qreal DuplicatePathEffect::getMargin() {
-    return mMaxDisplacement->qra_getCurrentValue();
+    return qMax(mTranslation->getXValue(),
+                mTranslation->getYValue());
 }
 
 Property *DuplicatePathEffect::makeDuplicate() {
@@ -311,29 +305,17 @@ Property *DuplicatePathEffect::makeDuplicate() {
 void DuplicatePathEffect::makeDuplicate(Property *target) {
     DuplicatePathEffect *effectTarget = (DuplicatePathEffect*)target;
 
-    effectTarget->duplicateAnimatorsFrom(mNumberDuplicates.data(),
-                                         mMaxDisplacement.data());
+    effectTarget->duplicateAnimatorsFrom(mTranslation.data());
 }
 
-void DuplicatePathEffect::duplicateAnimatorsFrom(IntAnimator *nDupl,
-                                                 QrealAnimator *maxDis) {
-    nDupl->makeDuplicate(mNumberDuplicates.data());
-    maxDis->makeDuplicate(mMaxDisplacement.data());
+void DuplicatePathEffect::duplicateAnimatorsFrom(QPointFAnimator *trans) {
+    trans->makeDuplicate(mTranslation.data());
 }
-#include "pointhelpers.h"
+
 void DuplicatePathEffect::filterPath(const SkPath &src,
                                     SkPath *dst) {
     *dst = src;
-    qreal maxDisp = mMaxDisplacement->qra_getCurrentValue();
-    for(int i = 0; i < mNumberDuplicates->getCurrentIntValue(); i++) {
-        QPointF currDisp = mDisplacements.at(i)*maxDisp;
-        dst->addPath(src, currDisp.x(), currDisp.y());
-    }
-}
-
-void DuplicatePathEffect::updateDisplacements() {
-    mDisplacements.clear();
-    for(int i = 0; i < mNumberDuplicates->getCurrentIntValue(); i++) {
-        mDisplacements << QPointF(qRandF(0., 1.), qRandF(0., 1.));
-    }
+    dst->addPath(src,
+                 mTranslation->getXValue(),
+                 mTranslation->getYValue());
 }

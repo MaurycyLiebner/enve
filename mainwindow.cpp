@@ -515,7 +515,7 @@ MainWindow *MainWindow::getInstance()
 void MainWindow::createNewCanvas() {
     QString defName = "Canvas " +
             QString::number(mCurrentCanvasComboBox->count());
-    NewCanvasDialog dialog(defName, this);
+    CanvasSettingsDialog dialog(defName, this);
 
     if(dialog.exec() == QDialog::Accepted) {
         Canvas *newCanvas = new Canvas(getFillStrokeSettings(),
@@ -524,7 +524,7 @@ void MainWindow::createNewCanvas() {
                                        dialog.getCanvasHeight(),
                                        dialog.getCanvasFrameCount());
 
-        newCanvas->setName(dialog.getCanvasName());
+        dialog.applySettingsToCanvas(newCanvas);
 
         addCanvas(newCanvas);
     }

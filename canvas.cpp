@@ -396,6 +396,10 @@ void Canvas::renderSk(SkCanvas *canvas) {
     }
 }
 
+void Canvas::setMaxFrame(const int &frame) {
+    mMaxFrame = frame;
+}
+
 void Canvas::drawInputText(QPainter *p) {
     if(mInputTransformationEnabled) {
         QRect inputRect = QRect(2*MIN_WIDGET_HEIGHT,

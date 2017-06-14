@@ -6,16 +6,29 @@
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QLabel>
+class Canvas;
 
-class NewCanvasDialog : public QDialog
+class CanvasSettingsDialog : public QDialog
 {
 public:
-    NewCanvasDialog(const QString &defName, QWidget *parent = NULL);
+    CanvasSettingsDialog(Canvas *canvas,
+                         QWidget *parent = NULL);
+    CanvasSettingsDialog(const QString &defName,
+                         QWidget *parent = NULL);
+    CanvasSettingsDialog(const QString &currName,
+                         const int &currWidth,
+                         const int &currHeight,
+                         const int &currFrameCount,
+                         const qreal &currFps,
+                         QWidget *parent = NULL);
 
     int getCanvasWidth();
     int getCanvasHeight();
     QString getCanvasName();
     int getCanvasFrameCount();
+    qreal getFps();
+
+    void applySettingsToCanvas(Canvas *canvas);
 private:
     QVBoxLayout *mMainLayout;
 
@@ -32,6 +45,10 @@ private:
     QHBoxLayout *mFrameCountLayout;
     QLabel *mFrameCountLabel;
     QSpinBox *mFrameCountSpinBox;
+
+    QHBoxLayout *mFPSLayout;
+    QLabel *mFPSLabel;
+    QDoubleSpinBox *mFPSSpinBox;
 
     QPushButton *mOkButton;
     QPushButton *mCancelButton;

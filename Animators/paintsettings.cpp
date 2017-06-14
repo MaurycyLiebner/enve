@@ -768,7 +768,9 @@ void PaintSetting::applyColorSetting(ColorAnimator *animator) const {
     mColorSetting.apply(animator);
 }
 
-UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColorT, const PaintType &paintTypeT, const QLinearGradient &gradientT) {
+UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColorT,
+                                         const PaintType &paintTypeT,
+                                         const QLinearGradient &gradientT) {
     paintColor = paintColorT;
     paintType = paintTypeT;
     gradient = gradientT;
@@ -782,6 +784,7 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
     if(paintType == GRADIENTPAINT) {
         //p->setBrush(gradient);
         paint->setShader(gradientSk);
+        paint->setAlpha(255);
     } else if(paintType == FLATPAINT) {
         paint->setColor(SkColorSetARGBInline(paintColor.alpha(),
                                              paintColor.red(),

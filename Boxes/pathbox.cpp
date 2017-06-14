@@ -13,8 +13,24 @@ PathBox::PathBox(BoxesGroup *parent,
     BoundingBox(parent, type) {
     mPathEffectsAnimators =
             (new PathEffectAnimators())->ref<PathEffectAnimators>();
+    mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setBlockedUpdater(
                 new PathPointUpdater(this));
+
+    mOutlinePathEffectsAnimators =
+            (new PathEffectAnimators())->ref<PathEffectAnimators>();
+    mOutlinePathEffectsAnimators->prp_setName("outline effects");
+    mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
+                new PathPointUpdater(this));
+
+//    mPathEffectsAnimators->prp_setName("path effects");
+//    mPathEffectsAnimators->prp_setBlockedUpdater(
+//                new PixmapEffectUpdater(this));
+
+//    mOutlinePathEffectsAnimators->prp_setName("outline path effects");
+//    mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
+//                new PixmapEffectUpdater(this));
+
     mStrokeGradientPoints =
             (new GradientPoints)->ref<GradientPoints>();
     mFillGradientPoints =
@@ -40,10 +56,6 @@ PathBox::PathBox(BoxesGroup *parent,
     mFillSettings->setPaintPathTarget(this);
 
     schedulePathUpdate();
-
-    mPathEffectsAnimators->prp_setName("path effects");
-    mPathEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
-    mPathEffectsAnimators->prp_blockUpdater();
 }
 
 PathBox::~PathBox() {
@@ -56,8 +68,9 @@ PathBox::~PathBox() {
 }
 
 void PathBox::updateEffectsMargin() {
-    mEffectsMargin = mEffectsAnimators->getEffectsMargin() +
-                        mPathEffectsAnimators->getEffectsMargin();
+    mEffectsMargin = mEffectsAnimators->getEffectsMargin();/* +
+                        mPathEffectsAnimators->getEffectsMargin() +
+                            mOutlinePathEffectsAnimators->getEffectsMargin();*/
 }
 
 #include <QSqlError>
@@ -169,6 +182,19 @@ void PathBox::addPathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
+void PathBox::addOutlinePathEffect(PathEffect *effect) {
+    //effect->setUpdater(new PixmapEffectUpdater(this));
+
+    if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
+        ca_addChildAnimator(mOutlinePathEffectsAnimators.data());
+    }
+    mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
+    //effect->setParentEffectAnimators(mEffectsAnimators.data());
+
+    //scheduleEffectsMarginUpdate();
+    clearAllCache();
+}
+
 void PathBox::resetStrokeGradientPointsPos(bool finish) {
     mStrokeGradientPoints->prp_setRecording(false);
     mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),
@@ -265,6 +291,14 @@ void PathBox::makeDuplicate(Property *targetBox) {
                     ca_getChildAt(i))->makeDuplicate() );
     }
 
+    int outlineEffectsCount =
+            mOutlinePathEffectsAnimators->ca_getNumberOfChildren();
+    for(int i = 0; i < outlineEffectsCount; i++) {
+        pathBoxTarget->addOutlinePathEffect(
+                (PathEffect*)((PathEffect*)mOutlinePathEffectsAnimators->
+                    ca_getChildAt(i))->makeDuplicate() );
+    }
+
     pathBoxTarget->duplicatePaintSettingsFrom(mFillSettings.data(),
                                               mStrokeSettings.data());
     pathBoxTarget->duplicateGradientPointsFrom(mFillGradientPoints.data(),
@@ -351,6 +385,7 @@ void PathBox::updateOutlinePathSk() {
     } else {
         mOutlinePathSk = SkPath();
     }
+    mOutlinePathEffectsAnimators->filterPath(&mOutlinePathSk);
     updateWholePathSk();
 }
 
@@ -446,16 +481,16 @@ void PathBox::drawSk(SkCanvas *canvas) {
 
     SkPaint paint;
     paint.setAntiAlias(true);
+    paint.setStyle(SkPaint::kFill_Style);
     //mPathEffectsAnimators->applyEffectsSk(&paint);
     if(!mUpdatePathSk.isEmpty()) {
         mUpdateFillSettings.applyPainterSettingsSk(&paint);
-        paint.setStyle(SkPaint::kFill_Style);
 
         canvas->drawPath(mUpdatePathSk, paint);
     }
     if(!mUpdateOutlinePathSk.isEmpty()) {
+        paint.setShader(NULL);
         mUpdateStrokeSettings.applyPainterSettingsSk(&paint);
-        paint.setStyle(SkPaint::kFill_Style);
 
         canvas->drawPath(mUpdateOutlinePathSk, paint);
     }

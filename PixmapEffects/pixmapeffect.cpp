@@ -277,7 +277,7 @@ void ShadowEffect::applyShadow(const SkBitmap &imgPtr,
     qreal radius = mBlurRadius->qra_getCurrentValue()*scale;
     Color currentColor = mColor->getCurrentColor();
     QPointF trans = mTranslation->getCurrentPointValue()*scale;
-    qreal opacity = mOpacity->qra_getCurrentValue()*255;
+    qreal opacity = mOpacity->qra_getCurrentValue()*2.55;
 
     SkBitmap shadowBitmap;
     shadowBitmap.allocPixels(imgPtr.info());

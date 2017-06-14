@@ -225,9 +225,6 @@ private:
     bool mEventFilterDisabled = true;
     bool isEnabled();
     QWidget *mGrayOutWidget = NULL;
-
-    qreal mFPS = 24.;
-
     bool mAllPointsRecording = false;
     bool mDisplayedFillStrokeSettingsUpdateNeeded = false;
 

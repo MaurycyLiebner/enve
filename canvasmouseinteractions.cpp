@@ -121,8 +121,16 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             effectsMenu->addAction("Alpha Matte");
 
             QMenu *pathEffectsMenu = menu.addMenu("Path Effects");
-            pathEffectsMenu->addAction("Discrete Effect");
-            pathEffectsMenu->addAction("Duplicate Effect");
+            QAction *discreteEffA =
+                    pathEffectsMenu->addAction("Discrete Effect");
+            QAction *duplicateEffA =
+                    pathEffectsMenu->addAction("Duplicate Effect");
+
+            QMenu *outlinePathEffectsMenu = menu.addMenu("Outline Effects");
+            QAction *discretePathEffA =
+                    outlinePathEffectsMenu->addAction("Discrete Effect");
+            QAction *duplicatePathEffA =
+                    outlinePathEffectsMenu->addAction("Duplicate Effect");
 
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
@@ -160,10 +168,14 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                     applyDesaturateEffectToSelected();
                 } else if(selectedAction->text() == "Alpha Matte") {
                     applyAlphaMatteToSelected();
-                } else if(selectedAction->text() == "Discrete Effect") {
+                } else if(selectedAction == discreteEffA) {
                     applyDiscretePathEffectToSelected();
-                } else if(selectedAction->text() == "Duplicate Effect") {
+                } else if(selectedAction == duplicateEffA) {
                     applyDuplicatePathEffectToSelected();
+                } else if(selectedAction == discretePathEffA) {
+                    applyDiscreteOutlinePathEffectToSelected();
+                } else if(selectedAction == duplicatePathEffA) {
+                    applyDuplicateOutlinePathEffectToSelected();
                 }
             } else {
 
