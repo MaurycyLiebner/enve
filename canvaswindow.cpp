@@ -74,7 +74,6 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
     } else {
         setCurrentCanvas(mCanvasList.at(id));
     }
-    callUpdateSchedulers();
 }
 
 void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
@@ -254,6 +253,7 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
 
     if(dialog.exec() == QDialog::Accepted) {
         dialog.applySettingsToCanvas(mCurrentCanvas);
+        setCurrentCanvas(mCurrentCanvas);
     }
 }
 

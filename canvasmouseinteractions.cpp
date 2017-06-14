@@ -59,9 +59,13 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             effectsMenu->addAction("Implode");
             effectsMenu->addAction("Desaturate");
 
+            menu.addAction("Settings...");
+
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
                 if(selectedAction->text() == "Paste") {
+                } else if(selectedAction->text()== "Settings...") {
+                    mCanvasWindow->openSettingsWindowForCurrentCanvas();
                 } else if(selectedAction->text() == "Blur") {
                     addEffect(new BlurEffect());
                 } /*else if(selectedAction->text() == "Brush") {

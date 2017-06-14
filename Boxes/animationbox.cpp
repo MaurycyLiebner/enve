@@ -1,6 +1,7 @@
 #include "animationbox.h"
 #include "BoxesList/boxsinglewidget.h"
 #include "Animators/animatorupdater.h"
+#include "canvas.h"
 
 AnimationBox::AnimationBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_IMAGE) {
@@ -40,7 +41,8 @@ FixedLenAnimationRect *AnimationBox::getAnimationDurationRect() {
 }
 
 void AnimationBox::updateDurationRectangleAnimationRange() {
-    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue();
+    qreal fpsRatio = getParentCanvas()->getFps()/mFps;
+    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
     getAnimationDurationRect()->setAnimationFrameDuration(
                 qCeil(qAbs(timeScale*mFramesCount)));
@@ -48,7 +50,8 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 
 void AnimationBox::updateAfterFrameChanged(const int &currentFrame) {
     BoundingBox::updateAfterFrameChanged(currentFrame);
-    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue();
+    qreal fpsRatio = getParentCanvas()->getFps()/mFps;
+    qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
     int pixId;
     const int &absMinAnimation =

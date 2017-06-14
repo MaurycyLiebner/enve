@@ -45,7 +45,10 @@ void VideoBox::updateFrameCount(const char* path) {
     for (uint i = 0; i < format->nb_streams; i++) {
         const AVMediaType &mediaType = format->streams[i]->codec->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
-            mFramesCount = format->streams[i]->nb_frames - 1;
+            AVStream *vidStream = format->streams[i];
+            mFps = vidStream->avg_frame_rate.den/
+                   (qreal)vidStream->avg_frame_rate.num;
+            mFramesCount = vidStream->nb_frames - 1;
             break;
         }
     }
@@ -54,7 +57,7 @@ void VideoBox::updateFrameCount(const char* path) {
 }
 
 int VideoBox::getImageAtFrame(const char* path,
-                    const int &frameId) {
+                              const int &frameId) {
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
     if (avformat_open_input(&format, path, NULL, NULL) != 0) {
@@ -62,14 +65,17 @@ int VideoBox::getImageAtFrame(const char* path,
         return -1;
     }
     if (avformat_find_stream_info(format, NULL) < 0) {
-        fprintf(stderr, "Could not retrieve stream info from file '%s'\n", path);
+        fprintf(stderr,
+                "Could not retrieve stream info from file '%s'\n",
+                path);
         return -1;
     }
 
     // Find the index of the first audio stream
     int videoStreamIndex = -1;
     for (uint i = 0; i < format->nb_streams; i++) {
-        const AVMediaType &mediaType = format->streams[i]->codec->codec_type;
+        const AVMediaType &mediaType =
+                format->streams[i]->codec->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
             videoStreamIndex = i;
             break;
@@ -77,7 +83,8 @@ int VideoBox::getImageAtFrame(const char* path,
     }
     if(videoStreamIndex == -1) {
         fprintf(stderr,
-                "Could not retrieve video stream from file '%s'\n", path);
+                "Could not retrieve video stream from file '%s'\n",
+                path);
         return -1;
     }
     AVCodecContext *videoCodec = NULL;
@@ -85,8 +92,11 @@ int VideoBox::getImageAtFrame(const char* path,
 
     AVStream *videoStream = format->streams[videoStreamIndex];
     videoCodec = videoStream->codec;
-    if( avcodec_open2(videoCodec, avcodec_find_decoder(videoCodec->codec_id), NULL) < 0 ) {
-        fprintf(stderr, "Failed to open decoder for stream #%u in file '%s'\n",
+    if( avcodec_open2(videoCodec,
+                      avcodec_find_decoder(videoCodec->codec_id),
+                      NULL) < 0 ) {
+        fprintf(stderr,
+                "Failed to open decoder for stream #%u in file '%s'\n",
                 videoStreamIndex, path);
         return -1;
     }
@@ -158,6 +168,32 @@ int VideoBox::getImageAtFrame(const char* path,
     sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
               0, videoCodec->height,
               dst, linesizes);
+
+// SKIA
+
+    SkImageInfo info = SkImageInfo::Make(videoCodec->width,
+                                         videoCodec->height,
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         nullptr);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+
+    SkPixmap pixmap;
+    bitmap.peekPixels(&pixmap);
+
+    /* 2. Convert and write into image buffer  */
+    uint8_t *dstSk[] = {(unsigned char*)pixmap.writable_addr()};
+    int linesizesSk[4];
+
+    av_image_fill_linesizes(linesizesSk, AV_PIX_FMT_BGRA, decodedFrame->width);
+
+    sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
+              0, videoCodec->height,
+              dstSk, linesizesSk);
+
+    mUpdateAnimationImageSk = SkImage::MakeFromBitmap(bitmap);
+// SKIA
 
 
     // clean up

@@ -35,6 +35,7 @@ protected:
     int mUpdateAnimationFrame = 0;
     int mCurrentAnimationFrame = 0;
     int mFramesCount = 0;
+    qreal mFps = 24.;
     QImage mUpdateAnimationImage;
     sk_sp<SkImage> mUpdateAnimationImageSk;
 
