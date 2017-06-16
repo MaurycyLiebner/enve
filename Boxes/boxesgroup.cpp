@@ -470,7 +470,6 @@ void BoxesGroup::addChildToListAt(int index,
     updateChildrenId(index, saveUndoRedo);
 
     scheduleEffectsMarginUpdate();
-    if(!mPivotChanged) scheduleCenterPivot();
 
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(child,
@@ -539,7 +538,6 @@ void BoxesGroup::removeChild(BoundingBox *child) {
         mParent->removeChild(this);
     }
     //child->setParent(NULL);
-    if(!mPivotChanged) centerPivotPosition();
 }
 
 

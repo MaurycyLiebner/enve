@@ -55,6 +55,7 @@ public:
     virtual bool SWT_isBasicTransformAnimator() { return false; }
     virtual bool SWT_isBoxTransformAnimator() { return false; }
     // Boxes
+    virtual bool SWT_isCanvas() { return false; }
     virtual bool SWT_isAnimationBox() { return false; }
     virtual bool SWT_isBoundingBox() { return false; }
     virtual bool SWT_isBoxesGroup() { return false; }

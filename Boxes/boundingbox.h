@@ -121,7 +121,7 @@ public:
     void finishTransform();
 
 
-    virtual bool relPointInsidePath(const QPointF &) { return false; }
+    virtual bool relPointInsidePath(const QPointF &);
     bool absPointInsidePath(const QPointF &absPos);
     virtual MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                      const CanvasMode &currentCanvasMode,
@@ -459,6 +459,7 @@ public:
     }
 
 
+    SkPoint getUpdateDrawPos();
 protected:
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
@@ -534,6 +535,7 @@ signals:
     void replaceChacheSet();
     void scheduledUpdate();
     void scheduleAwaitUpdateAllLinkBoxes();
+    void nameChanged(QString);
 public slots:
     void updateAfterDurationRectangleShifted(const int &dFrame = 0);
     void updateAfterDurationMinFrameChangedBy(const int &by);

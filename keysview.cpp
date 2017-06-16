@@ -47,8 +47,7 @@ void KeysView::middleMove(const QPointF &movePos) {
                    mSavedMaxViewedFrame - roundX );
 }
 
-void KeysView::deleteSelectedKeys()
-{
+void KeysView::deleteSelectedKeys() {
     if(mHoveredKey != NULL) {
         if(mHoveredKey->isSelected()) {
             clearHoveredPoint();
@@ -588,23 +587,19 @@ void KeysView::setFramesRange(const int &startFrame,
     update();
 }
 
-int KeysView::getMinViewedFrame()
-{
+int KeysView::getMinViewedFrame() {
     return mMinViewedFrame;
 }
 
-int KeysView::getMaxViewedFrame()
-{
+int KeysView::getMaxViewedFrame() {
     return mMaxViewedFrame;
 }
 
-qreal KeysView::getPixelsPerFrame()
-{
+qreal KeysView::getPixelsPerFrame() {
     return mPixelsPerFrame;
 }
 
-void KeysView::updatePixelsPerFrame()
-{
+void KeysView::updatePixelsPerFrame() {
     qreal animWidth = width() - 2*MIN_WIDGET_HEIGHT;
     qreal dFrame = mMaxViewedFrame - mMinViewedFrame + 1;
     mPixelsPerFrame = animWidth/dFrame;
@@ -618,8 +613,7 @@ void KeysView::removeKeyFromSelection(Key *key) {
     key->removeFromSelection(&mSelectedKeys);
 }
 
-void KeysView::clearKeySelection()
-{
+void KeysView::clearKeySelection() {
     Q_FOREACH(Key *key, mSelectedKeys) {
         key->setSelected(false);
     }

@@ -322,6 +322,10 @@ public:
                QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
+    void applySk(BoundingBox *target,
+                 const SkBitmap &imgPtr,
+                 const fmt_filters::image &img,
+                 qreal scale);
 
     qreal getMargin() { return 0.; }
 

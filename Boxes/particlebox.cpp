@@ -50,6 +50,7 @@ void ParticleBox::updateAfterFrameChanged(const int &currentFrame) {
 void ParticleBox::updateRelBoundingRect() {
     mRelBoundingRect = QRectF(mTopLeftPoint->getRelativePos(),
                               mBottomRightPoint->getRelativePos());
+    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
 //    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
 //        mRelBoundingRect = mRelBoundingRect.united(
 //                    emitter->getParticlesBoundingRect());
@@ -308,11 +309,12 @@ void Particle::generatePathNextFrame(const int &frame,
         currId--;
     }
 
-    mParticleStates[arrayId] = ParticleState(mLastPos,
-                                             mLastScale,
-                                             mSize,
-                                             mLastOpacity,
-                                             linePath);
+    mParticleStates[arrayId] =
+            ParticleState(mLastPos,
+                          mLastScale,
+                          mSize,
+                          qMax(0, qMin(255, qRound(mLastOpacity*255))),
+                          linePath);
 
     SkScalar perPrevVelVar = (velocityVarPeriod - mPrevVelocityDuration)/
                             velocityVarPeriod;

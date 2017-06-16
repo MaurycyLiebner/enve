@@ -51,8 +51,6 @@ void TextBox::prp_loadFromSql(const int &boundingBoxId) {
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }
-
-    if(!mPivotChanged) centerPivotPosition();
 }
 
 

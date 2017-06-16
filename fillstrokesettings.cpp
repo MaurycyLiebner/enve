@@ -141,8 +141,7 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
 
     connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
-    connect(mLineWidthSpin, SIGNAL(editingStarted(qreal)),
-            mCanvasWindow, SLOT(startSelectedStrokeWidthTransform()));
+
     connect(mLineWidthSpin, SIGNAL(editingFinished(qreal)),
             this, SLOT(emitStrokeWidthChanged()));
 
@@ -513,9 +512,10 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
     }
 }
 
-void FillStrokeSettingsWidget::setCanvasWindowPtr(CanvasWindow *canvasWidget)
-{
+void FillStrokeSettingsWidget::setCanvasWindowPtr(CanvasWindow *canvasWidget) {
     mCanvasWindow = canvasWidget;
+    connect(mLineWidthSpin, SIGNAL(editingStarted(qreal)),
+            mCanvasWindow, SLOT(startSelectedStrokeWidthTransform()));
 }
 
 void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {

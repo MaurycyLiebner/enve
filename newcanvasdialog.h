@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QLabel>
 class Canvas;
+class ColorAnimator;
+class ColorAnimatorButton;
 
 class CanvasSettingsDialog : public QDialog
 {
@@ -20,6 +22,7 @@ public:
                          const int &currHeight,
                          const int &currFrameCount,
                          const qreal &currFps,
+                         ColorAnimator *bgColorAnimator,
                          QWidget *parent = NULL);
 
     int getCanvasWidth();
@@ -49,6 +52,10 @@ private:
     QHBoxLayout *mFPSLayout;
     QLabel *mFPSLabel;
     QDoubleSpinBox *mFPSSpinBox;
+
+    QHBoxLayout *mBgColorLayout;
+    QLabel *mBgColorLabel;
+    ColorAnimatorButton *mBgColorButton;
 
     QPushButton *mOkButton;
     QPushButton *mCancelButton;

@@ -25,6 +25,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                int canvasWidth, int canvasHeight,
                const int &frameCount) :
     BoxesGroup(fillStrokeSettings) {
+    connect(this, SIGNAL(nameChanged(QString)),
+            this, SLOT(emitCanvasNameChanged()));
     mCacheHandler.setParentBox(this);
     mBackgroundColor->qra_setCurrentValue(Color(75, 75, 75));
     ca_addChildAnimator(mBackgroundColor.data());
@@ -61,6 +63,10 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
 Canvas::~Canvas() {
     delete mRotPivot;
+}
+
+void Canvas::emitCanvasNameChanged() {
+    emit canvasNameChanged(this, prp_mName);
 }
 
 void Canvas::showContextMenu(QPointF globalPos) {
@@ -244,18 +250,55 @@ void Canvas::updateHoveredElements() {
     updateHoveredBox();
 }
 
+void Canvas::drawTransparencyMesh(SkCanvas *canvas,
+                                  const SkRect &viewRect) {
+    if(mBackgroundColor->getCurrentColor().qcol.alpha() != 255) {
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        paint.setStyle(SkPaint::kFill_Style);
+        paint.setColor(SkColorSetARGBInline(125, 255, 255, 255));
+        SkScalar currX = viewRect.left();
+        SkScalar currY = viewRect.top();
+        SkScalar widthT = MIN_WIDGET_HEIGHT*0.5f*mCanvasTransformMatrix.m11();
+        SkScalar heightT = widthT;
+        bool isOdd = false;
+        while(currY < viewRect.bottom()) {
+            widthT = heightT;
+            if(currY + heightT > viewRect.bottom()) {
+                heightT = viewRect.bottom() - currY;
+            }
+            currX = viewRect.left();
+            if(isOdd) currX += widthT;
+
+            while(currX < viewRect.right()) {
+                if(currX + widthT > viewRect.right()) {
+                    widthT = viewRect.right() - currX;
+                }
+                canvas->drawRect(SkRect::MakeXYWH(currX, currY,
+                                                  widthT, heightT),
+                                 paint);
+                currX += 2*widthT;
+            }
+
+            isOdd = !isOdd;
+            currY += heightT;
+        }
+    }
+}
+
 void Canvas::renderSk(SkCanvas *canvas) {
     SkRect viewRect = QRectFToSkRect(getPixBoundingRect());
 
     SkPaint paint;
     paint.setAntiAlias(true);
+    paint.setStyle(SkPaint::kFill_Style);
+
     if(isPreviewingOrRendering()) {
         paint.setColor(SK_ColorBLACK);
-        paint.setStyle(SkPaint::kFill_Style);
         canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width() + 1,
                                         mCanvasWidget->height() + 1),
                          paint);
-
+        drawTransparencyMesh(canvas, viewRect);
         if(mCurrentPreviewContainer != NULL) {
             canvas->save();
 
@@ -270,7 +313,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
         SkScalar invScale = 1./mCanvasTransformMatrix.m11();
 #ifdef CPU_ONLY_RENDER
         canvas->clear(SK_ColorBLACK);
-
+        drawTransparencyMesh(canvas, viewRect);
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
 
         if(mCurrentPreviewContainer != NULL) {
@@ -282,10 +325,10 @@ void Canvas::renderSk(SkCanvas *canvas) {
         }
 #else
         paint.setColor(SkColorSetARGBInline(255, 75, 75, 75));
-        paint.setStyle(SkPaint::kFill_Style);
         canvas->drawRect(SkRect::MakeWH(mCanvasWindow->width() + 1,
                                         mCanvasWidget->height() + 1),
                          paint);
+        drawTransparencyMesh(canvas, viewRect);
         paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
         canvas->drawRect(viewRect, paint);
 
@@ -376,7 +419,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
                               &bounds);
             paint.setColor(SK_ColorBLACK);
             paint.setTypeface(SkTypeface::MakeDefault());
-            paint.setStyle(SkPaint::kStroke_Style);
+            paint.setStyle(SkPaint::kFill_Style);
 
             canvas->drawString(
                    transStr.toStdString().c_str(),
@@ -390,6 +433,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
     if(mCanvasWindow->hasFocus()) {
         paint.setColor(SK_ColorRED);
         paint.setStrokeWidth(4.);
+        paint.setStyle(SkPaint::kStroke_Style);
         canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width(),
                                         mCanvasWidget->height()),
                                         paint);

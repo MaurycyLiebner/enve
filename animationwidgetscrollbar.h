@@ -8,12 +8,15 @@ class AnimationWidgetScrollBar : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AnimationWidgetScrollBar(int minSpan, int maxSpan,
-                                     int spanInc, int height, bool range,
-                                     bool clamp,
-                                     QWidget *parent = 0);
+    explicit AnimationWidgetScrollBar(const int &minSpan,
+                                      const int &maxSpan,
+                                      const int &spanInc,
+                                      const int &height,
+                                      const bool &range,
+                                      const bool &clamp,
+                                      QWidget *parent = 0);
     void emitChange();
-    bool setFirstViewedFrame(int firstFrame);
+    bool setFirstViewedFrame(const int &firstFrame);
     void setFramesSpan(int newSpan);
 
     int getMaxFrame();
@@ -37,9 +40,11 @@ protected:
 signals:
     void viewedFramesChanged(int, int);
 public slots:
-    void setViewedFramesRange(int startFrame, int endFrame);
+    void setViewedFramesRange(const int &startFrame,
+                              const int &endFrame);
 
-    void setMinMaxFrames(int minFrame, int maxFrame);
+    void setMinMaxFrames(const int &minFrame,
+                         const int &maxFrame);
 private:
     CacheHandler *mCacheHandler = NULL;
     bool mTopBorderVisible = true;

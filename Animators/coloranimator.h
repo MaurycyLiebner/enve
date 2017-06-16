@@ -11,8 +11,7 @@ enum ColorMode : short {
     HSLMODE
 };
 
-class ColorAnimator : public ComplexAnimator
-{
+class ColorAnimator : public ComplexAnimator {
     Q_OBJECT
 public:
     ColorAnimator();
@@ -20,12 +19,12 @@ public:
     void qra_setCurrentValue(const Color &colorValue,
                              const bool &saveUndoRedo = false,
                              const bool &finish = false);
-    void qra_setCurrentValue(QColor qcolorValue,
+    void qra_setCurrentValue(const QColor &qcolorValue,
                              const bool &saveUndoRedo = false,
                              const bool &finish = false);
 
     Color getCurrentColor() const;
-    void setColorMode(ColorMode colorMode);
+    void setColorMode(const ColorMode &colorMode);
 
     void startVal1Transform();
     void startVal2Transform();
@@ -41,7 +40,7 @@ public:
     void setCurrentAlphaValue(const qreal &alpha,
                               const bool &finish = false);
 
-    void prp_openContextMenu(QPoint pos);
+    void prp_openContextMenu(const QPoint &pos);
     void prp_loadFromSql(const int &sqlId);
     int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
     void makeDuplicate(Property *target);

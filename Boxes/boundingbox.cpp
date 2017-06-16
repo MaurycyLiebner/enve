@@ -548,7 +548,10 @@ void BoundingBox::updateRelBoundingRect() {
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(!mPivotChanged || mCenterPivotScheduled) {
+    bool pivotHasKeys =
+            mTransformAnimator->getPivotMovablePoint()->
+                prp_isDescendantRecording();
+    if((!mPivotChanged && !pivotHasKeys) || mCenterPivotScheduled) {
         mCenterPivotScheduled = false;
         centerPivotPosition();
     }
@@ -711,6 +714,14 @@ void BoundingBox::startTransform() {
 void BoundingBox::finishTransform() {
     mTransformAnimator->prp_finishTransform();
     //updateCombinedTransform();
+}
+
+SkPoint BoundingBox::getUpdateDrawPos() {
+    return mUpdateRenderContainer.getDrawpos();
+}
+
+bool BoundingBox::relPointInsidePath(const QPointF &point) {
+    return mRelBoundingRect.contains(point.toPoint());
 }
 
 bool BoundingBox::absPointInsidePath(const QPointF &absPoint) {
@@ -982,6 +993,8 @@ void BoundingBox::prp_drawKeys(QPainter *p,
 
 void BoundingBox::setName(const QString &name) {
     prp_mName = name;
+
+    emit nameChanged(name);
 }
 
 QString BoundingBox::getName() {

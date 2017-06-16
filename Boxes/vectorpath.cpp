@@ -48,7 +48,6 @@ void VectorPath::removeChildPathAnimator(PathAnimator *path) {
 void VectorPath::prp_loadFromSql(const int &boundingBoxId) {
     PathBox::prp_loadFromSql(boundingBoxId);
     mPathAnimator->prp_loadFromSql(boundingBoxId);
-    if(!mPivotChanged) centerPivotPosition();
 }
 
 VectorPath *VectorPath::createPathFromSql(int boundingBoxId,

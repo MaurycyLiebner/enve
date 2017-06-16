@@ -12,9 +12,11 @@ DisplacePathEffect::DisplacePathEffect() :
 
     mSegLength->prp_setName("segment length");
     mSegLength->qra_setValueRange(0., 1000.);
+    mSegLength->qra_setCurrentValue(20.);
 
     mMaxDev->prp_setName("max deviation");
     mMaxDev->qra_setValueRange(0., 1000.);
+    mMaxDev->qra_setCurrentValue(20.);
 
     mSmoothness->prp_setName("smoothness");
     mSmoothness->qra_setValueRange(0., 1.);
@@ -287,6 +289,7 @@ DuplicatePathEffect::DuplicatePathEffect() :
     prp_setName("duplicate effect");
 
     mTranslation->prp_setName("translation");
+    mTranslation->setCurrentPointValue(QPointF(10., 10.));
 
     ca_addChildAnimator(mTranslation.data());
 }

@@ -1,5 +1,6 @@
 #include "newcanvasdialog.h"
 #include "canvas.h"
+#include "BoxesList/coloranimatorbutton.h"
 
 CanvasSettingsDialog::CanvasSettingsDialog(Canvas *canvas,
                                            QWidget *parent) :
@@ -8,17 +9,19 @@ CanvasSettingsDialog::CanvasSettingsDialog(Canvas *canvas,
                          canvas->getCanvasHeight(),
                          canvas->getMaxFrame(),
                          canvas->getFps(),
+                         canvas->getBgColorAnimator(),
                          parent) {}
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &defName,
                                            QWidget *parent) :
-    CanvasSettingsDialog(defName, 1920, 1080, 200, 24., parent) {}
+    CanvasSettingsDialog(defName, 1920, 1080, 200, 24., NULL, parent) {}
 
 CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
                                            const int &currWidth,
                                            const int &currHeight,
                                            const int &currFrameCount,
                                            const qreal &currFps,
+                                           ColorAnimator *bgColorAnimator,
                                            QWidget *parent) :
     QDialog(parent) {
     setWindowTitle("Canvas Settings");
@@ -68,6 +71,14 @@ CanvasSettingsDialog::CanvasSettingsDialog(const QString &currName,
     mFPSLayout->addWidget(mFPSLabel);
     mFPSLayout->addWidget(mFPSSpinBox);
     mMainLayout->addLayout(mFPSLayout);
+
+    mBgColorLabel = new QLabel("Backgroud:", this);
+    mBgColorButton = new ColorAnimatorButton(bgColorAnimator, this);
+
+    mBgColorLayout = new QHBoxLayout();
+    mBgColorLayout->addWidget(mBgColorLabel);
+    mBgColorLayout->addWidget(mBgColorButton);
+    mMainLayout->addLayout(mBgColorLayout);
 
     mOkButton = new QPushButton("Ok", this);
     mCancelButton = new QPushButton("Cancel", this);

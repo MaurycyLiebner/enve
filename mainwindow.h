@@ -134,6 +134,7 @@ public slots:
 
     void callUpdateSchedulers();
     void addCanvasToRenderQue();
+    void canvasNameChanged(Canvas *canvas, const QString &name);
 private slots:
     //void saveOutput(QString renderDest);
     //void renderOutput();

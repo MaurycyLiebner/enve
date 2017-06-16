@@ -1020,5 +1020,46 @@ void AlphaMatteEffect::apply(BoundingBox *target,
 //        p2.drawImage(0, 0, imgTmp);
 
 //        p2.end();
-//    }
+    //    }
+}
+
+void AlphaMatteEffect::applySk(BoundingBox *target,
+                               const SkBitmap &imgPtr,
+                               const fmt_filters::image &img,
+                               qreal scale) {
+    BoundingBox *boxTarget = mBoxTarget->getTarget();
+    if(boxTarget) {
+        qreal influence = mInfluenceAnimator->qra_getCurrentValue();
+        SkPoint targetDrawPos = target->getUpdateDrawPos();
+
+        SkBitmap bitmapTmp;
+        bitmapTmp.allocPixels(imgPtr.info());
+
+        SkCanvas *canvas = new SkCanvas(bitmapTmp);
+        canvas->clear(SK_ColorTRANSPARENT);
+
+        canvas->translate(-targetDrawPos.x(), -targetDrawPos.y());
+        canvas->concat(
+            QMatrixToSkMatrix(target->getUpdatePaintTransform().inverted()));
+
+        boxTarget->drawUpdatePixmapForEffectSk(canvas);
+        canvas->flush();
+
+        delete canvas;
+
+        canvas = new SkCanvas(imgPtr);
+
+        SkPaint paint;
+        paint.setAlpha(qMax(0, qMin(255, (int)(influence*255))) );
+        if(mInvertedProperty->getValue()) {
+            paint.setBlendMode(SkBlendMode::kDstIn);
+        } else {
+            paint.setBlendMode(SkBlendMode::kDstOut);
+        }
+
+        canvas->drawBitmap(bitmapTmp, 0, 0, &paint);
+
+        canvas->flush();
+        delete canvas;
+    }
 }

@@ -215,7 +215,7 @@ void AnimationRect::setAnimationFrameDuration(const int &frameDuration) {
 }
 
 int AnimationRect::getAnimationFrameDuration() {
-    return getMaxAnimationFrame() - getMinAnimationFrame();
+    return getMaxAnimationFrame() - getMinAnimationFrame() + 1;
 }
 
 void AnimationRect::draw(

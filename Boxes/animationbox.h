@@ -16,8 +16,6 @@ public:
 
 //    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
-    bool relPointInsidePath(const QPointF &point);
-    void draw(QPainter *p);
     void drawSk(SkCanvas *canvas);
     virtual void loadUpdatePixmap() = 0;
     void preUpdatePixmapsUpdates();
@@ -28,6 +26,7 @@ public:
     FixedLenAnimationRect *getAnimationDurationRect();
 
     bool SWT_isAnimationBox() { return true; }
+    void updateUpdateRelBoundingRectFromImage();
 public slots:
 protected:
     CacheHandler mAnimationFramesCache;

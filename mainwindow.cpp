@@ -515,18 +515,20 @@ MainWindow *MainWindow::getInstance()
 void MainWindow::createNewCanvas() {
     QString defName = "Canvas " +
             QString::number(mCurrentCanvasComboBox->count());
-    CanvasSettingsDialog dialog(defName, this);
+    Canvas *newCanvas = new Canvas(getFillStrokeSettings(),
+                                   mCanvasWindow,
+                                   1920,
+                                   1080,
+                                   200);
+    newCanvas->setName(defName);
+    CanvasSettingsDialog dialog(newCanvas, this);
 
     if(dialog.exec() == QDialog::Accepted) {
-        Canvas *newCanvas = new Canvas(getFillStrokeSettings(),
-                                       mCanvasWindow,
-                                       dialog.getCanvasWidth(),
-                                       dialog.getCanvasHeight(),
-                                       dialog.getCanvasFrameCount());
-
         dialog.applySettingsToCanvas(newCanvas);
 
         addCanvas(newCanvas);
+    } else {
+        delete newCanvas;
     }
 }
 
@@ -538,12 +540,23 @@ void MainWindow::addCanvas(Canvas *newCanvas) {
     mCurrentCanvasComboBox->addItem(newCanvas->getName());
     mCurrentCanvasComboBox->setCurrentIndex(
                 mCurrentCanvasComboBox->count() - 1);
+    connect(newCanvas, SIGNAL(canvasNameChanged(Canvas*, QString)),
+            this, SLOT(canvasNameChanged(Canvas*,QString)));
+
     connect(mCurrentCanvasComboBox, SIGNAL(currentIndexChanged(int)),
             mCanvasWindow, SLOT(setCurrentCanvas(int)));
 }
 
-void MainWindow::createDetachedUndoRedoStack()
-{
+void MainWindow::canvasNameChanged(Canvas *canvas,
+                                   const QString &name) {
+    int idT = mCanvasWindow->getCanvasList().indexOf(canvas);
+    if(idT < 0) return;
+    mCurrentCanvasComboBox->setItemText(
+                idT,
+                name);
+}
+
+void MainWindow::createDetachedUndoRedoStack() {
     mCurrentUndoRedoStack = new UndoRedoStack();
     mCurrentUndoRedoStack->setWindow(this);
     mDetachedUndoRedoStack = true;

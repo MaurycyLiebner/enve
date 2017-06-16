@@ -85,8 +85,14 @@ void AnimationBox::afterSuccessfulUpdate() {
         }
     }
     mRelBoundingRect = mUpdateRelBoundingRect;
+    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     updateRelBoundingRect();
-    if(!mPivotChanged) centerPivotPosition();
+}
+
+void AnimationBox::updateUpdateRelBoundingRectFromImage() {
+    mUpdateRelBoundingRect = QRectF(0., 0.,
+                mUpdateAnimationImageSk->width(),
+                mUpdateAnimationImageSk->height());//mUpdateAnimationImage.rect();
 }
 
 void AnimationBox::setUpdateVars() {
@@ -98,7 +104,7 @@ void AnimationBox::setUpdateVars() {
     mUpdatePixmapReloadScheduled = cont == NULL;
     if(cont != NULL) {
         mUpdateAnimationImageSk = cont->getImageSk();
-        mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
+        updateUpdateRelBoundingRectFromImage();
     }
 }
 
@@ -109,17 +115,8 @@ void AnimationBox::preUpdatePixmapsUpdates() {
     BoundingBox::preUpdatePixmapsUpdates();
 }
 
-void AnimationBox::draw(QPainter *p) {
-    p->setRenderHint(QPainter::SmoothPixmapTransform);
-    p->drawImage(0, 0, mUpdateAnimationImage);
-}
-
 void AnimationBox::drawSk(SkCanvas *canvas) {
     SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
-}
-
-bool AnimationBox::relPointInsidePath(const QPointF &point) {
-    return mRelBoundingRect.contains(point.toPoint());
 }

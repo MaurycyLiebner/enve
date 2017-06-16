@@ -10,7 +10,7 @@ struct ParticleState {
     ParticleState(const SkPoint &posT,
                   const SkScalar &scaleT,
                   const SkScalar &sizeT,
-                  const SkScalar &opacityT,
+                  const unsigned char &opacityT,
                   const SkPath &path) {
         pos = posT;
         size = scaleT*sizeT;
@@ -23,7 +23,7 @@ struct ParticleState {
                 const SkPaint paint) const {
         if(size < 0.) return;
         SkPaint paintT = paint;
-        paintT.setAlpha(opacity*255);
+        paintT.setAlpha(opacity);
         paintT.setStrokeWidth(size);
         canvas->drawPath(linePath, paintT);
     }
@@ -31,7 +31,7 @@ struct ParticleState {
     SkPath linePath;
     SkPoint pos;
     SkScalar size;
-    SkScalar opacity;
+    unsigned char opacity;
 };
 
 class Particle {

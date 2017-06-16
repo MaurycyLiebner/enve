@@ -57,9 +57,10 @@ int ColorAnimator::prp_saveToSql(QSqlQuery *query,
     int val2AnimatorId = mVal2Animator->prp_saveToSql(query);
     int val3AnimatorId = mVal3Animator->prp_saveToSql(query);
     int alphaAnimatorId = mAlphaAnimator->prp_saveToSql(query);
-    if(!query->exec(QString("INSERT INTO coloranimator (colormode, val1animatorid, "
-                       "val2animatorid, val3animatorid, alphaanimatorid) "
-                "VALUES (%1, %2, %3, %4, %5)").
+    if(!query->exec(QString("INSERT INTO coloranimator ("
+                            "colormode, val1animatorid, "
+                            "val2animatorid, val3animatorid, alphaanimatorid) "
+                            "VALUES (%1, %2, %3, %4, %5)").
                 arg(mColorMode).
                 arg(val1AnimatorId).
                 arg(val2AnimatorId).
@@ -106,7 +107,7 @@ void ColorAnimator::qra_setCurrentValue(const Color &colorValue,
     mAlphaAnimator->qra_setCurrentValue(colorValue.gl_a, saveUndoRedo, finish);
 }
 
-void ColorAnimator::qra_setCurrentValue(QColor qcolorValue,
+void ColorAnimator::qra_setCurrentValue(const QColor &qcolorValue,
                                         const bool &saveUndoRedo,
                                         const bool &finish) {
     Color color;
@@ -135,7 +136,7 @@ Color ColorAnimator::getCurrentColor() const {
     return color;
 }
 
-void ColorAnimator::setColorMode(ColorMode colorMode) {
+void ColorAnimator::setColorMode(const ColorMode &colorMode) {
     if(colorMode == RGBMODE) {
         mVal1Animator->prp_setName("red");
         mVal2Animator->prp_setName("green");
@@ -249,7 +250,7 @@ void ColorAnimator::anim_saveCurrentValueAsKey() {
 }
 
 #include <QMenu>
-void ColorAnimator::prp_openContextMenu(QPoint pos) {
+void ColorAnimator::prp_openContextMenu(const QPoint &pos) {
     QMenu menu;
     menu.addAction("Add Key");
 

@@ -46,8 +46,8 @@ void VideoBox::updateFrameCount(const char* path) {
         const AVMediaType &mediaType = format->streams[i]->codec->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
             AVStream *vidStream = format->streams[i];
-            mFps = vidStream->avg_frame_rate.den/
-                   (qreal)vidStream->avg_frame_rate.num;
+            mFps = (qreal)vidStream->avg_frame_rate.num/
+                        vidStream->avg_frame_rate.den;
             mFramesCount = vidStream->nb_frames - 1;
             break;
         }
@@ -104,30 +104,32 @@ int VideoBox::getImageAtFrame(const char* path,
     sws = sws_getContext(videoCodec->width, videoCodec->height,
                          videoCodec->pix_fmt,
                          videoCodec->width, videoCodec->height,
-                         AV_PIX_FMT_RGBA, SWS_BICUBIC, NULL, NULL, NULL);
+                         AV_PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
 
     // prepare to read data
     AVPacket packet;
     av_init_packet(&packet);
-    AVFrame* decodedFrame = av_frame_alloc();
-    if (!decodedFrame) {
+    AVFrame *decodedFrame = av_frame_alloc();
+    if(!decodedFrame) {
         fprintf(stderr, "Error allocating the frame\n");
         return -1;
     }
 
-    int tsms = qRound(frameId*1000*
-            videoStream->avg_frame_rate.den/
-            (double)videoStream->avg_frame_rate.num);
+    int tsms = qRound(frameId*1000/
+                      (double)videoStream->avg_frame_rate.num*
+                      videoStream->avg_frame_rate.den);
 
     int64_t frame = av_rescale(tsms, videoStream->time_base.den,
                                videoStream->time_base.num);
 
     frame /= 1000;
 
-    if (avformat_seek_file(format, videoStreamIndex, 0,
-                           frame, frame,
-            AVSEEK_FLAG_FRAME)< 0) {
-        return 0;
+    if(frameId != 0) {
+        if(avformat_seek_file(format, videoStreamIndex, 0,
+                               frame, frame,
+                AVSEEK_FLAG_FRAME)< 0) {
+            return 0;
+        }
     }
 
     avcodec_flush_buffers(videoCodec);
@@ -135,31 +137,32 @@ int VideoBox::getImageAtFrame(const char* path,
     int64_t pts = 0;
 
     do {
-        if (av_read_frame(format, &packet) >= 0) {
+        if(av_read_frame(format, &packet) >= 0) {
             int gotFrame;
-            if (packet.stream_index == videoStreamIndex) {
+            if(packet.stream_index == videoStreamIndex) {
                 avcodec_decode_video2(videoCodec, decodedFrame, &gotFrame,
                 &packet);
             }
             av_free_packet(&packet);
+            if(frameId == 0 && gotFrame) break;
         } else {
             break;
         }
 
         // calculate PTS:
-        pts = av_frame_get_best_effort_timestamp (decodedFrame);
-        pts = av_rescale_q ( pts, videoStream->time_base, AV_TIME_BASE_Q );
-    } while ( pts/1000 <= tsms);
+        pts = av_frame_get_best_effort_timestamp(decodedFrame);
+        pts = av_rescale_q(pts, videoStream->time_base, AV_TIME_BASE_Q);
+    } while(pts/1000 <= tsms);
 
 //    if(mImage.width() != videoCodec->width ||
 //       mImage.height() != videoCodec->height) {
 //        mImage = QImage(videoCodec->width, videoCodec->height,
 //                   QImage::Format_RGBA8888);
 //    }
-    mUpdateAnimationImage = QImage(videoCodec->width, videoCodec->height,
+
+/*    mUpdateAnimationImage = QImage(videoCodec->width, videoCodec->height,
                                     QImage::Format_RGBA8888);
 
-    /* 2. Convert and write into image buffer  */
     uint8_t *dst[] = {mUpdateAnimationImage.bits()};
     int linesizes[4];
 
@@ -167,7 +170,7 @@ int VideoBox::getImageAtFrame(const char* path,
 
     sws_scale(sws, decodedFrame->data, decodedFrame->linesize,
               0, videoCodec->height,
-              dst, linesizes);
+              dst, linesizes);*/
 
 // SKIA
 
@@ -182,7 +185,6 @@ int VideoBox::getImageAtFrame(const char* path,
     SkPixmap pixmap;
     bitmap.peekPixels(&pixmap);
 
-    /* 2. Convert and write into image buffer  */
     uint8_t *dstSk[] = {(unsigned char*)pixmap.writable_addr()};
     int linesizesSk[4];
 
@@ -213,10 +215,8 @@ void VideoBox::loadUpdatePixmap() {
     } else {
         getImageAtFrame(mSrcFilePath.toLatin1().data(),
                         mUpdateAnimationFrame);
-        mUpdateRelBoundingRect = mUpdateAnimationImage.rect();
+        updateUpdateRelBoundingRectFromImage();
     }
-
-    if(!mPivotChanged) centerPivotPosition();
 }
 
 void VideoBox::setFilePath(QString path) {
@@ -258,6 +258,7 @@ bool hasSound(const char* path) {
     // success
     return false;
 }
+
 #include "Sound/soundcomposition.h"
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {

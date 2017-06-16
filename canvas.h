@@ -297,6 +297,11 @@ public:
     }
 
     void setMaxFrame(const int &frame);
+
+    ColorAnimator *getBgColorAnimator() {
+        return mBackgroundColor.data();
+    }
+
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        Q_FOREACH(BoundingBox *child, mChildBoxes) {
@@ -317,7 +322,9 @@ protected:
     void handleRightButtonMousePress(QMouseEvent *event);
     void handleLeftButtonMousePress();
 signals:
+    void canvasNameChanged(Canvas *, QString);
 private slots:
+    void emitCanvasNameChanged();
 public slots:
     void nextPreviewFrame();
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
@@ -396,6 +403,9 @@ public:
 
     const qreal &getFps() const { return mFps; }
     void setFps(const qreal &fps) { mFps = fps; }
+    void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
+
+    bool SWT_isCanvas() { return true; }
 private:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;

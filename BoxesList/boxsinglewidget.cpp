@@ -476,7 +476,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_HEIGHT/2) return;
     SingleWidgetTarget *target = mTarget->getTarget();
-    if(target->SWT_isBoundingBox()) {
+    if(target->SWT_isBoundingBox() && !target->SWT_isCanvas()) {
         BoundingBox *bb_target = (BoundingBox*)target;
         bb_target->selectionChangeTriggered(event->modifiers() &
                                             Qt::ShiftModifier);

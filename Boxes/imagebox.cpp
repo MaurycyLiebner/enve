@@ -16,12 +16,6 @@ void ImageBox::updateRelBoundingRect() {
     BoundingBox::updateRelBoundingRect();
 }
 
-bool ImageBox::relPointInsidePath(const QPointF &point)
-{
-    return mImage.rect().contains(point.toPoint()
-                                   );
-}
-
 void ImageBox::makeDuplicate(Property *targetBox) {
     BoundingBox::makeDuplicate(targetBox);
     ImageBox *imgTarget = (ImageBox*)targetBox;
@@ -32,29 +26,20 @@ BoundingBox *ImageBox::createNewDuplicate(BoxesGroup *parent) {
     return new ImageBox(parent);
 }
 
-void ImageBox::draw(QPainter *p) {
-    p->setRenderHint(QPainter::SmoothPixmapTransform);
-    p->drawImage(0, 0, mImage);
-}
-
 void ImageBox::drawSk(SkCanvas *canvas) {
     SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(mImageSk, 0, 0, &paint);
 }
 
-void ImageBox::reloadPixmap()
-{
+void ImageBox::reloadPixmap() {
     if(mImageFilePath.isEmpty()) {
     } else {
-        mImage.load(mImageFilePath);
-
         sk_sp<SkData> data = SkData::MakeFromFileName(
                     mImageFilePath.toLocal8Bit().data());
         mImageSk = SkImage::MakeFromEncoded(data);
     }
 
-    if(!mPivotChanged) scheduleCenterPivot();
     scheduleSoftUpdate();
 }
 

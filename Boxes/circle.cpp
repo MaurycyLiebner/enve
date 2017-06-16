@@ -79,8 +79,6 @@ void Circle::prp_loadFromSql(const int &boundingBoxId) {
     } else {
         qDebug() << "Could not load circle with id " << boundingBoxId;
     }
-
-    if(!mPivotChanged) centerPivotPosition();
 }
 
 void Circle::duplicateCirclePointsFrom(
