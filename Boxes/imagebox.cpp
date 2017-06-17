@@ -12,6 +12,7 @@ ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
 void ImageBox::updateRelBoundingRect() {
     mRelBoundingRect = QRectF(0., 0.,
                               mImageSk->width(), mImageSk->height());
+    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
 
     BoundingBox::updateRelBoundingRect();
 }
@@ -46,4 +47,29 @@ void ImageBox::reloadPixmap() {
 void ImageBox::setFilePath(QString path) {
     mImageFilePath = path;
     reloadPixmap();
+}
+
+void ImageBox::addActionsToMenu(QMenu *menu) {
+    menu->addAction("Reload");
+    menu->addAction("Set Source File...");
+}
+#include <QFileDialog>
+#include "mainwindow.h"
+bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
+    if(selectedAction->text() == "Set Source File...") {
+        MainWindow::getInstance()->disableEventFilter();
+        QString importPath = QFileDialog::getOpenFileName(
+                                                MainWindow::getInstance(),
+                                                "Change Source", "",
+                                                "Image Files (*.png *.jpg)");
+        MainWindow::getInstance()->enableEventFilter();
+        if(!importPath.isEmpty()) {
+            setFilePath(importPath);
+        }
+        return true;
+    } else if(selectedAction->text() == "Reload") {
+        reloadPixmap();
+        return true;
+    }
+    return false;
 }

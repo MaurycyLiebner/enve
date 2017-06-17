@@ -89,7 +89,7 @@ public:
 
     void clearPreview();
 
-    void centerPivotPosition(bool finish = false) { Q_UNUSED(finish); }
+    void centerPivotPosition(const bool &finish = false) { Q_UNUSED(finish); }
     bool processUnfilteredKeyEvent(QKeyEvent *event);
 
     //
@@ -148,14 +148,10 @@ public:
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv);
 
-    void setSelectedFillGradient(Gradient* gradient, bool finish);
-    void setSelectedStrokeGradient(Gradient* gradient, bool finish);
-    void setSelectedFillFlatColor(Color color, bool finish);
-    void setSelectedStrokeFlatColor(Color color, bool finish);
 
     void setSelectedCapStyle(Qt::PenCapStyle capStyle);
     void setSelectedJoinStyle(Qt::PenJoinStyle joinStyle);
-    void setSelectedStrokeWidth(qreal strokeWidth, bool finish);
+    void setSelectedStrokeWidth(qreal strokeWidth, const bool &finish);
     void startSelectedStrokeWidthTransform();
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
@@ -226,7 +222,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void mouseDoubleClickEvent(QMouseEvent *);
+    void mouseDoubleClickEvent(QMouseEvent *e);
 
     void keyPressEvent(QKeyEvent *event);
     void drawPreviewPixmapSk(SkCanvas *canvas);
@@ -406,7 +402,9 @@ public:
     void drawTransparencyMesh(SkCanvas *canvas, const SkRect &viewRect);
 
     bool SWT_isCanvas() { return true; }
-private:
+    bool handleSelectedCanvasAction(QAction *selectedAction);
+    void addCanvasActionToMenu(QMenu *menu);
+protected:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 

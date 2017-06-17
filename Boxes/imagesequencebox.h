@@ -13,6 +13,8 @@ public:
     void makeDuplicate(Property *targetBox);
 
     bool SWT_isImageSequenceBox() { return true; }
+
+    void changeSourceFile();
 private:
     QStringList mListOfFrames;
     QString mUpdateFramePath = "";

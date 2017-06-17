@@ -4,6 +4,7 @@
 #include <QList>
 #include <QDebug>
 #include <memory>
+#include <QFont>
 #include "skiaincludes.h"
 
 class MainWindow;
@@ -25,6 +26,8 @@ class BoxesGroup;
 typedef QSharedPointer<BoxesGroup> BoxesGroupQSPtr;
 class BoundingBox;
 typedef QSharedPointer<BoundingBox> BoundingBoxQSPtr;
+class TextBox;
+typedef QSharedPointer<TextBox> TextBoxQSPtr;
 class ComplexAnimator;
 typedef QSharedPointer<ComplexAnimator> ComplexAnimatorQSPtr;
 class Property;
@@ -711,4 +714,37 @@ private:
     PathPointQSPtr mTarget;
 };
 
+class ChangeFontUndoRedo : public UndoRedo {
+public:
+    ChangeFontUndoRedo(TextBox *target,
+                       const QFont &fontBefore,
+                       const QFont &fontAfter);
+    ~ChangeFontUndoRedo();
+
+    void undo();
+
+    void redo();
+
+private:
+    TextBoxQSPtr mTarget;
+    QFont mOldFont;
+    QFont mNewFont;
+};
+
+class ChangeTextUndoRedo : public UndoRedo {
+public:
+    ChangeTextUndoRedo(TextBox *target,
+                       const QString &textBefore,
+                       const QString &textAfter);
+    ~ChangeTextUndoRedo();
+
+    void undo();
+
+    void redo();
+
+private:
+    TextBoxQSPtr mTarget;
+    QString mOldText;
+    QString mNewText;
+};
 #endif // UNDOREDO_H

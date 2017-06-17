@@ -83,15 +83,16 @@ public:
     virtual BoundingBox *createLink(BoxesGroup *parent);
     virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 
-    virtual void setFont(QFont) {}
-    virtual void setSelectedFontSize(qreal) {}
-    virtual void setSelectedFontFamilyAndStyle(QString, QString) {}
+    virtual void setFont(const QFont &) {}
+    virtual void setSelectedFontSize(const qreal &) {}
+    virtual void setSelectedFontFamilyAndStyle(const QString &,
+                                               const QString &) {}
 
     virtual QPointF getRelCenterPosition() {
         return mRelBoundingRect.center();
     }
 
-    virtual void centerPivotPosition(bool finish = false) {
+    virtual void centerPivotPosition(const bool &finish = false) {
         mTransformAnimator->setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), finish);
     }
@@ -107,8 +108,6 @@ public:
 
 
     void applyTransformation(BoxTransformAnimator *transAnimator);
-
-    void rotateBy(const qreal &rot, QPointF absOrigin);
 
     QPointF getAbsolutePos();
 
@@ -210,20 +209,12 @@ public:
     virtual void startAllPointsTransform() {}
     virtual void finishAllPointsTransform() {}
 
-    virtual void setFillGradient(Gradient* gradient, bool finish) {
-        Q_UNUSED(gradient); Q_UNUSED(finish); }
-    virtual void setStrokeGradient(Gradient* gradient, bool finish) {
-        Q_UNUSED(gradient); Q_UNUSED(finish); }
-    virtual void setFillFlatColor(Color color, bool finish) {
-        Q_UNUSED(color); Q_UNUSED(finish); }
-    virtual void setStrokeFlatColor(Color color, bool finish) {
-        Q_UNUSED(color); Q_UNUSED(finish); }
-
-    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle) {
+    virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
         Q_UNUSED(capStyle); }
-    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
+    virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
         Q_UNUSED(joinStyle); }
-    virtual void setStrokeWidth(qreal strokeWidth, bool finish) {
+    virtual void setStrokeWidth(const qreal &strokeWidth,
+                                const bool &finish) {
         Q_UNUSED(strokeWidth); Q_UNUSED(finish); }
 
     virtual void startSelectedStrokeWidthTransform() {}
@@ -241,7 +232,9 @@ public:
     void setRelativePos(const QPointF &relPos,
                         const bool &saveUndoRedo = false);
 
-    virtual void showContextMenu(QPoint globalPos) { Q_UNUSED(globalPos); }
+    virtual void showContextMenu(const QPoint &globalPos) {
+        Q_UNUSED(globalPos);
+    }
 
 
     void scaleRelativeToSavedPivot(const qreal &scaleXBy,
@@ -285,7 +278,6 @@ public:
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
-    void setAwaitUpdateScheduled(bool bT);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
     const SkBlendMode &getBlendMode() {
@@ -299,7 +291,7 @@ public:
     void updateEffectsMarginIfNeeded();
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
-    void selectionChangeTriggered(bool shiftPressed);
+    void selectionChangeTriggered(const bool &shiftPressed);
 
     bool isAnimated() { return prp_isDescendantRecording(); }
     virtual void updateRelBoundingRect();
@@ -460,6 +452,11 @@ public:
 
 
     SkPoint getUpdateDrawPos();
+
+    virtual void addActionsToMenu(QMenu *) {}
+    virtual bool handleSelectedCanvasAction(QAction *) {
+        return false;
+    }
 protected:
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
@@ -529,8 +526,6 @@ protected:
 
     bool mVisible = true;
     bool mLocked = false;
-
-    bool mForceUpdate = false;
 signals:
     void replaceChacheSet();
     void scheduledUpdate();
@@ -543,7 +538,6 @@ public slots:
     virtual void updateAfterDurationRectangleRangeChanged() {}
     void replaceCurrentFrameCache();
     void scheduleSoftUpdate();
-    void scheduleHardUpdate();
 
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);

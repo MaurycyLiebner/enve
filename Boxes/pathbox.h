@@ -25,11 +25,11 @@ public:
 
     void resetFillGradientPointsPos(bool finish);
 
-    virtual void setStrokeCapStyle(Qt::PenCapStyle capStyle);
+    virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
 
-    virtual void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle);
+    virtual void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
 
-    virtual void setStrokeWidth(qreal strokeWidth, bool finish);
+    virtual void setStrokeWidth(const qreal &strokeWidth, const bool &finish);
 
     void setOutlineCompositionMode(
             const QPainter::CompositionMode &compositionMode);

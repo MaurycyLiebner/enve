@@ -33,53 +33,49 @@ public:
 
     void addContainedBoxesToSelection(const QRectF &rect);
 
-    void setIsCurrentGroup(bool bT);
+    void setIsCurrentGroup(const bool &bT);
 
     BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
-
-    void setFillSettings(PaintSettings fillSettings,
-                         bool saveUndoRedo = true);
-    void setStrokeSettings(StrokeSettings strokeSettings,
-                           bool saveUndoRedo = true);
 
     void setCurrentFillStrokeSettingsFromBox(BoundingBox *box);
 
     void ungroup();
 
     int saveToSql(QSqlQuery *query, const int &parentId);
-    BoxesGroup *loadChildrenFromSql(int thisBoundingBoxId, bool loadInBox);
+    BoxesGroup *loadChildrenFromSql(const int &thisBoundingBoxId,
+                                    const bool &loadInBox);
 
     bool isCurrentGroup();
     void addChild(BoundingBox *child);
-    void addChildToListAt(int index, BoundingBox *child, bool saveUndoRedo = true);
-    void updateChildrenId(int firstId, bool saveUndoRedo = true);
-    void updateChildrenId(int firstId, int lastId, bool saveUndoRedo = true);
+    void addChildToListAt(const int &index, BoundingBox *child,
+                          const bool &saveUndoRedo = true);
+    void updateChildrenId(const int &firstId,
+                          const bool &saveUndoRedo = true);
+    void updateChildrenId(const int &firstId,
+                          const int &lastId,
+                          const bool &saveUndoRedo = true);
     void removeChild(BoundingBox *child);
     void increaseChildZInList(BoundingBox *child);
     void decreaseChildZInList(BoundingBox *child);
     void bringChildToEndList(BoundingBox *child);
     void bringChildToFrontList(BoundingBox *child);
     void moveChildInList(BoundingBox *child,
-                         int from, int to,
-                         bool saveUndoRedo = true);
+                         const int &from,
+                         const int &to,
+                         const bool &saveUndoRedo = true);
     void moveChildBelow(BoundingBox *boxToMove,
                         BoundingBox *below);
     void moveChildAbove(BoundingBox *boxToMove,
                         BoundingBox *above);
 
-    void removeChildFromList(int id, bool saveUndoRedo = true);
+    void removeChildFromList(const int &id,
+                             const bool &saveUndoRedo = true);
 
     void updateAfterFrameChanged(const int &currentFrame);
 
-
-    void setFillGradient(Gradient* gradient, bool finish);
-    void setStrokeGradient(Gradient* gradient, bool finish);
-    void setFillFlatColor(Color color, bool finish);
-    void setStrokeFlatColor(Color color, bool finish);
-
-    void setStrokeCapStyle(Qt::PenCapStyle capStyle);
-    void setStrokeJoinStyle(Qt::PenJoinStyle joinStyle);
-    void setStrokeWidth(qreal strokeWidth, bool finish);
+    void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
+    void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
+    void setStrokeWidth(const qreal &strokeWidth, const bool &finish);
 
     PaintSettings *getFillSettings();
     StrokeSettings *getStrokeSettings();
@@ -138,6 +134,10 @@ public:
     void updateAfterCombinedTransformationChangedAfterFrameChagne();
 
     bool SWT_isBoxesGroup() { return true; }
+    void drawSk(SkCanvas *canvas);
+    void drawSelectedSk(SkCanvas *canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

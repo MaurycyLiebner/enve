@@ -28,6 +28,18 @@ void ImageSequenceBox::makeDuplicate(Property *targetBox) {
     animationBoxTarget->duplicateAnimationBoxAnimatorsFrom(
                 mTimeScaleAnimator.data());
 }
+#include "mainwindow.h"
+#include <QFileDialog>
+void ImageSequenceBox::changeSourceFile() {
+    MainWindow::getInstance()->disableEventFilter();
+    QStringList importPaths = QFileDialog::getOpenFileNames(
+                MainWindow::getInstance(), "Import Image Sequence",
+                "", "Images (*.png *.jpg)");
+    MainWindow::getInstance()->enableEventFilter();
+    if(!importPaths.isEmpty()) {
+        setListOfFrames(importPaths);
+    }
+}
 
 BoundingBox *ImageSequenceBox::createNewDuplicate(BoxesGroup *parent) {
     return new ImageSequenceBox(parent);

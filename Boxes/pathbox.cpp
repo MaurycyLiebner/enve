@@ -209,19 +209,19 @@ void PathBox::resetFillGradientPointsPos(bool finish) {
                                       finish);
 }
 
-void PathBox::setStrokeCapStyle(Qt::PenCapStyle capStyle) {
+void PathBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
     clearAllCache();
     scheduleOutlinePathUpdate();
 }
 
-void PathBox::setStrokeJoinStyle(Qt::PenJoinStyle joinStyle) {
+void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
     clearAllCache();
     scheduleOutlinePathUpdate();
 }
 
-void PathBox::setStrokeWidth(qreal strokeWidth, bool finish) {
+void PathBox::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
     mStrokeSettings->setCurrentStrokeWidth(strokeWidth);
     if(finish) {
         mStrokeSettings->getStrokeWidthAnimator()->prp_finishTransform();

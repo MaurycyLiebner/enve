@@ -764,7 +764,7 @@ void MainWindow::callUpdateSchedulers() {
 
     mCurrentUndoRedoStack->startNewSet();
 }
-
+#include "Boxes/textbox.h"
 void MainWindow::setCurrentBox(BoundingBox *box) {
     if(box == NULL) {
         mFillStrokeSettings->setCurrentSettings(NULL,
@@ -772,6 +772,12 @@ void MainWindow::setCurrentBox(BoundingBox *box) {
     } else {
         mFillStrokeSettings->setCurrentSettings(box->getFillSettings(),
                                                 box->getStrokeSettings());
+        if(box->SWT_isTextBox()) {
+            TextBox *txtBox = (TextBox*)box;
+            mFontWidget->setCurrentSettings(txtBox->getFontSize(),
+                                            txtBox->getFontFamily(),
+                                            txtBox->getFontStyle());
+        }
     }
 }
 

@@ -30,7 +30,6 @@ int TextBox::saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
-
 void TextBox::prp_loadFromSql(const int &boundingBoxId) {
     PathBox::prp_loadFromSql(boundingBoxId);
 
@@ -46,7 +45,7 @@ void TextBox::prp_loadFromSql(const int &boundingBoxId) {
 
         setText(query.value(idText).toString());
         setSelectedFontFamilyAndStyle(query.value(idFontFamily).toString(),
-                              query.value(idFontStyle).toString() );
+                                      query.value(idFontStyle).toString() );
         setSelectedFontSize(query.value(idFontSize).toReal());
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
@@ -66,53 +65,72 @@ void TextBox::prp_loadFromSql(const int &boundingBoxId) {
 #include <QApplication>
 #include <QDesktopWidget>
 
-void TextBox::openTextEditor() {
+void TextBox::openTextEditor(const bool &saveUndoRedo) {
     bool ok;
     QString text =
             QInputDialog::getMultiLineText(mMainWindow, getName() + " text",
                                            "Text:", mText, &ok);
     if(ok) {
-        setText(text);
+        setText(text, saveUndoRedo);
         callUpdateSchedulers();
     }
 }
 
-void TextBox::setText(QString text) {
+void TextBox::setText(const QString &text, const bool &saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new ChangeTextUndoRedo(this, mText, text));
+    }
     clearAllCache();
     mText = text;
     schedulePathUpdate();
 }
 
-void TextBox::setFont(QFont font) {
+void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new ChangeFontUndoRedo(this, mFont, font));
+    }
     clearAllCache();
     mFont = font;
     schedulePathUpdate();
 }
 
-void TextBox::setSelectedFontSize(qreal size) {
-    clearAllCache();
-    mFont.setPointSize(size);
-    schedulePathUpdate();
+void TextBox::setSelectedFontSize(const qreal &size) {
+    QFont newFont = mFont;
+    newFont.setPointSize(size);
+    setFont(newFont);
 }
 
-void TextBox::setSelectedFontFamilyAndStyle(QString fontFamily,
-                                            QString fontStyle) {
-    clearAllCache();
-    mFont.setFamily(fontFamily);
-    mFont.setStyleName(fontStyle);
-    schedulePathUpdate();
+void TextBox::setSelectedFontFamilyAndStyle(const QString &fontFamily,
+                                            const QString &fontStyle) {
+    QFont newFont = mFont;
+    newFont.setFamily(fontFamily);
+    newFont.setStyleName(fontStyle);
+    setFont(newFont);
+}
+
+qreal TextBox::getFontSize() {
+    return mFont.pointSize();
+}
+
+QString TextBox::getFontFamily() {
+    return mFont.family();
+}
+
+QString TextBox::getFontStyle() {
+    return mFont.styleName();
 }
 
 MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
-                                  const CanvasMode &currentCanvasMode,
-                                  const qreal &canvasScaleInv) {
+                                        const CanvasMode &currentCanvasMode,
+                                        const qreal &canvasScaleInv) {
     return PathBox::getPointAtAbsPos(absPtPos,
                                      currentCanvasMode,
                                      canvasScaleInv);
 }
 
-qreal textForQPainterPath(Qt::Alignment alignment,
-                          qreal lineWidth, qreal maxWidth) {
+qreal textForQPainterPath(const Qt::Alignment &alignment,
+                          const qreal &lineWidth,
+                          const qreal &maxWidth) {
     if(alignment == Qt::AlignCenter) {
         return (maxWidth - lineWidth)*0.5;
     } else if(alignment == Qt::AlignLeft) {
@@ -135,11 +153,47 @@ void TextBox::updatePath() {
     }
     Q_FOREACH(QString line, lines) {
         qreal lineWidth = fm.width(line);
-        mPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth), yT,
-                      mFont, line);
+        mPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
+                      yT, mFont, line);
         yT += fm.height();
     }
 
     QRectF boundingRect = mPath.boundingRect();
     mPath.translate(-boundingRect.center());
+
+    bool firstOther;
+    SkPoint endPt;
+    SkPoint startPt;
+    mPathSk.reset();
+    for(int i = 0; i < mPath.elementCount(); i++) {
+        const QPainterPath::Element &elem = mPath.elementAt(i);
+
+        if(elem.isMoveTo()) { // move
+            mPathSk.moveTo(elem.x, elem.y);
+        } else if(elem.isLineTo()) { // line
+            mPathSk.lineTo(elem.x, elem.y);
+        } else if(elem.isCurveTo()) { // curve
+            endPt = SkPoint::Make(elem.x, elem.y);
+            firstOther = true;
+        } else { // other
+            if(firstOther) {
+                startPt = SkPoint::Make(elem.x, elem.y);
+            } else {
+                mPathSk.cubicTo(endPt, startPt, SkPoint::Make(elem.x, elem.y));
+            }
+            firstOther = !firstOther;
+        }
+    }
+}
+
+void TextBox::addActionsToMenu(QMenu *menu) {
+    menu->addAction("Set Text...");
+}
+
+bool TextBox::handleSelectedCanvasAction(QAction *selectedAction) {
+    if(selectedAction->text() == "Set Text...") {
+        openTextEditor();
+        return true;
+    }
+    return false;
 }

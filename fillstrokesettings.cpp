@@ -283,7 +283,7 @@ void FillStrokeSettingsWidget::setTransformFinishEmitter(const char *slot) {
             this, slot );
 }
 
-void FillStrokeSettingsWidget::setStrokeWidth(qreal width) {
+void FillStrokeSettingsWidget::setStrokeWidth(const qreal &width) {
     //startTransform(SLOT(emitStrokeWidthChanged()));
     mCurrentStrokeWidth = width;
     emitStrokeWidthChangedTMP();

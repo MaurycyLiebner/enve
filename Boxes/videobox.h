@@ -21,6 +21,7 @@ public:
     void loadUpdatePixmap();
 
     bool SWT_isVideoBox() { return true; }
+    void changeSourceFile();
 protected:
     void updateFrameCount(const char *path);
 private:

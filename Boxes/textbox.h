@@ -1,20 +1,25 @@
 #ifndef TEXTBOX_H
 #define TEXTBOX_H
 #include "Boxes/pathbox.h"
+#include "skiaincludes.h"
 
 class TextBox : public PathBox
 {
 public:
     TextBox(BoxesGroup *parent);
 
-    void setText(QString text);
+    void setText(const QString &text, const bool &saveUndoRedo = true);
 
-    void setFont(QFont font);
-    void setSelectedFontSize(qreal size);
-    void setSelectedFontFamilyAndStyle(QString fontFamily,
-                               QString fontStyle);
+    void setFont(const QFont &font, const bool &saveUndoRedo = true);
+    void setSelectedFontSize(const qreal &size);
+    void setSelectedFontFamilyAndStyle(const QString &fontFamily,
+                                       const QString &fontStyle);
 
-    void openTextEditor();
+    qreal getFontSize();
+    QString getFontFamily();
+    QString getFontStyle();
+
+    void openTextEditor(const bool &saveUndoRedo = true);
     int saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
     void updatePath();
@@ -42,6 +47,8 @@ public:
     }
 
     bool SWT_isTextBox() { return true; }
+    void addActionsToMenu(QMenu *menu);
+    bool handleSelectedCanvasAction(QAction *selectedAction);
 private:
     QString mText;
     QFont mFont;

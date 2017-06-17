@@ -62,7 +62,7 @@ public:
                          qreal maxPercent, qreal minPercent,
                          bool *found = NULL, QPointF *posInPath = NULL);
 
-    void showContextMenu(QPoint globalPos);
+    void showContextMenu(const QPoint &globalPos);
 
     void deletePointAndApproximate(PathPoint *pointToRemove);
     virtual void prp_loadFromSql(const int &boundingBoxId);

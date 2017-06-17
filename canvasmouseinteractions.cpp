@@ -26,6 +26,93 @@ void Canvas::handleMovePathMousePressEvent() {
     }
 }
 
+void Canvas::addCanvasActionToMenu(QMenu *menu) {
+    menu->addAction("Apply Transformation");
+    menu->addAction("Create Link");
+    menu->addAction("Center Pivot");
+    menu->addAction("Copy");
+    menu->addAction("Cut");
+    menu->addAction("Duplicate");
+    menu->addAction("Group");
+    menu->addAction("Ungroup");
+    menu->addAction("Delete");
+
+    QMenu *effectsMenu = menu->addMenu("Effects");
+    effectsMenu->addAction("Blur");
+    effectsMenu->addAction("Shadow");
+//            effectsMenu->addAction("Brush");
+    effectsMenu->addAction("Lines");
+    effectsMenu->addAction("Circles");
+    effectsMenu->addAction("Swirl");
+    effectsMenu->addAction("Oil");
+    effectsMenu->addAction("Implode");
+    effectsMenu->addAction("Desaturate");
+    effectsMenu->addAction("Alpha Matte");
+
+    QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
+    pathEffectsMenu->addAction("Discrete Effect");
+    pathEffectsMenu->addAction("Duplicate Effect");
+
+    QMenu *outlinePathEffectsMenu = menu->addMenu("Outline Effects");
+    outlinePathEffectsMenu->addAction("Discrete Effect");
+    outlinePathEffectsMenu->addAction("Duplicate Effect");
+}
+
+bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
+    if(selectedAction->text() == "Duplicate") {
+        duplicateSelectedBoxes();
+    } else if(selectedAction->text() == "Delete") {
+        removeSelectedBoxesAndClearList();
+    } else if(selectedAction->text() == "Apply Transformation") {
+        applyCurrentTransformationToSelected();
+    } else if(selectedAction->text() == "Create Link") {
+        createLinkBoxForSelected();
+    } else if(selectedAction->text() == "Group") {
+        groupSelectedBoxes();
+    } else if(selectedAction->text() == "Ungroup") {
+        ungroupSelected();
+    } else if(selectedAction->text() == "Center Pivot") {
+        centerPivotForSelected();
+    } else if(selectedAction->text() == "Blur") {
+        applyBlurToSelected();
+    } else if(selectedAction->text() == "Shadow") {
+        applyShadowToSelected();
+    } else if(selectedAction->text() == "Brush") {
+        applyBrushEffectToSelected();
+    } else if(selectedAction->text() == "Lines") {
+        applyLinesEffectToSelected();
+    } else if(selectedAction->text() == "Circles") {
+        applyCirclesEffectToSelected();
+    } else if(selectedAction->text() == "Swirl") {
+        applySwirlEffectToSelected();
+    } else if(selectedAction->text() == "Oil") {
+        applyOilEffectToSelected();
+    } else if(selectedAction->text() == "Implode") {
+        applyImplodeEffectToSelected();
+    } else if(selectedAction->text() == "Desaturate") {
+        applyDesaturateEffectToSelected();
+    } else if(selectedAction->text() == "Alpha Matte") {
+        applyAlphaMatteToSelected();
+    } else if(selectedAction->text() == "Discrete Effect") {
+        QMenu *parentMenu = (QMenu*)selectedAction->parent();
+        if(parentMenu->title() == "Path Effects") {
+            applyDiscretePathEffectToSelected();
+        } else {
+            applyDiscreteOutlinePathEffectToSelected();
+        }
+    } else if(selectedAction->text() == "Duplicate Effect") {
+        QMenu *parentMenu = (QMenu*)selectedAction->parent();
+        if(parentMenu->title() == "Path Effects") {
+            applyDuplicatePathEffectToSelected();
+        } else {
+            applyDuplicateOutlinePathEffectToSelected();
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
@@ -96,90 +183,21 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             }
         } else {
             if(!pressedBox->isSelected()) {
-                clearBoxesSelection();
+                if(!isShiftPressed()) {
+                    clearBoxesSelection();
+                }
                 addBoxToSelection(pressedBox);
             }
 
             QMenu menu(mCanvasWindow->getCanvasWidget());
 
-            menu.addAction("Apply Transformation");
-            menu.addAction("Create Link");
-            menu.addAction("Center Pivot");
-            menu.addAction("Copy");
-            menu.addAction("Cut");
-            menu.addAction("Duplicate");
-            menu.addAction("Group");
-            menu.addAction("Ungroup");
-            menu.addAction("Delete");
-
-            QMenu *effectsMenu = menu.addMenu("Effects");
-            effectsMenu->addAction("Blur");
-            effectsMenu->addAction("Shadow");
-//            effectsMenu->addAction("Brush");
-            effectsMenu->addAction("Lines");
-            effectsMenu->addAction("Circles");
-            effectsMenu->addAction("Swirl");
-            effectsMenu->addAction("Oil");
-            effectsMenu->addAction("Implode");
-            effectsMenu->addAction("Desaturate");
-            effectsMenu->addAction("Alpha Matte");
-
-            QMenu *pathEffectsMenu = menu.addMenu("Path Effects");
-            QAction *discreteEffA =
-                    pathEffectsMenu->addAction("Discrete Effect");
-            QAction *duplicateEffA =
-                    pathEffectsMenu->addAction("Duplicate Effect");
-
-            QMenu *outlinePathEffectsMenu = menu.addMenu("Outline Effects");
-            QAction *discretePathEffA =
-                    outlinePathEffectsMenu->addAction("Discrete Effect");
-            QAction *duplicatePathEffA =
-                    outlinePathEffectsMenu->addAction("Duplicate Effect");
+            pressedBox->addActionsToMenu(&menu);
+            addCanvasActionToMenu(&menu);
 
             QAction *selectedAction = menu.exec(event->globalPos());
-            if(selectedAction != NULL) {
-                if(selectedAction->text() == "Duplicate") {
-                    duplicateSelectedBoxes();
-                } else if(selectedAction->text() == "Delete") {
-                    removeSelectedBoxesAndClearList();
-                } else if(selectedAction->text() == "Apply Transformation") {
-                    applyCurrentTransformationToSelected();
-                } else if(selectedAction->text() == "Create Link") {
-                    createLinkBoxForSelected();
-                } else if(selectedAction->text() == "Group") {
-                    groupSelectedBoxes();
-                } else if(selectedAction->text() == "Ungroup") {
-                    ungroupSelected();
-                } else if(selectedAction->text() == "Center Pivot") {
-                    centerPivotForSelected();
-                } else if(selectedAction->text() == "Blur") {
-                    applyBlurToSelected();
-                } else if(selectedAction->text() == "Shadow") {
-                    applyShadowToSelected();
-                } else if(selectedAction->text() == "Brush") {
-                    applyBrushEffectToSelected();
-                } else if(selectedAction->text() == "Lines") {
-                    applyLinesEffectToSelected();
-                } else if(selectedAction->text() == "Circles") {
-                    applyCirclesEffectToSelected();
-                } else if(selectedAction->text() == "Swirl") {
-                    applySwirlEffectToSelected();
-                } else if(selectedAction->text() == "Oil") {
-                    applyOilEffectToSelected();
-                } else if(selectedAction->text() == "Implode") {
-                    applyImplodeEffectToSelected();
-                } else if(selectedAction->text() == "Desaturate") {
-                    applyDesaturateEffectToSelected();
-                } else if(selectedAction->text() == "Alpha Matte") {
-                    applyAlphaMatteToSelected();
-                } else if(selectedAction == discreteEffA) {
-                    applyDiscretePathEffectToSelected();
-                } else if(selectedAction == duplicateEffA) {
-                    applyDuplicatePathEffectToSelected();
-                } else if(selectedAction == discretePathEffA) {
-                    applyDiscreteOutlinePathEffectToSelected();
-                } else if(selectedAction == duplicatePathEffA) {
-                    applyDuplicateOutlinePathEffectToSelected();
+            if(selectedAction) {
+                if(!handleSelectedCanvasAction(selectedAction)) {
+                    pressedBox->handleSelectedCanvasAction(selectedAction);
                 }
             } else {
 
@@ -565,7 +583,7 @@ void Canvas::handleMouseRelease() {
             mCanvasWindow->setCanvasMode(MOVE_PATH);
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             if(mCurrentTextBox != NULL) {
-                mCurrentTextBox->openTextEditor();
+                mCurrentTextBox->openTextEditor(false);
             }
         }
     }
@@ -794,8 +812,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
     callUpdateSchedulers();
 }
 
-void Canvas::wheelEvent(QWheelEvent *event)
-{
+void Canvas::wheelEvent(QWheelEvent *event) {
     if(isPreviewingOrRendering()) return;
     if(event->delta() > 0) {
         zoomCanvas(1.1, event->posF());
@@ -812,7 +829,8 @@ void Canvas::wheelEvent(QWheelEvent *event)
     callUpdateSchedulers();
 }
 
-void Canvas::mouseDoubleClickEvent(QMouseEvent *) {
+void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
+    if(e->modifiers() & Qt::ShiftModifier) return;
     mDoubleClick = true;
 
     mLastPressedPoint = createNewPointOnLineNearSelected(
@@ -831,12 +849,13 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *) {
             if(boxAt->isGroup()) {
                 setCurrentBoxesGroup((BoxesGroup*) boxAt);
             } else if(boxAt->isText()) {
+                releaseMouseAndDontTrack();
                 ((TextBox*) boxAt)->openTextEditor();
             } else if(mCurrentMode == MOVE_PATH) {
                 mCanvasWindow->setCanvasMode(MOVE_PATH);
             }
         }
     }
-    
+
     callUpdateSchedulers();
 }

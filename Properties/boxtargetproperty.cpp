@@ -22,7 +22,7 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
     if(mTarget != NULL) {
         if(mParentBox != NULL) {
             QObject::connect(mTarget, SIGNAL(scheduledUpdate()),
-                             mParentBox, SLOT(scheduleHardUpdate()));
+                             mParentBox, SLOT(scheduleSoftUpdate()));
             QObject::connect(mTarget, SIGNAL(replaceChacheSet()),
                              mParentBox, SLOT(replaceCurrentFrameCache()));
         }

@@ -98,7 +98,7 @@ void VectorPath::updatePath() {
 }
 
 #include <QMenu>
-void VectorPath::showContextMenu(QPoint globalPos) {
+void VectorPath::showContextMenu(const QPoint &globalPos) {
     QMenu menu(mMainWindow);
 
     QAction *outlineScaled = new QAction("Scale outline");

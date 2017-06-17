@@ -120,3 +120,19 @@ void AnimationBox::drawSk(SkCanvas *canvas) {
     //paint.setFilterQuality(kHigh_SkFilterQuality);
     canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
 }
+
+void AnimationBox::addActionsToMenu(QMenu *menu) {
+    menu->addAction("Reload");
+    menu->addAction("Set Source File...");
+}
+
+bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
+    if(selectedAction->text() == "Set Source File...") {
+        changeSourceFile();
+        return true;
+    } else if(selectedAction->text() == "Reload") {
+        reloadFile();
+        return true;
+    }
+    return false;
+}

@@ -20,18 +20,15 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
 
     mFontFamilyCombo->addItems(mFontDatabase.families());
     connect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateStylesFromCurrentFamily(QString)));
+            this, SLOT(updateStylesFromCurrentFamilyAndEmit(QString)));
 
     connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(updateSizesFromCurrentFamilyAndStyles()) );
-
-    connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitFamilyAndStyleChanged()));
+            this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
 
     connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
             this, SLOT(emitSizeChanged()) );
 
-    updateStylesFromCurrentFamily();
+    updateStylesFromCurrentFamilyAndEmit();
 
     mMainLayout = new QHBoxLayout(this);
     setLayout(mMainLayout);
@@ -40,9 +37,9 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     mMainLayout->addWidget(mFontSizeCombo);
 }
 
-void FontsWidget::updateStylesFromCurrentFamily(QString family) {
+void FontsWidget::updateStylesFromCurrentFamily(const QString &family) {
     disconnect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitFamilyAndStyleChanged()));
+               this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
 
     QString currentStyle = getCurrentFontStyle();
 
@@ -54,10 +51,20 @@ void FontsWidget::updateStylesFromCurrentFamily(QString family) {
         mFontStyleCombo->setCurrentText(currentStyle);
     }
 
-    emitFamilyAndStyleChanged();
-
     connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitFamilyAndStyleChanged()));
+            this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    updateSizesFromCurrentFamilyAndStyles();
+}
+
+void FontsWidget::updateStylesFromCurrentFamilyAndEmit(const QString &family) {
+    updateStylesFromCurrentFamily(family);
+
+    emitFamilyAndStyleChanged();
+}
+
+void FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit() {
+    updateSizesFromCurrentFamilyAndStyles();
+    emitFamilyAndStyleChanged();
 }
 
 void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
@@ -77,8 +84,8 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
             this, SLOT(emitSizeChanged()) );
 }
 
-void FontsWidget::updateStylesFromCurrentFamily() {
-    updateStylesFromCurrentFamily(getCurrentFontFamily() );
+void FontsWidget::updateStylesFromCurrentFamilyAndEmit() {
+    updateStylesFromCurrentFamilyAndEmit(getCurrentFontFamily() );
 }
 
 qreal FontsWidget::getCurrentFontSize() {
@@ -91,6 +98,40 @@ QString FontsWidget::getCurrentFontStyle() {
 
 QString FontsWidget::getCurrentFontFamily() {
     return mFontFamilyCombo->currentText();
+}
+
+void FontsWidget::setCurrentFontSize(const qreal &size) {
+    disconnect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(emitSizeChanged()) );
+    mFontSizeCombo->setCurrentText(QString::number((int)size));
+    connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(emitSizeChanged()) );
+}
+
+void FontsWidget::setCurrentFontFamily(const QString &family) {
+    disconnect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),
+               this, SLOT(updateStylesFromCurrentFamilyAndEmit(QString)));
+    mFontFamilyCombo->setCurrentText(family);
+    connect(mFontFamilyCombo, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(updateStylesFromCurrentFamilyAndEmit(QString)));
+    updateStylesFromCurrentFamily(family);
+}
+
+void FontsWidget::setCurrentFontStyle(const QString &style) {
+    disconnect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
+               this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    mFontStyleCombo->setCurrentText(style);
+    connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
+    updateSizesFromCurrentFamilyAndStyles();
+}
+
+void FontsWidget::setCurrentSettings(const qreal &size,
+                                     const QString &family,
+                                     const QString &style) {
+    setCurrentFontFamily(family);
+    setCurrentFontStyle(style);
+    setCurrentFontSize(size);
 }
 
 void FontsWidget::emitFamilyAndStyleChanged() {

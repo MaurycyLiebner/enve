@@ -443,7 +443,7 @@ void BoundingBox::updateAfterFrameChanged(const int &currentFrame) {
         if(mUpdateDrawOnParentBox !=
            (anim_mCurrentRelFrame >= minDurRelFrame &&
             anim_mCurrentRelFrame <= maxDurRelFrame)) {
-            scheduleHardUpdate();
+            scheduleSoftUpdate();
         }
     }
 }
@@ -834,7 +834,7 @@ QMatrix BoundingBox::getCombinedFinalRenderTransform() {
             mParent->getCombinedFinalRenderTransform();
 }
 
-void BoundingBox::selectionChangeTriggered(bool shiftPressed) {
+void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
     Canvas *parentCanvas = getParentCanvas();
     if(shiftPressed) {
         if(mSelected) {
@@ -1254,13 +1254,8 @@ void BoundingBox::decUsedAsTarget() {
 }
 
 bool BoundingBox::shouldUpdate() {
-    if(mForceUpdate) {
-        mForceUpdate = false;
-        return true;
-    } else {
-        return (isVisibleAndInVisibleDurationRect()) ||
-               (isInVisibleDurationRect() && isUsedAsTarget());
-    }
+    return (isVisibleAndInVisibleDurationRect()) ||
+           (isInVisibleDurationRect() && isUsedAsTarget());
 }
 
 void BoundingBox::scheduleSoftUpdate() {
@@ -1284,9 +1279,4 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
         *minFrame = mDurationRectangle->getMinFrameAsAbsFrame();
         *maxFrame = mDurationRectangle->getMaxFrameAsAbsFrame();
     }
-}
-
-void BoundingBox::scheduleHardUpdate() {
-    mForceUpdate = true;
-    scheduleUpdate();
 }

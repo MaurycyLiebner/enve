@@ -241,7 +241,8 @@ static qreal toDouble(const QString &str, bool *ok = NULL) {
 //    return res;
 //}
 
-static void parseNumbersArray(const QChar *&str, QVarLengthArray<qreal, 8> &points)
+static void parseNumbersArray(const QChar *&str,
+                              QVarLengthArray<qreal, 8> &points)
 {
     while (str->isSpace())
         ++str;

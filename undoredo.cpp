@@ -583,3 +583,44 @@ void ReversePointsDirectionUndoRedo::undo() {
 void ReversePointsDirectionUndoRedo::redo() {
     mTarget->reversePointsDirection();
 }
+#include "Boxes/textbox.h"
+ChangeFontUndoRedo::ChangeFontUndoRedo(TextBox *target,
+                                       const QFont &fontBefore,
+                                       const QFont &fontAfter) :
+    UndoRedo("ChangeFontUndoRedo") {
+    mTarget = target->ref<TextBox>();
+    mOldFont = fontBefore;
+    mNewFont = fontAfter;
+}
+
+ChangeFontUndoRedo::~ChangeFontUndoRedo() {
+
+}
+
+void ChangeFontUndoRedo::undo() {
+    mTarget->setFont(mOldFont, false);
+}
+
+void ChangeFontUndoRedo::redo() {
+    mTarget->setFont(mNewFont, false);
+}
+
+ChangeTextUndoRedo::ChangeTextUndoRedo(TextBox *target,
+                                       const QString &textBefore,
+                                       const QString &textAfter) :
+    UndoRedo("ChangeTextUndoRedo") {
+    mTarget = target->ref<TextBox>();
+    mOldText = textBefore;
+    mNewText = textAfter;
+}
+
+ChangeTextUndoRedo::~ChangeTextUndoRedo() {
+}
+
+void ChangeTextUndoRedo::undo() {
+    mTarget->setText(mOldText, false);
+}
+
+void ChangeTextUndoRedo::redo() {
+    mTarget->setText(mNewText, false);
+}

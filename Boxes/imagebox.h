@@ -18,6 +18,8 @@ public:
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
 
     bool SWT_isImageBox() { return true; }
+    void addActionsToMenu(QMenu *menu);
+    bool handleSelectedCanvasAction(QAction *selectedAction);
 private:
     sk_sp<SkImage> mImageSk;
     QString mImageFilePath;

@@ -392,18 +392,21 @@ void BoxSingleWidget::loadStaticPixmaps() {
                 ":/icons/not_recording.png");
     mStaticPixmapsLoaded = true;
 }
-
+#include "canvas.h"
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     SingleWidgetTarget *target = mTarget->getTarget();
     if(event->button() == Qt::RightButton) {
         QMenu menu(this);
 
         if(target->SWT_isBoundingBox()) {
+            BoundingBox *boxTarget = ((BoundingBox*)target);
             menu.addAction("Rename");
             QAction *durRectAct = menu.addAction("Visibility Range");
             durRectAct->setCheckable(true);
             durRectAct->setChecked(
-                        ((BoundingBox*)target)->hasDurationRectangle());
+                        boxTarget->hasDurationRectangle());
+            boxTarget->getParentCanvas()->addCanvasActionToMenu(
+                        menu.addMenu("Canvas"));
         } else if(target->SWT_isAnimator()) {
             AnimatorClipboardContainer *clipboard =
                     (AnimatorClipboardContainer*)
@@ -414,29 +417,31 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 menu.addAction("Paste");
             }
         }
-        QAction *selected_action = menu.exec(event->globalPos());
-        if(selected_action != NULL)
-        {
-            if(selected_action->text() == "Rename") {
+        QAction *selectedAction = menu.exec(event->globalPos());
+        if(selectedAction != NULL) {
+            if(selectedAction->text() == "Rename") {
                 rename();
-            } else if(selected_action->text() == "Visibility Range") {
+            } else if(selectedAction->text() == "Visibility Range") {
                 BoundingBox *boxTarget = (BoundingBox*)target;
                 if(boxTarget->hasDurationRectangle()) {
                     boxTarget->setDurationRectangle(NULL);
                 } else {
                     boxTarget->createDurationRectangle();
                 }
-            } else if(selected_action->text() == "Copy") {
+            } else if(selectedAction->text() == "Copy") {
                 AnimatorClipboardContainer *container =
                         new AnimatorClipboardContainer();
                 container->setAnimator((QrealAnimator*)target);
                 MainWindow::getInstance()->replaceClipboard(container);
-            } else if(selected_action->text() == "Paste") {
+            } else if(selectedAction->text() == "Paste") {
                 AnimatorClipboardContainer *clipboard =
                         (AnimatorClipboardContainer*)
                         MainWindow::getInstance()->getClipboardContainer(
                                                     CCT_ANIMATOR);
                 clipboard->paste((QrealAnimator*)target);
+            } else if(target->SWT_isBoundingBox()) {
+                ((BoundingBox*)target)->getParentCanvas()->
+                        handleSelectedCanvasAction(selectedAction);
             }
         } else {
 

@@ -170,30 +170,6 @@ void Canvas::setSelectedStrokeColorMode(const ColorMode &mode) {
     }
 }
 
-void Canvas::setSelectedFillGradient(Gradient *gradient, bool finish) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->setFillGradient(gradient, finish);
-    }
-}
-
-void Canvas::setSelectedStrokeGradient(Gradient *gradient, bool finish) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeGradient(gradient, finish);
-    }
-}
-
-void Canvas::setSelectedFillFlatColor(Color color, bool finish) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->setFillFlatColor(color, finish);
-    }
-}
-
-void Canvas::setSelectedStrokeFlatColor(Color color, bool finish) {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->setStrokeFlatColor(color, finish);
-    }
-}
-
 void Canvas::setSelectedCapStyle(Qt::PenCapStyle capStyle) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeCapStyle(capStyle);
@@ -206,7 +182,7 @@ void Canvas::setSelectedJoinStyle(Qt::PenJoinStyle joinStyle) {
     }
 }
 
-void Canvas::setSelectedStrokeWidth(qreal strokeWidth, bool finish) {
+void Canvas::setSelectedStrokeWidth(qreal strokeWidth, const bool &finish) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->setStrokeWidth(strokeWidth, finish);
     }

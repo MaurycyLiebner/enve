@@ -16,17 +16,26 @@ public:
     QString getCurrentFontStyle();
     QString getCurrentFontFamily();
 
+    void setCurrentFontSize(const qreal &size);
+    void setCurrentFontFamily(const QString &family);
+    void setCurrentFontStyle(const QString &style);
+    void setCurrentSettings(const qreal &size,
+                            const QString &family,
+                            const QString &style);
 signals:
     void fontFamilyAndStyleChanged(QString family, QString style);
     void fontSizeChanged(qreal size);
 private slots:
-    void updateStylesFromCurrentFamily(QString family);
-    void updateStylesFromCurrentFamily();
-    void updateSizesFromCurrentFamilyAndStyles();
+    void updateStylesFromCurrentFamilyAndEmit(const QString &family);
+    void updateStylesFromCurrentFamilyAndEmit();
+    void updateSizesFromCurrentFamilyAndStylesAndEmit();
 
     void emitFamilyAndStyleChanged();
     void emitSizeChanged();
 private:
+    void updateStylesFromCurrentFamily(const QString &family);
+    void updateSizesFromCurrentFamilyAndStyles();
+
     QHBoxLayout *mMainLayout;
 
     QComboBox *mFontFamilyCombo;

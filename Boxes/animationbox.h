@@ -27,6 +27,9 @@ public:
 
     bool SWT_isAnimationBox() { return true; }
     void updateUpdateRelBoundingRectFromImage();
+    void addActionsToMenu(QMenu *menu);
+    bool handleSelectedCanvasAction(QAction *selectedAction);
+    virtual void changeSourceFile() = 0;
 public slots:
 protected:
     CacheHandler mAnimationFramesCache;

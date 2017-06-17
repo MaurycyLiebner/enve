@@ -82,8 +82,8 @@ BoundingBox *BoxesGroup::createSameTransformationLink(BoxesGroup *parent) {
 }
 
 
-BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
-                                            bool loadInBox) {
+BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
+                                            const bool &loadInBox) {
     QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
     if(loadInBox) {
         BoxesGroup *newGroup = new BoxesGroup(this);
@@ -93,7 +93,8 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
     }
     QSqlQuery query;
     QString queryStr;
-    queryStr = "SELECT id, boxtype FROM boundingbox WHERE parentboundingboxid = " + thisBoundingBoxIdStr;
+    queryStr = "SELECT id, boxtype FROM boundingbox "
+               "WHERE parentboundingboxid = " + thisBoundingBoxIdStr;
     if(query.exec(queryStr) ) {
         int idId = query.record().indexOf("id");
         int idBoxType = query.record().indexOf("boxtype");
@@ -120,7 +121,8 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(int thisBoundingBoxId,
             }
         }
     } else {
-        qDebug() << "Could not load children for boxesgroup with id " + thisBoundingBoxIdStr;
+        qDebug() << "Could not load children for boxesgroup with id " +
+                    thisBoundingBoxIdStr;
     }
     return this;
 }
@@ -155,56 +157,25 @@ void BoxesGroup::updateAfterFrameChanged(const int &currentFrame) {
     }
 }
 
-void BoxesGroup::setFillGradient(Gradient *gradient, bool finish) {
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->setFillGradient(gradient, finish);
-    }
-}
-
-void BoxesGroup::setStrokeGradient(Gradient *gradient, bool finish)
-{
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->setStrokeGradient(gradient, finish);
-    }
-}
-
-void BoxesGroup::setFillFlatColor(Color color, bool finish)
-{
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->setFillFlatColor(color, finish);
-    }
-}
-
-void BoxesGroup::setStrokeFlatColor(Color color, bool finish)
-{
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->setStrokeFlatColor(color, finish);
-    }
-}
-
-void BoxesGroup::setStrokeCapStyle(Qt::PenCapStyle capStyle)
-{
+void BoxesGroup::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeCapStyle(capStyle);
     }
 }
 
-void BoxesGroup::setStrokeJoinStyle(Qt::PenJoinStyle joinStyle)
-{
+void BoxesGroup::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeJoinStyle(joinStyle);
     }
 }
 
-void BoxesGroup::setStrokeWidth(qreal strokeWidth, bool finish)
-{
+void BoxesGroup::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeWidth(strokeWidth, finish);
     }
 }
 
-void BoxesGroup::startSelectedStrokeWidthTransform()
-{
+void BoxesGroup::startSelectedStrokeWidthTransform() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->startSelectedStrokeWidthTransform();
     }
@@ -291,7 +262,8 @@ void BoxesGroup::beforeUpdate() {
 }
 
 void BoxesGroup::processUpdate() {
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mUpdateChildrenAwaitingUpdate) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
+              mUpdateChildrenAwaitingUpdate) {
         child->processUpdate();
     }
     BoundingBox::processUpdate();
@@ -318,7 +290,32 @@ void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {
     }
 }
 
-void BoxesGroup::setIsCurrentGroup(bool bT) {
+void BoxesGroup::drawSelectedSk(SkCanvas *canvas,
+                                 const CanvasMode &currentCanvasMode,
+                                 const SkScalar &invScale) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        canvas->save();
+        drawBoundingRectSk(canvas, invScale);
+        if(currentCanvasMode == MOVE_PATH && !mIsCurrentGroup) {
+            mTransformAnimator->getPivotMovablePoint()->
+                    drawSk(canvas, invScale);
+        }
+        canvas->restore();
+    }
+}
+
+void BoxesGroup::drawSk(SkCanvas *canvas) {
+    canvas->save();
+    canvas->concat(QMatrixToSkMatrix(mUpdateTransform.inverted()));
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        //box->draw(p);
+        box->drawUpdatePixmapSk(canvas);
+    }
+
+    canvas->restore();
+}
+
+void BoxesGroup::setIsCurrentGroup(const bool &bT) {
     mIsCurrentGroup = bT;
     if(!bT) {
         if(mChildBoxes.isEmpty() && mParent != NULL) {
@@ -456,9 +453,9 @@ void BoxesGroup::addChild(BoundingBox *child) {
     addChildToListAt(mChildBoxes.count(), child);
 }
 
-void BoxesGroup::addChildToListAt(int index,
+void BoxesGroup::addChildToListAt(const int &index,
                                   BoundingBox *child,
-                                  bool saveUndoRedo) {
+                                  const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         child->setParent(this);
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
@@ -479,17 +476,21 @@ void BoxesGroup::addChildToListAt(int index,
     child->prp_updateInfluenceRangeAfterChanged();
 }
 
-void BoxesGroup::updateChildrenId(int firstId, bool saveUndoRedo) {
+void BoxesGroup::updateChildrenId(const int &firstId,
+                                  const bool &saveUndoRedo) {
     updateChildrenId(firstId, mChildBoxes.length() - 1, saveUndoRedo);
 }
 
-void BoxesGroup::updateChildrenId(int firstId, int lastId, bool saveUndoRedo) {
+void BoxesGroup::updateChildrenId(const int &firstId,
+                                  const int &lastId,
+                                  const bool &saveUndoRedo) {
     for(int i = firstId; i <= lastId; i++) {
         mChildBoxes.at(i)->setZListIndex(i, saveUndoRedo);
     }
 }
 
-void BoxesGroup::removeChildFromList(int id, bool saveUndoRedo) {
+void BoxesGroup::removeChildFromList(const int &id,
+                                     const bool &saveUndoRedo) {
     BoundingBox *box = mChildBoxes.at(id).data();
     box->clearAllCache();
     if(box->isSelected()) {
@@ -574,8 +575,8 @@ void BoxesGroup::bringChildToFrontList(BoundingBox *child) {
 }
 
 void BoxesGroup::moveChildInList(BoundingBox *child,
-                                 int from, int to,
-                                 bool saveUndoRedo) {
+                                 const int &from, const int &to,
+                                 const bool &saveUndoRedo) {
     mChildBoxes.move(from, to);
     updateChildrenId(qMin(from, to), qMax(from, to), saveUndoRedo);
     SWT_moveChildAbstractionForTargetToInAll(child, mChildBoxes.count() - to - 1

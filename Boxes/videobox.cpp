@@ -218,6 +218,18 @@ void VideoBox::loadUpdatePixmap() {
         updateUpdateRelBoundingRectFromImage();
     }
 }
+#include <QFileDialog>
+void VideoBox::changeSourceFile() {
+    MainWindow::getInstance()->disableEventFilter();
+    QString importPath = QFileDialog::getOpenFileName(
+                                            MainWindow::getInstance(),
+                                            "Change Source", "",
+                                            "Video Files (*.mp4 *.mov *.avi)");
+    MainWindow::getInstance()->enableEventFilter();
+    if(!importPath.isEmpty()) {
+        setFilePath(importPath);
+    }
+}
 
 void VideoBox::setFilePath(QString path) {
     mSrcFilePath = path;

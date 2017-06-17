@@ -468,34 +468,6 @@ void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
     mCurrentCanvas->updateAfterFrameChanged(currentFrame);
 }
 
-void CanvasWindow::strokeFlatColorChanged(const Color &color,
-                                      const bool &finish) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeFlatColor(color, finish);
-    callUpdateSchedulers();
-}
-
-void CanvasWindow::fillFlatColorChanged(const Color &color,
-                                        const bool &finish) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedFillFlatColor(color, finish);
-    callUpdateSchedulers();
-}
-
-void CanvasWindow::fillGradientChanged(Gradient *gradient,
-                                       const bool &finish) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedFillGradient(gradient, finish);
-    callUpdateSchedulers();
-}
-
-void CanvasWindow::strokeGradientChanged(Gradient *gradient,
-                                       const bool &finish) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->setSelectedStrokeGradient(gradient, finish);
-    callUpdateSchedulers();
-}
-
 void CanvasWindow::pickPathForSettings() {
     if(hasNoCanvas()) return;
     setCanvasMode(PICK_PATH_SETTINGS);

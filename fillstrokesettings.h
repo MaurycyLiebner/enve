@@ -50,7 +50,7 @@ public slots:
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
 private slots:
-    void setStrokeWidth(qreal width);
+    void setStrokeWidth(const qreal &width);
 
     void colorTypeSet(int id);
     void setFillTarget();

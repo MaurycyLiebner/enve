@@ -56,7 +56,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mCurrentMode = MOVE_PATH;
 
     prp_setAbsFrame(0);
-    scheduleHardUpdate();
+    scheduleSoftUpdate();
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
 }
@@ -333,9 +333,11 @@ void Canvas::renderSk(SkCanvas *canvas) {
         canvas->drawRect(viewRect, paint);
 
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
+        canvas->saveLayer(NULL, NULL);
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
             box->drawPixmapSk(canvas);
         }
+        canvas->restore();
 #endif
 //        QPen pen = QPen(Qt::black, 1.5);
 //        pen.setCosmetic(true);
@@ -1129,9 +1131,7 @@ void Canvas::setIsCurrentCanvas(const bool &bT) {
 
 void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
     BoxesGroup::addChildAwaitingUpdate(child);
-    if(mAwaitingUpdate) return;
-    mAwaitingUpdate = true;
-    scheduleUpdate();
+    scheduleSoftUpdate();
     //mCanvasWindow->addBoxAwaitingUpdate(this);
 }
 

@@ -50,10 +50,7 @@ public:
     void strokeCapStyleChanged(const Qt::PenCapStyle &capStyle);
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
     void strokeWidthChanged(const qreal &strokeWidth, const bool &finish);
-    void strokeFlatColorChanged(const Color &color, const bool &finish);
-    void fillFlatColorChanged(const Color &color, const bool &finish);
-    void fillGradientChanged(Gradient *gradient, const bool &finish);
-    void strokeGradientChanged(Gradient *gradient, const bool &finish);
+
     void pickPathForSettings();
     void updateDisplayedFillStrokeSettings();
 
