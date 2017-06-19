@@ -233,9 +233,14 @@ void BoxesGroup::drawUpdatePixmapSk(SkCanvas *canvas) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawUpdatePixmapSk(canvas);
     } else {
+        SkPaint paint;
+        paint.setAlpha(qRound(mUpdateOpacity*255));
+        paint.setBlendMode(mBlendModeSk);
+        canvas->saveLayer(NULL, &paint);
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             box->drawUpdatePixmapSk(canvas);
         }
+        canvas->restore();
     }
 }
 
@@ -283,10 +288,15 @@ void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {
     if(shouldPaintOnImage()) {
         BoundingBox::drawPixmapSk(canvas);
     } else {
+        SkPaint paint;
+        paint.setAlpha(qRound(mTransformAnimator->getOpacity()*2.55));
+        paint.setBlendMode(mBlendModeSk);
+        canvas->saveLayer(NULL, &paint);
         Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
             //box->draw(p);
             box->drawPixmapSk(canvas);
         }
+        canvas->restore();
     }
 }
 

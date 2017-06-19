@@ -56,8 +56,6 @@ void EffectAnimators::prp_loadFromSql(const int &boundingBoxSqlId) {
                 effect = new ImplodeEffect();
             } else if(typeT == EFFECT_OIL) {
                 effect = new OilEffect();
-            } else if(typeT == EFFECT_ALPHA_MATTE) {
-                effect = new AlphaMatteEffect(mParentBox);
             } else {
                 continue;
             }

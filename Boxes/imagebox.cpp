@@ -1,4 +1,6 @@
 #include "Boxes/imagebox.h"
+#include <QFileDialog>
+#include "mainwindow.h"
 
 ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
     BoundingBox(parent, TYPE_IMAGE) {
@@ -50,26 +52,30 @@ void ImageBox::setFilePath(QString path) {
 }
 
 void ImageBox::addActionsToMenu(QMenu *menu) {
-    menu->addAction("Reload");
-    menu->addAction("Set Source File...");
+    menu->addAction("Reload")->setObjectName("ib_reload");
+    menu->addAction("Set Source File...")->
+            setObjectName("ib_set_src_file");
 }
-#include <QFileDialog>
-#include "mainwindow.h"
-bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
-    if(selectedAction->text() == "Set Source File...") {
-        MainWindow::getInstance()->disableEventFilter();
-        QString importPath = QFileDialog::getOpenFileName(
-                                                MainWindow::getInstance(),
-                                                "Change Source", "",
-                                                "Image Files (*.png *.jpg)");
-        MainWindow::getInstance()->enableEventFilter();
-        if(!importPath.isEmpty()) {
-            setFilePath(importPath);
-        }
-        return true;
-    } else if(selectedAction->text() == "Reload") {
-        reloadPixmap();
-        return true;
+
+void ImageBox::changeSourceFile() {
+    MainWindow::getInstance()->disableEventFilter();
+    QString importPath = QFileDialog::getOpenFileName(
+                                            MainWindow::getInstance(),
+                                            "Change Source", "",
+                                            "Image Files (*.png *.jpg)");
+    MainWindow::getInstance()->enableEventFilter();
+    if(!importPath.isEmpty()) {
+        setFilePath(importPath);
     }
-    return false;
+}
+
+bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
+    if(selectedAction->objectName() == "ib_set_src_file") {
+        changeSourceFile();
+    } else if(selectedAction->objectName() == "ib_reload") {
+        reloadPixmap();
+    } else {
+        return false;
+    }
+    return true;
 }

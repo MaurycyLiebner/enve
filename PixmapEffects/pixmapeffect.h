@@ -40,7 +40,7 @@ enum PixmapEffectType {
     EFFECT_DESATURATE,
     EFFECT_OIL,
     EFFECT_IMPLODE,
-    EFFECT_ALPHA_MATTE
+    EFFECT_COLORIZE
 };
 
 class EffectAnimators;
@@ -309,23 +309,23 @@ public:
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
+    void applySk(BoundingBox *target,
+                 const SkBitmap &imgPtr,
+                 const fmt_filters::image &img,
+                 qreal scale);
 private:
     QSharedPointer<QrealAnimator> mInfluenceAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();
 };
 
-class AlphaMatteEffect : public PixmapEffect {
+class ColorizeEffect : public PixmapEffect {
 public:
-    AlphaMatteEffect(BoundingBox *parentBox);
+    ColorizeEffect();
 
     void apply(BoundingBox *target,
                QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
-    void applySk(BoundingBox *target,
-                 const SkBitmap &imgPtr,
-                 const fmt_filters::image &img,
-                 qreal scale);
 
     qreal getMargin() { return 0.; }
 
@@ -333,15 +333,14 @@ public:
     void prp_loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
-    void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
-    void setInverted(const bool &inv);
+    void duplicateInfluenceAnimatorFrom(ColorAnimator *source);
+    void applySk(BoundingBox *target,
+                 const SkBitmap &imgPtr,
+                 const fmt_filters::image &img,
+                 qreal scale);
 private:
-    QSharedPointer<BoolProperty> mInvertedProperty =
-            (new BoolProperty())->ref<BoolProperty>();
-    QSharedPointer<QrealAnimator> mInfluenceAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<BoxTargetProperty> mBoxTarget =
-            (new BoxTargetProperty())->ref<BoxTargetProperty>();
+    QSharedPointer<ColorAnimator> mColorAnimator =
+            (new ColorAnimator())->ref<ColorAnimator>();
 };
 
 #endif // PIXMAPEFFECT_H

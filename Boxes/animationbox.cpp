@@ -122,17 +122,18 @@ void AnimationBox::drawSk(SkCanvas *canvas) {
 }
 
 void AnimationBox::addActionsToMenu(QMenu *menu) {
-    menu->addAction("Reload");
-    menu->addAction("Set Source File...");
+    menu->addAction("Reload")->setObjectName("ab_reload");
+    menu->addAction("Set Source File...")->
+            setObjectName("ab_set_src_file");
 }
 
 bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
-    if(selectedAction->text() == "Set Source File...") {
+    if(selectedAction->objectName() == "ab_set_src_file") {
         changeSourceFile();
-        return true;
-    } else if(selectedAction->text() == "Reload") {
+    } else if(selectedAction->objectName() == "ab_reload") {
         reloadFile();
-        return true;
+    } else {
+        return false;
     }
-    return false;
+    return true;
 }

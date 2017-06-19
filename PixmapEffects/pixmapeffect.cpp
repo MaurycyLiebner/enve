@@ -836,7 +836,6 @@ void ImplodeEffect::apply(BoundingBox *target,
                          fmt_filters::rgba(0, 0, 0, 0));
 }
 
-
 DesaturateEffect::DesaturateEffect(qreal radius) :
     PixmapEffect(EFFECT_DESATURATE) {
     prp_setName("desaturate");
@@ -904,162 +903,97 @@ void DesaturateEffect::apply(BoundingBox *target,
                             mInfluenceAnimator->qra_getCurrentValue());
 }
 
-AlphaMatteEffect::AlphaMatteEffect(BoundingBox *parentBox) :
-    PixmapEffect(EFFECT_ALPHA_MATTE) {
-    prp_setName("alpha matte");
-
-    mInfluenceAnimator->qra_setValueRange(0., 1.);
-    mInfluenceAnimator->qra_setCurrentValue(1.);
-    mInfluenceAnimator->setPrefferedValueStep(0.05);
-    mInfluenceAnimator->prp_setName("influence");
-    ca_addChildAnimator(mInfluenceAnimator.data());
-
-    mBoxTarget->prp_setName("target");
-    mBoxTarget->setParentBox(parentBox);
-    ca_addChildAnimator(mBoxTarget.data());
-
-    mInvertedProperty->prp_setName("invert");
-    ca_addChildAnimator(mInvertedProperty.data());
+void DesaturateEffect::applySk(BoundingBox *target,
+                               const SkBitmap &imgPtr,
+                               const fmt_filters::image &img,
+                               qreal scale) {
+    Q_UNUSED(target);
+    Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
+    fmt_filters::desaturate(img,
+                            mInfluenceAnimator->qra_getCurrentValue());
 }
 
-int AlphaMatteEffect::prp_saveToSql(QSqlQuery *query,
+
+
+ColorizeEffect::ColorizeEffect() :
+    PixmapEffect(EFFECT_COLORIZE) {
+    prp_setName("colorize");
+
+    mColorAnimator->prp_setName("color");
+    ca_addChildAnimator(mColorAnimator.data());
+}
+
+int ColorizeEffect::prp_saveToSql(QSqlQuery *query,
                                     const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
-    int infId = mInfluenceAnimator->prp_saveToSql(query);
-    BoundingBox *target = mBoxTarget->getTarget();
-    int boundingBoxId;
-    if(target == NULL) {
-         boundingBoxId = -1;
-    } else {
-        boundingBoxId = target->getSqlId();
-    }
+    int infId = mColorAnimator->prp_saveToSql(query);
 
     if(!query->exec(
-        QString("INSERT INTO alphamatteeffect (pixmapeffectid, "
-                "influenceid, boundingboxid, inverted) "
-                "VALUES (%1, %2, %3, %4)").
+        QString("INSERT INTO colorizeeffect (pixmapeffectid, "
+                "influenceid) "
+                "VALUES (%1, %2)").
                 arg(pixmapEffectId).
-                arg(infId).
-                arg(boundingBoxId).
-                arg(mInvertedProperty->getValue()) ) ) {
+                arg(infId) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
     return pixmapEffectId;
 }
 
-void AlphaMatteEffect::prp_loadFromSql(const int &identifyingId) {
+void ColorizeEffect::prp_loadFromSql(const int &identifyingId) {
     QSqlQuery query;
 
-    QString queryStr = "SELECT * FROM alphamatteeffect WHERE pixmapeffectid = " +
+    QString queryStr = "SELECT * FROM colorizeeffect WHERE pixmapeffectid = " +
             QString::number(identifyingId);
     if(query.exec(queryStr)) {
         query.next();
-        mInfluenceAnimator->prp_loadFromSql(query.value("influenceid").toInt() );
-        mInvertedProperty->setValue(query.value("inverted").toBool() );
+        mColorAnimator->prp_loadFromSql(query.value("influenceid").toInt() );
     } else {
-        qDebug() << "Could not load alphamatteeffect with id " << identifyingId;
+        qDebug() << "Could not load colorizeeffect with id " << identifyingId;
     }
 }
 
-Property *AlphaMatteEffect::makeDuplicate() {
-    AlphaMatteEffect *alphaMatteTarget = new AlphaMatteEffect(
-                mParentEffects->getParentBox()); // !!!
-    makeDuplicate(alphaMatteTarget);
-    return alphaMatteTarget;
+Property *ColorizeEffect::makeDuplicate() {
+    ColorizeEffect *colorizeTarget = new ColorizeEffect();
+    makeDuplicate(colorizeTarget);
+    return colorizeTarget;
 }
 
-void AlphaMatteEffect::makeDuplicate(Property *target) {
-    AlphaMatteEffect *alphaMatteTarget = (AlphaMatteEffect*)target;
+void ColorizeEffect::makeDuplicate(Property *target) {
+    ColorizeEffect *colorizeTarget = (ColorizeEffect*)target;
 
-    alphaMatteTarget->duplicateInfluenceAnimatorFrom(mInfluenceAnimator.data());
-    alphaMatteTarget->setInverted(mInvertedProperty->getValue());
+    colorizeTarget->duplicateInfluenceAnimatorFrom(mColorAnimator.data());
 }
 
-void AlphaMatteEffect::duplicateInfluenceAnimatorFrom(QrealAnimator *source) {
-    source->makeDuplicate(mInfluenceAnimator.data());
+void ColorizeEffect::duplicateInfluenceAnimatorFrom(ColorAnimator *source) {
+    source->makeDuplicate(mColorAnimator.data());
 }
 
-void AlphaMatteEffect::setInverted(const bool &inv) {
-    mInvertedProperty->setValue(inv);
-}
-
-void AlphaMatteEffect::apply(BoundingBox *target,
-                             QImage *imgPtr,
-                             const fmt_filters::image &img,
-                             qreal scale) {
-    Q_UNUSED(img);
+void ColorizeEffect::apply(BoundingBox *target,
+                        QImage *imgPtr,
+                        const fmt_filters::image &img,
+                        qreal scale) {
+    Q_UNUSED(imgPtr);
+    Q_UNUSED(target);
     Q_UNUSED(scale);
-    BoundingBox *boxTarget = mBoxTarget->getTarget();
-//    if(boxTarget) {
-//        qreal influence = mInfluenceAnimator->qra_getCurrentValue();
-//        QPoint targetDrawPos = target->getUpdateDrawPos();
-
-//        QImage imgTmp = QImage(imgPtr->size(),
-//                               QImage::Format_ARGB32_Premultiplied);
-//        imgTmp.fill(Qt::transparent);
-//        QPainter p(&imgTmp);
-
-//        p.translate(-targetDrawPos);
-//        p.setTransform(
-//                    QTransform(target->getUpdatePaintTransform().inverted()),
-//                    true);
-
-//        boxTarget->drawUpdatePixmapForEffect(&p);
-//        p.end();
-
-//        QPainter p2(imgPtr);
-
-//        p2.setOpacity(influence);
-//        if(mInvertedProperty->getValue()) {
-//            p2.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-//        } else {
-//            p2.setCompositionMode(QPainter::CompositionMode_DestinationOut);
-//        }
-
-//        p2.drawImage(0, 0, imgTmp);
-
-//        p2.end();
-    //    }
+    Color color = mColorAnimator->getCurrentColor();
+    fmt_filters::colorize(img, color.gl_r,
+                          color.gl_g,
+                          color.gl_b,
+                          color.gl_a);
 }
 
-void AlphaMatteEffect::applySk(BoundingBox *target,
+void ColorizeEffect::applySk(BoundingBox *target,
                                const SkBitmap &imgPtr,
                                const fmt_filters::image &img,
                                qreal scale) {
-    BoundingBox *boxTarget = mBoxTarget->getTarget();
-    if(boxTarget) {
-        qreal influence = mInfluenceAnimator->qra_getCurrentValue();
-        SkPoint targetDrawPos = target->getUpdateDrawPos();
-
-        SkBitmap bitmapTmp;
-        bitmapTmp.allocPixels(imgPtr.info());
-
-        SkCanvas *canvas = new SkCanvas(bitmapTmp);
-        canvas->clear(SK_ColorTRANSPARENT);
-
-        canvas->translate(-targetDrawPos.x(), -targetDrawPos.y());
-        canvas->concat(
-            QMatrixToSkMatrix(target->getUpdatePaintTransform().inverted()));
-
-        boxTarget->drawUpdatePixmapForEffectSk(canvas);
-        canvas->flush();
-
-        delete canvas;
-
-        canvas = new SkCanvas(imgPtr);
-
-        SkPaint paint;
-        paint.setAlpha(qMax(0, qMin(255, (int)(influence*255))) );
-        if(mInvertedProperty->getValue()) {
-            paint.setBlendMode(SkBlendMode::kDstIn);
-        } else {
-            paint.setBlendMode(SkBlendMode::kDstOut);
-        }
-
-        canvas->drawBitmap(bitmapTmp, 0, 0, &paint);
-
-        canvas->flush();
-        delete canvas;
-    }
+    Q_UNUSED(target);
+    Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
+    Color color = mColorAnimator->getCurrentColor();
+    fmt_filters::colorize(img, color.gl_r,
+                          color.gl_g,
+                          color.gl_b,
+                          color.gl_a);
 }

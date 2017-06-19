@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "glwindow.h"
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
+#include "keyfocustarget.h"
 class Canvas;
 enum ColorMode : short;
 enum CanvasMode : short;
@@ -20,7 +21,9 @@ class RenderInstanceSettings;
 #include <QSqlQuery>
 #include <QAudioOutput>
 
-class CanvasWindow : public GLWindow, public SingleWidgetTarget {
+class CanvasWindow : public GLWindow,
+        public SingleWidgetTarget,
+        public KeyFocusTarget {
     Q_OBJECT
 public:
     explicit CanvasWindow(QWidget *parent);
@@ -41,8 +44,14 @@ public:
     void setCanvasMode(const CanvasMode &mode);
 
     void callUpdateSchedulers();
-    bool processUnfilteredKeyEvent(QKeyEvent *event);
-    bool processFilteredKeyEvent(QKeyEvent *event);
+    bool KFT_handleKeyEventForTarget(QKeyEvent *event);
+    void KFT_setFocusToWidget() {
+        setFocus();
+    }
+
+    void KFT_clearFocus() {
+        clearFocus();
+    }
 
     void startSelectedStrokeColorTransform();
     void startSelectedFillColorTransform();
@@ -122,6 +131,9 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
     void openSettingsWindowForCurrentCanvas();
+
+    void rotate90CCW();
+    void rotate90CW();
 protected:
     bool mMouseGrabber = false;
     bool mHasFocus = false;
@@ -233,6 +245,14 @@ public slots:
     void importFile();
 
     void startSelectedStrokeWidthTransform();
+
+    void deleteAction();
+    void copyAction();
+    void pasteAction();
+    void cutAction();
+    void duplicateAction();
+    void selectAllAction();
+    void clearSelectionAction();
 private slots:
     void sendNextBoxForUpdate();
     void nextSaveOutputFrame();

@@ -187,13 +187,14 @@ void TextBox::updatePath() {
 }
 
 void TextBox::addActionsToMenu(QMenu *menu) {
-    menu->addAction("Set Text...");
+    menu->addAction("Set Text...")->setObjectName("tb_set_text");
 }
 
 bool TextBox::handleSelectedCanvasAction(QAction *selectedAction) {
-    if(selectedAction->text() == "Set Text...") {
+    if(selectedAction->objectName() == "tb_set_text") {
         openTextEditor();
-        return true;
+    } else {
+        return false;
     }
-    return false;
+    return true;
 }

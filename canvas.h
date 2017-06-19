@@ -69,7 +69,6 @@ public:
 
     void resetTransormation();
     void fitCanvasToSize();
-    bool processFilteredKeyEvent(QKeyEvent *event);
     void zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin);
     void moveByRel(const QPointF &trans);
 
@@ -90,7 +89,6 @@ public:
     void clearPreview();
 
     void centerPivotPosition(const bool &finish = false) { Q_UNUSED(finish); }
-    bool processUnfilteredKeyEvent(QKeyEvent *event);
 
     //
     void finishSelectedPointsTransform();
@@ -131,7 +129,7 @@ public:
     void applyOilEffectToSelected();
     void applyImplodeEffectToSelected();
     void applyDesaturateEffectToSelected();
-    void applyAlphaMatteToSelected();
+    void applyColorizeEffectToSelected();
 
     void rotateSelectedBy(const qreal &rotBy,
                           const QPointF &absOrigin,
@@ -224,7 +222,7 @@ public:
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *e);
 
-    void keyPressEvent(QKeyEvent *event);
+    bool keyPressEvent(QKeyEvent *event);
     void drawPreviewPixmapSk(SkCanvas *canvas);
 
     void createAnimationBoxForPaths(const QStringList &paths);
@@ -404,6 +402,13 @@ public:
     bool SWT_isCanvas() { return true; }
     bool handleSelectedCanvasAction(QAction *selectedAction);
     void addCanvasActionToMenu(QMenu *menu);
+    void deleteAction();
+    void copyAction();
+    void pasteAction();
+    void cutAction();
+    void duplicateAction();
+    void selectAllAction();
+    void clearSelectionAction();
 protected:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;

@@ -172,7 +172,9 @@ SOURCES += main.cpp\
     sqltablecreation.cpp \
     PathEffects/patheffect.cpp \
     PathEffects/patheffectanimators.cpp \
-    BoxesList/coloranimatorbutton.cpp
+    BoxesList/coloranimatorbutton.cpp \
+    keyfocustarget.cpp \
+    noshortcutaction.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -306,7 +308,9 @@ HEADERS  += mainwindow.h \
     RenderWidget/renderdestinationdialog.h \
     PathEffects/patheffect.h \
     PathEffects/patheffectanimators.h \
-    BoxesList/coloranimatorbutton.h
+    BoxesList/coloranimatorbutton.h \
+    keyfocustarget.h \
+    noshortcutaction.h
 
 RESOURCES += \
     resources.qrc

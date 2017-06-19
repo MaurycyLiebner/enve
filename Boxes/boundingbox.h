@@ -392,7 +392,6 @@ public:
     virtual void updateCombinedTransformTmp();
     void updateRelativeTransformAfterFrameChange();
     QPainter::CompositionMode getCompositionMode();
-    void drawUpdatePixmapForEffectSk(SkCanvas *canvas);
     QMatrix getUpdatePaintTransform();
     bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(

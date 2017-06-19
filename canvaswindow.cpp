@@ -31,7 +31,6 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mCanvasWidget = QWidget::createWindowContainer(this, parent);
     //mCanvasWidget = new CanvasWidget(this, parent);
     mCanvasWidget->setAcceptDrops(true);
-    mCanvasWidget->setFocusPolicy(Qt::NoFocus);
     mCanvasWidget->setMinimumSize(MIN_WIDGET_HEIGHT*10,
                                   MIN_WIDGET_HEIGHT*10);
     mCanvasWidget->setSizePolicy(QSizePolicy::Minimum,
@@ -218,6 +217,7 @@ void CanvasWindow::renderSk(SkCanvas *canvas) {
 }
 
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
+    KFT_setFocus();
     if(mCurrentCanvas == NULL) return;
     mCurrentCanvas->mousePressEvent(event);
 }
@@ -257,7 +257,18 @@ void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     }
 }
 
-bool CanvasWindow::processUnfilteredKeyEvent(QKeyEvent *event) {
+void CanvasWindow::rotate90CCW() {
+    if(hasNoCanvas()) return;
+    //mCurrentCanvas->rotate90CCW();
+}
+
+void CanvasWindow::rotate90CW() {
+    if(hasNoCanvas()) return;
+    //mCurrentCanvas->rotate90CW();
+}
+
+bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
+    if(hasNoCanvas()) return false;
     if(event->key() == Qt::Key_F1) {
         setCanvasMode(CanvasMode::MOVE_PATH);
     } else if(event->key() == Qt::Key_F2) {
@@ -272,16 +283,11 @@ bool CanvasWindow::processUnfilteredKeyEvent(QKeyEvent *event) {
         setCanvasMode(CanvasMode::ADD_TEXT);
     } else if(event->key() == Qt::Key_F7) {
         setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
+    } else if(mCurrentCanvas->keyPressEvent(event)) {
     } else {
         return false;
     }
     return true;
-}
-
-bool CanvasWindow::processFilteredKeyEvent(QKeyEvent *event) {
-    if(processUnfilteredKeyEvent(event)) return true;
-    if(hasNoCanvas()) return false;
-    return mCurrentCanvas->processFilteredKeyEvent(event);
 }
 
 void CanvasWindow::raiseAction() {
@@ -414,6 +420,41 @@ void CanvasWindow::startSelectedStrokeWidthTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedStrokeWidthTransform();
     callUpdateSchedulers();
+}
+
+void CanvasWindow::deleteAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->deleteAction();
+}
+
+void CanvasWindow::copyAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->copyAction();
+}
+
+void CanvasWindow::pasteAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->pasteAction();
+}
+
+void CanvasWindow::cutAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->cutAction();
+}
+
+void CanvasWindow::duplicateAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->duplicateAction();
+}
+
+void CanvasWindow::selectAllAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->selectAllAction();
+}
+
+void CanvasWindow::clearSelectionAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->clearSelectionAction();
 }
 
 void CanvasWindow::startSelectedStrokeColorTransform() {
@@ -946,7 +987,21 @@ QWidget *CanvasWindow::getCanvasWidget() {
 
 void CanvasWindow::grabMouse() {
     mMouseGrabber = true;
-    //mWidgetContainer->grabMouse();
+    setMouseGrabEnabled(true);
+    //mCanvasWidget->grabMouse();
+}
+
+void CanvasWindow::releaseMouse() {
+    mMouseGrabber = false;
+    setMouseGrabEnabled(false);
+
+    //        QWidget *grabber = mWidgetContainer->mouseGrabber();
+    //mCanvasWidget->releaseMouse();
+    //        grabber = mWidgetContainer->mouseGrabber();
+}
+
+bool CanvasWindow::isMouseGrabber() {
+    return mMouseGrabber;
 }
 
 void CanvasWindow::repaint() {
@@ -956,17 +1011,6 @@ void CanvasWindow::repaint() {
 
 QRect CanvasWindow::rect() {
     return mCanvasWidget->rect();
-}
-
-void CanvasWindow::releaseMouse() {
-    mMouseGrabber = false;
-    //        QWidget *grabber = mWidgetContainer->mouseGrabber();
-    //        mWidgetContainer->releaseMouse();
-    //        grabber = mWidgetContainer->mouseGrabber();
-}
-
-bool CanvasWindow::isMouseGrabber() {
-    return mMouseGrabber;
 }
 
 void CanvasWindow::importFile() {

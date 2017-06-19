@@ -164,8 +164,7 @@ void KeysView::mousePressEvent(QMouseEvent *e) {
     mMainWindow->callUpdateSchedulers();
 }
 #include "clipboardcontainer.h"
-bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
-    if(!hasFocus() ) return false;
+bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(mGraphViewed) {
         return graphProcessFilteredKeyEvent(event);
     } else {
@@ -195,7 +194,7 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                 mLastPressPos = mapFromGlobal(QCursor::pos());
                 mIsMouseGrabbing = true;
                 //setMouseTracking(true);
-                //grabMouse();
+                grabMouse();
             }
         } else if(event->key() == Qt::Key_G) {
             if(!mMovingKeys) {
@@ -204,7 +203,7 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                 mLastPressPos = mapFromGlobal(QCursor::pos());
                 mIsMouseGrabbing = true;
                 //setMouseTracking(true);
-                //grabMouse();
+                grabMouse();
             }
         } else if(mMainWindow->isShiftPressed() &&
                   event->key() == Qt::Key_D) {
@@ -225,7 +224,7 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
                     mLastPressPos = mapFromGlobal(QCursor::pos());
                     mIsMouseGrabbing = true;
                     //setMouseTracking(true);
-                    //grabMouse();
+                    grabMouse();
                 }
             }
         } else if(event->key() == Qt::Key_Delete) {
@@ -244,6 +243,10 @@ bool KeysView::processFilteredKeyEvent(QKeyEvent *event) {
         }
         return true;
     }
+}
+
+void KeysView::focusInEvent(QFocusEvent *) {
+    KeyFocusTarget::KFT_setCurrentTarget(this);
 }
 
 #include "BoxesList/boxsinglewidget.h"
@@ -572,6 +575,7 @@ void KeysView::mouseReleaseEvent(QMouseEvent *e) {
         }
     }
     updateHoveredPointFromPos(e->pos() + QPoint(-MIN_WIDGET_HEIGHT/2, 0));
+    if(mouseGrabber() == this) releaseMouse();
 
     mMainWindow->callUpdateSchedulers();
 }

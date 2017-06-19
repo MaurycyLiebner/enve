@@ -18,8 +18,6 @@
 BoundingBox::BoundingBox(BoxesGroup *parent,
                          const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
-    mParent = parent->ref<BoxesGroup>();
-
     mEffectsAnimators->prp_setName("effects");
     mEffectsAnimators->setParentBox(this);
     mEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
@@ -31,6 +29,7 @@ BoundingBox::BoundingBox(BoxesGroup *parent,
 
     mTransformAnimator->reset();
     if(parent == NULL) return;
+    mParent = parent->ref<BoxesGroup>();
     parent->addChild(this);
     updateCombinedTransform();
 }
@@ -357,20 +356,12 @@ void BoundingBox::drawUpdatePixmapSk(SkCanvas *canvas) {
     if(mUpdateDrawOnParentBox) {
         canvas->save();
         SkPaint paint;
-        paint.setAlpha(mUpdateOpacity*255);
+        paint.setAlpha(qRound(mUpdateOpacity*255));
         paint.setBlendMode(mBlendModeSk);
         //p->setCompositionMode(mCompositionMode);
         mUpdateRenderContainer.drawSk(canvas, &paint);
         canvas->restore();
     }
-}
-
-void BoundingBox::drawUpdatePixmapForEffectSk(SkCanvas *canvas) {
-    canvas->save();
-    SkPaint paint;
-    paint.setAlpha(mUpdateOpacity*255);
-    mUpdateRenderContainer.drawSk(canvas, &paint);
-    canvas->restore();
 }
 
 QMatrix BoundingBox::getUpdatePaintTransform() {
@@ -386,9 +377,7 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
         //SkPaint paint;
         //paint.setAlpha(mTransformAnimator->getOpacity()*255/100);
         SkPaint paint;
-        paint.setAlpha(qMin(255,
-                            qMax(0,
-                                 (int)(mTransformAnimator->getOpacity()*2.55))));
+        paint.setAlpha(qRound(mTransformAnimator->getOpacity()*2.55));
         paint.setBlendMode(mBlendModeSk);
         //paint.setFilterQuality(kHigh_SkFilterQuality);
         mDrawRenderContainer.drawSk(canvas, &paint);
@@ -1259,7 +1248,7 @@ bool BoundingBox::shouldUpdate() {
 }
 
 void BoundingBox::scheduleSoftUpdate() {
-    if(mAwaitingUpdate) return;
+    if(mAwaitingUpdate && mParent.data() !=  NULL) return;
     scheduleUpdate();
 }
 

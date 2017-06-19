@@ -19,6 +19,7 @@
 #include "pathpoint.h"
 #include "Boxes/linkbox.h"
 #include "Animators/animatorupdater.h"
+#include "clipboardcontainer.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWindow *canvasWidget,
@@ -146,39 +147,6 @@ void Canvas::zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin) {
     mLastPressPosAbs = mCanvasTransformMatrix.map(mLastPressPosRel);
 }
 
-bool Canvas::processUnfilteredKeyEvent(QKeyEvent *event) {
-    Q_UNUSED(event);
-    return false;
-}
-
-bool Canvas::processFilteredKeyEvent(QKeyEvent *event) {
-    if(processUnfilteredKeyEvent(event)) return true;
-    if(!mCanvasWidget->hasFocus()) return false;
-    if(isCtrlPressed() && event->key() == Qt::Key_G) {
-        if(isShiftPressed()) {
-            ungroupSelected();
-        } else {
-            /*BoxesGroup *newGroup = */groupSelectedBoxes();
-//            if(newGroup != NULL) {
-//                setCurrentBoxesGroup(newGroup);
-//            }
-        }
-        schedulePivotUpdate();
-
-
-    } else if(event->key() == Qt::Key_PageUp) {
-        raiseSelectedBoxes();
-    } else if(event->key() == Qt::Key_PageDown) {
-        lowerSelectedBoxes();
-    } else if(event->key() == Qt::Key_End) {
-        lowerSelectedBoxesToBottom();
-    } else if(event->key() == Qt::Key_Home) {
-        raiseSelectedBoxesToTop();
-    } else {
-        return false;
-    }
-    return true;
-}
 #include "BoxesList/boxscrollwidget.h"
 void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
     mCurrentBoxesGroup->setIsCurrentGroup(false);
@@ -845,42 +813,94 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
 
     return true;
 }
-#include "clipboardcontainer.h"
-void Canvas::keyPressEvent(QKeyEvent *event) {
-    if(isPreviewingOrRendering()) return;
+
+void Canvas::deleteAction() {
+    if(mCurrentMode == MOVE_POINT) {
+        if(isShiftPressed()) {
+            removeSelectedPointsApproximateAndClearList();
+        } else {
+            removeSelectedPointsAndClearList();
+        }
+    } else if(mCurrentMode == MOVE_PATH) {
+        removeSelectedBoxesAndClearList();
+    }
+}
+
+void Canvas::copyAction() {
+    BoxesClipboardContainer *container =
+            new BoxesClipboardContainer();
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        container->copyBoxToContainer(box);
+    }
+    mMainWindow->replaceClipboard(container);
+}
+
+void Canvas::pasteAction() {
+    BoxesClipboardContainer *container =
+            (BoxesClipboardContainer*)
+            mMainWindow->getClipboardContainer(CCT_BOXES);
+    if(container == NULL) return;
+    container->pasteTo(mCurrentBoxesGroup);
+}
+
+void Canvas::cutAction() {
+    copyAction();
+    deleteAction();
+}
+
+void Canvas::duplicateAction() {
+
+}
+
+void Canvas::selectAllAction() {
+    if(mCurrentMode == MOVE_POINT) {
+//        if(isShiftPressed()) {
+//            removeSelectedPointsApproximateAndClearList();
+//        } else {
+//            removeSelectedPointsAndClearList();
+//        }
+    } else if(mCurrentMode == MOVE_PATH) {
+        selectAllBoxesFromBoxesGroup();
+    }
+}
+
+void Canvas::clearSelectionAction() {
+    if(mCurrentMode == MOVE_POINT) {
+//        if(isShiftPressed()) {
+//            removeSelectedPointsApproximateAndClearList();
+//        } else {
+//            removeSelectedPointsAndClearList();
+//        }
+    } else if(mCurrentMode == MOVE_PATH) {
+        clearBoxesSelection();
+    }
+}
+
+bool Canvas::keyPressEvent(QKeyEvent *event) {
+    if(isPreviewingOrRendering()) return false;
 
     bool isGrabbingMouse = mCanvasWindow->isMouseGrabber();
     if(isGrabbingMouse ? !handleKeyPressEventWhileMouseGrabbing(event) : true) {
-        if(isCtrlPressed() && event->key() == Qt::Key_V) {
-            if(event->isAutoRepeat()) return;
-            BoxesClipboardContainer *container =
-                    (BoxesClipboardContainer*)
-                    mMainWindow->getClipboardContainer(CCT_BOXES);
-            if(container == NULL) return;
-            container->pasteTo(mCurrentBoxesGroup);
-        } else if(isCtrlPressed() && event->key() == Qt::Key_C) {
-            if(event->isAutoRepeat()) return;
-            BoxesClipboardContainer *container =
-                    new BoxesClipboardContainer();
-            Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                container->copyBoxToContainer(box);
-            }
-            mMainWindow->replaceClipboard(container);
+        if(isCtrlPressed() &&
+                event->key() == Qt::Key_V) {
+            if(event->isAutoRepeat()) return false;
+            pasteAction();
+        } else if(isCtrlPressed() &&
+                  event->key() == Qt::Key_C) {
+            if(event->isAutoRepeat()) return false;
+            copyAction();
+        } else if(isCtrlPressed() &&
+                  event->key() == Qt::Key_X) {
+            if(event->isAutoRepeat()) return false;
+            cutAction();
         } else if(event->key() == Qt::Key_0) {
             fitCanvasToSize();
         } else if(event->key() == Qt::Key_1) {
             resetTransormation();
         } else if(event->key() == Qt::Key_Delete) {
-           if(mCurrentMode == MOVE_POINT) {
-               if(isShiftPressed()) {
-                   removeSelectedPointsApproximateAndClearList();
-               } else {
-                   removeSelectedPointsAndClearList();
-               }
-           } else if(mCurrentMode == MOVE_PATH) {
-               removeSelectedBoxesAndClearList();
-           }
-        } else if(isCtrlPressed() && event->key() == Qt::Key_G) {
+            deleteAction();
+        } else if(isCtrlPressed() &&
+                  event->key() == Qt::Key_G) {
            if(isShiftPressed()) {
                ungroupSelected();
            } else {
@@ -895,17 +915,22 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
            lowerSelectedBoxesToBottom();
         } else if(event->key() == Qt::Key_Home) {
            raiseSelectedBoxesToTop();
-        } else if(event->key() == Qt::Key_G && isAltPressed(event)) {
+        } else if(event->key() == Qt::Key_G &&
+                  isAltPressed(event)) {
             resetSelectedTranslation();
-        } else if(event->key() == Qt::Key_S && isAltPressed(event)) {
+        } else if(event->key() == Qt::Key_S &&
+                  isAltPressed(event)) {
             resetSelectedScale();
-        } else if(event->key() == Qt::Key_R && isAltPressed(event)) {
+        } else if(event->key() == Qt::Key_R &&
+                  isAltPressed(event)) {
             resetSelectedRotation();
-        } else if(event->key() == Qt::Key_R && (isMovingPath() ||
-                  mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
-            if(mSelectedBoxes.isEmpty()) return;
+        } else if(event->key() == Qt::Key_R &&
+                  (isMovingPath() ||
+                  mCurrentMode == MOVE_POINT) &&
+                  !isGrabbingMouse) {
+            if(mSelectedBoxes.isEmpty()) return false;
             if(mCurrentMode == MOVE_POINT) {
-                if(mSelectedPoints.isEmpty()) return;
+                if(mSelectedPoints.isEmpty()) return false;
             }
             mTransformationFinishedBeforeMouseRelease = false;
             QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
@@ -918,9 +943,9 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
             grabMouseAndTrack();
         } else if(event->key() == Qt::Key_S && (isMovingPath() ||
                   mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
-            if(mSelectedBoxes.isEmpty()) return;
+            if(mSelectedBoxes.isEmpty()) return false;
             if(mCurrentMode == MOVE_POINT) {
-                if(mSelectedPoints.isEmpty()) return;
+                if(mSelectedPoints.isEmpty()) return false;
             }
             mTransformationFinishedBeforeMouseRelease = false;
             mXOnlyTransform = false;
@@ -956,11 +981,16 @@ void Canvas::keyPressEvent(QKeyEvent *event) {
            } else {
                mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
            }
+        } else {
+            return false;
         }
         schedulePivotUpdate();
+    } else {
+        return false;
     }
 
     callUpdateSchedulers();
+    return true;
 }
 
 void Canvas::setCurrentEndPoint(PathPoint *point) {

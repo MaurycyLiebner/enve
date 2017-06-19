@@ -27,92 +27,100 @@ void Canvas::handleMovePathMousePressEvent() {
 }
 
 void Canvas::addCanvasActionToMenu(QMenu *menu) {
-    menu->addAction("Apply Transformation");
-    menu->addAction("Create Link");
-    menu->addAction("Center Pivot");
-    menu->addAction("Copy");
-    menu->addAction("Cut");
-    menu->addAction("Duplicate");
-    menu->addAction("Group");
-    menu->addAction("Ungroup");
-    menu->addAction("Delete");
+    menu->addAction("Apply Transformation")->setObjectName(
+                "canvas_apply_transformation");
+    menu->addAction("Create Link")->setObjectName(
+                "canvas_create_link");
+    menu->addAction("Center Pivot")->setObjectName(
+                "canvas_center_pivot");
+    menu->addSeparator();
+    QAction *copyAction = menu->addAction("Copy");
+    copyAction->setObjectName("canvas_copy");
+    copyAction->setShortcut(Qt::CTRL + Qt::Key_C);
+    QAction *cutAction = menu->addAction("Cut");
+    cutAction->setObjectName("canvas_cut");
+    cutAction->setShortcut(Qt::CTRL + Qt::Key_X);
+    QAction *duplicateAction = menu->addAction("Duplicate");
+    duplicateAction->setObjectName("canvas_duplicate");
+    duplicateAction->setShortcut(Qt::CTRL + Qt::Key_D);
+    QAction *groupAction = menu->addAction("Group");
+    groupAction->setObjectName("canvas_group");
+    groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
+    QAction *ungroupAction = menu->addAction("Ungroup");
+    ungroupAction->setObjectName("canvas_ungroup");
+    ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
+    QAction *deleteAction = menu->addAction("Delete");
+    deleteAction->setObjectName("canvas_delete");
+    deleteAction->setShortcut(Qt::Key_Delete);
+    menu->addSeparator();
 
     QMenu *effectsMenu = menu->addMenu("Effects");
-    effectsMenu->addAction("Blur");
-    effectsMenu->addAction("Shadow");
+    effectsMenu->addAction("Blur")->setObjectName(
+                "canvas_effects_blur");
+    effectsMenu->addAction("Shadow")->setObjectName(
+                "canvas_effects_shadow");
 //            effectsMenu->addAction("Brush");
-    effectsMenu->addAction("Lines");
-    effectsMenu->addAction("Circles");
-    effectsMenu->addAction("Swirl");
-    effectsMenu->addAction("Oil");
-    effectsMenu->addAction("Implode");
-    effectsMenu->addAction("Desaturate");
-    effectsMenu->addAction("Alpha Matte");
+//    effectsMenu->addAction("Lines");
+//    effectsMenu->addAction("Circles");
+//    effectsMenu->addAction("Swirl");
+//    effectsMenu->addAction("Oil");
+//    effectsMenu->addAction("Implode");
+    effectsMenu->addAction("Desaturate")->setObjectName(
+                "canvas_effects_desaturate");
+    effectsMenu->addAction("Colorize")->setObjectName(
+                "canvas_effects_colorize");
 
     QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
-    pathEffectsMenu->addAction("Discrete Effect");
-    pathEffectsMenu->addAction("Duplicate Effect");
+    pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                "canvas_path_effects_discrete");
+    pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                "canvas_path_effects_duplicate");
 
     QMenu *outlinePathEffectsMenu = menu->addMenu("Outline Effects");
-    outlinePathEffectsMenu->addAction("Discrete Effect");
-    outlinePathEffectsMenu->addAction("Duplicate Effect");
+    outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                "canvas_outline_effects_discrete");
+    outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                "canvas_outline_effects_duplicate");
 }
 
 bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
-    if(selectedAction->text() == "Duplicate") {
+    if(selectedAction->objectName() == "canvas_duplicate") {
         duplicateSelectedBoxes();
-    } else if(selectedAction->text() == "Delete") {
+    } else if(selectedAction->objectName() == "canvas_delete") {
         removeSelectedBoxesAndClearList();
-    } else if(selectedAction->text() == "Apply Transformation") {
+    } else if(selectedAction->objectName() == "canvas_apply_transformation") {
         applyCurrentTransformationToSelected();
-    } else if(selectedAction->text() == "Create Link") {
+    } else if(selectedAction->objectName() == "canvas_create_link") {
         createLinkBoxForSelected();
-    } else if(selectedAction->text() == "Group") {
+    } else if(selectedAction->objectName() == "canvas_group") {
         groupSelectedBoxes();
-    } else if(selectedAction->text() == "Ungroup") {
+    } else if(selectedAction->objectName() == "canvas_ungroup") {
         ungroupSelected();
-    } else if(selectedAction->text() == "Center Pivot") {
+    } else if(selectedAction->objectName() == "canvas_center_pivot") {
         centerPivotForSelected();
-    } else if(selectedAction->text() == "Blur") {
+    } else if(selectedAction->objectName() == "canvas_effects_blur") {
         applyBlurToSelected();
-    } else if(selectedAction->text() == "Shadow") {
+    } else if(selectedAction->objectName() == "canvas_effects_shadow") {
         applyShadowToSelected();
-    } else if(selectedAction->text() == "Brush") {
-        applyBrushEffectToSelected();
-    } else if(selectedAction->text() == "Lines") {
-        applyLinesEffectToSelected();
-    } else if(selectedAction->text() == "Circles") {
-        applyCirclesEffectToSelected();
-    } else if(selectedAction->text() == "Swirl") {
-        applySwirlEffectToSelected();
-    } else if(selectedAction->text() == "Oil") {
-        applyOilEffectToSelected();
-    } else if(selectedAction->text() == "Implode") {
-        applyImplodeEffectToSelected();
-    } else if(selectedAction->text() == "Desaturate") {
+    } else if(selectedAction->objectName() == "canvas_effects_desaturate") {
         applyDesaturateEffectToSelected();
-    } else if(selectedAction->text() == "Alpha Matte") {
-        applyAlphaMatteToSelected();
-    } else if(selectedAction->text() == "Discrete Effect") {
-        QMenu *parentMenu = (QMenu*)selectedAction->parent();
-        if(parentMenu->title() == "Path Effects") {
-            applyDiscretePathEffectToSelected();
-        } else {
-            applyDiscreteOutlinePathEffectToSelected();
-        }
-    } else if(selectedAction->text() == "Duplicate Effect") {
-        QMenu *parentMenu = (QMenu*)selectedAction->parent();
-        if(parentMenu->title() == "Path Effects") {
-            applyDuplicatePathEffectToSelected();
-        } else {
-            applyDuplicateOutlinePathEffectToSelected();
-        }
+    } else if(selectedAction->objectName() == "canvas_effects_colorize") {
+        applyColorizeEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
+        applyDiscretePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
+        applyDuplicatePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_outline_effects_discrete") {
+        applyDiscreteOutlinePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
+        applyDuplicateOutlinePathEffectToSelected();
     } else {
         return false;
     }
     return true;
 }
-
+#include "clipboardcontainer.h"
+#include "mainwindow.h"
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
@@ -125,14 +133,25 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
 
             QMenu menu(mCanvasWindow->getCanvasWidget());
 
-            menu.addAction("Paste");
-            QMenu *linkCanvasMenu = menu.addMenu("Link Canvas");
+            BoxesClipboardContainer *clipboard =
+                    (BoxesClipboardContainer*)
+                    MainWindow::getInstance()->getClipboardContainer(
+                                                CCT_BOXES);
+            if(clipboard != NULL) {
+                menu.addAction("Paste")->setShortcut(Qt::CTRL + Qt::Key_V);
+            }
+
             const QList<Canvas*> &listOfCanvas = mCanvasWindow->getCanvasList();
-            Q_FOREACH(Canvas *canvas, listOfCanvas) {
-                QAction *action = linkCanvasMenu->addAction(canvas->getName());
-                if(canvas == this) {
-                    action->setEnabled(false);
-                    action->setVisible(false);
+            QMenu *linkCanvasMenu;
+            if(listOfCanvas.count() > 1) {
+                linkCanvasMenu = menu.addMenu("Link Canvas");
+                Q_FOREACH(Canvas *canvas, listOfCanvas) {
+                    QAction *action =
+                            linkCanvasMenu->addAction(canvas->getName());
+                    if(canvas == this) {
+                        action->setEnabled(false);
+                        action->setVisible(false);
+                    }
                 }
             }
 
@@ -151,6 +170,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
                 if(selectedAction->text() == "Paste") {
+                    clipboard->pasteTo(mCurrentBoxesGroup);
                 } else if(selectedAction->text()== "Settings...") {
                     mCanvasWindow->openSettingsWindowForCurrentCanvas();
                 } else if(selectedAction->text() == "Blur") {
@@ -357,8 +377,7 @@ void Canvas::setCurrentMousePressPosAbs(const QPointF &abs) {
     mCurrentPressPosRel = mapCanvasAbsToRel(mCurrentMouseEventPosAbs);
 }
 
-void Canvas::mousePressEvent(QMouseEvent *event)
-{
+void Canvas::mousePressEvent(QMouseEvent *event) {
     if(isPreviewingOrRendering()) return;
     setLastMouseEventPosAbs(event->pos());
     if(event->button() != Qt::LeftButton) {
@@ -590,7 +609,8 @@ void Canvas::handleMouseRelease() {
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
-    if(isPreviewingOrRendering() || event->button() == Qt::MiddleButton) return;
+    if(isPreviewingOrRendering() ||
+            event->button() != Qt::LeftButton) return;
     setCurrentMouseEventPosAbs(event->pos());
     mXOnlyTransform = false;
     mYOnlyTransform = false;
@@ -771,7 +791,9 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 
     if(event->buttons() & Qt::MiddleButton) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
-    } else if(!mTransformationFinishedBeforeMouseRelease) {
+    } else if(!mTransformationFinishedBeforeMouseRelease &&
+              (event->buttons() & Qt::LeftButton ||
+               mIsMouseGrabbing)) {
         if(mSelecting) {
             moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||

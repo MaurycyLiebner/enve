@@ -78,7 +78,6 @@ MainWindow::MainWindow(QWidget *parent)
     mUndoRedoStack.setWindow(this);
     setCurrentPath("");
     QSqlDatabase::addDatabase("QSQLITE");
-    QApplication::instance()->installEventFilter((QObject*)this);
 
     mRightDock = new QDockWidget(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
@@ -156,6 +155,8 @@ MainWindow::MainWindow(QWidget *parent)
     createNewCanvas();
 
     mEventFilterDisabled = false;
+
+    QApplication::instance()->installEventFilter((QObject*)this);
 }
 
 MainWindow::~MainWindow() {
@@ -163,45 +164,80 @@ MainWindow::~MainWindow() {
 //    mPaintControlerThread->quit();
 }
 
+#include "noshortcutaction.h"
 void MainWindow::setupMenuBar() {
     mMenuBar = new QMenuBar(this);
 
     mFileMenu = mMenuBar->addMenu("File");
-    mFileMenu->addAction("New...", this, SLOT(newFile()));
-    mFileMenu->addAction("Open...", this, SLOT(openFile()));
+    mFileMenu->addAction("New...",
+                         this, SLOT(newFile()),
+                         Qt::CTRL + Qt::Key_N);
+    mFileMenu->addAction("Open...",
+                         this, SLOT(openFile()),
+                         Qt::CTRL + Qt::Key_O);
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Link...", this, SLOT(linkFile()));
-    mFileMenu->addAction("Import File...", mCanvasWindow, SLOT(importFile()));
-    mFileMenu->addAction("Import Image Sequence...", this, SLOT(importImageSequence()));
+    mFileMenu->addAction("Link...",
+                         this, SLOT(linkFile()),
+                         Qt::CTRL + Qt::Key_L);
+    mFileMenu->addAction("Import File...",
+                         mCanvasWindow, SLOT(importFile()),
+                         Qt::CTRL + Qt::Key_I);
+    mFileMenu->addAction("Import Image Sequence...",
+                         this, SLOT(importImageSequence()));
     mFileMenu->addSeparator();
     mFileMenu->addAction("Revert", this, SLOT(revert()));
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Save", this, SLOT(saveFile()));
-    mFileMenu->addAction("Save As...", this, SLOT(saveFileAs()));
-    mFileMenu->addAction("Save Backup", this, SLOT(saveBackup()));
+    mFileMenu->addAction("Save",
+                         this, SLOT(saveFile()),
+                         Qt::CTRL + Qt::Key_S);
+    mFileMenu->addAction("Save As...",
+                         this, SLOT(saveFileAs()),
+                         Qt::CTRL + Qt::SHIFT + Qt::Key_S);
+    mFileMenu->addAction("Save Backup",
+                         this, SLOT(saveBackup()));
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Close", this, SLOT(closeProject()));
+    mFileMenu->addAction("Close",
+                         this, SLOT(closeProject()));
     mFileMenu->addSeparator();
-    mFileMenu->addAction("Exit", this, SLOT(close()));
+    mFileMenu->addAction("Exit",
+                         this, SLOT(close()));
 
     mEditMenu = mMenuBar->addMenu("Edit");
 
-    mEditMenu->addAction("Undo");
-    mEditMenu->addAction("Redo");
+    mEditMenu->addAction("Undo",
+                         this, SLOT(undo()),
+                         Qt::CTRL + Qt::Key_Z);
+    mEditMenu->addAction("Redo",
+                         this, SLOT(redo()),
+                         Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
     mEditMenu->addAction("Undo History...");
     mEditMenu->addSeparator();
-    mEditMenu->addAction("Cut");
-    mEditMenu->addAction("Copy");
-    mEditMenu->addAction("Paste");
+    mEditMenu->addAction(new NoShortcutAction("Cut",
+                         mCanvasWindow, SLOT(cutAction()),
+                         Qt::CTRL + Qt::Key_X, mEditMenu));
+    mEditMenu->addAction(new NoShortcutAction("Copy",
+                         mCanvasWindow, SLOT(copyAction()),
+                         Qt::CTRL + Qt::Key_C, mEditMenu));
+    mEditMenu->addAction(new NoShortcutAction("Paste",
+                         mCanvasWindow, SLOT(pasteAction()),
+                         Qt::CTRL + Qt::Key_V, mEditMenu));
     mEditMenu->addSeparator();
-    mEditMenu->addAction("Duplicate");
+    mEditMenu->addAction(new NoShortcutAction("Duplicate",
+                         mCanvasWindow, SLOT(duplicateAction()),
+                         Qt::SHIFT + Qt::Key_D, mEditMenu));
     mEditMenu->addAction("Clone");
     mEditMenu->addSeparator();
-    mEditMenu->addAction("Delete");
+    mEditMenu->addAction(new NoShortcutAction("Delete",
+                         mCanvasWindow, SLOT(deleteAction()),
+                         Qt::Key_Delete, mEditMenu));
     mEditMenu->addSeparator();
-    mEditMenu->addAction("Select All");
+    mEditMenu->addAction(new NoShortcutAction("Select All",
+                         mCanvasWindow, SLOT(selectAllAction()),
+                         Qt::CTRL + Qt::Key_A, mEditMenu));
     mEditMenu->addAction("Invert Selection");
-    mEditMenu->addAction("Deselect");
+    mEditMenu->addAction(new NoShortcutAction("Clear Selection",
+                         mCanvasWindow, SLOT(clearSelectionAction()),
+                         Qt::CTRL + Qt::SHIFT + Qt::Key_A, mEditMenu));
 
     mSelectSameMenu = mEditMenu->addMenu("Select Same");
     mSelectSameMenu->addAction("Fill and Stroke");
@@ -213,22 +249,33 @@ void MainWindow::setupMenuBar() {
     mObjectMenu = mMenuBar->addMenu("Object");
 
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Raise", mCanvasWindow,
-                           SLOT(raiseAction()));
-    mObjectMenu->addAction("Lower", mCanvasWindow,
-                           SLOT(lowerAction()));
-    mObjectMenu->addAction("Rasie to Top", mCanvasWindow,
-                           SLOT(raiseToTopAction()));
-    mObjectMenu->addAction("Lower to Bottom", mCanvasWindow,
-                           SLOT(lowerToBottomAction()));
+    mObjectMenu->addAction("Raise",
+                           mCanvasWindow, SLOT(raiseAction()),
+                           Qt::Key_Up);
+    mObjectMenu->addAction("Lower",
+                           mCanvasWindow, SLOT(lowerAction()),
+                           Qt::Key_Down);
+    mObjectMenu->addAction("Rasie to Top",
+                           mCanvasWindow, SLOT(raiseToTopAction()),
+                           Qt::Key_Home);
+    mObjectMenu->addAction("Lower to Bottom",
+                           mCanvasWindow, SLOT(lowerToBottomAction()))->
+            setShortcut(Qt::Key_End);
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Rotate 90° Right");
-    mObjectMenu->addAction("Rotate 90° Left");
-    mObjectMenu->addAction("Flip Horizontal");
-    mObjectMenu->addAction("Flip Vertical");
+    mObjectMenu->addAction("Rotate 90° CW")->
+            setShortcut(Qt::SHIFT + Qt::RightArrow);
+    mObjectMenu->addAction("Rotate 90° CCW",
+                           mCanvasWindow, SLOT(rotate90CCW()),
+                           Qt::SHIFT + Qt::LeftArrow);
+    mObjectMenu->addAction("Flip Horizontal")->
+            setShortcut(Qt::Key_H);
+    mObjectMenu->addAction("Flip Vertical")->
+            setShortcut(Qt::Key_V);
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Group");
-    mObjectMenu->addAction("Ungroup");
+    mObjectMenu->addAction("Group")->
+            setShortcut(Qt::CTRL + Qt::Key_G);;
+    mObjectMenu->addAction("Ungroup")->
+            setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);;
 
     mPathMenu = mMenuBar->addMenu("Path");
 
@@ -238,22 +285,29 @@ void MainWindow::setupMenuBar() {
                          SLOT(strokeToPathAction()));
     mPathMenu->addSeparator();
     mPathMenu->addAction("Union", mCanvasWindow,
-                         SLOT(pathsUnionAction()));
+                         SLOT(pathsUnionAction()))->
+            setShortcut(Qt::CTRL + Qt::Key_Plus);
     mPathMenu->addAction("Difference", mCanvasWindow,
-                         SLOT(pathsDifferenceAction()));
+                         SLOT(pathsDifferenceAction()))->
+            setShortcut(Qt::CTRL + Qt::Key_Minus);
     mPathMenu->addAction("Intersection", mCanvasWindow,
-                         SLOT(pathsIntersectionAction()));
+                         SLOT(pathsIntersectionAction()))->
+            setShortcut(Qt::CTRL + Qt::Key_Asterisk);
     mPathMenu->addAction("Exclusion", mCanvasWindow,
-                         SLOT(pathsExclusionAction()));
+                         SLOT(pathsExclusionAction()))->
+            setShortcut(Qt::CTRL + Qt::Key_AsciiCircum);
     mPathMenu->addAction("Division", mCanvasWindow,
-                         SLOT(pathsDivisionAction()));
+                         SLOT(pathsDivisionAction()))->
+            setShortcut(Qt::CTRL + Qt::Key_Slash);
 //    mPathMenu->addAction("Cut Path", mCanvas,
 //                         SLOT(pathsCutAction()));
     mPathMenu->addSeparator();
     mPathMenu->addAction("Combine", mCanvasWindow,
-                         SLOT(pathsCombineAction()));
+                         SLOT(pathsCombineAction()))->
+            setShortcut(Qt::CTRL + Qt::Key_K);
     mPathMenu->addAction("Break Apart", mCanvasWindow,
-                         SLOT(pathsBreakApartAction()));
+                         SLOT(pathsBreakApartAction()))->
+            setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_K);
 
     mEffectsMenu = mMenuBar->addMenu("Effects");
 
@@ -870,7 +924,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     if(mEventFilterDisabled) {
         return QMainWindow::eventFilter(obj, e);
     }
-    if (e->type() == QEvent::KeyPress) {
+    if(e->type() == QEvent::KeyPress) {
         QKeyEvent *key_event = (QKeyEvent*)e;
         if(key_event->key() == Qt::Key_Control) {
             mCtrlPressed = true;
@@ -880,6 +934,18 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             mAltPressed = true;
         }
         return processKeyEvent(key_event);
+    } else if(e->type() == QEvent::ShortcutOverride) {
+        QKeyEvent *key_event = (QKeyEvent*)e;
+        if(mCtrlPressed) {
+            if(key_event->key() == Qt::Key_C ||
+               key_event->key() == Qt::Key_V ||
+               key_event->key() == Qt::Key_X ||
+               key_event->key() == Qt::Key_D ||
+               key_event->key() == Qt::Key_A ||
+               key_event->key() == Qt::Key_Delete) {
+                return processKeyEvent(key_event);
+            }
+        }
     } else if(e->type() == QEvent::KeyRelease) {
         QKeyEvent *key_event = (QKeyEvent*)e;
         if(key_event->key() == Qt::Key_Control) {
@@ -926,23 +992,7 @@ void MainWindow::scheduleDisplayedFillStrokeSettingsUpdate()
 }
 
 bool MainWindow::processKeyEvent(QKeyEvent *event) {
-    bool returnBool = true;
-    if(event->key() == Qt::Key_Z &&
-            isCtrlPressed()) {
-        if(isShiftPressed()) {
-            mCurrentUndoRedoStack->redo();
-        } else {
-            mCurrentUndoRedoStack->undo();
-        }
-    } else if(isCtrlPressed() && event->key() == Qt::Key_S) {
-        saveFile();
-    } else if(isCtrlPressed() && event->key() == Qt::Key_O) {
-        openFile();
-    } else if(mCanvasWindow->processFilteredKeyEvent(event) ) {
-    } else if(mBoxesListAnimationDockWidget->processFilteredKeyEvent(event) ) {
-    } else {
-        returnBool = false;
-    }
+    bool returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
 
     callUpdateSchedulers();
     return returnBool;
@@ -993,8 +1043,7 @@ void MainWindow::openFile() {
     }
 }
 
-void MainWindow::saveFile()
-{
+void MainWindow::saveFile() {
     if(mCurrentFilePath.isEmpty()) {
         saveFileAs();
         return;
@@ -1100,7 +1149,6 @@ void MainWindow::loadAVFile(QString path) {
     setFileChangedSinceSaving(false);
     setCurrentFrame(0);
 }
-
 
 Gradient *MainWindow::getLoadedGradientBySqlId(const int &id) {
     Q_FOREACH(Gradient *gradient, mLoadedGradientsList) {

@@ -151,6 +151,14 @@ private slots:
     void importImageSequence();
     //void importVideo();
     void revert();
+
+    void undo() {
+        getUndoRedoStack()->undo();
+    }
+    void redo() {
+        getUndoRedoStack()->redo();
+    }
+
 signals:
     void updateAll();
 private:

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include "keyfocustarget.h"
 
 const QList<QColor> ANIMATORCOLORS = {QColor(255, 0, 0) , QColor(0, 255, 255),
                                       QColor(255, 255, 0), QColor(255, 0, 255),
@@ -19,8 +20,7 @@ class AnimationDockWidget;
 class DurationRectangleMovable;
 enum CtrlsMode : short;
 
-class KeysView : public QWidget
-{
+class KeysView : public QWidget, public KeyFocusTarget {
     Q_OBJECT
 public:
     explicit KeysView(BoxScrollWidgetVisiblePart *boxesListVisible,
@@ -72,7 +72,6 @@ public:
     void graphResetValueScaleAndMinShown();
     void scheduleGraphUpdateAfterKeysChanged();
     void graphUpdateAfterKeysChangedIfNeeded();
-    bool processFilteredKeyEvent(QKeyEvent *event);
     void deleteSelectedKeys();
     void middleMove(const QPointF &movePos);
     void middlePress(const QPointF &pressPos);
@@ -81,7 +80,10 @@ public:
     void graphRemoveViewedAnimator(QrealAnimator *animator);
     void updateAnimatorsColors();
     void clearHoveredMovable();
+    bool KFT_handleKeyEventForTarget(QKeyEvent *event);
 protected:
+    void focusInEvent(QFocusEvent *);
+
     void resizeEvent(QResizeEvent *e);
 
     void wheelEvent(QWheelEvent *e);
@@ -89,6 +91,11 @@ protected:
     void mousePressEvent(QMouseEvent *e);
 
     void paintEvent(QPaintEvent *);
+
+    void KFT_setFocusToWidget() {
+        setFocus();
+    }
+
 signals:
     void changedViewedFrames(int, int);
     void wheelEventSignal(QWheelEvent*);

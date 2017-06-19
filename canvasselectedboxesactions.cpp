@@ -37,12 +37,6 @@ void Canvas::applyShadowToSelected() {
     }
 }
 
-void Canvas::applyAlphaMatteToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        box->addEffect(new AlphaMatteEffect(box));
-    }
-}
-
 void Canvas::applyBrushEffectToSelected() {
     //Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         //box->addEffect(new BrushEffect());
@@ -84,6 +78,13 @@ void Canvas::applyDesaturateEffectToSelected() {
         box->addEffect(new DesaturateEffect());
     }
 }
+
+void Canvas::applyColorizeEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new ColorizeEffect());
+    }
+}
+
 #include "PathEffects/patheffect.h"
 void Canvas::applyDiscretePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {

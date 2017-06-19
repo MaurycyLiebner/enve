@@ -158,7 +158,11 @@ namespace fmt_filters
     //
     // it just adds to each pixel in the image
     // aproproriate value.
-    void colorize(const image &im, int red, int green, int blue);
+    void colorize(const image &im,
+                  const double &red,
+                  const double &green,
+                  const double &blue,
+                  const double &alpha);
 
     // change brightness of the image
     void brightness(const image &im, int bn);

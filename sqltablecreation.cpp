@@ -238,14 +238,4 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                 "influenceid INTEGER, "
                 "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
                 "FOREIGN KEY(influenceid) REFERENCES qrealanimator(id) )");
-
-    query->exec("CREATE TABLE alphamatteeffect "
-                "(id INTEGER PRIMARY KEY, "
-                "pixmapeffectid INTEGER, "
-                "influenceid INTEGER, "
-                "boundingboxid INTEGER, "
-                "inverted BOOLEAN, "
-                "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
-                "FOREIGN KEY(influenceid) REFERENCES qrealanimator(id), "
-                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 }

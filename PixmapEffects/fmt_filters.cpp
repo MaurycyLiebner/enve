@@ -128,18 +128,23 @@ bool checkImage(const image &im)
 }
 
 // colorize tool
-void colorize(const image &im, s32 red, s32 green, s32 blue)
-{
+void colorize(const image &im,
+              const double &red,
+              const double &green,
+              const double &blue,
+              const double &alpha) {
     // check if all parameters are good
     if(!checkImage(im))
     return;
 
-    if(!red && !green && !blue)
-    return;
+//    if(!red && !green && !blue)
+//    return;
 
     u8 *bits;
     s32 val;
-    s32 V[3] = { red, green, blue };
+    s32 V[3] = { round(red*alpha*255),
+                 round(green*alpha*255),
+                 round(blue*alpha*255) };
 
     // add to RED component 'red' value, and check if the result is out of bounds.
     // do the same with GREEN and BLUE channels.
@@ -525,8 +530,7 @@ void gray(const image &im)
     }
 }
 
-void desaturate(const image &im, float desat)
-{
+void desaturate(const image &im, float desat) {
     if(!checkImage(im))
       return;
 
@@ -579,8 +583,7 @@ void threshold(const image &im, u32 trh)
     }
 }
 
-void solarize(const image &im, double factor)
-{
+void solarize(const image &im, double factor) {
     if(!checkImage(im))
         return;
 
@@ -604,8 +607,7 @@ void solarize(const image &im, double factor)
     }
 }
 
-void spread(const image &im, u32 amount)
-{
+void spread(const image &im, u32 amount) {
     if(!checkImage(im) || im.w < 3 || im.h < 3)
         return;
 
@@ -645,8 +647,7 @@ void spread(const image &im, u32 amount)
     delete [] n;
 }
 
-void swirl(const image &im, double degrees, const rgba &background)
-{
+void swirl(const image &im, double degrees, const rgba &background) {
     if(!checkImage(im))
         return;
 
