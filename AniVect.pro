@@ -174,7 +174,8 @@ SOURCES += main.cpp\
     PathEffects/patheffectanimators.cpp \
     BoxesList/coloranimatorbutton.cpp \
     keyfocustarget.cpp \
-    noshortcutaction.cpp
+    noshortcutaction.cpp \
+    Animators/vectorsinglepathanimator.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -310,7 +311,8 @@ HEADERS  += mainwindow.h \
     PathEffects/patheffectanimators.h \
     BoxesList/coloranimatorbutton.h \
     keyfocustarget.h \
-    noshortcutaction.h
+    noshortcutaction.h \
+    Animators/vectorsinglepathanimator.h
 
 RESOURCES += \
     resources.qrc

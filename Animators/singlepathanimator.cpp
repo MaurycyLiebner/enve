@@ -35,16 +35,6 @@ VectorPathEdge *SinglePathAnimator::getEgde(const QPointF &absPos,
     return NULL;
 }
 
-QPointF SinglePathAnimator::getRelCenterPosition() {
-    QPointF posSum = QPointF(0., 0.);
-    int count = mPoints.length();
-    if(count == 0) return posSum;
-    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
-        posSum += point->getRelativePos();
-    }
-    return posSum/count;
-}
-
 void SinglePathAnimator::updatePathPointIds() {
     if(mFirstPoint == NULL) return;
     int pointId = 0;

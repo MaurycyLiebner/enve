@@ -232,10 +232,6 @@ public:
     void setRelativePos(const QPointF &relPos,
                         const bool &saveUndoRedo = false);
 
-    virtual void showContextMenu(const QPoint &globalPos) {
-        Q_UNUSED(globalPos);
-    }
-
 
     void scaleRelativeToSavedPivot(const qreal &scaleXBy,
                                    const qreal &scaleYBy);
@@ -376,10 +372,6 @@ public:
         Q_UNUSED(colorMode);
     }
     void switchLocked();
-
-    virtual void removeChildPathAnimator(PathAnimator *path) {
-        Q_UNUSED(path);
-    }
 
     void applyEffectsSk(const SkBitmap &im, const qreal &scale = 1.);
 

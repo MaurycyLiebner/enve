@@ -37,14 +37,6 @@ PathPoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
                                                    canvasScaleInv);
 }
 
-void VectorPath::removeChildPathAnimator(PathAnimator *path) {
-    if(path == mPathAnimator.data()) {
-        removeFromParent();
-    } else {
-        BoundingBox::removeChildPathAnimator(path);
-    }
-}
-
 void VectorPath::prp_loadFromSql(const int &boundingBoxId) {
     PathBox::prp_loadFromSql(boundingBoxId);
     mPathAnimator->prp_loadFromSql(boundingBoxId);
@@ -79,10 +71,6 @@ VectorPathEdge *VectorPath::getEgde(const QPointF &absPos,
     return mPathAnimator->getEgde(absPos, canvasScaleInv);
 }
 
-void VectorPath::loadPathFromQPainterPath(const QPainterPath &path) {
-    mPathAnimator->loadPathFromQPainterPath(path);
-}
-
 void VectorPath::loadPathFromSkPath(const SkPath &path) {
     mPathAnimator->loadPathFromSkPath(path);
 }
@@ -97,29 +85,29 @@ void VectorPath::updatePath() {
     mPathSk = mPathAnimator->getCurrentSkPath();
 }
 
-#include <QMenu>
-void VectorPath::showContextMenu(const QPoint &globalPos) {
-    QMenu menu(mMainWindow);
+//#include <QMenu>
+//void VectorPath::showContextMenu(const QPoint &globalPos) {
+//    QMenu menu(mMainWindow);
 
-    QAction *outlineScaled = new QAction("Scale outline");
-    outlineScaled->setCheckable(true);
-    outlineScaled->setChecked(mOutlineAffectedByScale);
-    menu.addAction(outlineScaled);
+//    QAction *outlineScaled = new QAction("Scale outline");
+//    outlineScaled->setCheckable(true);
+//    outlineScaled->setChecked(mOutlineAffectedByScale);
+//    menu.addAction(outlineScaled);
 
-    menu.addAction("Delete");
-    QAction *selected_action = menu.exec(globalPos);
-    if(selected_action != NULL)
-    {
-        if(selected_action->text() == "Delete")
-        {
+//    menu.addAction("Delete");
+//    QAction *selected_action = menu.exec(globalPos);
+//    if(selected_action != NULL)
+//    {
+//        if(selected_action->text() == "Delete")
+//        {
 
-        } else if(selected_action == outlineScaled) {
-            setOutlineAffectedByScale(!mOutlineAffectedByScale);
-        }
-    } else {
+//        } else if(selected_action == outlineScaled) {
+//            setOutlineAffectedByScale(!mOutlineAffectedByScale);
+//        }
+//    } else {
 
-    }
-}
+//    }
+//}
 
 void VectorPath::drawSelectedSk(SkCanvas *canvas,
                               const CanvasMode &currentCanvasMode,
