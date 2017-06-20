@@ -1,5 +1,7 @@
 #include "vectorsinglepathanimator.h"
 
-VectorSinglePathAnimator::VectorSinglePathAnimator() {
+VectorSinglePathAnimator::VectorSinglePathAnimator(
+        PathAnimator *parentAnimator) :
+    SinglePathAnimator(parentAnimator) {
 
 }

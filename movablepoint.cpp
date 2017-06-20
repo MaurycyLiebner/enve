@@ -289,10 +289,6 @@ qreal MovablePoint::getRadius()
     return mRadius;
 }
 
-void MovablePoint::updateAfterFrameChanged(const int &frame) {
-    prp_setAbsFrame(frame);
-}
-
 //void MovablePoint::saveTransformPivot(QPointF absPivot)
 //{
 //    mSavedTransformPivot = -mParent->mapAbsPosToRel(absPivot);

@@ -148,15 +148,6 @@ bool BoxesGroup::relPointInsidePath(const QPointF &relPos) {
     return false;
 }
 
-void BoxesGroup::updateAfterFrameChanged(const int &currentFrame) {
-    BoundingBox::updateAfterFrameChanged(currentFrame);
-
-    updateDrawRenderContainerTransform();
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->updateAfterFrameChanged(currentFrame);
-    }
-}
-
 void BoxesGroup::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->setStrokeCapStyle(capStyle);

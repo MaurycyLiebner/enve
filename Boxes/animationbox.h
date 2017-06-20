@@ -10,7 +10,7 @@ class AnimationBox : public BoundingBox
     Q_OBJECT
 public:
     AnimationBox(BoxesGroup *parent);
-    void updateAfterFrameChanged(const int &currentFrame);
+    void prp_setAbsFrame(const int &frame);
 
     void makeDuplicate(Property *targetBox);
 

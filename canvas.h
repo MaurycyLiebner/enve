@@ -72,7 +72,7 @@ public:
     void zoomCanvas(const qreal &scaleBy, const QPointF &absOrigin);
     void moveByRel(const QPointF &trans);
 
-    void updateAfterFrameChanged(const int &currentFrame);
+    //void updateAfterFrameChanged(const int &currentFrame);
 
     void renderCurrentFrameToQImage(QImage *frame);
     void renderCurrentFrameToSkCanvasSk(SkCanvas *canvas);

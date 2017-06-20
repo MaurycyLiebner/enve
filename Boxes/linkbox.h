@@ -30,7 +30,6 @@ class InternalLinkBox : public BoundingBox
 {
     Q_OBJECT
 public:
-    InternalLinkBox(BoxesGroup *parent);
     InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent);
 
     void setLinkTarget(BoundingBox *linkTarget) {
@@ -41,8 +40,6 @@ public:
             return;
         }
         setName("Link " + linkTarget->getName());
-        connect(linkTarget, SIGNAL(scheduleAwaitUpdateAllLinkBoxes()),
-                this, SLOT(scheduleAwaitUpdateSLOT()));
     }
 
 
@@ -59,14 +56,14 @@ public:
     BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new InternalLinkBox(parent);
+        return new InternalLinkBox(mLinkTarget, parent);
     }
 
-    void makeDuplicate(Property *targetBox) {
-        BoundingBox::makeDuplicate(targetBox);
-        InternalLinkBox *linkBox = (InternalLinkBox*)targetBox;
-        linkBox->setLinkTarget(mLinkTarget);
-    }
+    sk_sp<SkImage> getAllUglyPixmapProvidedTransformSk(
+            const qreal &effectsMargin,
+            const qreal &resolution,
+            const QMatrix &allUglyTransform,
+            SkPoint *drawPosP);
 public slots:
     void scheduleAwaitUpdateSLOT();
 
@@ -78,11 +75,9 @@ class SameTransformInternalLink : public InternalLinkBox
 {
     Q_OBJECT
 public:
-    SameTransformInternalLink(BoxesGroup *&parent);
     SameTransformInternalLink(BoundingBox *linkTarget,
                               BoxesGroup *parent);
 
-    void updateCombinedTransform();
 
     QMatrix getRelativeTransform() const;
 
@@ -91,7 +86,7 @@ public:
     qreal getEffectsMargin();
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new SameTransformInternalLink(parent);
+        return new SameTransformInternalLink(mLinkTarget, parent);
     }
 };
 
@@ -99,14 +94,10 @@ class InternalLinkBoxesGroup : public BoxesGroup
 {
     Q_OBJECT
 public:
-    InternalLinkBoxesGroup(BoxesGroup *parent) :
-        BoxesGroup(parent) {
-        setType(TYPE_INTERNAL_LINK);
-    }
-
     InternalLinkBoxesGroup(BoxesGroup *linkTarget,
                            BoxesGroup *parent) :
-        InternalLinkBoxesGroup(parent) {
+        BoxesGroup(parent) {
+        setType(TYPE_INTERNAL_LINK);
         setLinkTarget(linkTarget);
     }
 
@@ -123,14 +114,7 @@ public:
     }
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new InternalLinkBoxesGroup(parent);
-    }
-
-    void makeDuplicate(Property *targetBox) {
-        BoxesGroup::makeDuplicate(targetBox);
-        InternalLinkBoxesGroup *ilbgTarget =
-                (InternalLinkBoxesGroup*)targetBox;
-        ilbgTarget->setLinkTarget(mLinkTarget.data());
+        return new InternalLinkBoxesGroup(mLinkTarget.data(), parent);
     }
 
 protected:
@@ -140,10 +124,6 @@ protected:
 class InternalLinkCanvas : public InternalLinkBoxesGroup {
     Q_OBJECT
 public:
-    InternalLinkCanvas(BoxesGroup *parent) :
-        InternalLinkBoxesGroup(parent) {
-    }
-
     InternalLinkCanvas(BoxesGroup *canvas,
                        BoxesGroup *parent) :
         InternalLinkBoxesGroup(canvas, parent) {
@@ -167,9 +147,9 @@ public:
     }
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new InternalLinkCanvas(parent);
+        return new InternalLinkCanvas(mLinkTarget.data(),
+                                      parent);
     }
-
 protected:
     bool mClipToCanvasSize = true;
 };
@@ -177,11 +157,8 @@ protected:
 class SameTransformInternalLinkBoxesGroup : public InternalLinkBoxesGroup {
     Q_OBJECT
 public:
-    SameTransformInternalLinkBoxesGroup(BoxesGroup *parent);
     SameTransformInternalLinkBoxesGroup(BoxesGroup *linkTarget,
                                         BoxesGroup *parent);
-
-    void updateCombinedTransform();
 
     QMatrix getRelativeTransform() const;
 
@@ -190,7 +167,8 @@ public:
     qreal getEffectsMargin();
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new SameTransformInternalLinkBoxesGroup(parent);
+        return new SameTransformInternalLinkBoxesGroup(mLinkTarget.data(),
+                                                       parent);
     }
 };
 

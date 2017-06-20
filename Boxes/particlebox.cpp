@@ -42,8 +42,9 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
     *acc = QPointF(0., 9.8)/24.;
 }
 
-void ParticleBox::updateAfterFrameChanged(const int &currentFrame) {
-    BoundingBox::updateAfterFrameChanged(currentFrame);
+void ParticleBox::prp_setAbsFrame(const int &frame) {
+    BoundingBox::prp_setAbsFrame(frame);
+    mFrameChangedUpdateScheduled = true;
     scheduleSoftUpdate();
 }
 
@@ -104,11 +105,6 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     ParticleEmitter *emitter = new ParticleEmitter(this);
     emitter->getPosPoint()->setAbsolutePos(absPos, false);
     addEmitter(emitter);
-}
-
-void ParticleBox::prp_setAbsFrame(const int &frame) {
-    BoundingBox::prp_setAbsFrame(frame);
-    mFrameChangedUpdateScheduled = true;
 }
 
 void ParticleBox::setUpdateVars() {

@@ -86,8 +86,6 @@ public:
 
     virtual void setPosAnimatorUpdater(AnimatorUpdater *updater);
 
-    virtual void updateAfterFrameChanged(const int &frame);
-
     qreal getRadius();
     virtual void applyTransform(const QMatrix &transform);
     void moveToRel(const QPointF &relPos);

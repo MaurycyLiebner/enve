@@ -179,8 +179,6 @@ public:
 
     void setPosAnimatorUpdater(AnimatorUpdater *updater);
 
-    void updateAfterFrameChanged(const int &frame);
-
     PathPointAnimators *getPathPointAnimatorsPtr();
     void setPointId(int idT);
     int getPointId();

@@ -40,7 +40,6 @@ public:
     PathPoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
-    void updateAfterFrameChanged(const int &currentFrame);
     qreal findPercentForPoint(const QPointF &point,
                               PathPoint **prevPoint,
                               qreal *error);

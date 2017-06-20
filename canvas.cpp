@@ -1054,16 +1054,16 @@ void Canvas::moveByRel(const QPointF &trans) {
     schedulePivotUpdate();
 }
 
-void Canvas::updateAfterFrameChanged(const int &currentFrame) {
-    anim_mCurrentAbsFrame = currentFrame;
+//void Canvas::updateAfterFrameChanged(const int &currentFrame) {
+//    anim_mCurrentAbsFrame = currentFrame;
 
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->updateAfterFrameChanged(currentFrame);
-    }
+//    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+//        box->prp_setAbsFrame(currentFrame);
+//    }
 
-    prp_setAbsFrame(currentFrame);
-    //mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
-}
+//    BoxesGroup::prp_setAbsFrame(currentFrame);
+//    //mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
+//}
 
 void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,
                              QPointF *startCtrlPtPos, QPointF *endCtrlPtPos) {

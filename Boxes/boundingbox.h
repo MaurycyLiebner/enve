@@ -203,7 +203,7 @@ public:
     virtual void startPosTransform();
     virtual void startRotTransform();
     virtual void startScaleTransform();
-    virtual void updateAfterFrameChanged(const int &currentFrame);
+    virtual void prp_setAbsFrame(const int &frame);
     virtual QMatrix getCombinedRenderTransform();
 
     virtual void startAllPointsTransform() {}
@@ -520,7 +520,6 @@ protected:
 signals:
     void replaceChacheSet();
     void scheduledUpdate();
-    void scheduleAwaitUpdateAllLinkBoxes();
     void nameChanged(QString);
 public slots:
     void updateAfterDurationRectangleShifted(const int &dFrame = 0);

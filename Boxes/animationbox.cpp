@@ -48,8 +48,8 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
                 qCeil(qAbs(timeScale*mFramesCount)));
 }
 
-void AnimationBox::updateAfterFrameChanged(const int &currentFrame) {
-    BoundingBox::updateAfterFrameChanged(currentFrame);
+void AnimationBox::prp_setAbsFrame(const int &frame) {
+    BoundingBox::prp_setAbsFrame(frame);
     qreal fpsRatio = getParentCanvas()->getFps()/mFps;
     qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 

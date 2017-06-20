@@ -66,34 +66,25 @@ void InternalLinkBox::updateRelBoundingRect() {
     BoundingBox::updateRelBoundingRect();
 }
 
-InternalLinkBox::InternalLinkBox(BoxesGroup *parent) :
-    BoundingBox(parent, TYPE_INTERNAL_LINK) {
-}
-
 InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
-    InternalLinkBox(parent) {
+    BoundingBox(parent, TYPE_INTERNAL_LINK) {
     setLinkTarget(linkTarget);
 }
 
-//QImage InternalLinkBox::getAllUglyPixmapProvidedTransform(
-//                                const qreal &effectsMargin,
-//                                const qreal &resolution,
-//                                const QMatrix &allUglyTransform,
-//                                QPoint *draWPosP) {
-//    return mLinkTarget->getAllUglyPixmapProvidedTransform(effectsMargin,
-//                                                          resolution,
-//                                                          allUglyTransform,
-//                                                          draWPosP);
-//}
+sk_sp<SkImage> InternalLinkBox::getAllUglyPixmapProvidedTransformSk(
+                            const qreal &effectsMargin,
+                            const qreal &resolution,
+                            const QMatrix &allUglyTransform,
+                            SkPoint *drawPosP) {
+    return mLinkTarget->getAllUglyPixmapProvidedTransformSk(effectsMargin,
+                                                          resolution,
+                                                          allUglyTransform,
+                                                          drawPosP);
+}
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &point)
 {
     return mLinkTarget->relPointInsidePath(point);
-}
-
-SameTransformInternalLink::SameTransformInternalLink(BoxesGroup *&parent) :
-    InternalLinkBox(parent) {
-
 }
 
 SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
@@ -101,37 +92,16 @@ SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
     InternalLinkBox(linkTarget, parent) {
 }
 
-void SameTransformInternalLink::updateCombinedTransform() {
-    if(mLinkTarget == NULL) return;
-//    mCombinedTransformMatrix =
-//            mLinkTarget->getRelativeTransform()*
-//            mParent->getCombinedTransform();
-
-
-    updateAfterCombinedTransformationChanged();
-
-    scheduleSoftUpdate();
-}
-
 QMatrix SameTransformInternalLink::getRelativeTransform() const {
-    if(mLinkTarget == NULL) return QMatrix();
     return mLinkTarget->getRelativeTransform();
 }
 
 const SkPath &SameTransformInternalLink::getRelBoundingRectPath() {
-    if(mLinkTarget == NULL) return SkPath();
     return mLinkTarget->getRelBoundingRectPath();
 }
 
 qreal SameTransformInternalLink::getEffectsMargin() {
-    if(mLinkTarget == NULL) return 0.;
     return mLinkTarget->getEffectsMargin();
-}
-
-SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
-                                                BoxesGroup *parent) :
-    InternalLinkBoxesGroup(parent) {
-
 }
 
 SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
@@ -139,16 +109,6 @@ SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
                                                 BoxesGroup *parent) :
     InternalLinkBoxesGroup(linkTarget, parent) {
 
-}
-
-void SameTransformInternalLinkBoxesGroup::updateCombinedTransform() {
-//    mCombinedTransformMatrix = mLinkTarget->getRelativeTransform()*
-//            mParent->getCombinedTransform();
-
-
-    updateAfterCombinedTransformationChanged();
-
-    scheduleSoftUpdate();
 }
 
 QMatrix SameTransformInternalLinkBoxesGroup::getRelativeTransform() const {
@@ -174,6 +134,7 @@ void InternalLinkCanvas::updateRelBoundingRect() {
         QSize size = ((Canvas*)mLinkTarget.data())->getCanvasSize();
         mRelBoundingRect = QRectF(0., 0.,
                                   size.width(), size.height());
+        mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
         //boundingPaths.boundingRect();
 
         BoundingBox::updateRelBoundingRect();

@@ -506,7 +506,7 @@ void CanvasWindow::setSelectedStrokeColorMode(const ColorMode &mode) {
 
 void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->updateAfterFrameChanged(currentFrame);
+    mCurrentCanvas->prp_setAbsFrame(currentFrame);
 }
 
 void CanvasWindow::pickPathForSettings() {
@@ -590,7 +590,7 @@ void CanvasWindow::renderPreview() {
     mCurrentRenderFrame = mSavedCurrentFrame;
     setRendering(true);
 
-    mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
+    mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
     mCurrentCanvas->updateAllBoxes();
     callUpdateSchedulers();
     if(mNoBoxesAwaitUpdate) {
@@ -794,7 +794,7 @@ void CanvasWindow::saveOutput(const QString &renderDest,
     }
 
     mCurrentRenderFrame = mSavedCurrentFrame;
-    mCurrentCanvas->updateAfterFrameChanged(mSavedCurrentFrame);
+    mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
     mCurrentCanvas->setOutputRendering(true);
     mCurrentCanvas->updateAllBoxes();
     mCurrentCanvas->setNoCache(true);

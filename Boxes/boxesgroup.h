@@ -71,8 +71,6 @@ public:
     void removeChildFromList(const int &id,
                              const bool &saveUndoRedo = true);
 
-    void updateAfterFrameChanged(const int &currentFrame);
-
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
     void setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle);
     void setStrokeWidth(const qreal &strokeWidth, const bool &finish);

@@ -189,7 +189,7 @@ public:
     void getAccelerationAt(const QPointF &pos,
                            const int &frame,
                            QPointF *acc);
-    void updateAfterFrameChanged(const int &currentFrame);
+    void prp_setAbsFrame(const int &frame);
     void updateRelBoundingRect();
     void preUpdatePixmapsUpdates();
     bool relPointInsidePath(const QPointF &relPos);
@@ -214,8 +214,6 @@ public:
     void applyPaintSetting(const PaintSetting &setting);
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
-
-    void prp_setAbsFrame(const int &frame);
 
     void setUpdateVars();
 

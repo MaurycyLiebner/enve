@@ -232,12 +232,6 @@ PathPoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
     return NULL;
 }
 
-void PathAnimator::updateAfterFrameChanged(const int &currentFrame) {
-    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
-        singlePath->updateAfterFrameChanged(currentFrame);
-    }
-}
-
 qreal PathAnimator::findPercentForPoint(const QPointF &point,
                                         PathPoint **prevPoint,
                                         qreal *error) {

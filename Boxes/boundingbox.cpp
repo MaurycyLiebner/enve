@@ -424,8 +424,8 @@ void BoundingBox::resetRotation() {
     mTransformAnimator->resetRotation(true);
 }
 
-void BoundingBox::updateAfterFrameChanged(const int &currentFrame) {
-    prp_setAbsFrame(currentFrame);
+void BoundingBox::prp_setAbsFrame(const int &frame) {
+    ComplexAnimator::prp_setAbsFrame(frame);
     if(mDurationRectangle != NULL) {
         int minDurRelFrame = mDurationRectangle->getMinFrameAsRelFrame();
         int maxDurRelFrame = mDurationRectangle->getMaxFrameAsRelFrame();
@@ -916,7 +916,7 @@ void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
 
 void BoundingBox::updateAfterDurationRectangleShifted(const int &dFrame) {
     prp_setParentFrameShift(prp_mParentFrameShift);
-    updateAfterFrameChanged(anim_mCurrentAbsFrame);
+    prp_setAbsFrame(anim_mCurrentAbsFrame);
     int minAbsUpdateFrame;
     int maxAbsUpdateFrame;
     getVisibleAbsFrameRange(&minAbsUpdateFrame, &maxAbsUpdateFrame);

@@ -330,12 +330,6 @@ PathPoint *SinglePathAnimator::createNewPointOnLineNear(
     return NULL;
 }
 
-void SinglePathAnimator::updateAfterFrameChanged(const int &currentFrame) {
-    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
-        point->updateAfterFrameChanged(currentFrame);
-    }
-}
-
 qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
     QPointF dPoint = point1 - point2;
     return sqrt(dPoint.x()*dPoint.x() + dPoint.y()*dPoint.y());

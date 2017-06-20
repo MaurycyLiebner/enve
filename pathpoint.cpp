@@ -541,13 +541,6 @@ void PathPoint::resetStartCtrlPt() {
     mStartCtrlPt->setRelativePos(getRelativePos());
 }
 
-void PathPoint::updateAfterFrameChanged(const int &frame)
-{
-    MovablePoint::updateAfterFrameChanged(frame);
-    mEndCtrlPt->updateAfterFrameChanged(frame);
-    mStartCtrlPt->updateAfterFrameChanged(frame);
-}
-
 void PathPoint::setPointId(int idT) {
     mPathPointAnimators->prp_setName("point " + QString::number(idT) );
     mPointId = idT;
