@@ -7,18 +7,6 @@ class RenderContainer;
 class CacheContainer;
 class RenderCacheHandler;
 
-class FileCacheHandler {
-public:
-    FileCacheHandler();
-
-    const QString &getFilePath() {
-        return mFilePath;
-    }
-
-private:
-    QString mFilePath;
-};
-
 class CacheHandler : public QObject {
     Q_OBJECT
 public:

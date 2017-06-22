@@ -159,7 +159,6 @@ SOURCES += main.cpp\
     Gradients/displayedgradientswidget.cpp \
     Gradients/currentgradientwidget.cpp \
     filesourcescache.cpp \
-    Boxes/draftcanvas.cpp \
     glwindow.cpp \
     canvaswindow.cpp \
     skqtconversions.cpp \
@@ -175,7 +174,8 @@ SOURCES += main.cpp\
     BoxesList/coloranimatorbutton.cpp \
     keyfocustarget.cpp \
     noshortcutaction.cpp \
-    Animators/vectorsinglepathanimator.cpp
+    Animators/vectorsinglepathanimator.cpp \
+    updatable.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -291,7 +291,6 @@ HEADERS  += mainwindow.h \
     Gradients/displayedgradientswidget.h \
     Gradients/currentgradientwidget.h \
     filesourcescache.h \
-    Boxes/draftcanvas.h \
     global.h \
     glwindow.h \
     canvaswindow.h \
@@ -312,7 +311,8 @@ HEADERS  += mainwindow.h \
     BoxesList/coloranimatorbutton.h \
     keyfocustarget.h \
     noshortcutaction.h \
-    Animators/vectorsinglepathanimator.h
+    Animators/vectorsinglepathanimator.h \
+    updatable.h
 
 RESOURCES += \
     resources.qrc

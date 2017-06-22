@@ -17,6 +17,7 @@ class SoundComposition;
 class PaintSetting;
 class CanvasWidget;
 class RenderInstanceSettings;
+class Updatable;
 
 #include <QSqlQuery>
 #include <QAudioOutput>
@@ -82,7 +83,7 @@ public:
     void createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void addBoxAwaitingUpdate(BoundingBox *box);
+    void addUpdatableAwaitingUpdate(Updatable *updatable);
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
     void createImageForPath(const QString &path);
@@ -151,8 +152,8 @@ protected:
     bool mRendering = false;
     bool mNoBoxesAwaitUpdate = true;
     bool mCancelLastBoxUpdate = false;
-    BoundingBox *mLastUpdatedBox = NULL;
-    QList<BoundingBox*> mBoxesAwaitingUpdate;
+    Updatable *mLastUpdatedUpdatable = NULL;
+    QList<Updatable*> mUpdatablesAwaitingUpdate;
 
     QString mOutputString;
     int mCurrentRenderFrame;
@@ -184,7 +185,7 @@ protected:
     void qRender(QPainter *p);
     void renderSk(SkCanvas *canvas);
 signals:
-    void updateBoxPixmaps(BoundingBox*);
+    void updateUpdatable(Updatable*);
     void changeCurrentFrame(int);
     void changeFrameRange(int, int);
 public slots:
@@ -254,7 +255,7 @@ public slots:
     void selectAllAction();
     void clearSelectionAction();
 private slots:
-    void sendNextBoxForUpdate();
+    void sendNextUpdatableForUpdate();
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
     void saveOutput(const QString &renderDest,

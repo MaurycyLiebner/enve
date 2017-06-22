@@ -6,15 +6,15 @@
 #include "Properties/boolproperty.h"
 #include <QObject>
 
+namespace fmt_filters {
+    struct image;
+}
+
 struct PixmapEffectRenderData {
     virtual void applyEffectsSk(const SkBitmap &imgPtr,
                                 const fmt_filters::image &img,
                                 const qreal &scale) = 0;
 };
-
-namespace fmt_filters {
-    struct image;
-}
 
 class PixmapEffect;
 
@@ -115,7 +115,7 @@ protected:
     bool mInterrupted = false;
 };
 
-struct BlurEffectRenderData {
+struct BlurEffectRenderData : public PixmapEffectRenderData {
     void applyEffectsSk(const SkBitmap &imgPtr,
                         const fmt_filters::image &img,
                         const qreal &scale);
@@ -152,7 +152,7 @@ private:
             (new QrealAnimator())->ref<QrealAnimator>();
 };
 
-struct ShadowEffectRenderData {
+struct ShadowEffectRenderData : public PixmapEffectRenderData {
     void applyEffectsSk(const SkBitmap &imgPtr,
                         const fmt_filters::image &img,
                         const qreal &scale);
@@ -185,6 +185,8 @@ public:
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+            const int &relFrame);
 private:
 //    QrealAnimator mScale;
     QSharedPointer<BoolProperty> mHighQuality =

@@ -17,10 +17,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
     mPaintControlerThread = new QThread(this);
     mPaintControler = new PaintControler();
     mPaintControler->moveToThread(mPaintControlerThread);
-    connect(mPaintControler, SIGNAL(finishedUpdatingLastBox()),
-            this, SLOT(sendNextBoxForUpdate()) );
-    connect(this, SIGNAL(updateBoxPixmaps(BoundingBox*)),
-            mPaintControler, SLOT(updateBoxPixmaps(BoundingBox*)) );
+    connect(mPaintControler, SIGNAL(finishedUpdating()),
+            this, SLOT(sendNextUpdatableForUpdate()) );
+    connect(this, SIGNAL(updateUpdatable(Updatable*)),
+            mPaintControler, SLOT(updateUpdatable(Updatable*)) );
 
     mPaintControlerThread->start();
 
@@ -599,38 +599,38 @@ void CanvasWindow::renderPreview() {
     MainWindow::getInstance()->previewBeingRendered();
 }
 
-void CanvasWindow::addBoxAwaitingUpdate(BoundingBox *box) {
+void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
-        mLastUpdatedBox = box;
-        mLastUpdatedBox->beforeUpdate();
-        emit updateBoxPixmaps(box);
+        mLastUpdatedUpdatable = updatable;
+        mLastUpdatedUpdatable->beforeUpdate();
+        emit updateUpdatable(updatable);
     } else {
-        mBoxesAwaitingUpdate << box;
+        mUpdatablesAwaitingUpdate << updatable;
     }
 }
 
-void CanvasWindow::sendNextBoxForUpdate() {
-    if(mLastUpdatedBox != NULL) {
-        mLastUpdatedBox->afterUpdate();
+void CanvasWindow::sendNextUpdatableForUpdate() {
+    if(mLastUpdatedUpdatable != NULL) {
+        mLastUpdatedUpdatable->afterUpdate();
 //        mLastUpdatedBox->setAwaitingUpdate(false);
 //        if(mLastUpdatedBox->shouldRedoUpdate()) {
 //            mLastUpdatedBox->setRedoUpdateToFalse();
 //            mLastUpdatedBox->awaitUpdate();
 //        }
     }
-    if(mBoxesAwaitingUpdate.isEmpty()) {
+    if(mUpdatablesAwaitingUpdate.isEmpty()) {
         mNoBoxesAwaitUpdate = true;
-        mLastUpdatedBox = NULL;
+        mLastUpdatedUpdatable = NULL;
         callUpdateSchedulers();
         if(mBoxesUpdateFinishedFunction != NULL) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
         //callUpdateSchedulers();
     } else {
-        mLastUpdatedBox = mBoxesAwaitingUpdate.takeFirst();
-        mLastUpdatedBox->beforeUpdate();
-        emit updateBoxPixmaps(mLastUpdatedBox);
+        mLastUpdatedUpdatable = mUpdatablesAwaitingUpdate.takeFirst();
+        mLastUpdatedUpdatable->beforeUpdate();
+        emit updateUpdatable(mLastUpdatedUpdatable);
     }
 }
 

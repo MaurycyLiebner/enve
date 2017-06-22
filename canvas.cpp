@@ -434,7 +434,7 @@ void Canvas::drawInputText(QPainter *p) {
 
 void Canvas::scheduleUpdate() {
     if(shouldUpdate()) {
-        addUpdateScheduler(new AddBoxAwaitingUpdateScheduler(this));
+        addUpdateScheduler(new AddUpdatableAwaitingUpdateScheduler(this));
     }
 }
 

@@ -11,9 +11,9 @@ public:
     explicit PaintControler(QObject *parent = 0);
 
 signals:
-    void finishedUpdatingLastBox();
+    void finishedUpdating();
 public slots:
-    void updateBoxPixmaps(BoundingBox *box);
+    void updateUpdatable(Updatable *updatable);
 private:
 };
 

@@ -1,9 +1,10 @@
 ﻿#ifndef UPDATESCHEDULER_H
 #define UPDATESCHEDULER_H
 
-#include "Boxes/vectorpath.h"
-#include "canvas.h"
-#include <QDebug>
+class FileCacheHandler;
+class PathBox;
+class Updatable;
+class Gradient;
 
 class UpdateScheduler {
 public:
@@ -21,13 +22,13 @@ private:
     Gradient *mGradient;
 };
 
-class AddBoxAwaitingUpdateScheduler : public UpdateScheduler {
+class AddUpdatableAwaitingUpdateScheduler : public UpdateScheduler {
 public:
-    AddBoxAwaitingUpdateScheduler(Canvas *canvas);
+    AddUpdatableAwaitingUpdateScheduler(Updatable *updatable);
 
     void update();
 private:
-    Canvas *mCanvas;
+    Updatable *mUpdatable;
 };
 
 class PathUpdateScheduler : public UpdateScheduler {
@@ -37,6 +38,15 @@ public:
     void update();
 private:
     PathBox *mPath;
+};
+
+class FileCacheLoadScheduler : public UpdateScheduler {
+public:
+    FileCacheLoadScheduler(FileCacheHandler *cacheHandler);
+
+    void update();
+private:
+    FileCacheHandler *mHandler;
 };
 
 #endif // UPDATESCHEDULER_H
