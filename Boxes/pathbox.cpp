@@ -7,6 +7,8 @@
 #include "skiaincludes.h"
 #include "PathEffects/patheffect.h"
 #include "PathEffects/patheffectanimators.h"
+#include "canvas.h"
+#include "vectorpath.h"
 
 PathBox::PathBox(BoxesGroup *parent,
                  const BoundingBoxType &type) :

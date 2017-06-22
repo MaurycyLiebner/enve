@@ -59,7 +59,7 @@ void FileCacheHandler::addScheduler() {
     if(mLoadingScheduled) return;
     mLoadingScheduled = true;
     if(mLoadingData) return;
-    MainWindow::addUpdateScheduler(
+    MainWindow::getInstance()->addFileCacheUpdateScheduler(
                 new AddUpdatableAwaitingUpdateScheduler(this));
 }
 
@@ -84,13 +84,10 @@ VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
     updateFrameCount();
 }
 
-CacheContainer *VideoCacheHandler::getFrameCacheAtFrame(const int &relFrame) {
-    return mFramesCache.getRenderContainerAtRelFrame(relFrame);
-}
-
-void VideoCacheHandler::scheduleFrameLoad(const int &frame) {
-    mFramesLoadScheduled << frame;
-    addScheduler();
+sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
+    CacheContainer *cont = mFramesCache.getRenderContainerAtRelFrame(relFrame);
+    if(cont == NULL) return sk_sp<SkImage>();
+    return cont->getImageSk();
 }
 
 void VideoCacheHandler::beforeUpdate() {
@@ -127,19 +124,19 @@ void VideoCacheHandler::updateFrameCount() {
     avformat_free_context(format);
 }
 
-int VideoCacheHandler::processUpdate() {
+void VideoCacheHandler::processUpdate() {
     const char* path = mFilePath.toLatin1().data();
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
     if (avformat_open_input(&format, path, NULL, NULL) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
-        return -1;
+        return;// -1;
     }
     if (avformat_find_stream_info(format, NULL) < 0) {
         fprintf(stderr,
                 "Could not retrieve stream info from file '%s'\n",
                 path);
-        return -1;
+        return;// -1;
     }
 
     // Find the index of the first audio stream
@@ -156,7 +153,7 @@ int VideoCacheHandler::processUpdate() {
         fprintf(stderr,
                 "Could not retrieve video stream from file '%s'\n",
                 path);
-        return -1;
+        return;// -1;
     }
     AVCodecContext *videoCodec = NULL;
     struct SwsContext *sws = NULL;
@@ -169,7 +166,7 @@ int VideoCacheHandler::processUpdate() {
         fprintf(stderr,
                 "Failed to open decoder for stream #%u in file '%s'\n",
                 videoStreamIndex, path);
-        return -1;
+        return;// -1;
     }
 
     sws = sws_getContext(videoCodec->width, videoCodec->height,
@@ -183,7 +180,7 @@ int VideoCacheHandler::processUpdate() {
     AVFrame *decodedFrame = av_frame_alloc();
     if(!decodedFrame) {
         fprintf(stderr, "Error allocating the frame\n");
-        return -1;
+        return;// -1;
     }
 
     foreach(const int &frameId, mFramesBeingLoaded) {
@@ -200,7 +197,7 @@ int VideoCacheHandler::processUpdate() {
             if(avformat_seek_file(format, videoStreamIndex, 0,
                                    frame, frame,
                     AVSEEK_FLAG_FRAME) < 0) {
-                return 0;
+                return;// 0;
             }
         }
 
@@ -263,7 +260,7 @@ int VideoCacheHandler::processUpdate() {
     avformat_free_context(format);
 
     // success
-    return 0;
+    return;// 0;
 }
 
 void VideoCacheHandler::afterUpdate() {

@@ -18,7 +18,6 @@ public:
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void reloadSound();
     void reloadFile();
-    void loadUpdatePixmap();
 
     bool SWT_isVideoBox() { return true; }
     void changeSourceFile();

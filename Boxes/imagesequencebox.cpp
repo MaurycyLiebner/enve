@@ -1,4 +1,5 @@
 #include "imagesequencebox.h"
+#include "filesourcescache.h"
 
 ImageSequenceBox::ImageSequenceBox(BoxesGroup *parent) :
     AnimationBox(parent) {
@@ -11,14 +12,10 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
 }
 
 void ImageSequenceBox::reloadFile() {
-    mFramesCount = mListOfFrames.count();
     updateDurationRectangleAnimationRange();
+    mAnimationCacheHandler = new ImageSequenceCacheHandler(mListOfFrames);
+    updateCurrentAnimationFrame();
     scheduleSoftUpdate();
-}
-
-void ImageSequenceBox::setUpdateVars() {
-    AnimationBox::setUpdateVars();
-    mUpdateFramePath = mListOfFrames.at(mUpdateAnimationFrame);
 }
 
 void ImageSequenceBox::makeDuplicate(Property *targetBox) {
@@ -43,15 +40,4 @@ void ImageSequenceBox::changeSourceFile() {
 
 BoundingBox *ImageSequenceBox::createNewDuplicate(BoxesGroup *parent) {
     return new ImageSequenceBox(parent);
-}
-
-void ImageSequenceBox::loadUpdatePixmap() {
-    if(mUpdateFramePath.isEmpty()) {
-    } else {
-        sk_sp<SkData> data = SkData::MakeFromFileName(
-                    mUpdateFramePath.toLocal8Bit().data());
-        mUpdateAnimationImageSk = SkImage::MakeFromEncoded(data);
-
-        updateUpdateRelBoundingRectFromImage();
-    } 
 }

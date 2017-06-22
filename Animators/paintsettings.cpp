@@ -8,6 +8,7 @@
 #include "Animators/animatorupdater.h"
 #include "skqtconversions.h"
 #include "skiaincludes.h"
+#include "Boxes/pathbox.h"
 
 ColorSetting::ColorSetting() {
     mChangedValue = CVR_ALL;
@@ -296,7 +297,7 @@ void Gradient::saveToSqlIfPathSelected(QSqlQuery *query) {
                 prp_saveToSql(query);
                 return;
             }
-            parent = parent->getParent();
+            parent = (BoundingBox*)parent->getParent();
         }
     }
 }

@@ -1242,8 +1242,8 @@ void BoundingBox::setUpdateVars() {
     if(mCurrentRenderData == NULL) {
         createCurrentRenderData();
     }
-    setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
-                                          mCurrentRenderData);
+//    setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
+//                                          mCurrentRenderData);
     mUpdateTransform = mTransformAnimator->getCombinedTransform();
     mUpdateRelFrame = anim_mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;

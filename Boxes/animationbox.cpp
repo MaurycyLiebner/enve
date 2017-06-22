@@ -2,6 +2,7 @@
 #include "BoxesList/boxsinglewidget.h"
 #include "Animators/animatorupdater.h"
 #include "canvas.h"
+#include "filesourcescache.h"
 
 AnimationBox::AnimationBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_IMAGE) {
@@ -45,11 +46,21 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
     qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
     getAnimationDurationRect()->setAnimationFrameDuration(
-                qCeil(qAbs(timeScale*mFramesCount)));
+                qCeil(qAbs(timeScale*mAnimationCacheHandler->getFramesCount())));
 }
 
-void AnimationBox::prp_setAbsFrame(const int &frame) {
-    BoundingBox::prp_setAbsFrame(frame);
+void AnimationBox::updateCurrentAnimationFrameIfNeeded() {
+    if(!mCurrentAnimationFrameChanged) return;
+    mCurrentAnimationFrameChanged = false;
+    updateCurrentAnimationFrame();
+}
+
+void AnimationBox::scheduleUpdate() {
+    updateCurrentAnimationFrameIfNeeded();
+    BoundingBox::scheduleUpdate();
+}
+
+void AnimationBox::updateCurrentAnimationFrame() {
     qreal fpsRatio = getParentCanvas()->getFps()/mFps;
     qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
@@ -59,31 +70,33 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
     if(timeScale > 0.) {
         pixId = (anim_mCurrentAbsFrame - absMinAnimation)/timeScale;
     } else {
-        pixId = mFramesCount - 1 +
+        pixId = mAnimationCacheHandler->getFramesCount() - 1 +
                 (anim_mCurrentAbsFrame - absMinAnimation)/timeScale;
     }
 
     if(pixId <= 0) {
         pixId = 0;
-    } else if(pixId > mFramesCount - 1){
-        pixId = mFramesCount - 1;
+    } else if(pixId > mAnimationCacheHandler->getFramesCount() - 1){
+        pixId = mAnimationCacheHandler->getFramesCount() - 1;
     }
 
     mCurrentAnimationFrame = pixId;
+
+    if(mAnimationCacheHandler->getFrameAtFrame(
+                mCurrentAnimationFrame).get() == NULL) {
+        mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
+    }
+}
+
+void AnimationBox::prp_setAbsFrame(const int &frame) {
+    BoundingBox::prp_setAbsFrame(frame);
+    if(mAnimationCacheHandler == NULL) return;
+    mCurrentAnimationFrameChanged = true;
 
     scheduleSoftUpdate();
 }
 
 void AnimationBox::afterSuccessfulUpdate() {
-    if(mUpdatePixmapReloadScheduled) {
-        CacheContainer *cont = mAnimationFramesCache.getRenderContainerAtRelFrame(
-                                    mUpdateAnimationFrame);
-        if(cont == NULL) {
-            cont = mAnimationFramesCache.createNewRenderContainerAtRelFrame(
-                                                        mUpdateAnimationFrame);
-            cont->replaceImageSk(mUpdateAnimationImageSk);
-        }
-    }
     mRelBoundingRect = mUpdateRelBoundingRect;
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     updateRelBoundingRect();
@@ -97,22 +110,17 @@ void AnimationBox::updateUpdateRelBoundingRectFromImage() {
 
 void AnimationBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
-    mUpdateAnimationFrame = mCurrentAnimationFrame;
-    CacheContainer *cont =
-            mAnimationFramesCache.getRenderContainerAtRelFrame(
-                mUpdateAnimationFrame);
-    mUpdatePixmapReloadScheduled = cont == NULL;
-    if(cont != NULL) {
-        mUpdateAnimationImageSk = cont->getImageSk();
-        updateUpdateRelBoundingRectFromImage();
-    }
-}
+    mUpdateAnimationImageSk = mAnimationCacheHandler->getFrameAtFrame(
+                                            mCurrentAnimationFrame);
+    updateUpdateRelBoundingRectFromImage();
+//    CacheContainer *cont =
+//            mAnimationFramesCache.getRenderContainerAtRelFrame(
+//                mUpdateAnimationFrame);
 
-void AnimationBox::preUpdatePixmapsUpdates() {
-    if(mUpdatePixmapReloadScheduled) {
-        loadUpdatePixmap();
-    }
-    BoundingBox::preUpdatePixmapsUpdates();
+//    if(cont != NULL) {
+//        mUpdateAnimationImageSk = cont->getImageSk();
+//        updateUpdateRelBoundingRectFromImage();
+//    }
 }
 
 void AnimationBox::drawSk(SkCanvas *canvas) {
