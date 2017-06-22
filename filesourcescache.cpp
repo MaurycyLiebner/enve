@@ -274,3 +274,43 @@ void VideoCacheHandler::afterUpdate() {
     mLoadedFrames.clear();
     mFramesBeingLoaded.clear();
 }
+
+void VideoCacheHandler::clearCache() {
+    mFramesCache.clearCache();
+}
+
+const qreal &VideoCacheHandler::getFps() { return mFps; }
+
+void VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+    mFramesLoadScheduled << frame;
+    addScheduler();
+}
+
+ImageSequenceCacheHandler::ImageSequenceCacheHandler(
+        const QStringList &framePaths) {
+    mFramePaths = framePaths;
+    foreach(const QString &path, framePaths) {
+        ImageCacheHandler *imgCacheHandler = (ImageCacheHandler*)
+                FileSourcesCache::getHandlerForFilePath(path);
+        if(imgCacheHandler == NULL) {
+            mFrameImageHandlers << new ImageCacheHandler(path);
+        } else {
+            mFrameImageHandlers << imgCacheHandler;
+        }
+    }
+    updateFrameCount();
+}
+
+sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int &relFrame) {
+    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
+    if(cacheHandler == NULL) return sk_sp<SkImage>();
+    return cacheHandler->getImage();
+}
+
+void ImageSequenceCacheHandler::updateFrameCount() {
+    mFramesCount = mFramePaths.count();
+}
+
+void ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
+    mFrameImageHandlers.at(frame)->addScheduler();
+}

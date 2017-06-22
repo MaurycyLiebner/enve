@@ -72,32 +72,13 @@ protected:
 
 class ImageSequenceCacheHandler : public AnimationCacheHandler {
 public:
-    ImageSequenceCacheHandler(const QStringList &framePaths) {
-        mFramePaths = framePaths;
-        foreach(const QString &path, framePaths) {
-            ImageCacheHandler *imgCacheHandler = (ImageCacheHandler*)
-                    FileSourcesCache::getHandlerForFilePath(path);
-            if(imgCacheHandler == NULL) {
-                mFrameImageHandlers << new ImageCacheHandler(path);
-            } else {
-                mFrameImageHandlers << imgCacheHandler;
-            }
-        }
-    }
+    ImageSequenceCacheHandler(const QStringList &framePaths);
 
-    sk_sp<SkImage> getFrameAtFrame(const int &relFrame) {
-        ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
-        if(cacheHandler == NULL) return sk_sp<SkImage>();
-        return cacheHandler->getImage();
-    }
+    sk_sp<SkImage> getFrameAtFrame(const int &relFrame);
 
-    void updateFrameCount() {
-        mFramesCount = mFramePaths.count();
-    }
+    void updateFrameCount();
 
-    void scheduleFrameLoad(const int &frame) {
-        mFrameImageHandlers.at(frame)->addScheduler();
-    }
+    void scheduleFrameLoad(const int &frame);
 protected:
     QStringList mFramePaths;
     QList<ImageCacheHandler*> mFrameImageHandlers;
@@ -116,16 +97,11 @@ public:
 
     void afterUpdate();
 
-    void clearCache() {
-        mFramesCache.clearCache();
-    }
+    void clearCache();
 
-    const qreal &getFps() { return mFps; }
+    const qreal &getFps();
 
-    virtual void scheduleFrameLoad(const int &frame) {
-        mFramesLoadScheduled << frame;
-        addScheduler();
-    }
+    virtual void scheduleFrameLoad(const int &frame);
 protected:
     QList<int> mFramesLoadScheduled;
 
