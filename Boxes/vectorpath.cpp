@@ -59,8 +59,8 @@ PathAnimator *VectorPath::getPathAnimator() {
 }
 
 void VectorPath::applyCurrentTransformation() {
-    mPathAnimator->
-            applyTransformToPoints(mTransformAnimator->getCurrentTransformationMatrix());
+    mPathAnimator->applyTransformToPoints(
+                mTransformAnimator->getCurrentTransformationMatrix());
 
     mTransformAnimator->reset(true);
     centerPivotPosition(true);
@@ -162,4 +162,15 @@ void VectorPath::makeDuplicate(Property *targetBox) {
 
 BoundingBox *VectorPath::createNewDuplicate(BoxesGroup *parent) {
     return new VectorPath(parent);
+}
+#include "PathEffects/patheffectanimators.h"
+void VectorPath::setupBoundingBoxRenderDataForRelFrame(
+                            const int &relFrame,
+                            BoundingBoxRenderData *data) {
+    PathBoxRenderData *pathData = (PathBoxRenderData*)data;
+    SkPath path = mPathAnimator->getPathAtRelFrame(relFrame);
+    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path);
+    pathData->path = path;
+
+    PathBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
 }

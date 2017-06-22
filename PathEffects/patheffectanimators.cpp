@@ -95,6 +95,18 @@ void PathEffectAnimators::filterPath(SkPath *srcDstPath) {
     *srcDstPath = dstPath;
 }
 
+void PathEffectAnimators::filterPathForRelFrame(const int &relFrame,
+                                                SkPath *srcDstPath) {
+    SkPath dstPath = *srcDstPath;
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        SkPath srcPath = dstPath;
+        ((PathEffect*)effect.data())->filterPathForRelFrame(relFrame,
+                                                            srcPath,
+                                                            &dstPath);
+    }
+    *srcDstPath = dstPath;
+}
+
 //void PathEffectAnimators::makeDuplicate(Property *target) {
 //    PathEffectAnimators *eaTarget = ((PathEffectAnimators*)target);
 //    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {

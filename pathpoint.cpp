@@ -306,17 +306,23 @@ void PathPoint::moveStartCtrlPtToRelPos(QPointF startCtrlPt) {
     mStartCtrlPt->setRelativePos(startCtrlPt);
 }
 
-QPointF PathPoint::getStartCtrlPtAbsPos() const
-{
+QPointF PathPoint::getStartCtrlPtAbsPos() const {
     return mapRelativeToAbsolute(getStartCtrlPtValue());
 }
 
-QPointF PathPoint::getStartCtrlPtValue() const
-{
+QPointF PathPoint::getStartCtrlPtValue() const {
     if(mStartCtrlPtEnabled) {
         return mStartCtrlPt->getRelativePos();
     } else {
         return getRelativePos();
+    }
+}
+
+QPointF PathPoint::getStartCtrlPtValueAtRelFrame(const int &relFrame) const {
+    if(mStartCtrlPtEnabled) {
+        return mStartCtrlPt->getCurrentPointValueAtRelFrame(relFrame);
+    } else {
+        return getCurrentPointValueAtRelFrame(relFrame);
     }
 }
 
@@ -355,12 +361,19 @@ QPointF PathPoint::getEndCtrlPtAbsPos() {
     return mapRelativeToAbsolute(getEndCtrlPtValue());
 }
 
-QPointF PathPoint::getEndCtrlPtValue() const
-{
+QPointF PathPoint::getEndCtrlPtValue() const {
     if(mEndCtrlPtEnabled) {
         return mEndCtrlPt->getRelativePos();
     } else {
         return getRelativePos();
+    }
+}
+
+QPointF PathPoint::getEndCtrlPtValueAtRelFrame(const int &relFrame) const {
+    if(mEndCtrlPtEnabled) {
+        return mEndCtrlPt->getCurrentPointValueAtRelFrame(relFrame);
+    } else {
+        return getCurrentPointValueAtRelFrame(relFrame);
     }
 }
 
@@ -554,6 +567,12 @@ PathPointValues PathPoint::getPointValues() const {
     return PathPointValues(getStartCtrlPtValue(),
                            getRelativePos(),
                            getEndCtrlPtValue() );
+}
+
+PathPointValues PathPoint::getPointValuesAtRelFrame(const int &relFrame) {
+    return PathPointValues(getStartCtrlPtValueAtRelFrame(relFrame),
+                           getCurrentPointValueAtRelFrame(relFrame),
+                           getEndCtrlPtValueAtRelFrame(relFrame) );
 }
 
 void PathPoint::setPointValues(const PathPointValues &values) {

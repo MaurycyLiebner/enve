@@ -54,6 +54,8 @@ public:
                                    const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
+    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
+                                               BoundingBoxRenderData *data);
 protected:
     PathAnimatorQSPtr mPathAnimator;
 

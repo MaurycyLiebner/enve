@@ -67,6 +67,7 @@ public:
                                   const bool &saveUndoRedo = true);
 
     bool SWT_isPathAnimator();
+    SkPath getPathAtRelFrame(const int &relFrame);
 private:
     BoundingBox *mParentBox = NULL;
     QPainterPath mPath;

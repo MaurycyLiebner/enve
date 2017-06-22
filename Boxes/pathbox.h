@@ -9,6 +9,35 @@ typedef QSharedPointer<PathEffectAnimators> PathEffectAnimatorsQSPtr;
 class PathEffect;
 typedef QSharedPointer<GradientPoints> GradientPointsQSPtr;
 
+struct PathBoxRenderData : public BoundingBoxRenderData {
+    SkPath path;
+    SkPath outlinePath;
+    UpdatePaintSettings paintSettings;
+    UpdateStrokeSettings strokeSettings;
+
+    void drawSk(SkCanvas *canvas) {
+        canvas->save();
+
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        paint.setStyle(SkPaint::kFill_Style);
+
+        if(!path.isEmpty()) {
+            paintSettings.applyPainterSettingsSk(&paint);
+
+            canvas->drawPath(path, paint);
+        }
+        if(!outlinePath.isEmpty()) {
+            paint.setShader(NULL);
+            strokeSettings.applyPainterSettingsSk(&paint);
+
+            canvas->drawPath(outlinePath, paint);
+        }
+
+        canvas->restore();
+    }
+};
+
 class PathBox : public BoundingBox {
 public:
     PathBox(BoxesGroup *parent,
@@ -90,6 +119,14 @@ public:
     void addPathEffect(PathEffect *effect);
     void addOutlinePathEffect(PathEffect *effect);
     void updateEffectsMargin();
+
+    void setupBoundingBoxRenderDataForRelFrame(
+                                const int &relFrame,
+                                BoundingBoxRenderData *data);
+
+    void createCurrentRenderData() {
+        mCurrentRenderData = new PathBoxRenderData();
+    }
 protected:
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;

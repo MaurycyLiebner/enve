@@ -219,6 +219,16 @@ void PathAnimator::updatePath() {
     }
 }
 
+SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
+    SkPath path = SkPath();
+
+    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
+        path.addPath(singlePath->getPathAtRelFrame(relFrame));
+    }
+
+    return path;
+}
+
 PathPoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
                                                   const bool &adjust,
                                                   const qreal &canvasScaleInv) {

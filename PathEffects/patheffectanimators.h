@@ -25,6 +25,7 @@ public:
     void updatePathEffectsSum();
 
     void filterPath(SkPath *srcDstPath);
+    void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
 };
 
 

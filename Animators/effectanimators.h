@@ -42,6 +42,7 @@ public:
     }
 
     bool SWT_isEffectAnimators() { return true; }
+    qreal getEffectsMarginAtRelFrame(const int &relFrame) const;
 private:
     BoundingBox *mParentBox;
 };

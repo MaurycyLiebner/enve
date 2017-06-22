@@ -386,6 +386,18 @@ void Gradient::startColorIdTransform(int id) {
     mColors.at(id)->prp_startTransform();
 }
 
+QGradientStops Gradient::getQGradientStopsAtAbsFrame(const int &absFrame) {
+    QGradientStops stops;
+    qreal inc = 1./(mColors.length() - 1.);
+    qreal cPos = 0.;
+    for(int i = 0; i < mColors.length(); i++) {
+        stops.append(QPair<qreal, QColor>(clamp(cPos, 0., 1.),
+                     mColors.at(i)->getColorAtRelFrame(absFrame).qcol) );
+        cPos += inc;
+    }
+    return stops;
+}
+
 void Gradient::updateQGradientStops() {
     mQGradientStops.clear();
     qreal inc = 1./(mColors.length() - 1.);
@@ -512,6 +524,10 @@ int PaintSettings::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 
 Color PaintSettings::getCurrentColor() const {
     return mColor->getCurrentColor();
+}
+
+Color PaintSettings::getColorAtRelFrame(const int &relFrame) const {
+    return mColor->getColorAtRelFrame(relFrame);
 }
 
 PaintType PaintSettings::getPaintType() const {
@@ -658,6 +674,13 @@ void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }
 
+void StrokeSettings::setStrokerSettingsForRelFrameSk(const int &relFrame,
+                                                     SkStroke *stroker) {
+    stroker->setWidth(mLineWidth->qra_getValueAtRelFrame(relFrame));
+    stroker->setCap(QCapToSkCap(mCapStyle));
+    stroker->setJoin(QJoinToSkJoin(mJoinStyle));
+}
+
 qreal StrokeSettings::getCurrentStrokeWidth() const {
     return mLineWidth->qra_getCurrentValue();
 }
@@ -795,7 +818,9 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
     }
 }
 
-void UpdatePaintSettings::updateGradient(const QGradientStops &stops, const QPointF &start, const QPointF &finalStop) {
+void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
+                                         const QPointF &start,
+                                         const QPointF &finalStop) {
     gradient.setStops(stops);
     gradient.setStart(start);
     gradient.setFinalStop(finalStop);
@@ -832,7 +857,11 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops, const QPoi
                                               SkShader::kClamp_TileMode);
 }
 
-UpdateStrokeSettings::UpdateStrokeSettings(const QColor &paintColorT, const PaintType &paintTypeT, const QLinearGradient &gradientT, const QPainter::CompositionMode &outlineCompositionModeT) :
+UpdateStrokeSettings::UpdateStrokeSettings(
+                   const QColor &paintColorT,
+                   const PaintType &paintTypeT,
+                   const QLinearGradient &gradientT,
+                   const QPainter::CompositionMode &outlineCompositionModeT) :
     UpdatePaintSettings(paintColorT, paintTypeT, gradientT) {
     outlineCompositionMode = outlineCompositionModeT;
 }

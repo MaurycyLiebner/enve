@@ -68,6 +68,76 @@ private:
     BoundingBox *mBoundingBox;
 };
 
+struct BoundingBoxRenderData {
+    QMatrix transform;
+    QRectF relBoundingRect;
+    qreal opacity;
+    qreal resolution;
+    qreal effectsMargin;
+    int relFrame;
+    QList<PixmapEffectRenderData*> pixmapEffects;
+
+    virtual void drawSk(SkCanvas *canvas) = 0;
+
+    sk_sp<SkImage> getAllUglyPixmapSk(SkPoint *drawPosP) {
+        QRectF allUglyBoundingRect =
+                transform.mapRect(relBoundingRect).
+                    adjusted(-effectsMargin, -effectsMargin,
+                             effectsMargin, effectsMargin);
+        QSizeF sizeF = allUglyBoundingRect.size();
+        QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
+                QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
+                        qRound(allUglyBoundingRect.top()/**resolution*/));
+
+        SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
+                                             ceil(sizeF.height()),
+                                             kBGRA_8888_SkColorType,
+                                             kPremul_SkAlphaType,
+                                             nullptr);
+        SkBitmap bitmap;
+        bitmap.allocPixels(info);
+
+        //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
+        SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
+        rasterCanvas->clear(SK_ColorTRANSPARENT);
+
+        rasterCanvas->translate(-allUglyBoundingRect.left(),
+                                -allUglyBoundingRect.top());
+
+        allUglyBoundingRect.translate(-transF);
+
+        rasterCanvas->translate(transF.x(), transF.y());
+        rasterCanvas->concat(QMatrixToSkMatrix(transform));
+
+        drawSk(rasterCanvas);
+
+        rasterCanvas->flush();
+        delete rasterCanvas;
+    //    if(parentCanvas->effectsPaintEnabled()) {
+    //        allUglyPixmap = applyEffects(allUglyPixmap,
+    //                                     false,
+    //                                     parentCanvas->getResolutionFraction());
+    //    }
+
+        *drawPosP = SkPoint::Make(qRound(allUglyBoundingRect.left()),
+                                  qRound(allUglyBoundingRect.top()));
+
+        if(!pixmapEffects.isEmpty()) {
+            SkPixmap pixmap;
+            bitmap.peekPixels(&pixmap);
+            fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
+                                   im.width(), im.height());
+            foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+                effect->applyEffectsSk(bitmap, img, resolution);
+            }
+        }
+
+        sk_sp<SkImage> image = SkImage::MakeFromBitmap(bitmap);
+        bitmap.reset();
+        return image;
+    }
+};
+
 class BoundingBox :
         public ComplexAnimator,
         public Transformable {
@@ -448,7 +518,16 @@ public:
     virtual bool handleSelectedCanvasAction(QAction *) {
         return false;
     }
+
+    virtual void setupBoundingBoxRenderDataForRelFrame(
+            const int &relFrame, BoundingBoxRenderData *data);
+
+    virtual void createCurrentRenderData() {
+        mCurrentRenderData = new BoundingBoxRenderData();
+    }
+
 protected:
+    BoundingBoxRenderData *mCurrentRenderData = NULL;
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
 

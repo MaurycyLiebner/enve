@@ -6,6 +6,12 @@
 #include "Properties/boolproperty.h"
 #include <QObject>
 
+struct PixmapEffectRenderData {
+    virtual void applyEffectsSk(const SkBitmap &imgPtr,
+                                const fmt_filters::image &img,
+                                const qreal &scale) = 0;
+};
+
 namespace fmt_filters {
     struct image;
 }
@@ -27,6 +33,7 @@ public:
         if(mimetype == "pixmapeffect") return true;
         return false;
     }
+
 private:
     PixmapEffect *mPixmapEffect;
 };
@@ -59,7 +66,7 @@ public:
                          qreal) {}
 
     virtual qreal getMargin() { return 0.; }
-
+    virtual qreal getMarginAtRelFrame(const int &) { return 0.; }
     bool interrupted() {
         if(mInterrupted) {
             mInterrupted = false;
@@ -94,6 +101,9 @@ public:
         mParentEffects = parentEffects;
     }
 
+    virtual PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+                                        const int &) { return NULL; }
+
     bool SWT_isPixmapEffect() { return true; }
 public slots:
     void interrupt() {
@@ -105,21 +115,26 @@ protected:
     bool mInterrupted = false;
 };
 
-class BlurEffect : public PixmapEffect
-{
+struct BlurEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    bool hasKeys;
+    bool highQuality;
+    qreal blurRadius;
+};
+
+class BlurEffect : public PixmapEffect {
 public:
     BlurEffect(qreal radius = 10.);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
     void applySk(BoundingBox *target,
                  const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
     qreal getMargin();
-
+    qreal getMarginAtRelFrame(const int &relFrame);
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &pixmapEffectId);
@@ -127,7 +142,9 @@ public:
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
-    void applyBlur(const fmt_filters::image &img, const qreal &scale);
+
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+                                    const int &relFrame);
 private:
     QSharedPointer<BoolProperty> mHighQuality =
             (new BoolProperty())->ref<BoolProperty>();
@@ -135,21 +152,29 @@ private:
             (new QrealAnimator())->ref<QrealAnimator>();
 };
 
-class ShadowEffect : public PixmapEffect
-{
+struct ShadowEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    bool hasKeys;
+    bool highQuality;
+    qreal blurRadius;
+    Color color;
+    QPointF translation;
+};
+
+class ShadowEffect : public PixmapEffect {
 public:
     ShadowEffect(qreal radius = 10.);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
     void applySk(BoundingBox *target,
                  const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
 
     qreal getMargin();
+    qreal getMarginAtRelFrame(const int &relFrame);
 
     int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
     void prp_loadFromSql(const int &identifyingId);
@@ -160,9 +185,6 @@ public:
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
     void duplicateColorAnimatorFrom(ColorAnimator *source);
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
-    void applyShadow(const SkBitmap &imgPtr,
-                     const fmt_filters::image &img,
-                     const qreal &scale);
 private:
 //    QrealAnimator mScale;
     QSharedPointer<BoolProperty> mHighQuality =

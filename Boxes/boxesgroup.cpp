@@ -490,6 +490,15 @@ void BoxesGroup::updateChildrenId(const int &firstId,
     }
 }
 
+void BoxesGroup::prp_setAbsFrame(const int &frame) {
+    BoundingBox::prp_setAbsFrame(frame);
+
+    updateDrawRenderContainerTransform();
+    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        box->prp_setAbsFrame(frame);
+    }
+}
+
 void BoxesGroup::removeChildFromList(const int &id,
                                      const bool &saveUndoRedo) {
     BoundingBox *box = mChildBoxes.at(id).data();

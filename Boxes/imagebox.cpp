@@ -69,6 +69,14 @@ void ImageBox::changeSourceFile() {
     }
 }
 
+void ImageBox::setupBoundingBoxRenderDataForRelFrame(
+                                    const int &relFrame,
+                                    BoundingBoxRenderData *data) {
+    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+    ImageBoxRenderData *imgData = new ImageBoxRenderData();
+    imgData->image = mImageSk;
+}
+
 bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "ib_set_src_file") {
         changeSourceFile();

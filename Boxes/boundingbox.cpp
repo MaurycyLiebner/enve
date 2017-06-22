@@ -266,7 +266,6 @@ sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
                 const qreal &resolution,
                 const QMatrix &allUglyTransform,
                 SkPoint *drawPosP) {
-    Q_UNUSED(resolution);
     QRectF allUglyBoundingRect =
             allUglyTransform.mapRect(mUpdateRelBoundingRect).
                 adjusted(-effectsMargin, -effectsMargin,
@@ -429,10 +428,15 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
     if(mDurationRectangle != NULL) {
         int minDurRelFrame = mDurationRectangle->getMinFrameAsRelFrame();
         int maxDurRelFrame = mDurationRectangle->getMaxFrameAsRelFrame();
-        if(mUpdateDrawOnParentBox !=
-           (anim_mCurrentRelFrame >= minDurRelFrame &&
-            anim_mCurrentRelFrame <= maxDurRelFrame)) {
-            scheduleSoftUpdate();
+        bool isInVisRange = (anim_mCurrentRelFrame >= minDurRelFrame &&
+                             anim_mCurrentRelFrame <= maxDurRelFrame);
+        if(mUpdateDrawOnParentBox != isInVisRange) {
+            if(mUpdateDrawOnParentBox) {
+                mUpdateDrawOnParentBox = false;
+                mParent->scheduleSoftUpdate();
+            } else {
+                scheduleSoftUpdate();
+            }
         }
     }
 }
@@ -707,6 +711,18 @@ void BoundingBox::finishTransform() {
 
 SkPoint BoundingBox::getUpdateDrawPos() {
     return mUpdateRenderContainer.getDrawpos();
+}
+
+void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
+                        const int &relFrame,
+                        BoundingBoxRenderData *data) {
+    data->relFrame = relFrame;
+    data->transform = mTransformAnimator->
+            getTransformMatrixAtRelFrame(relFrame);
+    data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
+    data->effectsMargin = mEffectsAnimators->
+            getEffectsMarginAtRelFrame(relFrame);
+    data->resolution = getParentCanvas()->getResolutionFraction();
 }
 
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
@@ -1223,6 +1239,11 @@ void BoundingBox::afterUpdate() {
 void BoundingBox::setUpdateVars() {
     updateRelBoundingRect();
 
+    if(mCurrentRenderData == NULL) {
+        createCurrentRenderData();
+    }
+    setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
+                                          mCurrentRenderData);
     mUpdateTransform = mTransformAnimator->getCombinedTransform();
     mUpdateRelFrame = anim_mCurrentRelFrame;
     mUpdateRelBoundingRect = mRelBoundingRect;
@@ -1248,7 +1269,7 @@ bool BoundingBox::shouldUpdate() {
 }
 
 void BoundingBox::scheduleSoftUpdate() {
-    if(mAwaitingUpdate && mParent.data() !=  NULL) return;
+    if(mAwaitingUpdate) return;
     scheduleUpdate();
 }
 

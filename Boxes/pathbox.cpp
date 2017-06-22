@@ -73,6 +73,56 @@ void PathBox::updateEffectsMargin() {
                             mOutlinePathEffectsAnimators->getEffectsMargin();*/
 }
 
+void PathBox::setupBoundingBoxRenderDataForRelFrame(
+                            const int &relFrame,
+                            BoundingBoxRenderData *data) {
+    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
+                                                       data);
+    PathBoxRenderData *pathData = (PathBoxRenderData*)data;
+
+
+    SkPath outline;
+    if(mStrokeSettings->nonZeroLineWidth()) {
+        SkStroke strokerSk;
+        mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
+        outline = SkPath();
+        strokerSk.strokePath(pathData->path, &outline);
+    } else {
+        outline = SkPath();
+    }
+    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
+    pathData->outlinePath = outline;
+    outline.addPath(pathData->path);
+    pathData->relBoundingRect = SkRectToQRectF(outline.computeTightBounds());
+
+    UpdatePaintSettings *fillSettings = &pathData->paintSettings;
+
+    fillSettings->paintColor = mFillSettings->
+            getColorAtRelFrame(relFrame).qcol;
+    fillSettings->paintType = mFillSettings->getPaintType();
+    Gradient *grad = mFillSettings->getGradient();
+    if(grad != NULL) {
+        fillSettings->updateGradient(
+                    grad->getQGradientStopsAtAbsFrame(
+                        prp_relFrameToAbsFrame(relFrame)),
+                    mFillGradientPoints->getStartPointAtRelFrame(relFrame),
+                    mFillGradientPoints->getEndPointAtRelFrame(relFrame));
+    }
+
+    UpdateStrokeSettings *strokeSettings = &pathData->strokeSettings;
+    strokeSettings->paintColor = mStrokeSettings->
+            getColorAtRelFrame(relFrame).qcol;
+    strokeSettings->paintType = mStrokeSettings->getPaintType();
+    grad = mStrokeSettings->getGradient();
+    if(grad != NULL) {
+        strokeSettings->updateGradient(
+                    grad->getQGradientStopsAtAbsFrame(
+                        prp_relFrameToAbsFrame(relFrame)),
+                    mStrokeGradientPoints->getStartPointAtRelFrame(relFrame),
+                    mStrokeGradientPoints->getEndPointAtRelFrame(relFrame));
+    }
+}
+
 #include <QSqlError>
 int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = BoundingBox::saveToSql(query, parentId);

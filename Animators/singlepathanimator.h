@@ -82,6 +82,7 @@ public:
     int getChildPointIndex(PathPoint *child);
 
     bool SWT_isSinglePathAnimator() { return true; }
+    SkPath getPathAtRelFrame(const int &relFrame);
 private:
     PathAnimator *mParentPathAnimator = NULL;
     QPainterPath mPath;

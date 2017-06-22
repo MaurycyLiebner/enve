@@ -211,6 +211,9 @@ public:
     VectorPathEdge *getNextEdge() {
         return mNextEdge.get();
     }
+    QPointF getEndCtrlPtValueAtRelFrame(const int &relFrame) const;
+    QPointF getStartCtrlPtValueAtRelFrame(const int &relFrame) const;
+    PathPointValues getPointValuesAtRelFrame(const int &relFrame);
 private:
     std::shared_ptr<VectorPathEdge> mNextEdge;
 

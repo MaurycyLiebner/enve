@@ -4,8 +4,17 @@
 #include <QImage>
 #include "skiaincludes.h"
 
-class ImageBox : public BoundingBox
-{
+struct ImageBoxRenderData : public BoundingBoxRenderData {
+    sk_sp<SkImage> image;
+
+    void drawSk(SkCanvas *canvas) {
+        SkPaint paint;
+        //paint.setFilterQuality(kHigh_SkFilterQuality);
+        canvas->drawImage(image, 0, 0, &paint);
+    }
+};
+
+class ImageBox : public BoundingBox {
 public:
     ImageBox(BoxesGroup *parent, QString filePath = "");
 
@@ -21,6 +30,9 @@ public:
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);
     void changeSourceFile();
+
+    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
+                                               BoundingBoxRenderData *data);
 private:
     sk_sp<SkImage> mImageSk;
     QString mImageFilePath;

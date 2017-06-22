@@ -8,10 +8,12 @@ class QPointFAnimator : public ComplexAnimator
 {
 public:
     QPointFAnimator();
-    QPointF getCurrentPointValue() const;
-    QPointF getPointValueAtFrame(const int &frame);
     qreal getXValue();
     qreal getYValue();
+
+    qreal getXValueAtRelFrame(const int &relFrame);
+    qreal getYValueAtRelFrame(const int &relFrame);
+
     void setCurrentPointValue(const QPointF &val,
                               const bool &finish = false);
     void incCurrentValues(const qreal &x,
@@ -40,8 +42,9 @@ public:
     void duplicateXAnimatorFrom(QrealAnimator *source);
     void setValuesRange(const qreal &minVal,
                         const qreal &maxVal);
-    QPointF getCurrentPointValueAtAbsFrame(const int &frame);
-    QPointF getCurrentPointValueAtRelFrame(const int &frame);
+    QPointF getCurrentPointValue() const;
+    QPointF getCurrentPointValueAtAbsFrame(const int &frame) const;
+    QPointF getCurrentPointValueAtRelFrame(const int &frame) const;
 
     void setPrefferedValueStep(const qreal &valueStep);
 

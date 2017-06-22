@@ -434,6 +434,10 @@ QPointF BoxTransformAnimator::getPivotAbs() {
     return mPivotAnimator->getAbsolutePos();
 }
 
+qreal BoxTransformAnimator::getOpacityAtRelFrame(const int &relFrame) {
+    return mOpacityAnimator->qra_getValueAtRelFrame(relFrame);
+}
+
 qreal BoxTransformAnimator::getPivotX() {
     return mPivotAnimator->getXValue();
 }
@@ -457,6 +461,24 @@ QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
     matrix.rotate(mRotAnimator->qra_getCurrentValue() );
     matrix.scale(mScaleAnimator->getXValue(),
                  mScaleAnimator->getYValue() );
+
+    matrix.translate(-pivotX,
+                     -pivotY);
+    return matrix;
+}
+
+QMatrix BoxTransformAnimator::getTransformMatrixAtRelFrame(
+                                    const int &relFrame) {
+    QMatrix matrix;
+    qreal pivotX = mPivotAnimator->getXValueAtRelFrame(relFrame);
+    qreal pivotY = mPivotAnimator->getYValueAtRelFrame(relFrame);
+
+    matrix.translate(pivotX + mPosAnimator->getXValueAtRelFrame(relFrame),
+                     pivotY + mPosAnimator->getYValueAtRelFrame(relFrame));
+
+    matrix.rotate(mRotAnimator->qra_getValueAtRelFrame(relFrame) );
+    matrix.scale(mScaleAnimator->getXValueAtRelFrame(relFrame),
+                 mScaleAnimator->getYValueAtRelFrame(relFrame) );
 
     matrix.translate(-pivotX,
                      -pivotY);

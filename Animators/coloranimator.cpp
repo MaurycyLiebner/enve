@@ -136,6 +136,27 @@ Color ColorAnimator::getCurrentColor() const {
     return color;
 }
 
+Color ColorAnimator::getColorAtRelFrame(const int &relFrame) {
+    Color color;
+    if(mColorMode == RGBMODE) {
+        color.setRGB(mVal1Animator->qra_getValueAtRelFrame(relFrame),
+                     mVal2Animator->qra_getValueAtRelFrame(relFrame),
+                     mVal3Animator->qra_getValueAtRelFrame(relFrame),
+                     mAlphaAnimator->qra_getValueAtRelFrame(relFrame) );
+    } else if(mColorMode == HSVMODE) {
+        color.setHSV(mVal1Animator->qra_getValueAtRelFrame(relFrame),
+                     mVal2Animator->qra_getValueAtRelFrame(relFrame),
+                     mVal3Animator->qra_getValueAtRelFrame(relFrame),
+                     mAlphaAnimator->qra_getValueAtRelFrame(relFrame) );
+    } else { // HSLMODE
+        color.setHSL(mVal1Animator->qra_getValueAtRelFrame(relFrame),
+                     mVal2Animator->qra_getValueAtRelFrame(relFrame),
+                     mVal3Animator->qra_getValueAtRelFrame(relFrame),
+                     mAlphaAnimator->qra_getValueAtRelFrame(relFrame) );
+    }
+    return color;
+}
+
 void ColorAnimator::setColorMode(const ColorMode &colorMode) {
     if(colorMode == RGBMODE) {
         mVal1Animator->prp_setName("red");
@@ -172,9 +193,9 @@ void ColorAnimator::setColorMode(const ColorMode &colorMode) {
     Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         int frame = key->getAbsFrame();
 
-        qreal rF = mVal1Animator->qra_getValueAtAbsFrame(frame);
-        qreal gF = mVal2Animator->qra_getValueAtAbsFrame(frame);
-        qreal bF = mVal3Animator->qra_getValueAtAbsFrame(frame);
+        qreal rF = mVal1Animator->getCurrentValueAtAbsFrame(frame);
+        qreal gF = mVal2Animator->getCurrentValueAtAbsFrame(frame);
+        qreal bF = mVal3Animator->getCurrentValueAtAbsFrame(frame);
 
         foo(&rF, &gF, &bF);
 

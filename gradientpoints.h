@@ -45,6 +45,8 @@ public:
     void makeDuplicate(Property *target);
     void duplicatePointsFrom(GradientPoint *startPointT,
                              GradientPoint *endPointT);
+    QPointF getStartPointAtRelFrame(const int &relFrame);
+    QPointF getEndPointAtRelFrame(const int &relFrame);
 };
 
 #endif // GRADIENTPOINTS_H

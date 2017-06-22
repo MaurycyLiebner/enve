@@ -22,6 +22,9 @@ public:
     virtual Property *makeDuplicate() = 0;
     virtual void makeDuplicate(Property *target) = 0;
     virtual void filterPath(const SkPath &, SkPath *) = 0;
+    virtual void filterPathForRelFrame(const int &,
+                                       const SkPath &,
+                                       SkPath *) = 0;
 protected:
     PathEffectType mPathEffectType;
 };
@@ -41,6 +44,8 @@ public:
                                 QrealAnimator *maxDev);
 
     void filterPath(const SkPath &src, SkPath *dst);
+    void filterPathForRelFrame(const int &relFrame,
+                               const SkPath &src, SkPath *dst);
 private:
     QSharedPointer<QrealAnimator> mSegLength =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -66,6 +71,8 @@ public:
 
     void filterPath(const SkPath &src, SkPath *dst);
 
+    void filterPathForRelFrame(const int &relFrame,
+                               const SkPath &src, SkPath *dst);
 private:
     QSharedPointer<QPointFAnimator> mTranslation =
             (new QPointFAnimator())->ref<QPointFAnimator>();

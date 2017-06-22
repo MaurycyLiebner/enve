@@ -42,7 +42,7 @@ public:
                             const bool &saveUndoRedo = true,
                             const bool &finish = true);
 
-    virtual void prp_setAbsFrame(const int &frame);
+    void prp_setAbsFrame(const int &frame);
     virtual void qra_updateKeysPath();
 
     void qra_getMinAndMaxValues(qreal *minValP, qreal *maxValP);

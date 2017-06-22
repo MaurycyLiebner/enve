@@ -136,6 +136,7 @@ public:
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
+    void prp_setAbsFrame(const int &frame);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

@@ -48,19 +48,14 @@ QPointF QPointFAnimator::getCurrentPointValue() const {
                    mYAnimator->qra_getCurrentValue());
 }
 
-QPointF QPointFAnimator::getCurrentPointValueAtAbsFrame(const int &frame) {
+QPointF QPointFAnimator::getCurrentPointValueAtAbsFrame(const int &frame) const {
     return QPointF(mXAnimator->getCurrentValueAtAbsFrame(frame),
                    mYAnimator->getCurrentValueAtAbsFrame(frame));
 }
 
-QPointF QPointFAnimator::getCurrentPointValueAtRelFrame(const int &frame) {
+QPointF QPointFAnimator::getCurrentPointValueAtRelFrame(const int &frame) const {
     return QPointF(mXAnimator->getCurrentValueAtRelFrame(frame),
                    mYAnimator->getCurrentValueAtRelFrame(frame));
-}
-
-QPointF QPointFAnimator::getPointValueAtFrame(const int &frame) {
-    return QPointF(mXAnimator->qra_getValueAtAbsFrame(frame),
-                   mYAnimator->qra_getValueAtAbsFrame(frame));
 }
 
 void QPointFAnimator::setPrefferedValueStep(const qreal &valueStep) {
@@ -74,6 +69,14 @@ qreal QPointFAnimator::getXValue() {
 
 qreal QPointFAnimator::getYValue() {
     return mYAnimator->qra_getCurrentValue();
+}
+
+qreal QPointFAnimator::getXValueAtRelFrame(const int &relFrame) {
+    return mXAnimator->qra_getValueAtRelFrame(relFrame);
+}
+
+qreal QPointFAnimator::getYValueAtRelFrame(const int &relFrame) {
+    return mYAnimator->qra_getValueAtRelFrame(relFrame);
 }
 
 void QPointFAnimator::setCurrentPointValue(const QPointF &val,

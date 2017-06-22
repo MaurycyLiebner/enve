@@ -284,6 +284,16 @@ void DisplacePathEffect::filterPath(const SkPath &src,
                        mSeedAssist);
 }
 
+void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
+                                               const SkPath &src,
+                                               SkPath *dst) {
+    displaceFilterPath(dst, src,
+                       mMaxDev->qra_getValueAtRelFrame(relFrame),
+                       mSegLength->qra_getValueAtRelFrame(relFrame),
+                       mSmoothness->qra_getValueAtRelFrame(relFrame),
+                       mSeedAssist);
+}
+
 DuplicatePathEffect::DuplicatePathEffect() :
     PathEffect(DUPLICATE_PATH_EFFECT) {
     prp_setName("duplicate effect");
@@ -316,9 +326,18 @@ void DuplicatePathEffect::duplicateAnimatorsFrom(QPointFAnimator *trans) {
 }
 
 void DuplicatePathEffect::filterPath(const SkPath &src,
-                                    SkPath *dst) {
+                                     SkPath *dst) {
     *dst = src;
     dst->addPath(src,
                  mTranslation->getXValue(),
                  mTranslation->getYValue());
+}
+
+void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
+                                                const SkPath &src,
+                                                SkPath *dst) {
+    *dst = src;
+    dst->addPath(src,
+                 mTranslation->getXValueAtRelFrame(relFrame),
+                 mTranslation->getYValueAtRelFrame(relFrame));
 }

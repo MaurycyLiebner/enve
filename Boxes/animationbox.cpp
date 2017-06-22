@@ -137,3 +137,10 @@ bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
     }
     return true;
 }
+
+void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
+                                const int &relFrame,
+                                BoundingBoxRenderData *data) {
+    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
+                                                       data);
+}

@@ -174,19 +174,16 @@ QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
 qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame) const {
     int prevId;
     int nextId;
-    qreal returnVal;
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, frame) ) {
         if(nextId == prevId) {
-            returnVal = getQrealKeyAtId(nextId)->getValue();
+            return getQrealKeyAtId(nextId)->getValue();
         } else {
             QrealKey *prevKey = getQrealKeyAtId(prevId);
             QrealKey *nextKey = getQrealKeyAtId(nextId);
-            returnVal = qra_getValueAtRelFrame(frame, prevKey, nextKey);
+            return qra_getValueAtRelFrame(frame, prevKey, nextKey);
         }
-    } else {
-        returnVal = mCurrentValue;
     }
-    return returnVal;
+    return mCurrentValue;
 }
 
 qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame,

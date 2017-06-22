@@ -24,6 +24,7 @@ public:
                              const bool &finish = false);
 
     Color getCurrentColor() const;
+    Color getColorAtRelFrame(const int &relFrame);
     void setColorMode(const ColorMode &colorMode);
 
     void startVal1Transform();

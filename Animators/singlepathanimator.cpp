@@ -164,6 +164,35 @@ void SinglePathAnimator::updateSkPath() {
     }
 }
 
+SkPath SinglePathAnimator::getPathAtRelFrame(const int &relFrame) {
+    SkPath path = SkPath();
+
+    PathPoint *point = mFirstPoint;
+    PathPointValues lastPointValues;
+    lastPointValues = point->getPointValuesAtRelFrame(relFrame);
+    path.moveTo(QPointFToSkPoint(lastPointValues.pointRelPos));
+    while(true) {
+        point = point->getNextPoint();
+        if(point == NULL) break;
+        PathPointValues pointValues;
+
+        pointValues = point->getPointValuesAtRelFrame(relFrame);
+
+        path.cubicTo(QPointFToSkPoint(lastPointValues.endRelPos),
+                        QPointFToSkPoint(pointValues.startRelPos),
+                        QPointFToSkPoint(pointValues.pointRelPos));
+
+        lastPointValues = pointValues;
+
+        if(point == mFirstPoint) {
+            path.close();
+            break;
+        }
+    }
+
+    return path;
+}
+
 bool doesPathIntersectWithCircle(const QPainterPath &path,
                                  qreal xRadius, qreal yRadius,
                                  QPointF center) {

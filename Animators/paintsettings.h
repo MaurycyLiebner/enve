@@ -129,6 +129,7 @@ public:
     void setGradientVar(Gradient *grad);
 
     bool SWT_isPaintSettings() { return true; }
+    Color getColorAtRelFrame(const int &relFrame) const;
 private:
     PathBox *mTarget;
     GradientPoints *mGradientPoints = NULL;
@@ -224,6 +225,7 @@ public:
     int prp_getParentFrameShift() const {
         return 0;
     }
+    QGradientStops getQGradientStopsAtAbsFrame(const int &absFrame);
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:
@@ -320,6 +322,8 @@ public:
     QrealAnimator *getLineWidthAnimator();
 
     bool SWT_isStrokeSettings() { return true; }
+    void setStrokerSettingsForRelFrameSk(const int &relFrame,
+                                         SkStroke *stroker);
 private:
     QSharedPointer<QrealAnimator> mLineWidth =
             (new QrealAnimator())->ref<QrealAnimator>();

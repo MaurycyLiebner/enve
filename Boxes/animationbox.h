@@ -30,6 +30,9 @@ public:
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);
     virtual void changeSourceFile() = 0;
+    void setupBoundingBoxRenderDataForRelFrame(
+                                const int &relFrame,
+                                BoundingBoxRenderData *data);
 public slots:
 protected:
     CacheHandler mAnimationFramesCache;
