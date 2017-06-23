@@ -100,11 +100,11 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
     if(mAnimationCacheHandler == NULL) return;
     mCurrentAnimationFrameChanged = true;
 
-    if(!mWaitingForSchedulerToBeProcessed) {
+    //if(!mWaitingForSchedulerToBeProcessed) {
+        //scheduleUpdate();
+    //} else {
         scheduleSoftUpdate();
-    } else {
-        scheduleSoftUpdate();
-    }
+    //}
 }
 
 void AnimationBox::afterSuccessfulUpdate() {

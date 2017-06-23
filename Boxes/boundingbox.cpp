@@ -1223,6 +1223,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 
 void BoundingBox::beforeUpdate() {
     setUpdateVars();
+    mAwaitingUpdate = false;
 }
 
 void BoundingBox::processUpdate() {
