@@ -469,6 +469,7 @@ public:
 
     virtual void createCurrentRenderData() {}
 
+    void schedulerProccessed();
 protected:
     BoundingBoxRenderData *mCurrentRenderData = NULL;
     bool mCustomFpsEnabled = false;
@@ -510,6 +511,7 @@ protected:
     qreal mUpdateOpacity;
 
     bool mRedoUpdate = false;
+    bool mWaitingForSchedulerToBeProcessed = false;
     bool mAwaitingUpdate = false;
 
     SkPath mSkRelBoundingRectPath;

@@ -20,6 +20,7 @@ AddUpdatableAwaitingUpdateScheduler::AddUpdatableAwaitingUpdateScheduler(
 }
 
 void AddUpdatableAwaitingUpdateScheduler::update() {
+    mUpdatable->schedulerProccessed();
     MainWindow::getInstance()->getCanvasWindow()->
             addUpdatableAwaitingUpdate(mUpdatable);
 }

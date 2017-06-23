@@ -43,22 +43,22 @@ FileCacheHandler::~FileCacheHandler() {
     FileSourcesCache::removeHandler(this);
 }
 
-void FileCacheHandler::beforeUpdate() {
+void FileCacheHandler::schedulerProccessed() {
+    qDebug() << "file scheduler processed ";
     mLoadingScheduled = false;
-    mLoadingData = true;
+}
+
+void FileCacheHandler::beforeUpdate() {
+    //mLoadingData = true;
 }
 
 void FileCacheHandler::afterUpdate() {
-    mLoadingData = false;
-    if(mLoadingScheduled) {
-        addScheduler();
-    }
+
 }
 
 void FileCacheHandler::addScheduler() {
     if(mLoadingScheduled) return;
     mLoadingScheduled = true;
-    if(mLoadingData) return;
     MainWindow::getInstance()->addFileCacheUpdateScheduler(
                 new AddUpdatableAwaitingUpdateScheduler(this));
 }
@@ -92,13 +92,16 @@ sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
 
 void VideoCacheHandler::beforeUpdate() {
     FileCacheHandler::beforeUpdate();
+    qDebug() << "loading: " << mFramesLoadScheduled;
     mFramesBeingLoaded = mFramesLoadScheduled;
+    mFramesBeingLoadedGUI = mFramesBeingLoaded;
     mFramesLoadScheduled.clear();
     qSort(mFramesBeingLoaded);
 }
 
 void VideoCacheHandler::updateFrameCount() {
-    const char *path = mFilePath.toLatin1().data();
+    QByteArray stringByteArray = mFilePath.toLatin1();
+    const char *path = stringByteArray.constData();
     AVFormatContext* format = avformat_alloc_context();
     if (avformat_open_input(&format, path, NULL, NULL) != 0) {
         fprintf(stderr, "Could not open file '%s'\n", path);
@@ -272,7 +275,7 @@ void VideoCacheHandler::afterUpdate() {
         cont->replaceImageSk(mLoadedFrames.at(i));
     }
     mLoadedFrames.clear();
-    mFramesBeingLoaded.clear();
+    mFramesBeingLoadedGUI.clear();
 }
 
 void VideoCacheHandler::clearCache() {
@@ -282,6 +285,9 @@ void VideoCacheHandler::clearCache() {
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
 void VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+    if(mFramesLoadScheduled.contains(frame) ||
+            mFramesBeingLoadedGUI.contains(frame)) return;
+    qDebug() << "schedule frame load: " << frame;
     mFramesLoadScheduled << frame;
     addScheduler();
 }

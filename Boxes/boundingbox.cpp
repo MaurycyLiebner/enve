@@ -1223,7 +1223,6 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 
 void BoundingBox::beforeUpdate() {
     setUpdateVars();
-    mAwaitingUpdate = false;
 }
 
 void BoundingBox::processUpdate() {
@@ -1276,9 +1275,14 @@ void BoundingBox::scheduleSoftUpdate() {
 void BoundingBox::scheduleUpdate() {
     if(shouldUpdate()) {
         mAwaitingUpdate = true;
+        mWaitingForSchedulerToBeProcessed = true;
         mParent->addChildAwaitingUpdate(this);
         emit scheduledUpdate();
     }
+}
+
+void BoundingBox::schedulerProccessed() {
+    mWaitingForSchedulerToBeProcessed = false;
 }
 
 void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {

@@ -248,29 +248,41 @@ void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
 }
 
 void BoxesGroup::beforeUpdate() {
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildrenAwaitingUpdate) {
-        child->beforeUpdate();
-        mUpdateChildrenAwaitingUpdate.append(child);
-    }
+//    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildrenAwaitingUpdate) {
+//        child->beforeUpdate();
+//        mUpdateChildrenAwaitingUpdate.append(child);
+//    }
 
-    mChildrenAwaitingUpdate.clear();
+//    mChildrenAwaitingUpdate.clear();
     BoundingBox::beforeUpdate();
 }
 
-void BoxesGroup::processUpdate() {
+void BoxesGroup::schedulerProccessed() {
+    BoundingBox::schedulerProccessed();
     Q_FOREACH(const QSharedPointer<BoundingBox> &child,
-              mUpdateChildrenAwaitingUpdate) {
-        child->processUpdate();
+              mChildrenAwaitingUpdate) {
+        child->schedulerProccessed();
+        MainWindow::getInstance()->getCanvasWindow()->
+                addUpdatableAwaitingUpdate(child.data());
     }
+
+    mChildrenAwaitingUpdate.clear();
+}
+
+void BoxesGroup::processUpdate() {
+//    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
+//              mUpdateChildrenAwaitingUpdate) {
+//        child->processUpdate();
+//    }
     BoundingBox::processUpdate();
 }
 
 void BoxesGroup::afterUpdate() {
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
-            mUpdateChildrenAwaitingUpdate) {
-        child->afterUpdate();
-    }
-    mUpdateChildrenAwaitingUpdate.clear();
+//    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
+//            mUpdateChildrenAwaitingUpdate) {
+//        child->afterUpdate();
+//    }
+//    mUpdateChildrenAwaitingUpdate.clear();
     BoundingBox::afterUpdate();
 
 }

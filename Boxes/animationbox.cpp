@@ -60,6 +60,12 @@ void AnimationBox::scheduleUpdate() {
     BoundingBox::scheduleUpdate();
 }
 
+void AnimationBox::schedulerProccessed() {
+    qDebug() << "animationbox scheduler processed ";
+    BoundingBox::schedulerProccessed();
+    mUpdateAnimationFrame = mCurrentAnimationFrame;
+}
+
 void AnimationBox::updateCurrentAnimationFrame() {
     qreal fpsRatio = getParentCanvas()->getFps()/mFps;
     qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
@@ -80,6 +86,7 @@ void AnimationBox::updateCurrentAnimationFrame() {
         pixId = mAnimationCacheHandler->getFramesCount() - 1;
     }
 
+    if(mCurrentAnimationFrame == pixId) return;
     mCurrentAnimationFrame = pixId;
 
     if(mAnimationCacheHandler->getFrameAtFrame(
@@ -93,7 +100,11 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
     if(mAnimationCacheHandler == NULL) return;
     mCurrentAnimationFrameChanged = true;
 
-    scheduleSoftUpdate();
+    if(!mWaitingForSchedulerToBeProcessed) {
+        scheduleSoftUpdate();
+    } else {
+        scheduleSoftUpdate();
+    }
 }
 
 void AnimationBox::afterSuccessfulUpdate() {
@@ -110,8 +121,9 @@ void AnimationBox::updateUpdateRelBoundingRectFromImage() {
 
 void AnimationBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
+    qDebug() << "frame used: " << mUpdateAnimationFrame;
     mUpdateAnimationImageSk = mAnimationCacheHandler->getFrameAtFrame(
-                                            mCurrentAnimationFrame);
+                mUpdateAnimationFrame);
     updateUpdateRelBoundingRectFromImage();
 //    CacheContainer *cont =
 //            mAnimationFramesCache.getRenderContainerAtRelFrame(

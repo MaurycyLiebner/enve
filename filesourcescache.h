@@ -22,6 +22,7 @@ public:
 
     virtual void clearCache() = 0;
     void addScheduler();
+    void schedulerProccessed();
 protected:
     QString mFilePath;
 
@@ -105,6 +106,7 @@ public:
 protected:
     QList<int> mFramesLoadScheduled;
 
+    QList<int> mFramesBeingLoadedGUI;
     QList<int> mFramesBeingLoaded;
     QList<sk_sp<SkImage> > mLoadedFrames;
     qreal mFps = 24.;

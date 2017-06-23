@@ -137,6 +137,7 @@ public:
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
     void prp_setAbsFrame(const int &frame);
+    void schedulerProccessed();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
@@ -145,7 +146,7 @@ protected:
     QList<QSharedPointer<BoundingBox> > mChildBoxes;
 
     QList<QSharedPointer<BoundingBox> > mChildrenAwaitingUpdate;
-    QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
+    //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getChildBoxIndex(BoundingBox *child);
 signals:
     void changeChildZSignal(int, int);

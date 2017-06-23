@@ -37,11 +37,13 @@ public:
     void updateCurrentAnimationFrame();
     void updateCurrentAnimationFrameIfNeeded();
     void scheduleUpdate();
+    void schedulerProccessed();
 public slots:
 protected:
     bool mCurrentAnimationFrameChanged = false;
     AnimationCacheHandler *mAnimationCacheHandler = NULL;
-    int mCurrentAnimationFrame = 0;
+    int mCurrentAnimationFrame = -1;
+    int mUpdateAnimationFrame = 0;
     qreal mFps = 24.;
     sk_sp<SkImage> mUpdateAnimationImageSk;
 

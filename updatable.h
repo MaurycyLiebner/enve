@@ -11,6 +11,8 @@ public:
     virtual void processUpdate() = 0;
 
     virtual void afterUpdate() = 0;
+
+    virtual void schedulerProccessed() {}
 };
 
 #endif // UPDATABLE_H
