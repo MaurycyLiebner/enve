@@ -21,7 +21,8 @@ public:
     void setUpdateVars();
     void afterSuccessfulUpdate();
     void updateDurationRectangleAnimationRange();
-    virtual void reloadFile() = 0;
+    virtual void reloadFile();
+    virtual void reloadSound() {}
     FixedLenAnimationRect *getAnimationDurationRect();
 
     bool SWT_isAnimationBox() { return true; }
@@ -35,12 +36,13 @@ public:
 
 
     void updateCurrentAnimationFrame();
-    void updateCurrentAnimationFrameIfNeeded();
-    void scheduleUpdate();
     void schedulerProccessed();
+
+    void scheduleUpdate();
+    void afterUpdate();
 public slots:
 protected:
-    bool mCurrentAnimationFrameChanged = false;
+    bool mNewCurrentFrameUpdateNeeded = false;
     AnimationCacheHandler *mAnimationCacheHandler = NULL;
     int mCurrentAnimationFrame = -1;
     int mUpdateAnimationFrame = 0;

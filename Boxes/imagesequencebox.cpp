@@ -13,9 +13,7 @@ void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
 
 void ImageSequenceBox::reloadFile() {
     mAnimationCacheHandler = new ImageSequenceCacheHandler(mListOfFrames);
-    updateDurationRectangleAnimationRange();
-    updateCurrentAnimationFrame();
-    scheduleSoftUpdate();
+    AnimationBox::reloadFile();
 }
 
 void ImageSequenceBox::makeDuplicate(Property *targetBox) {

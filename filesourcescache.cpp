@@ -45,11 +45,10 @@ FileCacheHandler::~FileCacheHandler() {
 
 void FileCacheHandler::schedulerProccessed() {
     qDebug() << "file scheduler processed ";
-    mLoadingScheduled = false;
 }
 
 void FileCacheHandler::beforeUpdate() {
-    //mLoadingData = true;
+    mLoadingScheduled = false;
 }
 
 void FileCacheHandler::afterUpdate() {
@@ -268,6 +267,7 @@ void VideoCacheHandler::processUpdate() {
 
 void VideoCacheHandler::afterUpdate() {
     FileCacheHandler::afterUpdate();
+    qDebug() << "loaded: " << mFramesBeingLoaded;
     for(int i = 0; i < mFramesBeingLoaded.count(); i++) {
         CacheContainer *cont =
                 mFramesCache.createNewRenderContainerAtRelFrame(
@@ -275,6 +275,7 @@ void VideoCacheHandler::afterUpdate() {
         cont->replaceImageSk(mLoadedFrames.at(i));
     }
     mLoadedFrames.clear();
+    mFramesBeingLoaded.clear();
     mFramesBeingLoadedGUI.clear();
 }
 

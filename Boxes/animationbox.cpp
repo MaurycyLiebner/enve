@@ -49,21 +49,35 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
                 qCeil(qAbs(timeScale*mAnimationCacheHandler->getFramesCount())));
 }
 
-void AnimationBox::updateCurrentAnimationFrameIfNeeded() {
-    if(!mCurrentAnimationFrameChanged) return;
-    mCurrentAnimationFrameChanged = false;
+void AnimationBox::reloadFile() {
+    updateDurationRectangleAnimationRange();
+    reloadSound();
+    clearAllCache();
     updateCurrentAnimationFrame();
-}
-
-void AnimationBox::scheduleUpdate() {
-    updateCurrentAnimationFrameIfNeeded();
-    BoundingBox::scheduleUpdate();
+    mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
+    scheduleSoftUpdate();
 }
 
 void AnimationBox::schedulerProccessed() {
+    mUpdateAnimationFrame = mCurrentAnimationFrame;
     qDebug() << "animationbox scheduler processed ";
     BoundingBox::schedulerProccessed();
-    mUpdateAnimationFrame = mCurrentAnimationFrame;
+}
+
+void AnimationBox::scheduleUpdate() {
+    if(mAnimationCacheHandler->getFrameAtFrame(
+                mCurrentAnimationFrame).get() == NULL) {
+        mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
+    }
+    mNewCurrentFrameUpdateNeeded = false;
+    BoundingBox::scheduleUpdate();
+}
+
+void AnimationBox::afterUpdate() {
+    BoundingBox::afterUpdate();
+    if(mNewCurrentFrameUpdateNeeded) {
+        scheduleSoftUpdate();
+    }
 }
 
 void AnimationBox::updateCurrentAnimationFrame() {
@@ -88,17 +102,17 @@ void AnimationBox::updateCurrentAnimationFrame() {
 
     if(mCurrentAnimationFrame == pixId) return;
     mCurrentAnimationFrame = pixId;
-
-    if(mAnimationCacheHandler->getFrameAtFrame(
-                mCurrentAnimationFrame).get() == NULL) {
-        mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
-    }
 }
 
 void AnimationBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
     if(mAnimationCacheHandler == NULL) return;
-    mCurrentAnimationFrameChanged = true;
+    updateCurrentAnimationFrame();
+    if(mAnimationCacheHandler->getFrameAtFrame(
+                mCurrentAnimationFrame).get() != NULL) {
+        mUpdateAnimationFrame = mCurrentAnimationFrame;
+    }
+    mNewCurrentFrameUpdateNeeded = true;
 
     //if(!mWaitingForSchedulerToBeProcessed) {
         //scheduleUpdate();

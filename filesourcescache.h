@@ -27,7 +27,6 @@ protected:
     QString mFilePath;
 
     bool mLoadingScheduled = false;
-    bool mLoadingData = false;
 };
 
 class FileSourcesCache {

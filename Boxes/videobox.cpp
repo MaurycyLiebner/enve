@@ -57,11 +57,7 @@ void VideoBox::reloadFile() {
     } else {
         ((VideoCacheHandler*)mAnimationCacheHandler)->clearCache();
     }
-    updateDurationRectangleAnimationRange();
-    reloadSound();
-    clearAllCache();
-    updateCurrentAnimationFrame();
-    scheduleSoftUpdate();
+    AnimationBox::reloadFile();
 }
 
 bool hasSound(const char* path) {
