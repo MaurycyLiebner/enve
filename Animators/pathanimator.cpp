@@ -56,86 +56,24 @@ void PathAnimator::removeSinglePathAnimator(SinglePathAnimator *path,
 
 bool PathAnimator::SWT_isPathAnimator() { return true; }
 
-void PathAnimator::loadPathFromQPainterPath(const QPainterPath &path) {
-    PathPoint *firstPoint = NULL;
-    PathPoint *lastPoint = NULL;
-    bool firstOther = true;
-    QPointF startCtrlPoint;
-    SinglePathAnimator *singlePathAnimator = NULL;
-
-    for(int i = 0; i < path.elementCount(); i++) {
-        const QPainterPath::Element &elem = path.elementAt(i);
-
-        if (elem.isMoveTo()) { // move
-            if(singlePathAnimator != NULL) {
-                addSinglePathAnimator(singlePathAnimator);
-            }
-            singlePathAnimator = new SinglePathAnimator(this);
-            lastPoint = singlePathAnimator->addPointRelPos(
-                                    QPointF(elem.x, elem.y), NULL);
-            firstPoint = lastPoint;
-        } else if (elem.isLineTo()) { // line
-            if((QPointF(elem.x, elem.y) == firstPoint->getRelativePos()) ?
-                    ((path.elementCount() > i + 1) ?
-                                path.elementAt(i + 1).isMoveTo() :
-                                true) :
-                    false) {
-                lastPoint->connectToPoint(firstPoint);
-                lastPoint = firstPoint;
-            } else {
-                lastPoint = singlePathAnimator->
-                        addPointRelPos(QPointF(elem.x, elem.y),
-                                           lastPoint);
-            }
-        } else if (elem.isCurveTo()) { // curve
-            lastPoint->setEndCtrlPtEnabled(true);
-            lastPoint->moveEndCtrlPtToRelPos(QPointF(elem.x, elem.y));
-            firstOther = true;
-        } else { // other
-            if(firstOther) {
-                startCtrlPoint = QPointF(elem.x, elem.y);
-            } else {
-                if((QPointF(elem.x, elem.y) == firstPoint->getRelativePos()) ?
-                        ((path.elementCount() > i + 1) ?
-                                    path.elementAt(i + 1).isMoveTo() :
-                                    true) :
-                        false) {
-                    lastPoint->connectToPoint(firstPoint);
-                    lastPoint = firstPoint;
-                } else {
-                    lastPoint = singlePathAnimator->
-                            addPointRelPos(QPointF(elem.x, elem.y),
-                                               lastPoint);
-                }
-                lastPoint->setStartCtrlPtEnabled(true);
-                lastPoint->moveStartCtrlPtToRelPos(startCtrlPoint);
-            }
-            firstOther = !firstOther;
-        }
-    }
-    if(singlePathAnimator != NULL) {
-        addSinglePathAnimator(singlePathAnimator);
-    }
-}
-
 void PathAnimator::loadPathFromSkPath(const SkPath &path) {
     PathPoint *firstPoint = NULL;
     PathPoint *lastPoint = NULL;
 
-    SinglePathAnimator *singlePathAnimator = NULL;
+    SingleVectorPathAnimator *singlePathAnimator = NULL;
 
     SkPath::RawIter iter = SkPath::RawIter(path);
 
     SkPoint pts[4];
     int verbId = 0;
-    for (;;) {
+    for(;;) {
         switch(iter.next(pts)) {
             case SkPath::kMove_Verb: {
                 SkPoint pt = pts[0];
                 if(singlePathAnimator != NULL) {
                     addSinglePathAnimator(singlePathAnimator);
                 }
-                singlePathAnimator = new SinglePathAnimator(this);
+                singlePathAnimator = new SingleVectorPathAnimator(this);
                 lastPoint = singlePathAnimator->addPointRelPos(
                                         SkPointToQPointF(pt), NULL);
                 firstPoint = lastPoint;
@@ -242,18 +180,6 @@ PathPoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,
     return NULL;
 }
 
-qreal PathAnimator::findPercentForPoint(const QPointF &point,
-                                        PathPoint **prevPoint,
-                                        qreal *error) {
-    Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
-        const qreal &val =
-                singlePath->findPercentForPoint(point, prevPoint, error);
-        if(*prevPoint == NULL) continue;
-        return val;
-    }
-    return 0.;
-}
-
 void PathAnimator::applyTransformToPoints(const QMatrix &transform) {
     Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
         singlePath->applyTransformToPoints(transform);
@@ -307,10 +233,10 @@ BoundingBox *PathAnimator::getParentBox() {
     return mParentBox;
 }
 
-int PathAnimator::prp_saveToSql(QSqlQuery *query,
-                                const int &boundingBoxId) {
+int PathAnimator::saveToSql(QSqlQuery *query,
+                            const int &boundingBoxId) {
     Q_FOREACH(SinglePathAnimator *singlePath, mSinglePaths) {
-        singlePath->savePointsToSql(query, boundingBoxId);
+        singlePath->saveToSql(query, boundingBoxId);
     }
     return 0;
 }
@@ -336,7 +262,7 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
         int idqpointfanimatorid = query.record().indexOf("qpointfanimatorid");
         PathPoint *firstPoint = NULL;
         PathPoint *lastPoint = NULL;
-        SinglePathAnimator *singlePathAnimator = NULL;
+        SingleVectorPathAnimator *singlePathAnimator = NULL;
         while(query.next()) {
             bool isfirst = query.value(idisfirst).toBool();
             bool isendpoint = query.value(idisendpoint).toBool();
@@ -348,7 +274,7 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
                     lastPoint->setPointAsNext(firstPoint, false);
                 }
                 lastPoint = NULL;
-                singlePathAnimator = new SinglePathAnimator(this);
+                singlePathAnimator = new SingleVectorPathAnimator(this);
                 addSinglePathAnimator(singlePathAnimator);
                 newPoint = new PathPoint(singlePathAnimator);
                 newPoint->prp_loadFromSql(qpointfanimatorid);
@@ -375,9 +301,7 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
 
 void PathAnimator::duplicatePathsTo(
         PathAnimator *target) {
-    Q_FOREACH(SinglePathAnimator *sepPoint, mSinglePaths) {
-        SinglePathAnimator *copy = new SinglePathAnimator(target);
-        sepPoint->duplicatePathPointsTo(copy);
-        target->addSinglePathAnimator(copy);
+    Q_FOREACH(SinglePathAnimator *path, mSinglePaths) {
+        target->addSinglePathAnimator(path->makeDuplicate(target));
     }
 }

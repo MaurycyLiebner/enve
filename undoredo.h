@@ -14,6 +14,8 @@ class PathPoint;
 typedef QSharedPointer<PathPoint> PathPointQSPtr;
 class SinglePathAnimator;
 typedef QSharedPointer<SinglePathAnimator> SinglePathAnimatorQSPtr;
+class SingleVectorPathAnimator;
+typedef QSharedPointer<SingleVectorPathAnimator> SingleVectorPathAnimatorQSPtr;
 class PathAnimator;
 typedef QSharedPointer<PathAnimator> PathAnimatorQSPtr;
 class Gradient;
@@ -185,7 +187,7 @@ private:
 class AppendToPointsListUndoRedo : public UndoRedo {
 public:
     AppendToPointsListUndoRedo(PathPoint *pointToAdd,
-                               SinglePathAnimator *path);
+                               SingleVectorPathAnimator *path);
 
     ~AppendToPointsListUndoRedo();
 
@@ -195,16 +197,15 @@ public:
 
 private:
     PathPointQSPtr mPoint;
-    SinglePathAnimatorQSPtr mPath;
+    SingleVectorPathAnimatorQSPtr mPath;
 };
 
 class RemoveFromPointsListUndoRedo : public AppendToPointsListUndoRedo {
 public:
     RemoveFromPointsListUndoRedo(PathPoint *pointToRemove,
-                                 SinglePathAnimator *path);
+                                 SingleVectorPathAnimator *path);
 
     void redo();
-
     void undo();
 };
 
@@ -217,9 +218,7 @@ public:
     ~SetNextPointUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     PathPointQSPtr mNewNext;
     PathPointQSPtr mOldNext;
@@ -236,9 +235,7 @@ public:
     ~SetPreviousPointUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     PathPointQSPtr mNewPrev;
     PathPointQSPtr mOldPrev;
@@ -299,9 +296,7 @@ public:
     ~SetPathPointModeUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     PathPointQSPtr mPoint;
     CtrlsMode mBefore;
@@ -317,9 +312,7 @@ public:
     ~SetCtrlPtEnabledUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     PathPoint *mParentPoint;
     bool mEnabled;
@@ -336,7 +329,6 @@ public:
     ~MoveChildInListUndoRedo();
 
     void redo();
-
     void undo();
 private:
     BoxesGroupQSPtr mParentBox;
@@ -355,7 +347,6 @@ public:
     ~MoveChildAnimatorInListUndoRedo();
 
     void redo();
-
     void undo();
 private:
     ComplexAnimatorQSPtr mParentAnimator;
@@ -373,9 +364,7 @@ public:
     ~SetBoundingBoxZListIndexUnoRedo();
 
     void redo();
-
     void undo();
-
 private:
     int mIndexBefore;
     int mIndexAfter;
@@ -391,9 +380,7 @@ public:
     ~AddChildToListUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     BoxesGroupQSPtr mParent;
     int mAddAtId;
@@ -428,9 +415,7 @@ public:
     ~SetBoxParentUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     BoundingBoxQSPtr mChildBox;
     BoxesGroupQSPtr mOldParent;
@@ -446,9 +431,7 @@ public:
      ~SetBoxVisibleUndoRedo();
 
      void redo();
-
      void undo();
-
 private:
      bool mVisibleBefore;
      bool mVisibleAfter;
@@ -464,9 +447,7 @@ public:
     ~ChangeQrealAnimatorValue();
 
     void redo();
-
     void undo();
-
 private:
     SkScalar mOldValue;
     SkScalar mNewValue;
@@ -482,9 +463,7 @@ public:
     ~ChangeQrealKeyValueUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     SkScalar mOldValue;
     SkScalar mNewValue;
@@ -501,9 +480,7 @@ public:
     ~ChangeKeyFrameUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     int mOldFrame;
     int mNewFrame;
@@ -519,9 +496,7 @@ public:
     ~AnimatorRecordingSetUndoRedo();
 
     void undo();
-
     void redo();
-
 private:
     bool mRecordingOld;
     bool mRecordingNew;
@@ -535,9 +510,7 @@ public:
     ~AddKeyToAnimatorUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     KeyStdPtr mKey;
     AnimatorQSPtr mAnimator;
@@ -570,9 +543,7 @@ public:
     ~PaintTypeChangeUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     PaintType mOldType;
     PaintType mNewType;
@@ -588,9 +559,7 @@ public:
     ~GradientChangeUndoRedo();
 
     void redo();
-
     void undo();
-
 private:
     GradientQSPtr mOldGradient;
     GradientQSPtr mNewGradient;
@@ -606,9 +575,7 @@ public:
     ~GradientColorAddedToListUndoRedo();
 
     void undo();
-
     void redo();
-
 private:
     ColorAnimatorQSPtr mColor;
     GradientQSPtr mGradient;
@@ -641,9 +608,7 @@ public:
     ~GradientSwapColorsUndoRedo();
 
     void undo();
-
     void redo();
-
 private:
     int mId1;
     int mId2;
@@ -658,7 +623,6 @@ public:
     ~AddSinglePathAnimatorUndoRedo();
 
     void undo();
-
     void redo();
 private:
     PathAnimatorQSPtr mTarget;
@@ -683,20 +647,18 @@ public:
     }
 };
 
-class ChangeSinglePathFirstPoint : public UndoRedo {
+class ChangeSingleVectorPathFirstPoint : public UndoRedo {
 public:
-    ChangeSinglePathFirstPoint(SinglePathAnimator *target,
+    ChangeSingleVectorPathFirstPoint(SingleVectorPathAnimator *target,
                                PathPoint *oldPoint,
                                PathPoint *newPoint);
 
-    ~ChangeSinglePathFirstPoint();
+    ~ChangeSingleVectorPathFirstPoint();
 
     void undo();
-
     void redo();
-
 private:
-    SinglePathAnimatorQSPtr mTarget;
+    SingleVectorPathAnimatorQSPtr mTarget;
     PathPointQSPtr mOldPoint;
     PathPointQSPtr mNewPoint;
 };
@@ -722,9 +684,7 @@ public:
     ~ChangeFontUndoRedo();
 
     void undo();
-
     void redo();
-
 private:
     TextBoxQSPtr mTarget;
     QFont mOldFont;
@@ -739,9 +699,7 @@ public:
     ~ChangeTextUndoRedo();
 
     void undo();
-
     void redo();
-
 private:
     TextBoxQSPtr mTarget;
     QString mOldText;

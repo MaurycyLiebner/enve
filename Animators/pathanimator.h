@@ -30,7 +30,7 @@ public:
     const SkPath &getCurrentSkPath();
 
     void prp_loadFromSql(const int &boundingBoxId);
-    int prp_saveToSql(QSqlQuery *query,
+    int saveToSql(QSqlQuery *query,
                       const int &boundingBoxId);
     void makeDuplicate(Property *property);
 
@@ -40,9 +40,6 @@ public:
     PathPoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
-    qreal findPercentForPoint(const QPointF &point,
-                              PathPoint **prevPoint,
-                              qreal *error);
     void applyTransformToPoints(const QMatrix &transform);
 
     void duplicatePathsTo(PathAnimator *target);
@@ -57,7 +54,6 @@ public:
 
     BoundingBox *getParentBox();
 
-    void loadPathFromQPainterPath(const QPainterPath &path);
     void loadPathFromSkPath(const SkPath &path);
 
     void setParentBox(BoundingBox *parent);

@@ -25,7 +25,7 @@ VectorPath::VectorPath(BoxesGroup *group) :
 #include <QSqlError>
 int VectorPath::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = PathBox::saveToSql(query, parentId);
-    mPathAnimator->prp_saveToSql(query, boundingBoxId);
+    mPathAnimator->saveToSql(query, boundingBoxId);
 
     return boundingBoxId;
 }

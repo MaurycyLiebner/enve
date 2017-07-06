@@ -81,8 +81,7 @@ protected:
             (new QPointFAnimator)->ref<QPointFAnimator>();
     QSharedPointer<QPointFAnimator> mScaleAnimator =
             (new QPointFAnimator)->ref<QPointFAnimator>();
-    QSharedPointer<QrealAnimator> mRotAnimator =
-            (new QrealAnimator)->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mRotAnimator;
 
     AnimatorUpdaterStdSPtr mTransformUpdater;
 public slots:
@@ -91,8 +90,7 @@ signals:
     void combinedTransformChanged();
 };
 
-class BoxTransformAnimator : public BasicTransformAnimator
-{
+class BoxTransformAnimator : public BasicTransformAnimator {
 public:
     BoxTransformAnimator(BoundingBox *parent);
 
@@ -138,8 +136,7 @@ public:
     qreal getOpacityAtRelFrame(const int &relFrame);
 private:
     QSharedPointer<MovablePoint> mPivotAnimator;
-    QSharedPointer<QrealAnimator> mOpacityAnimator =
-            (new QrealAnimator)->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mOpacityAnimator;
 };
 
 #endif // TRANSFORMANIMATOR_H

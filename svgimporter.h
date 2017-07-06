@@ -157,12 +157,13 @@ private:
 
 class PathAnimator;
 class SinglePathAnimator;
+class SingleVectorPathAnimator;
 class SvgSeparatePath {
 public:
     SvgSeparatePath();
     virtual ~SvgSeparatePath();
 
-    void apply(SinglePathAnimator *path);
+    void apply(SingleVectorPathAnimator *path);
 
     void closePath();
 

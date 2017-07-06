@@ -1,6 +1,9 @@
 #include "Animators/qpointfanimator.h"
+#include "Animators/qrealanimator.h"
 
 QPointFAnimator::QPointFAnimator() : ComplexAnimator() {
+    mXAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+    mYAnimator = (new QrealAnimator())->ref<QrealAnimator>();
     mXAnimator->prp_setName("x");
     mYAnimator->prp_setName("y");
     ca_addChildAnimator(mXAnimator.data());

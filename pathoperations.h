@@ -138,16 +138,16 @@ class PointsBezierCubic;
 #include "canvas.h"
 class BezierCubic {
 public:
-    BezierCubic(QPointF p1, QPointF c1, QPointF c2, QPointF p2);
+    BezierCubic(const QPointF &p1, const QPointF &c1,
+                const QPointF &c2, const QPointF &p2);
     BezierCubic(BezierCubic *cubic);
     virtual ~BezierCubic() {}
 
-    QPointF getPointAtT(const qreal &t) {
-        return calcCubicBezierVal(mP1, mC1, mC2, mP2, t);
-    }
+    QPointF getPointAtT(const qreal &t);
 
     qreal getTForPoint(QPointF point);
-    bool intersects(BezierCubic *bezier, QPointF *intersectionPt) const;
+    bool intersects(BezierCubic *bezier,
+                    QPointF *intersectionPt) const;
     QRectF getPointsBoundingRect() const;
 
     const QPointF &getP1();

@@ -4,6 +4,7 @@
 #include "Boxes/boundingbox.h"
 #include "global.h"
 #include "Animators/singlepathanimator.h"
+#include "pointhelpers.h"
 
 VectorPathEdge::VectorPathEdge(PathPoint *pt1, PathPoint *pt2) {
     setPoint1(pt1);

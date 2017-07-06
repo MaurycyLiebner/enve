@@ -7,6 +7,7 @@
 #include "Colors/helpers.h"
 #include "Animators/pathanimator.h"
 #include "pathpoint.h"
+#include "pointhelpers.h"
 
 //bool getRotationScaleFromMatrixIfNoShear(const QMatrix &matrix,
 //                                         qreal *rot,
@@ -1839,13 +1840,12 @@ void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
     box->getTransformAnimator()->setOpacity(mOpacity);
 }
 
-void VectorPathSvgAttributes::apply(VectorPath *path)
-{
+void VectorPathSvgAttributes::apply(VectorPath *path) {
     PathAnimator *pathAnimator = path->getPathAnimator();
     Q_FOREACH(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
-        SinglePathAnimator *singlePath =
-                new SinglePathAnimator(pathAnimator);
+        SingleVectorPathAnimator *singlePath =
+                new SingleVectorPathAnimator(pathAnimator);
         separatePath->apply(singlePath);
         pathAnimator->addSinglePathAnimator(singlePath);
     }
@@ -1871,8 +1871,7 @@ SvgSeparatePath::~SvgSeparatePath() {
     }
 }
 
-void SvgSeparatePath::apply(SinglePathAnimator *path)
-{
+void SvgSeparatePath::apply(SingleVectorPathAnimator *path) {
     PathPoint *lastPoint = NULL;
     PathPoint *firstPoint = NULL;
     Q_FOREACH(SvgPathPoint *point, mPoints) {

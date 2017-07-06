@@ -346,7 +346,8 @@ void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
         MinimalPathPoint *point = firstPoint;
         PathPoint *firstPathPoint = NULL;
         PathPoint *lastPathPoint = NULL;
-        SinglePathAnimator *singlePath = new SinglePathAnimator(path);
+        SingleVectorPathAnimator *singlePath =
+                new SingleVectorPathAnimator(path);
         do {
             lastPathPoint = singlePath->addPointRelPos(point->getPos(),
                                                  point->getStartPos(),
@@ -603,8 +604,8 @@ bool MinimalVectorPath::pointInsidePath(QPointF point) {
     return mPath.contains(point);
 }
 
-BezierCubic::BezierCubic(QPointF p1, QPointF c1,
-                         QPointF c2, QPointF p2) {
+BezierCubic::BezierCubic(const QPointF &p1, const QPointF &c1,
+                         const QPointF &c2, const QPointF &p2) {
     mP1 = p1;
     mC1 = c1;
     mC2 = c2;
@@ -616,6 +617,10 @@ BezierCubic::BezierCubic(BezierCubic *cubic) {
     mC1 = cubic->getC1();
     mC2 = cubic->getC2();
     mP2 = cubic->getP2();
+}
+
+QPointF BezierCubic::getPointAtT(const qreal &t) {
+    return calcCubicBezierVal(mP1, mC1, mC2, mP2, t);
 }
 
 qreal BezierCubic::getTForPoint(QPointF point) {

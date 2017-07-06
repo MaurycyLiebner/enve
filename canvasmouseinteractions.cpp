@@ -10,6 +10,7 @@
 #include "Animators/singlepathanimator.h"
 #include "pathpoint.h"
 #include "Animators/pathanimator.h"
+#include "pointhelpers.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -534,7 +535,7 @@ void Canvas::handleAddPointMousePress() {
         clearBoxesSelection();
         addBoxToSelection(newPath);
         PathAnimator *newPathAnimator = newPath->getPathAnimator();
-        SinglePathAnimator *newSinglePath = new SinglePathAnimator(
+        SingleVectorPathAnimator *newSinglePath = new SingleVectorPathAnimator(
                                                     newPathAnimator);
         newPathAnimator->addSinglePathAnimator(newSinglePath);
         setCurrentEndPoint(newSinglePath->

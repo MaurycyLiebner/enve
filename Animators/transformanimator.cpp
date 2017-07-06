@@ -4,9 +4,11 @@
 #include <QSqlRecord>
 #include "boxpathpoint.h"
 #include "animatorupdater.h"
+#include "qrealanimator.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     ComplexAnimator() {
+    mRotAnimator = (new QrealAnimator)->ref<QrealAnimator>();
     mTransformUpdater = (new TransformUpdater(this))->ref<TransformUpdater>();
 
     prp_setName("transformation");
@@ -257,6 +259,7 @@ void BasicTransformAnimator::makeDuplicate(BasicTransformAnimator *target) {
 
 BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     BasicTransformAnimator() {
+    mOpacityAnimator = (new QrealAnimator)->ref<QrealAnimator>();
     mPivotAnimator = (new BoxPathPoint(parent))->ref<MovablePoint>();
     mPivotAnimator->prp_setName("pivot");
     mPivotAnimator->setCurrentPointValue(QPointF(0., 0.) );

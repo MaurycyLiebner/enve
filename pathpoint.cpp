@@ -7,10 +7,12 @@
 #include "edge.h"
 #include "Animators/pathanimator.h"
 #include "canvas.h"
+#include "pointhelpers.h"
 
-PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
+PathPoint::PathPoint(SingleVectorPathAnimator *parentAnimator) :
     MovablePoint(parentAnimator->getParentPathAnimator()->getParentBox(),
                  MovablePointType::TYPE_PATH_POINT, 9.5) {
+    mCtrlsMode = CtrlsMode::CTRLS_CORNER;
     mParentPath = parentAnimator;
     mStartCtrlPt = new CtrlPoint(this, true);
     mEndCtrlPt = new CtrlPoint(this, false);
@@ -31,10 +33,7 @@ PathPoint::PathPoint(SinglePathAnimator *parentAnimator) :
     anim_setTraceKeyOnCurrentFrame(true);
 }
 
-PathPoint::~PathPoint() {
-}
-
-void PathPoint::setParentPath(SinglePathAnimator *path) {
+void PathPoint::setParentPath(SingleVectorPathAnimator *path) {
     mParentPath = path;
 }
 
@@ -256,7 +255,7 @@ MovablePoint *PathPoint::getPointAtAbsPos(const QPointF &absPos,
 }
 
 #include <QSqlError>
-int PathPoint::prp_saveToSql(QSqlQuery *query, const int &boundingBoxId) {
+int PathPoint::saveToSql(QSqlQuery *query, const int &boundingBoxId) {
     int movablePtId = MovablePoint::prp_saveToSql(query);
     int startPtId = mStartCtrlPt->prp_saveToSql(query);
     int endPtId = mEndCtrlPt->prp_saveToSql(query);
@@ -279,7 +278,7 @@ int PathPoint::prp_saveToSql(QSqlQuery *query, const int &boundingBoxId) {
     }
     if(mNextPoint != NULL) {
         if(!mNextPoint->isSeparatePathPoint()) {
-            mNextPoint->prp_saveToSql(query, boundingBoxId);
+            mNextPoint->saveToSql(query, boundingBoxId);
         }
     }
     return movablePtId;
@@ -649,7 +648,7 @@ bool PathPoint::isNeighbourSelected() {
     return isSelected() || nextSelected || prevSelected;
 }
 
-SinglePathAnimator *PathPoint::getParentPath() {
+SingleVectorPathAnimator *PathPoint::getParentPath() {
     return mParentPath;
 }
 

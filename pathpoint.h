@@ -1,8 +1,7 @@
 #ifndef PATHPOINT_H
 #define PATHPOINT_H
-#include "movablepoint.h"
 #include <QSqlQuery>
-#include "pointhelpers.h"
+#include "movablepoint.h"
 
 class UndoRedoStack;
 
@@ -10,7 +9,10 @@ class VectorPath;
 class SkCanvas;
 class CtrlPoint;
 
+class SingleVectorPathAnimator;
+
 enum CanvasMode : short;
+enum CtrlsMode : short;
 
 class PathPoint;
 class VectorPathEdge;
@@ -87,9 +89,7 @@ class SinglePathAnimator;
 class PathPoint : public MovablePoint
 {
 public:
-    PathPoint(SinglePathAnimator *parentAnimator);
-
-    ~PathPoint();
+    PathPoint(SingleVectorPathAnimator *parentAnimator);
 
     void applyTransform(const QMatrix &transform);
 
@@ -160,9 +160,9 @@ public:
     void setCtrlPtEnabled(const bool &enabled,
                           const bool &isStartPt,
                           const bool &saveUndoRedo = true);
-    SinglePathAnimator *getParentPath();
+    SingleVectorPathAnimator *getParentPath();
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxId);
 
     void cancelTransform();
 
@@ -200,7 +200,7 @@ public:
     void reversePointsDirection();
     PathPoint *getConnectedSeparatePathPoint();
 
-    void setParentPath(SinglePathAnimator *path);
+    void setParentPath(SingleVectorPathAnimator *path);
     void reversePointsDirectionStartingFromThis(
             const bool &saveUndoRedo = true);
     void reversePointsDirectionReverse();
@@ -221,8 +221,8 @@ private:
     QSharedPointer<PathPointAnimators> mPathPointAnimators =
             (new PathPointAnimators())->ref<PathPointAnimators>();
 
-    SinglePathAnimator *mParentPath;
-    CtrlsMode mCtrlsMode = CtrlsMode::CTRLS_CORNER;
+    SingleVectorPathAnimator *mParentPath;
+    CtrlsMode mCtrlsMode;
 
     bool mSeparatePathPoint = false;
     PathPoint *mNextPoint = NULL;

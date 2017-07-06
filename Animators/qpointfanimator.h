@@ -1,8 +1,9 @@
 #ifndef QPOINTFANIMATOR_H
 #define QPOINTFANIMATOR_H
 #include "Animators/complexanimator.h"
-#include "Animators/qrealanimator.h"
 #include "skiaincludes.h"
+class QrealAnimator;
+typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
 
 class QPointFAnimator : public ComplexAnimator
 {
@@ -50,10 +51,8 @@ public:
 
     bool SWT_isQPointFAnimator() { return true; }
 protected:
-    QSharedPointer<QrealAnimator> mXAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
-    QSharedPointer<QrealAnimator> mYAnimator =
-            (new QrealAnimator())->ref<QrealAnimator>();
+    QrealAnimatorQSPtr mXAnimator;
+    QrealAnimatorQSPtr mYAnimator;
 };
 
 #endif // QPOINTFANIMATOR_H

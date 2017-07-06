@@ -106,10 +106,11 @@ void ChangeQrealKeyValueUndoRedo::undo() {
 }
 
 AppendToPointsListUndoRedo::AppendToPointsListUndoRedo(
-        PathPoint *pointToAdd, SinglePathAnimator *path) :
+                        PathPoint *pointToAdd,
+                        SingleVectorPathAnimator *path) :
     UndoRedo("AppendToPointsListUndoRedo") {
     mPoint = pointToAdd->ref<PathPoint>();
-    mPath = path->ref<SinglePathAnimator>();
+    mPath = path->ref<SingleVectorPathAnimator>();
 }
 
 AppendToPointsListUndoRedo::~AppendToPointsListUndoRedo() {
@@ -124,7 +125,7 @@ void AppendToPointsListUndoRedo::undo() {
 }
 
 RemoveFromPointsListUndoRedo::RemoveFromPointsListUndoRedo(
-        PathPoint *pointToRemove, SinglePathAnimator *path) :
+        PathPoint *pointToRemove, SingleVectorPathAnimator *path) :
     AppendToPointsListUndoRedo(pointToRemove, path) {
 }
 
@@ -541,12 +542,12 @@ void AddSinglePathAnimatorUndoRedo::redo() {
     mTarget->addSinglePathAnimator(mPath.data(), false);
 }
 
-ChangeSinglePathFirstPoint::ChangeSinglePathFirstPoint(
-        SinglePathAnimator *target,
+ChangeSingleVectorPathFirstPoint::ChangeSingleVectorPathFirstPoint(
+        SingleVectorPathAnimator *target,
         PathPoint *oldPoint,
         PathPoint *newPoint) :
-    UndoRedo("ChangeSinglePathFirstPoint") {
-    mTarget = target->ref<SinglePathAnimator>();
+    UndoRedo("ChangeSingleVectorPathFirstPoint") {
+    mTarget = target->ref<SingleVectorPathAnimator>();
     if(oldPoint != NULL) {
         mOldPoint = oldPoint->ref<PathPoint>();
     }
@@ -555,15 +556,15 @@ ChangeSinglePathFirstPoint::ChangeSinglePathFirstPoint(
     }
 }
 
-ChangeSinglePathFirstPoint::~ChangeSinglePathFirstPoint() {
+ChangeSingleVectorPathFirstPoint::~ChangeSingleVectorPathFirstPoint() {
 
 }
 
-void ChangeSinglePathFirstPoint::undo() {
+void ChangeSingleVectorPathFirstPoint::undo() {
     mTarget->replaceSeparatePathPoint(mOldPoint.data(), false);
 }
 
-void ChangeSinglePathFirstPoint::redo() {
+void ChangeSingleVectorPathFirstPoint::redo() {
     mTarget->replaceSeparatePathPoint(mNewPoint.data(), false);
 }
 
