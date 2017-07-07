@@ -59,11 +59,6 @@ public:
         return new InternalLinkBox(mLinkTarget, parent);
     }
 
-    sk_sp<SkImage> getAllUglyPixmapProvidedTransformSk(
-            const qreal &effectsMargin,
-            const qreal &resolution,
-            const QMatrix &allUglyTransform,
-            SkPoint *drawPosP);
 public slots:
     void scheduleAwaitUpdateSLOT();
 

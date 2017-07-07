@@ -77,6 +77,7 @@ struct BoundingBoxRenderData {
     int relFrame;
     QList<PixmapEffectRenderData*> pixmapEffects;
     SkPoint drawPos;
+    SkBlendMode blendMode = SkBlendMode::kSrcOver;
 
     virtual void drawRenderedImage(SkCanvas *canvas);
     void renderToImage();
@@ -95,8 +96,6 @@ public:
                 const BoundingBoxType &type);
     BoundingBox(const BoundingBoxType &type);
     virtual ~BoundingBox();
-
-    const QMatrix &getUpdateTransform() { return mUpdateTransform; }
 
     virtual BoundingBox *createLink(BoxesGroup *parent);
     virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
@@ -321,12 +320,6 @@ public:
         return mEffectsMargin;
     }
 
-    virtual sk_sp<SkImage> getAllUglyPixmapProvidedTransformSk(
-                        const qreal &effectsMargin,
-                        const qreal &resolution,
-                        const QMatrix &allUglyTransform,
-                        SkPoint *drawPosP);
-
     virtual Canvas *getParentCanvas();
 
 
@@ -504,10 +497,7 @@ protected:
     RenderContainer mDrawRenderContainer;
 
     int mUpdateRelFrame = 0;
-    QRectF mUpdateRelBoundingRect;
-    QMatrix mUpdateTransform;
     bool mUpdateDrawOnParentBox = true;
-    qreal mUpdateOpacity;
 
     bool mRedoUpdate = false;
     bool mWaitingForSchedulerToBeProcessed = false;

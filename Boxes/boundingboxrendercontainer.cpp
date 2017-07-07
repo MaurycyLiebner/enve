@@ -49,30 +49,6 @@ const qreal &RenderContainer::getResolutionFraction() const {
     return mResolutionFraction;
 }
 
-void RenderContainer::updateVariables(const QMatrix &combinedTransform,
-                                      const qreal &effectsMargin,
-                                      const qreal &resolutionPer,
-                                      BoundingBox *target) {
-    //QElapsedTimer timer;
-    //timer.start();
-
-    mTransform = combinedTransform;
-    mTransform.scale(resolutionPer, resolutionPer);
-
-    mResolutionFraction = resolutionPer;
-
-    // SKIA
-
-    mImageSk = target->getAllUglyPixmapProvidedTransformSk(
-                            resolutionPer*effectsMargin,
-                            resolutionPer,
-                            mTransform,
-                            &mDrawPos);
-    mPaintTransform.reset();
-
-    //mRenderTime = timer.elapsed();
-}
-
 void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mTransform = data->transform;
     mResolutionFraction = data->resolution;

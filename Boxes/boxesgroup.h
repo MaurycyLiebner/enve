@@ -23,8 +23,8 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
             BoundingBoxRenderData::drawRenderedImage(canvas);
         } else {
             SkPaint paint;
-            paint.setAlpha(qRound(mUpdateOpacity*255));
-            paint.setBlendMode(mBlendModeSk);
+            paint.setAlpha(qRound(opacity*2.55));
+            paint.setBlendMode(blendMode);
             canvas->saveLayer(NULL, &paint);
             Q_FOREACH(BoundingBoxRenderData *renderData,
                       childrenRenderData) {
@@ -157,9 +157,6 @@ public:
     bool shouldPaintOnImage();
 
     virtual void addChildAwaitingUpdate(BoundingBox *child);
-    void beforeUpdate();
-    void processUpdate();
-    void afterUpdate();
     void updateAfterCombinedTransformationChanged();
     void updateCombinedTransformTmp();
     void updateAfterCombinedTransformationChangedAfterFrameChagne();
@@ -175,6 +172,10 @@ public:
     void createCurrentRenderData() {
         mCurrentRenderData = new BoxesGroupRenderData();
     }
+
+    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
+                                               BoundingBoxRenderData *data);
+
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

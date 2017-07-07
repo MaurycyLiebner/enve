@@ -261,60 +261,6 @@ void BoundingBox::replaceCurrentFrameCache() {
     scheduleSoftUpdate();
 }
 
-sk_sp<SkImage> BoundingBox::getAllUglyPixmapProvidedTransformSk(
-                const qreal &effectsMargin,
-                const qreal &resolution,
-                const QMatrix &allUglyTransform,
-                SkPoint *drawPosP) {
-    QRectF allUglyBoundingRect =
-            allUglyTransform.mapRect(mUpdateRelBoundingRect).
-                adjusted(-effectsMargin, -effectsMargin,
-                         effectsMargin, effectsMargin);
-    QSizeF sizeF = allUglyBoundingRect.size();
-    QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
-            QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
-                    qRound(allUglyBoundingRect.top()/**resolution*/));
-
-    SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
-                                         ceil(sizeF.height()),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-
-    //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
-    SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
-    rasterCanvas->clear(SK_ColorTRANSPARENT);
-
-    rasterCanvas->translate(-allUglyBoundingRect.left(),
-                            -allUglyBoundingRect.top());
-
-    allUglyBoundingRect.translate(-transF);
-
-    rasterCanvas->translate(transF.x(), transF.y());
-    rasterCanvas->concat(QMatrixToSkMatrix(allUglyTransform));
-
-    drawSk(rasterCanvas);
-
-    rasterCanvas->flush();
-    delete rasterCanvas;
-//    if(parentCanvas->effectsPaintEnabled()) {
-//        allUglyPixmap = applyEffects(allUglyPixmap,
-//                                     false,
-//                                     parentCanvas->getResolutionFraction());
-//    }
-
-    *drawPosP = SkPoint::Make(qRound(allUglyBoundingRect.left()),
-                              qRound(allUglyBoundingRect.top()));
-
-    applyEffectsSk(bitmap, resolution);
-
-    sk_sp<SkImage> image = SkImage::MakeFromBitmap(bitmap);
-    bitmap.reset();
-    return image;
-}
-
 void BoundingBox::updateAllUglyPixmap() {
     mCurrentRenderData->renderToImage();
 }
@@ -1231,11 +1177,9 @@ void BoundingBox::setUpdateVars() {
     }
     setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
                                           mCurrentRenderData);
-    mUpdateTransform = mTransformAnimator->getCombinedTransform();
+
     mUpdateRelFrame = anim_mCurrentRelFrame;
-    mUpdateRelBoundingRect = mRelBoundingRect;
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
-    mUpdateOpacity = mTransformAnimator->getOpacity()*0.01;
 }
 
 bool BoundingBox::isUsedAsTarget() {
@@ -1285,7 +1229,7 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
 
 void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
     SkPaint paint;
-    paint.setAlpha(qRound(opacity*255));
+    paint.setAlpha(qRound(opacity*2.55));
     paint.setBlendMode(blendMode);
     canvas->drawImage(renderedImage, /*drawPos.x(), drawPos.y()*/
                       0., 0., &paint);

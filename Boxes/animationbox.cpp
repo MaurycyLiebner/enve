@@ -122,23 +122,17 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
 }
 
 void AnimationBox::afterSuccessfulUpdate() {
-    mRelBoundingRect = mUpdateRelBoundingRect;
+    mRelBoundingRect = QRectF(0., 0.,
+                              mUpdateAnimationImageSk->width(),
+                              mUpdateAnimationImageSk->height());
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     updateRelBoundingRect();
 }
 
-void AnimationBox::updateUpdateRelBoundingRectFromImage() {
-    mUpdateRelBoundingRect = QRectF(0., 0.,
-                mUpdateAnimationImageSk->width(),
-                mUpdateAnimationImageSk->height());//mUpdateAnimationImage.rect();
-}
-
 void AnimationBox::setUpdateVars() {
-    BoundingBox::setUpdateVars();
-    qDebug() << "frame used: " << mUpdateAnimationFrame;
     mUpdateAnimationImageSk = mAnimationCacheHandler->getFrameAtFrame(
                 mUpdateAnimationFrame);
-    updateUpdateRelBoundingRectFromImage();
+    BoundingBox::setUpdateVars();
 //    CacheContainer *cont =
 //            mAnimationFramesCache.getRenderContainerAtRelFrame(
 //                mUpdateAnimationFrame);

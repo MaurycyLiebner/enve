@@ -26,7 +26,6 @@ public:
     FixedLenAnimationRect *getAnimationDurationRect();
 
     bool SWT_isAnimationBox() { return true; }
-    void updateUpdateRelBoundingRectFromImage();
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);
     virtual void changeSourceFile() = 0;

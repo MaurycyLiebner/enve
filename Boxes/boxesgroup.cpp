@@ -232,16 +232,6 @@ void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
     scheduleSoftUpdate();
 }
 
-void BoxesGroup::beforeUpdate() {
-//    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildrenAwaitingUpdate) {
-//        child->beforeUpdate();
-//        mUpdateChildrenAwaitingUpdate.append(child);
-//    }
-
-//    mChildrenAwaitingUpdate.clear();
-    BoundingBox::beforeUpdate();
-}
-
 void BoxesGroup::schedulerProccessed() {
     BoundingBox::schedulerProccessed();
     Q_FOREACH(const QSharedPointer<BoundingBox> &child,
@@ -254,22 +244,18 @@ void BoxesGroup::schedulerProccessed() {
     mChildrenAwaitingUpdate.clear();
 }
 
-void BoxesGroup::processUpdate() {
-//    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
-//              mUpdateChildrenAwaitingUpdate) {
-//        child->processUpdate();
-//    }
-    BoundingBox::processUpdate();
-}
-
-void BoxesGroup::afterUpdate() {
-//    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
-//            mUpdateChildrenAwaitingUpdate) {
-//        child->afterUpdate();
-//    }
-//    mUpdateChildrenAwaitingUpdate.clear();
-    BoundingBox::afterUpdate();
-
+void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
+                        const int &relFrame,
+                        BoundingBoxRenderData *data) {
+    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
+                                                       data);
+    BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
+    groupData->shouldPaintOnImage = shouldPaintOnImage();
+    groupData->childrenRenderData.clear();
+    foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        groupData->childrenRenderData << box->getCurrentRenderData();
+    }
+    groupData->relBoundingRect = mRelBoundingRect;
 }
 
 void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {

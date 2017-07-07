@@ -71,17 +71,6 @@ InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
     setLinkTarget(linkTarget);
 }
 
-sk_sp<SkImage> InternalLinkBox::getAllUglyPixmapProvidedTransformSk(
-                            const qreal &effectsMargin,
-                            const qreal &resolution,
-                            const QMatrix &allUglyTransform,
-                            SkPoint *drawPosP) {
-    return mLinkTarget->getAllUglyPixmapProvidedTransformSk(effectsMargin,
-                                                          resolution,
-                                                          allUglyTransform,
-                                                          drawPosP);
-}
-
 bool InternalLinkBox::relPointInsidePath(const QPointF &point)
 {
     return mLinkTarget->relPointInsidePath(point);
