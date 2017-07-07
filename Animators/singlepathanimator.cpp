@@ -505,8 +505,8 @@ SkPath SingleVectorPathAnimator::getPathAtRelFrame(const int &relFrame) {
         pointValues = point->getPointValuesAtRelFrame(relFrame);
 
         path.cubicTo(QPointFToSkPoint(lastPointValues.endRelPos),
-                        QPointFToSkPoint(pointValues.startRelPos),
-                        QPointFToSkPoint(pointValues.pointRelPos));
+                     QPointFToSkPoint(pointValues.startRelPos),
+                     QPointFToSkPoint(pointValues.pointRelPos));
 
         lastPointValues = pointValues;
 

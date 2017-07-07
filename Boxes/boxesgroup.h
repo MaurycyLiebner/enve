@@ -13,8 +13,42 @@ class MainWindow;
 
 class VectorPathEdge;
 
-class BoxesGroup : public BoundingBox
-{
+struct BoxesGroupRenderData : public BoundingBoxRenderData {
+    QList<BoundingBoxRenderData*> childrenRenderData;
+
+    bool shouldPaintOnImage = true;
+
+    void drawRenderedImage(SkCanvas *canvas) {
+        if(shouldPaintOnImage) {
+            BoundingBoxRenderData::drawRenderedImage(canvas);
+        } else {
+            SkPaint paint;
+            paint.setAlpha(qRound(mUpdateOpacity*255));
+            paint.setBlendMode(mBlendModeSk);
+            canvas->saveLayer(NULL, &paint);
+            Q_FOREACH(BoundingBoxRenderData *renderData,
+                      childrenRenderData) {
+                renderData->drawRenderedImage(canvas);
+            }
+            canvas->restore();
+        }
+    }
+
+private:
+    void drawSk(SkCanvas *canvas) {
+        canvas->save();
+        canvas->concat(QMatrixToSkMatrix(transform.inverted()));
+        Q_FOREACH(BoundingBoxRenderData *renderData,
+                  childrenRenderData) {
+            //box->draw(p);
+            renderData->drawRenderedImage(canvas);
+        }
+
+        canvas->restore();
+    }
+};
+
+class BoxesGroup : public BoundingBox {
     Q_OBJECT
 public:
     BoxesGroup(BoxesGroup *parent);
@@ -121,7 +155,6 @@ public:
     void setDescendantCurrentGroup(const bool &bT);
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
-    void drawUpdatePixmapSk(SkCanvas *canvas);
 
     virtual void addChildAwaitingUpdate(BoundingBox *child);
     void beforeUpdate();
@@ -138,6 +171,10 @@ public:
                         const SkScalar &invScale);
     void prp_setAbsFrame(const int &frame);
     void schedulerProccessed();
+
+    void createCurrentRenderData() {
+        mCurrentRenderData = new BoxesGroupRenderData();
+    }
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

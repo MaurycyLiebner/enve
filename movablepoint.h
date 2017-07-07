@@ -102,6 +102,7 @@ public:
 
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
+    virtual QPointF getRelativePosAtRelFrame(const int &frame) const;
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;

@@ -29,12 +29,6 @@ BoundingBox *ImageBox::createNewDuplicate(BoxesGroup *parent) {
     return new ImageBox(parent);
 }
 
-void ImageBox::drawSk(SkCanvas *canvas) {
-    SkPaint paint;
-    //paint.setFilterQuality(kHigh_SkFilterQuality);
-    canvas->drawImage(mImageSk, 0, 0, &paint);
-}
-
 void ImageBox::reloadPixmap() {
     if(mImageFilePath.isEmpty()) {
     } else {

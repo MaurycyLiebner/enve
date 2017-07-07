@@ -528,28 +528,6 @@ void PathBox::setUpdateVars() {
     BoundingBox::setUpdateVars();
 }
 
-void PathBox::drawSk(SkCanvas *canvas) {
-    canvas->save();
-
-    SkPaint paint;
-    paint.setAntiAlias(true);
-    paint.setStyle(SkPaint::kFill_Style);
-    //mPathEffectsAnimators->applyEffectsSk(&paint);
-    if(!mUpdatePathSk.isEmpty()) {
-        mUpdateFillSettings.applyPainterSettingsSk(&paint);
-
-        canvas->drawPath(mUpdatePathSk, paint);
-    }
-    if(!mUpdateOutlinePathSk.isEmpty()) {
-        paint.setShader(NULL);
-        mUpdateStrokeSettings.applyPainterSettingsSk(&paint);
-
-        canvas->drawPath(mUpdateOutlinePathSk, paint);
-    }
-
-    canvas->restore();
-}
-
 bool PathBox::relPointInsidePath(const QPointF &relPos) {
     if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
         if(mPathSk.contains(relPos.x(), relPos.y())) {

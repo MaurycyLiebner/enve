@@ -6,7 +6,7 @@
 
 struct ImageBoxRenderData : public BoundingBoxRenderData {
     sk_sp<SkImage> image;
-
+private:
     void drawSk(SkCanvas *canvas) {
         SkPaint paint;
         //paint.setFilterQuality(kHigh_SkFilterQuality);
@@ -18,7 +18,6 @@ class ImageBox : public BoundingBox {
 public:
     ImageBox(BoxesGroup *parent, QString filePath = "");
 
-    void drawSk(SkCanvas *canvas);
     void reloadPixmap();
     void setFilePath(QString path);
     void updateRelBoundingRect();

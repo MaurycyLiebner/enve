@@ -78,6 +78,10 @@ QPointF MovablePoint::getRelativePos() const {
     return getCurrentPointValue();
 }
 
+QPointF MovablePoint::getRelativePosAtRelFrame(const int &frame) const {
+    return getCurrentPointValueAtRelFrame(frame);
+}
+
 QPointF MovablePoint::mapRelativeToAbsolute(const QPointF &relPos) const {
     return mParent->mapRelPosToAbs(relPos);
 }

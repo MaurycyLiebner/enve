@@ -319,9 +319,9 @@ QPointF PathPoint::getStartCtrlPtValue() const {
 
 QPointF PathPoint::getStartCtrlPtValueAtRelFrame(const int &relFrame) const {
     if(mStartCtrlPtEnabled) {
-        return mStartCtrlPt->getCurrentPointValueAtRelFrame(relFrame);
+        return mStartCtrlPt->getRelativePosAtRelFrame(relFrame);
     } else {
-        return getCurrentPointValueAtRelFrame(relFrame);
+        return getRelativePosAtRelFrame(relFrame);
     }
 }
 
@@ -370,9 +370,9 @@ QPointF PathPoint::getEndCtrlPtValue() const {
 
 QPointF PathPoint::getEndCtrlPtValueAtRelFrame(const int &relFrame) const {
     if(mEndCtrlPtEnabled) {
-        return mEndCtrlPt->getCurrentPointValueAtRelFrame(relFrame);
+        return mEndCtrlPt->getRelativePosAtRelFrame(relFrame);
     } else {
-        return getCurrentPointValueAtRelFrame(relFrame);
+        return getRelativePosAtRelFrame(relFrame);
     }
 }
 

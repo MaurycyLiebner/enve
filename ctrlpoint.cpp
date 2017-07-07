@@ -17,6 +17,11 @@ QPointF CtrlPoint::getRelativePos() const {
     return mParentPoint->getRelativePos() + getCurrentPointValue();
 }
 
+QPointF CtrlPoint::getRelativePosAtRelFrame(const int &frame) const {
+    return mParentPoint->getRelativePosAtRelFrame(frame) +
+            getCurrentPointValueAtRelFrame(frame);
+}
+
 void CtrlPoint::setRelativePos(const QPointF &relPos,
                                const bool &saveUndoRedo) {
     setCurrentPointValue(relPos - mParentPoint->getRelativePos(),

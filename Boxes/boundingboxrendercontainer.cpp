@@ -68,9 +68,17 @@ void RenderContainer::updateVariables(const QMatrix &combinedTransform,
                             resolutionPer,
                             mTransform,
                             &mDrawPos);
-    updatePaintTransformGivenNewCombinedTransform(combinedTransform);
+    mPaintTransform.reset();
 
     //mRenderTime = timer.elapsed();
+}
+
+void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
+    mTransform = data->transform;
+    mResolutionFraction = data->resolution;
+    mImageSk = data->renderedImage;
+    mDrawPos = data->drawPos;
+    mPaintTransform.reset();
 }
 
 void RenderContainer::duplicateFrom(RenderContainer *src) {

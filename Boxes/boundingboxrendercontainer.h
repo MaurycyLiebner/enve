@@ -7,6 +7,7 @@ class BoundingBox;
 #include "skiaincludes.h"
 
 class CacheHandler;
+struct BoundingBoxRenderData;
 
 class CacheContainer : public SimpleSmartPointer {
 public:
@@ -101,6 +102,7 @@ public:
                       const sk_sp<SkImage> &imgSk,
                       const qreal &res);
     void duplicateFrom(RenderContainer *src);
+    void setVariablesFromRenderData(BoundingBoxRenderData *data);
 protected:
     qreal mResolutionFraction;
     QMatrix mTransform;

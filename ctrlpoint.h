@@ -25,6 +25,7 @@ public:
     void cancelTransform();
 
     void rotate(const qreal &rotate);
+    QPointF getRelativePosAtRelFrame(const int &frame) const;
 private:
     bool mIsStartCtrlPt;
     PathPoint *mParentPoint;

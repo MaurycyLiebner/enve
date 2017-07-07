@@ -14,7 +14,7 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
     SkPath outlinePath;
     UpdatePaintSettings paintSettings;
     UpdateStrokeSettings strokeSettings;
-
+private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
@@ -43,8 +43,6 @@ public:
     PathBox(BoxesGroup *parent,
             const BoundingBoxType &type);
     ~PathBox();
-
-    void drawSk(SkCanvas *canvas);
 
     void schedulePathUpdate();
 

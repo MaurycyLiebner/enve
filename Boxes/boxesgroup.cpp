@@ -220,21 +220,6 @@ void BoxesGroup::updateEffectsMargin() {
     mEffectsMargin += childrenMargin;
 }
 
-void BoxesGroup::drawUpdatePixmapSk(SkCanvas *canvas) {
-    if(shouldPaintOnImage()) {
-        BoundingBox::drawUpdatePixmapSk(canvas);
-    } else {
-        SkPaint paint;
-        paint.setAlpha(qRound(mUpdateOpacity*255));
-        paint.setBlendMode(mBlendModeSk);
-        canvas->saveLayer(NULL, &paint);
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-            box->drawUpdatePixmapSk(canvas);
-        }
-        canvas->restore();
-    }
-}
-
 void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
     for(int i = 0; i < mChildrenAwaitingUpdate.count(); i++) {
         if(mChildrenAwaitingUpdate.at(i) == child) {
@@ -315,17 +300,6 @@ void BoxesGroup::drawSelectedSk(SkCanvas *canvas,
         }
         canvas->restore();
     }
-}
-
-void BoxesGroup::drawSk(SkCanvas *canvas) {
-    canvas->save();
-    canvas->concat(QMatrixToSkMatrix(mUpdateTransform.inverted()));
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        //box->draw(p);
-        box->drawUpdatePixmapSk(canvas);
-    }
-
-    canvas->restore();
 }
 
 void BoxesGroup::setIsCurrentGroup(const bool &bT) {

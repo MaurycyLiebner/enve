@@ -76,10 +76,13 @@ struct BoundingBoxRenderData {
     qreal effectsMargin;
     int relFrame;
     QList<PixmapEffectRenderData*> pixmapEffects;
+    SkPoint drawPos;
 
+    virtual void drawRenderedImage(SkCanvas *canvas);
+    void renderToImage();
+    sk_sp<SkImage> renderedImage;
+private:
     virtual void drawSk(SkCanvas *canvas) = 0;
-
-    sk_sp<SkImage> getAllUglyPixmapSk(SkPoint *drawPosP);
 };
 
 class BoundingBox :
@@ -114,8 +117,6 @@ public:
     virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmapSk(SkCanvas *canvas);
-
-    virtual void drawSk(SkCanvas *) {}
 
     virtual void drawSelectedSk(SkCanvas *canvas,
                                 const CanvasMode &currentCanvasMode,
@@ -399,7 +400,6 @@ public:
     virtual void updateCombinedTransformTmp();
     void updateRelativeTransformAfterFrameChange();
     QPainter::CompositionMode getCompositionMode();
-    QMatrix getUpdatePaintTransform();
     bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                     const qreal &relX,
@@ -457,8 +457,6 @@ public:
     }
 
 
-    SkPoint getUpdateDrawPos();
-
     virtual void addActionsToMenu(QMenu *) {}
     virtual bool handleSelectedCanvasAction(QAction *) {
         return false;
@@ -470,6 +468,7 @@ public:
     virtual void createCurrentRenderData() {}
 
     void schedulerProccessed();
+    BoundingBoxRenderData *getCurrentRenderData();
 protected:
     BoundingBoxRenderData *mCurrentRenderData = NULL;
     bool mCustomFpsEnabled = false;
