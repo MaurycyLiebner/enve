@@ -103,6 +103,19 @@ void Rectangle::finishAllPointsTransform() {
     finishTransform();
 }
 
+SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
+    SkPath path;
+    SkPoint topLeft =
+            QPointFToSkPoint(mTopLeftPoint->
+                                getCurrentPointValueAtRelFrame(relFrame));
+    SkPoint bottomRight =
+            QPointFToSkPoint(mBottomRightPoint->
+                                getCurrentPointValueAtRelFrame(relFrame));
+    path.addRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
+                                  bottomRight.x(), bottomRight.y()));
+    return path;
+}
+
 void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {
     mBottomRightPoint->moveByAbs(absTrans);
 }

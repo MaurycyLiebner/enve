@@ -92,7 +92,9 @@ public:
     bool SWT_isCircle() { return true; }
 
     void startAllPointsTransform();
-private:
+protected:
+    SkPath getPathAtRelFrame(const int &relFrame);
+
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;
     CircleRadiusPoint *mVerticalRadiusPoint;

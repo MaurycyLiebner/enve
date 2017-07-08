@@ -7,8 +7,8 @@
 #include "Animators/pathanimator.h"
 
 SingleVectorPathAnimator::SingleVectorPathAnimator(PathAnimator *parentPath) :
-    SinglePathAnimator(parentPath) {
-
+    SinglePathAnimator() {
+    mParentPathAnimator = parentPath;
 }
 
 void SingleVectorPathAnimator::drawSelected(SkCanvas *canvas,
@@ -235,8 +235,9 @@ void SingleVectorPathAnimator::removePoint(PathPoint *point) {
     removeFromPointsList(point);
 }
 
-void SingleVectorPathAnimator::replaceSeparatePathPoint(PathPoint *newPoint,
-                                                  const bool &saveUndoRedo) {
+void SingleVectorPathAnimator::replaceSeparatePathPoint(
+                                    PathPoint *newPoint,
+                                    const bool &saveUndoRedo) {
     if(saveUndoRedo) {
         addUndoRedo(new ChangeSingleVectorPathFirstPoint(this,
                                                    mFirstPoint,
@@ -681,29 +682,4 @@ void SingleVectorPathAnimator::connectPoints(PathPoint *point1,
         point1->connectToPoint(point2);
         point2ParentPath->updatePathPointIds();
     }
-//    if(point1->isSeparatePathPoint() &&
-//       point2->isSeparatePathPoint()) {
-//        point1->reversePointsDirection();
-
-//        removePointFromSeparatePaths(point1);
-//        removePointFromSeparatePaths(point2);
-
-//        point1->connectToPoint(point2);
-//        PathPoint *firstPtCandidate = point1->getConnectedSeparatePathPoint();
-//        addPointToSeparatePaths(firstPtCandidate);
-//    } else if(point1->isSeparatePathPoint()) {
-//        removePointFromSeparatePaths(point1);
-//        point1->connectToPoint(point2);
-//    } else if(point2->isSeparatePathPoint()) {
-//        removePointFromSeparatePaths(point2);
-//        point1->connectToPoint(point2);
-//    } else {
-//        PathPoint *point1ConnectedFirst =
-//                point1->getConnectedSeparatePathPoint();
-//        removePointFromSeparatePaths(point1ConnectedFirst);
-//        point1ConnectedFirst->reversePointsDirection();
-//        point1->connectToPoint(point2);
-//    }
-
-    //updatePathPointIds();
 }

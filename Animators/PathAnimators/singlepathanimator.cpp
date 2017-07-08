@@ -8,9 +8,8 @@
 #include "skiaincludes.h"
 #include "pointhelpers.h"
 
-SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
+SinglePathAnimator::SinglePathAnimator() :
     ComplexAnimator() {
-    mParentPathAnimator = parentPath;
     prp_setName("path");
 }
 

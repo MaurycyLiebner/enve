@@ -81,7 +81,8 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
                                                        data);
     PathBoxRenderData *pathData = (PathBoxRenderData*)data;
-
+    pathData->path = getPathAtRelFrame(relFrame);
+    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
 
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {

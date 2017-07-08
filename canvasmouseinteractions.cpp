@@ -231,7 +231,7 @@ void Canvas::clearHoveredEdge() {
 }
 
 void Canvas::handleMovePointMousePressEvent() {
-    if (mLastPressedPoint == NULL) {
+    if(mLastPressedPoint == NULL) {
         if(isCtrlPressed() ) {
             clearPointsSelection();
             mLastPressedPoint = createNewPointOnLineNearSelected(
@@ -422,7 +422,21 @@ void Canvas::handleMovePointMouseRelease() {
         finishSelectedPointsTransform();
     } else if(mSelecting) {
         mSelecting = false;
-        if(mFirstMouseMove) {
+        if(!isShiftPressed()) clearPointsSelection();
+        moveSecondSelectionPoint(mCurrentMouseEventPosRel);
+        selectAndAddContainedPointsToSelection(mSelectionRect);
+    } else if(mFirstMouseMove) {
+        if(mLastPressedPoint != NULL) {
+            if(isShiftPressed()) {
+                if(mLastPressedPoint->isSelected()) {
+                    removePointFromSelection(mLastPressedPoint);
+                } else {
+                    addPointToSelection(mLastPressedPoint);
+                }
+            } else {
+                selectOnlyLastPressedPoint();
+            }
+        } else {
             mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
             if((mLastPressedBox == NULL) ? true : mLastPressedBox->isGroup()) {
                 BoundingBox *pressedBox = getPathAtFromAllAncestors(mCurrentMouseEventPosRel);
@@ -452,22 +466,6 @@ void Canvas::handleMovePointMouseRelease() {
                     selectOnlyLastPressedBox();
                 }
             }
-            return;
-        }
-        if(!isShiftPressed()) clearPointsSelection();
-        moveSecondSelectionPoint(mCurrentMouseEventPosRel);
-        selectAndAddContainedPointsToSelection(mSelectionRect);
-    } else if(mFirstMouseMove) {
-        if(isShiftPressed()) {
-            if(mLastPressedPoint != NULL) {
-                if(mLastPressedPoint->isSelected()) {
-                    removePointFromSelection(mLastPressedPoint);
-                } else {
-                    addPointToSelection(mLastPressedPoint);
-                }
-            }
-        } else {
-            selectOnlyLastPressedPoint();
         }
     } else {
         finishSelectedPointsTransform();

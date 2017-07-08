@@ -299,9 +299,10 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
     }
 }
 
-void PathAnimator::duplicatePathsTo(
-        PathAnimator *target) {
+void PathAnimator::duplicatePathsTo(PathAnimator *target) {
     Q_FOREACH(SingleVectorPathAnimator *path, mSinglePaths) {
-        target->addSinglePathAnimator(path->makeDuplicate(target));
+        SingleVectorPathAnimator *duplicate = path->makeDuplicate();
+        duplicate->setParentPath(target);
+        target->addSinglePathAnimator(duplicate);
     }
 }

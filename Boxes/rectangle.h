@@ -50,7 +50,8 @@ public:
     void finishAllPointsTransform();
 
     bool SWT_isRectangle() { return true; }
-private:
+protected:
+    SkPath getPathAtRelFrame(const int &relFrame);
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;
 

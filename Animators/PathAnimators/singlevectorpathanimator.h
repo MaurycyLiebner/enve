@@ -55,8 +55,6 @@ public:
     void startAllPointsTransform();
     void finishAllPointsTransform();
     void duplicatePathPointsTo(SingleVectorPathAnimator *target);
-    void removePointFromSeparatePaths(PathPoint *pointToRemove,
-                                      bool saveUndoRedo = true);
     PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
     PathPoint *addPointAbsPos(const QPointF &absPtPos, PathPoint *toPoint);
     void deletePointAndApproximate(PathPoint *pointToRemove);
@@ -76,13 +74,22 @@ public:
 
     SkPath getPathAtRelFrame(const int &relFrame);
 
-    SingleVectorPathAnimator *makeDuplicate(PathAnimator *parentPath) {
+    SingleVectorPathAnimator *makeDuplicate() {
         SingleVectorPathAnimator *path =
-                new SingleVectorPathAnimator(parentPath);
+                new SingleVectorPathAnimator(mParentPathAnimator);
         duplicatePathPointsTo(path);
         return path;
     }
+
+    void setParentPath(PathAnimator *parentPath) {
+        mParentPathAnimator = parentPath;
+    }
+
+    PathAnimator *getParentPathAnimator() {
+        return mParentPathAnimator;
+    }
 private:
+    PathAnimator *mParentPathAnimator = NULL;
     PathPoint *mFirstPoint = NULL;
     QList<QSharedPointer<PathPoint> > mPoints;
 

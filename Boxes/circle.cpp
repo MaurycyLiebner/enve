@@ -187,6 +187,15 @@ void Circle::updatePath() {
 
 }
 
+SkPath Circle::getPathAtRelFrame(const int &relFrame) {
+    SkPath path;
+    SkScalar xRadius = mHorizontalRadiusPoint->getXValueAtRelFrame(relFrame);
+    SkScalar yRadius = mVerticalRadiusPoint->getYValueAtRelFrame(relFrame);
+    path.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
+                                  2*xRadius, 2*yRadius));
+    return path;
+}
+
 CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,
                                      MovablePointType type) :
     MovablePoint(parent, type) {

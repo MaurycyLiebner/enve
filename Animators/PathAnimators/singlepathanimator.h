@@ -6,7 +6,6 @@
 
 enum CanvasMode : short;
 
-class PathAnimator;
 class VectorPathEdge;
 class MovablePoint;
 class PathPoint;
@@ -15,7 +14,7 @@ class PathPoint;
 class SinglePathAnimator : public ComplexAnimator {
     Q_OBJECT
 public:
-    SinglePathAnimator(PathAnimator *parentPath);
+    SinglePathAnimator();
 
     virtual VectorPathEdge *getEgde(const QPointF &,
                                     const qreal &) { return NULL; }
@@ -68,18 +67,13 @@ public:
                     const QRectF &,
                     QList<MovablePoint *> *) {}
 
-    PathAnimator *getParentPathAnimator() {
-        return mParentPathAnimator;
-    }
-
     //void loadPathFromQPainterPath(const QPainterPath &path);
 
     bool SWT_isSinglePathAnimator() { return true; }
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
 
-    virtual SinglePathAnimator *makeDuplicate(PathAnimator *parentPath) = 0;
+    virtual SinglePathAnimator *makeDuplicate() = 0;
 protected:
-    PathAnimator *mParentPathAnimator = NULL;
     QPainterPath mPath;
     SkPath mSkPath;
 };

@@ -149,6 +149,10 @@ void VectorPath::selectAndAddContainedPointsToList(const QRectF &absRect,
     mPathAnimator->selectAndAddContainedPointsToList(absRect, list);
 }
 
+SkPath VectorPath::getPathAtRelFrame(const int &relFrame) {
+     return mPathAnimator->getPathAtRelFrame(relFrame);
+}
+
 void VectorPath::duplicatePathAnimatorFrom(
         PathAnimator *source) {
     source->duplicatePathsTo(mPathAnimator.data());
@@ -162,15 +166,4 @@ void VectorPath::makeDuplicate(Property *targetBox) {
 
 BoundingBox *VectorPath::createNewDuplicate(BoxesGroup *parent) {
     return new VectorPath(parent);
-}
-#include "PathEffects/patheffectanimators.h"
-void VectorPath::setupBoundingBoxRenderDataForRelFrame(
-                            const int &relFrame,
-                            BoundingBoxRenderData *data) {
-    PathBoxRenderData *pathData = (PathBoxRenderData*)data;
-    SkPath path = mPathAnimator->getPathAtRelFrame(relFrame);
-    mPathEffectsAnimators->filterPathForRelFrame(relFrame, &path);
-    pathData->path = path;
-
-    PathBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
 }

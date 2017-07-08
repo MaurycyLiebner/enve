@@ -126,6 +126,8 @@ public:
         mCurrentRenderData = new PathBoxRenderData();
     }
 protected:
+    virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
+
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
     GradientPointsQSPtr mFillGradientPoints;
