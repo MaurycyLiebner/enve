@@ -37,7 +37,6 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
 private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
-        canvas->concat(QMatrixToSkMatrix(transform.inverted()));
         Q_FOREACH(BoundingBoxRenderData *renderData,
                   childrenRenderData) {
             //box->draw(p);

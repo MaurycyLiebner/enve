@@ -109,6 +109,16 @@ qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
     return newMargin;
 }
 
+void EffectAnimators::addEffectRenderDataToList(
+        const int &relFrame,
+        QList<PixmapEffectRenderData *> *pixmapEffects) {
+    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
+        pixmapEffects->append(
+                    ((PixmapEffect*)effect.data())->
+                     getPixmapEffectRenderDataForRelFrame(relFrame) );
+    }
+}
+
 bool EffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }

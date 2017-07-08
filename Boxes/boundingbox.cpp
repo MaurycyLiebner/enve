@@ -652,6 +652,12 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->effectsMargin = mEffectsAnimators->
             getEffectsMarginAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
+
+    data->transform.scale(data->resolution, data->resolution);
+
+    data->pixmapEffects.clear();
+    mEffectsAnimators->addEffectRenderDataToList(relFrame,
+                                                 &data->pixmapEffects);
 }
 
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
@@ -1231,8 +1237,7 @@ void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
     SkPaint paint;
     paint.setAlpha(qRound(opacity*2.55));
     paint.setBlendMode(blendMode);
-    canvas->drawImage(renderedImage, /*drawPos.x(), drawPos.y()*/
-                      0., 0., &paint);
+    canvas->drawImage(renderedImage, drawPos.x(), drawPos.y(), &paint);
 }
 
 void BoundingBoxRenderData::renderToImage() {

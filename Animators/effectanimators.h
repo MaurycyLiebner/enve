@@ -9,9 +9,9 @@ class BoundingBox;
 class SkImage;
 class SkCanvas;
 class SkBitmap;
+struct PixmapEffectRenderData;
 
-class EffectAnimators : public ComplexAnimator
-{
+class EffectAnimators : public ComplexAnimator {
 public:
     EffectAnimators();
 
@@ -43,6 +43,9 @@ public:
 
     bool SWT_isEffectAnimators() { return true; }
     qreal getEffectsMarginAtRelFrame(const int &relFrame) const;
+
+    void addEffectRenderDataToList(const int &relFrame,
+            QList<PixmapEffectRenderData*> *pixmapEffects);
 private:
     BoundingBox *mParentBox;
 };
