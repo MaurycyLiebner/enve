@@ -7,7 +7,7 @@
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
 #include "edge.h"
-#include "Animators/singlepathanimator.h"
+#include "Animators/PathAnimators/singlevectorpathanimator.h"
 #include "pathpoint.h"
 #include "Animators/pathanimator.h"
 #include "pointhelpers.h"
@@ -18,8 +18,6 @@ void Canvas::handleMovePathMousePressEvent() {
         if(!isShiftPressed() ) {
             clearBoxesSelection();
         }
-        mSelecting = true;
-        startSelectionAtPoint(mLastMouseEventPosRel);
     } else {
         if(!isShiftPressed() && !mLastPressedBox->isSelected()) {
             clearBoxesSelection();
@@ -96,7 +94,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     } else if(selectedAction->objectName() == "canvas_group") {
         groupSelectedBoxes();
     } else if(selectedAction->objectName() == "canvas_ungroup") {
-        ungroupSelected();
+        ungroupSelectedBoxes();
     } else if(selectedAction->objectName() == "canvas_center_pivot") {
         centerPivotForSelected();
     } else if(selectedAction->objectName() == "canvas_effects_blur") {
@@ -243,10 +241,7 @@ void Canvas::handleMovePointMousePressEvent() {
 
         } else {
             mCurrentEdge = getEdgeAt(mLastPressPosRel);
-            if(mCurrentEdge == NULL) {
-                mSelecting = true;
-                startSelectionAtPoint(mLastMouseEventPosRel);
-            } else {
+            if(mCurrentEdge != NULL) {
                 clearPointsSelection();
                 clearCurrentEndPoint();
                 clearLastPressedPoint();
@@ -619,11 +614,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
         mFirstMouseMove = false;
     }
     clearAndDisableInput();
-    if(mTransformationFinishedBeforeMouseRelease) {
-        mTransformationFinishedBeforeMouseRelease = false;
-    } else {
-        handleMouseRelease();
-    }
+    handleMouseRelease();
 
     mLastPressedBox = NULL;
     mHoveredPoint = mLastPressedPoint;
@@ -792,9 +783,18 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
 
     if(event->buttons() & Qt::MiddleButton) {
         moveByRel(mCurrentMouseEventPosRel - mLastMouseEventPosRel);
-    } else if(!mTransformationFinishedBeforeMouseRelease &&
-              (event->buttons() & Qt::LeftButton ||
-               mIsMouseGrabbing)) {
+    } else if(event->buttons() & Qt::LeftButton ||
+               mIsMouseGrabbing) {
+        if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
+            if(mCurrentMode == CanvasMode::MOVE_POINT ||
+               mCurrentMode == CanvasMode::MOVE_PATH) {
+                if(mHoveredBox == NULL &&
+                   mHoveredPoint == NULL &&
+                   mHoveredEdge == NULL) {
+                    startSelectionAtPoint(mLastMouseEventPosRel);
+                }
+            }
+        }
         if(mSelecting) {
             moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||

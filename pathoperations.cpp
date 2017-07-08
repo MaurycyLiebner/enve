@@ -2,6 +2,7 @@
 #include "pointhelpers.h"
 #include "edge.h"
 #include "Animators/pathanimator.h"
+#include "Animators/PathAnimators/singlevectorpathanimator.h"
 
 MinimalPathPoint::MinimalPathPoint() {}
 
@@ -339,7 +340,6 @@ void FullVectorPath::getListOfGeneratedSeparatePaths(
     }
 }
 
-#include "Animators/singlepathanimator.h"
 void FullVectorPath::addAllToVectorPath(PathAnimator *path) {
     Q_FOREACH(MinimalVectorPath *separatePath, mSeparatePaths) {
         MinimalPathPoint *firstPoint = separatePath->getFirstPoint();

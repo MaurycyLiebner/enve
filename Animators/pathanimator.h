@@ -10,6 +10,7 @@ class VectorPathEdge;
 class MovablePoint;
 class PathPoint;
 class SinglePathAnimator;
+class SingleVectorPathAnimator;
 class BoundingBox;
 
 class PathAnimator : public ComplexAnimator {
@@ -23,7 +24,7 @@ public:
     VectorPathEdge *getEgde(const QPointF &absPos,
                             const qreal &canvasScaleInv);
     void updatePath();
-    MovablePoint *qra_getPointAt(const QPointF &absPtPos,
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
     const QPainterPath &getCurrentPath();
@@ -57,9 +58,9 @@ public:
     void loadPathFromSkPath(const SkPath &path);
 
     void setParentBox(BoundingBox *parent);
-    void addSinglePathAnimator(SinglePathAnimator *path,
+    void addSinglePathAnimator(SingleVectorPathAnimator *path,
                                const bool &saveUndoRedo = true);
-    void removeSinglePathAnimator(SinglePathAnimator *path,
+    void removeSinglePathAnimator(SingleVectorPathAnimator *path,
                                   const bool &saveUndoRedo = true);
 
     bool SWT_isPathAnimator();
@@ -68,7 +69,7 @@ private:
     BoundingBox *mParentBox = NULL;
     QPainterPath mPath;
     SkPath mSkPath;
-    QList<SinglePathAnimator*> mSinglePaths;
+    QList<SingleVectorPathAnimator*> mSinglePaths;
 signals:
     void lastSinglePathRemoved();
 };

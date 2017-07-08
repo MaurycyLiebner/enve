@@ -462,6 +462,7 @@ public:
 
     void schedulerProccessed();
     BoundingBoxRenderData *getCurrentRenderData();
+    qreal getEffectsMarginAtRelFrame(const int &relFrame);
 protected:
     BoundingBoxRenderData *mCurrentRenderData = NULL;
     bool mCustomFpsEnabled = false;

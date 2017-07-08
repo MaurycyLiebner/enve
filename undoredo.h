@@ -618,7 +618,7 @@ private:
 class AddSinglePathAnimatorUndoRedo : public UndoRedo {
 public:
     AddSinglePathAnimatorUndoRedo(PathAnimator *target,
-                                  SinglePathAnimator *path);
+                                  SingleVectorPathAnimator *path);
 
     ~AddSinglePathAnimatorUndoRedo();
 
@@ -626,14 +626,14 @@ public:
     void redo();
 private:
     PathAnimatorQSPtr mTarget;
-    SinglePathAnimatorQSPtr mPath;
+    SingleVectorPathAnimatorQSPtr mPath;
 };
 
 class RemoveSinglePathAnimatorUndoRedo :
         public AddSinglePathAnimatorUndoRedo {
 public:
     RemoveSinglePathAnimatorUndoRedo(PathAnimator *target,
-                                     SinglePathAnimator *path) :
+                                     SingleVectorPathAnimator *path) :
         AddSinglePathAnimatorUndoRedo(target, path) {
 
     }

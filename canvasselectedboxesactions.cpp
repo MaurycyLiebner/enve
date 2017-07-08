@@ -302,7 +302,7 @@ bool Canvas::isSelectionEmpty() {
     return mSelectedBoxes.isEmpty();
 }
 
-void Canvas::ungroupSelected() {
+void Canvas::ungroupSelectedBoxes() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(box->isGroup()) {
             ((BoxesGroup*) box)->ungroup();
@@ -490,10 +490,8 @@ void Canvas::duplicateSelectedBoxes() {
     }
 }
 
-BoxesGroup* Canvas::groupSelectedBoxes() {
-    if(mSelectedBoxes.count() == 0) {
-        return NULL;
-    }
+void Canvas::groupSelectedBoxes() {
+    if(mSelectedBoxes.count() == 0) return;
     BoxesGroup *newGroup = new BoxesGroup(mCurrentBoxesGroup);
     BoundingBox *box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
@@ -501,7 +499,7 @@ BoxesGroup* Canvas::groupSelectedBoxes() {
         newGroup->addChild(box);
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
-    return newGroup;
+    addBoxToSelection(newGroup);
 }
 
 #include "pathoperations.h"

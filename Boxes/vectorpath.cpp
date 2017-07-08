@@ -137,7 +137,7 @@ MovablePoint *VectorPath::getPointAtAbsPos(const QPointF &absPtPos,
                                                             currentCanvasMode,
                                                             canvasScaleInv);
     if(pointToReturn == NULL) {
-        pointToReturn = mPathAnimator->qra_getPointAt(absPtPos,
+        pointToReturn = mPathAnimator->getPointAtAbsPos(absPtPos,
                                                       currentCanvasMode,
                                                       canvasScaleInv);
     }

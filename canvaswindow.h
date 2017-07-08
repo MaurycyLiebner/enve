@@ -254,6 +254,9 @@ public slots:
     void duplicateAction();
     void selectAllAction();
     void clearSelectionAction();
+
+    void groupSelectedBoxes();
+    void ungroupSelectedBoxes();
 private slots:
     void sendNextUpdatableForUpdate();
     void nextSaveOutputFrame();

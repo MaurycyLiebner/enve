@@ -272,10 +272,12 @@ void MainWindow::setupMenuBar() {
     mObjectMenu->addAction("Flip Vertical")->
             setShortcut(Qt::Key_V);
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Group")->
-            setShortcut(Qt::CTRL + Qt::Key_G);;
-    mObjectMenu->addAction("Ungroup")->
-            setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);;
+    mObjectMenu->addAction("Group", mCanvasWindow,
+                           SLOT(groupSelectedBoxes()),
+                           Qt::CTRL + Qt::Key_G);
+    mObjectMenu->addAction("Ungroup", mCanvasWindow,
+                           SLOT(ungroupSelectedBoxes()),
+                           Qt::CTRL + Qt::SHIFT + Qt::Key_G);
 
     mPathMenu = mMenuBar->addMenu("Path");
 
@@ -940,8 +942,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             mShiftPressed = true;
         } else if(key_event->key() == Qt::Key_Alt) {
             mAltPressed = true;
+        } else {
+            return processKeyEvent(key_event);
         }
-        return processKeyEvent(key_event);
+        return true;
     } else if(e->type() == QEvent::ShortcutOverride) {
         QKeyEvent *key_event = (QKeyEvent*)e;
         if(mCtrlPressed) {
@@ -949,10 +953,11 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
                key_event->key() == Qt::Key_V ||
                key_event->key() == Qt::Key_X ||
                key_event->key() == Qt::Key_D ||
-               key_event->key() == Qt::Key_A ||
-               key_event->key() == Qt::Key_Delete) {
+               key_event->key() == Qt::Key_A) {
                 return processKeyEvent(key_event);
             }
+        } else if(key_event->key() == Qt::Key_Delete) {
+            return processKeyEvent(key_event);
         }
     } else if(e->type() == QEvent::KeyRelease) {
         QKeyEvent *key_event = (QKeyEvent*)e;

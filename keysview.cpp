@@ -168,7 +168,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     if(mGraphViewed) {
         return graphProcessFilteredKeyEvent(event);
     } else {
-        if(mMainWindow->isCtrlPressed() &&
+        if(event->modifiers() & Qt::ControlModifier &&
            event->key() == Qt::Key_V) {
             if(event->isAutoRepeat()) return false;
             KeysClipboardContainer *container =
@@ -177,7 +177,7 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
             if(container == NULL) return false;
             container->paste(mMainWindow->getCurrentFrame(),
                              this);
-        } else if(mMainWindow->isCtrlPressed() &&
+        } else if(event->modifiers() & Qt::ControlModifier &&
                   event->key() == Qt::Key_C) {
             if(event->isAutoRepeat()) return false;
             KeysClipboardContainer *container =

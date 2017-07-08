@@ -457,6 +457,16 @@ void CanvasWindow::clearSelectionAction() {
     mCurrentCanvas->clearSelectionAction();
 }
 
+void CanvasWindow::groupSelectedBoxes() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->groupSelectedBoxes();
+}
+
+void CanvasWindow::ungroupSelectedBoxes() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->ungroupSelectedBoxes();
+}
+
 void CanvasWindow::startSelectedStrokeColorTransform() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->startSelectedStrokeColorTransform();

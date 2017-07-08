@@ -660,11 +660,12 @@ void Canvas::makeSegmentCurve() {
     makeSelectedPointsSegmentsCurves();
 }
 
-void Canvas::moveSecondSelectionPoint(QPointF pos) {
+void Canvas::moveSecondSelectionPoint(const QPointF &pos) {
     mSelectionRect.setBottomRight(pos);
 }
 
-void Canvas::startSelectionAtPoint(QPointF pos) {
+void Canvas::startSelectionAtPoint(const QPointF &pos) {
+    mSelecting = true;
     mSelectionRect.setTopLeft(pos);
     mSelectionRect.setBottomRight(pos);
 }
@@ -881,15 +882,15 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
 
     bool isGrabbingMouse = mCanvasWindow->isMouseGrabber();
     if(isGrabbingMouse ? !handleKeyPressEventWhileMouseGrabbing(event) : true) {
-        if(isCtrlPressed() &&
-                event->key() == Qt::Key_V) {
+        if(event->modifiers() & Qt::ControlModifier &&
+           event->key() == Qt::Key_V) {
             if(event->isAutoRepeat()) return false;
             pasteAction();
-        } else if(isCtrlPressed() &&
+        } else if(event->modifiers() & Qt::ControlModifier &&
                   event->key() == Qt::Key_C) {
             if(event->isAutoRepeat()) return false;
             copyAction();
-        } else if(isCtrlPressed() &&
+        } else if(event->modifiers() & Qt::ControlModifier &&
                   event->key() == Qt::Key_X) {
             if(event->isAutoRepeat()) return false;
             cutAction();
@@ -899,10 +900,10 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
             resetTransormation();
         } else if(event->key() == Qt::Key_Delete) {
             deleteAction();
-        } else if(isCtrlPressed() &&
+        } else if(event->modifiers() & Qt::ControlModifier &&
                   event->key() == Qt::Key_G) {
            if(isShiftPressed()) {
-               ungroupSelected();
+               ungroupSelectedBoxes();
            } else {
                groupSelectedBoxes();
            }
@@ -974,7 +975,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
 
             grabMouseAndTrack();
          } else if(event->key() == Qt::Key_A &&
-                   isCtrlPressed(event) &&
+                   event->modifiers() & Qt::ControlModifier &&
                    !isGrabbingMouse) {
            if(isShiftPressed()) {
                mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();

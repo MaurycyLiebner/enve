@@ -130,7 +130,6 @@ SOURCES += main.cpp\
     clipboardcontainer.cpp \
     Animators/paintsettings.cpp \
     edge.cpp \
-    Animators/singlepathanimator.cpp \
     Boxes/videobox.cpp \
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
@@ -174,8 +173,9 @@ SOURCES += main.cpp\
     BoxesList/coloranimatorbutton.cpp \
     keyfocustarget.cpp \
     noshortcutaction.cpp \
-    Animators/vectorsinglepathanimator.cpp \
-    updatable.cpp
+    updatable.cpp \
+    Animators/PathAnimators/singlepathanimator.cpp \
+    Animators/PathAnimators/singlevectorpathanimator.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -261,7 +261,6 @@ HEADERS  += mainwindow.h \
     clipboardcontainer.h \
     Animators/paintsettings.h \
     edge.h \
-    Animators/singlepathanimator.h \
     Boxes/videobox.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
@@ -311,8 +310,9 @@ HEADERS  += mainwindow.h \
     BoxesList/coloranimatorbutton.h \
     keyfocustarget.h \
     noshortcutaction.h \
-    Animators/vectorsinglepathanimator.h \
-    updatable.h
+    updatable.h \
+    Animators/PathAnimators/singlepathanimator.h \
+    Animators/PathAnimators/singlevectorpathanimator.h
 
 RESOURCES += \
     resources.qrc

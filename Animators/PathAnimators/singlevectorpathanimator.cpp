@@ -1,86 +1,18 @@
-#include "Animators/singlepathanimator.h"
-#include "pathanimator.h"
-#include "pathpoint.h"
-#include "undoredo.h"
-#include "edge.h"
-#include "Boxes/boundingbox.h"
+#include "singlevectorpathanimator.h"
 #include "canvas.h"
-#include "skiaincludes.h"
+#include "pathpoint.h"
 #include "pointhelpers.h"
+#include "edge.h"
+#include "undoredo.h"
+#include "Animators/pathanimator.h"
 
-qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
-    QPointF dPoint = point1 - point2;
-    return sqrt(dPoint.x()*dPoint.x() + dPoint.y()*dPoint.y());
+SingleVectorPathAnimator::SingleVectorPathAnimator(PathAnimator *parentPath) :
+    SinglePathAnimator(parentPath) {
+
 }
 
-
-bool doesPathIntersectWithCircle(const QPainterPath &path,
-                                 qreal xRadius, qreal yRadius,
-                                 QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return circlePath.intersects(path);
-}
-
-bool doesPathNotContainCircle(const QPainterPath &path,
-                              qreal xRadius, qreal yRadius,
-                              QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return !path.contains(circlePath);
-}
-
-QPointF getCenterOfPathIntersectionWithCircle(const QPainterPath &path,
-                                              qreal xRadius, qreal yRadius,
-                                              QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return circlePath.intersected(path).boundingRect().center();
-}
-
-QPointF getCenterOfPathDifferenceWithCircle(const QPainterPath &path,
-                                            qreal xRadius, qreal yRadius,
-                                            QPointF center) {
-    QPainterPath circlePath;
-    circlePath.addEllipse(center, xRadius, yRadius);
-    return circlePath.subtracted(path).boundingRect().center();
-}
-
-QPointF getPointClosestOnPathTo(const QPainterPath &path,
-                                QPointF relPos,
-                                qreal xRadiusScaling,
-                                qreal yRadiusScaling) {
-    bool (*checkerFunc)(const QPainterPath &, qreal, qreal, QPointF);
-    QPointF (*centerFunc)(const QPainterPath &, qreal, qreal, QPointF);
-    if(path.contains(relPos)) {
-        checkerFunc = &doesPathNotContainCircle;
-        centerFunc = &getCenterOfPathDifferenceWithCircle;
-    } else {
-        checkerFunc = &doesPathIntersectWithCircle;
-        centerFunc = &getCenterOfPathIntersectionWithCircle;
-    }
-    qreal radius = 1.;
-    while(true) {
-        if(checkerFunc(path,
-                       xRadiusScaling*radius,
-                       yRadiusScaling*radius,
-                       relPos)) {
-            return centerFunc(path,
-                              xRadiusScaling*radius,
-                              yRadiusScaling*radius,
-                              relPos);
-        }
-        radius += 1.;
-    }
-}
-
-SinglePathAnimator::SinglePathAnimator(PathAnimator *parentPath) :
-    ComplexAnimator() {
-    mParentPathAnimator = parentPath;
-}
-
-void SinglePathAnimator::drawSelected(SkCanvas *canvas,
-                                      const CanvasMode &,
+void SingleVectorPathAnimator::drawSelected(SkCanvas *canvas,
+                                      const CanvasMode &currentCanvasMode,
                                       const qreal &invScale,
                                       const SkMatrix &combinedTransform) {
     SkPaint paint;
@@ -94,16 +26,6 @@ void SinglePathAnimator::drawSelected(SkCanvas *canvas,
     paint.setStrokeWidth(0.75*invScale);
     paint.setColor(SK_ColorWHITE);
     canvas->drawPath(mappedPath, paint);
-}
-
-void SingleVectorPathAnimator::drawSelected(SkCanvas *canvas,
-                                      const CanvasMode &currentCanvasMode,
-                                      const qreal &invScale,
-                                      const SkMatrix &combinedTransform) {
-    SinglePathAnimator::drawSelected(canvas,
-                                     currentCanvasMode,
-                                     invScale,
-                                     combinedTransform);
 
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
@@ -120,7 +42,7 @@ void SingleVectorPathAnimator::drawSelected(SkCanvas *canvas,
     }
 }
 
-//void SinglePathAnimator::loadPointsFromSql(int boundingBoxId) {
+//void SingleVectorPathAnimator::loadPointsFromSql(int boundingBoxId) {
 //    QSqlQuery query;
 //    QString queryStr = QString("SELECT id, isfirst, isendpoint, qpointfanimatorid "
 //                               "FROM pathpoint WHERE boundingboxid = %1 "
@@ -365,12 +287,6 @@ void SingleVectorPathAnimator::duplicatePathPointsTo(
     }
 }
 
-
-SingleVectorPathAnimator::SingleVectorPathAnimator(PathAnimator *parentPath) :
-    SinglePathAnimator(parentPath) {
-    prp_setName("vector path");
-}
-
 VectorPathEdge *SingleVectorPathAnimator::getEgde(const QPointF &absPos,
                                             const qreal &canvasScaleInv) {
     qreal pressedT;
@@ -443,7 +359,7 @@ void SingleVectorPathAnimator::updateSkPath() {
     }
 }
 
-MovablePoint *SingleVectorPathAnimator::qra_getPointAt(
+MovablePoint *SingleVectorPathAnimator::getPointAtAbsPos(
                         const QPointF &absPtPos,
                         const CanvasMode &currentCanvasMode,
                         const qreal &canvasScaleInv) {
@@ -573,14 +489,15 @@ PathPoint *SingleVectorPathAnimator::createNewPointOnLineNear(
             QPointF newPointPos;
             QPointF newPointStart;
             QPointF newPointEnd;
-            VectorPathEdge::getNewRelPosForKnotInsertionAtT(prevPoint->getRelativePos(),
-                                                  &prevPointEnd,
-                                                  &nextPointStart,
-                                                  nextPoint->getRelativePos(),
-                                                  &newPointPos,
-                                                  &newPointStart,
-                                                  &newPointEnd,
-                                                  pressedT);
+            VectorPathEdge::getNewRelPosForKnotInsertionAtT(
+                          prevPoint->getRelativePos(),
+                          &prevPointEnd,
+                          &nextPointStart,
+                          nextPoint->getRelativePos(),
+                          &newPointPos,
+                          &newPointStart,
+                          &newPointEnd,
+                          pressedT);
 
             PathPoint *newPoint = new PathPoint(this);
             newPoint->setRelativePos(newPointPos, false);
@@ -661,7 +578,8 @@ qreal SingleVectorPathAnimator::findPercentForPoint(const QPointF &point,
     return bestTVal;
 }
 
-void SingleVectorPathAnimator::applyTransformToPoints(const QMatrix &transform) {
+void SingleVectorPathAnimator::applyTransformToPoints(
+        const QMatrix &transform) {
     Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
         point->applyTransform(transform);
     }

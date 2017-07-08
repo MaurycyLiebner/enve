@@ -301,3 +301,70 @@ void drawCosmeticEllipse(QPainter *p,
                    rX/transform.m11(),
                    rY/transform.m22());
 }
+
+
+qreal distBetweenTwoPoints(QPointF point1, QPointF point2) {
+    QPointF dPoint = point1 - point2;
+    return sqrt(dPoint.x()*dPoint.x() + dPoint.y()*dPoint.y());
+}
+
+
+bool doesPathIntersectWithCircle(const QPainterPath &path,
+                                 qreal xRadius, qreal yRadius,
+                                 QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return circlePath.intersects(path);
+}
+
+bool doesPathNotContainCircle(const QPainterPath &path,
+                              qreal xRadius, qreal yRadius,
+                              QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return !path.contains(circlePath);
+}
+
+QPointF getCenterOfPathIntersectionWithCircle(const QPainterPath &path,
+                                              qreal xRadius, qreal yRadius,
+                                              QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return circlePath.intersected(path).boundingRect().center();
+}
+
+QPointF getCenterOfPathDifferenceWithCircle(const QPainterPath &path,
+                                            qreal xRadius, qreal yRadius,
+                                            QPointF center) {
+    QPainterPath circlePath;
+    circlePath.addEllipse(center, xRadius, yRadius);
+    return circlePath.subtracted(path).boundingRect().center();
+}
+
+QPointF getPointClosestOnPathTo(const QPainterPath &path,
+                                QPointF relPos,
+                                qreal xRadiusScaling,
+                                qreal yRadiusScaling) {
+    bool (*checkerFunc)(const QPainterPath &, qreal, qreal, QPointF);
+    QPointF (*centerFunc)(const QPainterPath &, qreal, qreal, QPointF);
+    if(path.contains(relPos)) {
+        checkerFunc = &doesPathNotContainCircle;
+        centerFunc = &getCenterOfPathDifferenceWithCircle;
+    } else {
+        checkerFunc = &doesPathIntersectWithCircle;
+        centerFunc = &getCenterOfPathIntersectionWithCircle;
+    }
+    qreal radius = 1.;
+    while(true) {
+        if(checkerFunc(path,
+                       xRadiusScaling*radius,
+                       yRadiusScaling*radius,
+                       relPos)) {
+            return centerFunc(path,
+                              xRadiusScaling*radius,
+                              yRadiusScaling*radius,
+                              relPos);
+        }
+        radius += 1.;
+    }
+}

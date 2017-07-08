@@ -1,5 +1,5 @@
 #include "canvas.h"
-#include "Animators/singlepathanimator.h"
+#include "Animators/PathAnimators/singlevectorpathanimator.h"
 #include "pathpoint.h"
 
 void Canvas::connectPoints() {

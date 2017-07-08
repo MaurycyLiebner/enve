@@ -92,4 +92,28 @@ extern void drawCosmeticEllipse(QPainter *p,
                                 const QPointF &absPos,
                                 qreal rX, qreal rY);
 
+extern qreal distBetweenTwoPoints(QPointF point1, QPointF point2);
+
+
+extern bool doesPathIntersectWithCircle(const QPainterPath &path,
+                                 qreal xRadius, qreal yRadius,
+                                 QPointF center);
+
+extern bool doesPathNotContainCircle(const QPainterPath &path,
+                              qreal xRadius, qreal yRadius,
+                              QPointF center);
+
+extern QPointF getCenterOfPathIntersectionWithCircle(const QPainterPath &path,
+                                              qreal xRadius, qreal yRadius,
+                                              QPointF center);
+
+extern QPointF getCenterOfPathDifferenceWithCircle(const QPainterPath &path,
+                                            qreal xRadius, qreal yRadius,
+                                            QPointF center);
+
+extern QPointF getPointClosestOnPathTo(const QPainterPath &path,
+                                       QPointF relPos,
+                                       qreal xRadiusScaling,
+                                       qreal yRadiusScaling);
+
 #endif // POINTHELPERS_H

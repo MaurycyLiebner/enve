@@ -40,8 +40,6 @@ public:
 
     void loadPathFromSkPath(const SkPath &path);
 
-//    void disconnectPoints(PathPoint *point1, PathPoint *point2);
-//    void connectPoints(PathPoint *point1, PathPoint *point2);
     void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate(BoxesGroup *parent);
     PathAnimator *getPathAnimator();

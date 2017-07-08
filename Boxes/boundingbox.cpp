@@ -642,6 +642,10 @@ void BoundingBox::finishTransform() {
     //updateCombinedTransform();
 }
 
+qreal BoundingBox::getEffectsMarginAtRelFrame(const int &relFrame) {
+    mEffectsAnimators->getEffectsMarginAtRelFrame(relFrame);
+}
+
 void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
@@ -649,8 +653,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->transform = mTransformAnimator->
             getTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
-    data->effectsMargin = mEffectsAnimators->
-            getEffectsMarginAtRelFrame(relFrame);
+    data->effectsMargin = getEffectsMarginAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
 
     data->transform.scale(data->resolution, data->resolution);
@@ -1237,7 +1240,9 @@ void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
     SkPaint paint;
     paint.setAlpha(qRound(opacity*2.55));
     paint.setBlendMode(blendMode);
-    canvas->drawImage(renderedImage, drawPos.x(), drawPos.y(), &paint);
+    canvas->drawImage(renderedImage,
+                      drawPos.x(), drawPos.y(),
+                      &paint);
 }
 
 void BoundingBoxRenderData::renderToImage() {
@@ -1281,7 +1286,7 @@ void BoundingBoxRenderData::renderToImage() {
     //    }
 
     drawPos = SkPoint::Make(qRound(allUglyBoundingRect.left()),
-                            qRound(allUglyBoundingRect.top()));
+                            qRound(allUglyBoundingRect.top()))*resolution;
 
     if(!pixmapEffects.isEmpty()) {
         SkPixmap pixmap;

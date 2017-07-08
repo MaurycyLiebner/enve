@@ -53,8 +53,8 @@ public:
 
     void repaintIfNeeded();
     void setCanvasMode(CanvasMode mode);
-    void startSelectionAtPoint(QPointF pos);
-    void moveSecondSelectionPoint(QPointF pos);
+    void startSelectionAtPoint(const QPointF &pos);
+    void moveSecondSelectionPoint(const QPointF &pos);
     void setPointCtrlsMode(CtrlsMode mode);
     void setCurrentBoxesGroup(BoxesGroup *group);
 
@@ -97,7 +97,7 @@ public:
                                  const bool &startTransform);
     void moveSelectedBoxesByAbs(const QPointF &by,
                                 const bool &startTransform);
-    BoxesGroup *groupSelectedBoxes();
+    void groupSelectedBoxes();
 
     //void selectAllBoxes();
     void deselectAllBoxes();
@@ -138,7 +138,7 @@ public:
     QPointF getSelectedBoxesAbsPivotPos();
     bool isSelectionEmpty();
 
-    void ungroupSelected();
+    void ungroupSelectedBoxes();
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();

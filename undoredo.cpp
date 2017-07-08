@@ -5,7 +5,7 @@
 #include "Boxes/vectorpath.h"
 #include "movablepoint.h"
 #include "Animators/qrealanimator.h"
-#include "Animators/singlepathanimator.h"
+#include "Animators/PathAnimators/singlevectorpathanimator.h"
 #include "Animators/paintsettings.h"
 #include "pathpoint.h"
 #include "Animators/pathanimator.h"
@@ -524,10 +524,10 @@ void GradientSwapColorsUndoRedo::redo() {
 }
 
 AddSinglePathAnimatorUndoRedo::AddSinglePathAnimatorUndoRedo(
-        PathAnimator *target, SinglePathAnimator *path) :
+        PathAnimator *target, SingleVectorPathAnimator *path) :
     UndoRedo("AddSinglePathAnimatorUndoRedo") {
     mTarget = target->ref<PathAnimator>();
-    mPath = path->ref<SinglePathAnimator>();
+    mPath = path->ref<SingleVectorPathAnimator>();
 }
 
 AddSinglePathAnimatorUndoRedo::~AddSinglePathAnimatorUndoRedo() {
