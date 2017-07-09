@@ -53,8 +53,14 @@ BoundingBox *InternalLinkBox::createLink(BoxesGroup *parent) {
     return mLinkTarget->createLink(parent);
 }
 
-BoundingBox *InternalLinkBox::createSameTransformationLink(BoxesGroup *parent) {
-    return mLinkTarget->createSameTransformationLink(parent);
+BoundingBoxRenderData *InternalLinkBox::createRenderData() {
+    return mLinkTarget->createRenderData();
+}
+
+void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
+        const int &relFrame, BoundingBoxRenderData *data) {
+    mLinkTarget->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
 }
 
 void InternalLinkBox::scheduleAwaitUpdateSLOT() {
@@ -76,42 +82,6 @@ bool InternalLinkBox::relPointInsidePath(const QPointF &point)
     return mLinkTarget->relPointInsidePath(point);
 }
 
-SameTransformInternalLink::SameTransformInternalLink(BoundingBox *linkTarget,
-                                                     BoxesGroup *parent) :
-    InternalLinkBox(linkTarget, parent) {
-}
-
-QMatrix SameTransformInternalLink::getRelativeTransform() const {
-    return mLinkTarget->getRelativeTransform();
-}
-
-const SkPath &SameTransformInternalLink::getRelBoundingRectPath() {
-    return mLinkTarget->getRelBoundingRectPath();
-}
-
-qreal SameTransformInternalLink::getEffectsMargin() {
-    return mLinkTarget->getEffectsMargin();
-}
-
-SameTransformInternalLinkBoxesGroup::SameTransformInternalLinkBoxesGroup(
-                                                BoxesGroup *linkTarget,
-                                                BoxesGroup *parent) :
-    InternalLinkBoxesGroup(linkTarget, parent) {
-
-}
-
-QMatrix SameTransformInternalLinkBoxesGroup::getRelativeTransform() const {
-    return mLinkTarget->getRelativeTransform();
-}
-
-const SkPath &SameTransformInternalLinkBoxesGroup::getRelBoundingRectPath() {
-    return mLinkTarget->getRelBoundingRectPath();
-}
-
-qreal SameTransformInternalLinkBoxesGroup::getEffectsMargin() {
-    return mLinkTarget->getEffectsMargin();
-}
-
 void InternalLinkCanvas::updateRelBoundingRect() {
     if(mClipToCanvasSize) {
         //        QPainterPath boundingPaths = QPainterPath();
@@ -123,13 +93,13 @@ void InternalLinkCanvas::updateRelBoundingRect() {
         QSize size = ((Canvas*)mLinkTarget.data())->getCanvasSize();
         mRelBoundingRect = QRectF(0., 0.,
                                   size.width(), size.height());
-        mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
         //boundingPaths.boundingRect();
 
-        BoundingBox::updateRelBoundingRect();
     } else {
-        BoxesGroup::updateRelBoundingRect();
+        mRelBoundingRect = mLinkTarget->getRelBoundingRect();
     }
+    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
+    BoundingBox::updateRelBoundingRect();
 }
 
 void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {

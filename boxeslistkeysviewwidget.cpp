@@ -324,5 +324,6 @@ void BoxesListKeysViewWidget::setSearchText(const QString &text) {
 
 bool BoxesListKeysViewWidget::processFilteredKeyEvent(
         QKeyEvent *event) {
+    return false;
     //return mKeysView->processFilteredKeyEvent(event);
 }

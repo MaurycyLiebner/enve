@@ -62,26 +62,6 @@ void BoxesGroup::prp_loadFromSql(const int &boundingBoxId) {
     loadChildrenFromSql(boundingBoxId, false);
 }
 
-#include "linkbox.h"
-BoundingBox *BoxesGroup::createLink(BoxesGroup *parent) {
-    InternalLinkBoxesGroup *linkGroup =
-                        new InternalLinkBoxesGroup(this, parent);
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->createSameTransformationLink(linkGroup);
-    }
-    return linkGroup;
-}
-
-BoundingBox *BoxesGroup::createSameTransformationLink(BoxesGroup *parent) {
-    SameTransformInternalLinkBoxesGroup *linkGroup =
-                        new SameTransformInternalLinkBoxesGroup(this, parent);
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->createSameTransformationLink(linkGroup);
-    }
-    return linkGroup;
-}
-
-
 BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
                                             const bool &loadInBox) {
     QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
@@ -251,12 +231,18 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
                                                        data);
     BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
     groupData->shouldPaintOnImage = shouldPaintOnImage();
+    foreach(BoundingBoxRenderData *renderData, groupData->childrenRenderData) {
+        delete renderData;
+    }
+
     groupData->childrenRenderData.clear();
     qreal childrenEffectsMargin = 0.;
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         childrenEffectsMargin = qMax(box->getEffectsMarginAtRelFrame(relFrame),
                                      childrenEffectsMargin);
-        groupData->childrenRenderData << box->getCurrentRenderData();
+        BoundingBoxRenderData *boxRenderData = box->createRenderData();
+        box->setupBoundingBoxRenderDataForRelFrame(relFrame, boxRenderData);
+        groupData->childrenRenderData << boxRenderData;
     }
     data->effectsMargin += childrenEffectsMargin;
     groupData->relBoundingRect = mRelBoundingRect;

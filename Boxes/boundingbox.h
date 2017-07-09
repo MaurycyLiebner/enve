@@ -69,6 +69,8 @@ private:
 };
 
 struct BoundingBoxRenderData {
+    virtual ~BoundingBoxRenderData() {}
+    bool renderedToImage = false;
     QMatrix transform;
     QRectF relBoundingRect;
     qreal opacity;
@@ -98,7 +100,6 @@ public:
     virtual ~BoundingBox();
 
     virtual BoundingBox *createLink(BoxesGroup *parent);
-    virtual BoundingBox *createSameTransformationLink(BoxesGroup *parent);
 
     virtual void setFont(const QFont &) {}
     virtual void setSelectedFontSize(const qreal &) {}
@@ -458,7 +459,7 @@ public:
     virtual void setupBoundingBoxRenderDataForRelFrame(
             const int &relFrame, BoundingBoxRenderData *data);
 
-    virtual void createCurrentRenderData() {}
+    virtual BoundingBoxRenderData *createRenderData() { return NULL; }
 
     void schedulerProccessed();
     BoundingBoxRenderData *getCurrentRenderData();

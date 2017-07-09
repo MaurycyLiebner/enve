@@ -108,9 +108,6 @@ void Canvas::showContextMenu(QPointF globalPos) {
 BoundingBox *Canvas::createLink(BoxesGroup *parent) {
     InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this,
                                                            parent);
-    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        box->createSameTransformationLink(linkGroup);
-    }
     return linkGroup;
 }
 

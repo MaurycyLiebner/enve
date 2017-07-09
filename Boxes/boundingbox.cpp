@@ -120,10 +120,6 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
     canvas->restore();
 }
 
-BoundingBox *BoundingBox::createSameTransformationLink(BoxesGroup *parent) {
-    return new SameTransformInternalLink(this, parent);
-}
-
 bool BoundingBox::isAncestor(BoxesGroup *box) const {
     if(mParent == box) return true;
     if(mParent == NULL) return false;
@@ -643,13 +639,14 @@ void BoundingBox::finishTransform() {
 }
 
 qreal BoundingBox::getEffectsMarginAtRelFrame(const int &relFrame) {
-    mEffectsAnimators->getEffectsMarginAtRelFrame(relFrame);
+    return mEffectsAnimators->getEffectsMarginAtRelFrame(relFrame);
 }
 
 void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
     data->relFrame = relFrame;
+    data->renderedToImage = false;
     data->transform = mTransformAnimator->
             getTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
@@ -1182,7 +1179,7 @@ void BoundingBox::setUpdateVars() {
     updateRelBoundingRect();
 
     if(mCurrentRenderData == NULL) {
-        createCurrentRenderData();
+        mCurrentRenderData = createRenderData();
     }
     setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
                                           mCurrentRenderData);
@@ -1237,6 +1234,7 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
 }
 
 void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
+    renderToImage();
     SkPaint paint;
     paint.setAlpha(qRound(opacity*2.55));
     paint.setBlendMode(blendMode);
@@ -1246,6 +1244,8 @@ void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
 }
 
 void BoundingBoxRenderData::renderToImage() {
+    if(renderedToImage) return;
+    renderedToImage = true;
     QRectF allUglyBoundingRect =
             transform.mapRect(relBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,

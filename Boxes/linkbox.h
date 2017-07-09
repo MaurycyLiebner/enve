@@ -1,6 +1,6 @@
 #ifndef LINKBOX_H
 #define LINKBOX_H
-#include "boxesgroup.h"
+#include "canvas.h"
 
 class ExternalLinkBox : public BoxesGroup
 {
@@ -53,12 +53,13 @@ public:
 
     BoundingBox *createLink(BoxesGroup *parent);
 
-    BoundingBox *createSameTransformationLink(BoxesGroup *parent);
-
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
         return new InternalLinkBox(mLinkTarget, parent);
     }
 
+    BoundingBoxRenderData *createRenderData();
+    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
+                                               BoundingBoxRenderData *data);
 public slots:
     void scheduleAwaitUpdateSLOT();
 
@@ -66,68 +67,19 @@ protected:
     BoundingBox *mLinkTarget = NULL;
 };
 
-class SameTransformInternalLink : public InternalLinkBox
-{
+class InternalLinkCanvas : public BoundingBox {
     Q_OBJECT
 public:
-    SameTransformInternalLink(BoundingBox *linkTarget,
-                              BoxesGroup *parent);
-
-
-    QMatrix getRelativeTransform() const;
-
-    virtual const SkPath &getRelBoundingRectPath();
-
-    qreal getEffectsMargin();
-
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new SameTransformInternalLink(mLinkTarget, parent);
-    }
-};
-
-class InternalLinkBoxesGroup : public BoxesGroup
-{
-    Q_OBJECT
-public:
-    InternalLinkBoxesGroup(BoxesGroup *linkTarget,
-                           BoxesGroup *parent) :
-        BoxesGroup(parent) {
-        setType(TYPE_INTERNAL_LINK);
-        setLinkTarget(linkTarget);
-    }
-
-    virtual void setLinkTarget(BoxesGroup *linkTarget) {
-        mLinkTarget = linkTarget->ref<BoxesGroup>();
-    }
-
-    BoundingBox *createLink(BoxesGroup *parent) {
-        return mLinkTarget->createLink(parent);
-    }
-
-    BoundingBox *createSameTransformationLink(BoxesGroup *parent) {
-        return mLinkTarget->createSameTransformationLink(parent);
-    }
-
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new InternalLinkBoxesGroup(mLinkTarget.data(), parent);
-    }
-
-protected:
-    QSharedPointer<BoxesGroup> mLinkTarget;
-};
-
-class InternalLinkCanvas : public InternalLinkBoxesGroup {
-    Q_OBJECT
-public:
-    InternalLinkCanvas(BoxesGroup *canvas,
+    InternalLinkCanvas(Canvas *canvas,
                        BoxesGroup *parent) :
-        InternalLinkBoxesGroup(canvas, parent) {
+        BoundingBox(parent, TYPE_INTERNAL_LINK) {
+        setLinkTarget(canvas);
         updateRelBoundingRect();
         centerPivotPosition();
     }
 
-    void setLinkTarget(BoxesGroup *linkTarget) {
-        InternalLinkBoxesGroup::setLinkTarget(linkTarget);
+    void setLinkTarget(Canvas *linkTarget) {
+        mLinkTarget = linkTarget->ref<Canvas>();
         updateRelBoundingRect();
         centerPivotPosition();
     }
@@ -136,8 +88,8 @@ public:
     void setClippedToCanvasSize(const bool &clipped);
 
     void makeDuplicate(Property *targetBox) {
-        InternalLinkBoxesGroup::makeDuplicate(targetBox);
         InternalLinkCanvas *ilcTarget = (InternalLinkCanvas*)targetBox;
+        ilcTarget->setLinkTarget(mLinkTarget.data());
         ilcTarget->setClippedToCanvasSize(mClipToCanvasSize);
     }
 
@@ -145,26 +97,19 @@ public:
         return new InternalLinkCanvas(mLinkTarget.data(),
                                       parent);
     }
-protected:
-    bool mClipToCanvasSize = true;
-};
 
-class SameTransformInternalLinkBoxesGroup : public InternalLinkBoxesGroup {
-    Q_OBJECT
-public:
-    SameTransformInternalLinkBoxesGroup(BoxesGroup *linkTarget,
-                                        BoxesGroup *parent);
-
-    QMatrix getRelativeTransform() const;
-
-    virtual const SkPath &getRelBoundingRectPath();
-
-    qreal getEffectsMargin();
-
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new SameTransformInternalLinkBoxesGroup(mLinkTarget.data(),
-                                                       parent);
+    void setupBoundingBoxRenderDataForRelFrame(
+            const int &relFrame, BoundingBoxRenderData *data) {
+        mLinkTarget->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+        BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     }
+
+    BoundingBoxRenderData *createRenderData() {
+        return mLinkTarget->createRenderData();
+    }
+protected:
+    QSharedPointer<Canvas> mLinkTarget;
+    bool mClipToCanvasSize = true;
 };
 
 #endif // LINKBOX_H

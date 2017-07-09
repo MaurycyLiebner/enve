@@ -122,8 +122,8 @@ public:
                                 const int &relFrame,
                                 BoundingBoxRenderData *data);
 
-    void createCurrentRenderData() {
-        mCurrentRenderData = new PathBoxRenderData();
+    BoundingBoxRenderData *createRenderData() {
+        return new PathBoxRenderData();
     }
 protected:
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;

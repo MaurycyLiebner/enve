@@ -55,9 +55,6 @@ public:
     ~BoxesGroup();
     virtual void prp_loadFromSql(const int &boundingBoxId);
 
-    BoundingBox *createLink(BoxesGroup *parent);
-    BoundingBox *createSameTransformationLink(BoxesGroup *parent);
-
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
 
@@ -168,8 +165,8 @@ public:
     void prp_setAbsFrame(const int &frame);
     void schedulerProccessed();
 
-    void createCurrentRenderData() {
-        mCurrentRenderData = new BoxesGroupRenderData();
+    BoundingBoxRenderData *createRenderData() {
+        return new BoxesGroupRenderData();
     }
 
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
