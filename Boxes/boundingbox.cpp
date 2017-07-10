@@ -667,8 +667,6 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->effectsMargin = getEffectsMarginAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
 
-    data->transform.scale(data->resolution, data->resolution);
-
     data->pixmapEffects.clear();
     mEffectsAnimators->addEffectRenderDataToList(relFrame,
                                                  &data->pixmapEffects);
@@ -1272,8 +1270,10 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
 void BoundingBoxRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
+    QMatrix transformRes = transform;
+    //transformRes.scale(resolution, resolution);
     QRectF allUglyBoundingRect =
-            transform.mapRect(relBoundingRect).
+            transformRes.mapRect(relBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,
                      effectsMargin, effectsMargin);
     QSizeF sizeF = allUglyBoundingRect.size();
@@ -1299,7 +1299,7 @@ void BoundingBoxRenderData::renderToImage() {
     allUglyBoundingRect.translate(-transF);
 
     rasterCanvas->translate(transF.x(), transF.y());
-    rasterCanvas->concat(QMatrixToSkMatrix(transform));
+    rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
 
     drawSk(rasterCanvas);
 
