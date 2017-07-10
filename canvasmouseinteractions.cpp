@@ -437,9 +437,11 @@ void Canvas::handleMovePointMouseRelease() {
                 selectOnlyLastPressedPoint();
             }
         } else {
-            mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mCurrentMouseEventPosRel);
+            mLastPressedBox = mCurrentBoxesGroup->getBoxAt(
+                        mCurrentMouseEventPosRel);
             if((mLastPressedBox == NULL) ? true : mLastPressedBox->isGroup()) {
-                BoundingBox *pressedBox = getPathAtFromAllAncestors(mCurrentMouseEventPosRel);
+                BoundingBox *pressedBox = getPathAtFromAllAncestors(
+                            mCurrentMouseEventPosRel);
                 if(pressedBox == NULL) {
                     if(!(isShiftPressed()) ) {
                         clearPointsSelectionOrDeselect();
@@ -450,6 +452,7 @@ void Canvas::handleMovePointMouseRelease() {
                     clearLastPressedPoint();
                     setCurrentBoxesGroup((BoxesGroup*) pressedBox->getParent());
                     addBoxToSelection(pressedBox);
+                    mLastPressedBox = pressedBox;
                 }
             }
             if(mLastPressedBox != NULL) {

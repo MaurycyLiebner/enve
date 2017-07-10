@@ -60,15 +60,6 @@ void ParticleBox::updateRelBoundingRect() {
     BoundingBox::updateRelBoundingRect();
 }
 
-void ParticleBox::preUpdatePixmapsUpdates() {
-    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-        emitter->generateParticlesIfNeeded();
-        emitter->updateParticlesForFrameIfNeeded(mUpdateRelFrame);
-    }
-
-    BoundingBox::preUpdatePixmapsUpdates();
-}
-
 bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
     if(mSkRelBoundingRectPath.contains(relPos.x(), relPos.y()) ) {
         /*if(mEmitters.isEmpty()) */return true;
@@ -86,6 +77,15 @@ bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
 void ParticleBox::addEmitter(ParticleEmitter *emitter) {
     mEmitters << emitter;
     ca_addChildAnimator(emitter);
+    mFrameChangedUpdateScheduled = true;
+    scheduleSoftUpdate();
+}
+
+void ParticleBox::removeEmitter(ParticleEmitter *emitter) {
+    mEmitters.removeOne(emitter);
+    ca_removeChildAnimator(emitter);
+    mFrameChangedUpdateScheduled = true;
+    scheduleSoftUpdate();
 }
 
 BoundingBox *ParticleBox::createNewDuplicate(BoxesGroup *parent) {
@@ -108,13 +108,14 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
 }
 
 void ParticleBox::setUpdateVars() {
-    BoundingBox::setUpdateVars();
     if(mFrameChangedUpdateScheduled) {
         mFrameChangedUpdateScheduled = false;
         Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-            emitter->scheduleUpdateParticlesForFrame();
+            emitter->generateParticlesIfNeeded();
+            emitter->updateParticlesForFrameIfNeeded(mUpdateRelFrame);
         }
     }
+    BoundingBox::setUpdateVars();
 }
 
 bool ParticleBox::SWT_isParticleBox() { return true; }
@@ -445,6 +446,9 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
 
     prp_setUpdater(new ParticlesUpdater(this));
     prp_blockUpdater();
+
+    scheduleGenerateParticles();
+    scheduleUpdateParticlesForFrame();
 }
 
 void ParticleEmitter::setParentBox(ParticleBox *parentBox) {

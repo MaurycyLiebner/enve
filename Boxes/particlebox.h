@@ -240,7 +240,6 @@ public:
                            QPointF *acc);
     void prp_setAbsFrame(const int &frame);
     void updateRelBoundingRect();
-    void preUpdatePixmapsUpdates();
     bool relPointInsidePath(const QPointF &relPos);
 
     void addEmitter(ParticleEmitter *emitter);
@@ -291,6 +290,7 @@ public:
                       mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
     }
 
+    void removeEmitter(ParticleEmitter *emitter);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:
