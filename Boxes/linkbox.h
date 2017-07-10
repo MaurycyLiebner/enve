@@ -33,7 +33,7 @@ public:
     InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent);
 
     void setLinkTarget(BoundingBox *linkTarget) {
-        mLinkTarget = linkTarget;
+        mLinkTarget = linkTarget->ref<BoundingBox>();
         scheduleSoftUpdate();
         if(linkTarget == NULL) {
             setName("Link Empty");
@@ -54,17 +54,24 @@ public:
     BoundingBox *createLink(BoxesGroup *parent);
 
     BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new InternalLinkBox(mLinkTarget, parent);
+        return new InternalLinkBox(mLinkTarget.data(), parent);
     }
 
     BoundingBoxRenderData *createRenderData();
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
+
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2) {
+        return mLinkTarget->prp_differencesBetweenRelFrames(relFrame1,
+                                                            relFrame2);
+    }
+
 public slots:
     void scheduleAwaitUpdateSLOT();
 
 protected:
-    BoundingBox *mLinkTarget = NULL;
+    QSharedPointer<BoundingBox> mLinkTarget;
 };
 
 class InternalLinkCanvas : public BoundingBox {
@@ -73,12 +80,20 @@ public:
     InternalLinkCanvas(Canvas *canvas,
                        BoxesGroup *parent) :
         BoundingBox(parent, TYPE_INTERNAL_LINK) {
+        mClipToCanvasSize->prp_setName("clip to size");
+        mClipToCanvasSize->setValue(true);
+        mRastarized->prp_setName("rastarized");
+        mRastarized->setValue(false);
         setLinkTarget(canvas);
         updateRelBoundingRect();
         centerPivotPosition();
+
+        ca_addChildAnimator(mClipToCanvasSize.data());
+        ca_addChildAnimator(mRastarized.data());
     }
 
     void setLinkTarget(Canvas *linkTarget) {
+        setName(linkTarget->getName());
         mLinkTarget = linkTarget->ref<Canvas>();
         updateRelBoundingRect();
         centerPivotPosition();
@@ -107,9 +122,18 @@ public:
     BoundingBoxRenderData *createRenderData() {
         return mLinkTarget->createRenderData();
     }
+
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2) {
+        return mLinkTarget->prp_differencesBetweenRelFrames(relFrame1,
+                                                            relFrame2);
+    }
 protected:
     QSharedPointer<Canvas> mLinkTarget;
-    bool mClipToCanvasSize = true;
+    QSharedPointer<BoolProperty> mClipToCanvasSize =
+            (new BoolProperty())->ref<BoolProperty>();
+    QSharedPointer<BoolProperty> mRastarized =
+            (new BoolProperty())->ref<BoolProperty>();
 };
 
 #endif // LINKBOX_H

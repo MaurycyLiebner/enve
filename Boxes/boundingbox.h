@@ -82,6 +82,7 @@ struct BoundingBoxRenderData {
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
 
     virtual void drawRenderedImage(SkCanvas *canvas);
+    virtual void drawRenderedImageForParent(SkCanvas *canvas);
     void renderToImage();
     sk_sp<SkImage> renderedImage;
 private:
@@ -464,6 +465,9 @@ public:
     void schedulerProccessed();
     BoundingBoxRenderData *getCurrentRenderData();
     qreal getEffectsMarginAtRelFrame(const int &relFrame);
+
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2);
 protected:
     BoundingBoxRenderData *mCurrentRenderData = NULL;
     bool mCustomFpsEnabled = false;
@@ -495,7 +499,6 @@ protected:
     virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
 
 
-    RenderContainer mUpdateRenderContainer;
     RenderContainer mDrawRenderContainer;
 
     int mUpdateRelFrame = 0;

@@ -132,6 +132,10 @@ public:
 
     bool SWT_isProperty() { return true; }
 
+    virtual bool prp_differencesBetweenRelFrames(const int &,
+                                                 const int &) {
+        return false;
+    }
 public slots:
     virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 

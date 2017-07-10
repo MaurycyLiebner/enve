@@ -37,10 +37,12 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
 private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
+
+        canvas->concat(QMatrixToSkMatrix(transform.inverted()));
         Q_FOREACH(BoundingBoxRenderData *renderData,
                   childrenRenderData) {
             //box->draw(p);
-            renderData->drawRenderedImage(canvas);
+            renderData->drawRenderedImageForParent(canvas);
         }
 
         canvas->restore();
@@ -172,6 +174,8 @@ public:
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
 
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

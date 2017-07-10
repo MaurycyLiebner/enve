@@ -44,6 +44,19 @@ void BoxesGroup::clearAllCache() {
     }
 }
 
+bool BoxesGroup::prp_differencesBetweenRelFrames(const int &relFrame1,
+                                                 const int &relFrame2) {
+    bool differences =
+            BoundingBox::prp_differencesBetweenRelFrames(relFrame1,
+                                                         relFrame2);
+    if(differences) return true;
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        if(child->prp_differencesBetweenRelFrames(relFrame1,
+                                                  relFrame2)) return true;
+    }
+    return false;
+}
+
 void BoxesGroup::updateCombinedTransformTmp() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateCombinedTransformTmp();

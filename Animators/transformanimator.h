@@ -42,6 +42,7 @@ public:
     void moveRelativeToSavedValue(const qreal &dX,
                                   const qreal &dY);
     virtual QMatrix getCurrentTransformationMatrix();
+    virtual QMatrix getTransformMatrixAtRelFrame(const int &relFrame);
 
     qreal dx();
     qreal dy();
@@ -71,6 +72,8 @@ public:
     void makeDuplicate(BasicTransformAnimator *target);
 
     bool SWT_isBasicTransformAnimator() { return true; }
+
+    QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
 protected:
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;

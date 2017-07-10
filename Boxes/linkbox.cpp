@@ -46,7 +46,7 @@ qreal InternalLinkBox::getEffectsMargin() {
 }
 
 BoundingBox *InternalLinkBox::getLinkTarget() {
-    return mLinkTarget;
+    return mLinkTarget.data();
 }
 
 BoundingBox *InternalLinkBox::createLink(BoxesGroup *parent) {
@@ -83,7 +83,7 @@ bool InternalLinkBox::relPointInsidePath(const QPointF &point)
 }
 
 void InternalLinkCanvas::updateRelBoundingRect() {
-    if(mClipToCanvasSize) {
+    if(mClipToCanvasSize->getValue()) {
         //        QPainterPath boundingPaths = QPainterPath();
         //        Q_FOREACH(BoundingBox *child, mChildren) {
         //            boundingPaths.addPath(
@@ -103,7 +103,7 @@ void InternalLinkCanvas::updateRelBoundingRect() {
 }
 
 void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
-    mClipToCanvasSize = clipped;
+    mClipToCanvasSize->setValue(clipped);
     scheduleSoftUpdate();
 }
 

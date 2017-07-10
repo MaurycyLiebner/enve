@@ -353,6 +353,7 @@ void BoundingBox::resetRotation() {
 }
 
 void BoundingBox::prp_setAbsFrame(const int &frame) {
+    int lastRelFrame = anim_mCurrentRelFrame;
     ComplexAnimator::prp_setAbsFrame(frame);
     if(mDurationRectangle != NULL) {
         int minDurRelFrame = mDurationRectangle->getMinFrameAsRelFrame();
@@ -368,6 +369,19 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
             }
         }
     }
+    if(prp_differencesBetweenRelFrames(lastRelFrame,
+                                       anim_mCurrentRelFrame)) {
+        scheduleSoftUpdate();
+    }
+}
+
+bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
+                                                  const int &relFrame2) {
+    bool differences =
+            ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
+                                                             relFrame2);
+    if(differences || mDurationRectangle == NULL) return differences;
+    return mDurationRectangle->hasAnimationFrameRange();
 }
 
 void BoundingBox::setParent(BoxesGroup *parent,
@@ -648,7 +662,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->relFrame = relFrame;
     data->renderedToImage = false;
     data->transform = mTransformAnimator->
-            getTransformMatrixAtRelFrame(relFrame);
+            getCombinedTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
     data->effectsMargin = getEffectsMarginAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
@@ -1243,6 +1257,18 @@ void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
                       &paint);
 }
 
+void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
+    canvas->save();
+    renderToImage();
+    SkPaint paint;
+    paint.setAlpha(qRound(opacity*2.55));
+    paint.setBlendMode(blendMode);
+    canvas->drawImage(renderedImage,
+                      drawPos.x(), drawPos.y(),
+                      &paint);
+    canvas->restore();
+}
+
 void BoundingBoxRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
@@ -1286,7 +1312,7 @@ void BoundingBoxRenderData::renderToImage() {
     //    }
 
     drawPos = SkPoint::Make(qRound(allUglyBoundingRect.left()),
-                            qRound(allUglyBoundingRect.top()))*resolution;
+                            qRound(allUglyBoundingRect.top()));
 
     if(!pixmapEffects.isEmpty()) {
         SkPixmap pixmap;

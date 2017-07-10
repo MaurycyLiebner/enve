@@ -134,6 +134,19 @@ QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
     return matrix;
 }
 
+QMatrix BasicTransformAnimator::getTransformMatrixAtRelFrame(
+                                    const int &relFrame) {
+    QMatrix matrix;
+
+    matrix.translate(mPosAnimator->getXValueAtRelFrame(relFrame),
+                     mPosAnimator->getYValueAtRelFrame(relFrame));
+
+    matrix.rotate(mRotAnimator->qra_getValueAtRelFrame(relFrame) );
+    matrix.scale(mScaleAnimator->getXValueAtRelFrame(relFrame),
+                 mScaleAnimator->getYValueAtRelFrame(relFrame) );
+    return matrix;
+}
+
 void BasicTransformAnimator::duplicatePosAnimatorFrom(
                         QPointFAnimator *source) {
     source->makeDuplicate(mPosAnimator.data());
@@ -486,6 +499,17 @@ QMatrix BoxTransformAnimator::getTransformMatrixAtRelFrame(
     matrix.translate(-pivotX,
                      -pivotY);
     return matrix;
+}
+
+QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrame(
+                                    const int &relFrame) {
+    if(mParentTransformAnimator.data() == NULL) {
+        return getTransformMatrixAtRelFrame(relFrame);
+    } else {
+        return getTransformMatrixAtRelFrame(relFrame)*
+                mParentTransformAnimator->
+                    getCombinedTransformMatrixAtRelFrame(relFrame);
+    }
 }
 
 void BoxTransformAnimator::makeDuplicate(BoxTransformAnimator *target) {

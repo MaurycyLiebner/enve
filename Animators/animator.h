@@ -99,6 +99,8 @@ public:
     void anim_setRecordingValue(const bool &rec);
 
     bool SWT_isAnimator() { return true; }
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2);
 protected:
     int anim_getKeyIndex(Key *key);
 

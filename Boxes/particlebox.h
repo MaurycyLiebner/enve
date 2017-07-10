@@ -34,6 +34,40 @@ struct ParticleState {
     unsigned char opacity;
 };
 
+struct EmitterData {
+    void drawParticles(SkCanvas *canvas) const {
+        canvas->save();
+        SkPaint paint;
+        paint.setAntiAlias(true);
+        paint.setColor(color);
+        paint.setStrokeCap(SkPaint::kRound_Cap);
+        paint.setStyle(SkPaint::kStroke_Style);
+        Q_FOREACH(const ParticleState &state, particleStates) {
+            state.drawSk(canvas, paint);
+        }
+        canvas->restore();
+    }
+
+    SkColor color;
+    QList<ParticleState> particleStates;
+};
+
+struct ParticleBoxRenderData : public BoundingBoxRenderData {
+    QList<EmitterData> emittersData;
+    SkRect clipRect;
+private:
+    void drawSk(SkCanvas *canvas) {
+        canvas->save();
+
+        canvas->clipRect(clipRect);
+        Q_FOREACH(const EmitterData &emitterData, emittersData) {
+            emitterData.drawParticles(canvas);
+        }
+
+        canvas->restore();
+    }
+};
+
 class Particle {
 public:
     Particle(ParticleBox *parentBox);
@@ -124,6 +158,21 @@ public:
 
     ColorAnimator *getColorAnimator();
     MovablePoint *getPosPoint();
+
+    EmitterData getEmitterDataAtRelFrame(const int &relFrame) {
+        EmitterData data;
+        data.color = mColorAnimator->getColorAtRelFrame(relFrame).getSkColor();
+
+        Q_FOREACH(Particle *particle, mParticles) {
+            if(particle->isVisibleAtFrame(relFrame)) {
+                data.particleStates <<
+                    particle->getParticleStateAtFrame(relFrame);
+            }
+        }
+
+        return data;
+    }
+
 private:
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;
@@ -218,6 +267,30 @@ public:
     void setUpdateVars();
 
     bool SWT_isParticleBox();
+
+    BoundingBoxRenderData *createRenderData() {
+        return new ParticleBoxRenderData();
+    }
+
+    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
+                                               BoundingBoxRenderData *data) {
+        BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+        ParticleBoxRenderData *particleData = (ParticleBoxRenderData*)data;
+        particleData->emittersData.clear();
+        foreach(ParticleEmitter *emitter, mEmitters) {
+            particleData->emittersData << emitter->getEmitterDataAtRelFrame(
+                                              relFrame);
+        }
+        particleData->relBoundingRect = getBoundingRectAtRelFrame(relFrame);
+
+        particleData->clipRect = QRectFToSkRect(particleData->relBoundingRect);
+    }
+
+    QRectF getBoundingRectAtRelFrame(const int &relFrame) {
+        return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
+                      mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
+    }
+
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

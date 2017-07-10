@@ -67,7 +67,6 @@ public:
     int getChildPropertyIndex(Property *child);
 
     void ca_updateDescendatKeyFrame(Key *key);
-
 public slots:
     void prp_setRecording(const bool &rec);
 

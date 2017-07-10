@@ -55,6 +55,8 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mImageSk = data->renderedImage;
     mDrawPos = data->drawPos;
     mPaintTransform.reset();
+    mPaintTransform.scale(1./mResolutionFraction,
+                          1./mResolutionFraction);
 }
 
 void RenderContainer::duplicateFrom(RenderContainer *src) {

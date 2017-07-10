@@ -46,7 +46,8 @@ bool CacheHandler::getRenderContainterIdAtRelFrame(const int &relFrame,
     return false;
 }
 
-int CacheHandler::getRenderContainterInsertIdAtRelFrame(const int &relFrame) {
+int CacheHandler::getRenderContainterInsertIdAtRelFrame(
+                    const int &relFrame) {
     int minId = 0;
     int maxId = mRenderContainers.count();
 
@@ -69,7 +70,8 @@ int CacheHandler::getRenderContainterInsertIdAtRelFrame(const int &relFrame) {
     return 0;
 }
 
-CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(const int &frame) {
+CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(
+                                const int &frame) {
     CacheContainer *cont = new CacheContainer();
     cont->setParentCacheHandler(this);
     cont->setRelFrame(frame);
@@ -208,7 +210,8 @@ void RenderCacheHandler::clearCacheForRelFrameRange(const int &minFrame,
 }
 
 #include <QDebug>
-CacheContainer *RenderCacheHandler::createNewRenderContainerAtRelFrame(const int &frame) {
+CacheContainer *RenderCacheHandler::createNewRenderContainerAtRelFrame(
+                                        const int &frame) {
     RenderContainer *cont = new RenderContainer();
     cont->setParentCacheHandler(this);
     cont->setRelFrame(frame);
