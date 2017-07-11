@@ -51,8 +51,8 @@ public:
 
     void apply(BoundingBox *box);
 protected:
-    Color mColor;
-    PaintType mPaintType = NOPAINT;
+    Color mColor = Color(0, 0, 0);
+    PaintType mPaintType = FLATPAINT;//NOPAINT;
     Gradient *mGradient = NULL;
 };
 
@@ -78,10 +78,11 @@ public:
 
     void apply(BoundingBox *box, const qreal &scale);
 protected:
-    qreal mLineWidth;
+    qreal mLineWidth = 0.;
     Qt::PenCapStyle mCapStyle = Qt::RoundCap;
     Qt::PenJoinStyle mJoinStyle = Qt::RoundJoin;
-    QPainter::CompositionMode mOutlineCompositionMode = QPainter::CompositionMode_Source;
+    QPainter::CompositionMode mOutlineCompositionMode =
+            QPainter::CompositionMode_Source;
 };
 
 class BoundingBoxSvgAttributes {
@@ -105,6 +106,8 @@ public:
     void applySingleTransformations(BoundingBox *box);
 
     void apply(BoundingBox *box);
+    void setFillAttribute(const QString &value);
+    void setStrokeAttribute(const QString &value);
 protected:
     qreal mDx = 0.;
     qreal mDy = 0.;

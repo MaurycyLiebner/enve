@@ -264,8 +264,8 @@ static void parseNumbersArray(const QChar *&str,
     }
 }
 
-bool parsePathDataFast(const QString &dataStr, VectorPathSvgAttributes *attributes)
-{
+bool parsePathDataFast(const QString &dataStr,
+                       VectorPathSvgAttributes *attributes) {
     qreal x0 = 0, y0 = 0;              // starting point
     qreal x = 0, y = 0;                // current point
     char lastMode = 0;
@@ -608,6 +608,53 @@ bool parsePathDataFast(const QString &dataStr, VectorPathSvgAttributes *attribut
     return true;
 }
 
+
+bool parsePolylineDataFast(const QString &dataStr,
+                       VectorPathSvgAttributes *attributes) {
+    qreal x0 = 0, y0 = 0;              // starting point
+    qreal x = 0, y = 0;                // current point
+    const QChar *str = dataStr.constData();
+    const QChar *end = str + dataStr.size();
+
+    SvgSeparatePath *lastPath = NULL;
+    while (str != end) {
+        while (str->isSpace())
+            ++str;
+        QChar endc = *end;
+        *const_cast<QChar *>(end) = 0; // parseNumbersArray requires 0-termination that QStringRef cannot guarantee
+        QVarLengthArray<qreal, 8> arg;
+        parseNumbersArray(str, arg);
+        *const_cast<QChar *>(end) = endc;
+        const qreal *num = arg.constData();
+        int count = arg.count();
+        bool first = true;
+        while (count > 0) {
+            x = num[0];
+            y = num[1];
+            num++;
+            num++;
+            count -= 2;
+            if(count < 0) {
+                if(qAbs(x - x0) < 0.001 &&
+                   qAbs(y - y0) < 0.001) {
+                    lastPath->closePath();
+                    return true;
+                }
+            }
+            if(first) {
+                x0 = x;
+                y0 = y;
+                lastPath = attributes->newSeparatePath();
+                lastPath->moveTo(QPointF(x0, y0));
+                first = false;
+            } else {
+                lastPath->lineTo(QPointF(x, y));
+            }
+        }
+    }
+    return true;
+}
+
 BoundingBoxSvgAttributes::BoundingBoxSvgAttributes() {}
 
 BoundingBoxSvgAttributes::~BoundingBoxSvgAttributes() {}
@@ -633,6 +680,28 @@ const FillSvgAttributes &BoundingBoxSvgAttributes::getFillAttributes() const { r
 const StrokeSvgAttributes &BoundingBoxSvgAttributes::getStrokeAttributes() const { return mStrokeAttributes; }
 
 const TextSvgAttributes &BoundingBoxSvgAttributes::getTextAttributes() const { return mTextAttributes; }
+
+void BoundingBoxSvgAttributes::setFillAttribute(const QString &value) {
+    if(value.contains("none")) {
+        mFillAttributes.setPaintType(NOPAINT);
+    } else {
+        mFillAttributes.setPaintType(FLATPAINT);
+        Color color;
+        getColorFromString(value, &color);
+        mFillAttributes.setColor(color);
+    }
+}
+
+void BoundingBoxSvgAttributes::setStrokeAttribute(const QString &value) {
+    if(value.contains("none")) {
+        mStrokeAttributes.setPaintType(NOPAINT);
+    } else {
+        mStrokeAttributes.setPaintType(FLATPAINT);
+        Color color;
+        getColorFromString(value, &color);
+        mStrokeAttributes.setColor(color);
+    }
+}
 
 void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &element) {
     QList<SvgAttribute> styleAttributes;
@@ -667,14 +736,7 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
 
         case 'f':
             if (name == "fill") {
-                if(value.contains("none")) {
-                    mFillAttributes.setPaintType(NOPAINT);
-                } else {
-                    mFillAttributes.setPaintType(FLATPAINT);
-                    Color color;
-                    getColorFromString(value, &color);
-                    mFillAttributes.setColor(color);
-                }
+                setFillAttribute(value);
             } else if (name == "fill-rule") {
                 if(value == "nonzero") {
                     mFillRule = Qt::WindingFill;
@@ -744,14 +806,7 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
         case 's':
             if(name.contains("stroke")) {
                 if(name == "stroke") {
-                    if(value.contains("none")) {
-                        mStrokeAttributes.setPaintType(NOPAINT);
-                    } else {
-                        mStrokeAttributes.setPaintType(FLATPAINT);
-                        Color color;
-                        getColorFromString(value, &color);
-                        mStrokeAttributes.setColor(color);
-                    }
+                    setStrokeAttribute(value);
                 } else if (name == "stroke-dasharray") {
                     //strokeDashArray = value;
                 } else if (name == "stroke-dashoffset") {
@@ -825,6 +880,17 @@ void BoundingBoxSvgAttributes::loadBoundingBoxAttributes(const QDomElement &elem
         }
     }
 
+    QString fillAttributesStr = element.attribute("fill");
+    if(!fillAttributesStr.isEmpty()) {
+        setFillAttribute(fillAttributesStr);
+    }
+
+    QString strokeAttributesStr = element.attribute("stroke");
+    if(!strokeAttributesStr.isEmpty()) {
+        setStrokeAttribute(strokeAttributesStr);
+    }
+
+
     QString matrixStr = element.attribute("transform");
     if(!matrixStr.isEmpty()) {
         mRelTransform = getMatrixFromString(matrixStr)*mRelTransform;
@@ -870,12 +936,23 @@ void BoundingBoxSvgAttributes::applySingleTransformations(BoundingBox *box) {
     animator->setRotation(mRot);
 }
 
-void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup,
+void loadVectorPath(const QDomElement &pathElement,
+                    BoxesGroup *parentGroup,
                     VectorPathSvgAttributes *attributes) {
     VectorPath *vectorPath = new VectorPath(parentGroup);
 
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
+    attributes->apply(vectorPath);
+}
+
+void loadPolyline(const QDomElement &pathElement,
+                  BoxesGroup *parentGroup,
+                  VectorPathSvgAttributes *attributes) {
+    VectorPath *vectorPath = new VectorPath(parentGroup);
+
+    QString pathStr = pathElement.attribute("points");
+    parsePolylineDataFast(pathStr, attributes);
     attributes->apply(vectorPath);
 }
 
@@ -891,6 +968,11 @@ void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
         attributes *= (*parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         loadVectorPath(element, parentGroup, &attributes);
+    } else if(element.tagName() == "polyline") {
+        VectorPathSvgAttributes attributes;
+        attributes *= (*parentGroupAttributes);
+        attributes.loadBoundingBoxAttributes(element);
+        loadPolyline(element, parentGroup, &attributes);
     }
 }
 
@@ -1743,6 +1825,7 @@ void FillSvgAttributes::setPaintType(const PaintType &type) {
 
 void FillSvgAttributes::setGradient(Gradient *gradient) {
     mGradient = gradient;
+    if(gradient == NULL) return;
     setPaintType(GRADIENTPAINT);
 }
 
@@ -1777,8 +1860,8 @@ StrokeSvgAttributes::StrokeSvgAttributes() {}
 
 StrokeSvgAttributes &StrokeSvgAttributes::operator*=(const StrokeSvgAttributes &overwritter) {
     setColor(overwritter.getColor());
-    setPaintType(overwritter.getPaintType());
     setGradient(overwritter.getGradient());
+    setPaintType(overwritter.getPaintType());
 
     setLineWidth(overwritter.getLineWidth());
     setCapStyle(overwritter.getCapStyle());
