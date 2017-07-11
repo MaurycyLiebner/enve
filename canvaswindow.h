@@ -257,6 +257,8 @@ public slots:
 
     void groupSelectedBoxes();
     void ungroupSelectedBoxes();
+    void rotate90CWAction();
+    void rotate90CCWAction();
 private slots:
     void sendNextUpdatableForUpdate();
     void nextSaveOutputFrame();

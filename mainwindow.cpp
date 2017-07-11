@@ -262,11 +262,12 @@ void MainWindow::setupMenuBar() {
                            mCanvasWindow, SLOT(lowerToBottomAction()))->
             setShortcut(Qt::Key_End);
     mObjectMenu->addSeparator();
-    mObjectMenu->addAction("Rotate 90° CW")->
-            setShortcut(Qt::SHIFT + Qt::RightArrow);
+    mObjectMenu->addAction("Rotate 90° CW",
+                           mCanvasWindow, SLOT(rotate90CWAction()),
+                           Qt::SHIFT + Qt::Key_Right);
     mObjectMenu->addAction("Rotate 90° CCW",
-                           mCanvasWindow, SLOT(rotate90CCW()),
-                           Qt::SHIFT + Qt::LeftArrow);
+                           mCanvasWindow, SLOT(rotate90CCWAction()),
+                           Qt::SHIFT + Qt::Key_Left);
     mObjectMenu->addAction("Flip Horizontal")->
             setShortcut(Qt::Key_H);
     mObjectMenu->addAction("Flip Vertical")->

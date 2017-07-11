@@ -1,5 +1,6 @@
 #include "canvas.h"
 #include "mainwindow.h"
+#include "pathpivot.h"
 
 void Canvas::convertSelectedBoxesToPath() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
@@ -217,6 +218,24 @@ VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
         }
     }
     return NULL;
+}
+
+void Canvas::rotateSelectedBoxesStartAndFinish(const qreal &rotBy) {
+    if(mLocalPivot) {
+        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+            box->startRotTransform();
+            box->rotateBy(rotBy);
+            box->finishTransform();
+        }
+    } else {
+        Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+            box->startRotTransform();
+            box->startPosTransform();
+            box->saveTransformPivotAbsPos(mRotPivot->getAbsolutePos());
+            box->rotateRelativeToSavedPivot(rotBy);
+            box->finishTransform();
+        }
+    }
 }
 
 void Canvas::rotateSelectedBy(const qreal &rotBy,

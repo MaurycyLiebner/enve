@@ -409,6 +409,7 @@ public:
     void duplicateAction();
     void selectAllAction();
     void clearSelectionAction();
+    void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
 protected:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;

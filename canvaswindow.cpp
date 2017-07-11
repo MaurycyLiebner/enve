@@ -326,6 +326,18 @@ void CanvasWindow::strokeToPathAction() {
     callUpdateSchedulers();
 }
 
+void CanvasWindow::rotate90CWAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(90.);
+    callUpdateSchedulers();
+}
+
+void CanvasWindow::rotate90CCWAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->rotateSelectedBoxesStartAndFinish(-90.);
+    callUpdateSchedulers();
+}
+
 void CanvasWindow::pathsUnionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsUnion();
