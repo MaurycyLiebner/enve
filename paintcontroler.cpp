@@ -1,11 +1,14 @@
 #include "paintcontroler.h"
 
-PaintControler::PaintControler(QObject *parent) : QObject(parent)
-{
-
+PaintControler::PaintControler(const int &id,
+                               QObject *parent) : QObject(parent) {
+    mId = id;
 }
 
-void PaintControler::updateUpdatable(Updatable *updatable) {
-    updatable->processUpdate();
-    emit finishedUpdating();
+void PaintControler::updateUpdatable(Updatable *updatable,
+                                     const int &targetId) {
+    if(targetId == mId) {
+        updatable->processUpdate();
+        emit finishedUpdating(mId);
+    }
 }

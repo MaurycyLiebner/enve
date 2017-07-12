@@ -112,6 +112,28 @@ public:
     void updateAllBoxes();
 
     void updateRelBoundingRect();
+    void forceUpdateRelBoundingRect() {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+            child->forceUpdateRelBoundingRect();
+        }
+        updateRelBoundingRect();
+    }
+
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
+        SkPath boundingPaths = SkPath();
+        Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+            SkPath childPath;
+            childPath.addRect(
+                        QRectFToSkRect(
+                            child->getRelBoundingRectAtRelFrame(relFrame)));
+            childPath.transform(
+                        QMatrixToSkMatrix(
+                            child->getRelativeTransform()));
+            boundingPaths.addPath(childPath);
+        }
+        return SkRectToQRectF(boundingPaths.computeTightBounds());
+    }
+
     void applyCurrentTransformation();
 
     bool relPointInsidePath(const QPointF &relPos);

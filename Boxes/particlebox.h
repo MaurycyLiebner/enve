@@ -280,12 +280,11 @@ public:
             particleData->emittersData << emitter->getEmitterDataAtRelFrame(
                                               relFrame);
         }
-        particleData->relBoundingRect = getBoundingRectAtRelFrame(relFrame);
 
         particleData->clipRect = QRectFToSkRect(particleData->relBoundingRect);
     }
 
-    QRectF getBoundingRectAtRelFrame(const int &relFrame) {
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
         return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
                       mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
     }

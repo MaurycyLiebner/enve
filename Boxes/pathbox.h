@@ -80,6 +80,13 @@ public:
     int saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
     void updateRelBoundingRect();
+    void forceUpdateRelBoundingRect() {
+        updatePathIfNeeded();
+        updateOutlinePathIfNeeded();
+        updateRelBoundingRect();
+    }
+
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
     void setUpdateVars();
 

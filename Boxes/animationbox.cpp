@@ -3,6 +3,7 @@
 #include "Animators/animatorupdater.h"
 #include "canvas.h"
 #include "filesourcescache.h"
+#include "imagebox.h"
 
 AnimationBox::AnimationBox(BoxesGroup *parent) :
     BoundingBox(parent, TYPE_IMAGE) {
@@ -59,15 +60,17 @@ void AnimationBox::reloadFile() {
 }
 
 void AnimationBox::schedulerProccessed() {
-    mUpdateAnimationFrame = mCurrentAnimationFrame;
+    //mUpdateAnimationFrame = mCurrentAnimationFrame;
     qDebug() << "animationbox scheduler processed ";
     BoundingBox::schedulerProccessed();
 }
 
 void AnimationBox::scheduleUpdate() {
+    mUpdateAnimationFrame = mCurrentAnimationFrame;
     if(mAnimationCacheHandler->getFrameAtFrame(
-                mCurrentAnimationFrame).get() == NULL) {
-        mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
+                mUpdateAnimationFrame).get() == NULL) {
+        mAnimationCacheHandler->scheduleFrameLoad(mUpdateAnimationFrame)->
+                addDependent(this);
     }
     mNewCurrentFrameUpdateNeeded = false;
     BoundingBox::scheduleUpdate();
@@ -122,32 +125,19 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
 }
 
 void AnimationBox::afterSuccessfulUpdate() {
+    sk_sp<SkImage> image = ((ImageBoxRenderData*)mCurrentRenderData)->image;
     mRelBoundingRect = QRectF(0., 0.,
-                              mUpdateAnimationImageSk->width(),
-                              mUpdateAnimationImageSk->height());
+                              image->width(),
+                              image->height());
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     updateRelBoundingRect();
 }
 
-void AnimationBox::setUpdateVars() {
-    mUpdateAnimationImageSk = mAnimationCacheHandler->getFrameAtFrame(
-                mUpdateAnimationFrame);
-    BoundingBox::setUpdateVars();
-//    CacheContainer *cont =
-//            mAnimationFramesCache.getRenderContainerAtRelFrame(
-//                mUpdateAnimationFrame);
-
-//    if(cont != NULL) {
-//        mUpdateAnimationImageSk = cont->getImageSk();
-//        updateUpdateRelBoundingRectFromImage();
-//    }
-}
-
-void AnimationBox::drawSk(SkCanvas *canvas) {
-    SkPaint paint;
-    //paint.setFilterQuality(kHigh_SkFilterQuality);
-    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
-}
+//void AnimationBox::drawSk(SkCanvas *canvas) {
+//    SkPaint paint;
+//    //paint.setFilterQuality(kHigh_SkFilterQuality);
+//    canvas->drawImage(mUpdateAnimationImageSk, 0, 0, &paint);
+//}
 
 void AnimationBox::addActionsToMenu(QMenu *menu) {
     menu->addAction("Reload")->setObjectName("ab_reload");
@@ -171,4 +161,11 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
                                 BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
                                                        data);
+    ImageBoxRenderData *imageData = (ImageBoxRenderData*)data;
+    imageData->image = mAnimationCacheHandler->getFrameAtFrame(
+                                    mUpdateAnimationFrame);;
+}
+
+BoundingBoxRenderData *AnimationBox::createRenderData() {
+    return new ImageBoxRenderData();
 }

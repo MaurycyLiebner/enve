@@ -16,17 +16,9 @@ public:
         return mFilePath;
     }
 
-    void beforeUpdate();
-
-    void afterUpdate();
-
     virtual void clearCache() = 0;
-    void addScheduler();
-    void schedulerProccessed();
 protected:
     QString mFilePath;
-
-    bool mLoadingScheduled = false;
 };
 
 class FileSourcesCache {
@@ -62,7 +54,7 @@ public:
 
     virtual void clearCache() {}
 
-    virtual void scheduleFrameLoad(const int &frame) = 0;
+    virtual Updatable *scheduleFrameLoad(const int &frame) = 0;
     const int &getFramesCount() { return mFramesCount; }
 protected:
 
@@ -78,7 +70,7 @@ public:
 
     void updateFrameCount();
 
-    void scheduleFrameLoad(const int &frame);
+    Updatable *scheduleFrameLoad(const int &frame);
 protected:
     QStringList mFramePaths;
     QList<ImageCacheHandler*> mFrameImageHandlers;
@@ -101,7 +93,7 @@ public:
 
     const qreal &getFps();
 
-    virtual void scheduleFrameLoad(const int &frame);
+    virtual Updatable *scheduleFrameLoad(const int &frame);
 protected:
     QList<int> mFramesLoadScheduled;
 

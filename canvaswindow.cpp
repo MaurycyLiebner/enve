@@ -17,15 +17,23 @@
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
-    mPaintControlerThread = new QThread(this);
-    mPaintControler = new PaintControler();
-    mPaintControler->moveToThread(mPaintControlerThread);
-    connect(mPaintControler, SIGNAL(finishedUpdating()),
-            this, SLOT(sendNextUpdatableForUpdate()) );
-    connect(this, SIGNAL(updateUpdatable(Updatable*)),
-            mPaintControler, SLOT(updateUpdatable(Updatable*)) );
+    int numberThreads = 1;//qMax(1, QThread::idealThreadCount() - 1);
+    for(int i = 0; i < numberThreads; i++) {
+        QThread *paintControlerThread = new QThread(this);
+        PaintControler *paintControler = new PaintControler(i);
+        paintControler->moveToThread(paintControlerThread);
+        connect(paintControler, SIGNAL(finishedUpdating(int)),
+                this, SLOT(sendNextUpdatableForUpdate(int)) );
+        connect(this, SIGNAL(updateUpdatable(Updatable*, int)),
+                paintControler, SLOT(updateUpdatable(Updatable*, int)) );
 
-    mPaintControlerThread->start();
+        paintControlerThread->start();
+
+        mPaintControlers << paintControler;
+        mPaintControlerThreads << paintControlerThread;
+
+        mFreeThreads << i;
+    }
 
     mPreviewFPSTimer = new QTimer(this);
 
@@ -42,8 +50,10 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
 }
 
 CanvasWindow::~CanvasWindow() {
-    mPaintControlerThread->quit();
-    mPaintControlerThread->wait();
+    foreach(QThread *thread, mPaintControlerThreads) {
+        thread->quit();
+        thread->wait();
+    }
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
@@ -627,15 +637,17 @@ void CanvasWindow::renderPreview() {
 void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
+    }
+    if(!mFreeThreads.isEmpty()) {
         mLastUpdatedUpdatable = updatable;
         mLastUpdatedUpdatable->beforeUpdate();
-        emit updateUpdatable(updatable);
+        emit updateUpdatable(updatable, mFreeThreads.takeFirst());
     } else {
         mUpdatablesAwaitingUpdate << updatable;
     }
 }
 
-void CanvasWindow::sendNextUpdatableForUpdate() {
+void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId) {
     if(mLastUpdatedUpdatable != NULL) {
         mLastUpdatedUpdatable->afterUpdate();
 //        mLastUpdatedBox->setAwaitingUpdate(false);
@@ -651,11 +663,19 @@ void CanvasWindow::sendNextUpdatableForUpdate() {
         if(mBoxesUpdateFinishedFunction != NULL) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
+        mFreeThreads << threadId;
         //callUpdateSchedulers();
     } else {
-        mLastUpdatedUpdatable = mUpdatablesAwaitingUpdate.takeFirst();
-        mLastUpdatedUpdatable->beforeUpdate();
-        emit updateUpdatable(mLastUpdatedUpdatable);
+        foreach(Updatable *updatablaT, mUpdatablesAwaitingUpdate) {
+            if(updatablaT->readyToBeProcessed()) {
+                mLastUpdatedUpdatable = updatablaT;
+                mUpdatablesAwaitingUpdate.removeOne(updatablaT);
+                mLastUpdatedUpdatable->beforeUpdate();
+                emit updateUpdatable(mLastUpdatedUpdatable, threadId);
+                return;
+            }
+        }
+        mFreeThreads << threadId;
     }
 }
 
@@ -989,23 +1009,31 @@ void CanvasWindow::importFile(const QString &path,
         return;
     }
 
-    QPointF trans = mCurrentCanvas->mapCanvasAbsToRel(absDropPos);
     QString extension = path.split(".").last();
+    BoundingBox *boxToPosition = NULL;
     if(extension == "svg") {
-        loadSVGFile(path, mCurrentCanvas)->moveByAbs(trans);
+        boxToPosition = loadSVGFile(path, mCurrentCanvas);
     } else if(extension == "png" ||
               extension == "jpg") {
-        createImageForPath(path)->moveByAbs(trans);
+        boxToPosition = createImageForPath(path);
     } else if(extension == "avi" ||
               extension == "mp4" ||
               extension == "mov") {
-        createVideoForPath(path)->moveByAbs(trans);
+        boxToPosition = createVideoForPath(path);
     } else if(extension == "mp3" ||
               extension == "wav") {
         createSoundForPath(path);
     } else if(extension == "av") {
         MainWindow::getInstance()->loadAVFile(path);
     }
+    if(boxToPosition != NULL) {
+        QPointF trans = mCurrentCanvas->mapCanvasAbsToRel(absDropPos);
+        boxToPosition->forceUpdateRelBoundingRect();
+        trans -= boxToPosition->mapRelPosToAbs(
+                    boxToPosition->getRelCenterPosition());
+        boxToPosition->moveByAbs(trans);
+    }
+    updateHoveredElements();
     MainWindow::getInstance()->enable();
 
     MainWindow::getInstance()->callUpdateSchedulers();

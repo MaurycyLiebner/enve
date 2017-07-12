@@ -176,7 +176,7 @@ protected:
     bool mTransformed = false;
 
     qreal mCurrentValue = 0.;
-    qreal mSavedCurrentValue;
+    qreal mSavedCurrentValue = 0.;
     QPainterPath mKeysPath;
 
     qreal mPrefferedValueStep = 1.;

@@ -670,6 +670,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->pixmapEffects.clear();
     mEffectsAnimators->addEffectRenderDataToList(relFrame,
                                                  &data->pixmapEffects);
+    data->relBoundingRect = getRelBoundingRectAtRelFrame(relFrame);
 }
 
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
@@ -1169,6 +1170,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::beforeUpdate() {
+    Updatable::beforeUpdate();
     setUpdateVars();
     mAwaitingUpdate = false;
 }
@@ -1181,6 +1183,7 @@ void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
     mDrawRenderContainer.setVariablesFromRenderData(mCurrentRenderData);
     updateDrawRenderContainerTransform();
+    Updatable::afterUpdate();
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
@@ -1232,6 +1235,7 @@ void BoundingBox::scheduleUpdate() {
 }
 
 void BoundingBox::schedulerProccessed() {
+    Updatable::schedulerProccessed();
     mWaitingForSchedulerToBeProcessed = false;
 }
 

@@ -8,13 +8,16 @@ class PaintControler : public QObject
 {
     Q_OBJECT
 public:
-    explicit PaintControler(QObject *parent = 0);
+    explicit PaintControler(const int &id,
+                            QObject *parent = 0);
 
 signals:
-    void finishedUpdating();
+    void finishedUpdating(int);
 public slots:
-    void updateUpdatable(Updatable *updatable);
+    void updateUpdatable(Updatable *updatable,
+                         const int &targetId);
 private:
+    int mId;
 };
 
 #endif // PAINTCONTROLER_H

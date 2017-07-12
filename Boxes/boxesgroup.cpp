@@ -230,6 +230,7 @@ void BoxesGroup::schedulerProccessed() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &child,
               mChildrenAwaitingUpdate) {
         child->schedulerProccessed();
+        child->addDependent(this);
         MainWindow::getInstance()->getCanvasWindow()->
                 addUpdatableAwaitingUpdate(child.data());
     }

@@ -43,25 +43,6 @@ FileCacheHandler::~FileCacheHandler() {
     FileSourcesCache::removeHandler(this);
 }
 
-void FileCacheHandler::schedulerProccessed() {
-    qDebug() << "file scheduler processed ";
-}
-
-void FileCacheHandler::beforeUpdate() {
-    mLoadingScheduled = false;
-}
-
-void FileCacheHandler::afterUpdate() {
-
-}
-
-void FileCacheHandler::addScheduler() {
-    if(mLoadingScheduled) return;
-    mLoadingScheduled = true;
-    MainWindow::getInstance()->addFileCacheUpdateScheduler(
-                new AddUpdatableAwaitingUpdateScheduler(this));
-}
-
 ImageCacheHandler::ImageCacheHandler(const QString &filePath) :
     FileCacheHandler(filePath) {
 }
@@ -125,8 +106,10 @@ void VideoCacheHandler::updateFrameCount() {
 
     avformat_free_context(format);
 }
-
+#include <QElapsedTimer>
 void VideoCacheHandler::processUpdate() {
+    QElapsedTimer timer;
+    timer.start();
     const char* path = mFilePath.toLatin1().data();
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
@@ -185,6 +168,8 @@ void VideoCacheHandler::processUpdate() {
         return;// -1;
     }
 
+    QElapsedTimer framesTimer;
+    framesTimer.start();
     foreach(const int &frameId, mFramesBeingLoaded) {
         int tsms = qRound(frameId * 1000 /
                           (double)videoStream->avg_frame_rate.num*
@@ -252,6 +237,9 @@ void VideoCacheHandler::processUpdate() {
         mLoadedFrames << SkImage::MakeFromBitmap(bitmap);
     // SKIA
     }
+    qDebug() << "elapsed loading " <<
+                mFramesBeingLoaded.count() <<
+                " frames: " << framesTimer.elapsed();
 
     // clean up
     av_frame_free(&decodedFrame);
@@ -261,6 +249,7 @@ void VideoCacheHandler::processUpdate() {
 
     avformat_free_context(format);
 
+    qDebug() << "total elapsed: " << timer.elapsed();
     // success
     return;// 0;
 }
@@ -285,12 +274,13 @@ void VideoCacheHandler::clearCache() {
 
 const qreal &VideoCacheHandler::getFps() { return mFps; }
 
-void VideoCacheHandler::scheduleFrameLoad(const int &frame) {
+Updatable *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
     if(mFramesLoadScheduled.contains(frame) ||
-            mFramesBeingLoadedGUI.contains(frame)) return;
+       mFramesBeingLoadedGUI.contains(frame)) return this;
     qDebug() << "schedule frame load: " << frame;
     mFramesLoadScheduled << frame;
     addScheduler();
+    return this;
 }
 
 ImageSequenceCacheHandler::ImageSequenceCacheHandler(
@@ -318,6 +308,8 @@ void ImageSequenceCacheHandler::updateFrameCount() {
     mFramesCount = mFramePaths.count();
 }
 
-void ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
-    mFrameImageHandlers.at(frame)->addScheduler();
+Updatable *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
+    ImageCacheHandler *imageHandler = mFrameImageHandlers.at(frame);
+    imageHandler->addScheduler();
+    return imageHandler;
 }

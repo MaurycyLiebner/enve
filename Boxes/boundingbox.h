@@ -308,12 +308,21 @@ public:
 
     bool isAnimated() { return prp_isDescendantRecording(); }
     virtual void updateRelBoundingRect();
+    virtual void forceUpdateRelBoundingRect() {
+        updateRelBoundingRect();
+    }
+
     virtual const SkPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
     QPointF mapRelPosToAbs(const QPointF &relPos) const;
 
     QRectF getRelBoundingRect() const {
         return mRelBoundingRect;
+    }
+
+    virtual QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
+        Q_UNUSED(relFrame);
+        return getRelBoundingRect();
     }
 
     virtual void applyCurrentTransformation() {}

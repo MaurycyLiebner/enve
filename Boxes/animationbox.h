@@ -4,10 +4,10 @@
 #include "durationrectangle.h"
 #include "boundingbox.h"
 #include "rendercachehandler.h"
+#include "imagebox.h"
 class AnimationCacheHandler;
 
-class AnimationBox : public BoundingBox
-{
+class AnimationBox : public BoundingBox {
     Q_OBJECT
 public:
     AnimationBox(BoxesGroup *parent);
@@ -17,8 +17,6 @@ public:
 
 //    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
-    void drawSk(SkCanvas *canvas);
-    void setUpdateVars();
     void afterSuccessfulUpdate();
     void updateDurationRectangleAnimationRange();
     virtual void reloadFile();
@@ -33,6 +31,8 @@ public:
                                 const int &relFrame,
                                 BoundingBoxRenderData *data);
 
+    BoundingBoxRenderData *createRenderData();
+
 
     void updateCurrentAnimationFrame();
     void schedulerProccessed();
@@ -46,7 +46,6 @@ protected:
     int mCurrentAnimationFrame = -1;
     int mUpdateAnimationFrame = 0;
     qreal mFps = 24.;
-    sk_sp<SkImage> mUpdateAnimationImageSk;
 
     QSharedPointer<QrealAnimator> mTimeScaleAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();

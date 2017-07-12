@@ -140,6 +140,7 @@ public:
     void rotate90CCW();
     void rotate90CW();
 protected:
+    QList<int> mFreeThreads;
     bool mMouseGrabber = false;
     bool mHasFocus = false;
     QWidget *mCanvasWidget;
@@ -147,8 +148,8 @@ protected:
     void setPreviewing(const bool &bT);
 
     QTimer *mPreviewFPSTimer = NULL;
-    QThread *mPaintControlerThread;
-    PaintControler *mPaintControler;
+    QList<QThread*> mPaintControlerThreads;
+    QList<PaintControler*> mPaintControlers;
 
     qreal mSavedResolutionFraction = 100.;
     int mSavedCurrentFrame = 0;
@@ -189,7 +190,7 @@ protected:
     void qRender(QPainter *p);
     void renderSk(SkCanvas *canvas);
 signals:
-    void updateUpdatable(Updatable*);
+    void updateUpdatable(Updatable*, int);
     void changeCurrentFrame(int);
     void changeFrameRange(int, int);
 public slots:
@@ -264,7 +265,7 @@ public slots:
     void rotate90CWAction();
     void rotate90CCWAction();
 private slots:
-    void sendNextUpdatableForUpdate();
+    void sendNextUpdatableForUpdate(const int &threadId);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
     void saveOutput(const QString &renderDest,

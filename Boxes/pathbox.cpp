@@ -96,7 +96,6 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
     pathData->outlinePath = outline;
     outline.addPath(pathData->path);
-    pathData->relBoundingRect = SkRectToQRectF(outline.computeTightBounds());
 
     UpdatePaintSettings *fillSettings = &pathData->paintSettings;
 
@@ -495,6 +494,22 @@ void PathBox::updateRelBoundingRect() {
     mRelBoundingRect = SkRectToQRectF(mRelBoundingRectSk);
 
     BoundingBox::updateRelBoundingRect();
+}
+
+QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+    SkPath path = getPathAtRelFrame(relFrame);
+    SkPath outline;
+    if(mStrokeSettings->nonZeroLineWidth()) {
+        SkStroke strokerSk;
+        mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
+        outline = SkPath();
+        strokerSk.strokePath(path, &outline);
+    } else {
+        outline = SkPath();
+    }
+    mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
+    outline.addPath(path);
+    return SkRectToQRectF(outline.computeTightBounds());
 }
 
 void PathBox::setUpdateVars() {

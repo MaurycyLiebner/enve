@@ -68,7 +68,7 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrame(
                                     BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     data->transform.scale(data->resolution, data->resolution);
-    ImageBoxRenderData *imgData = new ImageBoxRenderData();
+    ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
     imgData->image = mImageSk;
 }
 
