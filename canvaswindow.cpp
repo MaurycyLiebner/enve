@@ -11,6 +11,9 @@
 #include "canvaswidget.h"
 #include "RenderWidget/renderinstancesettings.h"
 #include "newcanvasdialog.h"
+#include "Boxes/videobox.h"
+#include "Boxes/imagebox.h"
+#include "Sound/singlesound.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -769,7 +772,7 @@ void CanvasWindow::nextSaveOutputFrame() {
     }
 }
 
-void CanvasWindow::loadCanvasesFromSql() {
+Canvas *CanvasWindow::loadCanvasesFromSql() {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM canvas";
@@ -792,10 +795,12 @@ void CanvasWindow::loadCanvasesFromSql() {
                                frameCount);
             canvas->prp_loadFromSql(boundingBoxId);
             MainWindow::getInstance()->addCanvas(canvas);
+            return canvas;
         }
     } else {
         qDebug() << "Could not load canvases";
     }
+    return NULL;
 }
 
 void CanvasWindow::saveCanvasesFromSql(QSqlQuery *query) {
@@ -842,19 +847,19 @@ void CanvasWindow::createAnimationBoxForPaths(
     mCurrentCanvas->createAnimationBoxForPaths(importPaths);
 }
 
-void CanvasWindow::createVideoForPath(const QString &path) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->createVideoForPath(path);
+VideoBox *CanvasWindow::createVideoForPath(const QString &path) {
+    if(hasNoCanvas()) return NULL;
+    return mCurrentCanvas->createVideoForPath(path);
 }
 
-void CanvasWindow::createImageForPath(const QString &path) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->createImageBox(path);
+ImageBox *CanvasWindow::createImageForPath(const QString &path) {
+    if(hasNoCanvas()) return NULL;
+    return mCurrentCanvas->createImageBox(path);
 }
 
-void CanvasWindow::createSoundForPath(const QString &path) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->createSoundForPath(path);
+SingleSound *CanvasWindow::createSoundForPath(const QString &path) {
+    if(hasNoCanvas()) return NULL;
+    return mCurrentCanvas->createSoundForPath(path);
 }
 
 void CanvasWindow::saveToSql(QSqlQuery *query) {
@@ -960,7 +965,8 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
         QList<QUrl> urlList = mimeData->urls();
 
         for (int i = 0; i < urlList.size() && i < 32; i++) {
-            importFile(urlList.at(i).toLocalFile());
+            importFile(urlList.at(i).toLocalFile(),
+                       event->posF());
         }
     }
 }
@@ -973,7 +979,8 @@ void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
 
 #include "svgimporter.h"
 #include <QFileDialog>
-void CanvasWindow::importFile(const QString &path) {
+void CanvasWindow::importFile(const QString &path,
+                              const QPointF &absDropPos) {
     if(hasNoCanvas()) return;
     MainWindow::getInstance()->disable();
 
@@ -982,16 +989,17 @@ void CanvasWindow::importFile(const QString &path) {
         return;
     }
 
+    QPointF trans = mCurrentCanvas->mapCanvasAbsToRel(absDropPos);
     QString extension = path.split(".").last();
     if(extension == "svg") {
-        loadSVGFile(path, mCurrentCanvas);
+        loadSVGFile(path, mCurrentCanvas)->moveByAbs(trans);
     } else if(extension == "png" ||
               extension == "jpg") {
-        createImageForPath(path);
+        createImageForPath(path)->moveByAbs(trans);
     } else if(extension == "avi" ||
               extension == "mp4" ||
               extension == "mov") {
-        createVideoForPath(path);
+        createVideoForPath(path)->moveByAbs(trans);
     } else if(extension == "mp3" ||
               extension == "wav") {
         createSoundForPath(path);

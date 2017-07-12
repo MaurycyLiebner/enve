@@ -18,6 +18,9 @@ class PaintSetting;
 class CanvasWidget;
 class RenderInstanceSettings;
 class Updatable;
+class ImageBox;
+class SingleSound;
+class VideoBox;
 
 #include <QSqlQuery>
 #include <QAudioOutput>
@@ -80,15 +83,15 @@ public:
     void createAnimationBoxForPaths(const QStringList &importPaths);
     void createLinkToFileWithPath(const QString &path);
     void saveToSql(QSqlQuery *query);
-    void createVideoForPath(const QString &path);
+    VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
     void addUpdatableAwaitingUpdate(Updatable *updatable);
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);
-    void createImageForPath(const QString &path);
-    void createSoundForPath(const QString &path);
-    void loadCanvasesFromSql();
+    ImageBox *createImageForPath(const QString &path);
+    SingleSound *createSoundForPath(const QString &path);
+    Canvas *loadCanvasesFromSql();
     void saveCanvasesFromSql(QSqlQuery *query);
     void updateHoveredElements();
 
@@ -96,7 +99,8 @@ public:
     bool getLocalPivot();
     void setLocalPivot(const bool &bT);
 
-    void importFile(const QString &path);
+    void importFile(const QString &path,
+                    const QPointF &absDropPos = QPointF(0., 0.));
 
     QWidget *getCanvasWidget();
 

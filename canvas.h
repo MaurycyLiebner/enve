@@ -34,6 +34,25 @@ enum CanvasMode : short {
 
 extern bool zLessThan(BoundingBox *box1, BoundingBox *box2);
 
+struct CanvasRenderData : public BoxesGroupRenderData {
+    void renderToImage();
+    SkScalar canvasWidth;
+    SkScalar canvasHeight;
+    SkColor bgColor;
+private:
+    void drawSk(SkCanvas *canvas) {
+        canvas->save();
+
+        Q_FOREACH(BoundingBoxRenderData *renderData,
+                  childrenRenderData) {
+            //box->draw(p);
+            renderData->drawRenderedImageForParent(canvas);
+        }
+
+        canvas->restore();
+    }
+};
+
 class Canvas : public BoxesGroup
 {
     Q_OBJECT
@@ -226,7 +245,7 @@ public:
     void drawPreviewPixmapSk(SkCanvas *canvas);
 
     void createAnimationBoxForPaths(const QStringList &paths);
-    void createVideoForPath(const QString &path);
+    VideoBox *createVideoForPath(const QString &path);
 
     void setPreviewing(const bool &bT);
     void setOutputRendering(const bool &bT);
@@ -296,6 +315,20 @@ public:
         return mBackgroundColor.data();
     }
 
+    BoundingBoxRenderData *createRenderData() {
+        return new CanvasRenderData();
+    }
+
+    void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
+                                               BoundingBoxRenderData *data) {
+        BoxesGroup::setupBoundingBoxRenderDataForRelFrame(relFrame,
+                                                          data);
+        CanvasRenderData *canvasData = (CanvasRenderData*)data;
+        canvasData->bgColor = mBackgroundColor->getCurrentColor().getSkColor();
+        canvasData->canvasHeight = mHeight*mResolutionFraction;
+        canvasData->canvasWidth = mWidth*mResolutionFraction;
+    }
+
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        Q_FOREACH(BoundingBox *child, mChildBoxes) {
@@ -332,7 +365,7 @@ public:
     void makeSegmentCurve();
 
     BoundingBox *createLink(BoxesGroup *parent);
-    void createImageBox(const QString &path);
+    ImageBox *createImageBox(const QString &path);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
@@ -351,7 +384,7 @@ public:
 
     SoundComposition *getSoundComposition();
 
-    void createSoundForPath(const QString &path);
+    SingleSound *createSoundForPath(const QString &path);
 
     void updateHoveredBox();
     void updateHoveredPoint();
@@ -374,7 +407,7 @@ public:
     void afterCurrentFrameRender();
     void beforeUpdate();
     void afterUpdate();
-    void updatePixmaps();
+    //void updatePixmaps();
     CacheHandler *getCacheHandler() {
         return &mCacheHandler;
     }

@@ -120,8 +120,9 @@ void extractSvgAttributes(const QString &string,
 }
 
 
-void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup,
-                    BoundingBoxSvgAttributes *attributes) {
+BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
+                           BoxesGroup *parentGroup,
+                           BoundingBoxSvgAttributes *attributes) {
     QDomNodeList allRootChildNodes = groupElement.childNodes();
     BoxesGroup *boxesGroup;
     bool hasTransform = attributes->hasTransform();
@@ -139,6 +140,7 @@ void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup,
             loadElement(iNode.toElement(), boxesGroup, attributes);
         }
     }
+    return boxesGroup;
 }
 
 // '0' is 0x30 and '9' is 0x39
@@ -1061,7 +1063,8 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
     return matrix;
 }
 #include "mainwindow.h"
-void loadSVGFile(const QString &filename, Canvas *canvas) {
+BoxesGroup *loadSVGFile(const QString &filename,
+                        Canvas *canvas) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
@@ -1069,7 +1072,7 @@ void loadSVGFile(const QString &filename, Canvas *canvas) {
             QDomElement rootElement = document.firstChildElement("svg");
             if(!rootElement.isNull()) {
                 BoundingBoxSvgAttributes attributes;
-                loadBoxesGroup(rootElement, canvas, &attributes);
+                return loadBoxesGroup(rootElement, canvas, &attributes);
             } else {
                 qDebug() << "File does not have svg root element";
             }
@@ -1079,7 +1082,6 @@ void loadSVGFile(const QString &filename, Canvas *canvas) {
     } else {
         qDebug() << "Cannot open file " + filename;
     }
-    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 /*

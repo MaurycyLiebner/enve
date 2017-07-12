@@ -32,6 +32,11 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
+
+    BoundingBoxRenderData *createRenderData() {
+        return new ImageBoxRenderData();
+    }
+
 private:
     sk_sp<SkImage> mImageSk;
     QString mImageFilePath;

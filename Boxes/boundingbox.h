@@ -83,7 +83,7 @@ struct BoundingBoxRenderData {
 
     virtual void drawRenderedImage(SkCanvas *canvas);
     virtual void drawRenderedImageForParent(SkCanvas *canvas);
-    void renderToImage();
+    virtual void renderToImage();
     sk_sp<SkImage> renderedImage;
 private:
     virtual void drawSk(SkCanvas *canvas) = 0;
@@ -287,7 +287,7 @@ public:
 
     void updateRelativeTransformTmp();
 
-    virtual void updateAllUglyPixmap();
+    void updateAllUglyPixmap();
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);

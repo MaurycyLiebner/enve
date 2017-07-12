@@ -221,14 +221,21 @@ protected:
 };
 
 
-extern void loadBoxesGroup(const QDomElement &groupElement, BoxesGroup *parentGroup, BoundingBoxSvgAttributes *attributes);
-extern bool parsePathDataFast(const QString &dataStr, VectorPathSvgAttributes *attributes);
-extern void loadVectorPath(const QDomElement &pathElement, BoxesGroup *parentGroup, VectorPathSvgAttributes *attributes);
-extern void loadElement(const QDomElement &element, BoxesGroup *parentGroup, BoundingBoxSvgAttributes *parentGroupAttributes);
-extern void loadSVGFile(const QString &filename, Canvas *canvas);
+extern BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
+                                  BoxesGroup *parentGroup,
+                                  BoundingBoxSvgAttributes *attributes);
+extern bool parsePathDataFast(const QString &dataStr,
+                              VectorPathSvgAttributes *attributes);
+extern void loadVectorPath(const QDomElement &pathElement,
+                           BoxesGroup *parentGroup, VectorPathSvgAttributes *attributes);
+extern void loadElement(const QDomElement &element,
+                        BoxesGroup *parentGroup, BoundingBoxSvgAttributes *parentGroupAttributes);
+extern BoxesGroup *loadSVGFile(const QString &filename,
+                               Canvas *canvas);
 
 extern QMatrix getMatrixFromString(const QString &matrixStr);
-extern bool getColorFromString(const QString &colorStr, Color *color);
+extern bool getColorFromString(const QString &colorStr,
+                               Color *color);
 
 /*
 #include <QStringRef>

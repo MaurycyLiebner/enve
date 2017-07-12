@@ -172,12 +172,14 @@ int Canvas::saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
-void Canvas::createImageBox(const QString &path) {
-    new ImageBox(mCurrentBoxesGroup, path);
+ImageBox *Canvas::createImageBox(const QString &path) {
+    return new ImageBox(mCurrentBoxesGroup, path);
 }
 
-void Canvas::createSoundForPath(const QString &path) {
-    getSoundComposition()->addSoundAnimator(new SingleSound(path));
+SingleSound *Canvas::createSoundForPath(const QString &path) {
+    SingleSound *singleSound = new SingleSound(path);
+    getSoundComposition()->addSoundAnimator(singleSound);
+    return singleSound;
 }
 
 void Canvas::drawSelectedSk(SkCanvas *canvas,
@@ -525,7 +527,7 @@ void Canvas::afterUpdate() {
     if(mUpdateReplaceCache) {
         CacheContainer *cont =
               mCacheHandler.createNewRenderContainerAtRelFrame(mUpdateRelFrame);
-        cont->replaceImageSk(mRenderImageSk);
+        cont->replaceImageSk(mCurrentRenderData->renderedImage);
         setCurrentPreviewContainer(cont);
         if(mRendering) {
             //mRenderImage.save(renderDest + QString::number(mUpdateRelFrame) + ".png");
@@ -534,9 +536,9 @@ void Canvas::afterUpdate() {
     callUpdateSchedulers();
 }
 
-void Canvas::updatePixmaps() {
-    renderCurrentFrameToPreview();
-}
+//void Canvas::updatePixmaps() {
+//    renderCurrentFrameToPreview();
+//}
 
 void Canvas::renderCurrentFrameToPreview() {
     SkImageInfo info = SkImageInfo::Make(mRenderImageSize.width(),
@@ -595,9 +597,10 @@ void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
 }
 
 #include "Boxes/videobox.h"
-void Canvas::createVideoForPath(const QString &path) {
-    /*VideoBox *vidBox = */new VideoBox(path,
+VideoBox *Canvas::createVideoForPath(const QString &path) {
+    VideoBox *vidBox = new VideoBox(path,
                                     mCurrentBoxesGroup);
+    return vidBox;
 }
 
 #include "Boxes/linkbox.h"
@@ -1177,4 +1180,26 @@ int Canvas::getMaxFrame() {
 
 SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition;
+}
+
+void CanvasRenderData::renderToImage() {
+    if(renderedToImage) return;
+    renderedToImage = true;
+
+    SkImageInfo info = SkImageInfo::Make(canvasWidth,
+                                         canvasHeight,
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         nullptr);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+    SkCanvas *rasterCanvas = new SkCanvas(bitmap);
+    rasterCanvas->clear(bgColor);
+
+    drawSk(rasterCanvas);
+    rasterCanvas->flush();
+
+    renderedImage = SkImage::MakeFromBitmap(bitmap);
+    bitmap.reset();
+    delete rasterCanvas;
 }
