@@ -1,6 +1,8 @@
 #ifndef RENDERCACHEHANDLER_H
 #define RENDERCACHEHANDLER_H
 #include <QtCore>
+#include <memory>
+
 class QPainter;
 class RenderContainer;
 class RenderContainer;
@@ -29,7 +31,7 @@ public:
 protected:
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
     bool getRenderContainterIdAtRelFrame(const int &relFrame, int *id);
-    QList<CacheContainer*> mRenderContainers;
+    QList<std::shared_ptr<CacheContainer> > mRenderContainers;
 };
 
 class BoundingBox;

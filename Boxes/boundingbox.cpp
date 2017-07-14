@@ -1249,6 +1249,8 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
     }
 }
 
+BoundingBoxRenderData::~BoundingBoxRenderData() {}
+
 void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
     renderToImage();
     SkPaint paint;
@@ -1330,4 +1332,17 @@ void BoundingBoxRenderData::renderToImage() {
 
     renderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
+}
+
+void BoundingBoxRenderData::processUpdate() {
+    renderToImage();
+}
+
+void BoundingBoxRenderData::beforeUpdate() {
+    Updatable::beforeUpdate();
+    parentBox->setupBoundingBoxRenderDataForRelFrame(relFrame, this);
+}
+
+void BoundingBoxRenderData::afterUpdate() {
+    Updatable::afterUpdate();
 }

@@ -6,9 +6,12 @@
 #include "global.h"
 
 void CacheHandler::removeRenderContainer(CacheContainer *cont) {
-    mRenderContainers.removeOne(cont);
     cont->setParentCacheHandler(NULL);
-    cont->decNumberPointers();
+    for(int i = 0; i < mRenderContainers.count(); i++) {
+        if(mRenderContainers.at(i).get() == cont) {
+            mRenderContainers.removeAt(i);
+        }
+    }
 }
 
 bool CacheHandler::getRenderContainterIdAtRelFrame(const int &relFrame,
@@ -18,7 +21,7 @@ bool CacheHandler::getRenderContainterIdAtRelFrame(const int &relFrame,
 
     while(minId <= maxId) {
         int guess = (minId + maxId)/2;
-        CacheContainer *cont = mRenderContainers.at(guess);
+        CacheContainer *cont = mRenderContainers.at(guess).get();
         if(cont->relFrameInRange(relFrame)) {
             *id = guess;
             return true;
@@ -53,7 +56,7 @@ int CacheHandler::getRenderContainterInsertIdAtRelFrame(
 
     while(minId < maxId) {
         int guess = (minId + maxId)/2;
-        CacheContainer *cont = mRenderContainers.at(guess);
+        CacheContainer *cont = mRenderContainers.at(guess).get();
         int contFrame = cont->getMinRelFrame();
         if(contFrame > relFrame) {
             if(guess == maxId) {
@@ -75,9 +78,8 @@ CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(
     CacheContainer *cont = new CacheContainer();
     cont->setParentCacheHandler(this);
     cont->setRelFrame(frame);
-    cont->incNumberPointers();
     int contId = getRenderContainterInsertIdAtRelFrame(frame);
-    mRenderContainers.insert(contId, cont);
+    mRenderContainers.insert(contId, cont->ref<CacheContainer>());
     return cont;
 }
 
@@ -124,9 +126,8 @@ void CacheHandler::setContainersInFrameRangeBlocked(const int &minFrame,
 }
 
 void CacheHandler::clearCache() {
-    Q_FOREACH(CacheContainer *cont, mRenderContainers) {
+    Q_FOREACH(const std::shared_ptr<CacheContainer> &cont, mRenderContainers) {
         cont->setParentCacheHandler(NULL);
-        cont->decNumberPointers();
     }
 
     mRenderContainers.clear();
@@ -135,7 +136,7 @@ void CacheHandler::clearCache() {
 CacheContainer *CacheHandler::getRenderContainerAtRelFrame(const int &frame) {
     int id;
     if(getRenderContainterIdAtRelFrame(frame, &id)) {
-        return mRenderContainers.at(id);
+        return mRenderContainers.at(id).get();
     }
     return NULL;
 }
@@ -146,7 +147,7 @@ CacheContainer *CacheHandler::getRenderContainerAtOrBeforeRelFrame(
     if(cont == NULL) {
         int id = getRenderContainterInsertIdAtRelFrame(frame) - 1;
         if(id >= 0 && id < mRenderContainers.length()) {
-            cont = mRenderContainers.at(id);
+            cont = mRenderContainers.at(id).get();
         }
     }
     return cont;
@@ -161,7 +162,7 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     p->setPen(Qt::NoPen);
     int lastDrawnFrame = startFrame;
     int lastDrawX = 0;
-    Q_FOREACH(CacheContainer *cont, mRenderContainers) {
+    Q_FOREACH(const std::shared_ptr<CacheContainer> &cont, mRenderContainers) {
         int maxFrame = cont->getMaxRelFrame();
         int minFrame = cont->getMinRelFrame();
         if(maxFrame < startFrame) continue;
@@ -199,9 +200,7 @@ void RenderCacheHandler::clearCacheForRelFrameRange(const int &minFrame,
         maxId = getRenderContainterInsertIdAtRelFrame(maxFrame) - 1;
     }
     for(int i = minId; i <= maxId; i++) {
-        CacheContainer *cont = mRenderContainers.takeAt(minId);
-        cont->setParentCacheHandler(NULL);
-        cont->decNumberPointers();
+        mRenderContainers.takeAt(minId)->setParentCacheHandler(NULL);
     }
     int minFrameT = minFrame;
     int maxFrameT = maxFrame;
@@ -215,9 +214,8 @@ CacheContainer *RenderCacheHandler::createNewRenderContainerAtRelFrame(
     RenderContainer *cont = new RenderContainer();
     cont->setParentCacheHandler(this);
     cont->setRelFrame(frame);
-    cont->incNumberPointers();
     int contId = getRenderContainterInsertIdAtRelFrame(frame);
-    mRenderContainers.insert(contId, cont);
+    mRenderContainers.insert(contId, cont->ref<CacheContainer>());
     return cont;
 }
 

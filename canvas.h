@@ -497,7 +497,7 @@ protected:
     bool mNoCache = false;
     bool mPreviewing = false;
     bool mRendering = false;
-    CacheContainer *mCurrentPreviewContainer = NULL;
+    std::shared_ptr<CacheContainer> mCurrentPreviewContainer;
     int mCurrentPreviewFrameId;
     int mMaxPreviewFrameId = 0;
 

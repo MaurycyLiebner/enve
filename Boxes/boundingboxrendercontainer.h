@@ -9,7 +9,7 @@ class BoundingBox;
 class CacheHandler;
 struct BoundingBoxRenderData;
 
-class CacheContainer : public SimpleSmartPointer {
+class CacheContainer : public StdSelfRef {
 public:
     CacheContainer();
 
@@ -54,13 +54,7 @@ public:
     virtual void drawSk(SkCanvas *canvas);
 
     void setBlocked(const bool &bT) {
-        if(bT == mBlocked) return;
         mBlocked = bT;
-        if(bT) {
-            incNumberPointers();
-        } else {
-            decNumberPointers();
-        }
     }
 
 protected:

@@ -459,19 +459,16 @@ void Canvas::setOutputRendering(const bool &bT) {
 }
 
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
-    if(mCurrentPreviewContainer != NULL) {
-        mCurrentPreviewContainer->decNumberPointers();
+    if(mCurrentPreviewContainer.get() != NULL) {
         if(mNoCache) {
-            mCurrentPreviewContainer->setBlocked(false);
             mCurrentPreviewContainer->freeThis();
         } else if(!mRendering) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
-    mCurrentPreviewContainer = cont;
+    mCurrentPreviewContainer = cont->ref<CacheContainer>();
     if(mCurrentPreviewContainer != NULL) {
         mCurrentPreviewContainer->setBlocked(true);
-        mCurrentPreviewContainer->incNumberPointers();
     }
 }
 

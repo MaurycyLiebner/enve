@@ -68,8 +68,8 @@ private:
     BoundingBox *mBoundingBox;
 };
 
-struct BoundingBoxRenderData {
-    virtual ~BoundingBoxRenderData() {}
+struct BoundingBoxRenderData : public Updatable {
+    virtual ~BoundingBoxRenderData();
     bool renderedToImage = false;
     QMatrix transform;
     QRectF relBoundingRect;
@@ -80,11 +80,19 @@ struct BoundingBoxRenderData {
     QList<PixmapEffectRenderData*> pixmapEffects;
     SkPoint drawPos;
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
+    BoundingBox *parentBox;
 
     virtual void drawRenderedImage(SkCanvas *canvas);
     virtual void drawRenderedImageForParent(SkCanvas *canvas);
     virtual void renderToImage();
     sk_sp<SkImage> renderedImage;
+
+    void processUpdate();
+
+    void beforeUpdate();
+
+    void afterUpdate();
+
 private:
     virtual void drawSk(SkCanvas *canvas) = 0;
 };
@@ -470,6 +478,13 @@ public:
             const int &relFrame, BoundingBoxRenderData *data);
 
     virtual BoundingBoxRenderData *createRenderData() { return NULL; }
+
+    BoundingBoxRenderData *getRenderDataForRelFrame(const int &relFrame) {
+        BoundingBoxRenderData *data = createRenderData();
+        data->parentBox = this;
+        setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+        return data;
+    }
 
     void schedulerProccessed();
     BoundingBoxRenderData *getCurrentRenderData();
