@@ -15,6 +15,7 @@ class Rectangle;
 class PathPivot;
 class SoundComposition;
 class SkCanvas;
+class ImageSequenceBox;
 
 enum CtrlsMode : short;
 
@@ -244,7 +245,7 @@ public:
     bool keyPressEvent(QKeyEvent *event);
     void drawPreviewPixmapSk(SkCanvas *canvas);
 
-    void createAnimationBoxForPaths(const QStringList &paths);
+    ImageSequenceBox *createAnimationBoxForPaths(const QStringList &paths);
     VideoBox *createVideoForPath(const QString &path);
 
     void setPreviewing(const bool &bT);
@@ -364,7 +365,7 @@ public:
     void makeSegmentLine();
     void makeSegmentCurve();
 
-    BoundingBox *createLink(BoxesGroup *parent);
+    BoundingBox *createLink();
     ImageBox *createImageBox(const QString &path);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,

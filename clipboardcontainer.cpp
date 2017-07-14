@@ -19,12 +19,12 @@ BoxesClipboardContainer::~BoxesClipboardContainer() {
 }
 
 void BoxesClipboardContainer::copyBoxToContainer(BoundingBox *box) {
-    mBoxesList << box->createDuplicate(NULL);
+    mBoxesList << box->createDuplicate();
 }
 
 void BoxesClipboardContainer::pasteTo(BoxesGroup *parent) {
     Q_FOREACH(BoundingBox *box, mBoxesList) {
-        box->createDuplicate(parent);
+        parent->addChild(box->createDuplicate());
     }
 }
 

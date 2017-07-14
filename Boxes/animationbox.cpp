@@ -4,9 +4,10 @@
 #include "canvas.h"
 #include "filesourcescache.h"
 #include "imagebox.h"
+#include "undoredo.h"
 
-AnimationBox::AnimationBox(BoxesGroup *parent) :
-    BoundingBox(parent, TYPE_IMAGE) {
+AnimationBox::AnimationBox() :
+    BoundingBox(TYPE_IMAGE) {
     setName("Animation");
     mTimeScaleAnimator->prp_setName("time scale");
     mTimeScaleAnimator->qra_setValueRange(-100, 100);
@@ -47,16 +48,30 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
     qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
     getAnimationDurationRect()->setAnimationFrameDuration(
-                qCeil(qAbs(timeScale*mAnimationCacheHandler->getFramesCount())));
+            qCeil(qAbs(timeScale*mAnimationCacheHandler->getFramesCount())));
 }
 
 void AnimationBox::reloadFile() {
-    updateDurationRectangleAnimationRange();
+    if(mParent != NULL) {
+        updateDurationRectangleAnimationRange();
+        updateCurrentAnimationFrame();
+    }
     reloadSound();
     clearAllCache();
-    updateCurrentAnimationFrame();
-    mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
+
+    //mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
     scheduleSoftUpdate();
+}
+
+void AnimationBox::setParent(BoxesGroup *parent) {
+    mParent = parent->ref<BoxesGroup>();
+    mTransformAnimator->setParentTransformAnimator(
+                        mParent->getTransformAnimator());
+
+    updateDurationRectangleAnimationRange();
+    updateCurrentAnimationFrame();
+
+    updateCombinedTransform();
 }
 
 void AnimationBox::schedulerProccessed() {
@@ -66,6 +81,7 @@ void AnimationBox::schedulerProccessed() {
 }
 
 void AnimationBox::scheduleUpdate() {
+    if(mAnimationCacheHandler == NULL || mParent == NULL) return;
     mUpdateAnimationFrame = mCurrentAnimationFrame;
     if(mAnimationCacheHandler->getFrameAtFrame(
                 mUpdateAnimationFrame).get() == NULL) {

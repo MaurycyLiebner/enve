@@ -3,8 +3,8 @@
 #include "mainwindow.h"
 #include "canvas.h"
 
-ExternalLinkBox::ExternalLinkBox(BoxesGroup *parent) :
-    BoxesGroup(parent) {
+ExternalLinkBox::ExternalLinkBox() :
+    BoxesGroup() {
     setType(TYPE_EXTERNAL_LINK);
     setName("Link Empty");
 }
@@ -49,8 +49,8 @@ BoundingBox *InternalLinkBox::getLinkTarget() {
     return mLinkTarget.data();
 }
 
-BoundingBox *InternalLinkBox::createLink(BoxesGroup *parent) {
-    return mLinkTarget->createLink(parent);
+BoundingBox *InternalLinkBox::createLink() {
+    return mLinkTarget->createLink();
 }
 
 BoundingBoxRenderData *InternalLinkBox::createRenderData() {
@@ -72,8 +72,8 @@ void InternalLinkBox::updateRelBoundingRect() {
     BoundingBox::updateRelBoundingRect();
 }
 
-InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent) :
-    BoundingBox(parent, TYPE_INTERNAL_LINK) {
+InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget) :
+    BoundingBox(TYPE_INTERNAL_LINK) {
     setLinkTarget(linkTarget);
 }
 

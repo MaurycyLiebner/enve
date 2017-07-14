@@ -2,8 +2,8 @@
 #include <QFileDialog>
 #include "mainwindow.h"
 
-ImageBox::ImageBox(BoxesGroup *parent, QString filePath) :
-    BoundingBox(parent, TYPE_IMAGE) {
+ImageBox::ImageBox(QString filePath) :
+    BoundingBox(TYPE_IMAGE) {
     mImageFilePath = filePath;
 
     setName("Image");
@@ -25,8 +25,8 @@ void ImageBox::makeDuplicate(Property *targetBox) {
     imgTarget->setFilePath(mImageFilePath);
 }
 
-BoundingBox *ImageBox::createNewDuplicate(BoxesGroup *parent) {
-    return new ImageBox(parent);
+BoundingBox *ImageBox::createNewDuplicate() {
+    return new ImageBox();
 }
 
 void ImageBox::reloadPixmap() {

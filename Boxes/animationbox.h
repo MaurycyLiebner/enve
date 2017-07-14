@@ -10,7 +10,7 @@ class AnimationCacheHandler;
 class AnimationBox : public BoundingBox {
     Q_OBJECT
 public:
-    AnimationBox(BoxesGroup *parent);
+    AnimationBox();
     void prp_setAbsFrame(const int &frame);
 
     void makeDuplicate(Property *targetBox);
@@ -39,6 +39,7 @@ public:
 
     void scheduleUpdate();
     void afterUpdate();
+    void setParent(BoxesGroup *parent);
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;

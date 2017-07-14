@@ -12,10 +12,9 @@ public:
     RectangleBottomRightPoint(BoundingBox *parent);
 };
 
-class Rectangle : public PathBox
-{
+class Rectangle : public PathBox {
 public:
-    Rectangle(BoxesGroup *parent);
+    Rectangle();
     ~Rectangle();
 
     void moveSizePointByAbs(const QPointF &absTrans);
@@ -45,7 +44,7 @@ public:
     void duplicateRectanglePointsFrom(RectangleTopLeftPoint *topLeftPoint,
                         RectangleBottomRightPoint *bottomRightPoint,
                         QrealAnimator *radiusAnimator);
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    BoundingBox *createNewDuplicate();
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
 

@@ -3,8 +3,7 @@
 #include "Animators/animatorupdater.h"
 #include "gradientpoints.h"
 
-Rectangle::Rectangle(BoxesGroup *parent) : PathBox(parent, TYPE_RECTANGLE)
-{
+Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     setName("Rectangle");
 
     mTopLeftPoint = new RectangleTopLeftPoint(this);
@@ -63,8 +62,8 @@ void Rectangle::duplicateRectanglePointsFrom(
     radiusAnimator->makeDuplicate(&mRadiusAnimator);
 }
 
-BoundingBox *Rectangle::createNewDuplicate(BoxesGroup *parent) {
-    return new Rectangle(parent);
+BoundingBox *Rectangle::createNewDuplicate() {
+    return new Rectangle();
 }
 
 void Rectangle::prp_loadFromSql(const int &boundingBoxId) {

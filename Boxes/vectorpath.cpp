@@ -12,8 +12,8 @@
 #include "Animators/pathanimator.h"
 #include "gradientpoints.h"
 
-VectorPath::VectorPath(BoxesGroup *group) :
-    PathBox(group, BoundingBoxType::TYPE_VECTOR_PATH) {
+VectorPath::VectorPath() :
+    PathBox(BoundingBoxType::TYPE_VECTOR_PATH) {
     mPathAnimator =
             (new PathAnimator(this))->ref<PathAnimator>();
     setName("Path");
@@ -42,9 +42,8 @@ void VectorPath::prp_loadFromSql(const int &boundingBoxId) {
     mPathAnimator->prp_loadFromSql(boundingBoxId);
 }
 
-VectorPath *VectorPath::createPathFromSql(int boundingBoxId,
-                                          BoxesGroup *parent) {
-    VectorPath *path = new VectorPath(parent);
+VectorPath *VectorPath::createPathFromSql(int boundingBoxId) {
+    VectorPath *path = new VectorPath();
     path->prp_loadFromSql(boundingBoxId);
 
     return path;
@@ -164,6 +163,6 @@ void VectorPath::makeDuplicate(Property *targetBox) {
             duplicatePathAnimatorFrom(mPathAnimator.data());
 }
 
-BoundingBox *VectorPath::createNewDuplicate(BoxesGroup *parent) {
-    return new VectorPath(parent);
+BoundingBox *VectorPath::createNewDuplicate() {
+    return new VectorPath();
 }

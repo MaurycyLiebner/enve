@@ -12,7 +12,7 @@ public:
                             QObject *parent = 0);
 
 signals:
-    void finishedUpdating(int);
+    void finishedUpdating(int, Updatable*);
 public slots:
     void updateUpdatable(Updatable *updatable,
                          const int &targetId);

@@ -10,12 +10,12 @@ class VideoBox : public AnimationBox
 {
     Q_OBJECT
 public:
-    VideoBox(const QString &filePath,
-             BoxesGroup *parent);
+    VideoBox(const QString &filePath);
 
+    void setParent(BoxesGroup *parent);
     void setFilePath(QString path);
     void makeDuplicate(Property *targetBox);
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    BoundingBox *createNewDuplicate();
     void reloadSound();
     void reloadFile();
 

@@ -5,8 +5,8 @@
 #include "Animators/animatorupdater.h"
 #include "gradientpoints.h"
 
-Circle::Circle(BoxesGroup *parent) :
-    PathBox(parent, TYPE_CIRCLE) {
+Circle::Circle() :
+    PathBox(TYPE_CIRCLE) {
     setName("Circle");
 
     mCenter = new CircleCenterPoint(this, TYPE_PATH_POINT);

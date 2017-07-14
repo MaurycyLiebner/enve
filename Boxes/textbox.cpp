@@ -4,8 +4,8 @@
 #include "canvas.h"
 #include "gradientpoints.h"
 
-TextBox::TextBox(BoxesGroup *parent) :
-    PathBox(parent, TYPE_TEXT) {
+TextBox::TextBox() :
+    PathBox(TYPE_TEXT) {
     setName("text");
 
     mFillSettings->setCurrentColor(Color(0, 0, 0));

@@ -105,9 +105,8 @@ void Canvas::showContextMenu(QPointF globalPos) {
 //    }
 }
 
-BoundingBox *Canvas::createLink(BoxesGroup *parent) {
-    InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this,
-                                                           parent);
+BoundingBox *Canvas::createLink() {
+    InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this);
     return linkGroup;
 }
 
@@ -173,7 +172,9 @@ int Canvas::saveToSql(QSqlQuery *query, const int &parentId) {
 }
 
 ImageBox *Canvas::createImageBox(const QString &path) {
-    return new ImageBox(mCurrentBoxesGroup, path);
+    ImageBox *img = new ImageBox(path);
+    mCurrentBoxesGroup->addChild(img);
+    return img;
 }
 
 SingleSound *Canvas::createSoundForPath(const QString &path) {
@@ -506,7 +507,7 @@ void Canvas::beforeUpdate() {
     mRenderImageSize = QSize(mWidth*mResolutionFraction,
                              mHeight*mResolutionFraction);
     CacheContainer *cont =
-          mCacheHandler.getRenderContainerAtRelFrame(mUpdateRelFrame);
+          mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
     mUpdateReplaceCache = cont == NULL;
     if(cont != NULL) {
         setCurrentPreviewContainer(cont);
@@ -523,7 +524,8 @@ void Canvas::afterUpdate() {
     BoxesGroup::afterUpdate();
     if(mUpdateReplaceCache) {
         CacheContainer *cont =
-              mCacheHandler.createNewRenderContainerAtRelFrame(mUpdateRelFrame);
+              mCacheHandler.createNewRenderContainerAtRelFrame(
+                    mCurrentRenderData->relFrame);
         cont->replaceImageSk(mCurrentRenderData->renderedImage);
         setCurrentPreviewContainer(cont);
         if(mRendering) {
@@ -588,22 +590,25 @@ void Canvas::drawPreviewPixmapSk(SkCanvas *canvas) {
 }
 
 #include "Boxes/imagesequencebox.h"
-void Canvas::createAnimationBoxForPaths(const QStringList &paths) {
-    ImageSequenceBox *aniBox = new ImageSequenceBox(mCurrentBoxesGroup);
+ImageSequenceBox *Canvas::createAnimationBoxForPaths(const QStringList &paths) {
+    ImageSequenceBox *aniBox = new ImageSequenceBox();
     aniBox->setListOfFrames(paths);
+    mCurrentBoxesGroup->addChild(aniBox);
+    return aniBox;
 }
 
 #include "Boxes/videobox.h"
 VideoBox *Canvas::createVideoForPath(const QString &path) {
-    VideoBox *vidBox = new VideoBox(path,
-                                    mCurrentBoxesGroup);
+    VideoBox *vidBox = new VideoBox(path);
+    mCurrentBoxesGroup->addChild(vidBox);
     return vidBox;
 }
 
 #include "Boxes/linkbox.h"
 void Canvas::createLinkToFileWithPath(const QString &path) {
-    ExternalLinkBox *extLinkBox = new ExternalLinkBox(mCurrentBoxesGroup);
+    ExternalLinkBox *extLinkBox = new ExternalLinkBox();
     extLinkBox->setSrc(path);
+    mCurrentBoxesGroup->addChild(extLinkBox);
 }
 
 void Canvas::renderCurrentFrameToSkCanvasSk(SkCanvas *canvas) {

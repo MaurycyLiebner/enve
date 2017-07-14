@@ -16,14 +16,14 @@ private:
 
 class ImageBox : public BoundingBox {
 public:
-    ImageBox(BoxesGroup *parent, QString filePath = "");
+    ImageBox(QString filePath = "");
 
     void reloadPixmap();
     void setFilePath(QString path);
     void updateRelBoundingRect();
 
     void makeDuplicate(Property *targetBox);
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    BoundingBox *createNewDuplicate();
 
     bool SWT_isImageBox() { return true; }
     void addActionsToMenu(QMenu *menu);

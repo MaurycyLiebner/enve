@@ -10,8 +10,8 @@ double fRand(double fMin, double fMax) {
     return fMin + f * (fMax - fMin);
 }
 
-ParticleBox::ParticleBox(BoxesGroup *parent) :
-    BoundingBox(parent, TYPE_PARTICLES) {
+ParticleBox::ParticleBox() :
+    BoundingBox(TYPE_PARTICLES) {
     setName("Particle Box");
     mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
     mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
@@ -88,8 +88,8 @@ void ParticleBox::removeEmitter(ParticleEmitter *emitter) {
     scheduleSoftUpdate();
 }
 
-BoundingBox *ParticleBox::createNewDuplicate(BoxesGroup *parent) {
-    return new ParticleBox(parent);
+BoundingBox *ParticleBox::createNewDuplicate() {
+    return new ParticleBox();
 }
 
 void ParticleBox::makeDuplicate(Property *targetBox) {
@@ -112,7 +112,6 @@ void ParticleBox::setUpdateVars() {
         mFrameChangedUpdateScheduled = false;
         Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
             emitter->generateParticlesIfNeeded();
-            emitter->updateParticlesForFrameIfNeeded(mUpdateRelFrame);
         }
     }
     BoundingBox::setUpdateVars();
@@ -126,19 +125,6 @@ void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
         emitter->setFrameRange(minFrame, maxFrame);
     }
-}
-
-void ParticleBox::drawSk(SkCanvas *canvas) {
-    canvas->save();
-
-    canvas->clipRect(QRectFToSkRect(mRelBoundingRect));
-    Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-        emitter->drawParticlesSk(canvas);
-    }
-
-    //p->setCompositionMode(QPainter::CompositionMode_DestinationIn);
-    //p->fillRect(mRelBoundingRect, Qt::white);
-    canvas->restore();
 }
 
 void ParticleBox::applyPaintSetting(const PaintSetting &setting) {
@@ -448,7 +434,6 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
     prp_blockUpdater();
 
     scheduleGenerateParticles();
-    scheduleUpdateParticlesForFrame();
 }
 
 void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
@@ -467,28 +452,6 @@ void ParticleEmitter::scheduleGenerateParticles() {
     mGenerateParticlesScheduled = true;
     mParentBox->clearAllCache();
     mParentBox->scheduleSoftUpdate();
-}
-
-void ParticleEmitter::scheduleUpdateParticlesForFrame() {
-    mUpdateParticlesForFrameScheduled = true;
-    mParentBox->scheduleSoftUpdate();
-}
-
-void ParticleEmitter::updateParticlesForFrameIfNeeded(const int &frame) {
-    if(mUpdateParticlesForFrameScheduled) {
-        mUpdateParticlesForFrameScheduled = false;
-        updateParticlesForFrame(frame);
-    }
-}
-
-bool ParticleEmitter::relPointInsidePath(const SkPoint &relPos) {
-    Q_FOREACH(const ParticleState &state, mParticleStates) {
-        if(pointToLen(state.pos - relPos) < 5.) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 Property *ParticleEmitter::makeDuplicate() {
@@ -725,26 +688,4 @@ void ParticleEmitter::generateParticles() {
     }
 
     mUpdateParticlesForFrameScheduled = true;
-}
-
-void ParticleEmitter::drawParticlesSk(SkCanvas *canvas) {
-    canvas->save();
-    SkPaint paint;
-    paint.setAntiAlias(true);
-    paint.setColor(mColorAnimator->getCurrentColor().getSkColor());
-    paint.setStrokeCap(SkPaint::kRound_Cap);
-    paint.setStyle(SkPaint::kStroke_Style);
-    Q_FOREACH(const ParticleState &state, mParticleStates) {
-        state.drawSk(canvas, paint);
-    }
-    canvas->restore();
-}
-
-void ParticleEmitter::updateParticlesForFrame(const int &frame) {
-    mParticleStates.clear();
-    Q_FOREACH(Particle *particle, mParticles) {
-        if(particle->isVisibleAtFrame(frame)) {
-            mParticleStates << particle->getParticleStateAtFrame(frame);
-        }
-    }
 }

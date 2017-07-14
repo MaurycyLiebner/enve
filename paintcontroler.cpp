@@ -9,6 +9,6 @@ void PaintControler::updateUpdatable(Updatable *updatable,
                                      const int &targetId) {
     if(targetId == mId) {
         updatable->processUpdate();
-        emit finishedUpdating(mId);
+        emit finishedUpdating(mId, updatable);
     }
 }

@@ -6,15 +6,15 @@ class ExternalLinkBox : public BoxesGroup
 {
     Q_OBJECT
 public:
-    ExternalLinkBox(BoxesGroup *parent);
+    ExternalLinkBox();
     void reload();
 
     void changeSrc();
 
     void setSrc(const QString &src);
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new ExternalLinkBox(parent);
+    BoundingBox *createNewDuplicate() {
+        return new ExternalLinkBox();
     }
 
     void makeDuplicate(Property *targetBox) {
@@ -30,7 +30,7 @@ class InternalLinkBox : public BoundingBox
 {
     Q_OBJECT
 public:
-    InternalLinkBox(BoundingBox *linkTarget, BoxesGroup *parent);
+    InternalLinkBox(BoundingBox *linkTarget);
 
     void setLinkTarget(BoundingBox *linkTarget) {
         mLinkTarget = linkTarget->ref<BoundingBox>();
@@ -51,10 +51,10 @@ public:
 
     BoundingBox *getLinkTarget();
 
-    BoundingBox *createLink(BoxesGroup *parent);
+    BoundingBox *createLink();
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new InternalLinkBox(mLinkTarget.data(), parent);
+    BoundingBox *createNewDuplicate() {
+        return new InternalLinkBox(mLinkTarget.data());
     }
 
     BoundingBoxRenderData *createRenderData();
@@ -77,9 +77,8 @@ protected:
 class InternalLinkCanvas : public BoundingBox {
     Q_OBJECT
 public:
-    InternalLinkCanvas(Canvas *canvas,
-                       BoxesGroup *parent) :
-        BoundingBox(parent, TYPE_INTERNAL_LINK) {
+    InternalLinkCanvas(Canvas *canvas) :
+        BoundingBox(TYPE_INTERNAL_LINK) {
         mClipToCanvasSize->prp_setName("clip to size");
         mClipToCanvasSize->setValue(true);
         mRastarized->prp_setName("rastarized");
@@ -108,9 +107,8 @@ public:
         ilcTarget->setClippedToCanvasSize(mClipToCanvasSize);
     }
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new InternalLinkCanvas(mLinkTarget.data(),
-                                      parent);
+    BoundingBox *createNewDuplicate() {
+        return new InternalLinkCanvas(mLinkTarget.data());
     }
 
     void setupBoundingBoxRenderDataForRelFrame(

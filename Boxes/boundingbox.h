@@ -104,12 +104,10 @@ class BoundingBox :
         public Updatable {
     Q_OBJECT
 public:
-    BoundingBox(BoxesGroup *parent,
-                const BoundingBoxType &type);
     BoundingBox(const BoundingBoxType &type);
     virtual ~BoundingBox();
 
-    virtual BoundingBox *createLink(BoxesGroup *parent);
+    virtual BoundingBox *createLink();
 
     virtual void setFont(const QFont &) {}
     virtual void setSelectedFontSize(const qreal &) {}
@@ -170,8 +168,7 @@ public:
     void drawBoundingRectSk(SkCanvas *canvas,
                             const qreal &invScale);
 
-    void setParent(BoxesGroup *parent,
-                   const bool &saveUndoRedo = true);
+    virtual void setParent(BoxesGroup *parent);
     BoxesGroup *getParent();
 
     bool isGroup();
@@ -374,11 +371,9 @@ public:
     void moveByAbs(const QPointF &trans);
     virtual void makeDuplicate(Property *property);
     Property *makeDuplicate();
-    BoundingBox *createDuplicate(BoxesGroup *parent);
-    virtual BoundingBox *createNewDuplicate(BoxesGroup *) = 0;
-    BoundingBox *createDuplicate() {
-        return createDuplicate(mParent.data());
-    }
+    BoundingBox *createDuplicate();
+    virtual BoundingBox *createNewDuplicate() = 0;
+    BoundingBox *createDuplicateWithSameParent();
 
     virtual void drawHoveredSk(SkCanvas *canvas,
                                const qreal &invScale) {
@@ -526,7 +521,6 @@ protected:
 
     RenderContainer mDrawRenderContainer;
 
-    int mUpdateRelFrame = 0;
     bool mUpdateDrawOnParentBox = true;
 
     bool mRedoUpdate = false;

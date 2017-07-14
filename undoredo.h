@@ -406,22 +406,6 @@ public:
 private:
 };
 
-class SetBoxParentUndoRedo : public UndoRedo {
-public:
-    SetBoxParentUndoRedo(BoundingBox *childBox,
-                         BoxesGroup *oldParent,
-                         BoxesGroup *newParent);
-
-    ~SetBoxParentUndoRedo();
-
-    void redo();
-    void undo();
-private:
-    BoundingBoxQSPtr mChildBox;
-    BoxesGroupQSPtr mOldParent;
-    BoxesGroupQSPtr mNewParent;
-};
-
 class  SetBoxVisibleUndoRedo : public UndoRedo {
 public:
      SetBoxVisibleUndoRedo(BoundingBox *target,

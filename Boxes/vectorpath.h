@@ -13,12 +13,10 @@ enum CanvasMode : short;
 
 class VectorPathEdge;
 
-class VectorPath : public PathBox
-{
+class VectorPath : public PathBox {
 public:
-    VectorPath(BoxesGroup *group);
-    static VectorPath *createPathFromSql(int boundingBoxId,
-                                         BoxesGroup *parent);
+    VectorPath();
+    static VectorPath *createPathFromSql(int boundingBoxId);
 
     ~VectorPath();
 
@@ -41,7 +39,7 @@ public:
     void loadPathFromSkPath(const SkPath &path);
 
     void makeDuplicate(Property *targetBox);
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    BoundingBox *createNewDuplicate();
     PathAnimator *getPathAnimator();
     void duplicatePathAnimatorFrom(PathAnimator *source);
     void updatePath();

@@ -22,8 +22,8 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
         QThread *paintControlerThread = new QThread(this);
         PaintControler *paintControler = new PaintControler(i);
         paintControler->moveToThread(paintControlerThread);
-        connect(paintControler, SIGNAL(finishedUpdating(int)),
-                this, SLOT(sendNextUpdatableForUpdate(int)) );
+        connect(paintControler, SIGNAL(finishedUpdating(int, Updatable*)),
+                this, SLOT(sendNextUpdatableForUpdate(int, Updatable*)) );
         connect(this, SIGNAL(updateUpdatable(Updatable*, int)),
                 paintControler, SLOT(updateUpdatable(Updatable*, int)) );
 
@@ -639,17 +639,17 @@ void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
         mNoBoxesAwaitUpdate = false;
     }
     if(!mFreeThreads.isEmpty()) {
-        mLastUpdatedUpdatable = updatable;
-        mLastUpdatedUpdatable->beforeUpdate();
+        updatable->beforeUpdate();
         emit updateUpdatable(updatable, mFreeThreads.takeFirst());
     } else {
         mUpdatablesAwaitingUpdate << updatable;
     }
 }
 
-void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId) {
-    if(mLastUpdatedUpdatable != NULL) {
-        mLastUpdatedUpdatable->afterUpdate();
+void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
+                                              Updatable *lastUpdatable) {
+    if(lastUpdatable != NULL) {
+        lastUpdatable->afterUpdate();
 //        mLastUpdatedBox->setAwaitingUpdate(false);
 //        if(mLastUpdatedBox->shouldRedoUpdate()) {
 //            mLastUpdatedBox->setRedoUpdateToFalse();
@@ -658,7 +658,6 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId) {
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
         mNoBoxesAwaitUpdate = true;
-        mLastUpdatedUpdatable = NULL;
         callUpdateSchedulers();
         if(mBoxesUpdateFinishedFunction != NULL) {
             (*this.*mBoxesUpdateFinishedFunction)();
@@ -668,10 +667,9 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId) {
     } else {
         foreach(Updatable *updatablaT, mUpdatablesAwaitingUpdate) {
             if(updatablaT->readyToBeProcessed()) {
-                mLastUpdatedUpdatable = updatablaT;
                 mUpdatablesAwaitingUpdate.removeOne(updatablaT);
-                mLastUpdatedUpdatable->beforeUpdate();
-                emit updateUpdatable(mLastUpdatedUpdatable, threadId);
+                updatablaT->beforeUpdate();
+                emit updateUpdatable(updatablaT, threadId);
                 return;
             }
         }

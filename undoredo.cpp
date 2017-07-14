@@ -315,27 +315,6 @@ void AddChildToListUndoRedo::undo() {
     mParent->removeChildFromList(mAddAtId, false);
 }
 
-SetBoxParentUndoRedo::SetBoxParentUndoRedo(BoundingBox *childBox,
-                                           BoxesGroup *oldParent,
-                                           BoxesGroup *newParent) :
-    UndoRedo("SetBoxParentUndoRedo")
-{
-    mChildBox = childBox->ref<BoundingBox>();
-    mOldParent = oldParent->ref<BoxesGroup>();
-    mNewParent = newParent->ref<BoxesGroup>();
-}
-
-SetBoxParentUndoRedo::~SetBoxParentUndoRedo() {
-}
-
-void SetBoxParentUndoRedo::redo() {
-    mChildBox->setParent(mNewParent.data(), false);
-}
-
-void SetBoxParentUndoRedo::undo() {
-    mChildBox->setParent(mOldParent.data(), false);
-}
-
 SetBoxVisibleUndoRedo::SetBoxVisibleUndoRedo(BoundingBox *target,
                                              const bool &visibleBefore,
                                              const bool &visibleAfter) :

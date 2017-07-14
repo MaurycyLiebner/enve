@@ -157,7 +157,6 @@ protected:
     bool mRendering = false;
     bool mNoBoxesAwaitUpdate = true;
     bool mCancelLastBoxUpdate = false;
-    Updatable *mLastUpdatedUpdatable = NULL;
     QList<Updatable*> mUpdatablesAwaitingUpdate;
 
     QString mOutputString;
@@ -265,7 +264,8 @@ public slots:
     void rotate90CWAction();
     void rotate90CCWAction();
 private slots:
-    void sendNextUpdatableForUpdate(const int &threadId);
+    void sendNextUpdatableForUpdate(const int &threadId,
+                                    Updatable *lastUpdatable = NULL);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
     void saveOutput(const QString &renderDest,

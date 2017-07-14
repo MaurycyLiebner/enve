@@ -110,6 +110,7 @@ struct KeyPair {
 class KeyCloner {
 public:
     KeyCloner(Key *key);
+    virtual ~KeyCloner() {}
 
     int getRelFrame() { return mRelFrame; }
 

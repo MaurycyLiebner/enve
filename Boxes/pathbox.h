@@ -40,8 +40,7 @@ private:
 
 class PathBox : public BoundingBox {
 public:
-    PathBox(BoxesGroup *parent,
-            const BoundingBoxType &type);
+    PathBox(const BoundingBoxType &type);
     ~PathBox();
 
     void schedulePathUpdate();

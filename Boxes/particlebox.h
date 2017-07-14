@@ -110,15 +110,9 @@ public:
 
     void setParentBox(ParticleBox *parentBox);
 
-    void generateParticles();
-
-    void drawParticlesSk(SkCanvas *canvas);
-    void updateParticlesForFrame(const int &frame);
     void scheduleGenerateParticles();
-    void scheduleUpdateParticlesForFrame();
     void generateParticlesIfNeeded();
-    void updateParticlesForFrameIfNeeded(const int &frame);
-    bool relPointInsidePath(const SkPoint &relPos);
+    void generateParticles();
 
     Property *makeDuplicate();
 
@@ -234,7 +228,7 @@ private:
 class ParticleBox : public BoundingBox {
     Q_OBJECT
 public:
-    ParticleBox(BoxesGroup *parent);
+    ParticleBox();
     void getAccelerationAt(const QPointF &pos,
                            const int &frame,
                            QPointF *acc);
@@ -243,12 +237,11 @@ public:
     bool relPointInsidePath(const QPointF &relPos);
 
     void addEmitter(ParticleEmitter *emitter);
-    void drawSk(SkCanvas *canvas);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    BoundingBox *createNewDuplicate();
 
     void makeDuplicate(Property *targetBox);
 

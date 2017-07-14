@@ -18,8 +18,8 @@ bool BoxesGroup::mCtrlsAlwaysVisible = false;
 //    return box1->getZIndex() < box2->getZIndex();
 //}
 
-BoxesGroup::BoxesGroup(BoxesGroup *parent) :
-    BoundingBox(parent, BoundingBoxType::TYPE_GROUP) {
+BoxesGroup::BoxesGroup() :
+    BoundingBox(BoundingBoxType::TYPE_GROUP) {
     setName("Group");
     mFillStrokeSettingsWidget = getMainWindow()->getFillStrokeSettings();
 }
@@ -79,9 +79,10 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
                                             const bool &loadInBox) {
     QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
     if(loadInBox) {
-        BoxesGroup *newGroup = new BoxesGroup(this);
+        BoxesGroup *newGroup = new BoxesGroup();
         newGroup->loadChildrenFromSql(thisBoundingBoxId, false);
         newGroup->centerPivotPosition();
+        addChild(newGroup);
         return newGroup;
     }
     QSqlQuery query;
@@ -94,23 +95,28 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
         while(query.next() ) {
             if(static_cast<BoundingBoxType>(
                         query.value(idBoxType).toInt()) == TYPE_VECTOR_PATH ) {
-                VectorPath::createPathFromSql(query.value(idId).toInt(), this);
+                addChild(VectorPath::createPathFromSql(
+                             query.value(idId).toInt()) );
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_GROUP ) {
-                BoxesGroup *group = new BoxesGroup(this);
+                BoxesGroup *group = new BoxesGroup();
                 group->prp_loadFromSql(query.value(idId).toInt());
+                addChild(group);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_CIRCLE ) {
-                Circle *circle = new Circle(this);
+                Circle *circle = new Circle();
                 circle->prp_loadFromSql(query.value(idId).toInt());
+                addChild(circle);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_TEXT ) {
-                TextBox *textBox = new TextBox(this);
+                TextBox *textBox = new TextBox();
                 textBox->prp_loadFromSql(query.value(idId).toInt());
+                addChild(textBox);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_RECTANGLE ) {
-                Rectangle *rectangle = new Rectangle(this);
+                Rectangle *rectangle = new Rectangle();
                 rectangle->prp_loadFromSql(query.value(idId).toInt());
+                addChild(rectangle);
             }
         }
     } else {
@@ -181,13 +187,14 @@ void BoxesGroup::startSelectedFillColorTransform()
 
 void BoxesGroup::makeDuplicate(Property *targetBox) {
     BoundingBox::makeDuplicate(targetBox);
+    BoxesGroup *boxesGroupTarget = (BoxesGroup*)targetBox;
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-        child->createDuplicate((BoxesGroup*)targetBox);
+        boxesGroupTarget->addChild(child->createDuplicate());
     }
 }
 
-BoundingBox *BoxesGroup::createNewDuplicate(BoxesGroup *parent) {
-    return new BoxesGroup(parent);
+BoundingBox *BoxesGroup::createNewDuplicate() {
+    return new BoxesGroup();
 }
 
 void BoxesGroup::updateRelBoundingRect() {
@@ -430,8 +437,8 @@ void BoxesGroup::addChild(BoundingBox *child) {
 void BoxesGroup::addChildToListAt(const int &index,
                                   BoundingBox *child,
                                   const bool &saveUndoRedo) {
+    child->setParent(this);
     if(saveUndoRedo) {
-        child->setParent(this);
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
     connect(child, SIGNAL(prp_absFrameRangeChanged(int,int)),

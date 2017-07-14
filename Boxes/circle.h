@@ -48,7 +48,7 @@ private:
 class Circle : public PathBox
 {
 public:
-    Circle(BoxesGroup *parent);
+    Circle();
 
     void setVerticalRadius(const qreal &verticalRadius);
     void setHorizontalRadius(const qreal &horizontalRadius);
@@ -68,8 +68,8 @@ public:
                       const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new Circle(parent);
+    BoundingBox *createNewDuplicate() {
+        return new Circle();
     }
 
     void drawSelectedSk(SkCanvas *canvas,

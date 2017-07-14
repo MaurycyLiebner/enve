@@ -52,7 +52,7 @@ private:
 class BoxesGroup : public BoundingBox {
     Q_OBJECT
 public:
-    BoxesGroup(BoxesGroup *parent);
+    BoxesGroup();
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
     ~BoxesGroup();
     virtual void prp_loadFromSql(const int &boundingBoxId);
@@ -151,7 +151,7 @@ public:
     void startSelectedFillColorTransform();
 
     void makeDuplicate(Property *targetBox);
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    BoundingBox *createNewDuplicate();
 
     void applyPaintSetting(
             const PaintSetting &setting) {

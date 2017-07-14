@@ -10,9 +10,8 @@
 #include "canvas.h"
 #include "vectorpath.h"
 
-PathBox::PathBox(BoxesGroup *parent,
-                 const BoundingBoxType &type) :
-    BoundingBox(parent, type) {
+PathBox::PathBox(const BoundingBoxType &type) :
+    BoundingBox(type) {
     mPathEffectsAnimators =
             (new PathEffectAnimators())->ref<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
@@ -404,25 +403,27 @@ void PathBox::updateOutlinePathIfNeeded() {
 }
 
 VectorPath *PathBox::objectToPath() {
-    VectorPath *newPath = new VectorPath(mParent.data());
+    VectorPath *newPath = new VectorPath();
     newPath->loadPathFromSkPath(mPathSk);
     newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
     newPath->duplicatePaintSettingsFrom(mFillSettings.data(),
                                         mStrokeSettings.data());
     newPath->duplicateGradientPointsFrom(mFillGradientPoints.data(),
                                          mStrokeGradientPoints.data());
+    mParent->addChild(newPath);
     return newPath;
 }
 
 VectorPath *PathBox::strokeToPath() {
     if(mOutlinePathSk.isEmpty()) return NULL;
-    VectorPath *newPath = new VectorPath(mParent.data());
+    VectorPath *newPath = new VectorPath();
     newPath->loadPathFromSkPath(mOutlinePathSk);
     newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
     newPath->duplicatePaintSettingsFrom(mStrokeSettings.data(),
                                         NULL);
     newPath->duplicateGradientPointsFrom(mStrokeGradientPoints.data(),
                                          NULL);
+    mParent->addChild(newPath);
     return newPath;
 }
 

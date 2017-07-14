@@ -227,7 +227,8 @@ extern BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
 extern bool parsePathDataFast(const QString &dataStr,
                               VectorPathSvgAttributes *attributes);
 extern void loadVectorPath(const QDomElement &pathElement,
-                           BoxesGroup *parentGroup, VectorPathSvgAttributes *attributes);
+                           BoxesGroup *parentGroup,
+                           VectorPathSvgAttributes *attributes);
 extern void loadElement(const QDomElement &element,
                         BoxesGroup *parentGroup, BoundingBoxSvgAttributes *parentGroupAttributes);
 extern BoxesGroup *loadSVGFile(const QString &filename,

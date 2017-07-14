@@ -4,9 +4,9 @@
 
 class ImageSequenceBox : public AnimationBox{
 public:
-    ImageSequenceBox(BoxesGroup *parent);
+    ImageSequenceBox();
     void setListOfFrames(const QStringList &listOfFrames);
-    BoundingBox *createNewDuplicate(BoxesGroup *parent);
+    BoundingBox *createNewDuplicate();
     void reloadFile();
     void makeDuplicate(Property *targetBox);
 

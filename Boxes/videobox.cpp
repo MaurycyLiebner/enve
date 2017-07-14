@@ -9,13 +9,23 @@ extern "C" {
 #include <QDebug>
 #include "Sound/singlesound.h"
 #include "canvas.h"
+#include "Sound/soundcomposition.h"
 
-VideoBox::VideoBox(const QString &filePath,
-                   BoxesGroup *parent) :
-    AnimationBox(parent) {
+VideoBox::VideoBox(const QString &filePath) :
+    AnimationBox() {
     setName("Video");
 
     setFilePath(filePath);
+}
+
+void VideoBox::setParent(BoxesGroup *parent) {
+    if(mParent != NULL && mSound != NULL) {
+        getParentCanvas()->getSoundComposition()->removeSound(mSound);
+    }
+    AnimationBox::setParent(parent);
+    if(mParent != NULL && mSound != NULL) {
+        getParentCanvas()->getSoundComposition()->addSound(mSound);
+    }
 }
 
 void VideoBox::makeDuplicate(Property *targetBox) {
@@ -26,8 +36,8 @@ void VideoBox::makeDuplicate(Property *targetBox) {
                 mTimeScaleAnimator.data());
 }
 
-BoundingBox *VideoBox::createNewDuplicate(BoxesGroup *parent) {
-    return new VideoBox(mSrcFilePath, parent);
+BoundingBox *VideoBox::createNewDuplicate() {
+    return new VideoBox(mSrcFilePath);
 }
 
 #include <QFileDialog>
@@ -86,14 +96,15 @@ bool hasSound(const char* path) {
     return false;
 }
 
-#include "Sound/soundcomposition.h"
 void VideoBox::reloadSound() {
     if(hasSound(mSrcFilePath.toLatin1().data())) {
         if(mSound == NULL) {
             mSound = new SingleSound(mSrcFilePath,
                                      (FixedLenAnimationRect*)mDurationRectangle);
             ca_addChildAnimator(mSound);
-            getParentCanvas()->getSoundComposition()->addSound(mSound);
+            if(mParent != NULL) {
+                getParentCanvas()->getSoundComposition()->addSound(mSound);
+            }
         } else {
             mSound->reloadDataFromFile();
         }

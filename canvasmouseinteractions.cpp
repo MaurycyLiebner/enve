@@ -193,8 +193,10 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                             linkCanvasMenu->actions();
                     int id = canvasActions.indexOf(selectedAction);
                     if(id >= 0) {
-                        listOfCanvas.at(id)->createLink(
-                                    mCurrentBoxesGroup)->centerPivotPosition();
+                        Canvas *canvasLink =
+                                (Canvas*)listOfCanvas.at(id)->createLink();
+                        mCurrentBoxesGroup->addChild(canvasLink);
+                        canvasLink->centerPivotPosition();
                     }
                 }
             } else {
@@ -299,7 +301,8 @@ void Canvas::handleLeftButtonMousePress() {
             handleMovePointMousePressEvent();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
 
-            Circle *newPath = new Circle(mCurrentBoxesGroup);
+            Circle *newPath = new Circle();
+            mCurrentBoxesGroup->addChild(newPath);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
@@ -308,7 +311,8 @@ void Canvas::handleLeftButtonMousePress() {
             mCurrentCircle = newPath;
 
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-            Rectangle *newPath = new Rectangle(mCurrentBoxesGroup);
+            Rectangle *newPath = new Rectangle();
+            mCurrentBoxesGroup->addChild(newPath);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
@@ -316,18 +320,18 @@ void Canvas::handleLeftButtonMousePress() {
 
             mCurrentRectangle = newPath;
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
-
-            TextBox *newPath = new TextBox(mCurrentBoxesGroup);
+            TextBox *newPath = new TextBox();
+            mCurrentBoxesGroup->addChild(newPath);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
 
             mCurrentTextBox = newPath;
 
             clearBoxesSelection();
             addBoxToSelection(newPath);
-
         } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             //setCanvasMode(CanvasMode::MOVE_POINT);
-            ParticleBox *partBox = new ParticleBox(mCurrentBoxesGroup);
+            ParticleBox *partBox = new ParticleBox();
+            mCurrentBoxesGroup->addChild(partBox);
             partBox->setAbsolutePos(mLastMouseEventPosRel, false);
             clearBoxesSelection();
             addBoxToSelection(partBox);
@@ -526,8 +530,8 @@ void Canvas::handleAddPointMousePress() {
         return;
     }
     if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
-
-        VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
+        VectorPath *newPath = new VectorPath();
+        mCurrentBoxesGroup->addChild(newPath);
         clearBoxesSelection();
         addBoxToSelection(newPath);
         PathAnimator *newPathAnimator = newPath->getPathAnimator();

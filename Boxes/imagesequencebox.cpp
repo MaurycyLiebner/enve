@@ -1,8 +1,8 @@
 #include "imagesequencebox.h"
 #include "filesourcescache.h"
 
-ImageSequenceBox::ImageSequenceBox(BoxesGroup *parent) :
-    AnimationBox(parent) {
+ImageSequenceBox::ImageSequenceBox() :
+    AnimationBox() {
     setName("Image Sequence");
 }
 
@@ -36,6 +36,6 @@ void ImageSequenceBox::changeSourceFile() {
     }
 }
 
-BoundingBox *ImageSequenceBox::createNewDuplicate(BoxesGroup *parent) {
-    return new ImageSequenceBox(parent);
+BoundingBox *ImageSequenceBox::createNewDuplicate() {
+    return new ImageSequenceBox();
 }

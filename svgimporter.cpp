@@ -128,8 +128,9 @@ BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
     bool hasTransform = attributes->hasTransform();
     if(allRootChildNodes.count() > 1 ||
        hasTransform) {
-        boxesGroup = new BoxesGroup(parentGroup);
+        boxesGroup = new BoxesGroup();
         attributes->apply(boxesGroup);
+        parentGroup->addChild(boxesGroup);
     } else {
         boxesGroup = parentGroup;
     }
@@ -941,21 +942,22 @@ void BoundingBoxSvgAttributes::applySingleTransformations(BoundingBox *box) {
 void loadVectorPath(const QDomElement &pathElement,
                     BoxesGroup *parentGroup,
                     VectorPathSvgAttributes *attributes) {
-    VectorPath *vectorPath = new VectorPath(parentGroup);
-
+    VectorPath *vectorPath = new VectorPath();
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
     attributes->apply(vectorPath);
+    parentGroup->addChild(vectorPath);
 }
 
 void loadPolyline(const QDomElement &pathElement,
                   BoxesGroup *parentGroup,
                   VectorPathSvgAttributes *attributes) {
-    VectorPath *vectorPath = new VectorPath(parentGroup);
+    VectorPath *vectorPath = new VectorPath();
 
     QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
     attributes->apply(vectorPath);
+    parentGroup->addChild(parentGroup);
 }
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,

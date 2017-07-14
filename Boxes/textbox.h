@@ -6,7 +6,7 @@
 class TextBox : public PathBox
 {
 public:
-    TextBox(BoxesGroup *parent);
+    TextBox();
 
     void setText(const QString &text, const bool &saveUndoRedo = true);
 
@@ -29,8 +29,8 @@ public:
 //    QRectF getTextRect();
     void setPathText(bool pathText);
 
-    BoundingBox *createNewDuplicate(BoxesGroup *parent) {
-        return new TextBox(parent);
+    BoundingBox *createNewDuplicate() {
+        return new TextBox();
     }
 
     void setTextAlignment(const Qt::Alignment &alignment) {

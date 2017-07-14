@@ -15,8 +15,7 @@
 #include "skqtconversions.h"
 #include "global.h"
 
-BoundingBox::BoundingBox(BoxesGroup *parent,
-                         const BoundingBoxType &type) :
+BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
     mEffectsAnimators->prp_setName("effects");
     mEffectsAnimators->setParentBox(this);
@@ -27,16 +26,6 @@ BoundingBox::BoundingBox(BoxesGroup *parent,
 
     mType = type;
 
-    mTransformAnimator->reset();
-    if(parent == NULL) return;
-    mParent = parent->ref<BoxesGroup>();
-    parent->addChild(this);
-    updateCombinedTransform();
-}
-
-BoundingBox::BoundingBox(const BoundingBoxType &type) :
-    ComplexAnimator(), Transformable() {
-    mType = type;
     mTransformAnimator->reset();
 }
 
@@ -72,8 +61,8 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
 }
 
 #include "linkbox.h"
-BoundingBox *BoundingBox::createLink(BoxesGroup *parent) {
-    InternalLinkBox *linkBox = new InternalLinkBox(this, parent);
+BoundingBox *BoundingBox::createLink() {
+    InternalLinkBox *linkBox = new InternalLinkBox(this);
     BoundingBox::makeDuplicate(linkBox);
     return linkBox;
 }
@@ -90,13 +79,19 @@ void BoundingBox::makeDuplicate(Property *property) {
 }
 
 Property *BoundingBox::makeDuplicate() {
-    return createDuplicate(mParent.data());
+    return createDuplicateWithSameParent();
 }
 
-BoundingBox *BoundingBox::createDuplicate(BoxesGroup *parent) {
-    BoundingBox *target = createNewDuplicate(parent);
+BoundingBox *BoundingBox::createDuplicate() {
+    BoundingBox *target = createNewDuplicate();
     makeDuplicate(target);
     return target;
+}
+
+BoundingBox *BoundingBox::createDuplicateWithSameParent() {
+    BoundingBox *duplicate = createDuplicate();
+    mParent->addChild(duplicate);
+    return duplicate;
 }
 
 
@@ -384,11 +379,7 @@ bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     return mDurationRectangle->hasAnimationFrameRange();
 }
 
-void BoundingBox::setParent(BoxesGroup *parent,
-                            const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-        addUndoRedo(new SetBoxParentUndoRedo(this, mParent.data(), parent));
-    }
+void BoundingBox::setParent(BoxesGroup *parent) {
     mParent = parent->ref<BoxesGroup>();
     mTransformAnimator->setParentTransformAnimator(
                         mParent->getTransformAnimator());
@@ -1136,7 +1127,7 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
         } else if(selectedAction->text() == "Apply Transformation") {
             applyCurrentTransformation();
         } else if(selectedAction->text() == "Create Link") {
-            createLink(mParent.data());
+            mParent->addChild(createLink());
         } else if(selectedAction->text() == "Group") {
             getParentCanvas()->groupSelectedBoxes();
             return true;
@@ -1199,7 +1190,6 @@ void BoundingBox::setUpdateVars() {
     setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
                                           mCurrentRenderData.get());
 
-    mUpdateRelFrame = anim_mCurrentRelFrame;
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 }
 
@@ -1226,6 +1216,7 @@ void BoundingBox::scheduleSoftUpdate() {
 }
 
 void BoundingBox::scheduleUpdate() {
+    if(mParent == NULL) return;
     if(shouldUpdate()) {
         mAwaitingUpdate = true;
         mWaitingForSchedulerToBeProcessed = true;

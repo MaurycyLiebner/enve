@@ -499,25 +499,26 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 #include "Boxes/linkbox.h"
 void Canvas::createLinkBoxForSelected() {
     Q_FOREACH(BoundingBox *selectedBox, mSelectedBoxes) {
-        selectedBox->createLink(mCurrentBoxesGroup);
+        mCurrentBoxesGroup->addChild(selectedBox->createLink());
     }
 }
 
 void Canvas::duplicateSelectedBoxes() {
     Q_FOREACH(BoundingBox *selectedBox, mSelectedBoxes) {
-        selectedBox->createDuplicate();
+        selectedBox->createDuplicateWithSameParent();
     }
 }
 
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) return;
-    BoxesGroup *newGroup = new BoxesGroup(mCurrentBoxesGroup);
+    BoxesGroup *newGroup = new BoxesGroup();
     BoundingBox *box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
         box->removeFromParent();
         newGroup->addChild(box);
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
+    mCurrentBoxesGroup->addChild(newGroup);
     addBoxToSelection(newGroup);
 }
 
@@ -525,7 +526,7 @@ void Canvas::groupSelectedBoxes() {
 VectorPath *Canvas::getPathResultingFromOperation(
                                 const bool &unionInterThis,
                                 const bool &unionInterOther) {
-    VectorPath *newPath = new VectorPath(mCurrentBoxesGroup);
+    VectorPath *newPath = new VectorPath();
     FullVectorPath *targetPath = new FullVectorPath();
     FullVectorPath *addToPath = NULL;
     FullVectorPath *addedPath = NULL;
@@ -554,7 +555,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
     }
 
     targetPath->addAllToVectorPath(newPath->getPathAnimator());
-
+    mCurrentBoxesGroup->addChild(newPath);
     return newPath;
 }
 
