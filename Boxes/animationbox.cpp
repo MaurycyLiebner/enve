@@ -125,7 +125,8 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
 }
 
 void AnimationBox::afterSuccessfulUpdate() {
-    sk_sp<SkImage> image = ((ImageBoxRenderData*)mCurrentRenderData)->image;
+    sk_sp<SkImage> image =
+            ((ImageBoxRenderData*)mCurrentRenderData.get())->image;
     mRelBoundingRect = QRectF(0., 0.,
                               image->width(),
                               image->height());

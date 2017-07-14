@@ -14,7 +14,7 @@ class MainWindow;
 class VectorPathEdge;
 
 struct BoxesGroupRenderData : public BoundingBoxRenderData {
-    QList<BoundingBoxRenderData*> childrenRenderData;
+    QList<std::shared_ptr<BoundingBoxRenderData> > childrenRenderData;
 
     bool shouldPaintOnImage = true;
 
@@ -26,7 +26,7 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
             paint.setAlpha(qRound(opacity*2.55));
             paint.setBlendMode(blendMode);
             canvas->saveLayer(NULL, &paint);
-            Q_FOREACH(BoundingBoxRenderData *renderData,
+            Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &renderData,
                       childrenRenderData) {
                 renderData->drawRenderedImage(canvas);
             }
@@ -39,7 +39,7 @@ private:
         canvas->save();
 
         canvas->concat(QMatrixToSkMatrix(transform.inverted()));
-        Q_FOREACH(BoundingBoxRenderData *renderData,
+        Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &renderData,
                   childrenRenderData) {
             //box->draw(p);
             renderData->drawRenderedImageForParent(canvas);

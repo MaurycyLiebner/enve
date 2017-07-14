@@ -68,7 +68,8 @@ private:
     BoundingBox *mBoundingBox;
 };
 
-struct BoundingBoxRenderData : public Updatable {
+struct BoundingBoxRenderData : public Updatable,
+                               public StdSelfRef {
     virtual ~BoundingBoxRenderData();
     bool renderedToImage = false;
     QMatrix transform;
@@ -80,7 +81,7 @@ struct BoundingBoxRenderData : public Updatable {
     QList<PixmapEffectRenderData*> pixmapEffects;
     SkPoint drawPos;
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
-    BoundingBox *parentBox;
+    QSharedPointer<BoundingBox> parentBox;
 
     virtual void drawRenderedImage(SkCanvas *canvas);
     virtual void drawRenderedImageForParent(SkCanvas *canvas);
@@ -481,7 +482,7 @@ public:
 
     BoundingBoxRenderData *getRenderDataForRelFrame(const int &relFrame) {
         BoundingBoxRenderData *data = createRenderData();
-        data->parentBox = this;
+        data->parentBox = this->ref<BoundingBox>();
         setupBoundingBoxRenderDataForRelFrame(relFrame, data);
         return data;
     }
@@ -493,7 +494,7 @@ public:
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
 protected:
-    BoundingBoxRenderData *mCurrentRenderData = NULL;
+    std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
 

@@ -1181,23 +1181,23 @@ void BoundingBox::processUpdate() {
 
 void BoundingBox::afterUpdate() {
     afterSuccessfulUpdate();
-    mDrawRenderContainer.setVariablesFromRenderData(mCurrentRenderData);
+    mDrawRenderContainer.setVariablesFromRenderData(mCurrentRenderData.get());
     updateDrawRenderContainerTransform();
     Updatable::afterUpdate();
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
-    return mCurrentRenderData;
+    return mCurrentRenderData.get();
 }
 
 void BoundingBox::setUpdateVars() {
     updateRelBoundingRect();
 
     if(mCurrentRenderData == NULL) {
-        mCurrentRenderData = createRenderData();
+        mCurrentRenderData = createRenderData()->ref<BoundingBoxRenderData>();
     }
     setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
-                                          mCurrentRenderData);
+                                          mCurrentRenderData.get());
 
     mUpdateRelFrame = anim_mCurrentRelFrame;
     mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();

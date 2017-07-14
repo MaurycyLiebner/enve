@@ -6,8 +6,7 @@
 class ComplexKey;
 class KeysClipboardContainer;
 
-class ComplexAnimator : public Animator
-{
+class ComplexAnimator : public Animator {
     Q_OBJECT
 public:
     ComplexAnimator();

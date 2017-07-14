@@ -245,10 +245,6 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
                                                        data);
     BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
     groupData->shouldPaintOnImage = shouldPaintOnImage();
-    foreach(BoundingBoxRenderData *renderData, groupData->childrenRenderData) {
-        delete renderData;
-    }
-
     groupData->childrenRenderData.clear();
     qreal childrenEffectsMargin = 0.;
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
@@ -256,7 +252,8 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
                                      childrenEffectsMargin);
         BoundingBoxRenderData *boxRenderData = box->createRenderData();
         box->setupBoundingBoxRenderDataForRelFrame(relFrame, boxRenderData);
-        groupData->childrenRenderData << boxRenderData;
+        groupData->childrenRenderData <<
+                boxRenderData->ref<BoundingBoxRenderData>();
     }
     data->effectsMargin += childrenEffectsMargin;
     groupData->relBoundingRect = mRelBoundingRect;
