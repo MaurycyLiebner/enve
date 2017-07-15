@@ -17,7 +17,6 @@ public:
 
 //    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
-    void afterSuccessfulUpdate();
     void updateDurationRectangleAnimationRange();
     virtual void reloadFile();
     virtual void reloadSound() {}
@@ -40,6 +39,7 @@ public:
     void scheduleUpdate();
     void afterUpdate();
     void setParent(BoxesGroup *parent);
+    void updateRelBoundingRect();
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;

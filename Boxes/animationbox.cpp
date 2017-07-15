@@ -140,14 +140,14 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
     //}
 }
 
-void AnimationBox::afterSuccessfulUpdate() {
+void AnimationBox::updateRelBoundingRect() {
     sk_sp<SkImage> image =
             ((ImageBoxRenderData*)mCurrentRenderData.get())->image;
     mRelBoundingRect = QRectF(0., 0.,
                               image->width(),
                               image->height());
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
-    updateRelBoundingRect();
+    BoundingBox::updateRelBoundingRect();
 }
 
 //void AnimationBox::drawSk(SkCanvas *canvas) {

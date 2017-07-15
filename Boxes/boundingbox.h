@@ -289,7 +289,6 @@ public:
     bool shouldRedoUpdate();
     void setRedoUpdateToFalse();
 
-    virtual void afterSuccessfulUpdate() {}
 
     void updateRelativeTransformTmp();
 

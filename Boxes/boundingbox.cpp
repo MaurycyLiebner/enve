@@ -1171,7 +1171,6 @@ void BoundingBox::processUpdate() {
 }
 
 void BoundingBox::afterUpdate() {
-    afterSuccessfulUpdate();
     mDrawRenderContainer.setVariablesFromRenderData(mCurrentRenderData.get());
     updateDrawRenderContainerTransform();
     Updatable::afterUpdate();

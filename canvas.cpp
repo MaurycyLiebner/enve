@@ -503,9 +503,7 @@ void Canvas::nextPreviewFrame() {
 
 void Canvas::beforeUpdate() {
     BoxesGroup::beforeUpdate();
-    mRenderBackgroundColor = mBackgroundColor->getCurrentColor();
-    mRenderImageSize = QSize(mWidth*mResolutionFraction,
-                             mHeight*mResolutionFraction);
+
     CacheContainer *cont =
           mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
     mUpdateReplaceCache = cont == NULL;
@@ -539,24 +537,6 @@ void Canvas::afterUpdate() {
 //    renderCurrentFrameToPreview();
 //}
 
-void Canvas::renderCurrentFrameToPreview() {
-    SkImageInfo info = SkImageInfo::Make(mRenderImageSize.width(),
-                                         mRenderImageSize.height(),
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    SkCanvas *rasterCanvas = new SkCanvas(bitmap);
-    rasterCanvas->clear(mRenderBackgroundColor.getSkColor());
-
-    renderCurrentFrameToSkCanvasSk(rasterCanvas);
-    rasterCanvas->flush();
-
-    mRenderImageSk = SkImage::MakeFromBitmap(bitmap);
-    bitmap.reset();
-    delete rasterCanvas;
-}
 #include <QFile>
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
     Q_UNUSED(renderDest);

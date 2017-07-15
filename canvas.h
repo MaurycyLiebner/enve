@@ -102,8 +102,6 @@ public:
     void playPreview(const int &minPreviewFrameId,
                      const int &maxPreviewFrameId);
 
-    void renderCurrentFrameToPreview();
-
     QMatrix getCombinedRenderTransform();
 
     void clearPreview();
@@ -449,8 +447,7 @@ protected:
     bool mUpdateReplaceCache = false;
 
     sk_sp<SkImage> mRenderImageSk;
-    QSize mRenderImageSize;
-    Color mRenderBackgroundColor;
+
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();
 

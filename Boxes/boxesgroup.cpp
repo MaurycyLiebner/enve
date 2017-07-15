@@ -257,10 +257,11 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         childrenEffectsMargin = qMax(box->getEffectsMarginAtRelFrame(relFrame),
                                      childrenEffectsMargin);
-        BoundingBoxRenderData *boxRenderData = box->createRenderData();
-        box->setupBoundingBoxRenderDataForRelFrame(relFrame, boxRenderData);
+        BoundingBoxRenderData *boxRenderData =
+                box->getRenderDataForRelFrame(relFrame);
         groupData->childrenRenderData <<
                 boxRenderData->ref<BoundingBoxRenderData>();
+        boxRenderData->addDependent(groupData);
     }
     data->effectsMargin += childrenEffectsMargin;
     groupData->relBoundingRect = mRelBoundingRect;
