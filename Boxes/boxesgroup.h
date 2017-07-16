@@ -111,14 +111,6 @@ public:
     StrokeSettings *getStrokeSettings();
     void updateAllBoxes();
 
-    void updateRelBoundingRect();
-    void forceUpdateRelBoundingRect() {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-            child->forceUpdateRelBoundingRect();
-        }
-        updateRelBoundingRect();
-    }
-
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
         SkPath boundingPaths = SkPath();
         Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
@@ -176,7 +168,6 @@ public:
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
 
-    virtual void addChildAwaitingUpdate(BoundingBox *child);
     void updateAfterCombinedTransformationChanged();
     void updateCombinedTransformTmp();
     void updateAfterCombinedTransformationChangedAfterFrameChagne();
@@ -205,7 +196,6 @@ protected:
     bool mIsDescendantCurrentGroup = false;
     QList<QSharedPointer<BoundingBox> > mChildBoxes;
 
-    QList<QSharedPointer<BoundingBox> > mChildrenAwaitingUpdate;
     //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getChildBoxIndex(BoundingBox *child);
 signals:

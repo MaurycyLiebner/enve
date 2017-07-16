@@ -101,6 +101,10 @@ public:
     bool SWT_isAnimator() { return true; }
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
+    int anim_getCurrentAbsFrame() {
+        return anim_mCurrentAbsFrame;
+    }
+
 protected:
     int anim_getKeyIndex(Key *key);
 

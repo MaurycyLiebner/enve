@@ -68,8 +68,8 @@ private:
     BoundingBox *mBoundingBox;
 };
 
-struct BoundingBoxRenderData : public Updatable,
-                               public StdSelfRef {
+struct BoundingBoxRenderData : public StdSelfRef,
+                               public Updatable {
     virtual ~BoundingBoxRenderData();
     bool renderedToImage = false;
     QMatrix transform;
@@ -81,6 +81,7 @@ struct BoundingBoxRenderData : public Updatable,
     QList<PixmapEffectRenderData*> pixmapEffects;
     SkPoint drawPos;
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
+
     QSharedPointer<BoundingBox> parentBox;
 
     virtual void drawRenderedImage(SkCanvas *canvas);
@@ -100,8 +101,7 @@ private:
 
 class BoundingBox :
         public ComplexAnimator,
-        public Transformable,
-        public Updatable {
+        public Transformable {
     Q_OBJECT
 public:
     BoundingBox(const BoundingBoxType &type);
@@ -284,7 +284,7 @@ public:
                               const SkPath &path,
                               const SkScalar &invScale);
 
-    virtual void setUpdateVars();
+    virtual void setUpdateVars() {}
     void redoUpdate();
     bool shouldRedoUpdate();
     void setRedoUpdateToFalse();
@@ -312,10 +312,6 @@ public:
     void selectionChangeTriggered(const bool &shiftPressed);
 
     bool isAnimated() { return prp_isDescendantRecording(); }
-    virtual void updateRelBoundingRect();
-    virtual void forceUpdateRelBoundingRect() {
-        updateRelBoundingRect();
-    }
 
     virtual const SkPath &getRelBoundingRectPath();
     virtual QMatrix getRelativeTransform() const;
@@ -399,11 +395,7 @@ public:
     void applyEffectsSk(const SkBitmap &im, const qreal &scale = 1.);
 
     virtual QMatrix getCombinedTransform() const;
-    virtual void drawUpdatePixmapSk(SkCanvas *canvas);
 
-    virtual void processUpdate();
-    virtual void afterUpdate();
-    virtual void beforeUpdate();
     virtual void updateCombinedTransformTmp();
     void updateRelativeTransformAfterFrameChange();
     QPainter::CompositionMode getCompositionMode();
@@ -420,10 +412,8 @@ public:
 
     bool isInVisibleDurationRect();
     bool isVisibleAndInVisibleDurationRect();
-    bool isUsedAsTarget();
     void incUsedAsTarget();
     void decUsedAsTarget();
-    bool shouldUpdate();
     void ca_childAnimatorIsRecordingChanged();
 
     int getSqlId() {
@@ -476,24 +466,34 @@ public:
 
     BoundingBoxRenderData *getRenderDataForRelFrame(const int &relFrame) {
         BoundingBoxRenderData *data = createRenderData();
-        data->parentBox = this->ref<BoundingBox>();
         setupBoundingBoxRenderDataForRelFrame(relFrame, data);
         return data;
     }
 
-    void schedulerProccessed();
     BoundingBoxRenderData *getCurrentRenderData();
     qreal getEffectsMarginAtRelFrame(const int &relFrame);
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
+    void renderDataFinished(BoundingBoxRenderData *renderData);
+    void updateRelBoundingRectFromCurrentData();
+
+    virtual void scheduleUpdate();
+    virtual void updateCurrentPreviewDataFromRenderData();
+    virtual bool shouldScheduleUpdate() {
+        if(mParent == NULL) return false;
+        if((isVisibleAndInVisibleDurationRect()) ||
+           (isInVisibleDurationRect())) {
+            return true;
+        }
+        return false;
+    }
 protected:
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
 
     void updateDrawRenderContainerTransform();
-    virtual void scheduleUpdate();
 
     bool mRenderCacheChangeNeeded = false;
     bool mReplaceCache = false;
@@ -523,8 +523,7 @@ protected:
     bool mUpdateDrawOnParentBox = true;
 
     bool mRedoUpdate = false;
-    bool mWaitingForSchedulerToBeProcessed = false;
-    bool mAwaitingUpdate = false;
+    bool mLoadingScheduled = false;
 
     SkPath mSkRelBoundingRectPath;
 
@@ -555,7 +554,6 @@ protected:
     bool mLocked = false;
 signals:
     void replaceChacheSet();
-    void scheduledUpdate();
     void nameChanged(QString);
 public slots:
     void updateAfterDurationRectangleShifted(const int &dFrame = 0);
@@ -563,7 +561,6 @@ public slots:
     void updateAfterDurationMaxFrameChangedBy(const int &by);
     virtual void updateAfterDurationRectangleRangeChanged() {}
     void replaceCurrentFrameCache();
-    void scheduleSoftUpdate();
 
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);

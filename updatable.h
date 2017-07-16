@@ -13,7 +13,7 @@ public:
     virtual void afterUpdate();
 
     virtual void schedulerProccessed() {
-        mLoadingScheduled = true;
+        mAwaitingUpdate = true;
     }
 
 
@@ -26,6 +26,14 @@ public:
     }
 
     void addScheduler();
+
+    virtual bool shouldUpdate() {
+        return true;
+    }
+
+    virtual void beforeAddingScheduler() {}
+
+    bool isAwaitingUpdate() { return mAwaitingUpdate; }
 private:
     bool mBeingProcessed = false;
     void tellDependentThatFinished();
@@ -33,7 +41,7 @@ private:
     QList<Updatable*> mDependent;
     QList<Updatable*> mUpdateDependent;
     int nDependancies = 0;
-    bool mLoadingScheduled = false;
+    bool mAwaitingUpdate = false;
 };
 
 #endif // UPDATABLE_H

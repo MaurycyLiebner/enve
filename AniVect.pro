@@ -134,8 +134,6 @@ SOURCES += main.cpp\
     Sound/singlesound.cpp \
     Sound/soundcomposition.cpp \
     Boxes/boundingboxrendercontainer.cpp \
-    BoxesList/boxtargetwidget.cpp \
-    Properties/boxtargetproperty.cpp \
     Properties/property.cpp \
     boxeslistkeysviewwidget.cpp \
     animationwidgetscrollbar.cpp \
@@ -265,8 +263,6 @@ HEADERS  += mainwindow.h \
     Sound/singlesound.h \
     Sound/soundcomposition.h \
     Boxes/boundingboxrendercontainer.h \
-    BoxesList/boxtargetwidget.h \
-    Properties/boxtargetproperty.h \
     Properties/property.h \
     boxeslistkeysviewwidget.h \
     animationwidgetscrollbar.h \

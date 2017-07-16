@@ -18,7 +18,7 @@ void ExternalLinkBox::reload() {
 
     db.close();
 
-    scheduleSoftUpdate();
+    scheduleUpdate();
 }
 
 void ExternalLinkBox::changeSrc() {
@@ -64,12 +64,7 @@ void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
 }
 
 void InternalLinkBox::scheduleAwaitUpdateSLOT() {
-    scheduleSoftUpdate();
-}
-
-void InternalLinkBox::updateRelBoundingRect() {
-    mRelBoundingRect = mLinkTarget->getRelBoundingRect();
-    BoundingBox::updateRelBoundingRect();
+    scheduleUpdate();
 }
 
 InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget) :
@@ -82,29 +77,9 @@ bool InternalLinkBox::relPointInsidePath(const QPointF &point)
     return mLinkTarget->relPointInsidePath(point);
 }
 
-void InternalLinkCanvas::updateRelBoundingRect() {
-    if(mClipToCanvasSize->getValue()) {
-        //        QPainterPath boundingPaths = QPainterPath();
-        //        Q_FOREACH(BoundingBox *child, mChildren) {
-        //            boundingPaths.addPath(
-        //                        child->getRelativeTransform().
-        //                        map(child->getRelBoundingRectPath()));
-        //        }
-        QSize size = ((Canvas*)mLinkTarget.data())->getCanvasSize();
-        mRelBoundingRect = QRectF(0., 0.,
-                                  size.width(), size.height());
-        //boundingPaths.boundingRect();
-
-    } else {
-        mRelBoundingRect = mLinkTarget->getRelBoundingRect();
-    }
-    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
-    BoundingBox::updateRelBoundingRect();
-}
-
 void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
     mClipToCanvasSize->setValue(clipped);
-    scheduleSoftUpdate();
+    scheduleUpdate();
 }
 
 //void InternalLinkCanvas::draw(QPainter *p) {

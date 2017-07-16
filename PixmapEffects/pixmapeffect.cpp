@@ -109,11 +109,9 @@ void applyBlur(const fmt_filters::image &img,
     }
 }
 
-void BlurEffect::applySk(BoundingBox *target,
-                         const SkBitmap &imgPtr,
+void BlurEffect::applySk(const SkBitmap &imgPtr,
                          const fmt_filters::image &img,
                          qreal scale) {
-    Q_UNUSED(target);
     Q_UNUSED(imgPtr);
     applyBlur(img, scale,
               mBlurRadius->qra_getCurrentValue(),
@@ -311,11 +309,9 @@ void ShadowEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                 highQuality);
 }
 
-void ShadowEffect::applySk(BoundingBox *target,
-                           const SkBitmap &imgPtr,
+void ShadowEffect::applySk(const SkBitmap &imgPtr,
                            const fmt_filters::image &img,
                            qreal scale) {
-    Q_UNUSED(target);
     Q_UNUSED(img);
     applyShadow(imgPtr, scale,
                 mBlurRadius->qra_getCurrentValue(),
@@ -436,11 +432,9 @@ void LinesEffect::duplicateWidthAnimatorFrom(QrealAnimator *source) {
     source->makeDuplicate(mLinesWidth.data());
 }
 
-void LinesEffect::apply(BoundingBox *target,
-                        QImage *imgPtr,
+void LinesEffect::apply(QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
-    Q_UNUSED(target);
     Q_UNUSED(img);
     qreal linesWidth = mLinesWidth->qra_getCurrentValue()*scale;
     qreal linesDistance = mLinesDistance->qra_getCurrentValue()*scale;
@@ -554,11 +548,9 @@ void CirclesEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
 }
 
 #include "Boxes/boundingbox.h"
-void CirclesEffect::apply(BoundingBox *target,
-                          QImage *imgPtr,
+void CirclesEffect::apply(QImage *imgPtr,
                           const fmt_filters::image &img,
                           qreal scale) {
-    Q_UNUSED(target);
     Q_UNUSED(img);
     qreal radius = mCirclesRadius->qra_getCurrentValue()*scale;
     qreal distance = mCirclesDistance->qra_getCurrentValue()*scale;
@@ -661,11 +653,9 @@ void SwirlEffect::duplicateDegreesAnimatorFrom(QrealAnimator *source) {
     source->makeDuplicate(mDegreesAnimator.data());
 }
 
-void SwirlEffect::apply(BoundingBox *target,
-                        QImage *imgPtr,
+void SwirlEffect::apply(QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
-    Q_UNUSED(target);
     Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
     fmt_filters::swirl(img,
@@ -728,11 +718,9 @@ void OilEffect::duplicateRadiusAnimatorFrom(QrealAnimator *source) {
     source->makeDuplicate(mRadiusAnimator.data());
 }
 
-void OilEffect::apply(BoundingBox *target,
-                        QImage *imgPtr,
+void OilEffect::apply(QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
-    Q_UNUSED(target);
     Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
     fmt_filters::oil(img,
@@ -749,7 +737,8 @@ ImplodeEffect::ImplodeEffect(qreal radius) :
     ca_addChildAnimator(mFactorAnimator.data());
 }
 
-int ImplodeEffect::prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId) {
+int ImplodeEffect::prp_saveToSql(QSqlQuery *query,
+                                 const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::prp_saveToSql(query,
                                                      boundingBoxSqlId);
     int facId = mFactorAnimator->prp_saveToSql(query);
@@ -794,12 +783,10 @@ void ImplodeEffect::duplicateFactorAnimatorFrom(QrealAnimator *source) {
     source->makeDuplicate(mFactorAnimator.data());
 }
 
-void ImplodeEffect::apply(BoundingBox *target,
-                        QImage *imgPtr,
+void ImplodeEffect::apply(QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
     Q_UNUSED(imgPtr);
-    Q_UNUSED(target);
     Q_UNUSED(scale);
     fmt_filters::implode(img,
                          mFactorAnimator->qra_getCurrentValue(),
@@ -862,22 +849,18 @@ void DesaturateEffect::duplicateInfluenceAnimatorFrom(QrealAnimator *source) {
     source->makeDuplicate(mInfluenceAnimator.data());
 }
 
-void DesaturateEffect::apply(BoundingBox *target,
-                        QImage *imgPtr,
+void DesaturateEffect::apply(QImage *imgPtr,
                         const fmt_filters::image &img,
                         qreal scale) {
     Q_UNUSED(imgPtr);
-    Q_UNUSED(target);
     Q_UNUSED(scale);
     fmt_filters::desaturate(img,
                             mInfluenceAnimator->qra_getCurrentValue());
 }
 
-void DesaturateEffect::applySk(BoundingBox *target,
-                               const SkBitmap &imgPtr,
+void DesaturateEffect::applySk(const SkBitmap &imgPtr,
                                const fmt_filters::image &img,
                                qreal scale) {
-    Q_UNUSED(target);
     Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
     fmt_filters::desaturate(img,
@@ -940,12 +923,10 @@ void ColorizeEffect::duplicateInfluenceAnimatorFrom(ColorAnimator *source) {
     source->makeDuplicate(mColorAnimator.data());
 }
 
-void ColorizeEffect::apply(BoundingBox *target,
-                        QImage *imgPtr,
-                        const fmt_filters::image &img,
-                        qreal scale) {
+void ColorizeEffect::apply(QImage *imgPtr,
+                           const fmt_filters::image &img,
+                           qreal scale) {
     Q_UNUSED(imgPtr);
-    Q_UNUSED(target);
     Q_UNUSED(scale);
     Color color = mColorAnimator->getCurrentColor();
     fmt_filters::colorize(img, color.gl_r,
@@ -954,11 +935,9 @@ void ColorizeEffect::apply(BoundingBox *target,
                           color.gl_a);
 }
 
-void ColorizeEffect::applySk(BoundingBox *target,
-                               const SkBitmap &imgPtr,
-                               const fmt_filters::image &img,
-                               qreal scale) {
-    Q_UNUSED(target);
+void ColorizeEffect::applySk(const SkBitmap &imgPtr,
+                             const fmt_filters::image &img,
+                             qreal scale) {
     Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
     Color color = mColorAnimator->getCurrentColor();

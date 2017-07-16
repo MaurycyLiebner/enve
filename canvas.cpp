@@ -57,7 +57,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mCurrentMode = MOVE_PATH;
 
     prp_setAbsFrame(0);
-    scheduleSoftUpdate();
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
 }
@@ -432,12 +431,6 @@ void Canvas::drawInputText(QPainter *p) {
     }
 }
 
-void Canvas::scheduleUpdate() {
-    if(shouldUpdate()) {
-        addUpdateScheduler(new AddUpdatableAwaitingUpdateScheduler(this));
-    }
-}
-
 bool Canvas::isMovingPath() {
     return mCurrentMode == CanvasMode::MOVE_PATH;
 }
@@ -501,36 +494,29 @@ void Canvas::nextPreviewFrame() {
     mCanvasWindow->requestUpdate();
 }
 
-void Canvas::beforeUpdate() {
-    BoxesGroup::beforeUpdate();
-
+void Canvas::scheduleUpdate() {
     CacheContainer *cont =
           mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
-    mUpdateReplaceCache = cont == NULL;
-    if(cont != NULL) {
+    if(cont == NULL) {
+        BoundingBox::scheduleUpdate();
+    } else {
         setCurrentPreviewContainer(cont);
     }
+}
+
+void Canvas::updateCurrentPreviewDataFromRenderData() {
+    CacheContainer *cont =
+          mCacheHandler.createNewRenderContainerAtRelFrame(
+                mCurrentRenderData->relFrame);
+    cont->replaceImageSk(mCurrentRenderData->renderedImage);
+    setCurrentPreviewContainer(cont);
+    callUpdateSchedulers();
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                  const int &maxFrame) {
     mCacheHandler.clearCacheForAbsFrameRange(minFrame, maxFrame);
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
-}
-
-void Canvas::afterUpdate() {
-    BoxesGroup::afterUpdate();
-    if(mUpdateReplaceCache) {
-        CacheContainer *cont =
-              mCacheHandler.createNewRenderContainerAtRelFrame(
-                    mCurrentRenderData->relFrame);
-        cont->replaceImageSk(mCurrentRenderData->renderedImage);
-        setCurrentPreviewContainer(cont);
-        if(mRendering) {
-            //mRenderImage.save(renderDest + QString::number(mUpdateRelFrame) + ".png");
-        }
-    }
-    callUpdateSchedulers();
 }
 
 //void Canvas::updatePixmaps() {
@@ -561,14 +547,6 @@ void Canvas::clearCurrentPreviewImage() {
 
 }
 
-void Canvas::drawPreviewPixmapSk(SkCanvas *canvas) {
-    if(isVisibleAndInVisibleDurationRect()) {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
-            box->drawUpdatePixmapSk(canvas);
-        }
-    }
-}
-
 #include "Boxes/imagesequencebox.h"
 ImageSequenceBox *Canvas::createAnimationBoxForPaths(const QStringList &paths) {
     ImageSequenceBox *aniBox = new ImageSequenceBox();
@@ -589,14 +567,6 @@ void Canvas::createLinkToFileWithPath(const QString &path) {
     ExternalLinkBox *extLinkBox = new ExternalLinkBox();
     extLinkBox->setSrc(path);
     mCurrentBoxesGroup->addChild(extLinkBox);
-}
-
-void Canvas::renderCurrentFrameToSkCanvasSk(SkCanvas *canvas) {
-    canvas->scale(mResolutionFraction, mResolutionFraction);
-
-    drawPreviewPixmapSk(canvas);
-
-    canvas->flush();
 }
 
 QMatrix Canvas::getCombinedRenderTransform() {
@@ -1140,12 +1110,6 @@ bool Canvas::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
 
 void Canvas::setIsCurrentCanvas(const bool &bT) {
     mIsCurrentCanvas = bT;
-}
-
-void Canvas::addChildAwaitingUpdate(BoundingBox *child) {
-    BoxesGroup::addChildAwaitingUpdate(child);
-    scheduleSoftUpdate();
-    //mCanvasWindow->addBoxAwaitingUpdate(this);
 }
 
 int Canvas::getCurrentFrame() {

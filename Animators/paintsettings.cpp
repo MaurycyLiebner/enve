@@ -358,7 +358,7 @@ void Gradient::updatePaths() {
     Q_FOREACH (PathBox *path, mAffectedPaths) {
         //path->replaceCurrentFrameCache();
         path->updateDrawGradients();
-        path->scheduleSoftUpdate();
+        path->scheduleUpdate();
     }
 }
 

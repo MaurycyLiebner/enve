@@ -8,7 +8,7 @@ Updatable::Updatable() {
 
 void Updatable::beforeUpdate() {
     mBeingProcessed = true;
-    mLoadingScheduled = false;
+    mAwaitingUpdate = false;
     mUpdateDependent = mDependent;
     mDependent.clear();
 }
@@ -26,7 +26,7 @@ void Updatable::tellDependentThatFinished() {
 }
 
 void Updatable::addDependent(Updatable *updatable) {
-    if(mLoadingScheduled) {
+    if(mAwaitingUpdate) {
         if(mDependent.contains(updatable)) return;
         mDependent << updatable;
         updatable->incDependencies();
@@ -34,8 +34,9 @@ void Updatable::addDependent(Updatable *updatable) {
 }
 
 void Updatable::addScheduler() {
-    if(mLoadingScheduled) return;
-    mLoadingScheduled = true;
+    if(!shouldUpdate() || mAwaitingUpdate) return;
+    beforeAddingScheduler();
+    mAwaitingUpdate = true;
     MainWindow::getInstance()->addFileCacheUpdateScheduler(
                 new AddUpdatableAwaitingUpdateScheduler(this));
 }

@@ -34,7 +34,7 @@ void BoxesGroup::updateAllBoxes() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateAllBoxes();
     }
-    scheduleSoftUpdate();
+    scheduleUpdate();
 }
 
 void BoxesGroup::clearAllCache() {
@@ -197,19 +197,6 @@ BoundingBox *BoxesGroup::createNewDuplicate() {
     return new BoxesGroup();
 }
 
-void BoxesGroup::updateRelBoundingRect() {
-    SkPath boundingPaths = SkPath();
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-        SkPath childPath = child->getRelBoundingRectPath();
-        childPath.transform(QMatrixToSkMatrix(child->getRelativeTransform()));
-        boundingPaths.addPath(childPath);
-    }
-    mRelBoundingRectSk = boundingPaths.computeTightBounds();
-    mRelBoundingRect = SkRectToQRectF(mRelBoundingRectSk);
-
-    BoundingBox::updateRelBoundingRect();
-}
-
 void BoxesGroup::updateEffectsMargin() {
     qreal childrenMargin = 0.;
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
@@ -218,31 +205,6 @@ void BoxesGroup::updateEffectsMargin() {
     }
     BoundingBox::updateEffectsMargin();
     mEffectsMargin += childrenMargin;
-}
-
-void BoxesGroup::addChildAwaitingUpdate(BoundingBox *child) {
-    for(int i = 0; i < mChildrenAwaitingUpdate.count(); i++) {
-        if(mChildrenAwaitingUpdate.at(i) == child) {
-            mChildrenAwaitingUpdate.removeAt(i);
-        }
-    }
-    mChildrenAwaitingUpdate << child->ref<BoundingBox>();
-
-    if(mParent == NULL) return;
-    scheduleSoftUpdate();
-}
-
-void BoxesGroup::schedulerProccessed() {
-    BoundingBox::schedulerProccessed();
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child,
-              mChildrenAwaitingUpdate) {
-        child->schedulerProccessed();
-        child->addDependent(this);
-        MainWindow::getInstance()->getCanvasWindow()->
-                addUpdatableAwaitingUpdate(child.data());
-    }
-
-    mChildrenAwaitingUpdate.clear();
 }
 
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
@@ -258,7 +220,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
         childrenEffectsMargin = qMax(box->getEffectsMarginAtRelFrame(relFrame),
                                      childrenEffectsMargin);
         BoundingBoxRenderData *boxRenderData =
-                box->getRenderDataForRelFrame(relFrame);
+                box->getCurrentRenderData();
         groupData->childrenRenderData <<
                 boxRenderData->ref<BoundingBoxRenderData>();
         boxRenderData->addDependent(groupData);
@@ -324,7 +286,7 @@ bool BoxesGroup::shouldPaintOnImage() {
 void BoxesGroup::setDescendantCurrentGroup(const bool &bT) {
     mIsDescendantCurrentGroup = bT;
     if(!bT) {
-        scheduleSoftUpdate();
+        scheduleUpdate();
     }
     if(mParent == NULL) return;
     mParent->setDescendantCurrentGroup(bT);
@@ -445,7 +407,6 @@ void BoxesGroup::addChildToListAt(const int &index,
     connect(child, SIGNAL(prp_absFrameRangeChanged(int,int)),
             this, SLOT(prp_updateAfterChangedAbsFrameRange(int,int)));
     mChildBoxes.insert(index, child->ref<BoundingBox>());
-    updateRelBoundingRect();
     updateChildrenId(index, saveUndoRedo);
 
     scheduleEffectsMarginUpdate();
@@ -494,7 +455,6 @@ void BoxesGroup::removeChildFromList(const int &id,
     }
     mChildBoxes.removeAt(id);
 
-    updateRelBoundingRect();
     if(box->isGroup()) {
         BoxesGroup *group = (BoxesGroup*) box;
         if(group->isCurrentGroup()) {
@@ -576,7 +536,7 @@ void BoxesGroup::moveChildInList(BoundingBox *child,
         addUndoRedo(new MoveChildInListUndoRedo(child, from, to, this) );
     }
 
-    scheduleSoftUpdate();
+    scheduleUpdate();
 
     clearAllCache();
 }

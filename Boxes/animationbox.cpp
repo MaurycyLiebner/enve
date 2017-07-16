@@ -60,7 +60,7 @@ void AnimationBox::reloadFile() {
     clearAllCache();
 
     //mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame);
-    scheduleSoftUpdate();
+    scheduleUpdate();
 }
 
 void AnimationBox::setParent(BoxesGroup *parent) {
@@ -74,29 +74,9 @@ void AnimationBox::setParent(BoxesGroup *parent) {
     updateCombinedTransform();
 }
 
-void AnimationBox::schedulerProccessed() {
-    //mUpdateAnimationFrame = mCurrentAnimationFrame;
-    qDebug() << "animationbox scheduler processed ";
-    BoundingBox::schedulerProccessed();
-}
-
-void AnimationBox::scheduleUpdate() {
-    if(mAnimationCacheHandler == NULL || mParent == NULL) return;
-    mUpdateAnimationFrame = mCurrentAnimationFrame;
-    if(mAnimationCacheHandler->getFrameAtFrame(
-                mUpdateAnimationFrame).get() == NULL) {
-        mAnimationCacheHandler->scheduleFrameLoad(mUpdateAnimationFrame)->
-                addDependent(this);
-    }
-    mNewCurrentFrameUpdateNeeded = false;
-    BoundingBox::scheduleUpdate();
-}
-
-void AnimationBox::afterUpdate() {
-    BoundingBox::afterUpdate();
-    if(mNewCurrentFrameUpdateNeeded) {
-        scheduleSoftUpdate();
-    }
+bool AnimationBox::shouldScheduleUpdate() {
+    if(mAnimationCacheHandler == NULL || mParent == NULL) return false;
+    return BoundingBox::shouldScheduleUpdate();
 }
 
 void AnimationBox::updateCurrentAnimationFrame() {
@@ -136,18 +116,8 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
     //if(!mWaitingForSchedulerToBeProcessed) {
         //scheduleUpdate();
     //} else {
-        scheduleSoftUpdate();
+        scheduleUpdate();
     //}
-}
-
-void AnimationBox::updateRelBoundingRect() {
-    sk_sp<SkImage> image =
-            ((ImageBoxRenderData*)mCurrentRenderData.get())->image;
-    mRelBoundingRect = QRectF(0., 0.,
-                              image->width(),
-                              image->height());
-    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
-    BoundingBox::updateRelBoundingRect();
 }
 
 //void AnimationBox::drawSk(SkCanvas *canvas) {
@@ -180,7 +150,14 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
                                                        data);
     ImageBoxRenderData *imageData = (ImageBoxRenderData*)data;
     imageData->image = mAnimationCacheHandler->getFrameAtFrame(
-                                    mUpdateAnimationFrame);;
+                                    mUpdateAnimationFrame);
+    if(imageData->image == NULL) {
+        if(mAnimationCacheHandler->getFrameAtFrame(
+                    mUpdateAnimationFrame).get() == NULL) {
+            mAnimationCacheHandler->scheduleFrameLoad(mUpdateAnimationFrame)->
+                    addDependent(imageData);
+        }
+    }
 }
 
 BoundingBoxRenderData *AnimationBox::createRenderData() {

@@ -55,8 +55,6 @@ PathBox::PathBox(const BoundingBoxType &type) :
 
     mStrokeSettings->setLineWidthUpdaterTarget(this);
     mFillSettings->setPaintPathTarget(this);
-
-    schedulePathUpdate();
 }
 
 PathBox::~PathBox() {
@@ -186,20 +184,6 @@ void PathBox::prp_loadFromSql(const int &boundingBoxId) {
     }
 }
 
-void PathBox::updatePathIfNeeded() {
-    if(mPathUpdateNeeded) {
-        updatePath();
-        mPathEffectsAnimators->filterPath(&mPathSk);
-        updateOutlinePathSk();
-        if(!prp_hasKeys() &&
-           !mPivotChanged ) {
-            centerPivotPosition();
-        }
-        mPathUpdateNeeded = false;
-        mOutlinePathUpdateNeeded = false;
-    }
-}
-
 MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
                                      const CanvasMode &currentCanvasMode,
                                      const qreal &canvasScaleInv) {
@@ -263,13 +247,13 @@ void PathBox::resetFillGradientPointsPos(bool finish) {
 void PathBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {
     mStrokeSettings->setCapStyle(capStyle);
     clearAllCache();
-    scheduleOutlinePathUpdate();
+    scheduleUpdate();
 }
 
 void PathBox::setStrokeJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mStrokeSettings->setJoinStyle(joinStyle);
     clearAllCache();
-    scheduleOutlinePathUpdate();
+    scheduleUpdate();
 }
 
 void PathBox::setStrokeWidth(const qreal &strokeWidth, const bool &finish) {
@@ -284,7 +268,7 @@ void PathBox::setOutlineCompositionMode(
         const QPainter::CompositionMode &compositionMode) {
     mStrokeSettings->setOutlineCompositionMode(compositionMode);
     clearAllCache();
-    scheduleSoftUpdate();
+    scheduleUpdate();
 }
 
 void PathBox::startSelectedStrokeWidthTransform() {
@@ -374,34 +358,6 @@ void PathBox::setStrokeColorMode(const ColorMode &colorMode) {
     mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
 
-void PathBox::schedulePathUpdate() {
-    scheduleSoftUpdate();
-    if(mPathUpdateNeeded) {
-        return;
-    }
-    addUpdateScheduler(new PathUpdateScheduler(this));
-
-    mPathUpdateNeeded = true;
-    mOutlinePathUpdateNeeded = false;
-}
-
-void PathBox::scheduleOutlinePathUpdate() {
-    scheduleSoftUpdate();
-    if(mOutlinePathUpdateNeeded || mPathUpdateNeeded) {
-        return;
-    }
-    addUpdateScheduler(new PathUpdateScheduler(this));
-
-    mOutlinePathUpdateNeeded = true;
-}
-
-void PathBox::updateOutlinePathIfNeeded() {
-    if(mOutlinePathUpdateNeeded) {
-        updateOutlinePathSk();
-        mOutlinePathUpdateNeeded = false;
-    }
-}
-
 VectorPath *PathBox::objectToPath() {
     VectorPath *newPath = new VectorPath();
     newPath->loadPathFromSkPath(mPathSk);
@@ -429,34 +385,8 @@ VectorPath *PathBox::strokeToPath() {
 
 const SkPath &PathBox::getRelativePath() const { return mPathSk; }
 
-void PathBox::updateOutlinePathSk() {
-    if(mStrokeSettings->nonZeroLineWidth()) {
-        SkStroke strokerSk;
-        mStrokeSettings->setStrokerSettingsSk(&strokerSk);
-        mOutlinePathSk = SkPath();
-        strokerSk.strokePath(mPathSk, &mOutlinePathSk);
-    } else {
-        mOutlinePathSk = SkPath();
-    }
-    mOutlinePathEffectsAnimators->filterPath(&mOutlinePathSk);
-    updateWholePathSk();
-}
-
-void PathBox::updateWholePathSk() {
-    mWholePathSk = SkPath();
-    if(mStrokeSettings->getPaintType() != NOPAINT) {
-        mWholePathSk.addPath(mOutlinePathSk);
-    }
-    if(mFillSettings->getPaintType() != NOPAINT ||
-            mStrokeSettings->getPaintType() == NOPAINT) {
-        mWholePathSk.addPath(mPathSk);
-    }
-    updateRelBoundingRect();
-}
-
 void PathBox::updateFillDrawGradient() {
     if(mFillSettings->getPaintType() == GRADIENTPAINT) {
-        mFillSettingsGradientUpdateNeeded = true;
         Gradient *gradient = mFillSettings->getGradient();
 
         mFillGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
@@ -471,7 +401,6 @@ void PathBox::updateFillDrawGradient() {
 
 void PathBox::updateStrokeDrawGradient() {
     if(mStrokeSettings->getPaintType() == GRADIENTPAINT) {
-        mStrokeSettingsGradientUpdateNeeded = true;
         Gradient *gradient = mStrokeSettings->getGradient();
 
         mStrokeGradientPoints->setColors(gradient->getFirstQGradientStopQColor(),
@@ -490,13 +419,6 @@ void PathBox::updateDrawGradients() {
     updateStrokeDrawGradient();
 }
 
-void PathBox::updateRelBoundingRect() {
-    mRelBoundingRectSk = mWholePathSk.computeTightBounds();//mWholePath.boundingRect();
-    mRelBoundingRect = SkRectToQRectF(mRelBoundingRectSk);
-
-    BoundingBox::updateRelBoundingRect();
-}
-
 QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     SkPath path = getPathAtRelFrame(relFrame);
     SkPath outline;
@@ -513,36 +435,12 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     return SkRectToQRectF(outline.computeTightBounds());
 }
 
-void PathBox::setUpdateVars() {
-    mUpdateFillSettings.paintColor = mFillSettings->getCurrentColor().qcol;
-    mUpdateFillSettings.paintType = mFillSettings->getPaintType();
-    if(mFillSettingsGradientUpdateNeeded) {
-        mFillSettingsGradientUpdateNeeded = false;
-        Gradient *grad = mFillSettings->getGradient();
-        if(grad != NULL) {
-            mUpdateFillSettings.updateGradient(
-                        grad->getQGradientStops(),
-                        mFillGradientPoints->getStartPoint(),
-                        mFillGradientPoints->getEndPoint());
-        }
-    }
-    mUpdateStrokeSettings.paintColor = mStrokeSettings->getCurrentColor().qcol;
-    mUpdateStrokeSettings.paintType = mStrokeSettings->getPaintType();
-    if(mStrokeSettingsGradientUpdateNeeded) {
-        mStrokeSettingsGradientUpdateNeeded = false;
-        Gradient *grad = mStrokeSettings->getGradient();
-        if(grad != NULL) {
-            mUpdateStrokeSettings.updateGradient(
-                        grad->getQGradientStops(),
-                        mStrokeGradientPoints->getStartPoint(),
-                        mStrokeGradientPoints->getEndPoint());
-        }
-    }
-    updatePathIfNeeded();
-    updateOutlinePathIfNeeded();
-    mUpdatePathSk = mPathSk;
-    mUpdateOutlinePathSk = mOutlinePathSk;
-    BoundingBox::setUpdateVars();
+void PathBox::updateCurrentPreviewDataFromRenderData() {
+    PathBoxRenderData *pathRenderData =
+            ((PathBoxRenderData*)mCurrentRenderData.get());
+    mPathSk = pathRenderData->path;
+    mOutlinePathSk = pathRenderData->outlinePath;
+    BoundingBox::updateCurrentPreviewDataFromRenderData();
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) {
@@ -558,7 +456,7 @@ bool PathBox::relPointInsidePath(const QPointF &relPos) {
 
 void PathBox::setOutlineAffectedByScale(bool bT) {
     mOutlineAffectedByScale = bT;
-    scheduleOutlinePathUpdate();
+    scheduleUpdate();
 }
 
 PaintSettings *PathBox::getFillSettings() {

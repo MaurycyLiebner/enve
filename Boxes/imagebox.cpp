@@ -11,13 +11,6 @@ ImageBox::ImageBox(QString filePath) :
     reloadPixmap();
 }
 
-void ImageBox::updateRelBoundingRect() {
-    mRelBoundingRect = QRectF(0., 0.,
-                              mImageSk->width(), mImageSk->height());
-    mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
-
-    BoundingBox::updateRelBoundingRect();
-}
 
 void ImageBox::makeDuplicate(Property *targetBox) {
     BoundingBox::makeDuplicate(targetBox);
@@ -37,7 +30,7 @@ void ImageBox::reloadPixmap() {
         mImageSk = SkImage::MakeFromEncoded(data);
     }
 
-    scheduleSoftUpdate();
+    scheduleUpdate();
 }
 
 void ImageBox::setFilePath(QString path) {

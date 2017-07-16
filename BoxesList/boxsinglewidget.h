@@ -80,7 +80,6 @@ private:
     BoxesListActionButton *mVisibleButton;
     BoxesListActionButton *mLockedButton;
     BoxesListActionButton *mColorButton;
-    BoxTargetWidget *mBoxTargetWidget;
 
     QPoint mDragStartPos;
     QWidget *mFillWidget;

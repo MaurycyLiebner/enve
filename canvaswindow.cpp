@@ -1026,7 +1026,6 @@ void CanvasWindow::importFile(const QString &path,
     }
     if(boxToPosition != NULL) {
         QPointF trans = mCurrentCanvas->mapCanvasAbsToRel(absDropPos);
-        boxToPosition->forceUpdateRelBoundingRect();
         trans -= boxToPosition->mapRelPosToAbs(
                     boxToPosition->getRelCenterPosition());
         boxToPosition->moveByAbs(trans);

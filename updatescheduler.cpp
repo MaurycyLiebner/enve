@@ -25,15 +25,6 @@ void AddUpdatableAwaitingUpdateScheduler::update() {
             addUpdatableAwaitingUpdate(mUpdatable);
 }
 
-PathUpdateScheduler::PathUpdateScheduler(PathBox *path) {
-    mPath = path;
-}
-
-void PathUpdateScheduler::update() {
-    mPath->updatePathIfNeeded();
-    mPath->updateOutlinePathIfNeeded();
-}
-
 FileCacheLoadScheduler::FileCacheLoadScheduler(
         FileCacheHandler *cacheHandler) {
     mHandler = cacheHandler;

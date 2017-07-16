@@ -94,9 +94,6 @@ public:
 
     //void updateAfterFrameChanged(const int &currentFrame);
 
-    void renderCurrentFrameToQImage(QImage *frame);
-    void renderCurrentFrameToSkCanvasSk(SkCanvas *canvas);
-
     QSize getCanvasSize();
 
     void playPreview(const int &minPreviewFrameId,
@@ -241,7 +238,6 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *e);
 
     bool keyPressEvent(QKeyEvent *event);
-    void drawPreviewPixmapSk(SkCanvas *canvas);
 
     ImageSequenceBox *createAnimationBoxForPaths(const QStringList &paths);
     VideoBox *createVideoForPath(const QString &path);
@@ -289,8 +285,6 @@ public:
     void setIsCurrentCanvas(const bool &bT);
 
     void scheduleEffectsMarginUpdate() {}
-
-    void addChildAwaitingUpdate(BoundingBox *child);
 
     void renderSk(SkCanvas *canvas);
 
@@ -404,8 +398,6 @@ public:
 
     void beforeCurrentFrameRender();
     void afterCurrentFrameRender();
-    void beforeUpdate();
-    void afterUpdate();
     //void updatePixmaps();
     CacheHandler *getCacheHandler() {
         return &mCacheHandler;
@@ -442,6 +434,13 @@ public:
     void selectAllAction();
     void clearSelectionAction();
     void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
+    void scheduleUpdate();
+    bool shouldScheduleUpdate() {
+        return isVisibleAndInVisibleDurationRect() ||
+               isInVisibleDurationRect();
+    }
+
+    void updateCurrentPreviewDataFromRenderData();
 protected:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
@@ -451,7 +450,6 @@ protected:
     QSharedPointer<ColorAnimator> mBackgroundColor =
             (new ColorAnimator())->ref<ColorAnimator>();
 
-    void scheduleUpdate();
     VectorPath *getPathResultingFromOperation(const bool &unionInterThis,
                                               const bool &unionInterOther);
 

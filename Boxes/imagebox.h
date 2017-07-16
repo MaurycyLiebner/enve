@@ -20,7 +20,6 @@ public:
 
     void reloadPixmap();
     void setFilePath(QString path);
-    void updateRelBoundingRect();
 
     void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate();

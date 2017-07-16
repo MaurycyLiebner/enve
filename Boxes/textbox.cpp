@@ -82,7 +82,7 @@ void TextBox::setText(const QString &text, const bool &saveUndoRedo) {
     }
     clearAllCache();
     mText = text;
-    schedulePathUpdate();
+    scheduleUpdate();
 }
 
 void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
@@ -91,7 +91,7 @@ void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
     }
     clearAllCache();
     mFont = font;
-    schedulePathUpdate();
+    scheduleUpdate();
 }
 
 void TextBox::setSelectedFontSize(const qreal &size) {

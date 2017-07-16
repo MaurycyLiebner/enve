@@ -34,7 +34,7 @@ public:
 
     void setLinkTarget(BoundingBox *linkTarget) {
         mLinkTarget = linkTarget->ref<BoundingBox>();
-        scheduleSoftUpdate();
+        scheduleUpdate();
         if(linkTarget == NULL) {
             setName("Link Empty");
             return;
@@ -44,7 +44,6 @@ public:
 
 
 
-    void updateRelBoundingRect();
     bool relPointInsidePath(const QPointF &point);
     QPointF getRelCenterPosition();
     qreal getEffectsMargin();
@@ -84,8 +83,6 @@ public:
         mRastarized->prp_setName("rastarized");
         mRastarized->setValue(false);
         setLinkTarget(canvas);
-        updateRelBoundingRect();
-        centerPivotPosition();
 
         ca_addChildAnimator(mClipToCanvasSize.data());
         ca_addChildAnimator(mRastarized.data());
@@ -94,11 +91,8 @@ public:
     void setLinkTarget(Canvas *linkTarget) {
         setName(linkTarget->getName());
         mLinkTarget = linkTarget->ref<Canvas>();
-        updateRelBoundingRect();
-        centerPivotPosition();
     }
 
-    void updateRelBoundingRect();
     void setClippedToCanvasSize(const bool &clipped);
 
     void makeDuplicate(Property *targetBox) {

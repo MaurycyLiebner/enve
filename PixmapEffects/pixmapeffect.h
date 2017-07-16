@@ -2,7 +2,6 @@
 #define PIXMAPEFFECT_H
 #include "Animators/coloranimator.h"
 #include "Animators/qpointfanimator.h"
-#include "Properties/boxtargetproperty.h"
 #include "Properties/boolproperty.h"
 #include <QObject>
 
@@ -56,12 +55,10 @@ class PixmapEffect : public ComplexAnimator {
     Q_OBJECT
 public:
     PixmapEffect(const PixmapEffectType &type);
-    virtual void apply(BoundingBox *,
-                       QImage *,
+    virtual void apply(QImage *,
                        const fmt_filters::image &,
                        qreal) {}
-    virtual void applySk(BoundingBox *,
-                         const SkBitmap &,
+    virtual void applySk(const SkBitmap &,
                          const fmt_filters::image &,
                          qreal) {}
 
@@ -129,8 +126,7 @@ class BlurEffect : public PixmapEffect {
 public:
     BlurEffect(qreal radius = 10.);
 
-    void applySk(BoundingBox *target,
-                 const SkBitmap &imgPtr,
+    void applySk(const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
     qreal getMargin();
@@ -168,8 +164,7 @@ class ShadowEffect : public PixmapEffect {
 public:
     ShadowEffect(qreal radius = 10.);
 
-    void applySk(BoundingBox *target,
-                 const SkBitmap &imgPtr,
+    void applySk(const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
 
@@ -207,8 +202,7 @@ public:
     LinesEffect(qreal linesWidth = 5.,
                 qreal linesDistance = 5.);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
+    void apply(QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
 
@@ -234,8 +228,7 @@ public:
     CirclesEffect(qreal circlesRadius = 5.,
                   qreal circlesDistance = 5.);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
+    void apply(QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
 
@@ -258,8 +251,7 @@ class SwirlEffect : public PixmapEffect {
 public:
     SwirlEffect(qreal degrees = 45.);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
+    void apply(QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
 
@@ -279,8 +271,7 @@ class OilEffect : public PixmapEffect {
 public:
     OilEffect(qreal radius = 2.);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
+    void apply(QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
 
@@ -300,8 +291,7 @@ class ImplodeEffect : public PixmapEffect {
 public:
     ImplodeEffect(qreal radius = 10.);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
+    void apply(QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
 
@@ -321,8 +311,7 @@ class DesaturateEffect : public PixmapEffect {
 public:
     DesaturateEffect(qreal influence = .5);
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
+    void apply(QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
 
@@ -333,8 +322,7 @@ public:
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
-    void applySk(BoundingBox *target,
-                 const SkBitmap &imgPtr,
+    void applySk(const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
 private:
@@ -346,8 +334,7 @@ class ColorizeEffect : public PixmapEffect {
 public:
     ColorizeEffect();
 
-    void apply(BoundingBox *target,
-               QImage *imgPtr,
+    void apply(QImage *imgPtr,
                const fmt_filters::image &img,
                qreal scale);
 
@@ -358,8 +345,7 @@ public:
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(ColorAnimator *source);
-    void applySk(BoundingBox *target,
-                 const SkBitmap &imgPtr,
+    void applySk(const SkBitmap &imgPtr,
                  const fmt_filters::image &img,
                  qreal scale);
 private:

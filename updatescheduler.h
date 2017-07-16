@@ -31,15 +31,6 @@ private:
     Updatable *mUpdatable;
 };
 
-class PathUpdateScheduler : public UpdateScheduler {
-public:
-    PathUpdateScheduler(PathBox *path);
-
-    void update();
-private:
-    PathBox *mPath;
-};
-
 class FileCacheLoadScheduler : public UpdateScheduler {
 public:
     FileCacheLoadScheduler(FileCacheHandler *cacheHandler);

@@ -45,11 +45,10 @@ PathPointUpdater::PathPointUpdater(PathBox *vectorPath) {
 
 void PathPointUpdater::update() {
     mTarget->replaceCurrentFrameCache();
-    mTarget->schedulePathUpdate();
 }
 
 void PathPointUpdater::frameChangeUpdate() {
-    mTarget->schedulePathUpdate();
+    mTarget->scheduleUpdate();
 }
 
 GradientUpdater::GradientUpdater(Gradient *gradient) {
@@ -74,11 +73,10 @@ StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path) {
 
 void StrokeWidthUpdater::update() {
     mTarget->replaceCurrentFrameCache();
-    mTarget->scheduleOutlinePathUpdate();
 }
 
 void StrokeWidthUpdater::frameChangeUpdate() {
-    mTarget->scheduleOutlinePathUpdate();
+    mTarget->scheduleUpdate();
 }
 
 DisplayedFillStrokeSettingsUpdater::
@@ -91,7 +89,7 @@ void DisplayedFillStrokeSettingsUpdater::update() {
 }
 
 void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
-    mTarget->scheduleSoftUpdate();
+    mTarget->scheduleUpdate();
 }
 
 void DisplayedFillStrokeSettingsUpdater::updateFinal() {
@@ -137,7 +135,7 @@ void GradientPointsUpdater::update() {
     } else {
         mTarget->updateStrokeDrawGradient();
     }
-    mTarget->scheduleSoftUpdate();
+    mTarget->scheduleUpdate();
 }
 
 void GradientPointsUpdater::frameChangeUpdate() {
@@ -146,7 +144,7 @@ void GradientPointsUpdater::frameChangeUpdate() {
     } else {
         mTarget->updateStrokeDrawGradient();
     }
-    mTarget->scheduleSoftUpdate();
+    mTarget->scheduleUpdate();
 }
 
 #include "Sound/singlesound.h"

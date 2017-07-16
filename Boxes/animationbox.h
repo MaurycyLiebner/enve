@@ -34,12 +34,11 @@ public:
 
 
     void updateCurrentAnimationFrame();
-    void schedulerProccessed();
 
-    void scheduleUpdate();
     void afterUpdate();
     void setParent(BoxesGroup *parent);
-    void updateRelBoundingRect();
+    void beforeAddingScheduler();
+    bool shouldScheduleUpdate();
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;

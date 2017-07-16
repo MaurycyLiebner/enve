@@ -71,21 +71,19 @@ void EffectAnimators::setParentBox(BoundingBox *box) {
     mParentBox = box;
 }
 
-void EffectAnimators::applyEffects(BoundingBox *target,
-                                   QImage *imgPtr,
+void EffectAnimators::applyEffects(QImage *imgPtr,
                                    const fmt_filters::image &img,
                                    const qreal &scale) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PixmapEffect*)effect.data())->apply(target, imgPtr, img, scale);
+        ((PixmapEffect*)effect.data())->apply(imgPtr, img, scale);
     }
 }
 
-void EffectAnimators::applyEffectsSk(BoundingBox *target,
-                                     const SkBitmap &imgPtr,
+void EffectAnimators::applyEffectsSk(const SkBitmap &imgPtr,
                                      const fmt_filters::image &img,
                                      const qreal &scale) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PixmapEffect*)effect.data())->applySk(target, imgPtr,
+        ((PixmapEffect*)effect.data())->applySk(imgPtr,
                                                 img, scale);
     }
 }

@@ -35,8 +35,6 @@ Circle::Circle() :
                 new PathPointUpdater(this));
     mVerticalRadiusPoint->setPosAnimatorUpdater(
                 new PathPointUpdater(this));
-
-    schedulePathUpdate();
 }
 
 

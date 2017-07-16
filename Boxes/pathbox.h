@@ -43,10 +43,6 @@ public:
     PathBox(const BoundingBoxType &type);
     ~PathBox();
 
-    void schedulePathUpdate();
-
-    void updatePathIfNeeded();
-
     void resetStrokeGradientPointsPos(bool finish);
 
     void resetFillGradientPointsPos(bool finish);
@@ -70,24 +66,11 @@ public:
     PaintSettings *getFillSettings();
     void updateDrawGradients();
 
-    void updateOutlinePath();
-    void updateOutlinePathSk();
-    void scheduleOutlinePathUpdate();
-    void updateOutlinePathIfNeeded();
-
     void setOutlineAffectedByScale(bool bT);
     int saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
-    void updateRelBoundingRect();
-    void forceUpdateRelBoundingRect() {
-        updatePathIfNeeded();
-        updateOutlinePathIfNeeded();
-        updateRelBoundingRect();
-    }
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-
-    void setUpdateVars();
 
     VectorPath *objectToPath();
     VectorPath *strokeToPath();
@@ -131,6 +114,7 @@ public:
     BoundingBoxRenderData *createRenderData() {
         return new PathBoxRenderData();
     }
+    void updateCurrentPreviewDataFromRenderData();
 protected:
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
 
@@ -138,9 +122,6 @@ protected:
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
     GradientPointsQSPtr mFillGradientPoints;
     GradientPointsQSPtr mStrokeGradientPoints;
-
-    QLinearGradient mDrawFillGradient;
-    QLinearGradient mDrawStrokeGradient;
 
     QSharedPointer<PaintSettings> mFillSettings =
             (new PaintSettings)->ref<PaintSettings>();
@@ -150,13 +131,6 @@ protected:
 
     bool mPathUpdateNeeded = false;
     bool mOutlinePathUpdateNeeded = false;
-
-    SkPath mUpdatePathSk;
-    SkPath mUpdateOutlinePathSk;
-    bool mFillSettingsGradientUpdateNeeded = false;
-    bool mStrokeSettingsGradientUpdateNeeded = false;
-    UpdatePaintSettings mUpdateFillSettings;
-    UpdateStrokeSettings mUpdateStrokeSettings;
 
     SkPath mPathSk;
     SkPath mOutlinePathSk;

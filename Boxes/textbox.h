@@ -35,7 +35,7 @@ public:
 
     void setTextAlignment(const Qt::Alignment &alignment) {
         mAlignment = alignment;
-        scheduleSoftUpdate();
+        scheduleUpdate();
     }
 
     void makeDuplicate(Property *targetBox) {

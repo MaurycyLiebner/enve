@@ -16,12 +16,10 @@ public:
     EffectAnimators();
 
     void addEffect(PixmapEffect *effect);
-    void applyEffects(BoundingBox *target,
-                      QImage *imgPtr,
+    void applyEffects(QImage *imgPtr,
                       const fmt_filters::image &img,
                       const qreal &scale);
-    void applyEffectsSk(BoundingBox *target,
-                        const SkBitmap &imgPtr,
+    void applyEffectsSk(const SkBitmap &imgPtr,
                         const fmt_filters::image &img,
                         const qreal &scale);
 

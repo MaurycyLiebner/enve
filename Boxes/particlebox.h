@@ -233,7 +233,6 @@ public:
                            const int &frame,
                            QPointF *acc);
     void prp_setAbsFrame(const int &frame);
-    void updateRelBoundingRect();
     bool relPointInsidePath(const QPointF &relPos);
 
     void addEmitter(ParticleEmitter *emitter);
