@@ -440,7 +440,8 @@ public:
                isInVisibleDurationRect();
     }
 
-    void updateCurrentPreviewDataFromRenderData();
+    //void replaceCurrentFrameCache();
+    void renderDataFinished(BoundingBoxRenderData *renderData);
 protected:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;

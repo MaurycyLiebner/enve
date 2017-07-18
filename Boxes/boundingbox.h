@@ -475,7 +475,7 @@ public:
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
-    void renderDataFinished(BoundingBoxRenderData *renderData);
+    virtual void renderDataFinished(BoundingBoxRenderData *renderData);
     void updateRelBoundingRectFromCurrentData();
 
     virtual void scheduleUpdate();
@@ -488,6 +488,8 @@ public:
         }
         return false;
     }
+
+    virtual void replaceCurrentFrameCache();
 protected:
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;
@@ -553,14 +555,12 @@ protected:
     bool mVisible = true;
     bool mLocked = false;
 signals:
-    void replaceChacheSet();
     void nameChanged(QString);
 public slots:
     void updateAfterDurationRectangleShifted(const int &dFrame = 0);
     void updateAfterDurationMinFrameChangedBy(const int &by);
     void updateAfterDurationMaxFrameChangedBy(const int &by);
     virtual void updateAfterDurationRectangleRangeChanged() {}
-    void replaceCurrentFrameCache();
 
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);

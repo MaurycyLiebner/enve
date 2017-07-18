@@ -494,6 +494,13 @@ void Canvas::nextPreviewFrame() {
     mCanvasWindow->requestUpdate();
 }
 
+//void Canvas::replaceCurrentFrameCache() {
+//    CacheContainer *cont =
+//          mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
+//    if(cont == NULL) return;
+//    mCacheHandler.removeRenderContainer(cont);
+//}
+
 void Canvas::scheduleUpdate() {
     CacheContainer *cont =
           mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
@@ -504,19 +511,30 @@ void Canvas::scheduleUpdate() {
     }
 }
 
-void Canvas::updateCurrentPreviewDataFromRenderData() {
+void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     CacheContainer *cont =
-          mCacheHandler.createNewRenderContainerAtRelFrame(
-                mCurrentRenderData->relFrame);
-    cont->replaceImageSk(mCurrentRenderData->renderedImage);
+          mCacheHandler.getRenderContainerAtRelFrame(renderData->relFrame);
+    if(cont == NULL) {
+        cont = mCacheHandler.createNewRenderContainerAtRelFrame(
+                    renderData->relFrame);
+    }
+    cont->replaceImageSk(renderData->renderedImage);
     setCurrentPreviewContainer(cont);
-    callUpdateSchedulers();
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                  const int &maxFrame) {
     mCacheHandler.clearCacheForAbsFrameRange(minFrame, maxFrame);
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
+    if(anim_mCurrentRelFrame < minFrame &&
+       anim_mCurrentRelFrame > maxFrame) return;
+    CacheContainer *cont =
+          mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
+    if(cont == NULL) {
+        BoundingBox::scheduleUpdate();
+    } else {
+        setCurrentPreviewContainer(cont);
+    }
 }
 
 //void Canvas::updatePixmaps() {

@@ -34,14 +34,13 @@ BoundingBox::~BoundingBox() {
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                       const int &maxFrame) {
+    Property::prp_updateAfterChangedAbsFrameRange(minFrame,
+                                                  maxFrame);
     if(anim_mCurrentAbsFrame >= minFrame) {
         if(anim_mCurrentAbsFrame <= maxFrame) {
             replaceCurrentFrameCache();
         }
     }
-
-    Property::prp_updateAfterChangedAbsFrameRange(minFrame,
-                                                  maxFrame);
 }
 
 void BoundingBox::ca_childAnimatorIsRecordingChanged() {
@@ -245,10 +244,8 @@ void BoundingBox::clearAllCache() {
 }
 
 void BoundingBox::replaceCurrentFrameCache() {
-    emit replaceChacheSet();
-
     if(mParent == NULL) return;
-    mParent->BoundingBox::replaceCurrentFrameCache();
+    mParent->replaceCurrentFrameCache();
     scheduleUpdate();
 }
 
@@ -492,7 +489,13 @@ void BoundingBox::scheduleUpdate() {
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
-    mCurrentRenderData->addScheduler();
+    if(mParent != NULL) {
+        mParent->scheduleUpdate();
+        mCurrentRenderData->addScheduler();
+        mCurrentRenderData->addDependent(mParent->getCurrentRenderData());
+    } else {
+        mCurrentRenderData->addScheduler();
+    }
 }
 
 void BoundingBox::deselect() {

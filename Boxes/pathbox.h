@@ -129,13 +129,8 @@ protected:
             (new StrokeSettings)->ref<StrokeSettings>();
 
 
-    bool mPathUpdateNeeded = false;
-    bool mOutlinePathUpdateNeeded = false;
-
     SkPath mPathSk;
     SkPath mOutlinePathSk;
-    SkPath mWholePathSk;
-    QPainterPath mPath;
     void updateWholePathSk();
 
     bool mOutlineAffectedByScale = true;

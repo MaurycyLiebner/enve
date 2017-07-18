@@ -14,7 +14,7 @@ class GLWindow : public QWindow, protected QOpenGLFunctions
     Q_OBJECT
 public:
     GLWindow(QScreen *screen = 0);
-
+    ~GLWindow();
 protected:
     void initialize();
     void renderNow();

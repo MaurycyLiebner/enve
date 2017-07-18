@@ -53,6 +53,10 @@ CanvasWindow::~CanvasWindow() {
     foreach(QThread *thread, mPaintControlerThreads) {
         thread->quit();
         thread->wait();
+        delete thread;
+    }
+    foreach(PaintControler *paintControler, mPaintControlers) {
+        delete paintControler;
     }
 }
 

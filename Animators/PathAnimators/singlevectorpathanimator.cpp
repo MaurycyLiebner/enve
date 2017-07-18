@@ -451,20 +451,38 @@ bool SingleVectorPathAnimator::getTAndPointsForMouseEdgeInteraction(
     qreal maxDistX = 4./xScaling*canvasScaleInv;
     qreal maxDistY = 4./yScaling*canvasScaleInv;
     QPointF relPos = combinedTransform.inverted().map(absPos);
-    QRectF distRect = QRectF(relPos - QPointF(maxDistX, maxDistY),
-                             QSizeF(maxDistX*2, maxDistY*2));
-    if(!mPath.intersects(distRect) ||
-        mPath.contains(distRect)) {
-        return false;
+
+//    if(!mPath.intersects(distRect) ||
+//        mPath.contains(distRect)) {
+//        return false;
+//    }
+
+    QPointF nearestPos;
+    qreal nearestT;
+    qreal nearestError = 1000000.;
+
+    foreach(const QSharedPointer<PathPoint> &pathPoint, mPoints) {
+        VectorPathEdge *edgeT = pathPoint->getNextEdge();
+        if(edgeT == NULL) continue;
+        QPointF posT;
+        qreal tT;
+        qreal errorT;
+        edgeT->getNearestRelPosAndT(relPos,
+                                    &posT,
+                                    &tT,
+                                    &errorT);
+        if(errorT < nearestError) {
+            nearestError = errorT;
+            nearestT = tT;
+            nearestPos = posT;
+            *prevPoint = pathPoint.data();
+        }
     }
+    QPointF distT = nearestPos - relPos;
+    if(qAbs(distT.x()) > maxDistX ||
+       qAbs(distT.y()) > maxDistY) return false;
 
-    relPos = getPointClosestOnPathTo(mPath, relPos,
-                                     1./xScaling*canvasScaleInv,
-                                     1./yScaling*canvasScaleInv);
-
-
-    qreal error;
-    *pressedT = findPercentForPoint(relPos, prevPoint, &error);
+    *pressedT = nearestT;
     if(*prevPoint == NULL) return false;
 
     *nextPoint = (*prevPoint)->getNextPoint();

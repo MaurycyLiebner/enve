@@ -12,6 +12,11 @@ GLWindow::GLWindow(QScreen *screen)
     : QWindow(screen), QOpenGLFunctions() {
     setSurfaceType(OpenGLSurface);
 }
+
+GLWindow::~GLWindow() {
+    delete mInterface;
+}
+
 #include <QDebug>
 void GLWindow::bindSkia() {
     GrBackendRenderTarget backendRT = GrBackendRenderTarget(

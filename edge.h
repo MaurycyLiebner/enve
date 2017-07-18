@@ -73,9 +73,13 @@ public:
 
     void getNearestAbsPosAndT(const QPointF &absPos,
                               QPointF *nearestPoint,
-                              qreal *t);
+                              qreal *t,
+                              qreal *error);
 
     QPointF getSlopeVector(const qreal &t);
+    void getNearestRelPosAndT(const QPointF &relPos,
+                              QPointF *nearestPoint,
+                              qreal *t, qreal *error);
 private:
     QPainterPath mPath;
     SkPath mSkPath;

@@ -141,7 +141,7 @@ qreal textForQPainterPath(const Qt::Alignment &alignment,
 }
 
 void TextBox::updatePath() {
-    mPath = QPainterPath();
+    QPainterPath qPath;
 
     QStringList lines = mText.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
@@ -153,20 +153,20 @@ void TextBox::updatePath() {
     }
     Q_FOREACH(QString line, lines) {
         qreal lineWidth = fm.width(line);
-        mPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
+        qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
                       yT, mFont, line);
         yT += fm.height();
     }
 
-    QRectF boundingRect = mPath.boundingRect();
-    mPath.translate(-boundingRect.center());
+    QRectF boundingRect = qPath.boundingRect();
+    qPath.translate(-boundingRect.center());
 
     bool firstOther;
     SkPoint endPt;
     SkPoint startPt;
     mPathSk.reset();
-    for(int i = 0; i < mPath.elementCount(); i++) {
-        const QPainterPath::Element &elem = mPath.elementAt(i);
+    for(int i = 0; i < qPath.elementCount(); i++) {
+        const QPainterPath::Element &elem = qPath.elementAt(i);
 
         if(elem.isMoveTo()) { // move
             mPathSk.moveTo(elem.x, elem.y);
