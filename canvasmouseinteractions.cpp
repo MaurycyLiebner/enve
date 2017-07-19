@@ -537,10 +537,10 @@ void Canvas::handleAddPointMousePress() {
         PathAnimator *newPathAnimator = newPath->getPathAnimator();
         SingleVectorPathAnimator *newSinglePath = new SingleVectorPathAnimator(
                                                     newPathAnimator);
-        newPathAnimator->addSinglePathAnimator(newSinglePath);
         setCurrentEndPoint(newSinglePath->
                             addPointAbsPos(mLastMouseEventPosRel,
                                             mCurrentEndPoint) );
+        newPathAnimator->addSinglePathAnimator(newSinglePath);
     } else {
         if(pathPointUnderMouse == NULL) {
             PathPoint *newPoint =

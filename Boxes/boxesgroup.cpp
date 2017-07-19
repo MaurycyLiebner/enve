@@ -221,6 +221,7 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
                                      childrenEffectsMargin);
         BoundingBoxRenderData *boxRenderData =
                 box->getCurrentRenderData();
+        boxRenderData->addDependent(data);
         groupData->childrenRenderData <<
                 boxRenderData->ref<BoundingBoxRenderData>();
         boxRenderData->addDependent(groupData);

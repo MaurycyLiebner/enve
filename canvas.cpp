@@ -520,6 +520,8 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     cont->replaceImageSk(renderData->renderedImage);
     setCurrentPreviewContainer(cont);
+
+    afterRenderDataFinished(renderData);
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,

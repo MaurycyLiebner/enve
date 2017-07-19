@@ -77,7 +77,6 @@ public:
 
     const SkPath &getRelativePath() const;
     bool relPointInsidePath(const QPointF &relPos);
-    void preUpdatePixmapsUpdates();
 
     void duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
                                      GradientPoints *strokeGradientPoints);

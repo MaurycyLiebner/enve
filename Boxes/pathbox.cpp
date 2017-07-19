@@ -283,13 +283,6 @@ void PathBox::startSelectedFillColorTransform() {
     mFillSettings->getColorAnimator()->prp_startTransform();
 }
 
-void PathBox::preUpdatePixmapsUpdates() {
-    updateEffectsMarginIfNeeded();
-    //    updatePathIfNeeded();
-    //    updateOutlinePathIfNeeded();
-    //updateBoundingRect();
-}
-
 void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
                                           GradientPoints *strokeGradientPoints) {
     if(fillGradientPoints != NULL) {

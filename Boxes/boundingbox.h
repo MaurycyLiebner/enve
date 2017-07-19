@@ -274,7 +274,6 @@ public:
     virtual VectorPath *strokeToPath() { return NULL; }
     virtual void prp_loadFromSql(const int &boundingBoxId);
 
-    virtual void updatePixmaps();
     void updatePrettyPixmap();
 
     void saveOldPixmap();
@@ -292,7 +291,6 @@ public:
 
     void updateRelativeTransformTmp();
 
-    void updateAllUglyPixmap();
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
@@ -336,7 +334,6 @@ public:
 
 
     void duplicateTransformAnimatorFrom(BoxTransformAnimator *source);
-    virtual void preUpdatePixmapsUpdates();
     void scheduleCenterPivot();
 
     bool SWT_isBoundingBox() { return true; }
@@ -490,7 +487,12 @@ public:
     }
 
     virtual void replaceCurrentFrameCache();
+    void updateCurrentRenderData();
+    void clearCurrentRenderData();
+    void afterRenderDataFinished(BoundingBoxRenderData *renderData);
 protected:
+    QList<std::shared_ptr<BoundingBoxRenderData> > mFreeRenderData;
+    QList<std::shared_ptr<BoundingBoxRenderData> > mProcessedRenderData;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;

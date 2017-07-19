@@ -207,16 +207,6 @@ void BoundingBox::prp_loadFromSql(const int &boundingBoxId) {
     }
 }
 
-void BoundingBox::preUpdatePixmapsUpdates() {
-    updateEffectsMarginIfNeeded();
-    //updateBoundingRect();
-}
-
-void BoundingBox::updatePixmaps() {
-    preUpdatePixmapsUpdates();
-    updateAllUglyPixmap();
-}
-
 Canvas *BoundingBox::getParentCanvas() {
     return mParent->getParentCanvas();
 }
@@ -247,10 +237,6 @@ void BoundingBox::replaceCurrentFrameCache() {
     if(mParent == NULL) return;
     mParent->replaceCurrentFrameCache();
     scheduleUpdate();
-}
-
-void BoundingBox::updateAllUglyPixmap() {
-    mCurrentRenderData->renderToImage();
 }
 
 void BoundingBox::drawSelectedSk(SkCanvas *canvas,
@@ -491,11 +477,12 @@ void BoundingBox::scheduleUpdate() {
 
     if(mParent != NULL) {
         mParent->scheduleUpdate();
-        mCurrentRenderData->addScheduler();
-        mCurrentRenderData->addDependent(mParent->getCurrentRenderData());
-    } else {
-        mCurrentRenderData->addScheduler();
     }
+    mCurrentRenderData->addScheduler();
+}
+
+void BoundingBox::clearCurrentRenderData() {
+    mCurrentRenderData.reset();
 }
 
 void BoundingBox::deselect() {
@@ -1178,11 +1165,33 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     mDrawRenderContainer.setVariablesFromRenderData(renderData);
     updateDrawRenderContainerTransform();
+    afterRenderDataFinished(renderData);
+}
+
+void BoundingBox::afterRenderDataFinished(BoundingBoxRenderData *renderData) {
+    mFreeRenderData << renderData->ref<BoundingBoxRenderData>();
+    for(int i = 0; i < mProcessedRenderData.count(); i++) {
+        const std::shared_ptr<BoundingBoxRenderData> &data =
+                mProcessedRenderData.at(i);
+        if(data.get() == renderData) {
+            mProcessedRenderData.removeAt(i);
+            break;
+        }
+    }
+}
+
+void BoundingBox::updateCurrentRenderData() {
+    if(mFreeRenderData.isEmpty()) {
+        mCurrentRenderData = createRenderData()->ref<BoundingBoxRenderData>();
+    } else {
+        mCurrentRenderData = mFreeRenderData.takeFirst();
+    }
+    mProcessedRenderData << mCurrentRenderData;
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
     if(mCurrentRenderData == NULL) {
-        mCurrentRenderData = createRenderData()->ref<BoundingBoxRenderData>();
+        updateCurrentRenderData();
     }
     return mCurrentRenderData.get();
 }
@@ -1288,6 +1297,8 @@ void BoundingBoxRenderData::processUpdate() {
 
 void BoundingBoxRenderData::beforeUpdate() {
     Updatable::beforeUpdate();
+    if(parentBox == NULL) return;
+    parentBox->clearCurrentRenderData();
 }
 
 void BoundingBoxRenderData::afterUpdate() {

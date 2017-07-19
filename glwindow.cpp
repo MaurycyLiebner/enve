@@ -14,7 +14,6 @@ GLWindow::GLWindow(QScreen *screen)
 }
 
 GLWindow::~GLWindow() {
-    delete mInterface;
 }
 
 #include <QDebug>
