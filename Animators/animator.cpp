@@ -400,6 +400,50 @@ bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
                 anim_mKeys.at(nextId2).get());
 }
 
+void Animator::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                                     int *lastIdentical,
+                                                     const int &relFrame) {
+    if(anim_mKeys.isEmpty()) {
+        *firstIdentical = INT_MIN;
+        *lastIdentical = INT_MAX;
+    } else {
+        int prevId;
+        int nextId;
+        anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
+                                                relFrame);
+        Key *prevKey = anim_mKeys.at(prevId).get();
+        Key *nextKey = anim_mKeys.at(nextId).get();
+        if(prevId == nextId) {
+            if(prevKey->getRelFrame() == relFrame) {
+                if(prevKey->getNextKey() == NULL) {
+                    *firstIdentical = nextKey->getRelFrame();
+                    *lastIdentical = INT_MAX;
+                } else if(nextKey->getPrevKey() == NULL) {
+                    *firstIdentical = INT_MIN;
+                    *lastIdentical = nextKey->getRelFrame();
+                } else {
+                    *firstIdentical = relFrame;
+                    *lastIdentical = relFrame;
+                }
+            } else if(nextKey->getRelFrame() > relFrame) {
+                *firstIdentical = INT_MIN;
+                *lastIdentical = nextKey->getRelFrame();
+            } else if(prevKey->getRelFrame() < relFrame) {
+                *firstIdentical = nextKey->getRelFrame();
+                *lastIdentical = INT_MAX;
+            }
+        } else {
+            if(prevKey->differsFromKey(nextKey) ) {
+                *firstIdentical = relFrame;
+                *lastIdentical = relFrame;
+            } else {
+                *firstIdentical = prevKey->getRelFrame();
+                *lastIdentical = nextKey->getRelFrame();
+            }
+        }
+    }
+}
+
 void Animator::anim_drawKey(QPainter *p,
                             Key *key,
                             const qreal &pixelsPerFrame,

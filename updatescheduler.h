@@ -30,14 +30,4 @@ public:
 private:
     Updatable *mUpdatable;
 };
-
-class FileCacheLoadScheduler : public UpdateScheduler {
-public:
-    FileCacheLoadScheduler(FileCacheHandler *cacheHandler);
-
-    void update();
-private:
-    FileCacheHandler *mHandler;
-};
-
 #endif // UPDATESCHEDULER_H

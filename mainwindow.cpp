@@ -774,12 +774,8 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
     updateTitle();
 }
 
-void MainWindow::addFileCacheUpdateScheduler(UpdateScheduler *scheduler) {
-    mFileCacheUpdateSchedulers.prepend(scheduler);
-}
-
-void MainWindow::addBoxUpdateScheduler(UpdateScheduler *scheduler) {
-    mBoxUpdateSchedulers.prepend(scheduler);
+void MainWindow::addUpdateScheduler(UpdateScheduler *scheduler) {
+    mUpdateSchedulers.prepend(scheduler);
 }
 
 bool MainWindow::isShiftPressed()
@@ -805,16 +801,11 @@ void MainWindow::callUpdateSchedulers() {
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
-    Q_FOREACH(UpdateScheduler *sheduler, mFileCacheUpdateSchedulers) {
+    Q_FOREACH(UpdateScheduler *sheduler, mUpdateSchedulers) {
         sheduler->update();
         delete sheduler;
     }
-    mFileCacheUpdateSchedulers.clear();
-    Q_FOREACH(UpdateScheduler *sheduler, mBoxUpdateSchedulers) {
-        sheduler->update();
-        delete sheduler;
-    }
-    mBoxUpdateSchedulers.clear();
+    mUpdateSchedulers.clear();
 
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mCanvasWindow->updateHoveredElements();
@@ -1017,14 +1008,10 @@ bool MainWindow::isEnabled() {
 }
 
 void MainWindow::clearAll() {
-    Q_FOREACH(UpdateScheduler *sheduler, mBoxUpdateSchedulers) {
+    Q_FOREACH(UpdateScheduler *sheduler, mUpdateSchedulers) {
         delete sheduler;
     }
-    mBoxUpdateSchedulers.clear();
-    Q_FOREACH(UpdateScheduler *sheduler, mFileCacheUpdateSchedulers) {
-        delete sheduler;
-    }
-    mFileCacheUpdateSchedulers.clear();
+    mUpdateSchedulers.clear();
 
     mUndoRedoStack.clearAll();
     mObjectSettingsWidget->setMainTarget(NULL);

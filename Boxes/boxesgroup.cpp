@@ -224,7 +224,6 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
         boxRenderData->addDependent(data);
         groupData->childrenRenderData <<
                 boxRenderData->ref<BoundingBoxRenderData>();
-        boxRenderData->addDependent(groupData);
     }
     data->effectsMargin += childrenEffectsMargin;
     groupData->relBoundingRect = mRelBoundingRect;

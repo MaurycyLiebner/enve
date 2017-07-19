@@ -104,7 +104,12 @@ public:
     int anim_getCurrentAbsFrame() {
         return anim_mCurrentAbsFrame;
     }
-
+    int anim_getCurrentRelFrame() {
+        return anim_mCurrentRelFrame;
+    }
+    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame);
 protected:
     int anim_getKeyIndex(Key *key);
 

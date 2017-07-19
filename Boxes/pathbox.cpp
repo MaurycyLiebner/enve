@@ -431,6 +431,8 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 void PathBox::updateCurrentPreviewDataFromRenderData() {
     PathBoxRenderData *pathRenderData =
             ((PathBoxRenderData*)mCurrentRenderData.get());
+    qDebug() << "update current data for frame: " <<
+                mCurrentRenderData->relFrame;
     mPathSk = pathRenderData->path;
     mOutlinePathSk = pathRenderData->outlinePath;
     BoundingBox::updateCurrentPreviewDataFromRenderData();

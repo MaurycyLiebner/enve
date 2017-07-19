@@ -34,7 +34,7 @@ void ConnectedToMainWindow::addUndoRedo(UndoRedo *undoRedo)
 
 void ConnectedToMainWindow::addUpdateScheduler(UpdateScheduler *scheduler)
 {
-    mMainWindow->addBoxUpdateScheduler(scheduler);
+    mMainWindow->addUpdateScheduler(scheduler);
 }
 
 void ConnectedToMainWindow::callUpdateSchedulers() {

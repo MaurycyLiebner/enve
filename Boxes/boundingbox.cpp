@@ -466,8 +466,8 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData() {
 }
 
 void BoundingBox::scheduleUpdate() {
-    if(getCurrentRenderData()->isAwaitingUpdate() ||
-       !shouldScheduleUpdate()) return;
+    if(!shouldScheduleUpdate()) return;
+    if(getCurrentRenderData()->isAwaitingUpdate()) return;
     setUpdateVars();
     setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
                                           mCurrentRenderData.get());
@@ -1163,8 +1163,34 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
-    mDrawRenderContainer.setVariablesFromRenderData(renderData);
-    updateDrawRenderContainerTransform();
+    if(renderData->relFrame != anim_mCurrentRelFrame) {
+        int firstIdenticalFrame;
+        int lastIdenticalFrame;
+        anim_getFirstAndLastIdenticalRelFrame(&firstIdenticalFrame,
+                                              &lastIdenticalFrame,
+                                              anim_mCurrentRelFrame);
+        bool renderDataCloserToCurrentFrame =
+                qAbs(renderData->relFrame - anim_mCurrentRelFrame) <
+                qAbs(mDrawRenderContainer.getRelFrame() - anim_mCurrentRelFrame);
+        bool renderDataInIdenticalRange =
+                renderData->relFrame >= firstIdenticalFrame &&
+                renderData->relFrame <= lastIdenticalFrame;
+        if(renderDataCloserToCurrentFrame ||
+           renderDataInIdenticalRange) {
+            mDrawRenderContainer.setVariablesFromRenderData(renderData);
+            updateDrawRenderContainerTransform();
+        }
+        if(mProcessedRenderData.count() == 1) {
+            if(mDrawRenderContainer.getRelFrame() > lastIdenticalFrame) {
+                if(mDrawRenderContainer.getRelFrame() < firstIdenticalFrame) {
+                    scheduleUpdate();
+                }
+            }
+        }
+    } else {
+        mDrawRenderContainer.setVariablesFromRenderData(renderData);
+        updateDrawRenderContainerTransform();
+    }
     afterRenderDataFinished(renderData);
 }
 

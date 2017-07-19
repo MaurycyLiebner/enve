@@ -24,12 +24,3 @@ void AddUpdatableAwaitingUpdateScheduler::update() {
     MainWindow::getInstance()->getCanvasWindow()->
             addUpdatableAwaitingUpdate(mUpdatable);
 }
-
-FileCacheLoadScheduler::FileCacheLoadScheduler(
-        FileCacheHandler *cacheHandler) {
-    mHandler = cacheHandler;
-}
-
-void FileCacheLoadScheduler::update() {
-    //mHandler
-}

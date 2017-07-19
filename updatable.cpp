@@ -37,6 +37,6 @@ void Updatable::addScheduler() {
     if(!shouldUpdate() || mAwaitingUpdate) return;
     beforeAddingScheduler();
     mAwaitingUpdate = true;
-    MainWindow::getInstance()->addFileCacheUpdateScheduler(
+    MainWindow::getInstance()->addUpdateScheduler(
                 new AddUpdatableAwaitingUpdateScheduler(this));
 }

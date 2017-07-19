@@ -97,7 +97,12 @@ public:
                       const qreal &res);
     void duplicateFrom(RenderContainer *src);
     void setVariablesFromRenderData(BoundingBoxRenderData *data);
+    int getRelFrame() {
+        return mRelFrame;
+    }
+
 protected:
+    int mRelFrame = 0;
     qreal mResolutionFraction;
     QMatrix mTransform;
     QMatrix mPaintTransform;

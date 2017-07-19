@@ -64,7 +64,7 @@ public:
 
     UndoRedoStack *getUndoRedoStack();
 
-    void addBoxUpdateScheduler(UpdateScheduler *scheduler);
+    void addUpdateScheduler(UpdateScheduler *scheduler);
 
     bool isShiftPressed();
     bool isCtrlPressed();
@@ -124,7 +124,6 @@ public:
     void previewBeingPlayed();
     void previewBeingRendered();
     void previewPaused();
-    void addFileCacheUpdateScheduler(UpdateScheduler *scheduler);
 public slots:
     void setCurrentFrame(int frame);
     void setAllPointsRecord(bool allPointsRecord);
@@ -227,8 +226,7 @@ private:
     bool mDetachedUndoRedoStack = false;
     UndoRedoStack *mCurrentUndoRedoStack;
 
-    QList<UpdateScheduler*> mFileCacheUpdateSchedulers;
-    QList<UpdateScheduler*> mBoxUpdateSchedulers;
+    QList<UpdateScheduler*> mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
 

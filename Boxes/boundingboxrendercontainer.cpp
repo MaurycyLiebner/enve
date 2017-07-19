@@ -54,6 +54,7 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mResolutionFraction = data->resolution;
     mImageSk = data->renderedImage;
     mDrawPos = data->drawPos;
+    mRelFrame = data->relFrame;
     mPaintTransform.reset();
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);
