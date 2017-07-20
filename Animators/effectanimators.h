@@ -16,9 +16,7 @@ public:
     EffectAnimators();
 
     void addEffect(PixmapEffect *effect);
-    void applyEffects(QImage *imgPtr,
-                      const fmt_filters::image &img,
-                      const qreal &scale);
+
     void applyEffectsSk(const SkBitmap &imgPtr,
                         const fmt_filters::image &img,
                         const qreal &scale);

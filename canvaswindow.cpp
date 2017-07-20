@@ -662,11 +662,12 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
         mNoBoxesAwaitUpdate = true;
-        callUpdateSchedulers();
+
         if(mBoxesUpdateFinishedFunction != NULL) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
         mFreeThreads << threadId;
+        callUpdateSchedulers();
         //callUpdateSchedulers();
     } else {
         foreach(Updatable *updatablaT, mUpdatablesAwaitingUpdate) {

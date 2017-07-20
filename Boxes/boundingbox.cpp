@@ -481,7 +481,8 @@ void BoundingBox::scheduleUpdate() {
     mCurrentRenderData->addScheduler();
 }
 
-void BoundingBox::clearCurrentRenderData() {
+void BoundingBox::currentRenderDataBeingProcessed() {
+    mProcessedRenderData << mCurrentRenderData;
     mCurrentRenderData.reset();
 }
 
@@ -1169,6 +1170,10 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
         anim_getFirstAndLastIdenticalRelFrame(&firstIdenticalFrame,
                                               &lastIdenticalFrame,
                                               anim_mCurrentRelFrame);
+        qDebug() << "current frame:" << anim_mCurrentRelFrame;
+        qDebug() << "render data frame:" << renderData->relFrame;
+        qDebug() << "first tidentical frame:" << firstIdenticalFrame;
+        qDebug() << "last identical frame:" << lastIdenticalFrame;
         bool renderDataCloserToCurrentFrame =
                 qAbs(renderData->relFrame - anim_mCurrentRelFrame) <
                 qAbs(mDrawRenderContainer.getRelFrame() - anim_mCurrentRelFrame);
@@ -1181,10 +1186,9 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
             updateDrawRenderContainerTransform();
         }
         if(mProcessedRenderData.count() == 1) {
-            if(mDrawRenderContainer.getRelFrame() > lastIdenticalFrame) {
-                if(mDrawRenderContainer.getRelFrame() < firstIdenticalFrame) {
-                    scheduleUpdate();
-                }
+            if(mDrawRenderContainer.getRelFrame() > lastIdenticalFrame ||
+               mDrawRenderContainer.getRelFrame() < firstIdenticalFrame) {
+                scheduleUpdate();
             }
         }
     } else {
@@ -1195,7 +1199,6 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void BoundingBox::afterRenderDataFinished(BoundingBoxRenderData *renderData) {
-    mFreeRenderData << renderData->ref<BoundingBoxRenderData>();
     for(int i = 0; i < mProcessedRenderData.count(); i++) {
         const std::shared_ptr<BoundingBoxRenderData> &data =
                 mProcessedRenderData.at(i);
@@ -1207,12 +1210,7 @@ void BoundingBox::afterRenderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void BoundingBox::updateCurrentRenderData() {
-    if(mFreeRenderData.isEmpty()) {
-        mCurrentRenderData = createRenderData()->ref<BoundingBoxRenderData>();
-    } else {
-        mCurrentRenderData = mFreeRenderData.takeFirst();
-    }
-    mProcessedRenderData << mCurrentRenderData;
+    mCurrentRenderData = createRenderData()->ref<BoundingBoxRenderData>();
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
@@ -1324,12 +1322,12 @@ void BoundingBoxRenderData::processUpdate() {
 void BoundingBoxRenderData::beforeUpdate() {
     Updatable::beforeUpdate();
     if(parentBox == NULL) return;
-    parentBox->clearCurrentRenderData();
+    parentBox->currentRenderDataBeingProcessed();
 }
 
 void BoundingBoxRenderData::afterUpdate() {
+    Updatable::afterUpdate();
     if(parentBox != NULL) {
         parentBox->renderDataFinished(this);
     }
-    Updatable::afterUpdate();
 }

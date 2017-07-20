@@ -1,7 +1,6 @@
 #ifndef IMAGEBOX_H
 #define IMAGEBOX_H
 #include "Boxes/boundingbox.h"
-#include <QImage>
 #include "skiaincludes.h"
 
 struct ImageBoxRenderData : public BoundingBoxRenderData {

@@ -488,10 +488,9 @@ public:
 
     virtual void replaceCurrentFrameCache();
     void updateCurrentRenderData();
-    void clearCurrentRenderData();
+    void currentRenderDataBeingProcessed();
     void afterRenderDataFinished(BoundingBoxRenderData *renderData);
 protected:
-    QList<std::shared_ptr<BoundingBoxRenderData> > mFreeRenderData;
     QList<std::shared_ptr<BoundingBoxRenderData> > mProcessedRenderData;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;

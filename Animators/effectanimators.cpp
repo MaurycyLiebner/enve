@@ -71,14 +71,6 @@ void EffectAnimators::setParentBox(BoundingBox *box) {
     mParentBox = box;
 }
 
-void EffectAnimators::applyEffects(QImage *imgPtr,
-                                   const fmt_filters::image &img,
-                                   const qreal &scale) {
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PixmapEffect*)effect.data())->apply(imgPtr, img, scale);
-    }
-}
-
 void EffectAnimators::applyEffectsSk(const SkBitmap &imgPtr,
                                      const fmt_filters::image &img,
                                      const qreal &scale) {
