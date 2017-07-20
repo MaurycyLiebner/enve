@@ -26,11 +26,11 @@ void Updatable::tellDependentThatFinished() {
 }
 
 void Updatable::addDependent(Updatable *updatable) {
-    if(mAwaitingUpdate) {
-        if(mDependent.contains(updatable)) return;
-        mDependent << updatable;
-        updatable->incDependencies();
-    }
+    //if(mAwaitingUpdate) {
+    if(mDependent.contains(updatable)) return;
+    mDependent << updatable;
+    updatable->incDependencies();
+    //}
 }
 
 void Updatable::addScheduler() {

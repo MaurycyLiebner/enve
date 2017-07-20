@@ -629,9 +629,9 @@ void CanvasWindow::renderPreview() {
     mCurrentRenderFrame = mSavedCurrentFrame;
     setRendering(true);
 
-    mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
-    mCurrentCanvas->updateAllBoxes();
-    callUpdateSchedulers();
+    //mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
+    //mCurrentCanvas->updateAllBoxes();
+    //callUpdateSchedulers();
     if(mNoBoxesAwaitUpdate) {
         nextPreviewRenderFrame();
     }
@@ -662,12 +662,13 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
         mNoBoxesAwaitUpdate = true;
-
+        mFreeThreads << threadId;
         if(mBoxesUpdateFinishedFunction != NULL) {
             (*this.*mBoxesUpdateFinishedFunction)();
         }
-        mFreeThreads << threadId;
-        callUpdateSchedulers();
+        if(!mRendering) {
+            callUpdateSchedulers();
+        }
         //callUpdateSchedulers();
     } else {
         foreach(Updatable *updatablaT, mUpdatablesAwaitingUpdate) {

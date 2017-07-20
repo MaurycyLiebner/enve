@@ -114,13 +114,16 @@ public:
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
         SkPath boundingPaths = SkPath();
         Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+            int childRelFrame =
+                    child->prp_parentRelFrameToThisRelFrame(relFrame);
             SkPath childPath;
             childPath.addRect(
-                        QRectFToSkRect(
-                            child->getRelBoundingRectAtRelFrame(relFrame)));
+                    QRectFToSkRect(
+                        child->getRelBoundingRectAtRelFrame(childRelFrame)));
             childPath.transform(
                         QMatrixToSkMatrix(
-                            child->getRelativeTransform()));
+                            child->getTransformAnimator()->
+                                getTransformMatrixAtRelFrame(childRelFrame)) );
             boundingPaths.addPath(childPath);
         }
         return SkRectToQRectF(boundingPaths.computeTightBounds());

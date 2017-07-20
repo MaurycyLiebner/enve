@@ -60,6 +60,19 @@ int Property::prp_parentRelFrameToAbsFrame(
     return relFrame + prp_getParentFrameShift();
 }
 
+int Property::prp_parentRelFrameToThisRelFrame(
+                            const int &relFrame) const {
+    if(relFrame == INT_MIN) return INT_MIN;
+    if(relFrame == INT_MAX) return INT_MAX;
+    return relFrame + prp_getParentFrameShift() - prp_getFrameShift();
+}
+
+int Property::prp_thisRelFrameToParentRelFrame(const int &relFrame) const {
+    if(relFrame == INT_MIN) return INT_MIN;
+    if(relFrame == INT_MAX) return INT_MAX;
+    return relFrame - prp_getParentFrameShift() + prp_getFrameShift();
+}
+
 void Property::prp_setName(const QString &newName) {
     prp_mName = newName;
 }

@@ -136,6 +136,8 @@ public:
                                                  const int &) {
         return false;
     }
+    int prp_parentRelFrameToThisRelFrame(const int &relFrame) const;
+    int prp_thisRelFrameToParentRelFrame(const int &relFrame) const;
 public slots:
     virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 

@@ -43,7 +43,8 @@ public:
     void addSoundAnimator(SingleSound *sound);
     void removeSoundAnimator(SingleSound *sound);
 private:
-    ComplexAnimator mSoundsAnimatorContainer;
+    QSharedPointer<ComplexAnimator> mSoundsAnimatorContainer =
+            (new ComplexAnimator())->ref<ComplexAnimator>();
     QList<SingleSound*> mSounds;
     qint64 mPos;
     QByteArray mBuffer;

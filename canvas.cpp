@@ -460,10 +460,12 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
-    mCurrentPreviewContainer = cont->ref<CacheContainer>();
-    if(mCurrentPreviewContainer != NULL) {
-        mCurrentPreviewContainer->setBlocked(true);
+    if(cont == NULL) {
+        mCurrentPreviewContainer.reset();
+        return;
     }
+    mCurrentPreviewContainer = cont->ref<CacheContainer>();
+    mCurrentPreviewContainer->setBlocked(true);
 }
 
 void Canvas::playPreview(const int &minPreviewFrameId,
@@ -543,8 +545,12 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                  const int &maxFrame) {
     mCacheHandler.clearCacheForAbsFrameRange(minFrame, maxFrame);
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
-    if(anim_mCurrentRelFrame < minFrame &&
-       anim_mCurrentRelFrame > maxFrame) return;
+    int fId;
+    int lId;
+    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId,
+                                          anim_mCurrentRelFrame);
+    if(fId < minFrame &&
+       fId > maxFrame) return;
     scheduleUpdate();
 }
 

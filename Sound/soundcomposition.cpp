@@ -3,14 +3,13 @@
 
 SoundComposition::SoundComposition(QObject *parent)
     :   QIODevice(parent) {
-    mSoundsAnimatorContainer.prp_setName("sounds");
+    mSoundsAnimatorContainer->prp_setName("sounds");
 }
 
 SoundComposition::~SoundComposition() {
 }
 
-void SoundComposition::start()
-{
+void SoundComposition::start() {
     open(QIODevice::ReadOnly);
 }
 
@@ -89,17 +88,17 @@ void SoundComposition::removeSound(SingleSound *sound) {
 
 void SoundComposition::addSoundAnimator(SingleSound *sound) {
     addSound(sound);
-    mSoundsAnimatorContainer.ca_addChildAnimator(sound);
+    mSoundsAnimatorContainer->ca_addChildAnimator(sound);
 }
 
 void SoundComposition::removeSoundAnimator(SingleSound *sound) {
     if(mSounds.removeOne(sound)) {
-        mSoundsAnimatorContainer.ca_removeChildAnimator(sound);
+        mSoundsAnimatorContainer->ca_removeChildAnimator(sound);
     }
 }
 
 ComplexAnimator *SoundComposition::getSoundsAnimatorContainer() {
-    return &mSoundsAnimatorContainer;
+    return mSoundsAnimatorContainer.data();
 }
 
 qint64 SoundComposition::readData(char *data, qint64 len) {

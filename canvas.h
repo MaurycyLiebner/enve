@@ -460,7 +460,7 @@ protected:
     void sortSelectedBoxesByZAscending();
 
     QMatrix mCanvasTransformMatrix;
-    SoundComposition *mSoundComposition;
+    SoundComposition *mSoundComposition = NULL;
 
     MovablePoint *mHoveredPoint = NULL;
     BoundingBox *mHoveredBox = NULL;

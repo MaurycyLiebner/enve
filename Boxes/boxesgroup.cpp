@@ -51,8 +51,11 @@ bool BoxesGroup::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                          relFrame2);
     if(differences) return true;
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-        if(child->prp_differencesBetweenRelFrames(relFrame1,
-                                                  relFrame2)) return true;
+        if(child->prp_differencesBetweenRelFrames(
+                    child->prp_parentRelFrameToThisRelFrame(relFrame1),
+                    child->prp_parentRelFrameToThisRelFrame(relFrame2))) {
+            return true;
+        }
     }
     return false;
 }
@@ -70,7 +73,11 @@ void BoxesGroup::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
         }
         int fIdT;
         int lIdT;
-        child->anim_getFirstAndLastIdenticalRelFrame(&fIdT, &lIdT, relFrame);
+        child->anim_getFirstAndLastIdenticalRelFrame(
+                    &fIdT, &lIdT,
+                    child->prp_parentRelFrameToThisRelFrame(relFrame));
+        fIdT = child->prp_thisRelFrameToParentRelFrame(fIdT);
+        lIdT = child->prp_thisRelFrameToParentRelFrame(lIdT);
         if(fIdT > fId) {
             fId = fIdT;
         }
@@ -248,8 +255,10 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
     groupData->childrenRenderData.clear();
     qreal childrenEffectsMargin = 0.;
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        childrenEffectsMargin = qMax(box->getEffectsMarginAtRelFrame(relFrame),
-                                     childrenEffectsMargin);
+        int boxRelFrame = box->prp_parentRelFrameToThisRelFrame(relFrame);
+        childrenEffectsMargin =
+                qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
+                     childrenEffectsMargin);
         BoundingBoxRenderData *boxRenderData =
                 box->getCurrentRenderData();
         boxRenderData->addDependent(data);
