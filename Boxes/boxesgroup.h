@@ -189,6 +189,9 @@ public:
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
+    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

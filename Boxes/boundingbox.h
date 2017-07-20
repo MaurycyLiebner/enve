@@ -490,6 +490,11 @@ public:
     void updateCurrentRenderData();
     void currentRenderDataBeingProcessed();
     void afterRenderDataFinished(BoundingBoxRenderData *renderData);
+    bool isRelFrameInVisibleDurationRect(const int &relFrame);
+    bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
+    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame);
 protected:
     QList<std::shared_ptr<BoundingBoxRenderData> > mProcessedRenderData;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;

@@ -958,6 +958,41 @@ bool BoundingBox::isVisibleAndInVisibleDurationRect() {
     return isInVisibleDurationRect() && mVisible;
 }
 
+bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
+    if(mDurationRectangle == NULL) return true;
+    return relFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
+           relFrame >= mDurationRectangle->getMinFrameAsRelFrame();
+}
+
+bool BoundingBox::isRelFrameVisibleAndInVisibleDurationRect(
+        const int &relFrame) {
+    return isRelFrameInVisibleDurationRect(relFrame) && mVisible;
+}
+
+void BoundingBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                                        int *lastIdentical,
+                                                        const int &relFrame) {
+    if(mVisible) {
+        if(isRelFrameInVisibleDurationRect(relFrame)) {
+            Animator::anim_getFirstAndLastIdenticalRelFrame(firstIdentical,
+                                                            lastIdentical,
+                                                            relFrame);
+        } else {
+            if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+                *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame();
+                *lastIdentical = INT_MAX;
+            } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
+                *firstIdentical = INT_MIN;
+                *lastIdentical = mDurationRectangle->getMinFrameAsRelFrame();
+            }
+        }
+    } else {
+        *firstIdentical = INT_MIN;
+        *lastIdentical = INT_MAX;
+    }
+}
+
+
 void BoundingBox::setVisibile(const bool &visible,
                               const bool &saveUndoRedo) {
     if(mVisible == visible) return;

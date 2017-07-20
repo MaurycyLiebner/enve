@@ -34,8 +34,13 @@ int Animator::anim_getPrevKeyRelFrame(Key *key) {
 
 void Animator::anim_updateAfterChangedKey(Key *key) {
     if(anim_mIsComplexAnimator) return;
-    prp_updateAfterChangedRelFrameRange(anim_getPrevKeyRelFrame(key),
-                                        anim_getNextKeyRelFrame(key));
+    int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
+    if(prevKeyRelFrame != INT_MIN) prevKeyRelFrame++;
+    int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
+    if(nextKeyRelFrame != INT_MAX) nextKeyRelFrame--;
+
+    prp_updateAfterChangedRelFrameRange(prevKeyRelFrame,
+                                        nextKeyRelFrame);
 }
 
 void Animator::prp_setAbsFrame(const int &frame) {

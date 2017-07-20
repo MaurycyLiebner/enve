@@ -21,6 +21,10 @@ public:
 
     bool SWT_isVideoBox() { return true; }
     void changeSourceFile();
+
+    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame);
 protected:
     void updateFrameCount(const char *path);
 private:

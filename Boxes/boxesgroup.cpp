@@ -57,6 +57,37 @@ bool BoxesGroup::prp_differencesBetweenRelFrames(const int &relFrame1,
     return false;
 }
 
+void BoxesGroup::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                                       int *lastIdentical,
+                                                       const int &relFrame) {
+    int fId;
+    int lId;
+
+    BoundingBox::anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        if(fId > lId) {
+            break;
+        }
+        int fIdT;
+        int lIdT;
+        child->anim_getFirstAndLastIdenticalRelFrame(&fIdT, &lIdT, relFrame);
+        if(fIdT > fId) {
+            fId = fIdT;
+        }
+        if(lIdT < lId) {
+            lId = lIdT;
+        }
+    }
+
+    if(lId > fId) {
+        *firstIdentical = fId;
+        *lastIdentical = lId;
+    } else {
+        *firstIdentical = relFrame;
+        *lastIdentical = relFrame;
+    }
+}
+
 void BoxesGroup::updateCombinedTransformTmp() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateCombinedTransformTmp();

@@ -53,6 +53,19 @@ void VideoBox::changeSourceFile() {
     }
 }
 
+void VideoBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                                     int *lastIdentical,
+                                                     const int &relFrame) {
+    if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
+        *firstIdentical = relFrame;
+        *lastIdentical = relFrame;
+    } else {
+        BoundingBox::anim_getFirstAndLastIdenticalRelFrame(firstIdentical,
+                                                           lastIdentical,
+                                                           relFrame);
+    }
+}
+
 void VideoBox::setFilePath(QString path) {
     mSrcFilePath = path;
     reloadFile();

@@ -282,6 +282,10 @@ public:
     }
 
     void removeEmitter(ParticleEmitter *emitter);
+
+    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

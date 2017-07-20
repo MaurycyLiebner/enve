@@ -76,6 +76,19 @@ void ParticleBox::removeEmitter(ParticleEmitter *emitter) {
     scheduleUpdate();
 }
 
+void ParticleBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                                        int *lastIdentical,
+                                                        const int &relFrame) {
+    if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
+        *firstIdentical = relFrame;
+        *lastIdentical = relFrame;
+    } else {
+        BoundingBox::anim_getFirstAndLastIdenticalRelFrame(firstIdentical,
+                                                           lastIdentical,
+                                                           relFrame);
+    }
+}
+
 BoundingBox *ParticleBox::createNewDuplicate() {
     return new ParticleBox();
 }

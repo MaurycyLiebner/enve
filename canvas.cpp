@@ -501,9 +501,22 @@ void Canvas::nextPreviewFrame() {
 //    mCacheHandler.removeRenderContainer(cont);
 //}
 
+void Canvas::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                                   int *lastIdentical,
+                                                   const int &relFrame) {
+    int fId;
+    int lId;
+    BoxesGroup::anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
+    *firstIdentical = qMax(fId, 0);
+    *lastIdentical = qMin(lId, getMaxFrame());
+}
+
 void Canvas::scheduleUpdate() {
+    int fId;
+    int lId;
+    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, anim_mCurrentRelFrame);
     CacheContainer *cont =
-          mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
+          mCacheHandler.getRenderContainerAtRelFrame(fId);
     if(cont == NULL) {
         BoundingBox::scheduleUpdate();
     } else {
@@ -512,11 +525,13 @@ void Canvas::scheduleUpdate() {
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
+    int fId;
+    int lId;
+    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);
     CacheContainer *cont =
-          mCacheHandler.getRenderContainerAtRelFrame(renderData->relFrame);
+          mCacheHandler.getRenderContainerAtRelFrame(fId);
     if(cont == NULL) {
-        cont = mCacheHandler.createNewRenderContainerAtRelFrame(
-                    renderData->relFrame);
+        cont = mCacheHandler.createNewRenderContainerAtRelFrame(fId);
     }
     cont->replaceImageSk(renderData->renderedImage);
     setCurrentPreviewContainer(cont);
@@ -530,13 +545,7 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
     if(anim_mCurrentRelFrame < minFrame &&
        anim_mCurrentRelFrame > maxFrame) return;
-    CacheContainer *cont =
-          mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
-    if(cont == NULL) {
-        BoundingBox::scheduleUpdate();
-    } else {
-        setCurrentPreviewContainer(cont);
-    }
+    scheduleUpdate();
 }
 
 //void Canvas::updatePixmaps() {

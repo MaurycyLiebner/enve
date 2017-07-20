@@ -442,6 +442,9 @@ public:
 
     //void replaceCurrentFrameCache();
     void renderDataFinished(BoundingBoxRenderData *renderData);
+    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame);
 protected:
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
