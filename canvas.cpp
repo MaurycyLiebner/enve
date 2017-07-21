@@ -261,10 +261,8 @@ void Canvas::renderSk(SkCanvas *canvas) {
     paint.setStyle(SkPaint::kFill_Style);
 
     if(isPreviewingOrRendering()) {
-        paint.setColor(SK_ColorBLACK);
-        canvas->drawRect(SkRect::MakeWH(mCanvasWidget->width() + 1,
-                                        mCanvasWidget->height() + 1),
-                         paint);
+        canvas->clear(SK_ColorBLACK);
+
         drawTransparencyMesh(canvas, viewRect);
         if(mCurrentPreviewContainer != NULL) {
             canvas->save();
@@ -291,10 +289,8 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->restore();
         }
 #else
-        paint.setColor(SkColorSetARGBInline(255, 75, 75, 75));
-        canvas->drawRect(SkRect::MakeWH(mCanvasWindow->width() + 1,
-                                        mCanvasWidget->height() + 1),
-                         paint);
+        canvas->clear(SkColorSetARGBInline(255, 75, 75, 75));
+
         drawTransparencyMesh(canvas, viewRect);
         paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
         canvas->drawRect(viewRect, paint);

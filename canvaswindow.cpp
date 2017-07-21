@@ -229,7 +229,10 @@ void CanvasWindow::qRender(QPainter *p) {
 }
 
 void CanvasWindow::renderSk(SkCanvas *canvas) {
-    if(mCurrentCanvas == NULL) return;
+    if(mCurrentCanvas == NULL) {
+        canvas->clear(SK_ColorBLACK);
+        return;
+    }
     mCurrentCanvas->renderSk(canvas);
 }
 
