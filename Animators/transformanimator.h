@@ -104,7 +104,7 @@ public:
     QMatrix getTransformMatrixAtRelFrame(const int &relFrame);
 
     void setPivotWithoutChangingTransformation(QPointF point,
-                                               const bool &finish = false);
+                                               const bool &saveUndoRedo = false);
     QPointF getPivot();
 
     qreal getPivotX();

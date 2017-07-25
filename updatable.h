@@ -1,10 +1,12 @@
 #ifndef UPDATABLE_H
 #define UPDATABLE_H
 #include <QList>
+#include "selfref.h"
 
-class Updatable {
+class Updatable : public StdSelfRef {
 public:
     Updatable();
+    virtual ~Updatable();
 
     virtual void beforeUpdate();
 
@@ -12,10 +14,7 @@ public:
 
     virtual void afterUpdate();
 
-    virtual void schedulerProccessed() {
-        mAwaitingUpdate = true;
-        mSchedulerAdded = false;
-    }
+    virtual void schedulerProccessed();
 
     void addDependent(Updatable *updatable);
 
@@ -37,7 +36,9 @@ public:
     bool isAwaitingUpdate() { return mAwaitingUpdate; }
     bool isBeingProcessed() { return mBeingProcessed; }
     bool finished() { return mFinished; }
-private:
+    bool schedulerAdded() { return mSchedulerAdded; }
+protected:
+    int mId = 0;
     bool mFinished = false;
     bool mSchedulerAdded = false;
     bool mBeingProcessed = false;

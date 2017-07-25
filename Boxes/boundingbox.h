@@ -123,9 +123,9 @@ public:
         return mRelBoundingRect.center();
     }
 
-    virtual void centerPivotPosition(const bool &finish = false) {
+    virtual void centerPivotPosition(const bool &saveUndoRedo = false) {
         mTransformAnimator->setPivotWithoutChangingTransformation(
-                    getRelCenterPosition(), finish);
+                    getRelCenterPosition(), saveUndoRedo);
     }
     virtual bool isContainedIn(const QRectF &absRect);
 
@@ -339,7 +339,6 @@ public:
 
 
     void duplicateTransformAnimatorFrom(BoxTransformAnimator *source);
-    void scheduleCenterPivot();
 
     bool SWT_isBoundingBox() { return true; }
 
@@ -494,7 +493,7 @@ public:
 
     virtual void replaceCurrentFrameCache();
     void updateCurrentRenderData();
-    void resetcurrentRenderData();
+    void nullifyCurrentRenderData();
     bool isRelFrameInVisibleDurationRect(const int &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
     void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
@@ -516,11 +515,12 @@ protected:
 
     int mSqlId = 0;
 
+    bool mBlockedSchedule = false;
+
     DurationRectangle *mDurationRectangle = NULL;
     SingleWidgetAbstraction *mSelectedAbstraction = NULL;
     SingleWidgetAbstraction *mTimelineAbstraction = NULL;
 
-    bool mCenterPivotScheduled = false;
     QPointF mPreviewDrawPos;
     QRectF mRelBoundingRect;
     SkRect mRelBoundingRectSk;

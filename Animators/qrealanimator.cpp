@@ -207,7 +207,8 @@ qreal QrealAnimator::qra_getCurrentValue() const {
 
 void QrealAnimator::qra_setCurrentValue(qreal newValue,
                                         const bool &saveUndoRedo,
-                                        const bool &finish) {
+                                        const bool &finish,
+                                        const bool &callUpdater) {
     newValue = clamp(newValue, mMinPossibleVal, mMaxPossibleVal);
 
     if(saveUndoRedo) {
@@ -228,7 +229,9 @@ void QrealAnimator::qra_setCurrentValue(qreal newValue,
     }
 
     emit valueChangedSignal(mCurrentValue);
-    prp_callUpdater();
+    if(callUpdater) {
+        prp_callUpdater();
+    }
 
     //qra_updateKeysPath();
 }

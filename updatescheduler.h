@@ -23,12 +23,4 @@ private:
     Gradient *mGradient;
 };
 
-class AddUpdatableAwaitingUpdateScheduler : public UpdateScheduler {
-public:
-    AddUpdatableAwaitingUpdateScheduler(Updatable *updatable);
-
-    void update();
-private:
-    Updatable *mUpdatable;
-};
 #endif // UPDATESCHEDULER_H

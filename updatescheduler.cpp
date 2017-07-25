@@ -13,14 +13,3 @@ void QGradientStopsUpdateScheduler::update()
 {
     mGradient->updateQGradientStopsIfNeeded();
 }
-
-AddUpdatableAwaitingUpdateScheduler::AddUpdatableAwaitingUpdateScheduler(
-        Updatable *updatable) {
-    mUpdatable = updatable;
-}
-
-void AddUpdatableAwaitingUpdateScheduler::update() {
-    mUpdatable->schedulerProccessed();
-    MainWindow::getInstance()->getCanvasWindow()->
-            addUpdatableAwaitingUpdate(mUpdatable);
-}

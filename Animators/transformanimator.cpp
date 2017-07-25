@@ -373,8 +373,38 @@ void BoxTransformAnimator::pivotTransformFinished() {
 }
 
 void BoxTransformAnimator::setPivotWithoutChangingTransformation(
-                                QPointF point, const bool &finish) {
-    if(mPosAnimator->prp_isDescendantRecording()) {
+                                QPointF point, const bool &saveUndoRedo) {
+    bool transRecording = mPosAnimator->prp_isDescendantRecording();
+
+    if(transRecording) {
+        QMatrix currentMatrix;
+        qreal pivotX = mPivotAnimator->getXValue();
+        qreal pivotY = mPivotAnimator->getYValue();
+        currentMatrix.translate(pivotX + mPosAnimator->getXValue(),
+                                pivotY + mPosAnimator->getYValue());
+
+        currentMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+        currentMatrix.scale(mScaleAnimator->getXValue(),
+                            mScaleAnimator->getYValue() );
+
+        currentMatrix.translate(-pivotX,
+                                -pivotY);
+
+        QMatrix futureMatrix;
+        futureMatrix.translate(point.x() + mPosAnimator->getXValue(),
+                               point.y() + mPosAnimator->getYValue());
+
+        futureMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+        futureMatrix.scale(mScaleAnimator->getXValue(),
+                           mScaleAnimator->getYValue() );
+
+        futureMatrix.translate(-point.x(),
+                               -point.y());
+
+
+        mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
+                                   currentMatrix.dy() - futureMatrix.dy());
+    } else {
         QMatrix currentMatrix;
         qreal pivotX = mPivotAnimator->getXValue();
         qreal pivotY = mPivotAnimator->getYValue();
@@ -402,37 +432,11 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
 
         point += QPointF(currentMatrix.dx() - futureMatrix.dx(),
                          currentMatrix.dy() - futureMatrix.dy());
-
-    } else {
-        QMatrix currentMatrix;
-        qreal pivotX = mPivotAnimator->getXValue();
-        qreal pivotY = mPivotAnimator->getYValue();
-        currentMatrix.translate(pivotX + mPosAnimator->getXValue(),
-                                pivotY + mPosAnimator->getYValue());
-
-        currentMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
-        currentMatrix.scale(mScaleAnimator->getXValue(),
-                            mScaleAnimator->getYValue() );
-
-        currentMatrix.translate(-pivotX,
-                                -pivotY);
-
-        QMatrix futureMatrix;
-        futureMatrix.translate(point.x() + mPosAnimator->getXValue(),
-                               point.y() + mPosAnimator->getYValue());
-
-        futureMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
-        futureMatrix.scale(mScaleAnimator->getXValue(),
-                           mScaleAnimator->getYValue() );
-
-        futureMatrix.translate(-point.x(),
-                               -point.y());
-
-
-        mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
-                                       currentMatrix.dy() - futureMatrix.dy());
     }
-    mPivotAnimator->setCurrentPointValue(point, finish);
+    mPivotAnimator->setCurrentPointValue(point,
+                                         saveUndoRedo,
+                                         false,
+                                         saveUndoRedo);
 }
 
 void BoxTransformAnimator::setPivot(const QPointF &point,

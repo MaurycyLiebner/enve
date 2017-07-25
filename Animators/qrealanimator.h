@@ -33,7 +33,8 @@ public:
     qreal qra_getCurrentValue() const;
     void qra_setCurrentValue(qreal newValue,
                              const bool &saveUndoRedo = false,
-                             const bool &finish = false);
+                             const bool &finish = false,
+                             const bool &callUpdater = true);
     void qra_updateValueFromCurrentFrame();
     void qra_saveCurrentValueToKey(QrealKey *key,
                                    const bool &finish = true);

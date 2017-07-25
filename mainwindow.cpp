@@ -45,6 +45,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 int FONT_HEIGHT;
 int MIN_WIDGET_HEIGHT;
 int KEY_RECT_SIZE;
+int gUpdatableId = 0;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
@@ -805,6 +806,9 @@ void MainWindow::callUpdateSchedulers() {
         mCanvasWindow->processSchedulers();
         foreach(Updatable *updatable, mUpdateSchedulers) {
             //updatable->schedulerProccessed();
+            if(!updatable->isAwaitingUpdate()) {
+                qDebug() << "hell";
+            }
             mCanvasWindow->addUpdatableAwaitingUpdate(updatable);
         }
         mUpdateSchedulers.clear();

@@ -442,10 +442,6 @@ void BoundingBox::select() {
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Selected);
 }
 
-void BoundingBox::scheduleCenterPivot() {
-    mCenterPivotScheduled = true;
-}
-
 void BoundingBox::updateRelBoundingRectFromRenderData(
         BoundingBoxRenderData *renderData) {
     mRelBoundingRect = renderData->relBoundingRect;
@@ -453,12 +449,8 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    bool pivotHasKeys =
-            mTransformAnimator->getPivotMovablePoint()->
-                prp_isDescendantRecording();
-    if((!mPivotChanged && !pivotHasKeys) || mCenterPivotScheduled) {
-        mCenterPivotScheduled = false;
-        centerPivotPosition();
+    if(!mPivotChanged && !mTransformAnimator->prp_isDescendantRecording()) {
+        centerPivotPosition(false);
     }
 }
 
@@ -468,6 +460,9 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 }
 
 void BoundingBox::scheduleUpdate() {
+    if(mBlockedSchedule) {
+        qDebug() << "hell";
+    }
     if(!shouldScheduleUpdate()) return;
     if(mCurrentRenderData == NULL) {
         updateCurrentRenderData();
@@ -484,7 +479,7 @@ void BoundingBox::scheduleUpdate() {
     mCurrentRenderData->addScheduler();
 }
 
-void BoundingBox::resetcurrentRenderData() {
+void BoundingBox::nullifyCurrentRenderData() {
     mCurrentRenderData = NULL;
 }
 
@@ -995,6 +990,7 @@ void BoundingBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 void BoundingBox::processSchedulers() {
+    mBlockedSchedule = true;
     foreach(Updatable *updatable, mSchedulers) {
         updatable->schedulerProccessed();
     }
@@ -1006,6 +1002,7 @@ void BoundingBox::addSchedulersToProcess() {
     }
 
     mSchedulers.clear();
+    mBlockedSchedule = false;
 }
 
 void BoundingBox::addScheduler(Updatable *updatable) {
@@ -1368,7 +1365,7 @@ void BoundingBoxRenderData::beforeUpdate() {
 //                parentBox->anim_getCurrentRelFrame(), this);
 //    parentBox->updateCurrentPreviewDataFromRenderData(this);
 
-    parentBox->resetcurrentRenderData();
+    parentBox->nullifyCurrentRenderData();
 }
 
 void BoundingBoxRenderData::afterUpdate() {

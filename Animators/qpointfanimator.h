@@ -16,7 +16,9 @@ public:
     qreal getYValueAtRelFrame(const int &relFrame);
 
     void setCurrentPointValue(const QPointF &val,
-                              const bool &finish = false);
+                              const bool &saveUndoRedo = false,
+                              const bool &finish = false,
+                              const bool &callUpdater = true);
     void incCurrentValues(const qreal &x,
                           const qreal &y);
     void multCurrentValues(qreal sx, qreal sy);
