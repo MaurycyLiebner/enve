@@ -775,7 +775,7 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
 }
 
 void MainWindow::addUpdateScheduler(Updatable *scheduler) {
-    mUpdateSchedulers.append(scheduler->ref<Updatable>());
+    mUpdateSchedulers.append(scheduler);
 }
 
 bool MainWindow::isShiftPressed()
@@ -803,9 +803,9 @@ void MainWindow::callUpdateSchedulers() {
 
     if(mCanvasWindow->noBoxesAwaitUpdate()) {
         mCanvasWindow->processSchedulers();
-        foreach(const std::shared_ptr<Updatable> &updatable, mUpdateSchedulers) {
+        foreach(Updatable *updatable, mUpdateSchedulers) {
             //updatable->schedulerProccessed();
-            mCanvasWindow->addUpdatableAwaitingUpdate(updatable.get());
+            mCanvasWindow->addUpdatableAwaitingUpdate(updatable);
         }
         mUpdateSchedulers.clear();
     }

@@ -1,9 +1,8 @@
 #ifndef UPDATABLE_H
 #define UPDATABLE_H
 #include <QList>
-#include "selfref.h"
 
-class Updatable : public StdSelfRef {
+class Updatable {
 public:
     Updatable();
 
@@ -39,7 +38,6 @@ public:
     bool isBeingProcessed() { return mBeingProcessed; }
     bool finished() { return mFinished; }
 private:
-    std::shared_ptr<Updatable> mSelfRef;
     bool mFinished = false;
     bool mSchedulerAdded = false;
     bool mBeingProcessed = false;

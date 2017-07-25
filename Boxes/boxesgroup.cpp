@@ -272,21 +272,19 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         int boxRelFrame = box->prp_parentRelFrameToThisRelFrame(relFrame);
         if(box->isRelFrameVisibleAndInVisibleDurationRect(boxRelFrame)) {
-            childrenEffectsMargin =
-                    qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
-                         childrenEffectsMargin);
             BoundingBoxRenderData *boxRenderData =
                     box->getCurrentRenderData();
             if(boxRenderData == NULL) {
-                box->scheduleUpdate();
-                box->processSchedulers();
-                boxRenderData = box->getCurrentRenderData();
+                continue;
             }
-            if(!boxRenderData->finished()) {
+                                                                                                                if(!boxRenderData->finished()) {
                 boxRenderData->addDependent(data);
             }
             groupData->childrenRenderData <<
-                    boxRenderData->ref<BoundingBoxRenderData>();
+                    boxRenderData;
+            childrenEffectsMargin =
+                    qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
+                         childrenEffectsMargin);
         }
     }
     data->effectsMargin += childrenEffectsMargin;

@@ -4,6 +4,12 @@
 #include "memoryhandler.h"
 #include "rendercachehandler.h"
 
+RenderContainer::~RenderContainer() {
+    if(mSrcRenderData != NULL) {
+        delete mSrcRenderData;
+    }
+}
+
 void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
@@ -58,7 +64,10 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.reset();
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);
-    mSrcRenderData = data->ref<BoundingBoxRenderData>();
+    if(mSrcRenderData != NULL) {
+        delete mSrcRenderData;
+    }
+    mSrcRenderData = data;
     thisAccessed();
 }
 

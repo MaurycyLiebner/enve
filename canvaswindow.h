@@ -159,7 +159,7 @@ protected:
     bool mRendering = false;
     bool mNoBoxesAwaitUpdate = true;
     bool mCancelLastBoxUpdate = false;
-    QList<std::shared_ptr<Updatable> > mUpdatablesAwaitingUpdate;
+    QList<Updatable*> mUpdatablesAwaitingUpdate;
 
     QString mOutputString;
     int mCurrentRenderFrame;

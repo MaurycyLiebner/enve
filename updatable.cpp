@@ -7,7 +7,6 @@ Updatable::Updatable() {
 }
 
 void Updatable::beforeUpdate() {
-    mSelfRef = ref<Updatable>();
     mBeingProcessed = true;
     mAwaitingUpdate = false;
     mUpdateDependent = mDependent;
@@ -18,7 +17,6 @@ void Updatable::afterUpdate() {
     mFinished = true;
     mBeingProcessed = false;
     tellDependentThatFinished();
-    mSelfRef.reset();
 }
 
 void Updatable::tellDependentThatFinished() {

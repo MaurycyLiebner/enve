@@ -469,8 +469,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 
 void BoundingBox::scheduleUpdate() {
     if(!shouldScheduleUpdate()) return;
-    if((mCurrentRenderData == NULL ? true :
-        mCurrentRenderData->isAwaitingUpdate())) {
+    if(mCurrentRenderData == NULL) {
         updateCurrentRenderData();
     } else {
         return;
@@ -486,7 +485,7 @@ void BoundingBox::scheduleUpdate() {
 }
 
 void BoundingBox::resetcurrentRenderData() {
-    mCurrentRenderData.reset();
+    mCurrentRenderData = NULL;
 }
 
 void BoundingBox::deselect() {
@@ -996,21 +995,21 @@ void BoundingBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 void BoundingBox::processSchedulers() {
-    foreach(const std::shared_ptr<Updatable> &updatable, mSchedulers) {
+    foreach(Updatable *updatable, mSchedulers) {
         updatable->schedulerProccessed();
     }
 }
 
 void BoundingBox::addSchedulersToProcess() {
-    foreach(const std::shared_ptr<Updatable> &updatable, mSchedulers) {
-        MainWindow::getInstance()->addUpdateScheduler(updatable.get());
+    foreach(Updatable *updatable, mSchedulers) {
+        MainWindow::getInstance()->addUpdateScheduler(updatable);
     }
 
     mSchedulers.clear();
 }
 
 void BoundingBox::addScheduler(Updatable *updatable) {
-    mSchedulers << updatable->ref<Updatable>();
+    mSchedulers << updatable;
 }
 
 void BoundingBox::setVisibile(const bool &visible,
@@ -1239,6 +1238,8 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
            renderDataInIdenticalRange) {
             mDrawRenderContainer.setVariablesFromRenderData(renderData);
             updateDrawRenderContainerTransform();
+        } else {
+            delete renderData;
         }
         if(mSchedulers.count() == 0) {
             if(mDrawRenderContainer.getRelFrame() > lastIdenticalFrame ||
@@ -1253,14 +1254,14 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void BoundingBox::updateCurrentRenderData() {
-    mCurrentRenderData = createRenderData()->ref<BoundingBoxRenderData>();
+    mCurrentRenderData = createRenderData();
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
-    if(mCurrentRenderData == NULL) {
-        return mDrawRenderContainer.getSrcRenderData();
-    }
-    return mCurrentRenderData.get();
+//    if(mCurrentRenderData == NULL) {
+//        return mDrawRenderContainer.getSrcRenderData();
+//    }
+    return mCurrentRenderData;
 }
 
 void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {

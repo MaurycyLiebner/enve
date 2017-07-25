@@ -48,7 +48,7 @@ private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
-        Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &renderData,
+        Q_FOREACH(BoundingBoxRenderData *renderData,
                   childrenRenderData) {
             //box->draw(p);
             renderData->drawRenderedImageForParent(canvas);

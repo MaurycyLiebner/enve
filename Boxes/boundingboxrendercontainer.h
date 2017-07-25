@@ -67,7 +67,7 @@ protected:
 class RenderContainer : public CacheContainer {
 public:
     RenderContainer() {}
-    virtual ~RenderContainer() {}
+    virtual ~RenderContainer();
 
     void drawSk(SkCanvas *canvas, SkPaint *paint);
 
@@ -90,11 +90,11 @@ public:
     }
 
     BoundingBoxRenderData *getSrcRenderData() {
-        return mSrcRenderData.get();
+        return mSrcRenderData;
     }
 
 protected:
-    std::shared_ptr<BoundingBoxRenderData> mSrcRenderData;
+    BoundingBoxRenderData *mSrcRenderData = NULL;
     int mRelFrame = 0;
     qreal mResolutionFraction;
     QMatrix mTransform;

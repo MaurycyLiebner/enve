@@ -504,8 +504,8 @@ public:
     void addScheduler(Updatable *updatable);
     virtual void addSchedulersToProcess();
 protected:
-    QList<std::shared_ptr<Updatable> > mSchedulers;
-    std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
+    QList<Updatable*> mSchedulers;
+    BoundingBoxRenderData *mCurrentRenderData = NULL;
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
 

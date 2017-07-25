@@ -227,7 +227,7 @@ private:
     bool mDetachedUndoRedoStack = false;
     UndoRedoStack *mCurrentUndoRedoStack;
 
-    QList<std::shared_ptr<Updatable> > mUpdateSchedulers;
+    QList<Updatable*> mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
 
