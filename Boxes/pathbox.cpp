@@ -428,14 +428,13 @@ QRectF PathBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     return SkRectToQRectF(outline.computeTightBounds());
 }
 
-void PathBox::updateCurrentPreviewDataFromRenderData() {
+void PathBox::updateCurrentPreviewDataFromRenderData(
+        BoundingBoxRenderData *renderData) {
     PathBoxRenderData *pathRenderData =
-            ((PathBoxRenderData*)mCurrentRenderData.get());
-    qDebug() << "update current data for frame: " <<
-                mCurrentRenderData->relFrame;
+            ((PathBoxRenderData*)renderData);
     mPathSk = pathRenderData->path;
     mOutlinePathSk = pathRenderData->outlinePath;
-    BoundingBox::updateCurrentPreviewDataFromRenderData();
+    BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);
 }
 
 bool PathBox::relPointInsidePath(const QPointF &relPos) {

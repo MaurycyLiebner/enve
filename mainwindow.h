@@ -23,6 +23,7 @@ class BoxesListAnimationDockWidget;
 class Canvas;
 class CanvasWindow;
 class MemoryHandler;
+class Updatable;
 
 class ObjectSettingsWidget;
 class BoxScrollWidget;
@@ -64,7 +65,7 @@ public:
 
     UndoRedoStack *getUndoRedoStack();
 
-    void addUpdateScheduler(UpdateScheduler *scheduler);
+    void addUpdateScheduler(Updatable *scheduler);
 
     bool isShiftPressed();
     bool isCtrlPressed();
@@ -226,7 +227,7 @@ private:
     bool mDetachedUndoRedoStack = false;
     UndoRedoStack *mCurrentUndoRedoStack;
 
-    QList<UpdateScheduler*> mUpdateSchedulers;
+    QList<std::shared_ptr<Updatable> > mUpdateSchedulers;
     bool processKeyEvent(QKeyEvent *event);
     FillStrokeSettingsWidget *mFillStrokeSettings;
 

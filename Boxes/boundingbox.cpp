@@ -446,8 +446,9 @@ void BoundingBox::scheduleCenterPivot() {
     mCenterPivotScheduled = true;
 }
 
-void BoundingBox::updateRelBoundingRectFromCurrentData() {
-    mRelBoundingRect = mCurrentRenderData->relBoundingRect;
+void BoundingBox::updateRelBoundingRectFromRenderData(
+        BoundingBoxRenderData *renderData) {
+    mRelBoundingRect = renderData->relBoundingRect;
     mRelBoundingRectSk = QRectFToSkRect(mRelBoundingRect);
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
@@ -461,17 +462,20 @@ void BoundingBox::updateRelBoundingRectFromCurrentData() {
     }
 }
 
-void BoundingBox::updateCurrentPreviewDataFromRenderData() {
-    updateRelBoundingRectFromCurrentData();
+void BoundingBox::updateCurrentPreviewDataFromRenderData(
+        BoundingBoxRenderData *renderData) {
+    updateRelBoundingRectFromRenderData(renderData);
 }
 
 void BoundingBox::scheduleUpdate() {
     if(!shouldScheduleUpdate()) return;
-    if(getCurrentRenderData()->isAwaitingUpdate()) return;
+    if((mCurrentRenderData == NULL ? true :
+        mCurrentRenderData->isAwaitingUpdate())) {
+        updateCurrentRenderData();
+    } else {
+        return;
+    }
     setUpdateVars();
-    setupBoundingBoxRenderDataForRelFrame(anim_mCurrentRelFrame,
-                                          mCurrentRenderData.get());
-    updateCurrentPreviewDataFromRenderData();
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
@@ -481,8 +485,7 @@ void BoundingBox::scheduleUpdate() {
     mCurrentRenderData->addScheduler();
 }
 
-void BoundingBox::currentRenderDataBeingProcessed() {
-    mProcessedRenderData << mCurrentRenderData;
+void BoundingBox::resetcurrentRenderData() {
     mCurrentRenderData.reset();
 }
 
@@ -653,10 +656,11 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
     data->relFrame = relFrame;
-    data->parentBox = this->ref<BoundingBox>();
     data->renderedToImage = false;
     data->transform = mTransformAnimator->
             getCombinedTransformMatrixAtRelFrame(relFrame);
+    data->relTransform = mTransformAnimator->
+            getTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
     data->effectsMargin = getEffectsMarginAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
@@ -664,7 +668,6 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->pixmapEffects.clear();
     mEffectsAnimators->addEffectRenderDataToList(relFrame,
                                                  &data->pixmapEffects);
-    data->relBoundingRect = getRelBoundingRectAtRelFrame(relFrame);
 }
 
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
@@ -992,6 +995,23 @@ void BoundingBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     }
 }
 
+void BoundingBox::processSchedulers() {
+    foreach(const std::shared_ptr<Updatable> &updatable, mSchedulers) {
+        updatable->schedulerProccessed();
+    }
+}
+
+void BoundingBox::addSchedulersToProcess() {
+    foreach(const std::shared_ptr<Updatable> &updatable, mSchedulers) {
+        MainWindow::getInstance()->addUpdateScheduler(updatable.get());
+    }
+
+    mSchedulers.clear();
+}
+
+void BoundingBox::addScheduler(Updatable *updatable) {
+    mSchedulers << updatable->ref<Updatable>();
+}
 
 void BoundingBox::setVisibile(const bool &visible,
                               const bool &saveUndoRedo) {
@@ -1220,7 +1240,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
             mDrawRenderContainer.setVariablesFromRenderData(renderData);
             updateDrawRenderContainerTransform();
         }
-        if(mProcessedRenderData.count() == 1) {
+        if(mSchedulers.count() == 0) {
             if(mDrawRenderContainer.getRelFrame() > lastIdenticalFrame ||
                mDrawRenderContainer.getRelFrame() < firstIdenticalFrame) {
                 scheduleUpdate();
@@ -1230,18 +1250,6 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
         mDrawRenderContainer.setVariablesFromRenderData(renderData);
         updateDrawRenderContainerTransform();
     }
-    afterRenderDataFinished(renderData);
-}
-
-void BoundingBox::afterRenderDataFinished(BoundingBoxRenderData *renderData) {
-    for(int i = 0; i < mProcessedRenderData.count(); i++) {
-        const std::shared_ptr<BoundingBoxRenderData> &data =
-                mProcessedRenderData.at(i);
-        if(data.get() == renderData) {
-            mProcessedRenderData.removeAt(i);
-            break;
-        }
-    }
 }
 
 void BoundingBox::updateCurrentRenderData() {
@@ -1250,7 +1258,7 @@ void BoundingBox::updateCurrentRenderData() {
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {
     if(mCurrentRenderData == NULL) {
-        updateCurrentRenderData();
+        return mDrawRenderContainer.getSrcRenderData();
     }
     return mCurrentRenderData.get();
 }
@@ -1265,16 +1273,14 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
     }
 }
 
+BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
+    parentBox = parentBoxT->ref<BoundingBox>();
+}
+
 BoundingBoxRenderData::~BoundingBoxRenderData() {}
 
-void BoundingBoxRenderData::drawRenderedImage(SkCanvas *canvas) {
-    renderToImage();
-    SkPaint paint;
-    paint.setAlpha(qRound(opacity*2.55));
-    paint.setBlendMode(blendMode);
-    canvas->drawImage(renderedImage,
-                      drawPos.x(), drawPos.y(),
-                      &paint);
+void BoundingBoxRenderData::updateRelBoundingRect() {
+    relBoundingRect = parentBox->getRelBoundingRectAtRelFrame(relFrame);
 }
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
@@ -1356,13 +1362,28 @@ void BoundingBoxRenderData::processUpdate() {
 
 void BoundingBoxRenderData::beforeUpdate() {
     Updatable::beforeUpdate();
-    if(parentBox == NULL) return;
-    parentBox->currentRenderDataBeingProcessed();
+    //parentBox->setUpdateVars();
+//    parentBox->setupBoundingBoxRenderDataForRelFrame(
+//                parentBox->anim_getCurrentRelFrame(), this);
+//    parentBox->updateCurrentPreviewDataFromRenderData(this);
+
+    parentBox->resetcurrentRenderData();
 }
 
 void BoundingBoxRenderData::afterUpdate() {
+    parentBox->renderDataFinished(this);
     Updatable::afterUpdate();
-    if(parentBox != NULL) {
-        parentBox->renderDataFinished(this);
-    }
+}
+
+void BoundingBoxRenderData::schedulerProccessed() {
+    parentBox->setupBoundingBoxRenderDataForRelFrame(
+                parentBox->anim_getCurrentRelFrame(),
+                this);
+    updateRelBoundingRect();
+    parentBox->updateCurrentPreviewDataFromRenderData(this);
+    Updatable::schedulerProccessed();
+}
+
+void BoundingBoxRenderData::addSchedulerNow() {
+    parentBox->addScheduler(this);
 }

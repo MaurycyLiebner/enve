@@ -30,6 +30,20 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
 }
 
 
+void BoxesGroup::processSchedulers() {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        child->processSchedulers();
+    }
+    BoundingBox::processSchedulers();
+}
+
+void BoxesGroup::addSchedulersToProcess() {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        child->addSchedulersToProcess();
+    }
+    BoundingBox::addSchedulersToProcess();
+}
+
 void BoxesGroup::updateAllBoxes() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         child->updateAllBoxes();
@@ -245,28 +259,37 @@ void BoxesGroup::updateEffectsMargin() {
     mEffectsMargin += childrenMargin;
 }
 
+
+
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
                                                        data);
     BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
-    groupData->shouldPaintOnImage = shouldPaintOnImage();
     groupData->childrenRenderData.clear();
     qreal childrenEffectsMargin = 0.;
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         int boxRelFrame = box->prp_parentRelFrameToThisRelFrame(relFrame);
-        childrenEffectsMargin =
-                qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
-                     childrenEffectsMargin);
-        BoundingBoxRenderData *boxRenderData =
-                box->getCurrentRenderData();
-        boxRenderData->addDependent(data);
-        groupData->childrenRenderData <<
-                boxRenderData->ref<BoundingBoxRenderData>();
+        if(box->isRelFrameVisibleAndInVisibleDurationRect(boxRelFrame)) {
+            childrenEffectsMargin =
+                    qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
+                         childrenEffectsMargin);
+            BoundingBoxRenderData *boxRenderData =
+                    box->getCurrentRenderData();
+            if(boxRenderData == NULL) {
+                box->scheduleUpdate();
+                box->processSchedulers();
+                boxRenderData = box->getCurrentRenderData();
+            }
+            if(!boxRenderData->finished()) {
+                boxRenderData->addDependent(data);
+            }
+            groupData->childrenRenderData <<
+                    boxRenderData->ref<BoundingBoxRenderData>();
+        }
     }
     data->effectsMargin += childrenEffectsMargin;
-    groupData->relBoundingRect = mRelBoundingRect;
 }
 
 void BoxesGroup::drawPixmapSk(SkCanvas *canvas) {

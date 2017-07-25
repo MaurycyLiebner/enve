@@ -139,6 +139,8 @@ public:
 
     void rotate90CCW();
     void rotate90CW();
+    void processSchedulers();
+    bool noBoxesAwaitUpdate();
 protected:
     QList<int> mFreeThreads;
     bool mMouseGrabber = false;
@@ -157,7 +159,7 @@ protected:
     bool mRendering = false;
     bool mNoBoxesAwaitUpdate = true;
     bool mCancelLastBoxUpdate = false;
-    QList<Updatable*> mUpdatablesAwaitingUpdate;
+    QList<std::shared_ptr<Updatable> > mUpdatablesAwaitingUpdate;
 
     QString mOutputString;
     int mCurrentRenderFrame;

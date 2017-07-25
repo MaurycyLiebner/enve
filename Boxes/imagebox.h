@@ -4,6 +4,11 @@
 #include "skiaincludes.h"
 
 struct ImageBoxRenderData : public BoundingBoxRenderData {
+    ImageBoxRenderData(BoundingBox *parentBoxT) :
+        BoundingBoxRenderData(parentBoxT){
+
+    }
+
     sk_sp<SkImage> image;
 private:
     void drawSk(SkCanvas *canvas) {
@@ -32,7 +37,7 @@ public:
                                                BoundingBoxRenderData *data);
 
     BoundingBoxRenderData *createRenderData() {
-        return new ImageBoxRenderData();
+        return new ImageBoxRenderData(this);
     }
 
 private:

@@ -641,15 +641,25 @@ void CanvasWindow::renderPreview() {
     MainWindow::getInstance()->previewBeingRendered();
 }
 
+void CanvasWindow::processSchedulers() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->processSchedulers();
+    mCurrentCanvas->addSchedulersToProcess();
+}
+
+bool CanvasWindow::noBoxesAwaitUpdate() {
+    return mNoBoxesAwaitUpdate;
+}
+
 void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
+
+    qDebug() << "add updatable";
+    mUpdatablesAwaitingUpdate << updatable->ref<Updatable>();
     if(!mFreeThreads.isEmpty()) {
-        updatable->beforeUpdate();
-        emit updateUpdatable(updatable, mFreeThreads.takeFirst());
-    } else {
-        mUpdatablesAwaitingUpdate << updatable;
+        sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
     }
 }
 
@@ -664,6 +674,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
 //        }
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
+        qDebug() << "no more updatables";
         mNoBoxesAwaitUpdate = true;
         mFreeThreads << threadId;
         if(mBoxesUpdateFinishedFunction != NULL) {
@@ -674,11 +685,14 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
         }
         //callUpdateSchedulers();
     } else {
-        foreach(Updatable *updatablaT, mUpdatablesAwaitingUpdate) {
+        for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
+            Updatable *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
-                mUpdatablesAwaitingUpdate.removeOne(updatablaT);
                 updatablaT->beforeUpdate();
                 emit updateUpdatable(updatablaT, threadId);
+                mUpdatablesAwaitingUpdate.removeAt(i);
+                qDebug() << "remove updatable";
+                i--;
                 return;
             }
         }
@@ -1051,13 +1065,13 @@ QWidget *CanvasWindow::getCanvasWidget() {
 
 void CanvasWindow::grabMouse() {
     mMouseGrabber = true;
-    setMouseGrabEnabled(true);
+    //setMouseGrabEnabled(true);
     //mCanvasWidget->grabMouse();
 }
 
 void CanvasWindow::releaseMouse() {
     mMouseGrabber = false;
-    setMouseGrabEnabled(false);
+    //setMouseGrabEnabled(false);
 
     //        QWidget *grabber = mWidgetContainer->mouseGrabber();
     //mCanvasWidget->releaseMouse();

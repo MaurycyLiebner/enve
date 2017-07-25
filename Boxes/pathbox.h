@@ -10,6 +10,11 @@ class PathEffect;
 typedef QSharedPointer<GradientPoints> GradientPointsQSPtr;
 
 struct PathBoxRenderData : public BoundingBoxRenderData {
+    PathBoxRenderData(BoundingBox *parentBoxT) :
+        BoundingBoxRenderData(parentBoxT) {
+
+    }
+
     SkPath path;
     SkPath outlinePath;
     UpdatePaintSettings paintSettings;
@@ -111,9 +116,10 @@ public:
                                 BoundingBoxRenderData *data);
 
     BoundingBoxRenderData *createRenderData() {
-        return new PathBoxRenderData();
+        return new PathBoxRenderData(this);
     }
-    void updateCurrentPreviewDataFromRenderData();
+    void updateCurrentPreviewDataFromRenderData(
+            BoundingBoxRenderData *renderData);
 protected:
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
 

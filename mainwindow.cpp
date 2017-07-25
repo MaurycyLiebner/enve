@@ -774,8 +774,8 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
     updateTitle();
 }
 
-void MainWindow::addUpdateScheduler(UpdateScheduler *scheduler) {
-    mUpdateSchedulers.prepend(scheduler);
+void MainWindow::addUpdateScheduler(Updatable *scheduler) {
+    mUpdateSchedulers.append(scheduler->ref<Updatable>());
 }
 
 bool MainWindow::isShiftPressed()
@@ -801,11 +801,14 @@ void MainWindow::callUpdateSchedulers() {
 
     //mKeysView->graphUpdateAfterKeysChangedIfNeeded();
 
-    Q_FOREACH(UpdateScheduler *sheduler, mUpdateSchedulers) {
-        sheduler->update();
-        delete sheduler;
+    if(mCanvasWindow->noBoxesAwaitUpdate()) {
+        mCanvasWindow->processSchedulers();
+        foreach(const std::shared_ptr<Updatable> &updatable, mUpdateSchedulers) {
+            //updatable->schedulerProccessed();
+            mCanvasWindow->addUpdatableAwaitingUpdate(updatable.get());
+        }
+        mUpdateSchedulers.clear();
     }
-    mUpdateSchedulers.clear();
 
     ScrollWidgetVisiblePart::callAllInstanceUpdaters();
     mCanvasWindow->updateHoveredElements();
@@ -1008,9 +1011,6 @@ bool MainWindow::isEnabled() {
 }
 
 void MainWindow::clearAll() {
-    Q_FOREACH(UpdateScheduler *sheduler, mUpdateSchedulers) {
-        delete sheduler;
-    }
     mUpdateSchedulers.clear();
 
     mUndoRedoStack.clearAll();

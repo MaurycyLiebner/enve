@@ -84,23 +84,17 @@ public:
 
     const qreal &getResolutionFraction() const;
 
-    void updateVariables(const QMatrix &combinedTransform,
-                         const qreal &effectsMargin,
-                         const qreal &resolutionPer,
-                         BoundingBox *target);
-
-    void setVariables(const QMatrix &transform,
-                      const QMatrix &paintTransform,
-                      const SkPoint &drawpos,
-                      const sk_sp<SkImage> &imgSk,
-                      const qreal &res);
-    void duplicateFrom(RenderContainer *src);
     void setVariablesFromRenderData(BoundingBoxRenderData *data);
     int getRelFrame() {
         return mRelFrame;
     }
 
+    BoundingBoxRenderData *getSrcRenderData() {
+        return mSrcRenderData.get();
+    }
+
 protected:
+    std::shared_ptr<BoundingBoxRenderData> mSrcRenderData;
     int mRelFrame = 0;
     qreal mResolutionFraction;
     QMatrix mTransform;

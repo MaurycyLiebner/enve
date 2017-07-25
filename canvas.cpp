@@ -510,16 +510,16 @@ void Canvas::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 }
 
 void Canvas::scheduleUpdate() {
-    int fId;
-    int lId;
-    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, anim_mCurrentRelFrame);
-    CacheContainer *cont =
-          mCacheHandler.getRenderContainerAtRelFrame(fId);
-    if(cont == NULL) {
+//    int fId;
+//    int lId;
+//    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, anim_mCurrentRelFrame);
+//    CacheContainer *cont =
+//          mCacheHandler.getRenderContainerAtRelFrame(fId);
+//    if(cont == NULL) {
         BoundingBox::scheduleUpdate();
-    } else {
-        setCurrentPreviewContainer(cont);
-    }
+//    } else {
+//        setCurrentPreviewContainer(cont);
+//    }
 }
 
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
@@ -533,8 +533,6 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     }
     cont->replaceImageSk(renderData->renderedImage);
     setCurrentPreviewContainer(cont);
-
-    afterRenderDataFinished(renderData);
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,

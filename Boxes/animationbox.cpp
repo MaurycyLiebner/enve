@@ -161,5 +161,5 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
 }
 
 BoundingBoxRenderData *AnimationBox::createRenderData() {
-    return new ImageBoxRenderData();
+    return new ImageBoxRenderData(this);
 }

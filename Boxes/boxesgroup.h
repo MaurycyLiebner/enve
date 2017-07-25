@@ -14,24 +14,26 @@ class MainWindow;
 class VectorPathEdge;
 
 struct BoxesGroupRenderData : public BoundingBoxRenderData {
+    BoxesGroupRenderData(BoundingBox *parentBoxT) :
+        BoundingBoxRenderData(parentBoxT) {
+
+    }
     QList<std::shared_ptr<BoundingBoxRenderData> > childrenRenderData;
 
-    bool shouldPaintOnImage = true;
-
-    void drawRenderedImage(SkCanvas *canvas) {
-        if(shouldPaintOnImage) {
-            BoundingBoxRenderData::drawRenderedImage(canvas);
-        } else {
-            SkPaint paint;
-            paint.setAlpha(qRound(opacity*2.55));
-            paint.setBlendMode(blendMode);
-            canvas->saveLayer(NULL, &paint);
-            Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &renderData,
-                      childrenRenderData) {
-                renderData->drawRenderedImage(canvas);
-            }
-            canvas->restore();
+    void updateRelBoundingRect() {
+        SkPath boundingPaths = SkPath();
+        Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &child,
+                  childrenRenderData) {
+            SkPath childPath;
+            childPath.addRect(
+                    QRectFToSkRect(
+                        child->relBoundingRect));
+            childPath.transform(
+                        QMatrixToSkMatrix(
+                            child->relTransform) );
+            boundingPaths.addPath(childPath);
         }
+        relBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
     }
 
 private:
@@ -116,15 +118,17 @@ public:
         Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
             int childRelFrame =
                     child->prp_parentRelFrameToThisRelFrame(relFrame);
-            SkPath childPath;
-            childPath.addRect(
-                    QRectFToSkRect(
-                        child->getRelBoundingRectAtRelFrame(childRelFrame)));
-            childPath.transform(
-                        QMatrixToSkMatrix(
-                            child->getTransformAnimator()->
-                                getTransformMatrixAtRelFrame(childRelFrame)) );
-            boundingPaths.addPath(childPath);
+            if(child->isRelFrameVisibleAndInVisibleDurationRect(childRelFrame)) {
+                SkPath childPath;
+                childPath.addRect(
+                        QRectFToSkRect(
+                            child->getRelBoundingRectAtRelFrame(childRelFrame)));
+                childPath.transform(
+                            QMatrixToSkMatrix(
+                                child->getTransformAnimator()->
+                                    getTransformMatrixAtRelFrame(childRelFrame)) );
+                boundingPaths.addPath(childPath);
+            }
         }
         return SkRectToQRectF(boundingPaths.computeTightBounds());
     }
@@ -184,7 +188,7 @@ public:
     void schedulerProccessed();
 
     BoundingBoxRenderData *createRenderData() {
-        return new BoxesGroupRenderData();
+        return new BoxesGroupRenderData(this);
     }
 
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
@@ -195,6 +199,8 @@ public:
     void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
+    void processSchedulers();
+    void addSchedulersToProcess();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

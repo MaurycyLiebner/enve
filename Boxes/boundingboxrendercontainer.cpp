@@ -58,26 +58,7 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.reset();
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);
-}
-
-void RenderContainer::duplicateFrom(RenderContainer *src) {
-    setVariables(src->getTransform(),
-                 src->getPaintTransform(),
-                 src->getDrawpos(),
-                 src->getImageSk(),
-                 src->getResolutionFraction());
-}
-
-void RenderContainer::setVariables(const QMatrix &transform,
-                                   const QMatrix &paintTransform,
-                                   const SkPoint &drawpos,
-                                   const sk_sp<SkImage> &imgSk,
-                                   const qreal &res) {
-    mTransform = transform;
-    mPaintTransform = paintTransform;
-    mImageSk = imgSk;
-    mDrawPos = drawpos;
-    mResolutionFraction = res;
+    mSrcRenderData = data->ref<BoundingBoxRenderData>();
     thisAccessed();
 }
 

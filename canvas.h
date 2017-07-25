@@ -36,6 +36,10 @@ enum CanvasMode : short {
 extern bool zLessThan(BoundingBox *box1, BoundingBox *box2);
 
 struct CanvasRenderData : public BoxesGroupRenderData {
+    CanvasRenderData(BoundingBox *parentBoxT) :
+        BoxesGroupRenderData(parentBoxT) {
+
+    }
     void renderToImage();
     SkScalar canvasWidth;
     SkScalar canvasHeight;
@@ -309,7 +313,7 @@ public:
     }
 
     BoundingBoxRenderData *createRenderData() {
-        return new CanvasRenderData();
+        return new CanvasRenderData(this);
     }
 
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,

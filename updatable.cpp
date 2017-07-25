@@ -7,6 +7,7 @@ Updatable::Updatable() {
 }
 
 void Updatable::beforeUpdate() {
+    mSelfRef = ref<Updatable>();
     mBeingProcessed = true;
     mAwaitingUpdate = false;
     mUpdateDependent = mDependent;
@@ -14,8 +15,10 @@ void Updatable::beforeUpdate() {
 }
 
 void Updatable::afterUpdate() {
+    mFinished = true;
     mBeingProcessed = false;
     tellDependentThatFinished();
+    mSelfRef.reset();
 }
 
 void Updatable::tellDependentThatFinished() {
@@ -34,9 +37,11 @@ void Updatable::addDependent(Updatable *updatable) {
 }
 
 void Updatable::addScheduler() {
-    if(!shouldUpdate() || mAwaitingUpdate) return;
-    beforeAddingScheduler();
-    mAwaitingUpdate = true;
-    MainWindow::getInstance()->addUpdateScheduler(
-                new AddUpdatableAwaitingUpdateScheduler(this));
+    if(!shouldUpdate() || mSchedulerAdded) return;
+    mSchedulerAdded = true;
+    addSchedulerNow();
+}
+
+void Updatable::addSchedulerNow() {
+    MainWindow::getInstance()->addUpdateScheduler(this);
 }

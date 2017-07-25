@@ -68,11 +68,13 @@ private:
     BoundingBox *mBoundingBox;
 };
 
-struct BoundingBoxRenderData : public StdSelfRef,
-                               public Updatable {
+struct BoundingBoxRenderData : public Updatable {
+    BoundingBoxRenderData(BoundingBox *parentBoxT);
+
     virtual ~BoundingBoxRenderData();
     bool renderedToImage = false;
     QMatrix transform;
+    QMatrix relTransform;
     QRectF relBoundingRect;
     qreal opacity;
     qreal resolution;
@@ -84,7 +86,7 @@ struct BoundingBoxRenderData : public StdSelfRef,
 
     QSharedPointer<BoundingBox> parentBox;
 
-    virtual void drawRenderedImage(SkCanvas *canvas);
+    virtual void updateRelBoundingRect();
     virtual void drawRenderedImageForParent(SkCanvas *canvas);
     virtual void renderToImage();
     sk_sp<SkImage> renderedImage;
@@ -95,6 +97,9 @@ struct BoundingBoxRenderData : public StdSelfRef,
 
     void afterUpdate();
 
+    void schedulerProccessed();
+
+    void addSchedulerNow();
 private:
     virtual void drawSk(SkCanvas *canvas) = 0;
 };
@@ -473,10 +478,11 @@ public:
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
     virtual void renderDataFinished(BoundingBoxRenderData *renderData);
-    void updateRelBoundingRectFromCurrentData();
+    void updateRelBoundingRectFromRenderData(BoundingBoxRenderData *renderData);
 
     virtual void scheduleUpdate();
-    virtual void updateCurrentPreviewDataFromRenderData();
+    virtual void updateCurrentPreviewDataFromRenderData(
+            BoundingBoxRenderData *renderData);
     virtual bool shouldScheduleUpdate() {
         if(mParent == NULL) return false;
         if((isVisibleAndInVisibleDurationRect()) ||
@@ -488,15 +494,17 @@ public:
 
     virtual void replaceCurrentFrameCache();
     void updateCurrentRenderData();
-    void currentRenderDataBeingProcessed();
-    void afterRenderDataFinished(BoundingBoxRenderData *renderData);
+    void resetcurrentRenderData();
     bool isRelFrameInVisibleDurationRect(const int &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
     void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
+    virtual void processSchedulers();
+    void addScheduler(Updatable *updatable);
+    virtual void addSchedulersToProcess();
 protected:
-    QList<std::shared_ptr<BoundingBoxRenderData> > mProcessedRenderData;
+    QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;

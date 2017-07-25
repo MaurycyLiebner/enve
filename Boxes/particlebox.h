@@ -53,6 +53,16 @@ struct EmitterData {
 };
 
 struct ParticleBoxRenderData : public BoundingBoxRenderData {
+    ParticleBoxRenderData(BoundingBox *parentBoxT) :
+        BoundingBoxRenderData(parentBoxT) {
+
+    }
+
+    void updateRelBoundingRect() {
+        BoundingBoxRenderData::updateRelBoundingRect();
+        clipRect = QRectFToSkRect(relBoundingRect);
+    }
+
     QList<EmitterData> emittersData;
     SkRect clipRect;
 private:
@@ -260,7 +270,7 @@ public:
     bool SWT_isParticleBox();
 
     BoundingBoxRenderData *createRenderData() {
-        return new ParticleBoxRenderData();
+        return new ParticleBoxRenderData(this);
     }
 
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
@@ -272,8 +282,6 @@ public:
             particleData->emittersData << emitter->getEmitterDataAtRelFrame(
                                               relFrame);
         }
-
-        particleData->clipRect = QRectFToSkRect(particleData->relBoundingRect);
     }
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
