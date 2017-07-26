@@ -516,22 +516,38 @@ StrokeSettings *BoundingBox::getStrokeSettings() {
 
 void BoundingBox::drawAsBoundingRectSk(SkCanvas *canvas,
                                        const SkPath &path,
-                                       const SkScalar &invScale) {
+                                       const SkScalar &invScale,
+                                       const bool &dashes) {
     canvas->save();
+
     SkPaint paint;
-//    QPen pen = QPen(QColor(0, 0, 0, 125), 1., Qt::DashLine);
-//    pen.setCosmetic(true);
-//    p->setPen(pen);
-//    p->setBrush(Qt::NoBrush);
-    SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
-                             MIN_WIDGET_HEIGHT*0.25f*invScale};
-    paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
-    paint.setColor(SkColorSetARGBInline(125, 0, 0, 0));
+    if(dashes) {
+        SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
+                                 MIN_WIDGET_HEIGHT*0.25f*invScale};
+        paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+    }
+    paint.setAntiAlias(true);
+    paint.setStrokeWidth(1.5*invScale);
     paint.setStyle(SkPaint::kStroke_Style);
-    paint.setStrokeWidth(invScale);
+    paint.setColor(SK_ColorBLACK);
     SkPath mappedPath = path;
     mappedPath.transform(QMatrixToSkMatrix(getCombinedTransform()));
     canvas->drawPath(mappedPath, paint);
+    paint.setStrokeWidth(0.75*invScale);
+    paint.setColor(SK_ColorWHITE);
+    canvas->drawPath(mappedPath, paint);
+
+//    SkPaint paint;
+//    SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
+//                             MIN_WIDGET_HEIGHT*0.25f*invScale};
+//    paint.setPathEffect(SkDashPathEffect::Make(intervals, 2, 0));
+//    paint.setColor(SkColorSetARGBInline(125, 0, 0, 0));
+//    paint.setStyle(SkPaint::kStroke_Style);
+//    paint.setStrokeWidth(invScale);
+//    SkPath mappedPath = path;
+//    mappedPath.transform(QMatrixToSkMatrix(getCombinedTransform()));
+//    canvas->drawPath(mappedPath, paint);
+
     canvas->restore();
 }
 
@@ -539,7 +555,8 @@ void BoundingBox::drawBoundingRectSk(SkCanvas *canvas,
                                      const qreal &invScale) {
     drawAsBoundingRectSk(canvas,
                          mSkRelBoundingRectPath,
-                         invScale);
+                         invScale,
+                         true);
 }
 
 const SkPath &BoundingBox::getRelBoundingRectPath() {

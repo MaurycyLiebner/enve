@@ -74,15 +74,6 @@ void VectorPath::loadPathFromSkPath(const SkPath &path) {
     mPathAnimator->loadPathFromSkPath(path);
 }
 
-void VectorPath::updatePath() {
-//    mPath = QPainterPath();
-//    //mPath.setFillRule(Qt::WindingFill);
-
-//    mEditPath = QPainterPath();
-
-    mPathAnimator->updatePath();
-    mPathSk = mPathAnimator->getCurrentSkPath();
-}
 
 //#include <QMenu>
 //void VectorPath::showContextMenu(const QPoint &globalPos) {

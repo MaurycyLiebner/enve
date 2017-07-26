@@ -170,8 +170,8 @@ public:
     virtual void select();
     void deselect();
     int getZIndex();
-    void drawBoundingRectSk(SkCanvas *canvas,
-                            const qreal &invScale);
+    virtual void drawBoundingRectSk(SkCanvas *canvas,
+                                    const qreal &invScale);
 
     virtual void setParent(BoxesGroup *parent);
     BoxesGroup *getParent();
@@ -286,7 +286,8 @@ public:
     void saveUglyPaintTransform();
     void drawAsBoundingRectSk(SkCanvas *canvas,
                               const SkPath &path,
-                              const SkScalar &invScale);
+                              const SkScalar &invScale,
+                              const bool &dashes);
 
     virtual void setUpdateVars() {}
     void redoUpdate();
@@ -372,7 +373,7 @@ public:
     BoundingBox *createDuplicateWithSameParent();
 
     virtual void drawHoveredSk(SkCanvas *canvas,
-                               const qreal &invScale) {
+                               const SkScalar &invScale) {
         drawHoveredPathSk(canvas, mSkRelBoundingRectPath, invScale);
     }
 

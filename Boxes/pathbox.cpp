@@ -204,6 +204,12 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
     return pointToReturn;
 }
 
+void PathBox::drawBoundingRectSk(SkCanvas *canvas,
+                                 const qreal &invScale) {
+    BoundingBox::drawBoundingRectSk(canvas, invScale);
+    drawAsBoundingRectSk(canvas, mPathSk, invScale, false);
+}
+
 void PathBox::addPathEffect(PathEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
 

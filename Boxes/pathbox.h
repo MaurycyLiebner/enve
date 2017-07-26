@@ -100,10 +100,12 @@ public:
     void updateStrokeDrawGradient();
     void updateFillDrawGradient();
 
-    virtual void updatePath() {}
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                    const CanvasMode &currentCanvasMode,
                                    const qreal &canvasScaleInv);
+
+    void drawBoundingRectSk(SkCanvas *canvas,
+                            const qreal &invScale);
 
     bool SWT_isPathBox() { return true; }
 

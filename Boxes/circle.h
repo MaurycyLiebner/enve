@@ -54,8 +54,6 @@ public:
     void setHorizontalRadius(const qreal &horizontalRadius);
     void setRadius(const qreal &radius);
 
-    void updatePath();
-
     MovablePoint *getPointAtAbsPos(
                              const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,

@@ -15,10 +15,6 @@ void SingleVectorPathAnimator::drawSelected(SkCanvas *canvas,
                                       const CanvasMode &currentCanvasMode,
                                       const qreal &invScale,
                                       const SkMatrix &combinedTransform) {
-    SinglePathAnimator::drawSelected(canvas,
-                                     currentCanvasMode,
-                                     invScale,
-                                     combinedTransform);
 
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
@@ -298,59 +294,6 @@ VectorPathEdge *SingleVectorPathAnimator::getEgde(const QPointF &absPos,
         }
     }
     return NULL;
-}
-
-void SingleVectorPathAnimator::updatePath() {
-    mPath = QPainterPath();
-    //mPath.setFillRule(Qt::WindingFill);
-
-    PathPoint *point = mFirstPoint;
-    PathPointValues lastPointValues;
-    lastPointValues = point->getPointValues();
-    mPath.moveTo(lastPointValues.pointRelPos);
-    while(true) {
-        point = point->getNextPoint();
-        if(point == NULL) break;
-        PathPointValues pointValues;
-
-        pointValues = point->getPointValues();
-
-        mPath.cubicTo(lastPointValues.endRelPos,
-                      pointValues.startRelPos,
-                      pointValues.pointRelPos);
-
-        lastPointValues = pointValues;
-
-        if(point == mFirstPoint) break;
-    }
-}
-
-void SingleVectorPathAnimator::updateSkPath() {
-    mSkPath = SkPath();
-    //mPath.setFillRule(Qt::WindingFill);
-
-    PathPoint *point = mFirstPoint;
-    PathPointValues lastPointValues;
-    lastPointValues = point->getPointValues();
-    mSkPath.moveTo(QPointFToSkPoint(lastPointValues.pointRelPos));
-    while(true) {
-        point = point->getNextPoint();
-        if(point == NULL) break;
-        PathPointValues pointValues;
-
-        pointValues = point->getPointValues();
-
-        mSkPath.cubicTo(QPointFToSkPoint(lastPointValues.endRelPos),
-                        QPointFToSkPoint(pointValues.startRelPos),
-                        QPointFToSkPoint(pointValues.pointRelPos));
-
-        lastPointValues = pointValues;
-
-        if(point == mFirstPoint) {
-            mSkPath.close();
-            break;
-        }
-    }
 }
 
 MovablePoint *SingleVectorPathAnimator::getPointAtAbsPos(

@@ -140,52 +140,6 @@ qreal textForQPainterPath(const Qt::Alignment &alignment,
     }
 }
 
-void TextBox::updatePath() {
-    QPainterPath qPath;
-
-    QStringList lines = mText.split(QRegExp("\n|\r\n|\r"));
-    QFontMetricsF fm(mFont);
-    qreal yT = 0.;
-    qreal maxWidth = 0.;
-    Q_FOREACH(QString line, lines) {
-        qreal lineWidth = fm.width(line);
-        if(lineWidth > maxWidth) maxWidth = lineWidth;
-    }
-    Q_FOREACH(QString line, lines) {
-        qreal lineWidth = fm.width(line);
-        qPath.addText(textForQPainterPath(mAlignment, lineWidth, maxWidth),
-                      yT, mFont, line);
-        yT += fm.height();
-    }
-
-    QRectF boundingRect = qPath.boundingRect();
-    qPath.translate(-boundingRect.center());
-
-    bool firstOther;
-    SkPoint endPt;
-    SkPoint startPt;
-    mPathSk.reset();
-    for(int i = 0; i < qPath.elementCount(); i++) {
-        const QPainterPath::Element &elem = qPath.elementAt(i);
-
-        if(elem.isMoveTo()) { // move
-            mPathSk.moveTo(elem.x, elem.y);
-        } else if(elem.isLineTo()) { // line
-            mPathSk.lineTo(elem.x, elem.y);
-        } else if(elem.isCurveTo()) { // curve
-            endPt = SkPoint::Make(elem.x, elem.y);
-            firstOther = true;
-        } else { // other
-            if(firstOther) {
-                startPt = SkPoint::Make(elem.x, elem.y);
-            } else {
-                mPathSk.cubicTo(endPt, startPt, SkPoint::Make(elem.x, elem.y));
-            }
-            firstOther = !firstOther;
-        }
-    }
-}
-
 void TextBox::addActionsToMenu(QMenu *menu) {
     menu->addAction("Set Text...")->setObjectName("tb_set_text");
 }

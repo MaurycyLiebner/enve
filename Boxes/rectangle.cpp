@@ -177,24 +177,6 @@ void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
     }
 }
 
-void Rectangle::updatePath() {
-    mPathSk = SkPath();
-    SkPoint topLeft =
-            QPointFToSkPoint(mTopLeftPoint->getCurrentPointValue());
-    SkPoint bottomRight =
-            QPointFToSkPoint(mBottomRightPoint->getCurrentPointValue());
-    mPathSk.addRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
-                                     bottomRight.x(), bottomRight.y()));
-
-//    mPath = QPainterPath();
-//    QPointF topPos = mTopLeftPoint->getRelativePos();
-//    QPointF botPos = mBottomRightPoint->getRelativePos();
-//    qreal radius = mRadiusAnimator.qra_getCurrentValue();
-//    mPath.addRoundedRect(QRectF(topPos, botPos),
-//                         radius, radius);
-
-}
-
 RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :
     MovablePoint(parent, TYPE_PATH_POINT) {
 

@@ -20,8 +20,6 @@ public:
 
     VectorPathEdge *getEgde(const QPointF &absPos,
                             const qreal &canvasScaleInv);
-    void updatePath();
-    void updateSkPath();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);

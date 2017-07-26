@@ -104,7 +104,7 @@ void ParticleBox::makeDuplicate(Property *targetBox) {
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     ParticleEmitter *emitter = new ParticleEmitter(this);
-    emitter->getPosPoint()->setAbsolutePos(absPos, false);
+    emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos), false);
     addEmitter(emitter);
 }
 

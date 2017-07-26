@@ -57,7 +57,6 @@ public:
 
     void generatePainterPath();
 
-    void drawHovered(QPainter *p);
     void drawHoveredSk(SkCanvas *canvas,
                                  const qreal &invScale);
 
@@ -81,7 +80,6 @@ public:
                               QPointF *nearestPoint,
                               qreal *t, qreal *error);
 private:
-    QPainterPath mPath;
     SkPath mSkPath;
 
     PathPoint *mPoint1;

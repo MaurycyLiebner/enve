@@ -42,7 +42,6 @@ public:
     BoundingBox *createNewDuplicate();
     PathAnimator *getPathAnimator();
     void duplicatePathAnimatorFrom(PathAnimator *source);
-    void updatePath();
 
     bool SWT_isVectorPath() { return true; }
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,

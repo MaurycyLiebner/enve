@@ -670,13 +670,13 @@ void PathPoint::setCtrlsMode(const CtrlsMode &mode,
         if(mCtrlsMode == CtrlsMode::CTRLS_SYMMETRIC) {
             QPointF newStartPos;
             QPointF newEndPos;
-            getCtrlsSymmetricPos(mEndCtrlPt->getAbsolutePos(),
-                                 mStartCtrlPt->getAbsolutePos(),
-                                 getAbsolutePos(),
+            getCtrlsSymmetricPos(mEndCtrlPt->getRelativePos(),
+                                 mStartCtrlPt->getRelativePos(),
+                                 getRelativePos(),
                                  &newEndPos,
                                  &newStartPos);
-            mStartCtrlPt->setAbsolutePos(newStartPos);
-            mEndCtrlPt->setAbsolutePos(newEndPos);
+            mStartCtrlPt->setRelativePos(newStartPos);
+            mEndCtrlPt->setRelativePos(newEndPos);
 //            QPointF point1 = mEndCtrlPt->getAbsolutePos();
 //            point1 = symmetricToAbsPos(point1);
 //            QPointF point2 = mStartCtrlPt->getAbsolutePos();
@@ -691,13 +691,13 @@ void PathPoint::setCtrlsMode(const CtrlsMode &mode,
         } else if(mCtrlsMode == CtrlsMode::CTRLS_SMOOTH) {
             QPointF newStartPos;
             QPointF newEndPos;
-            getCtrlsSmoothPos(mEndCtrlPt->getAbsolutePos(),
-                              mStartCtrlPt->getAbsolutePos(),
-                              getAbsolutePos(),
+            getCtrlsSmoothPos(mEndCtrlPt->getRelativePos(),
+                              mStartCtrlPt->getRelativePos(),
+                              getRelativePos(),
                               &newEndPos,
                               &newStartPos);
-            mStartCtrlPt->setAbsolutePos(newStartPos);
-            mEndCtrlPt->setAbsolutePos(newEndPos);
+            mStartCtrlPt->setRelativePos(newStartPos);
+            mEndCtrlPt->setRelativePos(newEndPos);
 //            QPointF point1 = mEndCtrlPt->getAbsolutePos();
 //            point1 = symmetricToAbsPos(point1);
 //            QPointF point2 = mStartCtrlPt->getAbsolutePos();
@@ -776,12 +776,15 @@ void PathPoint::setPointAsPrevious(PathPoint *pointToSet,
     }
 }
 
-PathPoint *PathPoint::addPointAbsPos(QPointF absPos) {
-    return mParentPath->addPointAbsPos(absPos, this);
+PathPoint *PathPoint::addPointRelPos(const QPointF &relPos) {
+    return mParentPath->addPointRelPos(relPos, this);
 }
 
-PathPoint *PathPoint::addPoint(PathPoint *pointToAdd)
-{
+PathPoint *PathPoint::addPointAbsPos(const QPointF &relPos) {
+    return mParentPath->addPointAbsPos(relPos, this);
+}
+
+PathPoint *PathPoint::addPoint(PathPoint *pointToAdd) {
     return mParentPath->addPoint(pointToAdd, this);
 }
 

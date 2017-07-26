@@ -22,7 +22,6 @@ public:
     void openTextEditor(const bool &saveUndoRedo = true);
     int saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
-    void updatePath();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);

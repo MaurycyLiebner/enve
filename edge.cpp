@@ -233,35 +233,11 @@ void VectorPathEdge::setEditPath(const bool &bT) {
 }
 
 void VectorPathEdge::generatePainterPath() {
-    mPath = QPainterPath();
-    mPath.moveTo(mPoint1->getAbsolutePos());
-    mPath.cubicTo(mPoint1->getEndCtrlPtAbsPos(),
-                  mPoint2->getStartCtrlPtAbsPos(),
-                  mPoint2->getAbsolutePos());
-
     mSkPath = SkPath();
     mSkPath.moveTo(QPointFToSkPoint(mPoint1->getAbsolutePos()));
     mSkPath.cubicTo(QPointFToSkPoint(mPoint1->getEndCtrlPtAbsPos()),
                     QPointFToSkPoint(mPoint2->getStartCtrlPtAbsPos()),
                     QPointFToSkPoint(mPoint2->getAbsolutePos()));
-}
-
-void VectorPathEdge::drawHovered(QPainter *p) {
-    p->save();
-    p->setBrush(Qt::NoBrush);
-    //QPen pen = QPen(Qt::red, 2.);
-    //p->setCompositionMode(QPainter::CompositionMode_Difference);
-    //pen.setCosmetic(true);
-    //p->setPen(pen);
-    QPen pen = QPen(Qt::black, 2.5);
-    pen.setCosmetic(true);
-    p->setPen(pen);
-    p->drawPath(mPath);
-    pen.setColor(Qt::red);
-    pen.setWidthF(1.25);
-    p->setPen(pen);
-    p->drawPath(mPath);
-    p->restore();
 }
 
 void VectorPathEdge::drawHoveredSk(SkCanvas *canvas,

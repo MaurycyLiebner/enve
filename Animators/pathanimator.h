@@ -23,12 +23,9 @@ public:
 
     VectorPathEdge *getEgde(const QPointF &absPos,
                             const qreal &canvasScaleInv);
-    void updatePath();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
-    const QPainterPath &getCurrentPath();
-    const SkPath &getCurrentSkPath();
 
     void prp_loadFromSql(const int &boundingBoxId);
     int saveToSql(QSqlQuery *query,
@@ -67,8 +64,6 @@ public:
     SkPath getPathAtRelFrame(const int &relFrame);
 private:
     BoundingBox *mParentBox = NULL;
-    QPainterPath mPath;
-    SkPath mSkPath;
     QList<SingleVectorPathAnimator*> mSinglePaths;
 signals:
     void lastSinglePathRemoved();

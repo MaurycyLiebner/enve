@@ -29,7 +29,6 @@ public:
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
-    void updatePath();
     void prp_loadFromSql(const int &boundingBoxId);
     int saveToSql(QSqlQuery *query, const int &parentId);
 

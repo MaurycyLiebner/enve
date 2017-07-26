@@ -18,16 +18,9 @@ public:
 
     virtual VectorPathEdge *getEgde(const QPointF &,
                                     const qreal &) { return NULL; }
-    virtual void updatePath() = 0;
-    virtual void updateSkPath() = 0;
     virtual MovablePoint *getPointAtAbsPos(const QPointF &,
                                          const CanvasMode &,
                                          const qreal &) { return NULL; }
-
-    const SkPath &getCurrentSkPath() {
-        return mSkPath;
-    }
-
     virtual void saveToSql(QSqlQuery *query,
                            const int &boundingBoxId) = 0;
 
@@ -61,7 +54,7 @@ public:
     virtual void drawSelected(SkCanvas *canvas,
                               const CanvasMode &,
                               const qreal &invScale,
-                              const SkMatrix &combinedTransform);
+                              const SkMatrix &combinedTransform) = 0;
 
     virtual void selectAndAddContainedPointsToList(
                     const QRectF &,
@@ -74,8 +67,6 @@ public:
 
     virtual SinglePathAnimator *makeDuplicate() = 0;
 protected:
-    QPainterPath mPath;
-    SkPath mSkPath;
 };
 
 #endif // SINGLEPATHANIMATOR_H

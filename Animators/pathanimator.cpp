@@ -147,16 +147,6 @@ DONE:
     }
 }
 
-void PathAnimator::updatePath() {
-    mSkPath = SkPath();
-
-    Q_FOREACH(SingleVectorPathAnimator *singlePath, mSinglePaths) {
-        singlePath->updatePath();
-        singlePath->updateSkPath();
-        mSkPath.addPath(singlePath->getCurrentSkPath());
-    }
-}
-
 SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
     SkPath path = SkPath();
 
@@ -199,14 +189,6 @@ MovablePoint *PathAnimator::getPointAtAbsPos(
     }
 
     return NULL;
-}
-
-const QPainterPath &PathAnimator::getCurrentPath() {
-    return mPath;
-}
-
-const SkPath &PathAnimator::getCurrentSkPath() {
-    return mSkPath;
 }
 
 void PathAnimator::drawSelected(SkCanvas *canvas,

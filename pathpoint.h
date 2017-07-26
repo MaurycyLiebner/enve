@@ -127,7 +127,7 @@ public:
     bool hasNextPoint();
     bool hasPreviousPoint();
 
-    PathPoint *addPointAbsPos(QPointF absPos);
+    PathPoint *addPointRelPos(const QPointF &relPos);
     PathPoint *addPoint(PathPoint *pointToAdd);
 
     void connectToPoint(PathPoint *point);
@@ -214,6 +214,7 @@ public:
     QPointF getEndCtrlPtValueAtRelFrame(const int &relFrame) const;
     QPointF getStartCtrlPtValueAtRelFrame(const int &relFrame) const;
     PathPointValues getPointValuesAtRelFrame(const int &relFrame);
+    PathPoint *addPointAbsPos(const QPointF &relPos);
 private:
     std::shared_ptr<VectorPathEdge> mNextEdge;
 
