@@ -373,69 +373,39 @@ void BoxTransformAnimator::pivotTransformFinished() {
 }
 
 void BoxTransformAnimator::setPivotWithoutChangingTransformation(
-                                QPointF point, const bool &saveUndoRedo) {
-    bool transRecording = mPosAnimator->prp_isDescendantRecording();
+                                const QPointF &point,
+                                const bool &saveUndoRedo) {
+    QMatrix currentMatrix;
+    qreal pivotX = mPivotAnimator->getXValue();
+    qreal pivotY = mPivotAnimator->getYValue();
+    currentMatrix.translate(pivotX + mPosAnimator->getXValue(),
+                            pivotY + mPosAnimator->getYValue());
 
-    if(!transRecording) {
-        QMatrix currentMatrix;
-        qreal pivotX = mPivotAnimator->getXValue();
-        qreal pivotY = mPivotAnimator->getYValue();
-        currentMatrix.translate(pivotX + mPosAnimator->getXValue(),
-                                pivotY + mPosAnimator->getYValue());
+    currentMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+    currentMatrix.scale(mScaleAnimator->getXValue(),
+                        mScaleAnimator->getYValue() );
 
-        currentMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
-        currentMatrix.scale(mScaleAnimator->getXValue(),
-                            mScaleAnimator->getYValue() );
+    currentMatrix.translate(-pivotX,
+                            -pivotY);
 
-        currentMatrix.translate(-pivotX,
-                                -pivotY);
+    QMatrix futureMatrix;
+    futureMatrix.translate(point.x() + mPosAnimator->getXValue(),
+                           point.y() + mPosAnimator->getYValue());
 
-        QMatrix futureMatrix;
-        futureMatrix.translate(point.x() + mPosAnimator->getXValue(),
-                               point.y() + mPosAnimator->getYValue());
+    futureMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+    futureMatrix.scale(mScaleAnimator->getXValue(),
+                       mScaleAnimator->getYValue() );
 
-        futureMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
-        futureMatrix.scale(mScaleAnimator->getXValue(),
-                           mScaleAnimator->getYValue() );
-
-        futureMatrix.translate(-point.x(),
-                               -point.y());
+    futureMatrix.translate(-point.x(),
+                           -point.y());
 
 
-        mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
-                                   currentMatrix.dy() - futureMatrix.dy(),
-                                   saveUndoRedo,
-                                   false,
-                                   saveUndoRedo);
-    } else {
-        QMatrix currentMatrix;
-        qreal pivotX = mPivotAnimator->getXValue();
-        qreal pivotY = mPivotAnimator->getYValue();
-        currentMatrix.translate(pivotX + mPosAnimator->getXValue(),
-                                pivotY + mPosAnimator->getYValue());
+    mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
+                               currentMatrix.dy() - futureMatrix.dy(),
+                               saveUndoRedo,
+                               false,
+                               saveUndoRedo);
 
-        currentMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
-        currentMatrix.scale(mScaleAnimator->getXValue(),
-                            mScaleAnimator->getYValue() );
-
-        currentMatrix.translate(-pivotX,
-                                -pivotY);
-
-        QMatrix futureMatrix;
-        futureMatrix.translate(point.x() + mPosAnimator->getXValue(),
-                               point.y() + mPosAnimator->getYValue());
-
-        futureMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
-        futureMatrix.scale(mScaleAnimator->getXValue(),
-                           mScaleAnimator->getYValue());
-
-        futureMatrix.translate(-point.x(),
-                               -point.y());
-
-
-        point += QPointF(currentMatrix.dx() - futureMatrix.dx(),
-                         currentMatrix.dy() - futureMatrix.dy());
-    }
     mPivotAnimator->setCurrentPointValue(point,
                                          saveUndoRedo,
                                          false,
@@ -459,6 +429,12 @@ QPointF BoxTransformAnimator::getPivotAbs() {
 
 qreal BoxTransformAnimator::getOpacityAtRelFrame(const int &relFrame) {
     return mOpacityAnimator->qra_getValueAtRelFrame(relFrame);
+}
+
+bool BoxTransformAnimator::rotOrScaleOrPivotRecording() {
+    return mRotAnimator->prp_isDescendantRecording() ||
+           mScaleAnimator->prp_isDescendantRecording() ||
+           mPivotAnimator->prp_isDescendantRecording();
 }
 
 qreal BoxTransformAnimator::getPivotX() {

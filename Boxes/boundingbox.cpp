@@ -449,7 +449,8 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(!mPivotChanged && !mTransformAnimator->prp_isDescendantRecording()) {
+    if(!mPivotChanged &&
+       !mTransformAnimator->rotOrScaleOrPivotRecording()) {
         centerPivotPosition(false);
     }
 }

@@ -103,7 +103,7 @@ public:
     QMatrix getCurrentTransformationMatrix();
     QMatrix getTransformMatrixAtRelFrame(const int &relFrame);
 
-    void setPivotWithoutChangingTransformation(QPointF point,
+    void setPivotWithoutChangingTransformation(const QPointF &point,
                                                const bool &saveUndoRedo = false);
     QPointF getPivot();
 
@@ -137,6 +137,8 @@ public:
     bool SWT_isBoxTransformAnimator() { return true; }
 
     qreal getOpacityAtRelFrame(const int &relFrame);
+
+    bool rotOrScaleOrPivotRecording();
 private:
     QSharedPointer<MovablePoint> mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;
