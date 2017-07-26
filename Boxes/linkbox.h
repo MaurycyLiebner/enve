@@ -60,12 +60,12 @@ public:
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
 
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                               int *lastIdentical,
+                                               const int &relFrame);
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
-                                         const int &relFrame2) {
-        return mLinkTarget->prp_differencesBetweenRelFrames(relFrame1,
-                                                            relFrame2);
-    }
-
+                                         const int &relFrame2);
 public slots:
     void scheduleAwaitUpdateSLOT();
 

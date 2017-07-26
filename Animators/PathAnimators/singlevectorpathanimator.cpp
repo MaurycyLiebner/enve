@@ -15,17 +15,10 @@ void SingleVectorPathAnimator::drawSelected(SkCanvas *canvas,
                                       const CanvasMode &currentCanvasMode,
                                       const qreal &invScale,
                                       const SkMatrix &combinedTransform) {
-    SkPaint paint;
-    paint.setAntiAlias(true);
-    paint.setStrokeWidth(1.5*invScale);
-    paint.setStyle(SkPaint::kStroke_Style);
-    paint.setColor(SK_ColorBLACK);
-    SkPath mappedPath = mSkPath;
-    mappedPath.transform(combinedTransform);
-    canvas->drawPath(mappedPath, paint);
-    paint.setStrokeWidth(0.75*invScale);
-    paint.setColor(SK_ColorWHITE);
-    canvas->drawPath(mappedPath, paint);
+    SinglePathAnimator::drawSelected(canvas,
+                                     currentCanvasMode,
+                                     invScale,
+                                     combinedTransform);
 
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
