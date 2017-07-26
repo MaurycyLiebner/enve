@@ -40,6 +40,7 @@ private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
+        //canvas-
         canvas->concat(QMatrixToSkMatrix(transform.inverted()));
         Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &child,
                   childrenRenderData) {

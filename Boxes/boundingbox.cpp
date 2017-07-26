@@ -1283,6 +1283,7 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     canvas->save();
+    canvas->scale(1.f/resolution, 1.f/resolution);
     renderToImage();
     SkPaint paint;
     paint.setAlpha(qRound(opacity*2.55));
@@ -1296,8 +1297,10 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
 void BoundingBoxRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
-    QMatrix transformRes = transform;
-    transformRes.scale(resolution, resolution);
+    QMatrix scale;
+    scale.scale(resolution, resolution);
+    QMatrix transformRes = transform*scale;
+    //transformRes.scale(resolution, resolution);
     QRectF allUglyBoundingRect =
             transformRes.mapRect(relBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,
