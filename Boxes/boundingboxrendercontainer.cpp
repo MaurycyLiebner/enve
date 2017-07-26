@@ -31,6 +31,8 @@ void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
 void RenderContainer::updatePaintTransformGivenNewCombinedTransform(
                                     const QMatrix &combinedTransform) {
     mPaintTransform = mTransform.inverted()*combinedTransform;
+    mPaintTransform.scale(1./mResolutionFraction,
+                          1./mResolutionFraction);
 }
 
 void RenderContainer::setTransform(const QMatrix &transform) {

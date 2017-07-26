@@ -1297,7 +1297,7 @@ void BoundingBoxRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
     QMatrix transformRes = transform;
-    //transformRes.scale(resolution, resolution);
+    transformRes.scale(resolution, resolution);
     QRectF allUglyBoundingRect =
             transformRes.mapRect(relBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,
