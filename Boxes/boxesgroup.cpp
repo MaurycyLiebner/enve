@@ -277,11 +277,11 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
             if(boxRenderData == NULL) {
                 continue;
             }
-                                                                                                                if(!boxRenderData->finished()) {
+            if(!boxRenderData->finished()) {
                 boxRenderData->addDependent(data);
             }
             groupData->childrenRenderData <<
-                    boxRenderData;
+                    boxRenderData->ref<BoundingBoxRenderData>();
             childrenEffectsMargin =
                     qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
                          childrenEffectsMargin);

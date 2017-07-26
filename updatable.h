@@ -38,12 +38,12 @@ public:
     bool finished() { return mFinished; }
     bool schedulerAdded() { return mSchedulerAdded; }
 protected:
-    int mId = 0;
     bool mFinished = false;
     bool mSchedulerAdded = false;
     bool mBeingProcessed = false;
     void tellDependentThatFinished();
 
+    std::shared_ptr<Updatable> mSelfRef;
     QList<Updatable*> mDependent;
     QList<Updatable*> mUpdateDependent;
     int nDependancies = 0;

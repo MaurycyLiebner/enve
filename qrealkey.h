@@ -32,8 +32,9 @@ public:
 
     virtual qreal getValue();
     virtual void setValue(qreal value,
-                          const bool &saveUndoRedo = true,
-                          const bool &finish = true);
+                          const bool &saveUndoRedo = false,
+                          const bool &finish = false,
+                          const bool &callUpdater = true);
     void setStartValueVar(const qreal &value);
     void setEndValueVar(const qreal &value);
 
@@ -69,7 +70,10 @@ public:
     qreal getPrevKeyValue();
     qreal getNextKeyValue();
 
-    void incValue(qreal incBy);
+    void incValue(const qreal &incBy,
+                  const bool &saveUndoRedo = false,
+                  const bool &finish = false,
+                  const bool &callUpdater = true);
 
     CtrlsMode getCtrlsMode();
     int saveToSql(const int &parentAnimatorSqlId);

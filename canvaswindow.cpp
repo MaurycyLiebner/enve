@@ -657,7 +657,7 @@ void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
     }
 
     qDebug() << "add updatable";
-    mUpdatablesAwaitingUpdate << updatable;
+    mUpdatablesAwaitingUpdate << updatable->ref<Updatable>();
     if(!mFreeThreads.isEmpty()) {
         sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
     }
@@ -686,7 +686,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
         //callUpdateSchedulers();
     } else {
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
-            Updatable *updatablaT = mUpdatablesAwaitingUpdate.at(i);
+            Updatable *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
                 updatablaT->beforeUpdate();
                 emit updateUpdatable(updatablaT, threadId);

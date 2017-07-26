@@ -45,7 +45,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 int FONT_HEIGHT;
 int MIN_WIDGET_HEIGHT;
 int KEY_RECT_SIZE;
-int gUpdatableId = 0;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
@@ -776,7 +775,7 @@ void MainWindow::setFileChangedSinceSaving(bool changed) {
 }
 
 void MainWindow::addUpdateScheduler(Updatable *scheduler) {
-    mUpdateSchedulers.append(scheduler);
+    mUpdateSchedulers.append(scheduler->ref<Updatable>());
 }
 
 bool MainWindow::isShiftPressed()
@@ -804,12 +803,13 @@ void MainWindow::callUpdateSchedulers() {
 
     if(mCanvasWindow->noBoxesAwaitUpdate()) {
         mCanvasWindow->processSchedulers();
-        foreach(Updatable *updatable, mUpdateSchedulers) {
+        foreach(const std::shared_ptr<Updatable> &updatable,
+                mUpdateSchedulers) {
             //updatable->schedulerProccessed();
             if(!updatable->isAwaitingUpdate()) {
                 qDebug() << "hell";
             }
-            mCanvasWindow->addUpdatableAwaitingUpdate(updatable);
+            mCanvasWindow->addUpdatableAwaitingUpdate(updatable.get());
         }
         mUpdateSchedulers.clear();
     }

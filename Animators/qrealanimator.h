@@ -68,7 +68,10 @@ public:
     qreal qra_getNextKeyValue(QrealKey *key);
 
     virtual void prp_retrieveSavedValue();
-    void qra_incCurrentValue(const qreal &incBy);
+    void qra_incCurrentValue(const qreal &incBy,
+                             const bool &saveUndoRedo = false,
+                             const bool &finish = false,
+                             const bool &callUpdater = true);
 
     virtual void prp_startTransform();
 
@@ -80,7 +83,10 @@ public:
 
     virtual void prp_cancelTransform();  
 
-    void qra_incAllValues(const qreal &valInc);
+    void qra_incAllValues(const qreal &valInc,
+                          const bool &saveUndoRedo = false,
+                          const bool &finish = false,
+                          const bool &callUpdater = true);
 
     virtual QString prp_getValueText();
     void getMinAndMaxMoveFrame(QrealKey *key,

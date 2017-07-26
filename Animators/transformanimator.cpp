@@ -376,7 +376,7 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
                                 QPointF point, const bool &saveUndoRedo) {
     bool transRecording = mPosAnimator->prp_isDescendantRecording();
 
-    if(transRecording) {
+    if(!transRecording) {
         QMatrix currentMatrix;
         qreal pivotX = mPivotAnimator->getXValue();
         qreal pivotY = mPivotAnimator->getYValue();
@@ -403,7 +403,10 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
 
 
         mPosAnimator->incAllValues(currentMatrix.dx() - futureMatrix.dx(),
-                                   currentMatrix.dy() - futureMatrix.dy());
+                                   currentMatrix.dy() - futureMatrix.dy(),
+                                   saveUndoRedo,
+                                   false,
+                                   saveUndoRedo);
     } else {
         QMatrix currentMatrix;
         qreal pivotX = mPivotAnimator->getXValue();

@@ -27,7 +27,11 @@ public:
     qreal getSavedXValue();
     qreal getSavedYValue();
 
-    void incAllValues(const qreal &x, const qreal &y);
+    void incAllValues(const qreal &x,
+                      const qreal &y,
+                      const bool &saveUndoRedo = false,
+                      const bool &finish = false,
+                      const bool &callUpdater = true);
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();

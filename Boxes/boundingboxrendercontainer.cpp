@@ -5,9 +5,7 @@
 #include "rendercachehandler.h"
 
 RenderContainer::~RenderContainer() {
-    if(mSrcRenderData != NULL) {
-        delete mSrcRenderData;
-    }
+
 }
 
 void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
@@ -64,10 +62,7 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.reset();
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);
-    if(mSrcRenderData != NULL) {
-        delete mSrcRenderData;
-    }
-    mSrcRenderData = data;
+    mSrcRenderData = data->ref<BoundingBoxRenderData>();
     thisAccessed();
 }
 

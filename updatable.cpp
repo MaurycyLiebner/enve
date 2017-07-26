@@ -1,19 +1,15 @@
 #include "updatable.h"
 #include "mainwindow.h"
 #include "updatescheduler.h"
-#include "global.h"
 
 Updatable::Updatable() {
-    mId = gUpdatableId;
-    gUpdatableId++;
 }
 
 Updatable::~Updatable() {
-    qDebug() << "deleting: " << mId;
 }
 
 void Updatable::beforeUpdate() {
-    qDebug() << "before update: " << mId;
+    mSelfRef = ref<Updatable>();
     mBeingProcessed = true;
     mAwaitingUpdate = false;
     mUpdateDependent = mDependent;
@@ -21,14 +17,13 @@ void Updatable::beforeUpdate() {
 }
 
 void Updatable::afterUpdate() {
-    qDebug() << "after update: " << mId;
     mFinished = true;
     mBeingProcessed = false;
     tellDependentThatFinished();
+    mSelfRef.reset();
 }
 
 void Updatable::schedulerProccessed() {
-    qDebug() << "scheduler proessed: " << mId;
     mAwaitingUpdate = true;
     mSchedulerAdded = false;
 }
@@ -50,7 +45,6 @@ void Updatable::addDependent(Updatable *updatable) {
 
 void Updatable::addScheduler() {
     if(!shouldUpdate() || mSchedulerAdded) return;
-    qDebug() << "add scheduler: " << mId;
 
     mSchedulerAdded = true;
     addSchedulerNow();

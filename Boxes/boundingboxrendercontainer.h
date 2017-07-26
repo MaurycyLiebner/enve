@@ -90,11 +90,11 @@ public:
     }
 
     BoundingBoxRenderData *getSrcRenderData() {
-        return mSrcRenderData;
+        return mSrcRenderData.get();
     }
 
 protected:
-    BoundingBoxRenderData *mSrcRenderData = NULL;
+    std::shared_ptr<BoundingBoxRenderData> mSrcRenderData;
     int mRelFrame = 0;
     qreal mResolutionFraction;
     QMatrix mTransform;

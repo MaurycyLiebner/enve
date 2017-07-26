@@ -121,8 +121,12 @@ void QrealKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
     mEndPoint->moveTo(newFrame, change*(mEndValue - mValue) + mValue);
 }
 
-void QrealKey::incValue(qreal incBy) {
-    setValue(mValue + incBy);
+void QrealKey::incValue(const qreal &incBy,
+                        const bool &saveUndoRedo,
+                        const bool &finish,
+                        const bool &callUpdater) {
+    setValue(mValue + incBy, saveUndoRedo,
+             finish, callUpdater);
 }
 
 CtrlsMode QrealKey::getCtrlsMode() {
@@ -270,7 +274,8 @@ qreal QrealKey::getValue() { return mValue; }
 #include "undoredo.h"
 void QrealKey::setValue(qreal value,
                         const bool &saveUndoRedo,
-                        const bool &finish) {
+                        const bool &finish,
+                        const bool &callUpdater) {
     if(mParentAnimator != NULL) {
         value = clamp(value,
                       getParentQrealAnimator()->getMinPossibleValue(),
@@ -286,7 +291,7 @@ void QrealKey::setValue(qreal value,
         }
     }
     mValue = value;
-    if(finish) {
+    if(finish && callUpdater) {
         mParentAnimator->anim_updateAfterChangedKey(this);
     }
 }

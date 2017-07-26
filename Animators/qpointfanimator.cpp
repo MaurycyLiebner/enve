@@ -108,9 +108,15 @@ void QPointFAnimator::incCurrentValues(const qreal &x,
     mYAnimator->qra_incCurrentValue(y);
 }
 
-void QPointFAnimator::incAllValues(const qreal &x, const qreal &y) {
-    mXAnimator->qra_incAllValues(x);
-    mYAnimator->qra_incAllValues(y);
+void QPointFAnimator::incAllValues(const qreal &x,
+                                   const qreal &y,
+                                   const bool &saveUndoRedo,
+                                   const bool &finish,
+                                   const bool &callUpdater) {
+    mXAnimator->qra_incAllValues(x, saveUndoRedo,
+                                 finish, callUpdater);
+    mYAnimator->qra_incAllValues(y, saveUndoRedo,
+                                 finish, callUpdater);
 }
 
 void QPointFAnimator::incSavedValueToCurrentValue(const qreal &incXBy,

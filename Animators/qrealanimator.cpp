@@ -78,17 +78,23 @@ void QrealAnimator::anim_loadKeysFromSql(const int &qrealAnimatorId) {
     }
 }
 
-void QrealAnimator::qra_setValueRange(const qreal &minVal, const qreal &maxVal) {
+void QrealAnimator::qra_setValueRange(const qreal &minVal,
+                                      const qreal &maxVal) {
     mMinPossibleVal = minVal;
     mMaxPossibleVal = maxVal;
     qra_setCurrentValue(mCurrentValue);
 }
 
-void QrealAnimator::qra_incAllValues(const qreal &valInc) {
+void QrealAnimator::qra_incAllValues(const qreal &valInc,
+                                     const bool &saveUndoRedo,
+                                     const bool &finish,
+                                     const bool &callUpdater) {
     Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QrealKey*)key.get())->incValue(valInc);
+        ((QrealKey*)key.get())->incValue(valInc, saveUndoRedo,
+                                         finish, callUpdater);
     }
-    qra_incCurrentValue(valInc);
+    qra_incCurrentValue(valInc, saveUndoRedo,
+                        finish, callUpdater);
 }
 
 QString QrealAnimator::prp_getValueText() {
@@ -557,8 +563,13 @@ void QrealAnimator::multSavedValueToCurrentValue(const qreal &multBy) {
     qra_setCurrentValue(mSavedCurrentValue * multBy);
 }
 
-void QrealAnimator::qra_incCurrentValue(const qreal &incBy) {
-    qra_setCurrentValue(mCurrentValue + incBy);
+void QrealAnimator::qra_incCurrentValue(const qreal &incBy,
+                                        const bool &saveUndoRedo,
+                                        const bool &finish,
+                                        const bool &callUpdater) {
+    qra_setCurrentValue(mCurrentValue + incBy,
+                        saveUndoRedo, finish,
+                        callUpdater);
 }
 
 void QrealAnimator::prp_startTransform() {
