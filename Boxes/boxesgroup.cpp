@@ -249,17 +249,6 @@ BoundingBox *BoxesGroup::createNewDuplicate() {
     return new BoxesGroup();
 }
 
-void BoxesGroup::updateEffectsMargin() {
-    qreal childrenMargin = 0.;
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-        childrenMargin = qMax(child->getEffectsMargin(),
-                              childrenMargin);
-    }
-    BoundingBox::updateEffectsMargin();
-    mEffectsMargin += childrenMargin;
-}
-
-
 
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
@@ -470,8 +459,6 @@ void BoxesGroup::addChildToListAt(const int &index,
     mChildBoxes.insert(index, child->ref<BoundingBox>());
     updateChildrenId(index, saveUndoRedo);
 
-    scheduleEffectsMarginUpdate();
-
     //SWT_addChildAbstractionForTargetToAll(child);
     SWT_addChildAbstractionForTargetToAllAt(child,
                                             ca_mChildAnimators.count());
@@ -524,8 +511,6 @@ void BoxesGroup::removeChildFromList(const int &id,
         }
     }
     updateChildrenId(id, saveUndoRedo);
-
-    scheduleEffectsMarginUpdate();
 
     SWT_removeChildAbstractionForTargetFromAll(box);
 }

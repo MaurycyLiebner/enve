@@ -102,11 +102,14 @@ PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
 
 void PixmapEffectUpdater::update() {
     mTarget->replaceCurrentFrameCache();
-    mTarget->scheduleEffectsMarginUpdate();
 }
 
 void PixmapEffectUpdater::frameChangeUpdate() {
-    mTarget->scheduleEffectsMarginUpdate();
+    mTarget->scheduleUpdate();
+}
+
+void PixmapEffectUpdater::updateFinal() {
+    mTarget->clearAllCache();
 }
 
 #include "Boxes/animationbox.h"

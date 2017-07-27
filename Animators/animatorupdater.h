@@ -101,6 +101,7 @@ public:
 
     void update();
     void frameChangeUpdate();
+    void updateFinal();
 private:
     BoundingBox *mTarget;
 };

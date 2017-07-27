@@ -136,7 +136,6 @@ public:
 
     bool relPointInsidePath(const QPointF &relPos);
 //    QPointF getRelCenterPosition();
-    void updateEffectsMargin();
 
     void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
                                      ScrollWidgetVisiblePart *visiblePartWidget);

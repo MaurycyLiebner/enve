@@ -66,12 +66,6 @@ PathBox::~PathBox() {
     }
 }
 
-void PathBox::updateEffectsMargin() {
-    mEffectsMargin = mEffectsAnimators->getEffectsMargin();/* +
-                        mPathEffectsAnimators->getEffectsMargin() +
-                            mOutlinePathEffectsAnimators->getEffectsMargin();*/
-}
-
 void PathBox::setupBoundingBoxRenderDataForRelFrame(
                             const int &relFrame,
                             BoundingBoxRenderData *data) {
@@ -219,7 +213,6 @@ void PathBox::addPathEffect(PathEffect *effect) {
     mPathEffectsAnimators->ca_addChildAnimator(effect);
     //effect->setParentEffectAnimators(mEffectsAnimators.data());
 
-    //scheduleEffectsMarginUpdate();
     clearAllCache();
 }
 
@@ -232,18 +225,17 @@ void PathBox::addOutlinePathEffect(PathEffect *effect) {
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
     //effect->setParentEffectAnimators(mEffectsAnimators.data());
 
-    //scheduleEffectsMarginUpdate();
     clearAllCache();
 }
 
-void PathBox::resetStrokeGradientPointsPos(bool finish) {
+void PathBox::resetStrokeGradientPointsPos(const bool &finish) {
     mStrokeGradientPoints->prp_setRecording(false);
     mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),
                                         mRelBoundingRect.bottomRight(),
                                         finish);
 }
 
-void PathBox::resetFillGradientPointsPos(bool finish) {
+void PathBox::resetFillGradientPointsPos(const bool &finish) {
     mFillGradientPoints->prp_setRecording(false);
     mFillGradientPoints->setPositions(mRelBoundingRect.topLeft(),
                                       mRelBoundingRect.bottomRight(),
@@ -454,7 +446,7 @@ bool PathBox::relPointInsidePath(const QPointF &relPos) {
     }
 }
 
-void PathBox::setOutlineAffectedByScale(bool bT) {
+void PathBox::setOutlineAffectedByScale(const bool &bT) {
     mOutlineAffectedByScale = bT;
     scheduleUpdate();
 }

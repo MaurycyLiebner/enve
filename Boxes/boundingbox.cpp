@@ -291,24 +291,6 @@ QPainter::CompositionMode BoundingBox::getCompositionMode() {
     return mCompositionMode;
 }
 
-void BoundingBox::updateEffectsMarginIfNeeded() {
-    if(mEffectsMarginUpdateNeeded) {
-        mEffectsMarginUpdateNeeded = false;
-        updateEffectsMargin();
-    }
-}
-
-void BoundingBox::updateEffectsMargin() {
-    mEffectsMargin = mEffectsAnimators->getEffectsMargin();
-}
-
-void BoundingBox::scheduleEffectsMarginUpdate() {
-    scheduleUpdate();
-    mEffectsMarginUpdateNeeded = true;
-    if(mParent == NULL) return;
-    mParent->scheduleEffectsMarginUpdate();
-}
-
 void BoundingBox::resetScale() {
     mTransformAnimator->resetScale(true);
 }
@@ -820,7 +802,6 @@ void BoundingBox::addEffect(PixmapEffect *effect) {
     mEffectsAnimators->ca_addChildAnimator(effect);
     effect->setParentEffectAnimators(mEffectsAnimators.data());
 
-    scheduleEffectsMarginUpdate();
     clearAllCache();
 }
 
@@ -830,7 +811,6 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
         ca_removeChildAnimator(mEffectsAnimators.data());
     }
 
-    scheduleEffectsMarginUpdate();
     clearAllCache();
 }
 

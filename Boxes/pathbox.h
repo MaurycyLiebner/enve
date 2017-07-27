@@ -48,9 +48,9 @@ public:
     PathBox(const BoundingBoxType &type);
     ~PathBox();
 
-    void resetStrokeGradientPointsPos(bool finish);
+    void resetStrokeGradientPointsPos(const bool &finish);
 
-    void resetFillGradientPointsPos(bool finish);
+    void resetFillGradientPointsPos(const bool &finish);
 
     virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
 
@@ -71,7 +71,7 @@ public:
     PaintSettings *getFillSettings();
     void updateDrawGradients();
 
-    void setOutlineAffectedByScale(bool bT);
+    void setOutlineAffectedByScale(const bool &bT);
     int saveToSql(QSqlQuery *query, const int &parentId);
     void prp_loadFromSql(const int &boundingBoxId);
 
@@ -111,7 +111,6 @@ public:
 
     void addPathEffect(PathEffect *effect);
     void addOutlinePathEffect(PathEffect *effect);
-    void updateEffectsMargin();
 
     void setupBoundingBoxRenderDataForRelFrame(
                                 const int &relFrame,

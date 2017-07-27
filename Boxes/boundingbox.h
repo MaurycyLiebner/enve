@@ -306,11 +306,6 @@ public:
         return mBlendModeSk;
     }
 
-
-    virtual void updateEffectsMargin();
-
-    virtual void scheduleEffectsMarginUpdate();
-    void updateEffectsMarginIfNeeded();
     virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
     void selectionChangeTriggered(const bool &shiftPressed);
