@@ -15,6 +15,7 @@ struct AnimationBoxRenderData : public ImageBoxRenderData {
     }
 
     void loadImageFromHandler();
+    int animationFrame;
 };
 
 class AnimationBox : public BoundingBox {
@@ -42,18 +43,15 @@ public:
 
     BoundingBoxRenderData *createRenderData();
 
-
-    void updateCurrentAnimationFrame();
-
     void afterUpdate();
     void setParent(BoxesGroup *parent);
     void beforeAddingScheduler();
     bool shouldScheduleUpdate();
+    int getAnimationFrameForRelFrame(const int &relFrame);
 public slots:
 protected:
     bool mNewCurrentFrameUpdateNeeded = false;
     AnimationCacheHandler *mAnimationCacheHandler = NULL;
-    int mCurrentAnimationFrame = -1;
     qreal mFps = 24.;
 
     QSharedPointer<QrealAnimator> mTimeScaleAnimator =

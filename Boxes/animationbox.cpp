@@ -54,7 +54,6 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 void AnimationBox::reloadFile() {
     if(mParent != NULL) {
         updateDurationRectangleAnimationRange();
-        updateCurrentAnimationFrame();
     }
     reloadSound();
     clearAllCache();
@@ -69,7 +68,6 @@ void AnimationBox::setParent(BoxesGroup *parent) {
                         mParent->getTransformAnimator());
 
     updateDurationRectangleAnimationRange();
-    updateCurrentAnimationFrame();
 
     updateCombinedTransform();
 }
@@ -79,18 +77,18 @@ bool AnimationBox::shouldScheduleUpdate() {
     return BoundingBox::shouldScheduleUpdate();
 }
 
-void AnimationBox::updateCurrentAnimationFrame() {
+int AnimationBox::getAnimationFrameForRelFrame(const int &relFrame) {
     qreal fpsRatio = getParentCanvas()->getFps()/mFps;
     qreal timeScale = mTimeScaleAnimator->qra_getCurrentValue()*fpsRatio;
 
     int pixId;
     const int &absMinAnimation =
-                getAnimationDurationRect()->getMinAnimationFrameAsAbsFrame();
+                getAnimationDurationRect()->getMinAnimationFrameAsRelFrame();
     if(timeScale > 0.) {
-        pixId = (anim_mCurrentAbsFrame - absMinAnimation)/timeScale;
+        pixId = (relFrame - absMinAnimation)/timeScale;
     } else {
         pixId = mAnimationCacheHandler->getFramesCount() - 1 +
-                (anim_mCurrentAbsFrame - absMinAnimation)/timeScale;
+                (relFrame - absMinAnimation)/timeScale;
     }
 
     if(pixId <= 0) {
@@ -99,14 +97,12 @@ void AnimationBox::updateCurrentAnimationFrame() {
         pixId = mAnimationCacheHandler->getFramesCount() - 1;
     }
 
-    if(mCurrentAnimationFrame == pixId) return;
-    mCurrentAnimationFrame = pixId;
+    return pixId;
 }
 
 void AnimationBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
     if(mAnimationCacheHandler == NULL) return;
-    updateCurrentAnimationFrame();
 
     mNewCurrentFrameUpdateNeeded = true;
 
@@ -145,13 +141,15 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
                                 BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
                                                        data);
-    ImageBoxRenderData *imageData = (ImageBoxRenderData*)data;
+    AnimationBoxRenderData *imageData = (AnimationBoxRenderData*)data;
+    int animationFrame = getAnimationFrameForRelFrame(relFrame);
+    imageData->animationFrame = animationFrame;
     imageData->image = mAnimationCacheHandler->getFrameAtFrame(
-                                    mCurrentAnimationFrame);
+                                    animationFrame);
     if(imageData->image == NULL) {
         if(mAnimationCacheHandler->getFrameAtFrame(
-                    mCurrentAnimationFrame).get() == NULL) {
-            mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame)->
+                    animationFrame).get() == NULL) {
+            mAnimationCacheHandler->scheduleFrameLoad(animationFrame)->
                     addDependent(imageData);
         }
     }
