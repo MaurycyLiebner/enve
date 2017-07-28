@@ -17,7 +17,8 @@ public:
     int saveToSql(const int &parentAnimatorSqlId);
     void loadFromSql(const int &keyId);
 
-    static QStringKey *qStringKeyFromSql(const int &keyId);
+    static QStringKey *qStringKeyFromSql(const int &keyId,
+                                         QStringAnimator *animator);
 private:
     QString mText;
 };

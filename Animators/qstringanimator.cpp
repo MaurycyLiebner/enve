@@ -10,9 +10,9 @@ QStringAnimator::QStringAnimator() : Animator() {
 int QStringAnimator::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     if(!query->exec(
-        QString("INSERT INTO qrealanimator (currenttext) "
-                "VALUES (%1)").
-                arg(mCurrentText, 0, 'f') ) ) {
+        QString("INSERT INTO qstringanimator (currenttext) "
+                "VALUES ('%1')").
+                arg(mCurrentText) ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
@@ -41,6 +41,7 @@ void QStringAnimator::loadFromSql(const int &qstringAnimatorId) {
             setCurrentTextValue(query.value(currentText).toString());
         } else {
             anim_setRecordingWithoutChangingKeys(true, false);
+            mCurrentText = getTextValueAtRelFrame(anim_mCurrentRelFrame);
         }
     } else {
         qDebug() << "Could not load qstringanimator with id " << qstringAnimatorId;
@@ -56,7 +57,7 @@ void QStringAnimator::loadKeysFromSql(const int &qstringAnimatorId) {
         int idId = query.record().indexOf("id");
         while(query.next() ) {
             int idT = query.value(idId).toInt();
-            anim_appendKey(QStringKey::qStringKeyFromSql(idT));
+            anim_appendKey(QStringKey::qStringKeyFromSql(idT, this));
         }
     } else {
         qDebug() << "Could not load qpointfanimator with id " << qstringAnimatorId;
@@ -95,9 +96,12 @@ QString QStringAnimator::getCurrentTextValue() {
 }
 
 QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
+    if(anim_mKeys.isEmpty()) {
+        return mCurrentText;
+    }
     QStringKey *key = (QStringKey *)anim_getPrevKey(relFrame);
     if(key == NULL) {
-        return mCurrentText;
+        key = (QStringKey *)anim_getNextKey(relFrame);
     }
     return key->getText();
 }
@@ -156,7 +160,7 @@ int QStringKey::saveToSql(const int &parentAnimatorSqlId) {
     QSqlQuery query;
     if(!query.exec(
         QString("INSERT INTO qstringkey (string, frame, qstringanimatorid) "
-                "VALUES (%1, %2, %3)").
+                "VALUES ('%1', %2, %3)").
                 arg(mText).
                 arg(mRelFrame).
                 arg(parentAnimatorSqlId) ) ) {
@@ -166,7 +170,8 @@ int QStringKey::saveToSql(const int &parentAnimatorSqlId) {
     return query.lastInsertId().toInt();
 }
 
-QStringKey *QStringKey::qStringKeyFromSql(const int &keyId) {
+QStringKey *QStringKey::qStringKeyFromSql(const int &keyId,
+                                          QStringAnimator *animator) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qstringkey WHERE id = " +
@@ -178,7 +183,7 @@ QStringKey *QStringKey::qStringKeyFromSql(const int &keyId) {
 
         QString text = query.value(idText).toString();
         int relFrame = query.value(idFrame).toInt();
-        return new QStringKey(text, relFrame);
+        return new QStringKey(text, relFrame, animator);
     } else {
         qDebug() << "Could not load qstringkey with id " << keyId;
     }

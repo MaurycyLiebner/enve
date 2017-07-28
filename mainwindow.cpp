@@ -1010,10 +1010,12 @@ void MainWindow::scheduleDisplayedFillStrokeSettingsUpdate()
 }
 
 bool MainWindow::processKeyEvent(QKeyEvent *event) {
-    bool returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
-
-    callUpdateSchedulers();
-    return returnBool;
+    if(isActiveWindow()) {
+        bool returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
+        callUpdateSchedulers();
+        return returnBool;
+    }
+    return false;
 }
 
 bool MainWindow::isEnabled() {

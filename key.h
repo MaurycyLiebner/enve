@@ -13,7 +13,7 @@ class KeysClipboardContainer;
 
 class Key : public StdSelfRef {
 public:
-    Key(Animator *parentAnimator = NULL);
+    Key(Animator *parentAnimator);
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~Key();

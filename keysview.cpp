@@ -177,48 +177,19 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
             if(container == NULL) return false;
             container->paste(mMainWindow->getCurrentFrame(),
                              this);
-        } else if(event->modifiers() & Qt::ControlModifier &&
-                  event->key() == Qt::Key_C) {
-            if(event->isAutoRepeat()) return false;
-            KeysClipboardContainer *container =
-                    new KeysClipboardContainer();
-            Q_FOREACH(Key *key, mSelectedKeys) {
-                key->copyToContainer(container);
-            }
-            mMainWindow->replaceClipboard(container);
-        } else if(event->key() == Qt::Key_S) {
-            if(!mMovingKeys) {
-                mScalingKeys = true;
-                mMovingKeys = true;
-                mFirstMove = true;
-                mLastPressPos = mapFromGlobal(QCursor::pos());
-                mIsMouseGrabbing = true;
-                //setMouseTracking(true);
-                grabMouse();
-            }
-        } else if(event->key() == Qt::Key_G) {
-            if(!mMovingKeys) {
-                mMovingKeys = true;
-                mFirstMove = true;
-                mLastPressPos = mapFromGlobal(QCursor::pos());
-                mIsMouseGrabbing = true;
-                //setMouseTracking(true);
-                grabMouse();
-            }
-        } else if(mMainWindow->isShiftPressed() &&
-                  event->key() == Qt::Key_D) {
-            if(!mSelectedKeys.isEmpty()) {
+        } else if(!mSelectedKeys.isEmpty()) {
+            if(event->modifiers() & Qt::ControlModifier &&
+                      event->key() == Qt::Key_C) {
+                if(event->isAutoRepeat()) return false;
+                KeysClipboardContainer *container =
+                        new KeysClipboardContainer();
+                Q_FOREACH(Key *key, mSelectedKeys) {
+                    key->copyToContainer(container);
+                }
+                mMainWindow->replaceClipboard(container);
+            } else if(event->key() == Qt::Key_S) {
                 if(!mMovingKeys) {
-                    QList<Key*> selectedKeys = mSelectedKeys;
-                    clearKeySelection();
-                    QrealKey *key; Q_FOREACHQK(key, selectedKeys)
-                        QrealKey *duplicate =
-                                key->makeQrealKeyDuplicate(
-                                        key->getParentQrealAnimator());
-                        key->getParentAnimator()->anim_appendKey(duplicate);
-                        addKeyToSelection(duplicate);
-                    }
-
+                    mScalingKeys = true;
                     mMovingKeys = true;
                     mFirstMove = true;
                     mLastPressPos = mapFromGlobal(QCursor::pos());
@@ -226,10 +197,42 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                     //setMouseTracking(true);
                     grabMouse();
                 }
+            } else if(event->key() == Qt::Key_G) {
+                if(!mMovingKeys) {
+                    mMovingKeys = true;
+                    mFirstMove = true;
+                    mLastPressPos = mapFromGlobal(QCursor::pos());
+                    mIsMouseGrabbing = true;
+                    //setMouseTracking(true);
+                    grabMouse();
+                }
+            } else if(mMainWindow->isShiftPressed() &&
+                      event->key() == Qt::Key_D) {
+                if(!mSelectedKeys.isEmpty()) {
+                    if(!mMovingKeys) {
+                        QList<Key*> selectedKeys = mSelectedKeys;
+                        clearKeySelection();
+                        QrealKey *key; Q_FOREACHQK(key, selectedKeys)
+                            QrealKey *duplicate =
+                                    key->makeQrealKeyDuplicate(
+                                            key->getParentQrealAnimator());
+                            key->getParentAnimator()->anim_appendKey(duplicate);
+                            addKeyToSelection(duplicate);
+                        }
+
+                        mMovingKeys = true;
+                        mFirstMove = true;
+                        mLastPressPos = mapFromGlobal(QCursor::pos());
+                        mIsMouseGrabbing = true;
+                        //setMouseTracking(true);
+                        grabMouse();
+                    }
+                }
+            } else if(event->key() == Qt::Key_Delete) {
+                deleteSelectedKeys();
+                update();
             }
-        } else if(event->key() == Qt::Key_Delete) {
-            deleteSelectedKeys();
-            update();
+            return false;
         } else if(event->key() == Qt::Key_Right) {
             Q_FOREACH(Key *key, mSelectedKeys) {
                 key->incFrameAndUpdateParentAnimator(1);

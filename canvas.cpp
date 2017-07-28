@@ -877,9 +877,11 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
                   event->key() == Qt::Key_X) {
             if(event->isAutoRepeat()) return false;
             cutAction();
-        } else if(event->key() == Qt::Key_0) {
+        } else if(event->key() == Qt::Key_0 &&
+                  event->modifiers() & Qt::KeypadModifier) {
             fitCanvasToSize();
-        } else if(event->key() == Qt::Key_1) {
+        } else if(event->key() == Qt::Key_1 &&
+                  event->modifiers() & Qt::KeypadModifier) {
             resetTransormation();
         } else if(event->key() == Qt::Key_Delete) {
             deleteAction();

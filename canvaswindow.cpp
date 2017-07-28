@@ -880,8 +880,13 @@ void CanvasWindow::saveOutput(const QString &renderDest,
 
 void CanvasWindow::clearAll() {
     //SWT_clearAll();
+
     mClearBeingUpdated = !mNoBoxesAwaitUpdate;
     mUpdatablesAwaitingUpdate.clear();
+    foreach(const CanvasQSPtr &canvas, mCanvasList) {
+        SWT_removeChildAbstractionForTargetFromAll(canvas.data());
+    }
+
     mCanvasList.clear();
     setCurrentCanvas((Canvas*)NULL);
 }
