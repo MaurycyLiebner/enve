@@ -26,7 +26,7 @@ ColorAnimator::ColorAnimator() : ComplexAnimator() {
     mAlphaAnimator->freezeMinMaxValues();
 }
 
-void ColorAnimator::prp_loadFromSql(const int &sqlId) {
+void ColorAnimator::loadFromSql(const int &sqlId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM coloranimator WHERE id = %1").
             arg(sqlId);
@@ -37,26 +37,26 @@ void ColorAnimator::prp_loadFromSql(const int &sqlId) {
                     query.value(idModeAnimator).toInt());
         setColorMode(colorMode);
         int idVal1AnimatorId = query.record().indexOf("val1animatorid");
-        mVal1Animator->prp_loadFromSql(query.value(idVal1AnimatorId).toInt());
+        mVal1Animator->loadFromSql(query.value(idVal1AnimatorId).toInt());
         int idVal2AnimatorId = query.record().indexOf("val2animatorid");
-        mVal2Animator->prp_loadFromSql(query.value(idVal2AnimatorId).toInt());
+        mVal2Animator->loadFromSql(query.value(idVal2AnimatorId).toInt());
         int idVal3AnimatorId = query.record().indexOf("val3animatorid");
-        mVal3Animator->prp_loadFromSql(query.value(idVal3AnimatorId).toInt());
+        mVal3Animator->loadFromSql(query.value(idVal3AnimatorId).toInt());
         int idAlphaAnimatorId = query.record().indexOf("alphaanimatorid");
-        mAlphaAnimator->prp_loadFromSql(query.value(idAlphaAnimatorId).toInt());
+        mAlphaAnimator->loadFromSql(query.value(idAlphaAnimatorId).toInt());
     } else {
         qDebug() << "Could not load color with id " << sqlId;
     }
 }
 
 #include <QSqlError>
-int ColorAnimator::prp_saveToSql(QSqlQuery *query,
+int ColorAnimator::saveToSql(QSqlQuery *query,
                                  const int &parentId) {
     Q_UNUSED(parentId);
-    int val1AnimatorId = mVal1Animator->prp_saveToSql(query);
-    int val2AnimatorId = mVal2Animator->prp_saveToSql(query);
-    int val3AnimatorId = mVal3Animator->prp_saveToSql(query);
-    int alphaAnimatorId = mAlphaAnimator->prp_saveToSql(query);
+    int val1AnimatorId = mVal1Animator->saveToSql(query);
+    int val2AnimatorId = mVal2Animator->saveToSql(query);
+    int val3AnimatorId = mVal3Animator->saveToSql(query);
+    int alphaAnimatorId = mAlphaAnimator->saveToSql(query);
     if(!query->exec(QString("INSERT INTO coloranimator ("
                             "colormode, val1animatorid, "
                             "val2animatorid, val3animatorid, alphaanimatorid) "

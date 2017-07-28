@@ -64,7 +64,7 @@ public:
 
     int saveToSql(QSqlQuery *query,
                       const int &parentId);
-    void prp_loadFromSql(const int &boundingBoxId);
+    void loadFromSql(const int &boundingBoxId);
 
     BoundingBox *createNewDuplicate() {
         return new Circle();

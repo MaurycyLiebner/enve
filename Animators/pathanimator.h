@@ -27,7 +27,7 @@ public:
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
 
-    void prp_loadFromSql(const int &boundingBoxId);
+    void loadFromSql(const int &boundingBoxId);
     int saveToSql(QSqlQuery *query,
                       const int &boundingBoxId);
     void makeDuplicate(Property *property);

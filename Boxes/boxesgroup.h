@@ -56,7 +56,7 @@ public:
     BoxesGroup();
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
     ~BoxesGroup();
-    virtual void prp_loadFromSql(const int &boundingBoxId);
+    virtual void loadFromSql(const int &boundingBoxId);
 
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
@@ -194,7 +194,7 @@ public:
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
-    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
     void processSchedulers();

@@ -2,14 +2,36 @@
 #define IMAGEBOX_H
 #include "Boxes/boundingbox.h"
 #include "skiaincludes.h"
+class FileCacheHandler;
+class ImageCacheHandler;
 
 struct ImageBoxRenderData : public BoundingBoxRenderData {
-    ImageBoxRenderData(BoundingBox *parentBoxT) :
+    ImageBoxRenderData(FileCacheHandler *cacheHandler,
+                       BoundingBox *parentBoxT) :
         BoundingBoxRenderData(parentBoxT){
+        srcCacheHandler = cacheHandler;
+    }
 
+    virtual void loadImageFromHandler();
+
+    void beforeUpdate() {
+        if(!allDataReady()) {
+            loadImageFromHandler();
+        }
+        BoundingBoxRenderData::beforeUpdate();
+    }
+
+    bool allDataReady() {
+        return image.get() != NULL;
+    }
+
+    void updateRelBoundingRect() {
+        relBoundingRect = QRectF(0., 0., image->width(), image->height());
     }
 
     sk_sp<SkImage> image;
+
+    FileCacheHandler *srcCacheHandler;
 private:
     void drawSk(SkCanvas *canvas) {
         SkPaint paint;
@@ -36,12 +58,10 @@ public:
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
 
-    BoundingBoxRenderData *createRenderData() {
-        return new ImageBoxRenderData(this);
-    }
+    BoundingBoxRenderData *createRenderData();
 
 private:
-    sk_sp<SkImage> mImageSk;
+    ImageCacheHandler *mImgCacheHandler;
     QString mImageFilePath;
 };
 

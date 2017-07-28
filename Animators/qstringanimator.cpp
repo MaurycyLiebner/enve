@@ -1,49 +1,102 @@
 #include "qstringanimator.h"
 
-QStringAnimator::QStringAnimator() : IntAnimator()
-{
+QStringAnimator::QStringAnimator() : Animator() {
 
 }
 
-void QStringAnimator::setCurrentTextValue(const QString &text)
-{
-    if(prp_isKeyOnCurrentFrame()) {
-        Q_FOREACH(QStringKey *key, mTextValues) {
-            if(key->keyFrame == anim_mCurrentAbsFrame) {
-                key->string = text;
-                break;
-            }
-        }
-        setCurrentIntValue(anim_mCurrentAbsFrame, true);
+void QStringAnimator::prp_setAbsFrame(const int &frame) {
+    Animator::prp_setAbsFrame(frame);
+    if(prp_hasKeys()) {
+        mCurrentText = getTextValueAtRelFrame(anim_mCurrentRelFrame);
+    }
+}
+
+void QStringAnimator::anim_saveCurrentValueAsKey() {
+    if(!anim_mIsRecording) prp_setRecording(true);
+
+    if(anim_mKeyOnCurrentFrame == NULL) {
+        anim_mKeyOnCurrentFrame = new QStringKey(mCurrentText,
+                                                 anim_mCurrentRelFrame,
+                                                 this);
+        anim_appendKey(anim_mKeyOnCurrentFrame);
     } else {
-        mTextValues << new QStringKey(text, anim_mCurrentAbsFrame);
-        setCurrentIntValue(anim_mCurrentAbsFrame, true);
+        ((QStringKey*)anim_mKeyOnCurrentFrame)->setText(mCurrentText);
     }
 }
 
-QString QStringAnimator::getCurrentTextValue()
-{
-    return getStringKeyWithLowerFrame(anim_mCurrentAbsFrame);
+void QStringAnimator::anim_loadKeysFromSql(const int &qrealAnimatorId) {
+
 }
 
-QString QStringAnimator::getStringKeyWithLowerFrame(int frame)
-{
-    QStringKey *bestKey = NULL;
-    int dFrame = 10000000;
-    Q_FOREACH(QStringKey *key, mTextValues) {
-        int newDFrame = frame - key->keyFrame;
-        if(newDFrame == 0) {
-            bestKey = key;
-            dFrame = newDFrame;
-            break;
-        }
-        if((dFrame < 0 && newDFrame > dFrame) || (dFrame > 0 && newDFrame < dFrame && newDFrame > 0) || bestKey == NULL) {
-            dFrame = newDFrame;
-            bestKey = key;
+void QStringAnimator::setCurrentTextValue(const QString &text) {
+    mCurrentText = text;
+    if(prp_isRecording()) {
+        anim_saveCurrentValueAsKey();
+    }
+}
+
+QString QStringAnimator::getCurrentTextValue() {
+    return mCurrentText;
+}
+
+QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
+    QStringKey *key = (QStringKey *)anim_getPrevKey(relFrame);
+    if(key == NULL) {
+        return mCurrentText;
+    }
+    return key->getText();
+}
+
+void QStringAnimator::prp_setRecording(const bool &rec) {
+    if(rec) {
+        anim_setRecordingWithoutChangingKeys(rec);
+        anim_saveCurrentValueAsKey();
+    } else {
+        anim_removeAllKeys();
+        anim_setRecordingWithoutChangingKeys(rec);
+    }
+}
+
+void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
+                            int *firstIdentical,
+                            int *lastIdentical,
+                            const int &relFrame) {
+    if(anim_mKeys.isEmpty()) {
+        *firstIdentical = INT_MIN;
+        *lastIdentical = INT_MAX;
+    } else {
+        int prevId;
+        int nextId;
+        anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
+                                                relFrame);
+        Key *prevKey = anim_mKeys.at(prevId).get();
+        Key *nextKey = anim_mKeys.at(nextId).get();
+        if(prevId == nextId) {
+            if(prevKey->getNextKey() == NULL) {
+                *firstIdentical = nextKey->getRelFrame();
+                *lastIdentical = INT_MAX;
+            } else if(nextKey->getPrevKey() == NULL) {
+                *firstIdentical = INT_MIN;
+                *lastIdentical = nextKey->getRelFrame();
+            } else {
+                *firstIdentical = prevKey->getRelFrame();
+                *lastIdentical = prevKey->getNextKey()->getRelFrame();
+            }
+        } else {
+            *firstIdentical = prevKey->getRelFrame();
+            *lastIdentical = nextKey->getRelFrame();
         }
     }
-    if(bestKey == NULL) {
-        return "";
-    }
-    return bestKey->string;
+}
+
+QStringKey::QStringKey(const QString &stringT,
+                       const int &relFrame,
+                       QStringAnimator *parentAnimator) :
+    Key(parentAnimator) {
+    mRelFrame = relFrame;
+    mText = stringT;
+}
+
+bool QStringKey::differsFromKey(Key *key) {
+    return ((QStringKey*)key)->getText() != mText;
 }

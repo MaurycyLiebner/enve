@@ -13,11 +13,11 @@ void EffectAnimators::addEffect(PixmapEffect *effect) {
     mParentBox->addEffect(effect);
 }
 
-int EffectAnimators::prp_saveToSql(QSqlQuery *query,
+int EffectAnimators::saveToSql(QSqlQuery *query,
                                     const int &boundingBoxSqlId) {
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         ((PixmapEffect*)effect.data())->
-                prp_saveToSql(query, boundingBoxSqlId);
+                saveToSql(query, boundingBoxSqlId);
     }
     return boundingBoxSqlId;
 }
@@ -27,7 +27,7 @@ int EffectAnimators::prp_saveToSql(QSqlQuery *query,
 //  EFFECT_CIRCLES
 //  EFFECT_SWIRL
 //  EFFECT_DESATURATE
-void EffectAnimators::prp_loadFromSql(const int &boundingBoxSqlId) {
+void EffectAnimators::loadFromSql(const int &boundingBoxSqlId) {
     QSqlQuery query;
     QString queryStr;
     queryStr = "SELECT * FROM pixmapeffect WHERE boundingboxid = " +
@@ -59,7 +59,7 @@ void EffectAnimators::prp_loadFromSql(const int &boundingBoxSqlId) {
             } else {
                 continue;
             }
-            effect->prp_loadFromSql(query.value(idId).toInt());
+            effect->loadFromSql(query.value(idId).toInt());
             addEffect(effect);
         }
     } else {

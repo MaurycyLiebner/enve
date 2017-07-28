@@ -7,6 +7,16 @@
 #include "imagebox.h"
 class AnimationCacheHandler;
 
+struct AnimationBoxRenderData : public ImageBoxRenderData {
+    AnimationBoxRenderData(FileCacheHandler *cacheHandler,
+                           BoundingBox *parentBox) :
+        ImageBoxRenderData(cacheHandler, parentBox) {
+
+    }
+
+    void loadImageFromHandler();
+};
+
 class AnimationBox : public BoundingBox {
     Q_OBJECT
 public:
@@ -44,7 +54,6 @@ protected:
     bool mNewCurrentFrameUpdateNeeded = false;
     AnimationCacheHandler *mAnimationCacheHandler = NULL;
     int mCurrentAnimationFrame = -1;
-    int mUpdateAnimationFrame = 0;
     qreal mFps = 24.;
 
     QSharedPointer<QrealAnimator> mTimeScaleAnimator =

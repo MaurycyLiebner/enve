@@ -447,7 +447,7 @@ public:
 
     //void replaceCurrentFrameCache();
     void renderDataFinished(BoundingBoxRenderData *renderData);
-    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
 protected:

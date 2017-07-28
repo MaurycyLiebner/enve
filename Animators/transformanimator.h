@@ -117,9 +117,9 @@ public:
 
     void setPivot(const QPointF &point,
                   const bool &finish = false);
-    int prp_saveToSql(QSqlQuery *query,
+    int saveToSql(QSqlQuery *query,
                       const int &parentId = 0);
-    void prp_loadFromSql(const int &transformAnimatorId);
+    void loadFromSql(const int &transformAnimatorId);
 
     void makeDuplicate(BoxTransformAnimator *target);
     Property *makeDuplicate() {

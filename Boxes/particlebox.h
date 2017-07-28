@@ -291,7 +291,7 @@ public:
 
     void removeEmitter(ParticleEmitter *emitter);
 
-    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
 public slots:

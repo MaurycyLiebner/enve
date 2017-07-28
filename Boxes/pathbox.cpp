@@ -74,6 +74,7 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     PathBoxRenderData *pathData = (PathBoxRenderData*)data;
     pathData->path = getPathAtRelFrame(relFrame);
     mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
+    //prp_thisRelFrameToParentRelFrame(relFrame);
 
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {
@@ -120,11 +121,11 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
 int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = BoundingBox::saveToSql(query, parentId);
 
-    int fillPts = mFillGradientPoints->startPoint->prp_saveToSql(query);
-    int strokePts = mStrokeGradientPoints->startPoint->prp_saveToSql(query);
+    int fillPts = mFillGradientPoints->startPoint->saveToSql(query);
+    int strokePts = mStrokeGradientPoints->startPoint->saveToSql(query);
 
-    int fillSettingsId = mFillSettings->prp_saveToSql(query);
-    int strokeSettingsId = mStrokeSettings->prp_saveToSql(query);
+    int fillSettingsId = mFillSettings->saveToSql(query);
+    int strokeSettingsId = mStrokeSettings->saveToSql(query);
     if(!query->exec(
             QString(
             "INSERT INTO pathbox (fillgradientpointsid, "
@@ -142,8 +143,8 @@ int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
-void PathBox::prp_loadFromSql(const int &boundingBoxId) {
-    BoundingBox::prp_loadFromSql(boundingBoxId);
+void PathBox::loadFromSql(const int &boundingBoxId) {
+    BoundingBox::loadFromSql(boundingBoxId);
     QSqlQuery query;
     QString queryStr = "SELECT * FROM pathbox WHERE boundingboxid = " +
             QString::number(boundingBoxId);
@@ -168,11 +169,11 @@ void PathBox::prp_loadFromSql(const int &boundingBoxId) {
                 query.value(idstrokesettingsid).toInt();
 
 
-        mFillGradientPoints->prp_loadFromSql(fillGradientPointsId);
-        mStrokeGradientPoints->prp_loadFromSql(strokeGradientPointsId);
+        mFillGradientPoints->loadFromSql(fillGradientPointsId);
+        mStrokeGradientPoints->loadFromSql(strokeGradientPointsId);
 
-        mFillSettings->prp_loadFromSql(fillSettingsId);
-        mStrokeSettings->prp_loadFromSql(strokeSettingsId);
+        mFillSettings->loadFromSql(fillSettingsId);
+        mStrokeSettings->loadFromSql(strokeSettingsId);
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }

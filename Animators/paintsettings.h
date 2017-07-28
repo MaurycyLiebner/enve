@@ -93,7 +93,7 @@ public:
                   const PaintType &paintTypeT,
                   Gradient *gradientT = NULL);
 
-    int prp_saveToSql(QSqlQuery *query,
+    int saveToSql(QSqlQuery *query,
                       const int &parentId = 0);
 
     Color getCurrentColor() const;
@@ -114,7 +114,7 @@ public:
 
     void setGradientPoints(GradientPoints *gradientPoints);
 
-    void prp_loadFromSql(const int &sqlId);
+    void loadFromSql(const int &sqlId);
     void setPaintPathTarget(PathBox *path);
 
     void makeDuplicate(Property *target);
@@ -150,7 +150,7 @@ public:
 
     Gradient(const int &sqlIdT);
 
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+    int saveToSql(QSqlQuery *query, const int &parentId = 0);
 
     void saveToSqlIfPathSelected(QSqlQuery *query);
 
@@ -187,7 +187,7 @@ public:
     void addColorToList(const Color &color,
                         const bool &saveUndoRedo = true);
 
-    Color getCurrentColorAt(int id);
+    Color getCurrentColorAt(const int &id);
 
     int getColorCount();
 
@@ -195,8 +195,6 @@ public:
     QColor getFirstQGradientStopQColor();
 
     QGradientStops getQGradientStops();
-    void scheduleQGradientStopsUpdate();
-    void updateQGradientStopsIfNeeded();
     void startColorIdTransform(int id);
     void addColorToList(ColorAnimator *newColorAnimator,
                         const bool &saveUndoRedo = true);
@@ -234,8 +232,6 @@ private:
     QList<ColorAnimator*> mColors;
     QList<PathBox*> mAffectedPaths;
     ColorAnimator *mCurrentColor = NULL;
-
-    bool mQGradientStopsUpdateNeeded = false;
 };
 
 struct UpdatePaintSettings {
@@ -286,7 +282,7 @@ public:
 //                   const int &paintSqlId,
 //                   GradientWidget *gradientWidget);
 
-    int prp_saveToSql(QSqlQuery *query,
+    int saveToSql(QSqlQuery *query,
                       const int &parentId = 0);
 
     void setCurrentStrokeWidth(const qreal &newWidth);
@@ -312,7 +308,7 @@ public:
     QPainter::CompositionMode getOutlineCompositionMode();
 
     void setLineWidthUpdaterTarget(PathBox *path);
-    void prp_loadFromSql(const int &strokeSqlId);
+    void loadFromSql(const int &strokeSqlId);
     bool nonZeroLineWidth();
 
     void makeDuplicate(Property *target);

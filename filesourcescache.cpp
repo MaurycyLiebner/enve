@@ -35,6 +35,7 @@ void FileSourcesCache::removeHandler(FileCacheHandler *handler) {
 }
 
 FileCacheHandler::FileCacheHandler(const QString &filePath) {
+    mFileHandlerRef = ref<FileCacheHandler>();
     mFilePath = filePath;
     FileSourcesCache::addHandler(this);
 }
@@ -60,7 +61,7 @@ void ImageCacheHandler::afterUpdate() {
 }
 
 VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
-    FileCacheHandler(filePath) {
+    AnimationCacheHandler(filePath) {
     updateFrameCount();
 }
 
@@ -76,6 +77,7 @@ void VideoCacheHandler::beforeUpdate() {
     mFramesBeingLoaded = mFramesLoadScheduled;
     mFramesBeingLoadedGUI = mFramesBeingLoaded;
     mFramesLoadScheduled.clear();
+    mUpdateFilePath = mFilePath;
     qSort(mFramesBeingLoaded);
 }
 
@@ -110,7 +112,8 @@ void VideoCacheHandler::updateFrameCount() {
 void VideoCacheHandler::processUpdate() {
     QElapsedTimer timer;
     timer.start();
-    const char* path = mFilePath.toLatin1().data();
+    QByteArray pathByteArray = mUpdateFilePath.toLatin1();
+    const char* path = pathByteArray.data();
     // get format from audio file
     AVFormatContext* format = avformat_alloc_context();
     if (avformat_open_input(&format, path, NULL, NULL) != 0) {

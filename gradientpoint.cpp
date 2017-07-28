@@ -49,7 +49,11 @@ void GradientPoint::drawSk(SkCanvas *canvas,
 
     paint.setStyle(SkPaint::kStroke_Style);
     paint.setColor(SK_ColorBLACK);
-    paint.setStrokeWidth(invScale);
+    paint.setStrokeWidth(1.5*invScale);
+    canvas->drawCircle(absPos,
+                       scaledRadius, paint);
+    paint.setColor(SK_ColorWHITE);
+    paint.setStrokeWidth(0.75*invScale);
     canvas->drawCircle(absPos,
                        scaledRadius, paint);
 

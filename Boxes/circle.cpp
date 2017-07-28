@@ -42,8 +42,8 @@ Circle::Circle() :
 int Circle::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = PathBox::saveToSql(query, parentId);
 
-    int horizontalRadiusPointId = mHorizontalRadiusPoint->prp_saveToSql(query);
-    int verticalRadiusPointId = mVerticalRadiusPoint->prp_saveToSql(query);
+    int horizontalRadiusPointId = mHorizontalRadiusPoint->saveToSql(query);
+    int verticalRadiusPointId = mVerticalRadiusPoint->saveToSql(query);
 
     if(!query->exec(QString("INSERT INTO circle (boundingboxid, "
                            "horizontalradiuspointid, verticalradiuspointid) "
@@ -58,8 +58,8 @@ int Circle::saveToSql(QSqlQuery *query, const int &parentId) {
 }
 
 
-void Circle::prp_loadFromSql(const int &boundingBoxId) {
-    PathBox::prp_loadFromSql(boundingBoxId);
+void Circle::loadFromSql(const int &boundingBoxId) {
+    PathBox::loadFromSql(boundingBoxId);
 
     QSqlQuery query;
     QString queryStr = "SELECT * FROM circle WHERE boundingboxid = " +
@@ -72,8 +72,8 @@ void Circle::prp_loadFromSql(const int &boundingBoxId) {
         int horizontalRadiusPointId = query.value(idHorizontalRadiusPointId).toInt();
         int verticalRadiusPointId = query.value(idVerticalRadiusPointId).toInt();
 
-        mHorizontalRadiusPoint->prp_loadFromSql(horizontalRadiusPointId);
-        mVerticalRadiusPoint->prp_loadFromSql(verticalRadiusPointId);
+        mHorizontalRadiusPoint->loadFromSql(horizontalRadiusPointId);
+        mVerticalRadiusPoint->loadFromSql(verticalRadiusPointId);
     } else {
         qDebug() << "Could not load circle with id " << boundingBoxId;
     }

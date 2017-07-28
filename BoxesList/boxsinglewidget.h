@@ -7,13 +7,13 @@
 #include <QPushButton>
 #include <QMimeData>
 #include <QComboBox>
-#include "BoxesList/boolpropertywidget.h"
 #include "skiaincludes.h"
 class QrealAnimatorValueSlider;
 class DurationRectangleMovable;
 class Key;
 class BoxTargetWidget;
 class BoxesListActionButton;
+class BoolPropertyWidget;
 
 class BoxSingleWidget : public SingleWidget
 {
@@ -80,6 +80,7 @@ private:
     BoxesListActionButton *mVisibleButton;
     BoxesListActionButton *mLockedButton;
     BoxesListActionButton *mColorButton;
+    BoxTargetWidget *mBoxTargetWidget;
 
     QPoint mDragStartPos;
     QWidget *mFillWidget;

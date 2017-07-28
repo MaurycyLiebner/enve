@@ -30,7 +30,7 @@ public:
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
 
-    virtual void prp_loadFromSql(const int &boundingBoxId);
+    virtual void loadFromSql(const int &boundingBoxId);
 
     void applyCurrentTransformation();
     VectorPathEdge *getEgde(const QPointF &absPos,

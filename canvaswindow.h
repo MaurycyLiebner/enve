@@ -6,6 +6,7 @@
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 #include "keyfocustarget.h"
 class Canvas;
+typedef QSharedPointer<Canvas> CanvasQSPtr;
 enum ColorMode : short;
 enum CanvasMode : short;
 class Color;
@@ -34,7 +35,7 @@ public:
     ~CanvasWindow();
 
     Canvas *getCurrentCanvas();
-    const QList<Canvas*> &getCanvasList() {
+    const QList<CanvasQSPtr> &getCanvasList() {
         return mCanvasList;
     }
 
@@ -165,8 +166,8 @@ protected:
     int mCurrentRenderFrame;
 
     void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
-    Canvas *mCurrentCanvas = NULL;
-    QList<Canvas*> mCanvasList;
+    CanvasQSPtr mCurrentCanvas;
+    QList<CanvasQSPtr> mCanvasList;
 
     //void paintEvent(QPaintEvent *);
 

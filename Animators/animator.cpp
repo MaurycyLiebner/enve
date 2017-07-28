@@ -107,6 +107,30 @@ Key *Animator::anim_getPrevKey(Key *key) {
     return anim_mKeys.at(keyId - 1).get();
 }
 
+Key *Animator::anim_getNextKey(const int &relFrame) {
+    int prevId;
+    int nextId;
+    if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, relFrame)) {
+        Key *key = anim_mKeys.at(nextId).get();
+        if(key->getRelFrame() >= relFrame) {
+            return key;
+        }
+    }
+    return NULL;
+}
+
+Key *Animator::anim_getPrevKey(const int &relFrame) {
+    int prevId;
+    int nextId;
+    if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, relFrame)) {
+        Key *key = anim_mKeys.at(prevId).get();
+        if(key->getRelFrame() <= relFrame) {
+            return key;
+        }
+    }
+    return NULL;
+}
+
 void Animator::anim_deleteCurrentKey() {
     if(anim_mKeyOnCurrentFrame == NULL) return;
     anim_mKeyOnCurrentFrame->deleteKey();
@@ -405,7 +429,7 @@ bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
                 anim_mKeys.at(nextId2).get());
 }
 
-void Animator::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+void Animator::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                      int *lastIdentical,
                                                      const int &relFrame) {
     if(anim_mKeys.isEmpty()) {

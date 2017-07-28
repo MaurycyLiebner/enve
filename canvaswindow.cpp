@@ -61,7 +61,7 @@ CanvasWindow::~CanvasWindow() {
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
-    return mCurrentCanvas;
+    return mCurrentCanvas.data();
 }
 
 SingleWidgetAbstraction* CanvasWindow::SWT_getAbstractionForWidget(
@@ -78,7 +78,7 @@ SingleWidgetAbstraction* CanvasWindow::SWT_getAbstractionForWidget(
 void CanvasWindow::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(Canvas *child, mCanvasList) {
+    Q_FOREACH(const CanvasQSPtr &child, mCanvasList) {
         abstraction->addChildAbstraction(
                     child->SWT_getAbstractionForWidget(visiblePartWidget));
     }
@@ -88,7 +88,7 @@ void CanvasWindow::setCurrentCanvas(const int &id) {
     if(id < 0 || id >= mCanvasList.count()) {
         setCurrentCanvas((Canvas*)NULL);
     } else {
-        setCurrentCanvas(mCanvasList.at(id));
+        setCurrentCanvas(mCanvasList.at(id).data());
     }
 }
 
@@ -96,15 +96,15 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
     if(mCurrentCanvas != NULL) {
         mCurrentCanvas->setIsCurrentCanvas(false);
         disconnect(mPreviewFPSTimer, SIGNAL(timeout()),
-                   mCurrentCanvas, SLOT(nextPreviewFrame()) );
+                   mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
     }
-    mCurrentCanvas = canvas;
+    mCurrentCanvas = canvas->ref<Canvas>();
     if(mCurrentCanvas == NULL) {
         mCurrentSoundComposition = NULL;
     } else {
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         connect(mPreviewFPSTimer, SIGNAL(timeout()),
-                mCurrentCanvas, SLOT(nextPreviewFrame()) );
+                mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
 
         mCurrentCanvas->setIsCurrentCanvas(true);
 
@@ -114,7 +114,7 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
         emit changeCurrentFrame(getCurrentFrame());
     }
     SWT_scheduleWidgetsContentUpdateWithTarget(
-                mCurrentCanvas,
+                mCurrentCanvas.data(),
                 SWT_CurrentCanvas);
     updateDisplayedFillStrokeSettings();
     MainWindow::getInstance()->updateSettingsForCurrentCanvas();
@@ -122,13 +122,13 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
 }
 
 void CanvasWindow::addCanvasToList(Canvas *canvas) {
-    mCanvasList << canvas;
+    mCanvasList << canvas->ref<Canvas>();
     SWT_addChildAbstractionForTargetToAll(canvas);
 }
 
 void CanvasWindow::removeCanvas(const int &id) {
-    Canvas *canvas = mCanvasList.takeAt(id);
-    SWT_removeChildAbstractionForTargetFromAll(canvas);
+    CanvasQSPtr canvas = mCanvasList.takeAt(id);
+    SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     if(mCanvasList.isEmpty()) {
         setCurrentCanvas((Canvas*)NULL);
     } else if(id < mCanvasList.count()) {
@@ -211,7 +211,7 @@ void CanvasWindow::renameCanvas(Canvas *canvas, const QString &newName) {
 }
 
 void CanvasWindow::renameCanvas(const int &id, const QString &newName) {
-    renameCanvas(mCanvasList.at(id), newName);
+    renameCanvas(mCanvasList.at(id).data(), newName);
 }
 
 bool CanvasWindow::hasNoCanvas() {
@@ -220,7 +220,7 @@ bool CanvasWindow::hasNoCanvas() {
 
 void CanvasWindow::renameCurrentCanvas(const QString &newName) {
     if(mCurrentCanvas == NULL) return;
-    renameCanvas(mCurrentCanvas, newName);
+    renameCanvas(mCurrentCanvas.data(), newName);
 }
 
 void CanvasWindow::qRender(QPainter *p) {
@@ -269,11 +269,11 @@ void CanvasWindow::keyPressEvent(QKeyEvent *event) {
 
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     if(hasNoCanvas()) return;
-    CanvasSettingsDialog dialog(mCurrentCanvas, mCanvasWidget);
+    CanvasSettingsDialog dialog(mCurrentCanvas.data(), mCanvasWidget);
 
     if(dialog.exec() == QDialog::Accepted) {
-        dialog.applySettingsToCanvas(mCurrentCanvas);
-        setCurrentCanvas(mCurrentCanvas);
+        dialog.applySettingsToCanvas(mCurrentCanvas.data());
+        setCurrentCanvas(mCurrentCanvas.data());
     }
 }
 
@@ -765,7 +765,7 @@ void CanvasWindow::resumePreview() {
 
 void CanvasWindow::playPreview() {
     setRendering(false);
-    //setPreviewing(true);
+    setPreviewing(true);
     //emit changeCurrentFrame(mSavedCurrentFrame);
     mBoxesUpdateFinishedFunction = NULL;
     mCurrentCanvas->playPreview(mSavedCurrentFrame,
@@ -834,7 +834,7 @@ Canvas *CanvasWindow::loadCanvasesFromSql() {
                                this,
                                width, height,
                                frameCount);
-            canvas->prp_loadFromSql(boundingBoxId);
+            canvas->loadFromSql(boundingBoxId);
             MainWindow::getInstance()->addCanvas(canvas);
             return canvas;
         }
@@ -845,7 +845,7 @@ Canvas *CanvasWindow::loadCanvasesFromSql() {
 }
 
 void CanvasWindow::saveCanvasesFromSql(QSqlQuery *query) {
-    Q_FOREACH(Canvas *canvas, mCanvasList) {
+    Q_FOREACH(const CanvasQSPtr &canvas, mCanvasList) {
         canvas->saveToSql(query);
     }
 }
@@ -1033,7 +1033,7 @@ void CanvasWindow::importFile(const QString &path,
     QString extension = path.split(".").last();
     BoundingBox *boxToPosition = NULL;
     if(extension == "svg") {
-        boxToPosition = loadSVGFile(path, mCurrentCanvas);
+        boxToPosition = loadSVGFile(path, mCurrentCanvas.data());
     } else if(extension == "png" ||
               extension == "jpg") {
         boxToPosition = createImageForPath(path);

@@ -295,14 +295,14 @@ MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
 }
 
 #include <QSqlError>
-int BoxTransformAnimator::prp_saveToSql(QSqlQuery *query,
+int BoxTransformAnimator::saveToSql(QSqlQuery *query,
                                      const int &parentId) {
     Q_UNUSED(parentId);
-    int posAnimatorId = mPosAnimator->prp_saveToSql(query);
-    int scaleAnimatorId = mScaleAnimator->prp_saveToSql(query);
-    int pivotAnimatorId = mPivotAnimator->prp_saveToSql(query);
-    int rotAnimatorId = mRotAnimator->prp_saveToSql(query);
-    int opacityAnimatorId = mOpacityAnimator->prp_saveToSql(query);
+    int posAnimatorId = mPosAnimator->saveToSql(query);
+    int scaleAnimatorId = mScaleAnimator->saveToSql(query);
+    int pivotAnimatorId = mPivotAnimator->saveToSql(query);
+    int rotAnimatorId = mRotAnimator->saveToSql(query);
+    int opacityAnimatorId = mOpacityAnimator->saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO transformanimator (posanimatorid, scaleanimatorid, "
                 "pivotanimatorid, rotanimatorid, opacityanimatorid ) "
@@ -318,7 +318,7 @@ int BoxTransformAnimator::prp_saveToSql(QSqlQuery *query,
     return query->lastInsertId().toInt();
 }
 
-void BoxTransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
+void BoxTransformAnimator::loadFromSql(const int &transformAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM transformanimator WHERE id = " +
@@ -333,11 +333,11 @@ void BoxTransformAnimator::prp_loadFromSql(const int &transformAnimatorId) {
 
         //loadKeysFromSql(qrealAnimatorId);
 
-        mPosAnimator->prp_loadFromSql(query.value(posanimatorid).toInt());
-        mScaleAnimator->prp_loadFromSql(query.value(scaleanimatorid).toInt());
-        mPivotAnimator->prp_loadFromSql(query.value(pivotanimatorid).toInt());
-        mRotAnimator->prp_loadFromSql(query.value(rotanimatorid).toInt());
-        mOpacityAnimator->prp_loadFromSql(query.value(opacityanimatorid).toInt());
+        mPosAnimator->loadFromSql(query.value(posanimatorid).toInt());
+        mScaleAnimator->loadFromSql(query.value(scaleanimatorid).toInt());
+        mPivotAnimator->loadFromSql(query.value(pivotanimatorid).toInt());
+        mRotAnimator->loadFromSql(query.value(rotanimatorid).toInt());
+        mOpacityAnimator->loadFromSql(query.value(opacityanimatorid).toInt());
     } else {
         qDebug() << "Could not load qpointfanimator with id " << transformAnimatorId;
     }

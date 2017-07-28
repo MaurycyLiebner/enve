@@ -18,7 +18,9 @@ public:
 
     virtual void clearCache() = 0;
 protected:
+    std::shared_ptr<FileCacheHandler> mFileHandlerRef;
     QString mFilePath;
+    QString mUpdateFilePath;
 };
 
 class FileSourcesCache {
@@ -47,9 +49,12 @@ private:
     sk_sp<SkImage> mImage;
 };
 
-class AnimationCacheHandler {
+class AnimationCacheHandler : public FileCacheHandler {
 public:
-    AnimationCacheHandler() {}
+    AnimationCacheHandler(const QString &filePath) :
+        FileCacheHandler(filePath) {}
+    AnimationCacheHandler() :
+        FileCacheHandler("") {}
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
 
     virtual void clearCache() {}
@@ -70,14 +75,15 @@ public:
 
     void updateFrameCount();
 
+    void processUpdate() {}
+
     Updatable *scheduleFrameLoad(const int &frame);
 protected:
     QStringList mFramePaths;
     QList<ImageCacheHandler*> mFrameImageHandlers;
 };
 
-class VideoCacheHandler : public AnimationCacheHandler,
-                            public FileCacheHandler {
+class VideoCacheHandler : public AnimationCacheHandler {
 public:
     VideoCacheHandler(const QString &filePath);
 

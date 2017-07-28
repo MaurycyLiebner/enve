@@ -42,8 +42,8 @@ public:
                               const bool &finish = false);
 
     void prp_openContextMenu(const QPoint &pos);
-    void prp_loadFromSql(const int &sqlId);
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+    void loadFromSql(const int &sqlId);
+    int saveToSql(QSqlQuery *query, const int &parentId = 0);
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 

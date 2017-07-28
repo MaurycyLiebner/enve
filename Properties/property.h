@@ -138,6 +138,15 @@ public:
     }
     int prp_parentRelFrameToThisRelFrame(const int &relFrame) const;
     int prp_thisRelFrameToParentRelFrame(const int &relFrame) const;
+    virtual void prp_getFirstAndLastIdenticalRelFrame(
+            int *firstIdentical,
+            int *lastIdentical,
+            const int &relFrame) {
+        *firstIdentical = INT_MIN;
+        *lastIdentical = INT_MAX;
+        Q_UNUSED(relFrame);
+    }
+
 public slots:
     virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 

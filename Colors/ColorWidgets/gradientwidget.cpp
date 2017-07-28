@@ -117,7 +117,7 @@ void GradientWidget::removeGradient(int gradientId)
 
 void GradientWidget::saveGradientsToQuery(QSqlQuery *query) {
     Q_FOREACH(const QSharedPointer<Gradient> &gradient, mGradients) {
-        gradient->prp_saveToSql(query);
+        gradient->saveToSql(query);
     }
 }
 

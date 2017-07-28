@@ -189,7 +189,7 @@ public:
 
     bool isNeighbourSelected();
     void moveByAbs(const QPointF &absTranslatione);
-    void prp_loadFromSql(const int &movablePointId);
+    void loadFromSql(const int &movablePointId);
 
     void setPointValues(const PathPointValues &values);
 

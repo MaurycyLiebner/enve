@@ -128,7 +128,52 @@ bool checkImage(const image &im)
 }
 
 // colorize tool
-void colorize(const image &im,
+void colorizeAdd(const image &im,
+              const double &red,
+              const double &green,
+              const double &blue,
+              const double &alpha) {
+    // check if all parameters are good
+    if(!checkImage(im))
+    return;
+
+//    if(!red && !green && !blue)
+//    return;
+
+    u8 *bits;
+    s32 val;
+    double minV = min(blue, min(red, green))/255.;
+    s32 V[3] = { round((red - minV)*alpha*255),
+                 round((green - minV)*alpha*255),
+                 round((blue - minV)*alpha*255) };
+
+    // add to RED component 'red' value, and check if the result is out of bounds.
+    // do the same with GREEN and BLUE channels.
+    for(s32 y = 0;y < im.h;++y) {
+        bits = im.data + im.rw * y * sizeof(rgba);
+
+        for(s32 x = 0;x < im.w;x++) {
+            s32 aT = val = (s32)*(bits + 4);
+            for(s32 v = 0;v < 3;++v) {
+                val = (s32)*(bits + v) + V[v]*aT/255;
+
+                if(val > 255) {
+                    *(bits + v) = 255;
+                } else if(val < 0) {
+                    *(bits + v) = 0;
+                } else {
+                    *(bits + v) = val;
+                }
+            }
+
+            bits += 4;
+        }
+    }
+}
+
+
+// colorize tool
+void colorizeRemove(const image &im,
               const double &red,
               const double &green,
               const double &blue,
@@ -148,23 +193,22 @@ void colorize(const image &im,
 
     // add to RED component 'red' value, and check if the result is out of bounds.
     // do the same with GREEN and BLUE channels.
-    for(s32 y = 0;y < im.h;++y)
-    {
+    for(s32 y = 0;y < im.h;++y) {
         bits = im.data + im.rw * y * sizeof(rgba);
 
-        for(s32 x = 0;x < im.w;x++)
-        {
-            for(s32 v = 0;v < 3;++v)
-            {
-            val = (s32)*(bits + v) + V[v];
+        for(s32 x = 0;x < im.w;x++) {
+            s32 aT = val = (s32)*(bits + 4);
+            for(s32 v = 0;v < 3;++v) {
+                val = (s32)*(bits + v) + (255 - V[v])*aT/255;
 
-            if(val > 255)
-            *(bits + v) = 255;
-            else if(val < 0)
-            *(bits + v) = 0;
-            else
-            *(bits + v) = val;
-        }
+                if(val > 255) {
+                    *(bits + v) = 255;
+                } else if(val < 0) {
+                    *(bits + v) = 0;
+                } else {
+                    *(bits + v) = val;
+                }
+            }
 
             bits += 4;
         }

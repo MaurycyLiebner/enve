@@ -74,20 +74,20 @@ bool BoxesGroup::prp_differencesBetweenRelFrames(const int &relFrame1,
     return false;
 }
 
-void BoxesGroup::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+void BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                        int *lastIdentical,
                                                        const int &relFrame) {
     int fId;
     int lId;
 
-    BoundingBox::anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
+    BoundingBox::prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         if(fId > lId) {
             break;
         }
         int fIdT;
         int lIdT;
-        child->anim_getFirstAndLastIdenticalRelFrame(
+        child->prp_getFirstAndLastIdenticalRelFrame(
                     &fIdT, &lIdT,
                     child->prp_parentRelFrameToThisRelFrame(relFrame));
         fIdT = child->prp_thisRelFrameToParentRelFrame(fIdT);
@@ -122,8 +122,8 @@ BoxesGroup::~BoxesGroup() {
 
 }
 
-void BoxesGroup::prp_loadFromSql(const int &boundingBoxId) {
-    BoundingBox::prp_loadFromSql(boundingBoxId);
+void BoxesGroup::loadFromSql(const int &boundingBoxId) {
+    BoundingBox::loadFromSql(boundingBoxId);
     loadChildrenFromSql(boundingBoxId, false);
 }
 
@@ -152,22 +152,22 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_GROUP ) {
                 BoxesGroup *group = new BoxesGroup();
-                group->prp_loadFromSql(query.value(idId).toInt());
+                group->loadFromSql(query.value(idId).toInt());
                 addChild(group);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_CIRCLE ) {
                 Circle *circle = new Circle();
-                circle->prp_loadFromSql(query.value(idId).toInt());
+                circle->loadFromSql(query.value(idId).toInt());
                 addChild(circle);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_TEXT ) {
                 TextBox *textBox = new TextBox();
-                textBox->prp_loadFromSql(query.value(idId).toInt());
+                textBox->loadFromSql(query.value(idId).toInt());
                 addChild(textBox);
             } else if(static_cast<BoundingBoxType>(
                           query.value(idBoxType).toInt()) == TYPE_RECTANGLE ) {
                 Rectangle *rectangle = new Rectangle();
-                rectangle->prp_loadFromSql(query.value(idId).toInt());
+                rectangle->loadFromSql(query.value(idId).toInt());
                 addChild(rectangle);
             }
         }

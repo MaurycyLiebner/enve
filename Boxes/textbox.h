@@ -2,6 +2,8 @@
 #define TEXTBOX_H
 #include "Boxes/pathbox.h"
 #include "skiaincludes.h"
+class QStringAnimator;
+typedef QSharedPointer<QStringAnimator> QStringAnimatorQSPtr;
 
 class TextBox : public PathBox
 {
@@ -21,7 +23,7 @@ public:
 
     void openTextEditor(const bool &saveUndoRedo = true);
     int saveToSql(QSqlQuery *query, const int &parentId);
-    void prp_loadFromSql(const int &boundingBoxId);
+    void loadFromSql(const int &boundingBoxId);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);
@@ -37,13 +39,7 @@ public:
         scheduleUpdate();
     }
 
-    void makeDuplicate(Property *targetBox) {
-        PathBox::makeDuplicate(targetBox);
-        TextBox *textTarget = (TextBox*)targetBox;
-        textTarget->setText(mText);
-        textTarget->setFont(mFont);
-        textTarget->setTextAlignment(mAlignment);
-    }
+    void makeDuplicate(Property *targetBox);
 
     bool SWT_isTextBox() { return true; }
     void addActionsToMenu(QMenu *menu);
@@ -52,7 +48,7 @@ public:
 private:
     SkPath getPathAtRelFrame(const int &relFrame);
 
-    QString mText;
+    QStringAnimatorQSPtr mText;
     QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;
 };

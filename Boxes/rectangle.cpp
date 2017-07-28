@@ -35,9 +35,9 @@ Rectangle::~Rectangle()
 int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = PathBox::saveToSql(query, parentId);
 
-    int bottomRightPointId = mTopLeftPoint->prp_saveToSql(query);
-    int topLeftPointId = mTopLeftPoint->prp_saveToSql(query);
-    int radiusPointId = mRadiusAnimator.prp_saveToSql(query);
+    int bottomRightPointId = mTopLeftPoint->saveToSql(query);
+    int topLeftPointId = mTopLeftPoint->saveToSql(query);
+    int radiusPointId = mRadiusAnimator.saveToSql(query);
 
     if(!query->exec(QString("INSERT INTO rectangle (boundingboxid, "
                            "topleftpointid, bottomrightpointid, "
@@ -66,8 +66,8 @@ BoundingBox *Rectangle::createNewDuplicate() {
     return new Rectangle();
 }
 
-void Rectangle::prp_loadFromSql(const int &boundingBoxId) {
-    PathBox::prp_loadFromSql(boundingBoxId);
+void Rectangle::loadFromSql(const int &boundingBoxId) {
+    PathBox::loadFromSql(boundingBoxId);
 
     QSqlQuery query;
     QString queryStr = "SELECT * FROM rectangle WHERE boundingboxid = " +
@@ -82,9 +82,9 @@ void Rectangle::prp_loadFromSql(const int &boundingBoxId) {
         int topLeftPointId = query.value(idTopLeftPointId).toInt();
         int radiusPointId = query.value(idRadiusPointId).toInt();
 
-        mBottomRightPoint->prp_loadFromSql(bottomRightPointId);
-        mTopLeftPoint->prp_loadFromSql(topLeftPointId);
-        mRadiusAnimator.prp_loadFromSql(radiusPointId);
+        mBottomRightPoint->loadFromSql(bottomRightPointId);
+        mTopLeftPoint->loadFromSql(topLeftPointId);
+        mRadiusAnimator.loadFromSql(radiusPointId);
     } else {
         qDebug() << "Could not load rectangle with id " << boundingBoxId;
     }

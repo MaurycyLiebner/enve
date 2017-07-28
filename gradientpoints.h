@@ -37,8 +37,8 @@ public:
     void setPositions(QPointF startPos,
                       QPointF endPos,
                       bool saveUndoRedo = true);
-    void prp_loadFromSql(const int &identifyingId);
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
+    void loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &parentId = 0);
     Property *makeDuplicate() {
         return NULL;
     }

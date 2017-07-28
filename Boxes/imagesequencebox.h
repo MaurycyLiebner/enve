@@ -2,7 +2,7 @@
 #define IMAGESEQUENCEBOX_H
 #include "animationbox.h"
 
-class ImageSequenceBox : public AnimationBox{
+class ImageSequenceBox : public AnimationBox {
 public:
     ImageSequenceBox();
     void setListOfFrames(const QStringList &listOfFrames);

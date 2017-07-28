@@ -158,7 +158,7 @@ namespace fmt_filters
     //
     // it just adds to each pixel in the image
     // aproproriate value.
-    void colorize(const image &im,
+    void colorizeAdd(const image &im,
                   const double &red,
                   const double &green,
                   const double &blue,

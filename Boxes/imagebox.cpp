@@ -1,14 +1,13 @@
 #include "Boxes/imagebox.h"
 #include <QFileDialog>
 #include "mainwindow.h"
+#include "filesourcescache.h"
 
 ImageBox::ImageBox(QString filePath) :
     BoundingBox(TYPE_IMAGE) {
-    mImageFilePath = filePath;
-
     setName("Image");
 
-    reloadPixmap();
+    setFilePath(filePath);
 }
 
 
@@ -23,18 +22,19 @@ BoundingBox *ImageBox::createNewDuplicate() {
 }
 
 void ImageBox::reloadPixmap() {
-    if(mImageFilePath.isEmpty()) {
-    } else {
-        sk_sp<SkData> data = SkData::MakeFromFileName(
-                    mImageFilePath.toLocal8Bit().data());
-        mImageSk = SkImage::MakeFromEncoded(data);
-    }
+    mImgCacheHandler->clearCache();
 
     scheduleUpdate();
 }
 
 void ImageBox::setFilePath(QString path) {
     mImageFilePath = path;
+    mImgCacheHandler = (ImageCacheHandler*)
+                                FileSourcesCache::getHandlerForFilePath(
+                                                        path);
+    if(mImgCacheHandler == NULL) {
+        mImgCacheHandler = new ImageCacheHandler(path);
+    }
     reloadPixmap();
 }
 
@@ -62,7 +62,15 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrame(
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     data->transform.scale(data->resolution, data->resolution);
     ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
-    imgData->image = mImageSk;
+    imgData->image = mImgCacheHandler->getImage();
+    if(imgData->image == NULL) {
+        mImgCacheHandler->addScheduler();
+        mImgCacheHandler->addDependent(imgData);
+    }
+}
+
+BoundingBoxRenderData *ImageBox::createRenderData() {
+    return new ImageBoxRenderData(mImgCacheHandler, this);
 }
 
 bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
@@ -74,4 +82,8 @@ bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
         return false;
     }
     return true;
+}
+#include "filesourcescache.h"
+void ImageBoxRenderData::loadImageFromHandler() {
+    image = ((ImageCacheHandler*)srcCacheHandler)->getImage();
 }

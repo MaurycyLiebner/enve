@@ -24,6 +24,7 @@
 #include "actionbutton.h"
 #include "fontswidget.h"
 #include "global.h"
+#include "filesourcescache.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -606,11 +607,17 @@ void MainWindow::addCanvas(Canvas *newCanvas) {
 
 void MainWindow::canvasNameChanged(Canvas *canvas,
                                    const QString &name) {
-    int idT = mCanvasWindow->getCanvasList().indexOf(canvas);
-    if(idT < 0) return;
-    mCurrentCanvasComboBox->setItemText(
-                idT,
-                name);
+    const QList<CanvasQSPtr> &canvasList = mCanvasWindow->getCanvasList();
+    int idT = 0;
+    foreach(const CanvasQSPtr &canvasPtr, canvasList) {
+        if(canvasPtr == canvas) {
+            break;
+        }
+        idT++;
+    }
+
+    if(idT < 0 || idT >= canvasList.count()) return;
+    mCurrentCanvasComboBox->setItemText(idT, name);
 }
 
 void MainWindow::createDetachedUndoRedoStack() {
@@ -805,9 +812,8 @@ void MainWindow::callUpdateSchedulers() {
         mCanvasWindow->processSchedulers();
         foreach(const std::shared_ptr<Updatable> &updatable,
                 mUpdateSchedulers) {
-            //updatable->schedulerProccessed();
             if(!updatable->isAwaitingUpdate()) {
-                qDebug() << "hell";
+                updatable->schedulerProccessed();
             }
             mCanvasWindow->addUpdatableAwaitingUpdate(updatable.get());
         }

@@ -73,7 +73,7 @@ public:
 
     void setOutlineAffectedByScale(const bool &bT);
     int saveToSql(QSqlQuery *query, const int &parentId);
-    void prp_loadFromSql(const int &boundingBoxId);
+    void loadFromSql(const int &boundingBoxId);
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 

@@ -11,16 +11,6 @@ public:
     UpdateScheduler() {}
     virtual ~UpdateScheduler() {}
     virtual void update() {}
-    virtual bool readyToBeProcessed() { return true; }
-};
-
-class QGradientStopsUpdateScheduler : public UpdateScheduler {
-public:
-    QGradientStopsUpdateScheduler(Gradient *gradient);
-
-    void update();
-private:
-    Gradient *mGradient;
 };
 
 #endif // UPDATESCHEDULER_H

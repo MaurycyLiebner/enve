@@ -151,7 +151,7 @@ void BoundingBox::applyEffectsSk(const SkBitmap &im,
 #include <QSqlError>
 int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
-    int transfromAnimatorId = mTransformAnimator->prp_saveToSql(query);
+    int transfromAnimatorId = mTransformAnimator->saveToSql(query);
     if(!query->exec(
                 QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
                         "pivotchanged, visible, locked, blendmode, "
@@ -171,12 +171,12 @@ int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
 
     int boxId = query->lastInsertId().toInt();
     if(mEffectsAnimators->hasChildAnimators()) {
-        mEffectsAnimators->prp_saveToSql(query, boxId);
+        mEffectsAnimators->saveToSql(query, boxId);
     }
     return boxId;
 }
 
-void BoundingBox::prp_loadFromSql(const int &boundingBoxId) {
+void BoundingBox::loadFromSql(const int &boundingBoxId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM boundingbox WHERE id = " +
@@ -196,8 +196,8 @@ void BoundingBox::prp_loadFromSql(const int &boundingBoxId) {
         bool locked = query.value(idLocked).toBool();
         mBlendModeSk = static_cast<SkBlendMode>(
                     query.value(idBlendMode).toInt());
-        mTransformAnimator->prp_loadFromSql(transformAnimatorId);
-        mEffectsAnimators->prp_loadFromSql(boundingBoxId);
+        mTransformAnimator->loadFromSql(transformAnimatorId);
+        mEffectsAnimators->loadFromSql(boundingBoxId);
         mPivotChanged = pivotChanged;
         mLocked = locked;
         mVisible = visible;
@@ -444,7 +444,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 
 void BoundingBox::scheduleUpdate() {
     if(mBlockedSchedule) {
-        qDebug() << "hell";
+        qDebug() << "hell1";
     }
     if(!shouldScheduleUpdate()) return;
     if(mCurrentRenderData == NULL) {
@@ -965,14 +965,15 @@ bool BoundingBox::isRelFrameVisibleAndInVisibleDurationRect(
     return isRelFrameInVisibleDurationRect(relFrame) && mVisible;
 }
 
-void BoundingBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                         int *lastIdentical,
                                                         const int &relFrame) {
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            Animator::anim_getFirstAndLastIdenticalRelFrame(firstIdentical,
-                                                            lastIdentical,
-                                                            relFrame);
+            ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
+                                        firstIdentical,
+                                        lastIdentical,
+                                        relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
                 *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame();
@@ -1217,7 +1218,7 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(renderData->relFrame != anim_mCurrentRelFrame) {
         int firstIdenticalFrame;
         int lastIdenticalFrame;
-        anim_getFirstAndLastIdenticalRelFrame(&firstIdenticalFrame,
+        prp_getFirstAndLastIdenticalRelFrame(&firstIdenticalFrame,
                                               &lastIdenticalFrame,
                                               anim_mCurrentRelFrame);
         qDebug() << "current frame:" << anim_mCurrentRelFrame;
@@ -1359,6 +1360,9 @@ void BoundingBoxRenderData::processUpdate() {
 }
 
 void BoundingBoxRenderData::beforeUpdate() {
+    if(!mDataSet) {
+        dataSet();
+    }
     Updatable::beforeUpdate();
     //parentBox->setUpdateVars();
 //    parentBox->setupBoundingBoxRenderDataForRelFrame(
@@ -1377,11 +1381,19 @@ void BoundingBoxRenderData::schedulerProccessed() {
     parentBox->setupBoundingBoxRenderDataForRelFrame(
                 parentBox->anim_getCurrentRelFrame(),
                 this);
-    updateRelBoundingRect();
-    parentBox->updateCurrentPreviewDataFromRenderData(this);
+    mDataSet = false;
+    dataSet();
     Updatable::schedulerProccessed();
 }
 
 void BoundingBoxRenderData::addSchedulerNow() {
     parentBox->addScheduler(this);
+}
+
+void BoundingBoxRenderData::dataSet() {
+    if(allDataReady()) {
+        mDataSet = true;
+        updateRelBoundingRect();
+        parentBox->updateCurrentPreviewDataFromRenderData(this);
+    }
 }

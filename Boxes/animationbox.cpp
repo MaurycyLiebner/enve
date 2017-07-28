@@ -107,10 +107,7 @@ void AnimationBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
     if(mAnimationCacheHandler == NULL) return;
     updateCurrentAnimationFrame();
-    if(mAnimationCacheHandler->getFrameAtFrame(
-                mCurrentAnimationFrame).get() != NULL) {
-        mUpdateAnimationFrame = mCurrentAnimationFrame;
-    }
+
     mNewCurrentFrameUpdateNeeded = true;
 
     //if(!mWaitingForSchedulerToBeProcessed) {
@@ -150,16 +147,21 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
                                                        data);
     ImageBoxRenderData *imageData = (ImageBoxRenderData*)data;
     imageData->image = mAnimationCacheHandler->getFrameAtFrame(
-                                    mUpdateAnimationFrame);
+                                    mCurrentAnimationFrame);
     if(imageData->image == NULL) {
         if(mAnimationCacheHandler->getFrameAtFrame(
-                    mUpdateAnimationFrame).get() == NULL) {
-            mAnimationCacheHandler->scheduleFrameLoad(mUpdateAnimationFrame)->
+                    mCurrentAnimationFrame).get() == NULL) {
+            mAnimationCacheHandler->scheduleFrameLoad(mCurrentAnimationFrame)->
                     addDependent(imageData);
         }
     }
 }
 
 BoundingBoxRenderData *AnimationBox::createRenderData() {
-    return new ImageBoxRenderData(this);
+    return new AnimationBoxRenderData(mAnimationCacheHandler, this);
+}
+
+void AnimationBoxRenderData::loadImageFromHandler() {
+    image = ((AnimationCacheHandler*)srcCacheHandler)->
+            getFrameAtFrame(relFrame);
 }

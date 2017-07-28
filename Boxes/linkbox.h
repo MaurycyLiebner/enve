@@ -61,7 +61,7 @@ public:
                                                BoundingBoxRenderData *data);
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
-    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
     bool prp_differencesBetweenRelFrames(const int &relFrame1,

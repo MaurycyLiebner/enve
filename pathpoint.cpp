@@ -43,8 +43,8 @@ void PathPoint::applyTransform(const QMatrix &transform) {
     MovablePoint::applyTransform(transform);
 }
 
-void PathPoint::prp_loadFromSql(const int &movablePointId) {
-    MovablePoint::prp_loadFromSql(movablePointId);
+void PathPoint::loadFromSql(const int &movablePointId) {
+    MovablePoint::loadFromSql(movablePointId);
     QSqlQuery query;
     QString queryStr = "SELECT * FROM pathpoint WHERE qpointfanimatorid = " +
             QString::number(movablePointId);
@@ -62,8 +62,8 @@ void PathPoint::prp_loadFromSql(const int &movablePointId) {
         mEndCtrlPtEnabled = query.value(idendpointenabled).toBool();
         mCtrlsMode = static_cast<CtrlsMode>(query.value(idctrlsmode).toInt() );
 
-        mStartCtrlPt->prp_loadFromSql(query.value(idstartctrlptid).toInt());
-        mEndCtrlPt->prp_loadFromSql(query.value(idendctrlptid).toInt());
+        mStartCtrlPt->loadFromSql(query.value(idstartctrlptid).toInt());
+        mEndCtrlPt->loadFromSql(query.value(idendctrlptid).toInt());
     } else {
         qDebug() << "Could not load pathpoint with id " << movablePointId;
     }
@@ -256,9 +256,9 @@ MovablePoint *PathPoint::getPointAtAbsPos(const QPointF &absPos,
 
 #include <QSqlError>
 int PathPoint::saveToSql(QSqlQuery *query, const int &boundingBoxId) {
-    int movablePtId = MovablePoint::prp_saveToSql(query);
-    int startPtId = mStartCtrlPt->prp_saveToSql(query);
-    int endPtId = mEndCtrlPt->prp_saveToSql(query);
+    int movablePtId = MovablePoint::saveToSql(query);
+    int startPtId = mStartCtrlPt->saveToSql(query);
+    int endPtId = mEndCtrlPt->saveToSql(query);
     QString isFirst = ( (mSeparatePathPoint) ? "1" : "0" );
     QString isEnd = ( (isEndPoint()) ? "1" : "0" );
     if(!query->exec(QString("INSERT INTO pathpoint (isfirst, isendpoint, "

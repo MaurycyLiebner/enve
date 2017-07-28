@@ -85,21 +85,21 @@ bool InternalLinkBox::relPointInsidePath(const QPointF &point) {
     return mLinkTarget->relPointInsidePath(point);
 }
 
-void InternalLinkBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+void InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                         int *lastIdentical,
                                                         const int &relFrame) {
     int fIdLT;
     int lIdLT;
     int relFrameLT = mLinkTarget->prp_absFrameToRelFrame(
                 prp_relFrameToAbsFrame(relFrame));
-    mLinkTarget->anim_getFirstAndLastIdenticalRelFrame(&fIdLT,
+    mLinkTarget->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
                                                        &lIdLT,
                                                        relFrameLT);
     int fId;
     int lId;
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            Animator::anim_getFirstAndLastIdenticalRelFrame(&fId,
+            Animator::prp_getFirstAndLastIdenticalRelFrame(&fId,
                                                             &lId,
                                                             relFrame);
         } else {

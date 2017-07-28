@@ -233,7 +233,7 @@ Property *PathAnimator::makeDuplicate() {
     return newAnimator;
 }
 
-void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
+void PathAnimator::loadFromSql(const int &boundingBoxId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT id, isfirst, isendpoint, qpointfanimatorid "
                                "FROM pathpoint WHERE boundingboxid = %1 "
@@ -259,7 +259,7 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
                 singlePathAnimator = new SingleVectorPathAnimator(this);
                 addSinglePathAnimator(singlePathAnimator);
                 newPoint = new PathPoint(singlePathAnimator);
-                newPoint->prp_loadFromSql(qpointfanimatorid);
+                newPoint->loadFromSql(qpointfanimatorid);
 
                 if(isendpoint) {
                     firstPoint = NULL;
@@ -268,7 +268,7 @@ void PathAnimator::prp_loadFromSql(const int &boundingBoxId) {
                 }
             } else {
                 newPoint = new PathPoint(singlePathAnimator);
-                newPoint->prp_loadFromSql(qpointfanimatorid);
+                newPoint->loadFromSql(qpointfanimatorid);
             }
             singlePathAnimator->addPoint(newPoint, lastPoint);
             lastPoint = newPoint;

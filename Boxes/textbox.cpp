@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 #include "canvas.h"
 #include "gradientpoints.h"
+#include "Animators/qstringanimator.h"
 
 TextBox::TextBox() :
     PathBox(TYPE_TEXT) {
@@ -10,6 +11,10 @@ TextBox::TextBox() :
 
     mFillSettings->setCurrentColor(Color(0, 0, 0));
     mStrokeSettings->setPaintType(PaintType::NOPAINT);
+
+    mText = (new QStringAnimator())->ref<QStringAnimator>();
+    mText->prp_setName("text");
+    ca_addChildAnimator(mText.data());
 }
 
 #include <QSqlError>
@@ -20,7 +25,7 @@ int TextBox::saveToSql(QSqlQuery *query, const int &parentId) {
                            "text, fontfamily, fontstyle, fontsize) "
                 "VALUES ('%1', '%2', '%3', '%4', %5)").
                 arg(boundingBoxId).
-                arg(mText).
+                arg(mText->getCurrentTextValue()).
                 arg(mFont.family()).
                 arg(mFont.style()).
                 arg(mFont.pointSizeF()) ) ) {
@@ -30,8 +35,8 @@ int TextBox::saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
-void TextBox::prp_loadFromSql(const int &boundingBoxId) {
-    PathBox::prp_loadFromSql(boundingBoxId);
+void TextBox::loadFromSql(const int &boundingBoxId) {
+    PathBox::loadFromSql(boundingBoxId);
 
     QSqlQuery query;
     QString queryStr = "SELECT * FROM textbox WHERE boundingboxid = " +
@@ -69,7 +74,8 @@ void TextBox::openTextEditor(const bool &saveUndoRedo) {
     bool ok;
     QString text =
             QInputDialog::getMultiLineText(mMainWindow, getName() + " text",
-                                           "Text:", mText, &ok);
+                                           "Text:",
+                                           mText->getCurrentTextValue(), &ok);
     if(ok) {
         setText(text, saveUndoRedo);
         callUpdateSchedulers();
@@ -78,10 +84,12 @@ void TextBox::openTextEditor(const bool &saveUndoRedo) {
 
 void TextBox::setText(const QString &text, const bool &saveUndoRedo) {
     if(saveUndoRedo) {
-        addUndoRedo(new ChangeTextUndoRedo(this, mText, text));
+        addUndoRedo(new ChangeTextUndoRedo(this,
+                                           mText->getCurrentTextValue(),
+                                           text));
     }
     clearAllCache();
-    mText = text;
+    mText->setCurrentTextValue(text);
     scheduleUpdate();
 }
 
@@ -128,6 +136,14 @@ MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
                                      canvasScaleInv);
 }
 
+void TextBox::makeDuplicate(Property *targetBox) {
+    PathBox::makeDuplicate(targetBox);
+    TextBox *textTarget = (TextBox*)targetBox;
+    textTarget->setText(mText->getCurrentTextValue());
+    textTarget->setFont(mFont);
+    textTarget->setTextAlignment(mAlignment);
+}
+
 qreal textForQPainterPath(const Qt::Alignment &alignment,
                           const qreal &lineWidth,
                           const qreal &maxWidth) {
@@ -156,7 +172,8 @@ bool TextBox::handleSelectedCanvasAction(QAction *selectedAction) {
 SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
     QPainterPath qPath = QPainterPath();
 
-    QStringList lines = mText.split(QRegExp("\n|\r\n|\r"));
+    QString textAtFrame = mText->getTextValueAtRelFrame(relFrame);
+    QStringList lines = textAtFrame.split(QRegExp("\n|\r\n|\r"));
     QFontMetricsF fm(mFont);
     qreal yT = 0.;
     qreal maxWidth = 0.;

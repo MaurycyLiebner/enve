@@ -28,7 +28,6 @@ public:
     void deleteDetachedUndoRedoStack();
 
     void addUndoRedo(UndoRedo *undoRedo);
-    void addUpdateScheduler(UpdateScheduler *scheduler);
     void callUpdateSchedulers();
     MainWindow *getMainWindow();
     virtual void schedulePivotUpdate();

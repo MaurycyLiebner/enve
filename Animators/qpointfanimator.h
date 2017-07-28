@@ -35,8 +35,8 @@ public:
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
-    void prp_loadFromSql(const int &posAnimatorId);
+    int saveToSql(QSqlQuery *query, const int &parentId = 0);
+    void loadFromSql(const int &posAnimatorId);
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 

@@ -37,14 +37,14 @@ PathPoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
                                                    canvasScaleInv);
 }
 
-void VectorPath::prp_loadFromSql(const int &boundingBoxId) {
-    PathBox::prp_loadFromSql(boundingBoxId);
-    mPathAnimator->prp_loadFromSql(boundingBoxId);
+void VectorPath::loadFromSql(const int &boundingBoxId) {
+    PathBox::loadFromSql(boundingBoxId);
+    mPathAnimator->loadFromSql(boundingBoxId);
 }
 
 VectorPath *VectorPath::createPathFromSql(int boundingBoxId) {
     VectorPath *path = new VectorPath();
-    path->prp_loadFromSql(boundingBoxId);
+    path->loadFromSql(boundingBoxId);
 
     return path;
 }

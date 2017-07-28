@@ -56,6 +56,8 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
     mCurrentMode = MOVE_PATH;
 
+    ca_removeChildAnimator(mTransformAnimator.data());
+
     prp_setAbsFrame(0);
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
@@ -499,12 +501,12 @@ void Canvas::nextPreviewFrame() {
 //    mCacheHandler.removeRenderContainer(cont);
 //}
 
-void Canvas::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                    int *lastIdentical,
                                                    const int &relFrame) {
     int fId;
     int lId;
-    BoxesGroup::anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
+    BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
     *firstIdentical = qMax(fId, 0);
     *lastIdentical = qMin(lId, getMaxFrame());
 }
@@ -512,7 +514,7 @@ void Canvas::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 void Canvas::scheduleUpdate() {
 //    int fId;
 //    int lId;
-//    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, anim_mCurrentRelFrame);
+//    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, anim_mCurrentRelFrame);
 //    CacheContainer *cont =
 //          mCacheHandler.getRenderContainerAtRelFrame(fId);
 //    if(cont == NULL) {
@@ -525,7 +527,7 @@ void Canvas::scheduleUpdate() {
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     int fId;
     int lId;
-    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);
+    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);
     CacheContainer *cont =
           mCacheHandler.getRenderContainerAtRelFrame(fId);
     if(cont == NULL) {
@@ -541,7 +543,7 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
     int fId;
     int lId;
-    anim_getFirstAndLastIdenticalRelFrame(&fId, &lId,
+    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId,
                                           anim_mCurrentRelFrame);
     if(fId < minFrame &&
        fId > maxFrame) return;

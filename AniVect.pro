@@ -173,7 +173,9 @@ SOURCES += main.cpp\
     noshortcutaction.cpp \
     updatable.cpp \
     Animators/PathAnimators/singlepathanimator.cpp \
-    Animators/PathAnimators/singlevectorpathanimator.cpp
+    Animators/PathAnimators/singlevectorpathanimator.cpp \
+    BoxesList/boxtargetwidget.cpp \
+    Properties/boxtargetproperty.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -308,7 +310,9 @@ HEADERS  += mainwindow.h \
     noshortcutaction.h \
     updatable.h \
     Animators/PathAnimators/singlepathanimator.h \
-    Animators/PathAnimators/singlevectorpathanimator.h
+    Animators/PathAnimators/singlevectorpathanimator.h \
+    BoxesList/boxtargetwidget.h \
+    Properties/boxtargetproperty.h
 
 RESOURCES += \
     resources.qrc

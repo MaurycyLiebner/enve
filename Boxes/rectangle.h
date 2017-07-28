@@ -29,7 +29,7 @@ public:
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
-    void prp_loadFromSql(const int &boundingBoxId);
+    void loadFromSql(const int &boundingBoxId);
     int saveToSql(QSqlQuery *query, const int &parentId);
 
     void makeDuplicate(Property *targetBox) {

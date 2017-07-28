@@ -9,6 +9,10 @@
 #include "boxscrollwidgetvisiblepart.h"
 #include "keysview.h"
 #include "pointhelpers.h"
+#include "BoxesList/boolpropertywidget.h"
+#include "boxtargetwidget.h"
+#include "Properties/boxtargetproperty.h"
+#include "Animators/qstringanimator.h"
 
 QPixmap *BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap *BoxSingleWidget::INVISIBLE_PIXMAP;
@@ -140,6 +144,10 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
             this, SLOT(setCompositionMode(int)));
     mCompositionModeCombo->setSizePolicy(QSizePolicy::Maximum,
                     mCompositionModeCombo->sizePolicy().horizontalPolicy());
+
+    mBoxTargetWidget = new BoxTargetWidget(this);
+    mMainLayout->addWidget(mBoxTargetWidget);
+
     mCheckBox = new BoolPropertyWidget(this);
     mMainLayout->addWidget(mCheckBox);
 
@@ -253,6 +261,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
                     ((BoundingBox*)target)->getCompositionMode());
         updateCompositionBoxVisible();
 
+        mBoxTargetWidget->hide();
         mCheckBox->hide();
 
         mValueSlider->setAnimator(NULL);
@@ -274,6 +283,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeCombo->setCurrentIndex(
             blendModeToIntSk(((BoundingBox*)target)->getBlendMode()) );
         updateCompositionBoxVisible();
+
+        mBoxTargetWidget->hide();
         mCheckBox->hide();
 
         mValueSlider->setAnimator(NULL);
@@ -291,6 +302,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mCompositionModeCombo->hide();
         mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
 
         mCheckBox->show();
         mCheckBox->setTarget((BoolProperty*)target);
@@ -312,6 +325,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeCombo->hide();
         mCompositionModeVisible = false;
 
+        mBoxTargetWidget->hide();
         mCheckBox->hide();
 
         mValueSlider->setAnimator(qa_target);
@@ -336,6 +350,49 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeCombo->hide();
         mCompositionModeVisible = false;
 
+        mBoxTargetWidget->hide();
+        mCheckBox->hide();
+
+        mValueSlider->setAnimator(NULL);
+        mValueSlider->hide();
+    } else if(target->SWT_isBoxTargetProperty()) {
+        mRecordButton->hide();
+
+        mContentButton->hide();
+
+        mVisibleButton->hide();
+
+        mLockedButton->hide();
+
+        mColorButton->hide();
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->show();
+        mBoxTargetWidget->setTargetProperty((BoxTargetProperty*)target);
+        mCheckBox->hide();
+
+        mValueSlider->hide();
+    } else if(target->SWT_isQStringAnimator()) {
+        mRecordButton->show();
+
+        mContentButton->show();
+
+        mVisibleButton->hide();
+
+        mLockedButton->hide();
+
+        if(target->SWT_isColorAnimator()) {
+            mColorButton->show();
+        } else {
+            mColorButton->hide();
+        }
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
         mCheckBox->hide();
 
         mValueSlider->setAnimator(NULL);
@@ -678,6 +735,20 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.drawRect(mColorButton->x(), 3,
                        MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT - 6);
         }
+    } else if(target->SWT_isQStringAnimator()) {
+        QStringAnimator *ca_target = (QStringAnimator*)target;
+        name = ca_target->prp_getName();
+
+        if(ca_target->prp_isRecording()) {
+            drawPixmapCentered(&p, mRecordButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_RECORDING);
+        } else {
+            drawPixmapCentered(&p, mRecordButton->geometry(),
+                               *BoxSingleWidget::ANIMATOR_NOT_RECORDING);
+        }
+     } else if(target->SWT_isBoxTargetProperty()) {
+        nameX += 40;
+        name = ((BoxTargetProperty*)target)->prp_getName();
     } else if(target->SWT_isBoolProperty()) {
         nameX += 2*MIN_WIDGET_HEIGHT;
         name = ((BoolProperty*)target)->prp_getName();

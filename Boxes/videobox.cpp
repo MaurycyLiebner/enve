@@ -53,14 +53,14 @@ void VideoBox::changeSourceFile() {
     }
 }
 
-void VideoBox::anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+void VideoBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                      int *lastIdentical,
                                                      const int &relFrame) {
     if(isRelFrameVisibleAndInVisibleDurationRect(relFrame)) {
         *firstIdentical = relFrame;
         *lastIdentical = relFrame;
     } else {
-        BoundingBox::anim_getFirstAndLastIdenticalRelFrame(firstIdentical,
+        BoundingBox::prp_getFirstAndLastIdenticalRelFrame(firstIdentical,
                                                            lastIdentical,
                                                            relFrame);
     }

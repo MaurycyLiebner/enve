@@ -31,6 +31,40 @@ void ComplexAnimator::SWT_addChildrenAbstractions(
 
 }
 
+void ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
+                           int *firstIdentical,
+                           int *lastIdentical,
+                           const int &relFrame) {
+    int fId = INT_MIN;
+    int lId = INT_MAX;
+
+    Q_FOREACH(const QSharedPointer<Property> &child, ca_mChildAnimators) {
+        if(fId > lId) {
+            break;
+        }
+        int fIdT;
+        int lIdT;
+        child->prp_getFirstAndLastIdenticalRelFrame(
+                    &fIdT, &lIdT,
+                    relFrame);
+        if(fIdT > fId) {
+            fId = fIdT;
+        }
+        if(lIdT < lId) {
+            lId = lIdT;
+        }
+    }
+
+    if(lId > fId) {
+        *firstIdentical = fId;
+        *lastIdentical = lId;
+    } else {
+        *firstIdentical = relFrame;
+        *lastIdentical = relFrame;
+    }
+}
+
+
 bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules, const bool &parentSatisfies, const bool &parentMainTarget) {
     if(hasChildAnimators()) {
         return Animator::SWT_shouldBeVisible(

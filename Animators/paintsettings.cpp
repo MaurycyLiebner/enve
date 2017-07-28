@@ -207,7 +207,7 @@ Gradient::Gradient(const int &sqlIdT) :
             while(query.next()) {
                 int colorId = query.value(idColorId).toInt();
                 ColorAnimator *newAnimator = new ColorAnimator();
-                newAnimator->prp_loadFromSql(colorId);
+                newAnimator->loadFromSql(colorId);
                 addColorToList(newAnimator);
             }
         } else {
@@ -247,7 +247,7 @@ void Gradient::addColorToList(ColorAnimator *newColorAnimator,
     }
 }
 
-Color Gradient::getCurrentColorAt(int id) {
+Color Gradient::getCurrentColorAt(const int &id) {
     return mColors.at(id)->getCurrentColor();
 }
 
@@ -271,13 +271,13 @@ QGradientStops Gradient::getQGradientStops() {
     return mQGradientStops;
 }
 
-int Gradient::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+int Gradient::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     query->exec("INSERT INTO gradient DEFAULT VALUES");
     mSqlId = query->lastInsertId().toInt();
     int posInGradient = 0;
     Q_FOREACH(ColorAnimator *color, mColors) {
-        int colorId = color->prp_saveToSql(query);
+        int colorId = color->saveToSql(query);
         query->exec(QString("INSERT INTO gradientcolor "
                             "(colorid, gradientid, positioningradient) "
                             "VALUES (%1, %2, %3)").
@@ -294,7 +294,7 @@ void Gradient::saveToSqlIfPathSelected(QSqlQuery *query) {
         BoundingBox *parent = (BoundingBox *) path;
         while(parent != NULL) {
             if(parent->isSelected()) {
-                prp_saveToSql(query);
+                saveToSql(query);
                 return;
             }
             parent = (BoundingBox*)parent->getParent();
@@ -368,19 +368,6 @@ void Gradient::updatePaths() {
 //    //savedColors = colors;
 //    callUpdateSchedulers();
 //}
-
-void Gradient::scheduleQGradientStopsUpdate() {
-    if(mQGradientStopsUpdateNeeded) return;
-    mQGradientStopsUpdateNeeded = true;
-    addUpdateScheduler(new QGradientStopsUpdateScheduler(this) );
-}
-
-void Gradient::updateQGradientStopsIfNeeded() {
-    if(mQGradientStopsUpdateNeeded) {
-        mQGradientStopsUpdateNeeded = false;
-        updateQGradientStops();
-    }
-}
 
 void Gradient::startColorIdTransform(int id) {
     if(mColors.count() <= id || id < 0) return;
@@ -488,7 +475,7 @@ void PaintSettings::setGradientVar(Gradient *grad) {
     }
 }
 
-void PaintSettings::prp_loadFromSql(const int &sqlId) {
+void PaintSettings::loadFromSql(const int &sqlId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM paintsettings WHERE id = %1").
             arg(sqlId);
@@ -497,7 +484,7 @@ void PaintSettings::prp_loadFromSql(const int &sqlId) {
         int idPaintType = query.record().indexOf("painttype");
         mPaintType = static_cast<PaintType>(query.value(idPaintType).toInt());
         int idColorId = query.record().indexOf("colorid");
-        mColor->prp_loadFromSql(query.value(idColorId).toInt() );
+        mColor->loadFromSql(query.value(idColorId).toInt() );
         int idGradientId = query.record().indexOf("gradientid");
         if(!query.value(idGradientId).isNull()) {
             setGradientVar(getLoadedGradientBySqlId(
@@ -508,9 +495,9 @@ void PaintSettings::prp_loadFromSql(const int &sqlId) {
     }
 }
 
-int PaintSettings::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+int PaintSettings::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
-    int colorId = mColor->prp_saveToSql(query);
+    int colorId = mColor->saveToSql(query);
     QString gradientId = (mGradient.isNull()) ? "NULL" :
                                                QString::number(
                                                    mGradient->getSqlId());
@@ -614,7 +601,7 @@ void StrokeSettings::setLineWidthUpdaterTarget(PathBox *path) {
     setPaintPathTarget(path);
 }
 
-void StrokeSettings::prp_loadFromSql(const int &strokeSqlId) {
+void StrokeSettings::loadFromSql(const int &strokeSqlId) {
     QSqlQuery query;
     QString queryStr = QString("SELECT * FROM "
                                "strokesettings WHERE id = %1").
@@ -627,8 +614,8 @@ void StrokeSettings::prp_loadFromSql(const int &strokeSqlId) {
         int idJoinStyle = query.record().indexOf("joinstyle");
         int paintSettingsId = static_cast<PaintType>(
                     query.value(idPaintSettingsId).toInt());
-        PaintSettings::prp_loadFromSql(paintSettingsId);
-        mLineWidth->prp_loadFromSql(query.value(idLineWidth).toInt() );
+        PaintSettings::loadFromSql(paintSettingsId);
+        mLineWidth->loadFromSql(query.value(idLineWidth).toInt() );
         mCapStyle = static_cast<Qt::PenCapStyle>(query.value(idCapStyle).toInt());
         mJoinStyle = static_cast<Qt::PenJoinStyle>(query.value(idJoinStyle).toInt());
     } else {
@@ -636,11 +623,11 @@ void StrokeSettings::prp_loadFromSql(const int &strokeSqlId) {
     }
 }
 
-int StrokeSettings::prp_saveToSql(QSqlQuery *query,
+int StrokeSettings::saveToSql(QSqlQuery *query,
                                   const int &parentId) {
     Q_UNUSED(parentId);
-    int paintSettingsId = PaintSettings::prp_saveToSql(query);
-    int lineWidthId = mLineWidth->prp_saveToSql(query);
+    int paintSettingsId = PaintSettings::saveToSql(query);
+    int lineWidthId = mLineWidth->saveToSql(query);
     query->exec(QString("INSERT INTO strokesettings (linewidthanimatorid, "
                        "capstyle, joinstyle, paintsettingsid) "
                        "VALUES (%1, %2, %3, %4)").

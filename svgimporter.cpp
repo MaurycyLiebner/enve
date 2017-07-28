@@ -1084,6 +1084,7 @@ BoxesGroup *loadSVGFile(const QString &filename,
     } else {
         qDebug() << "Cannot open file " + filename;
     }
+    return NULL;
 }
 
 /*
@@ -1805,7 +1806,8 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
 #include "Animators/paintsettings.h"
 FillSvgAttributes::FillSvgAttributes() {}
 
-FillSvgAttributes &FillSvgAttributes::operator*=(const FillSvgAttributes &overwritter) {
+FillSvgAttributes &FillSvgAttributes::operator*=(
+        const FillSvgAttributes &overwritter) {
     setColor(overwritter.getColor());
     setPaintType(overwritter.getPaintType());
     setGradient(overwritter.getGradient());

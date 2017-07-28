@@ -74,7 +74,7 @@ public:
 
     void prp_startDragging();
 
-    virtual int prp_saveToSql(QSqlQuery *query,
+    virtual int saveToSql(QSqlQuery *query,
                               const int &boundingBoxSqlId);
 
     friend QDataStream & operator << (QDataStream & s,
@@ -86,7 +86,7 @@ public:
         return new PixmapEffectMimeData(this);
     }
 
-    virtual void prp_loadFromSql(const int &identifyingId) = 0;
+    virtual void loadFromSql(const int &identifyingId) = 0;
     virtual Property *makeDuplicate() = 0;
     virtual void makeDuplicate(Property *target) = 0;
 
@@ -132,8 +132,8 @@ public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &pixmapEffectId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &pixmapEffectId);
 
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
@@ -171,8 +171,8 @@ public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
 
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
@@ -208,8 +208,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateDistanceAnimatorFrom(QrealAnimator *source);
@@ -234,8 +234,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateDistanceAnimatorFrom(QrealAnimator *source);
@@ -257,8 +257,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateDegreesAnimatorFrom(QrealAnimator *source);
@@ -277,8 +277,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateRadiusAnimatorFrom(QrealAnimator *source);
@@ -297,8 +297,8 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateFactorAnimatorFrom(QrealAnimator *source);
@@ -307,47 +307,54 @@ private:
             (new QrealAnimator())->ref<QrealAnimator>();
 };
 
+struct DesaturateEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    qreal influence;
+};
+
 class DesaturateEffect : public PixmapEffect {
 public:
     DesaturateEffect(qreal influence = .5);
 
-    void apply(QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
-
     qreal getMargin() { return 0.; }
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
-    void applySk(const SkBitmap &imgPtr,
-                 const fmt_filters::image &img,
-                 qreal scale);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+            const int &relFrame);
 private:
     QSharedPointer<QrealAnimator> mInfluenceAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();
 };
 
+struct ColorizeEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    Color color;
+};
+
+
 class ColorizeEffect : public PixmapEffect {
 public:
     ColorizeEffect();
 
-    void apply(QImage *imgPtr,
-               const fmt_filters::image &img,
-               qreal scale);
-
     qreal getMargin() { return 0.; }
 
-    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void prp_loadFromSql(const int &identifyingId);
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(ColorAnimator *source);
-    void applySk(const SkBitmap &imgPtr,
-                 const fmt_filters::image &img,
-                 qreal scale);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+            const int &relFrame);
 private:
     QSharedPointer<ColorAnimator> mColorAnimator =
             (new ColorAnimator())->ref<ColorAnimator>();

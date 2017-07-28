@@ -15,10 +15,10 @@ public:
                     QSharedPointer<SelfRef>(this->mThisWeak));
     }
 
-//    template<class T>
-//    QWeakPointer<T> weakRef() {
-//        return ref<T>().toWeakRef();
-//    }
+    template<class T>
+    QWeakPointer<T> weakRef() {
+        return ref<T>().toWeakRef();
+    }
 
 private:
     QWeakPointer<SelfRef> mThisWeak;

@@ -13,8 +13,8 @@ public:
 
     qreal getEffectsMargin() const;
 
-//    int prp_saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-//    void prp_loadFromSql(const int &boundingBoxSqlId);
+//    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+//    void loadFromSql(const int &boundingBoxSqlId);
 
     bool hasEffects();
 

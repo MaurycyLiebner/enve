@@ -140,11 +140,12 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                 menu.addAction("Paste")->setShortcut(Qt::CTRL + Qt::Key_V);
             }
 
-            const QList<Canvas*> &listOfCanvas = mCanvasWindow->getCanvasList();
+            const QList<CanvasQSPtr> &listOfCanvas =
+                    mCanvasWindow->getCanvasList();
             QMenu *linkCanvasMenu;
             if(listOfCanvas.count() > 1) {
                 linkCanvasMenu = menu.addMenu("Link Canvas");
-                Q_FOREACH(Canvas *canvas, listOfCanvas) {
+                Q_FOREACH(const CanvasQSPtr &canvas, listOfCanvas) {
                     QAction *action =
                             linkCanvasMenu->addAction(canvas->getName());
                     if(canvas == this) {

@@ -13,10 +13,10 @@ QPointFAnimator::QPointFAnimator() : ComplexAnimator() {
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
-int QPointFAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+int QPointFAnimator::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
-    int xAnimatorId = mXAnimator->prp_saveToSql(query);
-    int yAnimatorId = mYAnimator->prp_saveToSql(query);
+    int xAnimatorId = mXAnimator->saveToSql(query);
+    int yAnimatorId = mYAnimator->saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO qpointfanimator (xanimatorid, yanimatorid ) "
                 "VALUES (%1, %2)").
@@ -29,7 +29,7 @@ int QPointFAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
 }
 
 #include <QSqlRecord>
-void QPointFAnimator::prp_loadFromSql(const int &posAnimatorId) {
+void QPointFAnimator::loadFromSql(const int &posAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qpointfanimator WHERE id = " +
@@ -39,8 +39,8 @@ void QPointFAnimator::prp_loadFromSql(const int &posAnimatorId) {
         int idxanimator = query.record().indexOf("xanimatorid");
         int idyanimator = query.record().indexOf("yanimatorid");
 
-        mXAnimator->prp_loadFromSql(query.value(idxanimator).toInt() );
-        mYAnimator->prp_loadFromSql(query.value(idyanimator).toInt() );
+        mXAnimator->loadFromSql(query.value(idxanimator).toInt() );
+        mYAnimator->loadFromSql(query.value(idyanimator).toInt() );
     } else {
         qDebug() << "Could not load qpointfanimator with id " << posAnimatorId;
     }

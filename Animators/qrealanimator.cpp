@@ -21,7 +21,7 @@ QrealAnimator::~QrealAnimator() {
 
 #include <QSqlError>
 #include <QSqlQuery>
-int QrealAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
+int QrealAnimator::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     if(!query->exec(
         QString("INSERT INTO qrealanimator (currentvalue) "
@@ -39,7 +39,7 @@ int QrealAnimator::prp_saveToSql(QSqlQuery *query, const int &parentId) {
     return thisSqlId;
 }
 
-void QrealAnimator::prp_loadFromSql(const int &qrealAnimatorId) {
+void QrealAnimator::loadFromSql(const int &qrealAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qrealanimator WHERE id = " +
@@ -279,7 +279,7 @@ void QrealAnimator::qra_saveValueToKey(QrealKey *key,
 
 void QrealAnimator::prp_setAbsFrame(const int &frame) {
     Animator::prp_setAbsFrame(frame);
-    qreal newValue = qra_getValueAtAbsFrame(anim_mCurrentAbsFrame);
+    qreal newValue = qra_getValueAtRelFrame(anim_mCurrentRelFrame);
     if(newValue == mCurrentValue) return;
     mCurrentValue = newValue;
 

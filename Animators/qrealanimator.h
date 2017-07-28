@@ -123,8 +123,8 @@ public:
     void qra_saveValueToKey(const int &frame, const qreal &value);
     void removeThisFromGraphAnimator();
 
-    int prp_saveToSql(QSqlQuery *query, const int &parentId = 0);
-    void prp_loadFromSql(const int &qrealAnimatorId);
+    int saveToSql(QSqlQuery *query, const int &parentId = 0);
+    void loadFromSql(const int &qrealAnimatorId);
     void anim_loadKeysFromSql(const int &qrealAnimatorId);
     void incSavedValueToCurrentValue(const qreal &incBy);
     void multSavedValueToCurrentValue(const qreal &multBy);

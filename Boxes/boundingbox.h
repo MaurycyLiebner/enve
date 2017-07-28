@@ -100,7 +100,13 @@ struct BoundingBoxRenderData : public Updatable {
     void schedulerProccessed();
 
     void addSchedulerNow();
-private:
+
+    virtual bool allDataReady() { return true; }
+
+    void dataSet();
+
+protected:
+    bool mDataSet = false;
     virtual void drawSk(SkCanvas *canvas) = 0;
 };
 
@@ -277,7 +283,7 @@ public:
 
     virtual VectorPath *objectToPath() { return NULL; }
     virtual VectorPath *strokeToPath() { return NULL; }
-    virtual void prp_loadFromSql(const int &boundingBoxId);
+    virtual void loadFromSql(const int &boundingBoxId);
 
     void updatePrettyPixmap();
 
@@ -492,7 +498,7 @@ public:
     void nullifyCurrentRenderData();
     bool isRelFrameInVisibleDurationRect(const int &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
-    void anim_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
     virtual void processSchedulers();

@@ -13,16 +13,16 @@ PathEffectAnimators::PathEffectAnimators() :
 //    mParentBox->addPathEffect(effect);
 //}
 
-//int PathEffectAnimators::prp_saveToSql(QSqlQuery *query,
+//int PathEffectAnimators::saveToSql(QSqlQuery *query,
 //                                    const int &boundingBoxSqlId) {
 //    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
 //        ((PathEffect*)effect.data())->
-//                prp_saveToSql(query, boundingBoxSqlId);
+//                saveToSql(query, boundingBoxSqlId);
 //    }
 //    return boundingBoxSqlId;
 //}
 
-//void PathEffectAnimators::prp_loadFromSql(const int &boundingBoxSqlId) {
+//void PathEffectAnimators::loadFromSql(const int &boundingBoxSqlId) {
 //    QSqlQuery query;
 //    QString queryStr;
 //    queryStr = "SELECT * FROM PathEffect WHERE boundingboxid = " +
@@ -56,7 +56,7 @@ PathEffectAnimators::PathEffectAnimators() :
 //            } else {
 //                continue;
 //            }
-//            effect->prp_loadFromSql(query.value(idId).toInt());
+//            effect->loadFromSql(query.value(idId).toInt());
 //            addEffect(effect);
 //        }
 //    } else {
