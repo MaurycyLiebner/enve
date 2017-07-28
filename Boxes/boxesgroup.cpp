@@ -126,7 +126,8 @@ void BoxesGroup::loadFromSql(const int &boundingBoxId) {
     BoundingBox::loadFromSql(boundingBoxId);
     loadChildrenFromSql(boundingBoxId, false);
 }
-
+#include "imagebox.h"
+#include "videobox.h"
 BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
                                             const bool &loadInBox) {
     QString thisBoundingBoxIdStr = QString::number(thisBoundingBoxId);
@@ -169,6 +170,16 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
                 Rectangle *rectangle = new Rectangle();
                 rectangle->loadFromSql(query.value(idId).toInt());
                 addChild(rectangle);
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_IMAGE ) {
+                ImageBox *image = new ImageBox();
+                image->loadFromSql(query.value(idId).toInt());
+                addChild(image);
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_VIDEO ) {
+                VideoBox *video = new VideoBox("");
+                video->loadFromSql(query.value(idId).toInt());
+                addChild(video);
             }
         }
     } else {

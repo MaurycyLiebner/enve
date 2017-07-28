@@ -30,6 +30,7 @@ public:
     static void addHandler(FileCacheHandler *handlerPtr);
     static FileCacheHandler *getHandlerForFilePath(const QString &filePath);
     static void removeHandler(FileCacheHandler *handler);
+    static void clearAll();
 private:
     static QList<FileCacheHandler*> mFileCacheHandlers;
 };

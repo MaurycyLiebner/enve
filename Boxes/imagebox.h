@@ -45,7 +45,7 @@ public:
     ImageBox(QString filePath = "");
 
     void reloadPixmap();
-    void setFilePath(QString path);
+    void setFilePath(const QString &path);
 
     void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate();
@@ -60,6 +60,8 @@ public:
 
     BoundingBoxRenderData *createRenderData();
 
+    void loadFromSql(const int &boundingBoxId);
+    int saveToSql(QSqlQuery *query, const int &parentId);
 private:
     ImageCacheHandler *mImgCacheHandler;
     QString mImageFilePath;

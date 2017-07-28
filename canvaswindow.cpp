@@ -98,10 +98,12 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
         disconnect(mPreviewFPSTimer, SIGNAL(timeout()),
                    mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
     }
-    mCurrentCanvas = canvas->ref<Canvas>();
-    if(mCurrentCanvas == NULL) {
+
+    if(canvas == NULL) {
         mCurrentSoundComposition = NULL;
+        mCurrentCanvas.reset();
     } else {
+        mCurrentCanvas = canvas->ref<Canvas>();
         mCurrentSoundComposition = mCurrentCanvas->getSoundComposition();
         connect(mPreviewFPSTimer, SIGNAL(timeout()),
                 mCurrentCanvas.data(), SLOT(nextPreviewFrame()) );
@@ -162,7 +164,6 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
 
     mCurrentCanvas->setCanvasMode(mode);
     MainWindow::getInstance()->updateCanvasModeButtonsChecked();
-    callUpdateSchedulers();
 }
 
 void CanvasWindow::callUpdateSchedulers() {
@@ -307,6 +308,7 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
     } else {
         return false;
     }
+    callUpdateSchedulers();
     return true;
 }
 
@@ -666,7 +668,11 @@ void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
 void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
                                               Updatable *lastUpdatable) {
     if(lastUpdatable != NULL) {
-        lastUpdatable->afterUpdate();
+        if(mClearBeingUpdated) {
+            lastUpdatable->clear();
+        } else {
+            lastUpdatable->afterUpdate();
+        }
 //        mLastUpdatedBox->setAwaitingUpdate(false);
 //        if(mLastUpdatedBox->shouldRedoUpdate()) {
 //            mLastUpdatedBox->setRedoUpdateToFalse();
@@ -675,6 +681,7 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
         qDebug() << "no more updatables";
+        mClearBeingUpdated = false;
         mNoBoxesAwaitUpdate = true;
         mFreeThreads << threadId;
         if(mBoxesUpdateFinishedFunction != NULL) {
@@ -873,6 +880,8 @@ void CanvasWindow::saveOutput(const QString &renderDest,
 
 void CanvasWindow::clearAll() {
     //SWT_clearAll();
+    mClearBeingUpdated = !mNoBoxesAwaitUpdate;
+    mUpdatablesAwaitingUpdate.clear();
     mCanvasList.clear();
     setCurrentCanvas((Canvas*)NULL);
 }

@@ -1029,6 +1029,12 @@ void MainWindow::clearAll() {
     mCurrentCanvasComboBox->clear();
     mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
+    foreach(ClipboardContainer *cont, mClipboardContainers) {
+        delete cont;
+    }
+
+    mClipboardContainers.clear();
+    FileSourcesCache::clearAll();
     //mBoxListWidget->clearAll();
 }
 

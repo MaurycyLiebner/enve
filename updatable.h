@@ -37,17 +37,20 @@ public:
     bool isBeingProcessed() { return mBeingProcessed; }
     bool finished() { return mFinished; }
     bool schedulerAdded() { return mSchedulerAdded; }
+
+    void clear();
 protected:
     bool mFinished = false;
     bool mSchedulerAdded = false;
     bool mBeingProcessed = false;
+    bool mAwaitingUpdate = false;
+
     void tellDependentThatFinished();
 
     std::shared_ptr<Updatable> mSelfRef;
     QList<Updatable*> mDependent;
     QList<Updatable*> mUpdateDependent;
     int nDependancies = 0;
-    bool mAwaitingUpdate = false;
 };
 
 #endif // UPDATABLE_H

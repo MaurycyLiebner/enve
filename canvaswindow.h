@@ -165,6 +165,8 @@ protected:
     QString mOutputString;
     int mCurrentRenderFrame;
 
+    bool mClearBeingUpdated = false;
+
     void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
     CanvasQSPtr mCurrentCanvas;
     QList<CanvasQSPtr> mCanvasList;

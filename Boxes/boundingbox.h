@@ -38,7 +38,9 @@ enum BoundingBoxType {
     TYPE_CANVAS,
     TYPE_INTERNAL_LINK,
     TYPE_EXTERNAL_LINK,
-    TYPE_PARTICLES
+    TYPE_PARTICLES,
+    TYPE_VIDEO,
+    TYPE_IMAGESQUENCE
 };
 
 class BoxesGroup;

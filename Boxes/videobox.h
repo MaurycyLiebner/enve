@@ -24,7 +24,9 @@ public:
 
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
-                                               const int &relFrame);
+                                              const int &relFrame);
+    int saveToSql(QSqlQuery *query, const int &parentId);
+    void loadFromSql(const int &boundingBoxId);
 protected:
     void updateFrameCount(const char *path);
 private:

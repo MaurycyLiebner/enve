@@ -21,11 +21,13 @@ TextBox::TextBox() :
 int TextBox::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = PathBox::saveToSql(query, parentId);
 
+    int textId = mText->saveToSql(query, parentId);
+
     if(!query->exec(QString("INSERT INTO textbox (boundingboxid, "
-                           "text, fontfamily, fontstyle, fontsize) "
+                           "stringanimatorid, fontfamily, fontstyle, fontsize) "
                 "VALUES ('%1', '%2', '%3', '%4', %5)").
                 arg(boundingBoxId).
-                arg(mText->getCurrentTextValue()).
+                arg(textId).
                 arg(mFont.family()).
                 arg(mFont.style()).
                 arg(mFont.pointSizeF()) ) ) {
@@ -43,15 +45,15 @@ void TextBox::loadFromSql(const int &boundingBoxId) {
             QString::number(boundingBoxId);
     if(query.exec(queryStr) ) {
         query.next();
-        int idText = query.record().indexOf("text");
+        int idText = query.record().indexOf("stringanimatorid");
         int idFontFamily = query.record().indexOf("fontfamily");
         int idFontStyle = query.record().indexOf("fontstyle");
         int idFontSize = query.record().indexOf("fontsize");
 
-        setText(query.value(idText).toString());
         setSelectedFontFamilyAndStyle(query.value(idFontFamily).toString(),
                                       query.value(idFontStyle).toString() );
         setSelectedFontSize(query.value(idFontSize).toReal());
+        mText->loadFromSql(query.value(idText).toInt());
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }

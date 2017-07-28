@@ -173,10 +173,23 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
     query->exec("CREATE TABLE textbox "
                "(id INTEGER PRIMARY KEY, "
                "boundingboxid INTEGER, "
-               "text TEXT, "
+               "stringanimatorid INTEGER, "
                "fontfamily TEXT, "
                "fontstyle TEXT, "
                "fontsize REAL, "
+               "FOREIGN KEY(stringanimatorid) REFERENCES qstringanimator(id), "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE imagebox "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "imagefilepath TEXT, "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE videobox "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "srcfilepath TEXT, "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 
     query->exec("CREATE TABLE pixmapeffect "

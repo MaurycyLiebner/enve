@@ -34,6 +34,14 @@ void FileSourcesCache::removeHandler(FileCacheHandler *handler) {
     mFileCacheHandlers.removeOne(handler);
 }
 
+void FileSourcesCache::clearAll() {
+    Q_FOREACH(FileCacheHandler *handler, mFileCacheHandlers) {
+        handler->clearCache();
+        delete handler;
+    }
+    mFileCacheHandlers.clear();
+}
+
 FileCacheHandler::FileCacheHandler(const QString &filePath) {
     mFileHandlerRef = ref<FileCacheHandler>();
     mFilePath = filePath;

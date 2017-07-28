@@ -53,3 +53,13 @@ void Updatable::addScheduler() {
 void Updatable::addSchedulerNow() {
     MainWindow::getInstance()->addUpdateScheduler(this);
 }
+
+void Updatable::clear() {
+    mSelfRef.reset();
+    mDependent.clear();
+    mUpdateDependent.clear();
+    mFinished = false;
+    mSchedulerAdded = false;
+    mBeingProcessed = false;
+    mAwaitingUpdate = false;
+}

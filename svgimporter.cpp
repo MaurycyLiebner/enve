@@ -957,7 +957,7 @@ void loadPolyline(const QDomElement &pathElement,
     QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
     attributes->apply(vectorPath);
-    parentGroup->addChild(parentGroup);
+    parentGroup->addChild(vectorPath);
 }
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
