@@ -251,7 +251,7 @@ void ComplexAnimator::anim_drawKey(
     }
 }
 
-void ComplexAnimator::anim_loadKeysFromSql(const int &qrealAnimatorId) {
+void ComplexAnimator::loadKeysFromSql(const int &qrealAnimatorId) {
     Q_UNUSED(qrealAnimatorId);
 }
 

@@ -8,12 +8,16 @@ class QStringKey : public Key {
 public:
     QStringKey(const QString &stringT,
                const int &relFrame,
-               QStringAnimator *parentAnimator);
+               QStringAnimator *parentAnimator = NULL);
 
     bool differsFromKey(Key *key);
 
     const QString &getText() { return mText; }
     void setText(const QString &text) { mText = text; }
+    int saveToSql(const int &parentAnimatorSqlId);
+    void loadFromSql(const int &keyId);
+
+    static QStringKey *qStringKeyFromSql(const int &keyId);
 private:
     QString mText;
 };
@@ -30,10 +34,12 @@ public:
     bool SWT_isQStringAnimator() { return true; }
     QString getTextValueAtRelFrame(const int &relFrame);
     void anim_saveCurrentValueAsKey();
-    void anim_loadKeysFromSql(const int &qrealAnimatorId);
+    void loadKeysFromSql(const int &qrealAnimatorId);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
-                                               const int &relFrame);
+                                              const int &relFrame);
+    void loadFromSql(const int &qstringAnimatorId);
+    int saveToSql(QSqlQuery *query, const int &parentId);
 public slots:
     void prp_setRecording(const bool &rec);
 private:

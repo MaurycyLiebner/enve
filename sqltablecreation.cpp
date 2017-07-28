@@ -20,6 +20,18 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "qrealanimatorid INTEGER, "
                "FOREIGN KEY(qrealanimatorid) REFERENCES qrealanimator(id) )");
 
+    query->exec("CREATE TABLE qstringanimator "
+               "(id INTEGER PRIMARY KEY,"
+               "currenttext TEXT )");
+
+    query->exec("CREATE TABLE qstringkey "
+               "(id INTEGER PRIMARY KEY, "
+               "string TEXT, "
+               "frame INTEGER, "
+               "qstringanimatorid INTEGER, "
+               "FOREIGN KEY(qstringanimatorid) REFERENCES qstringanimator(id) )");
+
+
     query->exec("CREATE TABLE transformanimator "
                "(id INTEGER PRIMARY KEY, "
                "posanimatorid INTEGER, "

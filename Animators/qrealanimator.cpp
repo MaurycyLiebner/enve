@@ -49,7 +49,7 @@ void QrealAnimator::loadFromSql(const int &qrealAnimatorId) {
         int idQrealAnimatorId = query.record().indexOf("id");
         int currentValue = query.record().indexOf("currentvalue");
 
-        anim_loadKeysFromSql(query.value(idQrealAnimatorId).toInt() );
+        loadKeysFromSql(query.value(idQrealAnimatorId).toInt() );
 
         if(anim_mKeys.isEmpty()) {
             qra_setCurrentValue(query.value(currentValue).toReal());
@@ -61,7 +61,7 @@ void QrealAnimator::loadFromSql(const int &qrealAnimatorId) {
     }
 }
 
-void QrealAnimator::anim_loadKeysFromSql(const int &qrealAnimatorId) {
+void QrealAnimator::loadKeysFromSql(const int &qrealAnimatorId) {
     QSqlQuery query;
 
     QString queryStr = "SELECT * FROM qrealkey WHERE qrealanimatorid = " +

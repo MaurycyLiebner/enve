@@ -125,7 +125,7 @@ public:
 
     int saveToSql(QSqlQuery *query, const int &parentId = 0);
     void loadFromSql(const int &qrealAnimatorId);
-    void anim_loadKeysFromSql(const int &qrealAnimatorId);
+    void loadKeysFromSql(const int &qrealAnimatorId);
     void incSavedValueToCurrentValue(const qreal &incBy);
     void multSavedValueToCurrentValue(const qreal &multBy);
 

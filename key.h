@@ -13,7 +13,7 @@ class KeysClipboardContainer;
 
 class Key : public StdSelfRef {
 public:
-    Key(Animator *parentAnimator);
+    Key(Animator *parentAnimator = NULL);
 //    QrealPoint *mousePress(qreal frameT, qreal valueT,
 //                    qreal pixelsPerFrame, qreal pixelsPerValue);
     virtual ~Key();
@@ -42,9 +42,6 @@ public:
     void removeFromAnimator();
 
     virtual void deleteKey() { removeFromAnimator(); }
-
-    int saveToSql(int parentAnimatorSqlId);
-    void loadFromSql(int keyId);
 
     virtual void copyToContainer(KeysClipboardContainer *container);
     virtual void cancelFrameTransform();

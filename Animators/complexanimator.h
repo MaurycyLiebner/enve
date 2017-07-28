@@ -59,7 +59,7 @@ public:
                       const qreal &drawY,
                       const int &startFrame);
 
-    void anim_loadKeysFromSql(const int &qrealAnimatorId);
+    void loadKeysFromSql(const int &qrealAnimatorId);
 
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator *parentAnimator = NULL);

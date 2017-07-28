@@ -90,8 +90,6 @@ public:
 
     virtual void anim_saveCurrentValueAsKey() {}
 
-    virtual void anim_loadKeysFromSql(const int &qrealAnimatorId) = 0;
-
     Key *anim_getNextKey(Key *key);
     Key *anim_getPrevKey(Key *key);
     int anim_getNextKeyRelFrame(Key *key);
