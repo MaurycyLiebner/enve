@@ -121,8 +121,8 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
 int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = BoundingBox::saveToSql(query, parentId);
 
-    int fillPts = mFillGradientPoints->startPoint->saveToSql(query);
-    int strokePts = mStrokeGradientPoints->startPoint->saveToSql(query);
+    int fillPts = mFillGradientPoints->saveToSql(query);
+    int strokePts = mStrokeGradientPoints->saveToSql(query);
 
     int fillSettingsId = mFillSettings->saveToSql(query);
     int strokeSettingsId = mStrokeSettings->saveToSql(query);

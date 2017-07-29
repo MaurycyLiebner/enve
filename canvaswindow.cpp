@@ -826,15 +826,10 @@ Canvas *CanvasWindow::loadCanvasesFromSql() {
     QString queryStr = "SELECT * FROM canvas";
     if(query.exec(queryStr)) {
         while(query.next()) {
-            int idWidth = query.record().indexOf("width");
-            int idHeight = query.record().indexOf("height");
-            int idFrameCount = query.record().indexOf("framecount");
-            int idBoundingBoxId = query.record().indexOf("boundingboxid");
-
-            int width = query.value(idWidth).toInt();
-            int height = query.value(idHeight).toInt();
-            int frameCount = query.value(idFrameCount).toInt();
-            int boundingBoxId = query.value(idBoundingBoxId).toInt();
+            int width = query.value("width").toInt();
+            int height = query.value("height").toInt();
+            int frameCount = query.value("framecount").toInt();
+            int boundingBoxId = query.value("boundingboxid").toInt();
 
             Canvas *canvas =
                     new Canvas(MainWindow::getInstance()->getFillStrokeSettings(),
