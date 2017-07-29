@@ -38,8 +38,7 @@ extern "C" {
 
 MainWindow *MainWindow::mMainWindowInstance;
 
-void MainWindow::keyPressEvent(QKeyEvent *event)
-{
+void MainWindow::keyPressEvent(QKeyEvent *event) {
     processKeyEvent(event);
 }
 
@@ -1011,7 +1010,12 @@ void MainWindow::scheduleDisplayedFillStrokeSettingsUpdate()
 
 bool MainWindow::processKeyEvent(QKeyEvent *event) {
     if(isActiveWindow()) {
-        bool returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
+        bool returnBool = false;
+        if(mBoxesListAnimationDockWidget->processKeyEvent(event)) {
+            returnBool = true;
+        } else {
+            returnBool = KeyFocusTarget::KFT_handleKeyEvent(event);
+        }
         callUpdateSchedulers();
         return returnBool;
     }

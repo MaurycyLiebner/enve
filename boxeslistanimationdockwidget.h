@@ -60,8 +60,7 @@ class BoxesListAnimationDockWidget : public QWidget
     Q_OBJECT
 public:
     explicit BoxesListAnimationDockWidget(MainWindow *parent);
-    bool processUnfilteredKeyEvent(QKeyEvent *event);
-    bool processFilteredKeyEvent(QKeyEvent *event);
+    bool processKeyEvent(QKeyEvent *event);
     void previewFinished();
     void previewBeingPlayed();
     void previewBeingRendered();

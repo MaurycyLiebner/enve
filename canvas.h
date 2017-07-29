@@ -439,7 +439,6 @@ public:
     void selectAllAction();
     void clearSelectionAction();
     void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
-    void scheduleUpdate();
     bool shouldScheduleUpdate() {
         return isVisibleAndInVisibleDurationRect() ||
                isInVisibleDurationRect();

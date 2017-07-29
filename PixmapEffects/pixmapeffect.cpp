@@ -861,8 +861,14 @@ PixmapEffectRenderData *DesaturateEffect::getPixmapEffectRenderDataForRelFrame(
 PixmapEffectRenderData *ColorizeEffect::getPixmapEffectRenderDataForRelFrame(
         const int &relFrame) {
     ColorizeEffectRenderData *renderData = new ColorizeEffectRenderData();
-    renderData->color =
-            mColorAnimator->getColorAtRelFrame(relFrame);
+    renderData->hue =
+            mHueAnimator->getCurrentValueAtRelFrame(relFrame);
+    renderData->saturation =
+            mSaturationAnimator->getCurrentValueAtRelFrame(relFrame);
+    renderData->lightness =
+            mLightnessAnimator->getCurrentValueAtRelFrame(relFrame);
+    renderData->alpha =
+            mAlphaAnimator->getCurrentValueAtRelFrame(relFrame);
     return renderData;
 }
 
@@ -870,38 +876,61 @@ ColorizeEffect::ColorizeEffect() :
     PixmapEffect(EFFECT_COLORIZE) {
     prp_setName("colorize");
 
-    mColorAnimator->prp_setName("color");
-    ca_addChildAnimator(mColorAnimator.data());
+    mHueAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+    mSaturationAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+    mLightnessAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+    mAlphaAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+
+    mHueAnimator->prp_setName("hue");
+    mHueAnimator->qra_setValueRange(0., 1.);
+    mHueAnimator->setPrefferedValueStep(0.01);
+
+    mSaturationAnimator->prp_setName("saturation");
+    mSaturationAnimator->qra_setValueRange(0., 1.);
+    mSaturationAnimator->setPrefferedValueStep(0.01);
+
+    mLightnessAnimator->prp_setName("lightness");
+    mLightnessAnimator->qra_setValueRange(-1., 1.);
+    mLightnessAnimator->setPrefferedValueStep(0.01);
+
+    mAlphaAnimator->prp_setName("alpha");
+    mAlphaAnimator->qra_setValueRange(0., 1.);
+    mAlphaAnimator->setPrefferedValueStep(0.01);
+
+    ca_addChildAnimator(mHueAnimator.data());
+    ca_addChildAnimator(mSaturationAnimator.data());
+    ca_addChildAnimator(mLightnessAnimator.data());
+    ca_addChildAnimator(mAlphaAnimator.data());
 }
 
 int ColorizeEffect::saveToSql(QSqlQuery *query,
-                                    const int &boundingBoxSqlId) {
+                              const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::saveToSql(query,
                                                      boundingBoxSqlId);
-    int infId = mColorAnimator->saveToSql(query);
+//    int infId = mColorAnimator->saveToSql(query);
 
-    if(!query->exec(
-        QString("INSERT INTO colorizeeffect (pixmapeffectid, "
-                "influenceid) "
-                "VALUES (%1, %2)").
-                arg(pixmapEffectId).
-                arg(infId) ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
+//    if(!query->exec(
+//        QString("INSERT INTO colorizeeffect (pixmapeffectid, "
+//                "influenceid) "
+//                "VALUES (%1, %2)").
+//                arg(pixmapEffectId).
+//                arg(infId) ) ) {
+//        qDebug() << query->lastError() << endl << query->lastQuery();
+//    }
     return pixmapEffectId;
 }
 
 void ColorizeEffect::loadFromSql(const int &identifyingId) {
-    QSqlQuery query;
+//    QSqlQuery query;
 
-    QString queryStr = "SELECT * FROM colorizeeffect WHERE pixmapeffectid = " +
-            QString::number(identifyingId);
-    if(query.exec(queryStr)) {
-        query.next();
-        mColorAnimator->loadFromSql(query.value("influenceid").toInt() );
-    } else {
-        qDebug() << "Could not load colorizeeffect with id " << identifyingId;
-    }
+//    QString queryStr = "SELECT * FROM colorizeeffect WHERE pixmapeffectid = " +
+//            QString::number(identifyingId);
+//    if(query.exec(queryStr)) {
+//        query.next();
+//        mColorAnimator->loadFromSql(query.value("influenceid").toInt() );
+//    } else {
+//        qDebug() << "Could not load colorizeeffect with id " << identifyingId;
+//    }
 }
 
 Property *ColorizeEffect::makeDuplicate() {
@@ -913,11 +942,20 @@ Property *ColorizeEffect::makeDuplicate() {
 void ColorizeEffect::makeDuplicate(Property *target) {
     ColorizeEffect *colorizeTarget = (ColorizeEffect*)target;
 
-    colorizeTarget->duplicateInfluenceAnimatorFrom(mColorAnimator.data());
+    colorizeTarget->duplicateAnimatorsFrom(mHueAnimator.data(),
+                                           mSaturationAnimator.data(),
+                                           mLightnessAnimator.data(),
+                                           mAlphaAnimator.data());
 }
 
-void ColorizeEffect::duplicateInfluenceAnimatorFrom(ColorAnimator *source) {
-    source->makeDuplicate(mColorAnimator.data());
+void ColorizeEffect::duplicateAnimatorsFrom(QrealAnimator *hue,
+                                            QrealAnimator *saturation,
+                                            QrealAnimator *lightness,
+                                            QrealAnimator *alpha) {
+    hue->makeDuplicate(mHueAnimator.data());
+    saturation->makeDuplicate(mSaturationAnimator.data());
+    lightness->makeDuplicate(mLightnessAnimator.data());
+    alpha->makeDuplicate(mAlphaAnimator.data());
 }
 
 void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
@@ -925,10 +963,8 @@ void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                                               const qreal &scale) {
     Q_UNUSED(imgPtr);
     Q_UNUSED(scale);
-    fmt_filters::colorizeAdd(img, color.gl_r,
-                          color.gl_g,
-                          color.gl_b,
-                          color.gl_a);
+    fmt_filters::colorizeHSV(img,
+                             hue, saturation, lightness, alpha);
 }
 
 void DesaturateEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,

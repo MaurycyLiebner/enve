@@ -263,6 +263,8 @@ void KeysView::paintEvent(QPaintEvent *) {
         p.fillRect(rect(), QColor(60, 60, 60));
     }
 
+    if(mPixelsPerFrame < 0.001) return;
+
 //    QRect rect1(0, 0, 10, height());
 //    QLinearGradient gradient1(QPoint(rect1.left(), 0),
 //                              QPoint(rect1.right(), 0));

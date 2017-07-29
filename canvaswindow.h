@@ -101,7 +101,7 @@ public:
     void setLocalPivot(const bool &bT);
 
     void importFile(const QString &path,
-                    const QPointF &absDropPos = QPointF(0., 0.));
+                    const QPointF &relDropPos = QPointF(0., 0.));
 
     QWidget *getCanvasWidget();
 

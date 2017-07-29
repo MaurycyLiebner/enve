@@ -71,6 +71,7 @@ ImageMagick Studio.
 */
 
 #include "fmt_filters.h"
+#include "Colors/helpers.h"
 
 #include <cmath>
 #include "cstring"
@@ -92,26 +93,26 @@ namespace fmt_filters
 
 static void rgb2hsv(const fmt_filters::rgb &rgb, s32 *h, s32 *s, s32 *v);
 static void hsv2rgb(s32 h, s32 s, s32 v, fmt_filters::rgb *rgb);
-static fmt_filters::rgba interpolateColor(const fmt_filters::image &image, double x_offset, double y_offset, const fmt_filters::rgba &background);
+static fmt_filters::rgba interpolateColor(const fmt_filters::image &image, qreal x_offset, qreal y_offset, const fmt_filters::rgba &background);
 static u32 generateNoise(u32 pixel, fmt_filters::NoiseType noise_type);
 static u32 intensityValue(s32 r, s32 g, s32 b);
 static u32 intensityValue(const fmt_filters::rgba &rr);
-static s32 getBlurKernel(s32 width, double sigma, double **kernel);
-static void blurScanLine(double *kernel, s32 width, fmt_filters::rgba *src, fmt_filters::rgba *dest, s32 columns);
+static s32 getBlurKernel(s32 width, qreal sigma, qreal **kernel);
+static void blurScanLine(qreal *kernel, s32 width, fmt_filters::rgba *src, fmt_filters::rgba *dest, s32 columns);
 static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, const s32 columns,
                         const s32 rows, u8 *f, u8 *g);
-static bool convolveImage(fmt_filters::image *image, fmt_filters::rgba **dest, const unsigned int order, const double *kernel);
-static int getOptimalKernelWidth(double radius, double sigma);
+static bool convolveImage(fmt_filters::image *image, fmt_filters::rgba **dest, const unsigned int order, const qreal *kernel);
+static int getOptimalKernelWidth(qreal radius, qreal sigma);
 
 template<class T>
 static void scaleDown(T &val, T min, T max);
 
 struct double_packet
 {
-    double red;
-    double green;
-    double blue;
-    double alpha;
+    qreal red;
+    qreal green;
+    qreal blue;
+    qreal alpha;
 };
 
 struct short_packet
@@ -127,91 +128,83 @@ bool checkImage(const image &im)
     return (im.rw && im.rh && im.w && im.h && im.data);
 }
 
+#include "Colors/helpers.h"
 // colorize tool
-void colorizeAdd(const image &im,
-              const double &red,
-              const double &green,
-              const double &blue,
-              const double &alpha) {
+void colorizeHSV(const image &im,
+              const qreal &hue,
+              const qreal &saturation,
+              const qreal &lightness,
+              const qreal &alpha) {
     // check if all parameters are good
-    if(!checkImage(im))
-    return;
+    if(!checkImage(im)) return;
 
 //    if(!red && !green && !blue)
 //    return;
 
     u8 *bits;
-    s32 val;
-    double minV = min(blue, min(red, green))/255.;
-    s32 V[3] = { round((red - minV)*alpha*255),
-                 round((green - minV)*alpha*255),
-                 round((blue - minV)*alpha*255) };
 
     // add to RED component 'red' value, and check if the result is out of bounds.
     // do the same with GREEN and BLUE channels.
-    for(s32 y = 0;y < im.h;++y) {
-        bits = im.data + im.rw * y * sizeof(rgba);
+    if(alpha > 0.001) {
+        for(s32 y = 0; y < im.h; ++y) {
+            bits = im.data + im.rw * y * sizeof(rgba);
 
-        for(s32 x = 0;x < im.w;x++) {
-            s32 aT = val = (s32)*(bits + 4);
-            for(s32 v = 0;v < 3;++v) {
-                val = (s32)*(bits + v) + V[v]*aT/255;
+            for(s32 x = 0; x < im.w; x++) {
+                u8 u8aT = *(bits + 3);
+                if(u8aT != 0) {
+                    qreal aT = u8aT/255.;
+                    u8 bT = *(bits);
+                    u8 gT = *(bits + 1);
+                    u8 rT = *(bits + 2);
+                    u8 maxT = MAX3(rT, gT, bT);
+                    u8 minT = MIN3(rT, gT, bT);
 
-                if(val > 255) {
-                    *(bits + v) = 255;
-                } else if(val < 0) {
-                    *(bits + v) = 0;
-                } else {
-                    *(bits + v) = val;
+                    qreal hT = hue;
+                    qreal sT = saturation;
+                    qreal lT = (maxT + minT) / 510. + lightness;
+                    qhsl_to_rgb(&hT, &sT, &lT);
+
+                    *(bits) = (u8)qMin(255, qMax(0,
+                            qRound(
+                                (alpha*lT*255. + (1. - alpha)*bT)*aT)));
+                    *(bits + 1) = (u8)qMin(255, qMax(0,
+                            qRound(
+                                (alpha*sT*255. + (1. - alpha)*gT)*aT)));
+                    *(bits + 2) = (u8)qMin(255, qMax(0,
+                            qRound(
+                                (alpha*hT*255. + (1. - alpha)*rT)*aT)));
                 }
+
+                bits += 4;
             }
-
-            bits += 4;
         }
-    }
-}
+    } else {
+        return;
+//        for(s32 y = 0; y < im.h; ++y) {
+//            bits = im.data + im.rw * y * sizeof(rgba);
 
+//            for(s32 x = 0; x < im.w; x++) {
+//                u8 u8aT = *(bits + 3);
+//                if(u8aT != 0) {
+//                    u8 bT = *(bits);
+//                    u8 gT = *(bits + 1);
+//                    u8 rT = *(bits + 2);
+//                    qreal aT = u8aT;
+//                    u8 maxT = MAX3(rT, gT, bT);
+//                    u8 minT = MIN3(rT, gT, bT);
 
-// colorize tool
-void colorizeRemove(const image &im,
-              const double &red,
-              const double &green,
-              const double &blue,
-              const double &alpha) {
-    // check if all parameters are good
-    if(!checkImage(im))
-    return;
+//                    qreal hT = hue;
+//                    qreal sT = saturation;
+//                    qreal lT = (maxT + minT) / 510. + lightness;
+//                    qhsl_to_rgb(&hT, &sT, &lT);
 
-//    if(!red && !green && !blue)
-//    return;
-
-    u8 *bits;
-    s32 val;
-    s32 V[3] = { round(red*alpha*255),
-                 round(green*alpha*255),
-                 round(blue*alpha*255) };
-
-    // add to RED component 'red' value, and check if the result is out of bounds.
-    // do the same with GREEN and BLUE channels.
-    for(s32 y = 0;y < im.h;++y) {
-        bits = im.data + im.rw * y * sizeof(rgba);
-
-        for(s32 x = 0;x < im.w;x++) {
-            s32 aT = val = (s32)*(bits + 4);
-            for(s32 v = 0;v < 3;++v) {
-                val = (s32)*(bits + v) + (255 - V[v])*aT/255;
-
-                if(val > 255) {
-                    *(bits + v) = 255;
-                } else if(val < 0) {
-                    *(bits + v) = 0;
-                } else {
-                    *(bits + v) = val;
-                }
-            }
-
-            bits += 4;
-        }
+//                    *(bits) = (u8)qMin(255, qMax(0, qRound(lT*aT)));
+//                    *(bits + 1) = (u8)qMin(255, qMax(0, qRound(sT*aT)));
+//                    *(bits + 2) = (u8)qMin(255, qMax(0, qRound(hT*aT)));
+//                }
+//                bits += 4;
+//            }
+//        }
     }
 }
 
@@ -246,7 +239,7 @@ void brightness(const image &im, s32 bn)
 }
 
 // gamma tool
-void gamma(const image &im, double L)
+void gamma(const image &im, qreal L)
 {
     // check if all parameters are good
     if(!checkImage(im))
@@ -627,7 +620,7 @@ void threshold(const image &im, u32 trh)
     }
 }
 
-void solarize(const image &im, double factor) {
+void solarize(const image &im, qreal factor) {
     if(!checkImage(im))
         return;
 
@@ -691,11 +684,11 @@ void spread(const image &im, u32 amount) {
     delete [] n;
 }
 
-void swirl(const image &im, double degrees, const rgba &background) {
+void swirl(const image &im, qreal degrees, const rgba &background) {
     if(!checkImage(im))
         return;
 
-    double cosine, distance, factor, radius, sine, x_center, x_distance,
+    qreal cosine, distance, factor, radius, sine, x_center, x_distance,
             x_scale, y_center, y_distance, y_scale;
     s32 x, y;
 
@@ -796,14 +789,14 @@ void noise(const image &im, NoiseType noise_type)
     delete [] dest;
 }
 
-void implode(const image &im, double _factor, const rgba &background)
+void implode(const image &im, qreal _factor, const rgba &background)
 {
     if(!checkImage(im))
         return;
 
-    double amount, distance, radius;
-    double x_center, x_distance, x_scale;
-    double y_center, y_distance, y_scale;
+    qreal amount, distance, radius;
+    qreal x_center, x_distance, x_scale;
+    qreal y_center, y_distance, y_scale;
     rgba *dest;
     s32 x, y;
 
@@ -834,7 +827,7 @@ void implode(const image &im, double _factor, const rgba &background)
     if(amount >= 0)
         amount/=10.0;
 
-    double factor;
+    qreal factor;
 
     for(y = 0;y < im.h;++y)
     {
@@ -1000,35 +993,35 @@ void despeckle(const image &im)
 }
 
 void anim_fast_blur(const image &im,
-                    const double &fRadius) {
+                    const qreal &fRadius) {
     if(fRadius < 0.01) return;
     unsigned char *pix = im.data;
     int w = im.w;
     int h = im.h;
 
-    double divF = fRadius + fRadius + 1.;
-    double divFInv = 1./divF;
+    qreal divF = fRadius + fRadius + 1.;
+    qreal divFInv = 1./divF;
     int iRadius = ceil(fRadius);
     int nPoints = iRadius + iRadius + 1;
-    double fracInf = 1. - iRadius + fRadius;
-    double fracInfInv = 1. - fracInf;
+    qreal fracInf = 1. - iRadius + fRadius;
+    qreal fracInfInv = 1. - fracInf;
 
-    double *rLine = new double[nPoints];
-    double *gLine = new double[nPoints];
-    double *bLine = new double[nPoints];
-    double *aLine = new double[nPoints];
+    qreal *rLine = new double[nPoints];
+    qreal *gLine = new double[nPoints];
+    qreal *bLine = new double[nPoints];
+    qreal *aLine = new double[nPoints];
 
     int wm=w-1;
     int hm=h-1;
     int wh=w*h;
-    double *r=new double[wh];
-    double *g=new double[wh];
-    double *b=new double[wh];
-    double *a=new double[wh];
-    double rsum,gsum,bsum,asum;
+    qreal *r=new double[wh];
+    qreal *g=new double[wh];
+    qreal *b=new double[wh];
+    qreal *a=new double[wh];
+    qreal rsum,gsum,bsum,asum;
     int x,y,i,p,p1,yp,yi,yw;
-    int *vMIN = new int[max(w,h)];
-    int *vMAX = new int[max(w,h)];
+    int *vMIN = new int[qMax(w,h)];
+    int *vMAX = new int[qMax(w,h)];
 
 
     yw=yi=0;
@@ -1045,7 +1038,7 @@ void anim_fast_blur(const image &im,
         asum = pix[p + 3]*fracInf;
 
         for(i = 1 - iRadius; i < iRadius ; i++){
-            p = (yi + min(wm, max(i,0))) * 4;
+            p = (yi + qMin(wm, qMax(i,0))) * 4;
             rLine[i + iRadius] = pix[p];
             rsum += pix[p];
             gLine[i + iRadius] = pix[p + 1];
@@ -1056,7 +1049,7 @@ void anim_fast_blur(const image &im,
             asum += pix[p + 3];
         }
 
-        p = (yi + min(wm, iRadius)) * 4;
+        p = (yi + qMin(wm, iRadius)) * 4;
         rLine[iRadius + iRadius] = pix[p];
         rsum += pix[p]*fracInf;
         gLine[iRadius + iRadius] = pix[p + 1];
@@ -1074,8 +1067,8 @@ void anim_fast_blur(const image &im,
             a[yi] = asum*divFInv;
 
             if(y == 0) {
-                vMIN[x]=min(x+iRadius+1,wm);
-                vMAX[x]=max(x-iRadius,0);
+                vMIN[x]=qMin(x+iRadius+1,wm);
+                vMAX[x]=qMax(x-iRadius,0);
             }
             p1 = (yw + vMIN[x])*4;
 
@@ -1119,7 +1112,7 @@ void anim_fast_blur(const image &im,
     for (x=0;x<w;x++){
         yp=-iRadius*w;
 
-        yi=max(0,yp)+x;
+        yi=qMax(0,yp)+x;
         rLine[0] = r[yi];
         rsum = r[yi]*fracInf;
         gLine[0] = g[yi];
@@ -1131,7 +1124,7 @@ void anim_fast_blur(const image &im,
         yp+=w;
 
         for(i = 1 - iRadius; i < iRadius ; i++){
-            yi=max(0,yp)+x;
+            yi=qMax(0,yp)+x;
             rLine[i + iRadius] = r[yi];
             rsum += r[yi];
             gLine[i + iRadius] = g[yi];
@@ -1143,7 +1136,7 @@ void anim_fast_blur(const image &im,
             yp+=w;
         }
 
-        yi=max(0,yp)+x;
+        yi=qMax(0,yp)+x;
         rLine[iRadius + iRadius] = r[yi];
         rsum += r[yi]*fracInf;
         gLine[iRadius + iRadius] = g[yi];
@@ -1157,20 +1150,20 @@ void anim_fast_blur(const image &im,
 
         yi=x;
         for (y=0;y<h;y++){
-            unsigned char aVal = min(255, max(0, (int)(asum*divFInv)));
-            pix[yi*4]		= min(aVal,
-                                  (unsigned char)min(255,
-                                      max(0, (int)(rsum*divFInv))));
-            pix[yi*4 + 1]	= min(aVal,
-                                  (unsigned char)min(255,
-                                      max(0, (int)(gsum*divFInv))));
-            pix[yi*4 + 2]	= min(aVal,
-                                  (unsigned char)min(255,
-                                      max(0, (int)(bsum*divFInv))));
+            unsigned char aVal = qMin(255, qMax(0, (int)(asum*divFInv)));
+            pix[yi*4]		= qMin(aVal,
+                                  (unsigned char)qMin(255,
+                                      qMax(0, (int)(rsum*divFInv))));
+            pix[yi*4 + 1]	= qMin(aVal,
+                                  (unsigned char)qMin(255,
+                                      qMax(0, (int)(gsum*divFInv))));
+            pix[yi*4 + 2]	= qMin(aVal,
+                                  (unsigned char)qMin(255,
+                                      qMax(0, (int)(bsum*divFInv))));
             pix[yi*4 + 3]	= aVal;
             if(x==0) {
-                vMIN[y]=min(y+iRadius+1,hm)*w;
-                vMAX[y]=max(y-iRadius,0)*w;
+                vMIN[y]=qMin(y+iRadius+1,hm)*w;
+                vMAX[y]=qMax(y-iRadius,0)*w;
             }
             p1=x+vMIN[y];
 
@@ -1225,12 +1218,12 @@ void anim_fast_blur(const image &im,
 }
 
 void anim_fast_shadow(const image &im,
-                      const double &fRed,
-                      const double &fGreen,
-                      const double &fBlue,
-                      const double &fDx,
-                      const double &fDy,
-                      const double &fRadius) {
+                      const qreal &fRed,
+                      const qreal &fGreen,
+                      const qreal &fBlue,
+                      const qreal &fDx,
+                      const qreal &fDy,
+                      const qreal &fRadius) {
     unsigned char *pix = im.data;
     int w = im.w;
     int h = im.h;
@@ -1238,30 +1231,30 @@ void anim_fast_shadow(const image &im,
     int iDx = floor(fDx);
     int iDy = floor(fDy);
 
-    double divF = fRadius + fRadius + 1.;
-    double divFInv = 1./divF;
+    qreal divF = fRadius + fRadius + 1.;
+    qreal divFInv = 1./divF;
     int iRadius = ceil(fRadius);
     int nPoints = iRadius + iRadius + 1;
-    double fracInf = 1. - iRadius + fRadius;
-    double fracInfInv = 1. - fracInf;
+    qreal fracInf = 1. - iRadius + fRadius;
+    qreal fracInfInv = 1. - fracInf;
 
-    double *aLine = new double[nPoints];
+    qreal *aLine = new double[nPoints];
 
     int wh=w*h;
-    double *a = new double[wh];
-    double asum;
+    qreal *a = new double[wh];
+    qreal asum;
     int x,y,i,p,p1,yp,yi,yw,dp;
-    int *vMIN = new int[max(w,h)];
-    int *vMAX = new int[max(w,h)];
+    int *vMIN = new int[qMax(w,h)];
+    int *vMAX = new int[qMax(w,h)];
     int wm=w-1;
     int hm=h-1;
 
     yw = yi = 0;
 
-    int yMin = max(iDy, 0);
-    int yMax = min(h + iDy, h);
-    int xMin = max(iDx, 0);
-    int xMax = min(w + iDx, w);
+    int yMin = qMax(iDy, 0);
+    int yMax = qMin(h + iDy, h);
+    int xMin = qMax(iDx, 0);
+    int xMax = qMin(w + iDx, w);
     dp = -iDx - iDy*w;
 
     yi += yMin*w;
@@ -1274,12 +1267,12 @@ void anim_fast_shadow(const image &im,
         asum = pix[p + 3]*fracInf;
 
         for(i = 1 - iRadius; i < iRadius ; i++){
-            p = (yi + min(wm, max(i,0)) + dp) * 4;
+            p = (yi + qMin(wm, qMax(i,0)) + dp) * 4;
             aLine[i + iRadius] = pix[p + 3];
             asum += pix[p + 3];
         }
 
-        p = (yi + min(wm, iRadius) + dp) * 4;
+        p = (yi + qMin(wm, iRadius) + dp) * 4;
         aLine[iRadius + iRadius] = pix[p + 3];
         asum += pix[p + 3]*fracInf;
 
@@ -1287,8 +1280,8 @@ void anim_fast_shadow(const image &im,
             a[yi] = asum*divFInv;
 
             if(y == yMin) {
-                vMIN[x] = min(x + iRadius + 1, wm);
-                vMAX[x] = max(x - iRadius, 0);
+                vMIN[x] = qMin(x + iRadius + 1, wm);
+                vMAX[x] = qMax(x - iRadius, 0);
             }
             p1 = (yw + vMIN[x] + dp)*4;
 
@@ -1315,19 +1308,19 @@ void anim_fast_shadow(const image &im,
     for(x = xMin; x < xMax; x++) {
         yp=-iRadius*w;
 
-        yi=max(0,yp)+x;
+        yi=qMax(0,yp)+x;
         aLine[0] = a[yi];
         asum = a[yi]*fracInf;
         yp += w;
 
         for(i = 1 - iRadius; i < iRadius; i++){
-            yi = max(0, yp)+x;
+            yi = qMax(0, yp)+x;
             aLine[i + iRadius] = a[yi];
             asum += a[yi];
             yp+=w;
         }
 
-        yi = max(0, yp)+x;
+        yi = qMax(0, yp)+x;
         aLine[iRadius + iRadius] = a[yi];
         asum += a[yi] * fracInf;
         yp += w;
@@ -1338,40 +1331,40 @@ void anim_fast_shadow(const image &im,
         for(y = yMin; y < yMax; y++) {
             int pixA = pix[yi*4 + 3];
             if(pixA != 255) {
-                double pixAFrac = pixA/255.;
-                double shadowAFrac = asum*divFInv/255.;
-                double aMult = shadowAFrac*pixAFrac;
-                double fAVal = (shadowAFrac + pixAFrac - aMult)*255.;
-                unsigned char aVal = min(255,
-                                         max(0,
-                                             (int)round(fAVal)) );
+                qreal pixAFrac = pixA/255.;
+                qreal shadowAFrac = asum*divFInv/255.;
+                qreal aMult = shadowAFrac*pixAFrac;
+                qreal fAVal = (shadowAFrac + pixAFrac - aMult)*255.;
+                unsigned char aVal = qMin(255,
+                                         qMax(0,
+                                             qRound(fAVal)) );
                 unsigned char pixR = pix[yi*4];
                 int iRVal = round((pixR*aMult +
                             pixR*(1. - shadowAFrac) +
                             fRed*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4] = min(aVal,
-                                      (unsigned char)min(255,
-                                          max(0, iRVal)));
+                pix[yi*4] = qMin(aVal,
+                                      (unsigned char)qMin(255,
+                                          qMax(0, iRVal)));
                 unsigned char pixG = pix[yi*4 + 1];
                 int iGVal = round((pixG*aMult +
                             pixG*(1. - shadowAFrac) +
                             fGreen*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4 + 1] = min(aVal,
-                                      (unsigned char)min(255,
-                                          max(0, iGVal)));
+                pix[yi*4 + 1] = qMin(aVal,
+                                      (unsigned char)qMin(255,
+                                          qMax(0, iGVal)));
                 unsigned char pixB = pix[yi*4 + 2];
                 int iBVal = round((pixB*aMult +
                             pixB*(1. - shadowAFrac) +
                             fBlue*255*(1. - pixAFrac))*fAVal/255.);
-                pix[yi*4 + 2] = min(aVal,
-                                      (unsigned char)min(255,
-                                          max(0, iBVal)));
+                pix[yi*4 + 2] = qMin(aVal,
+                                      (unsigned char)qMin(255,
+                                          qMax(0, iBVal)));
                 pix[yi*4 + 3] = aVal;
             }
 
             if(x == xMin) {
-                vMIN[y] = min(y + iRadius + 1, hm) * w;
-                vMAX[y] = max(y - iRadius, 0) * w;
+                vMIN[y] = qMin(y + iRadius + 1, hm) * w;
+                vMAX[y] = qMax(y - iRadius, 0) * w;
             }
             p1 = x + vMIN[y];
 
@@ -1401,14 +1394,14 @@ void anim_fast_shadow(const image &im,
     delete[] vMAX;
 }
 
-//void fast_blur(const image &im, double radiusF)
+//void fast_blur(const image &im, qreal radiusF)
 //{
 //    unsigned char *pix = im.data;
 //    int w = im.w;
 //    int h = im.h;
 
 //    int maxRadius = ceil(radiusF);
-//    double fraqInf = maxRadius - radiusF;
+//    qreal fraqInf = maxRadius - radiusF;
 
 //    if (maxRadius<1) return;
 //    int wm=w-1;
@@ -1420,12 +1413,12 @@ void anim_fast_shadow(const image &im,
 //    unsigned char *b=new unsigned char[wh];
 //    unsigned char *a=new unsigned char[wh];
 //    int rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
-//    int *vMIN = new int[max(w,h)];
-//    int *vMAX = new int[max(w,h)];
+//    int *vMIN = new int[qMax(w,h)];
+//    int *vMAX = new int[qMax(w,h)];
 
-//    double divF = radiusF + radiusF + 1.;
+//    qreal divF = radiusF + radiusF + 1.;
 //    int minFi = 256*div - ceil(256*divF);
-//    double *dv=new double[256*div];
+//    qreal *dv=new double[256*div];
 //    for(i=0; i< minFi; i++) {
 //        dv[i] = 0.;
 //    }
@@ -1440,7 +1433,7 @@ void anim_fast_shadow(const image &im,
 //        rsum=gsum=bsum=asum=0;
 
 //        for(i=-maxRadius;i<=maxRadius;i++){
-//            p = (yi + min(wm, max(i,0))) * 4;
+//            p = (yi + qMin(wm, qMax(i,0))) * 4;
 //            rsum += pix[p];
 //            gsum += pix[p+1];
 //            bsum += pix[p+2];
@@ -1454,8 +1447,8 @@ void anim_fast_shadow(const image &im,
 //            a[yi]=dv[asum];
 
 //            if(y==0){
-//                vMIN[x]=min(x+maxRadius+1,wm);
-//                vMAX[x]=max(x-maxRadius,0);
+//                vMIN[x]=qMin(x+maxRadius+1,wm);
+//                vMAX[x]=qMax(x-maxRadius,0);
 //            }
 //            p1 = (yw+vMIN[x])*4;
 //            p2 = (yw+vMAX[x])*4;
@@ -1474,7 +1467,7 @@ void anim_fast_shadow(const image &im,
 //        rsum=gsum=bsum=asum=0;
 //        yp=-maxRadius*w;
 //        for(i=-maxRadius;i<=maxRadius;i++){
-//            yi=max(0,yp)+x;
+//            yi=qMax(0,yp)+x;
 //            rsum+=r[yi];
 //            gsum+=g[yi];
 //            bsum+=b[yi];
@@ -1488,8 +1481,8 @@ void anim_fast_shadow(const image &im,
 //            pix[yi*4 + 2]	= dv[bsum];
 //            pix[yi*4 + 3]	= dv[asum];
 //            if(x==0){
-//                vMIN[y]=min(y+maxRadius+1,hm)*w;
-//                vMAX[y]=max(y-maxRadius,0)*w;
+//                vMIN[y]=qMin(y+maxRadius+1,hm)*w;
+//                vMAX[y]=qMax(y-maxRadius,0)*w;
 //            }
 //            p1=x+vMIN[y];
 //            p2=x+vMAX[y];
@@ -1530,8 +1523,8 @@ void fast_blur(const image &im, int radius)
     unsigned char *b=new unsigned char[wh];
     unsigned char *a=new unsigned char[wh];
     int rsum,gsum,bsum,asum,x,y,i,p,p1,p2,yp,yi,yw;
-    int *vMIN = new int[max(w,h)];
-    int *vMAX = new int[max(w,h)];
+    int *vMIN = new int[qMax(w,h)];
+    int *vMAX = new int[qMax(w,h)];
 
     unsigned char *dv=new unsigned char[256*div];
     for (i=0;i<256*div;i++) dv[i]=(i/div);
@@ -1541,7 +1534,7 @@ void fast_blur(const image &im, int radius)
     for (y=0;y<h;y++){
         rsum=gsum=bsum=asum=0;
         for(i=-radius;i<=radius;i++){
-            p = (yi + min(wm, max(i,0))) * 4;
+            p = (yi + qMin(wm, qMax(i,0))) * 4;
             rsum += pix[p];
             gsum += pix[p+1];
             bsum += pix[p+2];
@@ -1555,8 +1548,8 @@ void fast_blur(const image &im, int radius)
             a[yi]=dv[asum];
 
             if(y==0){
-                vMIN[x]=min(x+radius+1,wm);
-                vMAX[x]=max(x-radius,0);
+                vMIN[x]=qMin(x+radius+1,wm);
+                vMAX[x]=qMax(x-radius,0);
             }
             p1 = (yw+vMIN[x])*4;
             p2 = (yw+vMAX[x])*4;
@@ -1575,7 +1568,7 @@ void fast_blur(const image &im, int radius)
         rsum=gsum=bsum=asum=0;
         yp=-radius*w;
         for(i=-radius;i<=radius;i++){
-            yi=max(0,yp)+x;
+            yi=qMax(0,yp)+x;
             rsum+=r[yi];
             gsum+=g[yi];
             bsum+=b[yi];
@@ -1589,8 +1582,8 @@ void fast_blur(const image &im, int radius)
             pix[yi*4 + 2]	= dv[bsum];
             pix[yi*4 + 3]	= dv[asum];
             if(x==0){
-                vMIN[y]=min(y+radius+1,hm)*w;
-                vMAX[y]=max(y-radius,0)*w;
+                vMIN[y]=qMin(y+radius+1,hm)*w;
+                vMAX[y]=qMax(y-radius,0)*w;
             }
             p1=x+vMIN[y];
             p2=x+vMAX[y];
@@ -1614,12 +1607,12 @@ void fast_blur(const image &im, int radius)
     delete[] dv;
 }
 
-void blur(const image &im, double radius, double sigma)
+void blur(const image &im, qreal radius, qreal sigma)
 {
     if(!checkImage(im))
         return;
 
-    double *kernel;
+    qreal *kernel;
     rgba *dest;
     s32 width;
     s32 x, y;
@@ -1635,7 +1628,7 @@ void blur(const image &im, double radius, double sigma)
         width = getBlurKernel((s32)(2*ceil(radius)+1), sigma, &kernel);
     else
     {
-        double *last_kernel = 0;
+        qreal *last_kernel = 0;
 
         width = getBlurKernel(3, sigma, &kernel);
 
@@ -1837,11 +1830,11 @@ void equalize(const image &im)
 
 struct PointInfo
 {
-    double x, y, z;
+    qreal x, y, z;
 };
 
-void shade(const image &im, bool color_shading, double azimuth,
-             double elevation)
+void shade(const image &im, bool color_shading, qreal azimuth,
+             qreal elevation)
 {
     if(!checkImage(im))
         return;
@@ -1851,7 +1844,7 @@ void shade(const image &im, bool color_shading, double azimuth,
     if(!n)
         return;
 
-    double distance, normal_distance, shade;
+    qreal distance, normal_distance, shade;
     s32 x, y;
 
     struct PointInfo light, normal;
@@ -1937,12 +1930,12 @@ void shade(const image &im, bool color_shading, double azimuth,
     delete [] n;
 }
 
-void edge(image &im, double radius)
+void edge(image &im, qreal radius)
 {
     if(!checkImage(im))
         return;
 
-    double *kernel;
+    qreal *kernel;
     int width;
     register long i;
     rgba *dest = 0;
@@ -1954,7 +1947,7 @@ void edge(image &im, double radius)
     if(im.w < width || im.h < width)
         return;
 
-    kernel = new double [W];
+    kernel = new qreal [W];
 
     if(!kernel)
         return;
@@ -1981,12 +1974,12 @@ void edge(image &im, double radius)
     delete [] dest;
 }
 
-void emboss(image &im, double radius, double sigma)
+void emboss(image &im, qreal radius, qreal sigma)
 {
     if(!checkImage(im))
         return;
 
-    double alpha, *kernel;
+    qreal alpha, *kernel;
     int j, width;
     register long i, u, v;
     rgba *dest = 0;
@@ -1999,7 +1992,7 @@ void emboss(image &im, double radius, double sigma)
     if(im.w < width || im.h < width)
         return;
 
-    kernel = new double [width*width];
+    kernel = new qreal [width*width];
 
     if(!kernel)
         return;
@@ -2007,7 +2000,7 @@ void emboss(image &im, double radius, double sigma)
     i = 0;
     j = width/2;
 
-    const double S = sigma * sigma;
+    const qreal S = sigma * sigma;
 
     for(v = (-width/2);v <= (width/2);v++)
     {
@@ -2043,12 +2036,12 @@ void emboss(image &im, double radius, double sigma)
     delete [] dest;
 }
 
-void sharpen(image &im, double radius, double sigma)
+void sharpen(image &im, qreal radius, qreal sigma)
 {
     if(!checkImage(im))
         return;
 
-    double alpha, normalize, *kernel;
+    qreal alpha, normalize, *kernel;
     int width;
     register long i, u, v;
     rgba *dest = 0;
@@ -2061,14 +2054,14 @@ void sharpen(image &im, double radius, double sigma)
     if(im.w < width)
         return;
 
-    kernel = new double [width*width];
+    kernel = new qreal [width*width];
 
     if(!kernel)
         return;
 
     i = 0;
     normalize = 0.0;
-    const double S = sigma * sigma;
+    const qreal S = sigma * sigma;
     const int w2 = width / 2;
 
     for(v = -w2; v <= w2; v++)
@@ -2102,7 +2095,7 @@ void sharpen(image &im, double radius, double sigma)
     delete [] dest;
 }
 
-void oil(const image &im, double radius)
+void oil(const image &im, qreal radius)
 {
     if(!checkImage(im))
         return;
@@ -2179,9 +2172,9 @@ void oil(const image &im, double radius)
 
 void redeye(const image &im, const int w, const int h, const int x, const int y, int th)
 {
-    const double RED_FACTOR = 0.5133333;
-    const double GREEN_FACTOR = 1;
-    const double BLUE_FACTOR = 0.1933333;
+    const qreal RED_FACTOR = 0.5133333;
+    const qreal GREEN_FACTOR = 1;
+    const qreal BLUE_FACTOR = 0.1933333;
 
     if(!checkImage(im))
         return;
@@ -2223,13 +2216,13 @@ void redeye(const image &im, const int w, const int h, const int x, const int y,
 /*************************************************************************/
 
 static bool convolveImage(image *image, rgba **dest, const unsigned int order,
-                                 const double *kernel)
+                                 const qreal *kernel)
 {
     long width;
-    double red, green, blue;
+    qreal red, green, blue;
     u8 alpha;
-    double normalize, *normal_kernel;
-    register const double *k;
+    qreal normalize, *normal_kernel;
+    register const qreal *k;
     register rgba *q;
     int x, y, mx, my, sx, sy;
     long i;
@@ -2242,7 +2235,7 @@ static bool convolveImage(image *image, rgba **dest, const unsigned int order,
 
     const int W = width*width;
 
-    normal_kernel = new double [W];
+    normal_kernel = new qreal [W];
 
     if(!normal_kernel)
         return false;
@@ -2380,8 +2373,7 @@ static void rgb2hsv(const rgb &rgb, s32 *h, s32 *s, s32 *v)
     }
 }
 
-static void hsv2rgb(s32 h, s32 s, s32 v, rgb *rgb)
-{
+static void hsv2rgb(s32 h, s32 s, s32 v, rgb *rgb) {
     if(h < -1 || (u32)s > 255 || (u32)v > 255 || !rgb)
         return;
 
@@ -2430,9 +2422,9 @@ static void hsv2rgb(s32 h, s32 s, s32 v, rgb *rgb)
     rgb->b = b;
 }
 
-static rgba interpolateColor(const image &im, double x_offset, double y_offset, const rgba &background)
+static rgba interpolateColor(const image &im, qreal x_offset, qreal y_offset, const rgba &background)
 {
-    double alpha, beta;
+    qreal alpha, beta;
     rgba p, q, r, s;
     s32 x, y;
     rgba *bits = (rgba *)im.data;
@@ -2513,7 +2505,7 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
 #define SigmaPoisson  0.05
 #define TauGaussian  20.0
 
-    double alpha, beta, sigma, value;
+    qreal alpha, beta, sigma, value;
     alpha=(double) (rand() & NoiseMask)/NoiseMask;
     if (alpha == 0.0)
         alpha=1.0;
@@ -2526,7 +2518,7 @@ static u32 generateNoise(u32 pixel, NoiseType noise_type)
         }
     case GaussianNoise:
         {
-            double tau;
+            qreal tau;
 
             beta=(double) (rand() & NoiseMask)/NoiseMask;
             sigma=sqrt(-2.0*log(alpha))*cos(2.0*M_PI*beta);
@@ -2616,14 +2608,14 @@ static inline void scaleDown(T &val, T min, T max)
         val = max;
 }
 
-static void blurScanLine(double *kernel, s32 width, rgba *src, rgba *dest, s32 columns)
+static void blurScanLine(qreal *kernel, s32 width, rgba *src, rgba *dest, s32 columns)
 {
-    register double *p;
+    register qreal *p;
     rgba *q;
     register s32 x;
     register long i;
-    double red, green, blue, alpha;
-    double scale = 0.0;
+    qreal red, green, blue, alpha;
+    qreal scale = 0.0;
 
     if(width > columns)
     {
@@ -2775,13 +2767,13 @@ static void blurScanLine(double *kernel, s32 width, rgba *src, rgba *dest, s32 c
     }
 }
 
-static s32 getBlurKernel(s32 width, double sigma, double **kernel)
+static s32 getBlurKernel(s32 width, qreal sigma, qreal **kernel)
 {
 
 #define KernelRank  3
 #define KernelRankQ 18.0
 
-    double alpha, normalize;
+    qreal alpha, normalize;
     register long i;
     s32 bias;
 
@@ -2791,7 +2783,7 @@ static s32 getBlurKernel(s32 width, double sigma, double **kernel)
     if(width == 0)
         width = 3;
 
-    *kernel = new double [width];
+    *kernel = new qreal [width];
 
     if(!*kernel)
         return 0;
@@ -2911,9 +2903,9 @@ static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, con
     }
 }
 
-static int getOptimalKernelWidth(double radius, double sigma)
+static int getOptimalKernelWidth(qreal radius, qreal sigma)
 {
-    double normalize, value;
+    qreal normalize, value;
     long width;
     register long u;
 
@@ -2923,7 +2915,7 @@ static int getOptimalKernelWidth(double radius, double sigma)
     if(radius > 0.0)
         return((int)(2.0*ceil(radius)+1.0));
 
-    const double S = sigma * sigma;
+    const qreal S = sigma * sigma;
 
     for(width = 5;;)
     {

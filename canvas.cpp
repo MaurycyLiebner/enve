@@ -511,20 +511,10 @@ void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     *lastIdentical = qMin(lId, getMaxFrame());
 }
 
-void Canvas::scheduleUpdate() {
-//    int fId;
-//    int lId;
-//    prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, anim_mCurrentRelFrame);
-//    CacheContainer *cont =
-//          mCacheHandler.getRenderContainerAtRelFrame(fId);
-//    if(cont == NULL) {
-        BoundingBox::scheduleUpdate();
-//    } else {
-//        setCurrentPreviewContainer(cont);
-//    }
-}
-
 void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
+    if(mRedoUpdate) {
+        scheduleUpdate();
+    }
     int fId;
     int lId;
     prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, renderData->relFrame);

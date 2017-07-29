@@ -1,6 +1,6 @@
 #ifndef SKIADEFINES_H
 #define SKIADEFINES_H
-
+#include <QtGlobal>
 //#define CPU_ONLY_RENDER
 
 #ifdef QT_DEBUG

@@ -253,18 +253,6 @@ void BoundingBox::drawSelectedSk(SkCanvas *canvas,
     }
 }
 
-bool BoundingBox::shouldRedoUpdate() {
-    return mRedoUpdate;
-}
-
-void BoundingBox::setRedoUpdateToFalse() {
-    mRedoUpdate = false;
-}
-
-void BoundingBox::redoUpdate() {
-    mRedoUpdate = true;
-}
-
 void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
@@ -450,8 +438,12 @@ void BoundingBox::scheduleUpdate() {
     if(mCurrentRenderData == NULL) {
         updateCurrentRenderData();
     } else {
+        if(!mRedoUpdate) {
+            mRedoUpdate = mCurrentRenderData->isAwaitingUpdate();
+        }
         return;
     }
+    mRedoUpdate = false;
     setUpdateVars();
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
@@ -1215,37 +1207,11 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
 }
 
 void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
-    if(renderData->relFrame != anim_mCurrentRelFrame) {
-        int firstIdenticalFrame;
-        int lastIdenticalFrame;
-        prp_getFirstAndLastIdenticalRelFrame(&firstIdenticalFrame,
-                                              &lastIdenticalFrame,
-                                              anim_mCurrentRelFrame);
-        qDebug() << "current frame:" << anim_mCurrentRelFrame;
-        qDebug() << "render data frame:" << renderData->relFrame;
-        qDebug() << "first tidentical frame:" << firstIdenticalFrame;
-        qDebug() << "last identical frame:" << lastIdenticalFrame;
-        bool renderDataCloserToCurrentFrame =
-                qAbs(renderData->relFrame - anim_mCurrentRelFrame) <
-                qAbs(mDrawRenderContainer.getRelFrame() - anim_mCurrentRelFrame);
-        bool renderDataInIdenticalRange =
-                renderData->relFrame >= firstIdenticalFrame &&
-                renderData->relFrame <= lastIdenticalFrame;
-        if(renderDataCloserToCurrentFrame ||
-           renderDataInIdenticalRange) {
-            mDrawRenderContainer.setVariablesFromRenderData(renderData);
-            updateDrawRenderContainerTransform();
-        }
-        if(mSchedulers.count() == 0) {
-            if(mDrawRenderContainer.getRelFrame() > lastIdenticalFrame ||
-               mDrawRenderContainer.getRelFrame() < firstIdenticalFrame) {
-                scheduleUpdate();
-            }
-        }
-    } else {
-        mDrawRenderContainer.setVariablesFromRenderData(renderData);
-        updateDrawRenderContainerTransform();
+    if(mRedoUpdate) {
+        scheduleUpdate();
     }
+    mDrawRenderContainer.setVariablesFromRenderData(renderData);
+    updateDrawRenderContainerTransform();
 }
 
 void BoundingBox::updateCurrentRenderData() {

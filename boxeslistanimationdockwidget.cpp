@@ -323,7 +323,7 @@ RenderWidget *BoxesListAnimationDockWidget::getRenderWidget() {
     return mRenderWidget;
 }
 
-bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
+bool BoxesListAnimationDockWidget::processKeyEvent(
         QKeyEvent *event) {
     if(event->key() == Qt::Key_Right &&
        event->modifiers() & Qt::ControlModifier) {
@@ -337,15 +337,6 @@ bool BoxesListAnimationDockWidget::processUnfilteredKeyEvent(
         return false;
     }
     return true;
-}
-
-bool BoxesListAnimationDockWidget::processFilteredKeyEvent(
-        QKeyEvent *event) {
-    Q_FOREACH(BoxesListKeysViewWidget *blk, mBoxesListKeysViewWidgets) {
-        blk->processFilteredKeyEvent(event);
-    }
-    if(processUnfilteredKeyEvent(event) ) return true;
-    return false;//mBoxesList->processFilteredKeyEvent(event);
 }
 
 void BoxesListAnimationDockWidget::previewFinished() {

@@ -615,6 +615,12 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler()->
             getFirstEmptyFrameAfterFrame(mCurrentRenderFrame);
+    int firstIdT;
+    int lastIdT;
+    mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(&firstIdT,
+                                                         &lastIdT,
+                                                         newCurrentRenderFrame);
+    newCurrentRenderFrame = firstIdT;
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         mCurrentCanvas->getCacheHandler()->
             setContainersInFrameRangeBlocked(mCurrentRenderFrame + 1,
@@ -789,7 +795,7 @@ void CanvasWindow::playPreview() {
 void CanvasWindow::nextPreviewRenderFrame() {
     //mCurrentCanvas->renderCurrentFrameToPreview();
     if(!mRendering) return;
-    if(mCurrentRenderFrame > getMaxFrame()) {
+    if(mCurrentRenderFrame >= getMaxFrame()) {
         playPreview();
     } else {
         nextCurrentRenderFrame();
@@ -1016,7 +1022,7 @@ void CanvasWindow::dropEvent(QDropEvent *event) {
 
         for (int i = 0; i < urlList.size() && i < 32; i++) {
             importFile(urlList.at(i).toLocalFile(),
-                       event->posF());
+                       mCurrentCanvas->mapCanvasAbsToRel(event->posF()));
         }
     }
 }
@@ -1030,7 +1036,7 @@ void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
 #include "svgimporter.h"
 #include <QFileDialog>
 void CanvasWindow::importFile(const QString &path,
-                              const QPointF &absDropPos) {
+                              const QPointF &relDropPos) {
     if(hasNoCanvas()) return;
     MainWindow::getInstance()->disable();
 
@@ -1057,7 +1063,7 @@ void CanvasWindow::importFile(const QString &path,
         MainWindow::getInstance()->loadAVFile(path);
     }
     if(boxToPosition != NULL) {
-        QPointF trans = mCurrentCanvas->mapCanvasAbsToRel(absDropPos);
+        QPointF trans = relDropPos;
         trans -= boxToPosition->mapRelPosToAbs(
                     boxToPosition->getRelCenterPosition());
         boxToPosition->moveByAbs(trans);
@@ -1074,17 +1080,16 @@ QWidget *CanvasWindow::getCanvasWidget() {
 
 void CanvasWindow::grabMouse() {
     mMouseGrabber = true;
-    //setMouseGrabEnabled(true);
-    //mCanvasWidget->grabMouse();
+#ifndef QT_DEBUG
+    setMouseGrabEnabled(true);
+#endif
 }
 
 void CanvasWindow::releaseMouse() {
     mMouseGrabber = false;
-    //setMouseGrabEnabled(false);
-
-    //        QWidget *grabber = mWidgetContainer->mouseGrabber();
-    //mCanvasWidget->releaseMouse();
-    //        grabber = mWidgetContainer->mouseGrabber();
+#ifndef QT_DEBUG
+    setMouseGrabEnabled(false);
+#endif
 }
 
 bool CanvasWindow::isMouseGrabber() {

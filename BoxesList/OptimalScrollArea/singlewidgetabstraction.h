@@ -86,7 +86,7 @@ private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;
     bool mContentVisible = false;
-    SingleWidgetTarget *mTarget;
+    SingleWidgetTarget *mTarget = NULL;
 
     QList<SingleWidgetAbstraction*> mChildren;
 };

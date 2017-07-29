@@ -83,7 +83,7 @@ ImageMagick Studio.
 //  Pass the image through some filter  //
 //                                      //
 //////////////////////////////////////////
-
+#include <QtCore>
 
 namespace fmt_filters
 {
@@ -101,10 +101,12 @@ namespace fmt_filters
         image() : data(0), w(0), h(0), rw(0), rh(0)
         {}
 
-        image(unsigned char *d, int _w, int _h) : data(d), w(_w), h(_h), rw(_w), rh(_h)
+        image(unsigned char *d, int _w, int _h) :
+            data(d), w(_w), h(_h), rw(_w), rh(_h)
         {}
 
-        image(unsigned char *d, int _w, int _h, int _rw, int _rh) : data(d), w(_w), h(_h), rw(_rw), rh(_rh)
+        image(unsigned char *d, int _w, int _h, int _rw, int _rh) :
+            data(d), w(_w), h(_h), rw(_rw), rh(_rh)
         {}
 
         unsigned char *data;
@@ -158,11 +160,12 @@ namespace fmt_filters
     //
     // it just adds to each pixel in the image
     // aproproriate value.
-    void colorizeAdd(const image &im,
-                  const double &red,
-                  const double &green,
-                  const double &blue,
-                  const double &alpha);
+
+    void colorizeHSV(const image &im,
+                     const qreal &hue,
+                     const qreal &saturation,
+                     const qreal &lightness,
+                     const qreal &alpha);
 
     // change brightness of the image
     void brightness(const image &im, int bn);
@@ -172,7 +175,7 @@ namespace fmt_filters
     //
     // it is no problem to set L to 8.0 or 9.0, but the resulting
     // image won't have much difference from 6.0
-    void gamma(const image &im, double L);
+    void gamma(const image &im, qreal L);
 
     // change contrast with Photoshop-like method
     // contrast should be  -255 <= contrast <= 255
@@ -212,53 +215,53 @@ namespace fmt_filters
         void threshold(const image &im, unsigned int threshold);
 
         // factor = [0.0; 50.0]
-        void solarize(const image &im, double factor);
+        void solarize(const image &im, qreal factor);
 
         // amount = [1; 10]
         void spread(const image &im, unsigned int amount);
 
         // degrees = [-720.0; 720.0]
-        void swirl(const image &im, double degrees, const rgba &background);
+        void swirl(const image &im, qreal degrees, const rgba &background);
 
         void noise(const image &im, NoiseType noise_type);
 
         void flatten(const image &im, const rgb &ca, const rgb &cb);
 
         // azimuth = [0.0; 90.0], elevation = [0.0; 90.0]
-        void shade(const image &im, bool color, double azimuth, double elevation);
+        void shade(const image &im, bool color, qreal azimuth, qreal elevation);
 
         void equalize(const image &im);
 
         // radius = [0.01; 90.0], sigma = [0.01; 50.0]
-        void anim_fast_blur(const image &im, const double &fRadius);
+        void anim_fast_blur(const image &im, const qreal &fRadius);
         void fast_blur(const image &im, int radius);
 
         void anim_fast_shadow(const image &im,
-                              const double &fRed,
-                              const double &fGreen,
-                              const double &fBlue,
-                              const double &fDx,
-                              const double &fDy,
-                              const double &fRadius);
+                              const qreal &fRed,
+                              const qreal &fGreen,
+                              const qreal &fBlue,
+                              const qreal &fDx,
+                              const qreal &fDy,
+                              const qreal &fRadius);
 
-        void blur(const image &im, double radius, double sigma);
+        void blur(const image &im, qreal radius, qreal sigma);
 
         void despeckle(const image &im);
 
         // factor = [0; 100]
-        void implode(const image &im, double factor, const rgba &background);
+        void implode(const image &im, qreal factor, const rgba &background);
 
         // radius = [0.01; 30.0]
-        void edge(image &im, double radius);
+        void edge(image &im, qreal radius);
 
         // radius = [0.01; 99.9], sigma = [0.01; 99.9]
-        void emboss(image &im, double radius, double sigma);
+        void emboss(image &im, qreal radius, qreal sigma);
 
         // radius = [0.01; 99.9], sigma = [0.01; 30.0]
-        void sharpen(image &im, double radius, double sigma);
+        void sharpen(image &im, qreal radius, qreal sigma);
 
         // radius = [1.0; 5.0]
-        void oil(const image &im, double radius);
+        void oil(const image &im, qreal radius);
 
         // red-eye removal.
         // th = [0; 255]

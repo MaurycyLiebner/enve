@@ -445,6 +445,9 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             if(clipboard != NULL) {
                 menu.addAction("Paste")->setObjectName("swt_paste");
             }
+            if(target->SWT_isPixmapEffect()) {
+                menu.addAction("Delete Effect")->setObjectName("swt_delete_effect");
+            }
         }
         QAction *selectedAction = menu.exec(event->globalPos());
         if(selectedAction != NULL) {
@@ -468,6 +471,10 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         MainWindow::getInstance()->getClipboardContainer(
                                                     CCT_ANIMATOR);
                 clipboard->paste((QrealAnimator*)target);
+            } else if(selectedAction->objectName() == "swt_delete_effect") {
+                PixmapEffect *effectTarget = (PixmapEffect*)target;
+                effectTarget->getParentEffectAnimators()->
+                        getParentBox()->removeEffect(effectTarget);
             } else if(target->SWT_isBoundingBox()) {
                 BoundingBox *boxTarget = ((BoundingBox*)target);
                 if(!boxTarget->getParentCanvas()->

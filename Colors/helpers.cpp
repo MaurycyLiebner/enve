@@ -1,5 +1,8 @@
 #include "helpers.h"
 #include <math.h>
+#include <GL/gl.h>
+#include <QString>
+#include <sys/sysinfo.h>
 
 void rotate(float rad_t, float *x_t, float *y_t)
 {
@@ -22,16 +25,6 @@ int clampInt(int val, int min, int max) {
     }
 }
 
-bool insideCircle(int r, int x_t, int y_t)
-{
-    return x_t*x_t + y_t*y_t < r*r;
-}
-
-bool outsideCircle(int r, int x_t, int y_t)
-{
-    return !insideCircle(r, x_t, y_t);
-}
-
 
 //bool isnan(float var)
 //{
@@ -39,7 +32,7 @@ bool outsideCircle(int r, int x_t, int y_t)
 //    return d != d;
 //}
 
-void glOrthoAndViewportSet(GLuint w, GLuint h) {
+void glOrthoAndViewportSet(unsigned int w, unsigned int h) {
     glViewport(0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -74,11 +67,10 @@ float getAngleDeg(double x1, double y1, double x2, double y2)
     return atan2(det, dot)*RadToDeg + 180;
 }
 
-void normalize(GLfloat *x_t, GLfloat *y_t, GLfloat dest_len)
-{
-    GLfloat x_val_t = *x_t;
-    GLfloat y_val_t = *y_t;
-    GLfloat curr_len = sqrt(x_val_t*x_val_t + y_val_t*y_val_t);
+void normalize(float *x_t, float *y_t, float dest_len) {
+    float x_val_t = *x_t;
+    float y_val_t = *y_t;
+    float curr_len = sqrt(x_val_t*x_val_t + y_val_t*y_val_t);
     *x_t = x_val_t*dest_len/curr_len;
     *y_t = y_val_t*dest_len/curr_len;
 }
@@ -658,42 +650,10 @@ void qrgb_to_hsl(qreal *r_, qreal *g_, qreal *b_)
   *b_ = l;
 }
 
-bool isNonZero(GLfloat val_t)
-{
+bool isNonZero(const float &val_t) {
     return val_t > 0.0001f || val_t < - 0.0001f;
 }
 
-bool isZero(GLfloat val_t)
-{
+bool isZero(const float val_t) {
     return val_t < 0.0001f && val_t > - 0.0001f;
-}
-
-#include <QInputDialog>
-#include <QString>
-#include <QFile>
-#include <QTextStream>
-
-ushort getFreeRamMB()
-{
-    struct sysinfo info_t;
-    sysinfo(&info_t);
-    return info_t.freeram*0.000001;
-}
-
-
-qreal sign(qreal x, qreal y, QPointF p2, QPointF p3)
-{
-    return (x - p3.x()) * (p2.y() - p3.y()) - (p2.x() - p3.x()) * (y - p3.y());
-}
-
-bool pointInTriangle(qreal x, qreal y, QPointF v1, QPointF v2, QPointF v3)
-{
-    bool b1, b2, b3;
-
-    qreal q0 = 0;
-    b1 = sign(x, y, v1, v2) < q0;
-    b2 = sign(x, y, v2, v3) < q0;
-    b3 = sign(x, y, v3, v1) < q0;
-
-    return ((b1 == b2) && (b2 == b3));
 }

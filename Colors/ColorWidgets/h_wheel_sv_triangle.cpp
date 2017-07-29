@@ -7,8 +7,32 @@
 #include <QWindow>
 #include <QApplication>
 
-H_Wheel_SV_Triangle::H_Wheel_SV_Triangle(QWidget *parent_t) : ColorWidget(parent_t)
+qreal sign(qreal x, qreal y, QPointF p2, QPointF p3) {
+    return (x - p3.x()) * (p2.y() - p3.y()) - (p2.x() - p3.x()) * (y - p3.y());
+}
+
+bool pointInTriangle(qreal x, qreal y, QPointF v1, QPointF v2, QPointF v3)
 {
+    bool b1, b2, b3;
+
+    qreal q0 = 0;
+    b1 = sign(x, y, v1, v2) < q0;
+    b2 = sign(x, y, v2, v3) < q0;
+    b3 = sign(x, y, v3, v1) < q0;
+
+    return ((b1 == b2) && (b2 == b3));
+}
+
+bool insideCircle(int r, int x_t, int y_t) {
+    return x_t*x_t + y_t*y_t < r*r;
+}
+
+bool outsideCircle(int r, int x_t, int y_t) {
+    return !insideCircle(r, x_t, y_t);
+}
+
+H_Wheel_SV_Triangle::H_Wheel_SV_Triangle(QWidget *parent_t) :
+    ColorWidget(parent_t) {
     setFixedSize(200, 200);
 }
 

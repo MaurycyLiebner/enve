@@ -338,7 +338,10 @@ struct ColorizeEffectRenderData : public PixmapEffectRenderData {
                         const fmt_filters::image &img,
                         const qreal &scale);
 
-    Color color;
+    qreal hue;
+    qreal saturation;
+    qreal lightness;
+    qreal alpha;
 };
 
 
@@ -352,12 +355,17 @@ public:
     void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
-    void duplicateInfluenceAnimatorFrom(ColorAnimator *source);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
+    void duplicateAnimatorsFrom(QrealAnimator *hue,
+                                QrealAnimator *saturation,
+                                QrealAnimator *lightness,
+                                QrealAnimator *alpha);
 private:
-    QSharedPointer<ColorAnimator> mColorAnimator =
-            (new ColorAnimator())->ref<ColorAnimator>();
+    QrealAnimatorQSPtr mHueAnimator;
+    QrealAnimatorQSPtr mSaturationAnimator;
+    QrealAnimatorQSPtr mLightnessAnimator;
+    QrealAnimatorQSPtr mAlphaAnimator;
 };
 
 #endif // PIXMAPEFFECT_H

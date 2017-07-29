@@ -483,7 +483,7 @@ public:
     virtual void renderDataFinished(BoundingBoxRenderData *renderData);
     void updateRelBoundingRectFromRenderData(BoundingBoxRenderData *renderData);
 
-    virtual void scheduleUpdate();
+    void scheduleUpdate();
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData *renderData);
     virtual bool shouldScheduleUpdate() {
