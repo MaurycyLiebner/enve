@@ -282,23 +282,50 @@ void PathBox::startSelectedFillColorTransform() {
     mFillSettings->getColorAnimator()->prp_startTransform();
 }
 
-void PathBox::duplicateGradientPointsFrom(GradientPoints *fillGradientPoints,
-                                          GradientPoints *strokeGradientPoints) {
-    if(fillGradientPoints != NULL) {
-        fillGradientPoints->makeDuplicate(mFillGradientPoints.data());
-    }
+void PathBox::duplicateGradientPointsFrom(
+        GradientPoints *fillGradientPoints,
+        GradientPoints *strokeGradientPoints) {
+    duplicateFillGradientPointsFrom(fillGradientPoints);
+    duplicateStrokeGradientPointsFrom(strokeGradientPoints);
+}
+
+GradientPoints *PathBox::getStrokeGradientPoints() {
+    return mStrokeGradientPoints.data();
+}
+
+GradientPoints *PathBox::getFillGradientPoints() {
+    return mFillGradientPoints.data();
+}
+
+void PathBox::duplicateStrokeGradientPointsFrom(
+        GradientPoints *strokeGradientPoints) {
     if(strokeGradientPoints != NULL) {
         strokeGradientPoints->makeDuplicate(mStrokeGradientPoints.data());
     }
 }
 
+void PathBox::duplicateFillGradientPointsFrom(
+        GradientPoints *fillGradientPoints) {
+    if(fillGradientPoints != NULL) {
+        fillGradientPoints->makeDuplicate(mFillGradientPoints.data());
+    }
+}
+
 void PathBox::duplicatePaintSettingsFrom(PaintSettings *fillSettings,
                                          StrokeSettings *strokeSettings) {
+    duplicateFillSettingsFrom(fillSettings);
+    duplicateStrokeSettingsFrom(strokeSettings);
+}
+
+void PathBox::duplicateFillSettingsFrom(PaintSettings *fillSettings) {
     if(fillSettings == NULL) {
         mFillSettings->setPaintType(NOPAINT);
     } else {
         fillSettings->makeDuplicate(mFillSettings.data());
     }
+}
+
+void PathBox::duplicateStrokeSettingsFrom(StrokeSettings *strokeSettings) {
     if(strokeSettings == NULL) {
         mStrokeSettings->setPaintType(NOPAINT);
     } else {

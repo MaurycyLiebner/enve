@@ -449,7 +449,16 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                                const int &relFrame);
+    void setPickingFromPath(const bool &pickFill,
+                            const bool &pickStroke) {
+        mPickFillFromPath = pickFill;
+        mPickStrokeFromPath = pickStroke;
+    }
+
 protected:
+    bool mPickFillFromPath = false;
+    bool mPickStrokeFromPath = false;
+
     RenderCacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 

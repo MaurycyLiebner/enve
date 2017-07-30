@@ -512,22 +512,6 @@ void FillStrokeSettingsWidget::setCanvasWindowPtr(CanvasWindow *canvasWidget) {
             mCanvasWindow, SLOT(startSelectedStrokeWidthTransform()));
 }
 
-void FillStrokeSettingsWidget::loadSettingsFromPath(PathBox *path) {
-    if(mLoadFillFromPath) {
-        mLoadFillFromPath = false;
-        setFillValuesFromFillSettings(path->getFillSettings());
-
-    }
-    if(mLoadStrokeFromPath) {
-        mLoadStrokeFromPath = false;
-        setStrokeValuesFromStrokeSettings(path->getStrokeSettings());
-
-        mCanvasWindow->strokeCapStyleChanged(mCurrentCapStyle);
-        mCanvasWindow->strokeJoinStyleChanged(mCurrentJoinStyle);
-        mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth, true);
-    }
-}
-
 void FillStrokeSettingsWidget::emitStrokeWidthChanged() {
     mCanvasWindow->strokeWidthChanged(mCurrentStrokeWidth, true);
 }
@@ -544,23 +528,16 @@ void FillStrokeSettingsWidget::emitJoinStyleChanged() {
     mCanvasWindow->strokeJoinStyleChanged(mCurrentJoinStyle);
 }
 
-void FillStrokeSettingsWidget::startLoadingFillFromPath()
-{
-    mLoadFillFromPath = true;
-    mCanvasWindow->pickPathForSettings();
+void FillStrokeSettingsWidget::startLoadingFillFromPath() {
+    mCanvasWindow->pickPathForSettings(true, false);
 }
 
-void FillStrokeSettingsWidget::startLoadingStrokeFromPath()
-{
-    mLoadStrokeFromPath = true;
-    mCanvasWindow->pickPathForSettings();
+void FillStrokeSettingsWidget::startLoadingStrokeFromPath() {
+    mCanvasWindow->pickPathForSettings(false, true);
 }
 
-void FillStrokeSettingsWidget::startLoadingSettingsFromPath()
-{
-    mLoadFillFromPath = true;
-    mLoadStrokeFromPath = true;
-    mCanvasWindow->pickPathForSettings();
+void FillStrokeSettingsWidget::startLoadingSettingsFromPath() {
+    mCanvasWindow->pickPathForSettings(true, true);
 }
 
 void FillStrokeSettingsWidget::finishTransform()

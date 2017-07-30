@@ -598,8 +598,22 @@ void Canvas::handleMouseRelease() {
             handleAddPointMouseRelease();
         } else if(mCurrentMode == PICK_PATH_SETTINGS) {
             if(mLastPressedBox != NULL) {
-                mFillStrokeSettingsWidget->loadSettingsFromPath(
-                            (VectorPath*) mLastPressedBox);
+                PathBox *srcPathBox = (PathBox*) mLastPressedBox;
+                foreach(BoundingBox *box, mSelectedBoxes) {
+                    if(box->SWT_isPathBox()) {
+                        PathBox *pathBox = (PathBox*)box;
+                        if(mPickStrokeFromPath) {
+                            pathBox->duplicateStrokeSettingsFrom(
+                                        srcPathBox->getStrokeSettings());
+                            pathBox->resetStrokeGradientPointsPos(true);
+                        }
+                        if(mPickFillFromPath) {
+                            pathBox->duplicateFillSettingsFrom(
+                                        srcPathBox->getFillSettings());
+                            pathBox->resetFillGradientPointsPos(true);
+                        }
+                    }
+                }
             }
             mCanvasWindow->setCanvasMode(MOVE_PATH);
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {

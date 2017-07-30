@@ -121,6 +121,16 @@ public:
     }
     void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData *renderData);
+    void duplicateStrokeSettingsFrom(
+            StrokeSettings *strokeSettings);
+    void duplicateFillSettingsFrom(
+            PaintSettings *fillSettings);
+    void duplicateStrokeGradientPointsFrom(
+            GradientPoints *strokeGradientPoints);
+    void duplicateFillGradientPointsFrom(
+            GradientPoints *fillGradientPoints);
+    GradientPoints *getFillGradientPoints();
+    GradientPoints *getStrokeGradientPoints();
 protected:
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
 

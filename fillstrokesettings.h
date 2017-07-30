@@ -39,7 +39,6 @@ public:
 
     void clearAll();
     void saveGradientsToSqlIfPathSelected(QSqlQuery *query);
-    void loadSettingsFromPath(PathBox *path);
     void setFillValuesFromFillSettings(PaintSettings *settings);
     void setStrokeValuesFromStrokeSettings(StrokeSettings *settings);
 
@@ -85,9 +84,6 @@ private slots:
 private:
 
     CanvasWindow *mCanvasWindow;
-
-    bool mLoadFillFromPath = false;
-    bool mLoadStrokeFromPath = false;
 
     MainWindow *mMainWindow;
     bool mTransormStarted = false;

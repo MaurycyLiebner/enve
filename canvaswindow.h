@@ -63,9 +63,11 @@ public:
 
     void strokeCapStyleChanged(const Qt::PenCapStyle &capStyle);
     void strokeJoinStyleChanged(const Qt::PenJoinStyle &joinStyle);
-    void strokeWidthChanged(const qreal &strokeWidth, const bool &finish);
+    void strokeWidthChanged(const qreal &strokeWidth,
+                            const bool &finish);
 
-    void pickPathForSettings();
+    void pickPathForSettings(const bool &pickFill,
+                             const bool &pickStroke);
     void updateDisplayedFillStrokeSettings();
 
     void setResolutionFraction(const qreal &percent);
@@ -88,8 +90,9 @@ public:
     int getCurrentFrame();
     int getMaxFrame();
     void addUpdatableAwaitingUpdate(Updatable *updatable);
-    void SWT_addChildrenAbstractions(SingleWidgetAbstraction *abstraction,
-                                     ScrollWidgetVisiblePart *visiblePartWidget);
+    void SWT_addChildrenAbstractions(
+            SingleWidgetAbstraction *abstraction,
+            ScrollWidgetVisiblePart *visiblePartWidget);
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
     Canvas *loadCanvasesFromSql();

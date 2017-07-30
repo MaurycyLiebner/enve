@@ -16,6 +16,7 @@ public:
     void toggle();
     bool checked() { return mChecked; }
 protected:
+    void mouseReleaseEvent(QMouseEvent *);
     void mousePressEvent(QMouseEvent *);
     void enterEvent(QEvent *);
     void leaveEvent(QEvent *);
@@ -29,6 +30,7 @@ protected:
     QImage mCheckedPixmap;
     QImage mNotCheckedPixmap;
 signals:
+    void released();
     void pressed();
     void toggled(bool);
 public slots:

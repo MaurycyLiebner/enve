@@ -553,9 +553,11 @@ void CanvasWindow::updateAfterFrameChanged(const int &currentFrame) {
     mCurrentCanvas->prp_setAbsFrame(currentFrame);
 }
 
-void CanvasWindow::pickPathForSettings() {
+void CanvasWindow::pickPathForSettings(const bool &pickFill,
+                                       const bool &pickStroke) {
     if(hasNoCanvas()) return;
     setCanvasMode(PICK_PATH_SETTINGS);
+    mCurrentCanvas->setPickingFromPath(pickFill, pickStroke);
 }
 
 void CanvasWindow::updateDisplayedFillStrokeSettings() {
@@ -620,7 +622,11 @@ void CanvasWindow::nextCurrentRenderFrame() {
     mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(&firstIdT,
                                                          &lastIdT,
                                                          newCurrentRenderFrame);
-    newCurrentRenderFrame = firstIdT;
+    if(mCurrentRenderFrame >= firstIdT) {
+        newCurrentRenderFrame = lastIdT + 1;
+    } else {
+        newCurrentRenderFrame = firstIdT;
+    }
     if(newCurrentRenderFrame - mCurrentRenderFrame > 1) {
         mCurrentCanvas->getCacheHandler()->
             setContainersInFrameRangeBlocked(mCurrentRenderFrame + 1,

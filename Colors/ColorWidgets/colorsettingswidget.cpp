@@ -419,7 +419,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
 
     mPickingButton = new ActionButton(":/icons/draw_dropper.png",
                                      "", this);
-    connect(mPickingButton, SIGNAL(pressed()),
+    connect(mPickingButton, SIGNAL(released()),
             this, SLOT(startColorPicking()));
     mColorLabelLayout->addWidget(color_label);
     mColorLabelLayout->addWidget(mPickingButton);

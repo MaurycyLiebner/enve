@@ -70,3 +70,7 @@ void ActionButton::toggle() {
         emit toggled(mChecked);
     }
 }
+
+void ActionButton::mouseReleaseEvent(QMouseEvent *) {
+    emit released();
+}
