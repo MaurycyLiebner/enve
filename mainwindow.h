@@ -125,6 +125,14 @@ public:
     void previewBeingPlayed();
     void previewBeingRendered();
     void previewPaused();
+
+    void blockUndoRedo() {
+        mUndoRedoStack.blockUndoRedo();
+    }
+
+    void unblockUndoRedo() {
+        mUndoRedoStack.unblockUndoRedo();
+    }
 public slots:
     void setCurrentFrame(int frame);
     void setAllPointsRecord(bool allPointsRecord);
@@ -153,12 +161,8 @@ private slots:
     //void importVideo();
     void revert();
 
-    void undo() {
-        getUndoRedoStack()->undo();
-    }
-    void redo() {
-        getUndoRedoStack()->redo();
-    }
+    void undo();
+    void redo();
 
 signals:
     void updateAll();

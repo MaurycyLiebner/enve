@@ -230,9 +230,9 @@ extern void loadVectorPath(const QDomElement &pathElement,
                            BoxesGroup *parentGroup,
                            VectorPathSvgAttributes *attributes);
 extern void loadElement(const QDomElement &element,
-                        BoxesGroup *parentGroup, BoundingBoxSvgAttributes *parentGroupAttributes);
-extern BoxesGroup *loadSVGFile(const QString &filename,
-                               Canvas *canvas);
+                        BoxesGroup *parentGroup,
+                        BoundingBoxSvgAttributes *parentGroupAttributes);
+extern BoxesGroup *loadSVGFile(const QString &filename);
 
 extern QMatrix getMatrixFromString(const QString &matrixStr);
 extern bool getColorFromString(const QString &colorStr,

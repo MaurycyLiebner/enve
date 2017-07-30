@@ -8,23 +8,33 @@
 #include "ColorWidgets/colorsettingswidget.h"
 #include <QDebug>
 #include "global.h"
+#include <QWindow>
 
 ColorPickingWidget::ColorPickingWidget(ColorSettingsWidget *parent)
-    : QWidget()
-{
+    : QWidget() {
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (const QWindow *window = windowHandle())
+        screen = window->screen();
+    if (!screen)
+        return;
+
+    QApplication::beep();
+
+    mScreenshotPixmap = screen->grabWindow(0);
+
     mColorSettingsWidget = parent;
     QPixmap picker(":/cursors/cursor_color_picker.png");
     QApplication::setOverrideCursor(QCursor(picker, 2, 20) );
     grabMouse();
     grabKeyboard();
     setMouseTracking(true);
-    setAttribute(Qt::WA_TranslucentBackground);
+    //setAttribute(Qt::WA_TranslucentBackground);
+    //setAttribute(Qt::WA_PaintOnScreen);
     showFullScreen();
     updateBox(QCursor::pos());
 }
 
-void ColorPickingWidget::mousePressEvent(QMouseEvent *e)
-{
+void ColorPickingWidget::mouseReleaseEvent(QMouseEvent *e) {
     if(e->button() == Qt::RightButton) endThis();
     QPoint pos_t = mapToGlobal(e->pos());
     QColor pickedColor = colorFromPoint(pos_t.x(), pos_t.y());
@@ -36,9 +46,9 @@ void ColorPickingWidget::mousePressEvent(QMouseEvent *e)
     endThis();
 }
 
-void ColorPickingWidget::paintEvent(QPaintEvent *)
-{
+void ColorPickingWidget::paintEvent(QPaintEvent *) {
     QPainter p(this);
+    p.drawPixmap(0, 0, mScreenshotPixmap);
     p.fillRect(cursor_x + 16, cursor_y + 16, 28, 28, Qt::black);
     p.fillRect(cursor_x + 18, cursor_y + 18, 24, 24, Qt::white);
     p.fillRect(cursor_x + MIN_WIDGET_HEIGHT,

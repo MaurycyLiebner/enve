@@ -8,6 +8,7 @@
 
 GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
     QWidget(parent) {
+    setFixedHeight((3 + mNumberVisibleGradients + 0.5)*MIN_WIDGET_HEIGHT);
     mMainLayout = new QVBoxLayout(this);
     mMainLayout->setMargin(0);
     mMainLayout->setSpacing(0);
@@ -18,7 +19,6 @@ GradientWidget::GradientWidget(QWidget *parent, MainWindow *mainWindow) :
     mMainLayout->addSpacing(MIN_WIDGET_HEIGHT/2);
     mMainLayout->addWidget(mCurrentGradientWidget);
     setLayout(mMainLayout);
-    setFixedHeight((3 + mNumberVisibleGradients + 0.5)*MIN_WIDGET_HEIGHT);
 
     mScrollItemHeight = MIN_WIDGET_HEIGHT;
 
@@ -324,7 +324,7 @@ void GradientWidget::drawHoveredGradientBorder(const int &displayedTop,
 
 void GradientWidget::drawHoveredColorBorder(const int &hoveredX,
                                             const int &colHeight) {
-    if(hoveredX < 0 || hoveredX > width()) return;
+    if(hoveredX < 0 || hoveredX > width() || mCurrentGradient == NULL) return;
     int colId = getColorIdAtX(hoveredX);
     int len = mCurrentGradient->getColorCount();
     int colWidth = width()/len;

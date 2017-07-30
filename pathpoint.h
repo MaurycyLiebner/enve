@@ -149,14 +149,14 @@ public:
 
     void setCtrlsMode(const CtrlsMode &mode,
                       const bool &saveUndoRedo = true);
-    QPointF symmetricToAbsPos(QPointF absPosToMirror);
-    QPointF symmetricToAbsPosNewLen(QPointF absPosToMirror,
-                                    qreal newLen);
-    void ctrlPointPosChanged(bool startPtChanged);
-    void moveEndCtrlPtToAbsPos(QPointF endCtrlPt);
-    void moveStartCtrlPtToAbsPos(QPointF startCtrlPt);
-    void moveEndCtrlPtToRelPos(QPointF endCtrlPt);
-    void moveStartCtrlPtToRelPos(QPointF startCtrlPt);
+    QPointF symmetricToAbsPos(const QPointF &absPosToMirror);
+    QPointF symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
+                                    const qreal &newLen);
+    void ctrlPointPosChanged(const bool &startPtChanged);
+    void moveEndCtrlPtToAbsPos(const QPointF &endCtrlPt);
+    void moveStartCtrlPtToAbsPos(const QPointF &startCtrlPt);
+    void moveEndCtrlPtToRelPos(const QPointF &endCtrlPt);
+    void moveStartCtrlPtToRelPos(const QPointF &startCtrlPt);
     void setCtrlPtEnabled(const bool &enabled,
                           const bool &isStartPt,
                           const bool &saveUndoRedo = true);

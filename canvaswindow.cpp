@@ -664,7 +664,6 @@ void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
         mNoBoxesAwaitUpdate = false;
     }
 
-    qDebug() << "add updatable";
     mUpdatablesAwaitingUpdate << updatable->ref<Updatable>();
     if(!mFreeThreads.isEmpty()) {
         sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
@@ -686,7 +685,6 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
 //        }
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
-        qDebug() << "no more updatables";
         mClearBeingUpdated = false;
         mNoBoxesAwaitUpdate = true;
         mFreeThreads << threadId;
@@ -704,7 +702,6 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
                 updatablaT->beforeUpdate();
                 emit updateUpdatable(updatablaT, threadId);
                 mUpdatablesAwaitingUpdate.removeAt(i);
-                qDebug() << "remove updatable";
                 i--;
                 return;
             }
@@ -1046,29 +1043,36 @@ void CanvasWindow::importFile(const QString &path,
     }
 
     QString extension = path.split(".").last();
-    BoundingBox *boxToPosition = NULL;
-    if(extension == "svg") {
-        boxToPosition = loadSVGFile(path, mCurrentCanvas.data());
-    } else if(extension == "png" ||
-              extension == "jpg") {
-        boxToPosition = createImageForPath(path);
-    } else if(extension == "avi" ||
-              extension == "mp4" ||
-              extension == "mov") {
-        boxToPosition = createVideoForPath(path);
-    } else if(extension == "mp3" ||
-              extension == "wav") {
+    if(extension == "mp3" ||
+       extension == "wav") {
         createSoundForPath(path);
-    } else if(extension == "av") {
-        MainWindow::getInstance()->loadAVFile(path);
+    } else {
+        BoundingBox *importedBox = NULL;
+        MainWindow::getInstance()->blockUndoRedo();
+        if(extension == "svg") {
+            importedBox = loadSVGFile(path);
+        } else if(extension == "png" ||
+                  extension == "jpg") {
+            importedBox = new ImageBox(path);;
+        } else if(extension == "avi" ||
+                  extension == "mp4" ||
+                  extension == "mov") {
+            importedBox = new VideoBox(path);
+        } else if(extension == "av") {
+            MainWindow::getInstance()->loadAVFile(path);
+        }
+        MainWindow::getInstance()->unblockUndoRedo();
+
+        if(importedBox != NULL) {
+            mCurrentCanvas->getCurrentBoxesGroup()->addChild(
+                        importedBox);
+            QPointF trans = relDropPos;
+            trans -= importedBox->mapRelPosToAbs(
+                        importedBox->getRelCenterPosition());
+            importedBox->moveByAbs(trans);
+        }
+        updateHoveredElements();
     }
-    if(boxToPosition != NULL) {
-        QPointF trans = relDropPos;
-        trans -= boxToPosition->mapRelPosToAbs(
-                    boxToPosition->getRelCenterPosition());
-        boxToPosition->moveByAbs(trans);
-    }
-    updateHoveredElements();
     MainWindow::getInstance()->enable();
 
     MainWindow::getInstance()->callUpdateSchedulers();

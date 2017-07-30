@@ -198,6 +198,7 @@ QTabWidget::pane {
 }
 
 QPushButton {
+    qproperty-iconSize: 17px;
     background: qlineargradient(x1:0, y1:0,
                                 x2:0, y2:1,
         stop:0 rgb(200, 200, 200),
@@ -262,7 +263,9 @@ QPushButton#leftButton {
     border-right: 0;
 }
 
-QPushButton#middleButton:checked, QPushButton#rightButton:checked, QPushButton#leftButton:checked {
+QPushButton#middleButton:checked,
+QPushButton#rightButton:checked,
+QPushButton#leftButton:checked {
     background: qlineargradient(x1:0, y1:0,
                                 x2:0, y2:1,
         stop:0 rgb(85, 175, 235),

@@ -175,7 +175,16 @@ public:
 
     void undo();
 
+    void blockUndoRedo() {
+        mUndoRedoBlocked = true;
+    }
+
+    void unblockUndoRedo() {
+        mUndoRedoBlocked = false;
+    }
+
 private:
+    bool mUndoRedoBlocked = false;
     int mLastUndoRedoFrame = INT_MAX;
     MainWindow *mMainWindow;
     int mNumberOfSets = 0;

@@ -15,6 +15,7 @@ void UndoRedoStack::setWindow(MainWindow *mainWindow) {
 }
 
 void UndoRedoStack::addUndoRedo(UndoRedo *undoRedo) {
+    if(mUndoRedoBlocked) return;
     mMainWindow->setFileChangedSinceSaving(true);
     if(mNumberOfSets != 0) {
         addToSet(undoRedo);

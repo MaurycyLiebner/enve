@@ -6,11 +6,11 @@
 #include "updatescheduler.h"
 #include "qrealanimatorvalueslider.h"
 #include "Colors/ColorWidgets/colorsettingswidget.h"
-
+#include "actionbutton.h"
 #include "qdoubleslider.h"
+
 FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
-    QWidget(parent)
-{
+    QWidget(parent) {
     //setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mMainWindow = parent;
     mUndoRedoSaveTimer = new QTimer(this);
@@ -66,14 +66,9 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mTargetLayout->addWidget(mFillTargetButton);
     mTargetLayout->addWidget(mStrokeTargetButton);
 
-    mMainLayout->addLayout(mTargetLayout);
-    mMainLayout->addLayout(mColorTypeLayout);
-    mMainLayout->addWidget(mStrokeSettingsWidget);
-    mMainLayout->addWidget(mGradientWidget);
-    mMainLayout->addWidget(mColorsSettingsWidget);
-
     //mLineWidthSpin = new QDoubleSpinBox(this);
-    mLineWidthSpin = new QrealAnimatorValueSlider("line width", 0., 1000., 1., this);
+    mLineWidthSpin = new QrealAnimatorValueSlider("line width",
+                                                  0., 1000., 1., this);
     mLineWidthSpin->setNameVisible(false);
     //mLineWidthSpin->setValueSliderVisibile(false);
     //mLineWidthSpin->setRange(0.0, 1000.0);
@@ -156,21 +151,13 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
             SIGNAL(colorSettingSignal(ColorSetting)),
             this, SLOT(colorSettingReceived(ColorSetting)));
 
-    mFillPickerButton = new QPushButton(
-                QIcon(":/icons/fill_dropper.png"), "", this);
-    mFillPickerButton->setSizePolicy(QSizePolicy::Maximum,
-                                     QSizePolicy::Maximum);
-    mFillPickerButton->setFocusPolicy(Qt::NoFocus);
-    mStrokePickerButton = new QPushButton(
-                QIcon(":/icons/stroke_dropper.png"), "", this);
-    mStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
-                                       QSizePolicy::Maximum);
-    mStrokePickerButton->setFocusPolicy(Qt::NoFocus);
-    mFillStrokePickerButton = new QPushButton(
-                QIcon(":/icons/fill_stroke_dropper.png"), "", this);
-    mFillStrokePickerButton->setSizePolicy(QSizePolicy::Maximum,
-                                           QSizePolicy::Maximum);
-    mFillStrokePickerButton->setFocusPolicy(Qt::NoFocus);
+    mFillPickerButton = new ActionButton(
+                ":/icons/fill_dropper.png", "", this);
+    mStrokePickerButton = new ActionButton(
+                ":/icons/stroke_dropper.png", "", this);
+    mFillStrokePickerButton = new ActionButton(
+                ":/icons/fill_stroke_dropper.png", "", this);
+
     mPickersLayout->addWidget(mFillPickerButton);
 
     connect(mFillPickerButton, SIGNAL(pressed()),
@@ -183,14 +170,21 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     mPickersLayout->addWidget(mFillStrokePickerButton);
     connect(mFillStrokePickerButton, SIGNAL(pressed()),
             this, SLOT(startLoadingSettingsFromPath()) );
+
+    connect(mColorsSettingsWidget, SIGNAL(colorModeChanged(ColorMode)),
+            this, SLOT(setCurrentColorMode(ColorMode)));
+
+    mMainLayout->addLayout(mTargetLayout);
+    mMainLayout->addLayout(mColorTypeLayout);
+    mMainLayout->addWidget(mStrokeSettingsWidget);
+    mMainLayout->addWidget(mGradientWidget);
+    mMainLayout->addWidget(mColorsSettingsWidget);
     mMainLayout->addLayout(mPickersLayout);
+    mMainLayout->addStretch(1);
 
     setFillTarget();
     setCapStyle(Qt::RoundCap);
     setJoinStyle(Qt::RoundJoin);
-
-    connect(mColorsSettingsWidget, SIGNAL(colorModeChanged(ColorMode)),
-            this, SLOT(setCurrentColorMode(ColorMode)));
 }
 
 void FillStrokeSettingsWidget::setGradientFill() {
@@ -701,8 +695,12 @@ void FillStrokeSettingsWidget::setGradientPaintType()
             mCurrentStrokeGradient = mGradientWidget->getCurrentGradient();
         }
     }
-    mColorsSettingsWidget->show();
-    mGradientWidget->show();
+    if(mColorsSettingsWidget->isHidden()) {
+        mColorsSettingsWidget->show();
+    }
+    if(mGradientWidget->isHidden()) {
+        mGradientWidget->show();
+    }
     updateColorAnimator();
 
     mGradientWidget->update();

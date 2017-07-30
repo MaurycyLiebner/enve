@@ -641,7 +641,6 @@ qreal BoundingBox::getEffectsMarginAtRelFrame(const int &relFrame) {
 void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
-    qDebug() << "setup " + prp_mName;
     data->relFrame = relFrame;
     data->renderedToImage = false;
     data->transform = mTransformAnimator->

@@ -22,6 +22,7 @@ class MainWindow;
 class CanvasWindow;
 class ColorSettingsWidget;
 class QrealAnimatorValueSlider;
+class ActionButton;
 
 class FillStrokeSettingsWidget : public QWidget {
     Q_OBJECT
@@ -169,9 +170,9 @@ private:
     GradientWidget *mGradientWidget;
 
     QHBoxLayout *mPickersLayout = new QHBoxLayout();
-    QPushButton *mFillPickerButton;
-    QPushButton *mStrokePickerButton;
-    QPushButton *mFillStrokePickerButton;
+    ActionButton *mFillPickerButton;
+    ActionButton *mStrokePickerButton;
+    ActionButton *mFillStrokePickerButton;
     void setTransformFinishEmitter(const char *slot);
 };
 

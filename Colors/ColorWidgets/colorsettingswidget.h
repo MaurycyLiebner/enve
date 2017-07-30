@@ -14,6 +14,7 @@
 #include "Animators/paintsettings.h"
 
 class ColorLabel;
+class ActionButton;
 
 class ColorSettingsWidget : public QWidget
 {
@@ -143,7 +144,7 @@ private:
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
     QHBoxLayout *mColorLabelLayout = new QHBoxLayout();
-    QPushButton *mPickingButton;
+    ActionButton *mPickingButton;
 
     ColorLabel *color_label = NULL;
     void connectColorWidgetSignalToSlot(ColorWidget *slot_obj, const char *slot,

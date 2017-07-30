@@ -336,6 +336,7 @@ void ColorSettingsWidget::startColorPicking()
 {
     new ColorPickingWidget(this);
 }
+#include "actionbutton.h"
 
 ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
 {
@@ -416,9 +417,8 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
     aLayout->addWidget(aSpin);
 
 
-    mPickingButton = new QPushButton(QIcon(":/icons/draw_dropper.png"),
+    mPickingButton = new ActionButton(":/icons/draw_dropper.png",
                                      "", this);
-    mPickingButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     connect(mPickingButton, SIGNAL(pressed()),
             this, SLOT(startColorPicking()));
     mColorLabelLayout->addWidget(color_label);
@@ -579,7 +579,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
             aSpin, SLOT(emitValueChangedExternal(qreal)));
 
 
-    setMinimumSize(250, 200);
+    //setMinimumSize(250, 200);
     mTabWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                               QSizePolicy::Maximum);
     setCurrentColor(0.f, 0.f, 0.f);

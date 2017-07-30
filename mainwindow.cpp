@@ -85,6 +85,8 @@ MainWindow::MainWindow(QWidget *parent)
     mRightDock->setFeatures(0);
     mRightDock->setTitleBarWidget(new QWidget());
     addDockWidget(Qt::RightDockWidgetArea, mRightDock);
+    mRightDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
+    mRightDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
 
     mBottomDock = new QDockWidget(this);
 
@@ -115,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent)
     mLeftDock->setFeatures(mLeftDock->features().setFlag(
                                QDockWidget::DockWidgetClosable, false));
     mLeftDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
+    mLeftDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
 
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(mObjectSettingsScrollArea);
@@ -1028,7 +1031,7 @@ bool MainWindow::isEnabled() {
 
 void MainWindow::clearAll() {
     mUpdateSchedulers.clear();
-
+    setFileChangedSinceSaving(false);
     mUndoRedoStack.clearAll();
     mObjectSettingsWidget->setMainTarget(NULL);
     mBoxesListAnimationDockWidget->clearAll();
@@ -1155,6 +1158,18 @@ void MainWindow::revert() {
     setFileChangedSinceSaving(false);
 }
 
+void MainWindow::undo() {
+    getUndoRedoStack()->undo();
+    mCanvasWindow->updateHoveredElements();
+    callUpdateSchedulers();
+}
+
+void MainWindow::redo() {
+    getUndoRedoStack()->redo();
+    mCanvasWindow->updateHoveredElements();
+    callUpdateSchedulers();
+}
+
 void MainWindow::setCurrentFrameForAllWidgets(int frame)
 {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
@@ -1171,10 +1186,6 @@ void MainWindow::loadAVFile(QString path) {
 
     clearLoadedGradientsList();
     db.close();
-
-    mUndoRedoStack.clearAll();
-    setFileChangedSinceSaving(false);
-    setCurrentFrame(0);
 }
 
 Gradient *MainWindow::getLoadedGradientBySqlId(const int &id) {

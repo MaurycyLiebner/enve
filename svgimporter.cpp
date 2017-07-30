@@ -127,10 +127,12 @@ BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
     BoxesGroup *boxesGroup;
     bool hasTransform = attributes->hasTransform();
     if(allRootChildNodes.count() > 1 ||
-       hasTransform) {
+       hasTransform || parentGroup == NULL) {
         boxesGroup = new BoxesGroup();
         attributes->apply(boxesGroup);
-        parentGroup->addChild(boxesGroup);
+        if(parentGroup != NULL) {
+            parentGroup->addChild(boxesGroup);
+        }
     } else {
         boxesGroup = parentGroup;
     }
@@ -1065,8 +1067,7 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
     return matrix;
 }
 #include "mainwindow.h"
-BoxesGroup *loadSVGFile(const QString &filename,
-                        Canvas *canvas) {
+BoxesGroup *loadSVGFile(const QString &filename) {
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QDomDocument document;
@@ -1074,7 +1075,7 @@ BoxesGroup *loadSVGFile(const QString &filename,
             QDomElement rootElement = document.firstChildElement("svg");
             if(!rootElement.isNull()) {
                 BoundingBoxSvgAttributes attributes;
-                return loadBoxesGroup(rootElement, canvas, &attributes);
+                return loadBoxesGroup(rootElement, NULL, &attributes);
             } else {
                 qDebug() << "File does not have svg root element";
             }
@@ -1864,7 +1865,8 @@ void FillSvgAttributes::apply(BoundingBox *box) {
 
 StrokeSvgAttributes::StrokeSvgAttributes() {}
 
-StrokeSvgAttributes &StrokeSvgAttributes::operator*=(const StrokeSvgAttributes &overwritter) {
+StrokeSvgAttributes &StrokeSvgAttributes::operator*=(
+        const StrokeSvgAttributes &overwritter) {
     setColor(overwritter.getColor());
     setGradient(overwritter.getGradient());
     setPaintType(overwritter.getPaintType());
@@ -1876,13 +1878,22 @@ StrokeSvgAttributes &StrokeSvgAttributes::operator*=(const StrokeSvgAttributes &
     return *this;
 }
 
-const qreal &StrokeSvgAttributes::getLineWidth() const { return mLineWidth; }
+const qreal &StrokeSvgAttributes::getLineWidth() const {
+    return mLineWidth;
+}
 
-const Qt::PenCapStyle &StrokeSvgAttributes::getCapStyle() const { return mCapStyle; }
+const Qt::PenCapStyle &StrokeSvgAttributes::getCapStyle() const {
+    return mCapStyle;
+}
 
-const Qt::PenJoinStyle &StrokeSvgAttributes::getJoinStyle() const { return mJoinStyle; }
+const Qt::PenJoinStyle &StrokeSvgAttributes::getJoinStyle() const {
+    return mJoinStyle;
+}
 
-const QPainter::CompositionMode &StrokeSvgAttributes::getOutlineCompositionMode() const { return mOutlineCompositionMode; }
+const QPainter::CompositionMode &
+StrokeSvgAttributes::getOutlineCompositionMode() const {
+    return mOutlineCompositionMode;
+}
 
 void StrokeSvgAttributes::setLineWidth(const qreal &val) {
     mLineWidth = val;
@@ -1896,7 +1907,8 @@ void StrokeSvgAttributes::setJoinStyle(const Qt::PenJoinStyle &joinStyle) {
     mJoinStyle = joinStyle;
 }
 
-void StrokeSvgAttributes::setOutlineCompositionMode(const QPainter::CompositionMode &compMode) {
+void StrokeSvgAttributes::setOutlineCompositionMode(
+        const QPainter::CompositionMode &compMode) {
     mOutlineCompositionMode = compMode;
 }
 

@@ -284,24 +284,24 @@ int PathPoint::saveToSql(QSqlQuery *query, const int &boundingBoxId) {
     return movablePtId;
 }
 
-QPointF PathPoint::symmetricToAbsPos(QPointF absPosToMirror) {
+QPointF PathPoint::symmetricToAbsPos(const QPointF &absPosToMirror) {
     return symmetricToPos(absPosToMirror, getAbsolutePos());
 }
 
-QPointF PathPoint::symmetricToAbsPosNewLen(QPointF absPosToMirror,
-                                           qreal newLen) {
+QPointF PathPoint::symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
+                                           const qreal &newLen) {
     return symmetricToPosNewLen(absPosToMirror, getAbsolutePos(), newLen);
 }
 
-void PathPoint::moveStartCtrlPtToAbsPos(QPointF startCtrlPt) {
+void PathPoint::moveStartCtrlPtToAbsPos(const QPointF &startCtrlPt) {
     mStartCtrlPt->moveToAbs(startCtrlPt);
 }
 
-void PathPoint::moveEndCtrlPtToRelPos(QPointF endCtrlPt) {
+void PathPoint::moveEndCtrlPtToRelPos(const QPointF &endCtrlPt) {
     mEndCtrlPt->setRelativePos(endCtrlPt);
 }
 
-void PathPoint::moveStartCtrlPtToRelPos(QPointF startCtrlPt) {
+void PathPoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
     mStartCtrlPt->setRelativePos(startCtrlPt);
 }
 
@@ -330,7 +330,7 @@ CtrlPoint *PathPoint::getStartCtrlPt()
     return mStartCtrlPt;
 }
 
-void PathPoint::ctrlPointPosChanged(bool startPtChanged) {
+void PathPoint::ctrlPointPosChanged(const bool &startPtChanged) {
     ctrlPointPosChanged((startPtChanged) ? mStartCtrlPt : mEndCtrlPt,
                         (startPtChanged) ? mEndCtrlPt : mStartCtrlPt);
 }
@@ -352,7 +352,7 @@ void PathPoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
     }
 }
 
-void PathPoint::moveEndCtrlPtToAbsPos(QPointF endCtrlPt) {
+void PathPoint::moveEndCtrlPtToAbsPos(const QPointF &endCtrlPt) {
     mEndCtrlPt->moveToAbs(endCtrlPt);
 }
 

@@ -10,7 +10,7 @@ class ColorPickingWidget : public QWidget
     Q_OBJECT
 public:
     explicit ColorPickingWidget(ColorSettingsWidget *parent = 0);
-    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
@@ -21,6 +21,7 @@ signals:
 
 public slots:
 private:
+    QPixmap mScreenshotPixmap;
     QColor current_color;
     int cursor_x = 0;
     ColorSettingsWidget *mColorSettingsWidget;
