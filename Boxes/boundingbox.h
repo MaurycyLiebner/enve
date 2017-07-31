@@ -340,7 +340,7 @@ public:
     }
 
     virtual Canvas *getParentCanvas();
-
+    virtual void reloadCacheHandler() {}
 
     void duplicateTransformAnimatorFrom(BoxTransformAnimator *source);
 

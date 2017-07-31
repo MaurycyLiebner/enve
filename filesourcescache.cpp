@@ -3,6 +3,7 @@
 #include "Boxes/boundingboxrendercontainer.h"
 #include "mainwindow.h"
 #include "updatescheduler.h"
+#include "Boxes/boundingbox.h"
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
@@ -50,6 +51,26 @@ FileCacheHandler::FileCacheHandler(const QString &filePath) {
 
 FileCacheHandler::~FileCacheHandler() {
     FileSourcesCache::removeHandler(this);
+}
+
+void FileCacheHandler::clearCache() {
+    foreach(const BoundingBoxQSPtr &boxPtr, mDependentBoxes) {
+        boxPtr->reloadCacheHandler();
+    }
+}
+
+void FileCacheHandler::addDependentBox(BoundingBox *dependent) {
+    mDependentBoxes << dependent->ref<BoundingBox>();
+}
+
+void FileCacheHandler::removeDependentBox(BoundingBox *dependent) {
+    for(int i = 0; i < mDependentBoxes.count(); i++) {
+        const BoundingBoxQSPtr &boxPtr = mDependentBoxes.at(i);
+        if(boxPtr.data() == dependent) {
+            mDependentBoxes.removeAt(i);
+            return;
+        }
+    }
 }
 
 ImageCacheHandler::ImageCacheHandler(const QString &filePath) :
@@ -281,6 +302,7 @@ void VideoCacheHandler::afterUpdate() {
 
 void VideoCacheHandler::clearCache() {
     mFramesCache.clearCache();
+    AnimationCacheHandler::clearCache();
 }
 
 const qreal &VideoCacheHandler::getFps() { return mFps; }
@@ -317,6 +339,13 @@ sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int &relFrame) {
 
 void ImageSequenceCacheHandler::updateFrameCount() {
     mFramesCount = mFramePaths.count();
+}
+
+void ImageSequenceCacheHandler::clearCache() {
+    foreach(ImageCacheHandler *cacheHandler, mFrameImageHandlers) {
+        cacheHandler->clearCache();
+    }
+    FileCacheHandler::clearCache();
 }
 
 Updatable *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {

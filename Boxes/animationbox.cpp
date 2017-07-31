@@ -51,7 +51,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
             qCeil(qAbs(timeScale*mAnimationCacheHandler->getFramesCount())));
 }
 
-void AnimationBox::reloadFile() {
+void AnimationBox::reloadCacheHandler() {
     if(mParent != NULL) {
         updateDurationRectangleAnimationRange();
     }
@@ -129,7 +129,9 @@ bool AnimationBox::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "ab_set_src_file") {
         changeSourceFile();
     } else if(selectedAction->objectName() == "ab_reload") {
-        reloadFile();
+        if(mAnimationCacheHandler != NULL) {
+            mAnimationCacheHandler->clearCache();
+        }
     } else {
         return false;
     }

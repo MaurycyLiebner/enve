@@ -6,6 +6,7 @@
 #include "skiaincludes.h"
 #include "Boxes/rendercachehandler.h"
 #include "updatable.h"
+typedef QSharedPointer<BoundingBox> BoundingBoxQSPtr;
 
 class FileCacheHandler : public Updatable {
 public:
@@ -16,8 +17,13 @@ public:
         return mFilePath;
     }
 
-    virtual void clearCache() = 0;
+    virtual void clearCache();
+
+    void scheduleUpdateForAllDependent();
+    void addDependentBox(BoundingBox *dependent);
+    void removeDependentBox(BoundingBox *dependent);
 protected:
+    QList<BoundingBoxQSPtr> mDependentBoxes;
     std::shared_ptr<FileCacheHandler> mFileHandlerRef;
     QString mFilePath;
     QString mUpdateFilePath;
@@ -43,6 +49,7 @@ public:
     void afterUpdate();
     void clearCache() {
         mImage.reset();
+        FileCacheHandler::clearCache();
     }
     sk_sp<SkImage> getImage() { return mImage; }
 private:
@@ -57,8 +64,6 @@ public:
     AnimationCacheHandler() :
         FileCacheHandler("") {}
     virtual sk_sp<SkImage> getFrameAtFrame(const int &relFrame) = 0;
-
-    virtual void clearCache() {}
 
     virtual Updatable *scheduleFrameLoad(const int &frame) = 0;
     const int &getFramesCount() { return mFramesCount; }
@@ -77,6 +82,8 @@ public:
     void updateFrameCount();
 
     void processUpdate() {}
+
+    void clearCache();
 
     Updatable *scheduleFrameLoad(const int &frame);
 protected:
@@ -98,7 +105,7 @@ public:
 
     void clearCache();
 
-    const qreal &getFps();
+    const qreal &getFps();    
 
     virtual Updatable *scheduleFrameLoad(const int &frame);
 protected:

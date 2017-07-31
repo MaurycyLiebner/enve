@@ -29,7 +29,7 @@ public:
 //    BoundingBox *createNewDuplicate(BoxesGroup *parent);
     void duplicateAnimationBoxAnimatorsFrom(QrealAnimator *timeScaleAnimator);
     void updateDurationRectangleAnimationRange();
-    virtual void reloadFile();
+    void reloadCacheHandler();
     virtual void reloadSound() {}
     FixedLenAnimationRect *getAnimationDurationRect();
 

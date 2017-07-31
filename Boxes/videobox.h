@@ -17,7 +17,6 @@ public:
     void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate();
     void reloadSound();
-    void reloadFile();
 
     bool SWT_isVideoBox() { return true; }
     void changeSourceFile();

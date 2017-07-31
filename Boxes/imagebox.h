@@ -43,8 +43,8 @@ private:
 class ImageBox : public BoundingBox {
 public:
     ImageBox(QString filePath = "");
+    ~ImageBox();
 
-    void reloadPixmap();
     void setFilePath(const QString &path);
 
     void makeDuplicate(Property *targetBox);

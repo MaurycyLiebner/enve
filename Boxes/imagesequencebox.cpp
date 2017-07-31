@@ -8,12 +8,13 @@ ImageSequenceBox::ImageSequenceBox() :
 
 void ImageSequenceBox::setListOfFrames(const QStringList &listOfFrames) {
     mListOfFrames = listOfFrames;
-    reloadFile();
-}
-
-void ImageSequenceBox::reloadFile() {
+    if(mAnimationCacheHandler != NULL) {
+        mAnimationCacheHandler->removeDependentBox(this);
+    }
     mAnimationCacheHandler = new ImageSequenceCacheHandler(mListOfFrames);
-    AnimationBox::reloadFile();
+    mAnimationCacheHandler->addDependentBox(this);
+
+    reloadCacheHandler();
 }
 
 void ImageSequenceBox::makeDuplicate(Property *targetBox) {

@@ -7,7 +7,6 @@ public:
     ImageSequenceBox();
     void setListOfFrames(const QStringList &listOfFrames);
     BoundingBox *createNewDuplicate();
-    void reloadFile();
     void makeDuplicate(Property *targetBox);
 
     bool SWT_isImageSequenceBox() { return true; }

@@ -10,6 +10,7 @@ extern "C" {
 #include "Sound/singlesound.h"
 #include "canvas.h"
 #include "Sound/soundcomposition.h"
+#include "filesourcescache.h"
 
 VideoBox::VideoBox(const QString &filePath) :
     AnimationBox() {
@@ -101,19 +102,16 @@ void VideoBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 
 void VideoBox::setFilePath(QString path) {
     mSrcFilePath = path;
-    reloadFile();
-}
-#include "filesourcescache.h"
-void VideoBox::reloadFile() {
-    mAnimationCacheHandler = (AnimationCacheHandler*)
-                                FileSourcesCache::getHandlerForFilePath(
-                                                        mSrcFilePath);
     if(mAnimationCacheHandler == NULL) {
-        mAnimationCacheHandler = new VideoCacheHandler(mSrcFilePath);
-    } else {
-        ((VideoCacheHandler*)mAnimationCacheHandler)->clearCache();
+        mAnimationCacheHandler = (AnimationCacheHandler*)
+                                    FileSourcesCache::getHandlerForFilePath(
+                                                            mSrcFilePath);
+        if(mAnimationCacheHandler == NULL) {
+            mAnimationCacheHandler = new VideoCacheHandler(mSrcFilePath);
+        }
+        mAnimationCacheHandler->addDependentBox(this);
     }
-    AnimationBox::reloadFile();
+    reloadCacheHandler();
 }
 
 bool hasSound(const char* path) {

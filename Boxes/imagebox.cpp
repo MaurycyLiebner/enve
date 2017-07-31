@@ -10,7 +10,11 @@ ImageBox::ImageBox(QString filePath) :
     setFilePath(filePath);
 }
 
-
+ImageBox::~ImageBox() {
+    if(mImgCacheHandler != NULL) {
+        mImgCacheHandler->removeDependentBox(this);
+    }
+}
 
 #include <QSqlError>
 int ImageBox::saveToSql(QSqlQuery *query, const int &parentId) {
@@ -55,14 +59,11 @@ BoundingBox *ImageBox::createNewDuplicate() {
     return new ImageBox();
 }
 
-void ImageBox::reloadPixmap() {
-    mImgCacheHandler->clearCache();
-
-    scheduleUpdate();
-}
-
 void ImageBox::setFilePath(const QString &path) {
     mImageFilePath = path;
+    if(mImgCacheHandler != NULL) {
+        mImgCacheHandler->removeDependentBox(this);
+    }
     mImgCacheHandler = (ImageCacheHandler*)
                                 FileSourcesCache::getHandlerForFilePath(
                                                         path);
@@ -72,7 +73,8 @@ void ImageBox::setFilePath(const QString &path) {
             mImgCacheHandler = new ImageCacheHandler(path);
         }
     }
-    reloadPixmap();
+    mImgCacheHandler->addDependentBox(this);
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void ImageBox::addActionsToMenu(QMenu *menu) {
@@ -114,7 +116,9 @@ bool ImageBox::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "ib_set_src_file") {
         changeSourceFile();
     } else if(selectedAction->objectName() == "ib_reload") {
-        reloadPixmap();
+        if(mImgCacheHandler != NULL) {
+            mImgCacheHandler->clearCache();
+        }
     } else {
         return false;
     }
