@@ -33,7 +33,3 @@ void MinimalScrollWidget::changeVisibleHeight(const int &height) {
                     MIN_WIDGET_HEIGHT;
     mMinimalVisiblePartWidget->setVisibleHeight(newHeight);
 }
-
-void MinimalScrollWidget::createVisiblePartWidget() {
-    mMinimalVisiblePartWidget = new MinimalScrollWidgetVisiblePart(this);
-}

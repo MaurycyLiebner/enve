@@ -7,6 +7,7 @@
 #include "Boxes/rendercachehandler.h"
 #include "updatable.h"
 typedef QSharedPointer<BoundingBox> BoundingBoxQSPtr;
+class FileSourceListVisibleWidget;
 
 class FileCacheHandler : public Updatable {
 public:
@@ -33,11 +34,18 @@ class FileSourcesCache {
 public:
     FileSourcesCache();
 
+    static void addFileSourceListVisibleWidget(
+            FileSourceListVisibleWidget *wid);
+    static void removeFileSourceListVisibleWidget(
+            FileSourceListVisibleWidget *wid);
     static void addHandler(FileCacheHandler *handlerPtr);
     static FileCacheHandler *getHandlerForFilePath(const QString &filePath);
     static void removeHandler(FileCacheHandler *handler);
     static void clearAll();
+    static const QList<FileCacheHandler*> &getFileCacheList();
+
 private:
+    static QList<FileSourceListVisibleWidget*> mFileSourceListVisibleWidgets;
     static QList<FileCacheHandler*> mFileCacheHandlers;
 };
 

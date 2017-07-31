@@ -25,6 +25,7 @@
 #include "fontswidget.h"
 #include "global.h"
 #include "filesourcescache.h"
+#include "filesourcelist.h"
 
 #include <QAudioOutput>
 #include "Sound/soundcomposition.h"
@@ -140,6 +141,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     mLeftDock->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock);
+
+    QDockWidget *mLeftDock2 = new QDockWidget(this);
+    mLeftDock2->setFeatures(mLeftDock2->features().setFlag(
+                               QDockWidget::DockWidgetClosable, false));
+    mLeftDock2->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
+    mLeftDock2->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+
+    mLeftDock2->setWidget(new FileSourceList(this));
+    addDockWidget(Qt::LeftDockWidgetArea, mLeftDock2);
+
 
 //    mCanvasWindow->SWT_getAbstractionForWidget(
 //                mBoxListWidget->getVisiblePartWidget());

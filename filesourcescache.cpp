@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include "updatescheduler.h"
 #include "Boxes/boundingbox.h"
+#include "filesourcelist.h"
 extern "C" {
     #include <libavcodec/avcodec.h>
     #include <libavformat/avformat.h>
@@ -11,14 +12,30 @@ extern "C" {
     #include <libavutil/imgutils.h>
 }
 
-QList<FileCacheHandler*> FileSourcesCache::mFileCacheHandlers;
+QList<FileCacheHandler*>
+FileSourcesCache::mFileCacheHandlers;
+QList<FileSourceListVisibleWidget*>
+FileSourcesCache::mFileSourceListVisibleWidgets;
 
 FileSourcesCache::FileSourcesCache() {
 
 }
 
+void FileSourcesCache::addFileSourceListVisibleWidget(
+        FileSourceListVisibleWidget *wid) {
+    mFileSourceListVisibleWidgets << wid;
+}
+
+void FileSourcesCache::removeFileSourceListVisibleWidget(
+        FileSourceListVisibleWidget *wid) {
+    mFileSourceListVisibleWidgets.removeOne(wid);
+}
+
 void FileSourcesCache::addHandler(FileCacheHandler *handlerPtr) {
     mFileCacheHandlers.append(handlerPtr);
+    foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
+        wid->scheduleContentUpdate();
+    }
 }
 
 FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
@@ -41,6 +58,10 @@ void FileSourcesCache::clearAll() {
         delete handler;
     }
     mFileCacheHandlers.clear();
+}
+
+const QList<FileCacheHandler*> &FileSourcesCache::getFileCacheList() {
+    return mFileCacheHandlers;
 }
 
 FileCacheHandler::FileCacheHandler(const QString &filePath) {

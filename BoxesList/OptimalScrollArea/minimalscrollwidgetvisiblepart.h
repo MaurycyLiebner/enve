@@ -25,7 +25,7 @@ public:
 
     void updateParentHeight();
 
-    virtual QWidget *createNewSingleWidget();
+    virtual QWidget *createNewSingleWidget() = 0;
     void updateWidgetsWidth();
 
     virtual void callUpdaters();

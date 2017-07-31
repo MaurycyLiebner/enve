@@ -140,7 +140,3 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 void MinimalScrollWidgetVisiblePart::updateParentHeight() {
     mParentWidget->updateHeight();
 }
-
-QWidget *MinimalScrollWidgetVisiblePart::createNewSingleWidget() {
-    return new QWidget(this);
-}

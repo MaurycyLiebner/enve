@@ -25,7 +25,7 @@ public slots:
     void changeVisibleHeight(const int &height);
     void setWidth(const int &width);
 protected:
-    virtual void createVisiblePartWidget();
+    virtual void createVisiblePartWidget() = 0;
     MinimalScrollWidgetVisiblePart *mMinimalVisiblePartWidget;
     ScrollArea *mParentScrollArea;
 };

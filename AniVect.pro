@@ -177,7 +177,8 @@ SOURCES += main.cpp\
     BoxesList/boxtargetwidget.cpp \
     Properties/boxtargetproperty.cpp \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
-    BoxesList/OptimalScrollArea/minimalscrollwidget.cpp
+    BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
+    filesourcelist.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -316,7 +317,8 @@ HEADERS  += mainwindow.h \
     BoxesList/boxtargetwidget.h \
     Properties/boxtargetproperty.h \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
-    BoxesList/OptimalScrollArea/minimalscrollwidget.h
+    BoxesList/OptimalScrollArea/minimalscrollwidget.h \
+    filesourcelist.h
 
 RESOURCES += \
     resources.qrc
