@@ -7,8 +7,7 @@
 #include "global.h"
 
 ScrollWidget::ScrollWidget(ScrollArea *parent) :
-    QWidget(parent) {
-    mParentScrollArea = parent;
+    MinimalScrollWidget(parent) {
     //createVisiblePartWidget();
 }
 
@@ -30,30 +29,9 @@ void ScrollWidget::updateAbstraction() {
     updateHeight();
 }
 
-void ScrollWidget::scrollParentAreaBy(const int &by) {
-    mParentScrollArea->scrollBy(0, by);
-}
-
-void ScrollWidget::setWidth(const int &width) {
-    setFixedWidth(width);
-    mVisiblePartWidget->setFixedWidth(width);
-    mVisiblePartWidget->updateWidgetsWidth();
-}
-
-void ScrollWidget::changeVisibleTop(const int &top) {
-    int newTop = top - top % MIN_WIDGET_HEIGHT;
-    mVisiblePartWidget->move(0, newTop);
-    mVisiblePartWidget->setVisibleTop(newTop);
-}
-#include <QtMath>
-void ScrollWidget::changeVisibleHeight(const int &height) {
-    int newHeight = qCeil(height/(qreal)MIN_WIDGET_HEIGHT)*
-                    MIN_WIDGET_HEIGHT;
-    mVisiblePartWidget->setVisibleHeight(newHeight);
-}
-
 void ScrollWidget::createVisiblePartWidget() {
     mVisiblePartWidget = new ScrollWidgetVisiblePart(this);
+    mMinimalVisiblePartWidget = mVisiblePartWidget;
 }
 
 void ScrollWidget::setMainTarget(SingleWidgetTarget *target) {

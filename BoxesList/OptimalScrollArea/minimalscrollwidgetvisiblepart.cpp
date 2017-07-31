@@ -1,5 +1,3 @@
-#include "minimalMinimalScrollWidgetVisiblePart.h"
-
 #include "minimalscrollwidgetvisiblepart.h"
 #include <QPainter>
 #include "singlewidgetabstraction.h"
@@ -9,12 +7,12 @@
 #include "mainwindow.h"
 #include "global.h"
 
-QList<MinimalScrollWidgetVisiblePart*> MinimalScrollWidgetVisiblePart::mAllInstances;
+QList<MinimalScrollWidgetVisiblePart*>
+MinimalScrollWidgetVisiblePart::mAllInstances;
 
 MinimalScrollWidgetVisiblePart::MinimalScrollWidgetVisiblePart(
         MinimalScrollWidget *parent) :
     QWidget(parent) {
-    mCurrentRulesCollection.rule = SWT_NoRule;
     mParentWidget = parent;
     addInstance(this);
 }
@@ -35,7 +33,7 @@ void MinimalScrollWidgetVisiblePart::setVisibleHeight(const int &height) {
 }
 
 void MinimalScrollWidgetVisiblePart::updateWidgetsWidth() {
-    Q_FOREACH(SingleWidget *widget, mSingleWidgets) {
+    Q_FOREACH(QWidget *widget, mSingleWidgets) {
         widget->setFixedWidth(width() - widget->x());
     }
 }
@@ -65,33 +63,9 @@ void MinimalScrollWidgetVisiblePart::removeInstance(
     mAllInstances.removeOne(instance);
 }
 
-void MinimalScrollWidgetVisiblePart::setAlwaysShowChildren(
-        const bool &alwaysShowChildren) {
-    mCurrentRulesCollection.alwaysShowChildren = alwaysShowChildren;
-    updateParentHeight();
-    updateVisibleWidgetsContent();
-}
-
-void MinimalScrollWidgetVisiblePart::setCurrentSearchText(
-        const QString &text) {
-    mCurrentRulesCollection.searchString = text;
-    updateParentHeight();
-    updateVisibleWidgetsContent();
-}
-
 void MinimalScrollWidgetVisiblePart::scheduleContentUpdate() {
     scheduleUpdateParentHeight();
     scheduledUpdateVisibleWidgetsContent();
-}
-
-void MinimalScrollWidgetVisiblePart::scheduleContentUpdateIfSearchNotEmpty() {
-    if(mCurrentRulesCollection.searchString.isEmpty()) return;
-    scheduleUpdateParentHeight();
-    scheduledUpdateVisibleWidgetsContent();
-}
-
-bool MinimalScrollWidgetVisiblePart::isCurrentRule(const SWT_Rule &rule) {
-    return rule == mCurrentRulesCollection.rule;
 }
 
 void MinimalScrollWidgetVisiblePart::scheduledUpdateVisibleWidgetsContent() {
@@ -124,8 +98,7 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
     if(neededWidgets == currentNWidgets) return;
     if(neededWidgets > currentNWidgets) {
         for(int i = neededWidgets - currentNWidgets; i > 0; i--) {
-            SingleWidget *newWidget = createNewSingleWidget();
-            mSingleWidgets.append(newWidget);
+            mSingleWidgets.append(createNewSingleWidget());
         }
     } else {
         for(int i = currentNWidgets - neededWidgets; i > 0; i--) {
@@ -134,7 +107,7 @@ void MinimalScrollWidgetVisiblePart::updateVisibleWidgets() {
     }
 
     int yT = 0;
-    Q_FOREACH(SingleWidget *widget, mSingleWidgets) {
+    Q_FOREACH(QWidget *widget, mSingleWidgets) {
         widget->move(widget->x(), yT);
         widget->setFixedWidth(width() - widget->x());
         yT += MIN_WIDGET_HEIGHT;
@@ -168,14 +141,6 @@ void MinimalScrollWidgetVisiblePart::updateParentHeight() {
     mParentWidget->updateHeight();
 }
 
-SingleWidget *MinimalScrollWidgetVisiblePart::createNewSingleWidget() {
-    return new SingleWidget(this);
-}
-
-SWT_RulesCollection::SWT_RulesCollection() {
-    type = NULL;
-    rule = SWT_NoRule;
-    alwaysShowChildren = false;
-    target = SWT_CurrentCanvas;
-    searchString = "";
+QWidget *MinimalScrollWidgetVisiblePart::createNewSingleWidget() {
+    return new QWidget(this);
 }

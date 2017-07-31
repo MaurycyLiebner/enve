@@ -17,7 +17,7 @@ public:
     explicit BoxScrollWidgetVisiblePart(ScrollWidget *parent = 0);
 
 
-    SingleWidget *createNewSingleWidget();
+    QWidget *createNewSingleWidget();
     void paintEvent(QPaintEvent *);
     void drawKeys(QPainter *p,
                   const qreal &pixelsPerFrame,

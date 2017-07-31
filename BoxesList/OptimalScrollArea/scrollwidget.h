@@ -4,15 +4,14 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QLabel>
+#include "minimalscrollwidget.h"
 class SingleWidget;
 class ScrollWidgetVisiblePart;
-class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidgetTarget;
 class ScrollArea;
 
-class ScrollWidget : public QWidget
-{
+class ScrollWidget : public MinimalScrollWidget {
     Q_OBJECT
 public:
     explicit ScrollWidget(ScrollArea *parent = 0);
@@ -20,20 +19,11 @@ public:
     void updateHeight();
     void setMainTarget(SingleWidgetTarget *target);
     virtual void updateAbstraction();
-
-    void scrollParentAreaBy(const int &by);
-signals:
-
-public slots:
-    void changeVisibleTop(const int &top);
-    void changeVisibleHeight(const int &height);
-    void setWidth(const int &width);
 protected:
     virtual void createVisiblePartWidget();
     SingleWidgetTarget *mMainTarget = NULL;
     SingleWidgetAbstraction *mMainAbstraction = NULL;
-    ScrollWidgetVisiblePart *mVisiblePartWidget;
-    ScrollArea *mParentScrollArea;
+    ScrollWidgetVisiblePart *mVisiblePartWidget = NULL;
 };
 
 #endif // SCROLLWIDGET_H

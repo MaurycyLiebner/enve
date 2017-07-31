@@ -2,7 +2,7 @@
 #define MINIMALSCROLLWIDGETVISIBLEPART_H
 class MinimalScrollWidget;
 class SingleWidget;
-#include <QList>
+#include <QWidget>
 
 class MinimalScrollWidgetVisiblePart :
         public QWidget {
@@ -25,19 +25,14 @@ public:
 
     void updateParentHeight();
 
-    virtual SingleWidget *createNewSingleWidget();
+    virtual QWidget *createNewSingleWidget();
     void updateWidgetsWidth();
 
-    void callUpdaters();
+    virtual void callUpdaters();
 
     static void callAllInstanceUpdaters();
     static void addInstance(MinimalScrollWidgetVisiblePart *instance);
     static void removeInstance(MinimalScrollWidgetVisiblePart *instance);
-
-    void setAlwaysShowChildren(const bool &alwaysShowChildren);
-    void setCurrentSearchText(const QString &text);
-
-    void scheduleContentUpdateIfSearchNotEmpty();
 
     void scheduleContentUpdate();
 protected:
@@ -48,7 +43,7 @@ protected:
 
     MinimalScrollWidget *mParentWidget;
 
-    QList<SingleWidget*> mSingleWidgets;
+    QList<QWidget*> mSingleWidgets;
 
     int mVisibleTop = 0;
     int mVisibleHeight = 0;

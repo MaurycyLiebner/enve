@@ -25,4 +25,5 @@ BoxScrollWidgetVisiblePart *BoxScrollWidget::getVisiblePartWidget() {
 
 void BoxScrollWidget::createVisiblePartWidget() {
     mVisiblePartWidget = new BoxScrollWidgetVisiblePart(this);
+    mMinimalVisiblePartWidget = mVisiblePartWidget;
 }

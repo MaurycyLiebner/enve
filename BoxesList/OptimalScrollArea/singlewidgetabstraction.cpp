@@ -65,7 +65,7 @@ bool SingleWidgetAbstraction::getAbstractions(
 bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         const int &minY, const int &maxY,
         int *currY, int currX,
-        QList<SingleWidget *> *widgets,
+        QList<QWidget *> *widgets,
         int *currentWidgetId,
         const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule,
@@ -76,7 +76,7 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
                                                       parentMainTarget);
     if(*currY > minY && satisfiesRule && !mIsMainTarget) {
         if(*currentWidgetId < widgets->count()) {
-            SingleWidget *currWidget = widgets->at(*currentWidgetId);
+            SingleWidget *currWidget = (SingleWidget*)widgets->at(*currentWidgetId);
             int currWx = currWidget->x();
             currWidget->move(currX, currWidget->y());
             currWidget->setFixedWidth(currWx - currX + currWidget->width());

@@ -1,6 +1,7 @@
 #ifndef SCROLLWIDGETVISIBLEPART_H
 #define SCROLLWIDGETVISIBLEPART_H
 
+#include "minimalscrollwidgetvisiblepart.h"
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QtMath>
@@ -41,36 +42,19 @@ struct SWT_RulesCollection {
 };
 
 class ScrollWidgetVisiblePart :
-        public QWidget {
+        public MinimalScrollWidgetVisiblePart {
     Q_OBJECT
 public:
     ScrollWidgetVisiblePart(ScrollWidget *parent = 0);
     ~ScrollWidgetVisiblePart();
 
-    void setVisibleTop(const int &top);
-    void setVisibleHeight(const int &height);
-
-    void scheduledUpdateVisibleWidgetsContent();
-    void updateVisibleWidgetsContentIfNeeded();
-
-    void scheduleUpdateParentHeight();
-    void updateParentHeightIfNeeded();
-
-    void updateVisibleWidgets();
     void updateVisibleWidgetsContent();
 
     void setMainAbstraction(SingleWidgetAbstraction *abs);
 
-    void updateParentHeight();
-
-    virtual SingleWidget *createNewSingleWidget();
-    void updateWidgetsWidth();
+    virtual QWidget *createNewSingleWidget();
 
     void callUpdaters();
-    static void callAllInstanceUpdaters();
-
-    static void addInstance(ScrollWidgetVisiblePart *instance);
-    static void removeInstance(ScrollWidgetVisiblePart *instance);
 
     void setCurrentRule(const SWT_Rule &rule);
     void setCurrentTarget(SingleWidgetTarget *targetP,
@@ -95,22 +79,11 @@ public:
     void setCurrentType(SWT_Checker type);
 
 protected:
-    static QList<ScrollWidgetVisiblePart*> mAllInstances;
-
     SWT_RulesCollection mCurrentRulesCollection;
 
-    bool mVisibleWidgetsContentUpdateScheduled = false;
-    bool mParentHeightUpdateScheduled = false;
     bool mAlwaysShowChildren = false;
 
-    ScrollWidget *mParentWidget;
-
     SingleWidgetAbstraction *mMainAbstraction = NULL;
-
-    QList<SingleWidget*> mSingleWidgets;
-
-    int mVisibleTop = 0;
-    int mVisibleHeight = 0;
 };
 
 

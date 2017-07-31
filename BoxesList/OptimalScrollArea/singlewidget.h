@@ -5,8 +5,7 @@
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
 
-class SingleWidget : public QWidget
-{
+class SingleWidget : public QWidget {
     Q_OBJECT
 public:
     SingleWidget(ScrollWidgetVisiblePart *parent = 0);

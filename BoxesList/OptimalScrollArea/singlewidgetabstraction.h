@@ -24,7 +24,7 @@ public:
                          const bool &parentMainTarget);
     bool setSingleWidgetAbstractions(const int &minY, const int &maxY,
                                      int *currY, int currX,
-                                     QList<SingleWidget*> *widgets,
+                                     QList<QWidget *> *widgets,
                                      int *currentWidgetId,
                                      const SWT_RulesCollection &rules,
                                      const bool &parentSatisfiesRule,

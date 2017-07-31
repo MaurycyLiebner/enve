@@ -176,7 +176,8 @@ SOURCES += main.cpp\
     Animators/PathAnimators/singlevectorpathanimator.cpp \
     BoxesList/boxtargetwidget.cpp \
     Properties/boxtargetproperty.cpp \
-    BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp
+    BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
+    BoxesList/OptimalScrollArea/minimalscrollwidget.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -314,7 +315,8 @@ HEADERS  += mainwindow.h \
     Animators/PathAnimators/singlevectorpathanimator.h \
     BoxesList/boxtargetwidget.h \
     Properties/boxtargetproperty.h \
-    BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h
+    BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
+    BoxesList/OptimalScrollArea/minimalscrollwidget.h
 
 RESOURCES += \
     resources.qrc
