@@ -119,6 +119,17 @@ MainWindow::MainWindow(QWidget *parent)
                                QDockWidget::DockWidgetClosable, false));
     mLeftDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
     mLeftDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+    QLabel *leftDockLabel = new QLabel("Current Object", this);
+    leftDockLabel->setStyleSheet(
+                "QLabel {"
+                    "border-top: 0;"
+                    "border-bottom: 1px solid black;"
+                    "color: black;"
+                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                    "stop:0 lightgray, stop:1 darkgray);"
+                "}");
+    leftDockLabel->setAlignment(Qt::AlignCenter);
+    mLeftDock->setTitleBarWidget(leftDockLabel);
 
     mObjectSettingsScrollArea = new ScrollArea(this);
     mObjectSettingsWidget = new BoxScrollWidget(mObjectSettingsScrollArea);
@@ -150,6 +161,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     mLeftDock2->setWidget(new FileSourceList(this));
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock2);
+
+    QLabel *leftDock2Label = new QLabel("Files", this);
+    leftDock2Label->setStyleSheet(
+                "QLabel {"
+                    "border-top: 0;"
+                    "border-bottom: 1px solid black;"
+                    "color: black;"
+                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                    "stop:0 lightgray, stop:1 darkgray);"
+                "}");
+    leftDock2Label->setAlignment(Qt::AlignCenter);
+    mLeftDock2->setTitleBarWidget(leftDock2Label);
 
 
 //    mCanvasWindow->SWT_getAbstractionForWidget(

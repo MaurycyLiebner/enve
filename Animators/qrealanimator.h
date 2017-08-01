@@ -104,7 +104,8 @@ public:
 
     void anim_mergeKeysIfNeeded();
     void anim_appendKey(Key *newKey,
-                        const bool &saveUndoRedo = true);
+                        const bool &saveUndoRedo = true,
+                        const bool &update = true);
     void anim_removeKey(Key *keyToRemove,
                         const bool &saveUndoRedo = true);
     void anim_moveKeyToRelFrame(Key *key,

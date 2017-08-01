@@ -352,7 +352,7 @@ void ComplexAnimator::ca_addDescendantsKey(Key *key) {
     if(collection == NULL) {
         collection = new ComplexKey(this);
         collection->setAbsFrame(key->getAbsFrame());
-        anim_appendKey(collection);
+        anim_appendKey(collection, true, false);
     }
     collection->addAnimatorKey(key);
 }

@@ -308,7 +308,9 @@ void QrealAnimator::anim_saveCurrentValueAsKey() {
     if(anim_mKeyOnCurrentFrame == NULL) {
         anim_mKeyOnCurrentFrame = new QrealKey(anim_mCurrentRelFrame,
                                                mCurrentValue, this);
-        anim_appendKey(anim_mKeyOnCurrentFrame);
+        anim_appendKey(anim_mKeyOnCurrentFrame,
+                       true,
+                       false);
         qra_updateKeysPath();
     } else {
         qra_saveCurrentValueToKey((QrealKey*)anim_mKeyOnCurrentFrame);
@@ -333,8 +335,9 @@ void QrealAnimator::anim_mergeKeysIfNeeded() {
 }
 
 void QrealAnimator::anim_appendKey(Key *newKey,
-                                   const bool &saveUndoRedo) {
-    Animator::anim_appendKey(newKey, saveUndoRedo);
+                                   const bool &saveUndoRedo,
+                                   const bool &update) {
+    Animator::anim_appendKey(newKey, saveUndoRedo, update);
     //qra_updateKeysPath();
     qra_constrainCtrlsFrameValues();
     qra_updateValueFromCurrentFrame();

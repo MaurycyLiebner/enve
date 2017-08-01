@@ -23,6 +23,7 @@ public:
     void scheduleUpdateForAllDependent();
     void addDependentBox(BoundingBox *dependent);
     void removeDependentBox(BoundingBox *dependent);
+    virtual void replace() {}
 protected:
     QList<BoundingBoxQSPtr> mDependentBoxes;
     std::shared_ptr<FileCacheHandler> mFileHandlerRef;

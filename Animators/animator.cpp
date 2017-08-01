@@ -203,7 +203,8 @@ void Animator::anim_sortKeys() {
 }
 
 void Animator::anim_appendKey(Key *newKey,
-                              const bool &saveUndoRedo) {
+                              const bool &saveUndoRedo,
+                              const bool &update) {
     if(saveUndoRedo && !anim_isComplexAnimator()) {
         addUndoRedo(new AddKeyToAnimatorUndoRedo(newKey, this));
     }
@@ -218,7 +219,9 @@ void Animator::anim_appendKey(Key *newKey,
 
     anim_updateKeyOnCurrrentFrame();
 
-    anim_updateAfterChangedKey(newKey);
+    if(update) {
+        anim_updateAfterChangedKey(newKey);
+    }
 }
 
 void Animator::anim_removeKey(Key *keyToRemove,

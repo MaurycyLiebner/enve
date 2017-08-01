@@ -6,17 +6,44 @@
 #include "BoxesList/OptimalScrollArea/scrollarea.h"
 #include "BoxesList/OptimalScrollArea/minimalscrollwidget.h"
 
+struct FileCacheHandlerAbstraction {
+    FileCacheHandlerAbstraction(
+            FileCacheHandler *targetT,
+            FileSourceListVisibleWidget *parentVisibleWidgetT) {
+        target = targetT;
+        parentVisibleWidget = parentVisibleWidgetT;
+    }
+
+    FileCacheHandler *target;
+    bool selected = false;
+
+    void switchSelected() {
+        setSelected(!selected);
+    }
+
+    void setSelected(const bool &bT);
+
+    const QString &getFilePath() {
+        return target->getFilePath();
+    }
+
+    FileSourceListVisibleWidget *parentVisibleWidget;
+};
+
 class FileSourceWidget : public QWidget {
     Q_OBJECT
 public:
-    FileSourceWidget(QWidget *parent = NULL);
+    FileSourceWidget(FileSourceListVisibleWidget *parent = NULL);
 
-    void setTargetCache(FileCacheHandler *target);
+    void setTargetCache(FileCacheHandlerAbstraction *target);
 
+    void switchFileNameOnly();
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *);
-
-private:
-    FileCacheHandler *mTargetCache = NULL;
+    bool mFileNameOnly = true;
+    FileCacheHandlerAbstraction *mTargetCache = NULL;
+    FileSourceListVisibleWidget *mParentVisibleWidget = NULL;
 };
 
 class FileSourceListScrollWidget : public MinimalScrollWidget {
@@ -38,6 +65,35 @@ public:
     void updateVisibleWidgetsContent();
 
     QWidget *createNewSingleWidget();
+    void addCacheHandlerToList(FileCacheHandler *handler);
+
+    void removeCacheHandlerFromList(FileCacheHandler *handler);
+
+    void addToSelectedList(FileCacheHandlerAbstraction *item) {
+        mSelectedList << item;
+        update();
+    }
+
+    void removeFromSelectedList(FileCacheHandlerAbstraction *item) {
+        mSelectedList.removeOne(item);
+        update();
+    }
+
+    void clearSelected() {
+        foreach(FileCacheHandlerAbstraction *abs,
+                mSelectedList) {
+            abs->selected = false;
+        }
+
+        mSelectedList.clear();
+        update();
+    }
+
+    void showContextMenu(const QPoint &globalPos);
+protected:
+    QList<FileCacheHandlerAbstraction*> mSelectedList;
+    QList<FileCacheHandlerAbstraction*> mCacheList;
+    void paintEvent(QPaintEvent *);
 };
 
 class FileSourceList : public ScrollArea {

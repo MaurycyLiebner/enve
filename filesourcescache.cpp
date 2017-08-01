@@ -34,7 +34,7 @@ void FileSourcesCache::removeFileSourceListVisibleWidget(
 void FileSourcesCache::addHandler(FileCacheHandler *handlerPtr) {
     mFileCacheHandlers.append(handlerPtr);
     foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
-        wid->scheduleContentUpdate();
+        wid->addCacheHandlerToList(handlerPtr);
     }
 }
 
@@ -50,6 +50,9 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
 
 void FileSourcesCache::removeHandler(FileCacheHandler *handler) {
     mFileCacheHandlers.removeOne(handler);
+    foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
+        wid->removeCacheHandlerFromList(handler);
+    }
 }
 
 void FileSourcesCache::clearAll() {

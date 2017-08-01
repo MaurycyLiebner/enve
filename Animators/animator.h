@@ -38,7 +38,8 @@ public:
     virtual void anim_sortKeys();
 
     virtual void anim_appendKey(Key *newKey,
-                                const bool &saveUndoRedo = true);
+                                const bool &saveUndoRedo = true,
+                                const bool &update = true);
     virtual void anim_removeKey(Key *keyToRemove,
                                 const bool &saveUndoRedo = true);
     virtual void anim_moveKeyToRelFrame(Key *key,
