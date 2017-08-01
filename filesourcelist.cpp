@@ -4,6 +4,8 @@
 #include <QScrollBar>
 #include <QMenu>
 #include "mainwindow.h"
+#include <QApplication>
+#include <QDrag>
 
 FileSourceWidget::FileSourceWidget(FileSourceListVisibleWidget *parent) :
     QWidget(parent) {
@@ -19,6 +21,26 @@ void FileSourceWidget::setTargetCache(FileCacheHandlerAbstraction *target) {
         setToolTip(mTargetCache->getFilePath());
     }
 }
+
+void FileSourceWidget::mouseMoveEvent(QMouseEvent *event) {
+    if (!(event->buttons() & Qt::LeftButton)) {
+        return;
+    }
+    if((event->pos() - mDragStartPos).manhattanLength()
+         < QApplication::startDragDistance()) {
+        return;
+    }
+    QDrag *drag = new QDrag(this);
+
+    QMimeData *mimeData = new QMimeData();
+    mimeData->setUrls(QList<QUrl>() <<
+                      QUrl::fromLocalFile(mTargetCache->getFilePath()));
+    drag->setMimeData(mimeData);
+
+    drag->installEventFilter(MainWindow::getInstance());
+    drag->exec(Qt::CopyAction | Qt::MoveAction);
+}
+
 
 void FileSourceWidget::paintEvent(QPaintEvent *) {
     if(mTargetCache == NULL || width() <= 2*MIN_WIDGET_HEIGHT) return;
@@ -61,6 +83,10 @@ void FileSourceWidget::paintEvent(QPaintEvent *) {
 
 void FileSourceWidget::switchFileNameOnly() {
     mFileNameOnly = !mFileNameOnly;
+}
+
+void FileSourceWidget::mousePressEvent(QMouseEvent *event) {
+    mDragStartPos = event->pos();
 }
 
 void FileSourceWidget::mouseReleaseEvent(QMouseEvent *event) {
@@ -206,7 +232,31 @@ FileSourceList::FileSourceList(QWidget *parent) : ScrollArea(parent) {
 
     verticalScrollBar()->setSingleStep(
                 MIN_WIDGET_HEIGHT);
+    setAcceptDrops(true);
 }
+
+void FileSourceList::dropEvent(QDropEvent *event) {
+    if(event->mimeData()->hasUrls()) {
+        QList<QUrl> urlList = event->mimeData()->urls();
+        foreach(const QUrl &url, urlList) {
+            if(url.isLocalFile()) {
+                QString urlStr = url.toLocalFile();
+                QString ext = urlStr.split(".").last();
+                if(isVideoExt(ext) || isImageExt(ext)) {
+                    FileSourcesCache::getHandlerForFilePath(urlStr);
+                }
+            }
+        }
+    }
+    MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+void FileSourceList::dragEnterEvent(QDragEnterEvent *event) {
+    if(event->mimeData()->hasUrls()) {
+        event->acceptProposedAction();
+    }
+}
+
 
 void FileCacheHandlerAbstraction::setSelected(const bool &bT) {
     if(bT == selected) return;

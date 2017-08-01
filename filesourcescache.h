@@ -9,6 +9,12 @@
 typedef QSharedPointer<BoundingBox> BoundingBoxQSPtr;
 class FileSourceListVisibleWidget;
 
+extern bool isVideoExt(const QString &extension);
+extern bool isSoundExt(const QString &extension);
+extern bool isVectorExt(const QString &extension);
+extern bool isImageExt(const QString &extension);
+extern bool isAvExt(const QString &extension);
+
 class FileCacheHandler : public Updatable {
 public:
     FileCacheHandler(const QString &filePath);

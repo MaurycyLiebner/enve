@@ -65,7 +65,9 @@ void ComplexAnimator::prp_getFirstAndLastIdenticalRelFrame(
 }
 
 
-bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules, const bool &parentSatisfies, const bool &parentMainTarget) {
+bool ComplexAnimator::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
+                                          const bool &parentSatisfies,
+                                          const bool &parentMainTarget) {
     if(hasChildAnimators()) {
         return Animator::SWT_shouldBeVisible(
                     rules,

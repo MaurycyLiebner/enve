@@ -38,7 +38,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
     mMaxFrame = frameCount;
 
-    mEffectsPaintEnabled = true;
     mResolutionFraction = 1.;
 
     mWidth = canvasWidth;
@@ -109,14 +108,6 @@ void Canvas::showContextMenu(QPointF globalPos) {
 BoundingBox *Canvas::createLink() {
     InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this);
     return linkGroup;
-}
-
-void Canvas::setEffectsPaintEnabled(const bool &bT) {
-    mEffectsPaintEnabled = bT;
-}
-
-bool Canvas::effectsPaintEnabled() {
-    return mEffectsPaintEnabled;
 }
 
 qreal Canvas::getResolutionFraction() {
@@ -261,10 +252,9 @@ void Canvas::renderSk(SkCanvas *canvas) {
     SkPaint paint;
     paint.setAntiAlias(true);
     paint.setStyle(SkPaint::kFill_Style);
+    canvas->clear(SK_ColorBLACK);
 
     if(isPreviewingOrRendering()) {
-        canvas->clear(SK_ColorBLACK);
-
         drawTransparencyMesh(canvas, viewRect);
         if(mCurrentPreviewContainer != NULL) {
             canvas->save();
@@ -279,7 +269,6 @@ void Canvas::renderSk(SkCanvas *canvas) {
     } else {
         SkScalar invScale = 1./mCanvasTransformMatrix.m11();
 #ifdef CPU_ONLY_RENDER
-        canvas->clear(SK_ColorBLACK);
         drawTransparencyMesh(canvas, viewRect);
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
 
@@ -291,7 +280,12 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->restore();
         }
 #else
-        canvas->clear(SkColorSetARGBInline(255, 75, 75, 75));
+        if(!mClipToCanvasSize) {
+            paint.setColor(SkColorSetARGBInline(255, 75, 75, 75));
+            canvas->drawRect(QRectFToSkRect(mCanvasTransformMatrix.mapRect(
+                                                getMaxBoundsRect())),
+                             paint);
+        }
 
         drawTransparencyMesh(canvas, viewRect);
         paint.setColor(mBackgroundColor->getCurrentColor().getSkColor());
@@ -356,11 +350,13 @@ void Canvas::renderSk(SkCanvas *canvas) {
 
         canvas->resetMatrix();
 
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(2.);
-        paint.setColor(SK_ColorBLACK);
-        canvas->drawRect(viewRect.makeInset(1, 1),
-                         paint);
+        if(!mClipToCanvasSize) {
+            paint.setStyle(SkPaint::kStroke_Style);
+            paint.setStrokeWidth(2.);
+            paint.setColor(SK_ColorBLACK);
+            canvas->drawRect(viewRect.makeInset(1, 1),
+                             paint);
+        }
         if(mInputTransformationEnabled) {
             SkRect inputRect = SkRect::MakeXYWH(
                                     2*MIN_WIDGET_HEIGHT,
@@ -391,11 +387,11 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->drawString(
                    transStr.toStdString().c_str(),
                    inputRect.x() + paint.getTextSize(),
-                   inputRect.y() + 0.5*(inputRect.height() + FONT_HEIGHT),
+                   inputRect.y() + 0.5*inputRect.height(),
                    paint);
             //p->drawText(inputRect, Qt::AlignVCenter, transStr);
         }
-    }
+    }    
 
     if(mCanvasWindow->hasFocus()) {
         paint.setColor(SK_ColorRED);
@@ -854,116 +850,115 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
     if(isPreviewingOrRendering()) return false;
 
     bool isGrabbingMouse = mCanvasWindow->isMouseGrabber();
-    if(isGrabbingMouse ? !handleKeyPressEventWhileMouseGrabbing(event) : true) {
-        if(event->modifiers() & Qt::ControlModifier &&
-           event->key() == Qt::Key_V) {
-            if(event->isAutoRepeat()) return false;
-            pasteAction();
-        } else if(event->modifiers() & Qt::ControlModifier &&
-                  event->key() == Qt::Key_C) {
-            if(event->isAutoRepeat()) return false;
-            copyAction();
-        } else if(event->modifiers() & Qt::ControlModifier &&
-                  event->key() == Qt::Key_X) {
-            if(event->isAutoRepeat()) return false;
-            cutAction();
-        } else if(event->key() == Qt::Key_0 &&
-                  event->modifiers() & Qt::KeypadModifier) {
-            fitCanvasToSize();
-        } else if(event->key() == Qt::Key_1 &&
-                  event->modifiers() & Qt::KeypadModifier) {
-            resetTransormation();
-        } else if(event->key() == Qt::Key_Delete) {
-            deleteAction();
-        } else if(event->modifiers() & Qt::ControlModifier &&
-                  event->key() == Qt::Key_G) {
-           if(isShiftPressed()) {
-               ungroupSelectedBoxes();
-           } else {
-               groupSelectedBoxes();
-           }
+    if(isGrabbingMouse) {
+        if(handleKeyPressEventWhileMouseGrabbing(event)) return true;
+    }
+    if(event->modifiers() & Qt::ControlModifier &&
+       event->key() == Qt::Key_V) {
+        if(event->isAutoRepeat()) return false;
+        pasteAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_C) {
+        if(event->isAutoRepeat()) return false;
+        copyAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_X) {
+        if(event->isAutoRepeat()) return false;
+        cutAction();
+    } else if(event->key() == Qt::Key_0 &&
+              event->modifiers() & Qt::KeypadModifier) {
+        fitCanvasToSize();
+    } else if(event->key() == Qt::Key_1 &&
+              event->modifiers() & Qt::KeypadModifier) {
+        resetTransormation();
+    } else if(event->key() == Qt::Key_Delete) {
+        deleteAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_G) {
+       if(isShiftPressed()) {
+           ungroupSelectedBoxes();
+       } else {
+           groupSelectedBoxes();
+       }
 
-        } else if(event->key() == Qt::Key_PageUp) {
-           raiseSelectedBoxes();
-        } else if(event->key() == Qt::Key_PageDown) {
-           lowerSelectedBoxes();
-        } else if(event->key() == Qt::Key_End) {
-           lowerSelectedBoxesToBottom();
-        } else if(event->key() == Qt::Key_Home) {
-           raiseSelectedBoxesToTop();
-        } else if(event->key() == Qt::Key_G &&
-                  isAltPressed(event)) {
-            resetSelectedTranslation();
-        } else if(event->key() == Qt::Key_S &&
-                  isAltPressed(event)) {
-            resetSelectedScale();
-        } else if(event->key() == Qt::Key_R &&
-                  isAltPressed(event)) {
-            resetSelectedRotation();
-        } else if(event->key() == Qt::Key_R &&
-                  (isMovingPath() ||
-                  mCurrentMode == MOVE_POINT) &&
-                  !isGrabbingMouse) {
-            if(mSelectedBoxes.isEmpty()) return false;
-            if(mCurrentMode == MOVE_POINT) {
-                if(mSelectedPoints.isEmpty()) return false;
-            }
-            mTransformationFinishedBeforeMouseRelease = false;
-            QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
-            setLastMouseEventPosAbs(cursorPos);
-            setLastMousePressPosAbs(cursorPos);
-            mRotPivot->startRotating();
-            mDoubleClick = false;
-            mFirstMouseMove = true;
-
-            grabMouseAndTrack();
-        } else if(event->key() == Qt::Key_S && (isMovingPath() ||
-                  mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
-            if(mSelectedBoxes.isEmpty()) return false;
-            if(mCurrentMode == MOVE_POINT) {
-                if(mSelectedPoints.isEmpty()) return false;
-            }
-            mTransformationFinishedBeforeMouseRelease = false;
-            mXOnlyTransform = false;
-            mYOnlyTransform = false;
-
-            QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
-            setLastMouseEventPosAbs(cursorPos);
-            setLastMousePressPosAbs(cursorPos);
-            mRotPivot->startScaling();
-            mDoubleClick = false;
-            mFirstMouseMove = true;
-
-            grabMouseAndTrack();
-        } else if(event->key() == Qt::Key_G && (isMovingPath() ||
-                                                mCurrentMode == MOVE_POINT) &&
-                  !isGrabbingMouse) {
-            mTransformationFinishedBeforeMouseRelease = false;
-            mXOnlyTransform = false;
-            mYOnlyTransform = false;
-
-            QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
-            setLastMouseEventPosAbs(cursorPos);
-            setLastMousePressPosAbs(cursorPos);
-            mDoubleClick = false;
-            mFirstMouseMove = true;
-
-            grabMouseAndTrack();
-         } else if(event->key() == Qt::Key_A &&
-                   event->modifiers() & Qt::ControlModifier &&
-                   !isGrabbingMouse) {
-           if(isShiftPressed()) {
-               mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();
-           } else {
-               mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
-           }
-        } else {
-            return false;
+    } else if(event->key() == Qt::Key_PageUp) {
+       raiseSelectedBoxes();
+    } else if(event->key() == Qt::Key_PageDown) {
+       lowerSelectedBoxes();
+    } else if(event->key() == Qt::Key_End) {
+       lowerSelectedBoxesToBottom();
+    } else if(event->key() == Qt::Key_Home) {
+       raiseSelectedBoxesToTop();
+    } else if(event->key() == Qt::Key_G &&
+              isAltPressed(event)) {
+        resetSelectedTranslation();
+    } else if(event->key() == Qt::Key_S &&
+              isAltPressed(event)) {
+        resetSelectedScale();
+    } else if(event->key() == Qt::Key_R &&
+              isAltPressed(event)) {
+        resetSelectedRotation();
+    } else if(event->key() == Qt::Key_R &&
+              (isMovingPath() ||
+              mCurrentMode == MOVE_POINT) &&
+              !isGrabbingMouse) {
+        if(mSelectedBoxes.isEmpty()) return false;
+        if(mCurrentMode == MOVE_POINT) {
+            if(mSelectedPoints.isEmpty()) return false;
         }
-        schedulePivotUpdate();
+        mTransformationFinishedBeforeMouseRelease = false;
+        QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+        setLastMouseEventPosAbs(cursorPos);
+        setLastMousePressPosAbs(cursorPos);
+        mRotPivot->startRotating();
+        mDoubleClick = false;
+        mFirstMouseMove = true;
+
+        grabMouseAndTrack();
+    } else if(event->key() == Qt::Key_S && (isMovingPath() ||
+              mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
+        if(mSelectedBoxes.isEmpty()) return false;
+        if(mCurrentMode == MOVE_POINT) {
+            if(mSelectedPoints.isEmpty()) return false;
+        }
+        mTransformationFinishedBeforeMouseRelease = false;
+        mXOnlyTransform = false;
+        mYOnlyTransform = false;
+
+        QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+        setLastMouseEventPosAbs(cursorPos);
+        setLastMousePressPosAbs(cursorPos);
+        mRotPivot->startScaling();
+        mDoubleClick = false;
+        mFirstMouseMove = true;
+
+        grabMouseAndTrack();
+    } else if(event->key() == Qt::Key_G && (isMovingPath() ||
+                                            mCurrentMode == MOVE_POINT) &&
+              !isGrabbingMouse) {
+        mTransformationFinishedBeforeMouseRelease = false;
+        mXOnlyTransform = false;
+        mYOnlyTransform = false;
+
+        QPointF cursorPos = mCanvasWindow->mapFromGlobal(QCursor::pos());
+        setLastMouseEventPosAbs(cursorPos);
+        setLastMousePressPosAbs(cursorPos);
+        mDoubleClick = false;
+        mFirstMouseMove = true;
+
+        grabMouseAndTrack();
+     } else if(event->key() == Qt::Key_A &&
+               event->modifiers() & Qt::ControlModifier &&
+               !isGrabbingMouse) {
+       if(isShiftPressed()) {
+           mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();
+       } else {
+           mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
+       }
     } else {
         return false;
     }
+    schedulePivotUpdate();
 
     callUpdateSchedulers();
     return true;

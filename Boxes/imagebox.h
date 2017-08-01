@@ -42,7 +42,8 @@ private:
 
 class ImageBox : public BoundingBox {
 public:
-    ImageBox(QString filePath = "");
+    ImageBox();
+    ImageBox(const QString &filePath);
     ~ImageBox();
 
     void setFilePath(const QString &path);

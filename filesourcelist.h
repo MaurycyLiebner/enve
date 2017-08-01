@@ -39,11 +39,14 @@ public:
 
     void switchFileNameOnly();
 protected:
+    void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *);
     bool mFileNameOnly = true;
     FileCacheHandlerAbstraction *mTargetCache = NULL;
     FileSourceListVisibleWidget *mParentVisibleWidget = NULL;
+    void mouseMoveEvent(QMouseEvent *event);
+    QPoint mDragStartPos;
 };
 
 class FileSourceListScrollWidget : public MinimalScrollWidget {
@@ -101,6 +104,9 @@ class FileSourceList : public ScrollArea {
 public:
     FileSourceList(QWidget *parent = NULL);
 
+protected:
+    void dropEvent(QDropEvent *event);
+    void dragEnterEvent(QDragEnterEvent *event);
 private:
     FileSourceListScrollWidget *mScrollWidget;
 };

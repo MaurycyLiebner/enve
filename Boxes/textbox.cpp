@@ -79,20 +79,9 @@ void TextBox::openTextEditor(const bool &saveUndoRedo) {
                                            "Text:",
                                            mText->getCurrentTextValue(), &ok);
     if(ok) {
-        setText(text, saveUndoRedo);
+        mText->setCurrentTextValue(text, saveUndoRedo);
         callUpdateSchedulers();
     }
-}
-
-void TextBox::setText(const QString &text, const bool &saveUndoRedo) {
-    if(saveUndoRedo) {
-        addUndoRedo(new ChangeTextUndoRedo(this,
-                                           mText->getCurrentTextValue(),
-                                           text));
-    }
-    clearAllCache();
-    mText->setCurrentTextValue(text);
-    scheduleUpdate();
 }
 
 void TextBox::setFont(const QFont &font, const bool &saveUndoRedo) {
@@ -141,9 +130,13 @@ MovablePoint *TextBox::getPointAtAbsPos(const QPointF &absPtPos,
 void TextBox::makeDuplicate(Property *targetBox) {
     PathBox::makeDuplicate(targetBox);
     TextBox *textTarget = (TextBox*)targetBox;
-    textTarget->setText(mText->getCurrentTextValue());
+    textTarget->duplicateQStringAnimatorFrom(mText.data());
     textTarget->setFont(mFont);
     textTarget->setTextAlignment(mAlignment);
+}
+
+void TextBox::duplicateQStringAnimatorFrom(QStringAnimator *anim) {
+    anim->makeDuplicate(mText.data());
 }
 
 qreal textForQPainterPath(const Qt::Alignment &alignment,

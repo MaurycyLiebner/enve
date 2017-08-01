@@ -9,6 +9,7 @@ RenderContainer::~RenderContainer() {
 }
 
 void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
+    if(mSrcRenderData == NULL) return;
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
     if(paint->getBlendMode() == SkBlendMode::kDstIn ||

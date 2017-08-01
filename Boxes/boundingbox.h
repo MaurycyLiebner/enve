@@ -85,6 +85,7 @@ struct BoundingBoxRenderData : public Updatable {
     QList<PixmapEffectRenderData*> pixmapEffects;
     SkPoint drawPos;
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
+    QRectF maxBoundsRect;
 
     QSharedPointer<BoundingBox> parentBox;
 

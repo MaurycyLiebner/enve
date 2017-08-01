@@ -3,10 +3,13 @@
 #include "mainwindow.h"
 #include "filesourcescache.h"
 
-ImageBox::ImageBox(QString filePath) :
+ImageBox::ImageBox() :
     BoundingBox(TYPE_IMAGE) {
     setName("Image");
+}
 
+ImageBox::ImageBox(const QString &filePath) :
+    ImageBox() {
     setFilePath(filePath);
 }
 
@@ -99,7 +102,6 @@ void ImageBox::setupBoundingBoxRenderDataForRelFrame(
                                     const int &relFrame,
                                     BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-    data->transform.scale(data->resolution, data->resolution);
     ImageBoxRenderData *imgData = (ImageBoxRenderData*)data;
     imgData->image = mImgCacheHandler->getImage();
     if(imgData->image == NULL) {

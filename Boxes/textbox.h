@@ -10,8 +10,6 @@ class TextBox : public PathBox
 public:
     TextBox();
 
-    void setText(const QString &text, const bool &saveUndoRedo = true);
-
     void setFont(const QFont &font, const bool &saveUndoRedo = true);
     void setSelectedFontSize(const qreal &size);
     void setSelectedFontFamilyAndStyle(const QString &fontFamily,
@@ -40,6 +38,7 @@ public:
     }
 
     void makeDuplicate(Property *targetBox);
+    void duplicateQStringAnimatorFrom(QStringAnimator *anim);
 
     bool SWT_isTextBox() { return true; }
     void addActionsToMenu(QMenu *menu);

@@ -14,6 +14,9 @@
 #include "Boxes/videobox.h"
 #include "Boxes/imagebox.h"
 #include "Sound/singlesound.h"
+#include "svgimporter.h"
+#include "filesourcescache.h"
+#include <QFileDialog>
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
@@ -565,9 +568,9 @@ void CanvasWindow::updateDisplayedFillStrokeSettings() {
     mCurrentCanvas->setDisplayedFillStrokeSettingsFromLastSelected();
 }
 
-void CanvasWindow::setEffectsPaintEnabled(const bool &bT) {
+void CanvasWindow::setClipToCanvas(const bool &bT) {
     if(hasNoCanvas()) return;
-    mCurrentCanvas->setEffectsPaintEnabled(bT);
+    mCurrentCanvas->setClipToCanvas(bT);
     mCurrentCanvas->updateAllBoxes();
     callUpdateSchedulers();
 }
@@ -1036,35 +1039,29 @@ void CanvasWindow::dragEnterEvent(QDragEnterEvent *event) {
     }
 }
 
-#include "svgimporter.h"
-#include <QFileDialog>
 void CanvasWindow::importFile(const QString &path,
                               const QPointF &relDropPos) {
     if(hasNoCanvas()) return;
-    MainWindow::getInstance()->disable();
 
     QFile file(path);
     if(!file.exists()) {
         return;
     }
+    MainWindow::getInstance()->disable();
 
     QString extension = path.split(".").last();
-    if(extension == "mp3" ||
-       extension == "wav") {
+    if(isSoundExt(extension)) {
         createSoundForPath(path);
     } else {
         BoundingBox *importedBox = NULL;
         MainWindow::getInstance()->blockUndoRedo();
-        if(extension == "svg") {
+        if(isVectorExt(extension)) {
             importedBox = loadSVGFile(path);
-        } else if(extension == "png" ||
-                  extension == "jpg") {
+        } else if(isImageExt(extension)) {
             importedBox = new ImageBox(path);;
-        } else if(extension == "avi" ||
-                  extension == "mp4" ||
-                  extension == "mov") {
+        } else if(isVideoExt(extension)) {
             importedBox = new VideoBox(path);
-        } else if(extension == "av") {
+        } else if(isAvExt(extension)) {
             MainWindow::getInstance()->loadAVFile(path);
         }
         MainWindow::getInstance()->unblockUndoRedo();

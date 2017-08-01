@@ -648,8 +648,12 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->relTransform = mTransformAnimator->
             getTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
-    data->effectsMargin = getEffectsMarginAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
+    data->effectsMargin =
+            getEffectsMarginAtRelFrame(relFrame)*data->resolution + 2.;
+
+    Canvas *parentCanvas = getParentCanvas();
+    data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
 
     data->pixmapEffects.clear();
     mEffectsAnimators->addEffectRenderDataToList(relFrame,
@@ -1268,6 +1272,8 @@ void BoundingBoxRenderData::renderToImage() {
             transformRes.mapRect(relBoundingRect).
             adjusted(-effectsMargin, -effectsMargin,
                      effectsMargin, effectsMargin);
+    allUglyBoundingRect = allUglyBoundingRect.intersected(
+                          scale.mapRect(maxBoundsRect));
     QSizeF sizeF = allUglyBoundingRect.size();
     QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
             QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
@@ -1297,11 +1303,6 @@ void BoundingBoxRenderData::renderToImage() {
 
     rasterCanvas->flush();
     delete rasterCanvas;
-    //    if(parentCanvas->effectsPaintEnabled()) {
-    //        allUglyPixmap = applyEffects(allUglyPixmap,
-    //                                     false,
-    //                                     parentCanvas->getResolutionFraction());
-    //    }
 
     drawPos = SkPoint::Make(qRound(allUglyBoundingRect.left()),
                             qRound(allUglyBoundingRect.top()));

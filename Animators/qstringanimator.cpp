@@ -2,6 +2,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include "undoredo.h"
 
 QStringAnimator::QStringAnimator() : Animator() {
 
@@ -23,6 +24,20 @@ int QStringAnimator::saveToSql(QSqlQuery *query, const int &parentId) {
     }
 
     return thisSqlId;
+}
+
+void QStringAnimator::makeDuplicate(QStringAnimator *anim) {
+    anim->prp_setName(prp_mName);
+    anim->prp_setRecording(false);
+    anim->setCurrentTextValue(mCurrentText, false);
+    if(anim_mIsRecording) {
+        anim->anim_setRecordingWithoutChangingKeys(anim_mIsRecording);
+    }
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
+        QStringKey *duplicate =
+                ((QStringKey*)key.get())->makeDuplicate(anim);
+        anim->anim_appendKey(duplicate);
+    }
 }
 
 void QStringAnimator::loadFromSql(const int &qstringAnimatorId) {
@@ -84,9 +99,15 @@ void QStringAnimator::anim_saveCurrentValueAsKey() {
     }
 }
 
-void QStringAnimator::setCurrentTextValue(const QString &text) {
+void QStringAnimator::setCurrentTextValue(const QString &text,
+                                          const bool &saveUndoRedo) {
+    if(saveUndoRedo) {
+        addUndoRedo(new ChangeTextUndoRedo(this,
+                                           mCurrentText,
+                                           text));
+    }
     mCurrentText = text;
-    if(prp_isRecording()) {
+    if(prp_isRecording() && saveUndoRedo) {
         anim_saveCurrentValueAsKey();
     }
 }
@@ -128,23 +149,38 @@ void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
         int nextId;
         anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
                                                 relFrame);
+
         Key *prevKey = anim_mKeys.at(prevId).get();
         Key *nextKey = anim_mKeys.at(nextId).get();
-        if(prevId == nextId) {
-            if(prevKey->getNextKey() == NULL) {
-                *firstIdentical = nextKey->getRelFrame();
-                *lastIdentical = INT_MAX;
-            } else if(nextKey->getPrevKey() == NULL) {
-                *firstIdentical = INT_MIN;
-                *lastIdentical = nextKey->getRelFrame();
-            } else {
-                *firstIdentical = prevKey->getRelFrame();
-                *lastIdentical = prevKey->getNextKey()->getRelFrame();
+        Key *prevPrevKey = nextKey;
+        Key *prevNextKey = prevKey;
+
+        int fId = relFrame;
+        int lId = relFrame;
+
+        while(true) {
+            fId = prevKey->getRelFrame();
+            prevPrevKey = prevKey;
+            prevKey = prevKey->getPrevKey();
+            if(prevKey == NULL) {
+                fId = INT_MIN;
+                break;
             }
-        } else {
-            *firstIdentical = prevKey->getRelFrame();
-            *lastIdentical = nextKey->getRelFrame();
+            if(prevKey->differsFromKey(prevPrevKey)) break;
         }
+
+        while(true) {
+            lId = nextKey->getRelFrame();
+            if(nextKey->differsFromKey(prevNextKey)) break;
+            prevNextKey = nextKey;
+            nextKey = nextKey->getNextKey();
+            if(nextKey == NULL) {
+                lId = INT_MAX;
+                break;
+            }
+        }
+        *firstIdentical = fId;
+        *lastIdentical = lId;
     }
 }
 
@@ -188,6 +224,10 @@ QStringKey *QStringKey::qStringKeyFromSql(const int &keyId,
         qDebug() << "Could not load qstringkey with id " << keyId;
     }
     return NULL;
+}
+
+QStringKey *QStringKey::makeDuplicate(QStringAnimator *anim) {
+    return new QStringKey(mText, mRelFrame, anim);
 }
 
 bool QStringKey::differsFromKey(Key *key) {

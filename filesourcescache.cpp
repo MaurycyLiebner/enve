@@ -45,6 +45,12 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
             return handler;
         }
     }
+    QString ext = filePath.split(".").last();
+    if(isVideoExt(ext)) {
+        return new VideoCacheHandler(filePath);
+    } else if(isImageExt(ext)) {
+        return new ImageCacheHandler(filePath);
+    }
     return NULL;
 }
 
@@ -376,4 +382,28 @@ Updatable *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
     ImageCacheHandler *imageHandler = mFrameImageHandlers.at(frame);
     imageHandler->addScheduler();
     return imageHandler;
+}
+
+bool isVideoExt(const QString &extension) {
+    return extension == "avi" ||
+           extension == "mp4" ||
+           extension == "mov";
+}
+
+bool isSoundExt(const QString &extension) {
+    return extension == "mp3" ||
+           extension == "wav";
+}
+
+bool isVectorExt(const QString &extension) {
+    return extension == "svg";
+}
+
+bool isImageExt(const QString &extension) {
+    return extension == "png" ||
+           extension == "jpg";
+}
+
+bool isAvExt(const QString &extension) {
+    return extension == "av";
 }

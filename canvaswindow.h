@@ -241,7 +241,7 @@ public slots:
     void renameCurrentCanvas(const QString &newName);
     void setCurrentCanvas(const int &id);
 
-    void setEffectsPaintEnabled(const bool &bT);
+    void setClipToCanvas(const bool &bT);
 
     void interruptPreview();
     void outOfMemory();

@@ -90,7 +90,7 @@ qreal EffectAnimators::getEffectsMargin() const {
 }
 
 qreal EffectAnimators::getEffectsMarginAtRelFrame(const int &relFrame) const {
-    qreal newMargin = 2.;
+    qreal newMargin = 0.;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
         qreal effectMargin = ((PixmapEffect*)effect.data())->
                 getMarginAtRelFrame(relFrame);

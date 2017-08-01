@@ -186,9 +186,6 @@ public:
     void makePartialRepaintInclude(QPointF pointToInclude);
     void partialRepaintRectToPoint(QPointF point);
 
-    void setEffectsPaintEnabled(const bool &bT);
-    bool effectsPaintEnabled();
-
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal &percent);
 
@@ -303,6 +300,16 @@ public:
         return mWidth;
     }
 
+    QRectF getMaxBoundsRect() const {
+        if(mClipToCanvasSize) {
+            return QRectF(0., 0.,
+                          mWidth, mHeight);
+        } else {
+            return QRectF(-mWidth, - mHeight,
+                          3*mWidth, 3*mHeight);
+        }
+    }
+
     int getCanvasHeight() const {
         return mHeight;
     }
@@ -327,6 +334,7 @@ public:
         canvasData->canvasWidth = mWidth*mResolutionFraction;
     }
 
+    bool clipToCanvas() { return mClipToCanvasSize; }
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        Q_FOREACH(BoundingBox *child, mChildBoxes) {
@@ -354,6 +362,7 @@ public slots:
     void nextPreviewFrame();
     void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                              const int &maxFrame);
+    void setClipToCanvas(const bool &bT) { mClipToCanvasSize = bT; }
 public:
     void makePointCtrlsSymmetric();
     void makePointCtrlsSmooth();
@@ -486,7 +495,6 @@ protected:
     bool mIsCurrentCanvas = true;
     int mMaxFrame = 0;
 
-    bool mEffectsPaintEnabled;
     qreal mResolutionFraction;
 
     CanvasWindow *mCanvasWindow;
@@ -513,6 +521,8 @@ protected:
     std::shared_ptr<CacheContainer> mCurrentPreviewContainer;
     int mCurrentPreviewFrameId;
     int mMaxPreviewFrameId = 0;
+
+    bool mClipToCanvasSize = false;
 
     bool mIsMouseGrabbing = false;
 

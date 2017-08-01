@@ -42,6 +42,8 @@ class Key;
 typedef std::shared_ptr<Key> KeyStdPtr;
 class QrealKey;
 typedef std::shared_ptr<QrealKey> QrealKeyStdPtr;
+class QStringAnimator;
+typedef QSharedPointer<QStringAnimator> QStringAnimatorQSPtr;
 
 enum CtrlsMode : short;
 enum PaintType : short;
@@ -686,7 +688,7 @@ private:
 
 class ChangeTextUndoRedo : public UndoRedo {
 public:
-    ChangeTextUndoRedo(TextBox *target,
+    ChangeTextUndoRedo(QStringAnimator *target,
                        const QString &textBefore,
                        const QString &textAfter);
     ~ChangeTextUndoRedo();
@@ -694,7 +696,7 @@ public:
     void undo();
     void redo();
 private:
-    TextBoxQSPtr mTarget;
+    QStringAnimatorQSPtr mTarget;
     QString mOldText;
     QString mNewText;
 };

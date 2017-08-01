@@ -618,7 +618,7 @@ void Canvas::handleMouseRelease() {
             mCanvasWindow->setCanvasMode(MOVE_PATH);
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             if(mCurrentTextBox != NULL) {
-                mCurrentTextBox->openTextEditor(false);
+                mCurrentTextBox->openTextEditor();
             }
         }
     }

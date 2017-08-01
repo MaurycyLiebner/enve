@@ -433,8 +433,8 @@ bool Animator::prp_differencesBetweenRelFrames(const int &relFrame1,
 }
 
 void Animator::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                     int *lastIdentical,
-                                                     const int &relFrame) {
+                                                    int *lastIdentical,
+                                                    const int &relFrame) {
     if(anim_mKeys.isEmpty()) {
         *firstIdentical = INT_MIN;
         *lastIdentical = INT_MAX;
@@ -443,36 +443,39 @@ void Animator::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
         int nextId;
         anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
                                                 relFrame);
+
         Key *prevKey = anim_mKeys.at(prevId).get();
         Key *nextKey = anim_mKeys.at(nextId).get();
-        if(prevId == nextId) {
-            if(prevKey->getRelFrame() == relFrame) {
-                if(prevKey->getNextKey() == NULL) {
-                    *firstIdentical = nextKey->getRelFrame();
-                    *lastIdentical = INT_MAX;
-                } else if(nextKey->getPrevKey() == NULL) {
-                    *firstIdentical = INT_MIN;
-                    *lastIdentical = nextKey->getRelFrame();
-                } else {
-                    *firstIdentical = relFrame;
-                    *lastIdentical = relFrame;
-                }
-            } else if(nextKey->getRelFrame() > relFrame) {
-                *firstIdentical = INT_MIN;
-                *lastIdentical = nextKey->getRelFrame();
-            } else if(prevKey->getRelFrame() < relFrame) {
-                *firstIdentical = nextKey->getRelFrame();
-                *lastIdentical = INT_MAX;
-            }
-        } else {
-            if(prevKey->differsFromKey(nextKey) ) {
-                *firstIdentical = relFrame;
-                *lastIdentical = relFrame;
-            } else {
-                *firstIdentical = prevKey->getRelFrame();
-                *lastIdentical = nextKey->getRelFrame();
+        Key *prevPrevKey = nextKey;
+        Key *prevNextKey = prevKey;
+
+        int fId = relFrame;
+        int lId = relFrame;
+
+        while(true) {
+            if(prevKey->differsFromKey(prevPrevKey)) break;
+            fId = prevKey->getRelFrame();
+            prevPrevKey = prevKey;
+            prevKey = prevKey->getPrevKey();
+            if(prevKey == NULL) {
+                fId = INT_MIN;
+                break;
             }
         }
+
+        while(true) {
+            if(nextKey->differsFromKey(prevNextKey)) break;
+            lId = nextKey->getRelFrame();
+            prevNextKey = nextKey;
+            nextKey = nextKey->getNextKey();
+            if(nextKey == NULL) {
+                lId = INT_MAX;
+                break;
+            }
+        }
+
+        *firstIdentical = fId;
+        *lastIdentical = lId;
     }
 }
 

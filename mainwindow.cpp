@@ -355,10 +355,10 @@ void MainWindow::setupMenuBar() {
 
     mViewMenu = mMenuBar->addMenu("View");
 
-    mActionEffectsPaintEnabled = mViewMenu->addAction("Effects");
-    mActionEffectsPaintEnabled->setCheckable(true);
-    mActionEffectsPaintEnabled->setChecked(true);
-    mActionEffectsPaintEnabled->setShortcut(QKeySequence(Qt::Key_E));
+    mClipViewToCanvas = mViewMenu->addAction("Clip To Canvas");
+    mClipViewToCanvas->setCheckable(true);
+    mClipViewToCanvas->setChecked(true);
+    mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_V));
 
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render",
@@ -367,8 +367,8 @@ void MainWindow::setupMenuBar() {
     setMenuBar(mMenuBar);
 //
 
-    connect(mActionEffectsPaintEnabled, SIGNAL(toggled(bool)),
-            mCanvasWindow, SLOT(setEffectsPaintEnabled(bool)));
+    connect(mClipViewToCanvas, SIGNAL(toggled(bool)),
+            mCanvasWindow, SLOT(setClipToCanvas(bool)));
 }
 
 void MainWindow::addCanvasToRenderQue() {
@@ -383,7 +383,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
         return;
     }
     Canvas *canvas = mCanvasWindow->getCurrentCanvas();
-    mActionEffectsPaintEnabled->setChecked(canvas->effectsPaintEnabled());
+    mClipViewToCanvas->setChecked(canvas->clipToCanvas());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(
                 canvas->getCurrentBoxesGroup());

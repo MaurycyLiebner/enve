@@ -9,6 +9,7 @@
 #include "Animators/paintsettings.h"
 #include "pathpoint.h"
 #include "Animators/pathanimator.h"
+#include "Animators/qstringanimator.h"
 
 void UndoRedoStack::setWindow(MainWindow *mainWindow) {
     mMainWindow = mainWindow;
@@ -586,11 +587,11 @@ void ChangeFontUndoRedo::redo() {
     mTarget->setFont(mNewFont, false);
 }
 
-ChangeTextUndoRedo::ChangeTextUndoRedo(TextBox *target,
+ChangeTextUndoRedo::ChangeTextUndoRedo(QStringAnimator *target,
                                        const QString &textBefore,
                                        const QString &textAfter) :
     UndoRedo("ChangeTextUndoRedo") {
-    mTarget = target->ref<TextBox>();
+    mTarget = target->ref<QStringAnimator>();
     mOldText = textBefore;
     mNewText = textAfter;
 }
@@ -599,9 +600,9 @@ ChangeTextUndoRedo::~ChangeTextUndoRedo() {
 }
 
 void ChangeTextUndoRedo::undo() {
-    mTarget->setText(mOldText, false);
+    mTarget->setCurrentTextValue(mOldText, false);
 }
 
 void ChangeTextUndoRedo::redo() {
-    mTarget->setText(mNewText, false);
+    mTarget->setCurrentTextValue(mNewText, false);
 }

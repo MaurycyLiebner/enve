@@ -19,6 +19,7 @@ public:
 
     static QStringKey *qStringKeyFromSql(const int &keyId,
                                          QStringAnimator *animator);
+    QStringKey *makeDuplicate(QStringAnimator *anim);
 private:
     QString mText;
 };
@@ -29,7 +30,8 @@ public:
     QStringAnimator();
 
     void prp_setAbsFrame(const int &frame);
-    void setCurrentTextValue(const QString &text);
+    void setCurrentTextValue(const QString &text,
+                             const bool &saveUndoRedo = true);
     QString getCurrentTextValue();
 
     bool SWT_isQStringAnimator() { return true; }
@@ -41,6 +43,7 @@ public:
                                               const int &relFrame);
     void loadFromSql(const int &qstringAnimatorId);
     int saveToSql(QSqlQuery *query, const int &parentId);
+    void makeDuplicate(QStringAnimator *anim);
 public slots:
     void prp_setRecording(const bool &rec);
 private:
