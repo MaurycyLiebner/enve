@@ -958,6 +958,122 @@ void ColorizeEffect::duplicateAnimatorsFrom(QrealAnimator *hue,
     alpha->makeDuplicate(mAlphaAnimator.data());
 }
 
+PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame(
+        const int &relFrame) {
+    ReplaceColorEffectRenderData *renderData =
+            new ReplaceColorEffectRenderData();
+    QColor fromColor = mFromColor->getColorAtRelFrame(relFrame).qcol;
+    QColor toColor = mToColor->getColorAtRelFrame(relFrame).qcol;
+
+    renderData->redR = qRound(fromColor.red()*fromColor.alphaF());
+    renderData->greenR = qRound(fromColor.green()*fromColor.alphaF());
+    renderData->blueR = qRound(fromColor.blue()*fromColor.alphaF());
+    renderData->alphaR = fromColor.alpha();
+
+    renderData->redT = qRound(toColor.red()*toColor.alphaF());
+    renderData->greenT = qRound(toColor.green()*toColor.alphaF());
+    renderData->blueT = qRound(toColor.blue()*toColor.alphaF());
+    renderData->alphaT = toColor.alpha();
+
+    renderData->tolerance = qRound(mToleranceAnimator->
+            getCurrentValueAtRelFrame(relFrame)*255);
+    renderData->smoothness = qRound(mSmoothnessAnimator->
+            getCurrentValueAtRelFrame(relFrame)*255);
+    return renderData;
+}
+
+ReplaceColorEffect::ReplaceColorEffect() :
+    PixmapEffect(EFFECT_COLORIZE) {
+    prp_setName("replace color");
+
+    mFromColor = (new ColorAnimator())->ref<ColorAnimator>();
+    mToColor = (new ColorAnimator())->ref<ColorAnimator>();
+    mToleranceAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+    mSmoothnessAnimator = (new QrealAnimator())->ref<QrealAnimator>();
+
+    mFromColor->prp_setName("from color");
+
+    mToColor->prp_setName("to color");
+
+    mToleranceAnimator->prp_setName("tolerance");
+    mToleranceAnimator->qra_setValueRange(0., 1.);
+    mToleranceAnimator->setPrefferedValueStep(0.01);
+
+    mSmoothnessAnimator->prp_setName("smoothness");
+    mSmoothnessAnimator->qra_setValueRange(0., 1.);
+    mSmoothnessAnimator->setPrefferedValueStep(0.01);
+
+    ca_addChildAnimator(mFromColor.data());
+    ca_addChildAnimator(mToColor.data());
+    ca_addChildAnimator(mToleranceAnimator.data());
+    ca_addChildAnimator(mSmoothnessAnimator.data());
+}
+
+int ReplaceColorEffect::saveToSql(QSqlQuery *query,
+                              const int &boundingBoxSqlId) {
+    int pixmapEffectId = PixmapEffect::saveToSql(query,
+                                                     boundingBoxSqlId);
+//    int infId = mColorAnimator->saveToSql(query);
+
+//    if(!query->exec(
+//        QString("INSERT INTO ReplaceColorEffect (pixmapeffectid, "
+//                "influenceid) "
+//                "VALUES (%1, %2)").
+//                arg(pixmapEffectId).
+//                arg(infId) ) ) {
+//        qDebug() << query->lastError() << endl << query->lastQuery();
+//    }
+    return pixmapEffectId;
+}
+
+void ReplaceColorEffect::loadFromSql(const int &identifyingId) {
+//    QSqlQuery query;
+
+//    QString queryStr = "SELECT * FROM ReplaceColorEffect WHERE pixmapeffectid = " +
+//            QString::number(identifyingId);
+//    if(query.exec(queryStr)) {
+//        query.next();
+//        mColorAnimator->loadFromSql(query.value("influenceid").toInt() );
+//    } else {
+//        qDebug() << "Could not load ReplaceColorEffect with id " << identifyingId;
+//    }
+}
+
+Property *ReplaceColorEffect::makeDuplicate() {
+    ReplaceColorEffect *colorizeTarget = new ReplaceColorEffect();
+    makeDuplicate(colorizeTarget);
+    return colorizeTarget;
+}
+
+void ReplaceColorEffect::makeDuplicate(Property *target) {
+    ReplaceColorEffect *colorizeTarget = (ReplaceColorEffect*)target;
+
+    colorizeTarget->duplicateAnimatorsFrom(mFromColor.data(),
+                                           mToColor.data(),
+                                           mToleranceAnimator.data(),
+                                           mSmoothnessAnimator.data());
+}
+
+void ReplaceColorEffect::duplicateAnimatorsFrom(ColorAnimator *fromColor,
+                                            ColorAnimator *toColor,
+                                            QrealAnimator *tolerance,
+                                            QrealAnimator *smoothness) {
+    fromColor->makeDuplicate(mFromColor.data());
+    toColor->makeDuplicate(mToColor.data());
+    tolerance->makeDuplicate(mToleranceAnimator.data());
+    smoothness->makeDuplicate(mSmoothnessAnimator.data());
+}
+
+void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
+                                              const fmt_filters::image &img,
+                                              const qreal &scale) {
+    Q_UNUSED(imgPtr);
+    Q_UNUSED(scale);
+    fmt_filters::replaceColor(img, redR, greenR, blueR, alphaR,
+                              redT, greenT, blueT, alphaT,
+                              tolerance, smoothness);
+}
+
 void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                                               const fmt_filters::image &img,
                                               const qreal &scale) {

@@ -1,4 +1,4 @@
-#ifndef BOXESLISTANIMATIONDOCKWIDGET_H
+﻿#ifndef BOXESLISTANIMATIONDOCKWIDGET_H
 #define BOXESLISTANIMATIONDOCKWIDGET_H
 
 #include <QWidget>
@@ -96,8 +96,6 @@ private:
     QAction *mRenderAction;
 
     QToolBar *mToolBar;
-
-    QMenuBar *mAddBoxesListKeysViewWidgetsBar = new QMenuBar(this);
     QList<BoxesListKeysViewWidget*> mBoxesListKeysViewWidgets;
 
     VerticalWidgetsStack *mBoxesListKeysViewStack;

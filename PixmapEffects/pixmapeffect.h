@@ -5,6 +5,8 @@
 #include "Properties/boolproperty.h"
 #include <QObject>
 
+typedef QSharedPointer<ColorAnimator> ColorAnimatorQSPtr;
+
 namespace fmt_filters {
     struct image;
 }
@@ -368,4 +370,44 @@ private:
     QrealAnimatorQSPtr mAlphaAnimator;
 };
 
+struct ReplaceColorEffectRenderData : public PixmapEffectRenderData {
+    void applyEffectsSk(const SkBitmap &imgPtr,
+                        const fmt_filters::image &img,
+                        const qreal &scale);
+
+    int redR;
+    int greenR;
+    int blueR;
+    int alphaR;
+    int redT;
+    int greenT;
+    int blueT;
+    int alphaT;
+    int smoothness;
+    int tolerance;
+};
+
+class ReplaceColorEffect : public PixmapEffect {
+public:
+    ReplaceColorEffect();
+
+    qreal getMargin() { return 0.; }
+
+    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
+    void loadFromSql(const int &identifyingId);
+    Property *makeDuplicate();
+    void makeDuplicate(Property *target);
+    PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
+            const int &relFrame);
+    void duplicateAnimatorsFrom(ColorAnimator *fromColor,
+                                ColorAnimator *toColor,
+                                QrealAnimator *tolerance,
+                                QrealAnimator *smoothness);
+private:
+    ColorAnimatorQSPtr mFromColor;
+    ColorAnimatorQSPtr mToColor;
+
+    QrealAnimatorQSPtr mToleranceAnimator;
+    QrealAnimatorQSPtr mSmoothnessAnimator;
+};
 #endif // PIXMAPEFFECT_H

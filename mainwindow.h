@@ -182,6 +182,7 @@ private:
     QDockWidget *mRightDock;
     QDockWidget *mBottomDock;
     QDockWidget *mLeftDock;
+    QDockWidget *mLeftDock2;
     BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
 
     QToolBar *mToolBar;
@@ -209,6 +210,10 @@ private:
     ActionButton *mActionCurve;
 //
     QAction *mClipViewToCanvas;
+    QAction *mCurrentObjectDock;
+    QAction *mFilesDock;
+    QAction *mObjectsAndAnimationsDock;
+    QAction *mFillAndStrokeSettingsDock;
 
     QPushButton *mNewCanvasButton;
 
@@ -224,6 +229,7 @@ private:
     QMenu *mPathMenu;
     QMenu *mEffectsMenu;
     QMenu *mViewMenu;
+        QMenu *mPanelsMenu;
     QMenu *mRenderMenu;
 
     CanvasWindow *mCanvasWindow;

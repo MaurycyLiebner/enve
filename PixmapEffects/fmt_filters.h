@@ -177,6 +177,18 @@ namespace fmt_filters
     // image won't have much difference from 6.0
     void gamma(const image &im, qreal L);
 
+    void replaceColor(const image &im,
+                  const int &redR,
+                  const int &greenR,
+                  const int &blueR,
+                  const int &alphaR,
+                  const int &redT,
+                  const int &greenT,
+                  const int &blueT,
+                  const int &alphaT,
+                  const int &tolerance,
+                  const int &smooth);
+
     // change contrast with Photoshop-like method
     // contrast should be  -255 <= contrast <= 255
     void contrast(const image &im, int contrast);
@@ -245,6 +257,11 @@ namespace fmt_filters
                               const qreal &fRadius);
 
         void blur(const image &im, qreal radius, qreal sigma);
+
+        void qblurMono(qreal *data,
+                       const int &w,
+                       const int &h,
+                       const qreal &fRadius);
 
         void despeckle(const image &im);
 

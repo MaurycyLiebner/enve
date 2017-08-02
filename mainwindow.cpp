@@ -108,8 +108,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     mFillStrokeSettings->setCanvasWindowPtr(mCanvasWindow);
 
-    setupMenuBar();
-
     setCentralWidget(mCanvasWindow->getCanvasWidget());
 
     showMaximized();
@@ -153,7 +151,7 @@ MainWindow::MainWindow(QWidget *parent)
     mLeftDock->setWidget(mObjectSettingsScrollArea);
     addDockWidget(Qt::LeftDockWidgetArea, mLeftDock);
 
-    QDockWidget *mLeftDock2 = new QDockWidget(this);
+    mLeftDock2 = new QDockWidget(this);
     mLeftDock2->setFeatures(mLeftDock2->features().setFlag(
                                QDockWidget::DockWidgetClosable, false));
     mLeftDock2->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
@@ -183,6 +181,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    mCanvasWindow->addCanvasToListAndSetAsCurrent(canvas);
 //    mCanvas = mCanvasWindow->getCurrentCanvas();
 //    mCurrentCanvasComboBox->addItem(mCanvas->getName());
+
+    setupMenuBar();
 
     connectToolBarActions();
 
@@ -358,7 +358,46 @@ void MainWindow::setupMenuBar() {
     mClipViewToCanvas = mViewMenu->addAction("Clip To Canvas");
     mClipViewToCanvas->setCheckable(true);
     mClipViewToCanvas->setChecked(true);
-    mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_V));
+    mClipViewToCanvas->setShortcut(QKeySequence(Qt::Key_C));
+
+    connect(mClipViewToCanvas, SIGNAL(toggled(bool)),
+            mCanvasWindow, SLOT(setClipToCanvas(bool)));
+
+    mPanelsMenu = mViewMenu->addMenu("Docks");
+
+    mCurrentObjectDock = mPanelsMenu->addAction("Current Object");
+    mCurrentObjectDock->setCheckable(true);
+    mCurrentObjectDock->setChecked(true);
+    mCurrentObjectDock->setShortcut(QKeySequence(Qt::Key_O));
+
+    connect(mCurrentObjectDock, SIGNAL(toggled(bool)),
+            mLeftDock, SLOT(setVisible(bool)));
+
+    mFilesDock = mPanelsMenu->addAction("Files");
+    mFilesDock->setCheckable(true);
+    mFilesDock->setChecked(true);
+    mFilesDock->setShortcut(QKeySequence(Qt::Key_F));
+
+    connect(mFilesDock, SIGNAL(toggled(bool)),
+            mLeftDock2, SLOT(setVisible(bool)));
+
+    mObjectsAndAnimationsDock = mPanelsMenu->addAction("Objects and Animations");
+    mObjectsAndAnimationsDock->setCheckable(true);
+    mObjectsAndAnimationsDock->setChecked(true);
+    mObjectsAndAnimationsDock->setShortcut(QKeySequence(Qt::Key_A));
+
+    connect(mObjectsAndAnimationsDock, SIGNAL(toggled(bool)),
+            mBottomDock,
+            SLOT(setVisible(bool)));
+
+    mFillAndStrokeSettingsDock = mPanelsMenu->addAction("Fill and Stroke");
+    mFillAndStrokeSettingsDock->setCheckable(true);
+    mFillAndStrokeSettingsDock->setChecked(true);
+    mFillAndStrokeSettingsDock->setShortcut(QKeySequence(Qt::Key_E));
+
+    connect(mFillAndStrokeSettingsDock, SIGNAL(toggled(bool)),
+            mRightDock,
+            SLOT(setVisible(bool)));
 
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render",
@@ -367,8 +406,6 @@ void MainWindow::setupMenuBar() {
     setMenuBar(mMenuBar);
 //
 
-    connect(mClipViewToCanvas, SIGNAL(toggled(bool)),
-            mCanvasWindow, SLOT(setClipToCanvas(bool)));
 }
 
 void MainWindow::addCanvasToRenderQue() {

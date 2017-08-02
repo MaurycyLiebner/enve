@@ -128,6 +128,10 @@ bool checkImage(const image &im)
     return (im.rw && im.rh && im.w && im.h && im.data);
 }
 
+u8 qrealToU8(const qreal &val) {
+    return (u8)qMin(255, qMax(0, qRound(val)));
+}
+
 #include "Colors/helpers.h"
 // colorize tool
 void colorizeHSV(const image &im,
@@ -135,16 +139,10 @@ void colorizeHSV(const image &im,
               const qreal &saturation,
               const qreal &lightness,
               const qreal &alpha) {
-    // check if all parameters are good
     if(!checkImage(im)) return;
-
-//    if(!red && !green && !blue)
-//    return;
 
     u8 *bits;
 
-    // add to RED component 'red' value, and check if the result is out of bounds.
-    // do the same with GREEN and BLUE channels.
     if(alpha > 0.001) {
         for(s32 y = 0; y < im.h; ++y) {
             bits = im.data + im.rw * y * sizeof(rgba);
@@ -164,49 +162,135 @@ void colorizeHSV(const image &im,
                     qreal lT = (maxT + minT) / 510. + lightness;
                     qhsl_to_rgb(&hT, &sT, &lT);
 
-                    *(bits) = (u8)qMin(255, qMax(0,
-                            qRound(
-                                (alpha*lT*255. + (1. - alpha)*bT)*aT)));
-                    *(bits + 1) = (u8)qMin(255, qMax(0,
-                            qRound(
-                                (alpha*sT*255. + (1. - alpha)*gT)*aT)));
-                    *(bits + 2) = (u8)qMin(255, qMax(0,
-                            qRound(
-                                (alpha*hT*255. + (1. - alpha)*rT)*aT)));
+                    *(bits) =
+                        qrealToU8(
+                            (alpha*lT*255. + (1. - alpha)*bT)*aT);
+                    *(bits + 1) =
+                        qrealToU8(
+                            (alpha*sT*255. + (1. - alpha)*gT)*aT);
+                    *(bits + 2) =
+                        qrealToU8(
+                            (alpha*hT*255. + (1. - alpha)*rT)*aT);
                 }
 
                 bits += 4;
             }
         }
-    } else {
-        return;
-//        for(s32 y = 0; y < im.h; ++y) {
-//            bits = im.data + im.rw * y * sizeof(rgba);
-
-//            for(s32 x = 0; x < im.w; x++) {
-//                u8 u8aT = *(bits + 3);
-//                if(u8aT != 0) {
-//                    u8 bT = *(bits);
-//                    u8 gT = *(bits + 1);
-//                    u8 rT = *(bits + 2);
-//                    qreal aT = u8aT;
-//                    u8 maxT = MAX3(rT, gT, bT);
-//                    u8 minT = MIN3(rT, gT, bT);
-
-//                    qreal hT = hue;
-//                    qreal sT = saturation;
-//                    qreal lT = (maxT + minT) / 510. + lightness;
-//                    qhsl_to_rgb(&hT, &sT, &lT);
-
-//                    *(bits) = (u8)qMin(255, qMax(0, qRound(lT*aT)));
-//                    *(bits + 1) = (u8)qMin(255, qMax(0, qRound(sT*aT)));
-//                    *(bits + 2) = (u8)qMin(255, qMax(0, qRound(hT*aT)));
-//                }
-//                bits += 4;
-//            }
-//        }
     }
 }
+
+void replaceColor(const image &im,
+              const int &redR,
+              const int &greenR,
+              const int &blueR,
+              const int &alphaR,
+              const int &redT,
+              const int &greenT,
+              const int &blueT,
+              const int &alphaT,
+              const int &tolerance,
+              const int &smooth) {
+    if(!checkImage(im)) return;
+
+    u8 *bits;
+    int dataW = im.w;
+    int dataH = im.h;
+    qreal *imMap = new qreal[dataW * dataH];
+
+    for(s32 y = 0; y < im.h; ++y) {
+        bits = im.data + im.rw * y * sizeof(rgba);
+
+        for(s32 x = 0; x < im.w; x++) {
+            int u8aT = *(bits + 3);
+            int u8bT = *(bits);
+            int u8gT = *(bits + 1);
+            int u8rT = *(bits + 2);
+            int avgDT = (qAbs(u8aT - alphaR) +
+                         qAbs(u8bT - blueR) +
+                         qAbs(u8gT - greenR) +
+                         qAbs(u8rT - redR))/4;
+            if(avgDT < tolerance) {
+                imMap[y * dataW + x] = 1.;
+            } else {
+                imMap[y * dataW + x] = 0.;
+            }
+
+            bits += 4;
+        }
+    }
+
+    qblurMono(imMap, dataW, dataH, smooth*10.);
+    for(s32 y = 0; y < im.h; ++y) {
+        bits = im.data + im.rw * y * sizeof(rgba);
+
+        for(s32 x = 0; x < im.w; x++) {
+            int u8aT = *(bits + 3);
+            int u8bT = *(bits);
+            int u8gT = *(bits + 1);
+            int u8rT = *(bits + 2);
+            qreal inf = imMap[y * dataW + x];
+            if(inf > 0.001) {
+                *(bits) = qrealToU8(u8bT*(1. - inf) + blueT*inf);
+                *(bits + 1) = qrealToU8(u8gT*(1. - inf) + greenT*inf);
+                *(bits + 2) = qrealToU8(u8rT*(1. - inf) + redT*inf);
+                *(bits + 3) = qrealToU8(u8aT*(1. - inf) + alphaT*inf);
+            }
+
+            bits += 4;
+        }
+    }
+
+    delete[] imMap;
+}
+
+//void replaceColor(const image &im,
+//              const int &redR,
+//              const int &greenR,
+//              const int &blueR,
+//              const int &alphaR,
+//              const int &redT,
+//              const int &greenT,
+//              const int &blueT,
+//              const int &alphaT,
+//              const int &tolerance,
+//              const int &smooth) {
+//    if(!checkImage(im)) return;
+
+//    u8 *bits;
+
+//    for(s32 y = 0; y < im.h; ++y) {
+//        bits = im.data + im.rw * y * sizeof(rgba);
+
+//        for(s32 x = 0; x < im.w; x++) {
+//            int u8aT = *(bits + 3);
+//            int u8bT = *(bits);
+//            int u8gT = *(bits + 1);
+//            int u8rT = *(bits + 2);
+//            int avgDT = (qAbs(u8aT - alphaR) +
+//                         qAbs(u8bT - blueR) +
+//                         qAbs(u8gT - greenR) +
+//                         qAbs(u8rT - redR))/4;
+//            if(avgDT < tolerance) {
+//                *(bits) = blueT;
+//                *(bits + 1) = greenT;
+//                *(bits + 2) = redT;
+//                *(bits + 3) = alphaT;
+//            } else if(avgDT < tolerance + smooth) {
+//                qreal replaceAlpha = (tolerance + smooth - avgDT)/255.;
+//                *(bits) = qrealToU8(
+//                            (1. - replaceAlpha)*u8bT + replaceAlpha*blueT);
+//                *(bits + 1) = qrealToU8(
+//                            (1. - replaceAlpha)*u8gT + replaceAlpha*greenT);
+//                *(bits + 2) = qrealToU8(
+//                            (1. - replaceAlpha)*u8rT + replaceAlpha*redT);
+//                *(bits + 3) = qrealToU8(
+//                            (1. - replaceAlpha)*u8aT + replaceAlpha*alphaT);
+//            }
+
+//            bits += 4;
+//        }
+//    }
+//}
 
 // brightness tool
 void brightness(const image &im, s32 bn)
@@ -428,8 +512,7 @@ void blend(const image &im, const rgb &rgb, float opacity)
 void replaceColor(const image &im,
                   const int &rInt,
                   const int &gInt,
-                  const int &bInt)
-{
+                  const int &bInt) {
     // check parameters
     if(!checkImage(im))
     return;
@@ -440,12 +523,10 @@ void replaceColor(const image &im,
     unsigned char b = bInt;
 
     // blend!
-    for(s32 y = 0; y < im.h; ++y)
-    {
+    for(s32 y = 0; y < im.h; ++y) {
         bits = (rgba *)im.data + im.rw * y;
 
-        for(s32 x = 0; x < im.w; x++)
-        {
+        for(s32 x = 0; x < im.w; x++) {
             bits->r = b*bits->a/255;
             bits->g = g*bits->a/255;
             bits->b = r*bits->a/255;
@@ -2608,8 +2689,8 @@ static inline void scaleDown(T &val, T min, T max)
         val = max;
 }
 
-static void blurScanLine(qreal *kernel, s32 width, rgba *src, rgba *dest, s32 columns)
-{
+static void blurScanLine(qreal *kernel, s32 width,
+                         rgba *src, rgba *dest, s32 columns) {
     register qreal *p;
     rgba *q;
     register s32 x;
@@ -2810,6 +2891,135 @@ static s32 getBlurKernel(s32 width, qreal sigma, qreal **kernel)
 #undef KernelRankQ
 #undef KernelRank
 
+}
+
+void qblurMono(qreal *data,
+               const int &w,
+               const int &h,
+               const qreal &fRadius) {
+    if(fRadius < 0.01) return;
+    unsigned char *pix = (unsigned char*)data;
+
+    qreal divF = fRadius + fRadius + 1.;
+    qreal divFInv = 1./divF;
+    int iRadius = ceil(fRadius);
+    int nPoints = iRadius + iRadius + 1;
+    qreal fracInf = 1. - iRadius + fRadius;
+    qreal fracInfInv = 1. - fracInf;
+
+    qreal *valLine = new qreal[nPoints];
+
+    int wm=w-1;
+    int hm=h-1;
+    int wh=w*h;
+    qreal *v = new qreal[wh];
+    qreal vsum;
+    int x,y,i,p,p1,yp,yi,yw;
+    int *vMIN = new int[qMax(w,h)];
+    int *vMAX = new int[qMax(w,h)];
+
+
+    yw=yi=0;
+
+    for(y = 0; y < h; y++) {
+        p = yi;
+        valLine[0] = pix[p];
+        vsum = pix[p]*fracInf;
+
+        for(i = 1 - iRadius; i < iRadius; i++) {
+            p = yi + qMin(wm, qMax(i,0));
+            valLine[i + iRadius] = pix[p];
+            vsum += pix[p];
+        }
+
+        p = yi + qMin(wm, iRadius);
+        valLine[iRadius + iRadius] = pix[p];
+        vsum += pix[p]*fracInf;
+
+        for(x = 0; x < w; x++) {
+
+            v[yi] = vsum*divFInv;
+
+            if(y == 0) {
+                vMIN[x] = qMin(x+iRadius+1, wm);
+                vMAX[x] = qMax(x-iRadius, 0);
+            }
+            p1 = yw + vMIN[x];
+
+            vsum -= valLine[0]*fracInf;
+
+            vsum -= valLine[1]*fracInfInv;
+
+            for(i = 0; i < nPoints - 1; i++) {
+                valLine[i] = valLine[i + 1];
+            }
+
+            vsum += valLine[nPoints - 1]*fracInfInv;
+
+            valLine[nPoints - 1] = pix[p1];
+
+            vsum += pix[p1]*fracInf;
+
+            yi++;
+        }
+        yw+=w;
+    }
+
+    for(x = 0; x < w; x++) {
+        yp=-iRadius*w;
+
+        yi=qMax(0,yp)+x;
+        valLine[0] = v[yi];
+        vsum = v[yi]*fracInf;
+        yp+=w;
+
+        for(i = 1 - iRadius; i < iRadius; i++) {
+            yi = qMax(0, yp) + x;
+            valLine[i + iRadius] = v[yi];
+            vsum += v[yi];
+            yp+=w;
+        }
+
+        yi = qMax(0, yp)+x;
+        valLine[iRadius + iRadius] = v[yi];
+        vsum += v[yi]*fracInf;
+        yp+=w;
+
+
+        yi=x;
+        for(y = 0; y < h; y++) {
+            pix[yi]	= vsum*divFInv;
+
+            if(x==0) {
+                vMIN[y] = qMin(y+iRadius+1,hm)*w;
+                vMAX[y] = qMax(y-iRadius,0)*w;
+            }
+            p1=x+vMIN[y];
+
+            vsum -= valLine[0]*fracInf;
+
+            vsum -= valLine[1]*fracInfInv;
+
+            for(i = 0; i < nPoints - 1; i++) {
+                valLine[i] = valLine[i + 1];
+            }
+
+            vsum += valLine[nPoints - 1]*fracInfInv;
+
+            valLine[nPoints - 1] = v[p1];
+
+            vsum += v[p1]*fracInf;
+
+            yi+=w;
+        }
+    }
+
+    delete[] valLine;
+
+    delete[] v;
+
+    delete[] vMIN;
+    delete[] vMAX;
 }
 
 static void hull(const s32 x_offset, const s32 y_offset, const s32 polarity, const s32 columns,

@@ -68,6 +68,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_effects_desaturate");
     effectsMenu->addAction("Colorize")->setObjectName(
                 "canvas_effects_colorize");
+    effectsMenu->addAction("Replace Color")->setObjectName(
+                "canvas_effects_replace_color");
 
     QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
     pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
@@ -105,6 +107,8 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDesaturateEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_effects_colorize") {
         applyColorizeEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_effects_replace_color") {
+        applyReplaceColorEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_discrete") {
         applyDiscretePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {

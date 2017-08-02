@@ -72,24 +72,7 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
         MainWindow *parent) :
     QWidget(parent) {
     setFocusPolicy(Qt::NoFocus);
-    mAddBoxesListKeysViewWidgetsBar->hide();
-    mAddBoxesListKeysViewWidgetsBar->addAction(
-                        "+", this,
-                        SLOT(addNewBoxesListKeysViewWidget()));
-    mAddBoxesListKeysViewWidgetsBar->setStyleSheet(
-               "QMenuBar {"
-                   "color: white;"
-                   "background-color: rgb(50, 50, 50)"
-               "} QMenuBar::item {"
-                   "spacing: 3px;"
-                   "padding: 1px 4px;"
-                   "background: transparent;"
-                   "border-radius: 4px;"
-               "} QMenuBar::item:selected {"
-                   "background: rgb(75, 75, 75);"
-               "} QMenuBar::item:pressed {"
-                   "background: rgb(90, 90, 90);"
-               "}");
+
     mMainWindow = parent;
     setMinimumSize(10*MIN_WIDGET_HEIGHT, 10*MIN_WIDGET_HEIGHT);
     mMainLayout = new QVBoxLayout(this);
@@ -225,8 +208,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mBoxesListKeysViewStack = new VerticalWidgetsStack(this);
     mTimelineLayout->addWidget(mBoxesListKeysViewStack);
 
-    mTimelineLayout->addWidget(mAddBoxesListKeysViewWidgetsBar);
-
     mTimelineLayout->addWidget(mFrameRangeScrollbar, Qt::AlignBottom);
 
     mFrameRangeScrollbar->emitChange();
@@ -263,7 +244,6 @@ void BoxesListAnimationDockWidget::addNewBoxesListKeysViewWidget(
                                         int id) {
     if(mBoxesListKeysViewStack->isHidden()) {
         mBoxesListKeysViewStack->show();
-        mAddBoxesListKeysViewWidgetsBar->hide();
         setMinimumHeight(10*MIN_WIDGET_HEIGHT);
         setMaximumHeight(100*MIN_WIDGET_HEIGHT);
     }
@@ -296,11 +276,6 @@ void BoxesListAnimationDockWidget::removeBoxesListKeysViewWidget(
                                             mAnimationWidgetScrollbar);
         } else {
             return;
-//            mMainLayout->insertWidget(1, mAnimationWidgetScrollbar);
-//            mAddBoxesListKeysViewWidgetsBar->show();
-//            mBoxesListKeysViewStack->hide();
-//            setMinimumHeight(80);
-//            setMaximumHeight(80);
         }
     }
     mBoxesListKeysViewWidgets.removeOne(widget);

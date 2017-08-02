@@ -80,6 +80,12 @@ void Canvas::applyDesaturateEffectToSelected() {
     }
 }
 
+void Canvas::applyReplaceColorEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->addEffect(new ReplaceColorEffect());
+    }
+}
+
 void Canvas::applyColorizeEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->addEffect(new ColorizeEffect());

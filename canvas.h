@@ -150,6 +150,7 @@ public:
     void applyImplodeEffectToSelected();
     void applyDesaturateEffectToSelected();
     void applyColorizeEffectToSelected();
+    void applyReplaceColorEffectToSelected();
 
     void rotateSelectedBy(const qreal &rotBy,
                           const QPointF &absOrigin,
