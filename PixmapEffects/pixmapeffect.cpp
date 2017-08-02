@@ -977,8 +977,8 @@ PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame
 
     renderData->tolerance = qRound(mToleranceAnimator->
             getCurrentValueAtRelFrame(relFrame)*255);
-    renderData->smoothness = qRound(mSmoothnessAnimator->
-            getCurrentValueAtRelFrame(relFrame)*255);
+    renderData->smoothness = mSmoothnessAnimator->
+            getCurrentValueAtRelFrame(relFrame);
     return renderData;
 }
 
@@ -1068,10 +1068,9 @@ void ReplaceColorEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,
                                               const fmt_filters::image &img,
                                               const qreal &scale) {
     Q_UNUSED(imgPtr);
-    Q_UNUSED(scale);
     fmt_filters::replaceColor(img, redR, greenR, blueR, alphaR,
                               redT, greenT, blueT, alphaT,
-                              tolerance, smoothness);
+                              tolerance, smoothness*scale);
 }
 
 void ColorizeEffectRenderData::applyEffectsSk(const SkBitmap &imgPtr,

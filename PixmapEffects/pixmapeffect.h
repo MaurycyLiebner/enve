@@ -383,7 +383,7 @@ struct ReplaceColorEffectRenderData : public PixmapEffectRenderData {
     int greenT;
     int blueT;
     int alphaT;
-    int smoothness;
+    qreal smoothness;
     int tolerance;
 };
 

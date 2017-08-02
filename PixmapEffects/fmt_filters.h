@@ -187,7 +187,7 @@ namespace fmt_filters
                   const int &blueT,
                   const int &alphaT,
                   const int &tolerance,
-                  const int &smooth);
+                  const qreal &smooth);
 
     // change contrast with Photoshop-like method
     // contrast should be  -255 <= contrast <= 255
@@ -259,6 +259,10 @@ namespace fmt_filters
         void blur(const image &im, qreal radius, qreal sigma);
 
         void qblurMono(qreal *data,
+                       const int &w,
+                       const int &h,
+                       const qreal &fRadius);
+        void qspredMono(qreal *data,
                        const int &w,
                        const int &h,
                        const qreal &fRadius);

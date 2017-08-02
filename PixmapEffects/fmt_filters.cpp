@@ -189,7 +189,7 @@ void replaceColor(const image &im,
               const int &blueT,
               const int &alphaT,
               const int &tolerance,
-              const int &smooth) {
+              const qreal &smooth) {
     if(!checkImage(im)) return;
 
     u8 *bits;
@@ -201,10 +201,10 @@ void replaceColor(const image &im,
         bits = im.data + im.rw * y * sizeof(rgba);
 
         for(s32 x = 0; x < im.w; x++) {
-            int u8aT = *(bits + 3);
-            int u8bT = *(bits);
-            int u8gT = *(bits + 1);
-            int u8rT = *(bits + 2);
+            int u8aT = (u8)*(bits + 3);
+            int u8bT = (u8)*(bits);
+            int u8gT = (u8)*(bits + 1);
+            int u8rT = (u8)*(bits + 2);
             int avgDT = (qAbs(u8aT - alphaR) +
                          qAbs(u8bT - blueR) +
                          qAbs(u8gT - greenR) +
@@ -219,17 +219,18 @@ void replaceColor(const image &im,
         }
     }
 
-    qblurMono(imMap, dataW, dataH, smooth*10.);
+    qspredMono(imMap, dataW, dataH, smooth*10.);
     for(s32 y = 0; y < im.h; ++y) {
         bits = im.data + im.rw * y * sizeof(rgba);
 
         for(s32 x = 0; x < im.w; x++) {
-            int u8aT = *(bits + 3);
-            int u8bT = *(bits);
-            int u8gT = *(bits + 1);
-            int u8rT = *(bits + 2);
+            int u8aT = (u8)*(bits + 3);
+            int u8bT = (u8)*(bits);
+            int u8gT = (u8)*(bits + 1);
+            int u8rT = (u8)*(bits + 2);
             qreal inf = imMap[y * dataW + x];
             if(inf > 0.001) {
+                inf = qMin(1., 5*inf);
                 *(bits) = qrealToU8(u8bT*(1. - inf) + blueT*inf);
                 *(bits + 1) = qrealToU8(u8gT*(1. - inf) + greenT*inf);
                 *(bits + 2) = qrealToU8(u8rT*(1. - inf) + redT*inf);
@@ -2898,8 +2899,6 @@ void qblurMono(qreal *data,
                const int &h,
                const qreal &fRadius) {
     if(fRadius < 0.01) return;
-    unsigned char *pix = (unsigned char*)data;
-
     qreal divF = fRadius + fRadius + 1.;
     qreal divFInv = 1./divF;
     int iRadius = ceil(fRadius);
@@ -2923,18 +2922,18 @@ void qblurMono(qreal *data,
 
     for(y = 0; y < h; y++) {
         p = yi;
-        valLine[0] = pix[p];
-        vsum = pix[p]*fracInf;
+        valLine[0] = data[p];
+        vsum = data[p]*fracInf;
 
         for(i = 1 - iRadius; i < iRadius; i++) {
             p = yi + qMin(wm, qMax(i,0));
-            valLine[i + iRadius] = pix[p];
-            vsum += pix[p];
+            valLine[i + iRadius] = data[p];
+            vsum += data[p];
         }
 
         p = yi + qMin(wm, iRadius);
-        valLine[iRadius + iRadius] = pix[p];
-        vsum += pix[p]*fracInf;
+        valLine[iRadius + iRadius] = data[p];
+        vsum += data[p]*fracInf;
 
         for(x = 0; x < w; x++) {
 
@@ -2956,9 +2955,9 @@ void qblurMono(qreal *data,
 
             vsum += valLine[nPoints - 1]*fracInfInv;
 
-            valLine[nPoints - 1] = pix[p1];
+            valLine[nPoints - 1] = data[p1];
 
-            vsum += pix[p1]*fracInf;
+            vsum += data[p1]*fracInf;
 
             yi++;
         }
@@ -2988,7 +2987,135 @@ void qblurMono(qreal *data,
 
         yi=x;
         for(y = 0; y < h; y++) {
-            pix[yi]	= vsum*divFInv;
+            data[yi]	= vsum*divFInv;
+
+            if(x==0) {
+                vMIN[y] = qMin(y+iRadius+1,hm)*w;
+                vMAX[y] = qMax(y-iRadius,0)*w;
+            }
+            p1=x+vMIN[y];
+
+            vsum -= valLine[0]*fracInf;
+
+            vsum -= valLine[1]*fracInfInv;
+
+            for(i = 0; i < nPoints - 1; i++) {
+                valLine[i] = valLine[i + 1];
+            }
+
+            vsum += valLine[nPoints - 1]*fracInfInv;
+
+            valLine[nPoints - 1] = v[p1];
+
+            vsum += v[p1]*fracInf;
+
+            yi+=w;
+        }
+    }
+
+    delete[] valLine;
+
+    delete[] v;
+
+    delete[] vMIN;
+    delete[] vMAX;
+}
+
+
+void qspredMono(qreal *data,
+               const int &w,
+               const int &h,
+               const qreal &fRadius) {
+    if(fRadius < 0.01) return;
+    qreal divF = fRadius + fRadius + 1.;
+    qreal divFInv = 1./divF;
+    int iRadius = ceil(fRadius);
+    int nPoints = iRadius + iRadius + 1;
+    qreal fracInf = 1. - iRadius + fRadius;
+    qreal fracInfInv = 1. - fracInf;
+
+    qreal *valLine = new qreal[nPoints];
+
+    int wm=w-1;
+    int hm=h-1;
+    int wh=w*h;
+    qreal *v = new qreal[wh];
+    qreal vsum;
+    int x,y,i,p,p1,yp,yi,yw;
+    int *vMIN = new int[qMax(w,h)];
+    int *vMAX = new int[qMax(w,h)];
+
+
+    yw=yi=0;
+
+    for(y = 0; y < h; y++) {
+        p = yi;
+        valLine[0] = data[p];
+        vsum = data[p]*fracInf;
+
+        for(i = 1 - iRadius; i < iRadius; i++) {
+            p = yi + qMin(wm, qMax(i,0));
+            valLine[i + iRadius] = data[p];
+            vsum += data[p];
+        }
+
+        p = yi + qMin(wm, iRadius);
+        valLine[iRadius + iRadius] = data[p];
+        vsum += data[p]*fracInf;
+
+        for(x = 0; x < w; x++) {
+
+            v[yi] = vsum*divFInv;
+
+            if(y == 0) {
+                vMIN[x] = qMin(x+iRadius+1, wm);
+                vMAX[x] = qMax(x-iRadius, 0);
+            }
+            p1 = yw + vMIN[x];
+
+            vsum -= valLine[0]*fracInf;
+
+            vsum -= valLine[1]*fracInfInv;
+
+            for(i = 0; i < nPoints - 1; i++) {
+                valLine[i] = valLine[i + 1];
+            }
+
+            vsum += valLine[nPoints - 1]*fracInfInv;
+
+            valLine[nPoints - 1] = data[p1];
+
+            vsum += data[p1]*fracInf;
+
+            yi++;
+        }
+        yw+=w;
+    }
+
+    for(x = 0; x < w; x++) {
+        yp=-iRadius*w;
+
+        yi=qMax(0,yp)+x;
+        valLine[0] = v[yi];
+        vsum = v[yi]*fracInf;
+        yp+=w;
+
+        for(i = 1 - iRadius; i < iRadius; i++) {
+            yi = qMax(0, yp) + x;
+            valLine[i + iRadius] = v[yi];
+            vsum += v[yi];
+            yp+=w;
+        }
+
+        yi = qMax(0, yp)+x;
+        valLine[iRadius + iRadius] = v[yi];
+        vsum += v[yi]*fracInf;
+        yp+=w;
+
+
+        yi=x;
+        for(y = 0; y < h; y++) {
+            data[yi] = qMax(data[yi], vsum*divFInv);
 
             if(x==0) {
                 vMIN[y] = qMin(y+iRadius+1,hm)*w;
