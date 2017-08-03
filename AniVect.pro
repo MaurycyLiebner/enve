@@ -34,8 +34,9 @@ CONFIG(debug, debug|release) {
     QMAKE_CXXFLAGS = -m64 -O3
 }
 
+QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -lSDL2 -lSDL2_image \
-        -lSDL2_ttf -lfontconfig# -lX11
+        -lSDL2_ttf -lfontconfig -fopenmp# -lX11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -178,7 +179,22 @@ SOURCES += main.cpp\
     Properties/boxtargetproperty.cpp \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
-    filesourcelist.cpp
+    filesourcelist.cpp \
+    Paint/BrushesWidget/brushbutton.cpp \
+    Paint/BrushesWidget/brushcollectionselector.cpp \
+    Paint/BrushesWidget/brusheswidget.cpp \
+    Paint/BrushesWidget/brushselector.cpp \
+    Paint/BrushesWidget/collectionbutton.cpp \
+    Paint/BrushSettings/brushsettingswidget.cpp \
+    Paint/BrushSettings/brushsettingwidget.cpp \
+    Paint/PaintLib/brush.cpp \
+    Paint/PaintLib/brushsavedialog.cpp \
+    Paint/PaintLib/surface.cpp \
+    Paint/PaintLib/tile.cpp \
+    Paint/canvashandler.cpp \
+    Paint/layer.cpp \
+    Paint/paintcanvas.cpp \
+    Paint/windowvariables.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -318,7 +334,22 @@ HEADERS  += mainwindow.h \
     Properties/boxtargetproperty.h \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     BoxesList/OptimalScrollArea/minimalscrollwidget.h \
-    filesourcelist.h
+    filesourcelist.h \
+    Paint/BrushesWidget/brushbutton.h \
+    Paint/BrushesWidget/brushcollectionselector.h \
+    Paint/BrushesWidget/brusheswidget.h \
+    Paint/BrushesWidget/brushselector.h \
+    Paint/BrushesWidget/collectionbutton.h \
+    Paint/BrushSettings/brushsettingswidget.h \
+    Paint/BrushSettings/brushsettingwidget.h \
+    Paint/PaintLib/brush.h \
+    Paint/PaintLib/brushsavedialog.h \
+    Paint/PaintLib/surface.h \
+    Paint/PaintLib/tile.h \
+    Paint/canvashandler.h \
+    Paint/layer.h \
+    Paint/paintcanvas.h \
+    Paint/windowvariables.h
 
 RESOURCES += \
     resources.qrc

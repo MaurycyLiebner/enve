@@ -67,7 +67,7 @@ float getAngleDeg(double x1, double y1, double x2, double y2)
     return atan2(det, dot)*RadToDeg + 180;
 }
 
-void normalize(float *x_t, float *y_t, float dest_len) {
+void normalize(qreal *x_t, qreal *y_t, qreal dest_len) {
     float x_val_t = *x_t;
     float y_val_t = *y_t;
     float curr_len = sqrt(x_val_t*x_val_t + y_val_t*y_val_t);
@@ -656,4 +656,165 @@ bool isNonZero(const float &val_t) {
 
 bool isZero(const float val_t) {
     return val_t < 0.0001f && val_t > - 0.0001f;
+}
+
+
+qreal getUNoise(qreal noise_scale)
+{
+    if( isNonZero(noise_scale) )
+    {
+        return ( rand() % 101 )*0.01 * noise_scale;
+    }
+    else
+    {
+        return 0.f;
+    }
+}
+
+qreal getNoise(qreal noise_scale)
+{
+    if( isNonZero(noise_scale) )
+    {
+        return ( rand() % 201 - 100)*0.01 * noise_scale;
+    }
+    else
+    {
+        return 0.f;
+    }
+}
+
+void applyXYNoise(qreal noise_t,
+                  qreal *previous_noise_x,
+                  qreal *next_noise_x,
+                  qreal *previous_noise_y,
+                  qreal *next_noise_y,
+                  qreal noise_frequency,
+                  uchar *noise_count,
+                  qreal *value_x,
+                  qreal *value_y)
+{
+    if(isNonZero(noise_t) )
+    {
+        uchar max_stroke_noise_count = (uchar)(100 - noise_frequency*100);
+        if(*noise_count >= max_stroke_noise_count )
+        {
+            *noise_count = 0;
+            *previous_noise_x = *next_noise_x;
+            *previous_noise_y = *next_noise_y;
+            *next_noise_x = getNoise(noise_t );
+            *next_noise_y = getNoise(noise_t );
+        }
+        else
+        {
+            *noise_count = *noise_count + 1;
+        }
+        qreal current_noise_x = ( (*next_noise_x)*(*noise_count) +
+                                  (*previous_noise_x)*
+                                  (max_stroke_noise_count - (*noise_count) )
+                                  )/max_stroke_noise_count;
+        *value_x += current_noise_x;
+        qreal current_noise_y = ( (*next_noise_y)*(*noise_count) +
+                                  (*previous_noise_y)*
+                                  (max_stroke_noise_count - (*noise_count) )
+                                  )/max_stroke_noise_count;
+        *value_y += current_noise_y;
+    }
+}
+
+void applyNoise(qreal noise_t,
+                qreal *previous_noise,
+                qreal *next_noise,
+                qreal noise_frequency,
+                uchar *noise_count,
+                qreal *value)
+{
+    if(isNonZero(noise_t) )
+    {
+        uchar max_stroke_noise_count = (uchar)(100 - noise_frequency*100);
+        if(*noise_count >= max_stroke_noise_count )
+        {
+            *noise_count = 0;
+            *previous_noise = *next_noise;
+            *next_noise = getNoise(noise_t );
+        }
+        else
+        {
+            *noise_count = *noise_count + 1;
+        }
+        qreal current_noise = ( (*next_noise)*(*noise_count) +
+                                  (*previous_noise)*
+                                  (max_stroke_noise_count - (*noise_count) )
+                                  )/max_stroke_noise_count;
+        *value += current_noise;
+    }
+}
+
+void applyUNoise(qreal noise_t,
+                 qreal *previous_noise,
+                 qreal *next_noise,
+                 qreal noise_frequency,
+                 uchar *noise_count,
+                 qreal *value)
+{
+    if(isNonZero(noise_t) )
+    {
+        uchar max_stroke_noise_count = (uchar)(10000 - noise_frequency*10000);
+        if(*noise_count >= max_stroke_noise_count )
+        {
+            *noise_count = 0;
+            *previous_noise = *next_noise;
+            *next_noise = getUNoise(noise_t );
+        }
+        else
+        {
+            *noise_count = *noise_count + 1;
+        }
+        qreal current_noise = ( (*next_noise)*(*noise_count) +
+                                  (*previous_noise)*
+                                  (max_stroke_noise_count - (*noise_count) )
+                                  )/max_stroke_noise_count;
+        *value += current_noise;
+    }
+}
+
+#include <QInputDialog>
+#include <QString>
+#include <QFile>
+#include <QTextStream>
+#include "Paint/PaintLib/brush.h"
+void saveBrushDataAsFile(Brush *brush_t, QString file_path_t)
+{
+    QFile file(file_path_t);
+    file.open(QFile::WriteOnly | QFile::Text);
+    file.resize(0);
+    QTextStream in(&file);
+    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++)
+    {
+        in << brush_t->getSettingAsFileLine(Brush::brush_settings_info[i].setting ) << endl;
+    }
+    in.flush();
+    file.close();
+}
+
+void saveBrushDataAsFile(Brush *brush_t, QString collection_name, QString brush_name)
+{
+    brush_name = brush_name.replace(" ", "_").toLower();
+    QFile file("brushes/" + collection_name + "/" + brush_name + ".plb");
+    file.open(QFile::WriteOnly | QFile::Text);
+    file.resize(0);
+    QTextStream in(&file);
+    in << "name:" + brush_name << endl;
+    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++)
+    {
+        in << brush_t->getSettingAsFileLine(Brush::brush_settings_info[i].setting ) << endl;
+    }
+    in.flush();
+    file.close();
+}
+
+ushort getFreeRamMB()
+{
+    struct sysinfo info_t;
+    sysinfo(&info_t);
+    return info_t.freeram*0.000001;
 }

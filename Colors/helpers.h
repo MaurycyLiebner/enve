@@ -14,11 +14,12 @@
 #define RadToDeg 180/PI
 #define sqrt_3 1.73205080757
 #define sqrt_2 1.41421356237
+#include <QtCore>
 
 
 extern int clampInt(int val, int min, int max);
 extern void glOrthoAndViewportSet(unsigned int w, unsigned int h);
-extern void normalize(float *x_t, float *y_t, float dest_len = 1.f);
+extern void normalize(qreal *x_t, qreal *y_t, qreal dest_len = 1.);
 extern float clamp(float val_t, float min_t, float max_t);
 extern float getAngleF(double x1, double y1, double x2, double y2);
 extern float getAngleDeg(double x1, double y1, double x2, double y2);
@@ -42,5 +43,41 @@ extern bool isNonZero(const float &val_t);
 extern bool isZero(const float val_t);
 
 extern void rotate(float rad_t, float *x_t, float *y_t);
+
+extern qreal getUNoise(qreal noise_scale);
+extern qreal getNoise(qreal noise_scale);
+extern void applyXYNoise(qreal noise_t,
+                         qreal *previous_noise_x,
+                         qreal *next_noise_x,
+                         qreal *previous_noise_y,
+                         qreal *next_noise_y,
+                         qreal noise_frequency,
+                         uchar *noise_count,
+                         qreal *value_x,
+                         qreal *value_y);
+extern void applyUNoise(qreal noise_t,
+                        qreal *previous_noise,
+                        qreal *next_noise,
+                        qreal noise_frequency,
+                        uchar *noise_count,
+                        qreal *value);
+extern void applyNoise(qreal noise_t,
+                       qreal *previous_noise,
+                       qreal *next_noise,
+                       qreal noise_frequency,
+                       uchar *noise_count,
+                       qreal *value);
+
+
+class Brush;
+
+extern void saveBrushDataAsFile(Brush *brush_t,
+                                QString file_path_t);
+
+extern void saveBrushDataAsFile(Brush *brush_t,
+                                QString collection_name,
+                                QString brush_name);
+
+extern unsigned short getFreeRamMB();
 
 #endif // HELPERS_H
