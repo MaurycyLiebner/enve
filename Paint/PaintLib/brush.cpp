@@ -400,8 +400,7 @@ bool Brush::wasChangedSinceLastStroke()
     return changed_since_last_stroke;
 }
 
-void Brush::setChangedSinceLastStroke(bool b_t)
-{
+void Brush::setChangedSinceLastStroke(bool b_t) {
     changed_since_last_stroke = b_t;
 }
 

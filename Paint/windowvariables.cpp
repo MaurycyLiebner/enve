@@ -21,16 +21,6 @@ void WindowVariables::currentColorChanged()
     updateBrushColor();
 }
 
-void WindowVariables::setBrushesWidget(BrushesWidget *brushes_widget_t)
-{
-    brushes_widget = brushes_widget_t;
-}
-
-BrushesWidget *WindowVariables::getBrushesWidget()
-{
-    return brushes_widget;
-}
-
 Brush *WindowVariables::getBrush()
 {
     return current_brush;
@@ -104,13 +94,11 @@ void WindowVariables::saveColorIfNeeded()
 
 }
 
-void WindowVariables::setBrushSaved(bool b_t)
-{
+void WindowVariables::setBrushSaved(bool b_t) {
     brush_saved = b_t;
 }
 
-void WindowVariables::saveBrushIfNeeded()
-{
+void WindowVariables::saveBrushIfNeeded() {
     if(brush_saved)
     {
         return;

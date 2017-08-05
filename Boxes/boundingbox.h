@@ -40,7 +40,8 @@ enum BoundingBoxType {
     TYPE_EXTERNAL_LINK,
     TYPE_PARTICLES,
     TYPE_VIDEO,
-    TYPE_IMAGESQUENCE
+    TYPE_IMAGESQUENCE,
+    TYPE_PAINT
 };
 
 class BoxesGroup;
@@ -139,7 +140,7 @@ public:
     virtual bool isContainedIn(const QRectF &absRect);
 
     virtual void drawPixmapSk(SkCanvas *canvas);
-
+    virtual void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
     virtual void drawSelectedSk(SkCanvas *canvas,
                                 const CanvasMode &currentCanvasMode,
                                 const SkScalar &invScale);
@@ -513,7 +514,7 @@ protected:
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
 
-    void updateDrawRenderContainerTransform();
+    virtual void updateDrawRenderContainerTransform();
 
     bool mRenderCacheChangeNeeded = false;
     bool mReplaceCache = false;

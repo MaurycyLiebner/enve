@@ -124,17 +124,6 @@ void Surface::getColor(qreal cx, qreal cy,
     }
 }
 
-void Surface::savePixelsToPngArray(png::image< png::rgba_pixel_16 > *image)
-{
-    for(int i = 0; i < n_tile_cols; i++)
-    {
-        for(int j = 0; j < n_tile_rows; j++)
-        {
-            tiles[j][i]->savePixelsToPngArray(image);
-        }
-    }
-}
-
 void Surface::clear()
 {
     for(int i = 0; i < n_tile_cols; i++)
@@ -146,20 +135,18 @@ void Surface::clear()
     }
 }
 
-void Surface::loadImg(QString img_path)
-{
-    png::image< png::rgba_pixel_16 > image(img_path.toStdString(), png::require_color_space< png::rgba_pixel_16 >());
-    for(int i = 0; i < n_tile_cols; i++)
-    {
-        for(int j = 0; j < n_tile_rows; j++)
-        {
-            tiles[j][i]->loadImg(&image);
+void Surface::getTileDrawers(QList<TileSkDrawer> *tileDrawers) {
+    for(int i = 0; i < n_tile_cols; i++) {
+        for(int j = 0; j < n_tile_rows; j++) {
+            tileDrawers->append(tiles[j][i]->getTexTileDrawer());
         }
     }
 }
 
-void Surface::strokeTo(Brush *brush, qreal x, qreal y, qreal pressure, GLushort dt, bool erase)
-{
+void Surface::strokeTo(Brush *brush,
+                       qreal x, qreal y,
+                       qreal pressure, GLushort dt,
+                       bool erase) {
     qreal dist_between_dabs = brush->getDistBetweenDabsPx();
     qreal stroke_dx = x - last_event_stroke_x;
     qreal stroke_dy = y - last_event_stroke_y;
@@ -202,175 +189,145 @@ void Surface::strokeTo(Brush *brush, qreal x, qreal y, qreal pressure, GLushort 
     short min_affected_tile_y = 10000;
     short max_affected_tile_y = 0;
 
-    GLshort dabs_to_i = floor(dabs_to);
-    if(dabs_to_i > 0)
-    {
-        qreal rotation_delay = brush->getRotationDelay();
-        qreal angle_t = getAngleDeg(x - last_painted_stroke_x, y - last_painted_stroke_y, 0.f, -1.f);
-        if(angle_t > 180.f)
-        {
-            angle_t -= 180.f;
-        }
-        else if(angle_t < 0.f)
-        {
-            angle_t += 180.f;
-        }
-        qreal angle_diff = fabs(angle_t - last_stroke_beta);
-        qreal dest_angle;
-        if(angle_diff > 120.f)
-        {
-            dest_angle = angle_t;
-        }
-        else
-        {
-            dest_angle = angle_t*(1 - rotation_delay)*brush->getRotationInfluence() +
-                                 last_stroke_beta*rotation_delay;
-        }
-
-        if(dest_angle > 180.f)
-        {
-            dest_angle -= 180.f;
-        }
-        else if(dest_angle < 0.f)
-        {
-            dest_angle += 180.f;
-        }
-        last_stroke_beta = dest_angle;
-        qreal dab_r = qMin(brush->getRadius()*5,
-                             brush->getRadius() + brush->getPressureRadiusGainPx()*pressure +
-                             brush->getSpeedRadiusGain()*stroke_vel);
-        qreal dab_hardness = brush->getHardness() + brush->getPressureHardnessGain()*pressure +
-                                    brush->getSpeedHardnessGain()*stroke_vel;
-        qreal dab_opa = brush->getOpacity() + brush->getPressureOpacityGain()*pressure +
-                                    brush->getSpeedOpacityGain()*stroke_vel;
-        qreal dab_aspect_ratio = brush->getAspectRatio() + brush->getPressureAspectRatioGain()*pressure; // 1 to infinity
-
-        qreal smudge_red;
-        qreal smudge_green;
-        qreal smudge_blue;
-        qreal smudge_alpha;
-        getColor(last_painted_stroke_x, last_painted_stroke_y,
-                 dab_hardness, dab_opa,
-                 dab_aspect_ratio, dab_r, dest_angle,
-                 &smudge_red, &smudge_green, &smudge_blue, &smudge_alpha);
-        brush->addPickedUpRGBAFromNewStroke(smudge_red, smudge_green, smudge_blue, smudge_alpha);
-        brush->getPickedUpRGBA(&smudge_red, &smudge_green, &smudge_blue, &smudge_alpha);
-
-
-        qreal stroke_red;
-        qreal stroke_green;
-        qreal stroke_blue;
-        qreal dab_alpha;
-        bool fixed_color = isZero( brush->getHueNoise() ) && isZero(brush->getSaturationNoise() ) &&
-                                isZero( brush->getValueNoise() );
-
-        brush->getRGBA(&stroke_red, &stroke_green, &stroke_blue, &dab_alpha);
-        dab_alpha += brush->getPressureAlphaGain()*pressure;
-
-        qreal alpha_sum_t = dab_alpha + smudge_alpha;
-        stroke_red = (stroke_red*dab_alpha + smudge_alpha*smudge_red)/alpha_sum_t;
-        stroke_green = (stroke_green*dab_alpha + smudge_alpha*smudge_green)/alpha_sum_t;
-        stroke_blue = (stroke_blue*dab_alpha + smudge_alpha*smudge_blue)/alpha_sum_t;
-        if(alpha_sum_t > 1.f)
-        {
-            alpha_sum_t = 1.f;
-        }
-
-        qreal dab_red = stroke_red;
-        qreal dab_green = stroke_green;
-        qreal dab_blue = stroke_blue;
-
-        qreal stroke_h;
-        qreal stroke_s;
-        qreal stroke_v;
-        if(!fixed_color)
-        {
-            stroke_h = stroke_red;
-            stroke_s = stroke_green;
-            stroke_v = stroke_blue;
-            qrgb_to_hsv(&stroke_h, &stroke_s, &stroke_v);
-        }
-
-        for(GLshort i = 0; i < dabs_to_i; i++)
-        {
-            if(!fixed_color)
-            {
-                dab_red = stroke_h;
-                applyNoise(brush->getHueNoise(), &previous_hue_noise, &next_hue_noise,
-                           brush->getHueNoiseFrequency(), &hue_noise_count, &dab_red);
-                dab_green = stroke_s;
-                applyNoise(brush->getSaturationNoise(), &previous_saturation_noise, &next_saturation_noise,
-                           brush->getSaturationNoiseFrequency(), &saturation_noise_count, &dab_green);
-                dab_blue = stroke_v;
-                applyNoise(brush->getValueNoise(), &previous_value_noise, &next_value_noise,
-                           brush->getValueNoiseFrequency(), &value_noise_count, &dab_blue);
-                qhsv_to_rgb(&dab_red, &dab_green, &dab_blue);
-            }
-            qreal dab_x = first_dab_x + i*dabs_dx + getNoise(brush->getDabPositionNoisePx() ) ;
-            qreal dab_y = first_dab_y + i*dabs_dy + getNoise(brush->getDabPositionNoisePx() ) ;
-            last_painted_stroke_x = dab_x;
-            last_painted_stroke_y = dab_y;
-            last_dab_rotation_inc += brush->getRotationBetweenDabs();
-            if(last_dab_rotation_inc > 180.f)
-            {
-                last_dab_rotation_inc -= 180.f;
-            }
-
-            qreal dab_x_min = dab_x - dab_r;
-            qreal dab_x_max = dab_x + dab_r;
-            qreal dab_y_min = dab_y - dab_r;
-            qreal dab_y_max = dab_y + dab_r;
-
-            short dab_min_tile_x;
-            short dab_max_tile_x;
-            short dab_min_tile_y;
-            short dab_max_tile_y;
-            getTileIdsOnRect(dab_x_min, dab_x_max, dab_y_min, dab_y_max,
-                             &dab_min_tile_x, &dab_max_tile_x, &dab_min_tile_y, &dab_max_tile_y);
-
-            replaceIfSmaller(dab_min_tile_x, &min_affected_tile_x);
-            replaceIfSmaller(dab_min_tile_y, &min_affected_tile_y);
-            replaceIfBigger(dab_max_tile_x, &max_affected_tile_x);
-            replaceIfBigger(dab_max_tile_y, &max_affected_tile_y);
-            qreal dab_rot = dest_angle + brush->getInitialRotation() +
-                    last_dab_rotation_inc +
-                    getNoise(brush->getRotationNoise() );
-            #pragma omp parallel for
-            for(short tx = dab_min_tile_x; tx <= dab_max_tile_x; tx++)
-            {
-                for(short ty = dab_min_tile_y; ty <= dab_max_tile_y; ty++)
-                {
-                    tiles[ty][tx]->addDabToDraw(dab_x, dab_y,
-                                                dab_hardness, dab_opa*alpha_sum_t, dab_aspect_ratio,
-                                                dab_r, dab_rot,
-                                                dab_red, dab_green, dab_blue);
-                }
-            }
-        }
-
-        if(erase)
-        {
-            for(short tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++)
-            {
-                for(short ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++)
-                {
-                    tiles[ty][tx]->processDabErase();
-                }
-            }
-        }
-        else
-        {
-            for(short tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++)
-            {
-                for(short ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++)
-                {
-                    tiles[ty][tx]->processDabPainting();
-                }
-            }
-        }
-
-        last_stroke_press = pressure;
+    short dabs_to_i = floor(dabs_to);
+    if(dabs_to_i <= 0) return;
+    qreal rotation_delay = brush->getRotationDelay();
+    qreal angle_t = getAngleDeg(x - last_painted_stroke_x, y - last_painted_stroke_y, 0.f, -1.f);
+    if(angle_t > 180.f) {
+        angle_t -= 180.f;
+    } else if(angle_t < 0.f) {
+        angle_t += 180.f;
     }
+    qreal angle_diff = fabs(angle_t - last_stroke_beta);
+    qreal dest_angle;
+    if(angle_diff > 120.f) {
+        dest_angle = angle_t;
+    } else {
+        dest_angle = angle_t*(1 - rotation_delay)*brush->getRotationInfluence() +
+                             last_stroke_beta*rotation_delay;
+    }
+
+    if(dest_angle > 180.f) {
+        dest_angle -= 180.f;
+    } else if(dest_angle < 0.f) {
+        dest_angle += 180.f;
+    }
+    last_stroke_beta = dest_angle;
+    qreal dab_r = qMin(brush->getRadius()*5,
+                         brush->getRadius() + brush->getPressureRadiusGainPx()*pressure +
+                         brush->getSpeedRadiusGain()*stroke_vel);
+    qreal dab_hardness = brush->getHardness() + brush->getPressureHardnessGain()*pressure +
+                                brush->getSpeedHardnessGain()*stroke_vel;
+    qreal dab_opa = brush->getOpacity() + brush->getPressureOpacityGain()*pressure +
+                                brush->getSpeedOpacityGain()*stroke_vel;
+    qreal dab_aspect_ratio = brush->getAspectRatio() + brush->getPressureAspectRatioGain()*pressure; // 1 to infinity
+
+    qreal smudge_red;
+    qreal smudge_green;
+    qreal smudge_blue;
+    qreal smudge_alpha;
+    getColor(last_painted_stroke_x, last_painted_stroke_y,
+             dab_hardness, dab_opa,
+             dab_aspect_ratio, dab_r, dest_angle,
+             &smudge_red, &smudge_green, &smudge_blue, &smudge_alpha);
+    brush->addPickedUpRGBAFromNewStroke(smudge_red, smudge_green, smudge_blue, smudge_alpha);
+    brush->getPickedUpRGBA(&smudge_red, &smudge_green, &smudge_blue, &smudge_alpha);
+
+
+    qreal stroke_red;
+    qreal stroke_green;
+    qreal stroke_blue;
+    qreal dab_alpha;
+    bool fixed_color = isZero( brush->getHueNoise() ) && isZero(brush->getSaturationNoise() ) &&
+                            isZero( brush->getValueNoise() );
+
+    brush->getRGBA(&stroke_red, &stroke_green, &stroke_blue, &dab_alpha);
+    dab_alpha += brush->getPressureAlphaGain()*pressure;
+
+    qreal alpha_sum_t = dab_alpha + smudge_alpha;
+    stroke_red = (stroke_red*dab_alpha + smudge_alpha*smudge_red)/alpha_sum_t;
+    stroke_green = (stroke_green*dab_alpha + smudge_alpha*smudge_green)/alpha_sum_t;
+    stroke_blue = (stroke_blue*dab_alpha + smudge_alpha*smudge_blue)/alpha_sum_t;
+    if(alpha_sum_t > 1.f) {
+        alpha_sum_t = 1.f;
+    }
+
+    qreal dab_red = stroke_red;
+    qreal dab_green = stroke_green;
+    qreal dab_blue = stroke_blue;
+
+    qreal stroke_h;
+    qreal stroke_s;
+    qreal stroke_v;
+    if(!fixed_color) {
+        stroke_h = stroke_red;
+        stroke_s = stroke_green;
+        stroke_v = stroke_blue;
+        qrgb_to_hsv(&stroke_h, &stroke_s, &stroke_v);
+    }
+
+    for(short i = 0; i < dabs_to_i; i++) {
+        if(!fixed_color) {
+            dab_red = stroke_h;
+            applyNoise(brush->getHueNoise(), &previous_hue_noise, &next_hue_noise,
+                       brush->getHueNoiseFrequency(), &hue_noise_count, &dab_red);
+            dab_green = stroke_s;
+            applyNoise(brush->getSaturationNoise(), &previous_saturation_noise, &next_saturation_noise,
+                       brush->getSaturationNoiseFrequency(), &saturation_noise_count, &dab_green);
+            dab_blue = stroke_v;
+            applyNoise(brush->getValueNoise(), &previous_value_noise, &next_value_noise,
+                       brush->getValueNoiseFrequency(), &value_noise_count, &dab_blue);
+            qhsv_to_rgb(&dab_red, &dab_green, &dab_blue);
+        }
+        qreal dab_x = first_dab_x + i*dabs_dx + getNoise(brush->getDabPositionNoisePx() ) ;
+        qreal dab_y = first_dab_y + i*dabs_dy + getNoise(brush->getDabPositionNoisePx() ) ;
+        last_painted_stroke_x = dab_x;
+        last_painted_stroke_y = dab_y;
+        last_dab_rotation_inc += brush->getRotationBetweenDabs();
+        if(last_dab_rotation_inc > 180.f) {
+            last_dab_rotation_inc -= 180.f;
+        }
+
+        qreal dab_x_min = dab_x - dab_r;
+        qreal dab_x_max = dab_x + dab_r;
+        qreal dab_y_min = dab_y - dab_r;
+        qreal dab_y_max = dab_y + dab_r;
+
+        short dab_min_tile_x;
+        short dab_max_tile_x;
+        short dab_min_tile_y;
+        short dab_max_tile_y;
+        getTileIdsOnRect(dab_x_min, dab_x_max, dab_y_min, dab_y_max,
+                         &dab_min_tile_x, &dab_max_tile_x, &dab_min_tile_y, &dab_max_tile_y);
+
+        replaceIfSmaller(dab_min_tile_x, &min_affected_tile_x);
+        replaceIfSmaller(dab_min_tile_y, &min_affected_tile_y);
+        replaceIfBigger(dab_max_tile_x, &max_affected_tile_x);
+        replaceIfBigger(dab_max_tile_y, &max_affected_tile_y);
+        qreal dab_rot = dest_angle + brush->getInitialRotation() +
+                last_dab_rotation_inc +
+                getNoise(brush->getRotationNoise() );
+        #pragma omp parallel for
+        for(short tx = dab_min_tile_x; tx <= dab_max_tile_x; tx++) {
+            for(short ty = dab_min_tile_y; ty <= dab_max_tile_y; ty++) {
+                tiles[ty][tx]->addDabToDraw(dab_x, dab_y,
+                                            dab_hardness,
+                                            dab_opa*alpha_sum_t,
+                                            dab_aspect_ratio,
+                                            dab_r, dab_rot,
+                                            dab_red, dab_green,
+                                            dab_blue, erase);
+            }
+        }
+    }
+
+    for(short tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++) {
+        for(short ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++) {
+            tiles[ty][tx]->addScheduler();
+        }
+    }
+
+    last_stroke_press = pressure;
 }
 
 void Surface::startNewStroke(Brush *brush, qreal x, qreal y, qreal pressure)
@@ -424,12 +381,10 @@ void Surface::setSize(ushort width_t, ushort height_t)
 
     Tile ***tiles_t = new Tile**[n_tile_rows_t];
 
-    for(ushort rw = 0; rw < n_tile_rows_t; rw++)
-    {
+    for(ushort rw = 0; rw < n_tile_rows_t; rw++) {
         tiles_t[rw] = new Tile*[n_tile_cols_t];
         ushort first_new_col_in_row = 0;
-        if(rw < n_tile_rows)
-        {
+        if(rw < n_tile_rows) {
             first_new_col_in_row = n_tile_cols;
             for(ushort cl = 0; cl < n_tile_cols; cl++)
             {
@@ -440,8 +395,7 @@ void Surface::setSize(ushort width_t, ushort height_t)
             free(tiles[rw]);
         }
 
-        for(ushort cl = first_new_col_in_row; cl < n_tile_cols_t; cl++)
-        { 
+        for(ushort cl = first_new_col_in_row; cl < n_tile_cols_t; cl++) {
             tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM);
         }
 

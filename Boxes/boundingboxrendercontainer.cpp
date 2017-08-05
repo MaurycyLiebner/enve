@@ -12,18 +12,20 @@ void RenderContainer::drawSk(SkCanvas *canvas, SkPaint *paint) {
     if(mSrcRenderData == NULL) return;
     canvas->save();
     canvas->concat(QMatrixToSkMatrix(mPaintTransform));
-    if(paint->getBlendMode() == SkBlendMode::kDstIn ||
-       paint->getBlendMode() == SkBlendMode::kSrcIn ||
-       paint->getBlendMode() == SkBlendMode::kDstATop) {
-        SkPaint paintT;
-        paintT.setBlendMode(paint->getBlendMode());
-        paintT.setColor(SK_ColorTRANSPARENT);
-        SkPath path;
-        path.addRect(SkRect::MakeXYWH(mDrawPos.x(), mDrawPos.y(),
-                                      mImageSk->width(),
-                                      mImageSk->height()));
-        path.toggleInverseFillType();
-        canvas->drawPath(path, paintT);
+    if(paint != NULL) {
+        if(paint->getBlendMode() == SkBlendMode::kDstIn ||
+           paint->getBlendMode() == SkBlendMode::kSrcIn ||
+           paint->getBlendMode() == SkBlendMode::kDstATop) {
+            SkPaint paintT;
+            paintT.setBlendMode(paint->getBlendMode());
+            paintT.setColor(SK_ColorTRANSPARENT);
+            SkPath path;
+            path.addRect(SkRect::MakeXYWH(mDrawPos.x(), mDrawPos.y(),
+                                          mImageSk->width(),
+                                          mImageSk->height()));
+            path.toggleInverseFillType();
+            canvas->drawPath(path, paintT);
+        }
     }
     canvas->drawImage(mImageSk, mDrawPos.x(), mDrawPos.y(), paint);
     canvas->restore();

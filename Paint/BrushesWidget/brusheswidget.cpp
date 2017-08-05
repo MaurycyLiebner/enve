@@ -4,8 +4,8 @@
 #include <QResizeEvent>
 #include "../windowvariables.h"
 
-BrushesWidget::BrushesWidget(WindowVariables *window_vars_t, QWidget *parent) : QGraphicsView(parent)
-{
+BrushesWidget::BrushesWidget(WindowVariables *window_vars_t,
+                             QWidget *parent) : QGraphicsView(parent) {
     window_vars = window_vars_t;
     graphics_scene = new QGraphicsScene(this);
     setScene(graphics_scene);
@@ -17,7 +17,6 @@ BrushesWidget::BrushesWidget(WindowVariables *window_vars_t, QWidget *parent) : 
     brush_collection_selector->setPos(0, 0);
     graphics_scene->addItem(brush_collection_selector);
     brush_collection_selector->loadCollections("brushes/");
-    window_vars->setBrushesWidget(this);
 }
 
 void BrushesWidget::resizeEvent(QResizeEvent *e)

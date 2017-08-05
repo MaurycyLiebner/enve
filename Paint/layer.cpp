@@ -60,11 +60,6 @@ void Layer::clear()
     paintlib_surface->clear();
 }
 
-void Layer::loadImage(QString img_path)
-{
-    paintlib_surface->loadImg(img_path);
-}
-
 void Layer::setWidth(uint16_t width_t)
 {
     layer_width = width_t;
@@ -91,48 +86,24 @@ QString Layer::getLayerName()
     return layer_name;
 }
 
-void Layer::startStroke(GLfloat x_t, GLfloat y_t, GLfloat pressure)
-{
-    save_needed = true;
+void Layer::startStroke(GLfloat x_t, GLfloat y_t, GLfloat pressure) {
     paintlib_surface->startNewStroke(window_vars->getBrush(), x_t, y_t, pressure);
 }
 
-void Layer::setNewPaintLibSurface(int width_t, int height_t)
-{
+void Layer::setNewPaintLibSurface(int width_t, int height_t) {
     paintlib_surface = new Surface(width_t, height_t);
     setSize(width_t, height_t);
 }
 
-void Layer::repaint()
-{
+void Layer::repaint() {
     canvas_handler->repaint();
 }
 
-void Layer::savePixelsToPngArray(png::image< png::rgba_pixel_16 > *image)
-{
-    paintlib_surface->savePixelsToPngArray(image);
-}
-
-void Layer::saveLayerIfNeeded()
-{
-    if(save_needed)
-    {
-        png::image< png::rgba_pixel_16 > image(layer_width, layer_height);
-        savePixelsToPngArray(&image);
-
-        image.write(layer_file_path.toLatin1().toStdString());
-
-        save_needed = false;
-    }
-}
-
-void Layer::setLayerFilePath(QString path_t)
-{
+void Layer::setLayerFilePath(QString path_t) {
     layer_file_path = path_t;
 }
 
-void Layer::renderStroke()
-{
+void Layer::renderStroke() {
     /*if(n_strokes == 0)
     {
         return;
@@ -154,8 +125,9 @@ void Layer::renderStroke()
 
 }
 
-void Layer::tabletEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, float pressure, bool erase)
-{
+void Layer::tabletEvent(GLfloat x_t, GLfloat y_t,
+                        ulong time_stamp,
+                        float pressure, bool erase) {
     Q_UNUSED(time_stamp);
     if(!painting)
     {

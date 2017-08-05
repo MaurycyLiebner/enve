@@ -8,8 +8,8 @@ BrushSaveDialog::BrushSaveDialog(WindowVariables *window_vars_t)
     window_vars = window_vars_t;
     main_layout = new QVBoxLayout(this);
 
-    canvas = new PaintCanvas(128, 128, false, window_vars, this);
-    canvas->loadImage(0, window_vars_t->getBrush()->getBrushFilePath().replace(".plb", ".png") );
+    canvas = new PaintCanvas(128, 128, window_vars, this);
+    //canvas->loadImage(0, window_vars_t->getBrush()->getBrushFilePath().replace(".plb", ".png") );
     main_layout->addWidget(canvas);
     clear_button = new QPushButton("Clear", this);
     connect(clear_button, SIGNAL(released()), this, SLOT(clearCanvas()) );
@@ -56,10 +56,9 @@ void BrushSaveDialog::addNewCollectionToComboBox(QString collection_name)
     collection_combo_box->addItem(collection_name);
 }
 
-void BrushSaveDialog::saveBrushIcon(QString collection_name, QString brush_name)
-{
+void BrushSaveDialog::saveBrushIcon(QString collection_name, QString brush_name) {
     QString file_path = "brushes/" + collection_name + "/" + brush_name + ".png";
-    canvas->saveAsPng(file_path);
+    //canvas->saveAsPng(file_path);
 }
 
 void BrushSaveDialog::clearCanvas()

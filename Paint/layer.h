@@ -28,13 +28,14 @@ class Layer : public QObject
 {
     Q_OBJECT
 public:
-    Layer(QString layer_name_t, CanvasHandler *canvas_handler_t, WindowVariables *window_vars_t, int width_t = 0, int height_t = 0);
+    Layer(QString layer_name_t,
+          CanvasHandler *canvas_handler_t,
+          WindowVariables *window_vars_t,
+          int width_t = 0, int height_t = 0);
 
     void paint();
 
     void clear();
-    void loadImage(QString img_path);
-
     void setX(int16_t x_t);
     void setY(int16_t y_t);
     void moveBy(int16_t dx, int16_t dy);
@@ -47,9 +48,12 @@ public:
     void setLayerName(QString layer_name_t);
     QString getLayerName();
 
-    void tabletEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, float pressure, bool erase);
+    void tabletEvent(GLfloat x_t, GLfloat y_t,
+                     ulong time_stamp,
+                     float pressure, bool erase);
     void tabletReleaseEvent();
-    void tabletPressEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, float pressure);
+    void tabletPressEvent(GLfloat x_t, GLfloat y_t,
+                          ulong time_stamp, float pressure);
 
     void startStroke(GLfloat x_t, GLfloat y_t, GLfloat pressure);
 
@@ -57,14 +61,14 @@ public:
 
     void repaint();
 
-    void savePixelsToPngArray(png::image<png::rgba_pixel_16> *image);
-
-    void saveLayerIfNeeded();
-
     void setLayerFilePath(QString path_t);
+
+    void getTileDrawers(QList<TileSkDrawer> *tileDrawers) {
+        paintlib_surface->getTileDrawers(tileDrawers);
+    }
+
 private:
     QString layer_file_path;
-    bool save_needed = false;
     WindowVariables *window_vars = NULL;
     CanvasHandler *canvas_handler = NULL;
     ushort time_repaint = 10;

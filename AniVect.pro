@@ -194,7 +194,8 @@ SOURCES += main.cpp\
     Paint/canvashandler.cpp \
     Paint/layer.cpp \
     Paint/paintcanvas.cpp \
-    Paint/windowvariables.cpp
+    Paint/windowvariables.cpp \
+    Boxes/paintbox.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -349,7 +350,8 @@ HEADERS  += mainwindow.h \
     Paint/canvashandler.h \
     Paint/layer.h \
     Paint/paintcanvas.h \
-    Paint/windowvariables.h
+    Paint/windowvariables.h \
+    Boxes/paintbox.h
 
 RESOURCES += \
     resources.qrc

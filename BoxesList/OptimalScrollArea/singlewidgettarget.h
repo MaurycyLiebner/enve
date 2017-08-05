@@ -69,6 +69,7 @@ public:
     virtual bool SWT_isTextBox() { return false; }
     virtual bool SWT_isVectorPath() { return false; }
     virtual bool SWT_isVideoBox() { return false; }
+    virtual bool SWT_isPaintBox() { return false; }
     // Properties
     virtual bool SWT_isBoolProperty() { return false; }
     virtual bool SWT_isBoxTargetProperty() { return false; }

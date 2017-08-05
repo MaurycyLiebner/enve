@@ -257,17 +257,17 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
     if(isVisibleAndInVisibleDurationRect()) {
         canvas->save();
 
-        //p->setCompositionMode(mCompositionMode);
-        //p->setOpacity(mTransformAnimator->getOpacity()*0.01 );
-        //SkPaint paint;
-        //paint.setAlpha(mTransformAnimator->getOpacity()*255/100);
         SkPaint paint;
         paint.setAlpha(qRound(mTransformAnimator->getOpacity()*2.55));
         paint.setBlendMode(mBlendModeSk);
         //paint.setFilterQuality(kHigh_SkFilterQuality);
-        mDrawRenderContainer.drawSk(canvas, &paint);
+        drawPixmapSk(canvas, &paint);
         canvas->restore();
     }
+}
+
+void BoundingBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
+    mDrawRenderContainer.drawSk(canvas, paint);
 }
 
 void BoundingBox::setBlendModeSk(const SkBlendMode &blendMode) {
@@ -1300,7 +1300,6 @@ void BoundingBoxRenderData::renderToImage() {
     rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
 
     drawSk(rasterCanvas);
-
     rasterCanvas->flush();
     delete rasterCanvas;
 

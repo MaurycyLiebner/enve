@@ -5,15 +5,16 @@
 #include "brush.h"
 #include <png++/png.hpp>
 
-struct Stroke
-{
+struct Stroke {
     Brush *brush = NULL;
     qreal x;
     qreal y;
     qreal pressure;
-    GLushort dt;
-    Stroke(Brush *brush_t, qreal x_t, qreal y_t, qreal pressure_t, GLushort dt_t)
-    {
+    ushort dt;
+    Stroke(Brush *brush_t,
+           qreal x_t, qreal y_t,
+           qreal pressure_t,
+           ushort dt_t) {
         brush = brush_t;
         x = x_t;
         y = y_t;
@@ -27,18 +28,22 @@ class Surface
 public:
     Surface(ushort width_t, ushort height_t);
     void paintGL();
-    void strokeTo(Brush *brush, qreal x, qreal y, qreal pressure, GLushort dt, bool erase);
-    void startNewStroke(Brush *brush, qreal x, qreal y, qreal pressure);
+    void strokeTo(Brush *brush,
+                  qreal x, qreal y,
+                  qreal pressure, GLushort dt,
+                  bool erase);
+    void startNewStroke(Brush *brush,
+                        qreal x, qreal y,
+                        qreal pressure);
     void initializeGL();
     void getColor(qreal cx, qreal cy,
-                  qreal hardness, qreal opa, qreal aspect_ratio, qreal r, qreal beta_deg,
+                  qreal hardness, qreal opa,
+                  qreal aspect_ratio, qreal r, qreal beta_deg,
                   qreal *red, qreal *green, qreal *blue, qreal *alpha);
-
-    void savePixelsToPngArray(png::image<png::rgba_pixel_16> *image);
 
     void clear();
 
-    void loadImg(QString img_path);
+    void getTileDrawers(QList<TileSkDrawer> *tileDrawers);
 private:
     qreal countDabsTo(qreal dist_between_dabs, qreal x, qreal y);
     Tile *getTile(ushort tile_col, ushort tile_row);

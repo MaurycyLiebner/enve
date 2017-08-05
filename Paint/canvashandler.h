@@ -20,8 +20,8 @@ class CanvasHandler : public QObject
 {
     Q_OBJECT
 public:
-    CanvasHandler(WindowVariables *window_vars_t, int width_t, int height_t,
-                  bool main_canvas_t);
+    CanvasHandler(WindowVariables *window_vars_t,
+                  int width_t, int height_t);
     void newLayer(QString layer_name_t);
     void removeLayer(Layer *layer_t);
     void paintGL();
@@ -42,7 +42,6 @@ public:
     void mouseReleaseEvent();
     void mousePressEvent(GLfloat x_t, GLfloat y_t, ulong timestamp, float pressure);
     void mousePaintEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, bool erase);
-    void saveAsPng(QString file_name);
     void drawGridBg();
     void drawColorBg();
     void drawStretchedImgBg();
@@ -56,13 +55,10 @@ public:
 
     void repaint();
 
-    void loadImage(int layer_id_t, QString img_path_t);
-
     int getLayersCount();
-    void replaceLayerImage(int layer_id_t, QString img_path_t);
-private:
 
-    bool main_canvas = true;
+    void getTileDrawers(QList<TileSkDrawer> *tileDrawers);
+private:
 
     CanvasBackgroundMode backgroud_mode = CANVAS_BACKGROUND_COLOR;
     Color background_color = Color(1.f, 1.f, 1.f);

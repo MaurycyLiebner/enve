@@ -14,11 +14,7 @@ class BrushButton;
 
 #include "PaintLib/brush.h"
 
-struct WindowVariables
-{
-    MainWindow *main_window = NULL;
-    TreeWidget *tree_widget = NULL;
-    BrushesWidget *brushes_widget = NULL;
+struct WindowVariables {
     Brush *current_brush = new Brush();
     Color current_color;
     BrushSettingsWidget *brush_settings_widget = NULL;
@@ -33,8 +29,6 @@ struct WindowVariables
     void setBrushColor(GLfloat h_t, GLfloat s_t, GLfloat v_t);
     void currentColorChanged();
 
-    void setBrushesWidget(BrushesWidget *brushes_widget_t);
-    BrushesWidget *getBrushesWidget();
     Brush *getBrush();
     void setBrushButton(BrushButton *button_t);
     void setBrushSetting(BrushSetting setting_t, float val_t);
