@@ -839,6 +839,19 @@ void Canvas::updateTransformation() {
 void Canvas::mouseMoveEvent(QMouseEvent *event) {
     if(isPreviewingOrRendering()) return;
     setCurrentMouseEventPosAbs(event->pos());
+    if(mCurrentMode == PAINT_MODE &&
+       event->buttons() & Qt::LeftButton)  {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->mouseMoveEvent(mLastMouseEventPosRel.x(),
+                                         mLastMouseEventPosRel.y(),
+                                         event->timestamp(),
+                                         false);
+            }
+        }
+        return;
+    }
     if(!(event->buttons() & Qt::MiddleButton) &&
        !(event->buttons() & Qt::RightButton) &&
        !(event->buttons() & Qt::LeftButton) &&

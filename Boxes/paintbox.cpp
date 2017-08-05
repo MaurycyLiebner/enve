@@ -54,8 +54,8 @@ void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
 }
 
 void PaintBoxRenderData::updateRelBoundingRect() {
-    int widthT;
-    int heightT;
+    int widthT = 0;
+    int heightT = 0;
     foreach(const TileSkDrawer &tile, tileDrawers) {
         widthT += TILE_DIM;
         heightT += TILE_DIM;

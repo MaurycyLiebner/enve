@@ -169,15 +169,12 @@ void Surface::strokeTo(Brush *brush,
     qreal dabs_dx = first_dab_dx;
     qreal dabs_dy = first_dab_dy;
 
-    if(isZero(first_dab_dx) && isZero(first_dab_dy))
-    {
+    if(isZero(first_dab_dx) && isZero(first_dab_dy)) {
         first_dab_dx = 0.f;
         first_dab_dy = 0.f;
         dabs_dx = 0.f;
         dabs_dy = 0.f;
-    }
-    else
-    {
+    } else {
         normalize(&first_dab_dx, &first_dab_dy, dist_between_dabs );
         normalize(&dabs_dx, &dabs_dy, dist_between_dabs );
     }
