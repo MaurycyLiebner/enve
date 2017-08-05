@@ -20,6 +20,7 @@
 #include "Boxes/linkbox.h"
 #include "Animators/animatorupdater.h"
 #include "clipboardcontainer.h"
+#include "Boxes/paintbox.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWindow *canvasWidget,
@@ -58,6 +59,10 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     ca_removeChildAnimator(mTransformAnimator.data());
 
     prp_setAbsFrame(0);
+
+    BoundingBox *box = new PaintBox(200, 200);
+    addChild(box);
+    mCurrentMode = PAINT_MODE;
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
 }

@@ -29,21 +29,21 @@ class Layer : public QObject
     Q_OBJECT
 public:
     Layer(QString layer_name_t,
-          CanvasHandler *canvas_handler_t,
           int width_t = 0, int height_t = 0);
 
     void clear();
 
     void tabletEvent(const qreal &x_t,
                      const qreal &y_t,
-                     ulong time_stamp,
+                     const ulong &time_stamp,
                      const qreal &pressure,
                      const bool &erase);
     void tabletReleaseEvent();
     void tabletPressEvent(const qreal &x_t,
                           const qreal &y_t,
-                          ulong time_stamp,
-                          const qreal &pressure);
+                          const ulong &time_stamp,
+                          const qreal &pressure,
+                          const bool &erase);
 
     void startStroke(const qreal &x_t,
                      const qreal &y_t,
@@ -55,11 +55,10 @@ public:
     void getTileDrawers(QList<TileSkDrawer> *tileDrawers) {
         paintlib_surface->getTileDrawers(tileDrawers);
     }
+    void setLayerName(const QString &layerName);
+    const QString &getLayerName();
 private:
-    QString layer_file_path;
-    WindowVariables *window_vars = NULL;
-    CanvasHandler *canvas_handler = NULL;
-    ushort time_repaint = 10;
+    QString mLayerName;
     Surface *paintlib_surface = NULL;
     void renderStroke();
 };

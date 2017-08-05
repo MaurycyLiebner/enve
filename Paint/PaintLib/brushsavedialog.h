@@ -7,8 +7,6 @@
 #include <QPushButton>
 #include "../windowvariables.h"
 
-class PaintCanvas;
-
 class Brush;
 
 class BrushSaveDialog : public QDialog
@@ -23,7 +21,7 @@ private:
 
     QVBoxLayout *main_layout = NULL;
 
-    PaintCanvas *canvas = NULL;
+    //PaintCanvas *canvas = NULL;
     QPushButton *clear_button = NULL;
 
     QHBoxLayout *collection_layout = NULL;

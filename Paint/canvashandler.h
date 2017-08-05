@@ -19,37 +19,37 @@ public:
     CanvasHandler(int width_t, int height_t);
     void newLayer(QString layer_name_t);
     void removeLayer(Layer *layer_t);
-    void paintGL();
 
     void incNumberItems();
     void decNumberItems();
 
     void clear();
 
-    void tabletEvent(const qreal &x_t,
-                     const qreal &y_t,
-                     ulong time_stamp,
-                     float pressure,
-                     bool erase);
+    void tabletEvent(qreal xT,
+                     qreal yT,
+                     const ulong &time_stamp,
+                     const qreal &pressure,
+                     const bool &erase);
     void tabletReleaseEvent();
-    void tabletPressEvent(const qreal &x_t,
-                          const qreal &y_t,
-                          ulong time_stamp,
-                          float pressure);
+    void tabletPressEvent(qreal xT,
+                          qreal yT,
+                          const ulong &time_stamp,
+                          const qreal &pressure,
+                          const bool &erase);
 
     void setCurrentLayer(int layer_id);
     void setCurrentLayer(Layer *layer_t);
     void addLayer(Layer *layer_t);
     void changeLayerZFromTo(int z_val_t, int z_new_val_t);
     void mouseReleaseEvent();
-    void mousePressEvent(const qreal &x_t,
-                         const qreal &y_t,
-                         ulong timestamp,
-                         float pressure);
-    void mouseMoveEvent(const qreal &x_t,
-                         const qreal &y_t,
-                         ulong time_stamp,
-                         bool erase);
+    void mousePressEvent(qreal xT,
+                         qreal yT,
+                         const ulong &timestamp,
+                         const qreal &pressure);
+    void mouseMoveEvent(qreal xT,
+                        qreal yT,
+                        const ulong &time_stamp,
+                        const bool &erase);
     void drawGridBg();
     void drawColorBg();
     void drawStretchedImgBg();
@@ -65,11 +65,13 @@ public:
 
     bool connectedToTreeWidget();
 
-    void repaint();
-
     int getLayersCount();
 
     void getTileDrawers(QList<TileSkDrawer> *tileDrawers);
+    void paintPress(qreal xT,
+                    qreal yT,
+                    const ulong &timestamp,
+                    const qreal &pressure);
 private:
     virtual void mapToPaintCanvasHandler(qreal *x_t, qreal *y_t) = 0;
 

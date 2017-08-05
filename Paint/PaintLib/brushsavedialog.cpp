@@ -1,6 +1,5 @@
 #include "brushsavedialog.h"
 #include "brush.h"
-#include "../paintcanvas.h"
 #include "Colors/helpers.h"
 
 BrushSaveDialog::BrushSaveDialog(WindowVariables *window_vars_t)
@@ -61,9 +60,8 @@ void BrushSaveDialog::saveBrushIcon(QString collection_name, QString brush_name)
     //canvas->saveAsPng(file_path);
 }
 
-void BrushSaveDialog::clearCanvas()
-{
-    canvas->clear();
+void BrushSaveDialog::clearCanvas() {
+    //canvas->clear();
 }
 #include <QDir>
 void BrushSaveDialog::saveBrush()

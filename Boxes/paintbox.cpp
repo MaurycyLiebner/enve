@@ -3,7 +3,7 @@
 
 PaintBox::PaintBox(const ushort &canvasWidthT,
                    const ushort &canvasHeightT) : BoundingBox(TYPE_PAINT),
-    PaintCanvas(canvasWidthT, canvasHeightT) {
+    CanvasHandler(canvasWidthT, canvasHeightT) {
 
 }
 
@@ -16,18 +16,17 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
 
 void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     BoundingBox::renderDataFinished(renderData);
-    PaintBoxRenderData *paintData = (PaintBoxRenderData*)renderData;
-    mLastPaintImage = paintData->paintImage;
-    SkPixmap pixm;
-    mTemporaryOverlayCont.getImageSk()->peekPixels(&pixm);
-    pixm.erase(SK_ColorTRANSPARENT);
+    //PaintBoxRenderData *paintData = (PaintBoxRenderData*)renderData;
+//    SkPixmap pixm;
+//    mTemporaryOverlayCont.getImageSk()->peekPixels(&pixm);
+//    pixm.erase(SK_ColorTRANSPARENT);
 }
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrame(
         const int &relFrame, BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
-    paintData->tileDrawers = mLastPaintImage;
+    getTileDrawers(&paintData->tileDrawers);
 }
 
 void PaintBox::updateDrawRenderContainerTransform() {
@@ -40,6 +39,10 @@ void PaintBox::mapToPaintCanvasHandler(qreal *x_t, qreal *y_t) {
     QPointF relPos = mapAbsPosToRel(QPointF(*x_t, *y_t));
     *x_t = relPos.x();
     *y_t = relPos.y();
+}
+
+BoundingBoxRenderData *PaintBox::createRenderData() {
+    return new PaintBoxRenderData(this);
 }
 
 void PaintBoxRenderData::drawSk(SkCanvas *canvas) {

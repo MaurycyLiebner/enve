@@ -55,7 +55,7 @@ struct TileSkDrawer {
         posY = yT;
     }
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) {
+    void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) const {
         canvas->drawImage(tileImg, posX, posY, paint);
     }
 

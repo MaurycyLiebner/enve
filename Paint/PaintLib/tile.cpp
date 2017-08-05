@@ -296,9 +296,9 @@ void Tile::processUpdate() {
 }
 
 void Tile::updateTexFromDataArray() {
-    SkPixmap pix;
-    mTmpTexOverlay->peekPixels(&pix);
-    pix.erase(SK_ColorTRANSPARENT);
+    //SkPixmap pix;
+    //mTmpTexOverlay->peekPixels(&pix);
+    //pix.erase(SK_ColorTRANSPARENT);
     SkPixmap pix2;
     mDataTileImage->peekPixels(&pix2);
     mTexTileImage = SkImage::MakeRasterCopy(pix2);

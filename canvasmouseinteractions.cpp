@@ -680,7 +680,8 @@ void Canvas::tabletEvent(QTabletEvent *e,
         foreach(BoundingBox *box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = (PaintBox*)box;
-                paintBox->tabletEvent(mLastMouseEventPosRel,
+                paintBox->tabletEvent(mLastMouseEventPosRel.x(),
+                                      mLastMouseEventPosRel.y(),
                                       e->timestamp(),
                                       e->pressure(),
                                       e->pointerType() == QTabletEvent::Eraser);
