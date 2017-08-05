@@ -11,6 +11,10 @@
 #include "pathpoint.h"
 #include "Animators/pathanimator.h"
 #include "pointhelpers.h"
+#include "Boxes/particlebox.h"
+#include "clipboardcontainer.h"
+#include "mainwindow.h"
+#include "Boxes/paintbox.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -122,8 +126,7 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     }
     return true;
 }
-#include "clipboardcontainer.h"
-#include "mainwindow.h"
+
 void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
     if(mIsMouseGrabbing) {
         cancelCurrentTransform();
@@ -269,7 +272,7 @@ void Canvas::handleMovePointMousePressEvent() {
     }
 }
 
-#include "Boxes/particlebox.h"
+
 void Canvas::handleLeftButtonMousePress() {
     if(mIsMouseGrabbing) {
         //handleMouseRelease(event->pos());
@@ -385,6 +388,22 @@ void Canvas::setCurrentMousePressPosAbs(const QPointF &abs) {
 void Canvas::mousePressEvent(QMouseEvent *event) {
     if(isPreviewingOrRendering()) return;
     setLastMouseEventPosAbs(event->pos());
+    if(mCurrentMode == PAINT_MODE) {
+        if(mStylusDrawing) {
+            return;
+        }
+        if(event->button() == Qt::LeftButton) {
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                if(box->SWT_isPaintBox()) {
+                    PaintBox *paintBox = (PaintBox*)box;
+                    paintBox->paintPress(mLastMouseEventPosRel.x(),
+                                         mLastMouseEventPosRel.y(),
+                                         event->timestamp(), 0.5);
+                }
+            }
+        }
+        return;
+    }
     if(event->button() != Qt::LeftButton) {
         if(event->button() == Qt::RightButton) {
             handleRightButtonMousePress(event);
@@ -628,9 +647,60 @@ void Canvas::handleMouseRelease() {
     }
 }
 
+void Canvas::tabletEvent(QTabletEvent *e,
+                         const QPointF &absPos) {
+    setLastMouseEventPosAbs(absPos);
+    if(e->type() == QEvent::TabletPress) {
+        if(e->button() == Qt::RightButton) {
+            return;
+        } else if(e->button() == Qt::LeftButton) {
+            mStylusDrawing = true;
+
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                if(box->SWT_isPaintBox()) {
+                    PaintBox *paintBox = (PaintBox*)box;
+                    paintBox->paintPress(mLastMouseEventPosRel.x(),
+                                         mLastMouseEventPosRel.y(),
+                                         e->timestamp(),
+                                         e->pressure());
+                }
+            }
+        }
+    } else if(e->type() == QEvent::TabletRelease) {
+        if(e->button() == Qt::LeftButton) {
+            mStylusDrawing = false;
+            foreach(BoundingBox *box, mSelectedBoxes) {
+                if(box->SWT_isPaintBox()) {
+                    PaintBox *paintBox = (PaintBox*)box;
+                    paintBox->mouseReleaseEvent();
+                }
+            }
+        }
+    } else if(mStylusDrawing) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->tabletEvent(mLastMouseEventPosRel,
+                                      e->timestamp(),
+                                      e->pressure(),
+                                      e->pointerType() == QTabletEvent::Eraser);
+            }
+        }
+    } // else if
+}
+
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
     if(isPreviewingOrRendering() ||
             event->button() != Qt::LeftButton) return;
+    if(mCurrentMode == PAINT_MODE) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->mouseReleaseEvent();
+            }
+        }
+        return;
+    }
     setCurrentMouseEventPosAbs(event->pos());
     mXOnlyTransform = false;
     mYOnlyTransform = false;

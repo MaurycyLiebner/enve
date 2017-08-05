@@ -12,16 +12,11 @@ enum CanvasBackgroundMode
     CANVAS_BACKGROUND_GRID
 };
 
-struct WindowVariables;
-
 class Canvas;
 
-class CanvasHandler : public QObject
-{
-    Q_OBJECT
+class CanvasHandler {
 public:
-    CanvasHandler(WindowVariables *window_vars_t,
-                  int width_t, int height_t);
+    CanvasHandler(int width_t, int height_t);
     void newLayer(QString layer_name_t);
     void removeLayer(Layer *layer_t);
     void paintGL();
@@ -31,25 +26,42 @@ public:
 
     void clear();
 
-    void tabletEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, float pressure, bool erase);
+    void tabletEvent(const qreal &x_t,
+                     const qreal &y_t,
+                     ulong time_stamp,
+                     float pressure,
+                     bool erase);
     void tabletReleaseEvent();
-    void tabletPressEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, float pressure);
+    void tabletPressEvent(const qreal &x_t,
+                          const qreal &y_t,
+                          ulong time_stamp,
+                          float pressure);
 
     void setCurrentLayer(int layer_id);
     void setCurrentLayer(Layer *layer_t);
     void addLayer(Layer *layer_t);
     void changeLayerZFromTo(int z_val_t, int z_new_val_t);
     void mouseReleaseEvent();
-    void mousePressEvent(GLfloat x_t, GLfloat y_t, ulong timestamp, float pressure);
-    void mousePaintEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, bool erase);
+    void mousePressEvent(const qreal &x_t,
+                         const qreal &y_t,
+                         ulong timestamp,
+                         float pressure);
+    void mouseMoveEvent(const qreal &x_t,
+                         const qreal &y_t,
+                         ulong time_stamp,
+                         bool erase);
     void drawGridBg();
     void drawColorBg();
     void drawStretchedImgBg();
     void drawRepeatedImgBg();
     void setBackgroundMode(CanvasBackgroundMode bg_mode_t);
     void backgroundImgFromFile(QString file_name);
-    void setBackgroundColorRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t);
-    void setBackgroundColorHSV(GLfloat h_t, GLfloat s_t, GLfloat v_t);
+    void setBackgroundColorRGB(const qreal &r_t,
+                               const qreal &g_t,
+                               const qreal &b_t);
+    void setBackgroundColorHSV(const qreal &h_t,
+                               const qreal &s_t,
+                               const qreal &v_t);
 
     bool connectedToTreeWidget();
 
@@ -59,12 +71,11 @@ public:
 
     void getTileDrawers(QList<TileSkDrawer> *tileDrawers);
 private:
+    virtual void mapToPaintCanvasHandler(qreal *x_t, qreal *y_t) = 0;
 
     CanvasBackgroundMode backgroud_mode = CANVAS_BACKGROUND_COLOR;
     Color background_color = Color(1.f, 1.f, 1.f);
     GLuint background_img = 0;
-
-    WindowVariables *window_vars = NULL;
 
     int width = 0;
     int height = 0;

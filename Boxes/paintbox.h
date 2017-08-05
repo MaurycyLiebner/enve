@@ -1,7 +1,7 @@
 #ifndef PAINTBOX_H
 #define PAINTBOX_H
 #include "boundingbox.h"
-#include "Paint/paintcanvas.h"
+#include "Paint/canvashandler.h"
 struct TileSkDrawer;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
@@ -13,9 +13,10 @@ struct PaintBoxRenderData : public BoundingBoxRenderData {
 };
 
 class PaintBox : public BoundingBox,
-                 public PaintCanvas {
+                 public CanvasHandler {
 public:
-    PaintBox();
+    PaintBox(const ushort &canvasWidthT,
+             const ushort &canvasHeightT);
 
     bool SWT_isPaintBox() { return true; }
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);

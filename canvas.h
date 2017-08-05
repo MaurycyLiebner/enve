@@ -28,7 +28,8 @@ enum CanvasMode : short {
     ADD_TEXT,
     ADD_PARTICLE_BOX,
     ADD_PARTICLE_EMITTER,
-    PICK_PATH_SETTINGS
+    PICK_PATH_SETTINGS,
+    PAINT_MODE
 };
 
 #include "canvaswindow.h"
@@ -465,7 +466,9 @@ public:
         mPickStrokeFromPath = pickStroke;
     }
 
+    void tabletEvent(QTabletEvent *e, const QPointF &absPos);
 protected:
+    bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;
 

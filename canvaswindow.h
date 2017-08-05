@@ -196,6 +196,7 @@ protected:
 
     void qRender(QPainter *p);
     void renderSk(SkCanvas *canvas);
+    void tabletEvent(QTabletEvent *e);
 signals:
     void updateUpdatable(Updatable*, int);
     void changeCurrentFrame(int);

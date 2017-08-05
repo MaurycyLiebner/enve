@@ -10,15 +10,15 @@ void CanvasHandler::backgroundImgFromFile(QString file_name) {
 
 }
 
-void CanvasHandler::setBackgroundColorRGB(GLfloat r_t,
-                                          GLfloat g_t,
-                                          GLfloat b_t) {
+void CanvasHandler::setBackgroundColorRGB(const qreal &r_t,
+                                          const qreal &g_t,
+                                          const qreal &b_t) {
     background_color.setRGB(r_t, g_t, b_t);
 }
 
-void CanvasHandler::setBackgroundColorHSV(GLfloat h_t,
-                                          GLfloat s_t,
-                                          GLfloat v_t) {
+void CanvasHandler::setBackgroundColorHSV(const qreal &h_t,
+                                          const qreal &s_t,
+                                          const qreal &v_t) {
     background_color.setHSV(h_t, s_t, v_t);
 }
 
@@ -59,15 +59,15 @@ void CanvasHandler::drawRepeatedImgBg() {
 
 }
 
-CanvasHandler::CanvasHandler(WindowVariables *window_vars_t,
-                             int width_t, int height_t) {
-    window_vars = window_vars_t;
+CanvasHandler::CanvasHandler(int width_t, int height_t) {
     width = width_t;
     height = height_t;
+    newLayer("layer_1");
+    setCurrentLayer(0);
 }
 
 void CanvasHandler::newLayer(QString layer_name_t) {
-    layers.append(new Layer(layer_name_t, this, window_vars, width, height));
+    layers.append(new Layer(layer_name_t, this, width, height));
     n_layers++;
 }
 
@@ -122,28 +122,39 @@ void CanvasHandler::decNumberItems()
     }
 }
 
-void CanvasHandler::clear()
-{
+void CanvasHandler::clear() {
     for(int i = 0; i < n_layers; i++)
     {
         layers.at(i)->clear();
     }
 }
 
-void CanvasHandler::tabletEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, float pressure, bool erase)
-{
-    current_layer->tabletEvent(x_t, y_t, time_stamp, pressure, erase);
+void CanvasHandler::tabletEvent(const qreal &x_t,
+                                const qreal &y_t,
+                                ulong time_stamp,
+                                float pressure,
+                                bool erase) {
+    qreal xT = absPos.x();
+    qreal yT = absPos.y();
+    mapToPaintCanvasHandler(&xT, &yT);
+    current_layer->tabletEvent(x_t, y_t,
+                               time_stamp,
+                               pressure,
+                               erase);
 }
 
-void CanvasHandler::tabletReleaseEvent()
-{
+void CanvasHandler::tabletReleaseEvent() {
     current_layer->tabletReleaseEvent();
 }
 
-void CanvasHandler::tabletPressEvent(GLfloat x_t, GLfloat y_t,
-                                     ulong time_stamp, float pressure) {
-    window_vars->saveBrushAndColorIfNeeded();
-    current_layer->tabletPressEvent(x_t, y_t, time_stamp, pressure);
+void CanvasHandler::tabletPressEvent(const qreal &x_t,
+                                     const qreal &y_t,
+                                     ulong time_stamp,
+                                     float pressure) {
+    mapToPaintCanvasHandler(&x_t, &y_t);
+    current_layer->tabletPressEvent(x_t, y_t,
+                                    time_stamp,
+                                    pressure);
 }
 
 void CanvasHandler::setCurrentLayer(int layer_id)
@@ -156,17 +167,22 @@ void CanvasHandler::setCurrentLayer(Layer *layer_t)
     current_layer = layer_t;
 }
 
-void CanvasHandler::mouseReleaseEvent()
-{
+void CanvasHandler::mouseReleaseEvent() {
     tabletReleaseEvent();
 }
 
-void CanvasHandler::mousePressEvent(GLfloat x_t, GLfloat y_t, ulong timestamp, float pressure)
-{
-    tabletPressEvent(x_t, y_t, timestamp, pressure);
+void CanvasHandler::mousePressEvent(const qreal &x_t,
+                                    const qreal &y_t,
+                                    ulong timestamp,
+                                    float pressure) {
+    mapToPaintCanvasHandler(&x_t, &y_t);
+    tabletPressEvent(x_tmp, y_tmp, timestamp, pressure);
 }
 
-void CanvasHandler::mousePaintEvent(GLfloat x_t, GLfloat y_t, ulong time_stamp, bool erase)
-{
+void CanvasHandler::mouseMoveEvent(const qreal &x_t,
+                                    const qreal &y_t,
+                                    ulong time_stamp,
+                                    bool erase) {
+    mapToPaintCanvasHandler(&x_t, &y_t);
     tabletEvent(x_t, y_t, time_stamp, 1.0, erase);
 }

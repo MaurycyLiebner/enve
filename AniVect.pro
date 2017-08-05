@@ -193,7 +193,6 @@ SOURCES += main.cpp\
     Paint/PaintLib/tile.cpp \
     Paint/canvashandler.cpp \
     Paint/layer.cpp \
-    Paint/paintcanvas.cpp \
     Paint/windowvariables.cpp \
     Boxes/paintbox.cpp
 
@@ -349,7 +348,6 @@ HEADERS  += mainwindow.h \
     Paint/PaintLib/tile.h \
     Paint/canvashandler.h \
     Paint/layer.h \
-    Paint/paintcanvas.h \
     Paint/windowvariables.h \
     Boxes/paintbox.h
 

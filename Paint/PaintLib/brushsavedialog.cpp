@@ -8,9 +8,9 @@ BrushSaveDialog::BrushSaveDialog(WindowVariables *window_vars_t)
     window_vars = window_vars_t;
     main_layout = new QVBoxLayout(this);
 
-    canvas = new PaintCanvas(128, 128, window_vars, this);
+    //canvas = new PaintCanvas(128, 128, window_vars, this);
     //canvas->loadImage(0, window_vars_t->getBrush()->getBrushFilePath().replace(".plb", ".png") );
-    main_layout->addWidget(canvas);
+    //main_layout->addWidget(canvas);
     clear_button = new QPushButton("Clear", this);
     connect(clear_button, SIGNAL(released()), this, SLOT(clearCanvas()) );
     main_layout->addWidget(clear_button);

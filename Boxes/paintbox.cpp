@@ -1,7 +1,9 @@
 #include "paintbox.h"
 #include "Paint/layer.h"
 
-PaintBox::PaintBox() : BoundingBox(TYPE_PAINT) {
+PaintBox::PaintBox(const ushort &canvasWidthT,
+                   const ushort &canvasHeightT) : BoundingBox(TYPE_PAINT),
+    PaintCanvas(canvasWidthT, canvasHeightT) {
 
 }
 

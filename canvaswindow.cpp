@@ -240,6 +240,14 @@ void CanvasWindow::renderSk(SkCanvas *canvas) {
     mCurrentCanvas->renderSk(canvas);
 }
 
+void CanvasWindow::tabletEvent(QTabletEvent *e) {
+    if(hasNoCanvas()) return;
+    QPoint global_pos = mapToGlobal( QPoint(0, 0) );
+    qreal w_x_t = e->hiResGlobalX() - global_pos.x();
+    qreal w_y_t = e->hiResGlobalY() - global_pos.y();
+    mCurrentCanvas->tabletEvent(e, QPointF(w_x_t, w_y_t));
+}
+
 void CanvasWindow::mousePressEvent(QMouseEvent *event) {
     KFT_setFocus();
     if(mCurrentCanvas == NULL) return;
