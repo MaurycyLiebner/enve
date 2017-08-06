@@ -16,6 +16,7 @@ class PathPivot;
 class SoundComposition;
 class SkCanvas;
 class ImageSequenceBox;
+class Brush;
 
 enum CtrlsMode : short;
 
@@ -468,6 +469,7 @@ public:
 
     void tabletEvent(QTabletEvent *e, const QPointF &absPos);
 protected:
+    Brush *mCurrentBrush;
     bool mStylusDrawing = false;
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;

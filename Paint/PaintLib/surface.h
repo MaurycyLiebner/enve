@@ -23,11 +23,9 @@ struct Stroke {
     }
 };
 
-class Surface
-{
+class Surface {
 public:
     Surface(ushort width_t, ushort height_t);
-    void paintGL();
     void strokeTo(Brush *brush,
                   qreal x, qreal y,
                   qreal pressure, GLushort dt,
@@ -35,7 +33,6 @@ public:
     void startNewStroke(Brush *brush,
                         qreal x, qreal y,
                         qreal pressure);
-    void initializeGL();
     void getColor(qreal cx, qreal cy,
                   qreal hardness, qreal opa,
                   qreal aspect_ratio, qreal r, qreal beta_deg,

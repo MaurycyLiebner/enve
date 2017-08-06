@@ -35,7 +35,8 @@ public:
                           qreal yT,
                           const ulong &time_stamp,
                           const qreal &pressure,
-                          const bool &erase);
+                          const bool &erase,
+                          Brush *brush);
 
     void setCurrentLayer(int layer_id);
     void setCurrentLayer(Layer *layer_t);
@@ -45,7 +46,7 @@ public:
     void mousePressEvent(qreal xT,
                          qreal yT,
                          const ulong &timestamp,
-                         const qreal &pressure);
+                         const qreal &pressure, Brush *brush);
     void mouseMoveEvent(qreal xT,
                         qreal yT,
                         const ulong &time_stamp,
@@ -71,7 +72,8 @@ public:
     void paintPress(qreal xT,
                     qreal yT,
                     const ulong &timestamp,
-                    const qreal &pressure);
+                    const qreal &pressure,
+                    Brush *brush);
 private:
     virtual void mapToPaintCanvasHandler(qreal *x_t, qreal *y_t) = 0;
 

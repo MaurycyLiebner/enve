@@ -9,27 +9,6 @@ Surface::Surface(ushort width_t, ushort height_t)
     setSize(width_t, height_t);
 }
 
-void Surface::paintGL()
-{
-    glEnable( GL_TEXTURE_2D );
-    glTexEnvf(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-    for(ushort rw = 0; rw < n_tile_rows; rw++)
-    {
-        for(ushort cl = 0; cl < n_tile_cols; cl++)
-        {
-            tiles[rw][cl]->paintGL();
-        }
-    }
-
-    glDisable(GL_BLEND);
-    glDisable( GL_TEXTURE_2D);
-}
-
 qreal Surface::countDabsTo(qreal dist_between_dabs, qreal x, qreal y)
 {
     qreal dx = x - last_painted_stroke_x;
@@ -147,6 +126,7 @@ void Surface::strokeTo(Brush *brush,
                        qreal x, qreal y,
                        qreal pressure, GLushort dt,
                        bool erase) {
+    qDebug() << "strokeTo: " << x << y;
     qreal dist_between_dabs = brush->getDistBetweenDabsPx();
     qreal stroke_dx = x - last_event_stroke_x;
     qreal stroke_dy = y - last_event_stroke_y;
@@ -304,7 +284,7 @@ void Surface::strokeTo(Brush *brush,
         qreal dab_rot = dest_angle + brush->getInitialRotation() +
                 last_dab_rotation_inc +
                 getNoise(brush->getRotationNoise() );
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for(short tx = dab_min_tile_x; tx <= dab_max_tile_x; tx++) {
             for(short ty = dab_min_tile_y; ty <= dab_max_tile_y; ty++) {
                 tiles[ty][tx]->addDabToDraw(dab_x, dab_y,

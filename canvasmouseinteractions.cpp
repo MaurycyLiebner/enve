@@ -15,6 +15,7 @@
 #include "clipboardcontainer.h"
 #include "mainwindow.h"
 #include "Boxes/paintbox.h"
+#include "Paint/PaintLib/brush.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -398,7 +399,8 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
                     PaintBox *paintBox = (PaintBox*)box;
                     paintBox->paintPress(mLastMouseEventPosRel.x(),
                                          mLastMouseEventPosRel.y(),
-                                         event->timestamp(), 0.5);
+                                         event->timestamp(), 0.5,
+                                         mCurrentBrush);
                 }
             }
         }
@@ -662,7 +664,8 @@ void Canvas::tabletEvent(QTabletEvent *e,
                     paintBox->paintPress(mLastMouseEventPosRel.x(),
                                          mLastMouseEventPosRel.y(),
                                          e->timestamp(),
-                                         e->pressure());
+                                         e->pressure(),
+                                         mCurrentBrush);
                 }
             }
         }
@@ -844,8 +847,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         foreach(BoundingBox *box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = (PaintBox*)box;
-                paintBox->mouseMoveEvent(mLastMouseEventPosRel.x(),
-                                         mLastMouseEventPosRel.y(),
+                paintBox->mouseMoveEvent(mCurrentMouseEventPosRel.x(),
+                                         mCurrentMouseEventPosRel.y(),
                                          event->timestamp(),
                                          false);
             }

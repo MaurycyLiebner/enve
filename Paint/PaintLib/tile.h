@@ -68,7 +68,6 @@ class Tile : public Updatable {
 public:
     Tile(const ushort &x_t, const ushort &y_t);
 
-    void paintGL();
     void partOfSurfRectInTile(const short &surf_x,
                               const short &surf_y,
                               const short &width,
@@ -111,21 +110,11 @@ public:
     void setTileWidth(const ushort &width_t);
     void setTileHeight(const ushort &height_t);
     void resetTileSize();
-    TileSkDrawer getTexTileDrawer() {
-        return TileSkDrawer(mTexTileImage,
-                            mPosX, mPosY);
-    }
+    TileSkDrawer getTexTileDrawer();
 
-    void schedulerProccessed() {
-        mUpdateDabsToPaint = mDabsToPaint;
-        mDabsToPaint.clear();
-        Updatable::schedulerProccessed();
-    }
+    void schedulerProccessed();
 
-    void afterUpdate() {
-        updateTexFromDataArray();
-        Updatable::afterUpdate();
-    }
+    void afterUpdate();
 
 private:
     QList<Dab> mUpdateDabsToPaint;

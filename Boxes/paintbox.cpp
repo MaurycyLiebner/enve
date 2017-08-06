@@ -57,8 +57,8 @@ void PaintBoxRenderData::updateRelBoundingRect() {
     int widthT = 0;
     int heightT = 0;
     foreach(const TileSkDrawer &tile, tileDrawers) {
-        widthT += TILE_DIM;
-        heightT += TILE_DIM;
+        widthT = qMax(widthT, tile.posX + TILE_DIM);
+        heightT = qMax(heightT, tile.posY + TILE_DIM);
     }
     relBoundingRect = QRectF(0., 0.,
                              widthT, heightT);

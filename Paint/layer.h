@@ -24,9 +24,7 @@ struct LayerRenderData
     int tile_size = 0;
 };
 
-class Layer : public QObject
-{
-    Q_OBJECT
+class Layer {
 public:
     Layer(QString layer_name_t,
           int width_t = 0, int height_t = 0);
@@ -43,11 +41,12 @@ public:
                           const qreal &y_t,
                           const ulong &time_stamp,
                           const qreal &pressure,
-                          const bool &erase);
+                          const bool &erase, Brush *brush);
 
     void startStroke(const qreal &x_t,
                      const qreal &y_t,
-                     const qreal &pressure);
+                     const qreal &pressure,
+                     Brush *brush);
 
     void setNewPaintLibSurface(int width_t, int height_t);
 
@@ -58,6 +57,7 @@ public:
     void setLayerName(const QString &layerName);
     const QString &getLayerName();
 private:
+    Brush *mCurrentBrush = NULL;
     QString mLayerName;
     Surface *paintlib_surface = NULL;
     void renderStroke();

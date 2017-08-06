@@ -63,6 +63,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     BoundingBox *box = new PaintBox(200, 200);
     addChild(box);
     mCurrentMode = PAINT_MODE;
+    mCurrentBrush = new Brush();
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
 }

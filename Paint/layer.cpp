@@ -35,8 +35,11 @@ void Layer::clear() {
 
 void Layer::startStroke(const qreal &x_t,
                         const qreal &y_t,
-                        const qreal &pressure) {
-    paintlib_surface->startNewStroke(new Brush(),
+                        const qreal &pressure,
+                        Brush *brush) {
+    qDebug() << "startStroke";
+    mCurrentBrush = brush;
+    paintlib_surface->startNewStroke(mCurrentBrush,
                                      x_t, y_t, pressure);
 }
 
@@ -50,20 +53,24 @@ void Layer::tabletEvent(const qreal &x_t,
                         const qreal &pressure,
                         const bool &erase) {
     Q_UNUSED(time_stamp);
-
-    paintlib_surface->strokeTo(new Brush(),
+    qDebug() << "tableEvent";
+    paintlib_surface->strokeTo(mCurrentBrush,
                                x_t, y_t, pressure, 100, erase);
 }
 
 void Layer::tabletReleaseEvent() {
+    mCurrentBrush = NULL;
+    qDebug() << "tableReleaseEvent";
 }
 
 void Layer::tabletPressEvent(const qreal &x_t,
                              const qreal &y_t,
                              const ulong &time_stamp,
                              const qreal &pressure,
-                             const bool &erase) {
-    startStroke(x_t, y_t, pressure);
+                             const bool &erase,
+                             Brush *brush) {
+    qDebug() << "tablePressEvent";
+    startStroke(x_t, y_t, pressure, brush);
     tabletEvent(x_t, y_t, time_stamp, pressure, erase);
 }
 

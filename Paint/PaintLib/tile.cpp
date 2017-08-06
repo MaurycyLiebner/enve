@@ -6,7 +6,7 @@
 
 void Tile::clear() {
     for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
-        mData[i] = 0;
+        mData[i] = 125;
     }
     updateTexFromDataArray();
 }
@@ -23,6 +23,22 @@ void Tile::resetTileSize()
 {
     mMaxPaintX = TILE_DIM;
     mMinPaintY = 0;
+}
+
+TileSkDrawer Tile::getTexTileDrawer() {
+    return TileSkDrawer(mTexTileImage,
+                        mPosX, mPosY);
+}
+
+void Tile::schedulerProccessed() {
+    mUpdateDabsToPaint = mDabsToPaint;
+    mDabsToPaint.clear();
+    Updatable::schedulerProccessed();
+}
+
+void Tile::afterUpdate() {
+    updateTexFromDataArray();
+    Updatable::afterUpdate();
 }
 
 Tile::Tile(const ushort &x_t, const ushort &y_t) {
@@ -44,11 +60,6 @@ Tile::Tile(const ushort &x_t, const ushort &y_t) {
 void Tile::setPosInSurface(const ushort &x_t, const ushort &y_t) {
     mPosX = x_t;
     mPosY = y_t;
-}
-
-void Tile::paintGL()
-{
-
 }
 
 void Tile::partOfSurfRectInTile(const short &surf_x,
@@ -174,7 +185,7 @@ void Tile::getColor(qreal cx,
     qreal blue_sum_t = 0.f;
     qreal alpha_sum_t = 0.f;
     qreal weight_sum_t = 0.f;
-    #pragma omp parallel for reduction(+: red_sum_t, green_sum_t, blue_sum_t, alpha_sum_t, weight_sum_t)
+    //#pragma omp parallel for reduction(+: red_sum_t, green_sum_t, blue_sum_t, alpha_sum_t, weight_sum_t)
     for(short i = x_min; i < x_max; i++) {
         for(short j = y_min; j < y_max; j++) {
             GLuint col_val_id = ( (TILE_DIM - j - 1 + mMinPaintY)*TILE_DIM + i)*4;
@@ -240,7 +251,7 @@ void Tile::processUpdate() {
             y_max = mMinPaintY;
         }
 
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for(int i = x_min; i < x_max; i++) {
             for(int j = y_min; j < y_max; j++) {
                 GLuint id_t = ( j*TILE_DIM + i)*4;
@@ -299,7 +310,22 @@ void Tile::updateTexFromDataArray() {
     //SkPixmap pix;
     //mTmpTexOverlay->peekPixels(&pix);
     //pix.erase(SK_ColorTRANSPARENT);
-    SkPixmap pix2;
-    mDataTileImage->peekPixels(&pix2);
-    mTexTileImage = SkImage::MakeRasterCopy(pix2);
+//    SkPixmap pix2;
+//    mDataTileImage->peekPixels(&pix2);
+//    mTexTileImage = SkImage::MakeRasterCopy(pix2);
+
+    SkImageInfo info = SkImageInfo::Make(TILE_DIM,
+                                         TILE_DIM,
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         nullptr);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+    mTexTileImage = SkImage::MakeFromBitmap(bitmap);
+    SkPixmap pix;
+    mTexTileImage->peekPixels(&pix);
+    uchar *data = (uchar*)pix.writable_addr();
+    for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
+        data[i] = mData[i];
+    }
 }

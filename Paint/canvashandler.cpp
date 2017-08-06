@@ -94,9 +94,10 @@ void CanvasHandler::clear() {
 void CanvasHandler::paintPress(qreal xT,
                                qreal yT,
                                const ulong &timestamp,
-                               const qreal &pressure) {
+                               const qreal &pressure,
+                               Brush *brush) {
     mapToPaintCanvasHandler(&xT, &yT);
-    mousePressEvent(xT, yT, timestamp, pressure);
+    mousePressEvent(xT, yT, timestamp, pressure, brush);
 }
 
 void CanvasHandler::tabletEvent(qreal xT,
@@ -119,12 +120,14 @@ void CanvasHandler::tabletPressEvent(qreal xT,
                                      qreal yT,
                                      const ulong &time_stamp,
                                      const qreal &pressure,
-                                     const bool &erase) {
+                                     const bool &erase,
+                                     Brush *brush) {
     mapToPaintCanvasHandler(&xT, &yT);
     current_layer->tabletPressEvent(xT, yT,
                                     time_stamp,
                                     pressure,
-                                    erase);
+                                    erase,
+                                    brush);
 }
 
 void CanvasHandler::setCurrentLayer(int layer_id)
@@ -144,9 +147,10 @@ void CanvasHandler::mouseReleaseEvent() {
 void CanvasHandler::mousePressEvent(qreal xT,
                                     qreal yT,
                                     const ulong &timestamp,
-                                    const qreal &pressure) {
+                                    const qreal &pressure,
+                                    Brush *brush) {
     mapToPaintCanvasHandler(&xT, &yT);
-    tabletPressEvent(xT, yT, timestamp, pressure, false);
+    tabletPressEvent(xT, yT, timestamp, pressure, false, brush);
 }
 
 void CanvasHandler::mouseMoveEvent(qreal xT,
