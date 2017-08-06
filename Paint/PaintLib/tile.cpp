@@ -16,8 +16,8 @@ void Tile::setTileWidth(const ushort &width_t) {
 }
 
 void Tile::setTileHeight(const ushort &height_t) {
-    mMinPaintY = TILE_DIM - height_t;
-    mDrawer->minPaintY = mMinPaintY;
+    mMaxPaintY = height_t;
+    mDrawer->maxPaintY = mMaxPaintY;
 }
 
 void Tile::resetTileSize() {
@@ -59,61 +59,6 @@ void Tile::setPosInSurface(const ushort &x_t, const ushort &y_t) {
     mPosY = y_t;
 }
 
-void Tile::partOfSurfRectInTile(const short &surf_x,
-                                const short &surf_y,
-                                const short &width,
-                                const short &height,
-                                short *rect_x, short *rect_y,
-                                short *width_t, short *height_t) {
-    if(surf_x > mPosX) {
-        *rect_x = surf_x - mPosX;
-        *width_t = width;
-        if(*rect_x + width > TILE_DIM) {
-            *width_t = TILE_DIM - *rect_x;
-        } else {
-            *width_t = width;
-        }
-    } else {
-        *rect_x = 0;
-        *width_t = width - (mPosX - surf_x);
-        if(*width_t > TILE_DIM) {
-            *width_t = TILE_DIM;
-        }
-    }
-    if(surf_y > mPosY) {
-        *rect_y = surf_y - mPosY;
-        *height_t = height;
-        if(*rect_y + height > TILE_DIM) {
-            *height_t = TILE_DIM - *rect_y;
-        } else {
-            *width_t = width;
-        }
-    } else {
-        *rect_y = 0;
-        *height_t = height - (mPosY - surf_y);
-        if(*height_t > TILE_DIM) {
-            *height_t = TILE_DIM;
-        }
-    }
-}
-
-bool Tile::surfRectInTile(const int &surf_x, const int &surf_y,
-                          const int &width, const int &height) {
-    if(surf_x > mPosX + TILE_DIM) {
-        return false;
-    }
-    if(surf_y > mPosY + TILE_DIM) {
-        return false;
-    }
-    if(surf_x + width < mPosX) {
-        return false;
-    }
-    if(surf_y + height < mPosY) {
-        return false;
-    }
-    return true;
-}
-
 void Tile::addDabToDraw(qreal cx,
                         qreal cy,
                         const qreal &hardness,
@@ -127,7 +72,6 @@ void Tile::addDabToDraw(qreal cx,
                         const bool &erase) {
     cx -= mPosX;
     cy -= mPosY;
-    cy = TILE_DIM - cy;
 
     mDabsToPaint.append(
                 Dab(cx, cy,
@@ -162,19 +106,19 @@ void Tile::getColor(qreal cx,
     if(x_max > mMaxPaintX) {
         x_max = mMaxPaintX;
     } else if(x_max < 0) {
-        x_max = 0;
+        return;
     }
     int y_min = floor(cy - r);
-    if(y_min > TILE_DIM) {
+    if(y_min > mMaxPaintY) {
         return;
-    } else if(y_min < mMinPaintY) {
-        y_min = mMinPaintY;
+    } else if(y_min < 0) {
+        y_min = 0;
     }
     int y_max = ceil(cy + r);
-    if(y_max > TILE_DIM) {
-        y_max = TILE_DIM;
-    } else if(y_max < mMinPaintY) {
-        y_max = mMinPaintY;
+    if(y_max > mMaxPaintY) {
+        y_max = mMaxPaintY;
+    } else if(y_max < 0) {
+        return;
     }
 
     qreal red_sum_t = 0.f;
@@ -185,7 +129,7 @@ void Tile::getColor(qreal cx,
     //#pragma omp parallel for reduction(+: red_sum_t, green_sum_t, blue_sum_t, alpha_sum_t, weight_sum_t)
     for(short i = x_min; i < x_max; i++) {
         for(short j = y_min; j < y_max; j++) {
-            GLuint col_val_id = ( (TILE_DIM - j - 1 + mMinPaintY)*TILE_DIM + i)*4;
+            GLuint col_val_id = (j*TILE_DIM + i)*4;
             qreal dx = i - cx;
             qreal dy = j - cy;
             qreal dyr = (dy*cs - dx*sn)*aspect_ratio;
@@ -199,13 +143,17 @@ void Tile::getColor(qreal cx,
             } else {
                 h_opa = hardness/(1 - hardness)*(1 - curr_r_frac);
             }
-            qreal alpha_t = mData[col_val_id + 3]/(float)UCHAR_MAX;
+            qreal alpha_t = mData[col_val_id + 3]/
+                    (qreal)UCHAR_MAX;
             qreal weight_t = opacity * h_opa;
             weight_sum_t += weight_t;
             qreal alpha_sum_inc_t = weight_t*alpha_t;
-            red_sum_t += mData[col_val_id]/(float)UCHAR_MAX*alpha_sum_inc_t;
-            green_sum_t += mData[col_val_id + 1]/(float)UCHAR_MAX*alpha_sum_inc_t;
-            blue_sum_t += mData[col_val_id + 2]/(float)UCHAR_MAX*alpha_sum_inc_t;
+            red_sum_t += mData[col_val_id]/
+                    (qreal)UCHAR_MAX*alpha_sum_inc_t;
+            green_sum_t += mData[col_val_id + 1]/
+                    (qreal)UCHAR_MAX*alpha_sum_inc_t;
+            blue_sum_t += mData[col_val_id + 2]/
+                    (qreal)UCHAR_MAX*alpha_sum_inc_t;
             alpha_sum_t += alpha_sum_inc_t;
         }
     }
@@ -269,19 +217,19 @@ void TileSkDrawer::processUpdate() {
         if(x_max > maxPaintX) {
             x_max = maxPaintX;
         } else if(x_max < 0) {
-            x_max = 0;
+            continue;
         }
         int y_min = floor(dab_t.cy - dab_t.r);
-        if(y_min > TILE_DIM) {
+        if(y_min > maxPaintY) {
             continue;
-        } else if(y_min < minPaintY) {
-            y_min = minPaintY;
+        } else if(y_min < 0) {
+            y_min = 0;
         }
         int y_max = ceil(dab_t.cy + dab_t.r);
-        if(y_max > TILE_DIM) {
-            y_max = TILE_DIM;
-        } else if(y_max < minPaintY) {
-            y_max = minPaintY;
+        if(y_max > maxPaintY) {
+            y_max = maxPaintY;
+        } else if(y_max < 0) {
+            continue;
         }
 
         //#pragma omp parallel for
@@ -346,6 +294,6 @@ void TileSkDrawer::afterUpdate() {
 
 void TileSkDrawer::clearImg() {
     for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
-        data[i] = 125;
+        data[i] = 0;
     }
 }

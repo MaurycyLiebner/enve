@@ -404,6 +404,7 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
                 }
             }
         }
+        callUpdateSchedulers();
         return;
     }
     if(event->button() != Qt::LeftButton) {
@@ -691,6 +692,7 @@ void Canvas::tabletEvent(QTabletEvent *e,
             }
         }
     } // else if
+    callUpdateSchedulers();
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
@@ -703,6 +705,7 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
                 paintBox->mouseReleaseEvent();
             }
         }
+        callUpdateSchedulers();
         return;
     }
     setCurrentMouseEventPosAbs(event->pos());
@@ -851,8 +854,10 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
                                          mCurrentMouseEventPosRel.y(),
                                          event->timestamp(),
                                          false);
+                paintBox->scheduleUpdate();
             }
         }
+        callUpdateSchedulers();
         return;
     }
     if(!(event->buttons() & Qt::MiddleButton) &&

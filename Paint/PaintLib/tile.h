@@ -68,24 +68,13 @@ struct TileSkDrawer : public Updatable {
     sk_sp<SkImage> tileImg;
     ushort posX;
     ushort posY;
-    ushort minPaintY = 0;
+    ushort maxPaintY = 0;
     ushort maxPaintX = 0;
 };
 
 class Tile {
 public:
     Tile(const ushort &x_t, const ushort &y_t);
-
-    void partOfSurfRectInTile(const short &surf_x,
-                              const short &surf_y,
-                              const short &width,
-                              const short &height,
-                              short *rect_x, short *rect_y,
-                              short *width_t, short *height_t);
-    bool surfRectInTile(const int &surf_x,
-                        const int &surf_y,
-                        const int &width,
-                        const int &height);
 
 
     void processUpdate();
@@ -130,8 +119,6 @@ private:
     sk_sp<SkImage> mDataTileImage;
     uchar *mData = NULL;
 
-    sk_sp<SkImage> mTmpTexOverlay;
-
     QList<Dab> mDabsToPaint;
 
     void setPosInSurface(const ushort &x_t, const ushort &y_t);
@@ -139,7 +126,7 @@ private:
     ushort mPosX = 0;
     ushort mPosY = 0;
 
-    ushort mMinPaintY = 0;
+    ushort mMaxPaintY = 0;
     ushort mMaxPaintX = TILE_DIM;
 };
 

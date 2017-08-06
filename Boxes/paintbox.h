@@ -30,7 +30,6 @@ public:
                                                BoundingBoxRenderData *data);
     void updateDrawRenderContainerTransform();
     void mapToPaintCanvasHandler(qreal *x_t, qreal *y_t);
-
     BoundingBox *createNewDuplicate() {
         return new PaintBox(100, 100);
     }

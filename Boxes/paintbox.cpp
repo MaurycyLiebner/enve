@@ -17,9 +17,9 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
 void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     BoundingBox::renderDataFinished(renderData);
     //PaintBoxRenderData *paintData = (PaintBoxRenderData*)renderData;
-//    SkPixmap pixm;
-//    mTemporaryOverlayCont.getImageSk()->peekPixels(&pixm);
-//    pixm.erase(SK_ColorTRANSPARENT);
+    SkPixmap pixm;
+    mTemporaryOverlayCont.getImageSk()->peekPixels(&pixm);
+    pixm.erase(SK_ColorTRANSPARENT);
 }
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrame(

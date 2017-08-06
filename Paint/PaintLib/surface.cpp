@@ -33,35 +33,34 @@ void replaceIfBigger(short potentially_bigger, short *to_be_replaced)
     }
 }
 
-void Surface::getTileIdsOnRect(qreal x_min, qreal x_max, qreal y_min, qreal y_max,
-                               short *tile_x_min, short *tile_x_max, short *tile_y_min, short *tile_y_max)
-{
+void Surface::getTileIdsOnRect(qreal x_min, qreal x_max,
+                               qreal y_min, qreal y_max,
+                               short *tile_x_min, short *tile_x_max,
+                               short *tile_y_min, short *tile_y_max) {
     *tile_x_min = floor(x_min/TILE_DIM);
-    if(*tile_x_min < 0)
-    {
+    if(*tile_x_min < 0) {
         *tile_x_min = 0;
     }
     *tile_x_max = ceil(x_max/TILE_DIM);
-    if(*tile_x_max >= n_tile_cols)
-    {
+    if(*tile_x_max >= n_tile_cols) {
         *tile_x_max = n_tile_cols - 1;
     }
     *tile_y_min = floor(y_min/TILE_DIM);
-    if(*tile_y_min < 0)
-    {
+    if(*tile_y_min < 0) {
         *tile_y_min = 0;
     }
     *tile_y_max = ceil(y_max/TILE_DIM);
-    if(*tile_y_max >= n_tile_rows)
-    {
+    if(*tile_y_max >= n_tile_rows) {
         *tile_y_max = n_tile_rows - 1;
     }
 }
 
 void Surface::getColor(qreal cx, qreal cy,
-                    qreal hardness, qreal opa, qreal aspect_ratio, qreal r, qreal beta_deg,
-                    qreal *red, qreal *green, qreal *blue, qreal *alpha)
-{
+                       qreal hardness, qreal opa,
+                       qreal aspect_ratio, qreal r,
+                       qreal beta_deg,
+                       qreal *red, qreal *green,
+                       qreal *blue, qreal *alpha) {
     qreal cs = cos(beta_deg*2*PI/360);
     qreal sn = sin(beta_deg*2*PI/360);
 
