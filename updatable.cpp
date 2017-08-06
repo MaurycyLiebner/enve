@@ -46,6 +46,7 @@ void Updatable::addDependent(Updatable *updatable) {
 void Updatable::addScheduler() {
     if(!shouldUpdate() || mSchedulerAdded) return;
 
+    mFinished = false;
     mSchedulerAdded = true;
     addSchedulerNow();
 }

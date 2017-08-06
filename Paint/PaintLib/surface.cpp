@@ -114,7 +114,7 @@ void Surface::clear()
     }
 }
 
-void Surface::getTileDrawers(QList<TileSkDrawer> *tileDrawers) {
+void Surface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
     for(int i = 0; i < n_tile_cols; i++) {
         for(int j = 0; j < n_tile_rows; j++) {
             tileDrawers->append(tiles[j][i]->getTexTileDrawer());

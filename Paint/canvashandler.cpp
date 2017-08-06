@@ -26,7 +26,7 @@ int CanvasHandler::getLayersCount() {
     return layers.count();
 }
 
-void CanvasHandler::getTileDrawers(QList<TileSkDrawer> *tileDrawers) {
+void CanvasHandler::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
     current_layer->getTileDrawers(tileDrawers);
 }
 

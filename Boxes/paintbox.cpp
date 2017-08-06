@@ -27,6 +27,11 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrame(
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
     getTileDrawers(&paintData->tileDrawers);
+    foreach(TileSkDrawer *drawer, paintData->tileDrawers) {
+        if(!drawer->finished()) {
+            drawer->addDependent(paintData);
+        }
+    }
 }
 
 void PaintBox::updateDrawRenderContainerTransform() {
@@ -48,17 +53,17 @@ BoundingBoxRenderData *PaintBox::createRenderData() {
 void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
     SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
-    foreach(const TileSkDrawer &tile, tileDrawers) {
-        tile.drawSk(canvas, &paint);
+    foreach(TileSkDrawer *tile, tileDrawers) {
+        tile->drawSk(canvas, &paint);
     }
 }
 
 void PaintBoxRenderData::updateRelBoundingRect() {
     int widthT = 0;
     int heightT = 0;
-    foreach(const TileSkDrawer &tile, tileDrawers) {
-        widthT = qMax(widthT, tile.posX + TILE_DIM);
-        heightT = qMax(heightT, tile.posY + TILE_DIM);
+    foreach(TileSkDrawer *tile, tileDrawers) {
+        widthT = qMax(widthT, tile->posX + TILE_DIM);
+        heightT = qMax(heightT, tile->posY + TILE_DIM);
     }
     relBoundingRect = QRectF(0., 0.,
                              widthT, heightT);

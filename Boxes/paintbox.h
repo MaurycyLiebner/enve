@@ -14,7 +14,7 @@ struct PaintBoxRenderData : public BoundingBoxRenderData {
 
     void updateRelBoundingRect();
 
-    QList<TileSkDrawer> tileDrawers;
+    QList<TileSkDrawer*> tileDrawers;
 };
 
 class PaintBox : public BoundingBox,

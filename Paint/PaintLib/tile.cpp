@@ -5,44 +5,40 @@
 #include "Colors/helpers.h"
 
 void Tile::clear() {
-    for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
-        mData[i] = 125;
-    }
+    mDrawer->clearImg();
     updateTexFromDataArray();
+    mDrawer->addScheduler();
 }
 
 void Tile::setTileWidth(const ushort &width_t) {
     mMaxPaintX = width_t;
+    mDrawer->maxPaintX = mMaxPaintX;
 }
 
 void Tile::setTileHeight(const ushort &height_t) {
     mMinPaintY = TILE_DIM - height_t;
+    mDrawer->minPaintY = mMinPaintY;
 }
 
-void Tile::resetTileSize()
-{
-    mMaxPaintX = TILE_DIM;
-    mMinPaintY = 0;
+void Tile::resetTileSize() {
+    setTileHeight(TILE_DIM);
+    setTileWidth(TILE_DIM);
 }
 
-TileSkDrawer Tile::getTexTileDrawer() {
-    return TileSkDrawer(mTexTileImage,
-                        mPosX, mPosY);
+TileSkDrawer *Tile::getTexTileDrawer() {
+    return mDrawer.get();
 }
 
-void Tile::schedulerProccessed() {
-    mUpdateDabsToPaint = mDabsToPaint;
+void Tile::setDabsForDrawer() {
+    mDrawer->dabsToPaint = mDabsToPaint;
     mDabsToPaint.clear();
-    Updatable::schedulerProccessed();
-}
-
-void Tile::afterUpdate() {
-    updateTexFromDataArray();
-    Updatable::afterUpdate();
 }
 
 Tile::Tile(const ushort &x_t, const ushort &y_t) {
     setPosInSurface(x_t, y_t);
+    mDrawer = (new TileSkDrawer(this, x_t, y_t))->ref<TileSkDrawer>();
+    resetTileSize();
+
     SkImageInfo info = SkImageInfo::Make(TILE_DIM,
                                          TILE_DIM,
                                          kBGRA_8888_SkColorType,
@@ -54,6 +50,7 @@ Tile::Tile(const ushort &x_t, const ushort &y_t) {
     SkPixmap pix;
     mDataTileImage->peekPixels(&pix);
     mData = (uchar*)pix.writable_addr();
+
     clear();
 }
 
@@ -219,36 +216,72 @@ void Tile::getColor(qreal cx,
     *alpha_sum += alpha_sum_t;
     *weight_sum += weight_sum_t;
 }
+void Tile::updateTexFromDataArray() {
+    uchar *dataT = mDrawer->data;
+    for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
+        mData[i] = dataT[i];
+    }
+}
 
-void Tile::processUpdate() {
-    foreach(const Dab &dab_t, mUpdateDabsToPaint) {
+TileSkDrawer::TileSkDrawer(Tile *parentTileT,
+                           const ushort &xT,
+                           const ushort &yT) {
+    parentTile = parentTileT;
+    posX = xT;
+    posY = yT;
+
+    SkImageInfo info = SkImageInfo::Make(TILE_DIM,
+                                         TILE_DIM,
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         nullptr);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+    tileImg = SkImage::MakeFromBitmap(bitmap);
+
+    SkPixmap pix;
+    tileImg->peekPixels(&pix);
+    data = (uchar*)pix.writable_addr();
+}
+
+void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
+    canvas->drawImage(tileImg, posX, posY, paint);
+}
+
+void TileSkDrawer::beforeUpdate() {
+    Updatable::beforeUpdate();
+    parentTile->setDabsForDrawer();
+}
+
+void TileSkDrawer::processUpdate() {
+    foreach(const Dab &dab_t, dabsToPaint) {
         qreal cs = cos(dab_t.beta_deg*2*PI/360);
         qreal sn = sin(dab_t.beta_deg*2*PI/360);
 
 
         int x_min = floor(dab_t.cx - dab_t.r);
-        if(x_min > mMaxPaintX) {
+        if(x_min > maxPaintX) {
             continue;
         } else if(x_min < 0) {
             x_min = 0;
         }
         int x_max = ceil(dab_t.cx + dab_t.r);
-        if(x_max > mMaxPaintX) {
-            x_max = mMaxPaintX;
+        if(x_max > maxPaintX) {
+            x_max = maxPaintX;
         } else if(x_max < 0) {
             x_max = 0;
         }
         int y_min = floor(dab_t.cy - dab_t.r);
         if(y_min > TILE_DIM) {
             continue;
-        } else if(y_min < mMinPaintY) {
-            y_min = mMinPaintY;
+        } else if(y_min < minPaintY) {
+            y_min = minPaintY;
         }
         int y_max = ceil(dab_t.cy + dab_t.r);
         if(y_max > TILE_DIM) {
             y_max = TILE_DIM;
-        } else if(y_max < mMinPaintY) {
-            y_max = mMinPaintY;
+        } else if(y_max < minPaintY) {
+            y_max = minPaintY;
         }
 
         //#pragma omp parallel for
@@ -268,64 +301,51 @@ void Tile::processUpdate() {
                 } else {
                     h_opa = dab_t.hardness/(1 - dab_t.hardness)*(1 - curr_r_frac);
                 }
-                qreal curr_alpha = mData[id_t + 3];
+                qreal curr_alpha = data[id_t + 3];
                 qreal paint_alpha = dab_t.opacity * h_opa * UCHAR_MAX;
                 if(dab_t.erase) {
                     qreal alpha_sum = curr_alpha - paint_alpha;
 
                     if(alpha_sum < 0) {
-                        mData[id_t + 3] = 0;
+                        data[id_t + 3] = 0;
                     } else {
-                        mData[id_t + 3] = alpha_sum;
+                        data[id_t + 3] = alpha_sum;
                     }
                 } else {
                     qreal alpha_sum = curr_alpha + paint_alpha;
                     // red
-                    mData[id_t] =
+                    data[id_t] =
                             (dab_t.red*UCHAR_MAX*paint_alpha +
-                             mData[id_t]*curr_alpha)/alpha_sum;
+                             data[id_t]*curr_alpha)/alpha_sum;
                     // green
-                    mData[id_t + 1] =
+                    data[id_t + 1] =
                             (dab_t.green*UCHAR_MAX*paint_alpha +
-                             mData[id_t + 1]*curr_alpha)/alpha_sum;
+                             data[id_t + 1]*curr_alpha)/alpha_sum;
                     // blue
-                    mData[id_t + 2] =
+                    data[id_t + 2] =
                             (dab_t.blue*UCHAR_MAX*paint_alpha +
-                             mData[id_t + 2]*curr_alpha)/alpha_sum;
+                             data[id_t + 2]*curr_alpha)/alpha_sum;
                     // alpha
                     if(alpha_sum > UCHAR_MAX) {
-                        mData[id_t + 3] = UCHAR_MAX;
+                        data[id_t + 3] = UCHAR_MAX;
                     } else {
-                        mData[id_t + 3] = alpha_sum;
+                        data[id_t + 3] = alpha_sum;
                     }
                 }
             }
         }
     }
 
-    mUpdateDabsToPaint.clear();
+    dabsToPaint.clear();
 }
 
-void Tile::updateTexFromDataArray() {
-    //SkPixmap pix;
-    //mTmpTexOverlay->peekPixels(&pix);
-    //pix.erase(SK_ColorTRANSPARENT);
-//    SkPixmap pix2;
-//    mDataTileImage->peekPixels(&pix2);
-//    mTexTileImage = SkImage::MakeRasterCopy(pix2);
+void TileSkDrawer::afterUpdate() {
+    Updatable::afterUpdate();
+    parentTile->updateTexFromDataArray();
+}
 
-    SkImageInfo info = SkImageInfo::Make(TILE_DIM,
-                                         TILE_DIM,
-                                         kBGRA_8888_SkColorType,
-                                         kPremul_SkAlphaType,
-                                         nullptr);
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    mTexTileImage = SkImage::MakeFromBitmap(bitmap);
-    SkPixmap pix;
-    mTexTileImage->peekPixels(&pix);
-    uchar *data = (uchar*)pix.writable_addr();
+void TileSkDrawer::clearImg() {
     for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
-        data[i] = mData[i];
+        data[i] = 125;
     }
 }

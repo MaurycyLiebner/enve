@@ -40,7 +40,7 @@ public:
 
     void clear();
 
-    void getTileDrawers(QList<TileSkDrawer> *tileDrawers);
+    void getTileDrawers(QList<TileSkDrawer *> *tileDrawers);
 private:
     qreal countDabsTo(qreal dist_between_dabs, qreal x, qreal y);
     Tile *getTile(ushort tile_col, ushort tile_row);

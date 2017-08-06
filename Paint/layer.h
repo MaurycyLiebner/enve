@@ -51,7 +51,7 @@ public:
     void setNewPaintLibSurface(int width_t, int height_t);
 
 
-    void getTileDrawers(QList<TileSkDrawer> *tileDrawers) {
+    void getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
         paintlib_surface->getTileDrawers(tileDrawers);
     }
     void setLayerName(const QString &layerName);

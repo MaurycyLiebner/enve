@@ -68,7 +68,7 @@ public:
 
     int getLayersCount();
 
-    void getTileDrawers(QList<TileSkDrawer> *tileDrawers);
+    void getTileDrawers(QList<TileSkDrawer*> *tileDrawers);
     void paintPress(qreal xT,
                     qreal yT,
                     const ulong &timestamp,

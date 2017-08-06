@@ -9,6 +9,7 @@
 #include "Colors/helpers.h"
 #include <png++/png.hpp>
 #include "skiaincludes.h"
+#include "updatable.h"
 
 struct Dab {
     qreal cx;
@@ -46,25 +47,32 @@ struct Dab {
         erase = eraseT;
     }
 };
+class Tile;
+struct TileSkDrawer : public Updatable {
+    TileSkDrawer(Tile *parentTileT,
+                 const ushort &xT, const ushort &yT);
 
-struct TileSkDrawer {
-    TileSkDrawer(const sk_sp<SkImage> &img,
-                 const ushort &xT, const ushort &yT) {
-        tileImg = img;
-        posX = xT;
-        posY = yT;
-    }
+    void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) const;
 
-    void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) const {
-        canvas->drawImage(tileImg, posX, posY, paint);
-    }
+    void beforeUpdate();
 
+    void processUpdate();
+
+    void afterUpdate();
+
+    void clearImg();
+
+    Tile *parentTile;
+    QList<Dab> dabsToPaint;
+    uchar *data;
     sk_sp<SkImage> tileImg;
     ushort posX;
     ushort posY;
+    ushort minPaintY = 0;
+    ushort maxPaintX = 0;
 };
-#include "updatable.h"
-class Tile : public Updatable {
+
+class Tile {
 public:
     Tile(const ushort &x_t, const ushort &y_t);
 
@@ -110,18 +118,18 @@ public:
     void setTileWidth(const ushort &width_t);
     void setTileHeight(const ushort &height_t);
     void resetTileSize();
-    TileSkDrawer getTexTileDrawer();
+    TileSkDrawer *getTexTileDrawer();
 
-    void schedulerProccessed();
+    void addScheduler() {
+        mDrawer->addScheduler();
+    }
 
-    void afterUpdate();
-
+    void setDabsForDrawer();
 private:
-    QList<Dab> mUpdateDabsToPaint;
+    std::shared_ptr<TileSkDrawer> mDrawer;
     sk_sp<SkImage> mDataTileImage;
     uchar *mData = NULL;
 
-    sk_sp<SkImage> mTexTileImage;
     sk_sp<SkImage> mTmpTexOverlay;
 
     QList<Dab> mDabsToPaint;
