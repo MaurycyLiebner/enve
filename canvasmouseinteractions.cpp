@@ -688,7 +688,8 @@ void Canvas::tabletEvent(QTabletEvent *e,
                                       mLastMouseEventPosRel.y(),
                                       e->timestamp(),
                                       e->pressure(),
-                                      e->pointerType() == QTabletEvent::Eraser);
+                                      e->pointerType() == QTabletEvent::Eraser,
+                                      mCurrentBrush);
             }
         }
     } // else if
@@ -853,7 +854,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
                 paintBox->mouseMoveEvent(mCurrentMouseEventPosRel.x(),
                                          mCurrentMouseEventPosRel.y(),
                                          event->timestamp(),
-                                         false);
+                                         false, mCurrentBrush);
                 paintBox->scheduleUpdate();
             }
         }

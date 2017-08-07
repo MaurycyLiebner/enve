@@ -28,6 +28,7 @@ class Layer {
 public:
     Layer(QString layer_name_t,
           int width_t = 0, int height_t = 0,
+          const qreal &scale = 1.,
           const bool &paintInOtherThread = true);
 
     void clear();
@@ -36,7 +37,8 @@ public:
                      const qreal &y_t,
                      const ulong &time_stamp,
                      const qreal &pressure,
-                     const bool &erase);
+                     const bool &erase,
+                     Brush *brush);
     void tabletReleaseEvent();
     void tabletPressEvent(const qreal &x_t,
                           const qreal &y_t,
@@ -60,7 +62,6 @@ public:
     }
 private:
     bool mPaintInOtherThread = true;
-    Brush *mCurrentBrush = NULL;
     QString mLayerName;
     Surface *paintlib_surface = NULL;
     void renderStroke();

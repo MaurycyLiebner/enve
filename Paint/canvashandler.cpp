@@ -56,7 +56,9 @@ void CanvasHandler::drawRepeatedImgBg() {
 
 CanvasHandler::CanvasHandler(const int &width_t,
                              const int &height_t,
+                             const qreal &scale,
                              const bool &paintOnOtherThread) {
+    mScale = scale;
     mPaintOnOtherThread = paintOnOtherThread;
     width = width_t;
     height = height_t;
@@ -66,6 +68,7 @@ CanvasHandler::CanvasHandler(const int &width_t,
 
 void CanvasHandler::newLayer(QString layer_name_t) {
     layers.append(new Layer(layer_name_t, width, height,
+                            mScale,
                             mPaintOnOtherThread));
     n_layers++;
 }
@@ -93,11 +96,13 @@ void CanvasHandler::tabletEvent(qreal xT,
                                 qreal yT,
                                 const ulong &time_stamp,
                                 const qreal &pressure,
-                                const bool &erase) {
+                                const bool &erase,
+                                Brush *brush) {
     current_layer->tabletEvent(xT, yT,
                                time_stamp,
                                pressure,
-                               erase);
+                               erase,
+                               brush);
 }
 
 void CanvasHandler::tabletReleaseEvent() {
@@ -141,6 +146,7 @@ void CanvasHandler::mousePressEvent(qreal xT,
 void CanvasHandler::mouseMoveEvent(qreal xT,
                                    qreal yT,
                                    const ulong &time_stamp,
-                                   const bool &erase) {
-    tabletEvent(xT, yT, time_stamp, 1.0, erase);
+                                   const bool &erase,
+                                   Brush *brush) {
+    tabletEvent(xT, yT, time_stamp, 1.0, erase, brush);
 }

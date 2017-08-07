@@ -6,7 +6,9 @@
 
 Surface::Surface(const ushort &width_t,
                  const ushort &height_t,
+                 const qreal &scale,
                  const bool &paintOnOtherThread) {
+    mScale = scale;
     mPaintInOtherThread = paintOnOtherThread;
     setSize(width_t, height_t);
 }
@@ -127,7 +129,9 @@ void Surface::strokeTo(Brush *brush,
                        qreal x, qreal y,
                        qreal pressure, GLushort dt,
                        bool erase) {
-    qreal dist_between_dabs = brush->getDistBetweenDabsPx();
+    x *= mScale;
+    y *= mScale;
+    qreal dist_between_dabs = brush->getDistBetweenDabsPx()*mScale;
     qreal stroke_dx = x - last_event_stroke_x;
     qreal stroke_dy = y - last_event_stroke_y;
     last_event_stroke_x = x;
@@ -192,7 +196,7 @@ void Surface::strokeTo(Brush *brush,
     last_stroke_beta = dest_angle;
     qreal dab_r = qMin(brush->getRadius()*5,
                          brush->getRadius() + brush->getPressureRadiusGainPx()*pressure +
-                         brush->getSpeedRadiusGain()*stroke_vel);
+                         brush->getSpeedRadiusGain()*stroke_vel)*mScale;
     qreal dab_hardness = brush->getHardness() + brush->getPressureHardnessGain()*pressure +
                                 brush->getSpeedHardnessGain()*stroke_vel;
     qreal dab_opa = brush->getOpacity() + brush->getPressureOpacityGain()*pressure +
@@ -307,8 +311,9 @@ void Surface::strokeTo(Brush *brush,
     last_stroke_press = pressure;
 }
 
-void Surface::startNewStroke(Brush *brush, qreal x, qreal y, qreal pressure)
-{
+void Surface::startNewStroke(Brush *brush, qreal x, qreal y, qreal pressure) {
+    x *= mScale;
+    y *= mScale;
     stroke_noise_count = UCHAR_MAX;
     previous_stroke_x_noise = 0.f;
     previous_stroke_y_noise = 0.f;

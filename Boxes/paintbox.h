@@ -37,7 +37,7 @@ public:
                      const qreal &yT,
                      const ulong &time_stamp,
                      const qreal &pressure,
-                     const bool &erase);
+                     const bool &erase, Brush *brush);
     void tabletReleaseEvent();
     void tabletPressEvent(const qreal &xT,
                           const qreal &yT,
@@ -49,11 +49,13 @@ public:
     void mousePressEvent(const qreal &xT,
                          const qreal &yT,
                          const ulong &timestamp,
-                         const qreal &pressure, Brush *brush);
+                         const qreal &pressure,
+                         Brush *brush);
     void mouseMoveEvent(const qreal &xT,
                         const qreal &yT,
                         const ulong &time_stamp,
-                        const bool &erase);
+                        const bool &erase,
+                        Brush *brush);
     void paintPress(const qreal &xT,
                     const qreal &yT,
                     const ulong &timestamp,

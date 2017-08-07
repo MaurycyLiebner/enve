@@ -12,11 +12,13 @@ typedef struct {
 
 Layer::Layer(QString layer_name_t,
              int width_t, int height_t,
+             const qreal &scale,
              const bool &paintInOtherThread) {
     mPaintInOtherThread = paintInOtherThread;
     setLayerName(layer_name_t);
     if(width_t != 0) {
         paintlib_surface = new Surface(width_t, height_t,
+                                       scale,
                                        mPaintInOtherThread);
     }
 }
@@ -40,8 +42,7 @@ void Layer::startStroke(const qreal &x_t,
                         const qreal &y_t,
                         const qreal &pressure,
                         Brush *brush) {
-    mCurrentBrush = brush;
-    paintlib_surface->startNewStroke(mCurrentBrush,
+    paintlib_surface->startNewStroke(brush,
                                      x_t, y_t, pressure);
 }
 
@@ -49,14 +50,16 @@ void Layer::tabletEvent(const qreal &x_t,
                         const qreal &y_t,
                         const ulong &time_stamp,
                         const qreal &pressure,
-                        const bool &erase) {
+                        const bool &erase,
+                        Brush *brush) {
     Q_UNUSED(time_stamp);
-    paintlib_surface->strokeTo(mCurrentBrush,
-                               x_t, y_t, pressure, 100, erase);
+    paintlib_surface->strokeTo(brush,
+                               x_t, y_t,
+                               pressure, 100,
+                               erase);
 }
 
 void Layer::tabletReleaseEvent() {
-    mCurrentBrush = NULL;
 }
 
 void Layer::tabletPressEvent(const qreal &x_t,
@@ -66,6 +69,6 @@ void Layer::tabletPressEvent(const qreal &x_t,
                              const bool &erase,
                              Brush *brush) {
     startStroke(x_t, y_t, pressure, brush);
-    tabletEvent(x_t, y_t, time_stamp, pressure, erase);
+    tabletEvent(x_t, y_t, time_stamp, pressure, erase, brush);
 }
 

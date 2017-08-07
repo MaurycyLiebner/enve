@@ -3,9 +3,10 @@
 
 PaintBox::PaintBox(const ushort &canvasWidthT,
                    const ushort &canvasHeightT) : BoundingBox(TYPE_PAINT) {
-    mMainHandler = new CanvasHandler(canvasWidthT, canvasHeightT, true);
+    mMainHandler = new CanvasHandler(canvasWidthT, canvasHeightT,
+                                     1., true);
     mTemporaryHandler = new CanvasHandler(canvasWidthT/4, canvasHeightT/4,
-                                          false);
+                                          0.25, false);
 }
 
 void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
@@ -14,7 +15,6 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
     canvas->concat(
             QMatrixToSkMatrix(
                 mTransformAnimator->getCombinedTransform()) );
-    canvas->scale(4., 4.);
     mTemporaryHandler->drawSk(canvas, paint);
     canvas->restore();
 }
@@ -44,15 +44,15 @@ void PaintBox::tabletEvent(const qreal &xT,
                            const qreal &yT,
                            const ulong &time_stamp,
                            const qreal &pressure,
-                           const bool &erase) {
+                           const bool &erase,
+                           Brush *brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
     mMainHandler->tabletEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
-                              erase);
-    relPos *= 0.25;
+                              erase, brush);
     mTemporaryHandler->tabletEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
-                              erase);
+                              erase, brush);
 }
 
 void PaintBox::tabletReleaseEvent() {
@@ -71,7 +71,6 @@ void PaintBox::tabletPressEvent(const qreal &xT,
     mMainHandler->tabletPressEvent(relPos.x(), relPos.y(),
                                    time_stamp, pressure,
                                    erase, brush);
-    relPos *= 0.25;
     mTemporaryHandler->tabletPressEvent(relPos.x(), relPos.y(),
                                    time_stamp, pressure,
                                    erase, brush);
@@ -92,7 +91,6 @@ void PaintBox::mousePressEvent(const qreal &xT,
     mMainHandler->mousePressEvent(relPos.x(), relPos.y(),
                                   timestamp, pressure,
                                   brush);
-    relPos *= 0.25;
     mTemporaryHandler->mousePressEvent(relPos.x(), relPos.y(),
                                   timestamp, pressure,
                                   brush);
@@ -101,14 +99,14 @@ void PaintBox::mousePressEvent(const qreal &xT,
 void PaintBox::mouseMoveEvent(const qreal &xT,
                               const qreal &yT,
                               const ulong &time_stamp,
-                              const bool &erase) {
+                              const bool &erase,
+                              Brush *brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
 
     mMainHandler->mouseMoveEvent(relPos.x(), relPos.y(),
-                                 time_stamp, erase);
-    relPos *= 0.25;
+                                 time_stamp, erase, brush);
     mTemporaryHandler->mouseMoveEvent(relPos.x(), relPos.y(),
-                                 time_stamp, erase);
+                                 time_stamp, erase, brush);
 }
 
 void PaintBox::paintPress(const qreal &xT,
@@ -121,7 +119,6 @@ void PaintBox::paintPress(const qreal &xT,
     mMainHandler->paintPress(relPos.x(), relPos.y(),
                              timestamp, pressure,
                              brush);
-    relPos *= 0.25;
     mTemporaryHandler->paintPress(relPos.x(), relPos.y(),
                              timestamp, pressure,
                              brush);

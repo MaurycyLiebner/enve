@@ -17,6 +17,7 @@ class CanvasHandler {
 public:
     CanvasHandler(const int &width_t,
                   const int &height_t,
+                  const qreal &scale = 1.,
                   const bool &paintOnOtherThread = true);
     void newLayer(QString layer_name_t);
     void removeLayer(Layer *layer_t);
@@ -27,7 +28,8 @@ public:
                      qreal yT,
                      const ulong &time_stamp,
                      const qreal &pressure,
-                     const bool &erase);
+                     const bool &erase,
+                     Brush *brush);
     void tabletReleaseEvent();
     void tabletPressEvent(qreal xT,
                           qreal yT,
@@ -43,7 +45,7 @@ public:
     void mouseMoveEvent(qreal xT,
                         qreal yT,
                         const ulong &time_stamp,
-                        const bool &erase);
+                        const bool &erase, Brush *brush);
     void paintPress(qreal xT,
                     qreal yT,
                     const ulong &timestamp,
@@ -75,6 +77,7 @@ public:
         current_layer->drawSk(canvas, paint);
     }
 private:
+    qreal mScale = 1.;
     bool mPaintOnOtherThread = true;
 
     CanvasBackgroundMode backgroud_mode = CANVAS_BACKGROUND_COLOR;

@@ -26,6 +26,7 @@ struct Stroke {
 class Surface {
 public:
     Surface(const ushort &width_t, const ushort &height_t,
+            const qreal &scale,
             const bool &paintOnOtherThread = true);
     void strokeTo(Brush *brush,
                   qreal x, qreal y,
@@ -44,6 +45,7 @@ public:
     void getTileDrawers(QList<TileSkDrawer *> *tileDrawers);
 
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
+        canvas->scale(4., 4.);
         for(int i = 0; i < n_tile_cols; i++) {
             for(int j = 0; j < n_tile_rows; j++) {
                 tiles[j][i]->drawSk(canvas, paint);
@@ -52,6 +54,7 @@ public:
     }
 
 private:
+    qreal mScale = 1.;
     bool mPaintInOtherThread = true;
     qreal countDabsTo(qreal dist_between_dabs, qreal x, qreal y);
     Tile *getTile(ushort tile_col, ushort tile_row);
