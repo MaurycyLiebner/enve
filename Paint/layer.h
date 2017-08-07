@@ -27,7 +27,8 @@ struct LayerRenderData
 class Layer {
 public:
     Layer(QString layer_name_t,
-          int width_t = 0, int height_t = 0);
+          int width_t = 0, int height_t = 0,
+          const bool &paintInOtherThread = true);
 
     void clear();
 
@@ -48,15 +49,17 @@ public:
                      const qreal &pressure,
                      Brush *brush);
 
-    void setNewPaintLibSurface(int width_t, int height_t);
-
-
     void getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
         paintlib_surface->getTileDrawers(tileDrawers);
     }
     void setLayerName(const QString &layerName);
     const QString &getLayerName();
+
+    void drawSk(SkCanvas *canvas, SkPaint *paint) {
+        paintlib_surface->drawSk(canvas, paint);
+    }
 private:
+    bool mPaintInOtherThread = true;
     Brush *mCurrentBrush = NULL;
     QString mLayerName;
     Surface *paintlib_surface = NULL;

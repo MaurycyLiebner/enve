@@ -4,20 +4,118 @@
 #include <stdio.h>
 #include "Colors/helpers.h"
 
+void processPaintDabs(const QList<Dab> &dabs,
+                      const ushort &maxPaintX,
+                      const ushort &maxPaintY,
+                      uchar *data) {
+
+    foreach(const Dab &dab_t, dabs) {
+        qreal cs = cos(dab_t.beta_deg*2*PI/360);
+        qreal sn = sin(dab_t.beta_deg*2*PI/360);
+
+
+        int x_min = floor(dab_t.cx - dab_t.r);
+        if(x_min > maxPaintX) {
+            continue;
+        } else if(x_min < 0) {
+            x_min = 0;
+        }
+        int x_max = ceil(dab_t.cx + dab_t.r);
+        if(x_max > maxPaintX) {
+            x_max = maxPaintX;
+        } else if(x_max < 0) {
+            continue;
+        }
+        int y_min = floor(dab_t.cy - dab_t.r);
+        if(y_min > maxPaintY) {
+            continue;
+        } else if(y_min < 0) {
+            y_min = 0;
+        }
+        int y_max = ceil(dab_t.cy + dab_t.r);
+        if(y_max > maxPaintY) {
+            y_max = maxPaintY;
+        } else if(y_max < 0) {
+            continue;
+        }
+
+        //#pragma omp parallel for
+        for(int i = x_min; i < x_max; i++) {
+            for(int j = y_min; j < y_max; j++) {
+                GLuint id_t = ( j*TILE_DIM + i)*4;
+                qreal dx = i - dab_t.cx;
+                qreal dy = j - dab_t.cy;
+                qreal dyr = (dy*cs - dx*sn)*dab_t.aspect_ratio;
+                qreal dxr = (dy*sn + dx*cs);
+                qreal curr_r_frac = (dyr*dyr + dxr*dxr) / (dab_t.r*dab_t.r);
+                qreal h_opa;
+                if(curr_r_frac > 1) {
+                    h_opa = 0;
+                } else if(curr_r_frac < dab_t.hardness) {
+                    h_opa = curr_r_frac + 1 - curr_r_frac/dab_t.hardness;
+                } else {
+                    h_opa = dab_t.hardness/(1 - dab_t.hardness)*(1 - curr_r_frac);
+                }
+                qreal curr_alpha = data[id_t + 3];
+                qreal paint_alpha = dab_t.opacity * h_opa * UCHAR_MAX;
+                if(dab_t.erase) {
+                    qreal alpha_sum = curr_alpha - paint_alpha;
+
+                    if(alpha_sum < 0) {
+                        data[id_t + 3] = 0;
+                    } else {
+                        data[id_t + 3] = alpha_sum;
+                    }
+                } else {
+                    qreal alpha_sum = curr_alpha + paint_alpha;
+                    // red
+                    data[id_t] =
+                            (dab_t.red*UCHAR_MAX*paint_alpha +
+                             data[id_t]*curr_alpha)/alpha_sum;
+                    // green
+                    data[id_t + 1] =
+                            (dab_t.green*UCHAR_MAX*paint_alpha +
+                             data[id_t + 1]*curr_alpha)/alpha_sum;
+                    // blue
+                    data[id_t + 2] =
+                            (dab_t.blue*UCHAR_MAX*paint_alpha +
+                             data[id_t + 2]*curr_alpha)/alpha_sum;
+                    // alpha
+                    if(alpha_sum > UCHAR_MAX) {
+                        data[id_t + 3] = UCHAR_MAX;
+                    } else {
+                        data[id_t + 3] = alpha_sum;
+                    }
+                }
+            }
+        }
+    }
+}
+
 void Tile::clear() {
-    mDrawer->clearImg();
-    updateTexFromDataArray();
-    mDrawer->addScheduler();
+    if(mPaintInOtherThread) {
+        mDrawer->clearImg();
+        updateTexFromDataArray();
+        mDrawer->addScheduler();
+    } else {
+        for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
+            mData[i] = 0;
+        }
+    }
 }
 
 void Tile::setTileWidth(const ushort &width_t) {
     mMaxPaintX = width_t;
-    mDrawer->maxPaintX = mMaxPaintX;
+    if(mPaintInOtherThread) {
+        mDrawer->maxPaintX = mMaxPaintX;
+    }
 }
 
 void Tile::setTileHeight(const ushort &height_t) {
     mMaxPaintY = height_t;
-    mDrawer->maxPaintY = mMaxPaintY;
+    if(mPaintInOtherThread) {
+        mDrawer->maxPaintY = mMaxPaintY;
+    }
 }
 
 void Tile::resetTileSize() {
@@ -29,14 +127,33 @@ TileSkDrawer *Tile::getTexTileDrawer() {
     return mDrawer.get();
 }
 
+void Tile::addScheduler() {
+    if(mPaintInOtherThread) {
+        mDrawer->addScheduler();
+    } else {
+        processPaintDabs(mDabsToPaint,
+                         mMaxPaintX, mMaxPaintY,
+                         (uchar*)mDataTileImage.getPixels());
+        mDabsToPaint.clear();
+    }
+}
+
 void Tile::setDabsForDrawer() {
     mDrawer->dabsToPaint = mDabsToPaint;
     mDabsToPaint.clear();
 }
 
-Tile::Tile(const ushort &x_t, const ushort &y_t) {
+void Tile::drawSk(SkCanvas *canvas, SkPaint *paint) {
+    canvas->drawBitmap(mDataTileImage, mPosX, mPosY, paint);
+}
+
+Tile::Tile(const ushort &x_t, const ushort &y_t,
+           const bool &paintInOtherThread) {
+    mPaintInOtherThread = paintInOtherThread;
     setPosInSurface(x_t, y_t);
-    mDrawer = (new TileSkDrawer(this, x_t, y_t))->ref<TileSkDrawer>();
+    if(mPaintInOtherThread) {
+        mDrawer = (new TileSkDrawer(this, x_t, y_t))->ref<TileSkDrawer>();
+    }
     resetTileSize();
 
     SkImageInfo info = SkImageInfo::Make(TILE_DIM,
@@ -44,12 +161,12 @@ Tile::Tile(const ushort &x_t, const ushort &y_t) {
                                          kBGRA_8888_SkColorType,
                                          kPremul_SkAlphaType,
                                          nullptr);
-    SkBitmap bitmap;
-    bitmap.allocPixels(info);
-    mDataTileImage = SkImage::MakeFromBitmap(bitmap);
-    SkPixmap pix;
-    mDataTileImage->peekPixels(&pix);
-    mData = (uchar*)pix.writable_addr();
+    //SkBitmap bitmap;
+    mDataTileImage.allocPixels(info);
+    mDataTileImage.setIsVolatile(true);
+    //mDataTileImage = SkImage::MakeFromBitmap(bitmap);
+
+    mData = (uchar*)mDataTileImage.getPixels();
 
     clear();
 }
@@ -202,88 +319,9 @@ void TileSkDrawer::beforeUpdate() {
 }
 
 void TileSkDrawer::processUpdate() {
-    foreach(const Dab &dab_t, dabsToPaint) {
-        qreal cs = cos(dab_t.beta_deg*2*PI/360);
-        qreal sn = sin(dab_t.beta_deg*2*PI/360);
-
-
-        int x_min = floor(dab_t.cx - dab_t.r);
-        if(x_min > maxPaintX) {
-            continue;
-        } else if(x_min < 0) {
-            x_min = 0;
-        }
-        int x_max = ceil(dab_t.cx + dab_t.r);
-        if(x_max > maxPaintX) {
-            x_max = maxPaintX;
-        } else if(x_max < 0) {
-            continue;
-        }
-        int y_min = floor(dab_t.cy - dab_t.r);
-        if(y_min > maxPaintY) {
-            continue;
-        } else if(y_min < 0) {
-            y_min = 0;
-        }
-        int y_max = ceil(dab_t.cy + dab_t.r);
-        if(y_max > maxPaintY) {
-            y_max = maxPaintY;
-        } else if(y_max < 0) {
-            continue;
-        }
-
-        //#pragma omp parallel for
-        for(int i = x_min; i < x_max; i++) {
-            for(int j = y_min; j < y_max; j++) {
-                GLuint id_t = ( j*TILE_DIM + i)*4;
-                qreal dx = i - dab_t.cx;
-                qreal dy = j - dab_t.cy;
-                qreal dyr = (dy*cs - dx*sn)*dab_t.aspect_ratio;
-                qreal dxr = (dy*sn + dx*cs);
-                qreal curr_r_frac = (dyr*dyr + dxr*dxr) / (dab_t.r*dab_t.r);
-                qreal h_opa;
-                if(curr_r_frac > 1) {
-                    h_opa = 0;
-                } else if(curr_r_frac < dab_t.hardness) {
-                    h_opa = curr_r_frac + 1 - curr_r_frac/dab_t.hardness;
-                } else {
-                    h_opa = dab_t.hardness/(1 - dab_t.hardness)*(1 - curr_r_frac);
-                }
-                qreal curr_alpha = data[id_t + 3];
-                qreal paint_alpha = dab_t.opacity * h_opa * UCHAR_MAX;
-                if(dab_t.erase) {
-                    qreal alpha_sum = curr_alpha - paint_alpha;
-
-                    if(alpha_sum < 0) {
-                        data[id_t + 3] = 0;
-                    } else {
-                        data[id_t + 3] = alpha_sum;
-                    }
-                } else {
-                    qreal alpha_sum = curr_alpha + paint_alpha;
-                    // red
-                    data[id_t] =
-                            (dab_t.red*UCHAR_MAX*paint_alpha +
-                             data[id_t]*curr_alpha)/alpha_sum;
-                    // green
-                    data[id_t + 1] =
-                            (dab_t.green*UCHAR_MAX*paint_alpha +
-                             data[id_t + 1]*curr_alpha)/alpha_sum;
-                    // blue
-                    data[id_t + 2] =
-                            (dab_t.blue*UCHAR_MAX*paint_alpha +
-                             data[id_t + 2]*curr_alpha)/alpha_sum;
-                    // alpha
-                    if(alpha_sum > UCHAR_MAX) {
-                        data[id_t + 3] = UCHAR_MAX;
-                    } else {
-                        data[id_t + 3] = alpha_sum;
-                    }
-                }
-            }
-        }
-    }
-
+    processPaintDabs(dabsToPaint,
+                     maxPaintX, maxPaintY,
+                     data);
     dabsToPaint.clear();
 }
 

@@ -4,8 +4,10 @@
 #include "GL/gl.h"
 #include "Colors/helpers.h"
 
-Surface::Surface(ushort width_t, ushort height_t)
-{
+Surface::Surface(const ushort &width_t,
+                 const ushort &height_t,
+                 const bool &paintOnOtherThread) {
+    mPaintInOtherThread = paintOnOtherThread;
     setSize(width_t, height_t);
 }
 
@@ -125,7 +127,6 @@ void Surface::strokeTo(Brush *brush,
                        qreal x, qreal y,
                        qreal pressure, GLushort dt,
                        bool erase) {
-    qDebug() << "strokeTo: " << x << y;
     qreal dist_between_dabs = brush->getDistBetweenDabsPx();
     qreal stroke_dx = x - last_event_stroke_x;
     qreal stroke_dy = y - last_event_stroke_y;
@@ -362,8 +363,7 @@ void Surface::setSize(ushort width_t, ushort height_t)
         ushort first_new_col_in_row = 0;
         if(rw < n_tile_rows) {
             first_new_col_in_row = n_tile_cols;
-            for(ushort cl = 0; cl < n_tile_cols; cl++)
-            {
+            for(ushort cl = 0; cl < n_tile_cols; cl++) {
                 Tile *tile_t = tiles[rw][cl];
                 tile_t->resetTileSize();
                 tiles_t[rw][cl] = tile_t;
@@ -372,12 +372,12 @@ void Surface::setSize(ushort width_t, ushort height_t)
         }
 
         for(ushort cl = first_new_col_in_row; cl < n_tile_cols_t; cl++) {
-            tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM);
+            tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM,
+                                       mPaintInOtherThread);
         }
 
     }
-    if(tiles != NULL)
-    {
+    if(tiles != NULL) {
         free(tiles);
     }
 
@@ -389,18 +389,14 @@ void Surface::setSize(ushort width_t, ushort height_t)
 
 
     GLushort last_row_height = height%TILE_DIM;
-    if(last_row_height != 0)
-    {
-        for(int i = 0; i < n_tile_cols; i++)
-        {
+    if(last_row_height != 0) {
+        for(int i = 0; i < n_tile_cols; i++) {
             tiles[n_tile_rows - 1][i]->setTileHeight(last_row_height);
         }
     }
     GLushort last_column_width = width%TILE_DIM;
-    if(last_column_width != 0)
-    {
-        for(int j = 0; j < n_tile_rows; j++)
-        {
+    if(last_column_width != 0) {
+        for(int j = 0; j < n_tile_rows; j++) {
             tiles[j][n_tile_cols - 1]->setTileWidth(last_column_width);
         }
     }

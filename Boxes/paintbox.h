@@ -17,8 +17,7 @@ struct PaintBoxRenderData : public BoundingBoxRenderData {
     QList<TileSkDrawer*> tileDrawers;
 };
 
-class PaintBox : public BoundingBox,
-                 public CanvasHandler {
+class PaintBox : public BoundingBox {
 public:
     PaintBox(const ushort &canvasWidthT,
              const ushort &canvasHeightT);
@@ -28,16 +27,41 @@ public:
     void renderDataFinished(BoundingBoxRenderData *renderData);
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
-    void updateDrawRenderContainerTransform();
-    void mapToPaintCanvasHandler(qreal *x_t, qreal *y_t);
     BoundingBox *createNewDuplicate() {
         return new PaintBox(100, 100);
     }
 
     BoundingBoxRenderData *createRenderData();
+
+    void tabletEvent(const qreal &xT,
+                     const qreal &yT,
+                     const ulong &time_stamp,
+                     const qreal &pressure,
+                     const bool &erase);
+    void tabletReleaseEvent();
+    void tabletPressEvent(const qreal &xT,
+                          const qreal &yT,
+                          const ulong &time_stamp,
+                          const qreal &pressure,
+                          const bool &erase,
+                          Brush *brush);
+    void mouseReleaseEvent();
+    void mousePressEvent(const qreal &xT,
+                         const qreal &yT,
+                         const ulong &timestamp,
+                         const qreal &pressure, Brush *brush);
+    void mouseMoveEvent(const qreal &xT,
+                        const qreal &yT,
+                        const ulong &time_stamp,
+                        const bool &erase);
+    void paintPress(const qreal &xT,
+                    const qreal &yT,
+                    const ulong &timestamp,
+                    const qreal &pressure,
+                    Brush *brush);
 private:
-    RenderContainer mTemporaryOverlayCont;
-    sk_sp<SkImage> mLastPaintImage;
+    CanvasHandler *mMainHandler;
+    CanvasHandler *mTemporaryHandler;
 };
 
 #endif // PAINTBOX_H

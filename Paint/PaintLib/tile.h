@@ -74,7 +74,8 @@ struct TileSkDrawer : public Updatable {
 
 class Tile {
 public:
-    Tile(const ushort &x_t, const ushort &y_t);
+    Tile(const ushort &x_t, const ushort &y_t,
+         const bool &paintInOtherThread = true);
 
 
     void processUpdate();
@@ -109,14 +110,15 @@ public:
     void resetTileSize();
     TileSkDrawer *getTexTileDrawer();
 
-    void addScheduler() {
-        mDrawer->addScheduler();
-    }
+    void addScheduler();
 
     void setDabsForDrawer();
+
+    void drawSk(SkCanvas *canvas, SkPaint *paint = NULL);
 private:
+    bool mPaintInOtherThread = true;
     std::shared_ptr<TileSkDrawer> mDrawer;
-    sk_sp<SkImage> mDataTileImage;
+    SkBitmap mDataTileImage;
     uchar *mData = NULL;
 
     QList<Dab> mDabsToPaint;
