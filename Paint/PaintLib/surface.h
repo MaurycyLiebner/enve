@@ -53,6 +53,8 @@ public:
         }
     }
 
+    void clearTmp();
+    void saveToTmp();
 private:
     qreal mScale = 1.;
     bool mPaintInOtherThread = true;

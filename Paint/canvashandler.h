@@ -76,6 +76,15 @@ public:
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
         current_layer->drawSk(canvas, paint);
     }
+
+    void clearTmp() {
+        current_layer->clearTmp();
+    }
+
+    void saveToTmp() {
+        current_layer->saveToTmp();
+    }
+
 private:
     qreal mScale = 1.;
     bool mPaintOnOtherThread = true;

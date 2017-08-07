@@ -19,9 +19,14 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
     canvas->restore();
 }
 
+void PaintBox::processSchedulers() {
+    mTemporaryHandler->saveToTmp();
+    BoundingBox::processSchedulers();
+}
+
 void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     BoundingBox::renderDataFinished(renderData);
-    mTemporaryHandler->clear();
+    mTemporaryHandler->clearTmp();
 }
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrame(

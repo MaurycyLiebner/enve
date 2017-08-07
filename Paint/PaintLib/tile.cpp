@@ -144,7 +144,21 @@ void Tile::setDabsForDrawer() {
 }
 
 void Tile::drawSk(SkCanvas *canvas, SkPaint *paint) {
+    canvas->drawBitmap(mTmpDataTileImage, mPosX, mPosY, paint);
     canvas->drawBitmap(mDataTileImage, mPosX, mPosY, paint);
+}
+
+void Tile::saveToTmp() {
+    mTmpDataTileImage.swap(mDataTileImage);
+    uchar *dataT = mData;
+    mData = mDataTmp;
+    mDataTmp = dataT;
+}
+
+void Tile::clearTmp() {
+    for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
+        mDataTmp[i] = 0;
+    }
 }
 
 Tile::Tile(const ushort &x_t, const ushort &y_t,
@@ -161,12 +175,16 @@ Tile::Tile(const ushort &x_t, const ushort &y_t,
                                          kBGRA_8888_SkColorType,
                                          kPremul_SkAlphaType,
                                          nullptr);
-    //SkBitmap bitmap;
     mDataTileImage.allocPixels(info);
     mDataTileImage.setIsVolatile(true);
-    //mDataTileImage = SkImage::MakeFromBitmap(bitmap);
 
     mData = (uchar*)mDataTileImage.getPixels();
+
+    if(!mPaintInOtherThread) {
+        mTmpDataTileImage.allocPixels(info);
+        mTmpDataTileImage.setIsVolatile(true);
+        mDataTmp = (uchar*)mTmpDataTileImage.getPixels();
+    }
 
     clear();
 }
@@ -313,8 +331,8 @@ void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
     canvas->drawImage(tileImg, posX, posY, paint);
 }
 
-void TileSkDrawer::beforeUpdate() {
-    Updatable::beforeUpdate();
+void TileSkDrawer::schedulerProccessed() {
+    Updatable::schedulerProccessed();
     parentTile->setDabsForDrawer();
 }
 

@@ -24,6 +24,7 @@ public:
 
     bool SWT_isPaintBox() { return true; }
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
+    void processSchedulers();
     void renderDataFinished(BoundingBoxRenderData *renderData);
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);

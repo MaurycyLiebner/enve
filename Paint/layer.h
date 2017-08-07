@@ -60,6 +60,15 @@ public:
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
         paintlib_surface->drawSk(canvas, paint);
     }
+
+    void clearTmp() {
+        paintlib_surface->clearTmp();
+    }
+
+    void saveToTmp() {
+        paintlib_surface->saveToTmp();
+    }
+
 private:
     bool mPaintInOtherThread = true;
     QString mLayerName;

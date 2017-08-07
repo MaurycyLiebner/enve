@@ -54,9 +54,9 @@ struct TileSkDrawer : public Updatable {
 
     void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) const;
 
-    void beforeUpdate();
-
     void processUpdate();
+
+    void schedulerProccessed();
 
     void afterUpdate();
 
@@ -115,10 +115,15 @@ public:
     void setDabsForDrawer();
 
     void drawSk(SkCanvas *canvas, SkPaint *paint = NULL);
+
+    void saveToTmp();
+    void clearTmp();
 private:
     bool mPaintInOtherThread = true;
     std::shared_ptr<TileSkDrawer> mDrawer;
     SkBitmap mDataTileImage;
+    SkBitmap mTmpDataTileImage;
+    uchar *mDataTmp = NULL;
     uchar *mData = NULL;
 
     QList<Dab> mDabsToPaint;
