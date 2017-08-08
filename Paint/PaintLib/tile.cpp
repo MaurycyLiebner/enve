@@ -257,11 +257,11 @@ void Tile::getColor(qreal cx,
         return;
     }
 
-    qreal red_sum_t = 0.f;
-    qreal green_sum_t = 0.f;
-    qreal blue_sum_t = 0.f;
-    qreal alpha_sum_t = 0.f;
-    qreal weight_sum_t = 0.f;
+    qreal red_sum_t = 0.;
+    qreal green_sum_t = 0.;
+    qreal blue_sum_t = 0.;
+    qreal alpha_sum_t = 0.;
+    qreal weight_sum_t = 0.;
     //#pragma omp parallel for reduction(+: red_sum_t, green_sum_t, blue_sum_t, alpha_sum_t, weight_sum_t)
     for(short i = x_min; i < x_max; i++) {
         for(short j = y_min; j < y_max; j++) {
@@ -283,22 +283,22 @@ void Tile::getColor(qreal cx,
                     (qreal)UCHAR_MAX;
             qreal weight_t = opacity * h_opa;
             weight_sum_t += weight_t;
-            qreal alpha_sum_inc_t = weight_t*alpha_t;
-            red_sum_t += mData[col_val_id]/
-                    (qreal)UCHAR_MAX*alpha_sum_inc_t;
-            green_sum_t += mData[col_val_id + 1]/
-                    (qreal)UCHAR_MAX*alpha_sum_inc_t;
-            blue_sum_t += mData[col_val_id + 2]/
-                    (qreal)UCHAR_MAX*alpha_sum_inc_t;
-            alpha_sum_t += alpha_sum_inc_t;
+            if(alpha_t < 0.01) continue;
+            red_sum_t += mData[col_val_id + 2]*weight_t/
+                    ((qreal)UCHAR_MAX*alpha_t);
+            green_sum_t += mData[col_val_id + 1]*weight_t/
+                    ((qreal)UCHAR_MAX*alpha_t);
+            blue_sum_t += mData[col_val_id ]*weight_t/
+                    ((qreal)UCHAR_MAX*alpha_t);
+            alpha_sum_t += weight_t*alpha_t;
         }
     }
 
-    *red_sum += red_sum_t;
-    *green_sum += green_sum_t;
-    *blue_sum += blue_sum_t;
-    *alpha_sum += alpha_sum_t;
-    *weight_sum += weight_sum_t;
+    *red_sum = red_sum_t;
+    *green_sum = green_sum_t;
+    *blue_sum = blue_sum_t;
+    *alpha_sum = alpha_sum_t;
+    *weight_sum = weight_sum_t;
 }
 void Tile::updateTexFromDataArray() {
     uchar *dataT = mDrawer->data;

@@ -68,40 +68,37 @@ void Surface::getColor(qreal cx, qreal cy,
     qreal cs = cos(beta_deg*2*PI/360);
     qreal sn = sin(beta_deg*2*PI/360);
 
-    qreal red_sum = 0.f;
-    qreal green_sum = 0.f;
-    qreal blue_sum = 0.f;
-    qreal alpha_sum = 0.f;
-    qreal weight_sum = 0.f;
+    qreal red_sum = 0.;
+    qreal green_sum = 0.;
+    qreal blue_sum = 0.;
+    qreal alpha_sum = 0.;
+    qreal weight_sum = 0.;
     short min_tile_x;
     short max_tile_x;
     short min_tile_y;
     short max_tile_y;
     getTileIdsOnRect(cx - r, cx + r, cy - r, cy + r,
                      &min_tile_x, &max_tile_x, &min_tile_y, &max_tile_y);
-    for(short i = min_tile_x; i <= max_tile_x; i++)
-    {
-        for(short j = min_tile_y; j <= max_tile_y; j++)
-        {
+    for(short i = min_tile_x; i <= max_tile_x; i++) {
+        for(short j = min_tile_y; j <= max_tile_y; j++) {
             Tile *tile_t = tiles[j][i];
             tile_t->getColor(cx, cy,
                              r, aspect_ratio, cs, sn,
                              hardness, opa,
-                             &red_sum, &green_sum, &blue_sum, &alpha_sum, &weight_sum);
+                             &red_sum, &green_sum,
+                             &blue_sum, &alpha_sum,
+                             &weight_sum);
         }
     }
-    if(alpha_sum < 0.0001f)
-    {
-        *red = 0.f;
-        *green = 0.f;
-        *blue = 0.f;
-        *alpha = 0.f;
-    }
-    else
-    {
-        *red = red_sum/alpha_sum;
-        *green = green_sum/alpha_sum;
-        *blue = blue_sum/alpha_sum;
+    if(alpha_sum < 0.01) {
+        *red = 0.;
+        *green = 0.;
+        *blue = 0.;
+        *alpha = 0.;
+    } else {
+        *red = red_sum/weight_sum;
+        *green = green_sum/weight_sum;
+        *blue = blue_sum/weight_sum;
         *alpha = alpha_sum/weight_sum;
     }
 }
