@@ -30,7 +30,8 @@ enum CanvasMode : short {
     ADD_PARTICLE_BOX,
     ADD_PARTICLE_EMITTER,
     PICK_PATH_SETTINGS,
-    PAINT_MODE
+    ADD_PAINT_BOX,
+    PAINT_MODE,
 };
 
 #include "canvaswindow.h"

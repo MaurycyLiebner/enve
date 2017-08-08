@@ -55,12 +55,13 @@ public:
 
     void clearTmp();
     void saveToTmp();
+    void setSize(const ushort &width_t,
+                 const ushort &height_t);
 private:
     qreal mScale = 1.;
     bool mPaintInOtherThread = true;
     qreal countDabsTo(qreal dist_between_dabs, qreal x, qreal y);
     Tile *getTile(ushort tile_col, ushort tile_row);
-    void setSize(ushort width_t, ushort height_t);
 
     qreal previous_second_color_alpha = 0.f;
     qreal next_second_color_alpha = 0.f;

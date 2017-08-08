@@ -5,28 +5,26 @@
 #include "../PaintLib/brush.h"
 #include "brushsettingwidget.h"
 
-struct WindowVariables;
-
-class BrushButton;
-
 class BrushSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BrushSettingsWidget(WindowVariables *window_vars_t, QWidget *parent = 0);
-    void setBrushSetting(BrushSetting setting_id, float val_t, bool edited_t);
-    float getBrushSetting(BrushSetting settind_id);
+    explicit BrushSettingsWidget(QWidget *parent = 0);
+    void setBrushWidgetSetting(const BrushSetting &setting_id,
+                               const qreal &val_t,
+                               const bool &edited_t);
+    float getBrushSetting(const BrushSetting &settind_id);
     void incBrushRadius();
     void decBrushRadius();
-    void setBrushButton(BrushButton *button_t);
-    void setButtonSetting(BrushSetting setting_id, float val_t);
-    void revertSettingToDefault(BrushSetting setting_t);
-    bool hasSettingDefaultVal(BrushSetting setting_t);
-    BrushButton *getCurrentButton();
-
+    void setCurrentBrush(Brush *brushT);
+    void revertSettingToDefault(const BrushSetting &setting_t);
+    bool hasSettingDefaultVal(const BrushSetting &setting_t);
+    Brush *getCurrentBrush();
 signals:
 
 public slots:
+    void setBrushSetting(const BrushSetting &setting_id,
+                         const qreal &val_t);
     void showHideAdvancedSettings();
     void openBrushSaveDialog();
     void overwriteBrushSettings();
@@ -37,8 +35,7 @@ private:
     QPushButton *advanced_button = NULL;
 
     bool advanced_settings_visible = false;
-    BrushButton *current_button = NULL;
-    WindowVariables *window_vars = NULL;
+    Brush *mCurrentBrush = NULL;
     QList<BrushSettingWidget*> setting_widgets;
     QVBoxLayout *main_layout = NULL;
     QHBoxLayout *h_layout = NULL;

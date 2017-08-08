@@ -12,16 +12,22 @@ struct PaintBoxRenderData : public BoundingBoxRenderData {
 
     void drawSk(SkCanvas *canvas);
 
-    void updateRelBoundingRect();
-
     QList<TileSkDrawer*> tileDrawers;
 };
 
 class PaintBox : public BoundingBox {
 public:
+    PaintBox();
     PaintBox(const ushort &canvasWidthT,
              const ushort &canvasHeightT);
 
+    void setSize(const ushort &width,
+                 const ushort &height) {
+        mWidth = width;
+        mHeight = height;
+    }
+
+    void finishSizeSetup();
     bool SWT_isPaintBox() { return true; }
     void drawPixmapSk(SkCanvas *canvas, SkPaint *paint);
     void processSchedulers();
@@ -62,9 +68,29 @@ public:
                     const ulong &timestamp,
                     const qreal &pressure,
                     Brush *brush);
+
+    MovablePoint *getBottomRightPoint();
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                             const CanvasMode &currentCanvasMode,
+                             const qreal &canvasScaleInv);
+    void selectAndAddContainedPointsToList(const QRectF &absRect,
+                                           QList<MovablePoint *> *list);
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
+        return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
+                      mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
+    }
+
+    void drawSelectedSk(SkCanvas *canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
+    void startAllPointsTransform();
 private:
-    CanvasHandler *mMainHandler;
-    CanvasHandler *mTemporaryHandler;
+    MovablePoint *mTopLeftPoint = NULL;
+    MovablePoint *mBottomRightPoint = NULL;
+    ushort mWidth = 0;
+    ushort mHeight = 0;
+    CanvasHandler *mMainHandler = NULL;
+    CanvasHandler *mTemporaryHandler = NULL;
 };
 
 #endif // PAINTBOX_H

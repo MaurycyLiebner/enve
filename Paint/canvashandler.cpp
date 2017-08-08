@@ -1,5 +1,4 @@
 #include "canvashandler.h"
-#include "windowvariables.h"
 #include <png++/png.hpp>
 
 void CanvasHandler::setBackgroundMode(CanvasBackgroundMode bg_mode_t) {
@@ -28,6 +27,13 @@ int CanvasHandler::getLayersCount() {
 
 void CanvasHandler::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
     current_layer->getTileDrawers(tileDrawers);
+}
+
+void CanvasHandler::setSize(const ushort &widthT,
+                            const ushort &heightT) {
+    foreach(Layer *layer, layers) {
+        layer->setSize(widthT, heightT);
+    }
 }
 
 void CanvasHandler::drawGridBg() {

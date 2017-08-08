@@ -85,6 +85,8 @@ public:
         current_layer->saveToTmp();
     }
 
+    void setSize(const ushort &widthT,
+                 const ushort &heightT);
 private:
     qreal mScale = 1.;
     bool mPaintOnOtherThread = true;

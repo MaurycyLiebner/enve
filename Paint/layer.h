@@ -69,6 +69,11 @@ public:
         paintlib_surface->saveToTmp();
     }
 
+    void setSize(const ushort &widthT,
+                                const ushort &heightT) {
+        paintlib_surface->setSize(widthT, heightT);
+    }
+
 private:
     bool mPaintInOtherThread = true;
     QString mLayerName;

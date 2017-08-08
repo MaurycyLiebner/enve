@@ -371,11 +371,11 @@ Tile *Surface::getTile(ushort tile_col, ushort tile_row)
     return tiles[tile_row][tile_col];
 }
 
-void Surface::setSize(ushort width_t, ushort height_t)
-{
+void Surface::setSize(const ushort &width_t,
+                      const ushort &height_t) {
     // initialize tiles
-    ushort n_tile_cols_t = ceil(width_t/(double)TILE_DIM);
-    ushort n_tile_rows_t = ceil(height_t/(double)TILE_DIM);
+    ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
+    ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
 
     Tile ***tiles_t = new Tile**[n_tile_rows_t];
 
@@ -386,10 +386,14 @@ void Surface::setSize(ushort width_t, ushort height_t)
             first_new_col_in_row = n_tile_cols;
             for(ushort cl = 0; cl < n_tile_cols; cl++) {
                 Tile *tile_t = tiles[rw][cl];
-                tile_t->resetTileSize();
-                tiles_t[rw][cl] = tile_t;
+                if(cl < n_tile_cols_t) {
+                    tile_t->resetTileSize();
+                    tiles_t[rw][cl] = tile_t;
+                } else {
+                    delete tile_t;
+                }
             }
-            free(tiles[rw]);
+            delete[] tiles[rw];
         }
 
         for(ushort cl = first_new_col_in_row; cl < n_tile_cols_t; cl++) {
@@ -399,7 +403,7 @@ void Surface::setSize(ushort width_t, ushort height_t)
 
     }
     if(tiles != NULL) {
-        free(tiles);
+        delete[] tiles;
     }
 
     tiles = tiles_t;

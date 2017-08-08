@@ -1,7 +1,6 @@
 #include "layer.h"
 #include <QDebug>
 #include "canvashandler.h"
-#include "windowvariables.h"
 #include "canvas.h"
 
 typedef struct {

@@ -210,6 +210,8 @@ public slots:
     void setTextMode();
     void setParticleBoxMode();
     void setParticleEmitterMode();
+    void setPaintBoxMode();
+    void setPaintMode();
 
     void raiseAction();
     void lowerAction();

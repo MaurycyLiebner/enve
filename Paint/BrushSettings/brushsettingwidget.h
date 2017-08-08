@@ -15,36 +15,36 @@ class BrushSettingWidget : public QObject
 {
     Q_OBJECT
 public:
-    explicit BrushSettingWidget(QVBoxLayout *label_layout_t, QVBoxLayout *rest_layout_t,
+    explicit BrushSettingWidget(QVBoxLayout *label_layout_t,
+                                QVBoxLayout *rest_layout_t,
                                 BrushSetting setting_id_t,
-                                WindowVariables *window_vars_t,
                                 QWidget *parent = 0);
-    float getVal();
-    void setVal(float val_t, bool edited_t);
+    qreal getVal();
+    void setVal(const qreal &val_t,
+                const bool &edited_t);
 
     void valChanged();
 
     void hide();
     void show();
-    void setVisible(bool b_t);
+    void setVisible(const bool &b_t);
 
-    void setDefaultButtonEnabled(bool b_t);
+    void setDefaultButtonEnabled(const bool &b_t);
 signals:
-
+    void setBrushSetting(BrushSetting, qreal);
 public slots:
-    void setSpinVal(int val_t);
+    void setSpinVal(const int &val_t);
     void setSliderVal(double val_t);
-    void incVal(float inc_t);
+    void incVal(const qreal &inc_t);
     void revertToDefaultVal();
 private:
-    QHBoxLayout *h_layout = NULL;
-    QPushButton *default_button = NULL;
-    const BrushSettingInfo *setting_info = NULL;
-    WindowVariables *window_vars = NULL;
-    QLabel *name_label = NULL;
-    QDoubleSpinBox *spin_box = NULL;
-    QSlider *val_slider = NULL;
-    BrushSetting setting_id;
+    QHBoxLayout *mMainLayout = NULL;
+    QPushButton *mDefaultButton = NULL;
+    const BrushSettingInfo *mSettingInfo = NULL;
+    QLabel *mNameLabel = NULL;
+    QDoubleSpinBox *mValSpinBox = NULL;
+    QSlider *mValSlider = NULL;
+    BrushSetting mTargetSetting;
 };
 
 #endif // BRUSHSETTINGWIDGET_H

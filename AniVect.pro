@@ -180,20 +180,13 @@ SOURCES += main.cpp\
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
     BoxesList/OptimalScrollArea/minimalscrollwidget.cpp \
     filesourcelist.cpp \
-    Paint/BrushesWidget/brushbutton.cpp \
-    Paint/BrushesWidget/brushcollectionselector.cpp \
-    Paint/BrushesWidget/brusheswidget.cpp \
-    Paint/BrushesWidget/brushselector.cpp \
-    Paint/BrushesWidget/collectionbutton.cpp \
     Paint/BrushSettings/brushsettingswidget.cpp \
     Paint/BrushSettings/brushsettingwidget.cpp \
     Paint/PaintLib/brush.cpp \
-    Paint/PaintLib/brushsavedialog.cpp \
     Paint/PaintLib/surface.cpp \
     Paint/PaintLib/tile.cpp \
     Paint/canvashandler.cpp \
     Paint/layer.cpp \
-    Paint/windowvariables.cpp \
     Boxes/paintbox.cpp
 
 HEADERS  += mainwindow.h \
@@ -335,20 +328,13 @@ HEADERS  += mainwindow.h \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \
     BoxesList/OptimalScrollArea/minimalscrollwidget.h \
     filesourcelist.h \
-    Paint/BrushesWidget/brushbutton.h \
-    Paint/BrushesWidget/brushcollectionselector.h \
-    Paint/BrushesWidget/brusheswidget.h \
-    Paint/BrushesWidget/brushselector.h \
-    Paint/BrushesWidget/collectionbutton.h \
     Paint/BrushSettings/brushsettingswidget.h \
     Paint/BrushSettings/brushsettingwidget.h \
     Paint/PaintLib/brush.h \
-    Paint/PaintLib/brushsavedialog.h \
     Paint/PaintLib/surface.h \
     Paint/PaintLib/tile.h \
     Paint/canvashandler.h \
     Paint/layer.h \
-    Paint/windowvariables.h \
     Boxes/paintbox.h
 
 RESOURCES += \

@@ -489,8 +489,6 @@ void MainWindow::setupToolBar() {
     mTextMode->setCheckable(":/icons/draw_text_checked.png");
     mToolBar->addWidget(mTextMode);
 
-    mToolBar->addSeparator();
-
     mParticleBoxMode = new ActionButton(
                 ":/icons/draw_particle_box.png",
                 "F7", this);
@@ -503,6 +501,22 @@ void MainWindow::setupToolBar() {
     mParticleEmitterMode->setCheckable(
                 ":/icons/draw_particle_emitter_checked.png");
     mToolBar->addWidget(mParticleEmitterMode);
+
+    mToolBar->addSeparator();
+
+    mPaintBoxMode = new ActionButton(
+                ":/icons/add_paint_box.png",
+                "F9", this);
+    mPaintBoxMode->setCheckable(
+                ":/icons/add_paint_box_checked.png");
+    mToolBar->addWidget(mPaintBoxMode);
+
+    mPaintMode = new ActionButton(
+                ":/icons/paint_mode.png",
+                "F10", this);
+    mPaintMode->setCheckable(
+                ":/icons/paint_mode_checked.png");
+    mToolBar->addWidget(mPaintMode);
 
     mToolBar->addSeparator();
 
@@ -610,6 +624,10 @@ void MainWindow::connectToolBarActions() {
             mCanvasWindow, SLOT(setParticleBoxMode()) );
     connect(mParticleEmitterMode, SIGNAL(pressed()),
             mCanvasWindow, SLOT(setParticleEmitterMode()));
+    connect(mPaintBoxMode, SIGNAL(pressed()),
+            mCanvasWindow, SLOT(setPaintBoxMode()));
+    connect(mPaintMode, SIGNAL(pressed()),
+            mCanvasWindow, SLOT(setPaintMode()));
     connect(mActionConnectPoints, SIGNAL(pressed()),
             mCanvasWindow, SLOT(connectPointsSlot()) );
     connect(mActionDisconnectPoints, SIGNAL(pressed()),
@@ -718,6 +736,8 @@ void MainWindow::updateCanvasModeButtonsChecked() {
     mTextMode->setChecked(currentMode == ADD_TEXT);
     mParticleBoxMode->setChecked(currentMode == ADD_PARTICLE_BOX);
     mParticleEmitterMode->setChecked(currentMode == ADD_PARTICLE_EMITTER);
+    mPaintBoxMode->setChecked(currentMode == ADD_PAINT_BOX);
+    mPaintMode->setChecked(currentMode == PAINT_MODE);
 }
 
 //void MainWindow::addBoxAwaitingUpdate(BoundingBox *box)

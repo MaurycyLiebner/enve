@@ -96,6 +96,10 @@
         <file alias="difference.png">pixmaps/icons/difference.png</file>
         <file>pixmaps/cursor_forbidden_everywhere.png</file>
         <file>pixmaps/cursor_add.png</file>
+        <file alias="add_paint_box.png">pixmaps/icons/add_paint_box.png</file>
+        <file alias="add_paint_box_checked.png">pixmaps/icons/add_paint_box_checked.png</file>
+        <file alias="paint_mode.png">pixmaps/icons/paint_mode.png</file>
+        <file alias="paint_mode_checked.png">pixmaps/icons/paint_mode_checked.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>

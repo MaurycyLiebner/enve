@@ -194,9 +194,11 @@ private:
 //
     ActionButton *mRectangleMode;
     ActionButton *mTextMode;
-
     ActionButton *mParticleBoxMode;
     ActionButton *mParticleEmitterMode;
+
+    ActionButton *mPaintBoxMode;
+    ActionButton *mPaintMode;
 //
     ActionButton *mActionConnectPoints;
     ActionButton *mActionDisconnectPoints;

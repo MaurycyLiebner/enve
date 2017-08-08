@@ -157,7 +157,9 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
         setCursor(QCursor(QPixmap(":/cursors/cursor_color_picker.png"), 2, 20) );
     } else if(mode == ADD_CIRCLE) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-ellipse.xpm"), 4, 4) );
-    } else if(mode == ADD_RECTANGLE || mode == ADD_PARTICLE_BOX) {
+    } else if(mode == ADD_RECTANGLE ||
+              mode == ADD_PARTICLE_BOX ||
+              mode == ADD_PAINT_BOX) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-rect.xpm"), 4, 4) );
     } else if(mode == ADD_TEXT) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-text.xpm"), 4, 4) );
@@ -203,6 +205,14 @@ void CanvasWindow::setParticleBoxMode() {
 
 void CanvasWindow::setParticleEmitterMode() {
     setCanvasMode(ADD_PARTICLE_EMITTER);
+}
+
+void CanvasWindow::setPaintBoxMode() {
+    setCanvasMode(ADD_PAINT_BOX);
+}
+
+void CanvasWindow::setPaintMode() {
+    setCanvasMode(PAINT_MODE);
 }
 
 void CanvasWindow::addCanvasToListAndSetAsCurrent(Canvas *canvas) {
@@ -315,6 +325,12 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         setCanvasMode(CanvasMode::ADD_TEXT);
     } else if(event->key() == Qt::Key_F7) {
         setCanvasMode(CanvasMode::ADD_PARTICLE_BOX);
+    } else if(event->key() == Qt::Key_F8) {
+        setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+    } else if(event->key() == Qt::Key_F9) {
+        setCanvasMode(CanvasMode::ADD_PAINT_BOX);
+    } else if(event->key() == Qt::Key_F10) {
+        setCanvasMode(CanvasMode::PAINT_MODE);
     } else if(mCurrentCanvas->keyPressEvent(event)) {
     } else {
         return false;

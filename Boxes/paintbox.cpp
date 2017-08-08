@@ -1,38 +1,148 @@
 #include "paintbox.h"
 #include "Paint/layer.h"
+#include "canvas.h"
+#include "Animators/animatorupdater.h"
+
+PaintBox::PaintBox() :
+    BoundingBox(TYPE_PAINT) {
+    setName("Paint Box");
+    mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
+    mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
+
+    mTopLeftPoint->prp_setUpdater(
+                new PaintBoxSizeUpdater(this));
+    mTopLeftPoint->prp_setName("top left");
+    mBottomRightPoint->prp_setUpdater(
+                new PaintBoxSizeUpdater(this));
+    mBottomRightPoint->prp_setName("bottom right");
+}
 
 PaintBox::PaintBox(const ushort &canvasWidthT,
-                   const ushort &canvasHeightT) : BoundingBox(TYPE_PAINT) {
-    mMainHandler = new CanvasHandler(canvasWidthT, canvasHeightT,
-                                     1., true);
-    mTemporaryHandler = new CanvasHandler(canvasWidthT/4, canvasHeightT/4,
-                                          0.25, false);
+                   const ushort &canvasHeightT) :
+    PaintBox() {
+    mBottomRightPoint->setRelativePos(QPointF(canvasWidthT, canvasHeightT),
+                                      false);
+    mWidth = canvasWidthT;
+    mHeight = canvasHeightT;
+    finishSizeSetup();
+}
+
+MovablePoint *PaintBox::getPointAtAbsPos(const QPointF &absPtPos,
+                                      const CanvasMode &currentCanvasMode,
+                                      const qreal &canvasScaleInv) {
+    if(currentCanvasMode == MOVE_POINT) {
+        if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+            return mTopLeftPoint;
+        }
+        if(mBottomRightPoint->isPointAtAbsPos(absPtPos, canvasScaleInv) ) {
+            return mBottomRightPoint;
+        }
+    } else if(currentCanvasMode == MOVE_PATH) {
+        MovablePoint *pivotMovable = mTransformAnimator->getPivotMovablePoint();
+        if(pivotMovable->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
+            return pivotMovable;
+        }
+    }
+    return NULL;
+}
+
+void PaintBox::selectAndAddContainedPointsToList(const QRectF &absRect,
+                                                  QList<MovablePoint *> *list) {
+    if(!mTopLeftPoint->isSelected()) {
+        if(mTopLeftPoint->isContainedInRect(absRect)) {
+            mTopLeftPoint->select();
+            list->append(mTopLeftPoint);
+        }
+    }
+    if(!mBottomRightPoint->isSelected()) {
+        if(mBottomRightPoint->isContainedInRect(absRect)) {
+            mBottomRightPoint->select();
+            list->append(mBottomRightPoint);
+        }
+    }
+}
+
+void PaintBox::drawSelectedSk(SkCanvas *canvas,
+                              const CanvasMode &currentCanvasMode,
+                              const SkScalar &invScale) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        canvas->save();
+        drawBoundingRectSk(canvas, invScale);
+        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+            mTopLeftPoint->drawSk(canvas, invScale);
+            mBottomRightPoint->drawSk(canvas, invScale);
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->
+                    drawSk(canvas, invScale);
+        }
+        canvas->restore();
+    }
+}
+
+void PaintBox::startAllPointsTransform() {
+    mBottomRightPoint->startTransform();
+    mTopLeftPoint->startTransform();
+    startTransform();
+}
+
+MovablePoint *PaintBox::getBottomRightPoint() {
+    return mBottomRightPoint;
+}
+
+void PaintBox::finishSizeSetup() {
+    QPointF bR = mBottomRightPoint->getCurrentPointValue();
+    if(bR.x() < 1. || bR.y() < 1.) return;
+    ushort widthT = bR.x();
+    ushort heightT = bR.y();
+    if(widthT == mWidth && heightT == mHeight) return;
+    mWidth = widthT;
+    mHeight = heightT;
+    if(mMainHandler == NULL) {
+        mMainHandler = new CanvasHandler(mWidth, mHeight,
+                                         1., true);
+    } else {
+        mMainHandler->setSize(mWidth, mHeight);
+    }
+    if(mTemporaryHandler == NULL) {
+        mTemporaryHandler = new CanvasHandler(mWidth/4, mHeight/4,
+                                              0.25, false);
+    } else {
+        mTemporaryHandler->setSize(mWidth/4, mHeight/4);
+    }
 }
 
 void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
     canvas->saveLayer(NULL, paint);
     BoundingBox::drawPixmapSk(canvas, NULL);
-    canvas->concat(
-            QMatrixToSkMatrix(
-                mTransformAnimator->getCombinedTransform()) );
-    mTemporaryHandler->drawSk(canvas, paint);
+    if(mTemporaryHandler != NULL) {
+        canvas->concat(
+                QMatrixToSkMatrix(
+                    mTransformAnimator->getCombinedTransform()) );
+        mTemporaryHandler->drawSk(canvas, paint);
+    }
+
     canvas->restore();
 }
 
 void PaintBox::processSchedulers() {
-    mTemporaryHandler->saveToTmp();
+    if(mTemporaryHandler != NULL) {
+        mTemporaryHandler->saveToTmp();
+    }
     BoundingBox::processSchedulers();
 }
 
 void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
     BoundingBox::renderDataFinished(renderData);
-    mTemporaryHandler->clearTmp();
+    if(mTemporaryHandler != NULL) {
+        mTemporaryHandler->clearTmp();
+    }
 }
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrame(
         const int &relFrame, BoundingBoxRenderData *data) {
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
+    if(mMainHandler == NULL) return;
     mMainHandler->getTileDrawers(&paintData->tileDrawers);
     foreach(TileSkDrawer *drawer, paintData->tileDrawers) {
         if(!drawer->finished()) {
@@ -135,15 +245,4 @@ void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
     foreach(TileSkDrawer *tile, tileDrawers) {
         tile->drawSk(canvas, &paint);
     }
-}
-
-void PaintBoxRenderData::updateRelBoundingRect() {
-    int widthT = 0;
-    int heightT = 0;
-    foreach(TileSkDrawer *tile, tileDrawers) {
-        widthT = qMax(widthT, tile->posX + TILE_DIM);
-        heightT = qMax(heightT, tile->posY + TILE_DIM);
-    }
-    relBoundingRect = QRectF(0., 0.,
-                             widthT, heightT);
 }

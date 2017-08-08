@@ -156,6 +156,17 @@ public:
 private:
     SingleSound *mTarget;
 };
+class PaintBox;
+class PaintBoxSizeUpdater : public AnimatorUpdater {
+public:
+    PaintBoxSizeUpdater(PaintBox *paintBox);
+    ~PaintBoxSizeUpdater();
 
+    void update();
+    void frameChangeUpdate();
+    void updateFinal();
+private:
+    PaintBox *mTarget;
+};
 
 #endif // ANIMATORUPDATER_H

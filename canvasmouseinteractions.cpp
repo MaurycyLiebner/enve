@@ -358,6 +358,18 @@ void Canvas::handleLeftButtonMousePress() {
                     }
                 }
             }
+        } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
+            //setCanvasMode(CanvasMode::MOVE_POINT);
+            PaintBox *paintBox = new PaintBox();
+            mCurrentBoxesGroup->addChild(paintBox);
+            paintBox->setAbsolutePos(mLastMouseEventPosRel, false);
+            clearBoxesSelection();
+            clearPointsSelection();
+            addBoxToSelection(paintBox);
+
+            mLastPressedPoint = paintBox->getBottomRightPoint();
+            addPointToSelection(mLastPressedPoint);
+            mLastPressedPoint->startTransform();
         }
     } // current mode allows interaction with points
 }
@@ -608,7 +620,8 @@ void Canvas::handleMouseRelease() {
     }
     if(!mDoubleClick) {
         if(mCurrentMode == CanvasMode::MOVE_POINT ||
-           mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+           mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
+           mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             handleMovePointMouseRelease();
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
                 mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
@@ -652,6 +665,7 @@ void Canvas::handleMouseRelease() {
 
 void Canvas::tabletEvent(QTabletEvent *e,
                          const QPointF &absPos) {
+    if(mCurrentMode != PAINT_MODE) return;
     setLastMouseEventPosAbs(absPos);
     if(e->type() == QEvent::TabletPress) {
         if(e->button() == Qt::RightButton) {
@@ -915,7 +929,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
         if(mSelecting) {
             moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||
-                  mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
+                  mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
+                  mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             handleMovePointMouseMove();
         } else if(isMovingPath()) {
             if(mLastPressedPoint == NULL) {
