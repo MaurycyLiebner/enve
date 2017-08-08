@@ -67,25 +67,26 @@ void processPaintDabs(const QList<Dab> &dabs,
                         data[id_t + 3] = alpha_sum;
                     }
                 } else {
-                    qreal alpha_sum = curr_alpha + paint_alpha;
-                    // red
-                    data[id_t] =
-                            (dab_t.red*UCHAR_MAX*paint_alpha +
-                             data[id_t]*curr_alpha)/alpha_sum;
-                    // green
-                    data[id_t + 1] =
-                            (dab_t.green*UCHAR_MAX*paint_alpha +
-                             data[id_t + 1]*curr_alpha)/alpha_sum;
                     // blue
-                    data[id_t + 2] =
-                            (dab_t.blue*UCHAR_MAX*paint_alpha +
-                             data[id_t + 2]*curr_alpha)/alpha_sum;
+                    data[id_t] = qMin(255, qMax(0, (int)
+                            ((dab_t.blue*paint_alpha*curr_alpha +
+                              dab_t.blue*paint_alpha*(UCHAR_MAX - curr_alpha) +
+                             data[id_t]*(UCHAR_MAX - paint_alpha))/UCHAR_MAX) ));
+                    // green
+                    data[id_t + 1] = qMin(255, qMax(0, (int)
+                            ((dab_t.green*paint_alpha*curr_alpha +
+                              dab_t.green*paint_alpha*(UCHAR_MAX - curr_alpha) +
+                             data[id_t + 1]*(UCHAR_MAX - paint_alpha))/UCHAR_MAX) ));
+                    // red
+                    data[id_t + 2] = qMin(255, qMax(0, (int)
+                            ((dab_t.red*paint_alpha*curr_alpha +
+                              dab_t.red*paint_alpha*(UCHAR_MAX - curr_alpha) +
+                             data[id_t + 2]*(UCHAR_MAX - paint_alpha))/UCHAR_MAX) ));
                     // alpha
-                    if(alpha_sum > UCHAR_MAX) {
-                        data[id_t + 3] = UCHAR_MAX;
-                    } else {
-                        data[id_t + 3] = alpha_sum;
-                    }
+                    data[id_t + 3] = qMin(255, qMax(0, (int)
+                            ((curr_alpha*paint_alpha +
+                              curr_alpha*(UCHAR_MAX - paint_alpha) +
+                              paint_alpha*(UCHAR_MAX - curr_alpha))/UCHAR_MAX) ));
                 }
             }
         }

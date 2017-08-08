@@ -1,20 +1,24 @@
 #include "brushsettingswidget.h"
 #include "Colors/helpers.h"
 #include <QPushButton>
+#include "Colors/ColorWidgets/colorsettingswidget.h"
 
 BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     : QWidget(parent) {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
     main_layout = new QVBoxLayout(this);
 
+    mColorSettingsWidget = new ColorSettingsWidget(this);
+    connect(mColorSettingsWidget, SIGNAL(colorSettingSignal(ColorSetting)),
+            this, SLOT(setColorSetting(ColorSetting)));
+    main_layout->addWidget(mColorSettingsWidget);
     h_layout = new QHBoxLayout();
     main_layout->addLayout(h_layout);
     labels_layout = new QVBoxLayout();
     rest_layout = new QVBoxLayout();
     h_layout->addLayout(labels_layout);
     h_layout->addLayout(rest_layout);
-    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++)
-    {
+    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
         BrushSettingWidget *setting_widget_t =
                 new BrushSettingWidget(labels_layout, rest_layout,
                                        static_cast<BrushSetting>(i),
@@ -87,8 +91,7 @@ Brush *BrushSettingsWidget::getCurrentBrush() {
 
 void BrushSettingsWidget::showHideAdvancedSettings() {
     advanced_settings_visible = !advanced_settings_visible;
-    for(int i = BRUSH_SETTING_ALPHA; i < BRUSH_SETTINGS_COUNT; i++)
-    {
+    for(int i = BRUSH_SETTING_ALPHA; i < BRUSH_SETTINGS_COUNT; i++) {
         setting_widgets.at(i)->setVisible(advanced_settings_visible);
     }
 }
@@ -108,6 +111,33 @@ void BrushSettingsWidget::overwriteBrushSettings() {
     }
 }
 
+void BrushSettingsWidget::setColorSetting(const ColorSetting &colorSetting) {
+    ColorMode colorMode = colorSetting.getSettingMode();
+    if(colorMode == ColorMode::HSVMODE) {
+        mCurrentBrush->setHSV(colorSetting.getVal1(),
+                              colorSetting.getVal2(),
+                              colorSetting.getVal3());
+    } else if(colorMode == ColorMode::HSLMODE) {
+        Color color;
+        color.setHSL(colorSetting.getVal1(),
+                     colorSetting.getVal2(),
+                     colorSetting.getVal3(),
+                     colorSetting.getAlpa());
+        mCurrentBrush->setHSV(color.gl_h,
+                              color.gl_s,
+                              color.gl_v);
+    } else if(colorMode == ColorMode::RGBMODE) {
+        Color color;
+        color.setRGB(colorSetting.getVal1(),
+                     colorSetting.getVal2(),
+                     colorSetting.getVal3(),
+                     colorSetting.getAlpa());
+        mCurrentBrush->setHSV(color.gl_h,
+                              color.gl_s,
+                              color.gl_v);
+    }
+}
+
 float BrushSettingsWidget::getBrushSetting(const BrushSetting &settind_id) {
     return setting_widgets.at(settind_id)->getVal();
 }
@@ -115,11 +145,11 @@ float BrushSettingsWidget::getBrushSetting(const BrushSetting &settind_id) {
 void BrushSettingsWidget::incBrushRadius() {
     BrushSettingWidget *setting_widget_t =
             setting_widgets.at(BRUSH_SETTING_RADIUS);
-    setting_widget_t->incVal(mCurrentBrush->getRadius()*0.2f + 0.3f);
+    setting_widget_t->incVal(mCurrentBrush->getRadius()*0.2 + 0.3);
 }
 
 void BrushSettingsWidget::decBrushRadius() {
     BrushSettingWidget *setting_widget_t =
             setting_widgets.at(BRUSH_SETTING_RADIUS);
-    setting_widget_t->incVal(-(mCurrentBrush->getRadius()*0.2f + 0.3f) );
+    setting_widget_t->incVal(-(mCurrentBrush->getRadius()*0.2 + 0.3) );
 }

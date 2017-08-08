@@ -161,9 +161,12 @@ void PaintBox::tabletEvent(const qreal &xT,
                            const bool &erase,
                            Brush *brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
+    int seedT = rand() % 1000;
+    srand(seedT);
     mMainHandler->tabletEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
                               erase, brush);
+    srand(seedT);
     mTemporaryHandler->tabletEvent(relPos.x(), relPos.y(),
                               time_stamp, pressure,
                               erase, brush);
@@ -216,9 +219,11 @@ void PaintBox::mouseMoveEvent(const qreal &xT,
                               const bool &erase,
                               Brush *brush) {
     QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
-
+    int seedT = rand() % 1000;
+    srand(seedT);
     mMainHandler->mouseMoveEvent(relPos.x(), relPos.y(),
                                  time_stamp, erase, brush);
+    srand(seedT);
     mTemporaryHandler->mouseMoveEvent(relPos.x(), relPos.y(),
                                  time_stamp, erase, brush);
 }

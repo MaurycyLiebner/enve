@@ -4,6 +4,8 @@
 #include <QWidget>
 #include "../PaintLib/brush.h"
 #include "brushsettingwidget.h"
+class ColorSettingsWidget;
+class ColorSetting;
 
 class BrushSettingsWidget : public QWidget
 {
@@ -28,7 +30,9 @@ public slots:
     void showHideAdvancedSettings();
     void openBrushSaveDialog();
     void overwriteBrushSettings();
+    void setColorSetting(const ColorSetting &colorSetting);
 private:
+    ColorSettingsWidget *mColorSettingsWidget;
     QHBoxLayout *buttons_layout = NULL;
     QPushButton *save_brush_button = NULL;
     QPushButton *overwrite_brush_settings = NULL;
