@@ -78,7 +78,7 @@ private:
 
     QHBoxLayout *mColorModeLayout = new QHBoxLayout();
     QLabel *mColorModeLabel = new QLabel("Color model:", this);
-    QComboBox *mColorModeCombo = new QComboBox(this);
+    QComboBox *mColorModeCombo;
 
     QTabWidget *mTabWidget = new QTabWidget();
     QVBoxLayout *mWidgetsLayout = new QVBoxLayout();

@@ -6,9 +6,9 @@
 #include "brushsettingwidget.h"
 class ColorSettingsWidget;
 class ColorSetting;
+class ScrollArea;
 
-class BrushSettingsWidget : public QWidget
-{
+class BrushSettingsWidget : public QWidget {
     Q_OBJECT
 public:
     explicit BrushSettingsWidget(QWidget *parent = 0);
@@ -32,6 +32,8 @@ public slots:
     void overwriteBrushSettings();
     void setColorSetting(const ColorSetting &colorSetting);
 private:
+    ScrollArea *mAdvancedArea;
+    QWidget *mAdvancedWidget;
     ColorSettingsWidget *mColorSettingsWidget;
     QHBoxLayout *buttons_layout = NULL;
     QPushButton *save_brush_button = NULL;
@@ -45,6 +47,11 @@ private:
     QHBoxLayout *h_layout = NULL;
     QVBoxLayout *labels_layout = NULL;
     QVBoxLayout *rest_layout = NULL;
+
+    QHBoxLayout *mAdvancedLayout;
+    QVBoxLayout *mAdvancedLabelsLayout = NULL;
+    QVBoxLayout *mAdvancedRestLayout = NULL;
 };
+
 
 #endif // BRUSHSETTINGSWIDGET_H

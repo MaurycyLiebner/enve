@@ -338,8 +338,8 @@ void ColorSettingsWidget::startColorPicking()
 }
 #include "actionbutton.h"
 
-ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent)
-{
+ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
+    mColorModeCombo = new QComboBox(this);
     mWidgetsLayout->setAlignment(Qt::AlignTop);
     setLayout(mWidgetsLayout);
 

@@ -2,6 +2,8 @@
 #include "Colors/helpers.h"
 #include <QPushButton>
 #include "Colors/ColorWidgets/colorsettingswidget.h"
+#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "global.h"
 
 BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     : QWidget(parent) {
@@ -16,21 +18,44 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     main_layout->addLayout(h_layout);
     labels_layout = new QVBoxLayout();
     rest_layout = new QVBoxLayout();
+
+    mAdvancedArea = new ScrollArea(this);
+    mAdvancedArea->setMinimumHeight(10*MIN_WIDGET_HEIGHT);
+    mAdvancedWidget = new QWidget(this);
+    mAdvancedArea->setWidget(mAdvancedWidget);
+
+    mAdvancedLayout = new QHBoxLayout();
+    mAdvancedLabelsLayout = new QVBoxLayout();
+    mAdvancedRestLayout = new QVBoxLayout();
+
+    mAdvancedLayout->addLayout(mAdvancedLabelsLayout);
+    mAdvancedLayout->addLayout(mAdvancedRestLayout);
+    mAdvancedWidget->setLayout(mAdvancedLayout);
+    main_layout->addWidget(mAdvancedArea);
+
     h_layout->addLayout(labels_layout);
     h_layout->addLayout(rest_layout);
-    for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
+    for(int i = 0; i < BRUSH_SETTING_ALPHA; i++) {
         BrushSettingWidget *setting_widget_t =
-                new BrushSettingWidget(labels_layout, rest_layout,
+                new BrushSettingWidget(labels_layout,
+                                       rest_layout,
                                        static_cast<BrushSetting>(i),
                                        this);
         setting_widgets.append(setting_widget_t);
-        setting_widget_t->hide();
         connect(setting_widget_t, SIGNAL(setBrushSetting(BrushSetting,qreal)),
                 this, SLOT(setBrushSetting(BrushSetting,qreal)));
     }
-    setting_widgets.at(BRUSH_SETTING_RADIUS)->show();
-    setting_widgets.at(BRUSH_SETTING_HARDNESS)->show();
-    setting_widgets.at(BRUSH_SETTING_OPACITY)->show();
+    for(int i = BRUSH_SETTING_ALPHA; i < BRUSH_SETTINGS_COUNT; i++) {
+        BrushSettingWidget *setting_widget_t =
+                new BrushSettingWidget(mAdvancedLabelsLayout,
+                                       mAdvancedRestLayout,
+                                       static_cast<BrushSetting>(i),
+                                       this);
+        setting_widgets.append(setting_widget_t);
+        connect(setting_widget_t, SIGNAL(setBrushSetting(BrushSetting,qreal)),
+                this, SLOT(setBrushSetting(BrushSetting,qreal)));
+    }
+    mAdvancedArea->hide();
     //setting_widgets.at(BRUSH_SETTING_SLOW_TRACKING)->show();
 
     buttons_layout = new QHBoxLayout();
@@ -70,18 +95,21 @@ void BrushSettingsWidget::setCurrentBrush(Brush *brushT) {
     }
 }
 
-void BrushSettingsWidget::setBrushSetting(const BrushSetting &setting_id,
-                                          const qreal &val_t) {
+void BrushSettingsWidget::setBrushSetting(
+        const BrushSetting &setting_id,
+        const qreal &val_t) {
     mCurrentBrush->setSetting(setting_id, val_t);
 }
 
-void BrushSettingsWidget::revertSettingToDefault(const BrushSetting &setting_t) {
+void BrushSettingsWidget::revertSettingToDefault(
+        const BrushSetting &setting_t) {
     setBrushWidgetSetting(setting_t,
                     mCurrentBrush->getBrushSettingInfo(setting_t)->def,
                     false);
 }
 
-bool BrushSettingsWidget::hasSettingDefaultVal(const BrushSetting &setting_t) {
+bool BrushSettingsWidget::hasSettingDefaultVal(
+        const BrushSetting &setting_t) {
     return true;
 }
 
@@ -91,9 +119,7 @@ Brush *BrushSettingsWidget::getCurrentBrush() {
 
 void BrushSettingsWidget::showHideAdvancedSettings() {
     advanced_settings_visible = !advanced_settings_visible;
-    for(int i = BRUSH_SETTING_ALPHA; i < BRUSH_SETTINGS_COUNT; i++) {
-        setting_widgets.at(i)->setVisible(advanced_settings_visible);
-    }
+    mAdvancedArea->setVisible(advanced_settings_visible);
 }
 
 void BrushSettingsWidget::openBrushSaveDialog() {
