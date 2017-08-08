@@ -20,6 +20,7 @@ class AnimationDockWidget;
 class ColorSettingsWidget;
 class FillStrokeSettingsWidget;
 class BoxesListAnimationDockWidget;
+class BrushSettingsWidget;
 class Canvas;
 class CanvasWindow;
 class MemoryHandler;
@@ -183,7 +184,9 @@ private:
     QDockWidget *mBottomDock;
     QDockWidget *mLeftDock;
     QDockWidget *mLeftDock2;
-    BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget;
+    QDockWidget *mBrushSettingsDock;
+    BoxesListAnimationDockWidget *mBoxesListAnimationDockWidget = NULL;
+    BrushSettingsWidget *mBrushSettingsWidget = NULL;
 
     QToolBar *mToolBar;
 
@@ -216,6 +219,7 @@ private:
     QAction *mFilesDock;
     QAction *mObjectsAndAnimationsDock;
     QAction *mFillAndStrokeSettingsDock;
+    QAction *mBrushSettingsDockAction;
 
     QPushButton *mNewCanvasButton;
 

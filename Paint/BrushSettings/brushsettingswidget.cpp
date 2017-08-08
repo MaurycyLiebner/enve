@@ -21,7 +21,7 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
                                        this);
         setting_widgets.append(setting_widget_t);
         setting_widget_t->hide();
-        connect(setting_widget_t, SIGNAL(setBrushSettings(BrushSetting,qreal)),
+        connect(setting_widget_t, SIGNAL(setBrushSetting(BrushSetting,qreal)),
                 this, SLOT(setBrushSetting(BrushSetting,qreal)));
     }
     setting_widgets.at(BRUSH_SETTING_RADIUS)->show();

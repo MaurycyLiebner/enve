@@ -339,6 +339,8 @@ public:
     }
 
     bool clipToCanvas() { return mClipToCanvasSize; }
+
+    Brush *getCurrentBrush();
 protected:
     void updateAfterCombinedTransformationChanged() {
 //        Q_FOREACH(BoundingBox *child, mChildBoxes) {

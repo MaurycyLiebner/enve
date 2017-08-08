@@ -20,10 +20,9 @@ PaintBox::PaintBox() :
 PaintBox::PaintBox(const ushort &canvasWidthT,
                    const ushort &canvasHeightT) :
     PaintBox() {
-    mBottomRightPoint->setRelativePos(QPointF(canvasWidthT, canvasHeightT),
-                                      false);
-    mWidth = canvasWidthT;
-    mHeight = canvasHeightT;
+    mBottomRightPoint->setCurrentPointValue(QPointF(canvasWidthT,
+                                                    canvasHeightT),
+                                            false, true);
     finishSizeSetup();
 }
 

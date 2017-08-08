@@ -32,7 +32,7 @@
 #include "Sound/singlesound.h"
 #include "BoxesList/boxsinglewidget.h"
 #include "memoryhandler.h"
-
+#include "Paint/BrushSettings/brushsettingswidget.h"
 extern "C" {
     #include <libavformat/avformat.h>
 }
@@ -105,6 +105,29 @@ MainWindow::MainWindow(QWidget *parent)
     connect(mCanvasWindow, SIGNAL(changeFrameRange(int,int)),
             mBoxesListAnimationDockWidget, SLOT(setMinMaxFrame(int,int)));
     mBottomDock->setWidget(mBoxesListAnimationDockWidget);
+
+    mBrushSettingsDock = new QDockWidget(this);
+    mBrushSettingsDock->setFeatures(mBrushSettingsDock->features().setFlag(
+                               QDockWidget::DockWidgetClosable, false));
+    mBrushSettingsDock->setMinimumWidth(MIN_WIDGET_HEIGHT*10);
+    mBrushSettingsDock->setMaximumWidth(MIN_WIDGET_HEIGHT*20);
+    QLabel *brushDockLabel = new QLabel("Brush Settings", this);
+    brushDockLabel->setStyleSheet(
+                "QLabel {"
+                    "border-top: 0;"
+                    "border-bottom: 1px solid black;"
+                    "color: black;"
+                    "background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
+                    "stop:0 lightgray, stop:1 darkgray);"
+                "}");
+    brushDockLabel->setAlignment(Qt::AlignCenter);
+    mBrushSettingsDock->setTitleBarWidget(brushDockLabel);
+
+    mBrushSettingsWidget = new BrushSettingsWidget(this);
+    mBrushSettingsDock->setWidget(mBrushSettingsWidget);
+
+    addDockWidget(Qt::LeftDockWidgetArea, mBrushSettingsDock);
+    mBrushSettingsDock->hide();
 
     mFillStrokeSettings->setCanvasWindowPtr(mCanvasWindow);
 
@@ -399,6 +422,15 @@ void MainWindow::setupMenuBar() {
             mRightDock,
             SLOT(setVisible(bool)));
 
+    mBrushSettingsDockAction = mPanelsMenu->addAction("Brush Settings");
+    mBrushSettingsDockAction->setCheckable(true);
+    mBrushSettingsDockAction->setChecked(false);
+    mBrushSettingsDockAction->setShortcut(QKeySequence(Qt::Key_B));
+
+    connect(mBrushSettingsDockAction, SIGNAL(toggled(bool)),
+            mBrushSettingsDock,
+            SLOT(setVisible(bool)));
+
     mRenderMenu = mMenuBar->addMenu("Render");
     mRenderMenu->addAction("Render",
                            this, SLOT(addCanvasToRenderQue()));
@@ -417,6 +449,7 @@ void MainWindow::addCanvasToRenderQue() {
 void MainWindow::updateSettingsForCurrentCanvas() {
     if(mCanvasWindow->hasNoCanvas()) {
         mObjectSettingsWidget->setMainTarget(NULL);
+        mBrushSettingsWidget->setCurrentBrush(NULL);
         return;
     }
     Canvas *canvas = mCanvasWindow->getCurrentCanvas();
@@ -424,6 +457,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
     mObjectSettingsWidget->setMainTarget(
                 canvas->getCurrentBoxesGroup());
+    mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
 }
 
 void MainWindow::replaceClipboard(ClipboardContainer *container) {

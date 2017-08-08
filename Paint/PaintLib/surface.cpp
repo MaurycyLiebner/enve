@@ -158,8 +158,12 @@ void Surface::strokeTo(Brush *brush,
             0.2*sqrt(stroke_vx*stroke_vx + stroke_vy*stroke_vy);
     last_event_stroke_vel = stroke_vel;
 
-    applyXYNoise(brush->getStrokePositionNoisePx(), &previous_stroke_x_noise, &next_stroke_x_noise,
-                 &previous_stroke_y_noise, &next_stroke_y_noise, brush->getStrokePositionNoiseFrequency(),
+    applyXYNoise(brush->getStrokePositionNoisePx()*mScale,
+                 &previous_stroke_x_noise,
+                 &next_stroke_x_noise,
+                 &previous_stroke_y_noise,
+                 &next_stroke_y_noise,
+                 brush->getStrokePositionNoiseFrequency(),
                  &stroke_noise_count, &x, &y);
 
     qreal dabs_to = countDabsTo(dist_between_dabs, x, y);
@@ -211,13 +215,17 @@ void Surface::strokeTo(Brush *brush,
     }
     last_stroke_beta = dest_angle;
     qreal dab_r = qMin(brush->getRadius()*5,
-                         brush->getRadius() + brush->getPressureRadiusGainPx()*pressure +
-                         brush->getSpeedRadiusGain()*stroke_vel)*mScale;
-    qreal dab_hardness = brush->getHardness() + brush->getPressureHardnessGain()*pressure +
-                                brush->getSpeedHardnessGain()*stroke_vel;
-    qreal dab_opa = brush->getOpacity() + brush->getPressureOpacityGain()*pressure +
-                                brush->getSpeedOpacityGain()*stroke_vel;
-    qreal dab_aspect_ratio = brush->getAspectRatio() + brush->getPressureAspectRatioGain()*pressure; // 1 to infinity
+                       brush->getRadius() +
+                       brush->getPressureRadiusGainPx()*pressure +
+                       brush->getSpeedRadiusGain()*stroke_vel)*mScale;
+    qreal dab_hardness = brush->getHardness() +
+            brush->getPressureHardnessGain()*pressure +
+            brush->getSpeedHardnessGain()*stroke_vel;
+    qreal dab_opa = brush->getOpacity() +
+            brush->getPressureOpacityGain()*pressure +
+            brush->getSpeedOpacityGain()*stroke_vel;
+    qreal dab_aspect_ratio = brush->getAspectRatio() +
+            brush->getPressureAspectRatioGain()*pressure; // 1 to infinity
 
     qreal smudge_red;
     qreal smudge_green;
@@ -226,17 +234,25 @@ void Surface::strokeTo(Brush *brush,
     getColor(last_painted_stroke_x, last_painted_stroke_y,
              dab_hardness, dab_opa,
              dab_aspect_ratio, dab_r, dest_angle,
-             &smudge_red, &smudge_green, &smudge_blue, &smudge_alpha);
-    brush->addPickedUpRGBAFromNewStroke(smudge_red, smudge_green, smudge_blue, smudge_alpha);
-    brush->getPickedUpRGBA(&smudge_red, &smudge_green, &smudge_blue, &smudge_alpha);
+             &smudge_red, &smudge_green,
+             &smudge_blue, &smudge_alpha);
+    brush->addPickedUpRGBAFromNewStroke(smudge_red,
+                                        smudge_green,
+                                        smudge_blue,
+                                        smudge_alpha);
+    brush->getPickedUpRGBA(&smudge_red,
+                           &smudge_green,
+                           &smudge_blue,
+                           &smudge_alpha);
 
 
     qreal stroke_red;
     qreal stroke_green;
     qreal stroke_blue;
     qreal dab_alpha;
-    bool fixed_color = isZero( brush->getHueNoise() ) && isZero(brush->getSaturationNoise() ) &&
-                            isZero( brush->getValueNoise() );
+    bool fixed_color = isZero( brush->getHueNoise() ) &&
+            isZero(brush->getSaturationNoise() ) &&
+            isZero( brush->getValueNoise() );
 
     brush->getRGBA(&stroke_red, &stroke_green, &stroke_blue, &dab_alpha);
     dab_alpha += brush->getPressureAlphaGain()*pressure;
@@ -276,8 +292,10 @@ void Surface::strokeTo(Brush *brush,
                        brush->getValueNoiseFrequency(), &value_noise_count, &dab_blue);
             qhsv_to_rgb(&dab_red, &dab_green, &dab_blue);
         }
-        qreal dab_x = first_dab_x + i*dabs_dx + getNoise(brush->getDabPositionNoisePx() ) ;
-        qreal dab_y = first_dab_y + i*dabs_dy + getNoise(brush->getDabPositionNoisePx() ) ;
+        qreal dab_x = first_dab_x + i*dabs_dx +
+                getNoise(brush->getDabPositionNoisePx()*mScale ) ;
+        qreal dab_y = first_dab_y + i*dabs_dy +
+                getNoise(brush->getDabPositionNoisePx()*mScale ) ;
         last_painted_stroke_x = dab_x;
         last_painted_stroke_y = dab_y;
         last_dab_rotation_inc += brush->getRotationBetweenDabs();
@@ -294,8 +312,10 @@ void Surface::strokeTo(Brush *brush,
         short dab_max_tile_x;
         short dab_min_tile_y;
         short dab_max_tile_y;
-        getTileIdsOnRect(dab_x_min, dab_x_max, dab_y_min, dab_y_max,
-                         &dab_min_tile_x, &dab_max_tile_x, &dab_min_tile_y, &dab_max_tile_y);
+        getTileIdsOnRect(dab_x_min, dab_x_max,
+                         dab_y_min, dab_y_max,
+                         &dab_min_tile_x, &dab_max_tile_x,
+                         &dab_min_tile_y, &dab_max_tile_y);
 
         replaceIfSmaller(dab_min_tile_x, &min_affected_tile_x);
         replaceIfSmaller(dab_min_tile_y, &min_affected_tile_y);
