@@ -884,6 +884,14 @@ void MainWindow::previewPaused() {
     mBoxesListAnimationDockWidget->previewPaused();
 }
 
+void MainWindow::incBrushRadius() {
+    mBrushSettingsWidget->incBrushRadius();
+}
+
+void MainWindow::decBrushRadius() {
+    mBrushSettingsWidget->decBrushRadius();
+}
+
 //void MainWindow::stopPreview() {
 //    mPreviewInterrupted = true;
 //    if(!mRendering) {

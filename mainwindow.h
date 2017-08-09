@@ -134,6 +134,9 @@ public:
     void unblockUndoRedo() {
         mUndoRedoStack.unblockUndoRedo();
     }
+
+    void incBrushRadius();
+    void decBrushRadius();
 public slots:
     void setCurrentFrame(int frame);
     void setAllPointsRecord(bool allPointsRecord);

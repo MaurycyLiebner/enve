@@ -60,9 +60,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
     prp_setAbsFrame(0);
 
-    BoundingBox *box = new PaintBox(640, 640);
-    addChild(box);
-    mCurrentMode = PAINT_MODE;
     mCurrentBrush = new Brush();
     //fitCanvasToSize();
     //setCanvasMode(MOVE_PATH);
@@ -965,6 +962,10 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
        } else {
            mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
        }
+    } else if(event->key() == Qt::Key_W) {
+        MainWindow::getInstance()->incBrushRadius();
+    } else if(event->key() == Qt::Key_Q) {
+        MainWindow::getInstance()->decBrushRadius();
     } else {
         return false;
     }
