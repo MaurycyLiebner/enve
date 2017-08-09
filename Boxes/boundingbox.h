@@ -299,7 +299,6 @@ public:
                               const SkScalar &invScale,
                               const bool &dashes);
 
-    virtual void setUpdateVars() {}
     void redoUpdate();
     bool shouldRedoUpdate();
     void setRedoUpdateToFalse();

@@ -18,7 +18,6 @@ ParticleBox::ParticleBox() :
 
     ca_addChildAnimator(mTopLeftPoint);
     ca_addChildAnimator(mBottomRightPoint);
-
     mTopLeftPoint->prp_setUpdater(
                 new DisplayedFillStrokeSettingsUpdater(this));
     mTopLeftPoint->prp_setName("top left");
@@ -44,7 +43,6 @@ void ParticleBox::getAccelerationAt(const QPointF &pos,
 
 void ParticleBox::prp_setAbsFrame(const int &frame) {
     BoundingBox::prp_setAbsFrame(frame);
-    mFrameChangedUpdateScheduled = true;
     scheduleUpdate();
 }
 
@@ -65,14 +63,12 @@ bool ParticleBox::relPointInsidePath(const QPointF &relPos) {
 void ParticleBox::addEmitter(ParticleEmitter *emitter) {
     mEmitters << emitter;
     ca_addChildAnimator(emitter);
-    mFrameChangedUpdateScheduled = true;
     scheduleUpdate();
 }
 
 void ParticleBox::removeEmitter(ParticleEmitter *emitter) {
     mEmitters.removeOne(emitter);
     ca_removeChildAnimator(emitter);
-    mFrameChangedUpdateScheduled = true;
     scheduleUpdate();
 }
 
@@ -106,15 +102,6 @@ void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     ParticleEmitter *emitter = new ParticleEmitter(this);
     emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos), false);
     addEmitter(emitter);
-}
-
-void ParticleBox::setUpdateVars() {
-    if(mFrameChangedUpdateScheduled) {
-        mFrameChangedUpdateScheduled = false;
-        Q_FOREACH(ParticleEmitter *emitter, mEmitters) {
-            emitter->generateParticlesIfNeeded();
-        }
-    }
 }
 
 bool ParticleBox::SWT_isParticleBox() { return true; }

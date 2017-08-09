@@ -444,7 +444,6 @@ void BoundingBox::scheduleUpdate() {
         return;
     }
     mRedoUpdate = false;
-    setUpdateVars();
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 

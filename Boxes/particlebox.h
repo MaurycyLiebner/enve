@@ -183,7 +183,6 @@ private:
     int mMinFrame = -10;
     int mMaxFrame = 200;
 
-    QList<ParticleState> mParticleStates;
     QList<Particle*> mParticles;
     QList<Particle*> mNotFinishedParticles;
     ParticleBox *mParentBox = NULL;
@@ -265,8 +264,6 @@ public:
     MovablePoint *getBottomRightPoint();
     void addEmitterAtAbsPos(const QPointF &absPos);
 
-    void setUpdateVars();
-
     bool SWT_isParticleBox();
 
     BoundingBoxRenderData *createRenderData() {
@@ -279,6 +276,7 @@ public:
         ParticleBoxRenderData *particleData = (ParticleBoxRenderData*)data;
         particleData->emittersData.clear();
         foreach(ParticleEmitter *emitter, mEmitters) {
+            emitter->generateParticlesIfNeeded();
             particleData->emittersData << emitter->getEmitterDataAtRelFrame(
                                               relFrame);
         }
@@ -297,7 +295,6 @@ public:
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:
-    bool mFrameChangedUpdateScheduled = false;
     MovablePoint *mTopLeftPoint;
     MovablePoint *mBottomRightPoint;
     QList<ParticleEmitter*> mEmitters;
