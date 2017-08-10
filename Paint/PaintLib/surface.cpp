@@ -86,7 +86,7 @@ void Surface::getColor(const qreal &cx,
                      &min_tile_x, &max_tile_x, &min_tile_y, &max_tile_y);
     for(short i = min_tile_x; i <= max_tile_x; i++) {
         for(short j = min_tile_y; j <= max_tile_y; j++) {
-            Tile *tile_t = mTiles[j][i];
+            Tile *tile_t = mCurrentTiles[j][i];
             tile_t->getColor(cx, cy,
                              r, aspect_ratio, cs, sn,
                              hardness, opa,
@@ -111,7 +111,7 @@ void Surface::getColor(const qreal &cx,
 void Surface::clear() {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->clear();
+            mCurrentTiles[j][i]->clear();
         }
     }
 }
@@ -119,7 +119,7 @@ void Surface::clear() {
 void Surface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            tileDrawers->append(mTiles[j][i]->getTexTileDrawer());
+            tileDrawers->append(mCurrentTiles[j][i]->getTexTileDrawer());
         }
     }
 }
@@ -127,7 +127,7 @@ void Surface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
 void Surface::clearTmp() {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->clearTmp();
+            mCurrentTiles[j][i]->clearTmp();
         }
     }
 }
@@ -135,7 +135,7 @@ void Surface::clearTmp() {
 void Surface::saveToTmp() {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->saveToTmp();
+            mCurrentTiles[j][i]->saveToTmp();
         }
     }
 }
@@ -350,7 +350,7 @@ void Surface::strokeTo(Brush *brush,
         //#pragma omp parallel for
         for(short tx = dab_min_tile_x; tx <= dab_max_tile_x; tx++) {
             for(short ty = dab_min_tile_y; ty <= dab_max_tile_y; ty++) {
-                mTiles[ty][tx]->addDabToDraw(dab_x, dab_y,
+                mCurrentTiles[ty][tx]->addDabToDraw(dab_x, dab_y,
                                             dab_hardness,
                                             dab_opa*alpha_sum_t,
                                             dab_aspect_ratio,
@@ -363,7 +363,7 @@ void Surface::strokeTo(Brush *brush,
 
     for(short tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++) {
         for(short ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++) {
-            mTiles[ty][tx]->addScheduler();
+            mCurrentTiles[ty][tx]->addScheduler();
         }
     }
 
@@ -413,7 +413,7 @@ void Surface::startNewStroke(Brush *brush,
 
 Tile *Surface::getTile(const ushort &tile_col,
                        const ushort &tile_row) {
-    return mTiles[tile_row][tile_col];
+    return mCurrentTiles[tile_row][tile_col];
 }
 
 void Surface::setSize(const ushort &width_t,
@@ -430,7 +430,7 @@ void Surface::setSize(const ushort &width_t,
         if(rw < mNTileRows) {
             first_new_col_in_row = mNTileCols;
             for(ushort cl = 0; cl < mNTileCols; cl++) {
-                Tile *tile_t = mTiles[rw][cl];
+                Tile *tile_t = mCurrentTiles[rw][cl];
                 if(cl < n_tile_cols_t) {
                     tile_t->resetTileSize();
                     tiles_t[rw][cl] = tile_t;
@@ -438,7 +438,7 @@ void Surface::setSize(const ushort &width_t,
                     delete tile_t;
                 }
             }
-            delete[] mTiles[rw];
+            delete[] mCurrentTiles[rw];
         }
 
         for(ushort cl = first_new_col_in_row; cl < n_tile_cols_t; cl++) {
@@ -447,11 +447,11 @@ void Surface::setSize(const ushort &width_t,
         }
 
     }
-    if(mTiles != NULL) {
-        delete[] mTiles;
+    if(mCurrentTiles != NULL) {
+        delete[] mCurrentTiles;
     }
 
-    mTiles = tiles_t;
+    mCurrentTiles = tiles_t;
     mWidth = width_t;
     mHeight = height_t;
     mNTileRows = n_tile_rows_t;
@@ -461,13 +461,13 @@ void Surface::setSize(const ushort &width_t,
     ushort last_row_height = mHeight%TILE_DIM;
     if(last_row_height != 0) {
         for(int i = 0; i < mNTileCols; i++) {
-            mTiles[mNTileRows - 1][i]->setTileHeight(last_row_height);
+            mCurrentTiles[mNTileRows - 1][i]->setTileHeight(last_row_height);
         }
     }
     ushort last_column_width = mWidth%TILE_DIM;
     if(last_column_width != 0) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][mNTileCols - 1]->setTileWidth(last_column_width);
+            mCurrentTiles[j][mNTileCols - 1]->setTileWidth(last_column_width);
         }
     }
 }

@@ -185,7 +185,8 @@ SOURCES += main.cpp\
     Paint/PaintLib/brush.cpp \
     Paint/PaintLib/surface.cpp \
     Paint/PaintLib/tile.cpp \
-    Boxes/paintbox.cpp
+    Boxes/paintbox.cpp \
+    Paint/PaintLib/animatedsurface.cpp
 
 HEADERS  += mainwindow.h \
     pathpoint.h \
@@ -331,7 +332,8 @@ HEADERS  += mainwindow.h \
     Paint/PaintLib/brush.h \
     Paint/PaintLib/surface.h \
     Paint/PaintLib/tile.h \
-    Boxes/paintbox.h
+    Boxes/paintbox.h \
+    Paint/PaintLib/animatedsurface.h
 
 RESOURCES += \
     resources.qrc

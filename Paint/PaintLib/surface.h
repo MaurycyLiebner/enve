@@ -45,7 +45,7 @@ public:
         canvas->scale(4., 4.);
         for(int i = 0; i < mNTileCols; i++) {
             for(int j = 0; j < mNTileRows; j++) {
-                mTiles[j][i]->drawSk(canvas, paint);
+                mCurrentTiles[j][i]->drawSk(canvas, paint);
             }
         }
     }
@@ -92,7 +92,7 @@ public:
     void setBackgroundColorHSV(const qreal &h_t,
                                const qreal &s_t,
                                const qreal &v_t);
-private:
+protected:
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;
     Color mBackgroundColor = Color(1.f, 1.f, 1.f);
@@ -148,7 +148,7 @@ private:
     ushort mHeight = 0;
     ushort mNTileCols = 0;
     ushort mNTileRows = 0;
-    Tile ***mTiles = NULL;
+    Tile ***mCurrentTiles = NULL;
     void getTileIdsOnRect(const qreal &x_min,
                           const qreal &x_max,
                           const qreal &y_min,
