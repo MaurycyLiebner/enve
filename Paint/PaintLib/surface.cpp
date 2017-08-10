@@ -9,7 +9,7 @@ Surface::Surface(const ushort &width_t,
                  const qreal &scale,
                  const bool &paintOnOtherThread) {
     mScale = scale;
-    mPaintInOtherThread = paintOnOtherThread;
+    mPaintOnOtherThread = paintOnOtherThread;
     setSize(width_t, height_t);
 }
 
@@ -443,7 +443,7 @@ void Surface::setSize(const ushort &width_t,
 
         for(ushort cl = first_new_col_in_row; cl < n_tile_cols_t; cl++) {
             tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM,
-                                       mPaintInOtherThread);
+                                       mPaintOnOtherThread);
         }
 
     }
@@ -470,5 +470,84 @@ void Surface::setSize(const ushort &width_t,
             mTiles[j][mNTileCols - 1]->setTileWidth(last_column_width);
         }
     }
+}
 
+void Surface::setBackgroundMode(
+        const CanvasBackgroundMode &bg_mode_t) {
+    mBackgroudMode = bg_mode_t;
+}
+
+void Surface::backgroundImgFromFile(
+        const QString &file_name) {
+
+}
+
+void Surface::setBackgroundColorRGB(const qreal &r_t,
+                                          const qreal &g_t,
+                                          const qreal &b_t) {
+    mBackgroundColor.setRGB(r_t, g_t, b_t);
+}
+
+void Surface::setBackgroundColorHSV(const qreal &h_t,
+                                          const qreal &s_t,
+                                          const qreal &v_t) {
+    mBackgroundColor.setHSV(h_t, s_t, v_t);
+}
+
+void Surface::paintPress(const qreal &xT,
+                               const qreal &yT,
+                               const ulong &timestamp,
+                               const qreal &pressure,
+                               Brush *brush) {
+    mousePressEvent(xT, yT, timestamp, pressure, brush);
+}
+
+void Surface::tabletEvent(const qreal &xT,
+                                const qreal &yT,
+                                const ulong &time_stamp,
+                                const qreal &pressure,
+                                const bool &erase,
+                                Brush *brush) {
+    Q_UNUSED(time_stamp);
+    strokeTo(brush,
+             xT, yT,
+             pressure, 100,
+             erase);
+}
+
+void Surface::tabletReleaseEvent() {
+}
+
+void Surface::tabletPressEvent(const qreal &xT,
+                               const qreal &yT,
+                               const ulong &time_stamp,
+                               const qreal &pressure,
+                               const bool &erase,
+                               Brush *brush) {
+    startNewStroke(brush, xT, yT, pressure);
+    tabletEvent(xT, yT, time_stamp, pressure, erase, brush);
+}
+
+void Surface::mouseReleaseEvent() {
+    tabletReleaseEvent();
+}
+
+void Surface::mousePressEvent(const qreal &xT,
+                                    const qreal &yT,
+                                    const ulong &timestamp,
+                                    const qreal &pressure,
+                                    Brush *brush) {
+    tabletPressEvent(xT, yT,
+                     timestamp, pressure,
+                     false, brush);
+}
+
+void Surface::mouseMoveEvent(const qreal &xT,
+                                   const qreal &yT,
+                                   const ulong &time_stamp,
+                                   const bool &erase,
+                                   Brush *brush) {
+    tabletEvent(xT, yT,
+                time_stamp, 1.0,
+                erase, brush);
 }

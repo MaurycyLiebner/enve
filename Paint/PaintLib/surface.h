@@ -3,7 +3,15 @@
 #include <stdlib.h>
 #include "tile.h"
 #include "brush.h"
+#include "Colors/color.h"
 #include <png++/png.hpp>
+
+enum CanvasBackgroundMode {
+    CANVAS_BACKGROUND_COLOR,
+    CANVAS_BACKGROUND_STRETCHED_IMAGE,
+    CANVAS_BACKGROND_REPEATED_IMAGE,
+    CANVAS_BACKGROUND_GRID
+};
 
 class Surface {
 public:
@@ -46,9 +54,51 @@ public:
     void saveToTmp();
     void setSize(const ushort &width_t,
                  const ushort &height_t);
+    void paintPress(const qreal &xT,
+                    const qreal &yT,
+                    const ulong &timestamp,
+                    const qreal &pressure,
+                    Brush *brush);
+    void tabletEvent(const qreal &xT,
+                     const qreal &yT,
+                     const ulong &time_stamp,
+                     const qreal &pressure,
+                     const bool &erase,
+                     Brush *brush);
+    void tabletReleaseEvent();
+    void tabletPressEvent(const qreal &xT,
+                          const qreal &yT,
+                          const ulong &time_stamp,
+                          const qreal &pressure,
+                          const bool &erase,
+                          Brush *brush);
+    void mouseReleaseEvent();
+    void mousePressEvent(const qreal &xT,
+                         const qreal &yT,
+                         const ulong &timestamp,
+                         const qreal &pressure,
+                         Brush *brush);
+    void mouseMoveEvent(const qreal &xT,
+                        const qreal &yT,
+                        const ulong &time_stamp,
+                        const bool &erase,
+                        Brush *brush);
+    void setBackgroundMode(
+            const CanvasBackgroundMode &bg_mode_t);
+    void backgroundImgFromFile(const QString &file_name);
+    void setBackgroundColorRGB(const qreal &r_t,
+                               const qreal &g_t,
+                               const qreal &b_t);
+    void setBackgroundColorHSV(const qreal &h_t,
+                               const qreal &s_t,
+                               const qreal &v_t);
 private:
+    CanvasBackgroundMode mBackgroudMode =
+            CANVAS_BACKGROUND_COLOR;
+    Color mBackgroundColor = Color(1.f, 1.f, 1.f);
+
     qreal mScale = 1.;
-    bool mPaintInOtherThread = true;
+    bool mPaintOnOtherThread = true;
     qreal countDabsTo(const qreal &dist_between_dabs,
                       const qreal &x, const qreal &y);
     Tile *getTile(const ushort &tile_col,

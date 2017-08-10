@@ -1,5 +1,5 @@
 #include "paintbox.h"
-#include "Paint/layer.h"
+#include "Paint/PaintLib/surface.h"
 #include "canvas.h"
 #include "Animators/animatorupdater.h"
 
@@ -97,14 +97,14 @@ void PaintBox::finishSizeSetup() {
     mWidth = widthT;
     mHeight = heightT;
     if(mMainHandler == NULL) {
-        mMainHandler = new CanvasHandler(mWidth, mHeight,
-                                         1., true);
+        mMainHandler = new Surface(mWidth, mHeight,
+                                   1., true);
     } else {
         mMainHandler->setSize(mWidth, mHeight);
     }
     if(mTemporaryHandler == NULL) {
-        mTemporaryHandler = new CanvasHandler(mWidth/4, mHeight/4,
-                                              0.25, false);
+        mTemporaryHandler = new Surface(mWidth/4, mHeight/4,
+                                        0.25, false);
     } else {
         mTemporaryHandler->setSize(mWidth/4, mHeight/4);
     }

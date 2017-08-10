@@ -21,6 +21,7 @@
 #include "Animators/animatorupdater.h"
 #include "clipboardcontainer.h"
 #include "Boxes/paintbox.h"
+#include "Paint/PaintLib/brush.h"
 
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWindow *canvasWidget,

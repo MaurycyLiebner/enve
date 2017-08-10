@@ -1,8 +1,9 @@
 #ifndef PAINTBOX_H
 #define PAINTBOX_H
 #include "boundingbox.h"
-#include "Paint/canvashandler.h"
 struct TileSkDrawer;
+class Surface;
+class Brush;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
     PaintBoxRenderData(BoundingBox *parentBoxT) :
@@ -89,8 +90,8 @@ private:
     MovablePoint *mBottomRightPoint = NULL;
     ushort mWidth = 0;
     ushort mHeight = 0;
-    CanvasHandler *mMainHandler = NULL;
-    CanvasHandler *mTemporaryHandler = NULL;
+    Surface *mMainHandler = NULL;
+    Surface *mTemporaryHandler = NULL;
 };
 
 #endif // PAINTBOX_H
