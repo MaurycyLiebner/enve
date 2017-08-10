@@ -186,7 +186,6 @@ SOURCES += main.cpp\
     Paint/PaintLib/surface.cpp \
     Paint/PaintLib/tile.cpp \
     Paint/canvashandler.cpp \
-    Paint/layer.cpp \
     Boxes/paintbox.cpp
 
 HEADERS  += mainwindow.h \
@@ -334,7 +333,6 @@ HEADERS  += mainwindow.h \
     Paint/PaintLib/surface.h \
     Paint/PaintLib/tile.h \
     Paint/canvashandler.h \
-    Paint/layer.h \
     Boxes/paintbox.h
 
 RESOURCES += \
