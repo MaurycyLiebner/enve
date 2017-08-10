@@ -21,14 +21,14 @@ qreal Surface::countDabsTo(const qreal &dist_between_dabs,
     return sqrt(dx*dx + dy*dy)/dist_between_dabs;
 }
 
-void replaceIfSmaller(short potentially_smaller,
+void replaceIfSmaller(const short &potentially_smaller,
                       short *to_be_replaced) {
     if(potentially_smaller < *to_be_replaced) {
         *to_be_replaced = potentially_smaller;
     }
 }
 
-void replaceIfBigger(short potentially_bigger,
+void replaceIfBigger(const short &potentially_bigger,
                      short *to_be_replaced) {
     if(potentially_bigger > *to_be_replaced) {
         *to_be_replaced = potentially_bigger;
@@ -108,12 +108,9 @@ void Surface::getColor(const qreal &cx,
     }
 }
 
-void Surface::clear()
-{
-    for(int i = 0; i < mNTileCols; i++)
-    {
-        for(int j = 0; j < mNTileRows; j++)
-        {
+void Surface::clear() {
+    for(int i = 0; i < mNTileCols; i++) {
+        for(int j = 0; j < mNTileRows; j++) {
             mTiles[j][i]->clear();
         }
     }
@@ -150,7 +147,8 @@ void Surface::strokeTo(Brush *brush,
                        const bool &erase) {
     x *= mScale;
     y *= mScale;
-    qreal dist_between_dabs = brush->getDistBetweenDabsPx()*mScale;
+    qreal dist_between_dabs =
+            brush->getDistBetweenDabsPx()*mScale;
     qreal stroke_dx = x - mLastEventStrokeX;
     qreal stroke_dy = y - mLastEventStrokeY;
     mLastEventStrokeX = x;
@@ -158,7 +156,8 @@ void Surface::strokeTo(Brush *brush,
     qreal stroke_vx = stroke_dx*50/dt;
     qreal stroke_vy = stroke_dy*50/dt;
     qreal stroke_vel = mLastEventStrokeVel*0.8 +
-            0.2*sqrt(stroke_vx*stroke_vx + stroke_vy*stroke_vy);
+            0.2*sqrt(stroke_vx*stroke_vx +
+                     stroke_vy*stroke_vy);
     mLastEventStrokeVel = stroke_vel;
 
     applyXYNoise(brush->getStrokePositionNoisePx()*mScale,
@@ -177,13 +176,15 @@ void Surface::strokeTo(Brush *brush,
     qreal dabs_dy = first_dab_dy;
 
     if(isZero(first_dab_dx) && isZero(first_dab_dy)) {
-        first_dab_dx = 0.f;
-        first_dab_dy = 0.f;
-        dabs_dx = 0.f;
-        dabs_dy = 0.f;
+        first_dab_dx = 0.;
+        first_dab_dy = 0.;
+        dabs_dx = 0.;
+        dabs_dy = 0.;
     } else {
-        normalize(&first_dab_dx, &first_dab_dy, dist_between_dabs );
-        normalize(&dabs_dx, &dabs_dy, dist_between_dabs );
+        normalize(&first_dab_dx, &first_dab_dy,
+                  dist_between_dabs);
+        normalize(&dabs_dx, &dabs_dy,
+                  dist_between_dabs);
     }
     qreal first_dab_x = mLastPaintedStrokeX + first_dab_dx;
     qreal first_dab_y = mLastPaintedStrokeY + first_dab_dy;
@@ -196,31 +197,35 @@ void Surface::strokeTo(Brush *brush,
     short dabs_to_i = floor(dabs_to);
     if(dabs_to_i <= 0) return;
     qreal rotation_delay = brush->getRotationDelay();
-    qreal angle_t = getAngleDeg(x - mLastPaintedStrokeX, y - mLastPaintedStrokeY, 0.f, -1.f);
-    if(angle_t > 180.f) {
-        angle_t -= 180.f;
-    } else if(angle_t < 0.f) {
-        angle_t += 180.f;
+    qreal angle_t =
+            getAngleDeg(x - mLastPaintedStrokeX,
+                        y - mLastPaintedStrokeY, 0., -1.);
+    if(angle_t > 180.) {
+        angle_t -= 180.;
+    } else if(angle_t < 0.) {
+        angle_t += 180.;
     }
     qreal angle_diff = fabs(angle_t - mLastStrokeBeta);
     qreal dest_angle;
-    if(angle_diff > 120.f) {
+    if(angle_diff > 120.) {
         dest_angle = angle_t;
     } else {
-        dest_angle = angle_t*(1 - rotation_delay)*brush->getRotationInfluence() +
-                             mLastStrokeBeta*rotation_delay;
+        dest_angle = angle_t*(1 - rotation_delay)*
+                brush->getRotationInfluence() +
+                mLastStrokeBeta*rotation_delay;
     }
 
-    if(dest_angle > 180.f) {
-        dest_angle -= 180.f;
-    } else if(dest_angle < 0.f) {
-        dest_angle += 180.f;
+    if(dest_angle > 180.) {
+        dest_angle -= 180.;
+    } else if(dest_angle < 0.) {
+        dest_angle += 180.;
     }
     mLastStrokeBeta = dest_angle;
-    qreal dab_r = qMin(brush->getRadius()*5,
-                       brush->getRadius() +
-                       brush->getPressureRadiusGainPx()*pressure +
-                       brush->getSpeedRadiusGain()*stroke_vel)*mScale;
+    qreal dab_r =
+       qMin(brush->getRadius()*5,
+            brush->getRadius() +
+            brush->getPressureRadiusGainPx()*pressure +
+            brush->getSpeedRadiusGain()*stroke_vel)*mScale;
     qreal dab_hardness = brush->getHardness() +
             brush->getPressureHardnessGain()*pressure +
             brush->getSpeedHardnessGain()*stroke_vel;
@@ -228,7 +233,7 @@ void Surface::strokeTo(Brush *brush,
             brush->getPressureOpacityGain()*pressure +
             brush->getSpeedOpacityGain()*stroke_vel;
     qreal dab_aspect_ratio = brush->getAspectRatio() +
-            brush->getPressureAspectRatioGain()*pressure; // 1 to infinity
+            brush->getPressureAspectRatioGain()*pressure;
 
     qreal smudge_red;
     qreal smudge_green;
@@ -253,19 +258,25 @@ void Surface::strokeTo(Brush *brush,
     qreal stroke_green;
     qreal stroke_blue;
     qreal dab_alpha;
-    bool fixed_color = isZero( brush->getHueNoise() ) &&
-            isZero(brush->getSaturationNoise() ) &&
-            isZero( brush->getValueNoise() );
+    bool fixed_color = isZero(brush->getHueNoise()) &&
+            isZero(brush->getSaturationNoise()) &&
+            isZero(brush->getValueNoise());
 
-    brush->getRGBA(&stroke_red, &stroke_green, &stroke_blue, &dab_alpha);
+    brush->getRGBA(&stroke_red,
+                   &stroke_green,
+                   &stroke_blue,
+                   &dab_alpha);
     dab_alpha += brush->getPressureAlphaGain()*pressure;
 
     qreal alpha_sum_t = dab_alpha + smudge_alpha;
-    stroke_red = (stroke_red*dab_alpha + smudge_alpha*smudge_red)/alpha_sum_t;
-    stroke_green = (stroke_green*dab_alpha + smudge_alpha*smudge_green)/alpha_sum_t;
-    stroke_blue = (stroke_blue*dab_alpha + smudge_alpha*smudge_blue)/alpha_sum_t;
-    if(alpha_sum_t > 1.f) {
-        alpha_sum_t = 1.f;
+    stroke_red = (stroke_red*dab_alpha +
+                  smudge_alpha*smudge_red)/alpha_sum_t;
+    stroke_green = (stroke_green*dab_alpha +
+                    smudge_alpha*smudge_green)/alpha_sum_t;
+    stroke_blue = (stroke_blue*dab_alpha +
+                   smudge_alpha*smudge_blue)/alpha_sum_t;
+    if(alpha_sum_t > 1.) {
+        alpha_sum_t = 1.;
     }
 
     qreal dab_red = stroke_red;
@@ -285,20 +296,29 @@ void Surface::strokeTo(Brush *brush,
     for(short i = 0; i < dabs_to_i; i++) {
         if(!fixed_color) {
             dab_red = stroke_h;
-            applyNoise(brush->getHueNoise(), &mPreviousHueNoise, &mNextHueNoise,
-                       brush->getHueNoiseFrequency(), &mHueNoiseCount, &dab_red);
+            applyNoise(brush->getHueNoise(),
+                       &mPreviousHueNoise,
+                       &mNextHueNoise,
+                       brush->getHueNoiseFrequency(),
+                       &mHueNoiseCount, &dab_red);
             dab_green = stroke_s;
-            applyNoise(brush->getSaturationNoise(), &mPreviousSaturationNoise, &mNextSaturationNoise,
-                       brush->getSaturationNoiseFrequency(), &mSaturationNoiseCount, &dab_green);
+            applyNoise(brush->getSaturationNoise(),
+                       &mPreviousSaturationNoise,
+                       &mNextSaturationNoise,
+                       brush->getSaturationNoiseFrequency(),
+                       &mSaturationNoiseCount, &dab_green);
             dab_blue = stroke_v;
-            applyNoise(brush->getValueNoise(), &mPreviousValueNoise, &mNextValueNoise,
-                       brush->getValueNoiseFrequency(), &mValueNoiseCount, &dab_blue);
+            applyNoise(brush->getValueNoise(),
+                       &mPreviousValueNoise,
+                       &mNextValueNoise,
+                       brush->getValueNoiseFrequency(),
+                       &mValueNoiseCount, &dab_blue);
             qhsv_to_rgb(&dab_red, &dab_green, &dab_blue);
         }
         qreal dab_x = first_dab_x + i*dabs_dx +
-                getNoise(brush->getDabPositionNoisePx()*mScale ) ;
+                getNoise(brush->getDabPositionNoisePx()*mScale);
         qreal dab_y = first_dab_y + i*dabs_dy +
-                getNoise(brush->getDabPositionNoisePx()*mScale ) ;
+                getNoise(brush->getDabPositionNoisePx()*mScale);
         mLastPaintedStrokeX = dab_x;
         mLastPaintedStrokeY = dab_y;
         mLastDabRotationInc += brush->getRotationBetweenDabs();
@@ -356,38 +376,38 @@ void Surface::startNewStroke(Brush *brush,
     x *= mScale;
     y *= mScale;
     mStrokeNoiseCount = UCHAR_MAX;
-    mPreviousStrokeXNoise = 0.f;
-    mPreviousStrokeYNoise = 0.f;
-    mNextStrokeXNoise = 0.f;
-    mNextStrokeYNoise = 0.f;
+    mPreviousStrokeXNoise = 0.;
+    mPreviousStrokeYNoise = 0.;
+    mNextStrokeXNoise = 0.;
+    mNextStrokeYNoise = 0.;
 
     mRotationNoiseCount = UCHAR_MAX;
-    mPreviousRotationNoise = 0.f;
-    mNextRotationNoise = 0.f;
+    mPreviousRotationNoise = 0.;
+    mNextRotationNoise = 0.;
 
     mHueNoiseCount = UCHAR_MAX;
-    mPreviousHueNoise = 0.f;
-    mNextHueNoise = 0.f;
+    mPreviousHueNoise = 0.;
+    mNextHueNoise = 0.;
 
     mSaturationNoiseCount = UCHAR_MAX;
-    mPreviousSaturationNoise = 0.f;
-    mNextSaturationNoise = 0.f;
+    mPreviousSaturationNoise = 0.;
+    mNextSaturationNoise = 0.;
 
     mValueNoiseCount = UCHAR_MAX;
-    mPreviousValueNoise = 0.f;
-    mNextValueNoise = 0.f;
+    mPreviousValueNoise = 0.;
+    mNextValueNoise = 0.;
 
     mLastEventStrokeX = x;
     mLastEventStrokeY = y;
     mLastPaintedStrokeX = x;
     mLastPaintedStrokeY = y;
-    mLastXSpeedOffset = 0.f;
-    mLastYSpeedOffset = 0.f;
+    mLastXSpeedOffset = 0.;
+    mLastYSpeedOffset = 0.;
     mLastStrokePress = pressure;
     brush->resetPickedUpRGBA();
 
-    mNextSecondColorAlpha = 0.f;
-    mPreviousSecondColorAlpha = 0.f;
+    mNextSecondColorAlpha = 0.;
+    mPreviousSecondColorAlpha = 0.;
     mSecondColorAlphaCount = UCHAR_MAX;
 }
 
@@ -438,13 +458,13 @@ void Surface::setSize(const ushort &width_t,
     mNTileCols = n_tile_cols_t;
 
 
-    GLushort last_row_height = mHeight%TILE_DIM;
+    ushort last_row_height = mHeight%TILE_DIM;
     if(last_row_height != 0) {
         for(int i = 0; i < mNTileCols; i++) {
             mTiles[mNTileRows - 1][i]->setTileHeight(last_row_height);
         }
     }
-    GLushort last_column_width = mWidth%TILE_DIM;
+    ushort last_column_width = mWidth%TILE_DIM;
     if(last_column_width != 0) {
         for(int j = 0; j < mNTileRows; j++) {
             mTiles[j][mNTileCols - 1]->setTileWidth(last_column_width);
