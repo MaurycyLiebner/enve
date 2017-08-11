@@ -1336,8 +1336,9 @@ void MainWindow::loadAllGradientsFromSql() {
     if(query.exec(queryStr) ) {
         int idId = query.record().indexOf("id");
         while(query.next() ) {
-            mLoadedGradientsList <<
-                new Gradient(query.value(idId).toInt());
+            Gradient *gradT = new Gradient(query.value(idId).toInt());
+            mLoadedGradientsList << gradT;
+            mFillStrokeSettings->getGradientWidget()->addGradientToList(gradT);
         }
     } else {
         qDebug() << "Could not load gradients";

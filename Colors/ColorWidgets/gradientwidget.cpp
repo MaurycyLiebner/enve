@@ -58,15 +58,15 @@ void GradientWidget::addGradientToList(Gradient *gradient) {
     updateNumberOfGradients();
 }
 
-void GradientWidget::newGradient(Color color1, Color color2) {
+void GradientWidget::newGradient(const Color &color1,
+                                 const Color &color2) {
     Gradient *newGradient = new Gradient(color1, color2);
     addGradientToList(newGradient);
     setCurrentGradient(newGradient);
     updateAll();
 }
 
-void GradientWidget::newGradient(int fromGradientId)
-{
+void GradientWidget::newGradient(const int &fromGradientId) {
     Gradient *fromGradient = mGradients.at(fromGradientId).data();
     Gradient *newGradient = (Gradient*)fromGradient->makeDuplicate();
     addGradientToList(newGradient);

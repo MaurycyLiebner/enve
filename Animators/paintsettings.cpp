@@ -278,12 +278,14 @@ int Gradient::saveToSql(QSqlQuery *query, const int &parentId) {
     int posInGradient = 0;
     Q_FOREACH(ColorAnimator *color, mColors) {
         int colorId = color->saveToSql(query);
-        query->exec(QString("INSERT INTO gradientcolor "
+        if(!query->exec(QString("INSERT INTO gradientcolor "
                             "(colorid, gradientid, positioningradient) "
                             "VALUES (%1, %2, %3)").
                     arg(colorId).
                     arg(mSqlId).
-                    arg(posInGradient) );
+                    arg(posInGradient) )) {
+            qDebug() << "Could not save gradientcolor";
+        }
         posInGradient++;
     }
     return mSqlId;

@@ -872,6 +872,7 @@ Canvas *CanvasWindow::loadCanvasesFromSql() {
             int boundingBoxId = query.value("boundingboxid").toInt();
             qreal fps = query.value("fps").toDouble();
             int colorId = query.value("colorid").toInt();
+            bool clipToCanvas = query.value("cliptocanvas").toBool();
 
             Canvas *canvas =
                     new Canvas(MainWindow::getInstance()->getFillStrokeSettings(),
@@ -879,6 +880,7 @@ Canvas *CanvasWindow::loadCanvasesFromSql() {
                                width, height,
                                frameCount,
                                fps);
+            canvas->setClipToCanvas(clipToCanvas);
             canvas->loadFromSql(boundingBoxId,
                                 colorId);
             MainWindow::getInstance()->addCanvas(canvas);

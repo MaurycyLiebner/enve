@@ -20,9 +20,9 @@ public:
 
     void moveColor(const int &x);
 
-    void newGradient(Color color1 = Color(0.f, 0.f, 0.f, 1.f),
-                     Color color2 = Color(0.f, 0.f, 0.f, 0.f));
-    void newGradient(int fromGradientId);
+    void newGradient(const Color &color1 = Color(0.f, 0.f, 0.f, 1.f),
+                     const Color &color2 = Color(0.f, 0.f, 0.f, 0.f));
+    void newGradient(const int &fromGradientId);
     void removeGradient(int gradientId);
 
     void finishGradientTransform();

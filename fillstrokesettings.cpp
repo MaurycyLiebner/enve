@@ -303,8 +303,7 @@ void FillStrokeSettingsWidget::setCurrentSettings(
             this, SLOT(setStrokeWidth(qreal)));
 }
 
-void FillStrokeSettingsWidget::saveGradientsToQuery(QSqlQuery *query)
-{
+void FillStrokeSettingsWidget::saveGradientsToQuery(QSqlQuery *query) {
     mGradientWidget->saveGradientsToQuery(query);
 }
 

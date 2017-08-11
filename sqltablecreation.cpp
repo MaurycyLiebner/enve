@@ -118,6 +118,7 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "framecount INTEGER, "
                "fps REAl, "
                "colorid INTEGER, "
+               "cliptocanvas BOOLEAN, "
                "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 

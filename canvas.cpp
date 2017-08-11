@@ -163,14 +163,15 @@ int Canvas::saveToSql(QSqlQuery *query, const int &parentId) {
                         "(boundingboxid, "
                         "width, height, "
                         "framecount, fps, "
-                        "colorid) VALUES "
-                        "(%1, %2, %3, %4, %5, %6)").
+                        "colorid, cliptocanvas) VALUES "
+                        "(%1, %2, %3, %4, %5, %6, %7)").
                 arg(boundingBoxId).
                 arg(mWidth).
                 arg(mHeight).
                 arg(mMaxFrame).
                 arg(mFps).
-                arg(colorId));
+                arg(colorId).
+                arg(boolToSql(mClipToCanvasSize)));
     return boundingBoxId;
 }
 
