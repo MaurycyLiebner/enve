@@ -116,6 +116,9 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "width INTEGER, "
                "height INTEGER, "
                "framecount INTEGER, "
+               "fps REAl, "
+               "colorid INTEGER, "
+               "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
 
     query->exec("CREATE TABLE pathbox "

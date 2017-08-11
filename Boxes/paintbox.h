@@ -4,6 +4,7 @@
 struct TileSkDrawer;
 class Surface;
 class Brush;
+class AnimatedSurface;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
     PaintBoxRenderData(BoundingBox *parentBoxT) :
@@ -27,6 +28,8 @@ public:
         mWidth = width;
         mHeight = height;
     }
+
+    void prp_setAbsFrame(const int &frame);
 
     void finishSizeSetup();
     bool SWT_isPaintBox() { return true; }
@@ -85,12 +88,14 @@ public:
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
     void startAllPointsTransform();
+
+    void newPaintFrameOnCurrentFrame();
 private:
     MovablePoint *mTopLeftPoint = NULL;
     MovablePoint *mBottomRightPoint = NULL;
     ushort mWidth = 0;
     ushort mHeight = 0;
-    Surface *mMainHandler = NULL;
+    AnimatedSurface *mMainHandler = NULL;
     Surface *mTemporaryHandler = NULL;
 };
 

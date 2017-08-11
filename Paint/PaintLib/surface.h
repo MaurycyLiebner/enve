@@ -39,10 +39,10 @@ public:
 
     void clear();
 
-    void getTileDrawers(QList<TileSkDrawer *> *tileDrawers);
+    virtual void getTileDrawers(QList<TileSkDrawer *> *tileDrawers);
 
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
-        canvas->scale(4., 4.);
+        canvas->scale(1./mScale, 1./mScale);
         for(int i = 0; i < mNTileCols; i++) {
             for(int j = 0; j < mNTileRows; j++) {
                 mCurrentTiles[j][i]->drawSk(canvas, paint);
@@ -52,8 +52,8 @@ public:
 
     void clearTmp();
     void saveToTmp();
-    void setSize(const ushort &width_t,
-                 const ushort &height_t);
+    virtual void setSize(const ushort &width_t,
+                         const ushort &height_t);
     void paintPress(const qreal &xT,
                     const qreal &yT,
                     const ulong &timestamp,
@@ -92,6 +92,7 @@ public:
     void setBackgroundColorHSV(const qreal &h_t,
                                const qreal &s_t,
                                const qreal &v_t);
+    void clearTiles(Tile ***tiles);
 protected:
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;

@@ -394,10 +394,11 @@ void BoxesListAnimationDockWidget::setRenderMode() {
     mTimelineWidget->hide();
 }
 
-void BoxesListAnimationDockWidget::setCurrentFrame(int frame) {
+void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
     mAnimationWidgetScrollbar->setFirstViewedFrame(frame);
     mAnimationWidgetScrollbar->emitChange();
     mAnimationWidgetScrollbar->update();
+    mRenderWidget->setRenderedFrame(frame);
 }
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(

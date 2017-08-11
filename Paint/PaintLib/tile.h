@@ -70,6 +70,7 @@ struct TileSkDrawer : public Updatable {
     ushort posY;
     ushort maxPaintY = 0;
     ushort maxPaintX = 0;
+    uchar alpha = 255;
 };
 
 class Tile {

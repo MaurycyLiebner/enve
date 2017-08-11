@@ -634,6 +634,7 @@ void CanvasWindow::renderOutput() {
 }
 
 void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
+    mCurrentRenderSettings = settings;
     Canvas *canvas = settings->getTargetCanvas();
     const QString &destination = settings->getOutputDestination();
     setCurrentCanvas(canvas);
@@ -839,6 +840,7 @@ void CanvasWindow::nextSaveOutputFrame() {
     mCurrentCanvas->renderCurrentFrameToOutput(mOutputString);
     if(mCurrentRenderFrame > getMaxFrame()) {
         emit changeCurrentFrame(mSavedCurrentFrame);
+        mCurrentRenderSettings = NULL;
         mBoxesUpdateFinishedFunction = NULL;
         mCurrentCanvas->setOutputRendering(false);
         mCurrentCanvas->clearCurrentPreviewImage();
@@ -848,6 +850,8 @@ void CanvasWindow::nextSaveOutputFrame() {
         }
         mCurrentCanvas->setNoCache(false);
     } else {
+        mCurrentRenderSettings->setCurrentRenderFrame(
+                    mCurrentRenderFrame);
         mCurrentRenderFrame++;
         emit changeCurrentFrame(mCurrentRenderFrame);
         if(mNoBoxesAwaitUpdate) {
@@ -866,13 +870,17 @@ Canvas *CanvasWindow::loadCanvasesFromSql() {
             int height = query.value("height").toInt();
             int frameCount = query.value("framecount").toInt();
             int boundingBoxId = query.value("boundingboxid").toInt();
+            qreal fps = query.value("fps").toDouble();
+            int colorId = query.value("colorid").toInt();
 
             Canvas *canvas =
                     new Canvas(MainWindow::getInstance()->getFillStrokeSettings(),
                                this,
                                width, height,
-                               frameCount);
-            canvas->loadFromSql(boundingBoxId);
+                               frameCount,
+                               fps);
+            canvas->loadFromSql(boundingBoxId,
+                                colorId);
             MainWindow::getInstance()->addCanvas(canvas);
             return canvas;
         }

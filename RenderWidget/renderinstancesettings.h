@@ -31,7 +31,34 @@ public:
         return mTargetCanvas;
     }
 
+    void setCurrentRenderFrame(const int &currentRenderFrame) {
+        mCurrentRenderFrame = currentRenderFrame;
+    }
+
+    const int &minFrame() const {
+        return mMinFrame;
+    }
+
+    const int &maxFrame() const {
+        return mMaxFrame;
+    }
+
+    void setMaxFrame(const int &maxFrameT) {
+        mMaxFrame = maxFrameT;
+    }
+
+    void setMinFrame(const int &minFrameT) {
+        mMinFrame = minFrameT;
+    }
+
+    const int &currentRenderFrame() {
+        return mCurrentRenderFrame;
+    }
+
 private:
+    int mMinFrame = 0;
+    int mMaxFrame = 0;
+    int mCurrentRenderFrame = 0;
     Canvas *mTargetCanvas;
     QString mName;
 

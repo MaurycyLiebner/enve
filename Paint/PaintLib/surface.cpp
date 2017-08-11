@@ -108,12 +108,16 @@ void Surface::getColor(const qreal &cx,
     }
 }
 
-void Surface::clear() {
+void Surface::clearTiles(Tile ***tiles) {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mCurrentTiles[j][i]->clear();
+            tiles[j][i]->clear();
         }
     }
+}
+
+void Surface::clear() {
+    clearTiles(mCurrentTiles);
 }
 
 void Surface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {

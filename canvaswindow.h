@@ -146,6 +146,7 @@ public:
     void processSchedulers();
     bool noBoxesAwaitUpdate();
 protected:
+    RenderInstanceSettings *mCurrentRenderSettings = NULL;
     QList<int> mFreeThreads;
     bool mMouseGrabber = false;
     bool mHasFocus = false;

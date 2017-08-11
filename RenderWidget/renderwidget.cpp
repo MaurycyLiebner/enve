@@ -13,7 +13,7 @@ RenderWidget::RenderWidget(QWidget *parent) : QWidget(parent) {
                                       "border-right: 0;"
                                       "border-left: 0;");
     mRenderProgressBar->setFixedHeight(8);
-    mRenderProgressBar->setValue(59);
+    mRenderProgressBar->setValue(0);
     mMainLayout->addWidget(mRenderProgressBar);
 
     mButtonsLayout = new QHBoxLayout();
@@ -62,6 +62,8 @@ void RenderWidget::createNewRenderInstanceWidgetForCanvas(Canvas *canvas) {
     RenderInstanceSettings *settings = new RenderInstanceSettings();
     settings->setTargetCanvas(canvas);
     settings->setName(canvas->getName());
+    settings->setMinFrame(0);
+    settings->setMaxFrame(canvas->getMaxFrame());
     RenderInstanceWidget *wid = new RenderInstanceWidget(settings, this);
     mContLayout->addWidget(wid);
     mRenderInstanceWidgets << wid;
@@ -72,10 +74,19 @@ void RenderWidget::removeRenderInstanceWidget(RenderInstanceWidget *wid) {
     delete wid;
 }
 
+void RenderWidget::setRenderedFrame(const int &frame) {
+    if(mCurrentRenderedSettings == NULL) return;
+    mRenderProgressBar->setValue(frame);
+}
+
 void RenderWidget::render() {
     foreach(RenderInstanceWidget *wid, mRenderInstanceWidgets) {
         //if
         RenderInstanceSettings *settings = wid->getSettings();
+        mRenderProgressBar->setRange(settings->minFrame(),
+                                     settings->maxFrame());
+        mRenderProgressBar->setValue(settings->minFrame());
+        mCurrentRenderedSettings = settings;
         emit renderFromSettings(settings);
     }
 }

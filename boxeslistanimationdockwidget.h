@@ -72,10 +72,12 @@ public:
 
     RenderWidget *getRenderWidget();
 public slots:
-    void setCurrentFrame(int frame);
-    void setMinMaxFrame(const int &minFrame, const int &maxFrame);
+    void setCurrentFrame(const int &frame);
+    void setMinMaxFrame(const int &minFrame,
+                        const int &maxFrame);
     void addNewBoxesListKeysViewWidget(int id = 0);
-    void removeBoxesListKeysViewWidget(BoxesListKeysViewWidget *widget);
+    void removeBoxesListKeysViewWidget(
+            BoxesListKeysViewWidget *widget);
 signals:
     void visibleRangeChanged(int, int);
 private slots:

@@ -87,6 +87,7 @@ void BrushSettingsWidget::setBrushWidgetSetting(const BrushSetting &setting_id,
 
 void BrushSettingsWidget::setCurrentBrush(Brush *brushT) {
     mCurrentBrush = brushT;
+    if(mCurrentBrush == NULL) return;
     for(int i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
         BrushSetting id_t = static_cast<BrushSetting>(i);
         setBrushWidgetSetting(id_t,

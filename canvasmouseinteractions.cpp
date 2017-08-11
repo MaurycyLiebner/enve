@@ -87,6 +87,14 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_outline_effects_discrete");
     outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                 "canvas_outline_effects_duplicate");
+
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isPaintBox()) {
+            menu->addAction("New Paint Frame")->setObjectName(
+                        "canvas_new_paint_frame");
+            break;
+        }
+    }
 }
 
 bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
@@ -122,6 +130,13 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDiscreteOutlinePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
         applyDuplicateOutlinePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_new_paint_frame") {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->newPaintFrameOnCurrentFrame();
+            }
+        }
     } else {
         return false;
     }

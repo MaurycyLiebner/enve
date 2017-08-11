@@ -26,8 +26,9 @@
 Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
                CanvasWindow *canvasWidget,
                int canvasWidth, int canvasHeight,
-               const int &frameCount) :
+               const int &frameCount, const qreal &fps) :
     BoxesGroup(fillStrokeSettings) {
+    mFps = fps;
     connect(this, SIGNAL(nameChanged(QString)),
             this, SLOT(emitCanvasNameChanged()));
     mCacheHandler.setParentBox(this);
@@ -157,14 +158,26 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
 int Canvas::saveToSql(QSqlQuery *query, const int &parentId) {
     Q_UNUSED(parentId);
     int boundingBoxId = BoxesGroup::saveToSql(query, 0);
+    int colorId = mBackgroundColor->saveToSql(query);
     query->exec(QString("INSERT INTO canvas "
-                        "(boundingboxid, width, height, framecount) VALUES "
-                        "(%1, %2, %3, %4)").
+                        "(boundingboxid, "
+                        "width, height, "
+                        "framecount, fps, "
+                        "colorid) VALUES "
+                        "(%1, %2, %3, %4, %5, %6)").
                 arg(boundingBoxId).
                 arg(mWidth).
                 arg(mHeight).
-                arg(mMaxFrame));
+                arg(mMaxFrame).
+                arg(mFps).
+                arg(colorId));
     return boundingBoxId;
+}
+
+void Canvas::loadFromSql(const int &boundingBoxId,
+                         const int &colorId) {
+    BoxesGroup::loadFromSql(boundingBoxId);
+    mBackgroundColor->loadFromSql(colorId);
 }
 
 ImageBox *Canvas::createImageBox(const QString &path) {
@@ -457,6 +470,7 @@ void Canvas::setOutputRendering(const bool &bT) {
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
     if(mCurrentPreviewContainer.get() != NULL) {
         if(mNoCache) {
+            mCurrentPreviewContainer->setBlocked(false);
             mCurrentPreviewContainer->freeThis();
         } else if(!mRendering) {
             mCurrentPreviewContainer->setBlocked(false);

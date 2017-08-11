@@ -70,7 +70,8 @@ public:
                     CanvasWindow *canvasWidget,
                     int canvasWidth = 1920,
                     int canvasHeight = 1080,
-                    const int &frameCount = 200);
+                    const int &frameCount = 200,
+                    const qreal &fps = 24.);
     ~Canvas();
 
     QRectF getPixBoundingRect();
@@ -471,6 +472,8 @@ public:
     }
 
     void tabletEvent(QTabletEvent *e, const QPointF &absPos);
+    void loadFromSql(const int &boundingBoxId,
+                     const int &colorId);
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

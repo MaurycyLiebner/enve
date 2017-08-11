@@ -1,5 +1,6 @@
 #include "paintbox.h"
 #include "Paint/PaintLib/surface.h"
+#include "Paint/PaintLib/animatedsurface.h"
 #include "canvas.h"
 #include "Animators/animatorupdater.h"
 
@@ -26,8 +27,15 @@ PaintBox::PaintBox(const ushort &canvasWidthT,
     finishSizeSetup();
 }
 
+void PaintBox::prp_setAbsFrame(const int &frame) {
+    BoundingBox::prp_setAbsFrame(frame);
+
+    if(mMainHandler == NULL) return;
+    mMainHandler->setCurrentRelFrame(frame);
+}
+
 MovablePoint *PaintBox::getPointAtAbsPos(const QPointF &absPtPos,
-                                      const CanvasMode &currentCanvasMode,
+                                         const CanvasMode &currentCanvasMode,
                                       const qreal &canvasScaleInv) {
     if(currentCanvasMode == MOVE_POINT) {
         if(mTopLeftPoint->isPointAtAbsPos(absPtPos, canvasScaleInv)) {
@@ -84,6 +92,11 @@ void PaintBox::startAllPointsTransform() {
     startTransform();
 }
 
+void PaintBox::newPaintFrameOnCurrentFrame() {
+    mMainHandler->newSurfaceFrame();
+    scheduleUpdate();
+}
+
 MovablePoint *PaintBox::getBottomRightPoint() {
     return mBottomRightPoint;
 }
@@ -97,8 +110,9 @@ void PaintBox::finishSizeSetup() {
     mWidth = widthT;
     mHeight = heightT;
     if(mMainHandler == NULL) {
-        mMainHandler = new Surface(mWidth, mHeight,
-                                   1., true);
+        mMainHandler = new AnimatedSurface(mWidth, mHeight,
+                                           1., true, this);
+        mMainHandler->setCurrentRelFrame(anim_mCurrentRelFrame);
     } else {
         mMainHandler->setSize(mWidth, mHeight);
     }

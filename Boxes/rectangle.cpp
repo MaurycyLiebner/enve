@@ -35,7 +35,7 @@ Rectangle::~Rectangle()
 int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
     int boundingBoxId = PathBox::saveToSql(query, parentId);
 
-    int bottomRightPointId = mTopLeftPoint->saveToSql(query);
+    int bottomRightPointId = mBottomRightPoint->saveToSql(query);
     int topLeftPointId = mTopLeftPoint->saveToSql(query);
     int radiusPointId = mRadiusAnimator.saveToSql(query);
 

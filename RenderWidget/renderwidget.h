@@ -20,6 +20,7 @@ public:
 
     void createNewRenderInstanceWidgetForCanvas(Canvas *canvas);
     void removeRenderInstanceWidget(RenderInstanceWidget *wid);
+    void setRenderedFrame(const int &frame);
 private:
     QVBoxLayout *mMainLayout;
     QProgressBar *mRenderProgressBar;
@@ -32,6 +33,7 @@ private:
     QVBoxLayout *mContLayout;
     ScrollArea *mScrollArea;
     QList<RenderInstanceWidget*> mRenderInstanceWidgets;
+    RenderInstanceSettings *mCurrentRenderedSettings = NULL;
 signals:
     void renderFromSettings(RenderInstanceSettings *);
 public slots:

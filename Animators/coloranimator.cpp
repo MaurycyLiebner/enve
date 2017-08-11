@@ -51,7 +51,7 @@ void ColorAnimator::loadFromSql(const int &sqlId) {
 
 #include <QSqlError>
 int ColorAnimator::saveToSql(QSqlQuery *query,
-                                 const int &parentId) {
+                             const int &parentId) {
     Q_UNUSED(parentId);
     int val1AnimatorId = mVal1Animator->saveToSql(query);
     int val2AnimatorId = mVal2Animator->saveToSql(query);
