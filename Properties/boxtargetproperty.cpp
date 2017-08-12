@@ -12,25 +12,15 @@ BoundingBox *BoxTargetProperty::getTarget() {
 }
 
 void BoxTargetProperty::setTarget(BoundingBox *box) {
-//    if(mTarget.data() != NULL) {
-//        if(mParentBox != NULL) {
-//            QObject::disconnect(mTarget.data(), 0, mParentBox, 0);
-//        }
-//    }
+    if(mTarget.data() != NULL) {
+        QObject::disconnect(mTarget.data(), 0, this, 0);
+    }
     mTarget = box->weakRef<BoundingBox>();
-//    if(mTarget.data() != NULL) {
-//        if(mParentBox != NULL) {
-//            QObject::connect(mTarget.data(), SIGNAL(scheduledUpdate()),
-//                             mParentBox, SLOT(scheduleHardUpdate()));
-//            QObject::connect(mTarget.data(), SIGNAL(replaceChacheSet()),
-//                             mParentBox, SLOT(replaceCurrentFrameCache()));
-//        }
-//    }
-    prp_callUpdater();
-}
-
-void BoxTargetProperty::setParentBox(BoundingBox *box) {
-    mParentBox = box;
+    if(mTarget.data() != NULL) {
+        QObject::connect(mTarget.data(), SIGNAL(scheduledUpdate()),
+                         this, SLOT(prp_callUpdater()));
+    }
+    prp_callFinishUpdater();
 }
 
 void BoxTargetProperty::makeDuplicate(Property *property) {

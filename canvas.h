@@ -460,7 +460,6 @@ public:
                isInVisibleDurationRect();
     }
 
-    //void replaceCurrentFrameCache();
     void renderDataFinished(BoundingBoxRenderData *renderData);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,

@@ -11,7 +11,6 @@ public:
 
     BoundingBox *getTarget();
     void setTarget(BoundingBox *box);
-    void setParentBox(BoundingBox *box);
 
     void makeDuplicate(Property *property);
     Property *makeDuplicate();
@@ -22,7 +21,6 @@ public:
     bool SWT_isBoxTargetProperty() { return true; }
 private:
     QWeakPointer<BoundingBox> mTarget;
-    BoundingBox *mParentBox = NULL;
 };
 
 #endif // BOXTARGETPROPERTY_H

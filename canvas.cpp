@@ -513,13 +513,6 @@ void Canvas::nextPreviewFrame() {
     mCanvasWindow->requestUpdate();
 }
 
-//void Canvas::replaceCurrentFrameCache() {
-//    CacheContainer *cont =
-//          mCacheHandler.getRenderContainerAtRelFrame(anim_mCurrentRelFrame);
-//    if(cont == NULL) return;
-//    mCacheHandler.removeRenderContainer(cont);
-//}
-
 void Canvas::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                    int *lastIdentical,
                                                    const int &relFrame) {

@@ -484,7 +484,6 @@ public:
     virtual void renderDataFinished(BoundingBoxRenderData *renderData);
     void updateRelBoundingRectFromRenderData(BoundingBoxRenderData *renderData);
 
-    void scheduleUpdate();
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData *renderData);
     virtual bool shouldScheduleUpdate() {
@@ -496,7 +495,6 @@ public:
         return false;
     }
 
-    virtual void replaceCurrentFrameCache();
     void updateCurrentRenderData();
     void nullifyCurrentRenderData();
     bool isRelFrameInVisibleDurationRect(const int &relFrame);
@@ -575,7 +573,10 @@ protected:
     bool mLocked = false;
 signals:
     void nameChanged(QString);
+    void updateScheduled();
 public slots:
+    void scheduleUpdate();
+
     void updateAfterDurationRectangleShifted(const int &dFrame = 0);
     void updateAfterDurationMinFrameChangedBy(const int &by);
     void updateAfterDurationMaxFrameChangedBy(const int &by);

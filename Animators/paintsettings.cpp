@@ -411,7 +411,7 @@ void Gradient::updateQGradientStopsFinal() {
     }
     Q_FOREACH(PathBox *path, mAffectedPaths) {
         path->updateDrawGradients();
-        path->replaceCurrentFrameCache();
+        path->scheduleUpdate();
     }
 }
 

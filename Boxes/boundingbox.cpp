@@ -38,7 +38,7 @@ void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                   maxFrame);
     if(anim_mCurrentAbsFrame >= minFrame) {
         if(anim_mCurrentAbsFrame <= maxFrame) {
-            replaceCurrentFrameCache();
+            scheduleUpdate();
         }
     }
 }
@@ -247,14 +247,8 @@ void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
 }
 
 void BoundingBox::clearAllCache() {
-    replaceCurrentFrameCache();
-    prp_updateInfluenceRangeAfterChanged();
-}
-
-void BoundingBox::replaceCurrentFrameCache() {
-    if(mParent == NULL) return;
-    mParent->replaceCurrentFrameCache();
     scheduleUpdate();
+    prp_updateInfluenceRangeAfterChanged();
 }
 
 void BoundingBox::drawSelectedSk(SkCanvas *canvas,
@@ -469,6 +463,8 @@ void BoundingBox::scheduleUpdate() {
         mParent->scheduleUpdate();
     }
     mCurrentRenderData->addScheduler();
+
+    emit updateScheduled();
 }
 
 void BoundingBox::nullifyCurrentRenderData() {
@@ -738,7 +734,7 @@ QPointF BoundingBox::getAbsolutePos() {
 void BoundingBox::updateRelativeTransformTmp() {
     updateCombinedTransformTmp();
     schedulePivotUpdate();
-    replaceCurrentFrameCache();
+    scheduleUpdate();
     //updateCombinedTransform(replaceCache);
 }
 
@@ -766,7 +762,7 @@ void BoundingBox::updateCombinedTransform() {
     updateDrawRenderContainerTransform();
 
     updateAfterCombinedTransformationChanged();
-    replaceCurrentFrameCache();
+    scheduleUpdate();
 }
 
 void BoundingBox::updateCombinedTransformTmp() {

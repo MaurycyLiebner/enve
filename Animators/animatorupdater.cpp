@@ -44,7 +44,7 @@ PathPointUpdater::PathPointUpdater(PathBox *vectorPath) {
 }
 
 void PathPointUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
+    mTarget->scheduleUpdate();
 }
 
 void PathPointUpdater::frameChangeUpdate() {
@@ -72,7 +72,7 @@ StrokeWidthUpdater::StrokeWidthUpdater(PathBox *path) {
 }
 
 void StrokeWidthUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
+    mTarget->scheduleUpdate();
 }
 
 void StrokeWidthUpdater::frameChangeUpdate() {
@@ -85,7 +85,7 @@ DisplayedFillStrokeSettingsUpdater(BoundingBox *path) {
 }
 
 void DisplayedFillStrokeSettingsUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
+    mTarget->scheduleUpdate();
 }
 
 void DisplayedFillStrokeSettingsUpdater::frameChangeUpdate() {
@@ -101,7 +101,7 @@ PixmapEffectUpdater::PixmapEffectUpdater(BoundingBox *target) {
 }
 
 void PixmapEffectUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
+    mTarget->scheduleUpdate();
 }
 
 void PixmapEffectUpdater::frameChangeUpdate() {
@@ -118,7 +118,7 @@ AnimationBoxFrameUpdater::AnimationBoxFrameUpdater(AnimationBox *target) {
 }
 
 void AnimationBoxFrameUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
+    mTarget->scheduleUpdate();
     mTarget->updateDurationRectangleAnimationRange();
 }
 
@@ -132,7 +132,7 @@ void ParticlesUpdater::update() {
 }
 
 void GradientPointsUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
+    mTarget->scheduleUpdate();
     if(mIsFill) {
         mTarget->updateFillDrawGradient();
     } else {
@@ -170,7 +170,7 @@ PaintBoxSizeUpdater::~PaintBoxSizeUpdater() {
 }
 
 void PaintBoxSizeUpdater::update() {
-    mTarget->replaceCurrentFrameCache();
+    mTarget->scheduleUpdate();
 }
 
 void PaintBoxSizeUpdater::frameChangeUpdate() {

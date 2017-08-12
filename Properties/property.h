@@ -122,7 +122,6 @@ public:
     void prp_setName(const QString &newName);
 
     virtual void prp_setUpdater(AnimatorUpdater *updater);
-    virtual void prp_callUpdater();
     void prp_blockUpdater();
     void prp_callFinishUpdater();
 
@@ -148,6 +147,8 @@ public:
     }
 
 public slots:
+    void prp_callUpdater();
+
     virtual void prp_setRecording(const bool &rec) { Q_UNUSED(rec); }
 
     virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,

@@ -366,7 +366,7 @@ void PathBox::drawHoveredSk(SkCanvas *canvas,
 
 void PathBox::applyPaintSetting(const PaintSetting &setting) {
     setting.apply(this);
-    replaceCurrentFrameCache();
+    scheduleUpdate();
 }
 
 void PathBox::setFillColorMode(const ColorMode &colorMode) {
