@@ -492,6 +492,7 @@ void PaintSettings::loadFromSql(const int &sqlId) {
             setGradientVar(getLoadedGradientBySqlId(
                         query.value(idGradientId).toInt()));
         }
+        mGradientLinear = query.record().value("gradientlinear").toBool();
     } else {
         qDebug() << "Could not load paintSettings with id " << sqlId;
     }
@@ -504,11 +505,13 @@ int PaintSettings::saveToSql(QSqlQuery *query, const int &parentId) {
                                                QString::number(
                                                    mGradient->getSqlId());
     query->exec(QString("INSERT INTO paintsettings "
-                        "(painttype, colorid, gradientid) "
-                        "VALUES (%1, %2, %3)").
+                        "(painttype, colorid, "
+                        "gradientid, gradientlinear) "
+                        "VALUES (%1, %2, %3, %4)").
                 arg(mPaintType).
                 arg(colorId).
-                arg(gradientId) );
+                arg(gradientId).
+                arg(mGradientLinear));
     return query->lastInsertId().toInt();
 }
 
@@ -717,7 +720,8 @@ QrealAnimator *StrokeSettings::getLineWidthAnimator() {
     return mLineWidth.data();
 }
 
-PaintSetting::PaintSetting(const bool &targetFillSettings, const ColorSetting &colorSetting) {
+PaintSetting::PaintSetting(const bool &targetFillSettings,
+                           const ColorSetting &colorSetting) {
     mTargetFillSettings = targetFillSettings;
     mColorSetting = colorSetting;
     mPaintType = FLATPAINT;
@@ -728,7 +732,10 @@ PaintSetting::PaintSetting(const bool &targetFillSettings) {
     mPaintType = NOPAINT;
 }
 
-PaintSetting::PaintSetting(const bool &targetFillSettings, Gradient *gradient) {
+PaintSetting::PaintSetting(const bool &targetFillSettings,
+                           const bool &linearGradient,
+                           Gradient *gradient) {
+    mLinearGradient = linearGradient;
     mTargetFillSettings = targetFillSettings;
     mPaintType = GRADIENTPAINT;
     mGradient = gradient;
@@ -750,9 +757,11 @@ void PaintSetting::apply(PathBox *box) const {
         if(paintTypeChanged) {
             gradientChanged = true;
         } else {
-            gradientChanged = paintSettings->getGradient() == mGradient;
+            gradientChanged = paintSettings->getGradient() == mGradient ||
+                    paintSettings->getGradientLinear() == mLinearGradient;
         }
         paintSettings->setGradient(mGradient);
+        paintSettings->setGradientLinear(mLinearGradient);
         if(paintTypeChanged) {
             if(mTargetFillSettings) {
                 box->resetFillGradientPointsPos(true);
@@ -782,11 +791,9 @@ void PaintSetting::applyColorSetting(ColorAnimator *animator) const {
 }
 
 UpdatePaintSettings::UpdatePaintSettings(const QColor &paintColorT,
-                                         const PaintType &paintTypeT,
-                                         const QLinearGradient &gradientT) {
+                                         const PaintType &paintTypeT) {
     paintColor = paintColorT;
     paintType = paintTypeT;
-    gradient = gradientT;
 }
 
 UpdatePaintSettings::UpdatePaintSettings() {}
@@ -810,11 +817,8 @@ void UpdatePaintSettings::applyPainterSettingsSk(SkPaint *paint) {
 
 void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
                                          const QPointF &start,
-                                         const QPointF &finalStop) {
-    gradient.setStops(stops);
-    gradient.setStart(start);
-    gradient.setFinalStop(finalStop);
-
+                                         const QPointF &finalStop,
+                                         const bool &linearGradient) {
     int nStops = stops.count();
     SkPoint gradPoints[nStops];
     SkColor gradColors[nStops];
@@ -840,19 +844,31 @@ void UpdatePaintSettings::updateGradient(const QGradientStops &stops,
         currY += yInc;
         currT += tInc;
     }
-    gradientSk = SkGradientShader::MakeLinear(gradPoints,
-                                              gradColors,
-                                              gradPos,
-                                              nStops,
-                                              SkShader::kClamp_TileMode);
+    if(linearGradient) {
+        gradientSk = SkGradientShader::MakeLinear(gradPoints,
+                                                  gradColors,
+                                                  gradPos,
+                                                  nStops,
+                                                  SkShader::kClamp_TileMode);
+    } else {
+        QPointF distPt = finalStop - start;
+        SkScalar radius = qSqrt(distPt.x()*distPt.x() +
+                                distPt.y()*distPt.y());
+        gradientSk = SkGradientShader::MakeRadial(
+                        QPointFToSkPoint(start),
+                        radius,
+                        gradColors,
+                        gradPos,
+                        nStops,
+                        SkShader::kClamp_TileMode);
+    }
 }
 
 UpdateStrokeSettings::UpdateStrokeSettings(
                    const QColor &paintColorT,
                    const PaintType &paintTypeT,
-                   const QLinearGradient &gradientT,
                    const QPainter::CompositionMode &outlineCompositionModeT) :
-    UpdatePaintSettings(paintColorT, paintTypeT, gradientT) {
+    UpdatePaintSettings(paintColorT, paintTypeT) {
     outlineCompositionMode = outlineCompositionModeT;
 }
 

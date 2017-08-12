@@ -85,6 +85,7 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "painttype INTEGER, "
                "colorid INTEGER, "
                "gradientid INTEGER, "
+               "gradientlinear BOOLEAN, "
                "FOREIGN KEY(colorid) REFERENCES coloranimator(id), "
                "FOREIGN KEY(gradientid) REFERENCES gradient(id) )");
 

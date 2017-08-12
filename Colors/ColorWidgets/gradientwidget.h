@@ -83,7 +83,7 @@ private:
     Gradient *mCurrentGradient = NULL;
     int mCurrentColorId = 0;
     int mCenterGradientId = 1;
-    void setCurrentGradient(int listId);
+    void setCurrentGradient(const int &listId);
     void setCurrentColorId(int id);
 };
 

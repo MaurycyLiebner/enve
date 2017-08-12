@@ -100,6 +100,7 @@
         <file alias="add_paint_box_checked.png">pixmaps/icons/add_paint_box_checked.png</file>
         <file alias="paint_mode.png">pixmaps/icons/paint_mode.png</file>
         <file alias="paint_mode_checked.png">pixmaps/icons/paint_mode_checked.png</file>
+        <file alias="fill_gradient_radial.png">pixmaps/icons/fill_gradient_radial.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="stylesheet.qss">stylesheet.qss</file>

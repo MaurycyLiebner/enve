@@ -1853,7 +1853,7 @@ void FillSvgAttributes::apply(BoundingBox *box) {
                                                       mColor.gl_a,
                                                       CST_CHANGE));
     } else if(mPaintType == GRADIENTPAINT) {
-        setting = new PaintSetting(true, mGradient);
+        setting = new PaintSetting(true, true, mGradient);
     } else {
         setting = new PaintSetting(true);
     }
@@ -1926,7 +1926,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale)
                                                       mColor.gl_a,
                                                       CST_CHANGE));
     } else if(mPaintType == GRADIENTPAINT) {
-        setting = new PaintSetting(false, mGradient);
+        setting = new PaintSetting(false, true, mGradient);
     } else {
         setting = new PaintSetting(false);
     }

@@ -100,7 +100,8 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
                     grad->getQGradientStopsAtAbsFrame(
                         prp_relFrameToAbsFrame(relFrame)),
                     mFillGradientPoints->getStartPointAtRelFrame(relFrame),
-                    mFillGradientPoints->getEndPointAtRelFrame(relFrame));
+                    mFillGradientPoints->getEndPointAtRelFrame(relFrame),
+                    mFillSettings->getGradientLinear());
     }
 
     UpdateStrokeSettings *strokeSettings = &pathData->strokeSettings;
@@ -113,7 +114,8 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
                     grad->getQGradientStopsAtAbsFrame(
                         prp_relFrameToAbsFrame(relFrame)),
                     mStrokeGradientPoints->getStartPointAtRelFrame(relFrame),
-                    mStrokeGradientPoints->getEndPointAtRelFrame(relFrame));
+                    mStrokeGradientPoints->getEndPointAtRelFrame(relFrame),
+                    mStrokeSettings->getGradientLinear());
     }
 }
 

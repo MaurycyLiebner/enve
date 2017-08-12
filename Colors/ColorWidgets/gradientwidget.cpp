@@ -185,7 +185,7 @@ void GradientWidget::resetColorIdIfEquals(Gradient *gradient, const int &id) {
     }
 }
 
-void GradientWidget::setCurrentGradient(int listId) {
+void GradientWidget::setCurrentGradient(const int &listId) {
     if(listId >= mGradients.length()) return;
     setCurrentGradient(mGradients.at(listId).data());
 }

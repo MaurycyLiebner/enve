@@ -32,7 +32,7 @@ public:
     void setCurrentSettings(PaintSettings *fillPaintSettings,
                             StrokeSettings *strokePaintSettings);
     void updateAfterTargetChanged();
-    void setCurrentPaintType(PaintType paintType);
+    void setCurrentPaintType(const PaintType &paintType);
 
     void saveGradientsToQuery(QSqlQuery *query);
     GradientWidget *getGradientWidget();
@@ -50,13 +50,17 @@ public slots:
     void emitCapStyleChanged();
     void emitJoinStyleChanged();
 private slots:
+    void setLinearGradientFill();
+    void setRadialGradientFill();
+
     void setStrokeWidth(const qreal &width);
 
-    void colorTypeSet(int id);
+    void colorTypeSet(const int &id);
     void setFillTarget();
     void setStrokeTarget();
 
     void setGradient(Gradient* gradient);
+    void setGradientLinear(const bool &linear);
 
     void setBevelJoinStyle();
     void setMiterJoinStyle();
@@ -112,8 +116,16 @@ private:
 
     Gradient *getCurrentGradientVal();
 
-    void setCurrentGradientVal(Gradient *gradient);
+    const bool &getCurrentGradientLinearVal() {
+        if(mTargetId == 0) {
+            return mCurrentFillGradientLinear;
+        } else {
+            return mCurrentStrokeGradientLinear;
+        }
+    }
 
+    void setCurrentGradientVal(Gradient *gradient);
+    void setCurrentGradientLinearVal(const bool &linear);
 
     ColorAnimator *mCurrentFillColorAnimator = NULL;
     ColorAnimator *mCurrentStrokeColorAnimator = NULL;
@@ -121,6 +133,10 @@ private:
     PaintType mCurrentStrokePaintType = NOPAINT;
     Color mCurrentFillColor;
     Color mCurrentStrokeColor;
+
+    bool mCurrentStrokeGradientLinear = true;
+    bool mCurrentFillGradientLinear = true;
+
     Gradient *mCurrentStrokeGradient = NULL;
     Gradient *mCurrentFillGradient = NULL;
     Qt::PenCapStyle mCurrentCapStyle;
@@ -164,6 +180,11 @@ private:
     ColorSettingsWidget *mColorsSettingsWidget;
 
     GradientWidget *mGradientWidget;
+
+    QHBoxLayout *mGradientTypeLayout;
+    QPushButton *mLinearGradientButton;
+    QPushButton *mRadialGradientButton;
+    QWidget *mGradientTypeWidget;
 
     QHBoxLayout *mPickersLayout = new QHBoxLayout();
     ActionButton *mFillPickerButton;

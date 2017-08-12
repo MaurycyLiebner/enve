@@ -174,17 +174,54 @@ FillStrokeSettingsWidget::FillStrokeSettingsWidget(MainWindow *parent) :
     connect(mColorsSettingsWidget, SIGNAL(colorModeChanged(ColorMode)),
             this, SLOT(setCurrentColorMode(ColorMode)));
 
+    mGradientTypeLayout = new QHBoxLayout();
+    mGradientTypeLayout->setSpacing(0);
+    mLinearGradientButton = new QPushButton(
+                QIcon(":/icons/fill_gradient.png"),
+                "Linear", this);
+    mLinearGradientButton->setCheckable(true);
+    mLinearGradientButton->setObjectName("leftButton");
+    connect(mLinearGradientButton, SIGNAL(released()),
+            this, SLOT(setLinearGradientFill()));
+
+    mRadialGradientButton = new QPushButton(
+                QIcon(":/icons/fill_gradient_radial.png"),
+                "Radial", this);
+    mRadialGradientButton->setCheckable(true);
+    mRadialGradientButton->setObjectName("rightButton");
+    connect(mRadialGradientButton, SIGNAL(released()),
+            this, SLOT(setRadialGradientFill()));
+
+    mGradientTypeLayout->addWidget(mLinearGradientButton);
+    mGradientTypeLayout->addWidget(mRadialGradientButton);
+    mGradientTypeWidget = new QWidget(this);
+    mGradientTypeWidget->setContentsMargins(0, 0, 0, 0);
+    mGradientTypeWidget->setLayout(mGradientTypeLayout);
+
     mMainLayout->addLayout(mTargetLayout);
     mMainLayout->addLayout(mColorTypeLayout);
+    mMainLayout->addWidget(mGradientTypeWidget);
     mMainLayout->addWidget(mStrokeSettingsWidget);
     mMainLayout->addWidget(mGradientWidget);
     mMainLayout->addWidget(mColorsSettingsWidget);
     mMainLayout->addLayout(mPickersLayout);
     mMainLayout->addStretch(1);
 
+    mGradientTypeWidget->hide();
+
     setFillTarget();
     setCapStyle(Qt::RoundCap);
     setJoinStyle(Qt::RoundJoin);
+}
+
+void FillStrokeSettingsWidget::setLinearGradientFill() {
+    setGradientLinear(true);
+    MainWindow::getInstance()->callUpdateSchedulers();
+}
+
+void FillStrokeSettingsWidget::setRadialGradientFill() {
+    setGradientLinear(false);
+    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 void FillStrokeSettingsWidget::setGradientFill() {
@@ -241,6 +278,8 @@ void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode &mode) {
 void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
         mGradientWidget->setCurrentGradient(getCurrentGradientVal() );
+        mLinearGradientButton->setChecked(getCurrentGradientLinearVal());
+        mRadialGradientButton->setChecked(!getCurrentGradientLinearVal());
     }
     setCurrentPaintType(getCurrentPaintTypeVal());
     if(getCurrentPaintTypeVal() == 0) {
@@ -258,8 +297,8 @@ void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     }
 }
 
-void FillStrokeSettingsWidget::setCurrentPaintType(PaintType paintType)
-{
+void FillStrokeSettingsWidget::setCurrentPaintType(
+        const PaintType &paintType) {
     if(paintType == NOPAINT) {
         setNoPaintType();
     } else if (paintType == FLATPAINT) {
@@ -316,8 +355,7 @@ void FillStrokeSettingsWidget::clearAll()
     mGradientWidget->clearAll();
 }
 
-void FillStrokeSettingsWidget::colorTypeSet(int id)
-{
+void FillStrokeSettingsWidget::colorTypeSet(const int &id) {
     if(id == 0) {
         setNoPaintType();
     } else if(id == 1) {
@@ -336,7 +374,9 @@ void FillStrokeSettingsWidget::colorTypeSet(int id)
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else if(mCurrentFillPaintType == GRADIENTPAINT) {
             PaintSetting paintSetting =
-                    PaintSetting(true, mCurrentFillGradient);
+                    PaintSetting(true,
+                                 mCurrentFillGradientLinear,
+                                 mCurrentFillGradient);
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else{
             PaintSetting paintSetting =
@@ -350,7 +390,9 @@ void FillStrokeSettingsWidget::colorTypeSet(int id)
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else if(mCurrentStrokePaintType == GRADIENTPAINT) {
             PaintSetting paintSetting =
-                    PaintSetting(false, mCurrentStrokeGradient);
+                    PaintSetting(false,
+                                 mCurrentStrokeGradientLinear,
+                                 mCurrentStrokeGradient);
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else{
             PaintSetting paintSetting =
@@ -371,7 +413,9 @@ void FillStrokeSettingsWidget::colorSettingReceived(
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else {
             PaintSetting paintSetting =
-                    PaintSetting(true, mCurrentFillGradient);
+                    PaintSetting(true,
+                                 mCurrentFillGradientLinear,
+                                 mCurrentFillGradient);
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         }
     } else {
@@ -381,30 +425,32 @@ void FillStrokeSettingsWidget::colorSettingReceived(
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         } else {
             PaintSetting paintSetting =
-                    PaintSetting(false, mCurrentStrokeGradient);
+                    PaintSetting(false,
+                                 mCurrentStrokeGradientLinear,
+                                 mCurrentStrokeGradient);
             mCanvasWindow->applyPaintSettingToSelected(paintSetting);
         }
     }
 }
 
-void FillStrokeSettingsWidget::connectGradient()
-{
+void FillStrokeSettingsWidget::connectGradient() {
     connect(mGradientWidget,
             SIGNAL(selectedColorChanged(ColorAnimator*)),
             mColorsSettingsWidget,
             SLOT(setColorAnimatorTarget(ColorAnimator*)) );
-    connect(mGradientWidget, SIGNAL(currentGradientChanged(Gradient*)),
+    connect(mGradientWidget,
+            SIGNAL(currentGradientChanged(Gradient*)),
             this, SLOT(setGradient(Gradient*)) );
+
 }
 
-void FillStrokeSettingsWidget::disconnectGradient()
-{
+void FillStrokeSettingsWidget::disconnectGradient() {
     disconnect(mGradientWidget,
             SIGNAL(selectedColorChanged(ColorAnimator*)),
             mColorsSettingsWidget,
             SLOT(setColorAnimatorTarget(ColorAnimator*) ) );
     disconnect(mGradientWidget, SIGNAL(currentGradientChanged(Gradient*)),
-            this, SLOT(setGradient(Gradient*)) );
+               this, SLOT(setGradient(Gradient*)) );
 }
 
 void FillStrokeSettingsWidget::setColorAnimatorTarget(
@@ -476,11 +522,21 @@ void FillStrokeSettingsWidget::setCurrentGradientVal(Gradient *gradient) {
     }
 }
 
+void FillStrokeSettingsWidget::setCurrentGradientLinearVal(
+                                const bool &linear) {
+    if(mTargetId == 0) {
+        mCurrentFillGradientLinear = linear;
+    } else {
+        mCurrentStrokeGradientLinear = linear;
+    }
+}
+
 void FillStrokeSettingsWidget::setFillValuesFromFillSettings(
         PaintSettings *settings) {
     if(settings == NULL) {
         mCurrentFillColorAnimator = NULL;
     } else {
+        mCurrentFillGradientLinear = settings->getGradientLinear();
         mCurrentFillColor = settings->getCurrentColor();
         mCurrentFillColorAnimator = settings->getColorAnimator();
         mCurrentFillGradient = settings->getGradient();
@@ -494,6 +550,7 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         mCurrentStrokeColorAnimator = NULL;
         mLineWidthSpin->setAnimator(NULL);
     } else {
+        mCurrentStrokeGradientLinear = settings->getGradientLinear();
         mCurrentStrokeColor = settings->getCurrentColor();
         mCurrentStrokeColorAnimator = settings->getColorAnimator();
         mCurrentStrokeGradient = settings->getGradient();
@@ -568,11 +625,34 @@ void FillStrokeSettingsWidget::setGradient(Gradient *gradient) {
     setCurrentGradientVal(gradient);
     if(mTargetId == 0) {
         PaintSetting paintSetting =
-                PaintSetting(true, mCurrentFillGradient);
+                PaintSetting(true,
+                             mCurrentFillGradientLinear,
+                             mCurrentFillGradient);
         mCanvasWindow->applyPaintSettingToSelected(paintSetting);
     } else {
         PaintSetting paintSetting =
-                PaintSetting(false, mCurrentStrokeGradient);
+                PaintSetting(false,
+                             mCurrentStrokeGradientLinear,
+                             mCurrentStrokeGradient);
+        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
+    }
+}
+
+void FillStrokeSettingsWidget::setGradientLinear(const bool &linear) {
+    setCurrentGradientLinearVal(linear);
+    mLinearGradientButton->setChecked(linear);
+    mRadialGradientButton->setChecked(!linear);
+    if(mTargetId == 0) {
+        PaintSetting paintSetting =
+                PaintSetting(true,
+                             mCurrentFillGradientLinear,
+                             mCurrentFillGradient);
+        mCanvasWindow->applyPaintSettingToSelected(paintSetting);
+    } else {
+        PaintSetting paintSetting =
+                PaintSetting(false,
+                             mCurrentStrokeGradientLinear,
+                             mCurrentStrokeGradient);
         mCanvasWindow->applyPaintSettingToSelected(paintSetting);
     }
 }
@@ -619,8 +699,7 @@ void FillStrokeSettingsWidget::waitToSaveChanges()
     mUndoRedoSaveTimer->start();
 }
 
-void FillStrokeSettingsWidget::setFillTarget()
-{
+void FillStrokeSettingsWidget::setFillTarget() {
     mTargetId = 0;
     mFillTargetButton->setChecked(true);
     mStrokeTargetButton->setChecked(false);
@@ -629,46 +708,45 @@ void FillStrokeSettingsWidget::setFillTarget()
     updateColorAnimator();
 }
 
-void FillStrokeSettingsWidget::setStrokeTarget()
-{
+void FillStrokeSettingsWidget::setStrokeTarget() {
     mTargetId = 1;
     mStrokeTargetButton->setChecked(true);
     mFillTargetButton->setChecked(false);
     mStrokeSettingsWidget->show();
     updateAfterTargetChanged();
     updateColorAnimator();
-
 }
 
-void FillStrokeSettingsWidget::setNoPaintType()
-{
+void FillStrokeSettingsWidget::setNoPaintType() {
     setCurrentPaintTypeVal(NOPAINT);
     mColorsSettingsWidget->hide();
     mGradientWidget->hide();
+    mGradientTypeWidget->hide();
     updateColorAnimator();
 }
 
-void FillStrokeSettingsWidget::setFlatPaintType()
-{
+void FillStrokeSettingsWidget::setFlatPaintType() {
     disconnectGradient();
     mColorsSettingsWidget->show();
     mGradientWidget->hide();
+    mGradientTypeWidget->hide();
     setCurrentPaintTypeVal(FLATPAINT);
     updateColorAnimator();
 }
 
-void FillStrokeSettingsWidget::setGradientPaintType()
-{
+void FillStrokeSettingsWidget::setGradientPaintType() {
     connectGradient();
     if(mTargetId == 0) {
         mCurrentFillPaintType = GRADIENTPAINT;
         if(mCurrentFillGradient == NULL) {
-            mCurrentFillGradient = mGradientWidget->getCurrentGradient();
+            mCurrentFillGradient =
+                    mGradientWidget->getCurrentGradient();
         }
     } else {
         mCurrentStrokePaintType = GRADIENTPAINT;
         if(mCurrentStrokeGradient == NULL) {
-            mCurrentStrokeGradient = mGradientWidget->getCurrentGradient();
+            mCurrentStrokeGradient =
+                    mGradientWidget->getCurrentGradient();
         }
     }
     if(mColorsSettingsWidget->isHidden()) {
@@ -676,6 +754,9 @@ void FillStrokeSettingsWidget::setGradientPaintType()
     }
     if(mGradientWidget->isHidden()) {
         mGradientWidget->show();
+    }
+    if(mGradientTypeWidget->isHidden()) {
+        mGradientTypeWidget->show();
     }
     updateColorAnimator();
 

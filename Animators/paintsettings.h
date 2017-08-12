@@ -71,6 +71,7 @@ public:
     PaintSetting(const bool &targetFillSettings);
 
     PaintSetting(const bool &targetFillSettings,
+                 const bool &linearGradient,
                  Gradient *gradient);
 
     void apply(PathBox *box) const;
@@ -80,6 +81,7 @@ public:
     bool targetsFill() const { return mTargetFillSettings; }
 private:
     bool mTargetFillSettings;
+    bool mLinearGradient = true;
     Gradient *mGradient;
     PaintType mPaintType;
     ColorSetting mColorSetting;
@@ -130,7 +132,13 @@ public:
 
     bool SWT_isPaintSettings() { return true; }
     Color getColorAtRelFrame(const int &relFrame) const;
+    const bool &getGradientLinear() { return mGradientLinear; }
+    void setGradientLinear(const bool &linear) {
+        mGradientLinear = linear;
+    }
+
 private:
+    bool mGradientLinear = true;
     PathBox *mTarget;
     GradientPoints *mGradientPoints = NULL;
     QSharedPointer<ColorAnimator> mColor =
@@ -236,8 +244,7 @@ private:
 
 struct UpdatePaintSettings {
     UpdatePaintSettings(const QColor &paintColorT,
-                        const PaintType &paintTypeT,
-                        const QLinearGradient &gradientT);
+                        const PaintType &paintTypeT);
 
     UpdatePaintSettings();
 
@@ -247,19 +254,17 @@ struct UpdatePaintSettings {
 
     void updateGradient(const QGradientStops &stops,
                         const QPointF &start,
-                        const QPointF &finalStop);
+                        const QPointF &finalStop,
+                        const bool &linearGradient = true);
 
     QColor paintColor;
     PaintType paintType;
-    QLinearGradient gradient;
     sk_sp<SkShader> gradientSk;
 };
 
 struct UpdateStrokeSettings : UpdatePaintSettings {
-    UpdateStrokeSettings(
-            const QColor &paintColorT,
+    UpdateStrokeSettings(const QColor &paintColorT,
             const PaintType &paintTypeT,
-            const QLinearGradient &gradientT,
             const QPainter::CompositionMode &outlineCompositionModeT);
 
     UpdateStrokeSettings();
