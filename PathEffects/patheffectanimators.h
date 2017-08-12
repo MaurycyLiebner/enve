@@ -11,8 +11,6 @@ public:
 
     //void addPathEffect(PathEffect *effect);
 
-    qreal getEffectsMargin() const;
-
 //    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
 //    void loadFromSql(const int &boundingBoxSqlId);
 
@@ -22,7 +20,6 @@ public:
 
     bool SWT_isEffectAnimators();
 
-    void updatePathEffectsSum();
 
     void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);

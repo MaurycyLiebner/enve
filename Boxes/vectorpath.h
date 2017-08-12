@@ -49,8 +49,9 @@ public:
                                    const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
-protected:
     SkPath getPathAtRelFrame(const int &relFrame);
+
+protected:
     PathAnimatorQSPtr mPathAnimator;
 
     void loadPointsFromSql(int boundingBoxId);

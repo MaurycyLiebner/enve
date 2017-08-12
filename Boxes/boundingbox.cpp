@@ -464,7 +464,7 @@ void BoundingBox::scheduleUpdate() {
     }
     mCurrentRenderData->addScheduler();
 
-    emit updateScheduled();
+    emit scheduledUpdate();
 }
 
 void BoundingBox::nullifyCurrentRenderData() {

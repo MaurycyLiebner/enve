@@ -9,15 +9,14 @@
 enum PathEffectType : short {
     DISCRETE_PATH_EFFECT,
     DASH_PATH_EFFECT,
-    DUPLICATE_PATH_EFFECT
+    DUPLICATE_PATH_EFFECT,
+    SUM_PATH_EFFECT
 };
 
 class PathEffect : public ComplexAnimator {
     Q_OBJECT
 public:
     PathEffect(const PathEffectType &type);
-
-    virtual qreal getMargin();
 
     virtual Property *makeDuplicate() = 0;
     virtual void makeDuplicate(Property *target) = 0;
@@ -33,8 +32,6 @@ class DisplacePathEffect : public PathEffect {
     Q_OBJECT
 public:
     DisplacePathEffect();
-
-    qreal getMargin();
 
     Property *makeDuplicate();
 
@@ -61,8 +58,6 @@ class DuplicatePathEffect : public PathEffect {
 public:
     DuplicatePathEffect();
 
-    qreal getMargin();
-
     Property *makeDuplicate();
 
     void makeDuplicate(Property *target);
@@ -76,6 +71,26 @@ public:
 private:
     QSharedPointer<QPointFAnimator> mTranslation =
             (new QPointFAnimator())->ref<QPointFAnimator>();
+};
+class PathBox;
+#include "Properties/boxtargetproperty.h"
+class SumPathEffect : public PathEffect {
+    Q_OBJECT
+public:
+    SumPathEffect(PathBox *parentPath);
+
+    Property *makeDuplicate() {}
+
+    void makeDuplicate(Property *target) {}
+
+    void filterPath(const SkPath &src, SkPath *dst) {}
+
+    void filterPathForRelFrame(const int &relFrame,
+                               const SkPath &src, SkPath *dst);
+private:
+    PathBox *mParentPathBox;
+    QSharedPointer<BoxTargetProperty> mBoxTarget =
+            (new BoxTargetProperty())->ref<BoxTargetProperty>();
 };
 
 #endif // PATHEFFECT_H

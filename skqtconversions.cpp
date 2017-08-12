@@ -62,6 +62,33 @@ SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join) {
     }
     return SkPaint::kMiter_Join;
 }
+#include <QPainterPath>
+SkPath QPainterPathToSkPath(const QPainterPath &qPath) {
+    SkPath path;
+    bool firstOther;
+    SkPoint endPt;
+    SkPoint startPt;
+    for(int i = 0; i < qPath.elementCount(); i++) {
+        const QPainterPath::Element &elem = qPath.elementAt(i);
+
+        if(elem.isMoveTo()) { // move
+            path.moveTo(elem.x, elem.y);
+        } else if(elem.isLineTo()) { // line
+            path.lineTo(elem.x, elem.y);
+        } else if(elem.isCurveTo()) { // curve
+            endPt = SkPoint::Make(elem.x, elem.y);
+            firstOther = true;
+        } else { // other
+            if(firstOther) {
+                startPt = SkPoint::Make(elem.x, elem.y);
+            } else {
+                path.cubicTo(endPt, startPt, SkPoint::Make(elem.x, elem.y));
+            }
+            firstOther = !firstOther;
+        }
+    }
+    return path;
+}
 
 //SkScalar SkLine::angleTo(const SkLine &l) const {
 //    if(isNull() || l.isNull()) return 0.f;

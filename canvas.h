@@ -439,6 +439,7 @@ public:
     void applyDuplicatePathEffectToSelected();
     void applyDiscreteOutlinePathEffectToSelected();
     void applyDuplicateOutlinePathEffectToSelected();
+    void applySumPathEffectToSelected();
 
     const qreal &getFps() const { return mFps; }
     void setFps(const qreal &fps) { mFps = fps; }

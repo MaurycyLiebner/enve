@@ -186,28 +186,5 @@ SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
     QRectF boundingRect = qPath.boundingRect();
     qPath.translate(-boundingRect.center());
 
-    bool firstOther;
-    SkPoint endPt;
-    SkPoint startPt;
-    SkPath path;
-    for(int i = 0; i < qPath.elementCount(); i++) {
-        const QPainterPath::Element &elem = qPath.elementAt(i);
-
-        if(elem.isMoveTo()) { // move
-            path.moveTo(elem.x, elem.y);
-        } else if(elem.isLineTo()) { // line
-            path.lineTo(elem.x, elem.y);
-        } else if(elem.isCurveTo()) { // curve
-            endPt = SkPoint::Make(elem.x, elem.y);
-            firstOther = true;
-        } else { // other
-            if(firstOther) {
-                startPt = SkPoint::Make(elem.x, elem.y);
-            } else {
-                path.cubicTo(endPt, startPt, SkPoint::Make(elem.x, elem.y));
-            }
-            firstOther = !firstOther;
-        }
-    }
-    return path;
+    return QPainterPathToSkPath(qPath);
 }

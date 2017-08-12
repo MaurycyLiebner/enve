@@ -19,6 +19,13 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
     SkPath outlinePath;
     UpdatePaintSettings paintSettings;
     UpdateStrokeSettings strokeSettings;
+
+    void updateRelBoundingRect() {
+        SkPath totalPath;
+        totalPath.addPath(path);
+        totalPath.addPath(outlinePath);
+        relBoundingRect = SkRectToQRectF(totalPath.computeTightBounds());
+    }
 private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
@@ -131,8 +138,8 @@ public:
             GradientPoints *fillGradientPoints);
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
-protected:
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
+protected:
 
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;

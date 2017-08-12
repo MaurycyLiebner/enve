@@ -4,8 +4,6 @@ PathEffect::PathEffect(const PathEffectType &type) {
     mPathEffectType = type;
 }
 
-qreal PathEffect::getMargin() { return 0.; }
-
 DisplacePathEffect::DisplacePathEffect() :
     PathEffect(DISCRETE_PATH_EFFECT) {
     prp_setName("discrete effect");
@@ -24,10 +22,6 @@ DisplacePathEffect::DisplacePathEffect() :
     ca_addChildAnimator(mSegLength.data());
     ca_addChildAnimator(mMaxDev.data());
     ca_addChildAnimator(mSmoothness.data());
-}
-
-qreal DisplacePathEffect::getMargin() {
-    return mMaxDev->qra_getCurrentValue();
 }
 
 Property *DisplacePathEffect::makeDuplicate() {
@@ -304,11 +298,6 @@ DuplicatePathEffect::DuplicatePathEffect() :
     ca_addChildAnimator(mTranslation.data());
 }
 
-qreal DuplicatePathEffect::getMargin() {
-    return qMax(mTranslation->getXValue(),
-                mTranslation->getYValue());
-}
-
 Property *DuplicatePathEffect::makeDuplicate() {
     DuplicatePathEffect *newEffect = new DuplicatePathEffect();
     makeDuplicate(newEffect);
@@ -340,4 +329,51 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
     dst->addPath(src,
                  mTranslation->getXValueAtRelFrame(relFrame),
                  mTranslation->getYValueAtRelFrame(relFrame));
+}
+#include "pathoperations.h"
+#include "skqtconversions.h"
+SumPathEffect::SumPathEffect(PathBox *parentPath) :
+    PathEffect(SUM_PATH_EFFECT) {
+    mParentPathBox = parentPath;
+    ca_addChildAnimator(mBoxTarget.data());
+}
+
+void SumPathEffect::filterPathForRelFrame(const int &relFrame,
+                                          const SkPath &src,
+                                          SkPath *dst) {
+    PathBox *pathBox = ((PathBox*)mBoxTarget->getTarget());
+    if(pathBox == NULL) {
+        *dst = src;
+        return;
+    }
+    int absFrame = mParentPathBox->
+            prp_relFrameToAbsFrame(relFrame);
+    int pathBoxRelFrame = pathBox->
+            prp_absFrameToRelFrame(absFrame);
+    SkPath boxPath = pathBox->getPathAtRelFrame(
+                pathBoxRelFrame);
+    QMatrix pathBoxMatrix =
+            pathBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrame(
+                    pathBoxRelFrame);
+    QMatrix parentBoxMatrix =
+            mParentPathBox->getTransformAnimator()->
+                getCombinedTransformMatrixAtRelFrame(
+                    relFrame);
+    boxPath.transform(
+                QMatrixToSkMatrix(
+                    pathBoxMatrix*parentBoxMatrix.inverted()));
+    FullVectorPath addToPath;
+    addToPath.generateFromPath(src);
+    FullVectorPath addedPath;
+    addedPath.generateFromPath(boxPath);
+    addToPath.intersectWith(&addedPath,
+                            true,
+                            true);
+    FullVectorPath targetPath;
+    targetPath.getSeparatePathsFromOther(&addToPath);
+    targetPath.getSeparatePathsFromOther(&addedPath);
+    targetPath.generateSinglePathPaths();
+
+    *dst = QPainterPathToSkPath(targetPath.getPath());
 }

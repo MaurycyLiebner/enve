@@ -43,9 +43,8 @@ public:
     bool SWT_isTextBox() { return true; }
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);
-
-private:
     SkPath getPathAtRelFrame(const int &relFrame);
+private:
 
     QStringAnimatorQSPtr mText;
     QFont mFont;

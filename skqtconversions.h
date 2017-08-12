@@ -26,7 +26,7 @@ extern SkPaint::Join QJoinToSkJoin(const Qt::PenJoinStyle &join);
 
 extern bool skRectContainesSkPoint(const SkRect &absRect,
                                    const SkPoint &pos);
-
+extern SkPath QPainterPathToSkPath(const QPainterPath &qPath);
 //struct SkLine {
 //    SkLine(const SkPoint &p1T,
 //           const SkPoint &p2T) {

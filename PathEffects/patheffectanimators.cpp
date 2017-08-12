@@ -71,15 +71,6 @@ PathEffectAnimators::PathEffectAnimators() :
 //    }
 //}
 
-qreal PathEffectAnimators::getEffectsMargin() const {
-    qreal newMargin = 0.;
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        qreal effectMargin = ((PathEffect*)effect.data())->getMargin();
-        newMargin += effectMargin;
-    }
-    return newMargin;
-}
-
 bool PathEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }

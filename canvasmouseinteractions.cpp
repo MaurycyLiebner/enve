@@ -81,6 +81,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                 "canvas_path_effects_discrete");
     pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                 "canvas_path_effects_duplicate");
+    pathEffectsMenu->addAction("Sum Effect")->setObjectName(
+                "canvas_path_effect_sum");
 
     QMenu *outlinePathEffectsMenu = menu->addMenu("Outline Effects");
     outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
@@ -130,6 +132,8 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDiscreteOutlinePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
         applyDuplicateOutlinePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_path_effect_sum") {
+        applySumPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_new_paint_frame") {
         foreach(BoundingBox *box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {

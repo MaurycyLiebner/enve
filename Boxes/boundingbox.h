@@ -573,7 +573,7 @@ protected:
     bool mLocked = false;
 signals:
     void nameChanged(QString);
-    void updateScheduled();
+    void scheduledUpdate();
 public slots:
     void scheduleUpdate();
 

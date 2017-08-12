@@ -95,24 +95,35 @@ void Canvas::applyColorizeEffectToSelected() {
 #include "PathEffects/patheffect.h"
 void Canvas::applyDiscretePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
         box->addPathEffect(new DisplacePathEffect());
     }
 }
 
 void Canvas::applyDuplicatePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
         box->addPathEffect(new DuplicatePathEffect());
     }
 }
 
 void Canvas::applyDiscreteOutlinePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
         box->addOutlinePathEffect(new DisplacePathEffect());
+    }
+}
+
+void Canvas::applySumPathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
+        box->addPathEffect(new SumPathEffect((PathBox*)box));
     }
 }
 
 void Canvas::applyDuplicateOutlinePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
         box->addOutlinePathEffect(new DuplicatePathEffect());
     }
 }
