@@ -150,13 +150,20 @@ void BoundingBox::applyEffectsSk(const SkBitmap &im,
 
 #include <QSqlError>
 int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
-    Q_UNUSED(parentId);
     int transfromAnimatorId = mTransformAnimator->saveToSql(query);
+    QString durRectId;
+    if(mDurationRectangle == NULL) {
+        durRectId = "NULL";
+    } else {
+        durRectId = QString::number(
+                    mDurationRectangle->saveToSql(query));
+    }
     if(!query->exec(
-                QString("INSERT INTO boundingbox (name, boxtype, transformanimatorid, "
+                QString("INSERT INTO boundingbox ("
+                        "name, boxtype, transformanimatorid, "
                         "pivotchanged, visible, locked, blendmode, "
-                        "parentboundingboxid) "
-                "VALUES ('%1', %2, %3, %4, %5, %6, %7, %8)").
+                        "parentboundingboxid, durationrectid) "
+                "VALUES ('%1', %2, %3, %4, %5, %6, %7, %8, %9)").
                 arg(prp_mName).
                 arg(mType).
                 arg(transfromAnimatorId).
@@ -164,7 +171,8 @@ int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
                 arg(boolToSql(mVisible) ).
                 arg(boolToSql(mLocked) ).
                 arg(static_cast<int>(mBlendModeSk)).
-                arg(parentId)
+                arg(parentId).
+                arg(durRectId)
                 ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
@@ -189,6 +197,7 @@ void BoundingBox::loadFromSql(const int &boundingBoxId) {
         int idVisible = query.record().indexOf("visible");
         int idLocked = query.record().indexOf("locked");
         int idBlendMode = query.record().indexOf("blendmode");
+        int idDurRectId = query.record().indexOf("durationrectid");
 
         int transformAnimatorId = query.value(idTransformAnimatorId).toInt();
         bool pivotChanged = query.value(idPivotChanged).toBool();
@@ -202,12 +211,21 @@ void BoundingBox::loadFromSql(const int &boundingBoxId) {
         mLocked = locked;
         mVisible = visible;
         prp_mName = query.value(idName).toString();
+
+        if(!query.value(idDurRectId).isNull()) {
+            if(mDurationRectangle == NULL) {
+                createDurationRectangle();
+            }
+            mDurationRectangle->loadFromSql(
+                        query.value(idDurRectId).toInt());
+        }
     } else {
         qDebug() << "Could not load boundingbox with id " << boundingBoxId;
     }
 }
 
 Canvas *BoundingBox::getParentCanvas() {
+    if(mParent == NULL) return NULL;
     return mParent->getParentCanvas();
 }
 
@@ -832,7 +850,10 @@ bool BoundingBox::hasDurationRectangle() {
 void BoundingBox::createDurationRectangle() {
     DurationRectangle *durRect = new DurationRectangle(this);
     durRect->setMinFrame(0);
-    durRect->setFramesDuration(getParentCanvas()->getFrameCount());
+    Canvas *parentCanvas = getParentCanvas();
+    if(parentCanvas != NULL) {
+        durRect->setFramesDuration(getParentCanvas()->getFrameCount());
+    }
     setDurationRectangle(durRect);
 }
 

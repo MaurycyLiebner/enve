@@ -97,6 +97,13 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "FOREIGN KEY(linewidthanimatorid) REFERENCES qrealanimator(id), "
                "FOREIGN KEY(paintsettingsid) REFERENCES paintsettings(id) )");
 
+
+    query->exec("CREATE TABLE durationrect "
+               "(id INTEGER PRIMARY KEY, "
+                "minframe INTEGER, "
+                "maxframe INTEGER )");
+
+
     query->exec("CREATE TABLE boundingbox "
                "(id INTEGER PRIMARY KEY, "
                "name TEXT, "
@@ -107,8 +114,10 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "locked BOOLEAN, "
                "blendmode INTEGER, "
                "parentboundingboxid INTEGER, "
+               "durationrectid INTEGER, "
                "FOREIGN KEY(transformanimatorid) REFERENCES transformanimator(id), "
-               "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id) )");
+               "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id), "
+               "FOREIGN KEY(durationrectid) REFERENCES durationrect(id) )");
 
     query->exec("CREATE TABLE canvas "
                "(id INTEGER PRIMARY KEY, "

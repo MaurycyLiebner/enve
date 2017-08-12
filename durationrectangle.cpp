@@ -85,6 +85,35 @@ DurationRectangle::DurationRectangle(Property *childProp) :
             this, SIGNAL(maxFrameChangedBy(int)));
 }
 
+#include <QSqlError>
+int DurationRectangle::saveToSql(QSqlQuery *query) {
+    if(!query->exec(
+                QString("INSERT INTO durationrect ("
+                        "minframe, maxframe) "
+                "VALUES (%1, %2)").
+                arg(getMinFrame()).
+                arg(getMaxFrame())
+                ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+
+    return query->lastInsertId().toInt();
+}
+
+void DurationRectangle::loadFromSql(const int &durRectId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM durationrect WHERE id = " +
+            QString::number(durRectId);
+    if(query.exec(queryStr)) {
+        query.next();
+        setMinFrame(query.value("minframe").toInt());
+        setMaxFrame(query.value("maxframe").toInt());
+    } else {
+        qDebug() << "Could not load durationrect with id " << durRectId;
+    }
+}
+
 void DurationRectangle::setFramesDuration(const int &duration) {
     mMaxFrame.setFramePos(getMinFrame() + duration - 1);
 }
