@@ -1059,8 +1059,19 @@ QMatrix getMatrixFromString(const QString &matrixStr) {
             matrix.translate(((const QString&)capturedTxt.at(1)).toDouble(),
                              ((const QString&)capturedTxt.at(3)).toDouble());
         } else {
-            qDebug() << "getMatrixFromString - could not extract values from string: "
-                     << endl << matrixStr;
+            QRegExp rx3 = QRegExp("scale\\("
+                                 "\\s*(-?\\d+(\\.\\d*)?),"
+                                 "\\s*(-?\\d+(\\.\\d*)?)"
+                                 "\\)", Qt::CaseInsensitive);
+            if(rx3.exactMatch(matrixStr)) {
+                rx3.indexIn(matrixStr);
+                QStringList capturedTxt = rx3.capturedTexts();
+                matrix.scale(((const QString&)capturedTxt.at(1)).toDouble(),
+                              ((const QString&)capturedTxt.at(3)).toDouble());
+            } else {
+                qDebug() << "getMatrixFromString - could not extract values from string: "
+                         << endl << matrixStr;
+            }
         }
     }
 
