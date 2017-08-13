@@ -3,11 +3,12 @@
 class PathEffect;
 #include "Animators/complexanimator.h"
 #include "skiaincludes.h"
+class PathBox;
 
 class PathEffectAnimators : public ComplexAnimator
 {
 public:
-    PathEffectAnimators();
+    PathEffectAnimators(PathBox *parentPath);
 
     //void addPathEffect(PathEffect *effect);
 
@@ -23,6 +24,14 @@ public:
 
     void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
+    int saveToSql(QSqlQuery *query,
+                  const int &boundingBoxSqlId,
+                  const bool &outline);
+    void loadFromSql(const int &boundingBoxSqlId,
+                     const bool &outline);
+
+protected:
+    PathBox *mParentPath = NULL;
 };
 
 

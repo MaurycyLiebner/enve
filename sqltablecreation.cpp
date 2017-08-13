@@ -276,4 +276,42 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                 "influenceid INTEGER, "
                 "FOREIGN KEY(pixmapeffectid) REFERENCES pixmapeffect(id), "
                 "FOREIGN KEY(influenceid) REFERENCES qrealanimator(id) )");
+
+    query->exec("CREATE TABLE patheffect "
+                "(id INTEGER PRIMARY KEY, "
+                "boundingboxid INTEGER, "
+                "type INTEGER, "
+                "outline BOOLEAN, "
+                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE boxtargetproperty "
+                "(id INTEGER PRIMARY KEY, "
+                "targetboxid INTEGER, "
+                "FOREIGN KEY(targetboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE sumpatheffect "
+                "(id INTEGER PRIMARY KEY, "
+                "patheffectid INTEGER, "
+                "boxtargetid INTEGER, "
+                "FOREIGN KEY(boxtargetid) REFERENCES boxtargetproperty(id), "
+                "FOREIGN KEY(patheffectid) REFERENCES patheffect(id) )");
+
+    query->exec("CREATE TABLE duplicatepatheffect "
+                "(id INTEGER PRIMARY KEY, "
+                "patheffectid INTEGER, "
+                "translationid INTEGER, "
+                "FOREIGN KEY(translationid) REFERENCES qpointfanimator(id), "
+                "FOREIGN KEY(patheffectid) REFERENCES patheffect(id) )");
+
+    query->exec("CREATE TABLE displacepatheffect "
+                "(id INTEGER PRIMARY KEY, "
+                "patheffectid INTEGER, "
+                "seglengthid INTEGER, "
+                "maxdevid INTEGER, "
+                "smoothnessid INTEGER, "
+                "FOREIGN KEY(seglengthid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(maxdevid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(smoothnessid) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(patheffectid) REFERENCES patheffect(id) )");
+
 }

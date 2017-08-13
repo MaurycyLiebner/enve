@@ -39,7 +39,7 @@ void PixmapEffect::prp_startDragging() {
 }
 
 int PixmapEffect::saveToSql(QSqlQuery *query,
-                                const int &boundingBoxSqlId) {
+                            const int &boundingBoxSqlId) {
     if(!query->exec(
         QString("INSERT INTO pixmapeffect (boundingboxid, type) "
                 "VALUES (%1, %2)").
@@ -130,7 +130,7 @@ qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
 int BlurEffect::saveToSql(QSqlQuery *query,
                               const int &boundingBoxSqlId) {
     int pixmapEffectId = PixmapEffect::saveToSql(query,
-                                                     boundingBoxSqlId);
+                                                 boundingBoxSqlId);
     int radiusId = mBlurRadius->saveToSql(query);
     if(!query->exec(
         QString("INSERT INTO blureffect (pixmapeffectid, radiusid) "

@@ -199,6 +199,13 @@ public:
                                                const int &relFrame);
     void processSchedulers();
     void addSchedulersToProcess();
+
+    void afterAllSavesFinished() {
+        BoundingBox::afterAllSavesFinished();
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+            box->afterAllSavesFinished();
+        }
+    }
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

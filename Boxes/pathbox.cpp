@@ -13,13 +13,13 @@
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
-            (new PathEffectAnimators())->ref<PathEffectAnimators>();
+            (new PathEffectAnimators(this))->ref<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setBlockedUpdater(
                 new PathPointUpdater(this));
 
     mOutlinePathEffectsAnimators =
-            (new PathEffectAnimators())->ref<PathEffectAnimators>();
+            (new PathEffectAnimators(this))->ref<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
                 new PathPointUpdater(this));
@@ -126,6 +126,8 @@ int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
     int fillPts = mFillGradientPoints->saveToSql(query);
     int strokePts = mStrokeGradientPoints->saveToSql(query);
 
+    mPathEffectsAnimators->saveToSql(query, boundingBoxId, false);
+    mOutlinePathEffectsAnimators->saveToSql(query, boundingBoxId, true);
     int fillSettingsId = mFillSettings->saveToSql(query);
     int strokeSettingsId = mStrokeSettings->saveToSql(query);
     if(!query->exec(
@@ -138,7 +140,7 @@ int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
             arg(strokePts).
             arg(boundingBoxId).
             arg(fillSettingsId).
-            arg(strokeSettingsId) ) ) {
+            arg(strokeSettingsId)) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
@@ -170,12 +172,14 @@ void PathBox::loadFromSql(const int &boundingBoxId) {
         int strokeSettingsId =
                 query.value(idstrokesettingsid).toInt();
 
-
         mFillGradientPoints->loadFromSql(fillGradientPointsId);
         mStrokeGradientPoints->loadFromSql(strokeGradientPointsId);
 
         mFillSettings->loadFromSql(fillSettingsId);
         mStrokeSettings->loadFromSql(strokeSettingsId);
+
+        mPathEffectsAnimators->loadFromSql(boundingBoxId, false);
+        mOutlinePathEffectsAnimators->loadFromSql(boundingBoxId, true);
     } else {
         qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }

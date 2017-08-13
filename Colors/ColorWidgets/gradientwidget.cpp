@@ -137,7 +137,8 @@ void GradientWidget::setCurrentColor(GLfloat h,
     updateAll();
 }
 
-void GradientWidget::setCurrentGradient(Gradient *gradient) {
+void GradientWidget::setCurrentGradient(Gradient *gradient,
+                                        const bool &emitChange) {
     if(mCurrentGradient != NULL) {
         disconnect(mCurrentGradient,
                    SIGNAL(resetGradientWidgetColorIdIfEquals(Gradient*,int)),
@@ -160,7 +161,9 @@ void GradientWidget::setCurrentGradient(Gradient *gradient) {
     }
     setCurrentColorId(0);
 
-    emit currentGradientChanged(mCurrentGradient);
+    if(emitChange) {
+        emit currentGradientChanged(mCurrentGradient);
+    }
 }
 
 Gradient *GradientWidget::getCurrentGradient() {

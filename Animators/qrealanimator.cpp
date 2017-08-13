@@ -21,8 +21,7 @@ QrealAnimator::~QrealAnimator() {
 
 #include <QSqlError>
 #include <QSqlQuery>
-int QrealAnimator::saveToSql(QSqlQuery *query, const int &parentId) {
-    Q_UNUSED(parentId);
+int QrealAnimator::saveToSql(QSqlQuery *query) {
     if(!query->exec(
         QString("INSERT INTO qrealanimator (currentvalue) "
                 "VALUES (%1)").

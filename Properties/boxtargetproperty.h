@@ -5,6 +5,18 @@
 class BoundingBox;
 class QrealAnimator;
 
+class BoxTargetProperty;
+
+#include "Boxes/boundingbox.h"
+struct SumPathEffectForBoxLoad : public FunctionWaitingForBoxLoad {
+    SumPathEffectForBoxLoad(const int &sqlBoxIdT,
+                            BoxTargetProperty *targetPropertyT);
+
+    void boxLoaded(BoundingBox *box);
+
+    BoxTargetProperty *targetProperty;
+};
+
 class BoxTargetProperty : public Property {
 public:
     BoxTargetProperty();
@@ -19,6 +31,9 @@ public:
 //    void loadFromSql(const int &identifyingId) {}
 
     bool SWT_isBoxTargetProperty() { return true; }
+
+    int saveToSql(QSqlQuery *query);
+    void loadFromSql(const int &identifyingId);
 private:
     QWeakPointer<BoundingBox> mTarget;
 };

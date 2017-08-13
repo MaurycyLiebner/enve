@@ -124,7 +124,7 @@ public:
     void qra_saveValueToKey(const int &frame, const qreal &value);
     void removeThisFromGraphAnimator();
 
-    int saveToSql(QSqlQuery *query, const int &parentId = 0);
+    int saveToSql(QSqlQuery *query);
     void loadFromSql(const int &qrealAnimatorId);
     void loadKeysFromSql(const int &qrealAnimatorId);
     void incSavedValueToCurrentValue(const qreal &incBy);

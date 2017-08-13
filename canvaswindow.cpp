@@ -892,10 +892,17 @@ Canvas *CanvasWindow::loadCanvasesFromSql() {
     return NULL;
 }
 
-void CanvasWindow::saveCanvasesFromSql(QSqlQuery *query) {
+void CanvasWindow::saveCanvasesToSql(QSqlQuery *query) {
     Q_FOREACH(const CanvasQSPtr &canvas, mCanvasList) {
         canvas->saveToSql(query);
     }
+}
+
+void CanvasWindow::afterAllSavesFinished() {
+    Q_FOREACH(const CanvasQSPtr &canvas, mCanvasList) {
+        canvas->afterAllSavesFinished();
+    }
+    BoundingBox::clearLoadedBoxes();
 }
 
 void CanvasWindow::saveOutput(const QString &renderDest,

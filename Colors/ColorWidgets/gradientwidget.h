@@ -13,7 +13,8 @@ public:
     GradientWidget(QWidget *parent, MainWindow *mainWindow);
     ~GradientWidget();
 
-    void setCurrentGradient(Gradient *gradient);
+    void setCurrentGradient(Gradient *gradient,
+                            const bool &emitChange = true);
     Gradient *getCurrentGradient();
     Color getCurrentColor();
     ColorAnimator *getCurrentColorAnimator();

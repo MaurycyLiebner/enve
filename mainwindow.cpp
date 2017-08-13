@@ -1366,7 +1366,8 @@ void MainWindow::saveToFile(QString path) {
     query.exec("BEGIN TRANSACTION");
 
     mFillStrokeSettings->saveGradientsToQuery(&query);
-    mCanvasWindow->saveToSql(&query);
+    mCanvasWindow->saveCanvasesToSql(&query);
+    mCanvasWindow->afterAllSavesFinished();
 
     query.exec("COMMIT TRANSACTION");
     db.close();

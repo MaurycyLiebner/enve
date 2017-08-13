@@ -277,7 +277,7 @@ void FillStrokeSettingsWidget::setCurrentColorMode(const ColorMode &mode) {
 
 void FillStrokeSettingsWidget::updateAfterTargetChanged() {
     if(getCurrentPaintTypeVal() == GRADIENTPAINT) {
-        mGradientWidget->setCurrentGradient(getCurrentGradientVal() );
+        mGradientWidget->setCurrentGradient(getCurrentGradientVal(), false);
         mLinearGradientButton->setChecked(getCurrentGradientLinearVal());
         mRadialGradientButton->setChecked(!getCurrentGradientLinearVal());
     }

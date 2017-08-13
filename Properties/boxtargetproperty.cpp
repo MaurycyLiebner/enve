@@ -32,3 +32,66 @@ Property *BoxTargetProperty::makeDuplicate() {
     makeDuplicate(prop);
     return prop;
 }
+
+int BoxTargetProperty::saveToSql(QSqlQuery *query) {
+    QString boxTargetStr = "NULL";
+    BoundingBox *targetBox = mTarget.data();
+    bool addAwaitForBox = false;
+    if(targetBox != NULL) {
+        if(targetBox->wasBoxSaved()) {
+            boxTargetStr = QString::number(targetBox->getSqlId());
+        } else {
+            addAwaitForBox = true;
+        }
+    }
+    if(!query->exec(
+                QString("INSERT INTO boxtargetproperty (targetboxid) "
+                        "VALUES (%1)").
+                arg(boxTargetStr) ) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+    int boxId = query->lastInsertId().toInt();
+
+    if(addAwaitForBox) {
+        BoundingBox::addSqlInsertAwaitingBox(
+             "UPDATE boxtargetproperty SET targetboxid=%1 "
+             "WHERE id=" + QString::number(boxId),
+             targetBox);
+    }
+
+    return boxId;
+}
+
+void BoxTargetProperty::loadFromSql(const int &identifyingId) {
+    QSqlQuery query;
+
+    QString queryStr = "SELECT * FROM boxtargetproperty WHERE id = " +
+            QString::number(identifyingId);
+    if(query.exec(queryStr)) {
+        query.next();
+        int targetBoxId = query.value("targetboxid").toInt();
+        BoundingBox *targetBox =
+                BoundingBox::getLoadedBoxById(targetBoxId);
+        if(targetBox == NULL) {
+            BoundingBox::addFunctionWaitingForBoxLoad(
+                        new SumPathEffectForBoxLoad(targetBoxId,
+                                                    this));
+        } else {
+            setTarget(targetBox);
+        }
+    } else {
+        qDebug() << "Could not load boxtargetproperty with id " <<
+                    identifyingId;
+    }
+}
+
+SumPathEffectForBoxLoad::SumPathEffectForBoxLoad(const int &sqlBoxIdT,
+                                                 BoxTargetProperty *targetPropertyT) :
+    FunctionWaitingForBoxLoad(sqlBoxIdT) {
+    sqlBoxId = sqlBoxIdT;
+    targetProperty = targetPropertyT;
+}
+
+void SumPathEffectForBoxLoad::boxLoaded(BoundingBox *box) {
+    targetProperty->setTarget(box);
+}

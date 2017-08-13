@@ -15,6 +15,10 @@
 #include "skqtconversions.h"
 #include "global.h"
 
+QList<SqlInsertAwaitingBox> BoundingBox::mSqlInsertAwaitingBox;
+QList<BoundingBox*> BoundingBox::mLoadedBoxes;
+QList<FunctionWaitingForBoxLoad*> BoundingBox::mFunctionsWaitingForBoxLoad;
+
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
     ComplexAnimator(), Transformable() {
     mEffectsAnimators->prp_setName("effects");
@@ -177,7 +181,10 @@ int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
+    setBoxSaved(true);
     int boxId = query->lastInsertId().toInt();
+    mSqlId = boxId;
+    callSqlInsertsAwaitingForBox(query, this, boxId);
     if(mEffectsAnimators->hasChildAnimators()) {
         mEffectsAnimators->saveToSql(query, boxId);
     }
@@ -186,7 +193,7 @@ int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
 
 void BoundingBox::loadFromSql(const int &boundingBoxId) {
     QSqlQuery query;
-
+    mSqlId = boundingBoxId;
     QString queryStr = "SELECT * FROM boundingbox WHERE id = " +
             QString::number(boundingBoxId);
     if(query.exec(queryStr)) {
@@ -219,6 +226,7 @@ void BoundingBox::loadFromSql(const int &boundingBoxId) {
             mDurationRectangle->loadFromSql(
                         query.value(idDurRectId).toInt());
         }
+        addLoadedBox(this);
     } else {
         qDebug() << "Could not load boundingbox with id " << boundingBoxId;
     }

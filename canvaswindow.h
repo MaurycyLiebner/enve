@@ -96,7 +96,7 @@ public:
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
     Canvas *loadCanvasesFromSql();
-    void saveCanvasesFromSql(QSqlQuery *query);
+    void saveCanvasesToSql(QSqlQuery *query);
     void updateHoveredElements();
 
     void switchLocalPivot();
@@ -145,6 +145,7 @@ public:
     void rotate90CW();
     void processSchedulers();
     bool noBoxesAwaitUpdate();
+    void afterAllSavesFinished();
 protected:
     RenderInstanceSettings *mCurrentRenderSettings = NULL;
     QList<int> mFreeThreads;

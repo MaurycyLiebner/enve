@@ -16,6 +16,7 @@
 #include "boundingboxrendercontainer.h"
 #include "skiaincludes.h"
 #include "updatable.h"
+#include <QSqlError>
 
 class Canvas;
 
@@ -51,6 +52,37 @@ class VectorPathEdge;
 class VectorPath;
 
 class DurationRectangle;
+
+struct FunctionWaitingForBoxLoad {
+    FunctionWaitingForBoxLoad(const int &sqlBoxIdT) {
+        sqlBoxId = sqlBoxIdT;
+    }
+    virtual ~FunctionWaitingForBoxLoad() {}
+
+    virtual void boxLoaded(BoundingBox *box) = 0;
+    int sqlBoxId;
+};
+
+struct SqlInsertAwaitingBox {
+    SqlInsertAwaitingBox(const QString &sqlCommandT,
+                         BoundingBox *boxT) {
+        sqlCommand = sqlCommandT;
+        box = boxT;
+    }
+
+    int callComand(QSqlQuery *query,
+                    const int &boundingBoxSqlId) const {
+        if(!query->exec(sqlCommand.
+                    arg(boundingBoxSqlId)) ) {
+            qDebug() << query->lastError() << endl << query->lastQuery();
+        }
+
+        return query->lastInsertId().toInt();
+    }
+
+    QString sqlCommand;
+    BoundingBox *box;
+};
 
 class BoundingBoxMimeData : public QMimeData {
     Q_OBJECT
@@ -422,13 +454,6 @@ public:
     void decUsedAsTarget();
     void ca_childAnimatorIsRecordingChanged();
 
-    int getSqlId() {
-        return mSqlId;
-    }
-
-    void setSqlId(int id) {
-        mSqlId = id;
-    }
     virtual void clearAllCache();
 
     void startPivotTransform();
@@ -505,7 +530,78 @@ public:
     virtual void processSchedulers();
     void addScheduler(Updatable *updatable);
     virtual void addSchedulersToProcess();
+    void setBoxSaved(const bool &saved) {
+        mBoxSaved = saved;
+    }
+    const bool &wasBoxSaved() {
+        return mBoxSaved;
+    }
+
+    virtual void afterAllSavesFinished() {
+        setBoxSaved(false);
+    }
+
+    const int &getSqlId() {
+        return mSqlId;
+    }
+
+    static void callSqlInsertsAwaitingForBox(QSqlQuery *query,
+                                             BoundingBox *box,
+                                             const int &sqlId) {
+        for(int i = 0; i < mSqlInsertAwaitingBox.count(); i++) {
+            const SqlInsertAwaitingBox &sqlInsertT =
+                    mSqlInsertAwaitingBox.at(i);
+            if(sqlInsertT.box == box) {
+                sqlInsertT.callComand(query, sqlId);
+                mSqlInsertAwaitingBox.removeAt(i);
+            }
+            i--;
+        }
+    }
+
+    static void addSqlInsertAwaitingBox(const QString &command,
+                                        BoundingBox *box) {
+        mSqlInsertAwaitingBox.append(SqlInsertAwaitingBox(command, box));
+    }
+
+    static BoundingBox *getLoadedBoxById(const int &sqlId) {
+        foreach(BoundingBox *box, mLoadedBoxes) {
+            if(box->getSqlId() == sqlId) {
+                return box;
+            }
+        }
+        return NULL;
+    }
+
+    static void addFunctionWaitingForBoxLoad(FunctionWaitingForBoxLoad *func) {
+        mFunctionsWaitingForBoxLoad << func;
+    }
+
+    static void addLoadedBox(BoundingBox *box) {
+        mLoadedBoxes << box;
+        for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
+            FunctionWaitingForBoxLoad *funcT =
+                    mFunctionsWaitingForBoxLoad.at(i);
+            if(funcT->sqlBoxId == box->getSqlId()) {
+                funcT->boxLoaded(box);
+                delete funcT;
+                mFunctionsWaitingForBoxLoad.removeAt(i);
+                i--;
+            }
+        }
+    }
+
+    static void clearLoadedBoxes() {
+        mLoadedBoxes.clear();
+        foreach(FunctionWaitingForBoxLoad *funcT,
+                mFunctionsWaitingForBoxLoad) {
+            delete funcT;
+        }
+
+        mFunctionsWaitingForBoxLoad.clear();
+    }
 protected:
+    bool mBoxSaved = false;
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;
@@ -571,6 +667,10 @@ protected:
 
     bool mVisible = true;
     bool mLocked = false;
+
+    static QList<SqlInsertAwaitingBox> mSqlInsertAwaitingBox;
+    static QList<BoundingBox*> mLoadedBoxes;
+    static QList<FunctionWaitingForBoxLoad*> mFunctionsWaitingForBoxLoad;
 signals:
     void nameChanged(QString);
     void scheduledUpdate();
