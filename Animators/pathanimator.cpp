@@ -5,6 +5,7 @@
 #include "edge.h"
 #include "skqtconversions.h"
 #include <QSqlRecord>
+#include "canvas.h"
 
 PathAnimator::PathAnimator() :
     ComplexAnimator() {
@@ -155,6 +156,12 @@ SkPath PathAnimator::getPathAtRelFrame(const int &relFrame) {
     }
 
     return path;
+}
+
+void PathAnimator::selectAllPoints(Canvas *canvas) {
+    Q_FOREACH(SingleVectorPathAnimator *singlePath, mSinglePaths) {
+        singlePath->selectAllPoints(canvas);
+    }
 }
 
 PathPoint *PathAnimator::createNewPointOnLineNear(const QPointF &absPos,

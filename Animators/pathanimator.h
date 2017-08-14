@@ -12,6 +12,7 @@ class PathPoint;
 class SinglePathAnimator;
 class SingleVectorPathAnimator;
 class BoundingBox;
+class Canvas;
 
 class PathAnimator : public ComplexAnimator {
     Q_OBJECT
@@ -59,7 +60,7 @@ public:
                                const bool &saveUndoRedo = true);
     void removeSinglePathAnimator(SingleVectorPathAnimator *path,
                                   const bool &saveUndoRedo = true);
-
+    void selectAllPoints(Canvas *canvas);
     bool SWT_isPathAnimator();
     SkPath getPathAtRelFrame(const int &relFrame);
 private:

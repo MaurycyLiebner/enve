@@ -920,19 +920,16 @@ void MainWindow::addUpdateScheduler(Updatable *scheduler) {
     mUpdateSchedulers.append(scheduler->ref<Updatable>());
 }
 
-bool MainWindow::isShiftPressed()
-{
-    return mShiftPressed;
+bool MainWindow::isShiftPressed() {
+    return QApplication::keyboardModifiers() & Qt::ShiftModifier;
 }
 
-bool MainWindow::isCtrlPressed()
-{
-    return mCtrlPressed;
+bool MainWindow::isCtrlPressed() {
+    return QApplication::keyboardModifiers() & Qt::ControlModifier;
 }
 
-bool MainWindow::isAltPressed()
-{
-    return mAltPressed;
+bool MainWindow::isAltPressed() {
+    return QApplication::keyboardModifiers() & Qt::AltModifier;
 }
 
 void MainWindow::callUpdateSchedulers() {
@@ -1076,19 +1073,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     }
     if(e->type() == QEvent::KeyPress) {
         QKeyEvent *key_event = (QKeyEvent*)e;
-        if(key_event->key() == Qt::Key_Control) {
-            mCtrlPressed = true;
-        } else if(key_event->key() == Qt::Key_Shift) {
-            mShiftPressed = true;
-        } else if(key_event->key() == Qt::Key_Alt) {
-            mAltPressed = true;
-        } else {
-            return processKeyEvent(key_event);
-        }
-        return true;
+        return processKeyEvent(key_event);
     } else if(e->type() == QEvent::ShortcutOverride) {
         QKeyEvent *key_event = (QKeyEvent*)e;
-        if(mCtrlPressed) {
+        if(isCtrlPressed() || isShiftPressed()) {
             if(key_event->key() == Qt::Key_C ||
                key_event->key() == Qt::Key_V ||
                key_event->key() == Qt::Key_X ||
@@ -1100,15 +1088,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
             return processKeyEvent(key_event);
         }
     } else if(e->type() == QEvent::KeyRelease) {
-        QKeyEvent *key_event = (QKeyEvent*)e;
-        if(key_event->key() == Qt::Key_Control) {
-            mCtrlPressed = false;
-            callUpdateSchedulers();
-        } else if(key_event->key() == Qt::Key_Shift) {
-            mShiftPressed = false;
-        } else if(key_event->key() == Qt::Key_Alt) {
-            mAltPressed = false;
-        }
+
     } else if(obj == mCanvasWindow->getCanvasWidget()) {
         if(e->type() == QEvent::Drop) {
             mCanvasWindow->dropEvent((QDropEvent*)e);

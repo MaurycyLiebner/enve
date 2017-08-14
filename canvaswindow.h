@@ -137,7 +137,6 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseDoubleClickEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
 
     void openSettingsWindowForCurrentCanvas();
 

@@ -311,6 +311,12 @@ MovablePoint *SingleVectorPathAnimator::getPointAtAbsPos(
     return NULL;
 }
 
+void SingleVectorPathAnimator::selectAllPoints(Canvas *canvas) {
+    Q_FOREACH(const QSharedPointer<PathPoint> &point, mPoints) {
+        canvas->addPointToSelection(point.data());
+    }
+}
+
 void SingleVectorPathAnimator::saveToSql(QSqlQuery *query,
                                          const int &boundingBoxId) {
     mFirstPoint->saveToSql(query, boundingBoxId);

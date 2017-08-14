@@ -284,11 +284,6 @@ void CanvasWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     mCurrentCanvas->mouseDoubleClickEvent(event);
 }
 
-void CanvasWindow::keyPressEvent(QKeyEvent *event) {
-    if(mCurrentCanvas == NULL) return;
-    mCurrentCanvas->keyPressEvent(event);
-}
-
 void CanvasWindow::openSettingsWindowForCurrentCanvas() {
     if(hasNoCanvas()) return;
     CanvasSettingsDialog dialog(mCurrentCanvas.data(), mCanvasWidget);

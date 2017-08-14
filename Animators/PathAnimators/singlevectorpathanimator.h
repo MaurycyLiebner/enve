@@ -11,6 +11,7 @@ class PathAnimator;
 class VectorPathEdge;
 class MovablePoint;
 class PathPoint;
+class Canvas;
 #include "skiaincludes.h"
 
 class SingleVectorPathAnimator : public SinglePathAnimator {
@@ -86,6 +87,7 @@ public:
     PathAnimator *getParentPathAnimator() {
         return mParentPathAnimator;
     }
+    void selectAllPoints(Canvas *canvas);
 private:
     PathAnimator *mParentPathAnimator = NULL;
     PathPoint *mFirstPoint = NULL;

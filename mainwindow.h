@@ -257,10 +257,6 @@ private:
     bool mAllPointsRecording = false;
     bool mDisplayedFillStrokeSettingsUpdateNeeded = false;
 
-    bool mShiftPressed = false;
-    bool mAltPressed = false;
-    bool mCtrlPressed = false;
-
     BoxScrollWidget *mObjectSettingsWidget = NULL;
     ScrollArea *mObjectSettingsScrollArea;
 

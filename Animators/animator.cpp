@@ -226,6 +226,8 @@ void Animator::anim_appendKey(Key *newKey,
 
 void Animator::anim_removeKey(Key *keyToRemove,
                               const bool &saveUndoRedo) {
+    keyToRemove->setSelected(false);
+
     anim_updateAfterChangedKey(keyToRemove);
 
     if(saveUndoRedo && !anim_isComplexAnimator()) {

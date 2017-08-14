@@ -600,6 +600,10 @@ public:
 
         mFunctionsWaitingForBoxLoad.clear();
     }
+
+    virtual void selectAllPoints(Canvas *canvas) {
+        Q_UNUSED(canvas);
+    }
 protected:
     bool mBoxSaved = false;
     QList<std::shared_ptr<Updatable> > mSchedulers;
@@ -671,6 +675,7 @@ protected:
     static QList<SqlInsertAwaitingBox> mSqlInsertAwaitingBox;
     static QList<BoundingBox*> mLoadedBoxes;
     static QList<FunctionWaitingForBoxLoad*> mFunctionsWaitingForBoxLoad;
+
 signals:
     void nameChanged(QString);
     void scheduledUpdate();

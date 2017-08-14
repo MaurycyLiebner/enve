@@ -524,7 +524,7 @@ void KeysView::graphMouseReleaseEvent(const Qt::MouseButton &eventButton) {
 }
 
 void KeysView::graphWheelEvent(QWheelEvent *event) {
-    if(mMainWindow->isCtrlPressed()) {
+    if(event->modifiers() & Qt::ControlModifier) {
         qreal valUnderMouse;
         qreal frame;
         graphGetValueAndFrameFromPos(event->posF(),

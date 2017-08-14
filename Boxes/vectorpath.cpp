@@ -30,6 +30,10 @@ int VectorPath::saveToSql(QSqlQuery *query, const int &parentId) {
     return boundingBoxId;
 }
 
+void VectorPath::selectAllPoints(Canvas *canvas) {
+    mPathAnimator->selectAllPoints(canvas);
+}
+
 PathPoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv) {

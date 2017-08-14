@@ -936,13 +936,12 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
     } else if(event->buttons() & Qt::LeftButton ||
                mIsMouseGrabbing) {
         if(mFirstMouseMove && event->buttons() & Qt::LeftButton) {
-            if(mCurrentMode == CanvasMode::MOVE_POINT ||
-               mCurrentMode == CanvasMode::MOVE_PATH) {
-                if(mHoveredBox == NULL &&
-                   mHoveredPoint == NULL &&
-                   mHoveredEdge == NULL) {
-                    startSelectionAtPoint(mLastMouseEventPosRel);
-                }
+            if((mCurrentMode == CanvasMode::MOVE_POINT &&
+                mHoveredPoint == NULL &&
+                mHoveredEdge == NULL) ||
+               (mCurrentMode == CanvasMode::MOVE_PATH &&
+                mHoveredBox == NULL)) {
+                startSelectionAtPoint(mLastMouseEventPosRel);
             }
         }
         if(mSelecting) {

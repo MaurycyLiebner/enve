@@ -931,7 +931,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         mFirstMouseMove = true;
 
         grabMouseAndTrack();
-    } else if(event->key() == Qt::Key_S && (isMovingPath() ||
+    } else if(event->key() == Qt::Key_S && (mCurrentMode == MOVE_PATH ||
               mCurrentMode == MOVE_POINT) && !isGrabbingMouse) {
         if(mSelectedBoxes.isEmpty()) return false;
         if(mCurrentMode == MOVE_POINT) {
@@ -966,11 +966,21 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
      } else if(event->key() == Qt::Key_A &&
                event->modifiers() & Qt::ControlModifier &&
                !isGrabbingMouse) {
-       if(isShiftPressed()) {
-           mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();
-       } else {
-           mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
-       }
+        if(mCurrentMode == MOVE_PATH) {
+            if(isShiftPressed()) {
+               mCurrentBoxesGroup->deselectAllBoxesFromBoxesGroup();
+           } else {
+               mCurrentBoxesGroup->selectAllBoxesFromBoxesGroup();
+           }
+        } else if(mCurrentMode == MOVE_POINT) {
+            if(isShiftPressed()) {
+                clearPointsSelection();
+            } else {
+                foreach(BoundingBox *box, mSelectedBoxes) {
+                    box->selectAllPoints(this);
+                }
+            }
+        }
     } else if(event->key() == Qt::Key_W) {
         MainWindow::getInstance()->incBrushRadius();
     } else if(event->key() == Qt::Key_Q) {

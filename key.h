@@ -41,7 +41,9 @@ public:
 
     void removeFromAnimator();
 
-    virtual void deleteKey() { removeFromAnimator(); }
+    virtual void deleteKey() {
+        removeFromAnimator();
+    }
 
     virtual void copyToContainer(KeysClipboardContainer *container);
     virtual void cancelFrameTransform();

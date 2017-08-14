@@ -51,6 +51,7 @@ public:
                                            QList<MovablePoint *> *list);
     SkPath getPathAtRelFrame(const int &relFrame);
 
+    void selectAllPoints(Canvas *canvas);
 protected:
     PathAnimatorQSPtr mPathAnimator;
 
