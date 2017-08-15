@@ -38,13 +38,11 @@ public:
         rectTarget->duplicateRectanglePointsFrom(
                     mTopLeftPoint,
                     mBottomRightPoint,
-                    &mXRadiusAnimator,
-                    &mYRadiusAnimator);
+                    &mRadiusPoint);
     }
     void duplicateRectanglePointsFrom(RectangleTopLeftPoint *topLeftPoint,
                         RectangleBottomRightPoint *bottomRightPoint,
-                        QrealAnimator *xRadiusAnimator,
-                        QrealAnimator *yRadiusAnimator);
+                        QPointFAnimator *radiusPoint);
     BoundingBox *createNewDuplicate();
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
@@ -60,8 +58,7 @@ protected:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;
 
-    QrealAnimator mXRadiusAnimator;
-    QrealAnimator mYRadiusAnimator;
+    QPointFAnimator mRadiusPoint;
 };
 
 #endif // RECTANGLE_H

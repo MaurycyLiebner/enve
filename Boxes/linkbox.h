@@ -33,13 +33,21 @@ public:
     InternalLinkBox(BoundingBox *linkTarget);
 
     void setLinkTarget(BoundingBox *linkTarget) {
-        mLinkTarget = linkTarget->ref<BoundingBox>();
-        scheduleUpdate();
-        if(linkTarget == NULL) {
-            setName("Link Empty");
-            return;
+        if(mLinkTarget != NULL) {
+            disconnect(mLinkTarget.data(), SIGNAL(scheduledUpdate()),
+                       this, SLOT(scheduleUpdate()));
         }
-        setName("Link " + linkTarget->getName());
+        if(linkTarget == NULL) {
+            setName("empty link");
+
+            mLinkTarget.reset();
+        } else {
+            setName(linkTarget->getName());
+            mLinkTarget = linkTarget->ref<BoundingBox>();
+            connect(linkTarget, SIGNAL(scheduledUpdate()),
+                    this, SLOT(scheduleUpdate()));
+        }
+        scheduleUpdate();
     }
 
 
@@ -73,24 +81,18 @@ protected:
     QSharedPointer<BoundingBox> mLinkTarget;
 };
 
-class InternalLinkCanvas : public BoundingBox {
+class InternalLinkCanvas : public InternalLinkBox {
     Q_OBJECT
 public:
     InternalLinkCanvas(Canvas *canvas) :
-        BoundingBox(TYPE_INTERNAL_LINK) {
+        InternalLinkBox(canvas) {
         mClipToCanvasSize->prp_setName("clip to size");
         mClipToCanvasSize->setValue(true);
         mRastarized->prp_setName("rastarized");
         mRastarized->setValue(false);
-        setLinkTarget(canvas);
 
         ca_addChildAnimator(mClipToCanvasSize.data());
         ca_addChildAnimator(mRastarized.data());
-    }
-
-    void setLinkTarget(Canvas *linkTarget) {
-        setName(linkTarget->getName());
-        mLinkTarget = linkTarget->ref<Canvas>();
     }
 
     void setClippedToCanvasSize(const bool &clipped);
@@ -107,12 +109,16 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrame(
             const int &relFrame, BoundingBoxRenderData *data) {
-        mLinkTarget->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+        mLinkTarget->BoxesGroup::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
         BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+        data->transform = QMatrix();
     }
 
     BoundingBoxRenderData *createRenderData() {
-        return mLinkTarget->createRenderData();
+        BoundingBoxRenderData *renderData =
+                mLinkTarget->BoxesGroup::createRenderData();
+        renderData->parentBox = ref<BoundingBox>();
+        return renderData;
     }
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
@@ -120,6 +126,8 @@ public:
         return mLinkTarget->prp_differencesBetweenRelFrames(relFrame1,
                                                             relFrame2);
     }
+
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 protected:
     QSharedPointer<Canvas> mLinkTarget;
     QSharedPointer<BoolProperty> mClipToCanvasSize =

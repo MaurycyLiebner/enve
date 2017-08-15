@@ -146,6 +146,13 @@ void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
     scheduleUpdate();
 }
 
+QRectF InternalLinkCanvas::getRelBoundingRectAtRelFrame(const int &relFrame) {
+    if(mClipToCanvasSize) {
+        return mLinkTarget->getRelBoundingRectAtRelFrame(relFrame);
+    }
+    return mLinkTarget->BoxesGroup::getRelBoundingRectAtRelFrame(relFrame);
+}
+
 
 //void InternalLinkCanvas::draw(QPainter *p) {
 //    p->save();

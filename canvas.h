@@ -474,6 +474,7 @@ public:
     void tabletEvent(QTabletEvent *e, const QPointF &absPos);
     void loadFromSql(const int &boundingBoxId,
                      const int &colorId);
+    QRectF getRelBoundingRectAtRelFrame(const int &);
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

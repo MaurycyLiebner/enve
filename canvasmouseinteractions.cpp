@@ -1010,7 +1010,6 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
                                     mLastPressPosRel,
                                     true,
                                     1./mCanvasTransformMatrix.m11());
-
     if(mLastPressedPoint == NULL) {
         BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);
         if(boxAt == NULL) {
@@ -1021,6 +1020,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
         } else {
             if(boxAt->isGroup()) {
                 setCurrentBoxesGroup((BoxesGroup*) boxAt);
+                updateHoveredElements();
             } else if(boxAt->isText()) {
                 releaseMouseAndDontTrack();
                 ((TextBox*) boxAt)->openTextEditor();
@@ -1028,6 +1028,9 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
                 mCanvasWindow->setCanvasMode(MOVE_PATH);
             }
         }
+    } else {
+        mCurrentEdge = NULL;
+        updateHoveredElements();
     }
 
     callUpdateSchedulers();

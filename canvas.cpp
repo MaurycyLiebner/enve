@@ -71,6 +71,10 @@ Canvas::~Canvas() {
     delete mRotPivot;
 }
 
+QRectF Canvas::getRelBoundingRectAtRelFrame(const int &) {
+    return QRectF(0., 0., mWidth, mHeight);
+}
+
 void Canvas::emitCanvasNameChanged() {
     emit canvasNameChanged(this, prp_mName);
 }
