@@ -246,7 +246,6 @@ public:
         Q_UNUSED(canvasScaleInv);
         return NULL;
     }
-    bool isVectorPath();
     void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     void setName(const QString &name);

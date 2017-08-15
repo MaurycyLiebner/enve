@@ -44,6 +44,9 @@ public:
     void addActionsToMenu(QMenu *menu);
     bool handleSelectedCanvasAction(QAction *selectedAction);
     SkPath getPathAtRelFrame(const int &relFrame);
+    void setCurrentTextValue(const QString &text,
+                             const bool &saveUndoRedo = true);
+
 private:
 
     QStringAnimatorQSPtr mText;

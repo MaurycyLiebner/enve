@@ -20,8 +20,13 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_addChildAnimator(mTopLeftPoint);
     ca_addChildAnimator(mBottomRightPoint);
 
-    mRadiusAnimator.prp_setName("radius");
-    ca_addChildAnimator(&mRadiusAnimator);
+    mXRadiusAnimator.prp_setName("x radius");
+    ca_addChildAnimator(&mXRadiusAnimator);
+    mXRadiusAnimator.qra_setValueRange(0., 9999.);
+
+    mYRadiusAnimator.prp_setName("y radius");
+    ca_addChildAnimator(&mYRadiusAnimator);
+    mYRadiusAnimator.qra_setValueRange(0., 9999.);
 
     prp_setUpdater(new PathPointUpdater(this));
 }
@@ -37,16 +42,18 @@ int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
 
     int bottomRightPointId = mBottomRightPoint->saveToSql(query);
     int topLeftPointId = mTopLeftPoint->saveToSql(query);
-    int radiusPointId = mRadiusAnimator.saveToSql(query);
+    int xRadiusPointId = mXRadiusAnimator.saveToSql(query);
+    int yRadiusPointId = mYRadiusAnimator.saveToSql(query);
 
     if(!query->exec(QString("INSERT INTO rectangle (boundingboxid, "
                            "topleftpointid, bottomrightpointid, "
-                           "radiuspointid) "
-                "VALUES (%1, %2, %3, %4)").
+                           "xradiuspointid, yradiuspointid) "
+                "VALUES (%1, %2, %3, %4, %5)").
                 arg(boundingBoxId).
                 arg(topLeftPointId).
                 arg(bottomRightPointId).
-                arg(radiusPointId) ) ) {
+                arg(xRadiusPointId).
+                arg(yRadiusPointId)) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
 
@@ -56,10 +63,12 @@ int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
 void Rectangle::duplicateRectanglePointsFrom(
         RectangleTopLeftPoint *topLeftPoint,
         RectangleBottomRightPoint *bottomRightPoint,
-        QrealAnimator *radiusAnimator) {
+        QrealAnimator *xRadiusAnimator,
+        QrealAnimator *yRadiusAnimator) {
     topLeftPoint->makeDuplicate(mTopLeftPoint);
     bottomRightPoint->makeDuplicate(mBottomRightPoint);
-    radiusAnimator->makeDuplicate(&mRadiusAnimator);
+    xRadiusAnimator->makeDuplicate(&mXRadiusAnimator);
+    yRadiusAnimator->makeDuplicate(&mYRadiusAnimator);
 }
 
 BoundingBox *Rectangle::createNewDuplicate() {
@@ -76,15 +85,18 @@ void Rectangle::loadFromSql(const int &boundingBoxId) {
         query.next();
         int idBottomRightPointId = query.record().indexOf("bottomrightpointid");
         int idTopLeftPointId = query.record().indexOf("topleftpointid");
-        int idRadiusPointId = query.record().indexOf("radiuspointid");
+        int idXRadiusPointId = query.record().indexOf("xradiuspointid");
+        int idYRadiusPointId = query.record().indexOf("yradiuspointid");
 
         int bottomRightPointId = query.value(idBottomRightPointId).toInt();
         int topLeftPointId = query.value(idTopLeftPointId).toInt();
-        int radiusPointId = query.value(idRadiusPointId).toInt();
+        int xRadiusPointId = query.value(idXRadiusPointId).toInt();
+        int yRadiusPointId = query.value(idYRadiusPointId).toInt();
 
         mBottomRightPoint->loadFromSql(bottomRightPointId);
         mTopLeftPoint->loadFromSql(topLeftPointId);
-        mRadiusAnimator.loadFromSql(radiusPointId);
+        mXRadiusAnimator.loadFromSql(xRadiusPointId);
+        mYRadiusAnimator.loadFromSql(yRadiusPointId);
     } else {
         qDebug() << "Could not load rectangle with id " << boundingBoxId;
     }
@@ -110,9 +122,27 @@ SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
     SkPoint bottomRight =
             QPointFToSkPoint(mBottomRightPoint->
                                 getCurrentPointValueAtRelFrame(relFrame));
-    path.addRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
-                                  bottomRight.x(), bottomRight.y()));
+    path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
+                                       bottomRight.x(), bottomRight.y()),
+                      mXRadiusAnimator.getCurrentValueAtRelFrame(relFrame),
+                      mYRadiusAnimator.getCurrentValueAtRelFrame(relFrame));
     return path;
+}
+
+void Rectangle::setTopLeftPos(const QPointF &pos) {
+    mTopLeftPoint->setRelativePos(pos);
+}
+
+void Rectangle::setBottomRightPos(const QPointF &pos) {
+    mBottomRightPoint->setRelativePos(pos);
+}
+
+void Rectangle::setYRadius(const qreal &radiusY) {
+    mYRadiusAnimator.qra_setCurrentValue(radiusY);
+}
+
+void Rectangle::setXRadius(const qreal &radiusX) {
+    mXRadiusAnimator.qra_setCurrentValue(radiusX);
 }
 
 void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {

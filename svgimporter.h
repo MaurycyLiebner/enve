@@ -26,6 +26,7 @@ public:
 
     void setFontAlignment(const Qt::Alignment &alignment);
 
+    const QFont &getFont() const { return mFont; }
 private:
     QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;

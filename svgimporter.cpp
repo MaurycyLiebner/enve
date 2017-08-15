@@ -8,6 +8,9 @@
 #include "Animators/pathanimator.h"
 #include "pathpoint.h"
 #include "pointhelpers.h"
+#include "Boxes/circle.h"
+#include "Boxes/rectangle.h"
+#include "Boxes/textbox.h"
 
 //bool getRotationScaleFromMatrixIfNoShear(const QMatrix &matrix,
 //                                         qreal *rot,
@@ -962,9 +965,87 @@ void loadPolyline(const QDomElement &pathElement,
     parentGroup->addChild(vectorPath);
 }
 
+void loadCircle(const QDomElement &pathElement,
+                BoxesGroup *parentGroup,
+                BoundingBoxSvgAttributes *attributes) {
+
+    QString cXstr = pathElement.attribute("cx");
+    QString cYstr = pathElement.attribute("cy");
+    QString rStr = pathElement.attribute("r");
+    QString rXstr = pathElement.attribute("rx");
+    QString rYstr = pathElement.attribute("ry");
+
+    Circle *circle;
+    if(!rStr.isEmpty()) {
+        circle = new Circle();
+        circle->setRadius(rStr.toDouble());
+    } else if(!rXstr.isEmpty() && !rYstr.isEmpty()){
+        circle = new Circle();
+        circle->setHorizontalRadius(rXstr.toDouble());
+        circle->setVerticalRadius(rYstr.toDouble());
+    } else {
+        return;
+    }
+
+    circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
+
+    attributes->apply(circle);
+    parentGroup->addChild(circle);
+}
+
+void loadRect(const QDomElement &pathElement,
+              BoxesGroup *parentGroup,
+              BoundingBoxSvgAttributes *attributes) {
+
+    QString xStr = pathElement.attribute("x");
+    QString yStr = pathElement.attribute("y");
+    QString wStr = pathElement.attribute("width");
+    QString hStr = pathElement.attribute("height");
+    QString rYstr = pathElement.attribute("ry");
+    QString rXstr = pathElement.attribute("rx");
+
+    if(rYstr.isEmpty()) {
+        rYstr = rXstr;
+    } else if(rXstr.isEmpty()) {
+        rXstr = rYstr;
+    }
+
+    Rectangle *rect = new Rectangle();
+
+    rect->moveByRel(QPointF(xStr.toDouble(),
+                            yStr.toDouble()));
+    rect->setTopLeftPos(QPointF(0., 0.));
+    rect->setBottomRightPos(QPointF(wStr.toDouble(),
+                                    hStr.toDouble()));
+    rect->setYRadius(rYstr.toDouble());
+    rect->setXRadius(rXstr.toDouble());
+
+    attributes->apply(rect);
+    parentGroup->addChild(rect);
+}
+
+
+void loadText(const QDomElement &pathElement,
+              BoxesGroup *parentGroup,
+              BoundingBoxSvgAttributes *attributes) {
+
+    QString xStr = pathElement.attribute("x");
+    QString yStr = pathElement.attribute("y");
+
+    TextBox *textBox = new TextBox();
+
+    textBox->moveByRel(QPointF(xStr.toDouble(),
+                               yStr.toDouble()));
+    textBox->setCurrentTextValue(pathElement.text(), false);
+
+    attributes->apply(textBox);
+    parentGroup->addChild(textBox);
+}
+
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
                  BoundingBoxSvgAttributes *parentGroupAttributes) {
-    if(element.tagName() == "g") {
+    if(element.tagName() == "g" ||
+       element.tagName() == "text") {
         BoundingBoxSvgAttributes attributes;
         attributes *= (*parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
@@ -979,6 +1060,22 @@ void loadElement(const QDomElement &element, BoxesGroup *parentGroup,
         attributes *= (*parentGroupAttributes);
         attributes.loadBoundingBoxAttributes(element);
         loadPolyline(element, parentGroup, &attributes);
+    } else if(element.tagName() == "circle" ||
+              element.tagName() == "ellipse") {
+        BoundingBoxSvgAttributes attributes;
+        attributes *= (*parentGroupAttributes);
+        attributes.loadBoundingBoxAttributes(element);
+        loadCircle(element, parentGroup, &attributes);
+    } else if(element.tagName() == "rect") {
+        BoundingBoxSvgAttributes attributes;
+        attributes *= (*parentGroupAttributes);
+        attributes.loadBoundingBoxAttributes(element);
+        loadRect(element, parentGroup, &attributes);
+    } else if(element.tagName() == "tspan") {
+        BoundingBoxSvgAttributes attributes;
+        attributes *= (*parentGroupAttributes);
+        attributes.loadBoundingBoxAttributes(element);
+        loadText(element, parentGroup, &attributes);
     }
 }
 
@@ -1868,7 +1965,7 @@ void FillSvgAttributes::apply(BoundingBox *box) {
     } else {
         setting = new PaintSetting(true);
     }
-    if(box->isVectorPath()) {
+    if(box->SWT_isPathBox()) {
         setting->apply((PathBox*)box);
     }
     delete setting;
@@ -1941,7 +2038,7 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale)
     } else {
         setting = new PaintSetting(false);
     }
-    if(box->isVectorPath()) {
+    if(box->SWT_isPathBox()) {
         setting->apply((PathBox*)box);
     }
     delete setting;
@@ -1950,6 +2047,23 @@ void StrokeSvgAttributes::apply(BoundingBox *box, const qreal &scale)
 
 void BoundingBoxSvgAttributes::apply(BoundingBox *box) {
     box->getTransformAnimator()->setOpacity(mOpacity);
+    if(box->SWT_isPathBox()) {
+        PathBox *path = (PathBox*)box;
+        qreal m11 = mRelTransform.m11();
+        qreal m12 = mRelTransform.m12();
+        qreal m21 = mRelTransform.m21();
+        qreal m22 = mRelTransform.m22();
+
+        qreal sxAbs = qSqrt(m11*m11 + m21*m21);
+        qreal syAbs = qSqrt(m12*m12 + m22*m22);
+        mStrokeAttributes.apply(path,
+                                (sxAbs + syAbs)*0.5);
+        mFillAttributes.apply(path);
+        if(box->SWT_isTextBox()) {
+            TextBox *text = (TextBox*)path;
+            text->setFont(mTextAttributes.getFont());
+        }
+    }
 }
 
 void VectorPathSvgAttributes::apply(VectorPath *path) {
@@ -1962,16 +2076,6 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
         pathAnimator->addSinglePathAnimator(singlePath);
     }
 
-    qreal m11 = mRelTransform.m11();
-    qreal m12 = mRelTransform.m12();
-    qreal m21 = mRelTransform.m21();
-    qreal m22 = mRelTransform.m22();
-
-    qreal sxAbs = qSqrt(m11*m11 + m21*m21);
-    qreal syAbs = qSqrt(m12*m12 + m22*m22);
-    mStrokeAttributes.apply(path,
-                            (sxAbs + syAbs)*0.5);
-    mFillAttributes.apply(path);
     BoundingBoxSvgAttributes::apply((BoundingBox*)path);
 }
 
@@ -2157,10 +2261,9 @@ void SvgSeparatePath::addPoint(SvgPathPoint *point) {
 
 TextSvgAttributes::TextSvgAttributes() {}
 
-TextSvgAttributes &TextSvgAttributes::operator*=(const TextSvgAttributes &overwritter) {
-    //        if(overwritter.wasColorAssigned()) {
-    //            mColor = overwritter.getColor();
-    //        }
+TextSvgAttributes &TextSvgAttributes::operator*=(
+        const TextSvgAttributes &overwritter) {
+    mFont = overwritter.getFont();
     return *this;
 }
 

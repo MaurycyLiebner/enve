@@ -549,10 +549,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
     FullVectorPath *addedPath = NULL;
 
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(box->isVectorPath() ||
-           box->isCircle() ||
-           box->isRect() ||
-           box->isText()) {
+        if(box->SWT_isPathBox()) {
             SkPath boxPath = ((PathBox*)box)->getRelativePath();
             boxPath.transform(QMatrixToSkMatrix(box->getRelativeTransform()));
             addToPath = targetPath;

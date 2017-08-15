@@ -188,3 +188,8 @@ SkPath TextBox::getPathAtRelFrame(const int &relFrame) {
 
     return QPainterPathToSkPath(qPath);
 }
+
+void TextBox::setCurrentTextValue(const QString &text,
+                                  const bool &saveUndoRedo) {
+    mText->setCurrentTextValue(text, saveUndoRedo);
+}

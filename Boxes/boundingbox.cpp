@@ -360,10 +360,6 @@ bool BoundingBox::isGroup() {
     return mType == TYPE_GROUP;
 }
 
-bool BoundingBox::isVectorPath() {
-    return mType == TYPE_VECTOR_PATH;
-}
-
 bool BoundingBox::isCircle() {
     return mType == TYPE_CIRCLE;
 }

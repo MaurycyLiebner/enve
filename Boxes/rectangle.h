@@ -38,22 +38,30 @@ public:
         rectTarget->duplicateRectanglePointsFrom(
                     mTopLeftPoint,
                     mBottomRightPoint,
-                    &mRadiusAnimator);
+                    &mXRadiusAnimator,
+                    &mYRadiusAnimator);
     }
     void duplicateRectanglePointsFrom(RectangleTopLeftPoint *topLeftPoint,
                         RectangleBottomRightPoint *bottomRightPoint,
-                        QrealAnimator *radiusAnimator);
+                        QrealAnimator *xRadiusAnimator,
+                        QrealAnimator *yRadiusAnimator);
     BoundingBox *createNewDuplicate();
     MovablePoint *getBottomRightPoint();
     void finishAllPointsTransform();
 
     bool SWT_isRectangle() { return true; }
     SkPath getPathAtRelFrame(const int &relFrame);
+
+    void setTopLeftPos(const QPointF &pos);
+    void setBottomRightPos(const QPointF &pos);
+    void setYRadius(const qreal &radiusY);
+    void setXRadius(const qreal &radiusX);
 protected:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;
 
-    QrealAnimator mRadiusAnimator;
+    QrealAnimator mXRadiusAnimator;
+    QrealAnimator mYRadiusAnimator;
 };
 
 #endif // RECTANGLE_H

@@ -680,13 +680,13 @@ bool BezierCubic::intersects(BezierCubic *bezier,
                 currentDistBetween = pointToLen(currentBezierPos -
                                                 currentThisPos);
                 if(currentDistBetween < lowestDistBetween) {
-                    if(currentDistBetween < 0.000001) {
-                        if(((pointToLen(mP1 - bezier->getP1()) < .001 ||
-                           pointToLen(mP1 - bezier->getP2()) < .001) &&
-                           pointToLen(mP1 - currentBezierPos) < .001) ||
-                           ((pointToLen(mP2 - bezier->getP1()) < .001 ||
-                           pointToLen(mP2 - bezier->getP2()) < .001) &&
-                           pointToLen(mP2 - currentBezierPos) < .001)) {
+                    if(currentDistBetween < 1.0e-10) {
+                        if(((pointToLen(mP1 - bezier->getP1()) < 1.0e-5 ||
+                           pointToLen(mP1 - bezier->getP2()) < 1.0e-5) &&
+                           pointToLen(mP1 - currentBezierPos) < 1.0e-5) ||
+                           ((pointToLen(mP2 - bezier->getP1()) < 1.0e-5 ||
+                           pointToLen(mP2 - bezier->getP2()) < 1.0e-5) &&
+                           pointToLen(mP2 - currentBezierPos) < 1.0e-5)) {
                             bezierTStep *= 10;
                             currentDistBetween *= 10;
                         } else {
