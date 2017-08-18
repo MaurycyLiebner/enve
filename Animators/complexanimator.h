@@ -68,7 +68,8 @@ public:
     void ca_updateDescendatKeyFrame(Key *key);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
-                                               const int &relFrame);
+                                              const int &relFrame);
+    void anim_saveCurrentValueAsKey();
 public slots:
     void prp_setRecording(const bool &rec);
 

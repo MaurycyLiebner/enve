@@ -10,6 +10,7 @@
 #include "BoxesList/OptimalScrollArea/scrollwidgetvisiblepart.h"
 #include "canvaswindow.h"
 #include "canvas.h"
+#include "Boxes/particlebox.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -180,6 +181,11 @@ BoxesGroup *BoxesGroup::loadChildrenFromSql(const int &thisBoundingBoxId,
                 VideoBox *video = new VideoBox("");
                 video->loadFromSql(query.value(idId).toInt());
                 addChild(video);
+            } else if(static_cast<BoundingBoxType>(
+                          query.value(idBoxType).toInt()) == TYPE_PARTICLES) {
+                ParticleBox *particleBox = new ParticleBox();
+                particleBox->loadFromSql(query.value(idId).toInt());
+                addChild(particleBox);
             }
         }
     } else {

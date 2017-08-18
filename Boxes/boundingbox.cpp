@@ -206,6 +206,14 @@ void BoundingBox::loadFromSql(const int &boundingBoxId) {
         int idBlendMode = query.record().indexOf("blendmode");
         int idDurRectId = query.record().indexOf("durationrectid");
 
+        if(!query.value(idDurRectId).isNull()) {
+            if(mDurationRectangle == NULL) {
+                createDurationRectangle();
+            }
+            mDurationRectangle->loadFromSql(
+                        query.value(idDurRectId).toInt());
+        }
+
         int transformAnimatorId = query.value(idTransformAnimatorId).toInt();
         bool pivotChanged = query.value(idPivotChanged).toBool();
         bool visible = query.value(idVisible).toBool();
@@ -219,13 +227,6 @@ void BoundingBox::loadFromSql(const int &boundingBoxId) {
         mVisible = visible;
         prp_mName = query.value(idName).toString();
 
-        if(!query.value(idDurRectId).isNull()) {
-            if(mDurationRectangle == NULL) {
-                createDurationRectangle();
-            }
-            mDurationRectangle->loadFromSql(
-                        query.value(idDurRectId).toInt());
-        }
         addLoadedBox(this);
     } else {
         qDebug() << "Could not load boundingbox with id " << boundingBoxId;

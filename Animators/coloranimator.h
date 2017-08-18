@@ -47,7 +47,6 @@ public:
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 
-    void anim_saveCurrentValueAsKey();
     void duplicateVal1AnimatorFrom(QrealAnimator *source);
     void duplicateVal2AnimatorFrom(QrealAnimator *source);
     void duplicateVal3AnimatorFrom(QrealAnimator *source);

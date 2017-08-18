@@ -89,10 +89,11 @@ DurationRectangle::DurationRectangle(Property *childProp) :
 int DurationRectangle::saveToSql(QSqlQuery *query) {
     if(!query->exec(
                 QString("INSERT INTO durationrect ("
-                        "minframe, maxframe) "
-                "VALUES (%1, %2)").
+                        "minframe, maxframe, frameshift) "
+                "VALUES (%1, %2, %3)").
                 arg(getMinFrame()).
-                arg(getMaxFrame())
+                arg(getMaxFrame()).
+                arg(getFramePos())
                 ) ) {
         qDebug() << query->lastError() << endl << query->lastQuery();
     }
@@ -109,6 +110,7 @@ void DurationRectangle::loadFromSql(const int &durRectId) {
         query.next();
         setMinFrame(query.value("minframe").toInt());
         setMaxFrame(query.value("maxframe").toInt());
+        mFramePos = query.value("frameshift").toInt();
     } else {
         qDebug() << "Could not load durationrect with id " << durRectId;
     }

@@ -68,7 +68,6 @@ struct ParticleBoxRenderData : public BoundingBoxRenderData {
 private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
-
         canvas->clipRect(clipRect);
         Q_FOREACH(const EmitterData &emitterData, emittersData) {
             emitterData.drawParticles(canvas);
@@ -117,6 +116,9 @@ private:
 class ParticleEmitter : public ComplexAnimator {
 public:
     ParticleEmitter(ParticleBox *parentBox);
+
+    void saveToSql(QSqlQuery *query, const int &parentId);
+    void loadFromSql(const int &boundingBoxId);
 
     void setParentBox(ParticleBox *parentBox);
 
@@ -291,7 +293,9 @@ public:
 
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
-                                               const int &relFrame);
+                                              const int &relFrame);
+    int saveToSql(QSqlQuery *query, const int &parentId);
+    void loadFromSql(const int &boundingBoxId);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

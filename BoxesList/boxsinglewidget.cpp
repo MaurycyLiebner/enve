@@ -441,6 +441,12 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     (AnimatorClipboardContainer*)
                     MainWindow::getInstance()->getClipboardContainer(
                                                 CCT_ANIMATOR);
+            Animator *animTarget = (Animator*)target;
+            if(animTarget->prp_isKeyOnCurrentFrame()) {
+                menu.addAction("Delete Key")->setObjectName("swt_delete_key");
+            } else {
+                menu.addAction("Add Key")->setObjectName("swt_add_key");
+            }
             menu.addAction("Copy")->setObjectName("swt_copy");
             if(clipboard != NULL) {
                 menu.addAction("Paste")->setObjectName("swt_paste");
@@ -475,6 +481,12 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 PixmapEffect *effectTarget = (PixmapEffect*)target;
                 effectTarget->getParentEffectAnimators()->
                         getParentBox()->removeEffect(effectTarget);
+            } else if(selectedAction->objectName() == "swt_delete_key") {
+                Animator *animTarget = (Animator*)target;
+                animTarget->anim_deleteCurrentKey();
+            } else if(selectedAction->objectName() == "swt_add_key") {
+                Animator *animTarget = (Animator*)target;
+                animTarget->anim_saveCurrentValueAsKey();
             } else if(target->SWT_isBoundingBox()) {
                 BoundingBox *boxTarget = ((BoundingBox*)target);
                 if(!boxTarget->getParentCanvas()->

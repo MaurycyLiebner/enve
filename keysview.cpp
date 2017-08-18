@@ -227,7 +227,27 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 mIsMouseGrabbing = true;
                 //setMouseTracking(true);
                 grabMouse();
-            } else if(event->key() == Qt::Key_Delete) {
+            } else if(mMainWindow->isCtrlPressed() &&
+                      event->key() == Qt::Key_D) {
+                int currFrame = MainWindow::getInstance()->getCurrentFrame();
+                QList<Key*> selectedKeys = mSelectedKeys;
+                clearKeySelection();
+                int firstSelectedFrame = INT_MAX;
+                Q_FOREACH(Key *key, selectedKeys) {
+                    if(firstSelectedFrame > key->getAbsFrame()) {
+                        firstSelectedFrame = key->getAbsFrame();
+                    }
+                }
+                int dFrame = currFrame - firstSelectedFrame;
+                Q_FOREACH(Key *key, selectedKeys) {
+                    QrealKey *qrKey = (QrealKey*)key;
+                    QrealKey *duplicate = qrKey->makeQrealKeyDuplicate(
+                                qrKey->getParentQrealAnimator());
+                    duplicate->setAbsFrame(dFrame + key->getAbsFrame());
+                    key->getParentAnimator()->anim_appendKey(duplicate);
+                }
+                //setMouseTracking(true);
+             } else if(event->key() == Qt::Key_Delete) {
                 deleteSelectedKeys();
                 update();
             } else if(event->key() == Qt::Key_Right) {

@@ -261,15 +261,6 @@ void ColorAnimator::setCurrentAlphaValue(const qreal &alpha,
     mAlphaAnimator->qra_setCurrentValue(alpha, finish);
 }
 
-void ColorAnimator::anim_saveCurrentValueAsKey() {
-    if(!anim_mIsRecording) {
-        prp_setRecording(true);
-    }
-    mVal1Animator->anim_saveCurrentValueAsKey();
-    mVal2Animator->anim_saveCurrentValueAsKey();
-    mVal3Animator->anim_saveCurrentValueAsKey();
-}
-
 #include <QMenu>
 void ColorAnimator::prp_openContextMenu(const QPoint &pos) {
     QMenu menu;

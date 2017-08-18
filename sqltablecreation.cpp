@@ -102,7 +102,8 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
     query->exec("CREATE TABLE durationrect "
                "(id INTEGER PRIMARY KEY, "
                 "minframe INTEGER, "
-                "maxframe INTEGER )");
+                "maxframe INTEGER,"
+                "frameshift INTEGER )");
 
 
     query->exec("CREATE TABLE boundingbox "
@@ -119,6 +120,60 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "FOREIGN KEY(transformanimatorid) REFERENCES transformanimator(id), "
                "FOREIGN KEY(parentboundingboxid) REFERENCES boundingbox(id), "
                "FOREIGN KEY(durationrectid) REFERENCES durationrect(id) )");
+
+    query->exec("CREATE TABLE particlebox "
+               "(id INTEGER PRIMARY KEY, "
+               "boundingboxid INTEGER, "
+               "topleftpointid INTEGER, "
+               "bottomrightpointid INTEGER, "
+               "FOREIGN KEY(topleftpointid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(bottomrightpointid) REFERENCES qpointfanimator(id), "
+               "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
+    query->exec("CREATE TABLE particleemitter "
+                "(id INTEGER PRIMARY KEY, "
+                "boundingboxid INTEGER, "
+                "color INTEGER, "
+                "pos INTEGER, "
+                "width INTEGER, "
+                "srcvelinfl INTEGER, "
+                "inivelocity INTEGER, "
+                "inivelocityvar INTEGER, "
+                "inivelocityangle INTEGER, "
+                "inivelocityanglevar INTEGER, "
+                "accelerartion INTEGER, "
+                "particlespersecond INTEGER, "
+                "particlesframelifetime INTEGER, "
+                "velocityrandomvar INTEGER, "
+                "velocityrandomvarperiod INTEGER, "
+                "particlesize INTEGER, "
+                "particlesizevar INTEGER, "
+                "particlelength INTEGER, "
+                "particlesdecayframes INTEGER, "
+                "particlessizedecay INTEGER, "
+                "particlesopacitydecay INTEGER, "
+
+                "FOREIGN KEY(color) REFERENCES coloranimator(id), "
+                "FOREIGN KEY(pos) REFERENCES qpointfanimator(id), "
+                "FOREIGN KEY(width) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(srcvelinfl) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(inivelocity) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(inivelocityvar) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(inivelocityangle) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(inivelocityanglevar) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(accelerartion) REFERENCES qpointfanimator(id), "
+                "FOREIGN KEY(particlespersecond) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(particlesframelifetime) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(velocityrandomvar) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(velocityrandomvarperiod) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(particlesize) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(particlesizevar) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(particlelength) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(particlesdecayframes) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(particlessizedecay) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(particlesopacitydecay) REFERENCES qrealanimator(id), "
+                "FOREIGN KEY(boundingboxid) REFERENCES boundingbox(id) )");
+
 
     query->exec("CREATE TABLE canvas "
                "(id INTEGER PRIMARY KEY, "

@@ -33,6 +33,61 @@ ParticleBox::ParticleBox() :
     //addEmitter(new ParticleEmitter(this));
 }
 
+#include <QSqlError>
+int ParticleBox::saveToSql(QSqlQuery *query, const int &parentId) {
+    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
+
+    foreach(ParticleEmitter *emitter, mEmitters) {
+        emitter->saveToSql(query, boundingBoxId);
+    }
+
+    int bottomRightPointId = mBottomRightPoint->saveToSql(query);
+    int topLeftPointId = mTopLeftPoint->saveToSql(query);
+
+    if(!query->exec(QString("INSERT INTO particlebox (boundingboxid, "
+                           "topleftpointid, bottomrightpointid) "
+                "VALUES (%1, %2, %3)").
+                arg(boundingBoxId).
+                arg(topLeftPointId).
+                arg(bottomRightPointId)) ) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+
+    return boundingBoxId;
+}
+
+void ParticleBox::loadFromSql(const int &boundingBoxId) {
+    BoundingBox::loadFromSql(boundingBoxId);
+
+    QSqlQuery query;
+    QString queryStr = "SELECT * FROM particlebox WHERE boundingboxid = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        int idBottomRightPointId = query.record().indexOf("bottomrightpointid");
+        int idTopLeftPointId = query.record().indexOf("topleftpointid");
+
+        int bottomRightPointId = query.value(idBottomRightPointId).toInt();
+        int topLeftPointId = query.value(idTopLeftPointId).toInt();
+
+        mBottomRightPoint->loadFromSql(bottomRightPointId);
+        mTopLeftPoint->loadFromSql(topLeftPointId);
+    } else {
+        qDebug() << "Could not load particlebox with id " << boundingBoxId;
+    }
+    queryStr = "SELECT * FROM particleemitter WHERE boundingboxid = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        while(query.next()) {
+            ParticleEmitter *emitter = new ParticleEmitter(this);
+            addEmitter(emitter);
+            emitter->loadFromSql(boundingBoxId);
+        }
+    } else {
+        qDebug() << "Could not load particlebox with id " << boundingBoxId;
+    }
+}
+
 void ParticleBox::getAccelerationAt(const QPointF &pos,
                                     const int &frame,
                                     QPointF *acc) {
@@ -432,6 +487,85 @@ void ParticleEmitter::setParentBox(ParticleBox *parentBox) {
     } else {
         mColorAnimator->prp_setUpdater(
                     new DisplayedFillStrokeSettingsUpdater(parentBox));
+    }
+}
+
+void ParticleEmitter::saveToSql(QSqlQuery *query, const int &parentId) {
+    int colorid = mColorAnimator->saveToSql(query);
+    int posid = mPos->saveToSql(query);
+    int widthid = mWidth->saveToSql(query);
+    int srcvelinflid = mSrcVelInfl->saveToSql(query);
+    int inivelocityid = mIniVelocity->saveToSql(query);
+    int inivelocityvarid = mIniVelocityVar->saveToSql(query);
+    int inivelocityangleid = mIniVelocityAngle->saveToSql(query);
+    int inivelocityanglevarid = mIniVelocityAngleVar->saveToSql(query);
+    int accelerartionid = mAcceleration->saveToSql(query);
+    int particlespersecondid = mParticlesPerSecond->saveToSql(query);
+    int particlesframelifetimeid = mParticlesFrameLifetime->saveToSql(query);
+    int velocityrandomvarid = mVelocityRandomVar->saveToSql(query);
+    int velocityrandomvarperiodid = mVelocityRandomVarPeriod->saveToSql(query);
+    int particlesizeid = mParticleSize->saveToSql(query);
+    int particlesizevarid = mParticleSizeVar->saveToSql(query);
+    int particlelengthid = mParticleLength->saveToSql(query);
+    int particlesdecayframesid = mParticlesDecayFrames->saveToSql(query);
+    int particlessizedecayid = mParticlesSizeDecay->saveToSql(query);
+    int particlesopacitydecayid = mParticlesOpacityDecay->saveToSql(query);
+
+    if(!query->exec(QString("INSERT INTO particleemitter "
+                            "(boundingboxid, color, "
+                            "pos, width, srcvelinfl, "
+                            "inivelocity, inivelocityvar, "
+                            "inivelocityangle, inivelocityanglevar, "
+                            "accelerartion, particlespersecond, "
+                            "particlesframelifetime, velocityrandomvar, "
+                            "velocityrandomvarperiod, particlesize, "
+                            "particlesizevar, particlelength, "
+                            "particlesdecayframes, particlessizedecay, "
+                            "particlesopacitydecay) "
+                "VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, "
+                        "%10, %11, %12, %13, %14, %15, %16, "
+                        "%17, %18, %19, %20)").
+                    arg(parentId).arg(colorid).
+                    arg(posid).arg(widthid).arg(srcvelinflid).
+                    arg(inivelocityid).arg(inivelocityvarid).
+                    arg(inivelocityangleid).arg(inivelocityanglevarid).
+                    arg(accelerartionid).arg(particlespersecondid).
+                    arg(particlesframelifetimeid).arg(velocityrandomvarid).
+                    arg(velocityrandomvarperiodid).arg(particlesizeid).
+                    arg(particlesizevarid).arg(particlelengthid).
+                    arg(particlesdecayframesid).arg(particlessizedecayid).
+                    arg(particlesopacitydecayid) )) {
+        qDebug() << query->lastError() << endl << query->lastQuery();
+    }
+}
+
+void ParticleEmitter::loadFromSql(const int &boundingBoxId) {
+    QSqlQuery query;
+    QString queryStr = "SELECT * FROM particleemitter WHERE boundingboxid = " +
+            QString::number(boundingBoxId);
+    if(query.exec(queryStr) ) {
+        query.next();
+        mColorAnimator->loadFromSql(query.value("color").toInt());
+        mPos->loadFromSql(query.value("pos").toInt());
+        mWidth->loadFromSql(query.value("width").toInt());
+        mSrcVelInfl->loadFromSql(query.value("srcvelinfl").toInt());
+        mIniVelocity->loadFromSql(query.value("inivelocity").toInt());
+        mIniVelocityVar->loadFromSql(query.value("inivelocityvar").toInt());
+        mIniVelocityAngle->loadFromSql(query.value("inivelocityangle").toInt());
+        mIniVelocityAngleVar->loadFromSql(query.value("inivelocityanglevar").toInt());
+        mAcceleration->loadFromSql(query.value("accelerartion").toInt());
+        mParticlesPerSecond->loadFromSql(query.value("particlespersecond").toInt());
+        mParticlesFrameLifetime->loadFromSql(query.value("particlesframelifetime").toInt());
+        mVelocityRandomVar->loadFromSql(query.value("velocityrandomvar").toInt());
+        mVelocityRandomVarPeriod->loadFromSql(query.value("velocityrandomvarperiod").toInt());
+        mParticleSize->loadFromSql(query.value("particlesize").toInt());
+        mParticleSizeVar->loadFromSql(query.value("particlesizevar").toInt());
+        mParticleLength->loadFromSql(query.value("particlelength").toInt());
+        mParticlesDecayFrames->loadFromSql(query.value("particlesdecayframes").toInt());
+        mParticlesSizeDecay->loadFromSql(query.value("particlessizedecay").toInt());
+        mParticlesOpacityDecay->loadFromSql(query.value("particlesopacitydecay").toInt());
+    } else {
+        qDebug() << "Could not load particleemitter with id " << boundingBoxId;
     }
 }
 

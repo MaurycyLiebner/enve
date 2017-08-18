@@ -317,6 +317,18 @@ QString ComplexAnimator::prp_getValueText() {
     return "";
 }
 
+void ComplexAnimator::anim_saveCurrentValueAsKey() {
+    if(!anim_mIsRecording) {
+        prp_setRecording(true);
+    } else {
+        Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+            if(property->SWT_isAnimator()) {
+                ((Animator*)property.data())->anim_saveCurrentValueAsKey();
+            }
+        }
+    }
+}
+
 void ComplexAnimator::prp_setRecording(const bool &rec) {
     Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
         property->prp_setRecording(rec);

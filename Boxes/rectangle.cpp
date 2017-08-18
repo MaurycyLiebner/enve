@@ -43,7 +43,7 @@ int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
     if(!query->exec(QString("INSERT INTO rectangle (boundingboxid, "
                            "topleftpointid, bottomrightpointid, "
                            "radiuspointid) "
-                "VALUES (%1, %2, %3, %4, %5)").
+                "VALUES (%1, %2, %3, %4)").
                 arg(boundingBoxId).
                 arg(topLeftPointId).
                 arg(bottomRightPointId).
@@ -52,19 +52,6 @@ int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
     }
 
     return boundingBoxId;
-}
-
-void Rectangle::duplicateRectanglePointsFrom(
-        RectangleTopLeftPoint *topLeftPoint,
-        RectangleBottomRightPoint *bottomRightPoint,
-        QPointFAnimator *radiusPoint) {
-    topLeftPoint->makeDuplicate(mTopLeftPoint);
-    bottomRightPoint->makeDuplicate(mBottomRightPoint);
-    radiusPoint->makeDuplicate(&mRadiusPoint);
-}
-
-BoundingBox *Rectangle::createNewDuplicate() {
-    return new Rectangle();
 }
 
 void Rectangle::loadFromSql(const int &boundingBoxId) {
@@ -89,6 +76,19 @@ void Rectangle::loadFromSql(const int &boundingBoxId) {
     } else {
         qDebug() << "Could not load rectangle with id " << boundingBoxId;
     }
+}
+
+void Rectangle::duplicateRectanglePointsFrom(
+        RectangleTopLeftPoint *topLeftPoint,
+        RectangleBottomRightPoint *bottomRightPoint,
+        QPointFAnimator *radiusPoint) {
+    topLeftPoint->makeDuplicate(mTopLeftPoint);
+    bottomRightPoint->makeDuplicate(mBottomRightPoint);
+    radiusPoint->makeDuplicate(&mRadiusPoint);
+}
+
+BoundingBox *Rectangle::createNewDuplicate() {
+    return new Rectangle();
 }
 
 void Rectangle::startAllPointsTransform() {
