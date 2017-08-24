@@ -161,7 +161,7 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                                             &prevPoint, &nextPoint,
                                             canvasScaleInv)) {
         if(pressedT > 0.0001 && pressedT < 0.9999) {
-            int prevNodeId = prevPoint->getPointId();
+            int prevNodeId = prevPoint->getNodeId();
             int newNodeId = prevNodeId + 1;
             int nextNodeId = prevNodeId + 2;
             NodeSettings *prevNodeSettings =
@@ -189,7 +189,7 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
             newPoint->setRelativePos(newPointPos);
             nextPoint->setPointAsPrevious(newPoint);
             prevPoint->setPointAsNext(newPoint);
-            appendToPointsList(newPoint);
+            updateNodePointIds();
 
             if(adjust) {
                 if(!prevNodeSettings->endEnabled &&
@@ -276,6 +276,7 @@ void VectorPathAnimator::updateNodePointsFromCurrentPath() {
             mPoints << nextP;
         }
         currP = nextP;
+        currP->setNodeId(currId/3);
 
         currId += 3;
     }
@@ -368,9 +369,9 @@ void VectorPathAnimator::finishAllPointsTransform() {
 }
 
 void VectorPathAnimator::drawSelected(SkCanvas *canvas,
-                                     const CanvasMode &currentCanvasMode,
-                                     const qreal &invScale,
-                                     const SkMatrix &combinedTransform) {
+                                      const CanvasMode &currentCanvasMode,
+                                      const qreal &invScale,
+                                      const SkMatrix &combinedTransform) {
 
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
@@ -413,16 +414,17 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
     if(targetPt == NULL) {
         targetNodeId = 0;
     } else {
-        if(targetPt->getPointId() == 0) {
+        if(targetPt->getNodeId() == 0 &&
+           mFirstPoint->hasNextPoint()) {
             targetNodeId = 0;
         } else {
-            targetNodeId = targetPt->getPointId() + 1;
+            targetNodeId = targetPt->getNodeId() + 1;
         }
     }
     NodeSettings *nodeSettingsPtr =
             insertNodeSettingsForNodeId(targetNodeId,
                                         nodeSettings);
-    int nodePtId = nodeIdToPointId(targetNodeId);
+    int nodePtId = nodeIdToPointId(targetNodeId) - 1;
     insertElementPos(nodePtId, QPointFToSkPoint(endRelPos));
     insertElementPos(nodePtId, QPointFToSkPoint(relPos));
     insertElementPos(nodePtId, QPointFToSkPoint(startRelPos));
@@ -433,5 +435,21 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         targetPt->connectToPoint(newP);
     }
     newP->setCurrentNodeSettings(nodeSettingsPtr);
+    newP->setElementsPos(startRelPos,
+                         relPos,
+                         endRelPos);
+    updateNodePointIds();
     return newP;
+}
+
+void VectorPathAnimator::updateNodePointIds() {
+    if(mFirstPoint == NULL) return;
+    int pointId = 0;
+    NodePoint *nextPoint = mFirstPoint;
+    while(true) {
+        nextPoint->setNodeId(pointId);
+        pointId++;
+        nextPoint = nextPoint->getNextPoint();
+        if(nextPoint == NULL || nextPoint == mFirstPoint) break;
+    }
 }

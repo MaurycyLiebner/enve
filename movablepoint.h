@@ -125,6 +125,10 @@ public:
         mCurrentPos = relPos;
     }
 
+    virtual void setRelativePosVal(const QPointF &relPos) {
+        mCurrentPos = relPos;
+    }
+
     QPointF getRelativePos() const {
         return mCurrentPos;
     }

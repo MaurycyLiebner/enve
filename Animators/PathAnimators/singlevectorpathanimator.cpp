@@ -321,7 +321,7 @@ void SingleVectorPathAnimator::updateNodePointIds() {
     int pointId = 0;
     NodePoint *nextPoint = mFirstPoint;
     while(true) {
-        nextPoint->setPointId(pointId);
+        nextPoint->setNodeId(pointId);
         pointId++;
         nextPoint = nextPoint->getNextPoint();
         if(nextPoint == NULL || nextPoint == mFirstPoint) break;

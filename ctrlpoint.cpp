@@ -3,6 +3,8 @@
 #include "Boxes/vectorpath.h"
 #include "Boxes/boxesgroup.h"
 #include "pointhelpers.h"
+#include "Animators/PathAnimators/vectorpathanimator.h"
+#include "nodepoint.h"
 
 CtrlPoint::CtrlPoint(NodePoint *parentPoint, bool isStartCtrlPt) :
     NonAnimatedMovablePoint(parentPoint->getParent(),
@@ -16,8 +18,14 @@ QPointF CtrlPoint::getRelativePos() const {
     return mParentPoint->getRelativePos() + mCurrentPos;
 }
 
-void CtrlPoint::setRelativePos(const QPointF &relPos) {
+void CtrlPoint::setRelativePosVal(const QPointF &relPos) {
     mCurrentPos = relPos - mParentPoint->getRelativePos();
+}
+
+void CtrlPoint::setRelativePos(const QPointF &relPos) {
+    setRelativePosVal(relPos);
+    mParentPoint->getParentPath()->setElementPos(getPtId(),
+                                                 QPointFToSkPoint(relPos));
 }
 
 void CtrlPoint::setIsStartCtrlPt(const bool &bT) {
@@ -33,6 +41,13 @@ void CtrlPoint::rotate(const qreal &rotate) {
     QMatrix mat;
     mat.rotate(rotate);
     mCurrentPos = mat.map(savedValue);
+}
+
+int CtrlPoint::getPtId() {
+    if(mIsStartCtrlPt) {
+        return mParentPoint->getPtId() - 1;
+    }
+    return mParentPoint->getPtId() + 1;
 }
 
 void CtrlPoint::moveByAbs(const QPointF &absTranslatione) {

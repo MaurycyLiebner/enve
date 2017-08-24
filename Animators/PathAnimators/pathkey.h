@@ -35,11 +35,11 @@ public:
     }
 
     int pointIdToNodeId(const int &ptId) {
-        return (ptId + 1)/3;
+        return ptId/3;
     }
 
     int nodeIdToPointId(const int &nodeId) {
-        return nodeId*3;
+        return nodeId*3 + 1;
     }
 
     virtual void removeNodeAt(const int &nodeId) {

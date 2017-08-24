@@ -79,6 +79,8 @@ public:
     void startTransform();
     void finishTransform();
 
+    void setRelativePos(const QPointF &relPos);
+
     //void moveByRel(const QPointF &relTranslation);
 
     QPointF getStartCtrlPtAbsPos() const;
@@ -149,8 +151,11 @@ public:
     bool isEndCtrlPtEnabled();
     bool isStartCtrlPtEnabled();
 
-    void setPointId(const int &idT);
-    const int &getPointId();
+    void setNodeId(const int &idT);
+    const int &getNodeId();
+    int getPtId() {
+        return getNodeId()*3 + 1;
+    }
 
     CtrlsMode getCurrentCtrlsMode();
 
@@ -183,7 +188,7 @@ private:
     std::shared_ptr<VectorPathEdge> mNextEdge;
 
     NodeSettings *mCurrentNodeSettings = NULL;
-    int mPointId;
+    int mNodeId;
 
     VectorPathAnimator *mParentPath;
 

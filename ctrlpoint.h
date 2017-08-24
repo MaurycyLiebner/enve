@@ -24,6 +24,10 @@ public:
     void cancelTransform();
 
     void rotate(const qreal &rotate);
+
+    int getPtId();
+
+    void setRelativePosVal(const QPointF &relPos);
 private:
     bool mIsStartCtrlPt;
     NodePoint *mParentPoint;

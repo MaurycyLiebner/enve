@@ -23,7 +23,7 @@ struct NodeSettings {
 
     bool startEnabled = false;
     bool endEnabled = false;
-    CtrlsMode ctrlsMode = CtrlsMode::CTRLS_SYMMETRIC;
+    CtrlsMode ctrlsMode = CtrlsMode::CTRLS_CORNER;
 };
 
 class VectorPathAnimator : public Animator,
@@ -113,7 +113,8 @@ public:
                              const QPointF &relPos,
                              const QPointF &endRelPos,
                              NodePoint *targetPt,
-                             const NodeSettings &nodeSettings = NodeSettings(false, false, CTRLS_SYMMETRIC));
+                             const NodeSettings &nodeSettings =
+            NodeSettings());
     VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
     void selectAllPoints(Canvas *canvas);
@@ -149,6 +150,7 @@ public:
     void appendToPointsList(NodePoint *pt);
 
 private:
+    void updateNodePointIds();
 
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
                                               qreal *pressedT,

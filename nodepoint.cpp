@@ -23,6 +23,7 @@ NodePoint::NodePoint(VectorPathAnimator *parentAnimator) :
     mStartCtrlPt->hide();
     mEndCtrlPt->hide();
 
+    parentAnimator->appendToPointsList(this);
     //NodePointUpdater *updater = new NodePointUpdater(vectorPath);
     //prp_setUpdater(updater);
 }
@@ -87,6 +88,10 @@ void NodePoint::finishTransform() {
     }
 }
 
+void NodePoint::setRelativePos(const QPointF &relPos) {
+    setRelativePosVal(relPos);
+    getParentPath()->setElementPos(getPtId(), QPointFToSkPoint(relPos));
+}
 void NodePoint::connectToPoint(NodePoint *point) {
     if(point == NULL) {
         return;
@@ -114,11 +119,11 @@ void NodePoint::disconnectFromPoint(NodePoint *point) {
 }
 
 void NodePoint::removeFromVectorPath() {
-    mParentPath->removeNodeAt(mPointId);
+    mParentPath->removeNodeAt(mNodeId);
 }
 
 void NodePoint::removeApproximate() {
-    mParentPath->removeNodeAtAndApproximate(mPointId);
+    mParentPath->removeNodeAtAndApproximate(mNodeId);
 }
 
 void NodePoint::rectPointsSelection(const QRectF &absRect,
@@ -176,23 +181,18 @@ QPointF NodePoint::symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
 }
 
 void NodePoint::moveStartCtrlPtToAbsPos(const QPointF &startCtrlPt) {
-    if(!isStartCtrlPtEnabled()) {
-        setStartCtrlPtEnabled(true);
-    }
-    mStartCtrlPt->moveToAbs(startCtrlPt);
+    moveStartCtrlPtToRelPos(mapAbsoluteToRelative(startCtrlPt));
 }
 
 void NodePoint::moveEndCtrlPtToAbsPos(const QPointF &endCtrlPt) {
-    if(!isEndCtrlPtEnabled()) {
-        setEndCtrlPtEnabled(true);
-    }
-    mEndCtrlPt->moveToAbs(endCtrlPt);
+    moveEndCtrlPtToRelPos(mapAbsoluteToRelative(endCtrlPt));
 }
 
 void NodePoint::moveEndCtrlPtToRelPos(const QPointF &endCtrlPt) {
     if(!isEndCtrlPtEnabled()) {
         setEndCtrlPtEnabled(true);
     }
+    mParentPath->setElementPos(getPtId() + 1, QPointFToSkPoint(endCtrlPt));
     mEndCtrlPt->setRelativePos(endCtrlPt);
 }
 
@@ -200,6 +200,7 @@ void NodePoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
     if(!isStartCtrlPtEnabled()) {
         setStartCtrlPtEnabled(true);
     }
+    mParentPath->setElementPos(getPtId() - 1, QPointFToSkPoint(startCtrlPt));
     mStartCtrlPt->setRelativePos(startCtrlPt);
 }
 
@@ -388,12 +389,12 @@ void NodePoint::resetStartCtrlPt() {
     mStartCtrlPt->setRelativePos(getRelativePos());
 }
 
-void NodePoint::setPointId(const int &idT) {
-    mPointId = idT;
+void NodePoint::setNodeId(const int &idT) {
+    mNodeId = idT;
 }
 
-const int &NodePoint::getPointId() {
-    return mPointId;
+const int &NodePoint::getNodeId() {
+    return mNodeId;
 }
 
 NodePointValues NodePoint::getPointValues() const {
@@ -518,15 +519,15 @@ void NodePoint::setPointAsPrevious(NodePoint *pointToSet) {
 
 NodePoint *NodePoint::addPointRelPos(const QPointF &relPos) {
     int targetId;
-    if(mPointId == 0) {
+    if(mNodeId == 0) {
         targetId = 0;
     } else {
-        targetId = mPointId + 1;
+        targetId = mNodeId + 1;
     }
     NodePoint *newPt =
             mParentPath->addNodeRelPos(relPos,
                                        this);
-    if(mPointId == 0 && hasNextPoint()) {
+    if(mNodeId == 0 && hasNextPoint()) {
         setPointAsPrevious(newPt);
     } else {
         setPointAsNext(newPt);
@@ -544,9 +545,9 @@ NodePoint *NodePoint::addPointAbsPos(const QPointF &absPos) {
 void NodePoint::setElementsPos(const QPointF &startPos,
                                const QPointF &targetPos,
                                const QPointF &endPos) {
-    mStartCtrlPt->setRelativePos(startPos);
-    setRelativePos(targetPos);
-    mEndCtrlPt->setRelativePos(endPos);
+    setRelativePosVal(targetPos);
+    mStartCtrlPt->setRelativePosVal(startPos);
+    mEndCtrlPt->setRelativePosVal(endPos);
 }
 
 bool NodePoint::isEndPoint() {
