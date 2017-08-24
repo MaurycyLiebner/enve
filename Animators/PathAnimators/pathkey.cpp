@@ -59,28 +59,33 @@ const SkPath &PathContainer::getPath() {
 
 void PathContainer::updatePath() {
     mPath.reset();
-    mPath.moveTo(mElementsPos.first());
+    SkPoint firstPos = mElementsPos.first();
+    mPath.moveTo(firstPos);
     int currId = 1;
     int elementsCount = mElementsPos.count();
-    bool endEnabled = getNodeSettingsForPtId(0)->startEnabled;
+    bool endEnabled = getNodeSettingsForPtId(0)->endEnabled;
+    SkPoint endPos;
+    if(endEnabled) {
+        endPos = mElementsPos.at(1);
+    } else {
+        endPos = firstPos;
+    }
     while(currId < elementsCount) {
-        const SkPoint &targetPos = mElementsPos.at(currId + 2);
-        NodeSettings *nodeSettings = getNodeSettingsForPtId(currId + 2);
-        SkPoint endPos;
-        if(endEnabled) {
-            endPos = mElementsPos.at(currId);
-        } else {
-            endPos = targetPos;
-        }
+        const SkPoint &targetPos = mElementsPos.at(currId);
+        NodeSettings *nodeSettings = getNodeSettingsForPtId(currId);
 
         SkPoint startPos;
-        if(nodeSettings->endEnabled) {
-            startPos = mElementsPos.at(currId + 1);
+        if(nodeSettings->startEnabled) {
+            startPos = mElementsPos.at(currId - 1);
         } else {
             startPos = targetPos;
         }
         mPath.cubicTo(endPos, startPos, targetPos);
-        endEnabled = nodeSettings->endEnabled;
+        if(nodeSettings->endEnabled) {
+            endPos = mElementsPos.at(currId + 1);
+        } else {
+            endPos = targetPos;
+        }
         currId += 3;
     }
     if(mPathClosed) {

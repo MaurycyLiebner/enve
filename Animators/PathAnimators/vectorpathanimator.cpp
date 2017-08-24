@@ -419,8 +419,9 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
             targetNodeId = targetPt->getPointId() + 1;
         }
     }
-    insertNodeSettingsForNodeId(targetNodeId,
-                                nodeSettings);
+    NodeSettings *nodeSettingsPtr =
+            insertNodeSettingsForNodeId(targetNodeId,
+                                        nodeSettings);
     int nodePtId = nodeIdToPointId(targetNodeId);
     insertElementPos(nodePtId, QPointFToSkPoint(endRelPos));
     insertElementPos(nodePtId, QPointFToSkPoint(relPos));
@@ -431,5 +432,6 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
     } else {
         targetPt->connectToPoint(newP);
     }
+    newP->setCurrentNodeSettings(nodeSettingsPtr);
     return newP;
 }

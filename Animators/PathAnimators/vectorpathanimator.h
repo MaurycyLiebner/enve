@@ -53,11 +53,12 @@ public:
         *mNodeSettings.at(nodeId) = settings;
     }
 
-    void insertNodeSettingsForNodeId(const int &nodeId,
-                                     const NodeSettings &settings) {
+    NodeSettings *insertNodeSettingsForNodeId(const int &nodeId,
+                                              const NodeSettings &settings) {
         NodeSettings *newSettings = new NodeSettings;
         *newSettings = settings;
         mNodeSettings.insert(nodeId, newSettings);
+        return newSettings;
     }
 
     void setNodeStartEnabled(const int &nodeId,

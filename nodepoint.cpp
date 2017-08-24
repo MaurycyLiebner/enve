@@ -176,14 +176,30 @@ QPointF NodePoint::symmetricToAbsPosNewLen(const QPointF &absPosToMirror,
 }
 
 void NodePoint::moveStartCtrlPtToAbsPos(const QPointF &startCtrlPt) {
+    if(!isStartCtrlPtEnabled()) {
+        setStartCtrlPtEnabled(true);
+    }
     mStartCtrlPt->moveToAbs(startCtrlPt);
 }
 
+void NodePoint::moveEndCtrlPtToAbsPos(const QPointF &endCtrlPt) {
+    if(!isEndCtrlPtEnabled()) {
+        setEndCtrlPtEnabled(true);
+    }
+    mEndCtrlPt->moveToAbs(endCtrlPt);
+}
+
 void NodePoint::moveEndCtrlPtToRelPos(const QPointF &endCtrlPt) {
+    if(!isEndCtrlPtEnabled()) {
+        setEndCtrlPtEnabled(true);
+    }
     mEndCtrlPt->setRelativePos(endCtrlPt);
 }
 
 void NodePoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
+    if(!isStartCtrlPtEnabled()) {
+        setStartCtrlPtEnabled(true);
+    }
     mStartCtrlPt->setRelativePos(startCtrlPt);
 }
 
@@ -226,10 +242,6 @@ void NodePoint::ctrlPointPosChanged(CtrlPoint *pointChanged,
                                        getAbsolutePos())) );
         }
     }
-}
-
-void NodePoint::moveEndCtrlPtToAbsPos(const QPointF &endCtrlPt) {
-    mEndCtrlPt->moveToAbs(endCtrlPt);
 }
 
 QPointF NodePoint::getEndCtrlPtAbsPos() {
