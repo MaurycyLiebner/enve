@@ -1,6 +1,6 @@
 #ifndef BONEPOINT_H
 #define BONEPOINT_H
-#include "movablepoint.h"
+#include "pointanimator.h"
 
 class WeightMap {
 public:
@@ -42,7 +42,7 @@ private:
     int mNumberOfControlPoints;
 };
 
-class BonePoint : public MovablePoint {
+class BonePoint : public PointAnimator {
 public:
     BonePoint(BoundingBox *bonesBox);
     BonePoint(BoundingBox *bonesBox, BonePoint *parentBonePt);

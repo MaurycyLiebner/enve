@@ -6,11 +6,12 @@
 #include "Colors/ColorWidgets/colorvaluerect.h"
 #include "Colors/helpers.h"
 #include "Animators/pathanimator.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "pointhelpers.h"
 #include "Boxes/circle.h"
 #include "Boxes/rectangle.h"
 #include "Boxes/textbox.h"
+#include "Animators/PathAnimators/vectorpathanimator.h"
 
 //bool getRotationScaleFromMatrixIfNoShear(const QMatrix &matrix,
 //                                         qreal *rot,
@@ -1526,8 +1527,8 @@ bool parsePathDataFast(const QStringRef &dataStr, VectorPath *path)
     const QChar *str = dataStr.constData();
     const QChar *end = str + dataStr.size();
 
-    PathPoint *firstPointAfterM = NULL;
-    PathPoint *lastAddedPoint = NULL;
+    NodePoint *firstPointAfterM = NULL;
+    NodePoint *lastAddedPoint = NULL;
     while (str != end) {
         while (str->isSpace())
             ++str;
@@ -2070,8 +2071,8 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
     PathAnimator *pathAnimator = path->getPathAnimator();
     Q_FOREACH(SvgSeparatePath *separatePath, mSvgSeparatePaths) {
         separatePath->applyTransfromation(mRelTransform);
-        SingleVectorPathAnimator *singlePath =
-                new SingleVectorPathAnimator(pathAnimator);
+        VectorPathAnimator *singlePath =
+                new VectorPathAnimator(pathAnimator);
         separatePath->apply(singlePath);
         pathAnimator->addSinglePathAnimator(singlePath);
     }
@@ -2082,28 +2083,24 @@ void VectorPathSvgAttributes::apply(VectorPath *path) {
 SvgSeparatePath::SvgSeparatePath() {}
 
 SvgSeparatePath::~SvgSeparatePath() {
-    Q_FOREACH(SvgPathPoint *point, mPoints) {
+    Q_FOREACH(SvgNodePoint *point, mPoints) {
         delete point;
     }
 }
 
-void SvgSeparatePath::apply(SingleVectorPathAnimator *path) {
-    PathPoint *lastPoint = NULL;
-    PathPoint *firstPoint = NULL;
-    Q_FOREACH(SvgPathPoint *point, mPoints) {
-        PathPoint *newPoint = new PathPoint(path);
+void SvgSeparatePath::apply(VectorPathAnimator *path) {
+    NodePoint *lastPoint = NULL;
+    NodePoint *firstPoint = NULL;
+    Q_FOREACH(SvgNodePoint *point, mPoints) {
+        NodePoint *newPoint = new NodePoint(path);
         if(firstPoint == NULL) firstPoint = newPoint;
-        path->addPoint(newPoint, lastPoint);
-        newPoint->setRelativePos(point->getPoint());
-        newPoint->setCtrlsMode(point->getCtrlsMode());
-
-        newPoint->moveEndCtrlPtToRelPos(point->getEndPoint());
-        newPoint->setEndCtrlPtEnabled(point->getEndPointEnabled());
-
-        newPoint->moveStartCtrlPtToRelPos(point->getStartPoint());
-        newPoint->setStartCtrlPtEnabled(point->getStartPointEnabled());
-
-        lastPoint = newPoint;
+        lastPoint = path->addNodeRelPos(point->getStartPoint(),
+                            point->getPoint(),
+                            point->getEndPoint(),
+                            lastPoint,
+                            NodeSettings(point->getStartPointEnabled(),
+                                         point->getEndPointEnabled(),
+                                         point->getCtrlsMode()));
     }
     if(mClosedPath) {
         lastPoint->connectToPoint(firstPoint);
@@ -2122,7 +2119,7 @@ void SvgSeparatePath::closePath() {
 }
 
 void SvgSeparatePath::moveTo(const QPointF &e) {
-    mFirstPoint = new SvgPathPoint(e);
+    mFirstPoint = new SvgNodePoint(e);
     mLastPoint = mFirstPoint;
     addPoint(mFirstPoint);
 }
@@ -2131,13 +2128,13 @@ void SvgSeparatePath::cubicTo(const QPointF &c1,
                               const QPointF &c2,
                               const QPointF &e) {
     mLastPoint->setEndPoint(c1);
-    mLastPoint = new SvgPathPoint(e);
+    mLastPoint = new SvgNodePoint(e);
     mLastPoint->setStartPoint(c2);
     addPoint(mLastPoint);
 }
 
 void SvgSeparatePath::lineTo(const QPointF &e) {
-    mLastPoint = new SvgPathPoint(e);
+    mLastPoint = new SvgNodePoint(e);
     addPoint(mLastPoint);
 }
 
@@ -2149,7 +2146,7 @@ void SvgSeparatePath::quadTo(const QPointF &c, const QPointF &e) {
 }
 
 void SvgSeparatePath::applyTransfromation(const QMatrix &transformation) {
-    Q_FOREACH(SvgPathPoint *point, mPoints) {
+    Q_FOREACH(SvgNodePoint *point, mPoints) {
         point->applyTransfromation(transformation);
     }
 }
@@ -2255,7 +2252,7 @@ void SvgSeparatePath::pathArcSegment(qreal xc, qreal yc, qreal th0, qreal th1, q
             QPointF(a00 * x3 + a01 * y3, a10 * x3 + a11 * y3));
 }
 
-void SvgSeparatePath::addPoint(SvgPathPoint *point) {
+void SvgSeparatePath::addPoint(SvgNodePoint *point) {
     mPoints << point;
 }
 
@@ -2287,12 +2284,12 @@ void TextSvgAttributes::setFontAlignment(const Qt::Alignment &alignment) {
     mAlignment = alignment;
 }
 
-SvgPathPoint::SvgPathPoint(QPointF point) {
+SvgNodePoint::SvgNodePoint(QPointF point) {
     mCtrlsMode = CTRLS_CORNER;
     mPoint = point;
 }
 
-void SvgPathPoint::guessCtrlsMode() {
+void SvgNodePoint::guessCtrlsMode() {
     QPointF startPointRel = mStartPoint - mPoint;
     QPointF endPointRel = mEndPoint - mPoint;
     if(isZero1Dec(pointToLen(startPointRel) - pointToLen(endPointRel)) ) {
@@ -2307,45 +2304,45 @@ void SvgPathPoint::guessCtrlsMode() {
     }
 }
 
-void SvgPathPoint::setStartPoint(const QPointF &startPoint) {
+void SvgNodePoint::setStartPoint(const QPointF &startPoint) {
     mStartPoint = startPoint;
     if(isZero1Dec(pointToLen(mStartPoint - mPoint))) return;
     mStartPointSet = true;
     if(mEndPointSet) guessCtrlsMode();
 }
 
-void SvgPathPoint::setEndPoint(const QPointF &endPoint) {
+void SvgNodePoint::setEndPoint(const QPointF &endPoint) {
     mEndPoint = endPoint;
     if(isZero1Dec(pointToLen(mEndPoint - mPoint))) return;
     mEndPointSet = true;
     if(mStartPointSet) guessCtrlsMode();
 }
 
-CtrlsMode SvgPathPoint::getCtrlsMode() const {
+CtrlsMode SvgNodePoint::getCtrlsMode() const {
     return mCtrlsMode;
 }
 
-QPointF SvgPathPoint::getPoint() const {
+QPointF SvgNodePoint::getPoint() const {
     return mPoint;
 }
 
-QPointF SvgPathPoint::getStartPoint() const {
+QPointF SvgNodePoint::getStartPoint() const {
     return mStartPoint;
 }
 
-QPointF SvgPathPoint::getEndPoint() const {
+QPointF SvgNodePoint::getEndPoint() const {
     return mEndPoint;
 }
 
-bool SvgPathPoint::getStartPointEnabled() {
+bool SvgNodePoint::getStartPointEnabled() {
     return mStartPointSet;
 }
 
-bool SvgPathPoint::getEndPointEnabled() {
+bool SvgNodePoint::getEndPointEnabled() {
     return mEndPointSet;
 }
 
-void SvgPathPoint::applyTransfromation(const QMatrix &transformation) {
+void SvgNodePoint::applyTransfromation(const QMatrix &transformation) {
     mPoint = transformation.map(mPoint);
     mEndPoint = transformation.map(mEndPoint);
     mStartPoint = transformation.map(mStartPoint);

@@ -9,7 +9,6 @@
 MovablePoint::MovablePoint(BoundingBox *parent,
                            const MovablePointType &type,
                            const qreal &radius) :
-    QPointFAnimator(),
     Transformable() {
     mType = type;
     mRadius = radius;
@@ -17,28 +16,8 @@ MovablePoint::MovablePoint(BoundingBox *parent,
 }
 
 void MovablePoint::startTransform() {
-    prp_startTransform();
     mTransformStarted = true;
     mSavedRelPos = getRelativePos();
-}
-
-void MovablePoint::applyTransform(const QMatrix &transform){
-    QPointF point = getCurrentPointValue();
-    setCurrentPointValue(transform.map(point), true);
-}
-
-void MovablePoint::removeAnimations() {
-    if(prp_isRecording()) {
-        prp_setRecording(false);
-    }
-}
-
-void MovablePoint::makeDuplicate(MovablePoint *targetPoint) {
-    targetPoint->duplicatePosAnimatorFrom(this);
-}
-
-void MovablePoint::duplicatePosAnimatorFrom(QPointFAnimator *source) {
-    source->makeDuplicate(this);
 }
 
 void MovablePoint::drawHovered(SkCanvas *canvas,
@@ -59,27 +38,12 @@ void MovablePoint::drawHovered(SkCanvas *canvas,
 void MovablePoint::finishTransform() {
     if(mTransformStarted) {
         mTransformStarted = false;
-        prp_finishTransform();
     }
 }
 
-void MovablePoint::setAbsolutePos(const QPointF &pos,
-                                  const bool &saveUndoRedo) {
+void MovablePoint::setAbsolutePos(const QPointF &pos) {
     QPointF newPos = mParent->getCombinedTransform().inverted().map(pos);
-    setRelativePos(newPos, saveUndoRedo);
-}
-
-void MovablePoint::setRelativePos(const QPointF &relPos,
-                                  const bool &saveUndoRedo) {
-    setCurrentPointValue(relPos, saveUndoRedo);
-}
-
-QPointF MovablePoint::getRelativePos() const {
-    return getCurrentPointValue();
-}
-
-QPointF MovablePoint::getRelativePosAtRelFrame(const int &frame) const {
-    return getCurrentPointValueAtRelFrame(frame);
+    setRelativePos(newPos);
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(const QPointF &relPos) const {
@@ -92,29 +56,6 @@ QPointF MovablePoint::mapAbsoluteToRelative(const QPointF &absPos) const {
 
 QPointF MovablePoint::getAbsolutePos() const {
     return mapRelativeToAbsolute(getRelativePos());
-}
-
-void MovablePoint::drawOnAbsPos(QPainter *p,
-                                const QPointF &absPos) {
-    if(mSelected) {
-        p->setBrush(QColor(255, 0, 0));
-    } else {
-        p->setBrush(QColor(255, 175, 175));
-    }
-
-    drawCosmeticEllipse(p, absPos,
-                        mRadius, mRadius);
-    if(prp_isKeyOnCurrentFrame()) {
-        p->save();
-
-        p->setBrush(Qt::red);
-        QPen pen = QPen(Qt::black, 1.);
-        pen.setCosmetic(true);
-        p->setPen(pen);
-        drawCosmeticEllipse(p, absPos,
-                            mRadius*0.5, mRadius*0.5);
-        p->restore();
-    }
 }
 
 void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
@@ -141,25 +82,18 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
     canvas->drawCircle(absPos,
                        scaledRadius, paint);
 
-    if(prp_isKeyOnCurrentFrame()) {
-        paint.setColor(SK_ColorRED);
-        paint.setStyle(SkPaint::kFill_Style);
-        canvas->drawCircle(absPos,
-                           scaledRadius*0.5, paint);
+//    if(prp_isKeyOnCurrentFrame()) {
+//        paint.setColor(SK_ColorRED);
+//        paint.setStyle(SkPaint::kFill_Style);
+//        canvas->drawCircle(absPos,
+//                           scaledRadius*0.5, paint);
 
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setColor(SK_ColorBLACK);
-        canvas->drawCircle(absPos,
-                           scaledRadius*0.5, paint);
-    }
+//        paint.setStyle(SkPaint::kStroke_Style);
+//        paint.setColor(SK_ColorBLACK);
+//        canvas->drawCircle(absPos,
+//                           scaledRadius*0.5, paint);
+//    }
     canvas->restore();
-}
-
-void MovablePoint::draw(QPainter *p) {
-    if(isHidden()) {
-        return;
-    }
-    drawOnAbsPos(p, getAbsolutePos());
 }
 
 void MovablePoint::drawSk(SkCanvas *canvas,
@@ -204,18 +138,22 @@ bool MovablePoint::isContainedInRect(const QRectF &absRect) {
 
 void MovablePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     QMatrix mat;
-    mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    mat.translate(mSavedTransformPivot.x(),
+                  mSavedTransformPivot.y());
     mat.rotate(rot);
-    mat.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    mat.translate(-mSavedTransformPivot.x(),
+                  -mSavedTransformPivot.y());
     moveToRel(mat.map(mSavedRelPos));
 }
 
 void MovablePoint::scaleRelativeToSavedPivot(const qreal &sx,
                                              const qreal &sy) {
     QMatrix mat;
-    mat.translate(mSavedTransformPivot.x(), mSavedTransformPivot.y());
+    mat.translate(mSavedTransformPivot.x(),
+                  mSavedTransformPivot.y());
     mat.scale(sx, sy);
-    mat.translate(-mSavedTransformPivot.x(), -mSavedTransformPivot.y());
+    mat.translate(-mSavedTransformPivot.x(),
+                  -mSavedTransformPivot.y());
     moveToRel(mat.map(mSavedRelPos));
 }
 
@@ -230,8 +168,7 @@ void MovablePoint::rotateBy(const qreal &rot) {
     rotMatrix.rotate(rot);
     rotMatrix.translate(mSavedTransformPivot.x(),
                         mSavedTransformPivot.y());
-    setRelativePos(rotMatrix.map(mSavedRelPos),
-                   false);
+    setRelativePos(rotMatrix.map(mSavedRelPos));
 }
 
 void MovablePoint::scale(const qreal &scaleXBy,
@@ -242,36 +179,28 @@ void MovablePoint::scale(const qreal &scaleXBy,
     scaleMatrix.scale(scaleXBy, scaleYBy);
     scaleMatrix.translate(mSavedTransformPivot.x(),
                           mSavedTransformPivot.y());
-    setRelativePos(scaleMatrix.map(mSavedRelPos),
-                   false);
+    setRelativePos(scaleMatrix.map(mSavedRelPos));
 }
 
 void MovablePoint::moveToRel(const QPointF &relPos) {
     moveByRel(relPos - mSavedRelPos);
 }
 
-void MovablePoint::moveByRel(const QPointF &relTranslation) {
-    incSavedValueToCurrentValue(relTranslation.x(),
-                                relTranslation.y());
-}
-
 void MovablePoint::moveByAbs(const QPointF &absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(getSavedPointValue()) +
+    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) +
               absTranslatione);
 }
 
 void MovablePoint::moveToAbs(QPointF absPos) {
-    setAbsolutePos(absPos, false);
+    setAbsolutePos(absPos);
 }
 
 void MovablePoint::scale(const qreal &scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
-void MovablePoint::cancelTransform()
-{
-    prp_cancelTransform();
-    //setRelativePos(mSavedRelPos, false);
+void MovablePoint::cancelTransform() {
+    //prp_cancelTransform();
 }
 
 void MovablePoint::setRadius(qreal radius)
@@ -282,10 +211,6 @@ void MovablePoint::setRadius(qreal radius)
 bool MovablePoint::isBeingTransformed()
 {
     return mSelected || mParent->isSelected();
-}
-
-void MovablePoint::setPosAnimatorUpdater(AnimatorUpdater *updater) {
-    prp_setUpdater(updater);
 }
 
 qreal MovablePoint::getRadius()
@@ -335,7 +260,7 @@ void MovablePoint::setVisible(const bool &bT) {
     }
 }
 
-bool MovablePoint::isPathPoint() {
+bool MovablePoint::isNodePoint() {
     return mType == MovablePointType::TYPE_PATH_POINT;
 }
 

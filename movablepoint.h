@@ -8,7 +8,7 @@
 #include "skiaincludes.h"
 
 class BoundingBox;
-class PathPoint;
+class NodePoint;
 class QSqlQuery;
 
 class AnimatorUpdater;
@@ -22,7 +22,6 @@ enum MovablePointType {
 };
 
 class MovablePoint :
-    public QPointFAnimator,
     public Transformable {
 public:
     MovablePoint(BoundingBox *parent,
@@ -34,24 +33,18 @@ public:
     virtual void startTransform();
     virtual void finishTransform();
 
-
-    virtual QPointF getRelativePos() const;
-
     QPointF getAbsolutePos() const;
 
-    virtual void draw(QPainter *p);
     virtual void drawSk(SkCanvas *canvas,
                         const SkScalar &invScale);
 
     bool isPointAtAbsPos(const QPointF &absPoint,
                          const qreal &canvasScaleInv);
-    void setAbsolutePos(const QPointF &pos,
-                        const bool &saveUndoRedo = true);
+    void setAbsolutePos(const QPointF &pos);
 
     BoundingBox *getParent();
 
     bool isContainedInRect(const QRectF &absRect);
-    virtual void moveByRel(const QPointF &relTranslation);
     virtual void moveToAbs(QPointF absPos);
     virtual void moveByAbs(const QPointF &absTranslatione);
 
@@ -68,12 +61,10 @@ public:
     bool isVisible();
     void setVisible(const bool &bT);
 
-    bool isPathPoint();
+    bool isNodePoint();
     bool isPivotPoint();
     bool isCtrlPoint();
 
-    virtual void setRelativePos(const QPointF &relPos,
-                                const bool &saveUndoRedo = true);
     void rotateBy(const qreal &rot);
     void scale(const qreal &scaleXBy, const qreal &scaleYBy);
     void saveTransformPivotAbsPos(const QPointF &absPivot);
@@ -84,25 +75,23 @@ public:
 
     bool isBeingTransformed();
 
-    virtual void setPosAnimatorUpdater(AnimatorUpdater *updater);
-
     qreal getRadius();
-    virtual void applyTransform(const QMatrix &transform);
     void moveToRel(const QPointF &relPos);
     void scaleRelativeToSavedPivot(const qreal &sx,
                                    const qreal &sy);
     virtual void rotateRelativeToSavedPivot(const qreal &rot);
-    void removeAnimations();
 
-    void makeDuplicate(MovablePoint *targetPoint);
-    void duplicatePosAnimatorFrom(QPointFAnimator *source);
 
     virtual void drawHovered(SkCanvas *canvas,
                              const qreal &invScale);
 
     QPointF mapRelativeToAbsolute(const QPointF &relPos) const;
     QPointF mapAbsoluteToRelative(const QPointF &absPos) const;
-    virtual QPointF getRelativePosAtRelFrame(const int &frame) const;
+
+    virtual void applyTransform(const QMatrix &transform) = 0;
+    virtual void setRelativePos(const QPointF &relPos) = 0;
+    virtual QPointF getRelativePos() const = 0;
+    virtual void moveByRel(const QPointF &relTranslation) = 0;
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;
@@ -110,8 +99,7 @@ protected:
     qreal mRadius;
     QPointF mSavedRelPos;
     BoundingBox *mParent = NULL;
-    virtual void drawOnAbsPos(QPainter *p,
-                              const QPointF &absPos);
+
     virtual void drawOnAbsPosSk(SkCanvas *canvas,
                 const SkPoint &absPos,
                 const SkScalar &invScale,
@@ -120,4 +108,31 @@ protected:
                 const unsigned char b);
 };
 
+class NonAnimatedMovablePoint : public MovablePoint {
+public:
+    NonAnimatedMovablePoint(BoundingBox *parent,
+                            const MovablePointType &type,
+                            const qreal &radius = 7.5) :
+        MovablePoint(parent, type, radius) {
+
+    }
+
+    void applyTransform(const QMatrix &transform){
+        mCurrentPos = transform.map(mCurrentPos);
+    }
+
+    void setRelativePos(const QPointF &relPos) {
+        mCurrentPos = relPos;
+    }
+
+    QPointF getRelativePos() const {
+        return mCurrentPos;
+    }
+
+    void moveByRel(const QPointF &relTranslation) {
+        mCurrentPos = mSavedRelPos + relTranslation;
+    }
+protected:
+    QPointF mCurrentPos;
+};
 #endif // MOVABLEPOINT_H

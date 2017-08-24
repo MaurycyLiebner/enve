@@ -4,7 +4,7 @@
 const int MAP_SIZE = 100;
 
 BonePoint::BonePoint(BoundingBox *bonesBox) :
-    MovablePoint(bonesBox, TYPE_BONE_POINT) {
+    PointAnimator(bonesBox, TYPE_BONE_POINT) {
 
 }
 

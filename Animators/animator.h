@@ -31,7 +31,7 @@ public:
     void anim_updateRelFrame();
     virtual void anim_mergeKeysIfNeeded();
     int anim_getClosestsKeyOccupiedRelFrame(const int &frame);
-    virtual Key *anim_getKeyAtRelFrame(const int &frame);
+    Key *anim_getKeyAtRelFrame(const int &frame);
     bool anim_hasPrevKey(Key *key);
     bool anim_hasNextKey(Key *key);
     virtual void anim_callFrameChangeUpdater();
@@ -50,9 +50,7 @@ public:
     virtual void anim_keyValueChanged(Key *key);
 
     void anim_updateKeyOnCurrrentFrame();
-    void anim_setTraceKeyOnCurrentFrame(const bool &bT) {
-        anim_mTraceKeyOnCurrentFrame = bT;
-    }
+
     virtual DurationRectangleMovable *anim_getRectangleMovableAtPos(
                                            const qreal &relX,
                                            const int &minViewedFrame,
@@ -119,7 +117,6 @@ protected:
                          const qreal &pixelsPerFrame,
                          const qreal &drawY,
                          const int &startFrame);
-    bool anim_mTraceKeyOnCurrentFrame = false;
     QList<std::shared_ptr<Key> > anim_mKeys;
     int anim_mCurrentAbsFrame = 0;
     int anim_mCurrentRelFrame = 0;
@@ -131,6 +128,7 @@ protected:
 public slots:
     void anim_deleteCurrentKey();
     virtual void anim_updateAfterShifted();
+    void prp_setRecording(const bool &rec);
 signals:
     void beingDeleted();
 };

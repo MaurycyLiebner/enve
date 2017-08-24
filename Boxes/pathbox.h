@@ -55,9 +55,9 @@ public:
     PathBox(const BoundingBoxType &type);
     ~PathBox();
 
-    void resetStrokeGradientPointsPos(const bool &finish);
+    void resetStrokeGradientPointsPos();
 
-    void resetFillGradientPointsPos(const bool &finish);
+    void resetFillGradientPointsPos();
 
     virtual void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
 

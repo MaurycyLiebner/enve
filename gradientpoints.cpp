@@ -71,10 +71,10 @@ void GradientPoints::enable() {
     enabled = true;
 }
 
-void GradientPoints::setPositions(QPointF startPos,
-                                  QPointF endPos, bool saveUndoRedo) {
-    startPoint->setRelativePos(startPos, saveUndoRedo);
-    endPoint->setRelativePos(endPos, saveUndoRedo);
+void GradientPoints::setPositions(const QPointF &startPos,
+                                  const QPointF &endPos) {
+    startPoint->setRelativePos(startPos);
+    endPoint->setRelativePos(endPos);
 }
 
 void GradientPoints::disable()

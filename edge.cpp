@@ -1,13 +1,13 @@
 #include "edge.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "ctrlpoint.h"
 #include "Boxes/boundingbox.h"
 #include "global.h"
-#include "Animators/PathAnimators/singlevectorpathanimator.h"
+#include "Animators/PathAnimators/vectorpathanimator.h"
 #include "pointhelpers.h"
 #include "mainwindow.h"
 
-VectorPathEdge::VectorPathEdge(PathPoint *pt1, PathPoint *pt2) {
+VectorPathEdge::VectorPathEdge(NodePoint *pt1, NodePoint *pt2) {
     setPoint1(pt1);
     setPoint2(pt2);
 }
@@ -15,7 +15,7 @@ VectorPathEdge::VectorPathEdge(PathPoint *pt1, PathPoint *pt2) {
 void VectorPathEdge::getNewRelPosForKnotInsertionAtT(const QPointF &P0,
                                                      QPointF *P1_ptr,
                                                      QPointF *P2_ptr,
-                                                     QPointF P3,
+                                                     const QPointF &P3,
                                                      QPointF *new_p_ptr,
                                                      QPointF *new_p_start_ptr,
                                                      QPointF *new_p_end_ptr,
@@ -30,6 +30,33 @@ void VectorPathEdge::getNewRelPosForKnotInsertionAtT(const QPointF &P0,
     QPointF P12_23 = (1-t)*P1_2 + t*P2_3;
 
     QPointF P0112_1223 = (1-t)*P01_12 + t*P12_23;
+
+    *P1_ptr = P0_1;
+    *new_p_start_ptr = P01_12;
+    *new_p_ptr = P0112_1223;
+    *new_p_end_ptr = P12_23;
+    *P2_ptr = P2_3;
+}
+
+
+void VectorPathEdge::getNewRelPosForKnotInsertionAtTSk(const SkPoint &P0,
+                                                     SkPoint *P1_ptr,
+                                                     SkPoint *P2_ptr,
+                                                     SkPoint P3,
+                                                     SkPoint *new_p_ptr,
+                                                     SkPoint *new_p_start_ptr,
+                                                     SkPoint *new_p_end_ptr,
+                                                     const SkScalar &t) {
+    SkPoint P1 = *P1_ptr;
+    SkPoint P2 = *P2_ptr;
+    SkPoint P0_1 = P0*(1-t) + P1*t;
+    SkPoint P1_2 = P1*(1-t) + P2*t;
+    SkPoint P2_3 = P2*(1-t) + P3*t;
+
+    SkPoint P01_12 = P0_1*(1-t) + P1_2*t;
+    SkPoint P12_23 = P1_2*(1-t) + P2_3*t;
+
+    SkPoint P0112_1223 = P01_12*(1-t) + P12_23*t;
 
     *P1_ptr = P0_1;
     *new_p_start_ptr = P01_12;
@@ -117,8 +144,8 @@ QPointF VectorPathEdge::getPosBetweenPointsAtT(const qreal &t,
 }
 
 QPointF VectorPathEdge::getRelPosBetweenPointsAtT(const qreal &t,
-                                        PathPoint *point1,
-                                        PathPoint *point2) {
+                                        NodePoint *point1,
+                                        NodePoint *point2) {
     if(point1 == NULL) return point2->getRelativePos();
     if(point2 == NULL) return point1->getRelativePos();
 
@@ -133,8 +160,8 @@ QPointF VectorPathEdge::getRelPosBetweenPointsAtT(const qreal &t,
 }
 
 QPointF VectorPathEdge::getAbsPosBetweenPointsAtT(const qreal &t,
-                                        PathPoint *point1,
-                                        PathPoint *point2) {
+                                        NodePoint *point1,
+                                        NodePoint *point2) {
     if(point1 == NULL) return point2->getAbsolutePos();
     if(point2 == NULL) return point1->getAbsolutePos();
 
@@ -172,12 +199,12 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
 
     if(!mEditPath) {
         BoundingBox *parentBox = mPoint1->getParent();
-        PathPointValues p1Values = mPoint1->getPointValues();
+        NodePointValues p1Values = mPoint1->getPointValues();
         p0Pos = parentBox->getCombinedTransform().map(
                     p1Values.pointRelPos);
         p1Pos = parentBox->getCombinedTransform().map(
                     p1Values.endRelPos);
-        PathPointValues p2Values = mPoint2->getPointValues();
+        NodePointValues p2Values = mPoint2->getPointValues();
         p2Pos = parentBox->getCombinedTransform().map(
                     p2Values.startRelPos);
         p3Pos = parentBox->getCombinedTransform().map(
@@ -254,20 +281,20 @@ void VectorPathEdge::drawHoveredSk(SkCanvas *canvas,
     canvas->drawPath(mSkPath, paint);
 }
 
-PathPoint *VectorPathEdge::getPoint1() const {
+NodePoint *VectorPathEdge::getPoint1() const {
     return mPoint1;
 }
 
-PathPoint *VectorPathEdge::getPoint2() const {
+NodePoint *VectorPathEdge::getPoint2() const {
     return mPoint2;
 }
 
-void VectorPathEdge::setPoint1(PathPoint *point1) {
+void VectorPathEdge::setPoint1(NodePoint *point1) {
     mPoint1 = point1;
     mPoint1EndPt = mPoint1->getEndCtrlPt();
 }
 
-void VectorPathEdge::setPoint2(PathPoint *point2) {
+void VectorPathEdge::setPoint2(NodePoint *point2) {
     mPoint2 = point2;
     mPoint2StartPt = mPoint2->getStartCtrlPt();
 }

@@ -1,9 +1,9 @@
 #ifndef BOXPATHPOINT_H
 #define BOXPATHPOINT_H
-#include "movablepoint.h"
+#include "pointanimator.h"
 class BoundingBox;
 
-class BoxPathPoint : public MovablePoint
+class BoxPathPoint : public PointAnimator
 {
 public:
     BoxPathPoint(BoundingBox *box);

@@ -8,7 +8,7 @@
 #include "pathpivot.h"
 #include "pointhelpers.h"
 #include "Animators/animatorupdater.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "Animators/pathanimator.h"
 #include "gradientpoints.h"
 
@@ -17,7 +17,7 @@ VectorPath::VectorPath() :
     mPathAnimator =
             (new PathAnimator(this))->ref<PathAnimator>();
     setName("Path");
-    mPathAnimator->prp_setUpdater(new PathPointUpdater(this));
+    mPathAnimator->prp_setUpdater(new NodePointUpdater(this));
     mPathAnimator->prp_blockUpdater();
     ca_addChildAnimator(mPathAnimator.data());
 }
@@ -34,7 +34,7 @@ void VectorPath::selectAllPoints(Canvas *canvas) {
     mPathAnimator->selectAllPoints(canvas);
 }
 
-PathPoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
+NodePoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv) {
     return mPathAnimator->createNewPointOnLineNear(absPos, adjust,
@@ -69,9 +69,9 @@ void VectorPath::applyCurrentTransformation() {
     centerPivotPosition(true);
 }
 
-VectorPathEdge *VectorPath::getEgde(const QPointF &absPos,
+VectorPathEdge *VectorPath::getEdge(const QPointF &absPos,
                                     const qreal &canvasScaleInv) {
-    return mPathAnimator->getEgde(absPos, canvasScaleInv);
+    return mPathAnimator->getEdge(absPos, canvasScaleInv);
 }
 
 void VectorPath::loadPathFromSkPath(const SkPath &path) {

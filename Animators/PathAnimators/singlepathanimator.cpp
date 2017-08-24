@@ -1,6 +1,6 @@
 #include "singlepathanimator.h"
 #include "Animators/pathanimator.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "undoredo.h"
 #include "edge.h"
 #include "Boxes/boundingbox.h"

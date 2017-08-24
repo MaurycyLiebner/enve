@@ -6,13 +6,11 @@ class Canvas;
 
 enum CanvasMode : short;
 
-class PathPivot : public MovablePoint
-{
+class PathPivot : public NonAnimatedMovablePoint {
 public:
     PathPivot(Canvas *parent);
 
-    void setRelativePos(const QPointF &relPos,
-                        const bool &saveUndoRedo = true);
+    //void setRelativePos(const QPointF &relPos);
 
     bool isRotating();
     bool isScaling();
@@ -27,11 +25,9 @@ public:
                          const qreal &inputTransformationValue,
                          const bool &startTransform,
                          const CanvasMode &mode);
-//    void updateRotationMappedPath();
     void finishTransform();
     void startRotating();
     void startScaling();
-    void startTransform();
     void drawSk(SkCanvas *canvas, const SkScalar &invScale);
 protected:
     qreal mLastDRot = 0.;
@@ -39,10 +35,6 @@ protected:
     Canvas *mCanvas;
     bool mRotating = false;
     bool mScaling = false;
-//    bool isRotationPathAt(QPointF absPos);
-
-//    QPainterPath mRotationPath;
-//    QPainterPath mMappedRotationPath;
 };
 
 #endif // PATHPIVOT_H

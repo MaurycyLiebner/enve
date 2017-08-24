@@ -55,6 +55,16 @@ void Animator::anim_updateRelFrame() {
                             prp_getFrameShift();
 }
 
+void Animator::prp_setRecording(const bool &rec) {
+    if(rec) {
+        anim_setRecordingWithoutChangingKeys(rec);
+        anim_saveCurrentValueAsKey();
+    } else {
+        anim_removeAllKeys();
+        anim_setRecordingWithoutChangingKeys(rec);
+    }
+}
+
 void Animator::prp_switchRecording() {
     prp_setRecording(!anim_mIsRecording);
 }
@@ -265,9 +275,7 @@ void Animator::anim_keyValueChanged(Key *key) {
 }
 
 void Animator::anim_updateKeyOnCurrrentFrame() {
-    if(anim_mTraceKeyOnCurrentFrame) {
-        anim_mKeyOnCurrentFrame = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
-    }
+    anim_mKeyOnCurrentFrame = anim_getKeyAtAbsFrame(anim_mCurrentAbsFrame);
 }
 
 Key *Animator::prp_getKeyAtPos(const qreal &relX,
@@ -321,7 +329,6 @@ void Animator::anim_setRecordingWithoutChangingKeys(const bool &rec,
     }
 
     anim_setRecordingValue(rec);
-    anim_setTraceKeyOnCurrentFrame(rec); // !!!
 }
 
 void Animator::anim_setRecordingValue(const bool &rec) {

@@ -146,12 +146,12 @@ void Canvas::resetSelectedRotation() {
     }
 }
 
-PathPoint *Canvas::createNewPointOnLineNearSelected(
+NodePoint *Canvas::createNewPointOnLineNearSelected(
                         const QPointF &absPos,
                         const bool &adjust,
                         const qreal &canvasScaleInv) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        PathPoint *point = box->createNewPointOnLineNear(absPos, adjust,
+        NodePoint *point = box->createNewPointOnLineNear(absPos, adjust,
                                                          canvasScaleInv);
         if(point != NULL) {
             return point;
@@ -228,7 +228,7 @@ void Canvas::startSelectedFillColorTransform() {
 VectorPathEdge *Canvas::getEdgeAt(QPointF absPos) {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(box->isSelected() ) {
-            VectorPathEdge *pathEdge = box->getEgde(absPos,
+            VectorPathEdge *pathEdge = box->getEdge(absPos,
                                                     1./mCanvasTransformMatrix.m11());
             if(pathEdge == NULL) continue;
             return pathEdge;

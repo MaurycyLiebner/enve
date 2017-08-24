@@ -127,16 +127,6 @@ QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
     return key->getText();
 }
 
-void QStringAnimator::prp_setRecording(const bool &rec) {
-    if(rec) {
-        anim_setRecordingWithoutChangingKeys(rec);
-        anim_saveCurrentValueAsKey();
-    } else {
-        anim_removeAllKeys();
-        anim_setRecordingWithoutChangingKeys(rec);
-    }
-}
-
 void QStringAnimator::prp_getFirstAndLastIdenticalRelFrame(
                             int *firstIdentical,
                             int *lastIdentical,

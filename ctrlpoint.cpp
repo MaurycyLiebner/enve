@@ -1,31 +1,23 @@
 #include "ctrlpoint.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "Boxes/vectorpath.h"
 #include "Boxes/boxesgroup.h"
 #include "pointhelpers.h"
 
-CtrlPoint::CtrlPoint(PathPoint *parentPoint, bool isStartCtrlPt) :
-    MovablePoint(parentPoint->getParent(),
+CtrlPoint::CtrlPoint(NodePoint *parentPoint, bool isStartCtrlPt) :
+    NonAnimatedMovablePoint(parentPoint->getParent(),
                  MovablePointType::TYPE_CTRL_POINT, 5.) {
     mIsStartCtrlPt = isStartCtrlPt;
     mParentPoint = parentPoint;
     mParent = mParentPoint->getParent();
-    anim_setTraceKeyOnCurrentFrame(true);
 }
 
 QPointF CtrlPoint::getRelativePos() const {
-    return mParentPoint->getRelativePos() + getCurrentPointValue();
+    return mParentPoint->getRelativePos() + mCurrentPos;
 }
 
-QPointF CtrlPoint::getRelativePosAtRelFrame(const int &frame) const {
-    return mParentPoint->getRelativePosAtRelFrame(frame) +
-            getCurrentPointValueAtRelFrame(frame);
-}
-
-void CtrlPoint::setRelativePos(const QPointF &relPos,
-                               const bool &saveUndoRedo) {
-    setCurrentPointValue(relPos - mParentPoint->getRelativePos(),
-                         saveUndoRedo);
+void CtrlPoint::setRelativePos(const QPointF &relPos) {
+    mCurrentPos = relPos - mParentPoint->getRelativePos();
 }
 
 void CtrlPoint::setIsStartCtrlPt(const bool &bT) {
@@ -33,24 +25,24 @@ void CtrlPoint::setIsStartCtrlPt(const bool &bT) {
 }
 
 void CtrlPoint::moveToAbsWithoutUpdatingTheOther(const QPointF &absPos) {
-    MovablePoint::moveToAbs(absPos);
+    NonAnimatedMovablePoint::moveToAbs(absPos);
 }
 
 void CtrlPoint::rotate(const qreal &rotate) {
-    QPointF savedValue = getSavedPointValue();
+    QPointF savedValue = mSavedRelPos;
     QMatrix mat;
     mat.rotate(rotate);
-    setCurrentPointValue(mat.map(savedValue));
+    mCurrentPos = mat.map(savedValue);
 }
 
 void CtrlPoint::moveByAbs(const QPointF &absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(getSavedPointValue() +
-                                    mParentPoint->getCurrentPointValue()) +
+    moveToAbs(mapRelativeToAbsolute(mSavedRelPos +
+                                    mParentPoint->getRelativePos()) +
               absTranslatione);
 }
 
 void CtrlPoint::moveToAbs(QPointF absPos) {
-    MovablePoint::moveToAbs(absPos);
+    NonAnimatedMovablePoint::moveToAbs(absPos);
     if(mOtherCtrlPt->isSelected()) {
         return;
     }
@@ -58,7 +50,7 @@ void CtrlPoint::moveToAbs(QPointF absPos) {
 }
 
 void CtrlPoint::moveByRel(const QPointF &relTranslation) {
-    MovablePoint::moveByRel(relTranslation);
+    NonAnimatedMovablePoint::moveByRel(relTranslation);
     if(mOtherCtrlPt->isSelected()) {
         return;
     }
@@ -66,26 +58,26 @@ void CtrlPoint::moveByRel(const QPointF &relTranslation) {
 }
 
 void CtrlPoint::startTransform() {
-    MovablePoint::startTransform();
-    //mParentPoint->MovablePoint::startTransform();
+    NonAnimatedMovablePoint::startTransform();
+    //mParentPoint->NonAnimatedMovablePoint::startTransform();
     if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
-        mOtherCtrlPt->MovablePoint::startTransform();
+        mOtherCtrlPt->NonAnimatedMovablePoint::startTransform();
     }
 }
 
 void CtrlPoint::finishTransform() {
-    //mParentPoint->MovablePoint::finishTransform();
-    MovablePoint::finishTransform();
+    //mParentPoint->NonAnimatedMovablePoint::finishTransform();
+    NonAnimatedMovablePoint::finishTransform();
     if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
-        mOtherCtrlPt->MovablePoint::finishTransform();
+        mOtherCtrlPt->NonAnimatedMovablePoint::finishTransform();
     }
 }
 
 void CtrlPoint::cancelTransform() {
-    //mParentPoint->MovablePoint::cancelTransform();
-    MovablePoint::cancelTransform();
+    //mParentPoint->NonAnimatedMovablePoint::cancelTransform();
+    NonAnimatedMovablePoint::cancelTransform();
     if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
-        mOtherCtrlPt->MovablePoint::cancelTransform();
+        mOtherCtrlPt->NonAnimatedMovablePoint::cancelTransform();
     }
 }
 
@@ -98,6 +90,6 @@ void CtrlPoint::removeFromVectorPath() {
 }
 
 bool CtrlPoint::isHidden() {
-    return MovablePoint::isHidden() ||
+    return NonAnimatedMovablePoint::isHidden() ||
            (!mParentPoint->isNeighbourSelected() );
 }

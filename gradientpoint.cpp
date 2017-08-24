@@ -4,19 +4,17 @@
 #include "pointhelpers.h"
 
 GradientPoint::GradientPoint(PathBox *parent) :
-    MovablePoint(parent, TYPE_GRADIENT_POINT) {
+    PointAnimator(parent, TYPE_GRADIENT_POINT) {
     prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
-    anim_setTraceKeyOnCurrentFrame(true);
 }
 
-void GradientPoint::setRelativePos(const QPointF &relPos,
-                                   const bool &saveUndoRedo) {
-    MovablePoint::setRelativePos(relPos, saveUndoRedo);
+void GradientPoint::setRelativePos(const QPointF &relPos) {
+    PointAnimator::setRelativePos(relPos);
     ((VectorPath*)mParent)->updateDrawGradients();
 }
 
 void GradientPoint::moveByRel(const QPointF &relTranslatione) {
-    MovablePoint::moveByRel(relTranslatione);
+    PointAnimator::moveByRel(relTranslatione);
     ((VectorPath*)mParent)->updateDrawGradients();
 }
 

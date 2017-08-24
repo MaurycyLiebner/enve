@@ -2,7 +2,7 @@
 #define TRANSFORMANIMATOR_H
 #include "Animators/complexanimator.h"
 #include "Animators/qpointfanimator.h"
-#include "movablepoint.h"
+#include "pointanimator.h"
 class TransformUpdater;
 
 class BasicTransformAnimator : public ComplexAnimator {
@@ -140,7 +140,7 @@ public:
 
     bool rotOrScaleOrPivotRecording();
 private:
-    QSharedPointer<MovablePoint> mPivotAnimator;
+    QSharedPointer<PointAnimator> mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;
 };
 

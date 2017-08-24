@@ -16,7 +16,7 @@
 #include "Sound/singlesound.h"
 #include "global.h"
 #include "pointhelpers.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "Boxes/linkbox.h"
 #include "Animators/animatorupdater.h"
 #include "clipboardcontainer.h"
@@ -669,11 +669,9 @@ void Canvas::updatePivot() {
         if(getPointsSelectionCount() == 1) {
             mRotPivot->setAbsolutePos(
                         getSelectedPointsAbsPivotPos() +
-                            QPointF(0., 20.),
-                        false);
+                            QPointF(0., 20.));
         } else {
-            mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos(),
-                                      false);
+            mRotPivot->setAbsolutePos(getSelectedPointsAbsPivotPos());
         }
     } else if(mCurrentMode == MOVE_PATH) {
         if(isSelectionEmpty() ||
@@ -683,8 +681,7 @@ void Canvas::updatePivot() {
             mRotPivot->show();
 
         }
-        mRotPivot->setAbsolutePos(getSelectedBoxesAbsPivotPos(),
-                                  false);
+        mRotPivot->setAbsolutePos(getSelectedBoxesAbsPivotPos());
     }
 }
 
@@ -998,7 +995,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
     return true;
 }
 
-void Canvas::setCurrentEndPoint(PathPoint *point) {
+void Canvas::setCurrentEndPoint(NodePoint *point) {
     if(mCurrentEndPoint != NULL) {
         mCurrentEndPoint->deselect();
     }
@@ -1070,8 +1067,10 @@ void Canvas::moveByRel(const QPointF &trans) {
 //    //mSoundComposition->getSoundsAnimatorContainer()->prp_setAbsFrame(currentFrame);
 //}
 
-void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,
-                             QPointF *startCtrlPtPos, QPointF *endCtrlPtPos) {
+void getMirroredCtrlPtAbsPos(bool mirror,
+                             NodePoint *point,
+                             QPointF *startCtrlPtPos,
+                             QPointF *endCtrlPtPos) {
     if(mirror) {
         *startCtrlPtPos = point->getEndCtrlPtAbsPos();
         *endCtrlPtPos = point->getStartCtrlPtAbsPos();
@@ -1081,8 +1080,8 @@ void getMirroredCtrlPtAbsPos(bool mirror, PathPoint *point,
     }
 }
 
-void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
-                                             PathPoint *pointDest) {
+void Canvas::connectPointsFromDifferentPaths(NodePoint *pointSrc,
+                                             NodePoint *pointDest) {
 //    if(pointSrc->getParentPath() == pointDest->getParentPath()) {
 //        return;
 //    }
@@ -1090,14 +1089,14 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
 //    PathAnimator *pathDest = pointDest->getParentPath();
 //    setCurrentEndPoint(pointDest);
 //    if(pointSrc->hasNextPoint()) {
-//        PathPoint *point = pointSrc;
+//        NodePoint *point = pointSrc;
 //        bool mirror = pointDest->hasNextPoint();
 //        while(point != NULL) {
 //            QPointF startCtrlPpclab.pltPos;
 //            QPointF endCtrlPtPos;
 //            getMirroredCtrlPtAbsPos(mirror, point,
 //                                    &startCtrlPtPos, &endCtrlPtPos);
-//            PathPoint *newPoint = new PathPoint(pathDest);
+//            NodePoint *newPoint = new NodePoint(pathDest);
 //            newPoint->setAbsolutePos(point->getAbsolutePos());
 //            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
 //            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);
@@ -1106,7 +1105,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
 //            point = point->getNextPoint();
 //        }
 //    } else {
-//        PathPoint *point = pointSrc;
+//        NodePoint *point = pointSrc;
 //        bool mirror = pointDest->hasPreviousPoint();
 //        while(point != NULL) {
 //            QPointF startCtrlPtPos;
@@ -1114,7 +1113,7 @@ void Canvas::connectPointsFromDifferentPaths(PathPoint *pointSrc,
 //            getMirroredCtrlPtAbsPos(mirror, point,
 //                                    &startCtrlPtPos, &endCtrlPtPos);
 
-//            PathPoint *newPoint = new PathPoint(pathDest);
+//            NodePoint *newPoint = new NodePoint(pathDest);
 //            newPoint->setAbsolutePos(point->getAbsolutePos());
 //            newPoint->moveStartCtrlPtToAbsPos(startCtrlPtPos);
 //            newPoint->moveEndCtrlPtToAbsPos(endCtrlPtPos);

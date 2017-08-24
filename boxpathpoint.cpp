@@ -3,8 +3,7 @@
 #include "pointhelpers.h"
 
 BoxPathPoint::BoxPathPoint(BoundingBox *box) :
-    MovablePoint(box, TYPE_PATH_POINT, 7.) {
-    anim_setTraceKeyOnCurrentFrame(true);
+    PointAnimator(box, TYPE_PATH_POINT, 7.) {
 }
 
 void BoxPathPoint::startTransform() {

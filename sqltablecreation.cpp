@@ -202,7 +202,7 @@ void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
                "FOREIGN KEY(fillsettingsid) REFERENCES paintsettings(id), "
                "FOREIGN KEY(strokesettingsid) REFERENCES strokesettings(id) )");
 
-    query->exec("CREATE TABLE pathpoint "
+    query->exec("CREATE TABLE NodePoint "
                "(id INTEGER PRIMARY KEY, "
                "isfirst BOOLEAN, "
                "isendpoint BOOLEAN, "

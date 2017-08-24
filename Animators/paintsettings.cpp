@@ -764,9 +764,9 @@ void PaintSetting::apply(PathBox *box) const {
         paintSettings->setGradientLinear(mLinearGradient);
         if(paintTypeChanged) {
             if(mTargetFillSettings) {
-                box->resetFillGradientPointsPos(true);
+                box->resetFillGradientPointsPos();
               } else {
-                box->resetStrokeGradientPointsPos(true);
+                box->resetStrokeGradientPointsPos();
             }
         }
 //        if(gradientChanged) {

@@ -39,15 +39,15 @@ void TransformUpdater::frameChangeUpdate() {
     mTarget->anim_callFrameChangeUpdater();
 }
 
-PathPointUpdater::PathPointUpdater(PathBox *vectorPath) {
+NodePointUpdater::NodePointUpdater(PathBox *vectorPath) {
     mTarget = vectorPath;
 }
 
-void PathPointUpdater::update() {
+void NodePointUpdater::update() {
     mTarget->scheduleUpdate();
 }
 
-void PathPointUpdater::frameChangeUpdate() {
+void NodePointUpdater::frameChangeUpdate() {
     mTarget->scheduleUpdate();
 }
 

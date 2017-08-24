@@ -1,13 +1,12 @@
 #ifndef GRADIENTPOINT_H
 #define GRADIENTPOINT_H
-#include "movablepoint.h"
+#include "pointanimator.h"
 class PathBox;
 
-class GradientPoint : public MovablePoint {
+class GradientPoint : public PointAnimator {
 public:
     GradientPoint(PathBox *parent);
-    void setRelativePos(const QPointF &relPos,
-                        const bool &saveUndoRedo);
+    void setRelativePos(const QPointF &relPos);
     void moveByRel(const QPointF &relTranslatione);
     void setColor(QColor fillColor);
     void drawSk(SkCanvas *canvas,

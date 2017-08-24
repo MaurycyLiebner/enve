@@ -2,24 +2,24 @@
 #define PATHOPERATIONS_H
 #include <QPainterPath>
 #include "Boxes/vectorpath.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 
-class MinimalPathPoint {
+class MinimalNodePoint {
 public:
-    MinimalPathPoint();
-    MinimalPathPoint(QPointF ctrlStart, QPointF pos, QPointF ctrlEnd);
-    MinimalPathPoint(MinimalPathPoint *point);
-    virtual ~MinimalPathPoint() {}
+    MinimalNodePoint();
+    MinimalNodePoint(QPointF ctrlStart, QPointF pos, QPointF ctrlEnd);
+    MinimalNodePoint(MinimalNodePoint *point);
+    virtual ~MinimalNodePoint() {}
 
-    void setNextPoint(MinimalPathPoint *point);
-    void setPrevPoint(MinimalPathPoint *point);
+    void setNextPoint(MinimalNodePoint *point);
+    void setPrevPoint(MinimalNodePoint *point);
 
-    MinimalPathPoint *getNextPoint();
-    MinimalPathPoint *getPrevPoint();
+    MinimalNodePoint *getNextPoint();
+    MinimalNodePoint *getPrevPoint();
 
-    void setStartCtrlPos(QPointF pos);
-    void setEndCtrlPos(QPointF pos);
-    void setPos(QPointF pos);
+    void setStartCtrlPos(const QPointF &pos);
+    void setEndCtrlPos(const QPointF &pos);
+    void setPos(const QPointF &pos);
 
     QPointF getStartPos();
     QPointF getEndPos();
@@ -31,8 +31,8 @@ public:
     bool wasAdded() { return mAdded; }
     void setAdded() { mAdded = true; }
 private:
-    MinimalPathPoint *mNextPoint = NULL;
-    MinimalPathPoint *mPrevPoint = NULL;
+    MinimalNodePoint *mNextPoint = NULL;
+    MinimalNodePoint *mPrevPoint = NULL;
     QPointF mStartCtrlPos;
     QPointF mPos;
     QPointF mEndCtrlPos;
@@ -40,22 +40,22 @@ private:
     bool mReversed = false;
 };
 
-class IntersectionPathPoint : public MinimalPathPoint
+class IntersectionNodePoint : public MinimalNodePoint
 {
 public:
-    IntersectionPathPoint();
-    IntersectionPathPoint(QPointF start, QPointF pos, QPointF end);
-    ~IntersectionPathPoint();
+    IntersectionNodePoint();
+    IntersectionNodePoint(QPointF start, QPointF pos, QPointF end);
+    ~IntersectionNodePoint();
 
     bool isIntersection();
 
-    void setSibling(IntersectionPathPoint *sibling);
-    IntersectionPathPoint *getSibling();
+    void setSibling(IntersectionNodePoint *sibling);
+    IntersectionNodePoint *getSibling();
 
     void fixSiblingSideCtrlPoint();
 
 private:
-    IntersectionPathPoint *mSiblingIntPoint;
+    IntersectionNodePoint *mSiblingIntPoint;
 };
 
 class MinimalVectorPath;
@@ -98,11 +98,11 @@ public:
     void setLastPointEnd(QPointF end);
     void setLastPointPos(QPointF pos);
 
-    void addPoint(MinimalPathPoint *point);
+    void addPoint(MinimalNodePoint *point);
 
     virtual ~MinimalVectorPath();
 
-    MinimalPathPoint *getFirstPoint();
+    MinimalNodePoint *getFirstPoint();
 
     void intersectWith(MinimalVectorPath *otherPath,
                        const bool &unionInterThis,
@@ -117,7 +117,7 @@ public:
 
     const QPainterPath &getPath() { return mPath; }
 
-    void addIntersectionPoint(IntersectionPathPoint *point) {
+    void addIntersectionPoint(IntersectionNodePoint *point) {
         mIntersectionPoints << point;
     }
 
@@ -127,9 +127,9 @@ public:
 
 private:
     FullVectorPath *mParentFullPath = NULL;
-    MinimalPathPoint *mFirstPoint = NULL;
-    MinimalPathPoint *mLastPoint = NULL;
-    QList<IntersectionPathPoint*> mIntersectionPoints;
+    MinimalNodePoint *mFirstPoint = NULL;
+    MinimalNodePoint *mLastPoint = NULL;
+    QList<IntersectionNodePoint*> mIntersectionPoints;
     QPainterPath mPath;
 
 };
@@ -163,15 +163,15 @@ protected:
 
 class PointsBezierCubic : public BezierCubic {
 public:
-    PointsBezierCubic(MinimalPathPoint *mpp1,
-                      MinimalPathPoint *mpp2,
+    PointsBezierCubic(MinimalNodePoint *mpp1,
+                      MinimalNodePoint *mpp2,
                       MinimalVectorPath *parentPath);
 
-    void setPoints(MinimalPathPoint *mpp1, MinimalPathPoint *mpp2);
+    void setPoints(MinimalNodePoint *mpp1, MinimalNodePoint *mpp2);
 
     void intersectWith(PointsBezierCubic *bezier);
 
-    IntersectionPathPoint *addIntersectionPointAt(QPointF pos);
+    IntersectionNodePoint *addIntersectionPointAt(QPointF pos);
 
     void setNextCubic(PointsBezierCubic *cubic);
     void setPrevCubic(PointsBezierCubic *cubic);
@@ -179,15 +179,15 @@ public:
     PointsBezierCubic *getNextCubic();
     PointsBezierCubic *getPrevCubic();
 
-    IntersectionPathPoint *divideCubicAtPointAndReturnIntersection(
+    IntersectionNodePoint *divideCubicAtPointAndReturnIntersection(
                                 const QPointF &pos);
 
     void disconnect();
 private:
     PointsBezierCubic *mNextCubic = NULL;
     PointsBezierCubic *mPrevCubic = NULL;
-    MinimalPathPoint *mMPP1;
-    MinimalPathPoint *mMPP2;
+    MinimalNodePoint *mMPP1;
+    MinimalNodePoint *mMPP2;
     MinimalVectorPath *mParentPath = NULL;
 };
 

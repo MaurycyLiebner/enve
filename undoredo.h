@@ -10,12 +10,12 @@
 class MainWindow;
 class MovablePoint;
 typedef QSharedPointer<MovablePoint> MovablePointQSPtr;
-class PathPoint;
-typedef QSharedPointer<PathPoint> PathPointQSPtr;
+class NodePoint;
+typedef QSharedPointer<NodePoint> NodePointQSPtr;
 class SinglePathAnimator;
 typedef QSharedPointer<SinglePathAnimator> SinglePathAnimatorQSPtr;
-class SingleVectorPathAnimator;
-typedef QSharedPointer<SingleVectorPathAnimator> SingleVectorPathAnimatorQSPtr;
+class VectorPathAnimator;
+typedef QSharedPointer<VectorPathAnimator> VectorPathAnimatorQSPtr;
 class PathAnimator;
 typedef QSharedPointer<PathAnimator> PathAnimatorQSPtr;
 class Gradient;
@@ -195,69 +195,11 @@ private:
     QList<UndoRedo*> mRedoStack;
 };
 
-class AppendToPointsListUndoRedo : public UndoRedo {
-public:
-    AppendToPointsListUndoRedo(PathPoint *pointToAdd,
-                               SingleVectorPathAnimator *path);
-
-    ~AppendToPointsListUndoRedo();
-
-    void redo();
-
-    void undo();
-
-private:
-    PathPointQSPtr mPoint;
-    SingleVectorPathAnimatorQSPtr mPath;
-};
-
-class RemoveFromPointsListUndoRedo : public AppendToPointsListUndoRedo {
-public:
-    RemoveFromPointsListUndoRedo(PathPoint *pointToRemove,
-                                 SingleVectorPathAnimator *path);
-
-    void redo();
-    void undo();
-};
-
-class SetNextPointUndoRedo : public UndoRedo {
-public:
-    SetNextPointUndoRedo(PathPoint *point,
-                         PathPoint *oldNext,
-                         PathPoint *newNext);
-
-    ~SetNextPointUndoRedo();
-
-    void redo();
-    void undo();
-private:
-    PathPointQSPtr mNewNext;
-    PathPointQSPtr mOldNext;
-    PathPointQSPtr mPoint;
-};
-
-class SetPreviousPointUndoRedo : public UndoRedo
-{
-public:
-    SetPreviousPointUndoRedo(PathPoint *point,
-                             PathPoint *oldPrevious,
-                             PathPoint *newPrevious);
-
-    ~SetPreviousPointUndoRedo();
-
-    void redo();
-    void undo();
-private:
-    PathPointQSPtr mNewPrev;
-    PathPointQSPtr mOldPrev;
-    PathPointQSPtr mPoint;
-};
-
 //class AddPointToSeparatePathsUndoRedo : public UndoRedo
 //{
 //public:
 //    AddPointToSeparatePathsUndoRedo(PathAnimator *path,
-//                                    PathPoint *point) :
+//                                    NodePoint *point) :
 //        UndoRedo("AddPointToSeparatePathsUndoRedo") {
 //        mPath = path;
 //        mPoint = point;
@@ -276,7 +218,7 @@ private:
 
 //private:
 //    PathAnimator *mPath;
-//    PathPoint *mPoint;
+//    NodePoint *mPoint;
 //};
 
 //class RemovePointFromSeparatePathsUndoRedo :
@@ -284,7 +226,7 @@ private:
 //{
 //public:
 //    RemovePointFromSeparatePathsUndoRedo(PathAnimator *path,
-//                                         PathPoint *point) :
+//                                         NodePoint *point) :
 //        AddPointToSeparatePathsUndoRedo(path, point) {
 
 //    }
@@ -298,37 +240,6 @@ private:
 //    }
 //};
 
-class SetPathPointModeUndoRedo : public UndoRedo {
-public:
-    SetPathPointModeUndoRedo(PathPoint *point,
-                             const CtrlsMode &modeBefore,
-                             const CtrlsMode &modeAfter);
-
-    ~SetPathPointModeUndoRedo();
-
-    void redo();
-    void undo();
-private:
-    PathPointQSPtr mPoint;
-    CtrlsMode mBefore;
-    CtrlsMode mAfter;
-};
-
-class SetCtrlPtEnabledUndoRedo : public UndoRedo {
-public:
-    SetCtrlPtEnabledUndoRedo(const bool &enabled,
-                             const bool &isStartPt,
-                             PathPoint *parentPoint);
-
-    ~SetCtrlPtEnabledUndoRedo();
-
-    void redo();
-    void undo();
-private:
-    PathPoint *mParentPoint;
-    bool mEnabled;
-    bool mIsStartPt;
-};
 
 class MoveChildInListUndoRedo : public UndoRedo {
 public:
@@ -613,7 +524,7 @@ private:
 class AddSinglePathAnimatorUndoRedo : public UndoRedo {
 public:
     AddSinglePathAnimatorUndoRedo(PathAnimator *target,
-                                  SingleVectorPathAnimator *path);
+                                  VectorPathAnimator *path);
 
     ~AddSinglePathAnimatorUndoRedo();
 
@@ -621,14 +532,14 @@ public:
     void redo();
 private:
     PathAnimatorQSPtr mTarget;
-    SingleVectorPathAnimatorQSPtr mPath;
+    VectorPathAnimatorQSPtr mPath;
 };
 
 class RemoveSinglePathAnimatorUndoRedo :
         public AddSinglePathAnimatorUndoRedo {
 public:
     RemoveSinglePathAnimatorUndoRedo(PathAnimator *target,
-                                     SingleVectorPathAnimator *path) :
+                                     VectorPathAnimator *path) :
         AddSinglePathAnimatorUndoRedo(target, path) {
 
     }
@@ -640,35 +551,6 @@ public:
     void redo() {
         AddSinglePathAnimatorUndoRedo::undo();
     }
-};
-
-class ChangeSingleVectorPathFirstPoint : public UndoRedo {
-public:
-    ChangeSingleVectorPathFirstPoint(SingleVectorPathAnimator *target,
-                               PathPoint *oldPoint,
-                               PathPoint *newPoint);
-
-    ~ChangeSingleVectorPathFirstPoint();
-
-    void undo();
-    void redo();
-private:
-    SingleVectorPathAnimatorQSPtr mTarget;
-    PathPointQSPtr mOldPoint;
-    PathPointQSPtr mNewPoint;
-};
-
-class ReversePointsDirectionUndoRedo : public UndoRedo {
-public:
-    ReversePointsDirectionUndoRedo(PathPoint *target);
-
-    ~ReversePointsDirectionUndoRedo();
-
-    void undo();
-
-    void redo();
-private:
-    PathPointQSPtr mTarget;
 };
 
 class ChangeFontUndoRedo : public UndoRedo {

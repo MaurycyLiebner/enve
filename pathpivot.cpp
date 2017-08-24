@@ -1,19 +1,15 @@
 #include "pathpivot.h"
 #include "canvas.h"
 #include "pointhelpers.h"
+#include "mainwindow.h"
 
 PathPivot::PathPivot(Canvas *parent) :
-    MovablePoint(parent, MovablePointType::TYPE_PIVOT_POINT, 7.) {
+    NonAnimatedMovablePoint(parent, TYPE_PIVOT_POINT, 7.) {
     mCanvas = parent;
 //    mRotationPath.addEllipse(QPointF(0., 0.), 50., 50.);
 //    QPainterPath removeEllipse;
 //    removeEllipse.addEllipse(QPointF(0., 0.), 40., 40.);
 //    mRotationPath -= removeEllipse;
-}
-
-void PathPivot::startTransform() {
-    prp_setTransformed(false);
-    MovablePoint::startTransform();
 }
 
 void PathPivot::drawSk(SkCanvas *canvas,
@@ -40,24 +36,12 @@ void PathPivot::drawSk(SkCanvas *canvas,
     canvas->restore();
 }
 
-//void PathPivot::updateRotationMappedPath() {
-//    mMappedRotationPath = mRotationPath.translated(getAbsolutePos());
-//    
-//}
-
 void PathPivot::finishTransform()
 {
     if(!mTransformStarted) {
         return;
     }
     mTransformStarted = false;
-}
-
-void PathPivot::setRelativePos(const QPointF &relPos,
-                               const bool &saveUndoRedo) {
-    MovablePoint::setRelativePos(relPos, saveUndoRedo);
-//    updateRotationMappedPath();
-    
 }
 
 bool PathPivot::isRotating()
@@ -185,7 +169,8 @@ bool PathPivot::handleMouseMove(const QPointF &moveDestAbs,
             scaleX = 1.;
             scaleY = scaleBy;
         } else {
-            if(isShiftPressed() || inputTransformationEnabled || true) { // always
+            if(MainWindow::getInstance()->isShiftPressed() ||
+               inputTransformationEnabled || true) { // always
                 scaleX = scaleBy;
                 scaleY = scaleBy;
             } else {

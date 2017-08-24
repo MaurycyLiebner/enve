@@ -44,8 +44,6 @@ public:
     void loadFromSql(const int &qstringAnimatorId);
     int saveToSql(QSqlQuery *query, const int &parentId);
     void makeDuplicate(QStringAnimator *anim);
-public slots:
-    void prp_setRecording(const bool &rec);
 private:
 
     QString mCurrentText;

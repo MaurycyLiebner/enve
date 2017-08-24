@@ -22,7 +22,7 @@ class Canvas;
 
 class MovablePoint;
 
-class PathPoint;
+class NodePoint;
 class PathEffect;
 class PathAnimator;
 class DurationRectangleMovable;
@@ -238,7 +238,7 @@ public:
 
     virtual int saveToSql(QSqlQuery *query, const int &parentId);
 
-    virtual PathPoint *createNewPointOnLineNear(const QPointF &absPos,
+    virtual NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv) {
         Q_UNUSED(absPos);
@@ -290,7 +290,7 @@ public:
     virtual void startSelectedStrokeColorTransform() {}
     virtual void startSelectedFillColorTransform() {}
 
-    virtual VectorPathEdge *getEgde(const QPointF &absPos,
+    virtual VectorPathEdge *getEdge(const QPointF &absPos,
                                     const qreal &canvasScaleInv) {
         Q_UNUSED(absPos);
         Q_UNUSED(canvasScaleInv);

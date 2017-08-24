@@ -3,12 +3,13 @@
 #include "Paint/PaintLib/animatedsurface.h"
 #include "canvas.h"
 #include "Animators/animatorupdater.h"
+#include "pointanimator.h"
 
 PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {
     setName("Paint Box");
-    mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
-    mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
+    mTopLeftPoint = new PointAnimator(this, TYPE_PATH_POINT);
+    mBottomRightPoint = new PointAnimator(this, TYPE_PATH_POINT);
 
     mTopLeftPoint->prp_setUpdater(
                 new PaintBoxSizeUpdater(this));
@@ -67,6 +68,11 @@ void PaintBox::selectAndAddContainedPointsToList(const QRectF &absRect,
             list->append(mBottomRightPoint);
         }
     }
+}
+
+QRectF PaintBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+    return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
+                  mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
 }
 
 void PaintBox::drawSelectedSk(SkCanvas *canvas,

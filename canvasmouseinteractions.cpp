@@ -8,7 +8,7 @@
 #include "Boxes/textbox.h"
 #include "edge.h"
 #include "Animators/PathAnimators/singlevectorpathanimator.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "Animators/pathanimator.h"
 #include "pointhelpers.h"
 #include "Boxes/particlebox.h"
@@ -16,6 +16,7 @@
 #include "mainwindow.h"
 #include "Boxes/paintbox.h"
 #include "Paint/PaintLib/brush.h"
+#include "Animators/PathAnimators/vectorpathanimator.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -578,55 +579,54 @@ void Canvas::handleAddPointMousePress() {
             setCurrentEndPoint(NULL);
         }
     }
-    PathPoint *pathPointUnderMouse = (PathPoint*) mLastPressedPoint;
-    if( (pathPointUnderMouse == NULL) ? false :
-            !pathPointUnderMouse->isEndPoint() ) {
-        pathPointUnderMouse = NULL;
+    NodePoint *nodePointUnderMouse = (NodePoint*) mLastPressedPoint;
+    if( (nodePointUnderMouse == NULL) ? false :
+            !nodePointUnderMouse->isEndPoint() ) {
+        nodePointUnderMouse = NULL;
     }
-    if(pathPointUnderMouse == mCurrentEndPoint &&
-            pathPointUnderMouse != NULL) {
+    if(nodePointUnderMouse == mCurrentEndPoint &&
+            nodePointUnderMouse != NULL) {
         return;
     }
-    if(mCurrentEndPoint == NULL && pathPointUnderMouse == NULL) {
+    if(mCurrentEndPoint == NULL && nodePointUnderMouse == NULL) {
         VectorPath *newPath = new VectorPath();
         mCurrentBoxesGroup->addChild(newPath);
         clearBoxesSelection();
         addBoxToSelection(newPath);
         PathAnimator *newPathAnimator = newPath->getPathAnimator();
-        SingleVectorPathAnimator *newSinglePath = new SingleVectorPathAnimator(
+        VectorPathAnimator *newSinglePath = new VectorPathAnimator(
                                                     newPathAnimator);
         setCurrentEndPoint(newSinglePath->
-                            addPointAbsPos(mLastMouseEventPosRel,
+                            addNodeAbsPos(mLastMouseEventPosRel,
                                             mCurrentEndPoint) );
         newPathAnimator->addSinglePathAnimator(newSinglePath);
     } else {
-        if(pathPointUnderMouse == NULL) {
-            PathPoint *newPoint =
+        if(nodePointUnderMouse == NULL) {
+            NodePoint *newPoint =
                     mCurrentEndPoint->addPointAbsPos(mLastMouseEventPosRel);
             //newPoint->startTransform();
             setCurrentEndPoint(newPoint);
         } else if(mCurrentEndPoint == NULL) {
-            setCurrentEndPoint(pathPointUnderMouse);
+            setCurrentEndPoint(nodePointUnderMouse);
         } else {
-            //pathPointUnderMouse->startTransform();
+            //NodePointUnderMouse->startTransform();
             if(mCurrentEndPoint->getParentPath() ==
-               pathPointUnderMouse->getParentPath()) {
-                mCurrentEndPoint->getParentPath()->
-                        connectPoints(mCurrentEndPoint,
-                                      pathPointUnderMouse);
+               nodePointUnderMouse->getParentPath()) {
+                mCurrentEndPoint->connectToPoint(nodePointUnderMouse);
+                mCurrentEndPoint->getParentPath()->setPathClosed(true);
             }
             else {
                 connectPointsFromDifferentPaths(mCurrentEndPoint,
-                                                pathPointUnderMouse);
+                                                nodePointUnderMouse);
             }
-            setCurrentEndPoint(pathPointUnderMouse);
+            setCurrentEndPoint(nodePointUnderMouse);
         }
     } // pats is not null
 }
 
 void Canvas::handleAddPointMouseRelease() {
     if(mCurrentEndPoint != NULL) {
-        mCurrentEndPoint->prp_updateInfluenceRangeAfterChanged();
+        //mCurrentEndPoint->prp_updateInfluenceRangeAfterChanged();
         if(!mCurrentEndPoint->isEndPoint()) {
             setCurrentEndPoint(NULL);
         }
@@ -663,12 +663,12 @@ void Canvas::handleMouseRelease() {
                         if(mPickStrokeFromPath) {
                             pathBox->duplicateStrokeSettingsFrom(
                                         srcPathBox->getStrokeSettings());
-                            pathBox->resetStrokeGradientPointsPos(true);
+                            pathBox->resetStrokeGradientPointsPos();
                         }
                         if(mPickFillFromPath) {
                             pathBox->duplicateFillSettingsFrom(
                                         srcPathBox->getFillSettings());
-                            pathBox->resetFillGradientPointsPos(true);
+                            pathBox->resetFillGradientPointsPos();
                         }
                     }
                 }
@@ -855,7 +855,7 @@ void Canvas::handleAddPointMouseMove() {
     if(mCurrentEndPoint == NULL) return;
     if(mCurrentEndPoint->getCurrentCtrlsMode() !=
        CtrlsMode::CTRLS_SYMMETRIC) {
-        mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC, false);
+        mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
     }
     mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
 }

@@ -2,12 +2,12 @@
 #define RECTANGLE_H
 #include "Boxes/pathbox.h"
 
-class RectangleTopLeftPoint : public MovablePoint {
+class RectangleTopLeftPoint : public PointAnimator {
 public:
     RectangleTopLeftPoint(BoundingBox *parent);
 };
 
-class RectangleBottomRightPoint : public MovablePoint {
+class RectangleBottomRightPoint : public PointAnimator {
 public:
     RectangleBottomRightPoint(BoundingBox *parent);
 };

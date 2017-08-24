@@ -5,9 +5,9 @@
 #include "Boxes/vectorpath.h"
 #include "movablepoint.h"
 #include "Animators/qrealanimator.h"
-#include "Animators/PathAnimators/singlevectorpathanimator.h"
+#include "Animators/PathAnimators/vectorpathanimator.h"
 #include "Animators/paintsettings.h"
-#include "pathpoint.h"
+#include "nodepoint.h"
 #include "Animators/pathanimator.h"
 #include "Animators/qstringanimator.h"
 
@@ -105,126 +105,6 @@ void ChangeQrealKeyValueUndoRedo::redo() {
 void ChangeQrealKeyValueUndoRedo::undo() {
     ((QrealAnimator*)mTargetKey->getParentAnimator())->
             qra_saveValueToKey(mTargetKey.get(), mOldValue, false, true);
-}
-
-AppendToPointsListUndoRedo::AppendToPointsListUndoRedo(
-                        PathPoint *pointToAdd,
-                        SingleVectorPathAnimator *path) :
-    UndoRedo("AppendToPointsListUndoRedo") {
-    mPoint = pointToAdd->ref<PathPoint>();
-    mPath = path->ref<SingleVectorPathAnimator>();
-}
-
-AppendToPointsListUndoRedo::~AppendToPointsListUndoRedo() {
-}
-
-void AppendToPointsListUndoRedo::redo() {
-    mPath->appendToPointsList(mPoint.data(), false);
-}
-
-void AppendToPointsListUndoRedo::undo() {
-    mPath->removeFromPointsList(mPoint.data(), false);
-}
-
-RemoveFromPointsListUndoRedo::RemoveFromPointsListUndoRedo(
-        PathPoint *pointToRemove, SingleVectorPathAnimator *path) :
-    AppendToPointsListUndoRedo(pointToRemove, path) {
-}
-
-void RemoveFromPointsListUndoRedo::redo() {
-    AppendToPointsListUndoRedo::undo();
-}
-
-void RemoveFromPointsListUndoRedo::undo() {
-    AppendToPointsListUndoRedo::redo();
-}
-
-SetNextPointUndoRedo::SetNextPointUndoRedo(PathPoint *point,
-                                           PathPoint *oldNext,
-                                           PathPoint *newNext) :
-    UndoRedo("SetNextPointUndoRedo") {
-    if(newNext != NULL) {
-        mNewNext = newNext->ref<PathPoint>();
-    }
-    if(oldNext != NULL) {
-        mOldNext = oldNext->ref<PathPoint>();
-    }
-    mPoint = point->ref<PathPoint>();
-}
-
-SetNextPointUndoRedo::~SetNextPointUndoRedo() {
-}
-
-void SetNextPointUndoRedo::redo(){
-    mPoint->setNextPoint(mNewNext.data(), false);
-}
-
-void SetNextPointUndoRedo::undo() {
-    mPoint->setNextPoint(mOldNext.data(), false);
-}
-
-SetPreviousPointUndoRedo::SetPreviousPointUndoRedo(PathPoint *point,
-                                                   PathPoint *oldPrevious,
-                                                   PathPoint *newPrevious) :
-    UndoRedo("SetPreviousPointUndoRedo") {
-    if(newPrevious != NULL) {
-        mNewPrev = newPrevious->ref<PathPoint>();
-    }
-    if(oldPrevious != NULL) {
-        mOldPrev = oldPrevious->ref<PathPoint>();
-    }
-    mPoint = point->ref<PathPoint>();
-}
-
-SetPreviousPointUndoRedo::~SetPreviousPointUndoRedo() {
-}
-
-void SetPreviousPointUndoRedo::redo(){
-    mPoint->setPreviousPoint(mNewPrev.data(), false);
-}
-
-void SetPreviousPointUndoRedo::undo() {
-    mPoint->setPreviousPoint(mOldPrev.data(), false);
-}
-
-SetPathPointModeUndoRedo::SetPathPointModeUndoRedo(PathPoint *point,
-                                                   const CtrlsMode &modeBefore,
-                                                   const CtrlsMode &modeAfter) :
-    UndoRedo("SetPathPointModeUndoRedo") {
-    mPoint = point->ref<PathPoint>();
-    mBefore = modeBefore;
-    mAfter = modeAfter;
-}
-
-SetPathPointModeUndoRedo::~SetPathPointModeUndoRedo() {
-}
-
-void SetPathPointModeUndoRedo::redo() {
-    mPoint->setCtrlsMode(mAfter, false);
-}
-
-void SetPathPointModeUndoRedo::undo() {
-    mPoint->setCtrlsMode(mBefore, false);
-}
-
-SetCtrlPtEnabledUndoRedo::SetCtrlPtEnabledUndoRedo(const bool &enabled,
-                                                   const bool &isStartPt,
-                                                   PathPoint *parentPoint) :
-    UndoRedo("SetCtrlPtEnabledUndoRedo") {
-    mParentPoint = parentPoint;
-    mEnabled = enabled;
-    mIsStartPt = isStartPt;
-}
-
-SetCtrlPtEnabledUndoRedo::~SetCtrlPtEnabledUndoRedo() {
-}
-
-void SetCtrlPtEnabledUndoRedo::redo() {
-    mParentPoint->setCtrlPtEnabled(mEnabled, mIsStartPt, false);
-}
-
-void SetCtrlPtEnabledUndoRedo::undo() {
-    mParentPoint->setCtrlPtEnabled(!mEnabled, mIsStartPt, false);
 }
 
 MoveChildInListUndoRedo::MoveChildInListUndoRedo(BoundingBox *child,
@@ -505,10 +385,10 @@ void GradientSwapColorsUndoRedo::redo() {
 }
 
 AddSinglePathAnimatorUndoRedo::AddSinglePathAnimatorUndoRedo(
-        PathAnimator *target, SingleVectorPathAnimator *path) :
+        PathAnimator *target, VectorPathAnimator *path) :
     UndoRedo("AddSinglePathAnimatorUndoRedo") {
     mTarget = target->ref<PathAnimator>();
-    mPath = path->ref<SingleVectorPathAnimator>();
+    mPath = path->ref<VectorPathAnimator>();
 }
 
 AddSinglePathAnimatorUndoRedo::~AddSinglePathAnimatorUndoRedo() {
@@ -523,48 +403,6 @@ void AddSinglePathAnimatorUndoRedo::redo() {
     mTarget->addSinglePathAnimator(mPath.data(), false);
 }
 
-ChangeSingleVectorPathFirstPoint::ChangeSingleVectorPathFirstPoint(
-        SingleVectorPathAnimator *target,
-        PathPoint *oldPoint,
-        PathPoint *newPoint) :
-    UndoRedo("ChangeSingleVectorPathFirstPoint") {
-    mTarget = target->ref<SingleVectorPathAnimator>();
-    if(oldPoint != NULL) {
-        mOldPoint = oldPoint->ref<PathPoint>();
-    }
-    if(newPoint != NULL) {
-        mNewPoint = newPoint->ref<PathPoint>();
-    }
-}
-
-ChangeSingleVectorPathFirstPoint::~ChangeSingleVectorPathFirstPoint() {
-
-}
-
-void ChangeSingleVectorPathFirstPoint::undo() {
-    mTarget->replaceSeparatePathPoint(mOldPoint.data(), false);
-}
-
-void ChangeSingleVectorPathFirstPoint::redo() {
-    mTarget->replaceSeparatePathPoint(mNewPoint.data(), false);
-}
-
-ReversePointsDirectionUndoRedo::ReversePointsDirectionUndoRedo(
-        PathPoint *target) :
-    UndoRedo("ReversePointsDirectionUndoRedo") {
-    mTarget = target->ref<PathPoint>();
-}
-
-ReversePointsDirectionUndoRedo::~ReversePointsDirectionUndoRedo() {
-}
-
-void ReversePointsDirectionUndoRedo::undo() {
-    mTarget->reversePointsDirectionReverse();
-}
-
-void ReversePointsDirectionUndoRedo::redo() {
-    mTarget->reversePointsDirection();
-}
 #include "Boxes/textbox.h"
 ChangeFontUndoRedo::ChangeFontUndoRedo(TextBox *target,
                                        const QFont &fontBefore,

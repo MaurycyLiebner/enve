@@ -45,10 +45,10 @@ private:
     BasicTransformAnimator *mTarget;
 };
 
-class PathPointUpdater : public AnimatorUpdater
+class NodePointUpdater : public AnimatorUpdater
 {
 public:
-    PathPointUpdater(PathBox *vectorPath);
+    NodePointUpdater(PathBox *vectorPath);
 
     void update();
 

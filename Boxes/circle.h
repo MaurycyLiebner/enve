@@ -3,7 +3,7 @@
 #include "Boxes/pathbox.h"
 #include "movablepoint.h"
 
-class CircleCenterPoint : public MovablePoint
+class CircleCenterPoint : public PointAnimator
 {
 public:
     CircleCenterPoint(BoundingBox *parent, MovablePointType type);
@@ -12,7 +12,7 @@ public:
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
                                         MovablePoint *horizontalPoint);
 
-    void moveByRel(const QPointF &absTranslatione);
+    void moveByRel(const QPointF &relTranslatione);
 
     void startTransform();
 
@@ -23,7 +23,7 @@ private:
     MovablePoint *mHorizontalPoint = NULL;
 };
 
-class CircleRadiusPoint : public MovablePoint
+class CircleRadiusPoint : public PointAnimator
 {
 public:
     CircleRadiusPoint(BoundingBox *parent,
@@ -38,8 +38,7 @@ public:
 
     void startTransform();
     void finishTransform();
-    void setRelativePos(const QPointF &relPos,
-                        const bool &saveUndoRedo = true);
+    void setRelativePos(const QPointF &relPos);
 private:
     MovablePoint *mCenterPoint = NULL;
     bool mXBlocked = false;

@@ -17,6 +17,7 @@ class SoundComposition;
 class SkCanvas;
 class ImageSequenceBox;
 class Brush;
+class NodePoint;
 
 enum CtrlsMode : short;
 
@@ -77,8 +78,8 @@ public:
     QRectF getPixBoundingRect();
     void selectOnlyLastPressedBox();
     void selectOnlyLastPressedPoint();
-    void connectPointsFromDifferentPaths(PathPoint *pointSrc,
-                                         PathPoint *pointDest);
+    void connectPointsFromDifferentPaths(NodePoint *pointSrc,
+                                         NodePoint *pointDest);
 
     void repaintIfNeeded();
     void setCanvasMode(CanvasMode mode);
@@ -167,7 +168,7 @@ public:
     void scaleSelectedBy(qreal scaleBy, QPointF absOrigin, bool startTrans);
     void cancelSelectedBoxesTransform();
     void cancelSelectedPointsTransform();
-    PathPoint *createNewPointOnLineNearSelected(const QPointF &absPos,
+    NodePoint *createNewPointOnLineNearSelected(const QPointF &absPos,
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv);
 
@@ -350,9 +351,9 @@ protected:
 //        }
     }
 
-    void setCurrentEndPoint(PathPoint *point);
+    void setCurrentEndPoint(NodePoint *point);
 
-    PathPoint *getCurrentPoint();
+    NodePoint *getCurrentPoint();
 
     void handleMovePathMouseRelease();
     void handleMovePointMouseRelease();
@@ -572,7 +573,7 @@ protected:
     QRectF mSelectionRect;
     CanvasMode mCurrentMode = ADD_POINT;
     MovablePoint *mLastPressedPoint = NULL;
-    PathPoint *mCurrentEndPoint = NULL;
+    NodePoint *mCurrentEndPoint = NULL;
     BoundingBox *mLastPressedBox = NULL;
     void setCtrlPointsEnabled(bool enabled);
     PathPivot *mRotPivot;

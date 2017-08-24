@@ -4,6 +4,7 @@
 #include "Animators/animatorupdater.h"
 #include "canvas.h"
 #include "pointhelpers.h"
+#include "pointanimator.h"
 
 double fRand(double fMin, double fMax) {
     double f = (double)rand() / RAND_MAX;
@@ -13,8 +14,8 @@ double fRand(double fMin, double fMax) {
 ParticleBox::ParticleBox() :
     BoundingBox(TYPE_PARTICLES) {
     setName("Particle Box");
-    mTopLeftPoint = new MovablePoint(this, TYPE_PATH_POINT);
-    mBottomRightPoint = new MovablePoint(this, TYPE_PATH_POINT);
+    mTopLeftPoint = new PointAnimator(this, TYPE_PATH_POINT);
+    mBottomRightPoint = new PointAnimator(this, TYPE_PATH_POINT);
 
     ca_addChildAnimator(mTopLeftPoint);
     ca_addChildAnimator(mBottomRightPoint);
@@ -155,11 +156,16 @@ void ParticleBox::makeDuplicate(Property *targetBox) {
 
 void ParticleBox::addEmitterAtAbsPos(const QPointF &absPos) {
     ParticleEmitter *emitter = new ParticleEmitter(this);
-    emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos), false);
+    emitter->getPosPoint()->setRelativePos(mapAbsPosToRel(absPos));
     addEmitter(emitter);
 }
 
 bool ParticleBox::SWT_isParticleBox() { return true; }
+
+QRectF ParticleBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+    return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
+                  mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
+}
 
 void ParticleBox::updateAfterDurationRectangleRangeChanged() {
     int minFrame = mDurationRectangle->getMinFrameAsRelFrame();
@@ -367,7 +373,7 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
 
     prp_setName("particle emitter");
 
-    mPos = (new MovablePoint(mParentBox, TYPE_PATH_POINT))->ref<MovablePoint>();
+    mPos = (new PointAnimator(mParentBox, TYPE_PATH_POINT))->ref<PointAnimator>();
     //mPos->setName("pos");
     //mPos.setCurrentValue(QPointF(0., 0.));
 

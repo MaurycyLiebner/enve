@@ -8,9 +8,9 @@ enum CanvasMode : short;
 
 class VectorPathEdge;
 class MovablePoint;
-class PathPoint;
+class NodePoint;
 class SinglePathAnimator;
-class SingleVectorPathAnimator;
+class VectorPathAnimator;
 class BoundingBox;
 class Canvas;
 
@@ -22,7 +22,7 @@ public:
 
     ~PathAnimator();
 
-    VectorPathEdge *getEgde(const QPointF &absPos,
+    VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
@@ -36,7 +36,7 @@ public:
     Property *makeDuplicate();
 
 
-    PathPoint *createNewPointOnLineNear(const QPointF &absPos,
+    NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
     void applyTransformToPoints(const QMatrix &transform);
@@ -56,16 +56,16 @@ public:
     void loadPathFromSkPath(const SkPath &path);
 
     void setParentBox(BoundingBox *parent);
-    void addSinglePathAnimator(SingleVectorPathAnimator *path,
+    void addSinglePathAnimator(VectorPathAnimator *path,
                                const bool &saveUndoRedo = true);
-    void removeSinglePathAnimator(SingleVectorPathAnimator *path,
+    void removeSinglePathAnimator(VectorPathAnimator *path,
                                   const bool &saveUndoRedo = true);
     void selectAllPoints(Canvas *canvas);
     bool SWT_isPathAnimator();
     SkPath getPathAtRelFrame(const int &relFrame);
 private:
     BoundingBox *mParentBox = NULL;
-    QList<SingleVectorPathAnimator*> mSinglePaths;
+    QList<VectorPathAnimator*> mSinglePaths;
 signals:
     void lastSinglePathRemoved();
 };

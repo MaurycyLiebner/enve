@@ -10,7 +10,7 @@ enum CanvasMode : short;
 class PathAnimator;
 class VectorPathEdge;
 class MovablePoint;
-class PathPoint;
+class NodePoint;
 class Canvas;
 #include "skiaincludes.h"
 
@@ -19,7 +19,7 @@ class SingleVectorPathAnimator : public SinglePathAnimator {
 public:
     SingleVectorPathAnimator(PathAnimator *parentPath);
 
-    VectorPathEdge *getEgde(const QPointF &absPos,
+    VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                                  const CanvasMode &currentCanvasMode,
@@ -29,34 +29,32 @@ public:
     //void loadPointsFromSql(int boundingBoxId);
     void saveToSql(QSqlQuery *query,
                    const int &boundingBoxId);
-    PathPoint *createNewPointOnLineNear(const QPointF &absPos,
+    NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
-    qreal findPercentForPoint(const QPointF &point,
-                              PathPoint **prevPoint,
-                              qreal *error);
+
     void applyTransformToPoints(const QMatrix &transform);
-    void disconnectPoints(PathPoint *point1, PathPoint *point2);
-    void connectPoints(PathPoint *point1, PathPoint *point2);
-    PathPoint *addPointRelPos(const QPointF &relPos,
+    void disconnectPoints(NodePoint *point1, NodePoint *point2);
+    void connectPoints(NodePoint *point1, NodePoint *point2);
+    NodePoint *addPointRelPos(const QPointF &relPos,
                               const QPointF &startRelPos,
                               const QPointF &endRelPos,
-                              PathPoint *toPoint);
-    PathPoint *addPointRelPos(const QPointF &relPtPos,
-                              PathPoint *toPoint);
-    void appendToPointsList(PathPoint *point,
+                              NodePoint *toPoint);
+    NodePoint *addPointRelPos(const QPointF &relPtPos,
+                              NodePoint *toPoint);
+    void appendToPointsList(NodePoint *point,
                             const bool &saveUndoRedo = true);
-    void removeFromPointsList(PathPoint *point,
+    void removeFromPointsList(NodePoint *point,
                               const bool &saveUndoRedo = true);
-    void removePoint(PathPoint *point);
-    void replaceSeparatePathPoint(PathPoint *newPoint,
+    void removePoint(NodePoint *point);
+    void replaceSeparateNodePoint(NodePoint *newPoint,
                                   const bool &saveUndoRedo = true);
     void startAllPointsTransform();
     void finishAllPointsTransform();
-    void duplicatePathPointsTo(SingleVectorPathAnimator *target);
-    PathPoint *addPoint(PathPoint *pointToAdd, PathPoint *toPoint);
-    PathPoint *addPointAbsPos(const QPointF &absPtPos, PathPoint *toPoint);
-    void deletePointAndApproximate(PathPoint *pointToRemove);
+    void duplicateNodePointsTo(SingleVectorPathAnimator *target);
+    NodePoint *addPoint(NodePoint *pointToAdd, NodePoint *toPoint);
+    NodePoint *addPointAbsPos(const QPointF &absPtPos, NodePoint *toPoint);
+    void deletePointAndApproximate(NodePoint *pointToRemove);
 
     void drawSelected(SkCanvas *canvas,
                       const CanvasMode &currentCanvasMode,
@@ -68,15 +66,15 @@ public:
 
     //void loadPathFromQPainterPath(const QPainterPath &path);
     void changeAllPointsParentPathTo(SingleVectorPathAnimator *path);
-    void updatePathPointIds();
-    int getChildPointIndex(PathPoint *child);
+    void updateNodePointIds();
+    int getChildPointIndex(NodePoint *child);
 
     SkPath getPathAtRelFrame(const int &relFrame);
 
     SingleVectorPathAnimator *makeDuplicate() {
         SingleVectorPathAnimator *path =
                 new SingleVectorPathAnimator(mParentPathAnimator);
-        duplicatePathPointsTo(path);
+        duplicateNodePointsTo(path);
         return path;
     }
 
@@ -88,15 +86,19 @@ public:
         return mParentPathAnimator;
     }
     void selectAllPoints(Canvas *canvas);
+
+    bool closedPath() const {
+        return false;
+    }
 private:
     PathAnimator *mParentPathAnimator = NULL;
-    PathPoint *mFirstPoint = NULL;
-    QList<QSharedPointer<PathPoint> > mPoints;
+    NodePoint *mFirstPoint = NULL;
+    QList<QSharedPointer<NodePoint> > mPoints;
 
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
                                               qreal *pressedT,
-                                              PathPoint **prevPoint,
-                                              PathPoint **nextPoint,
+                                              NodePoint **prevPoint,
+                                              NodePoint **nextPoint,
                                               const qreal &canvasScaleInv);
 };
 

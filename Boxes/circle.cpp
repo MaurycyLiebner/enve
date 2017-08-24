@@ -10,13 +10,13 @@ Circle::Circle() :
     setName("Circle");
 
     mCenter = new CircleCenterPoint(this, TYPE_PATH_POINT);
-    mCenter->setRelativePos(QPointF(0., 0.), false);
+    mCenter->setRelativePos(QPointF(0., 0.));
     mHorizontalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
                                                    false, mCenter);
-    mHorizontalRadiusPoint->setRelativePos(QPointF(10., 0.), false);
+    mHorizontalRadiusPoint->setRelativePos(QPointF(10., 0.));
     mVerticalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
                                                  true, mCenter);
-    mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.), false);
+    mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.));
 
     QrealAnimator *hXAnimator = mHorizontalRadiusPoint->getXAnimator();
     ca_addChildAnimator(hXAnimator);
@@ -30,11 +30,11 @@ Circle::Circle() :
     mCenter->setVerticalAndHorizontalPoints(mVerticalRadiusPoint,
                                             mHorizontalRadiusPoint);
 
-    mCenter->setPosAnimatorUpdater(new PathPointUpdater(this) );
-    mHorizontalRadiusPoint->setPosAnimatorUpdater(
-                new PathPointUpdater(this));
-    mVerticalRadiusPoint->setPosAnimatorUpdater(
-                new PathPointUpdater(this));
+    mCenter->prp_setUpdater(new NodePointUpdater(this) );
+    mHorizontalRadiusPoint->prp_setUpdater(
+                new NodePointUpdater(this));
+    mVerticalRadiusPoint->prp_setUpdater(
+                new NodePointUpdater(this));
 }
 
 
@@ -187,7 +187,7 @@ SkPath Circle::getPathAtRelFrame(const int &relFrame) {
 
 CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,
                                      MovablePointType type) :
-    MovablePoint(parent, type) {
+    PointAnimator(parent, type) {
 
 }
 
@@ -203,8 +203,8 @@ void CircleCenterPoint::setVerticalAndHorizontalPoints(
     mHorizontalPoint = horizontalPoint;
 }
 
-void CircleCenterPoint::moveByRel(const QPointF &absTranslatione) {
-    mParent->moveByRel(absTranslatione);
+void CircleCenterPoint::moveByRel(const QPointF &relTranslatione) {
+    mParent->moveByRel(relTranslatione);
 }
 
 void CircleCenterPoint::moveByAbs(const QPointF &absTranslatione) {
@@ -223,7 +223,7 @@ CircleRadiusPoint::CircleRadiusPoint(BoundingBox *parent,
                                      const MovablePointType &type,
                                      const bool &blockX,
                                      MovablePoint *centerPoint) :
-    MovablePoint(parent, type) {
+    PointAnimator(parent, type) {
     mCenterPoint = centerPoint;
     mXBlocked = blockX;
 }
@@ -240,7 +240,7 @@ void CircleRadiusPoint::moveByRel(const QPointF &relTranslation) {
     } else {
         relTranslationT.setY(0.);
     }
-    MovablePoint::moveByRel(relTranslationT);
+    PointAnimator::moveByRel(relTranslationT);
 }
 
 //void CircleRadiusPoint::setAbsPosRadius(QPointF pos)
@@ -262,12 +262,11 @@ void CircleRadiusPoint::moveByAbs(const QPointF &absTranslatione) {
     //setAbsPosRadius(getAbsolutePos() + absTranslatione);
 }
 
-void CircleRadiusPoint::setRelativePos(const QPointF &relPos,
-                                       const bool &saveUndoRedo) {
+void CircleRadiusPoint::setRelativePos(const QPointF &relPos) {
     if(mXBlocked) {
-        mYAnimator->qra_setCurrentValue(relPos.y(), saveUndoRedo);
+        mYAnimator->qra_setCurrentValue(relPos.y());
     } else {
-        mXAnimator->qra_setCurrentValue(relPos.x(), saveUndoRedo);
+        mXAnimator->qra_setCurrentValue(relPos.x());
     }
 }
 

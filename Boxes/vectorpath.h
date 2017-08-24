@@ -4,7 +4,7 @@
 #include <QLinearGradient>
 #include "pathbox.h"
 
-class PathPoint;
+class NodePoint;
 class BoxesGroup;
 class PathAnimator;
 typedef QSharedPointer<PathAnimator> PathAnimatorQSPtr;
@@ -26,14 +26,14 @@ public:
 
     int saveToSql(QSqlQuery *query, const int &parentId);
 
-    PathPoint *createNewPointOnLineNear(const QPointF &absPos,
+    NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
 
     virtual void loadFromSql(const int &boundingBoxId);
 
     void applyCurrentTransformation();
-    VectorPathEdge *getEgde(const QPointF &absPos,
+    VectorPathEdge *getEdge(const QPointF &absPos,
                             const qreal &canvasScaleInv);
 
     void loadPathFromSkPath(const SkPath &path);

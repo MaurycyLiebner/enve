@@ -5,6 +5,7 @@ struct TileSkDrawer;
 class Surface;
 class Brush;
 class AnimatedSurface;
+class PointAnimator;
 
 struct PaintBoxRenderData : public BoundingBoxRenderData {
     PaintBoxRenderData(BoundingBox *parentBoxT) :
@@ -79,10 +80,7 @@ public:
                              const qreal &canvasScaleInv);
     void selectAndAddContainedPointsToList(const QRectF &absRect,
                                            QList<MovablePoint *> *list);
-    QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
-        return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
-                      mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
-    }
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
@@ -91,8 +89,8 @@ public:
 
     void newPaintFrameOnCurrentFrame();
 private:
-    MovablePoint *mTopLeftPoint = NULL;
-    MovablePoint *mBottomRightPoint = NULL;
+    PointAnimator *mTopLeftPoint = NULL;
+    PointAnimator *mBottomRightPoint = NULL;
     ushort mWidth = 0;
     ushort mHeight = 0;
     AnimatedSurface *mMainHandler = NULL;

@@ -1,6 +1,7 @@
 #ifndef PARTICLEBOX_H
 #define PARTICLEBOX_H
 #include "boundingbox.h"
+class PointAnimator;
 
 class ParticleBox;
 
@@ -192,7 +193,7 @@ private:
     QSharedPointer<ColorAnimator> mColorAnimator =
             (new ColorAnimator())->ref<ColorAnimator>();
 
-    QSharedPointer<MovablePoint> mPos;
+    QSharedPointer<PointAnimator> mPos;
     QSharedPointer<QrealAnimator> mWidth =
             (new QrealAnimator())->ref<QrealAnimator>();
 
@@ -284,10 +285,7 @@ public:
         }
     }
 
-    QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
-        return QRectF(mTopLeftPoint->getRelativePosAtRelFrame(relFrame),
-                      mBottomRightPoint->getRelativePosAtRelFrame(relFrame));
-    }
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
     void removeEmitter(ParticleEmitter *emitter);
 
@@ -299,8 +297,8 @@ public:
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:
-    MovablePoint *mTopLeftPoint;
-    MovablePoint *mBottomRightPoint;
+    PointAnimator *mTopLeftPoint;
+    PointAnimator *mBottomRightPoint;
     QList<ParticleEmitter*> mEmitters;
 };
 

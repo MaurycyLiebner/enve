@@ -34,9 +34,8 @@ public:
     GradientPoint *endPoint;
     PathBox *parent;
 
-    void setPositions(QPointF startPos,
-                      QPointF endPos,
-                      bool saveUndoRedo = true);
+    void setPositions(const QPointF &startPos,
+                      const QPointF &endPos);
     void loadFromSql(const int &identifyingId);
     int saveToSql(QSqlQuery *query, const int &parentId = 0);
     Property *makeDuplicate() {

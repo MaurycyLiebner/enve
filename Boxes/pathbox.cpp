@@ -16,13 +16,13 @@ PathBox::PathBox(const BoundingBoxType &type) :
             (new PathEffectAnimators(this))->ref<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setBlockedUpdater(
-                new PathPointUpdater(this));
+                new NodePointUpdater(this));
 
     mOutlinePathEffectsAnimators =
             (new PathEffectAnimators(this))->ref<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
-                new PathPointUpdater(this));
+                new NodePointUpdater(this));
 
 //    mPathEffectsAnimators->prp_setName("path effects");
 //    mPathEffectsAnimators->prp_setBlockedUpdater(
@@ -235,18 +235,16 @@ void PathBox::addOutlinePathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
-void PathBox::resetStrokeGradientPointsPos(const bool &finish) {
+void PathBox::resetStrokeGradientPointsPos() {
     mStrokeGradientPoints->prp_setRecording(false);
     mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),
-                                        mRelBoundingRect.bottomRight(),
-                                        finish);
+                                        mRelBoundingRect.bottomRight());
 }
 
-void PathBox::resetFillGradientPointsPos(const bool &finish) {
+void PathBox::resetFillGradientPointsPos() {
     mFillGradientPoints->prp_setRecording(false);
     mFillGradientPoints->setPositions(mRelBoundingRect.topLeft(),
-                                      mRelBoundingRect.bottomRight(),
-                                      finish);
+                                      mRelBoundingRect.bottomRight());
 }
 
 void PathBox::setStrokeCapStyle(const Qt::PenCapStyle &capStyle) {

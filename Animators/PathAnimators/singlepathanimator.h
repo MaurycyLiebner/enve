@@ -8,7 +8,7 @@ enum CanvasMode : short;
 
 class VectorPathEdge;
 class MovablePoint;
-class PathPoint;
+class NodePoint;
 #include "skiaincludes.h"
 
 class SinglePathAnimator : public ComplexAnimator {
@@ -16,7 +16,7 @@ class SinglePathAnimator : public ComplexAnimator {
 public:
     SinglePathAnimator();
 
-    virtual VectorPathEdge *getEgde(const QPointF &,
+    virtual VectorPathEdge *getEdge(const QPointF &,
                                     const qreal &) { return NULL; }
     virtual MovablePoint *getPointAtAbsPos(const QPointF &,
                                          const CanvasMode &,
@@ -25,31 +25,29 @@ public:
                            const int &boundingBoxId) = 0;
 
     //void loadPointsFromSql(int boundingBoxId);
-    virtual PathPoint *createNewPointOnLineNear(const QPointF &,
+    virtual NodePoint *createNewPointOnLineNear(const QPointF &,
                                                 const bool &,
                                                 const qreal &) { return NULL; }
-    qreal findPercentForPoint(const QPointF &point,
-                              PathPoint **prevPoint,
-                              qreal *error);
+
     virtual void applyTransformToPoints(const QMatrix &) {}
-    void disconnectPoints(PathPoint *point1, PathPoint *point2);
-    void connectPoints(PathPoint *point1, PathPoint *point2);
-    PathPoint *addPointRelPos(const QPointF &relPos,
+    void disconnectPoints(NodePoint *point1, NodePoint *point2);
+    void connectPoints(NodePoint *point1, NodePoint *point2);
+    NodePoint *addPointRelPos(const QPointF &relPos,
                               const QPointF &startRelPos,
                               const QPointF &endRelPos,
-                              PathPoint *toPoint);
-    PathPoint *addPointRelPos(const QPointF &relPtPos,
-                              PathPoint *toPoint);
-    void appendToPointsList(PathPoint *point,
+                              NodePoint *toPoint);
+    NodePoint *addPointRelPos(const QPointF &relPtPos,
+                              NodePoint *toPoint);
+    void appendToPointsList(NodePoint *point,
                             const bool &saveUndoRedo = true);
-    void removeFromPointsList(PathPoint *point,
+    void removeFromPointsList(NodePoint *point,
                               const bool &saveUndoRedo = true);
-    void removePoint(PathPoint *point);
-    void replaceSeparatePathPoint(PathPoint *newPoint,
+    void removePoint(NodePoint *point);
+    void replaceSeparateNodePoint(NodePoint *newPoint,
                                   const bool &saveUndoRedo = true);
     virtual void startAllPointsTransform() {}
     virtual void finishAllPointsTransform() {}
-    void duplicatePathPointsTo(SinglePathAnimator *target);
+    void duplicateNodePointsTo(SinglePathAnimator *target);
 
     virtual void drawSelected(SkCanvas *canvas,
                               const CanvasMode &,

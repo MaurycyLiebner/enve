@@ -1,19 +1,19 @@
 #include "canvas.h"
-#include "Animators/PathAnimators/singlevectorpathanimator.h"
-#include "pathpoint.h"
+#include "Animators/PathAnimators/vectorpathanimator.h"
+#include "nodepoint.h"
 
 void Canvas::connectPoints() {
-    QList<PathPoint*> selectedPathPoints;
+    QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            if(((PathPoint*)point)->isEndPoint()) {
-                selectedPathPoints.append( (PathPoint*) point);
+        if(point->isNodePoint()) {
+            if(((NodePoint*)point)->isEndPoint()) {
+                selectedNodePoints.append( (NodePoint*) point);
             }
         }
     }
-    if(selectedPathPoints.count() == 2) {
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
+    if(selectedNodePoints.count() == 2) {
+        NodePoint *firstPoint = selectedNodePoints.first();
+        NodePoint *secondPoint = selectedNodePoints.last();
         if(firstPoint->getParentPath()->getParentPathAnimator() ==
                 secondPoint->getParentPath()->getParentPathAnimator()) {
             firstPoint->getParentPath()->
@@ -23,18 +23,18 @@ void Canvas::connectPoints() {
 }
 
 void Canvas::disconnectPoints() {
-    QList<PathPoint*> selectedPathPoints;
+    QList<NodePoint*> selectedNodePoints;
         Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-            if(point->isPathPoint()) {
-                PathPoint *nextPoint = ((PathPoint*)point)->getNextPoint();
+            if(point->isNodePoint()) {
+                NodePoint *nextPoint = ((NodePoint*)point)->getNextPoint();
                 if(nextPoint == NULL) continue;
                 if(nextPoint->isSelected()) {
-                    selectedPathPoints.append( (PathPoint*) point);
+                    selectedNodePoints.append( (NodePoint*) point);
                 }
             }
         }
-        Q_FOREACH(PathPoint *point, selectedPathPoints) {
-            PathPoint *secondPoint = point->getNextPoint();
+        Q_FOREACH(NodePoint *point, selectedNodePoints) {
+            NodePoint *secondPoint = point->getNextPoint();
             if(secondPoint == NULL) secondPoint = point->getPreviousPoint();
             if(point->getParentPath() ==
                     secondPoint->getParentPath()) {
@@ -45,22 +45,22 @@ void Canvas::disconnectPoints() {
 }
 
 void Canvas::mergePoints() {
-    QList<PathPoint*> selectedPathPoints;
+    QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            //if(((PathPoint*)point)->isEndPoint()) {
-                selectedPathPoints.append( (PathPoint*) point);
+        if(point->isNodePoint()) {
+            //if(((NodePoint*)point)->isEndPoint()) {
+                selectedNodePoints.append( (NodePoint*) point);
             //}
         }
     }
-    if(selectedPathPoints.count() == 2) {
-        PathPoint *firstPoint = selectedPathPoints.first();
-        PathPoint *secondPoint = selectedPathPoints.last();
+    if(selectedNodePoints.count() == 2) {
+        NodePoint *firstPoint = selectedNodePoints.first();
+        NodePoint *secondPoint = selectedNodePoints.last();
         if(firstPoint->isEndPoint() &&
            secondPoint->isEndPoint()) {
 
             secondPoint->getParentPath()->connectPoints(firstPoint,
-                                                  secondPoint);
+                                                        secondPoint);
         } else if(firstPoint->getNextPoint() != secondPoint &&
                   firstPoint->getPreviousPoint() != secondPoint) {
             return;
@@ -87,47 +87,47 @@ void Canvas::mergePoints() {
 
 void Canvas::setPointCtrlsMode(CtrlsMode mode) {
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            ( (PathPoint*)point)->setCtrlsMode(mode);
+        if(point->isNodePoint()) {
+            ( (NodePoint*)point)->setCtrlsMode(mode);
         }
     }
 }
 
 void Canvas::makeSelectedPointsSegmentsCurves() {
-    QList<PathPoint*> selectedPathPoints;
+    QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
+        if(point->isNodePoint()) {
+            selectedNodePoints.append( (NodePoint*) point);
         }
     }
-    Q_FOREACH(PathPoint *selectedPoint,
-            selectedPathPoints) {
-        PathPoint *nextPoint = selectedPoint->getNextPoint();
-        PathPoint *prevPoint = selectedPoint->getPreviousPoint();
-        if(selectedPathPoints.contains(nextPoint)) {
+    Q_FOREACH(NodePoint *selectedPoint,
+            selectedNodePoints) {
+        NodePoint *nextPoint = selectedPoint->getNextPoint();
+        NodePoint *prevPoint = selectedPoint->getPreviousPoint();
+        if(selectedNodePoints.contains(nextPoint)) {
             selectedPoint->setEndCtrlPtEnabled(true);
         }
-        if(selectedPathPoints.contains(prevPoint)) {
+        if(selectedNodePoints.contains(prevPoint)) {
             selectedPoint->setStartCtrlPtEnabled(true);
         }
     }
 }
 
 void Canvas::makeSelectedPointsSegmentsLines() {
-    QList<PathPoint*> selectedPathPoints;
+    QList<NodePoint*> selectedNodePoints;
     Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-        if(point->isPathPoint()) {
-            selectedPathPoints.append( (PathPoint*) point);
+        if(point->isNodePoint()) {
+            selectedNodePoints.append( (NodePoint*) point);
         }
     }
-    Q_FOREACH(PathPoint *selectedPoint,
-            selectedPathPoints) {
-        PathPoint *nextPoint = selectedPoint->getNextPoint();
-        PathPoint *prevPoint = selectedPoint->getPreviousPoint();
-        if(selectedPathPoints.contains(nextPoint)) {
+    Q_FOREACH(NodePoint *selectedPoint,
+            selectedNodePoints) {
+        NodePoint *nextPoint = selectedPoint->getNextPoint();
+        NodePoint *prevPoint = selectedPoint->getPreviousPoint();
+        if(selectedNodePoints.contains(nextPoint)) {
             selectedPoint->setEndCtrlPtEnabled(false);
         }
-        if(selectedPathPoints.contains(prevPoint)) {
+        if(selectedNodePoints.contains(prevPoint)) {
             selectedPoint->setStartCtrlPtEnabled(false);
         }
     }
@@ -135,17 +135,17 @@ void Canvas::makeSelectedPointsSegmentsLines() {
 
 void Canvas::finishSelectedPointsTransform() {
     if(isRecordingAllPoints() ) {
-        QList<SinglePathAnimator*> separatePaths;
+        QList<VectorPathAnimator*> separatePaths;
         Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-            if(point->isPathPoint()) {
-                SinglePathAnimator *sPath = ((PathPoint*)point)->getParentPath();
+            if(point->isNodePoint()) {
+                VectorPathAnimator *sPath = ((NodePoint*)point)->getParentPath();
                 if(separatePaths.contains(sPath)) continue;
                 separatePaths << sPath;
             } else {
                 point->finishTransform();
             }
         }
-        Q_FOREACH(SinglePathAnimator *path, separatePaths) {
+        Q_FOREACH(VectorPathAnimator *path, separatePaths) {
             path->finishAllPointsTransform();
         }
     } else {
@@ -157,17 +157,18 @@ void Canvas::finishSelectedPointsTransform() {
 
 void Canvas::startSelectedPointsTransform() {
     if(isRecordingAllPoints() ) {
-        QList<SinglePathAnimator*> separatePaths;
+        QList<VectorPathAnimator*> separatePaths;
         Q_FOREACH(MovablePoint *point, mSelectedPoints) {
-            if(point->isPathPoint()) {
-                SinglePathAnimator *sPath = ((PathPoint*)point)->getParentPath();
+            if(point->isNodePoint()) {
+                VectorPathAnimator *sPath =
+                        ((NodePoint*)point)->getParentPath();
                 if(separatePaths.contains(sPath)) continue;
                 separatePaths << sPath;
             } else {
                 point->startTransform();
             }
         }
-        Q_FOREACH(SinglePathAnimator *path, separatePaths) {
+        Q_FOREACH(VectorPathAnimator *path, separatePaths) {
             path->startAllPointsTransform();
         }
     } else {

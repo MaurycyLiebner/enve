@@ -127,9 +127,9 @@ protected:
     Qt::FillRule mFillRule = Qt::OddEvenFill;
 };
 
-class SvgPathPoint {
+class SvgNodePoint {
 public:
-    SvgPathPoint(QPointF point);
+    SvgNodePoint(QPointF point);
 
     void guessCtrlsMode();
 
@@ -161,13 +161,13 @@ private:
 
 class PathAnimator;
 class SinglePathAnimator;
-class SingleVectorPathAnimator;
+class VectorPathAnimator;
 class SvgSeparatePath {
 public:
     SvgSeparatePath();
     virtual ~SvgSeparatePath();
 
-    void apply(SingleVectorPathAnimator *path);
+    void apply(VectorPathAnimator *path);
 
     void closePath();
 
@@ -194,10 +194,10 @@ private:
                         qreal th0, qreal th1,
                         qreal rx, qreal ry, qreal xAxisRotation);
 
-    void addPoint(SvgPathPoint *point);
-    SvgPathPoint *mFirstPoint = NULL;
-    SvgPathPoint *mLastPoint = NULL;
-    QList<SvgPathPoint*> mPoints;
+    void addPoint(SvgNodePoint *point);
+    SvgNodePoint *mFirstPoint = NULL;
+    SvgNodePoint *mLastPoint = NULL;
+    QList<SvgNodePoint*> mPoints;
     bool mClosedPath = false;
 };
 

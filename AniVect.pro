@@ -45,7 +45,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    pathpoint.cpp \
     canvas.cpp \
     undoredo.cpp \
     connectedtomainwindow.cpp \
@@ -186,10 +185,13 @@ SOURCES += main.cpp\
     Paint/PaintLib/surface.cpp \
     Paint/PaintLib/tile.cpp \
     Boxes/paintbox.cpp \
-    Paint/PaintLib/animatedsurface.cpp
+    Paint/PaintLib/animatedsurface.cpp \
+    Animators/PathAnimators/pathkey.cpp \
+    Animators/PathAnimators/vectorpathanimator.cpp \
+    pointanimator.cpp \
+    nodepoint.cpp
 
 HEADERS  += mainwindow.h \
-    pathpoint.h \
     canvas.h \
     undoredo.h \
     updatescheduler.h \
@@ -333,7 +335,11 @@ HEADERS  += mainwindow.h \
     Paint/PaintLib/surface.h \
     Paint/PaintLib/tile.h \
     Boxes/paintbox.h \
-    Paint/PaintLib/animatedsurface.h
+    Paint/PaintLib/animatedsurface.h \
+    Animators/PathAnimators/pathkey.h \
+    Animators/PathAnimators/vectorpathanimator.h \
+    pointanimator.h \
+    nodepoint.h
 
 RESOURCES += \
     resources.qrc
