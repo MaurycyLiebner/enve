@@ -149,7 +149,14 @@ public:
                        NodePoint *pt2);
     void appendToPointsList(NodePoint *pt);
 
+    void setElementPos(const int &index,
+                       const SkPoint &pos);
 private:
+    NodePoint *createNewNode(const int &targetNodeId,
+                             const QPointF &startRelPos,
+                             const QPointF &endRelPos,
+                             const QPointF &relPos,
+                             const NodeSettings &nodeSettings);
     void updateNodePointIds();
 
     bool getTAndPointsForMouseEdgeInteraction(const QPointF &absPos,
@@ -157,7 +164,6 @@ private:
                                               NodePoint **prevPoint,
                                               NodePoint **nextPoint,
                                               const qreal &canvasScaleInv);
-    bool mPathClosed = false;
     QList<NodeSettings*> mNodeSettings;
     PathAnimator *mParentPathAnimator;
     NodePoint *mFirstPoint = NULL;

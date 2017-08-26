@@ -25,7 +25,7 @@ void CtrlPoint::setRelativePosVal(const QPointF &relPos) {
 void CtrlPoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
     mParentPoint->getParentPath()->setElementPos(getPtId(),
-                                                 QPointFToSkPoint(relPos));
+                                                 QPointFToSkPoint(mCurrentPos));
 }
 
 void CtrlPoint::setIsStartCtrlPt(const bool &bT) {
@@ -51,8 +51,7 @@ int CtrlPoint::getPtId() {
 }
 
 void CtrlPoint::moveByAbs(const QPointF &absTranslatione) {
-    moveToAbs(mapRelativeToAbsolute(mSavedRelPos +
-                                    mParentPoint->getRelativePos()) +
+    moveToAbs(mapRelativeToAbsolute(mSavedRelPos) +
               absTranslatione);
 }
 

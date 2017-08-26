@@ -32,6 +32,12 @@ void VectorPathAnimator::setCurrentPosForPtWithId(const int &ptId,
     }
 }
 
+void VectorPathAnimator::setElementPos(const int &index,
+                                       const SkPoint &pos) {
+    PathContainer::setElementPos(index, pos);
+    prp_updateInfluenceRangeAfterChanged();
+}
+
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {
     if(!anim_mIsRecording) prp_setRecording(true);
 
@@ -163,11 +169,26 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
         if(pressedT > 0.0001 && pressedT < 0.9999) {
             int prevNodeId = prevPoint->getNodeId();
             int newNodeId = prevNodeId + 1;
-            int nextNodeId = prevNodeId + 2;
+
             NodeSettings *prevNodeSettings =
                     getNodeSettingsForNodeId(prevNodeId);
-            NodeSettings *nextNodeSettings =
-                    getNodeSettingsForNodeId(newNodeId);
+            NodeSettings *nextNodeSettings;
+            int nextNodeId;
+            int prevPtId = nodeIdToPointId(prevNodeId);
+            int nextPtId;
+            if(nextPoint->getNodeId() == 0) {
+                nextNodeSettings =
+                        getNodeSettingsForNodeId(0);
+
+                nextNodeId = 0;
+                nextPtId = nodeIdToPointId(nextNodeId);
+            } else {
+                nextNodeSettings =
+                        getNodeSettingsForNodeId(prevNodeId + 1);
+                nextPtId = nodeIdToPointId(prevNodeId + 1);
+                nextNodeId = prevNodeId + 2;
+            }
+
             bool newPtSmooth = false;
 
             QPointF prevPointEnd = prevPoint->getEndCtrlPtValue();
@@ -185,21 +206,19 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                           &newPointEnd,
                           pressedT);
 
+            
             NodePoint *newPoint = new NodePoint(this);
-            newPoint->setRelativePos(newPointPos);
-            nextPoint->setPointAsPrevious(newPoint);
-            prevPoint->setPointAsNext(newPoint);
-            updateNodePointIds();
 
             if(adjust) {
+                NodeSettings *newNodeSettings;
                 if(!prevNodeSettings->endEnabled &&
                    !nextNodeSettings->startEnabled) {
-                    insertNodeSettingsForNodeId(newNodeId,
+                    newNodeSettings = insertNodeSettingsForNodeId(newNodeId,
                                                 NodeSettings(false, false,
                                                              CTRLS_CORNER));
                 } else {
                     newPtSmooth = true;
-                    insertNodeSettingsForNodeId(newNodeId,
+                    newNodeSettings = insertNodeSettingsForNodeId(newNodeId,
                                                 NodeSettings(true, true,
                                                              CTRLS_SMOOTH));
                     if(prevNodeSettings->ctrlsMode == CTRLS_SYMMETRIC &&
@@ -219,25 +238,32 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
                                                  CTRLS_SMOOTH));
                     }
                 }
+                newPoint->setCurrentNodeSettings(newNodeSettings);
             }
 
-            int prevId = nodeIdToPointId(prevNodeId);
-            int nextId = prevId + 1;
+            nextPoint->setPointAsPrevious(newPoint);
+            prevPoint->setPointAsNext(newPoint);
+            updateNodePointIds();
+
             if(anim_mKeys.isEmpty()) {
                 addNewPointAtTBetweenPts(pressedT,
-                                         prevId,
-                                         nextId,
+                                         prevPtId,
+                                         nextPtId,
                                          newPtSmooth);
             } else {
                 foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
                     ((PathKey*)key.get())->
                             addNewPointAtTBetweenPts(pressedT,
-                                                     prevId,
-                                                     nextId,
+                                                     prevPtId,
+                                                     nextPtId,
                                                      newPtSmooth);
                 }
-                setCurrentPath(getPathAtRelFrame(anim_mCurrentRelFrame));
             }
+
+            newPoint->setElementsPos(SkPointToQPointF(mElementsPos.at(prevPtId + 2)),
+                                     SkPointToQPointF(mElementsPos.at(prevPtId + 3)),
+                                     SkPointToQPointF(mElementsPos.at(prevPtId + 4)));
+            setCurrentPath(getPathAtRelFrame(anim_mCurrentRelFrame));
 
             return newPoint;
         }
@@ -404,6 +430,26 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
     mPathClosed = false;
 }
 
+NodePoint *VectorPathAnimator::createNewNode(const int &targetNodeId,
+                                             const QPointF &startRelPos,
+                                             const QPointF &endRelPos,
+                                             const QPointF &relPos,
+                                             const NodeSettings &nodeSettings) {
+    NodeSettings *nodeSettingsPtr =
+            insertNodeSettingsForNodeId(targetNodeId,
+                                        nodeSettings);
+    int nodePtId = nodeIdToPointId(targetNodeId) - 1;
+    insertElementPos(nodePtId, QPointFToSkPoint(endRelPos));
+    insertElementPos(nodePtId, QPointFToSkPoint(relPos));
+    insertElementPos(nodePtId, QPointFToSkPoint(startRelPos));
+    NodePoint *newP = new NodePoint(this);
+    newP->setCurrentNodeSettings(nodeSettingsPtr);
+    newP->setElementsPos(startRelPos,
+                         relPos,
+                         endRelPos);
+    return newP;
+}
+
 NodePoint *VectorPathAnimator::addNodeRelPos(
         const QPointF &startRelPos,
         const QPointF &relPos,
@@ -421,23 +467,15 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
             targetNodeId = targetPt->getNodeId() + 1;
         }
     }
-    NodeSettings *nodeSettingsPtr =
-            insertNodeSettingsForNodeId(targetNodeId,
-                                        nodeSettings);
-    int nodePtId = nodeIdToPointId(targetNodeId) - 1;
-    insertElementPos(nodePtId, QPointFToSkPoint(endRelPos));
-    insertElementPos(nodePtId, QPointFToSkPoint(relPos));
-    insertElementPos(nodePtId, QPointFToSkPoint(startRelPos));
-    NodePoint *newP = new NodePoint(this);
+
+    NodePoint *newP = createNewNode(targetNodeId,
+                                    startRelPos, relPos, endRelPos,
+                                    nodeSettings);
     if(targetPt == NULL) {
         mFirstPoint = newP;
     } else {
         targetPt->connectToPoint(newP);
     }
-    newP->setCurrentNodeSettings(nodeSettingsPtr);
-    newP->setElementsPos(startRelPos,
-                         relPos,
-                         endRelPos);
     updateNodePointIds();
     return newP;
 }

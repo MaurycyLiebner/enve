@@ -11,8 +11,8 @@ public:
         return mElementsPos;
     }
     const SkPoint &getElementPos(const int &index) const;
-    void setElementPos(const int &index,
-                       const SkPoint &pos);
+    virtual void setElementPos(const int &index,
+                               const SkPoint &pos);
     void prependElementPos(const SkPoint &pos);
     void appendElementPos(const SkPoint &pos);
     void insertElementPos(const int &index,

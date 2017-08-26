@@ -195,9 +195,7 @@ private:
     bool mSeparateNodePoint = false;
     NodePoint *mNextPoint = NULL;
     NodePoint *mPreviousPoint = NULL;
-    bool mStartCtrlPtEnabled = false;
     CtrlPoint *mStartCtrlPt = NULL;
-    bool mEndCtrlPtEnabled = false;
     CtrlPoint *mEndCtrlPt = NULL;
     void ctrlPointPosChanged(CtrlPoint *pointChanged,
                              CtrlPoint *pointToUpdate);

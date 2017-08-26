@@ -92,6 +92,7 @@ void NodePoint::setRelativePos(const QPointF &relPos) {
     setRelativePosVal(relPos);
     getParentPath()->setElementPos(getPtId(), QPointFToSkPoint(relPos));
 }
+
 void NodePoint::connectToPoint(NodePoint *point) {
     if(point == NULL) {
         return;
@@ -194,6 +195,7 @@ void NodePoint::moveEndCtrlPtToRelPos(const QPointF &endCtrlPt) {
     }
     mParentPath->setElementPos(getPtId() + 1, QPointFToSkPoint(endCtrlPt));
     mEndCtrlPt->setRelativePos(endCtrlPt);
+    ctrlPointPosChanged(mEndCtrlPt, mStartCtrlPt);
 }
 
 void NodePoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
@@ -202,6 +204,7 @@ void NodePoint::moveStartCtrlPtToRelPos(const QPointF &startCtrlPt) {
     }
     mParentPath->setElementPos(getPtId() - 1, QPointFToSkPoint(startCtrlPt));
     mStartCtrlPt->setRelativePos(startCtrlPt);
+    ctrlPointPosChanged(mStartCtrlPt, mEndCtrlPt);
 }
 
 QPointF NodePoint::getStartCtrlPtAbsPos() const {
@@ -209,7 +212,7 @@ QPointF NodePoint::getStartCtrlPtAbsPos() const {
 }
 
 QPointF NodePoint::getStartCtrlPtValue() const {
-    if(mStartCtrlPtEnabled) {
+    if(mCurrentNodeSettings->startEnabled) {
         return mStartCtrlPt->getRelativePos();
     } else {
         return getRelativePos();
@@ -351,7 +354,7 @@ void NodePoint::updateStartCtrlPtVisibility() {
     if(mPreviousPoint == NULL) {
         mStartCtrlPt->hide();
     } else {
-        mStartCtrlPt->setVisible(mStartCtrlPtEnabled);
+        mStartCtrlPt->setVisible(mCurrentNodeSettings->startEnabled);
     }
 }
 
@@ -403,30 +406,27 @@ NodePointValues NodePoint::getPointValues() const {
                            getEndCtrlPtValue() );
 }
 
-CtrlsMode NodePoint::getCurrentCtrlsMode()
-{
+CtrlsMode NodePoint::getCurrentCtrlsMode() {
     return mCurrentNodeSettings->ctrlsMode;
 }
 
-bool NodePoint::isEndCtrlPtEnabled()
-{
-    return mEndCtrlPtEnabled;
+bool NodePoint::isEndCtrlPtEnabled() {
+    return mCurrentNodeSettings->endEnabled;
 }
 
-bool NodePoint::isStartCtrlPtEnabled()
-{
-    return mStartCtrlPtEnabled;
+bool NodePoint::isStartCtrlPtEnabled() {
+    return mCurrentNodeSettings->startEnabled;
 }
 
 void NodePoint::setCtrlPtEnabled(const bool &enabled,
                                  const bool &isStartPt) {
     if(isStartPt) {
-        if(mStartCtrlPtEnabled == enabled) {
+        if(mCurrentNodeSettings->startEnabled == enabled) {
             return;
         }
         setStartCtrlPtEnabled(enabled);
     } else {
-        if(mEndCtrlPtEnabled == enabled) {
+        if(mCurrentNodeSettings->endEnabled == enabled) {
             return;
         }
         setEndCtrlPtEnabled(enabled);
@@ -546,8 +546,8 @@ void NodePoint::setElementsPos(const QPointF &startPos,
                                const QPointF &targetPos,
                                const QPointF &endPos) {
     setRelativePosVal(targetPos);
-    mStartCtrlPt->setRelativePosVal(startPos);
-    mEndCtrlPt->setRelativePosVal(endPos);
+    mStartCtrlPt->setRelativePosVal(startPos + targetPos);
+    mEndCtrlPt->setRelativePosVal(endPos + targetPos);
 }
 
 bool NodePoint::isEndPoint() {

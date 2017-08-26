@@ -134,7 +134,7 @@ public:
     }
 
     void moveByRel(const QPointF &relTranslation) {
-        mCurrentPos = mSavedRelPos + relTranslation;
+        setRelativePos(mSavedRelPos + relTranslation);
     }
 protected:
     QPointF mCurrentPos;

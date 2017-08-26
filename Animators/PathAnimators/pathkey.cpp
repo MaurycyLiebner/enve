@@ -66,7 +66,7 @@ void PathContainer::updatePath() {
     bool endEnabled = getNodeSettingsForPtId(0)->endEnabled;
     SkPoint endPos;
     if(endEnabled) {
-        endPos = mElementsPos.at(2);
+        endPos = firstPos + mElementsPos.at(2);
     } else {
         endPos = firstPos;
     }
@@ -77,13 +77,13 @@ void PathContainer::updatePath() {
 
         SkPoint startPos;
         if(nodeSettings->startEnabled) {
-            startPos = mElementsPos.at(currId - 1);
+            startPos = targetPos + mElementsPos.at(currId - 1);
         } else {
             startPos = targetPos;
         }
         mPath.cubicTo(endPos, startPos, targetPos);
         if(nodeSettings->endEnabled) {
-            endPos = mElementsPos.at(currId + 1);
+            endPos = targetPos + mElementsPos.at(currId + 1);
         } else {
             endPos = targetPos;
         }
@@ -92,7 +92,7 @@ void PathContainer::updatePath() {
     if(mPathClosed) {
         SkPoint firstStartPos;
         if(getNodeSettingsForPtId(0)->startEnabled) {
-            firstStartPos = mElementsPos.first();
+            firstStartPos = firstPos + mElementsPos.first();
         } else {
             firstStartPos = firstPos;
         }
@@ -187,10 +187,17 @@ void PathContainer::addNewPointAtTBetweenPts(const SkScalar &tVal,
                                              const bool &newPtSmooth) {
     int prevPtId = qMin(id1, id2);
     int nextPtId = qMax(id1, id2);
+    if(prevPtId == 1 && nextPtId != 4) {
+        prevPtId = nextPtId;
+        nextPtId = 1;
+    }
     SkPoint prevPoint = getElementPos(prevPtId);
-    SkPoint prevPointEnd = getElementPos(prevPtId + 1);
-    SkPoint nextPointStart = getElementPos(prevPtId + 2);
-    SkPoint nextPoint = getElementPos(prevPtId + 3);
+    SkPoint prevPointEnd = getElementPos(prevPtId + 1) + prevPoint;
+    SkPoint nextPoint = getElementPos(nextPtId);
+    SkPoint nextPointStart = getElementPos(nextPtId - 1) + nextPoint;
+    if(nextPtId != 1) {
+        nextPtId += 3;
+    }
     SkPoint newPointPos;
     SkPoint newPointStart;
     SkPoint newPointEnd;
@@ -204,14 +211,13 @@ void PathContainer::addNewPointAtTBetweenPts(const SkScalar &tVal,
                   &newPointEnd,
                   tVal);
 
-    insertElementPos(prevPtId + 2, newPointPos);
+    insertElementPos(prevPtId + 2, SkPoint::Make(0., 0.));
     insertElementPos(prevPtId + 3, newPointPos);
-    insertElementPos(prevPtId + 4, newPointPos);
-    nextPtId += 3;
+    insertElementPos(prevPtId + 4, SkPoint::Make(0., 0.));
     if(newPtSmooth) {
-        setElementPos(prevPtId + 2, newPointStart);
-        setElementPos(prevPtId + 4, newPointEnd);
-        setElementPos(prevPtId + 1, prevPointEnd);
-        setElementPos(prevPtId + 2 + 3, nextPointStart);
+        setElementPos(prevPtId + 2, newPointStart - newPointPos);
+        setElementPos(prevPtId + 4, newPointEnd - newPointPos);
+        setElementPos(prevPtId + 1, prevPointEnd - prevPoint);
+        setElementPos(nextPtId - 1, nextPointStart - nextPoint);
     }
 }

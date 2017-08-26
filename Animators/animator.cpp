@@ -34,6 +34,10 @@ int Animator::anim_getPrevKeyRelFrame(Key *key) {
 
 void Animator::anim_updateAfterChangedKey(Key *key) {
     if(anim_mIsComplexAnimator) return;
+    if(key = NULL) {
+        prp_updateInfluenceRangeAfterChanged();
+        return;
+    }
     int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
     if(prevKeyRelFrame != INT_MIN) prevKeyRelFrame++;
     int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
