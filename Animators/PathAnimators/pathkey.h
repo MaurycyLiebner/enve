@@ -20,7 +20,7 @@ public:
     void removeElementPosAt(const int &index);
     const SkPath &getPath();
     void updatePath();
-    void closedChanged(const bool &bT);
+    virtual void setPathClosed(const bool &bT);
     void setElementsFromSkPath(const SkPath &path);
     void clearElements();
 

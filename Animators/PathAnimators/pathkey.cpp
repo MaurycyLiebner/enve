@@ -101,7 +101,7 @@ void PathContainer::updatePath() {
     }
 }
 
-void PathContainer::closedChanged(const bool &bT) {
+void PathContainer::setPathClosed(const bool &bT) {
     mPathClosed = bT;
     mPathNeedUpdate = true;
 }

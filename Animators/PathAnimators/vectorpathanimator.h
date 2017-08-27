@@ -79,8 +79,9 @@ public:
         settings->ctrlsMode = ctrlsMode;
     }
 
-    void setPathClosed(const bool &closed) {
-        mPathClosed = closed;
+    void setPathClosed(const bool &bT) {
+        PathContainer::setPathClosed(bT);
+        prp_updateInfluenceRangeAfterChanged();
     }
 
     const CtrlsMode &getNodeCtrlsMode(const int &nodeId) {
