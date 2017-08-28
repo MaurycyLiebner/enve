@@ -59,7 +59,7 @@ const SkPath &PathContainer::getPath() {
 
 void PathContainer::updatePath() {
     mPath.reset();
-    if(mElementsPos.count() < 6) return;
+    if(mElementsPos.count() < 3) return;
     SkPoint firstPos = mElementsPos.at(1);
     mPath.moveTo(firstPos);
     int elementsCount = mElementsPos.count();
@@ -114,12 +114,15 @@ void PathContainer::setElementsFromSkPath(const SkPath &path) {
     SkPoint pts[4];
     int verbId = 0;
     SkPoint firstPoint;
+    SkPoint lastTargetPt;
     for(;;) {
         switch(iter.next(pts)) {
             case SkPath::kMove_Verb: {
                 SkPoint pt = pts[0];
                 firstPoint = pt;
+                mElementsPos.append(SkPoint::Make(0., 0.));
                 mElementsPos.append(pt);
+                lastTargetPt = pt;
             }
                 break;
             case SkPath::kLine_Verb: {
@@ -134,30 +137,43 @@ void PathContainer::setElementsFromSkPath(const SkPath &path) {
                     }
                 }
                 if(!connectOnly) {
+                    mElementsPos.append(SkPoint::Make(0., 0.));
                     mElementsPos.append(pt);
+                    mElementsPos.append(SkPoint::Make(0., 0.));
                 }
+                lastTargetPt = pt;
             }
                 break;
             case SkPath::kCubic_Verb: {
                 SkPoint endPt = pts[1];
                 SkPoint startPt = pts[2];
                 SkPoint targetPt = pts[3];
-                mElementsPos.append(endPt);
-
+                mElementsPos.append(endPt - lastTargetPt);
 
                 bool sameAsFirstPoint = targetPt == firstPoint;
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
                     if(path.countVerbs() > verbId + 1) {
-                        connectOnly = iter.peek() == SkPath::kMove_Verb;
+                        connectOnly = iter.peek() == SkPath::kMove_Verb ||
+                                iter.peek() == SkPath::kDone_Verb ||
+                                iter.peek() == SkPath::kClose_Verb;
                     } else {
                         connectOnly = true;
                     }
                 }
-                mElementsPos.append(startPt);
-                if(!connectOnly) {
+                if(connectOnly) {
+                    mPathClosed = true;
+                    mElementsPos.replace(0, startPt - firstPoint);
+                } else {
+                    mElementsPos.append(startPt - targetPt);
                     mElementsPos.append(targetPt);
                 }
+                if(iter.peek() == SkPath::kMove_Verb ||
+                   iter.peek() == SkPath::kDone_Verb ||
+                   iter.peek() == SkPath::kClose_Verb) {
+                    goto DONE;
+                }
+                lastTargetPt = targetPt;
             }
                 break;
             case SkPath::kClose_Verb:
@@ -172,6 +188,9 @@ void PathContainer::setElementsFromSkPath(const SkPath &path) {
         verbId++;
     }
 DONE:
+    if(!mPathClosed) {
+        mElementsPos.append(SkPoint::Make(0., 0.));
+    }
     mPathNeedUpdate = false;
     mPath = path;
 }

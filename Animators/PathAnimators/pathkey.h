@@ -21,7 +21,7 @@ public:
     const SkPath &getPath();
     void updatePath();
     virtual void setPathClosed(const bool &bT);
-    void setElementsFromSkPath(const SkPath &path);
+    virtual void setElementsFromSkPath(const SkPath &path);
     void clearElements();
 
     void addNewPointAtTBetweenPts(const SkScalar &tVal,

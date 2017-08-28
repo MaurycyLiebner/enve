@@ -152,6 +152,7 @@ public:
 
     void setElementPos(const int &index,
                        const SkPoint &pos);
+    void setElementsFromSkPath(const SkPath &path);
 private:
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,

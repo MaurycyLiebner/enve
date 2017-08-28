@@ -350,6 +350,7 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
 #include "skqtconversions.h"
 SumPathEffect::SumPathEffect(PathBox *parentPath) :
     PathEffect(SUM_PATH_EFFECT) {
+    prp_setName("path sum effect");
     mParentPathBox = parentPath;
     ca_addChildAnimator(mBoxTarget.data());
 }
