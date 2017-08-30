@@ -28,8 +28,6 @@ public:
                  const MovablePointType &type,
                  const qreal &radius = 7.5);
 
-    virtual ~MovablePoint() {}
-
     virtual void startTransform();
     virtual void finishTransform();
 

@@ -46,6 +46,7 @@ void NodePoint::startTransform() {
     if(!mEndCtrlPt->isSelected()) {
         mEndCtrlPt->NonAnimatedMovablePoint::startTransform();
     }
+    getParentPath()->startPathChange();
 }
 
 void NodePoint::saveTransformPivotAbsPos(const QPointF &absPivot) {
@@ -76,6 +77,7 @@ void NodePoint::cancelTransform() {
     if(!mEndCtrlPt->isSelected()) {
         mEndCtrlPt->NonAnimatedMovablePoint::cancelTransform();
     }
+    getParentPath()->cancelPathChange();
 }
 
 void NodePoint::finishTransform() {
@@ -86,6 +88,7 @@ void NodePoint::finishTransform() {
     if(!mEndCtrlPt->isSelected()) {
         mEndCtrlPt->NonAnimatedMovablePoint::finishTransform();
     }
+    getParentPath()->finishedPathChange();
 }
 
 void NodePoint::setRelativePos(const QPointF &relPos) {

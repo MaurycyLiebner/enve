@@ -33,7 +33,8 @@ public:
     VectorPathAnimator(PathAnimator *pathAnimator);
 
     void prp_setAbsFrame(const int &frame);
-    SkPath getPathAtRelFrame(const int &relFrame);
+    SkPath getPathAtRelFrame(const int &relFrame,
+                             const bool &considerCurrent = true);
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId) {
         return mNodeSettings.at(pointIdToNodeId(ptId));
@@ -81,6 +82,10 @@ public:
 
     void setPathClosed(const bool &bT) {
         PathContainer::setPathClosed(bT);
+        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+            ((PathKey*)key.get())->setPathClosed(bT);
+        }
+        setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
         prp_updateInfluenceRangeAfterChanged();
     }
 
@@ -92,6 +97,8 @@ public:
     void setCurrentPosForPtWithId(const int &ptId,
                                   const SkPoint &pos,
                                   const bool &finish);
+
+    void finishedPathChange();
 
     void anim_saveCurrentValueAsKey();
     void anim_removeKey(Key *keyToRemove, const bool &saveUndoRedo);
@@ -153,6 +160,8 @@ public:
     void setElementPos(const int &index,
                        const SkPoint &pos);
     void setElementsFromSkPath(const SkPath &path);
+    void startPathChange();
+    void cancelPathChange();
 private:
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,
@@ -170,6 +179,7 @@ private:
     PathAnimator *mParentPathAnimator;
     NodePoint *mFirstPoint = NULL;
     QList<NodePoint*> mPoints;
+    bool mPathChanged = false;
 };
 
 #endif // VECTORPATHANIMATOR_H

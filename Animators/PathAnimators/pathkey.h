@@ -98,6 +98,11 @@ public:
     PathKey(const int &relFrame,
             const SkPath &path,
             VectorPathAnimator *parentAnimator);
+    PathKey(const int &relFrame,
+            const SkPath &path,
+            const QList<SkPoint> &elementsPos,
+            VectorPathAnimator *parentAnimator);
+
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
     bool differsFromKey(Key *key) { return true; }
 };

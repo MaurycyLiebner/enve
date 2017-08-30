@@ -77,6 +77,7 @@ void CtrlPoint::startTransform() {
     if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
         mOtherCtrlPt->NonAnimatedMovablePoint::startTransform();
     }
+    mParentPoint->getParentPath()->startPathChange();
 }
 
 void CtrlPoint::finishTransform() {
@@ -85,6 +86,7 @@ void CtrlPoint::finishTransform() {
     if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
         mOtherCtrlPt->NonAnimatedMovablePoint::finishTransform();
     }
+    mParentPoint->getParentPath()->finishedPathChange();
 }
 
 void CtrlPoint::cancelTransform() {
@@ -93,6 +95,7 @@ void CtrlPoint::cancelTransform() {
     if(mParentPoint->getCurrentCtrlsMode() != CTRLS_CORNER) {
         mOtherCtrlPt->NonAnimatedMovablePoint::cancelTransform();
     }
+    mParentPoint->getParentPath()->cancelPathChange();
 }
 
 void CtrlPoint::setOtherCtrlPt(CtrlPoint *ctrlPt) {

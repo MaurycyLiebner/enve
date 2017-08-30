@@ -7,6 +7,7 @@ class Transformable
 {
 public:
     Transformable();
+    virtual ~Transformable() {}
 
     virtual void startTransform() {}
     virtual void finishTransform() {}
