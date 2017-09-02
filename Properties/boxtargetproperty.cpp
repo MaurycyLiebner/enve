@@ -15,7 +15,11 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
     if(mTarget.data() != NULL) {
         QObject::disconnect(mTarget.data(), 0, this, 0);
     }
-    mTarget = box->weakRef<BoundingBox>();
+    if(box == NULL) {
+        mTarget.clear();
+    } else {
+        mTarget = box->weakRef<BoundingBox>();
+    }
     if(mTarget.data() != NULL) {
         QObject::connect(mTarget.data(), SIGNAL(scheduledUpdate()),
                          this, SLOT(prp_callUpdater()));

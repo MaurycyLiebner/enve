@@ -86,6 +86,7 @@ class InternalLinkCanvas : public InternalLinkBox {
 public:
     InternalLinkCanvas(Canvas *canvas) :
         InternalLinkBox(canvas) {
+        mType = TYPE_INTERNAL_LINK_CANVAS;
         mClipToCanvasSize->prp_setName("clip to size");
         mClipToCanvasSize->setValue(true);
         mRastarized->prp_setName("rastarized");

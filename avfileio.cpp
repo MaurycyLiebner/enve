@@ -23,6 +23,8 @@
 #include "Boxes/videobox.h"
 #include "Boxes/textbox.h"
 #include "Boxes/particlebox.h"
+#include "Boxes/imagesequencebox.h"
+#include "Boxes/linkbox.h"
 #include "canvas.h"
 #include "durationrectangle.h"
 #include "gradientpoints.h"
@@ -457,6 +459,7 @@ void BoundingBox::readBoundingBox(std::fstream *file) {
     }
 
     mTransformAnimator->readBoxTransformAnimator(file);
+    BoundingBox::addLoadedBox(this);
 }
 
 void PathEffect::writePathEffect(std::fstream *file) {
@@ -474,6 +477,47 @@ void DisplacePathEffect::readDisplacePathEffect(std::fstream *file) {
     mSegLength->readQrealAnimator(file);
     mMaxDev->readQrealAnimator(file);
     mSmoothness->readQrealAnimator(file);
+}
+
+void DuplicatePathEffect::writePathEffect(std::fstream *file) {
+    PathEffect::writePathEffect(file);
+    mTranslation->writeQPointFAnimator(file);
+}
+
+void DuplicatePathEffect::readDuplicatePathEffect(std::fstream *file) {
+    mTranslation->readQPointFAnimator(file);
+}
+
+void BoxTargetProperty::writeBoxTargetProperty(std::fstream *file) {
+    BoundingBox *targetBox = mTarget.data();
+    int targetId;
+    if(targetBox == NULL) {
+        targetId = -1;
+    } else {
+        targetId = targetBox->getLoadId();
+    }
+    file->write((char*)&targetId, sizeof(int));
+}
+
+void BoxTargetProperty::readBoxTargetProperty(std::fstream *file) {
+    int targetId;
+    file->read((char*)&targetId, sizeof(int));
+    BoundingBox *targetBox = BoundingBox::getLoadedBoxById(targetId);
+    if(targetBox == NULL && targetId >= 0) {
+        BoundingBox::addFunctionWaitingForBoxLoad(
+                    SumPathEffectForBoxLoad(targetId, this) );
+    } else {
+        setTarget(targetBox);
+    }
+}
+
+void SumPathEffect::writePathEffect(std::fstream *file) {
+    PathEffect::writePathEffect(file);
+    mBoxTarget->writeBoxTargetProperty(file);
+}
+
+void SumPathEffect::readSumPathEffect(std::fstream *file) {
+    mBoxTarget->readBoxTargetProperty(file);
 }
 
 void PathEffectAnimators::writePathEffectAnimators(std::fstream *file) {
@@ -494,6 +538,14 @@ void PathEffectAnimators::readPathEffectAnimators(std::fstream *file) {
             DisplacePathEffect *displaceEffect = new DisplacePathEffect();
             displaceEffect->readDisplacePathEffect(file);
             addEffect(displaceEffect);
+        } else if(typeT == DUPLICATE_PATH_EFFECT) {
+            DuplicatePathEffect *duplicateEffect = new DuplicatePathEffect();
+            duplicateEffect->readDuplicatePathEffect(file);
+            addEffect(duplicateEffect);
+        } else if(typeT == SUM_PATH_EFFECT) {
+            SumPathEffect *sumEffect = new SumPathEffect();
+            sumEffect->readSumPathEffect(file);
+            addEffect(sumEffect);
         }
     }
 }
@@ -537,6 +589,30 @@ void BoxesGroup::readBoundingBox(std::fstream *file) {
         file->read((char*)&boxType, sizeof(BoundingBoxType));
         if(boxType == TYPE_VECTOR_PATH) {
             box = new VectorPath();
+        } else if(boxType == TYPE_IMAGE) {
+            box = new ImageBox();
+        } else if(boxType == TYPE_TEXT) {
+            box = new TextBox();
+        } else if(boxType == TYPE_VIDEO) {
+            box = new VideoBox();
+        } else if(boxType == TYPE_PARTICLES) {
+            box = new ParticleBox();
+        } else if(boxType == TYPE_RECTANGLE) {
+            box = new Rectangle();
+        } else if(boxType == TYPE_CIRCLE) {
+            box = new Circle();
+        } else if(boxType == TYPE_GROUP) {
+            box = new BoxesGroup();
+        } else if(boxType == TYPE_PAINT) {
+            box = new PaintBox();
+        } else if(boxType == TYPE_IMAGESQUENCE) {
+            box = new ImageSequenceBox();
+        } else if(boxType == TYPE_INTERNAL_LINK) {
+            box = new InternalLinkBox();
+        } else if(boxType == TYPE_EXTERNAL_LINK) {
+            box = new ExternalLinkBox();
+        } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
+            box = new InternalLinkCanvas();
         }
 
         box->readBoundingBox(file);

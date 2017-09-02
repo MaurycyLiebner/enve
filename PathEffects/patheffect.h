@@ -71,6 +71,8 @@ public:
 
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
+    void writePathEffect(std::fstream *file);
+    void readDuplicatePathEffect(std::fstream *file);
 private:
     QSharedPointer<QPointFAnimator> mTranslation =
             (new QPointFAnimator())->ref<QPointFAnimator>();
