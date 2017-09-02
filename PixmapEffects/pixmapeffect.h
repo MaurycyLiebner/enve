@@ -39,7 +39,7 @@ private:
     PixmapEffect *mPixmapEffect;
 };
 
-enum PixmapEffectType {
+enum PixmapEffectType : short {
     EFFECT_BLUR,
     EFFECT_SHADOW,
     EFFECT_LINES,
@@ -76,8 +76,6 @@ public:
 
     void prp_startDragging();
 
-    virtual int saveToSql(QSqlQuery *query,
-                              const int &boundingBoxSqlId);
 
     friend QDataStream & operator << (QDataStream & s,
                                       const PixmapEffect *ptr);
@@ -88,7 +86,6 @@ public:
         return new PixmapEffectMimeData(this);
     }
 
-    virtual void loadFromSql(const int &identifyingId) = 0;
     virtual Property *makeDuplicate() = 0;
     virtual void makeDuplicate(Property *target) = 0;
 
@@ -104,6 +101,9 @@ public:
                                         const int &) { return NULL; }
 
     bool SWT_isPixmapEffect() { return true; }
+
+
+    virtual void writePixmapEffect(std::fstream *file);
 public slots:
     void interrupt() {
         mInterrupted = true;
@@ -134,15 +134,14 @@ public:
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &pixmapEffectId);
-
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateBlurRadiusAnimatorFrom(QrealAnimator *source);
 
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
-                                    const int &relFrame);
+            const int &relFrame);
+    void readBlurEffect(std::fstream *file);
+    void writePixmapEffect(std::fstream *file);
 private:
     QSharedPointer<BoolProperty> mHighQuality =
             (new BoolProperty())->ref<BoolProperty>();
@@ -172,9 +171,6 @@ public:
 
     qreal getMargin();
     qreal getMarginAtRelFrame(const int &relFrame);
-
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
 
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
@@ -210,8 +206,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateDistanceAnimatorFrom(QrealAnimator *source);
@@ -236,8 +230,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateDistanceAnimatorFrom(QrealAnimator *source);
@@ -259,8 +251,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateDegreesAnimatorFrom(QrealAnimator *source);
@@ -279,8 +269,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateRadiusAnimatorFrom(QrealAnimator *source);
@@ -299,8 +287,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateFactorAnimatorFrom(QrealAnimator *source);
@@ -323,8 +309,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
@@ -353,8 +337,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
@@ -393,8 +375,6 @@ public:
 
     qreal getMargin() { return 0.; }
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &identifyingId);
     Property *makeDuplicate();
     void makeDuplicate(Property *target);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(

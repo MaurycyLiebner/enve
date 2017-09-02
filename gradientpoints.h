@@ -36,8 +36,7 @@ public:
 
     void setPositions(const QPointF &startPos,
                       const QPointF &endPos);
-    void loadFromSql(const int &identifyingId);
-    int saveToSql(QSqlQuery *query, const int &parentId = 0);
+
     Property *makeDuplicate() {
         return NULL;
     }
@@ -46,6 +45,8 @@ public:
                              GradientPoint *endPointT);
     QPointF getStartPointAtRelFrame(const int &relFrame);
     QPointF getEndPointAtRelFrame(const int &relFrame);
+    void writeGradientPoints(std::fstream *file);
+    void readGradientPoints(std::fstream *file);
 };
 
 #endif // GRADIENTPOINTS_H

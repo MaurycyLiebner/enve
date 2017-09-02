@@ -19,39 +19,6 @@ ImageBox::~ImageBox() {
     }
 }
 
-#include <QSqlError>
-int ImageBox::saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
-
-    if(!query->exec(QString("INSERT INTO imagebox (boundingboxid, "
-                           "imagefilepath) "
-                "VALUES (%1, '%2')").
-                    arg(boundingBoxId).
-                    arg(mImageFilePath) ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return boundingBoxId;
-}
-
-
-void ImageBox::loadFromSql(const int &boundingBoxId) {
-    BoundingBox::loadFromSql(boundingBoxId);
-
-    QSqlQuery query;
-    QString queryStr = "SELECT * FROM imagebox WHERE boundingboxid = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        int ImageFilePathId = query.record().indexOf("imagefilepath");
-
-        setFilePath(query.value(ImageFilePathId).toString());
-    } else {
-        qDebug() << "Could not load imagebox with id " << boundingBoxId;
-    }
-}
-
-
 void ImageBox::makeDuplicate(Property *targetBox) {
     BoundingBox::makeDuplicate(targetBox);
     ImageBox *imgTarget = (ImageBox*)targetBox;

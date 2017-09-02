@@ -253,10 +253,6 @@ void ComplexAnimator::anim_drawKey(
     }
 }
 
-void ComplexAnimator::loadKeysFromSql(const int &qrealAnimatorId) {
-    Q_UNUSED(qrealAnimatorId);
-}
-
 void ComplexAnimator::prp_setParentFrameShift(const int &shift,
                                               ComplexAnimator *parentAnimator) {
     Property::prp_setParentFrameShift(shift, parentAnimator);

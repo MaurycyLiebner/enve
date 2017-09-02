@@ -2,7 +2,6 @@
 #define PROPERTY_H
 #include <QObject>
 #include <QColor>
-#include <QSqlQuery>
 #include "connectedtomainwindow.h"
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 #include "selfref.h"

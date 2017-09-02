@@ -5,7 +5,6 @@
 #include "mainwindow.h"
 #include "animationdockwidget.h"
 #include <QMenu>
-#include <QSqlRecord>
 #include "qrealanimatorvalueslider.h"
 #include <QWidgetAction>
 #include "BoxesList/boxsinglewidget.h"
@@ -17,64 +16,6 @@ QrealAnimator::QrealAnimator() : Animator() {
 }
 
 QrealAnimator::~QrealAnimator() {
-}
-
-#include <QSqlError>
-#include <QSqlQuery>
-int QrealAnimator::saveToSql(QSqlQuery *query) {
-    if(!query->exec(
-        QString("INSERT INTO qrealanimator (currentvalue) "
-                "VALUES (%1)").
-                arg(mCurrentValue, 0, 'f') ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    int thisSqlId = query->lastInsertId().toInt();
-
-    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QrealKey*)key.get())->saveToSql(thisSqlId);
-    }
-
-    return thisSqlId;
-}
-
-void QrealAnimator::loadFromSql(const int &qrealAnimatorId) {
-    QSqlQuery query;
-
-    QString queryStr = "SELECT * FROM qrealanimator WHERE id = " +
-            QString::number(qrealAnimatorId);
-    if(query.exec(queryStr)) {
-        query.next();
-        int idQrealAnimatorId = query.record().indexOf("id");
-        int currentValue = query.record().indexOf("currentvalue");
-
-        loadKeysFromSql(query.value(idQrealAnimatorId).toInt() );
-
-        if(anim_mKeys.isEmpty()) {
-            qra_setCurrentValue(query.value(currentValue).toReal());
-        } else {
-            anim_setRecordingWithoutChangingKeys(true, false);
-        }
-    } else {
-        qDebug() << "Could not load qpointfanimator with id " << qrealAnimatorId;
-    }
-}
-
-void QrealAnimator::loadKeysFromSql(const int &qrealAnimatorId) {
-    QSqlQuery query;
-
-    QString queryStr = "SELECT * FROM qrealkey WHERE qrealanimatorid = " +
-            QString::number(qrealAnimatorId);
-    if(query.exec(queryStr)) {
-        int idId = query.record().indexOf("id");
-        while(query.next() ) {
-            QrealKey *key = new QrealKey(this);
-            key->loadFromSql(query.value(idId).toInt());
-            anim_appendKey(key);
-        }
-    } else {
-        qDebug() << "Could not load qpointfanimator with id " << qrealAnimatorId;
-    }
 }
 
 void QrealAnimator::qra_setValueRange(const qreal &minVal,

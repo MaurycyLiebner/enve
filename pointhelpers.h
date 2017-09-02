@@ -51,8 +51,6 @@ extern bool isZero2Dec(qreal val);
 
 extern bool isZero1Dec(qreal val);
 
-extern QString boolToSql(bool bT);
-
 extern qreal getTforBezierPoint(const qreal &x0,
                                 const qreal &x1,
                                 const qreal &x2,

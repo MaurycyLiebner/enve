@@ -15,7 +15,6 @@
 #include "skqtconversions.h"
 #include "global.h"
 
-QList<SqlInsertAwaitingBox> BoundingBox::mSqlInsertAwaitingBox;
 QList<BoundingBox*> BoundingBox::mLoadedBoxes;
 QList<FunctionWaitingForBoxLoad*> BoundingBox::mFunctionsWaitingForBoxLoad;
 
@@ -149,87 +148,6 @@ void BoundingBox::applyEffectsSk(const SkBitmap &im,
         fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
                                im.width(), im.height());
         mEffectsAnimators->applyEffectsSk(im, img, scale);
-    }
-}
-
-#include <QSqlError>
-int BoundingBox::saveToSql(QSqlQuery *query, const int &parentId) {
-    int transfromAnimatorId = mTransformAnimator->saveToSql(query);
-    QString durRectId;
-    if(mDurationRectangle == NULL) {
-        durRectId = "NULL";
-    } else {
-        durRectId = QString::number(
-                    mDurationRectangle->saveToSql(query));
-    }
-    if(!query->exec(
-                QString("INSERT INTO boundingbox ("
-                        "name, boxtype, transformanimatorid, "
-                        "pivotchanged, visible, locked, blendmode, "
-                        "parentboundingboxid, durationrectid) "
-                "VALUES ('%1', %2, %3, %4, %5, %6, %7, %8, %9)").
-                arg(prp_mName).
-                arg(mType).
-                arg(transfromAnimatorId).
-                arg(boolToSql(mPivotChanged)).
-                arg(boolToSql(mVisible) ).
-                arg(boolToSql(mLocked) ).
-                arg(static_cast<int>(mBlendModeSk)).
-                arg(parentId).
-                arg(durRectId)
-                ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    setBoxSaved(true);
-    int boxId = query->lastInsertId().toInt();
-    mSqlId = boxId;
-    callSqlInsertsAwaitingForBox(query, this, boxId);
-    if(mEffectsAnimators->hasChildAnimators()) {
-        mEffectsAnimators->saveToSql(query, boxId);
-    }
-    return boxId;
-}
-
-void BoundingBox::loadFromSql(const int &boundingBoxId) {
-    QSqlQuery query;
-    mSqlId = boundingBoxId;
-    QString queryStr = "SELECT * FROM boundingbox WHERE id = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr)) {
-        query.next();
-        int idName = query.record().indexOf("name");
-        int idTransformAnimatorId = query.record().indexOf("transformanimatorid");
-        int idPivotChanged = query.record().indexOf("pivotchanged");
-        int idVisible = query.record().indexOf("visible");
-        int idLocked = query.record().indexOf("locked");
-        int idBlendMode = query.record().indexOf("blendmode");
-        int idDurRectId = query.record().indexOf("durationrectid");
-
-        if(!query.value(idDurRectId).isNull()) {
-            if(mDurationRectangle == NULL) {
-                createDurationRectangle();
-            }
-            mDurationRectangle->loadFromSql(
-                        query.value(idDurRectId).toInt());
-        }
-
-        int transformAnimatorId = query.value(idTransformAnimatorId).toInt();
-        bool pivotChanged = query.value(idPivotChanged).toBool();
-        bool visible = query.value(idVisible).toBool();
-        bool locked = query.value(idLocked).toBool();
-        mBlendModeSk = static_cast<SkBlendMode>(
-                    query.value(idBlendMode).toInt());
-        mTransformAnimator->loadFromSql(transformAnimatorId);
-        mEffectsAnimators->loadFromSql(boundingBoxId);
-        mPivotChanged = pivotChanged;
-        mLocked = locked;
-        mVisible = visible;
-        prp_mName = query.value(idName).toString();
-
-        addLoadedBox(this);
-    } else {
-        qDebug() << "Could not load boundingbox with id " << boundingBoxId;
     }
 }
 

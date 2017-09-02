@@ -11,7 +11,6 @@
 
 class BoundingBox;
 class NodePoint;
-class QSqlQuery;
 
 class AnimatorUpdater;
 

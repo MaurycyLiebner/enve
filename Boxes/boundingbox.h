@@ -3,7 +3,6 @@
 #include <QMatrix>
 #include "transformable.h"
 #include "fillstrokesettings.h"
-#include <QSqlQuery>
 #include "Animators/transformanimator.h"
 
 #include "PixmapEffects/pixmapeffect.h"
@@ -16,7 +15,6 @@
 #include "boundingboxrendercontainer.h"
 #include "skiaincludes.h"
 #include "updatable.h"
-#include <QSqlError>
 
 class Canvas;
 
@@ -54,34 +52,13 @@ class VectorPath;
 class DurationRectangle;
 
 struct FunctionWaitingForBoxLoad {
-    FunctionWaitingForBoxLoad(const int &sqlBoxIdT) {
-        sqlBoxId = sqlBoxIdT;
+    FunctionWaitingForBoxLoad(const int &boxIdT) {
+        loadBoxId = boxIdT;
     }
     virtual ~FunctionWaitingForBoxLoad() {}
 
     virtual void boxLoaded(BoundingBox *box) = 0;
-    int sqlBoxId;
-};
-
-struct SqlInsertAwaitingBox {
-    SqlInsertAwaitingBox(const QString &sqlCommandT,
-                         BoundingBox *boxT) {
-        sqlCommand = sqlCommandT;
-        box = boxT;
-    }
-
-    int callComand(QSqlQuery *query,
-                    const int &boundingBoxSqlId) const {
-        if(!query->exec(sqlCommand.
-                    arg(boundingBoxSqlId)) ) {
-            qDebug() << query->lastError() << endl << query->lastQuery();
-        }
-
-        return query->lastInsertId().toInt();
-    }
-
-    QString sqlCommand;
-    BoundingBox *box;
+    int loadBoxId;
 };
 
 class BoundingBoxMimeData : public QMimeData {
@@ -236,8 +213,6 @@ public:
     void scale(const qreal &scaleXBy,
                const qreal &scaleYBy);
 
-    virtual int saveToSql(QSqlQuery *query, const int &parentId);
-
     virtual NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
                                                 const qreal &canvasScaleInv) {
@@ -318,7 +293,6 @@ public:
 
     virtual VectorPath *objectToPath() { return NULL; }
     virtual VectorPath *strokeToPath() { return NULL; }
-    virtual void loadFromSql(const int &boundingBoxId);
 
     void updatePrettyPixmap();
 
@@ -540,32 +514,13 @@ public:
         setBoxSaved(false);
     }
 
-    const int &getSqlId() {
-        return mSqlId;
+    const int &getLoadId() {
+        return mLoadId;
     }
 
-    static void callSqlInsertsAwaitingForBox(QSqlQuery *query,
-                                             BoundingBox *box,
-                                             const int &sqlId) {
-        for(int i = 0; i < mSqlInsertAwaitingBox.count(); i++) {
-            const SqlInsertAwaitingBox &sqlInsertT =
-                    mSqlInsertAwaitingBox.at(i);
-            if(sqlInsertT.box == box) {
-                sqlInsertT.callComand(query, sqlId);
-                mSqlInsertAwaitingBox.removeAt(i);
-            }
-            i--;
-        }
-    }
-
-    static void addSqlInsertAwaitingBox(const QString &command,
-                                        BoundingBox *box) {
-        mSqlInsertAwaitingBox.append(SqlInsertAwaitingBox(command, box));
-    }
-
-    static BoundingBox *getLoadedBoxById(const int &sqlId) {
+    static BoundingBox *getLoadedBoxById(const int &LoadId) {
         foreach(BoundingBox *box, mLoadedBoxes) {
-            if(box->getSqlId() == sqlId) {
+            if(box->getLoadId() == LoadId) {
                 return box;
             }
         }
@@ -581,7 +536,7 @@ public:
         for(int i = 0; i < mFunctionsWaitingForBoxLoad.count(); i++) {
             FunctionWaitingForBoxLoad *funcT =
                     mFunctionsWaitingForBoxLoad.at(i);
-            if(funcT->sqlBoxId == box->getSqlId()) {
+            if(funcT->loadBoxId == box->getLoadId()) {
                 funcT->boxLoaded(box);
                 delete funcT;
                 mFunctionsWaitingForBoxLoad.removeAt(i);
@@ -603,6 +558,8 @@ public:
     virtual void selectAllPoints(Canvas *canvas) {
         Q_UNUSED(canvas);
     }
+    virtual void writeBoundingBox(std::fstream *file);
+    virtual void readBoundingBox(std::fstream *file);
 protected:
     bool mBoxSaved = false;
     QList<std::shared_ptr<Updatable> > mSchedulers;
@@ -615,7 +572,7 @@ protected:
     bool mRenderCacheChangeNeeded = false;
     bool mReplaceCache = false;
 
-    int mSqlId = 0;
+    int mLoadId = 0;
 
     bool mBlockedSchedule = false;
 
@@ -671,7 +628,6 @@ protected:
     bool mVisible = true;
     bool mLocked = false;
 
-    static QList<SqlInsertAwaitingBox> mSqlInsertAwaitingBox;
     static QList<BoundingBox*> mLoadedBoxes;
     static QList<FunctionWaitingForBoxLoad*> mFunctionsWaitingForBoxLoad;
 

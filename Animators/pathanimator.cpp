@@ -4,7 +4,6 @@
 #include "undoredo.h"
 #include "edge.h"
 #include "skqtconversions.h"
-#include <QSqlRecord>
 #include "canvas.h"
 
 PathAnimator::PathAnimator() :
@@ -226,14 +225,6 @@ BoundingBox *PathAnimator::getParentBox() {
     return mParentBox;
 }
 
-int PathAnimator::saveToSql(QSqlQuery *query,
-                            const int &boundingBoxId) {
-    Q_FOREACH(VectorPathAnimator *singlePath, mSinglePaths) {
-        singlePath->saveToSql(query, boundingBoxId);
-    }
-    return 0;
-}
-
 void PathAnimator::makeDuplicate(Property *property) {
     duplicatePathsTo((PathAnimator*)property);
 }
@@ -242,10 +233,6 @@ Property *PathAnimator::makeDuplicate() {
     PathAnimator *newAnimator = new PathAnimator();
     makeDuplicate(newAnimator);
     return newAnimator;
-}
-
-void PathAnimator::loadFromSql(const int &boundingBoxId) {
-
 }
 
 void PathAnimator::duplicatePathsTo(PathAnimator *target) {

@@ -25,10 +25,6 @@ public:
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
 
-
-    //void loadPointsFromSql(int boundingBoxId);
-    void saveToSql(QSqlQuery *query,
-                   const int &boundingBoxId);
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);

@@ -27,56 +27,10 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     prp_setUpdater(new NodePointUpdater(this));
 }
 
-Rectangle::~Rectangle()
-{
+Rectangle::~Rectangle() {
 
 }
 
-#include <QSqlError>
-int Rectangle::saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::saveToSql(query, parentId);
-
-    int bottomRightPointId = mBottomRightPoint->saveToSql(query);
-    int topLeftPointId = mTopLeftPoint->saveToSql(query);
-    int radiusPointId = mRadiusPoint.saveToSql(query);
-
-    if(!query->exec(QString("INSERT INTO rectangle (boundingboxid, "
-                           "topleftpointid, bottomrightpointid, "
-                           "radiuspointid) "
-                "VALUES (%1, %2, %3, %4)").
-                arg(boundingBoxId).
-                arg(topLeftPointId).
-                arg(bottomRightPointId).
-                arg(radiusPointId)) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return boundingBoxId;
-}
-
-void Rectangle::loadFromSql(const int &boundingBoxId) {
-    PathBox::loadFromSql(boundingBoxId);
-
-    QSqlQuery query;
-    QString queryStr = "SELECT * FROM rectangle WHERE boundingboxid = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        int idBottomRightPointId = query.record().indexOf("bottomrightpointid");
-        int idTopLeftPointId = query.record().indexOf("topleftpointid");
-        int idRadiusPointId = query.record().indexOf("radiuspointid");
-
-        int bottomRightPointId = query.value(idBottomRightPointId).toInt();
-        int topLeftPointId = query.value(idTopLeftPointId).toInt();
-        int radiusPointId = query.value(idRadiusPointId).toInt();
-
-        mBottomRightPoint->loadFromSql(bottomRightPointId);
-        mTopLeftPoint->loadFromSql(topLeftPointId);
-        mRadiusPoint.loadFromSql(radiusPointId);
-    } else {
-        qDebug() << "Could not load rectangle with id " << boundingBoxId;
-    }
-}
 
 void Rectangle::duplicateRectanglePointsFrom(
         RectangleTopLeftPoint *topLeftPoint,

@@ -74,6 +74,8 @@ public:
     bool SWT_isBasicTransformAnimator() { return true; }
 
     QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
+    void writeBasicTransformAnimator(std::fstream *file);
+    void readBasicTransformAnimator(std::fstream *file);
 protected:
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;
@@ -117,9 +119,6 @@ public:
 
     void setPivot(const QPointF &point,
                   const bool &finish = false);
-    int saveToSql(QSqlQuery *query,
-                      const int &parentId = 0);
-    void loadFromSql(const int &transformAnimatorId);
 
     void makeDuplicate(BoxTransformAnimator *target);
     Property *makeDuplicate() {
@@ -139,6 +138,8 @@ public:
     qreal getOpacityAtRelFrame(const int &relFrame);
 
     bool rotOrScaleOrPivotRecording();
+    void writeBoxTransformAnimator(std::fstream *file);
+    void readBoxTransformAnimator(std::fstream *file);
 private:
     QSharedPointer<PointAnimator> mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;

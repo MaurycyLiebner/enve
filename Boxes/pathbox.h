@@ -79,8 +79,6 @@ public:
     void updateDrawGradients();
 
     void setOutlineAffectedByScale(const bool &bT);
-    int saveToSql(QSqlQuery *query, const int &parentId);
-    void loadFromSql(const int &boundingBoxId);
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 
@@ -139,6 +137,8 @@ public:
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 protected:
 
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;

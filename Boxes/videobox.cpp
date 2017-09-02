@@ -20,38 +20,6 @@ VideoBox::VideoBox(const QString &filePath) :
     setFilePath(filePath);
 }
 
-#include <QSqlError>
-int VideoBox::saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
-
-    if(!query->exec(QString("INSERT INTO videobox (boundingboxid, "
-                           "srcfilepath) "
-                "VALUES (%1, '%2')").
-                    arg(boundingBoxId).
-                    arg(mSrcFilePath) ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return boundingBoxId;
-}
-
-
-void VideoBox::loadFromSql(const int &boundingBoxId) {
-    BoundingBox::loadFromSql(boundingBoxId);
-
-    QSqlQuery query;
-    QString queryStr = "SELECT * FROM videobox WHERE boundingboxid = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        int videoFilePathId = query.record().indexOf("srcfilepath");
-
-        setFilePath(query.value(videoFilePathId).toString());
-    } else {
-        qDebug() << "Could not load videobox with id " << boundingBoxId;
-    }
-}
-
 void VideoBox::setParent(BoxesGroup *parent) {
     if(mParent != NULL && mSound != NULL) {
         getParentCanvas()->getSoundComposition()->removeSound(mSound);

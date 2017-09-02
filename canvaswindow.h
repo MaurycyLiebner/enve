@@ -23,7 +23,6 @@ class ImageBox;
 class SingleSound;
 class VideoBox;
 
-#include <QSqlQuery>
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow,
@@ -85,7 +84,6 @@ public:
     void clearAll();
     void createAnimationBoxForPaths(const QStringList &importPaths);
     void createLinkToFileWithPath(const QString &path);
-    void saveToSql(QSqlQuery *query);
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
@@ -95,8 +93,6 @@ public:
             ScrollWidgetVisiblePart *visiblePartWidget);
     ImageBox *createImageForPath(const QString &path);
     SingleSound *createSoundForPath(const QString &path);
-    Canvas *loadCanvasesFromSql();
-    void saveCanvasesToSql(QSqlQuery *query);
     void updateHoveredElements();
 
     void switchLocalPivot();
@@ -145,6 +141,8 @@ public:
     void processSchedulers();
     bool noBoxesAwaitUpdate();
     void afterAllSavesFinished();
+    void writeCanvases(std::fstream *file);
+    void readCanvases(std::fstream *file);
 protected:
     RenderInstanceSettings *mCurrentRenderSettings = NULL;
     QList<int> mFreeThreads;

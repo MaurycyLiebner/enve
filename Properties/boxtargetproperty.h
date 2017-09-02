@@ -9,7 +9,7 @@ class BoxTargetProperty;
 
 #include "Boxes/boundingbox.h"
 struct SumPathEffectForBoxLoad : public FunctionWaitingForBoxLoad {
-    SumPathEffectForBoxLoad(const int &sqlBoxIdT,
+    SumPathEffectForBoxLoad(const int &boxIdT,
                             BoxTargetProperty *targetPropertyT);
 
     void boxLoaded(BoundingBox *box);
@@ -26,14 +26,8 @@ public:
 
     void makeDuplicate(Property *property);
     Property *makeDuplicate();
-//    int saveToSql(QSqlQuery *query,
-//                      const int &parentId) {}
-//    void loadFromSql(const int &identifyingId) {}
 
     bool SWT_isBoxTargetProperty() { return true; }
-
-    int saveToSql(QSqlQuery *query);
-    void loadFromSql(const int &identifyingId);
 private:
     QWeakPointer<BoundingBox> mTarget;
 };

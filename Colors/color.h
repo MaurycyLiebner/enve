@@ -1,8 +1,6 @@
 #ifndef COLOR_H
 #define COLOR_H
 #include <QColor>
-#include <QSqlQuery>
-#include <QSqlRecord>
 #include "skiaincludes.h"
 
 class Color

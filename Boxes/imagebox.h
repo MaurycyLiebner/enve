@@ -60,9 +60,6 @@ public:
                                                BoundingBoxRenderData *data);
 
     BoundingBoxRenderData *createRenderData();
-
-    void loadFromSql(const int &boundingBoxId);
-    int saveToSql(QSqlQuery *query, const int &parentId);
 private:
     ImageCacheHandler *mImgCacheHandler = NULL;
     QString mImageFilePath;

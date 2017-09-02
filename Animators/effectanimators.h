@@ -23,8 +23,6 @@ public:
 
     qreal getEffectsMargin() const;
 
-    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-    void loadFromSql(const int &boundingBoxSqlId);
     void setParentBox(BoundingBox *box);
     BoundingBox *getParentBox() {
         return mParentBox;
@@ -42,6 +40,9 @@ public:
 
     void addEffectRenderDataToList(const int &relFrame,
             QList<PixmapEffectRenderData*> *pixmapEffects);
+
+    void writeEffectAnimators(std::fstream *file);
+    void readEffectAnimators(std::fstream *file);
 private:
     BoundingBox *mParentBox;
 };

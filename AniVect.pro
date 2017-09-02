@@ -189,7 +189,8 @@ SOURCES += main.cpp\
     Animators/PathAnimators/pathkey.cpp \
     Animators/PathAnimators/vectorpathanimator.cpp \
     pointanimator.cpp \
-    nodepoint.cpp
+    nodepoint.cpp \
+    avfileio.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -339,7 +340,8 @@ HEADERS  += mainwindow.h \
     Animators/PathAnimators/pathkey.h \
     Animators/PathAnimators/vectorpathanimator.h \
     pointanimator.h \
-    nodepoint.h
+    nodepoint.h \
+    avfileio.h
 
 RESOURCES += \
     resources.qrc

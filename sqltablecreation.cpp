@@ -1,7 +1,7 @@
 #include "mainwindow.h"
+#include <QSqlQuery>
 
-
-void MainWindow::createTablesInSaveDatabase(QSqlQuery *query) {
+void createTablesInSaveDatabase(QSqlQuery *query) {
     query->exec("CREATE TABLE qrealanimator "
                "(id INTEGER PRIMARY KEY,"
                "currentvalue REAL )");

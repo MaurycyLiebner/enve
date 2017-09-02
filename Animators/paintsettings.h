@@ -63,7 +63,7 @@ private:
 };
 
 class Gradient;
-class PaintSetting{
+class PaintSetting {
 public:
     PaintSetting(const bool &targetFillSettings,
                  const ColorSetting &colorSetting);
@@ -95,9 +95,6 @@ public:
                   const PaintType &paintTypeT,
                   Gradient *gradientT = NULL);
 
-    int saveToSql(QSqlQuery *query,
-                      const int &parentId = 0);
-
     Color getCurrentColor() const;
 
     PaintType getPaintType() const;
@@ -116,7 +113,6 @@ public:
 
     void setGradientPoints(GradientPoints *gradientPoints);
 
-    void loadFromSql(const int &sqlId);
     void setPaintPathTarget(PathBox *path);
 
     void makeDuplicate(Property *target);
@@ -137,6 +133,8 @@ public:
         mGradientLinear = linear;
     }
 
+    void writePaintSettings(std::fstream *file);
+    void readPaintSettings(std::fstream *file);
 private:
     bool mGradientLinear = true;
     PathBox *mTarget;
@@ -155,12 +153,6 @@ public:
 
     Gradient(const Color &color1,
              const Color &color2);
-
-    Gradient(const int &sqlIdT);
-
-    int saveToSql(QSqlQuery *query, const int &parentId = 0);
-
-    void saveToSqlIfPathSelected(QSqlQuery *query);
 
     void swapColors(const int &id1, const int &id2,
                     const bool &saveUndoRedo = true);
@@ -189,8 +181,8 @@ public:
 
     void updateQGradientStops();
 
-    int getSqlId();
-    void setSqlId(const int &id);
+    int getLoadId();
+    void setLoadId(const int &id);
 
     void addColorToList(const Color &color,
                         const bool &saveUndoRedo = true);
@@ -232,10 +224,13 @@ public:
         return 0;
     }
     QGradientStops getQGradientStopsAtAbsFrame(const int &absFrame);
+    void writeGradient(std::fstream *file);
+    void readGradient(std::fstream *file);
+
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
 private:
-    int mSqlId = -1;
+    int mLoadId = -1;
     QGradientStops mQGradientStops;
     QList<ColorAnimator*> mColors;
     QList<PathBox*> mAffectedPaths;
@@ -283,12 +278,6 @@ public:
     StrokeSettings(const Color &colorT,
                    const PaintType &paintTypeT,
                    Gradient *gradientT = NULL);
-//    StrokeSettings(const int &strokeSqlId,
-//                   const int &paintSqlId,
-//                   GradientWidget *gradientWidget);
-
-    int saveToSql(QSqlQuery *query,
-                      const int &parentId = 0);
 
     void setCurrentStrokeWidth(const qreal &newWidth);
 
@@ -313,7 +302,6 @@ public:
     QPainter::CompositionMode getOutlineCompositionMode();
 
     void setLineWidthUpdaterTarget(PathBox *path);
-    void loadFromSql(const int &strokeSqlId);
     bool nonZeroLineWidth();
 
     void makeDuplicate(Property *target);
@@ -325,6 +313,8 @@ public:
     bool SWT_isStrokeSettings() { return true; }
     void setStrokerSettingsForRelFrameSk(const int &relFrame,
                                          SkStroke *stroker);
+    void writeStrokeSettings(std::fstream *file);
+    void readStrokeSettings(std::fstream *file);
 private:
     QSharedPointer<QrealAnimator> mLineWidth =
             (new QrealAnimator())->ref<QrealAnimator>();

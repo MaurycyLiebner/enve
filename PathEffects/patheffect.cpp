@@ -5,23 +5,8 @@ PathEffect::PathEffect(const PathEffectType &type) {
     mPathEffectType = type;
 }
 
-int PathEffect::saveToSql(QSqlQuery *query,
-                          const int &boundingBoxSqlId,
-                          const bool &outline) {
-    if(!query->exec(
-        QString("INSERT INTO patheffect (boundingboxid, type, outline) "
-                "VALUES (%1, %2, %3)").
-                arg(boundingBoxSqlId).
-                arg(mPathEffectType).
-                arg(boolToSql(outline))) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return query->lastInsertId().toInt();
-}
-
 DisplacePathEffect::DisplacePathEffect() :
-    PathEffect(DISCRETE_PATH_EFFECT) {
+    PathEffect(DISPLACE_PATH_EFFECT) {
     prp_setName("discrete effect");
 
     mSegLength->prp_setName("segment length");
@@ -401,37 +386,4 @@ void SumPathEffect::filterPathForRelFrame(const int &relFrame,
     targetPath.generateSinglePathPaths();
 
     *dst = QPainterPathToSkPath(targetPath.getPath());
-}
-
-int SumPathEffect::saveToSql(QSqlQuery *query,
-                             const int &boundingBoxSqlId,
-                             const bool &outline) {
-    int pathEffectId = PathEffect::saveToSql(query,
-                                             boundingBoxSqlId,
-                                             outline);
-    int boxTargetId = mBoxTarget->saveToSql(query);
-
-    if(!query->exec(
-                QString("INSERT INTO sumpatheffect "
-                        "(patheffectid, boxtargetid) "
-                        "VALUES (%1, %2)").
-                arg(pathEffectId).
-                arg(boxTargetId) ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return query->lastInsertId().toInt();
-}
-
-void SumPathEffect::loadFromSql(const int &pathEffectId) {
-    QSqlQuery query;
-
-    QString queryStr = "SELECT * FROM sumpatheffect WHERE patheffectid = " +
-            QString::number(pathEffectId);
-    if(query.exec(queryStr)) {
-        query.next();
-        mBoxTarget->loadFromSql(query.value("boxtargetid").toInt());
-    } else {
-        qDebug() << "Could not load sumpatheffect with id " << pathEffectId;
-    }
 }

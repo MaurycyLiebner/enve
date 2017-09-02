@@ -17,58 +17,6 @@ TextBox::TextBox() :
     ca_addChildAnimator(mText.data());
 }
 
-#include <QSqlError>
-int TextBox::saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::saveToSql(query, parentId);
-
-    int textId = mText->saveToSql(query, parentId);
-
-    if(!query->exec(QString("INSERT INTO textbox (boundingboxid, "
-                           "stringanimatorid, fontfamily, fontstyle, fontsize) "
-                "VALUES ('%1', '%2', '%3', '%4', %5)").
-                arg(boundingBoxId).
-                arg(textId).
-                arg(mFont.family()).
-                arg(mFont.style()).
-                arg(mFont.pointSizeF()) ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return boundingBoxId;
-}
-
-void TextBox::loadFromSql(const int &boundingBoxId) {
-    PathBox::loadFromSql(boundingBoxId);
-
-    QSqlQuery query;
-    QString queryStr = "SELECT * FROM textbox WHERE boundingboxid = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        int idText = query.record().indexOf("stringanimatorid");
-        int idFontFamily = query.record().indexOf("fontfamily");
-        int idFontStyle = query.record().indexOf("fontstyle");
-        int idFontSize = query.record().indexOf("fontsize");
-
-        setSelectedFontFamilyAndStyle(query.value(idFontFamily).toString(),
-                                      query.value(idFontStyle).toString() );
-        setSelectedFontSize(query.value(idFontSize).toReal());
-        mText->loadFromSql(query.value(idText).toInt());
-    } else {
-        qDebug() << "Could not load vectorpath with id " << boundingBoxId;
-    }
-}
-
-
-//#include <QApplication>
-//#include <QDesktopWidget>
-//QRectF TextBox::getTextRect() {
-//    QFontMetrics fm(mFont);
-//    QRectF rect = fm.boundingRect(QApplication::desktop()->geometry(),
-//                           mAlignment, mText);
-//    return rect.translated(QPointF(0., -fm.height()));
-//}
-
 #include <QApplication>
 #include <QDesktopWidget>
 

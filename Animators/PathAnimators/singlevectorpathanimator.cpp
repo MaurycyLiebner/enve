@@ -31,52 +31,6 @@ void SingleVectorPathAnimator::drawSelected(SkCanvas *canvas,
     }
 }
 
-//void SingleVectorPathAnimator::loadPointsFromSql(int boundingBoxId) {
-//    QSqlQuery query;
-//    QString queryStr = QString("SELECT id, isfirst, isendpoint, qpointfanimatorid "
-//                               "FROM NodePoint WHERE boundingboxid = %1 "
-//                               "ORDER BY id ASC").arg(boundingBoxId);
-//    if(query.exec(queryStr) ) {
-//        int idisfirst = query.record().indexOf("isfirst");
-//        int idisendpoint = query.record().indexOf("isendpoint");
-//        int idqpointfanimatorid = query.record().indexOf("qpointfanimatorid");
-//        int idId = query.record().indexOf("id");
-//        NodePoint *firstPoint = NULL;
-//        NodePoint *lastPoint = NULL;
-//        while(query.next()) {
-//            int id = query.value(idId).toInt();
-//            bool isfirst = query.value(idisfirst).toBool();
-//            bool isendpoint = query.value(idisendpoint).toBool();
-//            int qpointfanimatorid = query.value(idqpointfanimatorid).toInt();
-
-//            NodePoint *newPoint = new NodePoint(this);
-//            newPoint->loadFromSql(id, qpointfanimatorid);
-//            appendToPointsList(newPoint, false);
-//            if(lastPoint != NULL) {
-//                if(isfirst && firstPoint != NULL) {
-//                    lastPoint->setPointAsNext(firstPoint, false);
-//                } else if(!isfirst) {
-//                    lastPoint->setPointAsNext(newPoint, false);
-//                }
-//            }
-//            if(isfirst) {
-//                addPointToSeparatePaths(newPoint, false);
-//                if(isendpoint) {
-//                    firstPoint = NULL;
-//                } else {
-//                    firstPoint = newPoint;
-//                }
-//            }
-//            lastPoint = newPoint;
-//        }
-//        if(lastPoint != NULL && firstPoint != NULL) {
-//            lastPoint->setPointAsNext(firstPoint, false);
-//        }
-//    } else {
-//        qDebug() << "Could not load points for vectorpath with id " << boundingBoxId;
-//    }
-//}
-
 void SingleVectorPathAnimator::changeAllPointsParentPathTo(
         SingleVectorPathAnimator *path) {
     replaceSeparateNodePoint(NULL);
@@ -309,12 +263,6 @@ void SingleVectorPathAnimator::selectAllPoints(Canvas *canvas) {
         canvas->addPointToSelection(point.data());
     }
 }
-
-void SingleVectorPathAnimator::saveToSql(QSqlQuery *query,
-                                         const int &boundingBoxId) {
-    //mFirstPoint->saveToSql(query, boundingBoxId);
-}
-
 
 void SingleVectorPathAnimator::updateNodePointIds() {
     if(mFirstPoint == NULL) return;

@@ -10,8 +10,6 @@
 #include <QDebug>
 #include <QTimer>
 #include <QPainterPathStroker>
-#include <QSqlQuery>
-#include <QSqlRecord>
 #include <QLabel>
 #include <QHBoxLayout>
 #include "Animators/coloranimator.h"
@@ -34,11 +32,9 @@ public:
     void updateAfterTargetChanged();
     void setCurrentPaintType(const PaintType &paintType);
 
-    void saveGradientsToQuery(QSqlQuery *query);
     GradientWidget *getGradientWidget();
 
     void clearAll();
-    void saveGradientsToSqlIfPathSelected(QSqlQuery *query);
     void setFillValuesFromFillSettings(PaintSettings *settings);
     void setStrokeValuesFromStrokeSettings(StrokeSettings *settings);
 

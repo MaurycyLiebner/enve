@@ -20,8 +20,6 @@ public:
     QString getFontStyle();
 
     void openTextEditor(const bool &saveUndoRedo = true);
-    int saveToSql(QSqlQuery *query, const int &parentId);
-    void loadFromSql(const int &boundingBoxId);
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,
                              const qreal &canvasScaleInv);

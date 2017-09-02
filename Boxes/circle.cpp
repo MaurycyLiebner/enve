@@ -37,48 +37,6 @@ Circle::Circle() :
                 new NodePointUpdater(this));
 }
 
-
-#include <QSqlError>
-int Circle::saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::saveToSql(query, parentId);
-
-    int horizontalRadiusPointId = mHorizontalRadiusPoint->saveToSql(query);
-    int verticalRadiusPointId = mVerticalRadiusPoint->saveToSql(query);
-
-    if(!query->exec(QString("INSERT INTO circle (boundingboxid, "
-                           "horizontalradiuspointid, verticalradiuspointid) "
-                "VALUES (%1, %2, %3)").
-                arg(boundingBoxId).
-                arg(horizontalRadiusPointId).
-                arg(verticalRadiusPointId) ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return boundingBoxId;
-}
-
-
-void Circle::loadFromSql(const int &boundingBoxId) {
-    PathBox::loadFromSql(boundingBoxId);
-
-    QSqlQuery query;
-    QString queryStr = "SELECT * FROM circle WHERE boundingboxid = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        int idHorizontalRadiusPointId = query.record().indexOf("horizontalradiuspointid");
-        int idVerticalRadiusPointId = query.record().indexOf("verticalradiuspointid");
-
-        int horizontalRadiusPointId = query.value(idHorizontalRadiusPointId).toInt();
-        int verticalRadiusPointId = query.value(idVerticalRadiusPointId).toInt();
-
-        mHorizontalRadiusPoint->loadFromSql(horizontalRadiusPointId);
-        mVerticalRadiusPoint->loadFromSql(verticalRadiusPointId);
-    } else {
-        qDebug() << "Could not load circle with id " << boundingBoxId;
-    }
-}
-
 void Circle::duplicateCirclePointsFrom(
         CircleCenterPoint *center,
         CircleRadiusPoint *horizontalRadiusPoint,

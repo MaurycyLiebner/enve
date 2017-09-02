@@ -1,69 +1,22 @@
 #include "patheffectanimators.h"
 #include "patheffect.h"
-#include "Boxes/boundingbox.h"
-#include <QSqlError>
+#include "Boxes/pathbox.h"
 #include <QDebug>
 
-PathEffectAnimators::PathEffectAnimators(PathBox *parentPath) :
+PathEffectAnimators::PathEffectAnimators(const bool &isOutline,
+                                         PathBox *parentPath) :
     ComplexAnimator() {
+    mIsOutline = isOutline;
     mParentPath = parentPath;
 }
 
-//void PathEffectAnimators::addPathEffect(PathEffect *effect) {
-//    mParentBox->addPathEffect(effect);
-//}
-
-int PathEffectAnimators::saveToSql(QSqlQuery *query,
-                                   const int &boundingBoxSqlId,
-                                   const bool &outline) {
-    Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PathEffect*)effect.data())->saveToSql(query,
-                                                boundingBoxSqlId,
-                                                outline);
-    }
-    return boundingBoxSqlId;
-}
-#include "pointhelpers.h"
-void PathEffectAnimators::loadFromSql(const int &boundingBoxSqlId,
-                                      const bool &outline) {
-    QSqlQuery query;
-    QString queryStr;
-    queryStr = "SELECT * FROM patheffect WHERE boundingboxid = " +
-               QString::number(boundingBoxSqlId) +
-               " AND outline = " + boolToSql(outline);
-    if(query.exec(queryStr) ) {
-        int idId = query.record().indexOf("id");
-        int typeId = query.record().indexOf("type");
-
-        while(query.next() ) {
-            PathEffectType typeT = static_cast<PathEffectType>(
-                                            query.value(typeId).toInt());
-            PathEffect *effect;
-            if(typeT == DISCRETE_PATH_EFFECT) {
-                effect = new DisplacePathEffect();
-            } /*else if(typeT == DASH_PATH_EFFECT) {
-                effect = new dashpat();
-            } */else if(typeT == DUPLICATE_PATH_EFFECT) {
-                effect = new DuplicatePathEffect();
-            } else if(typeT == SUM_PATH_EFFECT) {
-                effect = new SumPathEffect(mParentPath);
-            } else {
-                continue;
-            }
-            effect->loadFromSql(query.value(idId).toInt());
-            ca_addChildAnimator(effect);
-        }
+void PathEffectAnimators::addEffect(PathEffect *effect) {
+    if(mIsOutline) {
+        mParentPath->addOutlinePathEffect(effect);
     } else {
-        qDebug() << query.lastError() << endl << query.lastQuery();
+        mParentPath->addPathEffect(effect);
     }
 }
-
-//void PathEffectAnimators::applyEffectsSk(SkPaint *paint) {
-//    updatePathEffectsSum();
-//    if(hasEffects()) {
-//        paint->setPathEffect(mPathEffectsSum);
-//    }
-//}
 
 bool PathEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();

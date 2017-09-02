@@ -21,10 +21,6 @@ public:
     virtual MovablePoint *getPointAtAbsPos(const QPointF &,
                                          const CanvasMode &,
                                          const qreal &) { return NULL; }
-    virtual void saveToSql(QSqlQuery *query,
-                           const int &boundingBoxId) = 0;
-
-    //void loadPointsFromSql(int boundingBoxId);
     virtual NodePoint *createNewPointOnLineNear(const QPointF &,
                                                 const bool &,
                                                 const qreal &) { return NULL; }

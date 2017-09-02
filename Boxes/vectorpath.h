@@ -16,7 +16,6 @@ class VectorPathEdge;
 class VectorPath : public PathBox {
 public:
     VectorPath();
-    static VectorPath *createPathFromSql(int boundingBoxId);
 
     ~VectorPath();
 
@@ -24,13 +23,10 @@ public:
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
 
-    int saveToSql(QSqlQuery *query, const int &parentId);
 
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
-
-    virtual void loadFromSql(const int &boundingBoxId);
 
     void applyCurrentTransformation();
     VectorPathEdge *getEdge(const QPointF &absPos,
@@ -52,10 +48,10 @@ public:
     SkPath getPathAtRelFrame(const int &relFrame);
 
     void selectAllPoints(Canvas *canvas);
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 protected:
     PathAnimatorQSPtr mPathAnimator;
-
-    void loadPointsFromSql(int boundingBoxId);
 };
 
 #endif // VECTORPATH_H

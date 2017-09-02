@@ -61,10 +61,6 @@ public:
                                            QList<MovablePoint *> *list);
     void moveRadiusesByAbs(const QPointF &absTrans);
 
-    int saveToSql(QSqlQuery *query,
-                      const int &parentId);
-    void loadFromSql(const int &boundingBoxId);
-
     BoundingBox *createNewDuplicate() {
         return new Circle();
     }

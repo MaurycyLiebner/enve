@@ -6,8 +6,6 @@
 #include <QToolBar>
 #include "updatescheduler.h"
 #include "Colors/ColorWidgets/colorsettingswidget.h"
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlQuery>
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -78,7 +76,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     mUndoRedoStack.setWindow(this);
     setCurrentPath("");
-    QSqlDatabase::addDatabase("QSQLITE");
 
     mRightDock = new QDockWidget(this);
     mFillStrokeSettings = new FillStrokeSettingsWidget(this);
@@ -1283,74 +1280,58 @@ void MainWindow::redo() {
     callUpdateSchedulers();
 }
 
-void MainWindow::setCurrentFrameForAllWidgets(int frame)
-{
+void MainWindow::setCurrentFrameForAllWidgets(const int &frame) {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
 }
-
-void MainWindow::loadAVFile(QString path) {
-    QSqlDatabase db = QSqlDatabase::database();//not dbConnection
-    db.setDatabaseName(path);
-    db.open();
-
-    loadAllGradientsFromSql();
-
-    mCanvasWindow->loadCanvasesFromSql();
+#include <fstream>
+void MainWindow::loadAVFile(const QString &path) {
+    GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
+    std::fstream file(path.toUtf8().data(), std::ios_base::in);
+    gradientWidget->readGradients(&file);
+    mCanvasWindow->readCanvases(&file);
 
     clearLoadedGradientsList();
-    db.close();
+    gradientWidget->clearGradientsLoadIds();
+
+    file.close();
 }
 
-Gradient *MainWindow::getLoadedGradientBySqlId(const int &id) {
+Gradient *MainWindow::getLoadedGradientById(const int &id) {
     Q_FOREACH(Gradient *gradient, mLoadedGradientsList) {
-        if(gradient->getSqlId() == id) {
+        if(gradient->getLoadId() == id) {
             return gradient;
         }
     }
     return NULL;
 }
 
-void MainWindow::loadAllGradientsFromSql() {
-    QSqlQuery query;
-    QString queryStr = QString("SELECT * FROM gradient");
-    if(query.exec(queryStr) ) {
-        int idId = query.record().indexOf("id");
-        while(query.next() ) {
-            Gradient *gradT = new Gradient(query.value(idId).toInt());
-            mLoadedGradientsList << gradT;
-            mFillStrokeSettings->getGradientWidget()->addGradientToList(gradT);
-        }
-    } else {
-        qDebug() << "Could not load gradients";
-    }
-}
-
 void MainWindow::clearLoadedGradientsList() {
     mLoadedGradientsList.clear();
 }
 
-void MainWindow::saveToFile(QString path) {
+void MainWindow::addLoadedGradient(Gradient *gradient) {
+    mLoadedGradientsList << gradient;
+}
+
+void MainWindow::saveToFile(const QString &path) {
     disable();
     QFile file(path);
     if(file.exists()) {
         file.remove();
     }
 
-    QSqlDatabase db = QSqlDatabase::database();
-    db.setDatabaseName(path);
-    db.open();
+    GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
+    std::fstream fileS(path.toUtf8().data(), std::ios_base::out);
+    gradientWidget->setGradientLoadIds();
+    gradientWidget->writeGradients(&fileS);
+    mCanvasWindow->writeCanvases(&fileS);
 
-    QSqlQuery query;
-    createTablesInSaveDatabase(&query);
+    clearLoadedGradientsList();
+    gradientWidget->clearGradientsLoadIds();
 
-    query.exec("BEGIN TRANSACTION");
+    fileS.close();
 
-    mFillStrokeSettings->saveGradientsToQuery(&query);
-    mCanvasWindow->saveCanvasesToSql(&query);
     mCanvasWindow->afterAllSavesFinished();
-
-    query.exec("COMMIT TRANSACTION");
-    db.close();
 
     enable();
 }

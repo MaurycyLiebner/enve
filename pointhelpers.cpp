@@ -95,10 +95,6 @@ QPointF scalePointToNewLen(QPointF point, qreal newLen) {
     return point * newLen / pointToLen(point);
 }
 
-QString boolToSql(bool bT) {
-    return (bT) ? "1" : "0";
-}
-
 void getCtrlsSymmetricPos(QPointF endPos, QPointF startPos,
                           QPointF centerPos,
                           QPointF *newEndPos, QPointF *newStartPos) {

@@ -13,13 +13,15 @@
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
-            (new PathEffectAnimators(this))->ref<PathEffectAnimators>();
+            (new PathEffectAnimators(false, this))->
+            ref<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setBlockedUpdater(
                 new NodePointUpdater(this));
 
     mOutlinePathEffectsAnimators =
-            (new PathEffectAnimators(this))->ref<PathEffectAnimators>();
+            (new PathEffectAnimators(true, this))->
+            ref<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
                 new NodePointUpdater(this));
@@ -116,72 +118,6 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
                     mStrokeGradientPoints->getStartPointAtRelFrame(relFrame),
                     mStrokeGradientPoints->getEndPointAtRelFrame(relFrame),
                     mStrokeSettings->getGradientLinear());
-    }
-}
-
-#include <QSqlError>
-int PathBox::saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = BoundingBox::saveToSql(query, parentId);
-
-    int fillPts = mFillGradientPoints->saveToSql(query);
-    int strokePts = mStrokeGradientPoints->saveToSql(query);
-
-    mPathEffectsAnimators->saveToSql(query, boundingBoxId, false);
-    mOutlinePathEffectsAnimators->saveToSql(query, boundingBoxId, true);
-    int fillSettingsId = mFillSettings->saveToSql(query);
-    int strokeSettingsId = mStrokeSettings->saveToSql(query);
-    if(!query->exec(
-            QString(
-            "INSERT INTO pathbox (fillgradientpointsid, "
-            "strokegradientpointsid, "
-            "boundingboxid, fillsettingsid, strokesettingsid) "
-            "VALUES (%1, %2, %3, %4, %5)").
-            arg(fillPts).
-            arg(strokePts).
-            arg(boundingBoxId).
-            arg(fillSettingsId).
-            arg(strokeSettingsId)) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-
-    return boundingBoxId;
-}
-
-void PathBox::loadFromSql(const int &boundingBoxId) {
-    BoundingBox::loadFromSql(boundingBoxId);
-    QSqlQuery query;
-    QString queryStr = "SELECT * FROM pathbox WHERE boundingboxid = " +
-            QString::number(boundingBoxId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        int idfillgradientpointsid =
-                query.record().indexOf("fillgradientpointsid");
-        int idstrokegradientpointsid =
-                query.record().indexOf("strokegradientpointsid");
-        int idfillsettingsid =
-                query.record().indexOf("fillsettingsid");
-        int idstrokesettingsid =
-                query.record().indexOf("strokesettingsid");
-
-        int fillGradientPointsId =
-                query.value(idfillgradientpointsid).toInt();
-        int strokeGradientPointsId =
-                query.value(idstrokegradientpointsid).toInt();
-        int fillSettingsId =
-                query.value(idfillsettingsid).toInt();
-        int strokeSettingsId =
-                query.value(idstrokesettingsid).toInt();
-
-        mFillGradientPoints->loadFromSql(fillGradientPointsId);
-        mStrokeGradientPoints->loadFromSql(strokeGradientPointsId);
-
-        mFillSettings->loadFromSql(fillSettingsId);
-        mStrokeSettings->loadFromSql(strokeSettingsId);
-
-        mPathEffectsAnimators->loadFromSql(boundingBoxId, false);
-        mOutlinePathEffectsAnimators->loadFromSql(boundingBoxId, true);
-    } else {
-        qDebug() << "Could not load vectorpath with id " << boundingBoxId;
     }
 }
 

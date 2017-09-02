@@ -11,13 +11,7 @@ ExternalLinkBox::ExternalLinkBox() :
 }
 
 void ExternalLinkBox::reload() {
-    QSqlDatabase db = QSqlDatabase::database();//not dbConnection
-    db.setDatabaseName(mSrc);
-    db.open();
 
-    loadChildrenFromSql(0, false);
-
-    db.close();
 
     scheduleUpdate();
 }

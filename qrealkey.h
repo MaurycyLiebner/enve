@@ -76,8 +76,6 @@ public:
                   const bool &callUpdater = true);
 
     CtrlsMode getCtrlsMode();
-    int saveToSql(const int &parentAnimatorSqlId);
-    void loadFromSql(const int &keyId);
 
     virtual void copyToContainer(KeysClipboardContainer *container);
 
@@ -95,6 +93,8 @@ public:
 
     void startValueTransform();
     void finishValueTransform();
+    void writeQrealKey(std::fstream *file);
+    void readQrealKey(std::fstream *file);
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 

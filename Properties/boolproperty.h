@@ -13,6 +13,8 @@ public:
     Property *makeDuplicate();
 
     bool SWT_isBoolProperty() { return true; }
+    void writeBoolProperty(std::fstream *file);
+    void readBoolProperty(std::fstream *file);
 public slots:
     void setValue(const bool &value);
 private:

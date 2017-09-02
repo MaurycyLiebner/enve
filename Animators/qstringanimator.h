@@ -14,12 +14,9 @@ public:
 
     const QString &getText() { return mText; }
     void setText(const QString &text) { mText = text; }
-    int saveToSql(const int &parentAnimatorSqlId);
-    void loadFromSql(const int &keyId);
-
-    static QStringKey *qStringKeyFromSql(const int &keyId,
-                                         QStringAnimator *animator);
     QStringKey *makeDuplicate(QStringAnimator *anim);
+    void writeQStringKey(std::fstream *file);
+    void readQStringKey(std::fstream *file);
 private:
     QString mText;
 };
@@ -37,13 +34,13 @@ public:
     bool SWT_isQStringAnimator() { return true; }
     QString getTextValueAtRelFrame(const int &relFrame);
     void anim_saveCurrentValueAsKey();
-    void loadKeysFromSql(const int &qrealAnimatorId);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                               const int &relFrame);
-    void loadFromSql(const int &qstringAnimatorId);
-    int saveToSql(QSqlQuery *query, const int &parentId);
+
     void makeDuplicate(QStringAnimator *anim);
+    void writeQStringAnimator(std::fstream *file);
+    void readQStringAnimator(std::fstream *file);
 private:
 
     QString mCurrentText;

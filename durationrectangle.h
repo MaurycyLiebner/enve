@@ -3,8 +3,6 @@
 #include <QtCore>
 #include <QPainter>
 #include <QObject>
-#include <QSqlQuery>
-
 
 class DurationRectangleMovable : public QObject {
     Q_OBJECT
@@ -92,8 +90,8 @@ public:
     }
 
     virtual bool hasAnimationFrameRange() { return false; }
-    void loadFromSql(const int &durRectId);
-    int saveToSql(QSqlQuery *query);
+    void writeDurationRectangle(std::fstream *file);
+    void readDurationRectangle(std::fstream *file);
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);

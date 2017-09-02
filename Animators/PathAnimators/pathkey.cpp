@@ -36,23 +36,23 @@ const SkPoint &PathContainer::getElementPos(const int &index) const {
 void PathContainer::setElementPos(const int &index,
                                   const SkPoint &pos) {
     mElementsPos.replace(index, pos);
-    mPathNeedUpdate = true;
+    mPathUpdateNeeded = true;
 }
 
 void PathContainer::prependElementPos(const SkPoint &pos) {
     mElementsPos.prepend(pos);
-    mPathNeedUpdate = true;
+    mPathUpdateNeeded = true;
 }
 
 void PathContainer::appendElementPos(const SkPoint &pos) {
     mElementsPos.append(pos);
-    mPathNeedUpdate = true;
+    mPathUpdateNeeded = true;
 }
 
 void PathContainer::insertElementPos(const int &index,
                                const SkPoint &pos) {
     mElementsPos.insert(index, pos);
-    mPathNeedUpdate = true;
+    mPathUpdateNeeded = true;
 }
 
 void PathContainer::removeElementPosAt(const int &index) {
@@ -60,9 +60,9 @@ void PathContainer::removeElementPosAt(const int &index) {
 }
 
 const SkPath &PathContainer::getPath() {
-    if(mPathNeedUpdate) {
+    if(mPathUpdateNeeded) {
         updatePath();
-        mPathNeedUpdate = false;
+        mPathUpdateNeeded = false;
     }
     return mPath;
 }
@@ -113,7 +113,7 @@ void PathContainer::updatePath() {
 
 void PathContainer::setPathClosed(const bool &bT) {
     mPathClosed = bT;
-    mPathNeedUpdate = true;
+    mPathUpdateNeeded = true;
 }
 
 void PathContainer::setElementsFromSkPath(const SkPath &path) {
@@ -202,13 +202,13 @@ DONE:
     if(!mPathClosed) {
         mElementsPos.append(SkPoint::Make(0., 0.));
     }
-    mPathNeedUpdate = false;
+    mPathUpdateNeeded = false;
     mPath = path;
 }
 
 void PathContainer::clearElements() {
     mElementsPos.clear();
-    mPathNeedUpdate = true;
+    mPathUpdateNeeded = true;
 }
 #include "edge.h"
 void PathContainer::addNewPointAtTBetweenPts(const SkScalar &tVal,

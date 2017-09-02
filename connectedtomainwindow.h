@@ -43,7 +43,6 @@ public:
     bool isShiftPressed(QKeyEvent *event);
     bool isCtrlPressed(QKeyEvent *event);
     bool isAltPressed(QKeyEvent *event);
-    Gradient *getLoadedGradientBySqlId(const int &id);
 protected:
     MainWindow *mMainWindow;
 };

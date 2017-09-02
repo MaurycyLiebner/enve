@@ -84,9 +84,11 @@ public:
             mElementsPos.move(lastId, firstId + i);
         }
     }
+    void readPathContainer(std::fstream *file);
+    void writePathContainer(std::fstream *file);
 protected:
     bool mPathClosed = false;
-    bool mPathNeedUpdate = false;
+    bool mPathUpdateNeeded = false;
     SkPath mPath;
     QList<SkPoint> mElementsPos;
 };
@@ -105,6 +107,8 @@ public:
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
     bool differsFromKey(Key *key) { return true; }
+    void writePathKey(std::fstream *file);
+    void readPathKey(std::fstream *file);
 };
 
 #endif // PATHKEY_H

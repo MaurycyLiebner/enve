@@ -22,14 +22,6 @@ VectorPath::VectorPath() :
     ca_addChildAnimator(mPathAnimator.data());
 }
 
-#include <QSqlError>
-int VectorPath::saveToSql(QSqlQuery *query, const int &parentId) {
-    int boundingBoxId = PathBox::saveToSql(query, parentId);
-    mPathAnimator->saveToSql(query, boundingBoxId);
-
-    return boundingBoxId;
-}
-
 void VectorPath::selectAllPoints(Canvas *canvas) {
     mPathAnimator->selectAllPoints(canvas);
 }
@@ -39,18 +31,6 @@ NodePoint *VectorPath::createNewPointOnLineNear(const QPointF &absPos,
                                                 const qreal &canvasScaleInv) {
     return mPathAnimator->createNewPointOnLineNear(absPos, adjust,
                                                    canvasScaleInv);
-}
-
-void VectorPath::loadFromSql(const int &boundingBoxId) {
-    PathBox::loadFromSql(boundingBoxId);
-    mPathAnimator->loadFromSql(boundingBoxId);
-}
-
-VectorPath *VectorPath::createPathFromSql(int boundingBoxId) {
-    VectorPath *path = new VectorPath();
-    path->loadFromSql(boundingBoxId);
-
-    return path;
 }
 
 VectorPath::~VectorPath() {

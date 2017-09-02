@@ -146,9 +146,6 @@ public:
         return path;
     }
 
-    void saveToSql(QSqlQuery *query,
-                   const int &boundingBoxId) {
-    }
     void finishAllPointsTransform();
     void startAllPointsTransform();
     void disconnectPoints(NodePoint *pt1,
@@ -162,6 +159,8 @@ public:
     void setElementsFromSkPath(const SkPath &path);
     void startPathChange();
     void cancelPathChange();
+    void readVectorPathAnimator(std::fstream *file);
+    void writeVectorPathAnimator(std::fstream *file);
 private:
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,

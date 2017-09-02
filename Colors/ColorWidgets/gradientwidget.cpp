@@ -115,18 +115,6 @@ void GradientWidget::removeGradient(int gradientId)
     updateAll();
 }
 
-void GradientWidget::saveGradientsToQuery(QSqlQuery *query) {
-    Q_FOREACH(const QSharedPointer<Gradient> &gradient, mGradients) {
-        gradient->saveToSql(query);
-    }
-}
-
-void GradientWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
-    Q_FOREACH(const QSharedPointer<Gradient> &gradient, mGradients) {
-        gradient->saveToSqlIfPathSelected(query);
-    }
-}
-
 void GradientWidget::setCurrentColor(GLfloat h,
                                      GLfloat s,
                                      GLfloat v,
@@ -338,6 +326,20 @@ void GradientWidget::drawHoveredColorBorder(const int &hoveredX,
 void GradientWidget::updateAfterFrameChanged(const int &absFrame) {
     Q_FOREACH(const QSharedPointer<Gradient> &gradient, mGradients) {
         gradient->prp_setAbsFrame(absFrame);
+    }
+}
+
+void GradientWidget::clearGradientsLoadIds() {
+    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
+        gradient->setLoadId(-1);
+    }
+}
+
+void GradientWidget::setGradientLoadIds() {
+    int id = 0;
+    foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
+        gradient->setLoadId(id);
+        id++;
     }
 }
 

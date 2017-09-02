@@ -82,6 +82,8 @@ public:
     }
 
     virtual bool differsFromKey(Key *key) = 0;
+    void writeKey(std::fstream *file);
+    void readKey(std::fstream *file);
 protected:
     bool mIsSelected = false;
     Animator *mParentAnimator = NULL;

@@ -3,7 +3,6 @@
 
 #include "Boxes/boxesgroup.h"
 #include "Colors/color.h"
-#include <QSqlQuery>
 #include <QThread>
 #include "Boxes/rendercachehandler.h"
 #include "skiaincludes.h"
@@ -94,8 +93,6 @@ public:
     void updatePivotIfNeeded();
 
     void awaitUpdate() {}
-
-    int saveToSql(QSqlQuery *query, const int &parentId = 0);
 
     void resetTransormation();
     void fitCanvasToSize();
@@ -473,9 +470,9 @@ public:
     }
 
     void tabletEvent(QTabletEvent *e, const QPointF &absPos);
-    void loadFromSql(const int &boundingBoxId,
-                     const int &colorId);
     QRectF getRelBoundingRectAtRelFrame(const int &);
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

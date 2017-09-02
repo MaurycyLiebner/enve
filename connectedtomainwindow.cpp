@@ -40,11 +40,6 @@ MainWindow *ConnectedToMainWindow::getMainWindow() {
     return mMainWindow;
 }
 
-Gradient *ConnectedToMainWindow::getLoadedGradientBySqlId(
-                                const int &id) {
-    return mMainWindow->getLoadedGradientBySqlId(id);
-}
-
 bool ConnectedToMainWindow::isShiftPressed() {
     return mMainWindow->isShiftPressed();
 }

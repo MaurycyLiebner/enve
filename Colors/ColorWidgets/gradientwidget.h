@@ -6,8 +6,7 @@
 #include "Gradients/gradientslistwidget.h"
 #include "Gradients/currentgradientwidget.h"
 
-class GradientWidget : public QWidget
-{
+class GradientWidget : public QWidget {
     Q_OBJECT
 public:
     GradientWidget(QWidget *parent, MainWindow *mainWindow);
@@ -28,9 +27,7 @@ public:
 
     void finishGradientTransform();
     void startGradientTransform();
-    void saveGradientsToQuery(QSqlQuery *query);
     void clearAll();
-    void saveGradientsToSqlIfPathSelected(QSqlQuery *query);
     void addGradientToList(Gradient *gradient);
     void removeGradientFromList(Gradient *toRemove);
     void startSelectedColorTransform();
@@ -60,6 +57,11 @@ public:
                                 const int &colHeight);
 
     void updateAfterFrameChanged(const int &absFrame);
+
+    void clearGradientsLoadIds();
+    void setGradientLoadIds();
+    void writeGradients(std::fstream *file);
+    void readGradients(std::fstream *file);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);

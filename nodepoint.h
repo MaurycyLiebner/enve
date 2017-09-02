@@ -1,6 +1,5 @@
 #ifndef NODEPOINT_H
 #define NODEPOINT_H
-#include <QSqlQuery>
 #include "movablepoint.h"
 
 class UndoRedoStack;
@@ -163,7 +162,6 @@ public:
 
     bool isNeighbourSelected();
     //void moveByAbs(const QPointF &absTranslatione);
-    void loadFromSql(const int &movablePointId);
 
     NodePoint *getConnectedSeparateNodePoint();
 

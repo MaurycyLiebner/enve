@@ -1,7 +1,6 @@
 #include "gradientpoints.h"
 #include "gradientpoint.h"
 #include "skqtconversions.h"
-#include <QSqlError>
 
 GradientPoints::GradientPoints() : ComplexAnimator()
 {
@@ -21,35 +20,6 @@ void GradientPoints::initialize(PathBox *parentT)
     endPoint->prp_setName("point2");
     ca_addChildAnimator(endPoint);
     enabled = false;
-}
-
-void GradientPoints::loadFromSql(const int &identifyingId) {
-
-    QSqlQuery query;
-    QString queryStr = QString("SELECT * FROM gradientpoints WHERE id = %1").
-            arg(identifyingId);
-    if(query.exec(queryStr) ) {
-        query.next();
-        endPoint->loadFromSql(query.value("endpointid").toInt());
-        startPoint->loadFromSql(query.value("startpointid").toInt());
-    } else {
-        qDebug() << "Could not load gradientpoints with id " << identifyingId;
-    }
-}
-
-int GradientPoints::saveToSql(QSqlQuery *query, const int &parentId) {
-    Q_UNUSED(parentId);
-    int startPtId = startPoint->saveToSql(query);
-    int endPtId = endPoint->saveToSql(query);
-    if(!query->exec(QString("INSERT INTO gradientpoints (endpointid, "
-                            "startpointid) "
-                "VALUES (%1, %2)").
-                arg(endPtId).
-                arg(startPtId) ) ) {
-        qDebug() << query->lastError() << endl << query->lastQuery();
-    }
-    return query->lastInsertId().toInt();
-
 }
 
 void GradientPoints::duplicatePointsFrom(GradientPoint *startPointT,

@@ -28,9 +28,6 @@ public:
                                  const CanvasMode &currentCanvasMode,
                                  const qreal &canvasScaleInv);
 
-    void loadFromSql(const int &boundingBoxId);
-    int saveToSql(QSqlQuery *query,
-                      const int &boundingBoxId);
     void makeDuplicate(Property *property);
 
     Property *makeDuplicate();
@@ -63,6 +60,8 @@ public:
     void selectAllPoints(Canvas *canvas);
     bool SWT_isPathAnimator();
     SkPath getPathAtRelFrame(const int &relFrame);
+    void readPathAnimator(std::fstream *file);
+    void writePathAnimator(std::fstream *file);
 private:
     BoundingBox *mParentBox = NULL;
     QList<VectorPathAnimator*> mSinglePaths;

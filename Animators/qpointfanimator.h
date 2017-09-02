@@ -35,8 +35,6 @@ public:
 
     QrealAnimator *getXAnimator();
     QrealAnimator *getYAnimator();
-    int saveToSql(QSqlQuery *query, const int &parentId = 0);
-    void loadFromSql(const int &posAnimatorId);
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 
@@ -56,6 +54,8 @@ public:
     void setPrefferedValueStep(const qreal &valueStep);
 
     bool SWT_isQPointFAnimator() { return true; }
+    void writeQPointFAnimator(std::fstream *file);
+    void readQPointFAnimator(std::fstream *file);
 protected:
     QrealAnimatorQSPtr mXAnimator;
     QrealAnimatorQSPtr mYAnimator;

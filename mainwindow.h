@@ -6,7 +6,6 @@
 #include <QGraphicsView>
 #include <QComboBox>
 #include <QPushButton>
-#include <QSqlQuery>
 #include "undoredo.h"
 
 enum ClipboardContainerType : short;
@@ -79,11 +78,10 @@ public:
 
     CanvasWindow *getCanvasWindow() { return mCanvasWindow; }
     FillStrokeSettingsWidget *getFillStrokeSettings();
-    void saveToFile(QString path);
-    void loadAVFile(QString path);
+    void saveToFile(const QString &path);
+    void loadAVFile(const QString &path);
     void clearAll();
     void setCurrentPath(QString newPath);
-    void createTablesInSaveDatabase(QSqlQuery *query);
     void updateTitle();
     void setFileChangedSinceSaving(bool changed);
     void disableEventFilter();
@@ -113,7 +111,7 @@ public:
 
     void setResolutionFraction(qreal percent);
 
-    void setCurrentFrameForAllWidgets(int frame);
+    void setCurrentFrameForAllWidgets(const int &frame);
     void updateSettingsForCurrentCanvas();
 
     void replaceClipboard(ClipboardContainer *container);
@@ -121,7 +119,7 @@ public:
             const ClipboardContainerType &type);
     void addCanvas(Canvas *newCanvas);
 
-    Gradient *getLoadedGradientBySqlId(const int &id);
+    Gradient *getLoadedGradientById(const int &id);
     void clearLoadedGradientsList();
     void previewBeingPlayed();
     void previewBeingRendered();
@@ -137,6 +135,7 @@ public:
 
     void incBrushRadius();
     void decBrushRadius();
+    void addLoadedGradient(Gradient *gradient);
 public slots:
     void setCurrentFrame(int frame);
     void setAllPointsRecord(bool allPointsRecord);
@@ -238,7 +237,7 @@ private:
     QMenu *mPathMenu;
     QMenu *mEffectsMenu;
     QMenu *mViewMenu;
-        QMenu *mPanelsMenu;
+    QMenu *mPanelsMenu;
     QMenu *mRenderMenu;
 
     CanvasWindow *mCanvasWindow;
@@ -265,7 +264,6 @@ private:
     void setupMenuBar();
 
     QList<Gradient*> mLoadedGradientsList;
-    void loadAllGradientsFromSql();
 protected:
     void keyPressEvent(QKeyEvent *event);
     bool eventFilter(QObject *obj, QEvent *e);

@@ -245,10 +245,6 @@ void FillStrokeSettingsWidget::setNoneFill() {
     colorTypeSet(0);
 }
 
-void FillStrokeSettingsWidget::saveGradientsToSqlIfPathSelected(QSqlQuery *query) {
-    mGradientWidget->saveGradientsToSqlIfPathSelected(query);
-}
-
 void FillStrokeSettingsWidget::updateColorAnimator() {
     if(getCurrentPaintTypeVal() == 0) {
         setColorAnimatorTarget(NULL);
@@ -340,10 +336,6 @@ void FillStrokeSettingsWidget::setCurrentSettings(
 
     connect(mLineWidthSpin, SIGNAL(valueChanged(double)),
             this, SLOT(setStrokeWidth(qreal)));
-}
-
-void FillStrokeSettingsWidget::saveGradientsToQuery(QSqlQuery *query) {
-    mGradientWidget->saveGradientsToQuery(query);
 }
 
 GradientWidget *FillStrokeSettingsWidget::getGradientWidget() {

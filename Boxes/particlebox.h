@@ -118,9 +118,6 @@ class ParticleEmitter : public ComplexAnimator {
 public:
     ParticleEmitter(ParticleBox *parentBox);
 
-    void saveToSql(QSqlQuery *query, const int &parentId);
-    void loadFromSql(const int &boundingBoxId);
-
     void setParentBox(ParticleBox *parentBox);
 
     void scheduleGenerateParticles();
@@ -292,8 +289,6 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                               const int &relFrame);
-    int saveToSql(QSqlQuery *query, const int &parentId);
-    void loadFromSql(const int &boundingBoxId);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

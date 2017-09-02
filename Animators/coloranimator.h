@@ -42,8 +42,6 @@ public:
                               const bool &finish = false);
 
     void prp_openContextMenu(const QPoint &pos);
-    void loadFromSql(const int &sqlId);
-    int saveToSql(QSqlQuery *query, const int &parentId = 0);
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 
@@ -73,6 +71,9 @@ public:
     }
 
     bool SWT_isColorAnimator() { return true; }
+
+    void writeColorAnimator(std::fstream *file);
+    void readColorAnimator(std::fstream *file);
 private:
     ColorMode mColorMode = RGBMODE;
     QSharedPointer<QrealAnimator> mVal1Animator =

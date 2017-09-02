@@ -855,44 +855,6 @@ void CanvasWindow::nextSaveOutputFrame() {
     }
 }
 
-Canvas *CanvasWindow::loadCanvasesFromSql() {
-    QSqlQuery query;
-
-    QString queryStr = "SELECT * FROM canvas";
-    if(query.exec(queryStr)) {
-        while(query.next()) {
-            int width = query.value("width").toInt();
-            int height = query.value("height").toInt();
-            int frameCount = query.value("framecount").toInt();
-            int boundingBoxId = query.value("boundingboxid").toInt();
-            qreal fps = query.value("fps").toDouble();
-            int colorId = query.value("colorid").toInt();
-            bool clipToCanvas = query.value("cliptocanvas").toBool();
-
-            Canvas *canvas =
-                    new Canvas(MainWindow::getInstance()->getFillStrokeSettings(),
-                               this,
-                               width, height,
-                               frameCount,
-                               fps);
-            canvas->setClipToCanvas(clipToCanvas);
-            canvas->loadFromSql(boundingBoxId,
-                                colorId);
-            MainWindow::getInstance()->addCanvas(canvas);
-            return canvas;
-        }
-    } else {
-        qDebug() << "Could not load canvases";
-    }
-    return NULL;
-}
-
-void CanvasWindow::saveCanvasesToSql(QSqlQuery *query) {
-    Q_FOREACH(const CanvasQSPtr &canvas, mCanvasList) {
-        canvas->saveToSql(query);
-    }
-}
-
 void CanvasWindow::afterAllSavesFinished() {
     Q_FOREACH(const CanvasQSPtr &canvas, mCanvasList) {
         canvas->afterAllSavesFinished();
@@ -958,11 +920,6 @@ ImageBox *CanvasWindow::createImageForPath(const QString &path) {
 SingleSound *CanvasWindow::createSoundForPath(const QString &path) {
     if(hasNoCanvas()) return NULL;
     return mCurrentCanvas->createSoundForPath(path);
-}
-
-void CanvasWindow::saveToSql(QSqlQuery *query) {
-    if(hasNoCanvas()) return;
-    mCurrentCanvas->saveToSql(query);
 }
 
 int CanvasWindow::getCurrentFrame() {

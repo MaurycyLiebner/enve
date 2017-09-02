@@ -8,13 +8,9 @@ class PathBox;
 class PathEffectAnimators : public ComplexAnimator
 {
 public:
-    PathEffectAnimators(PathBox *parentPath);
-
-    //void addPathEffect(PathEffect *effect);
-
-//    int saveToSql(QSqlQuery *query, const int &boundingBoxSqlId);
-//    void loadFromSql(const int &boundingBoxSqlId);
-
+    PathEffectAnimators(const bool &isOutline,
+                        PathBox *parentPath);
+    void addEffect(PathEffect *effect);
     bool hasEffects();
 
     //void makeDuplicate(Property *target);
@@ -24,13 +20,11 @@ public:
 
     void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
-    int saveToSql(QSqlQuery *query,
-                  const int &boundingBoxSqlId,
-                  const bool &outline);
-    void loadFromSql(const int &boundingBoxSqlId,
-                     const bool &outline);
 
+    void readPathEffectAnimators(std::fstream *file);
+    void writePathEffectAnimators(std::fstream *file);
 protected:
+    bool mIsOutline;
     PathBox *mParentPath = NULL;
 };
 

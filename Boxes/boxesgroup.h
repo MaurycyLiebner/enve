@@ -56,7 +56,6 @@ public:
     BoxesGroup();
     BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting);
     ~BoxesGroup();
-    virtual void loadFromSql(const int &boundingBoxId);
 
     void deselectAllBoxesFromBoxesGroup();
     void selectAllBoxesFromBoxesGroup();
@@ -73,10 +72,6 @@ public:
     void setCurrentFillStrokeSettingsFromBox(BoundingBox *box);
 
     void ungroup();
-
-    int saveToSql(QSqlQuery *query, const int &parentId);
-    BoxesGroup *loadChildrenFromSql(const int &thisBoundingBoxId,
-                                    const bool &loadInBox);
 
     bool isCurrentGroup();
     void addChild(BoundingBox *child);
@@ -206,6 +201,8 @@ public:
             box->afterAllSavesFinished();
         }
     }
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

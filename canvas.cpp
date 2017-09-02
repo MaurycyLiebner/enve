@@ -159,32 +159,6 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
                                                SWT_CurrentGroup);
 }
 
-int Canvas::saveToSql(QSqlQuery *query, const int &parentId) {
-    Q_UNUSED(parentId);
-    int boundingBoxId = BoxesGroup::saveToSql(query, 0);
-    int colorId = mBackgroundColor->saveToSql(query);
-    query->exec(QString("INSERT INTO canvas "
-                        "(boundingboxid, "
-                        "width, height, "
-                        "framecount, fps, "
-                        "colorid, cliptocanvas) VALUES "
-                        "(%1, %2, %3, %4, %5, %6, %7)").
-                arg(boundingBoxId).
-                arg(mWidth).
-                arg(mHeight).
-                arg(mMaxFrame).
-                arg(mFps).
-                arg(colorId).
-                arg(boolToSql(mClipToCanvasSize)));
-    return boundingBoxId;
-}
-
-void Canvas::loadFromSql(const int &boundingBoxId,
-                         const int &colorId) {
-    BoxesGroup::loadFromSql(boundingBoxId);
-    mBackgroundColor->loadFromSql(colorId);
-}
-
 ImageBox *Canvas::createImageBox(const QString &path) {
     ImageBox *img = new ImageBox(path);
     mCurrentBoxesGroup->addChild(img);
