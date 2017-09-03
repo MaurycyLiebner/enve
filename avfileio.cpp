@@ -406,7 +406,7 @@ void PaintSettings::writePaintSettings(std::fstream *file) {
     } else {
         gradId = mGradient->getLoadId();
     }
-    file->wrtie((char*)&mGradientLinear, sizeof(bool));
+    file->write((char*)&mGradientLinear, sizeof(bool));
     file->write((char*)&gradId, sizeof(int));
 }
 
@@ -726,14 +726,87 @@ void Surface::readSurface(std::fstream *file) {
     }
 }
 
+void SurfaceKey::writeSurfaceKey(std::fstream *file,
+                                const ushort &nCols,
+                                const ushort &nRows) {
+    Key::writeKey(file);
+    for(int i = 0; i < nCols; i++) {
+        for(int j = 0; j < nRows; j++) {
+            mTiles[j][i]->writeTile(file);
+        }
+    }
+}
+
+void SurfaceKey::readSurfaceKey(std::fstream *file,
+                                const ushort &nCols,
+                                const ushort &nRows) {
+    Key::readKey(file);
+    for(int i = 0; i < nCols; i++) {
+        for(int j = 0; j < nRows; j++) {
+            mTiles[j][i]->readTile(file);
+        }
+    }
+}
+
+void AnimatedSurface::writeAnimatedSurface(std::fstream *file) {
+    file->write((char*)&mWidth, sizeof(ushort));
+    file->write((char*)&mHeight, sizeof(ushort));
+    int nKeys = anim_mKeys.count();
+    file->write((char*)&nKeys, sizeof(int));
+    if(nKeys == 0) {
+        for(int i = 0; i < mNTileCols; i++) {
+            for(int j = 0; j < mNTileRows; j++) {
+                mCurrentTiles[j][i]->writeTile(file);
+            }
+        }
+    } else {
+        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+            ((SurfaceKey*)key.get())->writeSurfaceKey(file,
+                                                      mNTileCols,
+                                                      mNTileRows);
+        }
+    }
+}
+
+void AnimatedSurface::readAnimatedSurface(std::fstream *file) {
+    file->read((char*)&mWidth, sizeof(ushort));
+    file->read((char*)&mHeight, sizeof(ushort));
+    setSize(mWidth, mHeight);
+    int nKeys;
+    file->read((char*)&nKeys, sizeof(int));
+    if(nKeys == 0) {
+        for(int i = 0; i < mNTileCols; i++) {
+            for(int j = 0; j < mNTileRows; j++) {
+                mCurrentTiles[j][i]->readTile(file);
+            }
+        }
+    } else {
+        for(int i = 0; i < nKeys; i++) {
+            SurfaceKey *key = new SurfaceKey(this);
+            if(i == 0) {
+                key->setTiles(createNewTilesArray());
+            } else {
+                key->setTiles(mCurrentTiles);
+            }
+            key->readSurfaceKey(file, mNTileCols, mNTileRows);
+            anim_appendKey(key);
+        }
+    }
+}
+
 void PaintBox::writeBoundingBox(std::fstream *file) {
     BoundingBox::writeBoundingBox(file);
-    mMainHandler->writeSurface(file);
+    mTopLeftPoint->writeQPointFAnimator(file);
+    mBottomRightPoint->writeQPointFAnimator(file);
+    mMainHandler->writeAnimatedSurface(file);
 }
 
 void PaintBox::readBoundingBox(std::fstream *file) {
     BoundingBox::readBoundingBox(file);
-    mMainHandler->readSurface(file);
+    mTopLeftPoint->readQPointFAnimator(file);
+    mBottomRightPoint->readQPointFAnimator(file);
+    finishSizeSetup();
+    mMainHandler->readAnimatedSurface(file);
 }
 
 void ImageSequenceBox::writeBoundingBox(std::fstream *file) {

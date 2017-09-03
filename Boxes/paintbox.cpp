@@ -119,6 +119,7 @@ void PaintBox::finishSizeSetup() {
         mMainHandler = new AnimatedSurface(mWidth, mHeight,
                                            1., true, this);
         mMainHandler->setCurrentRelFrame(anim_mCurrentRelFrame);
+        ca_addChildAnimator(mMainHandler);
     } else {
         mMainHandler->setSize(mWidth, mHeight);
     }

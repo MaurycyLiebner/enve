@@ -96,6 +96,11 @@ public:
     void writeSurface(std::fstream *file);
     void readSurface(std::fstream *file);
 protected:
+    virtual Tile ***createResizedTiles(const ushort &nTileCols,
+                               const ushort &nTilesRows,
+                               const ushort &lastColumnWidth,
+                               const ushort &lastRowHeight,
+                               Tile ***currentTiles);
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;
     Color mBackgroundColor = Color(1.f, 1.f, 1.f);

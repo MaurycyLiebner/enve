@@ -1,14 +1,24 @@
 #ifndef ANIMATEDSURFACE_H
 #define ANIMATEDSURFACE_H
 #include "surface.h"
+#include "Animators/animator.h"
+#include "key.h"
 class PaintBox;
 
-struct SurfaceFrame {
-    int relFrame;
-    Tile ***tiles = NULL;
+class SurfaceKey : public Key {
+public:
+    SurfaceKey(Animator *parentAnimator);
+    Tile ***getTiles() { return mTiles; }
+    void setTiles(Tile ***tiles) { mTiles = tiles; }
+    bool differsFromKey(Key *) { return true; }
+    void writeSurfaceKey(std::fstream *file, const ushort &nCols, const ushort &nRows);
+    void readSurfaceKey(std::fstream *file, const ushort &nCols, const ushort &nRows);
+private:
+    Tile ***mTiles = NULL;
 };
 
-class AnimatedSurface : public Surface {
+class AnimatedSurface : public Surface,
+                        public Animator {
 public:
     AnimatedSurface(const ushort &widthT,
                     const ushort &heightT,
@@ -29,12 +39,27 @@ public:
 
     void newSurfaceFrame();
     void updateTargetTiles();
+    Tile ***createNewTilesArray();
+    Tile ***createResizedTiles(const ushort &nTileCols,
+                               const ushort &nTilesRows,
+                               const ushort &lastColumnWidth,
+                               const ushort &lastRowHeight,
+                               Tile ***currentTiles);
+    void anim_removeKey(Key *keyToRemove,
+                        const bool &saveUndoRedo = true);
+    void anim_appendKey(Key *newKey,
+                        const bool &saveUndoRedo = true,
+                        const bool &update = true);
+    void anim_moveKeyToRelFrame(Key *key,
+                                const int &newFrame,
+                                const bool &saveUndoRedo = true,
+                                const bool &finish = true);
+
+    void writeAnimatedSurface(std::fstream *file);
+    void readAnimatedSurface(std::fstream *file);
 protected:
     PaintBox *mParentBox = NULL;
-    int mRelFrame = 0;
-    QList<SurfaceFrame> mSurfaceFrames;
     int mCurrentTilesFrame = 0;
-    Tile ***mPreviousTiles = NULL;
     int mPreviousTilesFrame = 0;
     Tile ***mNextTiles = NULL;
     int mNextTilesFrame = 0;

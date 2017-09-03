@@ -420,60 +420,77 @@ Tile *Surface::getTile(const ushort &tile_col,
     return mCurrentTiles[tile_row][tile_col];
 }
 
-void Surface::setSize(const ushort &width_t,
-                      const ushort &height_t) {
-    // initialize tiles
-    ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
-    ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
 
-    Tile ***tiles_t = new Tile**[n_tile_rows_t];
+Tile ***Surface::createResizedTiles(const ushort &nTileCols,
+                                    const ushort &nTilesRows,
+                                    const ushort &lastColumnWidth,
+                                    const ushort &lastRowHeight,
+                                    Tile ***currentTiles) {
+    Tile ***tiles_t = new Tile**[nTilesRows];
 
-    for(ushort rw = 0; rw < n_tile_rows_t; rw++) {
-        tiles_t[rw] = new Tile*[n_tile_cols_t];
+    for(ushort rw = 0; rw < nTilesRows; rw++) {
+        tiles_t[rw] = new Tile*[nTileCols];
         ushort first_new_col_in_row = 0;
         if(rw < mNTileRows) {
             first_new_col_in_row = mNTileCols;
             for(ushort cl = 0; cl < mNTileCols; cl++) {
-                Tile *tile_t = mCurrentTiles[rw][cl];
-                if(cl < n_tile_cols_t) {
+                Tile *tile_t = currentTiles[rw][cl];
+                if(cl < nTileCols) {
                     tile_t->resetTileSize();
                     tiles_t[rw][cl] = tile_t;
                 } else {
                     delete tile_t;
                 }
             }
-            delete[] mCurrentTiles[rw];
+            delete[] currentTiles[rw];
         }
 
-        for(ushort cl = first_new_col_in_row; cl < n_tile_cols_t; cl++) {
+        for(ushort cl = first_new_col_in_row; cl < nTileCols; cl++) {
             tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM,
                                        mPaintOnOtherThread);
         }
-
     }
+
+    if(lastRowHeight != 0) {
+        for(int i = 0; i < nTileCols; i++) {
+            tiles_t[nTilesRows - 1][i]->setTileHeight(lastRowHeight);
+        }
+    }
+    if(lastColumnWidth != 0) {
+        for(int j = 0; j < nTilesRows; j++) {
+            tiles_t[j][nTileCols - 1]->setTileWidth(lastColumnWidth);
+        }
+    }
+
+    if(currentTiles == mCurrentTiles) {
+        mCurrentTiles = tiles_t;
+    }
+
+    return tiles_t;
+}
+
+void Surface::setSize(const ushort &width_t,
+                      const ushort &height_t) {
+    // initialize tiles
+    ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
+    ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
+    ushort last_row_height = height_t%TILE_DIM;
+    ushort last_column_width = width_t%TILE_DIM;
+    Tile ***tiles_t = createResizedTiles(n_tile_cols_t,
+                                         n_tile_rows_t,
+                                         last_column_width,
+                                         last_row_height,
+                                         mCurrentTiles);
     if(mCurrentTiles != NULL) {
         delete[] mCurrentTiles;
     }
 
     mCurrentTiles = tiles_t;
+
     mWidth = width_t;
     mHeight = height_t;
     mNTileRows = n_tile_rows_t;
     mNTileCols = n_tile_cols_t;
-
-
-    ushort last_row_height = mHeight%TILE_DIM;
-    if(last_row_height != 0) {
-        for(int i = 0; i < mNTileCols; i++) {
-            mCurrentTiles[mNTileRows - 1][i]->setTileHeight(last_row_height);
-        }
-    }
-    ushort last_column_width = mWidth%TILE_DIM;
-    if(last_column_width != 0) {
-        for(int j = 0; j < mNTileRows; j++) {
-            mCurrentTiles[j][mNTileCols - 1]->setTileWidth(last_column_width);
-        }
-    }
 }
 
 void Surface::setBackgroundMode(
