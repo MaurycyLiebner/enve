@@ -86,6 +86,8 @@ public:
 
     void startAllPointsTransform();
     SkPath getPathAtRelFrame(const int &relFrame);
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 protected:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;

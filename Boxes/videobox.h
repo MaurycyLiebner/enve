@@ -11,6 +11,7 @@ class VideoBox : public AnimationBox
     Q_OBJECT
 public:
     VideoBox(const QString &filePath);
+    VideoBox();
 
     void setParent(BoxesGroup *parent);
     void setFilePath(QString path);
@@ -24,6 +25,8 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                               const int &relFrame);
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 protected:
     void updateFrameCount(const char *path);
 private:

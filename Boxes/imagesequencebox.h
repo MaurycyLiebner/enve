@@ -12,6 +12,8 @@ public:
     bool SWT_isImageSequenceBox() { return true; }
 
     void changeSourceFile();
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 private:
     QStringList mListOfFrames;
 };

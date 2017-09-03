@@ -88,6 +88,8 @@ public:
     void startAllPointsTransform();
 
     void newPaintFrameOnCurrentFrame();
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 private:
     PointAnimator *mTopLeftPoint = NULL;
     PointAnimator *mBottomRightPoint = NULL;

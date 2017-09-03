@@ -119,6 +119,8 @@ public:
 
     void saveToTmp();
     void clearTmp();
+    void writeTile(std::fstream *file);
+    void readTile(std::fstream *file);
 private:
     bool mPaintInOtherThread = true;
     std::shared_ptr<TileSkDrawer> mDrawer;

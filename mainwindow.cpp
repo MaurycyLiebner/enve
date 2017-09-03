@@ -447,6 +447,7 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     if(mCanvasWindow->hasNoCanvas()) {
         mObjectSettingsWidget->setMainTarget(NULL);
         mBrushSettingsWidget->setCurrentBrush(NULL);
+        mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(NULL);
         return;
     }
     Canvas *canvas = mCanvasWindow->getCurrentCanvas();
@@ -1283,18 +1284,6 @@ void MainWindow::redo() {
 void MainWindow::setCurrentFrameForAllWidgets(const int &frame) {
     mBoxesListAnimationDockWidget->setCurrentFrame(frame);
 }
-#include <fstream>
-void MainWindow::loadAVFile(const QString &path) {
-    GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
-    std::fstream file(path.toUtf8().data(), std::ios_base::in);
-    gradientWidget->readGradients(&file);
-    mCanvasWindow->readCanvases(&file);
-
-    clearLoadedGradientsList();
-    gradientWidget->clearGradientsLoadIds();
-
-    file.close();
-}
 
 Gradient *MainWindow::getLoadedGradientById(const int &id) {
     Q_FOREACH(Gradient *gradient, mLoadedGradientsList) {
@@ -1311,27 +1300,4 @@ void MainWindow::clearLoadedGradientsList() {
 
 void MainWindow::addLoadedGradient(Gradient *gradient) {
     mLoadedGradientsList << gradient;
-}
-
-void MainWindow::saveToFile(const QString &path) {
-    disable();
-    QFile file(path);
-    if(file.exists()) {
-        file.remove();
-    }
-
-    GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
-    std::fstream fileS(path.toUtf8().data(), std::ios_base::out);
-    gradientWidget->setGradientLoadIds();
-    gradientWidget->writeGradients(&fileS);
-    mCanvasWindow->writeCanvases(&fileS);
-
-    clearLoadedGradientsList();
-    gradientWidget->clearGradientsLoadIds();
-
-    fileS.close();
-
-    mCanvasWindow->afterAllSavesFinished();
-
-    enable();
 }

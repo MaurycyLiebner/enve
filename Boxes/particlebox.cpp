@@ -453,7 +453,8 @@ Property *ParticleEmitter::makeDuplicate() {
     return emitterDupli;
 }
 
-void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
+void ParticleEmitter::duplicateAnimatorsFrom(ColorAnimator *color,
+                                             QPointFAnimator *pos,
                                              QrealAnimator *width,
                                              QrealAnimator *srcVelInfl,
                                              QrealAnimator *iniVelocity,
@@ -471,6 +472,7 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
                                              QrealAnimator *particlesDecayFrames,
                                              QrealAnimator *particlesSizeDecay,
                                              QrealAnimator *particlesOpacityDecay) {
+    color->makeDuplicate(mColorAnimator.data());
     pos->makeDuplicate(mPos.data());
     width->makeDuplicate(mWidth.data());
 
@@ -501,6 +503,7 @@ void ParticleEmitter::duplicateAnimatorsFrom(QPointFAnimator *pos,
 void ParticleEmitter::makeDuplicate(Property *target) {
     ParticleEmitter *peTarget = ((ParticleEmitter*)target);
     peTarget->duplicateAnimatorsFrom(
+                mColorAnimator.data(),
                 mPos.data(),
                 mWidth.data(),
                 mSrcVelInfl.data(),

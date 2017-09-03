@@ -403,13 +403,17 @@ void BoxesListAnimationDockWidget::setCurrentFrame(const int &frame) {
 
 void BoxesListAnimationDockWidget::updateSettingsForCurrentCanvas(
                                         Canvas *canvas) {
-    disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
-               this, SLOT(setResolutionFractionText(QString)));
-    mResolutionComboBox->setCurrentText(
-                QString::number(canvas->getResolutionFraction()*100.) + " %");
-    connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(setResolutionFractionText(QString)));
-    mAnimationWidgetScrollbar->setCacheHandler(canvas->getCacheHandler());
+    if(canvas == NULL) {
+        mAnimationWidgetScrollbar->setCacheHandler(NULL);
+    } else {
+        disconnect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
+                   this, SLOT(setResolutionFractionText(QString)));
+        mResolutionComboBox->setCurrentText(
+                    QString::number(canvas->getResolutionFraction()*100.) + " %");
+        connect(mResolutionComboBox, SIGNAL(currentTextChanged(QString)),
+                this, SLOT(setResolutionFractionText(QString)));
+        mAnimationWidgetScrollbar->setCacheHandler(canvas->getCacheHandler());
+    }
 }
 
 void BoxesListAnimationDockWidget::setMinMaxFrame(

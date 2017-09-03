@@ -126,7 +126,9 @@ public:
 
     Property *makeDuplicate();
 
-    void duplicateAnimatorsFrom(QPointFAnimator *pos,
+    void duplicateAnimatorsFrom(
+            ColorAnimator *color,
+            QPointFAnimator *pos,
             QrealAnimator *width,
             QrealAnimator *srcVelInfl,
 
@@ -177,6 +179,8 @@ public:
         return data;
     }
 
+    void writeParticleEmitter(std::fstream *file);
+    void readParticleEmitter(std::fstream *file);
 private:
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;
@@ -289,6 +293,8 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                               const int &relFrame);
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

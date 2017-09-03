@@ -12,11 +12,14 @@ extern "C" {
 #include "Sound/soundcomposition.h"
 #include "filesourcescache.h"
 
-VideoBox::VideoBox(const QString &filePath) :
+VideoBox::VideoBox() :
     AnimationBox() {
     mType = TYPE_VIDEO;
     setName("Video");
+}
 
+VideoBox::VideoBox(const QString &filePath) :
+    VideoBox() {
     setFilePath(filePath);
 }
 

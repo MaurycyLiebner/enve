@@ -36,10 +36,10 @@ void AnimationWidgetScrollBar::setTopBorderVisible(const bool &bT) {
 void AnimationWidgetScrollBar::setCacheHandler(CacheHandler *handler) {
     mCacheHandler = handler;
 }
+
 #include "Boxes/rendercachehandler.h"
 void AnimationWidgetScrollBar::paintEvent(QPaintEvent *) {
     QPainter p(this);
-
 
     p.fillRect(rect(), QColor(60, 60, 60));
 

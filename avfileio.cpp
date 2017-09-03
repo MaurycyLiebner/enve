@@ -25,6 +25,9 @@
 #include "Boxes/particlebox.h"
 #include "Boxes/imagesequencebox.h"
 #include "Boxes/linkbox.h"
+#include "Boxes/paintbox.h"
+#include "Paint/PaintLib/surface.h"
+#include "Paint/PaintLib/animatedsurface.h"
 #include "canvas.h"
 #include "durationrectangle.h"
 #include "gradientpoints.h"
@@ -32,7 +35,7 @@
 #include "qrealkey.h"
 #include "mainwindow.h"
 #include "Colors/ColorWidgets/gradientwidget.h"
-// each returns written size
+#include <QMessageBox>
 
 #define FORMAT_STR "AniVect av"
 #define CREATOR_VERSION "0.1a"
@@ -57,9 +60,21 @@ void readQString(std::fstream *file,
 }
 
 struct FileFooter {
+    enum CompatybilityMode {
+        Compatible,
+        NonCompatible
+    };
+
     char formatStr[15] = FORMAT_STR;
     char creatorVersion[15] = CREATOR_VERSION;
     char creatorApplication[15] = CREATOR_APPLICATION;
+
+    CompatybilityMode combatybilityMode() const {
+        if(!std::strcmp(formatStr, FORMAT_STR)) {
+            return Compatible;
+        }
+        return NonCompatible;
+    }
 
     void write(std::fstream *file) {
         file->write((char*)this, sizeof(FileFooter));
@@ -70,6 +85,8 @@ struct FileFooter {
         file->read((char*)this, sizeof(FileFooter));
         file->seekg(0);
     }
+
+
 };
 
 void BoolProperty::writeBoolProperty(std::fstream *file) {
@@ -389,6 +406,7 @@ void PaintSettings::writePaintSettings(std::fstream *file) {
     } else {
         gradId = mGradient->getLoadId();
     }
+    file->wrtie((char*)&mGradientLinear, sizeof(bool));
     file->write((char*)&gradId, sizeof(int));
 }
 
@@ -397,6 +415,7 @@ void PaintSettings::readPaintSettings(std::fstream *file) {
     mColor->readColorAnimator(file);
     file->read((char*)&mPaintType, sizeof(PaintType));
     int gradId;
+    file->read((char*)&mGradientLinear, sizeof(bool));
     file->read((char*)&gradId, sizeof(int));
     if(gradId != -1) {
         mGradient = MainWindow::getInstance()->
@@ -505,7 +524,7 @@ void BoxTargetProperty::readBoxTargetProperty(std::fstream *file) {
     BoundingBox *targetBox = BoundingBox::getLoadedBoxById(targetId);
     if(targetBox == NULL && targetId >= 0) {
         BoundingBox::addFunctionWaitingForBoxLoad(
-                    SumPathEffectForBoxLoad(targetId, this) );
+                    new SumPathEffectForBoxLoad(targetId, this) );
     } else {
         setTarget(targetBox);
     }
@@ -543,7 +562,7 @@ void PathEffectAnimators::readPathEffectAnimators(std::fstream *file) {
             duplicateEffect->readDuplicatePathEffect(file);
             addEffect(duplicateEffect);
         } else if(typeT == SUM_PATH_EFFECT) {
-            SumPathEffect *sumEffect = new SumPathEffect();
+            SumPathEffect *sumEffect = new SumPathEffect(NULL);
             sumEffect->readSumPathEffect(file);
             addEffect(sumEffect);
         }
@@ -568,6 +587,200 @@ void PathBox::readBoundingBox(std::fstream *file) {
     mStrokeGradientPoints->readGradientPoints(file);
     mFillSettings->readPaintSettings(file);
     mStrokeSettings->readStrokeSettings(file);
+}
+
+void ParticleEmitter::writeParticleEmitter(std::fstream *file) {
+    mColorAnimator->writeColorAnimator(file);
+    mPos->writeQPointFAnimator(file);
+    mWidth->writeQrealAnimator(file);
+    mSrcVelInfl->writeQrealAnimator(file);
+    mIniVelocity->writeQrealAnimator(file);
+    mIniVelocityVar->writeQrealAnimator(file);
+    mIniVelocityAngle->writeQrealAnimator(file);
+    mIniVelocityAngleVar->writeQrealAnimator(file);
+    mAcceleration->writeQPointFAnimator(file);
+    mParticlesPerSecond->writeQrealAnimator(file);
+    mParticlesFrameLifetime->writeQrealAnimator(file);
+    mVelocityRandomVar->writeQrealAnimator(file);
+    mVelocityRandomVarPeriod->writeQrealAnimator(file);
+    mParticleSize->writeQrealAnimator(file);
+    mParticleSizeVar->writeQrealAnimator(file);
+    mParticleLength->writeQrealAnimator(file);
+    mParticlesDecayFrames->writeQrealAnimator(file);
+    mParticlesSizeDecay->writeQrealAnimator(file);
+    mParticlesOpacityDecay->writeQrealAnimator(file);
+}
+
+void ParticleEmitter::readParticleEmitter(std::fstream *file) {
+    mColorAnimator->readColorAnimator(file);
+    mPos->readQPointFAnimator(file);
+    mWidth->readQrealAnimator(file);
+    mSrcVelInfl->readQrealAnimator(file);
+    mIniVelocity->readQrealAnimator(file);
+    mIniVelocityVar->readQrealAnimator(file);
+    mIniVelocityAngle->readQrealAnimator(file);
+    mIniVelocityAngleVar->readQrealAnimator(file);
+    mAcceleration->readQPointFAnimator(file);
+    mParticlesPerSecond->readQrealAnimator(file);
+    mParticlesFrameLifetime->readQrealAnimator(file);
+    mVelocityRandomVar->readQrealAnimator(file);
+    mVelocityRandomVarPeriod->readQrealAnimator(file);
+    mParticleSize->readQrealAnimator(file);
+    mParticleSizeVar->readQrealAnimator(file);
+    mParticleLength->readQrealAnimator(file);
+    mParticlesDecayFrames->readQrealAnimator(file);
+    mParticlesSizeDecay->readQrealAnimator(file);
+    mParticlesOpacityDecay->readQrealAnimator(file);
+}
+
+void ParticleBox::writeBoundingBox(std::fstream *file) {
+    int nEmitters = mEmitters.count();
+    file->write((char*)&nEmitters, sizeof(int));
+    foreach(ParticleEmitter *emitter, mEmitters) {
+        emitter->writeParticleEmitter(file);
+    }
+}
+
+void ParticleBox::readBoundingBox(std::fstream *file) {
+    int nEmitters;
+    file->read((char*)&nEmitters, sizeof(int));
+    for(int i = 0; i < nEmitters; i++) {
+        ParticleEmitter *emitter = new ParticleEmitter(this);
+        emitter->readParticleEmitter(file);
+        addEmitter(emitter);
+    }
+}
+
+void ImageBox::writeBoundingBox(std::fstream *file) {
+    BoundingBox::writeBoundingBox(file);
+    writeQString(file, mImageFilePath);
+}
+
+void ImageBox::readBoundingBox(std::fstream *file) {
+    BoundingBox::readBoundingBox(file);
+    readQString(file, &mImageFilePath);
+}
+
+void Circle::writeBoundingBox(std::fstream *file) {
+    BoundingBox::writeBoundingBox(file);
+    mHorizontalRadiusPoint->writeQPointFAnimator(file);
+    mVerticalRadiusPoint->writeQPointFAnimator(file);
+}
+
+void Circle::readBoundingBox(std::fstream *file) {
+    BoundingBox::readBoundingBox(file);
+    mHorizontalRadiusPoint->readQPointFAnimator(file);
+    mVerticalRadiusPoint->readQPointFAnimator(file);
+}
+
+void Rectangle::writeBoundingBox(std::fstream *file) {
+    BoundingBox::writeBoundingBox(file);
+    mRadiusPoint.writeQPointFAnimator(file);
+    mTopLeftPoint->writeQPointFAnimator(file);
+    mBottomRightPoint->writeQPointFAnimator(file);
+}
+
+void Rectangle::readBoundingBox(std::fstream *file) {
+    BoundingBox::readBoundingBox(file);
+    mRadiusPoint.readQPointFAnimator(file);
+    mTopLeftPoint->readQPointFAnimator(file);
+    mBottomRightPoint->readQPointFAnimator(file);
+}
+
+void VideoBox::writeBoundingBox(std::fstream *file) {
+    BoundingBox::writeBoundingBox(file);
+    writeQString(file, mSrcFilePath);
+}
+
+void VideoBox::readBoundingBox(std::fstream *file) {
+    BoundingBox::readBoundingBox(file);
+    readQString(file, &mSrcFilePath);
+}
+
+void Tile::writeTile(std::fstream *file) {
+    file->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+}
+
+void Tile::readTile(std::fstream *file) {
+    file->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+}
+
+void Surface::writeSurface(std::fstream *file) {
+    file->write((char*)&mWidth, sizeof(ushort));
+    file->write((char*)&mHeight, sizeof(ushort));
+    for(int i = 0; i < mNTileCols; i++) {
+        for(int j = 0; j < mNTileRows; j++) {
+            mCurrentTiles[j][i]->writeTile(file);
+        }
+    }
+}
+
+void Surface::readSurface(std::fstream *file) {
+    file->read((char*)&mWidth, sizeof(ushort));
+    file->read((char*)&mHeight, sizeof(ushort));
+    setSize(mWidth, mHeight);
+    for(int i = 0; i < mNTileCols; i++) {
+        for(int j = 0; j < mNTileRows; j++) {
+            mCurrentTiles[j][i]->readTile(file);
+        }
+    }
+}
+
+void PaintBox::writeBoundingBox(std::fstream *file) {
+    BoundingBox::writeBoundingBox(file);
+    mMainHandler->writeSurface(file);
+}
+
+void PaintBox::readBoundingBox(std::fstream *file) {
+    BoundingBox::readBoundingBox(file);
+    mMainHandler->readSurface(file);
+}
+
+void ImageSequenceBox::writeBoundingBox(std::fstream *file) {
+    BoundingBox::writeBoundingBox(file);
+    int nFrames = mListOfFrames.count();
+    file->write((char*)&nFrames, sizeof(int));
+    foreach(const QString &frame, mListOfFrames) {
+        writeQString(file, frame);
+    }
+}
+
+void ImageSequenceBox::readBoundingBox(std::fstream *file) {
+    BoundingBox::readBoundingBox(file);
+    int nFrames;
+    file->read((char*)&nFrames, sizeof(int));
+    for(int i = 0; i < nFrames; i++) {
+        QString frame;
+        readQString(file, &frame);
+        mListOfFrames << frame;
+    }
+}
+
+void TextBox::writeBoundingBox(std::fstream *file) {
+    BoundingBox::writeBoundingBox(file);
+    mText->writeQStringAnimator(file);
+    file->write((char*)&mAlignment, sizeof(Qt::Alignment));
+    qreal fontSize = mFont.pointSizeF();
+    QString fontFamily = mFont.family();
+    QString fontStyle = mFont.styleName();
+    file->write((char*)&fontSize, sizeof(qreal));
+    writeQString(file, fontFamily);
+    writeQString(file, fontStyle);
+}
+
+void TextBox::readBoundingBox(std::fstream *file) {
+    BoundingBox::readBoundingBox(file);
+    mText->readQStringAnimator(file);
+    file->read((char*)&mAlignment, sizeof(Qt::Alignment));
+    qreal fontSize;
+    QString fontFamily;
+    QString fontStyle;
+    file->read((char*)&fontSize, sizeof(qreal));
+    readQString(file, &fontFamily);
+    readQString(file, &fontStyle);
+    mFont.setPointSizeF(fontSize);
+    mFont.setFamily(fontFamily);
+    mFont.setStyleName(fontStyle);
 }
 
 void BoxesGroup::writeBoundingBox(std::fstream *file) {
@@ -608,11 +821,11 @@ void BoxesGroup::readBoundingBox(std::fstream *file) {
         } else if(boxType == TYPE_IMAGESQUENCE) {
             box = new ImageSequenceBox();
         } else if(boxType == TYPE_INTERNAL_LINK) {
-            box = new InternalLinkBox();
+            box = new InternalLinkBox(NULL);
         } else if(boxType == TYPE_EXTERNAL_LINK) {
             box = new ExternalLinkBox();
         } else if(boxType == TYPE_INTERNAL_LINK_CANVAS) {
-            box = new InternalLinkCanvas();
+            box = new InternalLinkCanvas(NULL);
         }
 
         box->readBoundingBox(file);
@@ -700,4 +913,54 @@ void CanvasWindow::readCanvases(std::fstream *file) {
         canvas->readBoundingBox(file);
         MainWindow::getInstance()->addCanvas(canvas);
     }
+}
+
+void MainWindow::loadAVFile(const QString &path) {
+    std::fstream file(path.toUtf8().data(), std::ios_base::in);
+    FileFooter footer;
+    footer.read(&file);
+    if(footer.combatybilityMode() ==
+            FileFooter::CompatybilityMode::Compatible) {
+        GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
+        gradientWidget->readGradients(&file);
+        mCanvasWindow->readCanvases(&file);
+
+        clearLoadedGradientsList();
+        gradientWidget->clearGradientsLoadIds();
+        BoundingBox::clearLoadedBoxes();
+    } else {
+        QMessageBox::critical(this, tr("File Load Fail"),
+                              tr("The file you tried to load is incompatible,\n"
+                                 "or damaged."),
+                              QMessageBox::Ok,
+                              QMessageBox::Ok);
+    }
+
+    file.close();
+}
+
+void MainWindow::saveToFile(const QString &path) {
+    disable();
+    QFile file(path);
+    if(file.exists()) {
+        file.remove();
+    }
+
+    GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
+    std::fstream fileS(path.toUtf8().data(), std::ios_base::out);
+    gradientWidget->setGradientLoadIds();
+    gradientWidget->writeGradients(&fileS);
+    mCanvasWindow->writeCanvases(&fileS);
+
+    clearLoadedGradientsList();
+    gradientWidget->clearGradientsLoadIds();
+
+    FileFooter footer;
+    footer.write(&fileS);
+
+    fileS.close();
+
+    mCanvasWindow->afterAllSavesFinished();
+
+    enable();
 }

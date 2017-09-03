@@ -60,6 +60,8 @@ public:
                                                BoundingBoxRenderData *data);
 
     BoundingBoxRenderData *createRenderData();
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 private:
     ImageCacheHandler *mImgCacheHandler = NULL;
     QString mImageFilePath;

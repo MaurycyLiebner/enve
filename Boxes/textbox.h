@@ -45,8 +45,9 @@ public:
     void setCurrentTextValue(const QString &text,
                              const bool &saveUndoRedo = true);
 
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 private:
-
     QStringAnimatorQSPtr mText;
     QFont mFont;
     Qt::Alignment mAlignment = Qt::AlignLeft;

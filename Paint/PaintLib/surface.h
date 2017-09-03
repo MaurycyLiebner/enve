@@ -93,6 +93,8 @@ public:
                                const qreal &s_t,
                                const qreal &v_t);
     void clearTiles(Tile ***tiles);
+    void writeSurface(std::fstream *file);
+    void readSurface(std::fstream *file);
 protected:
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;

@@ -94,6 +94,8 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
 
+    void writePathEffect(std::fstream *file);
+    void readSumPathEffect(std::fstream *file);
 private:
     PathBox *mParentPathBox;
     QSharedPointer<BoxTargetProperty> mBoxTarget =

@@ -52,6 +52,8 @@ public:
     void setBottomRightPos(const QPointF &pos);
     void setYRadius(const qreal &radiusY);
     void setXRadius(const qreal &radiusX);
+    void writeBoundingBox(std::fstream *file);
+    void readBoundingBox(std::fstream *file);
 protected:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;
