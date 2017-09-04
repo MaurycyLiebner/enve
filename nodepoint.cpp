@@ -521,12 +521,6 @@ void NodePoint::setPointAsPrevious(NodePoint *pointToSet) {
 }
 
 NodePoint *NodePoint::addPointRelPos(const QPointF &relPos) {
-    int targetId;
-    if(mNodeId == 0) {
-        targetId = 0;
-    } else {
-        targetId = mNodeId + 1;
-    }
     NodePoint *newPt =
             mParentPath->addNodeRelPos(relPos,
                                        this);

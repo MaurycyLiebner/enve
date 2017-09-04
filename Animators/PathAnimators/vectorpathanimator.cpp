@@ -460,8 +460,8 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
 
 NodePoint *VectorPathAnimator::createNewNode(const int &targetNodeId,
                                              const QPointF &startRelPos,
-                                             const QPointF &endRelPos,
                                              const QPointF &relPos,
+                                             const QPointF &endRelPos,
                                              const NodeSettings &nodeSettings) {
     NodeSettings *nodeSettingsPtr =
             insertNodeSettingsForNodeId(targetNodeId,

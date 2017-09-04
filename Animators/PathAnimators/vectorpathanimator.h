@@ -164,8 +164,8 @@ public:
 private:
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,
-                             const QPointF &endRelPos,
                              const QPointF &relPos,
+                             const QPointF &endRelPos,
                              const NodeSettings &nodeSettings);
     void updateNodePointIds();
 
