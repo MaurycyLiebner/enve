@@ -190,6 +190,15 @@ Tile::Tile(const ushort &x_t, const ushort &y_t,
     clear();
 }
 
+Tile::~Tile() {
+    if(mDataTmp != NULL) {
+        delete[] mDataTmp;
+    }
+    if(mData != NULL) {
+        delete[] mData;
+    }
+}
+
 void Tile::setPosInSurface(const ushort &x_t, const ushort &y_t) {
     mPosX = x_t;
     mPosY = y_t;
@@ -300,10 +309,18 @@ void Tile::getColor(qreal cx,
     *alpha_sum = alpha_sum_t;
     *weight_sum = weight_sum_t;
 }
+
 void Tile::updateTexFromDataArray() {
     uchar *dataT = mDrawer->data;
     for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
         mData[i] = dataT[i];
+    }
+}
+
+void Tile::updateDrawerFromDataArray() {
+    uchar *dataT = mDrawer->data;
+    for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
+        dataT[i] = mData[i];
     }
 }
 
@@ -326,6 +343,10 @@ TileSkDrawer::TileSkDrawer(Tile *parentTileT,
     SkPixmap pix;
     tileImg->peekPixels(&pix);
     data = (uchar*)pix.writable_addr();
+}
+
+TileSkDrawer::~TileSkDrawer() {
+    delete[] data;
 }
 
 void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {

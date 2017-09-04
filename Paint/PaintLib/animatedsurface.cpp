@@ -144,11 +144,12 @@ void AnimatedSurface::anim_moveKeyToRelFrame(Key *key,
 void AnimatedSurface::setSize(const ushort &width_t,
                               const ushort &height_t) {
     // initialize tiles
-    ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
-    ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
-    ushort last_row_height = height_t%TILE_DIM;
-    ushort last_column_width = width_t%TILE_DIM;
+
     if(prp_hasKeys()) {
+        ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
+        ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
+        ushort last_row_height = height_t%TILE_DIM;
+        ushort last_column_width = width_t%TILE_DIM;
         Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
             SurfaceKey *frameT = (SurfaceKey*)key.get();
             Tile ***currentTiles = frameT->getTiles();
@@ -159,25 +160,14 @@ void AnimatedSurface::setSize(const ushort &width_t,
                                                  currentTiles);
 
             frameT->setTiles(tiles_t);
-            delete[] currentTiles;
         }
+        mWidth = width_t;
+        mHeight = height_t;
+        mNTileRows = n_tile_rows_t;
+        mNTileCols = n_tile_cols_t;
     } else {
-        Tile ***tiles_t = createResizedTiles(n_tile_cols_t,
-                                             n_tile_rows_t,
-                                             last_column_width,
-                                             last_row_height,
-                                             mCurrentTiles);
-
-        if(mCurrentTiles != NULL) {
-            delete[] mCurrentTiles;
-        }
-        mCurrentTiles = tiles_t;
+        Surface::setSize(width_t, height_t);
     }
-
-    mWidth = width_t;
-    mHeight = height_t;
-    mNTileRows = n_tile_rows_t;
-    mNTileCols = n_tile_cols_t;
 }
 
 void AnimatedSurface::newSurfaceFrame() {

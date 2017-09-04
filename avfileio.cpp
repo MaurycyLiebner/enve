@@ -328,24 +328,28 @@ void BasicTransformAnimator::writeBasicTransformAnimator(std::fstream *file) {
     mPosAnimator->writeQPointFAnimator(file);
     mScaleAnimator->writeQPointFAnimator(file);
     mRotAnimator->writeQrealAnimator(file);
+    updateRelativeTransform();
 }
 
 void BasicTransformAnimator::readBasicTransformAnimator(std::fstream *file) {
     mPosAnimator->readQPointFAnimator(file);
     mScaleAnimator->readQPointFAnimator(file);
     mRotAnimator->readQrealAnimator(file);
+    updateRelativeTransform();
 }
 
 void BoxTransformAnimator::writeBoxTransformAnimator(std::fstream *file) {
     writeBasicTransformAnimator(file);
     mOpacityAnimator->writeQrealAnimator(file);
     mPivotAnimator->writeQPointFAnimator(file);
+    updateRelativeTransform();
 }
 
 void BoxTransformAnimator::readBoxTransformAnimator(std::fstream *file) {
     readBasicTransformAnimator(file);
     mOpacityAnimator->readQrealAnimator(file);
     mPivotAnimator->readQPointFAnimator(file);
+    updateRelativeTransform();
 }
 
 void GradientPoints::writeGradientPoints(std::fstream *file) {
@@ -703,6 +707,9 @@ void Tile::writeTile(std::fstream *file) {
 
 void Tile::readTile(std::fstream *file) {
     file->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+    if(mPaintInOtherThread) {
+        updateDrawerFromDataArray();
+    }
 }
 
 void Surface::writeSurface(std::fstream *file) {
@@ -902,6 +909,7 @@ void BoxesGroup::readBoundingBox(std::fstream *file) {
         }
 
         box->readBoundingBox(file);
+        box->setParent(this);
         addChild(box);
     }
 }

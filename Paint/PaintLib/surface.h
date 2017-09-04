@@ -19,6 +19,7 @@ public:
             const ushort &height_t,
             const qreal &scale,
             const bool &paintOnOtherThread = true);
+    ~Surface();
     void strokeTo(Brush *brush,
                   qreal x, qreal y,
                   const qreal &pressure,

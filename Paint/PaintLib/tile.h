@@ -51,6 +51,7 @@ class Tile;
 struct TileSkDrawer : public Updatable {
     TileSkDrawer(Tile *parentTileT,
                  const ushort &xT, const ushort &yT);
+    ~TileSkDrawer();
 
     void drawSk(SkCanvas *canvas, SkPaint *paint = NULL) const;
 
@@ -77,7 +78,7 @@ class Tile {
 public:
     Tile(const ushort &x_t, const ushort &y_t,
          const bool &paintInOtherThread = true);
-
+    ~Tile();
 
     void processUpdate();
     void addDabToDraw(qreal cx,
@@ -122,6 +123,8 @@ public:
     void writeTile(std::fstream *file);
     void readTile(std::fstream *file);
 private:
+    void updateDrawerFromDataArray();
+
     bool mPaintInOtherThread = true;
     std::shared_ptr<TileSkDrawer> mDrawer;
     SkBitmap mDataTileImage;

@@ -73,7 +73,7 @@ public:
                     const ulong &timestamp,
                     const qreal &pressure,
                     Brush *brush);
-
+    MovablePoint *getTopLeftPoint();
     MovablePoint *getBottomRightPoint();
     MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
                              const CanvasMode &currentCanvasMode,

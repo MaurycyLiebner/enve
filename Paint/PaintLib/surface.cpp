@@ -13,6 +13,17 @@ Surface::Surface(const ushort &width_t,
     setSize(width_t, height_t);
 }
 
+Surface::~Surface() {
+    if(mCurrentTiles == NULL) return;
+    for(int i = 0; i < mNTileRows; i++) {
+        for(int j = 0; j < mNTileCols; j++) {
+            delete mCurrentTiles[i][j];
+        }
+        delete[] mCurrentTiles[i];
+    }
+    delete[] mCurrentTiles;
+}
+
 qreal Surface::countDabsTo(const qreal &dist_between_dabs,
                            const qreal &x, const qreal &y) {
     qreal dx = x - mLastPaintedStrokeX;
@@ -450,7 +461,12 @@ Tile ***Surface::createResizedTiles(const ushort &nTileCols,
                                        mPaintOnOtherThread);
         }
     }
-
+    if(currentTiles == mCurrentTiles) {
+        mCurrentTiles = tiles_t;
+    }
+    if(currentTiles != NULL) {
+        delete[] currentTiles;
+    }
     if(lastRowHeight != 0) {
         for(int i = 0; i < nTileCols; i++) {
             tiles_t[nTilesRows - 1][i]->setTileHeight(lastRowHeight);
@@ -460,10 +476,6 @@ Tile ***Surface::createResizedTiles(const ushort &nTileCols,
         for(int j = 0; j < nTilesRows; j++) {
             tiles_t[j][nTileCols - 1]->setTileWidth(lastColumnWidth);
         }
-    }
-
-    if(currentTiles == mCurrentTiles) {
-        mCurrentTiles = tiles_t;
     }
 
     return tiles_t;
@@ -481,9 +493,6 @@ void Surface::setSize(const ushort &width_t,
                                          last_column_width,
                                          last_row_height,
                                          mCurrentTiles);
-    if(mCurrentTiles != NULL) {
-        delete[] mCurrentTiles;
-    }
 
     mCurrentTiles = tiles_t;
 

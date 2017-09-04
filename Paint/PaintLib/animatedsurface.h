@@ -8,12 +8,25 @@ class PaintBox;
 class SurfaceKey : public Key {
 public:
     SurfaceKey(Animator *parentAnimator);
+    ~SurfaceKey() {
+        if(mCurrentTiles == NULL) return;
+        for(int i = 0; i < mNTileRows; i++) {
+            for(int j = 0; j < mNTileCols; j++) {
+                delete mCurrentTiles[i][j];
+            }
+            delete[] mCurrentTiles[i];
+        }
+        delete[] mCurrentTiles;
+    }
+
     Tile ***getTiles() { return mTiles; }
     void setTiles(Tile ***tiles) { mTiles = tiles; }
     bool differsFromKey(Key *) { return true; }
     void writeSurfaceKey(std::fstream *file, const ushort &nCols, const ushort &nRows);
     void readSurfaceKey(std::fstream *file, const ushort &nCols, const ushort &nRows);
 private:
+    int mNTileCols = 0;
+    int mNTileRows = 0;
     Tile ***mTiles = NULL;
 };
 

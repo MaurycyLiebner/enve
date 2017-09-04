@@ -103,15 +103,21 @@ void PaintBox::newPaintFrameOnCurrentFrame() {
     scheduleUpdate();
 }
 
+MovablePoint *PaintBox::getTopLeftPoint() {
+    return mTopLeftPoint;
+}
+
 MovablePoint *PaintBox::getBottomRightPoint() {
     return mBottomRightPoint;
 }
 
 void PaintBox::finishSizeSetup() {
+    QPointF tL = mTopLeftPoint->getCurrentPointValue();
     QPointF bR = mBottomRightPoint->getCurrentPointValue();
-    if(bR.x() < 1. || bR.y() < 1.) return;
-    ushort widthT = bR.x();
-    ushort heightT = bR.y();
+    QPointF sizeT = bR - tL;
+    if(sizeT.x() < 1. || sizeT.y() < 1.) return;
+    ushort widthT = sizeT.x();
+    ushort heightT = sizeT.y();
     if(widthT == mWidth && heightT == mHeight) return;
     mWidth = widthT;
     mHeight = heightT;
@@ -261,7 +267,7 @@ void PaintBox::paintPress(const qreal &xT,
                              brush);
     mTemporaryHandler->paintPress(relPos.x(), relPos.y(),
                              timestamp, pressure,
-                             brush);
+                                  brush);
 }
 
 void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
