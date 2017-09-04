@@ -2092,18 +2092,18 @@ void SvgSeparatePath::apply(VectorPathAnimator *path) {
     NodePoint *lastPoint = NULL;
     NodePoint *firstPoint = NULL;
     Q_FOREACH(SvgNodePoint *point, mPoints) {
-        NodePoint *newPoint = new NodePoint(path);
-        if(firstPoint == NULL) firstPoint = newPoint;
         lastPoint = path->addNodeRelPos(point->getStartPoint(),
-                            point->getPoint(),
-                            point->getEndPoint(),
-                            lastPoint,
-                            NodeSettings(point->getStartPointEnabled(),
-                                         point->getEndPointEnabled(),
-                                         point->getCtrlsMode()));
+                                        point->getPoint(),
+                                        point->getEndPoint(),
+                                        lastPoint,
+                                        NodeSettings(point->getStartPointEnabled(),
+                                                     point->getEndPointEnabled(),
+                                                     point->getCtrlsMode()));
+        if(firstPoint == NULL) firstPoint = lastPoint;
     }
     if(mClosedPath) {
         lastPoint->connectToPoint(firstPoint);
+        path->setPathClosed(mClosedPath);
     }
 }
 
