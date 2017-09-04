@@ -191,12 +191,7 @@ Tile::Tile(const ushort &x_t, const ushort &y_t,
 }
 
 Tile::~Tile() {
-    if(mDataTmp != NULL) {
-        delete[] mDataTmp;
-    }
-    if(mData != NULL) {
-        delete[] mData;
-    }
+    mDrawer->parentTile = NULL;
 }
 
 void Tile::setPosInSurface(const ushort &x_t, const ushort &y_t) {
@@ -346,7 +341,6 @@ TileSkDrawer::TileSkDrawer(Tile *parentTileT,
 }
 
 TileSkDrawer::~TileSkDrawer() {
-    delete[] data;
 }
 
 void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
@@ -356,7 +350,9 @@ void TileSkDrawer::drawSk(SkCanvas *canvas, SkPaint *paint) const {
 
 void TileSkDrawer::schedulerProccessed() {
     Updatable::schedulerProccessed();
-    parentTile->setDabsForDrawer();
+    if(parentTile != NULL) {
+        parentTile->setDabsForDrawer();
+    }
 }
 
 void TileSkDrawer::processUpdate() {
@@ -367,8 +363,10 @@ void TileSkDrawer::processUpdate() {
 }
 
 void TileSkDrawer::afterUpdate() {
+    if(parentTile != NULL) {
+        parentTile->updateTexFromDataArray();
+    }
     Updatable::afterUpdate();
-    parentTile->updateTexFromDataArray();
 }
 
 void TileSkDrawer::clearImg() {

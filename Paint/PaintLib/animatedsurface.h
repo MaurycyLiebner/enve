@@ -9,25 +9,25 @@ class SurfaceKey : public Key {
 public:
     SurfaceKey(Animator *parentAnimator);
     ~SurfaceKey() {
-        if(mCurrentTiles == NULL) return;
-        for(int i = 0; i < mNTileRows; i++) {
-            for(int j = 0; j < mNTileCols; j++) {
-                delete mCurrentTiles[i][j];
-            }
-            delete[] mCurrentTiles[i];
-        }
-        delete[] mCurrentTiles;
+
     }
 
-    Tile ***getTiles() { return mTiles; }
-    void setTiles(Tile ***tiles) { mTiles = tiles; }
-    bool differsFromKey(Key *) { return true; }
-    void writeSurfaceKey(std::fstream *file, const ushort &nCols, const ushort &nRows);
-    void readSurfaceKey(std::fstream *file, const ushort &nCols, const ushort &nRows);
+    void setSize(const ushort &width,
+                 const ushort &height) {
+        if(mTiles == NULL) {
+            mTiles = (new TilesData(width, height, true))->ref<TilesData>();
+        } else {
+            mTiles->setSize(width, height);
+        }
+    }
+
+    TilesData *getTiles() { return mTiles.get(); }
+    void setTiles(TilesData *tiles) { mTiles = tiles->ref<TilesData>(); }
+    bool differsFromKey(Key *key) { return key != this; }
+    void writeSurfaceKey(std::fstream *file);
+    void readSurfaceKey(std::fstream *file);
 private:
-    int mNTileCols = 0;
-    int mNTileRows = 0;
-    Tile ***mTiles = NULL;
+    std::shared_ptr<TilesData> mTiles;
 };
 
 class AnimatedSurface : public Surface,
@@ -52,12 +52,7 @@ public:
 
     void newSurfaceFrame();
     void updateTargetTiles();
-    Tile ***createNewTilesArray();
-    Tile ***createResizedTiles(const ushort &nTileCols,
-                               const ushort &nTilesRows,
-                               const ushort &lastColumnWidth,
-                               const ushort &lastRowHeight,
-                               Tile ***currentTiles);
+
     void anim_removeKey(Key *keyToRemove,
                         const bool &saveUndoRedo = true);
     void anim_appendKey(Key *newKey,
@@ -70,11 +65,12 @@ public:
 
     void writeAnimatedSurface(std::fstream *file);
     void readAnimatedSurface(std::fstream *file);
+    void currentDataModified();
 protected:
     PaintBox *mParentBox = NULL;
     int mCurrentTilesFrame = 0;
     int mPreviousTilesFrame = 0;
-    Tile ***mNextTiles = NULL;
+    std::shared_ptr<TilesData> mNextTiles;
     int mNextTilesFrame = 0;
 };
 

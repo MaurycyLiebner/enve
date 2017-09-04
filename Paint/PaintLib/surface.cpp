@@ -4,24 +4,19 @@
 #include "GL/gl.h"
 #include "Colors/helpers.h"
 
-Surface::Surface(const ushort &width_t,
-                 const ushort &height_t,
+Surface::Surface(const ushort &widthT,
+                 const ushort &heightT,
                  const qreal &scale,
                  const bool &paintOnOtherThread) {
     mScale = scale;
+    mCurrentTiles = (new TilesData(widthT, heightT,
+                                   paintOnOtherThread))->ref<TilesData>();
     mPaintOnOtherThread = paintOnOtherThread;
-    setSize(width_t, height_t);
+    setSize(widthT, heightT);
 }
 
 Surface::~Surface() {
-    if(mCurrentTiles == NULL) return;
-    for(int i = 0; i < mNTileRows; i++) {
-        for(int j = 0; j < mNTileCols; j++) {
-            delete mCurrentTiles[i][j];
-        }
-        delete[] mCurrentTiles[i];
-    }
-    delete[] mCurrentTiles;
+
 }
 
 qreal Surface::countDabsTo(const qreal &dist_between_dabs,
@@ -95,9 +90,10 @@ void Surface::getColor(const qreal &cx,
     short max_tile_y;
     getTileIdsOnRect(cx - r, cx + r, cy - r, cy + r,
                      &min_tile_x, &max_tile_x, &min_tile_y, &max_tile_y);
+    Tile ***tilesT = mCurrentTiles->getData();
     for(short i = min_tile_x; i <= max_tile_x; i++) {
         for(short j = min_tile_y; j <= max_tile_y; j++) {
-            Tile *tile_t = mCurrentTiles[j][i];
+            Tile *tile_t = tilesT[j][i];
             tile_t->getColor(cx, cy,
                              r, aspect_ratio, cs, sn,
                              hardness, opa,
@@ -128,31 +124,19 @@ void Surface::clearTiles(Tile ***tiles) {
 }
 
 void Surface::clear() {
-    clearTiles(mCurrentTiles);
+    mCurrentTiles->clearTiles();
 }
 
 void Surface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            tileDrawers->append(mCurrentTiles[j][i]->getTexTileDrawer());
-        }
-    }
+    mCurrentTiles->getTileDrawers(tileDrawers);
 }
 
 void Surface::clearTmp() {
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            mCurrentTiles[j][i]->clearTmp();
-        }
-    }
+    mCurrentTiles->clearTmp();
 }
 
 void Surface::saveToTmp() {
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            mCurrentTiles[j][i]->saveToTmp();
-        }
-    }
+    mCurrentTiles->saveToTmp();
 }
 
 void Surface::strokeTo(Brush *brush,
@@ -307,7 +291,7 @@ void Surface::strokeTo(Brush *brush,
         stroke_v = stroke_blue;
         qrgb_to_hsv(&stroke_h, &stroke_s, &stroke_v);
     }
-
+    Tile ***tilesT = mCurrentTiles->getData();
     for(short i = 0; i < dabs_to_i; i++) {
         if(!fixed_color) {
             dab_red = stroke_h;
@@ -365,7 +349,7 @@ void Surface::strokeTo(Brush *brush,
         //#pragma omp parallel for
         for(short tx = dab_min_tile_x; tx <= dab_max_tile_x; tx++) {
             for(short ty = dab_min_tile_y; ty <= dab_max_tile_y; ty++) {
-                mCurrentTiles[ty][tx]->addDabToDraw(dab_x, dab_y,
+                tilesT[ty][tx]->addDabToDraw(dab_x, dab_y,
                                             dab_hardness,
                                             dab_opa*alpha_sum_t,
                                             dab_aspect_ratio,
@@ -378,11 +362,12 @@ void Surface::strokeTo(Brush *brush,
 
     for(short tx = min_affected_tile_x; tx <= max_affected_tile_x; tx++) {
         for(short ty = min_affected_tile_y; ty <= max_affected_tile_y; ty++) {
-            mCurrentTiles[ty][tx]->addScheduler();
+            tilesT[ty][tx]->addScheduler();
         }
     }
 
     mLastStrokePress = pressure;
+    currentDataModified();
 }
 
 void Surface::startNewStroke(Brush *brush,
@@ -426,75 +411,13 @@ void Surface::startNewStroke(Brush *brush,
     mSecondColorAlphaCount = UCHAR_MAX;
 }
 
-Tile *Surface::getTile(const ushort &tile_col,
-                       const ushort &tile_row) {
-    return mCurrentTiles[tile_row][tile_col];
-}
-
-
-Tile ***Surface::createResizedTiles(const ushort &nTileCols,
-                                    const ushort &nTilesRows,
-                                    const ushort &lastColumnWidth,
-                                    const ushort &lastRowHeight,
-                                    Tile ***currentTiles) {
-    Tile ***tiles_t = new Tile**[nTilesRows];
-
-    for(ushort rw = 0; rw < nTilesRows; rw++) {
-        tiles_t[rw] = new Tile*[nTileCols];
-        ushort first_new_col_in_row = 0;
-        if(rw < mNTileRows) {
-            first_new_col_in_row = mNTileCols;
-            for(ushort cl = 0; cl < mNTileCols; cl++) {
-                Tile *tile_t = currentTiles[rw][cl];
-                if(cl < nTileCols) {
-                    tile_t->resetTileSize();
-                    tiles_t[rw][cl] = tile_t;
-                } else {
-                    delete tile_t;
-                }
-            }
-            delete[] currentTiles[rw];
-        }
-
-        for(ushort cl = first_new_col_in_row; cl < nTileCols; cl++) {
-            tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM,
-                                       mPaintOnOtherThread);
-        }
-    }
-    if(currentTiles == mCurrentTiles) {
-        mCurrentTiles = tiles_t;
-    }
-    if(currentTiles != NULL) {
-        delete[] currentTiles;
-    }
-    if(lastRowHeight != 0) {
-        for(int i = 0; i < nTileCols; i++) {
-            tiles_t[nTilesRows - 1][i]->setTileHeight(lastRowHeight);
-        }
-    }
-    if(lastColumnWidth != 0) {
-        for(int j = 0; j < nTilesRows; j++) {
-            tiles_t[j][nTileCols - 1]->setTileWidth(lastColumnWidth);
-        }
-    }
-
-    return tiles_t;
-}
-
 void Surface::setSize(const ushort &width_t,
                       const ushort &height_t) {
     // initialize tiles
     ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
     ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
-    ushort last_row_height = height_t%TILE_DIM;
-    ushort last_column_width = width_t%TILE_DIM;
-    Tile ***tiles_t = createResizedTiles(n_tile_cols_t,
-                                         n_tile_rows_t,
-                                         last_column_width,
-                                         last_row_height,
-                                         mCurrentTiles);
 
-    mCurrentTiles = tiles_t;
+    mCurrentTiles->setSize(width_t, height_t);
 
     mWidth = width_t;
     mHeight = height_t;

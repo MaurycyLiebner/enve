@@ -106,7 +106,7 @@ public:
             VectorPathAnimator *parentAnimator);
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
-    bool differsFromKey(Key *key) { return true; }
+    bool differsFromKey(Key *key) { return key != this; }
     void writePathKey(std::fstream *file);
     void readPathKey(std::fstream *file);
 };

@@ -253,6 +253,7 @@ void PaintBox::mouseMoveEvent(const qreal &xT,
     srand(seedT);
     mTemporaryHandler->mouseMoveEvent(relPos.x(), relPos.y(),
                                  time_stamp, erase, brush);
+    scheduleUpdate();
 }
 
 void PaintBox::paintPress(const qreal &xT,

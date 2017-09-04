@@ -712,47 +712,43 @@ void Tile::readTile(std::fstream *file) {
     }
 }
 
+void TilesData::writeTilesData(std::fstream *file) {
+    for(int i = 0; i < mNTileCols; i++) {
+        for(int j = 0; j < mNTileRows; j++) {
+            mTiles[j][i]->writeTile(file);
+        }
+    }
+}
+
+void TilesData::readTilesData(std::fstream *file) {
+    for(int i = 0; i < mNTileCols; i++) {
+        for(int j = 0; j < mNTileRows; j++) {
+            mTiles[j][i]->readTile(file);
+        }
+    }
+}
+
 void Surface::writeSurface(std::fstream *file) {
     file->write((char*)&mWidth, sizeof(ushort));
     file->write((char*)&mHeight, sizeof(ushort));
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            mCurrentTiles[j][i]->writeTile(file);
-        }
-    }
+    mCurrentTiles->writeTilesData(file);
 }
 
 void Surface::readSurface(std::fstream *file) {
     file->read((char*)&mWidth, sizeof(ushort));
     file->read((char*)&mHeight, sizeof(ushort));
     setSize(mWidth, mHeight);
-    for(int i = 0; i < mNTileCols; i++) {
-        for(int j = 0; j < mNTileRows; j++) {
-            mCurrentTiles[j][i]->readTile(file);
-        }
-    }
+    mCurrentTiles->readTilesData(file);
 }
 
-void SurfaceKey::writeSurfaceKey(std::fstream *file,
-                                const ushort &nCols,
-                                const ushort &nRows) {
+void SurfaceKey::writeSurfaceKey(std::fstream *file) {
     Key::writeKey(file);
-    for(int i = 0; i < nCols; i++) {
-        for(int j = 0; j < nRows; j++) {
-            mTiles[j][i]->writeTile(file);
-        }
-    }
+    mTiles->writeTilesData(file);
 }
 
-void SurfaceKey::readSurfaceKey(std::fstream *file,
-                                const ushort &nCols,
-                                const ushort &nRows) {
+void SurfaceKey::readSurfaceKey(std::fstream *file) {
     Key::readKey(file);
-    for(int i = 0; i < nCols; i++) {
-        for(int j = 0; j < nRows; j++) {
-            mTiles[j][i]->readTile(file);
-        }
-    }
+    mTiles->readTilesData(file);
 }
 
 void AnimatedSurface::writeAnimatedSurface(std::fstream *file) {
@@ -761,16 +757,10 @@ void AnimatedSurface::writeAnimatedSurface(std::fstream *file) {
     int nKeys = anim_mKeys.count();
     file->write((char*)&nKeys, sizeof(int));
     if(nKeys == 0) {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                mCurrentTiles[j][i]->writeTile(file);
-            }
-        }
+        mCurrentTiles->writeTilesData(file);
     } else {
         foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-            ((SurfaceKey*)key.get())->writeSurfaceKey(file,
-                                                      mNTileCols,
-                                                      mNTileRows);
+            ((SurfaceKey*)key.get())->writeSurfaceKey(file);
         }
     }
 }
@@ -778,26 +768,21 @@ void AnimatedSurface::writeAnimatedSurface(std::fstream *file) {
 void AnimatedSurface::readAnimatedSurface(std::fstream *file) {
     file->read((char*)&mWidth, sizeof(ushort));
     file->read((char*)&mHeight, sizeof(ushort));
-    setSize(mWidth, mHeight);
     int nKeys;
     file->read((char*)&nKeys, sizeof(int));
     if(nKeys == 0) {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                mCurrentTiles[j][i]->readTile(file);
-            }
-        }
+        setSize(mWidth, mHeight);
+        mCurrentTiles->readTilesData(file);
     } else {
         for(int i = 0; i < nKeys; i++) {
             SurfaceKey *key = new SurfaceKey(this);
-            if(i == 0) {
-                key->setTiles(createNewTilesArray());
-            } else {
-                key->setTiles(mCurrentTiles);
-            }
-            key->readSurfaceKey(file, mNTileCols, mNTileRows);
+            key->setTiles(new TilesData(mWidth,
+                                        mHeight,
+                                        true));
+            key->readSurfaceKey(file);
             anim_appendKey(key);
         }
+        setSize(mWidth, mHeight);
     }
 }
 

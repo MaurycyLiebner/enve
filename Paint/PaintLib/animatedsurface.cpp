@@ -9,7 +9,22 @@ AnimatedSurface::AnimatedSurface(const ushort &widthT,
     Surface(widthT, heightT, scale, paintOnOtherThread),
     Animator() {
     mParentBox = parentBox;
-    mCurrentTiles = createNewTilesArray();
+}
+
+void AnimatedSurface::currentDataModified() {
+    if(prp_hasKeys()) {
+        if(prp_isKeyOnCurrentFrame()) {
+            anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
+        } else {
+            Key *key = anim_getPrevKey(anim_mCurrentRelFrame);
+            if(key == NULL) {
+                key = anim_getNextKey(anim_mCurrentRelFrame);
+            }
+            anim_updateAfterChangedKey(key);
+        }
+    } else {
+        prp_updateInfluenceRangeAfterChanged();
+    }
 }
 
 void AnimatedSurface::updateTargetTiles() {
@@ -18,42 +33,17 @@ void AnimatedSurface::updateTargetTiles() {
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
                                                anim_mCurrentRelFrame)) {
         SurfaceKey *prevKey = (SurfaceKey*)anim_mKeys.at(prevId).get();
-        mCurrentTiles = prevKey->getTiles();
+        mCurrentTiles = prevKey->getTiles()->ref<TilesData>();
         mCurrentTilesFrame = prevKey->getRelFrame();
         if(prevId == nextId) {
             mNextTiles = NULL;
             mNextTilesFrame = mCurrentTilesFrame;
         } else {
             SurfaceKey *nextKey = (SurfaceKey*)anim_mKeys.at(nextId).get();
-            mNextTiles = nextKey->getTiles();
+            mNextTiles = nextKey->getTiles()->ref<TilesData>();
             mNextTilesFrame = nextKey->getRelFrame();
         }
     }
-}
-
-Tile ***AnimatedSurface::createNewTilesArray() {
-    ushort lastRowHeight = mHeight%TILE_DIM;
-    ushort lastColumnWidth = mWidth%TILE_DIM;
-    Tile ***tiles_t = new Tile**[mNTileRows];
-
-    for(ushort rw = 0; rw < mNTileRows; rw++) {
-        tiles_t[rw] = new Tile*[mNTileCols];
-        for(ushort cl = 0; cl < mNTileCols; cl++) {
-            tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM,
-                                       mPaintOnOtherThread);
-        }
-    }
-    if(lastRowHeight != 0) {
-        for(int i = 0; i < mNTileCols; i++) {
-            tiles_t[mNTileRows - 1][i]->setTileHeight(lastRowHeight);
-        }
-    }
-    if(lastColumnWidth != 0) {
-        for(int j = 0; j < mNTileRows; j++) {
-            tiles_t[j][mNTileCols - 1]->setTileWidth(lastColumnWidth);
-        }
-    }
-    return tiles_t;
 }
 
 void AnimatedSurface::setCurrentRelFrame(const int &relFrame) {
@@ -74,14 +64,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
             qreal alphaT = (mCurrentTilesFrame - anim_mCurrentRelFrame)*1./dR;
             alpha = qRound((1. - alphaT*alphaT)*255.);
         }
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                TileSkDrawer *tileDrawer =
-                        mCurrentTiles[j][i]->getTexTileDrawer();
-                tileDrawer->alpha = alpha;
-                tileDrawers->append(tileDrawer);
-            }
-        }
+        mCurrentTiles->getTileDrawers(tileDrawers, alpha);
     }
     if(mNextTiles != NULL) {
         int alpha;
@@ -92,31 +75,8 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
             qreal alphaT = (mNextTilesFrame - anim_mCurrentRelFrame)*1./dR;
             alpha = qRound((1. - alphaT*alphaT)*255.);
         }
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                TileSkDrawer *tileDrawer =
-                        mNextTiles[j][i]->getTexTileDrawer();
-                tileDrawer->alpha = alpha;
-                tileDrawers->append(tileDrawer);
-            }
-        }
+        mNextTiles->getTileDrawers(tileDrawers, alpha);
     }
-}
-
-Tile ***AnimatedSurface::createResizedTiles(const ushort &nTileCols,
-                                         const ushort &nTilesRows,
-                                         const ushort &lastColumnWidth,
-                                         const ushort &lastRowHeight,
-                                         Tile ***currentTiles) {
-    Tile ***tiles_t = Surface::createResizedTiles(nTileCols, nTilesRows,
-                                                  lastColumnWidth,
-                                                  lastRowHeight,
-                                                  currentTiles);
-    if(currentTiles == mNextTiles) {
-        mNextTiles = tiles_t;
-    }
-
-    return tiles_t;
 }
 
 void AnimatedSurface::anim_removeKey(Key *keyToRemove,
@@ -148,18 +108,10 @@ void AnimatedSurface::setSize(const ushort &width_t,
     if(prp_hasKeys()) {
         ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
         ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
-        ushort last_row_height = height_t%TILE_DIM;
-        ushort last_column_width = width_t%TILE_DIM;
         Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
             SurfaceKey *frameT = (SurfaceKey*)key.get();
-            Tile ***currentTiles = frameT->getTiles();
-            Tile ***tiles_t = createResizedTiles(n_tile_cols_t,
-                                                 n_tile_rows_t,
-                                                 last_column_width,
-                                                 last_row_height,
-                                                 currentTiles);
-
-            frameT->setTiles(tiles_t);
+            frameT->setSize(width_t,
+                            height_t);
         }
         mWidth = width_t;
         mHeight = height_t;
@@ -174,7 +126,7 @@ void AnimatedSurface::newSurfaceFrame() {
     SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(anim_mCurrentRelFrame);
     if(prevKey != NULL) {
         if(prevKey->getRelFrame() == anim_mCurrentRelFrame) {
-            clearTiles(prevKey->getTiles());
+            prevKey->getTiles()->clearTiles();
             return;
         }
     }
@@ -182,9 +134,9 @@ void AnimatedSurface::newSurfaceFrame() {
     SurfaceKey *frameT = new SurfaceKey(this);
     frameT->setRelFrame(anim_mCurrentRelFrame);
     if(prp_hasKeys()) {
-        frameT->setTiles(createNewTilesArray());
+        frameT->setSize(mWidth, mHeight);
     } else {
-        frameT->setTiles(mCurrentTiles);
+        frameT->setTiles(mCurrentTiles.get());
     }
 
     anim_appendKey(frameT);
@@ -192,6 +144,6 @@ void AnimatedSurface::newSurfaceFrame() {
     updateTargetTiles();
 }
 
-SurfaceKey::SurfaceKey(Animator *parentAnimator) : Key(parentAnimator){
-
+SurfaceKey::SurfaceKey(Animator *parentAnimator) :
+    Key(parentAnimator){
 }

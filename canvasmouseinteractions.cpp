@@ -888,7 +888,6 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
                                          mCurrentMouseEventPosRel.y(),
                                          event->timestamp(),
                                          false, mCurrentBrush);
-                paintBox->scheduleUpdate();
             }
         }
         callUpdateSchedulers();
