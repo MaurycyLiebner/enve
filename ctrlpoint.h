@@ -24,6 +24,7 @@ public:
     void cancelTransform();
 
     void rotate(const qreal &rotate);
+    void scale(const qreal &sx, const qreal &sy);
 
     int getPtId();
 

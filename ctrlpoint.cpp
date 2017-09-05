@@ -37,10 +37,18 @@ void CtrlPoint::moveToAbsWithoutUpdatingTheOther(const QPointF &absPos) {
 }
 
 void CtrlPoint::rotate(const qreal &rotate) {
-    QPointF savedValue = mSavedRelPos;
+    QPointF savedValue = mSavedRelPos - mParentPoint->getSavedRelPos();
     QMatrix mat;
     mat.rotate(rotate);
-    mCurrentPos = mat.map(savedValue);
+    setRelativePos(mat.map(savedValue) + mParentPoint->getRelativePos());
+}
+
+void CtrlPoint::scale(const qreal &sx,
+                      const qreal &sy) {
+    QPointF savedValue = mSavedRelPos - mParentPoint->getSavedRelPos();
+    QMatrix mat;
+    mat.scale(sx, sy);
+    setRelativePos(mat.map(savedValue) + mParentPoint->getRelativePos());
 }
 
 int CtrlPoint::getPtId() {

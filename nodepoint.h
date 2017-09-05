@@ -169,6 +169,8 @@ public:
 
     void saveTransformPivotAbsPos(const QPointF &absPivot);
     void rotateRelativeToSavedPivot(const qreal &rot);
+    void scaleRelativeToSavedPivot(const qreal &sx,
+                                   const qreal &sy);
 
     VectorPathEdge *getNextEdge() {
         return mNextEdge.get();

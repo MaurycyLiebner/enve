@@ -66,7 +66,6 @@ public:
     void scale(const qreal &scaleXBy, const qreal &scaleYBy);
     void saveTransformPivotAbsPos(const QPointF &absPivot);
     void scale(const qreal &scaleBy);
-    void cancelTransform();
 
     void setRadius(qreal radius);
 
@@ -74,8 +73,8 @@ public:
 
     qreal getRadius();
     void moveToRel(const QPointF &relPos);
-    void scaleRelativeToSavedPivot(const qreal &sx,
-                                   const qreal &sy);
+    virtual void scaleRelativeToSavedPivot(const qreal &sx,
+                                           const qreal &sy);
     virtual void rotateRelativeToSavedPivot(const qreal &rot);
 
 
@@ -89,6 +88,7 @@ public:
     virtual void setRelativePos(const QPointF &relPos) = 0;
     virtual QPointF getRelativePos() const = 0;
     virtual void moveByRel(const QPointF &relTranslation) = 0;
+    const QPointF &getSavedRelPos() const;
 protected:
     bool mTransformStarted = false;
     MovablePointType mType;
@@ -132,6 +132,10 @@ public:
 
     void moveByRel(const QPointF &relTranslation) {
         setRelativePos(mSavedRelPos + relTranslation);
+    }
+
+    void cancelTransform() {
+        setRelativePos(mSavedRelPos);
     }
 protected:
     QPointF mCurrentPos;

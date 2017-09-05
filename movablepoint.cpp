@@ -20,6 +20,10 @@ void MovablePoint::startTransform() {
     mSavedRelPos = getRelativePos();
 }
 
+const QPointF &MovablePoint::getSavedRelPos() const {
+    return mSavedRelPos;
+}
+
 void MovablePoint::drawHovered(SkCanvas *canvas,
                                const qreal &invScale) {
     SkPaint paint;
@@ -199,12 +203,7 @@ void MovablePoint::scale(const qreal &scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
-void MovablePoint::cancelTransform() {
-    //prp_cancelTransform();
-}
-
-void MovablePoint::setRadius(qreal radius)
-{
+void MovablePoint::setRadius(qreal radius) {
     mRadius = radius;
 }
 

@@ -69,6 +69,17 @@ void NodePoint::rotateRelativeToSavedPivot(const qreal &rot) {
     }
 }
 
+void NodePoint::scaleRelativeToSavedPivot(const qreal &sx,
+                                          const qreal &sy) {
+    NonAnimatedMovablePoint::scaleRelativeToSavedPivot(sx, sy);
+    if(!mStartCtrlPt->isSelected()) {
+        mStartCtrlPt->scale(sx, sy);
+    }
+    if(!mEndCtrlPt->isSelected()) {
+        mEndCtrlPt->scale(sx, sy);
+    }
+}
+
 void NodePoint::cancelTransform() {
     NonAnimatedMovablePoint::cancelTransform();
     if(!mStartCtrlPt->isSelected()) {
