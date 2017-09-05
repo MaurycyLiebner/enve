@@ -507,7 +507,7 @@ void Animator::anim_drawKey(QPainter *p,
         p->setPen(QPen(Qt::black, 1.5));
         p->drawEllipse(
             QRectF(
-                QPointF((key->getAbsFrame() - startFrame + 0.5)*
+                QPointF((key->getRelFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.5,
                         drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE)*0.5 ),
@@ -516,7 +516,7 @@ void Animator::anim_drawKey(QPainter *p,
     } else {
         p->drawEllipse(
             QRectF(
-                QPointF((key->getAbsFrame() - startFrame + 0.5)*
+                QPointF((key->getRelFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.5,
                         drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE)*0.5 ),
@@ -530,7 +530,7 @@ void Animator::prp_drawKeys(QPainter *p,
                             const int &startFrame,
                             const int &endFrame) {
     p->save();
-    //p->translate(getFrameShift()*pixelsPerFrame, 0.);
+    p->translate(prp_getFrameShift()*pixelsPerFrame, 0.);
     Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
         if(key->getAbsFrame() >= startFrame &&
            key->getAbsFrame() <= endFrame) {

@@ -30,7 +30,7 @@ public:
     bool hasNextKey();
     void incFrameAndUpdateParentAnimator(const int &inc,
                                          const bool &finish = true);
-    void setFrameAndUpdateParentAnimator(const int &relFrame,
+    void setRelFrameAndUpdateParentAnimator(const int &relFrame,
                                          const bool &finish = true);
 
     Animator *getParentAnimator();

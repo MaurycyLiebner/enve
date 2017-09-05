@@ -236,7 +236,7 @@ void ComplexAnimator::anim_drawKey(
         p->setPen(QPen(Qt::black, 1.5));
         p->drawEllipse(
             QRectF(
-                QPointF((key->getAbsFrame() - startFrame + 0.5)*
+                QPointF((key->getRelFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.35,
                         drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE*0.7)*0.5 ),
@@ -245,7 +245,7 @@ void ComplexAnimator::anim_drawKey(
     } else {
         p->drawEllipse(
             QRectF(
-                QPointF((key->getAbsFrame() - startFrame + 0.5)*
+                QPointF((key->getRelFrame() - startFrame + 0.5)*
                         pixelsPerFrame - KEY_RECT_SIZE*0.35,
                         drawY + (MIN_WIDGET_HEIGHT -
                                   KEY_RECT_SIZE*0.7)*0.5 ),

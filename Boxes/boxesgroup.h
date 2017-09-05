@@ -203,6 +203,8 @@ public:
     }
     void writeBoundingBox(std::fstream *file);
     void readBoundingBox(std::fstream *file);
+    void prp_setParentFrameShift(const int &shift,
+                                 ComplexAnimator *parentAnimator);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

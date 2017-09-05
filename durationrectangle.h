@@ -13,8 +13,6 @@ public:
 
     int getFramePos() const;
 
-    int getFrameShift() const;
-
     virtual DurationRectangleMovable *getMovableAt(
                       const int &pressX,
                       const qreal &pixelsPerFrame,

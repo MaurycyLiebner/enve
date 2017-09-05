@@ -859,13 +859,16 @@ void BoundingBox::prp_drawKeys(QPainter *p,
                                const int &startFrame,
                                const int &endFrame) {
     if(mDurationRectangle != NULL) {
+        p->save();
+        p->translate(prp_getParentFrameShift()*pixelsPerFrame, 0);
         mDurationRectangle->draw(p, pixelsPerFrame,
                                 drawY, startFrame);
+        p->restore();
     }
 
     Animator::prp_drawKeys(p,
-                            pixelsPerFrame, drawY,
-                            startFrame, endFrame);
+                           pixelsPerFrame, drawY,
+                           startFrame, endFrame);
 }
 
 void BoundingBox::setName(const QString &name) {

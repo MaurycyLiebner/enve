@@ -30,6 +30,14 @@ BoxesGroup::BoxesGroup(FillStrokeSettingsWidget *fillStrokeSetting) :
     mFillStrokeSettingsWidget = fillStrokeSetting;
 }
 
+void BoxesGroup::prp_setParentFrameShift(const int &shift,
+                                         ComplexAnimator *parentAnimator) {
+    ComplexAnimator::prp_setParentFrameShift(shift, parentAnimator);
+    int thisShift = prp_getFrameShift();
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        child->prp_setParentFrameShift(thisShift, this);
+    }
+}
 
 void BoxesGroup::processSchedulers() {
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {

@@ -194,7 +194,6 @@ public:
 
     QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(const QString &renderDest);
-    void showContextMenu(QPointF globalPos);
 
     void applyCurrentTransformationToSelected();
     QPointF getSelectedPointsAbsPivotPos();

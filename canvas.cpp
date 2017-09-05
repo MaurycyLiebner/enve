@@ -79,41 +79,6 @@ void Canvas::emitCanvasNameChanged() {
     emit canvasNameChanged(this, prp_mName);
 }
 
-void Canvas::showContextMenu(QPointF globalPos) {
-//    QMenu menu(mMainWindow);
-
-//    QAction *outlineScaled = new QAction("Scale outline");
-//    outlineScaled->setCheckable(true);
-//    outlineScaled->setChecked(mOutlineAffectedByScale);
-//    menu.addAction(outlineScaled);
-
-//    QAction  *infAction = new QAction("Points influence");
-//    infAction->setCheckable(true);
-//    infAction->setChecked(mInfluenceEnabled);
-
-//    menu.addAction(infAction);
-
-//    menu.addAction("Delete");
-//    QAction *selected_action = menu.exec(globalPos);
-//    if(selected_action != NULL)
-//    {
-//        if(selected_action->text() == "Delete")
-//        {
-
-//        } else if(selected_action == infAction) {
-//            if(mInfluenceEnabled) {
-//                disableInfluence();
-//            } else {
-//                enableInfluence();
-//            }
-//        } else if(selected_action == outlineScaled) {
-//            setOutlineAffectedByScale(!mOutlineAffectedByScale);
-//        }
-//    } else {
-
-//    }
-}
-
 BoundingBox *Canvas::createLink() {
     InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this);
     return linkGroup;

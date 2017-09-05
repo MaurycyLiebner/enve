@@ -44,10 +44,10 @@ bool Key::hasNextKey() {
 
 void Key::incFrameAndUpdateParentAnimator(const int &inc,
                                           const bool &finish) {
-    setFrameAndUpdateParentAnimator(mRelFrame + inc, finish);
+    setRelFrameAndUpdateParentAnimator(mRelFrame + inc, finish);
 }
 
-void Key::setFrameAndUpdateParentAnimator(const int &relFrame,
+void Key::setRelFrameAndUpdateParentAnimator(const int &relFrame,
                                           const bool &finish) {
     if(mParentAnimator == NULL) return;
     mParentAnimator->anim_moveKeyToRelFrame(this, relFrame, finish);
