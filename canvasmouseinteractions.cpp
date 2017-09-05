@@ -7,7 +7,6 @@
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
 #include "edge.h"
-#include "Animators/PathAnimators/singlevectorpathanimator.h"
 #include "nodepoint.h"
 #include "Animators/pathanimator.h"
 #include "pointhelpers.h"

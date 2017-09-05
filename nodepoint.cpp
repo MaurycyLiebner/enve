@@ -1,5 +1,4 @@
 #include "nodepoint.h"
-#include "Animators/PathAnimators/singlevectorpathanimator.h"
 #include "undoredo.h"
 #include "ctrlpoint.h"
 #include <QPainter>

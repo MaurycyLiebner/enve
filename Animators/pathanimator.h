@@ -9,7 +9,6 @@ enum CanvasMode : short;
 class VectorPathEdge;
 class MovablePoint;
 class NodePoint;
-class SinglePathAnimator;
 class VectorPathAnimator;
 class BoundingBox;
 class Canvas;

@@ -54,6 +54,8 @@ public:
     virtual bool SWT_isSinglePathAnimator() { return false; }
     virtual bool SWT_isBasicTransformAnimator() { return false; }
     virtual bool SWT_isBoxTransformAnimator() { return false; }
+    virtual bool SWT_isVectorPathAnimator() { return false; }
+    virtual bool SWT_isAnimatedSurface() { return false; }
     // Boxes
     virtual bool SWT_isCanvas() { return false; }
     virtual bool SWT_isAnimationBox() { return false; }

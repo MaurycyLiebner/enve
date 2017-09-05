@@ -160,7 +160,6 @@ private:
 };
 
 class PathAnimator;
-class SinglePathAnimator;
 class VectorPathAnimator;
 class SvgSeparatePath {
 public:

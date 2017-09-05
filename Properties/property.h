@@ -48,9 +48,6 @@ public:
     int prp_absFrameToRelFrame(const int &absFrame) const;
     int prp_relFrameToAbsFrame(const int &relFrame) const;
 
-    int prp_absFrameToParentRelFrame(const int &absFrame) const;
-    int prp_parentRelFrameToAbsFrame(const int &relFrame) const;
-
     virtual void prp_drawKeys(QPainter *p,
                               const qreal &pixelsPerFrame,
                               const qreal &drawY,
@@ -134,8 +131,7 @@ public:
                                                  const int &) {
         return false;
     }
-    int prp_parentRelFrameToThisRelFrame(const int &relFrame) const;
-    int prp_thisRelFrameToParentRelFrame(const int &relFrame) const;
+
     virtual void prp_getFirstAndLastIdenticalRelFrame(
             int *firstIdentical,
             int *lastIdentical,

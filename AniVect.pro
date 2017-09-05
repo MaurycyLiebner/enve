@@ -172,8 +172,6 @@ SOURCES += main.cpp\
     keyfocustarget.cpp \
     noshortcutaction.cpp \
     updatable.cpp \
-    Animators/PathAnimators/singlepathanimator.cpp \
-    Animators/PathAnimators/singlevectorpathanimator.cpp \
     BoxesList/boxtargetwidget.cpp \
     Properties/boxtargetproperty.cpp \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.cpp \
@@ -323,8 +321,6 @@ HEADERS  += mainwindow.h \
     keyfocustarget.h \
     noshortcutaction.h \
     updatable.h \
-    Animators/PathAnimators/singlepathanimator.h \
-    Animators/PathAnimators/singlevectorpathanimator.h \
     BoxesList/boxtargetwidget.h \
     Properties/boxtargetproperty.h \
     BoxesList/OptimalScrollArea/minimalscrollwidgetvisiblepart.h \

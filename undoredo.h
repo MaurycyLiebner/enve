@@ -12,8 +12,6 @@ class MovablePoint;
 typedef QSharedPointer<MovablePoint> MovablePointQSPtr;
 class NodePoint;
 typedef QSharedPointer<NodePoint> NodePointQSPtr;
-class SinglePathAnimator;
-typedef QSharedPointer<SinglePathAnimator> SinglePathAnimatorQSPtr;
 class VectorPathAnimator;
 typedef QSharedPointer<VectorPathAnimator> VectorPathAnimatorQSPtr;
 class PathAnimator;

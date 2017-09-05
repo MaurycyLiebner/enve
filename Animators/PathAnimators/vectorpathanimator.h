@@ -161,6 +161,8 @@ public:
     void cancelPathChange();
     void readVectorPathAnimator(std::fstream *file);
     void writeVectorPathAnimator(std::fstream *file);
+
+    bool SWT_isVectorPathAnimator() { return true; }
 private:
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,

@@ -109,9 +109,9 @@ public:
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
         SkPath boundingPaths = SkPath();
+        int absFrame = prp_relFrameToAbsFrame(relFrame);
         Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-            int childRelFrame =
-                    child->prp_parentRelFrameToThisRelFrame(relFrame);
+            int childRelFrame = child->prp_absFrameToRelFrame(absFrame);
             if(child->isRelFrameVisibleAndInVisibleDurationRect(childRelFrame)) {
                 SkPath childPath;
                 childPath.addRect(

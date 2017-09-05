@@ -330,7 +330,9 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mValueSlider->setAnimator(qa_target);
         mValueSlider->show();
-    } else if(target->SWT_isComplexAnimator()) {
+    } else if(target->SWT_isComplexAnimator() ||
+              target->SWT_isVectorPathAnimator() ||
+              target->SWT_isAnimatedSurface()) {
         //ComplexAnimator *ca_target = (ComplexAnimator*)target;
 
         mRecordButton->show();
@@ -754,8 +756,10 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
             p.drawRect(mColorButton->x(), 3,
                        MIN_WIDGET_HEIGHT, MIN_WIDGET_HEIGHT - 6);
         }
-    } else if(target->SWT_isQStringAnimator()) {
-        QStringAnimator *ca_target = (QStringAnimator*)target;
+    } else if(target->SWT_isQStringAnimator() ||
+              target->SWT_isVectorPathAnimator() ||
+              target->SWT_isAnimatedSurface()) {
+        Animator *ca_target = (Animator*)target;
         name = ca_target->prp_getName();
 
         if(ca_target->prp_isRecording()) {

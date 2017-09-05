@@ -66,6 +66,7 @@ public:
     void writeAnimatedSurface(std::fstream *file);
     void readAnimatedSurface(std::fstream *file);
     void currentDataModified();
+    bool SWT_isAnimatedSurface() { return true; }
 protected:
     PaintBox *mParentBox = NULL;
     int mCurrentTilesFrame = 0;

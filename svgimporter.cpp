@@ -2,7 +2,6 @@
 #include "Boxes/vectorpath.h"
 #include "Boxes/boxesgroup.h"
 #include "canvas.h"
-#include "Animators/PathAnimators/singlevectorpathanimator.h"
 #include "Colors/ColorWidgets/colorvaluerect.h"
 #include "Colors/helpers.h"
 #include "Animators/pathanimator.h"

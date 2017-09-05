@@ -439,9 +439,12 @@ QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrame(
     if(mParentTransformAnimator.data() == NULL) {
         return getTransformMatrixAtRelFrame(relFrame);
     } else {
+        int absFrame = prp_relFrameToAbsFrame(relFrame);
+        int parentRelFrame =
+                mParentTransformAnimator->prp_absFrameToRelFrame(absFrame);
         return getTransformMatrixAtRelFrame(relFrame)*
                 mParentTransformAnimator->
-                    getCombinedTransformMatrixAtRelFrame(relFrame);
+                    getCombinedTransformMatrixAtRelFrame(parentRelFrame);
     }
 }
 

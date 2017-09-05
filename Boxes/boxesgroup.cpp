@@ -65,10 +65,12 @@ bool BoxesGroup::prp_differencesBetweenRelFrames(const int &relFrame1,
             BoundingBox::prp_differencesBetweenRelFrames(relFrame1,
                                                          relFrame2);
     if(differences) return true;
+    int absFrame1 = prp_relFrameToAbsFrame(relFrame1);
+    int absFrame2 = prp_relFrameToAbsFrame(relFrame2);
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         if(child->prp_differencesBetweenRelFrames(
-                    child->prp_parentRelFrameToThisRelFrame(relFrame1),
-                    child->prp_parentRelFrameToThisRelFrame(relFrame2))) {
+                    child->prp_absFrameToRelFrame(absFrame1),
+                    child->prp_absFrameToRelFrame(absFrame2))) {
             return true;
         }
     }
@@ -82,6 +84,7 @@ void BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     int lId;
 
     BoundingBox::prp_getFirstAndLastIdenticalRelFrame(&fId, &lId, relFrame);
+    int absFrame = prp_relFrameToAbsFrame(relFrame);
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
         if(fId > lId) {
             break;
@@ -90,9 +93,11 @@ void BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
         int lIdT;
         child->prp_getFirstAndLastIdenticalRelFrame(
                     &fIdT, &lIdT,
-                    child->prp_parentRelFrameToThisRelFrame(relFrame));
-        fIdT = child->prp_thisRelFrameToParentRelFrame(fIdT);
-        lIdT = child->prp_thisRelFrameToParentRelFrame(lIdT);
+                    child->prp_absFrameToRelFrame(absFrame));
+        int fIdAbsT = child->prp_relFrameToAbsFrame(fIdT);
+        int lIdAbsT = child->prp_relFrameToAbsFrame(lIdT);
+        fIdT = prp_absFrameToRelFrame(fIdAbsT);
+        lIdT = prp_absFrameToRelFrame(lIdAbsT);
         if(fIdT > fId) {
             fId = fIdT;
         }
@@ -193,8 +198,9 @@ void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
     BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
     groupData->childrenRenderData.clear();
     qreal childrenEffectsMargin = 0.;
+    int absFrame = prp_relFrameToAbsFrame(relFrame);
     foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        int boxRelFrame = box->prp_parentRelFrameToThisRelFrame(relFrame);
+        int boxRelFrame = box->prp_absFrameToRelFrame(absFrame);
         if(box->isRelFrameVisibleAndInVisibleDurationRect(boxRelFrame)) {
             BoundingBoxRenderData *boxRenderData =
                     box->getCurrentRenderData();

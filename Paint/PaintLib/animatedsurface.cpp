@@ -8,6 +8,7 @@ AnimatedSurface::AnimatedSurface(const ushort &widthT,
                                  PaintBox *parentBox) :
     Surface(widthT, heightT, scale, paintOnOtherThread),
     Animator() {
+    prp_setName("canvas");
     mParentBox = parentBox;
 }
 
