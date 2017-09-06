@@ -519,9 +519,14 @@ public:
         return mLoadId;
     }
 
-    static BoundingBox *getLoadedBoxById(const int &LoadId) {
+    virtual int setBoxLoadId(const int &loadId) {
+        mLoadId = loadId;
+        return loadId + 1;
+    }
+
+    static BoundingBox *getLoadedBoxById(const int &loadId) {
         foreach(BoundingBox *box, mLoadedBoxes) {
-            if(box->getLoadId() == LoadId) {
+            if(box->getLoadId() == loadId) {
                 return box;
             }
         }

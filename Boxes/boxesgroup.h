@@ -206,6 +206,16 @@ public:
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator *parentAnimator);
     void shiftAll(const int &shift);
+
+    int setBoxLoadId(const int &loadId) {
+        mLoadId = loadId;
+        int loadIdT = loadId + 1;
+        foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+            loadIdT = child->setBoxLoadId(loadIdT);
+        }
+
+        return loadIdT;
+    }
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

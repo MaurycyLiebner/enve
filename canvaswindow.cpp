@@ -516,11 +516,13 @@ void CanvasWindow::clearSelectionAction() {
 void CanvasWindow::groupSelectedBoxes() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->groupSelectedBoxes();
+    callUpdateSchedulers();
 }
 
 void CanvasWindow::ungroupSelectedBoxes() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->ungroupSelectedBoxes();
+    callUpdateSchedulers();
 }
 
 void CanvasWindow::startSelectedStrokeColorTransform() {

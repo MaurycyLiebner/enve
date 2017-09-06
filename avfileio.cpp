@@ -666,26 +666,26 @@ void ImageBox::readBoundingBox(std::fstream *file) {
 }
 
 void Circle::writeBoundingBox(std::fstream *file) {
-    BoundingBox::writeBoundingBox(file);
+    PathBox::writeBoundingBox(file);
     mHorizontalRadiusPoint->writeQPointFAnimator(file);
     mVerticalRadiusPoint->writeQPointFAnimator(file);
 }
 
 void Circle::readBoundingBox(std::fstream *file) {
-    BoundingBox::readBoundingBox(file);
+    PathBox::readBoundingBox(file);
     mHorizontalRadiusPoint->readQPointFAnimator(file);
     mVerticalRadiusPoint->readQPointFAnimator(file);
 }
 
 void Rectangle::writeBoundingBox(std::fstream *file) {
-    BoundingBox::writeBoundingBox(file);
+    PathBox::writeBoundingBox(file);
     mRadiusPoint.writeQPointFAnimator(file);
     mTopLeftPoint->writeQPointFAnimator(file);
     mBottomRightPoint->writeQPointFAnimator(file);
 }
 
 void Rectangle::readBoundingBox(std::fstream *file) {
-    BoundingBox::readBoundingBox(file);
+    PathBox::readBoundingBox(file);
     mRadiusPoint.readQPointFAnimator(file);
     mTopLeftPoint->readQPointFAnimator(file);
     mBottomRightPoint->readQPointFAnimator(file);
@@ -822,7 +822,7 @@ void ImageSequenceBox::readBoundingBox(std::fstream *file) {
 }
 
 void TextBox::writeBoundingBox(std::fstream *file) {
-    BoundingBox::writeBoundingBox(file);
+    PathBox::writeBoundingBox(file);
     mText->writeQStringAnimator(file);
     file->write((char*)&mAlignment, sizeof(Qt::Alignment));
     qreal fontSize = mFont.pointSizeF();
@@ -834,7 +834,7 @@ void TextBox::writeBoundingBox(std::fstream *file) {
 }
 
 void TextBox::readBoundingBox(std::fstream *file) {
-    BoundingBox::readBoundingBox(file);
+    PathBox::readBoundingBox(file);
     mText->readQStringAnimator(file);
     file->read((char*)&mAlignment, sizeof(Qt::Alignment));
     qreal fontSize;
@@ -932,6 +932,7 @@ void Canvas::writeBoundingBox(std::fstream *file) {
     file->write((char*)&mWidth, sizeof(int));
     file->write((char*)&mHeight, sizeof(int));
     file->write((char*)&mFps, sizeof(qreal));
+    file->write((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
 }
 
 void Canvas::readBoundingBox(std::fstream *file) {
@@ -940,6 +941,9 @@ void Canvas::readBoundingBox(std::fstream *file) {
     file->read((char*)&mWidth, sizeof(int));
     file->read((char*)&mHeight, sizeof(int));
     file->read((char*)&mFps, sizeof(qreal));
+    file->read((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
+    mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
+    mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
 }
 
 void GradientWidget::writeGradients(std::fstream *file) {
@@ -964,9 +968,16 @@ void GradientWidget::readGradients(std::fstream *file) {
 void CanvasWindow::writeCanvases(std::fstream *file) {
     int nCanvases = mCanvasList.count();
     file->write((char*)&nCanvases, sizeof(int));
+    int currentCanvasId = -1;
+    int boxLoadId = 0;
     foreach(const CanvasQSPtr &canvas, mCanvasList) {
+        boxLoadId = canvas->setBoxLoadId(boxLoadId);
         canvas->writeBoundingBox(file);
+        if(canvas == mCurrentCanvas) {
+            currentCanvasId = mCurrentCanvas->getLoadId();
+        }
     }
+    file->write((char*)&currentCanvasId, sizeof(int));
 }
 
 void CanvasWindow::readCanvases(std::fstream *file) {
@@ -979,6 +990,9 @@ void CanvasWindow::readCanvases(std::fstream *file) {
         canvas->readBoundingBox(file);
         MainWindow::getInstance()->addCanvas(canvas);
     }
+    int currentCanvasId;
+    file->read((char*)&currentCanvasId, sizeof(int));
+    setCurrentCanvas((Canvas*)BoundingBox::getLoadedBoxById(currentCanvasId));
 }
 
 void MainWindow::loadAVFile(const QString &path) {
