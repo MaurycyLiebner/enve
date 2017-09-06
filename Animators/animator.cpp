@@ -14,6 +14,13 @@ Animator::~Animator() {
     emit beingDeleted();
 }
 
+void Animator::anim_shiftAllKeys(const int &shift) {
+    Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
+        anim_moveKeyToRelFrame(key.get(),
+                               key->getRelFrame() + shift);
+    }
+}
+
 int Animator::anim_getNextKeyRelFrame(Key *key) {
     if(key == NULL) return INT_MAX;
     Key *nextKey = key->getNextKey();

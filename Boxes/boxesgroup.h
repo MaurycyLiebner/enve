@@ -205,6 +205,7 @@ public:
     void readBoundingBox(std::fstream *file);
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator *parentAnimator);
+    void shiftAll(const int &shift);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
@@ -214,6 +215,7 @@ protected:
 
     //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getChildBoxIndex(BoundingBox *child);
+    void shiftAll();
 signals:
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);

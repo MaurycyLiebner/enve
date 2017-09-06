@@ -561,6 +561,7 @@ public:
     }
     virtual void writeBoundingBox(std::fstream *file);
     virtual void readBoundingBox(std::fstream *file);
+    virtual void shiftAll(const int &shift);
 protected:
     bool mBoxSaved = false;
     QList<std::shared_ptr<Updatable> > mSchedulers;

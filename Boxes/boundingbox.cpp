@@ -776,20 +776,26 @@ void BoundingBox::createDurationRectangle() {
     setDurationRectangle(durRect);
 }
 
+void BoundingBox::shiftAll(const int &shift) {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->changeFramePosBy(shift);
+    } else {
+        anim_shiftAllKeys(shift);
+    }
+}
+
 void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
     if(durationRect == mDurationRectangle) return;
     if(mDurationRectangle != NULL) {
         disconnect(mDurationRectangle, 0, this, 0);
     }
-    if(durationRect == NULL) {
-        int shift = mDurationRectangle->getFrameShift();
-        Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
-            anim_moveKeyToRelFrame(key.get(),
-                                   key->getRelFrame() + shift);
-        }
-    }
+    DurationRectangle *oldDurRect = mDurationRectangle;
     mDurationRectangle = durationRect;
     updateAfterDurationRectangleShifted();
+    if(durationRect == NULL) {
+        shiftAll(oldDurRect->getFrameShift());
+    }
+
     if(mDurationRectangle == NULL) return;
     connect(mDurationRectangle, SIGNAL(posChangedBy(int)),
             this, SLOT(updateAfterDurationRectangleShifted(int)));

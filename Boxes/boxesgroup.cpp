@@ -11,6 +11,7 @@
 #include "canvaswindow.h"
 #include "canvas.h"
 #include "Boxes/particlebox.h"
+#include "durationrectangle.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -197,6 +198,16 @@ BoundingBox *BoxesGroup::createNewDuplicate() {
     return new BoxesGroup();
 }
 
+void BoxesGroup::shiftAll(const int &shift) {
+    if(hasDurationRectangle()) {
+        mDurationRectangle->changeFramePosBy(shift);
+    } else {
+        anim_shiftAllKeys(shift);
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+            box->shiftAll(shift);
+        }
+    }
+}
 
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,

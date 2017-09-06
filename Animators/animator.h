@@ -109,6 +109,7 @@ public:
                                                        const int &relFrame);
     Key *anim_getPrevKey(const int &relFrame);
     Key *anim_getNextKey(const int &relFrame);
+    void anim_shiftAllKeys(const int &shift);
 protected:
     int anim_getKeyIndex(Key *key);
 
