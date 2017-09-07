@@ -90,7 +90,8 @@ public:
 
     void drawSk(SkCanvas *canvas,
               const CanvasMode &mode,
-              const SkScalar &invScale);
+              const SkScalar &invScale,
+              const bool &keyOnCurrent);
 
     NodePoint *getNextPoint();
     NodePoint *getPreviousPoint();

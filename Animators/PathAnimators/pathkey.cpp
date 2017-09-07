@@ -36,6 +36,9 @@ const SkPoint &PathContainer::getElementPos(const int &index) const {
 void PathContainer::setElementPos(const int &index,
                                   const SkPoint &pos) {
     mElementsPos.replace(index, pos);
+    if(qIsNaN(pos.x()) || qIsNaN(pos.y())) {
+        mPathUpdateNeeded = false;
+    }
     mPathUpdateNeeded = true;
 }
 
@@ -46,12 +49,18 @@ void PathContainer::prependElementPos(const SkPoint &pos) {
 
 void PathContainer::appendElementPos(const SkPoint &pos) {
     mElementsPos.append(pos);
+    if(qIsNaN(pos.x()) || qIsNaN(pos.y())) {
+        mPathUpdateNeeded = false;
+    }
     mPathUpdateNeeded = true;
 }
 
 void PathContainer::insertElementPos(const int &index,
                                const SkPoint &pos) {
     mElementsPos.insert(index, pos);
+    if(qIsNaN(pos.x()) || qIsNaN(pos.y())) {
+        mPathUpdateNeeded = false;
+    }
     mPathUpdateNeeded = true;
 }
 

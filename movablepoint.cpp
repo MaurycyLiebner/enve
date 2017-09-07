@@ -65,9 +65,10 @@ QPointF MovablePoint::getAbsolutePos() const {
 void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
                 const SkPoint &absPos,
                 const SkScalar &invScale,
-                const unsigned char r,
-                const unsigned char g,
-                const unsigned char b) {
+                const unsigned char &r,
+                const unsigned char &g,
+                const unsigned char &b,
+                const bool &keyOnCurrent) {
     canvas->save();
 
     SkScalar scaledRadius = mRadius*invScale;
@@ -86,17 +87,18 @@ void MovablePoint::drawOnAbsPosSk(SkCanvas *canvas,
     canvas->drawCircle(absPos,
                        scaledRadius, paint);
 
-//    if(prp_isKeyOnCurrentFrame()) {
-//        paint.setColor(SK_ColorRED);
-//        paint.setStyle(SkPaint::kFill_Style);
-//        canvas->drawCircle(absPos,
-//                           scaledRadius*0.5, paint);
+    if(keyOnCurrent) {
+        paint.setColor(SK_ColorRED);
+        paint.setStyle(SkPaint::kFill_Style);
+        canvas->drawCircle(absPos,
+                           scaledRadius*0.5, paint);
 
-//        paint.setStyle(SkPaint::kStroke_Style);
-//        paint.setColor(SK_ColorBLACK);
-//        canvas->drawCircle(absPos,
-//                           scaledRadius*0.5, paint);
-//    }
+        paint.setStyle(SkPaint::kStroke_Style);
+        paint.setStrokeWidth(0.5);
+        paint.setColor(SK_ColorBLACK);
+        canvas->drawCircle(absPos,
+                           scaledRadius*0.5, paint);
+    }
     canvas->restore();
 }
 
@@ -269,4 +271,11 @@ bool MovablePoint::isPivotPoint() {
 
 bool MovablePoint::isCtrlPoint() {
     return mType == MovablePointType::TYPE_CTRL_POINT;
+}
+
+void NonAnimatedMovablePoint::setRelativePosVal(const QPointF &relPos) {
+    if(qIsNaN(relPos.x()) || qIsNaN(relPos.y())) {
+        mCurrentPos = relPos;
+    }
+    mCurrentPos = relPos;
 }

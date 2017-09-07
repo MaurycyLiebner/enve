@@ -19,7 +19,8 @@ QPointF CtrlPoint::getRelativePos() const {
 }
 
 void CtrlPoint::setRelativePosVal(const QPointF &relPos) {
-    mCurrentPos = relPos - mParentPoint->getRelativePos();
+    NonAnimatedMovablePoint::setRelativePosVal(
+                relPos - mParentPoint->getRelativePos());
 }
 
 void CtrlPoint::setRelativePos(const QPointF &relPos) {

@@ -279,19 +279,22 @@ CtrlPoint *NodePoint::getEndCtrlPt() {
 
 void NodePoint::drawSk(SkCanvas *canvas,
                      const CanvasMode &mode,
-                     const SkScalar &invScale) {
+                     const SkScalar &invScale,
+                     const bool &keyOnCurrent) {
     canvas->save();
     SkPoint absPos = QPointFToSkPoint(getAbsolutePos());
     if(mSelected) {
         drawOnAbsPosSk(canvas,
                      absPos,
                      invScale,
-                     0, 200, 255);
+                     0, 200, 255,
+                     keyOnCurrent);
     } else {
         drawOnAbsPosSk(canvas,
                      absPos,
                      invScale,
-                     170, 240, 255);
+                     170, 240, 255,
+                     keyOnCurrent);
     }
 
     if((mode == CanvasMode::MOVE_POINT &&

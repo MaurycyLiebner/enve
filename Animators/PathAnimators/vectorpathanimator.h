@@ -163,6 +163,14 @@ public:
     void writeVectorPathAnimator(std::fstream *file);
 
     bool SWT_isVectorPathAnimator() { return true; }
+    void anim_moveKeyToRelFrame(Key *key,
+                                const int &newFrame,
+                                const bool &saveUndoRedo = true,
+                                const bool &finish = true);
+    void anim_appendKey(Key *newKey,
+                        const bool &saveUndoRedo = true,
+                        const bool &update = true);
+
 private:
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,
@@ -181,6 +189,7 @@ private:
     NodePoint *mFirstPoint = NULL;
     QList<NodePoint*> mPoints;
     bool mPathChanged = false;
+    bool mElementsUpdateNeeded = false;
 };
 
 #endif // VECTORPATHANIMATOR_H

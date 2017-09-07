@@ -15,7 +15,7 @@ void VectorPathAnimator::prp_setAbsFrame(const int &frame) {
     Animator::prp_setAbsFrame(frame);
     //setCurrentPath(getPathAtRelFrame(frame));
     if(prp_hasKeys()) {
-        setElementsFromSkPath(getPathAtRelFrame(frame, false));
+        setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
     }
 }
 
@@ -82,33 +82,58 @@ void VectorPathAnimator::anim_saveCurrentValueAsKey() {
 
 SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
                                              const bool &considerCurrent) {
-    if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
+    //if(relFrame == anim_mCurrentRelFrame && considerCurrent) return getPath();
+    SkPath pathToRuturn;
     int prevId;
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, relFrame) ) {
         if(prevId == nextId) {
-            return ((PathKey*)anim_mKeys.at(prevId).get())->getPath();
+            pathToRuturn = ((PathKey*)anim_mKeys.at(prevId).get())->getPath();
+        } else {
+            PathKey *prevKey = ((PathKey*)anim_mKeys.at(prevId).get());
+            PathKey *nextKey = ((PathKey*)anim_mKeys.at(nextId).get());
+            int prevRelFrame = prevKey->getRelFrame();
+            int nextRelFrame = nextKey->getRelFrame();
+            SkScalar weight = ((SkScalar)relFrame - prevRelFrame)/
+                    (nextRelFrame - prevRelFrame);
+            nextKey->getPath().interpolate(prevKey->getPath(),
+                                           weight, &pathToRuturn);
         }
-        PathKey *prevKey = ((PathKey*)anim_mKeys.at(prevId).get());
-        PathKey *nextKey = ((PathKey*)anim_mKeys.at(nextId).get());
-        int prevRelFrame = prevKey->getRelFrame();
-        int nextRelFrame = nextKey->getRelFrame();
-        SkScalar weight = ((SkScalar)relFrame - prevRelFrame)/
-                (nextRelFrame - prevRelFrame);
-        SkPath outPath;
-        nextKey->getPath().interpolate(prevKey->getPath(),
-                                       weight, &outPath);
-        return outPath;
+    } else {
+        pathToRuturn = getPath();
     }
-    return getPath();
+    if(mElementsUpdateNeeded) {
+        if(anim_mCurrentRelFrame == relFrame) {
+            mElementsUpdateNeeded = false;
+            setElementsFromSkPath(pathToRuturn);
+        }
+    }
+    return pathToRuturn;
 }
 
 void VectorPathAnimator::anim_removeKey(Key *keyToRemove,
                                         const bool &saveUndoRedo) {
     Animator::anim_removeKey(keyToRemove, saveUndoRedo);
-    if(anim_mKeys.count() == 0) {
-        setElementsFromSkPath(getPath());
-    }
+    mElementsUpdateNeeded = true;
+//    if(anim_mKeys.count() == 0) {
+//        setElementsFromSkPath(getPath());
+//    }
+}
+
+void VectorPathAnimator::anim_moveKeyToRelFrame(Key *key,
+                                                const int &newFrame,
+                                                const bool &saveUndoRedo,
+                                                const bool &finish) {
+    Animator::anim_moveKeyToRelFrame(key, newFrame,
+                                     saveUndoRedo, finish);
+    mElementsUpdateNeeded = true;
+}
+
+void VectorPathAnimator::anim_appendKey(Key *newKey,
+                                        const bool &saveUndoRedo,
+                                        const bool &update) {
+    Animator::anim_appendKey(newKey, saveUndoRedo, update);
+    mElementsUpdateNeeded = true;
 }
 
 VectorPathEdge *VectorPathAnimator::getEdge(const QPointF &absPos,
@@ -430,13 +455,15 @@ void VectorPathAnimator::drawSelected(SkCanvas *canvas,
     if(currentCanvasMode == CanvasMode::MOVE_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             NodePoint *point = mPoints.at(i);
-            point->drawSk(canvas, currentCanvasMode, invScale);
+            point->drawSk(canvas, currentCanvasMode, invScale,
+                          prp_isKeyOnCurrentFrame());
         }
     } else if(currentCanvasMode == CanvasMode::ADD_POINT) {
         for(int i = mPoints.count() - 1; i >= 0; i--) {
             NodePoint *point = mPoints.at(i);
             if(point->isEndPoint() || point->isSelected()) {
-                point->drawSk(canvas, currentCanvasMode, invScale);
+                point->drawSk(canvas, currentCanvasMode, invScale,
+                              prp_isKeyOnCurrentFrame());
             }
         }
     }

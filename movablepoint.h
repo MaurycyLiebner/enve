@@ -100,9 +100,10 @@ protected:
     virtual void drawOnAbsPosSk(SkCanvas *canvas,
                 const SkPoint &absPos,
                 const SkScalar &invScale,
-                const unsigned char r,
-                const unsigned char g,
-                const unsigned char b);
+                const unsigned char &r,
+                const unsigned char &g,
+                const unsigned char &b,
+                const bool &keyOnCurrent = false);
 };
 
 class NonAnimatedMovablePoint : public MovablePoint {
@@ -115,16 +116,14 @@ public:
     }
 
     void applyTransform(const QMatrix &transform){
-        mCurrentPos = transform.map(mCurrentPos);
+        setRelativePosVal(transform.map(mCurrentPos));
     }
 
     void setRelativePos(const QPointF &relPos) {
-        mCurrentPos = relPos;
+        setRelativePosVal(relPos);
     }
 
-    virtual void setRelativePosVal(const QPointF &relPos) {
-        mCurrentPos = relPos;
-    }
+    virtual void setRelativePosVal(const QPointF &relPos);
 
     QPointF getRelativePos() const {
         return mCurrentPos;
