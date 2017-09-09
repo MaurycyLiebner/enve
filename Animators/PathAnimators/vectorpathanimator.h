@@ -31,6 +31,9 @@ class VectorPathAnimator : public Animator,
     Q_OBJECT
 public:
     VectorPathAnimator(PathAnimator *pathAnimator);
+    VectorPathAnimator(const QList<NodeSettings *> &settingsList,
+                       const QList<SkPoint> &posList,
+                       PathAnimator *pathAnimator);
 
     void prp_setAbsFrame(const int &frame);
     SkPath getPathAtRelFrame(const int &relFrame,
@@ -85,7 +88,9 @@ public:
         foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
             ((PathKey*)key.get())->setPathClosed(bT);
         }
-        setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+        if(prp_hasKeys()) {
+            setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame));
+        }
         prp_updateInfluenceRangeAfterChanged();
     }
 
@@ -101,7 +106,7 @@ public:
     NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                         const bool &adjust,
                                         const qreal &canvasScaleInv);
-    void updateNodePointsFromCurrentPath();
+    void updateNodePointsFromElements();
     PathAnimator *getParentPathAnimator() {
         return mParentPathAnimator;
     }
@@ -167,7 +172,10 @@ public:
                         const bool &saveUndoRedo = true,
                         const bool &update = true);
 
+    void moveElementPosSubset(int firstId, int count, int targetId);
 private:
+    void setFirstPoint(NodePoint *firstPt);
+
     NodePoint *createNewNode(const int &targetNodeId,
                              const QPointF &startRelPos,
                              const QPointF &relPos,

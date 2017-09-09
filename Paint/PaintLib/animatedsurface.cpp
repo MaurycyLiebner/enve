@@ -28,6 +28,33 @@ void AnimatedSurface::currentDataModified() {
     }
 }
 
+void AnimatedSurface::anim_saveCurrentValueAsKey() {
+    if(!anim_mIsRecording) {
+        prp_setRecording(true);
+        return;
+    }
+
+    SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(anim_mCurrentRelFrame);
+    if(prevKey != NULL) {
+        if(prevKey->getRelFrame() == anim_mCurrentRelFrame) {
+            prevKey->getTiles()->clearTiles();
+            return;
+        }
+    }
+
+    SurfaceKey *frameT = new SurfaceKey(this);
+    frameT->setRelFrame(anim_mCurrentRelFrame);
+    if(prp_hasKeys()) {
+        frameT->setSize(mWidth, mHeight);
+    } else {
+        frameT->setTiles(mCurrentTiles.get());
+    }
+
+    anim_appendKey(frameT);
+
+    updateTargetTiles();
+}
+
 void AnimatedSurface::updateTargetTiles() {
     int prevId;
     int nextId;
@@ -121,28 +148,6 @@ void AnimatedSurface::setSize(const ushort &width_t,
     } else {
         Surface::setSize(width_t, height_t);
     }
-}
-
-void AnimatedSurface::newSurfaceFrame() {
-    SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(anim_mCurrentRelFrame);
-    if(prevKey != NULL) {
-        if(prevKey->getRelFrame() == anim_mCurrentRelFrame) {
-            prevKey->getTiles()->clearTiles();
-            return;
-        }
-    }
-
-    SurfaceKey *frameT = new SurfaceKey(this);
-    frameT->setRelFrame(anim_mCurrentRelFrame);
-    if(prp_hasKeys()) {
-        frameT->setSize(mWidth, mHeight);
-    } else {
-        frameT->setTiles(mCurrentTiles.get());
-    }
-
-    anim_appendKey(frameT);
-
-    updateTargetTiles();
 }
 
 SurfaceKey::SurfaceKey(Animator *parentAnimator) :

@@ -99,7 +99,7 @@ void PaintBox::startAllPointsTransform() {
 }
 
 void PaintBox::newPaintFrameOnCurrentFrame() {
-    mMainHandler->newSurfaceFrame();
+    mMainHandler->anim_saveCurrentValueAsKey();
     scheduleUpdate();
 }
 

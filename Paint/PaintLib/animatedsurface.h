@@ -50,7 +50,6 @@ public:
     void setSize(const ushort &width_t,
                  const ushort &height_t);
 
-    void newSurfaceFrame();
     void updateTargetTiles();
 
     void anim_removeKey(Key *keyToRemove,
@@ -67,6 +66,7 @@ public:
     void readAnimatedSurface(std::fstream *file);
     void currentDataModified();
     bool SWT_isAnimatedSurface() { return true; }
+    void anim_saveCurrentValueAsKey();
 protected:
     PaintBox *mParentBox = NULL;
     int mCurrentTilesFrame = 0;

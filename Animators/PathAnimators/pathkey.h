@@ -57,15 +57,24 @@ public:
     }
 
     virtual void moveElementPosSubset(
-            const int &firstId,
-            const int &count,
+            int firstId,
+            int count,
             int targetId) {
         if(firstId == targetId) return;
+        if(targetId == -1) {
+            targetId = mElementsPos.count() - count;
+        }
+        if(count == -1) {
+            count = mElementsPos.count() - firstId;
+        }
         int lastId = firstId + count - 1;
         if(targetId > firstId) {
             int takeId = lastId + 1;
+            int moveTo = firstId;
             for(int i = 0; i < targetId - firstId; i++) {
-                mElementsPos.move(takeId, firstId);
+                mElementsPos.move(takeId, moveTo);
+                takeId++;
+                moveTo++;
             }
         } else {
             int takeId = firstId - 1;
@@ -103,7 +112,8 @@ public:
     PathKey(const int &relFrame,
             const SkPath &path,
             const QList<SkPoint> &elementsPos,
-            VectorPathAnimator *parentAnimator);
+            VectorPathAnimator *parentAnimator,
+            const bool &closed);
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
     bool differsFromKey(Key *key) { return key != this; }

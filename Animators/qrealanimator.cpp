@@ -243,7 +243,10 @@ void QrealAnimator::saveValueAtAbsFrameAsKey(const int &frame) {
 }
 
 void QrealAnimator::anim_saveCurrentValueAsKey() {
-    if(!anim_mIsRecording) prp_setRecording(true);
+    if(!anim_mIsRecording) {
+        prp_setRecording(true);
+        return;
+    }
 
     if(anim_mKeyOnCurrentFrame == NULL) {
         anim_mKeyOnCurrentFrame = new QrealKey(anim_mCurrentRelFrame,

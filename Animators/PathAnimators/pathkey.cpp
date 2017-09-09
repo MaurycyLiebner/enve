@@ -17,11 +17,13 @@ PathKey::PathKey(const int &relFrame,
 PathKey::PathKey(const int &relFrame,
                  const SkPath &path,
                  const QList<SkPoint> &elementsPos,
-                 VectorPathAnimator *parentAnimator) :
+                 VectorPathAnimator *parentAnimator,
+                 const bool &closed) :
     PathKey(parentAnimator) {
     mRelFrame = relFrame;
     mPath = path;
     mElementsPos = elementsPos;
+    mPathClosed = closed;
 }
 
 NodeSettings *PathKey::getNodeSettingsForPtId(const int &ptId) {
