@@ -12,12 +12,19 @@ VectorPathAnimator::VectorPathAnimator(PathAnimator *pathAnimator) :
 }
 
 VectorPathAnimator::VectorPathAnimator(const QList<NodeSettings*> &settingsList,
-                                       const QList<SkPoint> &posList,
                                        PathAnimator *pathAnimator) :
     VectorPathAnimator(pathAnimator) {
     mNodeSettings = settingsList;
+}
+
+VectorPathAnimator::VectorPathAnimator(const QList<NodeSettings*> &settingsList,
+                                       const QList<SkPoint> &posList,
+                                       PathAnimator *pathAnimator) :
+    VectorPathAnimator(settingsList,
+                       pathAnimator) {
     mElementsPos = posList;
     updatePath();
+    updateNodePointsFromElements();
 }
 
 void VectorPathAnimator::prp_setAbsFrame(const int &frame) {
@@ -332,7 +339,7 @@ void VectorPathAnimator::updateNodePointsFromElements() {
     NodePoint *lastP = NULL;
     for(int i = 0; i < nodesCount; i++) {
         int nodePtId = nodeIdToPointId(i);
-        NodePoint *newP;
+
         if(currOldNode == NULL) {
             newP = new NodePoint(this);
             mPoints.append(newP);
@@ -357,15 +364,18 @@ void VectorPathAnimator::updateNodePointsFromElements() {
         }
         lastP = newP;
     }
-    if(mPathClosed) {
-        newFirstPt->setPointAsPrevious(lastP);
-    }
 
     while(currOldNode != NULL && currOldNode != mFirstPoint) {
         NodePoint *oldOldNode = currOldNode;
         currOldNode = currOldNode->getNextPoint();
         mPoints.removeOne(oldOldNode);
         delete oldOldNode;
+    }
+    if(mPathClosed) {
+        newFirstPt->setPointAsPrevious(lastP);
+    } else {
+        newFirstPt->setPointAsPrevious(NULL);
+        lastP->setPointAsNext(NULL);
     }
     setFirstPoint(mFirstPoint);
 }
@@ -521,15 +531,7 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
         setPathClosed(false);
         updateNodePointsFromElements();
     } else {
-        QList<SkPoint> elementsPos;
-        {
-            int firstPtForNew = nextPt->getPtId() - 1;
-            int countPts = mElementsPos.count() - firstPtForNew;
-
-            for(int i = 0; i < countPts; i++) {
-                elementsPos.append(mElementsPos.takeAt(firstPtForNew));
-            }
-        }
+        VectorPathAnimator *newSinglePath;
         QList<NodeSettings*> nodeSettings;
         {
             int firstNodeForNew = nextPt->getNodeId();
@@ -539,15 +541,30 @@ void VectorPathAnimator::disconnectPoints(NodePoint *pt1,
                 nodeSettings.append(mNodeSettings.takeAt(firstNodeForNew));
             }
         }
+        if(prp_hasKeys()) {
+            newSinglePath = new VectorPathAnimator(nodeSettings,
+                                                   mParentPathAnimator);
+            foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+                ((PathKey*)key.get())->createNewKeyFromSubsetForPath(
+                                             newSinglePath,
+                                             nextPt->getPtId() - 1,
+                                             -1);
+            }
+            mElementsUpdateNeeded = true;
+        } else {
+            QList<SkPoint> elementsPos =
+                    takeElementsPosSubset(nextPt->getPtId() - 1, -1);
 
 
-        VectorPathAnimator *newSinglePath =
-                new VectorPathAnimator(nodeSettings,
-                                       elementsPos,
-                                       mParentPathAnimator);
+            newSinglePath = new VectorPathAnimator(nodeSettings,
+                                                   elementsPos,
+                                                   mParentPathAnimator);
+            mPathUpdateNeeded = true;
+            updateNodePointsFromElements();
+        }
+
         mParentPathAnimator->addSinglePathAnimator(newSinglePath);
 
-        updateNodePointsFromElements();
         prp_updateInfluenceRangeAfterChanged();
     }
 }

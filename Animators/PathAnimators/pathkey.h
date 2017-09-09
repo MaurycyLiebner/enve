@@ -93,6 +93,20 @@ public:
             mElementsPos.move(lastId, firstId + i);
         }
     }
+
+    QList<SkPoint> takeElementsPosSubset(const int &firstId,
+                                         int count) {
+        if(count == -1) {
+            count = mElementsPos.count() - firstId;
+        }
+        QList<SkPoint> elements;
+        for(int i = 0; i < count; i++) {
+            elements << mElementsPos.takeAt(firstId);
+        }
+        setPathClosed(false);
+        return elements;
+    }
+
     void readPathContainer(std::fstream *file);
     void writePathContainer(std::fstream *file);
 protected:
@@ -114,11 +128,19 @@ public:
             const QList<SkPoint> &elementsPos,
             VectorPathAnimator *parentAnimator,
             const bool &closed);
+    PathKey(const int &relFrame,
+            const QList<SkPoint> &elementsPos,
+            VectorPathAnimator *parentAnimator,
+            const bool &closed);
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
     bool differsFromKey(Key *key) { return key != this; }
     void writePathKey(std::fstream *file);
     void readPathKey(std::fstream *file);
+
+    PathKey *createNewKeyFromSubsetForPath(VectorPathAnimator *parentAnimator,
+                                           const int &firstId,
+                                           int count);
 };
 
 #endif // PATHKEY_H

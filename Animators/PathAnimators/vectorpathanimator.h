@@ -32,6 +32,8 @@ class VectorPathAnimator : public Animator,
 public:
     VectorPathAnimator(PathAnimator *pathAnimator);
     VectorPathAnimator(const QList<NodeSettings *> &settingsList,
+                       PathAnimator *pathAnimator);
+    VectorPathAnimator(const QList<NodeSettings *> &settingsList,
                        const QList<SkPoint> &posList,
                        PathAnimator *pathAnimator);
 

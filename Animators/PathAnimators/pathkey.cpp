@@ -26,6 +26,28 @@ PathKey::PathKey(const int &relFrame,
     mPathClosed = closed;
 }
 
+PathKey::PathKey(const int &relFrame,
+                 const QList<SkPoint> &elementsPos,
+                 VectorPathAnimator *parentAnimator,
+                 const bool &closed) :
+    PathKey(parentAnimator) {
+    mRelFrame = relFrame;
+    mElementsPos = elementsPos;
+    mPathClosed = closed;
+    updatePath();
+}
+
+PathKey *PathKey::createNewKeyFromSubsetForPath(
+        VectorPathAnimator *parentAnimator,
+        const int &firstId, int count) {
+    QList<SkPoint> elementsPos =
+            takeElementsPosSubset(firstId, count);
+    PathKey *newKey = new PathKey(mRelFrame, elementsPos,
+                                  parentAnimator, false);
+    parentAnimator->anim_appendKey(newKey);
+    return newKey;
+}
+
 NodeSettings *PathKey::getNodeSettingsForPtId(const int &ptId) {
     return ((VectorPathAnimator*)mParentAnimator)->
             getNodeSettingsForPtId(ptId);
