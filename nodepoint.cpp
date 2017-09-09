@@ -99,6 +99,8 @@ void NodePoint::finishTransform() {
         mEndCtrlPt->NonAnimatedMovablePoint::finishTransform();
     }
     getParentPath()->finishedPathChange();
+    getParentPath()->setElementPos(getPtId(),
+                                   QPointFToSkPoint(getRelativePos()));
 }
 
 void NodePoint::setRelativePos(const QPointF &relPos) {

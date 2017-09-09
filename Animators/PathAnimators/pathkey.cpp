@@ -36,9 +36,6 @@ const SkPoint &PathContainer::getElementPos(const int &index) const {
 void PathContainer::setElementPos(const int &index,
                                   const SkPoint &pos) {
     mElementsPos.replace(index, pos);
-    if(qIsNaN(pos.x()) || qIsNaN(pos.y())) {
-        mPathUpdateNeeded = false;
-    }
     mPathUpdateNeeded = true;
 }
 

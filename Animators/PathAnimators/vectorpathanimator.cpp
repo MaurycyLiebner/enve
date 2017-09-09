@@ -28,21 +28,13 @@ void VectorPathAnimator::anim_saveCurrentValueToKey(PathKey *key) {
     key->setElementsFromSkPath(getPath());
 }
 
-void VectorPathAnimator::setCurrentPosForPtWithId(const int &ptId,
-                                                  const SkPoint &pos,
-                                                  const bool &finish) {
-    setElementPos(ptId, pos);
-    if(finish) {
-        if(anim_mKeyOnCurrentFrame == NULL) {
-            anim_saveCurrentValueAsKey();
-        } else {
-            ((PathKey*)anim_mKeyOnCurrentFrame)->setElementPos(ptId, pos);
-        }
-    }
-}
-
 void VectorPathAnimator::startPathChange() {
+    if(mPathChanged) return;
     mPathChanged = true;
+    if(prp_isRecording()) {
+        if(prp_isKeyOnCurrentFrame()) return;
+        anim_saveCurrentValueAsKey();
+    }
 }
 
 void VectorPathAnimator::cancelPathChange() {
@@ -52,15 +44,16 @@ void VectorPathAnimator::cancelPathChange() {
 void VectorPathAnimator::finishedPathChange() {
     if(mPathChanged) {
         mPathChanged = false;
-        if(prp_isRecording()) {
-            anim_saveCurrentValueAsKey();
-        }
     }
 }
 
 void VectorPathAnimator::setElementPos(const int &index,
                                        const SkPoint &pos) {
-    PathContainer::setElementPos(index, pos);
+    if(prp_isKeyOnCurrentFrame()) {
+        ((PathKey*)anim_mKeyOnCurrentFrame)->setElementPos(index, pos);
+    } else {
+        PathContainer::setElementPos(index, pos);
+    }
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -102,12 +95,7 @@ SkPath VectorPathAnimator::getPathAtRelFrame(const int &relFrame,
     } else {
         pathToRuturn = getPath();
     }
-    if(mElementsUpdateNeeded) {
-        if(anim_mCurrentRelFrame == relFrame) {
-            mElementsUpdateNeeded = false;
-            setElementsFromSkPath(pathToRuturn);
-        }
-    }
+
     return pathToRuturn;
 }
 

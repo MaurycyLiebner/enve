@@ -94,10 +94,6 @@ public:
     }
     void anim_saveCurrentValueToKey(PathKey *key);
 
-    void setCurrentPosForPtWithId(const int &ptId,
-                                  const SkPoint &pos,
-                                  const bool &finish);
-
     void finishedPathChange();
 
     void anim_saveCurrentValueAsKey();
