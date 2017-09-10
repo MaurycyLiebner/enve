@@ -14,10 +14,26 @@ void Canvas::connectPoints() {
     if(selectedNodePoints.count() == 2) {
         NodePoint *firstPoint = selectedNodePoints.first();
         NodePoint *secondPoint = selectedNodePoints.last();
-        if(firstPoint->getParentPath()->getParentPathAnimator() ==
-                secondPoint->getParentPath()->getParentPathAnimator()) {
-            firstPoint->getParentPath()->
-                    connectPoints(firstPoint, secondPoint);
+        VectorPathAnimator *firstParentPath = firstPoint->getParentPath();
+        VectorPathAnimator *secondParentPath = secondPoint->getParentPath();
+        if(firstParentPath->getParentPathAnimator() ==
+           secondParentPath->getParentPathAnimator()) {
+            if(firstParentPath == secondParentPath) {
+                firstPoint->getParentPath()->
+                        connectPoints(firstPoint, secondPoint);
+            } else {
+                if(firstPoint->isSeparateNodePoint()) {
+                    firstParentPath->revertElementPosSubset(0, -1);
+                    firstParentPath->revertNodeSettingsSubset(0, -1);
+                }
+                if(!secondPoint->isSeparateNodePoint()) {
+                    secondParentPath->revertElementPosSubset(0, -1);
+                    firstParentPath->revertNodeSettingsSubset(0, -1);
+                }
+                firstParentPath->connectWith(secondParentPath);
+            }
+        } else {
+
         }
     }
 }

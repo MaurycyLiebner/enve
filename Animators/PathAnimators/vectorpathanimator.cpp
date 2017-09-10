@@ -331,6 +331,9 @@ NodePoint *VectorPathAnimator::createNewPointOnLineNear(
 }
 
 void VectorPathAnimator::updateNodePointsFromElements() {
+    if(mFirstPoint != NULL) {
+        mFirstPoint->setPointAsPrevious(NULL); // make sure path not closed
+    }
     NodePoint *currOldNode = mFirstPoint;
     NodePoint *newFirstPt = NULL;
     int elementsCount = mElementsPos.count();
@@ -339,17 +342,12 @@ void VectorPathAnimator::updateNodePointsFromElements() {
     NodePoint *lastP = NULL;
     for(int i = 0; i < nodesCount; i++) {
         int nodePtId = nodeIdToPointId(i);
-
+        NodePoint *newP;
         if(currOldNode == NULL) {
             newP = new NodePoint(this);
-            mPoints.append(newP);
         } else {
             newP = currOldNode;
             currOldNode = currOldNode->getNextPoint();
-            if(currOldNode == mFirstPoint) {
-                newP->setPointAsNext(NULL);
-                currOldNode = NULL;
-            }
         }
         newP->setCurrentNodeSettings(getNodeSettingsForNodeId(i));
         newP->setElementsPos(SkPointToQPointF(mElementsPos.at(nodePtId - 1)),
@@ -365,7 +363,7 @@ void VectorPathAnimator::updateNodePointsFromElements() {
         lastP = newP;
     }
 
-    while(currOldNode != NULL && currOldNode != mFirstPoint) {
+    while(currOldNode != NULL) {
         NodePoint *oldOldNode = currOldNode;
         currOldNode = currOldNode->getNextPoint();
         mPoints.removeOne(oldOldNode);
@@ -374,10 +372,9 @@ void VectorPathAnimator::updateNodePointsFromElements() {
     if(mPathClosed) {
         newFirstPt->setPointAsPrevious(lastP);
     } else {
-        newFirstPt->setPointAsPrevious(NULL);
         lastP->setPointAsNext(NULL);
     }
-    setFirstPoint(mFirstPoint);
+    setFirstPoint(newFirstPt);
 }
 
 void VectorPathAnimator::removeNodeAtAndApproximate(const int &nodeId) {
@@ -510,6 +507,67 @@ void VectorPathAnimator::moveElementPosSubset(int firstId,
     PathContainer::moveElementPosSubset(firstId, count, targetId);
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
         ((PathKey*)key.get())->moveElementPosSubset(firstId, count, targetId);
+    }
+}
+
+void VectorPathAnimator::revertNodeSettingsSubset(
+            const int &firstId,
+            int count) {
+    if(count == -1) {
+        count = mNodeSettings.count() - firstId;
+    }
+    int lastId = firstId + count - 1;
+    for(int i = 0; i < count; i++) {
+        mNodeSettings.move(lastId, firstId + i);
+    }
+}
+
+void VectorPathAnimator::connectWith(VectorPathAnimator *srcPath) {
+    QList<int> keyFrames;
+    QList<QList<SkPoint> > newKeysData;
+    QList<NodeSettings*> newNodeSettings;
+    foreach(NodeSettings *setting, mNodeSettings) {
+        newNodeSettings << setting;
+    }
+    QList<NodeSettings*> srcNodeSettings;
+    srcPath->getNodeSettingsList(&srcNodeSettings);
+    foreach(NodeSettings *setting, srcNodeSettings) {
+        newNodeSettings << setting;
+    }
+
+    getKeysDataForConnection(this, srcPath, &keyFrames, &newKeysData, false);
+    getKeysDataForConnection(srcPath, this, &keyFrames, &newKeysData, true);
+
+    QList<SkPoint> srcElements;
+    srcPath->getElementPosList(&srcElements);
+    QList<SkPoint> defPosList;
+    defPosList.append(mElementsPos);
+    defPosList.append(srcElements);
+
+    VectorPathAnimator *newAnimator = new VectorPathAnimator(newNodeSettings,
+                                                             defPosList,
+                                                             mParentPathAnimator);
+    int idT = 0;
+    foreach(const QList<SkPoint> &posList, newKeysData) {
+        int relFrame = keyFrames.at(idT);
+        PathKey *newKey = new PathKey(relFrame, posList, newAnimator, false);
+        newAnimator->anim_appendKey(newKey);
+        idT++;
+    }
+
+    mParentPathAnimator->addSinglePathAnimator(newAnimator);
+
+
+    mParentPathAnimator->removeSinglePathAnimator(this);
+    mParentPathAnimator->removeSinglePathAnimator(srcPath);
+}
+
+void VectorPathAnimator::revertElementPosSubset(
+        const int &firstId,
+        int count) {
+    PathContainer::revertElementPosSubset(firstId, count);
+    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        ((PathKey*)key.get())->revertElementPosSubset(firstId, count);
     }
 }
 

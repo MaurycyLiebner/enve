@@ -25,8 +25,7 @@ struct NodePointValues {
         endRelPos = endPosT;
     }
 
-    NodePointValues() {}
-
+    NodePointValues() {}    
 
     QPointF startRelPos;
     QPointF pointRelPos;
@@ -70,6 +69,7 @@ class NodePoint : public NonAnimatedMovablePoint
 {
 public:
     NodePoint(VectorPathAnimator *parentAnimator);
+    ~NodePoint();
 
     void applyTransform(const QMatrix &transform);
 

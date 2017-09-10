@@ -87,7 +87,10 @@ public:
 
     virtual void revertElementPosSubset(
             const int &firstId,
-            const int &count) {
+            int count) {
+        if(count == -1) {
+            count = mElementsPos.count() - firstId;
+        }
         int lastId = firstId + count - 1;
         for(int i = 0; i < count; i++) {
             mElementsPos.move(lastId, firstId + i);
@@ -109,6 +112,7 @@ public:
 
     void readPathContainer(std::fstream *file);
     void writePathContainer(std::fstream *file);
+    static QList<SkPoint> extractElementsFromSkPath(const SkPath &path);
 protected:
     bool mPathClosed = false;
     bool mPathUpdateNeeded = false;

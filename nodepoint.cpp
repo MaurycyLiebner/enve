@@ -27,6 +27,11 @@ NodePoint::NodePoint(VectorPathAnimator *parentAnimator) :
     //prp_setUpdater(updater);
 }
 
+NodePoint::~NodePoint() {
+    delete mStartCtrlPt;
+    delete mEndCtrlPt;
+}
+
 void NodePoint::setParentPath(VectorPathAnimator *path) {
     mParentPath = path;
 }

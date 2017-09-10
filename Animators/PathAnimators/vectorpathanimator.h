@@ -175,6 +175,56 @@ public:
                         const bool &update = true);
 
     void moveElementPosSubset(int firstId, int count, int targetId);
+    void revertElementPosSubset(const int &firstId, int count);
+    void revertNodeSettingsSubset(const int &firstId, int count);
+
+    void getNodeSettingsList(QList<NodeSettings*> *nodeSettingsList) {
+        *nodeSettingsList = mNodeSettings;
+    }
+
+    void getElementPosList(QList<SkPoint> *elementPosList) {
+        *elementPosList = mElementsPos;
+    }
+
+    void getKeysList(QList<PathKey*> *pathKeyList) {
+        foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+            pathKeyList->append((PathKey*)key.get());
+        }
+    }
+
+    static void getKeysDataForConnection(VectorPathAnimator *targetPath,
+                                  VectorPathAnimator *srcPath,
+                                  QList<int> *keyFrames,
+                                  QList<QList<SkPoint> > *newKeysData,
+                                  const bool &addSrcFirst) {
+        QList<PathKey*> keys;
+        srcPath->getKeysList(&keys);
+        foreach(PathKey *srcKey, keys) {
+            QList<SkPoint> combinedKeyData;
+            int relFrame = srcKey->getRelFrame();
+            PathKey *keyAtRelFrame =
+                    (PathKey*)targetPath->anim_getKeyAtRelFrame(relFrame);
+            const QList<SkPoint> &srcKeyElements = srcKey->getElementsPosList();
+            QList<SkPoint> targetKeyElements;
+            if(keyAtRelFrame == NULL) {
+                targetKeyElements =
+                        extractElementsFromSkPath(targetPath->getPathAtRelFrame(relFrame));
+            } else {
+                targetKeyElements = keyAtRelFrame->getElementsPosList();
+            }
+            if(addSrcFirst) {
+                combinedKeyData.append(targetKeyElements);
+                combinedKeyData.append(srcKeyElements);
+            } else {
+                combinedKeyData.append(targetKeyElements);
+                combinedKeyData.append(srcKeyElements);
+            }
+            newKeysData->append(combinedKeyData);
+            keyFrames->append(srcKey->getRelFrame());
+        }
+    }
+
+    void connectWith(VectorPathAnimator *srcPath);
 private:
     void setFirstPoint(NodePoint *firstPt);
 
