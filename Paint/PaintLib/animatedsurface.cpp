@@ -29,6 +29,20 @@ void AnimatedSurface::currentDataModified() {
 }
 
 void AnimatedSurface::anim_saveCurrentValueAsKey() {
+    if(prp_isKeyOnCurrentFrame()) return;
+    newEmptyPaintFrame();
+    SurfaceKey *key = (SurfaceKey*)anim_mKeyOnCurrentFrame;
+    SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(key);
+    Tile ***tiles;
+    if(prevKey == NULL) {
+        tiles = mCurrentTiles->getData();
+    } else {
+        tiles = prevKey->getTiles()->getData();
+    }
+    key->duplicateTilesContentFrom(tiles);
+}
+
+void AnimatedSurface::newEmptyPaintFrame() {
     if(!anim_mIsRecording) {
         prp_setRecording(true);
         return;

@@ -94,6 +94,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
         if(box->SWT_isPaintBox()) {
             menu->addAction("New Paint Frame")->setObjectName(
                         "canvas_new_paint_frame");
+            menu->addAction("New Empty Paint Frame")->setObjectName(
+                        "canvas_new_empty_paint_frame");
             break;
         }
     }
@@ -139,6 +141,13 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = (PaintBox*)box;
                 paintBox->newPaintFrameOnCurrentFrame();
+            }
+        }
+    } else if(selectedAction->objectName() == "canvas_new_empty_paint_frame") {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->newEmptyPaintFrameOnCurrentFrame();
             }
         }
     } else {

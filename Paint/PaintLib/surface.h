@@ -65,6 +65,14 @@ public:
         delete[] mTiles;
     }
 
+    void duplicateTilesContentFrom(Tile ***src) {
+        for(int i = 0; i < mNTileCols; i++) {
+            for(int j = 0; j < mNTileRows; j++) {
+                mTiles[j][i]->duplicateFrom(src[j][i]);
+            }
+        }
+    }
+
     void clearTiles() {
         for(int i = 0; i < mNTileCols; i++) {
             for(int j = 0; j < mNTileRows; j++) {
@@ -266,6 +274,12 @@ public:
     void clearTiles(Tile ***tiles);
     void writeSurface(std::fstream *file);
     void readSurface(std::fstream *file);
+
+    void duplicateTilesContentFrom(Tile ***tilesSrc);
+
+    TilesData *getTilesData() {
+        return mCurrentTiles.get();
+    }
 protected:
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;

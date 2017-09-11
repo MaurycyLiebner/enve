@@ -90,6 +90,7 @@ public:
     void newPaintFrameOnCurrentFrame();
     void writeBoundingBox(std::fstream *file);
     void readBoundingBox(std::fstream *file);
+    void newEmptyPaintFrameOnCurrentFrame();
 private:
     PointAnimator *mTopLeftPoint = NULL;
     PointAnimator *mBottomRightPoint = NULL;

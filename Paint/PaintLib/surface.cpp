@@ -19,6 +19,10 @@ Surface::~Surface() {
 
 }
 
+void Surface::duplicateTilesContentFrom(Tile ***tilesSrc) {
+    mCurrentTiles->duplicateTilesContentFrom(tilesSrc);
+}
+
 qreal Surface::countDabsTo(const qreal &dist_between_dabs,
                            const qreal &x, const qreal &y) {
     qreal dx = x - mLastPaintedStrokeX;

@@ -122,6 +122,10 @@ public:
     void clearTmp();
     void writeTile(std::fstream *file);
     void readTile(std::fstream *file);
+
+    void duplicateFrom(Tile *tile);
+
+    uchar *getData() { return mData; }
 private:
     void updateDrawerFromDataArray();
 

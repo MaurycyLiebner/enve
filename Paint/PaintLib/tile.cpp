@@ -93,6 +93,23 @@ void processPaintDabs(const QList<Dab> &dabs,
     }
 }
 
+void Tile::duplicateFrom(Tile *tile) {
+    if(mPaintInOtherThread) {
+        uchar *dataT = tile->getTexTileDrawer()->data;
+        uchar *drawerData = mDrawer->data;
+        for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
+            drawerData[i] = dataT[i];
+            mData[i] = dataT[i];
+        }
+        mDrawer->addScheduler();
+    } else {
+        uchar *dataT = tile->getData();
+        for(int i = 0; i < TILE_DIM*TILE_DIM*4; i++) {
+            mData[i] = dataT[i];
+        }
+    }
+}
+
 void Tile::clear() {
     if(mPaintInOtherThread) {
         mDrawer->clearImg();

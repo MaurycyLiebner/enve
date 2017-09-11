@@ -103,6 +103,11 @@ void PaintBox::newPaintFrameOnCurrentFrame() {
     scheduleUpdate();
 }
 
+void PaintBox::newEmptyPaintFrameOnCurrentFrame() {
+    mMainHandler->newEmptyPaintFrame();
+    scheduleUpdate();
+}
+
 MovablePoint *PaintBox::getTopLeftPoint() {
     return mTopLeftPoint;
 }

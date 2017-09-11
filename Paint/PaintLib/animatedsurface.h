@@ -26,6 +26,9 @@ public:
     bool differsFromKey(Key *key) { return key != this; }
     void writeSurfaceKey(std::fstream *file);
     void readSurfaceKey(std::fstream *file);
+    void duplicateTilesContentFrom(Tile ***tilesSrc) {
+        mTiles->duplicateTilesContentFrom(tilesSrc);
+    }
 private:
     std::shared_ptr<TilesData> mTiles;
 };
@@ -67,6 +70,7 @@ public:
     void currentDataModified();
     bool SWT_isAnimatedSurface() { return true; }
     void anim_saveCurrentValueAsKey();
+    void newEmptyPaintFrame();
 protected:
     PaintBox *mParentBox = NULL;
     int mCurrentTilesFrame = 0;

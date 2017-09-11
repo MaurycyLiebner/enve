@@ -229,6 +229,9 @@ void Animator::anim_appendKey(Key *newKey,
     if(saveUndoRedo && !anim_isComplexAnimator()) {
         addUndoRedo(new AddKeyToAnimatorUndoRedo(newKey, this));
     }
+    if(!anim_mIsRecording) {
+        anim_mIsRecording = true;
+    }
     anim_mKeys.append(newKey->ref<Key>());
     anim_sortKeys();
     //mergeKeysIfNeeded();
