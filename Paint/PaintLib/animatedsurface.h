@@ -71,12 +71,17 @@ public:
     bool SWT_isAnimatedSurface() { return true; }
     void anim_saveCurrentValueAsKey();
     void newEmptyPaintFrame();
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                              int *lastIdentical,
+                                              const int &relFrame);
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2);
 protected:
     PaintBox *mParentBox = NULL;
-    int mCurrentTilesFrame = 0;
-    int mPreviousTilesFrame = 0;
-    std::shared_ptr<TilesData> mNextTiles;
-    int mNextTilesFrame = 0;
+
+    QList<std::shared_ptr<TilesData>> mDrawTilesData;
+    QList<int> mDrawTilesFrames;
+    int mAdditionalFrames = 5;
 };
 
 #endif // ANIMATEDSURFACE_H

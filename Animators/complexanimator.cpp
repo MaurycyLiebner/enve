@@ -230,27 +230,18 @@ void ComplexAnimator::anim_drawKey(
     } else {
         p->setBrush(Qt::red);
     }
-
     if(key->isHovered()) {
-        p->save();
         p->setPen(QPen(Qt::black, 1.5));
-        p->drawEllipse(
-            QRectF(
-                QPointF((key->getRelFrame() - startFrame + 0.5)*
-                        pixelsPerFrame - KEY_RECT_SIZE*0.35,
-                        drawY + (MIN_WIDGET_HEIGHT -
-                                  KEY_RECT_SIZE*0.7)*0.5 ),
-                QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
-        p->restore();
     } else {
-        p->drawEllipse(
-            QRectF(
-                QPointF((key->getRelFrame() - startFrame + 0.5)*
-                        pixelsPerFrame - KEY_RECT_SIZE*0.35,
-                        drawY + (MIN_WIDGET_HEIGHT -
-                                  KEY_RECT_SIZE*0.7)*0.5 ),
-                QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
+        p->setPen(Qt::NoPen);
     }
+    p->drawEllipse(
+        QRectF(
+            QPointF((key->getRelFrame() - startFrame + 0.5)*
+                    pixelsPerFrame - KEY_RECT_SIZE*0.35,
+                    drawY + (MIN_WIDGET_HEIGHT -
+                              KEY_RECT_SIZE*0.7)*0.5 ),
+            QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
 }
 
 void ComplexAnimator::prp_setParentFrameShift(const int &shift,

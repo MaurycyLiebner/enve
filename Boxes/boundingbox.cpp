@@ -919,11 +919,11 @@ void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                         relFrame);
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
-                *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame();
+                *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame() + 1;
                 *lastIdentical = INT_MAX;
             } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
                 *firstIdentical = INT_MIN;
-                *lastIdentical = mDurationRectangle->getMinFrameAsRelFrame();
+                *lastIdentical = mDurationRectangle->getMinFrameAsRelFrame() - 1;
             }
         }
     } else {

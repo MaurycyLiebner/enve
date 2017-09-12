@@ -513,25 +513,17 @@ void Animator::anim_drawKey(QPainter *p,
         p->setBrush(Qt::red);
     }
     if(key->isHovered()) {
-        p->save();
         p->setPen(QPen(Qt::black, 1.5));
-        p->drawEllipse(
-            QRectF(
-                QPointF((key->getRelFrame() - startFrame + 0.5)*
-                        pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                        drawY + (MIN_WIDGET_HEIGHT -
-                                  KEY_RECT_SIZE)*0.5 ),
-                QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
-        p->restore();
     } else {
-        p->drawEllipse(
-            QRectF(
-                QPointF((key->getRelFrame() - startFrame + 0.5)*
-                        pixelsPerFrame - KEY_RECT_SIZE*0.5,
-                        drawY + (MIN_WIDGET_HEIGHT -
-                                  KEY_RECT_SIZE)*0.5 ),
-                QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
+        p->setPen(Qt::NoPen);
     }
+    p->drawEllipse(
+        QRectF(
+            QPointF((key->getRelFrame() - startFrame + 0.5)*
+                    pixelsPerFrame - KEY_RECT_SIZE*0.5,
+                    drawY + (MIN_WIDGET_HEIGHT -
+                              KEY_RECT_SIZE)*0.5 ),
+            QSize(KEY_RECT_SIZE, KEY_RECT_SIZE) ) );
 }
 
 void Animator::prp_drawKeys(QPainter *p,

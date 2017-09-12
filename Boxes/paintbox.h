@@ -91,6 +91,8 @@ public:
     void writeBoundingBox(std::fstream *file);
     void readBoundingBox(std::fstream *file);
     void newEmptyPaintFrameOnCurrentFrame();
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2);
 private:
     PointAnimator *mTopLeftPoint = NULL;
     PointAnimator *mBottomRightPoint = NULL;
