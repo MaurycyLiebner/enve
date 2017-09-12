@@ -15,7 +15,7 @@ public:
     Animator();
     ~Animator();
 
-    void anim_updateAfterChangedKey(Key *key);
+    virtual void anim_updateAfterChangedKey(Key *key);
 
     virtual void prp_setAbsFrame(const int &frame);
 

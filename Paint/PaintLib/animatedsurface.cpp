@@ -215,7 +215,7 @@ void AnimatedSurface::setSize(const ushort &width_t,
 
 bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                       const int &relFrame2) {
-    if(prp_hasKeys()) {
+    if(anim_mKeys.count() > 1) {
         int firstKeyRelFrame = anim_mKeys.first()->getRelFrame();
         int lastKeyRelFrame = anim_mKeys.last()->getRelFrame();
         if(relFrame1 >= lastKeyRelFrame + mAdditionalFrames &&
@@ -227,6 +227,27 @@ bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,
     return false;
 }
 
+void AnimatedSurface::anim_updateAfterChangedKey(Key *key) {
+    if(anim_mIsComplexAnimator) return;
+    if(key == NULL) {
+        prp_updateInfluenceRangeAfterChanged();
+        return;
+    }
+    int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
+    if(prevKeyRelFrame != INT_MIN) {
+        prevKeyRelFrame++;
+        prevKeyRelFrame -= mAdditionalFrames;
+    }
+    int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
+    if(nextKeyRelFrame != INT_MAX) {
+        nextKeyRelFrame--;
+        nextKeyRelFrame += mAdditionalFrames;
+    }
+
+    prp_updateAfterChangedRelFrameRange(prevKeyRelFrame,
+                                        nextKeyRelFrame);
+}
+
 void AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                            int *lastIdentical,
                                                            const int &relFrame) {
@@ -234,12 +255,28 @@ void AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                 firstIdentical,
                                 lastIdentical,
                                 relFrame);
-    if(prp_hasKeys()) {
+    if(anim_mKeys.count() > 1) {
+//        if(anim_mKeys.count() == 1) {
+//            int keyFrame = anim_mKeys.first()->getRelFrame();
+//            if(relFrame > keyFrame - mAdditionalFrames &&
+//               relFrame < keyFrame + mAdditionalFrames) {
+//                *firstIdentical = relFrame;
+//                *lastIdentical = relFrame;
+//            } else {
+//                if(relFrame > keyFrame) {
+//                    *firstIdentical = keyFrame + mAdditionalFrames;
+//                } else {
+//                    *lastIdentical = keyFrame - mAdditionalFrames;
+//                }
+//            }
+//            return;
+//        }
         if(*firstIdentical == INT_MIN) {
             int firstKeyFrame = anim_mKeys.first()->getRelFrame();
             if(firstKeyFrame - mAdditionalFrames < relFrame) {
                 *firstIdentical = relFrame;
                 *lastIdentical = relFrame;
+                return;
             } else {
                 *lastIdentical = firstKeyFrame - mAdditionalFrames;
             }

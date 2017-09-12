@@ -76,12 +76,13 @@ public:
                                               const int &relFrame);
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
+    void anim_updateAfterChangedKey(Key *key);
 protected:
     PaintBox *mParentBox = NULL;
 
     QList<std::shared_ptr<TilesData>> mDrawTilesData;
     QList<int> mDrawTilesFrames;
-    int mAdditionalFrames = 5;
+    int mAdditionalFrames = 2;
 };
 
 #endif // ANIMATEDSURFACE_H
