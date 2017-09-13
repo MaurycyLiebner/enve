@@ -188,7 +188,8 @@ SOURCES += main.cpp\
     Animators/PathAnimators/vectorpathanimator.cpp \
     pointanimator.cpp \
     nodepoint.cpp \
-    avfileio.cpp
+    avfileio.cpp \
+    Paint/paintboxsettingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -337,7 +338,8 @@ HEADERS  += mainwindow.h \
     Animators/PathAnimators/vectorpathanimator.h \
     pointanimator.h \
     nodepoint.h \
-    avfileio.h
+    avfileio.h \
+    Paint/paintboxsettingsdialog.h
 
 RESOURCES += \
     resources.qrc

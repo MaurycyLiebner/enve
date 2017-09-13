@@ -93,7 +93,39 @@ public:
     void newEmptyPaintFrameOnCurrentFrame();
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
+    void newEmptyPaintFrameAtFrame(const int &relFrame);
+
+    void setOverlapFrames(const int &overlapFrames);
+
+    const int &getOverlapFrames() {
+        return mOverlapFrames;
+    }
+    void setFrameStep(const int &frameStep) {
+        mFrameStep = frameStep;
+    }
+
+    const int &getFrameStep() {
+        return mFrameStep;
+    }
+    void setFrameCount(const int &frameCount) {
+        mFrameCount = frameCount;
+    }
+
+    const int &getFrameCount() {
+        return mFrameCount;
+    }
+    void setFirstFrame(const int &firstFrame) {
+        mFirstFrame = firstFrame;
+    }
+
+    const int &getFirstFrame() {
+        return mFirstFrame;
+    }
 private:
+    int mOverlapFrames = INT_MIN;
+    int mFrameStep = INT_MIN;
+    int mFrameCount = INT_MIN;
+    int mFirstFrame = INT_MIN;
     PointAnimator *mTopLeftPoint = NULL;
     PointAnimator *mBottomRightPoint = NULL;
     ushort mWidth = 0;

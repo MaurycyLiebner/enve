@@ -2,6 +2,38 @@
 #include "mainwindow.h"
 #include "pathpivot.h"
 
+int Canvas::nextRelFrameWithKey(const int &relFrame) {
+    int minNextFrame = INT_MAX;
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
+        int boxNext = box->prp_nextRelFrameWithKey(boxRelFrame);
+        int absNext = box->prp_relFrameToAbsFrame(boxNext);
+        if(minNextFrame > absNext) {
+            minNextFrame = absNext;
+        }
+    }
+    if(minNextFrame == INT_MAX) {
+        return relFrame;
+    }
+    return minNextFrame;
+}
+
+int Canvas::prevRelFrameWithKey(const int &relFrame) {
+    int maxPrevFrame = INT_MIN;
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        int boxRelFrame = box->prp_absFrameToRelFrame(relFrame);
+        int boxPrev = box->prp_prevRelFrameWithKey(boxRelFrame);
+        int absPrev = box->prp_relFrameToAbsFrame(boxPrev);
+        if(maxPrevFrame < absPrev) {
+            maxPrevFrame = absPrev;
+        }
+    }
+    if(maxPrevFrame == INT_MIN) {
+        return relFrame;
+    }
+    return maxPrevFrame;
+}
+
 void Canvas::convertSelectedBoxesToPath() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->objectToPath();

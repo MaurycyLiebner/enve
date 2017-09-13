@@ -472,6 +472,8 @@ public:
     QRectF getRelBoundingRectAtRelFrame(const int &);
     void writeBoundingBox(std::fstream *file);
     void readBoundingBox(std::fstream *file);
+    int prevRelFrameWithKey(const int &relFrame);
+    int nextRelFrameWithKey(const int &relFrame);
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

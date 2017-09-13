@@ -77,12 +77,16 @@ public:
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
     void anim_updateAfterChangedKey(Key *key);
+    void newEmptyPaintFrame(const int &relFrame);
+    void setOverlapFrames(const int &overlapFrames) {
+        mOverlapFrames = overlapFrames;
+    }
 protected:
     PaintBox *mParentBox = NULL;
 
     QList<std::shared_ptr<TilesData>> mDrawTilesData;
     QList<int> mDrawTilesFrames;
-    int mAdditionalFrames = 2;
+    int mOverlapFrames = 2;
 };
 
 #endif // ANIMATEDSURFACE_H

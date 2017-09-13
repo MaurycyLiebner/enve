@@ -21,6 +21,22 @@ void Animator::anim_shiftAllKeys(const int &shift) {
     }
 }
 
+int Animator::prp_nextRelFrameWithKey(const int &relFrame) {
+    Key *key = anim_getNextKey(relFrame);
+    if(key == NULL) {
+        return relFrame;
+    }
+    return key->getRelFrame();
+}
+
+int Animator::prp_prevRelFrameWithKey(const int &relFrame) {
+    Key *key = anim_getPrevKey(relFrame);
+    if(key == NULL) {
+        return relFrame;
+    }
+    return key->getRelFrame();
+}
+
 int Animator::anim_getNextKeyRelFrame(Key *key) {
     if(key == NULL) return INT_MAX;
     Key *nextKey = key->getNextKey();
@@ -133,8 +149,12 @@ Key *Animator::anim_getNextKey(const int &relFrame) {
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, relFrame)) {
         Key *key = anim_mKeys.at(nextId).get();
-        if(key->getRelFrame() >= relFrame) {
+        if(key->getRelFrame() > relFrame) {
             return key;
+        } else if(key->getRelFrame() == relFrame) {
+            if(nextId + 1 < anim_mKeys.count()) {
+                return anim_mKeys.at(nextId + 1).get();
+            }
         }
     }
     return NULL;
@@ -145,8 +165,12 @@ Key *Animator::anim_getPrevKey(const int &relFrame) {
     int nextId;
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId, relFrame)) {
         Key *key = anim_mKeys.at(prevId).get();
-        if(key->getRelFrame() <= relFrame) {
+        if(key->getRelFrame() < relFrame) {
             return key;
+        } else if(key->getRelFrame() == relFrame) {
+            if(prevId > 0) {
+                return anim_mKeys.at(prevId - 1).get();
+            }
         }
     }
     return NULL;

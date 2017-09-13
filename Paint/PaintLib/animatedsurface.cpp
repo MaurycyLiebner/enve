@@ -13,9 +13,9 @@ void getTileDrawers(const std::shared_ptr<TilesData> &drawTilesData,
         alpha = 255;
     } else {
         int dR = qAbs(drawTilesFrame - neighDrawerRelFrame) + additionalFrames;
-        int dFrame = drawTilesFrame - currRelFrame;
+        int dFrame = qAbs(drawTilesFrame - currRelFrame);
         qreal alphaT = dFrame*1./dR;
-        alpha = qMin(255, qMax(0, qRound((1. - alphaT*alphaT)*255.)) );
+        alpha = qMin(255, qMax(0, qRound((1. - alphaT/*alphaT*/)*255.)) );
     }
     drawTilesData->getTileDrawers(tileDrawers, alpha);
 }
@@ -61,22 +61,21 @@ void AnimatedSurface::anim_saveCurrentValueAsKey() {
     key->duplicateTilesContentFrom(tiles);
 }
 
-void AnimatedSurface::newEmptyPaintFrame() {
+void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
     if(!anim_mIsRecording) {
-        prp_setRecording(true);
-        return;
+        anim_setRecordingValue(true);
     }
 
-    SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(anim_mCurrentRelFrame);
+    SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(relFrame);
     if(prevKey != NULL) {
-        if(prevKey->getRelFrame() == anim_mCurrentRelFrame) {
+        if(prevKey->getRelFrame() == relFrame) {
             prevKey->getTiles()->clearTiles();
             return;
         }
     }
 
     SurfaceKey *frameT = new SurfaceKey(this);
-    frameT->setRelFrame(anim_mCurrentRelFrame);
+    frameT->setRelFrame(relFrame);
     if(prp_hasKeys()) {
         frameT->setSize(mWidth, mHeight);
     } else {
@@ -86,6 +85,10 @@ void AnimatedSurface::newEmptyPaintFrame() {
     anim_appendKey(frameT);
 
     updateTargetTiles();
+}
+
+void AnimatedSurface::newEmptyPaintFrame() {
+    newEmptyPaintFrame(anim_mCurrentRelFrame);
 }
 
 void AnimatedSurface::updateTargetTiles() {
@@ -105,7 +108,7 @@ void AnimatedSurface::updateTargetTiles() {
             mDrawTilesFrames.prepend(keyT->getRelFrame());
             idT--;
             if(anim_mCurrentRelFrame - keyT->getRelFrame() >=
-                    mAdditionalFrames) break;
+                    mOverlapFrames) break;
         }
         SurfaceKey *nextKey = (SurfaceKey*)anim_mKeys.at(nextId).get();
         if(nextKey != prevKey) {
@@ -119,7 +122,7 @@ void AnimatedSurface::updateTargetTiles() {
             mDrawTilesFrames.append(keyT->getRelFrame());
             idT++;
             if(keyT->getRelFrame() - anim_mCurrentRelFrame >=
-                    mAdditionalFrames) break;
+                    mOverlapFrames) break;
         }
 
         int nextDFrame = qAbs(nextKey->getRelFrame() - anim_mCurrentRelFrame);
@@ -141,7 +144,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
     if(mDrawTilesFrames.isEmpty()) {
         ::getTileDrawers(mCurrentTiles, 0,
                          INT_MIN, anim_mCurrentRelFrame,
-                         mAdditionalFrames,
+                         mOverlapFrames,
                          tileDrawers);
     } else {
         int countT = mDrawTilesFrames.count();
@@ -162,7 +165,7 @@ void AnimatedSurface::getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
             }
             ::getTileDrawers(tilesData, relFrame,
                              neighRelFrame, anim_mCurrentRelFrame,
-                             mAdditionalFrames,
+                             mOverlapFrames,
                              tileDrawers);
 
             prevRelFrame = relFrame;
@@ -218,10 +221,10 @@ bool AnimatedSurface::prp_differencesBetweenRelFrames(const int &relFrame1,
     if(anim_mKeys.count() > 1) {
         int firstKeyRelFrame = anim_mKeys.first()->getRelFrame();
         int lastKeyRelFrame = anim_mKeys.last()->getRelFrame();
-        if(relFrame1 >= lastKeyRelFrame + mAdditionalFrames &&
-           relFrame2 >= lastKeyRelFrame + mAdditionalFrames) return false;
-        if(relFrame1 <= firstKeyRelFrame - mAdditionalFrames &&
-           relFrame2 <= firstKeyRelFrame - mAdditionalFrames) return false;
+        if(relFrame1 >= lastKeyRelFrame + mOverlapFrames &&
+           relFrame2 >= lastKeyRelFrame + mOverlapFrames) return false;
+        if(relFrame1 <= firstKeyRelFrame - mOverlapFrames &&
+           relFrame2 <= firstKeyRelFrame - mOverlapFrames) return false;
         return true;
     }
     return false;
@@ -236,12 +239,12 @@ void AnimatedSurface::anim_updateAfterChangedKey(Key *key) {
     int prevKeyRelFrame = anim_getPrevKeyRelFrame(key);
     if(prevKeyRelFrame != INT_MIN) {
         prevKeyRelFrame++;
-        prevKeyRelFrame -= mAdditionalFrames;
+        prevKeyRelFrame -= mOverlapFrames;
     }
     int nextKeyRelFrame = anim_getNextKeyRelFrame(key);
     if(nextKeyRelFrame != INT_MAX) {
         nextKeyRelFrame--;
-        nextKeyRelFrame += mAdditionalFrames;
+        nextKeyRelFrame += mOverlapFrames;
     }
 
     prp_updateAfterChangedRelFrameRange(prevKeyRelFrame,
@@ -273,20 +276,20 @@ void AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 //        }
         if(*firstIdentical == INT_MIN) {
             int firstKeyFrame = anim_mKeys.first()->getRelFrame();
-            if(firstKeyFrame - mAdditionalFrames < relFrame) {
+            if(firstKeyFrame - mOverlapFrames < relFrame) {
                 *firstIdentical = relFrame;
                 *lastIdentical = relFrame;
                 return;
             } else {
-                *lastIdentical = firstKeyFrame - mAdditionalFrames;
+                *lastIdentical = firstKeyFrame - mOverlapFrames;
             }
         } else if(*lastIdentical == INT_MAX) {
             int lastKeyFrame = anim_mKeys.last()->getRelFrame();
-            if(lastKeyFrame + mAdditionalFrames > relFrame) {
+            if(lastKeyFrame + mOverlapFrames > relFrame) {
                 *firstIdentical = relFrame;
                 *lastIdentical = relFrame;
             } else {
-                *firstIdentical = lastKeyFrame + mAdditionalFrames;
+                *firstIdentical = lastKeyFrame + mOverlapFrames;
             }
         }
     }

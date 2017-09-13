@@ -108,6 +108,16 @@ void PaintBox::newEmptyPaintFrameOnCurrentFrame() {
     scheduleUpdate();
 }
 
+void PaintBox::newEmptyPaintFrameAtFrame(const int &relFrame) {
+    mMainHandler->newEmptyPaintFrame(relFrame);
+    scheduleUpdate();
+}
+
+void PaintBox::setOverlapFrames(const int &overlapFrames) {
+    mOverlapFrames = overlapFrames;
+    mMainHandler->setOverlapFrames(overlapFrames);
+}
+
 MovablePoint *PaintBox::getTopLeftPoint() {
     return mTopLeftPoint;
 }

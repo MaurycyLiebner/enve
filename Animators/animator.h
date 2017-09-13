@@ -105,11 +105,14 @@ public:
         return anim_mCurrentRelFrame;
     }
     virtual void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                                       int *lastIdentical,
-                                                       const int &relFrame);
+                                                      int *lastIdentical,
+                                                      const int &relFrame);
     Key *anim_getPrevKey(const int &relFrame);
     Key *anim_getNextKey(const int &relFrame);
     void anim_shiftAllKeys(const int &shift);
+
+    int prp_nextRelFrameWithKey(const int &relFrame);
+    int prp_prevRelFrameWithKey(const int &relFrame);
 protected:
     int anim_getKeyIndex(Key *key);
 

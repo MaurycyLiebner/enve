@@ -60,9 +60,14 @@ QString QStringAnimator::getTextValueAtRelFrame(const int &relFrame) {
     if(anim_mKeys.isEmpty()) {
         return mCurrentText;
     }
-    QStringKey *key = (QStringKey *)anim_getPrevKey(relFrame);
+    QStringKey *key;
+    if(prp_isKeyOnCurrentFrame()) {
+        key = (QStringKey*)anim_mKeyOnCurrentFrame;
+    } else {
+        key = (QStringKey*)anim_getPrevKey(relFrame);
+    }
     if(key == NULL) {
-        key = (QStringKey *)anim_getNextKey(relFrame);
+        key = (QStringKey*)anim_getNextKey(relFrame);
     }
     return key->getText();
 }

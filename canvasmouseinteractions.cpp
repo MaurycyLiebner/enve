@@ -96,11 +96,13 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                         "canvas_new_paint_frame");
             menu->addAction("New Empty Paint Frame")->setObjectName(
                         "canvas_new_empty_paint_frame");
+            menu->addAction("Setup Animation Frames")->setObjectName(
+                        "canvas_setup_animation_frames");
             break;
         }
     }
 }
-
+#include "Paint/paintboxsettingsdialog.h"
 bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "canvas_duplicate") {
         duplicateSelectedBoxes();
@@ -148,6 +150,36 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
             if(box->SWT_isPaintBox()) {
                 PaintBox *paintBox = (PaintBox*)box;
                 paintBox->newEmptyPaintFrameOnCurrentFrame();
+            }
+        }
+    } else if(selectedAction->objectName() == "canvas_setup_animation_frames") {
+        PaintBoxSettingsDialog dialog;
+        PaintBox *firstPaintBox = (PaintBox*)mSelectedBoxes.first();
+        int firstFrame = firstPaintBox->getFirstFrame();
+        int frameStep = firstPaintBox->getFrameStep();
+        int frameCount = firstPaintBox->getFrameCount();
+        int overlapFrames = firstPaintBox->getOverlapFrames();
+        dialog.setFirstFrame(firstFrame);
+        dialog.setOverlapFrames(overlapFrames);
+        dialog.setFrameStep(frameStep);
+        dialog.setFrameCount(frameCount);
+        dialog.exec();
+        if(dialog.result() == QDialog::Rejected) return true;
+        firstFrame = dialog.getFirstFrame();
+        frameStep = dialog.getFrameStep();
+        frameCount = dialog.getFrameCount();
+        overlapFrames = dialog.getOverlapFrames();
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->setOverlapFrames(overlapFrames);
+                paintBox->setFirstFrame(firstFrame);
+                paintBox->setFrameStep(frameStep);
+                paintBox->setFrameCount(frameCount);
+                for(int i = firstFrame;
+                    i < frameCount*frameStep; i += frameStep) {
+                    paintBox->newEmptyPaintFrameAtFrame(i);
+                }
             }
         }
     } else {

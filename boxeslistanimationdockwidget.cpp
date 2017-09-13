@@ -306,6 +306,16 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
     } else if(event->key() == Qt::Key_Left &&
               event->modifiers() & Qt::ControlModifier) {
         setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
+    } else if(event->key() == Qt::Key_Down) {
+        Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
+        if(currCanvas == NULL) return false;
+        setCurrentFrame(currCanvas->prevRelFrameWithKey(
+                        mMainWindow->getCurrentFrame()));
+    } else if(event->key() == Qt::Key_Up) {
+        Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();
+        if(currCanvas == NULL) return false;
+        setCurrentFrame(currCanvas->nextRelFrameWithKey(
+                        mMainWindow->getCurrentFrame()));
     } else if(event->key() == Qt::Key_P) {
         mLocalPivot->toggle();
     } else {

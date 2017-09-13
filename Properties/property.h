@@ -141,6 +141,13 @@ public:
         Q_UNUSED(relFrame);
     }
 
+    virtual int prp_nextRelFrameWithKey(const int &relFrame) {
+        return relFrame;
+    }
+
+    virtual int prp_prevRelFrameWithKey(const int &relFrame) {
+        return relFrame;
+    }
 public slots:
     void prp_callUpdater();
 
