@@ -24,6 +24,7 @@ public:
 
 
     void setCurrentColor(Color color);
+    void hideAlphaControlers();
 signals:
     void colorSettingSignal(const ColorSetting&);
     void colorModeChanged(const ColorMode&);
@@ -52,7 +53,7 @@ public slots:
 
     void emitFullColorChangedSignal();
 private slots:
-    void moveAlphaWidgetToTab(int tabId);
+    void moveAlphaWidgetToTab(const int &tabId);
 
     void startColorPicking();
 
@@ -137,9 +138,10 @@ private:
     QrealAnimatorValueSlider *lSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
 
+    bool mAlphaHidden = false;
     QHBoxLayout *aLayout = new QHBoxLayout();
     QLabel *aLabel = new QLabel("A:");
-    ColorValueRect *a_rect = NULL;
+    ColorValueRect *aRect = NULL;
     QrealAnimatorValueSlider *aSpin =
             new QrealAnimatorValueSlider(0., 1., 0.1, this);
 

@@ -11,6 +11,7 @@ BrushSettingsWidget::BrushSettingsWidget(QWidget *parent)
     main_layout = new QVBoxLayout(this);
 
     mColorSettingsWidget = new ColorSettingsWidget(this);
+    mColorSettingsWidget->hideAlphaControlers();
     connect(mColorSettingsWidget, SIGNAL(colorSettingSignal(ColorSetting)),
             this, SLOT(setColorSetting(ColorSetting)));
     main_layout->addWidget(mColorSettingsWidget);

@@ -21,10 +21,10 @@ PaintBoxSettingsDialog::PaintBoxSettingsDialog(QWidget *parent) :
     mMainLayout->addLayout(mFrameCountLayout);
     mMainLayout->addLayout(mOverlapFramesLayout);
 
-    mFirstFrameLabel = new QLabel("First Frame: ", this);
-    mFrameStepLabel = new QLabel("Frame Step: ", this);
-    mFrameCountLabel = new QLabel("Frame Count: ", this);
-    mOverlapFramesLabel = new QLabel("Overlap Frame: ", this);
+    mFirstFrameLabel = new QLabel("First frame: ", this);
+    mFrameStepLabel = new QLabel("Frame step: ", this);
+    mFrameCountLabel = new QLabel("Keyframe count: ", this);
+    mOverlapFramesLabel = new QLabel("Overlap frames: ", this);
     mFirstFrameSpin = new QSpinBox(this);
     mFirstFrameSpin->setRange(0, 99999);
     mFrameStepSpin = new QSpinBox(this);

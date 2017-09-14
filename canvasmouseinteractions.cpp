@@ -893,11 +893,27 @@ void Canvas::handleMovePathMouseMove() {
 
 void Canvas::handleAddPointMouseMove() {
     if(mCurrentEndPoint == NULL) return;
-    if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-       CtrlsMode::CTRLS_SYMMETRIC) {
-        mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+    if(mCurrentEndPoint->isSeparateNodePoint()) {
+        if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+           CtrlsMode::CTRLS_CORNER) {
+            mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+        }
+        if(mCurrentEndPoint->isEndPoint()) {
+            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
+        } else {
+            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
+        }
+    } else {
+        if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+           CtrlsMode::CTRLS_SYMMETRIC) {
+            mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+        }
+        if(mCurrentEndPoint->hasNextPoint()) {
+            mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
+        } else {
+            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
+        }
     }
-    mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
 }
 
 void Canvas::updateTransformation() {

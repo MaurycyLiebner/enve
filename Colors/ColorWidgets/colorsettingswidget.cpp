@@ -67,12 +67,23 @@ void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t,
     hslSSpin->setValueExternal(hslSat);
     lSpin->setValueExternal(lig);
 
+    if(mAlphaHidden) return;
     aSpin->setValueExternal(a_t);
 }
 
 void ColorSettingsWidget::setCurrentColor(Color color)
 {
     setCurrentColor(color.gl_h, color.gl_s, color.gl_v, color.gl_a);
+}
+
+void ColorSettingsWidget::hideAlphaControlers() {
+    delete aLabel;
+    delete aRect;
+    delete aSpin;
+    delete aLayout;
+    mAlphaHidden = true;
+    mColorModeCombo->hide();
+    mColorModeLabel->hide();
 }
 
 void ColorSettingsWidget::refreshColorAnimatorTarget() {
@@ -99,14 +110,18 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
     lSpin->setAnimator(NULL);
     hsvSSpin->setAnimator(NULL);
     vSpin->setAnimator(NULL);
-    aSpin->setAnimator(NULL);
+    if(mAlphaHidden) {
+        aSpin->setAnimator(NULL);
+    }
     if(target != NULL) {
         disconnect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(setColorMode(int)));
         mColorModeCombo->setCurrentIndex(target->getColorMode());
         connect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(setColorMode(int)));
-        aSpin->setAnimator(target->getAlphaAnimator());
+        if(mAlphaHidden) {
+            aSpin->setAnimator(target->getAlphaAnimator());
+        }
         if(target->getColorMode() == RGBMODE) {
             rSpin->setAnimator(target->getVal1Animator());
             gSpin->setAnimator(target->getVal2Animator());
@@ -126,6 +141,7 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
 
             updateValuesFromHSV();
         }
+
         updateAlphaFromSpin();
         connect(target, SIGNAL(colorModeChanged(ColorMode)),
                 this, SLOT(refreshColorAnimatorTarget()));
@@ -136,13 +152,17 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
 
 void ColorSettingsWidget::emitColorChangedSignal() {
     int tabId = mTabWidget->currentIndex();
+    int alphaVal = 255;
+    if(!mAlphaHidden) {
+        alphaVal = aSpin->value();
+    }
     if(tabId == 0) {
         ColorSetting setting = ColorSetting(
                     RGBMODE, mLastTriggeredCVR,
                     rSpin->value(),
                     gSpin->value(),
                     bSpin->value(),
-                    aSpin->value(),
+                    alphaVal,
                     CST_CHANGE, mTargetAnimator);
         emit colorSettingSignal(setting);
     } else if(tabId == 1) {
@@ -151,7 +171,7 @@ void ColorSettingsWidget::emitColorChangedSignal() {
                     hSpin->value(),
                     hsvSSpin->value(),
                     vSpin->value(),
-                    aSpin->value(),
+                    alphaVal,
                     CST_CHANGE, mTargetAnimator);
         emit colorSettingSignal(setting);
     } else if(tabId == 2) {
@@ -160,7 +180,7 @@ void ColorSettingsWidget::emitColorChangedSignal() {
                     hSpin->value(),
                     hslSSpin->value(),
                     lSpin->value(),
-                    aSpin->value(),
+                    alphaVal,
                     CST_CHANGE, mTargetAnimator);
         emit colorSettingSignal(setting);
     }
@@ -302,20 +322,14 @@ void ColorSettingsWidget::emitFullColorChangedSignal() {
     emitEditingFinishedSignal();
 }
 
-void ColorSettingsWidget::moveAlphaWidgetToTab(int tabId)
-{
-    ((QVBoxLayout*)aLayout->parent())->removeItem(aLayout);
-    if(tabId == 0) {
-        mRGBLayout->addLayout(aLayout);
-    } else if(tabId == 1) {
-        mHSVLayout->addLayout(aLayout);
+void ColorSettingsWidget::moveAlphaWidgetToTab(const int &tabId) {
+    if(tabId == 1) {
         QVBoxLayout *hueParentLay = ((QVBoxLayout*)hLayout->parent());
         if(hueParentLay != mHSVLayout) {
             hueParentLay->removeItem(hLayout);
             mHSVLayout->insertLayout(0, hLayout);
         }
     } else if(tabId == 2) {
-        mHSLLayout->addLayout(aLayout);
         QVBoxLayout *hueParentLay = ((QVBoxLayout*)hLayout->parent());
         if(hueParentLay != mHSLLayout) {
             hueParentLay->removeItem(hLayout);
@@ -324,12 +338,37 @@ void ColorSettingsWidget::moveAlphaWidgetToTab(int tabId)
     }/* else if(tabId == 3) {
         mWheelLayout->addLayout(aLayout);
     }*/
+    if(!mAlphaHidden) {
+        ((QVBoxLayout*)aLayout->parent())->removeItem(aLayout);
+        if(tabId == 0) {
+            mRGBLayout->addLayout(aLayout);
+        } else if(tabId == 1) {
+            mHSVLayout->addLayout(aLayout);
+            QVBoxLayout *hueParentLay = ((QVBoxLayout*)hLayout->parent());
+            if(hueParentLay != mHSVLayout) {
+                hueParentLay->removeItem(hLayout);
+                mHSVLayout->insertLayout(0, hLayout);
+            }
+        } else if(tabId == 2) {
+            mHSLLayout->addLayout(aLayout);
+            QVBoxLayout *hueParentLay = ((QVBoxLayout*)hLayout->parent());
+            if(hueParentLay != mHSLLayout) {
+                hueParentLay->removeItem(hLayout);
+                mHSLLayout->insertLayout(0, hLayout);
+            }
+        }/* else if(tabId == 3) {
+            mWheelLayout->addLayout(aLayout);
+        }*/
+    }
     for(int i=0;i < mTabWidget->count();i++)
         if(i!=tabId)
-            mTabWidget->widget(i)->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Ignored);
+            mTabWidget->widget(i)->setSizePolicy(QSizePolicy::Minimum,
+                                                 QSizePolicy::Ignored);
 
-    mTabWidget->widget(tabId)->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-    mTabWidget->widget(tabId)->resize(mTabWidget->widget(tabId)->minimumSizeHint());
+    mTabWidget->widget(tabId)->setSizePolicy(QSizePolicy::Minimum,
+                                             QSizePolicy::Preferred);
+    mTabWidget->widget(tabId)->resize(
+                mTabWidget->widget(tabId)->minimumSizeHint());
 }
 
 void ColorSettingsWidget::startColorPicking()
@@ -410,10 +449,10 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
     mHSLLayout->addLayout(lLayout);
     mHSLWidget->setLayout(mHSLLayout);
 
-    a_rect = new ColorValueRect(CVR_ALPHA, this);
+    aRect = new ColorValueRect(CVR_ALPHA, this);
     aLabel->setFixedWidth(LABEL_WIDTH);
     aLayout->addWidget(aLabel);
-    aLayout->addWidget(a_rect);
+    aLayout->addWidget(aRect);
     aLayout->addWidget(aSpin);
 
 
@@ -537,7 +576,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             hslSSpin, SLOT(emitEditingStarted(qreal)));
     connect(l_rect, SIGNAL(editingStarted(qreal)),
             lSpin, SLOT(emitEditingStarted(qreal)));
-    connect(a_rect, SIGNAL(editingStarted(qreal)),
+    connect(aRect, SIGNAL(editingStarted(qreal)),
             aSpin, SLOT(emitEditingStarted(qreal)));
 
     connect(r_rect, SIGNAL(editingFinished(qreal)),
@@ -556,7 +595,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             hslSSpin, SLOT(emitEditingFinished(qreal)));
     connect(l_rect, SIGNAL(editingFinished(qreal)),
             lSpin, SLOT(emitEditingFinished(qreal)));
-    connect(a_rect, SIGNAL(editingFinished(qreal)),
+    connect(aRect, SIGNAL(editingFinished(qreal)),
             aSpin, SLOT(emitEditingFinished(qreal)));
 
     connect(r_rect, SIGNAL(valChanged(qreal)),
@@ -575,7 +614,7 @@ ColorSettingsWidget::ColorSettingsWidget(QWidget *parent) : QWidget(parent) {
             hslSSpin, SLOT(emitValueChangedExternal(qreal)));
     connect(l_rect, SIGNAL(valChanged(qreal)),
             lSpin, SLOT(emitValueChangedExternal(qreal)));
-    connect(a_rect, SIGNAL(valChanged(qreal)),
+    connect(aRect, SIGNAL(valChanged(qreal)),
             aSpin, SLOT(emitValueChangedExternal(qreal)));
 
 
@@ -625,7 +664,9 @@ void ColorSettingsWidget::setRectValuesAndColor(
     hsl_s_rect->setColorHSV_f(hueGl, satGl, valGl);
     l_rect->setColorHSV_f(hueGl, satGl, valGl);
 
-    a_rect->setColorHSV_f(hueGl, satGl, valGl);
+    if(!mAlphaHidden) {
+        aRect->setColorHSV_f(hueGl, satGl, valGl);
+    }
 
     color_label->setColorHSV_f(hueGl, satGl, valGl);
 
@@ -727,8 +768,9 @@ void ColorSettingsWidget::setValuesFromHSL() {
 }
 
 void ColorSettingsWidget::updateAlphaFromSpin() {
+    if(mAlphaHidden) return;
     color_label->setAlpha(aSpin->value());
-    a_rect->setDisplayedValue(aSpin->value());
+    aRect->setDisplayedValue(aSpin->value());
 }
 
 void ColorSettingsWidget::setColorMode(const int &colorMode) {
@@ -740,8 +782,9 @@ void ColorSettingsWidget::setColorMode(const int &colorMode) {
 }
 
 void ColorSettingsWidget::setAlphaFromSpin(const qreal &val) {
+    if(mAlphaHidden) return;
     color_label->setAlpha(val);
-    a_rect->setDisplayedValue(val);
+    aRect->setDisplayedValue(val);
 
     emitColorChangedSignal();
 }

@@ -733,6 +733,13 @@ bool Canvas::handleKeyPressEventWhileMouseGrabbing(QKeyEvent *event) {
         mXOnlyTransform = false;
 
         updateTransformation();
+    } else if(event->key() == Qt::Key_N) {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPaintBox()) {
+                PaintBox *paintBox = (PaintBox*)box;
+                paintBox->newEmptyPaintFrameOnCurrentFrame();
+            }
+        }
     } else {
         return false;
     }
