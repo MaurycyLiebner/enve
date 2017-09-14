@@ -80,7 +80,7 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
     }
 
     if(currentSize.isEmpty()) {
-        mFontSizeCombo->setCurrentIndex(0);
+        mFontSizeCombo->setCurrentText("72");
     } else {
         mFontSizeCombo->setCurrentText(currentSize);
     }
