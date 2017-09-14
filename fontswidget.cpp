@@ -28,13 +28,13 @@ FontsWidget::FontsWidget(QWidget *parent) : QWidget(parent) {
     connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
             this, SLOT(emitSizeChanged()) );
 
-    updateStylesFromCurrentFamilyAndEmit();
-
     mMainLayout = new QHBoxLayout(this);
     setLayout(mMainLayout);
     mMainLayout->addWidget(mFontFamilyCombo);
     mMainLayout->addWidget(mFontStyleCombo);
     mMainLayout->addWidget(mFontSizeCombo);
+
+    updateStylesFromCurrentFamilyAndEmit();
 }
 
 void FontsWidget::updateStylesFromCurrentFamily(const QString &family) {
@@ -69,17 +69,21 @@ void FontsWidget::updateSizesFromCurrentFamilyAndStylesAndEmit() {
 
 void FontsWidget::updateSizesFromCurrentFamilyAndStyles() {
     disconnect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(emitSizeChanged()) );
+               this, SLOT(emitSizeChanged()) );
     QString currentSize = mFontSizeCombo->currentText();
 
     mFontSizeCombo->clear();
     QList<int> sizes = mFontDatabase.smoothSizes(getCurrentFontFamily(),
                                                  getCurrentFontStyle() );
-    Q_FOREACH(int size, sizes) {
+    Q_FOREACH(const int &size, sizes) {
         mFontSizeCombo->addItem(QString::number(size) );
     }
 
-    mFontSizeCombo->setCurrentText(currentSize);
+    if(currentSize.isEmpty()) {
+        mFontSizeCombo->setCurrentIndex(0);
+    } else {
+        mFontSizeCombo->setCurrentText(currentSize);
+    }
     connect(mFontSizeCombo, SIGNAL(currentTextChanged(QString)),
             this, SLOT(emitSizeChanged()) );
 }
@@ -120,7 +124,11 @@ void FontsWidget::setCurrentFontFamily(const QString &family) {
 void FontsWidget::setCurrentFontStyle(const QString &style) {
     disconnect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
                this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
-    mFontStyleCombo->setCurrentText(style);
+    if(style.isEmpty()) {
+        mFontStyleCombo->setCurrentIndex(0);
+    } else {
+        mFontStyleCombo->setCurrentText(style);
+    }
     connect(mFontStyleCombo, SIGNAL(currentTextChanged(QString)),
             this, SLOT(updateSizesFromCurrentFamilyAndStylesAndEmit()) );
     updateSizesFromCurrentFamilyAndStyles();

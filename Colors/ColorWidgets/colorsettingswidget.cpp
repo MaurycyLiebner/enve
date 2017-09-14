@@ -7,12 +7,12 @@
 #include "colorlabel.h"
 #include "global.h"
 
-void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
-                            int rect_width, int rect_height,
-                            ColorValueRect *rect_t)
-{
-    if(rect_t->isHidden() )
-    {
+void moveAndResizeValueRect(const int &rect_x_t,
+                            int *rect_y_t,
+                            const int &rect_width,
+                            const int &rect_height,
+                            ColorValueRect *rect_t) {
+    if(rect_t->isHidden()) {
         return;
     }
     rect_t->move(rect_x_t, *rect_y_t);
@@ -20,9 +20,10 @@ void moveAndResizeValueRect(int rect_x_t, int *rect_y_t,
     rect_t->resize(rect_width, rect_height);
 }
 
-void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t,
-                                          GLfloat v_t, GLfloat a_t)
-{
+void ColorSettingsWidget::setCurrentColor(const GLfloat &h_t,
+                                          const GLfloat &s_t,
+                                          const GLfloat &v_t,
+                                          const GLfloat &a_t) {
 
     //wheel_triangle_widget->setColorHSV_f(h_t, s_t, v_t);
 //    r_rect->setColorHSV_f(h_t, s_t, v_t);
@@ -71,8 +72,7 @@ void ColorSettingsWidget::setCurrentColor(GLfloat h_t, GLfloat s_t,
     aSpin->setValueExternal(a_t);
 }
 
-void ColorSettingsWidget::setCurrentColor(Color color)
-{
+void ColorSettingsWidget::setCurrentColor(const Color &color) {
     setCurrentColor(color.gl_h, color.gl_s, color.gl_v, color.gl_a);
 }
 

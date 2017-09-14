@@ -23,16 +23,16 @@ public:
     explicit ColorSettingsWidget(QWidget *parent = 0);
 
 
-    void setCurrentColor(Color color);
+    void setCurrentColor(const Color &color);
     void hideAlphaControlers();
 signals:
     void colorSettingSignal(const ColorSetting&);
     void colorModeChanged(const ColorMode&);
 public slots:
-    void setCurrentColor(GLfloat h_t,
-                         GLfloat s_t,
-                         GLfloat v_t,
-                         GLfloat a_t = 1.f);
+    void setCurrentColor(const GLfloat &h_t,
+                         const GLfloat &s_t,
+                         const GLfloat &v_t,
+                         const GLfloat &a_t = 1.f);
     void setColorAnimatorTarget(ColorAnimator *target);
     void emitColorChangedSignal();
     void emitEditingFinishedSignal();
@@ -149,17 +149,25 @@ private:
     ActionButton *mPickingButton;
 
     ColorLabel *color_label = NULL;
-    void connectColorWidgetSignalToSlot(ColorWidget *slot_obj, const char *slot,
-                                        ColorWidget *signal_src, const char *signal);
+    void connectColorWidgetSignalToSlot(ColorWidget *slot_obj,
+                                        const char *slot,
+                                        ColorWidget *signal_src,
+                                        const char *signal);
     void connectColorWidgetSignalToSlots(ColorWidget *signal_src,
-                                         const char *signal, const char *slot );
+                                         const char *signal,
+                                         const char *slot );
     void connectColorWidgetSignalToSlotsWithoutThis(ColorWidget *signal_src,
                                                     const char *signal,
                                                     const char *slot);
     void setRectValuesAndColor(
-            const qreal &red, const qreal &green, const qreal &blue,
-            const qreal &hue, const qreal &hsvSaturation, const qreal &value,
-            const qreal &hslSaturation, const qreal &lightness);
+        const qreal &red,
+        const qreal &green,
+        const qreal &blue,
+        const qreal &hue,
+        const qreal &hsvSaturation,
+        const qreal &value,
+        const qreal &hslSaturation,
+        const qreal &lightness);
 };
 
 #endif // COLORSETTINGSWIDGET_H

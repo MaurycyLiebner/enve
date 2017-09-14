@@ -136,6 +136,9 @@ public:
     void incBrushRadius();
     void decBrushRadius();
     void addLoadedGradient(Gradient *gradient);
+    FontsWidget *getFontsWidget() {
+        return mFontWidget;
+    }
 public slots:
     void setCurrentFrame(int frame);
     void setAllPointsRecord(bool allPointsRecord);

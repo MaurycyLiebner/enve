@@ -54,8 +54,7 @@ void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
     emitValueChanged(value);
 }
 
-void QrealAnimatorValueSlider::emitValueChanged(qreal value)
-{
+void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mAnimator != NULL) {
         mAnimator->qra_setCurrentValue(value);
     }

@@ -119,8 +119,6 @@ private:
     ActionButton *mPlayButton;
     ActionButton *mStopButton;
 
-    ActionButton *mAllPointsRecordButton;
-//    ActionButton *mCtrlsAlwaysVisible;
     ActionButton *mLocalPivot;
 
     AnimationDockWidget *mAnimationDockWidget;

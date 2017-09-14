@@ -49,7 +49,11 @@ void QStringAnimator::setCurrentTextValue(const QString &text,
     mCurrentText = text;
     if(prp_isRecording() && saveUndoRedo) {
         anim_saveCurrentValueAsKey();
+    } else {
+        prp_updateInfluenceRangeAfterChanged();
     }
+
+    prp_callUpdater();
 }
 
 QString QStringAnimator::getCurrentTextValue() {

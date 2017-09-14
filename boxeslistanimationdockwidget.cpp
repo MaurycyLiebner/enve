@@ -143,13 +143,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     connect(mStopButton, SIGNAL(pressed()),
             this, SLOT(interruptPreview()));
 
-    mAllPointsRecordButton = new ActionButton(
-                ":/icons/recordSinglePoint.png",
-                "start preview", this);
-    mAllPointsRecordButton->setCheckable(":/icons/recordAllPoints.png");
-    connect(mAllPointsRecordButton, SIGNAL(toggled(bool)),
-            parent, SLOT(setAllPointsRecord(bool)) );
-
     mLocalPivot = new ActionButton(
                 ":/icons/globalPivot.png",
                 "", this);
@@ -177,8 +170,6 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar->addWidget(mStopButton);
 
     mToolBar->addSeparator();
-    mToolBar->addWidget(mAllPointsRecordButton);
-    mAllPointsRecordButton->setFocusPolicy(Qt::NoFocus);
     mToolBar->addWidget(mLocalPivot);
     mLocalPivot->setFocusPolicy(Qt::NoFocus);
     mToolBar->addSeparator();

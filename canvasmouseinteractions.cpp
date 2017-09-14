@@ -16,6 +16,7 @@
 #include "Boxes/paintbox.h"
 #include "Paint/PaintLib/brush.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
+#include "fontswidget.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -390,6 +391,11 @@ void Canvas::handleLeftButtonMousePress() {
             mCurrentRectangle = newPath;
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
             TextBox *newPath = new TextBox();
+            FontsWidget *fonstWidget = mMainWindow->getFontsWidget();
+            newPath->setSelectedFontFamilyAndStyle(
+                        fonstWidget->getCurrentFontFamily(),
+                        fonstWidget->getCurrentFontStyle());
+            newPath->setSelectedFontSize(fonstWidget->getCurrentFontSize());
             mCurrentBoxesGroup->addChild(newPath);
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
 

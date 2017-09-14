@@ -4,6 +4,7 @@
 #include "canvas.h"
 #include "gradientpoints.h"
 #include "Animators/qstringanimator.h"
+#include "Animators/animatorupdater.h"
 
 TextBox::TextBox() :
     PathBox(TYPE_TEXT) {
@@ -15,6 +16,7 @@ TextBox::TextBox() :
     mText = (new QStringAnimator())->ref<QStringAnimator>();
     mText->prp_setName("text");
     ca_addChildAnimator(mText.data());
+    mText->prp_setUpdater(new NodePointUpdater(this));
 }
 
 #include <QApplication>
