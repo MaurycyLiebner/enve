@@ -899,15 +899,16 @@ void Canvas::handleMovePathMouseMove() {
 
 void Canvas::handleAddPointMouseMove() {
     if(mCurrentEndPoint == NULL) return;
-    if(mCurrentEndPoint->isSeparateNodePoint()) {
+    if(mCurrentEndPoint->hasNextPoint() &&
+       mCurrentEndPoint->hasPreviousPoint()) {
         if(mCurrentEndPoint->getCurrentCtrlsMode() !=
            CtrlsMode::CTRLS_CORNER) {
             mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
         }
-        if(mCurrentEndPoint->isEndPoint()) {
-            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
-        } else {
+        if(mCurrentEndPoint->isSeparateNodePoint()) {
             mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);
+        } else {
+            mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
         }
     } else {
         if(mCurrentEndPoint->getCurrentCtrlsMode() !=

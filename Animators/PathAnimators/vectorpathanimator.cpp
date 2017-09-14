@@ -666,12 +666,15 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
         NodePoint *targetPt,
         const NodeSettings &nodeSettings) {
     int targetNodeId;
+    bool changeFirstPt = false;
     if(targetPt == NULL) {
         targetNodeId = 0;
+        changeFirstPt = true;
     } else {
         if(targetPt->getNodeId() == 0 &&
            mFirstPoint->hasNextPoint()) {
             targetNodeId = 0;
+            changeFirstPt = true;
         } else {
             targetNodeId = targetPt->getNodeId() + 1;
         }
@@ -681,9 +684,10 @@ NodePoint *VectorPathAnimator::addNodeRelPos(
                                     startRelPos, relPos, endRelPos,
                                     nodeSettings);
 
-    if(targetPt == NULL) {
+    if(changeFirstPt) {
         setFirstPoint(newP);
-    } else {
+    }
+    if(targetPt != NULL) {
         targetPt->connectToPoint(newP);
     }
     updateNodePointIds();
