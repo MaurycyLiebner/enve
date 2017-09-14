@@ -68,6 +68,23 @@ PathBox::~PathBox() {
     }
 }
 
+void PathBox::drawSelectedSk(SkCanvas *canvas,
+                             const CanvasMode &currentCanvasMode,
+                             const SkScalar &invScale) {
+    if(isVisibleAndInVisibleDurationRect()) {
+        canvas->save();
+        drawBoundingRectSk(canvas, invScale);
+        if(currentCanvasMode == CanvasMode::MOVE_POINT) {
+            mFillGradientPoints->drawGradientPointsSk(canvas, invScale);
+            mStrokeGradientPoints->drawGradientPointsSk(canvas, invScale);
+        } else if(currentCanvasMode == MOVE_PATH) {
+            mTransformAnimator->getPivotMovablePoint()->
+                    drawSk(canvas, invScale);
+        }
+        canvas->restore();
+    }
+}
+
 void PathBox::setupBoundingBoxRenderDataForRelFrame(
                             const int &relFrame,
                             BoundingBoxRenderData *data) {

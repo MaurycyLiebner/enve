@@ -110,7 +110,7 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
     lSpin->setAnimator(NULL);
     hsvSSpin->setAnimator(NULL);
     vSpin->setAnimator(NULL);
-    if(mAlphaHidden) {
+    if(!mAlphaHidden) {
         aSpin->setAnimator(NULL);
     }
     if(target != NULL) {
@@ -119,7 +119,7 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
         mColorModeCombo->setCurrentIndex(target->getColorMode());
         connect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(setColorMode(int)));
-        if(mAlphaHidden) {
+        if(!mAlphaHidden) {
             aSpin->setAnimator(target->getAlphaAnimator());
         }
         if(target->getColorMode() == RGBMODE) {
@@ -152,7 +152,7 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
 
 void ColorSettingsWidget::emitColorChangedSignal() {
     int tabId = mTabWidget->currentIndex();
-    int alphaVal = 255;
+    qreal alphaVal = 1.;
     if(!mAlphaHidden) {
         alphaVal = aSpin->value();
     }
