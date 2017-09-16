@@ -8,16 +8,31 @@ class BoundingBox;
 class CacheHandler;
 struct BoundingBoxRenderData;
 
-class CacheContainer : public StdSelfRef {
+class MinimalCacheContainer : public StdSelfRef {
 public:
-    CacheContainer();
+    MinimalCacheContainer();
 
-    virtual ~CacheContainer();
+    virtual ~MinimalCacheContainer();
+
+    virtual bool freeThis() = 0;
+
+    void thisAccessed();
+
+    virtual int getByteCount() = 0;
+
+    void setBlocked(const bool &bT) {
+        mBlocked = bT;
+    }
+protected:
+    bool mBlocked = false;
+};
+
+class CacheContainer : public MinimalCacheContainer {
+public:
+    CacheContainer() {}
 
     void setParentCacheHandler(CacheHandler *handler);
     bool freeThis();
-
-    void thisAccessed();
 
     int getByteCount() {
         if(mImageSk.get() == NULL) return 0;
@@ -51,13 +66,7 @@ public:
                              const int &endFrame);
 
     virtual void drawSk(SkCanvas *canvas);
-
-    void setBlocked(const bool &bT) {
-        mBlocked = bT;
-    }
-
 protected:
-    bool mBlocked = false;
     sk_sp<SkImage> mImageSk;
     CacheHandler *mParentCacheHandler = NULL;
     int mMinRelFrame = 0;

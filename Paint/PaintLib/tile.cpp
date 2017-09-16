@@ -39,7 +39,7 @@ void processPaintDabs(const QList<Dab> &dabs,
             continue;
         }
 
-        //#pragma omp parallel for
+        #pragma omp parallel for
         for(int i = x_min; i < x_max; i++) {
             for(int j = y_min; j < y_max; j++) {
                 GLuint id_t = ( j*TILE_DIM + i)*4;
@@ -124,14 +124,14 @@ void Tile::clear() {
 
 void Tile::setTileWidth(const ushort &width_t) {
     mMaxPaintX = width_t;
-    if(mPaintInOtherThread) {
+    if(mDrawer != NULL) {
         mDrawer->maxPaintX = mMaxPaintX;
     }
 }
 
 void Tile::setTileHeight(const ushort &height_t) {
     mMaxPaintY = height_t;
-    if(mPaintInOtherThread) {
+    if(mDrawer != NULL) {
         mDrawer->maxPaintY = mMaxPaintY;
     }
 }
@@ -183,11 +183,18 @@ Tile::Tile(const ushort &x_t, const ushort &y_t,
            const bool &paintInOtherThread) {
     mPaintInOtherThread = paintInOtherThread;
     setPosInSurface(x_t, y_t);
-    if(mPaintInOtherThread) {
-        mDrawer = (new TileSkDrawer(this, x_t, y_t))->ref<TileSkDrawer>();
-    }
-    resetTileSize();
 
+    initializeTileData();
+    clear();
+    resetTileSize();
+}
+
+Tile::~Tile() {
+    if(mDrawer == NULL) return;
+    mDrawer->parentTile = NULL;
+}
+
+void Tile::initializeTileData() {
     SkImageInfo info = SkImageInfo::Make(TILE_DIM,
                                          TILE_DIM,
                                          kBGRA_8888_SkColorType,
@@ -198,17 +205,15 @@ Tile::Tile(const ushort &x_t, const ushort &y_t,
 
     mData = (uchar*)mDataTileImage.getPixels();
 
-    if(!mPaintInOtherThread) {
+    if(mPaintInOtherThread) {
+        mDrawer = (new TileSkDrawer(this, mPosX, mPosY))->ref<TileSkDrawer>();
+        mDrawer->maxPaintX = mMaxPaintX;
+        mDrawer->maxPaintY = mMaxPaintY;
+    } else {
         mTmpDataTileImage.allocPixels(info);
         mTmpDataTileImage.setIsVolatile(true);
         mDataTmp = (uchar*)mTmpDataTileImage.getPixels();
     }
-
-    clear();
-}
-
-Tile::~Tile() {
-    mDrawer->parentTile = NULL;
 }
 
 void Tile::setPosInSurface(const ushort &x_t, const ushort &y_t) {
@@ -283,7 +288,7 @@ void Tile::getColor(qreal cx,
     qreal blue_sum_t = 0.;
     qreal alpha_sum_t = 0.;
     qreal weight_sum_t = 0.;
-    //#pragma omp parallel for reduction(+: red_sum_t, green_sum_t, blue_sum_t, alpha_sum_t, weight_sum_t)
+    #pragma omp parallel for reduction(+: red_sum_t, green_sum_t, blue_sum_t, alpha_sum_t, weight_sum_t)
     for(short i = x_min; i < x_max; i++) {
         for(short j = y_min; j < y_max; j++) {
             GLuint col_val_id = (j*TILE_DIM + i)*4;

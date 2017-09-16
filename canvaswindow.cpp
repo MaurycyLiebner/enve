@@ -20,15 +20,15 @@
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
-    int numberThreads = 1;//qMax(1, QThread::idealThreadCount() - 1);
+    int numberThreads = qMax(1, QThread::idealThreadCount() - 1);
     for(int i = 0; i < numberThreads; i++) {
         QThread *paintControlerThread = new QThread(this);
         PaintControler *paintControler = new PaintControler(i);
         paintControler->moveToThread(paintControlerThread);
-        connect(paintControler, SIGNAL(finishedUpdating(int, Updatable*)),
-                this, SLOT(sendNextUpdatableForUpdate(int, Updatable*)) );
-        connect(this, SIGNAL(updateUpdatable(Updatable*, int)),
-                paintControler, SLOT(updateUpdatable(Updatable*, int)) );
+        connect(paintControler, SIGNAL(finishedUpdating(int, Executable*)),
+                this, SLOT(sendNextUpdatableForUpdate(int, Executable*)) );
+        connect(this, SIGNAL(updateUpdatable(Executable*, int)),
+                paintControler, SLOT(updateUpdatable(Executable*, int)) );
 
         paintControlerThread->start();
 
@@ -690,30 +690,25 @@ bool CanvasWindow::noBoxesAwaitUpdate() {
     return mNoBoxesAwaitUpdate;
 }
 
-void CanvasWindow::addUpdatableAwaitingUpdate(Updatable *updatable) {
+void CanvasWindow::addUpdatableAwaitingUpdate(Executable *updatable) {
     if(mNoBoxesAwaitUpdate) {
         mNoBoxesAwaitUpdate = false;
     }
 
-    mUpdatablesAwaitingUpdate << updatable->ref<Updatable>();
+    mUpdatablesAwaitingUpdate << updatable->ref<Executable>();
     if(!mFreeThreads.isEmpty()) {
         sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
     }
 }
 
 void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
-                                              Updatable *lastUpdatable) {
+                                              Executable *lastUpdatable) {
     if(lastUpdatable != NULL) {
         if(mClearBeingUpdated) {
             lastUpdatable->clear();
         } else {
-            lastUpdatable->afterUpdate();
+            lastUpdatable->updateFinished();
         }
-//        mLastUpdatedBox->setAwaitingUpdate(false);
-//        if(mLastUpdatedBox->shouldRedoUpdate()) {
-//            mLastUpdatedBox->setRedoUpdateToFalse();
-//            mLastUpdatedBox->awaitUpdate();
-//        }
     }
     if(mUpdatablesAwaitingUpdate.isEmpty()) {
         mClearBeingUpdated = false;
@@ -725,11 +720,12 @@ void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
         if(!mRendering) {
             callUpdateSchedulers();
         }
-        //callUpdateSchedulers();
     } else {
         for(int i = 0; i < mUpdatablesAwaitingUpdate.count(); i++) {
-            Updatable *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
+            Executable *updatablaT = mUpdatablesAwaitingUpdate.at(i).get();
             if(updatablaT->readyToBeProcessed()) {
+                updatablaT->setCurrentPaintControler(
+                            mPaintControlers.at(threadId));
                 updatablaT->beforeUpdate();
                 emit updateUpdatable(updatablaT, threadId);
                 mUpdatablesAwaitingUpdate.removeAt(i);

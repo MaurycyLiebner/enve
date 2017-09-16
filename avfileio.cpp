@@ -707,9 +707,7 @@ void Tile::writeTile(std::fstream *file) {
 
 void Tile::readTile(std::fstream *file) {
     file->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-    if(mPaintInOtherThread) {
-        updateDrawerFromDataArray();
-    }
+    updateDrawerFromDataArray();
 }
 
 void TilesData::writeTilesData(std::fstream *file) {
@@ -777,8 +775,7 @@ void AnimatedSurface::readAnimatedSurface(std::fstream *file) {
         for(int i = 0; i < nKeys; i++) {
             SurfaceKey *key = new SurfaceKey(this);
             key->setTiles(new TilesData(mWidth,
-                                        mHeight,
-                                        true));
+                                        mHeight, true));
             key->readSurfaceKey(file);
             anim_appendKey(key);
         }

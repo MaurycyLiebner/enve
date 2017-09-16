@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += multimedia core gui svg opengl sql xml #widgets-private # gui-private core-private
+QT += multimedia core gui svg opengl sql xml concurrent #widgets-private # gui-private core-private
 LIBS += -lavutil -lavformat -lavcodec -lswscale -lswresample -ltcmalloc
 
 INCLUDEPATH += /home/ailuropoda/.skia/include/images/
@@ -37,6 +37,7 @@ CONFIG(debug, debug|release) {
 QMAKE_CXXFLAGS += -fopenmp
 LIBS += -lskia -lpthread -lfreetype -lpng -ldl -lSDL2 -lSDL2_image \
         -lSDL2_ttf -lfontconfig -fopenmp# -lX11
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -189,7 +190,8 @@ SOURCES += main.cpp\
     pointanimator.cpp \
     nodepoint.cpp \
     avfileio.cpp \
-    Paint/paintboxsettingsdialog.cpp
+    Paint/paintboxsettingsdialog.cpp \
+    execdelegator.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -339,7 +341,8 @@ HEADERS  += mainwindow.h \
     pointanimator.h \
     nodepoint.h \
     avfileio.h \
-    Paint/paintboxsettingsdialog.h
+    Paint/paintboxsettingsdialog.h \
+    execdelegator.h
 
 RESOURCES += \
     resources.qrc

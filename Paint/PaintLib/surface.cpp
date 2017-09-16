@@ -7,11 +7,11 @@
 Surface::Surface(const ushort &widthT,
                  const ushort &heightT,
                  const qreal &scale,
-                 const bool &paintOnOtherThread) {
+                 const bool &paintInOtherThread) {
     mScale = scale;
     mCurrentTiles = (new TilesData(widthT, heightT,
-                                   paintOnOtherThread))->ref<TilesData>();
-    mPaintOnOtherThread = paintOnOtherThread;
+                                   paintInOtherThread))->ref<TilesData>();
+    mCurrentTiles->setCurrentlyUsed(true);
     setSize(widthT, heightT);
 }
 

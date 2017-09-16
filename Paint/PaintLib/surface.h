@@ -49,8 +49,8 @@ class TilesData : public StdSelfRef {
 public:
     TilesData(const ushort &width,
               const ushort &height,
-              const bool &paintOnOtherThread) {
-        mPaintOnOtherThread = paintOnOtherThread;
+              const bool &paintInOtherThread) {
+        mPaintInOtherThread = paintInOtherThread;
         setSize(width, height);
     }
 
@@ -137,7 +137,25 @@ public:
     Tile ***getData() { return mTiles; }
     void writeTilesData(std::fstream *file);
     void readTilesData(std::fstream *file);
+
+    void setCurrentlyUsed(const bool &used) {
+        if(mCurrentlyUsed == used) return;
+        mCurrentlyUsed = used;
+        for(int i = 0; i < mNTileCols; i++) {
+            for(int j = 0; j < mNTileRows; j++) {
+                Tile *tileT = mTiles[j][i];
+                tileT->setBlocked(used);
+                if(used) {
+                    if(tileT->isStoredInTmpFile()) {
+                        tileT->loadDataFromTmpFile();
+                    }
+                    tileT->thisAccessed();
+                }
+            }
+        }
+    }
 private:
+    bool mCurrentlyUsed = false;
     void resizeTiles(const ushort &nTileCols,
                      const ushort &nTilesRows,
                      const ushort &lastColumnWidth,
@@ -163,7 +181,7 @@ private:
 
             for(ushort cl = first_new_col_in_row; cl < nTileCols; cl++) {
                 tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM,
-                                           mPaintOnOtherThread);
+                                           mPaintInOtherThread);
             }
         }
 
@@ -183,7 +201,7 @@ private:
         mTiles = tiles_t;
     }
 
-    bool mPaintOnOtherThread = false;
+    bool mPaintInOtherThread;
     ushort mWidth = 0;
     ushort mHeight = 0;
     ushort mNTileCols = 0;
@@ -196,7 +214,7 @@ public:
     Surface(const ushort &width_t,
             const ushort &heightT,
             const qreal &scale,
-            const bool &paintOnOtherThread = true);
+            const bool &paintInOtherThread);
     ~Surface();
     void strokeTo(Brush *brush,
                   qreal x, qreal y,
@@ -286,7 +304,6 @@ protected:
     Color mBackgroundColor = Color(1.f, 1.f, 1.f);
 
     qreal mScale = 1.;
-    bool mPaintOnOtherThread = true;
     qreal countDabsTo(const qreal &dist_between_dabs,
                       const qreal &x, const qreal &y);
 

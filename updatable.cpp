@@ -1,6 +1,7 @@
 #include "updatable.h"
 #include "mainwindow.h"
 #include "updatescheduler.h"
+#include "paintcontroler.h"
 
 Updatable::Updatable() {
 }
@@ -9,18 +10,14 @@ Updatable::~Updatable() {
 }
 
 void Updatable::beforeUpdate() {
-    mSelfRef = ref<Updatable>();
-    mBeingProcessed = true;
+    Executable::beforeUpdate();
     mAwaitingUpdate = false;
     mUpdateDependent = mDependent;
     mDependent.clear();
 }
 
 void Updatable::afterUpdate() {
-    mFinished = true;
-    mBeingProcessed = false;
     tellDependentThatFinished();
-    mSelfRef.reset();
 }
 
 void Updatable::schedulerProccessed() {
@@ -56,11 +53,20 @@ void Updatable::addSchedulerNow() {
 }
 
 void Updatable::clear() {
-    mSelfRef.reset();
     mDependent.clear();
-    mUpdateDependent.clear();
-    mFinished = false;
+    mUpdateDependent.clear();   
     mSchedulerAdded = false;
-    mBeingProcessed = false;
     mAwaitingUpdate = false;
+    Executable::clear();
+}
+
+void Executable::waitTillProcessed() {
+    if(mCurrentPaintControler == NULL) return;
+    {
+        QEventLoop loop;
+        loop.connect(mCurrentPaintControler,
+                     SIGNAL(finishedUpdating(int,Executable*)),
+                     SLOT(quit()));
+        loop.exec();
+    }
 }

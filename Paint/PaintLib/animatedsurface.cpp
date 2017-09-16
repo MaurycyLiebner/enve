@@ -23,9 +23,8 @@ void getTileDrawers(const std::shared_ptr<TilesData> &drawTilesData,
 AnimatedSurface::AnimatedSurface(const ushort &widthT,
                                  const ushort &heightT,
                                  const qreal &scale,
-                                 const bool &paintOnOtherThread,
                                  PaintBox *parentBox) :
-    Surface(widthT, heightT, scale, paintOnOtherThread),
+    Surface(widthT, heightT, scale, true),
     Animator() {
     prp_setName("canvas");
     mParentBox = parentBox;
@@ -56,7 +55,7 @@ void AnimatedSurface::anim_saveCurrentValueAsKey() {
     if(prevKey == NULL) {
         tiles = mCurrentTiles->getData();
     } else {
-        tiles = prevKey->getTiles()->getData();
+        tiles = prevKey->getTilesData()->getData();
     }
     key->duplicateTilesContentFrom(tiles);
 }
@@ -69,7 +68,7 @@ void AnimatedSurface::newEmptyPaintFrame(const int &relFrame) {
     SurfaceKey *prevKey = (SurfaceKey*)anim_getPrevKey(relFrame);
     if(prevKey != NULL) {
         if(prevKey->getRelFrame() == relFrame) {
-            prevKey->getTiles()->clearTiles();
+            prevKey->getTilesData()->clearTiles();
             return;
         }
     }
@@ -92,6 +91,10 @@ void AnimatedSurface::newEmptyPaintFrame() {
 }
 
 void AnimatedSurface::updateTargetTiles() {
+    mCurrentTiles->setCurrentlyUsed(false);
+    foreach(const std::shared_ptr<TilesData> &tilesDataT, mDrawTilesData) {
+        tilesDataT->setCurrentlyUsed(false);
+    }
     mDrawTilesData.clear();
     mDrawTilesFrames.clear();
     int prevId;
@@ -99,12 +102,16 @@ void AnimatedSurface::updateTargetTiles() {
     if(anim_getNextAndPreviousKeyIdForRelFrame(&prevId, &nextId,
                                                anim_mCurrentRelFrame)) {
         SurfaceKey *prevKey = (SurfaceKey*)anim_mKeys.at(prevId).get();
-        mDrawTilesData.append(prevKey->getTiles()->ref<TilesData>());
+        TilesData *prevKeyTilesData = prevKey->getTilesData();
+        prevKeyTilesData->setCurrentlyUsed(true);
+        mDrawTilesData.append(prevKeyTilesData->ref<TilesData>());
         mDrawTilesFrames.append(prevKey->getRelFrame());
         int idT = prevId - 1;
         while(idT >= 0) {
             SurfaceKey *keyT = (SurfaceKey*)anim_mKeys.at(idT).get();
-            mDrawTilesData.prepend(keyT->getTiles()->ref<TilesData>());
+            TilesData *keyTTilesData = keyT->getTilesData();
+            keyTTilesData->setCurrentlyUsed(true);
+            mDrawTilesData.prepend(keyTTilesData->ref<TilesData>());
             mDrawTilesFrames.prepend(keyT->getRelFrame());
             idT--;
             if(anim_mCurrentRelFrame - keyT->getRelFrame() >=
@@ -112,13 +119,17 @@ void AnimatedSurface::updateTargetTiles() {
         }
         SurfaceKey *nextKey = (SurfaceKey*)anim_mKeys.at(nextId).get();
         if(nextKey != prevKey) {
-            mDrawTilesData.append(nextKey->getTiles()->ref<TilesData>());
+            TilesData *nextKeyTilesData = nextKey->getTilesData();
+            nextKeyTilesData->setCurrentlyUsed(true);
+            mDrawTilesData.append(nextKeyTilesData->ref<TilesData>());
             mDrawTilesFrames.append(nextKey->getRelFrame());
         }
         idT = nextId + 1;
         while(idT < anim_mKeys.count()) {
             SurfaceKey *keyT = (SurfaceKey*)anim_mKeys.at(idT).get();
-            mDrawTilesData.append(keyT->getTiles()->ref<TilesData>());
+            TilesData *keyTTilesData = keyT->getTilesData();
+            keyTTilesData->setCurrentlyUsed(true);
+            mDrawTilesData.append(keyTTilesData->ref<TilesData>());
             mDrawTilesFrames.append(keyT->getRelFrame());
             idT++;
             if(keyT->getRelFrame() - anim_mCurrentRelFrame >=
@@ -127,10 +138,11 @@ void AnimatedSurface::updateTargetTiles() {
 
         int nextDFrame = qAbs(nextKey->getRelFrame() - anim_mCurrentRelFrame);
         int prevDFrame = qAbs(prevKey->getRelFrame() - anim_mCurrentRelFrame);
+
         if(nextDFrame > prevDFrame) {
-            mCurrentTiles = prevKey->getTiles()->ref<TilesData>();
+            mCurrentTiles = prevKey->getTilesData()->ref<TilesData>();
         } else {
-            mCurrentTiles = nextKey->getTiles()->ref<TilesData>();
+            mCurrentTiles = nextKey->getTilesData()->ref<TilesData>();
         }
     }
 }

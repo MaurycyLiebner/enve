@@ -5,7 +5,7 @@ PaintControler::PaintControler(const int &id,
     mId = id;
 }
 
-void PaintControler::updateUpdatable(Updatable *updatable,
+void PaintControler::updateUpdatable(Executable *updatable,
                                      const int &targetId) {
     if(targetId == mId) {
         updatable->processUpdate();

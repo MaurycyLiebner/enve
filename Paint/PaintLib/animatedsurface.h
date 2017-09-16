@@ -21,7 +21,7 @@ public:
         }
     }
 
-    TilesData *getTiles() { return mTiles.get(); }
+    TilesData *getTilesData() { return mTiles.get(); }
     void setTiles(TilesData *tiles) { mTiles = tiles->ref<TilesData>(); }
     bool differsFromKey(Key *key) { return key != this; }
     void writeSurfaceKey(std::fstream *file);
@@ -39,7 +39,6 @@ public:
     AnimatedSurface(const ushort &widthT,
                     const ushort &heightT,
                     const qreal &scale,
-                    const bool &paintOnOtherThread = true,
                     PaintBox *parentBox = NULL);
     void setCurrentRelFrame(const int &relFrame);
     Tile ***getTilesBeforeOrAtRelFrame(const int &relFrame,

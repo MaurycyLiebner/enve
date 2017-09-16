@@ -19,6 +19,7 @@ class PaintSetting;
 class CanvasWidget;
 class RenderInstanceSettings;
 class Updatable;
+class Executable;
 class ImageBox;
 class SingleSound;
 class VideoBox;
@@ -87,7 +88,7 @@ public:
     VideoBox *createVideoForPath(const QString &path);
     int getCurrentFrame();
     int getMaxFrame();
-    void addUpdatableAwaitingUpdate(Updatable *updatable);
+    void addUpdatableAwaitingUpdate(Executable *updatable);
     void SWT_addChildrenAbstractions(
             SingleWidgetAbstraction *abstraction,
             ScrollWidgetVisiblePart *visiblePartWidget);
@@ -145,7 +146,6 @@ public:
     void readCanvases(std::fstream *file);
 protected:
     RenderInstanceSettings *mCurrentRenderSettings = NULL;
-    QList<int> mFreeThreads;
     bool mMouseGrabber = false;
     bool mHasFocus = false;
     QWidget *mCanvasWidget;
@@ -153,16 +153,17 @@ protected:
     void setPreviewing(const bool &bT);
 
     QTimer *mPreviewFPSTimer = NULL;
-    QList<QThread*> mPaintControlerThreads;
-    QList<PaintControler*> mPaintControlers;
 
     qreal mSavedResolutionFraction = 100.;
     int mSavedCurrentFrame = 0;
     bool mPreviewing = false;
     bool mRendering = false;
+
+    QList<int> mFreeThreads;
     bool mNoBoxesAwaitUpdate = true;
-    bool mCancelLastBoxUpdate = false;
-    QList<std::shared_ptr<Updatable> > mUpdatablesAwaitingUpdate;
+    QList<QThread*> mPaintControlerThreads;
+    QList<PaintControler*> mPaintControlers;
+    QList<std::shared_ptr<Executable> > mUpdatablesAwaitingUpdate;
 
     QString mOutputString;
     int mCurrentRenderFrame;
@@ -197,7 +198,7 @@ protected:
     void renderSk(SkCanvas *canvas);
     void tabletEvent(QTabletEvent *e);
 signals:
-    void updateUpdatable(Updatable*, int);
+    void updateUpdatable(Executable*, int);
     void changeCurrentFrame(int);
     void changeFrameRange(int, int);
 public slots:
@@ -275,7 +276,7 @@ public slots:
     void rotate90CCWAction();
 private slots:
     void sendNextUpdatableForUpdate(const int &threadId,
-                                    Updatable *lastUpdatable = NULL);
+                                    Executable *lastUpdatable = NULL);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();
     void saveOutput(const QString &renderDest,

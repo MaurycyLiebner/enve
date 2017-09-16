@@ -23,15 +23,15 @@ MemoryHandler::~MemoryHandler() {
     mMemoryChekerThread->wait();
 }
 
-void MemoryHandler::addContainer(CacheContainer *cont) {
+void MemoryHandler::addContainer(MinimalCacheContainer *cont) {
     mContainers << cont;
 }
 
-void MemoryHandler::removeContainer(CacheContainer *cont) {
+void MemoryHandler::removeContainer(MinimalCacheContainer *cont) {
     mContainers.removeOne(cont);
 }
 
-void MemoryHandler::containerUpdated(CacheContainer *cont) {
+void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
     removeContainer(cont);
     addContainer(cont);
 }
@@ -40,7 +40,7 @@ void MemoryHandler::freeMemory(const unsigned long long &bytes) {
     long long memToFree = bytes;
     int unfreeable = 0;
     while(memToFree > 0 && mContainers.count() > unfreeable) {
-        CacheContainer *cont = mContainers.takeFirst();
+        MinimalCacheContainer *cont = mContainers.takeFirst();
         int byteCount = cont->getByteCount();
         if(cont->freeThis()) {
             memToFree -= byteCount;

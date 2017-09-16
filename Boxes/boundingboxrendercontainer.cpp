@@ -71,11 +71,15 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     thisAccessed();
 }
 
-CacheContainer::CacheContainer() {
+MinimalCacheContainer::MinimalCacheContainer() {
     MemoryHandler::getInstance()->addContainer(this);
 }
 
-CacheContainer::~CacheContainer() {
+void MinimalCacheContainer::thisAccessed() {
+    MemoryHandler::getInstance()->containerUpdated(this);
+}
+
+MinimalCacheContainer::~MinimalCacheContainer() {
     //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
     MemoryHandler::getInstance()->removeContainer(this);
 }
@@ -94,10 +98,6 @@ bool CacheContainer::freeThis() {
     if(mParentCacheHandler == NULL) return false;
     mParentCacheHandler->removeRenderContainer(this);
     return true;
-}
-
-void CacheContainer::thisAccessed() {
-    MemoryHandler::getInstance()->containerUpdated(this);
 }
 
 const int &CacheContainer::getMinRelFrame() const {

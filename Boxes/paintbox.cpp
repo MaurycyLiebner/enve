@@ -137,16 +137,14 @@ void PaintBox::finishSizeSetup() {
     mWidth = widthT;
     mHeight = heightT;
     if(mMainHandler == NULL) {
-        mMainHandler = new AnimatedSurface(mWidth, mHeight,
-                                           1., true, this);
+        mMainHandler = new AnimatedSurface(mWidth, mHeight, 1., this);
         mMainHandler->setCurrentRelFrame(anim_mCurrentRelFrame);
         ca_addChildAnimator(mMainHandler);
     } else {
         mMainHandler->setSize(mWidth, mHeight);
     }
     if(mTemporaryHandler == NULL) {
-        mTemporaryHandler = new Surface(mWidth/4, mHeight/4,
-                                        0.25, false);
+        mTemporaryHandler = new Surface(mWidth/4, mHeight/4, 0.25, false);
     } else {
         mTemporaryHandler->setSize(mWidth/4, mHeight/4);
     }

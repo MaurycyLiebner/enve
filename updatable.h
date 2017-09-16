@@ -2,17 +2,63 @@
 #define UPDATABLE_H
 #include <QList>
 #include "selfref.h"
+#include <QEventLoop>
+class PaintControler;
 
-class Updatable : public StdSelfRef {
+class Executable : public StdSelfRef {
+public:
+    void setCurrentPaintControler(PaintControler *paintControler) {
+        mCurrentPaintControler = paintControler;
+    }
+
+    virtual void beforeUpdate() {
+        mSelfRef = ref<Executable>();
+        mBeingProcessed = true;
+    }
+
+    virtual void processUpdate() = 0;
+
+    void updateFinished() {
+        mFinished = true;
+        mBeingProcessed = false;
+        mCurrentPaintControler = NULL;
+        afterUpdate();
+        mSelfRef.reset();
+    }
+
+    virtual void afterUpdate() {
+
+    }
+
+    bool isBeingProcessed() { return mBeingProcessed; }
+    bool finished() { return mFinished; }
+
+    void waitTillProcessed();
+
+    virtual bool readyToBeProcessed() {
+        return !mBeingProcessed;
+    }
+
+    virtual void clear() {
+        mFinished = false;
+        mBeingProcessed = false;
+        mSelfRef.reset();
+    }
+protected:
+    PaintControler *mCurrentPaintControler = NULL;
+    bool mFinished = false;
+    bool mBeingProcessed = false;
+    std::shared_ptr<Executable> mSelfRef;
+};
+
+class Updatable : public Executable {
 public:
     Updatable();
     virtual ~Updatable();
 
-    virtual void beforeUpdate();
+    void beforeUpdate();
 
-    virtual void processUpdate() = 0;
-
-    virtual void afterUpdate();
+    void afterUpdate();
 
     virtual void schedulerProccessed();
 
@@ -34,20 +80,15 @@ public:
     }
 
     bool isAwaitingUpdate() { return mAwaitingUpdate; }
-    bool isBeingProcessed() { return mBeingProcessed; }
-    bool finished() { return mFinished; }
     bool schedulerAdded() { return mSchedulerAdded; }
 
     void clear();
 protected:
-    bool mFinished = false;
     bool mSchedulerAdded = false;
-    bool mBeingProcessed = false;
     bool mAwaitingUpdate = false;
 
     void tellDependentThatFinished();
 
-    std::shared_ptr<Updatable> mSelfRef;
     QList<Updatable*> mDependent;
     QList<Updatable*> mUpdateDependent;
     int nDependancies = 0;
