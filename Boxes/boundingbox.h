@@ -564,8 +564,8 @@ public:
     virtual void selectAllPoints(Canvas *canvas) {
         Q_UNUSED(canvas);
     }
-    virtual void writeBoundingBox(std::fstream *file);
-    virtual void readBoundingBox(std::fstream *file);
+    virtual void writeBoundingBox(QFile *file);
+    virtual void readBoundingBox(QFile *file);
     virtual void shiftAll(const int &shift);
 protected:
     bool mBoxSaved = false;

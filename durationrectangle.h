@@ -88,8 +88,8 @@ public:
     }
 
     virtual bool hasAnimationFrameRange() { return false; }
-    void writeDurationRectangle(std::fstream *file);
-    void readDurationRectangle(std::fstream *file);
+    void writeDurationRectangle(QFile *file);
+    void readDurationRectangle(QFile *file);
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);

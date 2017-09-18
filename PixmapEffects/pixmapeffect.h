@@ -103,7 +103,7 @@ public:
     bool SWT_isPixmapEffect() { return true; }
 
 
-    virtual void writePixmapEffect(std::fstream *file);
+    virtual void writePixmapEffect(QFile *file);
 public slots:
     void interrupt() {
         mInterrupted = true;
@@ -140,8 +140,8 @@ public:
 
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
-    void readBlurEffect(std::fstream *file);
-    void writePixmapEffect(std::fstream *file);
+    void readBlurEffect(QFile *file);
+    void writePixmapEffect(QFile *file);
 private:
     QSharedPointer<BoolProperty> mHighQuality =
             (new BoolProperty())->ref<BoolProperty>();

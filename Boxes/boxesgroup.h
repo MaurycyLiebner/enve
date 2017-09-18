@@ -201,8 +201,8 @@ public:
             box->afterAllSavesFinished();
         }
     }
-    void writeBoundingBox(std::fstream *file);
-    void readBoundingBox(std::fstream *file);
+    void writeBoundingBox(QFile *file);
+    void readBoundingBox(QFile *file);
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator *parentAnimator);
     void shiftAll(const int &shift);

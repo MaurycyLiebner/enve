@@ -171,8 +171,8 @@ public:
     }
 
     bool SWT_isQrealAnimator() { return true; }
-    void writeQrealAnimator(std::fstream *file);
-    void readQrealAnimator(std::fstream *file);
+    void writeQrealAnimator(QFile *file);
+    void readQrealAnimator(QFile *file);
 protected:
     std::map<void*, QColor> mAnimatorColors;
 

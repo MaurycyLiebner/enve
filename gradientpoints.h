@@ -45,8 +45,8 @@ public:
                              GradientPoint *endPointT);
     QPointF getStartPointAtRelFrame(const int &relFrame);
     QPointF getEndPointAtRelFrame(const int &relFrame);
-    void writeGradientPoints(std::fstream *file);
-    void readGradientPoints(std::fstream *file);
+    void writeGradientPoints(QFile *file);
+    void readGradientPoints(QFile *file);
 };
 
 #endif // GRADIENTPOINTS_H

@@ -21,8 +21,8 @@ public:
     void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
 
-    void readPathEffectAnimators(std::fstream *file);
-    void writePathEffectAnimators(std::fstream *file);
+    void readPathEffectAnimators(QFile *file);
+    void writePathEffectAnimators(QFile *file);
 protected:
     bool mIsOutline;
     PathBox *mParentPath = NULL;

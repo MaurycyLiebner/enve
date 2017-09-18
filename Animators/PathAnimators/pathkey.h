@@ -110,8 +110,8 @@ public:
         return elements;
     }
 
-    void readPathContainer(std::fstream *file);
-    void writePathContainer(std::fstream *file);
+    void readPathContainer(QFile *file);
+    void writePathContainer(QFile *file);
     static QList<SkPoint> extractElementsFromSkPath(const SkPath &path);
 protected:
     bool mPathClosed = false;
@@ -139,8 +139,8 @@ public:
 
     NodeSettings *getNodeSettingsForPtId(const int &ptId);
     bool differsFromKey(Key *key) { return key != this; }
-    void writePathKey(std::fstream *file);
-    void readPathKey(std::fstream *file);
+    void writePathKey(QFile *file);
+    void readPathKey(QFile *file);
 
     PathKey *createNewKeyFromSubsetForPath(VectorPathAnimator *parentAnimator,
                                            const int &firstId,

@@ -20,7 +20,7 @@
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
-    int numberThreads = qMax(1, QThread::idealThreadCount() - 1);
+    int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
         QThread *paintControlerThread = new QThread(this);
         PaintControler *paintControler = new PaintControler(i);

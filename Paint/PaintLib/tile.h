@@ -73,14 +73,13 @@ struct TileSkDrawer : public Updatable {
     ushort maxPaintX = 0;
     uchar alpha = 255;
 };
-#include "Boxes/boundingboxrendercontainer.h"
-class Tile : public MinimalCacheContainer {
+
+class Tile {
 public:
     Tile(const ushort &x_t, const ushort &y_t,
          const bool &paintInOtherThread);
     ~Tile();
 
-    void processUpdate();
     void addDabToDraw(qreal cx,
                       qreal cy,
                       const qreal &hardness,
@@ -120,69 +119,20 @@ public:
 
     void saveToTmp();
     void clearTmp();
-    void writeTile(std::fstream *file);
-    void readTile(std::fstream *file);
+    void writeTile(QFile *file);
+    void readTile(QFile *file);
 
     void duplicateFrom(Tile *tile);
 
     uchar *getData() { return mData; }
 
-    bool freeThis() {
-        if(mDataStoredInTmpFile) return false;
-        if(mDrawer != NULL) {
-            if(mDrawer->finished()) {
-                mDrawer.reset();
-            } else {
-                return false;
-            }
-        }
-        if(mTmpFile != NULL) delete mTmpFile;
-        mTmpFile = new QTemporaryFile();
-        if(mTmpFile->open()) {
-            mTmpFile->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-            mDataTileImage.reset();
-            mData = NULL;
-            mTmpFile->close();
-            afterSavedToTmpFile(mTmpFile);
-            return true;
-        }
-        return false;
-    }
-
-    int getByteCount() {
-        return TILE_DIM*TILE_DIM*4*sizeof(uchar);
-    }
-
-    void loadDataFromTmpFile() {
-        if(mTmpFile->open()) {
-            initializeTileData();
-
-            mTmpFile->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-            mDataStoredInTmpFile = false;
-
-            mTmpFile->close();
-        }
-    }
-
-    void afterSavedToTmpFile(QTemporaryFile *tmpFile) {
-        mDataStoredInTmpFile = true;
-        mTmpFile = tmpFile;
-    }
-
-    void setData(const SkBitmap &bitmap) {
-        mDataTileImage = bitmap;
-        mData = (uchar*)mDataTileImage.getPixels();
-    }
-
-    const bool &isStoredInTmpFile() const {
-        return mDataStoredInTmpFile;
-    }
-
+    void initializeEmptyTileData();
     void initializeTileData();
+    void initializeDrawer();
+
+    void clearTileData();
 private:
     bool mPaintInOtherThread;
-    bool mDataStoredInTmpFile = false;
-    QTemporaryFile *mTmpFile = NULL;
 
     void updateDrawerFromDataArray();
     std::shared_ptr<TileSkDrawer> mDrawer;

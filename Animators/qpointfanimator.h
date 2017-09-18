@@ -54,8 +54,8 @@ public:
     void setPrefferedValueStep(const qreal &valueStep);
 
     bool SWT_isQPointFAnimator() { return true; }
-    void writeQPointFAnimator(std::fstream *file);
-    void readQPointFAnimator(std::fstream *file);
+    void writeQPointFAnimator(QFile *file);
+    void readQPointFAnimator(QFile *file);
 protected:
     QrealAnimatorQSPtr mXAnimator;
     QrealAnimatorQSPtr mYAnimator;

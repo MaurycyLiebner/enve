@@ -162,8 +162,8 @@ public:
     void setElementsFromSkPath(const SkPath &path);
     void startPathChange();
     void cancelPathChange();
-    void readVectorPathAnimator(std::fstream *file);
-    void writeVectorPathAnimator(std::fstream *file);
+    void readVectorPathAnimator(QFile *file);
+    void writeVectorPathAnimator(QFile *file);
 
     bool SWT_isVectorPathAnimator() { return true; }
     void anim_moveKeyToRelFrame(Key *key,

@@ -28,8 +28,8 @@ public:
     Property *makeDuplicate();
 
     bool SWT_isBoxTargetProperty() { return true; }
-    void writeBoxTargetProperty(std::fstream *file);
-    void readBoxTargetProperty(std::fstream *file);
+    void writeBoxTargetProperty(QFile *file);
+    void readBoxTargetProperty(QFile *file);
 private:
     QWeakPointer<BoundingBox> mTarget;
 };

@@ -179,8 +179,8 @@ public:
         return data;
     }
 
-    void writeParticleEmitter(std::fstream *file);
-    void readParticleEmitter(std::fstream *file);
+    void writeParticleEmitter(QFile *file);
+    void readParticleEmitter(QFile *file);
 private:
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;
@@ -293,8 +293,8 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                               const int &relFrame);
-    void writeBoundingBox(std::fstream *file);
-    void readBoundingBox(std::fstream *file);
+    void writeBoundingBox(QFile *file);
+    void readBoundingBox(QFile *file);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

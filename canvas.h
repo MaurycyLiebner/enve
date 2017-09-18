@@ -470,8 +470,8 @@ public:
 
     void tabletEvent(QTabletEvent *e, const QPointF &absPos);
     QRectF getRelBoundingRectAtRelFrame(const int &);
-    void writeBoundingBox(std::fstream *file);
-    void readBoundingBox(std::fstream *file);
+    void writeBoundingBox(QFile *file);
+    void readBoundingBox(QFile *file);
     int prevRelFrameWithKey(const int &relFrame);
     int nextRelFrameWithKey(const int &relFrame);
 protected:

@@ -24,7 +24,7 @@ public:
     virtual void filterPathForRelFrame(const int &,
                                        const SkPath &,
                                        SkPath *) = 0;
-    virtual void writePathEffect(std::fstream *file);
+    virtual void writePathEffect(QFile *file);
 protected:
     PathEffectType mPathEffectType;
 };
@@ -44,8 +44,8 @@ public:
     void filterPath(const SkPath &src, SkPath *dst);
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
-    void writePathEffect(std::fstream *file);
-    void readDisplacePathEffect(std::fstream *file);
+    void writePathEffect(QFile *file);
+    void readDisplacePathEffect(QFile *file);
 private:
     QSharedPointer<QrealAnimator> mSegLength =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -71,8 +71,8 @@ public:
 
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
-    void writePathEffect(std::fstream *file);
-    void readDuplicatePathEffect(std::fstream *file);
+    void writePathEffect(QFile *file);
+    void readDuplicatePathEffect(QFile *file);
 private:
     QSharedPointer<QPointFAnimator> mTranslation =
             (new QPointFAnimator())->ref<QPointFAnimator>();
@@ -94,8 +94,8 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
 
-    void writePathEffect(std::fstream *file);
-    void readSumPathEffect(std::fstream *file);
+    void writePathEffect(QFile *file);
+    void readSumPathEffect(QFile *file);
 private:
     PathBox *mParentPathBox;
     QSharedPointer<BoxTargetProperty> mBoxTarget =

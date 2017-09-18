@@ -133,8 +133,8 @@ public:
         mGradientLinear = linear;
     }
 
-    void writePaintSettings(std::fstream *file);
-    void readPaintSettings(std::fstream *file);
+    void writePaintSettings(QFile *file);
+    void readPaintSettings(QFile *file);
 private:
     bool mGradientLinear = true;
     PathBox *mTarget;
@@ -224,8 +224,8 @@ public:
         return 0;
     }
     QGradientStops getQGradientStopsAtAbsFrame(const int &absFrame);
-    void writeGradient(std::fstream *file);
-    void readGradient(std::fstream *file);
+    void writeGradient(QFile *file);
+    void readGradient(QFile *file);
 
 signals:
     void resetGradientWidgetColorIdIfEquals(Gradient *, int);
@@ -313,8 +313,8 @@ public:
     bool SWT_isStrokeSettings() { return true; }
     void setStrokerSettingsForRelFrameSk(const int &relFrame,
                                          SkStroke *stroker);
-    void writeStrokeSettings(std::fstream *file);
-    void readStrokeSettings(std::fstream *file);
+    void writeStrokeSettings(QFile *file);
+    void readStrokeSettings(QFile *file);
 private:
     QSharedPointer<QrealAnimator> mLineWidth =
             (new QrealAnimator())->ref<QrealAnimator>();

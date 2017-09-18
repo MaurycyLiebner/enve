@@ -5,6 +5,7 @@
 #include "brush.h"
 #include "Colors/color.h"
 #include <png++/png.hpp>
+#include "tilesdata.h"
 
 enum CanvasBackgroundMode {
     CANVAS_BACKGROUND_COLOR,
@@ -45,170 +46,6 @@ private:
     char *mData = NULL;
 };
 
-class TilesData : public StdSelfRef {
-public:
-    TilesData(const ushort &width,
-              const ushort &height,
-              const bool &paintInOtherThread) {
-        mPaintInOtherThread = paintInOtherThread;
-        setSize(width, height);
-    }
-
-    ~TilesData() {
-        if(mTiles == NULL) return;
-        for(int i = 0; i < mNTileRows; i++) {
-            for(int j = 0; j < mNTileCols; j++) {
-                delete mTiles[i][j];
-            }
-            delete[] mTiles[i];
-        }
-        delete[] mTiles;
-    }
-
-    void duplicateTilesContentFrom(Tile ***src) {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                mTiles[j][i]->duplicateFrom(src[j][i]);
-            }
-        }
-    }
-
-    void clearTiles() {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                mTiles[j][i]->clear();
-            }
-        }
-    }
-
-    void clearTmp() {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                mTiles[j][i]->clearTmp();
-            }
-        }
-    }
-
-    void getTileDrawers(QList<TileSkDrawer*> *tileDrawers) {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                tileDrawers->append(mTiles[j][i]->getTexTileDrawer());
-            }
-        }
-    }
-
-    void getTileDrawers(QList<TileSkDrawer*> *tileDrawers,
-                        const int &alpha) {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                TileSkDrawer *tileDrawer =
-                        mTiles[j][i]->getTexTileDrawer();
-                tileDrawer->alpha = alpha;
-                tileDrawers->append(tileDrawer);
-            }
-        }
-    }
-
-    void saveToTmp() {
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                mTiles[j][i]->saveToTmp();
-            }
-        }
-    }
-
-    void setSize(const ushort &width_t,
-                 const ushort &height_t) {
-        ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
-        ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
-        ushort last_row_height = height_t%TILE_DIM;
-        ushort last_column_width = width_t%TILE_DIM;
-        resizeTiles(n_tile_cols_t,
-                    n_tile_rows_t,
-                    last_column_width,
-                    last_row_height);
-
-        mWidth = width_t;
-        mHeight = height_t;
-        mNTileRows = n_tile_rows_t;
-        mNTileCols = n_tile_cols_t;
-    }
-
-    Tile ***getData() { return mTiles; }
-    void writeTilesData(std::fstream *file);
-    void readTilesData(std::fstream *file);
-
-    void setCurrentlyUsed(const bool &used) {
-        if(mCurrentlyUsed == used) return;
-        mCurrentlyUsed = used;
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                Tile *tileT = mTiles[j][i];
-                tileT->setBlocked(used);
-                if(used) {
-                    if(tileT->isStoredInTmpFile()) {
-                        tileT->loadDataFromTmpFile();
-                    }
-                    tileT->thisAccessed();
-                }
-            }
-        }
-    }
-private:
-    bool mCurrentlyUsed = false;
-    void resizeTiles(const ushort &nTileCols,
-                     const ushort &nTilesRows,
-                     const ushort &lastColumnWidth,
-                     const ushort &lastRowHeight) {
-        Tile ***tiles_t = new Tile**[nTilesRows];
-
-        for(ushort rw = 0; rw < nTilesRows; rw++) {
-            tiles_t[rw] = new Tile*[nTileCols];
-            ushort first_new_col_in_row = 0;
-            if(rw < mNTileRows) {
-                first_new_col_in_row = mNTileCols;
-                for(ushort cl = 0; cl < mNTileCols; cl++) {
-                    Tile *tile_t = mTiles[rw][cl];
-                    if(cl < nTileCols) {
-                        tile_t->resetTileSize();
-                        tiles_t[rw][cl] = tile_t;
-                    } else {
-                        delete tile_t;
-                    }
-                }
-                delete[] mTiles[rw];
-            }
-
-            for(ushort cl = first_new_col_in_row; cl < nTileCols; cl++) {
-                tiles_t[rw][cl] = new Tile(cl*TILE_DIM, rw*TILE_DIM,
-                                           mPaintInOtherThread);
-            }
-        }
-
-        if(mTiles != NULL) {
-            delete[] mTiles;
-        }
-        if(lastRowHeight != 0) {
-            for(int i = 0; i < nTileCols; i++) {
-                tiles_t[nTilesRows - 1][i]->setTileHeight(lastRowHeight);
-            }
-        }
-        if(lastColumnWidth != 0) {
-            for(int j = 0; j < nTilesRows; j++) {
-                tiles_t[j][nTileCols - 1]->setTileWidth(lastColumnWidth);
-            }
-        }
-        mTiles = tiles_t;
-    }
-
-    bool mPaintInOtherThread;
-    ushort mWidth = 0;
-    ushort mHeight = 0;
-    ushort mNTileCols = 0;
-    ushort mNTileRows = 0;
-    Tile ***mTiles = NULL;
-};
-
 class Surface {
 public:
     Surface(const ushort &width_t,
@@ -240,11 +77,7 @@ public:
 
     void drawSk(SkCanvas *canvas, SkPaint *paint) {
         canvas->scale(1./mScale, 1./mScale);
-        for(int i = 0; i < mNTileCols; i++) {
-            for(int j = 0; j < mNTileRows; j++) {
-                mCurrentTiles->getData()[j][i]->drawSk(canvas, paint);
-            }
-        }
+        mCurrentTiles->drawSk(canvas, paint);
     }
 
     void clearTmp();
@@ -290,8 +123,8 @@ public:
                                const qreal &s_t,
                                const qreal &v_t);
     void clearTiles(Tile ***tiles);
-    void writeSurface(std::fstream *file);
-    void readSurface(std::fstream *file);
+    void writeSurface(QFile *file);
+    void readSurface(QFile *file);
 
     void duplicateTilesContentFrom(Tile ***tilesSrc);
 

@@ -191,7 +191,8 @@ SOURCES += main.cpp\
     nodepoint.cpp \
     avfileio.cpp \
     Paint/paintboxsettingsdialog.cpp \
-    execdelegator.cpp
+    execdelegator.cpp \
+    Paint/PaintLib/tilesdata.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -342,7 +343,8 @@ HEADERS  += mainwindow.h \
     nodepoint.h \
     avfileio.h \
     Paint/paintboxsettingsdialog.h \
-    execdelegator.h
+    execdelegator.h \
+    Paint/PaintLib/tilesdata.h
 
 RESOURCES += \
     resources.qrc

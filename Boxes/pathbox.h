@@ -137,8 +137,8 @@ public:
     GradientPoints *getFillGradientPoints();
     GradientPoints *getStrokeGradientPoints();
     virtual SkPath getPathAtRelFrame(const int &relFrame) = 0;
-    void writeBoundingBox(std::fstream *file);
-    void readBoundingBox(std::fstream *file);
+    void writeBoundingBox(QFile *file);
+    void readBoundingBox(QFile *file);
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);

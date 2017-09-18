@@ -24,8 +24,8 @@ public:
     TilesData *getTilesData() { return mTiles.get(); }
     void setTiles(TilesData *tiles) { mTiles = tiles->ref<TilesData>(); }
     bool differsFromKey(Key *key) { return key != this; }
-    void writeSurfaceKey(std::fstream *file);
-    void readSurfaceKey(std::fstream *file);
+    void writeSurfaceKey(QFile *file);
+    void readSurfaceKey(QFile *file);
     void duplicateTilesContentFrom(Tile ***tilesSrc) {
         mTiles->duplicateTilesContentFrom(tilesSrc);
     }
@@ -64,8 +64,8 @@ public:
                                 const bool &saveUndoRedo = true,
                                 const bool &finish = true);
 
-    void writeAnimatedSurface(std::fstream *file);
-    void readAnimatedSurface(std::fstream *file);
+    void writeAnimatedSurface(QFile *file);
+    void readAnimatedSurface(QFile *file);
     void currentDataModified();
     bool SWT_isAnimatedSurface() { return true; }
     void anim_saveCurrentValueAsKey();

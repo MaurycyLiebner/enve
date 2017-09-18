@@ -3,10 +3,8 @@
 #include "updatescheduler.h"
 #include "paintcontroler.h"
 
-Updatable::Updatable() {
-}
-
 Updatable::~Updatable() {
+    tellDependentThatFinished();
 }
 
 void Updatable::beforeUpdate() {
@@ -53,16 +51,19 @@ void Updatable::addSchedulerNow() {
 }
 
 void Updatable::clear() {
+    foreach(Updatable *dependent, mDependent) {
+        dependent->decDependencies();
+    }
     mDependent.clear();
-    mUpdateDependent.clear();   
+    tellDependentThatFinished();
+    mUpdateDependent.clear();
     mSchedulerAdded = false;
     mAwaitingUpdate = false;
     Executable::clear();
 }
 
 void Executable::waitTillProcessed() {
-    if(mCurrentPaintControler == NULL) return;
-    {
+    if(mCurrentPaintControler == NULL) return; {
         QEventLoop loop;
         loop.connect(mCurrentPaintControler,
                      SIGNAL(finishedUpdating(int,Executable*)),

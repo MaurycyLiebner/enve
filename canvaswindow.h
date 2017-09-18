@@ -142,8 +142,8 @@ public:
     void processSchedulers();
     bool noBoxesAwaitUpdate();
     void afterAllSavesFinished();
-    void writeCanvases(std::fstream *file);
-    void readCanvases(std::fstream *file);
+    void writeCanvases(QFile *file);
+    void readCanvases(QFile *file);
 protected:
     RenderInstanceSettings *mCurrentRenderSettings = NULL;
     bool mMouseGrabber = false;

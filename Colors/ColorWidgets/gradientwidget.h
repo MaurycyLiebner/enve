@@ -60,8 +60,8 @@ public:
 
     void clearGradientsLoadIds();
     void setGradientLoadIds();
-    void writeGradients(std::fstream *file);
-    void readGradients(std::fstream *file);
+    void writeGradients(QFile *file);
+    void readGradients(QFile *file);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);

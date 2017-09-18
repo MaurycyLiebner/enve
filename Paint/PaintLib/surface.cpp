@@ -296,6 +296,7 @@ void Surface::strokeTo(Brush *brush,
         qrgb_to_hsv(&stroke_h, &stroke_s, &stroke_v);
     }
     Tile ***tilesT = mCurrentTiles->getData();
+    mCurrentTiles->dataChanged();
     for(short i = 0; i < dabs_to_i; i++) {
         if(!fixed_color) {
             dab_red = stroke_h;

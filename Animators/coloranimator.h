@@ -72,8 +72,8 @@ public:
 
     bool SWT_isColorAnimator() { return true; }
 
-    void writeColorAnimator(std::fstream *file);
-    void readColorAnimator(std::fstream *file);
+    void writeColorAnimator(QFile *file);
+    void readColorAnimator(QFile *file);
 private:
     ColorMode mColorMode = RGBMODE;
     QSharedPointer<QrealAnimator> mVal1Animator =

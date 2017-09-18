@@ -41,8 +41,8 @@ public:
     void addEffectRenderDataToList(const int &relFrame,
             QList<PixmapEffectRenderData*> *pixmapEffects);
 
-    void writeEffectAnimators(std::fstream *file);
-    void readEffectAnimators(std::fstream *file);
+    void writeEffectAnimators(QFile *file);
+    void readEffectAnimators(QFile *file);
 private:
     BoundingBox *mParentBox;
 };

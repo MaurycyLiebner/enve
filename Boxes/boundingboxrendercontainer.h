@@ -10,7 +10,7 @@ struct BoundingBoxRenderData;
 
 class MinimalCacheContainer : public StdSelfRef {
 public:
-    MinimalCacheContainer();
+    MinimalCacheContainer(const bool &addToMemortyHandler = true);
 
     virtual ~MinimalCacheContainer();
 

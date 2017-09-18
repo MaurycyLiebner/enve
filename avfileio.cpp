@@ -41,14 +41,14 @@
 #define CREATOR_VERSION "0.1a"
 #define CREATOR_APPLICATION "AniVect"
 
-void writeQString(std::fstream *file,
+void writeQString(QFile *file,
                  const QString &strToWrite) {
     int nChars = strToWrite.length();
     file->write((char*)&nChars, sizeof(int));
     file->write((char*)strToWrite.utf16(), nChars*sizeof(ushort));
 }
 
-void readQString(std::fstream *file,
+void readQString(QFile *file,
                 QString *targetStr) {
     int nChars;
     file->read((char*)&nChars, sizeof(int));
@@ -76,36 +76,36 @@ struct FileFooter {
         return NonCompatible;
     }
 
-    void write(std::fstream *file) {
+    void write(QFile *file) {
         file->write((char*)this, sizeof(FileFooter));
     }
 
-    void read(std::fstream *file) {
-        file->seekg(-sizeof(FileFooter), std::ios_base::end);
+    void read(QFile *file) {
+        file->seek(file->size() - sizeof(FileFooter));
         file->read((char*)this, sizeof(FileFooter));
-        file->seekg(0);
+        file->seek(0);
     }
 
 
 };
 
-void BoolProperty::writeBoolProperty(std::fstream *file) {
+void BoolProperty::writeBoolProperty(QFile *file) {
     file->write((char*)&mValue, sizeof(bool));
 }
 
-void BoolProperty::readBoolProperty(std::fstream *file) {
+void BoolProperty::readBoolProperty(QFile *file) {
     file->read((char*)&mValue, sizeof(bool));
 }
 
-void Key::writeKey(std::fstream *file) {
+void Key::writeKey(QFile *file) {
     file->write((char*)&mRelFrame, sizeof(int));
 }
 
-void Key::readKey(std::fstream *file) {
+void Key::readKey(QFile *file) {
     file->read((char*)&mRelFrame, sizeof(int));
 }
 
-void PathContainer::writePathContainer(std::fstream *file) {
+void PathContainer::writePathContainer(QFile *file) {
     int nPts = mElementsPos.count();
     file->write((char*)&nPts, sizeof(int)); // number pts
     foreach(const SkPoint &pos, mElementsPos) {
@@ -117,7 +117,7 @@ void PathContainer::writePathContainer(std::fstream *file) {
     file->write((char*)&mPathClosed, sizeof(bool));
 }
 
-void PathContainer::readPathContainer(std::fstream *file) {
+void PathContainer::readPathContainer(QFile *file) {
     int nPts;
     file->read((char*)&nPts, sizeof(int));
     for(int i = 0; i < nPts; i++) {
@@ -130,17 +130,17 @@ void PathContainer::readPathContainer(std::fstream *file) {
     mPathUpdateNeeded = true;
 }
 
-void PathKey::writePathKey(std::fstream *file) {
+void PathKey::writePathKey(QFile *file) {
     writeKey(file);
     writePathContainer(file);
 }
 
-void PathKey::readPathKey(std::fstream *file) {
+void PathKey::readPathKey(QFile *file) {
     readKey(file);
     readPathContainer(file);
 }
 
-void VectorPathAnimator::writeVectorPathAnimator(std::fstream *file) {
+void VectorPathAnimator::writeVectorPathAnimator(QFile *file) {
     int nNodes = mNodeSettings.count();
     file->write((char*)&nNodes, sizeof(int));
     foreach(NodeSettings *nodeSettings, mNodeSettings) {
@@ -158,7 +158,7 @@ void VectorPathAnimator::writeVectorPathAnimator(std::fstream *file) {
     writePathContainer(file);
 }
 
-void VectorPathAnimator::readVectorPathAnimator(std::fstream *file) {
+void VectorPathAnimator::readVectorPathAnimator(QFile *file) {
     int nNodes;
     file->read((char*)&nNodes, sizeof(int));
     for(int i = 0; i < nNodes; i++) {
@@ -184,7 +184,7 @@ void VectorPathAnimator::readVectorPathAnimator(std::fstream *file) {
     readPathContainer(file);
 }
 
-void QrealKey::writeQrealKey(std::fstream *file) {
+void QrealKey::writeQrealKey(QFile *file) {
     writeKey(file);
     file->write((char*)&mValue, sizeof(qreal));
 
@@ -197,7 +197,7 @@ void QrealKey::writeQrealKey(std::fstream *file) {
     file->write((char*)&mEndValue, sizeof(qreal));
 }
 
-void QrealKey::readQrealKey(std::fstream *file) {
+void QrealKey::readQrealKey(QFile *file) {
     readKey(file);
     file->read((char*)&mValue, sizeof(qreal));
 
@@ -210,7 +210,7 @@ void QrealKey::readQrealKey(std::fstream *file) {
     file->read((char*)&mEndValue, sizeof(qreal));
 }
 
-void QrealAnimator::writeQrealAnimator(std::fstream *file) {
+void QrealAnimator::writeQrealAnimator(QFile *file) {
     int nKeys = anim_mKeys.count();
     file->write((char*)&nKeys, sizeof(int));
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
@@ -220,7 +220,7 @@ void QrealAnimator::writeQrealAnimator(std::fstream *file) {
     file->write((char*)&mCurrentValue, sizeof(qreal));
 }
 
-void QrealAnimator::readQrealAnimator(std::fstream *file) {
+void QrealAnimator::readQrealAnimator(QFile *file) {
     int nKeys;
     file->read((char*)&nKeys, sizeof(int));
     for(int i = 0; i < nKeys; i++) {
@@ -232,17 +232,17 @@ void QrealAnimator::readQrealAnimator(std::fstream *file) {
     file->read((char*)&mCurrentValue, sizeof(qreal));
 }
 
-void QPointFAnimator::writeQPointFAnimator(std::fstream *file) {
+void QPointFAnimator::writeQPointFAnimator(QFile *file) {
     mXAnimator->writeQrealAnimator(file);
     mYAnimator->writeQrealAnimator(file);
 }
 
-void QPointFAnimator::readQPointFAnimator(std::fstream *file) {
+void QPointFAnimator::readQPointFAnimator(QFile *file) {
     mXAnimator->readQrealAnimator(file);
     mYAnimator->readQrealAnimator(file);
 }
 
-void ColorAnimator::writeColorAnimator(std::fstream *file) {
+void ColorAnimator::writeColorAnimator(QFile *file) {
     file->write((char*)&mColorMode, sizeof(ColorMode));
     mVal1Animator->writeQrealAnimator(file);
     mVal2Animator->writeQrealAnimator(file);
@@ -250,7 +250,7 @@ void ColorAnimator::writeColorAnimator(std::fstream *file) {
     mAlphaAnimator->writeQrealAnimator(file);
 }
 
-void ColorAnimator::readColorAnimator(std::fstream *file) {
+void ColorAnimator::readColorAnimator(QFile *file) {
     file->read((char*)&mColorMode, sizeof(ColorMode));
     setColorMode(mColorMode);
     mVal1Animator->readQrealAnimator(file);
@@ -259,15 +259,15 @@ void ColorAnimator::readColorAnimator(std::fstream *file) {
     mAlphaAnimator->readQrealAnimator(file);
 }
 
-void QStringKey::writeQStringKey(std::fstream *file) {
+void QStringKey::writeQStringKey(QFile *file) {
     writeQString(file, mText);
 }
 
-void QStringKey::readQStringKey(std::fstream *file) {
+void QStringKey::readQStringKey(QFile *file) {
     readQString(file, &mText);
 }
 
-void QStringAnimator::writeQStringAnimator(std::fstream *file) {
+void QStringAnimator::writeQStringAnimator(QFile *file) {
     int nKeys = anim_mKeys.count();
     file->write((char*)&nKeys, sizeof(int));
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
@@ -276,7 +276,7 @@ void QStringAnimator::writeQStringAnimator(std::fstream *file) {
     writeQString(file, mCurrentText);
 }
 
-void QStringAnimator::readQStringAnimator(std::fstream *file) {
+void QStringAnimator::readQStringAnimator(QFile *file) {
     int nKeys;
     file->read((char*)&nKeys, sizeof(int));
     for(int i = 0; i < nKeys; i++) {
@@ -287,22 +287,22 @@ void QStringAnimator::readQStringAnimator(std::fstream *file) {
     readQString(file, &mCurrentText);
 }
 
-void PixmapEffect::writePixmapEffect(std::fstream *file) {
+void PixmapEffect::writePixmapEffect(QFile *file) {
     file->write((char*)&mType, sizeof(PixmapEffectType));
 }
 
-void BlurEffect::readBlurEffect(std::fstream *file) {
+void BlurEffect::readBlurEffect(QFile *file) {
     mHighQuality->readBoolProperty(file);
     mBlurRadius->readQrealAnimator(file);
 }
 
-void BlurEffect::writePixmapEffect(std::fstream *file) {
+void BlurEffect::writePixmapEffect(QFile *file) {
     PixmapEffect::writePixmapEffect(file);
     mHighQuality->writeBoolProperty(file);
     mBlurRadius->writeQrealAnimator(file);
 }
 
-void EffectAnimators::writeEffectAnimators(std::fstream *file) {
+void EffectAnimators::writeEffectAnimators(QFile *file) {
     int nEffects = ca_mChildAnimators.count();
     file->write((char*)&nEffects, sizeof(int));
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
@@ -310,7 +310,7 @@ void EffectAnimators::writeEffectAnimators(std::fstream *file) {
     }
 }
 
-void EffectAnimators::readEffectAnimators(std::fstream *file) {
+void EffectAnimators::readEffectAnimators(QFile *file) {
     int nEffects;
     file->read((char*)&nEffects, sizeof(int));
     for(int i = 0; i < nEffects; i++) {
@@ -324,45 +324,45 @@ void EffectAnimators::readEffectAnimators(std::fstream *file) {
     }
 }
 
-void BasicTransformAnimator::writeBasicTransformAnimator(std::fstream *file) {
+void BasicTransformAnimator::writeBasicTransformAnimator(QFile *file) {
     mPosAnimator->writeQPointFAnimator(file);
     mScaleAnimator->writeQPointFAnimator(file);
     mRotAnimator->writeQrealAnimator(file);
     updateRelativeTransform();
 }
 
-void BasicTransformAnimator::readBasicTransformAnimator(std::fstream *file) {
+void BasicTransformAnimator::readBasicTransformAnimator(QFile *file) {
     mPosAnimator->readQPointFAnimator(file);
     mScaleAnimator->readQPointFAnimator(file);
     mRotAnimator->readQrealAnimator(file);
     updateRelativeTransform();
 }
 
-void BoxTransformAnimator::writeBoxTransformAnimator(std::fstream *file) {
+void BoxTransformAnimator::writeBoxTransformAnimator(QFile *file) {
     writeBasicTransformAnimator(file);
     mOpacityAnimator->writeQrealAnimator(file);
     mPivotAnimator->writeQPointFAnimator(file);
     updateRelativeTransform();
 }
 
-void BoxTransformAnimator::readBoxTransformAnimator(std::fstream *file) {
+void BoxTransformAnimator::readBoxTransformAnimator(QFile *file) {
     readBasicTransformAnimator(file);
     mOpacityAnimator->readQrealAnimator(file);
     mPivotAnimator->readQPointFAnimator(file);
     updateRelativeTransform();
 }
 
-void GradientPoints::writeGradientPoints(std::fstream *file) {
+void GradientPoints::writeGradientPoints(QFile *file) {
     startPoint->writeQPointFAnimator(file);
     endPoint->writeQPointFAnimator(file);
 }
 
-void GradientPoints::readGradientPoints(std::fstream *file) {
+void GradientPoints::readGradientPoints(QFile *file) {
     startPoint->readQPointFAnimator(file);
     endPoint->readQPointFAnimator(file);
 }
 
-void Gradient::writeGradient(std::fstream *file) {
+void Gradient::writeGradient(QFile *file) {
     file->write((char*)&mLoadId, sizeof(int));
     int nColors = mColors.count();
     file->write((char*)&nColors, sizeof(int));
@@ -371,7 +371,7 @@ void Gradient::writeGradient(std::fstream *file) {
     }
 }
 
-void Gradient::readGradient(std::fstream *file) {
+void Gradient::readGradient(QFile *file) {
     file->read((char*)&mLoadId, sizeof(int));
     int nColors;
     file->read((char*)&nColors, sizeof(int));
@@ -382,7 +382,7 @@ void Gradient::readGradient(std::fstream *file) {
     }
 }
 
-void StrokeSettings::writeStrokeSettings(std::fstream *file) {
+void StrokeSettings::writeStrokeSettings(QFile *file) {
     writePaintSettings(file);
     mLineWidth->writeQrealAnimator(file);
     file->write((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
@@ -391,7 +391,7 @@ void StrokeSettings::writeStrokeSettings(std::fstream *file) {
                sizeof(QPainter::CompositionMode));
 }
 
-void StrokeSettings::readStrokeSettings(std::fstream *file) {
+void StrokeSettings::readStrokeSettings(QFile *file) {
     readPaintSettings(file);
     mLineWidth->readQrealAnimator(file);
     file->read((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
@@ -400,7 +400,7 @@ void StrokeSettings::readStrokeSettings(std::fstream *file) {
                 sizeof(QPainter::CompositionMode));
 }
 
-void PaintSettings::writePaintSettings(std::fstream *file) {
+void PaintSettings::writePaintSettings(QFile *file) {
     mGradientPoints->writeGradientPoints(file);
     mColor->writeColorAnimator(file);
     file->write((char*)&mPaintType, sizeof(PaintType));
@@ -414,7 +414,7 @@ void PaintSettings::writePaintSettings(std::fstream *file) {
     file->write((char*)&gradId, sizeof(int));
 }
 
-void PaintSettings::readPaintSettings(std::fstream *file) {
+void PaintSettings::readPaintSettings(QFile *file) {
     mGradientPoints->readGradientPoints(file);
     mColor->readColorAnimator(file);
     file->read((char*)&mPaintType, sizeof(PaintType));
@@ -427,7 +427,7 @@ void PaintSettings::readPaintSettings(std::fstream *file) {
     }
 }
 
-void DurationRectangle::writeDurationRectangle(std::fstream *file) {
+void DurationRectangle::writeDurationRectangle(QFile *file) {
     int minFrame = getMinFrame();
     int maxFrame = getMaxFrame();
     int framePos = getFramePos();
@@ -436,7 +436,7 @@ void DurationRectangle::writeDurationRectangle(std::fstream *file) {
     file->write((char*)&framePos, sizeof(int));
 }
 
-void DurationRectangle::readDurationRectangle(std::fstream *file) {
+void DurationRectangle::readDurationRectangle(QFile *file) {
     int minFrame;
     int maxFrame;
     int framePos;
@@ -448,7 +448,7 @@ void DurationRectangle::readDurationRectangle(std::fstream *file) {
     setFramePos(framePos);
 }
 
-void BoundingBox::writeBoundingBox(std::fstream *file) {
+void BoundingBox::writeBoundingBox(QFile *file) {
     file->write((char*)&mType, sizeof(BoundingBoxType));
     writeQString(file, prp_mName);
     file->write((char*)&mLoadId, sizeof(int));
@@ -466,7 +466,7 @@ void BoundingBox::writeBoundingBox(std::fstream *file) {
     mTransformAnimator->writeBoxTransformAnimator(file);
 }
 
-void BoundingBox::readBoundingBox(std::fstream *file) {
+void BoundingBox::readBoundingBox(QFile *file) {
     readQString(file, &prp_mName);
     file->read((char*)&mLoadId, sizeof(int));
     file->read((char*)&mPivotChanged, sizeof(bool));
@@ -485,33 +485,33 @@ void BoundingBox::readBoundingBox(std::fstream *file) {
     BoundingBox::addLoadedBox(this);
 }
 
-void PathEffect::writePathEffect(std::fstream *file) {
+void PathEffect::writePathEffect(QFile *file) {
     file->write((char*)&mPathEffectType, sizeof(PathEffectType));
 }
 
-void DisplacePathEffect::writePathEffect(std::fstream *file) {
+void DisplacePathEffect::writePathEffect(QFile *file) {
     PathEffect::writePathEffect(file);
     mSegLength->writeQrealAnimator(file);
     mMaxDev->writeQrealAnimator(file);
     mSmoothness->writeQrealAnimator(file);
 }
 
-void DisplacePathEffect::readDisplacePathEffect(std::fstream *file) {
+void DisplacePathEffect::readDisplacePathEffect(QFile *file) {
     mSegLength->readQrealAnimator(file);
     mMaxDev->readQrealAnimator(file);
     mSmoothness->readQrealAnimator(file);
 }
 
-void DuplicatePathEffect::writePathEffect(std::fstream *file) {
+void DuplicatePathEffect::writePathEffect(QFile *file) {
     PathEffect::writePathEffect(file);
     mTranslation->writeQPointFAnimator(file);
 }
 
-void DuplicatePathEffect::readDuplicatePathEffect(std::fstream *file) {
+void DuplicatePathEffect::readDuplicatePathEffect(QFile *file) {
     mTranslation->readQPointFAnimator(file);
 }
 
-void BoxTargetProperty::writeBoxTargetProperty(std::fstream *file) {
+void BoxTargetProperty::writeBoxTargetProperty(QFile *file) {
     BoundingBox *targetBox = mTarget.data();
     int targetId;
     if(targetBox == NULL) {
@@ -522,7 +522,7 @@ void BoxTargetProperty::writeBoxTargetProperty(std::fstream *file) {
     file->write((char*)&targetId, sizeof(int));
 }
 
-void BoxTargetProperty::readBoxTargetProperty(std::fstream *file) {
+void BoxTargetProperty::readBoxTargetProperty(QFile *file) {
     int targetId;
     file->read((char*)&targetId, sizeof(int));
     BoundingBox *targetBox = BoundingBox::getLoadedBoxById(targetId);
@@ -534,16 +534,16 @@ void BoxTargetProperty::readBoxTargetProperty(std::fstream *file) {
     }
 }
 
-void SumPathEffect::writePathEffect(std::fstream *file) {
+void SumPathEffect::writePathEffect(QFile *file) {
     PathEffect::writePathEffect(file);
     mBoxTarget->writeBoxTargetProperty(file);
 }
 
-void SumPathEffect::readSumPathEffect(std::fstream *file) {
+void SumPathEffect::readSumPathEffect(QFile *file) {
     mBoxTarget->readBoxTargetProperty(file);
 }
 
-void PathEffectAnimators::writePathEffectAnimators(std::fstream *file) {
+void PathEffectAnimators::writePathEffectAnimators(QFile *file) {
     int nEffects = ca_mChildAnimators.count();
     file->write((char*)&nEffects, sizeof(int));
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
@@ -551,7 +551,7 @@ void PathEffectAnimators::writePathEffectAnimators(std::fstream *file) {
     }
 }
 
-void PathEffectAnimators::readPathEffectAnimators(std::fstream *file) {
+void PathEffectAnimators::readPathEffectAnimators(QFile *file) {
     int nEffects;
     file->read((char*)&nEffects, sizeof(int));
     for(int i = 0; i < nEffects; i++) {
@@ -573,7 +573,7 @@ void PathEffectAnimators::readPathEffectAnimators(std::fstream *file) {
     }
 }
 
-void PathBox::writeBoundingBox(std::fstream *file) {
+void PathBox::writeBoundingBox(QFile *file) {
     BoundingBox::writeBoundingBox(file);
     mPathEffectsAnimators->writePathEffectAnimators(file);
     mOutlinePathEffectsAnimators->writePathEffectAnimators(file);
@@ -583,7 +583,7 @@ void PathBox::writeBoundingBox(std::fstream *file) {
     mStrokeSettings->writeStrokeSettings(file);
 }
 
-void PathBox::readBoundingBox(std::fstream *file) {
+void PathBox::readBoundingBox(QFile *file) {
     BoundingBox::readBoundingBox(file);
     mPathEffectsAnimators->readPathEffectAnimators(file);
     mOutlinePathEffectsAnimators->readPathEffectAnimators(file);
@@ -593,7 +593,7 @@ void PathBox::readBoundingBox(std::fstream *file) {
     mStrokeSettings->readStrokeSettings(file);
 }
 
-void ParticleEmitter::writeParticleEmitter(std::fstream *file) {
+void ParticleEmitter::writeParticleEmitter(QFile *file) {
     mColorAnimator->writeColorAnimator(file);
     mPos->writeQPointFAnimator(file);
     mWidth->writeQrealAnimator(file);
@@ -615,7 +615,7 @@ void ParticleEmitter::writeParticleEmitter(std::fstream *file) {
     mParticlesOpacityDecay->writeQrealAnimator(file);
 }
 
-void ParticleEmitter::readParticleEmitter(std::fstream *file) {
+void ParticleEmitter::readParticleEmitter(QFile *file) {
     mColorAnimator->readColorAnimator(file);
     mPos->readQPointFAnimator(file);
     mWidth->readQrealAnimator(file);
@@ -637,7 +637,7 @@ void ParticleEmitter::readParticleEmitter(std::fstream *file) {
     mParticlesOpacityDecay->readQrealAnimator(file);
 }
 
-void ParticleBox::writeBoundingBox(std::fstream *file) {
+void ParticleBox::writeBoundingBox(QFile *file) {
     int nEmitters = mEmitters.count();
     file->write((char*)&nEmitters, sizeof(int));
     foreach(ParticleEmitter *emitter, mEmitters) {
@@ -645,7 +645,7 @@ void ParticleBox::writeBoundingBox(std::fstream *file) {
     }
 }
 
-void ParticleBox::readBoundingBox(std::fstream *file) {
+void ParticleBox::readBoundingBox(QFile *file) {
     int nEmitters;
     file->read((char*)&nEmitters, sizeof(int));
     for(int i = 0; i < nEmitters; i++) {
@@ -655,62 +655,62 @@ void ParticleBox::readBoundingBox(std::fstream *file) {
     }
 }
 
-void ImageBox::writeBoundingBox(std::fstream *file) {
+void ImageBox::writeBoundingBox(QFile *file) {
     BoundingBox::writeBoundingBox(file);
     writeQString(file, mImageFilePath);
 }
 
-void ImageBox::readBoundingBox(std::fstream *file) {
+void ImageBox::readBoundingBox(QFile *file) {
     BoundingBox::readBoundingBox(file);
     readQString(file, &mImageFilePath);
 }
 
-void Circle::writeBoundingBox(std::fstream *file) {
+void Circle::writeBoundingBox(QFile *file) {
     PathBox::writeBoundingBox(file);
     mHorizontalRadiusPoint->writeQPointFAnimator(file);
     mVerticalRadiusPoint->writeQPointFAnimator(file);
 }
 
-void Circle::readBoundingBox(std::fstream *file) {
+void Circle::readBoundingBox(QFile *file) {
     PathBox::readBoundingBox(file);
     mHorizontalRadiusPoint->readQPointFAnimator(file);
     mVerticalRadiusPoint->readQPointFAnimator(file);
 }
 
-void Rectangle::writeBoundingBox(std::fstream *file) {
+void Rectangle::writeBoundingBox(QFile *file) {
     PathBox::writeBoundingBox(file);
     mRadiusPoint.writeQPointFAnimator(file);
     mTopLeftPoint->writeQPointFAnimator(file);
     mBottomRightPoint->writeQPointFAnimator(file);
 }
 
-void Rectangle::readBoundingBox(std::fstream *file) {
+void Rectangle::readBoundingBox(QFile *file) {
     PathBox::readBoundingBox(file);
     mRadiusPoint.readQPointFAnimator(file);
     mTopLeftPoint->readQPointFAnimator(file);
     mBottomRightPoint->readQPointFAnimator(file);
 }
 
-void VideoBox::writeBoundingBox(std::fstream *file) {
+void VideoBox::writeBoundingBox(QFile *file) {
     BoundingBox::writeBoundingBox(file);
     writeQString(file, mSrcFilePath);
 }
 
-void VideoBox::readBoundingBox(std::fstream *file) {
+void VideoBox::readBoundingBox(QFile *file) {
     BoundingBox::readBoundingBox(file);
     readQString(file, &mSrcFilePath);
 }
 
-void Tile::writeTile(std::fstream *file) {
+void Tile::writeTile(QFile *file) {
     file->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
 }
 
-void Tile::readTile(std::fstream *file) {
+void Tile::readTile(QFile *file) {
     file->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
     updateDrawerFromDataArray();
 }
 
-void TilesData::writeTilesData(std::fstream *file) {
+void TilesData::writeTilesData(QFile *file) {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
             mTiles[j][i]->writeTile(file);
@@ -718,7 +718,7 @@ void TilesData::writeTilesData(std::fstream *file) {
     }
 }
 
-void TilesData::readTilesData(std::fstream *file) {
+void TilesData::readTilesData(QFile *file) {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
             mTiles[j][i]->readTile(file);
@@ -726,30 +726,30 @@ void TilesData::readTilesData(std::fstream *file) {
     }
 }
 
-void Surface::writeSurface(std::fstream *file) {
+void Surface::writeSurface(QFile *file) {
     file->write((char*)&mWidth, sizeof(ushort));
     file->write((char*)&mHeight, sizeof(ushort));
     mCurrentTiles->writeTilesData(file);
 }
 
-void Surface::readSurface(std::fstream *file) {
+void Surface::readSurface(QFile *file) {
     file->read((char*)&mWidth, sizeof(ushort));
     file->read((char*)&mHeight, sizeof(ushort));
     setSize(mWidth, mHeight);
     mCurrentTiles->readTilesData(file);
 }
 
-void SurfaceKey::writeSurfaceKey(std::fstream *file) {
+void SurfaceKey::writeSurfaceKey(QFile *file) {
     Key::writeKey(file);
     mTiles->writeTilesData(file);
 }
 
-void SurfaceKey::readSurfaceKey(std::fstream *file) {
+void SurfaceKey::readSurfaceKey(QFile *file) {
     Key::readKey(file);
     mTiles->readTilesData(file);
 }
 
-void AnimatedSurface::writeAnimatedSurface(std::fstream *file) {
+void AnimatedSurface::writeAnimatedSurface(QFile *file) {
     file->write((char*)&mWidth, sizeof(ushort));
     file->write((char*)&mHeight, sizeof(ushort));
     int nKeys = anim_mKeys.count();
@@ -763,7 +763,7 @@ void AnimatedSurface::writeAnimatedSurface(std::fstream *file) {
     }
 }
 
-void AnimatedSurface::readAnimatedSurface(std::fstream *file) {
+void AnimatedSurface::readAnimatedSurface(QFile *file) {
     file->read((char*)&mWidth, sizeof(ushort));
     file->read((char*)&mHeight, sizeof(ushort));
     int nKeys;
@@ -783,14 +783,14 @@ void AnimatedSurface::readAnimatedSurface(std::fstream *file) {
     }
 }
 
-void PaintBox::writeBoundingBox(std::fstream *file) {
+void PaintBox::writeBoundingBox(QFile *file) {
     BoundingBox::writeBoundingBox(file);
     mTopLeftPoint->writeQPointFAnimator(file);
     mBottomRightPoint->writeQPointFAnimator(file);
     mMainHandler->writeAnimatedSurface(file);
 }
 
-void PaintBox::readBoundingBox(std::fstream *file) {
+void PaintBox::readBoundingBox(QFile *file) {
     BoundingBox::readBoundingBox(file);
     mTopLeftPoint->readQPointFAnimator(file);
     mBottomRightPoint->readQPointFAnimator(file);
@@ -798,7 +798,7 @@ void PaintBox::readBoundingBox(std::fstream *file) {
     mMainHandler->readAnimatedSurface(file);
 }
 
-void ImageSequenceBox::writeBoundingBox(std::fstream *file) {
+void ImageSequenceBox::writeBoundingBox(QFile *file) {
     BoundingBox::writeBoundingBox(file);
     int nFrames = mListOfFrames.count();
     file->write((char*)&nFrames, sizeof(int));
@@ -807,7 +807,7 @@ void ImageSequenceBox::writeBoundingBox(std::fstream *file) {
     }
 }
 
-void ImageSequenceBox::readBoundingBox(std::fstream *file) {
+void ImageSequenceBox::readBoundingBox(QFile *file) {
     BoundingBox::readBoundingBox(file);
     int nFrames;
     file->read((char*)&nFrames, sizeof(int));
@@ -818,7 +818,7 @@ void ImageSequenceBox::readBoundingBox(std::fstream *file) {
     }
 }
 
-void TextBox::writeBoundingBox(std::fstream *file) {
+void TextBox::writeBoundingBox(QFile *file) {
     PathBox::writeBoundingBox(file);
     mText->writeQStringAnimator(file);
     file->write((char*)&mAlignment, sizeof(Qt::Alignment));
@@ -830,7 +830,7 @@ void TextBox::writeBoundingBox(std::fstream *file) {
     writeQString(file, fontStyle);
 }
 
-void TextBox::readBoundingBox(std::fstream *file) {
+void TextBox::readBoundingBox(QFile *file) {
     PathBox::readBoundingBox(file);
     mText->readQStringAnimator(file);
     file->read((char*)&mAlignment, sizeof(Qt::Alignment));
@@ -845,7 +845,7 @@ void TextBox::readBoundingBox(std::fstream *file) {
     mFont.setStyleName(fontStyle);
 }
 
-void BoxesGroup::writeBoundingBox(std::fstream *file) {
+void BoxesGroup::writeBoundingBox(QFile *file) {
     BoundingBox::writeBoundingBox(file);
     int nChildBoxes = mChildBoxes.count();
     file->write((char*)&nChildBoxes, sizeof(int));
@@ -854,7 +854,7 @@ void BoxesGroup::writeBoundingBox(std::fstream *file) {
     }
 }
 
-void BoxesGroup::readBoundingBox(std::fstream *file) {
+void BoxesGroup::readBoundingBox(QFile *file) {
     BoundingBox::readBoundingBox(file);
     int nChildBoxes;
     file->read((char*)&nChildBoxes, sizeof(int));
@@ -896,7 +896,7 @@ void BoxesGroup::readBoundingBox(std::fstream *file) {
     }
 }
 
-void PathAnimator::writePathAnimator(std::fstream *file) {
+void PathAnimator::writePathAnimator(QFile *file) {
     int nPaths = mSinglePaths.count();
     file->write((char*)&nPaths, sizeof(int));
     foreach(VectorPathAnimator *pathAnimator, mSinglePaths) {
@@ -904,7 +904,7 @@ void PathAnimator::writePathAnimator(std::fstream *file) {
     }
 }
 
-void PathAnimator::readPathAnimator(std::fstream *file) {
+void PathAnimator::readPathAnimator(QFile *file) {
     int nPaths;
     file->read((char*)&nPaths, sizeof(int));
     for(int i = 0; i < nPaths; i++) {
@@ -914,17 +914,17 @@ void PathAnimator::readPathAnimator(std::fstream *file) {
     }
 }
 
-void VectorPath::writeBoundingBox(std::fstream *file) {
+void VectorPath::writeBoundingBox(QFile *file) {
     PathBox::writeBoundingBox(file);
     mPathAnimator->writePathAnimator(file);
 }
 
-void VectorPath::readBoundingBox(std::fstream *file) {
+void VectorPath::readBoundingBox(QFile *file) {
     PathBox::readBoundingBox(file);
     mPathAnimator->readPathAnimator(file);
 }
 
-void Canvas::writeBoundingBox(std::fstream *file) {
+void Canvas::writeBoundingBox(QFile *file) {
     BoxesGroup::writeBoundingBox(file);
     file->write((char*)&mWidth, sizeof(int));
     file->write((char*)&mHeight, sizeof(int));
@@ -932,7 +932,7 @@ void Canvas::writeBoundingBox(std::fstream *file) {
     file->write((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
 }
 
-void Canvas::readBoundingBox(std::fstream *file) {
+void Canvas::readBoundingBox(QFile *file) {
     file->read((char*)&mType, sizeof(BoundingBoxType));
     BoxesGroup::readBoundingBox(file);
     file->read((char*)&mWidth, sizeof(int));
@@ -943,7 +943,7 @@ void Canvas::readBoundingBox(std::fstream *file) {
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
 }
 
-void GradientWidget::writeGradients(std::fstream *file) {
+void GradientWidget::writeGradients(QFile *file) {
     int nGradients = mGradients.count();
     file->write((char*)&nGradients, sizeof(int));
     foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
@@ -951,7 +951,7 @@ void GradientWidget::writeGradients(std::fstream *file) {
     }
 }
 
-void GradientWidget::readGradients(std::fstream *file) {
+void GradientWidget::readGradients(QFile *file) {
     int nGradients;
     file->read((char*)&nGradients, sizeof(int));
     for(int i = 0; i < nGradients; i++) {
@@ -962,7 +962,7 @@ void GradientWidget::readGradients(std::fstream *file) {
     }
 }
 
-void CanvasWindow::writeCanvases(std::fstream *file) {
+void CanvasWindow::writeCanvases(QFile *file) {
     int nCanvases = mCanvasList.count();
     file->write((char*)&nCanvases, sizeof(int));
     int currentCanvasId = -1;
@@ -977,7 +977,7 @@ void CanvasWindow::writeCanvases(std::fstream *file) {
     file->write((char*)&currentCanvasId, sizeof(int));
 }
 
-void CanvasWindow::readCanvases(std::fstream *file) {
+void CanvasWindow::readCanvases(QFile *file) {
     int nCanvases;
     file->read((char*)&nCanvases, sizeof(int));
     for(int i = 0; i < nCanvases; i++) {
@@ -993,27 +993,29 @@ void CanvasWindow::readCanvases(std::fstream *file) {
 }
 
 void MainWindow::loadAVFile(const QString &path) {
-    std::fstream file(path.toUtf8().data(), std::ios_base::in);
-    FileFooter footer;
-    footer.read(&file);
-    if(footer.combatybilityMode() ==
-            FileFooter::CompatybilityMode::Compatible) {
-        GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
-        gradientWidget->readGradients(&file);
-        mCanvasWindow->readCanvases(&file);
+    QFile file(path);
+    if(file.open(QIODevice::ReadOnly) ) {
+        FileFooter footer;
+        footer.read(&file);
+        if(footer.combatybilityMode() ==
+                FileFooter::CompatybilityMode::Compatible) {
+            GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
+            gradientWidget->readGradients(&file);
+            mCanvasWindow->readCanvases(&file);
 
-        clearLoadedGradientsList();
-        gradientWidget->clearGradientsLoadIds();
-        BoundingBox::clearLoadedBoxes();
-    } else {
-        QMessageBox::critical(this, tr("File Load Fail"),
-                              tr("The file you tried to load is incompatible,\n"
-                                 "or damaged."),
-                              QMessageBox::Ok,
-                              QMessageBox::Ok);
+            clearLoadedGradientsList();
+            gradientWidget->clearGradientsLoadIds();
+            BoundingBox::clearLoadedBoxes();
+        } else {
+            QMessageBox::critical(this, tr("File Load Fail"),
+                                  tr("The file you tried to load is incompatible,\n"
+                                     "or damaged."),
+                                  QMessageBox::Ok,
+                                  QMessageBox::Ok);
+        }
+
+        file.close();
     }
-
-    file.close();
 }
 
 void MainWindow::saveToFile(const QString &path) {
@@ -1024,18 +1026,19 @@ void MainWindow::saveToFile(const QString &path) {
     }
 
     GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
-    std::fstream fileS(path.toUtf8().data(), std::ios_base::out);
-    gradientWidget->setGradientLoadIds();
-    gradientWidget->writeGradients(&fileS);
-    mCanvasWindow->writeCanvases(&fileS);
+    if(file.open(QIODevice::WriteOnly) ) {
+        gradientWidget->setGradientLoadIds();
+        gradientWidget->writeGradients(&file);
+        mCanvasWindow->writeCanvases(&file);
 
-    clearLoadedGradientsList();
-    gradientWidget->clearGradientsLoadIds();
+        clearLoadedGradientsList();
+        gradientWidget->clearGradientsLoadIds();
 
-    FileFooter footer;
-    footer.write(&fileS);
+        FileFooter footer;
+        footer.write(&file);
 
-    fileS.close();
+        file.close();
+    }
 
     mCanvasWindow->afterAllSavesFinished();
 

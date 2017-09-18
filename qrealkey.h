@@ -93,8 +93,8 @@ public:
 
     void startValueTransform();
     void finishValueTransform();
-    void writeQrealKey(std::fstream *file);
-    void readQrealKey(std::fstream *file);
+    void writeQrealKey(QFile *file);
+    void readQrealKey(QFile *file);
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 

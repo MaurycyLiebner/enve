@@ -7,6 +7,8 @@ class PaintControler;
 
 class Executable : public StdSelfRef {
 public:
+    Executable() {}
+    virtual ~Executable() {}
     void setCurrentPaintControler(PaintControler *paintControler) {
         mCurrentPaintControler = paintControler;
     }
@@ -53,8 +55,8 @@ protected:
 
 class Updatable : public Executable {
 public:
-    Updatable();
-    virtual ~Updatable();
+    Updatable() {}
+    ~Updatable();
 
     void beforeUpdate();
 

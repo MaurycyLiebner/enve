@@ -48,8 +48,8 @@ public:
     SkPath getPathAtRelFrame(const int &relFrame);
 
     void selectAllPoints(Canvas *canvas);
-    void writeBoundingBox(std::fstream *file);
-    void readBoundingBox(std::fstream *file);
+    void writeBoundingBox(QFile *file);
+    void readBoundingBox(QFile *file);
 protected:
     PathAnimatorQSPtr mPathAnimator;
 };
