@@ -367,8 +367,6 @@ TileSkDrawer::TileSkDrawer(Tile *parentTileT,
     SkPixmap pix;
     tileImg->peekPixels(&pix);
     data = (uchar*)pix.writable_addr();
-
-    mFinished = true;
 }
 
 TileSkDrawer::~TileSkDrawer() {

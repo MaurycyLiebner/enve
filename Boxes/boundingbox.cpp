@@ -33,6 +33,7 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
 }
 
 BoundingBox::~BoundingBox() {
+    qDebug() << "hell";
 }
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,

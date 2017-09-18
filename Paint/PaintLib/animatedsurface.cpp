@@ -30,6 +30,10 @@ AnimatedSurface::AnimatedSurface(const ushort &widthT,
     mParentBox = parentBox;
 }
 
+AnimatedSurface::~AnimatedSurface() {
+    qDebug() << "hell";
+}
+
 void AnimatedSurface::currentDataModified() {
     if(prp_hasKeys()) {
         if(prp_isKeyOnCurrentFrame()) {
@@ -309,4 +313,8 @@ void AnimatedSurface::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
 
 SurfaceKey::SurfaceKey(Animator *parentAnimator) :
     Key(parentAnimator){
+}
+
+SurfaceKey::~SurfaceKey() {
+    qDebug() << "key";
 }

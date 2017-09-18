@@ -8,9 +8,7 @@ class PaintBox;
 class SurfaceKey : public Key {
 public:
     SurfaceKey(Animator *parentAnimator);
-    ~SurfaceKey() {
-
-    }
+    ~SurfaceKey();
 
     void setSize(const ushort &width,
                  const ushort &height) {
@@ -40,6 +38,7 @@ public:
                     const ushort &heightT,
                     const qreal &scale,
                     PaintBox *parentBox = NULL);
+    ~AnimatedSurface();
     void setCurrentRelFrame(const int &relFrame);
     Tile ***getTilesBeforeOrAtRelFrame(const int &relFrame,
                                        int *foundAtRelFrame = NULL);

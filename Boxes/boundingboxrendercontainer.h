@@ -4,6 +4,7 @@ class BoundingBox;
 #include "selfref.h"
 #include "skqtconversions.h"
 #include "skiaincludes.h"
+class QTemporaryFile;
 
 class CacheHandler;
 struct BoundingBoxRenderData;
@@ -20,7 +21,7 @@ public:
 
     virtual int getByteCount() = 0;
 
-    void setBlocked(const bool &bT) {
+    virtual void setBlocked(const bool &bT) {
         mBlocked = bT;
     }
 protected:
@@ -30,9 +31,17 @@ protected:
 class CacheContainer : public MinimalCacheContainer {
 public:
     CacheContainer() {}
+    ~CacheContainer();
 
     void setParentCacheHandler(CacheHandler *handler);
     bool freeThis();
+    void setBlocked(const bool &bT) {
+        if(bT) {
+            if(mNoDataInMemory) {
+                loadFromTmpFile();
+            }
+        }
+    }
 
     int getByteCount() {
         if(mImageSk.get() == NULL) return 0;
@@ -59,14 +68,13 @@ public:
     void setMinRelFrame(const int &minFrame);
     void setRelFrameRange(const int &minFrame, const int &maxFrame);
     bool relFrameInRange(const int &relFrame);
-    void drawCacheOnTimeline(QPainter *p,
-                             const qreal &pixelsPerFrame,
-                             const qreal &drawY,
-                             const int &startFrame,
-                             const int &endFrame);
-
     virtual void drawSk(SkCanvas *canvas);
 protected:
+    void loadFromTmpFile();
+    void saveToTmpFile();
+    bool mNoDataInMemory = false;
+    QTemporaryFile *mTmpFile = NULL;
+
     sk_sp<SkImage> mImageSk;
     CacheHandler *mParentCacheHandler = NULL;
     int mMinRelFrame = 0;

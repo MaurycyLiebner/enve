@@ -86,19 +86,27 @@ MinimalCacheContainer::~MinimalCacheContainer() {
     MemoryHandler::getInstance()->removeContainer(this);
 }
 
+CacheContainer::~CacheContainer() {
+    if(mTmpFile != NULL) {
+        delete mTmpFile;
+    }
+}
+
 void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
     mParentCacheHandler = handler;
 }
-
 
 void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
     mImageSk = img;
 }
 
 bool CacheContainer::freeThis() {
-    if(mBlocked) return false;
+    if(mBlocked || mNoDataInMemory) return false;
     if(mParentCacheHandler == NULL) return false;
-    mParentCacheHandler->removeRenderContainer(this);
+    saveToTmpFile();
+    mImageSk.reset();
+    mNoDataInMemory = true;
+    //mParentCacheHandler->removeRenderContainer(this);
     return true;
 }
 
@@ -135,4 +143,41 @@ void CacheContainer::setRelFrameRange(const int &minFrame,
 
 void CacheContainer::drawSk(SkCanvas *canvas) {
     canvas->drawImage(mImageSk, 0, 0);
+}
+
+void CacheContainer::loadFromTmpFile() {
+    mNoDataInMemory = false;
+    if(mTmpFile->open()) {
+        int width, height;
+        mTmpFile->read((char*)&width, sizeof(int));
+        mTmpFile->read((char*)&height, sizeof(int));
+        SkBitmap btmp;
+        SkImageInfo info = SkImageInfo::Make(width,
+                                             height,
+                                             kBGRA_8888_SkColorType,
+                                             kPremul_SkAlphaType,
+                                             nullptr);
+        btmp.allocPixels(info);
+        mTmpFile->read((char*)btmp.getPixels(),
+                       width*height*4*sizeof(uchar));
+        mImageSk = SkImage::MakeFromBitmap(btmp);
+
+        mTmpFile->close();
+    }
+}
+
+void CacheContainer::saveToTmpFile() {
+    SkPixmap pix;
+    mImageSk->peekPixels(&pix);
+    if(mTmpFile != NULL) delete mTmpFile;
+    mTmpFile = new QTemporaryFile();
+    if(mTmpFile->open()) {
+        int width = pix.width();
+        int height = pix.height();
+        mTmpFile->write((char*)&width, sizeof(int));
+        mTmpFile->write((char*)&height, sizeof(int));
+        mTmpFile->write((char*)pix.writable_addr(),
+                        width*height*4*sizeof(uchar));
+        mTmpFile->close();
+    }
 }

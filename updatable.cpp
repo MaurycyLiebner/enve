@@ -63,7 +63,10 @@ void Updatable::clear() {
 }
 
 void Executable::waitTillProcessed() {
-    if(mCurrentPaintControler == NULL) return; {
+    if(mCurrentPaintControler == NULL) {
+        return;
+    }
+    {
         QEventLoop loop;
         loop.connect(mCurrentPaintControler,
                      SIGNAL(finishedUpdating(int,Executable*)),

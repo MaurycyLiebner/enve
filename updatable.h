@@ -55,7 +55,9 @@ protected:
 
 class Updatable : public Executable {
 public:
-    Updatable() {}
+    Updatable() {
+        mFinished = true;
+    }
     ~Updatable();
 
     void beforeUpdate();
