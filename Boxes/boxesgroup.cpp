@@ -319,11 +319,10 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
 
 void BoxesGroup::ungroup() {
     //clearBoxesSelection();
-    BoxesGroup *parentGroup = mParent.data();
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->applyTransformation(mTransformAnimator.data());
         removeChild(box.data());
-        parentGroup->addChild(box.data());
+        mParent->addChild(box.data());
     }
     mParent->removeChild(this);
 }

@@ -17,6 +17,7 @@ public:
 
     template<class T>
     QWeakPointer<T> weakRef() {
+        Q_ASSERT(!mThisWeak.isNull());
         return ref<T>().toWeakRef();
     }
 

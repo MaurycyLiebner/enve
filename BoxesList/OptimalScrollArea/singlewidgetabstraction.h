@@ -1,6 +1,7 @@
 ﻿#ifndef SINGLEWIDGETABSTRACTION_H
 #define SINGLEWIDGETABSTRACTION_H
 
+#include "selfref.h"
 #include <QWidget>
 class SingleWidgetTarget;
 class SingleWidget;
@@ -10,7 +11,7 @@ enum SWT_Rule : short;
 enum SWT_Target : short;
 struct SWT_RulesCollection;
 
-class SingleWidgetAbstraction {
+class SingleWidgetAbstraction : public StdSelfRef {
 public:
     SingleWidgetAbstraction(SingleWidgetTarget *target,
                             ScrollWidgetVisiblePart *visiblePart);
@@ -36,6 +37,9 @@ public:
 
     void setContentVisible(const bool &bT);
 
+    void clearTarget() {
+        mTarget = NULL;
+    }
     SingleWidgetTarget *getTarget() {
         return mTarget;
     }
@@ -80,15 +84,13 @@ public:
 
     void moveChildAbstractionForTargetTo(SingleWidgetTarget *target,
                                          const int &id);
-    void deleteWithDescendantAbstraction();
-
 private:
     ScrollWidgetVisiblePart *mVisiblePartWidget;
     bool mIsMainTarget = false;
     bool mContentVisible = false;
     SingleWidgetTarget *mTarget = NULL;
 
-    QList<SingleWidgetAbstraction*> mChildren;
+    QList<std::shared_ptr<SingleWidgetAbstraction> > mChildren;
 };
 
 #endif // SINGLEWIDGETABSTRACTION_H

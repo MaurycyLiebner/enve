@@ -98,7 +98,7 @@ struct BoundingBoxRenderData : public Updatable {
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
     QRectF maxBoundsRect;
 
-    QSharedPointer<BoundingBox> parentBox;
+    QWeakPointer<BoundingBox> parentBox;
 
     virtual void updateRelBoundingRect();
     virtual void drawRenderedImageForParent(SkCanvas *canvas);
@@ -615,7 +615,7 @@ protected:
 
     void setType(const BoundingBoxType &type) { mType = type; }
     BoundingBoxType mType;
-    QSharedPointer<BoxesGroup> mParent;
+    BoxesGroup *mParent = NULL;
 
     QSharedPointer<EffectAnimators> mEffectsAnimators =
             (new EffectAnimators())->ref<EffectAnimators>();

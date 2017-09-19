@@ -15,9 +15,6 @@ ScrollWidgetVisiblePart::ScrollWidgetVisiblePart(
 
 ScrollWidgetVisiblePart::~ScrollWidgetVisiblePart() {
     removeInstance(this);
-    if(mMainAbstraction != NULL) {
-        mMainAbstraction->deleteWithDescendantAbstraction();
-    }
 }
 
 void ScrollWidgetVisiblePart::callUpdaters() {
@@ -123,7 +120,11 @@ void ScrollWidgetVisiblePart::updateVisibleWidgetsContent() {
 
 void ScrollWidgetVisiblePart::setMainAbstraction(
         SingleWidgetAbstraction *abs) {
-    mMainAbstraction = abs;
+    if(abs == NULL) {
+        mMainAbstraction.reset();
+    } else {
+        mMainAbstraction = abs->ref<SingleWidgetAbstraction>();
+    }
     scheduledUpdateVisibleWidgetsContent();
 //    if(abs == NULL) return;
 //    abs->setContentVisible(true);

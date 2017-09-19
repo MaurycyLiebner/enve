@@ -4,6 +4,7 @@
 #include <QMenu>
 #include <QMimeData>
 #include <QFlags>
+#include <memory>
 
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
@@ -122,7 +123,7 @@ public:
     virtual void SWT_clearAll();
 
 protected:
-    QList<SingleWidgetAbstraction*> mSWT_allAbstractions;
+    QList<std::shared_ptr<SingleWidgetAbstraction> > mSWT_allAbstractions;
 
     void SWT_addChildAbstractionForTargetToAll(
             SingleWidgetTarget *target);

@@ -371,45 +371,48 @@ void Canvas::handleLeftButtonMousePress() {
             handleMovePointMousePressEvent();
         } else if(mCurrentMode == CanvasMode::ADD_CIRCLE) {
 
-            Circle *newPath = new Circle();
-            mCurrentBoxesGroup->addChild(newPath);
+            QSharedPointer<Circle> newPath =
+                    (new Circle())->ref<Circle>();
+            mCurrentBoxesGroup->addChild(newPath.data());
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
-            addBoxToSelection(newPath);
+            addBoxToSelection(newPath.data());
 
-            mCurrentCircle = newPath;
+            mCurrentCircle = newPath.data();
 
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
-            Rectangle *newPath = new Rectangle();
-            mCurrentBoxesGroup->addChild(newPath);
+            QSharedPointer<Rectangle> newPath =
+                    (new Rectangle())->ref<Rectangle>();
+            mCurrentBoxesGroup->addChild(newPath.data());
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
-            addBoxToSelection(newPath);
+            addBoxToSelection(newPath.data());
 
-            mCurrentRectangle = newPath;
+            mCurrentRectangle = newPath.data();
         } else if(mCurrentMode == CanvasMode::ADD_TEXT) {
-            TextBox *newPath = new TextBox();
+            QSharedPointer<TextBox> newPath = (new TextBox())->ref<TextBox>();
             FontsWidget *fonstWidget = mMainWindow->getFontsWidget();
             newPath->setSelectedFontFamilyAndStyle(
                         fonstWidget->getCurrentFontFamily(),
                         fonstWidget->getCurrentFontStyle());
             newPath->setSelectedFontSize(fonstWidget->getCurrentFontSize());
-            mCurrentBoxesGroup->addChild(newPath);
+            mCurrentBoxesGroup->addChild(newPath.data());
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
 
-            mCurrentTextBox = newPath;
+            mCurrentTextBox = newPath.data();
 
             clearBoxesSelection();
-            addBoxToSelection(newPath);
+            addBoxToSelection(newPath.data());
         } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
             //setCanvasMode(CanvasMode::MOVE_POINT);
-            ParticleBox *partBox = new ParticleBox();
-            mCurrentBoxesGroup->addChild(partBox);
+            QSharedPointer<ParticleBox> partBox =
+                    (new ParticleBox())->ref<ParticleBox>();
+            mCurrentBoxesGroup->addChild(partBox.data());
             partBox->setAbsolutePos(mLastMouseEventPosRel, false);
             clearBoxesSelection();
-            addBoxToSelection(partBox);
+            addBoxToSelection(partBox.data());
 
             mLastPressedPoint = partBox->getBottomRightPoint();
         } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
@@ -426,12 +429,12 @@ void Canvas::handleLeftButtonMousePress() {
             }
         } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             //setCanvasMode(CanvasMode::MOVE_POINT);
-            PaintBox *paintBox = new PaintBox();
-            mCurrentBoxesGroup->addChild(paintBox);
+            QSharedPointer<PaintBox> paintBox = (new PaintBox())->ref<PaintBox>();
+            mCurrentBoxesGroup->addChild(paintBox.data());
             paintBox->setAbsolutePos(mLastMouseEventPosRel, false);
             clearBoxesSelection();
             clearPointsSelection();
-            addBoxToSelection(paintBox);
+            addBoxToSelection(paintBox.data());
 
             mLastPressedPoint = paintBox->getBottomRightPoint();
             addPointToSelection(mLastPressedPoint);

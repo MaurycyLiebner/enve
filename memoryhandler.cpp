@@ -21,6 +21,7 @@ MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
 MemoryHandler::~MemoryHandler() {
     mMemoryChekerThread->quit();
     mMemoryChekerThread->wait();
+    mInstance = NULL;
 }
 
 void MemoryHandler::addContainer(MinimalCacheContainer *cont) {

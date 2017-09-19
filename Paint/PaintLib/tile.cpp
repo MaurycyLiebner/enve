@@ -95,12 +95,12 @@ void processPaintDabs(const QList<Dab> &dabs,
 
 void Tile::duplicateFrom(Tile *tile) {
     if(mPaintInOtherThread) {
-        uchar *dataT = tile->getTexTileDrawer()->data;
-        uchar *drawerData = mDrawer->data;
-        std::memcpy(drawerData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-        std::memcpy(mData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
-
-        mDrawer->addScheduler();
+        if(mDrawer->finished() && tile->getTexTileDrawer()->finished()) {
+            uchar *dataT = tile->getTexTileDrawer()->data;
+            uchar *drawerData = mDrawer->data;
+            std::memcpy(drawerData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+            std::memcpy(mData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+        }
     } else {
         uchar *dataT = tile->getData();
         std::memcpy(mData, dataT, TILE_DIM*TILE_DIM*4*sizeof(uchar));
@@ -117,9 +117,10 @@ void Tile::initializeEmptyTileData() {
 
 void Tile::clear() {
     if(mPaintInOtherThread) {
-        mDrawer->clearImg();
-        updateTexFromDataArray();
-        mDrawer->addScheduler();
+        if(mDrawer->finished()) {
+            mDrawer->clearImg();
+            updateTexFromDataArray();
+        }
     } else {
         std::memset(mData, 0, TILE_DIM*TILE_DIM*4*sizeof(uchar));
     }

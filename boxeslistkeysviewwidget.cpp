@@ -169,8 +169,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 }
 
 BoxesListKeysViewWidget::~BoxesListKeysViewWidget() {
-    delete mMainWindow->getCanvasWindow()->SWT_getAbstractionForWidget(
-                mBoxesListWidget->getVisiblePartWidget());
+
 }
 
 void BoxesListKeysViewWidget::setGraphEnabled(const bool &bT) {

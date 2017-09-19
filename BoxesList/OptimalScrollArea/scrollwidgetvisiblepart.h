@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QtMath>
+#include <memory>
 class ScrollWidget;
 class SingleWidgetAbstraction;
 class SingleWidget;
@@ -83,7 +84,7 @@ protected:
 
     bool mAlwaysShowChildren = false;
 
-    SingleWidgetAbstraction *mMainAbstraction = NULL;
+    std::shared_ptr<SingleWidgetAbstraction> mMainAbstraction;
 };
 
 

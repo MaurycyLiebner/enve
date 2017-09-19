@@ -31,7 +31,6 @@ AnimatedSurface::AnimatedSurface(const ushort &widthT,
 }
 
 AnimatedSurface::~AnimatedSurface() {
-    qDebug() << "hell";
 }
 
 void AnimatedSurface::currentDataModified() {
@@ -149,6 +148,7 @@ void AnimatedSurface::updateTargetTiles() {
             mCurrentTiles = nextKey->getTilesData()->ref<TilesData>();
         }
     }
+    mCurrentTiles->setCurrentlyUsed(true);
 }
 
 void AnimatedSurface::setCurrentRelFrame(const int &relFrame) {
@@ -316,5 +316,4 @@ SurfaceKey::SurfaceKey(Animator *parentAnimator) :
 }
 
 SurfaceKey::~SurfaceKey() {
-    qDebug() << "key";
 }

@@ -63,7 +63,7 @@ void AnimationBox::reloadCacheHandler() {
 }
 
 void AnimationBox::setParent(BoxesGroup *parent) {
-    mParent = parent->ref<BoxesGroup>();
+    mParent = parent;
     mTransformAnimator->setParentTransformAnimator(
                         mParent->getTransformAnimator());
 

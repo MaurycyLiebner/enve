@@ -118,7 +118,7 @@ public:
     BoundingBoxRenderData *createRenderData() {
         BoundingBoxRenderData *renderData =
                 mLinkTarget->BoxesGroup::createRenderData();
-        renderData->parentBox = ref<BoundingBox>();
+        renderData->parentBox = weakRef<BoundingBox>();
         return renderData;
     }
 

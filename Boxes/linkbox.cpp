@@ -50,7 +50,7 @@ BoundingBox *InternalLinkBox::createLink() {
 
 BoundingBoxRenderData *InternalLinkBox::createRenderData() {
     BoundingBoxRenderData *renderData = mLinkTarget->createRenderData();
-    renderData->parentBox = ref<BoundingBox>();
+    renderData->parentBox = weakRef<BoundingBox>();
     return renderData;
 }
 

@@ -14,6 +14,13 @@ GLWindow::GLWindow(QScreen *screen)
 }
 
 GLWindow::~GLWindow() {
+//    mGrContext->abandonContext();
+//    delete mGrContext;
+//    delete mInterface;
+//    m_context->makeCurrent(this);
+//    mSurface.reset();
+//    delete mGrContext;
+//    m_context->doneCurrent();
 }
 
 #include <QDebug>
@@ -223,7 +230,7 @@ void GLWindow::renderNow() {
 
     m_context->swapBuffers(this);
 
-    //m_context->doneCurrent();
+    m_context->doneCurrent();
 }
 
 bool GLWindow::event(QEvent *event) {

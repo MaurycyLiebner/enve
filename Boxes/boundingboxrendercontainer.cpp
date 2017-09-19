@@ -83,6 +83,7 @@ void MinimalCacheContainer::thisAccessed() {
 
 MinimalCacheContainer::~MinimalCacheContainer() {
     //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
+    if(MemoryHandler::getInstance() == NULL) return;
     MemoryHandler::getInstance()->removeContainer(this);
 }
 

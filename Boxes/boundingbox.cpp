@@ -33,7 +33,6 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
 }
 
 BoundingBox::~BoundingBox() {
-    qDebug() << "hell";
 }
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
@@ -55,9 +54,10 @@ void BoundingBox::ca_childAnimatorIsRecordingChanged() {
 
 SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs,
+              mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
-            return abs;
+            return abs.get();
         }
     }
     return SWT_createAbstraction(visiblePartWidget);
@@ -96,7 +96,6 @@ BoundingBox *BoundingBox::createDuplicateWithSameParent() {
     mParent->addChild(duplicate);
     return duplicate;
 }
-
 
 void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
                                     const SkPath &path,
@@ -264,7 +263,7 @@ bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
 }
 
 void BoundingBox::setParent(BoxesGroup *parent) {
-    mParent = parent->ref<BoxesGroup>();
+    mParent = parent;
     mTransformAnimator->setParentTransformAnimator(
                         mParent->getTransformAnimator());
 
@@ -273,7 +272,7 @@ void BoundingBox::setParent(BoxesGroup *parent) {
 }
 
 BoxesGroup *BoundingBox::getParent() {
-    return mParent.data();
+    return mParent;
 }
 
 bool BoundingBox::isGroup() {
@@ -367,9 +366,7 @@ void BoundingBox::updateCurrentPreviewDataFromRenderData(
 }
 
 void BoundingBox::scheduleUpdate() {
-    if(mBlockedSchedule) {
-        qDebug() << "hell1";
-    }
+    Q_ASSERT(!mBlockedSchedule);
     if(!shouldScheduleUpdate()) return;
     if(mCurrentRenderData == NULL) {
         updateCurrentRenderData();
@@ -1188,13 +1185,15 @@ void BoundingBox::getVisibleAbsFrameRange(int *minFrame, int *maxFrame) {
 }
 
 BoundingBoxRenderData::BoundingBoxRenderData(BoundingBox *parentBoxT) {
-    parentBox = parentBoxT->ref<BoundingBox>();
+    parentBox = parentBoxT->weakRef<BoundingBox>();
 }
 
 BoundingBoxRenderData::~BoundingBoxRenderData() {}
 
 void BoundingBoxRenderData::updateRelBoundingRect() {
-    relBoundingRect = parentBox->getRelBoundingRectAtRelFrame(relFrame);
+    BoundingBox *parentBoxT = parentBox.data();
+    if(parentBoxT == NULL) return;
+    relBoundingRect = parentBoxT->getRelBoundingRectAtRelFrame(relFrame);
 }
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
@@ -1283,31 +1282,43 @@ void BoundingBoxRenderData::beforeUpdate() {
 //                parentBox->anim_getCurrentRelFrame(), this);
 //    parentBox->updateCurrentPreviewDataFromRenderData(this);
 
-    parentBox->nullifyCurrentRenderData();
+    BoundingBox *parentBoxT = parentBox.data();
+    if(parentBoxT == NULL) return;
+    parentBoxT->nullifyCurrentRenderData();
 }
 
 void BoundingBoxRenderData::afterUpdate() {
-    parentBox->renderDataFinished(this);
+    BoundingBox *parentBoxT = parentBox.data();
+    if(parentBoxT != NULL) {
+        parentBoxT->renderDataFinished(this);
+    }
     Updatable::afterUpdate();
 }
 
 void BoundingBoxRenderData::schedulerProccessed() {
-    parentBox->setupBoundingBoxRenderDataForRelFrame(
-                parentBox->anim_getCurrentRelFrame(),
-                this);
+    BoundingBox *parentBoxT = parentBox.data();
+    if(parentBoxT != NULL) {
+        parentBoxT->setupBoundingBoxRenderDataForRelFrame(
+                    parentBoxT->anim_getCurrentRelFrame(),
+                    this);
+    }
     mDataSet = false;
     dataSet();
     Updatable::schedulerProccessed();
 }
 
 void BoundingBoxRenderData::addSchedulerNow() {
-    parentBox->addScheduler(this);
+    BoundingBox *parentBoxT = parentBox.data();
+    if(parentBoxT == NULL) return;
+    parentBoxT->addScheduler(this);
 }
 
 void BoundingBoxRenderData::dataSet() {
     if(allDataReady()) {
         mDataSet = true;
         updateRelBoundingRect();
-        parentBox->updateCurrentPreviewDataFromRenderData(this);
+        BoundingBox *parentBoxT = parentBox.data();
+        if(parentBoxT == NULL) return;
+        parentBoxT->updateCurrentPreviewDataFromRenderData(this);
     }
 }

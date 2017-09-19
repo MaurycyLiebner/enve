@@ -69,6 +69,7 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
 
 Canvas::~Canvas() {
     delete mRotPivot;
+    delete mCurrentBrush;
 }
 
 QRectF Canvas::getRelBoundingRectAtRelFrame(const int &) {

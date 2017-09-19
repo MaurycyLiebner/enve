@@ -69,9 +69,9 @@ Canvas *CanvasWindow::getCurrentCanvas() {
 
 SingleWidgetAbstraction* CanvasWindow::SWT_getAbstractionForWidget(
             ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
-            return abs;
+            return abs.get();
         }
     }
     SingleWidgetAbstraction *abs = SWT_createAbstraction(visiblePartWidget);

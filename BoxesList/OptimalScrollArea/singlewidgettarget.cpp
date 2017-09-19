@@ -25,32 +25,38 @@ SingleWidgetAbstraction *SingleWidgetTarget::SWT_createAbstraction(
                                         visiblePartWidget);
     SWT_addChildrenAbstractions(SWT_Abstraction,
                                 visiblePartWidget);
-    mSWT_allAbstractions << SWT_Abstraction;
+    mSWT_allAbstractions << SWT_Abstraction->ref<SingleWidgetAbstraction>();
     return SWT_Abstraction;
 }
 
 void SingleWidgetTarget::SWT_removeAbstractionFromList(
         SingleWidgetAbstraction *abs) {
-    mSWT_allAbstractions.removeOne(abs);
+    for(int i = 0; i < mSWT_allAbstractions.count(); i++) {
+        const std::shared_ptr<SingleWidgetAbstraction> &absT = mSWT_allAbstractions.at(i);
+        if(abs == absT.get()) {
+            mSWT_allAbstractions.removeAt(i);
+            break;
+        }
+    }
 }
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAll(
         SingleWidgetTarget *target) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->addChildAbstractionForTarget(target);
     }
 }
 
 void SingleWidgetTarget::SWT_addChildAbstractionForTargetToAllAt(
         SingleWidgetTarget *target, const int &id) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->addChildAbstractionForTargetAt(target, id);
     }
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
         const SWT_Rule &rule) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfIsCurrentRule(rule);
     }
 }
@@ -58,35 +64,32 @@ void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithRule(
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithTarget(
         SingleWidgetTarget *targetP,
         const SWT_Target &target) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfIsCurrentTarget(targetP,
                                                           target);
     }
 }
 
 void SingleWidgetTarget::SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty() {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->scheduleWidgetContentUpdateIfSearchNotEmpty();
     }
 }
 
 void SingleWidgetTarget::SWT_removeChildAbstractionForTargetFromAll(
         SingleWidgetTarget *target) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->removeChildAbstractionForTarget(target);
     }
 }
 
 void SingleWidgetTarget::SWT_moveChildAbstractionForTargetToInAll(
         SingleWidgetTarget *target, const int &id) {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
+    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
         abs->moveChildAbstractionForTargetTo(target, id);
     }
 }
 
 void SingleWidgetTarget::SWT_clearAll() {
-    Q_FOREACH(SingleWidgetAbstraction *abs, mSWT_allAbstractions) {
-        delete abs;
-    }
     mSWT_allAbstractions.clear();
 }
