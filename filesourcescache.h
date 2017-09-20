@@ -17,7 +17,8 @@ extern bool isAvExt(const QString &extension);
 
 class FileCacheHandler : public Updatable {
 public:
-    FileCacheHandler(const QString &filePath);
+    FileCacheHandler(const QString &filePath,
+                     const bool &visibleInListWidgets = true);
     ~FileCacheHandler();
 
     const QString &getFilePath() {
@@ -30,7 +31,9 @@ public:
     void addDependentBox(BoundingBox *dependent);
     void removeDependentBox(BoundingBox *dependent);
     virtual void replace() {}
+    void setVisibleInListWidgets(const bool &bT);
 protected:
+    bool mVisibleInListWidgets;
     QList<BoundingBoxQSPtr> mDependentBoxes;
     std::shared_ptr<FileCacheHandler> mFileHandlerRef;
     QString mFilePath;
@@ -45,20 +48,23 @@ public:
             FileSourceListVisibleWidget *wid);
     static void removeFileSourceListVisibleWidget(
             FileSourceListVisibleWidget *wid);
-    static void addHandler(FileCacheHandler *handlerPtr);
     static FileCacheHandler *getHandlerForFilePath(const QString &filePath);
     static void removeHandler(FileCacheHandler *handler);
     static void clearAll();
-    static const QList<FileCacheHandler*> &getFileCacheList();
+    static int getFileCacheListCount();
 
+    static void addHandlerToHandlersList(FileCacheHandler *handlerPtr);
+    static void addHandlerToListWidgets(FileCacheHandler *handlerPtr);
+    static void removeHandlerFromListWidgets(FileCacheHandler *handlerPtr);
 private:
     static QList<FileSourceListVisibleWidget*> mFileSourceListVisibleWidgets;
-    static QList<FileCacheHandler*> mFileCacheHandlers;
+    static QList<std::shared_ptr<FileCacheHandler> > mFileCacheHandlers;
 };
 
 class ImageCacheHandler : public FileCacheHandler {
 public:
-    ImageCacheHandler(const QString &filePath);
+    ImageCacheHandler(const QString &filePath,
+                      const bool &visibleSeparatly = true);
 
     void processUpdate();
     void afterUpdate();
@@ -103,7 +109,7 @@ public:
     Updatable *scheduleFrameLoad(const int &frame);
 protected:
     QStringList mFramePaths;
-    QList<ImageCacheHandler*> mFrameImageHandlers;
+    QList<std::shared_ptr<ImageCacheHandler> > mFrameImageHandlers;
 };
 
 class VideoCacheHandler : public AnimationCacheHandler {

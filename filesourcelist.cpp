@@ -116,7 +116,7 @@ FileSourceListScrollWidget::FileSourceListScrollWidget(ScrollArea *parent) :
 }
 
 void FileSourceListScrollWidget::updateHeight() {
-    setFixedHeight((FileSourcesCache::getFileCacheList().count() + 0.5) *
+    setFixedHeight((FileSourcesCache::getFileCacheListCount() + 0.5) *
                    MIN_WIDGET_HEIGHT);
 }
 

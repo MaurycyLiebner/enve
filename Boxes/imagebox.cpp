@@ -37,11 +37,14 @@ void ImageBox::setFilePath(const QString &path) {
     mImgCacheHandler = (ImageCacheHandler*)
                                 FileSourcesCache::getHandlerForFilePath(
                                                         path);
+
     if(mImgCacheHandler == NULL) {
         QFile file(path);
         if(file.exists()) {
             mImgCacheHandler = new ImageCacheHandler(path);
         }
+    } else {
+        mImgCacheHandler->setVisibleInListWidgets(true);
     }
     mImgCacheHandler->addDependentBox(this);
     prp_updateInfluenceRangeAfterChanged();

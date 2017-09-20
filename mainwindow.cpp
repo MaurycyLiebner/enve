@@ -696,20 +696,18 @@ MainWindow *MainWindow::getInstance()
 void MainWindow::createNewCanvas() {
     QString defName = "Canvas " +
             QString::number(mCurrentCanvasComboBox->count());
-    Canvas *newCanvas = new Canvas(getFillStrokeSettings(),
+    QSharedPointer<Canvas> newCanvas = (new Canvas(getFillStrokeSettings(),
                                    mCanvasWindow,
                                    1920,
                                    1080,
-                                   200);
+                                   200))->ref<Canvas>();
     newCanvas->setName(defName);
-    CanvasSettingsDialog dialog(newCanvas, this);
+    CanvasSettingsDialog dialog(newCanvas.data(), this);
 
     if(dialog.exec() == QDialog::Accepted) {
-        dialog.applySettingsToCanvas(newCanvas);
+        dialog.applySettingsToCanvas(newCanvas.data());
 
-        addCanvas(newCanvas);
-    } else {
-        delete newCanvas;
+        addCanvas(newCanvas.data());
     }
 }
 

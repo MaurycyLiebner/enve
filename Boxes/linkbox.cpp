@@ -60,6 +60,11 @@ void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
 }
 
+void InternalLinkBox::addSchedulersToProcess() {
+    mLinkTarget->addSchedulersToProcess();
+    BoundingBox::addSchedulersToProcess();
+}
+
 QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     int absFrame = prp_relFrameToAbsFrame(relFrame);
     int relFrameLT = mLinkTarget->prp_absFrameToRelFrame(absFrame);
@@ -144,7 +149,8 @@ QRectF InternalLinkCanvas::getRelBoundingRectAtRelFrame(const int &relFrame) {
     if(mClipToCanvasSize) {
         return mLinkTarget->getRelBoundingRectAtRelFrame(relFrame);
     }
-    return mLinkTarget->BoxesGroup::getRelBoundingRectAtRelFrame(relFrame);
+    return ((Canvas*)mLinkTarget.data())->BoxesGroup::
+            getRelBoundingRectAtRelFrame(relFrame);
 }
 
 

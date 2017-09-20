@@ -12,7 +12,7 @@ extern "C" {
     #include <libavutil/imgutils.h>
 }
 
-QList<FileCacheHandler*>
+QList<std::shared_ptr<FileCacheHandler> >
 FileSourcesCache::mFileCacheHandlers;
 QList<FileSourceListVisibleWidget*>
 FileSourcesCache::mFileSourceListVisibleWidgets;
@@ -31,8 +31,11 @@ void FileSourcesCache::removeFileSourceListVisibleWidget(
     mFileSourceListVisibleWidgets.removeOne(wid);
 }
 
-void FileSourcesCache::addHandler(FileCacheHandler *handlerPtr) {
-    mFileCacheHandlers.append(handlerPtr);
+void FileSourcesCache::addHandlerToHandlersList(FileCacheHandler *handlerPtr) {
+    mFileCacheHandlers.append(handlerPtr->ref<FileCacheHandler>());
+}
+
+void FileSourcesCache::addHandlerToListWidgets(FileCacheHandler *handlerPtr) {
     foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
         wid->addCacheHandlerToList(handlerPtr);
     }
@@ -40,9 +43,10 @@ void FileSourcesCache::addHandler(FileCacheHandler *handlerPtr) {
 
 FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
         const QString &filePath) {
-    Q_FOREACH(FileCacheHandler *handler, mFileCacheHandlers) {
+    Q_FOREACH(const std::shared_ptr<FileCacheHandler> &handler,
+              mFileCacheHandlers) {
         if(handler->getFilePath() == filePath) {
-            return handler;
+            return handler.get();
         }
     }
     QString ext = filePath.split(".").last();
@@ -55,28 +59,54 @@ FileCacheHandler *FileSourcesCache::getHandlerForFilePath(
 }
 
 void FileSourcesCache::removeHandler(FileCacheHandler *handler) {
-    mFileCacheHandlers.removeOne(handler);
+    for(int i = 0 ; i < mFileCacheHandlers.count(); i++) {
+        if(mFileCacheHandlers.at(i).get() == handler) {
+            mFileCacheHandlers.removeAt(i);
+            break;
+        }
+    }
     foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
         wid->removeCacheHandlerFromList(handler);
     }
 }
 
+void FileSourcesCache::removeHandlerFromListWidgets(FileCacheHandler *handlerPtr) {
+    foreach(FileSourceListVisibleWidget *wid, mFileSourceListVisibleWidgets) {
+        wid->removeCacheHandlerFromList(handlerPtr);
+    }
+}
+
 void FileSourcesCache::clearAll() {
-    Q_FOREACH(FileCacheHandler *handler, mFileCacheHandlers) {
+    Q_FOREACH(const std::shared_ptr<FileCacheHandler> &handler,
+              mFileCacheHandlers) {
         handler->clearCache();
-        delete handler;
     }
     mFileCacheHandlers.clear();
 }
 
-const QList<FileCacheHandler*> &FileSourcesCache::getFileCacheList() {
-    return mFileCacheHandlers;
+int FileSourcesCache::getFileCacheListCount() {
+    return mFileCacheHandlers.count();
 }
 
-FileCacheHandler::FileCacheHandler(const QString &filePath) {
+FileCacheHandler::FileCacheHandler(const QString &filePath,
+                                   const bool &visibleInListWidgets) {
+    mVisibleInListWidgets = visibleInListWidgets;
     mFileHandlerRef = ref<FileCacheHandler>();
     mFilePath = filePath;
-    FileSourcesCache::addHandler(this);
+    FileSourcesCache::addHandlerToListWidgets(this);
+    if(visibleInListWidgets) {
+        FileSourcesCache::addHandlerToListWidgets(this);
+    }
+}
+
+void FileCacheHandler::setVisibleInListWidgets(const bool &bT) {
+    if(bT == mVisibleInListWidgets) return;
+    mVisibleInListWidgets = bT;
+    if(bT) {
+        FileSourcesCache::addHandlerToListWidgets(this);
+    } else {
+        FileSourcesCache::removeHandlerFromListWidgets(this);
+    }
 }
 
 FileCacheHandler::~FileCacheHandler() {
@@ -103,8 +133,10 @@ void FileCacheHandler::removeDependentBox(BoundingBox *dependent) {
     }
 }
 
-ImageCacheHandler::ImageCacheHandler(const QString &filePath) :
+ImageCacheHandler::ImageCacheHandler(const QString &filePath,
+                                     const bool &visibleSeparatly) :
     FileCacheHandler(filePath) {
+    mVisibleInListWidgets = visibleSeparatly;
 }
 
 void ImageCacheHandler::processUpdate() {
@@ -353,16 +385,16 @@ ImageSequenceCacheHandler::ImageSequenceCacheHandler(
         ImageCacheHandler *imgCacheHandler = (ImageCacheHandler*)
                 FileSourcesCache::getHandlerForFilePath(path);
         if(imgCacheHandler == NULL) {
-            mFrameImageHandlers << new ImageCacheHandler(path);
+            mFrameImageHandlers << (new ImageCacheHandler(path, false))->ref<ImageCacheHandler>();
         } else {
-            mFrameImageHandlers << imgCacheHandler;
+            mFrameImageHandlers << imgCacheHandler->ref<ImageCacheHandler>();
         }
     }
     updateFrameCount();
 }
 
 sk_sp<SkImage> ImageSequenceCacheHandler::getFrameAtFrame(const int &relFrame) {
-    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame);
+    ImageCacheHandler *cacheHandler = mFrameImageHandlers.at(relFrame).get();
     if(cacheHandler == NULL) return sk_sp<SkImage>();
     return cacheHandler->getImage();
 }
@@ -372,14 +404,14 @@ void ImageSequenceCacheHandler::updateFrameCount() {
 }
 
 void ImageSequenceCacheHandler::clearCache() {
-    foreach(ImageCacheHandler *cacheHandler, mFrameImageHandlers) {
+    foreach(const std::shared_ptr<ImageCacheHandler> &cacheHandler, mFrameImageHandlers) {
         cacheHandler->clearCache();
     }
     FileCacheHandler::clearCache();
 }
 
 Updatable *ImageSequenceCacheHandler::scheduleFrameLoad(const int &frame) {
-    ImageCacheHandler *imageHandler = mFrameImageHandlers.at(frame);
+    ImageCacheHandler *imageHandler = mFrameImageHandlers.at(frame).get();
     imageHandler->addScheduler();
     return imageHandler;
 }

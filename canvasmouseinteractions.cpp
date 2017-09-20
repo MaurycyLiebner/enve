@@ -638,10 +638,11 @@ void Canvas::handleAddPointMousePress() {
         return;
     }
     if(mCurrentEndPoint == NULL && nodePointUnderMouse == NULL) {
-        VectorPath *newPath = new VectorPath();
-        mCurrentBoxesGroup->addChild(newPath);
+        QSharedPointer<VectorPath> newPath =
+                (new VectorPath())->ref<VectorPath>();
+        mCurrentBoxesGroup->addChild(newPath.data());
         clearBoxesSelection();
-        addBoxToSelection(newPath);
+        addBoxToSelection(newPath.data());
         PathAnimator *newPathAnimator = newPath->getPathAnimator();
         VectorPathAnimator *newSinglePath = new VectorPathAnimator(
                                                     newPathAnimator);
@@ -914,9 +915,17 @@ void Canvas::handleAddPointMouseMove() {
             mCurrentEndPoint->moveEndCtrlPtToAbsPos(mLastMouseEventPosRel);
         }
     } else {
-        if(mCurrentEndPoint->getCurrentCtrlsMode() !=
-           CtrlsMode::CTRLS_SYMMETRIC) {
-            mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+        if(!mCurrentEndPoint->hasNextPoint() &&
+           !mCurrentEndPoint->hasPreviousPoint()) {
+            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+               CtrlsMode::CTRLS_CORNER) {
+                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_CORNER);
+            }
+        } else {
+            if(mCurrentEndPoint->getCurrentCtrlsMode() !=
+               CtrlsMode::CTRLS_SYMMETRIC) {
+                mCurrentEndPoint->setCtrlsMode(CtrlsMode::CTRLS_SYMMETRIC);
+            }
         }
         if(mCurrentEndPoint->hasNextPoint()) {
             mCurrentEndPoint->moveStartCtrlPtToAbsPos(mLastMouseEventPosRel);

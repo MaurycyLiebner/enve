@@ -409,13 +409,13 @@ void BoxesGroup::addChild(BoundingBox *child) {
 void BoxesGroup::addChildToListAt(const int &index,
                                   BoundingBox *child,
                                   const bool &saveUndoRedo) {
+    mChildBoxes.insert(index, child->ref<BoundingBox>());
     child->setParent(this);
     if(saveUndoRedo) {
         addUndoRedo(new AddChildToListUndoRedo(this, index, child));
     }
     connect(child, SIGNAL(prp_absFrameRangeChanged(int,int)),
             this, SLOT(prp_updateAfterChangedAbsFrameRange(int,int)));
-    mChildBoxes.insert(index, child->ref<BoundingBox>());
     updateChildrenId(index, saveUndoRedo);
 
     //SWT_addChildAbstractionForTargetToAll(child);

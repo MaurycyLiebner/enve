@@ -42,15 +42,13 @@ public:
 
             mLinkTarget.reset();
         } else {
-            setName(linkTarget->getName());
+            setName(linkTarget->getName() + " link");
             mLinkTarget = linkTarget->ref<BoundingBox>();
             connect(linkTarget, SIGNAL(scheduledUpdate()),
                     this, SLOT(scheduleUpdate()));
         }
         scheduleUpdate();
     }
-
-
 
     bool relPointInsidePath(const QPointF &point);
     QPointF getRelCenterPosition();
@@ -70,10 +68,11 @@ public:
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                               int *lastIdentical,
-                                               const int &relFrame);
+                                              int *lastIdentical,
+                                              const int &relFrame);
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
+    void addSchedulersToProcess();
 public slots:
     void scheduleAwaitUpdateSLOT();
 
@@ -96,6 +95,12 @@ public:
         ca_addChildAnimator(mRastarized.data());
     }
 
+    void prp_setAbsFrame(const int &frame) {
+        BoundingBox::prp_setAbsFrame(frame);
+        ((Canvas*)mLinkTarget.data())->prp_setAbsFrame(
+                    anim_mCurrentRelFrame);
+    }
+
     void setClippedToCanvasSize(const bool &clipped);
 
     void makeDuplicate(Property *targetBox) {
@@ -105,19 +110,20 @@ public:
     }
 
     BoundingBox *createNewDuplicate() {
-        return new InternalLinkCanvas(mLinkTarget.data());
+        return new InternalLinkCanvas((Canvas*)mLinkTarget.data());
     }
 
     void setupBoundingBoxRenderDataForRelFrame(
             const int &relFrame, BoundingBoxRenderData *data) {
-        mLinkTarget->BoxesGroup::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+        ((Canvas*)mLinkTarget.data())->BoxesGroup::
+                setupBoundingBoxRenderDataForRelFrame(relFrame, data);
         BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
         data->transform = QMatrix();
     }
 
     BoundingBoxRenderData *createRenderData() {
         BoundingBoxRenderData *renderData =
-                mLinkTarget->BoxesGroup::createRenderData();
+                ((Canvas*)mLinkTarget.data())->BoxesGroup::createRenderData();
         renderData->parentBox = weakRef<BoundingBox>();
         return renderData;
     }
@@ -130,7 +136,6 @@ public:
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
 protected:
-    QSharedPointer<Canvas> mLinkTarget;
     QSharedPointer<BoolProperty> mClipToCanvasSize =
             (new BoolProperty())->ref<BoolProperty>();
     QSharedPointer<BoolProperty> mRastarized =
