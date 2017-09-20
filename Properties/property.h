@@ -27,24 +27,6 @@ public:
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 
-    virtual void prp_updateAfterChangedRelFrameRange(const int &minFrame,
-                                                     const int &maxFrame) {
-        int minFrameT;
-        if(minFrame == INT_MIN) {
-            minFrameT = minFrame;
-        } else {
-            minFrameT = prp_relFrameToAbsFrame(minFrame);
-        }
-        int maxFrameT;
-        if(maxFrame == INT_MAX) {
-            maxFrameT = maxFrame;
-        } else {
-            maxFrameT = prp_relFrameToAbsFrame(maxFrame);
-        }
-        prp_updateAfterChangedAbsFrameRange(minFrameT,
-                                            maxFrameT);
-    }
-
     int prp_absFrameToRelFrame(const int &absFrame) const;
     int prp_relFrameToAbsFrame(const int &relFrame) const;
 
@@ -155,6 +137,25 @@ public slots:
 
     virtual void prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                      const int &maxFrame);
+
+    virtual void prp_updateAfterChangedRelFrameRange(const int &minFrame,
+                                                     const int &maxFrame) {
+        int minFrameT;
+        if(minFrame == INT_MIN) {
+            minFrameT = minFrame;
+        } else {
+            minFrameT = prp_relFrameToAbsFrame(minFrame);
+        }
+        int maxFrameT;
+        if(maxFrame == INT_MAX) {
+            maxFrameT = maxFrame;
+        } else {
+            maxFrameT = prp_relFrameToAbsFrame(maxFrame);
+        }
+        prp_updateAfterChangedAbsFrameRange(minFrameT,
+                                            maxFrameT);
+    }
+
     virtual void prp_updateInfluenceRangeAfterChanged();
 signals:
     void prp_updateWholeInfluenceRange();

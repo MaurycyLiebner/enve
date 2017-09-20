@@ -34,8 +34,7 @@ public:
 
     void setLinkTarget(BoundingBox *linkTarget) {
         if(mLinkTarget != NULL) {
-            disconnect(mLinkTarget.data(), SIGNAL(scheduledUpdate()),
-                       this, SLOT(scheduleUpdate()));
+            disconnect(mLinkTarget.data(), 0, this, 0);
         }
         if(linkTarget == NULL) {
             setName("empty link");
@@ -46,6 +45,8 @@ public:
             mLinkTarget = linkTarget->ref<BoundingBox>();
             connect(linkTarget, SIGNAL(scheduledUpdate()),
                     this, SLOT(scheduleUpdate()));
+            connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
+                    this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
         scheduleUpdate();
     }
@@ -73,9 +74,7 @@ public:
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
     void addSchedulersToProcess();
-public slots:
-    void scheduleAwaitUpdateSLOT();
-
+    void processSchedulers();
 protected:
     QSharedPointer<BoundingBox> mLinkTarget;
 };

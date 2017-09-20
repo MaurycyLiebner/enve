@@ -65,14 +65,15 @@ void InternalLinkBox::addSchedulersToProcess() {
     BoundingBox::addSchedulersToProcess();
 }
 
+void InternalLinkBox::processSchedulers() {
+    mLinkTarget->processSchedulers();
+    BoundingBox::processSchedulers();
+}
+
 QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     int absFrame = prp_relFrameToAbsFrame(relFrame);
     int relFrameLT = mLinkTarget->prp_absFrameToRelFrame(absFrame);
     return mLinkTarget->getRelBoundingRectAtRelFrame(relFrameLT);
-}
-
-void InternalLinkBox::scheduleAwaitUpdateSLOT() {
-    scheduleUpdate();
 }
 
 InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget) :
@@ -89,11 +90,11 @@ void InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                         const int &relFrame) {
     int fIdLT;
     int lIdLT;
-    int relFrameLT = mLinkTarget->prp_absFrameToRelFrame(
-                prp_relFrameToAbsFrame(relFrame));
+//    int relFrameLT = mLinkTarget->prp_absFrameToRelFrame(
+//                prp_relFrameToAbsFrame(relFrame));
     mLinkTarget->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
-                                                       &lIdLT,
-                                                       relFrameLT);
+                                                      &lIdLT,
+                                                      relFrame);
     int fId;
     int lId;
     if(mVisible) {
