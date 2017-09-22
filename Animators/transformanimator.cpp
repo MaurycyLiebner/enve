@@ -1,9 +1,9 @@
-#include "Animators/transformanimator.h"
 #include "undoredo.h"
 #include <QDebug>
 #include "boxpathpoint.h"
 #include "animatorupdater.h"
 #include "qrealanimator.h"
+#include "transformanimator.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     ComplexAnimator() {
@@ -432,6 +432,19 @@ QMatrix BoxTransformAnimator::getTransformMatrixAtRelFrame(
     matrix.translate(-pivotX,
                      -pivotY);
     return matrix;
+}
+
+QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrame(
+        const int &relFrame) {
+    if(mParentTransformAnimator.data() == NULL) {
+        return QMatrix();
+    } else {
+        int absFrame = prp_relFrameToAbsFrame(relFrame);
+        int parentRelFrame =
+                mParentTransformAnimator->prp_absFrameToRelFrame(absFrame);
+        return mParentTransformAnimator->
+                getCombinedTransformMatrixAtRelFrame(parentRelFrame);
+    }
 }
 
 QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrame(

@@ -26,8 +26,7 @@ private:
     QString mSrc;
 };
 
-class InternalLinkBox : public BoundingBox
-{
+class InternalLinkBox : public BoundingBox {
     Q_OBJECT
 public:
     InternalLinkBox(BoundingBox *linkTarget);
@@ -43,8 +42,8 @@ public:
         } else {
             setName(linkTarget->getName() + " link");
             mLinkTarget = linkTarget->ref<BoundingBox>();
-            connect(linkTarget, SIGNAL(scheduledUpdate()),
-                    this, SLOT(scheduleUpdate()));
+//            connect(linkTarget, SIGNAL(scheduledUpdate()),
+//                    this, SLOT(scheduleUpdate()));
             connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
@@ -72,10 +71,135 @@ public:
                                               const int &relFrame);
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
-    void addSchedulersToProcess();
-    void processSchedulers();
+    bool SWT_isLinkBox() { return true; }
 protected:
     QSharedPointer<BoundingBox> mLinkTarget;
+};
+
+class InternalLinkGroupBox : public BoxesGroup {
+    Q_OBJECT
+public:
+    InternalLinkGroupBox(BoxesGroup *linkTarget);
+
+    void setLinkTarget(BoxesGroup *linkTarget) {
+        if(mLinkTarget != NULL) {
+            disconnect(mLinkTarget.data(), 0, this, 0);
+        }
+        if(linkTarget == NULL) {
+            setName("empty link");
+
+            mLinkTarget.reset();
+        } else {
+            setName(linkTarget->getName() + " link");
+            mLinkTarget = linkTarget->ref<BoxesGroup>();
+//            connect(linkTarget, SIGNAL(scheduledUpdate()),
+//                    this, SLOT(scheduleUpdate()));
+            connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
+                    this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
+        }
+        scheduleUpdate();
+    }
+
+    bool relPointInsidePath(const QPointF &point);
+    QPointF getRelCenterPosition();
+
+    BoxesGroup *getLinkTarget();
+
+    BoundingBox *createLink();
+    BoundingBox *createLinkForLinkGroup() {
+        return new InternalLinkGroupBox(this);
+    }
+
+    bool SWT_isLinkBox() { return true; }
+
+    BoundingBox *createNewDuplicate() {
+        return new InternalLinkGroupBox(mLinkTarget.data());
+    }
+
+    BoundingBoxRenderData *createRenderData();
+    QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                              int *lastIdentical,
+                                              const int &relFrame);
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2);
+
+    bool SWT_isBoxesGroup() { return false; }
+
+    QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
+        if(mLinkTarget->SWT_isLinkBox()) {
+            return BoundingBox::getRelativeTransformAtRelFrame(relFrame)*
+                    mLinkTarget->getRelativeTransformAtRelFrame(relFrame);
+        } else {
+            return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
+        }
+    }
+
+    void setupBoundingBoxRenderDataForRelFrame(
+                            const int &relFrame,
+                            BoundingBoxRenderData *data) {
+        BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
+                                                           data);
+        BoxesGroupRenderData *groupData = ((BoxesGroupRenderData*)data);
+        groupData->childrenRenderData.clear();
+        qreal childrenEffectsMargin = 0.;
+        int absFrame = prp_relFrameToAbsFrame(relFrame);
+        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+            int boxRelFrame = box->prp_absFrameToRelFrame(absFrame);
+            if(box->isRelFrameVisibleAndInVisibleDurationRect(boxRelFrame)) {
+                BoundingBoxRenderData *boxRenderData =
+                        box->getCurrentRenderData();
+                if(boxRenderData == NULL) {
+                    continue;
+                }
+                if(!boxRenderData->finished()) {
+                    boxRenderData->addDependent(data);
+                    boxRenderData->transform =
+                            boxRenderData->relTransform*data->transform;
+                }
+                groupData->childrenRenderData <<
+                        boxRenderData->ref<BoundingBoxRenderData>();
+                childrenEffectsMargin =
+                        qMax(box->getEffectsMarginAtRelFrame(boxRelFrame),
+                             childrenEffectsMargin);
+            }
+        }
+        data->effectsMargin += childrenEffectsMargin;
+        BoxesGroup *finalTarget = getFinalTarget();
+        if(finalTarget->SWT_isCanvas()) {
+            CanvasRenderData *canvasData = (CanvasRenderData*)data;
+            Canvas *canvasTarget = (Canvas*)finalTarget;
+            canvasData->bgColor = canvasTarget->getBgColorAnimator()->
+                                    getColorAtRelFrame(relFrame).getSkColor();
+            canvasData->canvasHeight = canvasTarget->getCanvasHeight()*
+                                        canvasTarget->getResolutionFraction();
+            canvasData->canvasWidth = canvasTarget->getCanvasWidth()*
+                                        canvasTarget->getResolutionFraction();
+        }
+    }
+
+    BoxesGroup *getFinalTarget() {
+        if(mLinkTarget->SWT_isLinkBox()) {
+            return ((InternalLinkGroupBox*)mLinkTarget.data())->getFinalTarget();
+        }
+        return mLinkTarget.data();
+    }
+
+    void addSchedulersToProcess() {
+        if(mLinkTarget->SWT_isCanvas()) {
+            mLinkTarget->addSchedulersToProcess();
+        }
+        BoxesGroup::addSchedulersToProcess();
+    }
+
+    void processSchedulers() {
+        if(mLinkTarget->SWT_isCanvas()) {
+            mLinkTarget->processSchedulers();
+        }
+        BoxesGroup::processSchedulers();
+    }
+protected:
+    QSharedPointer<BoxesGroup> mLinkTarget;
 };
 
 struct LinkCanvasRenderData : public CanvasRenderData {
@@ -139,6 +263,15 @@ public:
     }
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
+    void addSchedulersToProcess() {
+        mLinkTarget->addSchedulersToProcess();
+        BoundingBox::addSchedulersToProcess();
+    }
+
+    void processSchedulers() {
+        mLinkTarget->processSchedulers();
+        BoundingBox::processSchedulers();
+    }
 protected:
     QSharedPointer<BoolProperty> mClipToCanvasSize =
             (new BoolProperty())->ref<BoolProperty>();

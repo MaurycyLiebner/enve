@@ -452,7 +452,7 @@ void BoundingBox::writeBoundingBox(QFile *file) {
     file->write((char*)&mType, sizeof(BoundingBoxType));
     writeQString(file, prp_mName);
     file->write((char*)&mLoadId, sizeof(int));
-    file->write((char*)&mPivotAutoadjust, sizeof(bool));
+    file->write((char*)&mPivotAutoAdjust, sizeof(bool));
     file->write((char*)&mVisible, sizeof(bool));
     file->write((char*)&mLocked, sizeof(bool));
     file->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
@@ -469,7 +469,7 @@ void BoundingBox::writeBoundingBox(QFile *file) {
 void BoundingBox::readBoundingBox(QFile *file) {
     readQString(file, &prp_mName);
     file->read((char*)&mLoadId, sizeof(int));
-    file->read((char*)&mPivotAutoadjust, sizeof(bool));
+    file->read((char*)&mPivotAutoAdjust, sizeof(bool));
     file->read((char*)&mVisible, sizeof(bool));
     file->read((char*)&mLocked, sizeof(bool));
     file->read((char*)&mBlendModeSk, sizeof(SkBlendMode));

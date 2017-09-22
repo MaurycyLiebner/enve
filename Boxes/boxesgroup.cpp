@@ -12,6 +12,7 @@
 #include "canvas.h"
 #include "Boxes/particlebox.h"
 #include "durationrectangle.h"
+#include "linkbox.h"
 
 bool BoxesGroup::mCtrlsAlwaysVisible = false;
 
@@ -207,6 +208,12 @@ void BoxesGroup::shiftAll(const int &shift) {
             box->shiftAll(shift);
         }
     }
+}
+
+BoundingBox *BoxesGroup::createLink() {
+    InternalLinkGroupBox *linkBox = new InternalLinkGroupBox(this);
+    BoundingBox::makeDuplicate(linkBox);
+    return linkBox;
 }
 
 void BoxesGroup::setupBoundingBoxRenderDataForRelFrame(

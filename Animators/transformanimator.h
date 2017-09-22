@@ -76,6 +76,7 @@ public:
     QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
     void writeBasicTransformAnimator(QFile *file);
     void readBasicTransformAnimator(QFile *file);
+    QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
 protected:
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;

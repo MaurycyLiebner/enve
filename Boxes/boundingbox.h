@@ -94,7 +94,7 @@ struct BoundingBoxRenderData : public Updatable {
     qreal effectsMargin;
     int relFrame;
     QList<PixmapEffectRenderData*> pixmapEffects;
-    SkPoint drawPos;
+    SkPoint drawPos = SkPoint::Make(0.f, 0.f);
     SkBlendMode blendMode = SkBlendMode::kSrcOver;
     QRectF maxBoundsRect;
 
@@ -133,6 +133,9 @@ public:
     virtual ~BoundingBox();
 
     virtual BoundingBox *createLink();
+    virtual BoundingBox *createLinkForLinkGroup() {
+        return createLink();
+    }
 
     virtual void setFont(const QFont &) {}
     virtual void setSelectedFontSize(const qreal &) {}
@@ -207,7 +210,7 @@ public:
 
     void setPivotRelPos(const QPointF &relPos,
                         const bool &saveUndoRedo = true,
-                        const bool &pivotAutoadjust = true);
+                        const bool &pivotAutoAdjust = true);
 
     void cancelTransform();
     void scale(const qreal &scaleXBy,
@@ -539,6 +542,7 @@ public:
     virtual void writeBoundingBox(QFile *file);
     virtual void readBoundingBox(QFile *file);
     virtual void shiftAll(const int &shift);
+    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
 protected:
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
@@ -581,7 +585,7 @@ protected:
                 (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
 
     int mZListIndex = 0;
-    bool mPivotAutoadjust = false;
+    bool mPivotAutoAdjust = true;
 
     QPainter::CompositionMode mCompositionMode =
             QPainter::CompositionMode_SourceOver;

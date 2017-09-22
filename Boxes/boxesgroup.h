@@ -210,6 +210,11 @@ public:
 
         return loadIdT;
     }
+
+    const QList<QSharedPointer<BoundingBox> > &getChildBoxesList() const {
+        return mChildBoxes;
+    }
+    BoundingBox *createLink();
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

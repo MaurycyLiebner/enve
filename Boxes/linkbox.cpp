@@ -53,17 +53,9 @@ BoundingBoxRenderData *InternalLinkBox::createRenderData() {
 void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
         const int &relFrame, BoundingBoxRenderData *data) {
     mLinkTarget->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-}
-
-void InternalLinkBox::addSchedulersToProcess() {
-    mLinkTarget->addSchedulersToProcess();
-    BoundingBox::addSchedulersToProcess();
-}
-
-void InternalLinkBox::processSchedulers() {
-    mLinkTarget->processSchedulers();
-    BoundingBox::processSchedulers();
+    if(mParent->SWT_isBoxesGroup()) {
+        BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+    }
 }
 
 QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
@@ -135,6 +127,105 @@ bool InternalLinkBox::prp_differencesBetweenRelFrames(const int &relFrame1,
                                                          relFrame2LT);
     if(differences || mDurationRectangle == NULL) return differences;
     return mDurationRectangle->hasAnimationFrameRange();
+}
+
+
+InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup *linkTarget) :
+    BoxesGroup() {
+    const QList<QSharedPointer<BoundingBox> > &boxesList =
+            linkTarget->getChildBoxesList();
+    foreach(const QSharedPointer<BoundingBox> &child, boxesList) {
+        QSharedPointer<BoundingBox> newLink =
+                child->createLinkForLinkGroup()->ref<BoundingBox>();
+        addChild(newLink.data());
+    }
+    mType = TYPE_INTERNAL_LINK;
+    setLinkTarget(linkTarget);
+}
+
+bool InternalLinkGroupBox::relPointInsidePath(const QPointF &point) {
+    return mLinkTarget->relPointInsidePath(point);
+}
+
+void InternalLinkGroupBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                                        int *lastIdentical,
+                                                        const int &relFrame) {
+    int fIdLT;
+    int lIdLT;
+//    int relFrameLT = mLinkTarget->prp_absFrameToRelFrame(
+//                prp_relFrameToAbsFrame(relFrame));
+    mLinkTarget->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
+                                                      &lIdLT,
+                                                      relFrame);
+    int fId;
+    int lId;
+    if(mVisible) {
+        if(isRelFrameInVisibleDurationRect(relFrame)) {
+            Animator::prp_getFirstAndLastIdenticalRelFrame(&fId,
+                                                            &lId,
+                                                            relFrame);
+        } else {
+            if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
+                fId = mDurationRectangle->getMaxFrameAsRelFrame();
+                lId = INT_MAX;
+            } else if(relFrame < mDurationRectangle->getMinFrameAsRelFrame()) {
+                fId = INT_MIN;
+                lId = mDurationRectangle->getMinFrameAsRelFrame();
+            }
+        }
+    } else {
+        fId = INT_MIN;
+        lId = INT_MAX;
+    }
+    fId = qMax(fId, fIdLT);
+    lId = qMin(lId, lIdLT);
+    if(lId > fId) {
+        *firstIdentical = fId;
+        *lastIdentical = lId;
+    } else {
+        *firstIdentical = relFrame;
+        *lastIdentical = relFrame;
+    }
+}
+
+bool InternalLinkGroupBox::prp_differencesBetweenRelFrames(const int &relFrame1,
+                                                      const int &relFrame2) {
+    int relFrame1LT = mLinkTarget->prp_absFrameToRelFrame(
+                prp_relFrameToAbsFrame(relFrame1));
+    int relFrame2LT = mLinkTarget->prp_absFrameToRelFrame(
+                prp_relFrameToAbsFrame(relFrame2));
+    bool differences =
+            ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
+                                                             relFrame2) ||
+            mLinkTarget->prp_differencesBetweenRelFrames(relFrame1LT,
+                                                         relFrame2LT);
+    if(differences || mDurationRectangle == NULL) return differences;
+    return mDurationRectangle->hasAnimationFrameRange();
+}
+
+
+QPointF InternalLinkGroupBox::getRelCenterPosition() {
+    return mLinkTarget->getRelCenterPosition();
+}
+
+BoxesGroup *InternalLinkGroupBox::getLinkTarget() {
+    return mLinkTarget.data();
+}
+
+BoundingBox *InternalLinkGroupBox::createLink() {
+    return mLinkTarget->createLink();
+}
+
+BoundingBoxRenderData *InternalLinkGroupBox::createRenderData() {
+    BoundingBoxRenderData *renderData = mLinkTarget->createRenderData();
+    renderData->parentBox = weakRef<BoundingBox>();
+    return renderData;
+}
+
+QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
+    int absFrame = prp_relFrameToAbsFrame(relFrame);
+    int relFrameLT = mLinkTarget->prp_absFrameToRelFrame(absFrame);
+    return mLinkTarget->getRelBoundingRectAtRelFrame(relFrameLT);
 }
 
 void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {

@@ -81,6 +81,7 @@ void Canvas::emitCanvasNameChanged() {
 }
 
 BoundingBox *Canvas::createLink() {
+    return new InternalLinkGroupBox(this);
     InternalLinkCanvas *linkGroup = new InternalLinkCanvas(this);
     return linkGroup;
 }

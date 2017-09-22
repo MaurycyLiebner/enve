@@ -275,17 +275,17 @@ BoxesGroup *BoundingBox::getParent() {
 }
 
 void BoundingBox::disablePivotAutoAdjust() {
-    mPivotAutoadjust = false;
+    mPivotAutoAdjust = false;
 }
 
 void BoundingBox::enablePivotAutoAdjust() {
-    mPivotAutoadjust = true;
+    mPivotAutoAdjust = true;
 }
 
 void BoundingBox::setPivotRelPos(const QPointF &relPos,
                                  const bool &saveUndoRedo,
-                                 const bool &pivotAutoadjust) {
-    mPivotAutoadjust = pivotAutoadjust;
+                                 const bool &pivotAutoAdjust) {
+    mPivotAutoAdjust = pivotAutoAdjust;
     mTransformAnimator->
             setPivotWithoutChangingTransformation(relPos,
                                                   saveUndoRedo);//setPivot(relPos, saveUndoRedo);//setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
@@ -325,7 +325,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(mPivotAutoadjust &&
+    if(mPivotAutoAdjust &&
        !mTransformAnimator->rotOrScaleOrPivotRecording()) {
         centerPivotPosition(false);
     }
@@ -543,15 +543,18 @@ qreal BoundingBox::getEffectsMarginAtRelFrame(const int &relFrame) {
     return mEffectsAnimators->getEffectsMarginAtRelFrame(relFrame);
 }
 
+QMatrix BoundingBox::getRelativeTransformAtRelFrame(const int &relFrame) {
+    return mTransformAnimator->getTransformMatrixAtRelFrame(relFrame);
+}
+
 void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
     data->relFrame = relFrame;
     data->renderedToImage = false;
-    data->transform = mTransformAnimator->
-            getCombinedTransformMatrixAtRelFrame(relFrame);
-    data->relTransform = mTransformAnimator->
-            getTransformMatrixAtRelFrame(relFrame);
+    data->relTransform = getRelativeTransformAtRelFrame(relFrame);
+    data->transform = data->relTransform*mTransformAnimator->
+            getParentCombinedTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
     data->effectsMargin =
