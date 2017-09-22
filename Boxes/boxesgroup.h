@@ -195,12 +195,6 @@ public:
     void processSchedulers();
     void addSchedulersToProcess();
 
-    void afterAllSavesFinished() {
-        BoundingBox::afterAllSavesFinished();
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-            box->afterAllSavesFinished();
-        }
-    }
     void writeBoundingBox(QFile *file);
     void readBoundingBox(QFile *file);
     void prp_setParentFrameShift(const int &shift,
@@ -225,7 +219,6 @@ protected:
 
     //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getChildBoxIndex(BoundingBox *child);
-    void shiftAll();
 signals:
     void changeChildZSignal(int, int);
     void removeAnimatedBoundingBoxSignal(BoundingBox*);

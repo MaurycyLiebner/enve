@@ -457,12 +457,6 @@ public:
 
     virtual BoundingBoxRenderData *createRenderData() { return NULL; }
 
-    BoundingBoxRenderData *getRenderDataForRelFrame(const int &relFrame) {
-        BoundingBoxRenderData *data = createRenderData();
-        setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-        return data;
-    }
-
     BoundingBoxRenderData *getCurrentRenderData();
     qreal getEffectsMarginAtRelFrame(const int &relFrame);
 
@@ -487,21 +481,11 @@ public:
     bool isRelFrameInVisibleDurationRect(const int &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
-                                               int *lastIdentical,
-                                               const int &relFrame);
+                                              int *lastIdentical,
+                                              const int &relFrame);
     virtual void processSchedulers();
     void addScheduler(Updatable *updatable);
     virtual void addSchedulersToProcess();
-    void setBoxSaved(const bool &saved) {
-        mBoxSaved = saved;
-    }
-    const bool &wasBoxSaved() {
-        return mBoxSaved;
-    }
-
-    virtual void afterAllSavesFinished() {
-        setBoxSaved(false);
-    }
 
     const int &getLoadId() {
         return mLoadId;
@@ -556,16 +540,12 @@ public:
     virtual void readBoundingBox(QFile *file);
     virtual void shiftAll(const int &shift);
 protected:
-    bool mBoxSaved = false;
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
     bool mCustomFpsEnabled = false;
     qreal mCustomFps = 24.;
 
     virtual void updateDrawRenderContainerTransform();
-
-    bool mRenderCacheChangeNeeded = false;
-    bool mReplaceCache = false;
 
     int mLoadId = 0;
 
@@ -582,19 +562,13 @@ protected:
     virtual void updateAfterCombinedTransformationChanged() {}
     virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
 
-
     RenderContainer mDrawRenderContainer;
 
     bool mUpdateDrawOnParentBox = true;
 
     bool mRedoUpdate = false;
-    bool mLoadingScheduled = false;
 
     SkPath mSkRelBoundingRectPath;
-
-    int mUsedAsTargetCount = 0;
-
-    bool mScheduledForRemove = false;
 
     void setType(const BoundingBoxType &type) { mType = type; }
     BoundingBoxType mType;

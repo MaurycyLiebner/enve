@@ -174,7 +174,6 @@ void BoundingBox::prp_updateInfluenceRangeAfterChanged() {
 }
 
 void BoundingBox::clearAllCache() {
-    scheduleUpdate();
     prp_updateInfluenceRangeAfterChanged();
 }
 
@@ -240,11 +239,11 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
                              anim_mCurrentRelFrame <= maxDurRelFrame);
         if(mUpdateDrawOnParentBox != isInVisRange) {
             if(mUpdateDrawOnParentBox) {
-                mUpdateDrawOnParentBox = false;
                 mParent->scheduleUpdate();
             } else {
                 scheduleUpdate();
             }
+            mUpdateDrawOnParentBox = isInVisRange;
         }
     }
     if(prp_differencesBetweenRelFrames(lastRelFrame,
@@ -659,11 +658,7 @@ void BoundingBox::updateCombinedTransform() {
 }
 
 void BoundingBox::updateCombinedTransformTmp() {
-    if(mLoadingScheduled) {
-        updateDrawRenderContainerTransform();
-    } else {
-        updateCombinedTransform();
-    }
+    updateCombinedTransform();
 }
 
 BoxTransformAnimator *BoundingBox::getTransformAnimator() {

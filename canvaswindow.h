@@ -141,7 +141,6 @@ public:
     void rotate90CW();
     void processSchedulers();
     bool noBoxesAwaitUpdate();
-    void afterAllSavesFinished();
     void writeCanvases(QFile *file);
     void readCanvases(QFile *file);
 protected:

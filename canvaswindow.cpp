@@ -853,13 +853,6 @@ void CanvasWindow::nextSaveOutputFrame() {
     }
 }
 
-void CanvasWindow::afterAllSavesFinished() {
-    Q_FOREACH(const CanvasQSPtr &canvas, mCanvasList) {
-        canvas->afterAllSavesFinished();
-    }
-    BoundingBox::clearLoadedBoxes();
-}
-
 void CanvasWindow::saveOutput(const QString &renderDest,
                               const qreal &resolutionFraction) {
     mOutputString = renderDest;

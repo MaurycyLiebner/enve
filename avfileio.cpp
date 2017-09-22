@@ -1040,7 +1040,7 @@ void MainWindow::saveToFile(const QString &path) {
         file.close();
     }
 
-    mCanvasWindow->afterAllSavesFinished();
+    BoundingBox::clearLoadedBoxes();
 
     enable();
 }
