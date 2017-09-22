@@ -36,10 +36,6 @@ QPointF InternalLinkBox::getRelCenterPosition() {
     return mLinkTarget->getRelCenterPosition();
 }
 
-qreal InternalLinkBox::getEffectsMargin() {
-    return mLinkTarget->getEffectsMargin();
-}
-
 BoundingBox *InternalLinkBox::getLinkTarget() {
     return mLinkTarget.data();
 }

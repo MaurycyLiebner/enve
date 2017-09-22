@@ -372,7 +372,7 @@ bool Canvas::isSelectionEmpty() {
 
 void Canvas::ungroupSelectedBoxes() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(box->isGroup()) {
+        if(box->SWT_isBoxesGroup()) {
             ((BoxesGroup*) box)->ungroup();
         }
     }

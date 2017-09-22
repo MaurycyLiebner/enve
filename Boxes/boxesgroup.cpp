@@ -462,7 +462,7 @@ void BoxesGroup::removeChildFromList(const int &id,
     }
     mChildBoxes.removeAt(id);
 
-    if(box->isGroup()) {
+    if(box->SWT_isBoxesGroup()) {
         BoxesGroup *group = (BoxesGroup*) box;
         if(group->isCurrentGroup()) {
             mMainWindow->getCanvasWindow()->getCurrentCanvas()->

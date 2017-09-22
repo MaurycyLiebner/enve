@@ -196,7 +196,6 @@ public:
     virtual void setParent(BoxesGroup *parent);
     BoxesGroup *getParent();
 
-    bool isGroup();
     virtual BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
     virtual PaintSettings *getFillSettings();
@@ -208,7 +207,7 @@ public:
 
     void setPivotRelPos(const QPointF &relPos,
                         const bool &saveUndoRedo = true,
-                        const bool &pivotChanged = true);
+                        const bool &pivotAutoadjust = true);
 
     void cancelTransform();
     void scale(const qreal &scaleXBy,
@@ -282,11 +281,6 @@ public:
     void resetScale();
     void resetTranslation();
     void resetRotation();
-    bool isCircle();
-    bool isRect();
-    bool isText();
-    bool isInternalLink();
-    bool isExternalLink();
     BoxTransformAnimator *getTransformAnimator();
     void disablePivotAutoAdjust();
     void enablePivotAutoAdjust();
@@ -339,10 +333,6 @@ public:
     }
 
     virtual void applyCurrentTransformation() {}
-
-    virtual qreal getEffectsMargin() {
-        return mEffectsMargin;
-    }
 
     virtual Canvas *getParentCanvas();
     virtual void reloadCacheHandler() { clearAllCache(); }
@@ -589,11 +579,6 @@ protected:
     QRectF mRelBoundingRect;
     SkRect mRelBoundingRectSk;
 
-    bool mEffectsMarginUpdateNeeded = false;
-    qreal mEffectsMargin = 2.;
-
-    bool mAwaitUpdateScheduled = false;
-
     virtual void updateAfterCombinedTransformationChanged() {}
     virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
 
@@ -622,7 +607,7 @@ protected:
                 (new BoxTransformAnimator(this))->ref<BoxTransformAnimator>();
 
     int mZListIndex = 0;
-    bool mPivotChanged = false;
+    bool mPivotAutoadjust = false;
 
     QPainter::CompositionMode mCompositionMode =
             QPainter::CompositionMode_SourceOver;

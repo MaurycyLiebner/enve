@@ -53,7 +53,6 @@ public:
 
     bool relPointInsidePath(const QPointF &point);
     QPointF getRelCenterPosition();
-    qreal getEffectsMargin();
 
     BoundingBox *getLinkTarget();
 

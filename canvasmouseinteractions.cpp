@@ -419,7 +419,7 @@ void Canvas::handleLeftButtonMousePress() {
             mLastPressedPoint = partBox->getBottomRightPoint();
         } else if(mCurrentMode == CanvasMode::ADD_PARTICLE_EMITTER) {
             Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-                if(box->isParticleBox()) {
+                if(box->SWT_isParticleBox()) {
                     QPointF relPos = box->mapAbsPosToRel(mLastMouseEventPosRel);
                     if(box->getRelBoundingRectPath().contains(relPos.x(),
                                                               relPos.y())) {
@@ -553,7 +553,7 @@ void Canvas::handleMovePointMouseRelease() {
         } else {
             mLastPressedBox = mCurrentBoxesGroup->getBoxAt(
                         mCurrentMouseEventPosRel);
-            if((mLastPressedBox == NULL) ? true : mLastPressedBox->isGroup()) {
+            if((mLastPressedBox == NULL) ? true : mLastPressedBox->SWT_isBoxesGroup()) {
                 BoundingBox *pressedBox = getPathAtFromAllAncestors(
                             mCurrentMouseEventPosRel);
                 if(pressedBox == NULL) {
@@ -1094,10 +1094,10 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
                                      mCurrentBoxesGroup->getParent());
             }
         } else {
-            if(boxAt->isGroup()) {
+            if(boxAt->SWT_isBoxesGroup()) {
                 setCurrentBoxesGroup((BoxesGroup*) boxAt);
                 updateHoveredElements();
-            } else if(boxAt->isText()) {
+            } else if(boxAt->SWT_isTextBox()) {
                 releaseMouseAndDontTrack();
                 ((TextBox*) boxAt)->openTextEditor();
             } else if(mCurrentMode == MOVE_PATH) {

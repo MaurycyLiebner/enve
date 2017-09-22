@@ -124,7 +124,7 @@ bool BoundingBox::isAncestor(BoxesGroup *box) const {
 }
 
 bool BoundingBox::isAncestor(BoundingBox *box) const {
-    if(box->isGroup()) {
+    if(box->SWT_isBoxesGroup()) {
         return isAncestor((BoxesGroup*)box);
     }
     return false;
@@ -275,46 +275,18 @@ BoxesGroup *BoundingBox::getParent() {
     return mParent;
 }
 
-bool BoundingBox::isGroup() {
-    return mType == TYPE_GROUP;
-}
-
-bool BoundingBox::isCircle() {
-    return mType == TYPE_CIRCLE;
-}
-
-bool BoundingBox::isRect() {
-    return mType == TYPE_RECTANGLE;
-}
-
-bool BoundingBox::isText() {
-    return mType == TYPE_TEXT;
-}
-
-bool BoundingBox::isParticleBox() {
-    return mType == TYPE_PARTICLES;
-}
-
-bool BoundingBox::isInternalLink() {
-    return mType == TYPE_INTERNAL_LINK;
-}
-
-bool BoundingBox::isExternalLink() {
-    return mType == TYPE_EXTERNAL_LINK;
-}
-
 void BoundingBox::disablePivotAutoAdjust() {
-    mPivotChanged = true;
+    mPivotAutoadjust = false;
 }
 
 void BoundingBox::enablePivotAutoAdjust() {
-    mPivotChanged = false;
+    mPivotAutoadjust = true;
 }
 
 void BoundingBox::setPivotRelPos(const QPointF &relPos,
                                  const bool &saveUndoRedo,
-                                 const bool &pivotChanged) {
-    mPivotChanged = pivotChanged;
+                                 const bool &pivotAutoadjust) {
+    mPivotAutoadjust = pivotAutoadjust;
     mTransformAnimator->
             setPivotWithoutChangingTransformation(relPos,
                                                   saveUndoRedo);//setPivot(relPos, saveUndoRedo);//setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
@@ -354,7 +326,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
     mSkRelBoundingRectPath = SkPath();
     mSkRelBoundingRectPath.addRect(mRelBoundingRectSk);
 
-    if(!mPivotChanged &&
+    if(mPivotAutoadjust &&
        !mTransformAnimator->rotOrScaleOrPivotRecording()) {
         centerPivotPosition(false);
     }
