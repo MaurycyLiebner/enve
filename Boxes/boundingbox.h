@@ -101,7 +101,7 @@ struct BoundingBoxRenderData : public Updatable {
     QWeakPointer<BoundingBox> parentBox;
 
     virtual void updateRelBoundingRect();
-    virtual void drawRenderedImageForParent(SkCanvas *canvas);
+    void drawRenderedImageForParent(SkCanvas *canvas);
     virtual void renderToImage();
     sk_sp<SkImage> renderedImage;
 
@@ -249,7 +249,6 @@ public:
     virtual void startRotTransform();
     virtual void startScaleTransform();
     virtual void prp_setAbsFrame(const int &frame);
-    virtual QMatrix getCombinedRenderTransform();
 
     virtual void startAllPointsTransform() {}
     virtual void finishAllPointsTransform() {}
@@ -321,7 +320,6 @@ public:
         return mBlendModeSk;
     }
 
-    virtual QMatrix getCombinedFinalRenderTransform();
     virtual void updateAllBoxes();
     void selectionChangeTriggered(const bool &shiftPressed);
 

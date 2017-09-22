@@ -546,17 +546,6 @@ void Canvas::createLinkToFileWithPath(const QString &path) {
     mCurrentBoxesGroup->addChild(extLinkBox);
 }
 
-QMatrix Canvas::getCombinedRenderTransform() {
-    QMatrix matrix;
-    matrix.scale(mCanvasTransformMatrix.m11(),
-                 mCanvasTransformMatrix.m22() );
-    return matrix;
-}
-
-QMatrix Canvas::getCombinedFinalRenderTransform() {
-    return QMatrix();
-}
-
 void Canvas::schedulePivotUpdate() {
     if(mRotPivot->isRotating() || mRotPivot->isScaling()) return;
     mPivotUpdateNeeded = true;
@@ -625,7 +614,7 @@ void Canvas::updatePivot() {
     }
 }
 
-void Canvas::setCanvasMode(CanvasMode mode) {
+void Canvas::setCanvasMode(const CanvasMode &mode) {
     mCurrentMode = mode;
 
     mHoveredPoint = NULL;

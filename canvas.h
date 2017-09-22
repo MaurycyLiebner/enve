@@ -47,7 +47,7 @@ struct CanvasRenderData : public BoxesGroupRenderData {
     SkScalar canvasWidth;
     SkScalar canvasHeight;
     SkColor bgColor;
-private:
+protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
@@ -81,7 +81,7 @@ public:
                                          NodePoint *pointDest);
 
     void repaintIfNeeded();
-    void setCanvasMode(CanvasMode mode);
+    void setCanvasMode(const CanvasMode &mode);
     void startSelectionAtPoint(const QPointF &pos);
     void moveSecondSelectionPoint(const QPointF &pos);
     void setPointCtrlsMode(CtrlsMode mode);
@@ -105,8 +105,6 @@ public:
 
     void playPreview(const int &minPreviewFrameId,
                      const int &maxPreviewFrameId);
-
-    QMatrix getCombinedRenderTransform();
 
     void clearPreview();
 
@@ -192,7 +190,6 @@ public:
     qreal getResolutionFraction();
     void setResolutionFraction(const qreal &percent);
 
-    QMatrix getCombinedFinalRenderTransform();
     void renderCurrentFrameToOutput(const QString &renderDest);
 
     void applyCurrentTransformationToSelected();

@@ -36,7 +36,7 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
         relBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
     }
 
-private:
+protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 

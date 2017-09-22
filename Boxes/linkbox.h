@@ -79,6 +79,15 @@ protected:
     QSharedPointer<BoundingBox> mLinkTarget;
 };
 
+struct LinkCanvasRenderData : public CanvasRenderData {
+    LinkCanvasRenderData(BoundingBox *parentBoxT) :
+        CanvasRenderData(parentBoxT) {
+
+    }
+protected:
+    void renderToImage();
+};
+
 class InternalLinkCanvas : public InternalLinkBox {
     Q_OBJECT
 public:
@@ -114,17 +123,14 @@ public:
 
     void setupBoundingBoxRenderDataForRelFrame(
             const int &relFrame, BoundingBoxRenderData *data) {
-        ((Canvas*)mLinkTarget.data())->BoxesGroup::
+        ((Canvas*)mLinkTarget.data())->
                 setupBoundingBoxRenderDataForRelFrame(relFrame, data);
         BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-        data->transform = QMatrix();
+        //data->transform = QMatrix();
     }
 
     BoundingBoxRenderData *createRenderData() {
-        BoundingBoxRenderData *renderData =
-                ((Canvas*)mLinkTarget.data())->BoxesGroup::createRenderData();
-        renderData->parentBox = weakRef<BoundingBox>();
-        return renderData;
+        return new LinkCanvasRenderData(this);
     }
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,

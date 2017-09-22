@@ -698,16 +698,6 @@ BoxTransformAnimator *BoundingBox::getTransformAnimator() {
     return mTransformAnimator.data();
 }
 
-QMatrix BoundingBox::getCombinedRenderTransform() {
-    return mTransformAnimator->getCurrentTransformationMatrix()*
-            mParent->getCombinedRenderTransform();
-}
-
-QMatrix BoundingBox::getCombinedFinalRenderTransform() {
-    return mTransformAnimator->getCurrentTransformationMatrix()*
-            mParent->getCombinedFinalRenderTransform();
-}
-
 void BoundingBox::selectionChangeTriggered(const bool &shiftPressed) {
     Canvas *parentCanvas = getParentCanvas();
     if(shiftPressed) {

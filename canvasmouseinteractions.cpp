@@ -6,6 +6,7 @@
 #include "Boxes/rectangle.h"
 #include "Boxes/imagebox.h"
 #include "Boxes/textbox.h"
+#include "Boxes/linkbox.h"
 #include "edge.h"
 #include "nodepoint.h"
 #include "Animators/pathanimator.h"
@@ -263,9 +264,10 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                             linkCanvasMenu->actions();
                     int id = canvasActions.indexOf(selectedAction);
                     if(id >= 0) {
-                        Canvas *canvasLink =
-                                (Canvas*)listOfCanvas.at(id)->createLink();
-                        mCurrentBoxesGroup->addChild(canvasLink);
+                        QSharedPointer<InternalLinkCanvas> canvasLink =
+                                listOfCanvas.at(id)->
+                                createLink()->ref<InternalLinkCanvas>();
+                        mCurrentBoxesGroup->addChild(canvasLink.data());
                         canvasLink->centerPivotPosition();
                     }
                 }
