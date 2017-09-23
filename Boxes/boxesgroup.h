@@ -120,7 +120,7 @@ public:
                 childPath.transform(
                             QMatrixToSkMatrix(
                                 child->getTransformAnimator()->
-                                    getTransformMatrixAtRelFrame(childRelFrame)) );
+                                    getRelativeTransformAtRelFrame(childRelFrame)) );
                 boundingPaths.addPath(childPath);
             }
         }

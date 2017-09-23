@@ -718,7 +718,21 @@ void TilesData::writeTilesData(QFile *file) {
     }
 }
 
+void TilesData::writeTilesDataFromMemoryOrTmp(QFile *file) {
+    bool noDataInMemory = !mDataStoredInTmpFile && mNoDataInMemory;
+    file->write((char*)&noDataInMemory, sizeof(bool));
+    if(mNoDataInMemory) {
+        if(mDataStoredInTmpFile) {
+            file->write(mTmpFile->readAll());
+        }
+    } else {
+        writeTilesData(file);
+    }
+}
+
 void TilesData::readTilesData(QFile *file) {
+    file->read((char*)&mNoDataInMemory, sizeof(bool));
+    if(mNoDataInMemory) return;
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
             mTiles[j][i]->readTile(file);
@@ -729,7 +743,7 @@ void TilesData::readTilesData(QFile *file) {
 void Surface::writeSurface(QFile *file) {
     file->write((char*)&mWidth, sizeof(ushort));
     file->write((char*)&mHeight, sizeof(ushort));
-    mCurrentTiles->writeTilesData(file);
+    mCurrentTiles->writeTilesDataFromMemoryOrTmp(file);
 }
 
 void Surface::readSurface(QFile *file) {
@@ -741,7 +755,7 @@ void Surface::readSurface(QFile *file) {
 
 void SurfaceKey::writeSurfaceKey(QFile *file) {
     Key::writeKey(file);
-    mTiles->writeTilesData(file);
+    mTiles->writeTilesDataFromMemoryOrTmp(file);
 }
 
 void SurfaceKey::readSurfaceKey(QFile *file) {
@@ -755,7 +769,7 @@ void AnimatedSurface::writeAnimatedSurface(QFile *file) {
     int nKeys = anim_mKeys.count();
     file->write((char*)&nKeys, sizeof(int));
     if(nKeys == 0) {
-        mCurrentTiles->writeTilesData(file);
+        mCurrentTiles->writeTilesDataFromMemoryOrTmp(file);
     } else {
         foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
             ((SurfaceKey*)key.get())->writeSurfaceKey(file);

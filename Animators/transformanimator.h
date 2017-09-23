@@ -42,7 +42,7 @@ public:
     void moveRelativeToSavedValue(const qreal &dX,
                                   const qreal &dY);
     virtual QMatrix getCurrentTransformationMatrix();
-    virtual QMatrix getTransformMatrixAtRelFrame(const int &relFrame);
+    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
 
     qreal dx();
     qreal dy();
@@ -73,7 +73,7 @@ public:
 
     bool SWT_isBasicTransformAnimator() { return true; }
 
-    QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
+    virtual QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
     void writeBasicTransformAnimator(QFile *file);
     void readBasicTransformAnimator(QFile *file);
     QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
@@ -104,7 +104,9 @@ public:
     void reset(const bool &finish = false);
 
     QMatrix getCurrentTransformationMatrix();
-    QMatrix getTransformMatrixAtRelFrame(const int &relFrame);
+    QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
+    QMatrix getCombinedTransformMatrixAtRelFrame(
+                                        const int &relFrame);
 
     void setPivotWithoutChangingTransformation(const QPointF &point,
                                                const bool &saveUndoRedo = false);
@@ -142,6 +144,7 @@ public:
     void writeBoxTransformAnimator(QFile *file);
     void readBoxTransformAnimator(QFile *file);
 private:
+    BoundingBox *mParentBox;
     QSharedPointer<PointAnimator> mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;
 };

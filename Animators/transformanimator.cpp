@@ -4,6 +4,7 @@
 #include "animatorupdater.h"
 #include "qrealanimator.h"
 #include "transformanimator.h"
+#include "Boxes/boundingbox.h"
 
 BasicTransformAnimator::BasicTransformAnimator() :
     ComplexAnimator() {
@@ -133,7 +134,7 @@ QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
     return matrix;
 }
 
-QMatrix BasicTransformAnimator::getTransformMatrixAtRelFrame(
+QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrame(
                                     const int &relFrame) {
     QMatrix matrix;
 
@@ -287,6 +288,8 @@ BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     ca_addChildAnimator(mOpacityAnimator.data());
 
     prp_setBlockedUpdater(new TransUpdater(parent) );
+
+    mParentBox = parent;
 }
 
 MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
@@ -416,7 +419,7 @@ QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
     return matrix;
 }
 
-QMatrix BoxTransformAnimator::getTransformMatrixAtRelFrame(
+QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrame(
                                     const int &relFrame) {
     QMatrix matrix;
     qreal pivotX = mPivotAnimator->getXValueAtRelFrame(relFrame);
@@ -434,6 +437,20 @@ QMatrix BoxTransformAnimator::getTransformMatrixAtRelFrame(
     return matrix;
 }
 
+QMatrix BoxTransformAnimator::getCombinedTransformMatrixAtRelFrame(
+        const int &relFrame) {
+    if(mParentTransformAnimator.data() == NULL) {
+        return mParentBox->getRelativeTransformAtRelFrame(relFrame);
+    } else {
+        int absFrame = prp_relFrameToAbsFrame(relFrame);
+        int parentRelFrame =
+                mParentTransformAnimator->prp_absFrameToRelFrame(absFrame);
+        return mParentBox->getRelativeTransformAtRelFrame(relFrame)*
+                mParentTransformAnimator->
+                getCombinedTransformMatrixAtRelFrame(parentRelFrame);
+    }
+}
+
 QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrame(
         const int &relFrame) {
     if(mParentTransformAnimator.data() == NULL) {
@@ -448,14 +465,14 @@ QMatrix BasicTransformAnimator::getParentCombinedTransformMatrixAtRelFrame(
 }
 
 QMatrix BasicTransformAnimator::getCombinedTransformMatrixAtRelFrame(
-                                    const int &relFrame) {
+        const int &relFrame) {
     if(mParentTransformAnimator.data() == NULL) {
-        return getTransformMatrixAtRelFrame(relFrame);
+        return getRelativeTransformAtRelFrame(relFrame);
     } else {
         int absFrame = prp_relFrameToAbsFrame(relFrame);
         int parentRelFrame =
                 mParentTransformAnimator->prp_absFrameToRelFrame(absFrame);
-        return getTransformMatrixAtRelFrame(relFrame)*
+        return getRelativeTransformAtRelFrame(relFrame)*
                 mParentTransformAnimator->
                     getCombinedTransformMatrixAtRelFrame(parentRelFrame);
     }

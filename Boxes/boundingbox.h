@@ -542,7 +542,9 @@ public:
     virtual void writeBoundingBox(QFile *file);
     virtual void readBoundingBox(QFile *file);
     virtual void shiftAll(const int &shift);
-    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
+    virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
+        return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
+    }
 protected:
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;

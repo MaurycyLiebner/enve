@@ -471,6 +471,10 @@ public:
     void readBoundingBox(QFile *file);
     int prevRelFrameWithKey(const int &relFrame);
     int nextRelFrameWithKey(const int &relFrame);
+    QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
+        Q_UNUSED(relFrame);
+        return QMatrix();
+    }
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

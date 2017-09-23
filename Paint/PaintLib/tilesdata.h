@@ -52,6 +52,7 @@ public:
     void _writeTilesDataToTmp();
     void _readTilesDataFromTmp();
     void initializeEmptyTilesData();
+    void writeTilesDataFromMemoryOrTmp(QFile *file);
 private:
     bool mNoDataInMemory = true;
     bool mDataStoredInTmpFile = false;

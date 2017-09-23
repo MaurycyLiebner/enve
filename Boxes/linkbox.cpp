@@ -53,9 +53,7 @@ BoundingBoxRenderData *InternalLinkBox::createRenderData() {
 void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
         const int &relFrame, BoundingBoxRenderData *data) {
     mLinkTarget->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-    if(mParent->SWT_isBoxesGroup()) {
-        BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
-    }
+    BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
 }
 
 QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {

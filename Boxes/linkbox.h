@@ -72,6 +72,14 @@ public:
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
     bool SWT_isLinkBox() { return true; }
+
+    QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
+        if(mParent->SWT_isLinkBox()) {
+            return mLinkTarget->getRelativeTransformAtRelFrame(relFrame);
+        } else {
+            return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
+        }
+    }
 protected:
     QSharedPointer<BoundingBox> mLinkTarget;
 };
@@ -107,7 +115,11 @@ public:
 
     BoundingBox *createLink();
     BoundingBox *createLinkForLinkGroup() {
-        return new InternalLinkGroupBox(this);
+        if(mParent->SWT_isLinkBox()) {
+            return mLinkTarget->createLinkForLinkGroup();
+        } else {
+            return new InternalLinkGroupBox(this);
+        }
     }
 
     bool SWT_isLinkBox() { return true; }
@@ -154,8 +166,6 @@ public:
                 }
                 if(!boxRenderData->finished()) {
                     boxRenderData->addDependent(data);
-                    boxRenderData->transform =
-                            boxRenderData->relTransform*data->transform;
                 }
                 groupData->childrenRenderData <<
                         boxRenderData->ref<BoundingBoxRenderData>();

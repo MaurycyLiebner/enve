@@ -543,18 +543,13 @@ qreal BoundingBox::getEffectsMarginAtRelFrame(const int &relFrame) {
     return mEffectsAnimators->getEffectsMarginAtRelFrame(relFrame);
 }
 
-QMatrix BoundingBox::getRelativeTransformAtRelFrame(const int &relFrame) {
-    return mTransformAnimator->getTransformMatrixAtRelFrame(relFrame);
-}
-
 void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
                         const int &relFrame,
                         BoundingBoxRenderData *data) {
     data->relFrame = relFrame;
     data->renderedToImage = false;
     data->relTransform = getRelativeTransformAtRelFrame(relFrame);
-    data->transform = data->relTransform*mTransformAnimator->
-            getParentCombinedTransformMatrixAtRelFrame(relFrame);
+    data->transform = mTransformAnimator->getCombinedTransformMatrixAtRelFrame(relFrame);
     data->opacity = mTransformAnimator->getOpacityAtRelFrame(relFrame);
     data->resolution = getParentCanvas()->getResolutionFraction();
     data->effectsMargin =
