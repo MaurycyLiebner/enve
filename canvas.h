@@ -452,7 +452,7 @@ public:
     void rotateSelectedBoxesStartAndFinish(const qreal &rotBy);
     bool shouldScheduleUpdate() {
         return isVisibleAndInVisibleDurationRect() ||
-               isInVisibleDurationRect();
+               isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame);
     }
 
     void renderDataFinished(BoundingBoxRenderData *renderData);

@@ -314,7 +314,8 @@ BoundingBox *BoxesGroup::getPathAtFromAllAncestors(const QPointF &absPos) {
     //Q_FOREACHBoxInListInverted(mChildren) {
     for(int i = mChildBoxes.count() - 1; i >= 0; i--) {
         const QSharedPointer<BoundingBox> &box = mChildBoxes.at(i);
-        if(box->isVisibleAndUnlocked()) {
+        if(box->isVisibleAndUnlocked() &&
+            box->isVisibleAndInVisibleDurationRect()) {
             boxAtPos = box->getPathAtFromAllAncestors(absPos);
             if(boxAtPos != NULL) {
                 break;
@@ -388,7 +389,8 @@ BoundingBox *BoxesGroup::getBoxAt(const QPointF &absPos) {
 
     for(int i = mChildBoxes.count() - 1; i >= 0; i--) {
         const QSharedPointer<BoundingBox> &box = mChildBoxes.at(i);
-        if(box->isVisibleAndUnlocked()) {
+        if(box->isVisibleAndUnlocked() &&
+            box->isVisibleAndInVisibleDurationRect()) {
             if(box->absPointInsidePath(absPos)) {
                 boxAtPos = box.data();
                 break;
@@ -400,7 +402,8 @@ BoundingBox *BoxesGroup::getBoxAt(const QPointF &absPos) {
 
 void BoxesGroup::addContainedBoxesToSelection(const QRectF &rect) {
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-        if(box->isVisibleAndUnlocked()) {
+        if(box->isVisibleAndUnlocked() &&
+            box->isVisibleAndInVisibleDurationRect()) {
             if(box->isContainedIn(rect) ) {
                 getParentCanvas()->addBoxToSelection(box.data());
             }

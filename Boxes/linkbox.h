@@ -80,6 +80,7 @@ public:
             return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
         }
     }
+    bool isRelFrameInVisibleDurationRect(const int &relFrame);
 protected:
     QSharedPointer<BoundingBox> mLinkTarget;
 };
@@ -108,7 +109,7 @@ public:
         scheduleUpdate();
     }
 
-    bool relPointInsidePath(const QPointF &point);
+    //bool relPointInsidePath(const QPointF &point);
     QPointF getRelCenterPosition();
 
     BoxesGroup *getLinkTarget();
@@ -126,6 +127,11 @@ public:
 
     BoundingBox *createNewDuplicate() {
         return new InternalLinkGroupBox(mLinkTarget.data());
+    }
+
+    bool isRelFrameInVisibleDurationRect(const int &relFrame) {
+        return BoxesGroup::isRelFrameInVisibleDurationRect(relFrame) &&
+                mLinkTarget->isRelFrameInVisibleDurationRect(relFrame);
     }
 
     BoundingBoxRenderData *createRenderData();
@@ -207,6 +213,15 @@ public:
             mLinkTarget->processSchedulers();
         }
         BoxesGroup::processSchedulers();
+    }
+
+    int prp_getRelFrameShift() const {
+        if(mLinkTarget->SWT_isLinkBox() ||
+           (mParent == NULL ? false : mParent->SWT_isLinkBox())) {
+            return BoxesGroup::prp_getRelFrameShift() +
+                    mLinkTarget->prp_getRelFrameShift();
+        }
+        return BoxesGroup::prp_getRelFrameShift();
     }
 protected:
     QSharedPointer<BoxesGroup> mLinkTarget;

@@ -24,6 +24,9 @@ public:
 
     virtual void prp_valueChanged();
 
+    virtual int prp_getRelFrameShift() const {
+        return 0;
+    }
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 

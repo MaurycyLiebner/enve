@@ -20,7 +20,7 @@ const QString &Property::prp_getName() {
 }
 
 int Property::prp_getFrameShift() const {
-    return prp_getParentFrameShift();
+    return prp_getRelFrameShift() + prp_getParentFrameShift();
 }
 
 int Property::prp_getParentFrameShift() const {

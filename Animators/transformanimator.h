@@ -144,7 +144,7 @@ public:
     void writeBoxTransformAnimator(QFile *file);
     void readBoxTransformAnimator(QFile *file);
 private:
-    BoundingBox *mParentBox;
+    BoundingBox *mParentBox = NULL;
     QSharedPointer<PointAnimator> mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;
 };

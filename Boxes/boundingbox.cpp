@@ -232,19 +232,15 @@ void BoundingBox::resetRotation() {
 void BoundingBox::prp_setAbsFrame(const int &frame) {
     int lastRelFrame = anim_mCurrentRelFrame;
     ComplexAnimator::prp_setAbsFrame(frame);
-    if(mDurationRectangle != NULL) {
-        int minDurRelFrame = mDurationRectangle->getMinFrameAsRelFrame();
-        int maxDurRelFrame = mDurationRectangle->getMaxFrameAsRelFrame();
-        bool isInVisRange = (anim_mCurrentRelFrame >= minDurRelFrame &&
-                             anim_mCurrentRelFrame <= maxDurRelFrame);
-        if(mUpdateDrawOnParentBox != isInVisRange) {
-            if(mUpdateDrawOnParentBox) {
-                mParent->scheduleUpdate();
-            } else {
-                scheduleUpdate();
-            }
-            mUpdateDrawOnParentBox = isInVisRange;
+    bool isInVisRange = isRelFrameInVisibleDurationRect(
+                anim_mCurrentRelFrame);
+    if(mUpdateDrawOnParentBox != isInVisRange) {
+        if(mUpdateDrawOnParentBox) {
+            mParent->scheduleUpdate();
+        } else {
+            scheduleUpdate();
         }
+        mUpdateDrawOnParentBox = isInVisRange;
     }
     if(prp_differencesBetweenRelFrames(lastRelFrame,
                                        anim_mCurrentRelFrame)) {
@@ -706,15 +702,6 @@ int BoundingBox::prp_getParentFrameShift() const {
     }
 }
 
-int BoundingBox::prp_getFrameShift() const {
-    if(mDurationRectangle == NULL) {
-        return prp_getParentFrameShift();
-    } else {
-        return mDurationRectangle->getFrameShift() +
-                prp_getParentFrameShift();
-    }
-}
-
 bool BoundingBox::hasDurationRectangle() {
     return mDurationRectangle != NULL;
 }
@@ -735,6 +722,11 @@ void BoundingBox::shiftAll(const int &shift) {
     } else {
         anim_shiftAllKeys(shift);
     }
+}
+
+int BoundingBox::prp_getRelFrameShift() const {
+    if(mDurationRectangle == NULL) return 0;
+    return mDurationRectangle->getFrameShift();
 }
 
 void BoundingBox::setDurationRectangle(DurationRectangle *durationRect) {
@@ -840,14 +832,8 @@ QString BoundingBox::getName() {
     return prp_mName;
 }
 
-bool BoundingBox::isInVisibleDurationRect() {
-    if(mDurationRectangle == NULL) return true;
-    return anim_mCurrentRelFrame <= mDurationRectangle->getMaxFrameAsRelFrame() &&
-           anim_mCurrentRelFrame >= mDurationRectangle->getMinFrameAsRelFrame();
-}
-
 bool BoundingBox::isVisibleAndInVisibleDurationRect() {
-    return isInVisibleDurationRect() && mVisible;
+    return isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame) && mVisible;
 }
 
 bool BoundingBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
@@ -870,6 +856,14 @@ void BoundingBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                         firstIdentical,
                                         lastIdentical,
                                         relFrame);
+            if(mDurationRectangle != NULL) {
+                if(relFrame == mDurationRectangle->getMinFrameAsRelFrame()) {
+                    *firstIdentical = relFrame;
+                }
+                if(relFrame == mDurationRectangle->getMaxFrameAsRelFrame()) {
+                    *lastIdentical = relFrame;
+                }
+            }
         } else {
             if(relFrame > mDurationRectangle->getMaxFrameAsRelFrame()) {
                 *firstIdentical = mDurationRectangle->getMaxFrameAsRelFrame() + 1;
@@ -946,8 +940,7 @@ bool BoundingBox::isVisibleAndUnlocked() {
     return mVisible && !mLocked;
 }
 
-bool BoundingBox::isVisible()
-{
+bool BoundingBox::isVisible() {
     return mVisible;
 }
 

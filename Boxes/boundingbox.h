@@ -408,12 +408,10 @@ public:
                                     const int &minViewedFrame,
                                     const qreal &pixelsPerFrame);
 
-    int prp_getFrameShift() const;
     int prp_getParentFrameShift() const;
 
     void setDurationRectangle(DurationRectangle *durationRect);
 
-    bool isInVisibleDurationRect();
     bool isVisibleAndInVisibleDurationRect();
     void incUsedAsTarget();
     void decUsedAsTarget();
@@ -473,7 +471,7 @@ public:
     virtual bool shouldScheduleUpdate() {
         if(mParent == NULL) return false;
         if((isVisibleAndInVisibleDurationRect()) ||
-           (isInVisibleDurationRect())) {
+           (isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame))) {
             return true;
         }
         return false;
@@ -481,7 +479,7 @@ public:
 
     void updateCurrentRenderData();
     void nullifyCurrentRenderData();
-    bool isRelFrameInVisibleDurationRect(const int &relFrame);
+    virtual bool isRelFrameInVisibleDurationRect(const int &relFrame);
     bool isRelFrameVisibleAndInVisibleDurationRect(const int &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
@@ -545,6 +543,7 @@ public:
     virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
     }
+    int prp_getRelFrameShift() const;
 protected:
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;

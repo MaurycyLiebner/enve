@@ -272,6 +272,7 @@ void BasicTransformAnimator::makeDuplicate(BasicTransformAnimator *target) {
 
 BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     BasicTransformAnimator() {
+    mParentBox = parent;
     mOpacityAnimator = (new QrealAnimator)->ref<QrealAnimator>();
     mPivotAnimator = (new BoxPathPoint(parent))->ref<PointAnimator>();
     mPivotAnimator->prp_setName("pivot");
@@ -288,8 +289,6 @@ BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     ca_addChildAnimator(mOpacityAnimator.data());
 
     prp_setBlockedUpdater(new TransUpdater(parent) );
-
-    mParentBox = parent;
 }
 
 MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
