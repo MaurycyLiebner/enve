@@ -202,10 +202,6 @@ BoxesGroup *InternalLinkGroupBox::getLinkTarget() {
     return mLinkTarget.data();
 }
 
-BoundingBox *InternalLinkGroupBox::createLink() {
-    return mLinkTarget->createLink();
-}
-
 BoundingBoxRenderData *InternalLinkGroupBox::createRenderData() {
     BoundingBoxRenderData *renderData = mLinkTarget->createRenderData();
     renderData->parentBox = weakRef<BoundingBox>();
@@ -216,17 +212,9 @@ QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
     return mLinkTarget->getRelBoundingRectAtRelFrame(relFrame);
 }
 
-void InternalLinkCanvas::setClippedToCanvasSize(const bool &clipped) {
-    mClipToCanvasSize->setValue(clipped);
-    scheduleUpdate();
-}
+InternalLinkCanvas::InternalLinkCanvas(BoxesGroup *linkTarget) :
+    InternalLinkGroupBox(linkTarget) {
 
-QRectF InternalLinkCanvas::getRelBoundingRectAtRelFrame(const int &relFrame) {
-    if(mClipToCanvasSize) {
-        return mLinkTarget->getRelBoundingRectAtRelFrame(relFrame);
-    }
-    return ((Canvas*)mLinkTarget.data())->BoxesGroup::
-            getRelBoundingRectAtRelFrame(relFrame);
 }
 
 #include "PixmapEffects/fmt_filters.h"
@@ -258,7 +246,7 @@ void LinkCanvasRenderData::renderToImage() {
 
     //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
     SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
-    rasterCanvas->clear(bgColor);
+    rasterCanvas->clear(SK_ColorTRANSPARENT);
 
     rasterCanvas->translate(-allUglyBoundingRect.left(),
                             -allUglyBoundingRect.top());
@@ -266,7 +254,13 @@ void LinkCanvasRenderData::renderToImage() {
     allUglyBoundingRect.translate(-transF);
 
     rasterCanvas->translate(transF.x(), transF.y());
+
+    rasterCanvas->save();
     rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
+    SkPaint fillP;
+    fillP.setColor(bgColor);
+    rasterCanvas->drawRect(QRectFToSkRect(relBoundingRect), fillP);
+    rasterCanvas->restore();
 
     drawSk(rasterCanvas);
     rasterCanvas->flush();
@@ -288,16 +282,3 @@ void LinkCanvasRenderData::renderToImage() {
     renderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
 }
-
-//void InternalLinkCanvas::draw(QPainter *p) {
-//    p->save();
-//    if(mClipToCanvasSize) {
-//        p->setClipRect(mRelBoundingRect);
-//    }
-//    p->setTransform(QTransform(getCombinedTransform().inverted()), true);
-//    Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
-//        box->drawPixmap(p);
-//    }
-
-//    p->restore();
-//}

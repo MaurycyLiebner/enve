@@ -60,6 +60,10 @@ protected:
 
         canvas->restore();
     }
+
+    void updateRelBoundingRect() {
+        relBoundingRect = QRectF(0., 0., canvasWidth, canvasHeight);
+    }
 };
 
 class Canvas : public BoxesGroup
@@ -273,10 +277,8 @@ public:
         return matrix;
     }
 
-    QMatrix getRelativeTransform() const {
-        QMatrix matrix;
-        matrix.reset();
-        return matrix;
+    QMatrix getRelativeTransformAtCurrentFrame() {
+        return QMatrix();
     }
 
     QPointF mapAbsPosToRel(const QPointF &absPos) {

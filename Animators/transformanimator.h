@@ -61,9 +61,6 @@ public:
     void rotateRelativeToSavedValue(const qreal &rotRel,
                                     const QPointF &pivot);
 
-    QPointF mapRelPosToAbs(const QPointF &relPos) const;
-    QPointF mapAbsPosToRel(const QPointF &absPos) const;
-
     void updateRelativeTransform();
     const QMatrix &getCombinedTransform() const;
     const QMatrix &getRelativeTransform() const;
@@ -102,7 +99,6 @@ public:
 
     void resetPivot(const bool &finish = false);
     void reset(const bool &finish = false);
-
     QMatrix getCurrentTransformationMatrix();
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
     QMatrix getCombinedTransformMatrixAtRelFrame(

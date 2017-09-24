@@ -201,14 +201,6 @@ void BasicTransformAnimator::rotateRelativeToSavedValue(const qreal &rotRel,
     mPosAnimator->setCurrentPointValue(QPointF(matrix.dx(), matrix.dy()) );
 }
 
-QPointF BasicTransformAnimator::mapRelPosToAbs(const QPointF &relPos) const {
-    return mCombinedTransform.map(relPos);
-}
-
-QPointF BasicTransformAnimator::mapAbsPosToRel(const QPointF &absPos) const {
-    return mCombinedTransform.inverted().map(absPos);
-}
-
 void BasicTransformAnimator::updateRelativeTransform() {
     mRelTransform = getCurrentTransformationMatrix();
     updateCombinedTransform();

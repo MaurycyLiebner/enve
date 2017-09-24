@@ -378,7 +378,8 @@ BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
 }
 
 QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
-    return mTransformAnimator->mapAbsPosToRel(absPos);
+    return mTransformAnimator->getCombinedTransform().
+            inverted().map(absPos);
 }
 
 PaintSettings *BoundingBox::getFillSettings() {
@@ -442,8 +443,8 @@ QMatrix BoundingBox::getCombinedTransform() const {
     return mTransformAnimator->getCombinedTransform();
 }
 
-QMatrix BoundingBox::getRelativeTransform() const {
-    return mTransformAnimator->getRelativeTransform();
+QMatrix BoundingBox::getRelativeTransformAtCurrentFrame() {
+    return getRelativeTransformAtRelFrame(anim_mCurrentRelFrame);
 }
 
 void BoundingBox::applyTransformation(BoxTransformAnimator *transAnimator) {
@@ -479,7 +480,7 @@ void BoundingBox::scaleRelativeToSavedPivot(const qreal &scaleBy) {
 }
 
 QPointF BoundingBox::mapRelPosToAbs(const QPointF &relPos) const {
-    return mTransformAnimator->mapRelPosToAbs(relPos);
+    return mTransformAnimator->getCombinedTransform().map(relPos);
 }
 
 void BoundingBox::moveByAbs(const QPointF &trans) {
