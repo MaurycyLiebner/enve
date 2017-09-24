@@ -4,6 +4,7 @@
 #include "Animators/qrealanimator.h"
 #include "Animators/qpointfanimator.h"
 #include "Animators/intanimator.h"
+#include "Properties/boolproperty.h"
 #include "skiaincludes.h"
 
 enum PathEffectType : short {
@@ -46,6 +47,35 @@ public:
                                const SkPath &src, SkPath *dst);
     void writePathEffect(QFile *file);
     void readDisplacePathEffect(QFile *file);
+
+    void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
+                                              int *lastIdentical,
+                                              const int &relFrame) {
+        if(mRandomize->getValue()) {
+            *firstIdentical = relFrame;
+            *lastIdentical = relFrame;
+        } else {
+            PathEffect::prp_getFirstAndLastIdenticalRelFrame(firstIdentical,
+                                                             lastIdentical,
+                                                             relFrame);
+        }
+    }
+
+    bool prp_differencesBetweenRelFrames(const int &relFrame1,
+                                         const int &relFrame2) {
+        if(mRandomize->getValue()) {
+            return true;
+        }
+        return PathEffect::prp_differencesBetweenRelFrames(relFrame1,
+                                                           relFrame2);
+    }
+
+    void prp_setAbsFrame(const int &frame) {
+        ComplexAnimator::prp_setAbsFrame(frame);
+        if(mRandomize->getValue()) {
+            prp_callUpdater();
+        }
+    }
 private:
     QSharedPointer<QrealAnimator> mSegLength =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -53,6 +83,8 @@ private:
             (new QrealAnimator())->ref<QrealAnimator>();
     QSharedPointer<QrealAnimator> mSmoothness =
             (new QrealAnimator())->ref<QrealAnimator>();
+    QSharedPointer<BoolProperty> mRandomize =
+            (new BoolProperty())->ref<BoolProperty>();
     uint32_t mSeedAssist = 0;
 };
 

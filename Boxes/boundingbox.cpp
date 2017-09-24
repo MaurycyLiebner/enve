@@ -555,7 +555,11 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     Canvas *parentCanvas = getParentCanvas();
     data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
 
-    data->pixmapEffects.clear();
+    setupEffects(relFrame, data);
+}
+
+void BoundingBox::setupEffects(const int &relFrame,
+                               BoundingBoxRenderData *data) {
     mEffectsAnimators->addEffectRenderDataToList(relFrame,
                                                  &data->pixmapEffects);
 }
@@ -1211,6 +1215,7 @@ void BoundingBoxRenderData::renderToImage() {
         foreach(PixmapEffectRenderData *effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
+        clearPixmapEffects();
     }
 
     renderedImage = SkImage::MakeFromBitmap(bitmap);

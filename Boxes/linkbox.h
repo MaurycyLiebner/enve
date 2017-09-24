@@ -57,6 +57,10 @@ public:
 
     BoundingBox *createLink();
 
+    BoundingBox *createLinkForLinkGroup() {
+        return new InternalLinkBox(this);
+    }
+
     BoundingBox *createNewDuplicate() {
         return new InternalLinkBox(mLinkTarget.data());
     }
@@ -64,6 +68,13 @@ public:
     BoundingBoxRenderData *createRenderData();
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
+
+    qreal getEffectsMarginAtRelFrame(const int &relFrame) {
+        qreal margin = 0.;
+        margin += mLinkTarget->getEffectsMarginAtRelFrame(relFrame);
+        margin += BoundingBox::getEffectsMarginAtRelFrame(relFrame);
+        return margin;
+    }
 
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame);
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
@@ -154,6 +165,22 @@ public:
         } else {
             return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
         }
+    }
+
+    void setupEffects(const int &relFrame,
+                      BoundingBoxRenderData *data) {
+        if(mParent->SWT_isLinkBox()) {
+            mLinkTarget->setupEffects(relFrame, data);
+        } else {
+            BoundingBox::setupEffects(relFrame, data);
+        }
+    }
+
+    qreal getEffectsMarginAtRelFrame(const int &relFrame) {
+        if(mParent->SWT_isLinkBox()) {
+            return mLinkTarget->getEffectsMarginAtRelFrame(relFrame);
+        }
+        return BoxesGroup::getEffectsMarginAtRelFrame(relFrame);
     }
 
     void setupBoundingBoxRenderDataForRelFrame(
@@ -263,7 +290,16 @@ public:
                                     canvasTarget->getResolutionFraction();
         canvasData->canvasWidth = canvasTarget->getCanvasWidth()*
                                     canvasTarget->getResolutionFraction();
-        canvasData->clipToCanvas = mClipToCanvas->getValue();
+        if(mParent->SWT_isLinkBox()) {
+            canvasData->clipToCanvas =
+                    ((InternalLinkCanvas*)mLinkTarget.data())->clipToCanvas();
+        } else {
+            canvasData->clipToCanvas = mClipToCanvas->getValue();
+        }
+    }
+
+    bool clipToCanvas() {
+        return mClipToCanvas->getValue();
     }
 
     BoundingBox *createLinkForLinkGroup() {

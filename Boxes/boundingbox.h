@@ -119,6 +119,10 @@ struct BoundingBoxRenderData : public Updatable {
 
     void dataSet();
 
+    void clearPixmapEffects() {
+        pixmapEffects.clear();
+        effectsMargin = 0.;
+    }
 protected:
     bool mDataSet = false;
     virtual void drawSk(SkCanvas *canvas) = 0;
@@ -134,7 +138,13 @@ public:
 
     virtual BoundingBox *createLink();
     virtual BoundingBox *createLinkForLinkGroup() {
-        return createLink();
+        BoundingBox *box = createLink();
+        box->clearEffects();
+        return box;
+    }
+
+    void clearEffects() {
+        mEffectsAnimators->ca_removeChildAnimators();
     }
 
     virtual void setFont(const QFont &) {}
@@ -459,7 +469,7 @@ public:
     virtual BoundingBoxRenderData *createRenderData() { return NULL; }
 
     BoundingBoxRenderData *getCurrentRenderData();
-    qreal getEffectsMarginAtRelFrame(const int &relFrame);
+    virtual qreal getEffectsMarginAtRelFrame(const int &relFrame);
 
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);
@@ -544,6 +554,8 @@ public:
         return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);
     }
     int prp_getRelFrameShift() const;
+    virtual void setupEffects(const int &relFrame,
+                              BoundingBoxRenderData *data);
 protected:
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;

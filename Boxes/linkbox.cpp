@@ -281,6 +281,7 @@ void LinkCanvasRenderData::renderToImage() {
         foreach(PixmapEffectRenderData *effect, pixmapEffects) {
             effect->applyEffectsSk(bitmap, img, resolution);
         }
+        clearPixmapEffects();
     }
 
     renderedImage = SkImage::MakeFromBitmap(bitmap);

@@ -20,9 +20,12 @@ DisplacePathEffect::DisplacePathEffect() :
     mSmoothness->prp_setName("smoothness");
     mSmoothness->qra_setValueRange(0., 1.);
 
+    mRandomize->prp_setName("randomize");
+
     ca_addChildAnimator(mSegLength.data());
     ca_addChildAnimator(mMaxDev.data());
     ca_addChildAnimator(mSmoothness.data());
+    ca_addChildAnimator(mRandomize.data());
 }
 
 Property *DisplacePathEffect::makeDuplicate() {
@@ -272,6 +275,9 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 
 void DisplacePathEffect::filterPath(const SkPath &src,
                                     SkPath *dst) {
+    if(mRandomize->getValue()) {
+        mSeedAssist = qrand() % 2000;
+    }
     displaceFilterPath(dst, src,
                        mMaxDev->qra_getCurrentValue(),
                        mSegLength->qra_getCurrentValue(),
@@ -282,6 +288,9 @@ void DisplacePathEffect::filterPath(const SkPath &src,
 void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
                                                SkPath *dst) {
+    if(mRandomize->getValue()) {
+        mSeedAssist = qrand() % 2000;
+    }
     displaceFilterPath(dst, src,
                        mMaxDev->qra_getValueAtRelFrame(relFrame),
                        mSegLength->qra_getValueAtRelFrame(relFrame),
