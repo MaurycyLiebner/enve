@@ -60,7 +60,11 @@ SingleWidgetAbstraction* BoundingBox::SWT_getAbstractionForWidget(
             return abs.get();
         }
     }
-    return SWT_createAbstraction(visiblePartWidget);
+    SingleWidgetAbstraction *abs = SWT_createAbstraction(visiblePartWidget);
+    if(visiblePartWidget->getCurrentRulesCollection().rule == SWT_Selected) {
+        abs->setContentVisible(true);
+    }
+    return abs;
 }
 
 #include "linkbox.h"
