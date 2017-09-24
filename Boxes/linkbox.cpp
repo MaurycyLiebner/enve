@@ -214,7 +214,8 @@ QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
 
 InternalLinkCanvas::InternalLinkCanvas(BoxesGroup *linkTarget) :
     InternalLinkGroupBox(linkTarget) {
-
+    mClipToCanvas->prp_setName("clip to canvas");
+    ca_addChildAnimator(mClipToCanvas.data());
 }
 
 #include "PixmapEffects/fmt_filters.h"
@@ -255,12 +256,15 @@ void LinkCanvasRenderData::renderToImage() {
 
     rasterCanvas->translate(transF.x(), transF.y());
 
-    rasterCanvas->save();
-    rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
-    SkPaint fillP;
-    fillP.setColor(bgColor);
-    rasterCanvas->drawRect(QRectFToSkRect(relBoundingRect), fillP);
-    rasterCanvas->restore();
+    if(clipToCanvas) {
+        rasterCanvas->save();
+        rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
+        SkPaint fillP;
+        fillP.setAntiAlias(true);
+        fillP.setColor(bgColor);
+        rasterCanvas->drawRect(QRectFToSkRect(relBoundingRect), fillP);
+        rasterCanvas->restore();
+    }
 
     drawSk(rasterCanvas);
     rasterCanvas->flush();

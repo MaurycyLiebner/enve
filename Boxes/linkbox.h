@@ -220,6 +220,16 @@ struct LinkCanvasRenderData : public CanvasRenderData {
         CanvasRenderData(parentBoxT) {
 
     }
+
+    void updateRelBoundingRect() {
+        if(clipToCanvas) {
+            CanvasRenderData::updateRelBoundingRect();
+        } else {
+            BoxesGroupRenderData::updateRelBoundingRect();
+        }
+    }
+
+    bool clipToCanvas = false;
 protected:
     void renderToImage();
 };
@@ -245,7 +255,7 @@ public:
                                                                     data);
 
         BoxesGroup *finalTarget = getFinalTarget();
-        CanvasRenderData *canvasData = (CanvasRenderData*)data;
+        LinkCanvasRenderData *canvasData = (LinkCanvasRenderData*)data;
         Canvas *canvasTarget = (Canvas*)finalTarget;
         canvasData->bgColor = canvasTarget->getBgColorAnimator()->
                                 getColorAtRelFrame(relFrame).getSkColor();
@@ -253,6 +263,7 @@ public:
                                     canvasTarget->getResolutionFraction();
         canvasData->canvasWidth = canvasTarget->getCanvasWidth()*
                                     canvasTarget->getResolutionFraction();
+        canvasData->clipToCanvas = mClipToCanvas->getValue();
     }
 
     BoundingBox *createLinkForLinkGroup() {
@@ -266,6 +277,14 @@ public:
     BoundingBoxRenderData *createRenderData() {
         return new LinkCanvasRenderData(this);
     }
+
+    bool relPointInsidePath(const QPointF &relPos) {
+        if(mClipToCanvas->getValue()) return mRelBoundingRect.contains(relPos);
+        return InternalLinkGroupBox::relPointInsidePath(relPos);
+    }
+protected:
+    QSharedPointer<BoolProperty> mClipToCanvas =
+                (new BoolProperty())->ref<BoolProperty>();
 };
 
 #endif // LINKBOX_H
