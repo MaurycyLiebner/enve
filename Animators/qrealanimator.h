@@ -29,7 +29,7 @@ public:
     void qra_setValueRange(const qreal &minVal,
                            const qreal &maxVal);
 
-    qreal qra_getValueAtAbsFrame(const int &frame) const;
+    qreal qra_getValueAtAbsFrame(const int &frame);
     qreal qra_getCurrentValue() const;
     void qra_setCurrentValue(qreal newValue,
                              const bool &saveUndoRedo = false,
@@ -153,8 +153,8 @@ public:
     void makeDuplicate(Property *target);
     Property *makeDuplicate();
 
-    qreal getCurrentValueAtAbsFrame(const int &frame) const;
-    qreal getCurrentValueAtRelFrame(const int &frame) const;
+    qreal getCurrentValueAtAbsFrame(const int &frame);
+    qreal getCurrentValueAtRelFrame(const int &frame);
     qreal qra_getValueAtRelFrame(const int &frame) const;
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
     void anim_removeAllKeys();

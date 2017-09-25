@@ -457,6 +457,13 @@ public:
         mCustomFps = customFps;
     }
 
+    const qreal &getCustomFps() const {
+        return mCustomFps;
+    }
+
+    const bool &getCustomFpsEnabled() const {
+        return mCustomFpsEnabled;
+    }
 
     virtual void addActionsToMenu(QMenu *) {}
     virtual bool handleSelectedCanvasAction(QAction *) {
@@ -556,6 +563,13 @@ public:
     int prp_getRelFrameShift() const;
     virtual void setupEffects(const int &relFrame,
                               BoundingBoxRenderData *data);
+
+    void setCustomFps(const qreal &fps, const bool &enabled) {
+        mCustomFps = fps;
+        mCustomFpsEnabled = enabled;
+    }
+    int prp_relFrameToAbsFrame(const int &relFrame);
+    int prp_absFrameToRelFrame(const int &absFrame);
 protected:
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;

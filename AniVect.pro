@@ -192,7 +192,8 @@ SOURCES += main.cpp\
     avfileio.cpp \
     Paint/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
-    Paint/PaintLib/tilesdata.cpp
+    Paint/PaintLib/tilesdata.cpp \
+    customfpsdialog.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -344,7 +345,8 @@ HEADERS  += mainwindow.h \
     avfileio.h \
     Paint/paintboxsettingsdialog.h \
     execdelegator.h \
-    Paint/PaintLib/tilesdata.h
+    Paint/PaintLib/tilesdata.h \
+    customfpsdialog.h
 
 RESOURCES += \
     resources.qrc

@@ -103,8 +103,11 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
             break;
         }
     }
+    menu->addAction("Custom Fps...")->setObjectName("canvas_custom_fps");
 }
+
 #include "Paint/paintboxsettingsdialog.h"
+#include "customfpsdialog.h"
 bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
     if(selectedAction->objectName() == "canvas_duplicate") {
         duplicateSelectedBoxes();
@@ -183,6 +186,18 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
                     paintBox->newEmptyPaintFrameAtFrame(i);
                 }
             }
+        }
+    } else if(selectedAction->objectName() == "canvas_custom_fps") {
+        CustomFpsDialog dialog;
+        dialog.exec();
+        BoundingBox *lastBox=  mSelectedBoxes.last();
+        qreal fps = lastBox->getCustomFps();
+        bool customFps = lastBox->getCustomFpsEnabled();
+        if(dialog.result() == QDialog::Rejected) return true;
+        fps = dialog.getFps();
+        customFps = dialog.getFpsEnabled();
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            box->setCustomFps(fps, customFps);
         }
     } else {
         return false;

@@ -233,6 +233,28 @@ void BoundingBox::resetRotation() {
     mTransformAnimator->resetRotation(true);
 }
 
+int BoundingBox::prp_absFrameToRelFrame(const int &absFrame) {
+    if(absFrame == INT_MIN) return INT_MIN;
+    if(absFrame == INT_MAX) return INT_MAX;
+    if(mCustomFpsEnabled) {
+        qreal canvasFps = getParentCanvas()->getFps();
+        int relFrame = ComplexAnimator::prp_absFrameToRelFrame(absFrame);
+        return relFrame*mCustomFps/canvasFps;
+    }
+    return ComplexAnimator::prp_absFrameToRelFrame(absFrame);
+}
+
+
+int BoundingBox::prp_relFrameToAbsFrame(const int &relFrame) {
+    if(relFrame == INT_MIN) return INT_MIN;
+    if(relFrame == INT_MAX) return INT_MAX;
+    if(mCustomFpsEnabled) {
+        qreal canvasFps = getParentCanvas()->getFps();
+        return ComplexAnimator::prp_relFrameToAbsFrame(relFrame*canvasFps/mCustomFps);
+    }
+    return ComplexAnimator::prp_relFrameToAbsFrame(relFrame);
+}
+
 void BoundingBox::prp_setAbsFrame(const int &frame) {
     int lastRelFrame = anim_mCurrentRelFrame;
     ComplexAnimator::prp_setAbsFrame(frame);

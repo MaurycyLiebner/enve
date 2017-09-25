@@ -99,17 +99,17 @@ void QrealAnimator::freezeMinMaxValues() {
     mMinMaxValuesFrozen = true;
 }
 
-qreal QrealAnimator::getCurrentValueAtAbsFrame(const int &frame) const {
+qreal QrealAnimator::getCurrentValueAtAbsFrame(const int &frame) {
     if(frame == anim_mCurrentAbsFrame) return mCurrentValue;
     return qra_getValueAtAbsFrame(frame);
 }
 
-qreal QrealAnimator::getCurrentValueAtRelFrame(const int &frame) const {
+qreal QrealAnimator::getCurrentValueAtRelFrame(const int &frame) {
     if(frame == anim_mCurrentRelFrame) return mCurrentValue;
     return qra_getValueAtRelFrame(frame);
 }
 
-qreal QrealAnimator::qra_getValueAtAbsFrame(const int &frame) const {
+qreal QrealAnimator::qra_getValueAtAbsFrame(const int &frame) {
     return qra_getValueAtRelFrame(prp_absFrameToRelFrame(frame));
 }
 

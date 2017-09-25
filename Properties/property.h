@@ -30,8 +30,8 @@ public:
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 
-    int prp_absFrameToRelFrame(const int &absFrame) const;
-    int prp_relFrameToAbsFrame(const int &relFrame) const;
+    virtual int prp_absFrameToRelFrame(const int &absFrame);
+    virtual int prp_relFrameToAbsFrame(const int &relFrame);
 
     virtual void prp_drawKeys(QPainter *p,
                               const qreal &pixelsPerFrame,
