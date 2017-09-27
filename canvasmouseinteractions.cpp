@@ -86,6 +86,14 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
     pathEffectsMenu->addAction("Sum Effect")->setObjectName(
                 "canvas_path_effect_sum");
 
+    QMenu *fillPathEffectsMenu = menu->addMenu("Fill Effects");
+    fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                "canvas_fill_effects_discrete");
+    fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                "canvas_fill_effects_duplicate");
+    fillPathEffectsMenu->addAction("Sum Effect")->setObjectName(
+                "canvas_fill_effect_sum");
+
     QMenu *outlinePathEffectsMenu = menu->addMenu("Outline Effects");
     outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
                 "canvas_outline_effects_discrete");
@@ -103,7 +111,6 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
             break;
         }
     }
-    menu->addAction("Custom Fps...")->setObjectName("canvas_custom_fps");
 }
 
 #include "Paint/paintboxsettingsdialog.h"
@@ -137,12 +144,18 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDiscretePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
         applyDuplicatePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_path_effect_sum") {
+        applySumPathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_fill_effects_discrete") {
+        applyDiscreteFillPathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_fill_effects_duplicate") {
+        applyDuplicateFillPathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_fill_effect_sum") {
+        applySumFillPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_outline_effects_discrete") {
         applyDiscreteOutlinePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_outline_effects_duplicate") {
         applyDuplicateOutlinePathEffectToSelected();
-    } else if(selectedAction->objectName() == "canvas_path_effect_sum") {
-        applySumPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_new_paint_frame") {
         foreach(BoundingBox *box, mSelectedBoxes) {
             if(box->SWT_isPaintBox()) {
@@ -186,18 +199,6 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
                     paintBox->newEmptyPaintFrameAtFrame(i);
                 }
             }
-        }
-    } else if(selectedAction->objectName() == "canvas_custom_fps") {
-        CustomFpsDialog dialog;
-        dialog.exec();
-        BoundingBox *lastBox=  mSelectedBoxes.last();
-        qreal fps = lastBox->getCustomFps();
-        bool customFps = lastBox->getCustomFpsEnabled();
-        if(dialog.result() == QDialog::Rejected) return true;
-        fps = dialog.getFps();
-        customFps = dialog.getFpsEnabled();
-        foreach(BoundingBox *box, mSelectedBoxes) {
-            box->setCustomFps(fps, customFps);
         }
     } else {
         return false;

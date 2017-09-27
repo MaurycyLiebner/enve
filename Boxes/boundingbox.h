@@ -439,31 +439,8 @@ public:
                       const int &startFrame,
                       const int &endFrame);
     virtual void addPathEffect(PathEffect *) {}
+    virtual void addFillPathEffect(PathEffect *) {}
     virtual void addOutlinePathEffect(PathEffect *) {}
-
-    void setCustomFpsEnabled(const bool &bT) {
-        mCustomFpsEnabled = bT;
-    }
-
-    void enableCustomFps() {
-        setCustomFpsEnabled(true);
-    }
-
-    void disableCustomFps() {
-        setCustomFpsEnabled(false);
-    }
-
-    void setCustomFps(const qreal &customFps) {
-        mCustomFps = customFps;
-    }
-
-    const qreal &getCustomFps() const {
-        return mCustomFps;
-    }
-
-    const bool &getCustomFpsEnabled() const {
-        return mCustomFpsEnabled;
-    }
 
     virtual void addActionsToMenu(QMenu *) {}
     virtual bool handleSelectedCanvasAction(QAction *) {
@@ -564,17 +541,9 @@ public:
     virtual void setupEffects(const int &relFrame,
                               BoundingBoxRenderData *data);
 
-    void setCustomFps(const qreal &fps, const bool &enabled) {
-        mCustomFps = fps;
-        mCustomFpsEnabled = enabled;
-    }
-    int prp_relFrameToAbsFrame(const int &relFrame);
-    int prp_absFrameToRelFrame(const int &absFrame);
 protected:
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
-    bool mCustomFpsEnabled = false;
-    qreal mCustomFps = 24.;
 
     virtual void updateDrawRenderContainerTransform();
 

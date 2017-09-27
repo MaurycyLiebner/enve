@@ -87,7 +87,7 @@ void InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     int lId;
     if(mVisible) {
         if(isRelFrameInVisibleDurationRect(relFrame)) {
-            Animator::prp_getFirstAndLastIdenticalRelFrame(&fId,
+            BoundingBox::prp_getFirstAndLastIdenticalRelFrame(&fId,
                                                             &lId,
                                                             relFrame);
         } else {

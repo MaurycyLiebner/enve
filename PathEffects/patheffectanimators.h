@@ -9,6 +9,7 @@ class PathEffectAnimators : public ComplexAnimator
 {
 public:
     PathEffectAnimators(const bool &isOutline,
+                        const bool &isFill,
                         PathBox *parentPath);
     void addEffect(PathEffect *effect);
     bool hasEffects();
@@ -21,10 +22,13 @@ public:
     void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
 
-    void readPathEffectAnimators(QFile *file);
+    void readPathEffectAnimators(QFile *file, const bool &outline);
     void writePathEffectAnimators(QFile *file);
+    void filterPathForRelFrameBeforeThickness(const int &relFrame,
+                                              SkPath *srcDstPath);
 protected:
     bool mIsOutline;
+    bool mIsFill;
     PathBox *mParentPath = NULL;
 };
 

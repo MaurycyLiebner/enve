@@ -551,22 +551,23 @@ void PathEffectAnimators::writePathEffectAnimators(QFile *file) {
     }
 }
 
-void PathEffectAnimators::readPathEffectAnimators(QFile *file) {
+void PathEffectAnimators::readPathEffectAnimators(QFile *file,
+                                                  const bool &outline) {
     int nEffects;
     file->read((char*)&nEffects, sizeof(int));
     for(int i = 0; i < nEffects; i++) {
         PathEffectType typeT;
         file->read((char*)&typeT, sizeof(PathEffectType));
         if(typeT == DISPLACE_PATH_EFFECT) {
-            DisplacePathEffect *displaceEffect = new DisplacePathEffect();
+            DisplacePathEffect *displaceEffect = new DisplacePathEffect(outline);
             displaceEffect->readDisplacePathEffect(file);
             addEffect(displaceEffect);
         } else if(typeT == DUPLICATE_PATH_EFFECT) {
-            DuplicatePathEffect *duplicateEffect = new DuplicatePathEffect();
+            DuplicatePathEffect *duplicateEffect = new DuplicatePathEffect(outline);
             duplicateEffect->readDuplicatePathEffect(file);
             addEffect(duplicateEffect);
         } else if(typeT == SUM_PATH_EFFECT) {
-            SumPathEffect *sumEffect = new SumPathEffect(NULL);
+            SumPathEffect *sumEffect = new SumPathEffect(NULL, outline);
             sumEffect->readSumPathEffect(file);
             addEffect(sumEffect);
         }
@@ -576,6 +577,7 @@ void PathEffectAnimators::readPathEffectAnimators(QFile *file) {
 void PathBox::writeBoundingBox(QFile *file) {
     BoundingBox::writeBoundingBox(file);
     mPathEffectsAnimators->writePathEffectAnimators(file);
+    mFillPathEffectsAnimators->writePathEffectAnimators(file);
     mOutlinePathEffectsAnimators->writePathEffectAnimators(file);
     mFillGradientPoints->writeGradientPoints(file);
     mStrokeGradientPoints->writeGradientPoints(file);
@@ -585,8 +587,9 @@ void PathBox::writeBoundingBox(QFile *file) {
 
 void PathBox::readBoundingBox(QFile *file) {
     BoundingBox::readBoundingBox(file);
-    mPathEffectsAnimators->readPathEffectAnimators(file);
-    mOutlinePathEffectsAnimators->readPathEffectAnimators(file);
+    mPathEffectsAnimators->readPathEffectAnimators(file, false);
+    mFillPathEffectsAnimators->readPathEffectAnimators(file, false);
+    mOutlinePathEffectsAnimators->readPathEffectAnimators(file, true);
     mFillGradientPoints->readGradientPoints(file);
     mStrokeGradientPoints->readGradientPoints(file);
     mFillSettings->readPaintSettings(file);

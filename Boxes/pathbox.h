@@ -115,6 +115,7 @@ public:
     bool SWT_isPathBox() { return true; }
 
     void addPathEffect(PathEffect *effect);
+    void addFillPathEffect(PathEffect *effect);
     void addOutlinePathEffect(PathEffect *effect);
 
     void setupBoundingBoxRenderDataForRelFrame(
@@ -145,6 +146,7 @@ public:
 protected:
 
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;
+    PathEffectAnimatorsQSPtr mFillPathEffectsAnimators;
     PathEffectAnimatorsQSPtr mOutlinePathEffectsAnimators;
     GradientPointsQSPtr mFillGradientPoints;
     GradientPointsQSPtr mStrokeGradientPoints;

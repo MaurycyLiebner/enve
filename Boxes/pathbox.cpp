@@ -13,14 +13,21 @@
 PathBox::PathBox(const BoundingBoxType &type) :
     BoundingBox(type) {
     mPathEffectsAnimators =
-            (new PathEffectAnimators(false, this))->
+            (new PathEffectAnimators(false, false, this))->
             ref<PathEffectAnimators>();
     mPathEffectsAnimators->prp_setName("path effects");
     mPathEffectsAnimators->prp_setBlockedUpdater(
                 new NodePointUpdater(this));
 
+    mFillPathEffectsAnimators =
+            (new PathEffectAnimators(false, true, this))->
+            ref<PathEffectAnimators>();
+    mFillPathEffectsAnimators->prp_setName("fill effects");
+    mFillPathEffectsAnimators->prp_setBlockedUpdater(
+                new NodePointUpdater(this));
+
     mOutlinePathEffectsAnimators =
-            (new PathEffectAnimators(true, this))->
+            (new PathEffectAnimators(true, false, this))->
             ref<PathEffectAnimators>();
     mOutlinePathEffectsAnimators->prp_setName("outline effects");
     mOutlinePathEffectsAnimators->prp_setBlockedUpdater(
@@ -97,16 +104,20 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
 
     SkPath outline;
     if(mStrokeSettings->nonZeroLineWidth()) {
+        SkPath outlineBase = pathData->path;
+        mOutlinePathEffectsAnimators->filterPathForRelFrameBeforeThickness(relFrame, &outlineBase);
         SkStroke strokerSk;
         mStrokeSettings->setStrokerSettingsForRelFrameSk(relFrame, &strokerSk);
         outline = SkPath();
-        strokerSk.strokePath(pathData->path, &outline);
+        strokerSk.strokePath(outlineBase, &outline);
     } else {
         outline = SkPath();
     }
     mOutlinePathEffectsAnimators->filterPathForRelFrame(relFrame, &outline);
     pathData->outlinePath = outline;
     outline.addPath(pathData->path);
+
+    mFillPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
 
     UpdatePaintSettings *fillSettings = &pathData->paintSettings;
 
@@ -171,6 +182,18 @@ void PathBox::addPathEffect(PathEffect *effect) {
         ca_addChildAnimator(mPathEffectsAnimators.data());
     }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
+    //effect->setParentEffectAnimators(mEffectsAnimators.data());
+
+    clearAllCache();
+}
+
+void PathBox::addFillPathEffect(PathEffect *effect) {
+    //effect->setUpdater(new PixmapEffectUpdater(this));
+
+    if(!mFillPathEffectsAnimators->hasChildAnimators()) {
+        ca_addChildAnimator(mFillPathEffectsAnimators.data());
+    }
+    mFillPathEffectsAnimators->ca_addChildAnimator(effect);
     //effect->setParentEffectAnimators(mEffectsAnimators.data());
 
     clearAllCache();
@@ -301,6 +324,15 @@ void PathBox::makeDuplicate(Property *targetBox) {
                 (PathEffect*)((PathEffect*)mPathEffectsAnimators->
                     ca_getChildAt(i))->makeDuplicate() );
     }
+
+    int fillPathEffectsCount =
+            mFillPathEffectsAnimators->ca_getNumberOfChildren();
+    for(int i = 0; i < fillPathEffectsCount; i++) {
+        pathBoxTarget->addFillPathEffect(
+                (PathEffect*)((PathEffect*)mFillPathEffectsAnimators->
+                    ca_getChildAt(i))->makeDuplicate() );
+    }
+
 
     int outlineEffectsCount =
             mOutlinePathEffectsAnimators->ca_getNumberOfChildren();

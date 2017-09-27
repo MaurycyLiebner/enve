@@ -128,35 +128,57 @@ void Canvas::applyColorizeEffectToSelected() {
 void Canvas::applyDiscretePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
-        box->addPathEffect(new DisplacePathEffect());
+        box->addPathEffect(new DisplacePathEffect(false));
     }
 }
 
 void Canvas::applyDuplicatePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
-        box->addPathEffect(new DuplicatePathEffect());
-    }
-}
-
-void Canvas::applyDiscreteOutlinePathEffectToSelected() {
-    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        if(!box->SWT_isPathBox()) continue;
-        box->addOutlinePathEffect(new DisplacePathEffect());
+        box->addPathEffect(new DuplicatePathEffect(false));
     }
 }
 
 void Canvas::applySumPathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
-        box->addPathEffect(new SumPathEffect((PathBox*)box));
+        box->addPathEffect(new SumPathEffect((PathBox*)box, false));
+    }
+}
+
+void Canvas::applyDiscreteFillPathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
+        box->addFillPathEffect(new DisplacePathEffect(false));
+    }
+}
+
+void Canvas::applyDuplicateFillPathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
+        box->addFillPathEffect(new DuplicatePathEffect(false));
+    }
+}
+
+void Canvas::applySumFillPathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
+        box->addFillPathEffect(new SumPathEffect((PathBox*)box, false));
+    }
+}
+
+
+void Canvas::applyDiscreteOutlinePathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
+        box->addOutlinePathEffect(new DisplacePathEffect(true));
     }
 }
 
 void Canvas::applyDuplicateOutlinePathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;
-        box->addOutlinePathEffect(new DuplicatePathEffect());
+        box->addOutlinePathEffect(new DuplicatePathEffect(true));
     }
 }
 

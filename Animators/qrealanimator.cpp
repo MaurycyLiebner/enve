@@ -104,7 +104,7 @@ qreal QrealAnimator::getCurrentValueAtAbsFrame(const int &frame) {
     return qra_getValueAtAbsFrame(frame);
 }
 
-qreal QrealAnimator::getCurrentValueAtRelFrame(const int &frame) {
+qreal QrealAnimator::getCurrentValueAtRelFrame(const int &frame) const {
     if(frame == anim_mCurrentRelFrame) return mCurrentValue;
     return qra_getValueAtRelFrame(frame);
 }

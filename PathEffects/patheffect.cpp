@@ -1,12 +1,19 @@
 #include "patheffect.h"
 #include "pointhelpers.h"
 
-PathEffect::PathEffect(const PathEffectType &type) {
+PathEffect::PathEffect(const PathEffectType &type,
+                       const bool &outlinePathEffect) {
     mPathEffectType = type;
+    if(outlinePathEffect) {
+        mApplyBeforeThickness = (new BoolProperty())->ref<BoolProperty>();
+        mApplyBeforeThickness->prp_setName("pre-thickness");
+        ca_addChildAnimator(mApplyBeforeThickness.data());
+    }
+    mOutlineEffect = outlinePathEffect;
 }
 
-DisplacePathEffect::DisplacePathEffect() :
-    PathEffect(DISPLACE_PATH_EFFECT) {
+DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
+    PathEffect(DISPLACE_PATH_EFFECT, outlinePathEffect) {
     prp_setName("discrete effect");
 
     mSegLength->prp_setName("segment length");
@@ -22,14 +29,23 @@ DisplacePathEffect::DisplacePathEffect() :
 
     mRandomize->prp_setName("randomize");
 
+    mRandomizeStep->prp_setName("rand frame step");
+    mRandomizeStep->setIntValueRange(1, 99);
+
+    mSeed->prp_setName("seed");
+    mSeed->setIntValueRange(0, 9999);
+    mSeed->setCurrentIntValue(qrand() % 9999, false);
+
     ca_addChildAnimator(mSegLength.data());
     ca_addChildAnimator(mMaxDev.data());
     ca_addChildAnimator(mSmoothness.data());
     ca_addChildAnimator(mRandomize.data());
+    ca_addChildAnimator(mRandomizeStep.data());
+    ca_addChildAnimator(mSeed.data());
 }
 
 Property *DisplacePathEffect::makeDuplicate() {
-    DisplacePathEffect *newEffect = new DisplacePathEffect();
+    DisplacePathEffect *newEffect = new DisplacePathEffect(mOutlineEffect);
     makeDuplicate(newEffect);
     return newEffect;
 }
@@ -119,6 +135,10 @@ void getC1AndC2(const SkPoint &lastP,
     *c2 = currP + vectP;
 }
 
+float randFloat() {
+    return (float)qRandF(-1., 1.);
+}
+
 bool displaceFilterPath(SkPath* dst, const SkPath& src,
                         const SkScalar &maxDev,
                         const SkScalar &segLen,
@@ -127,11 +147,12 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
     if(segLen < 0.01) return false;
     dst->reset();
     SkPathMeasure meas(src, false);
+    qsrand(seedAssist);
 
     /* Caller may supply their own seed assist, which by default is 0 */
-    uint32_t seed = seedAssist ^ SkScalarRoundToInt(meas.getLength());
+    //uint32_t seed = seedAssist ^ SkScalarRoundToInt(meas.getLength());
 
-    LCGRandom rand(seed ^ ((seed << 16) | (seed >> 16)));
+    //LCGRandom rand(seed ^ ((seed << 16) | (seed >> 16)));
     SkScalar scale = maxDev;
     SkPoint p;
     SkVector v;
@@ -152,13 +173,13 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 }
 
                 if(meas.getPosTan(distance, &p, &v)) {
-                    Perterb(&p, v, rand.nextSScalar1() * scale);
+                    Perterb(&p, v, randFloat() /*rand.nextSScalar1()*/ * scale);
                     dst->moveTo(p);
                 }
                 while(--n >= 0) {
                     distance += delta;
                     if(meas.getPosTan(distance, &p, &v)) {
-                        Perterb(&p, v, rand.nextSScalar1() * scale);
+                        Perterb(&p, v, randFloat() /*rand.nextSScalar1()*/ * scale);
                         dst->lineTo(p);
                     }
                 }
@@ -195,20 +216,20 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 }
 
                 if(meas.getPosTan(distance, &firstP, &v)) {
-                    Perterb(&firstP, v, rand.nextSScalar1() * scale);
+                    Perterb(&firstP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
                     lastP = firstP;
                 }
 
                 if(meas.isClosed()) {
                     distance += delta;
                     if(meas.getPosTan(distance, &currP, &v)) {
-                        Perterb(&currP, v, rand.nextSScalar1() * scale);
+                        Perterb(&currP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
                         n--;
                         secondP = currP;
                     }
                     distance += delta;
                     if(meas.getPosTan(distance, &nextP, &v)) {
-                        Perterb(&nextP, v, rand.nextSScalar1() * scale);
+                        Perterb(&nextP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
                         n--;
                         thirdP = nextP;
 
@@ -228,7 +249,7 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
                 while(--n >= 0) {
                     distance += delta;
                     if(meas.getPosTan(distance, &nextP, &v)) {
-                        Perterb(&nextP, v, rand.nextSScalar1() * scale);
+                        Perterb(&nextP, v, randFloat() /*rand.nextSScalar1()*/ * scale);
                         getC1AndC2(lastP, currP, nextP,
                                    &c1, &c2, smoothLen);
 
@@ -275,8 +296,10 @@ bool displaceFilterPath(SkPath* dst, const SkPath& src,
 
 void DisplacePathEffect::filterPath(const SkPath &src,
                                     SkPath *dst) {
+    qsrand(mSeed->getCurrentIntValue());
+    mSeedAssist = qrand() % 999999;
     if(mRandomize->getValue()) {
-        mSeedAssist = qrand() % 2000;
+        mSeedAssist += anim_mCurrentRelFrame / mRandomizeStep->getCurrentIntValue();
     }
     displaceFilterPath(dst, src,
                        mMaxDev->qra_getCurrentValue(),
@@ -288,8 +311,10 @@ void DisplacePathEffect::filterPath(const SkPath &src,
 void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                const SkPath &src,
                                                SkPath *dst) {
+    qsrand(mSeed->getCurrentIntValue());
+    mSeedAssist = qrand() % 999999;
     if(mRandomize->getValue()) {
-        mSeedAssist = qrand() % 2000;
+        mSeedAssist += relFrame / mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
     }
     displaceFilterPath(dst, src,
                        mMaxDev->qra_getValueAtRelFrame(relFrame),
@@ -298,8 +323,9 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                        mSeedAssist);
 }
 
-DuplicatePathEffect::DuplicatePathEffect() :
-    PathEffect(DUPLICATE_PATH_EFFECT) {
+DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :
+    PathEffect(DUPLICATE_PATH_EFFECT, outlinePathEffect) {
+
     prp_setName("duplicate effect");
 
     mTranslation->prp_setName("translation");
@@ -309,7 +335,7 @@ DuplicatePathEffect::DuplicatePathEffect() :
 }
 
 Property *DuplicatePathEffect::makeDuplicate() {
-    DuplicatePathEffect *newEffect = new DuplicatePathEffect();
+    DuplicatePathEffect *newEffect = new DuplicatePathEffect(mOutlineEffect);
     makeDuplicate(newEffect);
     return newEffect;
 }
@@ -342,8 +368,9 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
 }
 #include "pathoperations.h"
 #include "skqtconversions.h"
-SumPathEffect::SumPathEffect(PathBox *parentPath) :
-    PathEffect(SUM_PATH_EFFECT) {
+SumPathEffect::SumPathEffect(PathBox *parentPath,
+                             const bool &outlinePathEffect) :
+    PathEffect(SUM_PATH_EFFECT, outlinePathEffect) {
     prp_setName("path sum effect");
     mParentPathBox = parentPath;
     ca_addChildAnimator(mBoxTarget.data());

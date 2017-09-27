@@ -477,6 +477,9 @@ public:
         Q_UNUSED(relFrame);
         return QMatrix();
     }
+    void applyDiscreteFillPathEffectToSelected();
+    void applyDuplicateFillPathEffectToSelected();
+    void applySumFillPathEffectToSelected();
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;
