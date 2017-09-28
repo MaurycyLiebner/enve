@@ -17,8 +17,6 @@ public:
 
     virtual bool freeThis() = 0;
 
-    void thisAccessed();
-
     virtual int getByteCount() = 0;
 
     virtual void setBlocked(const bool &bT) {
@@ -35,11 +33,11 @@ public:
 
     void setParentCacheHandler(CacheHandler *handler);
     bool freeThis();
-    void setBlocked(const bool &bT) {
-        if(bT) {
-            if(mNoDataInMemory) {
-                loadFromTmpFile();
-            }
+    void setBlocked(const bool &bT);
+
+    void neededInMemory() {
+        if(mNoDataInMemory) {
+            loadFromTmpFile();
         }
     }
 

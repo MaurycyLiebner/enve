@@ -323,7 +323,7 @@ public:
     void removeEffect(PixmapEffect *effect);
 
     void setBlendModeSk(const SkBlendMode &blendMode);
-    const SkBlendMode &getBlendMode() {
+    virtual const SkBlendMode &getBlendMode() {
         return mBlendModeSk;
     }
 

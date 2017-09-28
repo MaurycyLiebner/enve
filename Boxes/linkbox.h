@@ -69,6 +69,13 @@ public:
     void setupBoundingBoxRenderDataForRelFrame(const int &relFrame,
                                                BoundingBoxRenderData *data);
 
+    const SkBlendMode &getBlendMode() {
+        if(mParent->SWT_isLinkBox()) {
+            return mLinkTarget->getBlendMode();
+        }
+        return BoundingBox::getBlendMode();
+    }
+
     qreal getEffectsMarginAtRelFrame(const int &relFrame) {
         qreal margin = 0.;
         margin += mLinkTarget->getEffectsMarginAtRelFrame(relFrame);
@@ -181,6 +188,13 @@ public:
             return mLinkTarget->getEffectsMarginAtRelFrame(relFrame);
         }
         return BoxesGroup::getEffectsMarginAtRelFrame(relFrame);
+    }
+
+    const SkBlendMode &getBlendMode() {
+        if(mParent->SWT_isLinkBox()) {
+            return mLinkTarget->getBlendMode();
+        }
+        return BoundingBox::getBlendMode();
     }
 
     void setupBoundingBoxRenderDataForRelFrame(

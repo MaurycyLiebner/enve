@@ -32,7 +32,6 @@ protected:
 private:
     SingleSound *mSound = NULL;
     QString mSrcFilePath;
-    int getImageAtFrame(const char *path, const int &frameId);
 };
 
 #endif // VIDEOBOX_H

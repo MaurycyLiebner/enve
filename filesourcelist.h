@@ -93,6 +93,10 @@ public:
     }
 
     void showContextMenu(const QPoint &globalPos);
+
+    int getCacheListCount() {
+        return mCacheList.count();
+    }
 protected:
     QList<FileCacheHandlerAbstraction*> mSelectedList;
     QList<FileCacheHandlerAbstraction*> mCacheList;

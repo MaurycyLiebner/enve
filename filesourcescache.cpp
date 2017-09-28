@@ -93,7 +93,7 @@ FileCacheHandler::FileCacheHandler(const QString &filePath,
     mVisibleInListWidgets = visibleInListWidgets;
     mFileHandlerRef = ref<FileCacheHandler>();
     mFilePath = filePath;
-    FileSourcesCache::addHandlerToListWidgets(this);
+    FileSourcesCache::addHandlerToHandlersList(this);
     if(visibleInListWidgets) {
         FileSourcesCache::addHandlerToListWidgets(this);
     }
@@ -159,6 +159,7 @@ VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     CacheContainer *cont = mFramesCache.getRenderContainerAtRelFrame(relFrame);
     if(cont == NULL) return sk_sp<SkImage>();
+    cont->neededInMemory();
     return cont->getImageSk();
 }
 

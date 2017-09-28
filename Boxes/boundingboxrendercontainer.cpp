@@ -68,17 +68,13 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mPaintTransform.scale(1./mResolutionFraction,
                           1./mResolutionFraction);
     mSrcRenderData = data->ref<BoundingBoxRenderData>();
-    thisAccessed();
+    MemoryHandler::getInstance()->containerUpdated(this);
 }
 
 MinimalCacheContainer::MinimalCacheContainer(const bool &addToMemortyHandler) {
     if(addToMemortyHandler) {
         MemoryHandler::getInstance()->addContainer(this);
     }
-}
-
-void MinimalCacheContainer::thisAccessed() {
-    MemoryHandler::getInstance()->containerUpdated(this);
 }
 
 MinimalCacheContainer::~MinimalCacheContainer() {
@@ -107,8 +103,17 @@ bool CacheContainer::freeThis() {
     saveToTmpFile();
     mImageSk.reset();
     mNoDataInMemory = true;
-    //mParentCacheHandler->removeRenderContainer(this);
     return true;
+}
+
+void CacheContainer::setBlocked(const bool &bT) {
+    mBlocked = bT;
+    if(bT) {
+        MemoryHandler::getInstance()->removeContainer(this);
+        neededInMemory();
+    } else {
+        MemoryHandler::getInstance()->addContainer(this);
+    }
 }
 
 const int &CacheContainer::getMinRelFrame() const {
@@ -164,6 +169,9 @@ void CacheContainer::loadFromTmpFile() {
         mImageSk = SkImage::MakeFromBitmap(btmp);
 
         mTmpFile->close();
+    }
+    if(!mBlocked) {
+        MemoryHandler::getInstance()->addContainer(this);
     }
 }
 

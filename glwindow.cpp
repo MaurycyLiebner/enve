@@ -237,6 +237,7 @@ bool GLWindow::event(QEvent *event) {
     switch (event->type()) {
     case QEvent::UpdateRequest:
         renderNow();
+        //QWindow::event(event);
         return true;
     default:
         if(isExposed()) requestUpdate();

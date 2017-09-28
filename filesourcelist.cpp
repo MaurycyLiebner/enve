@@ -116,8 +116,9 @@ FileSourceListScrollWidget::FileSourceListScrollWidget(ScrollArea *parent) :
 }
 
 void FileSourceListScrollWidget::updateHeight() {
-    setFixedHeight((FileSourcesCache::getFileCacheListCount() + 0.5) *
-                   MIN_WIDGET_HEIGHT);
+    FileSourceListVisibleWidget *visWid =
+            ((FileSourceListVisibleWidget*)mMinimalVisiblePartWidget);
+    setFixedHeight((visWid->getCacheListCount() + 0.5) * MIN_WIDGET_HEIGHT);
 }
 
 void FileSourceListScrollWidget::createVisiblePartWidget() {
@@ -230,8 +231,7 @@ FileSourceList::FileSourceList(QWidget *parent) : ScrollArea(parent) {
     connect(this, SIGNAL(widthChanged(int)),
             mScrollWidget, SLOT(setWidth(int)));
 
-    verticalScrollBar()->setSingleStep(
-                MIN_WIDGET_HEIGHT);
+    verticalScrollBar()->setSingleStep(MIN_WIDGET_HEIGHT);
     setAcceptDrops(true);
 }
 
@@ -256,7 +256,6 @@ void FileSourceList::dragEnterEvent(QDragEnterEvent *event) {
         event->acceptProposedAction();
     }
 }
-
 
 void FileCacheHandlerAbstraction::setSelected(const bool &bT) {
     if(bT == selected) return;

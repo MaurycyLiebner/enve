@@ -583,13 +583,13 @@ void Canvas::duplicateSelectedBoxes() {
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) return;
     BoxesGroup *newGroup = new BoxesGroup();
+    mCurrentBoxesGroup->addChild(newGroup);
     BoundingBox *box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
         box->removeFromParent();
         newGroup->addChild(box);
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
-    mCurrentBoxesGroup->addChild(newGroup);
     addBoxToSelection(newGroup);
 }
 

@@ -479,7 +479,9 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
         cont = mCacheHandler.createNewRenderContainerAtRelFrame(fId);
     }
     cont->replaceImageSk(renderData->renderedImage);
-    setCurrentPreviewContainer(cont);
+    if(mRendering || !mPreviewing) {
+        setCurrentPreviewContainer(cont);
+    }
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,

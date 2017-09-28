@@ -555,6 +555,7 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
     data->resolution = getParentCanvas()->getResolutionFraction();
     data->effectsMargin =
             getEffectsMarginAtRelFrame(relFrame)*data->resolution + 2.;
+    data->blendMode = getBlendMode();
 
     Canvas *parentCanvas = getParentCanvas();
     data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
@@ -1160,6 +1161,19 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
     SkPaint paint;
     paint.setAlpha(qRound(opacity*2.55));
     paint.setBlendMode(blendMode);
+    if(blendMode == SkBlendMode::kDstIn ||
+       blendMode == SkBlendMode::kSrcIn ||
+       blendMode == SkBlendMode::kDstATop) {
+        SkPaint paintT;
+        paintT.setBlendMode(blendMode);
+        paintT.setColor(SK_ColorTRANSPARENT);
+        SkPath path;
+        path.addRect(SkRect::MakeXYWH(drawPos.x(), drawPos.y(),
+                                      renderedImage->width(),
+                                      renderedImage->height()));
+        path.toggleInverseFillType();
+        canvas->drawPath(path, paintT);
+    }
     canvas->drawImage(renderedImage,
                       drawPos.x(), drawPos.y(),
                       &paint);

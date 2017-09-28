@@ -814,6 +814,7 @@ void CanvasWindow::playPreview() {
     mPreviewFPSTimer->setInterval(1000/mCurrentCanvas->getFps());
     mPreviewFPSTimer->start();
     MainWindow::getInstance()->previewBeingPlayed();
+    requestUpdate();
 }
 
 void CanvasWindow::nextPreviewRenderFrame() {
