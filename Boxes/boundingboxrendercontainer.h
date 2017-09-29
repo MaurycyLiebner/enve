@@ -11,7 +11,7 @@ struct BoundingBoxRenderData;
 
 class MinimalCacheContainer : public StdSelfRef {
 public:
-    MinimalCacheContainer(const bool &addToMemortyHandler = true);
+    MinimalCacheContainer(const bool &addToMemoryHandler = true);
 
     virtual ~MinimalCacheContainer();
 
@@ -22,7 +22,16 @@ public:
     virtual void setBlocked(const bool &bT) {
         mBlocked = bT;
     }
+
+    void setHandledByMemoryHanlder(const bool &bT) {
+        mHandledByMemoryHandler = bT;
+    }
+
+    const bool &handledByMemoryHandler() {
+        return mHandledByMemoryHandler;
+    }
 protected:
+    bool mHandledByMemoryHandler = false;
     bool mBlocked = false;
 };
 

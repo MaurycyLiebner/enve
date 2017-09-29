@@ -124,6 +124,7 @@ struct BoundingBoxRenderData : public Updatable {
         effectsMargin = 0.;
     }
 protected:
+    bool mDelayDataSet = false;
     bool mDataSet = false;
     virtual void drawSk(SkCanvas *canvas) = 0;
 };

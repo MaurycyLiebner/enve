@@ -88,6 +88,22 @@ public:
     SkPath getPathAtRelFrame(const int &relFrame);
     void writeBoundingBox(QFile *file);
     void readBoundingBox(QFile *file);
+
+    qreal getXRadiusAtRelFrame(const int &relFrame) {
+        return mHorizontalRadiusPoint->getXValueAtRelFrame(relFrame);
+    }
+
+    qreal getYRadiusAtRelFrame(const int &relFrame) {
+        return mVerticalRadiusPoint->getYValueAtRelFrame(relFrame);
+    }
+
+    qreal getCurrentXRadius() {
+        return mHorizontalRadiusPoint->getXValue();
+    }
+
+    qreal getCurrentYRadius() {
+        return mVerticalRadiusPoint->getYValue();
+    }
 protected:
     CircleCenterPoint *mCenter;
     CircleRadiusPoint *mHorizontalRadiusPoint;

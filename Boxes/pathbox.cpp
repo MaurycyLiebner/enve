@@ -98,7 +98,8 @@ void PathBox::setupBoundingBoxRenderDataForRelFrame(
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame,
                                                        data);
     PathBoxRenderData *pathData = (PathBoxRenderData*)data;
-    pathData->path = getPathAtRelFrame(relFrame);
+    pathData->editPath = getPathAtRelFrame(relFrame);
+    pathData->path = pathData->editPath;
     mPathEffectsAnimators->filterPathForRelFrame(relFrame, &pathData->path);
     //prp_thisRelFrameToParentRelFrame(relFrame);
 
@@ -172,7 +173,7 @@ MovablePoint *PathBox::getPointAtAbsPos(const QPointF &absPtPos,
 void PathBox::drawBoundingRectSk(SkCanvas *canvas,
                                  const qreal &invScale) {
     BoundingBox::drawBoundingRectSk(canvas, invScale);
-    drawAsBoundingRectSk(canvas, mPathSk, invScale, false);
+    drawAsBoundingRectSk(canvas, mEditPathSk, invScale, false);
 }
 
 void PathBox::addPathEffect(PathEffect *effect) {
@@ -365,10 +366,19 @@ void PathBox::setFillColorMode(const ColorMode &colorMode) {
 void PathBox::setStrokeColorMode(const ColorMode &colorMode) {
     mFillSettings->getColorAnimator()->setColorMode(colorMode);
 }
-
+#include "circle.h"
 VectorPath *PathBox::objectToPath() {
     VectorPath *newPath = new VectorPath();
-    newPath->loadPathFromSkPath(mPathSk);
+    if(SWT_isCircle()) {
+        QPainterPath pathT;
+        Circle *circleT = (Circle*)this;
+        pathT.addEllipse(QPointF(0., 0.),
+                         circleT->getCurrentXRadius(),
+                         circleT->getCurrentYRadius());
+        newPath->loadPathFromSkPath(QPainterPathToSkPath(pathT));
+    } else {
+        newPath->loadPathFromSkPath(mPathSk);
+    }
     newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
     newPath->duplicatePaintSettingsFrom(mFillSettings.data(),
                                         mStrokeSettings.data());
@@ -447,6 +457,7 @@ void PathBox::updateCurrentPreviewDataFromRenderData(
         BoundingBoxRenderData *renderData) {
     PathBoxRenderData *pathRenderData =
             ((PathBoxRenderData*)renderData);
+    mEditPathSk = pathRenderData->editPath;
     mPathSk = pathRenderData->path;
     mOutlinePathSk = pathRenderData->outlinePath;
     BoundingBox::updateCurrentPreviewDataFromRenderData(renderData);

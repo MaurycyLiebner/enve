@@ -8,7 +8,8 @@ class ImageCacheHandler;
 struct ImageBoxRenderData : public BoundingBoxRenderData {
     ImageBoxRenderData(FileCacheHandler *cacheHandler,
                        BoundingBox *parentBoxT) :
-        BoundingBoxRenderData(parentBoxT){
+        BoundingBoxRenderData(parentBoxT) {
+        mDelayDataSet = true;
         srcCacheHandler = cacheHandler;
     }
 

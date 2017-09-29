@@ -71,8 +71,8 @@ void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     MemoryHandler::getInstance()->containerUpdated(this);
 }
 
-MinimalCacheContainer::MinimalCacheContainer(const bool &addToMemortyHandler) {
-    if(addToMemortyHandler) {
+MinimalCacheContainer::MinimalCacheContainer(const bool &addToMemoryHandler) {
+    if(addToMemoryHandler) {
         MemoryHandler::getInstance()->addContainer(this);
     }
 }

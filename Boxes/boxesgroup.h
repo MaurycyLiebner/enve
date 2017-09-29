@@ -16,7 +16,7 @@ class VectorPathEdge;
 struct BoxesGroupRenderData : public BoundingBoxRenderData {
     BoxesGroupRenderData(BoundingBox *parentBoxT) :
         BoundingBoxRenderData(parentBoxT) {
-
+        mDelayDataSet = true;
     }
     QList<std::shared_ptr<BoundingBoxRenderData> > childrenRenderData;
 

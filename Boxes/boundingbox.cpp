@@ -1275,7 +1275,9 @@ void BoundingBoxRenderData::schedulerProccessed() {
                     this);
     }
     mDataSet = false;
-    dataSet();
+    if(!mDelayDataSet) {
+        dataSet();
+    }
     Updatable::schedulerProccessed();
 }
 

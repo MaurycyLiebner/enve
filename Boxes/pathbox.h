@@ -15,6 +15,7 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
 
     }
 
+    SkPath editPath;
     SkPath path;
     SkPath outlinePath;
     UpdatePaintSettings paintSettings;
@@ -156,7 +157,7 @@ protected:
     QSharedPointer<StrokeSettings> mStrokeSettings =
             (new StrokeSettings)->ref<StrokeSettings>();
 
-
+    SkPath mEditPathSk;
     SkPath mPathSk;
     SkPath mOutlinePathSk;
     void updateWholePathSk();
