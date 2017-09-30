@@ -76,15 +76,16 @@ void QrealPoint::draw(QPainter *p, const QColor &paintColor) {
                         mRadius);
 
     p->setBrush(paintColor);
-    if(isSelected()) {
-        drawCosmeticEllipse(p, center,
-                            mRadius - 1.,
-                            mRadius - 1.);
-    } else {
+    if(!isSelected()) {
+        p->setBrush(paintColor.lighter());
+    }/* else {
         drawCosmeticEllipse(p, center,
                             mRadius*0.5 - 1.,
                             mRadius*0.5 - 1.);
-    }
+    }*/
+    drawCosmeticEllipse(p, center,
+                        mRadius - 1.,
+                        mRadius - 1.);
 }
 
 void QrealPoint::setSelected(const bool &bT) {

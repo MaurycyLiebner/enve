@@ -3,7 +3,7 @@
 #include "pointhelpers.h"
 
 BoxPathPoint::BoxPathPoint(BoundingBox *box) :
-    PointAnimator(box, TYPE_PATH_POINT, 7.) {
+    PointAnimator(box, TYPE_PIVOT_POINT, 7.) {
 }
 
 void BoxPathPoint::startTransform() {
@@ -19,7 +19,7 @@ void BoxPathPoint::finishTransform() {
 
 void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
     QPointF absPos = mSavedAbsPos + absTranslatione;
-    mParent->setPivotAbsPos(absPos, false, true);
+    mParent->setPivotAbsPos(absPos, false, false);
 }
 
 void BoxPathPoint::drawSk(SkCanvas *canvas,

@@ -278,7 +278,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     QPainter p(this);
 
     if(mGraphViewed) {
-        p.fillRect(rect(), QColor(30, 30, 30));
+        p.fillRect(rect(), QColor(60, 60, 60));
     } else {
         p.fillRect(rect(), QColor(60, 60, 60));
     }
@@ -336,7 +336,7 @@ void KeysView::paintEvent(QPaintEvent *) {
     minFrame = minFrame - minFrame%iInc - 1;
     maxFrame += floor((width() - 40. - xT)/mPixelsPerFrame) - maxFrame%iInc;
     for(int i = minFrame; i <= maxFrame; i += iInc) {
-        qreal xTT = xT + (i - mMinViewedFrame)*mPixelsPerFrame;
+        qreal xTT = xT + (i - mMinViewedFrame + 1)*mPixelsPerFrame;
         p.drawLine(QPointF(xTT, 0.), QPointF(xTT, height()) );
     }
 

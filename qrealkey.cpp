@@ -324,10 +324,22 @@ void QrealKey::drawGraphKey(QPainter *p,
                             const QColor &paintColor) {
     if(isSelected()) {
         p->save();
-        QPen pen = QPen(Qt::black, 2., Qt::DotLine);
+        QPen pen = QPen(Qt::black, 1.5);
         pen.setCosmetic(true);
+
+        QPen pen2 = QPen(Qt::white, .75);
+        pen2.setCosmetic(true);
         p->setPen(pen);
         QPointF thisPos = QPointF(mRelFrame, mValue);
+        if(mStartEnabled) {
+            p->drawLine(thisPos,
+                        QPointF(mStartFrame, mStartValue));
+        }
+        if(mEndEnabled) {
+            p->drawLine(thisPos,
+                        QPointF(mEndFrame, mEndValue));
+        }
+        p->setPen(pen2);
         if(mStartEnabled) {
             p->drawLine(thisPos,
                         QPointF(mStartFrame, mStartValue));
@@ -365,6 +377,7 @@ void QrealKey::setRelFrame(const int &frame) {
 }
 
 bool QrealKey::differsFromKey(Key *key) {
+    if(key == this) return false;
     QrealKey *qa_key = (QrealKey*)key;
     if(qa_key->getValue() == mValue) {
         if(key->getRelFrame() > mRelFrame) {

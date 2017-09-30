@@ -1032,7 +1032,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
                 mHoveredPoint == NULL &&
                 mHoveredEdge == NULL) ||
                (mCurrentMode == CanvasMode::MOVE_PATH &&
-                mHoveredBox == NULL)) {
+                mHoveredBox == NULL && mHoveredPoint == NULL)) {
                 startSelectionAtPoint(mLastMouseEventPosRel);
             }
         }

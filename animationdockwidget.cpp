@@ -89,10 +89,11 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
 //    mButtonsLayout->addWidget(mNoSideCtrlButton);
 
     setLayout(mButtonsLayout);
+
+    setStyleSheet("border-top: 1px solid black");
 }
 
-void AnimationDockWidget::paintEvent(QPaintEvent *)
-{
+void AnimationDockWidget::paintEvent(QPaintEvent *) {
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);

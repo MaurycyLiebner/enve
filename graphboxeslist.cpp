@@ -551,12 +551,14 @@ void KeysView::graphWheelEvent(QWheelEvent *event) {
     update();
 }
 
-bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event)
-{
+bool KeysView::graphProcessFilteredKeyEvent(QKeyEvent *event) {
     if(!hasFocus() ) return false;
     if(event->key() == Qt::Key_Delete) {
         graphDeletePressed();
         mMainWindow->callUpdateSchedulers();
+    } else if(event->key() == Qt::Key_0 &&
+              event->modifiers() & Qt::KeypadModifier) {
+        graphResetValueScaleAndMinShownAction();
     } else {
         return false;
     }
