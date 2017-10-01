@@ -434,6 +434,12 @@ void BoxesGroup::addChildToListAt(const int &index,
     child->prp_setAbsFrame(anim_mCurrentAbsFrame);
 
     child->prp_updateInfluenceRangeAfterChanged();
+
+    foreach(BoundingBox *box, mLinkingBoxes) {
+        ((InternalLinkGroupBox*)box)->addChildToListAt(index,
+                                                       child->createLinkForLinkGroup(),
+                                                       false);
+    }
 }
 
 void BoxesGroup::updateChildrenId(const int &firstId,
@@ -482,6 +488,10 @@ void BoxesGroup::removeChildFromList(const int &id,
     updateChildrenId(id, saveUndoRedo);
 
     SWT_removeChildAbstractionForTargetFromAll(box);
+
+    foreach(BoundingBox *box, mLinkingBoxes) {
+        ((InternalLinkGroupBox*)box)->removeChildFromList(id, false);
+    }
 }
 
 int BoxesGroup::getChildBoxIndex(BoundingBox *child) {

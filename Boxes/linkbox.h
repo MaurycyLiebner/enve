@@ -30,10 +30,14 @@ class InternalLinkBox : public BoundingBox {
     Q_OBJECT
 public:
     InternalLinkBox(BoundingBox *linkTarget);
+    ~InternalLinkBox() {
+        setLinkTarget(NULL);
+    }
 
     void setLinkTarget(BoundingBox *linkTarget) {
         if(mLinkTarget != NULL) {
             disconnect(mLinkTarget.data(), 0, this, 0);
+            mLinkTarget->removeLinkingBox(this);
         }
         if(linkTarget == NULL) {
             setName("empty link");
@@ -42,8 +46,7 @@ public:
         } else {
             setName(linkTarget->getName() + " link");
             mLinkTarget = linkTarget->ref<BoundingBox>();
-//            connect(linkTarget, SIGNAL(scheduledUpdate()),
-//                    this, SLOT(scheduleUpdate()));
+            mLinkTarget->addLinkingBox(this);
             connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }
@@ -107,10 +110,14 @@ class InternalLinkGroupBox : public BoxesGroup {
     Q_OBJECT
 public:
     InternalLinkGroupBox(BoxesGroup *linkTarget);
+    ~InternalLinkGroupBox() {
+        setLinkTarget(NULL);
+    }
 
     void setLinkTarget(BoxesGroup *linkTarget) {
         if(mLinkTarget != NULL) {
             disconnect(mLinkTarget.data(), 0, this, 0);
+            mLinkTarget->removeLinkingBox(this);
         }
         if(linkTarget == NULL) {
             setName("empty link");
@@ -119,8 +126,7 @@ public:
         } else {
             setName(linkTarget->getName() + " link");
             mLinkTarget = linkTarget->ref<BoxesGroup>();
-//            connect(linkTarget, SIGNAL(scheduledUpdate()),
-//                    this, SLOT(scheduleUpdate()));
+            mLinkTarget->addLinkingBox(this);
             connect(linkTarget, SIGNAL(prp_absFrameRangeChanged(int,int)),
                     this, SLOT(prp_updateAfterChangedRelFrameRange(int,int)));
         }

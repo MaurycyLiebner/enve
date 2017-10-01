@@ -926,10 +926,19 @@ void BoundingBox::setVisibile(const bool &visible,
 
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Visible);
     SWT_scheduleWidgetsContentUpdateWithRule(SWT_Invisible);
+    foreach(BoundingBox *box, mLinkingBoxes) {
+        if(box->isParentLinkBox()) {
+            box->setVisibile(visible, false);
+        }
+    }
 }
 
 void BoundingBox::switchVisible() {
     setVisibile(!mVisible);
+}
+
+bool BoundingBox::isParentLinkBox() {
+    return mParent->SWT_isLinkBox();
 }
 
 void BoundingBox::switchLocked() {
@@ -947,7 +956,7 @@ void BoundingBox::show()
 }
 
 bool BoundingBox::isVisibleAndUnlocked() {
-    return mVisible && !mLocked;
+    return isVisible() && !mLocked;
 }
 
 bool BoundingBox::isVisible() {

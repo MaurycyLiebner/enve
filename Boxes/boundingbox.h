@@ -246,7 +246,7 @@ public:
     void setVisibile(const bool &visible,
                      const bool &saveUndoRedo = true);
     void switchVisible();
-
+    bool isParentLinkBox();
     void lock();
     void unlock();
     void setLocked(const bool &bt);
@@ -542,7 +542,19 @@ public:
     virtual void setupEffects(const int &relFrame,
                               BoundingBoxRenderData *data);
 
+    void addLinkingBox(BoundingBox *box) {
+        mLinkingBoxes << box;
+    }
+
+    void removeLinkingBox(BoundingBox *box) {
+        mLinkingBoxes.removeOne(box);
+    }
+
+    const QList<BoundingBox*> &getLinkingBoxes() const {
+        return mLinkingBoxes;
+    }
 protected:
+    QList<BoundingBox*> mLinkingBoxes;
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
 

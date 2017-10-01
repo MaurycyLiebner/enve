@@ -267,6 +267,19 @@ void LinkCanvasRenderData::renderToImage() {
     }
 
     drawSk(rasterCanvas);
+    if(clipToCanvas) {
+        rasterCanvas->save();
+        rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
+        SkPaint paintT;
+        paintT.setBlendMode(SkBlendMode::kDstIn);
+        paintT.setColor(SK_ColorTRANSPARENT);
+        paintT.setAntiAlias(true);
+        SkPath path;
+        path.addRect(QRectFToSkRect(relBoundingRect));
+        path.toggleInverseFillType();
+        rasterCanvas->drawPath(path, paintT);
+        rasterCanvas->restore();
+    }
     rasterCanvas->flush();
     delete rasterCanvas;
 
