@@ -15,10 +15,6 @@ Key::~Key() {
 
 bool Key::isSelected() { return mIsSelected; }
 
-void Key::copyToContainer(KeysClipboardContainer *container) {
-    container->copyKeyToContainer(this);
-}
-
 void Key::removeFromAnimator() {
     if(mParentAnimator == NULL) return;
     mParentAnimator->anim_removeKey(this);

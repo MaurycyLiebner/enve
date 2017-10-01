@@ -123,8 +123,8 @@ public:
                                const qreal &s_t,
                                const qreal &v_t);
     void clearTiles(Tile ***tiles);
-    void writeSurface(QFile *file);
-    void readSurface(QFile *file);
+    void writeSurface(QIODevice *target);
+    void readSurface(QIODevice *target);
 
     void duplicateTilesContentFrom(Tile ***tilesSrc);
 

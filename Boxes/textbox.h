@@ -45,8 +45,8 @@ public:
     void setCurrentTextValue(const QString &text,
                              const bool &saveUndoRedo = true);
 
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
 private:
     QStringAnimatorQSPtr mText;
     QFont mFont;

@@ -22,8 +22,8 @@ public:
     TilesData *getTilesData() { return mTiles.get(); }
     void setTiles(TilesData *tiles) { mTiles = tiles->ref<TilesData>(); }
     bool differsFromKey(Key *key) { return key != this; }
-    void writeSurfaceKey(QFile *file);
-    void readSurfaceKey(QFile *file);
+    void writeKey(QIODevice *target);
+    void readKey(QIODevice *target);
     void duplicateTilesContentFrom(Tile ***tilesSrc) {
         mTiles->duplicateTilesContentFrom(tilesSrc);
     }
@@ -63,8 +63,8 @@ public:
                                 const bool &saveUndoRedo = true,
                                 const bool &finish = true);
 
-    void writeAnimatedSurface(QFile *file);
-    void readAnimatedSurface(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
     void currentDataModified();
     bool SWT_isAnimatedSurface() { return true; }
     void anim_saveCurrentValueAsKey();
@@ -79,6 +79,7 @@ public:
     void setOverlapFrames(const int &overlapFrames) {
         mOverlapFrames = overlapFrames;
     }
+    Key *readKey(QIODevice *target);
 protected:
     PaintBox *mParentBox = NULL;
 

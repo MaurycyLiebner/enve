@@ -22,8 +22,8 @@ public:
     void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
 
-    void readPathEffectAnimators(QFile *file, const bool &outline);
-    void writePathEffectAnimators(QFile *file);
+    void readProperty(QIODevice *target, const bool &outline);
+    void writeProperty(QIODevice *target);
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath);
 protected:

@@ -8,11 +8,12 @@ class KeysView;
 class Key;
 class KeyCloner;
 class Animator;
+class Property;
 
 enum  ClipboardContainerType : short {
     CCT_BOXES,
     CCT_KEYS,
-    CCT_ANIMATOR,
+    CCT_PROPERTY,
     CCT_COUNT
 };
 
@@ -22,7 +23,11 @@ public:
     virtual ~ClipboardContainer() {}
 
     ClipboardContainerType getType();
+    QByteArray *getBytesArray() {
+        return &mData;
+    }
 private:
+    QByteArray mData;
     ClipboardContainerType mType;
 };
 
@@ -43,25 +48,31 @@ public:
     KeysClipboardContainer();
     ~KeysClipboardContainer();
 
-    void copyKeyToContainer(Key *key);
-
     void paste(const int &pasteFrame,
                KeysView *keysView);
+
+    void addTargetAnimator(Animator *anim);
 private:
-    QList<KeyCloner*> mKeyClonersList;
-    QList<Animator*> mTargetAnimators;
+    QList<QWeakPointer<Animator> > mTargetAnimators;
 };
 
-class AnimatorClipboardContainer : public ClipboardContainer {
+class PropertyClipboardContainer : public ClipboardContainer {
 public:
-    AnimatorClipboardContainer();
-    ~AnimatorClipboardContainer();
+    PropertyClipboardContainer();
+    ~PropertyClipboardContainer();
 
-    void setAnimator(QrealAnimator *animator);
+    void paste(Property *targetProperty);
 
-    void paste(QrealAnimator *target);
+    bool propertyCompatible(Property *target);
+    void setProperty(Property *property);
 private:
-    QrealAnimator *mAnimator;
+    bool mQrealAnimator = false;
+    bool mQPointFAnimator = false;
+    bool mQStringAnimator = false;
+    bool mPathAnimator = false;
+    bool mAnimatedSurface = false;
+    bool mComplexAnimator = false;
+    QString mPropertyName;
 };
 
 #endif // CLIPBOARDCONTAINER_H

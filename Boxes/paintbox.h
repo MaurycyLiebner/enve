@@ -88,8 +88,8 @@ public:
     void startAllPointsTransform();
 
     void newPaintFrameOnCurrentFrame();
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
     void newEmptyPaintFrameOnCurrentFrame();
     bool prp_differencesBetweenRelFrames(const int &relFrame1,
                                          const int &relFrame2);

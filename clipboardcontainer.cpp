@@ -23,9 +23,10 @@ void BoxesClipboardContainer::copyBoxToContainer(BoundingBox *box) {
 }
 
 void BoxesClipboardContainer::pasteTo(BoxesGroup *parent) {
-    Q_FOREACH(BoundingBox *box, mBoxesList) {
-        parent->addChild(box->createDuplicate());
-    }
+    QBuffer target(getBytesArray());
+    target.open(QIODevice::ReadOnly);
+    parent->readChildBoxes(&target);
+    target.close();
 }
 
 KeysClipboardContainer::KeysClipboardContainer() :
@@ -34,42 +35,47 @@ KeysClipboardContainer::KeysClipboardContainer() :
 }
 
 KeysClipboardContainer::~KeysClipboardContainer() {
-    Q_FOREACH(KeyCloner *keyCloner, mKeyClonersList) {
-        delete keyCloner;
-    }
-}
 
-void KeysClipboardContainer::copyKeyToContainer(Key *key) {
-    mKeyClonersList << key->createNewKeyCloner();
-    mTargetAnimators << key->getParentAnimator();
 }
 
 #include "keysview.h"
 void KeysClipboardContainer::paste(const int &pasteFrame,
                                    KeysView *keysView) {
-    int firstKeyFrame = 1000000;
-    Q_FOREACH(KeyCloner *keyCloner, mKeyClonersList) {
-        if(keyCloner->getAbsFrame() < firstKeyFrame) {
-            firstKeyFrame = keyCloner->getAbsFrame();
-        }
-    }
-    int dFrame = pasteFrame - firstKeyFrame;
-
-    QList<Animator*> animators;
-    Q_FOREACH(Animator *animator, mTargetAnimators) {
-        if(animators.contains(animator)) continue;
-        animators << animator;
-    }
-
     keysView->clearKeySelection();
 
-    int count = mKeyClonersList.count();
-    for(int i = 0; i < count; i++) {
-        KeyCloner *keyCloner = mKeyClonersList.at(i);
-        Animator *animator = mTargetAnimators.at(i);
-        keyCloner->shiftKeyFrame(dFrame);
-        Key *newKey = keyCloner->createKeyForAnimator(animator);
-        keysView->addKeyToSelection(newKey);
+    int firstKeyFrame = 1000000;
+    QBuffer target(getBytesArray());
+    target.open(QIODevice::ReadOnly);
+    QList<Key*> keys;
+    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
+        Animator *animator = animatorT.data();
+        Key *keyT = animator->readKey(&target);
+        if(animator == NULL) {
+            keyT->ref<Key>();
+            continue;
+        }
+        if(keyT->getAbsFrame() < firstKeyFrame) {
+            firstKeyFrame = keyT->getAbsFrame();
+        }
+        keys << keyT;
+    }
+    target.close();
+    int dFrame = pasteFrame - firstKeyFrame;
+
+    int keyId = 0;
+    QList<Animator*> animators;
+
+    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
+        Animator *animator = animatorT.data();
+        if(animator == NULL) {
+            continue;
+        }
+        Key *keyT = keys.at(keyId);
+        keyT->setRelFrame(keyT->getRelFrame() + dFrame);
+        animator->anim_appendKey(keyT);
+        keyId++;
+        if(animators.contains(animator)) continue;
+        animators << animator;
     }
 
     Q_FOREACH(Animator *animator, animators) {
@@ -77,24 +83,65 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     }
 }
 
-AnimatorClipboardContainer::AnimatorClipboardContainer() :
-    ClipboardContainer(CCT_ANIMATOR) {
+void KeysClipboardContainer::addTargetAnimator(Animator *anim) {
+    mTargetAnimators << anim->weakRef<Animator>();
+}
+
+PropertyClipboardContainer::PropertyClipboardContainer() :
+    ClipboardContainer(CCT_PROPERTY) {
 
 }
 
-AnimatorClipboardContainer::~AnimatorClipboardContainer() {
+PropertyClipboardContainer::~PropertyClipboardContainer() {
 }
 
-void AnimatorClipboardContainer::setAnimator(QrealAnimator *animator) {
-    mAnimator = animator;
-}
-
-void AnimatorClipboardContainer::paste(QrealAnimator *target) {
-    QString nameT = target->prp_getName();
-    if(nameT == mAnimator->prp_getName() ||
-       !(target->anim_isComplexAnimator() ||
-         mAnimator->anim_isComplexAnimator())) {
-        mAnimator->makeDuplicate(target);
-        target->prp_setName(nameT);
+void PropertyClipboardContainer::paste(Property *targetProperty) {
+    QBuffer target(getBytesArray());
+    target.open(QIODevice::ReadOnly);
+    if(propertyCompatible(targetProperty)) {
+        if(targetProperty->SWT_isAnimator()) {
+            ((Animator*)targetProperty)->anim_removeAllKeys();
+        }
+        targetProperty->readProperty(&target);
+        targetProperty->prp_callUpdater();
+        targetProperty->prp_callFinishUpdater();
     }
+    target.close();
+}
+
+bool PropertyClipboardContainer::propertyCompatible(Property *target) {
+    QString nameT = target->prp_getName();
+    if(mQrealAnimator) {
+        return target->SWT_isQrealAnimator();
+    }
+    if(mQPointFAnimator) {
+        return target->SWT_isQPointFAnimator();
+    }
+    if(mQStringAnimator) {
+        return target->SWT_isQStringAnimator();
+    }
+    if(mPathAnimator) {
+        return target->SWT_isVectorPathAnimator();
+    }
+    if(mAnimatedSurface) {
+        return target->SWT_isAnimatedSurface();
+    }
+    if(mComplexAnimator) {
+        return target->SWT_isComplexAnimator() &&
+                nameT == mPropertyName;
+    }
+    return false;
+}
+
+void PropertyClipboardContainer::setProperty(Property *property) {
+    QBuffer targetBuff(getBytesArray());
+    targetBuff.open(QIODevice::WriteOnly);
+    property->writeProperty(&targetBuff);
+    targetBuff.close();
+    mQrealAnimator = property->SWT_isQrealAnimator();
+    mQPointFAnimator = property->SWT_isQPointFAnimator();
+    mQStringAnimator = property->SWT_isQStringAnimator();
+    mPathAnimator = property->SWT_isPathAnimator();
+    mAnimatedSurface = property->SWT_isAnimatedSurface();
+    mComplexAnimator = property->SWT_isComplexAnimator();
 }

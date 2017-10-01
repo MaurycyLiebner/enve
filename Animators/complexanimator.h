@@ -108,7 +108,6 @@ public:
 
     void startFrameTransform();
     void finishFrameTransform();
-    void copyToContainer(KeysClipboardContainer *container);
     void cancelFrameTransform();
     //void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame, const qreal &scaleFactor);
     //QrealKey *makeQrealKeyDuplicate(QrealAnimator *targetParent);

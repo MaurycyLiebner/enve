@@ -469,8 +469,8 @@ public:
 
     void tabletEvent(QTabletEvent *e, const QPointF &absPos);
     QRectF getRelBoundingRectAtRelFrame(const int &);
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
     int prevRelFrameWithKey(const int &relFrame);
     int nextRelFrameWithKey(const int &relFrame);
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {

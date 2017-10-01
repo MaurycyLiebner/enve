@@ -88,8 +88,8 @@ public:
     }
 
     virtual bool hasAnimationFrameRange() { return false; }
-    void writeDurationRectangle(QFile *file);
-    void readDurationRectangle(QFile *file);
+    void writeDurationRectangle(QIODevice *target);
+    void readDurationRectangle(QIODevice *target);
 signals:
     void minFrameChangedBy(int);
     void maxFrameChangedBy(int);

@@ -195,8 +195,8 @@ public:
     void processSchedulers();
     void addSchedulersToProcess();
 
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
     void prp_setParentFrameShift(const int &shift,
                                  ComplexAnimator *parentAnimator);
     void shiftAll(const int &shift);
@@ -215,6 +215,7 @@ public:
         return mChildBoxes;
     }
     BoundingBox *createLink();
+    void readChildBoxes(QIODevice *target);
 protected:
     static bool mCtrlsAlwaysVisible;
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;

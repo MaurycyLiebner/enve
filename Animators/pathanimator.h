@@ -59,8 +59,8 @@ public:
     void selectAllPoints(Canvas *canvas);
     bool SWT_isPathAnimator();
     SkPath getPathAtRelFrame(const int &relFrame);
-    void readPathAnimator(QFile *file);
-    void writePathAnimator(QFile *file);
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice *target);
 private:
     BoundingBox *mParentBox = NULL;
     QList<VectorPathAnimator*> mSinglePaths;

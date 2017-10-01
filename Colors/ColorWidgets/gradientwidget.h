@@ -60,8 +60,8 @@ public:
 
     void clearGradientsLoadIds();
     void setGradientLoadIds();
-    void writeGradients(QFile *file);
-    void readGradients(QFile *file);
+    void writeGradients(QIODevice *target);
+    void readGradients(QIODevice *target);
 signals:
     void selectedColorChanged(ColorAnimator*);
     void currentGradientChanged(Gradient *gradient);

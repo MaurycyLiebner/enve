@@ -113,6 +113,10 @@ public:
 
     int prp_nextRelFrameWithKey(const int &relFrame);
     int prp_prevRelFrameWithKey(const int &relFrame);
+    virtual Key *readKey(QIODevice *target) {
+        Q_UNUSED(target);
+        return NULL;
+    }
 protected:
     int anim_getKeyIndex(Key *key);
 

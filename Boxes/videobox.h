@@ -25,8 +25,8 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                               const int &relFrame);
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
 protected:
     void updateFrameCount(const char *path);
 private:

@@ -52,8 +52,8 @@ public:
     void setBottomRightPos(const QPointF &pos);
     void setYRadius(const qreal &radiusY);
     void setXRadius(const qreal &radiusX);
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
 protected:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;

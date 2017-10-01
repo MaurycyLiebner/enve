@@ -27,7 +27,7 @@ public:
     virtual void filterPathForRelFrame(const int &,
                                        const SkPath &,
                                        SkPath *) = 0;
-    virtual void writePathEffect(QFile *file);
+    virtual void writeProperty(QIODevice *target);
     bool applyBeforeThickness() {
         if(mApplyBeforeThickness == NULL) return false;
         return mApplyBeforeThickness->getValue();
@@ -53,8 +53,8 @@ public:
     void filterPath(const SkPath &src, SkPath *dst);
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
-    void writePathEffect(QFile *file);
-    void readDisplacePathEffect(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
@@ -119,8 +119,8 @@ public:
 
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
-    void writePathEffect(QFile *file);
-    void readDuplicatePathEffect(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
     QSharedPointer<QPointFAnimator> mTranslation =
             (new QPointFAnimator())->ref<QPointFAnimator>();
@@ -143,8 +143,8 @@ public:
     void filterPathForRelFrame(const int &relFrame,
                                const SkPath &src, SkPath *dst);
 
-    void writePathEffect(QFile *file);
-    void readSumPathEffect(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
     PathBox *mParentPathBox;
     QSharedPointer<BoxTargetProperty> mBoxTarget =

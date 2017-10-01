@@ -34,8 +34,8 @@ public:
                  const ushort &height_t);
 
     Tile ***getData();
-    void writeTilesData(QFile *file);
-    void readTilesData(QFile *file);
+    void writeTilesData(QIODevice *target);
+    void readTilesData(QIODevice *target);
 
     void setCurrentlyUsed(const bool &used);
 
@@ -52,7 +52,7 @@ public:
     void _writeTilesDataToTmp();
     void _readTilesDataFromTmp();
     void initializeEmptyTilesData();
-    void writeTilesDataFromMemoryOrTmp(QFile *file);
+    void writeTilesDataFromMemoryOrTmp(QIODevice *target);
 private:
     bool mNoDataInMemory = true;
     bool mDataStoredInTmpFile = false;

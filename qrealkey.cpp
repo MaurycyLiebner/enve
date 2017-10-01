@@ -52,10 +52,6 @@ QrealKey *QrealKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
     return target;
 }
 
-void QrealKey::copyToContainer(KeysClipboardContainer *container) {
-    container->copyKeyToContainer(this);
-}
-
 void QrealKey::constrainEndCtrlMaxFrame(const int &maxFrame) {
     if(mEndFrame < maxFrame || !mEndEnabled) return;
     qreal newFrame = clamp(mEndFrame, mRelFrame, maxFrame);

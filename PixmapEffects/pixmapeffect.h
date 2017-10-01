@@ -103,7 +103,7 @@ public:
     bool SWT_isPixmapEffect() { return true; }
 
 
-    virtual void writePixmapEffect(QFile *file);
+    virtual void writeProperty(QIODevice *target);
 public slots:
     void interrupt() {
         mInterrupted = true;
@@ -140,8 +140,8 @@ public:
 
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
-    void readBlurEffect(QFile *file);
-    void writePixmapEffect(QFile *file);
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice *target);
 private:
     QSharedPointer<BoolProperty> mHighQuality =
             (new BoolProperty())->ref<BoolProperty>();

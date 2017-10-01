@@ -13,8 +13,8 @@ public:
     Property *makeDuplicate();
 
     bool SWT_isBoolProperty() { return true; }
-    void writeBoolProperty(QFile *file);
-    void readBoolProperty(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 public slots:
     void setValue(const bool &value);
 private:

@@ -41,20 +41,20 @@
 #define CREATOR_VERSION "0.1a"
 #define CREATOR_APPLICATION "AniVect"
 
-void writeQString(QFile *file,
+void writeQString(QIODevice *target,
                  const QString &strToWrite) {
     int nChars = strToWrite.length();
-    file->write((char*)&nChars, sizeof(int));
-    file->write((char*)strToWrite.utf16(), nChars*sizeof(ushort));
+    target->write((char*)&nChars, sizeof(int));
+    target->write((char*)strToWrite.utf16(), nChars*sizeof(ushort));
 }
 
-void readQString(QFile *file,
+void readQString(QIODevice *target,
                 QString *targetStr) {
     int nChars;
-    file->read((char*)&nChars, sizeof(int));
+    target->read((char*)&nChars, sizeof(int));
     ushort *chars = new ushort[nChars];
 
-    file->read((char*)chars, nChars*sizeof(ushort));
+    target->read((char*)chars, nChars*sizeof(ushort));
     *targetStr = QString::fromUtf16(chars, nChars);
     delete[] chars;
 }
@@ -76,442 +76,449 @@ struct FileFooter {
         return NonCompatible;
     }
 
-    void write(QFile *file) {
-        file->write((char*)this, sizeof(FileFooter));
+    void write(QIODevice *target) {
+        target->write((char*)this, sizeof(FileFooter));
     }
 
-    void read(QFile *file) {
-        file->seek(file->size() - sizeof(FileFooter));
-        file->read((char*)this, sizeof(FileFooter));
-        file->seek(0);
+    void read(QIODevice *target) {
+        target->seek(target->size() - sizeof(FileFooter));
+        target->read((char*)this, sizeof(FileFooter));
+        target->seek(0);
     }
 
 
 };
 
-void BoolProperty::writeBoolProperty(QFile *file) {
-    file->write((char*)&mValue, sizeof(bool));
+void BoolProperty::writeProperty(QIODevice *target) {
+    target->write((char*)&mValue, sizeof(bool));
 }
 
-void BoolProperty::readBoolProperty(QFile *file) {
-    file->read((char*)&mValue, sizeof(bool));
+void BoolProperty::readProperty(QIODevice *target) {
+    target->read((char*)&mValue, sizeof(bool));
 }
 
-void Key::writeKey(QFile *file) {
-    file->write((char*)&mRelFrame, sizeof(int));
+void Key::writeKey(QIODevice *target) {
+    target->write((char*)&mRelFrame, sizeof(int));
 }
 
-void Key::readKey(QFile *file) {
-    file->read((char*)&mRelFrame, sizeof(int));
+void Key::readKey(QIODevice *target) {
+    target->read((char*)&mRelFrame, sizeof(int));
 }
 
-void PathContainer::writePathContainer(QFile *file) {
+void PathContainer::writePathContainer(QIODevice *target) {
     int nPts = mElementsPos.count();
-    file->write((char*)&nPts, sizeof(int)); // number pts
+    target->write((char*)&nPts, sizeof(int)); // number pts
     foreach(const SkPoint &pos, mElementsPos) {
         SkScalar xT, yT;
         xT = pos.x(); yT = pos.y();
-        file->write((char*)&xT, sizeof(SkScalar));
-        file->write((char*)&yT, sizeof(SkScalar));
+        target->write((char*)&xT, sizeof(SkScalar));
+        target->write((char*)&yT, sizeof(SkScalar));
     }
-    file->write((char*)&mPathClosed, sizeof(bool));
+    target->write((char*)&mPathClosed, sizeof(bool));
 }
 
-void PathContainer::readPathContainer(QFile *file) {
+void PathContainer::readPathContainer(QIODevice *target) {
     int nPts;
-    file->read((char*)&nPts, sizeof(int));
+    target->read((char*)&nPts, sizeof(int));
     for(int i = 0; i < nPts; i++) {
         SkScalar xT, yT;
-        file->read((char*)&xT, sizeof(SkScalar));
-        file->read((char*)&yT, sizeof(SkScalar));
+        target->read((char*)&xT, sizeof(SkScalar));
+        target->read((char*)&yT, sizeof(SkScalar));
         mElementsPos.append(SkPoint::Make(xT, yT));
     }
-    file->read((char*)&mPathClosed, sizeof(bool));
+    target->read((char*)&mPathClosed, sizeof(bool));
     mPathUpdateNeeded = true;
 }
 
-void PathKey::writePathKey(QFile *file) {
-    writeKey(file);
-    writePathContainer(file);
+void PathKey::writeKey(QIODevice *target) {
+    Key::writeKey(target);
+    writePathContainer(target);
 }
 
-void PathKey::readPathKey(QFile *file) {
-    readKey(file);
-    readPathContainer(file);
+void PathKey::readKey(QIODevice *target) {
+    Key::readKey(target);
+    readPathContainer(target);
 }
 
-void VectorPathAnimator::writeVectorPathAnimator(QFile *file) {
+void VectorPathAnimator::writeProperty(QIODevice *target) {
     int nNodes = mNodeSettings.count();
-    file->write((char*)&nNodes, sizeof(int));
+    target->write((char*)&nNodes, sizeof(int));
     foreach(NodeSettings *nodeSettings, mNodeSettings) {
-        file->write((char*)&nodeSettings->ctrlsMode, sizeof(CtrlsMode));
-        file->write((char*)&nodeSettings->startEnabled, sizeof(bool));
-        file->write((char*)&nodeSettings->endEnabled, sizeof(bool));
+        target->write((char*)&nodeSettings->ctrlsMode, sizeof(CtrlsMode));
+        target->write((char*)&nodeSettings->startEnabled, sizeof(bool));
+        target->write((char*)&nodeSettings->endEnabled, sizeof(bool));
     }
 
     int nKeys = anim_mKeys.count();
-    file->write((char*)&nKeys, sizeof(int));
+    target->write((char*)&nKeys, sizeof(int));
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((PathKey*)key.get())->writePathKey(file);
+        ((PathKey*)key.get())->writeKey(target);
     }
 
-    writePathContainer(file);
+    writePathContainer(target);
 }
 
-void VectorPathAnimator::readVectorPathAnimator(QFile *file) {
+Key *VectorPathAnimator::readKey(QIODevice *target) {
+    PathKey *newKey = new PathKey(this);
+
+    newKey->readKey(target);
+    return newKey;
+}
+
+void VectorPathAnimator::readProperty(QIODevice *target) {
     int nNodes;
-    file->read((char*)&nNodes, sizeof(int));
+    target->read((char*)&nNodes, sizeof(int));
     for(int i = 0; i < nNodes; i++) {
         NodeSettings nodeSettings;
-        file->read((char*)&nodeSettings.ctrlsMode, sizeof(CtrlsMode));
-        file->read((char*)&nodeSettings.startEnabled, sizeof(bool));
-        file->read((char*)&nodeSettings.endEnabled, sizeof(bool));
+        target->read((char*)&nodeSettings.ctrlsMode, sizeof(CtrlsMode));
+        target->read((char*)&nodeSettings.startEnabled, sizeof(bool));
+        target->read((char*)&nodeSettings.endEnabled, sizeof(bool));
         insertNodeSettingsForNodeId(i, nodeSettings);
     }
 
     int nKeys;
-    file->read((char*)&nKeys, sizeof(int));
+    target->read((char*)&nKeys, sizeof(int));
     for(int i = 0; i < nKeys; i++) {
-        PathKey *newKey = new PathKey(this);
-
-        newKey->readPathKey(file);
-
-        anim_appendKey(newKey,
+        anim_appendKey(readKey(target),
                        false,
                        false);
     }
 
-    readPathContainer(file);
+    readPathContainer(target);
 }
 
-void QrealKey::writeQrealKey(QFile *file) {
-    writeKey(file);
-    file->write((char*)&mValue, sizeof(qreal));
+void QrealKey::writeKey(QIODevice *target) {
+    Key::writeKey(target);
+    target->write((char*)&mValue, sizeof(qreal));
 
-    file->write((char*)&mStartEnabled, sizeof(bool));
-    file->write((char*)&mStartFrame, sizeof(qreal));
-    file->write((char*)&mStartValue, sizeof(qreal));
+    target->write((char*)&mStartEnabled, sizeof(bool));
+    target->write((char*)&mStartFrame, sizeof(qreal));
+    target->write((char*)&mStartValue, sizeof(qreal));
 
-    file->write((char*)&mEndEnabled, sizeof(bool));
-    file->write((char*)&mEndFrame, sizeof(qreal));
-    file->write((char*)&mEndValue, sizeof(qreal));
+    target->write((char*)&mEndEnabled, sizeof(bool));
+    target->write((char*)&mEndFrame, sizeof(qreal));
+    target->write((char*)&mEndValue, sizeof(qreal));
 }
 
-void QrealKey::readQrealKey(QFile *file) {
-    readKey(file);
-    file->read((char*)&mValue, sizeof(qreal));
+void QrealKey::readKey(QIODevice *target) {
+    Key::readKey(target);
+    target->read((char*)&mValue, sizeof(qreal));
 
-    file->read((char*)&mStartEnabled, sizeof(bool));
-    file->read((char*)&mStartFrame, sizeof(qreal));
-    file->read((char*)&mStartValue, sizeof(qreal));
+    target->read((char*)&mStartEnabled, sizeof(bool));
+    target->read((char*)&mStartFrame, sizeof(qreal));
+    target->read((char*)&mStartValue, sizeof(qreal));
 
-    file->read((char*)&mEndEnabled, sizeof(bool));
-    file->read((char*)&mEndFrame, sizeof(qreal));
-    file->read((char*)&mEndValue, sizeof(qreal));
+    target->read((char*)&mEndEnabled, sizeof(bool));
+    target->read((char*)&mEndFrame, sizeof(qreal));
+    target->read((char*)&mEndValue, sizeof(qreal));
 }
 
-void QrealAnimator::writeQrealAnimator(QFile *file) {
+void QrealAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
-    file->write((char*)&nKeys, sizeof(int));
+    target->write((char*)&nKeys, sizeof(int));
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QrealKey*)key.get())->writeQrealKey(file);
+        ((QrealKey*)key.get())->writeKey(target);
     }
 
-    file->write((char*)&mCurrentValue, sizeof(qreal));
+    target->write((char*)&mCurrentValue, sizeof(qreal));
 }
 
-void QrealAnimator::readQrealAnimator(QFile *file) {
+Key *QrealAnimator::readKey(QIODevice *target) {
+    QrealKey *newKey = new QrealKey(this);
+    newKey->readKey(target);
+    return newKey;
+}
+
+void QrealAnimator::readProperty(QIODevice *target) {
     int nKeys;
-    file->read((char*)&nKeys, sizeof(int));
+    target->read((char*)&nKeys, sizeof(int));
     for(int i = 0; i < nKeys; i++) {
-        QrealKey *newKey = new QrealKey(this);
-        newKey->readQrealKey(file);
-        anim_appendKey(newKey, false, false);
+        anim_appendKey(readKey(target), false, false);
     }
 
-    file->read((char*)&mCurrentValue, sizeof(qreal));
+    target->read((char*)&mCurrentValue, sizeof(qreal));
 }
 
-void QPointFAnimator::writeQPointFAnimator(QFile *file) {
-    mXAnimator->writeQrealAnimator(file);
-    mYAnimator->writeQrealAnimator(file);
+void QPointFAnimator::writeProperty(QIODevice *target) {
+    mXAnimator->writeProperty(target);
+    mYAnimator->writeProperty(target);
 }
 
-void QPointFAnimator::readQPointFAnimator(QFile *file) {
-    mXAnimator->readQrealAnimator(file);
-    mYAnimator->readQrealAnimator(file);
+void QPointFAnimator::readProperty(QIODevice *target) {
+    mXAnimator->readProperty(target);
+    mYAnimator->readProperty(target);
 }
 
-void ColorAnimator::writeColorAnimator(QFile *file) {
-    file->write((char*)&mColorMode, sizeof(ColorMode));
-    mVal1Animator->writeQrealAnimator(file);
-    mVal2Animator->writeQrealAnimator(file);
-    mVal3Animator->writeQrealAnimator(file);
-    mAlphaAnimator->writeQrealAnimator(file);
+void ColorAnimator::writeProperty(QIODevice *target) {
+    target->write((char*)&mColorMode, sizeof(ColorMode));
+    mVal1Animator->writeProperty(target);
+    mVal2Animator->writeProperty(target);
+    mVal3Animator->writeProperty(target);
+    mAlphaAnimator->writeProperty(target);
 }
 
-void ColorAnimator::readColorAnimator(QFile *file) {
-    file->read((char*)&mColorMode, sizeof(ColorMode));
+void ColorAnimator::readProperty(QIODevice *target) {
+    target->read((char*)&mColorMode, sizeof(ColorMode));
     setColorMode(mColorMode);
-    mVal1Animator->readQrealAnimator(file);
-    mVal2Animator->readQrealAnimator(file);
-    mVal3Animator->readQrealAnimator(file);
-    mAlphaAnimator->readQrealAnimator(file);
+    mVal1Animator->readProperty(target);
+    mVal2Animator->readProperty(target);
+    mVal3Animator->readProperty(target);
+    mAlphaAnimator->readProperty(target);
 }
 
-void QStringKey::writeQStringKey(QFile *file) {
-    writeQString(file, mText);
+void QStringKey::writeQStringKey(QIODevice *target) {
+    writeQString(target, mText);
 }
 
-void QStringKey::readQStringKey(QFile *file) {
-    readQString(file, &mText);
+void QStringKey::readQStringKey(QIODevice *target) {
+    readQString(target, &mText);
 }
 
-void QStringAnimator::writeQStringAnimator(QFile *file) {
+void QStringAnimator::writeProperty(QIODevice *target) {
     int nKeys = anim_mKeys.count();
-    file->write((char*)&nKeys, sizeof(int));
+    target->write((char*)&nKeys, sizeof(int));
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((QStringKey*)key.get())->writeQStringKey(file);
+        ((QStringKey*)key.get())->writeQStringKey(target);
     }
-    writeQString(file, mCurrentText);
+    writeQString(target, mCurrentText);
 }
 
-void QStringAnimator::readQStringAnimator(QFile *file) {
+void QStringAnimator::readProperty(QIODevice *target) {
     int nKeys;
-    file->read((char*)&nKeys, sizeof(int));
+    target->read((char*)&nKeys, sizeof(int));
     for(int i = 0; i < nKeys; i++) {
         QStringKey *newKey = new QStringKey("", 0, this);
-        newKey->readQStringKey(file);
+        newKey->readQStringKey(target);
         anim_appendKey(newKey, false, false);
     }
-    readQString(file, &mCurrentText);
+    readQString(target, &mCurrentText);
 }
 
-void PixmapEffect::writePixmapEffect(QFile *file) {
-    file->write((char*)&mType, sizeof(PixmapEffectType));
+void PixmapEffect::writeProperty(QIODevice *target) {
+    target->write((char*)&mType, sizeof(PixmapEffectType));
 }
 
-void BlurEffect::readBlurEffect(QFile *file) {
-    mHighQuality->readBoolProperty(file);
-    mBlurRadius->readQrealAnimator(file);
+void BlurEffect::readProperty(QIODevice *target) {
+    mHighQuality->readProperty(target);
+    mBlurRadius->readProperty(target);
 }
 
-void BlurEffect::writePixmapEffect(QFile *file) {
-    PixmapEffect::writePixmapEffect(file);
-    mHighQuality->writeBoolProperty(file);
-    mBlurRadius->writeQrealAnimator(file);
+void BlurEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mHighQuality->writeProperty(target);
+    mBlurRadius->writeProperty(target);
 }
 
-void EffectAnimators::writeEffectAnimators(QFile *file) {
+void EffectAnimators::writeProperty(QIODevice *target) {
     int nEffects = ca_mChildAnimators.count();
-    file->write((char*)&nEffects, sizeof(int));
+    target->write((char*)&nEffects, sizeof(int));
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PixmapEffect*)effect.data())->writePixmapEffect(file);
+        ((PixmapEffect*)effect.data())->writeProperty(target);
     }
 }
 
-void EffectAnimators::readEffectAnimators(QFile *file) {
+void EffectAnimators::readProperty(QIODevice *target) {
     int nEffects;
-    file->read((char*)&nEffects, sizeof(int));
+    target->read((char*)&nEffects, sizeof(int));
     for(int i = 0; i < nEffects; i++) {
         PixmapEffectType typeT;
-        file->read((char*)&typeT, sizeof(PixmapEffectType));
+        target->read((char*)&typeT, sizeof(PixmapEffectType));
         if(typeT == EFFECT_BLUR) {
             BlurEffect *blurEffect = new BlurEffect();
-            blurEffect->readBlurEffect(file);
+            blurEffect->readProperty(target);
             addEffect(blurEffect);
         }
     }
 }
 
-void BasicTransformAnimator::writeBasicTransformAnimator(QFile *file) {
-    mPosAnimator->writeQPointFAnimator(file);
-    mScaleAnimator->writeQPointFAnimator(file);
-    mRotAnimator->writeQrealAnimator(file);
+void BasicTransformAnimator::writeProperty(QIODevice *target) {
+    mPosAnimator->writeProperty(target);
+    mScaleAnimator->writeProperty(target);
+    mRotAnimator->writeProperty(target);
     updateRelativeTransform();
 }
 
-void BasicTransformAnimator::readBasicTransformAnimator(QFile *file) {
-    mPosAnimator->readQPointFAnimator(file);
-    mScaleAnimator->readQPointFAnimator(file);
-    mRotAnimator->readQrealAnimator(file);
+void BasicTransformAnimator::readProperty(QIODevice *target) {
+    mPosAnimator->readProperty(target);
+    mScaleAnimator->readProperty(target);
+    mRotAnimator->readProperty(target);
     updateRelativeTransform();
 }
 
-void BoxTransformAnimator::writeBoxTransformAnimator(QFile *file) {
-    writeBasicTransformAnimator(file);
-    mOpacityAnimator->writeQrealAnimator(file);
-    mPivotAnimator->writeQPointFAnimator(file);
+void BoxTransformAnimator::writeProperty(QIODevice *target) {
+    writeProperty(target);
+    mOpacityAnimator->writeProperty(target);
+    mPivotAnimator->writeProperty(target);
     updateRelativeTransform();
 }
 
-void BoxTransformAnimator::readBoxTransformAnimator(QFile *file) {
-    readBasicTransformAnimator(file);
-    mOpacityAnimator->readQrealAnimator(file);
-    mPivotAnimator->readQPointFAnimator(file);
+void BoxTransformAnimator::readProperty(QIODevice *target) {
+    readProperty(target);
+    mOpacityAnimator->readProperty(target);
+    mPivotAnimator->readProperty(target);
     updateRelativeTransform();
 }
 
-void GradientPoints::writeGradientPoints(QFile *file) {
-    startPoint->writeQPointFAnimator(file);
-    endPoint->writeQPointFAnimator(file);
+void GradientPoints::writeProperty(QIODevice *target) {
+    startPoint->writeProperty(target);
+    endPoint->writeProperty(target);
 }
 
-void GradientPoints::readGradientPoints(QFile *file) {
-    startPoint->readQPointFAnimator(file);
-    endPoint->readQPointFAnimator(file);
+void GradientPoints::readProperty(QIODevice *target) {
+    startPoint->readProperty(target);
+    endPoint->readProperty(target);
 }
 
-void Gradient::writeGradient(QFile *file) {
-    file->write((char*)&mLoadId, sizeof(int));
+void Gradient::writeProperty(QIODevice *target) {
+    target->write((char*)&mLoadId, sizeof(int));
     int nColors = mColors.count();
-    file->write((char*)&nColors, sizeof(int));
+    target->write((char*)&nColors, sizeof(int));
     foreach(ColorAnimator *color, mColors) {
-        color->writeColorAnimator(file);
+        color->writeProperty(target);
     }
 }
 
-void Gradient::readGradient(QFile *file) {
-    file->read((char*)&mLoadId, sizeof(int));
+void Gradient::readProperty(QIODevice *target) {
+    target->read((char*)&mLoadId, sizeof(int));
     int nColors;
-    file->read((char*)&nColors, sizeof(int));
+    target->read((char*)&nColors, sizeof(int));
     for(int i = 0; i < nColors; i++) {
         ColorAnimator *colorAnim = new ColorAnimator();
-        colorAnim->readColorAnimator(file);
+        colorAnim->readProperty(target);
         addColorToList(colorAnim, false);
     }
 }
 
-void StrokeSettings::writeStrokeSettings(QFile *file) {
-    writePaintSettings(file);
-    mLineWidth->writeQrealAnimator(file);
-    file->write((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
-    file->write((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
-    file->write((char*)&mOutlineCompositionMode,
+void StrokeSettings::writeProperty(QIODevice *target) {
+    writeProperty(target);
+    mLineWidth->writeProperty(target);
+    target->write((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
+    target->write((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
+    target->write((char*)&mOutlineCompositionMode,
                sizeof(QPainter::CompositionMode));
 }
 
-void StrokeSettings::readStrokeSettings(QFile *file) {
-    readPaintSettings(file);
-    mLineWidth->readQrealAnimator(file);
-    file->read((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
-    file->read((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
-    file->read((char*)&mOutlineCompositionMode,
+void StrokeSettings::readProperty(QIODevice *target) {
+    readProperty(target);
+    mLineWidth->readProperty(target);
+    target->read((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
+    target->read((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
+    target->read((char*)&mOutlineCompositionMode,
                 sizeof(QPainter::CompositionMode));
 }
 
-void PaintSettings::writePaintSettings(QFile *file) {
-    mGradientPoints->writeGradientPoints(file);
-    mColor->writeColorAnimator(file);
-    file->write((char*)&mPaintType, sizeof(PaintType));
+void PaintSettings::writeProperty(QIODevice *target) {
+    mGradientPoints->writeProperty(target);
+    mColor->writeProperty(target);
+    target->write((char*)&mPaintType, sizeof(PaintType));
     int gradId;
     if(mGradient == NULL) {
         gradId = -1;
     } else {
         gradId = mGradient->getLoadId();
     }
-    file->write((char*)&mGradientLinear, sizeof(bool));
-    file->write((char*)&gradId, sizeof(int));
+    target->write((char*)&mGradientLinear, sizeof(bool));
+    target->write((char*)&gradId, sizeof(int));
 }
 
-void PaintSettings::readPaintSettings(QFile *file) {
-    mGradientPoints->readGradientPoints(file);
-    mColor->readColorAnimator(file);
-    file->read((char*)&mPaintType, sizeof(PaintType));
+void PaintSettings::readProperty(QIODevice *target) {
+    mGradientPoints->readProperty(target);
+    mColor->readProperty(target);
+    target->read((char*)&mPaintType, sizeof(PaintType));
     int gradId;
-    file->read((char*)&mGradientLinear, sizeof(bool));
-    file->read((char*)&gradId, sizeof(int));
+    target->read((char*)&mGradientLinear, sizeof(bool));
+    target->read((char*)&gradId, sizeof(int));
     if(gradId != -1) {
         mGradient = MainWindow::getInstance()->
                 getLoadedGradientById(gradId)->ref<Gradient>();
     }
 }
 
-void DurationRectangle::writeDurationRectangle(QFile *file) {
+void DurationRectangle::writeDurationRectangle(QIODevice *target) {
     int minFrame = getMinFrame();
     int maxFrame = getMaxFrame();
     int framePos = getFramePos();
-    file->write((char*)&minFrame, sizeof(int));
-    file->write((char*)&maxFrame, sizeof(int));
-    file->write((char*)&framePos, sizeof(int));
+    target->write((char*)&minFrame, sizeof(int));
+    target->write((char*)&maxFrame, sizeof(int));
+    target->write((char*)&framePos, sizeof(int));
 }
 
-void DurationRectangle::readDurationRectangle(QFile *file) {
+void DurationRectangle::readDurationRectangle(QIODevice *target) {
     int minFrame;
     int maxFrame;
     int framePos;
-    file->read((char*)&minFrame, sizeof(int));
-    file->read((char*)&maxFrame, sizeof(int));
-    file->read((char*)&framePos, sizeof(int));
+    target->read((char*)&minFrame, sizeof(int));
+    target->read((char*)&maxFrame, sizeof(int));
+    target->read((char*)&framePos, sizeof(int));
     setMinFrame(minFrame);
     setMaxFrame(maxFrame);
     setFramePos(framePos);
 }
 
-void BoundingBox::writeBoundingBox(QFile *file) {
-    file->write((char*)&mType, sizeof(BoundingBoxType));
-    writeQString(file, prp_mName);
-    file->write((char*)&mLoadId, sizeof(int));
-    file->write((char*)&mPivotAutoAdjust, sizeof(bool));
-    file->write((char*)&mVisible, sizeof(bool));
-    file->write((char*)&mLocked, sizeof(bool));
-    file->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
+void BoundingBox::writeBoundingBox(QIODevice *target) {
+    target->write((char*)&mType, sizeof(BoundingBoxType));
+    writeQString(target, prp_mName);
+    target->write((char*)&mLoadId, sizeof(int));
+    target->write((char*)&mPivotAutoAdjust, sizeof(bool));
+    target->write((char*)&mVisible, sizeof(bool));
+    target->write((char*)&mLocked, sizeof(bool));
+    target->write((char*)&mBlendModeSk, sizeof(SkBlendMode));
     bool hasDurRect = mDurationRectangle != NULL;
-    file->write((char*)&hasDurRect, sizeof(bool));
+    target->write((char*)&hasDurRect, sizeof(bool));
 
     if(hasDurRect) {
-        mDurationRectangle->writeDurationRectangle(file);
+        mDurationRectangle->writeDurationRectangle(target);
     }
 
-    mTransformAnimator->writeBoxTransformAnimator(file);
+    mTransformAnimator->writeProperty(target);
 }
 
-void BoundingBox::readBoundingBox(QFile *file) {
-    readQString(file, &prp_mName);
-    file->read((char*)&mLoadId, sizeof(int));
-    file->read((char*)&mPivotAutoAdjust, sizeof(bool));
-    file->read((char*)&mVisible, sizeof(bool));
-    file->read((char*)&mLocked, sizeof(bool));
-    file->read((char*)&mBlendModeSk, sizeof(SkBlendMode));
+void BoundingBox::readBoundingBox(QIODevice *target) {
+    readQString(target, &prp_mName);
+    target->read((char*)&mLoadId, sizeof(int));
+    target->read((char*)&mPivotAutoAdjust, sizeof(bool));
+    target->read((char*)&mVisible, sizeof(bool));
+    target->read((char*)&mLocked, sizeof(bool));
+    target->read((char*)&mBlendModeSk, sizeof(SkBlendMode));
     bool hasDurRect;
-    file->read((char*)&hasDurRect, sizeof(bool));
+    target->read((char*)&hasDurRect, sizeof(bool));
 
     if(hasDurRect) {
         if(mDurationRectangle == NULL) createDurationRectangle();
-        mDurationRectangle->readDurationRectangle(file);
+        mDurationRectangle->readDurationRectangle(target);
     }
 
-    mTransformAnimator->readBoxTransformAnimator(file);
+    mTransformAnimator->readProperty(target);
     BoundingBox::addLoadedBox(this);
 }
 
-void PathEffect::writePathEffect(QFile *file) {
-    file->write((char*)&mPathEffectType, sizeof(PathEffectType));
+void PathEffect::writeProperty(QIODevice *target) {
+    target->write((char*)&mPathEffectType, sizeof(PathEffectType));
 }
 
-void DisplacePathEffect::writePathEffect(QFile *file) {
-    PathEffect::writePathEffect(file);
-    mSegLength->writeQrealAnimator(file);
-    mMaxDev->writeQrealAnimator(file);
-    mSmoothness->writeQrealAnimator(file);
+void DisplacePathEffect::writeProperty(QIODevice *target) {
+    PathEffect::writeProperty(target);
+    mSegLength->writeProperty(target);
+    mMaxDev->writeProperty(target);
+    mSmoothness->writeProperty(target);
 }
 
-void DisplacePathEffect::readDisplacePathEffect(QFile *file) {
-    mSegLength->readQrealAnimator(file);
-    mMaxDev->readQrealAnimator(file);
-    mSmoothness->readQrealAnimator(file);
+void DisplacePathEffect::readProperty(QIODevice *target) {
+    mSegLength->readProperty(target);
+    mMaxDev->readProperty(target);
+    mSmoothness->readProperty(target);
 }
 
-void DuplicatePathEffect::writePathEffect(QFile *file) {
-    PathEffect::writePathEffect(file);
-    mTranslation->writeQPointFAnimator(file);
+void DuplicatePathEffect::writeProperty(QIODevice *target) {
+    PathEffect::writeProperty(target);
+    mTranslation->writeProperty(target);
 }
 
-void DuplicatePathEffect::readDuplicatePathEffect(QFile *file) {
-    mTranslation->readQPointFAnimator(file);
+void DuplicatePathEffect::readProperty(QIODevice *target) {
+    mTranslation->readProperty(target);
 }
 
-void BoxTargetProperty::writeBoxTargetProperty(QFile *file) {
+void BoxTargetProperty::writeProperty(QIODevice *target) {
     BoundingBox *targetBox = mTarget.data();
     int targetId;
     if(targetBox == NULL) {
@@ -519,12 +526,12 @@ void BoxTargetProperty::writeBoxTargetProperty(QFile *file) {
     } else {
         targetId = targetBox->getLoadId();
     }
-    file->write((char*)&targetId, sizeof(int));
+    target->write((char*)&targetId, sizeof(int));
 }
 
-void BoxTargetProperty::readBoxTargetProperty(QFile *file) {
+void BoxTargetProperty::readProperty(QIODevice *target) {
     int targetId;
-    file->read((char*)&targetId, sizeof(int));
+    target->read((char*)&targetId, sizeof(int));
     BoundingBox *targetBox = BoundingBox::getLoadedBoxById(targetId);
     if(targetBox == NULL && targetId >= 0) {
         BoundingBox::addFunctionWaitingForBoxLoad(
@@ -534,351 +541,354 @@ void BoxTargetProperty::readBoxTargetProperty(QFile *file) {
     }
 }
 
-void SumPathEffect::writePathEffect(QFile *file) {
-    PathEffect::writePathEffect(file);
-    mBoxTarget->writeBoxTargetProperty(file);
+void SumPathEffect::writeProperty(QIODevice *target) {
+    PathEffect::writeProperty(target);
+    mBoxTarget->writeProperty(target);
 }
 
-void SumPathEffect::readSumPathEffect(QFile *file) {
-    mBoxTarget->readBoxTargetProperty(file);
+void SumPathEffect::readProperty(QIODevice *target) {
+    mBoxTarget->readProperty(target);
 }
 
-void PathEffectAnimators::writePathEffectAnimators(QFile *file) {
+void PathEffectAnimators::writeProperty(QIODevice *target) {
     int nEffects = ca_mChildAnimators.count();
-    file->write((char*)&nEffects, sizeof(int));
+    target->write((char*)&nEffects, sizeof(int));
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        ((PathEffect*)effect.data())->writePathEffect(file);
+        ((PathEffect*)effect.data())->writeProperty(target);
     }
 }
 
-void PathEffectAnimators::readPathEffectAnimators(QFile *file,
+void PathEffectAnimators::readProperty(QIODevice *target,
                                                   const bool &outline) {
     int nEffects;
-    file->read((char*)&nEffects, sizeof(int));
+    target->read((char*)&nEffects, sizeof(int));
     for(int i = 0; i < nEffects; i++) {
         PathEffectType typeT;
-        file->read((char*)&typeT, sizeof(PathEffectType));
+        target->read((char*)&typeT, sizeof(PathEffectType));
         if(typeT == DISPLACE_PATH_EFFECT) {
             DisplacePathEffect *displaceEffect = new DisplacePathEffect(outline);
-            displaceEffect->readDisplacePathEffect(file);
+            displaceEffect->readProperty(target);
             addEffect(displaceEffect);
         } else if(typeT == DUPLICATE_PATH_EFFECT) {
             DuplicatePathEffect *duplicateEffect = new DuplicatePathEffect(outline);
-            duplicateEffect->readDuplicatePathEffect(file);
+            duplicateEffect->readProperty(target);
             addEffect(duplicateEffect);
         } else if(typeT == SUM_PATH_EFFECT) {
             SumPathEffect *sumEffect = new SumPathEffect(NULL, outline);
-            sumEffect->readSumPathEffect(file);
+            sumEffect->readProperty(target);
             addEffect(sumEffect);
         }
     }
 }
 
-void PathBox::writeBoundingBox(QFile *file) {
-    BoundingBox::writeBoundingBox(file);
-    mPathEffectsAnimators->writePathEffectAnimators(file);
-    mFillPathEffectsAnimators->writePathEffectAnimators(file);
-    mOutlinePathEffectsAnimators->writePathEffectAnimators(file);
-    mFillGradientPoints->writeGradientPoints(file);
-    mStrokeGradientPoints->writeGradientPoints(file);
-    mFillSettings->writePaintSettings(file);
-    mStrokeSettings->writeStrokeSettings(file);
+void PathBox::writeBoundingBox(QIODevice *target) {
+    BoundingBox::writeBoundingBox(target);
+    mPathEffectsAnimators->writeProperty(target);
+    mFillPathEffectsAnimators->writeProperty(target);
+    mOutlinePathEffectsAnimators->writeProperty(target);
+    mFillGradientPoints->writeProperty(target);
+    mStrokeGradientPoints->writeProperty(target);
+    mFillSettings->writeProperty(target);
+    mStrokeSettings->writeProperty(target);
 }
 
-void PathBox::readBoundingBox(QFile *file) {
-    BoundingBox::readBoundingBox(file);
-    mPathEffectsAnimators->readPathEffectAnimators(file, false);
-    mFillPathEffectsAnimators->readPathEffectAnimators(file, false);
-    mOutlinePathEffectsAnimators->readPathEffectAnimators(file, true);
-    mFillGradientPoints->readGradientPoints(file);
-    mStrokeGradientPoints->readGradientPoints(file);
-    mFillSettings->readPaintSettings(file);
-    mStrokeSettings->readStrokeSettings(file);
+void PathBox::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
+    mPathEffectsAnimators->readProperty(target, false);
+    mFillPathEffectsAnimators->readProperty(target, false);
+    mOutlinePathEffectsAnimators->readProperty(target, true);
+    mFillGradientPoints->readProperty(target);
+    mStrokeGradientPoints->readProperty(target);
+    mFillSettings->readProperty(target);
+    mStrokeSettings->readProperty(target);
 }
 
-void ParticleEmitter::writeParticleEmitter(QFile *file) {
-    mColorAnimator->writeColorAnimator(file);
-    mPos->writeQPointFAnimator(file);
-    mWidth->writeQrealAnimator(file);
-    mSrcVelInfl->writeQrealAnimator(file);
-    mIniVelocity->writeQrealAnimator(file);
-    mIniVelocityVar->writeQrealAnimator(file);
-    mIniVelocityAngle->writeQrealAnimator(file);
-    mIniVelocityAngleVar->writeQrealAnimator(file);
-    mAcceleration->writeQPointFAnimator(file);
-    mParticlesPerSecond->writeQrealAnimator(file);
-    mParticlesFrameLifetime->writeQrealAnimator(file);
-    mVelocityRandomVar->writeQrealAnimator(file);
-    mVelocityRandomVarPeriod->writeQrealAnimator(file);
-    mParticleSize->writeQrealAnimator(file);
-    mParticleSizeVar->writeQrealAnimator(file);
-    mParticleLength->writeQrealAnimator(file);
-    mParticlesDecayFrames->writeQrealAnimator(file);
-    mParticlesSizeDecay->writeQrealAnimator(file);
-    mParticlesOpacityDecay->writeQrealAnimator(file);
+void ParticleEmitter::writeProperty(QIODevice *target) {
+    mColorAnimator->writeProperty(target);
+    mPos->writeProperty(target);
+    mWidth->writeProperty(target);
+    mSrcVelInfl->writeProperty(target);
+    mIniVelocity->writeProperty(target);
+    mIniVelocityVar->writeProperty(target);
+    mIniVelocityAngle->writeProperty(target);
+    mIniVelocityAngleVar->writeProperty(target);
+    mAcceleration->writeProperty(target);
+    mParticlesPerSecond->writeProperty(target);
+    mParticlesFrameLifetime->writeProperty(target);
+    mVelocityRandomVar->writeProperty(target);
+    mVelocityRandomVarPeriod->writeProperty(target);
+    mParticleSize->writeProperty(target);
+    mParticleSizeVar->writeProperty(target);
+    mParticleLength->writeProperty(target);
+    mParticlesDecayFrames->writeProperty(target);
+    mParticlesSizeDecay->writeProperty(target);
+    mParticlesOpacityDecay->writeProperty(target);
 }
 
-void ParticleEmitter::readParticleEmitter(QFile *file) {
-    mColorAnimator->readColorAnimator(file);
-    mPos->readQPointFAnimator(file);
-    mWidth->readQrealAnimator(file);
-    mSrcVelInfl->readQrealAnimator(file);
-    mIniVelocity->readQrealAnimator(file);
-    mIniVelocityVar->readQrealAnimator(file);
-    mIniVelocityAngle->readQrealAnimator(file);
-    mIniVelocityAngleVar->readQrealAnimator(file);
-    mAcceleration->readQPointFAnimator(file);
-    mParticlesPerSecond->readQrealAnimator(file);
-    mParticlesFrameLifetime->readQrealAnimator(file);
-    mVelocityRandomVar->readQrealAnimator(file);
-    mVelocityRandomVarPeriod->readQrealAnimator(file);
-    mParticleSize->readQrealAnimator(file);
-    mParticleSizeVar->readQrealAnimator(file);
-    mParticleLength->readQrealAnimator(file);
-    mParticlesDecayFrames->readQrealAnimator(file);
-    mParticlesSizeDecay->readQrealAnimator(file);
-    mParticlesOpacityDecay->readQrealAnimator(file);
+void ParticleEmitter::readProperty(QIODevice *target) {
+    mColorAnimator->readProperty(target);
+    mPos->readProperty(target);
+    mWidth->readProperty(target);
+    mSrcVelInfl->readProperty(target);
+    mIniVelocity->readProperty(target);
+    mIniVelocityVar->readProperty(target);
+    mIniVelocityAngle->readProperty(target);
+    mIniVelocityAngleVar->readProperty(target);
+    mAcceleration->readProperty(target);
+    mParticlesPerSecond->readProperty(target);
+    mParticlesFrameLifetime->readProperty(target);
+    mVelocityRandomVar->readProperty(target);
+    mVelocityRandomVarPeriod->readProperty(target);
+    mParticleSize->readProperty(target);
+    mParticleSizeVar->readProperty(target);
+    mParticleLength->readProperty(target);
+    mParticlesDecayFrames->readProperty(target);
+    mParticlesSizeDecay->readProperty(target);
+    mParticlesOpacityDecay->readProperty(target);
 }
 
-void ParticleBox::writeBoundingBox(QFile *file) {
+void ParticleBox::writeBoundingBox(QIODevice *target) {
     int nEmitters = mEmitters.count();
-    file->write((char*)&nEmitters, sizeof(int));
+    target->write((char*)&nEmitters, sizeof(int));
     foreach(ParticleEmitter *emitter, mEmitters) {
-        emitter->writeParticleEmitter(file);
+        emitter->writeProperty(target);
     }
 }
 
-void ParticleBox::readBoundingBox(QFile *file) {
+void ParticleBox::readBoundingBox(QIODevice *target) {
     int nEmitters;
-    file->read((char*)&nEmitters, sizeof(int));
+    target->read((char*)&nEmitters, sizeof(int));
     for(int i = 0; i < nEmitters; i++) {
         ParticleEmitter *emitter = new ParticleEmitter(this);
-        emitter->readParticleEmitter(file);
+        emitter->readProperty(target);
         addEmitter(emitter);
     }
 }
 
-void ImageBox::writeBoundingBox(QFile *file) {
-    BoundingBox::writeBoundingBox(file);
-    writeQString(file, mImageFilePath);
+void ImageBox::writeBoundingBox(QIODevice *target) {
+    BoundingBox::writeBoundingBox(target);
+    writeQString(target, mImageFilePath);
 }
 
-void ImageBox::readBoundingBox(QFile *file) {
-    BoundingBox::readBoundingBox(file);
-    readQString(file, &mImageFilePath);
+void ImageBox::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
+    readQString(target, &mImageFilePath);
 }
 
-void Circle::writeBoundingBox(QFile *file) {
-    PathBox::writeBoundingBox(file);
-    mHorizontalRadiusPoint->writeQPointFAnimator(file);
-    mVerticalRadiusPoint->writeQPointFAnimator(file);
+void Circle::writeBoundingBox(QIODevice *target) {
+    PathBox::writeBoundingBox(target);
+    mHorizontalRadiusPoint->writeProperty(target);
+    mVerticalRadiusPoint->writeProperty(target);
 }
 
-void Circle::readBoundingBox(QFile *file) {
-    PathBox::readBoundingBox(file);
-    mHorizontalRadiusPoint->readQPointFAnimator(file);
-    mVerticalRadiusPoint->readQPointFAnimator(file);
+void Circle::readBoundingBox(QIODevice *target) {
+    PathBox::readBoundingBox(target);
+    mHorizontalRadiusPoint->readProperty(target);
+    mVerticalRadiusPoint->readProperty(target);
 }
 
-void Rectangle::writeBoundingBox(QFile *file) {
-    PathBox::writeBoundingBox(file);
-    mRadiusPoint.writeQPointFAnimator(file);
-    mTopLeftPoint->writeQPointFAnimator(file);
-    mBottomRightPoint->writeQPointFAnimator(file);
+void Rectangle::writeBoundingBox(QIODevice *target) {
+    PathBox::writeBoundingBox(target);
+    mRadiusPoint.writeProperty(target);
+    mTopLeftPoint->writeProperty(target);
+    mBottomRightPoint->writeProperty(target);
 }
 
-void Rectangle::readBoundingBox(QFile *file) {
-    PathBox::readBoundingBox(file);
-    mRadiusPoint.readQPointFAnimator(file);
-    mTopLeftPoint->readQPointFAnimator(file);
-    mBottomRightPoint->readQPointFAnimator(file);
+void Rectangle::readBoundingBox(QIODevice *target) {
+    PathBox::readBoundingBox(target);
+    mRadiusPoint.readProperty(target);
+    mTopLeftPoint->readProperty(target);
+    mBottomRightPoint->readProperty(target);
 }
 
-void VideoBox::writeBoundingBox(QFile *file) {
-    BoundingBox::writeBoundingBox(file);
-    writeQString(file, mSrcFilePath);
+void VideoBox::writeBoundingBox(QIODevice *target) {
+    BoundingBox::writeBoundingBox(target);
+    writeQString(target, mSrcFilePath);
 }
 
-void VideoBox::readBoundingBox(QFile *file) {
-    BoundingBox::readBoundingBox(file);
-    readQString(file, &mSrcFilePath);
+void VideoBox::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
+    readQString(target, &mSrcFilePath);
 }
 
-void Tile::writeTile(QFile *file) {
-    file->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+void Tile::writeTile(QIODevice *target) {
+    target->write((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
 }
 
-void Tile::readTile(QFile *file) {
-    file->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+void Tile::readTile(QIODevice *target) {
+    target->read((char*)mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
     updateDrawerFromDataArray();
 }
 
-void TilesData::writeTilesData(QFile *file) {
+void TilesData::writeTilesData(QIODevice *target) {
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->writeTile(file);
+            mTiles[j][i]->writeTile(target);
         }
     }
 }
 
-void TilesData::writeTilesDataFromMemoryOrTmp(QFile *file) {
+void TilesData::writeTilesDataFromMemoryOrTmp(QIODevice *target) {
     bool noDataInMemory = !mDataStoredInTmpFile && mNoDataInMemory;
-    file->write((char*)&noDataInMemory, sizeof(bool));
+    target->write((char*)&noDataInMemory, sizeof(bool));
     if(mNoDataInMemory) {
         if(mDataStoredInTmpFile) {
-            file->write(mTmpFile->readAll());
+            target->write(mTmpFile->readAll());
         }
     } else {
-        writeTilesData(file);
+        writeTilesData(target);
     }
 }
 
-void TilesData::readTilesData(QFile *file) {
-    file->read((char*)&mNoDataInMemory, sizeof(bool));
+void TilesData::readTilesData(QIODevice *target) {
+    target->read((char*)&mNoDataInMemory, sizeof(bool));
     if(mNoDataInMemory) return;
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
-            mTiles[j][i]->readTile(file);
+            mTiles[j][i]->readTile(target);
         }
     }
 }
 
-void Surface::writeSurface(QFile *file) {
-    file->write((char*)&mWidth, sizeof(ushort));
-    file->write((char*)&mHeight, sizeof(ushort));
-    mCurrentTiles->writeTilesDataFromMemoryOrTmp(file);
+void Surface::writeSurface(QIODevice *target) {
+    target->write((char*)&mWidth, sizeof(ushort));
+    target->write((char*)&mHeight, sizeof(ushort));
+    mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
 }
 
-void Surface::readSurface(QFile *file) {
-    file->read((char*)&mWidth, sizeof(ushort));
-    file->read((char*)&mHeight, sizeof(ushort));
+void Surface::readSurface(QIODevice *target) {
+    target->read((char*)&mWidth, sizeof(ushort));
+    target->read((char*)&mHeight, sizeof(ushort));
     setSize(mWidth, mHeight);
-    mCurrentTiles->readTilesData(file);
+    mCurrentTiles->readTilesData(target);
 }
 
-void SurfaceKey::writeSurfaceKey(QFile *file) {
-    Key::writeKey(file);
-    mTiles->writeTilesDataFromMemoryOrTmp(file);
+void SurfaceKey::writeKey(QIODevice *target) {
+    Key::writeKey(target);
+    mTiles->writeTilesDataFromMemoryOrTmp(target);
 }
 
-void SurfaceKey::readSurfaceKey(QFile *file) {
-    Key::readKey(file);
-    mTiles->readTilesData(file);
+void SurfaceKey::readKey(QIODevice *target) {
+    Key::readKey(target);
+    mTiles->readTilesData(target);
 }
 
-void AnimatedSurface::writeAnimatedSurface(QFile *file) {
-    file->write((char*)&mWidth, sizeof(ushort));
-    file->write((char*)&mHeight, sizeof(ushort));
+void AnimatedSurface::writeProperty(QIODevice *target) {
+    target->write((char*)&mWidth, sizeof(ushort));
+    target->write((char*)&mHeight, sizeof(ushort));
     int nKeys = anim_mKeys.count();
-    file->write((char*)&nKeys, sizeof(int));
+    target->write((char*)&nKeys, sizeof(int));
     if(nKeys == 0) {
-        mCurrentTiles->writeTilesDataFromMemoryOrTmp(file);
+        mCurrentTiles->writeTilesDataFromMemoryOrTmp(target);
     } else {
         foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-            ((SurfaceKey*)key.get())->writeSurfaceKey(file);
+            ((SurfaceKey*)key.get())->writeKey(target);
         }
     }
 }
 
-void AnimatedSurface::readAnimatedSurface(QFile *file) {
-    file->read((char*)&mWidth, sizeof(ushort));
-    file->read((char*)&mHeight, sizeof(ushort));
+Key *AnimatedSurface::readKey(QIODevice *target) {
+    SurfaceKey *newKey = new SurfaceKey(this);
+    newKey->setTiles(new TilesData(mWidth,
+                                mHeight, true));
+    newKey->readKey(target);
+    return newKey;
+}
+
+void AnimatedSurface::readProperty(QIODevice *target) {
+    target->read((char*)&mWidth, sizeof(ushort));
+    target->read((char*)&mHeight, sizeof(ushort));
     int nKeys;
-    file->read((char*)&nKeys, sizeof(int));
+    target->read((char*)&nKeys, sizeof(int));
     if(nKeys == 0) {
         setSize(mWidth, mHeight);
-        mCurrentTiles->readTilesData(file);
+        mCurrentTiles->readTilesData(target);
     } else {
         for(int i = 0; i < nKeys; i++) {
-            SurfaceKey *key = new SurfaceKey(this);
-            key->setTiles(new TilesData(mWidth,
-                                        mHeight, true));
-            key->readSurfaceKey(file);
-            anim_appendKey(key);
+            anim_appendKey(readKey(target), false, false);
         }
         setSize(mWidth, mHeight);
     }
 }
 
-void PaintBox::writeBoundingBox(QFile *file) {
-    BoundingBox::writeBoundingBox(file);
-    mTopLeftPoint->writeQPointFAnimator(file);
-    mBottomRightPoint->writeQPointFAnimator(file);
-    mMainHandler->writeAnimatedSurface(file);
+void PaintBox::writeBoundingBox(QIODevice *target) {
+    BoundingBox::writeBoundingBox(target);
+    mTopLeftPoint->writeProperty(target);
+    mBottomRightPoint->writeProperty(target);
+    mMainHandler->writeProperty(target);
 }
 
-void PaintBox::readBoundingBox(QFile *file) {
-    BoundingBox::readBoundingBox(file);
-    mTopLeftPoint->readQPointFAnimator(file);
-    mBottomRightPoint->readQPointFAnimator(file);
+void PaintBox::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
+    mTopLeftPoint->readProperty(target);
+    mBottomRightPoint->readProperty(target);
     finishSizeSetup();
-    mMainHandler->readAnimatedSurface(file);
+    mMainHandler->readProperty(target);
 }
 
-void ImageSequenceBox::writeBoundingBox(QFile *file) {
-    BoundingBox::writeBoundingBox(file);
+void ImageSequenceBox::writeBoundingBox(QIODevice *target) {
+    BoundingBox::writeBoundingBox(target);
     int nFrames = mListOfFrames.count();
-    file->write((char*)&nFrames, sizeof(int));
+    target->write((char*)&nFrames, sizeof(int));
     foreach(const QString &frame, mListOfFrames) {
-        writeQString(file, frame);
+        writeQString(target, frame);
     }
 }
 
-void ImageSequenceBox::readBoundingBox(QFile *file) {
-    BoundingBox::readBoundingBox(file);
+void ImageSequenceBox::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
     int nFrames;
-    file->read((char*)&nFrames, sizeof(int));
+    target->read((char*)&nFrames, sizeof(int));
     for(int i = 0; i < nFrames; i++) {
         QString frame;
-        readQString(file, &frame);
+        readQString(target, &frame);
         mListOfFrames << frame;
     }
 }
 
-void TextBox::writeBoundingBox(QFile *file) {
-    PathBox::writeBoundingBox(file);
-    mText->writeQStringAnimator(file);
-    file->write((char*)&mAlignment, sizeof(Qt::Alignment));
+void TextBox::writeBoundingBox(QIODevice *target) {
+    PathBox::writeBoundingBox(target);
+    mText->writeProperty(target);
+    target->write((char*)&mAlignment, sizeof(Qt::Alignment));
     qreal fontSize = mFont.pointSizeF();
     QString fontFamily = mFont.family();
     QString fontStyle = mFont.styleName();
-    file->write((char*)&fontSize, sizeof(qreal));
-    writeQString(file, fontFamily);
-    writeQString(file, fontStyle);
+    target->write((char*)&fontSize, sizeof(qreal));
+    writeQString(target, fontFamily);
+    writeQString(target, fontStyle);
 }
 
-void TextBox::readBoundingBox(QFile *file) {
-    PathBox::readBoundingBox(file);
-    mText->readQStringAnimator(file);
-    file->read((char*)&mAlignment, sizeof(Qt::Alignment));
+void TextBox::readBoundingBox(QIODevice *target) {
+    PathBox::readBoundingBox(target);
+    mText->readProperty(target);
+    target->read((char*)&mAlignment, sizeof(Qt::Alignment));
     qreal fontSize;
     QString fontFamily;
     QString fontStyle;
-    file->read((char*)&fontSize, sizeof(qreal));
-    readQString(file, &fontFamily);
-    readQString(file, &fontStyle);
+    target->read((char*)&fontSize, sizeof(qreal));
+    readQString(target, &fontFamily);
+    readQString(target, &fontStyle);
     mFont.setPointSizeF(fontSize);
     mFont.setFamily(fontFamily);
     mFont.setStyleName(fontStyle);
 }
 
-void BoxesGroup::writeBoundingBox(QFile *file) {
-    BoundingBox::writeBoundingBox(file);
+void BoxesGroup::writeBoundingBox(QIODevice *target) {
+    BoundingBox::writeBoundingBox(target);
     int nChildBoxes = mChildBoxes.count();
-    file->write((char*)&nChildBoxes, sizeof(int));
+    target->write((char*)&nChildBoxes, sizeof(int));
     Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
-        child->writeBoundingBox(file);
+        child->writeBoundingBox(target);
     }
 }
 
-void BoxesGroup::readBoundingBox(QFile *file) {
-    BoundingBox::readBoundingBox(file);
+void BoxesGroup::readChildBoxes(QIODevice *target) {
     int nChildBoxes;
-    file->read((char*)&nChildBoxes, sizeof(int));
+    target->read((char*)&nChildBoxes, sizeof(int));
     for(int i = 0; i < nChildBoxes; i++) {
         BoundingBox *box;
         BoundingBoxType boxType;
-        file->read((char*)&boxType, sizeof(BoundingBoxType));
+        target->read((char*)&boxType, sizeof(BoundingBoxType));
         if(boxType == TYPE_VECTOR_PATH) {
             box = new VectorPath();
         } else if(boxType == TYPE_IMAGE) {
@@ -907,154 +917,158 @@ void BoxesGroup::readBoundingBox(QFile *file) {
             box = new InternalLinkCanvas(NULL);
         }
 
-        box->readBoundingBox(file);
-        box->setParent(this);
+        box->readBoundingBox(target);
         addChild(box);
     }
 }
 
-void PathAnimator::writePathAnimator(QFile *file) {
+void BoxesGroup::readBoundingBox(QIODevice *target) {
+    BoundingBox::readBoundingBox(target);
+    readChildBoxes(target);
+}
+
+void PathAnimator::writeProperty(QIODevice *target) {
     int nPaths = mSinglePaths.count();
-    file->write((char*)&nPaths, sizeof(int));
+    target->write((char*)&nPaths, sizeof(int));
     foreach(VectorPathAnimator *pathAnimator, mSinglePaths) {
-        pathAnimator->writeVectorPathAnimator(file);
+        pathAnimator->writeProperty(target);
     }
 }
 
-void PathAnimator::readPathAnimator(QFile *file) {
+void PathAnimator::readProperty(QIODevice *target) {
     int nPaths;
-    file->read((char*)&nPaths, sizeof(int));
+    target->read((char*)&nPaths, sizeof(int));
     for(int i = 0; i < nPaths; i++) {
         VectorPathAnimator *pathAnimator = new VectorPathAnimator(this);
-        pathAnimator->readVectorPathAnimator(file);
+        pathAnimator->readProperty(target);
         addSinglePathAnimator(pathAnimator, false);
     }
 }
 
-void VectorPath::writeBoundingBox(QFile *file) {
-    PathBox::writeBoundingBox(file);
-    mPathAnimator->writePathAnimator(file);
+void VectorPath::writeBoundingBox(QIODevice *target) {
+    PathBox::writeBoundingBox(target);
+    mPathAnimator->writeProperty(target);
 }
 
-void VectorPath::readBoundingBox(QFile *file) {
-    PathBox::readBoundingBox(file);
-    mPathAnimator->readPathAnimator(file);
+void VectorPath::readBoundingBox(QIODevice *target) {
+    PathBox::readBoundingBox(target);
+    mPathAnimator->readProperty(target);
 }
 
-void Canvas::writeBoundingBox(QFile *file) {
-    BoxesGroup::writeBoundingBox(file);
-    file->write((char*)&mWidth, sizeof(int));
-    file->write((char*)&mHeight, sizeof(int));
-    file->write((char*)&mFps, sizeof(qreal));
-    file->write((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
+void Canvas::writeBoundingBox(QIODevice *target) {
+    BoxesGroup::writeBoundingBox(target);
+    target->write((char*)&mWidth, sizeof(int));
+    target->write((char*)&mHeight, sizeof(int));
+    target->write((char*)&mFps, sizeof(qreal));
+    target->write((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
 }
 
-void Canvas::readBoundingBox(QFile *file) {
-    file->read((char*)&mType, sizeof(BoundingBoxType));
-    BoxesGroup::readBoundingBox(file);
-    file->read((char*)&mWidth, sizeof(int));
-    file->read((char*)&mHeight, sizeof(int));
-    file->read((char*)&mFps, sizeof(qreal));
-    file->read((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
+void Canvas::readBoundingBox(QIODevice *target) {
+    target->read((char*)&mType, sizeof(BoundingBoxType));
+    BoxesGroup::readBoundingBox(target);
+    target->read((char*)&mWidth, sizeof(int));
+    target->read((char*)&mHeight, sizeof(int));
+    target->read((char*)&mFps, sizeof(qreal));
+    target->read((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
 }
 
-void GradientWidget::writeGradients(QFile *file) {
+void GradientWidget::writeGradients(QIODevice *target) {
     int nGradients = mGradients.count();
-    file->write((char*)&nGradients, sizeof(int));
+    target->write((char*)&nGradients, sizeof(int));
     foreach(const QSharedPointer<Gradient> &gradient, mGradients) {
-        gradient->writeGradient(file);
+        gradient->writeProperty(target);
     }
 }
 
-void GradientWidget::readGradients(QFile *file) {
+void GradientWidget::readGradients(QIODevice *target) {
     int nGradients;
-    file->read((char*)&nGradients, sizeof(int));
+    target->read((char*)&nGradients, sizeof(int));
     for(int i = 0; i < nGradients; i++) {
         Gradient *gradient = new Gradient();
-        gradient->readGradient(file);
+        gradient->readProperty(target);
         addGradientToList(gradient);
         MainWindow::getInstance()->addLoadedGradient(gradient);
     }
 }
 
-void CanvasWindow::writeCanvases(QFile *file) {
+void CanvasWindow::writeCanvases(QIODevice *target) {
     int nCanvases = mCanvasList.count();
-    file->write((char*)&nCanvases, sizeof(int));
+    target->write((char*)&nCanvases, sizeof(int));
     int currentCanvasId = -1;
     int boxLoadId = 0;
     foreach(const CanvasQSPtr &canvas, mCanvasList) {
         boxLoadId = canvas->setBoxLoadId(boxLoadId);
-        canvas->writeBoundingBox(file);
+        canvas->writeBoundingBox(target);
         if(canvas == mCurrentCanvas) {
             currentCanvasId = mCurrentCanvas->getLoadId();
         }
     }
-    file->write((char*)&currentCanvasId, sizeof(int));
+    target->write((char*)&currentCanvasId, sizeof(int));
 }
 
-void CanvasWindow::readCanvases(QFile *file) {
+void CanvasWindow::readCanvases(QIODevice *target) {
     int nCanvases;
-    file->read((char*)&nCanvases, sizeof(int));
+    target->read((char*)&nCanvases, sizeof(int));
     for(int i = 0; i < nCanvases; i++) {
         FillStrokeSettingsWidget *fillStrokeSettingsWidget =
                 MainWindow::getInstance()->getFillStrokeSettings();
         Canvas *canvas = new Canvas(fillStrokeSettingsWidget, this);
-        canvas->readBoundingBox(file);
+        canvas->readBoundingBox(target);
         MainWindow::getInstance()->addCanvas(canvas);
     }
     int currentCanvasId;
-    file->read((char*)&currentCanvasId, sizeof(int));
+    target->read((char*)&currentCanvasId, sizeof(int));
     setCurrentCanvas((Canvas*)BoundingBox::getLoadedBoxById(currentCanvasId));
 }
 
 void MainWindow::loadAVFile(const QString &path) {
-    QFile file(path);
-    if(file.open(QIODevice::ReadOnly) ) {
+    QFile target(path);
+    if(target.open(QIODevice::ReadOnly) ) {
         FileFooter footer;
-        footer.read(&file);
+        footer.read(&target);
         if(footer.combatybilityMode() ==
                 FileFooter::CompatybilityMode::Compatible) {
             GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
-            gradientWidget->readGradients(&file);
-            mCanvasWindow->readCanvases(&file);
+            gradientWidget->readGradients(&target);
+            mCanvasWindow->readCanvases(&target);
 
             clearLoadedGradientsList();
             gradientWidget->clearGradientsLoadIds();
             BoundingBox::clearLoadedBoxes();
         } else {
             QMessageBox::critical(this, tr("File Load Fail"),
-                                  tr("The file you tried to load is incompatible,\n"
+                                  tr("The target you tried to load is incompatible,\n"
                                      "or damaged."),
                                   QMessageBox::Ok,
                                   QMessageBox::Ok);
         }
 
-        file.close();
+        target.close();
     }
 }
 
 void MainWindow::saveToFile(const QString &path) {
     disable();
-    QFile file(path);
-    if(file.exists()) {
-        file.remove();
+    QFile target(path);
+    if(target.exists()) {
+        target.remove();
     }
 
     GradientWidget *gradientWidget = mFillStrokeSettings->getGradientWidget();
-    if(file.open(QIODevice::WriteOnly) ) {
+    if(target.open(QIODevice::WriteOnly) ) {
         gradientWidget->setGradientLoadIds();
-        gradientWidget->writeGradients(&file);
-        mCanvasWindow->writeCanvases(&file);
+        gradientWidget->writeGradients(&target);
+        mCanvasWindow->writeCanvases(&target);
 
         clearLoadedGradientsList();
         gradientWidget->clearGradientsLoadIds();
 
         FileFooter footer;
-        footer.write(&file);
+        footer.write(&target);
 
-        file.close();
+        target.close();
     }
 
     BoundingBox::clearLoadedBoxes();

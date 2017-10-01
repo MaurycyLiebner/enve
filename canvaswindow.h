@@ -141,8 +141,8 @@ public:
     void rotate90CW();
     void processSchedulers();
     bool noBoxesAwaitUpdate();
-    void writeCanvases(QFile *file);
-    void readCanvases(QFile *file);
+    void writeCanvases(QIODevice *target);
+    void readCanvases(QIODevice *target);
 protected:
     RenderInstanceSettings *mCurrentRenderSettings = NULL;
     bool mMouseGrabber = false;

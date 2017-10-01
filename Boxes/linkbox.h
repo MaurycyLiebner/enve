@@ -157,6 +157,7 @@ public:
     }
 
     bool isRelFrameInVisibleDurationRect(const int &relFrame) {
+        if(mLinkTarget == NULL) return false;
         return BoxesGroup::isRelFrameInVisibleDurationRect(relFrame) &&
                 mLinkTarget->isRelFrameInVisibleDurationRect(relFrame);
     }
@@ -306,10 +307,9 @@ public:
         Canvas *canvasTarget = (Canvas*)finalTarget;
         canvasData->bgColor = canvasTarget->getBgColorAnimator()->
                                 getColorAtRelFrame(relFrame).getSkColor();
-        canvasData->canvasHeight = canvasTarget->getCanvasHeight()*
-                                    canvasTarget->getResolutionFraction();
-        canvasData->canvasWidth = canvasTarget->getCanvasWidth()*
-                                    canvasTarget->getResolutionFraction();
+        qreal res = getParentCanvas()->getResolutionFraction();
+        canvasData->canvasHeight = canvasTarget->getCanvasHeight()*res;
+        canvasData->canvasWidth = canvasTarget->getCanvasWidth()*res;
         if(mParent->SWT_isLinkBox()) {
             canvasData->clipToCanvas =
                     ((InternalLinkCanvas*)mLinkTarget.data())->clipToCanvas();

@@ -77,8 +77,6 @@ public:
 
     CtrlsMode getCtrlsMode();
 
-    virtual void copyToContainer(KeysClipboardContainer *container);
-
     QrealAnimator *getParentQrealAnimator();
     void setRelFrame(const int &frame);
 
@@ -93,8 +91,8 @@ public:
 
     void startValueTransform();
     void finishValueTransform();
-    void writeQrealKey(QFile *file);
-    void readQrealKey(QFile *file);
+    void writeKey(QIODevice *target);
+    void readKey(QIODevice *target);
 protected:
     CtrlsMode mCtrlsMode = CTRLS_SYMMETRIC;
 

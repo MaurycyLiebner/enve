@@ -406,13 +406,6 @@ bool ComplexKey::isEmpty() {
     return mKeys.isEmpty();
 }
 
-void ComplexKey::copyToContainer(KeysClipboardContainer *container) {
-    Q_FOREACH(Key *key, mKeys) {
-        if(key->isSelected()) continue;
-        key->copyToContainer(container);
-    }
-}
-
 //QrealKey *ComplexKey::makeQrealKeyDuplicate(QrealAnimator *targetParent) {
 //    ComplexKey *target = new ComplexKey((ComplexAnimator*)targetParent);
 //    target->setValue(mValue);

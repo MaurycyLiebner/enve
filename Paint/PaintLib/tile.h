@@ -119,8 +119,8 @@ public:
 
     void saveToTmp();
     void clearTmp();
-    void writeTile(QFile *file);
-    void readTile(QFile *file);
+    void writeTile(QIODevice *target);
+    void readTile(QIODevice *target);
 
     void duplicateFrom(Tile *tile);
 

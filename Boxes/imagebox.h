@@ -61,8 +61,8 @@ public:
                                                BoundingBoxRenderData *data);
 
     BoundingBoxRenderData *createRenderData();
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
 private:
     ImageCacheHandler *mImgCacheHandler = NULL;
     QString mImageFilePath;

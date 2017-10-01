@@ -532,8 +532,8 @@ public:
     virtual void selectAllPoints(Canvas *canvas) {
         Q_UNUSED(canvas);
     }
-    virtual void writeBoundingBox(QFile *file);
-    virtual void readBoundingBox(QFile *file);
+    virtual void writeBoundingBox(QIODevice *target);
+    virtual void readBoundingBox(QIODevice *target);
     virtual void shiftAll(const int &shift);
     virtual QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
         return mTransformAnimator->getRelativeTransformAtRelFrame(relFrame);

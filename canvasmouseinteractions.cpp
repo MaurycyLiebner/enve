@@ -256,7 +256,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
             QAction *selectedAction = menu.exec(event->globalPos());
             if(selectedAction != NULL) {
                 if(selectedAction->text() == "Paste") {
-                    clipboard->pasteTo(mCurrentBoxesGroup);
+                    pasteAction();
                 } else if(selectedAction->text()== "Settings...") {
                     mCanvasWindow->openSettingsWindowForCurrentCanvas();
                 } else if(selectedAction->text() == "Blur") {

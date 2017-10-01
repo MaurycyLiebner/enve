@@ -438,20 +438,28 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             QMenu *canvasMenu = menu.addMenu("Canvas");
             boxTarget->addActionsToMenu(canvasMenu);
             boxTarget->getParentCanvas()->addCanvasActionToMenu(canvasMenu);
-        } else if(target->SWT_isAnimator()) {
-            AnimatorClipboardContainer *clipboard =
-                    (AnimatorClipboardContainer*)
+        } else if(target->SWT_isProperty()) {
+            PropertyClipboardContainer *clipboard =
+                    (PropertyClipboardContainer*)
                     MainWindow::getInstance()->getClipboardContainer(
-                                                CCT_ANIMATOR);
-            Animator *animTarget = (Animator*)target;
-            if(animTarget->prp_isKeyOnCurrentFrame()) {
-                menu.addAction("Delete Key")->setObjectName("swt_delete_key");
-            } else {
-                menu.addAction("Add Key")->setObjectName("swt_add_key");
+                                                CCT_PROPERTY);
+            if(target->SWT_isAnimator()) {
+                Animator *animTarget = (Animator*)target;
+                if(animTarget->prp_isKeyOnCurrentFrame()) {
+                    menu.addAction("Delete Key")->setObjectName("swt_delete_key");
+                } else {
+                    menu.addAction("Add Key")->setObjectName("swt_add_key");
+                }
             }
             menu.addAction("Copy")->setObjectName("swt_copy");
             if(clipboard != NULL) {
-                menu.addAction("Paste")->setObjectName("swt_paste");
+                if(clipboard->propertyCompatible((Property*)target)) {
+                    menu.addAction("Paste")->setObjectName("swt_paste");
+                } else {
+                    menu.addAction("Paste")->setDisabled(true);
+                }
+            } else {
+                menu.addAction("Paste")->setDisabled(true);
             }
             if(target->SWT_isPixmapEffect()) {
                 menu.addAction("Delete Effect")->setObjectName("swt_delete_effect");
@@ -469,15 +477,15 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     boxTarget->createDurationRectangle();
                 }
             } else if(selectedAction->objectName() == "swt_copy") {
-                AnimatorClipboardContainer *container =
-                        new AnimatorClipboardContainer();
-                container->setAnimator((QrealAnimator*)target);
+                PropertyClipboardContainer *container =
+                        new PropertyClipboardContainer();
+                container->setProperty((Property*)target);
                 MainWindow::getInstance()->replaceClipboard(container);
             } else if(selectedAction->objectName() == "swt_paste") {
-                AnimatorClipboardContainer *clipboard =
-                        (AnimatorClipboardContainer*)
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
                         MainWindow::getInstance()->getClipboardContainer(
-                                                    CCT_ANIMATOR);
+                                                    CCT_PROPERTY);
                 clipboard->paste((QrealAnimator*)target);
             } else if(selectedAction->objectName() == "swt_delete_effect") {
                 PixmapEffect *effectTarget = (PixmapEffect*)target;

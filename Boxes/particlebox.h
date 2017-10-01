@@ -179,8 +179,8 @@ public:
         return data;
     }
 
-    void writeParticleEmitter(QFile *file);
-    void readParticleEmitter(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
     bool mGenerateParticlesScheduled = false;
     bool mUpdateParticlesForFrameScheduled = false;
@@ -293,8 +293,8 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                                int *lastIdentical,
                                               const int &relFrame);
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
 public slots:
     void updateAfterDurationRectangleRangeChanged();
 private:

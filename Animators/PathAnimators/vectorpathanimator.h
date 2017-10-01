@@ -162,8 +162,8 @@ public:
     void setElementsFromSkPath(const SkPath &path);
     void startPathChange();
     void cancelPathChange();
-    void readVectorPathAnimator(QFile *file);
-    void writeVectorPathAnimator(QFile *file);
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice *target);
 
     bool SWT_isVectorPathAnimator() { return true; }
     void anim_moveKeyToRelFrame(Key *key,
@@ -225,6 +225,7 @@ public:
     }
 
     void connectWith(VectorPathAnimator *srcPath);
+    Key *readKey(QIODevice *target);
 private:
     void setFirstPoint(NodePoint *firstPt);
 

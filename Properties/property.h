@@ -133,6 +133,14 @@ public:
     virtual int prp_prevRelFrameWithKey(const int &relFrame) {
         return relFrame;
     }
+
+    virtual void readProperty(QIODevice *device) {
+        Q_UNUSED(device);
+    }
+
+    virtual void writeProperty(QIODevice *device) {
+        Q_UNUSED(device);
+    }
 public slots:
     void prp_callUpdater();
 

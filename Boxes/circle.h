@@ -86,8 +86,8 @@ public:
 
     void startAllPointsTransform();
     SkPath getPathAtRelFrame(const int &relFrame);
-    void writeBoundingBox(QFile *file);
-    void readBoundingBox(QFile *file);
+    void writeBoundingBox(QIODevice *target);
+    void readBoundingBox(QIODevice *target);
 
     qreal getXRadiusAtRelFrame(const int &relFrame) {
         return mHorizontalRadiusPoint->getXValueAtRelFrame(relFrame);

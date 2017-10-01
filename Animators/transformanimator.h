@@ -71,8 +71,8 @@ public:
     bool SWT_isBasicTransformAnimator() { return true; }
 
     virtual QMatrix getCombinedTransformMatrixAtRelFrame(const int &relFrame);
-    void writeBasicTransformAnimator(QFile *file);
-    void readBasicTransformAnimator(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
     QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
 protected:
     QMatrix mRelTransform;
@@ -137,8 +137,8 @@ public:
     qreal getOpacityAtRelFrame(const int &relFrame);
 
     bool rotOrScaleOrPivotRecording();
-    void writeBoxTransformAnimator(QFile *file);
-    void readBoxTransformAnimator(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
     BoundingBox *mParentBox = NULL;
     QSharedPointer<PointAnimator> mPivotAnimator;

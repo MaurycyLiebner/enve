@@ -45,7 +45,6 @@ public:
         removeFromAnimator();
     }
 
-    virtual void copyToContainer(KeysClipboardContainer *container);
     virtual void cancelFrameTransform();
     virtual void scaleFrameAndUpdateParentAnimator(const int &relativeToFrame,
                                                    const qreal &scaleFactor);
@@ -82,8 +81,8 @@ public:
     }
 
     virtual bool differsFromKey(Key *key) = 0;
-    void writeKey(QFile *file);
-    void readKey(QFile *file);
+    virtual void writeKey(QIODevice *target);
+    virtual void readKey(QIODevice *target);
 protected:
     bool mIsSelected = false;
     Animator *mParentAnimator = NULL;

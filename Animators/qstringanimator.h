@@ -15,8 +15,8 @@ public:
     const QString &getText() { return mText; }
     void setText(const QString &text) { mText = text; }
     QStringKey *makeDuplicate(QStringAnimator *anim);
-    void writeQStringKey(QFile *file);
-    void readQStringKey(QFile *file);
+    void writeQStringKey(QIODevice *target);
+    void readQStringKey(QIODevice *target);
 private:
     QString mText;
 };
@@ -39,8 +39,8 @@ public:
                                               const int &relFrame);
 
     void makeDuplicate(QStringAnimator *anim);
-    void writeQStringAnimator(QFile *file);
-    void readQStringAnimator(QFile *file);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
 
     QString mCurrentText;

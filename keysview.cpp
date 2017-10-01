@@ -185,9 +185,13 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
                 if(event->isAutoRepeat()) return false;
                 KeysClipboardContainer *container =
                         new KeysClipboardContainer();
+                QBuffer target(container->getBytesArray());
+                target.open(QIODevice::WriteOnly);
                 Q_FOREACH(Key *key, mSelectedKeys) {
-                    key->copyToContainer(container);
+                    key->writeKey(&target);
+                    container->addTargetAnimator(key->getParentAnimator());
                 }
+                target.close();
                 mMainWindow->replaceClipboard(container);
             } else if(event->key() == Qt::Key_S) {
                 if(!mMovingKeys) {

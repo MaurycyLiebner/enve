@@ -753,9 +753,15 @@ void Canvas::deleteAction() {
 void Canvas::copyAction() {
     BoxesClipboardContainer *container =
             new BoxesClipboardContainer();
+    QBuffer target(container->getBytesArray());
+    target.open(QIODevice::WriteOnly);
+    int nBoxes = mSelectedBoxes.count();
+    target.write((char*)&nBoxes, sizeof(int));
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
-        container->copyBoxToContainer(box);
+        box->writeBoundingBox(&target);
     }
+    target.close();
+
     mMainWindow->replaceClipboard(container);
 }
 
@@ -765,6 +771,7 @@ void Canvas::pasteAction() {
             mMainWindow->getClipboardContainer(CCT_BOXES);
     if(container == NULL) return;
     container->pasteTo(mCurrentBoxesGroup);
+    clearBoxesSelection();
 }
 
 void Canvas::cutAction() {

@@ -74,6 +74,10 @@ QMenu::item:selected {
     color: black;
 }
 
+QMenu::item:disabled {
+    color: gray;
+}
+
 QMenuBar {
     padding-right: 4px;
     padding-left: 4px;
