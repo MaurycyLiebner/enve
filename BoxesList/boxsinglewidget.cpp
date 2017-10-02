@@ -421,6 +421,9 @@ void BoxSingleWidget::loadStaticPixmaps() {
     mStaticPixmapsLoaded = true;
 }
 #include "canvas.h"
+#include "PathEffects/patheffect.h"
+#include "PathEffects/patheffectanimators.h".h"
+
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     SingleWidgetTarget *target = mTarget->getTarget();
     if(event->button() == Qt::RightButton) {
@@ -443,6 +446,25 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     (PropertyClipboardContainer*)
                     MainWindow::getInstance()->getClipboardContainer(
                                                 CCT_PROPERTY);
+            menu.addAction("Copy")->setObjectName("swt_copy");
+            if(clipboard != NULL) {
+                if(clipboard->propertyCompatible((Property*)target)) {
+                    menu.addAction("Paste")->setObjectName("swt_paste");
+                    if(target->SWT_isAnimator()) {
+                        menu.addAction("Clear and Paste")->setObjectName("swt_clear_and_paste");
+                    }
+                } else {
+                    menu.addAction("Paste")->setDisabled(true);
+                    if(target->SWT_isAnimator()) {
+                        menu.addAction("Clear and Paste")->setDisabled(true);
+                    }
+                }
+            } else {
+                menu.addAction("Paste")->setDisabled(true);
+                if(target->SWT_isAnimator()) {
+                    menu.addAction("Clear and Paste")->setDisabled(true);
+                }
+            }
             if(target->SWT_isAnimator()) {
                 Animator *animTarget = (Animator*)target;
                 if(animTarget->prp_isKeyOnCurrentFrame()) {
@@ -451,17 +473,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     menu.addAction("Add Key")->setObjectName("swt_add_key");
                 }
             }
-            menu.addAction("Copy")->setObjectName("swt_copy");
-            if(clipboard != NULL) {
-                if(clipboard->propertyCompatible((Property*)target)) {
-                    menu.addAction("Paste")->setObjectName("swt_paste");
-                } else {
-                    menu.addAction("Paste")->setDisabled(true);
-                }
-            } else {
-                menu.addAction("Paste")->setDisabled(true);
-            }
-            if(target->SWT_isPixmapEffect()) {
+            if(target->SWT_isPixmapEffect() || target->SWT_isPathEffect()) {
                 menu.addAction("Delete Effect")->setObjectName("swt_delete_effect");
             }
         }
@@ -486,11 +498,33 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         (PropertyClipboardContainer*)
                         MainWindow::getInstance()->getClipboardContainer(
                                                     CCT_PROPERTY);
-                clipboard->paste((QrealAnimator*)target);
+                clipboard->paste((Property*)target);
+            } else if(selectedAction->objectName() == "swt_clear_and_paste") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->clearAndPaste((Property*)target);
             } else if(selectedAction->objectName() == "swt_delete_effect") {
-                PixmapEffect *effectTarget = (PixmapEffect*)target;
-                effectTarget->getParentEffectAnimators()->
-                        getParentBox()->removeEffect(effectTarget);
+                if(target->SWT_isPixmapEffect()) {
+                    PixmapEffect *effectTarget = (PixmapEffect*)target;
+                    effectTarget->getParentEffectAnimators()->
+                            getParentBox()->removeEffect(effectTarget);
+                } else {
+                    PathEffect *effectTarget = (PathEffect*)target;
+                    PathEffectAnimators *parentAnimators = effectTarget->getParentEffectAnimators();
+                    if(parentAnimators->isOutline()) {
+                        parentAnimators->getParentBox()->
+                                removeOutlinePathEffect(effectTarget);
+                    } else if(parentAnimators->isFill()) {
+                        parentAnimators->getParentBox()->
+                                removeFillPathEffect(effectTarget);
+                    } else {
+                        parentAnimators->getParentBox()->
+                                removePathEffect(effectTarget);
+                    }
+
+                }
             } else if(selectedAction->objectName() == "swt_delete_key") {
                 Animator *animTarget = (Animator*)target;
                 animTarget->anim_deleteCurrentKey();

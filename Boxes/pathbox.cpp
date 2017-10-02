@@ -183,7 +183,7 @@ void PathBox::addPathEffect(PathEffect *effect) {
         ca_addChildAnimator(mPathEffectsAnimators.data());
     }
     mPathEffectsAnimators->ca_addChildAnimator(effect);
-    //effect->setParentEffectAnimators(mEffectsAnimators.data());
+    effect->setParentEffectAnimators(mPathEffectsAnimators.data());
 
     clearAllCache();
 }
@@ -195,7 +195,7 @@ void PathBox::addFillPathEffect(PathEffect *effect) {
         ca_addChildAnimator(mFillPathEffectsAnimators.data());
     }
     mFillPathEffectsAnimators->ca_addChildAnimator(effect);
-    //effect->setParentEffectAnimators(mEffectsAnimators.data());
+    effect->setParentEffectAnimators(mFillPathEffectsAnimators.data());
 
     clearAllCache();
 }
@@ -207,7 +207,34 @@ void PathBox::addOutlinePathEffect(PathEffect *effect) {
         ca_addChildAnimator(mOutlinePathEffectsAnimators.data());
     }
     mOutlinePathEffectsAnimators->ca_addChildAnimator(effect);
-    //effect->setParentEffectAnimators(mEffectsAnimators.data());
+    effect->setParentEffectAnimators(mOutlinePathEffectsAnimators.data());
+
+    clearAllCache();
+}
+
+void PathBox::removePathEffect(PathEffect *effect) {
+    mPathEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mPathEffectsAnimators->hasChildAnimators()) {
+        ca_removeChildAnimator(mPathEffectsAnimators.data());
+    }
+
+    clearAllCache();
+}
+
+void PathBox::removeFillPathEffect(PathEffect *effect) {
+    mFillPathEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mFillPathEffectsAnimators->hasChildAnimators()) {
+        ca_removeChildAnimator(mFillPathEffectsAnimators.data());
+    }
+
+    clearAllCache();
+}
+
+void PathBox::removeOutlinePathEffect(PathEffect *effect) {
+    mOutlinePathEffectsAnimators->ca_removeChildAnimator(effect);
+    if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
+        ca_removeChildAnimator(mOutlinePathEffectsAnimators.data());
+    }
 
     clearAllCache();
 }

@@ -7,12 +7,33 @@
 #include "Properties/boolproperty.h"
 #include "Animators/intanimator.h"
 #include "skiaincludes.h"
-
+class PathEffectAnimators;
 enum PathEffectType : short {
     DISPLACE_PATH_EFFECT,
     DASH_PATH_EFFECT,
     DUPLICATE_PATH_EFFECT,
     SUM_PATH_EFFECT
+};
+class PathEffect;
+
+class PathEffectMimeData : public QMimeData {
+    Q_OBJECT
+public:
+    PathEffectMimeData(PathEffect *target) : QMimeData() {
+        mPathEffect = target;
+    }
+
+    PathEffect *getPathEffect() {
+        return mPathEffect;
+    }
+
+    bool hasFormat(const QString &mimetype) const {
+        if(mimetype == "patheffect") return true;
+        return false;
+    }
+
+private:
+    PathEffect *mPathEffect;
 };
 
 class PathEffect : public ComplexAnimator {
@@ -32,10 +53,37 @@ public:
         if(mApplyBeforeThickness == NULL) return false;
         return mApplyBeforeThickness->getValue();
     }
+    void setParentEffectAnimators(PathEffectAnimators *parent) {
+        mParentEffectAnimators = parent;
+    }
+
+    PathEffectAnimators *getParentEffectAnimators() {
+        return mParentEffectAnimators;
+    }
+
+    QMimeData *SWT_createMimeData() {
+        return new PathEffectMimeData(this);
+    }
+
+    bool SWT_isPathEffect() { return true; }
+
+    void setIsOutlineEffect(const bool &bT) {
+        if(bT == mOutlineEffect) return;
+        mOutlineEffect = bT;
+        if(mOutlineEffect) {
+            mApplyBeforeThickness = (new BoolProperty())->ref<BoolProperty>();
+            mApplyBeforeThickness->prp_setName("pre-thickness");
+            ca_addChildAnimator(mApplyBeforeThickness.data());
+        } else if(mApplyBeforeThickness != NULL) {
+            ca_removeChildAnimator(mApplyBeforeThickness.data());
+            mApplyBeforeThickness.reset();
+        }
+    }
 protected:
-    bool mOutlineEffect;
+    bool mOutlineEffect = false;
     QSharedPointer<BoolProperty> mApplyBeforeThickness;
     PathEffectType mPathEffectType;
+    PathEffectAnimators *mParentEffectAnimators = NULL;
 };
 
 class DisplacePathEffect : public PathEffect {

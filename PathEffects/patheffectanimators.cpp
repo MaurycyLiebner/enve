@@ -22,6 +22,16 @@ void PathEffectAnimators::addEffect(PathEffect *effect) {
     }
 }
 
+void PathEffectAnimators::removeEffect(PathEffect *effect) {
+    if(mIsOutline) {
+        mParentPath->removeOutlinePathEffect(effect);
+    } else if(mIsFill) {
+        mParentPath->removeFillPathEffect(effect);
+    } else {
+        mParentPath->removePathEffect(effect);
+    }
+}
+
 bool PathEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }

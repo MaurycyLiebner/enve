@@ -26,6 +26,16 @@ public:
     void writeProperty(QIODevice *target);
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath);
+    void removeEffect(PathEffect *effect);
+    PathBox *getParentBox() {
+        return mParentPath;
+    }
+    const bool &isOutline() const {
+        return mIsOutline;
+    }
+    const bool &isFill() const {
+        return mIsFill;
+    }
 protected:
     bool mIsOutline;
     bool mIsFill;

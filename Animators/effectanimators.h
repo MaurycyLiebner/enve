@@ -41,6 +41,8 @@ public:
     void addEffectRenderDataToList(const int &relFrame,
             QList<PixmapEffectRenderData*> *pixmapEffects);
 
+    void ca_removeAllChildAnimators();
+
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
 private:

@@ -95,13 +95,30 @@ PropertyClipboardContainer::PropertyClipboardContainer() :
 PropertyClipboardContainer::~PropertyClipboardContainer() {
 }
 
-void PropertyClipboardContainer::paste(Property *targetProperty) {
+void PropertyClipboardContainer::clearAndPaste(Property *targetProperty) {
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
     if(propertyCompatible(targetProperty)) {
         if(targetProperty->SWT_isAnimator()) {
-            ((Animator*)targetProperty)->anim_removeAllKeys();
+            if(targetProperty->SWT_isComplexAnimator()) {
+                if(targetProperty->SWT_isEffectAnimators()) {
+                    ((ComplexAnimator*)targetProperty)->ca_removeAllChildAnimators();
+                }
+            } else {
+                ((Animator*)targetProperty)->anim_removeAllKeys();
+            }
         }
+        targetProperty->readProperty(&target);
+        targetProperty->prp_callUpdater();
+        targetProperty->prp_callFinishUpdater();
+    }
+    target.close();
+}
+
+void PropertyClipboardContainer::paste(Property *targetProperty) {
+    QBuffer target(getBytesArray());
+    target.open(QIODevice::ReadOnly);
+    if(propertyCompatible(targetProperty)) {
         targetProperty->readProperty(&target);
         targetProperty->prp_callUpdater();
         targetProperty->prp_callFinishUpdater();

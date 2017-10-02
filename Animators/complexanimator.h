@@ -69,7 +69,7 @@ public:
                                                int *lastIdentical,
                                               const int &relFrame);
     void anim_saveCurrentValueAsKey();
-    void ca_removeChildAnimators();
+    virtual void ca_removeAllChildAnimators();
 public slots:
     void prp_setRecording(const bool &rec);
 

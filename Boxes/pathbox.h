@@ -144,6 +144,9 @@ public:
     void drawSelectedSk(SkCanvas *canvas,
                         const CanvasMode &currentCanvasMode,
                         const SkScalar &invScale);
+    void removePathEffect(PathEffect *effect);
+    void removeFillPathEffect(PathEffect *effect);
+    void removeOutlinePathEffect(PathEffect *effect);
 protected:
 
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;

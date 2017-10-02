@@ -62,6 +62,7 @@ public:
     ~PropertyClipboardContainer();
 
     void paste(Property *targetProperty);
+    void clearAndPaste(Property *targetProperty);
 
     bool propertyCompatible(Property *target);
     void setProperty(Property *property);

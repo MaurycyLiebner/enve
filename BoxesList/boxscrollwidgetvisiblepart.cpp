@@ -149,13 +149,15 @@ BoxSingleWidget *BoxScrollWidgetVisiblePart::
                     mSingleWidgets.at(
                         idAtYPos);
         }
-        while(!type.isTargeted(singleWidgetUnderMouse->getTargetAbstraction()->
-                                getTarget()) ) {
+        SingleWidgetAbstraction *targetAbs =
+                singleWidgetUnderMouse->getTargetAbstraction();
+        while(!type.isTargeted(targetAbs->getTarget()) ) {
             idAtYPos++;
             if(idAtYPos >= mSingleWidgets.count()) return NULL;
             singleWidgetUnderMouse = (BoxSingleWidget*)
                     mSingleWidgets.at(
                         idAtYPos);
+            targetAbs = singleWidgetUnderMouse->getTargetAbstraction();
         }
         *isBelow = targetId > idAtYPos;
         return singleWidgetUnderMouse;
@@ -209,7 +211,8 @@ void BoxScrollWidgetVisiblePart::stopScrolling() {
         mScrollTimer->stop();
     }
 }
-
+#include "PathEffects/patheffect.h"
+#include "PathEffects/patheffectanimators.h"
 void BoxScrollWidgetVisiblePart::dropEvent(
         QDropEvent *event) {
     stopScrolling();
@@ -276,8 +279,64 @@ void BoxScrollWidgetVisiblePart::dropEvent(
             EffectAnimators *draggedAnimator =
                                      effect->getParentEffectAnimators();
             if(draggedAnimator != underMouseAnimator) {
-                draggedAnimator->getParentBox()->removeEffect(effect);
                 underMouseAnimator->getParentBox()->addEffect(effect);
+                draggedAnimator->getParentBox()->removeEffect(effect);
+            }
+            if(below) { // add box below
+                underMouseAnimator->ca_moveChildAbove( // boxesgroup list is reversed
+                            effect,
+                            effectUnderMouse);
+            } else { // add box above
+                underMouseAnimator->ca_moveChildBelow(
+                            effect,
+                            effectUnderMouse);
+            }
+            underMouseAnimator->getParentBox()->clearAllCache();
+        }
+    } else if(event->mimeData()->hasFormat("patheffect")) {
+        int yPos = event->pos().y();
+        bool below;
+
+        SWT_TargetTypes type;
+        type.targetsFunctionList =
+                QList<SWT_Checker>({&SingleWidgetTarget::SWT_isPathEffect});
+        BoxSingleWidget *singleWidgetUnderMouse =
+                getClosestsSingleWidgetWithTargetType(
+                    type,
+                    yPos,
+                    &below);
+        if(singleWidgetUnderMouse == NULL) return;
+
+        PathEffect *effect = ((PathEffectMimeData*)event->mimeData())->
+                getPathEffect();
+        PathEffect *effectUnderMouse =
+                ((PathEffect*)singleWidgetUnderMouse->
+                 getTargetAbstraction()->getTarget());
+
+        if(effect != effectUnderMouse) {
+            PathEffectAnimators *underMouseAnimator =
+                                     effectUnderMouse->getParentEffectAnimators();
+            PathEffectAnimators *draggedAnimator =
+                                     effect->getParentEffectAnimators();
+            if(draggedAnimator != underMouseAnimator) {
+                if(underMouseAnimator->isOutline()) {
+                    underMouseAnimator->getParentBox()->addOutlinePathEffect(effect);
+                    effect->setIsOutlineEffect(true);
+                } else if(draggedAnimator->isFill()) {
+                    underMouseAnimator->getParentBox()->addFillPathEffect(effect);
+                    effect->setIsOutlineEffect(false);
+                } else {
+                    underMouseAnimator->getParentBox()->addPathEffect(effect);
+                    effect->setIsOutlineEffect(false);
+                }
+
+                if(draggedAnimator->isOutline()) {
+                    draggedAnimator->getParentBox()->removeOutlinePathEffect(effect);
+                } else if(draggedAnimator->isFill()) {
+                    draggedAnimator->getParentBox()->removeFillPathEffect(effect);
+                } else {
+                    draggedAnimator->getParentBox()->removePathEffect(effect);
+                }
             }
             if(below) { // add box below
                 underMouseAnimator->ca_moveChildAbove( // boxesgroup list is reversed
@@ -300,7 +359,8 @@ void BoxScrollWidgetVisiblePart::dragEnterEvent(
 {
     //mDragging = true;
     if(event->mimeData()->hasFormat("boundingbox") ||
-       event->mimeData()->hasFormat("pixmapeffect")) {
+       event->mimeData()->hasFormat("pixmapeffect") ||
+       event->mimeData()->hasFormat("patheffect")) {
         event->acceptProposedAction();
     }
 }
@@ -352,6 +412,10 @@ void BoxScrollWidgetVisiblePart::dragMoveEvent(
         mLastDragMoveTargetTypes.targetsFunctionList =
                 QList<SWT_Checker>(
                         {&SingleWidgetTarget::SWT_isPixmapEffect});
+    } else if(event->mimeData()->hasFormat("patheffect")) {
+        mLastDragMoveTargetTypes.targetsFunctionList =
+                QList<SWT_Checker>(
+                        {&SingleWidgetTarget::SWT_isPathEffect});
     }
 
     updateDraggingHighlight();

@@ -4,12 +4,7 @@
 PathEffect::PathEffect(const PathEffectType &type,
                        const bool &outlinePathEffect) {
     mPathEffectType = type;
-    if(outlinePathEffect) {
-        mApplyBeforeThickness = (new BoolProperty())->ref<BoolProperty>();
-        mApplyBeforeThickness->prp_setName("pre-thickness");
-        ca_addChildAnimator(mApplyBeforeThickness.data());
-    }
-    mOutlineEffect = outlinePathEffect;
+    setIsOutlineEffect(outlinePathEffect);
 }
 
 DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :

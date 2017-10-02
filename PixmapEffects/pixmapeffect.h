@@ -82,7 +82,7 @@ public:
     friend QDataStream & operator >> (QDataStream & s,
                                       PixmapEffect *& ptr);
 
-    virtual QMimeData *SWT_createMimeData() {
+    QMimeData *SWT_createMimeData() {
         return new PixmapEffectMimeData(this);
     }
 

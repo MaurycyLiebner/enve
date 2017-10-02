@@ -145,7 +145,7 @@ public:
     }
 
     void clearEffects() {
-        mEffectsAnimators->ca_removeChildAnimators();
+        mEffectsAnimators->ca_removeAllChildAnimators();
     }
 
     virtual void setFont(const QFont &) {}
@@ -442,6 +442,9 @@ public:
     virtual void addPathEffect(PathEffect *) {}
     virtual void addFillPathEffect(PathEffect *) {}
     virtual void addOutlinePathEffect(PathEffect *) {}
+    virtual void removePathEffect(PathEffect *) {}
+    virtual void removeFillPathEffect(PathEffect *) {}
+    virtual void removeOutlinePathEffect(PathEffect *) {}
 
     virtual void addActionsToMenu(QMenu *) {}
     virtual bool handleSelectedCanvasAction(QAction *) {

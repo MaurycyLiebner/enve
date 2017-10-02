@@ -54,6 +54,11 @@ void EffectAnimators::addEffectRenderDataToList(
     }
 }
 
+void EffectAnimators::ca_removeAllChildAnimators() {
+    ComplexAnimator::ca_removeAllChildAnimators();
+    mParentBox->ca_removeChildAnimator(this);
+}
+
 bool EffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }

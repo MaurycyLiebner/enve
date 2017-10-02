@@ -44,6 +44,7 @@ public:
     virtual bool SWT_isComplexAnimator() { return false; }
     virtual bool SWT_isEffectAnimators() { return false; }
     virtual bool SWT_isPixmapEffect() { return false; }
+    virtual bool SWT_isPathEffect() { return false; }
     virtual bool SWT_isIntAnimator() { return false; }
     virtual bool SWT_isGradient() { return false; }
     virtual bool SWT_isPaintSettings() { return false; }

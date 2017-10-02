@@ -187,7 +187,7 @@ void ComplexAnimator::ca_removeChildAnimator(Property *removeAnimator) {
     prp_callUpdater();
 }
 
-void ComplexAnimator::ca_removeChildAnimators() {
+void ComplexAnimator::ca_removeAllChildAnimators() {
     for(int i = ca_mChildAnimators.count() - 1; i >= 0; i--) {
         ca_removeChildAnimator(ca_mChildAnimators.at(i).data());
     }
