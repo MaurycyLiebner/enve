@@ -556,6 +556,8 @@ public:
     const QList<BoundingBox*> &getLinkingBoxes() const {
         return mLinkingBoxes;
     }
+
+    void updateGlobalPivotIfSelected();
 protected:
     QList<BoundingBox*> mLinkingBoxes;
     QList<std::shared_ptr<Updatable> > mSchedulers;

@@ -16,13 +16,14 @@ public:
 
     //void makeDuplicate(Property *target);
 
-    bool SWT_isEffectAnimators();
-
+    bool SWT_isPathEffectAnimators() {
+        return true;
+    }
 
     void filterPath(SkPath *srcDstPath);
     void filterPathForRelFrame(const int &relFrame, SkPath *srcDstPath);
 
-    void readProperty(QIODevice *target, const bool &outline);
+    void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
     void filterPathForRelFrameBeforeThickness(const int &relFrame,
                                               SkPath *srcDstPath);
@@ -36,6 +37,7 @@ public:
     const bool &isFill() const {
         return mIsFill;
     }
+    readPathEffect(QIODevice *target);
 protected:
     bool mIsOutline;
     bool mIsFill;

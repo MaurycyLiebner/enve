@@ -42,7 +42,8 @@ public:
     virtual bool SWT_isBoolAnimator() { return false; }
     virtual bool SWT_isColorAnimator() { return false; }
     virtual bool SWT_isComplexAnimator() { return false; }
-    virtual bool SWT_isEffectAnimators() { return false; }
+    virtual bool SWT_isPixmapEffectAnimators() { return false; }
+    virtual bool SWT_isPathEffectAnimators() { return false; }
     virtual bool SWT_isPixmapEffect() { return false; }
     virtual bool SWT_isPathEffect() { return false; }
     virtual bool SWT_isIntAnimator() { return false; }
@@ -53,7 +54,6 @@ public:
     virtual bool SWT_isQPointFAnimator() { return false; }
     virtual bool SWT_isQrealAnimator() { return false; }
     virtual bool SWT_isQStringAnimator() { return false; }
-    virtual bool SWT_isSinglePathAnimator() { return false; }
     virtual bool SWT_isBasicTransformAnimator() { return false; }
     virtual bool SWT_isBoxTransformAnimator() { return false; }
     virtual bool SWT_isVectorPathAnimator() { return false; }

@@ -569,6 +569,14 @@ void BoundingBox::setupEffects(const int &relFrame,
                                                  &data->pixmapEffects);
 }
 
+void BoundingBox::updateGlobalPivotIfSelected() {
+    if(isSelected()) {
+        Canvas *parentCanvas = getParentCanvas();
+        if(parentCanvas == NULL) return;
+        parentCanvas->schedulePivotUpdate();
+    }
+}
+
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
     return mRelBoundingRect.contains(point.toPoint());
 }

@@ -9,6 +9,8 @@
 ScrollWidget::ScrollWidget(ScrollArea *parent) :
     MinimalScrollWidget(parent) {
     //createVisiblePartWidget();
+    connect(parent, SIGNAL(heightChanged(int)),
+            this, SLOT(updateHeightAfterScrollAreaResize(int)));
 }
 
 void ScrollWidget::updateAbstraction() {
@@ -44,9 +46,15 @@ void ScrollWidget::updateHeight() {
         hide();
         return;
     }
-    setFixedHeight(mMainAbstraction->getHeight(
-                       mVisiblePartWidget->getCurrentRulesCollection(),
-                       false,
-                       false) + MIN_WIDGET_HEIGHT/2);
+    mContentHeight = mMainAbstraction->getHeight(
+                mVisiblePartWidget->getCurrentRulesCollection(),
+                false,
+                false) + MIN_WIDGET_HEIGHT/2;
+    int parentHeight = mParentScrollArea->height();
+    setFixedHeight(qMax(mContentHeight, parentHeight));
     if(isHidden()) show();
+}
+
+void ScrollWidget::updateHeightAfterScrollAreaResize(const int &parentHeight) {
+    setFixedHeight(qMax(mContentHeight, parentHeight));
 }

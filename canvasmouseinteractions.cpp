@@ -798,6 +798,7 @@ void Canvas::tabletEvent(QTabletEvent *e,
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
+    schedulePivotUpdate();
     if(isPreviewingOrRendering() ||
             event->button() != Qt::LeftButton) return;
     if(mCurrentMode == PAINT_MODE) {

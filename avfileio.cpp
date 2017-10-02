@@ -317,17 +317,21 @@ void EffectAnimators::writeProperty(QIODevice *target) {
     }
 }
 
+void EffectAnimators::readPixmapEffect(QIODevice *target) {
+    PixmapEffectType typeT;
+    target->read((char*)&typeT, sizeof(PixmapEffectType));
+    if(typeT == EFFECT_BLUR) {
+        BlurEffect *blurEffect = new BlurEffect();
+        blurEffect->readProperty(target);
+        addEffect(blurEffect);
+    }
+}
+
 void EffectAnimators::readProperty(QIODevice *target) {
     int nEffects;
     target->read((char*)&nEffects, sizeof(int));
     for(int i = 0; i < nEffects; i++) {
-        PixmapEffectType typeT;
-        target->read((char*)&typeT, sizeof(PixmapEffectType));
-        if(typeT == EFFECT_BLUR) {
-            BlurEffect *blurEffect = new BlurEffect();
-            blurEffect->readProperty(target);
-            addEffect(blurEffect);
-        }
+        readPixmapEffect(target);
     }
 }
 
@@ -558,26 +562,32 @@ void PathEffectAnimators::writeProperty(QIODevice *target) {
     }
 }
 
-void PathEffectAnimators::readProperty(QIODevice *target,
-                                                  const bool &outline) {
+PathEffectAnimators::readPathEffect(QIODevice *target) {
+    PathEffectType typeT;
+    target->read((char*)&typeT, sizeof(PathEffectType));
+    if(typeT == DISPLACE_PATH_EFFECT) {
+        DisplacePathEffect *displaceEffect =
+                new DisplacePathEffect(mIsOutline);
+        displaceEffect->readProperty(target);
+        addEffect(displaceEffect);
+    } else if(typeT == DUPLICATE_PATH_EFFECT) {
+        DuplicatePathEffect *duplicateEffect =
+                new DuplicatePathEffect(mIsOutline);
+        duplicateEffect->readProperty(target);
+        addEffect(duplicateEffect);
+    } else if(typeT == SUM_PATH_EFFECT) {
+        SumPathEffect *sumEffect =
+                new SumPathEffect(NULL, mIsOutline);
+        sumEffect->readProperty(target);
+        addEffect(sumEffect);
+    }
+}
+
+void PathEffectAnimators::readProperty(QIODevice *target) {
     int nEffects;
     target->read((char*)&nEffects, sizeof(int));
     for(int i = 0; i < nEffects; i++) {
-        PathEffectType typeT;
-        target->read((char*)&typeT, sizeof(PathEffectType));
-        if(typeT == DISPLACE_PATH_EFFECT) {
-            DisplacePathEffect *displaceEffect = new DisplacePathEffect(outline);
-            displaceEffect->readProperty(target);
-            addEffect(displaceEffect);
-        } else if(typeT == DUPLICATE_PATH_EFFECT) {
-            DuplicatePathEffect *duplicateEffect = new DuplicatePathEffect(outline);
-            duplicateEffect->readProperty(target);
-            addEffect(duplicateEffect);
-        } else if(typeT == SUM_PATH_EFFECT) {
-            SumPathEffect *sumEffect = new SumPathEffect(NULL, outline);
-            sumEffect->readProperty(target);
-            addEffect(sumEffect);
-        }
+        readPathEffect(target);
     }
 }
 
@@ -594,9 +604,9 @@ void PathBox::writeBoundingBox(QIODevice *target) {
 
 void PathBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
-    mPathEffectsAnimators->readProperty(target, false);
-    mFillPathEffectsAnimators->readProperty(target, false);
-    mOutlinePathEffectsAnimators->readProperty(target, true);
+    mPathEffectsAnimators->readProperty(target);
+    mFillPathEffectsAnimators->readProperty(target);
+    mOutlinePathEffectsAnimators->readProperty(target);
     mFillGradientPoints->readProperty(target);
     mStrokeGradientPoints->readProperty(target);
     mFillSettings->readProperty(target);

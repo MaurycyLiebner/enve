@@ -35,7 +35,7 @@ public:
         return NULL;
     }
 
-    bool SWT_isEffectAnimators() { return true; }
+    bool SWT_isPixmapEffectAnimators() { return true; }
     qreal getEffectsMarginAtRelFrame(const int &relFrame) const;
 
     void addEffectRenderDataToList(const int &relFrame,
@@ -45,6 +45,7 @@ public:
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+    void readPixmapEffect(QIODevice *target);
 private:
     BoundingBox *mParentBox;
 };

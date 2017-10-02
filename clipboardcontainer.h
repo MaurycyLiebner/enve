@@ -73,6 +73,9 @@ private:
     bool mPathAnimator = false;
     bool mAnimatedSurface = false;
     bool mComplexAnimator = false;
+    bool mPathEffectAnimators = false;
+    bool mPathEffect = false;
+    bool mPixmapEffect = false;
     QString mPropertyName;
 };
 

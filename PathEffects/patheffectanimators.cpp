@@ -36,8 +36,6 @@ bool PathEffectAnimators::hasEffects() {
     return !ca_mChildAnimators.isEmpty();
 }
 
-bool PathEffectAnimators::SWT_isEffectAnimators() { return true; }
-
 void PathEffectAnimators::filterPath(SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {

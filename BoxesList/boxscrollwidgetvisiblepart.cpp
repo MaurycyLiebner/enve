@@ -29,7 +29,7 @@ void BoxScrollWidgetVisiblePart::paintEvent(QPaintEvent *) {
 //    p.fillRect(rect(), Qt::red);
     int currY = MIN_WIDGET_HEIGHT;
     p.setPen(QPen(QColor(40, 40, 40), 1.));
-    while(currY < height()) {
+    while(currY < ((BoxScrollWidget*)mParentWidget)->getContentHeight()) {
         p.drawLine(0, currY, width(), currY);
 
         currY += MIN_WIDGET_HEIGHT;
@@ -431,7 +431,9 @@ void BoxScrollWidgetVisiblePart::updateDraggingHighlight() {
     if(singleWidgetUnderMouse != NULL) {
         int currentDragPosId = singleWidgetUnderMouse->y()/MIN_WIDGET_HEIGHT;
         if(below) {
-            currentDragPosId++;
+            //currentDragPosId++;
+            currentDragPosId += singleWidgetUnderMouse->getTargetAbstraction()->
+                    getHeight(getCurrentRulesCollection(), true, false)/MIN_WIDGET_HEIGHT;
         }
         mDragging = true;
         mCurrentDragPosId = currentDragPosId;

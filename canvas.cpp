@@ -596,7 +596,7 @@ void Canvas::updatePivot() {
         } else {
             mRotPivot->show();
         }
-        if(getPointsSelectionCount() == 1) {
+        if(getPointsSelectionCount() == 1 && !mLocalPivot) {
             mRotPivot->setAbsolutePos(
                         getSelectedPointsAbsPivotPos() +
                             QPointF(0., 20.));
@@ -647,13 +647,17 @@ void Canvas::updateInputValue() {
 
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
-    //mCanvasWindow->setMouseTracking(true);
+#ifndef QT_DEBUG
+    mCanvasWindow->setMouseTracking(true);
+#endif
     mCanvasWindow->grabMouse();
 }
 
 void Canvas::releaseMouseAndDontTrack() {
     mIsMouseGrabbing = false;
-    //mCanvasWindow->setMouseTracking(false);
+#ifndef QT_DEBUG
+    mCanvasWindow->setMouseTracking(false);
+#endif
     mCanvasWindow->releaseMouse();
 }
 
