@@ -601,6 +601,11 @@ void BoxTargetProperty::writeProperty(QIODevice *target) {
         targetId = -1;
     } else {
         targetId = targetBox->getLoadId();
+        if(targetId < 0) {
+            targetId = BoundingBox::getLoadedBoxesCount();
+            targetBox->setBoxLoadId(targetId);
+            BoundingBox::addLoadedBox(targetBox);
+        }
     }
     target->write((char*)&targetId, sizeof(int));
 }
@@ -611,7 +616,7 @@ void BoxTargetProperty::readProperty(QIODevice *target) {
     BoundingBox *targetBox = BoundingBox::getLoadedBoxById(targetId);
     if(targetBox == NULL && targetId >= 0) {
         BoundingBox::addFunctionWaitingForBoxLoad(
-                    new SumPathEffectForBoxLoad(targetId, this) );
+                    new BoxTargetPropertyWaitingForBoxLoad(targetId, this) );
     } else {
         setTarget(targetBox);
     }
@@ -1092,6 +1097,9 @@ void CanvasWindow::writeCanvases(QIODevice *target) {
         }
     }
     target->write((char*)&currentCanvasId, sizeof(int));
+    foreach(const CanvasQSPtr &canvas, mCanvasList) {
+        canvas->clearBoxLoadId();
+    }
 }
 
 void CanvasWindow::readCanvases(QIODevice *target) {
@@ -1101,8 +1109,8 @@ void CanvasWindow::readCanvases(QIODevice *target) {
         FillStrokeSettingsWidget *fillStrokeSettingsWidget =
                 MainWindow::getInstance()->getFillStrokeSettings();
         Canvas *canvas = new Canvas(fillStrokeSettingsWidget, this);
-        canvas->readBoundingBox(target);
         MainWindow::getInstance()->addCanvas(canvas);
+        canvas->readBoundingBox(target);
     }
     int currentCanvasId;
     target->read((char*)&currentCanvasId, sizeof(int));

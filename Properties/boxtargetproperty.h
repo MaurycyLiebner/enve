@@ -8,8 +8,8 @@ class QrealAnimator;
 class BoxTargetProperty;
 
 #include "Boxes/boundingbox.h"
-struct SumPathEffectForBoxLoad : public FunctionWaitingForBoxLoad {
-    SumPathEffectForBoxLoad(const int &boxIdT,
+struct BoxTargetPropertyWaitingForBoxLoad : public FunctionWaitingForBoxLoad {
+    BoxTargetPropertyWaitingForBoxLoad(const int &boxIdT,
                             BoxTargetProperty *targetPropertyT);
 
     void boxLoaded(BoundingBox *box);
@@ -18,10 +18,11 @@ struct SumPathEffectForBoxLoad : public FunctionWaitingForBoxLoad {
 };
 
 class BoxTargetProperty : public Property {
+    Q_OBJECT
 public:
     BoxTargetProperty();
 
-    BoundingBox *getTarget();
+    BoundingBox *getTarget() const;
     void setTarget(BoundingBox *box);
 
     void makeDuplicate(Property *property);
@@ -30,6 +31,8 @@ public:
     bool SWT_isBoxTargetProperty() { return true; }
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+signals:
+    void targetSet(BoundingBox *);
 private:
     QWeakPointer<BoundingBox> mTarget;
 };

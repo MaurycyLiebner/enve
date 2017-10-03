@@ -7,7 +7,7 @@ BoxTargetProperty::BoxTargetProperty() :
     prp_setName("target");
 }
 
-BoundingBox *BoxTargetProperty::getTarget() {
+BoundingBox *BoxTargetProperty::getTarget() const {
     return mTarget.data();
 }
 
@@ -25,6 +25,7 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
                          this, SLOT(prp_callUpdater()));
     }
     prp_callFinishUpdater();
+    emit targetSet(box);
 }
 
 void BoxTargetProperty::makeDuplicate(Property *property) {
@@ -37,12 +38,12 @@ Property *BoxTargetProperty::makeDuplicate() {
     return prop;
 }
 
-SumPathEffectForBoxLoad::SumPathEffectForBoxLoad(const int &boxIdT,
+BoxTargetPropertyWaitingForBoxLoad::BoxTargetPropertyWaitingForBoxLoad(const int &boxIdT,
                                                  BoxTargetProperty *targetPropertyT) :
     FunctionWaitingForBoxLoad(boxIdT) {
     targetProperty = targetPropertyT;
 }
 
-void SumPathEffectForBoxLoad::boxLoaded(BoundingBox *box) {
+void BoxTargetPropertyWaitingForBoxLoad::boxLoaded(BoundingBox *box) {
     targetProperty->setTarget(box);
 }

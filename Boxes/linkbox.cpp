@@ -33,45 +33,49 @@ void ExternalLinkBox::setSrc(const QString &src) {
 }
 
 QPointF InternalLinkBox::getRelCenterPosition() {
-    return mLinkTarget->getRelCenterPosition();
+    return getLinkTarget()->getRelCenterPosition();
 }
 
-BoundingBox *InternalLinkBox::getLinkTarget() {
-    return mLinkTarget.data();
+BoundingBox *InternalLinkBox::getLinkTarget() const {
+    return mBoxTarget->getTarget();
 }
 
 BoundingBox *InternalLinkBox::createLink() {
-    return mLinkTarget->createLink();
+    return getLinkTarget()->createLink();
 }
 
 BoundingBoxRenderData *InternalLinkBox::createRenderData() {
-    BoundingBoxRenderData *renderData = mLinkTarget->createRenderData();
+    BoundingBoxRenderData *renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = weakRef<BoundingBox>();
     return renderData;
 }
 
 void InternalLinkBox::setupBoundingBoxRenderDataForRelFrame(
         const int &relFrame, BoundingBoxRenderData *data) {
-    mLinkTarget->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
+    getLinkTarget()->setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
 }
 
 QRectF InternalLinkBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
-    return mLinkTarget->getRelBoundingRectAtRelFrame(relFrame);
+    return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }
 
 InternalLinkBox::InternalLinkBox(BoundingBox *linkTarget) :
     BoundingBox(TYPE_INTERNAL_LINK) {
     setLinkTarget(linkTarget);
+    ca_addChildAnimator(mBoxTarget.data());
+    connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
+            this, SLOT(setTargetSlot(BoundingBox*)));
 }
 
 bool InternalLinkBox::relPointInsidePath(const QPointF &point) {
-    return mLinkTarget->relPointInsidePath(point);
+    return getLinkTarget()->relPointInsidePath(point);
 }
 
 bool InternalLinkBox::isRelFrameInVisibleDurationRect(const int &relFrame) {
+    if(getLinkTarget() == NULL) return false;
     return BoundingBox::isRelFrameInVisibleDurationRect(relFrame) &&
-            mLinkTarget->isRelFrameInVisibleDurationRect(relFrame);
+            getLinkTarget()->isRelFrameInVisibleDurationRect(relFrame);
 }
 
 void InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
@@ -80,7 +84,7 @@ void InternalLinkBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     int fIdLT;
     int lIdLT;
 
-    mLinkTarget->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
+    getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
                                                       &lIdLT,
                                                       relFrame);
     int fId;
@@ -119,7 +123,7 @@ bool InternalLinkBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     bool differences =
             ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
                                                              relFrame2) ||
-            mLinkTarget->prp_differencesBetweenRelFrames(relFrame1,
+            getLinkTarget()->prp_differencesBetweenRelFrames(relFrame1,
                                                          relFrame2);
     if(differences || mDurationRectangle == NULL) return differences;
     return mDurationRectangle->hasAnimationFrameRange();
@@ -137,6 +141,9 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup *linkTarget) :
                 child->createLinkForLinkGroup()->ref<BoundingBox>();
         addChild(newLink.data());
     }
+    ca_addChildAnimator(mBoxTarget.data());
+    connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),
+            this, SLOT(setTargetSlot(BoundingBox*)));
 }
 
 //bool InternalLinkGroupBox::relPointInsidePath(const QPointF &point) {
@@ -148,7 +155,7 @@ void InternalLinkGroupBox::prp_getFirstAndLastIdenticalRelFrame(int *firstIdenti
                                                         const int &relFrame) {
     int fIdLT;
     int lIdLT;
-    mLinkTarget->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
+    getLinkTarget()->prp_getFirstAndLastIdenticalRelFrame(&fIdLT,
                                                       &lIdLT,
                                                       relFrame);
     int fId;
@@ -187,7 +194,7 @@ bool InternalLinkGroupBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     bool differences =
             ComplexAnimator::prp_differencesBetweenRelFrames(relFrame1,
                                                              relFrame2) ||
-            mLinkTarget->prp_differencesBetweenRelFrames(relFrame1,
+            getLinkTarget()->prp_differencesBetweenRelFrames(relFrame1,
                                                          relFrame2);
     if(differences || mDurationRectangle == NULL) return differences;
     return mDurationRectangle->hasAnimationFrameRange();
@@ -195,21 +202,21 @@ bool InternalLinkGroupBox::prp_differencesBetweenRelFrames(const int &relFrame1,
 
 
 QPointF InternalLinkGroupBox::getRelCenterPosition() {
-    return mLinkTarget->getRelCenterPosition();
+    return getLinkTarget()->getRelCenterPosition();
 }
 
-BoxesGroup *InternalLinkGroupBox::getLinkTarget() {
-    return mLinkTarget.data();
+BoxesGroup *InternalLinkGroupBox::getLinkTarget() const {
+    return (BoxesGroup*)mBoxTarget->getTarget();
 }
 
 BoundingBoxRenderData *InternalLinkGroupBox::createRenderData() {
-    BoundingBoxRenderData *renderData = mLinkTarget->createRenderData();
+    BoundingBoxRenderData *renderData = getLinkTarget()->createRenderData();
     renderData->parentBox = weakRef<BoundingBox>();
     return renderData;
 }
 
 QRectF InternalLinkGroupBox::getRelBoundingRectAtRelFrame(const int &relFrame) {
-    return mLinkTarget->getRelBoundingRectAtRelFrame(relFrame);
+    return getLinkTarget()->getRelBoundingRectAtRelFrame(relFrame);
 }
 
 InternalLinkCanvas::InternalLinkCanvas(BoxesGroup *linkTarget) :

@@ -755,19 +755,25 @@ void Canvas::deleteAction() {
     }
 }
 
+bool boxesZSort(BoundingBox *box1,
+                BoundingBox *box2) {
+    return box1->getZIndex() < box2->getZIndex();
+}
+
 void Canvas::copyAction() {
     BoxesClipboardContainer *container =
             new BoxesClipboardContainer();
+    mMainWindow->replaceClipboard(container);
     QBuffer target(container->getBytesArray());
     target.open(QIODevice::WriteOnly);
     int nBoxes = mSelectedBoxes.count();
     target.write((char*)&nBoxes, sizeof(int));
+
+    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->writeBoundingBox(&target);
     }
     target.close();
-
-    mMainWindow->replaceClipboard(container);
 }
 
 void Canvas::pasteAction() {

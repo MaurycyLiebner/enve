@@ -202,13 +202,19 @@ public:
     void shiftAll(const int &shift);
 
     int setBoxLoadId(const int &loadId) {
-        mLoadId = loadId;
-        int loadIdT = loadId + 1;
+        int loadIdT = BoundingBox::setBoxLoadId(loadId);
         foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
             loadIdT = child->setBoxLoadId(loadIdT);
         }
 
         return loadIdT;
+    }
+
+    virtual void clearBoxLoadId() {
+        BoundingBox::clearBoxLoadId();
+        foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+            child->clearBoxLoadId();
+        }
     }
 
     const QList<QSharedPointer<BoundingBox> > &getChildBoxesList() const {

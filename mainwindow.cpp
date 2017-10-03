@@ -219,6 +219,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
 //    mPaintControlerThread->terminate();
 //    mPaintControlerThread->quit();
+    replaceClipboard(NULL);
 }
 
 #include "noshortcutaction.h"
@@ -453,14 +454,14 @@ void MainWindow::updateSettingsForCurrentCanvas() {
     Canvas *canvas = mCanvasWindow->getCurrentCanvas();
     mClipViewToCanvas->setChecked(canvas->clipToCanvas());
     mBoxesListAnimationDockWidget->updateSettingsForCurrentCanvas(canvas);
-    mObjectSettingsWidget->setMainTarget(
-                canvas->getCurrentBoxesGroup());
+    mObjectSettingsWidget->setMainTarget(canvas->getCurrentBoxesGroup());
     mBrushSettingsWidget->setCurrentBrush(canvas->getCurrentBrush());
 }
 
 void MainWindow::replaceClipboard(ClipboardContainer *container) {
     if(mClipboardContainer != NULL) {
         delete mClipboardContainer;
+        BoundingBox::clearLoadedBoxes();
     }
     mClipboardContainer = container;
 }
@@ -1156,10 +1157,7 @@ void MainWindow::clearAll() {
 //        delete cont;
 //    }
 //    mClipboardContainers.clear();
-    if(mClipboardContainer != NULL) {
-        delete mClipboardContainer;
-        mClipboardContainer = NULL;
-    }
+    replaceClipboard(NULL);
     FileSourcesCache::clearAll();
     //mBoxListWidget->clearAll();
 }

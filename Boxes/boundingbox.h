@@ -495,6 +495,10 @@ public:
         return loadId + 1;
     }
 
+    virtual void clearBoxLoadId() {
+        mLoadId = -1;
+    }
+
     static BoundingBox *getLoadedBoxById(const int &loadId) {
         foreach(BoundingBox *box, mLoadedBoxes) {
             if(box->getLoadId() == loadId) {
@@ -522,7 +526,14 @@ public:
         }
     }
 
+    static int getLoadedBoxesCount() {
+        return mLoadedBoxes.count();
+    }
+
     static void clearLoadedBoxes() {
+        foreach(BoundingBox *box, mLoadedBoxes) {
+            box->clearBoxLoadId();
+        }
         mLoadedBoxes.clear();
         foreach(FunctionWaitingForBoxLoad *funcT,
                 mFunctionsWaitingForBoxLoad) {
@@ -569,7 +580,7 @@ protected:
 
     virtual void updateDrawRenderContainerTransform();
 
-    int mLoadId = 0;
+    int mLoadId = -1;
 
     bool mBlockedSchedule = false;
 
