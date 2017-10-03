@@ -18,10 +18,6 @@ BoxesClipboardContainer::BoxesClipboardContainer() :
 BoxesClipboardContainer::~BoxesClipboardContainer() {
 }
 
-void BoxesClipboardContainer::copyBoxToContainer(BoundingBox *box) {
-    mBoxesList << box->createDuplicate();
-}
-
 void BoxesClipboardContainer::pasteTo(BoxesGroup *parent) {
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
@@ -113,11 +109,17 @@ void PropertyClipboardContainer::clearAndPaste(Property *targetProperty) {
 }
 #include "PathEffects/patheffectanimators.h"
 #include "Animators/pathanimator.h"
+#include "Properties/boxtargetproperty.h"
 void PropertyClipboardContainer::paste(Property *targetProperty) {
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
     if(propertyCompatible(targetProperty)) {
-        if(mPathEffect &&
+        if(mBoxTargetProperty) {
+            if(targetProperty->SWT_isBoxTargetProperty()) {
+                ((BoxTargetProperty*)targetProperty)->setTarget(
+                            mTargetBox.data());
+            }
+        } else if(mPathEffect &&
            targetProperty->SWT_isPathEffectAnimators()) {
             ((PathEffectAnimators*)targetProperty)->readPathEffect(&target);
         } else if(mPixmapEffect &&
@@ -143,6 +145,9 @@ void PropertyClipboardContainer::paste(Property *targetProperty) {
 
 bool PropertyClipboardContainer::propertyCompatible(Property *target) {
     QString nameT = target->prp_getName();
+    if(mBoxTargetProperty) {
+        return target->SWT_isBoxTargetProperty();
+    }
     if(mQrealAnimator) {
         return target->SWT_isQrealAnimator();
     }
@@ -180,12 +185,13 @@ bool PropertyClipboardContainer::propertyCompatible(Property *target) {
     }
     return false;
 }
-
+#include "Properties/boxtargetproperty.h"
 void PropertyClipboardContainer::setProperty(Property *property) {
     QBuffer targetBuff(getBytesArray());
     targetBuff.open(QIODevice::WriteOnly);
     property->writeProperty(&targetBuff);
     targetBuff.close();
+    mPropertyName = property->prp_getName();
     mQrealAnimator = property->SWT_isQrealAnimator();
     mQPointFAnimator = property->SWT_isQPointFAnimator();
     mQStringAnimator = property->SWT_isQStringAnimator();
@@ -197,4 +203,13 @@ void PropertyClipboardContainer::setProperty(Property *property) {
     mPathEffect = property->SWT_isPathEffect();
     mVectorPathAnimator = property->SWT_isVectorPathAnimator();
     mPixmapEffect = property->SWT_isPixmapEffect();
+    mBoxTargetProperty = property->SWT_isBoxTargetProperty();
+    if(mBoxTargetProperty) {
+        BoundingBox *targetBox = ((BoxTargetProperty*)property)->getTarget();
+        if(targetBox == NULL) {
+            mTargetBox.clear();
+        } else {
+            mTargetBox = targetBox->weakRef<BoundingBox>();
+        }
+    }
 }

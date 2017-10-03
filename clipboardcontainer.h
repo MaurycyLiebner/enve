@@ -1,6 +1,7 @@
 #ifndef CLIPBOARDCONTAINER_H
 #define CLIPBOARDCONTAINER_H
 #include <QList>
+#include <QWeakPointer>
 class QrealAnimator;
 class BoundingBox;
 class BoxesGroup;
@@ -35,8 +36,6 @@ class BoxesClipboardContainer : public ClipboardContainer {
 public:
     BoxesClipboardContainer();
     ~BoxesClipboardContainer();
-
-    void copyBoxToContainer(BoundingBox *box);
 
     void pasteTo(BoxesGroup *parent);
 private:
@@ -94,7 +93,9 @@ private:
     bool mPathEffect = false;
     bool mPixmapEffect = false;
     bool mVectorPathAnimator = false;
+    bool mBoxTargetProperty = false;
     QString mPropertyName;
+    QWeakPointer<BoundingBox> mTargetBox;
 };
 
 #endif // CLIPBOARDCONTAINER_H

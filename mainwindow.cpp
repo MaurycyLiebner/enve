@@ -63,9 +63,9 @@ MainWindow::MainWindow(QWidget *parent)
     BoxSingleWidget::loadStaticPixmaps();
     setupToolBar();
 
-    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
-        mClipboardContainers << NULL;
-    }
+//    for(int i = 0; i < ClipboardContainerType::CCT_COUNT; i++) {
+//        mClipboardContainers << NULL;
+//    }
 
     mCurrentUndoRedoStack = &mUndoRedoStack;
 
@@ -459,18 +459,19 @@ void MainWindow::updateSettingsForCurrentCanvas() {
 }
 
 void MainWindow::replaceClipboard(ClipboardContainer *container) {
-    ClipboardContainer *clipboardContainer = mClipboardContainers.at(
-                                                container->getType());
-    if(clipboardContainer != NULL) {
-        delete clipboardContainer;
+    if(mClipboardContainer != NULL) {
+        delete mClipboardContainer;
     }
-    mClipboardContainers.replace(container->getType(),
-                                 container);
+    mClipboardContainer = container;
 }
 
 ClipboardContainer *MainWindow::getClipboardContainer(
         const ClipboardContainerType &type) {
-    return mClipboardContainers.at(type);
+    if(mClipboardContainer == NULL) return NULL;
+    if(type == mClipboardContainer->getType()) {
+        return mClipboardContainer;
+    }
+    return NULL;
 }
 
 void MainWindow::setupToolBar() {
@@ -1151,11 +1152,14 @@ void MainWindow::clearAll() {
     mCurrentCanvasComboBox->clear();
     mCanvasWindow->clearAll();
     mFillStrokeSettings->clearAll();
-    foreach(ClipboardContainer *cont, mClipboardContainers) {
-        delete cont;
+//    foreach(ClipboardContainer *cont, mClipboardContainers) {
+//        delete cont;
+//    }
+//    mClipboardContainers.clear();
+    if(mClipboardContainer != NULL) {
+        delete mClipboardContainer;
+        mClipboardContainer = NULL;
     }
-
-    mClipboardContainers.clear();
     FileSourcesCache::clearAll();
     //mBoxListWidget->clearAll();
 }

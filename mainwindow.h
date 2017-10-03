@@ -176,7 +176,7 @@ private:
     static MainWindow *mMainWindowInstance;
     MemoryHandler *mMemoryHandler;
 
-    QList<ClipboardContainer*> mClipboardContainers;
+    ClipboardContainer *mClipboardContainer = NULL;
 //    bool mRendering = false;
 
     QComboBox *mCurrentCanvasComboBox;

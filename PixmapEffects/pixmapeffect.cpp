@@ -689,7 +689,7 @@ PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame
 }
 
 ReplaceColorEffect::ReplaceColorEffect() :
-    PixmapEffect(EFFECT_COLORIZE) {
+    PixmapEffect(EFFECT_REPLACE_COLOR) {
     prp_setName("replace color");
 
     mFromColor = (new ColorAnimator())->ref<ColorAnimator>();

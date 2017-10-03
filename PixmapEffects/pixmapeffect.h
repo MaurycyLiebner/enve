@@ -48,7 +48,8 @@ enum PixmapEffectType : short {
     EFFECT_DESATURATE,
     EFFECT_OIL,
     EFFECT_IMPLODE,
-    EFFECT_COLORIZE
+    EFFECT_COLORIZE,
+    EFFECT_REPLACE_COLOR
 };
 
 class EffectAnimators;
@@ -180,6 +181,8 @@ public:
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice *target);
 private:
 //    QrealAnimator mScale;
     QSharedPointer<BoolProperty> mHighQuality =
@@ -314,6 +317,8 @@ public:
     void duplicateInfluenceAnimatorFrom(QrealAnimator *source);
     PixmapEffectRenderData *getPixmapEffectRenderDataForRelFrame(
             const int &relFrame);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
     QSharedPointer<QrealAnimator> mInfluenceAnimator =
             (new QrealAnimator())->ref<QrealAnimator>();
@@ -345,6 +350,8 @@ public:
                                 QrealAnimator *saturation,
                                 QrealAnimator *lightness,
                                 QrealAnimator *alpha);
+    void writeProperty(QIODevice *target);
+    void readProperty(QIODevice *target);
 private:
     QrealAnimatorQSPtr mHueAnimator;
     QrealAnimatorQSPtr mSaturationAnimator;
@@ -383,6 +390,8 @@ public:
                                 ColorAnimator *toColor,
                                 QrealAnimator *tolerance,
                                 QrealAnimator *smoothness);
+    void readProperty(QIODevice *target);
+    void writeProperty(QIODevice *target);
 private:
     ColorAnimatorQSPtr mFromColor;
     ColorAnimatorQSPtr mToColor;

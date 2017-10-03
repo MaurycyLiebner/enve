@@ -433,13 +433,14 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         if(target->SWT_isBoundingBox()) {
             BoundingBox *boxTarget = ((BoundingBox*)target);
             menu.addAction("Rename")->setObjectName("swt_rename");
-            QAction *durRectAct = menu.addAction("Visibility Range");
-            durRectAct->setObjectName("swt_visibility_range");
-            durRectAct->setCheckable(true);
-            durRectAct->setChecked(boxTarget->hasDurationRectangle());
-            QMenu *canvasMenu = menu.addMenu("Canvas");
-            boxTarget->addActionsToMenu(canvasMenu);
-            boxTarget->getParentCanvas()->addCanvasActionToMenu(canvasMenu);
+            if(!target->SWT_isParticleBox() &&
+                !target->SWT_isAnimationBox()) {
+                QAction *durRectAct = menu.addAction("Visibility Range");
+                durRectAct->setObjectName("swt_visibility_range");
+                durRectAct->setCheckable(true);
+                durRectAct->setChecked(boxTarget->hasDurationRectangle());
+            }
+            menu.addSeparator();
         }
         if(target->SWT_isProperty()) {
             PropertyClipboardContainer *clipboard =
@@ -449,7 +450,8 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
             menu.addAction("Copy")->setObjectName("swt_copy");
             if(clipboard != NULL) {
                 if(target->SWT_isBoundingBox()) {
-                    if(!target->SWT_isLinkBox()) {
+                    if(target->SWT_isBoxesGroup() &&
+                        !target->SWT_isLinkBox()) {
                         BoxesClipboardContainer *clipboard =
                                 (BoxesClipboardContainer*)
                                 MainWindow::getInstance()->getClipboardContainer(
@@ -495,22 +497,27 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                         }
                     }
                 }
-            } else if(target->SWT_isBoundingBox()) {
-                menu.addAction("Paste")->setDisabled(true);
-                if(target->SWT_isAnimator()) {
-                    menu.addAction("Clear and Paste")->setDisabled(true);
-                }
             }
-            if(target->SWT_isAnimator() && !target->SWT_isBoundingBox()) {
+            if(target->SWT_isBoundingBox()) {
+                menu.addSeparator();
+                BoundingBox *boxTarget = (BoundingBox*)target;
+                QMenu *canvasMenu = menu.addMenu("Canvas");
+                boxTarget->addActionsToMenu(canvasMenu);
+                boxTarget->getParentCanvas()->addCanvasActionToMenu(canvasMenu);
+            } else if(target->SWT_isAnimator()) {
+                menu.addSeparator();
                 Animator *animTarget = (Animator*)target;
                 if(animTarget->prp_isKeyOnCurrentFrame()) {
+                    menu.addAction("Add Key")->setDisabled(true);
                     menu.addAction("Delete Key")->setObjectName("swt_delete_key");
                 } else {
                     menu.addAction("Add Key")->setObjectName("swt_add_key");
+                    menu.addAction("Delete Key")->setDisabled(true);
                 }
-            }
-            if(target->SWT_isPixmapEffect() || target->SWT_isPathEffect()) {
-                menu.addAction("Delete Effect")->setObjectName("swt_delete_effect");
+                if(target->SWT_isPixmapEffect() || target->SWT_isPathEffect()) {
+                    menu.addSeparator();
+                    menu.addAction("Delete Effect")->setObjectName("swt_delete_effect");
+                }
             }
         }
         QAction *selectedAction = menu.exec(event->globalPos());
@@ -528,7 +535,13 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 if(target->SWT_isBoundingBox()) {
                     BoxesClipboardContainer *container =
                             new BoxesClipboardContainer();
-                    container->copyBoxToContainer((BoundingBox*)target);
+                    QBuffer targetT(container->getBytesArray());
+                    targetT.open(QIODevice::WriteOnly);
+                    int nBoxes = 1;
+                    targetT.write((char*)&nBoxes, sizeof(int));
+                    ((BoundingBox*)target)->writeBoundingBox(&targetT);
+                    targetT.close();
+
                     MainWindow::getInstance()->replaceClipboard(container);
                 } else {
                     PropertyClipboardContainer *container =

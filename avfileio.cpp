@@ -309,6 +309,62 @@ void BlurEffect::writeProperty(QIODevice *target) {
     mBlurRadius->writeProperty(target);
 }
 
+void ShadowEffect::readProperty(QIODevice *target) {
+    mHighQuality->readProperty(target);
+    mBlurRadius->readProperty(target);
+    mOpacity->readProperty(target);
+    mColor->readProperty(target);
+    mTranslation->readProperty(target);
+}
+
+void ShadowEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mHighQuality->writeProperty(target);
+    mBlurRadius->writeProperty(target);
+    mOpacity->writeProperty(target);
+    mColor->writeProperty(target);
+    mTranslation->writeProperty(target);
+}
+
+void DesaturateEffect::readProperty(QIODevice *target) {
+    mInfluenceAnimator->readProperty(target);
+}
+
+void DesaturateEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mInfluenceAnimator->writeProperty(target);
+}
+
+void ColorizeEffect::readProperty(QIODevice *target) {
+    mHueAnimator->readProperty(target);
+    mSaturationAnimator->readProperty(target);
+    mLightnessAnimator->readProperty(target);
+    mAlphaAnimator->readProperty(target);
+}
+
+void ColorizeEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mHueAnimator->writeProperty(target);
+    mSaturationAnimator->writeProperty(target);
+    mLightnessAnimator->writeProperty(target);
+    mAlphaAnimator->writeProperty(target);
+}
+
+void ReplaceColorEffect::readProperty(QIODevice *target) {
+    mFromColor->readProperty(target);
+    mToColor->readProperty(target);
+    mToleranceAnimator->readProperty(target);
+    mSmoothnessAnimator->readProperty(target);
+}
+
+void ReplaceColorEffect::writeProperty(QIODevice *target) {
+    PixmapEffect::writeProperty(target);
+    mFromColor->writeProperty(target);
+    mToColor->writeProperty(target);
+    mToleranceAnimator->writeProperty(target);
+    mSmoothnessAnimator->writeProperty(target);
+}
+
 void EffectAnimators::writeProperty(QIODevice *target) {
     int nEffects = ca_mChildAnimators.count();
     target->write((char*)&nEffects, sizeof(int));
@@ -321,9 +377,25 @@ void EffectAnimators::readPixmapEffect(QIODevice *target) {
     PixmapEffectType typeT;
     target->read((char*)&typeT, sizeof(PixmapEffectType));
     if(typeT == EFFECT_BLUR) {
-        BlurEffect *blurEffect = new BlurEffect();
-        blurEffect->readProperty(target);
-        addEffect(blurEffect);
+        BlurEffect *effect = new BlurEffect();
+        effect->readProperty(target);
+        addEffect(effect);
+    } else if(typeT == EFFECT_SHADOW) {
+        ShadowEffect *effect = new ShadowEffect();
+        effect->readProperty(target);
+        addEffect(effect);
+    } else if(typeT == EFFECT_DESATURATE) {
+        DesaturateEffect *effect = new DesaturateEffect();
+        effect->readProperty(target);
+        addEffect(effect);
+    } else if(typeT == EFFECT_COLORIZE) {
+        ColorizeEffect *effect = new ColorizeEffect();
+        effect->readProperty(target);
+        addEffect(effect);
+    } else if(typeT == EFFECT_REPLACE_COLOR) {
+        ReplaceColorEffect *effect = new ReplaceColorEffect();
+        effect->readProperty(target);
+        addEffect(effect);
     }
 }
 
