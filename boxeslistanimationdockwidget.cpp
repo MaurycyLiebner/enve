@@ -292,10 +292,10 @@ RenderWidget *BoxesListAnimationDockWidget::getRenderWidget() {
 bool BoxesListAnimationDockWidget::processKeyEvent(
         QKeyEvent *event) {
     if(event->key() == Qt::Key_Right &&
-       event->modifiers() & Qt::ControlModifier) {
+            !(event->modifiers() & Qt::ControlModifier)) {
         setCurrentFrame(mMainWindow->getCurrentFrame() + 1);
     } else if(event->key() == Qt::Key_Left &&
-              event->modifiers() & Qt::ControlModifier) {
+              !(event->modifiers() & Qt::ControlModifier)) {
         setCurrentFrame(mMainWindow->getCurrentFrame() - 1);
     } else if(event->key() == Qt::Key_Down) {
         Canvas *currCanvas = mMainWindow->getCanvasWindow()->getCurrentCanvas();

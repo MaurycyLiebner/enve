@@ -337,8 +337,7 @@ void NodePoint::drawSk(SkCanvas *canvas,
         mEndCtrlPt->drawSk(canvas, invScale);
         mStartCtrlPt->drawSk(canvas, invScale);
     }
-    if(MainWindow::isAltPressed() ||
-       MainWindow::isCtrlPressed()) {
+    if(MainWindow::isCtrlPressed()) {
         SkPaint paint;
         paint.setTextAlign(SkPaint::kCenter_Align);
         paint.setAntiAlias(true);
@@ -358,8 +357,7 @@ void NodePoint::drawSk(SkCanvas *canvas,
     canvas->restore();
 }
 
-NodePoint* NodePoint::getNextPoint()
-{
+NodePoint* NodePoint::getNextPoint() {
     return mNextPoint;
 }
 

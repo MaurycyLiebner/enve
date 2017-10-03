@@ -791,7 +791,8 @@ void Canvas::cutAction() {
 }
 
 void Canvas::duplicateAction() {
-
+    copyAction();
+    pasteAction();
 }
 
 void Canvas::selectAllAction() {
@@ -834,6 +835,10 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         if(event->isAutoRepeat()) return false;
         copyAction();
     } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_D) {
+        if(event->isAutoRepeat()) return false;
+        duplicateAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_X) {
         if(event->isAutoRepeat()) return false;
         cutAction();
@@ -852,7 +857,6 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
        } else {
            groupSelectedBoxes();
        }
-
     } else if(event->key() == Qt::Key_PageUp) {
        raiseSelectedBoxes();
     } else if(event->key() == Qt::Key_PageDown) {
@@ -948,14 +952,14 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         MainWindow::getInstance()->incBrushRadius();
     } else if(event->key() == Qt::Key_Q) {
         MainWindow::getInstance()->decBrushRadius();
-    } else if(event->modifiers() & Qt::AltModifier &&
+    } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_Right) {
         if(event->modifiers() & Qt::ShiftModifier) {
             shiftAllPointsForAllKeys(1);
         } else {
             shiftAllPoints(1);
         }
-    } else if(event->modifiers() & Qt::AltModifier &&
+    } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_Left) {
         if(event->modifiers() & Qt::ShiftModifier) {
             shiftAllPointsForAllKeys(-1);

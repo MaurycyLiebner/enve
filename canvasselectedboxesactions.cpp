@@ -64,6 +64,22 @@ void Canvas::revertAllPoints() {
     }
 }
 
+void Canvas::flipSelectedBoxesHorizontally() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->startScaleTransform();
+        box->scale(-1., 1.);
+        box->finishTransform();
+    }
+}
+
+void Canvas::flipSelectedBoxesVertically() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->startScaleTransform();
+        box->scale(1., -1.);
+        box->finishTransform();
+    }
+}
+
 void Canvas::convertSelectedBoxesToPath() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->objectToPath();

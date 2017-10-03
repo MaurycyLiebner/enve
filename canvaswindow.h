@@ -274,6 +274,9 @@ public slots:
     void ungroupSelectedBoxes();
     void rotate90CWAction();
     void rotate90CCWAction();
+
+    void flipHorizontalAction();
+    void flipVerticalAction();
 private slots:
     void sendNextUpdatableForUpdate(const int &threadId,
                                     Executable *lastUpdatable = NULL);

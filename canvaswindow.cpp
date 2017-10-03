@@ -382,6 +382,18 @@ void CanvasWindow::rotate90CCWAction() {
     callUpdateSchedulers();
 }
 
+void CanvasWindow::flipHorizontalAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->flipSelectedBoxesHorizontally();
+    callUpdateSchedulers();
+}
+
+void CanvasWindow::flipVerticalAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->flipSelectedBoxesVertically();
+    callUpdateSchedulers();
+}
+
 void CanvasWindow::pathsUnionAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectedPathsUnion();

@@ -484,6 +484,8 @@ public:
     void revertAllPointsForAllKeys();
     void shiftAllPoints(const int &by);
     void revertAllPoints();
+    void flipSelectedBoxesHorizontally();
+    void flipSelectedBoxesVertically();
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

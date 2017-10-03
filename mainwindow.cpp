@@ -309,10 +309,10 @@ void MainWindow::setupMenuBar() {
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Raise",
                            mCanvasWindow, SLOT(raiseAction()),
-                           Qt::Key_Up);
+                           Qt::Key_PageUp);
     mObjectMenu->addAction("Lower",
                            mCanvasWindow, SLOT(lowerAction()),
-                           Qt::Key_Down);
+                           Qt::Key_PageDown);
     mObjectMenu->addAction("Rasie to Top",
                            mCanvasWindow, SLOT(raiseToTopAction()),
                            Qt::Key_Home);
@@ -321,15 +321,13 @@ void MainWindow::setupMenuBar() {
             setShortcut(Qt::Key_End);
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Rotate 90° CW",
-                           mCanvasWindow, SLOT(rotate90CWAction()),
-                           Qt::SHIFT + Qt::Key_Right);
+                           mCanvasWindow, SLOT(rotate90CWAction()));
     mObjectMenu->addAction("Rotate 90° CCW",
-                           mCanvasWindow, SLOT(rotate90CCWAction()),
-                           Qt::SHIFT + Qt::Key_Left);
-    mObjectMenu->addAction("Flip Horizontal")->
-            setShortcut(Qt::Key_H);
-    mObjectMenu->addAction("Flip Vertical")->
-            setShortcut(Qt::Key_V);
+                           mCanvasWindow, SLOT(rotate90CCWAction()));
+    mObjectMenu->addAction("Flip Horizontal", mCanvasWindow,
+                           SLOT(flipHorizontalAction()), Qt::Key_H);
+    mObjectMenu->addAction("Flip Vertical", mCanvasWindow,
+                           SLOT(flipVerticalAction()), Qt::Key_V);
     mObjectMenu->addSeparator();
     mObjectMenu->addAction("Group", mCanvasWindow,
                            SLOT(groupSelectedBoxes()),

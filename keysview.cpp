@@ -254,11 +254,13 @@ bool KeysView::KFT_handleKeyEventForTarget(QKeyEvent *event) {
              } else if(event->key() == Qt::Key_Delete) {
                 deleteSelectedKeys();
                 update();
-            } else if(event->key() == Qt::Key_Right) {
+            } else if(event->modifiers() & Qt::ControlModifier &&
+                      event->key() == Qt::Key_Right) {
                 Q_FOREACH(Key *key, mSelectedKeys) {
                     key->incFrameAndUpdateParentAnimator(1);
                 }
-            } else if(event->key() == Qt::Key_Left) {
+            } else if(event->modifiers() & Qt::ControlModifier &&
+                      event->key() == Qt::Key_Left) {
                 Q_FOREACH(Key *key, mSelectedKeys) {
                     key->incFrameAndUpdateParentAnimator(-1);
                 }
