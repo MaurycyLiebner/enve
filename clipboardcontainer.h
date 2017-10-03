@@ -66,6 +66,22 @@ public:
 
     bool propertyCompatible(Property *target);
     void setProperty(Property *property);
+
+    bool isPathEffect() {
+        return mPathEffect;
+    }
+
+    bool isPixmapEffect() {
+        return mPixmapEffect;
+    }
+
+    bool isPathEffectAnimators() {
+        return mPathEffectAnimators;
+    }
+
+    bool isPixmapEffectAnimators() {
+        return mPixmapEffectAnimators;
+    }
 private:
     bool mQrealAnimator = false;
     bool mQPointFAnimator = false;
@@ -74,8 +90,10 @@ private:
     bool mAnimatedSurface = false;
     bool mComplexAnimator = false;
     bool mPathEffectAnimators = false;
+    bool mPixmapEffectAnimators = false;
     bool mPathEffect = false;
     bool mPixmapEffect = false;
+    bool mVectorPathAnimator = false;
     QString mPropertyName;
 };
 

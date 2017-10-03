@@ -277,3 +277,27 @@ void PathAnimator::duplicatePathsTo(PathAnimator *target) {
         target->addSinglePathAnimator(duplicate);
     }
 }
+
+void PathAnimator::shiftAllPointsForAllKeys(const int &by) {
+    Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
+        path->shiftAllPointsForAllKeys(by);
+    }
+}
+
+void PathAnimator::revertAllPointsForAllKeys() {
+    Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
+        path->revertAllPointsForAllKeys();
+    }
+}
+
+void PathAnimator::shiftAllPoints(const int &by) {
+    Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
+        path->shiftAllPoints(by);
+    }
+}
+
+void PathAnimator::revertAllPoints() {
+    Q_FOREACH(VectorPathAnimator *path, mSinglePaths) {
+        path->revertAllPoints();
+    }
+}

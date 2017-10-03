@@ -50,6 +50,10 @@ public:
     void selectAllPoints(Canvas *canvas);
     void writeBoundingBox(QIODevice *target);
     void readBoundingBox(QIODevice *target);
+    void shiftAllPointsForAllKeys(const int &by);
+    void revertAllPointsForAllKeys();
+    void shiftAllPoints(const int &by);
+    void revertAllPoints();
 protected:
     PathAnimatorQSPtr mPathAnimator;
 };

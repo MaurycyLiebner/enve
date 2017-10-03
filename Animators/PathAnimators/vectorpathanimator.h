@@ -226,6 +226,25 @@ public:
 
     void connectWith(VectorPathAnimator *srcPath);
     Key *readKey(QIODevice *target);
+    void shiftAllPointsForAllKeys(const int &by);
+    void revertAllPointsForAllKeys();
+    void shiftAllPoints(const int &by) {
+        PathContainer::shiftAllPoints(by);
+        if(anim_mIsRecording) {
+            anim_saveCurrentValueAsKey();
+        } else {
+            updateNodePointsFromElements();
+        }
+    }
+
+    void revertAllPoints() {
+        PathContainer::revertAllPoints();
+        if(anim_mIsRecording) {
+            anim_saveCurrentValueAsKey();
+        } else {
+            updateNodePointsFromElements();
+        }
+    }
 private:
     void setFirstPoint(NodePoint *firstPt);
 

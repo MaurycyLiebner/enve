@@ -348,7 +348,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
             canvas->drawString(
                    transStr.toStdString().c_str(),
                    inputRect.x() + paint.getTextSize(),
-                   inputRect.y() + 0.5*inputRect.height(),
+                   inputRect.y() + inputRect.height()*0.5 + bounds.height()*0.2f,
                    paint);
             //p->drawText(inputRect, Qt::AlignVCenter, transStr);
         }
@@ -618,6 +618,7 @@ void Canvas::updatePivot() {
 void Canvas::setCanvasMode(const CanvasMode &mode) {
     mCurrentMode = mode;
 
+    mSelecting = false;
     mHoveredPoint = NULL;
     clearHoveredEdge();
     clearPointsSelection();
@@ -860,7 +861,14 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
     } else if(event->key() == Qt::Key_S &&
               isAltPressed(event)) {
         resetSelectedScale();
-    } else if(event->key() == Qt::Key_R &&
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_R) {
+       if(event->modifiers() & Qt::ShiftModifier) {
+           revertAllPointsForAllKeys();
+       } else {
+           revertAllPoints();
+       }
+   } else if(event->key() == Qt::Key_R &&
               isAltPressed(event)) {
         resetSelectedRotation();
     } else if(event->key() == Qt::Key_R &&
@@ -934,6 +942,20 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         MainWindow::getInstance()->incBrushRadius();
     } else if(event->key() == Qt::Key_Q) {
         MainWindow::getInstance()->decBrushRadius();
+    } else if(event->modifiers() & Qt::AltModifier &&
+              event->key() == Qt::Key_Right) {
+        if(event->modifiers() & Qt::ShiftModifier) {
+            shiftAllPointsForAllKeys(1);
+        } else {
+            shiftAllPoints(1);
+        }
+    } else if(event->modifiers() & Qt::AltModifier &&
+              event->key() == Qt::Key_Left) {
+        if(event->modifiers() & Qt::ShiftModifier) {
+            shiftAllPointsForAllKeys(-1);
+        } else {
+            shiftAllPoints(-1);
+        }
     } else {
         return false;
     }

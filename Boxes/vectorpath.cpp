@@ -22,6 +22,22 @@ VectorPath::VectorPath() :
     ca_addChildAnimator(mPathAnimator.data());
 }
 
+void VectorPath::shiftAllPointsForAllKeys(const int &by) {
+    mPathAnimator->shiftAllPointsForAllKeys(by);
+}
+
+void VectorPath::revertAllPointsForAllKeys() {
+    mPathAnimator->revertAllPointsForAllKeys();
+}
+
+void VectorPath::shiftAllPoints(const int &by) {
+    mPathAnimator->shiftAllPoints(by);
+}
+
+void VectorPath::revertAllPoints() {
+    mPathAnimator->revertAllPoints();
+}
+
 void VectorPath::selectAllPoints(Canvas *canvas) {
     mPathAnimator->selectAllPoints(canvas);
 }

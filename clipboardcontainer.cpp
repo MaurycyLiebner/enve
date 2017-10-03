@@ -112,6 +112,7 @@ void PropertyClipboardContainer::clearAndPaste(Property *targetProperty) {
     paste(targetProperty);
 }
 #include "PathEffects/patheffectanimators.h"
+#include "Animators/pathanimator.h"
 void PropertyClipboardContainer::paste(Property *targetProperty) {
     QBuffer target(getBytesArray());
     target.open(QIODevice::ReadOnly);
@@ -120,8 +121,17 @@ void PropertyClipboardContainer::paste(Property *targetProperty) {
            targetProperty->SWT_isPathEffectAnimators()) {
             ((PathEffectAnimators*)targetProperty)->readPathEffect(&target);
         } else if(mPixmapEffect &&
-                  targetProperty->SWT_isPixmapEffectAnimators()) {
+            targetProperty->SWT_isPixmapEffectAnimators()) {
             ((EffectAnimators*)targetProperty)->readPixmapEffect(&target);
+        } else if(mPathEffectAnimators &&
+            targetProperty->SWT_isPathEffectAnimators()) {
+            ((PathEffectAnimators*)targetProperty)->readProperty(&target);
+        } else if(mPixmapEffectAnimators &&
+            targetProperty->SWT_isPixmapEffectAnimators()) {
+            ((EffectAnimators*)targetProperty)->readProperty(&target);
+        } else if(mVectorPathAnimator &&
+            targetProperty->SWT_isPathAnimator()) {
+            ((PathAnimator*)targetProperty)->readVectorPathAnimator(&target);
         } else {
             targetProperty->readProperty(&target);
         }
@@ -143,7 +153,11 @@ bool PropertyClipboardContainer::propertyCompatible(Property *target) {
         return target->SWT_isQStringAnimator();
     }
     if(mPathAnimator) {
-        return target->SWT_isVectorPathAnimator();
+        return target->SWT_isPathAnimator();
+    }
+    if(mVectorPathAnimator) {
+        return target->SWT_isPathAnimator() ||
+                target->SWT_isVectorPathAnimator();
     }
     if(mAnimatedSurface) {
         return target->SWT_isAnimatedSurface();
@@ -151,8 +165,14 @@ bool PropertyClipboardContainer::propertyCompatible(Property *target) {
     if(mPathEffectAnimators) {
         return target->SWT_isPathEffectAnimators();
     }
+    if(mPixmapEffectAnimators) {
+        return target->SWT_isPixmapEffectAnimators();
+    }
     if(target->SWT_isPathEffectAnimators()) {
         return mPathEffect;
+    }
+    if(target->SWT_isPixmapEffectAnimators()) {
+        return mPixmapEffect;
     }
     if(mComplexAnimator) {
         return target->SWT_isComplexAnimator() &&
@@ -173,4 +193,8 @@ void PropertyClipboardContainer::setProperty(Property *property) {
     mAnimatedSurface = property->SWT_isAnimatedSurface();
     mComplexAnimator = property->SWT_isComplexAnimator();
     mPathEffectAnimators = property->SWT_isPathEffectAnimators();
+    mPixmapEffectAnimators = property->SWT_isPixmapEffectAnimators();
+    mPathEffect = property->SWT_isPathEffect();
+    mVectorPathAnimator = property->SWT_isVectorPathAnimator();
+    mPixmapEffect = property->SWT_isPixmapEffect();
 }

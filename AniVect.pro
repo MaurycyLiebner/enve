@@ -193,7 +193,8 @@ SOURCES += main.cpp\
     Paint/paintboxsettingsdialog.cpp \
     execdelegator.cpp \
     Paint/PaintLib/tilesdata.cpp \
-    customfpsdialog.cpp
+    customfpsdialog.cpp \
+    BoxesList/boxscrollarea.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -346,7 +347,8 @@ HEADERS  += mainwindow.h \
     Paint/paintboxsettingsdialog.h \
     execdelegator.h \
     Paint/PaintLib/tilesdata.h \
-    customfpsdialog.h
+    customfpsdialog.h \
+    BoxesList/boxscrollarea.h
 
 RESOURCES += \
     resources.qrc

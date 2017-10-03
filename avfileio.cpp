@@ -350,14 +350,14 @@ void BasicTransformAnimator::readProperty(QIODevice *target) {
 }
 
 void BoxTransformAnimator::writeProperty(QIODevice *target) {
-    writeProperty(target);
+    BasicTransformAnimator::writeProperty(target);
     mOpacityAnimator->writeProperty(target);
     mPivotAnimator->writeProperty(target);
     updateRelativeTransform();
 }
 
 void BoxTransformAnimator::readProperty(QIODevice *target) {
-    readProperty(target);
+    BasicTransformAnimator::readProperty(target);
     mOpacityAnimator->readProperty(target);
     mPivotAnimator->readProperty(target);
     updateRelativeTransform();
@@ -394,7 +394,7 @@ void Gradient::readProperty(QIODevice *target) {
 }
 
 void StrokeSettings::writeProperty(QIODevice *target) {
-    writeProperty(target);
+    PaintSettings::writeProperty(target);
     mLineWidth->writeProperty(target);
     target->write((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
     target->write((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
@@ -403,7 +403,7 @@ void StrokeSettings::writeProperty(QIODevice *target) {
 }
 
 void StrokeSettings::readProperty(QIODevice *target) {
-    readProperty(target);
+    PaintSettings::readProperty(target);
     mLineWidth->readProperty(target);
     target->read((char*)&mCapStyle, sizeof(Qt::PenCapStyle));
     target->read((char*)&mJoinStyle, sizeof(Qt::PenJoinStyle));
@@ -554,7 +554,7 @@ void SumPathEffect::readProperty(QIODevice *target) {
     mBoxTarget->readProperty(target);
 }
 
-void PathEffectAnimators::writeProperty(QIODevice *target) {
+void PathEffectAnimators::writeProperty(QIODevice *target) {   
     int nEffects = ca_mChildAnimators.count();
     target->write((char*)&nEffects, sizeof(int));
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
@@ -562,7 +562,7 @@ void PathEffectAnimators::writeProperty(QIODevice *target) {
     }
 }
 
-PathEffectAnimators::readPathEffect(QIODevice *target) {
+void PathEffectAnimators::readPathEffect(QIODevice *target) {
     PathEffectType typeT;
     target->read((char*)&typeT, sizeof(PathEffectType));
     if(typeT == DISPLACE_PATH_EFFECT) {
@@ -945,13 +945,17 @@ void PathAnimator::writeProperty(QIODevice *target) {
     }
 }
 
+void PathAnimator::readVectorPathAnimator(QIODevice *target) {
+    VectorPathAnimator *pathAnimator = new VectorPathAnimator(this);
+    pathAnimator->readProperty(target);
+    addSinglePathAnimator(pathAnimator, false);
+}
+
 void PathAnimator::readProperty(QIODevice *target) {
     int nPaths;
     target->read((char*)&nPaths, sizeof(int));
     for(int i = 0; i < nPaths; i++) {
-        VectorPathAnimator *pathAnimator = new VectorPathAnimator(this);
-        pathAnimator->readProperty(target);
-        addSinglePathAnimator(pathAnimator, false);
+        readVectorPathAnimator(target);
     }
 }
 

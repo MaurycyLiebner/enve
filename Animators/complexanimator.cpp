@@ -193,6 +193,19 @@ void ComplexAnimator::ca_removeAllChildAnimators() {
     }
 }
 
+Property *ComplexAnimator::ca_getFirstDescendantWithName(const QString &name) {
+    Q_FOREACH(const QSharedPointer<Property> &property, ca_mChildAnimators) {
+        if(property->prp_getName() == name) {
+            return property.data();
+        } else if(property->SWT_isComplexAnimator()) {
+            Property *propT = ((ComplexAnimator*)property.data())->
+                    ca_getFirstDescendantWithName(name);
+            if(propT != NULL) return propT;
+        }
+    }
+    return NULL;
+}
+
 void ComplexAnimator::ca_swapChildAnimators(Property *animator1,
                                             Property *animator2) {
     int id1 = getChildPropertyIndex(animator1);

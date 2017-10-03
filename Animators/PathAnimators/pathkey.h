@@ -113,6 +113,24 @@ public:
     void readPathContainer(QIODevice *target);
     void writePathContainer(QIODevice *target);
     static QList<SkPoint> extractElementsFromSkPath(const SkPath &path);
+
+    virtual void shiftAllPoints(const int &by) {
+        if(by == 0) return;
+        if(mPathClosed) {
+            for(int i = 0; i < by*3; i++) {
+                mElementsPos.prepend(mElementsPos.takeLast());
+            }
+            for(int i = 0; i < -by*3; i++) {
+                mElementsPos.append(mElementsPos.takeFirst());
+            }
+            mPathUpdateNeeded = true;
+        }
+    }
+
+    virtual void revertAllPoints() {
+        revertElementPosSubset(0, -1);
+        PathContainer::shiftAllPoints(1);
+    }
 protected:
     bool mPathClosed = false;
     bool mPathUpdateNeeded = false;

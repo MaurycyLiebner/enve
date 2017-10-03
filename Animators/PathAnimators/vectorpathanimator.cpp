@@ -706,3 +706,19 @@ void VectorPathAnimator::updateNodePointIds() {
         if(nextPoint == NULL || nextPoint == mFirstPoint) break;
     }
 }
+
+void VectorPathAnimator::shiftAllPointsForAllKeys(const int &by) {
+    PathContainer::shiftAllPoints(by);
+    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        ((PathKey*)key.get())->shiftAllPoints(by);
+    }
+    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
+}
+
+void VectorPathAnimator::revertAllPointsForAllKeys() {
+    PathContainer::revertAllPoints();
+    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        ((PathKey*)key.get())->revertAllPoints();
+    }
+    setElementsFromSkPath(getPathAtRelFrame(anim_mCurrentRelFrame, false));
+}

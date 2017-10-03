@@ -35,6 +35,14 @@ BoundingBox::BoundingBox(const BoundingBoxType &type) :
 BoundingBox::~BoundingBox() {
 }
 
+Property *BoundingBox::ca_getFirstDescendantWithName(const QString &name) {
+    Property *propT = ComplexAnimator::ca_getFirstDescendantWithName(name);
+    if(propT != NULL) return propT;
+    if(name == mEffectsAnimators->prp_getName()) {
+        return mEffectsAnimators.data();
+    }
+}
+
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                       const int &maxFrame) {
     Property::prp_updateAfterChangedAbsFrameRange(minFrame,

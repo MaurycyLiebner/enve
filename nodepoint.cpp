@@ -283,7 +283,8 @@ QPointF NodePoint::getEndCtrlPtValue() const {
 CtrlPoint *NodePoint::getEndCtrlPt() {
     return mEndCtrlPt;
 }
-
+#include "mainwindow.h"
+#include "global.h"
 void NodePoint::drawSk(SkCanvas *canvas,
                      const CanvasMode &mode,
                      const SkScalar &invScale,
@@ -336,7 +337,24 @@ void NodePoint::drawSk(SkCanvas *canvas,
         mEndCtrlPt->drawSk(canvas, invScale);
         mStartCtrlPt->drawSk(canvas, invScale);
     }
-
+    if(MainWindow::isAltPressed() ||
+       MainWindow::isCtrlPressed()) {
+        SkPaint paint;
+        paint.setTextAlign(SkPaint::kCenter_Align);
+        paint.setAntiAlias(true);
+        paint.setTextSize(FONT_HEIGHT*invScale);
+        SkRect bounds;
+        paint.measureText(QString::number(mNodeId).toStdString().c_str(),
+                          QString::number(mNodeId).size()*sizeof(char),
+                          &bounds);
+        paint.setColor(SK_ColorBLACK);
+        paint.setTypeface(SkTypeface::MakeDefault(SkTypeface::kBold));
+        paint.setStyle(SkPaint::kFill_Style);
+        canvas->drawString(QString::number(mNodeId).toStdString().c_str(),
+                           absPos.x(),
+                           absPos.y() + bounds.height()*0.5f,
+                           paint);
+    }
     canvas->restore();
 }
 

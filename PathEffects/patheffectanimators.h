@@ -37,7 +37,7 @@ public:
     const bool &isFill() const {
         return mIsFill;
     }
-    readPathEffect(QIODevice *target);
+    void readPathEffect(QIODevice *target);
 protected:
     bool mIsOutline;
     bool mIsFill;

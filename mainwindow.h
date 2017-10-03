@@ -67,9 +67,9 @@ public:
 
     void addUpdateScheduler(Updatable *scheduler);
 
-    bool isShiftPressed();
-    bool isCtrlPressed();
-    bool isAltPressed();
+    static bool isShiftPressed();
+    static bool isCtrlPressed();
+    static bool isAltPressed();
 
     void schedulePivotUpdate();
 

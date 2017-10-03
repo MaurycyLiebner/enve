@@ -61,6 +61,11 @@ public:
     SkPath getPathAtRelFrame(const int &relFrame);
     void readProperty(QIODevice *target);
     void writeProperty(QIODevice *target);
+    void shiftAllPoints(const int &by);
+    void revertAllPoints();
+    void shiftAllPointsForAllKeys(const int &by);
+    void revertAllPointsForAllKeys();
+    void readVectorPathAnimator(QIODevice *target);
 private:
     BoundingBox *mParentBox = NULL;
     QList<VectorPathAnimator*> mSinglePaths;

@@ -52,6 +52,7 @@ public:
     bool KFT_handleKeyEventForTarget(QKeyEvent *event);
     void KFT_setFocusToWidget() {
         setFocus();
+        requestUpdate();
     }
 
     void KFT_clearFocus() {

@@ -53,7 +53,12 @@ public:
                         const qreal &pixelsPerFrame,
                         const int &minViewedFrame);
     void setBlendMode(const SkBlendMode &mode);
+    void setSelected(const bool &bT) {
+        mSelected = bT;
+        update();
+    }
 protected:
+    bool mSelected = false;
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -67,6 +72,9 @@ protected:
 signals:
 
 private slots:
+    void clearSelected() {
+        setSelected(false);
+    }
     void switchContentVisibleAction();
     void switchRecordingAction();
     void switchBoxLockedAction();

@@ -147,6 +147,16 @@ public:
     void removePathEffect(PathEffect *effect);
     void removeFillPathEffect(PathEffect *effect);
     void removeOutlinePathEffect(PathEffect *effect);
+    Property *ca_getFirstDescendantWithName(const QString &name);
+    PathEffectAnimators *getPathEffectsAnimators() {
+        return mPathEffectsAnimators.data();
+    }
+    PathEffectAnimators *getFillPathEffectsAnimators() {
+        return mFillPathEffectsAnimators.data();
+    }
+    PathEffectAnimators *getOutlinePathEffectsAnimators() {
+        return mOutlinePathEffectsAnimators.data();
+    }
 protected:
 
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;

@@ -480,6 +480,10 @@ public:
     void applyDiscreteFillPathEffectToSelected();
     void applyDuplicateFillPathEffectToSelected();
     void applySumFillPathEffectToSelected();
+    void shiftAllPointsForAllKeys(const int &by);
+    void revertAllPointsForAllKeys();
+    void shiftAllPoints(const int &by);
+    void revertAllPoints();
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

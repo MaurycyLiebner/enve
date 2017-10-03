@@ -34,6 +34,36 @@ int Canvas::prevRelFrameWithKey(const int &relFrame) {
     return maxPrevFrame;
 }
 
+void Canvas::shiftAllPointsForAllKeys(const int &by) {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            ((VectorPath*)box)->shiftAllPointsForAllKeys(by);
+        }
+    }}
+
+void Canvas::revertAllPointsForAllKeys() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            ((VectorPath*)box)->revertAllPointsForAllKeys();
+        }
+    }}
+
+void Canvas::shiftAllPoints(const int &by) {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            ((VectorPath*)box)->shiftAllPoints(by);
+        }
+    }
+}
+
+void Canvas::revertAllPoints() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            ((VectorPath*)box)->revertAllPoints();
+        }
+    }
+}
+
 void Canvas::convertSelectedBoxesToPath() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         box->objectToPath();

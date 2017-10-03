@@ -75,6 +75,20 @@ PathBox::~PathBox() {
     }
 }
 
+Property *PathBox::ca_getFirstDescendantWithName(const QString &name) {
+    Property *propT = BoundingBox::ca_getFirstDescendantWithName(name);
+    if(propT != NULL) return propT;
+    if(name == mOutlinePathEffectsAnimators->prp_getName()) {
+        return mOutlinePathEffectsAnimators.data();
+    }
+    if(name == mFillPathEffectsAnimators->prp_getName()) {
+        return mFillPathEffectsAnimators.data();
+    }
+    if(name == mPathEffectsAnimators->prp_getName()) {
+        return mPathEffectsAnimators.data();
+    }
+}
+
 void PathBox::drawSelectedSk(SkCanvas *canvas,
                              const CanvasMode &currentCanvasMode,
                              const SkScalar &invScale) {

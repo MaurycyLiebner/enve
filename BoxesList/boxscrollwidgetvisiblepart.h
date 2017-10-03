@@ -49,7 +49,6 @@ public:
     void setKeysView(KeysView *keysView) {
         mKeysView = keysView;
     }
-
 protected:
     void dropEvent(QDropEvent *event);
     void dragLeaveEvent(QDragLeaveEvent *);

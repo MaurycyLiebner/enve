@@ -558,6 +558,10 @@ public:
     }
 
     void updateGlobalPivotIfSelected();
+    Property *ca_getFirstDescendantWithName(const QString &name);
+    EffectAnimators *getEffectsAnimators() {
+        return mEffectsAnimators.data();
+    }
 protected:
     QList<BoundingBox*> mLinkingBoxes;
     QList<std::shared_ptr<Updatable> > mSchedulers;

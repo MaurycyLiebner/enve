@@ -6,7 +6,7 @@
 #include "BoxesList/OptimalScrollArea/singlewidgetabstraction.h"
 #include "BoxesList/boxscrollwidget.h"
 #include "keysview.h"
-#include "BoxesList/OptimalScrollArea/scrollarea.h"
+#include "BoxesList/boxscrollarea.h"
 #include "BoxesList/boxscrollwidgetvisiblepart.h"
 #include "canvaswindow.h"
 #include "animationdockwidget.h"
@@ -114,7 +114,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     mBoxesListLayout->setSpacing(0);
     mBoxesListLayout->setMargin(0);
     mBoxesListLayout->addLayout(mMenuLayout);
-    mBoxesListScrollArea = new ScrollArea(this);
+    mBoxesListScrollArea = new BoxScrollArea(this);
     mBoxesListWidget = new BoxScrollWidget(mBoxesListScrollArea);
     mBoxesListScrollArea->setWidget(mBoxesListWidget);
     mBoxesListLayout->addWidget(mBoxesListScrollArea);

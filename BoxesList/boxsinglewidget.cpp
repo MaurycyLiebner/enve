@@ -422,50 +422,86 @@ void BoxSingleWidget::loadStaticPixmaps() {
 }
 #include "canvas.h"
 #include "PathEffects/patheffect.h"
-#include "PathEffects/patheffectanimators.h".h"
+#include "PathEffects/patheffectanimators.h"
 
 void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
     SingleWidgetTarget *target = mTarget->getTarget();
     if(event->button() == Qt::RightButton) {
+        setSelected(true);
         QMenu menu(this);
 
         if(target->SWT_isBoundingBox()) {
             BoundingBox *boxTarget = ((BoundingBox*)target);
-            menu.addAction("Rename")->
-                    setObjectName("swt_rename");
+            menu.addAction("Rename")->setObjectName("swt_rename");
             QAction *durRectAct = menu.addAction("Visibility Range");
             durRectAct->setObjectName("swt_visibility_range");
             durRectAct->setCheckable(true);
-            durRectAct->setChecked(
-                        boxTarget->hasDurationRectangle());
+            durRectAct->setChecked(boxTarget->hasDurationRectangle());
             QMenu *canvasMenu = menu.addMenu("Canvas");
             boxTarget->addActionsToMenu(canvasMenu);
             boxTarget->getParentCanvas()->addCanvasActionToMenu(canvasMenu);
-        } else if(target->SWT_isProperty()) {
+        }
+        if(target->SWT_isProperty()) {
             PropertyClipboardContainer *clipboard =
                     (PropertyClipboardContainer*)
                     MainWindow::getInstance()->getClipboardContainer(
                                                 CCT_PROPERTY);
             menu.addAction("Copy")->setObjectName("swt_copy");
             if(clipboard != NULL) {
-                if(clipboard->propertyCompatible((Property*)target)) {
-                    menu.addAction("Paste")->setObjectName("swt_paste");
-                    if(target->SWT_isAnimator()) {
-                        menu.addAction("Clear and Paste")->setObjectName("swt_clear_and_paste");
+                if(target->SWT_isBoundingBox()) {
+                    if(!target->SWT_isLinkBox()) {
+                        BoxesClipboardContainer *clipboard =
+                                (BoxesClipboardContainer*)
+                                MainWindow::getInstance()->getClipboardContainer(
+                                                            CCT_BOXES);
+                        if(clipboard != NULL) {
+                            menu.addAction("Paste Boxes")->
+                                    setObjectName("swt_paste_boxes");
+                        }
+                    }
+                    if(clipboard->isPathEffect() ||
+                        clipboard->isPathEffectAnimators()) {
+                        QMenu *pasteMenu = menu.addMenu("Paste");
+                        pasteMenu->addAction("Paste Path Effect")->
+                                setObjectName("swt_paste_path_effect");
+                        pasteMenu->addAction("Paste Outline Path Effect")->
+                                setObjectName("swt_paste_outline_path_effect");
+                        pasteMenu->addAction("Paste Fill Path Effect")->
+                                setObjectName("swt_paste_fill_path_effect");
+                        pasteMenu = menu.addMenu("Clear and Paste");
+                        pasteMenu->addAction("Clear and Paste Path Effect")->
+                                setObjectName("swt_clear_and_paste_path_effect");
+                        pasteMenu->addAction("Clear and Paste Outline Path Effect")->
+                                setObjectName("swt_clear_and_paste_outline_path_effect");
+                        pasteMenu->addAction("Clear and Paste Fill Path Effect")->
+                                setObjectName("swt_clear_and_paste_fill_path_effect");
+                    } else if(clipboard->isPixmapEffect() ||
+                               clipboard->isPixmapEffectAnimators()) {
+                        menu.addAction("Paste Raster Effect")->
+                                setObjectName("swt_paste_pixmap_effect");
+                        menu.addAction("Clear and Paste Raster Effect")->
+                                setObjectName("swt_clear_and_paste_pixmap_effect");
                     }
                 } else {
-                    menu.addAction("Paste")->setDisabled(true);
-                    if(target->SWT_isAnimator()) {
-                        menu.addAction("Clear and Paste")->setDisabled(true);
+                    if(clipboard->propertyCompatible((Property*)target)) {
+                        menu.addAction("Paste")->setObjectName("swt_paste");
+                        if(target->SWT_isAnimator()) {
+                            menu.addAction("Clear and Paste")->setObjectName("swt_clear_and_paste");
+                        }
+                    } else {
+                        menu.addAction("Paste")->setDisabled(true);
+                        if(target->SWT_isAnimator()) {
+                            menu.addAction("Clear and Paste")->setDisabled(true);
+                        }
                     }
                 }
-            } else {
+            } else if(target->SWT_isBoundingBox()) {
                 menu.addAction("Paste")->setDisabled(true);
                 if(target->SWT_isAnimator()) {
                     menu.addAction("Clear and Paste")->setDisabled(true);
                 }
             }
-            if(target->SWT_isAnimator()) {
+            if(target->SWT_isAnimator() && !target->SWT_isBoundingBox()) {
                 Animator *animTarget = (Animator*)target;
                 if(animTarget->prp_isKeyOnCurrentFrame()) {
                     menu.addAction("Delete Key")->setObjectName("swt_delete_key");
@@ -489,22 +525,83 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     boxTarget->createDurationRectangle();
                 }
             } else if(selectedAction->objectName() == "swt_copy") {
-                PropertyClipboardContainer *container =
-                        new PropertyClipboardContainer();
-                container->setProperty((Property*)target);
-                MainWindow::getInstance()->replaceClipboard(container);
+                if(target->SWT_isBoundingBox()) {
+                    BoxesClipboardContainer *container =
+                            new BoxesClipboardContainer();
+                    container->copyBoxToContainer((BoundingBox*)target);
+                    MainWindow::getInstance()->replaceClipboard(container);
+                } else {
+                    PropertyClipboardContainer *container =
+                            new PropertyClipboardContainer();
+                    container->setProperty((Property*)target);
+                    MainWindow::getInstance()->replaceClipboard(container);
+                }
             } else if(selectedAction->objectName() == "swt_paste") {
                 PropertyClipboardContainer *clipboard =
                         (PropertyClipboardContainer*)
                         MainWindow::getInstance()->getClipboardContainer(
                                                     CCT_PROPERTY);
                 clipboard->paste((Property*)target);
+            } else if(selectedAction->objectName() == "swt_paste_pixmap_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->paste(((BoundingBox*)target)->getEffectsAnimators());
+            } else if(selectedAction->objectName() == "swt_paste_outline_path_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->paste(((PathBox*)target)->getOutlinePathEffectsAnimators());
+            } else if(selectedAction->objectName() == "swt_paste_fill_path_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->paste(((PathBox*)target)->getFillPathEffectsAnimators());
+            } else if(selectedAction->objectName() == "swt_paste_path_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->paste(((PathBox*)target)->getPathEffectsAnimators());
+            } else if(selectedAction->objectName() == "swt_clear_and_paste_pixmap_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->clearAndPaste(((BoundingBox*)target)->getEffectsAnimators());
+            } else if(selectedAction->objectName() == "swt_clear_and_paste_outline_path_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->clearAndPaste(((PathBox*)target)->getOutlinePathEffectsAnimators());
+            } else if(selectedAction->objectName() == "swt_clear_and_paste_fill_path_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->clearAndPaste(((PathBox*)target)->getFillPathEffectsAnimators());
+            } else if(selectedAction->objectName() == "swt_clear_and_paste_path_effect") {
+                PropertyClipboardContainer *clipboard =
+                        (PropertyClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_PROPERTY);
+                clipboard->clearAndPaste(((PathBox*)target)->getPathEffectsAnimators());
             } else if(selectedAction->objectName() == "swt_clear_and_paste") {
                 PropertyClipboardContainer *clipboard =
                         (PropertyClipboardContainer*)
                         MainWindow::getInstance()->getClipboardContainer(
                                                     CCT_PROPERTY);
                 clipboard->clearAndPaste((Property*)target);
+            } else if(selectedAction->objectName() == "swt_paste_boxes") {
+                BoxesClipboardContainer *clipboard =
+                        (BoxesClipboardContainer*)
+                        MainWindow::getInstance()->getClipboardContainer(
+                                                    CCT_BOXES);
+                clipboard->pasteTo(((BoxesGroup*)target));
             } else if(selectedAction->objectName() == "swt_delete_effect") {
                 if(target->SWT_isPixmapEffect()) {
                     PixmapEffect *effectTarget = (PixmapEffect*)target;
@@ -541,6 +638,7 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
         } else {
 
         }
+        setSelected(false);
     } else {
         mDragStartPos = event->pos();
 //        if(type == SWT_BoundingBox ||
@@ -564,9 +662,11 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
         return;
     }
     QDrag *drag = new QDrag(this);
+    connect(drag, SIGNAL(destroyed(QObject*)), this, SLOT(clearSelected()));
 
     QMimeData *mimeData = mTarget->getTarget()->SWT_createMimeData();
     if(mimeData == NULL) return;
+    setSelected(true);
     drag->setMimeData(mimeData);
 
     drag->installEventFilter(MainWindow::getInstance());
@@ -574,6 +674,7 @@ void BoxSingleWidget::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
+    setSelected(false);
     if(pointToLen(event->pos() - mDragStartPos) > MIN_WIDGET_HEIGHT/2) return;
     SingleWidgetTarget *target = mTarget->getTarget();
     if(target->SWT_isBoundingBox() && !target->SWT_isCanvas()) {
@@ -596,8 +697,7 @@ void BoxSingleWidget::mouseReleaseEvent(QMouseEvent *event) {
     }
 }
 
-void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e)
-{
+void BoxSingleWidget::mouseDoubleClickEvent(QMouseEvent *e) {
     if(e->modifiers() & Qt::ShiftModifier) {
         //mousePressEvent(e);
     } else {
@@ -617,8 +717,7 @@ void BoxSingleWidget::rename() {
         if(ok) {
             bb_target->setName(text);
 
-            bb_target->
-                    SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
+            bb_target->SWT_scheduleWidgetsContentUpdateWithSearchNotEmpty();
         }
     }
 }
@@ -823,7 +922,11 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
                      MIN_WIDGET_HEIGHT,
                      MIN_WIDGET_HEIGHT),
                name, QTextOption(Qt::AlignVCenter));
-
+    if(mSelected) {
+        p.setBrush(Qt::NoBrush);
+        p.setPen(QPen(Qt::lightGray));
+        p.drawRect(rect().adjusted(0, 0, -1, -1));
+    }
     p.end();
 }
 

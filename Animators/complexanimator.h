@@ -70,6 +70,7 @@ public:
                                               const int &relFrame);
     void anim_saveCurrentValueAsKey();
     virtual void ca_removeAllChildAnimators();
+    virtual Property *ca_getFirstDescendantWithName(const QString &name);
 public slots:
     void prp_setRecording(const bool &rec);
 
