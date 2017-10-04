@@ -413,7 +413,15 @@ void Canvas::setOutputRendering(const bool &bT) {
 
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
     if(mCurrentPreviewContainer.get() != NULL) {
-        if(!mRendering) {
+        bool contIsFirstPreviewFrame;
+        if(cont == NULL) {
+            contIsFirstPreviewFrame = false;
+        } else {
+            contIsFirstPreviewFrame =
+                    mCurrentPreviewContainer->getMinRelFrame() >
+                    cont->getMinRelFrame();
+        }
+        if(!mRendering && !contIsFirstPreviewFrame) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
@@ -440,7 +448,8 @@ void Canvas::playPreview(const int &minPreviewFrameId,
 int Canvas::getMaxPreviewFrame(const int &minFrame,
                                const int &maxFrame) {
     int frameSize = getByteCountPerFrame();
-    unsigned long long freeRam = getFreeRam();
+    unsigned long long freeRam = getFreeRam() -
+            MemoryChecker::getInstance()->getMinFreeRam();
     int maxNewFrames = freeRam/frameSize - 5;
     int maxFrameT = minFrame + maxNewFrames;
     int firstF, lastF = minFrame, frameT;

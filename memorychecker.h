@@ -18,6 +18,9 @@ public:
 //    void incUsedMemory(const unsigned long long &used) {
 //        mUsedRam += used;
 //    }
+    unsigned long long getMinFreeRam() {
+        return mMinFreeRam;
+    }
 private:
     bool mSlowedDown = false;
     QTimer *mTimer;
