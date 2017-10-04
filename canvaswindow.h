@@ -158,6 +158,7 @@ protected:
     int mSavedCurrentFrame = 0;
     bool mPreviewing = false;
     bool mRendering = false;
+    int mMaxRenderFrame = 0;
 
     QList<int> mFreeThreads;
     bool mNoBoxesAwaitUpdate = true;

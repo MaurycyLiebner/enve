@@ -59,6 +59,12 @@ const qreal &RenderContainer::getResolutionFraction() const {
 }
 
 void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
+    mNoDataInMemory = false;
+    if(mTmpFile != NULL) {
+        delete mTmpFile;
+        mTmpFile = NULL;
+    }
+
     mTransform = data->transform;
     mResolutionFraction = data->resolution;
     mImageSk = data->renderedImage;
@@ -81,6 +87,14 @@ MinimalCacheContainer::~MinimalCacheContainer() {
     //MemoryChecker::getInstance()->decUsedMemory(mImage.byteCount());
     if(MemoryHandler::getInstance() == NULL) return;
     MemoryHandler::getInstance()->removeContainer(this);
+}
+
+bool MinimalCacheContainer::freeAndRemoveFromMemoryHandler() {
+    if(freeThis()) {
+        MemoryHandler::getInstance()->removeContainer(this);
+        return true;
+    }
+    return false;
 }
 
 CacheContainer::~CacheContainer() {
@@ -107,6 +121,7 @@ bool CacheContainer::freeThis() {
 }
 
 void CacheContainer::setBlocked(const bool &bT) {
+    if(bT == mBlocked) return;
     mBlocked = bT;
     if(bT) {
         MemoryHandler::getInstance()->removeContainer(this);
@@ -152,33 +167,35 @@ void CacheContainer::drawSk(SkCanvas *canvas) {
 }
 
 void CacheContainer::loadFromTmpFile() {
-    mNoDataInMemory = false;
-    if(mTmpFile->open()) {
-        int width, height;
-        mTmpFile->read((char*)&width, sizeof(int));
-        mTmpFile->read((char*)&height, sizeof(int));
-        SkBitmap btmp;
-        SkImageInfo info = SkImageInfo::Make(width,
-                                             height,
-                                             kBGRA_8888_SkColorType,
-                                             kPremul_SkAlphaType,
-                                             nullptr);
-        btmp.allocPixels(info);
-        mTmpFile->read((char*)btmp.getPixels(),
-                       width*height*4*sizeof(uchar));
-        mImageSk = SkImage::MakeFromBitmap(btmp);
+    if(mNoDataInMemory) {
+        mNoDataInMemory = false;
+        if(mTmpFile->open()) {
+            int width, height;
+            mTmpFile->read((char*)&width, sizeof(int));
+            mTmpFile->read((char*)&height, sizeof(int));
+            SkBitmap btmp;
+            SkImageInfo info = SkImageInfo::Make(width,
+                                                 height,
+                                                 kBGRA_8888_SkColorType,
+                                                 kPremul_SkAlphaType,
+                                                 nullptr);
+            btmp.allocPixels(info);
+            mTmpFile->read((char*)btmp.getPixels(),
+                           width*height*4*sizeof(uchar));
+            mImageSk = SkImage::MakeFromBitmap(btmp);
 
-        mTmpFile->close();
-    }
-    if(!mBlocked) {
-        MemoryHandler::getInstance()->addContainer(this);
+            mTmpFile->close();
+        }
+        if(!mBlocked) {
+            MemoryHandler::getInstance()->addContainer(this);
+        }
     }
 }
 
 void CacheContainer::saveToTmpFile() {
+    if(mTmpFile != NULL) return;
     SkPixmap pix;
     mImageSk->peekPixels(&pix);
-    if(mTmpFile != NULL) delete mTmpFile;
     mTmpFile = new QTemporaryFile();
     if(mTmpFile->open()) {
         int width = pix.width();

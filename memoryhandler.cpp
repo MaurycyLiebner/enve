@@ -27,6 +27,7 @@ MemoryHandler::~MemoryHandler() {
 void MemoryHandler::addContainer(MinimalCacheContainer *cont) {
     if(cont->handledByMemoryHandler()) return;
     mContainers << cont;
+    cont->setHandledByMemoryHanlder(true);
 }
 
 void MemoryHandler::removeContainer(MinimalCacheContainer *cont) {
@@ -39,7 +40,6 @@ void MemoryHandler::removeContainer(MinimalCacheContainer *cont) {
 void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
     removeContainer(cont);
     addContainer(cont);
-    cont->setHandledByMemoryHanlder(true);
 }
 
 void MemoryHandler::freeMemory(const unsigned long long &bytes) {

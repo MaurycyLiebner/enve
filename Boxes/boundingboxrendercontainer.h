@@ -15,6 +15,8 @@ public:
 
     virtual ~MinimalCacheContainer();
 
+    bool freeAndRemoveFromMemoryHandler();
+
     virtual bool freeThis() = 0;
 
     virtual int getByteCount() = 0;
@@ -76,6 +78,9 @@ public:
     void setRelFrameRange(const int &minFrame, const int &maxFrame);
     bool relFrameInRange(const int &relFrame);
     virtual void drawSk(SkCanvas *canvas);
+    bool storesDataInMemory() {
+        return !mNoDataInMemory;
+    }
 protected:
     void loadFromTmpFile();
     void saveToTmpFile();

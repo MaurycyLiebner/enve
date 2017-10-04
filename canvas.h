@@ -422,9 +422,6 @@ public:
 
     void setCurrentPreviewContainer(CacheContainer *cont);
     void setRendering(const bool &bT);
-    void setNoCache(const bool &bT) {
-        mNoCache = bT;
-    }
 
     bool isPreviewingOrRendering() const {
         return mPreviewing || mRendering;
@@ -486,6 +483,10 @@ public:
     void revertAllPoints();
     void flipSelectedBoxesHorizontally();
     void flipSelectedBoxesVertically();
+    int getByteCountPerFrame() {
+        return mCurrentPreviewContainer->getByteCount();
+    }
+    int getMaxPreviewFrame(const int &minFrame, const int &maxFrame);
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;
@@ -539,7 +540,6 @@ protected:
 
     VectorPathEdge *mCurrentEdge = NULL;
 
-    bool mNoCache = false;
     bool mPreviewing = false;
     bool mRendering = false;
     std::shared_ptr<CacheContainer> mCurrentPreviewContainer;

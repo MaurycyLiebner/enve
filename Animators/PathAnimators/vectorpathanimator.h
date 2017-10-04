@@ -36,6 +36,7 @@ public:
     VectorPathAnimator(const QList<NodeSettings *> &settingsList,
                        const QList<SkPoint> &posList,
                        PathAnimator *pathAnimator);
+    ~VectorPathAnimator();
 
     void prp_setAbsFrame(const int &frame);
     SkPath getPathAtRelFrame(const int &relFrame,

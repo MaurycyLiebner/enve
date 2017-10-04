@@ -378,7 +378,7 @@ void ComplexAnimator::ca_addDescendantsKey(Key *key) {
 }
 
 void ComplexAnimator::ca_removeDescendantsKey(Key *key) {
-    ComplexKey *collection = ca_getKeyCollectionAtAbsFrame(key->getAbsFrame());//key->getParentKey();//getKeyCollectionAtAbsFrame(key->getAbsFrame() );
+    ComplexKey *collection = ca_getKeyCollectionAtRelFrame(key->getRelFrame());//key->getParentKey();//getKeyCollectionAtAbsFrame(key->getAbsFrame() );
     if(collection == NULL) return;
     collection->removeAnimatorKey(key);
     if(collection->isEmpty() ) {

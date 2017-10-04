@@ -65,8 +65,7 @@ NodePointValues operator/(const NodePointValues &ppv, const qreal &val);
 NodePointValues operator*(const NodePointValues &ppv, const qreal &val);
 NodePointValues operator*(const qreal &val, const NodePointValues &ppv);
 
-class NodePoint : public NonAnimatedMovablePoint
-{
+class NodePoint : public NonAnimatedMovablePoint {
 public:
     NodePoint(VectorPathAnimator *parentAnimator);
     ~NodePoint();

@@ -133,6 +133,56 @@ void CacheHandler::clearCache() {
     mRenderContainers.clear();
 }
 
+void CacheHandler::cacheDataBeforeRelFrame(const int &relFrame) {
+    int lastId = getRenderContainerIdAtOrBeforeRelFrame(relFrame);
+    for(int i = 0; i < lastId; i++) {
+        mRenderContainers.at(i)->freeAndRemoveFromMemoryHandler();
+    }
+}
+
+void CacheHandler::cacheDataAfterRelFrame(const int &relFrame) {
+    int firstId = getRenderContainerIdAtOrAfterRelFrame(relFrame);
+    for(int i = firstId; i < mRenderContainers.count(); i++) {
+        mRenderContainers.at(i)->freeAndRemoveFromMemoryHandler();
+    }
+}
+
+void CacheHandler::cacheFirstContainer() {
+    if(mRenderContainers.isEmpty()) return;
+    mRenderContainers.first()->freeAndRemoveFromMemoryHandler();
+}
+
+void CacheHandler::cacheLastContainer() {
+    if(mRenderContainers.isEmpty()) return;
+    mRenderContainers.last()->freeAndRemoveFromMemoryHandler();
+}
+
+int CacheHandler::getContainerCountAfterRelFrame(const int &relFrame) {
+    int firstId = getRenderContainerIdAtOrAfterRelFrame(relFrame + 1);
+    return mRenderContainers.count() - firstId;
+}
+
+int CacheHandler::getNumberNotCachedBeforeRelFrame(const int &relFrame) {
+    int nNotCached = 0;
+    int firstId = getRenderContainerIdAtOrBeforeRelFrame(relFrame - 1);
+    for(int i = 0; i < firstId; i++) {
+        if(mRenderContainers.at(i)->storesDataInMemory()) {
+            nNotCached++;
+        }
+    }
+    return nNotCached;
+}
+#include "memoryhandler.h"
+void CacheHandler::updateAllAfterFrameInMemoryHandler(const int &relFrame) {
+    int firstId = getRenderContainerIdAtOrAfterRelFrame(relFrame + 1);
+    for(int i = mRenderContainers.count() - 1; i >= firstId; i--) {
+        CacheContainer *cont = mRenderContainers.at(i).get();
+        if(cont->handledByMemoryHandler()) {
+            MemoryHandler::getInstance()->containerUpdated(cont);
+        }
+    }
+}
+
 CacheContainer *CacheHandler::getRenderContainerAtRelFrame(const int &frame) {
     int id;
     if(getRenderContainterIdAtRelFrame(frame, &id)) {
@@ -141,11 +191,40 @@ CacheContainer *CacheHandler::getRenderContainerAtRelFrame(const int &frame) {
     return NULL;
 }
 
+int CacheHandler::getRenderContainerIdAtOrBeforeRelFrame(const int &frame) {
+    int id;
+    if(!getRenderContainterIdAtRelFrame(frame, &id)) {
+        id = getRenderContainterInsertIdAtRelFrame(frame) - 1;
+    }
+    return id;
+}
+
 CacheContainer *CacheHandler::getRenderContainerAtOrBeforeRelFrame(
                                                 const int &frame) {
     CacheContainer *cont = getRenderContainerAtRelFrame(frame);
     if(cont == NULL) {
         int id = getRenderContainterInsertIdAtRelFrame(frame) - 1;
+        if(id >= 0 && id < mRenderContainers.length()) {
+            cont = mRenderContainers.at(id).get();
+        }
+    }
+    return cont;
+}
+
+
+int CacheHandler::getRenderContainerIdAtOrAfterRelFrame(const int &frame) {
+    int id;
+    if(!getRenderContainterIdAtRelFrame(frame, &id)) {
+        id = getRenderContainterInsertIdAtRelFrame(frame);
+    }
+    return id;
+}
+
+CacheContainer *CacheHandler::getRenderContainerAtOrAfterRelFrame(
+                                                const int &frame) {
+    CacheContainer *cont = getRenderContainerAtRelFrame(frame);
+    if(cont == NULL) {
+        int id = getRenderContainterInsertIdAtRelFrame(frame);
         if(id >= 0 && id < mRenderContainers.length()) {
             cont = mRenderContainers.at(id).get();
         }
@@ -162,10 +241,11 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     p->setPen(Qt::NoPen);
     int lastDrawnFrame = startFrame;
     int lastDrawX = 0;
+    bool lastStoresInMemory = true;
     Q_FOREACH(const std::shared_ptr<CacheContainer> &cont, mRenderContainers) {
         int maxFrame = cont->getMaxRelFrame();
-        int minFrame = cont->getMinRelFrame();
         if(maxFrame < startFrame) continue;
+        int minFrame = cont->getMinRelFrame();
         if(minFrame > endFrame + 1) return;
 
         if(maxFrame > endFrame) maxFrame = endFrame + 1;
@@ -179,6 +259,16 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
             widthT += xT - lastDrawX;
             xT = lastDrawX;
         }
+        bool storesInMemory = cont->storesDataInMemory();
+        if(storesInMemory != lastStoresInMemory) {
+            if(storesInMemory) {
+                p->setBrush(QColor(0, 255, 0, 75));
+            } else {
+                p->setBrush(QColor(0, 0, 255, 75));
+            }
+            lastStoresInMemory = storesInMemory;
+        }
+
         p->drawRect(xT, drawY, widthT, MIN_WIDGET_HEIGHT);
         lastDrawnFrame = maxFrame;
         lastDrawX = xT + widthT;

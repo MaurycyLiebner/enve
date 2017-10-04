@@ -35,12 +35,11 @@ struct BoxesGroupRenderData : public BoundingBoxRenderData {
         }
         relBoundingRect = SkRectToQRectF(boundingPaths.computeTightBounds());
     }
-
+    void renderToImage();
 protected:
     void drawSk(SkCanvas *canvas) {
         canvas->save();
 
-        canvas->concat(QMatrixToSkMatrix(transform.inverted()));
         Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &child,
                   childrenRenderData) {
             child->drawRenderedImageForParent(canvas);

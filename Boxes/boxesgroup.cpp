@@ -629,3 +629,59 @@ bool BoxesGroup::SWT_shouldBeVisible(const SWT_RulesCollection &rules,
                                             parentSatisfies,
                                             parentMainTarget);
 }
+#include "PixmapEffects/fmt_filters.h"
+void BoxesGroupRenderData::renderToImage() {
+    if(renderedToImage) return;
+    renderedToImage = true;
+    QMatrix scale;
+    scale.scale(resolution, resolution);
+    QMatrix transformRes = transform*scale;
+    //transformRes.scale(resolution, resolution);
+    QRectF allUglyBoundingRect =
+            transformRes.mapRect(relBoundingRect).
+            adjusted(-effectsMargin, -effectsMargin,
+                     effectsMargin, effectsMargin);
+    allUglyBoundingRect = allUglyBoundingRect.intersected(
+                scale.mapRect(maxBoundsRect));
+    QSizeF sizeF = allUglyBoundingRect.size();
+    QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
+            QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
+                    qRound(allUglyBoundingRect.top()/**resolution*/));
+    allUglyBoundingRect.translate(-transF);
+    SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
+                                         ceil(sizeF.height()),
+                                         kBGRA_8888_SkColorType,
+                                         kPremul_SkAlphaType,
+                                         nullptr);
+    SkBitmap bitmap;
+    bitmap.allocPixels(info);
+
+    //sk_sp<SkSurface> rasterSurface(SkSurface::MakeRaster(info));
+    SkCanvas *rasterCanvas = new SkCanvas(bitmap);//rasterSurface->getCanvas();
+    rasterCanvas->clear(SK_ColorTRANSPARENT);
+
+    rasterCanvas->translate(-allUglyBoundingRect.left(),
+                            -allUglyBoundingRect.top());
+    rasterCanvas->concat(QMatrixToSkMatrix(scale));
+
+    drawSk(rasterCanvas);
+    rasterCanvas->flush();
+    delete rasterCanvas;
+
+    drawPos = SkPoint::Make(qRound(allUglyBoundingRect.left()),
+                            qRound(allUglyBoundingRect.top()));
+
+    if(!pixmapEffects.isEmpty()) {
+        SkPixmap pixmap;
+        bitmap.peekPixels(&pixmap);
+        fmt_filters::image img((uint8_t*)pixmap.writable_addr(),
+                               pixmap.width(), pixmap.height());
+        foreach(PixmapEffectRenderData *effect, pixmapEffects) {
+            effect->applyEffectsSk(bitmap, img, resolution);
+        }
+        clearPixmapEffects();
+    }
+
+    renderedImage = SkImage::MakeFromBitmap(bitmap);
+    bitmap.reset();
+}

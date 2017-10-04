@@ -413,10 +413,7 @@ void Canvas::setOutputRendering(const bool &bT) {
 
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
     if(mCurrentPreviewContainer.get() != NULL) {
-        if(mNoCache) {
-            mCurrentPreviewContainer->setBlocked(false);
-            mCurrentPreviewContainer->freeThis();
-        } else if(!mRendering) {
+        if(!mRendering) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
@@ -437,6 +434,52 @@ void Canvas::playPreview(const int &minPreviewFrameId,
                                     mCurrentPreviewFrameId));
     setPreviewing(true);
     mCanvasWindow->requestUpdate();
+}
+
+#include "memorychecker.h"
+int Canvas::getMaxPreviewFrame(const int &minFrame,
+                               const int &maxFrame) {
+    int frameSize = getByteCountPerFrame();
+    unsigned long long freeRam = getFreeRam();
+    int maxNewFrames = freeRam/frameSize - 5;
+    int maxFrameT = minFrame + maxNewFrames;
+    int firstF, lastF = minFrame, frameT;
+    frameT = minFrame;
+    maxFrameT += mCacheHandler.getNumberNotCachedBeforeRelFrame(minFrame);
+    while(lastF < maxFrameT && lastF < maxFrame) {
+        prp_getFirstAndLastIdenticalRelFrame(&firstF, &lastF, frameT);
+//        if(frameT == minFrame) {
+//            mCacheHandler.cacheDataBeforeRelFrame(firstF);
+//        }
+        CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(firstF);
+        if(cont != NULL) {
+            if(cont->storesDataInMemory()) {
+                maxFrameT++;
+            }
+            cont->setBlocked(true);
+        }
+        frameT = lastF + 1;
+    }
+    mCacheHandler.updateAllAfterFrameInMemoryHandler(maxFrameT);
+    return qMin(maxFrame, qMax(minFrame, maxFrameT));
+    int nContsAfter = mCacheHandler.getContainerCountAfterRelFrame(maxFrameT);
+    int maxFrameT2 = maxFrameT;
+    while(lastF < maxFrame && nContsAfter > 0) {
+        prp_getFirstAndLastIdenticalRelFrame(&firstF, &lastF, frameT);
+        if(frameT == minFrame) {
+            mCacheHandler.cacheDataBeforeRelFrame(frameT);
+        }
+        CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(firstF);
+        if(cont != NULL) {
+            cont->setBlocked(true);
+        } else {
+            mCacheHandler.cacheLastContainer();
+        }
+        nContsAfter--;
+        maxFrameT2++;
+        frameT = lastF + 1;
+    }
+    return qMin(maxFrame, qMax(minFrame, maxFrameT2));
 }
 
 void Canvas::clearPreview() {

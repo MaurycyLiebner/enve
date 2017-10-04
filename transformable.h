@@ -3,8 +3,7 @@
 #include <QPointF>
 #include "skiaincludes.h"
 
-class Transformable
-{
+class Transformable {
 public:
     Transformable();
     virtual ~Transformable() {}

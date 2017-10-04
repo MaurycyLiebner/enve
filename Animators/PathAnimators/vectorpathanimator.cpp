@@ -27,6 +27,13 @@ VectorPathAnimator::VectorPathAnimator(const QList<NodeSettings*> &settingsList,
     updateNodePointsFromElements();
 }
 
+VectorPathAnimator::~VectorPathAnimator() {
+    foreach(NodePoint *pt, mPoints) {
+        delete pt;
+    }
+    mPoints.clear();
+}
+
 void VectorPathAnimator::prp_setAbsFrame(const int &frame) {
     Animator::prp_setAbsFrame(frame);
     //setCurrentPath(getPathAtRelFrame(frame));

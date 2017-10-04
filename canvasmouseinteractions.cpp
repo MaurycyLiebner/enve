@@ -1114,11 +1114,14 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
             if(boxAt->SWT_isBoxesGroup()) {
                 setCurrentBoxesGroup((BoxesGroup*) boxAt);
                 updateHoveredElements();
-            } else if(boxAt->SWT_isTextBox()) {
+            } else if((mCurrentMode == MOVE_PATH ||
+                       mCurrentMode == MOVE_POINT) &&
+                      boxAt->SWT_isTextBox()) {
                 releaseMouseAndDontTrack();
                 ((TextBox*) boxAt)->openTextEditor();
-            } else if(mCurrentMode == MOVE_PATH) {
-                mCanvasWindow->setCanvasMode(MOVE_PATH);
+            } else if(mCurrentMode == MOVE_PATH &&
+                      boxAt->SWT_isVectorPath()) {
+                mCanvasWindow->setCanvasMode(MOVE_POINT);
             }
         }
     } else {

@@ -112,5 +112,6 @@
         <file alias="cursor-rect.xpm">pixmaps/cursor-rect.xpm</file>
         <file alias="cursor-text.xpm">pixmaps/cursor-text.xpm</file>
         <file alias="cursor-pen.xpm">pixmaps/cursor-pen.xpm</file>
+        <file alias="cursor-crosshairs.xpm">pixmaps/cursor-crosshairs.xpm</file>
     </qresource>
 </RCC>

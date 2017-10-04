@@ -87,6 +87,7 @@ Property *PathBox::ca_getFirstDescendantWithName(const QString &name) {
     if(name == mPathEffectsAnimators->prp_getName()) {
         return mPathEffectsAnimators.data();
     }
+    return NULL;
 }
 
 void PathBox::drawSelectedSk(SkCanvas *canvas,

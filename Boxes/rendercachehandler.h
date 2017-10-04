@@ -28,6 +28,19 @@ public:
     void clearCache();
     CacheContainer *getRenderContainerAtOrBeforeRelFrame(const int &frame);
     int getFirstEmptyFrameAfterFrame(const int &frame);
+    int getMaxPreviewFrame(const int &minFrame,
+                           const int &maxFrame,
+                           const int &frameSize);
+    void cacheDataBeforeRelFrame(const int &relFrame);
+    void cacheDataAfterRelFrame(const int &relFrame);
+    CacheContainer *getRenderContainerAtOrAfterRelFrame(const int &frame);
+    int getContainerCountAfterRelFrame(const int &relFrame);
+    void cacheLastContainer();
+    int getRenderContainerIdAtOrAfterRelFrame(const int &frame);
+    int getRenderContainerIdAtOrBeforeRelFrame(const int &frame);
+    void cacheFirstContainer();
+    int getNumberNotCachedBeforeRelFrame(const int &relFrame);
+    void updateAllAfterFrameInMemoryHandler(const int &relFrame);
 protected:
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
     bool getRenderContainterIdAtRelFrame(const int &relFrame, int *id);

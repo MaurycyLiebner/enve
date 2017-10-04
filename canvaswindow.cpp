@@ -163,6 +163,8 @@ void CanvasWindow::setCanvasMode(const CanvasMode &mode) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-rect.xpm"), 4, 4) );
     } else if(mode == ADD_TEXT) {
         setCursor(QCursor(QPixmap(":/cursors/cursor-text.xpm"), 4, 4) );
+    } else if(mode == PAINT_MODE) {
+        setCursor(QCursor(QPixmap(":/cursors/cursor-crosshairs.xpm"), 4, 4) );
     } else {
         setCursor(QCursor(QPixmap(":/cursors/cursor-pen.xpm"), 4, 4) );
     }
@@ -681,6 +683,10 @@ void CanvasWindow::renderPreview() {
     mSavedCurrentFrame = getCurrentFrame();
 
     mCurrentRenderFrame = mSavedCurrentFrame;
+    mMaxRenderFrame =
+            mCurrentCanvas->getMaxPreviewFrame(mCurrentRenderFrame,
+                                               getMaxFrame());
+    mMaxRenderFrame = getMaxFrame();
     setRendering(true);
 
     //mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
@@ -767,10 +773,11 @@ void CanvasWindow::setRendering(const bool &bT) {
     mRendering = bT;
     mCurrentCanvas->setRendering(bT);
 }
-
+#include "memorychecker.h"
 void CanvasWindow::setPreviewing(const bool &bT) {
     mPreviewing = bT;
     mCurrentCanvas->setPreviewing(bT);
+    MemoryChecker::getInstance()->setMemoryReleaseSlowedDown(bT);
 }
 
 void CanvasWindow::interruptRendering() {
@@ -779,7 +786,7 @@ void CanvasWindow::interruptRendering() {
     mCurrentCanvas->clearPreview();
     mCurrentCanvas->getCacheHandler()->
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
-                                         mCurrentRenderFrame,
+                                         mMaxRenderFrame,
                                          false);
     emit changeCurrentFrame(mSavedCurrentFrame);
     MainWindow::getInstance()->previewFinished();
@@ -789,7 +796,7 @@ void CanvasWindow::stopPreview() {
     setPreviewing(false);
     mCurrentCanvas->getCacheHandler()->
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
-                                         mCurrentRenderFrame,
+                                         mMaxRenderFrame,
                                          false);
     emit changeCurrentFrame(mSavedCurrentFrame);
     mPreviewFPSTimer->stop();
@@ -832,7 +839,7 @@ void CanvasWindow::playPreview() {
 void CanvasWindow::nextPreviewRenderFrame() {
     //mCurrentCanvas->renderCurrentFrameToPreview();
     if(!mRendering) return;
-    if(mCurrentRenderFrame >= getMaxFrame()) {
+    if(mCurrentRenderFrame >= mMaxRenderFrame) {
         playPreview();
     } else {
         nextCurrentRenderFrame();
@@ -844,7 +851,7 @@ void CanvasWindow::nextPreviewRenderFrame() {
 
 void CanvasWindow::nextSaveOutputFrame() {
     mCurrentCanvas->renderCurrentFrameToOutput(mOutputString);
-    if(mCurrentRenderFrame > getMaxFrame()) {
+    if(mCurrentRenderFrame > mMaxRenderFrame) {
         emit changeCurrentFrame(mSavedCurrentFrame);
         mCurrentRenderSettings = NULL;
         mBoxesUpdateFinishedFunction = NULL;
@@ -854,7 +861,6 @@ void CanvasWindow::nextSaveOutputFrame() {
                 mCurrentCanvas->getResolutionFraction()) > 0.1) {
             mCurrentCanvas->setResolutionFraction(mSavedResolutionFraction);
         }
-        mCurrentCanvas->setNoCache(false);
     } else {
         mCurrentRenderSettings->setCurrentRenderFrame(
                     mCurrentRenderFrame);
@@ -869,6 +875,7 @@ void CanvasWindow::nextSaveOutputFrame() {
 void CanvasWindow::saveOutput(const QString &renderDest,
                               const qreal &resolutionFraction) {
     mOutputString = renderDest;
+    mMaxRenderFrame = getMaxFrame();
     mBoxesUpdateFinishedFunction = &CanvasWindow::nextSaveOutputFrame;
     mSavedCurrentFrame = getCurrentFrame();
     mCurrentCanvas->fitCanvasToSize();
@@ -881,7 +888,6 @@ void CanvasWindow::saveOutput(const QString &renderDest,
     mCurrentCanvas->prp_setAbsFrame(mSavedCurrentFrame);
     mCurrentCanvas->setOutputRendering(true);
     mCurrentCanvas->updateAllBoxes();
-    mCurrentCanvas->setNoCache(true);
     if(mNoBoxesAwaitUpdate) {
         nextSaveOutputFrame();
     }

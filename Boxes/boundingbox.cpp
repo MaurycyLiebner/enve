@@ -41,6 +41,7 @@ Property *BoundingBox::ca_getFirstDescendantWithName(const QString &name) {
     if(name == mEffectsAnimators->prp_getName()) {
         return mEffectsAnimators.data();
     }
+    return propT;
 }
 
 void BoundingBox::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
@@ -1222,7 +1223,7 @@ void BoundingBoxRenderData::renderToImage() {
     QPointF transF = allUglyBoundingRect.topLeft()/**resolution*/ -
             QPointF(qRound(allUglyBoundingRect.left()/**resolution*/),
                     qRound(allUglyBoundingRect.top()/**resolution*/));
-
+    allUglyBoundingRect.translate(-transF);
     SkImageInfo info = SkImageInfo::Make(ceil(sizeF.width()),
                                          ceil(sizeF.height()),
                                          kBGRA_8888_SkColorType,
@@ -1237,10 +1238,6 @@ void BoundingBoxRenderData::renderToImage() {
 
     rasterCanvas->translate(-allUglyBoundingRect.left(),
                             -allUglyBoundingRect.top());
-
-    allUglyBoundingRect.translate(-transF);
-
-    rasterCanvas->translate(transF.x(), transF.y());
     rasterCanvas->concat(QMatrixToSkMatrix(transformRes));
 
     drawSk(rasterCanvas);

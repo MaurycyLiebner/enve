@@ -18,12 +18,17 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
 //                   //info.freeswap*info.mem_unit +
 //                   info.bufferram*info.mem_unit;
         mMinFreeRam = totalRam*20/100;
+        mSlowMinFreeRam = mMinFreeRam/2;
     } else { // ??
     }
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()),
             this, SLOT(checkMemory()) );
     mTimer->start(500);
+}
+
+void MemoryChecker::setMemoryReleaseSlowedDown(const bool &bT) {
+    mSlowedDown = bT;
 }
 
 unsigned long long getFreeRam() {
@@ -84,8 +89,14 @@ unsigned long long getFreeRam() {
 
 void MemoryChecker::checkMemory() {
     unsigned long long freeMem = getFreeRam();
-    if(freeMem < mMinFreeRam) {
-        emit outOfMemory(mMinFreeRam - freeMem);
+    if(mSlowedDown) {
+        if(freeMem < mSlowMinFreeRam) {
+            emit outOfMemory(mSlowMinFreeRam - freeMem);
+        }
+    } else {
+        if(freeMem < mMinFreeRam) {
+            emit outOfMemory(mMinFreeRam - freeMem);
+        }
     }
 //    struct sysinfo info;
 //    if(sysinfo(&info) == 0) {
