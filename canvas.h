@@ -484,6 +484,8 @@ public:
     void flipSelectedBoxesHorizontally();
     void flipSelectedBoxesVertically();
     int getByteCountPerFrame() {
+        return qCeil(mWidth*mResolutionFraction)*
+                qCeil(mHeight*mResolutionFraction)*4;
         return mCurrentPreviewContainer->getByteCount();
     }
     int getMaxPreviewFrame(const int &minFrame, const int &maxFrame);
@@ -493,7 +495,7 @@ protected:
     bool mPickFillFromPath = false;
     bool mPickStrokeFromPath = false;
 
-    RenderCacheHandler mCacheHandler;
+    CacheHandler mCacheHandler;
     bool mUpdateReplaceCache = false;
 
     sk_sp<SkImage> mRenderImageSk;

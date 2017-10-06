@@ -159,7 +159,7 @@ VideoCacheHandler::VideoCacheHandler(const QString &filePath) :
 sk_sp<SkImage> VideoCacheHandler::getFrameAtFrame(const int &relFrame) {
     CacheContainer *cont = mFramesCache.getRenderContainerAtRelFrame(relFrame);
     if(cont == NULL) return sk_sp<SkImage>();
-    cont->neededInMemory();
+    //cont->neededInMemory();
     return cont->getImageSk();
 }
 
@@ -374,7 +374,13 @@ Updatable *VideoCacheHandler::scheduleFrameLoad(const int &frame) {
     if(mFramesLoadScheduled.contains(frame) ||
        mFramesBeingLoadedGUI.contains(frame)) return this;
     qDebug() << "schedule frame load: " << frame;
-    mFramesLoadScheduled << frame;
+    CacheContainer *contAtFrame =
+            mFramesCache.getRenderContainerAtRelFrame(frame);
+    if(contAtFrame == NULL) {
+        mFramesLoadScheduled << frame;
+    } else {
+        return contAtFrame->scheduleLoadFromTmpFile();
+    }
     addScheduler();
     return this;
 }

@@ -6,6 +6,7 @@
 #include "skiaincludes.h"
 #include "Boxes/rendercachehandler.h"
 #include "updatable.h"
+class BoundingBox;
 typedef QSharedPointer<BoundingBox> BoundingBoxQSPtr;
 class FileSourceListVisibleWidget;
 

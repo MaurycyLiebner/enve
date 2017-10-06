@@ -146,11 +146,13 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
     AnimationBoxRenderData *imageData = (AnimationBoxRenderData*)data;
     int animationFrame = getAnimationFrameForRelFrame(relFrame);
     imageData->animationFrame = animationFrame;
-    imageData->image = mAnimationCacheHandler->getFrameAtFrame(
-                                    animationFrame);
+    imageData->image = mAnimationCacheHandler->getFrameAtFrame(animationFrame);
     if(imageData->image == NULL) {
-        mAnimationCacheHandler->scheduleFrameLoad(animationFrame)->
-                addDependent(imageData);
+        Updatable *upd = mAnimationCacheHandler->
+                scheduleFrameLoad(animationFrame);
+        if(upd != NULL) {
+            upd->addDependent(upd);
+        }
     }
 }
 
@@ -159,6 +161,5 @@ BoundingBoxRenderData *AnimationBox::createRenderData() {
 }
 
 void AnimationBoxRenderData::loadImageFromHandler() {
-    image = ((AnimationCacheHandler*)srcCacheHandler)->
-            getFrameAtFrame(relFrame);
+    image = ((AnimationCacheHandler*)srcCacheHandler)->getFrameAtFrame(relFrame);
 }

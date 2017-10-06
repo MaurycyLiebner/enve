@@ -36,21 +36,61 @@ protected:
     bool mHandledByMemoryHandler = false;
     bool mBlocked = false;
 };
+#include "updatable.h"
+class CacheContainer;
+class CacheContainerTmpFileDataLoader : public Updatable {
+public:
+    CacheContainerTmpFileDataLoader(const QSharedPointer<QTemporaryFile> &file,
+                                    CacheContainer *target);
+    void processUpdate();
+
+    void afterUpdate();
+
+    bool isFileUpdatable() { return true; }
+    void addSchedulerNow();
+private:
+    CacheContainer *mTargetCont = NULL;
+    sk_sp<SkImage> mImage;
+    QSharedPointer<QTemporaryFile> mTmpFile;
+};
+
+class CacheContainerTmpFileDataSaver : public Updatable {
+public:
+    CacheContainerTmpFileDataSaver(const sk_sp<SkImage> &image,
+                                   CacheContainer *target);
+    void processUpdate();
+
+    void afterUpdate();
+    bool isFileUpdatable() { return true; }
+    void addSchedulerNow();
+private:
+    CacheContainer *mTargetCont = NULL;
+    sk_sp<SkImage> mImage;
+    QSharedPointer<QTemporaryFile> mTmpFile;
+};
 
 class CacheContainer : public MinimalCacheContainer {
 public:
     CacheContainer() {}
     ~CacheContainer();
 
+    Updatable *scheduleLoadFromTmpFile() {
+        if(mSavingToFile) {
+            mCancelAfterSaveDataClear = true;
+            return mSavingUpdatable;
+        }
+        if(!mNoDataInMemory || mLoadingFromFile) return NULL;
+
+        mLoadingFromFile = true;
+        Updatable *updatable = new CacheContainerTmpFileDataLoader(mTmpFile,
+                                                                   this);
+        updatable->addScheduler();
+        return updatable;
+    }
+
     void setParentCacheHandler(CacheHandler *handler);
     bool freeThis();
     void setBlocked(const bool &bT);
-
-    void neededInMemory() {
-        if(mNoDataInMemory) {
-            loadFromTmpFile();
-        }
-    }
 
     int getByteCount() {
         if(mImageSk.get() == NULL) return 0;
@@ -66,6 +106,7 @@ public:
         return mImageSk;
     }
 
+    void setDataLoadedFromTmpFile(const sk_sp<SkImage> &img);
     void replaceImageSk(const sk_sp<SkImage> &img);
 
     const int &getMinRelFrame() const;
@@ -81,11 +122,15 @@ public:
     bool storesDataInMemory() {
         return !mNoDataInMemory;
     }
+    void setDataSavedToTmpFile(const QSharedPointer<QTemporaryFile> &tmpFile);
 protected:
-    void loadFromTmpFile();
+    Updatable *mSavingUpdatable = NULL;
+    bool mCancelAfterSaveDataClear = false;
+    bool mSavingToFile = false;
+    bool mLoadingFromFile = false;
     void saveToTmpFile();
     bool mNoDataInMemory = false;
-    QTemporaryFile *mTmpFile = NULL;
+    QSharedPointer<QTemporaryFile> mTmpFile;
 
     sk_sp<SkImage> mImageSk;
     CacheHandler *mParentCacheHandler = NULL;

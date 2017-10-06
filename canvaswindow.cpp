@@ -33,10 +33,21 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
         paintControlerThread->start();
 
         mPaintControlers << paintControler;
-        mPaintControlerThreads << paintControlerThread;
+        mControlerThreads << paintControlerThread;
 
         mFreeThreads << i;
     }
+
+    QThread *fileControlerThread = new QThread(this);
+    mFileControler = new PaintControler(numberThreads);
+    mFileControler->moveToThread(fileControlerThread);
+    connect(mFileControler, SIGNAL(finishedUpdating(int, Executable*)),
+            this, SLOT(sendNextFileUpdatableForUpdate(int, Executable*)) );
+    connect(this, SIGNAL(updateFileUpdatable(Executable*, int)),
+            mFileControler, SLOT(updateUpdatable(Executable*, int)) );
+
+    fileControlerThread->start();
+    mControlerThreads << fileControlerThread;
 
     mPreviewFPSTimer = new QTimer(this);
 
@@ -53,7 +64,7 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
 }
 
 CanvasWindow::~CanvasWindow() {
-    foreach(QThread *thread, mPaintControlerThreads) {
+    foreach(QThread *thread, mControlerThreads) {
         thread->quit();
         thread->wait();
         delete thread;
@@ -655,7 +666,7 @@ void CanvasWindow::renderFromSettings(RenderInstanceSettings *settings) {
 
 void CanvasWindow::nextCurrentRenderFrame() {
     int newCurrentRenderFrame = mCurrentCanvas->getCacheHandler()->
-            getFirstEmptyFrameAfterFrame(mCurrentRenderFrame);
+            getFirstEmptyOrCachedFrameAfterFrame(mCurrentRenderFrame);
     int firstIdT;
     int lastIdT;
     mCurrentCanvas->prp_getFirstAndLastIdenticalRelFrame(&firstIdT,
@@ -719,6 +730,44 @@ void CanvasWindow::addUpdatableAwaitingUpdate(Executable *updatable) {
     }
 }
 
+void CanvasWindow::addFileUpdatableAwaitingUpdate(Executable *updatable) {
+    mFileUpdatablesAwaitingUpdate << updatable->ref<Executable>();
+
+    if(mNoFileAwaitUpdate) {
+        mNoFileAwaitUpdate = false;
+        sendNextFileUpdatableForUpdate(0, NULL);
+    }
+}
+
+void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
+                                              Executable *lastUpdatable) {
+    Q_UNUSED(threadId);
+    if(lastUpdatable != NULL) {
+        lastUpdatable->updateFinished();
+    }
+    if(mFileUpdatablesAwaitingUpdate.isEmpty()) {
+        mNoFileAwaitUpdate = true;
+        if(mFilesUpdateFinishedFunction != NULL) {
+            (*this.*mFilesUpdateFinishedFunction)();
+        }
+        if(!mRendering) {
+            callUpdateSchedulers();
+        }
+    } else {
+        for(int i = 0; i < mFileUpdatablesAwaitingUpdate.count(); i++) {
+            Executable *updatablaT = mFileUpdatablesAwaitingUpdate.at(i).get();
+            if(updatablaT->readyToBeProcessed()) {
+                updatablaT->setCurrentPaintControler(mFileControler);
+                updatablaT->beforeUpdate();
+                emit updateFileUpdatable(updatablaT, mPaintControlers.count());
+                mFileUpdatablesAwaitingUpdate.removeAt(i);
+                i--;
+                return;
+            }
+        }
+    }
+}
+
 void CanvasWindow::sendNextUpdatableForUpdate(const int &threadId,
                                               Executable *lastUpdatable) {
     if(lastUpdatable != NULL) {
@@ -765,7 +814,15 @@ void CanvasWindow::interruptPreview() {
 
 void CanvasWindow::outOfMemory() {
     if(mRendering) {
-        playPreview();
+        if(mNoBoxesAwaitUpdate && mNoFileAwaitUpdate) {
+            playPreview();
+        } else if(mNoBoxesAwaitUpdate) {
+            mBoxesUpdateFinishedFunction = NULL;
+            mFilesUpdateFinishedFunction = &CanvasWindow::playPreview;
+        } else if(mNoFileAwaitUpdate) {
+            mFilesUpdateFinishedFunction = NULL;
+            mBoxesUpdateFinishedFunction = &CanvasWindow::playPreview;
+        }
     }
 }
 
@@ -777,12 +834,12 @@ void CanvasWindow::setRendering(const bool &bT) {
 void CanvasWindow::setPreviewing(const bool &bT) {
     mPreviewing = bT;
     mCurrentCanvas->setPreviewing(bT);
-    MemoryChecker::getInstance()->setMemoryReleaseSlowedDown(bT);
 }
 
 void CanvasWindow::interruptRendering() {
     setRendering(false);
     mBoxesUpdateFinishedFunction = NULL;
+    mFilesUpdateFinishedFunction = NULL;
     mCurrentCanvas->clearPreview();
     mCurrentCanvas->getCacheHandler()->
         setContainersInFrameRangeBlocked(mSavedCurrentFrame + 1,
@@ -820,12 +877,13 @@ void CanvasWindow::resumePreview() {
 }
 
 void CanvasWindow::playPreview() {
-    setRendering(false);
-    setPreviewing(true);
     //emit changeCurrentFrame(mSavedCurrentFrame);
     mBoxesUpdateFinishedFunction = NULL;
+    mFilesUpdateFinishedFunction = NULL;
     mCurrentCanvas->playPreview(mSavedCurrentFrame,
                                 mCurrentRenderFrame);
+    setRendering(false);
+    setPreviewing(true);
     mCurrentSoundComposition->generateData(mSavedCurrentFrame,
                                            mCurrentRenderFrame,
                                            mCurrentCanvas->getFps());
@@ -855,6 +913,7 @@ void CanvasWindow::nextSaveOutputFrame() {
         emit changeCurrentFrame(mSavedCurrentFrame);
         mCurrentRenderSettings = NULL;
         mBoxesUpdateFinishedFunction = NULL;
+        mFilesUpdateFinishedFunction = NULL;
         mCurrentCanvas->setOutputRendering(false);
         mCurrentCanvas->clearCurrentPreviewImage();
         if(qAbs(mSavedResolutionFraction -

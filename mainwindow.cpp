@@ -916,6 +916,10 @@ void MainWindow::addUpdateScheduler(Updatable *scheduler) {
     mUpdateSchedulers.append(scheduler->ref<Updatable>());
 }
 
+void MainWindow::addFileUpdateScheduler(Updatable *scheduler) {
+    mCanvasWindow->addFileUpdatableAwaitingUpdate(scheduler);
+}
+
 bool MainWindow::isShiftPressed() {
     return QApplication::keyboardModifiers() & Qt::ShiftModifier;
 }

@@ -144,7 +144,9 @@ public:
     bool noBoxesAwaitUpdate();
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
+    void addFileUpdatableAwaitingUpdate(Executable *updatable);
 protected:
+    PaintControler *mFileControler = NULL;
     RenderInstanceSettings *mCurrentRenderSettings = NULL;
     bool mMouseGrabber = false;
     bool mHasFocus = false;
@@ -162,9 +164,11 @@ protected:
 
     QList<int> mFreeThreads;
     bool mNoBoxesAwaitUpdate = true;
-    QList<QThread*> mPaintControlerThreads;
+    bool mNoFileAwaitUpdate = true;
+    QList<QThread*> mControlerThreads;
     QList<PaintControler*> mPaintControlers;
     QList<std::shared_ptr<Executable> > mUpdatablesAwaitingUpdate;
+    QList<std::shared_ptr<Executable> > mFileUpdatablesAwaitingUpdate;
 
     QString mOutputString;
     int mCurrentRenderFrame;
@@ -172,6 +176,8 @@ protected:
     bool mClearBeingUpdated = false;
 
     void (CanvasWindow::*mBoxesUpdateFinishedFunction)(void) = NULL;
+    void (CanvasWindow::*mFilesUpdateFinishedFunction)(void) = NULL;
+
     CanvasQSPtr mCurrentCanvas;
     QList<CanvasQSPtr> mCanvasList;
 
@@ -200,6 +206,8 @@ protected:
     void tabletEvent(QTabletEvent *e);
 signals:
     void updateUpdatable(Executable*, int);
+    void updateFileUpdatable(Executable*, int);
+
     void changeCurrentFrame(int);
     void changeFrameRange(int, int);
 public slots:
@@ -280,6 +288,8 @@ public slots:
     void flipVerticalAction();
 private slots:
     void sendNextUpdatableForUpdate(const int &threadId,
+                                    Executable *lastUpdatable = NULL);
+    void sendNextFileUpdatableForUpdate(const int &threadId,
                                     Executable *lastUpdatable = NULL);
     void nextSaveOutputFrame();
     void nextPreviewRenderFrame();

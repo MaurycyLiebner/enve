@@ -42,8 +42,13 @@ void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
     addContainer(cont);
 }
 
+void MemoryHandler::incMemoryAwaitingRelease(const int &mem) {
+    mMemoryAwaitingRelease += mem;
+}
+#include "mainwindow.h"
 void MemoryHandler::freeMemory(const unsigned long long &bytes) {
-    long long memToFree = bytes;
+    long long memToFree = bytes - mMemoryAwaitingRelease;
+    if(memToFree <= 0) return;
     int unfreeable = 0;
     while(memToFree > 0 && mContainers.count() > unfreeable) {
         MinimalCacheContainer *cont = mContainers.takeFirst();
@@ -59,7 +64,7 @@ void MemoryHandler::freeMemory(const unsigned long long &bytes) {
         emit allMemoryUsed();
     }
     emit memoryFreed();
-
+    MainWindow::getInstance()->callUpdateSchedulers();
     //MallocExtension::instance()->ReleaseToSystem(bytes - memToFree);
-//    MallocExtension::instance()->ReleaseFreeMemory();
+    //MallocExtension::instance()->ReleaseFreeMemory();
 }

@@ -3,6 +3,7 @@
 #include <QElapsedTimer>
 #include "memoryhandler.h"
 #include "rendercachehandler.h"
+#include "mainwindow.h"
 
 RenderContainer::~RenderContainer() {
 
@@ -60,10 +61,7 @@ const qreal &RenderContainer::getResolutionFraction() const {
 
 void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mNoDataInMemory = false;
-    if(mTmpFile != NULL) {
-        delete mTmpFile;
-        mTmpFile = NULL;
-    }
+    mTmpFile.reset();
 
     mTransform = data->transform;
     mResolutionFraction = data->resolution;
@@ -98,9 +96,6 @@ bool MinimalCacheContainer::freeAndRemoveFromMemoryHandler() {
 }
 
 CacheContainer::~CacheContainer() {
-    if(mTmpFile != NULL) {
-        delete mTmpFile;
-    }
 }
 
 void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
@@ -109,14 +104,17 @@ void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
 
 void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
     mImageSk = img;
+    if(mNoDataInMemory) {
+        mNoDataInMemory = false;
+        mTmpFile.reset();
+    }
 }
 
 bool CacheContainer::freeThis() {
     if(mBlocked || mNoDataInMemory) return false;
     if(mParentCacheHandler == NULL) return false;
+    MemoryHandler::getInstance()->incMemoryAwaitingRelease(getByteCount());
     saveToTmpFile();
-    mImageSk.reset();
-    mNoDataInMemory = true;
     return true;
 }
 
@@ -125,8 +123,17 @@ void CacheContainer::setBlocked(const bool &bT) {
     mBlocked = bT;
     if(bT) {
         MemoryHandler::getInstance()->removeContainer(this);
-        neededInMemory();
+        scheduleLoadFromTmpFile();
     } else {
+        MemoryHandler::getInstance()->addContainer(this);
+    }
+}
+
+void CacheContainer::setDataLoadedFromTmpFile(const sk_sp<SkImage> &img) {
+    mLoadingFromFile = false;
+    mNoDataInMemory = false;
+    mImageSk = img;
+    if(!mBlocked) {
         MemoryHandler::getInstance()->addContainer(this);
     }
 }
@@ -166,37 +173,83 @@ void CacheContainer::drawSk(SkCanvas *canvas) {
     canvas->drawImage(mImageSk, 0, 0);
 }
 
-void CacheContainer::loadFromTmpFile() {
-    if(mNoDataInMemory) {
+void CacheContainer::setDataSavedToTmpFile(
+        const QSharedPointer<QTemporaryFile> &tmpFile) {
+    mSavingUpdatable = NULL;
+    mTmpFile = tmpFile;
+    mSavingToFile = false;
+    if(mCancelAfterSaveDataClear) {
         mNoDataInMemory = false;
-        if(mTmpFile->open()) {
-            int width, height;
-            mTmpFile->read((char*)&width, sizeof(int));
-            mTmpFile->read((char*)&height, sizeof(int));
-            SkBitmap btmp;
-            SkImageInfo info = SkImageInfo::Make(width,
-                                                 height,
-                                                 kBGRA_8888_SkColorType,
-                                                 kPremul_SkAlphaType,
-                                                 nullptr);
-            btmp.allocPixels(info);
-            mTmpFile->read((char*)btmp.getPixels(),
-                           width*height*4*sizeof(uchar));
-            mImageSk = SkImage::MakeFromBitmap(btmp);
-
-            mTmpFile->close();
-        }
+        mCancelAfterSaveDataClear = false;
         if(!mBlocked) {
             MemoryHandler::getInstance()->addContainer(this);
         }
+        return;
+    } else {
+        mNoDataInMemory = true;
     }
+    MemoryHandler::getInstance()->incMemoryAwaitingRelease(-getByteCount());
+    mImageSk.reset();
 }
 
 void CacheContainer::saveToTmpFile() {
-    if(mTmpFile != NULL) return;
+    if(mSavingToFile || mLoadingFromFile) return;
+    MemoryHandler::getInstance()->removeContainer(this);
+    mSavingToFile = true;
+    mNoDataInMemory = true;
+    mCancelAfterSaveDataClear = false;
+    mSavingUpdatable = new CacheContainerTmpFileDataSaver(mImageSk,
+                                                          this);
+    mSavingUpdatable->addScheduler();
+}
+
+CacheContainerTmpFileDataLoader::CacheContainerTmpFileDataLoader(
+        const QSharedPointer<QTemporaryFile> &file,
+        CacheContainer *target) {
+    mTargetCont = target;
+    mTmpFile = file;
+}
+
+void CacheContainerTmpFileDataLoader::processUpdate() {
+    if(mTmpFile->open()) {
+        int width, height;
+        mTmpFile->read((char*)&width, sizeof(int));
+        mTmpFile->read((char*)&height, sizeof(int));
+        SkBitmap btmp;
+        SkImageInfo info = SkImageInfo::Make(width,
+                                             height,
+                                             kBGRA_8888_SkColorType,
+                                             kPremul_SkAlphaType,
+                                             nullptr);
+        btmp.allocPixels(info);
+        mTmpFile->read((char*)btmp.getPixels(),
+                       width*height*4*sizeof(uchar));
+        mImage = SkImage::MakeFromBitmap(btmp);
+
+        mTmpFile->close();
+    }
+}
+
+void CacheContainerTmpFileDataLoader::afterUpdate() {
+    mTargetCont->setDataLoadedFromTmpFile(mImage);
+    Updatable::afterUpdate();
+}
+
+void CacheContainerTmpFileDataLoader::addSchedulerNow() {
+    MainWindow::getInstance()->addFileUpdateScheduler(this);
+}
+
+CacheContainerTmpFileDataSaver::CacheContainerTmpFileDataSaver(
+        const sk_sp<SkImage> &image,
+        CacheContainer *target) {
+    mTargetCont = target;
+    mImage = image;
+}
+
+void CacheContainerTmpFileDataSaver::processUpdate() {
     SkPixmap pix;
-    mImageSk->peekPixels(&pix);
-    mTmpFile = new QTemporaryFile();
+    mImage->peekPixels(&pix);
+    mTmpFile = QSharedPointer<QTemporaryFile>(new QTemporaryFile());
     if(mTmpFile->open()) {
         int width = pix.width();
         int height = pix.height();
@@ -206,4 +259,13 @@ void CacheContainer::saveToTmpFile() {
                         width*height*4*sizeof(uchar));
         mTmpFile->close();
     }
+}
+
+void CacheContainerTmpFileDataSaver::afterUpdate() {
+    mTargetCont->setDataSavedToTmpFile(mTmpFile);
+    Updatable::afterUpdate();
+}
+
+void CacheContainerTmpFileDataSaver::addSchedulerNow() {
+    MainWindow::getInstance()->addFileUpdateScheduler(this);
 }

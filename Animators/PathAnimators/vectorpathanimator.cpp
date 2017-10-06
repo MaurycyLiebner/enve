@@ -32,6 +32,10 @@ VectorPathAnimator::~VectorPathAnimator() {
         delete pt;
     }
     mPoints.clear();
+    foreach(NodeSettings *settings, mNodeSettings) {
+        delete settings;
+    }
+    mNodeSettings.clear();
 }
 
 void VectorPathAnimator::prp_setAbsFrame(const int &frame) {

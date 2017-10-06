@@ -139,6 +139,7 @@ public:
     FontsWidget *getFontsWidget() {
         return mFontWidget;
     }
+    void addFileUpdateScheduler(Updatable *scheduler);
 public slots:
     void setCurrentFrame(int frame);
     void setAllPointsRecord(bool allPointsRecord);

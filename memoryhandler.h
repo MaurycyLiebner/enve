@@ -14,6 +14,8 @@ public:
     void removeContainer(MinimalCacheContainer *cont);
     void containerUpdated(MinimalCacheContainer *cont);
 
+    void incMemoryAwaitingRelease(const int &mem);
+
     static MemoryHandler *getInstance() { return mInstance; }
 signals:
     void allMemoryUsed();
@@ -21,6 +23,7 @@ signals:
 public slots:
     void freeMemory(const unsigned long long &bytes);
 private:
+    long long mMemoryAwaitingRelease = 0;
     static MemoryHandler *mInstance;
     QThread *mMemoryChekerThread;
     MemoryChecker *mMemoryChecker;

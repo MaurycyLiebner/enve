@@ -41,58 +41,14 @@ public:
     void cacheFirstContainer();
     int getNumberNotCachedBeforeRelFrame(const int &relFrame);
     void updateAllAfterFrameInMemoryHandler(const int &relFrame);
+    int getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
+                                             CacheContainer **contP = NULL);
+    void clearCacheForRelFrameRange(const int &minFrame,
+                                    const int &maxFrame);
 protected:
     int getRenderContainterInsertIdAtRelFrame(const int &relFrame);
     bool getRenderContainterIdAtRelFrame(const int &relFrame, int *id);
     QList<std::shared_ptr<CacheContainer> > mRenderContainers;
-};
-
-class BoundingBox;
-class RenderCacheHandler : public CacheHandler {
-    Q_OBJECT
-public:
-    RenderCacheHandler();
-
-    CacheContainer *createNewRenderContainerAtRelFrame(const int &frame);
-
-    void updateCurrentRenderContainerFromFrame(const int &relFrame);
-
-    bool updateCurrentRenderContainerFromFrameIfNotNull(const int &relFrame);
-
-    void duplicateCurrentRenderContainerFrom(RenderContainer *cont);
-
-    void updateCurrentRenderContainerTransform(const QMatrix &trans);
-
-    void drawCurrentRenderContainer(QPainter *p);
-
-    void clearCacheForRelFrameRange(const int &minFrame,
-                                    const int &maxFrame);
-    void clearCacheForAbsFrameRange(const int &minFrame,
-                                    const int &maxFrame);
-
-    void setParentBox(BoundingBox *parentBox) {
-        mParentBox = parentBox;
-    }
-
-    void relRangeToAbsRange(int *minFrame,
-                            int *maxFrame) {
-        *minFrame = relFrameToAbsFrame(*minFrame);
-        *maxFrame = relFrameToAbsFrame(*maxFrame);
-    }
-
-    void absRangeToRelRange(int *minFrame,
-                            int *maxFrame) {
-        *minFrame = absFrameToRelFrame(*minFrame);
-        *maxFrame = absFrameToRelFrame(*maxFrame);
-    }
-
-    int relFrameToAbsFrame(const int &relFrame);
-    int absFrameToRelFrame(const int &absFrame);
-signals:
-    void clearedCacheForAbsFrameRange(int, int);
-public slots:
-private:
-    BoundingBox *mParentBox = NULL;
 };
 
 #endif // RENDERCACHEHANDLER_H

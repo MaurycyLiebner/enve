@@ -27,10 +27,6 @@ MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mTimer->start(500);
 }
 
-void MemoryChecker::setMemoryReleaseSlowedDown(const bool &bT) {
-    mSlowedDown = bT;
-}
-
 unsigned long long getFreeRam() {
     unsigned long long unmapped = 0ULL;
     char buffer[1000];

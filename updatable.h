@@ -87,6 +87,7 @@ public:
     bool schedulerAdded() { return mSchedulerAdded; }
 
     void clear();
+    virtual bool isFileUpdatable() { return false; }
 protected:
     bool mSchedulerAdded = false;
     bool mAwaitingUpdate = false;

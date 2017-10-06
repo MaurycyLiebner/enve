@@ -31,7 +31,6 @@ Canvas::Canvas(FillStrokeSettingsWidget *fillStrokeSettings,
     mFps = fps;
     connect(this, SIGNAL(nameChanged(QString)),
             this, SLOT(emitCanvasNameChanged()));
-    mCacheHandler.setParentBox(this);
     mBackgroundColor->qra_setCurrentValue(Color(75, 75, 75));
     ca_addChildAnimator(mBackgroundColor.data());
     mBackgroundColor->prp_setUpdater(
@@ -412,16 +411,9 @@ void Canvas::setOutputRendering(const bool &bT) {
 }
 
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
+    if(cont == mCurrentPreviewContainer.get()) return;
     if(mCurrentPreviewContainer.get() != NULL) {
-        bool contIsFirstPreviewFrame;
-        if(cont == NULL) {
-            contIsFirstPreviewFrame = false;
-        } else {
-            contIsFirstPreviewFrame =
-                    mCurrentPreviewContainer->getMinRelFrame() >
-                    cont->getMinRelFrame();
-        }
-        if(!mRendering && !contIsFirstPreviewFrame) {
+        if(!mRendering) {
             mCurrentPreviewContainer->setBlocked(false);
         }
     }
@@ -450,10 +442,9 @@ int Canvas::getMaxPreviewFrame(const int &minFrame,
     int frameSize = getByteCountPerFrame();
     unsigned long long freeRam = getFreeRam() -
             MemoryChecker::getInstance()->getMinFreeRam();
-    int maxNewFrames = freeRam/frameSize - 5;
+    int maxNewFrames = freeRam/frameSize;
     int maxFrameT = minFrame + maxNewFrames;
-    int firstF, lastF = minFrame, frameT;
-    frameT = minFrame;
+    int firstF = minFrame, lastF = minFrame, frameT = minFrame;
     maxFrameT += mCacheHandler.getNumberNotCachedBeforeRelFrame(minFrame);
     while(lastF < maxFrameT && lastF < maxFrame) {
         prp_getFirstAndLastIdenticalRelFrame(&firstF, &lastF, frameT);
@@ -469,26 +460,8 @@ int Canvas::getMaxPreviewFrame(const int &minFrame,
         }
         frameT = lastF + 1;
     }
-    mCacheHandler.updateAllAfterFrameInMemoryHandler(maxFrameT);
+    mCacheHandler.updateAllAfterFrameInMemoryHandler(firstF);
     return qMin(maxFrame, qMax(minFrame, maxFrameT));
-    int nContsAfter = mCacheHandler.getContainerCountAfterRelFrame(maxFrameT);
-    int maxFrameT2 = maxFrameT;
-    while(lastF < maxFrame && nContsAfter > 0) {
-        prp_getFirstAndLastIdenticalRelFrame(&firstF, &lastF, frameT);
-        if(frameT == minFrame) {
-            mCacheHandler.cacheDataBeforeRelFrame(frameT);
-        }
-        CacheContainer *cont = mCacheHandler.getRenderContainerAtRelFrame(firstF);
-        if(cont != NULL) {
-            cont->setBlocked(true);
-        } else {
-            mCacheHandler.cacheLastContainer();
-        }
-        nContsAfter--;
-        maxFrameT2++;
-        frameT = lastF + 1;
-    }
-    return qMin(maxFrame, qMax(minFrame, maxFrameT2));
 }
 
 void Canvas::clearPreview() {
@@ -534,11 +507,16 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     if(mRendering || !mPreviewing) {
         setCurrentPreviewContainer(cont);
     }
+    if(mPreviewing) {
+        cont->setBlocked(true);
+    }
 }
 
 void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
                                                  const int &maxFrame) {
-    mCacheHandler.clearCacheForAbsFrameRange(minFrame, maxFrame);
+    mCacheHandler.clearCacheForRelFrameRange(
+                prp_absFrameToRelFrame(minFrame),
+                prp_absFrameToRelFrame(maxFrame));
     Property::prp_updateAfterChangedAbsFrameRange(minFrame, maxFrame);
     int fId;
     int lId;
@@ -700,17 +678,11 @@ void Canvas::updateInputValue() {
 
 void Canvas::grabMouseAndTrack() {
     mIsMouseGrabbing = true;
-#ifndef QT_DEBUG
-    mCanvasWindow->setMouseTracking(true);
-#endif
     mCanvasWindow->grabMouse();
 }
 
 void Canvas::releaseMouseAndDontTrack() {
     mIsMouseGrabbing = false;
-#ifndef QT_DEBUG
-    mCanvasWindow->setMouseTracking(false);
-#endif
     mCanvasWindow->releaseMouse();
 }
 

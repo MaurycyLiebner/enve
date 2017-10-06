@@ -83,6 +83,25 @@ CacheContainer *CacheHandler::createNewRenderContainerAtRelFrame(
     return cont;
 }
 
+int CacheHandler::getFirstEmptyOrCachedFrameAfterFrame(const int &frame,
+                                                       CacheContainer **contP) {
+    int currFrame = frame + 1;
+    CacheContainer *cont = NULL;
+    while(true) {
+        cont = getRenderContainerAtRelFrame(currFrame);
+        if(cont == NULL) {
+            break;
+        } else if(!cont->storesDataInMemory()) {
+            break;
+        }
+        currFrame = cont->getMaxRelFrame();
+    }
+    if(contP != NULL) {
+        *contP = cont;
+    }
+    return currFrame;
+}
+
 int CacheHandler::getFirstEmptyFrameAfterFrame(const int &frame) {
     int currFrame = frame + 1;
     CacheContainer *cont = NULL;
@@ -275,12 +294,8 @@ void CacheHandler::drawCacheOnTimeline(QPainter *p,
     }
 }
 
-RenderCacheHandler::RenderCacheHandler() {
-
-}
-
-void RenderCacheHandler::clearCacheForRelFrameRange(const int &minFrame,
-                                                    const int &maxFrame) {
+void CacheHandler::clearCacheForRelFrameRange(const int &minFrame,
+                                              const int &maxFrame) {
     int minId;
     if(!getRenderContainterIdAtRelFrame(minFrame, &minId)) {
         minId = getRenderContainterInsertIdAtRelFrame(minFrame);
@@ -292,36 +307,4 @@ void RenderCacheHandler::clearCacheForRelFrameRange(const int &minFrame,
     for(int i = minId; i <= maxId; i++) {
         mRenderContainers.takeAt(minId)->setParentCacheHandler(NULL);
     }
-    int minFrameT = minFrame;
-    int maxFrameT = maxFrame;
-    relRangeToAbsRange(&minFrameT, &maxFrameT);
-    emit clearedCacheForAbsFrameRange(minFrameT, maxFrameT);
-}
-
-#include <QDebug>
-CacheContainer *RenderCacheHandler::createNewRenderContainerAtRelFrame(
-                                        const int &frame) {
-    RenderContainer *cont = new RenderContainer();
-    cont->setParentCacheHandler(this);
-    cont->setRelFrame(frame);
-    int contId = getRenderContainterInsertIdAtRelFrame(frame);
-    mRenderContainers.insert(contId, cont->ref<CacheContainer>());
-    return cont;
-}
-
-#include "boundingbox.h"
-int RenderCacheHandler::relFrameToAbsFrame(const int &relFrame) {
-    return mParentBox->prp_relFrameToAbsFrame(relFrame);
-}
-
-int RenderCacheHandler::absFrameToRelFrame(const int &absFrame) {
-    return mParentBox->prp_absFrameToRelFrame(absFrame);
-}
-
-void RenderCacheHandler::clearCacheForAbsFrameRange(const int &minFrame,
-                                                    const int &maxFrame) {
-    int minFrameT = minFrame;
-    int maxFrameT = maxFrame;
-    absRangeToRelRange(&minFrameT, &maxFrameT);
-    clearCacheForRelFrameRange(minFrameT, maxFrameT);
 }

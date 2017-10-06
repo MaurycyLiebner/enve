@@ -10,7 +10,6 @@ class MemoryChecker : public QObject {
 public:
     explicit MemoryChecker(QObject *parent = 0);
     static MemoryChecker *getInstance() { return mInstance; }
-    void setMemoryReleaseSlowedDown(const bool &bT);
 //    void decUsedMemory(const unsigned long long &used) {
 //        mUsedRam -= used;
 //    }
