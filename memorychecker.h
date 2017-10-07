@@ -24,8 +24,8 @@ public:
 //    void incUsedMemory(const unsigned long long &used) {
 //        mUsedRam += used;
 //    }
-    unsigned long long getMinFreeRam() {
-        return mMinFreeRam;
+    unsigned long long getLowFreeRam() {
+        return mLowFreeRam;
     }
 
     void setCurrentMemoryState(const MemoryState &state);
@@ -33,7 +33,9 @@ private:
     MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     QTimer *mTimer;
 
-    unsigned long long mMinFreeRam = 0ULL;
+    unsigned long long mLowFreeRam = 0ULL;
+    unsigned long long mVeryLowFreeRam = 0ULL;
+
 //    unsigned long long mUsedRam = 0ULL;
 //    unsigned long long mLeaveUnused = 1500000000ULL;
 

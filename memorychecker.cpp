@@ -30,7 +30,11 @@ unsigned long long getTotalRam() {
 
 MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mInstance = this;
-    mMinFreeRam = getTotalRam()/5;
+
+    //unsigned long long totRam = getTotalRam();
+    mLowFreeRam = 1200000000;
+    mVeryLowFreeRam = 800000000;
+
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()),
             this, SLOT(checkMemory()) );
@@ -115,23 +119,16 @@ unsigned long long getFreeRam() {
 
 void MemoryChecker::checkMemory() {
     unsigned long long freeMem = getFreeRam();
-    qDebug() << "freemem: " << freeMem;
+    //qDebug() << "freemem: " << freeMem;
 
-    if(freeMem < mMinFreeRam) {
-        setCurrentMemoryState(LOW_MEMORY_STATE);
+    if(freeMem < mLowFreeRam) {
+        if(freeMem < mVeryLowFreeRam) {
+            emit handleMemoryState(VERY_LOW_MEMORY_STATE, mLowFreeRam - freeMem);
+        } else {
+            emit handleMemoryState(LOW_MEMORY_STATE, mLowFreeRam - freeMem);
+        }
+        //setCurrentMemoryState(LOW_MEMORY_STATE);
     }
-//    struct sysinfo info;
-//    if(sysinfo(&info) == 0) {
-//        mFreeRam = info.freeram*info.mem_unit +
-//                   //info.freeswap*info.mem_unit +
-//                   info.bufferram*info.mem_unit;
-//        if(mFreeRam < mMinFreeRam) {
-//            emit outOfMemory(mMinFreeRam);
-//        }
-//    }
-//    if(mTotalRam < mLeaveUnused + mUsedRam) {
-//        emit outOfMemory(mUsedRam + mLeaveUnused - mTotalRam);
-    //    }
 }
 
 unsigned long long getMajorPageFaults() {
@@ -186,7 +183,7 @@ void MemoryChecker::checkMajorMemoryPageFault() {
             unsigned long long freeMem = getFreeRam();
             qDebug() << "freemem: " << freeMem;
 
-            if(freeMem > mMinFreeRam) {
+            if(freeMem > mLowFreeRam) {
                 setCurrentMemoryState(NORMAL_MEMORY_STATE);
                 return;
             }
@@ -197,5 +194,5 @@ void MemoryChecker::checkMajorMemoryPageFault() {
         }
     }
 
-    emit handleMemoryState(mCurrentMemoryState, mMinFreeRam);
+    emit handleMemoryState(mCurrentMemoryState, mLowFreeRam);
 }

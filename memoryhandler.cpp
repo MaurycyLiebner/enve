@@ -51,11 +51,9 @@ void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
 
 void MemoryHandler::freeMemory(const MemoryState &state,
                                const unsigned long long &minFreeBytes) {
-    long long memToFree;
-    if(CRITICAL_MEMORY_STATE) {
-        memToFree = (long long)minFreeBytes;
-    } else {
-        memToFree = ((long long)minFreeBytes/3);
+    long long memToFree = (long long)minFreeBytes;
+    if(state == LOW_MEMORY_STATE) {
+        memToFree -= mMemoryScheduledToRemove;
     }
     if(memToFree <= 0) return;
     int unfreeable = 0;
@@ -78,12 +76,12 @@ void MemoryHandler::freeMemory(const MemoryState &state,
             }
         }
     }
-    emit allMemoryUsed();
-//    if(memToFree > 0 ||
-//        state == VERY_LOW_MEMORY_STATE ||
-//        state == CRITICAL_MEMORY_STATE) {
-//        emit allMemoryUsed();
-//    }
+    //emit allMemoryUsed();
+    if(memToFree > 0 ||
+        state == VERY_LOW_MEMORY_STATE ||
+        state == CRITICAL_MEMORY_STATE) {
+        emit allMemoryUsed();
+    }
     emit memoryFreed();
     //MainWindow::getInstance()->callUpdateSchedulers();
     //MallocExtension::instance()->ReleaseToSystem(bytes - memToFree);

@@ -15,6 +15,9 @@ public:
     void containerUpdated(MinimalCacheContainer *cont);
 
     static MemoryHandler *getInstance() { return mInstance; }
+    void incMemoryScheduledToRemove(const int &mem) {
+        mMemoryScheduledToRemove += mem;
+    }
 signals:
     void allMemoryUsed();
     void memoryFreed();
@@ -22,6 +25,7 @@ public slots:
     void freeMemory(const MemoryState &state,
                     const unsigned long long &minFreeBytes);
 private:
+    long long mMemoryScheduledToRemove = 0;
     static MemoryHandler *mInstance;
     QThread *mMemoryChekerThread;
     MemoryChecker *mMemoryChecker;

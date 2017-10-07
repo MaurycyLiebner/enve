@@ -441,7 +441,7 @@ int Canvas::getMaxPreviewFrame(const int &minFrame,
                                const int &maxFrame) {
     int frameSize = getByteCountPerFrame();
     unsigned long long freeRam = getFreeRam() -
-            MemoryChecker::getInstance()->getMinFreeRam();
+            MemoryChecker::getInstance()->getLowFreeRam();
     int maxNewFrames = freeRam/frameSize;
     int maxFrameT = minFrame + maxNewFrames;
     int firstF = minFrame, lastF = minFrame, frameT = minFrame;

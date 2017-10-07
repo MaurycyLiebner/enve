@@ -112,7 +112,8 @@ void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
 }
 
 bool CacheContainer::cacheAndFree() {
-    if(mBlocked || mNoDataInMemory) return false;
+    if(mBlocked || mNoDataInMemory ||
+        mSavingToFile || mLoadingFromFile) return false;
     if(mParentCacheHandler == NULL) return false;
     saveToTmpFile();
     return true;
@@ -196,10 +197,13 @@ void CacheContainer::setDataSavedToTmpFile(
         mNoDataInMemory = true;
     }
     mImageSk.reset();
+    MemoryHandler::getInstance()->incMemoryScheduledToRemove(-mMemSizeAwaitingSave);
 }
 
 void CacheContainer::saveToTmpFile() {
     if(mSavingToFile || mLoadingFromFile) return;
+    mMemSizeAwaitingSave = getByteCount();
+    MemoryHandler::getInstance()->incMemoryScheduledToRemove(mMemSizeAwaitingSave);
     MemoryHandler::getInstance()->removeContainer(this);
     mSavingToFile = true;
     mNoDataInMemory = true;
