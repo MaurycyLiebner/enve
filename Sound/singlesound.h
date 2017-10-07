@@ -58,7 +58,8 @@ private:
     int mFinalSampleCount = 0;
     int mFinalAbsStartFrame = 0;
     int mSrcSampleCount = 0;
-    QrealAnimator mVolumeAnimator;
+    QSharedPointer<QrealAnimator> mVolumeAnimator =
+            (new QrealAnimator())->ref<QrealAnimator>();
     QString mPath;
 };
 

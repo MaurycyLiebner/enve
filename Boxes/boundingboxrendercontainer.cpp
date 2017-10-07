@@ -61,7 +61,7 @@ const qreal &RenderContainer::getResolutionFraction() const {
 
 void RenderContainer::setVariablesFromRenderData(BoundingBoxRenderData *data) {
     mNoDataInMemory = false;
-    mTmpFile.reset();
+    scheduleDeleteTmpFile();
 
     mTransform = data->transform;
     mResolutionFraction = data->resolution;
@@ -87,8 +87,8 @@ MinimalCacheContainer::~MinimalCacheContainer() {
     MemoryHandler::getInstance()->removeContainer(this);
 }
 
-bool MinimalCacheContainer::freeAndRemoveFromMemoryHandler() {
-    if(freeThis()) {
+bool MinimalCacheContainer::cacheFreeAndRemoveFromMemoryHandler() {
+    if(cacheAndFree()) {
         MemoryHandler::getInstance()->removeContainer(this);
         return true;
     }
@@ -96,6 +96,7 @@ bool MinimalCacheContainer::freeAndRemoveFromMemoryHandler() {
 }
 
 CacheContainer::~CacheContainer() {
+    scheduleDeleteTmpFile();
 }
 
 void CacheContainer::setParentCacheHandler(CacheHandler *handler) {
@@ -106,15 +107,21 @@ void CacheContainer::replaceImageSk(const sk_sp<SkImage> &img) {
     mImageSk = img;
     if(mNoDataInMemory) {
         mNoDataInMemory = false;
-        mTmpFile.reset();
+        scheduleDeleteTmpFile();
     }
 }
 
-bool CacheContainer::freeThis() {
+bool CacheContainer::cacheAndFree() {
     if(mBlocked || mNoDataInMemory) return false;
     if(mParentCacheHandler == NULL) return false;
-    MemoryHandler::getInstance()->incMemoryAwaitingRelease(getByteCount());
     saveToTmpFile();
+    return true;
+}
+
+bool CacheContainer::freeAndRemove() {
+    if(mBlocked || mNoDataInMemory) return false;
+    if(mParentCacheHandler == NULL) return false;
+    mParentCacheHandler->removeRenderContainer(this);
     return true;
 }
 
@@ -188,7 +195,6 @@ void CacheContainer::setDataSavedToTmpFile(
     } else {
         mNoDataInMemory = true;
     }
-    MemoryHandler::getInstance()->incMemoryAwaitingRelease(-getByteCount());
     mImageSk.reset();
 }
 
@@ -267,5 +273,13 @@ void CacheContainerTmpFileDataSaver::afterUpdate() {
 }
 
 void CacheContainerTmpFileDataSaver::addSchedulerNow() {
+    MainWindow::getInstance()->addFileUpdateScheduler(this);
+}
+
+void CacheContainerTmpFileDataDeleter::processUpdate() {
+    mTmpFile.reset();
+}
+
+void CacheContainerTmpFileDataDeleter::addSchedulerNow() {
     MainWindow::getInstance()->addFileUpdateScheduler(this);
 }

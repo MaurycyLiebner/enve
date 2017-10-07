@@ -4,7 +4,7 @@
 #include "paintcontroler.h"
 
 Updatable::~Updatable() {
-    tellDependentThatFinished();
+    clear();
 }
 
 void Updatable::beforeUpdate() {
@@ -32,6 +32,7 @@ void Updatable::tellDependentThatFinished() {
 
 void Updatable::addDependent(Updatable *updatable) {
     //if(mAwaitingUpdate) {
+    if(updatable == NULL) return;
     if(mDependent.contains(updatable)) return;
     mDependent << updatable;
     updatable->incDependencies();
@@ -56,7 +57,6 @@ void Updatable::clear() {
     }
     mDependent.clear();
     tellDependentThatFinished();
-    mUpdateDependent.clear();
     mSchedulerAdded = false;
     mAwaitingUpdate = false;
     Executable::clear();

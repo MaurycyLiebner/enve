@@ -78,10 +78,11 @@ void VectorPathAnimator::setElementPos(const int &index,
                                        const SkPoint &pos) {
     if(prp_isKeyOnCurrentFrame()) {
         ((PathKey*)anim_mKeyOnCurrentFrame)->setElementPos(index, pos);
+        anim_updateAfterChangedKey(anim_mKeyOnCurrentFrame);
     } else {
         PathContainer::setElementPos(index, pos);
+        prp_updateInfluenceRangeAfterChanged();
     }
-    prp_updateInfluenceRangeAfterChanged();
 }
 
 void VectorPathAnimator::anim_saveCurrentValueAsKey() {

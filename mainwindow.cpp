@@ -1060,8 +1060,7 @@ void MainWindow::setAllPointsRecord(bool allPointsRecord) {
     mAllPointsRecording = allPointsRecord;
 }
 
-void MainWindow::newFile()
-{
+void MainWindow::newFile() {
     if(askForSaving()) {
         closeProject();
     }
@@ -1105,9 +1104,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
     return QMainWindow::eventFilter(obj, e);
 }
 
-void MainWindow::closeEvent(QCloseEvent *e)
-{
-    if(!askForSaving() ) {
+void MainWindow::closeEvent(QCloseEvent *e) {
+    if(!closeProject()) {
         e->ignore();
     }
 }
@@ -1225,13 +1223,14 @@ void MainWindow::saveBackup()
     saveToFile(backupPath.arg(id));
 }
 
-void MainWindow::closeProject()
-{
+bool MainWindow::closeProject() {
     if(askForSaving()) {
         setCurrentPath("");
         clearAll();
         setFileChangedSinceSaving(false);
+        return true;
     }
+    return false;
 }
 
 void MainWindow::linkFile() {

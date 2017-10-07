@@ -2,8 +2,11 @@
 #include "Boxes/boundingboxrendercontainer.h"
 #include <gperftools/malloc_extension.h>
 #include <malloc.h>
+#include "mainwindow.h"
+#include <QMetaType>
 
 MemoryHandler *MemoryHandler::mInstance;
+Q_DECLARE_METATYPE(MemoryState)
 
 MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
     mInstance = this;
@@ -11,9 +14,13 @@ MemoryHandler::MemoryHandler(QObject *parent) : QObject(parent) {
     mMemoryChekerThread = new QThread(this);
     mMemoryChecker = new MemoryChecker();
     mMemoryChecker->moveToThread(mMemoryChekerThread);
-
-    connect(mMemoryChecker, SIGNAL(outOfMemory(unsigned long long)),
-            this, SLOT(freeMemory(unsigned long long)) );
+    qRegisterMetaType<MemoryState>();
+    connect(mMemoryChecker,
+            SIGNAL(handleMemoryState(const MemoryState &,
+                                     const unsigned long long &)),
+            this,
+            SLOT(freeMemory(const MemoryState &,
+                            const unsigned long long &)) );
 
     mMemoryChekerThread->start();
 }
@@ -42,29 +49,43 @@ void MemoryHandler::containerUpdated(MinimalCacheContainer *cont) {
     addContainer(cont);
 }
 
-void MemoryHandler::incMemoryAwaitingRelease(const int &mem) {
-    mMemoryAwaitingRelease += mem;
-}
-#include "mainwindow.h"
-void MemoryHandler::freeMemory(const unsigned long long &bytes) {
-    long long memToFree = bytes - mMemoryAwaitingRelease;
+void MemoryHandler::freeMemory(const MemoryState &state,
+                               const unsigned long long &minFreeBytes) {
+    long long memToFree;
+    if(CRITICAL_MEMORY_STATE) {
+        memToFree = (long long)minFreeBytes;
+    } else {
+        memToFree = ((long long)minFreeBytes/3);
+    }
     if(memToFree <= 0) return;
     int unfreeable = 0;
     while(memToFree > 0 && mContainers.count() > unfreeable) {
         MinimalCacheContainer *cont = mContainers.takeFirst();
         int byteCount = cont->getByteCount();
-        if(cont->freeThis()) {
-            memToFree -= byteCount;
+        if(state == LOW_MEMORY_STATE) {
+            if(cont->cacheAndFree()) {
+                memToFree -= byteCount;
+            } else {
+                unfreeable++;
+                mContainers << cont;
+            }
         } else {
-            unfreeable++;
-            mContainers << cont;
+            if(cont->freeAndRemove()) {
+                memToFree -= byteCount;
+            } else {
+                unfreeable++;
+                mContainers << cont;
+            }
         }
     }
-    if(memToFree > 0) {
-        emit allMemoryUsed();
-    }
+    emit allMemoryUsed();
+//    if(memToFree > 0 ||
+//        state == VERY_LOW_MEMORY_STATE ||
+//        state == CRITICAL_MEMORY_STATE) {
+//        emit allMemoryUsed();
+//    }
     emit memoryFreed();
-    MainWindow::getInstance()->callUpdateSchedulers();
+    //MainWindow::getInstance()->callUpdateSchedulers();
     //MallocExtension::instance()->ReleaseToSystem(bytes - memToFree);
     //MallocExtension::instance()->ReleaseFreeMemory();
 }

@@ -162,7 +162,7 @@ private slots:
     void saveFile();
     void saveFileAs();
     void saveBackup();
-    void closeProject();
+    bool closeProject();
     void linkFile();
     void importImageSequence();
     //void importVideo();

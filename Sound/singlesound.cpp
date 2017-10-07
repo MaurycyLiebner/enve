@@ -134,10 +134,10 @@ SingleSound::SingleSound(const QString &path,
 
     prp_setName("sound");
 
-    ca_addChildAnimator(&mVolumeAnimator);
-    mVolumeAnimator.qra_setValueRange(0, 200);
-    mVolumeAnimator.qra_setCurrentValue(100);
-    mVolumeAnimator.prp_setName("volume");
+    ca_addChildAnimator(mVolumeAnimator.data());
+    mVolumeAnimator->qra_setValueRange(0, 200);
+    mVolumeAnimator->qra_setCurrentValue(100);
+    mVolumeAnimator->prp_setName("volume");
 
     setFilePath(path);
 }
@@ -276,16 +276,16 @@ void SingleSound::prepareFinalData(const qreal &fps,
         mFinalSampleCount = maxSampleFromSrc - minSampleFromSrc;
         qDebug() << minSampleFromSrc << maxSampleFromSrc << mFinalSampleCount;
         mFinalData = (float*)malloc(mFinalSampleCount*sizeof(float));
-        if(mVolumeAnimator.prp_hasKeys()) {
+        if(mVolumeAnimator->prp_hasKeys()) {
             int j = 0;
             int frame = 0;
             qreal lastFrameVol =
-                    mVolumeAnimator.qra_getValueAtRelFrame(frame)/100.;
+                    mVolumeAnimator->qra_getValueAtRelFrame(frame)/100.;
             qreal volStep = fps/SAMPLERATE;
             while(j < mFinalSampleCount) {
                 frame++;
                 qreal nextFrameVol =
-                        mVolumeAnimator.qra_getValueAtRelFrame(frame)/100.;
+                        mVolumeAnimator->qra_getValueAtRelFrame(frame)/100.;
                 qreal volDiff = (nextFrameVol - lastFrameVol);
                 qreal currVolFrac = lastFrameVol;
                 for(int i = 0;
@@ -298,7 +298,7 @@ void SingleSound::prepareFinalData(const qreal &fps,
                 lastFrameVol = nextFrameVol;
             }
         } else {
-            qreal volFrac = mVolumeAnimator.qra_getCurrentValue()/100.;
+            qreal volFrac = mVolumeAnimator->qra_getCurrentValue()/100.;
             for(int i = 0; i < mFinalSampleCount; i++) {
                 mFinalData[i] = mSrcData[i + minSampleFromSrc]*volFrac;
             }

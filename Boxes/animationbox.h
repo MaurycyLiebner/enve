@@ -22,6 +22,7 @@ class AnimationBox : public BoundingBox {
     Q_OBJECT
 public:
     AnimationBox();
+    ~AnimationBox();
     void prp_setAbsFrame(const int &frame);
 
     void makeDuplicate(Property *targetBox);

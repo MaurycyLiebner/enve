@@ -155,25 +155,25 @@ void CacheHandler::clearCache() {
 void CacheHandler::cacheDataBeforeRelFrame(const int &relFrame) {
     int lastId = getRenderContainerIdAtOrBeforeRelFrame(relFrame);
     for(int i = 0; i < lastId; i++) {
-        mRenderContainers.at(i)->freeAndRemoveFromMemoryHandler();
+        mRenderContainers.at(i)->cacheFreeAndRemoveFromMemoryHandler();
     }
 }
 
 void CacheHandler::cacheDataAfterRelFrame(const int &relFrame) {
     int firstId = getRenderContainerIdAtOrAfterRelFrame(relFrame);
     for(int i = firstId; i < mRenderContainers.count(); i++) {
-        mRenderContainers.at(i)->freeAndRemoveFromMemoryHandler();
+        mRenderContainers.at(i)->cacheFreeAndRemoveFromMemoryHandler();
     }
 }
 
 void CacheHandler::cacheFirstContainer() {
     if(mRenderContainers.isEmpty()) return;
-    mRenderContainers.first()->freeAndRemoveFromMemoryHandler();
+    mRenderContainers.first()->cacheFreeAndRemoveFromMemoryHandler();
 }
 
 void CacheHandler::cacheLastContainer() {
     if(mRenderContainers.isEmpty()) return;
-    mRenderContainers.last()->freeAndRemoveFromMemoryHandler();
+    mRenderContainers.last()->cacheFreeAndRemoveFromMemoryHandler();
 }
 
 int CacheHandler::getContainerCountAfterRelFrame(const int &relFrame) {

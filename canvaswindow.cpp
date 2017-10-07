@@ -735,7 +735,7 @@ void CanvasWindow::addFileUpdatableAwaitingUpdate(Executable *updatable) {
 
     if(mNoFileAwaitUpdate) {
         mNoFileAwaitUpdate = false;
-        sendNextFileUpdatableForUpdate(0, NULL);
+        sendNextFileUpdatableForUpdate(mPaintControlers.count(), NULL);
     }
 }
 
@@ -752,6 +752,9 @@ void CanvasWindow::sendNextFileUpdatableForUpdate(const int &threadId,
         }
         if(!mRendering) {
             callUpdateSchedulers();
+        }
+        if(!mFreeThreads.isEmpty() && !mUpdatablesAwaitingUpdate.isEmpty()) {
+            sendNextUpdatableForUpdate(mFreeThreads.takeFirst(), NULL);
         }
     } else {
         for(int i = 0; i < mFileUpdatablesAwaitingUpdate.count(); i++) {
@@ -1115,14 +1118,18 @@ void CanvasWindow::importFile(const QString &path,
     if(isSoundExt(extension)) {
         createSoundForPath(path);
     } else {
-        BoundingBox *importedBox = NULL;
+        QSharedPointer<BoundingBox> importedBox;
         MainWindow::getInstance()->blockUndoRedo();
         if(isVectorExt(extension)) {
-            importedBox = loadSVGFile(path);
+            importedBox = loadSVGFile(path)->ref<BoundingBox>();
         } else if(isImageExt(extension)) {
-            importedBox = new ImageBox(path);;
+            ImageBox *imgBox = new ImageBox();
+            importedBox = imgBox->ref<BoundingBox>();
+            imgBox->setFilePath(path);
         } else if(isVideoExt(extension)) {
-            importedBox = new VideoBox(path);
+            VideoBox *vidBox = new VideoBox();
+            importedBox = vidBox->ref<BoundingBox>();
+            vidBox->setFilePath(path);
         } else if(isAvExt(extension)) {
             MainWindow::getInstance()->loadAVFile(path);
         }
@@ -1130,7 +1137,7 @@ void CanvasWindow::importFile(const QString &path,
 
         if(importedBox != NULL) {
             mCurrentCanvas->getCurrentBoxesGroup()->addChild(
-                        importedBox);
+                        importedBox.data());
             QPointF trans = relDropPos;
             trans -= importedBox->mapRelPosToAbs(
                         importedBox->getRelCenterPosition());

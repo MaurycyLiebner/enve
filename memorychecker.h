@@ -4,6 +4,13 @@
 #include <QObject>
 #include <QTimer>
 
+enum MemoryState {
+    NORMAL_MEMORY_STATE,
+    LOW_MEMORY_STATE = 5,
+    VERY_LOW_MEMORY_STATE = 15,
+    CRITICAL_MEMORY_STATE = 30
+};
+
 extern unsigned long long getFreeRam();
 class MemoryChecker : public QObject {
     Q_OBJECT
@@ -20,11 +27,12 @@ public:
     unsigned long long getMinFreeRam() {
         return mMinFreeRam;
     }
+
+    void setCurrentMemoryState(const MemoryState &state);
 private:
-    bool mSlowedDown = false;
+    MemoryState mCurrentMemoryState = NORMAL_MEMORY_STATE;
     QTimer *mTimer;
 
-    unsigned long long mSlowMinFreeRam = 0ULL;
     unsigned long long mMinFreeRam = 0ULL;
 //    unsigned long long mUsedRam = 0ULL;
 //    unsigned long long mLeaveUnused = 1500000000ULL;
@@ -33,11 +41,14 @@ private:
 //    unsigned long long mTotalRam;
 //    unsigned long long mMemUnit;
     static MemoryChecker *mInstance;
+    QList<int> mPgFltSamples;
+    int mLastPgFlts = -1;
 private slots:
     void checkMemory();
+    void checkMajorMemoryPageFault();
 signals:
-    void outOfMemory(unsigned long long);
-
+    void handleMemoryState(const MemoryState &,
+                           const unsigned long long &);
 };
 
 #endif // MEMORYCHECKER_H

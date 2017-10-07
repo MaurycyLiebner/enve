@@ -20,7 +20,12 @@ AnimationBox::AnimationBox() :
     setDurationRectangle(new FixedLenAnimationRect(this));
 //    mFrameAnimator.blockPointer();
 //    mFrameAnimator.setValueRange(0, listOfFrames.count() - 1);
-//    mFrameAnimator.setCurrentIntValue(0);
+    //    mFrameAnimator.setCurrentIntValue(0);
+}
+
+AnimationBox::~AnimationBox() {
+    mAnimationCacheHandler->removeDependentBox(this);
+    mAnimationCacheHandler = NULL;
 }
 
 void AnimationBox::makeDuplicate(Property *targetBox) {
@@ -151,7 +156,7 @@ void AnimationBox::setupBoundingBoxRenderDataForRelFrame(
         Updatable *upd = mAnimationCacheHandler->
                 scheduleFrameLoad(animationFrame);
         if(upd != NULL) {
-            upd->addDependent(upd);
+            upd->addDependent(imageData);
         }
     }
 }

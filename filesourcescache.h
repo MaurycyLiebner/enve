@@ -7,7 +7,7 @@
 #include "Boxes/rendercachehandler.h"
 #include "updatable.h"
 class BoundingBox;
-typedef QSharedPointer<BoundingBox> BoundingBoxQSPtr;
+typedef QWeakPointer<BoundingBox> BoundingBoxQWPtr;
 class FileSourceListVisibleWidget;
 
 extern bool isVideoExt(const QString &extension);
@@ -35,8 +35,7 @@ public:
     void setVisibleInListWidgets(const bool &bT);
 protected:
     bool mVisibleInListWidgets;
-    QList<BoundingBoxQSPtr> mDependentBoxes;
-    std::shared_ptr<FileCacheHandler> mFileHandlerRef;
+    QList<BoundingBoxQWPtr> mDependentBoxes;
     QString mFilePath;
     QString mUpdateFilePath;
 };

@@ -1,7 +1,7 @@
 #ifndef MEMORYHANDLER_H
 #define MEMORYHANDLER_H
-#include "memorychecker.h"
 #include <QThread>
+#include "memorychecker.h"
 class MinimalCacheContainer;
 
 class MemoryHandler : public QObject {
@@ -14,16 +14,14 @@ public:
     void removeContainer(MinimalCacheContainer *cont);
     void containerUpdated(MinimalCacheContainer *cont);
 
-    void incMemoryAwaitingRelease(const int &mem);
-
     static MemoryHandler *getInstance() { return mInstance; }
 signals:
     void allMemoryUsed();
     void memoryFreed();
 public slots:
-    void freeMemory(const unsigned long long &bytes);
+    void freeMemory(const MemoryState &state,
+                    const unsigned long long &minFreeBytes);
 private:
-    long long mMemoryAwaitingRelease = 0;
     static MemoryHandler *mInstance;
     QThread *mMemoryChekerThread;
     MemoryChecker *mMemoryChecker;

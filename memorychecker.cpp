@@ -8,23 +8,53 @@
 
 MemoryChecker *MemoryChecker::mInstance;
 
+unsigned long long getTotalRam() {
+    FILE *meminfo = fopen("/proc/meminfo", "r");
+    if(meminfo == NULL) return 0;
+
+    char line[256];
+
+    while(fgets(line, sizeof(line), meminfo)) {
+        int ram;
+        if(sscanf(line, "MemTotal: %d kB", &ram) == 1) {
+            fclose(meminfo);
+            return (unsigned long long)ram*1000ULL;
+        }
+    }
+
+    // If we got here, then we couldn't find the proper line in the meminfo file:
+    // do something appropriate like return an error code, throw an exception, etc.
+    fclose(meminfo);
+    return 0;
+}
+
 MemoryChecker::MemoryChecker(QObject *parent) : QObject(parent) {
     mInstance = this;
-    struct sysinfo info;
-    if(sysinfo(&info) == 0) {
-        unsigned long long memUnit = info.mem_unit;
-        unsigned long long totalRam = info.totalram*memUnit;
-//        mFreeRam = info.freeram*info.mem_unit +
-//                   //info.freeswap*info.mem_unit +
-//                   info.bufferram*info.mem_unit;
-        mMinFreeRam = totalRam*20/100;
-        mSlowMinFreeRam = mMinFreeRam/2;
-    } else { // ??
-    }
+    mMinFreeRam = getTotalRam()/5;
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()),
             this, SLOT(checkMemory()) );
     mTimer->start(500);
+}
+
+void MemoryChecker::setCurrentMemoryState(const MemoryState &state) {
+    if(state == mCurrentMemoryState) return;
+    qDebug() << "set state: " << state;
+    //bool worsend = state > mCurrentMemoryState;
+    if(state == NORMAL_MEMORY_STATE) {
+        disconnect(mTimer, 0, this, 0);
+        connect(mTimer, SIGNAL(timeout()),
+                this, SLOT(checkMemory()) );
+        mTimer->setInterval(1000);
+        mPgFltSamples.clear();
+        mLastPgFlts = -1;
+    } else if(mCurrentMemoryState == NORMAL_MEMORY_STATE) {
+        disconnect(mTimer, 0, this, 0);
+        connect(mTimer, SIGNAL(timeout()),
+                this, SLOT(checkMajorMemoryPageFault()) );
+        mTimer->setInterval(500);
+    }
+    mCurrentMemoryState = state;
 }
 
 unsigned long long getFreeRam() {
@@ -85,14 +115,10 @@ unsigned long long getFreeRam() {
 
 void MemoryChecker::checkMemory() {
     unsigned long long freeMem = getFreeRam();
-    if(mSlowedDown) {
-        if(freeMem < mSlowMinFreeRam) {
-            emit outOfMemory(mSlowMinFreeRam - freeMem);
-        }
-    } else {
-        if(freeMem < mMinFreeRam) {
-            emit outOfMemory(mMinFreeRam - freeMem);
-        }
+    qDebug() << "freemem: " << freeMem;
+
+    if(freeMem < mMinFreeRam) {
+        setCurrentMemoryState(LOW_MEMORY_STATE);
     }
 //    struct sysinfo info;
 //    if(sysinfo(&info) == 0) {
@@ -105,5 +131,71 @@ void MemoryChecker::checkMemory() {
 //    }
 //    if(mTotalRam < mLeaveUnused + mUsedRam) {
 //        emit outOfMemory(mUsedRam + mLeaveUnused - mTotalRam);
-//    }
+    //    }
+}
+
+unsigned long long getMajorPageFaults() {
+    FILE *meminfo = fopen("/proc/vmstat", "r");
+    if(meminfo == NULL) return 0;
+
+    char line[256];
+    while(fgets(line, sizeof(line), meminfo)) {
+        int pgFlts;
+        if(sscanf(line, "pgmajfault %d", &pgFlts) == 1) {
+            fclose(meminfo);
+            return pgFlts;
+        }
+    }
+
+    // If we got here, then we couldn't find the proper line in the meminfo file:
+    // do something appropriate like return an error code, throw an exception, etc.
+    fclose(meminfo);
+    return 0;
+}
+
+void MemoryChecker::checkMajorMemoryPageFault() {
+    bool firstSample = mLastPgFlts == -1;
+    int pgFlts = getMajorPageFaults();
+
+    if(firstSample) {
+        mLastPgFlts = pgFlts;
+        return;
+    }
+    int relPgFlt = pgFlts - mLastPgFlts;
+    mLastPgFlts = pgFlts;
+    if(mPgFltSamples.count() == 3) {
+        mPgFltSamples.removeFirst();
+    }
+    mPgFltSamples << relPgFlt;
+    int avgPgFlts = 0;
+    foreach(const int &sample, mPgFltSamples) {
+        avgPgFlts += sample;
+    }
+    avgPgFlts = avgPgFlts/mPgFltSamples.count();
+    qDebug() << "avg pgflts: " << avgPgFlts;
+    if(avgPgFlts > mCurrentMemoryState) {
+        if(mCurrentMemoryState == LOW_MEMORY_STATE &&
+                avgPgFlts > VERY_LOW_MEMORY_STATE) {
+            setCurrentMemoryState(VERY_LOW_MEMORY_STATE);
+        } else if(mCurrentMemoryState == VERY_LOW_MEMORY_STATE &&
+                  avgPgFlts > CRITICAL_MEMORY_STATE) {
+            setCurrentMemoryState(CRITICAL_MEMORY_STATE);
+        }
+    } else {
+        if(mCurrentMemoryState == LOW_MEMORY_STATE) {
+            unsigned long long freeMem = getFreeRam();
+            qDebug() << "freemem: " << freeMem;
+
+            if(freeMem > mMinFreeRam) {
+                setCurrentMemoryState(NORMAL_MEMORY_STATE);
+                return;
+            }
+        } else if(mCurrentMemoryState == VERY_LOW_MEMORY_STATE) {
+            setCurrentMemoryState(LOW_MEMORY_STATE);
+        } else if(mCurrentMemoryState == CRITICAL_MEMORY_STATE) {
+            setCurrentMemoryState(VERY_LOW_MEMORY_STATE);
+        }
+    }
+
+    emit handleMemoryState(mCurrentMemoryState, mMinFreeRam);
 }

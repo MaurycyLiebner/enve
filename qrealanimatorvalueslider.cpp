@@ -40,8 +40,7 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(QString name,
 
 }
 
-void QrealAnimatorValueSlider::emitEditingStarted(qreal value)
-{
+void QrealAnimatorValueSlider::emitEditingStarted(qreal value) {
     if(mAnimator != NULL) {
         mBlockAnimatorSignals = true;
         mAnimator->prp_startTransform();
@@ -105,11 +104,9 @@ void QrealAnimatorValueSlider::paint(QPainter *p)
 }
 
 void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
+    if(animator == mAnimator) return;
     if(mAnimator != NULL) {
-        disconnect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
-                   this, SLOT(setValueFromAnimator(qreal)));
-        disconnect(mAnimator, SIGNAL(beingDeleted()),
-                   this, SLOT(nullifyAnimator()));
+        disconnect(mAnimator, 0, this, 0);
     }
     mAnimator = animator;
     if(mAnimator != NULL) {

@@ -15,9 +15,10 @@ public:
 
     virtual ~MinimalCacheContainer();
 
-    bool freeAndRemoveFromMemoryHandler();
+    bool cacheFreeAndRemoveFromMemoryHandler();
 
-    virtual bool freeThis() = 0;
+    virtual bool cacheAndFree() = 0;
+    virtual bool freeAndRemove() = 0;
 
     virtual int getByteCount() = 0;
 
@@ -69,12 +70,25 @@ private:
     QSharedPointer<QTemporaryFile> mTmpFile;
 };
 
+class CacheContainerTmpFileDataDeleter : public Updatable {
+public:
+    CacheContainerTmpFileDataDeleter(const QSharedPointer<QTemporaryFile> &file) {
+        mTmpFile = file;
+    }
+    void processUpdate();
+
+    bool isFileUpdatable() { return true; }
+    void addSchedulerNow();
+private:
+    QSharedPointer<QTemporaryFile> mTmpFile;
+};
+
 class CacheContainer : public MinimalCacheContainer {
 public:
     CacheContainer() {}
     ~CacheContainer();
 
-    Updatable *scheduleLoadFromTmpFile() {
+    Updatable *scheduleLoadFromTmpFile(Updatable *dependent = NULL) {
         if(mSavingToFile) {
             mCancelAfterSaveDataClear = true;
             return mSavingUpdatable;
@@ -84,12 +98,16 @@ public:
         mLoadingFromFile = true;
         Updatable *updatable = new CacheContainerTmpFileDataLoader(mTmpFile,
                                                                    this);
+        if(dependent != NULL) {
+            updatable->addDependent(dependent);
+        }
         updatable->addScheduler();
         return updatable;
     }
 
     void setParentCacheHandler(CacheHandler *handler);
-    bool freeThis();
+    bool cacheAndFree();
+    bool freeAndRemove();
     void setBlocked(const bool &bT);
 
     int getByteCount() {
@@ -104,6 +122,13 @@ public:
 
     sk_sp<SkImage> getImageSk() {
         return mImageSk;
+    }
+
+    void scheduleDeleteTmpFile() {
+        if(mTmpFile == NULL) return;
+        Updatable *updatable = new CacheContainerTmpFileDataDeleter(mTmpFile);
+        mTmpFile.reset();
+        updatable->addScheduler();
     }
 
     void setDataLoadedFromTmpFile(const sk_sp<SkImage> &img);
@@ -124,6 +149,7 @@ public:
     }
     void setDataSavedToTmpFile(const QSharedPointer<QTemporaryFile> &tmpFile);
 protected:
+    int mMemSizeAwaitingSave = 0;
     Updatable *mSavingUpdatable = NULL;
     bool mCancelAfterSaveDataClear = false;
     bool mSavingToFile = false;

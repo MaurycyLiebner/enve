@@ -96,10 +96,7 @@ void ColorSettingsWidget::nullifyAnimator() {
 
 void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
     if(mTargetAnimator != NULL) {
-        disconnect(mTargetAnimator, SIGNAL(colorModeChanged(ColorMode)),
-                this, SLOT(refreshColorAnimatorTarget()));
-        disconnect(mTargetAnimator, SIGNAL(beingDeleted()),
-                this, SLOT(nullifyAnimator()));
+        disconnect(mTargetAnimator, 0, this, 0);
     }
     mTargetAnimator = target;
     rSpin->setAnimator(NULL);

@@ -91,7 +91,6 @@ int FileSourcesCache::getFileCacheListCount() {
 FileCacheHandler::FileCacheHandler(const QString &filePath,
                                    const bool &visibleInListWidgets) {
     mVisibleInListWidgets = visibleInListWidgets;
-    mFileHandlerRef = ref<FileCacheHandler>();
     mFilePath = filePath;
     FileSourcesCache::addHandlerToHandlersList(this);
     if(visibleInListWidgets) {
@@ -114,18 +113,20 @@ FileCacheHandler::~FileCacheHandler() {
 }
 
 void FileCacheHandler::clearCache() {
-    foreach(const BoundingBoxQSPtr &boxPtr, mDependentBoxes) {
-        boxPtr->reloadCacheHandler();
+    foreach(const BoundingBoxQWPtr &boxPtr, mDependentBoxes) {
+        BoundingBox *box = boxPtr.data();
+        if(box == NULL) continue;
+        box->reloadCacheHandler();
     }
 }
 
 void FileCacheHandler::addDependentBox(BoundingBox *dependent) {
-    mDependentBoxes << dependent->ref<BoundingBox>();
+    mDependentBoxes << dependent->weakRef<BoundingBox>();
 }
 
 void FileCacheHandler::removeDependentBox(BoundingBox *dependent) {
     for(int i = 0; i < mDependentBoxes.count(); i++) {
-        const BoundingBoxQSPtr &boxPtr = mDependentBoxes.at(i);
+        const BoundingBoxQWPtr &boxPtr = mDependentBoxes.at(i);
         if(boxPtr.data() == dependent) {
             mDependentBoxes.removeAt(i);
             return;

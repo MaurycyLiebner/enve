@@ -154,7 +154,7 @@ void TilesData::afterSavedToTmpFile() {
     mDataStoredInTmpFile = true;
 }
 
-bool TilesData::freeThis() {
+bool TilesData::cacheAndFree() {
     if(mNoDataInMemory) return false;
     mNoDataInMemory = true;
     if(!mDataStoredInTmpFile) {
@@ -165,6 +165,10 @@ bool TilesData::freeThis() {
 //                    new SaveTilesDataToTmpFileExec(this));
     }
     return true;
+}
+
+bool TilesData::freeAndRemove() {
+    return false;
 }
 
 void TilesData::_writeTilesDataToTmp() {

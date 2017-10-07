@@ -41,7 +41,8 @@ public:
 
     void dataChanged();
 
-    bool freeThis();
+    bool cacheAndFree();
+    bool freeAndRemove();
 
     int getByteCount();
 
