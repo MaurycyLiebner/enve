@@ -418,6 +418,8 @@ void Surface::startNewStroke(Brush *brush,
 
 void Surface::setSize(const ushort &width_t,
                       const ushort &height_t) {
+    if(width_t == mWidth && height_t == mHeight) return;
+
     // initialize tiles
     ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
     ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
@@ -428,6 +430,10 @@ void Surface::setSize(const ushort &width_t,
     mHeight = height_t;
     mNTileRows = n_tile_rows_t;
     mNTileCols = n_tile_cols_t;
+}
+
+void Surface::move(const int &xT, const int &yT) {
+    mCurrentTiles->move(xT, yT);
 }
 
 void Surface::setBackgroundMode(

@@ -87,8 +87,109 @@ void TilesData::drawSk(SkCanvas *canvas, SkPaint *paint) {
     }
 }
 
-void TilesData::setSize(const ushort &width_t,
-                        const ushort &height_t) {
+void TilesData::move(const ushort &xT, const ushort &yT) {
+    if(mNoDataInMemory && !mDataStoredInTmpFile) return;
+    // !!! handle differently when stored in tmp file
+    int dTileX0T =  -qCeil(xT*1./TILE_DIM);
+    int dTileY0T = -qCeil(yT*1./TILE_DIM);
+    int x0T = (xT > 0) ? (TILE_DIM - xT%TILE_DIM) : xT%TILE_DIM;
+    int y0T = (yT > 0) ? (TILE_DIM - yT%TILE_DIM) : yT%TILE_DIM;
+    int width0T = TILE_DIM - x0T;
+    int height0T = TILE_DIM - y0T;
+// x1 and y1 always 0
+    int width1T = TILE_DIM - width0T;
+    int height1T = TILE_DIM - height0T;
+
+    int iFirst, iLast, iInc;
+    int jFirst, jLast, jInc;
+
+    if(xT > 0) {
+        iFirst = mNTileCols - 1;
+        iLast = 0;
+        iInc = -1;
+    } else {
+        iFirst = 0;
+        iLast = mNTileCols - 1;
+        iInc = 1;
+    }
+
+    if(yT > 0) {
+        jFirst = mNTileRows - 1;
+        jLast = 0;
+        jInc = -1;
+    } else {
+        jFirst = 0;
+        jLast = mNTileRows - 1;
+        jInc = 1;
+    }
+
+    int i = iFirst;
+    while(true) {
+        int j = jFirst;
+        while(true) {
+            Tile *tileT = mTiles[j][i];
+            int tileX0T = i + dTileX0T;
+            int tileY0T = j + dTileY0T;
+            int tileX1T = tileX0T + 1;
+            int tileY1T = tileY0T + 1;
+            if(tileX0T >= mNTileCols ||
+               tileY0T >= mNTileRows ||
+               tileX0T < 0 || tileY0T < 0) {
+                tileT->clearData(0, 0,
+                                 width0T, height0T);
+            } else {
+                Tile *srcTileT = mTiles[tileY0T][tileX0T];
+                tileT->replaceData(x0T, y0T,
+                                   0, 0,
+                                   width0T, height0T,
+                                   srcTileT);
+            }
+            if(tileX1T >= mNTileCols ||
+               tileY0T >= mNTileRows||
+               tileX1T < 0 || tileY0T < 0) {
+                tileT->clearData(width0T, 0,
+                                 width1T, height0T);
+            } else {
+                Tile *srcTileT = mTiles[tileY0T][tileX1T];
+                tileT->replaceData(0, y0T,
+                                   width0T, 0,
+                                   width1T, height0T,
+                                   srcTileT);
+            }
+            if(tileX0T >= mNTileCols ||
+               tileY1T >= mNTileRows ||
+               tileX0T < 0 || tileY1T < 0) {
+                tileT->clearData(0, height0T,
+                                 width0T, height1T);
+            } else {
+                Tile *srcTileT = mTiles[tileY1T][tileX0T];
+                tileT->replaceData(x0T, 0,
+                                   0, height0T,
+                                   width0T, height1T,
+                                   srcTileT);
+            }
+            if(tileX1T >= mNTileCols ||
+               tileY1T >= mNTileRows ||
+               tileX1T < 0 || tileY1T < 0) {
+                tileT->clearData(width0T, height0T,
+                                 width1T, height1T);
+            } else {
+                Tile *srcTileT = mTiles[tileY1T][tileX1T];
+                tileT->replaceData(0, 0,
+                                   width0T, height0T,
+                                   width1T, height1T,
+                                   srcTileT);
+            }
+            if(j == jLast) break;
+            j += jInc;
+        }
+        if(i == iLast) break;
+        i += iInc;
+    }
+}
+
+void TilesData::setSize(const ushort &width_t, const ushort &height_t) {
+    if(mWidth == width_t && mHeight == height_t) return;
     ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
     ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
     ushort last_row_height = height_t%TILE_DIM;

@@ -214,7 +214,7 @@ void AnimatedSurface::anim_moveKeyToRelFrame(Key *key,
 void AnimatedSurface::setSize(const ushort &width_t,
                               const ushort &height_t) {
     // initialize tiles
-
+    if(width_t == mWidth && height_t == mHeight) return;
     if(prp_hasKeys()) {
         ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);
         ushort n_tile_rows_t = ceil(height_t/(qreal)TILE_DIM);
@@ -229,6 +229,17 @@ void AnimatedSurface::setSize(const ushort &width_t,
         mNTileCols = n_tile_cols_t;
     } else {
         Surface::setSize(width_t, height_t);
+    }
+}
+
+void AnimatedSurface::move(const int &xT, const int &yT) {
+    if(prp_hasKeys()) {
+        Q_FOREACH(const std::shared_ptr<Key> &key, anim_mKeys) {
+            SurfaceKey *frameT = (SurfaceKey*)key.get();
+            frameT->getTilesData()->move(xT, yT);
+        }
+    } else {
+        Surface::move(xT, yT);
     }
 }
 

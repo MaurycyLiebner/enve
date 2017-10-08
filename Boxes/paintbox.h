@@ -30,6 +30,14 @@ public:
         mHeight = height;
     }
 
+    const ushort &getWidth() {
+        return mWidth;
+    }
+
+    const ushort &getHeight() {
+        return mHeight;
+    }
+
     void prp_setAbsFrame(const int &frame);
 
     void finishSizeSetup();
@@ -121,7 +129,13 @@ public:
     const int &getFirstFrame() {
         return mFirstFrame;
     }
+    void finishSizeAndPosSetup();
+    void scheduleFinishSizeSetup();
+    void scheduleFinishSizeAndPosSetup();
 private:
+    bool mFinishSizeAndPosSetupScheduled = false;
+    bool mFinishSizeSetupScheduled = false;
+
     int mOverlapFrames = INT_MIN;
     int mFrameStep = INT_MIN;
     int mFrameCount = INT_MIN;

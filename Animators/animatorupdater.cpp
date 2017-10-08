@@ -162,21 +162,42 @@ void SingleSoundUpdater::update() {
     mTarget->scheduleFinalDataUpdate();
 }
 #include "Boxes/paintbox.h"
-PaintBoxSizeUpdater::PaintBoxSizeUpdater(PaintBox *paintBox) {
+PaintBoxSizeUpdaterBR::PaintBoxSizeUpdaterBR(PaintBox *paintBox) {
     mTarget = paintBox;
 }
 
-PaintBoxSizeUpdater::~PaintBoxSizeUpdater() {
+PaintBoxSizeUpdaterBR::~PaintBoxSizeUpdaterBR() {
 }
 
-void PaintBoxSizeUpdater::update() {
+void PaintBoxSizeUpdaterBR::update() {
     mTarget->scheduleUpdate();
 }
 
-void PaintBoxSizeUpdater::frameChangeUpdate() {
+void PaintBoxSizeUpdaterBR::frameChangeUpdate() {
+    //mTarget->scheduleUpdate();
+}
+
+void PaintBoxSizeUpdaterBR::updateFinal() {
+    mTarget->scheduleFinishSizeSetup();
     mTarget->scheduleUpdate();
 }
 
-void PaintBoxSizeUpdater::updateFinal() {
-    mTarget->finishSizeSetup();
+PaintBoxSizeUpdaterTL::PaintBoxSizeUpdaterTL(PaintBox *paintBox) {
+    mTarget = paintBox;
+}
+
+PaintBoxSizeUpdaterTL::~PaintBoxSizeUpdaterTL() {
+}
+
+void PaintBoxSizeUpdaterTL::update() {
+    mTarget->scheduleUpdate();
+}
+
+void PaintBoxSizeUpdaterTL::frameChangeUpdate() {
+    //mTarget->scheduleUpdate();
+}
+
+void PaintBoxSizeUpdaterTL::updateFinal() {
+    mTarget->scheduleFinishSizeAndPosSetup();
+    mTarget->scheduleUpdate();
 }

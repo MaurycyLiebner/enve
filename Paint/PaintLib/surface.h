@@ -131,6 +131,7 @@ public:
     TilesData *getTilesData() {
         return mCurrentTiles.get();
     }
+    virtual void move(const int &xT, const int &yT);
 protected:
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;

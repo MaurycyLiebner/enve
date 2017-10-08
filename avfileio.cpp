@@ -816,6 +816,8 @@ void TilesData::writeTilesData(QIODevice *target) {
 }
 
 void TilesData::writeTilesDataFromMemoryOrTmp(QIODevice *target) {
+    target->write((char*)&mWidth, sizeof(ushort));
+    target->write((char*)&mHeight, sizeof(ushort));
     bool noDataInMemory = !mDataStoredInTmpFile && mNoDataInMemory;
     target->write((char*)&noDataInMemory, sizeof(bool));
     if(mNoDataInMemory) {
@@ -828,7 +830,12 @@ void TilesData::writeTilesDataFromMemoryOrTmp(QIODevice *target) {
 }
 
 void TilesData::readTilesData(QIODevice *target) {
+    ushort width;
+    ushort height;
+    target->read((char*)&width, sizeof(ushort));
+    target->read((char*)&height, sizeof(ushort));
     target->read((char*)&mNoDataInMemory, sizeof(bool));
+    setSize(width, height);
     if(mNoDataInMemory) return;
     for(int i = 0; i < mNTileCols; i++) {
         for(int j = 0; j < mNTileRows; j++) {
@@ -846,7 +853,6 @@ void Surface::writeSurface(QIODevice *target) {
 void Surface::readSurface(QIODevice *target) {
     target->read((char*)&mWidth, sizeof(ushort));
     target->read((char*)&mHeight, sizeof(ushort));
-    setSize(mWidth, mHeight);
     mCurrentTiles->readTilesData(target);
 }
 
@@ -876,8 +882,8 @@ void AnimatedSurface::writeProperty(QIODevice *target) {
 
 Key *AnimatedSurface::readKey(QIODevice *target) {
     SurfaceKey *newKey = new SurfaceKey(this);
-    newKey->setTiles(new TilesData(mWidth,
-                                mHeight, true));
+    newKey->setTiles(new TilesData(0,
+                                   0, true));
     newKey->readKey(target);
     return newKey;
 }
@@ -888,14 +894,13 @@ void AnimatedSurface::readProperty(QIODevice *target) {
     int nKeys;
     target->read((char*)&nKeys, sizeof(int));
     if(nKeys == 0) {
-        setSize(mWidth, mHeight);
         mCurrentTiles->readTilesData(target);
     } else {
         for(int i = 0; i < nKeys; i++) {
             anim_appendKey(readKey(target), false, false);
         }
-        setSize(mWidth, mHeight);
     }
+    setSize(mParentBox->getWidth(), mParentBox->getHeight());
 }
 
 void PaintBox::writeBoundingBox(QIODevice *target) {

@@ -80,6 +80,7 @@ public:
         mOverlapFrames = overlapFrames;
     }
     Key *readKey(QIODevice *target);
+    void move(const int &xT, const int &yT);
 protected:
     PaintBox *mParentBox = NULL;
 

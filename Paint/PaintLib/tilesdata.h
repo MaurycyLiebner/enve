@@ -54,6 +54,7 @@ public:
     void _readTilesDataFromTmp();
     void initializeEmptyTilesData();
     void writeTilesDataFromMemoryOrTmp(QIODevice *target);
+    void move(const ushort &xT, const ushort &yT);
 private:
     bool mNoDataInMemory = true;
     bool mDataStoredInTmpFile = false;

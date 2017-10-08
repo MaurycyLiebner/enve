@@ -12,10 +12,10 @@ PaintBox::PaintBox() :
     mBottomRightPoint = new PointAnimator(this, TYPE_PATH_POINT);
 
     mTopLeftPoint->prp_setUpdater(
-                new PaintBoxSizeUpdater(this));
+                new PaintBoxSizeUpdaterTL(this));
     mTopLeftPoint->prp_setName("top left");
     mBottomRightPoint->prp_setUpdater(
-                new PaintBoxSizeUpdater(this));
+                new PaintBoxSizeUpdaterBR(this));
     mBottomRightPoint->prp_setName("bottom right");
 }
 
@@ -150,6 +150,36 @@ void PaintBox::finishSizeSetup() {
     }
 }
 
+void PaintBox::finishSizeAndPosSetup() {
+    QPointF trans = mTopLeftPoint->getCurrentPointValue() -
+            mTopLeftPoint->getSavedPointValue();
+    int dX = -qRound(trans.x());
+    int dY = -qRound(trans.y());
+    if(dX <= 0 && dY <= 0) {
+        mMainHandler->move(dX, dY);
+    } else if(dX < 0) {
+        mMainHandler->move(dX, 0);
+    } else if(dY < 0) {
+        mMainHandler->move(0, dY);
+    }
+    finishSizeSetup();
+    if(dX >= 0 && dY >= 0) {
+        mMainHandler->move(dX, dY);
+    } else if(dX > 0) {
+        mMainHandler->move(dX, 0);
+    } else if(dY > 0) {
+        mMainHandler->move(0, dY);
+    }
+}
+
+void PaintBox::scheduleFinishSizeAndPosSetup() {
+    mFinishSizeAndPosSetupScheduled = true;
+}
+
+void PaintBox::scheduleFinishSizeSetup() {
+    mFinishSizeSetupScheduled = true;
+}
+
 void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
     canvas->saveLayer(NULL, paint);
     BoundingBox::drawPixmapSk(canvas, NULL);
@@ -179,6 +209,13 @@ void PaintBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 
 void PaintBox::setupBoundingBoxRenderDataForRelFrame(
         const int &relFrame, BoundingBoxRenderData *data) {
+    if(mFinishSizeAndPosSetupScheduled) {
+        mFinishSizeAndPosSetupScheduled = false;
+        finishSizeAndPosSetup();
+    } else if(mFinishSizeSetupScheduled) {
+        mFinishSizeSetupScheduled = false;
+        finishSizeSetup();
+    }
     BoundingBox::setupBoundingBoxRenderDataForRelFrame(relFrame, data);
     PaintBoxRenderData *paintData = (PaintBoxRenderData*)data;
     if(mMainHandler == NULL) return;
