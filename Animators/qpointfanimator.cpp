@@ -30,6 +30,11 @@ void QPointFAnimator::setPrefferedValueStep(const qreal &valueStep) {
     mYAnimator->setPrefferedValueStep(valueStep);
 }
 
+bool QPointFAnimator::getBeingTransformed() {
+    return mXAnimator->getBeingTransformed() ||
+            mYAnimator->getBeingTransformed();
+}
+
 qreal QPointFAnimator::getXValue() {
     return mXAnimator->qra_getCurrentValue();
 }

@@ -87,13 +87,14 @@ void TilesData::drawSk(SkCanvas *canvas, SkPaint *paint) {
     }
 }
 
-void TilesData::move(const ushort &xT, const ushort &yT) {
+void TilesData::move(const int &xT, const int &yT) {
     if(mNoDataInMemory && !mDataStoredInTmpFile) return;
     // !!! handle differently when stored in tmp file
     int dTileX0T =  -qCeil(xT*1./TILE_DIM);
     int dTileY0T = -qCeil(yT*1./TILE_DIM);
-    int x0T = (xT > 0) ? (TILE_DIM - xT%TILE_DIM) : xT%TILE_DIM;
-    int y0T = (yT > 0) ? (TILE_DIM - yT%TILE_DIM) : yT%TILE_DIM;
+
+    int x0T = (xT > 0) ? (TILE_DIM - xT%TILE_DIM) : -xT%TILE_DIM;
+    int y0T = (yT > 0) ? (TILE_DIM - yT%TILE_DIM) : -yT%TILE_DIM;
     int width0T = TILE_DIM - x0T;
     int height0T = TILE_DIM - y0T;
 // x1 and y1 always 0

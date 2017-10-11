@@ -69,8 +69,6 @@ public:
 
     void setRadius(qreal radius);
 
-    bool isBeingTransformed();
-
     qreal getRadius();
     void moveToRel(const QPointF &relPos);
     virtual void scaleRelativeToSavedPivot(const qreal &sx,

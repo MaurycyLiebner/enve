@@ -148,6 +148,12 @@ public:
                 int idTarget = ((j + targetY)*TILE_DIM + targetX + i)*4;
                 int idSrc = ((j + srcY)*TILE_DIM + srcX + i)*4;
 
+                if(idSrc >= TILE_DIM*TILE_DIM*4) {
+                    qDebug() << "error";
+                }
+                if(idTarget >= TILE_DIM*TILE_DIM*4) {
+                    qDebug() << "error";
+                }
                 mData[idTarget] = srcData[idSrc];
                 mData[idTarget + 1] = srcData[idSrc + 1];
                 mData[idTarget + 2] = srcData[idSrc + 2];

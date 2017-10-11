@@ -187,6 +187,9 @@ void PaintBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
         canvas->concat(
                 QMatrixToSkMatrix(
                     mTransformAnimator->getCombinedTransform()) );
+        QPointF trans = mTopLeftPoint->getRelativePosAtRelFrame(
+                    anim_mCurrentRelFrame);
+        canvas->translate(trans.x(), trans.y());
         mTemporaryHandler->drawSk(canvas, paint);
     }
 
@@ -225,6 +228,13 @@ void PaintBox::setupBoundingBoxRenderDataForRelFrame(
             drawer->addDependent(paintData);
         }
     }
+    QPointF topLeft;
+    if(mTopLeftPoint->getBeingTransformed()) {
+        topLeft = mTopLeftPoint->getSavedPointValue();
+    } else {
+        topLeft = mTopLeftPoint->getRelativePosAtRelFrame(relFrame);
+    }
+    paintData->trans = QPointFToSkPoint(topLeft);
 }
 
 BoundingBoxRenderData *PaintBox::createRenderData() {
@@ -251,7 +261,9 @@ void PaintBox::tabletEvent(const qreal &xT,
                            const qreal &pressure,
                            const bool &erase,
                            Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
+    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
+            mTopLeftPoint->getRelativePosAtRelFrame(
+                        anim_mCurrentRelFrame);
     int seedT = rand() % 1000;
     srand(seedT);
     mMainHandler->tabletEvent(relPos.x(), relPos.y(),
@@ -274,7 +286,9 @@ void PaintBox::tabletPressEvent(const qreal &xT,
                                 const qreal &pressure,
                                 const bool &erase,
                                 Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
+    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
+            mTopLeftPoint->getRelativePosAtRelFrame(
+                        anim_mCurrentRelFrame);
 
     mMainHandler->tabletPressEvent(relPos.x(), relPos.y(),
                                    time_stamp, pressure,
@@ -294,7 +308,9 @@ void PaintBox::mousePressEvent(const qreal &xT,
                                const ulong &timestamp,
                                const qreal &pressure,
                                Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
+    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
+            mTopLeftPoint->getRelativePosAtRelFrame(
+                        anim_mCurrentRelFrame);
 
     mMainHandler->mousePressEvent(relPos.x(), relPos.y(),
                                   timestamp, pressure,
@@ -309,7 +325,9 @@ void PaintBox::mouseMoveEvent(const qreal &xT,
                               const ulong &time_stamp,
                               const bool &erase,
                               Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
+    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
+            mTopLeftPoint->getRelativePosAtRelFrame(
+                        anim_mCurrentRelFrame);
     int seedT = rand() % 1000;
     srand(seedT);
     mMainHandler->mouseMoveEvent(relPos.x(), relPos.y(),
@@ -325,7 +343,9 @@ void PaintBox::paintPress(const qreal &xT,
                           const ulong &timestamp,
                           const qreal &pressure,
                           Brush *brush) {
-    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT));
+    QPointF relPos = mapAbsPosToRel(QPointF(xT, yT)) -
+            mTopLeftPoint->getRelativePosAtRelFrame(
+                        anim_mCurrentRelFrame);
 
     mMainHandler->paintPress(relPos.x(), relPos.y(),
                              timestamp, pressure,
@@ -338,6 +358,7 @@ void PaintBox::paintPress(const qreal &xT,
 void PaintBoxRenderData::drawSk(SkCanvas *canvas) {
     SkPaint paint;
     //paint.setFilterQuality(kHigh_SkFilterQuality);
+    canvas->translate(trans.x(), trans.y());
     foreach(TileSkDrawer *tile, tileDrawers) {
         tile->drawSk(canvas, &paint);
     }

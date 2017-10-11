@@ -32,8 +32,6 @@ public:
 
     bool isSelected() { return mSelected; }
 
-    virtual bool isBeingTransformed() { return mSelected; }
-
     virtual void saveTransformPivotAbsPos(QPointF absPivot) {
         Q_UNUSED(absPivot);
     }

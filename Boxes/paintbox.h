@@ -16,6 +16,8 @@ struct PaintBoxRenderData : public BoundingBoxRenderData {
     void drawSk(SkCanvas *canvas);
 
     QList<TileSkDrawer*> tileDrawers;
+
+    SkPoint trans;
 };
 
 class PaintBox : public BoundingBox {

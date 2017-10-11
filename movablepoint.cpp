@@ -209,13 +209,7 @@ void MovablePoint::setRadius(qreal radius) {
     mRadius = radius;
 }
 
-bool MovablePoint::isBeingTransformed()
-{
-    return mSelected || mParent->isSelected();
-}
-
-qreal MovablePoint::getRadius()
-{
+qreal MovablePoint::getRadius() {
     return mRadius;
 }
 

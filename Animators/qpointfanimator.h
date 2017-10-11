@@ -56,6 +56,8 @@ public:
     bool SWT_isQPointFAnimator() { return true; }
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+
+    bool getBeingTransformed();
 protected:
     QrealAnimatorQSPtr mXAnimator;
     QrealAnimatorQSPtr mYAnimator;

@@ -157,6 +157,7 @@ public:
     qreal getCurrentValueAtRelFrame(const int &frame) const;
     qreal qra_getValueAtRelFrame(const int &frame) const;
     void prp_setTransformed(const bool &bT) { mTransformed = bT; }
+    bool getBeingTransformed() { return mTransformed; }
     void anim_removeAllKeys();
     QrealKey *getQrealKeyAtId(const int &id) const;
 
