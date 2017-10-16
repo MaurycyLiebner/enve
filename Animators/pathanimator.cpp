@@ -90,12 +90,17 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 break;
             case SkPath::kLine_Verb: {
                 SkPoint pt = pts[1];
-                bool sameAsFirstPoint = SkPointToQPointF(pt) ==
-                                            firstPoint->getRelativePos();
+                bool sameAsFirstPoint = pointToLen(SkPointToQPointF(pt) -
+                                        firstPoint->getRelativePos()) < 0.1;
+
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
                     if(path.countVerbs() > verbId + 1) {
-                        connectOnly = iter.peek() == SkPath::kMove_Verb;
+                        SkPath::Verb nextPathVerb = iter.peek();
+
+                        connectOnly = nextPathVerb == SkPath::kMove_Verb ||
+                                nextPathVerb == SkPath::kDone_Verb ||
+                                nextPathVerb == SkPath::kClose_Verb;
                     } else {
                         connectOnly = true;
                     }
@@ -134,12 +139,16 @@ void PathAnimator::loadPathFromSkPath(const SkPath &path) {
                 lastPoint->moveEndCtrlPtToRelPos(
                             SkPointToQPointF(endPt));
 
-                bool sameAsFirstPoint = SkPointToQPointF(targetPt) ==
-                                            firstPoint->getRelativePos();
+                bool sameAsFirstPoint = pointToLen(SkPointToQPointF(targetPt) -
+                                            firstPoint->getRelativePos()) < 0.1;
                 bool connectOnly = false;
                 if(sameAsFirstPoint) {
                     if(path.countVerbs() > verbId + 1) {
-                        connectOnly = iter.peek() == SkPath::kMove_Verb;
+                        SkPath::Verb nextPathVerb = iter.peek();
+
+                        connectOnly = nextPathVerb == SkPath::kMove_Verb ||
+                                nextPathVerb == SkPath::kDone_Verb ||
+                                nextPathVerb == SkPath::kClose_Verb;
                     } else {
                         connectOnly = true;
                     }

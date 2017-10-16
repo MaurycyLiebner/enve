@@ -8,7 +8,6 @@ class MinimalNodePoint {
 public:
     MinimalNodePoint();
     MinimalNodePoint(QPointF ctrlStart, QPointF pos, QPointF ctrlEnd);
-    MinimalNodePoint(MinimalNodePoint *point);
     virtual ~MinimalNodePoint() {}
 
     void setNextPoint(MinimalNodePoint *point);
@@ -150,10 +149,14 @@ public:
                     QPointF *intersectionPt) const;
     QRectF getPointsBoundingRect() const;
 
-    const QPointF &getP1();
-    const QPointF &getC1();
-    const QPointF &getC2();
-    const QPointF &getP2();
+
+    const QPointF &getP1() const { return mP1; }
+
+    const QPointF &getC1() const { return mC1; }
+
+    const QPointF &getC2() const { return mC2; }
+
+    const QPointF &getP2() const { return mP2; }
 protected:
     QPointF mP1;
     QPointF mC1;

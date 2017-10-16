@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QSurfaceFormat>
+#include <QProcess>
 
 void setDefaultFormat()
 {
@@ -21,10 +22,8 @@ void setDefaultFormat()
     QSurfaceFormat::setDefaultFormat(format);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-
     setDefaultFormat();
 //    QSurfaceFormat  format;
 
@@ -38,6 +37,11 @@ int main(int argc, char *argv[])
 //    QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
+#ifdef QT_DEBUG
+    qint64 pId = QCoreApplication::applicationPid();
+    QProcess *process = new QProcess(&w);
+    process->start("prlimit --data=1500000000 --pid " + QString::number(pId));
+#endif
 
     w.show();
 
