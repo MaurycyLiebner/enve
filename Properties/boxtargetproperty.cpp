@@ -24,18 +24,10 @@ void BoxTargetProperty::setTarget(BoundingBox *box) {
         QObject::connect(mTarget.data(), SIGNAL(scheduledUpdate()),
                          this, SLOT(prp_callUpdater()));
     }
+    prp_updateInfluenceRangeAfterChanged();
+    prp_callUpdater();
     prp_callFinishUpdater();
     emit targetSet(box);
-}
-
-void BoxTargetProperty::makeDuplicate(Property *property) {
-    ((BoxTargetProperty*)property)->setTarget(mTarget.data());
-}
-
-Property *BoxTargetProperty::makeDuplicate() {
-    BoxTargetProperty *prop = new BoxTargetProperty();
-    makeDuplicate(prop);
-    return prop;
 }
 
 BoxTargetPropertyWaitingForBoxLoad::BoxTargetPropertyWaitingForBoxLoad(const int &boxIdT,

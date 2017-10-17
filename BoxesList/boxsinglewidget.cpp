@@ -12,6 +12,7 @@
 #include "BoxesList/boolpropertywidget.h"
 #include "boxtargetwidget.h"
 #include "Properties/boxtargetproperty.h"
+#include "Properties/comboboxproperty.h"
 #include "Animators/qstringanimator.h"
 
 QPixmap *BoxSingleWidget::VISIBLE_PIXMAP;
@@ -74,6 +75,9 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
     mMainLayout->addWidget(mColorButton, Qt::AlignRight);
     connect(mColorButton, SIGNAL(pressed()),
             this, SLOT(openColorSettingsDialog()));
+
+    mPropertyComboBox = new QComboBox(this);
+    mMainLayout->addWidget(mPropertyComboBox);
 
     mCompositionModeCombo = new QComboBox(this);
     mMainLayout->addWidget(mCompositionModeCombo);
@@ -144,7 +148,8 @@ BoxSingleWidget::BoxSingleWidget(ScrollWidgetVisiblePart *parent) :
             this, SLOT(setCompositionMode(int)));
     mCompositionModeCombo->setSizePolicy(QSizePolicy::Maximum,
                     mCompositionModeCombo->sizePolicy().horizontalPolicy());
-
+    mPropertyComboBox->setSizePolicy(QSizePolicy::Maximum,
+                                     mPropertyComboBox->sizePolicy().horizontalPolicy());
     mBoxTargetWidget = new BoxTargetWidget(this);
     mMainLayout->addWidget(mBoxTargetWidget);
 
@@ -260,6 +265,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCompositionModeCombo->setCurrentIndex(
                     ((BoundingBox*)target)->getCompositionMode());
         updateCompositionBoxVisible();
+        mPropertyComboBox->hide();
 
         mBoxTargetWidget->hide();
         mCheckBox->hide();
@@ -278,6 +284,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mLockedButton->show();
 
         mColorButton->hide();
+        mPropertyComboBox->hide();
 
         mCompositionModeVisible = true;
         mCompositionModeCombo->setCurrentIndex(
@@ -300,6 +307,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
 
         mColorButton->hide();
 
+        mPropertyComboBox->hide();
+
         mCompositionModeCombo->hide();
         mCompositionModeVisible = false;
 
@@ -308,6 +317,40 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mCheckBox->show();
         mCheckBox->setTarget((BoolProperty*)target);
 
+        mValueSlider->hide();
+    } else if(target->SWT_isComboBoxProperty()) {
+        mRecordButton->hide();
+
+        mContentButton->hide();
+
+        mVisibleButton->hide();
+
+        mLockedButton->hide();
+
+        mColorButton->hide();
+
+        mCompositionModeCombo->hide();
+        mCompositionModeVisible = false;
+
+        mBoxTargetWidget->hide();
+
+        disconnect(mPropertyComboBox, 0, 0, 0);
+        if(mLastComboBoxProperty.data() != NULL) {
+            disconnect(mLastComboBoxProperty.data(), 0, mPropertyComboBox, 0);
+        }
+        ComboBoxProperty *comboBoxProperty = (ComboBoxProperty*)target;
+        mLastComboBoxProperty = comboBoxProperty->weakRef<ComboBoxProperty>();
+        mPropertyComboBox->clear();
+        mPropertyComboBox->addItems(comboBoxProperty->getValueNames());
+        mPropertyComboBox->setCurrentIndex(
+                    comboBoxProperty->getCurrentValue());
+        mPropertyComboBox->show();
+        connect(mPropertyComboBox, SIGNAL(activated(int)),
+                comboBoxProperty, SLOT(setCurrentValue(int)));
+        connect(comboBoxProperty, SIGNAL(valueChanged(int)),
+                mPropertyComboBox, SLOT(setCurrentIndex(int)));
+        connect(mPropertyComboBox, SIGNAL(activated(int)),
+                MainWindow::getInstance(), SLOT(callUpdateSchedulers()));
         mValueSlider->hide();
     } else if(target->SWT_isQrealAnimator()) {
         QrealAnimator *qa_target = (QrealAnimator*)target;
@@ -321,6 +364,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mLockedButton->hide();
 
         mColorButton->hide();
+        mPropertyComboBox->hide();
 
         mCompositionModeCombo->hide();
         mCompositionModeVisible = false;
@@ -342,6 +386,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mVisibleButton->hide();
 
         mLockedButton->hide();
+        mPropertyComboBox->hide();
 
         if(target->SWT_isColorAnimator()) {
             mColorButton->show();
@@ -367,6 +412,7 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         mLockedButton->hide();
 
         mColorButton->hide();
+        mPropertyComboBox->hide();
 
         mCompositionModeCombo->hide();
         mCompositionModeVisible = false;
@@ -392,6 +438,8 @@ void BoxSingleWidget::setTargetAbstraction(SingleWidgetAbstraction *abs) {
         }
 
         mCompositionModeCombo->hide();
+        mPropertyComboBox->hide();
+
         mCompositionModeVisible = false;
 
         mBoxTargetWidget->hide();
@@ -926,9 +974,9 @@ void BoxSingleWidget::paintEvent(QPaintEvent *) {
      } else if(target->SWT_isBoxTargetProperty()) {
         nameX += 40;
         name = ((BoxTargetProperty*)target)->prp_getName();
-    } else if(target->SWT_isBoolProperty()) {
+    } else {//if(target->SWT_isBoolProperty()) {
         nameX += 2*MIN_WIDGET_HEIGHT;
-        name = ((BoolProperty*)target)->prp_getName();
+        name = ((Property*)target)->prp_getName();
     }
     p.drawText(QRect(nameX, 0,
                      width() - nameX -

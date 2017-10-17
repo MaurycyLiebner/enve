@@ -11,6 +11,7 @@
 #include "Animators/transformanimator.h"
 #include "Animators/paintsettings.h"
 #include "Animators/pathanimator.h"
+#include "Properties/comboboxproperty.h"
 #include "PathEffects/patheffectanimators.h"
 #include "PathEffects/patheffect.h"
 #include "Boxes/boundingbox.h"
@@ -95,6 +96,14 @@ void BoolProperty::writeProperty(QIODevice *target) {
 
 void BoolProperty::readProperty(QIODevice *target) {
     target->read((char*)&mValue, sizeof(bool));
+}
+
+void ComboBoxProperty::writeProperty(QIODevice *target) {
+    target->write((char*)&mCurrentValue, sizeof(int));
+}
+
+void ComboBoxProperty::readProperty(QIODevice *target) {
+    target->read((char*)&mCurrentValue, sizeof(int));
 }
 
 void Key::writeKey(QIODevice *target) {

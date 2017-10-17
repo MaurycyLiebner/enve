@@ -14,6 +14,7 @@ class Key;
 class BoxTargetWidget;
 class BoxesListActionButton;
 class BoolPropertyWidget;
+class ComboBoxProperty;
 
 class BoxSingleWidget : public SingleWidget
 {
@@ -90,11 +91,13 @@ private:
     BoxesListActionButton *mColorButton;
     BoxTargetWidget *mBoxTargetWidget;
 
+    QWeakPointer<ComboBoxProperty> mLastComboBoxProperty;
     QPoint mDragStartPos;
     QWidget *mFillWidget;
     BoolPropertyWidget *mCheckBox;
     QHBoxLayout *mMainLayout;
     QrealAnimatorValueSlider *mValueSlider;
+    QComboBox *mPropertyComboBox;
     QComboBox *mCompositionModeCombo;
 };
 

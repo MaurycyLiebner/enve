@@ -76,6 +76,7 @@ public:
     virtual bool SWT_isPaintBox() { return false; }
     // Properties
     virtual bool SWT_isBoolProperty() { return false; }
+    virtual bool SWT_isComboBoxProperty() { return false; }
     virtual bool SWT_isBoxTargetProperty() { return false; }
     virtual bool SWT_isProperty() { return false; }
     // Sound

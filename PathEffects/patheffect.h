@@ -5,6 +5,7 @@
 #include "Animators/qpointfanimator.h"
 #include "Animators/intanimator.h"
 #include "Properties/boolproperty.h"
+#include "Properties/comboboxproperty.h"
 #include "Animators/intanimator.h"
 #include "skiaincludes.h"
 class PathEffectAnimators;
@@ -195,6 +196,11 @@ public:
     void readProperty(QIODevice *target);
 private:
     PathBox *mParentPathBox;
+    QSharedPointer<ComboBoxProperty> mOperationType =
+            (new ComboBoxProperty(
+                 QStringList() << "Union" <<
+                 "Difference" << "Intersection" <<
+                 "Exclusion"))->ref<ComboBoxProperty>();
     QSharedPointer<BoxTargetProperty> mBoxTarget =
             (new BoxTargetProperty())->ref<BoxTargetProperty>();
 };

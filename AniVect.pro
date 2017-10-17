@@ -194,7 +194,8 @@ SOURCES += main.cpp\
     execdelegator.cpp \
     Paint/PaintLib/tilesdata.cpp \
     customfpsdialog.cpp \
-    BoxesList/boxscrollarea.cpp
+    BoxesList/boxscrollarea.cpp \
+    Properties/comboboxproperty.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -348,7 +349,8 @@ HEADERS  += mainwindow.h \
     execdelegator.h \
     Paint/PaintLib/tilesdata.h \
     customfpsdialog.h \
-    BoxesList/boxscrollarea.h
+    BoxesList/boxscrollarea.h \
+    Properties/comboboxproperty.h
 
 RESOURCES += \
     resources.qrc

@@ -25,9 +25,6 @@ public:
     BoundingBox *getTarget() const;
     void setTarget(BoundingBox *box);
 
-    void makeDuplicate(Property *property);
-    Property *makeDuplicate();
-
     bool SWT_isBoxTargetProperty() { return true; }
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);

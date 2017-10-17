@@ -9,9 +9,6 @@ public:
 
     bool getValue();
 
-    void makeDuplicate(Property *property);
-    Property *makeDuplicate();
-
     bool SWT_isBoolProperty() { return true; }
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
