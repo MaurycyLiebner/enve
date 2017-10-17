@@ -145,8 +145,7 @@ public:
     QPointF getPointAtT(const qreal &t);
 
     qreal getTForPoint(QPointF point);
-    bool intersects(BezierCubic *bezier,
-                    QPointF *intersectionPt) const;
+
     QRectF getPointsBoundingRect() const;
 
 
@@ -172,7 +171,7 @@ public:
 
     void setPoints(MinimalNodePoint *mpp1, MinimalNodePoint *mpp2);
 
-    void intersectWith(PointsBezierCubic *bezier);
+    PointsBezierCubic *intersectWith(PointsBezierCubic *bezier);
 
     IntersectionNodePoint *addIntersectionPointAt(QPointF pos);
 
@@ -186,6 +185,11 @@ public:
                                 const QPointF &pos);
 
     void disconnect();
+    bool intersects(PointsBezierCubic *bezier,
+                    QList<QPointF> *intersectionPts,
+                    QList<int> *bezierIntersectionPts) const;
+    MinimalNodePoint *getMPP1() { return mMPP1; }
+    MinimalNodePoint *getMPP2() { return mMPP2; }
 private:
     PointsBezierCubic *mNextCubic = NULL;
     PointsBezierCubic *mPrevCubic = NULL;

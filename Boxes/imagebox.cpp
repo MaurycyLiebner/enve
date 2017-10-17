@@ -46,6 +46,7 @@ void ImageBox::setFilePath(const QString &path) {
     } else {
         mImgCacheHandler->setVisibleInListWidgets(true);
     }
+    prp_setName(path.split("/").last());
     mImgCacheHandler->addDependentBox(this);
     prp_updateInfluenceRangeAfterChanged();
 }

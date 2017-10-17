@@ -20,9 +20,10 @@ Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     ca_addChildAnimator(mTopLeftPoint);
     ca_addChildAnimator(mBottomRightPoint);
 
-    mRadiusPoint.prp_setName("round radius");
-    ca_addChildAnimator(&mRadiusPoint);
-    mRadiusPoint.setValuesRange(0., 9999.);
+    mRadiusPoint = new QPointFAnimator();
+    mRadiusPoint->prp_setName("round radius");
+    ca_addChildAnimator(mRadiusPoint);
+    mRadiusPoint->setValuesRange(0., 9999.);
 
     prp_setUpdater(new NodePointUpdater(this));
 }
@@ -38,7 +39,7 @@ void Rectangle::duplicateRectanglePointsFrom(
         QPointFAnimator *radiusPoint) {
     topLeftPoint->makeDuplicate(mTopLeftPoint);
     bottomRightPoint->makeDuplicate(mBottomRightPoint);
-    radiusPoint->makeDuplicate(&mRadiusPoint);
+    radiusPoint->makeDuplicate(mRadiusPoint);
 }
 
 BoundingBox *Rectangle::createNewDuplicate() {
@@ -66,7 +67,7 @@ SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
             QPointFToSkPoint(mBottomRightPoint->
                                 getCurrentPointValueAtRelFrame(relFrame));
     QPointF radiusAtFrame =
-            mRadiusPoint.getCurrentPointValueAtRelFrame(relFrame);
+            mRadiusPoint->getCurrentPointValueAtRelFrame(relFrame);
     path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
                                        bottomRight.x(), bottomRight.y()),
                       radiusAtFrame.x(), radiusAtFrame.y());
@@ -82,11 +83,11 @@ void Rectangle::setBottomRightPos(const QPointF &pos) {
 }
 
 void Rectangle::setYRadius(const qreal &radiusY) {
-    mRadiusPoint.getYAnimator()->qra_setCurrentValue(radiusY);
+    mRadiusPoint->getYAnimator()->qra_setCurrentValue(radiusY);
 }
 
 void Rectangle::setXRadius(const qreal &radiusX) {
-    mRadiusPoint.getXAnimator()->qra_setCurrentValue(radiusX);
+    mRadiusPoint->getXAnimator()->qra_setCurrentValue(radiusX);
 }
 
 void Rectangle::moveSizePointByAbs(const QPointF &absTrans) {

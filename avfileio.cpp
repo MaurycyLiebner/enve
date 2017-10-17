@@ -759,7 +759,9 @@ void ImageBox::writeBoundingBox(QIODevice *target) {
 
 void ImageBox::readBoundingBox(QIODevice *target) {
     BoundingBox::readBoundingBox(target);
-    readQString(target, &mImageFilePath);
+    QString path;
+    readQString(target, &path);
+    setFilePath(path);
 }
 
 void Circle::writeBoundingBox(QIODevice *target) {
@@ -776,14 +778,14 @@ void Circle::readBoundingBox(QIODevice *target) {
 
 void Rectangle::writeBoundingBox(QIODevice *target) {
     PathBox::writeBoundingBox(target);
-    mRadiusPoint.writeProperty(target);
+    mRadiusPoint->writeProperty(target);
     mTopLeftPoint->writeProperty(target);
     mBottomRightPoint->writeProperty(target);
 }
 
 void Rectangle::readBoundingBox(QIODevice *target) {
     PathBox::readBoundingBox(target);
-    mRadiusPoint.readProperty(target);
+    mRadiusPoint->readProperty(target);
     mTopLeftPoint->readProperty(target);
     mBottomRightPoint->readProperty(target);
 }

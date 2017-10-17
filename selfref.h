@@ -7,7 +7,13 @@ public:
     template<class T>
     QSharedPointer<T> ref() {
         if(mThisWeak.isNull()) {
-            QSharedPointer<T> thisRef = QSharedPointer<T>((T*)this);
+            QSharedPointer<T> thisRef;
+            if(mTmpPtr.isNull()) {
+                thisRef = QSharedPointer<T>((T*)this);
+            } else {
+                thisRef = qSharedPointerCast<T>(mTmpPtr);
+                mTmpPtr.reset();
+            }
             this->mThisWeak = qSharedPointerCast<SelfRef>(thisRef).toWeakRef();
             return thisRef;
         }
@@ -17,11 +23,17 @@ public:
 
     template<class T>
     QWeakPointer<T> weakRef() {
-        Q_ASSERT(!mThisWeak.isNull());
+        if(mThisWeak.isNull()) {
+            if(mTmpPtr.isNull()) {
+                mTmpPtr = QSharedPointer<SelfRef>(this);
+            }
+            return qSharedPointerCast<T>(mTmpPtr).toWeakRef();
+        }
         return ref<T>().toWeakRef();
     }
 
 private:
+    QSharedPointer<SelfRef> mTmpPtr;
     QWeakPointer<SelfRef> mThisWeak;
 };
 

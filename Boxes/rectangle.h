@@ -36,7 +36,7 @@ public:
         rectTarget->duplicateRectanglePointsFrom(
                     mTopLeftPoint,
                     mBottomRightPoint,
-                    &mRadiusPoint);
+                    mRadiusPoint);
     }
     void duplicateRectanglePointsFrom(RectangleTopLeftPoint *topLeftPoint,
                         RectangleBottomRightPoint *bottomRightPoint,
@@ -58,7 +58,7 @@ protected:
     RectangleTopLeftPoint *mTopLeftPoint;
     RectangleBottomRightPoint *mBottomRightPoint;
 
-    QPointFAnimator mRadiusPoint;
+    QPointFAnimator *mRadiusPoint;
 };
 
 #endif // RECTANGLE_H

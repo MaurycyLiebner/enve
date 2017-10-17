@@ -1021,8 +1021,8 @@ void MainWindow::enableEventFilter() {
     mEventFilterDisabled = false;
 }
 
-void MainWindow::disable()
-{
+void MainWindow::disable() {
+    disableEventFilter();
     mGrayOutWidget = new QWidget(this);
     mGrayOutWidget->setFixedSize(size());
     mGrayOutWidget->setStyleSheet(
@@ -1033,8 +1033,10 @@ void MainWindow::disable()
 
 void MainWindow::enable() {
     if(mGrayOutWidget == NULL) return;
+    enableEventFilter();
     delete mGrayOutWidget;
     mGrayOutWidget = NULL;
+    callUpdateSchedulers();
 }
 
 int MainWindow::getCurrentFrame() {
@@ -1175,15 +1177,15 @@ void MainWindow::updateTitle() {
 
 void MainWindow::openFile() {
     if(askForSaving()) {
-        disableEventFilter();
+        disable();
         QString openPath = QFileDialog::getOpenFileName(this,
             "Open File", "", "AniVect Files (*.av)");
-        enableEventFilter();
         if(!openPath.isEmpty()) {
             clearAll();
             setCurrentPath(openPath);
             loadAVFile(mCurrentFilePath);
         }
+        enable();
         setFileChangedSinceSaving(false);
     }
 }
@@ -1197,8 +1199,7 @@ void MainWindow::saveFile() {
     setFileChangedSinceSaving(false);
 }
 
-void MainWindow::saveFileAs()
-{
+void MainWindow::saveFileAs() {
     disableEventFilter();
     QString saveAs = QFileDialog::getSaveFileName(this, "Save File",
                                "untitled.av",

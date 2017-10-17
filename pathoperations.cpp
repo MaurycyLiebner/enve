@@ -462,8 +462,7 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
         do {
             otherCubic = firstOtherCubic;
             do {
-                thisCubic->intersectWith(otherCubic);
-                otherCubic = otherCubic->getNextCubic();
+                otherCubic = thisCubic->intersectWith(otherCubic);
             } while(otherCubic != firstOtherCubic);
             thisCubic = thisCubic->getNextCubic();
         } while(thisCubic != firstThisCubic);
@@ -512,9 +511,6 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList,
         newPath->closePath();
         targetsList->append(newPath);
         return;
-    }
-    if(mIntersectionPoints.count() != 4) {
-        qDebug() << "???";
     }
     while(!mIntersectionPoints.isEmpty()) {
         MinimalNodePoint *firstFirstPoint = mIntersectionPoints.takeFirst();
@@ -589,7 +585,7 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList,
                 nextPoint = point->getNextPoint();
             }
             if(nextPoint == NULL) {
-                qDebug() << "hell";
+                break;
             }
         }
         target->closePath();
@@ -652,33 +648,44 @@ bool isIntersecting(const QPointF &p1, const QPointF &p2,
             * ((p2.x() - q1.x())*(q2.y() - q1.y())  -  (p2.y() - q1.y())*(q2.x() - q1.x())) < 0.);
 }
 
-bool BezierCubic::intersects(BezierCubic *bezier, QPointF *intersectionPt) const {
-    bool plannedReturn;
-    if(pointToLen(getP1() - bezier->getP1()) < 0.001 ||
-        pointToLen(getP2() - bezier->getP2()) < 0.001 ||
-        pointToLen(getP1() - bezier->getP2()) < 0.001 ||
-        pointToLen(getP2() - bezier->getP1()) < 0.001) {
-        plannedReturn = false;
-    } else {
-        if(isIntersecting(bezier->getP1(), bezier->getP2(),
-                          getP1(), getP2())) {
-            qreal dx1 = getP2().x() - getP1().x();
-            qreal dy1 = getP2().y() - getP1().y();
-            qreal m1 = dy1/dx1;
-            qreal c1 = getP1().y() - getP1().x()*m1;
-
-            qreal dx2 = bezier->getP2().x() - bezier->getP1().x();
-            qreal dy2 = bezier->getP2().y() - bezier->getP1().y();
-            qreal m2 = dy2/dx2;
-            qreal c2 = bezier->getP1().y() - bezier->getP1().x()*m2;
-
-            qreal xT = (c2 - c1)/(m1 - m2);
-            *intersectionPt = QPointF(xT, xT*m1 + c1);
-            plannedReturn = true;
-        } else {
-            plannedReturn = false;
-        }
+struct qrealInt {
+    qrealInt(const qreal &v1, const int &v2) {
+        realV = v1;
+        intV = v2;
     }
+    qreal realV;
+    int intV;
+};
+
+bool qrealIntSort(const qrealInt &key1,
+                   const qrealInt &key2) {
+    return key1.realV < key2.realV;
+}
+
+bool PointsBezierCubic::intersects(PointsBezierCubic *bezier,
+                             QList<QPointF> *intersectionPts,
+                             QList<int> *bezierIntersectionPts) const {
+    if(mMPP1->isIntersection()) {
+        IntersectionNodePoint *interPt = (IntersectionNodePoint*)mMPP1;
+        IntersectionNodePoint *otherInterPt1 =
+                (IntersectionNodePoint*)bezier->getMPP1();
+        IntersectionNodePoint *otherInterPt2 =
+                (IntersectionNodePoint*)bezier->getMPP2();
+
+        if(interPt->getSibling() == otherInterPt1 ||
+            interPt->getSibling() == otherInterPt2) return false;
+    }
+    if(mMPP2->isIntersection()) {
+        IntersectionNodePoint *interPt = (IntersectionNodePoint*)mMPP2;
+        IntersectionNodePoint *otherInterPt1 =
+                (IntersectionNodePoint*)bezier->getMPP1();
+        IntersectionNodePoint *otherInterPt2 =
+                (IntersectionNodePoint*)bezier->getMPP2();
+
+        if(interPt->getSibling() == otherInterPt1 ||
+            interPt->getSibling() == otherInterPt2) return false;
+    }
+
     QPointF bP1 = bezier->getP1();
     QPointF bC1 = bezier->getC1();
     QPointF bC2 = bezier->getC2();
@@ -693,9 +700,6 @@ bool BezierCubic::intersects(BezierCubic *bezier, QPointF *intersectionPt) const
                           qMax4(mP1.y(), mC1.y(), mC2.y(), mP2.y()));
     if(mBR.x() < bTL.x() || bBR.x() < mTL.x() ||
        mBR.y() < bTL.y() || bBR.y() < mTL.y()) {
-        if(plannedReturn) {
-            qDebug() << "???";
-        }
         return false;
     }
     qreal thisT = 0.;
@@ -711,6 +715,7 @@ bool BezierCubic::intersects(BezierCubic *bezier, QPointF *intersectionPt) const
     qreal bezierTStep = 0.01;
     qreal lastMinDistBetween = -1.;
     qreal lastDistBetween = -1.;
+    QList<qrealInt> otherBezierInterTs;
     while(thisT < .9999) {
         thisT = thisT + thisTStep;
         currentThisPos = calcCubicBezierVal(mP1, mC1,
@@ -756,17 +761,15 @@ bool BezierCubic::intersects(BezierCubic *bezier, QPointF *intersectionPt) const
 
                 qreal xT = (c2 - c1)/(m1 - m2);
                 QPointF intT = QPointF(xT, xT*m1 + c1);
-                if(pointToLen(intT - mP1) < 1. ||
-                    pointToLen(intT - mP2) < 1. ||
-                    pointToLen(intT - bP1) < 1. ||
-                    pointToLen(intT - bP2) < 1.) {
-                } else {
-                    *intersectionPt = intT;
-                    if(!plannedReturn) {
-                        qDebug() << "??? ";
-                    }
-                    return true;
-                }
+//                if(pointToLen(intT - mP1) < 1. ||
+//                    pointToLen(intT - mP2) < 1. ||
+//                    pointToLen(intT - bP1) < 1. ||
+//                    pointToLen(intT - bP2) < 1.) {
+//                } else {
+                    otherBezierInterTs <<
+                                qrealInt(bezierT, intersectionPts->count());
+                    intersectionPts->append(intT);
+//                }
             }
 
             lastBezierPos = currentBezierPos;
@@ -774,10 +777,11 @@ bool BezierCubic::intersects(BezierCubic *bezier, QPointF *intersectionPt) const
 
         lastThisPos = currentThisPos;
     }
-    if(plannedReturn) {
-        qDebug() << "???";
+    qSort(otherBezierInterTs.begin(), otherBezierInterTs.end(), qrealIntSort);
+    foreach(const qrealInt &val, otherBezierInterTs) {
+        bezierIntersectionPts->append(val.intV);
     }
-    return false;
+    return !intersectionPts->isEmpty();
 }
 
 QRectF BezierCubic::getPointsBoundingRect() const {
@@ -807,16 +811,36 @@ void PointsBezierCubic::setPoints(MinimalNodePoint *mpp1,
     mMPP2 = mpp2;
 }
 
-void PointsBezierCubic::intersectWith(PointsBezierCubic *otherBezier) {
-    QPointF interPt;
-    if(intersects(otherBezier, &interPt)) {
-        IntersectionNodePoint *newPoint1 =
-                otherBezier->divideCubicAtPointAndReturnIntersection(interPt);
-        IntersectionNodePoint *newPoint2 =
-                this->divideCubicAtPointAndReturnIntersection(interPt);
-        newPoint1->setSibling(newPoint2);
-        newPoint2->setSibling(newPoint1);
+PointsBezierCubic *PointsBezierCubic::intersectWith(PointsBezierCubic *otherBezier) {
+    QList<QPointF> thisInterQPts;
+    QList<int> otherInterQPts;
+    if(intersects(otherBezier, &thisInterQPts, &otherInterQPts)) {
+        PointsBezierCubic *thisBezierT = this;
+        PointsBezierCubic *otherBezierT = otherBezier;
+        QList<IntersectionNodePoint*> thisInterPts;
+        QList<IntersectionNodePoint*> otherInterPts;
+
+        foreach(const QPointF &interPt, thisInterQPts) {
+            thisInterPts << thisBezierT->
+                            divideCubicAtPointAndReturnIntersection(
+                                interPt);
+            thisBezierT = thisBezierT->getNextCubic();
+        }
+        foreach(const int &interPt, otherInterQPts) {
+            otherInterPts << otherBezierT->
+                             divideCubicAtPointAndReturnIntersection(
+                                 thisInterQPts.at(interPt));
+            otherBezierT = otherBezier->getNextCubic();
+        }
+        for(int i = 0; i < thisInterQPts.count(); i++) {
+            IntersectionNodePoint *thisPt = thisInterPts.at(i);
+            IntersectionNodePoint *otherPt = otherInterPts.at(otherInterQPts.at(i));
+            thisPt->setSibling(otherPt);
+            otherPt->setSibling(thisPt);
+        }
+        return otherBezierT;
     }
+    return otherBezier->getNextCubic();
 }
 
 IntersectionNodePoint *PointsBezierCubic::addIntersectionPointAt(
@@ -870,8 +894,9 @@ divideCubicAtPointAndReturnIntersection(const QPointF &pos) {
     setPoints(mMPP1, interPt);
 
     newCubic->setNextCubic(mNextCubic);
-    if(mNextCubic != NULL)
-    mNextCubic->setPrevCubic(newCubic);
+    if(mNextCubic != NULL) {
+        mNextCubic->setPrevCubic(newCubic);
+    }
 
     newCubic->setPrevCubic(this);
     setNextCubic(newCubic);

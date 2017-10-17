@@ -1146,8 +1146,6 @@ void CanvasWindow::importFile(const QString &path,
         updateHoveredElements();
     }
     MainWindow::getInstance()->enable();
-
-    MainWindow::getInstance()->callUpdateSchedulers();
 }
 
 QWidget *CanvasWindow::getCanvasWidget() {
