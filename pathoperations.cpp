@@ -579,13 +579,13 @@ void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList,
 
                 point = nextPoint;
             }
+            if(point == NULL) {
+                break;
+            }
             if(reversed) {
                 nextPoint = point->getPrevPoint();
             } else {
                 nextPoint = point->getNextPoint();
-            }
-            if(nextPoint == NULL) {
-                break;
             }
         }
         target->closePath();

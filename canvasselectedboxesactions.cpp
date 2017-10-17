@@ -667,8 +667,9 @@ VectorPath *Canvas::getPathResultingFromOperation(
             delete addToPath;
         }
     }
+    targetPath->generateSinglePathPaths();
 
-    targetPath->addAllToVectorPath(newPath->getPathAnimator());
+    newPath->loadPathFromSkPath(QPainterPathToSkPath(targetPath->getPath()));
     mCurrentBoxesGroup->addChild(newPath);
     return newPath;
 }

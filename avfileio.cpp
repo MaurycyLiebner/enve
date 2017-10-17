@@ -547,6 +547,7 @@ void BoundingBox::writeBoundingBox(QIODevice *target) {
     }
 
     mTransformAnimator->writeProperty(target);
+    mEffectsAnimators->writeProperty(target);
 }
 
 void BoundingBox::readBoundingBox(QIODevice *target) {
@@ -565,6 +566,7 @@ void BoundingBox::readBoundingBox(QIODevice *target) {
     }
 
     mTransformAnimator->readProperty(target);
+    mEffectsAnimators->readProperty(target);
     BoundingBox::addLoadedBox(this);
 }
 
@@ -1058,6 +1060,7 @@ void Canvas::writeBoundingBox(QIODevice *target) {
     target->write((char*)&mWidth, sizeof(int));
     target->write((char*)&mHeight, sizeof(int));
     target->write((char*)&mFps, sizeof(qreal));
+    target->write((char*)&mMaxFrame, sizeof(int));
     target->write((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
 }
 
@@ -1067,6 +1070,7 @@ void Canvas::readBoundingBox(QIODevice *target) {
     target->read((char*)&mWidth, sizeof(int));
     target->read((char*)&mHeight, sizeof(int));
     target->read((char*)&mFps, sizeof(qreal));
+    target->read((char*)&mMaxFrame, sizeof(int));
     target->read((char*)&mCanvasTransformMatrix, sizeof(QMatrix));
     mVisibleHeight = mCanvasTransformMatrix.m22()*mHeight;
     mVisibleWidth = mCanvasTransformMatrix.m11()*mWidth;
