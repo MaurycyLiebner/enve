@@ -413,9 +413,13 @@ void Canvas::setOutputRendering(const bool &bT) {
 void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
     if(cont == mCurrentPreviewContainer.get()) return;
     if(mCurrentPreviewContainer.get() != NULL) {
-        if(!mRendering) {
-            mCurrentPreviewContainer->setBlocked(false);
-        }
+//        if(mNoCache) {
+//            mCurrentPreviewContainer->setBlocked(false);
+//            mCurrentPreviewContainer->freeThis();
+//        } else if(!mRendering) {
+//            mCurrentPreviewContainer->setBlocked(false);
+//        }
+        mCurrentPreviewContainer->setBlocked(false);
     }
     if(cont == NULL) {
         mCurrentPreviewContainer.reset();
@@ -506,8 +510,7 @@ void Canvas::renderDataFinished(BoundingBoxRenderData *renderData) {
     cont->replaceImageSk(renderData->renderedImage);
     if(mRendering || !mPreviewing) {
         setCurrentPreviewContainer(cont);
-    }
-    if(mPreviewing) {
+    } else if(mPreviewing) {
         cont->setBlocked(true);
     }
 }
