@@ -39,31 +39,15 @@ enum CanvasMode : short {
 extern bool zLessThan(BoundingBox *box1, BoundingBox *box2);
 
 struct CanvasRenderData : public BoxesGroupRenderData {
-    CanvasRenderData(BoundingBox *parentBoxT) :
-        BoxesGroupRenderData(parentBoxT) {
-
-    }
+    CanvasRenderData(BoundingBox *parentBoxT);
     void renderToImage();
     SkScalar canvasWidth;
     SkScalar canvasHeight;
     SkColor bgColor;
 protected:
-    void drawSk(SkCanvas *canvas) {
-        canvas->save();
+    void drawSk(SkCanvas *canvas);
 
-        canvas->scale(resolution, resolution);
-        Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &renderData,
-                  childrenRenderData) {
-            //box->draw(p);
-            renderData->drawRenderedImageForParent(canvas);
-        }
-
-        canvas->restore();
-    }
-
-    void updateRelBoundingRect() {
-        relBoundingRect = QRectF(0., 0., canvasWidth, canvasHeight);
-    }
+    void updateRelBoundingRect();
 };
 
 class Canvas : public BoxesGroup

@@ -366,7 +366,7 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
 SumPathEffect::SumPathEffect(PathBox *parentPath,
                              const bool &outlinePathEffect) :
     PathEffect(SUM_PATH_EFFECT, outlinePathEffect) {
-    prp_setName("path sum effect");
+    prp_setName("path operation effect");
     mParentPathBox = parentPath;
     ca_addChildAnimator(mBoxTarget.data());
     mOperationType->prp_setName("operation type");

@@ -536,15 +536,15 @@ void Canvas::prp_updateAfterChangedAbsFrameRange(const int &minFrame,
 
 #include <QFile>
 void Canvas::renderCurrentFrameToOutput(const QString &renderDest) {
-    Q_UNUSED(renderDest);
     SkData *data = mCurrentPreviewContainer->getImageSk()->
             encode(SkEncodedImageFormat::kPNG, 100);
     QFile file;
-    file.setFileName(renderDest + "_" +
-                     QString::number(anim_mCurrentAbsFrame));
+    QString fileName = renderDest;
+    fileName.remove(".png");
+    fileName += QString::number(anim_mCurrentAbsFrame) + ".png";
+    file.setFileName(fileName);
     if(file.open(QIODevice::WriteOnly) ) {
-        QByteArray array = QByteArray((const char*)data->data(), data->size());
-        file.write(array);
+        file.write((const char*)data->data(), data->size());
         file.flush();
         file.close();
     }
@@ -808,8 +808,8 @@ void Canvas::pasteAction() {
             (BoxesClipboardContainer*)
             mMainWindow->getClipboardContainer(CCT_BOXES);
     if(container == NULL) return;
-    container->pasteTo(mCurrentBoxesGroup);
     clearBoxesSelection();
+    container->pasteTo(mCurrentBoxesGroup);
 }
 
 void Canvas::cutAction() {
@@ -1186,6 +1186,11 @@ SoundComposition *Canvas::getSoundComposition() {
     return mSoundComposition;
 }
 
+CanvasRenderData::CanvasRenderData(BoundingBox *parentBoxT) :
+    BoxesGroupRenderData(parentBoxT) {
+
+}
+
 void CanvasRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
@@ -1206,4 +1211,21 @@ void CanvasRenderData::renderToImage() {
     renderedImage = SkImage::MakeFromBitmap(bitmap);
     bitmap.reset();
     delete rasterCanvas;
+}
+
+void CanvasRenderData::drawSk(SkCanvas *canvas) {
+    canvas->save();
+
+    canvas->scale(resolution, resolution);
+    Q_FOREACH(const std::shared_ptr<BoundingBoxRenderData> &renderData,
+              childrenRenderData) {
+        //box->draw(p);
+        renderData->drawRenderedImageForParent(canvas);
+    }
+
+    canvas->restore();
+}
+
+void CanvasRenderData::updateRelBoundingRect() {
+    relBoundingRect = QRectF(0., 0., canvasWidth, canvasHeight);
 }

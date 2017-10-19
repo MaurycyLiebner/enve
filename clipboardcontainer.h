@@ -47,8 +47,10 @@ public:
     KeysClipboardContainer();
     ~KeysClipboardContainer();
 
-    void paste(const int &pasteFrame,
-               KeysView *keysView);
+    QList<Key *> paste(const int &pasteFrame,
+                       KeysView *keysView);
+    QList<Key *> pasteWithoutMerging(const int &pasteFrame,
+                                     KeysView *keysView);
 
     void addTargetAnimator(Animator *anim);
 private:

@@ -205,7 +205,8 @@ void BoundingBox::drawSelectedSk(SkCanvas *canvas,
 }
 
 void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
-    if(isVisibleAndInVisibleDurationRect()) {
+    if(isVisibleAndInVisibleDurationRect() &&
+        mTransformAnimator->getOpacity() > 0.001) {
         canvas->save();
 
         SkPaint paint;
@@ -218,6 +219,7 @@ void BoundingBox::drawPixmapSk(SkCanvas *canvas) {
 }
 
 void BoundingBox::drawPixmapSk(SkCanvas *canvas, SkPaint *paint) {
+    if(mTransformAnimator->getOpacity() < 0.001) { return; }
     mDrawRenderContainer.drawSk(canvas, paint);
 }
 
@@ -568,8 +570,9 @@ void BoundingBox::setupBoundingBoxRenderDataForRelFrame(
 
     Canvas *parentCanvas = getParentCanvas();
     data->maxBoundsRect = parentCanvas->getMaxBoundsRect();
-
-    setupEffects(relFrame, data);
+    if(data->opacity > 0.001) {
+        setupEffects(relFrame, data);
+    }
 }
 
 void BoundingBox::setupEffects(const int &relFrame,
@@ -1181,6 +1184,7 @@ void BoundingBoxRenderData::updateRelBoundingRect() {
 }
 
 void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
+    if(opacity < 0.001) return;
     canvas->save();
     canvas->scale(1.f/resolution, 1.f/resolution);
     renderToImage();
@@ -1209,6 +1213,7 @@ void BoundingBoxRenderData::drawRenderedImageForParent(SkCanvas *canvas) {
 void BoundingBoxRenderData::renderToImage() {
     if(renderedToImage) return;
     renderedToImage = true;
+    if(opacity < 0.001) return;
     QMatrix scale;
     scale.scale(resolution, resolution);
     QMatrix transformRes = transform*scale;

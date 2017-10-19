@@ -35,8 +35,8 @@ KeysClipboardContainer::~KeysClipboardContainer() {
 }
 
 #include "keysview.h"
-void KeysClipboardContainer::paste(const int &pasteFrame,
-                                   KeysView *keysView) {
+QList<Key*> KeysClipboardContainer::paste(const int &pasteFrame,
+                                          KeysView *keysView) {
     keysView->clearKeySelection();
 
     int firstKeyFrame = 1000000;
@@ -64,6 +64,52 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
     Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
         Animator *animator = animatorT.data();
         if(animator == NULL) {
+            keys.removeAt(keyId);
+            continue;
+        }
+        Key *keyT = keys.at(keyId);
+        keyT->setRelFrame(keyT->getRelFrame() + dFrame);
+        animator->anim_appendKey(keyT);
+        keyId++;
+        if(animators.contains(animator)) continue;
+        animators << animator;
+    }
+    Q_FOREACH(Animator *animator, animators) {
+        animator->anim_mergeKeysIfNeeded();
+    }
+    return keys;
+}
+
+QList<Key*> KeysClipboardContainer::pasteWithoutMerging(const int &pasteFrame,
+                                                        KeysView *keysView) {
+    keysView->clearKeySelection();
+
+    int firstKeyFrame = 1000000;
+    QBuffer target(getBytesArray());
+    target.open(QIODevice::ReadOnly);
+    QList<Key*> keys;
+    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
+        Animator *animator = animatorT.data();
+        Key *keyT = animator->readKey(&target);
+        if(animator == NULL) {
+            keyT->ref<Key>();
+            continue;
+        }
+        if(keyT->getAbsFrame() < firstKeyFrame) {
+            firstKeyFrame = keyT->getAbsFrame();
+        }
+        keys << keyT;
+    }
+    target.close();
+    int dFrame = pasteFrame - firstKeyFrame;
+
+    int keyId = 0;
+    QList<Animator*> animators;
+
+    Q_FOREACH(const QWeakPointer<Animator> &animatorT, mTargetAnimators) {
+        Animator *animator = animatorT.data();
+        if(animator == NULL) {
+            keys.removeAt(keyId);
             continue;
         }
         Key *keyT = keys.at(keyId);
@@ -74,9 +120,7 @@ void KeysClipboardContainer::paste(const int &pasteFrame,
         animators << animator;
     }
 
-    Q_FOREACH(Animator *animator, animators) {
-        animator->anim_mergeKeysIfNeeded();
-    }
+    return keys;
 }
 
 void KeysClipboardContainer::addTargetAnimator(Animator *anim) {

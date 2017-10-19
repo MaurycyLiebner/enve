@@ -1076,21 +1076,23 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         QKeyEvent *key_event = (QKeyEvent*)e;
         return processKeyEvent(key_event);
     } else if(e->type() == QEvent::ShortcutOverride) {
-        QKeyEvent *key_event = (QKeyEvent*)e;
-        if(isCtrlPressed() || isShiftPressed() ||
-           key_event->key() == Qt::Key_Up ||
-           key_event->key() == Qt::Key_Down) {
-            if(key_event->key() == Qt::Key_C ||
-               key_event->key() == Qt::Key_V ||
-               key_event->key() == Qt::Key_X ||
-               key_event->key() == Qt::Key_D ||
-               key_event->key() == Qt::Key_A ||
-               key_event->key() == Qt::Key_Up ||
-               key_event->key() == Qt::Key_Down) {
-                return processKeyEvent(key_event);
+        QKeyEvent *keyEvent = (QKeyEvent*)e;
+        if(keyEvent->key() == Qt::Key_Up ||
+            keyEvent->key() == Qt::Key_Down) {
+            return processKeyEvent(keyEvent);
+        }
+        if(isShiftPressed() && keyEvent->key() == Qt::Key_D) {
+            return processKeyEvent(keyEvent);
+        }
+        if(isCtrlPressed()) {
+            if(keyEvent->key() == Qt::Key_C ||
+               keyEvent->key() == Qt::Key_V ||
+               keyEvent->key() == Qt::Key_X ||
+               keyEvent->key() == Qt::Key_A) {
+                return processKeyEvent(keyEvent);
             }
-        } else if(key_event->key() == Qt::Key_Delete) {
-            return processKeyEvent(key_event);
+        } else if(keyEvent->key() == Qt::Key_Delete) {
+            return processKeyEvent(keyEvent);
         }
     } else if(e->type() == QEvent::KeyRelease) {
 
