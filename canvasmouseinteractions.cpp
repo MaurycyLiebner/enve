@@ -800,7 +800,9 @@ void Canvas::tabletEvent(QTabletEvent *e,
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *event) {
-    schedulePivotUpdate();
+    if(event->button() == Qt::LeftButton) {
+        schedulePivotUpdate();
+    }
     if(isPreviewingOrRendering() ||
             event->button() != Qt::LeftButton) return;
     if(mCurrentMode == PAINT_MODE) {
@@ -820,11 +822,6 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
         mFirstMouseMove = false;
     }
     clearAndDisableInput();
-    handleMouseRelease();
-
-    mLastPressedBox = NULL;
-    mHoveredPoint = mLastPressedPoint;
-    mLastPressedPoint = NULL;
 
     if(mCurrentEdge != NULL) {
         if(!mFirstMouseMove) {
@@ -833,7 +830,12 @@ void Canvas::mouseReleaseEvent(QMouseEvent *event) {
         mHoveredEdge = mCurrentEdge;
         mHoveredEdge->generatePainterPath();
         mCurrentEdge = NULL;
+    } else {
+        handleMouseRelease();
     }
+    mLastPressedBox = NULL;
+    mHoveredPoint = mLastPressedPoint;
+    mLastPressedPoint = NULL;
 
     setLastMouseEventPosAbs(event->pos());
     callUpdateSchedulers();
@@ -1108,9 +1110,11 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
     if(mLastPressedPoint == NULL) {
         BoundingBox *boxAt = mCurrentBoxesGroup->getBoxAt(mLastPressPosRel);
         if(boxAt == NULL) {
-            if(mCurrentBoxesGroup != this) {
-                setCurrentBoxesGroup((BoxesGroup*)
-                                     mCurrentBoxesGroup->getParent());
+            if(mHoveredEdge == NULL && mHoveredPoint == NULL) {
+                if(mCurrentBoxesGroup != this) {
+                    setCurrentBoxesGroup((BoxesGroup*)
+                                         mCurrentBoxesGroup->getParent());
+                }
             }
         } else {
             if(boxAt->SWT_isBoxesGroup()) {

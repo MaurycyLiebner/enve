@@ -354,7 +354,7 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
                                          saveUndoRedo,
                                          false,
                                          saveUndoRedo);
-    mParentBox->updateGlobalPivotIfSelected();
+    //mParentBox->updateGlobalPivotIfSelected();
 }
 
 void BoxTransformAnimator::setPivot(const QPointF &point,

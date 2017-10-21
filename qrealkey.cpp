@@ -126,12 +126,12 @@ QrealPoint *QrealKey::mousePress(const qreal &frameT,
                                  const qreal &pixelsPerFrame,
                                  const qreal &pixelsPerValue) {
     if(isSelected() ) {
-        if( (mStartEnabled) ?
+        if( (mStartEnabled && hasPrevKey()) ?
             mStartPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
             false ) {
             return mStartPoint;
         }
-        if((mEndEnabled) ?
+        if((mEndEnabled && hasNextKey()) ?
             mEndPoint->isNear(frameT, valueT, pixelsPerFrame, pixelsPerValue) :
             false ) {
             return mEndPoint;
@@ -348,10 +348,10 @@ void QrealKey::drawGraphKey(QPainter *p,
     }
     mGraphPoint->draw(p, paintColor);
     if(isSelected() ) {
-        if(mStartEnabled) {
+        if(mStartEnabled && hasPrevKey()) {
             mStartPoint->draw(p, paintColor);
         }
-        if(mEndEnabled) {
+        if(mEndEnabled && hasNextKey()) {
             mEndPoint->draw(p, paintColor);
         }
     }

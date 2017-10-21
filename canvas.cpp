@@ -268,8 +268,9 @@ void Canvas::renderSk(SkCanvas *canvas) {
 
         if(mCurrentMode == CanvasMode::MOVE_PATH ||
            mCurrentMode == CanvasMode::MOVE_POINT) {
-            mRotPivot->drawSk(canvas, invScale);
+
             if(mRotPivot->isScaling() || mRotPivot->isRotating()) {
+                mRotPivot->drawSk(canvas, invScale);
                 paint.setStyle(SkPaint::kStroke_Style);
                 paint.setColor(SK_ColorBLACK);
                 SkScalar intervals[2] = {MIN_WIDGET_HEIGHT*0.25f*invScale,
@@ -279,6 +280,8 @@ void Canvas::renderSk(SkCanvas *canvas) {
                                  QPointFToSkPoint(mLastMouseEventPosRel),
                                  paint);
                 paint.setPathEffect(NULL);
+            } else if(!mIsMouseGrabbing || mRotPivot->isSelected()) {
+                mRotPivot->drawSk(canvas, invScale);
             }
         }
 //        pen = QPen(QColor(0, 0, 255, 125), 2., Qt::DotLine);
@@ -581,7 +584,14 @@ void Canvas::createLinkToFileWithPath(const QString &path) {
 }
 
 void Canvas::schedulePivotUpdate() {
-    if(mRotPivot->isRotating() || mRotPivot->isScaling()) return;
+    if(mRotPivot->isRotating() ||
+        mRotPivot->isScaling() ||
+        mRotPivot->isSelected()) return;
+    if(mLastPressedPoint != NULL) {
+        if(mLastPressedPoint->isCtrlPoint()) {
+            return;
+        }
+    }
     mPivotUpdateNeeded = true;
 }
 
@@ -996,7 +1006,6 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
     } else {
         return false;
     }
-    schedulePivotUpdate();
 
     callUpdateSchedulers();
     return true;

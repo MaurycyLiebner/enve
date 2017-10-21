@@ -500,16 +500,17 @@ void MinimalVectorPath::intersectWith(MinimalVectorPath *otherPath,
 void MinimalVectorPath::addAllPaths(QList<MinimalVectorPath*> *targetsList,
                                     FullVectorPath *targetFull) {
     if(mIntersectionPoints.isEmpty()) {
-        MinimalVectorPath *newPath = new MinimalVectorPath(targetFull);
-        MinimalNodePoint *point = mFirstPoint;
-        do {
-            newPath->addPoint(new MinimalNodePoint(point->getStartPos(),
-                                                   point->getPos(),
-                                                   point->getEndPos()));
-            point = point->getNextPoint();
-        } while(point != mFirstPoint);
-        newPath->closePath();
-        targetsList->append(newPath);
+//        MinimalVectorPath *newPath = new MinimalVectorPath(targetFull);
+//        MinimalNodePoint *point = mFirstPoint;
+//        do {
+//            newPath->addPoint(new MinimalNodePoint(point->getStartPos(),
+//                                                   point->getPos(),
+//                                                   point->getEndPos()));
+//            point = point->getNextPoint();
+//        } while(point != mFirstPoint);
+//        newPath->closePath();
+//        targetsList->append(newPath);
+        targetsList->append(this);
         return;
     }
     while(!mIntersectionPoints.isEmpty()) {

@@ -55,10 +55,10 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
     typeMenu->addAction("All", this, SLOT(setTypeAll()));
     typeMenu->addAction("Sound", this, SLOT(setTypeSound()));
 
-    QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
-    QAction *graphAct = viewMenu->addAction("Graph Editor");
-    graphAct->setCheckable(true);
-    connect(graphAct, SIGNAL(toggled(bool)),
+    //QMenu *viewMenu = mBoxesListMenuBar->addMenu("View");
+    mGraphAct = mBoxesListMenuBar->addAction("Graph");
+    mGraphAct->setCheckable(true);
+    connect(mGraphAct, SIGNAL(toggled(bool)),
             this, SLOT(setGraphEnabled(bool)));
 
     mCornerMenuBar = new QMenuBar(this);
@@ -125,11 +125,14 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                              this);
     mKeysViewLayout->addWidget(mKeysView);
     mAnimationDockWidget = new AnimationDockWidget(this, mKeysView);
-    mKeysViewLayout->addWidget(mAnimationDockWidget);
     mAnimationDockWidget->hide();
     mMainLayout->addLayout(mKeysViewLayout);
 
     QHBoxLayout *keysViewScrollbarLayout = new QHBoxLayout();
+    QVBoxLayout *layoutT = new QVBoxLayout();
+    layoutT->setAlignment(Qt::AlignBottom);
+    layoutT->addWidget(mAnimationDockWidget);
+    keysViewScrollbarLayout->addLayout(layoutT);
     mKeysView->setLayout(keysViewScrollbarLayout);
     keysViewScrollbarLayout->setAlignment(Qt::AlignRight);
     keysViewScrollbarLayout->addWidget(

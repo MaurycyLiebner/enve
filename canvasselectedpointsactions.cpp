@@ -49,6 +49,7 @@ void Canvas::disconnectPoints() {
                 }
             }
         }
+        clearPointsSelection();
         Q_FOREACH(NodePoint *point, selectedNodePoints) {
             NodePoint *secondPoint = point->getNextPoint();
             if(secondPoint == NULL) secondPoint = point->getPreviousPoint();
@@ -69,6 +70,7 @@ void Canvas::mergePoints() {
             //}
         }
     }
+    clearPointsSelection();
     if(selectedNodePoints.count() == 2) {
         NodePoint *firstPoint = selectedNodePoints.first();
         NodePoint *secondPoint = selectedNodePoints.last();

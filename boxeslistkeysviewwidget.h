@@ -63,6 +63,7 @@ private:
     QVBoxLayout *mKeysViewLayout;
     QHBoxLayout *mMenuLayout;
     QHBoxLayout *mMenuWidgetsLayout;
+    QAction *mGraphAct = NULL;
     QWidget *mMenuWidgetsCont;
     QWidget *mTopWidget = NULL;
     QMenuBar *mBoxesListMenuBar;

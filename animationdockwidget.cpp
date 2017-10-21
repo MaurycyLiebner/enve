@@ -7,14 +7,11 @@
 
 AnimationDockWidget::AnimationDockWidget(QWidget *parent,
                                          KeysView *keysView) :
-    QWidget(parent)
-{
-    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+    QToolBar(parent) {
+    setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 
-    mButtonsLayout = new QHBoxLayout();
-    mButtonsLayout->setMargin(0);
-    mButtonsLayout->setSpacing(0);
-
+    setIconSize(QSize(1.25*MIN_WIDGET_HEIGHT,
+                      1.25*MIN_WIDGET_HEIGHT));
     mSymmetricButton = new ActionButton(
                 ":/icons/node_symmetric.png",
                 "", this);
@@ -78,19 +75,29 @@ AnimationDockWidget::AnimationDockWidget(QWidget *parent,
 // //                                     QSizePolicy::Maximum);
 //    connect(mNoSideCtrlButton, SIGNAL(pressed()),
 //            keysView, SLOT(graphSetNoSideCtrlForSelected()) );
+    mActionLine = new ActionButton(
+                ":/icons/node_line.png",
+                "MAKE SEGMENT LINE", this);
+    addWidget(mActionLine);
 
-    mButtonsLayout->addWidget(mSymmetricButton);
-    mButtonsLayout->addWidget(mSmoothButton);
-    mButtonsLayout->addWidget(mCornerButton);
-    mButtonsLayout->addWidget(mFitToHeightButton);
+    mActionCurve = new ActionButton(
+                ":/icons/node_curve.png",
+                "MAKE SEGMENT CURVE", this);
+    addWidget(mActionCurve);
+
+
+    addSeparator();
+    addWidget(mSymmetricButton);
+    addWidget(mSmoothButton);
+    addWidget(mCornerButton);
+    addSeparator();
+    addWidget(mFitToHeightButton);
 //    mButtonsLayout->addWidget(mTwoSideCtrlButton);
 //    mButtonsLayout->addWidget(mLeftSideCtrlButton);
 //    mButtonsLayout->addWidget(mRightSideCtrlButton);
 //    mButtonsLayout->addWidget(mNoSideCtrlButton);
 
-    setLayout(mButtonsLayout);
-
-    setStyleSheet("border-top: 1px solid black");
+    setStyleSheet("border: 1px solid black; padding: 10px; margin-bottom: -1px");
 }
 
 void AnimationDockWidget::paintEvent(QPaintEvent *) {

@@ -27,6 +27,9 @@ struct PathBoxRenderData : public BoundingBoxRenderData {
         totalPath.addPath(outlinePath);
         relBoundingRect = SkRectToQRectF(totalPath.computeTightBounds());
     }
+    QPointF getCenterPosition() {
+        return SkRectToQRectF(editPath.getBounds()).center();
+    }
 private:
     void drawSk(SkCanvas *canvas) {
         canvas->save();

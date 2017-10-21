@@ -1,12 +1,12 @@
 #ifndef ANIMATIONDOCKWIDGET_H
 #define ANIMATIONDOCKWIDGET_H
-#include <QWidget>
+#include <QToolBar>
 #include <QVBoxLayout>
 #include <QPushButton>
 class ActionButton;
 class KeysView;
 
-class AnimationDockWidget : public QWidget
+class AnimationDockWidget : public QToolBar
 {
     Q_OBJECT
 public:
@@ -20,6 +20,8 @@ public slots:
 
 private:
     QHBoxLayout *mButtonsLayout;
+    ActionButton *mActionLine;
+    ActionButton *mActionCurve;
     ActionButton *mSmoothButton;
     ActionButton *mSymmetricButton;
     ActionButton *mCornerButton;

@@ -123,6 +123,10 @@ struct BoundingBoxRenderData : public Updatable {
         pixmapEffects.clear();
         effectsMargin = 0.;
     }
+
+    virtual QPointF getCenterPosition() {
+        return relBoundingRect.center();
+    }
 protected:
     bool mDelayDataSet = false;
     bool mDataSet = false;
@@ -160,6 +164,12 @@ public:
     virtual void centerPivotPosition(const bool &saveUndoRedo = false) {
         mTransformAnimator->setPivotWithoutChangingTransformation(
                     getRelCenterPosition(), saveUndoRedo);
+    }
+    virtual void setPivotPosition(
+            const QPointF &pos,
+            const bool &saveUndoRedo = false) {
+        mTransformAnimator->setPivotWithoutChangingTransformation(
+                    pos, saveUndoRedo);
     }
     virtual bool isContainedIn(const QRectF &absRect);
 

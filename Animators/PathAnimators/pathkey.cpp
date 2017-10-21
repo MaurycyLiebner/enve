@@ -87,6 +87,7 @@ void PathContainer::insertElementPos(const int &index,
 
 void PathContainer::removeElementPosAt(const int &index) {
     mElementsPos.removeAt(index);
+    mPathUpdateNeeded = true;
 }
 
 const SkPath &PathContainer::getPath() {

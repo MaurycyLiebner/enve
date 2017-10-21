@@ -338,7 +338,7 @@ void BoundingBox::updateRelBoundingRectFromRenderData(
 
     if(mPivotAutoAdjust &&
        !mTransformAnimator->rotOrScaleOrPivotRecording()) {
-        centerPivotPosition(false);
+        setPivotPosition(renderData->getCenterPosition(), false);
     }
 }
 

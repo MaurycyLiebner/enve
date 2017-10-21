@@ -15,8 +15,7 @@ class QrealAnimatorValueSlider;
 
 #include <QDoubleSpinBox>
 
-class QrealAnimator :  public Animator
-{
+class QrealAnimator :  public Animator {
     Q_OBJECT
 public:
     QrealAnimator();

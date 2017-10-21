@@ -404,9 +404,9 @@ void VectorPathAnimator::removeNodeAtAndApproximate(const int &nodeId) {
 void VectorPathAnimator::removeNodeAt(const int &nodeId) {
     PathContainer::removeNodeAt(nodeId);
     foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
-        ((PathKey*)key.get())->
-                removeNodeAt(nodeId);
+        ((PathKey*)key.get())->removeNodeAt(nodeId);
     }
+    mElementsUpdateNeeded = true;
 }
 
 NodePoint *VectorPathAnimator::addNodeAbsPos(

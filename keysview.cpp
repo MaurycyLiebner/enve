@@ -26,6 +26,7 @@ void KeysView::setGraphViewed(bool bT) {
     if(bT) {
         graphResetValueScaleAndMinShown();
     }
+    update();
 }
 
 void KeysView::middlePress(const QPointF &pressPos) {

@@ -154,7 +154,8 @@ BoxesListAnimationDockWidget::BoxesListAnimationDockWidget(
     mToolBar = new QToolBar(this);
     mToolBar->setMovable(false);
 
-    mToolBar->setIconSize(QSize(24, 24));
+    mToolBar->setIconSize(QSize(1.25*MIN_WIDGET_HEIGHT,
+                                1.25*MIN_WIDGET_HEIGHT));
     mToolBar->addSeparator();
 
 //    mControlButtonsLayout->addWidget(mGoToPreviousKeyButton);
