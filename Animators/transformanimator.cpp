@@ -308,12 +308,14 @@ void BoxTransformAnimator::pivotTransformStarted() {
     if(!mPosAnimator->prp_isDescendantRecording()) {
         mPosAnimator->prp_startTransform();
     }
+    mPivotAnimator->prp_startTransform();
 }
 
 void BoxTransformAnimator::pivotTransformFinished() {
     if(!mPosAnimator->prp_isDescendantRecording()) {
         mPosAnimator->prp_finishTransform();
     }
+    mPivotAnimator->prp_finishTransform();
 }
 
 void BoxTransformAnimator::setPivotWithoutChangingTransformation(
