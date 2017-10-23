@@ -27,6 +27,8 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRandomizeStep->prp_setName("rand frame step");
     mRandomizeStep->setIntValueRange(1, 99);
 
+    mSmoothTransform->prp_setName("smooth transform");
+
     mSeed->prp_setName("seed");
     mSeed->setIntValueRange(0, 9999);
     mSeed->setCurrentIntValue(qrand() % 9999, false);
@@ -36,6 +38,7 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     ca_addChildAnimator(mSmoothness.data());
     ca_addChildAnimator(mRandomize.data());
     ca_addChildAnimator(mRandomizeStep.data());
+    ca_addChildAnimator(mSmoothTransform.data());
     ca_addChildAnimator(mSeed.data());
 }
 
@@ -308,14 +311,34 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
                                                SkPath *dst) {
     qsrand(mSeed->getCurrentIntValue());
     mSeedAssist = qrand() % 999999;
+    int randStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
     if(mRandomize->getValue()) {
-        mSeedAssist += relFrame / mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+        mSeedAssist += relFrame / randStep;
     }
-    displaceFilterPath(dst, src,
-                       mMaxDev->qra_getValueAtRelFrame(relFrame),
-                       mSegLength->qra_getValueAtRelFrame(relFrame),
-                       mSmoothness->qra_getValueAtRelFrame(relFrame),
-                       mSeedAssist);
+    if(mSmoothTransform->getValue()) {
+        uint32_t nextSeed = mSeedAssist - 1;
+        SkPath path1;
+        displaceFilterPath(&path1, src,
+                           mMaxDev->qra_getValueAtRelFrame(relFrame),
+                           mSegLength->qra_getValueAtRelFrame(relFrame),
+                           mSmoothness->qra_getValueAtRelFrame(relFrame),
+                           mSeedAssist);
+        SkPath path2;
+        qsrand(mSeed->getCurrentIntValue());
+        displaceFilterPath(&path2, src,
+                           mMaxDev->qra_getValueAtRelFrame(relFrame),
+                           mSegLength->qra_getValueAtRelFrame(relFrame),
+                           mSmoothness->qra_getValueAtRelFrame(relFrame),
+                           nextSeed);
+        qreal weight = (relFrame % randStep)*1./randStep;
+        path1.interpolate(path2, weight, dst);
+    } else {
+        displaceFilterPath(dst, src,
+                           mMaxDev->qra_getValueAtRelFrame(relFrame),
+                           mSegLength->qra_getValueAtRelFrame(relFrame),
+                           mSmoothness->qra_getValueAtRelFrame(relFrame),
+                           mSeedAssist);
+    }
 }
 
 DuplicatePathEffect::DuplicatePathEffect(const bool &outlinePathEffect) :

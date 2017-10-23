@@ -194,6 +194,9 @@ void PathBox::drawBoundingRectSk(SkCanvas *canvas,
 void PathBox::addPathEffect(PathEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
 
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        incReasonsNotToApplyUglyTransform();
+    }
     if(!mPathEffectsAnimators->hasChildAnimators()) {
         ca_addChildAnimator(mPathEffectsAnimators.data());
     }
@@ -205,7 +208,9 @@ void PathBox::addPathEffect(PathEffect *effect) {
 
 void PathBox::addFillPathEffect(PathEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
-
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        incReasonsNotToApplyUglyTransform();
+    }
     if(!mFillPathEffectsAnimators->hasChildAnimators()) {
         ca_addChildAnimator(mFillPathEffectsAnimators.data());
     }
@@ -217,7 +222,9 @@ void PathBox::addFillPathEffect(PathEffect *effect) {
 
 void PathBox::addOutlinePathEffect(PathEffect *effect) {
     //effect->setUpdater(new PixmapEffectUpdater(this));
-
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        incReasonsNotToApplyUglyTransform();
+    }
     if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
         ca_addChildAnimator(mOutlinePathEffectsAnimators.data());
     }
@@ -228,6 +235,9 @@ void PathBox::addOutlinePathEffect(PathEffect *effect) {
 }
 
 void PathBox::removePathEffect(PathEffect *effect) {
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        decReasonsNotToApplyUglyTransform();
+    }
     mPathEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mPathEffectsAnimators->hasChildAnimators()) {
         ca_removeChildAnimator(mPathEffectsAnimators.data());
@@ -237,6 +247,9 @@ void PathBox::removePathEffect(PathEffect *effect) {
 }
 
 void PathBox::removeFillPathEffect(PathEffect *effect) {
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        decReasonsNotToApplyUglyTransform();
+    }
     mFillPathEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mFillPathEffectsAnimators->hasChildAnimators()) {
         ca_removeChildAnimator(mFillPathEffectsAnimators.data());
@@ -246,12 +259,32 @@ void PathBox::removeFillPathEffect(PathEffect *effect) {
 }
 
 void PathBox::removeOutlinePathEffect(PathEffect *effect) {
+    if(effect->hasReasonsNotToApplyUglyTransform()) {
+        decReasonsNotToApplyUglyTransform();
+    }
     mOutlinePathEffectsAnimators->ca_removeChildAnimator(effect);
     if(!mOutlinePathEffectsAnimators->hasChildAnimators()) {
         ca_removeChildAnimator(mOutlinePathEffectsAnimators.data());
     }
 
     clearAllCache();
+}
+
+void PathBox::updateCombinedTransformAfterFrameChange() {
+    if(mNReasonsNotToApplyUglyTransform != 0) {
+        mPathSk = mEditPathSk;
+        mSkRelBoundingRectPath.reset();
+    }
+
+    BoundingBox::updateCombinedTransformAfterFrameChange();
+}
+
+void PathBox::updateCombinedTransform() {
+    if(mNReasonsNotToApplyUglyTransform != 0) {
+        mPathSk = mEditPathSk;
+        mSkRelBoundingRectPath.reset();
+    }
+    BoundingBox::updateCombinedTransform();
 }
 
 void PathBox::resetStrokeGradientPointsPos() {

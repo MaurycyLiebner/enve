@@ -663,14 +663,16 @@ void BoundingBox::updateCombinedTransformAfterFrameChange() {
     if(mParent == NULL) return;
     updateDrawRenderContainerTransform();
 
-
     updateAfterCombinedTransformationChangedAfterFrameChagne();
     scheduleUpdate();
 }
 
 void BoundingBox::updateDrawRenderContainerTransform() {
-    mDrawRenderContainer.updatePaintTransformGivenNewCombinedTransform(
-                mTransformAnimator->getCombinedTransform());
+    if(mNReasonsNotToApplyUglyTransform == 0) {
+        mDrawRenderContainer.updatePaintTransformGivenNewCombinedTransform(
+                    mTransformAnimator->getCombinedTransform());
+    }
+
 }
 
 void BoundingBox::updateCombinedTransform() {

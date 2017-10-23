@@ -160,6 +160,8 @@ public:
     PathEffectAnimators *getOutlinePathEffectsAnimators() {
         return mOutlinePathEffectsAnimators.data();
     }
+    void updateCombinedTransformAfterFrameChange();
+    void updateCombinedTransform();
 protected:
 
     PathEffectAnimatorsQSPtr mPathEffectsAnimators;

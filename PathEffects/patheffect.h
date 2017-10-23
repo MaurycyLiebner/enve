@@ -80,6 +80,8 @@ public:
             mApplyBeforeThickness.reset();
         }
     }
+
+    virtual bool hasReasonsNotToApplyUglyTransform() { return false; }
 protected:
     bool mOutlineEffect = false;
     QSharedPointer<BoolProperty> mApplyBeforeThickness;
@@ -109,9 +111,14 @@ public:
                                               int *lastIdentical,
                                               const int &relFrame) {
         if(mRandomize->getValue()) {
-            int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
-            *firstIdentical = relFrame - relFrame % frameStep;
-            *lastIdentical = *firstIdentical + frameStep;
+            if(mSmoothTransform->getValue()) {
+                *firstIdentical = relFrame;
+                *lastIdentical = relFrame;
+            } else {
+                int frameStep = mRandomizeStep->getCurrentIntValueAtRelFrame(relFrame);
+                *firstIdentical = relFrame - relFrame % frameStep;
+                *lastIdentical = *firstIdentical + frameStep;
+            }
         } else {
             PathEffect::prp_getFirstAndLastIdenticalRelFrame(firstIdentical,
                                                              lastIdentical,
@@ -148,6 +155,8 @@ private:
             (new BoolProperty())->ref<BoolProperty>();
     QSharedPointer<IntAnimator> mRandomizeStep =
             (new IntAnimator())->ref<IntAnimator>();
+    QSharedPointer<BoolProperty> mSmoothTransform =
+            (new BoolProperty())->ref<BoolProperty>();
     QSharedPointer<IntAnimator> mSeed =
             (new IntAnimator())->ref<IntAnimator>();
     uint32_t mSeedAssist = 0;
@@ -194,6 +203,10 @@ public:
 
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+
+    bool hasReasonsNotToApplyUglyTransform() {
+        return mBoxTarget->getTarget() != NULL;
+    }
 private:
     PathBox *mParentPathBox;
     QSharedPointer<ComboBoxProperty> mOperationType =

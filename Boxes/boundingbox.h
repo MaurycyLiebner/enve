@@ -583,7 +583,16 @@ public:
     EffectAnimators *getEffectsAnimators() {
         return mEffectsAnimators.data();
     }
+
+    void incReasonsNotToApplyUglyTransform() {
+        mNReasonsNotToApplyUglyTransform++;
+    }
+
+    void decReasonsNotToApplyUglyTransform() {
+        mNReasonsNotToApplyUglyTransform--;
+    }
 protected:
+    int mNReasonsNotToApplyUglyTransform = 0;
     QList<BoundingBox*> mLinkingBoxes;
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
