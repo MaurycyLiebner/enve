@@ -132,6 +132,8 @@ public:
         return mCurrentTiles.get();
     }
     virtual void move(const int &xT, const int &yT);
+
+    virtual void loadFromImage(const QImage &img);
 protected:
     CanvasBackgroundMode mBackgroudMode =
             CANVAS_BACKGROUND_COLOR;

@@ -38,16 +38,16 @@ CanvasWindow::CanvasWindow(QWidget *parent) {
         mFreeThreads << i;
     }
 
-    QThread *fileControlerThread = new QThread(this);
+    mFileControlerThread = new QThread(this);
     mFileControler = new PaintControler(numberThreads);
-    mFileControler->moveToThread(fileControlerThread);
+    mFileControler->moveToThread(mFileControlerThread);
     connect(mFileControler, SIGNAL(finishedUpdating(int, Executable*)),
             this, SLOT(sendNextFileUpdatableForUpdate(int, Executable*)) );
     connect(this, SIGNAL(updateFileUpdatable(Executable*, int)),
             mFileControler, SLOT(updateUpdatable(Executable*, int)) );
 
-    fileControlerThread->start();
-    mControlerThreads << fileControlerThread;
+    mFileControlerThread->start();
+    mControlerThreads << mFileControlerThread;
 
     mPreviewFPSTimer = new QTimer(this);
 
@@ -72,6 +72,9 @@ CanvasWindow::~CanvasWindow() {
     foreach(PaintControler *paintControler, mPaintControlers) {
         delete paintControler;
     }
+    mFileControlerThread->quit();
+    mFileControlerThread->wait();
+    delete mFileControler;
 }
 
 Canvas *CanvasWindow::getCurrentCanvas() {
@@ -437,6 +440,18 @@ void CanvasWindow::pathsExclusionAction() {
     callUpdateSchedulers();
 }
 
+void CanvasWindow::pathsCombineAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->selectedPathsCombine();
+    callUpdateSchedulers();
+}
+
+void CanvasWindow::pathsBreakApartAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->selectedPathsBreakApart();
+    callUpdateSchedulers();
+}
+
 void CanvasWindow::setFontFamilyAndStyle(QString family, QString style) {
     if(hasNoCanvas()) return;
     mCurrentCanvas->setSelectedFontFamilyAndStyle(family, style);
@@ -531,6 +546,11 @@ void CanvasWindow::duplicateAction() {
 void CanvasWindow::selectAllAction() {
     if(hasNoCanvas()) return;
     mCurrentCanvas->selectAllAction();
+}
+
+void CanvasWindow::invertSelectionAction() {
+    if(hasNoCanvas()) return;
+    mCurrentCanvas->invertSelectionAction();
 }
 
 void CanvasWindow::clearSelectionAction() {

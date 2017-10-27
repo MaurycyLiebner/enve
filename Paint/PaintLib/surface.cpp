@@ -435,6 +435,10 @@ void Surface::setSize(const ushort &width_t,
 void Surface::move(const int &xT, const int &yT) {
     mCurrentTiles->move(xT, yT);
 }
+#include <QImage>
+void Surface::loadFromImage(const QImage &img) {
+    mCurrentTiles->setImage(img);
+}
 
 void Surface::setBackgroundMode(
         const CanvasBackgroundMode &bg_mode_t) {

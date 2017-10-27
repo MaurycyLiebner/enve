@@ -38,6 +38,17 @@ void VectorPath::revertAllPoints() {
     mPathAnimator->revertAllPoints();
 }
 
+void VectorPath::breakPathsApart() {
+    QList<VectorPathAnimator*> pathsList = mPathAnimator->getSinglePathsList();
+    foreach(VectorPathAnimator *path, pathsList) {
+        VectorPath *newPath = new VectorPath();
+        newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
+        mParent->addChild(newPath);
+        newPath->getPathAnimator()->addSinglePathAnimator(path, false);
+    }
+    removeFromParent();
+}
+
 void VectorPath::selectAllPoints(Canvas *canvas) {
     mPathAnimator->selectAllPoints(canvas);
 }
@@ -58,11 +69,13 @@ PathAnimator *VectorPath::getPathAnimator() {
 }
 
 void VectorPath::applyCurrentTransformation() {
+    mNReasonsNotToApplyUglyTransform++;
     mPathAnimator->applyTransformToPoints(
                 mTransformAnimator->getCurrentTransformationMatrix());
 
     mTransformAnimator->reset(true);
     centerPivotPosition(true);
+    mNReasonsNotToApplyUglyTransform--;
 }
 
 VectorPathEdge *VectorPath::getEdge(const QPointF &absPos,

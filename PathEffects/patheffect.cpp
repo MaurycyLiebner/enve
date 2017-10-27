@@ -27,7 +27,7 @@ DisplacePathEffect::DisplacePathEffect(const bool &outlinePathEffect) :
     mRandomizeStep->prp_setName("rand frame step");
     mRandomizeStep->setIntValueRange(1, 99);
 
-    mSmoothTransform->prp_setName("smooth transform");
+    mSmoothTransform->prp_setName("smooth progression");
 
     mSeed->prp_setName("seed");
     mSeed->setIntValueRange(0, 9999);

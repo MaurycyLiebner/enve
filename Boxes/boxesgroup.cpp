@@ -351,10 +351,12 @@ void BoxesGroup::setCurrentFillStrokeSettingsFromBox(BoundingBox *box) {
 }
 
 void BoxesGroup::applyCurrentTransformation() {
+    mNReasonsNotToApplyUglyTransform++;
     QPointF absPivot = getPivotAbsPos();
     qreal rotation = mTransformAnimator->rot();
     qreal scaleX = mTransformAnimator->xScale();
     qreal scaleY = mTransformAnimator->yScale();
+    QPointF relTrans = mTransformAnimator->pos();
     Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
         box->saveTransformPivotAbsPos(absPivot);
         box->startTransform();
@@ -363,10 +365,15 @@ void BoxesGroup::applyCurrentTransformation() {
         box->startTransform();
         box->scaleRelativeToSavedPivot(scaleX, scaleY);
         box->finishTransform();
+        box->startPosTransform();
+        box->moveByRel(relTrans);
+        box->finishTransform();
     }
 
     mTransformAnimator->resetRotation(true);
     mTransformAnimator->resetScale(true);
+    mTransformAnimator->resetTranslation(true);
+    mNReasonsNotToApplyUglyTransform--;
 }
 
 void BoxesGroup::selectAllBoxesFromBoxesGroup() {

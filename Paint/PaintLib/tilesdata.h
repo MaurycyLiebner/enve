@@ -55,6 +55,8 @@ public:
     void initializeEmptyTilesData();
     void writeTilesDataFromMemoryOrTmp(QIODevice *target);
     void move(const int &xT, const int &yT);
+
+    void setImage(const QImage &img);
 private:
     bool mNoDataInMemory = true;
     bool mDataStoredInTmpFile = false;

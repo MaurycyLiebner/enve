@@ -69,11 +69,6 @@ IntersectionNodePoint::IntersectionNodePoint(QPointF start,
 
 }
 
-IntersectionNodePoint::~IntersectionNodePoint()
-{
-
-}
-
 bool IntersectionNodePoint::isIntersection() {
     return true;
 }
@@ -390,12 +385,6 @@ void MinimalVectorPath::addPoint(MinimalNodePoint *point) {
         point->setPrevPoint(mLastPoint);
     }
     mLastPoint = point;
-}
-
-MinimalVectorPath::~MinimalVectorPath() {
-    Q_FOREACH(MinimalNodePoint *point, mIntersectionPoints) {
-        delete point;
-    }
 }
 
 MinimalNodePoint *MinimalVectorPath::getFirstPoint() {

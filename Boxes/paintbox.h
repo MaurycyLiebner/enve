@@ -134,6 +134,7 @@ public:
     void finishSizeAndPosSetup();
     void scheduleFinishSizeSetup();
     void scheduleFinishSizeAndPosSetup();
+    void loadFromImage(const QImage &img);
 private:
     bool mFinishSizeAndPosSetupScheduled = false;
     bool mFinishSizeSetupScheduled = false;

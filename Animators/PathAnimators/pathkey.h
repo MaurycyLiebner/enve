@@ -85,6 +85,8 @@ public:
         }
     }
 
+    virtual void applyTransformToPoints(const QMatrix &transform);
+
     virtual void revertElementPosSubset(
             const int &firstId,
             int count) {

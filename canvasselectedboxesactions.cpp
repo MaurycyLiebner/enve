@@ -620,10 +620,23 @@ void Canvas::createLinkBoxForSelected() {
     }
 }
 
+#include "clipboardcontainer.h"
 void Canvas::duplicateSelectedBoxes() {
-    Q_FOREACH(BoundingBox *selectedBox, mSelectedBoxes) {
-        selectedBox->createDuplicateWithSameParent();
+    BoxesClipboardContainer *container =
+            new BoxesClipboardContainer();
+    QBuffer target(container->getBytesArray());
+    target.open(QIODevice::WriteOnly);
+    int nBoxes = mSelectedBoxes.count();
+    target.write((char*)&nBoxes, sizeof(int));
+
+    qSort(mSelectedBoxes.begin(), mSelectedBoxes.end(), boxesZSort);
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        box->writeBoundingBox(&target);
     }
+    target.close();
+
+    clearBoxesSelection();
+    container->pasteTo(mCurrentBoxesGroup);
 }
 
 void Canvas::groupSelectedBoxes() {
@@ -644,7 +657,9 @@ VectorPath *Canvas::getPathResultingFromOperation(
                                 const bool &unionInterThis,
                                 const bool &unionInterOther) {
     VectorPath *newPath = new VectorPath();
+    QList<FullVectorPath*> pathsT;
     FullVectorPath *targetPath = new FullVectorPath();
+    pathsT << targetPath;
     FullVectorPath *addToPath = NULL;
     FullVectorPath *addedPath = NULL;
 
@@ -655,22 +670,24 @@ VectorPath *Canvas::getPathResultingFromOperation(
             addToPath = targetPath;
             addToPath->generateSinglePathPaths();
             addedPath = new FullVectorPath();
+            pathsT << addedPath;
             addedPath->generateFromPath(boxPath);
             addToPath->intersectWith(addedPath,
                                      unionInterThis,
                                      unionInterOther);
             targetPath = new FullVectorPath();
+            pathsT << targetPath;
             targetPath->getSeparatePathsFromOther(addToPath);
             targetPath->getSeparatePathsFromOther(addedPath);
-
-            delete addedPath;
-            delete addToPath;
         }
     }
     targetPath->generateSinglePathPaths();
 
     newPath->loadPathFromSkPath(QPainterPathToSkPath(targetPath->getPath()));
     mCurrentBoxesGroup->addChild(newPath);
+    foreach(FullVectorPath *pathT, pathsT) {
+        delete pathT;
+    }
     return newPath;
 }
 
@@ -711,6 +728,53 @@ void Canvas::selectedPathsExclusion() {
     clearBoxesSelection();
     addBoxToSelection(newPath1);
     addBoxToSelection(newPath2);
+}
+#include "Animators/pathanimator.h"
+void Canvas::selectedPathsCombine() {
+    if(mSelectedBoxes.isEmpty()) return;
+    VectorPath *firstVectorPath = NULL;
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            firstVectorPath = (VectorPath*)box;
+            break;
+        }
+    }
+    if(firstVectorPath == NULL) {
+        firstVectorPath = new VectorPath();
+        addChild(firstVectorPath);
+    }
+    QMatrix firstTranf = firstVectorPath->getCombinedTransform();
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isPathBox()) {
+            if(box->SWT_isVectorPath()) {
+                if(box == firstVectorPath) continue;
+                VectorPath *boxPath = (VectorPath*)box;
+                QMatrix relTransf = boxPath->getCombinedTransform()*
+                        firstTranf.inverted();
+                boxPath->getPathAnimator()->applyTransformToPoints(relTransf);
+                boxPath->getPathAnimator()->
+                        addAllSinglePathsToAnimator(
+                            firstVectorPath->getPathAnimator());
+            } else {
+                VectorPath *boxPath = ((VectorPath*)box)->objectToPath();
+                QMatrix relTransf = boxPath->getCombinedTransform()*
+                        firstTranf.inverted();
+                boxPath->getPathAnimator()->applyTransformToPoints(relTransf);
+                boxPath->getPathAnimator()->addAllSinglePathsToAnimator(
+                            firstVectorPath->getPathAnimator());
+                boxPath->removeFromParent();
+            }
+        }
+    }
+}
+
+void Canvas::selectedPathsBreakApart() {
+    if(mSelectedBoxes.isEmpty()) return;
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            ((VectorPath*)box)->breakPathsApart();
+        }
+    }
 }
 
 void Canvas::selectedPathsUnion() {

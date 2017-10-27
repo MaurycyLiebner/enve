@@ -54,6 +54,7 @@ public:
     void revertAllPointsForAllKeys();
     void shiftAllPoints(const int &by);
     void revertAllPoints();
+    void breakPathsApart();
 protected:
     PathAnimatorQSPtr mPathAnimator;
 };

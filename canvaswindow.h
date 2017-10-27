@@ -166,6 +166,7 @@ protected:
     bool mNoBoxesAwaitUpdate = true;
     bool mNoFileAwaitUpdate = true;
     QList<QThread*> mControlerThreads;
+    QThread *mFileControlerThread;
     QList<PaintControler*> mPaintControlers;
     QList<std::shared_ptr<Executable> > mUpdatablesAwaitingUpdate;
     QList<std::shared_ptr<Executable> > mFileUpdatablesAwaitingUpdate;
@@ -249,6 +250,8 @@ public slots:
     void pathsIntersectionAction();
     void pathsDivisionAction();
     void pathsExclusionAction();
+    void pathsCombineAction();
+    void pathsBreakApartAction();
 
     void renameCurrentCanvas(const QString &newName);
     void setCurrentCanvas(const int &id);
@@ -277,6 +280,7 @@ public slots:
     void cutAction();
     void duplicateAction();
     void selectAllAction();
+    void invertSelectionAction();
     void clearSelectionAction();
 
     void groupSelectedBoxes();

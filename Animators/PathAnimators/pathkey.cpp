@@ -371,3 +371,25 @@ void PathContainer::addNewPointAtTBetweenPts(const SkScalar &tVal,
         setElementPos(nextPtId - 1, nextPointStart - nextPoint);
     }
 }
+#include "skqtconversions.h"
+void PathContainer::applyTransformToPoints(const QMatrix &transform) {
+    for(int i = 1; i < mElementsPos.count(); i += 3) {
+        QPointF nodePos = SkPointToQPointF(mElementsPos.at(i));
+        QPointF newNodePos = transform.map(nodePos);
+        mElementsPos.replace(
+                    i,
+                    QPointFToSkPoint(
+                        newNodePos) );
+        QPointF startPos = nodePos + SkPointToQPointF(mElementsPos.at(i - 1));
+        mElementsPos.replace(
+                    i - 1,
+                    QPointFToSkPoint(
+                        transform.map(startPos) - newNodePos) );
+        QPointF endPos = nodePos + SkPointToQPointF(mElementsPos.at(i + 1));
+        mElementsPos.replace(
+                    i + 1,
+                    QPointFToSkPoint(
+                        transform.map(endPos) - newNodePos) );
+    }
+    mPathUpdateNeeded = true;
+}

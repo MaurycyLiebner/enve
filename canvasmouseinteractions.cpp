@@ -33,8 +33,36 @@ void Canvas::handleMovePathMousePressEvent() {
 }
 
 void Canvas::addCanvasActionToMenu(QMenu *menu) {
-    menu->addAction("Apply Transformation")->setObjectName(
-                "canvas_apply_transformation");
+    bool hasVectorPathBox = false;
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isVectorPath()) {
+            hasVectorPathBox = true;
+            break;
+        }
+    }
+    bool hasGroups = false;
+    foreach(BoundingBox *box, mSelectedBoxes) {
+        if(box->SWT_isBoxesGroup()) {
+            hasGroups = true;
+            break;
+        }
+    }
+    bool hasPathBox = false;
+    if(hasVectorPathBox) {
+        hasPathBox = true;
+    } else {
+        foreach(BoundingBox *box, mSelectedBoxes) {
+            if(box->SWT_isPathBox()) {
+                hasPathBox = true;
+                break;
+            }
+        }
+    }
+    if(hasVectorPathBox || hasGroups) {
+        menu->addAction("Apply Transformation")->setObjectName(
+                    "canvas_apply_transformation");
+    }
+    menu->addSeparator();
     menu->addAction("Create Link")->setObjectName(
                 "canvas_create_link");
     menu->addAction("Center Pivot")->setObjectName(
@@ -49,15 +77,18 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
     QAction *duplicateAction = menu->addAction("Duplicate");
     duplicateAction->setObjectName("canvas_duplicate");
     duplicateAction->setShortcut(Qt::CTRL + Qt::Key_D);
-    QAction *groupAction = menu->addAction("Group");
-    groupAction->setObjectName("canvas_group");
-    groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
-    QAction *ungroupAction = menu->addAction("Ungroup");
-    ungroupAction->setObjectName("canvas_ungroup");
-    ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
     QAction *deleteAction = menu->addAction("Delete");
     deleteAction->setObjectName("canvas_delete");
     deleteAction->setShortcut(Qt::Key_Delete);
+    menu->addSeparator();
+    QAction *groupAction = menu->addAction("Group");
+    groupAction->setObjectName("canvas_group");
+    groupAction->setShortcut(Qt::CTRL + Qt::Key_G);
+
+    QAction *ungroupAction = menu->addAction("Ungroup");
+    ungroupAction->setEnabled(hasGroups);
+    ungroupAction->setObjectName("canvas_ungroup");
+    ungroupAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_G);
     menu->addSeparator();
 
     QMenu *effectsMenu = menu->addMenu("Effects");
@@ -78,47 +109,57 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
     effectsMenu->addAction("Replace Color")->setObjectName(
                 "canvas_effects_replace_color");
 
-    QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
-    pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                "canvas_path_effects_discrete");
-    pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                "canvas_path_effects_duplicate");
-    pathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                "canvas_path_effect_sum");
+    if(hasPathBox) {
+        QMenu *pathEffectsMenu = menu->addMenu("Path Effects");
+        pathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                    "canvas_path_effects_discrete");
+        pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                    "canvas_path_effects_duplicate");
+        pathEffectsMenu->addAction("Operation Effect")->setObjectName(
+                    "canvas_path_effect_sum");
 
-    QMenu *fillPathEffectsMenu = menu->addMenu("Fill Effects");
-    fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                "canvas_fill_effects_discrete");
-    fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                "canvas_fill_effects_duplicate");
-    fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
-                "canvas_fill_effect_sum");
+        QMenu *fillPathEffectsMenu = menu->addMenu("Fill Effects");
+        fillPathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                    "canvas_fill_effects_discrete");
+        fillPathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                    "canvas_fill_effects_duplicate");
+        fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
+                    "canvas_fill_effect_sum");
 
-    QMenu *outlinePathEffectsMenu = menu->addMenu("Outline Effects");
-    outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
-                "canvas_outline_effects_discrete");
-    outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
-                "canvas_outline_effects_duplicate");
-//    fillPathEffectsMenu->addAction("Operation Effect")->setObjectName(
-//                "canvas_outline_effect_sum");
+        QMenu *outlinePathEffectsMenu = menu->addMenu("Outline Effects");
+        outlinePathEffectsMenu->addAction("Discrete Effect")->setObjectName(
+                    "canvas_outline_effects_discrete");
+        outlinePathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
+                    "canvas_outline_effects_duplicate");
+        outlinePathEffectsMenu->addAction("Operation Effect")->setObjectName(
+                    "canvas_outline_effect_sum");
+    }
 
     foreach(BoundingBox *box, mSelectedBoxes) {
         if(box->SWT_isPaintBox()) {
+            menu->addSeparator();
             menu->addAction("New Paint Frame")->setObjectName(
                         "canvas_new_paint_frame");
             menu->addAction("New Empty Paint Frame")->setObjectName(
                         "canvas_new_empty_paint_frame");
             menu->addAction("Setup Animation Frames")->setObjectName(
                         "canvas_setup_animation_frames");
+            menu->addSeparator();
+            menu->addAction("Load From Image")->setObjectName(
+                        "canvas_load_from_img");
             break;
         }
     }
 }
-
+#include <QFileDialog>
 #include "Paint/paintboxsettingsdialog.h"
 #include "customfpsdialog.h"
 bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
-    if(selectedAction->objectName() == "canvas_duplicate") {
+    if(selectedAction->objectName() == "canvas_copy") {
+        copyAction();
+    } if(selectedAction->objectName() == "canvas_cut") {
+        cutAction();
+    } if(selectedAction->objectName() == "canvas_duplicate") {
         duplicateSelectedBoxes();
     } else if(selectedAction->objectName() == "canvas_delete") {
         removeSelectedBoxesAndClearList();
@@ -199,6 +240,24 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
                 for(int i = firstFrame;
                     i < frameCount*frameStep; i += frameStep) {
                     paintBox->newEmptyPaintFrameAtFrame(i);
+                }
+            }
+        }
+    } else if(selectedAction->objectName() == "canvas_load_from_img") {
+        MainWindow::getInstance()->disableEventFilter();
+        QString importPath = QFileDialog::getOpenFileName(
+                                                MainWindow::getInstance(),
+                                                "Load From Image", "",
+                                                "Image Files (*.png *.jpg)");
+        MainWindow::getInstance()->enableEventFilter();
+        if(!importPath.isEmpty()) {
+            QImage img;
+            if(img.load(importPath)) {
+                foreach(BoundingBox *box, mSelectedBoxes) {
+                    if(box->SWT_isPaintBox()) {
+                        PaintBox *paintBox = (PaintBox*)box;
+                        paintBox->loadFromImage(img);
+                    }
                 }
             }
         }

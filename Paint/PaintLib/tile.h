@@ -183,6 +183,10 @@ public:
 
         updateDrawerFromDataArray();
     }
+    void finishSettingPixels();
+    void setPixel(const int &x, const int &y,
+                  const uchar &r, const uchar &g,
+                  const uchar &b, const uchar &a);
 private:
     bool mPaintInOtherThread;
 

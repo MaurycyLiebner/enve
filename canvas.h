@@ -50,6 +50,7 @@ protected:
     void updateRelBoundingRect();
 };
 
+extern bool boxesZSort(BoundingBox *box1, BoundingBox *box2);
 class Canvas : public BoxesGroup
 {
     Q_OBJECT
@@ -473,6 +474,9 @@ public:
         return mCurrentPreviewContainer->getByteCount();
     }
     int getMaxPreviewFrame(const int &minFrame, const int &maxFrame);
+    void selectedPathsCombine();
+    void selectedPathsBreakApart();
+    void invertSelectionAction();
 protected:
     Brush *mCurrentBrush;
     bool mStylusDrawing = false;

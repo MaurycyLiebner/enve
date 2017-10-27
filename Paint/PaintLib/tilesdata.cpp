@@ -189,6 +189,29 @@ void TilesData::move(const int &xT, const int &yT) {
     }
 }
 
+void TilesData::setImage(const QImage &img) {
+    clearTiles();
+    int tileX = 0;
+    int tileY = 0;
+    for(int i = 0; i < mNTileCols; i++) {
+        tileY = 0;
+        for(int j = 0; j < mNTileRows; j++) {
+            Tile *tileT = mTiles[j][i];
+            for(int ii = 0; ii < TILE_DIM; ii++) {
+                for(int jj = 0; jj < TILE_DIM; jj++) {
+                    QColor col = img.pixelColor(ii + tileX, jj + tileY);
+                    tileT->setPixel(ii, jj,
+                                    col.red(), col.green(),
+                                    col.blue(), col.alpha());
+                }
+            }
+            tileT->finishSettingPixels();
+            tileY += TILE_DIM;
+        }
+        tileX += TILE_DIM;
+    }
+}
+
 void TilesData::setSize(const ushort &width_t, const ushort &height_t) {
     if(mWidth == width_t && mHeight == height_t) return;
     ushort n_tile_cols_t = ceil(width_t/(qreal)TILE_DIM);

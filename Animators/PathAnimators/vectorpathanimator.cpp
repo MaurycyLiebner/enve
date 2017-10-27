@@ -429,11 +429,12 @@ void VectorPathAnimator::selectAllPoints(Canvas *canvas) {
     }
 }
 
-void VectorPathAnimator::applyTransformToPoints(
-        const QMatrix &transform) {
-    Q_FOREACH(NodePoint *point, mPoints) {
-        point->applyTransform(transform);
+void VectorPathAnimator::applyTransformToPoints(const QMatrix &transform) {
+    PathContainer::applyTransformToPoints(transform);
+    foreach(const std::shared_ptr<Key> &key, anim_mKeys) {
+        ((PathKey*)key.get())->applyTransformToPoints(transform);
     }
+    updateNodePointsFromElements();
 }
 
 MovablePoint *VectorPathAnimator::getPointAtAbsPos(

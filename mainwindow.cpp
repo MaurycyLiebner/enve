@@ -282,8 +282,7 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Duplicate",
                          mCanvasWindow, SLOT(duplicateAction()),
-                         Qt::SHIFT + Qt::Key_D, mEditMenu));
-    mEditMenu->addAction("Clone");
+                         Qt::CTRL + Qt::Key_D, mEditMenu));
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Delete",
                          mCanvasWindow, SLOT(deleteAction()),
@@ -291,18 +290,20 @@ void MainWindow::setupMenuBar() {
     mEditMenu->addSeparator();
     mEditMenu->addAction(new NoShortcutAction("Select All",
                          mCanvasWindow, SLOT(selectAllAction()),
-                         Qt::CTRL + Qt::Key_A, mEditMenu));
-    mEditMenu->addAction("Invert Selection");
+                         Qt::Key_A, mEditMenu));
+    mEditMenu->addAction(new NoShortcutAction("Invert Selection",
+                                              mCanvasWindow, SLOT(invertSelectionAction()),
+                                              Qt::Key_I, mEditMenu));
     mEditMenu->addAction(new NoShortcutAction("Clear Selection",
                          mCanvasWindow, SLOT(clearSelectionAction()),
-                         Qt::CTRL + Qt::SHIFT + Qt::Key_A, mEditMenu));
+                         Qt::ALT + Qt::Key_A, mEditMenu));
 
-    mSelectSameMenu = mEditMenu->addMenu("Select Same");
-    mSelectSameMenu->addAction("Fill and Stroke");
-    mSelectSameMenu->addAction("Fill Color");
-    mSelectSameMenu->addAction("Stroke Color");
-    mSelectSameMenu->addAction("Stroke Style");
-    mSelectSameMenu->addAction("Object Type");
+//    mSelectSameMenu = mEditMenu->addMenu("Select Same");
+//    mSelectSameMenu->addAction("Fill and Stroke");
+//    mSelectSameMenu->addAction("Fill Color");
+//    mSelectSameMenu->addAction("Stroke Color");
+//    mSelectSameMenu->addAction("Stroke Style");
+//    mSelectSameMenu->addAction("Object Type");
 
     mObjectMenu = mMenuBar->addMenu("Object");
 
@@ -368,9 +369,9 @@ void MainWindow::setupMenuBar() {
                          SLOT(pathsBreakApartAction()))->
             setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_K);
 
-    mEffectsMenu = mMenuBar->addMenu("Effects");
+//    mEffectsMenu = mMenuBar->addMenu("Effects");
 
-    mEffectsMenu->addAction("Blur");
+//    mEffectsMenu->addAction("Blur");
 
     mViewMenu = mMenuBar->addMenu("View");
 
@@ -403,7 +404,7 @@ void MainWindow::setupMenuBar() {
     mObjectsAndAnimationsDock = mPanelsMenu->addAction("Objects and Animations");
     mObjectsAndAnimationsDock->setCheckable(true);
     mObjectsAndAnimationsDock->setChecked(true);
-    mObjectsAndAnimationsDock->setShortcut(QKeySequence(Qt::Key_A));
+    mObjectsAndAnimationsDock->setShortcut(QKeySequence(Qt::Key_T));
 
     connect(mObjectsAndAnimationsDock, SIGNAL(toggled(bool)),
             mBottomDock,
@@ -1084,13 +1085,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *e) {
         if(isShiftPressed() && keyEvent->key() == Qt::Key_D) {
             return processKeyEvent(keyEvent);
         }
-        if(isCtrlPressed()) {
-            if(keyEvent->key() == Qt::Key_C ||
-               keyEvent->key() == Qt::Key_V ||
-               keyEvent->key() == Qt::Key_X ||
-               keyEvent->key() == Qt::Key_A) {
-                return processKeyEvent(keyEvent);
-            }
+        if(keyEvent->key() == Qt::Key_C ||
+           keyEvent->key() == Qt::Key_V ||
+           keyEvent->key() == Qt::Key_X ||
+           keyEvent->key() == Qt::Key_A ||
+           keyEvent->key() == Qt::Key_I) {
+            return processKeyEvent(keyEvent);
         } else if(keyEvent->key() == Qt::Key_Delete) {
             return processKeyEvent(keyEvent);
         }

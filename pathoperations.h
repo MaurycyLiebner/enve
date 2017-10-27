@@ -8,7 +8,6 @@ class MinimalNodePoint {
 public:
     MinimalNodePoint();
     MinimalNodePoint(QPointF ctrlStart, QPointF pos, QPointF ctrlEnd);
-    virtual ~MinimalNodePoint() {}
 
     void setNextPoint(MinimalNodePoint *point);
     void setPrevPoint(MinimalNodePoint *point);
@@ -39,12 +38,10 @@ private:
     bool mReversed = false;
 };
 
-class IntersectionNodePoint : public MinimalNodePoint
-{
+class IntersectionNodePoint : public MinimalNodePoint {
 public:
     IntersectionNodePoint();
     IntersectionNodePoint(QPointF start, QPointF pos, QPointF end);
-    ~IntersectionNodePoint();
 
     bool isIntersection();
 
@@ -62,7 +59,6 @@ class MinimalVectorPath;
 class FullVectorPath {
 public:
     FullVectorPath();
-
     void generateSinglePathPaths();
 
     //void generateFromPath(const QPainterPath &path);
@@ -76,7 +72,8 @@ public:
                        const bool &unionInterThis,
                        const bool &unionInterOther);
 
-    void getListOfGeneratedSeparatePaths(QList<MinimalVectorPath*> *separate, FullVectorPath *target);
+    void getListOfGeneratedSeparatePaths(QList<MinimalVectorPath*> *separate,
+                                         FullVectorPath *target);
 
     void addAllToVectorPath(PathAnimator *path);
 
@@ -99,7 +96,6 @@ public:
 
     void addPoint(MinimalNodePoint *point);
 
-    virtual ~MinimalVectorPath();
 
     MinimalNodePoint *getFirstPoint();
 
@@ -130,7 +126,6 @@ private:
     MinimalNodePoint *mLastPoint = NULL;
     QList<IntersectionNodePoint*> mIntersectionPoints;
     QPainterPath mPath;
-
 };
 
 class PointsBezierCubic;
@@ -140,7 +135,6 @@ public:
     BezierCubic(const QPointF &p1, const QPointF &c1,
                 const QPointF &c2, const QPointF &p2);
     BezierCubic(BezierCubic *cubic);
-    virtual ~BezierCubic() {}
 
     QPointF getPointAtT(const qreal &t);
 

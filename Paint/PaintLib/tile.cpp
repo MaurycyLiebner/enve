@@ -93,6 +93,30 @@ void processPaintDabs(const QList<Dab> &dabs,
     }
 }
 
+void Tile::finishSettingPixels() {
+    uchar *drawerData = mDrawer->data;
+    std::memcpy(drawerData, mData, TILE_DIM*TILE_DIM*4*sizeof(uchar));
+}
+
+void Tile::setPixel(const int &x, const int &y,
+                    const uchar &r, const uchar &g,
+                    const uchar &b, const uchar &a) {
+    int blueId = (x + y*TILE_DIM)*4;
+    if(mPaintInOtherThread) {
+        if(mDrawer->finished()) {
+            mData[blueId] = b;
+            mData[blueId + 1] = g;
+            mData[blueId + 2] = r;
+            mData[blueId + 3] = a;
+        }
+    } else {
+        mData[blueId] = b;
+        mData[blueId + 1] = g;
+        mData[blueId + 2] = r;
+        mData[blueId + 3] = a;
+    }
+}
+
 void Tile::duplicateFrom(Tile *tile) {
     if(mPaintInOtherThread) {
         if(mDrawer->finished() && tile->getTexTileDrawer()->finished()) {

@@ -176,6 +176,16 @@ void PaintBox::scheduleFinishSizeAndPosSetup() {
     mFinishSizeAndPosSetupScheduled = true;
 }
 
+void PaintBox::loadFromImage(const QImage &img) {
+    if(!prp_hasKeys()) {
+        mBottomRightPoint->setRelativePos(mTopLeftPoint->getRelativePos() +
+                                          QPointF(img.width(), img.height()));
+        finishSizeSetup();
+    }
+    mMainHandler->loadFromImage(img);
+    scheduleUpdate();
+}
+
 void PaintBox::scheduleFinishSizeSetup() {
     mFinishSizeSetupScheduled = true;
 }
