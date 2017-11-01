@@ -692,27 +692,45 @@ bool PointsBezierCubic::intersects(PointsBezierCubic *bezier,
        mBR.y() < bTL.y() || bBR.y() < mTL.y()) {
         return false;
     }
+
+    qreal thisAproxLen = 0.;
+    qreal bezierAproxLen = 0.;
+
+    QPointF lastPos = mP1;
+    for(int i = 0; i <= 100; i++) {
+        QPointF newPos = calcCubicBezierVal(mP1, mC1, mC2, mP2, i/100.);
+        thisAproxLen += pointToLen(lastPos - newPos);
+        lastPos = newPos;
+    }
+    lastPos = bP1;
+    for(int i = 0; i <= 100; i++) {
+        QPointF newPos = calcCubicBezierVal(bP1, bC1, bC2, bP2, i/100.);
+        bezierAproxLen += pointToLen(lastPos - newPos);
+        lastPos = newPos;
+    }
     qreal thisT = 0.;
+    qreal thisTStep = qMin(1., 5./thisAproxLen);
+    qreal maxThisT = 1.;
+
+    qreal bezierTStep = qMin(1., 5./bezierAproxLen);
+    qreal maxBezierT = 1.;
 
     QPointF lastBezierPos;
     QPointF currentBezierPos;
 
     QPointF lastThisPos = calcCubicBezierVal(mP1, mC1,
                                              mC2, mP2, 0.);
-    qreal thisTStep = 0.01;
-
     QPointF currentThisPos;
-    qreal bezierTStep = 0.01;
     qreal lastMinDistBetween = -1.;
     qreal lastDistBetween = -1.;
     QList<qrealInt> otherBezierInterTs;
-    while(thisT < .9999) {
+    while(thisT < maxThisT) {
         thisT = thisT + thisTStep;
         currentThisPos = calcCubicBezierVal(mP1, mC1,
-                                            mC2, mP2, thisT);
-//        if(pointToLen(currentThisPos - lastThisPos) < lastMinDistBetween*0.5) {
-//            continue;
-//        }
+                                            mC2, mP2, qMin(1., thisT));
+        if(pointToLen(currentThisPos - lastThisPos) < lastMinDistBetween*0.25) {
+            continue;
+        }
 
         currentBezierPos = calcCubicBezierVal(bP1, bC1,
                                               bC2, bP2,
@@ -722,10 +740,10 @@ bool PointsBezierCubic::intersects(PointsBezierCubic *bezier,
 
         qreal bezierT = 0.;
         lastMinDistBetween = 1000000.;
-        while(bezierT < 0.9999) {
+        while(bezierT < maxBezierT) {
             bezierT = bezierT + bezierTStep;
             currentBezierPos = calcCubicBezierVal(bP1, bC1,
-                                                  bC2, bP2, bezierT);
+                                                  bC2, bP2, qMin(1., bezierT));
             lastDistBetween = pointToLen(currentBezierPos -
                                          currentThisPos);
             if(lastDistBetween < lastMinDistBetween) {
@@ -848,7 +866,7 @@ IntersectionNodePoint *PointsBezierCubic::addIntersectionPointAt(
                 &sp2, &sc2, &sc3,
                 tVal);
     IntersectionNodePoint *newPoint =
-            new IntersectionNodePoint(sc2, sp2, sc3);
+            new IntersectionNodePoint(sc2, pos, sc3);
     mParentPath->addIntersectionPoint(newPoint);
     mMPP1->setEndCtrlPos(sc1);
     mMPP1->setNextPoint(newPoint);
