@@ -12,7 +12,7 @@ public:
     ComplexAnimator();
     ~ComplexAnimator();
 
-    void ca_addChildAnimator(Property *childAnimator);
+    void ca_addChildAnimator(Property *childAnimator, const int &id = INT_MAX);
     void ca_removeChildAnimator(Property *removeAnimator);
     void ca_swapChildAnimators(Property *animator1, Property *animator2);
     void ca_moveChildInList(Property *child,
@@ -72,6 +72,8 @@ public:
     virtual void ca_removeAllChildAnimators();
     virtual Property *ca_getFirstDescendantWithName(const QString &name);
 public slots:
+    void ca_replaceChildAnimator(Property *childAnimator,
+                                 Property *replaceWith);
     void prp_setRecording(const bool &rec);
 
     virtual void ca_addDescendantsKey(Key *key);

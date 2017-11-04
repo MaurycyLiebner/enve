@@ -62,12 +62,12 @@ SkPath Rectangle::getPathAtRelFrame(const int &relFrame) {
     SkPath path;
     SkPoint topLeft =
             QPointFToSkPoint(mTopLeftPoint->
-                                getCurrentPointValueAtRelFrame(relFrame));
+                                getCurrentEffectivePointValueAtRelFrame(relFrame));
     SkPoint bottomRight =
             QPointFToSkPoint(mBottomRightPoint->
-                                getCurrentPointValueAtRelFrame(relFrame));
+                                getCurrentEffectivePointValueAtRelFrame(relFrame));
     QPointF radiusAtFrame =
-            mRadiusPoint->getCurrentPointValueAtRelFrame(relFrame);
+            mRadiusPoint->getCurrentEffectivePointValueAtRelFrame(relFrame);
     path.addRoundRect(SkRect::MakeLTRB(topLeft.x(), topLeft.y(),
                                        bottomRight.x(), bottomRight.y()),
                       radiusAtFrame.x(), radiusAtFrame.y());

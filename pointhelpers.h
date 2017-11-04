@@ -12,7 +12,7 @@ enum CtrlsMode : short {
     CTRLS_CORNER
 };
 
-extern qreal qRandF(qreal fMin, qreal fMax);
+extern qreal qRandF(const qreal &fMin, const qreal &fMax);
 
 extern QPointF symmetricToPos(QPointF toMirror,
                               QPointF mirrorCenter);
@@ -70,6 +70,13 @@ extern qreal getTforBezierPoint(const QPointF &p0,
                                 const QPointF &p,
                                 qreal *error = NULL);
 
+extern qreal getBezierTValueForX(const qreal &x0,
+                                 const qreal &x1,
+                                 const qreal &x2,
+                                 const qreal &x3,
+                                 const qreal &x,
+                                 qreal *error = NULL);
+
 
 extern qreal qMin4(qreal v1, qreal v2,
                    qreal v3, qreal v4);
@@ -113,5 +120,13 @@ extern QPointF getPointClosestOnPathTo(const QPainterPath &path,
                                        QPointF relPos,
                                        qreal xRadiusScaling,
                                        qreal yRadiusScaling);
+
+extern qreal getBezierTValueForXAssumeNoOverlapGrowingOnly(const qreal &x0,
+                                                           const qreal &x1,
+                                                           const qreal &x2,
+                                                           const qreal &x3,
+                                                           const qreal &x,
+                                                           const qreal &maxError,
+                                                           qreal *error = NULL);
 
 #endif // POINTHELPERS_H

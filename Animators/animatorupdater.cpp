@@ -201,3 +201,12 @@ void PaintBoxSizeUpdaterTL::updateFinal() {
     mTarget->scheduleFinishSizeAndPosSetup();
     mTarget->scheduleUpdate();
 }
+
+RandomQrealGeneratorUpdater::RandomQrealGeneratorUpdater(
+        RandomQrealGenerator *target) {
+    mTarget = target;
+}
+#include "randomqrealgenerator.h"
+void RandomQrealGeneratorUpdater::update() {
+    mTarget->generateData();
+}

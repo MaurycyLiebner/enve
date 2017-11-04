@@ -9,7 +9,7 @@
 #define v2to2div3 1.58740105197
 #include <QList>
 
-qreal qRandF(qreal fMin, qreal fMax) {
+qreal qRandF(const qreal &fMin, const qreal &fMax) {
     qreal f = (qreal)qrand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
@@ -142,11 +142,11 @@ qreal qclamp(qreal val, qreal min, qreal max) {
 }
 
 void getTValuesforBezier1D(const qreal &x0n,
-                              const qreal &x1n,
-                              const qreal &x2n,
-                              const qreal &x3n,
-                              const qreal &xn,
-                              QList<std::complex<double> > *list) {
+                          const qreal &x1n,
+                          const qreal &x2n,
+                          const qreal &x3n,
+                          const qreal &xn,
+                          QList<std::complex<double> > *list) {
     std::complex<double> i = std::complex<double>(0., 1.);
     std::complex<double> x0 = std::complex<double>(x0n, 0.);
     std::complex<double> x1 = std::complex<double>(x1n, 0.);
@@ -243,6 +243,80 @@ qreal getTforBezierPoint(const qreal &x0,
     if(error != NULL) *error = minErrorT;
 
     return bestT;
+}
+
+
+qreal getBezierTValueForX(const qreal &x0,
+                         const qreal &x1,
+                         const qreal &x2,
+                         const qreal &x3,
+                         const qreal &x,
+                         qreal *error) {
+    if(qAbs(x0 - x) < 0.01) return x0;
+    if(qAbs(x3 - x) < 0.01) return x3;
+
+    QList<std::complex<double> > xValues;
+
+    getTValuesforBezier1D(x0, x1, x2, x3, x, &xValues);
+    qreal bestT = 0.;
+    qreal minErrorT = 1000000.;
+
+    Q_FOREACH(const std::complex<double> &xVal, xValues) {
+        qreal errorT = qAbs(calcCubicBezierVal(x0, x1, x2, x3,
+                                          xVal.real()) - x);
+        if(errorT < minErrorT) {
+            minErrorT = errorT;
+            bestT = xVal.real();
+        }
+    }
+
+    if(error != NULL) *error = minErrorT;
+
+    return bestT;
+}
+
+qreal getBezierTValueForXAssumeNoOverlapGrowingOnly(const qreal &x0,
+                         const qreal &x1,
+                         const qreal &x2,
+                         const qreal &x3,
+                         const qreal &x,
+                         const qreal &minT,
+                         const qreal &maxT,
+                         const qreal &maxError,
+                         qreal *error) {
+    qreal tGuess = (maxT + minT)*0.5;
+    qreal guessVal = calcCubicBezierVal(x0, x1, x2, x3, tGuess);
+    qreal errorT = qAbs(guessVal - x);
+    if(errorT < maxError) {
+        if(error != NULL) {
+            *error = errorT;
+        }
+        return tGuess;
+    }
+    if(guessVal > x) {
+        return getBezierTValueForXAssumeNoOverlapGrowingOnly(x0, x1, x2, x3, x,
+                                           minT, tGuess, maxError, error);
+    }
+    return getBezierTValueForXAssumeNoOverlapGrowingOnly(x0, x1, x2, x3, x,
+                                       tGuess, maxT, maxError, error);
+}
+
+qreal getBezierTValueForXAssumeNoOverlapGrowingOnly(const qreal &x0,
+                         const qreal &x1,
+                         const qreal &x2,
+                         const qreal &x3,
+                         const qreal &x,
+                         const qreal &maxError,
+                         qreal *error) {
+    if(x0 > x3) {
+        return getBezierTValueForXAssumeNoOverlapGrowingOnly(x3, x2, x1, x0, x,
+                                                             maxError, error);
+    }
+    if(qAbs(x0 - x) < 0.01) return x0;
+    if(qAbs(x3 - x) < 0.01) return x3;
+    return getBezierTValueForXAssumeNoOverlapGrowingOnly(x0, x1, x2, x3,
+                                                         x, 0., 1., maxError,
+                                                         error);
 }
 
 qreal getTforBezierPoint(const QPointF &p0,

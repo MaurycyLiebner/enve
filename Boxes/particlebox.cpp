@@ -578,43 +578,43 @@ void ParticleEmitter::generateParticles() {
     bool reuseParticle = nReuseParticles > 0;
 
     int totalNeededParticles = 0;
-    QPointF lastPos = mPos->getCurrentPointValueAtRelFrame(mMinFrame);
+    QPointF lastPos = mPos->getCurrentEffectivePointValueAtRelFrame(mMinFrame);
     for(int i = mMinFrame; i < mMaxFrame; i++) {
         qreal srcVelInfl =
-                mSrcVelInfl->getCurrentValueAtRelFrame(i);
+                mSrcVelInfl->getCurrentEffectiveValueAtRelFrame(i);
         qreal iniVelocity =
-                mIniVelocity->getCurrentValueAtRelFrame(i);
+                mIniVelocity->getCurrentEffectiveValueAtRelFrame(i);
         qreal iniVelocityVar =
-                mIniVelocityVar->getCurrentValueAtRelFrame(i);
+                mIniVelocityVar->getCurrentEffectiveValueAtRelFrame(i);
         qreal iniVelocityAngle =
-                mIniVelocityAngle->getCurrentValueAtRelFrame(i);
+                mIniVelocityAngle->getCurrentEffectiveValueAtRelFrame(i);
         qreal iniVelocityAngleVar =
-                mIniVelocityAngleVar->getCurrentValueAtRelFrame(i);
+                mIniVelocityAngleVar->getCurrentEffectiveValueAtRelFrame(i);
         qreal particlesPerFrame =
-                mParticlesPerSecond->getCurrentValueAtRelFrame(i)/24.;
+                mParticlesPerSecond->getCurrentEffectiveValueAtRelFrame(i)/24.;
         qreal particlesFrameLifetime =
-                mParticlesFrameLifetime->getCurrentValueAtRelFrame(i);
+                mParticlesFrameLifetime->getCurrentEffectiveValueAtRelFrame(i);
         QPointF pos =
-                mPos->getCurrentPointValueAtRelFrame(i);
+                mPos->getCurrentEffectivePointValueAtRelFrame(i);
         qreal width =
-                mWidth->getCurrentValueAtRelFrame(i);
+                mWidth->getCurrentEffectiveValueAtRelFrame(i);
         qreal velocityVar =
-                mVelocityRandomVar->getCurrentValueAtRelFrame(i);
+                mVelocityRandomVar->getCurrentEffectiveValueAtRelFrame(i);
         qreal velocityVarPeriod =
-                mVelocityRandomVarPeriod->getCurrentValueAtRelFrame(i);
+                mVelocityRandomVarPeriod->getCurrentEffectiveValueAtRelFrame(i);
         QPointF acceleration =
-                mAcceleration->getCurrentPointValueAtRelFrame(i)/24.;
+                mAcceleration->getCurrentEffectivePointValueAtRelFrame(i)/24.;
         qreal finalScale =
-                mParticlesSizeDecay->getCurrentValueAtRelFrame(i);
+                mParticlesSizeDecay->getCurrentEffectiveValueAtRelFrame(i);
         qreal finalOpacity =
-                mParticlesOpacityDecay->getCurrentValueAtRelFrame(i);
+                mParticlesOpacityDecay->getCurrentEffectiveValueAtRelFrame(i);
         qreal decayFrames =
-                mParticlesDecayFrames->getCurrentValueAtRelFrame(i);
+                mParticlesDecayFrames->getCurrentEffectiveValueAtRelFrame(i);
         qreal particleSize =
-                mParticleSize->getCurrentValueAtRelFrame(i);
+                mParticleSize->getCurrentEffectiveValueAtRelFrame(i);
         qreal particleSizeVar =
-                mParticleSizeVar->getCurrentValueAtRelFrame(i);
-        qreal length = mParticleLength->getCurrentValueAtRelFrame(i);
+                mParticleSizeVar->getCurrentEffectiveValueAtRelFrame(i);
+        qreal length = mParticleLength->getCurrentEffectiveValueAtRelFrame(i);
 
         QPointF srcVel = (pos - lastPos)*srcVelInfl;
 

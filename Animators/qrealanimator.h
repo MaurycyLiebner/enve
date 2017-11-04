@@ -10,7 +10,8 @@
 class QrealKey;
 class QrealPoint;
 class QrealAnimatorValueSlider;
-
+class RandomQrealGenerator;
+typedef QSharedPointer<RandomQrealGenerator> RandomQrealGeneratorQSPtr;
 #define Q_FOREACHQK(key, keysList) Q_FOREACH(Key *keyK, keysList) { key = (QrealKey*)keyK;
 
 #include <QDoubleSpinBox>
@@ -30,6 +31,7 @@ public:
 
     qreal qra_getValueAtAbsFrame(const int &frame);
     qreal qra_getCurrentValue() const;
+    qreal qra_getCurrentEffectiveValue();
     void qra_setCurrentValue(qreal newValue,
                              const bool &saveUndoRedo = false,
                              const bool &finish = false,
@@ -170,11 +172,20 @@ public:
         Property::prp_updateAfterChangedRelFrameRange(minFrame, maxFrame);
     }
 
+    void setGenerator(RandomQrealGenerator *generator);
+
     bool SWT_isQrealAnimator() { return true; }
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
     Key *readKey(QIODevice *target);
+    bool qra_hasNoise();
+
+    qreal qra_getEffectiveValueAtRelFrame(const int &frame) const;
+    qreal qra_getEffectiveValueAtAbsFrame(const int &frame);
+    qreal getCurrentEffectiveValueAtRelFrame(const int &frame) const;
+    qreal getCurrentEffectiveValueAtAbsFrame(const int &frame);
 protected:
+    RandomQrealGeneratorQSPtr mRandomGenerator;
     std::map<void*, QColor> mAnimatorColors;
 
     bool mMinMaxValuesFrozen = false;

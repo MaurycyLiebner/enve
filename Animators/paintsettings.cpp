@@ -530,7 +530,7 @@ void StrokeSettings::setStrokerSettingsSk(SkStroke *stroker) {
 
 void StrokeSettings::setStrokerSettingsForRelFrameSk(const int &relFrame,
                                                      SkStroke *stroker) {
-    stroker->setWidth(mLineWidth->qra_getValueAtRelFrame(relFrame));
+    stroker->setWidth(mLineWidth->qra_getEffectiveValueAtRelFrame(relFrame));
     stroker->setCap(QCapToSkCap(mCapStyle));
     stroker->setJoin(QJoinToSkJoin(mJoinStyle));
 }

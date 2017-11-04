@@ -164,7 +164,7 @@ void Bone::moveTipPointToRelPos(const QPointF &relPos) {
         qreal currLen = pointToLen(mTipPoint->getRelativePos() -
                                    mRootPoint->getRelativePos());
         tipVect = scalePointToNewLen(tipVect, currLen);
-        mTipPoint->moveToRel(mRootPoint->getCurrentPointValue() + tipVect);
+        mTipPoint->moveToRel(mRootPoint->getCurrentEffectivePointValue() + tipVect);
     } else {
         mTipPoint->moveToRel(relPos);
     }

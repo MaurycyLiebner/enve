@@ -94,20 +94,20 @@ Color ColorAnimator::getCurrentColor() const {
 Color ColorAnimator::getColorAtRelFrame(const int &relFrame) {
     Color color;
     if(mColorMode == RGBMODE) {
-        color.setRGB(mVal1Animator->qra_getValueAtRelFrame(relFrame),
-                     mVal2Animator->qra_getValueAtRelFrame(relFrame),
-                     mVal3Animator->qra_getValueAtRelFrame(relFrame),
-                     mAlphaAnimator->qra_getValueAtRelFrame(relFrame) );
+        color.setRGB(mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
     } else if(mColorMode == HSVMODE) {
-        color.setHSV(mVal1Animator->qra_getValueAtRelFrame(relFrame),
-                     mVal2Animator->qra_getValueAtRelFrame(relFrame),
-                     mVal3Animator->qra_getValueAtRelFrame(relFrame),
-                     mAlphaAnimator->qra_getValueAtRelFrame(relFrame) );
+        color.setHSV(mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
     } else { // HSLMODE
-        color.setHSL(mVal1Animator->qra_getValueAtRelFrame(relFrame),
-                     mVal2Animator->qra_getValueAtRelFrame(relFrame),
-                     mVal3Animator->qra_getValueAtRelFrame(relFrame),
-                     mAlphaAnimator->qra_getValueAtRelFrame(relFrame) );
+        color.setHSL(mVal1Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mVal2Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mVal3Animator->qra_getEffectiveValueAtRelFrame(relFrame),
+                     mAlphaAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
     }
     return color;
 }

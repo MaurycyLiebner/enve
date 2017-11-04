@@ -422,7 +422,9 @@ void Canvas::setCurrentPreviewContainer(CacheContainer *cont) {
 //        } else if(!mRendering) {
 //            mCurrentPreviewContainer->setBlocked(false);
 //        }
-        mCurrentPreviewContainer->setBlocked(false);
+        if(!mRendering) {
+            mCurrentPreviewContainer->setBlocked(false);
+        }
     }
     if(cont == NULL) {
         mCurrentPreviewContainer.reset();

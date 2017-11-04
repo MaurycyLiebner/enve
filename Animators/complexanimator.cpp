@@ -12,6 +12,14 @@ ComplexAnimator::~ComplexAnimator() {
     anim_removeAllKeys();
 }
 
+void ComplexAnimator::ca_replaceChildAnimator(Property *childAnimator,
+                                              Property *replaceWith) {
+    int id = getChildPropertyIndex(childAnimator);
+    if(id == -1) return;
+    ca_removeChildAnimator(childAnimator);
+    ca_addChildAnimator(replaceWith, id);
+}
+
 int ComplexAnimator::ca_getNumberOfChildren() {
     return ca_mChildAnimators.count();
 }
@@ -88,8 +96,9 @@ ComplexKey *ComplexAnimator::ca_getKeyCollectionAtRelFrame(const int &frame) {
     return (ComplexKey *) anim_getKeyAtRelFrame(frame);
 }
 
-void ComplexAnimator::ca_addChildAnimator(Property *childAnimator) {
-    ca_mChildAnimators << childAnimator->ref<Property>();
+void ComplexAnimator::ca_addChildAnimator(Property *childAnimator,
+                                          const int &id) {
+    ca_mChildAnimators.insert(id, childAnimator->ref<Property>());
     childAnimator->prp_setUpdater(prp_mUpdater.get());
     childAnimator->prp_setParentFrameShift(prp_getFrameShift());
     connect(childAnimator, SIGNAL(prp_updateWholeInfluenceRange()),
@@ -102,25 +111,26 @@ void ComplexAnimator::ca_addChildAnimator(Property *childAnimator) {
             this, SLOT(ca_addDescendantsKey(Key*)));
     connect(childAnimator, SIGNAL(prp_removingKey(Key*)),
             this, SLOT(ca_removeDescendantsKey(Key*)));
+    connect(childAnimator, SIGNAL(prp_replaceWith(Property*,Property*)),
+            this, SLOT(ca_replaceChildAnimator(Property*,Property*)));
 
     childAnimator->prp_addAllKeysToComplexAnimator(this);
     ca_childAnimatorIsRecordingChanged();
     childAnimator->prp_setAbsFrame(anim_mCurrentAbsFrame);
     //updateKeysPath();
 
-    SWT_addChildAbstractionForTargetToAll(childAnimator);
+    SWT_addChildAbstractionForTargetToAllAt(childAnimator, id);
 
     prp_callUpdater();
 }
 
 int ComplexAnimator::getChildPropertyIndex(Property *child) {
-    int index = -1;
     for(int i = 0; i < ca_mChildAnimators.count(); i++) {
         if(ca_mChildAnimators.at(i) == child) {
-            index = i;
+            return i;
         }
     }
-    return index;
+    return -1;
 }
 
 void ComplexAnimator::ca_updateDescendatKeyFrame(Key *key) {

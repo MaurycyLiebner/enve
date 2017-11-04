@@ -156,6 +156,19 @@ public:
 private:
     SingleSound *mTarget;
 };
+
+class RandomQrealGenerator;
+class RandomQrealGeneratorUpdater : public AnimatorUpdater {
+public:
+    RandomQrealGeneratorUpdater(RandomQrealGenerator *target);
+
+    void update();
+
+    void frameChangeUpdate() {}
+private:
+    RandomQrealGenerator *mTarget;
+};
+
 class PaintBox;
 class PaintBoxSizeUpdaterBR : public AnimatorUpdater {
 public:

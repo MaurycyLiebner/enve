@@ -58,6 +58,9 @@ public:
     void readProperty(QIODevice *target);
 
     bool getBeingTransformed();
+    QPointF getCurrentEffectivePointValueAtAbsFrame(const int &frame) const;
+    QPointF getCurrentEffectivePointValueAtRelFrame(const int &frame) const;
+    QPointF getCurrentEffectivePointValue() const;
 protected:
     QrealAnimatorQSPtr mXAnimator;
     QrealAnimatorQSPtr mYAnimator;

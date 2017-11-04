@@ -305,14 +305,12 @@ void VectorPathEdge::setPressedT(const qreal &t) {
 
 void VectorPathEdge::getNearestAbsPosAndT(const QPointF &absPos,
                                 QPointF *nearestPoint,
-                                qreal *t,
-                                qreal *error) {
+                                qreal *t) {
     *t = getTforBezierPoint(mPoint1->getAbsolutePos(),
                             mPoint1->getEndCtrlPtAbsPos(),
                             mPoint2->getStartCtrlPtAbsPos(),
                             mPoint2->getAbsolutePos(),
-                            absPos,
-                            error);
+                            absPos);
     *nearestPoint = getAbsPosAtT(*t);
 }
 
@@ -342,10 +340,9 @@ EdgeInfluencePoints::EdgeInfluencePoints(BonePoint *bonePoint) {
 void EdgeInfluencePoints::addInfluencePointAtAbsPos(const QPointF &absPos) {
     qreal tAtPos;
     QPointF nearestPoint;
-    qreal error;
     mParentEdge->getNearestAbsPosAndT(absPos,
                                       &nearestPoint,
-                                      &tAtPos, &error);
+                                      &tAtPos);
     if(pointToLen(nearestPoint - absPos) > MIN_WIDGET_HEIGHT/2) return;
     removeInfluencePointNearAbsPos(absPos);
     addInfluencePoint(tAtPos );

@@ -195,7 +195,8 @@ SOURCES += main.cpp\
     Paint/PaintLib/tilesdata.cpp \
     customfpsdialog.cpp \
     BoxesList/boxscrollarea.cpp \
-    Properties/comboboxproperty.cpp
+    Properties/comboboxproperty.cpp \
+    Animators/randomqrealgenerator.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -350,7 +351,8 @@ HEADERS  += mainwindow.h \
     Paint/PaintLib/tilesdata.h \
     customfpsdialog.h \
     BoxesList/boxscrollarea.h \
-    Properties/comboboxproperty.h
+    Properties/comboboxproperty.h \
+    Animators/randomqrealgenerator.h
 
 RESOURCES += \
     resources.qrc

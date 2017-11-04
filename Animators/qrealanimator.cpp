@@ -10,6 +10,7 @@
 #include "BoxesList/boxsinglewidget.h"
 #include "qrealpoint.h"
 #include "qrealkey.h"
+#include "randomqrealgenerator.h"
 
 QrealAnimator::QrealAnimator() : Animator() {
 
@@ -100,8 +101,7 @@ void QrealAnimator::freezeMinMaxValues() {
 }
 
 qreal QrealAnimator::getCurrentValueAtAbsFrame(const int &frame) {
-    if(frame == anim_mCurrentAbsFrame) return mCurrentValue;
-    return qra_getValueAtAbsFrame(frame);
+    return getCurrentValueAtRelFrame(prp_absFrameToRelFrame(frame));
 }
 
 qreal QrealAnimator::getCurrentValueAtRelFrame(const int &frame) const {
@@ -109,12 +109,57 @@ qreal QrealAnimator::getCurrentValueAtRelFrame(const int &frame) const {
     return qra_getValueAtRelFrame(frame);
 }
 
+qreal QrealAnimator::getCurrentEffectiveValueAtAbsFrame(const int &frame) {
+    return getCurrentEffectiveValueAtRelFrame(prp_absFrameToRelFrame(frame));
+}
+
+qreal QrealAnimator::getCurrentEffectiveValueAtRelFrame(const int &frame) const {
+    if(mRandomGenerator.isNull()) {
+        return getCurrentValueAtRelFrame(frame);
+    }
+    return getCurrentValueAtRelFrame(frame) +
+            mRandomGenerator->getDevAtRelFrame(frame);
+}
+
+
 qreal QrealAnimator::qra_getValueAtAbsFrame(const int &frame) {
+    return qra_getValueAtRelFrame(prp_absFrameToRelFrame(frame));
+}
+
+qreal QrealAnimator::qra_getEffectiveValueAtAbsFrame(const int &frame) {
     return qra_getValueAtRelFrame(prp_absFrameToRelFrame(frame));
 }
 
 QrealKey *QrealAnimator::getQrealKeyAtId(const int &id) const {
     return (QrealKey*)anim_mKeys.at(id).get();
+}
+
+void QrealAnimator::setGenerator(RandomQrealGenerator *generator) {
+    if(generator == mRandomGenerator.data()) return;
+    if(mRandomGenerator.isNull()) {
+        emit prp_replaceWith(this, generator);
+        generator->ca_addChildAnimator(this);
+    } else {
+        if(generator == NULL) {
+            emit mRandomGenerator->prp_replaceWith(mRandomGenerator.data(),
+                                                   this);
+        } else {
+            emit mRandomGenerator->prp_replaceWith(mRandomGenerator.data(),
+                                                   generator);
+            generator->ca_addChildAnimator(this);
+        }
+    }
+    if(generator == NULL) {
+        mRandomGenerator.reset();
+    } else {
+        generator->prp_setName(prp_mName);
+        mRandomGenerator = generator->ref<RandomQrealGenerator>();
+    }
+    prp_updateInfluenceRangeAfterChanged();
+}
+
+bool QrealAnimator::qra_hasNoise() {
+    return !mRandomGenerator.isNull();
 }
 
 qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame) const {
@@ -130,6 +175,15 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame) const {
         }
     }
     return mCurrentValue;
+}
+
+qreal QrealAnimator::qra_getEffectiveValueAtRelFrame(const int &frame) const {
+    if(mRandomGenerator.isNull()) {
+        return qra_getValueAtRelFrame(frame);
+    } else {
+        return qra_getValueAtRelFrame(frame) +
+                mRandomGenerator->getDevAtRelFrame(frame);
+    }
 }
 
 qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame,
@@ -149,6 +203,13 @@ qreal QrealAnimator::qra_getValueAtRelFrame(const int &frame,
 
 qreal QrealAnimator::qra_getCurrentValue() const {
     return mCurrentValue;
+}
+
+qreal QrealAnimator::qra_getCurrentEffectiveValue() {
+    if(mRandomGenerator.isNull()) {
+        return mCurrentValue;
+    }
+    return mCurrentValue + mRandomGenerator->getDevAtRelFrame(anim_mCurrentRelFrame);
 }
 
 void QrealAnimator::qra_setCurrentValue(qreal newValue,

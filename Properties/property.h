@@ -30,8 +30,8 @@ public:
     virtual int prp_getFrameShift() const;
     virtual int prp_getParentFrameShift() const;
 
-    virtual int prp_absFrameToRelFrame(const int &absFrame);
-    virtual int prp_relFrameToAbsFrame(const int &relFrame);
+    int prp_absFrameToRelFrame(const int &absFrame) const;
+    int prp_relFrameToAbsFrame(const int &relFrame) const;
 
     virtual void prp_drawKeys(QPainter *p,
                               const qreal &pixelsPerFrame,
@@ -141,6 +141,10 @@ public:
     virtual void writeProperty(QIODevice *device) {
         Q_UNUSED(device);
     }
+
+    AnimatorUpdater *prp_getUpdater() {
+        return prp_mUpdater.get();
+    }
 public slots:
     void prp_callUpdater();
 
@@ -175,6 +179,7 @@ signals:
                                   const int &maxFrame);
     void prp_removingKey(Key *);
     void prp_addingKey(Key *);
+    void prp_replaceWith(Property *, Property *);
 protected:
     int prp_mParentFrameShift = 0;
     AnimatorUpdaterStdSPtr prp_mUpdater;

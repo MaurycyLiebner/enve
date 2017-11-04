@@ -14,6 +14,7 @@
 #include "Properties/boxtargetproperty.h"
 #include "Properties/comboboxproperty.h"
 #include "Animators/qstringanimator.h"
+#include "Animators/randomqrealgenerator.h"
 
 QPixmap *BoxSingleWidget::VISIBLE_PIXMAP;
 QPixmap *BoxSingleWidget::INVISIBLE_PIXMAP;
@@ -565,6 +566,14 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                 if(target->SWT_isPixmapEffect() || target->SWT_isPathEffect()) {
                     menu.addSeparator();
                     menu.addAction("Delete Effect")->setObjectName("swt_delete_effect");
+                } else if(target->SWT_isQrealAnimator()) {
+                    if(((QrealAnimator*)target)->qra_hasNoise() ) {
+                        menu.addSeparator();
+                        menu.addAction("Remove Noise")->setObjectName("swt_remove_random_generator");
+                    } else {
+                        menu.addSeparator();
+                        menu.addAction("Add Noise")->setObjectName("swt_add_random_generator");
+                    }
                 }
             }
         }
@@ -683,6 +692,14 @@ void BoxSingleWidget::mousePressEvent(QMouseEvent *event) {
                     }
 
                 }
+            } else if(selectedAction->objectName() == "swt_add_random_generator") {
+                QrealAnimator *qrealTarget = (QrealAnimator*)target;
+                RandomQrealGenerator *randGen = new RandomQrealGenerator(0, 9999);
+                randGen->prp_setBlockedUpdater(qrealTarget->prp_getUpdater());
+                qrealTarget->setGenerator(randGen);
+            } else if(selectedAction->objectName() == "swt_remove_random_generator") {
+                QrealAnimator *qrealTarget = (QrealAnimator*)target;
+                qrealTarget->setGenerator(NULL);
             } else if(selectedAction->objectName() == "swt_delete_key") {
                 Animator *animTarget = (Animator*)target;
                 animTarget->anim_deleteCurrentKey();

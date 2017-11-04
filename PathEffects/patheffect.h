@@ -205,7 +205,7 @@ public:
     void readProperty(QIODevice *target);
 
     bool hasReasonsNotToApplyUglyTransform() {
-        return mBoxTarget->getTarget() != NULL;
+        return true;//mBoxTarget->getTarget() != NULL;
     }
 private:
     PathBox *mParentPathBox;

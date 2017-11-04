@@ -37,11 +37,11 @@ int main(int argc, char *argv[]) {
 //    QSurfaceFormat::setDefaultFormat(format);
 
     MainWindow w;
-#ifdef QT_DEBUG
-    qint64 pId = QCoreApplication::applicationPid();
-    QProcess *process = new QProcess(&w);
-    process->start("prlimit --data=1500000000 --pid " + QString::number(pId));
-#endif
+//#ifdef QT_DEBUG
+//    qint64 pId = QCoreApplication::applicationPid();
+//    QProcess *process = new QProcess(&w);
+//    process->start("prlimit --data=1500000000 --pid " + QString::number(pId));
+//#endif
 
     w.show();
 

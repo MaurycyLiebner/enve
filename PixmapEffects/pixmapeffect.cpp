@@ -133,7 +133,7 @@ void BlurEffect::duplicateBlurRadiusAnimatorFrom(
 PixmapEffectRenderData *BlurEffect::getPixmapEffectRenderDataForRelFrame(
                                     const int &relFrame) {
     BlurEffectRenderData *renderData = new BlurEffectRenderData();
-    renderData->blurRadius = mBlurRadius->getCurrentValueAtRelFrame(relFrame);
+    renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mBlurRadius->prp_hasKeys();
     renderData->highQuality = mHighQuality->getValue();
     return renderData;
@@ -174,12 +174,12 @@ ShadowEffect::ShadowEffect(qreal radius) : PixmapEffect(EFFECT_SHADOW) {
 PixmapEffectRenderData *ShadowEffect::getPixmapEffectRenderDataForRelFrame(
                                     const int &relFrame) {
     ShadowEffectRenderData *renderData = new ShadowEffectRenderData();
-    renderData->blurRadius = mBlurRadius->getCurrentValueAtRelFrame(relFrame);
+    renderData->blurRadius = mBlurRadius->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->hasKeys = mBlurRadius->prp_hasKeys();
     renderData->highQuality = mHighQuality->getValue();
     renderData->color = mColor->getColorAtRelFrame(relFrame);
     renderData->translation = mTranslation->
-            getCurrentPointValueAtRelFrame(relFrame);
+            getCurrentEffectivePointValueAtRelFrame(relFrame);
     return renderData;
 }
 
@@ -237,19 +237,19 @@ void ShadowEffect::applySk(const SkBitmap &imgPtr,
     applyShadow(imgPtr, scale,
                 mBlurRadius->qra_getCurrentValue(),
                 mColor->getCurrentColor(),
-                mTranslation->getCurrentPointValue(),
+                mTranslation->getCurrentEffectivePointValue(),
                 mBlurRadius->prp_hasKeys(),
                 mHighQuality->getValue());
 }
 
 qreal ShadowEffect::getMargin() {
     return mBlurRadius->qra_getCurrentValue() +
-            pointToLen(mTranslation->getCurrentPointValue());
+            pointToLen(mTranslation->getCurrentEffectivePointValue());
 }
 
 qreal ShadowEffect::getMarginAtRelFrame(const int &relFrame) {
     return mBlurRadius->qra_getValueAtRelFrame(relFrame) +
-            pointToLen(mTranslation->getCurrentPointValueAtRelFrame(relFrame));
+            pointToLen(mTranslation->getCurrentEffectivePointValueAtRelFrame(relFrame));
 }
 
 Property *ShadowEffect::makeDuplicate() {
@@ -589,7 +589,7 @@ PixmapEffectRenderData *DesaturateEffect::getPixmapEffectRenderDataForRelFrame(
         const int &relFrame) {
     DesaturateEffectRenderData *renderData = new DesaturateEffectRenderData();
     renderData->influence =
-            mInfluenceAnimator->getCurrentValueAtRelFrame(relFrame);
+            mInfluenceAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
     return renderData;
 }
 
@@ -598,13 +598,13 @@ PixmapEffectRenderData *ColorizeEffect::getPixmapEffectRenderDataForRelFrame(
         const int &relFrame) {
     ColorizeEffectRenderData *renderData = new ColorizeEffectRenderData();
     renderData->hue =
-            mHueAnimator->getCurrentValueAtRelFrame(relFrame);
+            mHueAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->saturation =
-            mSaturationAnimator->getCurrentValueAtRelFrame(relFrame);
+            mSaturationAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->lightness =
-            mLightnessAnimator->getCurrentValueAtRelFrame(relFrame);
+            mLightnessAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
     renderData->alpha =
-            mAlphaAnimator->getCurrentValueAtRelFrame(relFrame);
+            mAlphaAnimator->getCurrentEffectiveValueAtRelFrame(relFrame);
     return renderData;
 }
 
@@ -682,9 +682,9 @@ PixmapEffectRenderData *ReplaceColorEffect::getPixmapEffectRenderDataForRelFrame
     renderData->alphaT = toColor.alpha();
 
     renderData->tolerance = qRound(mToleranceAnimator->
-            getCurrentValueAtRelFrame(relFrame)*255);
+            getCurrentEffectiveValueAtRelFrame(relFrame)*255);
     renderData->smoothness = mSmoothnessAnimator->
-            getCurrentValueAtRelFrame(relFrame);
+            getCurrentEffectiveValueAtRelFrame(relFrame);
     return renderData;
 }
 

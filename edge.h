@@ -81,8 +81,7 @@ public:
 
     void getNearestAbsPosAndT(const QPointF &absPos,
                               QPointF *nearestPoint,
-                              qreal *t,
-                              qreal *error);
+                              qreal *t);
 
     QPointF getSlopeVector(const qreal &t);
     void getNearestRelPosAndT(const QPointF &relPos,

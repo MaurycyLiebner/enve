@@ -107,7 +107,7 @@ qreal BasicTransformAnimator::dy() {
 }
 
 qreal BasicTransformAnimator::rot() {
-    return mRotAnimator->qra_getCurrentValue();
+    return mRotAnimator->qra_getCurrentEffectiveValue();
 }
 
 qreal BasicTransformAnimator::xScale() {
@@ -119,7 +119,7 @@ qreal BasicTransformAnimator::yScale() {
 }
 
 QPointF BasicTransformAnimator::pos() {
-    return mPosAnimator->getCurrentPointValue();
+    return mPosAnimator->getCurrentEffectivePointValue();
 }
 
 QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
@@ -128,7 +128,7 @@ QMatrix BasicTransformAnimator::getCurrentTransformationMatrix() {
     matrix.translate(mPosAnimator->getXValue(),
                      mPosAnimator->getYValue());
 
-    matrix.rotate(mRotAnimator->qra_getCurrentValue() );
+    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue() );
     matrix.scale(mScaleAnimator->getXValue(),
                  mScaleAnimator->getYValue() );
     return matrix;
@@ -141,7 +141,7 @@ QMatrix BasicTransformAnimator::getRelativeTransformAtRelFrame(
     matrix.translate(mPosAnimator->getXValueAtRelFrame(relFrame),
                      mPosAnimator->getYValueAtRelFrame(relFrame));
 
-    matrix.rotate(mRotAnimator->qra_getValueAtRelFrame(relFrame) );
+    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
     matrix.scale(mScaleAnimator->getXValueAtRelFrame(relFrame),
                  mScaleAnimator->getYValueAtRelFrame(relFrame) );
     return matrix;
@@ -246,9 +246,9 @@ void BasicTransformAnimator::scaleRelativeToSavedValue(const qreal &sx,
     QMatrix matrix;
 
     matrix.translate(pivot.x(), pivot.y());
-    matrix.rotate(mRotAnimator->qra_getCurrentValue());
+    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue());
     matrix.scale(sx, sy);
-    matrix.rotate(-mRotAnimator->qra_getCurrentValue());
+    matrix.rotate(-mRotAnimator->qra_getCurrentEffectiveValue());
     matrix.translate(-pivot.x() + mPosAnimator->getSavedXValue(),
                      -pivot.y() + mPosAnimator->getSavedYValue());
 
@@ -327,7 +327,7 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
     currentMatrix.translate(pivotX + mPosAnimator->getXValue(),
                             pivotY + mPosAnimator->getYValue());
 
-    currentMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+    currentMatrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue() );
     currentMatrix.scale(mScaleAnimator->getXValue(),
                         mScaleAnimator->getYValue() );
 
@@ -338,7 +338,7 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
     futureMatrix.translate(point.x() + mPosAnimator->getXValue(),
                            point.y() + mPosAnimator->getYValue());
 
-    futureMatrix.rotate(mRotAnimator->qra_getCurrentValue() );
+    futureMatrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue() );
     futureMatrix.scale(mScaleAnimator->getXValue(),
                        mScaleAnimator->getYValue() );
 
@@ -367,7 +367,7 @@ void BoxTransformAnimator::setPivot(const QPointF &point,
 }
 
 QPointF BoxTransformAnimator::getPivot() {
-    return mPivotAnimator->getCurrentPointValue();
+    return mPivotAnimator->getCurrentEffectivePointValue();
 }
 
 QPointF BoxTransformAnimator::getPivotAbs() {
@@ -404,7 +404,7 @@ QMatrix BoxTransformAnimator::getCurrentTransformationMatrix() {
     matrix.translate(pivotX + mPosAnimator->getXValue(),
                      pivotY + mPosAnimator->getYValue());
 
-    matrix.rotate(mRotAnimator->qra_getCurrentValue() );
+    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue() );
     matrix.scale(mScaleAnimator->getXValue(),
                  mScaleAnimator->getYValue() );
 
@@ -422,7 +422,7 @@ QMatrix BoxTransformAnimator::getRelativeTransformAtRelFrame(
     matrix.translate(pivotX + mPosAnimator->getXValueAtRelFrame(relFrame),
                      pivotY + mPosAnimator->getYValueAtRelFrame(relFrame));
 
-    matrix.rotate(mRotAnimator->qra_getValueAtRelFrame(relFrame) );
+    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
     matrix.scale(mScaleAnimator->getXValueAtRelFrame(relFrame),
                  mScaleAnimator->getYValueAtRelFrame(relFrame) );
 
