@@ -90,19 +90,19 @@ public:
     void readBoundingBox(QIODevice *target);
 
     qreal getXRadiusAtRelFrame(const int &relFrame) {
-        return mHorizontalRadiusPoint->getXValueAtRelFrame(relFrame);
+        return mHorizontalRadiusPoint->getEffectiveXValueAtRelFrame(relFrame);
     }
 
     qreal getYRadiusAtRelFrame(const int &relFrame) {
-        return mVerticalRadiusPoint->getYValueAtRelFrame(relFrame);
+        return mVerticalRadiusPoint->getEffectiveYValueAtRelFrame(relFrame);
     }
 
     qreal getCurrentXRadius() {
-        return mHorizontalRadiusPoint->getXValue();
+        return mHorizontalRadiusPoint->getEffectiveXValue();
     }
 
     qreal getCurrentYRadius() {
-        return mVerticalRadiusPoint->getYValue();
+        return mVerticalRadiusPoint->getEffectiveYValue();
     }
 protected:
     CircleCenterPoint *mCenter;

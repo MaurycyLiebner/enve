@@ -136,8 +136,8 @@ void Circle::selectAndAddContainedPointsToList(const QRectF &absRect,
 
 SkPath Circle::getPathAtRelFrame(const int &relFrame) {
     SkPath path;
-    SkScalar xRadius = mHorizontalRadiusPoint->getXValueAtRelFrame(relFrame);
-    SkScalar yRadius = mVerticalRadiusPoint->getYValueAtRelFrame(relFrame);
+    SkScalar xRadius = mHorizontalRadiusPoint->getEffectiveXValueAtRelFrame(relFrame);
+    SkScalar yRadius = mVerticalRadiusPoint->getEffectiveYValueAtRelFrame(relFrame);
     path.addOval(SkRect::MakeXYWH(-xRadius, -yRadius,
                                   2*xRadius, 2*yRadius));
     return path;

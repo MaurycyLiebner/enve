@@ -1,8 +1,10 @@
 #ifndef SELFREF_H
 #define SELFREF_H
 #include <QSharedPointer>
+#include <QObject>
 
-class SelfRef {
+class SelfRef : public QObject {
+    Q_OBJECT
 public:
     template<class T>
     QSharedPointer<T> ref() {

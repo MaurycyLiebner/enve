@@ -7,6 +7,8 @@ class ComplexAnimator;
 class Key;
 class QPainter;
 class DurationRectangleMovable;
+class FakeComplexAnimator;
+typedef QSharedPointer<FakeComplexAnimator> FakeComplexAnimatorQSPtr;
 
 class Animator :
     public Property {
@@ -117,6 +119,19 @@ public:
         Q_UNUSED(target);
         return NULL;
     }
+
+    bool hasFakeComplexAnimator() {
+        return !mFakeComplexAnimator.isNull();
+    }
+
+    FakeComplexAnimator *getFakeComplexAnimator() {
+        return mFakeComplexAnimator.data();
+    }
+
+    void enableFakeComplexAnimator();
+
+    void disableFakeComplexAnimator();
+    void disableFakeComplexAnimatrIfNotNeeded();
 protected:
     int anim_getKeyIndex(Key *key);
 
@@ -133,12 +148,11 @@ protected:
     bool anim_mIsRecording = false;
     Key *anim_mKeyOnCurrentFrame = NULL;
     QColor anim_mAnimatorColor;
+    FakeComplexAnimatorQSPtr mFakeComplexAnimator;
 public slots:
     void anim_deleteCurrentKey();
     virtual void anim_updateAfterShifted();
     void prp_setRecording(const bool &rec);
-signals:
-    void beingDeleted();
 };
 
 #endif // ANIMATOR_H

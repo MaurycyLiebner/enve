@@ -73,20 +73,20 @@ void ColorAnimator::qra_setCurrentValue(const QColor &qcolorValue,
 Color ColorAnimator::getCurrentColor() const {
     Color color;
     if(mColorMode == RGBMODE) {
-        color.setRGB(mVal1Animator->qra_getCurrentValue(),
-                     mVal2Animator->qra_getCurrentValue(),
-                     mVal3Animator->qra_getCurrentValue(),
-                     mAlphaAnimator->qra_getCurrentValue() );
+        color.setRGB(mVal1Animator->qra_getCurrentEffectiveValue(),
+                     mVal2Animator->qra_getCurrentEffectiveValue(),
+                     mVal3Animator->qra_getCurrentEffectiveValue(),
+                     mAlphaAnimator->qra_getCurrentEffectiveValue() );
     } else if(mColorMode == HSVMODE) {
-        color.setHSV(mVal1Animator->qra_getCurrentValue(),
-                     mVal2Animator->qra_getCurrentValue(),
-                     mVal3Animator->qra_getCurrentValue(),
-                     mAlphaAnimator->qra_getCurrentValue() );
+        color.setHSV(mVal1Animator->qra_getCurrentEffectiveValue(),
+                     mVal2Animator->qra_getCurrentEffectiveValue(),
+                     mVal3Animator->qra_getCurrentEffectiveValue(),
+                     mAlphaAnimator->qra_getCurrentEffectiveValue() );
     } else { // HSLMODE
-        color.setHSL(mVal1Animator->qra_getCurrentValue(),
-                     mVal2Animator->qra_getCurrentValue(),
-                     mVal3Animator->qra_getCurrentValue(),
-                     mAlphaAnimator->qra_getCurrentValue() );
+        color.setHSL(mVal1Animator->qra_getCurrentEffectiveValue(),
+                     mVal2Animator->qra_getCurrentEffectiveValue(),
+                     mVal3Animator->qra_getCurrentEffectiveValue(),
+                     mAlphaAnimator->qra_getCurrentEffectiveValue() );
     }
     return color;
 }

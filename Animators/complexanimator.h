@@ -72,6 +72,8 @@ public:
     virtual void ca_removeAllChildAnimators();
     virtual Property *ca_getFirstDescendantWithName(const QString &name);
 public slots:
+    void ca_prependChildAnimator(Property *childAnimator,
+                                 Property *prependWith);
     void ca_replaceChildAnimator(Property *childAnimator,
                                  Property *replaceWith);
     void prp_setRecording(const bool &rec);

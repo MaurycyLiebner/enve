@@ -23,10 +23,6 @@ public:
     MovablePoint *qra_getPointAt(const QPointF &absPos,
                                  const qreal &canvasScaleInv);
 
-    QPointF getStartPoint();
-
-    QPointF getEndPoint();
-
     void setColors(QColor startColor, QColor endColor);
 
     bool enabled;

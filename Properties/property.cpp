@@ -1,9 +1,10 @@
 #include "property.h"
 #include "Animators/complexanimator.h"
 #include "Animators/animatorupdater.h"
+#include "mainwindow.h"
 
 Property::Property() {
-
+    mMainWindow = MainWindow::getInstance();
 }
 
 void Property::prp_valueChanged() {
@@ -83,4 +84,81 @@ void Property::prp_callUpdater() {
 void Property::prp_callFinishUpdater() {
     if(prp_mUpdater.get() == NULL) return;
     prp_mUpdater->updateFinal();
+}
+
+void Property::startNewUndoRedoSet() {
+    mMainWindow->getUndoRedoStack()->startNewSet();
+}
+
+void Property::finishUndoRedoSet() {
+    mMainWindow->getUndoRedoStack()->finishSet();
+}
+
+void Property::createDetachedUndoRedoStack() {
+    mMainWindow->createDetachedUndoRedoStack();
+}
+
+void Property::deleteDetachedUndoRedoStack() {
+    mMainWindow->deleteDetachedUndoRedoStack();
+}
+
+void Property::addUndoRedo(UndoRedo *undoRedo) {
+    mMainWindow->getUndoRedoStack()->addUndoRedo(undoRedo);
+}
+
+void Property::callUpdateSchedulers() {
+    mMainWindow->callUpdateSchedulers();
+}
+
+MainWindow *Property::getMainWindow() {
+    return mMainWindow;
+}
+
+bool Property::isShiftPressed() {
+    return mMainWindow->isShiftPressed();
+}
+
+bool Property::isShiftPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::ShiftModifier;
+}
+
+bool Property::isCtrlPressed() {
+    return mMainWindow->isCtrlPressed();
+}
+
+bool Property::isCtrlPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::ControlModifier;
+}
+
+bool Property::isAltPressed() {
+    return mMainWindow->isAltPressed();
+}
+
+bool Property::isAltPressed(QKeyEvent *event) {
+    return event->modifiers() & Qt::AltModifier;
+}
+
+int Property::getCurrentFrameFromMainWindow() {
+    return mMainWindow->getCurrentFrame();
+}
+
+int Property::getFrameCount() {
+    return mMainWindow->getFrameCount();
+}
+
+bool Property::isRecordingAllPoints() {
+    return mMainWindow->isRecordingAllPoints();
+}
+
+void Property::graphUpdateAfterKeysChanged()
+{
+    //mMainWindow->getKeysView()->graphUpdateAfterKeysChanged();
+}
+
+void Property::graphScheduleUpdateAfterKeysChanged() {
+    //mMainWindow->getKeysView()->scheduleGraphUpdateAfterKeysChanged();
+}
+
+void Property::schedulePivotUpdate() {
+    mMainWindow->schedulePivotUpdate();
 }

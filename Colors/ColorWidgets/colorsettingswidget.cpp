@@ -99,16 +99,16 @@ void ColorSettingsWidget::setColorAnimatorTarget(ColorAnimator *target) {
         disconnect(mTargetAnimator, 0, this, 0);
     }
     mTargetAnimator = target;
-    rSpin->setAnimator(NULL);
-    gSpin->setAnimator(NULL);
-    bSpin->setAnimator(NULL);
-    hSpin->setAnimator(NULL);
-    hslSSpin->setAnimator(NULL);
-    lSpin->setAnimator(NULL);
-    hsvSSpin->setAnimator(NULL);
-    vSpin->setAnimator(NULL);
+    rSpin->clearAnimator();
+    gSpin->clearAnimator();
+    bSpin->clearAnimator();
+    hSpin->clearAnimator();
+    hslSSpin->clearAnimator();
+    lSpin->clearAnimator();
+    hsvSSpin->clearAnimator();
+    vSpin->clearAnimator();
     if(!mAlphaHidden) {
-        aSpin->setAnimator(NULL);
+        aSpin->clearAnimator();
     }
     if(target != NULL) {
         disconnect(mColorModeCombo, SIGNAL(currentIndexChanged(int)),

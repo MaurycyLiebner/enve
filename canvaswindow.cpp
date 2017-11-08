@@ -17,8 +17,10 @@
 #include "svgimporter.h"
 #include "filesourcescache.h"
 #include <QFileDialog>
+#include "windowsinglewidgettarget.h"
 
 CanvasWindow::CanvasWindow(QWidget *parent) {
+    mWindowSWTTarget = new WindowSingleWidgetTarget(this);
     //setAttribute(Qt::WA_OpaquePaintEvent, true);
     int numberThreads = qMax(1, QThread::idealThreadCount());
     for(int i = 0; i < numberThreads; i++) {
@@ -81,17 +83,6 @@ Canvas *CanvasWindow::getCurrentCanvas() {
     return mCurrentCanvas.data();
 }
 
-SingleWidgetAbstraction* CanvasWindow::SWT_getAbstractionForWidget(
-            ScrollWidgetVisiblePart *visiblePartWidget) {
-    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mSWT_allAbstractions) {
-        if(abs->getParentVisiblePartWidget() == visiblePartWidget) {
-            return abs.get();
-        }
-    }
-    SingleWidgetAbstraction *abs = SWT_createAbstraction(visiblePartWidget);
-    return abs;
-}
-
 void CanvasWindow::SWT_addChildrenAbstractions(
         SingleWidgetAbstraction *abstraction,
         ScrollWidgetVisiblePart *visiblePartWidget) {
@@ -132,7 +123,7 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
         emit changeFrameRange(0, getMaxFrame());
         emit changeCurrentFrame(getCurrentFrame());
     }
-    SWT_scheduleWidgetsContentUpdateWithTarget(
+    mWindowSWTTarget->SWT_scheduleWidgetsContentUpdateWithTarget(
                 mCurrentCanvas.data(),
                 SWT_CurrentCanvas);
     updateDisplayedFillStrokeSettings();
@@ -142,12 +133,12 @@ void CanvasWindow::setCurrentCanvas(Canvas *canvas) {
 
 void CanvasWindow::addCanvasToList(Canvas *canvas) {
     mCanvasList << canvas->ref<Canvas>();
-    SWT_addChildAbstractionForTargetToAll(canvas);
+    mWindowSWTTarget->SWT_addChildAbstractionForTargetToAll(canvas);
 }
 
 void CanvasWindow::removeCanvas(const int &id) {
     CanvasQSPtr canvas = mCanvasList.takeAt(id);
-    SWT_removeChildAbstractionForTargetFromAll(canvas.data());
+    mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     if(mCanvasList.isEmpty()) {
         setCurrentCanvas((Canvas*)NULL);
     } else if(id < mCanvasList.count()) {
@@ -981,7 +972,7 @@ void CanvasWindow::clearAll() {
     mClearBeingUpdated = !mNoBoxesAwaitUpdate;
     mUpdatablesAwaitingUpdate.clear();
     foreach(const CanvasQSPtr &canvas, mCanvasList) {
-        SWT_removeChildAbstractionForTargetFromAll(canvas.data());
+        mWindowSWTTarget->SWT_removeChildAbstractionForTargetFromAll(canvas.data());
     }
 
     mCanvasList.clear();

@@ -4,7 +4,6 @@
 #include <QColor>
 #include "connectedtomainwindow.h"
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
-#include "selfref.h"
 
 class ComplexAnimator;
 class Key;
@@ -13,14 +12,13 @@ class AnimatorUpdater;
 typedef std::shared_ptr<AnimatorUpdater> AnimatorUpdaterStdSPtr;
 
 class Property :
-    public QObject,
-    public ConnectedToMainWindow,
-    public SingleWidgetTarget,
-    public SelfRef {
+    public SingleWidgetTarget {
     Q_OBJECT
 public:
     Property();
-    virtual ~Property() {}
+    virtual ~Property() {
+        emit beingDeleted();
+    }
 
     virtual void prp_valueChanged();
 
@@ -145,6 +143,33 @@ public:
     AnimatorUpdater *prp_getUpdater() {
         return prp_mUpdater.get();
     }
+
+    //
+
+    void startNewUndoRedoSet();
+    void finishUndoRedoSet();
+
+    void createDetachedUndoRedoStack();
+    void deleteDetachedUndoRedoStack();
+
+    void addUndoRedo(UndoRedo *undoRedo);
+    void callUpdateSchedulers();
+    MainWindow *getMainWindow();
+    virtual void schedulePivotUpdate();
+    bool isShiftPressed();
+    bool isCtrlPressed();
+    bool isAltPressed();
+
+    int getCurrentFrameFromMainWindow();
+    int getFrameCount();
+    bool isRecordingAllPoints();
+    void graphUpdateAfterKeysChanged();
+    void graphScheduleUpdateAfterKeysChanged();
+    bool isShiftPressed(QKeyEvent *event);
+    bool isCtrlPressed(QKeyEvent *event);
+    bool isAltPressed(QKeyEvent *event);
+protected:
+    MainWindow *mMainWindow;
 public slots:
     void prp_callUpdater();
 
@@ -180,6 +205,8 @@ signals:
     void prp_removingKey(Key *);
     void prp_addingKey(Key *);
     void prp_replaceWith(Property *, Property *);
+    void prp_prependWith(Property *, Property *);
+    void beingDeleted();
 protected:
     int prp_mParentFrameShift = 0;
     AnimatorUpdaterStdSPtr prp_mUpdater;

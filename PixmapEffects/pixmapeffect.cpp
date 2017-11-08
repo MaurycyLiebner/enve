@@ -110,7 +110,7 @@ qreal BlurEffect::getMargin() {
 }
 
 qreal BlurEffect::getMarginAtRelFrame(const int &relFrame) {
-    return mBlurRadius->qra_getValueAtRelFrame(relFrame);
+    return mBlurRadius->qra_getEffectiveValueAtRelFrame(relFrame);
 }
 
 Property *BlurEffect::makeDuplicate() {
@@ -248,7 +248,7 @@ qreal ShadowEffect::getMargin() {
 }
 
 qreal ShadowEffect::getMarginAtRelFrame(const int &relFrame) {
-    return mBlurRadius->qra_getValueAtRelFrame(relFrame) +
+    return mBlurRadius->qra_getEffectiveValueAtRelFrame(relFrame) +
             pointToLen(mTranslation->getCurrentEffectivePointValueAtRelFrame(relFrame));
 }
 

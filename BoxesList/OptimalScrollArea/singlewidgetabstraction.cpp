@@ -62,6 +62,7 @@ bool SingleWidgetAbstraction::setSingleWidgetAbstractions(
         const SWT_RulesCollection &rules,
         const bool &parentSatisfiesRule,
         const bool &parentMainTarget) { // returns whether should abort
+    if(!mTarget->SWT_isVisible()) return false;
     if(*currY > maxY) return true;
     bool satisfiesRule = mTarget->SWT_shouldBeVisible(rules,
                                                       parentSatisfiesRule,
@@ -101,17 +102,19 @@ int SingleWidgetAbstraction::getHeight(
         const bool &parentSatisfiesRule,
         const bool &parentMainTarget) {
     int height = 0;
-    bool satisfiesRule = mTarget->SWT_shouldBeVisible(rules,
-                                                      parentSatisfiesRule,
-                                                      parentMainTarget);
-    if(satisfiesRule && !mIsMainTarget) {
-        height += MIN_WIDGET_HEIGHT;
-    }
-    Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mChildren) {
-        height += abs->getHeight(
-                    rules,
-                    (satisfiesRule && mContentVisible) || mIsMainTarget,
-                    mIsMainTarget);
+    if(mTarget->SWT_isVisible()) {
+        bool satisfiesRule = mTarget->SWT_shouldBeVisible(rules,
+                                                          parentSatisfiesRule,
+                                                          parentMainTarget);
+        if(satisfiesRule && !mIsMainTarget) {
+            height += MIN_WIDGET_HEIGHT;
+        }
+        Q_FOREACH(const std::shared_ptr<SingleWidgetAbstraction> &abs, mChildren) {
+            height += abs->getHeight(
+                        rules,
+                        (satisfiesRule && mContentVisible) || mIsMainTarget,
+                        mIsMainTarget);
+        }
     }
 
     return height;

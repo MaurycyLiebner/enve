@@ -4,9 +4,12 @@
 #include "qrealkey.h"
 #include "pointhelpers.h"
 #include "animatorupdater.h"
+#include "Properties/comboboxproperty.h"
+#include "Properties/intproperty.h"
 
 RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
                                            const int &lastFrame) {
+    prp_setName("noise");
     mPeriod = (new QrealAnimator())->ref<QrealAnimator>();
     mPeriod->prp_setName("period");
     mPeriod->qra_setValueRange(1., 999.);
@@ -21,6 +24,19 @@ RandomQrealGenerator::RandomQrealGenerator(const int &firstFrame,
     mMaxDev->prp_setName("amplitude");
     mMaxDev->qra_setValueRange(0., 999.);
     ca_addChildAnimator(mMaxDev.data());
+    mType = (new ComboBoxProperty(QStringList() <<
+                                  "add" << "subtract" << "overlay"))
+            ->ref<ComboBoxProperty>();
+    mType->prp_setName("type");
+    ca_addChildAnimator(mType.data());
+
+    mSeedAssist = (new IntProperty())->ref<IntProperty>();
+    mSeedAssist->prp_setName("seed");
+    mSeedAssist->setValueRange(0, 9999);
+    mSeedAssist->setCurrentValue(0);
+    ca_addChildAnimator(mSeedAssist.data());
+    mSeedAssist->prp_setBlockedUpdater(new RandomQrealGeneratorUpdater(this));
+
     mFirstFrame = firstFrame;
     mLastFrame = lastFrame;
     generateData();
@@ -47,41 +63,56 @@ void RandomQrealGenerator::prp_getFirstAndLastIdenticalRelFrame(
 }
 
 qreal RandomQrealGenerator::getDevAtRelFrame(const int &relFrame) {
-    if(relFrame > mLastFrame) {
-        mLastFrame = relFrame;
-        generateData();
-    }
-    if(relFrame < mFirstFrame) {
-        mFirstFrame = relFrame;
-        generateData();
-    }
+//    if(relFrame > mLastFrame) {
+//        mLastFrame = relFrame;
+//        generateData();
+//    }
+//    if(relFrame < mFirstFrame) {
+//        mFirstFrame = relFrame;
+//        generateData();
+//    }
+    int relFrameRel = relFrame % (mLastFrame - 1);
 
-    int idBefore = getClosestLowerFrameId(0, mFrameValues.count() - 1, relFrame);
+    qreal maxDev = mMaxDev->getCurrentEffectiveValueAtRelFrame(relFrameRel);
+    int idBefore = getClosestLowerFrameId(0, mFrameValues.count() - 1, relFrameRel);
     const FrameValue &frameValueBefore = mFrameValues.at(idBefore);
     qreal frameBefore = frameValueBefore.frame;
-    qreal valueBefore = frameValueBefore.value*
-            mMaxDev->qra_getEffectiveValueAtRelFrame(frameBefore);
-    if(qAbs(relFrame - frameBefore) < 0.01) return valueBefore;
-    qreal smoothnessBefore = mSmoothness->qra_getEffectiveValueAtRelFrame(frameBefore);
+    qreal valueBefore = frameValueBefore.value;
+    qreal smoothnessBefore =
+            mSmoothness->qra_getEffectiveValueAtRelFrame(frameBefore);
 
     int idAfter = idBefore + 1;
     const FrameValue &frameValueAfter = mFrameValues.at(idAfter);
     qreal frameAfter = frameValueAfter.frame;
-    qreal valueAfter = frameValueAfter.value*
-            mMaxDev->qra_getEffectiveValueAtRelFrame(frameAfter);
-    if(qAbs(relFrame - frameAfter) < 0.01) return valueAfter;
-    qreal smoothnessAfter = mSmoothness->qra_getEffectiveValueAtRelFrame(frameAfter);
+    qreal valueAfter = frameValueAfter.value;
+
+    int currentType = mType->getCurrentValue();
+    if(currentType == 2) { // overlay
+        valueBefore = valueBefore - .5;
+        valueAfter = valueAfter - .5;
+    } else if(currentType == 1) { // subtract
+        valueBefore = -valueBefore;
+        valueAfter = -valueAfter;
+    }
+
+    valueBefore = valueBefore*maxDev;
+    valueAfter = valueAfter*maxDev;
+
+    if(qAbs(relFrameRel - frameBefore) < 0.01) return valueBefore;
+    if(qAbs(relFrameRel - frameAfter) < 0.01) return valueAfter;
+    qreal smoothnessAfter =
+            mSmoothness->qra_getEffectiveValueAtRelFrame(frameAfter);
 
     qreal t;
     if(smoothnessBefore < 0.001 && smoothnessAfter < 0.001) {
         qreal dVal = (valueAfter - valueBefore)/(frameAfter - frameBefore);
-        return (relFrame - frameBefore)*dVal + valueBefore;
+        return (relFrameRel - frameBefore)*dVal + valueBefore;
     } else {
         qreal c1F = frameBefore + smoothnessBefore*(frameAfter - frameBefore);
         qreal c2F = frameAfter - smoothnessAfter*(frameAfter - frameBefore);
 
         t = getBezierTValueForXAssumeNoOverlapGrowingOnly(
-                    frameBefore, c1F, c2F, frameAfter, relFrame, 0.01);
+                    frameBefore, c1F, c2F, frameAfter, relFrameRel, 0.01);
     }
     return t*valueAfter + (1. - t)*valueBefore;
     qreal c1V = valueBefore + smoothnessBefore*(valueAfter - valueBefore);
@@ -109,7 +140,7 @@ int RandomQrealGenerator::getClosestLowerFrameId(const int &minId,
 qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
     qreal totDeltaX = 0.;
     qreal A = 0.;
-    qreal prevPeriod = mPeriod->qra_getValueAtRelFrame(relFrame);
+    qreal prevPeriod = mPeriod->qra_getEffectiveValueAtRelFrame(relFrame);
     int prevFrame = relFrame;
     int nextFrame = relFrame;
     qreal nextPeriod = prevPeriod;
@@ -152,12 +183,12 @@ qreal RandomQrealGenerator::getDeltaX(const int &relFrame) {
 }
 
 void RandomQrealGenerator::generateData() {
-    qsrand(mSeedAssist);
+    qsrand(mSeedAssist->getValue());
     mFrameValues.clear();
     qreal currFrame = mFirstFrame;
     while(currFrame < mLastFrame) {
         //qreal maxDev = mMaxDev->qra_getValueAtRelFrame(currFrame);
-        mFrameValues << FrameValue(currFrame, qRandF(-1., 1.));
+        mFrameValues << FrameValue(currFrame, qRandF(0., 1.));
         currFrame += getDeltaX(currFrame);
     }
     prp_callUpdater();

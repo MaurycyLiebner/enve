@@ -280,12 +280,12 @@ void SingleSound::prepareFinalData(const qreal &fps,
             int j = 0;
             int frame = 0;
             qreal lastFrameVol =
-                    mVolumeAnimator->qra_getValueAtRelFrame(frame)/100.;
+                    mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame)/100.;
             qreal volStep = fps/SAMPLERATE;
             while(j < mFinalSampleCount) {
                 frame++;
                 qreal nextFrameVol =
-                        mVolumeAnimator->qra_getValueAtRelFrame(frame)/100.;
+                        mVolumeAnimator->qra_getEffectiveValueAtRelFrame(frame)/100.;
                 qreal volDiff = (nextFrameVol - lastFrameVol);
                 qreal currVolFrac = lastFrameVol;
                 for(int i = 0;

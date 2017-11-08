@@ -84,20 +84,12 @@ MovablePoint *GradientPoints::qra_getPointAt(const QPointF &absPos,
     return NULL;
 }
 
-QPointF GradientPoints::getStartPoint() {
-    return startPoint->getRelativePos();
-}
-
 QPointF GradientPoints::getStartPointAtRelFrame(const int &relFrame) {
-    return startPoint->getCurrentPointValueAtRelFrame(relFrame);
+    return startPoint->getCurrentEffectivePointValueAtRelFrame(relFrame);
 }
 
 QPointF GradientPoints::getEndPointAtRelFrame(const int &relFrame) {
-    return endPoint->getCurrentPointValueAtRelFrame(relFrame);
-}
-
-QPointF GradientPoints::getEndPoint() {
-    return endPoint->getRelativePos();
+    return endPoint->getCurrentEffectivePointValueAtRelFrame(relFrame);
 }
 
 void GradientPoints::setColors(QColor startColor, QColor endColor) {

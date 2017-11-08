@@ -24,6 +24,7 @@ signals:
     void valueChanged(int);
 public slots:
     void setCurrentValue(const int &id) {
+        if(mCurrentValue == id) return;
         mCurrentValue = id;
         emit valueChanged(id);
         prp_updateInfluenceRangeAfterChanged();

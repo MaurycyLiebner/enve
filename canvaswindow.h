@@ -5,6 +5,7 @@
 #include "glwindow.h"
 #include "BoxesList/OptimalScrollArea/singlewidgettarget.h"
 #include "keyfocustarget.h"
+class WindowSingleWidgetTarget;
 class Canvas;
 typedef QSharedPointer<Canvas> CanvasQSPtr;
 enum ColorMode : short;
@@ -27,7 +28,6 @@ class VideoBox;
 #include <QAudioOutput>
 
 class CanvasWindow : public GLWindow,
-        public SingleWidgetTarget,
         public KeyFocusTarget {
     Q_OBJECT
 public:
@@ -76,8 +76,6 @@ public:
     void schedulePivotUpdate();
 
     BoxesGroup *getCurrentGroup();
-    SingleWidgetAbstraction *SWT_getAbstractionForWidget(
-            ScrollWidgetVisiblePart *visiblePartWidget);
     void applyPaintSettingToSelected(const PaintSetting &setting);
     void setSelectedFillColorMode(const ColorMode &mode);
     void setSelectedStrokeColorMode(const ColorMode &mode);
@@ -145,7 +143,11 @@ public:
     void writeCanvases(QIODevice *target);
     void readCanvases(QIODevice *target);
     void addFileUpdatableAwaitingUpdate(Executable *updatable);
+    WindowSingleWidgetTarget *getWindowSWT() {
+        return mWindowSWTTarget;
+    }
 protected:
+    WindowSingleWidgetTarget *mWindowSWTTarget = NULL;
     PaintControler *mFileControler = NULL;
     RenderInstanceSettings *mCurrentRenderSettings = NULL;
     bool mMouseGrabber = false;

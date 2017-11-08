@@ -2,7 +2,9 @@
 #define QREALANIMATORVALUESLIDER_H
 #include "qdoubleslider.h"
 
+class IntProperty;
 class QrealAnimator;
+class Property;
 
 class QrealAnimatorValueSlider : public QDoubleSlider
 {
@@ -22,24 +24,27 @@ public:
     void paint(QPainter *p);
 
     void setAnimator(QrealAnimator *animator);
+    void setIntAnimator(IntProperty *animator);
+
     bool hasTargetAnimator() {
         return mAnimator != NULL;
     }
     void openContextMenu(const QPoint &globalPos);
+    void clearAnimator();
 public slots:
-    void setValueExternal(const qreal &value);
+    void setValueExternal(qreal value);
 
     void emitEditingStarted(qreal value);
     void emitValueChangedExternal(qreal value);
     void emitEditingFinished(qreal value);
+
+    void nullifyAnimator();
+    void setValueFromAnimator(qreal val);
 protected:
     void emitValueChanged(qreal value);
 private:
-    QrealAnimator *mAnimator = NULL;
+    Property *mAnimator = NULL;
     bool mBlockAnimatorSignals = false;
-private slots:
-    void nullifyAnimator();
-    void setValueFromAnimator(const qreal &val);
 signals:
     void displayedValueChanged(qreal);
 };

@@ -31,8 +31,7 @@ void Color::setHSL(GLfloat h, GLfloat s, GLfloat l, GLfloat a)
 }
 
 
-void Color::setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a)
-{
+void Color::setRGB(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a) {
     gl_r = r_t;
     gl_g = g_t;
     gl_b = b_t;
@@ -88,8 +87,7 @@ void Color::setGLColorA(GLfloat a_t)
     qcol.setAlpha(a_t*255);
 }
 
-Color::Color(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a_t)
-{
+Color::Color(GLfloat r_t, GLfloat g_t, GLfloat b_t, GLfloat a_t) {
     gl_r = r_t;
     gl_g = g_t;
     gl_b = b_t;

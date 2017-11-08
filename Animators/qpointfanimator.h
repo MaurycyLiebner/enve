@@ -61,6 +61,10 @@ public:
     QPointF getCurrentEffectivePointValueAtAbsFrame(const int &frame) const;
     QPointF getCurrentEffectivePointValueAtRelFrame(const int &frame) const;
     QPointF getCurrentEffectivePointValue() const;
+    qreal getEffectiveXValueAtRelFrame(const int &relFrame);
+    qreal getEffectiveYValueAtRelFrame(const int &relFrame);
+    qreal getEffectiveXValue();
+    qreal getEffectiveYValue();
 protected:
     QrealAnimatorQSPtr mXAnimator;
     QrealAnimatorQSPtr mYAnimator;

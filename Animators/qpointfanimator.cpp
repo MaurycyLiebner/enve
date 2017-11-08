@@ -56,12 +56,28 @@ qreal QPointFAnimator::getYValue() {
     return mYAnimator->qra_getCurrentValue();
 }
 
+qreal QPointFAnimator::getEffectiveXValue() {
+    return mXAnimator->qra_getCurrentEffectiveValue();
+}
+
+qreal QPointFAnimator::getEffectiveYValue() {
+    return mYAnimator->qra_getCurrentEffectiveValue();
+}
+
 qreal QPointFAnimator::getXValueAtRelFrame(const int &relFrame) {
     return mXAnimator->qra_getValueAtRelFrame(relFrame);
 }
 
 qreal QPointFAnimator::getYValueAtRelFrame(const int &relFrame) {
     return mYAnimator->qra_getValueAtRelFrame(relFrame);
+}
+
+qreal QPointFAnimator::getEffectiveXValueAtRelFrame(const int &relFrame) {
+    return mXAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
+}
+
+qreal QPointFAnimator::getEffectiveYValueAtRelFrame(const int &relFrame) {
+    return mYAnimator->qra_getEffectiveValueAtRelFrame(relFrame);
 }
 
 void QPointFAnimator::setCurrentPointValue(const QPointF &val,

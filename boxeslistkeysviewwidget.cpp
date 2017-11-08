@@ -12,6 +12,7 @@
 #include "animationdockwidget.h"
 #include "global.h"
 #include "canvas.h"
+#include "windowsinglewidgettarget.h"
 
 BoxesListKeysViewWidget::BoxesListKeysViewWidget(
                             QWidget *topWidget,
@@ -160,7 +161,7 @@ BoxesListKeysViewWidget::BoxesListKeysViewWidget(
 
     setLayout(mMainLayout);
 
-    mMainWindow->getCanvasWindow()->SWT_getAbstractionForWidget(
+    mMainWindow->getCanvasWindow()->getWindowSWT()->SWT_getAbstractionForWidget(
                 mBoxesListWidget->getVisiblePartWidget());
     mBoxesListWidget->getVisiblePartWidget()->setCurrentRule(SWT_NoRule);
     mBoxesListWidget->getVisiblePartWidget()->
@@ -285,7 +286,7 @@ void BoxesListKeysViewWidget::setRuleLocked() {
 void BoxesListKeysViewWidget::setTargetAll() {
     mBoxesListWidget->getVisiblePartWidget()->
             setCurrentTarget(
-                mMainWindow->getCanvasWindow(),
+                mMainWindow->getCanvasWindow()->getWindowSWT(),
                 SWT_All);
     mMainWindow->callUpdateSchedulers();
 }

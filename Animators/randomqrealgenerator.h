@@ -1,8 +1,12 @@
 #ifndef RANDOMQREALGENERATOR_H
 #define RANDOMQREALGENERATOR_H
-#include "complexanimator.h"
+#include "qrealvalueeffect.h"
 class QrealAnimator;
 typedef QSharedPointer<QrealAnimator> QrealAnimatorQSPtr;
+class ComboBoxProperty;
+typedef QSharedPointer<ComboBoxProperty> ComboBoxPropertyQSPtr;
+class IntProperty;
+typedef QSharedPointer<IntProperty> IntPropertyQSPtr;
 
 struct FrameValue {
     FrameValue(const qreal &frameT, const qreal &valueT) {
@@ -13,7 +17,7 @@ struct FrameValue {
     qreal value;
 };
 
-class RandomQrealGenerator : public ComplexAnimator {
+class RandomQrealGenerator : public QrealValueEffect {
 public:
     RandomQrealGenerator(const int &firstFrame, const int &lastFrame);
     qreal getDevAtRelFrame(const int &relFrame);
@@ -22,6 +26,9 @@ public:
     void prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
                                               int *lastIdentical,
                                               const int &relFrame);
+
+    void writeProperty(QIODevice *device);
+    void readProperty(QIODevice *device);
 protected:
     int getClosestLowerFrameId(const int &minId,
                                const int &maxId,
@@ -30,11 +37,12 @@ protected:
 private:
     int mFirstFrame;
     int mLastFrame;
-    uint32_t mSeedAssist = 0;
     QList<FrameValue> mFrameValues;
     QrealAnimatorQSPtr mPeriod;
     QrealAnimatorQSPtr mSmoothness;
     QrealAnimatorQSPtr mMaxDev;
+    IntPropertyQSPtr mSeedAssist;
+    ComboBoxPropertyQSPtr mType;
 };
 
 #endif // RANDOMQREALGENERATOR_H

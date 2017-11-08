@@ -5,6 +5,7 @@
 #include <QMimeData>
 #include <QFlags>
 #include <memory>
+#include "selfref.h"
 
 class SingleWidgetAbstraction;
 class ScrollWidgetVisiblePart;
@@ -24,10 +25,15 @@ enum SWT_Target : short;
 
 struct SWT_RulesCollection;
 
-class SingleWidgetTarget {
+class SingleWidgetTarget : public SelfRef {
 public:
     SingleWidgetTarget();
     virtual ~SingleWidgetTarget();
+
+    void SWT_addChildAbstractionForTargetToAll(
+            SingleWidgetTarget *target);
+    void SWT_removeChildAbstractionForTargetFromAll(
+            SingleWidgetTarget *target);
 
     SingleWidgetAbstraction *SWT_createAbstraction(
             ScrollWidgetVisiblePart *visiblePartWidget);
@@ -42,6 +48,7 @@ public:
     virtual bool SWT_isBoolAnimator() { return false; }
     virtual bool SWT_isColorAnimator() { return false; }
     virtual bool SWT_isComplexAnimator() { return false; }
+    virtual bool SWT_isFakeComplexAnimator() { return false; }
     virtual bool SWT_isPixmapEffectAnimators() { return false; }
     virtual bool SWT_isPathEffectAnimators() { return false; }
     virtual bool SWT_isPixmapEffect() { return false; }
@@ -79,6 +86,7 @@ public:
     virtual bool SWT_isComboBoxProperty() { return false; }
     virtual bool SWT_isBoxTargetProperty() { return false; }
     virtual bool SWT_isProperty() { return false; }
+    virtual bool SWT_isIntProperty() { return false; }
     // Sound
     virtual bool SWT_isSingleSound() { return false; }
 
@@ -123,14 +131,20 @@ public:
     }
 
     virtual void SWT_clearAll();
+    bool SWT_isVisible() {
+        return SWT_mVisible;
+    }
 
+    void SWT_hide() {
+        SWT_mVisible = false;
+    }
+
+    void SWT_show() {
+        SWT_mVisible = true;
+    }
 protected:
+    bool SWT_mVisible = true;
     QList<std::shared_ptr<SingleWidgetAbstraction> > mSWT_allAbstractions;
-
-    void SWT_addChildAbstractionForTargetToAll(
-            SingleWidgetTarget *target);
-    void SWT_removeChildAbstractionForTargetFromAll(
-            SingleWidgetTarget *target);
 };
 
 typedef bool (SingleWidgetTarget::*SWT_Checker)();

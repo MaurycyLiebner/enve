@@ -12,11 +12,21 @@ ComplexAnimator::~ComplexAnimator() {
     anim_removeAllKeys();
 }
 
+void ComplexAnimator::ca_prependChildAnimator(Property *childAnimator,
+                                              Property *prependWith) {
+    if(prependWith == NULL) return;
+    int id = getChildPropertyIndex(childAnimator);
+    if(id == -1) return;
+    ca_addChildAnimator(prependWith, id);
+}
+
+
 void ComplexAnimator::ca_replaceChildAnimator(Property *childAnimator,
                                               Property *replaceWith) {
     int id = getChildPropertyIndex(childAnimator);
     if(id == -1) return;
     ca_removeChildAnimator(childAnimator);
+    if(replaceWith == NULL) return;
     ca_addChildAnimator(replaceWith, id);
 }
 
@@ -113,6 +123,8 @@ void ComplexAnimator::ca_addChildAnimator(Property *childAnimator,
             this, SLOT(ca_removeDescendantsKey(Key*)));
     connect(childAnimator, SIGNAL(prp_replaceWith(Property*,Property*)),
             this, SLOT(ca_replaceChildAnimator(Property*,Property*)));
+    connect(childAnimator, SIGNAL(prp_prependWith(Property*,Property*)),
+            this, SLOT(ca_prependChildAnimator(Property*,Property*)));
 
     childAnimator->prp_addAllKeysToComplexAnimator(this);
     ca_childAnimatorIsRecordingChanged();
@@ -262,15 +274,16 @@ void ComplexAnimator::anim_drawKey(
     if(key->isHovered()) {
         p->setPen(QPen(Qt::black, 1.5));
     } else {
-        p->setPen(Qt::NoPen);
+        p->setPen(QPen(Qt::black, 0.5));
     }
+    qreal keySize = KEY_RECT_SIZE*0.7;
     p->drawEllipse(
         QRectF(
             QPointF((key->getRelFrame() - startFrame + 0.5)*
-                    pixelsPerFrame - KEY_RECT_SIZE*0.35,
+                    pixelsPerFrame - keySize*0.5,
                     drawY + (MIN_WIDGET_HEIGHT -
-                              KEY_RECT_SIZE*0.7)*0.5 ),
-            QSize(KEY_RECT_SIZE*0.7, KEY_RECT_SIZE*0.7) ) );
+                              keySize)*0.5 ),
+            QSize(keySize, keySize) ) );
 }
 
 void ComplexAnimator::prp_setParentFrameShift(const int &shift,

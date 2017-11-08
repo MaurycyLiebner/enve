@@ -3,6 +3,7 @@
 #include "Animators/PathAnimators/pathkey.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "Animators/qrealanimator.h"
+#include "Animators/randomqrealgenerator.h"
 #include "Animators/qpointfanimator.h"
 #include "Animators/coloranimator.h"
 #include "Animators/effectanimators.h"
@@ -12,6 +13,7 @@
 #include "Animators/paintsettings.h"
 #include "Animators/pathanimator.h"
 #include "Properties/comboboxproperty.h"
+#include "Properties/intproperty.h"
 #include "PathEffects/patheffectanimators.h"
 #include "PathEffects/patheffect.h"
 #include "Boxes/boundingbox.h"
@@ -104,6 +106,18 @@ void ComboBoxProperty::writeProperty(QIODevice *target) {
 
 void ComboBoxProperty::readProperty(QIODevice *target) {
     target->read((char*)&mCurrentValue, sizeof(int));
+}
+
+void IntProperty::writeProperty(QIODevice *target) {
+    target->write((char*)&mMinValue, sizeof(int));
+    target->write((char*)&mMaxValue, sizeof(int));
+    target->write((char*)&mValue, sizeof(int));
+}
+
+void IntProperty::readProperty(QIODevice *target) {
+    target->read((char*)&mMinValue, sizeof(int));
+    target->read((char*)&mMaxValue, sizeof(int));
+    target->read((char*)&mValue, sizeof(int));
 }
 
 void Key::writeKey(QIODevice *target) {
@@ -230,12 +244,33 @@ void QrealAnimator::writeProperty(QIODevice *target) {
     }
 
     target->write((char*)&mCurrentValue, sizeof(qreal));
+
+    bool hasRandomGenerator = !mRandomGenerator.isNull();
+    target->write((char*)&hasRandomGenerator, sizeof(bool));
+    if(hasRandomGenerator) {
+        mRandomGenerator->writeProperty(target);
+    }
 }
 
 Key *QrealAnimator::readKey(QIODevice *target) {
     QrealKey *newKey = new QrealKey(this);
     newKey->readKey(target);
     return newKey;
+}
+
+void RandomQrealGenerator::writeProperty(QIODevice *target) {
+    mPeriod->writeProperty(target);
+    mSmoothness->writeProperty(target);
+    mMaxDev->writeProperty(target);
+    mType->writeProperty(target);
+}
+
+void RandomQrealGenerator::readProperty(QIODevice *target) {
+    mPeriod->readProperty(target);
+    mSmoothness->readProperty(target);
+    mMaxDev->readProperty(target);
+    mType->readProperty(target);
+    generateData();
 }
 
 void QrealAnimator::readProperty(QIODevice *target) {
@@ -246,6 +281,13 @@ void QrealAnimator::readProperty(QIODevice *target) {
     }
 
     target->read((char*)&mCurrentValue, sizeof(qreal));
+    bool hasRandomGenerator;
+    target->read((char*)&hasRandomGenerator, sizeof(bool));
+    if(hasRandomGenerator) {
+        RandomQrealGenerator *generator = new RandomQrealGenerator(0, 9999);
+        generator->readProperty(target);
+        setGenerator(generator);
+    }
 }
 
 void QPointFAnimator::writeProperty(QIODevice *target) {

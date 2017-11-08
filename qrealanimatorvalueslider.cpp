@@ -1,12 +1,12 @@
 #include "qrealanimatorvalueslider.h"
 #include "Animators/qrealanimator.h"
 #include "mainwindow.h"
+#include "Properties/intproperty.h"
 
 QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                                                    qreal prefferedStep,
                                                    QWidget *parent) :
-    QDoubleSlider(minVal, maxVal, prefferedStep, parent)
-{
+    QDoubleSlider(minVal, maxVal, prefferedStep, parent) {
 
 }
 
@@ -14,8 +14,7 @@ QrealAnimatorValueSlider::QrealAnimatorValueSlider(qreal minVal, qreal maxVal,
                                                    qreal prefferedStep,
                                                    QrealAnimator *animator,
                                                    QWidget *parent) :
-    QDoubleSlider(minVal, maxVal, prefferedStep, parent)
-{
+    QDoubleSlider(minVal, maxVal, prefferedStep, parent) {
     setAnimator(animator);
 }
 
@@ -55,15 +54,23 @@ void QrealAnimatorValueSlider::emitValueChangedExternal(qreal value) {
 
 void QrealAnimatorValueSlider::emitValueChanged(qreal value) {
     if(mAnimator != NULL) {
-        mAnimator->qra_setCurrentValue(value);
+        if(mAnimator->SWT_isQrealAnimator()) {
+            ((QrealAnimator*)mAnimator)->qra_setCurrentValue(value);
+        } else if(mAnimator->SWT_isIntProperty()) {
+            ((IntProperty*)mAnimator)->setCurrentValue(value);
+        }
     }
     QDoubleSlider::emitValueChanged(value);
 }
 
-void QrealAnimatorValueSlider::setValueExternal(const qreal &value) {
+void QrealAnimatorValueSlider::setValueExternal(qreal value) {
     if(mAnimator != NULL) {
         mBlockAnimatorSignals = true;
-        mAnimator->qra_setCurrentValue(value);
+        if(mAnimator->SWT_isQrealAnimator()) {
+            ((QrealAnimator*)mAnimator)->qra_setCurrentValue(value);
+        } else if(mAnimator->SWT_isIntProperty()) {
+            ((IntProperty*)mAnimator)->setCurrentValue(value);
+        }
         mBlockAnimatorSignals = false;
     }
     setDisplayedValue(value);
@@ -78,17 +85,16 @@ void QrealAnimatorValueSlider::emitEditingFinished(qreal value) {
 }
 
 void QrealAnimatorValueSlider::nullifyAnimator() {
-    setAnimator(NULL);
+    clearAnimator();
 }
 
-void QrealAnimatorValueSlider::setValueFromAnimator(const qreal &val) {
+void QrealAnimatorValueSlider::setValueFromAnimator(qreal val) {
     if(mBlockAnimatorSignals) return;
     setDisplayedValue(val);
     emit displayedValueChanged(val);
 }
 
-void QrealAnimatorValueSlider::paint(QPainter *p)
-{
+void QrealAnimatorValueSlider::paint(QPainter *p) {
     if(mAnimator == NULL) {
         QDoubleSlider::paint(p);
     } else {
@@ -103,24 +109,48 @@ void QrealAnimatorValueSlider::paint(QPainter *p)
     }
 }
 
-void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
-    if(animator == mAnimator) return;
+void QrealAnimatorValueSlider::clearAnimator() {
     if(mAnimator != NULL) {
         disconnect(mAnimator, 0, this, 0);
     }
+    mAnimator = NULL;
+}
+
+void QrealAnimatorValueSlider::setAnimator(QrealAnimator *animator) {
+    if(animator == mAnimator) return;
+    clearAnimator();
     mAnimator = animator;
     if(mAnimator != NULL) {
-        setNumberDecimals(mAnimator->getNumberDecimals());
-        connect(mAnimator, SIGNAL(valueChangedSignal(qreal)),
+        setNumberDecimals(animator->getNumberDecimals());
+        connect(animator, SIGNAL(valueChangedSignal(qreal)),
                 this, SLOT(setValueFromAnimator(qreal)));
-        connect(mAnimator, SIGNAL(beingDeleted()),
+        connect(animator, SIGNAL(beingDeleted()),
                 this, SLOT(nullifyAnimator()));
 
-        setValueRange(mAnimator->getMinPossibleValue(),
-                      mAnimator->getMaxPossibleValue());
-        setPrefferedValueStep(mAnimator->getPrefferedValueStep());
+        setValueRange(animator->getMinPossibleValue(),
+                      animator->getMaxPossibleValue());
+        setPrefferedValueStep(animator->getPrefferedValueStep());
 
-        setDisplayedValue(mAnimator->qra_getCurrentValue());
+        setDisplayedValue(animator->qra_getCurrentValue());
+    }
+}
+
+void QrealAnimatorValueSlider::setIntAnimator(IntProperty *animator) {
+    if(animator == mAnimator) return;
+    clearAnimator();
+    if(animator != NULL) {
+        setNumberDecimals(0);
+        connect(animator, SIGNAL(valueChangedSignal(qreal)),
+                this, SLOT(setValueFromAnimator(qreal)));
+        connect(animator, SIGNAL(beingDeleted()),
+                this, SLOT(nullifyAnimator()));
+
+        setValueRange(animator->getMinValue(),
+                      animator->getMaxValue());
+        setPrefferedValueStep(1);
+
+        setDisplayedValue(animator->getValue());
+        mAnimator = animator;
     }
 }
 

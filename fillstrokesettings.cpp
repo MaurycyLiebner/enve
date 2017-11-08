@@ -540,7 +540,7 @@ void FillStrokeSettingsWidget::setStrokeValuesFromStrokeSettings(
         StrokeSettings *settings) {
     if(settings == NULL) {
         mCurrentStrokeColorAnimator = NULL;
-        mLineWidthSpin->setAnimator(NULL);
+        mLineWidthSpin->clearAnimator();
     } else {
         mCurrentStrokeGradientLinear = settings->getGradientLinear();
         mCurrentStrokeColor = settings->getCurrentColor();

@@ -23,9 +23,6 @@ public:
 
     virtual ~QrealAnimator();
 
-    void qra_addSlider(QrealAnimatorValueSlider *valueSlider);
-    void qra_removeSlider(QrealAnimatorValueSlider *valueSlider);
-
     void qra_setValueRange(const qreal &minVal,
                            const qreal &maxVal);
 
@@ -206,7 +203,7 @@ protected:
 signals:
     void valueChangedSignal(qreal);
 public slots:
-    void prp_setRecording(const bool &rec);
+    void prp_setRecording(bool rec);
 
     void anim_saveCurrentValueAsKey();
 };

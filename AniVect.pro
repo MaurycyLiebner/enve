@@ -196,7 +196,11 @@ SOURCES += main.cpp\
     customfpsdialog.cpp \
     BoxesList/boxscrollarea.cpp \
     Properties/comboboxproperty.cpp \
-    Animators/randomqrealgenerator.cpp
+    Animators/randomqrealgenerator.cpp \
+    Animators/fakecomplexanimator.cpp \
+    Animators/qrealvalueeffect.cpp \
+    Properties/intproperty.cpp \
+    windowsinglewidgettarget.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -352,7 +356,11 @@ HEADERS  += mainwindow.h \
     customfpsdialog.h \
     BoxesList/boxscrollarea.h \
     Properties/comboboxproperty.h \
-    Animators/randomqrealgenerator.h
+    Animators/randomqrealgenerator.h \
+    Animators/fakecomplexanimator.h \
+    Animators/qrealvalueeffect.h \
+    Properties/intproperty.h \
+    windowsinglewidgettarget.h
 
 RESOURCES += \
     resources.qrc

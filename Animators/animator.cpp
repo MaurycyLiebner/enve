@@ -5,13 +5,14 @@
 #include "BoxesList/boxsinglewidget.h"
 #include "global.h"
 #include "Animators/animatorupdater.h"
+#include "fakecomplexanimator.h"
 
 Animator::Animator() :
     Property() {
 }
 
 Animator::~Animator() {
-    emit beingDeleted();
+
 }
 
 void Animator::anim_shiftAllKeys(const int &shift) {
@@ -35,6 +36,29 @@ int Animator::prp_prevRelFrameWithKey(const int &relFrame) {
         return relFrame;
     }
     return key->getRelFrame();
+}
+
+void Animator::enableFakeComplexAnimator() {
+    if(!mFakeComplexAnimator.isNull()) return;
+    SWT_hide();
+    mFakeComplexAnimator = (new FakeComplexAnimator(this))->ref<FakeComplexAnimator>();
+    mFakeComplexAnimator->prp_setName(prp_mName);
+    emit prp_prependWith(this, mFakeComplexAnimator.data());
+}
+
+void Animator::disableFakeComplexAnimator() {
+    if(mFakeComplexAnimator.isNull()) return;
+    SWT_show();
+    emit mFakeComplexAnimator->prp_replaceWith(mFakeComplexAnimator.data(),
+                                               NULL);
+    mFakeComplexAnimator.reset();
+}
+
+void Animator::disableFakeComplexAnimatrIfNotNeeded() {
+    if(mFakeComplexAnimator.isNull()) return;
+    if(mFakeComplexAnimator->ca_getNumberOfChildren() == 0) {
+        disableFakeComplexAnimator();
+    }
 }
 
 int Animator::anim_getNextKeyRelFrame(Key *key) {
@@ -321,15 +345,19 @@ Key *Animator::prp_getKeyAtPos(const qreal &relX,
                                const qreal &pixelsPerFrame) {
     qreal relFrame = relX/pixelsPerFrame - prp_getFrameShift();
     qreal pressFrame = relFrame + minViewedFrame;
-    if(pixelsPerFrame > KEY_RECT_SIZE) {
+    qreal keySize = KEY_RECT_SIZE;
+    if(SWT_isComplexAnimator()) {
+        keySize *= 0.75;
+    }
+    if(pixelsPerFrame > keySize) {
         int relFrameInt = relFrame;
         if( qAbs((relFrameInt + 0.5)*pixelsPerFrame - relX +
-                 prp_getFrameShift()*pixelsPerFrame) > KEY_RECT_SIZE*0.5) {
+                 prp_getFrameShift()*pixelsPerFrame) > keySize*0.5) {
             return NULL;
         }
     }
     if(pressFrame < 0) pressFrame -= 1.;
-    qreal keyRectFramesSpan = 0.5*KEY_RECT_SIZE/pixelsPerFrame;
+    qreal keyRectFramesSpan = 0.5*keySize/pixelsPerFrame;
     int minPossibleKey = pressFrame - keyRectFramesSpan;
     int maxPossibleKey = pressFrame + keyRectFramesSpan;
     Key *keyAtPos = NULL;
@@ -539,7 +567,7 @@ void Animator::anim_drawKey(QPainter *p,
     if(key->isHovered()) {
         p->setPen(QPen(Qt::black, 1.5));
     } else {
-        p->setPen(Qt::NoPen);
+        p->setPen(QPen(Qt::black, .75));
     }
     p->drawEllipse(
         QRectF(

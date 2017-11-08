@@ -319,24 +319,24 @@ void DisplacePathEffect::filterPathForRelFrame(const int &relFrame,
         uint32_t nextSeed = mSeedAssist - 1;
         SkPath path1;
         displaceFilterPath(&path1, src,
-                           mMaxDev->qra_getValueAtRelFrame(relFrame),
-                           mSegLength->qra_getValueAtRelFrame(relFrame),
-                           mSmoothness->qra_getValueAtRelFrame(relFrame),
+                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
                            mSeedAssist);
         SkPath path2;
         qsrand(mSeed->getCurrentIntValue());
         displaceFilterPath(&path2, src,
-                           mMaxDev->qra_getValueAtRelFrame(relFrame),
-                           mSegLength->qra_getValueAtRelFrame(relFrame),
-                           mSmoothness->qra_getValueAtRelFrame(relFrame),
+                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
                            nextSeed);
         qreal weight = (relFrame % randStep)*1./randStep;
         path1.interpolate(path2, weight, dst);
     } else {
         displaceFilterPath(dst, src,
-                           mMaxDev->qra_getValueAtRelFrame(relFrame),
-                           mSegLength->qra_getValueAtRelFrame(relFrame),
-                           mSmoothness->qra_getValueAtRelFrame(relFrame),
+                           mMaxDev->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mSegLength->qra_getEffectiveValueAtRelFrame(relFrame),
+                           mSmoothness->qra_getEffectiveValueAtRelFrame(relFrame),
                            mSeedAssist);
     }
 }
@@ -372,8 +372,8 @@ void DuplicatePathEffect::filterPath(const SkPath &src,
                                      SkPath *dst) {
     *dst = src;
     dst->addPath(src,
-                 mTranslation->getXValue(),
-                 mTranslation->getYValue());
+                 mTranslation->getEffectiveXValue(),
+                 mTranslation->getEffectiveYValue());
 }
 
 void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
@@ -381,8 +381,8 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
                                                 SkPath *dst) {
     *dst = src;
     dst->addPath(src,
-                 mTranslation->getXValueAtRelFrame(relFrame),
-                 mTranslation->getYValueAtRelFrame(relFrame));
+                 mTranslation->getEffectiveXValueAtRelFrame(relFrame),
+                 mTranslation->getEffectiveYValueAtRelFrame(relFrame));
 }
 #include "pathoperations.h"
 #include "skqtconversions.h"
