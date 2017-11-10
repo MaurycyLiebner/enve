@@ -122,12 +122,12 @@ MoveChildInListUndoRedo::~MoveChildInListUndoRedo() {
 }
 
 void MoveChildInListUndoRedo::redo() {
-    mParentBox->moveChildInList(mChild.data(),
+    mParentBox->moveContainedBoxInList(mChild.data(),
                                 mFromIndex, mToIndex, false);
 }
 
 void MoveChildInListUndoRedo::undo() {
-    mParentBox->moveChildInList(mChild.data(),
+    mParentBox->moveContainedBoxInList(mChild.data(),
                                 mToIndex, mFromIndex, false);
 }
 
@@ -190,11 +190,11 @@ AddChildToListUndoRedo::~AddChildToListUndoRedo() {
 }
 
 void AddChildToListUndoRedo::redo() {
-    mParent->addChildToListAt(mAddAtId, mChild.data(), false);
+    mParent->addContainedBoxToListAt(mAddAtId, mChild.data(), false);
 }
 
 void AddChildToListUndoRedo::undo() {
-    mParent->removeChildFromList(mAddAtId, false);
+    mParent->removeContainedBoxFromList(mAddAtId, false);
 }
 
 SetBoxVisibleUndoRedo::SetBoxVisibleUndoRedo(BoundingBox *target,

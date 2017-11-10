@@ -43,7 +43,7 @@ void VectorPath::breakPathsApart() {
     foreach(VectorPathAnimator *path, pathsList) {
         VectorPath *newPath = new VectorPath();
         newPath->duplicateTransformAnimatorFrom(mTransformAnimator.data());
-        mParent->addChild(newPath);
+        mParentGroup->addContainedBox(newPath);
         newPath->getPathAnimator()->addSinglePathAnimator(path, false);
     }
     removeFromParent();

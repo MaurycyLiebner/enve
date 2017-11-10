@@ -73,29 +73,29 @@ public:
     void ungroup();
 
     bool isCurrentGroup();
-    void addChild(BoundingBox *child);
-    void addChildToListAt(const int &index, BoundingBox *child,
+    void addContainedBox(BoundingBox *child);
+    void addContainedBoxToListAt(const int &index, BoundingBox *child,
                           const bool &saveUndoRedo = true);
-    void updateChildrenId(const int &firstId,
+    void updateContainedBoxIds(const int &firstId,
                           const bool &saveUndoRedo = true);
-    void updateChildrenId(const int &firstId,
+    void updateContainedBoxIds(const int &firstId,
                           const int &lastId,
                           const bool &saveUndoRedo = true);
-    void removeChild(BoundingBox *child);
-    void increaseChildZInList(BoundingBox *child);
-    void decreaseChildZInList(BoundingBox *child);
-    void bringChildToEndList(BoundingBox *child);
-    void bringChildToFrontList(BoundingBox *child);
-    void moveChildInList(BoundingBox *child,
+    void removeContainedBox(BoundingBox *child);
+    void increaseContainedBoxZInList(BoundingBox *child);
+    void decreaseContainedBoxZInList(BoundingBox *child);
+    void bringContainedBoxToEndList(BoundingBox *child);
+    void bringContainedBoxToFrontList(BoundingBox *child);
+    void moveContainedBoxInList(BoundingBox *child,
                          const int &from,
                          const int &to,
                          const bool &saveUndoRedo = true);
-    void moveChildBelow(BoundingBox *boxToMove,
+    void moveContainedBoxBelow(BoundingBox *boxToMove,
                         BoundingBox *below);
-    void moveChildAbove(BoundingBox *boxToMove,
+    void moveContainedBoxAbove(BoundingBox *boxToMove,
                         BoundingBox *above);
 
-    void removeChildFromList(const int &id,
+    void removeContainedBoxFromList(const int &id,
                              const bool &saveUndoRedo = true);
 
     void setStrokeCapStyle(const Qt::PenCapStyle &capStyle);
@@ -109,7 +109,7 @@ public:
     QRectF getRelBoundingRectAtRelFrame(const int &relFrame) {
         SkPath boundingPaths = SkPath();
         int absFrame = prp_relFrameToAbsFrame(relFrame);
-        Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
             int childRelFrame = child->prp_absFrameToRelFrame(absFrame);
             if(child->isRelFrameVisibleAndInVisibleDurationRect(childRelFrame)) {
                 SkPath childPath;
@@ -146,18 +146,18 @@ public:
 
     void applyPaintSetting(
             const PaintSetting &setting) {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             box->applyPaintSetting(setting);
         }
     }
 
     void setFillColorMode(const ColorMode &colorMode) {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box,  mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box,  mContainedBoxes) {
             box->setFillColorMode(colorMode);
         }
     }
     void setStrokeColorMode(const ColorMode &colorMode) {
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             box->setStrokeColorMode(colorMode);
         }
     }
@@ -167,9 +167,7 @@ public:
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
 
-    void updateAfterCombinedTransformationChanged();
     void updateCombinedTransformTmp();
-    void updateAfterCombinedTransformationChangedAfterFrameChagne();
 
     bool SWT_isBoxesGroup() { return true; }
     void drawSk(SkCanvas *canvas);
@@ -202,7 +200,7 @@ public:
 
     int setBoxLoadId(const int &loadId) {
         int loadIdT = BoundingBox::setBoxLoadId(loadId);
-        foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        foreach(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
             loadIdT = child->setBoxLoadId(loadIdT);
         }
 
@@ -211,13 +209,13 @@ public:
 
     virtual void clearBoxLoadId() {
         BoundingBox::clearBoxLoadId();
-        foreach(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+        foreach(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
             child->clearBoxLoadId();
         }
     }
 
     const QList<QSharedPointer<BoundingBox> > &getChildBoxesList() const {
-        return mChildBoxes;
+        return mContainedBoxes;
     }
     BoundingBox *createLink();
     void readChildBoxes(QIODevice *target);
@@ -226,7 +224,7 @@ protected:
     FillStrokeSettingsWidget *mFillStrokeSettingsWidget;
     bool mIsCurrentGroup = false;
     bool mIsDescendantCurrentGroup = false;
-    QList<QSharedPointer<BoundingBox> > mChildBoxes;
+    QList<QSharedPointer<BoundingBox> > mContainedBoxes;
 
     //QList<QSharedPointer<BoundingBox> > mUpdateChildrenAwaitingUpdate;
     int getChildBoxIndex(BoundingBox *child);

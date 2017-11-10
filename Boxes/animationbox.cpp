@@ -57,7 +57,7 @@ void AnimationBox::updateDurationRectangleAnimationRange() {
 }
 
 void AnimationBox::reloadCacheHandler() {
-    if(mParent != NULL) {
+    if(mParentGroup != NULL) {
         updateDurationRectangleAnimationRange();
     }
     reloadSound();
@@ -67,18 +67,13 @@ void AnimationBox::reloadCacheHandler() {
     scheduleUpdate();
 }
 
-void AnimationBox::setParent(BoxesGroup *parent) {
-    mParent = parent;
-    mTransformAnimator->setParentTransformAnimator(
-                        mParent->getTransformAnimator());
-
+void AnimationBox::setParentGroup(BoxesGroup *parent) {
+    BoundingBox::setParentGroup(parent);
     updateDurationRectangleAnimationRange();
-
-    updateCombinedTransform();
 }
 
 bool AnimationBox::shouldScheduleUpdate() {
-    if(mAnimationCacheHandler == NULL || mParent == NULL) return false;
+    if(mAnimationCacheHandler == NULL || mParentGroup == NULL) return false;
     return BoundingBox::shouldScheduleUpdate();
 }
 

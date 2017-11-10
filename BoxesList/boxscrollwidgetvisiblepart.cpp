@@ -237,19 +237,19 @@ void BoxScrollWidgetVisiblePart::dropEvent(
                 ((BoundingBox*)singleWidgetUnderMouse->
                  getTargetAbstraction()->getTarget());
 
-        BoxesGroup *parentGroup = boxUnderMouse->getParent();
+        BoxesGroup *parentGroup = boxUnderMouse->getParentGroup();
         if(parentGroup == NULL ||
            boxUnderMouse->isAncestor(box)) return;
-        if(parentGroup != box->getParent()) {
-            box->getParent()->removeChild(box);
-            parentGroup->addChild(box);
+        if(parentGroup != box->getParentGroup()) {
+            box->getParentGroup()->removeContainedBox(box);
+            parentGroup->addContainedBox(box);
         }
         if(below) { // add box below
-            parentGroup->moveChildAbove( // boxesgroup list is reversed
+            parentGroup->moveContainedBoxAbove( // boxesgroup list is reversed
                         box,
                        boxUnderMouse);
         } else { // add box above
-            parentGroup->moveChildBelow(
+            parentGroup->moveContainedBoxBelow(
                         box,
                         boxUnderMouse);
         }

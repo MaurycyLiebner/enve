@@ -308,7 +308,9 @@ bool BoxesListAnimationDockWidget::processKeyEvent(
         if(currCanvas == NULL) return false;
         setCurrentFrame(currCanvas->nextRelFrameWithKey(
                         mMainWindow->getCurrentFrame()));
-    } else if(event->key() == Qt::Key_P) {
+    } else if(event->key() == Qt::Key_P &&
+              !(event->modifiers() & Qt::ControlModifier) &&
+              !(event->modifiers() & Qt::AltModifier)) {
         mLocalPivot->toggle();
     } else {
         return false;

@@ -87,7 +87,7 @@ public:
                                                BoundingBoxRenderData *data);
 
     const SkBlendMode &getBlendMode() {
-        if(mParent->SWT_isLinkBox()) {
+        if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getBlendMode();
         }
         return BoundingBox::getBlendMode();
@@ -109,7 +109,7 @@ public:
     bool SWT_isLinkBox() { return true; }
 
     QMatrix getRelativeTransformAtRelFrame(const int &relFrame) {
-        if(mParent == NULL ? false : mParent->SWT_isLinkBox()) {
+        if(mParentGroup == NULL ? false : mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getRelativeTransformAtRelFrame(relFrame);
         } else {
             return BoundingBox::getRelativeTransformAtRelFrame(relFrame);
@@ -175,7 +175,7 @@ public:
     }
 
     BoundingBox *createLinkForLinkGroup() {
-        if(mParent->SWT_isLinkBox()) {
+        if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->createLinkForLinkGroup();
         } else {
             return new InternalLinkGroupBox(this);
@@ -215,7 +215,7 @@ public:
 
     void setupEffects(const int &relFrame,
                       BoundingBoxRenderData *data) {
-        if(mParent->SWT_isLinkBox()) {
+        if(mParentGroup->SWT_isLinkBox()) {
             getLinkTarget()->setupEffects(relFrame, data);
         } else {
             BoundingBox::setupEffects(relFrame, data);
@@ -223,14 +223,14 @@ public:
     }
 
     qreal getEffectsMarginAtRelFrame(const int &relFrame) {
-        if(mParent->SWT_isLinkBox()) {
+        if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getEffectsMarginAtRelFrame(relFrame);
         }
         return BoxesGroup::getEffectsMarginAtRelFrame(relFrame);
     }
 
     const SkBlendMode &getBlendMode() {
-        if(mParent->SWT_isLinkBox()) {
+        if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->getBlendMode();
         }
         return BoundingBox::getBlendMode();
@@ -245,7 +245,7 @@ public:
         groupData->childrenRenderData.clear();
         qreal childrenEffectsMargin = 0.;
         int absFrame = prp_relFrameToAbsFrame(relFrame);
-        foreach(const QSharedPointer<BoundingBox> &box, mChildBoxes) {
+        foreach(const QSharedPointer<BoundingBox> &box, mContainedBoxes) {
             int boxRelFrame = box->prp_absFrameToRelFrame(absFrame);
             if(box->isRelFrameVisibleAndInVisibleDurationRect(boxRelFrame)) {
                 BoundingBoxRenderData *boxRenderData =
@@ -275,7 +275,7 @@ public:
 
     int prp_getRelFrameShift() const {
         if(getLinkTarget()->SWT_isLinkBox() ||
-           (mParent == NULL ? false : mParent->SWT_isLinkBox())) {
+           (mParentGroup == NULL ? false : mParentGroup->SWT_isLinkBox())) {
             return BoxesGroup::prp_getRelFrameShift() +
                     getLinkTarget()->prp_getRelFrameShift();
         }
@@ -358,7 +358,7 @@ public:
         qreal res = getParentCanvas()->getResolutionFraction();
         canvasData->canvasHeight = canvasTarget->getCanvasHeight()*res;
         canvasData->canvasWidth = canvasTarget->getCanvasWidth()*res;
-        if(mParent->SWT_isLinkBox()) {
+        if(mParentGroup->SWT_isLinkBox()) {
             canvasData->clipToCanvas =
                     ((InternalLinkCanvas*)getLinkTarget())->clipToCanvas();
         } else {
@@ -371,7 +371,7 @@ public:
     }
 
     BoundingBox *createLinkForLinkGroup() {
-        if(mParent->SWT_isLinkBox()) {
+        if(mParentGroup->SWT_isLinkBox()) {
             return getLinkTarget()->createLinkForLinkGroup();
         } else {
             return new InternalLinkCanvas(this);

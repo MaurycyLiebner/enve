@@ -13,7 +13,7 @@ public:
     VideoBox(const QString &filePath);
     VideoBox();
 
-    void setParent(BoxesGroup *parent);
+    void setParentGroup(BoxesGroup *parent);
     void setFilePath(QString path);
     void makeDuplicate(Property *targetBox);
     BoundingBox *createNewDuplicate();

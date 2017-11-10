@@ -148,7 +148,6 @@ SOURCES += main.cpp\
     memorychecker.cpp \
     memoryhandler.cpp \
     boxpathpoint.cpp \
-    Bones/bonepoint.cpp \
     outputgenerator.cpp \
     RenderWidget/renderwidget.cpp \
     RenderWidget/renderinstancewidget.cpp \
@@ -200,7 +199,8 @@ SOURCES += main.cpp\
     Animators/fakecomplexanimator.cpp \
     Animators/qrealvalueeffect.cpp \
     Properties/intproperty.cpp \
-    windowsinglewidgettarget.cpp
+    windowsinglewidgettarget.cpp \
+    Boxes/bone.cpp
 
 HEADERS  += mainwindow.h \
     canvas.h \
@@ -303,7 +303,6 @@ HEADERS  += mainwindow.h \
     memoryhandler.h \
     selfref.h \
     boxpathpoint.h \
-    Bones/bonepoint.h \
     outputgenerator.h \
     RenderWidget/renderwidget.h \
     RenderWidget/renderinstancewidget.h \
@@ -360,7 +359,8 @@ HEADERS  += mainwindow.h \
     Animators/fakecomplexanimator.h \
     Animators/qrealvalueeffect.h \
     Properties/intproperty.h \
-    windowsinglewidgettarget.h
+    windowsinglewidgettarget.h \
+    Boxes/bone.h
 
 RESOURCES += \
     resources.qrc

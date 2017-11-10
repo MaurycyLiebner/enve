@@ -344,7 +344,7 @@ void Canvas::handleRightButtonMousePress(QMouseEvent *event) {
                         QSharedPointer<InternalLinkCanvas> canvasLink =
                                 listOfCanvas.at(id)->
                                 createLink()->ref<InternalLinkCanvas>();
-                        mCurrentBoxesGroup->addChild(canvasLink.data());
+                        mCurrentBoxesGroup->addContainedBox(canvasLink.data());
                         canvasLink->centerPivotPosition();
                     }
                 }
@@ -452,7 +452,7 @@ void Canvas::handleLeftButtonMousePress() {
 
             QSharedPointer<Circle> newPath =
                     (new Circle())->ref<Circle>();
-            mCurrentBoxesGroup->addChild(newPath.data());
+            mCurrentBoxesGroup->addContainedBox(newPath.data());
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
@@ -463,7 +463,7 @@ void Canvas::handleLeftButtonMousePress() {
         } else if(mCurrentMode == CanvasMode::ADD_RECTANGLE) {
             QSharedPointer<Rectangle> newPath =
                     (new Rectangle())->ref<Rectangle>();
-            mCurrentBoxesGroup->addChild(newPath.data());
+            mCurrentBoxesGroup->addContainedBox(newPath.data());
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
             //newPath->startAllPointsTransform();
             clearBoxesSelection();
@@ -477,7 +477,7 @@ void Canvas::handleLeftButtonMousePress() {
                         fonstWidget->getCurrentFontFamily(),
                         fonstWidget->getCurrentFontStyle());
             newPath->setSelectedFontSize(fonstWidget->getCurrentFontSize());
-            mCurrentBoxesGroup->addChild(newPath.data());
+            mCurrentBoxesGroup->addContainedBox(newPath.data());
             newPath->setAbsolutePos(mLastMouseEventPosRel, false);
 
             mCurrentTextBox = newPath.data();
@@ -488,7 +488,7 @@ void Canvas::handleLeftButtonMousePress() {
             //setCanvasMode(CanvasMode::MOVE_POINT);
             QSharedPointer<ParticleBox> partBox =
                     (new ParticleBox())->ref<ParticleBox>();
-            mCurrentBoxesGroup->addChild(partBox.data());
+            mCurrentBoxesGroup->addContainedBox(partBox.data());
             partBox->setAbsolutePos(mLastMouseEventPosRel, false);
             clearBoxesSelection();
             addBoxToSelection(partBox.data());
@@ -509,7 +509,7 @@ void Canvas::handleLeftButtonMousePress() {
         } else if(mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
             //setCanvasMode(CanvasMode::MOVE_POINT);
             QSharedPointer<PaintBox> paintBox = (new PaintBox())->ref<PaintBox>();
-            mCurrentBoxesGroup->addChild(paintBox.data());
+            mCurrentBoxesGroup->addContainedBox(paintBox.data());
             paintBox->setAbsolutePos(mLastMouseEventPosRel, false);
             clearBoxesSelection();
             clearPointsSelection();
@@ -641,7 +641,7 @@ void Canvas::handleMovePointMouseRelease() {
                     clearPointsSelection();
                     clearCurrentEndPoint();
                     clearLastPressedPoint();
-                    setCurrentBoxesGroup((BoxesGroup*) pressedBox->getParent());
+                    setCurrentBoxesGroup((BoxesGroup*) pressedBox->getParentGroup());
                     addBoxToSelection(pressedBox);
                     mLastPressedBox = pressedBox;
                 }
@@ -719,7 +719,7 @@ void Canvas::handleAddPointMousePress() {
     if(mCurrentEndPoint == NULL && nodePointUnderMouse == NULL) {
         QSharedPointer<VectorPath> newPath =
                 (new VectorPath())->ref<VectorPath>();
-        mCurrentBoxesGroup->addChild(newPath.data());
+        mCurrentBoxesGroup->addContainedBox(newPath.data());
         clearBoxesSelection();
         addBoxToSelection(newPath.data());
         PathAnimator *newPathAnimator = newPath->getPathAnimator();
@@ -1172,7 +1172,7 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent *e) {
             if(mHoveredEdge == NULL && mHoveredPoint == NULL) {
                 if(mCurrentBoxesGroup != this) {
                     setCurrentBoxesGroup((BoxesGroup*)
-                                         mCurrentBoxesGroup->getParent());
+                                         mCurrentBoxesGroup->getParentGroup());
                 }
             }
         } else {

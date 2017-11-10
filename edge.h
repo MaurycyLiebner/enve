@@ -2,7 +2,6 @@
 #define EDGE_H
 #include <QPainter>
 #include "selfref.h"
-class BonePoint;
 class NodePoint;
 class CtrlPoint;
 #include "skiaincludes.h"
@@ -99,70 +98,4 @@ private:
     qreal mPressedT;
 };
 
-class BoneInfluencePoint {
-public:
-    BoneInfluencePoint() {}
-    BoneInfluencePoint(const qreal &tT) {
-        mWeight = 0.;
-        mT = tT;
-    }
-
-    BoneInfluencePoint(const qreal &tT,
-                       const qreal &weightT) {
-        mWeight = weightT;
-        mT = tT;
-    }
-
-    const qreal &getT() const {
-        return mT;
-    }
-
-    const qreal &getWeight() const {
-        return mWeight;
-    }
-
-    const QPointF &getAbsPos() const {
-        return mAbsPos;
-    }
-
-    void setAbsPos(const QPointF &absPos) {
-        mAbsPos = absPos;
-    }
-
-private:
-    qreal mAssignedRotation;
-    QPointF mAssignedScale;
-    QPointF mAssignedTranslation;
-
-    qreal mCurrentRotation;
-    QPointF mCurrentScale;
-    QPointF mCurrentTranslation;
-
-    qreal mT;
-    qreal mWeight;
-    QPointF mAbsPos;
-};
-
-class EdgeInfluencePoints {
-public:
-    EdgeInfluencePoints(BonePoint *bonePoint);
-
-    void addInfluencePointAtAbsPos(const QPointF &absPos);
-
-    void addInfluencePoint(const qreal &t);
-
-    void removeInfluencePointNearAbsPos(const QPointF &absPos);
-
-    void removeInfluencePoint(const int &id);
-
-    void updatePointsAbsPosition();
-
-private:
-    VectorPathEdge *mParentEdge;
-    BoneInfluencePoint mPoint1InfluencePoint;
-    BoneInfluencePoint mPoint2InfluencePoint;
-    QList<BoneInfluencePoint> mBoneInfluencePoints;
-
-    BonePoint *mBonePoint;
-};
 #endif // EDGE_H

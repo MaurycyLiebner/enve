@@ -41,7 +41,8 @@ enum BoundingBoxType {
     TYPE_PARTICLES,
     TYPE_VIDEO,
     TYPE_IMAGESQUENCE,
-    TYPE_PAINT
+    TYPE_PAINT,
+    TYPE_BONE
 };
 
 class BoxesGroup;
@@ -217,8 +218,12 @@ public:
     virtual void drawBoundingRectSk(SkCanvas *canvas,
                                     const qreal &invScale);
 
-    virtual void setParent(BoxesGroup *parent);
-    BoxesGroup *getParent();
+    virtual void setParentGroup(BoxesGroup *parent);
+    void setParent(BoundingBox *parent);
+    void clearParent();
+
+    BoxesGroup *getParentGroup();
+    BoundingBox *getParent();
 
     virtual BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
@@ -477,7 +482,7 @@ public:
     virtual void updateCurrentPreviewDataFromRenderData(
             BoundingBoxRenderData *renderData);
     virtual bool shouldScheduleUpdate() {
-        if(mParent == NULL) return false;
+        if(mParentGroup == NULL) return false;
         if((isVisibleAndInVisibleDurationRect()) ||
            (isRelFrameInVisibleDurationRect(anim_mCurrentRelFrame))) {
             return true;
@@ -591,8 +596,24 @@ public:
     void decReasonsNotToApplyUglyTransform() {
         mNReasonsNotToApplyUglyTransform--;
     }
+
+    void addChildBox(BoundingBox *box) {
+        mChildBoxes.append(box);
+    }
+
+    void removeChildBox(BoundingBox *box) {
+        mChildBoxes.removeOne(box);
+    }
+
+    void clearChildBoxes() {
+        foreach(BoundingBox *box, mChildBoxes) {
+            box->clearParent();
+        }
+        mChildBoxes.clear();
+    }
 protected:
     int mNReasonsNotToApplyUglyTransform = 0;
+    QList<BoundingBox*> mChildBoxes;
     QList<BoundingBox*> mLinkingBoxes;
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
@@ -611,8 +632,8 @@ protected:
     QRectF mRelBoundingRect;
     SkRect mRelBoundingRectSk;
 
-    virtual void updateAfterCombinedTransformationChanged() {}
-    virtual void updateAfterCombinedTransformationChangedAfterFrameChagne() {}
+    virtual void updateAfterCombinedTransformationChanged();
+    virtual void updateAfterCombinedTransformationChangedAfterFrameChagne();
 
     RenderContainer mDrawRenderContainer;
 
@@ -624,7 +645,8 @@ protected:
 
     void setType(const BoundingBoxType &type) { mType = type; }
     BoundingBoxType mType;
-    BoxesGroup *mParent = NULL;
+    BoxesGroup *mParentGroup = NULL;
+    BoundingBox *mParent = NULL;
 
     QSharedPointer<EffectAnimators> mEffectsAnimators =
             (new EffectAnimators())->ref<EffectAnimators>();

@@ -134,7 +134,7 @@ BoxesGroup *loadBoxesGroup(const QDomElement &groupElement,
         boxesGroup = new BoxesGroup();
         attributes->apply(boxesGroup);
         if(parentGroup != NULL) {
-            parentGroup->addChild(boxesGroup);
+            parentGroup->addContainedBox(boxesGroup);
         }
     } else {
         boxesGroup = parentGroup;
@@ -951,7 +951,7 @@ void loadVectorPath(const QDomElement &pathElement,
     QString pathStr = pathElement.attribute("d");
     parsePathDataFast(pathStr, attributes);
     attributes->apply(vectorPath);
-    parentGroup->addChild(vectorPath);
+    parentGroup->addContainedBox(vectorPath);
 }
 
 void loadPolyline(const QDomElement &pathElement,
@@ -962,7 +962,7 @@ void loadPolyline(const QDomElement &pathElement,
     QString pathStr = pathElement.attribute("points");
     parsePolylineDataFast(pathStr, attributes);
     attributes->apply(vectorPath);
-    parentGroup->addChild(vectorPath);
+    parentGroup->addContainedBox(vectorPath);
 }
 
 void loadCircle(const QDomElement &pathElement,
@@ -990,7 +990,7 @@ void loadCircle(const QDomElement &pathElement,
     circle->moveByRel(QPointF(cXstr.toDouble(), cYstr.toDouble()));
 
     attributes->apply(circle);
-    parentGroup->addChild(circle);
+    parentGroup->addContainedBox(circle);
 }
 
 void loadRect(const QDomElement &pathElement,
@@ -1021,7 +1021,7 @@ void loadRect(const QDomElement &pathElement,
     rect->setXRadius(rXstr.toDouble());
 
     attributes->apply(rect);
-    parentGroup->addChild(rect);
+    parentGroup->addContainedBox(rect);
 }
 
 
@@ -1039,7 +1039,7 @@ void loadText(const QDomElement &pathElement,
     textBox->setCurrentTextValue(pathElement.text(), false);
 
     attributes->apply(textBox);
-    parentGroup->addChild(textBox);
+    parentGroup->addContainedBox(textBox);
 }
 
 void loadElement(const QDomElement &element, BoxesGroup *parentGroup,

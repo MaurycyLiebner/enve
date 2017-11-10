@@ -1022,9 +1022,9 @@ void TextBox::readBoundingBox(QIODevice *target) {
 
 void BoxesGroup::writeBoundingBox(QIODevice *target) {
     BoundingBox::writeBoundingBox(target);
-    int nChildBoxes = mChildBoxes.count();
+    int nChildBoxes = mContainedBoxes.count();
     target->write((char*)&nChildBoxes, sizeof(int));
-    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mChildBoxes) {
+    Q_FOREACH(const QSharedPointer<BoundingBox> &child, mContainedBoxes) {
         child->writeBoundingBox(target);
     }
 }
@@ -1065,7 +1065,7 @@ void BoxesGroup::readChildBoxes(QIODevice *target) {
         }
 
         box->readBoundingBox(target);
-        addChild(box);
+        addContainedBox(box);
     }
 }
 

@@ -139,7 +139,7 @@ InternalLinkGroupBox::InternalLinkGroupBox(BoxesGroup *linkTarget) :
     foreach(const QSharedPointer<BoundingBox> &child, boxesList) {
         QSharedPointer<BoundingBox> newLink =
                 child->createLinkForLinkGroup()->ref<BoundingBox>();
-        addChild(newLink.data());
+        addContainedBox(newLink.data());
     }
     ca_addChildAnimator(mBoxTarget.data());
     connect(mBoxTarget.data(), SIGNAL(targetSet(BoundingBox*)),

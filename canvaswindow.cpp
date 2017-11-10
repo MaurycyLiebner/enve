@@ -1147,7 +1147,7 @@ void CanvasWindow::importFile(const QString &path,
         MainWindow::getInstance()->unblockUndoRedo();
 
         if(importedBox != NULL) {
-            mCurrentCanvas->getCurrentBoxesGroup()->addChild(
+            mCurrentCanvas->getCurrentBoxesGroup()->addContainedBox(
                         importedBox.data());
             QPointF trans = relDropPos;
             trans -= importedBox->mapRelPosToAbs(

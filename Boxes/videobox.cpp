@@ -23,12 +23,12 @@ VideoBox::VideoBox(const QString &filePath) :
     setFilePath(filePath);
 }
 
-void VideoBox::setParent(BoxesGroup *parent) {
-    if(mParent != NULL && mSound != NULL) {
+void VideoBox::setParentGroup(BoxesGroup *parent) {
+    if(mParentGroup != NULL && mSound != NULL) {
         getParentCanvas()->getSoundComposition()->removeSound(mSound);
     }
-    AnimationBox::setParent(parent);
-    if(mParent != NULL && mSound != NULL) {
+    AnimationBox::setParentGroup(parent);
+    if(mParentGroup != NULL && mSound != NULL) {
         getParentCanvas()->getSoundComposition()->addSound(mSound);
     }
 }
@@ -117,7 +117,7 @@ void VideoBox::reloadSound() {
             mSound = new SingleSound(mSrcFilePath,
                                      (FixedLenAnimationRect*)mDurationRectangle);
             ca_addChildAnimator(mSound);
-            if(mParent != NULL) {
+            if(mParentGroup != NULL) {
                 getParentCanvas()->getSoundComposition()->addSound(mSound);
             }
         } else {

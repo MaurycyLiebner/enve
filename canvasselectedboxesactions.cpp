@@ -616,7 +616,7 @@ void Canvas::moveSelectedBoxesByAbs(const QPointF &by,
 #include "Boxes/linkbox.h"
 void Canvas::createLinkBoxForSelected() {
     Q_FOREACH(BoundingBox *selectedBox, mSelectedBoxes) {
-        mCurrentBoxesGroup->addChild(selectedBox->createLink());
+        mCurrentBoxesGroup->addContainedBox(selectedBox->createLink());
     }
 }
 
@@ -642,11 +642,11 @@ void Canvas::duplicateSelectedBoxes() {
 void Canvas::groupSelectedBoxes() {
     if(mSelectedBoxes.count() == 0) return;
     BoxesGroup *newGroup = new BoxesGroup();
-    mCurrentBoxesGroup->addChild(newGroup);
+    mCurrentBoxesGroup->addContainedBox(newGroup);
     BoundingBox *box;
     Q_FOREACHInverted(box, mSelectedBoxes) {
         box->removeFromParent();
-        newGroup->addChild(box);
+        newGroup->addContainedBox(box);
     }
     mSelectedBoxes.clear(); schedulePivotUpdate();
     addBoxToSelection(newGroup);
@@ -684,7 +684,7 @@ VectorPath *Canvas::getPathResultingFromOperation(
     targetPath->generateSinglePathPaths();
 
     newPath->loadPathFromSkPath(QPainterPathToSkPath(targetPath->getPath()));
-    mCurrentBoxesGroup->addChild(newPath);
+    mCurrentBoxesGroup->addContainedBox(newPath);
     foreach(FullVectorPath *pathT, pathsT) {
         delete pathT;
     }
@@ -741,7 +741,7 @@ void Canvas::selectedPathsCombine() {
     }
     if(firstVectorPath == NULL) {
         firstVectorPath = new VectorPath();
-        addChild(firstVectorPath);
+        addContainedBox(firstVectorPath);
     }
     QMatrix firstTranf = firstVectorPath->getCombinedTransform();
     foreach(BoundingBox *box, mSelectedBoxes) {

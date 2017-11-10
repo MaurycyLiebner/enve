@@ -125,7 +125,7 @@ void Canvas::setCurrentBoxesGroup(BoxesGroup *group) {
 
 ImageBox *Canvas::createImageBox(const QString &path) {
     ImageBox *img = new ImageBox(path);
-    mCurrentBoxesGroup->addChild(img);
+    mCurrentBoxesGroup->addContainedBox(img);
     return img;
 }
 
@@ -253,7 +253,7 @@ void Canvas::renderSk(SkCanvas *canvas) {
 
         canvas->concat(QMatrixToSkMatrix(mCanvasTransformMatrix));
         canvas->saveLayer(NULL, NULL);
-        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mChildBoxes){
+        Q_FOREACH(const QSharedPointer<BoundingBox> &box, mContainedBoxes){
             box->drawPixmapSk(canvas);
         }
         canvas->restore();
@@ -567,14 +567,14 @@ void Canvas::clearCurrentPreviewImage() {
 ImageSequenceBox *Canvas::createAnimationBoxForPaths(const QStringList &paths) {
     ImageSequenceBox *aniBox = new ImageSequenceBox();
     aniBox->setListOfFrames(paths);
-    mCurrentBoxesGroup->addChild(aniBox);
+    mCurrentBoxesGroup->addContainedBox(aniBox);
     return aniBox;
 }
 
 #include "Boxes/videobox.h"
 VideoBox *Canvas::createVideoForPath(const QString &path) {
     VideoBox *vidBox = new VideoBox(path);
-    mCurrentBoxesGroup->addChild(vidBox);
+    mCurrentBoxesGroup->addContainedBox(vidBox);
     return vidBox;
 }
 
@@ -582,7 +582,7 @@ VideoBox *Canvas::createVideoForPath(const QString &path) {
 void Canvas::createLinkToFileWithPath(const QString &path) {
     ExternalLinkBox *extLinkBox = new ExternalLinkBox();
     extLinkBox->setSrc(path);
-    mCurrentBoxesGroup->addChild(extLinkBox);
+    mCurrentBoxesGroup->addContainedBox(extLinkBox);
 }
 
 void Canvas::schedulePivotUpdate() {
@@ -901,6 +901,19 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         resetTransormation();
     } else if(event->key() == Qt::Key_Delete) {
         deleteAction();
+    } else if(event->modifiers() & Qt::ControlModifier &&
+              event->key() == Qt::Key_P) {
+        if(mSelectedBoxes.count() > 1) {
+            BoundingBox *parentBox = mSelectedBoxes.last();
+            for(int i = 0; i < mSelectedBoxes.count() - 1; i++) {
+                mSelectedBoxes.at(i)->setParent(parentBox);
+            }
+        }
+    } else if(event->modifiers() & Qt::AltModifier &&
+              event->key() == Qt::Key_P) {
+        for(int i = 0; i < mSelectedBoxes.count(); i++) {
+            mSelectedBoxes.at(i)->clearParent();
+        }
     } else if(event->modifiers() & Qt::ControlModifier &&
               event->key() == Qt::Key_G) {
        if(isShiftPressed()) {

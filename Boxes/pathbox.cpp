@@ -459,7 +459,7 @@ VectorPath *PathBox::objectToPath() {
                                         mStrokeSettings.data());
     newPath->duplicateGradientPointsFrom(mFillGradientPoints.data(),
                                          mStrokeGradientPoints.data());
-    mParent->addChild(newPath);
+    mParentGroup->addContainedBox(newPath);
     return newPath;
 }
 
@@ -472,7 +472,7 @@ VectorPath *PathBox::strokeToPath() {
                                         NULL);
     newPath->duplicateGradientPointsFrom(mStrokeGradientPoints.data(),
                                          NULL);
-    mParent->addChild(newPath);
+    mParentGroup->addContainedBox(newPath);
     return newPath;
 }
 

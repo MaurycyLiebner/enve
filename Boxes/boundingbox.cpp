@@ -106,7 +106,7 @@ BoundingBox *BoundingBox::createDuplicate() {
 
 BoundingBox *BoundingBox::createDuplicateWithSameParent() {
     BoundingBox *duplicate = createDuplicate();
-    mParent->addChild(duplicate);
+    mParentGroup->addContainedBox(duplicate);
     return duplicate;
 }
 
@@ -131,9 +131,9 @@ void BoundingBox::drawHoveredPathSk(SkCanvas *canvas,
 }
 
 bool BoundingBox::isAncestor(BoxesGroup *box) const {
-    if(mParent == box) return true;
-    if(mParent == NULL) return false;
-    return mParent->isAncestor(box);
+    if(mParentGroup == box) return true;
+    if(mParentGroup == NULL) return false;
+    return mParentGroup->isAncestor(box);
 }
 
 bool BoundingBox::isAncestor(BoundingBox *box) const {
@@ -165,8 +165,8 @@ void BoundingBox::applyEffectsSk(const SkBitmap &im,
 }
 
 Canvas *BoundingBox::getParentCanvas() {
-    if(mParent == NULL) return NULL;
-    return mParent->getParentCanvas();
+    if(mParentGroup == NULL) return NULL;
+    return mParentGroup->getParentCanvas();
 }
 
 void BoundingBox::duplicateTransformAnimatorFrom(
@@ -251,7 +251,7 @@ void BoundingBox::prp_setAbsFrame(const int &frame) {
                 anim_mCurrentRelFrame);
     if(mUpdateDrawOnParentBox != isInVisRange) {
         if(mUpdateDrawOnParentBox) {
-            mParent->scheduleUpdate();
+            mParentGroup->scheduleUpdate();
         } else {
             scheduleUpdate();
         }
@@ -272,16 +272,42 @@ bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
     return mDurationRectangle->hasAnimationFrameRange();
 }
 
-void BoundingBox::setParent(BoxesGroup *parent) {
+void BoundingBox::setParentGroup(BoxesGroup *parent) {
+    mParentGroup = parent;
+    if(mParent != NULL) {
+        mParent->removeChildBox(this);
+    }
     mParent = parent;
     mTransformAnimator->setParentTransformAnimator(
                         mParent->getTransformAnimator());
 
-    prp_setAbsFrame(mParent->anim_getCurrentAbsFrame());
+    prp_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
     updateCombinedTransform();
+    mParent->addChildBox(this);
 }
 
-BoxesGroup *BoundingBox::getParent() {
+void BoundingBox::setParent(BoundingBox *parent) {
+    if(parent == mParent) return;
+    if(mParent != NULL) {
+        mParent->removeChildBox(this);
+    }
+    mParent = parent;
+    mTransformAnimator->setParentTransformAnimator(
+                        mParent->getTransformAnimator());
+
+    updateCombinedTransform();
+    mParent->addChildBox(this);
+}
+
+void BoundingBox::clearParent() {
+    setParent(mParentGroup);
+}
+
+BoxesGroup *BoundingBox::getParentGroup() {
+    return mParentGroup;
+}
+
+BoundingBox *BoundingBox::getParent() {
     return mParent;
 }
 
@@ -362,8 +388,8 @@ void BoundingBox::scheduleUpdate() {
 
     //mUpdateDrawOnParentBox = isVisibleAndInVisibleDurationRect();
 
-    if(mParent != NULL) {
-        mParent->scheduleUpdate();
+    if(mParentGroup != NULL) {
+        mParentGroup->scheduleUpdate();
     }
     mCurrentRenderData->addScheduler();
 
@@ -615,19 +641,19 @@ void BoundingBox::cancelTransform() {
 }
 
 void BoundingBox::moveUp() {
-    mParent->increaseChildZInList(this);
+    mParentGroup->increaseContainedBoxZInList(this);
 }
 
 void BoundingBox::moveDown() {
-    mParent->decreaseChildZInList(this);
+    mParentGroup->decreaseContainedBoxZInList(this);
 }
 
 void BoundingBox::bringToFront() {
-    mParent->bringChildToEndList(this);
+    mParentGroup->bringContainedBoxToEndList(this);
 }
 
 void BoundingBox::bringToEnd() {
-    mParent->bringChildToFrontList(this);
+    mParentGroup->bringContainedBoxToFrontList(this);
 }
 
 void BoundingBox::setZListIndex(const int &z,
@@ -660,7 +686,7 @@ void BoundingBox::updateRelativeTransformAfterFrameChange() {
 }
 
 void BoundingBox::updateCombinedTransformAfterFrameChange() {
-    if(mParent == NULL) return;
+    if(mParentGroup == NULL) return;
     updateDrawRenderContainerTransform();
 
     updateAfterCombinedTransformationChangedAfterFrameChagne();
@@ -676,15 +702,31 @@ void BoundingBox::updateDrawRenderContainerTransform() {
 }
 
 void BoundingBox::updateCombinedTransform() {
-    if(mParent == NULL) return;
+    if(mParentGroup == NULL) return;
     updateDrawRenderContainerTransform();
 
     updateAfterCombinedTransformationChanged();
     scheduleUpdate();
 }
 
+
 void BoundingBox::updateCombinedTransformTmp() {
+    Q_FOREACH(BoundingBox *child, mChildBoxes) {
+        child->updateCombinedTransformTmp();
+    }
     updateCombinedTransform();
+}
+
+void BoundingBox::updateAfterCombinedTransformationChanged() {
+    Q_FOREACH(BoundingBox *child, mChildBoxes) {
+        child->updateCombinedTransform();
+    }
+}
+
+void BoundingBox::updateAfterCombinedTransformationChangedAfterFrameChagne() {
+    Q_FOREACH(BoundingBox *child, mChildBoxes) {
+        child->updateCombinedTransformAfterFrameChange();
+    }
 }
 
 BoxTransformAnimator *BoundingBox::getTransformAnimator() {
@@ -727,10 +769,10 @@ void BoundingBox::removeEffect(PixmapEffect *effect) {
 }
 
 int BoundingBox::prp_getParentFrameShift() const {
-    if(mParent == NULL) {
+    if(mParentGroup == NULL) {
         return 0;
     } else {
-        return mParent->prp_getFrameShift();
+        return mParentGroup->prp_getFrameShift();
     }
 }
 
@@ -960,7 +1002,7 @@ void BoundingBox::switchVisible() {
 }
 
 bool BoundingBox::isParentLinkBox() {
-    return mParent->SWT_isLinkBox();
+    return mParentGroup->SWT_isLinkBox();
 }
 
 void BoundingBox::switchLocked() {
@@ -1094,7 +1136,7 @@ void BoundingBox::SWT_addToContextMenu(
 }
 
 void BoundingBox::removeFromParent() {
-    mParent->removeChild(this);
+    mParentGroup->removeContainedBox(this);
 }
 
 void BoundingBox::removeFromSelection() {
@@ -1107,11 +1149,11 @@ bool BoundingBox::SWT_handleContextMenuActionSelected(
         QAction *selectedAction) {
     if(selectedAction != NULL) {
         if(selectedAction->text() == "Delete") {
-            mParent->removeChild(this);
+            mParentGroup->removeContainedBox(this);
         } else if(selectedAction->text() == "Apply Transformation") {
             applyCurrentTransformation();
         } else if(selectedAction->text() == "Create Link") {
-            mParent->addChild(createLink());
+            mParentGroup->addContainedBox(createLink());
         } else if(selectedAction->text() == "Group") {
             getParentCanvas()->groupSelectedBoxes();
             return true;
