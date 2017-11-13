@@ -9,12 +9,14 @@ Circle::Circle() :
     PathBox(TYPE_CIRCLE) {
     setName("Circle");
 
-    mCenter = new CircleCenterPoint(this, TYPE_PATH_POINT);
+    mCenter = new CircleCenterPoint(mTransformAnimator.data(), TYPE_PATH_POINT);
     mCenter->setRelativePos(QPointF(0., 0.));
-    mHorizontalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
+    mHorizontalRadiusPoint = new CircleRadiusPoint(mTransformAnimator.data(),
+                                                   TYPE_PATH_POINT,
                                                    false, mCenter);
     mHorizontalRadiusPoint->setRelativePos(QPointF(10., 0.));
-    mVerticalRadiusPoint = new CircleRadiusPoint(this, TYPE_PATH_POINT,
+    mVerticalRadiusPoint = new CircleRadiusPoint(mTransformAnimator.data(),
+                                                 TYPE_PATH_POINT,
                                                  true, mCenter);
     mVerticalRadiusPoint->setRelativePos(QPointF(0., 10.));
 
@@ -143,7 +145,7 @@ SkPath Circle::getPathAtRelFrame(const int &relFrame) {
     return path;
 }
 
-CircleCenterPoint::CircleCenterPoint(BoundingBox *parent,
+CircleCenterPoint::CircleCenterPoint(BasicTransformAnimator *parent,
                                      MovablePointType type) :
     PointAnimator(parent, type) {
 
@@ -162,7 +164,8 @@ void CircleCenterPoint::setVerticalAndHorizontalPoints(
 }
 
 void CircleCenterPoint::moveByRel(const QPointF &relTranslatione) {
-    mParent->moveByRel(relTranslatione);
+    mParent->moveRelativeToSavedValue(relTranslatione.x(),
+                                      relTranslatione.y());
 }
 
 void CircleCenterPoint::moveByAbs(const QPointF &absTranslatione) {
@@ -170,14 +173,14 @@ void CircleCenterPoint::moveByAbs(const QPointF &absTranslatione) {
 }
 
 void CircleCenterPoint::startTransform() {
-    mParent->startTransform();
+    mParent->prp_startTransform();
 }
 
 void CircleCenterPoint::finishTransform() {
-    mParent->finishTransform();
+    mParent->prp_finishTransform();
 }
 
-CircleRadiusPoint::CircleRadiusPoint(BoundingBox *parent,
+CircleRadiusPoint::CircleRadiusPoint(BasicTransformAnimator *parent,
                                      const MovablePointType &type,
                                      const bool &blockX,
                                      MovablePoint *centerPoint) :

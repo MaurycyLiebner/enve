@@ -18,7 +18,7 @@ class PointAnimator :
     public QPointFAnimator,
     public MovablePoint {
 public:
-    PointAnimator(BoundingBox *parent,
+    PointAnimator(BasicTransformAnimator *parent,
                  const MovablePointType &type,
                  const qreal &radius = 7.5);
 

@@ -14,8 +14,10 @@ double fRand(double fMin, double fMax) {
 ParticleBox::ParticleBox() :
     BoundingBox(TYPE_PARTICLES) {
     setName("Particle Box");
-    mTopLeftPoint = new PointAnimator(this, TYPE_PATH_POINT);
-    mBottomRightPoint = new PointAnimator(this, TYPE_PATH_POINT);
+    mTopLeftPoint = new PointAnimator(mTransformAnimator.data(),
+                                      TYPE_PATH_POINT);
+    mBottomRightPoint = new PointAnimator(mTransformAnimator.data(),
+                                          TYPE_PATH_POINT);
 
     ca_addChildAnimator(mTopLeftPoint);
     ca_addChildAnimator(mBottomRightPoint);
@@ -318,7 +320,8 @@ ParticleEmitter::ParticleEmitter(ParticleBox *parentBox) :
 
     prp_setName("particle emitter");
 
-    mPos = (new PointAnimator(mParentBox, TYPE_PATH_POINT))->ref<PointAnimator>();
+    mPos = (new PointAnimator(mParentBox->getTransformAnimator(),
+                              TYPE_PATH_POINT))->ref<PointAnimator>();
     //mPos->setName("pos");
     //mPos.setCurrentValue(QPointF(0., 0.));
 

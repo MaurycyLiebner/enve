@@ -6,7 +6,7 @@
 #include "skqtconversions.h"
 #include "pointhelpers.h"
 
-MovablePoint::MovablePoint(BoundingBox *parent,
+MovablePoint::MovablePoint(BasicTransformAnimator *parent,
                            const MovablePointType &type,
                            const qreal &radius) :
     Transformable() {
@@ -46,8 +46,7 @@ void MovablePoint::finishTransform() {
 }
 
 void MovablePoint::setAbsolutePos(const QPointF &pos) {
-    QPointF newPos = mParent->getCombinedTransform().inverted().map(pos);
-    setRelativePos(newPos);
+    setRelativePos(mParent->mapAbsPosToRel(pos));
 }
 
 QPointF MovablePoint::mapRelativeToAbsolute(const QPointF &relPos) const {
@@ -120,7 +119,7 @@ void MovablePoint::drawSk(SkCanvas *canvas,
     }
 }
 
-BoundingBox *MovablePoint::getParent() {
+BasicTransformAnimator *MovablePoint::getParent() {
     return mParent;
 }
 

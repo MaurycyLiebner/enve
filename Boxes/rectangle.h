@@ -4,12 +4,12 @@
 
 class RectangleTopLeftPoint : public PointAnimator {
 public:
-    RectangleTopLeftPoint(BoundingBox *parent);
+    RectangleTopLeftPoint(BasicTransformAnimator *parent);
 };
 
 class RectangleBottomRightPoint : public PointAnimator {
 public:
-    RectangleBottomRightPoint(BoundingBox *parent);
+    RectangleBottomRightPoint(BasicTransformAnimator *parent);
 };
 
 class Rectangle : public PathBox {

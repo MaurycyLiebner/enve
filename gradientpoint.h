@@ -8,7 +8,7 @@ public:
     GradientPoint(PathBox *parent);
     void setRelativePos(const QPointF &relPos);
     void moveByRel(const QPointF &relTranslatione);
-    void setColor(QColor fillColor);
+    void setColor(const QColor &fillColor);
     void drawSk(SkCanvas *canvas,
                 const SkScalar &invScale);
 private:

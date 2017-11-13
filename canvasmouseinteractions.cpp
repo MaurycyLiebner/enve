@@ -525,16 +525,16 @@ void Canvas::handleLeftButtonMousePress() {
             mLastPressedPoint->startTransform();
         } else if(mCurrentMode == CanvasMode::ADD_BONE) {
             //setCanvasMode(CanvasMode::MOVE_POINT);
-            QSharedPointer<Bone> boneBox = (new Bone())->ref<Bone>();
+            QSharedPointer<BonesBox> boneBox = (new BonesBox())->ref<BonesBox>();
             mCurrentBoxesGroup->addContainedBox(boneBox.data());
             boneBox->setAbsolutePos(mLastMouseEventPosRel, false);
             clearBoxesSelection();
             clearPointsSelection();
             addBoxToSelection(boneBox.data());
 
-            mLastPressedPoint = boneBox->getEndPt();
-            addPointToSelection(mLastPressedPoint);
-            mLastPressedPoint->startTransform();
+//            mLastPressedPoint = boneBox->getEndPt();
+//            addPointToSelection(mLastPressedPoint);
+//            mLastPressedPoint->startTransform();
         }
     } // current mode allows interaction with points
 }

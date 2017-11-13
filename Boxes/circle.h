@@ -6,7 +6,7 @@
 class CircleCenterPoint : public PointAnimator
 {
 public:
-    CircleCenterPoint(BoundingBox *parent, MovablePointType type);
+    CircleCenterPoint(BasicTransformAnimator *parent, MovablePointType type);
     ~CircleCenterPoint();
 
     void setVerticalAndHorizontalPoints(MovablePoint *verticalPoint,
@@ -26,7 +26,7 @@ private:
 class CircleRadiusPoint : public PointAnimator
 {
 public:
-    CircleRadiusPoint(BoundingBox *parent,
+    CircleRadiusPoint(BasicTransformAnimator *parent,
                       const MovablePointType &type,
                       const bool &blockX,
                       MovablePoint *centerPoint);

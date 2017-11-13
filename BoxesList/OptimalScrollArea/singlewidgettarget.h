@@ -69,6 +69,7 @@ public:
     virtual bool SWT_isCanvas() { return false; }
     virtual bool SWT_isAnimationBox() { return false; }
     virtual bool SWT_isBoundingBox() { return false; }
+    virtual bool SWT_isBonesBox() { return false; }
     virtual bool SWT_isBone() { return false; }
     virtual bool SWT_isBoxesGroup() { return false; }
     virtual bool SWT_isCircle() { return false; }

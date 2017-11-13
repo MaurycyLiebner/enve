@@ -4,23 +4,22 @@
 #include "pointhelpers.h"
 
 GradientPoint::GradientPoint(PathBox *parent) :
-    PointAnimator(parent, TYPE_GRADIENT_POINT) {
+    PointAnimator(parent->getTransformAnimator(), TYPE_GRADIENT_POINT) {
     prp_setUpdater(new DisplayedFillStrokeSettingsUpdater(parent));
 }
 
 void GradientPoint::setRelativePos(const QPointF &relPos) {
     PointAnimator::setRelativePos(relPos);
-    ((VectorPath*)mParent)->updateDrawGradients();
+    ((VectorPath*)(((BoxTransformAnimator*)mParent)->getParentBox()))->updateDrawGradients();
 }
 
 void GradientPoint::moveByRel(const QPointF &relTranslatione) {
     PointAnimator::moveByRel(relTranslatione);
-    ((VectorPath*)mParent)->updateDrawGradients();
+    ((VectorPath*)(((BoxTransformAnimator*)mParent)->getParentBox()))->updateDrawGradients();
 }
 
-void GradientPoint::setColor(QColor fillColor) {
+void GradientPoint::setColor(const QColor &fillColor) {
     mFillColor = fillColor;
-    
 }
 
 void GradientPoint::drawSk(SkCanvas *canvas,

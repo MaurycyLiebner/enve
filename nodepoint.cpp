@@ -10,7 +10,8 @@
 #include "Animators/PathAnimators/vectorpathanimator.h"
 
 NodePoint::NodePoint(VectorPathAnimator *parentAnimator) :
-    NonAnimatedMovablePoint(parentAnimator->getParentPathAnimator()->getParentBox(),
+    NonAnimatedMovablePoint(parentAnimator->getParentPathAnimator()->
+                            getParentBox()->getTransformAnimator(),
                  MovablePointType::TYPE_PATH_POINT, 9.5) {
     mParentPath = parentAnimator;
     mStartCtrlPt = new CtrlPoint(this, true);

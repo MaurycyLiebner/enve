@@ -8,8 +8,10 @@
 PaintBox::PaintBox() :
     BoundingBox(TYPE_PAINT) {
     setName("Paint Box");
-    mTopLeftPoint = new PointAnimator(this, TYPE_PATH_POINT);
-    mBottomRightPoint = new PointAnimator(this, TYPE_PATH_POINT);
+    mTopLeftPoint = new PointAnimator(mTransformAnimator.data(),
+                                      TYPE_PATH_POINT);
+    mBottomRightPoint = new PointAnimator(mTransformAnimator.data(),
+                                          TYPE_PATH_POINT);
 
     mTopLeftPoint->prp_setUpdater(
                 new PaintBoxSizeUpdaterTL(this));

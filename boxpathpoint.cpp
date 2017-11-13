@@ -2,24 +2,25 @@
 #include "Boxes/boundingbox.h"
 #include "pointhelpers.h"
 
-BoxPathPoint::BoxPathPoint(BoundingBox *box) :
+BoxPathPoint::BoxPathPoint(BoxTransformAnimator *box) :
     PointAnimator(box, TYPE_PIVOT_POINT, 7.) {
 }
 
 void BoxPathPoint::startTransform() {
     MovablePoint::startTransform();
     mSavedAbsPos = getAbsolutePos();
-    mParent->startPivotTransform();
+    ((BoxTransformAnimator*)mParent)->startPivotTransform();
 }
 
 void BoxPathPoint::finishTransform() {
     MovablePoint::finishTransform();
-    mParent->finishPivotTransform();
+    ((BoxTransformAnimator*)mParent)->finishPivotTransform();
 }
 
 void BoxPathPoint::moveByAbs(const QPointF &absTranslatione) {
     QPointF absPos = mSavedAbsPos + absTranslatione;
-    mParent->setPivotAbsPos(absPos, false, false);
+    BoxTransformAnimator *boxTrans = (BoxTransformAnimator*)mParent;
+    boxTrans->getParentBox()->setPivotAbsPos(absPos, false, false);
 }
 
 void BoxPathPoint::drawSk(SkCanvas *canvas,

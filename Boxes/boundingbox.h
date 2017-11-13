@@ -42,7 +42,7 @@ enum BoundingBoxType {
     TYPE_VIDEO,
     TYPE_IMAGESQUENCE,
     TYPE_PAINT,
-    TYPE_BONE
+    TYPE_BONES_BOX
 };
 
 class BoxesGroup;
@@ -304,9 +304,6 @@ public:
     void resetTranslation();
     void resetRotation();
     BoxTransformAnimator *getTransformAnimator();
-    void disablePivotAutoAdjust();
-    void enablePivotAutoAdjust();
-
     virtual VectorPath *objectToPath() { return NULL; }
     virtual VectorPath *strokeToPath() { return NULL; }
 
@@ -588,6 +585,9 @@ public:
     bool isSelected() { return mSelected; }
 
     void updateDrawRenderContainerTransform();
+    void setPivotAutoAdjust(const bool &bT) {
+        mPivotAutoAdjust = bT;
+    }
 protected:
     QPointF mSavedTransformPivot;
     bool mSelected = false;

@@ -298,37 +298,27 @@ BoxesGroup *BoundingBox::getParentGroup() {
     return mParentGroup;
 }
 
-void BoundingBox::disablePivotAutoAdjust() {
-    mPivotAutoAdjust = false;
-}
-
-void BoundingBox::enablePivotAutoAdjust() {
-    mPivotAutoAdjust = true;
-}
-
 void BoundingBox::setPivotRelPos(const QPointF &relPos,
                                  const bool &saveUndoRedo,
                                  const bool &pivotAutoAdjust) {
     mPivotAutoAdjust = pivotAutoAdjust;
-    mTransformAnimator->
-            setPivotWithoutChangingTransformation(relPos,
-                                                  saveUndoRedo);//setPivot(relPos, saveUndoRedo);//setPivotWithoutChangingTransformation(relPos, saveUndoRedo);
+    mTransformAnimator->setPivotWithoutChangingTransformation(relPos,
+                                                              saveUndoRedo);
     schedulePivotUpdate();
 }
 
 void BoundingBox::startPivotTransform() {
-    mTransformAnimator->pivotTransformStarted();
+    mTransformAnimator->startPivotTransform();
 }
 
 void BoundingBox::finishPivotTransform() {
-    mTransformAnimator->pivotTransformFinished();
+    mTransformAnimator->finishPivotTransform();
 }
 
 void BoundingBox::setPivotAbsPos(const QPointF &absPos,
                                  const bool &saveUndoRedo,
                                  const bool &pivotChanged) {
-    QPointF newPos = mapAbsPosToRel(absPos);
-    setPivotRelPos(newPos, saveUndoRedo, pivotChanged);
+    setPivotRelPos(mapAbsPosToRel(absPos), saveUndoRedo, pivotChanged);
     //updateCombinedTransform();
 }
 
@@ -512,7 +502,7 @@ QPointF BoundingBox::mapRelPosToAbs(const QPointF &relPos) const {
 }
 
 void BoundingBox::moveByAbs(const QPointF &trans) {
-    mTransformAnimator->moveByAbs(mParentTransform->getCombinedTransform(), trans);
+    mTransformAnimator->moveByAbs(trans);
 //    QPointF by = mParent->mapAbsPosToRel(trans) -
 //                 mParent->mapAbsPosToRel(QPointF(0., 0.));
 // //    QPointF by = mapAbsPosToRel(
@@ -527,9 +517,7 @@ void BoundingBox::moveByRel(const QPointF &trans) {
 
 void BoundingBox::setAbsolutePos(const QPointF &pos,
                                  const bool &saveUndoRedo) {
-    QMatrix combinedM = mParentTransform->getCombinedTransform();
-    QPointF newPos = combinedM.inverted().map(pos);
-    setRelativePos(newPos, saveUndoRedo);
+    setRelativePos(mParentTransform->mapAbsPosToRel(pos), saveUndoRedo);
 }
 
 void BoundingBox::setRelativePos(const QPointF &relPos,

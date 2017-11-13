@@ -9,6 +9,7 @@
 
 class BoundingBox;
 class NodePoint;
+class BasicTransformAnimator;
 
 class AnimatorUpdater;
 
@@ -23,7 +24,7 @@ enum MovablePointType {
 class MovablePoint :
     public Transformable {
 public:
-    MovablePoint(BoundingBox *parent,
+    MovablePoint(BasicTransformAnimator *parent,
                  const MovablePointType &type,
                  const qreal &radius = 7.5);
 
@@ -39,7 +40,7 @@ public:
                          const qreal &canvasScaleInv);
     void setAbsolutePos(const QPointF &pos);
 
-    BoundingBox *getParent();
+    BasicTransformAnimator *getParent();
 
     bool isContainedInRect(const QRectF &absRect);
     virtual void moveToAbs(QPointF absPos);
@@ -93,7 +94,7 @@ protected:
     bool mHidden = false;
     qreal mRadius;
     QPointF mSavedRelPos;
-    BoundingBox *mParent = NULL;
+    BasicTransformAnimator *mParent = NULL;
 
     virtual void drawOnAbsPosSk(SkCanvas *canvas,
                 const SkPoint &absPos,
@@ -106,7 +107,7 @@ protected:
 
 class NonAnimatedMovablePoint : public MovablePoint {
 public:
-    NonAnimatedMovablePoint(BoundingBox *parent,
+    NonAnimatedMovablePoint(BasicTransformAnimator *parent,
                             const MovablePointType &type,
                             const qreal &radius = 7.5) :
         MovablePoint(parent, type, radius) {

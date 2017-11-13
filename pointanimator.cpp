@@ -7,7 +7,7 @@
 #include "skqtconversions.h"
 #include "pointhelpers.h"
 
-PointAnimator::PointAnimator(BoundingBox *parent,
+PointAnimator::PointAnimator(BasicTransformAnimator *parent,
                            const MovablePointType &type,
                            const qreal &radius) :
     QPointFAnimator(),

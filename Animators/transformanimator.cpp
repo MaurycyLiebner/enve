@@ -163,25 +163,20 @@ void BasicTransformAnimator::duplicateRotAnimatorFrom(
 }
 
 void BasicTransformAnimator::moveByAbs(
-                        const QMatrix &combinedTrans,
                         const QPointF &absTrans) {
-    moveToAbs(combinedTrans,
-              combinedTrans.map(mPosAnimator->getSavedPointValue()) +
+    moveToAbs(mParentTransformAnimator->mapRelPosToAbs(mPosAnimator->getSavedPointValue()) +
               absTrans);
 }
 
 void BasicTransformAnimator::moveToAbs(
-                        const QMatrix &combinedTrans,
                         const QPointF &absPos) {
-    setAbsolutePos(combinedTrans, absPos, false);
+    setAbsolutePos(absPos, false);
 }
 
 void BasicTransformAnimator::setAbsolutePos(
-                        const QMatrix &combinedTrans,
                         const QPointF &pos,
                         const bool &saveUndoRedo) {
-    QPointF newPos = combinedTrans.inverted().map(pos);
-    setRelativePos(newPos, saveUndoRedo);
+    setRelativePos(mParentTransformAnimator->mapAbsPosToRel(pos), saveUndoRedo);
 }
 
 void BasicTransformAnimator::setRelativePos(const QPointF &relPos,
@@ -267,7 +262,7 @@ BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
     BasicTransformAnimator() {
     mParentBox = parent;
     mOpacityAnimator = (new QrealAnimator)->ref<QrealAnimator>();
-    mPivotAnimator = (new BoxPathPoint(parent))->ref<PointAnimator>();
+    mPivotAnimator = (new BoxPathPoint(this))->ref<PointAnimator>();
     mPivotAnimator->prp_setName("pivot");
     mPivotAnimator->setCurrentPointValue(QPointF(0., 0.) );
     mPivotAnimator->prp_setBlockedUpdater(mTransformUpdater.get());
@@ -303,14 +298,14 @@ void BoxTransformAnimator::setOpacity(const qreal &newOpacity) {
     mOpacityAnimator->qra_setCurrentValue(newOpacity);
 }
 
-void BoxTransformAnimator::pivotTransformStarted() {
+void BoxTransformAnimator::startPivotTransform() {
     if(!mPosAnimator->prp_isDescendantRecording()) {
         mPosAnimator->prp_startTransform();
     }
     mPivotAnimator->prp_startTransform();
 }
 
-void BoxTransformAnimator::pivotTransformFinished() {
+void BoxTransformAnimator::finishPivotTransform() {
     if(!mPosAnimator->prp_isDescendantRecording()) {
         mPosAnimator->prp_finishTransform();
     }

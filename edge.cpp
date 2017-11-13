@@ -198,7 +198,8 @@ void VectorPathEdge::makePassThrough(const QPointF &absPos) {
     QPointF p3Pos = mPoint2->getAbsolutePos();
 
     if(!mEditPath) {
-        BoundingBox *parentBox = mPoint1->getParent();
+        BoundingBox *parentBox = ((BoxTransformAnimator*)mPoint1->getParent())->
+                                        getParentBox();
         NodePointValues p1Values = mPoint1->getPointValues();
         p0Pos = parentBox->getCombinedTransform().map(
                     p1Values.pointRelPos);

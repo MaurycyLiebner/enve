@@ -2,11 +2,11 @@
 #define BOXPATHPOINT_H
 #include "pointanimator.h"
 class BoundingBox;
-
+class BoxTransformAnimator;
 class BoxPathPoint : public PointAnimator
 {
 public:
-    BoxPathPoint(BoundingBox *box);
+    BoxPathPoint(BoxTransformAnimator *box);
 
     void startTransform();
     void finishTransform();

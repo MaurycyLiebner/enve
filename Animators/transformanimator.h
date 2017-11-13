@@ -28,13 +28,10 @@ public:
 
     void setRelativePos(const QPointF &relPos,
                         const bool &saveUndoRedo = false);
-    void setAbsolutePos(const QMatrix &combinedTrans,
-                        const QPointF &pos,
+    void setAbsolutePos(const QPointF &pos,
                         const bool &saveUndoRedo);
-    void moveToAbs(const QMatrix &combinedTrans,
-                   const QPointF &absPos);
-    void moveByAbs(const QMatrix &combinedTrans,
-                   const QPointF &absTrans);
+    void moveToAbs(const QPointF &absPos);
+    void moveByAbs(const QPointF &absTrans);
 
     void rotateRelativeToSavedValue(const qreal &rotRel);
     void translate(const qreal &dX, const qreal &dY);
@@ -149,8 +146,8 @@ public:
     void duplicateOpacityAnimatorFrom(QrealAnimator *source);
 
     MovablePoint *getPivotMovablePoint();
-    void pivotTransformStarted();
-    void pivotTransformFinished();
+    void startPivotTransform();
+    void finishPivotTransform();
     QPointF getPivotAbs();
 
     bool SWT_isBoxTransformAnimator() { return true; }
@@ -170,7 +167,12 @@ public:
     }
 
     void updateCombinedTransform();
+
+    BoundingBox *getParentBox() {
+        return mParentBox;
+    }
 private:
+    bool mPivotAutoAdjust = true;
     BoundingBox *mParentBox = NULL;
     QSharedPointer<PointAnimator> mPivotAnimator;
     QrealAnimatorQSPtr mOpacityAnimator;

@@ -6,9 +6,9 @@
 Rectangle::Rectangle() : PathBox(TYPE_RECTANGLE) {
     setName("Rectangle");
 
-    mTopLeftPoint = new RectangleTopLeftPoint(this);
+    mTopLeftPoint = new RectangleTopLeftPoint(mTransformAnimator.data());
     mTopLeftPoint->setRelativePos(QPointF(0., 0.));
-    mBottomRightPoint = new RectangleBottomRightPoint(this);
+    mBottomRightPoint = new RectangleBottomRightPoint(mTransformAnimator.data());
     mBottomRightPoint->setRelativePos(QPointF(0., 0.));
 
     //mTopLeftPoint->setBottomRightPoint(mBottomRightPoint);
@@ -152,12 +152,12 @@ void Rectangle::selectAndAddContainedPointsToList(const QRectF &absRect,
     }
 }
 
-RectangleTopLeftPoint::RectangleTopLeftPoint(BoundingBox *parent) :
+RectangleTopLeftPoint::RectangleTopLeftPoint(BasicTransformAnimator *parent) :
     PointAnimator(parent, TYPE_PATH_POINT) {
 
 }
 
-RectangleBottomRightPoint::RectangleBottomRightPoint(BoundingBox *parent) :
+RectangleBottomRightPoint::RectangleBottomRightPoint(BasicTransformAnimator *parent) :
     PointAnimator(parent, TYPE_PATH_POINT) {
 
 }
