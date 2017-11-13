@@ -219,7 +219,7 @@ public:
                                     const qreal &invScale);
 
     virtual void setParentGroup(BoxesGroup *parent);
-    void setParent(BoundingBox *parent);
+    virtual void setParent(BoundingBox *parent);
     void clearParent();
 
     BoxesGroup *getParentGroup();

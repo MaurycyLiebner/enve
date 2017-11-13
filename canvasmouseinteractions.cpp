@@ -18,6 +18,7 @@
 #include "Paint/PaintLib/brush.h"
 #include "Animators/PathAnimators/vectorpathanimator.h"
 #include "fontswidget.h"
+#include "Boxes/bone.h"
 
 void Canvas::handleMovePathMousePressEvent() {
     mLastPressedBox = mCurrentBoxesGroup->getBoxAt(mLastMouseEventPosRel);
@@ -115,6 +116,8 @@ void Canvas::addCanvasActionToMenu(QMenu *menu) {
                     "canvas_path_effects_discrete");
         pathEffectsMenu->addAction("Duplicate Effect")->setObjectName(
                     "canvas_path_effects_duplicate");
+        pathEffectsMenu->addAction("Solidify Effect")->setObjectName(
+                    "canvas_path_effects_solidify");
         pathEffectsMenu->addAction("Operation Effect")->setObjectName(
                     "canvas_path_effect_sum");
 
@@ -187,6 +190,8 @@ bool Canvas::handleSelectedCanvasAction(QAction *selectedAction) {
         applyDiscretePathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effects_duplicate") {
         applyDuplicatePathEffectToSelected();
+    } else if(selectedAction->objectName() == "canvas_path_effects_solidify") {
+        applySolidifyPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_path_effect_sum") {
         applySumPathEffectToSelected();
     } else if(selectedAction->objectName() == "canvas_fill_effects_discrete") {
@@ -518,6 +523,18 @@ void Canvas::handleLeftButtonMousePress() {
             mLastPressedPoint = paintBox->getBottomRightPoint();
             addPointToSelection(mLastPressedPoint);
             mLastPressedPoint->startTransform();
+        } else if(mCurrentMode == CanvasMode::ADD_BONE) {
+            //setCanvasMode(CanvasMode::MOVE_POINT);
+            QSharedPointer<Bone> boneBox = (new Bone())->ref<Bone>();
+            mCurrentBoxesGroup->addContainedBox(boneBox.data());
+            boneBox->setAbsolutePos(mLastMouseEventPosRel, false);
+            clearBoxesSelection();
+            clearPointsSelection();
+            addBoxToSelection(boneBox.data());
+
+            mLastPressedPoint = boneBox->getEndPt();
+            addPointToSelection(mLastPressedPoint);
+            mLastPressedPoint->startTransform();
         }
     } // current mode allows interaction with points
 }
@@ -769,10 +786,13 @@ void Canvas::handleMouseRelease() {
     if(!mDoubleClick) {
         if(mCurrentMode == CanvasMode::MOVE_POINT ||
            mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
-           mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
+           mCurrentMode == CanvasMode::ADD_PAINT_BOX ||
+           mCurrentMode == CanvasMode::ADD_BONE) {
             handleMovePointMouseRelease();
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
                 mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
+            } else if(mCurrentMode == CanvasMode::ADD_BONE) {
+                mCanvasWindow->setCanvasMode(CanvasMode::MOVE_POINT);
             }
         } else if(isMovingPath()) {
             if(mLastPressedPoint == NULL) {
@@ -1104,7 +1124,8 @@ void Canvas::mouseMoveEvent(QMouseEvent *event) {
             moveSecondSelectionPoint(mCurrentMouseEventPosRel);
         } else if(mCurrentMode == CanvasMode::MOVE_POINT ||
                   mCurrentMode == CanvasMode::ADD_PARTICLE_BOX ||
-                  mCurrentMode == CanvasMode::ADD_PAINT_BOX) {
+                  mCurrentMode == CanvasMode::ADD_PAINT_BOX ||
+                  mCurrentMode == CanvasMode::ADD_BONE) {
             handleMovePointMouseMove();
         } else if(isMovingPath()) {
             if(mLastPressedPoint == NULL) {

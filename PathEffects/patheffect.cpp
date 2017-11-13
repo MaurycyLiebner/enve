@@ -1,5 +1,7 @@
 #include "patheffect.h"
 #include "pointhelpers.h"
+#include "pathoperations.h"
+#include "skqtconversions.h"
 
 PathEffect::PathEffect(const PathEffectType &type,
                        const bool &outlinePathEffect) {
@@ -384,8 +386,64 @@ void DuplicatePathEffect::filterPathForRelFrame(const int &relFrame,
                  mTranslation->getEffectiveXValueAtRelFrame(relFrame),
                  mTranslation->getEffectiveYValueAtRelFrame(relFrame));
 }
-#include "pathoperations.h"
-#include "skqtconversions.h"
+
+
+SolidifyPathEffect::SolidifyPathEffect(const bool &outlinePathEffect) :
+    PathEffect(SOLIDIFY_PATH_EFFECT, outlinePathEffect) {
+
+    prp_setName("solidify effect");
+
+    mDisplacement->prp_setName("displacement");
+    mDisplacement->qra_setCurrentValue(10.);
+
+    ca_addChildAnimator(mDisplacement.data());
+}
+
+Property *SolidifyPathEffect::makeDuplicate() {
+    SolidifyPathEffect *newEffect = new SolidifyPathEffect(mOutlineEffect);
+    makeDuplicate(newEffect);
+    return newEffect;
+}
+
+void SolidifyPathEffect::makeDuplicate(Property *target) {
+    SolidifyPathEffect *effectTarget = (SolidifyPathEffect*)target;
+
+    effectTarget->duplicateAnimatorsFrom(mDisplacement.data());
+}
+
+void SolidifyPathEffect::duplicateAnimatorsFrom(QrealAnimator *trans) {
+    trans->makeDuplicate(mDisplacement.data());
+}
+
+void SolidifyPathEffect::filterPath(const SkPath &src,
+                                     SkPath *dst) {
+
+}
+
+void SolidifyPathEffect::filterPathForRelFrame(const int &relFrame,
+                                               const SkPath &src,
+                                               SkPath *dst) {
+    SkStroke strokerSk;
+    strokerSk.setWidth(mDisplacement->getCurrentEffectiveValueAtRelFrame(relFrame));
+    SkPath outline = SkPath();
+    strokerSk.strokePath(src, &outline);
+
+    FullVectorPath addToPath;
+    addToPath.generateFromPath(outline);
+    FullVectorPath addedPath;
+    addedPath.generateFromPath(src);
+
+    addToPath.intersectWith(&addedPath,
+                            true,
+                            true);
+    FullVectorPath targetPath;
+    targetPath.getSeparatePathsFromOther(&addToPath);
+    targetPath.getSeparatePathsFromOther(&addedPath);
+    targetPath.generateSinglePathPaths();
+
+    *dst = QPainterPathToSkPath(targetPath.getPath());
+}
+
 SumPathEffect::SumPathEffect(PathBox *parentPath,
                              const bool &outlinePathEffect) :
     PathEffect(SUM_PATH_EFFECT, outlinePathEffect) {

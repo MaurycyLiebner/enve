@@ -185,6 +185,13 @@ void Canvas::applyDuplicatePathEffectToSelected() {
     }
 }
 
+void Canvas::applySolidifyPathEffectToSelected() {
+    Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
+        if(!box->SWT_isPathBox()) continue;
+        box->addPathEffect(new SolidifyPathEffect(false));
+    }
+}
+
 void Canvas::applySumPathEffectToSelected() {
     Q_FOREACH(BoundingBox *box, mSelectedBoxes) {
         if(!box->SWT_isPathBox()) continue;

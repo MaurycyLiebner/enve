@@ -378,6 +378,7 @@ void BoundingBox::scheduleUpdate() {
     if(!shouldScheduleUpdate()) return;
     if(mCurrentRenderData == NULL) {
         updateCurrentRenderData();
+        if(mCurrentRenderData == NULL) return;
     } else {
         if(!mRedoUpdate) {
             mRedoUpdate = mCurrentRenderData->isAwaitingUpdate();
@@ -391,6 +392,7 @@ void BoundingBox::scheduleUpdate() {
     if(mParentGroup != NULL) {
         mParentGroup->scheduleUpdate();
     }
+
     mCurrentRenderData->addScheduler();
 
     emit scheduledUpdate();
@@ -1195,7 +1197,9 @@ void BoundingBox::renderDataFinished(BoundingBoxRenderData *renderData) {
 }
 
 void BoundingBox::updateCurrentRenderData() {
-    mCurrentRenderData = createRenderData()->ref<BoundingBoxRenderData>();
+    BoundingBoxRenderData *renderData = createRenderData();
+    if(renderData == NULL) return;
+    mCurrentRenderData = renderData->ref<BoundingBoxRenderData>();
 }
 
 BoundingBoxRenderData *BoundingBox::getCurrentRenderData() {

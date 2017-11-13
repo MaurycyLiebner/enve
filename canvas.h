@@ -32,6 +32,7 @@ enum CanvasMode : short {
     PICK_PATH_SETTINGS,
     ADD_PAINT_BOX,
     PAINT_MODE,
+    ADD_BONE
 };
 
 #include "canvaswindow.h"
@@ -415,6 +416,7 @@ public:
     QPointF mapCanvasAbsToRel(const QPointF &pos);
     void applyDiscretePathEffectToSelected();
     void applyDuplicatePathEffectToSelected();
+    void applySolidifyPathEffectToSelected();
     void applyDiscreteOutlinePathEffectToSelected();
     void applyDuplicateOutlinePathEffectToSelected();
     void applySumPathEffectToSelected();

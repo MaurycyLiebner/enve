@@ -13,6 +13,7 @@ enum PathEffectType : short {
     DISPLACE_PATH_EFFECT,
     DASH_PATH_EFFECT,
     DUPLICATE_PATH_EFFECT,
+    SOLIDIFY_PATH_EFFECT,
     SUM_PATH_EFFECT
 };
 class PathEffect;
@@ -81,8 +82,17 @@ public:
         }
     }
 
+    void setVisible(const bool &bT) {
+        mVisible = bT;
+    }
+
+    const bool &isVisible() {
+        return mVisible;
+    }
+
     virtual bool hasReasonsNotToApplyUglyTransform() { return false; }
 protected:
+    bool mVisible = true;
     bool mOutlineEffect = false;
     QSharedPointer<BoolProperty> mApplyBeforeThickness;
     PathEffectType mPathEffectType;
@@ -182,6 +192,28 @@ public:
 private:
     QSharedPointer<QPointFAnimator> mTranslation =
             (new QPointFAnimator())->ref<QPointFAnimator>();
+};
+
+class SolidifyPathEffect : public PathEffect {
+    Q_OBJECT
+public:
+    SolidifyPathEffect(const bool &outlinePathEffect);
+
+    Property *makeDuplicate();
+
+    void makeDuplicate(Property *target);
+
+    void duplicateAnimatorsFrom(QrealAnimator *trans);
+
+    void filterPath(const SkPath &src, SkPath *dst);
+
+    void filterPathForRelFrame(const int &relFrame,
+                               const SkPath &src, SkPath *dst);
+    void writeProperty(QIODevice *target) {}
+    void readProperty(QIODevice *target) {}
+private:
+    QSharedPointer<QrealAnimator> mDisplacement =
+            (new QrealAnimator())->ref<QrealAnimator>();
 };
 
 class PathBox;

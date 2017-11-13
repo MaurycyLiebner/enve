@@ -333,6 +333,8 @@ bool CanvasWindow::KFT_handleKeyEventForTarget(QKeyEvent *event) {
         setCanvasMode(CanvasMode::ADD_PAINT_BOX);
     } else if(event->key() == Qt::Key_F10) {
         setCanvasMode(CanvasMode::PAINT_MODE);
+    } else if(event->key() == Qt::Key_F11) {
+        setCanvasMode(CanvasMode::ADD_BONE);
     } else if(mCurrentCanvas->keyPressEvent(event)) {
     } else {
         return false;

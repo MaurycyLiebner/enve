@@ -74,6 +74,18 @@ public:
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
     QMatrix getParentCombinedTransformMatrixAtRelFrame(const int &relFrame);
+
+    QPointFAnimator *getPosAnimator() {
+        return mPosAnimator.data();
+    }
+
+    QPointFAnimator *getScaleAnimator() {
+        return mScaleAnimator.data();
+    }
+
+    QrealAnimator *getRotAnimator() {
+        return mRotAnimator.data();
+    }
 protected:
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;
@@ -139,6 +151,14 @@ public:
     bool rotOrScaleOrPivotRecording();
     void writeProperty(QIODevice *target);
     void readProperty(QIODevice *target);
+
+    PointAnimator *getPivotAnimator() {
+        return mPivotAnimator.data();
+    }
+
+    QrealAnimator *getOpacityAnimator() {
+        return mOpacityAnimator.data();
+    }
 private:
     BoundingBox *mParentBox = NULL;
     QSharedPointer<PointAnimator> mPivotAnimator;

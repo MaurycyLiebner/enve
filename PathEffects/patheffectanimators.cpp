@@ -50,11 +50,12 @@ void PathEffectAnimators::filterPathForRelFrameBeforeThickness(
                                                 SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        if(((PathEffect*)effect.data())->applyBeforeThickness()) {
+        PathEffect *effectT = (PathEffect*)effect.data();
+        if(effectT->applyBeforeThickness() && effectT->isVisible()) {
             SkPath srcPath = dstPath;
-            ((PathEffect*)effect.data())->filterPathForRelFrame(relFrame,
-                                                                srcPath,
-                                                                &dstPath);
+            effectT->filterPathForRelFrame(relFrame,
+                                           srcPath,
+                                           &dstPath);
         }
     }
     *srcDstPath = dstPath;
@@ -64,13 +65,14 @@ void PathEffectAnimators::filterPathForRelFrame(const int &relFrame,
                                                 SkPath *srcDstPath) {
     SkPath dstPath = *srcDstPath;
     Q_FOREACH(const QSharedPointer<Property> &effect, ca_mChildAnimators) {
-        if(((PathEffect*)effect.data())->applyBeforeThickness()) {
+        PathEffect *effectT = (PathEffect*)effect.data();
+        if(effectT->applyBeforeThickness() || !effectT->isVisible()) {
             continue;
         }
         SkPath srcPath = dstPath;
-        ((PathEffect*)effect.data())->filterPathForRelFrame(relFrame,
-                                                            srcPath,
-                                                            &dstPath);
+        effectT->filterPathForRelFrame(relFrame,
+                                       srcPath,
+                                       &dstPath);
     }
     *srcDstPath = dstPath;
 }
