@@ -53,14 +53,14 @@ public:
 
     bool SWT_isBone() { return true; }
 
-    void setParent(BoundingBox *parent) {
-        if(parent->SWT_isBone()) {
-            mRootPt = ((Bone*)parent)->getEndPt();
-        } else {
-            mRootPt = mThisRootPt;
-        }
-        BoundingBox::setParent(parent);
-    }
+//    void setParent(BoundingBox *parent) {
+//        if(parent->SWT_isBone()) {
+//            mRootPt = ((Bone*)parent)->getEndPt();
+//        } else {
+//            mRootPt = mThisRootPt;
+//        }
+//        BoundingBox::setParent(parent);
+//    }
 protected:
     NonAnimatedMovablePoint *mThisRootPt = NULL;
     QMatrix mSavedCombinedTransform;

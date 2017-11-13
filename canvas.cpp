@@ -906,7 +906,7 @@ bool Canvas::keyPressEvent(QKeyEvent *event) {
         if(mSelectedBoxes.count() > 1) {
             BoundingBox *parentBox = mSelectedBoxes.last();
             for(int i = 0; i < mSelectedBoxes.count() - 1; i++) {
-                mSelectedBoxes.at(i)->setParent(parentBox);
+                mSelectedBoxes.at(i)->setParent(parentBox->getTransformAnimator());
             }
         }
     } else if(event->modifiers() & Qt::AltModifier &&

@@ -3,40 +3,20 @@
 #include "Boxes/pathbox.h"
 #include "mainwindow.h"
 
-TransUpdater::TransUpdater(BoundingBox *boundingBox) :
-    AnimatorUpdater() {
-    mTarget = boundingBox;
-}
-
-void TransUpdater::update() {
-    mTarget->updateRelativeTransformTmp();
-}
-
-void TransUpdater::updateFinal() {
-    mTarget->updateCombinedTransform();
-}
-
-void TransUpdater::frameChangeUpdate() {
-    mTarget->updateRelativeTransformAfterFrameChange();
-}
-
 TransformUpdater::TransformUpdater(BasicTransformAnimator *transformAnimator) {
     mTarget = transformAnimator;
 }
 
 void TransformUpdater::update() {
     mTarget->updateRelativeTransform();
-    mTarget->prp_callUpdater();
 }
 
 void TransformUpdater::updateFinal() {
     mTarget->updateRelativeTransform();
-    mTarget->prp_callFinishUpdater();
 }
 
 void TransformUpdater::frameChangeUpdate() {
     mTarget->updateRelativeTransform();
-    mTarget->anim_callFrameChangeUpdater();
 }
 
 NodePointUpdater::NodePointUpdater(PathBox *vectorPath) {

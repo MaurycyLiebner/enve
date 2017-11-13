@@ -274,41 +274,28 @@ bool BoundingBox::prp_differencesBetweenRelFrames(const int &relFrame1,
 
 void BoundingBox::setParentGroup(BoxesGroup *parent) {
     mParentGroup = parent;
-    if(mParent != NULL) {
-        mParent->removeChildBox(this);
-    }
-    mParent = parent;
-    mTransformAnimator->setParentTransformAnimator(
-                        mParent->getTransformAnimator());
+
+    mParentTransform = parent->getTransformAnimator();
+    mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
     prp_setAbsFrame(mParentGroup->anim_getCurrentAbsFrame());
-    updateCombinedTransform();
-    mParent->addChildBox(this);
+    mTransformAnimator->updateCombinedTransform();
 }
 
-void BoundingBox::setParent(BoundingBox *parent) {
-    if(parent == mParent) return;
-    if(mParent != NULL) {
-        mParent->removeChildBox(this);
-    }
-    mParent = parent;
-    mTransformAnimator->setParentTransformAnimator(
-                        mParent->getTransformAnimator());
+void BoundingBox::setParent(BasicTransformAnimator *parent) {
+    if(parent == mParentTransform) return;
+    mParentTransform = parent;
+    mTransformAnimator->setParentTransformAnimator(mParentTransform);
 
-    updateCombinedTransform();
-    mParent->addChildBox(this);
+    mTransformAnimator->updateCombinedTransform();
 }
 
 void BoundingBox::clearParent() {
-    setParent(mParentGroup);
+    setParent(mParentGroup->getTransformAnimator());
 }
 
 BoxesGroup *BoundingBox::getParentGroup() {
     return mParentGroup;
-}
-
-BoundingBox *BoundingBox::getParent() {
-    return mParent;
 }
 
 void BoundingBox::disablePivotAutoAdjust() {
@@ -342,7 +329,7 @@ void BoundingBox::setPivotAbsPos(const QPointF &absPos,
                                  const bool &pivotChanged) {
     QPointF newPos = mapAbsPosToRel(absPos);
     setPivotRelPos(newPos, saveUndoRedo, pivotChanged);
-    updateCombinedTransform();
+    //updateCombinedTransform();
 }
 
 QPointF BoundingBox::getPivotAbsPos() {
@@ -421,8 +408,7 @@ BoundingBox *BoundingBox::getPathAtFromAllAncestors(const QPointF &absPos) {
 }
 
 QPointF BoundingBox::mapAbsPosToRel(const QPointF &absPos) {
-    return mTransformAnimator->getCombinedTransform().
-            inverted().map(absPos);
+    return mTransformAnimator->mapAbsPosToRel(absPos);
 }
 
 PaintSettings *BoundingBox::getFillSettings() {
@@ -522,11 +508,11 @@ void BoundingBox::scaleRelativeToSavedPivot(const qreal &scaleBy) {
 }
 
 QPointF BoundingBox::mapRelPosToAbs(const QPointF &relPos) const {
-    return mTransformAnimator->getCombinedTransform().map(relPos);
+    return mTransformAnimator->mapRelPosToAbs(relPos);
 }
 
 void BoundingBox::moveByAbs(const QPointF &trans) {
-    mTransformAnimator->moveByAbs(mParent->getCombinedTransform(), trans);
+    mTransformAnimator->moveByAbs(mParentTransform->getCombinedTransform(), trans);
 //    QPointF by = mParent->mapAbsPosToRel(trans) -
 //                 mParent->mapAbsPosToRel(QPointF(0., 0.));
 // //    QPointF by = mapAbsPosToRel(
@@ -541,7 +527,7 @@ void BoundingBox::moveByRel(const QPointF &trans) {
 
 void BoundingBox::setAbsolutePos(const QPointF &pos,
                                  const bool &saveUndoRedo) {
-    QMatrix combinedM = mParent->getCombinedTransform();
+    QMatrix combinedM = mParentTransform->getCombinedTransform();
     QPointF newPos = combinedM.inverted().map(pos);
     setRelativePos(newPos, saveUndoRedo);
 }
@@ -553,7 +539,7 @@ void BoundingBox::setRelativePos(const QPointF &relPos,
 
 void BoundingBox::saveTransformPivotAbsPos(const QPointF &absPivot) {
     mSavedTransformPivot =
-            mParent->mapAbsPosToRel(absPivot) -
+            mParentTransform->mapAbsPosToRel(absPivot) -
             mTransformAnimator->getPivot();
 }
 
@@ -666,26 +652,6 @@ QPointF BoundingBox::getAbsolutePos() {
                    mTransformAnimator->getCombinedTransform().dy());
 }
 
-void BoundingBox::updateRelativeTransformTmp() {
-    updateCombinedTransformTmp();
-    schedulePivotUpdate();
-    scheduleUpdate();
-    //updateCombinedTransform(replaceCache);
-}
-
-void BoundingBox::updateRelativeTransformAfterFrameChange() {
-    updateCombinedTransformAfterFrameChange();
-    schedulePivotUpdate();
-}
-
-void BoundingBox::updateCombinedTransformAfterFrameChange() {
-    if(mParentGroup == NULL) return;
-    updateDrawRenderContainerTransform();
-
-    updateAfterCombinedTransformationChangedAfterFrameChange();
-    scheduleUpdate();
-}
-
 void BoundingBox::updateDrawRenderContainerTransform() {
     if(mNReasonsNotToApplyUglyTransform == 0) {
         mDrawRenderContainer.updatePaintTransformGivenNewCombinedTransform(
@@ -694,33 +660,6 @@ void BoundingBox::updateDrawRenderContainerTransform() {
 
 }
 
-void BoundingBox::updateCombinedTransform() {
-    if(mParentGroup == NULL) return;
-    updateDrawRenderContainerTransform();
-
-    updateAfterCombinedTransformationChanged();
-    scheduleUpdate();
-}
-
-
-void BoundingBox::updateCombinedTransformTmp() {
-    Q_FOREACH(BoundingBox *child, mChildBoxes) {
-        child->updateCombinedTransformTmp();
-    }
-    updateCombinedTransform();
-}
-
-void BoundingBox::updateAfterCombinedTransformationChanged() {
-    Q_FOREACH(BoundingBox *child, mChildBoxes) {
-        child->updateCombinedTransform();
-    }
-}
-
-void BoundingBox::updateAfterCombinedTransformationChangedAfterFrameChange() {
-    Q_FOREACH(BoundingBox *child, mChildBoxes) {
-        child->updateCombinedTransformAfterFrameChange();
-    }
-}
 
 BoxTransformAnimator *BoundingBox::getTransformAnimator() {
     return mTransformAnimator.data();

@@ -270,23 +270,6 @@ void PathBox::removeOutlinePathEffect(PathEffect *effect) {
     clearAllCache();
 }
 
-void PathBox::updateCombinedTransformAfterFrameChange() {
-    if(mNReasonsNotToApplyUglyTransform != 0) {
-        mPathSk = mEditPathSk;
-        mSkRelBoundingRectPath.reset();
-    }
-
-    BoundingBox::updateCombinedTransformAfterFrameChange();
-}
-
-void PathBox::updateCombinedTransform() {
-    if(mNReasonsNotToApplyUglyTransform != 0) {
-        mPathSk = mEditPathSk;
-        mSkRelBoundingRectPath.reset();
-    }
-    BoundingBox::updateCombinedTransform();
-}
-
 void PathBox::resetStrokeGradientPointsPos() {
     mStrokeGradientPoints->prp_setRecording(false);
     mStrokeGradientPoints->setPositions(mRelBoundingRect.topLeft(),

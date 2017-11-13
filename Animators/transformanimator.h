@@ -51,6 +51,15 @@ public:
     qreal yScale();
     QPointF pos();
 
+    QPointF mapAbsPosToRel(const QPointF &absPos) const {
+        return getCombinedTransform().
+                inverted().map(absPos);
+    }
+
+    QPointF mapRelPosToAbs(const QPointF &relPos) const {
+        return getCombinedTransform().map(relPos);
+    }
+
     void duplicatePosAnimatorFrom(QPointFAnimator *source);
     void duplicateScaleAnimatorFrom(QPointFAnimator *source);
     void duplicateRotAnimatorFrom(QrealAnimator *source);
@@ -86,7 +95,10 @@ public:
     QrealAnimator *getRotAnimator() {
         return mRotAnimator.data();
     }
+
 protected:
+    QList<BasicTransformAnimator*> mChildBoxes;
+
     QMatrix mRelTransform;
     QMatrix mCombinedTransform;
 
@@ -100,7 +112,7 @@ protected:
 
     AnimatorUpdaterStdSPtr mTransformUpdater;
 public slots:
-    void updateCombinedTransform();
+    virtual void updateCombinedTransform();
 signals:
     void combinedTransformChanged();
 };
@@ -157,6 +169,7 @@ public:
         return mOpacityAnimator.data();
     }
 
+    void updateCombinedTransform();
 private:
     BoundingBox *mParentBox = NULL;
     QSharedPointer<PointAnimator> mPivotAnimator;

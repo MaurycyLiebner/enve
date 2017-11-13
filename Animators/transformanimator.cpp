@@ -214,6 +214,7 @@ void BasicTransformAnimator::updateCombinedTransform() {
                              mParentTransformAnimator->getCombinedTransform();
     }
     emit combinedTransformChanged();
+    schedulePivotUpdate();
 }
 
 const QMatrix &BasicTransformAnimator::getCombinedTransform() const {
@@ -279,8 +280,6 @@ BoxTransformAnimator::BoxTransformAnimator(BoundingBox *parent) :
 
     ca_addChildAnimator(mPivotAnimator.data());
     ca_addChildAnimator(mOpacityAnimator.data());
-
-    prp_setBlockedUpdater(new TransUpdater(parent) );
 }
 
 MovablePoint *BoxTransformAnimator::getPivotMovablePoint() {
@@ -374,6 +373,13 @@ bool BoxTransformAnimator::rotOrScaleOrPivotRecording() {
     return mRotAnimator->prp_isDescendantRecording() ||
            mScaleAnimator->prp_isDescendantRecording() ||
            mPivotAnimator->prp_isDescendantRecording();
+}
+
+void BoxTransformAnimator::updateCombinedTransform() {
+    BasicTransformAnimator::updateCombinedTransform();
+
+    mParentBox->updateDrawRenderContainerTransform();
+    mParentBox->scheduleUpdate();
 }
 
 qreal BoxTransformAnimator::getPivotX() {

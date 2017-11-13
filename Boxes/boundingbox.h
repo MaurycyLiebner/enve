@@ -184,9 +184,6 @@ public:
 
     QPointF getAbsolutePos();
 
-    virtual void updateCombinedTransform();
-    void updateCombinedTransformAfterFrameChange();
-
     virtual void moveByRel(const QPointF &trans);
 
     virtual void startTransform();
@@ -217,11 +214,10 @@ public:
                                     const qreal &invScale);
 
     virtual void setParentGroup(BoxesGroup *parent);
-    virtual void setParent(BoundingBox *parent);
+    virtual void setParent(BasicTransformAnimator *parent);
     void clearParent();
 
     BoxesGroup *getParentGroup();
-    BoundingBox *getParent();
 
     virtual BoundingBox *getPathAtFromAllAncestors(const QPointF &absPos);
 
@@ -329,8 +325,6 @@ public:
     void setRedoUpdateToFalse();
 
 
-    void updateRelativeTransformTmp();
-
     virtual QPointF mapAbsPosToRel(const QPointF &absPos);
     void addEffect(PixmapEffect *effect);
     void removeEffect(PixmapEffect *effect);
@@ -422,8 +416,6 @@ public:
 
     virtual QMatrix getCombinedTransform() const;
 
-    virtual void updateCombinedTransformTmp();
-    void updateRelativeTransformAfterFrameChange();
     QPainter::CompositionMode getCompositionMode();
     bool isParticleBox();
     DurationRectangleMovable *anim_getRectangleMovableAtPos(
@@ -593,22 +585,9 @@ public:
         mNReasonsNotToApplyUglyTransform--;
     }
 
-    void addChildBox(BoundingBox *box) {
-        mChildBoxes.append(box);
-    }
-
-    void removeChildBox(BoundingBox *box) {
-        mChildBoxes.removeOne(box);
-    }
-
-    void clearChildBoxes() {
-        foreach(BoundingBox *box, mChildBoxes) {
-            box->clearParent();
-        }
-        mChildBoxes.clear();
-    }
-
     bool isSelected() { return mSelected; }
+
+    void updateDrawRenderContainerTransform();
 protected:
     QPointF mSavedTransformPivot;
     bool mSelected = false;
@@ -617,8 +596,6 @@ protected:
     QList<BoundingBox*> mLinkingBoxes;
     QList<std::shared_ptr<Updatable> > mSchedulers;
     std::shared_ptr<BoundingBoxRenderData> mCurrentRenderData;
-
-    virtual void updateDrawRenderContainerTransform();
 
     int mLoadId = -1;
 
@@ -632,9 +609,6 @@ protected:
     QRectF mRelBoundingRect;
     SkRect mRelBoundingRectSk;
 
-    void updateAfterCombinedTransformationChanged();
-    void updateAfterCombinedTransformationChangedAfterFrameChange();
-
     RenderContainer mDrawRenderContainer;
 
     bool mUpdateDrawOnParentBox = true;
@@ -646,7 +620,7 @@ protected:
     void setType(const BoundingBoxType &type) { mType = type; }
     BoundingBoxType mType;
     BoxesGroup *mParentGroup = NULL;
-    BoundingBox *mParent = NULL;
+    BasicTransformAnimator *mParentTransform = NULL;
 
     QSharedPointer<EffectAnimators> mEffectsAnimators =
             (new EffectAnimators())->ref<EffectAnimators>();

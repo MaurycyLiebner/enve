@@ -125,13 +125,6 @@ void BoxesGroup::prp_getFirstAndLastIdenticalRelFrame(int *firstIdentical,
     }
 }
 
-void BoxesGroup::updateCombinedTransformTmp() {
-    BoundingBox::updateCombinedTransformTmp();
-    if(!mIsDescendantCurrentGroup) {
-        updateDrawRenderContainerTransform();
-    }
-}
-
 BoxesGroup::~BoxesGroup() {
 }
 

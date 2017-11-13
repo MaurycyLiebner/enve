@@ -167,8 +167,6 @@ public:
     bool isDescendantCurrentGroup();
     bool shouldPaintOnImage();
 
-    void updateCombinedTransformTmp();
-
     bool SWT_isBoxesGroup() { return true; }
     void drawSk(SkCanvas *canvas);
     void drawSelectedSk(SkCanvas *canvas,

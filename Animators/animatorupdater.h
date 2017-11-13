@@ -21,19 +21,6 @@ public:
     virtual void updateFinal() {}
 };
 
-class TransUpdater : public AnimatorUpdater
-{
-public:
-    TransUpdater(BoundingBox *boundingBox);
-
-    void update();
-    void updateFinal();
-
-    void frameChangeUpdate();
-private:
-    BoundingBox *mTarget;
-};
-
 class TransformUpdater : public AnimatorUpdater {
 public:
     TransformUpdater(BasicTransformAnimator *transformAnimator);
