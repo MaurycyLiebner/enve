@@ -19,7 +19,7 @@ QList<BoundingBox*> BoundingBox::mLoadedBoxes;
 QList<FunctionWaitingForBoxLoad*> BoundingBox::mFunctionsWaitingForBoxLoad;
 
 BoundingBox::BoundingBox(const BoundingBoxType &type) :
-    ComplexAnimator(), Transformable() {
+    ComplexAnimator() {
     mEffectsAnimators->prp_setName("effects");
     mEffectsAnimators->setParentBox(this);
     mEffectsAnimators->prp_setUpdater(new PixmapEffectUpdater(this));
@@ -498,8 +498,7 @@ void BoundingBox::scale(const qreal &scaleBy) {
     scale(scaleBy, scaleBy);
 }
 
-void BoundingBox::scale(const qreal &scaleXBy,
-                        const qreal &scaleYBy) {
+void BoundingBox::scale(const qreal &scaleXBy, const qreal &scaleYBy) {
     mTransformAnimator->scale(scaleXBy, scaleYBy);
 }
 
@@ -609,14 +608,6 @@ void BoundingBox::setupEffects(const int &relFrame,
                                                  &data->pixmapEffects);
 }
 
-void BoundingBox::updateGlobalPivotIfSelected() {
-    if(isSelected()) {
-        Canvas *parentCanvas = getParentCanvas();
-        if(parentCanvas == NULL) return;
-        parentCanvas->schedulePivotUpdate();
-    }
-}
-
 bool BoundingBox::relPointInsidePath(const QPointF &point) {
     return mRelBoundingRect.contains(point.toPoint());
 }
@@ -691,7 +682,7 @@ void BoundingBox::updateCombinedTransformAfterFrameChange() {
     if(mParentGroup == NULL) return;
     updateDrawRenderContainerTransform();
 
-    updateAfterCombinedTransformationChangedAfterFrameChagne();
+    updateAfterCombinedTransformationChangedAfterFrameChange();
     scheduleUpdate();
 }
 
@@ -725,7 +716,7 @@ void BoundingBox::updateAfterCombinedTransformationChanged() {
     }
 }
 
-void BoundingBox::updateAfterCombinedTransformationChangedAfterFrameChagne() {
+void BoundingBox::updateAfterCombinedTransformationChangedAfterFrameChange() {
     Q_FOREACH(BoundingBox *child, mChildBoxes) {
         child->updateCombinedTransformAfterFrameChange();
     }

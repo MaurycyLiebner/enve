@@ -128,9 +128,6 @@ public:
     void startOpacityTransform();
     void setOpacity(const qreal &newOpacity);
 
-    void setPivot(const QPointF &point,
-                  const bool &finish = false);
-
     void makeDuplicate(BoxTransformAnimator *target);
     Property *makeDuplicate() {
         return NULL;
@@ -159,6 +156,7 @@ public:
     QrealAnimator *getOpacityAnimator() {
         return mOpacityAnimator.data();
     }
+
 private:
     BoundingBox *mParentBox = NULL;
     QSharedPointer<PointAnimator> mPivotAnimator;

@@ -325,12 +325,12 @@ public:
 
     Brush *getCurrentBrush();
 protected:
-    void updateAfterCombinedTransformationChanged() {
-//        Q_FOREACH(BoundingBox *child, mChildBoxes) {
-//            child->updateCombinedTransformTmp();
-//            child->scheduleSoftUpdate();
-//        }
-    }
+//    void updateAfterCombinedTransformationChanged() {
+////        Q_FOREACH(BoundingBox *child, mChildBoxes) {
+////            child->updateCombinedTransformTmp();
+////            child->scheduleSoftUpdate();
+////        }
+//    }
 
     void setCurrentEndPoint(NodePoint *point);
 

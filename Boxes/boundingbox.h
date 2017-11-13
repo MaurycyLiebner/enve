@@ -135,8 +135,7 @@ protected:
 };
 
 class BoundingBox :
-        public ComplexAnimator,
-        public Transformable {
+        public ComplexAnimator {
     Q_OBJECT
 public:
     BoundingBox(const BoundingBoxType &type);
@@ -188,11 +187,10 @@ public:
     virtual void updateCombinedTransform();
     void updateCombinedTransformAfterFrameChange();
 
-    void moveByRel(const QPointF &trans);
+    virtual void moveByRel(const QPointF &trans);
 
-    void startTransform();
-    void finishTransform();
-
+    virtual void startTransform();
+    virtual void finishTransform();
 
     virtual bool relPointInsidePath(const QPointF &);
     bool absPointInsidePath(const QPointF &absPos);
@@ -238,9 +236,8 @@ public:
                         const bool &saveUndoRedo = true,
                         const bool &pivotAutoAdjust = true);
 
-    void cancelTransform();
-    void scale(const qreal &scaleXBy,
-               const qreal &scaleYBy);
+    virtual void cancelTransform();
+    virtual void scale(const qreal &scaleXBy, const qreal &scaleYBy);
 
     virtual NodePoint *createNewPointOnLineNear(const QPointF &absPos,
                                                 const bool &adjust,
@@ -250,7 +247,7 @@ public:
         Q_UNUSED(canvasScaleInv);
         return NULL;
     }
-    void saveTransformPivotAbsPos(const QPointF &absPivot);
+    virtual void saveTransformPivotAbsPos(const QPointF &absPivot);
 
     void setName(const QString &name);
     QString getName();
@@ -267,8 +264,8 @@ public:
     void setLocked(const bool &bt);
     bool isLocked();
     bool isVisibleAndUnlocked();
-    void rotateBy(const qreal &rot);
-    void scale(const qreal &scaleBy);
+    virtual void rotateBy(const qreal &rot);
+    virtual void scale(const qreal &scaleBy);
 
     void rotateRelativeToSavedPivot(const qreal &rot);
     void scaleRelativeToSavedPivot(const qreal &scaleBy);
@@ -392,7 +389,7 @@ public:
     bool isAncestor(BoundingBox *box) const;
     void removeFromParent();
     void removeFromSelection();
-    void moveByAbs(const QPointF &trans);
+    virtual void moveByAbs(const QPointF &trans);
     virtual void makeDuplicate(Property *property);
     Property *makeDuplicate();
     BoundingBox *createDuplicate();
@@ -583,7 +580,6 @@ public:
         return mLinkingBoxes;
     }
 
-    void updateGlobalPivotIfSelected();
     Property *ca_getFirstDescendantWithName(const QString &name);
     EffectAnimators *getEffectsAnimators() {
         return mEffectsAnimators.data();
@@ -611,7 +607,11 @@ public:
         }
         mChildBoxes.clear();
     }
+
+    bool isSelected() { return mSelected; }
 protected:
+    QPointF mSavedTransformPivot;
+    bool mSelected = false;
     int mNReasonsNotToApplyUglyTransform = 0;
     QList<BoundingBox*> mChildBoxes;
     QList<BoundingBox*> mLinkingBoxes;
@@ -632,8 +632,8 @@ protected:
     QRectF mRelBoundingRect;
     SkRect mRelBoundingRectSk;
 
-    virtual void updateAfterCombinedTransformationChanged();
-    virtual void updateAfterCombinedTransformationChangedAfterFrameChagne();
+    void updateAfterCombinedTransformationChanged();
+    void updateAfterCombinedTransformationChangedAfterFrameChange();
 
     RenderContainer mDrawRenderContainer;
 

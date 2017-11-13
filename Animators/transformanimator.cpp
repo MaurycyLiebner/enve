@@ -356,14 +356,6 @@ void BoxTransformAnimator::setPivotWithoutChangingTransformation(
                                          saveUndoRedo,
                                          false,
                                          saveUndoRedo);
-    //mParentBox->updateGlobalPivotIfSelected();
-}
-
-void BoxTransformAnimator::setPivot(const QPointF &point,
-                                    const bool &finish) {
-    mPivotAnimator->setCurrentPointValue(point, finish);
-    mParentBox->updateGlobalPivotIfSelected();
-    //callUpdater();
 }
 
 QPointF BoxTransformAnimator::getPivot() {
