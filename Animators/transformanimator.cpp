@@ -480,3 +480,32 @@ void BoxTransformAnimator::duplicateOpacityAnimatorFrom(
         QrealAnimator *source) {
     source->makeDuplicate(mOpacityAnimator.data());
 }
+#include "Boxes/bone.h"
+QMatrix BoneTransformAnimator::BoneTransformAnimator::getCurrentTransformationMatrix() {
+    QMatrix matrix;
+
+    QPointF rootRelPos = mParentBone->getRootRelPos();
+    matrix.translate(rootRelPos.x() + mPosAnimator->getEffectiveXValue(),
+                     rootRelPos.y() + mPosAnimator->getEffectiveYValue());
+
+    matrix.rotate(mRotAnimator->qra_getCurrentEffectiveValue() );
+    matrix.scale(mScaleAnimator->getEffectiveXValue(),
+                 mScaleAnimator->getEffectiveYValue() );
+    matrix.translate(-rootRelPos.x(), -rootRelPos.y());
+    return matrix;
+}
+
+QMatrix BoneTransformAnimator::getRelativeTransformAtRelFrame(
+                                    const int &relFrame) {
+    QMatrix matrix;
+    QPointF rootRelPos = mParentBone->getRootRelPos();
+    matrix.translate(rootRelPos.x() + mPosAnimator->getEffectiveXValueAtRelFrame(relFrame),
+                     rootRelPos.y() + mPosAnimator->getEffectiveYValueAtRelFrame(relFrame));
+
+    matrix.rotate(mRotAnimator->qra_getEffectiveValueAtRelFrame(relFrame) );
+    matrix.scale(mScaleAnimator->getEffectiveXValueAtRelFrame(relFrame),
+                 mScaleAnimator->getEffectiveYValueAtRelFrame(relFrame) );
+    matrix.translate(-rootRelPos.x(), -rootRelPos.y());
+
+    return matrix;
+}

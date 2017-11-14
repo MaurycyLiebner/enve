@@ -114,6 +114,19 @@ signals:
     void combinedTransformChanged();
 };
 
+class Bone;
+class BoneTransformAnimator : public BasicTransformAnimator {
+public:
+    BoneTransformAnimator(Bone *parentBone) {
+        mParentBone = parentBone;
+    }
+
+    QMatrix getCurrentTransformationMatrix();
+    QMatrix getRelativeTransformAtRelFrame(const int &relFrame);
+protected:
+    Bone *mParentBone = NULL;
+};
+
 class BoxTransformAnimator : public BasicTransformAnimator {
 public:
     BoxTransformAnimator(BoundingBox *parent);
