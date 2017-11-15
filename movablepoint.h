@@ -62,6 +62,7 @@ public:
     bool isNodePoint();
     bool isPivotPoint();
     bool isCtrlPoint();
+    bool isBonePoint();
 
     void rotateBy(const qreal &rot);
     void scale(const qreal &scaleXBy, const qreal &scaleYBy);

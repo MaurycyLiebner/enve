@@ -525,16 +525,33 @@ void Canvas::handleLeftButtonMousePress() {
             mLastPressedPoint->startTransform();
         } else if(mCurrentMode == CanvasMode::ADD_BONE) {
             //setCanvasMode(CanvasMode::MOVE_POINT);
-            QSharedPointer<BonesBox> boneBox = (new BonesBox())->ref<BonesBox>();
-            mCurrentBoxesGroup->addContainedBox(boneBox.data());
-            boneBox->setAbsolutePos(mLastMouseEventPosRel, false);
-            clearBoxesSelection();
+            BonePt *bonePt = NULL;
+            if(mLastPressedPoint != NULL) {
+                if(mLastPressedPoint->isBonePoint()) {
+                    bonePt = (BonePt*)mLastPressedPoint;
+                    if(bonePt->getTipBone() == NULL) {
+                        mLastMouseEventPosRel = bonePt->getAbsolutePos();
+                        bonePt = NULL;
+                    }
+                }
+            }
+            Bone *newBone = NULL;
+            if(bonePt == NULL) {
+                QSharedPointer<BonesBox> boneBox = (new BonesBox())->ref<BonesBox>();
+                mCurrentBoxesGroup->addContainedBox(boneBox.data());
+                boneBox->setAbsolutePos(mLastMouseEventPosRel, false);
+                clearBoxesSelection();
+                addBoxToSelection(boneBox.data());
+                newBone = boneBox->getMainBone();
+            } else {
+                Bone *boneT = bonePt->getTipBone();
+                newBone = new Bone(boneT);
+            }
             clearPointsSelection();
-            addBoxToSelection(boneBox.data());
 
-//            mLastPressedPoint = boneBox->getEndPt();
-//            addPointToSelection(mLastPressedPoint);
-//            mLastPressedPoint->startTransform();
+            mLastPressedPoint = newBone->getTipPt();
+            addPointToSelection(mLastPressedPoint);
+            mLastPressedPoint->startTransform();
         }
     } // current mode allows interaction with points
 }
@@ -791,9 +808,9 @@ void Canvas::handleMouseRelease() {
             handleMovePointMouseRelease();
             if(mCurrentMode == CanvasMode::ADD_PARTICLE_BOX) {
                 mCanvasWindow->setCanvasMode(CanvasMode::ADD_PARTICLE_EMITTER);
-            } else if(mCurrentMode == CanvasMode::ADD_BONE) {
+            }/* else if(mCurrentMode == CanvasMode::ADD_BONE) {
                 mCanvasWindow->setCanvasMode(CanvasMode::MOVE_POINT);
-            }
+            }*/
         } else if(isMovingPath()) {
             if(mLastPressedPoint == NULL) {
                 handleMovePathMouseRelease();

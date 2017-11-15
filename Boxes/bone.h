@@ -4,8 +4,8 @@
 class BonePt;
 class Bone : public ComplexAnimator {
 public:
-    Bone(BasicTransformAnimator *parentAnimator,
-         Bone *parentBone = NULL);
+    Bone(BasicTransformAnimator *parentAnimator);
+    Bone(Bone *parentBone);
 
     Bone *getBoneAtRelPos(const QPointF &relPos);
 
@@ -35,7 +35,29 @@ public:
     BonePt *getTipPt();
 
     BonePt *getRootPt();
+
+    MovablePoint *getPointAtAbsPos(const QPointF &absPtPos,
+                                   const qreal &canvasScaleInv);
+
+    void drawSelectedSk(SkCanvas *canvas,
+                        const CanvasMode &currentCanvasMode,
+                        const SkScalar &invScale);
+
+    void addChildBone(Bone *child) {
+        mChildBones << child;
+    }
+
+    void removeChildBone(Bone *child) {
+        mChildBones.removeOne(child);
+    }
+
+    void selectAndAddContainedPointsToList(const QRectF &absRect,
+                                           QList<MovablePoint *> *list);
+    void setParentBone(Bone *parentBone);
+    void clearParentBoneAndSetParentTransformAnimator(
+            BasicTransformAnimator *trans);
 protected:
+    bool mSelected = false;
     BonePt *mTipPt = NULL;
     BonePt *mRootPt = NULL;
 
@@ -43,7 +65,6 @@ protected:
     QPointF mRelRootPos;
     QPointF mRelTipPos;
     BasicTransformAnimator *mTransformAnimator = NULL;
-    BasicTransformAnimator *mParentTransformAnimator = NULL;
     QList<Bone*> mChildBones;
     Bone *mParentBone = NULL;
 };
@@ -92,11 +113,23 @@ public:
         }
     }
 
+    void removeRootBone(Bone *bone) {
+        mRootBones.removeOne(bone);
+    }
+
     void setParentBone(Bone *bone) {
         mParentBone = bone;
         if(bone != NULL) {
             mParent = mParentBone->getTransformAnimator();
         }
+    }
+
+    Bone *getTipBone() {
+        return mTipBone;
+    }
+
+    Bone *getParentBone() {
+        return mParentBone;
     }
 protected:
     Bone *mParentBone = NULL;
@@ -123,6 +156,14 @@ public:
     bool relPointInsidePath(const QPointF &relPos);
 
     bool SWT_isBonesBox() { return true; }
+    Bone *getMainBone() {
+        return mMainBone;
+    }
+
+    void selectAndAddContainedPointsToList(const QRectF &absRect,
+                                           QList<MovablePoint *> *list) {
+        mMainBone->selectAndAddContainedPointsToList(absRect, list);
+    }
 protected:
     Bone *mMainBone = NULL;
 };
